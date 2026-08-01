@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "smoke": "node scripts/smoke.mjs",
-    "sync-flags": "node scripts/sync-flags.mjs"
+    "sync-flags": "node scripts/sync-flags.mjs",
+    "build-rosters": "node scripts/build-rosters.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

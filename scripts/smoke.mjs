@@ -107,6 +107,36 @@ let failures = 0;
   }
 }
 
+// Rosters are generated from a dataset that is not committed, so verify the
+// committed output still builds a legal XI for every nation on the map.
+{
+  const { NATIONS, SQUAD_SIZE, buildTeam, makeRng, teamEff } = await import('../src/data/teams.js');
+  const { ROSTERS } = await import('../src/data/rosters.js');
+  console.log('\n  Squad rosters');
+  try {
+    const rng = makeRng(20260802);
+    const ids = Object.keys(NATIONS);
+    const teams = ids.map(id => buildTeam(id, rng));
+    const realPlayers = teams.reduce((s, t) => s + t.real, 0);
+    const fullyReal = teams.filter(t => t.real >= SQUAD_SIZE).length;
+    const strays = Object.keys(ROSTERS).filter(id => !NATIONS[id]);
+    const overCap = teams.flatMap(t => t.squad).filter(p => p.rating > 99 || p.rating < 1);
+    const ranked = teams.map(t => ({ n: t.name, e: teamEff(t) })).sort((a, b) => b.e - a.e);
+
+    check('every nation fields a full XI', teams.every(t => t.squad.length === SQUAD_SIZE), 'short squad');
+    check('no roster for an unknown nation', strays.length === 0, strays.join(', '));
+    check('every rating is within 1-99', overCap.length === 0, `${overCap.length} outside range`);
+    check('every squad has a keeper', teams.every(t => t.squad.some(p => p.pos === 'GK')), 'missing GK');
+    check('most of the world is real players', realPlayers / (teams.length * SQUAD_SIZE) > 0.6, `${realPlayers}`);
+    check('the strongest nations look right', ['France', 'Spain', 'England', 'Brazil'].every(n => ranked.slice(0, 6).some(r => r.n === n)), ranked.slice(0, 6).map(r => r.n).join(', '));
+    console.log(`    ${fullyReal}/${ids.length} nations field a fully real XI · ${realPlayers}/${teams.length * SQUAD_SIZE} players real (${(100 * realPlayers / (teams.length * SQUAD_SIZE)).toFixed(0)}%)`);
+    console.log(`    strongest: ${ranked.slice(0, 6).map(r => `${r.n} ${r.e}`).join(', ')}`);
+  } catch (e) {
+    failures++;
+    fail(`    ${e.message}`);
+  }
+}
+
 // Flag assets are vendored, so a stale map would 404 silently in the browser.
 {
   const { FLAG_CODES } = await import('../src/data/flags.js');
@@ -146,7 +176,7 @@ for (const scenario of SCENARIOS) {
     check('champion holds the entire map', r.territoriesHeld === r.totalTerritories, `${r.territoriesHeld}/${r.totalTerritories}`);
     check('one player changed shirts per match', r.stealsAllTeams === r.matches, `${r.stealsAllTeams} vs ${r.matches} matches`);
     check('champion took a player per conquest', r.stolenPlayers === r.championConquests, `${r.stolenPlayers} vs ${r.championConquests}`);
-    check('squad grew by the spoils', r.championSquad === 7 + r.championConquests, `${r.championSquad}`);
+    check('squad grew by the spoils', r.championSquad === 11 + r.championConquests, `${r.championSquad}`);
     check('every held territory flies a flag', r.flagFills === r.totalTerritories, `${r.flagFills} fills vs ${r.totalTerritories} territories`);
     check('one flag pattern per territory', r.flagPatterns === r.totalTerritories, `${r.flagPatterns}`);
     check('conquered land flies the conqueror’s flag', r.patternsFlyingChampionFlag === r.territoriesHeld, `${r.patternsFlyingChampionFlag} of ${r.territoriesHeld}`);

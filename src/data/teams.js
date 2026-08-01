@@ -1,5 +1,11 @@
-// Football Imperialism — nation data, ratings, real stars (2026), squad generation
+// Football Imperialism — nation identity and squad building.
 // Keyed by ISO-3166 numeric id (matches world-110m TopoJSON geometry ids). 'KOS' = Kosovo (-99 shape).
+//
+// Squads come from rosters.js, generated from a real EA Sports FC player export.
+// The `stars` field on each NATIONS entry is only a fallback for the handful of
+// nations that have nobody in that dataset.
+
+import { ROSTERS } from './rosters.js';
 
 // Map shapes that field no team of their own but belong to a nation that does.
 // They are annexed and lost along with their parent, and fly the parent's flag,
@@ -245,7 +251,10 @@ export function hashStr(s) {
   return h >>> 0;
 }
 
-const POS_PLAN = ['GK', 'DF', 'DF', 'MF', 'MF', 'FW', 'FW'];
+/** Every nation fields an XI, in a 4-4-2. */
+export const SQUAD_SIZE = 11;
+const FORMATION = { GK: 1, DF: 4, MF: 4, FW: 2 };
+const POS_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
 
 function genPlayer(rng, culture, pos, baseStr) {
   const pool = NAME_POOLS[culture] || NAME_POOLS.eng;
@@ -256,24 +265,43 @@ function genPlayer(rng, culture, pos, baseStr) {
   return { name: f[0] + '. ' + l, pos, rating, gen: true };
 }
 
-// Build a full team object for a campaign
+/**
+ * Build a nation's squad for a campaign.
+ *
+ * Real players are used wherever the dataset has them. Anything it cannot cover
+ * is generated at the confederation's baseline, so a thin nation still fields a
+ * full XI rather than a two-man team. `real` reports how much of the squad came
+ * from actual data.
+ */
 export function buildTeam(id, rng) {
   const rec = NATIONS[id];
   if (!rec) return null;
-  const [name, code, conf, culture, strRaw, colRaw, stars] = rec;
-  const str = strRaw || Math.round(CONF_META[conf].baseStr + (rng() * 10 - 5));
+  const [name, code, conf, culture, strFallback, colRaw, stars] = rec;
   const col = colRaw || `oklch(0.72 0.14 ${Math.floor(hashStr(id) % 360)})`;
+  const roster = ROSTERS[id];
+
   const squad = [];
-  if (stars) for (const [n, pos, r] of stars) squad.push({ name: n, pos, rating: r, gen: false });
-  // fill to 7 following position plan
+  let str;
+  if (roster) {
+    const [rosterStr, , players] = roster;
+    str = rosterStr;
+    for (const [n, pos, rating] of players) squad.push({ name: n, pos, rating, gen: false });
+  } else {
+    str = strFallback || Math.round(CONF_META[conf].baseStr + (rng() * 10 - 5));
+    if (stars) for (const [n, pos, rating] of stars) squad.push({ name: n, pos, rating, gen: false });
+  }
+  const real = squad.length;
+
   const have = p => squad.filter(x => x.pos === p).length;
-  const need = { GK: 1, DF: 2, MF: 2, FW: 2 };
-  for (const p of ['GK', 'DF', 'MF', 'FW']) {
-    while (have(p) < need[p] && squad.length < 7) squad.push(genPlayer(rng, culture, p, str));
+  for (const [pos, count] of Object.entries(FORMATION)) {
+    while (have(pos) < count && squad.length < SQUAD_SIZE) squad.push(genPlayer(rng, culture, pos, str));
   }
   let i = 0;
-  while (squad.length < 7) { squad.push(genPlayer(rng, culture, POS_PLAN[i % 7], str)); i++; }
-  return { id, name, code, conf, culture, str, col, squad, origin: id };
+  while (squad.length < SQUAD_SIZE) {
+    squad.push(genPlayer(rng, culture, POS_PLAN[i % SQUAD_SIZE], str));
+    i++;
+  }
+  return { id, name, code, conf, culture, str, col, squad, real, origin: id };
 }
 
 /** Mean rating across the whole squad, including everyone taken in conquest. */

@@ -4,3 +4,6 @@ dist
 
 # Third-party data drop, not part of the app
 FM26 Season Update*/
+
+# Source dataset for npm run build-rosters (11MB, regenerable)
+data-src/

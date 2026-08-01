@@ -33,17 +33,23 @@ export default function PlayerRow({ player, roomy = false }) {
         {player.pos}
       </span>
       <span
+        // Generated players are dimmed and asterisked: the dataset has no entry
+        // for this nation's shirt, so the name is invented and should not read
+        // as a real footballer.
+        title={player.gen ? 'Generated — no player in the dataset for this shirt' : undefined}
         style={{
           flex: 1,
           fontSize: roomy ? 15 : 14,
           fontWeight: 600,
-          color: C.textList,
+          color: player.gen ? C.textFaint : C.textList,
+          fontStyle: player.gen ? 'italic' : undefined,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}
       >
         {player.name}
+        {player.gen && <span style={{ color: C.textFaded }}>*</span>}
       </span>
       {player.from && (
         <span

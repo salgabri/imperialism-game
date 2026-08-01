@@ -16,6 +16,7 @@ npm run dev         # dev server, prints a localhost URL
 npm run build       # production bundle into dist/
 npm run smoke       # headless: plays campaigns to completion and checks invariants
 npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
+npm run build-rosters # regenerate real squads from an EA FC player CSV
 ```
 
 ## How a campaign plays
@@ -41,6 +42,39 @@ Scroll to zoom (up to 16×, anchored on the pointer), drag to pan, double-click 
 press the zoom readout to reset. The view is clamped to the world, so the map
 cannot be lost off-screen. Borders, labels and markers hold a constant weight on
 screen at every zoom level, and the scale bar re-snaps to a round distance.
+
+## Squads
+
+Every nation fields an XI in a 4-4-2, built from **real players with real
+ratings**. `src/data/rosters.js` is generated from an EA Sports FC player export
+(18,405 players): for each nationality the best available player by overall
+rating fills each slot of the formation, then the squad is topped up to eleven
+with the best remaining players whatever their position — which is what small
+nations do in reality.
+
+Ratings are EA overalls, already on the 1–99 scale (the real top is 91). A
+nation's **strength** is the mean rating across all eleven shirts; slots the
+dataset cannot fill count at the confederation's baseline, so a country with one
+62-rated player doesn't rate alongside a deep squad averaging 62. `teamEff` then
+blends strength with the top five, so star power and depth both count.
+
+The dataset covers players at playable clubs, so coverage is uneven — England has
+1,495 to choose from, Vietnam none. **65% of all shirts in the world are real
+players**, and 79 nations field a fully real XI. Anything the data can't cover is
+generated at the confederation baseline and shown *dimmed and asterisked* in the
+squad list, so an invented name never reads as a real footballer. A nation with
+no keeper in the dataset always has that shirt generated rather than handed to an
+outfielder.
+
+To rebuild after swapping datasets:
+
+```bash
+npm run build-rosters [path/to/players.csv]
+```
+
+The CSV needs `short_name`, `player_positions`, `overall` and `nationality_name`
+columns. It lives in `data-src/` and is not committed (11 MB) — only the 33 KB of
+generated rosters is.
 
 ## Squad economics
 
@@ -102,7 +136,8 @@ src/
   App.jsx              campaign state machine, match flow, view models
   config.js            simulation tunables (drama, upset threshold, labels)
   theme.js             design tokens
-  data/teams.js        170 nations: ratings, real 2026 stars, squad generation
+  data/teams.js        170 nations: identity, squad building
+  data/rosters.js      GENERATED real squads (npm run build-rosters)
   data/flags.js        nation id -> flag asset
   data/capitals.js     capital city coordinates
   hooks/               map zoom and pan viewport
@@ -118,6 +153,7 @@ public/
 scripts/
   smoke.mjs            headless campaign test (jsdom)
   sync-flags.mjs       vendors flag SVGs from flag-icons
+  build-rosters.mjs    builds real squads from an EA FC export
 ```
 
 ### Tuning
