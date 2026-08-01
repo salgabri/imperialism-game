@@ -1,0 +1,18 @@
+body { margin: 0; background: #26364B; overscroll-behavior: none; }
+a { color: #E5A83B; }
+a:hover { color: #F2C230; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #4A6480; border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes fiPulse { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.25; } }
+@keyframes fiDash { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+@keyframes fiFlash { 0% { opacity: 0.05; } 55% { opacity: 1; } 100% { opacity: 1; } }
+@keyframes fiBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+@keyframes fiPop { from { opacity: 0; transform: scale(0.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes fiMarch { to { stroke-dashoffset: -11; } }
+
+/* Hover affordances the design expresses as style-hover */
+.fi-row:hover { background: #33475F; }
+.fi-card:hover { border-color: #3A5A7C !important; }
