@@ -37,6 +37,19 @@ an instant full-time score.
 the war unattended. Speed cycles 1× / 2× / 4×. Progress autosaves after every
 match and is offered back on the setup screen.
 
+Scroll to zoom (up to 16×, anchored on the pointer), drag to pan, double-click or
+press the zoom readout to reset. The view is clamped to the world, so the map
+cannot be lost off-screen. Borders, labels and markers hold a constant weight on
+screen at every zoom level, and the scale bar re-snaps to a round distance.
+
+## Squad economics
+
+Beating a nation takes its best player. The squad panel tracks what that has
+actually done to a side: `EFF` is the best-XI rating and only ever climbs, while
+`AVG` is the whole-squad mean and can *fall* when a strong nation absorbs a weak
+one's best player. Both are shown against their kick-off value, and the power
+table ranks live EFF with the gain since the campaign began.
+
 ## Flags
 
 Territory is filled with its **owner's** flag, so an empire reads as one banner
@@ -59,6 +72,22 @@ numeric code. The SVGs are vendored into `public/flags/` from the MIT-licensed
 [`flag-icons`](https://github.com/lipis/flag-icons) package, so the built app has
 no runtime dependency on it.
 
+## Capitals
+
+Nations are anchored on their **capital city**, not their centre of mass: the
+capital marker, the empire label, the spinner and both ends of an attack vector
+sit on the capital, and empires are therefore measured capital-to-capital.
+
+`src/data/capitals.js` holds lon/lat for all 170. Coastline generalisation at
+110m leaves some real capitals fractionally offshore, so a capital that misses
+its own outline is walked toward the country's centre until it lands; 166 of 170
+anchor on the city itself and the rest fall back to the centroid rather than
+stranding a marker at sea.
+
+Overseas territory is declared in `DEPENDENCIES` in `src/data/teams.js`. It
+fields no team of its own, flies its parent's flag, and is annexed and lost with
+its parent — Greenland goes with Denmark.
+
 ## Targeting rule
 
 A nation may only attack a land neighbour, or strike across the sea at the
@@ -75,6 +104,8 @@ src/
   theme.js             design tokens
   data/teams.js        170 nations: ratings, real 2026 stars, squad generation
   data/flags.js        nation id -> flag asset
+  data/capitals.js     capital city coordinates
+  hooks/               map zoom and pan viewport
   engine/
     geo.js             TopoJSON decode, land adjacency, projection, SVG paths
     match.js           scorelines, scorers, penalty shootouts

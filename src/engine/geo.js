@@ -37,11 +37,20 @@ export function closestPair(aPts, bPts) {
 }
 
 export class WorldGeometry {
-  constructor(topo) {
+  constructor(topo, capitals = {}) {
     const { countries, adjacency } = decodeTopo(topo);
     this.countries = countries;
     /** country id -> Set of ids sharing a land border */
     this.adj = adjacency;
+
+    this.capitals = {};
+    for (const c of this.countries) {
+      const pt = capitals[c.id];
+      if (pt) {
+        const anchored = anchorInside(pt, c.polys);
+        if (anchored) this.capitals[c.id] = anchored;
+      }
+    }
 
     // Lon/lat -> plane is fixed; only the fit transform changes between theatres,
     // so project every ring once and reuse it for each fitTo().
@@ -53,7 +62,7 @@ export class WorldGeometry {
     this.fit = null;
     this.paths = {};
     this.graticule = { d: '', labels: [] };
-    this.scaleBar = { px: 0, label: '' };
+    this.kmPerUnit = 0;
   }
 
   /**
@@ -85,7 +94,8 @@ export class WorldGeometry {
     this.fit = { s, tx, ty };
 
     this.graticule = this.buildGraticule(s, tx, ty);
-    this.scaleBar = buildScaleBar(s);
+    // Ground distance covered by one SVG user unit, for the zoom-aware scale bar.
+    this.kmPerUnit = 7320 / s;
     this.paths = this.buildPaths(s, tx, ty);
     return this;
   }
@@ -155,7 +165,16 @@ export class WorldGeometry {
         }
       }
       if (!bbox) bbox = { x: cx - 2, y: cy - 1.5, w: 4, h: 3 };
-      paths[c.id] = { d, cx, cy, area: bestA, bbox };
+
+      // Prefer the capital as the country's anchor point; the centroid is only
+      // a fallback for shapes with no capital of their own.
+      const cap = this.capitals[c.id];
+      if (cap) {
+        const q = projPt(cap[0], cap[1]);
+        cx = q[0] * s + tx;
+        cy = q[1] * s + ty;
+      }
+      paths[c.id] = { d, cx, cy, area: bestA, bbox, hasCapital: !!cap };
     }
     return paths;
   }
@@ -273,6 +292,59 @@ function ringCentroid(ring) {
   return { area: Math.abs(a), cx: sx / (6 * a), cy: sy / (6 * a) };
 }
 
+/**
+ * Place a capital inside its own country's outline, in lon/lat.
+ *
+ * Coastline generalisation at 110m leaves a lot of real capitals fractionally
+ * offshore — Montevideo, Tripoli, Freetown — so a point that misses is walked
+ * toward the country's centre until it lands. Genuinely off-shape capitals
+ * (Malabo on Bioko, Nassau on New Providence) never land and return null, and
+ * the caller falls back to the centroid rather than stranding a marker at sea.
+ */
+function anchorInside(point, polys) {
+  const rings = polys.map(p => p[0]);
+  const hit = pt => rings.some(ring => pointInRing(pt, ring));
+  if (hit(point)) return point;
+
+  const target = ringCenter(largestRing(rings));
+  if (!target) return null;
+  for (const t of [0.03, 0.07, 0.12, 0.2, 0.3]) {
+    const nudged = [point[0] + (target[0] - point[0]) * t, point[1] + (target[1] - point[1]) * t];
+    if (hit(nudged)) return nudged;
+  }
+  return null;
+}
+
+function largestRing(rings) {
+  let best = null;
+  let bestArea = -1;
+  for (const ring of rings) {
+    const c = ringCentroid(ring);
+    if (c && c.area > bestArea) {
+      bestArea = c.area;
+      best = ring;
+    }
+  }
+  return best;
+}
+
+function ringCenter(ring) {
+  if (!ring) return null;
+  const c = ringCentroid(ring);
+  return c ? [c.cx, c.cy] : null;
+}
+
+/** Even-odd point-in-polygon test, used to validate a capital against its country. */
+function pointInRing([px, py], ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
 /** Axis-aligned bounds of a ring, floored so a sliver still gets a usable tile. */
 function ringBounds(ring) {
   let minX = Infinity;
@@ -288,15 +360,11 @@ function ringBounds(ring) {
   return { x: minX, y: minY, w: Math.max(3, maxX - minX), h: Math.max(2.5, maxY - minY) };
 }
 
-function buildScaleBar(s) {
-  const kmPerPx = 7320 / s;
-  let bestKm = 1000;
-  for (const km of [100, 250, 500, 1000, 2000, 4000]) {
-    const px = km / kmPerPx;
-    if (px >= 55 && px <= 160) {
-      bestKm = km;
-      break;
-    }
-  }
-  return { px: Math.max(30, Math.min(200, Math.round(bestKm / kmPerPx))), label: bestKm + ' KM' };
+const NICE_DISTANCES = [10, 25, 50, 100, 250, 500, 1000, 2000, 4000, 8000];
+
+/** Largest round distance that fits within `maxKm`, for scale-bar labelling. */
+export function niceDistance(maxKm) {
+  let best = NICE_DISTANCES[0];
+  for (const km of NICE_DISTANCES) if (km <= maxKm) best = km;
+  return best;
 }

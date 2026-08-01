@@ -38,6 +38,25 @@ export async function runResumeCheck() {
   await until('campaign running', () => first.app.state.phase === 'playing');
 
   const fielded = first.app.state.aliveIds.length;
+  // Greenland fields no team but should start out Danish.
+  const greenlandAtKickoff = first.app.state.own['304'];
+  const denmarkId = '208';
+
+  // Zoom is viewBox-driven: check the map reframes and clamps to the world.
+  // Locate the map by its flag patterns — the page has other SVGs (the logo,
+  // the pitch watermark) whose viewBox must not be mistaken for the map's.
+  const svg = document.querySelector('pattern[id^="fi-flag-"]').closest('svg');
+  const viewBoxAtRest = svg.getAttribute('viewBox');
+  document.querySelectorAll('button[title="Zoom in"]')[0].click();
+  await sleep(60);
+  const viewBoxZoomed = svg.getAttribute('viewBox');
+  for (let i = 0; i < 12; i++) {
+    document.querySelectorAll('button[title="Zoom out"]')[0].click();
+    await sleep(10);
+  }
+  await sleep(60);
+  const viewBoxClamped = svg.getAttribute('viewBox');
+
   first.app.setState({ speed: 4 });
   first.app.togglePlay();
 
@@ -78,7 +97,18 @@ export async function runResumeCheck() {
   const playableAfterResume = second.app.state.matches > after.matches || !!second.app.state.spin;
   second.root.unmount();
 
-  return { fielded, offeredResume, before, after, playableAfterResume };
+  return {
+    fielded,
+    offeredResume,
+    before,
+    after,
+    playableAfterResume,
+    greenlandStartsDanish: greenlandAtKickoff === denmarkId,
+    greenlandAlwaysHeld: !!greenlandAtKickoff,
+    viewBoxAtRest,
+    viewBoxZoomed,
+    viewBoxClamped,
+  };
 }
 
 export async function run({ scope, pacing, resolution }) {

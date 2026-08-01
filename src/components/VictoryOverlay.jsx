@@ -13,7 +13,22 @@ function Stat({ value, label, color }) {
 }
 
 /** Endgame: one nation, everyone else's best players. */
-export default function VictoryOverlay({ id, round, name, color, subtitle, conquests, steals, territories, squad, onClose, onNew }) {
+export default function VictoryOverlay({
+  id,
+  round,
+  name,
+  color,
+  subtitle,
+  conquests,
+  steals,
+  territories,
+  effNow,
+  effBase,
+  effGain,
+  squad,
+  onClose,
+  onNew,
+}) {
   return (
     <div
       style={{
@@ -53,10 +68,14 @@ export default function VictoryOverlay({ id, round, name, color, subtitle, conqu
           <Stat value={conquests} label="CONQUESTS" color={C.textHi} />
           <Stat value={steals} label="PLAYERS TAKEN" color={C.cyan} />
           <Stat value={territories} label="TERRITORIES" color={C.green} />
+          <Stat value={effGain.text} label="RATING GAINED" color={effGain.color} />
         </div>
 
         <div style={{ fontFamily: FONT.mono, fontSize: 9, letterSpacing: 3, color: C.textMute, margin: '30px 0 10px' }}>
           FINAL SQUAD — BUILT BY CONQUEST
+        </div>
+        <div style={{ fontFamily: FONT.mono, fontSize: 10, color: C.textSoft, marginBottom: 10 }}>
+          KICK-OFF EFF {effBase} → {effNow}
         </div>
         <div style={{ border: `1px solid ${C.lineCard}`, borderRadius: 5, background: C.card, textAlign: 'left' }}>
           {squad.map((p, i) => (

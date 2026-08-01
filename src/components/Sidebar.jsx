@@ -104,10 +104,13 @@ function Power({ rows, onSelect }) {
         {p.name}
       </span>
       <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textMute }}>{p.territories}</span>
-      <span
-        style={{ fontFamily: FONT.mono, fontSize: 13, fontWeight: 700, color: C.textHi, minWidth: 42, textAlign: 'right' }}
-      >
-        {p.eff}
+      <span style={{ textAlign: 'right', minWidth: 42 }}>
+        <span style={{ fontFamily: FONT.mono, fontSize: 13, fontWeight: 700, color: C.textHi, display: 'block' }}>
+          {p.eff}
+        </span>
+        <span style={{ fontFamily: FONT.mono, fontSize: 8.5, fontWeight: 700, color: p.effGain.color, display: 'block' }}>
+          {p.effGain.text}
+        </span>
       </span>
     </div>
   ));
@@ -182,7 +185,36 @@ function Squad({ squad }) {
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontFamily: FONT.mono, fontSize: 17, fontWeight: 700, color: C.textHi }}>{squad.eff}</div>
           <div style={{ fontFamily: FONT.mono, fontSize: 8, color: C.textMute, letterSpacing: 1 }}>EFF</div>
+          <div style={{ fontFamily: FONT.mono, fontSize: 10, fontWeight: 700, color: squad.effGain.color, marginTop: 2 }}>
+            {squad.effGain.text}
+          </div>
         </div>
+      </div>
+
+      {/* What conquest has actually done to the squad. EFF tracks the best XI, so
+          it only ever climbs; the squad average can fall when a big nation
+          absorbs a weak one's best player. */}
+      <div
+        style={{
+          padding: '8px 12px',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 14,
+          borderBottom: `1px solid ${C.lineSoft}`,
+          fontFamily: FONT.mono,
+          fontSize: 9,
+          color: C.textMute,
+          letterSpacing: 0.5,
+        }}
+      >
+        <span>
+          SQUAD <span style={{ color: C.textList, fontWeight: 700 }}>{squad.players.length}</span>
+        </span>
+        <span>
+          AVG <span style={{ color: C.textList, fontWeight: 700 }}>{squad.avg}</span>{' '}
+          <span style={{ color: squad.avgGain.color, fontWeight: 700 }}>{squad.avgGain.text}</span>
+        </span>
+        <span style={{ marginLeft: 'auto', color: C.textFaded, letterSpacing: 1 }}>SINCE KICK-OFF</span>
       </div>
 
       <div

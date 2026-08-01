@@ -1,7 +1,15 @@
 // Football Imperialism — nation data, ratings, real stars (2026), squad generation
 // Keyed by ISO-3166 numeric id (matches world-110m TopoJSON geometry ids). 'KOS' = Kosovo (-99 shape).
 
-export const EXCLUDED_SHAPES = new Set(['010', '260', '238', '304', '732']); // Antarctica, Fr.S.Lands, Falklands, Greenland, W.Sahara
+// Map shapes that field no team of their own but belong to a nation that does.
+// They are annexed and lost along with their parent, and fly the parent's flag,
+// but do not get a capital marker or affect which region a theatre zooms to.
+export const DEPENDENCIES = {
+  '304': { of: '208', name: 'Greenland' }, // Kingdom of Denmark
+};
+
+// Shapes drawn on the map that never belong to anyone.
+export const EXCLUDED_SHAPES = new Set(['010', '260', '238', '732']); // Antarctica, Fr.S.Lands, Falklands, W.Sahara
 
 export const CONF_META = {
   UEFA:      { name: 'Europe (UEFA)',            baseStr: 63 },
@@ -266,6 +274,12 @@ export function buildTeam(id, rng) {
   let i = 0;
   while (squad.length < 7) { squad.push(genPlayer(rng, culture, POS_PLAN[i % 7], str)); i++; }
   return { id, name, code, conf, culture, str, col, squad, origin: id };
+}
+
+/** Mean rating across the whole squad, including everyone taken in conquest. */
+export function squadAverage(team) {
+  if (!team.squad.length) return 0;
+  return Math.round((team.squad.reduce((s, p) => s + p.rating, 0) / team.squad.length) * 10) / 10;
 }
 
 export function teamEff(team) {

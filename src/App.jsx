@@ -1,8 +1,9 @@
 import React from 'react';
 import { CONFIG } from './config.js';
 import { C, FONT, pad3, tint } from './theme.js';
-import { NATIONS, SCOPES, buildTeam, makeRng, teamEff } from './data/teams.js';
+import { DEPENDENCIES, NATIONS, SCOPES, buildTeam, makeRng, squadAverage, teamEff } from './data/teams.js';
 import { flagUrl } from './data/flags.js';
+import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry } from './engine/geo.js';
 import { simulateMatch } from './engine/match.js';
 import {
@@ -26,6 +27,16 @@ const FEED_CAP = 90;
 const BATTLE_SCARS = 7;
 const MS_PER_MINUTE = 46; // ticker pace: a 90-minute match in ~4.2s at 1×
 const DEFAULT_SETUP = { scope: 'world', pacing: 'duel', resolution: 'ticker' };
+
+/** A rating delta as an explicitly signed string, plus the colour to show it in. */
+function signed(delta) {
+  const rounded = Math.round(delta * 10) / 10;
+  if (Math.abs(rounded) < 0.05) return { text: '±0.0', color: C.textFaint };
+  return {
+    text: (rounded > 0 ? '+' : '−') + Math.abs(rounded).toFixed(1),
+    color: rounded > 0 ? C.green : C.red,
+  };
+}
 
 export default class App extends React.Component {
   state = {
@@ -107,7 +118,7 @@ export default class App extends React.Component {
     try {
       const res = await fetch(MAP_URL);
       if (!res.ok) throw new Error('map fetch ' + res.status);
-      this.geo = new WorldGeometry(await res.json());
+      this.geo = new WorldGeometry(await res.json(), CAPITALS);
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
       const saved = loadSave();
@@ -118,7 +129,7 @@ export default class App extends React.Component {
           savedMeta: { round: saved.round, alive: saved.aliveIds.length, scope: saved.settings.scope },
         });
       }
-      this.geo.fitTo(Object.keys(NATIONS));
+      this.fitMap(Object.keys(NATIONS));
       this.setState({ phase: 'setup' });
     } catch (e) {
       this.setState({ err: 'MAP DATA FAILED TO LOAD — ' + String((e && e.message) || e) });
@@ -128,6 +139,15 @@ export default class App extends React.Component {
   /** The read-only view the campaign rules operate on. */
   board(state = this.state) {
     return { geo: this.geo, own: state.own, aliveIds: state.aliveIds };
+  }
+
+  /**
+   * Reframe the map on a set of nations. Bumping the key drops any zoom and pan
+   * the player had applied, which would otherwise point at the old theatre.
+   */
+  fitMap(ids) {
+    this.geo.fitTo(ids);
+    this.viewResetKey = (this.viewResetKey || 0) + 1;
   }
 
   // ---------- campaign lifecycle ----------
@@ -154,8 +174,15 @@ export default class App extends React.Component {
       teams[t.id] = t;
       own[t.id] = t.id; // everyone starts holding exactly their homeland
       stats[t.id] = { conq: 0, steals: [] };
+      // Squad quality at kick-off, so acquisitions can be measured against it.
+      t.baseEff = teamEff(t);
+      t.baseAvg = squadAverage(t);
     }
-    this.geo.fitTo(included.map(t => t.id));
+    // Overseas territory comes with its parent nation, if that nation is playing.
+    for (const [shapeId, dep] of Object.entries(DEPENDENCIES)) {
+      if (teams[dep.of]) own[shapeId] = dep.of;
+    }
+    this.fitMap(included.map(t => t.id));
 
     const scopeName = SCOPES.find(x => x.id === su.scope).name;
     this.setState(
@@ -196,7 +223,7 @@ export default class App extends React.Component {
   resume() {
     const s = this.saved;
     if (!s) return;
-    this.geo.fitTo(Object.keys(s.teams));
+    this.fitMap(Object.keys(s.teams));
     this.setState({
       phase: s.phase === 'victory' ? 'victory' : 'playing',
       settings: s.settings,
@@ -236,7 +263,7 @@ export default class App extends React.Component {
     }
     this.clearTimers();
     this.discardSave();
-    this.geo.fitTo(Object.keys(NATIONS));
+    this.fitMap(Object.keys(NATIONS));
     this.setState({
       phase: 'setup',
       confirmNew: false,
@@ -770,12 +797,7 @@ export default class App extends React.Component {
       if (own[tid] !== tid) continue;
       const p = this.geo.paths[tid];
       if (!p) continue;
-      const { cx: x, cy: y } = p;
-      out.push({
-        id: tid,
-        d: `M${x.toFixed(1)},${(y - 3.6).toFixed(1)}L${(x + 3.6).toFixed(1)},${y.toFixed(1)}L${x.toFixed(1)},${(y + 3.6).toFixed(1)}L${(x - 3.6).toFixed(1)},${y.toFixed(1)}Z`,
-        color: teams[tid] ? teams[tid].col : C.gold,
-      });
+      out.push({ id: tid, x: p.cx, y: p.cy, color: teams[tid] ? teams[tid].col : C.gold });
     }
     return out;
   }
@@ -783,8 +805,17 @@ export default class App extends React.Component {
   tooltip(playing) {
     const { hoverCid, own, teams } = this.state;
     const rec = hoverCid && NATIONS[hoverCid];
-    if (!rec) return { visible: false, name: '', sub: '' };
+    const dep = hoverCid && DEPENDENCIES[hoverCid];
+    if (!rec && !dep) return { visible: false, name: '', sub: '' };
     const ownerId = own[hoverCid];
+    if (dep) {
+      const holder = ownerId ? teams[ownerId] : null;
+      return {
+        visible: true,
+        name: dep.name.toUpperCase(),
+        sub: holder ? 'HELD BY ' + holder.name.toUpperCase() : 'AWAITING CAMPAIGN',
+      };
+    }
     let sub;
     if (ownerId && ownerId !== hoverCid) {
       sub = 'HELD BY ' + (teams[ownerId] ? teams[ownerId].name.toUpperCase() : '?');
@@ -873,6 +904,8 @@ export default class App extends React.Component {
         name: teams[r.tid].name,
         territories: 'T' + r.terr,
         eff: r.eff.toFixed(1),
+        // How much of that rating was bought with conquest rather than born with.
+        effGain: signed(r.eff - (teams[r.tid].baseEff ?? r.eff)),
       }));
   }
 
@@ -890,6 +923,9 @@ export default class App extends React.Component {
       name: team.name,
       meta: team.conf + ' · BASE STR ' + team.str,
       eff: teamEff(team).toFixed(1),
+      effGain: signed(teamEff(team) - (team.baseEff ?? teamEff(team))),
+      avg: squadAverage(team).toFixed(1),
+      avgGain: signed(squadAverage(team) - (team.baseAvg ?? squadAverage(team))),
       territories: String(territories(this.board(), team.id).length),
       conquests: String(s.conq || 0),
       stolen: String((s.steals || []).length),
@@ -927,6 +963,9 @@ export default class App extends React.Component {
       conquests: String(s.conq || 0),
       steals: String((s.steals || []).length),
       territories: String(territories(this.board(), champ.id).length),
+      effNow: teamEff(champ).toFixed(1),
+      effBase: (champ.baseEff ?? teamEff(champ)).toFixed(1),
+      effGain: signed(teamEff(champ) - (champ.baseEff ?? teamEff(champ))),
       squad: champ.squad.slice().sort((a, b) => b.rating - a.rating).slice(0, 11),
     };
   }
@@ -1010,18 +1049,17 @@ export default class App extends React.Component {
             graticule={this.geo ? this.geo.graticule : { d: '', labels: [] }}
             homes={this.mapHomes(playing)}
             battleMarks={(st.battles || []).map((b, i, arr) => ({
-              x1: (b.x - 4).toFixed(1),
-              y1: (b.y - 4).toFixed(1),
-              x2: (b.x + 4).toFixed(1),
-              y2: (b.y + 4).toFixed(1),
+              x: b.x,
+              y: b.y,
               op: (0.25 + 0.65 * ((i + 1) / arr.length)).toFixed(2),
             }))}
             labels={this.mapLabels(playing)}
             attack={st.atk ? { x1: st.atk.x1, y1: st.atk.y1, x2: st.atk.x2, y2: st.atk.y2, color: st.atk.col } : null}
             spin={st.spin ? { x: st.spin.x, y: st.spin.y, angle: st.spin.ang, color: st.teams[st.spin.tid] ? st.teams[st.spin.tid].col : C.gold } : null}
             tooltip={this.tooltip(playing)}
-            scaleBar={this.geo ? this.geo.scaleBar : { px: 0, label: '' }}
+            kmPerUnit={this.geo ? this.geo.kmPerUnit : 0}
             legend={this.legend(playing)}
+            viewResetKey={this.viewResetKey}
             mapRef={this.mapRef}
             svgRef={this.svgRef}
             tipRef={this.tipRef}
@@ -1074,7 +1112,7 @@ export default class App extends React.Component {
             onNew={() => {
               this.clearTimers();
               this.discardSave();
-              this.geo.fitTo(Object.keys(NATIONS));
+              this.fitMap(Object.keys(NATIONS));
               this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null });
             }}
           />

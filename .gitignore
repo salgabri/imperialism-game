@@ -1,3 +1,6 @@
 node_modules
 dist
 .snap
+
+# Third-party data drop, not part of the app
+FM26 Season Update*/

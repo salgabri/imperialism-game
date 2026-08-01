@@ -56,6 +56,11 @@ async function installDom() {
   return dom;
 }
 
+/** Report a failure without tripping the console-warning gate below. */
+function fail(msg) {
+  process.stderr.write(msg + '\n');
+}
+
 function check(label, ok, detail) {
   if (!ok) throw new Error(`FAILED: ${label}${detail ? ' — ' + detail : ''}`);
   console.log(`    ok  ${label}`);
@@ -76,6 +81,32 @@ for (const level of ['error', 'warn']) {
 const entry = await bundle();
 let failures = 0;
 
+// Capitals anchor every marker on the map, and a bad id silently reverts a
+// nation to its centroid, so check the resolution rate rather than trusting it.
+{
+  const { WorldGeometry } = await import('../src/engine/geo.js');
+  const { CAPITALS } = await import('../src/data/capitals.js');
+  const { NATIONS, DEPENDENCIES } = await import('../src/data/teams.js');
+  console.log('\n  Capitals and dependencies');
+  try {
+    const topo = JSON.parse(await readFile(path.join(root, 'public', 'world-110m.v1.json'), 'utf8'));
+    const geo = new WorldGeometry(topo, CAPITALS).fitTo(Object.keys(NATIONS));
+    const ids = Object.keys(NATIONS);
+    const anchored = ids.filter(id => geo.capitals[id]);
+    const unknown = Object.keys(CAPITALS).filter(id => !NATIONS[id] && !DEPENDENCIES[id]);
+    const badDeps = Object.entries(DEPENDENCIES).filter(([shape, d]) => !NATIONS[d.of] || !geo.paths[shape]);
+
+    check('every nation has capital coordinates', ids.every(id => CAPITALS[id]), 'missing entries');
+    check('no capital points at an unknown shape', unknown.length === 0, unknown.join(', '));
+    check('most capitals sit inside their country', anchored.length >= 160, `${anchored.length}/${ids.length}`);
+    check('dependencies name a real nation and shape', badDeps.length === 0, badDeps.map(([s]) => s).join(', '));
+    console.log(`    ${anchored.length}/${ids.length} anchored on their capital, rest on the centroid`);
+  } catch (e) {
+    failures++;
+    fail(`    ${e.message}`);
+  }
+}
+
 // Flag assets are vendored, so a stale map would 404 silently in the browser.
 {
   const { FLAG_CODES } = await import('../src/data/flags.js');
@@ -90,7 +121,7 @@ let failures = 0;
     console.log(`    ${Object.keys(FLAG_CODES).length} nations → ${onDisk.size} flag files`);
   } catch (e) {
     failures++;
-    console.error(`    ${e.message}`);
+    fail(`    ${e.message}`);
   }
 }
 
@@ -127,7 +158,7 @@ for (const scenario of SCENARIOS) {
     if (scenario.pacing === 'duel') check('spinner ran', r.seen.includes('spinner'));
   } catch (e) {
     failures++;
-    console.error(`    ${e.message}`);
+    fail(`    ${e.message}`);
   } finally {
     dom.window.close();
   }
@@ -145,6 +176,9 @@ for (const scenario of SCENARIOS) {
       `(${r.before.matches} matches, ${r.before.alive} alive) · reloaded at round ${r.after.round}`,
     );
     check('whole world fielded', r.fielded === 170, `${r.fielded}`);
+    check('Greenland starts out Danish', r.greenlandStartsDanish, `owner ${r.greenlandAlwaysHeld}`);
+    check('zoom in reframes the map', r.viewBoxZoomed !== r.viewBoxAtRest, r.viewBoxZoomed);
+    check('zoom out clamps back to the world', r.viewBoxClamped === '0 0 960 540', r.viewBoxClamped);
     check('war reduced the field', r.before.alive < r.fielded, `${r.before.alive} of ${r.fielded}`);
     check('reload offered the saved campaign', r.offeredResume);
     check('round restored', r.after.round === r.before.round, `${r.after.round} vs ${r.before.round}`);
@@ -154,7 +188,7 @@ for (const scenario of SCENARIOS) {
     check('campaign playable after reload', r.playableAfterResume);
   } catch (e) {
     failures++;
-    console.error(`    ${e.message}`);
+    fail(`    ${e.message}`);
   } finally {
     dom.window.close();
   }
@@ -164,8 +198,8 @@ await rm(outDir, { recursive: true, force: true });
 
 if (consoleIssues.length) {
   failures++;
-  console.error(`\n  ${consoleIssues.length} console error(s)/warning(s) during render:`);
-  for (const issue of [...new Set(consoleIssues)].slice(0, 10)) console.error(`    ${issue}`);
+  fail(`\n  ${consoleIssues.length} console error(s)/warning(s) during render:`);
+  for (const issue of [...new Set(consoleIssues)].slice(0, 10)) fail(`    ${issue}`);
 }
 
 console.log(failures ? `\n${failures} check group(s) failed\n` : '\nAll scenarios passed, no console warnings\n');
