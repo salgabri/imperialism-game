@@ -10,7 +10,8 @@
     "smoke": "node scripts/smoke.mjs",
     "sync-flags": "node scripts/sync-flags.mjs",
     "build-rosters": "node scripts/build-rosters.mjs",
-    "build-basketball": "node scripts/build-basketball.mjs"
+    "build-basketball": "node scripts/build-basketball.mjs",
+    "build-clubs": "node scripts/build-clubs.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

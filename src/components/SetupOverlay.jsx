@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { C, FONT } from '../theme.js';
 import { NATIONS, SCOPES } from '../data/teams.js';
 import { SPORT_LIST, getSport } from '../sports/index.js';
+import { CLUB_SCOPES } from '../data/scopes.js';
 
 const PACING = [
   ['duel', 'ONE BY ONE', 'A spinner picks an attacker and a direction. One dramatic duel per round.'],
@@ -66,6 +67,8 @@ export default function SetupOverlay({ setup, hasSave, savedText, onResume, onDi
     return counts;
   }, []);
   const sport = getSport(setup.sport);
+  const clubLayer = setup.layer === 'clubs';
+  const clubScopes = useMemo(() => CLUB_SCOPES(sport), [sport]);
 
   return (
     <div
@@ -163,28 +166,57 @@ export default function SetupOverlay({ setup, hasSave, savedText, onResume, onDi
           ))}
         </Grid>
 
-        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>02 · SELECT THEATRE</div>
-        <Grid min={200}>
-          {SCOPES.map(s => (
-            <Card
-              key={s.id}
-              selected={setup.scope === s.id}
-              onPick={() => onPick('scope', s.id)}
-              name={s.name.toUpperCase()}
-              desc={s.desc}
-              count={scopeCounts[s.id]}
-            />
-          ))}
+        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>02 · WHO FIGHTS</div>
+        <Grid min={240}>
+          <Card
+            selected={setup.layer === 'nations'}
+            onPick={() => onPick('layer', 'nations')}
+            name="NATIONS"
+            desc="National teams contest the map, each starting on its own homeland."
+            count={`${Object.keys(sport.rosters).length} REAL SQUADS`}
+          />
+          <Card
+            selected={setup.layer === 'clubs'}
+            onPick={() => onPick('layer', 'clubs')}
+            name="CLUBS"
+            desc="Domestic-league clubs fight for the world instead. Each is dealt the nearest free country to its home, then expands by conquest."
+            count={`${sport.clubs.length} CLUBS`}
+          />
         </Grid>
 
-        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>03 · PACING</div>
+        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>03 · SELECT THEATRE</div>
+        <Grid min={200}>
+          {clubLayer
+            ? clubScopes.map(s => (
+                <Card
+                  key={s.id}
+                  selected={setup.clubScope === s.id}
+                  onPick={() => onPick('clubScope', s.id)}
+                  name={s.name.toUpperCase()}
+                  desc={s.desc}
+                  count={`${sport.clubs.filter(s.filter).length} CLUBS`}
+                />
+              ))
+            : SCOPES.map(s => (
+                <Card
+                  key={s.id}
+                  selected={setup.scope === s.id}
+                  onPick={() => onPick('scope', s.id)}
+                  name={s.name.toUpperCase()}
+                  desc={s.desc}
+                  count={scopeCounts[s.id]}
+                />
+              ))}
+        </Grid>
+
+        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>04 · PACING</div>
         <Grid min={240}>
           {PACING.map(([id, name, desc]) => (
             <Card key={id} selected={setup.pacing === id} onPick={() => onPick('pacing', id)} name={name} desc={desc} />
           ))}
         </Grid>
 
-        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>04 · MATCH RESOLUTION</div>
+        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>05 · MATCH RESOLUTION</div>
         <Grid min={240}>
           {resolutionCards(sport).map(([id, name, desc]) => (
             <Card

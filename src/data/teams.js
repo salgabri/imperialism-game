@@ -298,7 +298,39 @@ export function buildTeam(id, rng, sport) {
     squad.push(genPlayer(rng, culture, positionPlan[i % squadSize], str));
     i++;
   }
-  return { id, name, code, conf, culture, str, col, squad, real, sport: sport.id, origin: id };
+  return {
+    id, name, code, conf, culture, str, col, squad, real,
+    kind: 'nation',
+    /** The map shape this combatant is seeded from — its homeland. */
+    home: id,
+    /** Nations fly a flag; clubs do not. */
+    flagId: id,
+    sport: sport.id,
+    origin: id,
+  };
+}
+
+/**
+ * Wrap a club as a combatant. Clubs field a fixed real lineup, so unlike nations
+ * there is nothing to generate — the dataset either has the club or it does not.
+ */
+export function buildClub(club, sport) {
+  return {
+    id: club.id,
+    name: club.name,
+    code: club.code,
+    conf: club.league,
+    culture: null,
+    str: club.str,
+    col: club.col,
+    squad: club.squad.map(([name, pos, rating]) => ({ name, pos, rating, gen: false })),
+    real: club.squad.length,
+    kind: 'club',
+    home: club.country,
+    flagId: null,
+    sport: sport.id,
+    origin: club.id,
+  };
 }
 
 /** Mean rating across the whole squad, including everyone taken in conquest. */

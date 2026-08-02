@@ -17,6 +17,8 @@ const SCENARIOS = [
   { name: 'N. & C. America · chaos · instant', scope: 'CONCACAF', pacing: 'chaos', resolution: 'instant' },
   { name: 'BASKETBALL · South America · duel · ticker', sport: 'basketball', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
   { name: 'BASKETBALL · Europe · blitz · instant', sport: 'basketball', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
+  { name: 'CLUBS · Premier League · blitz · instant', layer: 'clubs', clubScope: 'Premier League', pacing: 'blitz', resolution: 'instant' },
+  { name: 'CLUBS · NBA · chaos · instant', sport: 'basketball', layer: 'clubs', clubScope: 'NBA', pacing: 'chaos', resolution: 'instant' },
 ];
 
 async function bundle() {
@@ -145,6 +147,60 @@ let failures = 0;
     }
   }
 
+  // Clubs are combatants too, so they need the same guarantees a nation has.
+  const { buildClub } = await import('../src/data/teams.js');
+  const { CLUB_SCOPES } = await import('../src/data/scopes.js');
+  for (const sport of SPORT_LIST) {
+    console.log(`\n  Club layer — ${sport.name}`);
+    try {
+      const clubs = sport.clubs.map(c => buildClub(c, sport));
+      const codes = clubs.map(c => c.code);
+      const leagues = [...new Set(sport.clubs.map(c => c.league))];
+      const scopes = CLUB_SCOPES(sport);
+      const badHome = clubs.filter(c => !NATIONS[c.home]);
+      const outOfRange = clubs.flatMap(c => c.squad).filter(p => p.rating > 99 || p.rating < 1);
+      const badPos = clubs.flatMap(c => c.squad).filter(p => !sport.positionColors[p.pos]);
+
+      check('every club fields a full lineup', clubs.every(c => c.squad.length === sport.squadSize), 'short lineup');
+      check('club codes are unique', new Set(codes).size === codes.length, `${codes.length - new Set(codes).size} duplicates`);
+      check('every club has a real home country', badHome.length === 0, badHome.map(c => c.name).join(', '));
+      check('every club rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
+      check('every club position belongs to this sport', badPos.length === 0, [...new Set(badPos.map(p => p.pos))].join(', '));
+      check('every league is selectable as a theatre', leagues.every(l => scopes.some(s => s.id === l)), 'missing scope');
+      check('clubs carry no flag', clubs.every(c => c.flagId === null), 'club has a flagId');
+
+      const ranked = clubs.slice().sort((a, b) => b.str - a.str);
+      console.log(`    ${clubs.length} clubs · ${leagues.length} league(s): ${leagues.join(', ')}`);
+      console.log(`    strongest: ${ranked.slice(0, 5).map(c => `${c.name} ${c.str}`).join(', ')}`);
+    } catch (e) {
+      failures++;
+      fail(`    ${e.message}`);
+    }
+  }
+
+  // Seeding must give every club a foothold, without ever double-booking a country.
+  {
+    const { WorldGeometry } = await import('../src/engine/geo.js');
+    const { CAPITALS } = await import('../src/data/capitals.js');
+    const { seedClubs } = await import('../src/engine/campaign.js');
+    console.log('\n  Club seeding');
+    try {
+      const topo = JSON.parse(await readFile(path.join(root, 'public', 'world-110m.v1.json'), 'utf8'));
+      const geo = new WorldGeometry(topo, CAPITALS).fitTo(Object.keys(NATIONS));
+      for (const sport of SPORT_LIST) {
+        const clubs = sport.clubs.map(c => buildClub(c, sport));
+        const own = seedClubs(geo, clubs);
+        const seeded = new Set(Object.values(own));
+        const countries = Object.keys(own);
+        check(`${sport.name}: every club gets exactly one country`, seeded.size === clubs.length && countries.length === clubs.length, `${seeded.size} clubs on ${countries.length} shapes`);
+        check(`${sport.name}: the best club in each league takes its homeland`, [...new Set(clubs.map(c => c.home))].every(home => own[home] !== undefined), 'a homeland went unclaimed');
+      }
+    } catch (e) {
+      failures++;
+      fail(`    ${e.message}`);
+    }
+  }
+
   // The match model must produce sane scorelines and always separate the teams.
   for (const sport of SPORT_LIST) {
     console.log(`\n  Match model — ${sport.name}`);
@@ -214,9 +270,14 @@ for (const scenario of SCENARIOS) {
     check('one player changed shirts per match', r.stealsAllTeams === r.matches, `${r.stealsAllTeams} vs ${r.matches} matches`);
     check('champion took a player per conquest', r.stolenPlayers === r.championConquests, `${r.stolenPlayers} vs ${r.championConquests}`);
     check('squad grew by the spoils', r.championSquad === r.squadSize + r.championConquests, `${r.championSquad}`);
-    check('every held territory flies a flag', r.flagFills === r.totalTerritories, `${r.flagFills} fills vs ${r.totalTerritories} territories`);
-    check('one flag pattern per territory', r.flagPatterns === r.totalTerritories, `${r.flagPatterns}`);
-    check('conquered land flies the conqueror’s flag', r.patternsFlyingChampionFlag === r.territoriesHeld, `${r.patternsFlyingChampionFlag} of ${r.territoriesHeld}`);
+    if (r.layer === 'clubs') {
+      check('clubs paint territory rather than flying flags', r.flagPatterns === 0, `${r.flagPatterns} flag patterns`);
+      check('conquered land shows the conqueror’s colour', r.championFill === r.territoriesHeld, `${r.championFill} of ${r.territoriesHeld}`);
+    } else {
+      check('every held territory flies a flag', r.flagFills === r.totalTerritories, `${r.flagFills} fills vs ${r.totalTerritories} territories`);
+      check('one flag pattern per territory', r.flagPatterns === r.totalTerritories, `${r.flagPatterns}`);
+      check('conquered land flies the conqueror’s flag', r.patternsFlyingChampionFlag === r.territoriesHeld, `${r.patternsFlyingChampionFlag} of ${r.territoriesHeld}`);
+    }
     check('victory screen rendered', r.victoryScreen);
     check('campaign autosaved', r.saveWritten);
     check('feed logged the war', r.logEntries > r.matches);

@@ -1,5 +1,6 @@
 import { C } from '../theme.js';
 import { ROSTERS } from '../data/rosters.basketball.js';
+import { CLUBS } from '../data/clubs.basketball.js';
 import { clamp, gauss, pickScorer } from '../engine/random.js';
 
 const MINUTES = 40; // FIBA: four ten-minute quarters
@@ -32,6 +33,7 @@ export const basketball = {
   name: 'Basketball',
   blurb: 'Starting fives, forty minutes. Scores in the eighties — level games go to overtime.',
   rosters: ROSTERS,
+  clubs: CLUBS,
 
   squadSize: 5,
   formation: { PG: 1, SG: 1, SF: 1, PF: 1, C: 1 },

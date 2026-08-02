@@ -1,5 +1,6 @@
 import { C } from '../theme.js';
 import { ROSTERS } from '../data/rosters.js';
+import { CLUBS } from '../data/clubs.football.js';
 import { clamp, gauss, minuteSampler, pickScorer, poisson } from '../engine/random.js';
 
 const MINUTES = 90;
@@ -41,6 +42,7 @@ export const football = {
   name: 'Football',
   blurb: 'Eleven a side, ninety minutes. Low scores, high drama — level games go to penalties.',
   rosters: ROSTERS,
+  clubs: CLUBS,
 
   squadSize: 11,
   formation: { GK: 1, DF: 4, MF: 4, FW: 2 },

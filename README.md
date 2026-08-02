@@ -11,10 +11,16 @@ Pick your sport at kick-off:
 | Football | XI in a 4-4-2 | 90 minutes | penalty shootout |
 | Basketball | starting five | 40 minutes | overtime periods |
 
+And pick who fights:
+
+- **Nations** — 170 national teams, each starting on its own homeland.
+- **Clubs** — 133 football clubs from six European leagues, or all 30 NBA
+  franchises. Real Madrid annexes territory exactly the way Spain does.
+
 Everything outside the match — territory, the spinner, targeting, conquest,
-autosave, the map — is sport-agnostic. A sport supplies its own roster data,
-lineup shape, match model and vocabulary from `src/sports/`; adding a third is a
-single module and a roster file.
+autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
+data, lineup shape, match model and vocabulary from `src/sports/`; adding a third
+is a single module and a roster file.
 
 Implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -30,6 +36,7 @@ npm run smoke       # headless: plays campaigns to completion and checks invaria
 npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
 npm run build-basketball # regenerate basketball squads from an NBA 2K export
+npm run build-clubs      # regenerate the club layer for both sports
 ```
 
 ## How a campaign plays
@@ -107,6 +114,31 @@ The football CSV needs `short_name`, `player_positions`, `overall` and
 `nationality_name` columns. Sources live in `data-src/` and are not committed
 (11 MB) — only the generated rosters are.
 
+## The club layer
+
+A club is a combatant with the same shape as a nation — id, code, colour,
+strength, lineup — so every rule already in the game applies unchanged.
+
+The one problem clubs create is territory. Twenty Premier League sides share one
+homeland, and the map has no sub-national shapes to split. So clubs are **dealt**
+onto it: working down the strength order, each club claims the nearest country to
+its homeland that nobody has taken. The best club in each league gets the
+homeland itself and the rest fan outwards, which is why an all-leagues campaign
+opens with Europe carved up and the strongest sides at its centre. Countries
+nobody reaches stay neutral, exactly as non-participating nations do.
+
+Clubs have no crest in either dataset, so their territory is painted in a
+generated colour rather than a flag — 133 identical English flags would tell you
+nothing. Everything else (capital markers, the power table, squad panels,
+conquest, player theft) behaves identically.
+
+Club lineups come from the same two exports as the national squads:
+`clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
+`clubs.basketball.js` from the NBA 2K export. 2K carries no position, so each
+player's role is inferred from the attributes that define it — a centre by
+interior defence, rebounding and post play; a point guard by vision, handle and
+speed with the ball.
+
 ## Squad economics
 
 Beating a nation takes its best player. The squad panel tracks what that has
@@ -173,6 +205,9 @@ src/
   data/teams.js        170 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
+  data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
+  data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
+  data/scopes.js       club theatre choices (per league, all, elite)
   data/flags.js        nation id -> flag asset
   data/capitals.js     capital city coordinates
   hooks/               map zoom and pan viewport
@@ -190,6 +225,7 @@ scripts/
   sync-flags.mjs       vendors flag SVGs from flag-icons
   build-rosters.mjs    builds football squads from an EA FC export
   build-basketball.mjs builds FIBA fives from NBA 2K + fiba-squads.json
+  build-clubs.mjs      builds the club layer for both sports
 ```
 
 ### Tuning

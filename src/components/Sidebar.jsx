@@ -74,7 +74,7 @@ function Power({ rows, onSelect }) {
       }}
     >
       <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, minWidth: 22 }}>{p.rank}</span>
-      <Flag nationId={p.tid} width={20} />
+      <Flag nationId={p.flagId} width={20} />
       <span
         style={{
           minWidth: 36,

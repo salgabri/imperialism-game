@@ -111,7 +111,7 @@ export async function runResumeCheck() {
   };
 }
 
-export async function run({ sport = 'football', scope, pacing, resolution }) {
+export async function run({ sport = 'football', layer = 'nations', scope, clubScope, pacing, resolution }) {
   const seen = new Set();
   let app = null;
   createRoot(document.getElementById('root')).render(
@@ -121,7 +121,7 @@ export async function run({ sport = 'football', scope, pacing, resolution }) {
   await until('map + setup screen', () => text().includes('LAUNCH CAMPAIGN'));
   const nations = app.geo.countries.length;
 
-  app.setState({ setup: { sport, scope, pacing, resolution } });
+  app.setState({ setup: { sport, layer, scope, clubScope, pacing, resolution } });
   await sleep(50);
   app.startCampaign();
   await until('campaign running', () => app.state.phase === 'playing');
@@ -155,6 +155,9 @@ export async function run({ sport = 'football', scope, pacing, resolution }) {
       .map(p => p.id),
   );
   const flagFills = [...document.querySelectorAll('path[fill^="url(#fi-flag-"]')].length;
+  // Clubs have no crest in the data, so their territory is a flat colour instead.
+  // Scope to the country layer: the homeland marker is drawn in the same colour.
+  const championFill = [...document.querySelectorAll('g[filter] path[fill]')].filter(p => p.getAttribute('fill') === champion.col).length;
   const championConquests = app.state.stats[champion.id].conq;
   // Across the whole field, one player changes shirts per match played.
   const stealsAllTeams = Object.values(app.state.stats).reduce((n, s) => n + s.steals.length, 0);
@@ -183,7 +186,9 @@ export async function run({ sport = 'football', scope, pacing, resolution }) {
     conquestsAllTeams,
     territoriesHeld: owned,
     totalTerritories: Object.keys(app.state.own).length,
+    layer,
     flagPatterns: patterns.length,
+    championFill,
     flagFills,
     patternsFlyingChampionFlag: championFlag.size,
     logEntries: app.state.log.length,

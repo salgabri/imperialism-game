@@ -5,6 +5,42 @@
 
 import { closestPair } from './geo.js';
 
+/**
+ * Seed clubs onto the map.
+ *
+ * A club has a home country but shares it with every rival in its league, so
+ * they cannot all start there. Working down the strength order, each club claims
+ * the nearest country to its homeland that nobody has taken yet: the best club
+ * in each league gets the homeland itself, and the rest fan outwards. Countries
+ * nobody reaches stay neutral, exactly as non-participating nations do.
+ */
+export function seedClubs(geo, clubs) {
+  const own = {};
+  const anchorOf = id => {
+    const p = geo.paths[id];
+    return p ? [p.cx, p.cy] : null;
+  };
+  const available = Object.keys(geo.paths).filter(id => anchorOf(id));
+
+  for (const club of clubs.slice().sort((a, b) => b.str - a.str)) {
+    const from = anchorOf(club.home);
+    if (!from) continue;
+    let best = null;
+    let bestDist = Infinity;
+    for (const cid of available) {
+      if (own[cid]) continue;
+      const to = anchorOf(cid);
+      const d = (to[0] - from[0]) ** 2 + (to[1] - from[1]) ** 2;
+      if (d < bestDist) {
+        bestDist = d;
+        best = cid;
+      }
+    }
+    if (best) own[best] = club.id;
+  }
+  return own;
+}
+
 /** Country ids currently held by an empire. */
 export function territories(board, tid) {
   const out = [];

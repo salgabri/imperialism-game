@@ -1,7 +1,8 @@
 import React from 'react';
 import { CONFIG } from './config.js';
 import { C, FONT, pad3, tint } from './theme.js';
-import { DEPENDENCIES, NATIONS, SCOPES, buildTeam, makeRng, squadAverage, teamEff } from './data/teams.js';
+import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, squadAverage, teamEff } from './data/teams.js';
+import { CLUB_SCOPES } from './data/scopes.js';
 import { flagUrl } from './data/flags.js';
 import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry } from './engine/geo.js';
@@ -11,6 +12,7 @@ import {
   drawChaosPairs,
   empireCenter,
   pickTarget,
+  seedClubs,
   territories,
 } from './engine/campaign.js';
 import { clearSave, loadSave, writeSave } from './engine/storage.js';
@@ -25,7 +27,7 @@ const MAP_URL = `${import.meta.env.BASE_URL}world-110m.v1.json`;
 const LOG_CAP = 220;
 const FEED_CAP = 90;
 const BATTLE_SCARS = 7;
-const DEFAULT_SETUP = { sport: DEFAULT_SPORT, scope: 'world', pacing: 'duel', resolution: 'ticker' };
+const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'world', clubScope: 'all', pacing: 'duel', resolution: 'ticker' };
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
 function signed(delta) {
@@ -157,34 +159,49 @@ export default class App extends React.Component {
     this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
     const sport = getSport(su.sport);
-    const all = Object.keys(NATIONS).map(id => buildTeam(id, this.rng, sport));
+    const clubLayer = su.layer === 'clubs';
+
     let included;
-    if (su.scope === 'world') {
-      included = all;
-    } else if (su.scope === 'elite') {
-      included = all.slice().sort((a, b) => b.str - a.str || teamEff(b) - teamEff(a)).slice(0, 32);
+    let own = {};
+    let scopeName;
+
+    if (clubLayer) {
+      const scope = CLUB_SCOPES(sport).find(x => x.id === su.clubScope) || CLUB_SCOPES(sport)[0];
+      included = sport.clubs.filter(scope.filter).map(c => buildClub(c, sport));
+      scopeName = scope.name;
+      // Clubs share a homeland with their league rivals, so the map is dealt out
+      // by proximity rather than one shape per combatant.
+      own = seedClubs(this.geo, included);
+      included = included.filter(c => Object.values(own).includes(c.id));
     } else {
-      included = all.filter(SCOPES.find(x => x.id === su.scope).filter);
+      const all = Object.keys(NATIONS).map(id => buildTeam(id, this.rng, sport));
+      if (su.scope === 'world') {
+        included = all;
+      } else if (su.scope === 'elite') {
+        included = all.slice().sort((a, b) => b.str - a.str || teamEff(b) - teamEff(a)).slice(0, 32);
+      } else {
+        included = all.filter(SCOPES.find(x => x.id === su.scope).filter);
+      }
+      for (const t of included) own[t.id] = t.id; // everyone starts on its homeland
+      scopeName = SCOPES.find(x => x.id === su.scope).name;
     }
 
     const teams = {};
-    const own = {};
     const stats = {};
     for (const t of included) {
       teams[t.id] = t;
-      own[t.id] = t.id; // everyone starts holding exactly their homeland
       stats[t.id] = { conq: 0, steals: [] };
       // Squad quality at kick-off, so acquisitions can be measured against it.
       t.baseEff = teamEff(t);
       t.baseAvg = squadAverage(t);
     }
-    // Overseas territory comes with its parent nation, if that nation is playing.
-    for (const [shapeId, dep] of Object.entries(DEPENDENCIES)) {
-      if (teams[dep.of]) own[shapeId] = dep.of;
+    if (!clubLayer) {
+      // Overseas territory comes with its parent nation, if that nation is playing.
+      for (const [shapeId, dep] of Object.entries(DEPENDENCIES)) {
+        if (teams[dep.of]) own[shapeId] = dep.of;
+      }
     }
-    this.fitMap(included.map(t => t.id));
-
-    const scopeName = SCOPES.find(x => x.id === su.scope).name;
+    this.fitMap(Object.keys(own));
     this.setState(
       {
         phase: 'playing',
@@ -211,7 +228,7 @@ export default class App extends React.Component {
           {
             t: 'sys',
             r: 0,
-            txt: 'CAMPAIGN START — ' + included.length + ' NATIONS · THEATRE: ' + scopeName.toUpperCase(),
+            txt: 'CAMPAIGN START — ' + included.length + (clubLayer ? ' CLUBS' : ' NATIONS') + ' · THEATRE: ' + scopeName.toUpperCase(),
             chip: C.textMute,
           },
         ],
@@ -223,7 +240,7 @@ export default class App extends React.Component {
   resume() {
     const s = this.saved;
     if (!s) return;
-    this.fitMap(Object.keys(s.teams));
+    this.fitMap(Object.keys(s.own));
     this.setState({
       phase: s.phase === 'victory' ? 'victory' : 'playing',
       settings: s.settings,
@@ -433,8 +450,8 @@ export default class App extends React.Component {
       {
         kind: 'vs',
         label: 'ROUND ' + st.round + ' — ' + a.name.toUpperCase() + ' ATTACKS ' + d.name.toUpperCase(),
-        aId: a.id,
-        bId: d.id,
+        aId: a.flagId,
+        bId: d.flagId,
         aCode: a.code,
         aCol: a.col,
         aName: a.name,
@@ -664,10 +681,10 @@ export default class App extends React.Component {
                 sName: stolen.name,
                 sMeta: 'RATING ' + stolen.rating + ' · ' + stolen.pos,
                 sFrom: L.code,
-                sFromId: L.id,
+                sFromId: L.flagId,
                 sFromCol: L.col,
                 sTo: W.code,
-                sToId: W.id,
+                sToId: W.flagId,
                 sToCol: W.col,
                 sSub: 'JOINS ' + W.name.toUpperCase(),
               },
@@ -775,7 +792,7 @@ export default class App extends React.Component {
       const ownerId = own[c.id];
       const owner = ownerId ? teams[ownerId] : null;
       const isSelected = owner && selected === ownerId;
-      const flag = owner ? flagUrl(owner.id) : null;
+      const flag = owner && owner.flagId ? flagUrl(owner.flagId) : null;
       if (flag) flagPatterns.push({ id: c.id, url: flag, color: owner.col, bbox: p.bbox });
 
       const unclaimedShade = (parseInt(c.id, 10) || c.id.charCodeAt(0)) % 2 ? C.landA : C.landB;
@@ -815,8 +832,9 @@ export default class App extends React.Component {
     if (!playing || !this.geo) return [];
     const out = [];
     for (const tid of aliveIds) {
-      if (own[tid] !== tid) continue;
-      const p = this.geo.paths[tid];
+      const team = teams[tid];
+      if (!team || own[team.home] !== tid) continue;
+      const p = this.geo.paths[team.home];
       if (!p) continue;
       out.push({ id: tid, x: p.cx, y: p.cy, color: teams[tid] ? teams[tid].col : C.gold });
     }
@@ -884,8 +902,8 @@ export default class App extends React.Component {
       statusColor: m.done ? C.textMute : m.status === sport.labels.tie ? C.gold : C.green,
       statusLive: !m.done,
       startLabel: sport.labels.start,
-      a: { id: A.id, code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), score: m.ga },
-      b: { id: B.id, code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), score: m.gd },
+      a: { id: A.flagId, code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), score: m.ga },
+      b: { id: B.flagId, code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), score: m.gd },
       // Only a shootout reveals kick by kick; overtime plays out through the feed.
       kicks: m.tieShown ? { a: m.tieShown.A, b: m.tieShown.D } : null,
       events: m.shown.map(e => {
@@ -922,6 +940,7 @@ export default class App extends React.Component {
       .sort((a, b) => b.eff - a.eff)
       .map((r, i) => ({
         tid: r.tid,
+        flagId: teams[r.tid].flagId,
         rank: pad3(i + 1).slice(-2),
         code: teams[r.tid].code,
         color: teams[r.tid].col,
@@ -941,7 +960,7 @@ export default class App extends React.Component {
     const fell = fallen.find(f => f.id === team.id);
     const s = stats[team.id] || { conq: 0, steals: [] };
     return {
-      id: team.id,
+      id: team.flagId,
       color: team.col,
       code: team.code,
       name: team.name,
@@ -977,7 +996,7 @@ export default class App extends React.Component {
     const s = stats[champ.id] || { conq: 0, steals: [] };
     const scope = SCOPES.find(x => x.id === settings.scope);
     return {
-      id: champ.id,
+      id: champ.flagId,
       round: pad3(round),
       name: champ.name.toUpperCase(),
       color: champ.col,
