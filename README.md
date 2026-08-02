@@ -99,7 +99,8 @@ to an outfielder.
 To rebuild after swapping datasets:
 
 ```bash
-npm run build-rosters [path/to/players.csv]
+npm run build-rosters [path/to/players.csv]   # football
+npm run build-basketball                     # basketball
 ```
 
 The football CSV needs `short_name`, `player_positions`, `overall` and
