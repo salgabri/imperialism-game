@@ -45,6 +45,7 @@ function Segmented({ options, value, onChange }) {
 
 export default function CommandBar({
   show,
+  title,
   scopeName,
   round,
   alive,
@@ -93,7 +94,7 @@ export default function CommandBar({
             color: C.textHi,
           }}
         >
-          FOOTBALL IMPERIALISM
+          {title}
         </span>
         <span
           style={{

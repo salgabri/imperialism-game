@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "smoke": "node scripts/smoke.mjs",
     "sync-flags": "node scripts/sync-flags.mjs",
-    "build-rosters": "node scripts/build-rosters.mjs"
+    "build-rosters": "node scripts/build-rosters.mjs",
+    "build-basketball": "node scripts/build-basketball.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

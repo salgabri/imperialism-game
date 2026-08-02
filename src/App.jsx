@@ -5,7 +5,7 @@ import { DEPENDENCIES, NATIONS, SCOPES, buildTeam, makeRng, squadAverage, teamEf
 import { flagUrl } from './data/flags.js';
 import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry } from './engine/geo.js';
-import { simulateMatch } from './engine/match.js';
+import { getSport, DEFAULT_SPORT } from './sports/index.js';
 import {
   drawBlitzPairs,
   drawChaosPairs,
@@ -25,8 +25,7 @@ const MAP_URL = `${import.meta.env.BASE_URL}world-110m.v1.json`;
 const LOG_CAP = 220;
 const FEED_CAP = 90;
 const BATTLE_SCARS = 7;
-const MS_PER_MINUTE = 46; // ticker pace: a 90-minute match in ~4.2s at 1×
-const DEFAULT_SETUP = { scope: 'world', pacing: 'duel', resolution: 'ticker' };
+const DEFAULT_SETUP = { sport: DEFAULT_SPORT, scope: 'world', pacing: 'duel', resolution: 'ticker' };
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
 function signed(delta) {
@@ -157,7 +156,8 @@ export default class App extends React.Component {
     const su = this.state.setup;
     this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
-    const all = Object.keys(NATIONS).map(id => buildTeam(id, this.rng));
+    const sport = getSport(su.sport);
+    const all = Object.keys(NATIONS).map(id => buildTeam(id, this.rng, sport));
     let included;
     if (su.scope === 'world') {
       included = all;
@@ -402,23 +402,26 @@ export default class App extends React.Component {
     const d = st.teams[defenderId];
     if (!a || !d) return;
 
-    const sim = simulateMatch(this.rng, a, d, Number(CONFIG.matchDrama));
+    const sport = this.sport();
+    const effA = teamEff(a);
+    const effD = teamEff(d);
+    const sim = sport.simulate(this.rng, a, d, Number(CONFIG.matchDrama), effA, effD);
     this.setState({
       match: {
         aId: attackerId,
         dId: defenderId,
-        effA: sim.effA,
-        effD: sim.effD,
+        effA,
+        effD,
         ga: 0,
         gd: 0,
         shown: [],
         allEv: sim.ev,
-        pens: sim.pens,
-        pensShown: null,
+        tie: sim.tie,
+        tieShown: null,
         winner: sim.winner,
         finalGa: sim.ga,
         finalGd: sim.gd,
-        status: 'LIVE',
+        status: sport.labels.live,
         applied: false,
         done: false,
       },
@@ -435,11 +438,11 @@ export default class App extends React.Component {
         aCode: a.code,
         aCol: a.col,
         aName: a.name,
-        aEff: sim.effA.toFixed(1),
+        aEff: effA.toFixed(1),
         bCode: d.code,
         bCol: d.col,
         bName: d.name,
-        bEff: sim.effD.toFixed(1),
+        bEff: effD.toFixed(1),
       },
       instant ? 950 : 1650,
     );
@@ -449,23 +452,38 @@ export default class App extends React.Component {
       return;
     }
 
-    for (const e of sim.ev) this.after(450 + e.m * MS_PER_MINUTE, () => this.pushEvent(e));
-    this.after(450 + 91 * MS_PER_MINUTE, () => {
+    const { msPerUnit, length } = sport.clock;
+    for (const e of sim.ev) this.after(450 + e.m * msPerUnit, () => this.pushEvent(e));
+    // Overtime events run past the end of regulation, so wrap up after the last
+    // one rather than at a fixed whistle.
+    const lastTick = sim.ev.reduce((n, e) => Math.max(n, e.m), length);
+    this.after(450 + (lastTick + 1) * msPerUnit, () => {
       const m = this.state.match;
       if (!m || m.applied) return;
-      if (!m.pens) {
-        this.patchMatch({ status: 'FULL TIME' });
+      if (!m.tie) {
+        this.patchMatch({ status: sport.labels.end });
         this.after(420, () => this.finishMatch());
         return;
       }
-      this.patchMatch({ status: 'PENALTIES', pensShown: { A: [], D: [] } });
-      const n = Math.max(m.pens.A.length, m.pens.D.length);
+      if (sport.tieBreak !== 'shootout') {
+        // Overtime has already been played out through the event feed.
+        this.patchMatch({ status: sport.labels.tie });
+        this.after(700, () => this.finishMatch());
+        return;
+      }
+      this.patchMatch({ status: sport.labels.tie, tieShown: { A: [], D: [] } });
+      const n = Math.max(m.tie.A.length, m.tie.D.length);
       for (let i = 0; i < n; i++) {
-        if (i < m.pens.A.length) this.after(350 + i * 500, () => this.pushPen('A'));
-        if (i < m.pens.D.length) this.after(600 + i * 500, () => this.pushPen('D'));
+        if (i < m.tie.A.length) this.after(350 + i * 500, () => this.pushKick('A'));
+        if (i < m.tie.D.length) this.after(600 + i * 500, () => this.pushKick('D'));
       }
       this.after(350 + n * 500 + 650, () => this.finishMatch());
     });
+  }
+
+  /** The sport this campaign is being played in. */
+  sport() {
+    return getSport(this.state.settings.sport);
   }
 
   patchMatch(patch) {
@@ -477,32 +495,34 @@ export default class App extends React.Component {
     if (!m || m.applied) return;
     this.patchMatch({
       shown: m.shown.concat([e]),
-      ga: m.ga + (e.tid === m.aId ? 1 : 0),
-      gd: m.gd + (e.tid === m.dId ? 1 : 0),
+      ga: m.ga + (e.tid === m.aId ? e.pts : 0),
+      gd: m.gd + (e.tid === m.dId ? e.pts : 0),
     });
     const t = this.state.teams[e.tid] || {};
-    this.showToast({ code: t.code || 'GOL', txt: e.m + "' GOAL — " + e.name.toUpperCase(), col: t.col || C.gold }, 1150);
+    this.showToast({ code: t.code || '—', txt: this.sport().formatToast(e), col: t.col || C.gold }, 1150);
   }
 
-  pushPen(side) {
+  /** Reveal one more penalty in a shootout. */
+  pushKick(side) {
     const m = this.state.match;
-    if (!m || !m.pensShown || m.applied) return;
-    const shown = { A: m.pensShown.A.slice(), D: m.pensShown.D.slice() };
-    if (side === 'A') shown.A.push(m.pens.A[shown.A.length]);
-    else shown.D.push(m.pens.D[shown.D.length]);
-    this.patchMatch({ pensShown: shown });
+    if (!m || !m.tieShown || m.applied) return;
+    const shown = { A: m.tieShown.A.slice(), D: m.tieShown.D.slice() };
+    if (side === 'A') shown.A.push(m.tie.A[shown.A.length]);
+    else shown.D.push(m.tie.D[shown.D.length]);
+    this.patchMatch({ tieShown: shown });
   }
 
-  /** Jump straight to full time — used by INSTANT resolution and by STEP mid-match. */
+  /** Jump straight to the final score — used by INSTANT resolution and by STEP. */
   revealAll() {
     const m = this.state.match;
     if (!m || m.applied) return;
+    const sport = this.sport();
     this.patchMatch({
       shown: m.allEv,
       ga: m.finalGa,
       gd: m.finalGd,
-      pensShown: m.pens ? { A: m.pens.A, D: m.pens.D } : null,
-      status: m.pens ? 'PENALTIES' : 'FULL TIME',
+      tieShown: m.tie && sport.tieBreak === 'shootout' ? { A: m.tie.A, D: m.tie.D } : null,
+      status: m.tie ? sport.labels.tie : sport.labels.end,
     });
     this.after(500, () => this.finishMatch());
   }
@@ -555,13 +575,14 @@ export default class App extends React.Component {
     const effW = winnerId === m.aId ? m.effA : m.effD;
     const effL = winnerId === m.aId ? m.effD : m.effA;
     const isUpset = effW + Number(CONFIG.upsetThreshold) <= effL;
-    const pensTxt = m.pens ? ' (' + m.pens.ga + '–' + m.pens.gd + ' PENS)' : '';
+    const sport = this.sport();
+    const tieTxt = m.tie ? ' (' + m.tie.ga + '–' + m.tie.gd + ' ' + sport.labels.tieShort + ')' : '';
     const A = teams[m.aId];
     const B = teams[m.dId];
     const terrWord = 'TERRITOR' + (taken.length === 1 ? 'Y' : 'IES');
 
     const entries = [
-      { t: 'match', r: st.round, txt: A.code + ' ' + m.finalGa + '–' + m.finalGd + ' ' + B.code + pensTxt, chip: W.col, col: C.textSoft },
+      { t: 'match', r: st.round, txt: A.code + ' ' + m.finalGa + '–' + m.finalGd + ' ' + B.code + tieTxt, chip: W.col, col: C.textSoft },
     ];
     if (isUpset) {
       entries.push({
@@ -612,7 +633,7 @@ export default class App extends React.Component {
           ...m,
           applied: true,
           done: true,
-          status: 'FULL TIME',
+          status: sport.labels.end,
           isUpset,
           resText: '+' + taken.length + ' territories' + stealTxt,
           resTitle: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
@@ -626,8 +647,8 @@ export default class App extends React.Component {
         this.showPopup(
           {
             kind: 'result',
-            label: (m.pens ? 'PENALTIES' : 'FULL TIME') + ' — ROUND ' + st.round,
-            score: A.code + ' ' + m.finalGa + '–' + m.finalGd + ' ' + B.code + (m.pens ? '  ·  ' + m.pens.ga + '–' + m.pens.gd + 'P' : ''),
+            label: (m.tie ? sport.labels.tie : sport.labels.end) + ' — ROUND ' + st.round,
+            score: A.code + ' ' + m.finalGa + '–' + m.finalGd + ' ' + B.code + (m.tie ? '  ·  ' + m.tie.ga + '–' + m.tie.gd + ' ' + sport.labels.tieShort : ''),
             title: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
             sub: '+' + taken.length + ' ' + terrWord,
             upset: isUpset,
@@ -853,22 +874,25 @@ export default class App extends React.Component {
   matchCard() {
     const { match: m, teams, round, settings } = this.state;
     if (!m) return null;
+    const sport = this.sport();
     const A = teams[m.aId];
     const B = teams[m.dId];
     return {
       round: pad3(round),
       mode: settings.pacing.toUpperCase(),
       status: m.status,
-      statusColor: m.done ? C.textMute : m.status === 'PENALTIES' ? C.gold : C.green,
+      statusColor: m.done ? C.textMute : m.status === sport.labels.tie ? C.gold : C.green,
       statusLive: !m.done,
-      a: { id: A.id, code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), goals: m.ga },
-      b: { id: B.id, code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), goals: m.gd },
-      pens: m.pensShown ? { a: m.pensShown.A, b: m.pensShown.D } : null,
-      events: m.shown.map(e => ({
-        minute: e.m + "'",
-        color: teams[e.tid] ? teams[e.tid].col : '#fff',
-        text: 'GOAL — ' + e.name + ' (' + (teams[e.tid] ? teams[e.tid].code : '') + ')',
-      })),
+      startLabel: sport.labels.start,
+      a: { id: A.id, code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), score: m.ga },
+      b: { id: B.id, code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), score: m.gd },
+      // Only a shootout reveals kick by kick; overtime plays out through the feed.
+      kicks: m.tieShown ? { a: m.tieShown.A, b: m.tieShown.D } : null,
+      events: m.shown.map(e => {
+        const team = teams[e.tid];
+        const { when, text } = sport.formatEvent(e, team ? team.code : '');
+        return { when, text, color: team ? team.col : '#fff' };
+      }),
       noEvents: m.shown.length === 0 && !m.done,
       result: m.done
         ? { title: m.resTitle || '', text: m.resText || '', upset: !!m.isUpset, background: tint(m.wCol || C.gold, 0.1) }
@@ -1023,6 +1047,7 @@ export default class App extends React.Component {
       >
         <CommandBar
           show={playing}
+          title={this.sport().name.toUpperCase() + ' IMPERIALISM'}
           scopeName={scope ? scope.name.toUpperCase() : ''}
           round={st.round}
           alive={st.aliveIds.length}
@@ -1084,6 +1109,7 @@ export default class App extends React.Component {
               .map(f => ({ round: 'R' + pad3(f.r), chip: f.chip || C.textMute, color: f.col || C.textSoft, text: f.txt }))}
             power={this.powerTable(playing)}
             squad={this.squadPanel()}
+            positionColors={this.sport().positionColors}
             onSelectTeam={tid => this.setState({ selected: tid, tab: 'squad' })}
             eventsRef={this.eventsRef}
           />
@@ -1108,6 +1134,7 @@ export default class App extends React.Component {
         {victory && (
           <VictoryOverlay
             {...victory}
+            positionColors={this.sport().positionColors}
             onClose={() => this.setState({ phase: 'playing' })}
             onNew={() => {
               this.clearTimers();

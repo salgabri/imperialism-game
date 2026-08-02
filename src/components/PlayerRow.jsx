@@ -1,12 +1,12 @@
 import React from 'react';
-import { C, FONT, POS_COLORS, ratingColor } from '../theme.js';
+import { C, FONT, ratingColor } from '../theme.js';
 
 /**
  * One squad member. `from` is set on players taken as spoils of a conquest, which
  * is the whole story of a champion's final XI.
  */
-export default function PlayerRow({ player, roomy = false }) {
-  const posColor = POS_COLORS[player.pos] || C.textSoft;
+export default function PlayerRow({ player, positionColors = {}, roomy = false }) {
+  const posColor = positionColors[player.pos] || C.textSoft;
   return (
     <div
       style={{

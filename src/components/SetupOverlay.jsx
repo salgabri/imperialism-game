@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { C, FONT } from '../theme.js';
 import { NATIONS, SCOPES } from '../data/teams.js';
+import { SPORT_LIST, getSport } from '../sports/index.js';
 
 const PACING = [
   ['duel', 'ONE BY ONE', 'A spinner picks an attacker and a direction. One dramatic duel per round.'],
@@ -8,9 +9,9 @@ const PACING = [
   ['chaos', 'CHAOS DRAW', 'Random matchups are drawn until a name repeats — then the batch resolves.'],
 ];
 
-const RESOLUTION = [
-  ['ticker', 'LIVE TICKER', 'Goals drop in minute by minute. Draws go to penalties.'],
-  ['instant', 'INSTANT RESULT', 'Full-time score at once. Built for fast wars.'],
+const resolutionCards = sport => [
+  ['ticker', 'LIVE TICKER', `Scoring lands minute by minute. Level games go to ${sport.labels.tie.toLowerCase()}.`],
+  ['instant', 'INSTANT RESULT', 'Final score at once. Built for fast wars.'],
 ];
 
 const sectionLabel = {
@@ -64,6 +65,7 @@ export default function SetupOverlay({ setup, hasSave, savedText, onResume, onDi
     }
     return counts;
   }, []);
+  const sport = getSport(setup.sport);
 
   return (
     <div
@@ -86,7 +88,7 @@ export default function SetupOverlay({ setup, hasSave, savedText, onResume, onDi
             lineHeight: 1,
           }}
         >
-          FOOTBALL IMPERIALISM
+          {sport.name.toUpperCase()} IMPERIALISM
         </div>
         <div style={{ fontFamily: FONT.mono, fontSize: 10, letterSpacing: 2.5, color: C.gold, marginTop: 10 }}>
           WIN THE MATCH · TAKE ALL THEIR LAND · STEAL THEIR BEST PLAYER · LAST NATION STANDING
@@ -147,7 +149,21 @@ export default function SetupOverlay({ setup, hasSave, savedText, onResume, onDi
           </div>
         )}
 
-        <div style={{ ...sectionLabel, margin: '34px 0 12px' }}>01 · SELECT THEATRE</div>
+        <div style={{ ...sectionLabel, margin: '34px 0 12px' }}>01 · SELECT SPORT</div>
+        <Grid min={240}>
+          {SPORT_LIST.map(s => (
+            <Card
+              key={s.id}
+              selected={setup.sport === s.id}
+              onPick={() => onPick('sport', s.id)}
+              name={s.name.toUpperCase()}
+              desc={s.blurb}
+              count={`${Object.keys(s.rosters).length} REAL SQUADS`}
+            />
+          ))}
+        </Grid>
+
+        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>02 · SELECT THEATRE</div>
         <Grid min={200}>
           {SCOPES.map(s => (
             <Card
@@ -161,16 +177,16 @@ export default function SetupOverlay({ setup, hasSave, savedText, onResume, onDi
           ))}
         </Grid>
 
-        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>02 · PACING</div>
+        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>03 · PACING</div>
         <Grid min={240}>
           {PACING.map(([id, name, desc]) => (
             <Card key={id} selected={setup.pacing === id} onPick={() => onPick('pacing', id)} name={name} desc={desc} />
           ))}
         </Grid>
 
-        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>03 · MATCH RESOLUTION</div>
+        <div style={{ ...sectionLabel, margin: '30px 0 12px' }}>04 · MATCH RESOLUTION</div>
         <Grid min={240}>
-          {RESOLUTION.map(([id, name, desc]) => (
+          {resolutionCards(sport).map(([id, name, desc]) => (
             <Card
               key={id}
               selected={setup.resolution === id}

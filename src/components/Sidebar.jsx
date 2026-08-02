@@ -116,7 +116,7 @@ function Power({ rows, onSelect }) {
   ));
 }
 
-function Squad({ squad }) {
+function Squad({ squad, positionColors }) {
   if (!squad) {
     return (
       <div
@@ -242,14 +242,14 @@ function Squad({ squad }) {
       </div>
 
       {squad.players.map((p, i) => (
-        <PlayerRow key={i} player={p} />
+        <PlayerRow key={i} player={p} positionColors={positionColors} />
       ))}
     </>
   );
 }
 
 /** Intel panel: what just happened, who is winning, and who plays for them. */
-export default function Sidebar({ match, idleText, queueLeft, tab, onTab, feed, power, squad, onSelectTeam, eventsRef }) {
+export default function Sidebar({ match, idleText, queueLeft, tab, onTab, feed, power, squad, positionColors, onSelectTeam, eventsRef }) {
   return (
     <div
       style={{
@@ -306,7 +306,7 @@ export default function Sidebar({ match, idleText, queueLeft, tab, onTab, feed, 
       <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
         {tab === 'feed' && <Feed entries={feed} />}
         {tab === 'power' && <Power rows={power} onSelect={onSelectTeam} />}
-        {tab === 'squad' && <Squad squad={squad} />}
+        {tab === 'squad' && <Squad squad={squad} positionColors={positionColors} />}
       </div>
     </div>
   );

@@ -57,8 +57,6 @@ export const FONT = {
   mono: "'IBM Plex Mono', monospace",
 };
 
-export const POS_COLORS = { GK: C.gold, DF: C.cyan, MF: C.green, FW: C.red };
-
 /** Rating tiers: world class, solid, filler. */
 export function ratingColor(r) {
   return r >= 85 ? C.gold : r >= 75 ? C.textHi : C.textSoft;

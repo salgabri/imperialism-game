@@ -26,6 +26,7 @@ export default function VictoryOverlay({
   effBase,
   effGain,
   squad,
+  positionColors,
   onClose,
   onNew,
 }) {
@@ -79,7 +80,7 @@ export default function VictoryOverlay({
         </div>
         <div style={{ border: `1px solid ${C.lineCard}`, borderRadius: 5, background: C.card, textAlign: 'left' }}>
           {squad.map((p, i) => (
-            <PlayerRow key={i} player={p} roomy />
+            <PlayerRow key={i} player={p} positionColors={positionColors} roomy />
           ))}
         </div>
 

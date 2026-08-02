@@ -111,7 +111,7 @@ export async function runResumeCheck() {
   };
 }
 
-export async function run({ scope, pacing, resolution }) {
+export async function run({ sport = 'football', scope, pacing, resolution }) {
   const seen = new Set();
   let app = null;
   createRoot(document.getElementById('root')).render(
@@ -121,7 +121,7 @@ export async function run({ scope, pacing, resolution }) {
   await until('map + setup screen', () => text().includes('LAUNCH CAMPAIGN'));
   const nations = app.geo.countries.length;
 
-  app.setState({ setup: { scope, pacing, resolution } });
+  app.setState({ setup: { sport, scope, pacing, resolution } });
   await sleep(50);
   app.startCampaign();
   await until('campaign running', () => app.state.phase === 'playing');
@@ -176,6 +176,7 @@ export async function run({ scope, pacing, resolution }) {
     fallen: app.state.fallen.length,
     champion: champion.name,
     championSquad: champion.squad.length,
+    squadSize: app.sport().squadSize,
     championConquests,
     stolenPlayers: champion.squad.filter(p => p.from).length,
     stealsAllTeams,

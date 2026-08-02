@@ -15,6 +15,8 @@ const SCENARIOS = [
   { name: 'South America · duel · ticker', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
   { name: 'South America · blitz · instant', scope: 'CONMEBOL', pacing: 'blitz', resolution: 'instant' },
   { name: 'N. & C. America · chaos · instant', scope: 'CONCACAF', pacing: 'chaos', resolution: 'instant' },
+  { name: 'BASKETBALL · South America · duel · ticker', sport: 'basketball', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
+  { name: 'BASKETBALL · Europe · blitz · instant', sport: 'basketball', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
 ];
 
 async function bundle() {
@@ -110,30 +112,65 @@ let failures = 0;
 // Rosters are generated from a dataset that is not committed, so verify the
 // committed output still builds a legal XI for every nation on the map.
 {
-  const { NATIONS, SQUAD_SIZE, buildTeam, makeRng, teamEff } = await import('../src/data/teams.js');
-  const { ROSTERS } = await import('../src/data/rosters.js');
-  console.log('\n  Squad rosters');
-  try {
-    const rng = makeRng(20260802);
-    const ids = Object.keys(NATIONS);
-    const teams = ids.map(id => buildTeam(id, rng));
-    const realPlayers = teams.reduce((s, t) => s + t.real, 0);
-    const fullyReal = teams.filter(t => t.real >= SQUAD_SIZE).length;
-    const strays = Object.keys(ROSTERS).filter(id => !NATIONS[id]);
-    const overCap = teams.flatMap(t => t.squad).filter(p => p.rating > 99 || p.rating < 1);
-    const ranked = teams.map(t => ({ n: t.name, e: teamEff(t) })).sort((a, b) => b.e - a.e);
+  const { NATIONS, buildTeam, makeRng, teamEff } = await import('../src/data/teams.js');
+  const { SPORT_LIST } = await import('../src/sports/index.js');
+  const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'] };
 
-    check('every nation fields a full XI', teams.every(t => t.squad.length === SQUAD_SIZE), 'short squad');
-    check('no roster for an unknown nation', strays.length === 0, strays.join(', '));
-    check('every rating is within 1-99', overCap.length === 0, `${overCap.length} outside range`);
-    check('every squad has a keeper', teams.every(t => t.squad.some(p => p.pos === 'GK')), 'missing GK');
-    check('most of the world is real players', realPlayers / (teams.length * SQUAD_SIZE) > 0.6, `${realPlayers}`);
-    check('the strongest nations look right', ['France', 'Spain', 'England', 'Brazil'].every(n => ranked.slice(0, 6).some(r => r.n === n)), ranked.slice(0, 6).map(r => r.n).join(', '));
-    console.log(`    ${fullyReal}/${ids.length} nations field a fully real XI · ${realPlayers}/${teams.length * SQUAD_SIZE} players real (${(100 * realPlayers / (teams.length * SQUAD_SIZE)).toFixed(0)}%)`);
-    console.log(`    strongest: ${ranked.slice(0, 6).map(r => `${r.n} ${r.e}`).join(', ')}`);
-  } catch (e) {
-    failures++;
-    fail(`    ${e.message}`);
+  for (const sport of SPORT_LIST) {
+    console.log(`\n  Squad rosters — ${sport.name}`);
+    try {
+      const rng = makeRng(20260802);
+      const ids = Object.keys(NATIONS);
+      const teams = ids.map(id => buildTeam(id, rng, sport));
+      const size = sport.squadSize;
+      const realPlayers = teams.reduce((s, t) => s + t.real, 0);
+      const fullyReal = teams.filter(t => t.real >= size).length;
+      const strays = Object.keys(sport.rosters).filter(id => !NATIONS[id]);
+      const outOfRange = teams.flatMap(t => t.squad).filter(p => p.rating > 99 || p.rating < 1);
+      const badPos = teams.flatMap(t => t.squad).filter(p => !sport.positionColors[p.pos]);
+      const ranked = teams.map(t => ({ n: t.name, e: teamEff(t) })).sort((a, b) => b.e - a.e);
+      const top = ranked.slice(0, 8).map(r => r.n);
+
+      check('every nation fields a full lineup', teams.every(t => t.squad.length === size), 'short squad');
+      check('no roster for an unknown nation', strays.length === 0, strays.join(', '));
+      check('every rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
+      check('every position belongs to this sport', badPos.length === 0, [...new Set(badPos.map(p => p.pos))].join(', '));
+      check('every squad has the positions the sim needs', teams.every(t => sport.requiredPositions.every(pos => t.squad.some(p => p.pos === pos))), 'missing a required position');
+      check('the strongest nations look right', EXPECTED_BEST[sport.id].every(n => top.includes(n)), top.join(', '));
+      console.log(`    ${fullyReal}/${ids.length} nations fully real · ${realPlayers}/${teams.length * size} shirts real (${(100 * realPlayers / (teams.length * size)).toFixed(0)}%)`);
+      console.log(`    strongest: ${ranked.slice(0, 6).map(r => `${r.n} ${r.e}`).join(', ')}`);
+    } catch (e) {
+      failures++;
+      fail(`    ${e.message}`);
+    }
+  }
+
+  // The match model must produce sane scorelines and always separate the teams.
+  for (const sport of SPORT_LIST) {
+    console.log(`\n  Match model — ${sport.name}`);
+    try {
+      const rng = makeRng(99);
+      const a = buildTeam('840', rng, sport);
+      const b = buildTeam('250', rng, sport);
+      const results = [];
+      for (let i = 0; i < 400; i++) results.push(sport.simulate(rng, a, b, 6, teamEff(a), teamEff(b)));
+      const scores = results.flatMap(r => [r.ga, r.gd]);
+      const mean = scores.reduce((s, x) => s + x, 0) / scores.length;
+      const unresolved = results.filter(r => r.ga === r.gd && !r.tie).length;
+      const evTotals = results.every(r => {
+        const sum = t => r.ev.filter(e => e.tid === t).reduce((s, e) => s + e.pts, 0);
+        return sum(a.id) === r.ga && sum(b.id) === r.gd;
+      });
+
+      check('every match has a winner', results.every(r => r.winner === a.id || r.winner === b.id), 'no winner');
+      check('a level score always triggers a tie-break', unresolved === 0, `${unresolved} left level`);
+      check('the feed adds up to the final score', evTotals, 'event totals mismatch');
+      check('scoring is in the right range for the sport', sport.id === 'football' ? mean > 0.6 && mean < 3.5 : mean > 60 && mean < 110, `mean ${mean.toFixed(1)}`);
+      console.log(`    400 matches · mean score ${mean.toFixed(1)} · ${results.filter(r => r.tie).length} needed ${sport.labels.tie.toLowerCase()}`);
+    } catch (e) {
+      failures++;
+      fail(`    ${e.message}`);
+    }
   }
 }
 
@@ -176,7 +213,7 @@ for (const scenario of SCENARIOS) {
     check('champion holds the entire map', r.territoriesHeld === r.totalTerritories, `${r.territoriesHeld}/${r.totalTerritories}`);
     check('one player changed shirts per match', r.stealsAllTeams === r.matches, `${r.stealsAllTeams} vs ${r.matches} matches`);
     check('champion took a player per conquest', r.stolenPlayers === r.championConquests, `${r.stolenPlayers} vs ${r.championConquests}`);
-    check('squad grew by the spoils', r.championSquad === 11 + r.championConquests, `${r.championSquad}`);
+    check('squad grew by the spoils', r.championSquad === r.squadSize + r.championConquests, `${r.championSquad}`);
     check('every held territory flies a flag', r.flagFills === r.totalTerritories, `${r.flagFills} fills vs ${r.totalTerritories} territories`);
     check('one flag pattern per territory', r.flagPatterns === r.totalTerritories, `${r.flagPatterns}`);
     check('conquered land flies the conqueror’s flag', r.patternsFlyingChampionFlag === r.territoriesHeld, `${r.patternsFlyingChampionFlag} of ${r.territoriesHeld}`);

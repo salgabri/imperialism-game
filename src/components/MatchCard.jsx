@@ -59,7 +59,7 @@ function PenRow({ code, kicks }) {
 }
 
 /** Live scoreboard for the match currently on the pitch. */
-export default function MatchCard({ round, mode, status, statusColor, statusLive, a, b, pens, events, noEvents, result, eventsRef }) {
+export default function MatchCard({ round, mode, status, statusColor, statusLive, startLabel, a, b, kicks, events, noEvents, result, eventsRef }) {
   return (
     <div
       style={{
@@ -119,15 +119,15 @@ export default function MatchCard({ round, mode, status, statusColor, statusLive
                 EFF {t.eff}
               </span>
             </span>
-            <span style={score}>{t.goals}</span>
+            <span style={score}>{t.score}</span>
           </React.Fragment>
         ))}
       </div>
 
-      {pens && (
+      {kicks && (
         <div style={{ padding: '0 12px 9px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <PenRow code={a.code} kicks={pens.a} />
-          <PenRow code={b.code} kicks={pens.b} />
+          <PenRow code={a.code} kicks={kicks.a} />
+          <PenRow code={b.code} kicks={kicks.b} />
         </div>
       )}
 
@@ -144,11 +144,11 @@ export default function MatchCard({ round, mode, status, statusColor, statusLive
         }}
       >
         {noEvents && (
-          <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, letterSpacing: 1 }}>KICK-OFF…</span>
+          <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, letterSpacing: 1 }}>{startLabel}</span>
         )}
         {events.map((e, i) => (
           <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, minWidth: 28 }}>{e.minute}</span>
+            <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, minWidth: 28 }}>{e.when}</span>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: e.color, flex: 'none' }} />
             <span
               style={{
