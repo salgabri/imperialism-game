@@ -4,6 +4,7 @@
 //   { geo: WorldGeometry, own: {countryId -> empireId}, aliveIds: string[] }
 
 import { closestPair } from './geo.js';
+import { createAttackRouteIndex, firstForeignLand } from './attackRoutes.js';
 
 /**
  * Seed clubs onto the map.
@@ -66,7 +67,7 @@ function territoryPoints(board, tid) {
   const pts = [];
   for (const cid of territories(board, tid)) {
     const p = board.geo.paths[cid];
-    if (p) pts.push([p.cx, p.cy]);
+    if (Number.isFinite(p?.cx) && Number.isFinite(p?.cy)) pts.push([p.cx, p.cy]);
   }
   return pts;
 }
@@ -89,28 +90,50 @@ export function empireNeighbors(board, tid) {
  * Resolve the spinner into a victim.
  *
  * A nation may only attack a land neighbour, or strike across the sea at the
- * NEAREST enemy in the spun direction — never skipping over a closer one. The
- * search cone widens until something is in range so a spin is never wasted.
+ * NEAREST reachable enemy in the spun direction. A capital-distance cone is
+ * only a shortlist: the drawn route must reach that owner's land before any
+ * other owner's or neutral land. Widen the cone rather than jumping a blocker.
  */
 export function pickTarget(board, attackerId, angle) {
   const aPts = territoryPoints(board, attackerId);
   const neighbors = empireNeighbors(board, attackerId);
-  const cands = [];
-  for (const tid of board.aliveIds) {
-    if (tid === attackerId) continue;
-    const cp = closestPair(aPts, territoryPoints(board, tid));
-    if (!cp) continue;
+  const routeIndex = board.routeIndex ?? createAttackRouteIndex(board.routingPaths || board.geo.paths);
+  const candidateOf = tid => {
+    if (tid === attackerId) return null;
+    const bPts = territoryPoints(board, tid);
+    // An empire may have a blocked closest pair but an open route from another
+    // holding. Try pairs by distance, never falling back to an unchecked line.
+    const pairs = routeIndex ? aPts.flatMap(a => bPts.map(b => closestPair([a], [b])))
+      .filter(Boolean).sort((a, b) => a.dist - b.dist) : [closestPair(aPts, bPts)].filter(Boolean);
+    let cp = null, anchorDistance = 0;
+    for (const pair of pairs) {
+      if (!routeIndex) { cp = pair; anchorDistance = pair.dist; break; }
+      const hit = firstForeignLand(routeIndex, board.own, attackerId, pair);
+      if (!hit || hit.ownerId !== tid) continue;
+      // Stop just inside the first target land, not beyond it at a capital that
+      // may lie past another border/enclave. The bearing is unchanged.
+      const t = hit.t + Math.min((hit.exitT - hit.t) / 2, .05 / Math.max(pair.dist, .001));
+      cp = { ax: pair.ax, ay: pair.ay,
+        bx: pair.ax + (pair.bx - pair.ax) * t,
+        by: pair.ay + (pair.by - pair.ay) * t, dist: pair.dist * t };
+      anchorDistance = pair.dist;
+      break;
+    }
+    if (!cp) return null;
     const bearing = (Math.atan2(cp.by - cp.ay, cp.bx - cp.ax) * 180) / Math.PI;
     const diff = Math.abs(((((bearing - angle) % 360) + 540) % 360) - 180);
-    cands.push({ tid, diff, cp, isNeighbor: neighbors.has(tid) });
-  }
-  if (!cands.length) return null;
-
-  const landward = cands.filter(x => x.isNeighbor && x.diff <= 70).sort((x, y) => x.diff - y.diff);
+    return { tid, diff, cp, anchorDistance, isNeighbor: neighbors.has(tid) };
+  };
+  // Land candidates have priority, so avoid tracing every far-away coastline
+  // when a legal neighbor already wins. Keep survivor order for stable ties.
+  const nearby = new Map(board.aliveIds.filter(tid => neighbors.has(tid)).map(tid => [tid, candidateOf(tid)]));
+  const landward = [...nearby.values()].filter(x => x && x.diff <= 70).sort((x, y) => x.diff - y.diff);
   if (landward.length) return landward[0];
 
+  const cands = board.aliveIds.map(tid => nearby.has(tid) ? nearby.get(tid) : candidateOf(tid)).filter(Boolean);
+  if (!cands.length) return null;
   for (const cone of [45, 75, 110, 181]) {
-    const seaward = cands.filter(x => x.diff <= cone).sort((x, y) => x.cp.dist - y.cp.dist);
+    const seaward = cands.filter(x => x.diff <= cone).sort((x, y) => x.anchorDistance - y.anchorDistance);
     if (seaward.length) return seaward[0];
   }
   return cands[0];

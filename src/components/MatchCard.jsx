@@ -1,184 +1,85 @@
 import React from 'react';
-import { C, FONT } from '../theme.js';
+import { C } from '../theme.js';
 import Flag from './Flag.jsx';
+import Icon from './Icon.jsx';
+import './results.css';
 
-const chip = {
-  textAlign: 'center',
-  padding: '4px 0',
-  borderRadius: 3,
-  color: C.ink,
-  fontFamily: FONT.mono,
-  fontWeight: 700,
-  fontSize: 10,
-};
-
-const teamName = {
-  fontSize: 16,
-  fontWeight: 600,
-  color: C.textHi,
-  paddingLeft: 4,
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-};
-
-const score = {
-  fontFamily: FONT.mono,
-  fontSize: 24,
-  fontWeight: 700,
-  color: C.goldSoft,
-  textAlign: 'center',
-  background: C.ink,
-  border: `1px solid ${C.lineInner}`,
-  borderRadius: 4,
-  padding: '4px 2px',
-};
+export function TeamMark({ id, code, color, isClub, width = 48 }) {
+  return isClub ? (
+    <span className="fi-team-monogram" style={{ '--team-color': color, width, minHeight: Math.round(width * 0.75) }} aria-hidden="true">
+      {code}
+    </span>
+  ) : <Flag nationId={id} width={width} style={{ border: 'none', borderRadius: 2 }} />;
+}
 
 function PenRow({ code, kicks }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <span style={{ fontFamily: FONT.mono, fontSize: 9, fontWeight: 700, color: C.textChip, minWidth: 30 }}>
-        {code}
-      </span>
-      <div style={{ display: 'flex', gap: 5 }}>
-        {kicks.map((scored, i) => (
-          <span
-            key={i}
-            style={{
-              width: 9,
-              height: 9,
-              borderRadius: '50%',
-              background: scored ? C.green : 'transparent',
-              border: `1.5px solid ${scored ? C.green : C.red}`,
-            }}
-          />
-        ))}
-      </div>
+    <div className="fi-penalty-row" aria-label={`${code}: ${kicks.filter(Boolean).length} penalties scored from ${kicks.length}`}>
+      <span>{code}</span>
+      <div>{kicks.map((scored, i) => <i key={i} className={scored ? 'scored' : 'missed'} aria-hidden="true" />)}</div>
     </div>
   );
 }
 
-/** Live scoreboard for the match currently on the pitch. */
-export default function MatchCard({ round, mode, status, statusColor, statusLive, startLabel, a, b, kicks, events, noEvents, result, eventsRef }) {
+/** The latest match stays visible while its territory and player rewards resolve. */
+export default function MatchCard({ round, status, statusColor, statusLive, startLabel, a, b, kicks, events = [], noEvents, result, eventsRef }) {
+  const statusText = status === 'FT' || status === 'FULL TIME' ? 'Full time' : status;
+  const statusTone = statusColor === C.gold ? 'warning' : statusLive ? 'positive' : 'muted';
   return (
-    <div
-      style={{
-        margin: '12px 12px 0',
-        border: `1px solid ${C.lineCard}`,
-        borderRadius: 5,
-        background: C.card,
-        overflow: 'hidden',
-        flex: 'none',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '7px 12px',
-          borderBottom: `1px solid ${C.lineInner}`,
-          background:
-            'repeating-linear-gradient(90deg, rgba(87,196,139,0.10) 0px, rgba(87,196,139,0.10) 20px, rgba(87,196,139,0.045) 20px, rgba(87,196,139,0.045) 40px), ' +
-            C.cardHi,
-        }}
-      >
-        <span style={{ fontFamily: FONT.mono, fontSize: 9, letterSpacing: 1.5, color: C.textMute }}>
-          ROUND {round} · {mode}
-        </span>
-        <span
-          style={{
-            fontFamily: FONT.mono,
-            fontSize: 9,
-            letterSpacing: 1.5,
-            color: statusColor,
-            animation: statusLive ? 'fiBlink 1.1s ease-in-out infinite' : 'none',
-          }}
-        >
-          {status}
-        </span>
+    <section className="fi-match" aria-label="Latest match" data-testid="match-card">
+      <div className="fi-match-heading">
+        <h2>Latest match</h2>
+        <span className={`fi-match-status${statusLive ? ' is-live' : ''}`} style={{ color: `var(--result-${statusTone}, ${statusColor || C.textMute})` }}>{statusText}</span>
       </div>
-
-      <div
-        style={{
-          padding: '10px 12px 8px',
-          display: 'grid',
-          gridTemplateColumns: '22px 42px 1fr 52px',
-          columnGap: 6,
-          rowGap: 9,
-          alignItems: 'center',
-        }}
-      >
-        {[a, b].map((t, i) => (
-          <React.Fragment key={i}>
-            <Flag nationId={t.id} width={22} />
-            <span style={{ ...chip, background: t.color }}>{t.code}</span>
-            <span style={teamName}>
-              {t.name}{' '}
-              <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textMute, fontWeight: 400 }}>
-                EFF {t.eff}
-              </span>
-            </span>
-            <span style={score}>{t.score}</span>
-          </React.Fragment>
-        ))}
+      <div className="fi-scoreboard" aria-label={`${a.name} ${a.score}, ${b.name} ${b.score}`}>
+        <div className="fi-score-team">
+          <TeamMark {...a} width={48} />
+          <span className="fi-score-team-name">{a.name}</span>
+          <span className="fi-score-eff" title="Effective team strength">EFF {a.eff}</span>
+        </div>
+        <div className="fi-score-number"><span>{a.score}</span><span className="fi-score-dash">–</span><span>{b.score}</span></div>
+        <div className="fi-score-team">
+          <TeamMark {...b} width={48} />
+          <span className="fi-score-team-name">{b.name}</span>
+          <span className="fi-score-eff" title="Effective team strength">EFF {b.eff}</span>
+        </div>
       </div>
-
-      {kicks && (
-        <div style={{ padding: '0 12px 9px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <PenRow code={a.code} kicks={kicks.a} />
-          <PenRow code={b.code} kicks={kicks.b} />
+      <div className="fi-match-rule" aria-hidden="true" />
+      {kicks && <div className="fi-penalties"><PenRow code={a.code} kicks={kicks.a} /><PenRow code={b.code} kicks={kicks.b} /></div>}
+      {!result && (
+        <div className="fi-match-events" ref={eventsRef} role="log" aria-label="Match events">
+          {noEvents && <p className="fi-match-wait">{startLabel || 'Waiting for the opening play'} · Round {Number(round) || round}</p>}
+          {events.map((e, i) => (
+            <div className="fi-match-event" key={i}>
+              <span className="fi-event-time">{e.when}</span>
+              <i style={{ '--event-color': e.color }} aria-hidden="true" />
+              <span>{e.text}</span>
+            </div>
+          ))}
         </div>
       )}
-
-      <div
-        ref={eventsRef}
-        style={{
-          maxHeight: 128,
-          overflowY: 'auto',
-          borderTop: `1px solid ${C.lineInner}`,
-          padding: '7px 12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
-        }}
-      >
-        {noEvents && (
-          <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, letterSpacing: 1 }}>{startLabel}</span>
-        )}
-        {events.map((e, i) => (
-          <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, minWidth: 28 }}>{e.when}</span>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: e.color, flex: 'none' }} />
-            <span
-              style={{
-                fontFamily: FONT.mono,
-                fontSize: 10,
-                color: C.textEvent,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {e.text}
-            </span>
-          </div>
-        ))}
-      </div>
-
       {result && (
-        <div style={{ borderTop: `1px solid ${C.lineInner}`, padding: '10px 12px', background: result.background }}>
-          {result.upset && (
-            <div style={{ fontFamily: FONT.mono, fontSize: 9, letterSpacing: 2, color: C.gold, marginBottom: 5 }}>
-              UPSET ALERT — GIANT KILLED
+        <div className="fi-match-result" aria-live="polite">
+          {result.upset && <div className="fi-upset-label">Upset victory</div>}
+          <h3>{result.winnerName && result.loserName ? `${result.winnerName} takes ${result.loserName}` : result.title}</h3>
+          {result.tieText && <p className="fi-result-tiebreak">{result.tieText}</p>}
+          {result.territories != null && (
+            <div className="fi-spoils-row"><Icon name="globe" size={17} /><span>+{result.territories} {Number(result.territories) === 1 ? 'territory' : 'territories'}</span></div>
+          )}
+          {result.player && (
+            <div className="fi-spoils-row"><Icon name="users" size={17} /><span><strong>{result.player.name}</strong> joins {result.winnerName}<small>{result.player.pos} · {result.player.rating} rating</small></span></div>
+          )}
+          {Number.isFinite(result.strengthGain) && (
+            <div className="fi-spoils-row fi-strength-reward" data-testid="match-strength-gain">
+              <span>Overall strength<small>{result.strengthBefore.toFixed(1)} to {result.strengthAfter.toFixed(1)} · this conquest</small></span>
+              <strong className={result.strengthGain > 0 ? 'fi-strength-gain' : 'fi-strength-unchanged'}>
+                {result.strengthGain > 0 ? `+${result.strengthGain.toFixed(1)}` : 'No change'}
+              </strong>
             </div>
           )}
-          <div style={{ fontSize: 17, fontWeight: 700, color: C.textMax, letterSpacing: 0.5 }}>{result.title}</div>
-          <div style={{ fontFamily: FONT.mono, fontSize: 10, color: C.textChip, marginTop: 4, lineHeight: 1.55 }}>
-            {result.text}
-          </div>
+          {result.territories == null && !result.player && result.text && <p className="fi-result-fallback">{result.text}</p>}
         </div>
       )}
-    </div>
+    </section>
   );
 }

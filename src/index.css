@@ -1,18 +1,47 @@
-body { margin: 0; background: #26364B; overscroll-behavior: none; }
-a { color: #E5A83B; }
-a:hover { color: #F2C230; }
+@import './fonts.css';
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #4A6480; border-radius: 4px; }
+:root {
+  color-scheme: dark;
+  --bg: #202725; --header: #202725; --panel: #29322e; --ocean: #1d323b;
+  --text: #f0eee4; --muted: #acb4ae; --line: #4d5851; --accent: #e7e6dc; --success: #84c5a0;
+  --font-body: 'Archivo', 'Segoe UI', sans-serif;
+  --font-heading: 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  --font-map: 'Alegreya', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-body); font-size: 14px; font-synthesis: none;
+  background: var(--bg); color: var(--text);
+}
+* { box-sizing: border-box; }
+body { margin: 0; overscroll-behavior: none; }
+button, input, select { font: inherit; }
+button { cursor: pointer; font-size: 13px; }
+button, a, select, summary, [tabindex] { -webkit-tap-highlight-color: transparent; }
+button:disabled { opacity: .4; cursor: default; }
+button:focus-visible, a:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+a { color: var(--accent); }
+button svg { flex: none; }
+.button, .icon-button { min-height: 44px; border: 1px solid #69756d; border-radius: 2px; background: #202b28f5; color: var(--text); display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; font-weight: 500; transition: background .16s, border-color .16s; }
+.button:hover, .icon-button:hover { background: #39463f; border-color: #9da79e; }
+.button-primary { background: var(--accent); border-color: var(--accent); color: #202725; font-weight: 600; }
+.button-primary:hover { background: #fffef5; border-color: #fffef5; }
+.button-quiet { background: transparent; border-color: var(--line); }
+.icon-button { width: 44px; padding: 0; }
+.app-shell { height: 100dvh; min-height: 480px; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+.campaign-layout { flex: 1; display: flex; min-height: 0; }
+.loading-screen { position: fixed; inset: 64px 0 0; background: var(--bg); z-index: 60; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; color: var(--muted); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; clip: rect(0,0,0,0); overflow: hidden; white-space: nowrap; border: 0; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #42535b; border-radius: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-
-@keyframes fiPulse { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.25; } }
+@keyframes fiPulse { 0%,100% { opacity: .95; } 50% { opacity: .45; } }
 @keyframes fiDash { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
-@keyframes fiFlash { 0% { opacity: 0.05; } 55% { opacity: 1; } 100% { opacity: 1; } }
-@keyframes fiBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-@keyframes fiPop { from { opacity: 0; transform: scale(0.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes fiFlash { 0% { opacity: .35; } 100% { opacity: 1; } }
+@keyframes fiBlink { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+@keyframes fiPop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fiMarch { to { stroke-dashoffset: -11; } }
-
-/* Hover affordances the design expresses as style-hover */
-.fi-row:hover { background: #33475F; }
-.fi-card:hover { border-color: #3A5A7C !important; }
+@media (max-width: 700px) {
+  .app-shell { height: auto; min-height: 100dvh; overflow: visible; }
+  .campaign-layout { flex-direction: column; min-height: calc(100dvh - 64px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}

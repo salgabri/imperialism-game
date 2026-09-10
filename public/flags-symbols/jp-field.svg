@@ -1,0 +1,12 @@
+<!-- Derived from public/flags; flag-icons MIT license. See LICENSE. -->
+<svg xmlns="http://www.w3.org/2000/svg" id="flag-field-jp" viewBox="0 0 640 480" preserveAspectRatio="none">
+  <defs>
+    <clipPath id="jp-a">
+      <path fill-opacity=".7" d="M-88 32h640v480H-88z"/>
+    </clipPath>
+  </defs>
+  <g fill-rule="evenodd" stroke-width="1pt" clip-path="url(#jp-a)" transform="translate(88 -32)">
+    <path fill="#fff" d="M-128 32h720v480h-720z"/>
+
+  </g>
+</svg>

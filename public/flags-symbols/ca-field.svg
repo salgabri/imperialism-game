@@ -1,0 +1,5 @@
+<!-- Derived from public/flags; flag-icons MIT license. See LICENSE. -->
+<svg xmlns="http://www.w3.org/2000/svg" id="flag-field-ca" viewBox="0 0 640 480" preserveAspectRatio="none">
+  <path fill="#fff" d="M150.1 0h339.7v480H150z"/>
+  <path fill="#d52b1e" d="M-19.7 0h169.8v480H-19.7zm509.5 0h169.8v480H489.9z"/>
+</svg>

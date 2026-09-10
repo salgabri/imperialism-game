@@ -1,60 +1,61 @@
-// Design tokens for the war-room shell. Nation colours come from the data set;
+// Design tokens for the match-ledger / campaign-atlas shell. Nation colours come from the data set;
 // everything structural comes from here.
 
 export const C = {
   // surfaces
-  deep: '#26364B',
-  panel: '#2A3C54',
-  card: '#2D4059',
-  cardHi: '#33475F',
-  cardPick: '#3C4E63',
-  ocean: '#31465F',
-  ink: '#14202E',
-  shadow: '#0B1622',
-  landA: '#3B5069',
-  landB: '#42576F',
+  deep: '#10191F',
+  panel: '#162128',
+  card: '#19262D',
+  cardHi: '#223139',
+  cardPick: '#2A3940',
+  ocean: '#1D323B',
+  ink: '#10191F',
+  shadow: '#091217',
+  landA: '#515D59',
+  landB: '#59635F',
 
   // lines
-  line: '#445C7A',
-  lineSoft: '#3A4F6B',
-  lineCard: '#4A6480',
-  lineInner: '#40566F',
-  lineCtl: '#52698A',
-  lineCorner: '#5E7794',
-  lineHover: '#3A5A7C',
+  line: '#34424A',
+  lineSoft: '#2B383F',
+  lineCard: '#45545A',
+  lineInner: '#303E45',
+  lineCtl: '#56666D',
+  lineCorner: '#697A80',
+  lineHover: '#73838A',
 
   // type
-  text: '#C9D7E6',
-  textHi: '#E9F2FA',
-  textMax: '#F2F6FA',
-  textList: '#DCE7F2',
-  textSoft: '#A9BDD1',
-  textMute: '#90A6BC',
-  textDim: '#8CA2B8',
-  textFaint: '#7E94AB',
-  textFaded: '#7288A0',
-  textCoord: '#AEC1D4',
-  textChip: '#C4D5E6',
-  textEvent: '#CCDAE8',
+  text: '#ECE9DF',
+  textHi: '#F3F0E8',
+  textMax: '#FAF8F2',
+  textList: '#DFE4DF',
+  textSoft: '#AFBCC0',
+  textMute: '#95A3A8',
+  textDim: '#95A3A8',
+  textFaint: '#8D9CA2',
+  textFaded: '#8A9A9F',
+  textCoord: '#ADBDC3',
+  textChip: '#D3DDDD',
+  textEvent: '#DBE2DF',
 
   // signals
-  gold: '#E5A83B',
-  goldHi: '#F2C230',
-  goldSoft: '#FFE9C2',
-  goldEdge: '#6E5A2E',
+  gold: '#C6AC78',
+  goldHi: '#DCC18A',
+  goldSoft: '#EAD7AE',
+  goldEdge: '#746647',
   goldOutline: '#F5E9CE',
-  green: '#57C48B',
-  red: '#E5484D',
+  green: '#84C5A0',
+  red: '#DF8B80',
   redEdge: '#7A3C44',
-  cyan: '#4FB8D8',
+  cyan: '#8EBCC9',
   cyanEdge: '#3E6E84',
   cyanPanel: '#2D4356',
 };
 
 export const FONT = {
-  head: "'Big Shoulders Display', sans-serif",
-  body: "'Barlow Condensed', sans-serif",
-  mono: "'IBM Plex Mono', monospace",
+  head: "'Archivo Narrow', 'Arial Narrow', sans-serif",
+  body: "'Archivo', 'Segoe UI', sans-serif",
+  mono: "'Archivo Narrow', 'Arial Narrow', sans-serif",
+  map: "'Alegreya', Georgia, 'Times New Roman', serif",
 };
 
 /** Rating tiers: world class, solid, filler. */
@@ -74,3 +75,21 @@ export function tint(hex, alpha) {
 }
 
 export const pad3 = n => String(n).padStart(3, '0');
+
+// Muted political colors make empires legible; full flag mode is still available.
+const POLITICAL_PALETTE = ['#87999D', '#849077', '#B59872', '#9C8277', '#8194A3', '#A0A291', '#8C839A', '#779997'];
+const POLITICAL_COLORS = {
+  '250': '#6486B0', '724': '#AB6C5F', '276': '#849A70', '380': '#C2A057',
+  '826': '#85979D', '620': '#8D9984', '528': '#B2906F', '056': '#B4A990',
+  '756': '#A87C78', '040': '#A4A194', '616': '#A5A59C', '804': '#8196A7',
+  '643': '#798889', '752': '#8A9CAA', '578': '#A1AFAB', '246': '#B2AE99',
+  '208': '#A79B86', '300': '#95A4AA', '792': '#A39C8A', '372': '#8D9D8A',
+  '840': '#A4A087', '124': '#8E9C9B', '076': '#8B9A70', '032': '#91A9B1',
+  '156': '#B09B7E', '356': '#A9AB90', '036': '#B5A578', '392': '#AC827B',
+};
+export function politicalColor(id) {
+  if (POLITICAL_COLORS[id]) return POLITICAL_COLORS[id];
+  let hash = 0;
+  for (const c of String(id)) hash = ((hash * 31) + c.charCodeAt(0)) >>> 0;
+  return POLITICAL_PALETTE[hash % POLITICAL_PALETTE.length];
+}

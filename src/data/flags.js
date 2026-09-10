@@ -180,7 +180,7 @@ export const FLAG_CODES = {
   '090': 'sb',        // Solomon Islands
 };
 
-/** URL of a nation's flag, or null for map shapes outside the campaign. */
+/** URL of a nation's flag, or null for shapes without a mapped national flag. */
 export function flagUrl(nationId) {
   const code = FLAG_CODES[nationId];
   return code ? `${import.meta.env.BASE_URL}flags/${code}.svg` : null;

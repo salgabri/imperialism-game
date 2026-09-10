@@ -1,0 +1,24 @@
+.draw-compass, .draw-route { pointer-events: none; }
+.draw-compass-disk { fill: #202b28; stroke: #aab5a9; stroke-width: 1.1; }
+.draw-compass-inner { fill: none; stroke: #657569; stroke-width: .65; }
+.draw-compass-ticks { stroke: #b9c2b5; stroke-width: 1; }
+.draw-compass-north { fill: #c3cabc; font: 600 8px var(--font-heading); }
+.draw-compass-needle { transform-origin: 0 0; }
+.draw-compass-tail { fill: #7e9184; stroke: #14201b; stroke-width: .7; }
+.draw-compass-tip { fill: #f0eee4; stroke: #14201b; stroke-width: .7; stroke-linejoin: round; }
+.draw-compass-needle-seam { fill: none; stroke: #202b28; stroke-opacity: .4; stroke-width: .6; }
+.draw-compass-pivot { fill: #202b28; stroke: #e7e6dc; stroke-width: 1; }
+.draw-compass-pin { fill: #e7e6dc; }
+.draw-compass--locked .draw-compass-disk { stroke: #e7e6dc; }
+.draw-route { animation: drawRouteEnter 150ms ease-out both; }
+.draw-route-casing { fill: none; stroke: #18241e; stroke-opacity: .92; stroke-linecap: round; }
+.draw-route-line { fill: none; stroke: #e7e6dc; stroke-linecap: round; }
+.draw-route-origin { fill: #e7e6dc; stroke: #18241e; }
+.draw-route-arrow { fill: #f0eee4; stroke: #18241e; stroke-linejoin: round; }
+.draw-route-target circle { fill: #202b28; stroke: #e7e6dc; }
+.draw-route-target path { fill: none; stroke: #e7e6dc; stroke-width: .8; }
+@keyframes drawRouteEnter { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .draw-compass-needle { transition: none !important; }
+  .draw-route { animation: none !important; }
+}

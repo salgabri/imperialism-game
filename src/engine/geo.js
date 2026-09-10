@@ -1,24 +1,22 @@
-// World geometry: TopoJSON decoding, land adjacency, Robinson-style projection,
+// World geometry: TopoJSON decoding, land adjacency, flat cylindrical projection,
 // and the SVG path/graticule/scale-bar bundle the map renders from.
 
 const VIEW_W = 960;
 const VIEW_H = 540;
 const PAD = 16;
+export const EARTH_RADIUS_KM = 6371.0088;
+export const PROJECTION_X_SCALE = Math.cos(Math.PI / 6);
 
 // Natural Earth ships three unclaimed shapes with id "-99". They arrive in a stable
 // order, so name them rather than letting them collide on one key.
 const UNCLAIMED_IDS = ['XCYN', 'KOS', 'XSOL'];
 
-// Robinson-family forward projection (lon/lat degrees -> unit plane, y down).
+// Equirectangular, standard parallel 30° (degrees -> unit plane, y down).
+// A fixed horizontal scale keeps both meridians and parallels straight, without
+// globe-like tapering or infinite poles. All rendered and rule geometry shares
+// this plane; the 30° parallel balances the world's width against its height.
 export function projPt(lon, lat) {
-  const la = (lon * Math.PI) / 180;
-  const ph = (lat * Math.PI) / 180;
-  const p2 = ph * ph;
-  const p4 = p2 * p2;
-  return [
-    la * (0.8707 - 0.131979 * p2 + p4 * (-0.013791 + p4 * (0.003971 * p2 - 0.001529 * p4))),
-    -ph * (1.007226 + p2 * (0.015085 + p4 * (-0.044475 + 0.028874 * p2 - 0.005916 * p4))),
-  ];
+  return [(lon * Math.PI / 180) * PROJECTION_X_SCALE, -lat * Math.PI / 180];
 }
 
 export function closestPair(aPts, bPts) {
@@ -53,10 +51,14 @@ export class WorldGeometry {
     }
 
     // Lon/lat -> plane is fixed; only the fit transform changes between theatres,
-    // so project every ring once and reuse it for each fitTo().
+    // so project every ring once and reuse it for each fitTo(). Keep this original
+    // cache for fit/rule compatibility; repaired display geometry is separate.
     this.projected = {};
+    this.displayProjected = {};
     for (const c of this.countries) {
       this.projected[c.id] = c.polys.map(poly => poly.map(ring => ring.map(pt => projPt(pt[0], pt[1]))));
+      this.displayProjected[c.id] = c.polys.map(poly => poly.map(ring =>
+        splitAtAntimeridian(ring).map(part => part.map(pt => projPt(pt[0], pt[1])))));
     }
 
     this.fit = null;
@@ -94,8 +96,9 @@ export class WorldGeometry {
     this.fit = { s, tx, ty };
 
     this.graticule = this.buildGraticule(s, tx, ty);
-    // Ground distance covered by one SVG user unit, for the zoom-aware scale bar.
-    this.kmPerUnit = 7320 / s;
+    // Equatorial horizontal reference, not geodesic distance at every latitude.
+    // Also keeps regional flag grouping in fixed map units, independent of zoom.
+    this.kmPerUnit = EARTH_RADIUS_KM / (s * PROJECTION_X_SCALE);
     this.paths = this.buildPaths(s, tx, ty);
     return this;
   }
@@ -130,51 +133,62 @@ export class WorldGeometry {
     const paths = {};
     for (const c of this.countries) {
       let d = '';
-      let bestA = -1;
-      let cx = 0;
-      let cy = 0;
+      const labelRings = [];
+      const legacy = legacyAnchorMetrics(this.projected[c.id], s, tx, ty);
+      let cx = legacy.cx;
+      let cy = legacy.cy;
+      const bestA = legacy.area;
+      let largestPaintedArea = -1;
       let bbox = null;
-      for (const poly of this.projected[c.id]) {
-        poly.forEach((ring, ri) => {
-          const pts = ring.map(q => [q[0] * s + tx, q[1] * s + ty]);
-          for (const seg of splitAtAntimeridian(pts)) {
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      for (const poly of this.displayProjected[c.id]) {
+        poly.forEach((parts, ri) => {
+          for (const part of parts) {
+            const seg = part.map(q => [q[0] * s + tx, q[1] * s + ty]);
             if (seg.length < 3) continue;
             d += 'M' + seg.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L') + 'Z';
+            // Label containment must use the same split, rounded land that the
+            // SVG paints, including holes and disconnected date-line segments.
+            labelRings.push(seg.map(([x, y]) => [Number(x.toFixed(1)), Number(y.toFixed(1))]));
+            // Include every rendered island/segment in an empire's flag canvas.
+            for (const [x, y] of seg) {
+              minX = Math.min(minX, x);
+              minY = Math.min(minY, y);
+              maxX = Math.max(maxX, x);
+              maxY = Math.max(maxY, y);
+            }
             if (ri !== 0) continue;
-            // Track the largest outer ring. Its centroid anchors labels, capital
-            // markers and attack arrows; its bounds size the flag fill, so a
-            // country with distant islands still shows a flag scaled to its
-            // mainland rather than stretched across the whole archipelago.
+            // The visible mainland bounds follow the repaired outer ring. Rule
+            // anchors/area below retain the original source-ring calculation.
             const c2 = ringCentroid(seg);
-            if (c2 && c2.area > bestA && c2.area > 0.01) {
-              bestA = c2.area;
-              cx = c2.cx;
-              cy = c2.cy;
+            if (c2 && c2.area > largestPaintedArea && c2.area > 0.01) {
+              largestPaintedArea = c2.area;
               bbox = ringBounds(seg);
             }
           }
         });
       }
-      if (bestA < 0) {
-        // Shapes too small to survive the antimeridian split still need an anchor.
-        const fp = this.projected[c.id][0]?.[0]?.[0];
-        if (fp) {
-          cx = fp[0] * s + tx;
-          cy = fp[1] * s + ty;
-          bestA = 0.02;
-        }
-      }
       if (!bbox) bbox = { x: cx - 2, y: cy - 1.5, w: 4, h: 3 };
+      // Small padding around the land covers path coordinates rounded to 0.1,
+      // keeping every fill inside one SVG pattern tile (never a repeated flag).
+      const fullBounds = Number.isFinite(minX)
+        ? { x: minX - 0.1, y: minY - 0.1, w: maxX - minX + 0.2, h: maxY - minY + 0.2 }
+        : { ...bbox };
 
       // Prefer the capital as the country's anchor point; the centroid is only
       // a fallback for shapes with no capital of their own.
+      const labelX = cx;
+      const labelY = cy;
       const cap = this.capitals[c.id];
       if (cap) {
         const q = projPt(cap[0], cap[1]);
         cx = q[0] * s + tx;
         cy = q[1] * s + ty;
       }
-      paths[c.id] = { d, cx, cy, area: bestA, bbox, hasCapital: !!cap };
+      paths[c.id] = { d, cx, cy, labelX, labelY, area: bestA, bbox, fullBounds, labelRings, hasCapital: !!cap };
     }
     return paths;
   }
@@ -183,21 +197,11 @@ export class WorldGeometry {
   invert(px, py) {
     if (!this.fit) return null;
     const { s, tx, ty } = this.fit;
-    const x = (px - tx) / s;
-    const y = -((py - ty) / s);
-    let ph = y / 1.007226;
-    for (let i = 0; i < 6; i++) {
-      const p2 = ph * ph;
-      const p4 = p2 * p2;
-      const f = ph * (1.007226 + p2 * (0.015085 + p4 * (-0.044475 + 0.028874 * p2 - 0.005916 * p4))) - y;
-      const df =
-        1.007226 + 0.045255 * p2 - 0.311325 * p2 * p4 + 0.259866 * p4 * p4 - 0.065076 * p2 * p4 * p4;
-      ph -= f / df;
-    }
-    const p2 = ph * ph;
-    const p4 = p2 * p2;
-    const la = x / (0.8707 - 0.131979 * p2 + p4 * (-0.013791 + p4 * (0.003971 * p2 - 0.001529 * p4)));
-    return [(la * 180) / Math.PI, (ph * 180) / Math.PI];
+    const lon = (px - tx) / (s * PROJECTION_X_SCALE) * 180 / Math.PI;
+    const lat = (ty - py) / s * 180 / Math.PI;
+    // Empty space around the rectangular world isn't another geographic point.
+    if (!Number.isFinite(lon) || !Number.isFinite(lat) || Math.abs(lon) > 180 + 1e-9 || Math.abs(lat) > 90 + 1e-9) return null;
+    return [Math.max(-180, Math.min(180, lon)), Math.max(-90, Math.min(90, lat))];
   }
 }
 
@@ -226,9 +230,10 @@ function decodeTopo(topo) {
   const countries = [];
   const arcOwners = {};
   for (const g of topo.objects.countries.geometries) {
-    let id = g.id;
-    if (id === '-99') {
-      id = UNCLAIMED_IDS[unclaimed] || 'X' + unclaimed;
+    let id = g.id == null ? null : String(g.id);
+    if (id == null || id === '-99') {
+      const names = { 'Kosovo': 'KOS', 'N. Cyprus': 'XCYN', 'Somaliland': 'XSOL' };
+      id = names[g.properties?.name] || (g.id == null ? 'X-' + g.properties?.name : UNCLAIMED_IDS[unclaimed] || 'X' + unclaimed);
       unclaimed++;
     }
     const polys = g.type === 'Polygon' ? [g.arcs] : g.arcs;
@@ -240,7 +245,7 @@ function decodeTopo(topo) {
         }
       }
     }
-    countries.push({ id, polys: polys.map(p => p.map(ringFrom)) });
+    countries.push({ id, name: g.properties?.name, polys: polys.map(p => p.map(ringFrom)) });
   }
 
   // Two countries that reference the same topology arc are separated by that arc,
@@ -259,9 +264,148 @@ function decodeTopo(topo) {
   return { countries, adjacency };
 }
 
-// A ring that wraps past ±180° lands as a huge horizontal jump between consecutive
-// projected points, which would otherwise paint a band straight across the map.
-function splitAtAntimeridian(pts) {
+const SEAM_EPSILON = 1e-8;
+const SEAM_LATITUDE_STEP = 0.5;
+
+function sameGeographicPoint(a, b) {
+  const dx = Math.abs(a[0] - b[0]);
+  return Math.abs(a[1] - b[1]) <= SEAM_EPSILON && (dx <= SEAM_EPSILON || Math.abs(dx - 360) <= SEAM_EPSILON);
+}
+
+function normalizedRing(ring) {
+  const points = [];
+  for (const point of ring || []) {
+    let lon = Number(point[0]), lat = Number(point[1]);
+    if (!Number.isFinite(lon) || !Number.isFinite(lat)) continue;
+    if (Math.abs(lon - 180) <= SEAM_EPSILON) lon = 180;
+    else if (Math.abs(lon + 180) <= SEAM_EPSILON) lon = -180;
+    else if (lon < -180 || lon > 180) lon = ((lon + 180) % 360 + 360) % 360 - 180;
+    lat = Math.max(-90, Math.min(90, lat));
+    const p = [lon, lat];
+    if (!points.length || !sameGeographicPoint(points[points.length - 1], p)) points.push(p);
+  }
+  if (points.length > 1 && sameGeographicPoint(points[0], points[points.length - 1])) points.pop();
+  return points;
+}
+
+function unwrapRing(points) {
+  const result = [[...points[0]]];
+  // Include the closing edge. A closed geographic ring can wind once around a
+  // pole; its unwrapped last longitude then differs from its first by 360°.
+  for (let i = 1; i <= points.length; i++) {
+    const point = points[i % points.length];
+    let lon = point[0];
+    const previous = result[result.length - 1][0];
+    while (lon - previous > 180) lon -= 360;
+    while (lon - previous < -180) lon += 360;
+    result.push([lon, point[1]]);
+  }
+  return result;
+}
+
+function startPolarRingAtSeam(points, direction) {
+  const startLon = direction > 0 ? -180 : 180;
+  for (let i = 0; i < points.length; i++) {
+    if (Math.abs(Math.abs(points[i][0]) - 180) <= SEAM_EPSILON) {
+      return [[startLon, points[i][1]], ...points.slice(i + 1), ...points.slice(0, i)];
+    }
+  }
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i], b = points[(i + 1) % points.length];
+    if (Math.abs(b[0] - a[0]) <= 180) continue;
+    const endLon = b[0] + (b[0] < a[0] ? 360 : -360);
+    const seam = a[0] > 0 ? 180 : -180;
+    const lat = a[1] + (seam - a[0]) / (endLon - a[0]) * (b[1] - a[1]);
+    return [[startLon, lat], ...points.slice(i + 1), ...points.slice(0, i + 1)];
+  }
+  return points;
+}
+
+function clipLongitude(points, boundary, keepGreater) {
+  const result = [];
+  const inside = p => keepGreater ? p[0] >= boundary - SEAM_EPSILON : p[0] <= boundary + SEAM_EPSILON;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const a = points[j], b = points[i];
+    const aInside = inside(a), bInside = inside(b);
+    if (aInside !== bInside) {
+      const t = (boundary - a[0]) / (b[0] - a[0]);
+      result.push([boundary, a[1] + t * (b[1] - a[1])]);
+    }
+    if (bInside) result.push([...b]);
+  }
+  return result;
+}
+
+function closeAndDensifySeam(points) {
+  const clean = [];
+  for (const p of points) {
+    const previous = clean[clean.length - 1];
+    if (!previous || Math.abs(p[0] - previous[0]) > SEAM_EPSILON || Math.abs(p[1] - previous[1]) > SEAM_EPSILON) clean.push(p);
+  }
+  if (clean.length > 1 && Math.abs(clean[0][0] - clean[clean.length - 1][0]) <= SEAM_EPSILON && Math.abs(clean[0][1] - clean[clean.length - 1][1]) <= SEAM_EPSILON) clean.pop();
+  if (clean.length < 3) return null;
+  let twiceArea = 0;
+  for (let i = 0, j = clean.length - 1; i < clean.length; j = i++) twiceArea += clean[j][0] * clean[i][1] - clean[i][0] * clean[j][1];
+  if (Math.abs(twiceArea) < 1e-12) return null;
+  const result = [];
+  for (let i = 0; i < clean.length; i++) {
+    const a = clean[i], b = clean[(i + 1) % clean.length];
+    result.push([...a]);
+    if (Math.abs(a[0] - b[0]) <= SEAM_EPSILON && Math.abs(Math.abs(a[0]) - 180) <= SEAM_EPSILON) {
+      // Keep geographic seam sampling independent of projection and map fit.
+      // Every inserted point remains exactly on the straight ±180° map edge.
+      const count = Math.ceil(Math.abs(b[1] - a[1]) / SEAM_LATITUDE_STEP);
+      for (let j = 1; j < count; j++) result.push([a[0], a[1] + (b[1] - a[1]) * j / count]);
+    }
+  }
+  result.push([...result[0]]);
+  return result;
+}
+
+/**
+ * Cut a closed lon/lat ring at the geographic ±180° seam before projection.
+ *
+ * Unwrapping and clipping the complete cyclic polygon naturally reconnects its
+ * first/last coastline fragments. All introduced closures follow a map seam;
+ * no fragment is independently Z-closed back to a distant arbitrary start.
+ * Winding is preserved, so outer rings and holes keep SVG nonzero semantics.
+ * Returned rings are closed, normalized and seam-densified in geographic space.
+ * Polar winding loops (including Natural Earth's Antarctic outer/hole pair)
+ * close via their pole, beginning at the seam rather than an interior meridian.
+ * The source topology is never modified and the cut is independent of map fit.
+ */
+export function splitAtAntimeridian(ring) {
+  let points = normalizedRing(ring);
+  if (points.length < 3) return [];
+  let unwrapped = unwrapRing(points);
+  const turns = Math.round((unwrapped[unwrapped.length - 1][0] - unwrapped[0][0]) / 360);
+  if (turns) {
+    points = startPolarRingAtSeam(points, turns);
+    unwrapped = unwrapRing(points);
+    const pole = points.reduce((sum, point) => sum + point[1], 0) < 0 ? -90 : 90;
+    unwrapped.push([unwrapped[unwrapped.length - 1][0], pole], [unwrapped[0][0], pole]);
+  } else unwrapped.pop();
+  let minLon = Infinity, maxLon = -Infinity;
+  for (const point of unwrapped) { minLon = Math.min(minLon, point[0]); maxLon = Math.max(maxLon, point[0]); }
+  const firstStrip = Math.floor((minLon + 180) / 360), lastStrip = Math.floor((maxLon + 180) / 360);
+  const result = [];
+  for (let strip = firstStrip; strip <= lastStrip; strip++) {
+    const left = -180 + strip * 360, right = 180 + strip * 360;
+    let clipped = unwrapped;
+    if (minLon < left - SEAM_EPSILON) clipped = clipLongitude(clipped, left, true);
+    if (maxLon > right + SEAM_EPSILON) clipped = clipLongitude(clipped, right, false);
+    const shifted = clipped.map(([lon, lat]) => [Math.max(-180, Math.min(180, lon - strip * 360)), lat]);
+    const closed = closeAndDensifySeam(shifted);
+    if (closed) result.push(closed);
+  }
+  return result;
+}
+
+// Historical source-ring chunks are retained ONLY for campaign metadata. Club
+// assignment, target selection and empireCenter weights use this calculation,
+// reprojected alongside the rest of the map. These chunks are never painted:
+// d, labelRings and visible bounds exclusively use splitAtAntimeridian above.
+function legacyProjectedChunks(pts) {
   const segs = [];
   let cur = [pts[0]];
   for (let i = 1; i < pts.length; i++) {
@@ -273,6 +417,25 @@ function splitAtAntimeridian(pts) {
   }
   segs.push(cur);
   return segs;
+}
+
+function legacyAnchorMetrics(projected, s, tx, ty) {
+  let area = -1, cx = 0, cy = 0;
+  for (const poly of projected) {
+    const points = poly[0].map(q => [q[0] * s + tx, q[1] * s + ty]);
+    for (const part of legacyProjectedChunks(points)) {
+      if (part.length < 3) continue;
+      const center = ringCentroid(part);
+      if (center && center.area > area && center.area > 0.01) {
+        area = center.area; cx = center.cx; cy = center.cy;
+      }
+    }
+  }
+  if (area < 0) {
+    const first = projected[0]?.[0]?.[0];
+    if (first) { cx = first[0] * s + tx; cy = first[1] * s + ty; area = 0.02; }
+  }
+  return { area, cx, cy };
 }
 
 function ringCentroid(ring) {

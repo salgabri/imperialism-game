@@ -1,313 +1,120 @@
 import React from 'react';
-import { C, FONT } from '../theme.js';
-import MatchCard from './MatchCard.jsx';
+import MatchCard, { TeamMark } from './MatchCard.jsx';
 import PlayerRow from './PlayerRow.jsx';
-import Flag from './Flag.jsx';
+import Icon from './Icon.jsx';
+import './results.css';
 
-const TABS = [['feed', 'FEED'], ['power', 'POWER'], ['squad', 'SQUAD']];
+const TABS = [['power', 'Standings'], ['feed', 'Activity'], ['squad', 'Squad']];
+
+function gainColor(gain) {
+  const tone = gain.text.startsWith('+') ? 'positive' : /^[−-]/.test(gain.text) ? 'negative' : 'muted';
+  return `var(--result-${tone}, ${gain.color})`;
+}
 
 function Tabs({ value, onChange }) {
+  function onKeyDown(event, current) {
+    let next;
+    if (event.key === 'ArrowRight') next = (current + 1) % TABS.length;
+    if (event.key === 'ArrowLeft') next = (current + TABS.length - 1) % TABS.length;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = TABS.length - 1;
+    if (next == null) return;
+    event.preventDefault();
+    onChange(TABS[next][0]);
+    event.currentTarget.parentElement.children[next].focus();
+  }
   return (
-    <div style={{ display: 'flex', borderBottom: `1px solid ${C.line}`, marginTop: 12, flex: 'none' }}>
-      {TABS.map(([id, label], i) => {
-        const on = value === id;
-        return (
-          <button
-            key={id}
-            onClick={() => onChange(id)}
-            style={{
-              flex: 1,
-              fontFamily: FONT.mono,
-              fontSize: 9,
-              letterSpacing: 1.5,
-              padding: '9px 0',
-              border: 'none',
-              borderLeft: i ? `1px solid ${C.line}` : undefined,
-              cursor: 'pointer',
-              background: on ? C.cardHi : 'transparent',
-              color: on ? C.gold : C.textMute,
-              borderBottom: `2px solid ${on ? C.gold : 'transparent'}`,
-            }}
-          >
-            {label}
-          </button>
-        );
-      })}
+    <div className="fi-intel-tabs" role="tablist" aria-label="Campaign information">
+      {TABS.map(([id, label], i) => (
+        <button key={id} id={`intel-tab-${id}`} type="button" role="tab" aria-selected={value === id} aria-controls={`intel-panel-${id}`}
+          tabIndex={value === id ? 0 : -1} onClick={() => onChange(id)} onKeyDown={event => onKeyDown(event, i)}>{label}</button>
+      ))}
     </div>
   );
 }
 
-function Feed({ entries }) {
-  return entries.map((f, i) => (
-    <div
-      key={i}
-      style={{
-        display: 'flex',
-        gap: 9,
-        padding: '7px 12px',
-        borderBottom: `1px solid ${C.lineSoft}`,
-        alignItems: 'flex-start',
-      }}
-    >
-      <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, minWidth: 32, paddingTop: 1 }}>
-        {f.round}
-      </span>
-      <span style={{ width: 7, height: 7, borderRadius: 1, background: f.chip, flex: 'none', marginTop: 3 }} />
-      <span style={{ fontFamily: FONT.mono, fontSize: 10.5, lineHeight: 1.5, color: f.color }}>{f.text}</span>
-    </div>
-  ));
+function Feed({ entries = [] }) {
+  if (!entries.length) return <p className="fi-intel-empty">Match results and player transfers will appear here.</p>;
+  return (
+    <ol className="fi-activity-list" aria-label="Campaign activity">
+      {entries.map((entry, i) => (
+        <li key={i}>
+          <span className="fi-activity-round" title="Round">{entry.round}</span>
+          <i style={{ '--activity-color': entry.chip }} aria-hidden="true" />
+          <span>{entry.text}</span>
+        </li>
+      ))}
+    </ol>
+  );
 }
 
-function Power({ rows, onSelect }) {
-  return rows.map(p => (
-    <div
-      key={p.tid}
-      className="fi-row"
-      onClick={() => onSelect(p.tid)}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '8px 12px',
-        borderBottom: `1px solid ${C.lineSoft}`,
-        cursor: 'pointer',
-      }}
-    >
-      <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textFaint, minWidth: 22 }}>{p.rank}</span>
-      <Flag nationId={p.flagId} width={20} />
-      <span
-        style={{
-          minWidth: 36,
-          textAlign: 'center',
-          padding: '3px 0',
-          borderRadius: 3,
-          background: p.color,
-          color: C.ink,
-          fontFamily: FONT.mono,
-          fontSize: 9.5,
-          fontWeight: 700,
-        }}
-      >
-        {p.code}
-      </span>
-      <span
-        style={{
-          flex: 1,
-          fontSize: 14,
-          fontWeight: 600,
-          color: C.textList,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {p.name}
-      </span>
-      <span style={{ fontFamily: FONT.mono, fontSize: 9, color: C.textMute }}>{p.territories}</span>
-      <span style={{ textAlign: 'right', minWidth: 42 }}>
-        <span style={{ fontFamily: FONT.mono, fontSize: 13, fontWeight: 700, color: C.textHi, display: 'block' }}>
-          {p.eff}
-        </span>
-        <span style={{ fontFamily: FONT.mono, fontSize: 8.5, fontWeight: 700, color: p.effGain.color, display: 'block' }}>
-          {p.effGain.text}
-        </span>
-      </span>
-    </div>
-  ));
+function Power({ rows = [], onSelect }) {
+  return (
+    <table className="fi-standings">
+      <thead><tr><th scope="col">#</th><th scope="col">Team</th><th scope="col"><abbr title="Territories held">Terr.</abbr></th><th scope="col" aria-sort="descending"><abbr title="Overall team strength (EFF), highest first">Strength</abbr></th></tr></thead>
+      <tbody>{rows.map(team => (
+        <tr key={team.tid}>
+          <td>{Number(team.rank) || team.rank}</td>
+          <td><button type="button" className="fi-standing-team" onClick={() => onSelect(team.tid)} aria-label={`View ${team.name} squad`}>
+            <TeamMark id={team.flagId} code={team.code} color={team.color} isClub={team.isClub} width={20} />
+            <span title={team.name}>{team.name}</span>
+          </button></td>
+          <td>{String(team.territories).replace(/^T(?=\d)/, '')}</td>
+          <td title={team.effGain ? `Change since campaign start: ${team.effGain.text}` : undefined}>
+            <span className="fi-standing-rating">
+              <span className="fi-standing-eff">{team.eff}</span>
+              {team.effGain?.text?.startsWith('+') && <span key={team.effGain.text} className="fi-strength-gain" data-testid="standing-strength-gain"
+                aria-label={`Gained ${team.effGain.text} overall strength since campaign start`}>{team.effGain.text}</span>}
+            </span>
+          </td>
+        </tr>
+      ))}</tbody>
+    </table>
+  );
 }
 
 function Squad({ squad, positionColors }) {
-  if (!squad) {
-    return (
-      <div
-        style={{
-          padding: '18px 14px',
-          fontFamily: FONT.mono,
-          fontSize: 10,
-          color: C.textDim,
-          lineHeight: 1.8,
-          letterSpacing: 0.5,
-        }}
-      >
-        NO NATION SELECTED.
-        <br />
-        CLICK A TERRITORY ON THE MAP, OR PICK FROM THE POWER TAB.
-      </div>
-    );
-  }
+  if (!squad) return <div className="fi-intel-empty"><Icon name="users" size={25} /><p>Select a team on the map or in the standings to inspect its squad.</p></div>;
   return (
-    <>
-      <div
-        style={{
-          padding: '13px 12px',
-          borderBottom: `1px solid ${C.line}`,
-          display: 'flex',
-          gap: 11,
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 'none' }}>
-          <Flag nationId={squad.id} width={44} style={{ borderRadius: 2 }} />
-          <span
-            style={{
-              minWidth: 44,
-              textAlign: 'center',
-              padding: '4px 0',
-              borderRadius: 4,
-              background: squad.color,
-              color: C.ink,
-              fontFamily: FONT.mono,
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-          >
-            {squad.code}
-          </span>
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: 700,
-              color: C.textHi,
-              letterSpacing: 0.5,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {squad.name}
-          </div>
-          <div style={{ fontFamily: FONT.mono, fontSize: 8.5, color: C.textMute, letterSpacing: 1, marginTop: 2 }}>
-            {squad.meta}
-          </div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: FONT.mono, fontSize: 17, fontWeight: 700, color: C.textHi }}>{squad.eff}</div>
-          <div style={{ fontFamily: FONT.mono, fontSize: 8, color: C.textMute, letterSpacing: 1 }}>EFF</div>
-          <div style={{ fontFamily: FONT.mono, fontSize: 10, fontWeight: 700, color: squad.effGain.color, marginTop: 2 }}>
-            {squad.effGain.text}
-          </div>
-        </div>
+    <section className="fi-squad" aria-label={`${squad.name} squad`}>
+      <div className="fi-squad-heading">
+        <TeamMark {...squad} width={40} />
+        <div><h3>{squad.name}</h3><p>{squad.meta}</p></div>
+        <div className="fi-squad-strength"><strong>{squad.eff}</strong><span>EFF</span><small style={{ color: gainColor(squad.effGain) }}>{squad.effGain.text}</small></div>
       </div>
-
-      {/* What conquest has actually done to the squad. EFF tracks the best XI, so
-          it only ever climbs; the squad average can fall when a big nation
-          absorbs a weak one's best player. */}
-      <div
-        style={{
-          padding: '8px 12px',
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 14,
-          borderBottom: `1px solid ${C.lineSoft}`,
-          fontFamily: FONT.mono,
-          fontSize: 9,
-          color: C.textMute,
-          letterSpacing: 0.5,
-        }}
-      >
-        <span>
-          SQUAD <span style={{ color: C.textList, fontWeight: 700 }}>{squad.players.length}</span>
-        </span>
-        <span>
-          AVG <span style={{ color: C.textList, fontWeight: 700 }}>{squad.avg}</span>{' '}
-          <span style={{ color: squad.avgGain.color, fontWeight: 700 }}>{squad.avgGain.text}</span>
-        </span>
-        <span style={{ marginLeft: 'auto', color: C.textFaded, letterSpacing: 1 }}>SINCE KICK-OFF</span>
+      <div className="fi-squad-summary">
+        <span><strong>{squad.territories}</strong> {Number(squad.territories) === 1 ? 'territory' : 'territories'}</span><span><strong>{squad.conquests}</strong> {Number(squad.conquests) === 1 ? 'conquest' : 'conquests'}</span><span><strong>{squad.stolen}</strong> claimed</span>
       </div>
-
-      <div
-        style={{
-          padding: '8px 12px',
-          display: 'flex',
-          gap: 16,
-          borderBottom: `1px solid ${C.lineSoft}`,
-          fontFamily: FONT.mono,
-          fontSize: 9,
-          color: C.textMute,
-          letterSpacing: 0.5,
-        }}
-      >
-        <span>
-          TERR <span style={{ color: C.textList, fontWeight: 700 }}>{squad.territories}</span>
-        </span>
-        <span>
-          CONQUESTS <span style={{ color: C.textList, fontWeight: 700 }}>{squad.conquests}</span>
-        </span>
-        <span>
-          STOLEN <span style={{ color: C.cyan, fontWeight: 700 }}>{squad.stolen}</span>
-        </span>
-        <span style={{ marginLeft: 'auto', color: squad.statusColor, fontWeight: 700 }}>{squad.status}</span>
-      </div>
-
-      {squad.players.map((p, i) => (
-        <PlayerRow key={i} player={p} positionColors={positionColors} />
-      ))}
-    </>
+      <div className="fi-squad-roster-heading"><span>{squad.players.length} players · Avg. {squad.avg} <small style={{ color: gainColor(squad.avgGain) }}>{squad.avgGain.text}</small></span><span style={{ color: `var(--result-${squad.status === 'ALIVE' ? 'positive' : 'negative'}, ${squad.statusColor})` }}>{squad.status}</span></div>
+      <div className="fi-player-list">{squad.players.map((player, i) => <PlayerRow key={i} player={player} positionColors={positionColors} />)}</div>
+      {squad.players.some(player => player.gen) && <p className="fi-roster-note">* Generated player where roster data is unavailable.</p>}
+    </section>
   );
 }
 
-/** Intel panel: what just happened, who is winning, and who plays for them. */
-export default function Sidebar({ match, idleText, queueLeft, tab, onTab, feed, power, squad, positionColors, onSelectTeam, eventsRef }) {
+/** One quiet information surface: latest match, then standings, activity or squad. */
+export default function Sidebar({ match, draw, idleText, queueLeft, tab = 'power', onTab, feed, power, squad, positionColors, onSelectTeam, eventsRef }) {
   return (
-    <div
-      style={{
-        flex: 'none',
-        width: 378,
-        borderLeft: `1px solid ${C.line}`,
-        background: C.panel,
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: 0,
-      }}
-    >
-      {match && <MatchCard {...match} eventsRef={eventsRef} />}
-
-      {idleText && (
-        <div
-          style={{
-            margin: '12px 12px 0',
-            border: `1px dashed ${C.lineCard}`,
-            borderRadius: 5,
-            padding: 14,
-            color: C.textDim,
-            fontFamily: FONT.mono,
-            fontSize: 10,
-            letterSpacing: 0.5,
-            lineHeight: 1.7,
-            flex: 'none',
-          }}
-        >
-          {idleText}
-        </div>
+    <aside className="fi-intel" aria-label="Campaign details">
+      {match ? <MatchCard {...match} eventsRef={eventsRef} /> : draw ? (
+        <section className="fi-match fi-match-empty fi-match-draw" data-testid="draw-status" role="status" aria-live="polite" aria-atomic="true">
+          <div className="fi-match-heading"><h2>Latest match</h2><span className="fi-match-status">{draw.stage === 'locked' ? 'Opponent selected' : 'Drawing'}</span></div>
+          <h3>{draw.stage === 'locked' ? `${draw.attackerName} faces ${draw.targetName}` : `${draw.attackerName} to attack`}</h3>
+          <p>{draw.stage === 'locked' ? draw.isNeighbor ? 'Land-border opponent selected.' : 'Overseas opponent selected.' : 'Drawing a direction and finding an opponent.'}</p>
+        </section>
+      ) : (
+        <section className="fi-match fi-match-empty"><div className="fi-match-heading"><h2>Latest match</h2><span className="fi-match-status">Ready</span></div>
+          <h3>No match in progress</h3><p>{idleText || 'Choose Next match to draw the next fixture.'}</p>
+        </section>
       )}
-
-      {queueLeft > 0 && (
-        <div
-          style={{
-            margin: '8px 12px 0',
-            padding: '6px 10px',
-            border: `1px solid ${C.line}`,
-            borderRadius: 3,
-            fontFamily: FONT.mono,
-            fontSize: 9,
-            letterSpacing: 1,
-            color: C.textSoft,
-            flex: 'none',
-          }}
-        >
-          BATCH · {queueLeft} MATCH(ES) QUEUED THIS ROUND
-        </div>
-      )}
-
+      {queueLeft > 0 && <p className="fi-queue-note">{queueLeft} {queueLeft === 1 ? 'match' : 'matches'} remaining this round</p>}
       <Tabs value={tab} onChange={onTab} />
-
-      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+      <div className={`fi-intel-content fi-intel-content--${tab}`} role="tabpanel" id={`intel-panel-${tab}`} aria-labelledby={`intel-tab-${tab}`} tabIndex={0}>
         {tab === 'feed' && <Feed entries={feed} />}
         {tab === 'power' && <Power rows={power} onSelect={onSelectTeam} />}
         {tab === 'squad' && <Squad squad={squad} positionColors={positionColors} />}
       </div>
-    </div>
+      {tab === 'power' && <p className="fi-intel-hint"><Icon name="info" size={17} /><span>Select a team to view its squad.</span></p>}
+    </aside>
   );
 }

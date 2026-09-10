@@ -1,22 +1,26 @@
 import React from 'react';
 import { CONFIG } from './config.js';
-import { C, FONT, pad3, tint } from './theme.js';
+import { C, FONT, pad3, tint, politicalColor } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES } from './data/scopes.js';
-import { flagUrl } from './data/flags.js';
+import { FLAG_CODES, flagUrl } from './data/flags.js';
+import { FLAG_SYMBOLS } from './data/flagSymbols.js';
 import { CAPITALS } from './data/capitals.js';
-import { WorldGeometry } from './engine/geo.js';
+import { WorldGeometry, projPt } from './engine/geo.js';
+import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
+import { layoutFlagSymbol } from './engine/flagSymbolLayout.js';
 import { getSport, DEFAULT_SPORT } from './sports/index.js';
 import {
   drawBlitzPairs,
   drawChaosPairs,
   empireCenter,
-  pickTarget,
   seedClubs,
   territories,
 } from './engine/campaign.js';
+import { createDuelDraw } from './engine/duelDraw.js';
 import { clearSave, loadSave, writeSave } from './engine/storage.js';
 import CommandBar from './components/CommandBar.jsx';
+import PlaybackBar from './components/PlaybackBar.jsx';
 import WorldMap from './components/WorldMap.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import SetupOverlay from './components/SetupOverlay.jsx';
@@ -24,10 +28,11 @@ import VictoryOverlay from './components/VictoryOverlay.jsx';
 import { MatchupPopup, ResultPopup, StealPopup, Toast } from './components/Popups.jsx';
 
 const MAP_URL = `${import.meta.env.BASE_URL}world-110m.v1.json`;
+const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
 const LOG_CAP = 220;
 const FEED_CAP = 90;
 const BATTLE_SCARS = 7;
-const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'world', clubScope: 'all', pacing: 'duel', resolution: 'ticker' };
+const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'UEFA', clubScope: 'all', pacing: 'duel', resolution: 'ticker' };
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
 function signed(delta) {
@@ -60,7 +65,8 @@ export default class App extends React.Component {
     batchTotal: 0,
     autoplay: false,
     speed: 1,
-    tab: 'feed',
+    tab: 'power',
+    mapMode: 'flags',
     selected: null,
     hoverCid: null,
     flash: {},
@@ -74,6 +80,11 @@ export default class App extends React.Component {
 
   /** Every pending simulation timeout, so a reset or unmount can cancel the war. */
   timers = new Set();
+  drawTimers = new Set();
+  drawFrames = new Set();
+  activeDrawKey = null;
+  startedDrawKey = null;
+  lockedDrawKey = null;
   confirmTimer = null;
 
   mapRef = React.createRef();
@@ -99,27 +110,64 @@ export default class App extends React.Component {
   // ---------- timing ----------
 
   /** Schedule simulation work, scaled by the speed control and cancellable. */
-  after(ms, fn) {
+  after(ms, fn, speed = this.state.speed || 1) {
     const id = setTimeout(() => {
       this.timers.delete(id);
       fn();
-    }, ms / (this.state.speed || 1));
+    }, ms / speed);
     this.timers.add(id);
     return id;
   }
 
   clearTimers() {
+    this.clearDraw();
     for (const id of this.timers) clearTimeout(id);
     this.timers.clear();
+  }
+
+  /** Draw work has its own owner: reset, kickoff and unmount invalidate it. */
+  clearDraw() {
+    this.activeDrawKey = null;
+    this.startedDrawKey = null;
+    this.lockedDrawKey = null;
+    for (const id of this.drawFrames) cancelAnimationFrame(id);
+    for (const id of this.drawTimers) { clearTimeout(id); this.timers.delete(id); }
+    this.drawFrames.clear();
+    this.drawTimers.clear();
+  }
+
+  drawAfter(ms, key, fn) {
+    if (this.activeDrawKey !== key) return null;
+    const id = this.after(ms, () => {
+      this.drawTimers.delete(id);
+      if (this.activeDrawKey === key && this.state.spin?.key === key) fn();
+    }, 1); // Durations are already scaled by the draw's captured speed.
+    this.drawTimers.add(id);
+    return id;
+  }
+
+  drawFrame(key, fn) {
+    if (this.activeDrawKey !== key) return;
+    const id = requestAnimationFrame(() => {
+      this.drawFrames.delete(id);
+      if (this.activeDrawKey === key) fn();
+    });
+    this.drawFrames.add(id);
   }
 
   // ---------- boot ----------
 
   async boot() {
     try {
-      const res = await fetch(MAP_URL);
+      const [res, atlas] = await Promise.all([
+        fetch(MAP_URL),
+        fetch(ATLAS_URL).then(r => r.ok ? r.json() : null).catch(() => null),
+      ]);
       if (!res.ok) throw new Error('map fetch ' + res.status);
       this.geo = new WorldGeometry(await res.json(), CAPITALS);
+      // Display-only detail keeps targeting, club seeding and existing saves
+      // on the original topology. A missing visual atlas falls back gracefully.
+      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS) : null;
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
       const saved = loadSave();
@@ -127,7 +175,7 @@ export default class App extends React.Component {
         this.saved = saved;
         this.setState({
           hasSave: true,
-          savedMeta: { round: saved.round, alive: saved.aliveIds.length, scope: saved.settings.scope },
+          savedMeta: { round: saved.round, alive: saved.aliveIds.length, settings: saved.settings },
         });
       }
       this.fitMap(Object.keys(NATIONS));
@@ -139,16 +187,54 @@ export default class App extends React.Component {
 
   /** The read-only view the campaign rules operate on. */
   board(state = this.state) {
-    return { geo: this.geo, own: state.own, aliveIds: state.aliveIds };
+    return { geo: this.geo, routingPaths: this.displayGeo?.paths || this.geo.paths,
+      own: state.own, aliveIds: state.aliveIds };
   }
 
   /**
    * Reframe the map on a set of nations. Bumping the key drops any zoom and pan
    * the player had applied, which would otherwise point at the old theatre.
    */
-  fitMap(ids) {
+  fitMap(ids, settings) {
     this.geo.fitTo(ids);
+    if (this.displayGeo) {
+      const { s, tx, ty } = this.geo.fit;
+      this.displayGeo.paths = this.displayGeo.buildPaths(s, tx, ty);
+    }
+    // Stable display-only geometry lets the label engine cache shape work
+    // through ticker updates, hover, selection and camera movements.
+    this.labelGeometry = this.geo.countries.map(country => ({
+      id: country.id,
+      rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
+    }));
+    this.flagComponents = createFlagRegionIndex(this.labelGeometry, {
+      maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit,
+    });
+    this.setupFlagOwnership = Object.fromEntries(this.geo.countries
+      .filter(country => NATIONS[country.id] || DEPENDENCIES[country.id])
+      .map(country => [country.id, country.id]));
+    this.flagLayoutCache = null;
+    this.viewFocus = null;
+    // Russia and overseas islands remain playable, but the European opening
+    // camera should show the continent. Zooming out always restores all land.
+    if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') {
+      const { s, tx, ty } = this.geo.fit;
+      const points = [[-15, 34], [44, 34], [-15, 71], [44, 71]].map(([lon, lat]) => {
+        const [x, y] = projPt(lon, lat);
+        return [x * s + tx, y * s + ty];
+      });
+      const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+      this.viewFocus = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+    }
     this.viewResetKey = (this.viewResetKey || 0) + 1;
+  }
+
+  scopeName(settings = this.state.settings) {
+    if (settings?.layer === 'clubs') {
+      const scopes = CLUB_SCOPES(getSport(settings.sport));
+      return (scopes.find(x => x.id === settings.clubScope) || scopes[0]).name;
+    }
+    return SCOPES.find(x => x.id === settings?.scope)?.name || 'World War';
   }
 
   // ---------- campaign lifecycle ----------
@@ -201,7 +287,7 @@ export default class App extends React.Component {
         if (teams[dep.of]) own[shapeId] = dep.of;
       }
     }
-    this.fitMap(Object.keys(own));
+    this.fitMap(Object.keys(own), su);
     this.setState(
       {
         phase: 'playing',
@@ -221,7 +307,7 @@ export default class App extends React.Component {
         autoplay: false,
         selected: null,
         flash: {},
-        tab: 'feed',
+        tab: 'power',
         confirmNew: false,
         battles: [],
         log: [
@@ -240,7 +326,7 @@ export default class App extends React.Component {
   resume() {
     const s = this.saved;
     if (!s) return;
-    this.fitMap(Object.keys(s.own));
+    this.fitMap(Object.keys(s.own), s.settings);
     this.setState({
       phase: s.phase === 'victory' ? 'victory' : 'playing',
       settings: s.settings,
@@ -261,6 +347,7 @@ export default class App extends React.Component {
       selected: null,
       flash: {},
       battles: [],
+      tab: 'power',
     });
   }
 
@@ -334,39 +421,66 @@ export default class App extends React.Component {
 
   beginDuel() {
     const st = this.state;
-    const attackerId = st.aliveIds[Math.floor(this.rng() * st.aliveIds.length)];
-    const center = empireCenter(this.board(), attackerId);
-    const finalAngle = this.rng() * 360;
-    const spins = 720 + Math.floor(this.rng() * 360);
+    if (st.phase !== 'playing' || st.spin || this.activeDrawKey != null || (st.match && !st.match.applied)) return;
+    const reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const draw = createDuelDraw(this.rng, this.board(), { speed: st.speed, reducedMotion });
+    if (!draw) {
+      this.setState({ autoplay: false });
+      this.showToast({ code: 'DRAW', txt: 'No clear route for this draw. Choose Next match to try again.', col: C.gold },
+        6000 * (st.speed || 1));
+      return;
+    }
+    const spinKey = (this.spinKey = (this.spinKey || 0) + 1);
+    this.activeDrawKey = spinKey;
 
     this.setState({
       round: st.round + 1,
-      spin: { tid: attackerId, x: center.x, y: center.y, ang: 0 },
+      spin: { ...draw, key: spinKey, tid: draw.attackerId, stage: 'ready', ang: reducedMotion ? draw.rotation : 0 },
       atk: null,
       match: null,
       pu: null,
       toast: null,
-    });
-    // Two frames: the needle must paint at 0° before the CSS transition to the
-    // final angle can animate.
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        if (this.state.spin) this.setState({ spin: { ...this.state.spin, ang: spins + finalAngle } });
-      }),
-    );
-
-    this.after(2350, () => {
-      if (!this.state.spin) return;
-      const target = pickTarget(this.board(), attackerId, (spins + finalAngle) % 360);
-      if (!target) {
-        this.setState({ spin: null });
-        return;
+    }, () => {
+      if (reducedMotion) this.drawAfter(draw.spinMs, spinKey, () => this.lockDuel(spinKey));
+      else {
+        // Give the initial needle one paint before changing its angle. The
+        // fallback also advances background tabs where rAF may be suspended.
+        this.drawFrame(spinKey, () => this.drawFrame(spinKey, () => this.animateDuel(spinKey)));
+        this.drawAfter(160, spinKey, () => this.animateDuel(spinKey));
       }
-      const cp = target.cp;
-      this.setState({
-        atk: { x1: cp.ax, y1: cp.ay, x2: cp.bx, y2: cp.by, col: this.state.teams[attackerId].col },
-      });
-      this.after(720, () => this.startMatch(attackerId, target.tid));
+    });
+  }
+
+  animateDuel(key) {
+    if (this.activeDrawKey !== key || this.startedDrawKey === key) return;
+    this.startedDrawKey = key;
+    this.setState(state => this.activeDrawKey === key && state.spin?.key === key && state.spin.stage === 'ready'
+      ? { spin: { ...state.spin, stage: 'spinning', ang: state.spin.rotation } } : null, () => {
+      const draw = this.state.spin;
+      if (this.activeDrawKey === key && draw?.key === key && draw.stage === 'spinning') {
+        // A single timing snapshot drives CSS and kickoff. One paint of slack
+        // avoids cutting the last animation frame short at 4× playback.
+        this.drawAfter(draw.spinMs + 34, key, () => this.lockDuel(key));
+      }
+    });
+  }
+
+  lockDuel(key) {
+    if (this.activeDrawKey !== key || this.state.spin?.key !== key || this.lockedDrawKey === key) return;
+    this.lockedDrawKey = key;
+    this.setState(state => {
+      const draw = state.spin;
+      if (this.activeDrawKey !== key || draw?.key !== key || draw.stage === 'locked') return null;
+      return {
+        spin: { ...draw, stage: 'locked', ang: draw.rotation },
+        atk: { x1: draw.x, y1: draw.y, x2: draw.targetX, y2: draw.targetY,
+          col: state.teams[draw.attackerId].col, reducedMotion: draw.reducedMotion },
+      };
+    }, () => {
+      const draw = this.state.spin;
+      if (this.activeDrawKey === key && draw?.key === key && draw.stage === 'locked') {
+        this.drawAfter(draw.holdMs, key, () => this.startMatch(draw.attackerId, draw.targetId));
+      }
     });
   }
 
@@ -418,6 +532,7 @@ export default class App extends React.Component {
     const a = st.teams[attackerId];
     const d = st.teams[defenderId];
     if (!a || !d) return;
+    this.clearDraw();
 
     const sport = this.sport();
     const effA = teamEff(a);
@@ -565,11 +680,14 @@ export default class App extends React.Component {
     const teams = { ...st.teams };
     const W = { ...teams[winnerId], squad: teams[winnerId].squad.slice() };
     const L = { ...teams[loserId], squad: teams[loserId].squad.slice() };
+    const strengthBefore = teamEff(W);
     const stolen = L.squad.slice().sort((x, y) => y.rating - x.rating)[0];
     if (stolen) {
       W.squad.push({ ...stolen, from: L.code });
       L.squad = L.squad.filter(p => p !== stolen);
     }
+    const strengthAfter = teamEff(W);
+    const strengthGained = Math.round((strengthAfter - strengthBefore) * 10) / 10;
     teams[winnerId] = W;
     teams[loserId] = L;
 
@@ -655,6 +773,13 @@ export default class App extends React.Component {
           resText: '+' + taken.length + ' territories' + stealTxt,
           resTitle: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
           wCol: W.col,
+          winnerName: W.name,
+          loserName: L.name,
+          territoriesGained: taken.length,
+          playerTaken: stolen ? { name: stolen.name, rating: stolen.rating, pos: stolen.pos } : null,
+          strengthBefore,
+          strengthAfter,
+          strengthGained,
         },
       },
       () => {
@@ -698,7 +823,7 @@ export default class App extends React.Component {
           this.after(doneAt + 250, () => this.setState({ phase: 'victory', autoplay: false }, () => writeSave(this.state)));
         } else if (this.state.autoplay) {
           // Mid-batch runs back-to-back; a fresh round gets a beat of breathing room.
-          this.after(this.state.queue.length ? doneAt : doneAt + 120, () => this.nextAction());
+          this.after(this.state.queue.length ? doneAt : doneAt + 120, () => { if (this.state.autoplay) this.nextAction(); });
         }
         // Paused mid-batch: the next match waits for STEP.
       },
@@ -722,7 +847,9 @@ export default class App extends React.Component {
     const on = !this.state.autoplay;
     this.setState({ autoplay: on }, () => {
       const st = this.state;
-      if (on && (!st.match || st.match.applied) && !st.spin) this.after(80, () => this.nextAction());
+      if (on && (!st.match || st.match.applied) && !st.spin) this.after(80, () => {
+        if (this.state.autoplay) this.nextAction();
+      });
     });
   }
 
@@ -748,8 +875,8 @@ export default class App extends React.Component {
     const map = this.mapRef.current;
     if (tip && map) {
       const b = map.getBoundingClientRect();
-      tip.style.left = Math.min(e.clientX - b.left + 14, b.width - 200) + 'px';
-      tip.style.top = e.clientY - b.top + 12 + 'px';
+      tip.style.left = Math.max(8, Math.min(e.clientX - b.left + 14, b.width - 248)) + 'px';
+      tip.style.top = Math.min(e.clientY - b.top + 12, b.height - 80) + 'px';
     }
     const svg = this.svgRef.current;
     const coord = this.coordRef.current;
@@ -766,7 +893,7 @@ export default class App extends React.Component {
           coord.textContent =
             'LAT ' + Math.abs(lat).toFixed(1) + (lat >= 0 ? '°N' : '°S') +
             ' · LON ' + Math.abs(lon).toFixed(1) + (lon >= 0 ? '°E' : '°W');
-        }
+        } else coord.textContent = '';
       } catch {
         /* the pointer left the SVG mid-measurement */
       }
@@ -775,33 +902,75 @@ export default class App extends React.Component {
 
   // ---------- derived view models ----------
 
+  /** One regional banner across mainland and nearby islands, not tiny repeats. */
+  mapFlags(playing) {
+    const { mapMode, own, teams } = this.state;
+    const empty = { flagParts: new Map(), flagPatterns: [] };
+    if (mapMode !== 'flags' || !this.flagComponents) return empty;
+    if (playing && !Object.values(teams).some(team => team.flagId)) return empty;
+    const components = this.flagComponents.components(playing ? own : this.setupFlagOwnership);
+    const cached = this.flagLayoutCache;
+    if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
+
+    const flagParts = new Map();
+    const flagPatterns = [];
+    for (const component of components) {
+      const owner = playing ? teams[component.ownerId] : null;
+      const nationId = playing ? owner?.flagId : NATIONS[component.ownerId] ? component.ownerId : DEPENDENCIES[component.ownerId]?.of;
+      const url = flagUrl(nationId);
+      if (!url) continue;
+      // Owner + the lowest stable piece id is short and unique, including when
+      // a country's mainland and overseas polygons need different flag tiles.
+      const id = component.key.split('|').slice(0, 2).join('-').replace(/[^a-zA-Z0-9_-]/g, '-');
+      const b = component.bbox;
+      const symbolProfile = FLAG_SYMBOLS[FLAG_CODES[nationId]];
+      const symbolLayout = symbolProfile ? layoutFlagSymbol(component, symbolProfile) : null;
+      flagPatterns.push({ id, ownerId: component.ownerId, url, color: owner?.col || politicalColor(nationId),
+        symbolProfile, symbolLayout,
+        fieldUrl: symbolProfile ? `${import.meta.env.BASE_URL}${symbolProfile.fieldFile}` : null,
+        symbolUrl: symbolProfile ? `${import.meta.env.BASE_URL}${symbolProfile.symbolFile}` : null,
+        bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
+      for (const part of component.parts) {
+        if (!flagParts.has(part.countryId)) flagParts.set(part.countryId, []);
+        flagParts.get(part.countryId).push({ id, fill: `url(#fi-flag-${id})`,
+          d: part.rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join('') });
+      }
+    }
+    const result = { flagParts, flagPatterns };
+    this.flagLayoutCache = { components, teams, playing, result };
+    return result;
+  }
+
   /**
    * Every map shape, plus the flag patterns held territory is filled with.
    * A country flies its *owner's* flag, so an empire reads as one banner
    * spreading across the map.
    */
   mapCountries() {
-    const { own, teams, selected, flash } = this.state;
+    const { own, teams, selected, flash, phase } = this.state;
     if (!this.geo) return { countries: [], flagPatterns: [] };
+    const playing = phase === 'playing' || phase === 'victory';
 
     const countries = [];
-    const flagPatterns = [];
+    const { flagParts, flagPatterns } = this.mapFlags(playing);
     for (const c of this.geo.countries) {
-      const p = this.geo.paths[c.id];
+      const p = this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
       if (!p) continue;
-      const ownerId = own[c.id];
+      const ownerId = playing ? own[c.id] : null;
       const owner = ownerId ? teams[ownerId] : null;
       const isSelected = owner && selected === ownerId;
-      const flag = owner && owner.flagId ? flagUrl(owner.flagId) : null;
-      if (flag) flagPatterns.push({ id: c.id, url: flag, color: owner.col, bbox: p.bbox });
+      const parts = flagParts.get(c.id);
 
       const unclaimedShade = (parseInt(c.id, 10) || c.id.charCodeAt(0)) % 2 ? C.landA : C.landB;
       countries.push({
         id: c.id,
+        ownerId,
+        name: NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
         d: p.d,
-        fill: flag ? `url(#fi-flag-${c.id})` : owner ? owner.col : unclaimedShade,
-        stroke: isSelected ? C.goldOutline : C.ink,
-        strokeWidth: isSelected ? 1.1 : 0.55,
+        flagParts: parts,
+        fill: parts?.length ? 'transparent' : owner ? (owner.kind === 'club' ? owner.col : politicalColor(owner.id)) : phase === 'setup' && NATIONS[c.id] ? politicalColor(c.id) : unclaimedShade,
+        stroke: isSelected ? C.goldOutline : '#C0C7B2',
+        strokeWidth: isSelected ? 1.8 : 0.55,
         cursor: owner ? 'pointer' : 'default',
         animation: flash[c.id] ? 'fiFlash 0.9s ease-out' : 'none',
         onClick: () => this.selectCountry(c.id),
@@ -812,18 +981,12 @@ export default class App extends React.Component {
   }
 
   mapLabels(playing) {
-    const { aliveIds, teams } = this.state;
     if (!playing || !CONFIG.showLabels || !this.geo) return [];
-    const board = this.board();
-    return aliveIds
-      .map(tid => ({ tid, n: territories(board, tid).length }))
-      .sort((a, b) => b.n - a.n)
-      .slice(0, 8)
-      .filter(r => r.n >= 2)
-      .map(r => {
-        const c = empireCenter(board, r.tid);
-        return { key: r.tid, x: c.x.toFixed(0), y: c.y.toFixed(0), text: teams[r.tid].code + ' ' + r.n };
-      });
+    const { aliveIds, teams } = this.state;
+    return aliveIds.filter(id => teams[id]).map(id => ({
+      id,
+      text: (teams[id].kind === 'club' ? teams[id].code : teams[id].name).toUpperCase(),
+    }));
   }
 
   /** A diamond on every empire that still holds its own homeland. */
@@ -884,7 +1047,7 @@ export default class App extends React.Component {
     }
     if (!biggest || best <= 1) return null;
     return {
-      text: 'LARGEST EMPIRE — ' + teams[biggest].name.toUpperCase() + ' · ' + best + ' TERRITORIES',
+      text: 'Largest empire: ' + teams[biggest].name + ' · ' + best + ' territories',
       color: teams[biggest].col,
     };
   }
@@ -902,8 +1065,8 @@ export default class App extends React.Component {
       statusColor: m.done ? C.textMute : m.status === sport.labels.tie ? C.gold : C.green,
       statusLive: !m.done,
       startLabel: sport.labels.start,
-      a: { id: A.flagId, code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), score: m.ga },
-      b: { id: B.flagId, code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), score: m.gd },
+      a: { id: A.flagId, isClub: A.kind === 'club', code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), score: m.ga },
+      b: { id: B.flagId, isClub: B.kind === 'club', code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), score: m.gd },
       // Only a shootout reveals kick by kick; overtime plays out through the feed.
       kicks: m.tieShown ? { a: m.tieShown.A, b: m.tieShown.D } : null,
       events: m.shown.map(e => {
@@ -913,7 +1076,10 @@ export default class App extends React.Component {
       }),
       noEvents: m.shown.length === 0 && !m.done,
       result: m.done
-        ? { title: m.resTitle || '', text: m.resText || '', upset: !!m.isUpset, background: tint(m.wCol || C.gold, 0.1) }
+        ? { title: m.resTitle || '', text: m.resText || '', upset: !!m.isUpset, background: tint(m.wCol || C.gold, 0.1),
+          winnerName: m.winnerName, loserName: m.loserName, territories: m.territoriesGained, player: m.playerTaken,
+          strengthBefore: m.strengthBefore, strengthAfter: m.strengthAfter, strengthGain: m.strengthGained,
+          tieText: m.tie ? (sport.tieBreak === 'shootout' ? `${m.tie.ga}–${m.tie.gd} on penalties` : `After ${m.tie.periods.length} overtime period${m.tie.periods.length === 1 ? '' : 's'}`) : null }
         : null,
     };
   }
@@ -921,14 +1087,14 @@ export default class App extends React.Component {
   idleText() {
     const { phase, match, spin, queue, settings } = this.state;
     if (phase !== 'playing' || match || spin) return null;
-    if (queue.length) return 'BATCH PAUSED — PRESS STEP FOR THE NEXT MATCH, OR PLAY TO RUN THE REST.';
+    if (queue.length) return 'The round is paused. Play the next match when you’re ready.';
     if (settings.pacing === 'duel') {
-      return 'AWAITING ORDERS. STEP SPINS FOR AN ATTACKER AND A DIRECTION — PLAY RUNS THE WAR AUTOMATICALLY.';
+      return 'Choose Next match to draw the next fixture.';
     }
     if (settings.pacing === 'blitz') {
-      return 'AWAITING ORDERS. STEP LAUNCHES A BLITZ ROUND — EVERY NATION FIGHTS, THE FIELD HALVES.';
+      return 'Start a round of neighbouring rivals. Each match sends one team home.';
     }
-    return 'AWAITING ORDERS. STEP DRAWS RANDOM MATCHUPS UNTIL A NAME REPEATS, THEN RESOLVES THEM.';
+    return 'Draw an unpredictable round of matches, then watch the map change hands.';
   }
 
   powerTable(playing) {
@@ -937,15 +1103,16 @@ export default class App extends React.Component {
     const board = this.board();
     return aliveIds
       .map(tid => ({ tid, eff: teamEff(teams[tid]), terr: territories(board, tid).length }))
-      .sort((a, b) => b.eff - a.eff)
+      .sort((a, b) => b.eff - a.eff || teams[a.tid].name.localeCompare(teams[b.tid].name) || a.tid.localeCompare(b.tid))
       .map((r, i) => ({
         tid: r.tid,
         flagId: teams[r.tid].flagId,
-        rank: pad3(i + 1).slice(-2),
+        isClub: teams[r.tid].kind === 'club',
+        rank: i + 1,
         code: teams[r.tid].code,
         color: teams[r.tid].col,
         name: teams[r.tid].name,
-        territories: 'T' + r.terr,
+        territories: String(r.terr),
         eff: r.eff.toFixed(1),
         // How much of that rating was bought with conquest rather than born with.
         effGain: signed(r.eff - (teams[r.tid].baseEff ?? r.eff)),
@@ -961,10 +1128,11 @@ export default class App extends React.Component {
     const s = stats[team.id] || { conq: 0, steals: [] };
     return {
       id: team.flagId,
+      isClub: team.kind === 'club',
       color: team.col,
       code: team.code,
       name: team.name,
-      meta: team.conf + ' · BASE STR ' + team.str,
+      meta: team.conf + ' · Starting strength ' + team.str,
       eff: teamEff(team).toFixed(1),
       effGain: signed(teamEff(team) - (team.baseEff ?? teamEff(team))),
       avg: squadAverage(team).toFixed(1),
@@ -994,14 +1162,16 @@ export default class App extends React.Component {
     const champ = aliveIds.length ? teams[aliveIds[0]] : null;
     if (!champ) return null;
     const s = stats[champ.id] || { conq: 0, steals: [] };
-    const scope = SCOPES.find(x => x.id === settings.scope);
+    const scope = this.scopeName(settings);
     return {
       id: champ.flagId,
+      code: champ.code,
+      isClub: champ.kind === 'club',
       round: pad3(round),
       name: champ.name.toUpperCase(),
       color: champ.col,
       subtitle:
-        'has conquered ' + (settings.scope === 'world' ? 'the world' : scope ? scope.name : 'the theatre') +
+        'has conquered ' + (settings.layer !== 'clubs' && settings.scope === 'world' ? 'the world' : scope) +
         ' in ' + matches + ' battles',
       conquests: String(s.conq || 0),
       steals: String((s.steals || []).length),
@@ -1009,7 +1179,7 @@ export default class App extends React.Component {
       effNow: teamEff(champ).toFixed(1),
       effBase: (champ.baseEff ?? teamEff(champ)).toFixed(1),
       effGain: signed(teamEff(champ) - (champ.baseEff ?? teamEff(champ))),
-      squad: champ.squad.slice().sort((a, b) => b.rating - a.rating).slice(0, 11),
+      squad: champ.squad.slice().sort((a, b) => b.rating - a.rating).slice(0, this.sport().squadSize),
     };
   }
 
@@ -1046,149 +1216,91 @@ export default class App extends React.Component {
   render() {
     const st = this.state;
     const playing = st.phase === 'playing' || st.phase === 'victory';
-    const scope = SCOPES.find(x => x.id === st.settings.scope);
-    const stage = this.warStage();
+    const scopeName = this.scopeName();
     const victory = st.phase === 'victory' ? this.victoryPanel() : null;
     const { countries, flagPatterns } = this.mapCountries();
+    const completed = playing && st.aliveIds.length <= 1;
+    const liveMatch = !!st.match && !st.match.applied;
+    const sport = getSport(playing ? st.settings.sport : st.setup.sport);
+    const oceanLabels = !playing && this.geo ? [
+      ['Pacific Ocean', -135, -5], ['Atlantic Ocean', -30, 0], ['Indian Ocean', 76, -25],
+    ].map(([text, lon, lat]) => {
+      const [x, y] = projPt(lon, lat);
+      const { s, tx, ty } = this.geo.fit;
+      return { text, x: x * s + tx, y: y * s + ty };
+    }) : [];
+    const campaignTitle = st.settings.layer !== 'clubs' && st.settings.scope === 'UEFA'
+      ? 'The European campaign'
+      : st.settings.layer !== 'clubs' && st.settings.scope === 'world'
+        ? 'The world campaign'
+        : scopeName + ' campaign';
 
     return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: C.deep,
-          color: C.text,
-          position: 'relative',
-          overflow: 'hidden',
-          fontFamily: FONT.body,
-        }}
-      >
+      <div className="app-shell">
         <CommandBar
-          show={playing}
-          title={this.sport().name.toUpperCase() + ' IMPERIALISM'}
-          scopeName={scope ? scope.name.toUpperCase() : ''}
-          round={st.round}
-          alive={st.aliveIds.length}
-          fallen={st.fallen.length}
-          warStage={stage.text}
-          warPulsing={stage.pulsing}
-          pacing={st.settings.pacing}
-          resolution={st.settings.resolution}
-          speed={st.speed}
-          autoplay={st.autoplay}
-          confirmNew={st.confirmNew}
-          onPacing={p => this.setSetting('pacing', p)}
-          onResolution={r => this.setSetting('resolution', r)}
-          onSpeed={() => this.cycleSpeed()}
-          onStep={() => this.step()}
-          onPlay={() => this.togglePlay()}
+          show={playing} sportName={sport.name} layerName={st.settings.layer === 'clubs' ? 'Clubs' : 'Nations'}
+          scopeName={scopeName} round={st.round} alive={st.aliveIds.length}
+          pacing={st.settings.pacing} resolution={st.settings.resolution}
+          confirmNew={st.confirmNew} busy={liveMatch || !!st.spin} completed={completed}
+          onPacing={p => this.setSetting('pacing', p)} onResolution={r => this.setSetting('resolution', r)}
           onNew={() => this.newCampaign()}
         />
-
-        <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+        <main className="campaign-layout">
           <WorldMap
-            countries={countries}
-            flagPatterns={flagPatterns}
+            countries={countries} flagPatterns={flagPatterns}
             graticule={this.geo ? this.geo.graticule : { d: '', labels: [] }}
             homes={this.mapHomes(playing)}
-            battleMarks={(st.battles || []).map((b, i, arr) => ({
-              x: b.x,
-              y: b.y,
-              op: (0.25 + 0.65 * ((i + 1) / arr.length)).toFixed(2),
-            }))}
-            labels={this.mapLabels(playing)}
-            attack={st.atk ? { x1: st.atk.x1, y1: st.atk.y1, x2: st.atk.x2, y2: st.atk.y2, color: st.atk.col } : null}
-            spin={st.spin ? { x: st.spin.x, y: st.spin.y, angle: st.spin.ang, color: st.teams[st.spin.tid] ? st.teams[st.spin.tid].col : C.gold } : null}
-            tooltip={this.tooltip(playing)}
-            kmPerUnit={this.geo ? this.geo.kmPerUnit : 0}
-            legend={this.legend(playing)}
-            viewResetKey={this.viewResetKey}
-            mapRef={this.mapRef}
-            svgRef={this.svgRef}
-            tipRef={this.tipRef}
-            coordRef={this.coordRef}
-            onPointerMove={this.handleMapMove}
-            onPointerLeave={() => this.setState({ hoverCid: null })}
+            battleMarks={(st.battles || []).map((b, i, arr) => ({ x: b.x, y: b.y, op: .25 + .65 * (i + 1) / arr.length }))}
+            labels={this.mapLabels(playing)} labelGeometry={this.labelGeometry} ownership={st.own} oceanLabels={oceanLabels}
+            attack={st.atk}
+            spin={st.spin ? { ...st.spin, angle: st.spin.ang, durationMs: st.spin.spinMs,
+              attackerName: st.teams[st.spin.attackerId]?.name, targetName: st.teams[st.spin.targetId]?.name } : null}
+            tooltip={this.tooltip(playing)} kmPerUnit={this.geo?.kmPerUnit || 0} legend={this.legend(playing)}
+            viewResetKey={this.viewResetKey} initialFocus={this.viewFocus}
+            title={campaignTitle} playing={playing} mapMode={st.mapMode}
+            onMapMode={mapMode => this.setState({ mapMode })}
+            mapRef={this.mapRef} svgRef={this.svgRef} tipRef={this.tipRef} coordRef={this.coordRef}
+            onPointerMove={this.handleMapMove} onPointerLeave={() => this.setState({ hoverCid: null })}
+            playback={playing && <PlaybackBar
+              speed={st.speed} autoplay={st.autoplay} busy={!!st.spin} completed={completed}
+              stepLabel={st.spin ? 'Drawing match…' : liveMatch ? 'Finish match' : 'Next match'}
+              onSpeed={() => this.cycleSpeed()} onStep={() => this.step()} onPlay={() => this.togglePlay()}
+            />}
           >
             {st.toast && <Toast code={st.toast.code} text={st.toast.txt} color={st.toast.col} />}
             {this.renderPopup()}
           </WorldMap>
-
-          <Sidebar
-            match={this.matchCard()}
-            idleText={this.idleText()}
-            queueLeft={st.queue.length}
-            tab={st.tab}
-            onTab={tab => this.setState({ tab })}
-            feed={st.log
-              .slice()
-              .reverse()
-              .slice(0, FEED_CAP)
-              .map(f => ({ round: 'R' + pad3(f.r), chip: f.chip || C.textMute, color: f.col || C.textSoft, text: f.txt }))}
-            power={this.powerTable(playing)}
-            squad={this.squadPanel()}
-            positionColors={this.sport().positionColors}
-            onSelectTeam={tid => this.setState({ selected: tid, tab: 'squad' })}
-            eventsRef={this.eventsRef}
-          />
-        </div>
-
-        {st.phase === 'setup' && (
-          <SetupOverlay
-            setup={st.setup}
-            hasSave={st.hasSave}
-            savedText={
-              st.savedMeta
-                ? 'ROUND ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' NATIONS ALIVE · ' + String(st.savedMeta.scope).toUpperCase()
-                : ''
-            }
-            onResume={() => this.resume()}
-            onDiscard={() => this.discardSave()}
-            onPick={(key, value) => this.setState({ setup: { ...st.setup, [key]: value } })}
-            onStart={() => this.startCampaign()}
-          />
-        )}
-
-        {victory && (
-          <VictoryOverlay
-            {...victory}
-            positionColors={this.sport().positionColors}
-            onClose={() => this.setState({ phase: 'playing' })}
-            onNew={() => {
-              this.clearTimers();
-              this.discardSave();
-              this.fitMap(Object.keys(NATIONS));
-              this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null });
-            }}
-          />
-        )}
-
-        {st.phase === 'loading' && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 60,
-              background: C.deep,
-            }}
-          >
-            <span
-              style={{
-                fontFamily: FONT.mono,
-                fontSize: 11,
-                letterSpacing: 2,
-                color: st.err ? C.red : C.textMute,
-                animation: 'fiBlink 1.4s ease-in-out infinite',
-              }}
-            >
-              {st.err || 'ACQUIRING SATELLITE MAP ▮▮▮'}
-            </span>
-          </div>
-        )}
+          {playing && <Sidebar
+            match={this.matchCard()} idleText={this.idleText()} queueLeft={st.queue.length}
+            draw={st.spin ? { stage: st.spin.stage, isNeighbor: st.spin.isNeighbor,
+              attackerName: st.teams[st.spin.attackerId]?.name, targetName: st.teams[st.spin.targetId]?.name } : null}
+            tab={st.tab} onTab={tab => this.setState({ tab })}
+            feed={st.log.slice().reverse().slice(0, FEED_CAP).map(f => ({
+              round: 'R' + f.r, chip: f.chip || C.textMute, color: f.col || C.textSoft, text: f.txt,
+            }))}
+            power={this.powerTable(playing)} squad={this.squadPanel()} positionColors={sport.positionColors}
+            onSelectTeam={tid => this.setState({ selected: tid, tab: 'squad' })} eventsRef={this.eventsRef}
+          />}
+        </main>
+        {st.phase === 'setup' && <SetupOverlay
+          setup={st.setup} hasSave={st.hasSave}
+          savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
+            (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings) : ''}
+          onResume={() => this.resume()} onDiscard={() => this.discardSave()}
+          onPick={(key, value) => this.setState({ setup: { ...st.setup, [key]: value } })}
+          onStart={() => this.startCampaign()}
+        />}
+        {victory && <VictoryOverlay {...victory} positionColors={sport.positionColors}
+          onClose={() => this.setState({ phase: 'playing' })}
+          onNew={() => {
+            this.clearTimers(); this.discardSave(); this.fitMap(Object.keys(NATIONS));
+            this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null, autoplay: false });
+          }}
+        />}
+        {st.phase === 'loading' && <div className="loading-screen" role={st.err ? 'alert' : 'status'}>
+          <span>{st.err || 'Opening the atlas…'}</span>
+          {st.err && <button className="button" onClick={() => { this.setState({ err: null }); this.boot(); }}>Try again</button>}
+        </div>}
       </div>
     );
   }
