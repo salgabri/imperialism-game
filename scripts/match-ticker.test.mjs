@@ -114,3 +114,48 @@ test('penalty reveals respect the sampled first kicker and legacy saves default 
     } finally { await f.close(); }
   }
 });
+
+test('resuming between shootout kicks reveals the pending opponent reply before the next round', async () => {
+  const cases = [
+    { first: 'A', A: [1, 0], D: [0, 1], expected: ['D', 'A', 'D'] },
+    { first: 'D', A: [1, 0], D: [0, 1], expected: ['A', 'D', 'A'] },
+    { first: 'A', A: [1, 1, 1], D: [0, 0], expected: ['D', 'A', 'D', 'A'] },
+    { first: 'D', A: [0, 0], D: [1, 1, 1], expected: ['A', 'D', 'A', 'D'] },
+  ];
+  for (const scenario of cases) {
+    const { first, expected } = scenario;
+    const f = await fixture();
+    try {
+      const tasks = [], observed = [];
+      const second = first === 'A' ? 'D' : 'A';
+      const shown = { A: [], D: [] };
+      shown[first] = [scenario[first][0]];
+      f.app.after = (ms, callback) => tasks.push({ ms, callback });
+      let finished = 0;
+      f.app.finishMatch = () => { finished++; };
+      const pushKick = f.app.pushKick.bind(f.app);
+      f.app.pushKick = side => { observed.push(side); pushKick(side); };
+      await act(async () => f.app.setState(state => ({
+        settings: { ...state.settings, sport: 'football' },
+        match: { ...state.match, tie: { A: scenario.A, D: scenario.D, first }, tieShown: shown },
+      })));
+      f.app.presentMatch();
+      await act(async () => tasks.shift().callback());
+      tasks.sort((a, b) => a.ms - b.ms);
+      assert.deepEqual(tasks.slice(0, 3).map(task => task.ms), [350, 600, 850]);
+      await act(async () => tasks.shift().callback());
+      assert.deepEqual(observed, [second]);
+      assert.equal(f.app.state.match.tieShown.A.length, 1);
+      assert.equal(f.app.state.match.tieShown.D.length, 1);
+      await act(async () => tasks.shift().callback());
+      assert.deepEqual(observed, [second, first]);
+      assert.equal(f.app.state.match.tieShown[first].length, 2);
+      assert.equal(f.app.state.match.tieShown[second].length, 1);
+      assert.equal(finished, 0);
+      for (const task of tasks) await act(async () => task.callback());
+      assert.deepEqual(observed, expected);
+      assert.deepEqual(f.app.state.match.tieShown, { A: scenario.A, D: scenario.D });
+      assert.equal(finished, 1, 'the resumed match completes once, after every remaining kick');
+    } finally { await f.close(); }
+  }
+});

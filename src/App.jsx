@@ -720,12 +720,15 @@ export default class App extends React.Component {
       const shown = m.tieShown || { A: [], D: [] };
       this.patchMatch({ status: sport.labels.tie, tieShown: shown });
       const n = Math.max(m.tie.A.length, m.tie.D.length);
-      const firstSide = m.tie.first === 'D' ? 'D' : 'A';
+      const sides = m.tie.first === 'D' ? ['D', 'A'] : ['A', 'D'];
+      const remaining = [];
       for (let i = 0; i < n; i++) {
-        if (i >= shown.A.length && i < m.tie.A.length) this.after((firstSide === 'A' ? 350 : 600) + (i - shown.A.length) * 500, () => this.pushKick('A'));
-        if (i >= shown.D.length && i < m.tie.D.length) this.after((firstSide === 'D' ? 350 : 600) + (i - shown.D.length) * 500, () => this.pushKick('D'));
+        for (const side of sides) if (i >= shown[side].length && i < m.tie[side].length) remaining.push(side);
       }
-      this.after(350 + n * 500 + 650, () => this.finishMatch());
+      // Resume the remaining chronological sequence, including the opponent's
+      // pending reply when a save was captured between alternating kicks.
+      remaining.forEach((side, index) => this.after(350 + index * 250, () => this.pushKick(side)));
+      this.after(350 + remaining.length * 250 + 650, () => this.finishMatch());
     });
   }
 
