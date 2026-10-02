@@ -1,0 +1,578 @@
+{
+  "note": "Production App campaigns with one shared seeded RNG. Matched seeds across variants; divergent decisions/results naturally advance the shared stream differently. Model probes, not human engagement evidence. Wilson intervals are binomial reference intervals; the pooled acquisition interval does not account for within-campaign dependence.",
+  "runner": "src/App.jsx production lifecycle",
+  "seedStart": 20261002,
+  "runs": 100,
+  "matrix": "competitive",
+  "campaigns": [
+    {
+      "sport": "basketball",
+      "layer": "nations",
+      "scope": "elite",
+      "clubScope": "elite",
+      "pacing": "blitz",
+      "uncertainty": "balanced",
+      "finale": "single",
+      "acquisitionPolicy": "highest-rated",
+      "rosterPreset": "authentic",
+      "managerPolicy": "spectator",
+      "runs": 100,
+      "completed": 100,
+      "stalled": 0,
+      "completionShare95": [
+        0.963,
+        1
+      ],
+      "champions": [
+        {
+          "name": "United States",
+          "wins": 51,
+          "share": 0.51,
+          "share95": [
+            0.4135,
+            0.6058
+          ]
+        },
+        {
+          "name": "Serbia",
+          "wins": 8,
+          "share": 0.08,
+          "share95": [
+            0.0411,
+            0.15
+          ]
+        },
+        {
+          "name": "Germany",
+          "wins": 5,
+          "share": 0.05,
+          "share95": [
+            0.0215,
+            0.1118
+          ]
+        },
+        {
+          "name": "Slovenia",
+          "wins": 5,
+          "share": 0.05,
+          "share95": [
+            0.0215,
+            0.1118
+          ]
+        },
+        {
+          "name": "Canada",
+          "wins": 4,
+          "share": 0.04,
+          "share95": [
+            0.0157,
+            0.0984
+          ]
+        },
+        {
+          "name": "Latvia",
+          "wins": 3,
+          "share": 0.03,
+          "share95": [
+            0.0103,
+            0.0845
+          ]
+        },
+        {
+          "name": "Turkey",
+          "wins": 3,
+          "share": 0.03,
+          "share95": [
+            0.0103,
+            0.0845
+          ]
+        },
+        {
+          "name": "Argentina",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Croatia",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "France",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Greece",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Lithuania",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Spain",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Australia",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "China",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Dominican Rep.",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Finland",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Montenegro",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Philippines",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Poland",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Puerto Rico",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "South Sudan",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        }
+      ],
+      "distinctChampions": 22,
+      "effectiveChampionCount": 7.91,
+      "leadingChampionShare": 0.51,
+      "topFiveChampionShare": 0.7,
+      "topFiveChampionShare95": [
+        0.6042,
+        0.7811
+      ],
+      "usefulAcquisitionShare": 0.7761290322580645,
+      "usefulAcquisitionShare95": [
+        0.7611,
+        0.7905
+      ],
+      "meanMatches": 31,
+      "meanConquests": 31,
+      "meanRedraws": 0,
+      "meanAcquisitionGain": 47.61,
+      "meanManagedMatches": null,
+      "meanManagedConquests": null,
+      "meanManagedPlacement": null,
+      "meanManagedEliminatedAt": null,
+      "managedChampionShare": null,
+      "meanFirstDecisionMatch": null,
+      "managedRuns": 0,
+      "failures": []
+    },
+    {
+      "sport": "basketball",
+      "layer": "nations",
+      "scope": "elite",
+      "clubScope": "elite",
+      "pacing": "blitz",
+      "uncertainty": "balanced",
+      "finale": "single",
+      "acquisitionPolicy": "highest-rated",
+      "rosterPreset": "competitive",
+      "managerPolicy": "spectator",
+      "runs": 100,
+      "completed": 100,
+      "stalled": 0,
+      "completionShare95": [
+        0.963,
+        1
+      ],
+      "champions": [
+        {
+          "name": "Slovenia",
+          "wins": 9,
+          "share": 0.09,
+          "share95": [
+            0.0481,
+            0.1623
+          ]
+        },
+        {
+          "name": "Italy",
+          "wins": 7,
+          "share": 0.07,
+          "share95": [
+            0.0343,
+            0.1375
+          ]
+        },
+        {
+          "name": "South Sudan",
+          "wins": 7,
+          "share": 0.07,
+          "share95": [
+            0.0343,
+            0.1375
+          ]
+        },
+        {
+          "name": "Croatia",
+          "wins": 6,
+          "share": 0.06,
+          "share95": [
+            0.0278,
+            0.1248
+          ]
+        },
+        {
+          "name": "Greece",
+          "wins": 6,
+          "share": 0.06,
+          "share95": [
+            0.0278,
+            0.1248
+          ]
+        },
+        {
+          "name": "United States",
+          "wins": 5,
+          "share": 0.05,
+          "share95": [
+            0.0215,
+            0.1118
+          ]
+        },
+        {
+          "name": "China",
+          "wins": 4,
+          "share": 0.04,
+          "share95": [
+            0.0157,
+            0.0984
+          ]
+        },
+        {
+          "name": "France",
+          "wins": 4,
+          "share": 0.04,
+          "share95": [
+            0.0157,
+            0.0984
+          ]
+        },
+        {
+          "name": "New Zealand",
+          "wins": 4,
+          "share": 0.04,
+          "share95": [
+            0.0157,
+            0.0984
+          ]
+        },
+        {
+          "name": "Puerto Rico",
+          "wins": 4,
+          "share": 0.04,
+          "share95": [
+            0.0157,
+            0.0984
+          ]
+        },
+        {
+          "name": "Serbia",
+          "wins": 4,
+          "share": 0.04,
+          "share95": [
+            0.0157,
+            0.0984
+          ]
+        },
+        {
+          "name": "Canada",
+          "wins": 3,
+          "share": 0.03,
+          "share95": [
+            0.0103,
+            0.0845
+          ]
+        },
+        {
+          "name": "Dominican Rep.",
+          "wins": 3,
+          "share": 0.03,
+          "share95": [
+            0.0103,
+            0.0845
+          ]
+        },
+        {
+          "name": "Lithuania",
+          "wins": 3,
+          "share": 0.03,
+          "share95": [
+            0.0103,
+            0.0845
+          ]
+        },
+        {
+          "name": "Nigeria",
+          "wins": 3,
+          "share": 0.03,
+          "share95": [
+            0.0103,
+            0.0845
+          ]
+        },
+        {
+          "name": "Poland",
+          "wins": 3,
+          "share": 0.03,
+          "share95": [
+            0.0103,
+            0.0845
+          ]
+        },
+        {
+          "name": "Turkey",
+          "wins": 3,
+          "share": 0.03,
+          "share95": [
+            0.0103,
+            0.0845
+          ]
+        },
+        {
+          "name": "Argentina",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Bosnia & Herz.",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Czechia",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Georgia",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Germany",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Israel",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Japan",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Spain",
+          "wins": 2,
+          "share": 0.02,
+          "share95": [
+            0.0055,
+            0.07
+          ]
+        },
+        {
+          "name": "Australia",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Cameroon",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Finland",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Latvia",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Montenegro",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        },
+        {
+          "name": "Philippines",
+          "wins": 1,
+          "share": 0.01,
+          "share95": [
+            0.0018,
+            0.0545
+          ]
+        }
+      ],
+      "distinctChampions": 31,
+      "effectiveChampionCount": 25.88,
+      "leadingChampionShare": 0.09,
+      "topFiveChampionShare": 0.2,
+      "topFiveChampionShare95": [
+        0.1334,
+        0.2888
+      ],
+      "usefulAcquisitionShare": 0.8767741935483871,
+      "usefulAcquisitionShare95": [
+        0.8647,
+        0.8879
+      ],
+      "meanMatches": 31,
+      "meanConquests": 31,
+      "meanRedraws": 0,
+      "meanAcquisitionGain": 53.56,
+      "meanManagedMatches": null,
+      "meanManagedConquests": null,
+      "meanManagedPlacement": null,
+      "meanManagedEliminatedAt": null,
+      "managedChampionShare": null,
+      "meanFirstDecisionMatch": null,
+      "managedRuns": 0,
+      "failures": []
+    }
+  ]
+}

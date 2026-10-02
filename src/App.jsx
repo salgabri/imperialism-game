@@ -18,11 +18,17 @@ import {
   territories,
 } from './engine/campaign.js';
 import { createDuelDraw } from './engine/duelDraw.js';
-import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign } from './engine/storage.js';
+import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns,
+  loadCampaign, inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
-import { acquisitionOptions, advanceSeries, campaignRecap, estimateSession, recordMatch } from './engine/campaignExperience.js';
+import { acquisitionOptions, automaticAcquisition, advanceSeries, campaignRecap, estimateSession, recordMatch } from './engine/campaignExperience.js';
+import { tacticalMatchParameters, tacticalOptions, competitiveBasketballTeams } from './engine/managerStrategy.js';
+import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import AcquisitionChoice from './components/AcquisitionChoice.jsx';
+import TacticalChoice from './components/TacticalChoice.jsx';
+import ManagerElimination from './components/ManagerElimination.jsx';
+import CampaignStorageDialog from './components/CampaignStorageDialog.jsx';
 import ExportCheckpoint from './components/ExportCheckpoint.jsx';
 import CommandBar from './components/CommandBar.jsx';
 import PlaybackBar from './components/PlaybackBar.jsx';
@@ -38,7 +44,8 @@ const LOG_CAP = 220;
 const FEED_CAP = 90;
 const BATTLE_SCARS = 7;
 const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'UEFA', clubScope: 'all', pacing: 'duel', resolution: 'ticker',
-  preset: 'standard', seed: '', uncertainty: 'balanced', express: false, finale: 'single', role: 'spectator' };
+  preset: 'standard', seed: '', uncertainty: 'balanced', express: false, finale: 'single', role: 'spectator',
+  managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic' };
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
 function signed(delta) {
@@ -87,6 +94,23 @@ export default class App extends React.Component {
     choice: null, series: null, seed: null, rngState: null, saveStatus: null, exportText: null, exportFilename: null,
     conquestIds: [], focusBounds: null, focusKey: 0, startedAt: null, completedAt: null,
     metrics: { leaderChanges: 0, acquisitions: [], previousLeader: null },
+    managedTeamId: null, managementEnded: false, managerElimination: null, tacticalChoice: null,
+    historyFilter: '', decisionLedger: [], initialSettings: null,
+    campaignId: null, revision: 0, campaignName: '', storageDialog: null, storageConflict: false,
+  };
+
+  engagement = new SessionEngagement();
+  openingSeed = Date.now() >>> 0;
+  away = false;
+  updateEngagement = () => this.engagement.switchMode(engagementMode(this.state,
+    this.away || (typeof document !== 'undefined' && document.hidden)));
+  handleVisibility = () => this.updateEngagement();
+  handleFocus = () => { this.away = false; this.updateEngagement(); };
+  handleBlur = () => { this.away = true; this.updateEngagement(); };
+  handleStorage = event => {
+    if (!isCampaignStorageEvent(event, this.state.campaignId)) return;
+    const remote = detectSaveConflict(this.state);
+    if (remote) this.openStorageDialog('conflict', { campaign: remote, message: 'This campaign advanced in another tab. Reload its checkpoint or keep your branch in a new slot.' });
   };
 
   /** Every pending simulation timeout, so a reset or unmount can cancel the war. */
@@ -106,15 +130,26 @@ export default class App extends React.Component {
   eventsRef = React.createRef();
 
   componentDidMount() {
+    window.addEventListener('storage', this.handleStorage);
+    window.addEventListener('focus', this.handleFocus);
+    window.addEventListener('blur', this.handleBlur);
+    document.addEventListener('visibilitychange', this.handleVisibility);
     this.boot();
   }
 
   componentWillUnmount() {
     this.clearTimers();
     clearTimeout(this.confirmTimer);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('storage', this.handleStorage);
+      window.removeEventListener('focus', this.handleFocus);
+      window.removeEventListener('blur', this.handleBlur);
+      document.removeEventListener('visibilitychange', this.handleVisibility);
+    }
   }
 
   componentDidUpdate(_props, previous) {
+    this.updateEngagement();
     const el = this.eventsRef.current;
     if (el) el.scrollTop = el.scrollHeight;
     if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading'
@@ -178,7 +213,8 @@ export default class App extends React.Component {
       this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS) : null;
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
-      const saved = loadSave();
+      const inspection = inspectSave();
+      const saved = inspection.campaign || loadSave();
       if (saved) {
         this.saved = saved;
         this.setState({
@@ -186,6 +222,10 @@ export default class App extends React.Component {
           savedMeta: { round: saved.round, alive: saved.aliveIds.length, settings: saved.settings },
           saveStatus: { ok: true, savedAt: saved.savedAt, message: 'Saved campaign available' },
         });
+      }
+      if (inspection.state === 'recovery' || inspection.state === 'unavailable') {
+        this.setState({ saveStatus: { ok: false, message: inspection.message },
+          ...(inspection.state === 'recovery' ? { storageDialog: { mode: 'recovery', ...inspection } } : {}) });
       }
       this.fitMap(Object.keys(NATIONS));
       this.setState({ phase: 'setup' });
@@ -249,12 +289,23 @@ export default class App extends React.Component {
   // ---------- campaign lifecycle ----------
 
   persist() {
-    if (!Object.keys(this.state.teams).length) return;
+    if (!Object.keys(this.state.teams).length || this.saving || this.state.storageConflict) return;
+    this.saving = true;
     const rngState = this.rng?.getState?.() ?? this.state.rngState;
-    const snapshot = { ...this.state, rngState };
+    const snapshot = { ...this.state, rngState,
+      ...(this.saved?.campaignId === this.state.campaignId ? { revision: this.saved.revision } : {}),
+      metrics: { ...this.state.metrics, engagement: this.engagement.snapshot() } };
     const saveStatus = writeSave(snapshot);
-    this.saved = snapshot;
+    this.saving = false;
+    if (saveStatus.conflict) {
+      this.setState({ saveStatus }, () => this.openStorageDialog('conflict', { campaign: saveStatus.conflict,
+        message: 'A newer checkpoint exists in another tab. Choose which branch to continue.' }));
+      return;
+    }
+    this.saved = { ...snapshot, ...(saveStatus.ok ? { campaignId: saveStatus.campaignId, revision: saveStatus.revision, campaignName: saveStatus.campaignName } : {}) };
     this.setState({ rngState, saveStatus, hasSave: true,
+      metrics: snapshot.metrics,
+      ...(saveStatus.ok ? { campaignId: saveStatus.campaignId, revision: saveStatus.revision, campaignName: saveStatus.campaignName } : {}),
       savedMeta: { round: snapshot.round, alive: snapshot.aliveIds.length, settings: snapshot.settings } });
   }
 
@@ -266,13 +317,15 @@ export default class App extends React.Component {
         setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all' : CLUB_SCOPES(getSport(setup.sport))[2]?.id || 'all';
       } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
       if (key === 'sport' && !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope)) setup.clubScope = 'all';
+      if (['sport', 'layer', 'scope', 'clubScope', 'preset'].includes(key)) setup.managedTeamId = '';
       return { setup };
     });
   }
 
   exportProgress() {
     const data = this.state.phase === 'setup' && this.saved ? this.saved
-      : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState };
+      : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState,
+        metrics: { ...this.state.metrics, engagement: this.engagement.snapshot() } };
     const pending = this.state.autoplay || !!this.state.spin || (this.state.match && !this.state.match.done);
     if (pending) this.clock.pause();
     this.setState({ exportText: exportCampaign(data), exportFilename: `imperialism-${data.seed ?? 'campaign'}-match-${data.matches}.json`,
@@ -295,46 +348,84 @@ export default class App extends React.Component {
     try {
       if (file.size > 5_000_000) throw new Error('Choose a campaign file smaller than 5 MB.');
       const saved = parseCampaign(await file.text());
-      this.clearTimers(); this.saved = saved; this.resume();
+      this.openStorageDialog('import', { campaign: saved });
     } catch (error) {
       this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
     }
   }
 
-  startCampaign() {
-    this.clearTimers();
-    const su = this.state.setup;
-    const enteredSeed = String(su.seed || '').trim();
-    const seed = enteredSeed ? (/^\d+$/.test(enteredSeed) ? Number(enteredSeed) >>> 0 : hashStr(enteredSeed)) : Date.now() >>> 0;
-    this.rng = makeRng(seed);
+  openStorageDialog(mode, extras = {}) {
+    if (!this.state.storageDialog) this.storageReturn = { autoplay: this.state.autoplay, paused: this.state.paused };
+    this.clock.pause();
+    this.setState({ storageDialog: { mode, ...extras }, autoplay: false, paused: this.state.phase === 'playing',
+      ...(mode === 'conflict' ? { storageConflict: true } : {}) });
+  }
 
-    const sport = getSport(su.sport);
-    const clubLayer = su.layer === 'clubs';
+  closeStorageDialog() {
+    if (this.state.storageConflict) return;
+    const previous = this.storageReturn || { autoplay: false, paused: false };
+    this.setState({ storageDialog: null, ...previous }, () => {
+      if (!previous.paused) this.clock.resume();
+      this.updateEngagement();
+    });
+  }
 
-    let included;
-    let own = {};
-    let scopeName;
+  continueSaved(campaign, fork = false, name) {
+    if (!campaign) return;
+    this.saved = fork ? forkCampaign(campaign, name) : campaign;
+    this.setState({ storageDialog: null, storageConflict: false }, () => this.resume());
+  }
 
+  setupTeams(setup = this.state.setup) {
+    const key = JSON.stringify([setup.sport, setup.layer, setup.scope, setup.clubScope, setup.seed, setup.rosterPreset]);
+    if (this.setupTeamsCache?.key === key) return this.setupTeamsCache.teams;
+    const teams = this.opening(setup, makeRng(this.setupSeed(setup))).included
+      .map(team => ({ id: team.id, name: team.name, rating: teamEff(team) })).sort((a, b) => a.name.localeCompare(b.name));
+    this.setupTeamsCache = { key, teams };
+    return teams;
+  }
+
+  setupSeed(setup = this.state.setup) {
+    const entered = String(setup.seed || '').trim();
+    return entered ? (/^\d+$/.test(entered) ? Number(entered) >>> 0 : hashStr(entered)) : this.openingSeed;
+  }
+
+  opening(su, rng) {
+    const sport = getSport(su.sport), clubLayer = su.layer === 'clubs';
+    let included, own = {}, scopeName;
     if (clubLayer) {
       const scope = CLUB_SCOPES(sport).find(x => x.id === su.clubScope) || CLUB_SCOPES(sport)[0];
       included = sport.clubs.filter(scope.filter).map(c => buildClub(c, sport));
       scopeName = scope.name;
-      // Clubs share a homeland with their league rivals, so the map is dealt out
-      // by proximity rather than one shape per combatant.
-      own = seedClubs(this.geo, included);
-      included = included.filter(c => Object.values(own).includes(c.id));
-    } else {
-      const all = Object.keys(NATIONS).map(id => buildTeam(id, this.rng, sport));
-      if (su.scope === 'world') {
-        included = all;
-      } else if (su.scope === 'elite') {
-        included = all.slice().sort((a, b) => b.str - a.str || teamEff(b) - teamEff(a)).slice(0, 32);
-      } else {
-        included = all.filter(SCOPES.find(x => x.id === su.scope).filter);
+      if (this.geo) {
+        own = seedClubs(this.geo, included);
+        included = included.filter(c => Object.values(own).includes(c.id));
       }
-      for (const t of included) own[t.id] = t.id; // everyone starts on its homeland
-      scopeName = SCOPES.find(x => x.id === su.scope).name;
+    } else {
+      const all = Object.keys(NATIONS).map(id => buildTeam(id, rng, sport));
+      const scope = SCOPES.find(x => x.id === su.scope) || SCOPES[0];
+      included = su.scope === 'world' ? all : su.scope === 'elite'
+        ? all.slice().sort((a, b) => b.str - a.str || teamEff(b) - teamEff(a)).slice(0, 32) : all.filter(scope.filter);
+      for (const team of included) own[team.id] = team.id;
+      scopeName = scope.name;
     }
+    if (sport.id === 'basketball' && su.rosterPreset === 'competitive')
+      included = Object.values(competitiveBasketballTeams(Object.fromEntries(included.map(team => [team.id, team])), 'competitive'));
+    return { included, own, scopeName };
+  }
+
+  startCampaign() {
+    const su = this.state.setup;
+    const seed = this.setupSeed(su);
+    this.rng = makeRng(seed);
+    const clubLayer = su.layer === 'clubs';
+    const { included, own, scopeName } = this.opening(su, this.rng);
+    if (su.role === 'manager' && !included.some(team => team.id === su.managedTeamId)) {
+      this.setState({ saveStatus: { ok: false, message: 'Choose the team you will manage before launching.' } });
+      return;
+    }
+    this.clearTimers();
+    this.engagement = new SessionEngagement();
 
     const teams = {};
     const stats = {};
@@ -356,6 +447,12 @@ export default class App extends React.Component {
       {
         phase: 'playing',
         settings: { ...DEFAULT_SETUP, ...su, seed: String(seed) },
+        initialSettings: { ...DEFAULT_SETUP, ...su, seed: String(seed) },
+        managedTeamId: su.role === 'manager' ? su.managedTeamId : null, managementEnded: false,
+        managerElimination: null, tacticalChoice: null, decisionLedger: [], historyFilter: '',
+        campaignId: createCampaignId(), revision: 0,
+        campaignName: `${getSport(su.sport).name} · ${scopeName}${su.role === 'manager' ? ' · ' + included.find(team => team.id === su.managedTeamId).name : ''}`,
+        storageDialog: null, storageConflict: false,
         teams,
         own,
         aliveIds: included.map(t => t.id),
@@ -375,7 +472,7 @@ export default class App extends React.Component {
         confirmNew: false,
         battles: [],
         paused: false, history: [], selectedHistoryId: null, choice: null, series: null, exportText: null,
-        followedId: su.role === 'manager' ? included.slice().sort((a, b) => teamEff(b) - teamEff(a))[0]?.id : null,
+        followedId: su.role === 'manager' ? su.managedTeamId : null,
         pauseFollow: false, seed, rngState: this.rng.getState(), conquestIds: [], focusBounds: null,
         startedAt: Date.now(), completedAt: null, metrics: { leaderChanges: 0, acquisitions: [], previousLeader: null },
         log: [
@@ -395,12 +492,20 @@ export default class App extends React.Component {
     const s = this.saved;
     if (!s) return;
     this.clearTimers();
+    this.engagement = new SessionEngagement(s.metrics?.engagement);
     this.rng = makeRng(s.seed ?? 1);
     this.rng.setState(s.rngState ?? s.seed ?? 1);
     this.fitMap(Object.keys(s.own), s.settings);
     this.setState({
       phase: s.phase === 'victory' ? 'victory' : 'playing',
       settings: { ...DEFAULT_SETUP, ...s.settings },
+      initialSettings: s.initialSettings || { ...DEFAULT_SETUP, ...s.settings },
+      managedTeamId: s.managedTeamId || (s.settings.role === 'manager' && !s.managementEnded ? s.followedId : null),
+      managementEnded: !!s.managementEnded, managerElimination: s.managerElimination || null,
+      tacticalChoice: s.tacticalChoice || null, decisionLedger: s.decisionLedger || [],
+      historyFilter: s.historyFilter || '', selectedHistoryId: s.selectedHistoryId || null,
+      campaignId: s.campaignId || createCampaignId(), revision: s.revision || 0, campaignName: s.campaignName || `${getSport(s.settings.sport).name} · ${this.scopeName(s.settings)}`,
+      storageDialog: null, storageConflict: false,
       teams: s.teams,
       own: s.own,
       aliveIds: s.aliveIds,
@@ -421,12 +526,12 @@ export default class App extends React.Component {
       tab: 'power',
       paused: false, seed: s.seed ?? 1, rngState: s.rngState ?? 1, history: s.history || [], exportText: null,
       series: s.series || null, followedId: s.followedId || null, pauseFollow: !!s.pauseFollow,
-      choice: s.choice || null, selectedHistoryId: null, conquestIds: s.conquestIds || [],
+      choice: s.choice || null, conquestIds: s.conquestIds || [],
       startedAt: s.startedAt || Date.now(), completedAt: s.completedAt || (s.aliveIds.length === 1 ? s.savedAt : null),
       metrics: s.metrics || { leaderChanges: 0, acquisitions: [], previousLeader: null },
       saveStatus: s.legacy ? { ok: true, message: 'Legacy campaign restored. Future matches use the saved seed.' } : { ok: true, message: 'Campaign restored' },
     }, () => {
-      if (s.choice) return;
+      if (s.choice || s.tacticalChoice || s.managerElimination) { this.persist(); return; }
       if (s.match && !s.match.applied) this.presentMatch();
       else if (s.spin) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
       this.persist();
@@ -434,7 +539,7 @@ export default class App extends React.Component {
   }
 
   discardSave() {
-    clearSave();
+    clearSave(this.state.campaignId || this.saved?.campaignId);
     this.saved = null;
     this.setState({ hasSave: false, savedMeta: null });
   }
@@ -446,6 +551,8 @@ export default class App extends React.Component {
       return;
     }
     this.clearTimers();
+    this.openingSeed = Date.now() >>> 0;
+    this.setupTeamsCache = null;
     this.fitMap(Object.keys(NATIONS));
     this.setState({
       phase: 'setup',
@@ -458,7 +565,25 @@ export default class App extends React.Component {
       pu: null,
       toast: null,
       paused: false,
+      tacticalChoice: null, choice: null, managerElimination: null,
     });
+  }
+
+  managedId(state = this.state) {
+    // Adopt the identity once when migrating an older manager checkpoint.
+    return state.managementEnded ? null : state.managedTeamId || (state.settings.role === 'manager' ? state.followedId : null);
+  }
+
+  continueAsSpectator() {
+    this.clock.resume();
+    this.setState({ managerElimination: null, managementEnded: true, autoplay: false, paused: false,
+      phase: this.state.aliveIds.length === 1 ? 'victory' : 'playing' }, () => this.persist());
+  }
+
+  retryManager() {
+    this.clearTimers();
+    const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings), seed: String(this.state.seed), managedTeamId: this.state.managedTeamId };
+    this.setState({ setup, managerElimination: null }, () => this.startCampaign());
   }
 
   // ---------- transient overlays ----------
@@ -484,7 +609,7 @@ export default class App extends React.Component {
 
   nextAction() {
     const st = this.state;
-    if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice) return;
+    if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict) return;
     if (st.match && !st.match.applied) return;
     if (st.spin) return;
     if (st.series && st.aliveIds.length === 2) {
@@ -618,7 +743,7 @@ export default class App extends React.Component {
     );
   }
 
-  startMatch(attackerId, defenderId, route = {}) {
+  startMatch(attackerId, defenderId, route = {}, tactic) {
     const st = this.state;
     const a = st.teams[attackerId];
     const d = st.teams[defenderId];
@@ -626,12 +751,27 @@ export default class App extends React.Component {
     this.clearDraw();
 
     const sport = this.sport();
-    const effA = teamEff(a);
-    const effD = teamEff(d);
-    const drama = UNCERTAINTY_PRESETS[st.settings.uncertainty]?.drama ?? Number(CONFIG.matchDrama);
+    const managedId = this.managedId(st);
+    const baseDrama = UNCERTAINTY_PRESETS[st.settings.uncertainty]?.drama ?? Number(CONFIG.matchDrama);
+    if ([attackerId, defenderId].includes(managedId) && !tactic) {
+      if (st.tacticalChoice) return;
+      this.clearTimers();
+      const manager = st.teams[managedId], opponent = managedId === attackerId ? d : a;
+      const options = tacticalOptions(manager, opponent, baseDrama).map(option => {
+        const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic: option.id, drama: baseDrama });
+        const odds = estimateWinProbability({ sport, attacker: a, defender: d, ...params, samples: 512 });
+        return { ...option, winProbability: managedId === attackerId ? odds.attacker : odds.defender };
+      });
+      this.setState({ managedTeamId: managedId, tacticalChoice: { aId: attackerId, dId: defenderId, route,
+        managerName: manager.name, opponentName: opponent.name, options, resumeAutoplay: st.autoplay, openedAt: Date.now() },
+        match: null, spin: null, pu: null, toast: null, autoplay: false, paused: false }, () => this.persist());
+      return;
+    }
+    const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic, drama: baseDrama });
+    const { effA, effD, drama } = params;
     const sim = sport.simulate(this.rng, a, d, drama, effA, effD);
-    const probabilities = estimateWinProbability({ sport, attacker: a, defender: d, drama, samples: 512 });
-    const important = [attackerId, defenderId].includes(st.followedId) || st.aliveIds.length === 2
+    const probabilities = estimateWinProbability({ sport, attacker: a, defender: d, drama, effA, effD, samples: 512 });
+    const important = [attackerId, defenderId].includes(st.followedId) || [attackerId, defenderId].includes(managedId) || st.aliveIds.length === 2
       || (sim.winner === attackerId ? effA + CONFIG.upsetThreshold <= effD : effD + CONFIG.upsetThreshold <= effA);
     const series = st.aliveIds.length === 2 && st.settings.finale === 'best-of-three'
       ? st.series || { teamIds: [attackerId, defenderId], wins: { [attackerId]: 0, [defenderId]: 0 }, games: 0 } : null;
@@ -657,6 +797,8 @@ export default class App extends React.Component {
         odds: { a: probabilities.attacker, b: probabilities.defender },
         series: series ? { aWins: series.wins[attackerId], bWins: series.wins[defenderId], bestOf: 3 } : null,
         routeLabel: route.routeLabel || '', routeKind: route.routeKind || 'straight',
+        tactic: [attackerId, defenderId].includes(managedId) ? params.tactic : null,
+        tacticalBonus: params.bonus, matchDrama: drama,
         express: !!st.settings.express && !important,
       },
       spin: null,
@@ -666,9 +808,21 @@ export default class App extends React.Component {
     });
   }
 
+  chooseTactic(id) {
+    const choice = this.state.tacticalChoice;
+    const option = choice?.options.find(item => item.id === id);
+    if (!option) return;
+    this.engagement.count('decisions');
+    const entry = { type: 'tactic', match: this.state.matches + 1, teamId: this.managedId(), opponentId: choice.aId === this.managedId() ? choice.dId : choice.aId,
+      choice: id, expectedStrength: option.strength, variation: option.drama, options: choice.options.map(item => item.id),
+      decisionMs: Math.max(0, Date.now() - choice.openedAt) };
+    this.setState({ tacticalChoice: null, autoplay: choice.resumeAutoplay,
+      decisionLedger: [...this.state.decisionLedger, entry] }, () => this.startMatch(choice.aId, choice.dId, choice.route, id));
+  }
+
   presentMatch() {
     const st = this.state, m = st.match;
-    if (!m || m.applied || st.choice) return;
+    if (!m || m.applied || st.choice || st.tacticalChoice) return;
     const sport = this.sport(), a = st.teams[m.aId], d = st.teams[m.dId];
     const effA = m.effA, effD = m.effD;
     if (m.express) { this.after(18, () => this.revealAll()); return; }
@@ -788,6 +942,7 @@ export default class App extends React.Component {
   }
 
   fastForward() {
+    this.engagement.count('skips');
     this.clearTimers();
     this.setState({ paused: false });
     this.revealAll();
@@ -820,11 +975,11 @@ export default class App extends React.Component {
       return;
     }
     const loserId = m.winner === m.aId ? m.dId : m.aId;
-    if (st.settings.role === 'manager' && st.followedId === m.winner && st.teams[loserId].squad.length) {
+    if (this.managedId(st) === m.winner && st.teams[loserId].squad.length) {
       this.clearTimers();
       const candidates = acquisitionOptions(st.teams[m.winner], st.teams[loserId]);
       this.setState({ choice: { winnerName: st.teams[m.winner].name, loserName: st.teams[loserId].name,
-        candidates, resumeAutoplay: st.autoplay }, autoplay: false, paused: false,
+        candidates, resumeAutoplay: st.autoplay, openedAt: Date.now() }, autoplay: false, paused: false,
         match: { ...m, ga: m.finalGa, gd: m.finalGd, shown: m.allEv, status: 'Choose a signing' } }, () => this.persist());
       return;
     }
@@ -834,7 +989,13 @@ export default class App extends React.Component {
   chooseAcquisition(index) {
     const choice = this.state.choice;
     if (!choice || !choice.candidates.some(candidate => candidate.index === index)) return;
-    this.setState({ choice: null, autoplay: choice.resumeAutoplay && !this.state.pauseFollow }, () => this.applyConquest(index));
+    const candidate = choice.candidates.find(item => item.index === index);
+    this.engagement.count('decisions');
+    const entry = { type: 'signing', match: this.state.matches + 1, teamId: this.managedId(), choice: index,
+      player: candidate.name, strengthGain: candidate.gain, attackGain: candidate.attackGain || 0, defendGain: candidate.defendGain || 0,
+      optionCount: choice.candidates.length, chosenIndex: choice.candidates.indexOf(candidate),
+      decisionMs: Math.max(0, Date.now() - (choice.openedAt || Date.now())) };
+    this.setState({ choice: null, decisionLedger: [...this.state.decisionLedger, entry], autoplay: choice.resumeAutoplay && !this.state.pauseFollow }, () => this.applyConquest(index));
   }
 
   applyConquest(playerIndex) {
@@ -851,7 +1012,8 @@ export default class App extends React.Component {
     const L = { ...teams[loserId], squad: teams[loserId].squad.slice() };
     const strengthBefore = teamEff(W);
     const beforeLineup = selectLineup(W);
-    const stolen = Number.isInteger(playerIndex) ? L.squad[playerIndex] : L.squad.slice().sort((x, y) => y.rating - x.rating)[0];
+    const selectedCandidate = Number.isInteger(playerIndex) ? null : automaticAcquisition(W, L, st.settings.acquisitionPolicy);
+    const stolen = L.squad[Number.isInteger(playerIndex) ? playerIndex : selectedCandidate?.index];
     if (stolen) {
       W.squad.push({ ...stolen, from: L.code });
       L.squad = L.squad.filter(p => p !== stolen);
@@ -930,8 +1092,9 @@ export default class App extends React.Component {
       resTitle: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
       wCol: W.col, winnerName: W.name, loserName: L.name, territoriesGained: taken.length,
       territoryIds: taken, territoryNames: taken.map(cid => NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || cid),
-      playerTaken: stolen ? { name: stolen.name, rating: stolen.rating, pos: stolen.pos } : null,
+      playerTaken: stolen ? { ...stolen } : null,
       replacedPlayer, strengthBefore, strengthAfter, strengthGained,
+      acquisitionPolicy: Number.isInteger(playerIndex) ? 'manager-choice' : st.settings.acquisitionPolicy,
     };
     const archived = recordMatch({ ...st, sport }, completed, this.matchCard(completed, teams));
     const leader = aliveIds.slice().sort((a, b) => territories({ own }, b).length - territories({ own }, a).length)[0];
@@ -939,6 +1102,11 @@ export default class App extends React.Component {
       leaderChanges: (st.metrics?.leaderChanges || 0) + (st.metrics?.previousLeader && st.metrics.previousLeader !== leader ? 1 : 0),
       acquisitions: [...(st.metrics?.acquisitions || []), strengthGained] };
     const stopForFollow = st.pauseFollow && [m.aId, m.dId].includes(st.followedId);
+    const managerLost = this.managedId(st) === loserId;
+    if (m.express) this.engagement.count('compressedMatches');
+    const managerElimination = managerLost ? { teamId: loserId, opponentId: winnerId, matchId: archived.id,
+      teamName: L.name, opponentName: W.name, score: `${m.finalGa}–${m.finalGd}${tieTxt}`,
+      placement: aliveIds.length + 1, conquests: st.stats[loserId]?.conq || 0, signings: st.stats[loserId]?.steals?.length || 0 } : null;
 
     this.setState(
       {
@@ -953,11 +1121,13 @@ export default class App extends React.Component {
         matches: st.matches + 1,
         log: st.log.concat(entries).slice(-LOG_CAP),
         match: completed, history: [...st.history, archived], metrics, conquestIds: taken,
-        choice: null, autoplay: stopForFollow ? false : st.autoplay,
+        choice: null, autoplay: stopForFollow || managerLost ? false : st.autoplay,
+        managerElimination, paused: managerLost,
         completedAt: aliveIds.length === 1 ? Date.now() : st.completedAt,
       },
       () => {
         this.persist();
+        if (managerLost) { this.clearTimers(); this.clock.pause(); return; }
         this.after(1500, () => this.setState({ flash: {} }));
 
         if (st.settings.express) {
@@ -1014,7 +1184,7 @@ export default class App extends React.Component {
 
   step() {
     const st = this.state;
-    if (st.phase !== 'playing' || st.choice || st.paused) return;
+    if (st.phase !== 'playing' || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.paused) return;
     if (st.match && !st.match.applied) {
       this.fastForward();
       return;
@@ -1024,7 +1194,7 @@ export default class App extends React.Component {
   }
 
   togglePlay() {
-    if (this.state.choice) return;
+    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict) return;
     if (this.state.autoplay) { this.pausePlayback(); return; }
     this.clock.resume();
     this.setState({ autoplay: true, paused: false }, () => {
@@ -1036,6 +1206,7 @@ export default class App extends React.Component {
   }
 
   pausePlayback() {
+    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict) return;
     if (this.state.paused) {
       this.clock.resume();
       this.setState({ paused: false }, () => this.persist());
@@ -1047,7 +1218,7 @@ export default class App extends React.Component {
 
   followTeam(id) {
     if (id && !this.state.teams[id]) return;
-    this.setState({ followedId: id || null, selected: id || this.state.selected }, () => this.persist());
+    this.setState({ managedTeamId: this.managedId(), followedId: id || null, selected: id || this.state.selected }, () => this.persist());
   }
 
   viewConquest(result = this.matchCard()?.result) {
@@ -1069,9 +1240,9 @@ export default class App extends React.Component {
 
   setSetting(key, value) {
     if (this.state.phase !== 'playing') return;
-    this.setState(state => ({ settings: { ...state.settings, [key]: value },
-      ...(key === 'role' && value === 'manager' && !state.aliveIds.includes(state.followedId)
-        ? { followedId: state.aliveIds.slice().sort((a, b) => teamEff(state.teams[b]) - teamEff(state.teams[a]))[0] } : {}) }), () => this.persist());
+    if (!['resolution', 'express'].includes(key)) return;
+    if (key === 'resolution' && (this.state.spin || (this.state.match && !this.state.match.applied))) return;
+    this.setState(state => ({ settings: { ...state.settings, [key]: value } }), () => this.persist());
   }
 
   selectCountry(cid) {
@@ -1416,7 +1587,10 @@ export default class App extends React.Component {
       recap: { ...campaignRecap(this.state.history),
         'Leader changes': this.state.metrics?.leaderChanges || 0,
         'Acquisitions improving the lineup': (this.state.metrics?.acquisitions || []).filter(g => g > 0).length,
-        'Elapsed time': `${Math.max(1, Math.round(((this.state.completedAt || Date.now()) - (this.state.startedAt || Date.now())) / 60000))} min` },
+        'Elapsed time': `${Math.max(1, Math.round(((this.state.completedAt || Date.now()) - (this.state.startedAt || Date.now())) / 60000))} min`,
+        'Active viewing': `${Math.round(this.engagement.snapshot().viewingMs / 1000)} sec`,
+        'Time choosing': `${Math.round(this.engagement.snapshot().decisionMs / 1000)} sec`,
+        'Skipped presentations': this.engagement.totals.skips },
       seed: this.state.seed,
     };
   }
@@ -1459,7 +1633,7 @@ export default class App extends React.Component {
     const { countries, flagPatterns } = this.mapCountries();
     const completed = playing && st.aliveIds.length <= 1;
     const liveMatch = !!st.match && !st.match.applied;
-    const playbackState = completed ? 'Completed' : st.choice ? 'Choose a signing'
+    const playbackState = completed ? 'Completed' : st.tacticalChoice ? 'Choose an approach' : st.choice ? 'Choose a signing' : st.managerElimination ? 'Your campaign ended'
       : st.paused ? st.spin ? 'Draw paused' : liveMatch ? 'Match paused' : 'Paused'
       : st.spin ? 'Drawing' : st.match && !st.match.done ? 'Live' : st.match?.done ? 'Full time' : 'Ready';
     const currentCard = this.matchCard();
@@ -1483,13 +1657,14 @@ export default class App extends React.Component {
           show={playing} sportName={sport.name} layerName={st.settings.layer === 'clubs' ? 'Clubs' : 'Nations'}
           scopeName={scopeName} round={st.round} alive={st.aliveIds.length}
           pacing={st.settings.pacing} resolution={st.settings.resolution}
-          confirmNew={st.confirmNew} busy={liveMatch || !!st.spin} completed={completed}
+          confirmNew={st.confirmNew} busy={liveMatch || !!st.spin || !!st.tacticalChoice || !!st.choice} completed={completed}
           onPacing={p => this.setSetting('pacing', p)} onResolution={r => this.setSetting('resolution', r)}
           onNew={() => this.newCampaign()}
           onCancelNew={() => this.setState({ confirmNew: false })}
           saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
           onResults={() => this.setState({ phase: 'victory' })} seed={st.seed}
           settings={st.settings} onSetting={(key, value) => this.setSetting(key, value)}
+          managementEnded={st.managementEnded} onManageSaves={() => this.openStorageDialog('slots')}
         />
         {playing && <nav className="campaign-view-switch" aria-label="Campaign view">
           <button type="button" aria-pressed={st.mobileView === 'map'} onClick={() => this.setState({ mobileView: 'map' })}>Map</button>
@@ -1516,7 +1691,7 @@ export default class App extends React.Component {
             mapRef={this.mapRef} svgRef={this.svgRef} tipRef={this.tipRef} coordRef={this.coordRef}
             onPointerMove={this.handleMapMove} onPointerLeave={() => this.setState({ hoverCid: null })}
             playback={playing && <PlaybackBar
-              speed={st.speed} autoplay={st.autoplay} busy={!!st.spin} completed={completed}
+              speed={st.speed} autoplay={st.autoplay} busy={!!st.spin || !!st.choice || !!st.tacticalChoice || !!st.managerElimination || !!st.storageDialog} completed={completed}
               stepLabel={st.spin ? 'Drawing match…' : liveMatch ? 'Finish match' : 'Next match'}
               onSpeed={() => this.cycleSpeed()} onStep={() => this.step()} onPlay={() => this.togglePlay()}
               paused={st.paused} live={liveMatch || !!st.spin} onPause={() => this.pausePlayback()}
@@ -1541,32 +1716,65 @@ export default class App extends React.Component {
             selectedTeamId={st.selected} onSelectTeam={tid => this.selectTeam(tid)} eventsRef={this.eventsRef}
             followed={{ id: st.followedId, name: st.teams[st.followedId]?.name,
               alive: st.followedId ? st.aliveIds.includes(st.followedId) : true,
-              controlled: st.settings.role === 'manager', pauseOnEvents: st.pauseFollow }}
+              controlled: false, pauseOnEvents: st.pauseFollow }}
+            managed={{ id: st.managedTeamId, name: st.teams[st.managedTeamId]?.name,
+              alive: st.aliveIds.includes(st.managedTeamId), ended: st.managementEnded }}
             onFollow={id => this.followTeam(id)} onPauseFollow={pauseFollow => this.setState({ pauseFollow }, () => this.persist())}
             history={st.history} historyTeams={Object.values(st.teams).map(team => ({ id: team.id, name: team.name, alive: st.aliveIds.includes(team.id) })).sort((a, b) => a.name.localeCompare(b.name))}
             selectedHistory={st.history.find(entry => entry.id === st.selectedHistoryId)}
-            onHistorySelect={selectedHistoryId => this.setState({ selectedHistoryId })}
+            onHistorySelect={selectedHistoryId => this.setState({ selectedHistoryId }, () => this.persist())}
+            historyFilter={st.historyFilter} onHistoryFilter={historyFilter => this.setState({ historyFilter }, () => this.persist())}
             onViewConquest={result => this.viewConquest(result)}
-            session={{ ...estimateSession(st.aliveIds.length, st.settings, st.speed, st.series), upTo: st.settings.finale === 'best-of-three' }} paused={st.paused || !!st.choice}
+            session={{ ...estimateSession(st.aliveIds.length, st.settings, st.speed, st.series), upTo: st.settings.finale === 'best-of-three' }} paused={st.paused || !!st.choice || !!st.tacticalChoice}
           />}
         </main>
         {st.phase === 'setup' && <SetupOverlay
-          setup={st.setup} hasSave={st.hasSave}
+          setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()}
           savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
             (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings) : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
           onPick={(key, value) => this.pickSetup(key, value)}
           onStart={() => this.startCampaign()}
           saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
+          onManageSaves={() => this.openStorageDialog('slots')}
         />}
-        {victory && <VictoryOverlay {...victory} positionColors={sport.positionColors}
+        {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           onClose={() => this.setState({ phase: 'playing' })}
           onNew={() => {
             this.clearTimers(); this.fitMap(Object.keys(NATIONS));
             this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null, autoplay: false });
           }}
         />}
-        {st.choice && <AcquisitionChoice choice={st.choice} onChoose={index => this.chooseAcquisition(index)} />}
+        {st.tacticalChoice && !st.storageDialog && !st.exportText && <TacticalChoice choice={st.tacticalChoice} onChoose={id => this.chooseTactic(id)} />}
+        {st.choice && !st.storageDialog && !st.exportText && <AcquisitionChoice choice={st.choice} onChoose={index => this.chooseAcquisition(index)} />}
+        {st.managerElimination && !st.storageDialog && !st.exportText && <ManagerElimination result={st.managerElimination}
+          onSpectate={() => this.continueAsSpectator()} onRetry={() => this.retryManager()} />}
+        {st.storageDialog && !st.exportText && <CampaignStorageDialog key={st.storageDialog.mode} {...st.storageDialog}
+          activeId={st.campaignId} campaigns={listCampaigns()} onClose={() => this.closeStorageDialog()}
+          onConfirmImport={name => this.continueSaved(st.storageDialog.campaign, true, name)}
+          onExportCurrent={st.hasSave ? () => this.exportProgress() : undefined}
+          onLoad={id => {
+            try {
+              const inspection = inspectCampaign(id);
+              if (inspection.state === 'ready') this.continueSaved(inspection.campaign);
+              else this.setState({ storageDialog: { mode: 'recovery', ...inspection } });
+            }
+            catch (error) { this.setState({ storageDialog: { ...st.storageDialog, error: error.message } }); }
+          }}
+          onRename={(id, name) => {
+            const result = renameCampaign(id, name);
+            if (result.ok && id === st.campaignId) {
+              this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
+              this.setState({ revision: result.revision, campaignName: result.campaignName });
+            }
+            this.setState({ storageDialog: { ...st.storageDialog, error: result.ok ? null : result.message } });
+          }}
+          onFork={Object.keys(st.teams).length || this.saved ? name => this.continueSaved(st.phase === 'setup' ? this.saved
+            : { ...st, rngState: this.rng.getState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
+          onReload={() => this.continueSaved(st.storageDialog.campaign)}
+          onRestoreBackup={() => this.continueSaved(st.storageDialog.backup, true, `${st.storageDialog.backup.campaignName || 'Campaign'} recovered`)}
+          onExportRaw={st.storageDialog.raw ? () => this.setState({ exportText: st.storageDialog.raw, exportFilename: 'imperialism-damaged-save.json' }) : undefined}
+        />}
         {st.exportText && <ExportCheckpoint text={st.exportText} filename={st.exportFilename}
           onDownload={() => this.downloadProgress()} onClose={() => this.setState({ exportText: null })} />}
         {st.phase === 'loading' && <div className="loading-screen" role={st.err ? 'alert' : 'status'}>

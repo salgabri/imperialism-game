@@ -123,6 +123,7 @@
 .fi-player-identity { flex: 1; min-width: 0; color: var(--result-text, #ece9df); font-size: 12px; line-height: 1.4; }
 .fi-player-identity > span { display: block; overflow-wrap: anywhere; }
 .fi-player-identity small { display: block; color: var(--result-muted, #a2afb2); font-size: 10px; line-height: 1.5; }
+.fi-player-source a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .fi-player-identity.is-generated { color: var(--result-generated, #b1b8b9); font-style: italic; }
 .fi-player-identity sup { padding-left: 2px; }
 .fi-player-rating { min-width: 24px; text-align: right; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }

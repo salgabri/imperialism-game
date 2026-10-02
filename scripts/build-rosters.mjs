@@ -1,181 +1,58 @@
-// Generates src/data/rosters.js — a real national squad for every nation on the
-// map — from an EA Sports FC player export.
-//
-//   npm run build-rosters [path/to/players.csv]
-//
-// The source CSV is the sofifa-derived schema: one row per player with
-// short_name, player_positions, overall and nationality_name. It is not
-// committed (11 MB); only the ~2000-player output is.
-//
-// Selection: for each nation, take the best available player by overall rating
-// for each slot of a 1-4-4-2, then top the squad up to eleven with the best
-// remaining players whatever their position. Nations too thin to fill eleven
-// field what they have; nations with nobody in the dataset fall back to
-// generated players at build time (see buildTeam in teams.js).
-
-import { readFile, writeFile } from 'node:fs/promises';
+// Rebuild source-backed national XIs from committed, dated source snapshots.
+import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { CONF_META, NATIONS } from '../src/data/teams.js';
+import { NATIONS, selectLineup } from '../src/data/teams.js';
+import { loadFootballData, pickFootballSquad, playerTuple } from './lib/football-data.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const source = process.argv[2] || path.join(root, 'data-src', 'players.csv');
-
-/** Ratings are EA overalls, which already live on the 1-99 scale this game uses. */
-const MAX_RATING = 99;
-/** A 4-4-2. Filled in this order, best-rated first. */
-const FORMATION = { GK: 1, DF: 4, MF: 4, FW: 2 };
-const SQUAD_SIZE = 11;
-
-// The dataset names countries its own way, and separates the UK home nations —
-// which is correct here, since the campaign fields England, not Great Britain.
-const NATION_ALIASES = {
-  'Bosnia and Herzegovina': 'Bosnia & Herz.',
-  'Central African Republic': 'Central African Rep.',
-  'China PR': 'China',
-  'Congo DR': 'DR Congo',
-  'Dominican Republic': 'Dominican Rep.',
-  'Equatorial Guinea': 'Eq. Guinea',
-  'Korea Republic': 'South Korea',
-  'North Macedonia': 'N. Macedonia',
-  'Republic of Ireland': 'Ireland',
-  'Trinidad and Tobago': 'Trinidad & Tobago',
-  Türkiye: 'Turkey',
-};
-
-const ROLE_OF_POSITION = {
-  GK: 'GK',
-  CB: 'DF', LB: 'DF', RB: 'DF', LWB: 'DF', RWB: 'DF',
-  CDM: 'MF', CM: 'MF', CAM: 'MF', LM: 'MF', RM: 'MF',
-  LW: 'FW', RW: 'FW', ST: 'FW', CF: 'FW',
-};
-
-function parseCsv(text) {
-  const rows = [];
-  let field = '';
-  let row = [];
-  let quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (quoted) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; } else quoted = false;
-      } else field += c;
-    } else if (c === '"') quoted = true;
-    else if (c === ',') { row.push(field); field = ''; }
-    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-    else if (c !== '\r') field += c;
-  }
-  if (field || row.length) { row.push(field); rows.push(row); }
-  return rows;
-}
-
-/** Best XI: fill the formation by rating, then top up with whoever is left. */
-function pickSquad(pool) {
-  const byRating = pool.slice().sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
-  const taken = new Set();
-  const squad = [];
-  for (const [role, count] of Object.entries(FORMATION)) {
-    for (const p of byRating) {
-      if (squad.filter(x => x.pos === role).length >= count) break;
-      if (taken.has(p) || p.pos !== role) continue;
-      taken.add(p);
-      squad.push(p);
-    }
-  }
-  // A nation with no keeper in the dataset must still field one, so hold that
-  // shirt back for buildTeam to generate rather than handing it to an outfielder.
-  const reserved = squad.some(p => p.pos === 'GK') ? 0 : 1;
-
-  // A thin nation may have four midfielders and no left-back; rather than invent
-  // one, give the shirt to the next best player it actually has.
-  for (const p of byRating) {
-    if (squad.length >= SQUAD_SIZE - reserved) break;
-    if (taken.has(p)) continue;
-    taken.add(p);
-    squad.push(p);
-  }
-  return squad.sort((a, b) => b.rating - a.rating);
-}
-
-const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
-
-const rows = parseCsv(await readFile(source, 'utf8'));
-const header = rows[0];
-const col = name => {
-  const i = header.indexOf(name);
-  if (i < 0) throw new Error(`CSV is missing the "${name}" column`);
-  return i;
-};
-const [cName, cPositions, cOverall, cNationality] = ['short_name', 'player_positions', 'overall', 'nationality_name'].map(col);
-
-const nameToId = {};
-for (const [id, rec] of Object.entries(NATIONS)) nameToId[rec[0]] = id;
-
+const source = process.argv[2] || path.join(root, 'scripts/data/ea-fc26.csv');
+const fmSource = process.argv[3] || path.join(root, 'scripts/data/fm26-players.json');
+const data = await loadFootballData(source, fmSource);
+const nameToId = Object.fromEntries(Object.entries(NATIONS).map(([id, rec]) => [rec[0], id]));
 const pools = {};
-let offMap = 0;
-for (const row of rows.slice(1)) {
-  if (row.length < header.length) continue;
-  const id = nameToId[NATION_ALIASES[row[cNationality]] || row[cNationality]];
-  if (!id) { offMap++; continue; }
-  const primary = row[cPositions].split(',')[0].trim();
-  const role = ROLE_OF_POSITION[primary];
-  if (!role) continue;
-  (pools[id] = pools[id] || []).push({
-    name: row[cName],
-    pos: role,
-    rating: Math.min(MAX_RATING, Number(row[cOverall])),
-  });
+for (const player of data.players) {
+  const id = nameToId[player.nation];
+  if (!id) continue;
+  (pools[id] ||= []).push(player);
 }
 
-const rosters = {};
-const report = { full: 0, thin: 0, empty: [] };
-for (const id of Object.keys(NATIONS)) {
-  const pool = pools[id];
-  if (!pool || !pool.length) { report.empty.push(id); continue; }
-  const squad = pickSquad(pool);
-  // Team strength is squad depth across a full XI, so teamEff can blend it with
-  // the top five and stop a nation with one superstar outranking a uniformly
-  // strong side. Slots the dataset cannot fill count at the confederation's
-  // baseline — the same assumption buildTeam makes when it generates the
-  // remainder — otherwise a country with a single 62-rated player would rate as
-  // highly as a deep squad averaging 62.
-  const baseline = CONF_META[NATIONS[id][2]].baseStr;
-  const ratings = squad.map(p => p.rating);
-  const filled = ratings.concat(Array(Math.max(0, SQUAD_SIZE - ratings.length)).fill(baseline));
-  const str = Math.round(mean(filled));
-  rosters[id] = { str, pool: pool.length, squad };
-  if (squad.length >= SQUAD_SIZE) report.full++; else report.thin++;
+const rosters = {}, coverage = [];
+for (const [id, rec] of Object.entries(NATIONS)) {
+  const pool = pools[id] || [];
+  const squad = pickFootballSquad(pool);
+  const lineup = selectLineup({ sport: 'football', squad });
+  rosters[id] = [Math.round(lineup.rating), pool.length, squad.map(playerTuple)];
+  coverage.push({ id, name: rec[0], players: squad.length,
+    ea: squad.filter(p => p.sourceInfo.source === 'ea-fc').length,
+    fm: squad.filter(p => p.sourceInfo.source === 'football-manager').length,
+    goalkeeper: squad.some(p => p.positions.includes('GK')),
+    naturalLineup: lineup.slots.every(slot => slot.player && !slot.outOfPosition) });
 }
 
-const body = Object.entries(rosters)
-  .map(([id, r]) => {
-    const players = r.squad.map(p => `[${JSON.stringify(p.name)},'${p.pos}',${p.rating}]`).join(',');
-    return `  '${id}': [${r.str},${r.pool},[${players}]], // ${NATIONS[id][0]}`;
-  })
-  .join('\n');
-
-const out = `// GENERATED by scripts/build-rosters.mjs from an EA Sports FC player export.
-// Do not edit by hand — re-run \`npm run build-rosters\` instead.
-//
-// Real players, real ratings. Each entry is [strength, poolSize, squad], where
-// squad is [name, role, rating] picked as the best available 4-4-2 for that
-// nationality, strength is the squad's mean rating, and poolSize is how many
-// players the dataset had for that nation (a depth signal, not used in play).
-//
-// Ratings are EA overalls, already on a 1-${MAX_RATING} scale.
-
-export const ROSTERS = {
-${body}
-};
+const header = `// GENERATED by npm run build-rosters from the committed EA FC / FM snapshots.
+// Each entry is [effective XI strength, source pool size, player tuples].
+// Tuples: [display name, primary role, game rating, source metadata].
+// EA overalls are unchanged. FM source CA (1–100) is scaled once to 1–99;
+// its original value, scale, database version and source URL are retained.
+// No invented players or confederation-based player ratings.
 `;
-
-await writeFile(path.join(root, 'src', 'data', 'rosters.js'), out);
-
-const total = Object.keys(NATIONS).length;
-console.log(`source: ${path.relative(root, source)} — ${rows.length - 1} players, ${offMap} not on our map`);
-console.log(`wrote src/data/rosters.js`);
-console.log(`  ${report.full}/${total} nations field a full XI of real players`);
-console.log(`  ${report.thin}/${total} field a short real squad (dataset too thin)`);
-console.log(`  ${report.empty.length}/${total} have no players in the dataset and stay generated:`);
-console.log(`    ${report.empty.map(id => NATIONS[id][0]).join(', ')}`);
+const body = Object.entries(rosters).map(([id, roster]) => `  '${id}': ${JSON.stringify(roster)}, // ${NATIONS[id][0]}`).join('\n');
+await writeFile(path.join(root, 'src/data/rosters.js'), `${header}\nexport const ROSTERS = {\n${body}\n};\n`);
+const eaSnapshots = [...new Map(data.ea.players.map(player => {
+  const { edition, update, snapshotDate } = player.sourceInfo;
+  return [`${edition}:${update}:${snapshotDate}`, { edition, update, snapshotDate }];
+})).values()];
+const report = { ea: { snapshots: eaSnapshots,
+  records: data.ea.rows, excludedFictional: data.ea.fictional }, fm: data.fm,
+  fmRecords: data.fmCount, omittedPossibleDuplicates: data.duplicateCandidates,
+  unknownAbility: data.unknownAbility, conversion: 'round(EFEM currentAbility * 99 / 100)',
+  nationalTeams: coverage.length, fullXIs: coverage.filter(r => r.players === 11).length,
+  eaShirts: coverage.reduce((total, row) => total + row.ea, 0),
+  fmShirts: coverage.reduce((total, row) => total + row.fm, 0), generatedShirts: 0,
+  coverage };
+await writeFile(path.join(root, 'docs/design/football-roster-audit.json'), `${JSON.stringify(report, null, 2)}\n`);
+console.log(`National squads: ${report.fullXIs}/${report.nationalTeams} complete XIs; ${report.eaShirts} EA + ${report.fmShirts} FM players; zero generated.`);
+console.log(`Excluded ${data.ea.fictional} fictional EA Brazilian domestic players; omitted ${data.duplicateCandidates} possible duplicate FM identities.`);
+const incomplete = coverage.filter(row => row.players < 11 || !row.goalkeeper || !row.naturalLineup);
+if (incomplete.length) console.log('Coverage requiring attention:', incomplete);

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Icon from './Icon.jsx';
 import './results.css';
+import './strategy.css';
 
 /** A conquest waits here until its manager makes the one strategic choice. */
 export default function AcquisitionChoice({ choice, onChoose }) {
@@ -10,10 +11,10 @@ export default function AcquisitionChoice({ choice, onChoose }) {
     dialogRef.current?.querySelector('button')?.focus();
     const trap = event => {
       if (event.key !== 'Tab') return;
-      const buttons = [...(dialogRef.current?.querySelectorAll('button:not(:disabled)') || [])];
-      if (!buttons.length) return;
-      if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons.at(-1).focus(); }
-      else if (!event.shiftKey && document.activeElement === buttons.at(-1)) { event.preventDefault(); buttons[0].focus(); }
+      const controls = [...(dialogRef.current?.querySelectorAll('button:not(:disabled), summary') || [])];
+      if (!controls.length) return;
+      if (event.shiftKey && document.activeElement === controls[0]) { event.preventDefault(); controls.at(-1).focus(); }
+      else if (!event.shiftKey && document.activeElement === controls.at(-1)) { event.preventDefault(); controls[0].focus(); }
     };
     document.addEventListener('keydown', trap);
     return () => { document.removeEventListener('keydown', trap); if (previous?.isConnected) previous.focus(); };
@@ -27,14 +28,33 @@ export default function AcquisitionChoice({ choice, onChoose }) {
       <div className="fi-acquisition-options">{(choice.candidates || []).map((candidate, i) => {
         const gain = Number(candidate.gain) || 0;
         const replaces = typeof candidate.replaces === 'string' ? candidate.replaces : candidate.replaces?.name;
-        return <button type="button" key={candidate.index ?? i} data-testid="acquisition-candidate" onClick={() => onChoose(candidate.index ?? i)}>
+        const change = value => `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(2)}`;
+        const lineup = candidate.lineupPreview;
+        return <article className="fi-signing-option" key={candidate.index ?? i}>
+          <button type="button" data-testid="acquisition-candidate" onClick={() => onChoose(candidate.index ?? i)}>
+          {candidate.role && <span className="fi-signing-role">{candidate.role}</span>}
           <span className="fi-acquisition-player"><strong>{candidate.name}</strong><span>{candidate.pos} · {candidate.rating} rating</span></span>
           <span className={gain > 0 ? 'fi-strength-gain' : 'fi-strength-unchanged'}>{gain > 0 ? `+${gain.toFixed(1)} strength` : 'No strength change'}</span>
-          <small>{replaces ? `Replaces ${replaces} in the starting lineup` : 'Adds a squad option'}</small>
+          <small>{replaces ? `Replaces ${replaces} in the starting lineup` : 'Provides reserve support; starting lineup stays unchanged'}</small>
+          {candidate.support && <span className="fi-signing-support">
+            <span>Attack support {change(candidate.attackGain || 0)}</span>
+            <span>Defensive support {change(candidate.defendGain || 0)}</span>
+          </span>}
           <span className="fi-acquisition-select">Claim player <Icon name="arrow" size={16} /></span>
-        </button>;
+          </button>
+          {lineup && <details className="fi-signing-preview">
+            <summary>Compare starting lineup · {lineup.beforeRating.toFixed(1)} → {lineup.afterRating.toFixed(1)}</summary>
+            <table><caption>Legal lineup before and after signing {candidate.name}</caption>
+              <thead><tr><th scope="col">Position</th><th scope="col">Before</th><th scope="col">After</th></tr></thead>
+              <tbody>{lineup.after.map((slot, index) => <tr key={`${slot.position}-${index}`} className={slot.name !== lineup.before[index]?.name ? 'is-changed' : ''}>
+                <th scope="row">{slot.position}</th><td>{lineup.before[index]?.name} <small>{lineup.before[index]?.rating.toFixed(1)}</small></td>
+                <td>{slot.name} <small>{slot.rating.toFixed(1)}{slot.outOfPosition ? ' · out of position' : ''}</small></td>
+              </tr>)}</tbody>
+            </table>
+          </details>}
+        </article>;
       })}</div>
-      <p className="fi-acquisition-note">Lineup improvement accounts for positions and existing starters. Your choice completes this conquest.</p>
+      <p className="fi-acquisition-note">Starting strength uses a legal positional lineup. The best reserve in a useful position adds up to 1.20 match strength to Attack or Defend; support does not stack. Your signing completes this conquest.</p>
     </section>
   </div>;
 }

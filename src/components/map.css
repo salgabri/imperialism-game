@@ -20,6 +20,9 @@
 .map-modes button[aria-pressed=true] { color: #f0eee4; box-shadow: inset 0 -2px #e7e6dc; background: #293630; border-radius: 0; }
 .map-modes button:hover { background: #39463f; }
 .map-reset { color: #c4d0d0; min-width: 34px; padding: 0 2px; min-height: 40px; background: none; border: none; font-size: 11px; }
+.map-return { min-height: 44px; padding: 0 10px; border: 1px solid #69756d; border-radius: 2px; color: #f0eee4; background: #202b28f5; font-size: 11px; }
+.map-return:hover { background: #39463f; }
+.map-tools:has(.map-return) { flex-wrap: wrap; }
 .map-footnote { position: absolute; bottom: 10px; left: 25px; right: 25px; display: flex; align-items: center; gap: 16px; color: #afc0c3; font-size: 10px; pointer-events: none; }
 .map-coordinates { margin-left: auto; }
 .map-distance { border-top: 1px solid #acbdbd; padding: 3px 0 0; min-width: 55px; text-align: center; }

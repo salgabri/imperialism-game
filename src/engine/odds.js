@@ -17,7 +17,7 @@ const estimates = new Map();
 const modelIdentities = new WeakMap();
 let nextModelIdentity = 1;
 
-export function estimateWinProbability({ sport, attacker, defender, preset = 'balanced', drama, samples = DEFAULT_SAMPLES }) {
+export function estimateWinProbability({ sport, attacker, defender, preset = 'balanced', drama, effA: overrideA, effD: overrideD, samples = DEFAULT_SAMPLES }) {
   const model = typeof sport === 'string' ? getSport(sport) : sport;
   if (!model?.simulate || !attacker || !defender) throw new TypeError('Odds need a sport and both teams.');
   const selectedPreset = UNCERTAINTY_PRESETS[preset] || UNCERTAINTY_PRESETS.balanced;
@@ -26,12 +26,12 @@ export function estimateWinProbability({ sport, attacker, defender, preset = 'ba
   const a = { ...attacker, id: 'estimate-attacker' };
   const d = { ...defender, id: 'estimate-defender' };
   const fast = typeof model.prepareMatch === 'function' && typeof model.sampleResult === 'function';
-  const prepared = fast ? model.prepareMatch(a, d) : null;
+  const prepared = fast ? model.prepareMatch(a, d, overrideA, overrideD) : null;
   const lineupA = prepared?.lineupA || selectLineup(a);
   const lineupD = prepared?.lineupD || selectLineup(d);
   const lineupSignature = lineup => lineup.slots.map(slot => `${slot.position}:${slot.effectiveRating}:${slot.player ? 1 : 0}`).join(',');
-  const effA = lineupA.rating;
-  const effD = lineupD.rating;
+  const effA = Number.isFinite(overrideA) ? overrideA : lineupA.rating;
+  const effD = Number.isFinite(overrideD) ? overrideD : lineupD.rating;
   const modelKey = `${model.id}|${model.simulationVersion || 1}|${variation}|${count}|${effA}|${effD}|${lineupSignature(lineupA)}|${lineupSignature(lineupD)}`;
   // Two custom sport objects may share an ID but supply different models.
   // Keep their caches separate without changing reproducible sample seeds.

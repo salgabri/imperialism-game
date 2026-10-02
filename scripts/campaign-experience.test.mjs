@@ -194,6 +194,10 @@ test('manager conquest waits for a signing and applies the chosen player exactly
     assert.equal(f.app.timers.size, 0, 'the result cannot advance past the signing choice');
     const candidate = f.app.state.choice.candidates.at(-1);
     const chosen = f.app.state.teams['276'].squad[candidate.index];
+    const sourceInfo = { id: 'ea:123456', fullName: chosen.name, source: 'ea-fc', edition: 'FC 26',
+      snapshotDate: '2025-09-19', url: 'https://sofifa.com/player/123456/verified-player/260004/',
+      rawRating: chosen.rating, rawScale: 99, positions: [chosen.pos] };
+    Object.assign(chosen, { id: sourceInfo.id, positions: [chosen.pos], sourceInfo });
     f.app.chooseAcquisition(candidate.index);
     assert.equal(f.app.state.choice, null);
     assert.equal(f.app.state.own['276'], '250');
@@ -201,6 +205,12 @@ test('manager conquest waits for a signing and applies the chosen player exactly
     assert.equal(f.app.state.teams['276'].squad.length, before.teams['276'].squad.length - 1);
     assert.equal(f.app.state.teams['250'].squad.filter(player => player.name === chosen.name).length, 1);
     assert.equal(f.app.state.match.playerTaken.name, chosen.name);
+    assert.equal(f.app.state.match.playerTaken.id, chosen.id);
+    assert.deepEqual(f.app.state.match.playerTaken.positions, chosen.positions);
+    assert.deepEqual(f.app.state.match.playerTaken.sourceInfo, sourceInfo);
+    assert.deepEqual(f.app.state.history.at(-1).result.player.sourceInfo, sourceInfo);
+    const checkpoint = parseCampaign(exportCampaign(f.app.state));
+    assert.deepEqual(checkpoint.history.at(-1).result.player.sourceInfo, sourceInfo);
     f.app.chooseAcquisition(candidate.index);
     f.app.finishMatch();
     f.app.applyConquest(candidate.index);

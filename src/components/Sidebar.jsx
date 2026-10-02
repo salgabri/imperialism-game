@@ -109,17 +109,18 @@ function LatestAcquisition({ squad, history = [] }) {
   </section>;
 }
 
-function Squad({ squad, positionColors, followed, onFollow, history, onBack }) {
+function Squad({ squad, positionColors, followed, onFollow, history, onBack, backLabel = 'Back to standings' }) {
   if (!squad) return <div className="fi-intel-empty"><Icon name="users" size={25} /><p>Select a team on the map or in the standings to inspect its squad.</p></div>;
+  const expectedStarters = positionColors?.GK ? 11 : 5;
   return (
     <section className="fi-squad" aria-label={`${squad.name} squad`} style={{ '--team-color': squad.color }}>
-      {onBack && <button type="button" className="fi-context-button fi-squad-back" onClick={onBack}><Icon name="arrow" size={16} />Back to standings</button>}
+      {onBack && <button type="button" className="fi-context-button fi-squad-back" onClick={onBack}><Icon name="arrow" size={16} />{backLabel}</button>}
       <div className="fi-squad-heading">
         <TeamMark {...squad} width={44} />
         <div className="fi-squad-identity"><span className="fi-squad-eyebrow">{squad.code} · {squad.isClub ? 'Club team' : 'National team'}</span><h3>{squad.name}</h3><p>{squad.meta}</p></div>
         <div className="fi-squad-strength"><strong>{squad.eff}</strong><span>Strength</span><small title="Change since campaign start" style={{ color: gainColor(squad.effGain) }}>{squad.effGain?.text}</small></div>
       </div>
-      {onFollow && <button type="button" className="fi-context-button fi-follow-team" disabled={squad.status !== 'ALIVE'} aria-pressed={followed?.id === squad.teamId} onClick={() => onFollow(squad.teamId)}>{followed?.id === squad.teamId ? followed.controlled ? 'Your managed team' : 'Following this team' : followed?.controlled ? 'Manage this team' : 'Follow this team'}</button>}
+      {onFollow && <button type="button" className="fi-context-button fi-follow-team" disabled={squad.status !== 'ALIVE'} aria-pressed={followed?.id === squad.teamId} onClick={() => onFollow(squad.teamId)}>{followed?.id === squad.teamId ? 'Following this team' : 'Follow this team'}</button>}
       <div className="fi-squad-summary">
         <span><strong>{squad.territories}</strong> {Number(squad.territories) === 1 ? 'territory' : 'territories'}</span><span><strong>{squad.conquests}</strong> {Number(squad.conquests) === 1 ? 'conquest' : 'conquests'}</span><span><strong>{squad.stolen}</strong> {Number(squad.stolen) === 1 ? 'acquisition' : 'acquisitions'}</span>
       </div>
@@ -134,6 +135,8 @@ function Squad({ squad, positionColors, followed, onFollow, history, onBack }) {
         {!squad.bench?.length && <p className="fi-lineup-help">No reserve players yet.</p>}
       </> : <PositionGroups players={squad.players} positionColors={positionColors} />}
       {squad.players.some(player => player.gen) && <p className="fi-roster-note">* Generated player where roster data is unavailable.</p>}
+      {squad.starters && squad.starters.length < expectedStarters && !squad.players.some(player => player.gen)
+        && <p className="fi-roster-note">Source data covers {squad.starters.length} of {expectedStarters} starting places. Unfilled places use a 40-point team-strength baseline.</p>}
     </section>
   );
 }
@@ -141,52 +144,80 @@ function Squad({ squad, positionColors, followed, onFollow, history, onBack }) {
 function FollowedTeam({ followed, teams = [], onFollow, onPauseFollow }) {
   if (!onFollow) return null;
   return <section className="fi-followed" aria-label="Followed team">
-    <div className="fi-followed-header"><strong>{followed?.controlled ? 'Managing' : 'Following'}</strong><span className={followed?.alive === false ? 'is-fallen' : ''}>{followed?.id ? followed.alive === false ? 'Eliminated' : 'In contention' : 'Choose a favourite'}</span></div>
-    <label className="sr-only" htmlFor="followed-team">{followed?.controlled ? 'Managed team' : 'Followed team'}</label>
+    <div className="fi-followed-header"><strong>Following</strong><span className={followed?.alive === false ? 'is-fallen' : ''}>{followed?.id ? followed.alive === false ? 'Eliminated' : 'In contention' : 'Choose a favourite'}</span></div>
+    <label className="sr-only" htmlFor="followed-team">Followed team</label>
     <select id="followed-team" value={followed?.id || ''} onChange={event => onFollow(event.target.value)}>
-      {!followed?.controlled && <option value="">No followed team</option>}
-      {teams.map(team => <option key={team.id || team.tid} value={team.id || team.tid} disabled={followed?.controlled && team.alive === false}>{team.name}{team.alive === false ? ' · eliminated' : ''}</option>)}
+      <option value="">No followed team</option>
+      {teams.map(team => <option key={team.id || team.tid} value={team.id || team.tid}>{team.name}{team.alive === false ? ' · eliminated' : ''}</option>)}
     </select>
     {onPauseFollow && <label className="control-checkbox"><input type="checkbox" checked={!!followed?.pauseOnEvents} onChange={event => onPauseFollow(event.target.checked)} /><span>Pause for this team's matches and major events</span></label>}
   </section>;
 }
 
-function History({ entries = [], teams = [], selected, onSelect, onViewConquest, onSelectTeam }) {
-  const [filter, setFilter] = useState('');
-  const shown = entries.filter(entry => !filter || String(entry.aId ?? entry.a?.teamId ?? entry.a?.id) === filter || String(entry.dId ?? entry.bId ?? entry.b?.teamId ?? entry.b?.id) === filter);
+function belongsToHistoryFilter(entry, filter) {
+  return !filter || String(entry.aId ?? entry.a?.teamId ?? entry.a?.id) === filter || String(entry.dId ?? entry.bId ?? entry.b?.teamId ?? entry.b?.id) === filter;
+}
+
+function History({ entries = [], teams = [], selected, filter = '', onFilter, onSelect, onViewConquest, onSelectTeam }) {
+  const shown = entries.filter(entry => belongsToHistoryFilter(entry, filter));
+  const report = shown.find(entry => entry.id === selected?.id) || shown.at(-1);
   return <section className="fi-history" aria-label="Match history">
-    <label className="fi-history-filter" htmlFor="history-team"><span>Filter by team</span><select id="history-team" value={filter} onChange={event => setFilter(event.target.value)}><option value="">All teams</option>{teams.map(team => <option key={team.id || team.tid} value={team.id || team.tid}>{team.name}</option>)}</select></label>
+    <label className="fi-history-filter" htmlFor="history-team"><span>Filter by team</span><select id="history-team" value={filter} onChange={event => onFilter?.(event.target.value)}><option value="">All teams</option>{teams.map(team => <option key={team.id || team.tid} value={team.id || team.tid}>{team.name}</option>)}</select></label>
     {!shown.length ? <p className="fi-intel-empty">{entries.length ? 'No matches for this team yet.' : 'Completed matches will be saved here, including events and spoils.'}</p> : <>
-      <ol className="fi-history-list">{shown.slice().reverse().map((entry, i) => <li key={entry.id ?? i}><button type="button" aria-pressed={selected?.id === entry.id} onClick={() => onSelect?.(entry.id)}><span>R{Number(entry.round) || entry.round}</span><span>{entry.a?.name} <strong>{entry.a?.score}–{entry.b?.score}</strong> {entry.b?.name}</span></button></li>)}</ol>
-      {selected && <MatchCard {...selected} archived onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} />}
+      <ol className="fi-history-list">{shown.slice().reverse().map((entry, i) => <li key={entry.id ?? i}><button type="button" data-history-id={entry.id} aria-pressed={report?.id === entry.id} onClick={() => onSelect?.(entry.id)}><span>R{Number(entry.round) || entry.round}</span><span>{entry.a?.name} <strong>{entry.a?.score}–{entry.b?.score}</strong> {entry.b?.name}</span></button></li>)}</ol>
+      {report && <MatchCard {...report} archived onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} />}
     </>}
   </section>;
 }
 
 /** One quiet information surface: latest match, then standings, activity or squad. */
 export default function Sidebar({ match, draw, idleText, queueLeft, tab = 'power', onTab, feed, power, squad, positionColors, onSelectTeam, eventsRef,
-  followed, onFollow, onPauseFollow, history = [], historyTeams = [], onHistorySelect, selectedHistory, onViewConquest, session, paused = false, selectedTeamId }) {
+  followed, managed, onFollow, onPauseFollow, history = [], historyTeams = [], onHistorySelect, selectedHistory, historyFilter, onHistoryFilter, onViewConquest, session, paused = false, selectedTeamId }) {
   const contentRef = useRef(null);
   const returnToStandingsRef = useRef(false);
+  const squadOriginRef = useRef('power');
   const tabNavigationRef = useRef(false);
+  const [localHistoryFilter, setLocalHistoryFilter] = useState('');
+  const [localHistorySelection, setLocalHistorySelection] = useState(null);
+  const filter = historyFilter ?? localHistoryFilter;
+  const historySelection = selectedHistory || history.find(entry => entry.id === localHistorySelection);
   const inspectedTeamId = selectedTeamId ?? squad?.teamId;
   useEffect(() => {
     if (tab === 'squad' && squad?.teamId && !tabNavigationRef.current) contentRef.current?.focus();
     tabNavigationRef.current = false;
-    if (tab === 'power' && returnToStandingsRef.current) {
+    if (tab === squadOriginRef.current && returnToStandingsRef.current) {
       returnToStandingsRef.current = false;
-      const teamButton = [...(contentRef.current?.querySelectorAll('[data-team-id]') || [])].find(button => button.dataset.teamId === String(inspectedTeamId));
-      (teamButton || contentRef.current)?.focus();
+      const originButton = tab === 'history'
+        ? [...(contentRef.current?.querySelectorAll('[data-history-id]') || [])].find(button => button.dataset.historyId === String(historySelection?.id))
+        : [...(contentRef.current?.querySelectorAll('[data-team-id]') || [])].find(button => button.dataset.teamId === String(inspectedTeamId));
+      (originButton || contentRef.current)?.focus();
     }
-  }, [tab, squad?.teamId, inspectedTeamId]);
-  function backToStandings() {
+  }, [tab, squad?.teamId, inspectedTeamId, historySelection?.id]);
+  function backToOrigin() {
     returnToStandingsRef.current = true;
-    onTab?.('power');
+    onTab?.(squadOriginRef.current);
+  }
+  function inspectTeam(id) {
+    if (tab !== 'squad') squadOriginRef.current = tab === 'history' ? 'history' : 'power';
+    onSelectTeam?.(id);
+  }
+  function selectHistory(id) {
+    setLocalHistorySelection(id);
+    onHistorySelect?.(id);
+  }
+  function changeHistoryFilter(value) {
+    setLocalHistoryFilter(value);
+    onHistoryFilter?.(value);
+    selectHistory(history.filter(entry => belongsToHistoryFilter(entry, value)).at(-1)?.id ?? null);
   }
   return (
     <aside id="campaign-details" className="fi-intel" aria-label="Campaign details" tabIndex={-1}>
+      {managed?.id && <section className="fi-followed" aria-label="Managed team">
+        <div className="fi-followed-header"><strong>Your managed team</strong><span className={managed.alive === false ? 'is-fallen' : ''}>{managed.ended ? 'Now spectating' : managed.alive === false ? 'Eliminated' : 'In contention'}</span></div>
+        {onSelectTeam ? <button type="button" className="fi-context-button" onClick={() => inspectTeam(managed.id)}>View {managed.name} squad</button> : <p>{managed.name}</p>}
+      </section>}
       <FollowedTeam followed={followed} teams={historyTeams.length ? historyTeams : (power || []).map(team => ({ id: team.tid, name: team.name, alive: true }))} onFollow={onFollow} onPauseFollow={onPauseFollow} />
-      {match ? <MatchCard {...match} eventsRef={eventsRef} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} /> : draw ? (
+      {match ? <MatchCard {...match} eventsRef={eventsRef} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam ? inspectTeam : undefined} /> : draw ? (
         <section className="fi-match fi-match-empty fi-match-draw" data-testid="draw-status" role="status" aria-live="polite" aria-atomic="true">
           <div className="fi-match-heading"><h2>Latest match</h2><span className="fi-match-status">{draw.stage === 'locked' ? 'Opponent selected' : 'Drawing'}</span></div>
           <h3>{draw.stage === 'locked' ? `${draw.attackerName} faces ${draw.targetName}` : `${draw.attackerName} to attack`}</h3>
@@ -200,14 +231,18 @@ export default function Sidebar({ match, draw, idleText, queueLeft, tab = 'power
       )}
       {queueLeft > 0 && <p className="fi-queue-note">{queueLeft} {queueLeft === 1 ? 'match' : 'matches'} remaining this round</p>}
       {session && <p className="fi-session-remaining" data-testid="session-remaining" role="status">{session.games ? <>{session.upTo ? 'Up to ' : ''}{session.games} {Number(session.games) === 1 ? 'game' : 'games'} remaining · ~{Math.max(1, Math.ceil((session.seconds || 0) / 60))} min{paused ? ' · Paused' : ''}</> : 'Campaign complete'}</p>}
-      <Tabs value={tab} onChange={value => { tabNavigationRef.current = true; onTab?.(value); }} />
+      <Tabs value={tab} onChange={value => {
+        tabNavigationRef.current = true;
+        if (value === 'squad' && tab !== 'squad') squadOriginRef.current = tab === 'history' ? 'history' : 'power';
+        onTab?.(value);
+      }} />
       <div ref={contentRef} className={`fi-intel-content fi-intel-content--${tab}`} role="tabpanel" id={`intel-panel-${tab}`} aria-labelledby={`intel-tab-${tab}`} tabIndex={0} onKeyDown={event => {
-        if (tab === 'squad' && event.key === 'Escape' && onTab) { event.preventDefault(); backToStandings(); }
+        if (tab === 'squad' && event.key === 'Escape' && onTab) { event.preventDefault(); backToOrigin(); }
       }}>
         {tab === 'feed' && <Feed entries={feed} />}
-        {tab === 'power' && <Power rows={power} onSelect={onSelectTeam} selectedTeamId={inspectedTeamId} />}
-        {tab === 'squad' && <Squad squad={squad} positionColors={positionColors} followed={followed} onFollow={onFollow} history={history} onBack={onTab ? backToStandings : undefined} />}
-        {tab === 'history' && <History entries={history} teams={historyTeams} selected={selectedHistory} onSelect={onHistorySelect} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} />}
+        {tab === 'power' && <Power rows={power} onSelect={onSelectTeam ? inspectTeam : undefined} selectedTeamId={inspectedTeamId} />}
+        {tab === 'squad' && <Squad squad={squad} positionColors={positionColors} followed={followed} onFollow={onFollow} history={history} onBack={onTab ? backToOrigin : undefined} backLabel={squadOriginRef.current === 'history' ? 'Back to history' : 'Back to standings'} />}
+        {tab === 'history' && <History entries={history} teams={historyTeams} selected={historySelection} filter={filter} onFilter={changeHistoryFilter} onSelect={selectHistory} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam ? inspectTeam : undefined} />}
       </div>
       {tab === 'power' && <p className="fi-intel-hint"><Icon name="info" size={17} /><span>Select a team to view its squad.</span></p>}
     </aside>

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { computeRevealView, WORLD } from '../src/hooks/useMapViewport.js';
+import { computeFitView, computeRevealView, WORLD } from '../src/hooks/useMapViewport.js';
 
 const desktop = { width: 960, height: 540 };
 const zoomed = { x: 200, y: 100, w: 320, h: 180 };
@@ -31,6 +31,26 @@ function assertFramed(view, size) {
 }
 
 const desktopInset = { left: 72, right: 72, top: 90, bottom: 110 };
+
+test('explicit conquest inspection zooms into a small territory with HUD padding', () => {
+  const bounds = { x: 440, y: 260, w: 40, h: 20 };
+  const view = computeFitView(bounds, desktop);
+  assert.ok(view.w < WORLD.w / 4, 'An explicit conquest view must zoom in from the world view');
+  assertVisible([{ x: 440, y: 260 }, { x: 480, y: 280 }], view, desktop, desktopInset);
+  assertFramed(view, desktop);
+});
+
+test('conquest fitting handles phones, world edges, zero-sized land and invalid bounds', () => {
+  for (const size of [desktop, { width: 390, height: 700 }, { width: 240, height: 100 }]) {
+    for (const bounds of [{ x: 0, y: 0, w: 30, h: 20 }, { x: 900, y: 490, width: 60, height: 50 }, WORLD, { x: 430, y: 240, w: 0, h: 0 }]) {
+      const view = computeFitView(bounds, size);
+      assertFramed(view, size);
+      assertVisible([{ x: bounds.x, y: bounds.y }, { x: bounds.x + (bounds.width ?? bounds.w), y: bounds.y + (bounds.height ?? bounds.h) }], view, size);
+    }
+  }
+  for (const bounds of [null, {}, { x: 2, y: 3, w: -1, h: 5 }, { x: NaN, y: 3, w: 5, h: 5 }]) assert.equal(computeFitView(bounds, desktop), null);
+  assert.equal(computeFitView(WORLD, { width: 0, height: 0 }), null);
+});
 
 test('already-safe routes preserve the exact view object and zoom', () => {
   assert.equal(computeRevealView(zoomed, [{ x: 250, y: 160 }, { x: 400, y: 210 }], desktop), zoomed);

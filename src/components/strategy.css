@@ -1,0 +1,22 @@
+.fi-signing-option { min-width: 0; display: flex; flex-direction: column; border: 1px solid #69756d; border-radius: 2px; background: #202b28; }
+.fi-acquisition-options .fi-signing-option > button { flex: 1; width: 100%; border: 0; border-radius: 0; }
+.fi-signing-role { color: #e5c986; font-size: 10px; line-height: 1.5; text-transform: uppercase; letter-spacing: .04em; }
+.fi-signing-support { display: flex; flex-direction: column; gap: 3px; color: #b8c1b7; font-size: 11px; font-variant-numeric: tabular-nums; }
+.fi-signing-preview { padding: 0 13px 13px; font-size: 11px; color: #b8c1b7; line-height: 1.5; }
+.fi-signing-preview summary { padding: 8px 0; min-height: 40px; cursor: pointer; border-top: 1px solid #4c5b51; }
+.fi-signing-preview table { border-collapse: collapse; width: 100%; margin-top: 8px; font-size: 10px; overflow-wrap: anywhere; }
+.fi-signing-preview caption { text-align: left; margin-bottom: 7px; }
+.fi-signing-preview td, .fi-signing-preview th { padding: 6px 4px; border-bottom: 1px solid #4c5b51; text-align: left; vertical-align: top; }
+.fi-signing-preview td small { display: block; color: #b8c1b7; }
+.fi-signing-preview .is-changed td:last-child { color: #e5c986; }
+.fi-acquisition button:focus-visible, .fi-signing-preview summary:focus-visible { outline: 2px solid #e5c986; outline-offset: 3px; }
+.fi-tactical-rating { font-size: 12px; color: #ece9df; font-variant-numeric: tabular-nums; }
+.fi-tactical-rating small, .fi-tactical-risk small { display: block; margin-top: 3px; color: #b8c1b7; font-size: 10px; }
+.fi-tactical-risk { color: #e5c986; font-size: 12px; font-variant-numeric: tabular-nums; }
+.fi-tactical-choice .fi-acquisition-player { min-height: 155px; }
+@media (max-width: 700px) {
+  .fi-acquisition-options .fi-signing-option > button, .fi-tactical-choice .fi-acquisition-options > button { display: flex; flex-direction: column; }
+  .fi-tactical-choice .fi-acquisition-player { min-height: 0; }
+  .fi-tactical-choice .fi-acquisition-options > button { gap: 8px; }
+  .fi-signing-preview summary { min-height: 44px; }
+}

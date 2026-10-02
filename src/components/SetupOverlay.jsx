@@ -36,7 +36,7 @@ function SegmentedChoice({ label, options, value, onChange }) {
 }
 
 /** The three campaign choices stay visible; simulation options are optional. */
-export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, onResume, onDiscard, onPick, onStart, onExport, onImport }) {
+export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, onResume, onDiscard, onPick, onStart, onExport, onImport, onManageSaves, managerTeams = [] }) {
   const [confirmation, setConfirmation] = useState(null);
   const sport = getSport(setup.sport);
   const clubLayer = setup.layer === 'clubs';
@@ -58,8 +58,8 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
 
   function launch(event) {
     event.preventDefault();
-    if (hasSave) setConfirmation('launch');
-    else onStart();
+    if (setup.role === 'manager' && !managerTeams.some(team => team.id === setup.managedTeamId)) return;
+    onStart();
   }
 
   function confirm() {
@@ -89,7 +89,7 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
             <div><strong>Continue your campaign</strong><p>{savedText}</p></div>
             <div className="setup-save-actions">
               <button type="button" className="button button-quiet" onClick={onResume}>Resume</button>
-              <button type="button" className="setup-text-button" onClick={() => setConfirmation('discard')}>Discard save</button>
+              <button type="button" className="setup-text-button" onClick={() => setConfirmation('discard')}>Clear quick resume</button>
             </div>
           </div>
         )}
@@ -98,11 +98,18 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
             <SegmentedChoice label="Session" options={[['short', 'Short'], ['standard', 'Standard'], ['world', 'World']]} value={setup.preset || 'standard'} onChange={value => onPick('preset', value)} />
             <SegmentedChoice label="Your role" options={[['spectator', 'Spectator'], ['manager', 'Manager']]} value={setup.role || 'spectator'} onChange={value => onPick('role', value)} />
           </div>
-          <p className="control-help setup-role-help">{setup.role === 'manager' ? 'Choose among up to three signings after your team wins. Strongest team selected initially; change it in Squad.' : 'Automatic draws, results and signings. Follow a favourite for match alerts.'}</p>
+          <p className="control-help setup-role-help">{setup.role === 'manager' ? 'Commit to one team. Choose an approach before its matches and among up to three signings after its wins.' : 'Automatic draws, results and signings. Follow a favourite for match alerts.'}</p>
           <div className="setup-main-row">
             <SegmentedChoice label="Sport" options={SPORT_LIST.map(item => [item.id, item.name])} value={sport.id} onChange={value => onPick('sport', value)} />
             <SegmentedChoice label="Teams" options={[[ 'nations', 'Nations' ], [ 'clubs', 'Clubs' ]]} value={clubLayer ? 'clubs' : 'nations'} onChange={value => onPick('layer', value)} />
           </div>
+
+          {setup.role === 'manager' && <label className="control-field" htmlFor="setup-managed-team"><span>Your managed team</span>
+            <select id="setup-managed-team" value={setup.managedTeamId || ''} required onChange={event => onPick('managedTeamId', event.target.value)}>
+              <option value="" disabled>Choose your team</option>
+              {managerTeams.map(team => <option key={team.id} value={team.id}>{team.name} · {team.rating.toFixed(1)} strength</option>)}
+            </select><small className="control-help">Management stays with this team until elimination. You can follow any team independently.</small>
+          </label>}
 
           <div className="setup-theatre-preview">
           <label className="control-field" htmlFor="setup-theatre">
@@ -140,6 +147,16 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
                 </select>
                 <small className="control-help">{setup.finale === 'best-of-three' ? 'First to two wins claims the final territories and player.' : 'One decisive match crowns the champion.'}</small>
               </label>
+              <label className="control-field" htmlFor="setup-recruitment"><span>Automatic recruitment</span>
+                <select id="setup-recruitment" value={setup.acquisitionPolicy || 'highest-rated'} onChange={event => onPick('acquisitionPolicy', event.target.value)}>
+                  <option value="highest-rated">Highest rated player</option><option value="best-fit">Best fit for the starting lineup</option>
+                </select><small className="control-help">Applies to teams without a manager. Best fit maximizes legal lineup improvement, then rating.</small>
+              </label>
+              {sport.id === 'basketball' && <label className="control-field" htmlFor="setup-roster-preset"><span>Starting ratings</span>
+                <select id="setup-roster-preset" value={setup.rosterPreset || 'authentic'} onChange={event => onPick('rosterPreset', event.target.value)}>
+                  <option value="authentic">Authentic</option><option value="competitive">Competitive field</option>
+                </select><small className="control-help">Competitive narrows the strength gaps between teams and preserves player differences within each roster.</small>
+              </label>}
               <label className="control-field" htmlFor="setup-seed"><span>Campaign seed</span>
                 <input id="setup-seed" type="number" min="1" max="4294967295" step="1" placeholder="Random seed" value={setup.seed ?? ''} onChange={event => onPick('seed', event.target.value)} />
                 <small className="control-help">Share a seed and these settings to replay the same draw. Leave blank for a new seed.</small>
@@ -157,17 +174,17 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
           <footer className="setup-footer">
           {confirmation && hasSave ? (
             <div className="setup-confirmation" role="alert">
-              <strong>{confirmation === 'discard' ? 'Discard saved campaign?' : 'Start a new campaign?'}</strong>
-              <p>{confirmation === 'discard' ? 'Your saved progress will be removed.' : 'Your saved progress will be replaced by this campaign.'}</p>
+              <strong>{confirmation === 'discard' ? 'Clear quick resume?' : 'Start a new campaign?'}</strong>
+              <p>{confirmation === 'discard' ? 'The campaign stays available in Saved campaigns.' : 'Your saved campaign stays available in its own slot.'}</p>
               <div className="setup-confirm-actions">
                 <button type="button" className="button button-quiet" onClick={() => setConfirmation(null)}>Keep save</button>
-                <button type="button" className="button button-primary" onClick={confirm}>{confirmation === 'discard' ? 'Discard save' : 'Launch new campaign'}</button>
+                <button type="button" className="button button-primary" onClick={confirm}>{confirmation === 'discard' ? 'Clear quick resume' : 'Launch new campaign'}</button>
               </div>
             </div>
           ) : (
-            <button type="submit" className="button button-primary setup-launch"><Icon name="play" size={17} />Launch campaign</button>
+            <button type="submit" className="button button-primary setup-launch" disabled={setup.role === 'manager' && !managerTeams.some(team => team.id === setup.managedTeamId)}><Icon name="play" size={17} />Launch campaign</button>
           )}
-          <SaveControls status={saveStatus} onExport={hasSave ? onExport : undefined} onImport={onImport} />
+          <SaveControls status={saveStatus} onExport={hasSave ? onExport : undefined} onImport={onImport} onManageSaves={onManageSaves} />
           </footer>
         </form>
       </section>

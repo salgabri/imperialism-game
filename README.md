@@ -16,7 +16,7 @@ Pick your sport at kick-off:
 And pick who fights:
 
 - **Nations** — 170 national teams, each starting on its own homeland.
-- **Clubs** — 133 football clubs from six European leagues, or all 30 NBA
+- **Clubs** — 132 football clubs from seven European leagues, or all 30 NBA
   franchises. Real Madrid annexes territory exactly the way Spain does.
 
 Everything outside the match — territory, the spinner, targeting, conquest,
@@ -162,13 +162,27 @@ screen at every zoom level, and the scale bar re-snaps to a round distance.
 
 ## Squads
 
-Both sports field **real players with real ratings**, on the same 1–99 scale.
+Football fields source-backed players; each squad row links to its rating evidence.
+Game ratings use a 1–99 display range, with the original source values retained.
 
-**Football** — `src/data/rosters.js`, generated from an EA Sports FC export
-(18,405 players). For each nationality the best available player by overall
-rating fills each slot of the 4-4-2, then the squad is topped up to eleven with
-the best remaining players whatever their position — which is what small nations
-do in reality.
+**Football** — `src/data/rosters.js` combines the committed EA FC 26 update 4
+snapshot (19 September 2025; 18,405 records) with Football Manager 26 database
+26.3.0 from [EFEM.club](https://efem.club/players), retrieved on 2 October 2026.
+All **170 nations field eleven source-backed players**, with natural coverage for
+a 4-4-2. The builder prioritises unchanged EA overall ratings and uses FM to fill
+coverage gaps. It retains database IDs, full/display names, all natural roles,
+source URLs, versions, dates and original ratings through transfers and saves.
+The 280 generic Brazilian domestic players in EA's unlicensed `Série A` are
+excluded; this does not exclude the Italian `Serie A`.
+
+EFEM displays FM Current Ability on a normalised 1–100 scale. The game converts
+it once using `round(currentAbility * 99 / 100)` and exposes both values in the
+rating tooltip. It does not use potential or the site's separate EFEM Score.
+EA overall and FM Current Ability remain different measures; the conversion
+does not claim an official equivalence. These are **dated fantasy XIs by database
+nationality**, including international retirees, rather than current call-ups.
+Existing campaigns retain their saved squads; start a new campaign to use the
+updated data. See `docs/design/football-roster-audit.json` for per-nation coverage.
 
 **Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
@@ -191,25 +205,27 @@ use the team's sport baseline. The same starters determine strength and appear
 in match scoring and tie-break events. Squad lists separate starters from bench
 and identify positional penalties; bench depth does not directly inflate strength.
 
-Coverage is uneven in both. The football dataset only has players at playable
-clubs (England 1,495 candidates, Vietnam none): **65% of shirts are real** and 79
-nations field a fully real XI. Basketball is curated to the 40 federations that
-matter, so **24% of shirts are real** but every serious basketball nation is. Anything the data can't cover is
-generated at the confederation baseline and shown *dimmed and asterisked* in the
-squad list, so an invented name never reads as a real player. A football nation
-with no keeper in the dataset always has that shirt generated rather than handed
-to an outfielder.
+Football never invents a missing player or rating: an incomplete future source
+is shown as an incomplete squad. The shipped sources cover every football XI.
+Basketball is curated to the 40 federations that matter, so **24% of shirts are
+real** but every serious basketball nation is. Basketball gaps retain generated
+players at the confederation baseline, shown dimmed and asterisked.
 
 To rebuild after swapping datasets:
 
 ```bash
 npm run build-rosters [path/to/players.csv]   # football
+npm run sync:football-manager                # refresh the pinned FM database supplement
 npm run build-basketball                     # basketball
 ```
 
-The football CSV needs `short_name`, `player_positions`, `overall` and
-`nationality_name` columns. Sources live in `data-src/` and are not committed
-(11 MB) — only the generated rosters are.
+Football builders default to the committed reduced source snapshots in
+`scripts/data/`, so regeneration works without network access. An optional EA
+CSV must also include player IDs/URLs, full names, database version/update/date,
+birth dates and club/competition IDs. The FM refresh reads the same public
+endpoint and filters as EFEM's player grid. The original large exports remain in
+ignored `data-src/`; only fields used for roster construction and evidence are
+retained in the committed snapshots.
 
 ## The club layer
 
@@ -225,7 +241,7 @@ opens with Europe carved up and the strongest sides at its centre. Countries
 nobody reaches stay neutral, exactly as non-participating nations do.
 
 Clubs have no crest in either dataset, so their territory is painted in a
-generated colour rather than a flag — 133 identical English flags would tell you
+generated colour rather than a flag — identical national flags would tell you
 nothing. Everything else (capital markers, the power table, squad panels,
 conquest, player theft) behaves identically.
 

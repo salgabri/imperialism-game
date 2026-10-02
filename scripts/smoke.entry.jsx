@@ -805,7 +805,9 @@ export async function runStrengthStandingsCheck() {
     ids.forEach((id, i) => {
       for (let count = 0; count < definitions[i][3]; count++) own[shapes[shapeIndex++]] = id;
     });
-    await setState(app, { teams, own, aliveIds: ids.slice().reverse(), tab: 'power' });
+    // Keep inactive teams as historical identities, as a real campaign does.
+    // The save validator also resolves existing settings/statistics against them.
+    await setState(app, { teams: { ...app.state.teams, ...teams }, own, aliveIds: ids.slice().reverse(), tab: 'power' });
     const before = app.powerTable(true);
     const fixture = standingsSnapshot(app);
     const position = id => before.findIndex(row => row.tid === id);

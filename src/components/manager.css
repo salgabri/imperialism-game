@@ -1,0 +1,10 @@
+.manager-backdrop { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; background: #102528b8; }
+.manager-ending { width: min(100%, 520px); max-height: calc(100dvh - 40px); overflow: auto; padding: 28px; background: var(--result-paper, #f6f3e9); color: var(--result-ink, #243936); border: 1px solid #b7bcab; box-shadow: 0 16px 60px #071c2940; }
+.manager-eyebrow { text-transform: uppercase; letter-spacing: .1em; font-size: 11px; }
+.manager-ending h1 { margin: 12px 0; font-size: 26px; }
+.manager-ending p { line-height: 1.6; }
+.manager-stats { display: flex; gap: 30px; margin: 24px 0; }
+.manager-stats dt { font-size: 12px; opacity: .75; }
+.manager-stats dd { margin: 6px 0 0; font-size: 24px; }
+.manager-ending-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 600px) { .manager-ending { padding: 22px; } .manager-ending-actions .button { width: 100%; } }

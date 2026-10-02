@@ -269,13 +269,26 @@ function genPlayer(rng, culture, pos, baseStr) {
   return { name: f[0] + '. ' + l, pos, rating, gen: true };
 }
 
+/** Preserve the database identity and rating evidence carried by each export. */
+function rosterPlayer([name, pos, rating, metadata]) {
+  const player = { name, pos, rating, gen: false };
+  if (metadata) {
+    player.sourceInfo = { ...metadata };
+    if (metadata.id) player.id = metadata.id;
+    if (Array.isArray(metadata.positions) && metadata.positions.length) {
+      player.positions = [...new Set([pos, ...metadata.positions])];
+      player.sourceInfo.positions = metadata.positions.slice();
+    }
+  }
+  return player;
+}
+
 /**
  * Build a nation's squad for a campaign in the given sport.
  *
- * Real players are used wherever that sport's roster data has them. Anything it
- * cannot cover is generated at the confederation's baseline, so a thin nation
- * still fields a full lineup rather than a two-man team. `real` reports how much
- * of the squad came from actual data.
+ * Football only fields players in its source data; an incomplete export remains
+ * visibly incomplete. Other sports retain their generated baseline fillers.
+ * `real` reports how much of the squad came from actual data.
  */
 export function buildTeam(id, rng, sport) {
   const rec = NATIONS[id];
@@ -290,7 +303,7 @@ export function buildTeam(id, rng, sport) {
   if (roster) {
     const [rosterStr, , players] = roster;
     str = rosterStr;
-    for (const [n, pos, rating] of players) squad.push({ name: n, pos, rating, gen: false });
+    squad.push(...players.map(rosterPlayer));
   } else {
     // No roster in this sport: fall back to whatever that sport considers a
     // baseline nation, never to another sport's strength.
@@ -298,14 +311,16 @@ export function buildTeam(id, rng, sport) {
   }
   const real = squad.length;
 
-  const have = p => squad.filter(x => x.pos === p).length;
-  for (const [pos, count] of Object.entries(formation)) {
-    while (have(pos) < count && squad.length < squadSize) squad.push(genPlayer(rng, culture, pos, str));
-  }
-  let i = 0;
-  while (squad.length < squadSize) {
-    squad.push(genPlayer(rng, culture, positionPlan[i % squadSize], str));
-    i++;
+  if (sport.id !== 'football') {
+    const have = p => squad.filter(x => x.pos === p).length;
+    for (const [pos, count] of Object.entries(formation)) {
+      while (have(pos) < count && squad.length < squadSize) squad.push(genPlayer(rng, culture, pos, str));
+    }
+    let i = 0;
+    while (squad.length < squadSize) {
+      squad.push(genPlayer(rng, culture, positionPlan[i % squadSize], str));
+      i++;
+    }
   }
   return {
     id, name, code, conf, culture, str, col, squad, real,
@@ -332,7 +347,7 @@ export function buildClub(club, sport) {
     culture: null,
     str: club.str,
     col: club.col,
-    squad: club.squad.map(([name, pos, rating]) => ({ name, pos, rating, gen: false })),
+    squad: club.squad.map(rosterPlayer),
     real: club.squad.length,
     kind: 'club',
     home: club.country,
@@ -354,6 +369,7 @@ const LINEUP_PLANS = {
   basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
 };
 const BASKETBALL_POSITIONS = new Set(LINEUP_PLANS.basketball);
+const canPlay = (player, position) => player.pos === position || player.positions?.includes(position);
 
 /** Legacy saves can predate the sport field; their positions identify the plan. */
 export function teamSportId(team) {
@@ -374,9 +390,9 @@ export function selectLineup(team) {
   const columnCount = Math.max(rowCount, squad.length);
   const effective = (row, column) => {
     const player = squad[column];
-    if (!player) return 40; // Unfilled legacy shirts use the minimum generated baseline.
+    if (!player) return 40; // Unfilled shirts affect strength without inventing a player.
     const rating = Number.isFinite(player.rating) ? player.rating : 40;
-    return Math.max(1, rating - (player.pos === plan[row] ? 0 : OUT_OF_POSITION_PENALTY));
+    return Math.max(1, rating - (canPlay(player, plan[row]) ? 0 : OUT_OF_POSITION_PENALTY));
   };
 
   // Rectangular Hungarian assignment: rows are shirts, columns are players.
@@ -422,7 +438,7 @@ export function selectLineup(team) {
     const playerIndex = assignment[row];
     const source = squad[playerIndex];
     if (source) selected.add(playerIndex);
-    const outOfPosition = !!source && source.pos !== position;
+    const outOfPosition = !!source && !canPlay(source, position);
     const effectiveRating = effective(row, playerIndex);
     const player = source ? { ...source, originalIndex: playerIndex, assignedPos: position, effectiveRating, outOfPosition } : null;
     return { position, player, effectiveRating, outOfPosition, penalty: outOfPosition ? OUT_OF_POSITION_PENALTY : 0 };

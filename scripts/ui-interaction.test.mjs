@@ -75,7 +75,7 @@ test('history filters archived fixtures by team and selecting a result retains i
   await act(async () => { filter.value = 'a'; filter.dispatchEvent(new dom.window.Event('change', { bubbles: true })); });
   assert.equal(view.host.querySelectorAll('.fi-history-list button').length, 1);
   await act(async () => view.host.querySelector('.fi-history-list button').click());
-  assert.deepEqual(selected, ['m1']);
+  assert.deepEqual(selected, ['m1', 'm1'], 'Changing the filter selects its newest report before the explicit click');
   await view.close();
 });
 

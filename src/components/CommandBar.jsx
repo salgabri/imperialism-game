@@ -8,7 +8,7 @@ export default function CommandBar({
   show, sportName = 'Football', layerName = 'Nations', scopeName, round, alive,
   pacing, resolution, confirmNew, onPacing, onResolution, onNew, busy = false, completed = false,
   saveStatus, onExport, onImport, onResults, onCancelNew, seed,
-  settings, onSetting,
+  settings, onSetting, onManageSaves, managementEnded = false,
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
@@ -55,7 +55,7 @@ export default function CommandBar({
             <section id="campaign-settings" className="command-popover" aria-label="Campaign settings">
               <div className="command-popover-heading"><h2>Settings</h2><button type="button" className="icon-button" aria-label="Close settings" onClick={() => { setSettingsOpen(false); triggerRef.current?.focus(); }}><Icon name="close" size={17} /></button></div>
               <label className="control-field" htmlFor="campaign-pacing"><span>Pacing</span>
-                <select id="campaign-pacing" value={pacing} disabled={busy || completed} onChange={event => onPacing(event.target.value)}>
+                <select id="campaign-pacing" value={pacing} disabled title="Draw rules are fixed at launch" onChange={event => onPacing(event.target.value)}>
                   {PACING_OPTIONS.map(([id, label]) => <option value={id} key={id}>{label}</option>)}
                 </select>
               </label>
@@ -68,14 +68,15 @@ export default function CommandBar({
               {busy && <p className="command-settings-note">Match settings are available after this match.</p>}
               {onSetting && <>
                 <label className="control-checkbox"><input type="checkbox" checked={!!settings?.express} disabled={completed} onChange={event => onSetting('express', event.target.checked)} /><span>Express playback<small>Shorter waits from the next match.</small></span></label>
-                <label className="control-field" htmlFor="campaign-uncertainty"><span>Match uncertainty</span><select id="campaign-uncertainty" value={settings?.uncertainty || 'balanced'} disabled={busy || completed} onChange={event => onSetting('uncertainty', event.target.value)}><option value="predictable">Predictable</option><option value="balanced">Balanced</option><option value="wild">Wild</option></select></label>
-                <label className="control-field" htmlFor="campaign-finale"><span>Final two teams</span><select id="campaign-finale" value={settings?.finale || 'single'} disabled={busy || completed} onChange={event => onSetting('finale', event.target.value)}><option value="single">Single match</option><option value="best-of-three">Best of three</option></select></label>
-                <label className="control-field" htmlFor="campaign-role"><span>Your role</span><select id="campaign-role" value={settings?.role || 'spectator'} disabled={busy || completed} onChange={event => onSetting('role', event.target.value)}><option value="spectator">Spectator</option><option value="manager">Manager</option></select><small className="control-help">Managers choose a captured player after their team's conquests. Change your team in Squad.</small></label>
+                <label className="control-field" htmlFor="campaign-uncertainty"><span>Match uncertainty</span><select id="campaign-uncertainty" value={settings?.uncertainty || 'balanced'} disabled><option value="predictable">Predictable</option><option value="balanced">Balanced</option><option value="wild">Wild</option></select></label>
+                <label className="control-field" htmlFor="campaign-finale"><span>Final two teams</span><select id="campaign-finale" value={settings?.finale || 'single'} disabled><option value="single">Single match</option><option value="best-of-three">Best of three</option></select></label>
+                <label className="control-field" htmlFor="campaign-role"><span>Your role at launch</span><select id="campaign-role" value={settings?.role || 'spectator'} disabled><option value="spectator">Spectator</option><option value="manager">Manager</option></select><small className="control-help">{managementEnded ? 'Your managed team was eliminated. You are watching as a spectator.' : 'Campaign rules and your managed team are fixed at launch.'}</small></label>
+                <p className="command-settings-note">Recruitment: {settings?.acquisitionPolicy === 'best-fit' ? 'Best lineup fit' : 'Highest rated'}{settings?.sport === 'basketball' ? ` · ${settings.rosterPreset === 'competitive' ? 'Competitive' : 'Authentic'} ratings` : ''}</p>
               </>}
               {seed != null && <p className="command-settings-note campaign-seed">Seed <strong>{seed}</strong></p>}
-              <SaveControls status={saveStatus} onExport={onExport} onImport={onImport} compact />
+              <SaveControls status={saveStatus} onExport={onExport} onImport={onImport} onManageSaves={onManageSaves} compact />
               <div className="command-new">
-                {confirmNew && <p role="alert">Choose a new campaign? This campaign stays saved until you launch another.</p>}
+                {confirmNew && <p role="alert">Choose a new campaign? This run remains available in Saved campaigns.</p>}
                 <button type="button" className="button button-quiet" onClick={onNew}>{confirmNew ? 'Confirm new campaign' : 'New campaign'}</button>
                 {confirmNew && <button type="button" className="button button-quiet command-cancel" onClick={onCancelNew}>Cancel</button>}
               </div>

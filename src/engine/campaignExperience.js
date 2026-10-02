@@ -1,13 +1,49 @@
 import { selectLineup, teamEff } from '../data/teams.js';
+import { tacticalProfile } from './managerStrategy.js';
 
-export function acquisitionOptions(winner, loser) {
+const round = value => Math.round(value * 100) / 100;
+const preview = lineup => lineup.slots.map(slot => ({ position: slot.position, name: slot.player?.name || 'Unfilled shirt',
+  rating: slot.effectiveRating, outOfPosition: slot.outOfPosition }));
+
+export function acquisitionCandidates(winner, loser) {
   const before = selectLineup(winner);
+  const beforeSupport = tacticalProfile(winner);
   return loser.squad.map((player, index) => {
-    const after = selectLineup({ ...winner, squad: [...winner.squad, player] });
+    const recruited = { ...winner, squad: [...winner.squad, player] };
+    const after = selectLineup(recruited);
+    const support = tacticalProfile(recruited);
     const replaced = before.starters.find(p => !after.starters.some(q => q.originalIndex === p.originalIndex));
     return { ...player, index, gain: Math.round((after.rating - before.rating) * 10) / 10,
-      replaces: replaced || null, entersLineup: after.starters.some(p => p.originalIndex === winner.squad.length) };
-  }).sort((a, b) => b.gain - a.gain || b.rating - a.rating || a.index - b.index).slice(0, 3);
+      replaces: replaced || null, entersLineup: after.starters.some(p => p.originalIndex === winner.squad.length),
+      support, supportBefore: beforeSupport,
+      attackGain: round(support.attack - beforeSupport.attack), defendGain: round(support.defend - beforeSupport.defend),
+      lineupPreview: { beforeRating: before.rating, afterRating: after.rating, before: preview(before), after: preview(after) } };
+  });
+}
+
+export function acquisitionOptions(winner, loser, { limit = 3 } = {}) {
+  const candidates = acquisitionCandidates(winner, loser);
+  const rated = (a, b) => b.gain - a.gain || b.rating - a.rating || a.index - b.index;
+  const chosen = [];
+  const choose = (sorted, role) => {
+    const candidate = sorted.find(item => !chosen.some(selected => selected.index === item.index));
+    if (candidate && chosen.length < limit) chosen.push({ ...candidate, role });
+  };
+  choose(candidates.slice().sort(rated), 'Starting lineup');
+  choose(candidates.filter(item => item.attackGain > 0).sort((a, b) => b.attackGain - a.attackGain || rated(a, b)), 'Attack support');
+  choose(candidates.filter(item => item.defendGain > 0).sort((a, b) => b.defendGain - a.defendGain || rated(a, b)), 'Defensive support');
+  for (const candidate of candidates.slice().sort(rated)) {
+    if (chosen.length >= limit) break;
+    if (!chosen.some(item => item.index === candidate.index)) chosen.push({ ...candidate, role: candidate.entersLineup ? 'Starting lineup' : 'Squad depth' });
+  }
+  return chosen;
+}
+
+export function automaticAcquisition(winner, loser, policy = 'highest-rated') {
+  const candidates = acquisitionCandidates(winner, loser);
+  return candidates.sort(policy === 'best-fit'
+    ? (a, b) => b.gain - a.gain || b.rating - a.rating || a.index - b.index
+    : (a, b) => b.rating - a.rating || a.index - b.index)[0] || null;
 }
 
 export function recordMatch(state, match, extras = {}) {
