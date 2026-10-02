@@ -174,3 +174,35 @@ test('fast playback reduces decorative revolutions without changing either team 
   for (const draw of draws) assert.deepEqual([draw.attackerId, draw.targetId, draw.bearing],
     [draws[0].attackerId, draws[0].targetId, draws[0].bearing]);
 });
+
+test('coastal fallback cache order does not change a seeded draw or ownership validity', () => {
+  const rect = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+  const makeBoard = () => ({ geo: { paths: {
+    a: { cx: 0, cy: 0, labelRings: [rect(-1, -1, 2, 2)] },
+    wall: { labelRings: [rect(8, -30, 1, 60)] },
+    b: { cx: 20, cy: 0, labelRings: [rect(19, -1, 2, 2)] },
+  }, adj: {} }, own: { a: 'A', b: 'B' }, aliveIds: ['A', 'B'] });
+  const first = makeBoard(), reverseFirst = makeBoard();
+  const expected = createDuelDraw(rngOf(0, .25, .5), first);
+  createDuelDraw(rngOf(.75, .25, .5), reverseFirst);
+  const actual = createDuelDraw(rngOf(0, .25, .5), reverseFirst);
+  assert.equal(actual.routeKind, 'sea');
+  assert.deepEqual(actual, expected, 'cold/warm and opposite draws resolve exactly the same departure and route');
+  // A new blocker changes the prepared geometry identity and cannot inherit an
+  // obsolete sea route from the previous atlas.
+  const enclosed = makeBoard();
+  enclosed.geo.paths.wall.labelRings = [rect(-3, -3, 6, 6), rect(-2, -2, 4, 4).reverse()];
+  const treaty = createDuelDraw(rngOf(0, .25, .5), enclosed);
+  assert.equal(treaty.routeKind, 'neutral-transit');
+});
+
+test('an unreachable malformed owner retries the next attacker without consuming extra entropy', () => {
+  const board = boardOf({ far: [1e10, 0], b: [0, 0], c: [10, 0] },
+    { far: 'A', b: 'B', c: 'C' });
+  const rng = rngOf(0, 0, .5);
+  const draw = createDuelDraw(rng, board);
+  assert.equal(draw.attackerId, 'B');
+  assert.equal(draw.targetId, 'C');
+  assert.equal(draw.reroutedAttacker, true);
+  assert.equal(rng.calls(), 3);
+});

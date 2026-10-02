@@ -11,6 +11,8 @@ import { projPt } from '../src/engine/geo.js';
 import { createEmpireLabelEngine as createLabelValidator } from '../src/engine/empireLabels.js';
 
 const SPEED = 80;
+// The label engine marks a footprint coastal only above this clipping residue.
+const COASTAL_ZERO_TOLERANCE = 1e-8;
 const text = () => document.getElementById('root').textContent;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const countryPaths = () => [...document.querySelectorAll('[data-testid="world-map"] path[data-country]')];
@@ -394,7 +396,10 @@ function empireLabelsSnapshot(app, { geography = false } = {}) {
       && new Set(labelPaths.map(path => path.id)).size === labelPaths.length,
     gentleArches: placements.every(placement => placement && Number.isFinite(placement.rise) && placement.rise > 0 && placement.rise <= placement.width * .1),
     coastalPolicyValid: placements.every(placement => placement && Number.isFinite(placement.seaFraction) && placement.seaFraction >= 0
-      && placement.seaFraction <= .22 + .000001 && (placement.coastal || placement.seaFraction === 0)),
+      && placement.seaFraction <= .22 + .000001 && (placement.coastal || placement.seaFraction <= COASTAL_ZERO_TOLERANCE)),
+    coastalPolicyFailures: placements.filter(placement => !placement || !Number.isFinite(placement.seaFraction)
+      || placement.seaFraction < 0 || placement.seaFraction > .22 + .000001 || (!placement.coastal && placement.seaFraction > COASTAL_ZERO_TOLERANCE))
+      .map(placement => placement && ({ id: placement.id, seaFraction: placement.seaFraction, coastal: placement.coastal })),
     uiPolicyEnabled: !!policy && policy.curveRatio > 0 && policy.curveRatio <= .1
       && policy.coastalAllowancePx >= 8 && policy.coastalAllowancePx <= 10 && policy.maxSeaFraction === .22,
     coastalCount: placements.filter(placement => placement?.coastal).length,
@@ -438,9 +443,13 @@ export async function runEmpireLabelCheck(scenario) {
 
     // Use the real kickoff and ticker update, but hold simulation timers while
     // checking that these visual-only changes do not repeat geographic work.
+    // At 80x, an instant game can finish before until's 20ms polling interval.
+    // Freeze the production clock before kickoff so React's commit callback
+    // cannot arm a conquest while this cache-only probe waits for its match.
+    app.clock.pause();
     app.startMatch(winnerId, loserId);
+    await until('label regression match starts', () => !!app.state.match && !app.state.match.applied);
     app.clearTimers();
-    await until('label regression match starts', () => !!app.state.match);
     app.patchMatch({ ga: 1, shown: app.state.match.allEv.slice(0, 1) });
     await until('label regression ticker advances', () => app.state.match.ga === 1);
     const tickerCached = globalThis.__smokeEmpireLabelWork.layouts === workBefore.layouts;
@@ -783,7 +792,10 @@ export async function runStrengthStandingsCheck() {
     ];
     const teams = Object.fromEntries(ids.map((id, i) => {
       const [name, str, rating] = definitions[i];
-      const team = { ...app.state.teams[id], name, str, squad: app.state.teams[id].squad.map(player => ({ ...player, rating })) };
+      const squad = app.sport().positionPlan.map((pos, index) => ({ name: `${name} player ${index}`, pos,
+        rating: i === 3 || i === 4 ? 10 : rating, gen: false }));
+      if (i === 3 || i === 4) squad.find(player => player.pos === (i === 3 ? 'FW' : 'DF')).rating = 99;
+      const team = { ...app.state.teams[id], name, str, squad };
       team.baseEff = teamEff(team);
       return [id, team];
     }));
@@ -834,7 +846,7 @@ export async function runStrengthStandingsCheck() {
     const gainAfterTwo = cumulativeStandings.gains[0];
     const twoTerritories = app.state.match.territoriesGained === 2;
 
-    // A weaker new player does not enter the top five used by teamEff.
+    // A weaker new player does not enter the best legal lineup.
     const lowPlayerGain = await acquire(largeId);
     const zeroStandings = standingsSnapshot(app);
     const sixTerritories = app.state.match.territoriesGained === 6;
@@ -927,7 +939,7 @@ export async function runResumeCheck(scenario = {}) {
       ? first.app.state.round >= 3 && first.app.state.matches >= 40
       : first.app.state.matches >= 2, 180000);
     button('Pause').click();
-    await until('paused match settled', () => !first.app.state.autoplay && (!first.app.state.match || first.app.state.match.applied));
+    await until('paused match frozen', () => !first.app.state.autoplay && first.app.state.paused);
     const before = ownershipSnapshot(first.app);
     const standingsBefore = standingsSnapshot(first.app);
     const labelsBefore = empireLabelsSnapshot(first.app);
@@ -951,7 +963,7 @@ export async function runResumeCheck(scenario = {}) {
 
     second.app.rng = makeRng((scenario.seed || 20260910) + 1);
     await setState(second.app, { speed: SPEED });
-    button('Next match').click();
+    button(second.app.state.match && !second.app.state.match.applied ? 'Finish match' : 'Next match').click();
     await until('resumed campaign finishes another match', () => second.app.state.matches > after.matches, 60000);
     return {
       fielded, offeredResume, before, after, restoredMap, restoredFlags,
@@ -995,6 +1007,7 @@ export async function run(scenario) {
     let standingsGainsStayedCorrect = standingsAtKickoff.gainsCorrect;
     const labelsAtKickoff = empireLabelsSnapshot(app);
     let labelsStayedValid = true;
+    const labelFailures = [];
     let standingsSamples = 0;
     let sampledMatches = -1;
     // Flags are the default; exercise Political explicitly before sampling its
@@ -1018,9 +1031,12 @@ export async function run(scenario) {
         standingsRanksStayedSequential &&= standings.ranks;
         standingsGainsStayedCorrect &&= standings.gainsCorrect;
         const labels = empireLabelsSnapshot(app);
-        labelsStayedValid &&= labels.onePerOwner && labels.onlyCurrentOwners && labels.correctText
-          && labels.currentMetadata && labels.fontSizes && labels.withinViewport && labels.textPathsValid
-          && labels.gentleArches && labels.coastalPolicyValid && labels.uiPolicyEnabled;
+        const failed = ['onePerOwner', 'onlyCurrentOwners', 'correctText', 'currentMetadata', 'fontSizes',
+          'withinViewport', 'textPathsValid', 'gentleArches', 'coastalPolicyValid', 'uiPolicyEnabled']
+          .filter(key => !labels[key]);
+        if (failed.length) labelFailures.push({ matches: app.state.matches, failed, coastal: labels.coastalPolicyFailures,
+          ids: labels.ids, alive: app.state.aliveIds });
+        labelsStayedValid &&= failed.length === 0;
         standingsSamples++;
       }
       if (document.querySelector('[data-testid="match-card"]')) seen.add('match-card');
@@ -1038,6 +1054,9 @@ export async function run(scenario) {
     // because their original team has left aliveIds.
     button('Flags').click();
     await until('flags selected for conquest check', () => app.state.mapMode === 'flags');
+    // End the isolated rapid-pause check before testing manual stepping.
+    app.clock.resume();
+    await setState(app, { paused: false });
     button('Next match').click();
     await until('first conquest settled', () => app.state.matches >= 1 && app.state.match?.applied);
     const firstConquestFlagScope = regionalFlagsSnapshot(app);
@@ -1100,7 +1119,7 @@ export async function run(scenario) {
       nations, fielded, layer, rapidPauseHeld, setupFlags, kickoffFlags, politicalAtStart, politicalConquest, structuredConsequences, finalFlags,
       kickoffFlagScope, firstConquestFlagScope, victoryFlagScope, finalFlagScope,
       standingsAtKickoff, standingsStayedSorted, standingsRanksStayedSequential, standingsGainsStayedCorrect, standingsSamples,
-      labelsAtKickoff, labelsStayedValid, labelsAtFinish: empireLabelsSnapshot(app),
+      labelsAtKickoff, labelsStayedValid, labelFailures, labelsAtFinish: empireLabelsSnapshot(app),
       rounds: app.state.round,
       matches: app.state.matches,
       fallen: app.state.fallen.length,

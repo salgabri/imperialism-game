@@ -1,5 +1,9 @@
 # Interface verification
 
+Current campaign improvements, interaction checks and balance probes are recorded
+in [campaign verification](campaign-verification.md). The earlier interface
+verification below remains as the record for its original changes.
+
 ## Follow-up: gently arched names and coastal allowance
 
 Empire names now follow a shallow upward quadratic SVG text path, rising by 5.5% of the name width. A final on-land fallback softens the rise to 2.5% for otherwise-hidden cramped names. The fit envelope includes the bend, angled end glyphs and stroke halo. Path IDs are unique per map and stable per owner through camera changes. The game UI skill guided the restrained cartographic treatment, readable type size, owner-level hierarchy and non-interactive text layer.

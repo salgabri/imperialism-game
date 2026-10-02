@@ -44,11 +44,9 @@ function snapshotBoard(board) {
  * A valid field consumes exactly three RNG samples: attacker, requested compass
  * direction, and decorative whole turns (two/three at 1×, fewer at high speed).
  * Land-neighbor priority and the widening search cone apply only to routes
- * that reach the target before any intervening country. The route stops at the
- * first target land instead of crossing further borders to its capital.
- * The displayed needle instead finishes at the selected target's exact bearing,
- * from the SAME closest-pair origin used by the attack route. Bearings are SVG
- * degrees: east 0, south 90, west 180, north 270. No world-wrap rule is added.
+ * that reach the target before any intervening country. When none exists, a
+ * checked coastal sea polyline or explicit neutral transit treaty keeps play
+ * moving. The needle indicates the route's departure bearing. No wrap is added.
  *
  * Speed is captured for the whole presentation; callers use spinMs/holdMs for
  * both animation and scheduling rather than scaling those durations a second
@@ -60,11 +58,21 @@ export function createDuelDraw(rng, board, { speed = 1, reducedMotion = false } 
   const attackerRoll = unitSample(rng);
   const requestedAngle = unitSample(rng) * 360;
   const fullTurns = 2 + Math.floor(unitSample(rng) * 2);
-  const attackerId = snapshot.aliveIds[Math.floor(attackerRoll * snapshot.aliveIds.length)];
-  const target = pickTarget(snapshot, attackerId, requestedAngle);
+  const requestedIndex = Math.floor(attackerRoll * snapshot.aliveIds.length);
+  let attackerId = snapshot.aliveIds[requestedIndex];
+  let target = pickTarget(snapshot, attackerId, requestedAngle);
+  // Retry recoverable malformed/blocked owners in survivor order without extra
+  // entropy. Display speed and decorative timing cannot alter campaign outcomes.
+  for (let offset = 1; !target && offset < snapshot.aliveIds.length; offset++) {
+    attackerId = snapshot.aliveIds[(requestedIndex + offset) % snapshot.aliveIds.length];
+    target = pickTarget(snapshot, attackerId, requestedAngle);
+  }
   const cp = target?.cp;
   if (!cp || ![cp.ax, cp.ay, cp.bx, cp.by, cp.dist].every(Number.isFinite)) return null;
-  const bearing = ((Math.atan2(cp.by - cp.ay, cp.bx - cp.ax) * 180 / Math.PI) + 360) % 360;
+  const routePoints = Object.freeze((target.routePoints || [[cp.ax, cp.ay], [cp.bx, cp.by]])
+    .map(point => Object.freeze([...point])));
+  const [departure, nextPoint] = routePoints;
+  const bearing = ((Math.atan2(nextPoint[1] - departure[1], nextPoint[0] - departure[0]) * 180 / Math.PI) + 360) % 360;
   const safeSpeed = Number.isFinite(speed) && speed > 0 && Number.isFinite(1550 / speed) ? speed : 1;
   // Fast playback should shorten the ceremony, not turn the needle into a
   // strobing blur. Only complete decorative turns change; the draw never does.
@@ -80,6 +88,12 @@ export function createDuelDraw(rng, board, { speed = 1, reducedMotion = false } 
     y: cp.ay,
     targetX: cp.bx,
     targetY: cp.by,
+    routeKind: target.routeKind || 'straight',
+    routeLabel: target.routeLabel || 'Direct challenge',
+    routePoints,
+    routeD: routePoints.map(([x, y], i) => `${i ? 'L' : 'M'}${x},${y}`).join(''),
+    transitCountryIds: Object.freeze([...(target.transitCountryIds || [])]),
+    reroutedAttacker: attackerId !== snapshot.aliveIds[requestedIndex],
     isNeighbor: target.isNeighbor,
     spinMs: (quiet ? 160 : 1550) / safeSpeed,
     holdMs: (quiet ? 320 : 480) / safeSpeed,

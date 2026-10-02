@@ -236,12 +236,21 @@ export const NATIONS = {
 // ---- RNG (mulberry32) ----
 export function makeRng(seed) {
   let a = seed >>> 0;
-  return function () {
+  const rng = function () {
     a |= 0; a = (a + 0x6D2B79F5) | 0;
     let t = Math.imul(a ^ (a >>> 15), 1 | a);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+  rng.getState = () => a >>> 0;
+  rng.setState = state => {
+    if (!Number.isInteger(state) || state < 0 || state > 0xffffffff) {
+      throw new RangeError('RNG state must be an unsigned 32-bit integer.');
+    }
+    a = state >>> 0;
+    return rng;
+  };
+  return rng;
 }
 export function hashStr(s) {
   let h = 2166136261;
@@ -339,10 +348,95 @@ export function squadAverage(team) {
   return Math.round((team.squad.reduce((s, p) => s + p.rating, 0) / team.squad.length) * 10) / 10;
 }
 
+export const OUT_OF_POSITION_PENALTY = 12;
+const LINEUP_PLANS = {
+  football: ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'],
+  basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
+};
+const BASKETBALL_POSITIONS = new Set(LINEUP_PLANS.basketball);
+
+/** Legacy saves can predate the sport field; their positions identify the plan. */
+export function teamSportId(team) {
+  if (LINEUP_PLANS[team?.sport]) return team.sport;
+  return team?.squad?.some(player => BASKETBALL_POSITIONS.has(player.pos)) ? 'basketball' : 'football';
+}
+
+/**
+ * Select the strongest assignment to the sport's actual playing positions.
+ * A player may cover another position, but the assignment and 12-point penalty
+ * are explicit. Optimising the whole assignment means an acquisition cannot
+ * reduce strength by evicting a better emergency starter.
+ */
+export function selectLineup(team) {
+  const plan = LINEUP_PLANS[teamSportId(team)];
+  const squad = Array.isArray(team?.squad) ? team.squad : [];
+  const rowCount = plan.length;
+  const columnCount = Math.max(rowCount, squad.length);
+  const effective = (row, column) => {
+    const player = squad[column];
+    if (!player) return 40; // Unfilled legacy shirts use the minimum generated baseline.
+    const rating = Number.isFinite(player.rating) ? player.rating : 40;
+    return Math.max(1, rating - (player.pos === plan[row] ? 0 : OUT_OF_POSITION_PENALTY));
+  };
+
+  // Rectangular Hungarian assignment: rows are shirts, columns are players.
+  // Stable input order breaks equal-rating ties and preserves existing starters.
+  const u = new Float64Array(rowCount + 1);
+  const v = new Float64Array(columnCount + 1);
+  const occupied = new Int32Array(columnCount + 1);
+  const previous = new Int32Array(columnCount + 1);
+  for (let row = 1; row <= rowCount; row++) {
+    occupied[0] = row;
+    const best = new Float64Array(columnCount + 1).fill(Infinity);
+    const used = new Uint8Array(columnCount + 1);
+    let column = 0;
+    do {
+      used[column] = 1;
+      const activeRow = occupied[column];
+      let delta = Infinity;
+      let nextColumn = 0;
+      for (let candidate = 1; candidate <= columnCount; candidate++) {
+        if (used[candidate]) continue;
+        const cost = 99 - effective(activeRow - 1, candidate - 1) - u[activeRow] - v[candidate];
+        if (cost < best[candidate]) { best[candidate] = cost; previous[candidate] = column; }
+        if (best[candidate] < delta) { delta = best[candidate]; nextColumn = candidate; }
+      }
+      for (let candidate = 0; candidate <= columnCount; candidate++) {
+        if (used[candidate]) { u[occupied[candidate]] += delta; v[candidate] -= delta; }
+        else best[candidate] -= delta;
+      }
+      column = nextColumn;
+    } while (occupied[column] !== 0);
+    do {
+      const predecessor = previous[column];
+      occupied[column] = occupied[predecessor];
+      column = predecessor;
+    } while (column !== 0);
+  }
+  const assignment = new Int32Array(rowCount).fill(-1);
+  for (let column = 1; column <= columnCount; column++) {
+    if (occupied[column]) assignment[occupied[column] - 1] = column - 1;
+  }
+  const selected = new Set();
+  const slots = plan.map((position, row) => {
+    const playerIndex = assignment[row];
+    const source = squad[playerIndex];
+    if (source) selected.add(playerIndex);
+    const outOfPosition = !!source && source.pos !== position;
+    const effectiveRating = effective(row, playerIndex);
+    const player = source ? { ...source, originalIndex: playerIndex, assignedPos: position, effectiveRating, outOfPosition } : null;
+    return { position, player, effectiveRating, outOfPosition, penalty: outOfPosition ? OUT_OF_POSITION_PENALTY : 0 };
+  });
+  return {
+    starters: slots.filter(slot => slot.player).map(slot => slot.player),
+    bench: squad.filter((player, index) => !selected.has(index)),
+    slots,
+    rating: Math.round(slots.reduce((total, slot) => total + slot.effectiveRating, 0) / rowCount * 10) / 10,
+  };
+}
+
 export function teamEff(team) {
-  const top = team.squad.map(p => p.rating).sort((a, b) => b - a).slice(0, 5);
-  const avg = top.reduce((s, r) => s + r, 0) / Math.max(1, top.length);
-  return Math.round((0.55 * team.str + 0.45 * avg) * 10) / 10;
+  return selectLineup(team).rating;
 }
 
 export const SCOPES = [

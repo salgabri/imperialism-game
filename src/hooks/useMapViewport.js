@@ -4,6 +4,32 @@ export const WORLD = { x: 0, y: 0, w: 960, h: 540 };
 const MAX_ZOOM = 16;
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
+/** Explicit inspection fits the requested land, unlike automatic route reveals. */
+export function computeFitView(bounds, size, frameView) {
+  if (!bounds || !size || ![size.width, size.height].every(Number.isFinite) ||
+      size.width <= 0 || size.height <= 0) return null;
+  const { x, y, w, h, width = w, height = h } = bounds;
+  if (![x, y, width, height].every(Number.isFinite) || width < 0 || height < 0) return null;
+  const aspect = size.height / size.width;
+  const baseWidth = Math.max(WORLD.w, WORLD.h / aspect);
+  const frame = frameView || ((requestedWidth, requestedX, requestedY) => {
+    const nextWidth = clamp(requestedWidth, baseWidth / MAX_ZOOM, baseWidth);
+    const nextHeight = nextWidth * aspect;
+    return { w: nextWidth, h: nextHeight,
+      x: nextWidth > WORLD.w ? (WORLD.w - nextWidth) / 2 : clamp(requestedX, 0, WORLD.w - nextWidth),
+      y: nextHeight > WORLD.h ? (WORLD.h - nextHeight) / 2 : clamp(requestedY, 0, WORLD.h - nextHeight) };
+  });
+  const side = Math.min(72 / size.width, .2);
+  const verticalScale = Math.min(1, size.height * .4 / 200);
+  const top = 90 * verticalScale / size.height;
+  const bottom = 110 * verticalScale / size.height;
+  const requestedWidth = Math.max(width / (1 - 2 * side), height / (aspect * (1 - top - bottom)), baseWidth / MAX_ZOOM);
+  const next = frame(requestedWidth, 0, 0);
+  // Centre the land in the unobscured canvas, allowing for the larger bottom HUD.
+  return frame(next.w, x + width / 2 - next.w / 2,
+    y + height / 2 - next.h * (top + (1 - top - bottom) / 2));
+}
+
 /** Reveal map markers without zooming in or disturbing an already safe view. */
 export function computeRevealView(current, points, size, frameView) {
   if (!current || ![current.x, current.y, current.w, current.h].every(Number.isFinite) ||
@@ -60,12 +86,16 @@ export function useMapViewport(svgRef, resetKey, initialFocus) {
   }, [aspect, baseWidth]);
   const [view, setView] = useState({ ...WORLD });
   const [panning, setPanning] = useState(false);
+  const [canRestore, setCanRestore] = useState(false);
+  const inspectionOrigin = useRef(null);
   const viewRef = useRef(view);
   const drag = useRef(null);
   const suppressClick = useRef(false);
   viewRef.current = view;
   const fx = initialFocus?.x, fy = initialFocus?.y, fw = initialFocus?.w, fh = initialFocus?.h;
   const reset = useCallback(() => {
+    inspectionOrigin.current = null;
+    setCanRestore(false);
     if (fw && fh) {
       const width = Math.max(fw, fh / aspect) * 1.08;
       setView(frame(width, fx + fw / 2 - width / 2, fy + fh / 2 - width * aspect / 2));
@@ -140,6 +170,28 @@ export function useMapViewport(svgRef, resetKey, initialFocus) {
     setView(next);
   }, [size, frame]);
 
+  const fitBounds = useCallback(bounds => {
+    const next = computeFitView(bounds, size, frame);
+    if (!next) return;
+    // Several conquests can be inspected before returning to the exploration view.
+    if (!inspectionOrigin.current) inspectionOrigin.current = { view: { ...viewRef.current }, baseWidth };
+    setCanRestore(true);
+    viewRef.current = next;
+    setView(next);
+  }, [size, frame, baseWidth]);
+
+  const restore = useCallback(() => {
+    const saved = inspectionOrigin.current;
+    if (!saved) return;
+    const width = saved.view.w * baseWidth / saved.baseWidth;
+    const next = frame(width, saved.view.x + saved.view.w / 2 - width / 2,
+      saved.view.y + saved.view.h / 2 - width * aspect / 2);
+    inspectionOrigin.current = null;
+    setCanRestore(false);
+    viewRef.current = next;
+    setView(next);
+  }, [frame, baseWidth, aspect]);
+
   useEffect(() => {
     const el = svgRef.current;
     if (!el) return undefined;
@@ -175,7 +227,7 @@ export function useMapViewport(svgRef, resetKey, initialFocus) {
     return () => { window.removeEventListener('pointerup', endDrag); window.removeEventListener('mouseup', endDrag); };
   }, [endDrag]);
 
-  return { view, size, zoom: baseWidth / view.w, panning, reset, zoomBy, reveal,
+  return { view, size, zoom: baseWidth / view.w, panning, reset, zoomBy, reveal, fitBounds, restore, canRestore,
     didPan: () => suppressClick.current,
     handlers: { onMouseDown, onMouseMove, onMouseUp: endDrag, onDoubleClick: reset } };
 }

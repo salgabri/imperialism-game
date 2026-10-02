@@ -2,7 +2,9 @@
 
 A world-conquest simulation where sport decides borders. Every nation starts
 holding its own territory. Win a match and you annex **everything** the loser
-holds and sign their best player. Last nation standing takes the map.
+holds and claim one player. Spectators automatically sign the highest-rated
+player; managers choose from three candidates ranked by lineup improvement.
+Last team standing takes the map.
 
 Pick your sport at kick-off:
 
@@ -45,7 +47,13 @@ service is needed. Map names wait for their font metrics before switching faces.
 npm install
 npm run dev         # dev server, prints a localhost URL
 npm run build       # production bundle into dist/
+npm test            # complete automated regression suite
 npm run smoke       # headless: plays campaigns to completion and checks invariants
+npm run balance -- --runs=12 # seeded odds, acquisitions and campaign balance report
+npm run test:simulation # score distributions, RNG, tie-breaks, odds and live ticker
+npm run simulation:report -- --samples=200000 --out=docs/design/match-simulation-report.json
+npm run test:experience # pause, manager choice, series and checkpoint integration
+npm run test:reachability # every offered theatre and disconnected final opponents
 npm run test:map-fonts # font-loading, fallback and geographic remeasurement checks
 npm run test:duel-draw # selection, staged timing, cancellation and kickoff checks
 npm run test:draw-compass # compass, route, zoom and reduced-motion rendering
@@ -67,24 +75,65 @@ confederation, or the Elite 32. Club campaigns offer individual leagues, all
 leagues, or the strongest 32 available clubs. The setup shows the actual number
 of teams for each choice.
 
+Short, standard and world session presets show the field, games and estimated
+autoplay duration before launch. Choose **Spectator** for automatic signings or
+**Manager** to select a captured player when your managed team wins. The pinned
+team selector changes the team you follow or manage. Optional alerts pause for
+its matches; eliminated teams remain identified in the selector.
+
 **Pacing** decides how matchups are drawn:
 
 | Mode | Draw |
 | --- | --- |
 | `duel` | A spinner picks one attacker and a compass direction. One match per round. |
-| `blitz` | Everyone is paired with a neighbour. The field halves each round. |
-| `chaos` | Random matchups are drawn until a name repeats, then the batch resolves. |
+| `blitz` | Pair everyone, preferring neighbours; otherwise use another opponent. An odd team gets a bye. |
+| `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
+
+Blitz and chaos allow distant pairings without the directional route restrictions
+used in one-by-one mode. Neither mode annexes neutral land to connect teams.
 
 **Resolution** is either a live ticker or an instant final score. Level games go
 to penalties in football and overtime in basketball. Pacing and resolution are
 under **Match settings** during setup and the header's **Settings** button during
-a campaign.
+a campaign. Predictable, balanced and wild uncertainty presets adjust match-day
+rating variation; even Predictable retains scoring and tie-break randomness.
+Football uses the selected forwards and midfield to create chances against the
+opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
+produce varied low-scoring games. Basketball uses shared possessions, positional
+offence/defence, form and shooting variance. Stronger teams are favourites, while
+every uncertainty setting retains scoring randomness and possible upsets.
+Pre-match percentages estimate this model with an independent seeded sample.
+They do not consume the campaign's random stream.
+Odds prepare the two lineups once and sample scores without building hundreds of
+event timelines. The [match simulation notes](docs/design/match-simulation.md)
+describe the rules, calibration checks and measured performance.
 
 **Next match** draws or advances a match; **Finish match** fast-forwards a live
 ticker to its result. **Play campaign** runs the campaign automatically, and
-**Pause** stops autoplay. Speed cycles 1× / 2× / 4×. Progress autosaves after every
-match and can be resumed from setup. Discarding or replacing a saved campaign
-requires confirmation.
+**Pause** freezes the draw, ticker and scheduled presentation, and **Resume**
+continues them. Manual live matches also have a pause control. Speed cycles
+1× / 2× / 4×. **Express** compresses routine presentation while keeping followed
+matches, upsets and finales visible. It uses the same draw and match results.
+
+The optional best-of-three finale starts when two teams remain. Interim games
+award no territory or player; the second win resolves one conquest. A numeric
+seed reproduces a campaign when settings, manager choices and simulation version
+match. Updating the model can change future results for older seeds; already
+generated matches in saved campaigns retain their outcome and events.
+
+Progress autosaves during pending matches and after signings, preserving the
+seed, random state, queue, history and pending manager choice. Save status reports
+storage errors. Export/import JSON provides a portable checkpoint, with download
+and clipboard copy options. Entering new
+campaign setup retains the previous save until a replacement is launched.
+Older version-one saves migrate, but their original random stream was never
+recorded, so exact continuation from that historical stream cannot be recovered.
+
+History filters by team and opens full match events and conquest rewards.
+**View conquest on map** reveals the gained holdings. Final results include the
+largest upset, decisive match and most useful signing; the header trophy reopens
+them after viewing the map. On phones, playback stays at the bottom while
+scrolling. The map has one keyboard tab stop, arrow navigation and a skip link.
 
 In one-by-one mode, the [draw compass](docs/design/duel-draw.md) selects an
 attacker, slows to the chosen opponent's exact bearing, and briefly reveals the
@@ -135,12 +184,12 @@ Cameroon).
 Nations with no roster in a sport fall back to *that sport's* baseline, never to
 another's. Getting this wrong first time ranked England third at basketball.
 
-A nation's **strength** is the mean rating across every shirt in the lineup;
-slots the data cannot fill count at the confederation's baseline, so a country
-with one 62-rated player doesn't rate alongside a deep squad averaging 62.
-`teamEff` then blends strength with the top five, so star power and depth both
-count. The resulting orders come out credible without tuning — France, Brazil,
-Spain, England at football; USA, Canada, Serbia, Greece at basketball.
+A team's **strength** is the mean effective rating of its best positional lineup.
+An assignment optimizer fills all eleven football or five basketball slots.
+Playing outside a natural position costs 12 rating points. Missing legacy slots
+use the team's sport baseline. The same starters determine strength and appear
+in match scoring and tie-break events. Squad lists separate starters from bench
+and identify positional penalties; bench depth does not directly inflate strength.
 
 Coverage is uneven in both. The football dataset only has players at playable
 clubs (England 1,495 candidates, Vietnam none): **65% of shirts are real** and 79
@@ -189,7 +238,7 @@ speed with the ball.
 
 ## Squad economics
 
-Beating a nation takes its best player. The squad panel tracks what that has
+Beating a team claims one player. The squad panel tracks what that has
 actually done to a side: `EFF` is the best-lineup rating and only ever climbs, while
 `AVG` is the whole-squad mean and can *fall* when a strong nation absorbs a weak
 one's best player. Both are shown against their kick-off value. The standings
@@ -243,7 +292,8 @@ Rule targeting starts at each nation's **capital city**. Candidate routes are
 ranked capital-to-capital, but the arrow stops just inside the first target
 territory it reaches. It cannot cross a third country's land to reach that
 capital. Expanded empires can attack from another holding when their nearest
-capital pair is blocked. Display labels use a separate
+capital pair is blocked. If every direct route is blocked, the fallback rules
+below apply. Display labels use a separate
 ownership-aware interior-fit algorithm; their positions never affect targeting.
 
 ## Empire names
@@ -294,9 +344,13 @@ In one-by-one draws, every candidate route is also tested against the visible
 country shapes. Intervening rival or neutral land blocks the route, even when
 its capital falls outside the search cone. The selector tries another route or
 opponent, widening the cone only among unobstructed candidates. If the selected
-attacker has no legal straight-line route, the draw pauses without starting a
-match or changing ownership and offers another draw. Blitz and chaos pairing
-rules are unchanged. Previously saved results are not rewritten.
+attacker has no legal straight-line route, a checked coastal sea polyline tries
+to connect its holdings to an enemy. If neutral enclosure prevents that route,
+an explicitly labelled **neutral transit treaty** permits crossing neutral land
+without claiming it. The displayed polyline follows the checked route. A draw
+retries an unreachable attacker without consuming extra random samples. These
+exceptions keep disconnected final opponents playable. Blitz and chaos use the
+batch pairing rules described above.
 
 ## Map geometry
 
@@ -368,8 +422,9 @@ scripts/
 
 `src/config.js`:
 
-- `matchDrama` (0–12) — match-day variance in rating points. `0` makes the better
-  side always win; higher values produce more giant-killings.
+- `matchDrama` (0–12) — default match-day variance in rating points. Campaign
+  uncertainty presets use 0, 6 and 12; higher values widen performance variation.
+  Scoring and tie-break randomness remains at zero variance.
 - `upsetThreshold` (2–15) — rating gap at which a win is flagged as an upset.
 - `showLabels` — draw empire names (club codes for clubs) over their largest held
   shape; labels are spaced to remain readable at the current zoom.
@@ -393,3 +448,10 @@ It also checks each sport's match model over 400 simulated games: that every mat
 has a winner, that a level score always triggers a tie-break, that the event feed
 adds up to the final score, and that scoring lands in the right range for the
 sport.
+
+The [improvement checklist](docs/design/improvements.md) records the implemented
+design changes. The [playtest protocol](docs/design/playtest.md) covers first-run
+understanding, pacing, manager agency and save confidence. `npm run balance`
+compares seeded single-match and series finales, champion concentration, leader
+turnover and useful signing rates. Model probes and developer interaction checks
+do not replace observing new players.

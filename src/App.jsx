@@ -1,7 +1,7 @@
 import React from 'react';
 import { CONFIG } from './config.js';
 import { C, FONT, pad3, tint, politicalColor } from './theme.js';
-import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, squadAverage, teamEff } from './data/teams.js';
+import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES } from './data/scopes.js';
 import { FLAG_CODES, flagUrl } from './data/flags.js';
 import { FLAG_SYMBOLS } from './data/flagSymbols.js';
@@ -18,7 +18,12 @@ import {
   territories,
 } from './engine/campaign.js';
 import { createDuelDraw } from './engine/duelDraw.js';
-import { clearSave, loadSave, writeSave } from './engine/storage.js';
+import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign } from './engine/storage.js';
+import { PlaybackClock } from './engine/playbackClock.js';
+import { acquisitionOptions, advanceSeries, campaignRecap, estimateSession, recordMatch } from './engine/campaignExperience.js';
+import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
+import AcquisitionChoice from './components/AcquisitionChoice.jsx';
+import ExportCheckpoint from './components/ExportCheckpoint.jsx';
 import CommandBar from './components/CommandBar.jsx';
 import PlaybackBar from './components/PlaybackBar.jsx';
 import WorldMap from './components/WorldMap.jsx';
@@ -32,7 +37,8 @@ const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
 const LOG_CAP = 220;
 const FEED_CAP = 90;
 const BATTLE_SCARS = 7;
-const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'UEFA', clubScope: 'all', pacing: 'duel', resolution: 'ticker' };
+const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'UEFA', clubScope: 'all', pacing: 'duel', resolution: 'ticker',
+  preset: 'standard', seed: '', uncertainty: 'balanced', express: false, finale: 'single', role: 'spectator' };
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
 function signed(delta) {
@@ -67,6 +73,7 @@ export default class App extends React.Component {
     speed: 1,
     tab: 'power',
     mapMode: 'flags',
+    mobileView: 'map',
     selected: null,
     hoverCid: null,
     flash: {},
@@ -76,10 +83,15 @@ export default class App extends React.Component {
     pu: null,
     toast: null,
     battles: [],
+    paused: false, followedId: null, pauseFollow: false, history: [], selectedHistoryId: null,
+    choice: null, series: null, seed: null, rngState: null, saveStatus: null, exportText: null, exportFilename: null,
+    conquestIds: [], focusBounds: null, focusKey: 0, startedAt: null, completedAt: null,
+    metrics: { leaderChanges: 0, acquisitions: [], previousLeader: null },
   };
 
   /** Every pending simulation timeout, so a reset or unmount can cancel the war. */
-  timers = new Set();
+  clock = new PlaybackClock();
+  timers = this.clock.tasks;
   drawTimers = new Set();
   drawFrames = new Set();
   activeDrawKey = null;
@@ -102,27 +114,23 @@ export default class App extends React.Component {
     clearTimeout(this.confirmTimer);
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(_props, previous) {
     const el = this.eventsRef.current;
     if (el) el.scrollTop = el.scrollHeight;
+    if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading'
+        && (previous.match !== this.state.match || previous.spin !== this.state.spin)) this.persist();
   }
 
   // ---------- timing ----------
 
   /** Schedule simulation work, scaled by the speed control and cancellable. */
   after(ms, fn, speed = this.state.speed || 1) {
-    const id = setTimeout(() => {
-      this.timers.delete(id);
-      fn();
-    }, ms / speed);
-    this.timers.add(id);
-    return id;
+    return this.clock.after(ms / speed, fn);
   }
 
   clearTimers() {
     this.clearDraw();
-    for (const id of this.timers) clearTimeout(id);
-    this.timers.clear();
+    this.clock.clear();
   }
 
   /** Draw work has its own owner: reset, kickoff and unmount invalidate it. */
@@ -131,7 +139,7 @@ export default class App extends React.Component {
     this.startedDrawKey = null;
     this.lockedDrawKey = null;
     for (const id of this.drawFrames) cancelAnimationFrame(id);
-    for (const id of this.drawTimers) { clearTimeout(id); this.timers.delete(id); }
+    for (const id of this.drawTimers) this.clock.remove(id);
     this.drawFrames.clear();
     this.drawTimers.clear();
   }
@@ -150,7 +158,7 @@ export default class App extends React.Component {
     if (this.activeDrawKey !== key) return;
     const id = requestAnimationFrame(() => {
       this.drawFrames.delete(id);
-      if (this.activeDrawKey === key) fn();
+      if (this.activeDrawKey === key && !this.state.paused) fn();
     });
     this.drawFrames.add(id);
   }
@@ -176,6 +184,7 @@ export default class App extends React.Component {
         this.setState({
           hasSave: true,
           savedMeta: { round: saved.round, alive: saved.aliveIds.length, settings: saved.settings },
+          saveStatus: { ok: true, savedAt: saved.savedAt, message: 'Saved campaign available' },
         });
       }
       this.fitMap(Object.keys(NATIONS));
@@ -239,10 +248,65 @@ export default class App extends React.Component {
 
   // ---------- campaign lifecycle ----------
 
+  persist() {
+    if (!Object.keys(this.state.teams).length) return;
+    const rngState = this.rng?.getState?.() ?? this.state.rngState;
+    const snapshot = { ...this.state, rngState };
+    const saveStatus = writeSave(snapshot);
+    this.saved = snapshot;
+    this.setState({ rngState, saveStatus, hasSave: true,
+      savedMeta: { round: snapshot.round, alive: snapshot.aliveIds.length, settings: snapshot.settings } });
+  }
+
+  pickSetup(key, value) {
+    this.setState(state => {
+      const setup = { ...state.setup, [key]: value };
+      if (key === 'preset') {
+        setup.scope = value === 'short' ? 'elite' : value === 'world' ? 'world' : 'UEFA';
+        setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all' : CLUB_SCOPES(getSport(setup.sport))[2]?.id || 'all';
+      } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
+      if (key === 'sport' && !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope)) setup.clubScope = 'all';
+      return { setup };
+    });
+  }
+
+  exportProgress() {
+    const data = this.state.phase === 'setup' && this.saved ? this.saved
+      : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState };
+    const pending = this.state.autoplay || !!this.state.spin || (this.state.match && !this.state.match.done);
+    if (pending) this.clock.pause();
+    this.setState({ exportText: exportCampaign(data), exportFilename: `imperialism-${data.seed ?? 'campaign'}-match-${data.matches}.json`,
+      ...(pending ? { autoplay: false, paused: true } : {}) });
+  }
+
+  downloadProgress() {
+    const blob = new Blob([this.state.exportText], { type: 'application/json' });
+    const url = URL.createObjectURL(blob), anchor = document.createElement('a');
+    anchor.href = url; anchor.download = this.state.exportFilename;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    // Let the browser begin reading the blob before releasing its URL.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async importProgress(file) {
+    if (!file) return;
+    try {
+      if (file.size > 5_000_000) throw new Error('Choose a campaign file smaller than 5 MB.');
+      const saved = parseCampaign(await file.text());
+      this.clearTimers(); this.saved = saved; this.resume();
+    } catch (error) {
+      this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
+    }
+  }
+
   startCampaign() {
     this.clearTimers();
     const su = this.state.setup;
-    this.rng = makeRng((Date.now() % 1000000007) >>> 0);
+    const enteredSeed = String(su.seed || '').trim();
+    const seed = enteredSeed ? (/^\d+$/.test(enteredSeed) ? Number(enteredSeed) >>> 0 : hashStr(enteredSeed)) : Date.now() >>> 0;
+    this.rng = makeRng(seed);
 
     const sport = getSport(su.sport);
     const clubLayer = su.layer === 'clubs';
@@ -291,7 +355,7 @@ export default class App extends React.Component {
     this.setState(
       {
         phase: 'playing',
-        settings: { ...su },
+        settings: { ...DEFAULT_SETUP, ...su, seed: String(seed) },
         teams,
         own,
         aliveIds: included.map(t => t.id),
@@ -310,6 +374,10 @@ export default class App extends React.Component {
         tab: 'power',
         confirmNew: false,
         battles: [],
+        paused: false, history: [], selectedHistoryId: null, choice: null, series: null, exportText: null,
+        followedId: su.role === 'manager' ? included.slice().sort((a, b) => teamEff(b) - teamEff(a))[0]?.id : null,
+        pauseFollow: false, seed, rngState: this.rng.getState(), conquestIds: [], focusBounds: null,
+        startedAt: Date.now(), completedAt: null, metrics: { leaderChanges: 0, acquisitions: [], previousLeader: null },
         log: [
           {
             t: 'sys',
@@ -319,17 +387,20 @@ export default class App extends React.Component {
           },
         ],
       },
-      () => writeSave(this.state),
+      () => this.persist(),
     );
   }
 
   resume() {
     const s = this.saved;
     if (!s) return;
+    this.clearTimers();
+    this.rng = makeRng(s.seed ?? 1);
+    this.rng.setState(s.rngState ?? s.seed ?? 1);
     this.fitMap(Object.keys(s.own), s.settings);
     this.setState({
       phase: s.phase === 'victory' ? 'victory' : 'playing',
-      settings: s.settings,
+      settings: { ...DEFAULT_SETUP, ...s.settings },
       teams: s.teams,
       own: s.own,
       aliveIds: s.aliveIds,
@@ -340,7 +411,7 @@ export default class App extends React.Component {
       matches: s.matches || 0,
       queue: s.queue || [],
       batchTotal: s.batchTotal || 0,
-      match: null,
+      match: s.match || null,
       spin: null,
       atk: null,
       autoplay: false,
@@ -348,6 +419,17 @@ export default class App extends React.Component {
       flash: {},
       battles: [],
       tab: 'power',
+      paused: false, seed: s.seed ?? 1, rngState: s.rngState ?? 1, history: s.history || [], exportText: null,
+      series: s.series || null, followedId: s.followedId || null, pauseFollow: !!s.pauseFollow,
+      choice: s.choice || null, selectedHistoryId: null, conquestIds: s.conquestIds || [],
+      startedAt: s.startedAt || Date.now(), completedAt: s.completedAt || (s.aliveIds.length === 1 ? s.savedAt : null),
+      metrics: s.metrics || { leaderChanges: 0, acquisitions: [], previousLeader: null },
+      saveStatus: s.legacy ? { ok: true, message: 'Legacy campaign restored. Future matches use the saved seed.' } : { ok: true, message: 'Campaign restored' },
+    }, () => {
+      if (s.choice) return;
+      if (s.match && !s.match.applied) this.presentMatch();
+      else if (s.spin) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
+      this.persist();
     });
   }
 
@@ -357,16 +439,13 @@ export default class App extends React.Component {
     this.setState({ hasSave: false, savedMeta: null });
   }
 
-  /** Two-step so a stray click cannot wipe a long campaign. */
+  /** Keep the previous campaign until a replacement is actually launched. */
   newCampaign() {
     if (!this.state.confirmNew) {
       this.setState({ confirmNew: true });
-      clearTimeout(this.confirmTimer);
-      this.confirmTimer = setTimeout(() => this.setState({ confirmNew: false }), 2600);
       return;
     }
     this.clearTimers();
-    this.discardSave();
     this.fitMap(Object.keys(NATIONS));
     this.setState({
       phase: 'setup',
@@ -378,6 +457,7 @@ export default class App extends React.Component {
       queue: [],
       pu: null,
       toast: null,
+      paused: false,
     });
   }
 
@@ -404,9 +484,14 @@ export default class App extends React.Component {
 
   nextAction() {
     const st = this.state;
-    if (st.phase !== 'playing' || st.aliveIds.length <= 1) return;
+    if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice) return;
     if (st.match && !st.match.applied) return;
     if (st.spin) return;
+    if (st.series && st.aliveIds.length === 2) {
+      const [a, b] = st.series.teamIds;
+      this.setState({ round: st.round + 1, queue: [] }, () => this.startMatch(a, b));
+      return;
+    }
 
     if (st.queue.length) {
       const queue = st.queue.slice();
@@ -428,6 +513,11 @@ export default class App extends React.Component {
       this.setState({ autoplay: false });
       this.showToast({ code: 'DRAW', txt: 'No clear route for this draw. Choose Next match to try again.', col: C.gold },
         6000 * (st.speed || 1));
+      return;
+    }
+    if (st.settings.express && ![draw.attackerId, draw.targetId].includes(st.followedId) && st.aliveIds.length > 2) {
+      this.setState({ round: st.round + 1, match: null, pu: null, toast: null },
+        () => this.startMatch(draw.attackerId, draw.targetId, draw));
       return;
     }
     const spinKey = (this.spinKey = (this.spinKey || 0) + 1);
@@ -474,12 +564,13 @@ export default class App extends React.Component {
       return {
         spin: { ...draw, stage: 'locked', ang: draw.rotation },
         atk: { x1: draw.x, y1: draw.y, x2: draw.targetX, y2: draw.targetY,
-          col: state.teams[draw.attackerId].col, reducedMotion: draw.reducedMotion },
+          col: state.teams[draw.attackerId].col, reducedMotion: draw.reducedMotion,
+          routePoints: draw.routePoints, routeD: draw.routeD, routeKind: draw.routeKind, routeLabel: draw.routeLabel },
       };
     }, () => {
       const draw = this.state.spin;
       if (this.activeDrawKey === key && draw?.key === key && draw.stage === 'locked') {
-        this.drawAfter(draw.holdMs, key, () => this.startMatch(draw.attackerId, draw.targetId));
+        this.drawAfter(draw.holdMs, key, () => this.startMatch(draw.attackerId, draw.targetId, draw));
       }
     });
   }
@@ -527,7 +618,7 @@ export default class App extends React.Component {
     );
   }
 
-  startMatch(attackerId, defenderId) {
+  startMatch(attackerId, defenderId, route = {}) {
     const st = this.state;
     const a = st.teams[attackerId];
     const d = st.teams[defenderId];
@@ -537,8 +628,15 @@ export default class App extends React.Component {
     const sport = this.sport();
     const effA = teamEff(a);
     const effD = teamEff(d);
-    const sim = sport.simulate(this.rng, a, d, Number(CONFIG.matchDrama), effA, effD);
+    const drama = UNCERTAINTY_PRESETS[st.settings.uncertainty]?.drama ?? Number(CONFIG.matchDrama);
+    const sim = sport.simulate(this.rng, a, d, drama, effA, effD);
+    const probabilities = estimateWinProbability({ sport, attacker: a, defender: d, drama, samples: 512 });
+    const important = [attackerId, defenderId].includes(st.followedId) || st.aliveIds.length === 2
+      || (sim.winner === attackerId ? effA + CONFIG.upsetThreshold <= effD : effD + CONFIG.upsetThreshold <= effA);
+    const series = st.aliveIds.length === 2 && st.settings.finale === 'best-of-three'
+      ? st.series || { teamIds: [attackerId, defenderId], wins: { [attackerId]: 0, [defenderId]: 0 }, games: 0 } : null;
     this.setState({
+      series,
       match: {
         aId: attackerId,
         dId: defenderId,
@@ -556,11 +654,26 @@ export default class App extends React.Component {
         status: sport.labels.live,
         applied: false,
         done: false,
+        odds: { a: probabilities.attacker, b: probabilities.defender },
+        series: series ? { aWins: series.wins[attackerId], bWins: series.wins[defenderId], bestOf: 3 } : null,
+        routeLabel: route.routeLabel || '', routeKind: route.routeKind || 'straight',
+        express: !!st.settings.express && !important,
       },
       spin: null,
+    }, () => {
+      this.presentMatch();
+      if (this.state.autoplay && this.state.pauseFollow && [attackerId, defenderId].includes(this.state.followedId)) this.pausePlayback();
     });
+  }
 
-    const instant = st.settings.resolution === 'instant';
+  presentMatch() {
+    const st = this.state, m = st.match;
+    if (!m || m.applied || st.choice) return;
+    const sport = this.sport(), a = st.teams[m.aId], d = st.teams[m.dId];
+    const effA = m.effA, effD = m.effD;
+    if (m.express) { this.after(18, () => this.revealAll()); return; }
+
+    const instant = st.settings.resolution === 'instant' || st.settings.express;
     this.showPopup(
       {
         kind: 'vs',
@@ -585,11 +698,12 @@ export default class App extends React.Component {
     }
 
     const { msPerUnit, length } = sport.clock;
-    for (const e of sim.ev) this.after(450 + e.m * msPerUnit, () => this.pushEvent(e));
+    const resumeMinute = m.shown.length ? m.shown.at(-1).m : 0;
+    for (const e of m.allEv.slice(m.shown.length)) this.after(450 + Math.max(0, e.m - resumeMinute) * msPerUnit, () => this.pushEvent(e));
     // Overtime events run past the end of regulation, so wrap up after the last
     // one rather than at a fixed whistle.
-    const lastTick = sim.ev.reduce((n, e) => Math.max(n, e.m), length);
-    this.after(450 + (lastTick + 1) * msPerUnit, () => {
+    const lastTick = m.allEv.reduce((n, e) => Math.max(n, e.m), length);
+    this.after(450 + Math.max(0, lastTick + 1 - resumeMinute) * msPerUnit, () => {
       const m = this.state.match;
       if (!m || m.applied) return;
       if (!m.tie) {
@@ -603,11 +717,13 @@ export default class App extends React.Component {
         this.after(700, () => this.finishMatch());
         return;
       }
-      this.patchMatch({ status: sport.labels.tie, tieShown: { A: [], D: [] } });
+      const shown = m.tieShown || { A: [], D: [] };
+      this.patchMatch({ status: sport.labels.tie, tieShown: shown });
       const n = Math.max(m.tie.A.length, m.tie.D.length);
+      const firstSide = m.tie.first === 'D' ? 'D' : 'A';
       for (let i = 0; i < n; i++) {
-        if (i < m.tie.A.length) this.after(350 + i * 500, () => this.pushKick('A'));
-        if (i < m.tie.D.length) this.after(600 + i * 500, () => this.pushKick('D'));
+        if (i >= shown.A.length && i < m.tie.A.length) this.after((firstSide === 'A' ? 350 : 600) + (i - shown.A.length) * 500, () => this.pushKick('A'));
+        if (i >= shown.D.length && i < m.tie.D.length) this.after((firstSide === 'D' ? 350 : 600) + (i - shown.D.length) * 500, () => this.pushKick('D'));
       }
       this.after(350 + n * 500 + 650, () => this.finishMatch());
     });
@@ -625,10 +741,16 @@ export default class App extends React.Component {
   pushEvent(e) {
     const m = this.state.match;
     if (!m || m.applied) return;
-    this.patchMatch({
-      shown: m.shown.concat([e]),
-      ga: m.ga + (e.tid === m.aId ? e.pts : 0),
-      gd: m.gd + (e.tid === m.dId ? e.pts : 0),
+    // Several basketball runs can arrive on the same tick. React may batch
+    // their callbacks, so every update must use the preceding queued score.
+    this.setState(state => {
+      const match = state.match;
+      if (!match || match.applied || (e.tid !== match.aId && e.tid !== match.dId)) return null;
+      return { match: { ...match,
+        shown: match.shown.concat([e]),
+        ga: match.ga + (e.tid === match.aId ? e.pts : 0),
+        gd: match.gd + (e.tid === match.dId ? e.pts : 0),
+      } };
     });
     const t = this.state.teams[e.tid] || {};
     this.showToast({ code: t.code || '—', txt: this.sport().formatToast(e), col: t.col || C.gold }, 1150);
@@ -636,12 +758,15 @@ export default class App extends React.Component {
 
   /** Reveal one more penalty in a shootout. */
   pushKick(side) {
-    const m = this.state.match;
-    if (!m || !m.tieShown || m.applied) return;
-    const shown = { A: m.tieShown.A.slice(), D: m.tieShown.D.slice() };
-    if (side === 'A') shown.A.push(m.tie.A[shown.A.length]);
-    else shown.D.push(m.tie.D[shown.D.length]);
-    this.patchMatch({ tieShown: shown });
+    this.setState(state => {
+      const m = state.match;
+      if (!m || !m.tieShown || m.applied || !['A', 'D'].includes(side)) return null;
+      const kicks = m.tie?.[side];
+      if (!kicks || m.tieShown[side].length >= kicks.length) return null;
+      const shown = { A: m.tieShown.A.slice(), D: m.tieShown.D.slice() };
+      shown[side].push(kicks[shown[side].length]);
+      return { match: { ...m, tieShown: shown } };
+    });
   }
 
   /** Jump straight to the final score — used by INSTANT resolution and by STEP. */
@@ -656,11 +781,12 @@ export default class App extends React.Component {
       tieShown: m.tie && sport.tieBreak === 'shootout' ? { A: m.tie.A, D: m.tie.D } : null,
       status: m.tie ? sport.labels.tie : sport.labels.end,
     });
-    this.after(500, () => this.finishMatch());
+    this.after(m.express ? 18 : 500, () => this.finishMatch());
   }
 
   fastForward() {
     this.clearTimers();
+    this.setState({ paused: false });
     this.revealAll();
   }
 
@@ -669,6 +795,46 @@ export default class App extends React.Component {
    * the winner, and its best player switches allegiance.
    */
   finishMatch() {
+    const st = this.state, m = st.match;
+    if (!m || m.applied || st.choice) return;
+    if (st.series && !m.seriesResolved) {
+      const next = advanceSeries(st.series, m.aId, m.dId, m.winner);
+      const seriesView = { aWins: next.series.wins[m.aId], bWins: next.series.wins[m.dId], bestOf: 3 };
+      if (!next.complete) {
+        const completed = { ...m, ga: m.finalGa, gd: m.finalGd, applied: true, done: true, seriesResolved: true,
+          noConquest: true, series: seriesView, status: this.sport().labels.end,
+          winnerName: st.teams[m.winner].name, resTitle: `${st.teams[m.winner].name} wins the series game`,
+          resText: 'First to two wins claims the opposing empire. No territory or player changes yet.' };
+        const view = this.matchCard(completed);
+        const entry = recordMatch({ ...st, sport: this.sport() }, completed, view);
+        this.setState({ series: next.series, match: completed, matches: st.matches + 1,
+          history: [...st.history, entry], queue: [],
+          log: [...st.log, { t: 'match', r: st.round, txt: `${completed.winnerName} wins finale game ${next.series.games}; series continues.`, chip: C.gold }] },
+          () => { this.persist(); if (this.state.autoplay) this.after(st.settings.express ? 120 : 1000, () => this.nextAction()); });
+        return;
+      }
+      this.setState({ series: next.series, match: { ...m, seriesResolved: true, series: seriesView } }, () => this.finishMatch());
+      return;
+    }
+    const loserId = m.winner === m.aId ? m.dId : m.aId;
+    if (st.settings.role === 'manager' && st.followedId === m.winner && st.teams[loserId].squad.length) {
+      this.clearTimers();
+      const candidates = acquisitionOptions(st.teams[m.winner], st.teams[loserId]);
+      this.setState({ choice: { winnerName: st.teams[m.winner].name, loserName: st.teams[loserId].name,
+        candidates, resumeAutoplay: st.autoplay }, autoplay: false, paused: false,
+        match: { ...m, ga: m.finalGa, gd: m.finalGd, shown: m.allEv, status: 'Choose a signing' } }, () => this.persist());
+      return;
+    }
+    this.applyConquest();
+  }
+
+  chooseAcquisition(index) {
+    const choice = this.state.choice;
+    if (!choice || !choice.candidates.some(candidate => candidate.index === index)) return;
+    this.setState({ choice: null, autoplay: choice.resumeAutoplay && !this.state.pauseFollow }, () => this.applyConquest(index));
+  }
+
+  applyConquest(playerIndex) {
     const st = this.state;
     const m = st.match;
     if (!m || m.applied) return;
@@ -681,12 +847,15 @@ export default class App extends React.Component {
     const W = { ...teams[winnerId], squad: teams[winnerId].squad.slice() };
     const L = { ...teams[loserId], squad: teams[loserId].squad.slice() };
     const strengthBefore = teamEff(W);
-    const stolen = L.squad.slice().sort((x, y) => y.rating - x.rating)[0];
+    const beforeLineup = selectLineup(W);
+    const stolen = Number.isInteger(playerIndex) ? L.squad[playerIndex] : L.squad.slice().sort((x, y) => y.rating - x.rating)[0];
     if (stolen) {
       W.squad.push({ ...stolen, from: L.code });
       L.squad = L.squad.filter(p => p !== stolen);
     }
     const strengthAfter = teamEff(W);
+    const afterLineup = selectLineup(W);
+    const replacedPlayer = beforeLineup.starters.find(p => !afterLineup.starters.some(q => q.originalIndex === p.originalIndex)) || null;
     const strengthGained = Math.round((strengthAfter - strengthBefore) * 10) / 10;
     teams[winnerId] = W;
     teams[loserId] = L;
@@ -751,6 +920,22 @@ export default class App extends React.Component {
     const flash = {};
     for (const cid of taken) flash[cid] = true;
     const stealTxt = stolen ? ' · steals ' + stolen.name + ' (' + stolen.rating + ' ' + stolen.pos + ')' : '';
+    const completed = {
+      ...m, ga: m.finalGa, gd: m.finalGd, shown: m.allEv, applied: true, done: true,
+      status: sport.labels.end, isUpset,
+      resText: '+' + taken.length + ' territories' + stealTxt,
+      resTitle: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
+      wCol: W.col, winnerName: W.name, loserName: L.name, territoriesGained: taken.length,
+      territoryIds: taken, territoryNames: taken.map(cid => NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || cid),
+      playerTaken: stolen ? { name: stolen.name, rating: stolen.rating, pos: stolen.pos } : null,
+      replacedPlayer, strengthBefore, strengthAfter, strengthGained,
+    };
+    const archived = recordMatch({ ...st, sport }, completed, this.matchCard(completed, teams));
+    const leader = aliveIds.slice().sort((a, b) => territories({ own }, b).length - territories({ own }, a).length)[0];
+    const metrics = { ...st.metrics, previousLeader: leader,
+      leaderChanges: (st.metrics?.leaderChanges || 0) + (st.metrics?.previousLeader && st.metrics.previousLeader !== leader ? 1 : 0),
+      acquisitions: [...(st.metrics?.acquisitions || []), strengthGained] };
+    const stopForFollow = st.pauseFollow && [m.aId, m.dId].includes(st.followedId);
 
     this.setState(
       {
@@ -764,27 +949,19 @@ export default class App extends React.Component {
         battles: (st.battles || []).concat([{ x: battleAt.x, y: battleAt.y }]).slice(-BATTLE_SCARS),
         matches: st.matches + 1,
         log: st.log.concat(entries).slice(-LOG_CAP),
-        match: {
-          ...m,
-          applied: true,
-          done: true,
-          status: sport.labels.end,
-          isUpset,
-          resText: '+' + taken.length + ' territories' + stealTxt,
-          resTitle: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
-          wCol: W.col,
-          winnerName: W.name,
-          loserName: L.name,
-          territoriesGained: taken.length,
-          playerTaken: stolen ? { name: stolen.name, rating: stolen.rating, pos: stolen.pos } : null,
-          strengthBefore,
-          strengthAfter,
-          strengthGained,
-        },
+        match: completed, history: [...st.history, archived], metrics, conquestIds: taken,
+        choice: null, autoplay: stopForFollow ? false : st.autoplay,
+        completedAt: aliveIds.length === 1 ? Date.now() : st.completedAt,
       },
       () => {
-        writeSave(this.state);
+        this.persist();
         this.after(1500, () => this.setState({ flash: {} }));
+
+        if (st.settings.express) {
+          if (aliveIds.length === 1) this.after(200, () => this.setState({ phase: 'victory', autoplay: false }, () => this.persist()));
+          else if (this.state.autoplay) this.after(m.express ? 12 : 650, () => this.nextAction());
+          return;
+        }
 
         this.showPopup(
           {
@@ -820,7 +997,7 @@ export default class App extends React.Component {
 
         const doneAt = stolen ? 3900 : 1950;
         if (aliveIds.length === 1) {
-          this.after(doneAt + 250, () => this.setState({ phase: 'victory', autoplay: false }, () => writeSave(this.state)));
+          this.after(doneAt + 250, () => this.setState({ phase: 'victory', autoplay: false }, () => this.persist()));
         } else if (this.state.autoplay) {
           // Mid-batch runs back-to-back; a fresh round gets a beat of breathing room.
           this.after(this.state.queue.length ? doneAt : doneAt + 120, () => { if (this.state.autoplay) this.nextAction(); });
@@ -834,7 +1011,7 @@ export default class App extends React.Component {
 
   step() {
     const st = this.state;
-    if (st.phase !== 'playing') return;
+    if (st.phase !== 'playing' || st.choice || st.paused) return;
     if (st.match && !st.match.applied) {
       this.fastForward();
       return;
@@ -844,12 +1021,41 @@ export default class App extends React.Component {
   }
 
   togglePlay() {
-    const on = !this.state.autoplay;
-    this.setState({ autoplay: on }, () => {
+    if (this.state.choice) return;
+    if (this.state.autoplay) { this.pausePlayback(); return; }
+    this.clock.resume();
+    this.setState({ autoplay: true, paused: false }, () => {
       const st = this.state;
-      if (on && (!st.match || st.match.applied) && !st.spin) this.after(80, () => {
+      if ((!st.match || st.match.applied) && !st.spin) this.after(80, () => {
         if (this.state.autoplay) this.nextAction();
       });
+    });
+  }
+
+  pausePlayback() {
+    if (this.state.paused) {
+      this.clock.resume();
+      this.setState({ paused: false }, () => this.persist());
+      return;
+    }
+    this.clock.pause();
+    this.setState({ paused: true, autoplay: false }, () => this.persist());
+  }
+
+  followTeam(id) {
+    if (id && !this.state.teams[id]) return;
+    this.setState({ followedId: id || null, selected: id || this.state.selected }, () => this.persist());
+  }
+
+  viewConquest(result = this.matchCard()?.result) {
+    const ids = result?.territoryIds || this.state.conquestIds;
+    const boxes = ids.map(id => (this.displayGeo?.paths[id] || this.geo.paths[id])?.bbox).filter(Boolean);
+    if (!boxes.length) return;
+    const x = Math.min(...boxes.map(b => b.x)), y = Math.min(...boxes.map(b => b.y));
+    const right = Math.max(...boxes.map(b => b.x + b.w)), bottom = Math.max(...boxes.map(b => b.y + b.h));
+    this.setState({ mobileView: 'map', conquestIds: ids, focusBounds: { x, y, w: right - x, h: bottom - y }, focusKey: this.state.focusKey + 1 }, () => {
+      this.mapRef.current?.scrollIntoView?.({ block: 'start', behavior: 'auto' });
+      this.mapRef.current?.focus?.({ preventScroll: true });
     });
   }
 
@@ -860,12 +1066,29 @@ export default class App extends React.Component {
 
   setSetting(key, value) {
     if (this.state.phase !== 'playing') return;
-    this.setState({ settings: { ...this.state.settings, [key]: value } }, () => writeSave(this.state));
+    this.setState(state => ({ settings: { ...state.settings, [key]: value },
+      ...(key === 'role' && value === 'manager' && !state.aliveIds.includes(state.followedId)
+        ? { followedId: state.aliveIds.slice().sort((a, b) => teamEff(state.teams[b]) - teamEff(state.teams[a]))[0] } : {}) }), () => this.persist());
   }
 
   selectCountry(cid) {
     const tid = this.state.own[cid];
-    if (tid) this.setState({ selected: tid, tab: 'squad' });
+    if (tid) this.selectTeam(tid);
+  }
+
+  selectTeam(tid) {
+    if (!this.state.teams[tid]) return;
+    this.setState({ selected: tid, tab: 'squad', mobileView: 'details' }, () => {
+      const panel = document.getElementById('intel-panel-squad');
+      panel?.focus({ preventScroll: true });
+      panel?.scrollIntoView({ block: 'start' });
+    });
+  }
+
+  showDetails() {
+    this.setState({ mobileView: 'details' }, () => {
+      document.getElementById('campaign-details')?.focus({ preventScroll: true });
+    });
   }
 
   // ---------- pointer readouts ----------
@@ -965,12 +1188,14 @@ export default class App extends React.Component {
       countries.push({
         id: c.id,
         ownerId,
+        ownerName: owner?.name,
+        selected: !!isSelected,
         name: NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
         d: p.d,
         flagParts: parts,
         fill: parts?.length ? 'transparent' : owner ? (owner.kind === 'club' ? owner.col : politicalColor(owner.id)) : phase === 'setup' && NATIONS[c.id] ? politicalColor(c.id) : unclaimedShade,
-        stroke: isSelected ? C.goldOutline : '#C0C7B2',
-        strokeWidth: isSelected ? 1.8 : 0.55,
+        stroke: '#C0C7B2',
+        strokeWidth: 0.35,
         cursor: owner ? 'pointer' : 'default',
         animation: flash[c.id] ? 'fiFlash 0.9s ease-out' : 'none',
         onClick: () => this.selectCountry(c.id),
@@ -1052,8 +1277,8 @@ export default class App extends React.Component {
     };
   }
 
-  matchCard() {
-    const { match: m, teams, round, settings } = this.state;
+  matchCard(m = this.state.match, teams = this.state.teams) {
+    const { round, settings } = this.state;
     if (!m) return null;
     const sport = this.sport();
     const A = teams[m.aId];
@@ -1065,8 +1290,8 @@ export default class App extends React.Component {
       statusColor: m.done ? C.textMute : m.status === sport.labels.tie ? C.gold : C.green,
       statusLive: !m.done,
       startLabel: sport.labels.start,
-      a: { id: A.flagId, isClub: A.kind === 'club', code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), score: m.ga },
-      b: { id: B.flagId, isClub: B.kind === 'club', code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), score: m.gd },
+      a: { teamId: A.id, id: A.flagId, isClub: A.kind === 'club', code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), score: m.ga },
+      b: { teamId: B.id, id: B.flagId, isClub: B.kind === 'club', code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), score: m.gd },
       // Only a shootout reveals kick by kick; overtime plays out through the feed.
       kicks: m.tieShown ? { a: m.tieShown.A, b: m.tieShown.D } : null,
       events: m.shown.map(e => {
@@ -1075,10 +1300,13 @@ export default class App extends React.Component {
         return { when, text, color: team ? team.col : '#fff' };
       }),
       noEvents: m.shown.length === 0 && !m.done,
+      odds: m.odds, series: m.series, routeLabel: m.routeLabel,
       result: m.done
         ? { title: m.resTitle || '', text: m.resText || '', upset: !!m.isUpset, background: tint(m.wCol || C.gold, 0.1),
+          winnerId: m.winner, loserId: m.winner === m.aId ? m.dId : m.aId,
           winnerName: m.winnerName, loserName: m.loserName, territories: m.territoriesGained, player: m.playerTaken,
           strengthBefore: m.strengthBefore, strengthAfter: m.strengthAfter, strengthGain: m.strengthGained,
+          territoryNames: m.territoryNames || [], territoryIds: m.territoryIds || [], replacedPlayer: m.replacedPlayer,
           tieText: m.tie ? (sport.tieBreak === 'shootout' ? `${m.tie.ga}–${m.tie.gd} on penalties` : `After ${m.tie.periods.length} overtime period${m.tie.periods.length === 1 ? '' : 's'}`) : null }
         : null,
     };
@@ -1126,7 +1354,9 @@ export default class App extends React.Component {
     const alive = aliveIds.includes(team.id);
     const fell = fallen.find(f => f.id === team.id);
     const s = stats[team.id] || { conq: 0, steals: [] };
+    const lineup = selectLineup(team);
     return {
+      teamId: team.id, starters: lineup.starters, bench: lineup.bench, lineupRating: lineup.rating,
       id: team.flagId,
       isClub: team.kind === 'club',
       color: team.col,
@@ -1179,7 +1409,12 @@ export default class App extends React.Component {
       effNow: teamEff(champ).toFixed(1),
       effBase: (champ.baseEff ?? teamEff(champ)).toFixed(1),
       effGain: signed(teamEff(champ) - (champ.baseEff ?? teamEff(champ))),
-      squad: champ.squad.slice().sort((a, b) => b.rating - a.rating).slice(0, this.sport().squadSize),
+      squad: selectLineup(champ).starters,
+      recap: { ...campaignRecap(this.state.history),
+        'Leader changes': this.state.metrics?.leaderChanges || 0,
+        'Acquisitions improving the lineup': (this.state.metrics?.acquisitions || []).filter(g => g > 0).length,
+        'Elapsed time': `${Math.max(1, Math.round(((this.state.completedAt || Date.now()) - (this.state.startedAt || Date.now())) / 60000))} min` },
+      seed: this.state.seed,
     };
   }
 
@@ -1221,6 +1456,10 @@ export default class App extends React.Component {
     const { countries, flagPatterns } = this.mapCountries();
     const completed = playing && st.aliveIds.length <= 1;
     const liveMatch = !!st.match && !st.match.applied;
+    const playbackState = completed ? 'Completed' : st.choice ? 'Choose a signing'
+      : st.paused ? st.spin ? 'Draw paused' : liveMatch ? 'Match paused' : 'Paused'
+      : st.spin ? 'Drawing' : st.match && !st.match.done ? 'Live' : st.match?.done ? 'Full time' : 'Ready';
+    const currentCard = this.matchCard();
     const sport = getSport(playing ? st.settings.sport : st.setup.sport);
     const oceanLabels = !playing && this.geo ? [
       ['Pacific Ocean', -135, -5], ['Atlantic Ocean', -30, 0], ['Indian Ocean', 76, -25],
@@ -1236,7 +1475,7 @@ export default class App extends React.Component {
         : scopeName + ' campaign';
 
     return (
-      <div className="app-shell">
+      <div className={`app-shell${playing ? ' has-campaign' : ''}`} data-mobile-view={st.mobileView}>
         <CommandBar
           show={playing} sportName={sport.name} layerName={st.settings.layer === 'clubs' ? 'Clubs' : 'Nations'}
           scopeName={scopeName} round={st.round} alive={st.aliveIds.length}
@@ -1244,7 +1483,15 @@ export default class App extends React.Component {
           confirmNew={st.confirmNew} busy={liveMatch || !!st.spin} completed={completed}
           onPacing={p => this.setSetting('pacing', p)} onResolution={r => this.setSetting('resolution', r)}
           onNew={() => this.newCampaign()}
+          onCancelNew={() => this.setState({ confirmNew: false })}
+          saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
+          onResults={() => this.setState({ phase: 'victory' })} seed={st.seed}
+          settings={st.settings} onSetting={(key, value) => this.setSetting(key, value)}
         />
+        {playing && <nav className="campaign-view-switch" aria-label="Campaign view">
+          <button type="button" aria-pressed={st.mobileView === 'map'} onClick={() => this.setState({ mobileView: 'map' })}>Map</button>
+          <button type="button" aria-pressed={st.mobileView === 'details'} onClick={() => this.setState({ mobileView: 'details' })}>Details</button>
+        </nav>}
         <main className="campaign-layout">
           <WorldMap
             countries={countries} flagPatterns={flagPatterns}
@@ -1253,6 +1500,10 @@ export default class App extends React.Component {
             battleMarks={(st.battles || []).map((b, i, arr) => ({ x: b.x, y: b.y, op: .25 + .65 * (i + 1) / arr.length }))}
             labels={this.mapLabels(playing)} labelGeometry={this.labelGeometry} ownership={st.own} oceanLabels={oceanLabels}
             attack={st.atk}
+            conquestIds={st.conquestIds} followedId={st.followedId} paused={st.paused}
+            selectedId={st.selected}
+            onShowDetails={() => this.showDetails()}
+            focusBounds={st.focusBounds} focusKey={st.focusKey}
             spin={st.spin ? { ...st.spin, angle: st.spin.ang, durationMs: st.spin.spinMs,
               attackerName: st.teams[st.spin.attackerId]?.name, targetName: st.teams[st.spin.targetId]?.name } : null}
             tooltip={this.tooltip(playing)} kmPerUnit={this.geo?.kmPerUnit || 0} legend={this.legend(playing)}
@@ -1265,21 +1516,35 @@ export default class App extends React.Component {
               speed={st.speed} autoplay={st.autoplay} busy={!!st.spin} completed={completed}
               stepLabel={st.spin ? 'Drawing match…' : liveMatch ? 'Finish match' : 'Next match'}
               onSpeed={() => this.cycleSpeed()} onStep={() => this.step()} onPlay={() => this.togglePlay()}
+              paused={st.paused} live={liveMatch || !!st.spin} onPause={() => this.pausePlayback()}
+              stateLabel={playbackState}
+              summary={currentCard ? { text: `${currentCard.a.code} ${currentCard.a.score}–${currentCard.b.score} ${currentCard.b.code}`,
+                label: `${currentCard.a.name} ${currentCard.a.score}, ${currentCard.b.name} ${currentCard.b.score}` } : null}
             />}
           >
             {st.toast && <Toast code={st.toast.code} text={st.toast.txt} color={st.toast.col} />}
             {this.renderPopup()}
           </WorldMap>
           {playing && <Sidebar
-            match={this.matchCard()} idleText={this.idleText()} queueLeft={st.queue.length}
+            match={currentCard} idleText={this.idleText()} queueLeft={st.queue.length}
             draw={st.spin ? { stage: st.spin.stage, isNeighbor: st.spin.isNeighbor,
+              routeKind: st.spin.routeKind, routeLabel: st.spin.routeLabel,
               attackerName: st.teams[st.spin.attackerId]?.name, targetName: st.teams[st.spin.targetId]?.name } : null}
             tab={st.tab} onTab={tab => this.setState({ tab })}
             feed={st.log.slice().reverse().slice(0, FEED_CAP).map(f => ({
               round: 'R' + f.r, chip: f.chip || C.textMute, color: f.col || C.textSoft, text: f.txt,
             }))}
             power={this.powerTable(playing)} squad={this.squadPanel()} positionColors={sport.positionColors}
-            onSelectTeam={tid => this.setState({ selected: tid, tab: 'squad' })} eventsRef={this.eventsRef}
+            selectedTeamId={st.selected} onSelectTeam={tid => this.selectTeam(tid)} eventsRef={this.eventsRef}
+            followed={{ id: st.followedId, name: st.teams[st.followedId]?.name,
+              alive: st.followedId ? st.aliveIds.includes(st.followedId) : true,
+              controlled: st.settings.role === 'manager', pauseOnEvents: st.pauseFollow }}
+            onFollow={id => this.followTeam(id)} onPauseFollow={pauseFollow => this.setState({ pauseFollow }, () => this.persist())}
+            history={st.history} historyTeams={Object.values(st.teams).map(team => ({ id: team.id, name: team.name, alive: st.aliveIds.includes(team.id) })).sort((a, b) => a.name.localeCompare(b.name))}
+            selectedHistory={st.history.find(entry => entry.id === st.selectedHistoryId)}
+            onHistorySelect={selectedHistoryId => this.setState({ selectedHistoryId })}
+            onViewConquest={result => this.viewConquest(result)}
+            session={{ ...estimateSession(st.aliveIds.length, st.settings, st.speed, st.series), upTo: st.settings.finale === 'best-of-three' }} paused={st.paused || !!st.choice}
           />}
         </main>
         {st.phase === 'setup' && <SetupOverlay
@@ -1287,16 +1552,20 @@ export default class App extends React.Component {
           savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
             (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings) : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
-          onPick={(key, value) => this.setState({ setup: { ...st.setup, [key]: value } })}
+          onPick={(key, value) => this.pickSetup(key, value)}
           onStart={() => this.startCampaign()}
+          saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
         />}
         {victory && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           onClose={() => this.setState({ phase: 'playing' })}
           onNew={() => {
-            this.clearTimers(); this.discardSave(); this.fitMap(Object.keys(NATIONS));
+            this.clearTimers(); this.fitMap(Object.keys(NATIONS));
             this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null, autoplay: false });
           }}
         />}
+        {st.choice && <AcquisitionChoice choice={st.choice} onChoose={index => this.chooseAcquisition(index)} />}
+        {st.exportText && <ExportCheckpoint text={st.exportText} filename={st.exportFilename}
+          onDownload={() => this.downloadProgress()} onClose={() => this.setState({ exportText: null })} />}
         {st.phase === 'loading' && <div className="loading-screen" role={st.err ? 'alert' : 'status'}>
           <span>{st.err || 'Opening the atlas…'}</span>
           {st.err && <button className="button" onClick={() => { this.setState({ err: null }); this.boot(); }}>Try again</button>}

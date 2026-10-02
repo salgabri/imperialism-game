@@ -153,7 +153,7 @@ function cleanDraw(f) {
   assert.equal(f.clock.timers.size, 0);
 }
 
-test('an attacker blocked by neutral land pauses with feedback and never starts an illegal match', async () => {
+test('an attacker blocked by neutral land keeps autoplay moving on a coastal sea route', async () => {
   const f = await fixture({ speed: 4 });
   try {
     // Both French-held capitals lie west of this neutral wall; Germany is east.
@@ -163,17 +163,22 @@ test('an attacker blocked by neutral land pauses with feedback and never starts 
     await f.setState({ autoplay: true });
     const before = structuredClone(f.app.state.own);
     await f.begin();
-    assert.equal(f.app.state.autoplay, false);
-    assert.equal(f.app.state.round, 0);
-    assert.equal(f.app.state.spin, null);
+    assert.equal(f.app.state.autoplay, true);
+    assert.equal(f.app.state.round, 1);
+    const draw = f.app.state.spin;
+    assert.equal(draw.routeKind, 'sea');
+    assert.ok(draw.routePoints.length > 2);
+    assert.match(draw.routeLabel, /Coastal sea route/);
     assert.equal(f.app.kickoffs.length, 0);
     assert.deepEqual(f.app.state.own, before);
-    assert.match(f.dom.window.document.body.textContent, /No clear route.*Next match/);
-    assert.equal(f.clock.frames.size, 0);
-    assert.equal(f.app.drawTimers.size, 0);
-    await f.clock.tick(6000);
+    await f.spin();
+    await f.clock.tick(draw.spinMs + 34);
+    assert.ok(f.route());
+    assert.equal(f.app.state.atk.routeKind, 'sea');
+    assert.equal(f.route().querySelector('.draw-route-line').getAttribute('d'), draw.routeD);
+    await f.clock.tick(draw.holdMs);
     assert.equal(f.app.state.toast, null);
-    assert.equal(f.app.kickoffs.length, 0);
+    assert.equal(f.app.kickoffs.length, 1);
     cleanDraw(f);
   } finally { await f.close(); }
 });

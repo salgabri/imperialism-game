@@ -83,6 +83,8 @@ async function installDom() {
     pretendToBeVisual: true,
   });
   const { window } = dom;
+  // jsdom has no layout engine; squad-panel scrolling still needs its DOM API.
+  window.HTMLElement.prototype.scrollIntoView = () => {};
   const mapJson = await readFile(path.join(root, 'public', 'world-110m.v1.json'), 'utf8');
   const atlasJson = await readFile(path.join(root, 'public', 'countries-50m.json'), 'utf8');
 
@@ -253,7 +255,8 @@ if (!process.argv.includes('--duel-frame-only')) {
       for (const state of ['kickoff', 'political', 'reset', 'conquered', 'restored']) checkEmpireLabels(state, r[state]);
       r.zoomed.forEach((snapshot, i) => checkEmpireLabels(`zoom ${i + 1}`, snapshot));
       check('hover and ticker reuse cached geographic label placement', r.hoverCached && r.tickerCached);
-      check('hover, ticker and styling keep owner text-path references stable', r.hoverReferencesStable && r.tickerReferencesStable && r.styleReferencesStable);
+      check('hover, ticker and styling keep owner text-path references stable', r.hoverReferencesStable && r.tickerReferencesStable && r.styleReferencesStable,
+        JSON.stringify({ hover: r.hoverReferencesStable, ticker: r.tickerReferencesStable, style: r.styleReferencesStable }));
       check('owner text-path ids survive zoom visibility changes and conquest', r.ownerReferencesStable);
       check('Political/Flags styling cannot repeat label layout', r.styleCached);
       check('zoom updates placements without rebuilding display geometry', r.zoomChangesPlacement && r.cameraReusesGeometry);
@@ -504,7 +507,7 @@ for (const scenario of SCENARIOS) {
     check('survivor ranks stay sequential throughout the campaign', r.standingsRanksStayedSequential);
     check('standings display only true positive cumulative strength gains', r.standingsGainsStayedCorrect);
     checkEmpireLabels('campaign kickoff', r.labelsAtKickoff);
-    check('labels follow only current owners throughout the campaign', r.labelsStayedValid);
+    check('labels follow only current owners throughout the campaign', r.labelsStayedValid, JSON.stringify(r.labelFailures));
     checkEmpireLabels('campaign finish', r.labelsAtFinish);
     check('every match eliminated exactly one nation', r.fallen === r.fielded - 1, `${r.fallen} fallen of ${r.fielded}`);
     check('every match was won by someone', r.conquestsAllTeams === r.matches, `${r.conquestsAllTeams} vs ${r.matches}`);

@@ -202,3 +202,94 @@
 @media (pointer: coarse) {
   .fi-standing-team { min-height: 44px; }
 }
+
+.fi-followed { margin: 12px 20px 0; padding-bottom: 9px; border-bottom: 1px solid var(--result-line); flex: none; }
+.fi-followed-header { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 5px; font-size: 11px; color: var(--result-muted); }
+.fi-followed-header strong { font-weight: 500; color: var(--result-text); }
+.fi-followed-header .is-fallen { color: var(--result-negative); }
+.fi-followed select, .fi-history-filter select { width: 100%; min-height: 38px; background: transparent; border: 1px solid var(--result-line); border-radius: 2px; padding: 6px 8px; color: var(--result-text); font: inherit; font-size: 12px; }
+.fi-followed .control-checkbox { min-height: 32px; padding-top: 3px; font-size: 11px; }
+.fi-followed .control-checkbox input { accent-color: var(--result-positive); }
+.fi-intel-tabs { gap: 0; margin-inline: 16px; }
+.fi-intel-tabs button { flex: 1; padding-inline: 6px; font-size: 14px; }
+.fi-intel-tabs button:first-child { padding-left: 6px; }
+.fi-intel-content { min-height: 100px; }
+.fi-match-odds { display: flex; justify-content: space-between; gap: 7px; color: var(--result-muted); font-size: 10px; line-height: 1.4; margin: 12px 0 0; font-variant-numeric: tabular-nums; }
+.fi-match-odds span:nth-child(2) { text-align: center; }
+.fi-match-route { margin: 8px 0 0; font-size: 10px; color: var(--result-warning); line-height: 1.5; }
+.fi-series-status { padding: 7px 0; margin: 10px 0 0; border-block: 1px solid var(--result-line); color: var(--result-warning); font-size: 11px; line-height: 1.5; }
+.fi-context-button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; margin: 5px 0; padding: 5px 0; border: 0; background: transparent; color: var(--result-positive); font: inherit; font-size: 12px; cursor: pointer; text-align: left; }
+.fi-context-button:hover { text-decoration: underline; }
+.fi-context-button:disabled { color: var(--result-muted); cursor: default; text-decoration: none; }
+.fi-context-button[aria-pressed=true] { color: var(--result-text); }
+.fi-conquest-details { color: var(--result-muted); font-size: 11px; line-height: 1.5; margin-top: 8px; }
+.fi-conquest-details summary { cursor: pointer; min-height: 32px; display: list-item; padding-top: 7px; }
+.fi-conquest-details p { margin: 0 0 8px; }
+.fi-lineup-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: 15px; color: var(--result-muted); font-size: 10px; }
+.fi-lineup-heading h4 { margin: 0; font: 600 15px/1.4 var(--font-heading); color: var(--result-text); text-transform: uppercase; }
+.fi-lineup-help { margin: 6px 0; font-size: 10px; line-height: 1.5; color: var(--result-muted); }
+.fi-player-identity small.fi-out-of-position { color: var(--result-warning); }
+.fi-history-filter { display: flex; flex-direction: column; gap: 5px; margin: 7px 0; color: var(--result-muted); font-size: 11px; }
+.fi-history-list { margin: 10px 0 0; padding: 0; list-style: none; max-height: 185px; overflow: auto; }
+.fi-history-list li { border-bottom: 1px solid var(--result-line); }
+.fi-history-list button { display: flex; align-items: baseline; gap: 7px; width: 100%; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--result-text); text-align: left; font: inherit; font-size: 11px; line-height: 1.5; cursor: pointer; }
+.fi-history-list button > span:first-child { color: var(--result-muted); flex: none; min-width: 26px; }
+.fi-history-list button[aria-pressed=true] { background: var(--result-hover); }
+.fi-history-list button strong { white-space: nowrap; }
+.fi-match--archived { padding: 15px 0 12px; }
+.fi-match--archived .fi-match-heading h2 { font-size: 18px; }
+.fi-match--archived .fi-score-number { font-size: 32px; }
+.fi-route-explanation { color: var(--result-warning) !important; }
+.fi-session-remaining { margin: 9px 20px 0; font-size: 11px; line-height: 1.5; color: var(--result-muted); flex: none; }
+.fi-victory-recap { text-align: left; border-bottom: 1px solid #34424a; margin: 0 0 22px; padding-bottom: 7px; }
+.fi-victory-recap > div { margin-bottom: 12px; }
+.fi-victory-recap strong { font: 600 16px/1.4 var(--font-heading); }
+.fi-victory-recap p { margin: 3px 0 0; color: #a2afb2; font-size: 12px; line-height: 1.5; }
+@media (min-width: 701px) { .fi-victory-recap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; } }
+.fi-victory-seed { font-size: 11px !important; margin: 0 0 18px !important; }
+.fi-acquisition-backdrop { position: fixed; inset: 0; z-index: 55; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 24px 18px; background: #081116e8; color: #ece9df; }
+.fi-acquisition { width: min(700px, 100%); padding: 30px; background: #29322e; border: 1px solid #69756d; border-radius: 2px; margin: auto; }
+.fi-acquisition-eyebrow { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #b8c1b7; margin: 0 0 14px; }
+.fi-acquisition h1 { font: 600 30px/1.2 var(--font-heading); margin: 0; text-transform: uppercase; }
+.fi-acquisition > p:not(.fi-acquisition-eyebrow) { color: #b8c1b7; font-size: 13px; line-height: 1.5; margin: 8px 0 22px; }
+.fi-acquisition-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.fi-acquisition-options button { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; padding: 16px 13px; background: #202b28; border: 1px solid #69756d; color: #ece9df; text-align: left; font: inherit; cursor: pointer; border-radius: 2px; }
+.fi-acquisition-options button:hover { border-color: #e5c986; background: #344037; }
+.fi-acquisition-player { min-height: 57px; }
+.fi-acquisition-player strong { display: block; font: 600 20px/1.25 var(--font-heading); }
+.fi-acquisition-player > span, .fi-acquisition-options small { display: block; color: #b8c1b7; font-size: 11px; line-height: 1.5; }
+.fi-acquisition-player > span { margin-top: 5px; }
+.fi-acquisition-options small { flex: 1; }
+.fi-acquisition-select { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #e5c986; }
+.fi-acquisition .fi-acquisition-note { margin: 17px 0 0 !important; font-size: 11px !important; }
+@media (max-width: 700px) {
+  .fi-followed select, .fi-history-filter select { min-height: 44px; }
+  .fi-followed .control-checkbox, .fi-context-button { min-height: 44px; }
+  .fi-acquisition { padding: 25px 20px; }
+  .fi-acquisition-options { grid-template-columns: 1fr; }
+  .fi-acquisition-options button { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; }
+  .fi-acquisition-player { min-height: 0; }
+  .fi-acquisition-options small { grid-column: 1; }
+  .fi-acquisition-select { grid-column: 2; grid-row: 2; }
+  .fi-acquisition h1 { font-size: 26px; }
+}
+@media (max-height: 680px) and (min-width: 701px) {
+  .fi-match { padding-top: 12px; }
+  .fi-scoreboard { margin-top: 10px; }
+  .fi-match-events { max-height: 72px; }
+  .fi-acquisition-backdrop { align-items: flex-start; }
+}
+
+.fi-export-backdrop { position: fixed; inset: 0; z-index: 58; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 24px 18px; background: #081116e8; color: #ece9df; }
+.fi-export { width: min(620px, 100%); padding: 25px 28px; margin: auto; border: 1px solid #69756d; border-radius: 2px; background: #29322e; }
+.fi-export-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fi-export h1 { margin: 0; font: 600 28px/1.2 var(--font-heading); text-transform: uppercase; }
+.fi-export-heading .icon-button { padding: 0; width: 44px; border-color: transparent; background: transparent; }
+.fi-export > p { margin: 9px 0; font-size: 12px; line-height: 1.5; color: #b8c1b7; }
+.fi-export .fi-export-filename { color: #ece9df; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.fi-export > label { display: block; margin: 15px 0 7px; color: #b8c1b7; font-size: 12px; }
+.fi-export textarea { display: block; width: 100%; min-height: 150px; max-height: 40dvh; resize: vertical; border: 1px solid #69756d; border-radius: 2px; padding: 11px 12px; color: #ece9df; background: #202b28; font: 11px/1.5 Consolas, monospace; }
+.fi-export textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.fi-export .fi-export-status { min-height: 36px; margin: 12px 0; }
+.fi-export-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 540px) { .fi-export-backdrop { padding: 12px; } .fi-export { padding: 20px; } .fi-export h1 { font-size: 25px; } .fi-export-actions .button { flex: 1; padding-inline: 10px; } }

@@ -17,9 +17,9 @@ export function MatchupPopup({ label, a, b }) {
     <div className="fi-map-notice" role="status" data-testid="matchup-notice">
       <div className="fi-notice-label">{label}</div>
       <div className="fi-matchup-notice-teams">
-        <div><TeamMark {...a} isClub={a.isClub || !a.id} width={30} /><span><strong>{a.name}</strong><small>EFF {a.eff}</small></span></div>
+        <div><TeamMark {...a} isClub={a.isClub || !a.id} width={30} /><span><strong>{a.name}</strong><small>Strength {a.eff}</small></span></div>
         <span className="fi-matchup-vs">vs</span>
-        <div><TeamMark {...b} isClub={b.isClub || !b.id} width={30} /><span><strong>{b.name}</strong><small>EFF {b.eff}</small></span></div>
+        <div><TeamMark {...b} isClub={b.isClub || !b.id} width={30} /><span><strong>{b.name}</strong><small>Strength {b.eff}</small></span></div>
       </div>
     </div>
   );

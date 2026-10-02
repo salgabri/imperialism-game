@@ -1,0 +1,481 @@
+{
+  "note": "Seeded model probes; single and series variants share roster, draw and per-fixture random streams.",
+  "runs": 12,
+  "ratingGapProbes": [
+    {
+      "sport": "football",
+      "preset": "predictable",
+      "gap": 0,
+      "favouriteWinChance": 0.4936,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "predictable",
+      "gap": 5,
+      "favouriteWinChance": 0.7434,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "predictable",
+      "gap": 10,
+      "favouriteWinChance": 0.9176,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "predictable",
+      "gap": 20,
+      "favouriteWinChance": 0.9776,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "balanced",
+      "gap": 0,
+      "favouriteWinChance": 0.504,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "balanced",
+      "gap": 5,
+      "favouriteWinChance": 0.6996,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "balanced",
+      "gap": 10,
+      "favouriteWinChance": 0.862,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "balanced",
+      "gap": 20,
+      "favouriteWinChance": 0.9698,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "wild",
+      "gap": 0,
+      "favouriteWinChance": 0.4998,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "wild",
+      "gap": 5,
+      "favouriteWinChance": 0.6452,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "wild",
+      "gap": 10,
+      "favouriteWinChance": 0.7664,
+      "samples": 5000
+    },
+    {
+      "sport": "football",
+      "preset": "wild",
+      "gap": 20,
+      "favouriteWinChance": 0.9196,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "predictable",
+      "gap": 0,
+      "favouriteWinChance": 0.5068,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "predictable",
+      "gap": 5,
+      "favouriteWinChance": 0.7756,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "predictable",
+      "gap": 10,
+      "favouriteWinChance": 0.9324,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "predictable",
+      "gap": 20,
+      "favouriteWinChance": 0.9988,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "balanced",
+      "gap": 0,
+      "favouriteWinChance": 0.5008,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "balanced",
+      "gap": 5,
+      "favouriteWinChance": 0.7176,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "balanced",
+      "gap": 10,
+      "favouriteWinChance": 0.862,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "balanced",
+      "gap": 20,
+      "favouriteWinChance": 0.9858,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "wild",
+      "gap": 0,
+      "favouriteWinChance": 0.4912,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "wild",
+      "gap": 5,
+      "favouriteWinChance": 0.6406,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "wild",
+      "gap": 10,
+      "favouriteWinChance": 0.7652,
+      "samples": 5000
+    },
+    {
+      "sport": "basketball",
+      "preset": "wild",
+      "gap": 20,
+      "favouriteWinChance": 0.9242,
+      "samples": 5000
+    }
+  ],
+  "campaigns": [
+    {
+      "sport": "football",
+      "pacing": "blitz",
+      "finalSeries": 1,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "Spain": 1,
+        "Portugal": 2,
+        "Italy": 1,
+        "Germany": 1,
+        "England": 4,
+        "Japan": 1,
+        "Croatia": 1,
+        "United States": 1
+      },
+      "topFiveChampionShare": 0.5,
+      "meanFixtures": 31,
+      "meanGames": 31,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 3.33,
+      "meanTerritoryLeaderTurnovers": 8.75,
+      "usefulAcquisitionShare": 0.9193548387096774,
+      "meanCampaignAcquisitionGain": 18.14,
+      "meanGainPerAcquisition": 0.59
+    },
+    {
+      "sport": "football",
+      "pacing": "blitz",
+      "finalSeries": 3,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "Spain": 1,
+        "Brazil": 4,
+        "Italy": 1,
+        "Germany": 1,
+        "Portugal": 1,
+        "England": 3,
+        "Belgium": 1
+      },
+      "topFiveChampionShare": 0.75,
+      "meanFixtures": 31,
+      "meanGames": 32.58,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 3.08,
+      "meanTerritoryLeaderTurnovers": 8.67,
+      "usefulAcquisitionShare": 0.9193548387096774,
+      "meanCampaignAcquisitionGain": 18.03,
+      "meanGainPerAcquisition": 0.58
+    },
+    {
+      "sport": "football",
+      "pacing": "chaos",
+      "finalSeries": 1,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "England": 6,
+        "France": 1,
+        "Japan": 2,
+        "United States": 1,
+        "Sweden": 1,
+        "Côte d'Ivoire": 1
+      },
+      "topFiveChampionShare": 0.5833333333333334,
+      "meanFixtures": 31,
+      "meanGames": 31,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 3.67,
+      "meanTerritoryLeaderTurnovers": 7.83,
+      "usefulAcquisitionShare": 0.9408602150537635,
+      "meanCampaignAcquisitionGain": 18.52,
+      "meanGainPerAcquisition": 0.6
+    },
+    {
+      "sport": "football",
+      "pacing": "chaos",
+      "finalSeries": 3,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "England": 5,
+        "France": 1,
+        "United States": 2,
+        "Portugal": 1,
+        "Ghana": 1,
+        "Brazil": 1,
+        "Croatia": 1
+      },
+      "topFiveChampionShare": 0.5833333333333334,
+      "meanFixtures": 31,
+      "meanGames": 32.5,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 3.58,
+      "meanTerritoryLeaderTurnovers": 7.92,
+      "usefulAcquisitionShare": 0.9435483870967742,
+      "meanCampaignAcquisitionGain": 18.58,
+      "meanGainPerAcquisition": 0.6
+    },
+    {
+      "sport": "football",
+      "pacing": "duel",
+      "finalSeries": 1,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "Turkey": 1,
+        "Germany": 1,
+        "Algeria": 1,
+        "Portugal": 1,
+        "Uruguay": 1,
+        "France": 1,
+        "England": 1,
+        "Croatia": 1,
+        "Argentina": 1,
+        "Slovakia": 1,
+        "Netherlands": 1,
+        "Spain": 1
+      },
+      "topFiveChampionShare": 0.3333333333333333,
+      "meanFixtures": 31,
+      "meanGames": 31,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 4,
+      "meanTerritoryLeaderTurnovers": 7.42,
+      "usefulAcquisitionShare": 0.8252688172043011,
+      "meanCampaignAcquisitionGain": 16.3,
+      "meanGainPerAcquisition": 0.53
+    },
+    {
+      "sport": "football",
+      "pacing": "duel",
+      "finalSeries": 3,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "Turkey": 1,
+        "Germany": 1,
+        "Algeria": 1,
+        "Portugal": 1,
+        "Côte d'Ivoire": 1,
+        "France": 1,
+        "England": 1,
+        "Croatia": 1,
+        "Argentina": 1,
+        "Slovakia": 1,
+        "Netherlands": 2
+      },
+      "topFiveChampionShare": 0.25,
+      "meanFixtures": 31,
+      "meanGames": 32.25,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 4,
+      "meanTerritoryLeaderTurnovers": 7.42,
+      "usefulAcquisitionShare": 0.8279569892473119,
+      "meanCampaignAcquisitionGain": 16.39,
+      "meanGainPerAcquisition": 0.53
+    },
+    {
+      "sport": "basketball",
+      "pacing": "blitz",
+      "finalSeries": 1,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "United States": 9,
+        "Greece": 1,
+        "Serbia": 1,
+        "Argentina": 1
+      },
+      "topFiveChampionShare": 0.9166666666666666,
+      "meanFixtures": 31,
+      "meanGames": 31,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 0.25,
+      "meanTerritoryLeaderTurnovers": 9.5,
+      "usefulAcquisitionShare": 0.7311827956989247,
+      "meanCampaignAcquisitionGain": 41.75,
+      "meanGainPerAcquisition": 1.35
+    },
+    {
+      "sport": "basketball",
+      "pacing": "blitz",
+      "finalSeries": 3,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "United States": 9,
+        "Greece": 1,
+        "Serbia": 1,
+        "Argentina": 1
+      },
+      "topFiveChampionShare": 0.9166666666666666,
+      "meanFixtures": 31,
+      "meanGames": 32.42,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 0.25,
+      "meanTerritoryLeaderTurnovers": 9.5,
+      "usefulAcquisitionShare": 0.7311827956989247,
+      "meanCampaignAcquisitionGain": 41.75,
+      "meanGainPerAcquisition": 1.35
+    },
+    {
+      "sport": "basketball",
+      "pacing": "chaos",
+      "finalSeries": 1,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "United States": 9,
+        "Lithuania": 1,
+        "South Sudan": 1,
+        "Serbia": 1
+      },
+      "topFiveChampionShare": 0.8333333333333334,
+      "meanFixtures": 31,
+      "meanGames": 31,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 0.5,
+      "meanTerritoryLeaderTurnovers": 9,
+      "usefulAcquisitionShare": 0.7473118279569892,
+      "meanCampaignAcquisitionGain": 43.93,
+      "meanGainPerAcquisition": 1.42
+    },
+    {
+      "sport": "basketball",
+      "pacing": "chaos",
+      "finalSeries": 3,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "United States": 9,
+        "Lithuania": 1,
+        "South Sudan": 1,
+        "Serbia": 1
+      },
+      "topFiveChampionShare": 0.8333333333333334,
+      "meanFixtures": 31,
+      "meanGames": 32.17,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 0.5,
+      "meanTerritoryLeaderTurnovers": 9,
+      "usefulAcquisitionShare": 0.7473118279569892,
+      "meanCampaignAcquisitionGain": 43.93,
+      "meanGainPerAcquisition": 1.42
+    },
+    {
+      "sport": "basketball",
+      "pacing": "duel",
+      "finalSeries": 1,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "United States": 11,
+        "Slovenia": 1
+      },
+      "topFiveChampionShare": 0.9166666666666666,
+      "meanFixtures": 31,
+      "meanGames": 31,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 0.08,
+      "meanTerritoryLeaderTurnovers": 7.58,
+      "usefulAcquisitionShare": 0.6236559139784946,
+      "meanCampaignAcquisitionGain": 35.32,
+      "meanGainPerAcquisition": 1.14
+    },
+    {
+      "sport": "basketball",
+      "pacing": "duel",
+      "finalSeries": 3,
+      "runs": 12,
+      "completed": 12,
+      "stalled": 0,
+      "champions": {
+        "United States": 10,
+        "Slovenia": 1,
+        "France": 1
+      },
+      "topFiveChampionShare": 0.8333333333333334,
+      "meanFixtures": 31,
+      "meanGames": 32.25,
+      "meanRedraws": 0,
+      "meanStrengthLeaderTurnovers": 0.17,
+      "meanTerritoryLeaderTurnovers": 7.5,
+      "usefulAcquisitionShare": 0.6236559139784946,
+      "meanCampaignAcquisitionGain": 35.55,
+      "meanGainPerAcquisition": 1.15
+    }
+  ],
+  "scope": "elite",
+  "campaignPreset": "balanced",
+  "acquisition": "best-rating",
+  "seedStart": 20261002,
+  "seriesStartsAt": 2
+}

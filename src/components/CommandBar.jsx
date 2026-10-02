@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
-import { PACING_OPTIONS, RESOLUTION_OPTIONS } from './SetupOverlay.jsx';
+import { PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS } from './SetupOverlay.jsx';
+import SaveControls from './SaveControls.jsx';
 import './controls.css';
 
 export default function CommandBar({
   show, sportName = 'Football', layerName = 'Nations', scopeName, round, alive,
   pacing, resolution, confirmNew, onPacing, onResolution, onNew, busy = false, completed = false,
+  saveStatus, onExport, onImport, onResults, onCancelNew, seed,
+  settings, onSetting,
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
@@ -44,6 +47,8 @@ export default function CommandBar({
           <span>Round <strong>{String(round).padStart(2, '0')}</strong></span>
           <span><strong>{alive}</strong> remaining</span>
         </div>
+        {saveStatus?.ok === false && <button type="button" className="command-save-warning" onClick={() => setSettingsOpen(true)} title={saveStatus.message}><span role="status">Unsaved</span></button>}
+        {completed && onResults && <button type="button" className="icon-button command-results-trigger" aria-label="Campaign results" title="Campaign results" onClick={onResults}><Icon name="trophy" size={21} /></button>}
         <div className="command-settings" ref={settingsRef}>
           <button type="button" className="icon-button" aria-label="Settings" title="Settings" aria-expanded={settingsOpen} aria-controls="campaign-settings" ref={triggerRef} onClick={() => setSettingsOpen(value => !value)}><Icon name="settings" size={21} /></button>
           {settingsOpen && (
@@ -54,15 +59,25 @@ export default function CommandBar({
                   {PACING_OPTIONS.map(([id, label]) => <option value={id} key={id}>{label}</option>)}
                 </select>
               </label>
+              <p className="command-settings-note">{PACING_HELP[pacing]}</p>
               <label className="control-field" htmlFor="campaign-resolution"><span>Match display</span>
                 <select id="campaign-resolution" value={resolution} disabled={busy || completed} onChange={event => onResolution(event.target.value)}>
                   {RESOLUTION_OPTIONS.map(([id, label]) => <option value={id} key={id}>{label}</option>)}
                 </select>
               </label>
               {busy && <p className="command-settings-note">Match settings are available after this match.</p>}
+              {onSetting && <>
+                <label className="control-checkbox"><input type="checkbox" checked={!!settings?.express} disabled={completed} onChange={event => onSetting('express', event.target.checked)} /><span>Express playback<small>Shorter waits from the next match.</small></span></label>
+                <label className="control-field" htmlFor="campaign-uncertainty"><span>Match uncertainty</span><select id="campaign-uncertainty" value={settings?.uncertainty || 'balanced'} disabled={busy || completed} onChange={event => onSetting('uncertainty', event.target.value)}><option value="predictable">Predictable</option><option value="balanced">Balanced</option><option value="wild">Wild</option></select></label>
+                <label className="control-field" htmlFor="campaign-finale"><span>Final two teams</span><select id="campaign-finale" value={settings?.finale || 'single'} disabled={busy || completed} onChange={event => onSetting('finale', event.target.value)}><option value="single">Single match</option><option value="best-of-three">Best of three</option></select></label>
+                <label className="control-field" htmlFor="campaign-role"><span>Your role</span><select id="campaign-role" value={settings?.role || 'spectator'} disabled={busy || completed} onChange={event => onSetting('role', event.target.value)}><option value="spectator">Spectator</option><option value="manager">Manager</option></select><small className="control-help">Managers choose a captured player after their team's conquests. Change your team in Squad.</small></label>
+              </>}
+              {seed != null && <p className="command-settings-note campaign-seed">Seed <strong>{seed}</strong></p>}
+              <SaveControls status={saveStatus} onExport={onExport} onImport={onImport} compact />
               <div className="command-new">
-                {confirmNew && <p role="alert">End this campaign and choose a new one?</p>}
+                {confirmNew && <p role="alert">Choose a new campaign? This campaign stays saved until you launch another.</p>}
                 <button type="button" className="button button-quiet" onClick={onNew}>{confirmNew ? 'Confirm new campaign' : 'New campaign'}</button>
+                {confirmNew && <button type="button" className="button button-quiet command-cancel" onClick={onCancelNew}>Cancel</button>}
               </div>
             </section>
           )}

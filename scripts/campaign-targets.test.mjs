@@ -20,6 +20,9 @@ function inLand(rings, [x, y]) {
   for (const ring of rings || []) for (let i = 0; i < ring.length; i++) {
     const a = ring[i], b = ring[(i + 1) % ring.length];
     const cross = (b[0] - a[0]) * (y - a[1]) - (b[1] - a[1]) * (x - a[0]);
+    // Travelling along an actual coast/border is contact, not interior entry.
+    if (Math.abs(cross) < 1e-10 && x >= Math.min(a[0], b[0]) && x <= Math.max(a[0], b[0]) &&
+      y >= Math.min(a[1], b[1]) && y <= Math.max(a[1], b[1])) return false;
     if (a[1] <= y && b[1] > y && cross > 0) winding++;
     if (a[1] > y && b[1] <= y && cross < 0) winding--;
   }
@@ -63,11 +66,18 @@ function crossedCountries(paths, cp) {
 function assertLegal(board, attacker, target) {
   assert.ok(target, 'there is a legal opponent');
   const paths = board.routingPaths || board.geo.paths;
-  const crossings = crossedCountries(paths, target.cp);
+  const points = target.routePoints || [[target.cp.ax, target.cp.ay], [target.cp.bx, target.cp.by]];
+  const crossings = points.slice(1).flatMap((p, i) => crossedCountries(paths,
+    { ax: points[i][0], ay: points[i][1], bx: p[0], by: p[1] }));
   const foreign = crossings.filter(part => board.own[part.cid] !== attacker);
   assert.ok(foreign.length, 'arrow lands in an opponent territory');
-  assert.equal(board.own[foreign[0].cid], target.tid, `first foreign land is ${foreign[0].cid}, not the announced opponent`);
-  assert.ok(foreign.every(part => board.own[part.cid] === target.tid), 'visible arrow crosses no other foreign or neutral country');
+  const enemy = foreign.find(part => board.aliveIds.includes(board.own[part.cid]));
+  assert.equal(board.own[enemy.cid], target.tid, `first live foreign land is ${enemy.cid}, not the announced opponent`);
+  if (target.routeKind === 'neutral-transit') {
+    assert.ok(foreign.every(part => board.own[part.cid] === target.tid || !board.aliveIds.includes(board.own[part.cid])), 'treaty crosses no other live empire');
+    assert.match(target.routeLabel, /Neutral transit/);
+    assert.ok(foreign.some(part => target.transitCountryIds.includes(part.cid)), 'treaty names intervening neutral land');
+  } else assert.ok(foreign.every(part => board.own[part.cid] === target.tid), 'visible arrow crosses no other foreign or neutral country');
   assert.ok(Object.entries(paths).some(([cid, path]) => board.own[cid] === target.tid && inLand(path.labelRings, [target.cp.bx, target.cp.by])),
     'route endpoint is just inside target-owned land, not in the sea');
   near(target.cp.dist, Math.hypot(target.cp.bx - target.cp.ax, target.cp.by - target.cp.ay), 'displayed route distance matches its endpoints');
@@ -87,16 +97,21 @@ test('a nearer capital does not make a country behind an intervening enemy reach
 test('neutral and non-candidate foreign territory both block a route', () => {
   for (const own of [{ a: 'A', c: 'C' }, { a: 'A', blocker: 'eliminated', c: 'C' }]) {
     const board = boardOf({ a: shape(0, 0), blocker: shape(8.5, 90, [rect(8, -100, 1, 200)]), c: shape(20, 0) }, own, ['A', 'C']);
-    for (let angle = 0; angle < 360; angle += 15) assert.equal(pickTarget(board, 'A', angle), null,
+    for (let angle = 0; angle < 360; angle += 15) assert.equal(pickTarget(board, 'A', angle, { fallback: false }), null,
       'widening the cone never licenses skipping unclaimable land');
-    assert.equal(createDuelDraw(() => 0, board), null, 'an isolated attacker gets no illegal draw');
+    const draw = createDuelDraw(() => 0, board);
+    assert.ok(draw, 'the campaign uses a coastal route instead of stopping');
+    assert.equal(draw.routeKind, 'sea');
+    assertLegal(board, 'A', { tid: draw.targetId, routeKind: draw.routeKind, routePoints: draw.routePoints,
+      cp: { ax: draw.x, ay: draw.y, bx: draw.targetX, by: draw.targetY, dist: Math.hypot(draw.targetX - draw.x, draw.targetY - draw.y) } });
   }
 });
 
 test('a very narrow intervening country cannot fall between route samples', () => {
   const board = boardOf({ a: shape(0, 0), blocker: shape(8.001, 90, [rect(8.0001, -100, .0002, 200)]), c: shape(20, 0) },
     { a: 'A', c: 'C' });
-  assert.equal(pickTarget(board, 'A', 0), null);
+  assert.equal(pickTarget(board, 'A', 0, { fallback: false }), null);
+  assertLegal(board, 'A', pickTarget(board, 'A', 0));
 });
 
 test('conquered territory is passable, and the opponent marker stops at its first border', () => {
@@ -153,7 +168,8 @@ test('display routing geometry takes precedence over coarse simulation shapes', 
   const board = boardOf({ a: shape(0, 0), c: shape(20, 0) }, { a: 'A', c: 'C' });
   assert.equal(pickTarget(board, 'A', 0)?.tid, 'C');
   board.routingPaths = { ...board.geo.paths, visibleNeutral: shape(8, 0, [rect(7, -3, 2, 6)]) };
-  assert.equal(pickTarget(board, 'A', 0), null, 'land visible only in the detailed atlas still blocks');
+  assert.equal(pickTarget(board, 'A', 0, { fallback: false }), null, 'land visible only in the detailed atlas still blocks a straight route');
+  assertLegal(board, 'A', pickTarget(board, 'A', 0));
 });
 
 test('drawing snapshots routing polygons and neutral blockers before invoking external RNG', () => {
@@ -163,6 +179,7 @@ test('drawing snapshots routing polygons and neutral blockers before invoking ex
     return board;
   };
   const board = makeBoard();
+  const frozenBoard = structuredClone(board);
   let calls = 0;
   const result = createDuelDraw(() => {
     calls++;
@@ -172,7 +189,9 @@ test('drawing snapshots routing polygons and neutral blockers before invoking ex
     return 0;
   }, board);
   assert.equal(calls, 3, 'one complete draw still consumes exactly three random samples');
-  assert.equal(result, null, 'RNG cannot delete an intervening neutral country from the draw snapshot');
+  assert.equal(result.routeKind, 'sea', 'RNG cannot delete the neutral blocker and turn the draw into a straight route');
+  assertLegal(frozenBoard, 'A', { tid: result.targetId, routeKind: result.routeKind, routePoints: result.routePoints,
+    cp: { ax: result.x, ay: result.y, bx: result.targetX, by: result.targetY, dist: Math.hypot(result.targetX - result.x, result.targetY - result.y) } });
   const plain = boardOf({ a: { cx: 0, cy: 0 }, b: { cx: 20, cy: 0 } }, { a: 'A', b: 'B' });
   const fallback = pickTarget(plain, 'A', 0);
   assert.deepEqual(fallback.cp, { ax: 0, ay: 0, bx: 20, by: 0, dist: 20 }, 'point-only diagnostic fixtures preserve their old fallback');

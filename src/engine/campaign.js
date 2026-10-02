@@ -4,7 +4,7 @@
 //   { geo: WorldGeometry, own: {countryId -> empireId}, aliveIds: string[] }
 
 import { closestPair } from './geo.js';
-import { createAttackRouteIndex, firstForeignLand } from './attackRoutes.js';
+import { createAttackRouteIndex, firstForeignLand, findCoastalSeaRoute, routeLandCrossings } from './attackRoutes.js';
 
 /**
  * Seed clubs onto the map.
@@ -94,7 +94,7 @@ export function empireNeighbors(board, tid) {
  * only a shortlist: the drawn route must reach that owner's land before any
  * other owner's or neutral land. Widen the cone rather than jumping a blocker.
  */
-export function pickTarget(board, attackerId, angle) {
+export function pickTarget(board, attackerId, angle, { fallback = true } = {}) {
   const aPts = territoryPoints(board, attackerId);
   const neighbors = empireNeighbors(board, attackerId);
   const routeIndex = board.routeIndex ?? createAttackRouteIndex(board.routingPaths || board.geo.paths);
@@ -131,12 +131,78 @@ export function pickTarget(board, attackerId, angle) {
   if (landward.length) return landward[0];
 
   const cands = board.aliveIds.map(tid => nearby.has(tid) ? nearby.get(tid) : candidateOf(tid)).filter(Boolean);
-  if (!cands.length) return null;
+  if (!cands.length) return fallback ? pickFallbackTarget(board, attackerId, angle, routeIndex) : null;
   for (const cone of [45, 75, 110, 181]) {
     const seaward = cands.filter(x => x.diff <= cone).sort((x, y) => x.anchorDistance - y.anchorDistance);
     if (seaward.length) return seaward[0];
   }
   return cands[0];
+}
+
+function bearingDifference(points, angle) {
+  const [a, b] = points;
+  const bearing = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+  return Math.abs(((((bearing - angle) % 360) + 540) % 360) - 180);
+}
+
+function clippedRoute(pair, hit) {
+  const t = hit.t + Math.min((hit.exitT - hit.t) / 2, .05 / Math.max(pair.dist, .001));
+  return { ax: pair.ax, ay: pair.ay, bx: pair.ax + (pair.bx - pair.ax) * t,
+    by: pair.ay + (pair.by - pair.ay) * t, dist: pair.dist * t };
+}
+
+/**
+ * Curved coastal routes are a fallback, never permission for a straight arrow to
+ * jump blockers. Landlocked survivors use a visibly named neutral transit treaty:
+ * neutral land can be crossed, but the route still stops at the first live enemy.
+ * This explicit exception guarantees that a valid two-owner field can finish.
+ */
+function pickFallbackTarget(board, attackerId, angle, routeIndex) {
+  const aPts = territoryPoints(board, attackerId);
+  const candidates = board.aliveIds.filter(tid => tid !== attackerId).map(tid => {
+    const cp = closestPair(aPts, territoryPoints(board, tid));
+    return cp && { tid, cp, diff: bearingDifference([[cp.ax, cp.ay], [cp.bx, cp.by]], angle) };
+  }).filter(Boolean);
+  const order = [];
+  for (const cone of [45, 75, 110, 181]) {
+    for (const candidate of candidates.filter(c => c.diff <= cone).sort((a, b) => a.cp.dist - b.cp.dist)) {
+      if (!order.includes(candidate)) order.push(candidate);
+    }
+  }
+  const preparedSeaRoutes = {};
+  if (routeIndex) for (const candidate of order) {
+    const routePoints = findCoastalSeaRoute(routeIndex, board.own, attackerId, candidate.tid,
+      aPts, territoryPoints(board, candidate.tid), preparedSeaRoutes);
+    if (!routePoints) continue;
+    const a = routePoints[0], b = routePoints[routePoints.length - 1];
+    return { tid: candidate.tid, cp: { ax: a[0], ay: a[1], bx: b[0], by: b[1], dist: Math.hypot(b[0] - a[0], b[1] - a[1]) },
+      diff: bearingDifference(routePoints, angle), anchorDistance: candidate.cp.dist,
+      isNeighbor: false, routeKind: 'sea', routeLabel: 'Coastal sea route', routePoints, transitCountryIds: [] };
+  }
+  if (!routeIndex) return null;
+  const survivors = new Set(board.aliveIds);
+  const transitOwnership = Object.fromEntries(routeIndex.countries.map(({ countryId }) => [countryId,
+    survivors.has(board.own[countryId]) ? board.own[countryId] : attackerId]));
+  for (const candidate of order) {
+    const hit = firstForeignLand(routeIndex, transitOwnership, attackerId, candidate.cp);
+    if (!hit || !survivors.has(hit.ownerId) || hit.ownerId === attackerId) continue;
+    const cp = clippedRoute(candidate.cp, hit);
+    const transitCountryIds = [...new Set(routeLandCrossings(routeIndex, cp)
+      .filter(({ countryId }) => !survivors.has(board.own[countryId])).map(({ countryId }) => countryId))];
+    const routePoints = [[cp.ax, cp.ay], [cp.bx, cp.by]];
+    return { tid: hit.ownerId, cp, diff: bearingDifference(routePoints, angle), anchorDistance: candidate.cp.dist,
+      isNeighbor: empireNeighbors(board, attackerId).has(hit.ownerId),
+      routeKind: transitCountryIds.length ? 'neutral-transit' : 'straight',
+      routeLabel: transitCountryIds.length ? 'Neutral transit treaty' : 'Direct challenge', routePoints, transitCountryIds };
+  }
+  return null;
+}
+
+/** Cheap setup validation; fallback routes guarantee progress for placed owners. */
+export function validateReachability(board) {
+  if (!board?.geo?.paths || !board.own || !Array.isArray(board.aliveIds)) return { valid: false, unplacedIds: [] };
+  const unplacedIds = [...new Set(board.aliveIds)].filter(id => !territoryPoints(board, id).length);
+  return { valid: unplacedIds.length === 0, unplacedIds, rules: ['direct', 'coastal-sea', 'neutral-transit-treaty'] };
 }
 
 /**

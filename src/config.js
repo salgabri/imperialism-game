@@ -6,9 +6,9 @@ export const CONFIG = {
   showLabels: true,
   /** Effective-rating gap at which beating a favourite counts as a giant-killing (2–15). */
   upsetThreshold: 6,
-  /** Std-dev of match-day variance in rating points; 0 makes the better side always win (0–12). */
+  /** Std-dev of additional match-day variance; scoring and tie-break randomness remain at 0. */
   matchDrama: 6,
 };
 
 export const SAVE_KEY = 'football_imperialism_v1';
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;

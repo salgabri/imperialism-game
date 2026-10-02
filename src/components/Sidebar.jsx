@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import MatchCard, { TeamMark } from './MatchCard.jsx';
 import PlayerRow from './PlayerRow.jsx';
 import Icon from './Icon.jsx';
 import './results.css';
 
-const TABS = [['power', 'Standings'], ['feed', 'Activity'], ['squad', 'Squad']];
+const TABS = [['power', 'Standings'], ['feed', 'Activity'], ['squad', 'Squad'], ['history', 'History']];
 
 function gainColor(gain) {
+  if (!gain) return 'var(--result-muted)';
   const tone = gain.text.startsWith('+') ? 'positive' : /^[−-]/.test(gain.text) ? 'negative' : 'muted';
   return `var(--result-${tone}, ${gain.color})`;
 }
@@ -48,14 +49,14 @@ function Feed({ entries = [] }) {
   );
 }
 
-function Power({ rows = [], onSelect }) {
+function Power({ rows = [], onSelect, selectedTeamId }) {
   return (
     <table className="fi-standings">
       <thead><tr><th scope="col">#</th><th scope="col">Team</th><th scope="col"><abbr title="Territories held">Terr.</abbr></th><th scope="col" aria-sort="descending"><abbr title="Overall team strength (EFF), highest first">Strength</abbr></th></tr></thead>
       <tbody>{rows.map(team => (
-        <tr key={team.tid}>
+        <tr key={team.tid} className={selectedTeamId === team.tid ? 'is-selected' : undefined} style={{ '--team-color': team.color }}>
           <td>{Number(team.rank) || team.rank}</td>
-          <td><button type="button" className="fi-standing-team" onClick={() => onSelect(team.tid)} aria-label={`View ${team.name} squad`}>
+          <td><button type="button" className="fi-standing-team" data-team-id={team.tid} onClick={() => onSelect?.(team.tid)} aria-label={`View ${team.name} squad`} aria-current={selectedTeamId === team.tid ? 'true' : undefined}>
             <TeamMark id={team.flagId} code={team.code} color={team.color} isClub={team.isClub} width={20} />
             <span title={team.name}>{team.name}</span>
           </button></td>
@@ -73,34 +74,124 @@ function Power({ rows = [], onSelect }) {
   );
 }
 
-function Squad({ squad, positionColors }) {
+const POSITION_GROUPS = {
+  GK: 'Goalkeepers', DF: 'Defenders', MF: 'Midfielders', FW: 'Forwards',
+  PG: 'Point guards', SG: 'Shooting guards', SF: 'Small forwards', PF: 'Power forwards', C: 'Centers',
+};
+
+function PositionGroups({ players = [], positionColors, starter = false, depth = false }) {
+  const grouped = new Map();
+  players.forEach(player => {
+    const position = starter ? player.assignedPos || player.pos : player.pos;
+    if (!grouped.has(position)) grouped.set(position, []);
+    grouped.get(position).push(player);
+  });
+  const ordered = [...Object.keys(POSITION_GROUPS), ...grouped.keys()].filter((position, i, positions) => positions.indexOf(position) === i && grouped.has(position));
+  return ordered.map(position => <section className="fi-position-group" aria-label={POSITION_GROUPS[position] || position} key={position}>
+    <div className="fi-position-group-heading"><h5>{POSITION_GROUPS[position] || position}</h5><span>{grouped.get(position).length}</span></div>
+    <div className="fi-player-list">{grouped.get(position).map((player, i) => <PlayerRow key={player.originalIndex ?? `${player.name}-${player.pos}-${player.from || ''}-${i}`} player={player} positionColors={positionColors} role={starter ? 'starter' : depth ? 'depth' : undefined} />)}</div>
+  </section>);
+}
+
+function LatestAcquisition({ squad, history = [] }) {
+  const latest = history.slice().reverse().find(entry => entry.winnerId === squad.teamId && entry.result?.player);
+  if (!latest) return null;
+  const { player, strengthBefore, strengthAfter, strengthGain, replacedPlayer } = latest.result;
+  const previousTeam = latest.aId === squad.teamId ? latest.b : latest.a;
+  const currentPlayer = squad.players.find(member => member.name === player.name && member.pos === player.pos && member.rating === player.rating && member.from === previousTeam?.code);
+  const starts = currentPlayer && squad.starters?.some(member => member.name === currentPlayer.name && member.pos === currentPlayer.pos && member.from === currentPlayer.from);
+  return <section className="fi-acquisition-spotlight" aria-label="Latest acquisition">
+    <div className="fi-acquisition-heading"><span>Latest acquisition</span><span>Round {Number(latest.round) || latest.round}</span></div>
+    <div className="fi-acquisition-player"><Icon name="users" size={18} /><div><strong>{player.name}</strong><p>{player.pos} · {player.rating} rating{previousTeam?.name ? ` · From ${previousTeam.name}` : ''}</p></div></div>
+    {currentPlayer && <p className="fi-acquisition-role">{starts ? 'In the current starting lineup' : 'Available in squad depth'}</p>}
+    {Number.isFinite(strengthGain) && <div className="fi-acquisition-impact"><span>Strength at acquisition{Number.isFinite(strengthBefore) && Number.isFinite(strengthAfter) && <small>{strengthBefore.toFixed(1)} → {strengthAfter.toFixed(1)}</small>}</span><strong className={strengthGain > 0 ? 'fi-strength-gain' : 'fi-strength-unchanged'}>{strengthGain > 0 ? `+${strengthGain.toFixed(1)}` : 'No change'}</strong></div>}
+    {replacedPlayer && <p className="fi-acquisition-replaced">Replaced {typeof replacedPlayer === 'string' ? replacedPlayer : replacedPlayer.name} in the lineup at acquisition.</p>}
+  </section>;
+}
+
+function Squad({ squad, positionColors, followed, onFollow, history, onBack }) {
   if (!squad) return <div className="fi-intel-empty"><Icon name="users" size={25} /><p>Select a team on the map or in the standings to inspect its squad.</p></div>;
   return (
-    <section className="fi-squad" aria-label={`${squad.name} squad`}>
+    <section className="fi-squad" aria-label={`${squad.name} squad`} style={{ '--team-color': squad.color }}>
+      {onBack && <button type="button" className="fi-context-button fi-squad-back" onClick={onBack}><Icon name="arrow" size={16} />Back to standings</button>}
       <div className="fi-squad-heading">
-        <TeamMark {...squad} width={40} />
-        <div><h3>{squad.name}</h3><p>{squad.meta}</p></div>
-        <div className="fi-squad-strength"><strong>{squad.eff}</strong><span>EFF</span><small style={{ color: gainColor(squad.effGain) }}>{squad.effGain.text}</small></div>
+        <TeamMark {...squad} width={44} />
+        <div className="fi-squad-identity"><span className="fi-squad-eyebrow">{squad.code} · {squad.isClub ? 'Club team' : 'National team'}</span><h3>{squad.name}</h3><p>{squad.meta}</p></div>
+        <div className="fi-squad-strength"><strong>{squad.eff}</strong><span>Strength</span><small title="Change since campaign start" style={{ color: gainColor(squad.effGain) }}>{squad.effGain?.text}</small></div>
       </div>
+      {onFollow && <button type="button" className="fi-context-button fi-follow-team" disabled={squad.status !== 'ALIVE'} aria-pressed={followed?.id === squad.teamId} onClick={() => onFollow(squad.teamId)}>{followed?.id === squad.teamId ? followed.controlled ? 'Your managed team' : 'Following this team' : followed?.controlled ? 'Manage this team' : 'Follow this team'}</button>}
       <div className="fi-squad-summary">
-        <span><strong>{squad.territories}</strong> {Number(squad.territories) === 1 ? 'territory' : 'territories'}</span><span><strong>{squad.conquests}</strong> {Number(squad.conquests) === 1 ? 'conquest' : 'conquests'}</span><span><strong>{squad.stolen}</strong> claimed</span>
+        <span><strong>{squad.territories}</strong> {Number(squad.territories) === 1 ? 'territory' : 'territories'}</span><span><strong>{squad.conquests}</strong> {Number(squad.conquests) === 1 ? 'conquest' : 'conquests'}</span><span><strong>{squad.stolen}</strong> {Number(squad.stolen) === 1 ? 'acquisition' : 'acquisitions'}</span>
       </div>
-      <div className="fi-squad-roster-heading"><span>{squad.players.length} players · Avg. {squad.avg} <small style={{ color: gainColor(squad.avgGain) }}>{squad.avgGain.text}</small></span><span style={{ color: `var(--result-${squad.status === 'ALIVE' ? 'positive' : 'negative'}, ${squad.statusColor})` }}>{squad.status}</span></div>
-      <div className="fi-player-list">{squad.players.map((player, i) => <PlayerRow key={i} player={player} positionColors={positionColors} />)}</div>
+      <LatestAcquisition squad={squad} history={history} />
+      <div className="fi-squad-roster-heading"><span>{squad.players.length} players · Avg. {squad.avg} <small title="Squad average change since campaign start" style={{ color: gainColor(squad.avgGain) }}>{squad.avgGain?.text}</small></span><span className="fi-squad-status" style={{ color: `var(--result-${squad.status === 'ALIVE' ? 'positive' : 'negative'}, ${squad.statusColor})` }}>{squad.status === 'ALIVE' ? 'In contention' : squad.status?.replace('FALLEN R', 'Eliminated · R')}</span></div>
+      {squad.starters ? <>
+        <div className="fi-lineup-heading"><h4>Starting lineup</h4><span>{squad.starters.length} starters · rating {Number(squad.lineupRating).toFixed(1)}</span></div>
+        <p className="fi-lineup-help">Strength uses these starters. Players outside their natural position receive a rating penalty.</p>
+        <PositionGroups players={squad.starters} positionColors={positionColors} starter />
+        <div className="fi-lineup-heading"><h4>Squad depth</h4><span>{squad.bench?.length || 0} players</span></div>
+        <PositionGroups players={squad.bench || []} positionColors={positionColors} depth />
+        {!squad.bench?.length && <p className="fi-lineup-help">No reserve players yet.</p>}
+      </> : <PositionGroups players={squad.players} positionColors={positionColors} />}
       {squad.players.some(player => player.gen) && <p className="fi-roster-note">* Generated player where roster data is unavailable.</p>}
     </section>
   );
 }
 
+function FollowedTeam({ followed, teams = [], onFollow, onPauseFollow }) {
+  if (!onFollow) return null;
+  return <section className="fi-followed" aria-label="Followed team">
+    <div className="fi-followed-header"><strong>{followed?.controlled ? 'Managing' : 'Following'}</strong><span className={followed?.alive === false ? 'is-fallen' : ''}>{followed?.id ? followed.alive === false ? 'Eliminated' : 'In contention' : 'Choose a favourite'}</span></div>
+    <label className="sr-only" htmlFor="followed-team">{followed?.controlled ? 'Managed team' : 'Followed team'}</label>
+    <select id="followed-team" value={followed?.id || ''} onChange={event => onFollow(event.target.value)}>
+      {!followed?.controlled && <option value="">No followed team</option>}
+      {teams.map(team => <option key={team.id || team.tid} value={team.id || team.tid} disabled={followed?.controlled && team.alive === false}>{team.name}{team.alive === false ? ' · eliminated' : ''}</option>)}
+    </select>
+    {onPauseFollow && <label className="control-checkbox"><input type="checkbox" checked={!!followed?.pauseOnEvents} onChange={event => onPauseFollow(event.target.checked)} /><span>Pause for this team's matches and major events</span></label>}
+  </section>;
+}
+
+function History({ entries = [], teams = [], selected, onSelect, onViewConquest, onSelectTeam }) {
+  const [filter, setFilter] = useState('');
+  const shown = entries.filter(entry => !filter || String(entry.aId ?? entry.a?.teamId ?? entry.a?.id) === filter || String(entry.dId ?? entry.bId ?? entry.b?.teamId ?? entry.b?.id) === filter);
+  return <section className="fi-history" aria-label="Match history">
+    <label className="fi-history-filter" htmlFor="history-team"><span>Filter by team</span><select id="history-team" value={filter} onChange={event => setFilter(event.target.value)}><option value="">All teams</option>{teams.map(team => <option key={team.id || team.tid} value={team.id || team.tid}>{team.name}</option>)}</select></label>
+    {!shown.length ? <p className="fi-intel-empty">{entries.length ? 'No matches for this team yet.' : 'Completed matches will be saved here, including events and spoils.'}</p> : <>
+      <ol className="fi-history-list">{shown.slice().reverse().map((entry, i) => <li key={entry.id ?? i}><button type="button" aria-pressed={selected?.id === entry.id} onClick={() => onSelect?.(entry.id)}><span>R{Number(entry.round) || entry.round}</span><span>{entry.a?.name} <strong>{entry.a?.score}–{entry.b?.score}</strong> {entry.b?.name}</span></button></li>)}</ol>
+      {selected && <MatchCard {...selected} archived onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} />}
+    </>}
+  </section>;
+}
+
 /** One quiet information surface: latest match, then standings, activity or squad. */
-export default function Sidebar({ match, draw, idleText, queueLeft, tab = 'power', onTab, feed, power, squad, positionColors, onSelectTeam, eventsRef }) {
+export default function Sidebar({ match, draw, idleText, queueLeft, tab = 'power', onTab, feed, power, squad, positionColors, onSelectTeam, eventsRef,
+  followed, onFollow, onPauseFollow, history = [], historyTeams = [], onHistorySelect, selectedHistory, onViewConquest, session, paused = false, selectedTeamId }) {
+  const contentRef = useRef(null);
+  const returnToStandingsRef = useRef(false);
+  const tabNavigationRef = useRef(false);
+  const inspectedTeamId = selectedTeamId ?? squad?.teamId;
+  useEffect(() => {
+    if (tab === 'squad' && squad?.teamId && !tabNavigationRef.current) contentRef.current?.focus();
+    tabNavigationRef.current = false;
+    if (tab === 'power' && returnToStandingsRef.current) {
+      returnToStandingsRef.current = false;
+      const teamButton = [...(contentRef.current?.querySelectorAll('[data-team-id]') || [])].find(button => button.dataset.teamId === String(inspectedTeamId));
+      (teamButton || contentRef.current)?.focus();
+    }
+  }, [tab, squad?.teamId, inspectedTeamId]);
+  function backToStandings() {
+    returnToStandingsRef.current = true;
+    onTab?.('power');
+  }
   return (
-    <aside className="fi-intel" aria-label="Campaign details">
-      {match ? <MatchCard {...match} eventsRef={eventsRef} /> : draw ? (
+    <aside id="campaign-details" className="fi-intel" aria-label="Campaign details" tabIndex={-1}>
+      <FollowedTeam followed={followed} teams={historyTeams.length ? historyTeams : (power || []).map(team => ({ id: team.tid, name: team.name, alive: true }))} onFollow={onFollow} onPauseFollow={onPauseFollow} />
+      {match ? <MatchCard {...match} eventsRef={eventsRef} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} /> : draw ? (
         <section className="fi-match fi-match-empty fi-match-draw" data-testid="draw-status" role="status" aria-live="polite" aria-atomic="true">
           <div className="fi-match-heading"><h2>Latest match</h2><span className="fi-match-status">{draw.stage === 'locked' ? 'Opponent selected' : 'Drawing'}</span></div>
           <h3>{draw.stage === 'locked' ? `${draw.attackerName} faces ${draw.targetName}` : `${draw.attackerName} to attack`}</h3>
           <p>{draw.stage === 'locked' ? draw.isNeighbor ? 'Land-border opponent selected.' : 'Overseas opponent selected.' : 'Drawing a direction and finding an opponent.'}</p>
+          {draw.stage === 'locked' && draw.routeLabel && <p className="fi-route-explanation">{draw.routeLabel}{draw.routeKind === 'neutral-transit' ? ' · neutral land is crossed under a transit treaty.' : ''}</p>}
         </section>
       ) : (
         <section className="fi-match fi-match-empty"><div className="fi-match-heading"><h2>Latest match</h2><span className="fi-match-status">Ready</span></div>
@@ -108,11 +199,15 @@ export default function Sidebar({ match, draw, idleText, queueLeft, tab = 'power
         </section>
       )}
       {queueLeft > 0 && <p className="fi-queue-note">{queueLeft} {queueLeft === 1 ? 'match' : 'matches'} remaining this round</p>}
-      <Tabs value={tab} onChange={onTab} />
-      <div className={`fi-intel-content fi-intel-content--${tab}`} role="tabpanel" id={`intel-panel-${tab}`} aria-labelledby={`intel-tab-${tab}`} tabIndex={0}>
+      {session && <p className="fi-session-remaining" data-testid="session-remaining" role="status">{session.games ? <>{session.upTo ? 'Up to ' : ''}{session.games} {Number(session.games) === 1 ? 'game' : 'games'} remaining · ~{Math.max(1, Math.ceil((session.seconds || 0) / 60))} min{paused ? ' · Paused' : ''}</> : 'Campaign complete'}</p>}
+      <Tabs value={tab} onChange={value => { tabNavigationRef.current = true; onTab?.(value); }} />
+      <div ref={contentRef} className={`fi-intel-content fi-intel-content--${tab}`} role="tabpanel" id={`intel-panel-${tab}`} aria-labelledby={`intel-tab-${tab}`} tabIndex={0} onKeyDown={event => {
+        if (tab === 'squad' && event.key === 'Escape' && onTab) { event.preventDefault(); backToStandings(); }
+      }}>
         {tab === 'feed' && <Feed entries={feed} />}
-        {tab === 'power' && <Power rows={power} onSelect={onSelectTeam} />}
-        {tab === 'squad' && <Squad squad={squad} positionColors={positionColors} />}
+        {tab === 'power' && <Power rows={power} onSelect={onSelectTeam} selectedTeamId={inspectedTeamId} />}
+        {tab === 'squad' && <Squad squad={squad} positionColors={positionColors} followed={followed} onFollow={onFollow} history={history} onBack={onTab ? backToStandings : undefined} />}
+        {tab === 'history' && <History entries={history} teams={historyTeams} selected={selectedHistory} onSelect={onHistorySelect} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} />}
       </div>
       {tab === 'power' && <p className="fi-intel-hint"><Icon name="info" size={17} /><span>Select a team to view its squad.</span></p>}
     </aside>

@@ -7,6 +7,10 @@
   --font-body: 'Archivo', 'Segoe UI', sans-serif;
   --font-heading: 'Archivo Narrow', 'Arial Narrow', sans-serif;
   --font-map: 'Alegreya', Georgia, 'Times New Roman', serif;
+  --type-caption: 12px; --type-body: 13px; --type-control: 14px;
+  --type-panel: 22px; --type-title: 30px; --type-score: 40px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px;
+  --control-height: 44px; --corner: 2px;
   font-family: var(--font-body); font-size: 14px; font-synthesis: none;
   background: var(--bg); color: var(--text);
 }
@@ -21,6 +25,8 @@ a { color: var(--accent); }
 button svg { flex: none; }
 .button, .icon-button { min-height: 44px; border: 1px solid #69756d; border-radius: 2px; background: #202b28f5; color: var(--text); display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; font-weight: 500; transition: background .16s, border-color .16s; }
 .button:hover, .icon-button:hover { background: #39463f; border-color: #9da79e; }
+.button:active:not(:disabled), .icon-button:active:not(:disabled) { transform: translateY(1px); }
+.button:disabled:hover, .icon-button:disabled:hover { background: #202b28f5; border-color: #69756d; }
 .button-primary { background: var(--accent); border-color: var(--accent); color: #202725; font-weight: 600; }
 .button-primary:hover { background: #fffef5; border-color: #fffef5; }
 .button-quiet { background: transparent; border-color: var(--line); }
