@@ -1,6 +1,7 @@
 import { SAVE_KEY, SAVE_VERSION } from '../config.js';
 import { DOMESTIC_PREFIX, domesticScopeId, isDomesticScope } from './domestic.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
+import { getSport } from '../sports/index.js';
 
 export const CAMPAIGN_INDEX_KEY = `${SAVE_KEY}:campaigns`;
 export const CAMPAIGN_BACKUP_KEY = `${SAVE_KEY}:backup`;
@@ -94,9 +95,66 @@ function unpackCampaign(data, invalid) {
   });
 }
 
-/** The stored text of a checkpoint (country campaigns pack their players). */
+/** The portable text of a checkpoint, used for exports (country campaigns pack their players). */
 export function serializeCampaign(data, space) {
   return JSON.stringify(packCampaign(data), null, space);
+}
+
+// ---------- v4: bundled roster sources by id ----------
+// A sourced roster player carries ~380 characters of `sourceInfo` (the database export's identity and rating
+// evidence): three quarters of a world checkpoint, and every claimed or replaced player copies it into history. The
+// bundled national rosters and clubs already hold it by id, so a stored checkpoint keeps `sourceInfo: '<id>'` for every
+// copy that still equals its roster entry, and parseCampaign rebuilds it. Anything else (another roster snapshot's data,
+// edited data, a country campaign's FM players) is stored as before. Exports keep sources inline: a file can outlive
+// the bundle it was played with.
+const rosterSources = new Map();
+
+/** Source id → the bundled metadata JSON of one sport's national rosters and clubs (built once per sport). */
+function sourceIndex(sportId) {
+  const sport = getSport(sportId);
+  let index = rosterSources.get(sport.id);
+  if (!index) {
+    index = new Map();
+    const add = players => {
+      for (const [, , , meta] of players || []) if (typeof meta?.id === 'string' && !index.has(meta.id)) index.set(meta.id, JSON.stringify(meta));
+    };
+    for (const roster of Object.values(sport.rosters || {})) add(roster?.[2]);
+    for (const club of sport.clubs || []) add(club?.squad);
+    rosterSources.set(sport.id, index);
+  }
+  return index;
+}
+
+/** Each `sourceInfo` object → its id when it equals the roster entry, else false (squads share these objects). */
+const sourceRefs = new WeakMap();
+
+function referenceSource(player, index) {
+  const info = player?.sourceInfo;
+  if (!record(info) || typeof info.id !== 'string') return player;
+  let ref = sourceRefs.get(info);
+  if (ref === undefined) {
+    ref = index.get(info.id) === JSON.stringify(info) ? info.id : false;
+    sourceRefs.set(info, ref);
+  }
+  return ref ? { ...player, sourceInfo: ref } : player;
+}
+
+/**
+ * A referenced player gets a fresh copy of its roster entry in the same key position (squads are compared as JSON);
+ * a source the bundle no longer has is left out.
+ */
+function rebuildSource(player, index) {
+  if (typeof player?.sourceInfo !== 'string') return player;
+  const json = index.get(player.sourceInfo);
+  if (json) return { ...player, sourceInfo: JSON.parse(json) };
+  const { sourceInfo: _missing, ...rest } = player;
+  return rest;
+}
+
+/** The stored text of a checkpoint: the portable form with bundled roster sources as references. */
+function checkpointText(data) {
+  const packed = packCampaign(data), index = sourceIndex(data.settings?.sport);
+  return JSON.stringify(index.size ? mapPlayers(packed, player => referenceSource(player, index)) : packed);
 }
 
 /** Validate every value used by resume before touching the current campaign. */
@@ -104,7 +162,7 @@ export function parseCampaign(text) {
   let data = JSON.parse(text);
   const invalid = message => { throw new Error(message); };
   if (record(data) && data.playerPack !== undefined) data = unpackCampaign(data, invalid);
-  if (!record(data) || ![1, 2, 3].includes(data.v) || !record(data.teams)
+  if (!record(data) || ![1, 2, 3, 4].includes(data.v) || !record(data.teams)
       || !record(data.own) || !record(data.settings) || !Array.isArray(data.aliveIds)
       || data.aliveIds.length < 1 || data.aliveIds.length > 200) {
     invalid('This file is not a supported Imperialism campaign.');
@@ -250,7 +308,10 @@ export function parseCampaign(text) {
   // Saves from before turn modes (v1/v2) played the original random draw with compass targets.
   const rules = configuration => configuration && { ...configuration,
     turnOrder: configuration.turnOrder ?? 'random', targeting: configuration.targeting ?? 'compass' };
-  return { ...data, v: SAVE_VERSION, history: data.history || [], log: data.log || [],
+  // v4 source references; v1–v3 saves hold every source inline and pass through unchanged.
+  const index = sourceIndex(settings.sport);
+  const sourced = index.size ? mapPlayers(data, player => rebuildSource(player, index)) : data;
+  return { ...sourced, v: SAVE_VERSION, history: sourced.history || [], log: data.log || [],
     settings: rules(data.settings), ...(data.initialSettings ? { initialSettings: rules(data.initialSettings) } : {}),
     turnQueue: data.turnQueue || [], turnIndex: data.turnIndex || 0, pendingTarget: data.pendingTarget || null,
     queue: data.queue || [], matches: data.matches || 0, round: data.round || 0,
@@ -378,7 +439,7 @@ export function writeSave(state, { activate = true } = {}) {
         message: 'This campaign changed in another tab. Reload that checkpoint or fork your current progress.' };
     }
     data.revision = (state.revision || 0) + 1;
-    const text = serializeCampaign(data);
+    const text = checkpointText(data);
     parseCampaign(text);
     const index = indexData().filter(item => item.id !== data.campaignId);
     index.unshift(campaignMetadata(data));
@@ -391,7 +452,7 @@ export function writeSave(state, { activate = true } = {}) {
       // saved: resuming it gave it a fresh id, and this checkpoint replaces it).
       const migrated = { ...currentCampaign, campaignId: createCampaignId(), revision: 1,
         campaignName: cleanName(currentCampaign.campaignName || `${currentCampaign.settings.sport || 'Football'} legacy campaign`) };
-      kept.push([campaignStorageKey(migrated.campaignId), serializeCampaign(migrated)]);
+      kept.push([campaignStorageKey(migrated.campaignId), checkpointText(migrated)]);
       index.push(campaignMetadata(migrated));
     } else if (updatePointer && current && !currentCampaign) {
       // Retain damaged bytes even when the player chooses to start a fresh run.

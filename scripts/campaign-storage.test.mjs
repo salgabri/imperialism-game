@@ -190,10 +190,10 @@ const tactical = () => ({ aId: '250', dId: '276', managerName: 'France', opponen
   options: ['attack', 'balanced', 'defend'].map(id => ({ id, label: id, description: 'Approach', strength: 84, bonus: 0, support: 0, drama: 6, baseDrama: 6 })) });
 
 test('v3 checkpoints keep the round-robin queue, the pending target and the locked turn rules', () => withStorage(({ storage }) => {
-  assert.equal(SAVE_VERSION, 3);
+  assert.equal(SAVE_VERSION, 4);
   const state = turnCheckpoint();
   assert.equal(writeSave(state).ok, true);
-  assert.equal(JSON.parse(storage.getItem(SAVE_KEY)).v, 3);
+  assert.equal(JSON.parse(storage.getItem(SAVE_KEY)).v, SAVE_VERSION);
   const loaded = loadSave();
   assert.equal(loaded.v, SAVE_VERSION); assert.equal(loaded.legacy, false);
   assert.deepEqual(loaded.turnQueue, state.turnQueue); assert.equal(loaded.turnIndex, 3);
@@ -219,11 +219,11 @@ test('version-two saves still load, as the random draw with compass targets', ()
   assert.equal(migrated.initialSettings, undefined);
   const withInitial = { ...v2, initialSettings: { ...v2.settings } };
   assert.equal(parseCampaign(JSON.stringify(withInitial)).initialSettings.turnOrder, 'random');
-  for (const version of [2, 3]) {
+  for (const version of [2, 3, 4]) {
     const missing = { ...v2, v: version }; delete missing.rngState;
     assert.throws(() => parseCampaign(JSON.stringify(missing)), /random state/, `v${version} still requires the RNG state`);
   }
-  for (const version of [0, 4, '3']) assert.throws(() => parseCampaign(JSON.stringify({ ...v2, v: version })), /not a supported/);
+  for (const version of [0, 5, '4']) assert.throws(() => parseCampaign(JSON.stringify({ ...v2, v: version })), /not a supported/);
   const v1 = { ...v2, v: 1 }; delete v1.seed; delete v1.rngState;
   assert.equal(parseCampaign(JSON.stringify(v1)).legacy, true, 'v1 saves keep loading without a seed');
 });
@@ -347,7 +347,7 @@ test('country checkpoints pack FM players and rebuild them exactly; world checkp
   assert.deepEqual(plain(parseCampaign(exportCampaign(state)).teams), plain(snapshot.teams));
 
   const world = campaignSnapshot(checkpoint());
-  assert.equal(serializeCampaign(world), JSON.stringify(world), 'world checkpoints are written exactly as before');
+  assert.equal(serializeCampaign(world), JSON.stringify(world), 'a world campaign\'s portable text is its plain snapshot');
   assert.equal(serializeCampaign(world, 2), JSON.stringify(world, null, 2));
 }));
 
@@ -501,3 +501,89 @@ test('a save from another build of a country map moves club by club, or is refus
   const lost = fitDomesticCampaign(state, { ...same, sectionNames: { '826-001': 'One', '826-002': 'Two' } });
   assert.match(lost.error, /1 of its sections is missing/);
 });
+
+// ---------- v4: bundled roster sources stored by id ----------
+/** Every kind of saved player copy: squads, and a claimed and a replaced player in history and the match. */
+function sourcedCheckpoint() {
+  const state = checkpoint();
+  const claimed = state.teams['276'].squad[0], replaced = state.teams['250'].squad[1];
+  const mark = id => ({ name: state.teams[id].name, score: 1, eff: '80.0', id });
+  state.history = [{ id: 'match-1', aId: '250', dId: '276', winnerId: '250', a: mark('250'), b: mark('276'), events: [],
+    result: { title: 'France annexes Germany', player: { ...claimed, from: 'GER', fromId: '276', joined: 1 },
+      replacedPlayer: { ...replaced, originalIndex: 1 } } }];
+  state.match = { ...match(), playerTaken: { ...claimed }, replacedPlayer: { ...replaced, originalIndex: 1 } };
+  return state;
+}
+const SOURCED = ['teams', 'history', 'match'];
+const inlineSources = text => (text.match(/"sourceInfo":\s*\{/g) || []).length;
+
+test('v4 checkpoints store bundled roster sources by id and rebuild them exactly', () => withStorage(({ storage }) => {
+  const state = sourcedCheckpoint(), squad = state.teams['250'].squad;
+  assert.ok(squad.length >= 11 && squad.every(player => typeof player.sourceInfo?.id === 'string'), 'the fixture squads are sourced');
+  assert.equal(writeSave(state).ok, true);
+  const text = storage.getItem(SAVE_KEY), stored = JSON.parse(text);
+  assert.equal(stored.v, 4);
+  assert.equal(inlineSources(text), 0, 'no copy of a bundled source is stored inline');
+  assert.equal(stored.teams['250'].squad[0].sourceInfo, squad[0].sourceInfo.id);
+  assert.equal(stored.history[0].result.player.sourceInfo, state.teams['276'].squad[0].sourceInfo.id);
+  assert.equal(stored.match.replacedPlayer.sourceInfo, squad[1].sourceInfo.id);
+  assert.ok(text.length < saved(state).length * 0.6, 'sources were most of the checkpoint');
+  const loaded = loadSave();
+  for (const key of SOURCED) assert.deepEqual(loaded[key], plain(state[key]), `${key} rebuilt from the roster`);
+  assert.equal(JSON.stringify(loaded.teams), JSON.stringify(state.teams), 'in the same key order (squads are compared as JSON)');
+  // Each load gets its own copies: changing one never reaches the bundled roster or the next load.
+  loaded.teams['250'].squad[0].sourceInfo.positions.push('GK');
+  assert.deepEqual(loadSave().teams['250'].squad[0].sourceInfo, plain(squad[0].sourceInfo));
+}));
+
+test('v3 saves load with inline sources and move to references on their next checkpoint', () => withStorage(({ storage }) => {
+  const state = sourcedCheckpoint();
+  const v3 = JSON.stringify({ ...campaignSnapshot(state), v: 3 }); // v3 stored every source inline
+  storage.setItem(campaignStorageKey(state.campaignId), v3); storage.setItem(SAVE_KEY, v3);
+  const loaded = loadSave();
+  assert.equal(loaded.v, SAVE_VERSION);
+  for (const key of SOURCED) assert.deepEqual(loaded[key], plain(state[key]), `v3 ${key} unchanged`);
+  const result = writeSave(loaded);
+  assert.equal(result.ok, true); assert.equal(result.conflict, undefined); assert.equal(result.revision, 1);
+  const text = storage.getItem(SAVE_KEY);
+  assert.equal(JSON.parse(text).v, 4); assert.equal(inlineSources(text), 0);
+  assert.ok(text.length < v3.length * 0.6);
+  assert.equal(storage.getItem(backupOf(state.campaignId)), v3, 'the v3 bytes remain the recovery copy');
+  for (const key of SOURCED) assert.deepEqual(loadSave()[key], plain(state[key]), `migrated ${key} unchanged`);
+}));
+
+test('sources the bundle does not hold stay inline; a reference the bundle lost loads without a source', () => withStorage(({ storage }) => {
+  const state = checkpoint(), squad = state.teams['250'].squad;
+  squad[0] = { ...squad[0], sourceInfo: { ...squad[0].sourceInfo, snapshotDate: '2024-09-19' } }; // another roster snapshot
+  squad[1] = { ...squad[1], sourceInfo: { id: 'custom:1', fullName: 'Imported player' } };
+  assert.equal(writeSave(state).ok, true);
+  const stored = JSON.parse(storage.getItem(SAVE_KEY));
+  assert.deepEqual(stored.teams['250'].squad.slice(0, 2).map(player => player.sourceInfo), plain([squad[0].sourceInfo, squad[1].sourceInfo]));
+  assert.equal(typeof stored.teams['250'].squad[2].sourceInfo, 'string');
+  assert.deepEqual(loadSave().teams, plain(state.teams));
+  // A later roster update that drops a player keeps them in the squad, without source evidence.
+  stored.teams['250'].squad[2].sourceInfo = 'ea:0';
+  const kept = parseCampaign(JSON.stringify(stored)).teams['250'].squad[2];
+  assert.equal(kept.name, squad[2].name); assert.equal(kept.rating, squad[2].rating); assert.equal(kept.id, squad[2].id);
+  assert.equal(Object.hasOwn(kept, 'sourceInfo'), false);
+}));
+
+test('exports keep every source inline and import back to the same campaign', () => {
+  const state = sourcedCheckpoint(), text = exportCampaign(state);
+  assert.equal(JSON.parse(text).v, SAVE_VERSION);
+  assert.ok(inlineSources(text) >= state.teams['250'].squad.length, 'a file can outlive the bundled roster');
+  const imported = parseCampaign(text);
+  for (const key of SOURCED) assert.deepEqual(imported[key], plain(state[key]));
+});
+
+test('a country checkpoint packs its FM players first; a bundled roster player in it is stored by reference', () => withStorage(({ storage }) => {
+  const state = domesticCheckpoint(), rostered = checkpoint().teams['250'].squad[0];
+  state.teams['d826-101'].squad.push({ ...rostered });
+  assert.equal(writeSave(state).ok, true);
+  const text = storage.getItem(SAVE_KEY), stored = JSON.parse(text);
+  assert.ok(stored.playerPack, 'FM players are still packed');
+  assert.ok(stored.teams['d826-100'].squad.every(Array.isArray));
+  assert.equal(stored.teams['d826-101'].squad.at(-1).sourceInfo, rostered.sourceInfo.id);
+  assert.equal(inlineSources(text), 0);
+  assert.deepEqual(plain(loadSave().teams), plain(campaignSnapshot(state).teams));
+}));

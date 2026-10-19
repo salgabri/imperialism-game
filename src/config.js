@@ -11,5 +11,9 @@ export const CONFIG = {
 };
 
 export const SAVE_KEY = 'football_imperialism_v1';
-/** v3 (DEC D8): turn order × targeting (`turnQueue`, `turnIndex`, `pendingTarget`, settings enums). v1/v2 still load. */
-export const SAVE_VERSION = 3;
+/**
+ * v3 (DEC D8): turn order × targeting (`turnQueue`, `turnIndex`, `pendingTarget`, settings enums).
+ * v4: a stored checkpoint keeps a bundled roster player's `sourceInfo` as its source id, rebuilt on load (a world
+ * checkpoint shrinks from ~1.36M to ~0.6M characters). v1–v3 still load.
+ */
+export const SAVE_VERSION = 4;
