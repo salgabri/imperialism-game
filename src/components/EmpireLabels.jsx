@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createEmpireLabelEngine } from '../engine/empireLabels.js';
 import { FONT } from '../theme.js';
 
@@ -53,18 +53,29 @@ function useMapFont(characters) {
   return { family: ready ? MAP_FONT : FALLBACK_MAP_FONT, revision: loaded?.revision || 0 };
 }
 
-/** Geographic label work is independent of the match ticker and map styling. */
-export default function EmpireLabels({ geometry = EMPTY_GEOMETRY, ownership, labels, viewBox, unitsPerPixel, mapMode }) {
+/**
+ * Geographic label work is independent of the match ticker and map styling.
+ * While `holdCamera` is set (a drag or a burst of wheel zoom), labels keep the
+ * layout of the last settled view and move with the map; they are laid out for
+ * the new view once the camera settles. Ownership changes never wait.
+ */
+export default function EmpireLabels({ geometry = EMPTY_GEOMETRY, ownership, labels, viewBox, unitsPerPixel, mapMode, holdCamera = false }) {
   const pathPrefix = `empire-name-${useId().replace(/:/g, '')}`;
   const engine = useMemo(() => createEmpireLabelEngine(geometry), [geometry]);
   const namesKey = JSON.stringify(labels);
   const characters = useMemo(() => [...new Set('ABCDEFGHIJKLMNOPQRSTUVWXYZ' + labels.map(label => label.text).join(''))].sort().join(''), [namesKey]);
   const mapFont = useMapFont(characters);
   const names = useMemo(() => labels.map(label => ({ ...label, widthEm: widthInEm(label.text, mapFont.family) })), [namesKey, mapFont.family, mapFont.revision]);
+  const settled = useRef(null);
+  const held = settled.current;
+  if (!holdCamera || !held || held.engine !== engine || held.ownership !== ownership || held.names !== names) {
+    settled.current = { engine, ownership, names, viewBox, unitsPerPixel };
+  }
+  const camera = settled.current;
   const placed = useMemo(() => names.length ? engine.layout({
-    ownership, labels: names, viewBox, unitsPerPixel, minFontPx: 11, maxFontPx: 32,
+    ownership, labels: names, viewBox: camera.viewBox, unitsPerPixel: camera.unitsPerPixel, minFontPx: 11, maxFontPx: 32,
     curveRatio: .055, coastalAllowancePx: 10, maxSeaFraction: .22,
-  }) : [], [engine, ownership, names, viewBox, unitsPerPixel]);
+  }) : [], [engine, ownership, names, camera.viewBox, camera.unitsPerPixel]);
   // Keep references unique across maps and stable as other owners enter/leave view.
   const pathId = id => `${pathPrefix}-${Array.from(String(id), c => c.codePointAt(0).toString(16)).join('-')}`;
 

@@ -12,7 +12,7 @@ function snapshotBoard(board) {
   if (!board?.geo?.paths || !board.own || !Array.isArray(board.aliveIds)) return null;
   // The cached index owns frozen copies of ALL visible land, including neutral
   // countries. Capture it before RNG callbacks and retain it in the rule view.
-  const routeIndex = board.routeIndex ?? createAttackRouteIndex(board.routingPaths || board.geo.paths);
+  const routeIndex = board.routeIndex ?? createAttackRouteIndex(board.routingPaths || board.geo.paths, board.obstacles);
   const paths = Object.create(null);
   const ownership = Object.entries(board.own);
   const placedOwners = new Set();
@@ -35,7 +35,7 @@ function snapshotBoard(board) {
     const neighbors = board.geo.adj?.[cid];
     adj[cid] = neighbors instanceof Set || Array.isArray(neighbors) ? new Set(neighbors) : new Set();
   }
-  return { geo: { paths, adj }, own, aliveIds, routeIndex };
+  return { geo: { paths, adj }, own, aliveIds, routeIndex, borderRoutes: Boolean(board.borderRoutes) };
 }
 
 /**
@@ -45,7 +45,7 @@ function snapshotBoard(board) {
  * direction, and decorative whole turns (two/three at 1×, fewer at high speed).
  * Land-neighbor priority and the widening search cone apply only to routes
  * that reach the target before any intervening country. When none exists, a
- * checked coastal sea polyline or explicit neutral transit treaty keeps play
+ * checked coastal sea polyline or explicit neutral (or foreign) transit keeps play
  * moving. The needle indicates the route's departure bearing. No wrap is added.
  *
  * Speed is captured for the whole presentation; callers use spinMs/holdMs for

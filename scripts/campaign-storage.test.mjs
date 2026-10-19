@@ -1,11 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SAVE_KEY } from '../src/config.js';
-import { buildTeam, makeRng } from '../src/data/teams.js';
+import { buildClub, buildTeam, makeRng } from '../src/data/teams.js';
+import { expandFmTuple } from '../src/data/fmPlayers.js';
 import { getSport } from '../src/sports/index.js';
 import { CAMPAIGN_BACKUP_KEY, CAMPAIGN_DAMAGED_KEY, campaignStorageKey, createCampaignId, parseCampaign, writeSave,
   campaignSnapshot, inspectSave, inspectCampaign, loadSave, loadCampaign, listCampaigns, renameCampaign,
-  forkCampaign, clearSave, detectSaveConflict, isCampaignStorageEvent } from '../src/engine/storage.js';
+  forkCampaign, clearSave, detectSaveConflict, isCampaignStorageEvent, serializeCampaign, exportCampaign, deleteCampaign,
+  fitDomesticCampaign } from '../src/engine/storage.js';
 
 function checkpoint() {
   const rng = makeRng(42), sport = getSport('football');
@@ -172,3 +174,220 @@ test('starting a new campaign archives the old singleton instead of overwriting 
   const archived = loadCampaign(slots.find(item => item.id !== next.campaignId).id);
   assert.deepEqual(archived.own, legacy.own); assert.deepEqual(archived.teams, legacy.teams);
 }));
+
+// ---------- country checkpoints, full storage and deletion ----------
+
+const FM_SOURCE = { edition: 'FM 26', version: '26.3.0', snapshotDate: '2026-10-18' };
+
+/** A small country campaign with FM-sourced squads, one transfer and its records. */
+function domesticCheckpoint() {
+  const sport = getSport('football');
+  const clubs = ['Alpha Football Club', 'Beta United', 'Gamma Town'].map((name, c) => buildClub({
+    id: `d826-${100 + c}`, name, code: ['ALP', 'BET', 'GAM'][c], league: 'Premier League', col: '#336699', str: 70,
+    homeSection: `826-00${c + 1}`,
+    squad: Array.from({ length: 12 }, (_, i) => expandFmTuple([1000 * (c + 1) + i, `Player ${c}-${i}`, 55 + i * 3,
+      i ? (i % 3 ? 'cm,am' : 'st,lw') : 'gk', i % 2 ? 'ENG' : undefined], FM_SOURCE, name)),
+  }, sport));
+  const teams = Object.fromEntries(clubs.map(team => [team.id, team]));
+  const [a, b, c] = clubs;
+  const taken = { ...c.squad[5], from: c.code };
+  a.squad.push(taken);
+  c.squad.splice(5, 1);
+  const replaced = { ...a.squad[3], originalIndex: 3, assignedPos: 'MF', effectiveRating: 64, outOfPosition: false };
+  const settings = { sport: 'football', layer: 'clubs', clubScope: 'domestic:826', domesticVersion: '826-0a1b2c3d',
+    pacing: 'duel', resolution: 'instant', role: 'spectator' };
+  const result = { title: 'ALPHA ANNEXES GAMMA', winnerId: a.id, loserId: c.id, player: { ...taken }, replacedPlayer: replaced,
+    strengthBefore: 70, strengthAfter: 71, strengthGain: 1, territoryNames: ['Gamma'], territoryIds: ['826-003'] };
+  const mark = team => ({ id: null, tid: team.id, code: team.code, name: team.name, color: team.col, score: '1', eff: '70.0' });
+  return { phase: 'playing', settings, initialSettings: { ...settings }, teams,
+    own: { '826-001': a.id, '826-002': b.id, '826-003': a.id }, aliveIds: [a.id, b.id], fallen: [{ id: c.id, r: 1 }],
+    stats: {}, round: 1, matches: 1, queue: [], log: [], seed: 7, rngState: 7, conquestIds: ['826-003'],
+    history: [{ id: 'match-1', aId: a.id, dId: c.id, winnerId: a.id, a: mark(a), b: mark(c), events: [], result }],
+    match: { aId: a.id, dId: c.id, winner: a.id, finalGa: 1, finalGd: 0, effA: 70, effD: 69, ga: 1, gd: 0, allEv: [], shown: [],
+      applied: true, done: true, playerTaken: { ...taken }, replacedPlayer: replaced, territoryIds: ['826-003'] },
+    campaignId: createCampaignId(), revision: 0, campaignName: 'England campaign', metrics: { acquisitions: [], leaderChanges: 0 },
+    spin: null, choice: null, series: null, tacticalChoice: null };
+}
+
+const plain = value => JSON.parse(JSON.stringify(value));
+
+test('country checkpoints pack FM players and rebuild them exactly; world checkpoints are unchanged', () => withStorage(() => {
+  const state = domesticCheckpoint(), snapshot = campaignSnapshot(state);
+  const full = JSON.stringify(snapshot), text = serializeCampaign(snapshot), stored = JSON.parse(text);
+  assert.ok(stored.playerPack && Array.isArray(stored.playerPack.clubs), 'one shared player header');
+  assert.ok(Object.values(stored.teams).every(team => team.squad.every(Array.isArray)), 'every squad player is packed');
+  assert.ok(Array.isArray(stored.history[0].result.player) && Array.isArray(stored.match.playerTaken));
+  assert.ok(text.length * 3 < full.length, `${text.length} packed vs ${full.length} full`);
+  const restored = parseCampaign(text);
+  assert.equal(restored.playerPack, undefined);
+  for (const key of ['teams', 'history', 'match', 'own']) assert.deepEqual(plain(restored[key]), plain(snapshot[key]), key);
+  assert.equal(restored.teams['d826-100'].squad.at(-1).from, 'GAM', 'a transfer keeps its origin');
+  assert.equal(restored.teams['d826-100'].squad.at(-1).sourceInfo.club, 'Gamma Town', 'and its original club');
+
+  // A record that would not rebuild exactly is stored in full.
+  const odd = domesticCheckpoint();
+  odd.teams['d826-101'].squad[0].sourceInfo.url = 'https://example.org/player';
+  const oddText = serializeCampaign(campaignSnapshot(odd));
+  assert.equal(Array.isArray(JSON.parse(oddText).teams['d826-101'].squad[0]), false);
+  assert.deepEqual(plain(parseCampaign(oddText).teams), plain(campaignSnapshot(odd).teams));
+
+  // Saved and exported through the normal paths.
+  assert.equal(writeSave(state).ok, true);
+  assert.deepEqual(plain(loadCampaign(state.campaignId).teams), plain(snapshot.teams));
+  assert.deepEqual(plain(parseCampaign(exportCampaign(state)).teams), plain(snapshot.teams));
+
+  const world = campaignSnapshot(checkpoint());
+  assert.equal(serializeCampaign(world), JSON.stringify(world), 'world checkpoints are written exactly as before');
+  assert.equal(serializeCampaign(world, 2), JSON.stringify(world, null, 2));
+}));
+
+test('a damaged packed squad is rejected before it can replace anything', () => {
+  const stored = JSON.parse(serializeCampaign(campaignSnapshot(domesticCheckpoint())));
+  for (const mutate of [
+    s => { s.teams['d826-101'].squad[0][5] = 99; },
+    s => { s.teams['d826-101'].squad[0][3] = 'constructor'; },
+    s => { s.teams['d826-101'].squad[0][2] = 0; },
+    s => { s.teams['d826-101'].squad[0].push('extras'); },
+    s => { s.playerPack.clubs = 'Alpha'; },
+    s => { delete s.playerPack.source.version; },
+  ]) {
+    const copy = structuredClone(stored); mutate(copy);
+    assert.throws(() => parseCampaign(JSON.stringify(copy)), /squads are incomplete/);
+  }
+});
+
+/** Browser-like storage: key + value length count against the quota, and a write over it throws. */
+function withQuota(run) {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'localStorage'), items = new Map();
+  let used = 0;
+  const size = (key, value) => key.length + value.length;
+  const storage = {
+    quota: Infinity,
+    get used() { return used; },
+    getItem: key => items.get(key) ?? null,
+    setItem(key, value) {
+      value = String(value);
+      const next = used - (items.has(key) ? size(key, items.get(key)) : 0) + size(key, value);
+      if (next > storage.quota) { const error = new Error('The quota has been exceeded.'); error.name = 'QuotaExceededError'; throw error; }
+      items.set(key, value); used = next;
+    },
+    removeItem(key) { if (items.has(key)) { used -= size(key, items.get(key)); items.delete(key); } },
+  };
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
+  try { run({ storage, items }); } finally {
+    if (prior) Object.defineProperty(globalThis, 'localStorage', prior); else delete globalThis.localStorage;
+  }
+}
+/** A campaign whose checkpoint is a little over `chars` long. */
+function sized(name, chars) {
+  const state = checkpoint();
+  state.campaignName = name;
+  state.log = [{ t: 'sys', r: 0, txt: 'x'.repeat(chars) }];
+  return state;
+}
+const backupOf = id => `${campaignStorageKey(id)}:backup`;
+
+test('full storage never deletes another campaign’s recovery copy, and a failed save changes nothing', () => withQuota(({ storage, items }) => {
+  const damaged = sized('Damaged', 20_000), other = sized('Other', 20_000);
+  Object.assign(damaged, writeSave(damaged)); Object.assign(damaged, writeSave(damaged));
+  Object.assign(other, writeSave(other)); Object.assign(other, writeSave(other));
+  storage.setItem(campaignStorageKey(damaged.campaignId), '{damaged slot');
+  assert.equal(inspectCampaign(damaged.campaignId).state, 'recovery');
+  const before = new Map(items);
+  storage.quota = storage.used + 5_000;
+  const big = sized('Big', 30_000), result = writeSave(big);
+  assert.equal(result.ok, false); assert.equal(result.quota, true);
+  assert.match(result.message, /storage is full.*Saved campaigns/);
+  assert.deepEqual(new Map(items), before, 'nothing was written or removed');
+  assert.ok(inspectCampaign(damaged.campaignId).backup, 'the damaged campaign keeps its only readable copy');
+  assert.ok(items.has(backupOf(other.campaignId)));
+  // With room for the new checkpoint the save succeeds, and the other copies stay.
+  storage.quota = storage.used + 70_000;
+  assert.equal(writeSave(big).ok, true);
+  assert.ok(items.has(backupOf(damaged.campaignId)) && items.has(backupOf(other.campaignId)));
+}));
+
+test('when only its own recovery copy is in the way, a campaign saves without it and says so', () => withQuota(({ storage, items }) => {
+  const other = sized('Other', 20_000), state = sized('Growing', 20_000);
+  Object.assign(other, writeSave(other)); Object.assign(other, writeSave(other));
+  Object.assign(state, writeSave(state)); Object.assign(state, writeSave(state));
+  assert.ok(items.has(backupOf(state.campaignId)));
+  storage.quota = storage.used + 8_000;
+  state.log = [{ t: 'sys', r: 0, txt: 'y'.repeat(26_000) }];
+  const result = writeSave(state);
+  assert.equal(result.ok, true);
+  assert.match(result.message, /without a recovery copy.*Saved campaigns/);
+  assert.equal(items.has(backupOf(state.campaignId)), false, 'its own copy made room');
+  assert.ok(items.has(backupOf(other.campaignId)), 'another campaign’s copy is untouched');
+  assert.equal(loadCampaign(state.campaignId).revision, result.revision);
+}));
+
+test('a save that runs out of room part-way leaves no slot ahead of the game, so the next save is no false conflict', () => withQuota(({ storage, items }) => {
+  const small = sized('Small', 1_000);
+  Object.assign(small, writeSave(small));
+  const big = sized('Big', 40_000);
+  // The new slot would fit; the quick-resume copy of it would not.
+  storage.quota = storage.used + 45_000;
+  const before = new Map(items);
+  const failed = writeSave(big);
+  assert.equal(failed.ok, false); assert.equal(failed.quota, true);
+  assert.deepEqual(new Map(items), before, 'slot, list and pointer are all as they were');
+  assert.equal(listCampaigns().some(item => item.damaged), false, 'no list entry without a slot');
+  storage.quota = Infinity;
+  const retried = writeSave(big);
+  assert.equal(retried.ok, true, retried.message); assert.equal(retried.revision, 1);
+  assert.equal(retried.conflict, undefined);
+}));
+
+test('a damaged resume pointer goes through the same all-or-nothing save', () => withQuota(({ storage, items }) => {
+  storage.setItem(SAVE_KEY, '{damaged pointer' + 'z'.repeat(30_000));
+  const state = sized('Fresh', 5_000);
+  storage.quota = storage.used + 12_000;
+  const before = new Map(items);
+  const result = writeSave(state);
+  assert.equal(result.ok, false); assert.equal(result.quota, true, 'reported as full storage, not a generic failure');
+  assert.deepEqual(new Map(items), before);
+  storage.quota = Infinity;
+  assert.equal(writeSave(state).ok, true);
+  assert.match(storage.getItem(CAMPAIGN_DAMAGED_KEY), /^\{damaged pointer/, 'the damaged bytes are kept once the pointer moves on');
+}));
+
+test('deleting a campaign removes its checkpoint, recovery copy, list entry and quick resume', () => withQuota(({ storage, items }) => {
+  const keep = sized('Keep', 2_000), gone = sized('Gone', 2_000);
+  Object.assign(keep, writeSave(keep)); Object.assign(keep, writeSave(keep));
+  Object.assign(gone, writeSave(gone)); Object.assign(gone, writeSave(gone));
+  assert.equal(loadSave().campaignId, gone.campaignId);
+  const used = storage.used;
+  assert.equal(deleteCampaign(gone.campaignId).ok, true);
+  for (const key of [campaignStorageKey(gone.campaignId), backupOf(gone.campaignId), SAVE_KEY]) assert.equal(items.has(key), false, key);
+  assert.notEqual(JSON.parse(items.get(CAMPAIGN_BACKUP_KEY) || 'null')?.campaignId, gone.campaignId);
+  assert.deepEqual(listCampaigns().map(item => item.id), [keep.campaignId]);
+  assert.ok(storage.used < used / 2, 'its space is free again');
+  assert.equal(loadCampaign(keep.campaignId).revision, 2);
+  assert.ok(items.has(backupOf(keep.campaignId)));
+}));
+
+test('a save from another build of a country map moves club by club, or is refused and kept', () => {
+  const state = parseCampaign(serializeCampaign(campaignSnapshot(domesticCheckpoint())));
+  const names = { '826-001': 'One', '826-002': 'Two', '826-003': 'Three' };
+  const build = (version, homes) => ({ meta: { name: 'England', version }, sectionNames: names,
+    clubs: Object.entries(homes).map(([id, homeSection]) => ({ id, homeSection })) });
+  const same = build('826-0a1b2c3d', { 'd826-100': '826-001', 'd826-101': '826-002', 'd826-102': '826-003' });
+  assert.equal(fitDomesticCampaign(state, same).campaign, state, 'the same build resumes as saved');
+  // A rebuild that reorders the clubs: each club's land and its holder follow the club.
+  const reordered = build('826-99999999', { 'd826-100': '826-003', 'd826-101': '826-001', 'd826-102': '826-002' });
+  const { campaign: moved } = fitDomesticCampaign(state, reordered);
+  assert.deepEqual(moved.own, { '826-003': 'd826-100', '826-001': 'd826-101', '826-002': 'd826-100' });
+  assert.deepEqual(Object.values(moved.teams).map(team => team.home), ['826-003', '826-001', '826-002']);
+  assert.deepEqual(moved.conquestIds, ['826-002']);
+  assert.deepEqual(moved.match.territoryIds, ['826-002']);
+  assert.deepEqual(moved.history[0].result.territoryIds, ['826-002']);
+  assert.equal(state.own['826-001'], 'd826-100', 'the save itself is untouched');
+  const missing = fitDomesticCampaign(state, build('826-99999999', { 'd826-100': '826-001', 'd826-101': '826-002', 'd826-777': '826-003' }));
+  assert.match(missing.error, /no longer matches the map of England: 1 of its clubs is not on the updated map.*save is kept/);
+  const added = fitDomesticCampaign(state, build('826-99999999',
+    { 'd826-100': '826-001', 'd826-101': '826-002', 'd826-102': '826-003', 'd826-103': '826-004' }));
+  assert.match(added.error, /the updated map adds 1 club it never had/);
+  const lost = fitDomesticCampaign(state, { ...same, sectionNames: { '826-001': 'One', '826-002': 'Two' } });
+  assert.match(lost.error, /1 of its sections is missing/);
+});

@@ -93,11 +93,46 @@ function makeCountry(shape) {
   return { id, rings, bbox: boundsOf(rings), pieces };
 }
 
+// windingAt over a country's rings, answered from one horizontal band of edges.
+// An edge only affects a point (crossing it, or holding it within EPS) when the
+// point's y is inside the edge's own y range, so each band keeps every edge whose
+// padded y range overlaps it; the integer winding sum is order independent.
+const BAND_PAD = 1e-6;
+
+function countryWinding(country, x, y) {
+  const index = country.bands || (country.bands = edgeBands(country));
+  if (!(y >= index.y0 && y <= index.y1)) return false;
+  const band = index.edges[clamp(Math.floor((y - index.y0) / index.step), 0, index.edges.length - 1)];
+  let winding = 0;
+  for (let i = 0; i < band.length; i += 2) {
+    const a = band[i], b = band[i + 1];
+    if (pointOnSegment(x, y, a, b)) return true;
+    const cross = (b[0] - a[0]) * (y - a[1]) - (x - a[0]) * (b[1] - a[1]);
+    if (a[1] <= y && b[1] > y && cross > 0) winding++;
+    else if (a[1] > y && b[1] <= y && cross < 0) winding--;
+  }
+  return winding !== 0;
+}
+
+function edgeBands(country) {
+  const count = country.rings.reduce((sum, ring) => sum + ring.length, 0);
+  const y0 = country.bbox.y - BAND_PAD, y1 = country.bbox.y + country.bbox.h + BAND_PAD;
+  const edges = Array.from({ length: clamp(Math.ceil(count / 6), 1, 512) }, () => []);
+  const step = (y1 - y0) / edges.length;
+  for (const ring of country.rings) for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const a = ring[j], b = ring[i];
+    const first = clamp(Math.floor((Math.min(a[1], b[1]) - BAND_PAD - y0) / step), 0, edges.length - 1);
+    const last = clamp(Math.floor((Math.max(a[1], b[1]) + BAND_PAD - y0) / step), 0, edges.length - 1);
+    for (let band = first; band <= last; band++) edges[band].push(a, b);
+  }
+  return { y0, y1, step, edges };
+}
+
 function containsCountries(countries, x, y) {
   for (const country of countries) {
     const b = country.bbox;
     if (x < b.x - EPS || x > b.x + b.w + EPS || y < b.y - EPS || y > b.y + b.h + EPS) continue;
-    if (windingAt(country.rings, x, y)) return true;
+    if (countryWinding(country, x, y)) return true;
   }
   return false;
 }
@@ -262,17 +297,20 @@ function inView(footprint, view, margin = 0) {
   return footprint.every(([x, y]) => x >= view.x + margin && x <= view.x + view.w - margin && y >= view.y + margin && y <= view.y + view.h - margin);
 }
 
-function rasterFits(raster, x, y, angle, width, fontSize, curveRise = 0) {
-  const footprint = labelFootprint(x, y, angle, width, fontSize, curveRise);
+function rasterCellFilled(raster, px, py) {
+  const gx = Math.floor((px - raster.x0) / raster.cell), gy = Math.floor((py - raster.y0) / raster.cell);
+  return gx >= 0 && gy >= 0 && gx < raster.nx && gy < raster.ny && !!raster.mask[gy * raster.nx + gx];
+}
+
+function rasterFits(raster, x, y, angle, width, fontSize, curveRise = 0, footprint = labelFootprint(x, y, angle, width, fontSize, curveRise)) {
   // Scan the full rotated rectangle, not merely its corners or a capsule around
   // its centerline. A capsule needlessly rounds off a broad country's corners
   // and can favor a diagonal label even when a larger horizontal label fits.
   // Prefix counts make each covered raster row a constant-time interior check.
-  for (const [px, py] of [...footprint, [x, y]]) {
-    const gx = Math.floor((px - raster.x0) / raster.cell), gy = Math.floor((py - raster.y0) / raster.cell);
-    if (gx < 0 || gy < 0 || gx >= raster.nx || gy >= raster.ny || !raster.mask[gy * raster.nx + gx]) return false;
-  }
-  const minY = Math.min(...footprint.map(p => p[1])), maxY = Math.max(...footprint.map(p => p[1]));
+  for (const [px, py] of footprint) if (!rasterCellFilled(raster, px, py)) return false;
+  if (!rasterCellFilled(raster, x, y)) return false;
+  const minY = Math.min(footprint[0][1], footprint[1][1], footprint[2][1], footprint[3][1]);
+  const maxY = Math.max(footprint[0][1], footprint[1][1], footprint[2][1], footprint[3][1]);
   const start = clamp(Math.ceil((minY - raster.y0) / raster.cell - 0.5), 0, raster.ny);
   const end = clamp(Math.ceil((maxY - raster.y0) / raster.cell - 0.5), 0, raster.ny);
   for (let row = start; row < end; row++) {
@@ -352,27 +390,37 @@ function rectangleFrame(footprint) {
   };
 }
 
+const COASTAL_SAMPLES = 13 * 5;
+
 function coastalRasterFits(raster, bbox, footprint, allowance, maxSeaFraction) {
-  const frame = rectangleFrame(footprint);
-  let sea = 0, count = 0;
+  const [p0, p1, , p3] = footprint;
+  // rectangleFrame's world() arithmetic, inlined: this runs for every coastal
+  // size probe, so it must not allocate per sample.
+  const w = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]), h = Math.hypot(p3[0] - p0[0], p3[1] - p0[1]);
+  const ux = (p1[0] - p0[0]) / w, uy = (p1[1] - p0[1]) / w;
+  const vx = (p3[0] - p0[0]) / h, vy = (p3[1] - p0[1]) / h;
+  const limit = maxSeaFraction + 0.12;
+  let maxSea = COASTAL_SAMPLES;
+  while (maxSea > 0 && !(maxSea / COASTAL_SAMPLES <= limit)) maxSea--;
+  let sea = 0;
   // A cheap candidate filter only. Exact foreign-land intersection, union area
   // and a certified distance bound below decide whether a coastal fit is legal.
   for (let y = 0; y <= 4; y++) for (let x = 0; x <= 12; x++) {
-    const [px, py] = frame.world(frame.w * x / 12, frame.h * y / 4);
+    const fx = w * x / 12, fy = h * y / 4;
+    const px = p0[0] + fx * ux + fy * vx, py = p0[1] + fx * uy + fy * vy;
     const dx = Math.max(0, bbox.x - px, px - bbox.x - bbox.w), dy = Math.max(0, bbox.y - py, py - bbox.y - bbox.h);
     if (Math.hypot(dx, dy) > allowance + EPS) return false;
-    const gx = Math.floor((px - raster.x0) / raster.cell), gy = Math.floor((py - raster.y0) / raster.cell);
-    if (gx < 0 || gy < 0 || gx >= raster.nx || gy >= raster.ny || !raster.mask[gy * raster.nx + gx]) sea++;
-    count++;
+    // Once more samples are at sea than the full count could allow, the answer is settled.
+    if (!rasterCellFilled(raster, px, py) && ++sea > maxSea) return false;
   }
-  return sea / count <= maxSeaFraction + 0.12;
+  return sea / COASTAL_SAMPLES <= limit;
 }
 
 function foreignLandIntersects(foreignCountries, footprint) {
   const bbox = boundsOf([footprint]);
   for (const country of foreignCountries) {
     if (!overlaps(country.bbox, bbox)) continue;
-    if (footprint.some(([x, y]) => windingAt(country.rings, x, y))) return true;
+    if (footprint.some(([x, y]) => countryWinding(country, x, y))) return true;
     // An entire tiny island/enclave may sit between all sampled glyph points.
     // Inspect every relevant vector edge, including edges wholly in the band.
     for (const piece of country.pieces) {
@@ -518,6 +566,154 @@ function angleOptions(pca) {
   return [...new Set([0, pca, pca - 15, pca + 15, -30, 30, -45, 45, -60, 60].map(angle => Math.round(clamp(angle, -60, 60) * 10) / 10))];
 }
 
+// A proven ceiling on rasterFits, so hopeless sizes are never scanned. rasterFits
+// checks every raster cell whose centre lies inside the footprint, so any empty
+// cell centre strictly inside it makes the fit fail. The footprint's half sizes
+// are linear in font size, which turns each known empty cell into a maximum
+// size per angle. A few probes along rays from the candidate keep this bound
+// close to the real limit; the margin covers floating-point rounding.
+const PROBE_RAYS = 32;
+const PROBE_MARGIN = 1e-6;
+
+// Geometry-only caches per raster point. Raster candidates are stable objects
+// and carry their record; a previous label's anchor is looked up by position.
+function pointRecord(raster, point) {
+  if (point.record) return point.record;
+  const records = raster.records || (raster.records = new Map());
+  const key = `${point.x},${point.y}`;
+  let record = records.get(key);
+  if (!record) records.set(key, record = { x: point.x, y: point.y, limits: new Map(), coastalLimits: new Map() });
+  if (raster.candidates.includes(point)) point.record = record;
+  return record;
+}
+
+function rasterProbes(raster, record) {
+  if (record.probes) return record.probes;
+  const found = record.probes = [];
+  const { x, y } = record, { nx, ny, cell, x0, y0, mask } = raster;
+  for (let ray = 0; ray < PROBE_RAYS; ray++) {
+    const theta = 2 * Math.PI * ray / PROBE_RAYS, dx = Math.cos(theta) * cell / 2, dy = Math.sin(theta) * cell / 2;
+    for (let step = 1; ; step++) {
+      const gx = Math.floor((x + dx * step - x0) / cell), gy = Math.floor((y + dy * step - y0) / cell);
+      if (gx < 0 || gy < 0 || gx >= nx || gy >= ny) break;
+      if (!mask[gy * nx + gx]) { found.push(x0 + (gx + 0.5) * cell - x, y0 + (gy + 0.5) * cell - y); break; }
+    }
+  }
+  return found;
+}
+
+/** labelFootprint's half width and half height per unit of font size. */
+function footprintHalfSizes(widthEm, curveRatio) {
+  const tangent = Math.atan2(4 * Math.abs(widthEm * curveRatio), widthEm);
+  return [widthEm / 2 + SIDE_PADDING + FONT_HEIGHT / 2 * Math.sin(tangent), FONT_HEIGHT / 2 + Math.abs(widthEm * curveRatio) / 2];
+}
+
+/** Per-angle maximum font size that rasterFits could accept at (x, y); Infinity when unknown. */
+function rasterSizeLimits(raster, record, angles, shape, widthEm, curveRatio) {
+  let found = record.limits.get(shape);
+  if (found) return found;
+  const [halfWidth, halfHeight] = footprintHalfSizes(widthEm, curveRatio);
+  const probes = rasterProbes(raster, record);
+  found = angles.map(angle => {
+    const theta = angle * Math.PI / 180, cos = Math.cos(theta), sin = Math.sin(theta);
+    let limit = Infinity;
+    for (let i = 0; i < probes.length; i += 2) {
+      const u = Math.abs(probes[i] * cos + probes[i + 1] * sin), v = Math.abs(probes[i + 1] * cos - probes[i] * sin);
+      limit = Math.min(limit, Math.max((u + PROBE_MARGIN) / halfWidth, (v + PROBE_MARGIN) / halfHeight));
+    }
+    return limit * (1 + 1e-9);
+  });
+  record.limits.set(shape, found);
+  return found;
+}
+
+function convexHull(points) {
+  const sorted = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  if (sorted.length < 3) return sorted;
+  const turn = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const half = list => {
+    const out = [];
+    for (const p of list) {
+      while (out.length >= 2 && turn(out[out.length - 2], out[out.length - 1], p) <= 0) out.pop();
+      out.push(p);
+    }
+    out.pop();
+    return out;
+  };
+  return [...half(sorted), ...half(sorted.reverse())];
+}
+
+// The same kind of ceiling for coastalRasterFits, which tolerates at most 22
+// of its 13 x 5 samples at sea. A land sample lies in a filled cell whose centre
+// is inside the component, so it projects no further than the component's hull
+// plus half a cell diagonal. Too wide a label leaves six whole columns of
+// samples beyond that reach (30 at sea), too tall a label both outer rows (26).
+function coastalSizeLimits(raster, component, record, angles, shape, widthEm, curveRatio) {
+  let found = record.coastalLimits.get(shape);
+  if (found) return found;
+  const { x, y } = record;
+  const hull = raster.hull || (raster.hull = convexHull(component.pieces.flatMap(piece => piece.rings.flat())));
+  const [halfWidth, halfHeight] = footprintHalfSizes(widthEm, curveRatio);
+  const slack = raster.cell * Math.SQRT1_2 + PROBE_MARGIN;
+  found = angles.map(angle => {
+    const theta = angle * Math.PI / 180, cos = Math.cos(theta), sin = Math.sin(theta);
+    let along = 0, across = 0;
+    for (const [px, py] of hull) {
+      along = Math.max(along, Math.abs((px - x) * cos + (py - y) * sin));
+      across = Math.max(across, Math.abs((py - y) * cos - (px - x) * sin));
+    }
+    return Math.min(1.5 * (along + slack) / halfWidth, (across + slack) / halfHeight) * (1 + 1e-9);
+  });
+  record.coastalLimits.set(shape, found);
+  return found;
+}
+
+// Work that depends on the zoom is kept for a few recent scales, so panning and
+// stepping the zoom buttons back and forth reuse it while memory stays bounded.
+const SCALES_KEPT = 4;
+
+function scaleCache(holder, field, scale, create = () => new Map()) {
+  const caches = holder[field] || (holder[field] = new Map());
+  let cache = caches.get(scale);
+  if (cache) caches.delete(scale);
+  else {
+    cache = create();
+    if (caches.size >= SCALES_KEPT) caches.delete(caches.keys().next().value);
+  }
+  caches.set(scale, cache);
+  return cache;
+}
+
+/**
+ * Font-size searches already run at a zoom, per candidate point and angle
+ * (undefined: not run, null: no fit). Only view-independent searches are
+ * stored, so panning reuses them.
+ */
+function pointSearches(record, scale, key, angleCount) {
+  const searches = scaleCache(record, 'searches', scale);
+  let results = searches.get(key);
+  if (!results) searches.set(key, results = new Array(angleCount));
+  return results;
+}
+
+/** Count raster cells with clearance >= margin in any window, in constant time per window. */
+function clearanceTable(raster, margin) {
+  return scaleCache(raster, 'clearance', margin, () => buildClearanceTable(raster, margin));
+}
+
+function buildClearanceTable(raster, margin) {
+  const { nx, ny, cell, distance } = raster;
+  const table = new Uint32Array((nx + 1) * (ny + 1));
+  for (let y = 0; y < ny; y++) {
+    let row = 0;
+    for (let x = 0; x < nx; x++) {
+      if (distance[y * nx + x] * cell >= margin) row++;
+      table[(y + 1) * (nx + 1) + x + 1] = table[y * (nx + 1) + x + 1] + row;
+    }
+  }
+  return table;
+}
+
 function visibleUsableArea(component, view, minSize) {
   const raster = component.raster || (component.raster = rasterize(component));
   if (!raster) return 0;
@@ -527,14 +723,36 @@ function visibleUsableArea(component, view, minSize) {
   const x1 = clamp(Math.ceil((view.x + view.w - margin - raster.x0) / raster.cell - 0.5), 0, raster.nx);
   const y0 = clamp(Math.ceil((view.y + margin - raster.y0) / raster.cell - 0.5), 0, raster.ny);
   const y1 = clamp(Math.ceil((view.y + view.h - margin - raster.y0) / raster.cell - 0.5), 0, raster.ny);
-  let count = 0;
-  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) if (raster.distance[y * raster.nx + x] * raster.cell >= margin) count++;
+  if (x1 <= x0 || y1 <= y0) return 0;
+  // Every pan and zoom asks this for each visible empire. A fully visible raster
+  // keeps its count per clearance threshold; a partial window uses a summed-area
+  // table per threshold. Either way the same cells are counted.
+  if (x0 === 0 && y0 === 0 && x1 === raster.nx && y1 === raster.ny) {
+    const count = scaleCache(raster, 'usable', margin, () => raster.distance.reduce((sum, d) => sum + (d * raster.cell >= margin), 0));
+    return count * raster.cell * raster.cell;
+  }
+  const table = clearanceTable(raster, margin), stride = raster.nx + 1;
+  const count = table[y1 * stride + x1] - table[y0 * stride + x1] - table[y1 * stride + x0] + table[y0 * stride + x0];
   return count * raster.cell * raster.cell;
 }
 
-function componentCandidates(component, definition, options, previous, coastal = false) {
+/** Yield at most `count` items, without pulling (and so computing) one more. */
+function* first(items, count) {
+  if (count <= 0) return;
+  for (const item of items) {
+    yield item;
+    if (--count <= 0) return;
+  }
+}
+
+/**
+ * The (point, angle) pairs a component's candidate search can return, each with
+ * its proven size ceiling `limit` and score ceiling `bound`. Pairs whose ceiling
+ * is below the minimum size cannot fit and are left out.
+ */
+function candidatePairs(component, definition, options, previous, coastal) {
   const raster = component.raster || (component.raster = rasterize(component));
-  if (!raster) return [];
+  if (!raster) return null;
   component.area = raster.area;
   const { unitsPerPixel: k, minFontPx, maxFontPx, viewBox } = options;
   const characters = Math.max(1, [...definition.text].length);
@@ -542,34 +760,177 @@ function componentCandidates(component, definition, options, previous, coastal =
   const trackingEm = characters > 1 ? TRACKING : 0;
   const widthEm = advance + Math.max(0, characters - 1) * trackingEm;
   const minSize = minFontPx * k, maxSize = maxFontPx * k;
-  const results = [];
   const candidates = raster.candidates.slice();
   if (previous && previous.componentKey === component.key && !candidates.some(p => p.x === previous.x && p.y === previous.y)) candidates.unshift({ x: previous.x, y: previous.y, clearance: previous.clearance || 0 });
+  const angles = angleOptions(raster.pca);
+  const curveRatio = options.curveRatio || 0;
+  const shape = `${widthEm}|${curveRatio}`, scale = `${minSize},${maxSize}`;
+  const searchKey = `${coastal ? `coast:${options.coastalAllowancePx * k}:${options.maxSeaFraction}` : 'land'}|${shape}`;
+  // A footprint never reaches further from its centre than its two half sizes
+  // combined. When even the largest one stays clear of the view margin, inView
+  // holds at every size the search tries, so the result is view independent.
+  const reach = maxSize * footprintHalfSizes(widthEm, curveRatio).reduce((a, b) => a + b) * (1 + 1e-9) + PROBE_MARGIN;
+  const scoreOf = (pair, fontSize) => fontSize / k * (1 - Math.abs(pair.angle) / 60 * 0.17) * (pair.preferred ? 1.1 : 1) + 0.35 * pair.candidate.clearance / Math.max(component.bbox.w, component.bbox.h);
+  const pairs = [];
   for (const candidate of candidates) {
     if (candidate.x < viewBox.x || candidate.x > viewBox.x + viewBox.w || candidate.y < viewBox.y || candidate.y > viewBox.y + viewBox.h) continue;
-    for (const angle of angleOptions(raster.pca)) {
-      const fits = size => {
-        const width = widthEm * size, rise = width * (options.curveRatio || 0);
-        const footprint = labelFootprint(candidate.x, candidate.y, angle, width, size, rise);
-        return (coastal
-          ? coastalRasterFits(raster, component.bbox, footprint, options.coastalAllowancePx * k, options.maxSeaFraction)
-          : rasterFits(raster, candidate.x, candidate.y, angle, width, size, rise)) && inView(footprint, viewBox, 2 * k);
-      };
-      if (!fits(minSize)) continue;
-      let lo = minSize, hi = maxSize;
-      for (let n = 0; n < 9; n++) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; }
-      const fontSize = lo, width = widthEm * fontSize, curveRise = width * (options.curveRatio || 0);
+    const record = pointRecord(raster, candidate);
+    const limits = coastal ? coastalSizeLimits(raster, component, record, angles, shape, widthEm, curveRatio)
+      : rasterSizeLimits(raster, record, angles, shape, widthEm, curveRatio);
+    const clearOfView = candidate.x - reach >= viewBox.x + 2 * k && candidate.x + reach <= viewBox.x + viewBox.w - 2 * k
+      && candidate.y - reach >= viewBox.y + 2 * k && candidate.y + reach <= viewBox.y + viewBox.h - 2 * k;
+    const memo = clearOfView ? pointSearches(record, scale, searchKey, angles.length) : null;
+    angles.forEach((angle, angleIndex) => {
+      // Not even the smallest size can pass the raster test: no result.
+      if (!(limits[angleIndex] >= minSize)) return;
       const preferred = previous && previous.componentKey === component.key && Math.abs(previous.x - candidate.x) < EPS && Math.abs(previous.y - candidate.y) < EPS && Math.abs(previous.angle - angle) < EPS;
-      const score = fontSize / k * (1 - Math.abs(angle) / 60 * 0.17) * (preferred ? 1.1 : 1) + 0.35 * candidate.clearance / Math.max(component.bbox.w, component.bbox.h);
-      results.push({ id: definition.id, text: definition.text, x: candidate.x, y: candidate.y, angle, fontSize, letterSpacing: trackingEm * fontSize, width, height: FONT_HEIGHT * fontSize + Math.abs(curveRise), curveRise, coastal, seaFraction: 0, footprint: labelFootprint(candidate.x, candidate.y, angle, width, fontSize, curveRise), componentArea: raster.area, componentKey: component.key, clearance: candidate.clearance, score });
-    }
+      const pair = { candidate, angle, angleIndex, limit: limits[angleIndex], memo, preferred, order: pairs.length };
+      // The search never returns more than maxSize or a size that failed the raster test.
+      pair.bound = scoreOf(pair, Math.min(maxSize, pair.limit));
+      pairs.push(pair);
+    });
   }
-  return results.sort((a, b) => b.score - a.score || Math.abs(a.angle) - Math.abs(b.angle) || a.y - b.y || a.x - b.x);
+  return { raster, pairs, widthEm, trackingEm, minSize, maxSize, curveRatio, scoreOf };
+}
+
+// A coarse grid of each country's nonzero edges (the edges piece.edges holds,
+// which foreignLandIntersects tests) for questions about a small area.
+function edgeGrid(country) {
+  const edges = country.pieces.flatMap(piece => piece.edges), box = country.bbox;
+  const side = Math.max(Math.sqrt(box.w * box.h / Math.max(1, edges.length / 4)), box.w / 256, box.h / 256, 1e-9);
+  const nx = Math.max(1, Math.ceil(box.w / side)), ny = Math.max(1, Math.ceil(box.h / side));
+  const cells = Array.from({ length: nx * ny }, () => []);
+  const column = x => clamp(Math.floor((x - box.x) / side), 0, nx - 1), row = y => clamp(Math.floor((y - box.y) / side), 0, ny - 1);
+  for (const edge of edges) {
+    const b = edge.bbox;
+    for (let gy = row(b.y); gy <= row(b.y + b.h); gy++) for (let gx = column(b.x); gx <= column(b.x + b.w); gx++) cells[gy * nx + gx].push(edge);
+  }
+  return { cells, nx, column, row };
+}
+
+/** Call visit(edge) for the country's edges whose bounds meet `box` (some more than once); stop when it returns true. */
+function someEdgeIn(country, box, visit) {
+  if (!overlaps(country.bbox, box)) return false;
+  const grid = country.grid || (country.grid = edgeGrid(country));
+  for (let gy = grid.row(box.y); gy <= grid.row(box.y + box.h); gy++) for (let gx = grid.column(box.x); gx <= grid.column(box.x + box.w); gx++) {
+    for (const edge of grid.cells[gy * grid.nx + gx]) if (overlaps(edge.bbox, box) && visit(edge)) return true;
+  }
+  return false;
+}
+
+/** Does a foreign edge pass within `radius` of (x, y), keeping its clipped run well above edgeInsideRectangle's EPS? */
+function foreignEdgeNear(countries, x, y, radius) {
+  if (!(radius > 0)) return false;
+  const box = { x: x - radius, y: y - radius, w: 2 * radius, h: 2 * radius };
+  return countries.some(country => someEdgeIn(country, box, ({ a, b }) => {
+    const ex = b[0] - a[0], ey = b[1] - a[1], length = Math.hypot(ex, ey), reach = radius - 4 * EPS * (1 + length);
+    if (reach <= 0) return false;
+    const t = clamp(((x - a[0]) * ex + (y - a[1]) * ey) / (length * length), 0, 1);
+    return (x - a[0] - t * ex) ** 2 + (y - a[1] - t * ey) ** 2 < reach * reach;
+  }));
+}
+
+/** Does a foreign edge run through the footprint's interior, clearly beyond EPS? */
+function foreignEdgeCrosses(countries, footprint) {
+  const box = boundsOf([footprint]);
+  return countries.some(country => someEdgeIn(country, box, edge => {
+    const interval = edgeInsideRectangle(edge, footprint);
+    return !!interval && interval[1] - interval[0] > 4 * EPS;
+  }));
+}
+
+// Every coastal footprint the layout tries for a pair is centred on its point,
+// at its angle and at least the minimum size, so it contains that pair's minimum
+// footprint shrunk by 0.1%. A foreign edge crossing this core (or passing within
+// its inscribed circle, which settles every angle at once) therefore crosses
+// all of them, and foreignLandIntersects rejects them. When every pair is
+// blocked like this, the coastal search cannot produce a label: skip it.
+function coastalBlocked(component, definition, options, previous, foreign) {
+  const setup = candidatePairs(component, definition, options, previous, true);
+  if (!setup?.pairs.length) return true;
+  const { raster, pairs, widthEm, minSize, curveRatio } = setup;
+  const size = minSize * (1 - 1e-3), [halfWidth, halfHeight] = footprintHalfSizes(widthEm, curveRatio);
+  const inner = size * Math.min(halfWidth, halfHeight), margin = inner * 1e-3 + PROBE_MARGIN;
+  const reach = size * (halfWidth + halfHeight) + raster.cell + PROBE_MARGIN, b = component.bbox;
+  const key = `${size}|${widthEm}|${curveRatio}`;
+  let near = null, point = null, aroundPoint = false;
+  for (const { candidate, angle, angleIndex } of pairs) {
+    // The verdicts depend only on this owner's geometry and the size, so pans reuse them.
+    const record = pointRecord(raster, candidate);
+    const blocked = scaleCache(record, 'blocked', key, () => []);
+    if (blocked[angleIndex] === undefined) {
+      near ||= foreign.filter(country => overlaps(country.bbox, { x: b.x - reach, y: b.y - reach, w: b.w + 2 * reach, h: b.h + 2 * reach }));
+      // An edge inside the core's inscribed circle settles every angle at once.
+      if (candidate !== point) { point = candidate; aroundPoint = foreignEdgeNear(near, candidate.x, candidate.y, inner - margin); }
+      const width = widthEm * size;
+      blocked[angleIndex] = aroundPoint || foreignEdgeCrosses(near, labelFootprint(candidate.x, candidate.y, angle, width, size, width * curveRatio));
+    }
+    if (!blocked[angleIndex]) return false;
+  }
+  return true;
+}
+
+/**
+ * A component's label candidates, best first: exactly the order of a stable sort
+ * by score, then flatter angle, then y and x. Callers only read the first few,
+ * so the order is produced lazily. Each (point, angle) pair has a proven size
+ * ceiling and so a score ceiling; a result is final once it outscores every
+ * pair not yet searched, and lower pairs are never searched at all.
+ */
+function* componentCandidates(component, definition, options, previous, coastal = false) {
+  const setup = candidatePairs(component, definition, options, previous, coastal);
+  if (!setup) return;
+  const { raster, pairs, widthEm, trackingEm, minSize, maxSize, curveRatio, scoreOf } = setup;
+  const { unitsPerPixel: k, viewBox } = options;
+
+  function search({ candidate, angle, angleIndex, limit, memo }) {
+    let lo = memo?.[angleIndex];
+    if (lo !== undefined) return lo;
+    const fits = size => {
+      // Above the proven ceiling the raster test must fail, so skip the scan.
+      if (size > limit) return false;
+      const width = widthEm * size, rise = width * curveRatio;
+      const footprint = labelFootprint(candidate.x, candidate.y, angle, width, size, rise);
+      return (coastal
+        ? coastalRasterFits(raster, component.bbox, footprint, options.coastalAllowancePx * k, options.maxSeaFraction)
+        : rasterFits(raster, candidate.x, candidate.y, angle, width, size, rise, footprint)) && inView(footprint, viewBox, 2 * k);
+    };
+    lo = null;
+    if (fits(minSize)) {
+      let hi = maxSize;
+      lo = minSize;
+      for (let n = 0; n < 9; n++) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; }
+    }
+    if (memo) memo[angleIndex] = lo;
+    return lo;
+  }
+
+  const ranked = (a, b) => b.result.score - a.result.score || Math.abs(a.result.angle) - Math.abs(b.result.angle)
+    || a.result.y - b.result.y || a.result.x - b.result.x || a.order - b.order;
+  pairs.sort((a, b) => b.bound - a.bound);
+  const ready = [];
+  let next = 0, best = null;
+  for (;;) {
+    if (next < pairs.length && (!best || pairs[next].bound >= best.result.score)) {
+      const pair = pairs[next++], fontSize = search(pair);
+      if (fontSize === null) continue;
+      const { candidate, angle } = pair, width = widthEm * fontSize, curveRise = width * curveRatio;
+      const entry = { order: pair.order, result: { id: definition.id, text: definition.text, x: candidate.x, y: candidate.y, angle, fontSize, letterSpacing: trackingEm * fontSize, width, height: FONT_HEIGHT * fontSize + Math.abs(curveRise), curveRise, coastal, seaFraction: 0, footprint: labelFootprint(candidate.x, candidate.y, angle, width, fontSize, curveRise), componentArea: raster.area, componentKey: component.key, clearance: candidate.clearance, score: scoreOf(pair, fontSize) } };
+      ready.push(entry);
+      if (!best || ranked(entry, best) < 0) best = entry;
+      continue;
+    }
+    if (!best) return;
+    const { result } = best;
+    ready.splice(ready.indexOf(best), 1);
+    best = null;
+    for (const entry of ready) if (!best || ranked(entry, best) < 0) best = entry;
+    yield result;
+  }
 }
 
 function strictComponentLabel(component, definition, options, previous, accepts) {
-  const candidates = componentCandidates(component, definition, options, previous);
-  for (const candidate of candidates.slice(0, 36)) {
+  for (const candidate of first(componentCandidates(component, definition, options, previous), 36)) {
     if (accepts(candidate.footprint, component)) return candidate;
     // Coarse raster may slightly overestimate coastline clearance. Retry safely
     // smaller text rather than rejecting a useful geographic anchor outright.
@@ -652,6 +1013,26 @@ export function createEmpireLabelEngine(countryShapes = []) {
   const previousLabels = new Map();
   let preparedKey = null, prepared = new Map(), lastLayoutKey = null, lastLayout = [];
 
+  // Every land shape the owner does not hold, in engine order. Built once per
+  // owner group rather than once per label per camera frame.
+  function foreignOf(group) {
+    if (!group.foreign) {
+      const ownedIds = new Set(group.countries.map(country => country.id));
+      group.foreign = [...countries.values()].filter(country => !ownedIds.has(country.id));
+    }
+    return group.foreign;
+  }
+
+  // Footprint validity is pure geometry, so pans at one zoom repeat the same
+  // checks for the same candidates. Remember them for a few recent scales.
+  function footprintChecks(group, scale) {
+    const results = scaleCache(group, 'checks', scale);
+    return (key, check) => {
+      if (!results.has(key)) results.set(key, check());
+      return results.get(key);
+    };
+  }
+
   function prepare(ownership = {}) {
     const byOwner = new Map();
     for (const id of [...countries.keys()]) {
@@ -707,9 +1088,10 @@ export function createEmpireLabelEngine(countryShapes = []) {
       for (const definition of definitions) {
         const group = groups.get(definition.id);
         const previous = previousLabels.get(definition.id);
-        const ownedIds = new Set(group.countries.map(country => country.id));
-        const foreignCountries = options.coastalAllowancePx > 0 ? [...countries.values()].filter(country => !ownedIds.has(country.id)) : [];
-        const strictlyFits = (footprint, component) => exactFootprint(group, footprint, component) && (!foreignCountries.length || !foreignLandIntersects(foreignCountries, footprint));
+        const foreignCountries = options.coastalAllowancePx > 0 ? foreignOf(group) : [];
+        const checks = footprintChecks(group, `${unitsPerPixel}|${foreignCountries.length > 0}|${options.coastalAllowancePx}|${options.maxSeaFraction}`);
+        const strictlyFits = (footprint, component) => checks(`land|${component.key}|${footprint.join()}`,
+          () => exactFootprint(group, footprint, component) && (!foreignCountries.length || !foreignLandIntersects(foreignCountries, footprint)));
         // Rank the useful land *on screen*, not each island's worldwide area.
         // Otherwise a sliver of Greenland at the edge of a Europe view can steal
         // Germany's name from its much more prominent continental empire.
@@ -742,16 +1124,17 @@ export function createEmpireLabelEngine(countryShapes = []) {
         // that otherwise cannot fit, never as an automatic text-size boost.
         if (options.coastalAllowancePx > 0 && options.maxSeaFraction > 0 && !chosen) {
           for (const { component, score: visibleArea } of shortlist) {
-            const candidates = componentCandidates(component, definition, options, previous, true);
+            if (coastalBlocked(component, definition, options, previous, foreignCountries)) continue;
             let componentLabel = null;
-            for (const candidate of candidates.slice(0, 24)) {
+            for (const candidate of first(componentCandidates(component, definition, options, previous, true), 24)) {
               const minimum = options.minFontPx * unitsPerPixel;
               const sizes = [...new Set([candidate.fontSize, candidate.fontSize * 0.98, candidate.fontSize * 0.95, candidate.fontSize * 0.9, minimum].map(size => Math.max(minimum, size)))];
               for (const fontSize of sizes) {
                 const shrink = fontSize / candidate.fontSize;
                 const adjusted = shrink === 1 ? candidate : { ...candidate, fontSize, width: candidate.width * shrink, height: candidate.height * shrink, letterSpacing: candidate.letterSpacing * shrink, curveRise: candidate.curveRise * shrink };
                 adjusted.footprint = labelFootprint(adjusted.x, adjusted.y, adjusted.angle, adjusted.width, adjusted.fontSize, adjusted.curveRise);
-                const valid = coastalFootprint(group, foreignCountries, adjusted.footprint, options.coastalAllowancePx * unitsPerPixel, options.maxSeaFraction);
+                const valid = checks(`coast|${adjusted.footprint.join()}`,
+                  () => coastalFootprint(group, foreignCountries, adjusted.footprint, options.coastalAllowancePx * unitsPerPixel, options.maxSeaFraction));
                 if (valid) { componentLabel = { ...adjusted, ...valid }; break; }
               }
               if (componentLabel) break;
@@ -792,9 +1175,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
       const group = prepare(ownership).get(String(ownerId));
       if (!group) return false;
       if (!(coastalAllowancePx > 0 && unitsPerPixel > 0)) return exactFootprint(group, footprint);
-      const ownedIds = new Set(group.countries.map(country => country.id));
-      const foreignCountries = [...countries.values()].filter(country => !ownedIds.has(country.id));
-      return !!coastalFootprint(group, foreignCountries, footprint, coastalAllowancePx * unitsPerPixel, clamp(maxSeaFraction, 0, 0.22));
+      return !!coastalFootprint(group, foreignOf(group), footprint, coastalAllowancePx * unitsPerPixel, clamp(maxSeaFraction, 0, 0.22));
     },
   };
 }

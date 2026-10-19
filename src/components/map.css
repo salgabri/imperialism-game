@@ -1,5 +1,7 @@
 .world-map { position: relative; flex: 1; min-width: 0; min-height: 0; isolation: isolate; overflow: hidden; background: #1d323b url('/textures/cartographic-paper.png') center / 750px; }
 .political-map { width: 100%; height: 100%; display: block; touch-action: none; }
+/* Neighbouring land around a country map: context only, quieter than any territory. */
+.map-backdrop path { fill: var(--panel); stroke: var(--line); stroke-width: .6px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .country-shapes path { transition: fill .35s ease, stroke .15s; }
 .country-shapes path[role=button]:hover { filter: brightness(1.12); stroke: #eee1bf; }
 .country-region:hover .country-flag-parts { filter: brightness(1.12); }

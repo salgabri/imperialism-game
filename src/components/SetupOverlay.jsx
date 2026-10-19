@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { NATIONS, SCOPES } from '../data/teams.js';
 import { SPORT_LIST, getSport } from '../sports/index.js';
 import { CLUB_SCOPES } from '../data/scopes.js';
+import { DOMESTIC } from '../data/domestic.js';
+import { domesticEntry, isDomesticScope } from '../data/domesticScope.js';
 import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
 import './controls.css';
@@ -22,6 +24,16 @@ export function campaignPreview(count, sport, setup) {
   return { matches: `${matches}${extra}`, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
 }
 
+const DOMESTIC_THEATRES = [...DOMESTIC].sort((a, b) => a.name.localeCompare(b.name));
+const IDLE_DOMESTIC = { state: 'idle', message: null };
+
+/** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
+export function domesticDescription(entry) {
+  const top = entry.top || [];
+  const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
+  return `${leaders} ${entry.clubs} clubs fighting over ${entry.name}, split into ${entry.clubs} sections drawn from its administrative divisions.`;
+}
+
 function SegmentedChoice({ label, options, value, onChange }) {
   return (
     <fieldset className="setup-choice">
@@ -36,7 +48,8 @@ function SegmentedChoice({ label, options, value, onChange }) {
 }
 
 /** The three campaign choices stay visible; simulation options are optional. */
-export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, onResume, onDiscard, onPick, onStart, onExport, onImport, onManageSaves, managerTeams = [] }) {
+export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, onResume, onDiscard, onPick, onStart, onExport, onImport, onManageSaves,
+  managerTeams = [], domestic = IDLE_DOMESTIC, launching = false, restoring = false, beside = false }) {
   const [confirmation, setConfirmation] = useState(null);
   const sport = getSport(setup.sport);
   const clubLayer = setup.layer === 'clubs';
@@ -51,14 +64,24 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
   // Changing sport can leave a league from the previous sport in saved setup.
   // This is the same first-scope fallback used by startCampaign.
   const activeScope = scopes.find(scope => scope.id === (clubLayer ? setup.clubScope : setup.scope)) || scopes[0];
+  // One country's own top clubs: football only, listed from the shipped index.
+  const domesticTheatres = clubLayer && sport.id === 'football';
+  const country = domesticTheatres && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
+  const countryLoading = !!country && domestic.state === 'loading', countryFailed = !!country && domestic.state === 'error';
   const pacingName = PACING_OPTIONS.find(([id]) => id === setup.pacing)?.[1] || 'One by one';
   const resolutionName = RESOLUTION_OPTIONS.find(([id]) => id === setup.resolution)?.[1] || 'Live ticker';
-  const count = clubLayer ? sport.clubs.filter(activeScope.filter).length : nationCounts[activeScope.id];
+  const count = country ? country.clubs : clubLayer ? sport.clubs.filter(activeScope.filter).length : nationCounts[activeScope.id];
   const preview = campaignPreview(count, sport, setup);
+  const scopeOptions = scopes.map(scope => (
+    <option value={scope.id} key={scope.id}>
+      {scope.name} · {clubLayer ? sport.clubs.filter(scope.filter).length : nationCounts[scope.id]} {clubLayer ? 'clubs' : 'nations'}
+    </option>
+  ));
+  const managerMissing = setup.role === 'manager' && !managerTeams.some(team => team.id === setup.managedTeamId);
 
   function launch(event) {
     event.preventDefault();
-    if (setup.role === 'manager' && !managerTeams.some(team => team.id === setup.managedTeamId)) return;
+    if (managerMissing || countryLoading || countryFailed || launching) return;
     onStart();
   }
 
@@ -70,7 +93,7 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
   }
 
   return (
-    <div className="setup-overlay">
+    <div className={`setup-overlay${beside ? ' setup-overlay--beside' : ''}`}>
       <section className="setup-panel" aria-labelledby="setup-title">
         <form className="setup-form" onSubmit={launch}>
         <div className="setup-body">
@@ -88,7 +111,7 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
           <div className="setup-save">
             <div><strong>Continue your campaign</strong><p>{savedText}</p></div>
             <div className="setup-save-actions">
-              <button type="button" className="button button-quiet" onClick={onResume}>Resume</button>
+              <button type="button" className="button button-quiet" disabled={restoring} onClick={onResume}>Resume</button>
               <button type="button" className="setup-text-button" onClick={() => setConfirmation('discard')}>Clear quick resume</button>
             </div>
           </div>
@@ -114,17 +137,27 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
           <div className="setup-theatre-preview">
           <label className="control-field" htmlFor="setup-theatre">
             <span>Theatre</span>
-            <select id="setup-theatre" value={activeScope.id} onChange={event => onPick(clubLayer ? 'clubScope' : 'scope', event.target.value)}>
-              {scopes.map(scope => (
-                <option value={scope.id} key={scope.id}>
-                  {scope.name} · {clubLayer ? sport.clubs.filter(scope.filter).length : nationCounts[scope.id]} {clubLayer ? 'clubs' : 'nations'}
-                </option>
-              ))}
+            <select id="setup-theatre" value={country ? setup.clubScope : activeScope.id} aria-describedby={country ? 'setup-theatre-description' : undefined}
+              onChange={event => onPick(clubLayer ? 'clubScope' : 'scope', event.target.value)}>
+              {domesticTheatres ? <>
+                <optgroup label="European leagues">{scopeOptions}</optgroup>
+                {DOMESTIC_THEATRES.length > 0 && <optgroup label="One country · top clubs">
+                  {DOMESTIC_THEATRES.map(entry => <option key={entry.id} value={`domestic:${entry.id}`}>{entry.name} · {entry.clubs} clubs</option>)}
+                </optgroup>}
+              </> : scopeOptions}
             </select>
           </label>
 
           <p className="setup-session-preview" role="status"><strong>{count} {clubLayer ? 'clubs' : 'nations'} · {preview.matches} matches</strong><span>{preview.duration}. Ties and manager decisions may take longer.</span></p>
           </div>
+          {country && <div className="setup-domestic">
+            <p id="setup-theatre-description" className="control-help">{domesticDescription(country)}</p>
+            {countryLoading && <p className="setup-domestic-status" role="status">Loading the map of {country.name}…</p>}
+            {countryFailed && <div className="setup-domestic-error" role="alert">
+              <p>{domestic.message || `The map of ${country.name} could not be loaded.`}</p>
+              <button type="button" className="button button-quiet" onClick={domestic.onRetry}>Retry</button>
+            </div>}
+          </div>}
 
           <details className="setup-advanced">
             <summary><Icon name="chevron" size={17} /><span>Match settings</span><small>{pacingName} · {resolutionName}</small></summary>
@@ -182,7 +215,8 @@ export default function SetupOverlay({ setup, hasSave, savedText, saveStatus, on
               </div>
             </div>
           ) : (
-            <button type="submit" className="button button-primary setup-launch" disabled={setup.role === 'manager' && !managerTeams.some(team => team.id === setup.managedTeamId)}><Icon name="play" size={17} />Launch campaign</button>
+            <button type="submit" className="button button-primary setup-launch" disabled={managerMissing || countryLoading || countryFailed || launching}
+              aria-busy={launching || undefined}><Icon name="play" size={17} />{launching ? `Preparing the map of ${country?.name || 'the country'}…` : 'Launch campaign'}</button>
           )}
           <SaveControls status={saveStatus} onExport={hasSave ? onExport : undefined} onImport={onImport} onManageSaves={onManageSaves} />
           </footer>

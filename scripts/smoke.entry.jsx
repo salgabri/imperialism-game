@@ -6,13 +6,21 @@ import { unstable_batchedUpdates } from 'react-dom';
 import App from '../src/App.jsx';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
-import { DEPENDENCIES, NATIONS, makeRng, teamEff } from '../src/data/teams.js';
-import { projPt } from '../src/engine/geo.js';
+import { DEPENDENCIES, NATIONS, buildClub, makeRng, teamEff } from '../src/data/teams.js';
+import { SAVE_KEY } from '../src/config.js';
+import { campaignStorageKey, exportCampaign, listCampaigns, writeSave } from '../src/engine/storage.js';
+import { CLUB_SCOPES } from '../src/data/scopes.js';
+import { DOMESTIC } from '../src/data/domestic.js';
+import { domesticLabel } from '../src/data/domesticScope.js';
+// Same module instance as the bundled App, so clearing it really empties the app's cache.
+import { clearDomesticCache, decodeDomestic, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
+import { getSport } from '../src/sports/index.js';
 import { createEmpireLabelEngine as createLabelValidator } from '../src/engine/empireLabels.js';
 
 const SPEED = 80;
 // The label engine marks a footprint coastal only above this clipping residue.
 const COASTAL_ZERO_TOLERANCE = 1e-8;
+const DOMESTIC_SCALE_TITLE = "Distance at the map's centre";
 const text = () => document.getElementById('root').textContent;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const countryPaths = () => [...document.querySelectorAll('[data-testid="world-map"] path[data-country]')];
@@ -20,6 +28,69 @@ const countryFlagParts = id => [...document.querySelectorAll('path[data-flag-cou
   .filter(part => id == null || part.dataset.flagCountry === id);
 const setState = (app, state) => new Promise(resolve => app.setState(state, resolve));
 const roundedGain = (after, before) => Math.round((after - before) * 10) / 10;
+const buttonNamed = label => [...document.querySelectorAll('button')].find(el => el.textContent.trim() === label);
+
+/** Poll without throwing, for states that should appear but are reported as checks. */
+async function waitFor(predicate, timeoutMs) {
+  const started = Date.now();
+  while (Date.now() - started < timeoutMs) {
+    if (predicate()) return true;
+    await sleep(10);
+  }
+  return predicate();
+}
+
+// The country a domestic scenario plays on, decoded here independently of the
+// app so every check compares the rendered map against the shipped file.
+let domesticReference = null;
+
+async function loadReference(id) {
+  if (domesticReference?.id === id) return domesticReference;
+  const response = await fetch(`/domestic/${id}.json`);
+  if (!response.ok) throw new Error(`reference map ${id}: HTTP ${response.status}`);
+  const decoded = decodeDomestic(await response.json(), id);
+  domesticReference = {
+    id, entry: DOMESTIC.find(item => item.id === id), scope: domesticScope(id), label: domesticLabel(domesticScope(id)),
+    meta: decoded.meta, sectionNames: decoded.sectionNames, sectionIds: new Set(Object.keys(decoded.sectionNames)),
+    clubs: decoded.clubs, clubBySection: Object.fromEntries(decoded.clubs.map(club => [club.homeSection, club])),
+  };
+  return domesticReference;
+}
+
+/** The reference map when the app's campaign (or setup choice) is that country. */
+function domesticOf(app) {
+  const playing = app.state.phase === 'playing' || app.state.phase === 'victory';
+  const settings = playing ? app.state.settings : app.state.setup;
+  const id = settings?.layer === 'clubs' && settings.sport === 'football' ? domesticScopeId(settings.clubScope) : null;
+  return id && domesticReference?.id === id ? domesticReference : null;
+}
+
+/** Neighbouring land: drawn beneath the sections, muted, inert and never a territory. */
+function backdropSnapshot(app) {
+  const svg = document.querySelector('[data-testid="world-map"]');
+  const group = svg?.querySelector('g.map-backdrop');
+  if (!group) return { present: false };
+  const shapes = svg.querySelector('g.country-shapes');
+  const paths = [...group.querySelectorAll('path')];
+  const ownerColours = new Set(Object.values(app.state.teams).map(team => team.col));
+  const noPointer = el => el.getAttribute('pointer-events') === 'none' || el.style?.pointerEvents === 'none';
+  const fillOf = el => el.getAttribute('fill') || el.style?.fill || '';
+  return {
+    present: true,
+    paths: paths.length,
+    drawn: paths.length > 0 && paths.every(path => (path.getAttribute('d') || '').length > 2),
+    ariaHidden: group.getAttribute('aria-hidden') === 'true',
+    beneath: !!shapes && !group.contains(shapes) && !shapes.contains(group)
+      && !!(group.compareDocumentPosition(shapes) & Node.DOCUMENT_POSITION_FOLLOWING),
+    inert: (noPointer(group) || paths.every(noPointer)) && !group.querySelector('a, button, [tabindex], [role]')
+      && !['tabindex', 'role'].some(name => group.hasAttribute(name)),
+    notTerritory: paths.every(path => !path.hasAttribute('data-country') && !path.hasAttribute('data-owner') && !path.closest('g.country-shapes')),
+    muted: paths.every(path => {
+      const fill = fillOf(path) || fillOf(group);
+      return !!fill && !/^(none|transparent|url\()/i.test(fill) && !ownerColours.has(fill);
+    }),
+  };
+}
 
 function flagPattern(path) {
   const id = path.getAttribute('fill').match(/^url\(#(fi-flag-[^)]+)\)$/)?.[1];
@@ -68,6 +139,17 @@ function flagAssetsMatch(pattern, code) {
 function expectedFlagsShown(app) {
   const playing = app.state.phase === 'playing' || app.state.phase === 'victory';
   const paths = countryPaths();
+  const domestic = domesticOf(app);
+  if (domestic) {
+    // A country map is exactly its sections, painted in club colours: no flags.
+    const ids = paths.map(path => path.dataset.country);
+    if (app.state.mapMode !== 'flags' || ids.length !== domestic.sectionIds.size || !ids.every(id => domestic.sectionIds.has(id))
+      || countryFlagParts().length || document.querySelector('pattern[id^="fi-flag-"]')) return false;
+    return !playing || paths.every(path => {
+      const owner = app.state.teams[app.state.own[path.dataset.country]];
+      return owner?.kind === 'club' && path.getAttribute('fill') === owner.col && !flagPattern(path);
+    });
+  }
   const nationPaths = paths.filter(path => NATIONS[path.dataset.country]);
   if (app.state.mapMode !== 'flags' || nationPaths.length !== Object.keys(NATIONS).length) return false;
   return paths.every(path => {
@@ -167,7 +249,7 @@ function empireFlagsSnapshot(app) {
 
 /** Locate a real island in rendered geometry, not through component internals. */
 function flagPartAtCountryLocation(app, countryId, longitude, latitude) {
-  const [px, py] = projPt(longitude, latitude);
+  const [px, py] = app.geo.project(longitude, latitude);
   const { s, tx, ty } = app.geo.fit;
   const x = px * s + tx, y = py * s + ty;
   return countryFlagParts(countryId).find(part => {
@@ -242,6 +324,18 @@ export async function runSwissFlagRegionCheck() {
 function regionalFlagsSnapshot(app) {
   const paths = countryPaths();
   const neutral = paths.filter(path => !app.state.own[path.dataset.country]);
+  const domestic = domesticOf(app);
+  if (domestic) return {
+    domestic: true,
+    correct: expectedFlagsShown(app),
+    sections: paths.filter(path => domestic.sectionIds.has(path.dataset.country)).length,
+    expectedSections: domestic.sectionIds.size,
+    neutralCount: neutral.length,
+    flagParts: countryFlagParts().length,
+    flagPatterns: document.querySelectorAll('pattern[id^="fi-flag-"]').length,
+    empireFlags: empireFlagsSnapshot(app),
+    backdrop: backdropSnapshot(app),
+  };
   const conquered = paths.filter(path => {
     const id = path.dataset.country;
     const owner = app.state.teams[app.state.own[id]];
@@ -532,6 +626,7 @@ export async function runEmpireLabelCheck(scenario) {
       restoreRules: resumedRules.ownership === rulesAfterConquest.ownership && resumedRules.squads === rulesAfterConquest.squads
         && resumedRules.standings === rulesAfterConquest.standings && resumedRules.strengthGains === rulesAfterConquest.strengthGains,
       neutralTerritories: countryPaths().filter(path => !path.dataset.owner).length,
+      domestic: !!domesticOf(resumed.app),
       usesClubCodes: scenario.layer !== 'clubs' || restored.ids.every(id => resumed.app.state.teams[id].kind === 'club'
         && document.querySelector(`text[data-empire-label="${id}"]`).textContent === resumed.app.state.teams[id].code.toUpperCase()),
     };
@@ -577,14 +672,117 @@ async function select(id, value) {
   if (el.value !== value) throw new Error(`select rejected ${value}: ${id}`);
 }
 
-async function launch(mounted, { sport = 'football', layer = 'nations', scope = 'world', clubScope = 'all', pacing = 'blitz', resolution = 'instant', seed = 20260910 }) {
+/** Theatre choices as rendered, grouped as the setup screen groups them. */
+function theatreSnapshot(sport) {
+  const theatre = document.getElementById('setup-theatre');
+  const option = node => ({ value: node.value, text: node.textContent.trim() });
+  return {
+    groups: [...theatre.querySelectorAll('optgroup')].map(group => ({ label: group.getAttribute('label'),
+      options: [...group.querySelectorAll('option')].map(option) })),
+    options: [...theatre.querySelectorAll('option')].map(option),
+    clubScopes: CLUB_SCOPES(getSport(sport)).map(scope => scope.id),
+  };
+}
+
+/**
+ * Choose a country through the real Theatre select and wait for its map. The
+ * static server delays the file so the loading state is observable; with
+ * `setupChecks` the first request also fails, to exercise the error and Retry.
+ */
+async function chooseDomestic(app, id, { setupChecks = false } = {}) {
+  const entry = DOMESTIC.find(item => item.id === id);
+  if (!entry) throw new Error(`no shipped domestic map for ${id}`);
+  const file = `domestic/${id}.json`, plan = globalThis.__smokeFetch;
+  const sectionPattern = new RegExp(`^${id}-\\d{3}$`);
+  const launchButton = () => buttonNamed('Launch campaign');
+  const loading = () => text().includes(`Loading the map of ${entry.name}`) && !!launchButton()?.disabled;
+  const ready = () => {
+    const ids = countryPaths().map(path => path.dataset.country);
+    return !!launchButton() && !launchButton().disabled && ids.length === entry.clubs && ids.every(cid => sectionPattern.test(cid));
+  };
+  const result = { lazy: !plan.requests.includes(file) };
+  plan.delays[file] = 150;
+  if (setupChecks) plan.failures.add(file);
+  await select('setup-theatre', domesticScope(id));
+  result.sawLoading = await waitFor(loading, 3000);
+  if (setupChecks) {
+    result.errorShown = await waitFor(() => !!buttonNamed('Retry') && !!launchButton()?.disabled
+      && /could not|fail|error|unable/i.test(text()), 5000);
+    buttonNamed('Retry')?.click();
+    result.retryLoaded = await waitFor(ready, 30000);
+  }
+  await until(`the map of ${entry.name} on the setup screen`, ready, 30000);
+  delete plan.delays[file];
+  const reference = await loadReference(id);
+  const shown = countryPaths().map(path => path.dataset.country);
+  result.sectionsShown = shown.length === reference.sectionIds.size && shown.every(cid => reference.sectionIds.has(cid));
+  result.setupColours = countryPaths().every(path => path.getAttribute('fill') === reference.clubBySection[path.dataset.country]?.col);
+  result.previewCount = !!document.querySelector('.setup-session-preview')?.textContent.includes(`${entry.clubs} clubs`);
+  const page = text();
+  result.description = entry.top.every(name => page.includes(name)) && page.includes(entry.name) && page.includes(`${entry.clubs} sections`);
+  result.backdrop = backdropSnapshot(app);
+  if (setupChecks) {
+    // As the managed club's country: a session preset keeps both the country and the club.
+    button('Manager').click();
+    await sleep(30);
+    const club = reference.clubs[1].id;
+    await select('setup-managed-team', club);
+    button('Standard').click();
+    await sleep(30);
+    result.presetKeepsCountry = app.state.setup.clubScope === domesticScope(id)
+      && document.getElementById('setup-theatre').value === domesticScope(id);
+    result.presetKeepsClub = app.state.setup.managedTeamId === club && document.getElementById('setup-managed-team').value === club
+      && !buttonNamed('Launch campaign')?.disabled;
+    button('Spectator').click();
+    await sleep(30);
+    button('Basketball').click();
+    await waitFor(() => app.state.setup.clubScope === 'all', 2000);
+    result.basketballResets = app.state.setup.clubScope === 'all'
+      && !theatreSnapshot('basketball').options.some(item => item.value.startsWith('domestic:'));
+    button('Football').click();
+    await sleep(20);
+    await select('setup-theatre', domesticScope(id));
+    await until(`the map of ${entry.name} after switching sport back`, ready, 30000);
+  }
+  return result;
+}
+
+/** The started country campaign, read from rendered output and the rule view. */
+function domesticCampaignSnapshot(app, reference) {
+  const { settings, own, teams, aliveIds } = app.state;
+  const routing = Object.keys(app.board().routingPaths || {});
+  const homes = app.mapHomes(true);
+  const circles = [...document.querySelectorAll('[data-testid="world-map"] circle')];
+  const scale = document.querySelector('.map-distance');
+  return {
+    scope: settings.layer === 'clubs' && settings.clubScope === reference.scope,
+    version: settings.domesticVersion === reference.meta.version,
+    fielded: aliveIds.length === reference.entry.clubs,
+    everySectionHeld: Object.keys(own).length === reference.sectionIds.size && [...reference.sectionIds].every(id => aliveIds.includes(own[id])),
+    homeSections: reference.clubs.every(club => own[club.homeSection] === club.id && teams[club.id]?.home === club.homeSection),
+    routingIsSections: routing.length === reference.sectionIds.size && routing.every(id => reference.sectionIds.has(id)),
+    // Neighbouring land blocks routes but is never a section; the same array every time keeps the route index cached.
+    obstacles: app.board().borderRoutes === true && app.board().obstacles?.length > 0
+      && app.board().obstacles.every(shape => !reference.sectionIds.has(shape.id)) && app.board().obstacles === app.board().obstacles,
+    theatreLabel: document.querySelector('.command-theatre')?.textContent.trim() === reference.label,
+    mapTitle: !!document.querySelector('.map-heading h1')?.textContent.includes(reference.entry.name),
+    scaleTitle: (scale?.getAttribute('title') || '').replace(/[’‘]/g, "'") === DOMESTIC_SCALE_TITLE,
+    homesShown: homes.length === aliveIds.length && homes.every(home => circles.some(circle =>
+      Number(circle.getAttribute('cx')) === home.x && Number(circle.getAttribute('cy')) === home.y)),
+  };
+}
+
+async function launch(mounted, { sport = 'football', layer = 'nations', scope = 'world', clubScope = 'all', pacing = 'blitz', resolution = 'instant', seed = 20260910, setupChecks = false }) {
   await until('map + setup screen', () => text().includes('Launch campaign'));
   const setupFlags = expectedFlagsShown(mounted.app);
   button(sport === 'basketball' ? 'Basketball' : 'Football').click();
   await sleep(20);
   button(layer === 'clubs' ? 'Clubs' : 'Nations').click();
   await sleep(20);
-  await select('setup-theatre', layer === 'clubs' ? clubScope : scope);
+  const theatre = theatreSnapshot(sport);
+  const domesticId = layer === 'clubs' ? domesticScopeId(clubScope) : null;
+  const domesticSetup = domesticId ? await chooseDomestic(mounted.app, domesticId, { setupChecks }) : null;
+  if (!domesticId) await select('setup-theatre', layer === 'clubs' ? clubScope : scope);
   document.querySelector('.setup-advanced').open = true;
   await select('setup-pacing', pacing);
   await select('setup-resolution', resolution);
@@ -601,7 +799,78 @@ async function launch(mounted, { sport = 'football', layer = 'nations', scope = 
   await until('campaign running', () => mounted.app.state.phase === 'playing');
   mounted.app.rng = makeRng(seed);
   await setState(mounted.app, { speed: SPEED });
-  return { setupFlags, kickoffFlags: expectedFlagsShown(mounted.app), kickoffFlagScope: regionalFlagsSnapshot(mounted.app) };
+  const reference = domesticOf(mounted.app);
+  return { setupFlags, theatre, domesticSetup, kickoffFlags: expectedFlagsShown(mounted.app), kickoffFlagScope: regionalFlagsSnapshot(mounted.app),
+    domesticKickoff: reference ? domesticCampaignSnapshot(mounted.app, reference) : null };
+}
+
+/** Hovering a section names it and its holder; the backdrop ignores the pointer. */
+async function domesticPointerSnapshot(app, reference) {
+  const path = countryPaths().find(candidate => candidate.dataset.owner);
+  const id = path.dataset.country;
+  path.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+  await until('section hover committed', () => app.state.hoverCid === id);
+  await sleep(20);
+  const tip = document.querySelector('.map-tooltip');
+  const lower = value => String(value || '').toLocaleLowerCase();
+  const tooltip = tip?.style.display !== 'none' && lower(tip?.querySelector('strong')?.textContent) === lower(reference.sectionNames[id])
+    && lower(tip.textContent).includes(lower(app.state.teams[app.state.own[id]].name));
+  const backdropPath = document.querySelector('g.map-backdrop path');
+  const before = { selected: app.state.selected, hoverCid: app.state.hoverCid, own: JSON.stringify(app.state.own) };
+  backdropPath?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+  backdropPath?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  await sleep(30);
+  const backdropIgnored = !!backdropPath && app.state.selected === before.selected && app.state.hoverCid === before.hoverCid
+    && JSON.stringify(app.state.own) === before.own;
+  return { tooltip, tooltipText: tip?.textContent, section: reference.sectionNames[id], backdropIgnored };
+}
+
+const saveStatusText = () => document.querySelector('.save-status')?.textContent || '';
+
+/**
+ * Country saves restore only onto their map. On the setup screen, before the real
+ * resume: a save naming a section the map lacks is refused in place, and a map
+ * that cannot load blocks the resume with a message rather than a broken campaign.
+ */
+async function refusedCountryRestores(app, reference) {
+  const saved = app.saved, name = reference.entry.name;
+  const file = `domestic/${reference.id}.json`, plan = globalThis.__smokeFetch;
+  const broken = JSON.parse(JSON.stringify(saved));
+  const moved = Object.keys(broken.own)[0];
+  broken.own[`${reference.id}-999`] = broken.own[moved];
+  delete broken.own[moved];
+  app.continueSaved(broken);
+  const mismatchRefused = await waitFor(() => saveStatusText().includes(`no longer matches the map of ${name}`), 3000)
+    && app.state.phase === 'setup' && app.saved === saved;
+  clearDomesticCache(reference.id);
+  plan.failures.add(file);
+  button('Resume', document.querySelector('.setup-save')).click();
+  const loadFailureRefused = await waitFor(() => saveStatusText().includes(`map of ${name} could not be loaded, so the campaign cannot resume`), 5000)
+    && app.state.phase === 'setup' && app.saved === saved;
+  plan.failures.delete(file);
+  return { mismatchRefused, loadFailureRefused };
+}
+
+/**
+ * A save from an earlier build of the same map resumes (as a copy, so it cannot
+ * clash with the live slot), is re-stamped with the loaded version, says so, and
+ * never replays its stale draw.
+ */
+async function restoreOnUpdatedMap(app, reference, saved) {
+  const [attackerId, targetId] = saved.aliveIds;
+  const stale = { ...saved, settings: { ...saved.settings, domesticVersion: `${reference.id}-00000000` },
+    match: null, spin: { attackerId, targetId, key: 1, stage: 'locked', x: 0, y: 0, targetX: 1, targetY: 1 } };
+  app.continueSaved(stale, true, 'Older map copy');
+  await until('campaign restored on the updated map', () => app.state.phase === 'playing' && app.state.campaignId !== saved.campaignId
+    && app.state.settings.domesticVersion === reference.meta.version, 10000);
+  await sleep(50);
+  return {
+    restamped: app.state.settings.domesticVersion === reference.meta.version && app.saved?.settings.domesticVersion === reference.meta.version,
+    // The campaign's save status sits in the closed settings menu, so read the state it shows.
+    told: !!app.state.saveStatus?.message?.includes(`updated map of ${reference.entry.name}. The interrupted draw starts again.`),
+    staleDrawDropped: app.state.spin === null && app.state.match === null && app.state.matches === saved.matches,
+    status: app.state.saveStatus?.message,
+  };
 }
 
 /** Adjacent conquests merge flags; overseas conquests cannot distort them. */
@@ -914,6 +1183,109 @@ export async function runDuelFrameRace() {
   }
 }
 
+/** An England checkpoint as an earlier visit would have left it in storage. */
+async function storeEnglandCampaign(campaignId) {
+  const reference = await loadReference('826'), sport = getSport('football');
+  const teams = {}, own = {};
+  for (const club of reference.clubs) {
+    const team = buildClub(club, sport);
+    teams[team.id] = team;
+    own[team.home] = team.id;
+  }
+  const settings = { sport: 'football', layer: 'clubs', scope: 'UEFA', clubScope: reference.scope, domesticVersion: reference.meta.version,
+    pacing: 'duel', resolution: 'instant', preset: 'custom', role: 'spectator', managedTeamId: '' };
+  const campaign = { phase: 'playing', settings, initialSettings: settings, teams, own, aliveIds: Object.keys(teams), stats: {}, fallen: [],
+    round: 0, matches: 0, queue: [], log: [], history: [], seed: 5, rngState: 5, campaignId, revision: 0,
+    campaignName: `Football · ${reference.label}` };
+  const saved = writeSave(campaign);
+  if (!saved.ok) throw new Error(`could not store the England campaign: ${saved.message}`);
+  return { reference, campaign: { ...campaign, revision: saved.revision } };
+}
+
+const dialogText = () => document.querySelector('[aria-labelledby="campaign-storage-title"]')?.textContent || '';
+
+/**
+ * A country restore waits for its map. Clear quick resume, Close, Escape and
+ * Cancel import must each stop it, and the dialog says it is loading meanwhile.
+ * A saved campaign can be deleted from Saved campaigns.
+ */
+export async function runRestoreRaceCheck() {
+  const plan = globalThis.__smokeFetch, file = 'domestic/826.json';
+  const { reference, campaign: england } = await storeEnglandCampaign('smoke-england');
+  const mounted = mount();
+  const app = () => mounted.app;
+  const slow = () => { clearDomesticCache('826'); plan.delays[file] = 400; };
+  const result = {};
+  try {
+    await until('setup with a saved England campaign', () => text().includes('Launch campaign') && app().state.hasSave);
+    // Resume, then Clear quick resume while the map loads.
+    slow();
+    button('Resume', document.querySelector('.setup-save')).click();
+    result.setupLoading = await waitFor(() => saveStatusText().includes('Loading the map of England'), 2000)
+      && !!buttonNamed('Resume')?.disabled;
+    button('Clear quick resume').click();
+    await until('discard confirmation', () => !!document.querySelector('.setup-confirmation'));
+    button('Clear quick resume', document.querySelector('.setup-confirmation')).click();
+    await sleep(900);
+    result.discardStops = app().state.phase === 'setup' && !app().state.hasSave && localStorage.getItem(SAVE_KEY) === null
+      && !saveStatusText().includes('Loading the map');
+
+    // A world campaign is playing; importing England is cancelled while its map loads.
+    button('Launch campaign').click();
+    await until('world campaign running', () => app().state.phase === 'playing');
+    const world = { id: app().state.campaignId, name: app().state.campaignName };
+    const slots = listCampaigns().length;
+    await app().importProgress(new File([exportCampaign(england)], 'england.json', { type: 'application/json' }));
+    await until('import preview', () => dialogText().includes('Preview imported campaign'));
+    slow();
+    button('Import as new campaign').click();
+    result.dialogLoading = await waitFor(() => dialogText().includes('Loading the map of England')
+      && !!buttonNamed('Loading the map…')?.disabled, 2000);
+    button('Cancel import').click();
+    await sleep(900);
+    const unchanged = () => app().state.campaignId === world.id && app().state.campaignName === world.name
+      && app().state.settings.layer === 'nations' && !app().state.storageDialog && !app().state.restoring;
+    result.cancelImportStops = unchanged() && listCampaigns().length === slots;
+
+    // Resume the England slot from Saved campaigns, then Escape.
+    app().openStorageDialog('slots');
+    await until('saved campaigns', () => dialogText().includes('Saved campaigns'));
+    slow();
+    button(`Resume ${england.campaignName}`).click();
+    result.slotLoading = await waitFor(() => dialogText().includes('Loading the map of England'), 2000)
+      && !!buttonNamed(`Resume ${england.campaignName}`)?.disabled;
+    document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    await sleep(900);
+    result.escapeStops = unchanged();
+    delete plan.delays[file];
+
+    // Delete: the campaign in play offers none; another asks first, then goes.
+    app().openStorageDialog('slots');
+    await until('saved campaigns again', () => dialogText().includes('Saved campaigns'));
+    result.liveNotDeletable = !buttonNamed(`Delete ${world.name}`) && dialogText().includes('This campaign is open');
+    button(`Delete ${england.campaignName}`).click();
+    await until('delete confirmation', () => !!buttonNamed('Delete permanently'));
+    const asked =dialogText().includes(`Delete ${england.campaignName}? `) && listCampaigns().some(item => item.id === england.campaignId);
+    button('Delete permanently').click();
+    await sleep(50);
+    result.deleted = asked && !listCampaigns().some(item => item.id === england.campaignId)
+      && localStorage.getItem(campaignStorageKey(england.campaignId)) === null && dialogText().includes('Campaign deleted');
+    document.querySelector('button[aria-label="Close saved campaigns"]').click();
+    await sleep(30);
+    result.stillPlaying = app().state.phase === 'playing' && app().state.campaignId === world.id;
+
+    // The atlas gives Australia and the Ashmore islets one id: Indonesia's backdrop draws Australia once, whole.
+    const indonesia = decodeDomestic(await (await fetch('/domestic/360.json')).json(), '360');
+    const shapes = app().surroundings(indonesia).shapes, australia = shapes.filter(shape => shape.id === '036');
+    result.backdropIds = new Set(shapes.map(shape => shape.id)).size === shapes.length
+      && australia.length === 1 && australia[0].rings.length > 1 && australia[0].d.length > 2000;
+    return result;
+  } finally {
+    delete plan.delays[file];
+    mounted.unmount();
+  }
+}
+
 /** An unfinished campaign reloaded through the saved-campaign controls. */
 export async function runResumeCheck(scenario = {}) {
   const first = mount();
@@ -953,8 +1325,35 @@ export async function runResumeCheck(scenario = {}) {
     await until('setup screen again', () => text().includes('Launch campaign'));
     const savedStrip = document.querySelector('.setup-save');
     const offeredResume = !!second.app.state.hasSave && !!savedStrip && savedStrip.textContent.includes('Continue your campaign');
-    button('Resume', savedStrip).click();
+    let domesticSaved = null;
+    const reference = domesticReference?.scope === scenario.clubScope ? domesticReference : null;
+    if (reference) {
+      // The quick-resume strip and the saved-campaign list both name the country.
+      const savedText = savedStrip?.textContent || '';
+      button('Saved campaigns').click();
+      await until('saved campaigns dialog', () => !!document.querySelector('[aria-labelledby="campaign-storage-title"]'));
+      const listed = [...document.querySelectorAll('.campaign-storage-preview')].map(preview => preview.textContent);
+      document.querySelector('button[aria-label="Close saved campaigns"]').click();
+      await until('saved campaigns dialog closed', () => !document.querySelector('[aria-labelledby="campaign-storage-title"]'));
+      domesticSaved = { stripNamesCountry: savedText.includes(reference.label), dialogNamesCountry: listed.some(item => item.includes(reference.label)) };
+    }
+    let domesticRestore = null, savedBefore = null;
+    const mapFile = reference && `domestic/${reference.id}.json`, plan = globalThis.__smokeFetch;
+    if (reference) {
+      savedBefore = JSON.parse(JSON.stringify(second.app.saved));
+      domesticRestore = await refusedCountryRestores(second.app, reference);
+      // A cold cache: the resume itself must fetch the map and say it is waiting.
+      clearDomesticCache(reference.id);
+      plan.delays[mapFile] = 150;
+      domesticRestore.fetchesBefore = plan.requests.filter(request => request === mapFile).length;
+    }
+    button('Resume', document.querySelector('.setup-save')).click();
+    if (reference) domesticRestore.coldLoading = await waitFor(() => saveStatusText().includes(`Loading the map of ${reference.entry.name}`), 3000);
     await until('resumed', () => second.app.state.phase === 'playing');
+    if (reference) {
+      delete plan.delays[mapFile];
+      domesticRestore.coldFetched = plan.requests.filter(request => request === mapFile).length > domesticRestore.fetchesBefore;
+    }
     const after = ownershipSnapshot(second.app);
     const standingsAfter = standingsSnapshot(second.app);
     const labelsAfter = empireLabelsSnapshot(second.app);
@@ -962,17 +1361,37 @@ export async function runResumeCheck(scenario = {}) {
     const restoredMap = countryPaths().filter(path => path.dataset.owner).every(path => path.dataset.owner === second.app.state.own[path.dataset.country]);
     const restoredFlags = expectedFlagsShown(second.app);
     const flagScopeAfter = regionalFlagsSnapshot(second.app);
+    const domesticResumed = reference ? domesticCampaignSnapshot(second.app, reference) : null;
 
     second.app.rng = makeRng((scenario.seed || 20260910) + 1);
     await setState(second.app, { speed: SPEED });
     button(second.app.state.match && !second.app.state.match.applied ? 'Finish match' : 'Next match').click();
     await until('resumed campaign finishes another match', () => second.app.state.matches > after.matches, 60000);
+    const flagScopeAfterMatch = regionalFlagsSnapshot(second.app);
+    const standingsAfterMatch = standingsSnapshot(second.app);
+    const labelsAfterMatch = empireLabelsSnapshot(second.app);
+    let finished = null;
+    if (scenario.finish) {
+      // Play the reloaded campaign out: the restored map must carry it to a champion.
+      button('Play campaign').click();
+      await until('resumed campaign reaches a champion', () => second.app.state.phase === 'victory', Math.max(120000, fielded * 3000));
+      const state = second.app.state, championId = state.aliveIds[0];
+      finished = {
+        alive: state.aliveIds.length, matches: state.matches, fallen: state.fallen.length,
+        championHoldsAll: Object.keys(state.own).length === Object.keys(JSON.parse(before.ownership)).length
+          && Object.values(state.own).every(owner => owner === championId),
+        mapShowsChampion: countryPaths().every(path => path.dataset.owner === championId),
+      };
+    }
+    const playableAfterResume = second.app.state.matches > after.matches;
+    // Last, as it replaces the campaign on screen with an older copy.
+    if (reference) domesticRestore.updatedMap = await restoreOnUpdatedMap(second.app, reference, savedBefore);
     return {
-      fielded, offeredResume, before, after, restoredMap, restoredFlags,
-      kickoffFlagScope, flagScopeBefore, flagScopeAfter, flagScopeAfterMatch: regionalFlagsSnapshot(second.app),
-      standingsBefore, standingsAfter, standingsAfterMatch: standingsSnapshot(second.app),
-      labelsBefore, labelsAfter, labelsAfterMatch: empireLabelsSnapshot(second.app),
-      playableAfterResume: second.app.state.matches > after.matches,
+      fielded, offeredResume, before, after, restoredMap, restoredFlags, domesticSaved, domesticResumed, domesticRestore, finished,
+      kickoffFlagScope, flagScopeBefore, flagScopeAfter, flagScopeAfterMatch,
+      standingsBefore, standingsAfter, standingsAfterMatch,
+      labelsBefore, labelsAfter, labelsAfterMatch,
+      playableAfterResume,
       greenlandStartsDanish: greenlandAtKickoff === '208',
       greenlandAlwaysHeld: !!greenlandAtKickoff,
       viewBoxAtRest, viewBoxZoomed, viewBoxClamped,
@@ -989,8 +1408,11 @@ export async function run(scenario) {
   const mounted = mount();
   let sampler;
   try {
-    const { setupFlags, kickoffFlags, kickoffFlagScope } = await launch(mounted, scenario);
+    const { setupFlags, kickoffFlags, kickoffFlagScope, theatre, domesticSetup, domesticKickoff } = await launch(mounted, scenario);
     const app = mounted.app;
+    const reference = domesticOf(app);
+    const initialSquads = Object.fromEntries(Object.entries(app.state.teams).map(([id, team]) => [id, team.squad.length]));
+    const domesticPointer = reference ? await domesticPointerSnapshot(app, reference) : null;
     // At normal speed there is an 80ms opening callback: pausing before it
     // fires must cancel its effect, including a duel's otherwise visible spin.
     await setState(app, { speed: 1 });
@@ -1065,13 +1487,20 @@ export async function run(scenario) {
     button('Political').click();
     await until('political campaign restored', () => app.state.mapMode === 'political');
     button('Play campaign').click();
-    await until('a champion', () => app.state.phase === 'victory', 120000);
+    await until('a champion', () => app.state.phase === 'victory', Math.max(120000, fielded * 3000));
     clearInterval(sampler);
     const champion = app.state.teams[app.state.aliveIds[0]];
     const owned = Object.values(app.state.own).filter(owner => owner === champion.id).length;
     const victoryDialog = document.querySelector('[role="dialog"][aria-labelledby="victory-title"]');
     const victoryScreen = !!victoryDialog && victoryDialog.textContent.includes('Campaign complete')
       && document.getElementById('victory-title').textContent === champion.name.toUpperCase();
+    const domestic = reference && {
+      id: reference.id, name: reference.entry.name, sections: reference.sectionIds.size, label: reference.label,
+      victoryNamesCountry: victoryDialog.textContent.includes(reference.entry.name),
+      // Conquest summaries name sections, never raw ids.
+      resultsNameSections: app.state.history.length === app.state.matches && app.state.history.every(entry =>
+        (entry.result?.territoryIds || []).length > 0 && entry.result.territoryIds.every((id, i) => entry.result.territoryNames[i] === reference.sectionNames[id])),
+    };
     await setState(app, { mapMode: 'flags' });
     const victoryFlagScope = regionalFlagsSnapshot(app);
     button('View map', victoryDialog).click();
@@ -1119,6 +1548,7 @@ export async function run(scenario) {
 
     return {
       nations, fielded, layer, rapidPauseHeld, setupFlags, kickoffFlags, politicalAtStart, politicalConquest, structuredConsequences, finalFlags,
+      theatre, domesticSetup, domesticKickoff, domesticPointer, domestic, championInitialSquad: initialSquads[champion.id],
       kickoffFlagScope, firstConquestFlagScope, victoryFlagScope, finalFlagScope,
       standingsAtKickoff, standingsStayedSorted, standingsRanksStayedSequential, standingsGainsStayedCorrect, standingsSamples,
       labelsAtKickoff, labelsStayedValid, labelFailures, labelsAtFinish: empireLabelsSnapshot(app),

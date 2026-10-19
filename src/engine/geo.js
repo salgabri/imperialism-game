@@ -1,11 +1,14 @@
 // World geometry: TopoJSON decoding, land adjacency, flat cylindrical projection,
-// and the SVG path/graticule/scale-bar bundle the map renders from.
+// and the SVG path/graticule/scale-bar bundle the map renders from. The same class
+// draws one country's club sections with its own central meridian and parallel.
 
 const VIEW_W = 960;
 const VIEW_H = 540;
 const PAD = 16;
 export const EARTH_RADIUS_KM = 6371.0088;
 export const PROJECTION_X_SCALE = Math.cos(Math.PI / 6);
+export const DEFAULT_PROJECTION = Object.freeze({ lon0: 0, lat0: 30 });
+const GRATICULE_STEPS = [0.5, 1, 2, 5, 10, 20];
 
 // Natural Earth ships three unclaimed shapes with id "-99". They arrive in a stable
 // order, so name them rather than letting them collide on one key.
@@ -15,6 +18,7 @@ const UNCLAIMED_IDS = ['XCYN', 'KOS', 'XSOL'];
 // A fixed horizontal scale keeps both meridians and parallels straight, without
 // globe-like tapering or infinite poles. All rendered and rule geometry shares
 // this plane; the 30° parallel balances the world's width against its height.
+// This is the world chart; WorldGeometry#project serves any chart.
 export function projPt(lon, lat) {
   return [(lon * Math.PI / 180) * PROJECTION_X_SCALE, -lat * Math.PI / 180];
 }
@@ -34,37 +38,104 @@ export function closestPair(aPts, bPts) {
   return best;
 }
 
+function wrapLongitude(lon) {
+  return lon < -180 || lon > 180 ? ((lon + 180) % 360 + 360) % 360 - 180 : lon;
+}
+
 export class WorldGeometry {
-  constructor(topo, capitals = {}) {
-    const { countries, adjacency } = decodeTopo(topo);
+  /**
+   * `anchors` maps a shape id to a [lon, lat] marker point (a capital, a club's
+   * home town). `options.object` names the topology object (else its first
+   * GeometryCollection); `options.projection = { lon0, lat0 }` sets the central
+   * meridian and standard parallel. The defaults are the historical world chart.
+   */
+  constructor(topo, anchors = {}, options = {}) {
+    const { lon0 = DEFAULT_PROJECTION.lon0, lat0 = DEFAULT_PROJECTION.lat0 } = options.projection || {};
+    if (!Number.isFinite(lon0) || !Number.isFinite(lat0) || Math.abs(lat0) > 85) {
+      throw new Error(`Invalid map projection ${JSON.stringify(options.projection)}`);
+    }
+    this.projection = { lon0, lat0 };
+    // The default world chart keeps every historical formula bit for bit: saved
+    // campaigns, club seeding and pinned tests depend on its exact output.
+    this.legacy = lon0 === DEFAULT_PROJECTION.lon0 && lat0 === DEFAULT_PROJECTION.lat0;
+    this.xScale = lat0 === DEFAULT_PROJECTION.lat0 ? PROJECTION_X_SCALE : Math.cos(lat0 * Math.PI / 180);
+
+    const { countries, adjacency } = decodeTopo(topo, options.object || 'countries');
     this.countries = countries;
     /** country id -> Set of ids sharing a land border */
     this.adj = adjacency;
 
-    this.capitals = {};
-    for (const c of this.countries) {
-      const pt = capitals[c.id];
-      if (pt) {
-        const anchored = anchorInside(pt, c.polys);
-        if (anchored) this.capitals[c.id] = anchored;
-      }
-    }
-
     // Lon/lat -> plane is fixed; only the fit transform changes between theatres,
     // so project every ring once and reuse it for each fitTo(). Keep this original
     // cache for fit/rule compatibility; repaired display geometry is separate.
+    // A custom central meridian rotates longitudes first, so the seam split
+    // happens opposite the country instead of through it.
     this.projected = {};
     this.displayProjected = {};
+    const plane = this.legacy ? projPt : (lon, lat) => [(lon * Math.PI / 180) * this.xScale, -lat * Math.PI / 180];
+    const rotate = this.legacy ? ring => ring : ring => ring.map(([lon, lat]) => [wrapLongitude(lon - lon0), lat]);
     for (const c of this.countries) {
-      this.projected[c.id] = c.polys.map(poly => poly.map(ring => ring.map(pt => projPt(pt[0], pt[1]))));
+      this.projected[c.id] = c.polys.map(poly => poly.map(ring => rotate(ring).map(pt => plane(pt[0], pt[1]))));
       this.displayProjected[c.id] = c.polys.map(poly => poly.map(ring =>
-        splitAtAntimeridian(ring).map(part => part.map(pt => projPt(pt[0], pt[1])))));
+        splitAtAntimeridian(rotate(ring)).map(part => part.map(pt => plane(pt[0], pt[1])))));
+    }
+
+    // Plane-space point-on-surface and area per shape (custom projections only).
+    this.surface = {};
+    this.capitals = {};
+    for (const c of this.countries) {
+      const pt = anchors[c.id];
+      if (pt) {
+        const anchored = this.legacy ? anchorInside(pt, c.polys) : this.anchorInPlane(c.id, pt);
+        if (anchored) this.capitals[c.id] = anchored;
+      }
     }
 
     this.fit = null;
     this.paths = {};
     this.graticule = { d: '', labels: [] };
     this.kmPerUnit = 0;
+  }
+
+  /** Lon/lat -> unfitted projection plane (identical to projPt on the world chart). */
+  project(lon, lat) {
+    if (this.legacy) return projPt(lon, lat);
+    return [(wrapLongitude(lon - this.projection.lon0) * Math.PI / 180) * this.xScale, -lat * Math.PI / 180];
+  }
+
+  /** Fitted SVG box { x, y, w, h } around a [west, south, east, north] lon/lat box. */
+  focusView([west, south, east, north]) {
+    if (!this.fit) return null;
+    const { s, tx, ty } = this.fit;
+    const [x0, y0] = this.project(west, north), [x1, y1] = this.project(east, south);
+    return { x: Math.min(x0, x1) * s + tx, y: Math.min(y0, y1) * s + ty, w: Math.abs(x1 - x0) * s, h: Math.abs(y1 - y0) * s };
+  }
+
+  surfaceOf(id) {
+    return this.surface[id] || (this.surface[id] = surfaceMetrics(this.displayProjected[id] || []));
+  }
+
+  /**
+   * Custom-projection anchor: keep the point when it lies on the shape (holes
+   * excluded), nudge a fractionally-outside point toward the point-on-surface,
+   * else give up so the caller uses the point-on-surface. Never returns a point
+   * outside the shape. Works in the rotated plane, so shifted longitudes (182°)
+   * and wrapped ones (-178°) agree.
+   */
+  anchorInPlane(id, point) {
+    const polys = this.displayProjected[id];
+    if (!polys || !Number.isFinite(point?.[0]) || !Number.isFinite(point?.[1])) return null;
+    const q = this.project(point[0], point[1]);
+    if (insidePolygons(q, polys)) return [point[0], point[1]];
+    const target = this.surfaceOf(id);
+    if (!target.point) return null;
+    for (const t of [0.03, 0.07, 0.12, 0.2, 0.3]) {
+      const nudged = [q[0] + (target.point[0] - q[0]) * t, q[1] + (target.point[1] - q[1]) * t];
+      if (insidePolygons(nudged, polys)) {
+        return [nudged[0] / (this.xScale * Math.PI / 180) + this.projection.lon0, -nudged[1] * 180 / Math.PI];
+      }
+    }
+    return null;
   }
 
   /**
@@ -95,15 +166,17 @@ export class WorldGeometry {
     const ty = (VIEW_H - (maxY - minY) * s) / 2 - minY * s;
     this.fit = { s, tx, ty };
 
-    this.graticule = this.buildGraticule(s, tx, ty);
-    // Equatorial horizontal reference, not geodesic distance at every latitude.
-    // Also keeps regional flag grouping in fixed map units, independent of zoom.
-    this.kmPerUnit = EARTH_RADIUS_KM / (s * PROJECTION_X_SCALE);
+    this.graticule = this.buildGraticule(s, tx, ty, { minX, minY, maxX, maxY });
+    // World: equatorial horizontal reference, not geodesic distance at every
+    // latitude. Also keeps regional flag grouping in fixed map units, independent
+    // of zoom. A country chart is true scale along meridians and its parallel.
+    this.kmPerUnit = this.legacy ? EARTH_RADIUS_KM / (s * PROJECTION_X_SCALE) : EARTH_RADIUS_KM / s;
     this.paths = this.buildPaths(s, tx, ty);
     return this;
   }
 
-  buildGraticule(s, tx, ty) {
+  buildGraticule(s, tx, ty, bounds) {
+    if (!this.legacy) return this.buildLocalGraticule(s, tx, ty, bounds);
     const at = (lon, lat) => {
       const q = projPt(lon, lat);
       return (q[0] * s + tx).toFixed(1) + ',' + (q[1] * s + ty).toFixed(1);
@@ -129,22 +202,74 @@ export class WorldGeometry {
     return { d, labels };
   }
 
+  /**
+   * Country-scale graticule: a round step (0.5°–20°) giving a handful of lines
+   * over the fitted extent, drawn only over that extent plus one step and
+   * inside the frame. Meridians and parallels are straight, so two points each.
+   */
+  buildLocalGraticule(s, tx, ty, bounds) {
+    if (!Number.isFinite(s) || s <= 0) return { d: '', labels: [] };
+    const k = Math.PI / 180, kx = k * this.xScale;
+    const b = bounds && Number.isFinite(bounds.minX) && bounds.maxX >= bounds.minX
+      ? bounds : { minX: -tx / s, maxX: (VIEW_W - tx) / s, minY: -ty / s, maxY: (VIEW_H - ty) / s };
+    const span = Math.max((b.maxX - b.minX) / kx, (b.maxY - b.minY) / k);
+    // Five spans plus the end and margin lines keep it to roughly 4-8 lines.
+    const step = GRATICULE_STEPS.find(st => span / st <= 5) || GRATICULE_STEPS[GRATICULE_STEPS.length - 1];
+    // Rotated longitudes and latitudes of the drawable window.
+    const lonMin = Math.max(-180, b.minX / kx - step, -tx / s / kx);
+    const lonMax = Math.min(180, b.maxX / kx + step, (VIEW_W - tx) / s / kx);
+    const latMin = Math.max(-90, -b.maxY / k - step, -(VIEW_H - ty) / s / k);
+    const latMax = Math.min(90, -b.minY / k + step, ty / s / k);
+    const at = (lon, lat) => (lon * kx * s + tx).toFixed(1) + ',' + (-lat * k * s + ty).toFixed(1);
+    const { lon0 } = this.projection;
+    const eps = 1e-9;
+    let d = '';
+    for (let i = Math.ceil((lonMin + lon0) / step - eps); i * step <= lonMax + lon0 + eps; i++) {
+      const lon = i * step - lon0;
+      d += 'M' + at(lon, latMin) + 'L' + at(lon, latMax);
+    }
+    const labels = [];
+    for (let i = Math.ceil(latMin / step - eps); i * step <= latMax + eps; i++) {
+      const lat = i * step;
+      d += 'M' + at(lonMin, lat) + 'L' + at(lonMax, lat);
+      const y = -lat * k * s + ty;
+      if (y > 14 && y < VIEW_H - 12) {
+        const deg = Math.abs(lat).toFixed(step < 1 ? 1 : 0);
+        labels.push({ y: y.toFixed(0), text: lat === 0 ? '0°' : deg + '°' + (lat > 0 ? 'N' : 'S') });
+      }
+    }
+    return { d, labels };
+  }
+
   buildPaths(s, tx, ty) {
     const paths = {};
     for (const c of this.countries) {
       let d = '';
       const labelRings = [];
-      const legacy = legacyAnchorMetrics(this.projected[c.id], s, tx, ty);
-      let cx = legacy.cx;
-      let cy = legacy.cy;
-      const bestA = legacy.area;
+      // World: historical source-ring centroid. Country charts: a point on the
+      // largest polygon's surface (inside even for C-shaped or holed sections).
+      let cx, cy, bestA, largest = -1;
+      const largestRings = [];
+      if (this.legacy) {
+        const legacy = legacyAnchorMetrics(this.projected[c.id], s, tx, ty);
+        cx = legacy.cx;
+        cy = legacy.cy;
+        bestA = legacy.area;
+      } else {
+        const surface = this.surfaceOf(c.id);
+        const point = surface.point || this.projected[c.id][0]?.[0]?.[0] || [0, 0];
+        cx = point[0] * s + tx;
+        cy = point[1] * s + ty;
+        bestA = surface.area > 0 ? surface.area * s * s : 0.02;
+        largest = surface.index;
+      }
       let largestPaintedArea = -1;
       let bbox = null;
       let minX = Infinity;
       let minY = Infinity;
       let maxX = -Infinity;
       let maxY = -Infinity;
-      for (const poly of this.displayProjected[c.id]) {
+      this.displayProjected[c.id].forEach((poly, pi) => {
         poly.forEach((parts, ri) => {
           for (const part of parts) {
             const seg = part.map(q => [q[0] * s + tx, q[1] * s + ty]);
@@ -153,6 +278,7 @@ export class WorldGeometry {
             // Label containment must use the same split, rounded land that the
             // SVG paints, including holes and disconnected date-line segments.
             labelRings.push(seg.map(([x, y]) => [Number(x.toFixed(1)), Number(y.toFixed(1))]));
+            if (pi === largest) largestRings.push(labelRings[labelRings.length - 1]);
             // Include every rendered island/segment in an empire's flag canvas.
             for (const [x, y] of seg) {
               minX = Math.min(minX, x);
@@ -170,7 +296,7 @@ export class WorldGeometry {
             }
           }
         });
-      }
+      });
       if (!bbox) bbox = { x: cx - 2, y: cy - 1.5, w: 4, h: 3 };
       // Small padding around the land covers path coordinates rounded to 0.1,
       // keeping every fill inside one SVG pattern tile (never a repeated flag).
@@ -183,31 +309,52 @@ export class WorldGeometry {
       const labelX = cx;
       const labelY = cy;
       const cap = this.capitals[c.id];
+      let home = null;
       if (cap) {
-        const q = projPt(cap[0], cap[1]);
+        const q = this.project(cap[0], cap[1]);
         cx = q[0] * s + tx;
         cy = q[1] * s + ty;
+        if (!this.legacy) {
+          // Routes start at cx/cy, so test the painted (rounded) rings they use.
+          const rings = largestRings.length ? largestRings : labelRings;
+          if (insideRings([cx, cy], labelRings)) home = [cx, cy];
+          [cx, cy] = routingAnchor([cx, cy], [labelX, labelY], rings);
+        }
       }
       paths[c.id] = { d, cx, cy, labelX, labelY, area: bestA, bbox, fullBounds, labelRings, hasCapital: !!cap };
+      // The home town marker, where it is on the painted section; else the anchor.
+      if (!this.legacy) Object.assign(paths[c.id], { homeX: home ? home[0] : cx, homeY: home ? home[1] : cy });
     }
     return paths;
   }
 
-  /** Inverse projection: SVG user units -> [lon, lat] degrees. */
+  /**
+   * Inverse projection: SVG user units -> [lon, lat] degrees, longitude wrapped
+   * to ±180 (a shifted 182° source longitude comes back as -178°).
+   */
   invert(px, py) {
     if (!this.fit) return null;
     const { s, tx, ty } = this.fit;
-    const lon = (px - tx) / (s * PROJECTION_X_SCALE) * 180 / Math.PI;
+    const lon = (px - tx) / (s * this.xScale) * 180 / Math.PI;
     const lat = (ty - py) / s * 180 / Math.PI;
     // Empty space around the rectangular world isn't another geographic point.
     if (!Number.isFinite(lon) || !Number.isFinite(lat) || Math.abs(lon) > 180 + 1e-9 || Math.abs(lat) > 90 + 1e-9) return null;
-    return [Math.max(-180, Math.min(180, lon)), Math.max(-90, Math.min(90, lat))];
+    const clamped = Math.max(-180, Math.min(180, lon));
+    return [this.legacy ? clamped : wrapLongitude(clamped + this.projection.lon0), Math.max(-90, Math.min(90, lat))];
   }
 }
 
-function decodeTopo(topo) {
+function decodeTopo(topo, objectName = 'countries') {
+  const objects = topo?.objects || {};
+  const collection = objects[objectName]?.type === 'GeometryCollection' ? objects[objectName]
+    : Object.values(objects).find(object => object?.type === 'GeometryCollection');
+  if (!collection || !Array.isArray(topo.arcs)) {
+    throw new Error(`Topology has no "${objectName}" GeometryCollection`);
+  }
+  // Quantized topologies delta-encode arcs; an unquantized one is absolute.
   const tr = topo.transform;
   const arcs = topo.arcs.map(arc => {
+    if (!tr) return arc.map(p => [p[0], p[1]]);
     let x = 0;
     let y = 0;
     return arc.map(p => {
@@ -229,7 +376,9 @@ function decodeTopo(topo) {
   let unclaimed = 0;
   const countries = [];
   const arcOwners = {};
-  for (const g of topo.objects.countries.geometries) {
+  for (const g of collection.geometries || []) {
+    // Null geometries (and any non-area type) carry no land.
+    if (g?.type !== 'Polygon' && g?.type !== 'MultiPolygon') continue;
     let id = g.id == null ? null : String(g.id);
     if (id == null || id === '-99') {
       const names = { 'Kosovo': 'KOS', 'N. Cyprus': 'XCYN', 'Somaliland': 'XSOL' };
@@ -401,10 +550,12 @@ export function splitAtAntimeridian(ring) {
   return result;
 }
 
-// Historical source-ring chunks are retained ONLY for campaign metadata. Club
-// assignment, target selection and empireCenter weights use this calculation,
-// reprojected alongside the rest of the map. These chunks are never painted:
-// d, labelRings and visible bounds exclusively use splitAtAntimeridian above.
+// Historical source-ring chunks are retained ONLY for the world chart's campaign
+// metadata. Club assignment, target selection and empireCenter weights use this
+// calculation, reprojected alongside the rest of the map. These chunks are never
+// painted: d, labelRings and visible bounds exclusively use splitAtAntimeridian
+// above. The 300-unit jump is a world-scale date-line guess that cuts any wide
+// country-scale shape, so custom projections use surfaceMetrics instead.
 function legacyProjectedChunks(pts) {
   const segs = [];
   let cur = [pts[0]];
@@ -455,6 +606,101 @@ function ringCentroid(ring) {
   return { area: Math.abs(a), cx: sx / (6 * a), cy: sy / (6 * a) };
 }
 
+function ringArea(ring) {
+  let a = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) a += ring[j][0] * ring[i][1] - ring[i][0] * ring[j][1];
+  return Math.abs(a) / 2;
+}
+
+/** Even-odd test over every ring and seam part of each polygon, so holes count. */
+function insidePolygons(point, polys) {
+  return polys.some(poly => {
+    let inside = false;
+    for (const parts of poly) for (const part of parts) if (pointInRing(point, part)) inside = !inside;
+    return inside;
+  });
+}
+
+function segmentDistance2([px, py], [ax, ay], [bx, by]) {
+  const dx = bx - ax, dy = by - ay;
+  const len = dx * dx + dy * dy;
+  const t = len ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len)) : 0;
+  const ex = ax + t * dx - px, ey = ay + t * dy - py;
+  return ex * ex + ey * ey;
+}
+
+/**
+ * Area (outer minus holes) of the largest polygon and a point on its surface.
+ * Candidates are midpoints of the inside spans of horizontal scanlines, which
+ * lie inside by construction; the one farthest from any edge wins, so a C-shaped
+ * or holed shape gets a central interior point rather than an outside centroid.
+ * Input is display-projected plane geometry: polygons -> rings -> seam parts.
+ */
+function surfaceMetrics(polys) {
+  let best = null;
+  polys.forEach((poly, index) => {
+    if (!poly[0]?.length) return;
+    let area = 0;
+    poly.forEach((parts, ri) => { for (const part of parts) area += (ri ? -1 : 1) * ringArea(part); });
+    if (!best || area > best.area) best = { area, rings: poly.flat(), index };
+  });
+  if (!best) return { area: 0, point: null, index: -1 };
+  let minY = Infinity, maxY = -Infinity;
+  for (const ring of best.rings) for (const [, y] of ring) { minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
+  let point = null, clearance = -1;
+  const lines = 24;
+  for (let k = 0; k < lines && maxY > minY; k++) {
+    const y = minY + (maxY - minY) * (k + 0.5) / lines;
+    const xs = [];
+    for (const ring of best.rings) {
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const [xi, yi] = ring[i], [xj, yj] = ring[j];
+        if (yi > y !== yj > y) xs.push(xi + (y - yi) * (xj - xi) / (yj - yi));
+      }
+    }
+    xs.sort((a, b) => a - b);
+    for (let i = 0; i + 1 < xs.length; i += 2) {
+      if (!(xs[i + 1] > xs[i])) continue;
+      const candidate = [(xs[i] + xs[i + 1]) / 2, y];
+      let d2 = Infinity;
+      for (const ring of best.rings) for (let a = 0, b = ring.length - 1; a < ring.length; b = a++) d2 = Math.min(d2, segmentDistance2(candidate, ring[b], ring[a]));
+      if (d2 > clearance) { clearance = d2; point = candidate; }
+    }
+  }
+  return { area: Math.max(0, best.area), point, index: best.index };
+}
+
+// A country chart's routing anchor keeps at least this share of its polygon's
+// best clearance from the painted edge. Routes start there, so a home town on
+// a border (or outside it once paths are rounded to 0.1 units) would let one
+// neighbour's corner capture every arrow; a town comfortably inside stays put.
+const ANCHOR_CLEARANCE = 0.35;
+const ANCHOR_STEPS = 16;
+
+function edgeClearance(point, rings) {
+  let d2 = Infinity;
+  for (const ring of rings) for (let a = 0, b = ring.length - 1; a < ring.length; b = a++) d2 = Math.min(d2, segmentDistance2(point, ring[b], ring[a]));
+  return Math.sqrt(d2);
+}
+
+const insideRings = (point, rings) => rings.reduce((inside, ring) => pointInRing(point, ring) ? !inside : inside, false);
+
+/**
+ * Walk from `home` toward `pole` (the polygon's interior point) and keep the first
+ * point inside the painted `rings` with enough clearance. Without a usable pole
+ * (a section smaller than the rounding) the pole is the best available answer.
+ */
+function routingAnchor(home, pole, rings) {
+  const need = ANCHOR_CLEARANCE * edgeClearance(pole, rings);
+  if (!(need > 0) || !insideRings(pole, rings)) return pole;
+  for (let k = 0; k < ANCHOR_STEPS; k++) {
+    const t = k / ANCHOR_STEPS;
+    const point = k ? [home[0] + (pole[0] - home[0]) * t, home[1] + (pole[1] - home[1]) * t] : home;
+    if (insideRings(point, rings) && edgeClearance(point, rings) >= need) return point;
+  }
+  return pole;
+}
+
 /**
  * Place a capital inside its own country's outline, in lon/lat.
  *
@@ -463,6 +709,8 @@ function ringCentroid(ring) {
  * toward the country's centre until it lands. Genuinely off-shape capitals
  * (Malabo on Bioko, Nassau on New Providence) never land and return null, and
  * the caller falls back to the centroid rather than stranding a marker at sea.
+ * World chart only: it tests outer rings, and the pinned world capitals depend
+ * on that (Canberra lies in a 50m hole). Country charts use anchorInPlane.
  */
 function anchorInside(point, polys) {
   const rings = polys.map(p => p[0]);
@@ -523,7 +771,7 @@ function ringBounds(ring) {
   return { x: minX, y: minY, w: Math.max(3, maxX - minX), h: Math.max(2.5, maxY - minY) };
 }
 
-const NICE_DISTANCES = [10, 25, 50, 100, 250, 500, 1000, 2000, 4000, 8000];
+const NICE_DISTANCES = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2000, 4000, 8000];
 
 /** Largest round distance that fits within `maxKm`, for scale-bar labelling. */
 export function niceDistance(maxKm) {

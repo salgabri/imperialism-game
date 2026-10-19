@@ -105,16 +105,25 @@ export function useMapViewport(svgRef, resetKey, initialFocus) {
   }, [fx, fy, fw, fh, aspect, baseWidth, frame]);
 
   const previousCamera = useRef(null);
+  const settled = previousCamera.current;
+  // Until a new theatre is framed for the canvas it will have, the view is a
+  // stand-in: callers can skip work that depends on it (label layout).
+  const framing = !settled || settled.needsFit || settled.resetKey !== resetKey ||
+    settled.fx !== fx || settled.fy !== fy || settled.fw !== fw || settled.fh !== fh;
   useEffect(() => {
     const previous = previousCamera.current;
     const newTheatre = !previous || previous.resetKey !== resetKey ||
       previous.fx !== fx || previous.fy !== fy || previous.fw !== fw || previous.fh !== fh;
     const rect = svgRef.current?.getBoundingClientRect();
-    // A theatre change may reveal the sidebar in the same render. Complete
-    // that initial fit after ResizeObserver reports the new canvas aspect.
-    const needsFit = (newTheatre || previous?.needsFit) && rect?.width > 0 &&
+    // A theatre change may reveal the sidebar in the same render. Take the
+    // canvas size from the layout now and frame once, for that aspect.
+    const needsFit = (newTheatre || previous?.needsFit) && rect?.width > 0 && rect.height > 0 &&
       Math.abs(rect.height / rect.width - aspect) > .0001;
     previousCamera.current = { resetKey, fx, fy, fw, fh, baseWidth, aspect, needsFit };
+    if (needsFit) {
+      setSize({ width: rect.width, height: rect.height });
+      return;
+    }
     if (newTheatre || previous.needsFit) {
       reset();
       return;
@@ -227,7 +236,7 @@ export function useMapViewport(svgRef, resetKey, initialFocus) {
     return () => { window.removeEventListener('pointerup', endDrag); window.removeEventListener('mouseup', endDrag); };
   }, [endDrag]);
 
-  return { view, size, zoom: baseWidth / view.w, panning, reset, zoomBy, reveal, fitBounds, restore, canRestore,
+  return { view, size, zoom: baseWidth / view.w, panning, framing, reset, zoomBy, reveal, fitBounds, restore, canRestore,
     didPan: () => suppressClick.current,
     handlers: { onMouseDown, onMouseMove, onMouseUp: endDrag, onDoubleClick: reset } };
 }

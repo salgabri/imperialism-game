@@ -197,3 +197,18 @@
   .playback-play { min-width: 0; }
   .playback-speed { min-width: 44px; }
 }
+
+/* One country's own clubs: its theatre summary and the per-country map load. */
+.setup-domestic { margin: 8px 0 2px; }
+.setup-domestic-status { margin: 6px 0 0; font-size: 12px; color: var(--text); }
+.setup-domestic-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; padding: 6px 6px 6px 12px; border: 1px solid #dd9785; border-radius: 2px; }
+.setup-domestic-error p { margin: 0; font-size: 12px; line-height: 1.45; color: #edb5a7; }
+.setup-domestic-error .button { flex: none; }
+
+/* A country preview sits beside the setup panel rather than behind it: the
+   panel docks left and the map's frame (and so its camera) is the space to its
+   right. The map still draws under the panel. */
+@media (min-width: 1100px) {
+  .setup-overlay.setup-overlay--beside { justify-items: start; }
+  .world-map--beside-panel .political-map { margin-left: 680px; width: calc(100% - 680px); overflow: visible; }
+}

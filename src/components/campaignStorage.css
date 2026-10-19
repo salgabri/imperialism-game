@@ -27,3 +27,11 @@
 .campaign-storage-fork > div:not(.campaign-storage-actions) .button { flex: none; }
 .campaign-storage .campaign-storage-error { padding: 10px 12px; border: 1px solid #dd9785; color: #edb5a7; }
 @media (max-width: 540px) { .campaign-storage-backdrop { padding: 12px; } .campaign-storage { padding: 20px; } .campaign-storage h1 { font-size: 25px; } .campaign-storage-preview { grid-template-columns: 1fr; gap: 8px; } .campaign-storage-slot-actions > .button, .campaign-storage-slot-actions form { width: 100%; } .campaign-storage-fork > div:not(.campaign-storage-actions) { flex-wrap: wrap; } }
+.campaign-storage .campaign-storage-busy, .campaign-storage .campaign-storage-notice { padding: 10px 12px; border: 1px solid #69756d; color: #ece9df; }
+.campaign-storage .campaign-storage-busy { border-color: #e5c986; }
+.campaign-storage-delete { margin-top: 6px; padding-inline: 0; }
+.campaign-storage-confirm { margin-top: 12px; padding: 12px; border: 1px solid #dd9785; }
+.campaign-storage-confirm p { margin: 0; font-size: 13px; line-height: 1.5; }
+.campaign-storage-confirm .campaign-storage-actions { margin-top: 10px; }
+.campaign-storage .campaign-storage-danger { background: #c9705c; border-color: #c9705c; color: #1b1310; }
+.campaign-storage .campaign-storage-danger:hover { background: #e08b77; border-color: #e08b77; }

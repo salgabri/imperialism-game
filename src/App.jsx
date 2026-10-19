@@ -7,6 +7,9 @@ import { FLAG_CODES, flagUrl } from './data/flags.js';
 import { FLAG_SYMBOLS } from './data/flagSymbols.js';
 import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry, projPt } from './engine/geo.js';
+import { clearDomesticCache, domesticScopeId, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
+  retainDomestic } from './engine/domestic.js';
+import { domesticEntry, domesticLabel } from './data/domesticScope.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { layoutFlagSymbol } from './engine/flagSymbolLayout.js';
 import { getSport, DEFAULT_SPORT } from './sports/index.js';
@@ -18,8 +21,9 @@ import {
   territories,
 } from './engine/campaign.js';
 import { createDuelDraw } from './engine/duelDraw.js';
-import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns,
-  loadCampaign, inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent } from './engine/storage.js';
+import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
+  loadCampaign, inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
+  fitDomesticCampaign } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
 import { acquisitionOptions, automaticAcquisition, advanceSeries, campaignRecap, estimateSession, recordMatch } from './engine/campaignExperience.js';
 import { tacticalMatchParameters, tacticalOptions, competitiveBasketballTeams } from './engine/managerStrategy.js';
@@ -46,6 +50,49 @@ const BATTLE_SCARS = 7;
 const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'UEFA', clubScope: 'all', pacing: 'duel', resolution: 'ticker',
   preset: 'standard', seed: '', uncertainty: 'balanced', express: false, finale: 'single', role: 'spectator',
   managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic' };
+// Neighbouring land is drawn this far (SVG units) beyond the 960×540 frame: a
+// fully zoomed-out camera shows up to ~420 units beside it on ultra-wide screens
+// and ~770 above and below on a phone.
+const BACKDROP_MARGIN = { x: 480, y: 800 };
+const DOMESTIC_SCALE_TITLE = "Distance at the map's centre";
+const SETUP_LOAD_DELAY_MS = 120;
+
+/** The country whose own map a setup or saved campaign is played on, or null for the world. */
+function domesticIdOf(settings) {
+  return settings?.layer === 'clubs' && getSport(settings.sport).id === 'football' ? domesticScopeId(settings.clubScope) : null;
+}
+
+/**
+ * The 50m atlas gives Australia and the Ashmore and Cartier Islands the same id,
+ * and id-keyed paths keep only the islet. Country backdrops (and the land they
+ * route around) merge such shapes; the world map keeps the atlas untouched.
+ */
+function mergeSharedIds(atlas) {
+  const objects = atlas?.objects || {};
+  const name = objects.countries?.type === 'GeometryCollection' ? 'countries'
+    : Object.keys(objects).find(key => objects[key]?.type === 'GeometryCollection');
+  if (!name) return atlas;
+  const merged = new Map(), geometries = [];
+  for (const g of objects[name].geometries || []) {
+    const id = g?.id == null || String(g.id) === '-99' ? null : String(g.id);
+    const polygons = g?.type === 'Polygon' ? [g.arcs] : g?.type === 'MultiPolygon' ? g.arcs : null;
+    const first = id && polygons ? merged.get(id) : null;
+    if (first) first.arcs.push(...polygons);
+    else {
+      const copy = id && polygons ? { ...g, type: 'MultiPolygon', arcs: [...polygons] } : g;
+      if (id && polygons) merged.set(id, copy);
+      geometries.push(copy);
+    }
+  }
+  return { ...atlas, objects: { ...objects, [name]: { ...objects[name], geometries } } };
+}
+
+const homeClubCache = new WeakMap();
+/** Section id -> the club that starts there, for the setup preview and tooltips. */
+function homeClubs(domestic) {
+  if (!homeClubCache.has(domestic)) homeClubCache.set(domestic, Object.fromEntries(domestic.clubs.map(club => [club.homeSection, club])));
+  return homeClubCache.get(domestic);
+}
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
 function signed(delta) {
@@ -97,9 +144,20 @@ export default class App extends React.Component {
     managedTeamId: null, managementEnded: false, managerElimination: null, tacticalChoice: null,
     historyFilter: '', decisionLedger: [], initialSettings: null,
     campaignId: null, revision: 0, campaignName: '', storageDialog: null, storageConflict: false,
+    domesticLoad: { id: null, state: 'idle', message: null },
+    // A restore waiting for its country map ({ message, status }), and a country launch being prepared.
+    restoring: null, launching: false,
   };
 
   engagement = new SessionEngagement();
+  /** Loaded country whose sections this.geo currently holds (null: the world map). */
+  domesticId = null;
+  /** Country whose map a pending restore is waiting for. */
+  pendingDomesticId = null;
+  backdrop = [];
+  // Async map loads compare these so a result the player has moved on from is dropped.
+  setupMapToken = 0;
+  flowToken = 0;
   openingSeed = Date.now() >>> 0;
   away = false;
   updateEngagement = () => this.engagement.switchMode(engagementMode(this.state,
@@ -140,6 +198,7 @@ export default class App extends React.Component {
   componentWillUnmount() {
     this.clearTimers();
     clearTimeout(this.confirmTimer);
+    clearTimeout(this.setupLoadTimer);
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', this.handleStorage);
       window.removeEventListener('focus', this.handleFocus);
@@ -211,6 +270,8 @@ export default class App extends React.Component {
       // Display-only detail keeps targeting, club seeding and existing saves
       // on the original topology. A missing visual atlas falls back gracefully.
       this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS) : null;
+      // The atlas also draws a country map's neighbours in that map's projection.
+      this.atlas = atlas ? mergeSharedIds(atlas) : null;
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
       const inspection = inspectSave();
@@ -234,18 +295,85 @@ export default class App extends React.Component {
     }
   }
 
-  /** The read-only view the campaign rules operate on. */
+  /**
+   * The read-only view the campaign rules operate on. A country map adds the
+   * neighbouring land as obstacles (never territory) and lets routes aim across
+   * shared borders; the world board is unchanged.
+   */
   board(state = this.state) {
-    return { geo: this.geo, routingPaths: this.displayGeo?.paths || this.geo.paths,
+    const board = { geo: this.geo, routingPaths: this.displayGeo?.paths || this.geo.paths,
       own: state.own, aliveIds: state.aliveIds };
+    const domestic = this.domesticMap();
+    return domestic ? { ...board, obstacles: this.surroundings(domestic).obstacles, borderRoutes: true } : board;
+  }
+
+  /** Neighbouring land of a country map, built once per map and fit (and freed with the map). */
+  surroundings(domestic) {
+    return domesticSurroundings(this.atlas, domestic, BACKDROP_MARGIN);
+  }
+
+  /** Keep the maps in use decoded: the one on screen and the one a restore waits for. */
+  retainMaps() {
+    retainDomestic([this.domesticId, this.pendingDomesticId]);
+  }
+
+  /** Lon/lat on the current chart's unfitted plane (duck-typed test atlases have no project). */
+  planePoint(lon, lat) {
+    return this.geo.project ? this.geo.project(lon, lat) : projPt(lon, lat);
+  }
+
+  /** The loaded country this.geo is showing, or null on the world map. */
+  domesticMap() {
+    return this.domesticId ? getLoadedDomestic(this.domesticId) : null;
+  }
+
+  loadCountry(id) {
+    return loadDomestic(id, { baseUrl: import.meta.env.BASE_URL,
+      fetch: typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : globalThis.fetch });
+  }
+
+  /**
+   * Rules and display run on one geometry: the world (id null) or a loaded
+   * country's sections. Sections are their own routing paths, so there is no
+   * display atlas; the world pair is kept for the way back.
+   */
+  useGeometry(id) {
+    if (id) {
+      const loaded = getLoadedDomestic(id);
+      if (!loaded) throw new Error(`The map for country ${id} has not loaded.`);
+      if (!this.domesticId) {
+        this.worldGeo = this.geo;
+        this.worldDisplayGeo = this.displayGeo;
+      }
+      this.geo = loaded.geo;
+      this.displayGeo = null;
+      this.domesticId = id;
+    } else if (this.domesticId) {
+      this.geo = this.worldGeo;
+      this.displayGeo = this.worldDisplayGeo;
+      this.domesticId = null;
+      this.backdrop = [];
+    }
+    this.retainMaps();
   }
 
   /**
    * Reframe the map on a set of nations. Bumping the key drops any zoom and pan
    * the player had applied, which would otherwise point at the old theatre.
+   * A country map always frames all of its sections, so its camera and backdrop
+   * never depend on who holds what.
    */
   fitMap(ids, settings) {
-    this.geo.fitTo(ids);
+    const domestic = this.domesticMap();
+    // Launching the country the setup screen already frames keeps its paths,
+    // label geometry and backdrop, and so every cache built on them; only the
+    // camera resets.
+    if (domestic && this.fittedDomestic === domestic && this.geo === domestic.geo) {
+      this.viewResetKey = (this.viewResetKey || 0) + 1;
+      return;
+    }
+    this.fittedDomestic = domestic;
+    this.geo.fitTo(domestic ? Object.keys(domestic.sectionNames) : ids);
     if (this.displayGeo) {
       const { s, tx, ty } = this.geo.fit;
       this.displayGeo.paths = this.displayGeo.buildPaths(s, tx, ty);
@@ -256,20 +384,30 @@ export default class App extends React.Component {
       id: country.id,
       rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
     }));
+    this.flagLayoutCache = null;
+    this.viewFocus = null;
+    if (domestic) {
+      // Clubs fly no flags. The opening camera leaves out far outliers.
+      this.flagComponents = null;
+      this.setupFlagOwnership = {};
+      this.backdrop = this.domesticBackdrop(domestic);
+      this.viewFocus = this.geo.focusView(domestic.focus);
+      this.viewResetKey = (this.viewResetKey || 0) + 1;
+      return;
+    }
+    this.backdrop = [];
     this.flagComponents = createFlagRegionIndex(this.labelGeometry, {
       maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit,
     });
     this.setupFlagOwnership = Object.fromEntries(this.geo.countries
       .filter(country => NATIONS[country.id] || DEPENDENCIES[country.id])
       .map(country => [country.id, country.id]));
-    this.flagLayoutCache = null;
-    this.viewFocus = null;
     // Russia and overseas islands remain playable, but the European opening
     // camera should show the continent. Zooming out always restores all land.
     if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') {
       const { s, tx, ty } = this.geo.fit;
       const points = [[-15, 34], [44, 34], [-15, 71], [44, 71]].map(([lon, lat]) => {
-        const [x, y] = projPt(lon, lat);
+        const [x, y] = this.planePoint(lon, lat);
         return [x * s + tx, y * s + ty];
       });
       const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
@@ -278,7 +416,66 @@ export default class App extends React.Component {
     this.viewResetKey = (this.viewResetKey || 0) + 1;
   }
 
+  /**
+   * Neighbouring land beneath a country map, in its projection and fit. It is
+   * drawn and blocks routes, but is never territory, labels or adjacency. The
+   * host's own world shape is drawn only where the sections cover part of it
+   * (England keeps the UK beneath, so Wales and Scotland read as land).
+   */
+  domesticBackdrop(domestic) {
+    return this.surroundings(domestic).shapes;
+  }
+
+  /**
+   * Show the chosen theatre on the setup map: the world, or a country's sections
+   * in their clubs' colours. A country that has not loaded yet loads here while
+   * the world stays on screen; a result the player has since moved away from is
+   * ignored. `refit` reframes even when the geometry does not change.
+   */
+  showSetupMap(setup = this.state.setup, refit = false) {
+    const id = domesticIdOf(setup), token = ++this.setupMapToken;
+    const loaded = id ? getLoadedDomestic(id) : null;
+    const shown = loaded ? id : null;
+    if (refit || shown !== this.domesticId) {
+      this.useGeometry(shown);
+      this.fitMap(Object.keys(NATIONS));
+    }
+    const domesticLoad = { id, state: !id ? 'idle' : loaded ? 'ready' : 'loading', message: null };
+    const previous = this.state.domesticLoad;
+    if (refit || previous?.id !== id || previous?.state !== domesticLoad.state) this.setState({ domesticLoad });
+    clearTimeout(this.setupLoadTimer);
+    if (!id || loaded) return;
+    const current = () => token === this.setupMapToken && this.state.phase === 'setup';
+    // Arrow keys on the Theatre list step through countries: fetch and decode
+    // only the one the player stays on.
+    this.setupLoadTimer = setTimeout(() => current() && this.loadCountry(id).then(() => { if (current()) this.showSetupMap(); }, error => {
+      if (!current()) return;
+      const name = domesticEntry(setup.clubScope)?.name || 'this country';
+      this.setState({ domesticLoad: { id, state: 'error', message: `The map of ${name} could not be loaded. ${error.message || error}` } });
+    }), SETUP_LOAD_DELAY_MS);
+  }
+
+  retryDomestic() {
+    const id = domesticIdOf(this.state.setup);
+    if (!id) return;
+    clearDomesticCache(id);
+    this.showSetupMap();
+  }
+
+  /** What the setup screen shows for its chosen country: idle, loading, ready or error. */
+  domesticStatus(setup = this.state.setup) {
+    const id = domesticIdOf(setup), load = this.state.domesticLoad;
+    const state = !id ? 'idle' : getLoadedDomestic(id) ? 'ready' : load?.id === id ? load.state : 'loading';
+    return { state, message: state === 'error' ? load.message : null, onRetry: () => this.retryDomestic() };
+  }
+
+  /** Display name of a territory: a country map's section, else a nation or dependency. */
+  territoryName(cid) {
+    return this.domesticMap()?.sectionNames[cid] || NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || cid;
+  }
+
   scopeName(settings = this.state.settings) {
+    if (domesticIdOf(settings)) return domesticLabel(settings.clubScope);
     if (settings?.layer === 'clubs') {
       const scopes = CLUB_SCOPES(getSport(settings.sport));
       return (scopes.find(x => x.id === settings.clubScope) || scopes[0]).name;
@@ -312,14 +509,21 @@ export default class App extends React.Component {
   pickSetup(key, value) {
     this.setState(state => {
       const setup = { ...state.setup, [key]: value };
+      const domestic = isDomesticScope(setup.clubScope);
       if (key === 'preset') {
         setup.scope = value === 'short' ? 'elite' : value === 'world' ? 'world' : 'UEFA';
-        setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all' : CLUB_SCOPES(getSport(setup.sport))[2]?.id || 'all';
+        // A chosen country is its own theatre; a session length does not replace it.
+        if (!domestic) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all' : CLUB_SCOPES(getSport(setup.sport))[2]?.id || 'all';
       } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
-      if (key === 'sport' && !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope)) setup.clubScope = 'all';
-      if (['sport', 'layer', 'scope', 'clubScope', 'preset'].includes(key)) setup.managedTeamId = '';
+      // Country maps come with football data only.
+      if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
+        : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
+      // The field changes with the theatre, so the managed team goes too, but a
+      // preset leaves a chosen country's club theatre (and its clubs) as it was.
+      const sameField = key === 'preset' && domestic && setup.layer === 'clubs';
+      if (['sport', 'layer', 'scope', 'clubScope', 'preset'].includes(key) && !sameField) setup.managedTeamId = '';
       return { setup };
-    });
+    }, () => { if (this.state.phase === 'setup') this.showSetupMap(); });
   }
 
   exportProgress() {
@@ -363,6 +567,8 @@ export default class App extends React.Component {
 
   closeStorageDialog() {
     if (this.state.storageConflict) return;
+    // Close, Escape and Cancel import also mean "not that campaign" for a restore still loading its map.
+    this.cancelRestore();
     const previous = this.storageReturn || { autoplay: false, paused: false };
     this.setState({ storageDialog: null, ...previous }, () => {
       if (!previous.paused) this.clock.resume();
@@ -371,13 +577,74 @@ export default class App extends React.Component {
   }
 
   continueSaved(campaign, fork = false, name) {
-    if (!campaign) return;
-    this.saved = fork ? forkCampaign(campaign, name) : campaign;
-    this.setState({ storageDialog: null, storageConflict: false }, () => this.resume());
+    if (!campaign || this.pendingDomesticId != null) return;
+    // A country campaign is checked against its map before it replaces anything.
+    return this.withCampaignMap(campaign, (_loaded, fitted) => {
+      this.saved = fork ? forkCampaign(fitted, name) : fitted;
+      this.setState({ storageDialog: null, storageConflict: false }, () => this.resume());
+    });
+  }
+
+  /**
+   * Restoring a country campaign needs its map first. Runs `then(loaded, fitted)`
+   * once the map has loaded and the save fits it (synchronously when nothing has
+   * to load); `fitted` is the save moved onto this build of the map. Otherwise
+   * refuses with a clear message. World campaigns run at once, as saved.
+   */
+  withCampaignMap(campaign, then) {
+    const id = domesticIdOf(campaign?.settings);
+    if (!id) return then(null, campaign);
+    const loaded = getLoadedDomestic(id);
+    if (loaded) {
+      const fitted = fitDomesticCampaign(campaign, loaded);
+      if (fitted.error) {
+        this.refuseRestore(fitted.error);
+        return false;
+      }
+      return then(loaded, fitted.campaign);
+    }
+    const token = ++this.flowToken;
+    const name = domesticEntry(campaign.settings.clubScope)?.name || 'this country';
+    const message = `Loading the map of ${name}…`;
+    this.pendingDomesticId = id;
+    this.retainMaps();
+    this.setState(state => ({ restoring: { message, status: state.restoring?.status ?? state.saveStatus }, saveStatus: { ok: true, message } }));
+    const current = () => {
+      if (token !== this.flowToken) return false;
+      this.endRestore();
+      return true;
+    };
+    return this.loadCountry(id).then(() => current() && this.withCampaignMap(campaign, then), error => {
+      if (current()) this.refuseRestore(`The map of ${name} could not be loaded, so the campaign cannot resume. ${error.message || error}`);
+      return false;
+    });
+  }
+
+  /** The pending restore is over (it ran, failed or was replaced). */
+  endRestore() {
+    this.pendingDomesticId = null;
+    this.retainMaps();
+    this.setState(state => state.restoring ? { restoring: null } : null);
+  }
+
+  /** Drop a restore still waiting for its map: its campaign must not replace anything later. */
+  cancelRestore() {
+    if (this.pendingDomesticId == null) return;
+    this.flowToken++;
+    this.pendingDomesticId = null;
+    this.retainMaps();
+    this.setState(state => state.restoring ? { restoring: null, saveStatus: state.restoring.status ?? null } : null);
+  }
+
+  refuseRestore(message) {
+    this.setState(state => ({ saveStatus: { ok: false, message },
+      ...(state.storageDialog ? { storageDialog: { ...state.storageDialog, error: message } } : {}) }));
   }
 
   setupTeams(setup = this.state.setup) {
-    const key = JSON.stringify([setup.sport, setup.layer, setup.scope, setup.clubScope, setup.seed, setup.rosterPreset]);
+    const domesticId = domesticIdOf(setup);
+    const key = JSON.stringify([setup.sport, setup.layer, setup.scope, setup.clubScope, setup.seed, setup.rosterPreset,
+      domesticId ? getLoadedDomestic(domesticId)?.meta.version || 'loading' : null]);
     if (this.setupTeamsCache?.key === key) return this.setupTeamsCache.teams;
     const teams = this.opening(setup, makeRng(this.setupSeed(setup))).included
       .map(team => ({ id: team.id, name: team.name, rating: teamEff(team) })).sort((a, b) => a.name.localeCompare(b.name));
@@ -393,12 +660,21 @@ export default class App extends React.Component {
   opening(su, rng) {
     const sport = getSport(su.sport), clubLayer = su.layer === 'clubs';
     let included, own = {}, scopeName;
-    if (clubLayer) {
+    const domesticId = domesticIdOf(su);
+    if (domesticId) {
+      // Each club starts on its own section. Nobody plays until the map has loaded.
+      const loaded = getLoadedDomestic(domesticId);
+      included = loaded ? loaded.clubs.map(row => buildClub(row, sport)) : [];
+      for (const team of included) own[team.home] = team.id;
+      scopeName = domesticLabel(su.clubScope);
+    } else if (clubLayer) {
       const scope = CLUB_SCOPES(sport).find(x => x.id === su.clubScope) || CLUB_SCOPES(sport)[0];
       included = sport.clubs.filter(scope.filter).map(c => buildClub(c, sport));
       scopeName = scope.name;
-      if (this.geo) {
-        own = seedClubs(this.geo, included);
+      // World clubs always seed on the world map, even while a country preview is shown.
+      const world = this.domesticId ? this.worldGeo : this.geo;
+      if (world) {
+        own = seedClubs(world, included);
         included = included.filter(c => Object.values(own).includes(c.id));
       }
     } else {
@@ -414,8 +690,43 @@ export default class App extends React.Component {
     return { included, own, scopeName };
   }
 
+  /**
+   * The setup screen's Launch. Setting up a country map takes a moment, so the
+   * button first shows that it is preparing and the work starts after that
+   * paint. World theatres launch at once, as before.
+   */
+  launchCampaign() {
+    if (!domesticIdOf(this.state.setup)) return this.startCampaign();
+    if (this.state.launching) return;
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      // After the frame that shows the busy button (a hidden tab paints nothing, so a timer stands in).
+      setTimeout(() => {
+        const done = () => this.setState({ launching: false });
+        if (this.state.phase !== 'setup') return done();
+        Promise.resolve(this.startCampaign()).finally(done);
+      }, 0);
+    };
+    this.setState({ launching: true }, () => {
+      requestAnimationFrame(start);
+      setTimeout(start, 100);
+    });
+  }
+
   startCampaign() {
+    this.cancelRestore();
     const su = this.state.setup;
+    const domesticId = domesticIdOf(su);
+    const token = ++this.flowToken;
+    if (domesticId && !getLoadedDomestic(domesticId)) {
+      // The setup screen waits for the map, but a retry or test may arrive first.
+      const name = domesticEntry(su.clubScope)?.name || 'this country';
+      return this.loadCountry(domesticId).then(() => token === this.flowToken && this.startCampaign(), error => {
+        if (token === this.flowToken) this.setState({ saveStatus: { ok: false, message: `The map of ${name} could not be loaded. ${error.message || error}` } });
+      });
+    }
     const seed = this.setupSeed(su);
     this.rng = makeRng(seed);
     const clubLayer = su.layer === 'clubs';
@@ -426,6 +737,10 @@ export default class App extends React.Component {
     }
     this.clearTimers();
     this.engagement = new SessionEngagement();
+    // A stale map stamp from a retried country campaign never outlives its map.
+    const { domesticVersion: _previousMap, ...chosen } = su;
+    const settings = { ...DEFAULT_SETUP, ...chosen, seed: String(seed),
+      ...(domesticId ? { domesticVersion: getLoadedDomestic(domesticId).meta.version } : {}) };
 
     const teams = {};
     const stats = {};
@@ -442,12 +757,13 @@ export default class App extends React.Component {
         if (teams[dep.of]) own[shapeId] = dep.of;
       }
     }
+    this.useGeometry(domesticId);
     this.fitMap(Object.keys(own), su);
     this.setState(
       {
         phase: 'playing',
-        settings: { ...DEFAULT_SETUP, ...su, seed: String(seed) },
-        initialSettings: { ...DEFAULT_SETUP, ...su, seed: String(seed) },
+        settings,
+        initialSettings: { ...settings },
         managedTeamId: su.role === 'manager' ? su.managedTeamId : null, managementEnded: false,
         managerElimination: null, tacticalChoice: null, decisionLedger: [], historyFilter: '',
         campaignId: createCampaignId(), revision: 0,
@@ -491,14 +807,27 @@ export default class App extends React.Component {
   resume() {
     const s = this.saved;
     if (!s) return;
+    // A country campaign waits for its map; world campaigns restore synchronously.
+    return this.withCampaignMap(s, (loaded, fitted) => this.restoreCampaign(fitted, loaded));
+  }
+
+  restoreCampaign(s, loaded) {
+    this.flowToken++;
+    this.endRestore();
     this.clearTimers();
     this.engagement = new SessionEngagement(s.metrics?.engagement);
     this.rng = makeRng(s.seed ?? 1);
     this.rng.setState(s.rngState ?? s.seed ?? 1);
+    this.useGeometry(loaded ? loaded.meta.id : null);
     this.fitMap(Object.keys(s.own), s.settings);
+    // A save from another build was moved club by club onto this map; its saved draw is stale.
+    const remapped = !!loaded && s.settings.domesticVersion !== loaded.meta.version;
+    const restored = s.legacy ? 'Legacy campaign restored. Future matches use the saved seed.'
+      : remapped ? `Campaign restored on an updated map of ${loaded.meta.name}.${s.spin ? ' The interrupted draw starts again.' : ''}`
+        : 'Campaign restored';
     this.setState({
       phase: s.phase === 'victory' ? 'victory' : 'playing',
-      settings: { ...DEFAULT_SETUP, ...s.settings },
+      settings: { ...DEFAULT_SETUP, ...s.settings, ...(loaded ? { domesticVersion: loaded.meta.version } : {}) },
       initialSettings: s.initialSettings || { ...DEFAULT_SETUP, ...s.settings },
       managedTeamId: s.managedTeamId || (s.settings.role === 'manager' && !s.managementEnded ? s.followedId : null),
       managementEnded: !!s.managementEnded, managerElimination: s.managerElimination || null,
@@ -529,19 +858,38 @@ export default class App extends React.Component {
       choice: s.choice || null, conquestIds: s.conquestIds || [],
       startedAt: s.startedAt || Date.now(), completedAt: s.completedAt || (s.aliveIds.length === 1 ? s.savedAt : null),
       metrics: s.metrics || { leaderChanges: 0, acquisitions: [], previousLeader: null },
-      saveStatus: s.legacy ? { ok: true, message: 'Legacy campaign restored. Future matches use the saved seed.' } : { ok: true, message: 'Campaign restored' },
+      saveStatus: { ok: true, message: restored },
     }, () => {
       if (s.choice || s.tacticalChoice || s.managerElimination) { this.persist(); return; }
       if (s.match && !s.match.applied) this.presentMatch();
-      else if (s.spin) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
+      else if (s.spin && !remapped) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
       this.persist();
+      // The checkpoint re-stamps the map version; keep telling the player why the draw restarts.
+      if (remapped) this.setState(state => state.saveStatus?.ok && !state.storageConflict ? { saveStatus: { ...state.saveStatus, message: restored } } : null);
     });
   }
 
   discardSave() {
+    this.cancelRestore();
     clearSave(this.state.campaignId || this.saved?.campaignId);
     this.saved = null;
     this.setState({ hasSave: false, savedMeta: null });
+  }
+
+  /** Delete a saved campaign slot for good (from Saved campaigns, after confirmation). */
+  deleteSavedCampaign(id) {
+    const st = this.state, playing = st.phase === 'playing' || st.phase === 'victory';
+    if (playing && id === st.campaignId) return;
+    const result = deleteCampaign(id);
+    if (result.ok && this.saved?.campaignId === id) {
+      this.saved = null;
+      this.setState({ hasSave: false, savedMeta: null });
+    }
+    if (result.ok && !playing && st.campaignId === id) this.setState({ campaignId: null, revision: 0 });
+    this.setState(state => ({ storageDialog: state.storageDialog && { ...state.storageDialog, error: result.ok ? null : result.message,
+      notice: result.ok ? 'Campaign deleted from this browser.' : null } }),
+    // A campaign that could not be saved for lack of space saves now.
+    () => { if (result.ok && playing && this.state.saveStatus?.quota) this.persist(); });
   }
 
   /** Keep the previous campaign until a replacement is actually launched. */
@@ -551,9 +899,11 @@ export default class App extends React.Component {
       return;
     }
     this.clearTimers();
+    this.cancelRestore();
+    this.flowToken++;
     this.openingSeed = Date.now() >>> 0;
     this.setupTeamsCache = null;
-    this.fitMap(Object.keys(NATIONS));
+    this.showSetupMap(this.state.setup, true);
     this.setState({
       phase: 'setup',
       confirmNew: false,
@@ -1091,7 +1441,7 @@ export default class App extends React.Component {
       resText: '+' + taken.length + ' territories' + stealTxt,
       resTitle: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
       wCol: W.col, winnerName: W.name, loserName: L.name, territoriesGained: taken.length,
-      territoryIds: taken, territoryNames: taken.map(cid => NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || cid),
+      territoryIds: taken, territoryNames: taken.map(cid => this.territoryName(cid)),
       playerTaken: stolen ? { ...stolen } : null,
       replacedPlayer, strengthBefore, strengthAfter, strengthGained,
       acquisitionPolicy: Number.isInteger(playerIndex) ? 'manager-choice' : st.settings.acquisitionPolicy,
@@ -1350,6 +1700,9 @@ export default class App extends React.Component {
 
     const countries = [];
     const { flagParts, flagPatterns } = this.mapFlags(playing);
+    const domestic = this.domesticMap();
+    // The setup preview paints each section in the colour of the club starting there.
+    const preview = domestic && !playing ? homeClubs(domestic) : null;
     for (const c of this.geo.countries) {
       const p = this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
       if (!p) continue;
@@ -1358,16 +1711,18 @@ export default class App extends React.Component {
       const isSelected = owner && selected === ownerId;
       const parts = flagParts.get(c.id);
 
-      const unclaimedShade = (parseInt(c.id, 10) || c.id.charCodeAt(0)) % 2 ? C.landA : C.landB;
+      // Section ids share their country prefix, so they need a real hash to alternate.
+      const unclaimedShade = (domestic ? hashStr(c.id) : parseInt(c.id, 10) || c.id.charCodeAt(0)) % 2 ? C.landA : C.landB;
       countries.push({
         id: c.id,
         ownerId,
         ownerName: owner?.name,
         selected: !!isSelected,
-        name: NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
+        name: domestic?.sectionNames[c.id] || NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
         d: p.d,
         flagParts: parts,
-        fill: parts?.length ? 'transparent' : owner ? (owner.kind === 'club' ? owner.col : politicalColor(owner.id)) : phase === 'setup' && NATIONS[c.id] ? politicalColor(c.id) : unclaimedShade,
+        fill: parts?.length ? 'transparent' : owner ? (owner.kind === 'club' ? owner.col : politicalColor(owner.id))
+          : preview?.[c.id] ? preview[c.id].col : phase === 'setup' && NATIONS[c.id] ? politicalColor(c.id) : unclaimedShade,
         stroke: '#C0C7B2',
         strokeWidth: 0.35,
         cursor: owner ? 'pointer' : 'default',
@@ -1398,13 +1753,22 @@ export default class App extends React.Component {
       if (!team || own[team.home] !== tid) continue;
       const p = this.geo.paths[team.home];
       if (!p) continue;
-      out.push({ id: tid, x: p.cx, y: p.cy, color: teams[tid] ? teams[tid].col : C.gold });
+      // A country section marks the home town itself; routes leave from cx/cy, a point well inside.
+      out.push({ id: tid, x: p.homeX ?? p.cx, y: p.homeY ?? p.cy, color: teams[tid] ? teams[tid].col : C.gold });
     }
     return out;
   }
 
   tooltip(playing) {
     const { hoverCid, own, teams } = this.state;
+    const domestic = this.domesticMap();
+    if (domestic) {
+      const section = hoverCid && domestic.sectionNames[hoverCid];
+      if (!section) return { visible: false, name: '', sub: '' };
+      const holder = playing ? teams[own[hoverCid]] : homeClubs(domestic)[hoverCid];
+      return { visible: true, name: section.toUpperCase(),
+        sub: holder ? (playing ? 'HELD BY ' : 'HOME OF ') + holder.name.toUpperCase() : playing ? 'UNCLAIMED' : 'AWAITING CAMPAIGN' };
+    }
     const rec = hoverCid && NATIONS[hoverCid];
     const dep = hoverCid && DEPENDENCIES[hoverCid];
     if (!rec && !dep) return { visible: false, name: '', sub: '' };
@@ -1566,7 +1930,10 @@ export default class App extends React.Component {
     const champ = aliveIds.length ? teams[aliveIds[0]] : null;
     if (!champ) return null;
     const s = stats[champ.id] || { conq: 0, steals: [] };
-    const scope = this.scopeName(settings);
+    // "has conquered England", not the theatre's "England · top 100 clubs" label.
+    const scope = domesticIdOf(settings)
+      ? getLoadedDomestic(domesticIdOf(settings))?.meta.name || domesticEntry(settings.clubScope)?.name || this.scopeName(settings)
+      : this.scopeName(settings);
     return {
       id: champ.flagId,
       code: champ.code,
@@ -1638,18 +2005,22 @@ export default class App extends React.Component {
       : st.spin ? 'Drawing' : st.match && !st.match.done ? 'Live' : st.match?.done ? 'Full time' : 'Ready';
     const currentCard = this.matchCard();
     const sport = getSport(playing ? st.settings.sport : st.setup.sport);
-    const oceanLabels = !playing && this.geo ? [
+    const domesticMap = !!this.domesticId;
+    // A country previewed on the setup screen is framed beside the panel, not behind it.
+    const besidePanel = st.phase === 'setup' && domesticMap;
+    const oceanLabels = !playing && this.geo && !domesticMap ? [
       ['Pacific Ocean', -135, -5], ['Atlantic Ocean', -30, 0], ['Indian Ocean', 76, -25],
     ].map(([text, lon, lat]) => {
-      const [x, y] = projPt(lon, lat);
+      const [x, y] = this.planePoint(lon, lat);
       const { s, tx, ty } = this.geo.fit;
       return { text, x: x * s + tx, y: y * s + ty };
     }) : [];
-    const campaignTitle = st.settings.layer !== 'clubs' && st.settings.scope === 'UEFA'
-      ? 'The European campaign'
-      : st.settings.layer !== 'clubs' && st.settings.scope === 'world'
-        ? 'The world campaign'
-        : scopeName + ' campaign';
+    const campaignTitle = domesticIdOf(st.settings) ? scopeName
+      : st.settings.layer !== 'clubs' && st.settings.scope === 'UEFA'
+        ? 'The European campaign'
+        : st.settings.layer !== 'clubs' && st.settings.scope === 'world'
+          ? 'The world campaign'
+          : scopeName + ' campaign';
 
     return (
       <div className={`app-shell${playing ? ' has-campaign' : ''}`} data-mobile-view={st.mobileView}>
@@ -1685,6 +2056,8 @@ export default class App extends React.Component {
             spin={st.spin ? { ...st.spin, angle: st.spin.ang, durationMs: st.spin.spinMs,
               attackerName: st.teams[st.spin.attackerId]?.name, targetName: st.teams[st.spin.targetId]?.name } : null}
             tooltip={this.tooltip(playing)} kmPerUnit={this.geo?.kmPerUnit || 0} legend={this.legend(playing)}
+            backdrop={this.backdrop} scaleTitle={domesticMap ? DOMESTIC_SCALE_TITLE : undefined} showAllHomes={domesticMap}
+            besidePanel={besidePanel}
             viewResetKey={this.viewResetKey} initialFocus={this.viewFocus}
             title={campaignTitle} playing={playing} mapMode={st.mapMode}
             onMapMode={mapMode => this.setState({ mapMode })}
@@ -1729,19 +2102,19 @@ export default class App extends React.Component {
           />}
         </main>
         {st.phase === 'setup' && <SetupOverlay
-          setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()}
+          setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()} domestic={this.domesticStatus()}
           savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
             (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings) : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
           onPick={(key, value) => this.pickSetup(key, value)}
-          onStart={() => this.startCampaign()}
+          onStart={() => this.launchCampaign()} launching={st.launching} restoring={!!st.restoring} beside={besidePanel}
           saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
           onManageSaves={() => this.openStorageDialog('slots')}
         />}
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           onClose={() => this.setState({ phase: 'playing' })}
           onNew={() => {
-            this.clearTimers(); this.fitMap(Object.keys(NATIONS));
+            this.clearTimers(); this.cancelRestore(); this.showSetupMap(st.setup, true);
             this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null, autoplay: false });
           }}
         />}
@@ -1751,6 +2124,8 @@ export default class App extends React.Component {
           onSpectate={() => this.continueAsSpectator()} onRetry={() => this.retryManager()} />}
         {st.storageDialog && !st.exportText && <CampaignStorageDialog key={st.storageDialog.mode} {...st.storageDialog}
           activeId={st.campaignId} campaigns={listCampaigns()} onClose={() => this.closeStorageDialog()}
+          busy={st.restoring?.message || null} lockedId={playing ? st.campaignId : null}
+          onDelete={id => this.deleteSavedCampaign(id)}
           onConfirmImport={name => this.continueSaved(st.storageDialog.campaign, true, name)}
           onExportCurrent={st.hasSave ? () => this.exportProgress() : undefined}
           onLoad={id => {
@@ -1767,7 +2142,7 @@ export default class App extends React.Component {
               this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
               this.setState({ revision: result.revision, campaignName: result.campaignName });
             }
-            this.setState({ storageDialog: { ...st.storageDialog, error: result.ok ? null : result.message } });
+            this.setState({ storageDialog: { ...st.storageDialog, error: result.ok ? null : result.message, notice: null } });
           }}
           onFork={Object.keys(st.teams).length || this.saved ? name => this.continueSaved(st.phase === 'setup' ? this.saved
             : { ...st, rngState: this.rng.getState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}

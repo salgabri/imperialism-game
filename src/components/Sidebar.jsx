@@ -222,7 +222,8 @@ export default function Sidebar({ match, draw, idleText, queueLeft, tab = 'power
           <div className="fi-match-heading"><h2>Latest match</h2><span className="fi-match-status">{draw.stage === 'locked' ? 'Opponent selected' : 'Drawing'}</span></div>
           <h3>{draw.stage === 'locked' ? `${draw.attackerName} faces ${draw.targetName}` : `${draw.attackerName} to attack`}</h3>
           <p>{draw.stage === 'locked' ? draw.isNeighbor ? 'Land-border opponent selected.' : 'Overseas opponent selected.' : 'Drawing a direction and finding an opponent.'}</p>
-          {draw.stage === 'locked' && draw.routeLabel && <p className="fi-route-explanation">{draw.routeLabel}{draw.routeKind === 'neutral-transit' ? ' · neutral land is crossed under a transit treaty.' : ''}</p>}
+          {draw.stage === 'locked' && draw.routeLabel && <p className="fi-route-explanation">{draw.routeLabel}{draw.routeKind === 'neutral-transit' ? ' · neutral land is crossed under a transit treaty.'
+            : draw.routeKind === 'foreign-transit' ? ' · the route passes through a neighbouring country, which is never claimed.' : ''}</p>}
         </section>
       ) : (
         <section className="fi-match fi-match-empty"><div className="fi-match-heading"><h2>Latest match</h2><span className="fi-match-status">Ready</span></div>

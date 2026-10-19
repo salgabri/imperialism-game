@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { C, FONT } from '../theme.js';
 import { niceDistance } from '../engine/geo.js';
 import { useMapViewport } from '../hooks/useMapViewport.js';
@@ -9,6 +9,65 @@ import FlagPattern from './FlagPattern.jsx';
 import { createMapBorderIndex } from '../engine/mapBorders.js';
 import './map.css';
 
+const NONE = [];
+const EQUATORIAL_SCALE_TITLE = 'Approximate equatorial reference distance';
+// Wheel and trackpad zoom arrive as bursts of events; labels settle after one.
+const WHEEL_SETTLE_MS = 140;
+
+const TERRITORY_FIELDS = ['id', 'ownerId', 'ownerName', 'selected', 'name', 'd', 'fill', 'stroke', 'strokeWidth', 'cursor', 'animation'];
+const sameParts = (a, b) => a === b || (!!a && !!b && a.length === b.length
+  && a.every((part, i) => part.id === b[i].id && part.d === b[i].d && part.fill === b[i].fill));
+
+/**
+ * One territory. The map re-renders on every ticker update; a territory only
+ * redraws when its own geometry, colours or state change. Handlers go through
+ * `events`, which always holds the current props.
+ */
+const Territory = memo(function Territory({ country: c, k, conquered, followed, tabIndex, bordersDrawn, events, refs }) {
+  const id = c.id;
+  const setRef = useCallback(element => { if (element) refs.set(id, element); else refs.delete(id); }, [refs, id]);
+  return (
+    <g className="country-region" style={{ animation: c.animation }}>
+      <g className="country-flag-parts" pointerEvents="none">
+        {c.flagParts?.map((part, i) => <path key={`${part.id}-${i}`} data-flag-country={id}
+          data-flag-component={part.id} d={part.d} fill={part.fill} />)}
+      </g>
+      <path data-country={id} data-owner={c.ownerId || ''} d={c.d} fill={c.fill} ref={setRef}
+        data-conquered={conquered || undefined} data-followed={followed || undefined}
+        data-selected={c.selected || undefined}
+        stroke={conquered ? '#f2d991' : c.stroke} strokeWidth={(conquered ? 1.8 : bordersDrawn ? 0 : c.strokeWidth) * k}
+        onClick={() => events.current.click(id)}
+        onMouseEnter={() => events.current.enter(id)}
+        aria-label={c.ownerName ? `${c.name}, held by ${c.ownerName}. Inspect squad.` : c.name} role={c.ownerId ? 'button' : undefined}
+        tabIndex={tabIndex}
+        onFocus={event => events.current.focus(event, id)}
+        onKeyDown={event => events.current.keyDown(event, id)}
+        style={{ cursor: c.cursor }} />
+    </g>
+  );
+}, (a, b) => a.k === b.k && a.conquered === b.conquered && a.followed === b.followed && a.tabIndex === b.tabIndex
+  && a.bordersDrawn === b.bordersDrawn && a.events === b.events && a.refs === b.refs
+  && TERRITORY_FIELDS.every(key => a.country[key] === b.country[key]) && sameParts(a.country.flagParts, b.country.flagParts));
+
+const HomeMarkers = memo(function HomeMarkers({ homes, k }) {
+  return homes.map(h => <circle key={h.id} cx={h.x} cy={h.y} r={2.1 * k} fill="#e8dfc9" stroke="#243238" strokeWidth={.9 * k} />);
+}, (a, b) => a.k === b.k && a.homes.length === b.homes.length
+  && a.homes.every((h, i) => h.id === b.homes[i].id && h.x === b.homes[i].x && h.y === b.homes[i].y));
+
+/**
+ * Neighbouring land for context only: never territory, never interactive. The
+ * fill attribute repeats map.css (--panel) for renderers without the stylesheet.
+ */
+const Backdrop = memo(function Backdrop({ shapes }) {
+  if (!shapes.length) return null;
+  return (
+    <g className="map-backdrop" aria-hidden="true" pointerEvents="none" fill="#29322e">
+      {/* Atlas ids can repeat (Australia and Ashmore share 036), so keys carry the position too. */}
+      {shapes.map((shape, i) => <path key={`${shape.id}-${i}`} d={shape.d} />)}
+    </g>
+  );
+});
+
 /** Accurate, interactive political cartography; every fill comes from ownership. */
 export default function WorldMap({
   countries, flagPatterns, graticule, homes, battleMarks, labels, labelGeometry, ownership, oceanLabels = [], attack, spin,
@@ -16,9 +75,11 @@ export default function WorldMap({
   title, playing, mapRef, svgRef, tipRef, coordRef, onPointerMove, onPointerLeave,
   children, playback, onShowDetails,
   conquestIds = [], followedId, selectedId, paused = false, focusBounds, focusKey,
+  backdrop = NONE, scaleTitle = EQUATORIAL_SCALE_TITLE, showAllHomes = false, besidePanel = false,
 }) {
   const vp = useMapViewport(svgRef, viewResetKey, initialFocus);
   const k = vp.view.w / (vp.size.width || 960);
+  const [wheeling, setWheeling] = useState(false);
   const { key: compassKey, ...compassProps } = spin || {};
   const stop = e => e.stopPropagation();
   const revealedDraw = useRef(null);
@@ -30,6 +91,19 @@ export default function WorldMap({
   const conquest = new Set(conquestIds);
   const borderIndex = useMemo(() => createMapBorderIndex(labelGeometry || []), [labelGeometry]);
   const borders = borderIndex.resolve(playing ? ownership : {});
+  const byId = new Map(countries.map(country => [country.id, country]));
+  const territoryEvents = useRef(null);
+  territoryEvents.current = {
+    click: id => { if (!vp.didPan()) byId.get(id)?.onClick(); },
+    enter: id => byId.get(id)?.onEnter?.(),
+    focus: (event, id) => {
+      setKeyboardCountry(id);
+      byId.get(id)?.onEnter?.();
+      const bounds = event.currentTarget.getBoundingClientRect();
+      onPointerMove?.({ clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2 });
+    },
+    keyDown: (event, id) => navigateCountry(event, byId.get(id)),
+  };
   const focusCountry = id => {
     setKeyboardCountry(id);
     const path = countryRefs.current.get(id);
@@ -54,6 +128,18 @@ export default function WorldMap({
     vp.fitBounds(focusBounds);
   }, [focusKey]);
   useEffect(() => {
+    const svg = svgRef?.current;
+    if (!svg) return undefined;
+    let timer = null;
+    const onWheel = () => {
+      setWheeling(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setWheeling(false), WHEEL_SETTLE_MS);
+    };
+    svg.addEventListener('wheel', onWheel, { passive: true });
+    return () => { svg.removeEventListener('wheel', onWheel); clearTimeout(timer); };
+  }, [svgRef]);
+  useEffect(() => {
     if (!spin) { revealedDraw.current = null; return; }
     const stage = spin.stage === 'locked' ? 'locked' : 'origin';
     const key = `${spin.key}-${stage}`;
@@ -64,7 +150,7 @@ export default function WorldMap({
   }, [spin?.key, spin?.stage, vp.reveal]);
 
   return (
-    <section ref={mapRef} className={'world-map' + (playing ? '' : ' world-map--setup')} aria-label="Campaign map" tabIndex={-1}
+    <section ref={mapRef} className={'world-map' + (playing ? '' : ' world-map--setup') + (besidePanel ? ' world-map--beside-panel' : '')} aria-label="Campaign map" tabIndex={-1}
       onPointerDown={e => { if (e.target.closest('button, select, a, summary')) return; vp.handlers.onMouseDown(e); }}
       onPointerMove={e => { vp.handlers.onMouseMove(e); onPointerMove(e); }}
       onPointerUp={vp.handlers.onMouseUp}
@@ -84,31 +170,12 @@ export default function WorldMap({
           {flagPatterns.map(f => <FlagPattern key={f.id} flag={f} />)}
         </defs>
         <path d={graticule.d} fill="none" stroke="#9ebbc0" strokeOpacity=".09" strokeWidth={.6 * k} pointerEvents="none" />
+        <Backdrop shapes={backdrop} />
         <g className="country-shapes">
           {countries.map(c => (
-            <g key={c.id} className="country-region" style={{ animation: c.animation }}>
-              <g className="country-flag-parts" pointerEvents="none">
-                {c.flagParts?.map((part, i) => <path key={`${part.id}-${i}`} data-flag-country={c.id}
-                  data-flag-component={part.id} d={part.d} fill={part.fill} />)}
-              </g>
-              <path data-country={c.id} data-owner={c.ownerId || ''} d={c.d} fill={c.fill}
-                ref={element => { if (element) countryRefs.current.set(c.id, element); else countryRefs.current.delete(c.id); }}
-                data-conquered={conquest.has(c.id) || undefined} data-followed={c.ownerId === followedId || undefined}
-                data-selected={c.selected || undefined}
-                stroke={conquest.has(c.id) ? '#f2d991' : c.stroke} strokeWidth={(conquest.has(c.id) ? 1.8 : borders.borderD ? 0 : c.strokeWidth) * k}
-                onClick={() => { if (!vp.didPan()) c.onClick(); }}
-                onMouseEnter={c.onEnter}
-                aria-label={c.ownerName ? `${c.name}, held by ${c.ownerName}. Inspect squad.` : c.name} role={c.ownerId ? 'button' : undefined}
-                tabIndex={c.ownerId ? c.id === activeCountry ? 0 : -1 : undefined}
-                onFocus={event => {
-                  setKeyboardCountry(c.id);
-                  c.onEnter?.();
-                  const bounds = event.currentTarget.getBoundingClientRect();
-                  onPointerMove?.({ clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2 });
-                }}
-                onKeyDown={event => navigateCountry(event, c)}
-                style={{ cursor: c.cursor }} />
-            </g>
+            <Territory key={c.id} country={c} k={k} conquered={conquest.has(c.id)} followed={c.ownerId === followedId}
+              tabIndex={c.ownerId ? c.id === activeCountry ? 0 : -1 : undefined} bordersDrawn={!!borders.borderD}
+              events={territoryEvents} refs={countryRefs.current} />
           ))}
         </g>
         <g className="ownership-borders" pointerEvents="none" fill="none" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
@@ -121,9 +188,8 @@ export default function WorldMap({
           </g>)}
         </g>
         <g pointerEvents="none">
-          {homes.filter(h => vp.zoom > 1.5 || homes.length < 55).map(h => (
-            <circle key={h.id} cx={h.x} cy={h.y} r={2.1 * k} fill="#e8dfc9" stroke="#243238" strokeWidth={.9 * k} />
-          ))}
+          {/* A crowded world map keeps home markers for closer zooms; a country map always shows them. */}
+          <HomeMarkers homes={showAllHomes || vp.zoom > 1.5 || homes.length < 55 ? homes : NONE} k={k} />
           {battleMarks.slice(-3).map((b, i) => (
             <circle key={i} cx={b.x} cy={b.y} r={4 * k} fill="none" stroke={C.gold} strokeWidth={1.2 * k} opacity={b.op} />
           ))}
@@ -132,8 +198,9 @@ export default function WorldMap({
           {oceanLabels.map(lb => <text key={lb.text} x={lb.x} y={lb.y} textAnchor="middle" fill="#afc3c6"
             style={{ fontFamily: FONT.map, fontSize: 12 * k, fontWeight: 500, letterSpacing: 3 * k }}>{lb.text}</text>)}
         </g>
-        <EmpireLabels geometry={labelGeometry} ownership={ownership} labels={labels}
-          viewBox={vp.view} unitsPerPixel={k} mapMode={mapMode} />
+        {/* Labels wait for the opening camera: laying out 100 names for a stand-in view first is wasted work. */}
+        <EmpireLabels geometry={labelGeometry} ownership={ownership} labels={vp.framing ? NONE : labels}
+          viewBox={vp.view} unitsPerPixel={k} mapMode={mapMode} holdCamera={wheeling || vp.panning} />
         {attack && <AttackVector {...attack} k={k} paused={paused} />}
         {spin && <DrawCompass key={compassKey} {...compassProps} k={k} paused={paused} />}
       </svg>
@@ -161,7 +228,7 @@ export default function WorldMap({
       {playing && <div className="map-footnote">
         <span>{legend ? legend.text : 'Scroll to zoom · Drag to pan · Arrow keys select territories'}</span>
         <span ref={coordRef} className="map-coordinates">Select a territory to inspect its squad</span>
-        {kmPerUnit > 0 && <span className="map-distance" title="Approximate equatorial reference distance">≈ {niceDistance(vp.view.w * .12 * kmPerUnit).toLocaleString()} km</span>}
+        {kmPerUnit > 0 && <span className="map-distance" title={scaleTitle}>≈ {niceDistance(vp.view.w * .12 * kmPerUnit).toLocaleString()} km</span>}
       </div>}
     </section>
   );

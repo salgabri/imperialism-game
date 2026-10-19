@@ -350,7 +350,8 @@ export function buildClub(club, sport) {
     squad: club.squad.map(rosterPlayer),
     real: club.squad.length,
     kind: 'club',
-    home: club.country,
+    // A domestic club starts on its own section of the country map.
+    home: club.homeSection ?? club.country,
     flagId: null,
     sport: sport.id,
     origin: club.id,
