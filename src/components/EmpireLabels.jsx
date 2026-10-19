@@ -2,7 +2,7 @@
 // empire 700), uppercase, .14em tracking, a gentle 5% arc, sizes capped per viewport class (A-6).
 // No CSS import here: map-fonts.test bundles this file without a CSS loader. The engine import line below is
 // instrumented by smoke.mjs and must stay byte-identical.
-import React, { useEffect, useId, useMemo, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createEmpireLabelEngine } from '../engine/empireLabels.js';
 import { V4_LABEL_POLICY, estimateLabelWidthEm } from '../engine/empireLabels.js';
 
@@ -66,10 +66,12 @@ function useMapFont(characters) {
 /**
  * Geographic label work is independent of the match ticker and map styling: mode and colour changes never
  * re-run layout. `meId` (A-7: managed, else followed) gets weight 700, ink fill and a 6.5px minimum.
+ * While `holdCamera` is set (a drag), labels keep the layout of the last settled view and move with the map;
+ * they are laid out for the new view once the camera settles. Ownership changes never wait.
  */
 export default function EmpireLabels({
   geometry = EMPTY_GEOMETRY, ownership, labels, viewBox, unitsPerPixel, mapMode,
-  meId = null, maxFontPx = 22, minFontPx = POLICY.minFontPx,
+  meId = null, maxFontPx = 22, minFontPx = POLICY.minFontPx, holdCamera = false,
 }) {
   const pathPrefix = `empire-name-${useId().replace(/:/g, '')}`;
   const engine = useMemo(() => createEmpireLabelEngine(geometry), [geometry]);
@@ -81,11 +83,20 @@ export default function EmpireLabels({
     return { ...label, widthEm: widthInEm(label.text, mapFont.family, own ? OWN_FONT_WEIGHT : MAP_FONT_WEIGHT),
       minFontPx: own ? Math.min(POLICY.ownMinFontPx, minFontPx) : minFontPx };
   }), [namesKey, mapFont.family, mapFont.revision, meId, minFontPx]);
+  // A held camera keeps the last settled view (a 100-owner country map costs ~250 ms per fresh layout); anything
+  // that changes what is drawn, rather than where, lays out at once.
+  const settled = useRef(null);
+  const held = settled.current;
+  if (!holdCamera || !held || held.engine !== engine || held.ownership !== ownership || held.names !== names
+    || held.minFontPx !== minFontPx || held.maxFontPx !== maxFontPx) {
+    settled.current = { engine, ownership, names, viewBox, unitsPerPixel, minFontPx, maxFontPx };
+  }
+  const camera = settled.current;
   const placed = useMemo(() => names.length ? engine.layout({
-    ownership, labels: names, viewBox, unitsPerPixel, minFontPx, maxFontPx,
+    ownership, labels: names, viewBox: camera.viewBox, unitsPerPixel: camera.unitsPerPixel, minFontPx, maxFontPx,
     curveRatio: POLICY.curveRatio, coastalAllowancePx: POLICY.coastalAllowancePx, maxSeaFraction: POLICY.maxSeaFraction,
     trackingEm: POLICY.trackingEm,
-  }) : [], [engine, ownership, names, viewBox, unitsPerPixel, minFontPx, maxFontPx]);
+  }) : [], [engine, ownership, names, camera.viewBox, camera.unitsPerPixel, minFontPx, maxFontPx]);
   // Keep references unique across maps and stable as other owners enter/leave view.
   const pathId = id => `${pathPrefix}-${Array.from(String(id), c => c.codePointAt(0).toString(16)).join('-')}`;
   const flags = mapMode === 'flags';

@@ -160,14 +160,19 @@ export function identityFill(baseFill, { ownerId, meId, meFill, opponentId, mapM
 }
 
 /**
- * One country's fill (mapCountries). Rules in order: flag parts → transparent; unowned → setup nations pastel,
- * otherwise land-neutral; Flags mode → club colour (clubs fly no flag) or pastel; Strength → ramp; Fronts →
+ * One country's fill (mapCountries). Rules in order: flag parts → transparent; unowned → a country map's setup
+ * preview (`preview`: the club starting in that section) in the colour it takes at kick-off, else setup nations
+ * pastel, otherwise land-neutral; Flags mode → club colour (clubs fly no flag) or pastel; Strength → ramp; Fronts →
  * tint for your fronts, land-neutral elsewhere; Political → empire pastel by hash; then identityFill().
  */
 export function countryFill({ countryId, ownerId = null, owner = null, mapMode = DEFAULT_MAP_MODE, hasFlagParts = false,
-  setup = false, meId = null, meFill = false, opponentId = null, strength = null, fronts = null } = {}) {
+  setup = false, meId = null, meFill = false, opponentId = null, strength = null, fronts = null, preview = null } = {}) {
   if (hasFlagParts) return 'transparent';
-  if (!ownerId || !owner) return setup && NATIONS[countryId] ? empireFill(countryId) : V4.landNeutral;
+  if (!ownerId || !owner) {
+    // Decoded club rows carry no `kind`, hence their own parameter: Flags = the club colour, Political = its pastel.
+    if (preview?.id) return mapMode === 'flags' && preview.col ? preview.col : empireFill(preview.id);
+    return setup && NATIONS[countryId] ? empireFill(countryId) : V4.landNeutral;
+  }
   if (mapMode === 'flags') return owner.kind === 'club' && owner.col ? owner.col : empireFill(ownerId);
   const base = mapMode === 'strength' ? strength?.[ownerId] || empireFill(ownerId)
     : mapMode === 'fronts' && fronts ? fronts[ownerId] || V4.landNeutral
@@ -210,22 +215,30 @@ function wonLine(entry, ownerId) {
  * Hover tooltip (README §Interactions): name (CSS uppercases it), "Held by Italy since Round XII" |
  * "Capital of Italy" | "Held by Italy", "Won 2–1 against Austria" | "Strength 84.6", "Click to open the Italy
  * squad". Unowned land: "Not in this theatre" (playing) / "Awaiting campaign" (setup), no link.
+ * A country map names its sections (`ctx.sectionNames`): "Home of Burnley" on a club's home section, and in setup
+ * the club starting there (`ctx.homeClubs`), else "Awaiting campaign"; an unheld section reads "Unclaimed".
  * → { visible, name, held, result, link }.
  */
 export function tooltipModel(st, ctx = {}, cid) {
   const hidden = { visible: false, name: '', held: null, result: null, link: null };
   if (!cid) return hidden;
+  const section = ctx?.sectionNames?.[cid] || null;
   const nation = NATIONS[cid], dependency = DEPENDENCIES[cid];
-  if (!nation && !dependency) return hidden;
-  const name = nation?.[0] || dependency.name;
+  if (!section && !nation && !dependency) return hidden;
+  const name = section || nation?.[0] || dependency.name;
   const playing = isPlaying(st);
   const ownerId = playing ? st.own?.[cid] : null;
   const owner = ownerId ? st.teams?.[ownerId] : null;
-  if (!owner) return { visible: true, name, held: playing ? 'Not in this theatre' : 'Awaiting campaign', result: null, link: null };
+  if (!owner) {
+    const starting = section && !playing ? ctx?.homeClubs?.[cid] : null;
+    const held = starting ? `Home of ${starting.name}`
+      : playing ? section ? 'Unclaimed' : 'Not in this theatre' : 'Awaiting campaign';
+    return { visible: true, name, held, result: null, link: null };
+  }
   const conquest = lastConquestOf(st.history, ownerId, cid);
   const round = conquest ? roman(historyRound(conquest)) : '';
   const held = conquest && round ? `Held by ${owner.name} since Round ${round}`
-    : cid === owner.home ? `Capital of ${owner.name}` : `Held by ${owner.name}`;
+    : cid === owner.home ? `${section ? 'Home' : 'Capital'} of ${owner.name}` : `Held by ${owner.name}`;
   const eff = effOf(owner);
   const result = (conquest && wonLine(conquest, ownerId)) || (Number.isFinite(eff) ? `Strength ${eff.toFixed(1)}` : null);
   return { visible: true, name, held, result, link: `Click to open the ${owner.name} squad` };

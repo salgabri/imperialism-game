@@ -1,6 +1,7 @@
 // Owner: WP-0 (see PLAN.md §4). Frozen constants and helpers shared by App.jsx and the method modules (§1.4, §3.8).
 import { C } from '../theme.js';
-import { DEFAULT_SPORT } from '../sports/index.js';
+import { DEFAULT_SPORT, getSport } from '../sports/index.js';
+import { domesticScopeId } from '../engine/domestic.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -10,6 +11,11 @@ export const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'U
   managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic',
   // Turn modes (DEC D1): the defaults reproduce the original random draw with compass targets.
   turnOrder: 'random', targeting: 'compass' };
+
+/** The country whose own map a setup or saved campaign is played on, or null for the world. Pure. */
+export function domesticIdOf(settings) {
+  return settings?.layer === 'clubs' && getSport(settings.sport).id === 'football' ? domesticScopeId(settings.clubScope) : null;
+}
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
 export function signed(delta) {

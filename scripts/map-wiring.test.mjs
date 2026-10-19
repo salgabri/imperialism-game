@@ -291,3 +291,33 @@ test('handleMapMove keeps the tooltip inside the map by its measured size', () =
     assert.deepEqual(style, { left: '19px', top: '12px' });
   } finally { f.close(); }
 });
+
+test('a country map: setup paints each section as its starting club and names it; capitals mark the home town', () => {
+  const club = { id: 'd250-1', name: 'Paris FC', code: 'PFC', col: '#123456', homeSection: '250' };
+  const domestic = { clubs: [club], sectionNames: { '250': 'Paris', '276': 'Berlin', '826': 'London' } };
+  const f = fixture({ phase: 'setup' });
+  try {
+    const { app } = f;
+    app.domesticMap = () => domestic;
+    const paris = countryOf(app, '250');
+    assert.equal(paris.name, 'Paris');
+    assert.equal(paris.fill, empireFill(club.id), 'Political: the pastel the club takes at kick-off');
+    assert.equal(paris.ownerId, null, 'no owner, so no tab stops behind the wizard');
+    app.setState({ mapMode: 'flags' });
+    assert.equal(countryOf(app, '250').fill, club.col, 'Flags: the club colour');
+    app.setState({ hoverCid: '250' });
+    assert.deepEqual(app.tooltip(false), { visible: true, name: 'Paris', held: 'Home of Paris FC', result: null, link: null });
+    app.setState({ hoverCid: '826' });
+    assert.deepEqual(app.tooltip(false), { visible: true, name: 'London', held: 'Awaiting campaign', result: null, link: null });
+  } finally { f.close(); }
+
+  const g = fixture();
+  try {
+    const { app } = g;
+    const plain = app.mapHomes(true).find(home => home.id === '276');
+    assert.deepEqual([plain.x, plain.y], [app.geo.paths['276'].cx, app.geo.paths['276'].cy], 'world paths mark cx/cy');
+    app.geo = { ...app.geo, paths: { ...app.geo.paths, '276': { ...app.geo.paths['276'], homeX: 201.5, homeY: 99.25 } } };
+    const town = app.mapHomes(true).find(home => home.id === '276');
+    assert.deepEqual([town.x, town.y], [201.5, 99.25], 'a section marks the home town, not its routing anchor');
+  } finally { g.close(); }
+});

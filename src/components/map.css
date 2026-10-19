@@ -21,6 +21,12 @@
 .country-shapes path[data-country]:focus { outline: none; }
 .country-shapes path[data-country]:focus-visible { stroke: var(--ink); stroke-width: 2px; vector-effect: non-scaling-stroke; }
 .country-shapes path[data-reach=out], .country-shapes path[data-reach=kept] { filter: none; }
+/* Neighbouring land around a country map: context only — never territory, never interactive (WorldMap repeats the
+   fill as an attribute for renderers without this stylesheet). */
+.map-backdrop path {
+  fill: var(--land-neutral); stroke: var(--map-coast); stroke-width: .6px;
+  vector-effect: non-scaling-stroke; stroke-linejoin: round;
+}
 
 /* ---- your turn: out-of-reach land veiled (DEC D21, A-9) ---- */
 .reach-veil { fill: var(--map-veil); stroke: none; }

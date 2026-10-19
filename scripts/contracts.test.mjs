@@ -289,7 +289,8 @@ const EXPORT_FORMS = {
   'src/engine/liveMinute.js': { named: ['createMinuteStore'] },
   'src/engine/winProbability.js': { named: ['liveModelFor', 'footballRate', 'footballWinProbability', 'basketballWinProbability',
     'winSeries', 'chartGeometry'] },
-  'src/app/shared.js': { named: ['DEFAULT_SETUP', 'LOG_CAP', 'FEED_CAP', 'BATTLE_SCARS', 'signed'] },
+  // `domesticIdOf` (domestic campaigns): App, the method modules and the view-models name a country theatre with it.
+  'src/app/shared.js': { named: ['DEFAULT_SETUP', 'LOG_CAP', 'FEED_CAP', 'BATTLE_SCARS', 'signed', 'domesticIdOf'] },
   'src/app/mapMethods.jsx': { named: ['DEFAULT_MAP_MODE'] },
   'src/components/LiveMinute.jsx': { default: 'LiveMinute', named: ['useLiveMinute'] },
   'src/components/MatchCard.jsx': { default: true, named: ['TeamMark'] },
@@ -364,7 +365,7 @@ test('FROZEN pure-module exports are real values at runtime', async () => {
     'src/viewModels/conquest.js': ['buildConquestPreview'],
     'src/engine/turns.js': EXPORT_FORMS['src/engine/turns.js'].named,
     'src/engine/liveMinute.js': ['createMinuteStore'],
-    'src/app/shared.js': ['signed'],
+    'src/app/shared.js': ['signed', 'domesticIdOf'],
     'src/theme.js': ['empireFill', 'ratingTierOf', 'ratingTierColor', 'ratingColor', 'tint', 'pad3'],
   };
   for (const [file, names] of Object.entries(functions)) {
@@ -377,6 +378,12 @@ test('FROZEN pure-module exports are real values at runtime', async () => {
   assert.equal(shared.DEFAULT_SETUP.turnOrder, 'random');
   assert.equal(shared.DEFAULT_SETUP.targeting, 'compass');
   for (const name of ['LOG_CAP', 'FEED_CAP', 'BATTLE_SCARS']) assert.equal(typeof shared[name], 'number', name);
+  // A country theatre is football clubs on 'domestic:<id>'; anything else plays on the world map.
+  assert.equal(shared.domesticIdOf({ layer: 'clubs', sport: 'football', clubScope: 'domestic:826' }), '826');
+  assert.equal(shared.domesticIdOf({ layer: 'nations', sport: 'football', clubScope: 'domestic:826' }), null);
+  assert.equal(shared.domesticIdOf({ layer: 'clubs', sport: 'basketball', clubScope: 'domestic:826' }), null);
+  assert.equal(shared.domesticIdOf({ layer: 'clubs', sport: 'football', clubScope: 'all' }), null);
+  assert.equal(shared.domesticIdOf(null), null);
 });
 
 // ---------- (6) JSX runtime (§0.8) ----------

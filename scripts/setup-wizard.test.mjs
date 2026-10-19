@@ -9,21 +9,24 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { JSDOM } from 'jsdom';
 import { build } from 'esbuild';
 import {
-  TURN_ORDER_CARDS, buildSetupModel, campaignPreview as modelPreview, frontRelation, rulesOf, summaryOf, theatreRow, tierOf,
+  TURN_ORDER_CARDS, buildSetupModel, campaignPreview as modelPreview, countryMapPreview, domesticDescription as modelDescription,
+  domesticTheatres, frontRelation, rulesOf, summaryOf, theatreRow, tierOf,
 } from '../src/screens/setup/setupModel.js';
 import { SCOPES } from '../src/data/teams.js';
+import { DOMESTIC } from '../src/data/domestic.js';
 import { getSport } from '../src/sports/index.js';
+import { empireFill } from '../src/theme.js';
 
 const compiled = await build({
   stdin: { contents: `
-    export {default as SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignPreview} from './src/components/SetupOverlay.jsx';
+    export {default as SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignPreview, domesticDescription} from './src/components/SetupOverlay.jsx';
   `, resolveDir: fileURLToPath(new URL('../', import.meta.url)), loader: 'jsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'],
   loader: { '.css': 'empty' }, define: { 'import.meta.env.BASE_URL': '"/"' }, logLevel: 'silent',
 });
 const module = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
-const { SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignPreview } = module.exports;
+const { SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignPreview, domesticDescription } = module.exports;
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost' });
 globalThis.window = dom.window;
@@ -678,4 +681,204 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
   const stale = buildSetupModel({ ...BASE, sport: 'basketball', layer: 'clubs', clubScope: 'Serie A' });
   assert.equal(stale.scopeId, 'all');
   assert.match(stale.sports.find(sport => sport.id === 'basketball').note, /NBA/);
+});
+
+// ---------- One country's own top clubs (main 83b26cc, ported into the wizard; MERGE-DOMESTIC UI-10) ----------
+
+const ENGLAND = DOMESTIC.find(entry => entry.id === '826');
+const COUNTRY = { layer: 'clubs', clubScope: 'domestic:826' };
+
+test('football clubs list every shipped country after the leagues, in one radio group; the mirror groups them', async t => {
+  const sorted = DOMESTIC.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const rows = domesticTheatres();
+  assert.deepEqual(rows.map(row => row.id), sorted.map(entry => `domestic:${entry.id}`));
+  assert.deepEqual(rows[0], { id: `domestic:${sorted[0].id}`, name: sorted[0].name, label: sorted[0].name, count: sorted[0].clubs, note: '' });
+  const clubs = buildSetupModel({ ...BASE, layer: 'clubs' });
+  assert.ok(clubs.scopes.length > 1 && !clubs.scopes.some(scope => scope.id.startsWith('domestic:')), 'model.scopes stays the league rows');
+  assert.equal(clubs.domesticScopes, rows);
+  for (const setup of [{ ...BASE }, { ...BASE, sport: 'basketball', layer: 'clubs' }, { ...BASE, sport: 'basketball' }]) {
+    assert.deepEqual(buildSetupModel(setup).domesticScopes, [], `${setup.sport} ${setup.layer}: no single-country theatres`);
+  }
+
+  const view = await mount(t, { setup: { layer: 'clubs' } });
+  const list = view.q('.setup-theatres');
+  assert.ok(list.hasAttribute('data-long'), 'the long list scrolls in its own box');
+  assert.equal(view.qa('[role="radiogroup"][aria-labelledby="setup-theatre-label"]').length, 1);
+  assert.equal(view.qa('.setup-theatre').length, clubs.scopes.length + rows.length);
+  const heading = view.q('.setup-theatres__group');
+  assert.equal(heading.textContent, 'One country · top clubs');
+  assert.equal(heading.getAttribute('aria-hidden'), 'true');
+  assert.equal(heading.previousElementSibling.dataset.name, clubs.scopes.at(-1).label, 'leagues first, then the countries');
+  const england = view.qa('.setup-theatre').find(row => row.dataset.name === 'England');
+  assert.equal(england.querySelector('.setup-theatre__count').textContent, `${ENGLAND.clubs} clubs`);
+
+  // The mirror: "European leagues" holds the league ids in order; the countries read "Name · N clubs", A–Z.
+  const mirror = view.q('#setup-theatre');
+  const groups = [...mirror.querySelectorAll('optgroup')];
+  assert.deepEqual(groups.map(group => group.getAttribute('label')), ['European leagues', 'One country · top clubs']);
+  assert.deepEqual([...groups[0].querySelectorAll('option')].map(option => option.value), clubs.scopes.map(scope => scope.id));
+  assert.deepEqual([...groups[1].querySelectorAll('option')].map(option => [option.value, option.textContent]),
+    sorted.map(entry => [`domestic:${entry.id}`, `${entry.name} · ${entry.clubs} clubs`]));
+  mirror.value = 'domestic:826';
+  await act(async () => mirror.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', 'domestic:826']);
+
+  // Arrow keys walk from the last league into the first country; a letter jumps to the next name starting with it.
+  const leagues = view.qa('.setup-theatre').slice(0, clubs.scopes.length);
+  await view.key(leagues.at(-1), 'ArrowDown');
+  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', rows[0].id]);
+  const checked = view.q('.setup-theatre[aria-checked="true"]');
+  const names = view.qa('.setup-theatre').map(row => row.dataset.name);
+  const from = names.indexOf(checked.dataset.name);
+  const next = [...names.slice(from + 1), ...names.slice(0, from + 1)].find(name => name.toLowerCase().startsWith('s'));
+  await view.key(checked, 's');
+  assert.equal(document.activeElement.dataset.name, next);
+  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', rows.find(row => row.label === next)?.id ?? clubs.scopes.find(scope => scope.label === next).id]);
+  assert.deepEqual(view.errors, []);
+
+  // Nations keep v4's flat list and mirror.
+  const nations = await mount(t);
+  assert.equal(nations.q('.setup-theatres').hasAttribute('data-long'), false);
+  assert.equal(nations.q('.setup-theatres__group'), null);
+  assert.equal(nations.qa('#setup-theatre optgroup').length, 0);
+  assert.ok(!nations.qa('#setup-theatre option').some(option => option.value.startsWith('domestic:')));
+});
+
+test('a chosen country: description, counts, summaries, and its map load gating Launch', async t => {
+  assert.equal(domesticDescription(ENGLAND), modelDescription(ENGLAND), 'SetupOverlay re-exports the model description');
+  assert.equal(modelDescription({ name: 'X', clubs: 3, top: ['A', 'B', 'C'] }),
+    'A, B and C lead 3 clubs fighting over X, split into 3 sections drawn from its administrative divisions.');
+  assert.match(modelDescription({ name: 'X', clubs: 1, top: ['A'] }), /^A leads 1 clubs/);
+  assert.match(modelDescription({ name: 'X', clubs: 2 }), /^The strongest clubs lead/);
+
+  const model = buildSetupModel({ ...BASE, ...COUNTRY }, { domestic: { state: 'ready' } });
+  assert.equal(model.scopeId, 'domestic:826');
+  assert.equal(model.scopeName, 'England · top 100 clubs');
+  assert.equal(model.campaignSummary, 'Football · Clubs · England · top 100 clubs');
+  assert.equal(model.roleMeta, 'England · top 100 clubs · Football clubs · 100 clubs');
+  assert.equal(model.count, ENGLAND.clubs);
+  assert.equal(model.stats[0].value, String(ENGLAND.clubs));
+  assert.match(model.status, /^100 clubs · 99 matches/);
+  assert.equal(model.canLaunch, true);
+  assert.equal(model.countryNote, modelDescription(ENGLAND));
+  const states = Object.fromEntries(['loading', 'error', 'ready', 'idle'].map(state => [state,
+    buildSetupModel({ ...BASE, ...COUNTRY }, { domestic: { state, message: state === 'error' ? 'Network down.' : null } })]));
+  assert.deepEqual(Object.values(states).map(m => m.canLaunch), [false, false, true, true]);
+  assert.equal(states.loading.launchNote, 'Loading the map of England…');
+  assert.equal(states.loading.teamsEmpty, 'Loading the map of England…');
+  assert.equal(states.error.launchNote, 'The map of England could not be loaded.');
+  assert.equal(states.error.countryMessage, 'Network down.');
+  const busy = buildSetupModel({ ...BASE, ...COUNTRY }, { domestic: { state: 'ready' }, launching: true });
+  assert.equal(busy.canLaunch, false);
+  assert.equal(busy.launchNote, 'Preparing the map of England…');
+  // A country is a football-clubs theatre only: elsewhere the stale scope falls back like a stale league.
+  const basketball = buildSetupModel({ ...BASE, ...COUNTRY, sport: 'basketball' }, { domestic: { state: 'loading' } });
+  assert.equal(basketball.scopeId, 'all');
+  assert.equal(basketball.canLaunch, true);
+
+  // Loading: polite status under the description, Launch disabled, step 3 explains the empty club list.
+  const loading = await mount(t, { setup: { ...COUNTRY, role: 'manager' }, managerTeams: [], domestic: { state: 'loading', message: null, onRetry() {} } });
+  const row = loading.q('.setup-theatre[aria-checked="true"]');
+  assert.equal(row.dataset.name, 'England');
+  assert.equal(row.getAttribute('aria-describedby'), 'setup-theatre-description');
+  const description = loading.q('#setup-theatre-description').textContent;
+  assert.ok(ENGLAND.top.every(name => description.includes(name)) && description.includes('England') && description.includes('100 sections'));
+  assert.equal(loading.q('.setup-domestic__status[role="status"]').textContent, 'Loading the map of England…');
+  assert.equal(loading.q('#setup-theatre').value, 'domestic:826');
+  assert.match(loading.q('.setup-stats').textContent, /100/);
+  assert.equal(loading.button('Launch campaign').disabled, true);
+  assert.equal(loading.q('.setup-country-map').getAttribute('data-state'), 'loading');
+  await loading.click(loading.qa('.setup-rail__step')[2]);
+  assert.equal(loading.q('.setup-empty').textContent, 'Loading the map of England…');
+  assert.equal(loading.section(3).querySelector('.setup-foot__note').textContent, 'Loading the map of England…');
+  await loading.key(document.body, ' ');
+  assert.equal(loading.calls.start, 0, 'Space never launches while the map loads');
+  await loading.click(loading.qa('.setup-rail__step')[0]);
+  await loading.click(loading.button('Next: Rules'));
+  assert.match(loading.q('.setup-rail__step[data-state="done"]').textContent, /Football · Clubs · England · top 100 clubs/);
+
+  // Error: an alert with App's message and Retry (step 1 only); Launch stays disabled.
+  let retried = 0;
+  const failed = await mount(t, {
+    setup: COUNTRY, domestic: { state: 'error', message: 'The map of England could not be loaded. 404', onRetry: () => { retried += 1; } },
+  });
+  const alert = failed.q('.setup-domestic__error[role="alert"]');
+  assert.match(alert.textContent, /could not be loaded\. 404/);
+  assert.equal(failed.qa('button').filter(button => button.textContent.trim() === 'Retry').length, 1);
+  await failed.click(failed.button('Retry', alert));
+  assert.equal(retried, 1);
+  assert.equal(failed.button('Launch campaign').disabled, true);
+  assert.equal(failed.q('.setup-domestic__status'), null);
+
+  // Ready: Launch works; while App prepares the campaign the button is busy and a second submit is ignored.
+  const ready = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {} } });
+  assert.equal(ready.q('.setup-domestic__status'), null);
+  assert.equal(ready.q('.setup-country-map'), null, 'no card without a preview from App');
+  await ready.click(ready.button('Launch campaign'));
+  assert.equal(ready.calls.start, 1);
+  const launching = await mount(t, { setup: COUNTRY, launching: true, domestic: { state: 'ready', message: null, onRetry() {} } });
+  const launch = launching.button('Launch campaign');
+  assert.equal(launch.disabled, true);
+  assert.equal(launch.getAttribute('aria-busy'), 'true');
+  assert.equal(launching.section(3).querySelector('.setup-foot__note').textContent, 'Preparing the map of England…');
+  await act(async () => launching.q('form').dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true })));
+  assert.equal(launching.calls.start, 0);
+  assert.deepEqual(launching.visibleStep(), ['1'], 'a submit while launching does not jump to step 3');
+  assert.deepEqual([...loading.errors, ...failed.errors, ...ready.errors, ...launching.errors], []);
+});
+
+test('a country restore in progress disables Resume and Cancel', async t => {
+  const view = await mount(t, { hasSave: true, savedText: 'Round 2', restoring: true, onCancel: () => {} });
+  assert.equal(view.button('Resume', view.q('.setup-save')).disabled, true);
+  assert.equal(view.button('Cancel').disabled, true);
+  const idle = await mount(t, { hasSave: true, savedText: 'Round 2', onCancel: () => {} });
+  assert.equal(idle.button('Resume', idle.q('.setup-save')).disabled, false);
+  assert.equal(idle.button('Cancel').disabled, false);
+});
+
+test('country card: sections in their kick-off pastels over the neighbouring land, static and decorative', async t => {
+  const paths = {
+    s1: { d: 'M0,0L10,0L10,10Z', fullBounds: { x: 0, y: 0, w: 10, h: 10 } },
+    s2: { d: 'M10,0L20,0L20,10Z', fullBounds: { x: 10, y: 0, w: 10, h: 10 } },
+    s3: { d: 'M0,10L5,10L5,12Z', fullBounds: { x: 0, y: 10, w: 5, h: 2 } },
+  };
+  const map = {
+    geo: { paths, focusView: () => ({ x: 0, y: 0, w: 20, h: 10 }) }, focus: [0, 0, 1, 1],
+    sectionNames: { s1: 'North', s2: 'South', s3: 'Isle' },
+    clubs: [{ id: 'd999-1', homeSection: 's1' }, { id: 'd999-2', homeSection: 's2' }],
+  };
+  const backdrop = [{ id: '250', d: 'M-5,-5L0,-5L0,0Z', rings: [] }];
+  const preview = countryMapPreview(map, backdrop);
+  assert.equal(preview.viewBox, '-0.8 -0.8 21.6 11.6', 'framed on the opening focus, 4% margin');
+  assert.deepEqual(preview.sections.map(section => [section.id, section.fill]),
+    [['s1', empireFill('d999-1')], ['s2', empireFill('d999-2')], ['s3', '#e8e9e4']]);
+  assert.deepEqual(preview.backdrop, [{ id: '250', d: 'M-5,-5L0,-5L0,0Z' }]);
+  assert.equal(countryMapPreview(map, backdrop), preview, 'memoised per map, paths and backdrop');
+  assert.notEqual(countryMapPreview(map, [...backdrop]), preview);
+  const unfocused = countryMapPreview({ ...map, focus: null }, null);
+  assert.equal(unfocused.viewBox, '-0.8 -0.8 21.6 13.6', 'no focus: the union of the sections');
+  assert.deepEqual(unfocused.backdrop, []);
+  assert.equal(countryMapPreview(null), null);
+  assert.equal(countryMapPreview({ geo: { paths: {} }, sectionNames: {} }), null);
+
+  // A real shipped map: every section, each in its own home club's pastel.
+  const { decodeDomestic } = await import('../src/engine/domestic.js');
+  const decoded = decodeDomestic(JSON.parse(readFileSync(new URL('../public/domestic/826.json', import.meta.url), 'utf8')), '826');
+  const real = countryMapPreview(decoded, []);
+  assert.equal(real.sections.length, ENGLAND.clubs);
+  const home = new Map(decoded.clubs.map(club => [club.homeSection, club.id]));
+  assert.ok(real.sections.every(section => section.fill === empireFill(home.get(section.id))));
+  assert.ok(real.viewBox.split(' ').map(Number).every(Number.isFinite));
+
+  const view = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {}, preview } });
+  const card = view.q('.setup-step[data-step="1"] .setup-side > .setup-country-map');
+  assert.ok(card, 'the card leads the side column of step 1');
+  assert.equal(card.getAttribute('aria-hidden'), 'true');
+  assert.equal(card.querySelector('svg').getAttribute('viewBox'), preview.viewBox);
+  assert.equal(card.querySelectorAll('.setup-country-map__backdrop path').length, 1);
+  assert.deepEqual([...card.querySelectorAll('.setup-country-map__sections path')].map(path => path.getAttribute('fill')),
+    preview.sections.map(section => section.fill));
+  assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
+  assert.equal(card.querySelector('figcaption').textContent, 'England · 3 sections, one per club');
+  assert.deepEqual(view.errors, []);
 });

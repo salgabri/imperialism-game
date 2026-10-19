@@ -5,7 +5,9 @@
 // (smoke injects such matches). Memo keys carry the `col:` prefix (PLAN rule 16).
 import { SCOPES, teamEff } from '../data/teams.js';
 import { CLUB_SCOPES } from '../data/scopes.js';
+import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
+import { domesticIdOf } from '../app/shared.js';
 import { empireNeighbors, territories } from '../engine/campaign.js';
 import { reachableTargets } from '../engine/turns.js';
 import { empireFill, MAP } from '../theme.js';
@@ -42,6 +44,8 @@ function roundLabel(n) {
 function scopeNameOf(settings) {
   if (!settings) return '';
   try {
+    // A country theatre ("England · top 100 clubs"), as App.scopeName names it.
+    if (domesticIdOf(settings)) return domesticLabel(settings.clubScope) || '';
     if (settings.layer === 'clubs') {
       const scopes = CLUB_SCOPES(getSport(settings.sport));
       return plainScopeName((scopes.find(x => x.id === settings.clubScope) || scopes[0])?.name || '');
@@ -313,14 +317,15 @@ export function buildFronts(st, ctx = {}, { limit = 5, reach = null } = {}) {
 
 /**
  * The note under a fronts table without a land tier (DEC D4): direct sea strikes, or the fallback tier's coastal
- * sea routes and neutral transit treaties — the copy names the route kinds actually present.
+ * sea routes, neutral transit treaties and (an exclave on a country map) crossings of foreign land that is never
+ * claimed — the copy names the route kinds actually present.
  */
 function reachNote(entries) {
-  const transit = entries.some(entry => entry.routeKind === 'neutral-transit');
-  const sea = entries.some(entry => entry.routeKind !== 'neutral-transit');
-  if (transit && sea) return 'No land border · these rivals are reached by sea or transit treaty';
-  if (transit) return 'No land border · these rivals are reached by transit treaty';
-  return 'No land border · these rivals are reached by sea';
+  const kinds = new Set(entries.map(entry => (['neutral-transit', 'foreign-transit'].includes(entry.routeKind) ? entry.routeKind : 'sea')));
+  const by = [kinds.has('sea') || !kinds.size ? 'sea' : null, kinds.has('neutral-transit') ? 'transit treaty' : null].filter(Boolean);
+  const ways = [...by.map((way, i) => (i ? way : `by ${way}`)), ...(kinds.has('foreign-transit') ? ['across foreign land'] : [])];
+  const list = ways.length > 1 ? `${ways.slice(0, -1).join(', ')} or ${ways[ways.length - 1]}` : ways[0];
+  return `No land border · these rivals are reached ${list}`;
 }
 
 // ---------- history: latest results and ticker ----------
@@ -517,6 +522,8 @@ function mapKeyModel(st, ctx) {
   const mode = KEY_MODES.has(st.mapMode) ? st.mapMode : 'political';
   const me = meItem(st, ctx, mode);
   const hasMe = !!me;
+  // A country map marks each club's home town, not a national capital.
+  const capital = ctx?.sectionNames ? 'Home town' : 'Capital';
   if (st.pendingTarget) {
     return { variant: 'reach', heading: null, items: [
       me,
@@ -544,14 +551,14 @@ function mapKeyModel(st, ctx) {
     return { variant: 'flags', heading: 'Key', items: [
       me,
       hasMe ? { key: 'opponent', kind: 'swatch', label: 'Next opponent', color: null, ring: RING_OPPONENT } : null,
-      { key: 'capital', kind: 'capital', label: 'Capital' },
+      { key: 'capital', kind: 'capital', label: capital },
     ].filter(Boolean) };
   }
   return { variant: 'political', heading: 'Key', items: [
     me,
     hasMe ? { key: 'opponent', kind: 'swatch', label: 'Next opponent', color: 'var(--opponent-fill)', ring: RING_OPPONENT } : null,
     { key: 'attack', kind: 'arrow', label: 'Line of attack' },
-    { key: 'capital', kind: 'capital', label: 'Capital' },
+    { key: 'capital', kind: 'capital', label: capital },
   ].filter(Boolean) };
 }
 

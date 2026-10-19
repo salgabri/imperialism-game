@@ -3,8 +3,10 @@
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
 import { NATIONS, SCOPES } from '../../data/teams.js';
 import { CLUB_SCOPES } from '../../data/scopes.js';
+import { DOMESTIC } from '../../data/domestic.js';
+import { domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
-import { ratingTierOf } from '../../theme.js';
+import { V4, empireFill, ratingTierOf } from '../../theme.js';
 
 export const PACING_OPTIONS = [['duel', 'One by one'], ['blitz', 'Blitz round'], ['chaos', 'Chaos draw']];
 export const RESOLUTION_OPTIONS = [['ticker', 'Live ticker'], ['instant', 'Instant result']];
@@ -144,6 +146,70 @@ export function theatreOptions(sport, clubLayer) {
   return SCOPES.map(scope => theatreRow(scope, counts[scope.id]));
 }
 
+/** Theatre list group headings (and the `#setup-theatre` mirror's optgroup labels) when countries are offered. */
+export const LEAGUE_GROUP = 'European leagues';
+export const DOMESTIC_GROUP = 'One country · top clubs';
+
+let domesticRowCache = null;
+/**
+ * One country's own top clubs (docs/design/domestic-campaigns.md): one row per shipped map, A–Z, in the theatre row
+ * shape. Offered for football clubs only (`domesticOffered`).
+ */
+export function domesticTheatres() {
+  if (!domesticRowCache) {
+    domesticRowCache = Object.freeze([...DOMESTIC].sort((a, b) => a.name.localeCompare(b.name))
+      .map(entry => Object.freeze({ id: `domestic:${entry.id}`, name: entry.name, label: entry.name, count: entry.clubs, note: '' })));
+  }
+  return domesticRowCache;
+}
+
+export const domesticOffered = (sport, clubLayer) => !!clubLayer && sport?.id === 'football';
+
+/** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
+export function domesticDescription(entry) {
+  const top = entry.top || [];
+  const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
+  return `${leaders} ${entry.clubs} clubs fighting over ${entry.name}, split into ${entry.clubs} sections drawn from its administrative divisions.`;
+}
+
+const countryPreviewCache = new WeakMap();
+/**
+ * Step 1's static country card (the v4 form of the setup preview): a decoded country map's sections, each in the
+ * pastel its starting club takes at kick-off (`empireFill(club.id)`, DEC D18), over the neighbouring land
+ * (`backdrop`: [{ id, d }], App's `surroundings(map).shapes`). Framed on the map's opening focus, else on all sections,
+ * in the fitted 960×540 frame. Pure; memoised per decoded map, fitted paths and backdrop.
+ * → { viewBox, sections: [{ id, d, fill }], backdrop: [{ id, d }] } | null
+ */
+export function countryMapPreview(domestic, backdrop = null) {
+  const paths = domestic?.geo?.paths;
+  if (!paths || !domestic.sectionNames) return null;
+  const hit = countryPreviewCache.get(domestic);
+  if (hit && hit.paths === paths && hit.backdrop === backdrop) return hit.value;
+  const clubOf = new Map((domestic.clubs || []).map(club => [club.homeSection, club]));
+  const ids = Object.keys(domestic.sectionNames).filter(id => paths[id]?.d);
+  if (!ids.length) return null;
+  const sections = ids.map(id => {
+    const club = clubOf.get(id);
+    return Object.freeze({ id, d: paths[id].d, fill: club ? empireFill(club.id) : V4.landNeutral });
+  });
+  let box = domestic.focus && typeof domestic.geo.focusView === 'function' ? domestic.geo.focusView(domestic.focus) : null;
+  if (!(box && box.w > 0 && box.h > 0)) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const id of ids) {
+      const b = paths[id].fullBounds || paths[id].bbox;
+      if (!b) continue;
+      x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.w); y1 = Math.max(y1, b.y + b.h);
+    }
+    box = Number.isFinite(x0) && x1 > x0 && y1 > y0 ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : { x: 0, y: 0, w: 960, h: 540 };
+  }
+  const pad = Math.max(box.w, box.h) * .04;
+  const viewBox = [box.x - pad, box.y - pad, box.w + pad * 2, box.h + pad * 2].map(n => Number(n.toFixed(1))).join(' ');
+  const shapes = Array.isArray(backdrop) ? backdrop.filter(shape => shape?.d).map(shape => Object.freeze({ id: shape.id, d: shape.d })) : [];
+  const value = Object.freeze({ viewBox, sections: Object.freeze(sections), backdrop: Object.freeze(shapes) });
+  countryPreviewCache.set(domestic, { paths, backdrop, value });
+  return value;
+}
+
 /** Sport card subtitle, derived from the sport's own club data so it never overstates the leagues. */
 export function sportNote(sport) {
   const clubs = sport.clubs || [];
@@ -233,9 +299,13 @@ function teamIdentity(sport, id, clubLayer) {
   return { code: nation?.[1] || String(id), group: nation?.[2] || '', isClub: false };
 }
 
+const NO_ROWS = Object.freeze([]);
+
 /**
  * The wizard model. `ctx.managerTeams` is App's `setupTeams()` list: [{ id, name, rating }] sorted by name
  * (optional extras: `code`, `isClub`, `meta`, `players: [{ pos, name, rating }]`, `neighbours: [teamId]`).
+ * `ctx.domestic` is App's load state of the chosen country map ({ state: idle | loading | ready | error, message });
+ * `ctx.launching` is true while App prepares a country campaign after Launch.
  */
 export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
@@ -244,14 +314,23 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const noun = clubLayer ? 'club' : 'nation';
   const nouns = `${noun}s`;
   const scopes = theatreOptions(sport, clubLayer);
+  // One country's own top clubs: football clubs only, listed after the leagues.
+  const domesticOn = domesticOffered(sport, clubLayer);
+  const domesticScopes = domesticOn ? domesticTheatres() : NO_ROWS;
+  const country = domesticOn && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
   // Changing sport can leave a league from the previous sport in the saved setup; same fallback as startCampaign.
   const activeScope = scopes.find(scope => scope.id === (clubLayer ? setup.clubScope : setup.scope)) || scopes[0];
-  const count = activeScope.count;
+  const scopeId = country ? setup.clubScope : activeScope.id;
+  const scopeName = country ? domesticLabel(setup.clubScope) : activeScope.label;
+  const count = country ? country.clubs : activeScope.count;
   const preview = campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
   const resolution = RESOLUTION_OPTIONS.some(([id]) => id === setup.resolution) ? setup.resolution : 'ticker';
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.
-  const campaignSummary = `${sport.name} · ${clubLayer ? 'Clubs' : 'Nations'} · ${activeScope.label}`;
+  const campaignSummary = `${sport.name} · ${clubLayer ? 'Clubs' : 'Nations'} · ${scopeName}`;
+  const launching = !!ctx.launching;
+  const countryState = country && ['loading', 'ready', 'error'].includes(ctx.domestic?.state) ? ctx.domestic.state : 'idle';
+  const countryWaits = countryState === 'loading' || countryState === 'error';
 
   const ranked = managerTeams.slice().sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name)));
   const rankOf = new Map(ranked.map((team, index) => [team.id, index + 1]));
@@ -273,7 +352,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     const rank = rankOf.get(picked.id);
     managed = {
       ...row(picked),
-      meta: picked.meta || [identity.group, `${sport.name} ${noun}`].filter(Boolean).join(' · '),
+      meta: picked.meta || [identity.group || country?.name, `${sport.name} ${noun}`].filter(Boolean).join(' · '),
       rankText: `${rank} / ${field}`, tier: tierOf(rank),
       players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
@@ -285,14 +364,30 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const favouriteIds = new Set(favourites.map(team => team.id));
   const longShots = [...new Set([.55, .7, .85].map(share => ranked[Math.round(field * share)]).filter(Boolean))]
     .filter(team => !favouriteIds.has(team.id)).map(row);
-  const canLaunch = role !== 'manager' || !!picked;
+  const teamChosen = role !== 'manager' || !!picked;
+  // A country campaign also waits for its map (and never launches twice while App prepares it).
+  const canLaunch = teamChosen && !countryWaits && !launching;
+  const mapLoading = country ? `Loading the map of ${country.name}…` : '';
+  const mapFailed = country ? `The map of ${country.name} could not be loaded.` : '';
+  const launchNote = launching ? `Preparing the map of ${country?.name || 'the country'}…`
+    : countryState === 'loading' ? mapLoading
+      : countryState === 'error' ? mapFailed
+        : teamChosen ? SETUP_STEPS[2].note : `Choose a ${noun} to manage`;
 
   return {
     sport: { id: sport.id, name: sport.name },
     sports: SPORT_LIST.map(item => ({ id: item.id, name: item.name, note: sportNote(item), selected: item.id === sport.id })),
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
-    scopes, scopeId: activeScope.id, scopeName: activeScope.label, scopeKey: clubLayer ? 'clubScope' : 'scope',
+    // `scopes` stays the league / region rows; countries are their own group (`domesticScopes`) after them.
+    scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
     theatreNotes: scopes.filter(scope => scope.note),
+    domesticScopes, leagueGroup: LEAGUE_GROUP, domesticGroup: DOMESTIC_GROUP,
+    country: country ? { id: country.id, name: country.name, clubs: country.clubs } : null,
+    countryNote: country ? domesticDescription(country) : '',
+    countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
+    mapLoading, launching,
+    // Step 3's team list is empty until a country's map decodes.
+    teamsEmpty: countryState === 'loading' ? mapLoading : countryState === 'error' ? mapFailed : `No ${nouns} in this theatre.`,
     count, preview,
     stats: [
       { id: 'teams', label: clubLayer ? 'Clubs' : 'Nations', value: String(count) },
@@ -310,12 +405,12 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     role, teams, field, managed, favourites, longShots, canLaunch,
     // Spectators pick no team, so their step-3 heading names what they do choose.
     roleTitle: role === 'manager' ? `Choose your ${noun}` : 'Choose your role',
-    roleMeta: `${activeScope.label} · ${sport.name} ${nouns} · ${count} ${nouns}`,
+    roleMeta: `${scopeName} · ${sport.name} ${nouns} · ${count} ${nouns}`,
     stepSummaries: {
       1: campaignSummary,
       2: rules.summary,
       3: role === 'manager' ? (picked ? `Manager · ${picked.name}` : 'Manager') : 'Spectator',
     },
-    launchNote: canLaunch ? SETUP_STEPS[2].note : `Choose a ${noun} to manage`,
+    launchNote,
   };
 }

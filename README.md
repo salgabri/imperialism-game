@@ -18,6 +18,8 @@ And pick who fights:
 - **Nations** — 170 national teams, each starting on its own homeland.
 - **Clubs** — 132 football clubs from seven European leagues, or all 30 NBA
   franchises. Real Madrid annexes territory exactly the way Spain does.
+- **One country's clubs** — a country's top 100 football clubs on that country's
+  own map, split into one section per club ([domestic campaigns](#domestic-campaigns)).
 
 Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
@@ -49,6 +51,8 @@ npm run dev         # dev server, prints a localhost URL
 npm run build       # production bundle into dist/
 npm test            # complete automated regression suite
 npm run smoke       # headless: plays campaigns to completion and checks invariants
+npm run smoke -- --scenarios=england # only the smoke scenarios whose names match
+npm run smoke -- --campaign-only=7   # one scenario by index (also --resume-only=<i>, --manager-only)
 npm run balance -- --runs=12 # seeded odds, acquisitions and campaign balance report
 npm run test:simulation # score distributions, RNG, tie-breaks, odds and live ticker
 npm run simulation:report -- --samples=200000 --out=docs/design/match-simulation-report.json
@@ -65,6 +69,9 @@ npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
 npm run build-basketball # regenerate basketball squads from an NBA 2K export
 npm run build-clubs      # regenerate the club layer for both sports
+npm run sync:domestic-clubs # refresh country club snapshots (network, cached)
+npm run build:domestic   # rebuild country maps from snapshots and boundaries
+npm run test:domestic    # country maps, sections and seeded country campaigns
 ```
 
 ## How a campaign plays
@@ -123,7 +130,13 @@ generated matches in saved campaigns retain their outcome and events.
 
 Progress autosaves during pending matches and after signings, preserving the
 seed, random state, queue, history and pending manager choice. Save status reports
-storage errors. Export/import JSON provides a portable checkpoint, with download
+storage errors. Each checkpoint is kept with a recovery copy. A save is all or
+nothing: when browser storage is full, a campaign may drop its own recovery copy to
+fit, but never another campaign's; otherwise nothing is written and save status
+says storage is full. **Saved campaigns** can delete a campaign (after a
+confirmation; not the one in play) to free space. Country campaigns store their
+players compactly, so a 100-club checkpoint is about 0.1 MB at kick-off and 0.3 MB
+at the final. Export/import JSON provides a portable checkpoint, with download
 and clipboard copy options. Entering new
 campaign setup retains the previous save until a replacement is launched.
 Older version-one saves migrate, but their original random stream was never
@@ -251,6 +264,106 @@ Club lineups come from the same two exports as the national squads:
 player's role is inferred from the attributes that define it — a centre by
 interior defence, rebounding and post play; a point guard by vision, handle and
 speed with the ball.
+
+## Domestic campaigns
+
+With **Clubs** and football, the Theatre list has a second group, **One country ·
+top clubs**. Pick a country and its top clubs fight over that country alone: 100
+of them, or fewer where the database has fewer viable sides (a country ships with
+at least 10). The map is split into one section per club, built from the
+country's real administrative divisions. Each club starts on the section around
+its home town, and conquest is unchanged: the winner annexes everything the loser
+holds and claims one player. Every section is held from kick-off, so there is no
+neutral land and no transit treaty. Neighbouring countries are drawn as muted land
+beneath the map. They are never territory, but attacks go around them, by sea if
+need be; only an exclave (Nakhchivan, Gaza, Kaliningrad) may have to cross one,
+labelled "Crossing foreign territory". Attack routes start from a point well
+inside each section (the home town when it is clear of the border), while the
+home marker shows the town itself. Tooltips and conquest results use section
+names, such as "Lancashire (east)", where Burnley starts.
+
+Each country is one file, `public/domestic/<id>.json`, fetched only when chosen.
+The setup screen shows a loading state, and Retry if the fetch fails. The setup
+wizard previews the country in step 1, each section in the colour its starting
+club takes at kick-off, and Launch shows that it is preparing the map. The file
+holds the sections as TopoJSON with shared borders, the clubs and their squads,
+and a projection centred on the country, so distances are true at the map's
+centre. The generated index `src/data/domestic.js` lists the shipped
+countries. Saves record `clubScope: 'domestic:<id>'` and the map's version.
+Resuming, importing or reloading a save loads the map first. The saved-campaign
+dialog says so meanwhile, and closing it (or Cancel import, or Clear quick
+resume) cancels the restore. A save from another build of the same map resumes
+club by club: section ids follow club rank, so each club's new starting section
+goes to whoever held its old one. It is re-stamped with the new version and
+restarts an interrupted draw. A save whose clubs differ from the new build's is
+refused, and kept.
+
+**Sources.** All of this is fetched at build time and committed; nothing loads
+from these services at runtime.
+
+- **Clubs and squads**: Football Manager 26 database 26.3.0 from
+  [EFEM.club](https://efem.club), in reputation order (clubs of equal reputation
+  are re-read whole, since EFEM's pages shuffle them). A club is viable if it is a
+  men's first team (not a reserve, B, academy or youth side of a stronger club)
+  with at least eleven natural-position players, including a goalkeeper. Squads
+  keep up to 16 players: a natural 4-4-2 in the game's own roles (wingers count
+  as forwards) first, then the best by Current Ability, converted to the 1–99
+  range as for nations. Loans are not applied: EFEM lists only a player's
+  contract club. FM's placeholder names for unlicensed clubs (Portugal's "BRG")
+  are replaced from `scripts/data/domestic-names.json`.
+- **Home towns**: manual overrides in `scripts/data/domestic-locations.json`, then
+  Wikidata (CC0), then GeoNames `cities1000` (CC BY 4.0). Each club records which
+  one placed it. Some overrides are region-level (marked "approximate:"), and the
+  86 clubs with no known home start at a populous place no other club holds
+  (`homeSource` `placed:<geonameid>`, an estimate).
+- **Boundaries**: [geoBoundaries](https://www.geoboundaries.org) gbOpen layers,
+  pinned to one commit, with Natural Earth admin-1 (public domain) as a fallback;
+  GeoNames places repair broken unit names. Licences differ by country: 31 maps
+  derive from ODbL layers and 11 from CC BY-SA ones, and those terms also cover
+  the section shapes. Land the game's own world map gives to another country is
+  cut out (Pakistan's side of Kashmir from India, Crimea from Ukraine).
+
+`public/domestic/ATTRIBUTION.txt` is generated with every build and lists each
+country's boundary source and licence, its cuts and fills, plus the GeoNames,
+Wikidata and EFEM notes. 128 countries ship, with 6,205 clubs; the maps total
+17.9 MB (22–248 KB each), and a session fetches only the one chosen.
+
+**How sections are built.** For each country the builder takes the coarsest
+boundary level with at least twice as many units as clubs, or else the finest
+level with enough units, checking each layer's real unit count and coverage, and
+fills land a layer misses from the next coarser one (Kuwait's Bubiyan). England
+uses the UK's districts inside the England border. Units with separate parts
+become one unit per part, and far overseas islands without a club are dropped.
+If there are still too few units, the units holding the most club homes are
+split by a Voronoi diagram of those homes; a unit shared by clubs is also cut,
+one piece per club, when a club would otherwise start far from home, and the
+piece holding a shared town goes to its strongest club. In reputation order,
+each club claims the unit holding its home, or the nearest free unit. The
+smallest section then repeatedly takes an adjacent free unit, as long as no
+other club's start is much nearer, until every unit is claimed; islands join a
+club within reach. Each section is dissolved, simplified and quantized. Names
+come from the source units, repaired from GeoNames where broken, and are unique
+on each map; a club pushed off its home unit names its town, as in Everton's
+"Sefton (near Liverpool)". Codes are three letters, and colours differ between
+neighbours, also across straits.
+The output is deterministic.
+
+To refresh or rebuild:
+
+```bash
+npm run sync:domestic-clubs -- --only=826  # EFEM, Wikidata and GeoNames → scripts/data/domestic/826.json
+npm run build:domestic -- --only=826       # boundaries + snapshot → public/domestic/, index, ATTRIBUTION.txt
+npm run build:domestic -- --check          # offline rebuild must match the committed files byte for byte
+npm run test:domestic                      # shipped data, section geometry, seeded country campaigns
+```
+
+Both stages cache downloads under the ignored `data-src/`, so reruns work offline.
+The sync is polite: three requests at a time with pauses and retries. Leave out
+`--only` to process every nation. Country routing (anchors, foreign land, border
+routes) is tested by `scripts/domestic-routing.test.mjs`, which `npm test` runs.
+The [design notes](docs/design/domestic-campaigns.md) give the sources and
+queries, the partition, the file format, saves, acceptance checks and known
+limitations.
 
 ## Squad economics
 
@@ -447,18 +560,28 @@ scripts/
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **seven full
+`npm run smoke` boots the real component tree under jsdom and plays **nine full
 campaigns** across all three pacings, both resolution modes, both sports, and
-national and club teams. **Four interrupt-and-resume scenarios** cover a
-world-scale national campaign plus basketball nations, football clubs, and NBA
-clubs. They verify that settings, ownership, squads, acquired players, and the
-remaining match queue survive a reload and that the campaign remains playable.
+national, club and domestic teams; two of them are England's top 100 clubs on
+their own map. A manager campaign (Italy, round robin × You choose) is played
+only through the primary action: target choice, tactical gate, live matches and
+signings. **Five interrupt-and-resume scenarios** cover a world-scale
+national campaign plus basketball nations, football clubs, NBA clubs and an
+England domestic campaign, which is played on to its champion after the reload.
+They verify that settings, ownership, squads, acquired players, and the remaining
+match queue survive a reload and that the campaign remains playable. The app's
+files are served from `public/` by path, with a 404 for anything missing. The
+domestic runs also check the setup's loading, error and Retry states, and that
+the neighbouring-land backdrop stays inert. The domestic resume also refuses a
+save naming missing sections and a map that cannot load, resumes from a cold
+map cache, and restores a save from an earlier map build. `npm run test:domestic`
+kicks off every shipped country with legal duel draws.
 
 The suite asserts that each match eliminates exactly one team, that no territory
 is lost or duplicated, and that one player changes shirts per match. It checks
 political ownership colours, national flag ownership in Flags mode, club colours,
-structured result rewards, the sidebar tabs, victory, and absence of React
-warnings.
+structured result rewards, the Chronicle, Ledger and Squad screens, victory, and
+absence of React warnings.
 
 It also checks each sport's match model over 400 simulated games: that every match
 has a winner, that a level score always triggers a tie-break, that the event feed

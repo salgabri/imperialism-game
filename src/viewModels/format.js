@@ -1,6 +1,7 @@
 // Owner: WP-0 (see PLAN.md §4). Shared pure formatting helpers (PLAN §3.4) — FROZEN.
 // Pure: no window/document/timers/RNG. Every helper tolerates null/undefined input.
 import { ratingTierOf } from '../theme.js';
+import { isDomesticScope } from '../data/domesticScope.js';
 
 const ROMAN = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
   [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
@@ -94,19 +95,27 @@ export function shortName(name) {
   return tokens.slice(start, end + 1).join(' ') + suffix;
 }
 
-/** Route line for a draw or match: land border, neutral transit treaty or sea. */
+/**
+ * Route line for a draw or match: land border, neutral transit treaty, foreign land (an exclave on a country map:
+ * the neighbouring country is crossed, never claimed) or sea.
+ */
 export function routeCopy(draw) {
   if (!draw) return '';
   if (draw.routeKind === 'neutral-transit') return 'Through neutral land — transit treaty';
+  if (draw.routeKind === 'foreign-transit') return 'Through foreign land — never claimed';
   if (draw.routeKind === 'sea' || draw.isNeighbor === false) return 'By sea — no shared border';
   return 'Across a land border';
 }
 
-/** 'The European Campaign' | 'The World Campaign' | `${scopeName} Campaign` (DEC misc). */
+/**
+ * 'The European Campaign' | 'The World Campaign' | `${scopeName} Campaign` (DEC misc). A country's top clubs read as
+ * the theatre itself ('England · top 100 clubs').
+ */
 export function campaignTitle(settings, scopeName) {
   const nations = settings?.layer !== 'clubs';
   if (nations && settings?.scope === 'UEFA') return 'The European Campaign';
   if (nations && settings?.scope === 'world') return 'The World Campaign';
+  if (!nations && isDomesticScope(settings?.clubScope)) return scopeName || 'One country · top clubs';
   return scopeName ? `${scopeName} Campaign` : 'The Campaign';
 }
 

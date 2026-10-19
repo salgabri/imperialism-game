@@ -205,6 +205,37 @@
 /* Footnote for a "*"-marked theatre ("Asia & Oceania*" → "AFC plus OFC — the whole east."), aligned with the row text. */
 .setup-theatres__note { margin:8px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
 
+/* One country's own top clubs (football clubs): the leagues and every shipped country make a long list, so it scrolls
+   in its own box (block layout, so rows never shrink to fit) and the countries sit under a sticky group heading.
+   The chosen country's description, its map-load status and a failed load (with Retry) follow the list. */
+.setup-theatres[data-long] {
+  display:block; max-height:var(--setup-list-h); overflow-y:auto; overscroll-behavior:contain;
+  border-bottom:1px solid var(--rule); scrollbar-width:thin;
+}
+.setup-theatres__group {
+  position:sticky; top:0; z-index:1; margin:0; padding:14px 14px 6px;
+  background:var(--surface); border-top:1px solid var(--rule); border-bottom:1px solid var(--row-rule);
+  font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+}
+.setup-theatres__note.setup-domestic__note { color:var(--text-2); }
+.setup-domestic__status { margin:6px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--text-2); }
+.rule-note.setup-domestic__error { margin-top:10px; background:var(--panel); box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule); }
+.rule-note.setup-domestic__error > svg { color:var(--loss); }
+
+/* Step 1 country card: the chosen country's sections in their kick-off pastels over the neighbouring land. Static
+   (no camera, labels or territory attributes); one fixed frame so switching countries never moves the column. */
+.setup-country-map { margin:0; background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
+.setup-country-map__chart {
+  display:block; width:100%; height:auto; aspect-ratio:3 / 2; max-height:300px; background:var(--sea);
+}
+.setup-country-map__backdrop path {
+  fill:var(--land-neutral); stroke:var(--map-coast); stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round;
+}
+.setup-country-map__sections path { stroke:#fff; stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round; }
+.setup-country-map__caption {
+  padding:10px 14px; border-top:1px solid var(--rule); font:400 12px/1.4 var(--font-sans); color:var(--muted);
+}
+
 /* ---- Step 1 right column ---- */
 .setup-rules { list-style:none; margin:0; padding:0; counter-reset:setup-rule; }
 .setup-rules > li {

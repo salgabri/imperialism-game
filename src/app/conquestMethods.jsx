@@ -7,7 +7,7 @@
 import React from 'react';
 import { CONFIG } from '../config.js';
 import { C } from '../theme.js';
-import { DEPENDENCIES, NATIONS, selectLineup, teamEff } from '../data/teams.js';
+import { selectLineup, teamEff } from '../data/teams.js';
 import { empireCenter, territories } from '../engine/campaign.js';
 import { acquisitionOptions, automaticAcquisition, advanceSeries, recordMatch } from '../engine/campaignExperience.js';
 import { MatchupPopup, ResultPopup, StealPopup } from '../components/Popups.jsx';
@@ -225,7 +225,8 @@ export function applyConquest(playerIndex) {
     resText: '+' + taken.length + ' territories' + stealTxt,
     resTitle: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
     wCol: W.col, winnerName: W.name, loserName: L.name, territoriesGained: taken.length,
-    territoryIds: taken, territoryNames: taken.map(cid => NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || cid),
+    // Section names on a country map ("Burnley"), nation or dependency names on the world map.
+    territoryIds: taken, territoryNames: taken.map(cid => this.territoryName(cid)),
     playerTaken: stolen ? { ...stolen } : null,
     replacedPlayer, strengthBefore, strengthAfter, strengthGained,
     acquisitionPolicy: Number.isInteger(playerIndex) ? 'manager-choice' : st.settings.acquisitionPolicy,

@@ -2,36 +2,83 @@
 // Prepared geography is independent of ownership and shared between draw
 // snapshots; only a new fit/paths object needs to rebuild it.
 const indexes = new WeakMap();
+const obstacleIndexes = new WeakMap();
 const oceanGraphs = new WeakMap();
 const ROUNDING = 64 * Number.EPSILON;
+// Obstacle spans shorter than this (map units) are float seams between sections.
+const MIN_OBSTACLE_SPAN = 1e-6;
+export const OBSTACLE_PREFIX = 'obstacle:';
 
 const cross = (ax, ay, bx, by) => ax * by - ay * bx;
 const clampUnit = n => Math.max(0, Math.min(1, n));
+// Consecutive edges share a bounding box, so the exact tests below skip whole
+// runs that cannot touch a segment or point (large foreign outlines, mostly).
+const CHUNK = 16;
 
-/** Deeply immutable, cached snapshot of every painted country, including neutrals. */
-export function createAttackRouteIndex(paths) {
+function edgeChunks(edges) {
+  const chunks = [];
+  for (let start = 0; start < edges.length; start += CHUNK) {
+    const end = Math.min(edges.length, start + CHUNK);
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (let i = start; i < end; i++) {
+      const [ax, ay, bx, by] = edges[i];
+      minX = Math.min(minX, ax, bx); minY = Math.min(minY, ay, by);
+      maxX = Math.max(maxX, ax, bx); maxY = Math.max(maxY, ay, by);
+    }
+    chunks.push(Object.freeze([minX, minY, maxX, maxY, start, end]));
+  }
+  return Object.freeze(chunks);
+}
+
+function prepareLand(countryId, sourceRings, extra) {
+  const rings = [];
+  const edges = [];
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const source of sourceRings || []) {
+    if (!Array.isArray(source) || source.length < 3 ||
+      source.some(p => !Array.isArray(p) || !Number.isFinite(p[0]) || !Number.isFinite(p[1]))) continue;
+    const ring = source.map(([x, y]) => Object.freeze([x, y]));
+    for (let i = 0; i < ring.length; i++) {
+      const a = ring[i], b = ring[(i + 1) % ring.length];
+      minX = Math.min(minX, a[0]); minY = Math.min(minY, a[1]);
+      maxX = Math.max(maxX, a[0]); maxY = Math.max(maxY, a[1]);
+      if (a[0] !== b[0] || a[1] !== b[1]) edges.push(Object.freeze([a[0], a[1], b[0], b[1]]));
+    }
+    rings.push(Object.freeze(ring));
+  }
+  if (!rings.length) return null;
+  return Object.freeze({ countryId, ...extra, rings: Object.freeze(rings), edges: Object.freeze(edges),
+    bounds: Object.freeze({ minX, minY, maxX, maxY }), chunks: edgeChunks(edges) });
+}
+
+/**
+ * Deeply immutable, cached snapshot of every painted country, including neutrals.
+ *
+ * `obstacles` (optional, `[{ id, rings }]` in the same fitted units) is land that
+ * is never territory, such as the foreign countries beneath a country map. It
+ * blocks routes like neutral land, but only where no country of `paths` is
+ * painted, since its coarser outline overlaps theirs along every border. Its
+ * entries are flagged `obstacle` and named OBSTACLE_PREFIX + id.
+ */
+export function createAttackRouteIndex(paths, obstacles) {
   if (!paths || typeof paths !== 'object') return null;
+  const extra = Array.isArray(obstacles) && obstacles.length ? obstacles : null;
+  if (extra) {
+    let byObstacles = obstacleIndexes.get(paths);
+    if (!byObstacles) obstacleIndexes.set(paths, byObstacles = new WeakMap());
+    if (byObstacles.has(extra)) return byObstacles.get(extra);
+    const base = createAttackRouteIndex(paths);
+    const blocked = extra.map((obstacle, i) => prepareLand(OBSTACLE_PREFIX + (obstacle?.id ?? i), obstacle?.rings, { obstacle: true }))
+      .filter(Boolean);
+    const index = base && blocked.length ? Object.freeze({ countries: Object.freeze([...base.countries, ...blocked]), obstacles: true }) : base;
+    byObstacles.set(extra, index);
+    return index;
+  }
   if (indexes.has(paths)) return indexes.get(paths);
   const countries = [];
   for (const [countryId, path] of Object.entries(paths)) {
-    const rings = [];
-    const edges = [];
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (const source of path?.labelRings || []) {
-      if (!Array.isArray(source) || source.length < 3 ||
-        source.some(p => !Array.isArray(p) || !Number.isFinite(p[0]) || !Number.isFinite(p[1]))) continue;
-      const ring = source.map(([x, y]) => Object.freeze([x, y]));
-      for (let i = 0; i < ring.length; i++) {
-        const a = ring[i], b = ring[(i + 1) % ring.length];
-        minX = Math.min(minX, a[0]); minY = Math.min(minY, a[1]);
-        maxX = Math.max(maxX, a[0]); maxY = Math.max(maxY, a[1]);
-        if (a[0] !== b[0] || a[1] !== b[1]) edges.push(Object.freeze([a[0], a[1], b[0], b[1]]));
-      }
-      rings.push(Object.freeze(ring));
-    }
-    if (!rings.length) continue;
-    countries.push(Object.freeze({ countryId, rings: Object.freeze(rings), edges: Object.freeze(edges),
-      bounds: Object.freeze({ minX, minY, maxX, maxY }) }));
+    const country = prepareLand(countryId, path?.labelRings);
+    if (country) countries.push(country);
   }
   // Point-only rule fixtures have no painted land to inspect. Production maps
   // always have labelRings; callers explicitly retain their point-only fallback.
@@ -42,33 +89,45 @@ export function createAttackRouteIndex(paths) {
 
 function windingAt(country, x, y, nx = 0, ny = 0) {
   let winding = 0;
-  for (const [ax, ay, bx, by] of country.edges) {
-    const ex = bx - ax, ey = by - ay, px = x - ax, py = y - ay;
-    let side = cross(ex, ey, px, py);
-    const tolerance = ROUNDING * (Math.abs(ex * py) + Math.abs(ey * px));
-    // Symbolic infinitesimal offset: unlike a sampled epsilon this cannot jump
-    // over a narrow neighboring ring when classifying a collinear boundary.
-    if (Math.abs(side) <= tolerance) side = cross(ex, ey, nx, ny);
-    const aBelow = ay < y || (ay === y && ny >= 0);
-    const bAbove = by > y || (by === y && ny < 0);
-    if (aBelow && bAbove && side > 0) winding++;
-    if (!aBelow && !bAbove && side < 0) winding--;
+  const { edges } = country;
+  for (const [, minY, , maxY, start, end] of country.chunks) {
+    // An edge wholly above or below the point never changes the winding.
+    if (maxY < y || minY > y) continue;
+    for (let i = start; i < end; i++) {
+      const [ax, ay, bx, by] = edges[i];
+      const ex = bx - ax, ey = by - ay, px = x - ax, py = y - ay;
+      let side = cross(ex, ey, px, py);
+      const tolerance = ROUNDING * (Math.abs(ex * py) + Math.abs(ey * px));
+      // Symbolic infinitesimal offset: unlike a sampled epsilon this cannot jump
+      // over a narrow neighboring ring when classifying a collinear boundary.
+      if (Math.abs(side) <= tolerance) side = cross(ex, ey, nx, ny);
+      const aBelow = ay < y || (ay === y && ny >= 0);
+      const bAbove = by > y || (by === y && ny < 0);
+      if (aBelow && bAbove && side > 0) winding++;
+      if (!aBelow && !bAbove && side < 0) winding--;
+    }
   }
   return winding;
 }
 
 function interiorAt(country, x, y, dx, dy) {
-  for (const [ax, ay, bx, by] of country.edges) {
-    const ex = bx - ax, ey = by - ay, px = x - ax, py = y - ay;
-    const side = cross(ex, ey, px, py);
-    // Contact along a border is not a crossing of land. This machine-scale
-    // bound handles midpoint roundoff without a map-scale sampling tolerance.
-    const tolerance = ROUNDING * (Math.abs(ex * py) + Math.abs(ey * px));
-    if (Math.abs(side) <= tolerance && x >= Math.min(ax, bx) && x <= Math.max(ax, bx) &&
-      y >= Math.min(ay, by) && y <= Math.max(ay, by)) {
-      // Both sides must be painted. This excludes actual coastlines, but keeps
-      // internal edges of overlapping/same-winding rings inside filled land.
-      return windingAt(country, x, y, -dy, dx) !== 0 && windingAt(country, x, y, dy, -dx) !== 0;
+  const { edges } = country;
+  for (const [minX, minY, maxX, maxY, start, end] of country.chunks) {
+    // Only an edge whose box holds the point can carry it.
+    if (x < minX || x > maxX || y < minY || y > maxY) continue;
+    for (let i = start; i < end; i++) {
+      const [ax, ay, bx, by] = edges[i];
+      const ex = bx - ax, ey = by - ay, px = x - ax, py = y - ay;
+      const side = cross(ex, ey, px, py);
+      // Contact along a border is not a crossing of land. This machine-scale
+      // bound handles midpoint roundoff without a map-scale sampling tolerance.
+      const tolerance = ROUNDING * (Math.abs(ex * py) + Math.abs(ey * px));
+      if (Math.abs(side) <= tolerance && x >= Math.min(ax, bx) && x <= Math.max(ax, bx) &&
+        y >= Math.min(ay, by) && y <= Math.max(ay, by)) {
+        // Both sides must be painted. This excludes actual coastlines, but keeps
+        // internal edges of overlapping/same-winding rings inside filled land.
+        return windingAt(country, x, y, -dy, dx) !== 0 && windingAt(country, x, y, dy, -dx) !== 0;
+      }
     }
   }
   return windingAt(country, x, y) !== 0;
@@ -76,26 +135,40 @@ function interiorAt(country, x, y, dx, dy) {
 
 function countryIntervals(country, ax, ay, dx, dy, lengthSquared) {
   const cuts = [0, 1];
-  for (const [ex, ey, fx, fy] of country.edges) {
-    const sx = fx - ex, sy = fy - ey, qx = ex - ax, qy = ey - ay;
-    const denominator = cross(dx, dy, sx, sy);
-    const parallelTolerance = ROUNDING * (Math.abs(dx * sy) + Math.abs(dy * sx));
-    if (Math.abs(denominator) <= parallelTolerance) {
-      const offset = cross(qx, qy, dx, dy);
-      const collinearTolerance = ROUNDING * (Math.abs(qx * dy) + Math.abs(qy * dx));
-      if (Math.abs(offset) <= collinearTolerance) {
-        // Split at both ends of an overlapping edge. Midpoint winding below
-        // distinguishes true interior from merely travelling along a coastline.
-        for (const [x, y] of [[ex, ey], [fx, fy]]) {
-          const t = ((x - ax) * dx + (y - ay) * dy) / lengthSquared;
-          if (t > 0 && t < 1) cuts.push(t);
+  const { edges } = country;
+  // Far looser than every tolerance below: a skipped run lies clear of the segment.
+  const margin = 1e-9 * (1 + Math.abs(ax) + Math.abs(ay) + Math.abs(dx) + Math.abs(dy));
+  const x0 = Math.min(ax, ax + dx) - margin, x1 = Math.max(ax, ax + dx) + margin;
+  const y0 = Math.min(ay, ay + dy) - margin, y1 = Math.max(ay, ay + dy) + margin;
+  const lineMargin = margin * Math.sqrt(lengthSquared);
+  for (const [minX, minY, maxX, maxY, start, end] of country.chunks) {
+    if (maxX < x0 || minX > x1 || maxY < y0 || minY > y1) continue;
+    // All four corners strictly on one side of the segment's line.
+    const c1 = cross(dx, dy, minX - ax, minY - ay), c2 = cross(dx, dy, maxX - ax, minY - ay);
+    const c3 = cross(dx, dy, minX - ax, maxY - ay), c4 = cross(dx, dy, maxX - ax, maxY - ay);
+    if (Math.min(c1, c2, c3, c4) > lineMargin || Math.max(c1, c2, c3, c4) < -lineMargin) continue;
+    for (let i = start; i < end; i++) {
+      const [ex, ey, fx, fy] = edges[i];
+      const sx = fx - ex, sy = fy - ey, qx = ex - ax, qy = ey - ay;
+      const denominator = cross(dx, dy, sx, sy);
+      const parallelTolerance = ROUNDING * (Math.abs(dx * sy) + Math.abs(dy * sx));
+      if (Math.abs(denominator) <= parallelTolerance) {
+        const offset = cross(qx, qy, dx, dy);
+        const collinearTolerance = ROUNDING * (Math.abs(qx * dy) + Math.abs(qy * dx));
+        if (Math.abs(offset) <= collinearTolerance) {
+          // Split at both ends of an overlapping edge. Midpoint winding below
+          // distinguishes true interior from merely travelling along a coastline.
+          for (const [x, y] of [[ex, ey], [fx, fy]]) {
+            const t = ((x - ax) * dx + (y - ay) * dy) / lengthSquared;
+            if (t > 0 && t < 1) cuts.push(t);
+          }
         }
+        continue;
       }
-      continue;
+      const t = cross(qx, qy, sx, sy) / denominator;
+      const u = cross(qx, qy, dx, dy) / denominator;
+      if (t >= -ROUNDING && t <= 1 + ROUNDING && u >= -ROUNDING && u <= 1 + ROUNDING) cuts.push(clampUnit(t));
     }
-    const t = cross(qx, qy, sx, sy) / denominator;
-    const u = cross(qx, qy, dx, dy) / denominator;
-    if (t >= -ROUNDING && t <= 1 + ROUNDING && u >= -ROUNDING && u <= 1 + ROUNDING) cuts.push(clampUnit(t));
   }
   cuts.sort((a, b) => a - b);
   const intervals = [];
@@ -129,7 +202,8 @@ function boundsEntry(bounds, ax, ay, dx, dy) {
 /**
  * First non-attacker country whose actual interior the route enters.
  *
- * Neutral land blocks too. Owned islands/expanded holdings are passable. Holes,
+ * Neutral land blocks too, and so does obstacle land no country covers (its hit
+ * is flagged `obstacle`). Owned islands/expanded holdings are passable. Holes,
  * disconnected rings and repaired date-line parts follow SVG nonzero semantics.
  * Exact edge cuts, not point stepping, preserve even very narrow land barriers.
  * `t` is the boundary entry; `exitT` bounds its first contiguous interior span.
@@ -152,13 +226,15 @@ export function firstForeignLand(index, own, attackerId, cp) {
   // Preserve original source order for exactly coincident real intersections.
   candidates.sort((a, b) => a.entry - b.entry || a.order - b.order);
   let first = null, firstOrder = Infinity;
+  const spansOf = landSpans(index, ax, ay, dx, dy, lengthSquared);
   for (const { country, ownerId, entry, order } of candidates) {
     if (first && entry > first.t + ROUNDING) break;
-    const interval = countryIntervals(country, ax, ay, dx, dy, lengthSquared)[0];
+    const interval = spansOf(country)[0];
     if (!interval) continue;
     const [t, exitT] = interval;
     if (first && (t > first.t || (t === first.t && order >= firstOrder))) continue;
-    first = Object.freeze({ countryId: country.countryId, ownerId, t, x: ax + t * dx, y: ay + t * dy, exitT });
+    first = Object.freeze({ countryId: country.countryId, ownerId, t, x: ax + t * dx, y: ay + t * dy, exitT,
+      ...(country.obstacle ? { obstacle: true } : {}) });
     firstOrder = order;
   }
   return first;
@@ -170,10 +246,46 @@ export function routeLandCrossings(index, cp) {
   const { ax, ay, bx, by } = cp;
   const dx = bx - ax, dy = by - ay, lengthSquared = dx * dx + dy * dy;
   if (![ax, ay, bx, by, lengthSquared].every(Number.isFinite) || !(lengthSquared > 0)) return [];
+  const spansOf = landSpans(index, ax, ay, dx, dy, lengthSquared);
   return index.countries.flatMap(country => {
     if (boundsEntry(country.bounds, ax, ay, dx, dy) === null) return [];
-    return countryIntervals(country, ax, ay, dx, dy, lengthSquared).map(([t, exitT]) => ({ countryId: country.countryId, t, exitT }));
+    return spansOf(country).map(([t, exitT]) => country.obstacle
+      ? { countryId: country.countryId, t, exitT, obstacle: true } : { countryId: country.countryId, t, exitT });
   }).sort((a, b) => a.t - b.t);
+}
+
+/**
+ * Interior spans of one country along a segment. An obstacle keeps only the
+ * spans no painted country covers, tracing just the countries that meet each
+ * crossed span; every country is traced at most once per segment.
+ */
+function landSpans(index, ax, ay, dx, dy, lengthSquared) {
+  const traced = new Map();
+  const spansOf = country => {
+    if (!traced.has(country)) traced.set(country, countryIntervals(country, ax, ay, dx, dy, lengthSquared));
+    return traced.get(country);
+  };
+  if (!index.obstacles) return spansOf;
+  const minimum = MIN_OBSTACLE_SPAN / Math.sqrt(lengthSquared);
+  return country => {
+    const spans = spansOf(country);
+    if (!country.obstacle || !spans.length) return spans;
+    const open = [];
+    for (const [spanStart, end] of spans) {
+      const sx = ax + dx * spanStart, sy = ay + dy * spanStart, sdx = dx * (end - spanStart), sdy = dy * (end - spanStart);
+      const cover = index.countries.filter(land => !land.obstacle && boundsEntry(land.bounds, sx, sy, sdx, sdy) !== null)
+        .flatMap(spansOf).filter(([start, stop]) => stop > spanStart && start < end).sort((a, b) => a[0] - b[0]);
+      let start = spanStart;
+      for (const [coverStart, coverEnd] of cover) {
+        if (coverEnd <= start) continue;
+        if (coverStart >= end) break;
+        if (coverStart - start > minimum) open.push([start, coverStart]);
+        start = Math.max(start, coverEnd);
+      }
+      if (end - start > minimum) open.push([start, end]);
+    }
+    return open;
+  };
 }
 
 const segment = (a, b) => ({ ax: a[0], ay: a[1], bx: b[0], by: b[1] });
@@ -183,12 +295,44 @@ function pointInCountry(country, [x, y]) {
   return x >= minX && x <= maxX && y >= minY && y <= maxY && windingAt(country, x, y) !== 0;
 }
 
+const borders = new WeakMap();
+
+/**
+ * Points just inside `toId` across every painted edge it shares with `fromId`,
+ * so a route can aim at a land border instead of a far anchor. Neighbouring
+ * rings are rounded from the same arcs, so shared edges match exactly.
+ */
+export function borderApproachPoints(index, fromId, toId) {
+  if (!index) return [];
+  let cache = borders.get(index);
+  if (!cache) borders.set(index, cache = { byId: new Map(index.countries.map(c => [c.countryId, c])), edges: new Map(), points: new Map() });
+  const key = JSON.stringify([fromId, toId]);
+  if (cache.points.has(key)) return cache.points.get(key);
+  const from = cache.byId.get(fromId), to = cache.byId.get(toId), points = [];
+  if (from && to && !from.obstacle && !to.obstacle) {
+    if (!cache.edges.has(fromId)) cache.edges.set(fromId, new Set(from.edges.map(edge => edge.join(','))));
+    const own = cache.edges.get(fromId);
+    for (const [ax, ay, bx, by] of to.edges) {
+      if (!own.has(`${bx},${by},${ax},${ay}`) && !own.has(`${ax},${ay},${bx},${by}`)) continue;
+      const length = Math.hypot(bx - ax, by - ay), epsilon = Math.min(length / 4, .01);
+      const nx = -(by - ay) / length * epsilon, ny = (bx - ax) / length * epsilon;
+      for (const sign of [1, -1]) {
+        const point = [(ax + bx) / 2 + nx * sign, (ay + by) / 2 + ny * sign];
+        if (pointInCountry(to, point) && !pointInCountry(from, point)) { points.push(Object.freeze(point)); break; }
+      }
+    }
+  }
+  cache.points.set(key, Object.freeze(points));
+  return cache.points.get(key);
+}
+
 // Ocean nodes are only a search aid. Every connecting segment is checked against
 // exact painted edges, so a coarse grid can miss a passage but cannot invent one.
 // Geometry alone is cached: ownership and current survivors are never cached.
 function oceanGraph(index) {
   if (oceanGraphs.has(index)) return oceanGraphs.get(index);
-  const bounds = index.countries.reduce((b, c) => ({
+  // The grid spans the playable land; obstacles only remove nodes and edges.
+  const bounds = index.countries.filter(c => !c.obstacle).reduce((b, c) => ({
     minX: Math.min(b.minX, c.bounds.minX), minY: Math.min(b.minY, c.bounds.minY),
     maxX: Math.max(b.maxX, c.bounds.maxX), maxY: Math.max(b.maxY, c.bounds.maxY),
   }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
@@ -272,17 +416,22 @@ function oceanConnections(index, graph, own, empireId, anchors, toward = [], lim
   const countries = index.countries.filter(country => own[country.countryId] === empireId)
     .sort((a, b) => proximity([(a.bounds.minX + a.bounds.maxX) / 2, (a.bounds.minY + a.bounds.maxY) / 2]) -
       proximity([(b.bounds.minX + b.bounds.maxX) / 2, (b.bounds.minY + b.bounds.maxY) / 2]));
-  let accessedCountries = 0;
+  let accessedCountries = 0, truncated = Number.isFinite(limit) && anchors.length > 8;
   for (const country of countries) {
     const coast = coastalAnchors(index, graph, country);
     const stride = Math.max(1, Math.ceil(coast.length / 8));
     let reached = false;
     for (let i = 0; i < coast.length; i += stride) reached = connect(coast[i]) || reached;
-    if (reached && ++accessedCountries >= limit) break;
+    if (reached && ++accessedCountries >= limit) {
+      truncated ||= country !== countries[countries.length - 1];
+      break;
+    }
   }
   // Try nearby coastal holdings first. If they cannot connect, the search below
   // retries every holding, including a distant outpost, before using a treaty.
   const result = [...connected.values()].sort((a, b) => a.cost - b.cost);
+  // Nothing was left out, so the exhaustive retry would connect the same nodes.
+  result.complete = !truncated;
   graph.access.set(cacheKey, result);
   if (graph.access.size > 32) graph.access.delete(graph.access.keys().next().value);
   return result;
@@ -304,6 +453,34 @@ function waterNeighbors(index, graph, id) {
   return out;
 }
 
+/** Water nodes reachable from every connection the empire's anchors and coasts can make. */
+function waterReach(index, graph, own, empireId, anchors) {
+  const reach = new Uint8Array(graph.nodes.length);
+  const queue = oceanConnections(index, graph, own, empireId, anchors, [], Infinity).map(({ id }) => id);
+  for (const id of queue) reach[id] = 1;
+  for (let i = 0; i < queue.length; i++) for (const { id } of waterNeighbors(index, graph, queue[i])) {
+    if (!reach[id]) { reach[id] = 1; queue.push(id); }
+  }
+  return reach;
+}
+
+/** Conservative: could any of the empire's possible landings lie on reached water? */
+function mayLand(index, graph, own, empireId, anchors, reach) {
+  const points = [...anchors];
+  for (const country of index.countries) if (own[country.countryId] === empireId) points.push(...coastalAnchors(index, graph, country));
+  // The same nearest four water nodes oceanConnections may link, before its land check.
+  return points.some(point => {
+    const row = Math.round((point[1] - graph.top) / graph.step), col = Math.round((point[0] - graph.left) / graph.step);
+    const local = [];
+    for (let dr = -4; dr <= 4; dr++) for (let dc = -4; dc <= 4; dc++) {
+      if (row + dr < 0 || col + dc < 0 || row + dr >= graph.rows || col + dc >= graph.cols) continue;
+      const id = graph.grid.get((row + dr) * graph.cols + col + dc);
+      if (id != null) local.push({ id, cost: distance(point, graph.nodes[id].point) });
+    }
+    return local.sort((a, b) => a.cost - b.cost).slice(0, 4).some(({ id }) => reach[id]);
+  });
+}
+
 /** A polyline whose interior sea legs cross no country, including neutral land. */
 export function findCoastalSeaRoute(index, own, attackerId, targetId, attackerAnchors, targetAnchors, prepared = {}) {
   if (!index) return null;
@@ -312,19 +489,27 @@ export function findCoastalSeaRoute(index, own, attackerId, targetId, attackerAn
   const sourceKey = keyOf(attackerId, attackerAnchors), targetKey = keyOf(targetId, targetAnchors);
   const routeKey = `${sourceKey}>${targetKey}`;
   if (graph.routes.has(routeKey)) return graph.routes.get(routeKey);
+  // Obstacles leave many enemies on unconnected water (an exclave, a landlocked
+  // field). Rule those out before the costly search; `prepared` is per attacker.
+  // The check only skips searches that must fail, so routes are unchanged.
+  if (index.obstacles && !prepared.canonical) {
+    prepared.reach ??= waterReach(index, graph, own, attackerId, attackerAnchors);
+    if (!mayLand(index, graph, own, targetId, targetAnchors, prepared.reach)) return null;
+  }
   // Canonical orientation keeps cache warmth/query order from changing a seeded
   // draw's polyline. Opposite directions reuse its independently clipped reverse.
   if (sourceKey > targetKey && !prepared.canonical) {
     findCoastalSeaRoute(index, own, targetId, attackerId, targetAnchors, attackerAnchors, { canonical: true });
     return graph.routes.get(routeKey) || null;
   }
-  const retry = () => prepared.exhaustive ? null : findCoastalSeaRoute(index, own, attackerId, targetId,
-    attackerAnchors, targetAnchors, { exhaustive: true, canonical: true });
+  // With obstacles, skip a retry that would repeat the same failed search.
+  const retry = (...connections) => prepared.exhaustive || (index.obstacles && connections.every(c => c.complete))
+    ? null : findCoastalSeaRoute(index, own, attackerId, targetId, attackerAnchors, targetAnchors, { exhaustive: true, canonical: true });
   const limit = prepared.exhaustive ? Infinity : 4;
   const from = prepared.from ?? (prepared.from = oceanConnections(index, graph, own, attackerId, attackerAnchors, targetAnchors, limit));
-  if (!from.length) return retry();
+  if (!from.length) return retry(from);
   const to = oceanConnections(index, graph, own, targetId, targetAnchors, attackerAnchors, limit);
-  if (!to.length) return retry();
+  if (!to.length) return retry(from, to);
   const goals = new Map(to.map(connection => [connection.id, connection]));
   const landingPoints = [...new Set(to.map(connection => connection.point))];
   const landingX = Float64Array.from(landingPoints, point => point[0]);
@@ -361,7 +546,7 @@ export function findCoastalSeaRoute(index, own, attackerId, targetId, attackerAn
       costs[next.id] = cost; previous[next.id] = id;
     }
   }
-  if (finish < 0) return retry();
+  if (finish < 0) return retry(from, to);
   const path = [];
   let first = finish;
   for (let id = finish; id >= 0; id = previous[id]) { path.push(graph.nodes[id].point); first = id; }

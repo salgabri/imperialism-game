@@ -19,6 +19,19 @@ const isPlaying = st => st?.phase === 'playing' || st?.phase === 'victory';
 /** The views that show the map (App.render's `mapVisible`); every other view hides it. */
 const MAP_VIEWS = new Set(['setup', 'map', 'conquest']);
 
+const homeClubCache = new WeakMap();
+/**
+ * Section id → the club that starts there on a loaded country map (`{ clubs }` from engine/domestic.js), for the
+ * setup preview fill and the tooltip. Memoised per decoded map; pure (a module WeakMap, never React state).
+ */
+export function homeClubs(domestic) {
+  if (!domestic?.clubs) return {};
+  if (!homeClubCache.has(domestic)) {
+    homeClubCache.set(domestic, Object.fromEntries(domestic.clubs.map(club => [club.homeSection, club])));
+  }
+  return homeClubCache.get(domestic);
+}
+
 /**
  * The campaign as the map draws it. While the manager signs a player (`st.choice`) the map shows the projected
  * post-conquest board (DEC D15, D§2.3 / D§10): every loser cid belongs to the winner and the loser is no longer drawn,
@@ -129,7 +142,8 @@ export function mapFlags(playing) {
  * Fills come from `mapVM.countryFill` per `st.mapMode`: Political empire pastels (`empireFill`), Strength ramp,
  * Fronts win-chance tints, Flags banners (a country flies its *owner's* flag, so an empire reads as one banner);
  * then you-fill (managed only, A-7) and opponent-fill once the fixture is known. Borders come from WorldMap's mesh,
- * so the shapes carry no stroke. Setup shows the nations' pastels (or their flags) on neutral land.
+ * so the shapes carry no stroke. Setup shows the nations' pastels (or their flags) on neutral land; a previewed
+ * country map paints each section in the colour its starting club takes at kick-off (`countryFill` `preview`).
  */
 export function mapCountries() {
   const st = this.state;
@@ -141,6 +155,8 @@ export function mapCountries() {
   const identity = playing ? mapVM.mapIdentity(snap.state, ctx) : NO_IDENTITY;
   const strength = playing && mapMode === 'strength' ? mapVM.strengthFills(snap.state, ctx) : null;
   const fronts = playing && mapMode === 'fronts' ? mapVM.frontsFills(snap.state, ctx) : null;
+  const domestic = this.domesticMap();
+  const preview = domestic && !playing ? homeClubs(domestic) : null;
 
   const countries = [];
   const { flagParts, flagPatterns } = this.mapFlags(playing);
@@ -156,11 +172,11 @@ export function mapCountries() {
       ownerId,
       ownerName: owner?.name,
       selected: !!isSelected,
-      name: NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
+      name: domestic?.sectionNames[c.id] || NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
       d: p.d,
       flagParts: parts,
       fill: mapVM.countryFill({ countryId: c.id, ownerId, owner, mapMode, hasFlagParts: !!parts?.length,
-        setup: phase === 'setup', ...identity, strength, fronts }),
+        setup: phase === 'setup', ...identity, strength, fronts, preview: preview?.[c.id] || null }),
       stroke: 'none',
       strokeWidth: 0,
       cursor: owner ? 'pointer' : 'default',
@@ -184,7 +200,10 @@ export function mapLabels(playing) {
   }));
 }
 
-/** A capital on every empire that still holds its own homeland; `you` marks the map's "you" (A-7: star). */
+/**
+ * A capital on every empire that still holds its own homeland; `you` marks the map's "you" (A-7: star). A country
+ * section marks the home town itself (`homeX/homeY`); routes still leave from cx/cy, a point well inside.
+ */
 export function mapHomes(playing) {
   const st = this.state;
   if (!playing || !isPlaying(st) || !this.geo) return [];
@@ -197,7 +216,7 @@ export function mapHomes(playing) {
     if (!team || own[team.home] !== tid) continue;
     const p = this.geo.paths[team.home];
     if (!p) continue;
-    out.push({ id: tid, x: p.cx, y: p.cy, you: tid === meId });
+    out.push({ id: tid, x: p.homeX ?? p.cx, y: p.homeY ?? p.cy, you: tid === meId });
   }
   return out;
 }
@@ -205,7 +224,8 @@ export function mapHomes(playing) {
 /**
  * Hover tooltip (README §Interactions): `{ visible, name, held, result, link }` from `mapVM.tooltipModel` —
  * "Held by Italy since Round XII" | "Capital of Italy" | "Held by Italy", "Won 2–1 against Serbia" | "Strength 84.6",
- * "Click to open the Italy squad"; unowned "Not in this theatre" (playing) / "Awaiting campaign" (setup).
+ * "Click to open the Italy squad"; unowned "Not in this theatre" (playing) / "Awaiting campaign" (setup). On a country
+ * map the sections are named, "Home of Burnley" on a home section (in setup: the club starting there).
  * Hidden while another view covers the map (App's `mapVisible` views), so a hover left over from the map never shows
  * on Squad, Match, Ledger or Chronicle; WorldMap drops that hover when the map hides or reframes.
  */
@@ -213,7 +233,11 @@ export function tooltip() {
   const st = this.state;
   if (!st.hoverCid || !MAP_VIEWS.has(this.currentView())) return { visible: false, name: '', held: null, result: null, link: null };
   const snap = mapSnapshot(this);
-  return mapVM.tooltipModel(snap.state, isPlaying(st) ? this.viewContext(snap.state) : {}, st.hoverCid);
+  const ctx = isPlaying(st) ? this.viewContext(snap.state) : {};
+  const domestic = this.domesticMap();
+  if (!domestic) return mapVM.tooltipModel(snap.state, ctx, st.hoverCid);
+  return mapVM.tooltipModel(snap.state, { ...ctx, sectionNames: domestic.sectionNames,
+    homeClubs: isPlaying(st) ? null : homeClubs(domestic) }, st.hoverCid);
 }
 
 // ---------- v4 WorldMap props (PLAN §3.3 delegates; render-called, pure) ----------

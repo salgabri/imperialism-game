@@ -4,7 +4,12 @@ import TeamMark from './TeamMark.jsx';
 import Icon from './Icon.jsx';
 import { useLiveMinute } from './LiveMinute.jsx';
 import { formatOddsPair, roman } from '../viewModels/format.js';
+import { FOREIGN_TRANSIT_LABEL } from '../engine/campaign.js';
 import './match-card.css';
+
+/** The note after a route label: transit and exclave crossings never claim the land they cross. */
+const routeNote = label => (/neutral/i.test(label) ? ' · neutral territories remain unclaimed'
+  : label === FOREIGN_TRANSIT_LABEL ? ' · the neighbouring country is never claimed' : '');
 
 // TeamMark moved to its own module (PLAN §3.5); this re-export keeps `import { TeamMark } from './MatchCard.jsx'` working.
 export { default as TeamMark } from './TeamMark.jsx';
@@ -169,7 +174,7 @@ function CompactMatchCard({ round, status, statusLive, startLabel, a, b, firstTe
     </p>
   );
   const routeRow = routeLabel && routeLabel !== 'Direct challenge'
-    && <p className="fi-match-route">{routeLabel}{/neutral/i.test(routeLabel) ? ' · neutral territories remain unclaimed' : ''}</p>;
+    && <p className="fi-match-route">{routeLabel}{routeNote(routeLabel)}</p>;
   const kicksRow = kicks && <div className="fi-penalties"><PenRow code={a.code} kicks={kicks.a} /><PenRow code={b.code} kicks={kicks.b} /></div>;
   return (
     <section className="fi-match fi-match--compact" aria-label="Latest match" data-testid="match-card"
@@ -229,7 +234,7 @@ export default function MatchCard({ round, status, statusColor, statusLive, star
       </div>
       {odds != null && <p className="fi-match-odds" title="Pre-match estimate including match-day uncertainty and tie-breaks"><span>{a.code || a.name} {oddsLabels(odds).a}</span><span>Estimated win chance</span><span>{b.code || b.name} {oddsLabels(odds).b}</span></p>}
       {series && <p className="fi-series-status" role="status">Final series · {a.code || a.name} {series.aWins}–{series.bWins} {b.code || b.name} · first to {Math.ceil((series.bestOf || 3) / 2)} wins</p>}
-      {routeLabel && routeLabel !== 'Direct challenge' && <p className="fi-match-route">{routeLabel}{/neutral/i.test(routeLabel) ? ' · neutral territories remain unclaimed' : ''}</p>}
+      {routeLabel && routeLabel !== 'Direct challenge' && <p className="fi-match-route">{routeLabel}{routeNote(routeLabel)}</p>}
       <div className="fi-match-rule" aria-hidden="true" />
       {kicks && <div className="fi-penalties"><PenRow code={a.code} kicks={kicks.a} /><PenRow code={b.code} kicks={kicks.b} /></div>}
       {!completed && (

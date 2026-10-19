@@ -1,4 +1,6 @@
 import { SAVE_KEY, SAVE_VERSION } from '../config.js';
+import { DOMESTIC_PREFIX, domesticScopeId, isDomesticScope } from './domestic.js';
+import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 
 export const CAMPAIGN_INDEX_KEY = `${SAVE_KEY}:campaigns`;
 export const CAMPAIGN_BACKUP_KEY = `${SAVE_KEY}:backup`;
@@ -25,10 +27,83 @@ export function campaignSnapshot(state) {
     phase: state.phase === 'victory' ? 'victory' : 'playing' };
 }
 
+// A country campaign carries ~1,600 Football Manager players, and each full
+// record is ~470 characters, mostly text every player shares (edition, URL,
+// conversion) or repeats (id, positions). Its checkpoints store each player as
+// [fmId, name, ability, positions, nationality, club index, extras?] under one
+// `playerPack` header, and parseCampaign rebuilds the identical records. A
+// player whose record would not rebuild exactly stays in full. World campaigns
+// are written exactly as before.
+const fmPlayer = (player, source) => record(player) && typeof player.name === 'string' && record(player.sourceInfo)
+  && player.sourceInfo.source === 'football-manager' && /^fm:\d{1,15}$/.test(player.sourceInfo.id)
+  && Array.isArray(player.sourceInfo.naturalPositions) && typeof player.sourceInfo.club === 'string'
+  && (!source || ['edition', 'version', 'snapshotDate'].every(key => player.sourceInfo[key] === source[key]));
+
+function unpackPlayer(packed, pack) {
+  const [fmId, name, ability, positions, nationality, club, extras] = packed;
+  const [, pos, rating, sourceInfo] = expandFmTuple([fmId, name, ability, positions, nationality || undefined], pack.source, pack.clubs[club]);
+  return { name, pos, rating, gen: false, sourceInfo, id: sourceInfo.id, positions: [...sourceInfo.positions], ...extras };
+}
+
+/** Every place a checkpoint keeps whole player records, rewritten through `fn`. */
+function mapPlayers(data, fn) {
+  const swap = (object, keys) => {
+    const copy = { ...object };
+    for (const key of keys) if (copy[key] != null) copy[key] = fn(copy[key]);
+    return copy;
+  };
+  const out = { ...data };
+  if (record(data.teams)) out.teams = Object.fromEntries(Object.entries(data.teams).map(([id, team]) =>
+    [id, record(team) && Array.isArray(team.squad) ? { ...team, squad: team.squad.map(fn) } : team]));
+  if (Array.isArray(data.history)) out.history = data.history.map(entry => record(entry) && record(entry.result)
+    ? { ...entry, result: swap(entry.result, ['player', 'replacedPlayer']) } : entry);
+  if (record(data.match)) out.match = swap(data.match, ['playerTaken', 'replacedPlayer']);
+  return out;
+}
+
+function packCampaign(data) {
+  if (!isDomesticScope(data.settings?.clubScope)) return data;
+  const first = Object.values(data.teams || {}).flatMap(team => team?.squad || []).find(player => fmPlayer(player));
+  if (!first) return data;
+  const { edition, version, snapshotDate } = first.sourceInfo;
+  const pack = { source: { edition, version, snapshotDate }, clubs: [] }, clubs = new Map();
+  const packed = mapPlayers(data, player => {
+    if (!fmPlayer(player, pack.source)) return player;
+    const { name, pos, rating, gen, sourceInfo, id, positions, ...extras } = player;
+    if (!clubs.has(sourceInfo.club)) clubs.set(sourceInfo.club, pack.clubs.push(sourceInfo.club) - 1);
+    const tuple = [Number(sourceInfo.id.slice(3)), name, sourceInfo.rawRating, sourceInfo.naturalPositions.join(','),
+      sourceInfo.nationality || 0, clubs.get(sourceInfo.club)];
+    if (Object.keys(extras).length) tuple.push(extras);
+    try { return JSON.stringify(unpackPlayer(tuple, pack)) === JSON.stringify(player) ? tuple : player; } catch { return player; }
+  });
+  return { ...packed, playerPack: pack };
+}
+
+function unpackCampaign(data, invalid) {
+  const { playerPack: pack, ...rest } = data;
+  if (!record(pack) || !record(pack.source) || !['version', 'snapshotDate'].every(key => typeof pack.source[key] === 'string')
+      || (pack.source.edition != null && typeof pack.source.edition !== 'string')
+      || !Array.isArray(pack.clubs) || pack.clubs.some(club => typeof club !== 'string')) invalid('Campaign squads are incomplete.');
+  return mapPlayers(rest, value => {
+    if (!Array.isArray(value)) return value;
+    const [, , , positions, , club, extras] = value;
+    // Own keys only: 'constructor' must not pass as a position.
+    if (value.length < 6 || value.length > 7 || typeof positions !== 'string' || !positions.split(',').every(key => Object.hasOwn(FM_ROLES, key))
+        || !Number.isInteger(club) || club < 0 || club >= pack.clubs.length || (value.length === 7 && !record(extras))) invalid('Campaign squads are incomplete.');
+    try { return unpackPlayer(value, pack); } catch { return invalid('Campaign squads are incomplete.'); }
+  });
+}
+
+/** The stored text of a checkpoint (country campaigns pack their players). */
+export function serializeCampaign(data, space) {
+  return JSON.stringify(packCampaign(data), null, space);
+}
+
 /** Validate every value used by resume before touching the current campaign. */
 export function parseCampaign(text) {
-  const data = JSON.parse(text);
+  let data = JSON.parse(text);
   const invalid = message => { throw new Error(message); };
+  if (record(data) && data.playerPack !== undefined) data = unpackCampaign(data, invalid);
   if (!record(data) || ![1, 2, 3].includes(data.v) || !record(data.teams)
       || !record(data.own) || !record(data.settings) || !Array.isArray(data.aliveIds)
       || data.aliveIds.length < 1 || data.aliveIds.length > 200) {
@@ -55,6 +130,13 @@ export function parseCampaign(text) {
   for (const configuration of [settings, data.initialSettings].filter(Boolean)) {
     for (const [key, values] of Object.entries(enums)) if (configuration[key] != null && !values.includes(configuration[key])) invalid(`Campaign ${key} setting is unsupported.`);
     if (configuration.managedTeamId != null && configuration.managedTeamId !== '' && !known(configuration.managedTeamId)) invalid('The managed team setting is unavailable.');
+    // A country campaign names its map ('domestic:826') and the map build it was played on.
+    const { clubScope, domesticVersion } = configuration;
+    const domestic = isDomesticScope(clubScope);
+    if (typeof clubScope === 'string' && clubScope.startsWith(DOMESTIC_PREFIX)
+        && (!domestic || !/^[0-9A-Za-z]{1,12}$/.test(domesticScopeId(clubScope)))) invalid('Campaign country setting is unsupported.');
+    if (domesticVersion != null && (typeof domesticVersion !== 'string' || !/^[0-9A-Za-z]{1,12}-[0-9a-f]{8}$/.test(domesticVersion)
+        || (domestic && !domesticVersion.startsWith(`${domesticScopeId(clubScope)}-`)))) invalid('Campaign map version is invalid.');
   }
   for (const key of ['round', 'matches', 'batchTotal', 'revision']) if (data[key] != null && !nonnegative(data[key])) invalid(`Campaign ${key} is invalid.`);
   for (const key of ['seed', 'rngState']) if (data[key] != null && !uint(data[key])) invalid('The saved random state is invalid.');
@@ -254,8 +336,9 @@ export function isCampaignStorageEvent(event, id) {
   return !!id && (event.key === campaignStorageKey(id) || event.key === null);
 }
 
-const quotaExceeded = error => ['QuotaExceededError', 'NS_ERROR_DOM_QUOTA_REACHED'].includes(error?.name)
-  || error?.code === 22 || error?.code === 1014;
+// Quota errors by name or legacy code, plus any error naming the quota (older engines, test doubles).
+const isQuotaError = error => ['QuotaExceededError', 'NS_ERROR_DOM_QUOTA_REACHED'].includes(error?.name)
+  || /quota/i.test(`${error?.name} ${error?.message}`) || error?.code === 22 || error?.code === 1014;
 
 const sameJson = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -295,90 +378,96 @@ export function writeSave(state, { activate = true } = {}) {
         message: 'This campaign changed in another tab. Reload that checkpoint or fork your current progress.' };
     }
     data.revision = (state.revision || 0) + 1;
-    const text = JSON.stringify(data);
+    const text = serializeCampaign(data);
     parseCampaign(text);
     const index = indexData().filter(item => item.id !== data.campaignId);
     index.unshift(campaignMetadata(data));
     const current = localStorage.getItem(SAVE_KEY);
     const currentCampaign = tryParse(current);
-    let retained = null;
-    // A legacy singleton must remain reachable when a new campaign starts (not when it is the campaign being saved:
-    // resuming it gave it a fresh id, and this checkpoint replaces it).
-    if (currentCampaign && !currentCampaign.campaignId && !(activate && continuesLegacy(currentCampaign, data))) {
+    const updatePointer = activate || currentCampaign?.campaignId === data.campaignId;
+    const kept = [];
+    if (updatePointer && currentCampaign && !currentCampaign.campaignId && !continuesLegacy(currentCampaign, data)) {
+      // A legacy singleton must remain reachable when a new campaign starts (not when it is the campaign being
+      // saved: resuming it gave it a fresh id, and this checkpoint replaces it).
       const migrated = { ...currentCampaign, campaignId: createCampaignId(), revision: 1,
         campaignName: cleanName(currentCampaign.campaignName || `${currentCampaign.settings.sport || 'Football'} legacy campaign`) };
-      retained = [campaignStorageKey(migrated.campaignId), JSON.stringify(migrated)];
+      kept.push([campaignStorageKey(migrated.campaignId), serializeCampaign(migrated)]);
       index.push(campaignMetadata(migrated));
-    } else if (current && !currentCampaign) {
+    } else if (updatePointer && current && !currentCampaign) {
       // Retain damaged bytes even when the player chooses to start a fresh run.
-      retained = [CAMPAIGN_DAMAGED_KEY, current];
+      kept.push([CAMPAIGN_DAMAGED_KEY, current]);
     }
-    const updatePointer = activate || currentCampaign?.campaignId === data.campaignId;
-    const replacePointerBackup = !!currentCampaign && updatePointer;
-    // All or nothing: a failed write restores every key it touched. Otherwise a quota error after the slot was
-    // written (revision + 1) left the caller at the old revision, and its next save read as another tab's conflict.
-    const touched = [];
-    const put = (k, value) => { const prior = localStorage.getItem(k); localStorage.setItem(k, value); touched.push([k, prior]); };
-    const drop = k => { const value = localStorage.getItem(k); if (value != null) { touched.push([k, value]); localStorage.removeItem(k); } };
-    const rollback = () => {
-      for (const [k, value] of touched.reverse()) {
-        try { if (value == null) localStorage.removeItem(k); else localStorage.setItem(k, value); } catch { /* best effort */ }
-      }
-      touched.length = 0;
-    };
-    // Each checkpoint is stored up to four times (slot, resume pointer and a previous copy of each), so a world-sized
-    // campaign outgrows a ~5M-character origin quota within a few rounds. When storage is full the recovery copies
-    // give way before the checkpoint does: first the pointer's (normally the same bytes as the slot's), then the slot's,
-    // then (spareCopies) those of other checkpoints. The first tier writes exactly what it always did, in the same order.
-    const write = (slotBackup, pointerBackup, spare = []) => {
-      if (!slotBackup) drop(backupKey(data.campaignId));
-      if (!pointerBackup && replacePointerBackup) drop(CAMPAIGN_BACKUP_KEY);
-      for (const k of spare) drop(k);
-      if (retained) put(...retained);
-      if (slotBackup && previous) put(backupKey(data.campaignId), previous);
-      if (pointerBackup && replacePointerBackup) put(CAMPAIGN_BACKUP_KEY, current);
-      put(CAMPAIGN_INDEX_KEY, JSON.stringify(index));
-      put(key, text);
-      if (updatePointer) put(SAVE_KEY, text);
-      return { ok: true, campaignId: data.campaignId, revision: data.revision, campaignName: data.campaignName,
-        savedAt: data.savedAt, message: 'Progress saved' };
-    };
-    // Last tiers, still only on a full storage: recovery copies that only duplicate a readable checkpoint, dropped one
-    // at a time until the write fits (rollback restores them all if it never does). First the pointer's previous copy
-    // when the tiers above kept it (its campaign's slot holds the same or a newer revision; kept whenever the pointer
-    // is damaged, since that recovery offers it), then other campaigns' slot backups, oldest checkpoint first, each
-    // only while its own slot still reads. Another campaign's slot itself is never touched.
-    const spareCopies = () => {
-      const keys = [];
-      if (!replacePointerBackup && (!current || currentCampaign) && localStorage.getItem(CAMPAIGN_BACKUP_KEY) != null) {
-        keys.push(CAMPAIGN_BACKUP_KEY);
-      }
-      const others = index.filter(item => item.id !== data.campaignId)
-        .sort((a, b) => (Number(a.savedAt) || 0) - (Number(b.savedAt) || 0));
-      for (const item of others) {
-        if (localStorage.getItem(backupKey(item.id)) != null && tryParse(localStorage.getItem(campaignStorageKey(item.id)))) keys.push(backupKey(item.id));
-      }
-      return keys;
-    };
-    let failure = null;
-    for (const [slotBackup, pointerBackup] of [[true, true], [true, false], [false, false]]) {
-      try { return write(slotBackup, pointerBackup); } catch (error) {
-        rollback();
-        if (!quotaExceeded(error)) throw error;
-        failure = error;
+    // Recovery copies rotate first and the index precedes its slot. Each attempt
+    // is all or nothing, so a failed save leaves no slot ahead of the app's
+    // revision (a false "changed in another tab") and no index entry without a slot.
+    const steps = (slotCopy, pointerCopy) => [...kept,
+      ...(slotCopy && previous ? [[backupKey(data.campaignId), previous]] : []),
+      ...(pointerCopy && currentCampaign && updatePointer ? [[CAMPAIGN_BACKUP_KEY, current]] : []),
+      [CAMPAIGN_INDEX_KEY, JSON.stringify(index)], [key, text], ...(updatePointer ? [[SAVE_KEY, text]] : [])];
+    const saved = message => ({ ok: true, campaignId: data.campaignId, revision: data.revision, campaignName: data.campaignName,
+      savedAt: data.savedAt, message });
+    try {
+      writeAll(steps(true, true));
+      return saved('Progress saved');
+    } catch (error) {
+      if (!isQuotaError(error)) throw error;
+    }
+    // Storage is full: only this campaign's own recovery copies may go, one at a time (first the resume pointer's
+    // copy, which duplicates the slot's, then the slot's). Every other campaign's copies, damaged or not, stay.
+    const pointerCopy = tryParse(localStorage.getItem(CAMPAIGN_BACKUP_KEY))?.campaignId === data.campaignId
+      ? [[CAMPAIGN_BACKUP_KEY, null]] : [];
+    for (const [entries, message] of [
+      [[...pointerCopy, ...steps(true, false)], 'Progress saved'],
+      [[...pointerCopy, [backupKey(data.campaignId), null], ...steps(false, false)],
+        `Progress saved without a recovery copy: browser storage is nearly full. ${FREE_SPACE}`],
+    ]) {
+      try {
+        writeAll(entries);
+        return saved(message);
+      } catch (error) {
+        if (!isQuotaError(error)) throw error;
       }
     }
-    const spare = spareCopies();
-    for (let n = 1; n <= spare.length; n++) {
-      try { return write(false, false, spare.slice(0, n)); } catch (error) {
-        rollback();
-        if (!quotaExceeded(error)) throw error;
-        failure = error;
-      }
-    }
-    throw failure;
+    return { ok: false, quota: true, savedAt: null, message: `Progress could not be saved: browser storage is full. ${FREE_SPACE}` };
   } catch {
     return { ok: false, savedAt: null, message: 'Progress could not be saved. Export your campaign to keep it.' };
+  }
+}
+
+const FREE_SPACE = 'Delete campaigns you no longer need in Saved campaigns, or export this one to keep it.';
+
+/** Apply writes in order (null removes); if any fails, put every key back as it was and rethrow. */
+function writeAll(entries) {
+  const done = [];
+  try {
+    for (const [key, value] of entries) {
+      const before = localStorage.getItem(key);
+      if (value == null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
+      done.push([key, before]);
+    }
+  } catch (error) {
+    // Undoing in reverse retraces sizes that already fitted, so it cannot hit the quota.
+    for (const [key, before] of done.reverse()) {
+      try { if (before == null) localStorage.removeItem(key); else localStorage.setItem(key, before); } catch { /* keep undoing */ }
+    }
+    throw error;
+  }
+}
+
+/**
+ * Delete a campaign for good: its checkpoint, recovery copy and list entry, and
+ * the quick-resume pointer and its copy when they hold this campaign.
+ */
+export function deleteCampaign(id) {
+  try {
+    const holds = key => tryParse(localStorage.getItem(key))?.campaignId === id;
+    writeAll([[CAMPAIGN_INDEX_KEY, JSON.stringify(indexData().filter(item => item.id !== id))],
+      [campaignStorageKey(id), null], [backupKey(id), null],
+      ...[SAVE_KEY, CAMPAIGN_BACKUP_KEY].filter(holds).map(key => [key, null])]);
+    return { ok: true, message: 'Campaign deleted' };
+  } catch {
+    return { ok: false, message: 'The campaign could not be deleted. Browser storage is unavailable.' };
   }
 }
 
@@ -387,7 +476,50 @@ export function renameCampaign(id, name) {
   return writeSave({ ...campaign, campaignName: cleanName(name) }, { activate: false });
 }
 
-export function exportCampaign(state) { return JSON.stringify(campaignSnapshot(state), null, 2); }
+export function exportCampaign(state) { return serializeCampaign(campaignSnapshot(state), 2); }
+
+const sectionCount = (n, noun = 'section') => `${n} of its ${noun}s ${n === 1 ? 'is' : 'are'}`;
+
+/**
+ * Fit a country campaign to the loaded build of its map: `{ campaign }`, or
+ * `{ error }` with the save left as it is. Section ids follow club rank, so a
+ * rebuild can give an id to another club's land. A save from another build is
+ * therefore moved club by club: each club's new starting section is held by
+ * whoever held its old one. It must have exactly the map's clubs.
+ */
+export function fitDomesticCampaign(campaign, { meta, clubs, sectionNames }) {
+  const refuse = reason => ({ error: `This campaign no longer matches the map of ${meta.name}: ${reason}, so it cannot resume. The save is kept.` });
+  const teams = Object.entries(campaign.teams || {});
+  if (campaign.settings?.domesticVersion === meta.version) {
+    const known = id => typeof id === 'string' && Object.hasOwn(sectionNames, id);
+    const missing = new Set([...Object.keys(campaign.own || {}), ...teams.map(([, team]) => team?.home)].filter(id => !known(id)));
+    return missing.size ? refuse(`${sectionCount(missing.size)} missing`) : { campaign };
+  }
+  const homeOf = new Map(clubs.map(club => [club.id, club.homeSection]));
+  const clubOf = ([id, team]) => team?.origin || id;
+  const missing = teams.filter(entry => !homeOf.has(clubOf(entry)));
+  if (missing.length) return refuse(`${sectionCount(missing.length, 'club')} not on the updated map`);
+  const saved = new Set(teams.map(clubOf));
+  const added = clubs.filter(club => !saved.has(club.id)).length;
+  if (added) return refuse(`the updated map adds ${added} club${added === 1 ? '' : 's'} it never had`);
+  // Old starting section -> the same club's new one.
+  const moved = new Map(teams.map(entry => [entry[1]?.home, homeOf.get(clubOf(entry))]));
+  if (moved.size !== teams.length || moved.has(undefined)) return refuse('its clubs do not each start on their own section');
+  const ownEntries = Object.entries(campaign.own || {});
+  const strays = ownEntries.filter(([section]) => !moved.has(section)).length;
+  if (strays) return refuse(`${sectionCount(strays)} not a club's starting section`);
+  if (ownEntries.length !== clubs.length) return refuse(`${clubs.length - ownEntries.length} of its sections have no holder`);
+  const move = ids => Array.isArray(ids) ? ids.filter(id => moved.has(id)).map(id => moved.get(id)) : ids;
+  const withTerritories = value => value && Array.isArray(value.territoryIds) ? { ...value, territoryIds: move(value.territoryIds) } : value;
+  return { campaign: {
+    ...campaign,
+    own: Object.fromEntries(ownEntries.map(([section, owner]) => [moved.get(section), owner])),
+    teams: Object.fromEntries(teams.map(entry => [entry[0], { ...entry[1], home: homeOf.get(clubOf(entry)) }])),
+    conquestIds: move(campaign.conquestIds),
+    match: withTerritories(campaign.match),
+    history: (campaign.history || []).map(entry => entry?.result ? { ...entry, result: withTerritories(entry.result) } : entry),
+  } };
+}
 
 /** Discard only the resume pointer; named campaigns and recovery copies stay intact. */
 export function clearSave() {

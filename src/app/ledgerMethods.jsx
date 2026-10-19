@@ -7,8 +7,10 @@ import { pad3 } from '../theme.js';
 import { selectLineup, teamEff } from '../data/teams.js';
 import { territories } from '../engine/campaign.js';
 import { campaignRecap } from '../engine/campaignExperience.js';
+import { getLoadedDomestic } from '../engine/domestic.js';
+import { domesticEntry } from '../data/domesticScope.js';
 import * as ledgerVM from '../viewModels/ledger.js';
-import { signed } from './shared.js';
+import { domesticIdOf, signed } from './shared.js';
 
 function isPlaying(st) {
   return st?.phase === 'playing' || st?.phase === 'victory';
@@ -65,7 +67,11 @@ export function victoryPanel() {
   const champ = aliveIds.length ? teams[aliveIds[0]] : null;
   if (!champ) return null;
   const s = stats[champ.id] || { conq: 0, steals: [] };
-  const scope = this.scopeName(settings);
+  // "has conquered England", not the country theatre's "England · top 100 clubs" label.
+  const domesticId = domesticIdOf(settings);
+  const scope = domesticId
+    ? getLoadedDomestic(domesticId)?.meta.name || domesticEntry(settings.clubScope)?.name || this.scopeName(settings)
+    : this.scopeName(settings);
   return {
     id: champ.flagId,
     code: champ.code,

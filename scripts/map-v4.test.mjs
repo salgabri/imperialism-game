@@ -993,3 +993,94 @@ test('phone: no zoom buttons (A4); two fingers pinch-zoom around their midpoint 
     } finally { await view.close(); }
   }));
 });
+
+// ---- country maps (domestic campaigns: a country's top clubs on its own sectioned map) ----
+
+test('a country map: the setup preview paints each section as its starting club; tooltips name the sections', () => {
+  const club = { id: 'd826-679', name: 'Manchester City', col: 'oklch(0.74 0.15 0)' };
+  assert.equal(mapVM.countryFill({ countryId: '826-001', setup: true, preview: club }), empireFill(club.id),
+    'Political: the pastel the club takes at kick-off');
+  assert.equal(mapVM.countryFill({ countryId: '826-001', setup: true, preview: club, mapMode: 'flags' }), club.col,
+    'Flags: the club colour, as an owned club flies it');
+  assert.equal(mapVM.countryFill({ countryId: '826-001', setup: true }), V4.landNeutral, 'no starting club: neutral land');
+  assert.equal(mapVM.countryFill({ countryId: '826-001', ownerId: '380', owner: teams['380'], preview: club }), empireFill('380'),
+    'an owner always wins over the preview');
+  assert.equal(mapVM.countryFill({ countryId: '826-001', hasFlagParts: true, preview: club }), 'transparent');
+
+  const sectionNames = { '826-001': 'Manchester', '826-002': 'Liverpool', '826-003': 'Bolton' };
+  const setup = { phase: 'setup', teams: {}, own: {} };
+  assert.deepEqual(mapVM.tooltipModel(setup, { sectionNames, homeClubs: { '826-001': club } }, '826-001'),
+    { visible: true, name: 'Manchester', held: 'Home of Manchester City', result: null, link: null });
+  assert.equal(mapVM.tooltipModel(setup, { sectionNames, homeClubs: {} }, '826-003').held, 'Awaiting campaign');
+  assert.equal(mapVM.tooltipModel(setup, {}, '826-001').visible, false, 'without section names a section is no known shape');
+
+  const burnley = { ...teams['380'], id: 'd826-1', name: 'Burnley', home: '826-001' };
+  const st = { phase: 'playing', teams: { [burnley.id]: burnley }, aliveIds: [burnley.id], history: [],
+    own: { '826-001': burnley.id, '826-002': burnley.id } };
+  const home = mapVM.tooltipModel(st, { sectionNames }, '826-001');
+  assert.deepEqual([home.name, home.held, home.link], ['Manchester', 'Home of Burnley', 'Click to open the Burnley squad']);
+  assert.equal(home.result, `Strength ${teamEff(burnley).toFixed(1)}`);
+  assert.equal(mapVM.tooltipModel(st, { sectionNames }, '826-002').held, 'Held by Burnley');
+  assert.equal(mapVM.tooltipModel(st, { sectionNames }, '826-003').held, 'Unclaimed');
+  assert.equal(mapVM.tooltipModel(playingState(), {}, '380').held, 'Capital of Italy', 'the world map keeps "Capital of"');
+});
+
+test('a country map: neighbouring land is an inert backdrop beneath the sections, and every home town shows', async () => {
+  // Atlas ids can repeat (Australia and Ashmore share 036): each shape still draws.
+  const backdrop = [{ id: '250', d: 'M0,0L90,0L90,90Z' }, { id: '036', d: 'M900,400L950,400L950,450Z' },
+    { id: '036', d: 'M920,420L940,420L940,440Z' }];
+  const homes = Array.from({ length: 60 }, (_, i) => ({ id: `h${i}`, x: 100 + i * 10, y: 120 }));
+  const { props, calls } = mapProps({ backdrop, homes, showAllHomes: true });
+  const view = await mount(props);
+  try {
+    const svg = view.q('svg.political-map');
+    const layerOrder = [...svg.children].map(node => node.getAttribute('class')).filter(Boolean);
+    assert.deepEqual(layerOrder.slice(0, 3), ['map-graticule', 'map-backdrop', 'country-shapes']);
+    const group = view.q('g.map-backdrop');
+    assert.equal(group.getAttribute('aria-hidden'), 'true');
+    assert.equal(group.getAttribute('pointer-events'), 'none');
+    assert.equal(group.getAttribute('fill'), V4.landNeutral, 'muted land, never an owner colour (attribute for renderers without CSS)');
+    assert.equal(cssRule('.map-backdrop path').style.getPropertyValue('fill'), 'var(--land-neutral)');
+    const paths = [...group.querySelectorAll('path')];
+    assert.equal(paths.length, 3);
+    for (const path of paths) {
+      assert.ok(!['data-country', 'data-owner', 'role', 'tabindex'].some(name => path.hasAttribute(name)), 'never a territory');
+    }
+    await act(async () => paths[0].dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true })));
+    assert.deepEqual(calls.click, []);
+    assert.equal(view.qa('[data-capital]').length, 60, 'a country map shows every home town at any zoom');
+    await view.render({ ...props, showAllHomes: false, backdrop: [] });
+    assert.equal(view.qa('[data-capital]').length, 0, 'a crowded world map keeps capitals for closer zooms');
+    assert.equal(view.q('g.map-backdrop'), null, 'the world map has no backdrop');
+  } finally { await view.close(); }
+});
+
+test('labels wait for the opening camera, and keep their last layout while a drag is under way', async () => {
+  await withCanvas({ size: { width: 1200, height: 540 } }, async report => {
+    const before = globalThis.__mapV4Layouts || 0;
+    const { props } = mapProps();
+    const view = await mount(props);
+    try {
+      await report();
+      assert.ok(view.qa('text[data-empire-label]').length >= 2, 'labels are placed once the camera is framed');
+      assert.equal(globalThis.__mapV4Layouts - before, 1, 'one layout, for the framed view; none for the stand-in view');
+      await act(async () => view.q('[aria-label="Zoom in"]').click());
+      const signature = () => JSON.stringify(view.qa('text[data-empire-label]').map(label =>
+        [label.dataset.empireLabel, label.getAttribute('transform'), label.getAttribute('font-size')]));
+      const settled = signature();
+      const layouts = globalThis.__mapV4Layouts;
+      const section = view.q('section.world-map');
+      const pointer = (type, clientX) => act(async () => section.dispatchEvent(new dom.window.PointerEvent(type,
+        { bubbles: true, pointerId: 1, pointerType: 'mouse', button: 0, clientX, clientY: 270, isPrimary: true })));
+      const camera = view.q('svg').getAttribute('viewBox');
+      await pointer('pointerdown', 600);
+      await pointer('pointermove', 540);
+      await pointer('pointermove', 480);
+      assert.notEqual(view.q('svg').getAttribute('viewBox'), camera, 'the drag moves the camera');
+      assert.equal(globalThis.__mapV4Layouts, layouts, 'no label layout mid-drag');
+      assert.equal(signature(), settled, 'labels keep their map positions and sizes while dragging');
+      await pointer('pointerup', 480);
+      assert.ok(globalThis.__mapV4Layouts > layouts, 'the released camera is laid out');
+    } finally { await view.close(); }
+  });
+});

@@ -5,7 +5,8 @@ import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { roman, signedDelta, territoryWord } from './format.js';
 
 function territoryName(ctx, cid) {
-  return NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name
+  // A country map's sections first (ctx.sectionNames); the geometry fallback below is an O(n) find.
+  return ctx?.sectionNames?.[cid] || NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name
     || (ctx?.geo?.countries || []).find(country => country.id === cid)?.name || cid;
 }
 

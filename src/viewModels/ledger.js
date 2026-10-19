@@ -3,12 +3,13 @@
 // (teams {}, aliveIds [], board null), `stats: {}`, teams without baseEff and history entries without odds.
 import { DEPENDENCIES, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
 import { CLUB_SCOPES } from '../data/scopes.js';
+import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
-import { FEED_CAP } from '../app/shared.js';
+import { FEED_CAP, domesticIdOf } from '../app/shared.js';
 import { empireFill, V4 } from '../theme.js';
 import {
   campaignTitle, displayRound, formatOddsPair, historyRound, plainScopeName, memo, ratingTier, roman, routeCopy, teamChip,
@@ -24,6 +25,8 @@ const RECAP_LABELS = { biggestUpset: 'Biggest upset', decisiveMatch: 'Decisive m
 function scopeNameOf(settings) {
   if (!settings) return '';
   try {
+    // A country theatre ("England · top 100 clubs"), as App.scopeName names it.
+    if (domesticIdOf(settings)) return domesticLabel(settings.clubScope) || '';
     if (settings.layer === 'clubs') {
       const scopes = CLUB_SCOPES(getSport(settings.sport));
       return plainScopeName((scopes.find(x => x.id === settings.clubScope) || scopes[0])?.name || '');
@@ -428,8 +431,9 @@ function previewRoute(ctx, aId, dId, route) {
   return routeCopy({ routeKind: source.routeKind, isNeighbor }) || '';
 }
 
-function territoryName(cid) {
-  return NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || String(cid);
+/** A country map's section name (ctx.sectionNames), else the nation or dependency name. */
+function territoryName(cid, ctx) {
+  return ctx?.sectionNames?.[cid] || NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || String(cid);
 }
 
 /** The territories `team` holds: its homeland first, then in `own` order. */
@@ -445,7 +449,7 @@ function heldTerritories(own, team) {
  * Board 07 stakes: "Annex 3 territories — Serbia, Kosovo, Montenegro — and claim one player" (first three names,
  * an ellipsis when there are more) / "Italy falls. Your campaign ends."; the best-of-three finale keeps its own copy.
  */
-function stakesCopy(st, youTeam, themTeam) {
+function stakesCopy(st, youTeam, themTeam, ctx) {
   // Best-of-three final: a game only decides the series for a side that already has a win (as turns.js targetStakes
   // does for the target card), so the preview and the card agree on the deciding game.
   const series = (st?.aliveIds || []).length === 2 && st?.settings?.finale === 'best-of-three';
@@ -455,7 +459,7 @@ function stakesCopy(st, youTeam, themTeam) {
   const winDecides = !series || wins(youTeam.id) >= 1;
   const loseDecides = !series || wins(themTeam.id) >= 1;
   const held = heldTerritories(st?.own, themTeam);
-  const names = held.slice(0, 3).map(territoryName).join(', ') + (held.length > 3 ? '…' : '');
+  const names = held.slice(0, 3).map(cid => territoryName(cid, ctx)).join(', ') + (held.length > 3 ? '…' : '');
   return {
     win: !winDecides ? `${youTeam.name} moves one game closer to total conquest`
       : held.length
@@ -499,7 +503,7 @@ export function buildMatchPreview(st, ctx) {
     const fallbackA = Number.isFinite(balanced?.winProbability) ? (youAttack ? balanced.winProbability : 1 - balanced.winProbability) : NaN;
     const pA = odds ? odds.attacker : fallbackA;
     const pD = odds ? odds.defender : 1 - fallbackA;
-    const stakes = youAttack ? stakesCopy(st, A, D) : youDefend ? stakesCopy(st, D, A) : null;
+    const stakes = youAttack ? stakesCopy(st, A, D, ctx) : youDefend ? stakesCopy(st, D, A, ctx) : null;
     const round = displayRound(st);
     return {
       roman: roman(round),

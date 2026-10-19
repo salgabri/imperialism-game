@@ -2,9 +2,18 @@
 //
 // A `board` is the minimal read-only view these rules need:
 //   { geo: WorldGeometry, own: {countryId -> empireId}, aliveIds: string[] }
+// plus optional routing land: routingPaths (painted geometry, else geo.paths),
+// a prepared routeIndex, obstacles (createAttackRouteIndex's never-owned land),
+// and borderRoutes (country maps: aim at a neighbour's shared border when its
+// anchor is out of sight).
 
 import { closestPair } from './geo.js';
-import { createAttackRouteIndex, firstForeignLand, findCoastalSeaRoute, routeLandCrossings } from './attackRoutes.js';
+import { borderApproachPoints, createAttackRouteIndex, firstForeignLand, findCoastalSeaRoute, routeLandCrossings } from './attackRoutes.js';
+
+/** Route label for a transit across board.obstacles (a country map's foreign neighbours). */
+export const FOREIGN_TRANSIT_LABEL = 'Crossing foreign territory';
+// Shared-border points tried per target (nearest first) when borderRoutes is on.
+const BORDER_TRIES = 12;
 
 /**
  * Seed clubs onto the map.
@@ -86,24 +95,13 @@ export function empireNeighbors(board, tid) {
   return out;
 }
 
-const boardRouteIndex = board => board.routeIndex ?? createAttackRouteIndex(board.routingPaths || board.geo.paths);
+const boardRouteIndex = board => board.routeIndex ?? createAttackRouteIndex(board.routingPaths || board.geo.paths, board.obstacles);
 // Default-parameter form: tolerates a missing board/geo (render-purity inputs) instead of throwing.
 const safeRouteIndex = board => (board?.geo?.paths ? boardRouteIndex(board) : null);
 
-/**
- * The direct (angle-free) route from an attacker's holdings to one target, or
- * null. With a route index, pairs are tried by distance and the line must reach
- * the target's land before any other owner's or neutral land; without one
- * (point-only fixtures) the closest pair is used unchecked.
- */
-function directRoute(board, attackerId, aPts, routeIndex, tid) {
-  if (tid === attackerId) return null;
-  const bPts = territoryPoints(board, tid);
-  // An empire may have a blocked closest pair but an open route from another
-  // holding. Try pairs by distance, never falling back to an unchecked line.
-  const pairs = routeIndex ? aPts.flatMap(a => bPts.map(b => closestPair([a], [b])))
-    .filter(Boolean).sort((a, b) => a.dist - b.dist) : [closestPair(aPts, bPts)].filter(Boolean);
-  for (const pair of pairs) {
+/** The first pair in `list` whose line reaches `tid`'s land before any other land, clipped just inside it. */
+function aimAt(board, attackerId, routeIndex, tid, list) {
+  for (const pair of list) {
     if (!routeIndex) return { cp: pair, anchorDistance: pair.dist };
     const hit = firstForeignLand(routeIndex, board.own, attackerId, pair);
     if (!hit || hit.ownerId !== tid) continue;
@@ -115,6 +113,37 @@ function directRoute(board, attackerId, aPts, routeIndex, tid) {
       by: pair.ay + (pair.by - pair.ay) * t, dist: pair.dist * t }, anchorDistance: pair.dist };
   }
   return null;
+}
+
+/**
+ * The direct (angle-free) route from an attacker's holdings to one target, or
+ * null. With a route index, pairs are tried by distance and the line must reach
+ * the target's land before any other owner's or neutral land; without one
+ * (point-only fixtures) the closest pair is used unchecked.
+ */
+function directRoute(board, attackerId, aPts, routeIndex, tid, neighbors = null) {
+  if (tid === attackerId) return null;
+  const bPts = territoryPoints(board, tid);
+  // An empire may have a blocked closest pair but an open route from another
+  // holding. Try pairs by distance, never falling back to an unchecked line.
+  const pairs = routeIndex ? aPts.flatMap(a => bPts.map(b => closestPair([a], [b])))
+    .filter(Boolean).sort((a, b) => a.dist - b.dist) : [closestPair(aPts, bPts)].filter(Boolean);
+  const route = aimAt(board, attackerId, routeIndex, tid, pairs);
+  if (route || !routeIndex || !board.borderRoutes || !(neighbors ?? empireNeighbors(board, attackerId)).has(tid)) return route;
+  // Country maps: when no anchor line reaches a land neighbour (a concave or
+  // foreign-bounded border, a section in between), aim across the shared border.
+  const across = [];
+  for (const cid of territories(board, attackerId)) for (const next of board.geo.adj[cid] || []) {
+    if (board.own[next] !== tid) continue;
+    const p = board.geo.paths[cid];
+    for (const point of borderApproachPoints(routeIndex, cid, next)) across.push(closestPair([[p.cx, p.cy]], [point]));
+  }
+  // Nearest first, then spread along the border: a river bend or a foreign
+  // salient can hide every point close to the anchor.
+  across.sort((a, b) => a.dist - b.dist);
+  const step = Math.max(1, (across.length - 1) / (BORDER_TRIES - 1));
+  return aimAt(board, attackerId, routeIndex, tid,
+    [...new Set(Array.from({ length: Math.min(BORDER_TRIES, across.length) }, (_, i) => across[Math.round(i * step)]))]);
 }
 
 /**
@@ -142,7 +171,7 @@ export function pickTarget(board, attackerId, angle, { fallback = true } = {}) {
   const neighbors = empireNeighbors(board, attackerId);
   const routeIndex = boardRouteIndex(board);
   const candidateOf = tid => {
-    const route = directRoute(board, attackerId, aPts, routeIndex, tid);
+    const route = directRoute(board, attackerId, aPts, routeIndex, tid, neighbors);
     if (!route) return null;
     const { cp, anchorDistance } = route;
     const bearing = (Math.atan2(cp.by - cp.ay, cp.bx - cp.ax) * 180) / Math.PI;
@@ -180,6 +209,7 @@ function clippedRoute(pair, hit) {
  * Curved coastal routes are a fallback, never permission for a straight arrow to
  * jump blockers. Landlocked survivors use a visibly named neutral transit treaty:
  * neutral land can be crossed, but the route still stops at the first live enemy.
+ * Obstacle land is crossed the same way, labelled as foreign territory.
  * This explicit exception guarantees that a valid two-owner field can finish.
  */
 function pickFallbackTarget(board, attackerId, angle, routeIndex) {
@@ -212,13 +242,17 @@ function pickFallbackTarget(board, attackerId, angle, routeIndex) {
     const hit = firstForeignLand(routeIndex, transitOwnership, attackerId, candidate.cp);
     if (!hit || !survivors.has(hit.ownerId) || hit.ownerId === attackerId) continue;
     const cp = clippedRoute(candidate.cp, hit);
-    const transitCountryIds = [...new Set(routeLandCrossings(routeIndex, cp)
-      .filter(({ countryId }) => !survivors.has(board.own[countryId])).map(({ countryId }) => countryId))];
+    const crossed = routeLandCrossings(routeIndex, cp).filter(({ countryId }) => !survivors.has(board.own[countryId]));
+    // Obstacles (foreign land beneath a country map) are never territory, so
+    // they are named as foreign ground rather than listed as neutral states.
+    const transitCountryIds = [...new Set(crossed.filter(({ obstacle }) => !obstacle).map(({ countryId }) => countryId))];
+    const foreign = !transitCountryIds.length && crossed.some(({ obstacle }) => obstacle);
     const routePoints = [[cp.ax, cp.ay], [cp.bx, cp.by]];
     return { tid: hit.ownerId, cp, diff: bearingDifference(routePoints, angle), anchorDistance: candidate.cp.dist,
       isNeighbor: empireNeighbors(board, attackerId).has(hit.ownerId),
-      routeKind: transitCountryIds.length ? 'neutral-transit' : 'straight',
-      routeLabel: transitCountryIds.length ? 'Neutral transit treaty' : 'Direct challenge', routePoints, transitCountryIds };
+      routeKind: transitCountryIds.length ? 'neutral-transit' : foreign ? 'foreign-transit' : 'straight',
+      routeLabel: transitCountryIds.length ? 'Neutral transit treaty' : foreign ? FOREIGN_TRANSIT_LABEL : 'Direct challenge',
+      routePoints, transitCountryIds };
   }
   return null;
 }
@@ -230,7 +264,7 @@ function pickFallbackTarget(board, attackerId, angle, routeIndex) {
 const isolatedIndexes = new WeakMap();
 export function isolatedRouteIndex(routeIndex) {
   if (!routeIndex?.countries) return null;
-  if (!isolatedIndexes.has(routeIndex)) isolatedIndexes.set(routeIndex, Object.freeze({ countries: routeIndex.countries }));
+  if (!isolatedIndexes.has(routeIndex)) isolatedIndexes.set(routeIndex, Object.freeze({ countries: routeIndex.countries, ...(routeIndex.obstacles ? { obstacles: true } : {}) }));
   return isolatedIndexes.get(routeIndex);
 }
 
@@ -263,12 +297,13 @@ export function fallbackRouteTo(board, attackerId, targetId, routeIndex = isolat
     const hit = firstForeignLand(routeIndex, transitOwnership, attackerId, pair);
     if (!hit || hit.ownerId !== targetId) continue;
     const cp = clippedRoute(pair, hit);
-    const transitCountryIds = [...new Set(routeLandCrossings(routeIndex, cp)
-      .filter(({ countryId }) => !survivors.has(board.own[countryId])).map(({ countryId }) => countryId))];
+    const crossed = routeLandCrossings(routeIndex, cp).filter(({ countryId }) => !survivors.has(board.own[countryId]));
+    const transitCountryIds = [...new Set(crossed.filter(({ obstacle }) => !obstacle).map(({ countryId }) => countryId))];
+    const foreign = !transitCountryIds.length && crossed.some(({ obstacle }) => obstacle);
     return { tid: targetId, cp, anchorDistance: pair.dist,
       isNeighbor: empireNeighbors(board, attackerId).has(targetId),
-      routeKind: transitCountryIds.length ? 'neutral-transit' : 'straight',
-      routeLabel: transitCountryIds.length ? 'Neutral transit treaty' : 'Direct challenge',
+      routeKind: transitCountryIds.length ? 'neutral-transit' : foreign ? 'foreign-transit' : 'straight',
+      routeLabel: transitCountryIds.length ? 'Neutral transit treaty' : foreign ? FOREIGN_TRANSIT_LABEL : 'Direct challenge',
       routePoints: [[cp.ax, cp.ay], [cp.bx, cp.by]], transitCountryIds };
   }
   return null;

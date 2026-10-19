@@ -8,7 +8,7 @@ import { SAVE_KEY } from '../src/config.js';
 import { NATIONS, buildTeam, makeRng } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { CAMPAIGN_BACKUP_KEY, CAMPAIGN_INDEX_KEY, campaignSnapshot, campaignStorageKey, createCampaignId,
-  detectSaveConflict, loadCampaign, loadSave, writeSave } from '../src/engine/storage.js';
+  deleteCampaign, detectSaveConflict, loadCampaign, loadSave, writeSave } from '../src/engine/storage.js';
 
 const QUOTA = 5_000_000; // jsdom's default and Chromium's per-origin localStorage limit, in UTF-16 code units
 const slotBackupKey = id => `${campaignStorageKey(id)}:backup`;
@@ -205,14 +205,27 @@ function storedWorldCampaign(storage) {
   return first;
 }
 
-test('a second world campaign keeps saving: another campaign\'s recovery copy gives way, never its checkpoint', () => {
+// Merge with main (domestic campaigns): full storage never sheds another campaign's copies (docs/design/domestic-campaigns.md:
+// "a campaign may drop only its own recovery copy"); the player frees room in Saved campaigns instead.
+test('a second world campaign never sheds another campaign\'s recovery copy: it reports full storage until a campaign is deleted', () => {
   const storage = quotaStorage();
   withStorage(storage, () => {
     const first = storedWorldCampaign(storage);
+    const firstBackup = storage.items.get(slotBackupKey(first.campaignId));
     const second = worldCampaign();
     second.campaignName = 'Second world war';
+    const before = new Map(storage.items);
+    const blocked = writeSave(second);
+    assert.equal(blocked.ok, false);
+    assert.equal(blocked.quota, true, 'reported as full storage');
+    assert.equal(blocked.conflict, undefined);
+    assert.match(blocked.message, /storage is full.*Saved campaigns/);
+    assert.deepEqual(storage.items, before, 'nothing was written or removed');
+    assert.equal(storage.items.get(slotBackupKey(first.campaignId)), firstBackup, 'the first campaign keeps its recovery copy');
+    assert.equal(loadCampaign(first.campaignId).revision, 2);
+    // Deleting the first campaign frees its slot and copy; the second then saves all the way to finished size.
+    assert.equal(deleteCampaign(first.campaignId).ok, true);
     let n = 0;
-    // Kickoff (~0.95M) to finished size: before the last tier the very first of these saves already failed.
     for (const size of [0, 1_100_000, 1_250_000, 1_360_000]) {
       n = grow(second, size, n);
       const result = writeSave(second);
@@ -220,10 +233,8 @@ test('a second world campaign keeps saving: another campaign\'s recovery copy gi
       assert.equal(result.revision, second.revision + 1);
       Object.assign(second, { campaignId: result.campaignId, revision: result.revision });
       assert.ok(storage.used() <= QUOTA);
-      assert.equal(loadCampaign(first.campaignId).revision, 2, 'the first campaign\'s checkpoint is never dropped');
       assert.equal(loadSave().campaignId, second.campaignId);
     }
-    assert.equal(storage.items.has(slotBackupKey(first.campaignId)), false, 'its redundant recovery copy gave way');
     assert.equal(loadSave().history.length, second.history.length);
   });
 });

@@ -25,6 +25,12 @@
   font:600 13px/1.4 var(--font-sans);
 }
 .campaign-storage .campaign-storage-empty { color:var(--muted); }
+/* A restore waiting for its country map (busy), and a done notice (a campaign deleted). */
+.campaign-storage .campaign-storage-busy, .campaign-storage .campaign-storage-notice {
+  margin:14px 0 0; padding:10px 12px; background:#fff; font:600 13px/1.4 var(--font-sans); color:var(--ink);
+  box-shadow:inset 3px 0 0 var(--even), inset 0 0 0 1px var(--rule);
+}
+.campaign-storage .campaign-storage-notice { box-shadow:inset 3px 0 0 var(--gain), inset 0 0 0 1px var(--rule); }
 
 /* Preview: label/value pairs in two columns */
 .campaign-storage-preview { margin:14px 0; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px 22px; }
@@ -54,13 +60,22 @@
 /* Component CSS loads before primitives.css in the app: match .button.button-primary specificity and beat it. */
 .campaign-storage .button, .campaign-storage .button.button-primary { height:max(40px, var(--tap)); min-height:max(40px, var(--tap)); }
 .campaign-storage-slot-actions { display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
-.campaign-storage-slot-actions > .button { max-width:100%; overflow:hidden; text-overflow:ellipsis; }
+.campaign-storage-slot-actions > .button { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .campaign-storage-slot-actions form { flex:1; min-width:220px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:0 8px; }
 .campaign-storage-slot-actions form > label { grid-column:1 / -1; }
 .campaign-storage-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
 .campaign-storage-fork { margin-top:20px; padding-top:16px; border-top:1px solid var(--rule); }
 .campaign-storage-fork > div:not(.campaign-storage-actions) { display:flex; gap:8px; }
 .campaign-storage-fork > div:not(.campaign-storage-actions) .button { flex:none; }
+
+/* Delete a slot: a quiet link, then an inline confirmation with the destructive action in loss red. */
+.campaign-storage-delete { margin-top:8px; padding-inline:0; }
+.campaign-storage-locked { margin:10px 0 0; }
+.campaign-storage-confirm { margin-top:12px; padding:12px; box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule); }
+.campaign-storage-confirm p { margin:0; font:400 13px/1.5 var(--font-sans); }
+.campaign-storage-confirm .campaign-storage-actions { margin-top:10px; }
+.campaign-storage .button.campaign-storage-danger { background:var(--loss); color:#fff; }
+.campaign-storage .button.campaign-storage-danger:hover:not(:disabled) { background:#a92a26; color:#fff; }
 
 @media (max-width:699.98px) {
   .campaign-storage-backdrop { align-items:stretch; padding:0; }

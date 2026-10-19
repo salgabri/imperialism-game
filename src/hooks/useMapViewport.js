@@ -223,16 +223,28 @@ export function useMapViewport(svgRef, resetKey, initialFocus, fitKey = null) {
   }, [theatreView]);
 
   const previousCamera = useRef(null);
+  const settled = previousCamera.current;
+  // Until a new theatre is framed for the canvas it will have, the view is a stand-in: callers can skip work that
+  // depends on it (label layout). Only a new resetKey (another campaign or country) or a pending canvas fit counts:
+  // both are always followed by a camera update, hence a render. A focus change within a campaign (the phone near
+  // frame, a conquest refit) may leave the view as it is and must never hide the labels.
+  const framing = !settled || settled.needsFit || settled.resetKey !== resetKey;
   useEffect(() => {
     const previous = previousCamera.current;
     const newTheatre = !previous || previous.resetKey !== resetKey ||
       previous.fx !== fx || previous.fy !== fy || previous.fw !== fw || previous.fh !== fh;
     const rect = svgRef.current?.getBoundingClientRect();
-    // A theatre change may reveal the sidebar in the same render. Complete
-    // that initial fit after ResizeObserver reports the new canvas aspect.
-    const needsFit = (newTheatre || previous?.needsFit) && rect?.width > 0 &&
+    // A theatre change may reveal the sidebar in the same render. Take the
+    // canvas size from the layout now and frame once, for that aspect.
+    const needsFit = (newTheatre || previous?.needsFit) && rect?.width > 0 && rect.height > 0 &&
       Math.abs(rect.height / rect.width - aspect) > .0001;
     previousCamera.current = { resetKey, fx, fy, fw, fh, baseWidth, aspect, needsFit, fitKey };
+    // Frame once, for the canvas the layout already has: the next pass (previous.needsFit) resets or refits with
+    // the right aspect, rather than framing a stand-in first and again after ResizeObserver reports.
+    if (needsFit) {
+      setSize({ width: rect.width, height: rect.height });
+      return;
+    }
     if (newTheatre || previous.needsFit) {
       // An untouched explicit fit outlives a theatre change of the same campaign: a reloaded signing (resume() runs
       // fitMap() and frames the conquest in one commit, then the canvas settles) and the conquest view crossing the
@@ -243,7 +255,8 @@ export function useMapViewport(svgRef, resetKey, initialFocus, fitKey = null) {
       if (refit) {
         if (inspectionOrigin.current) inspectionOrigin.current = { view: theatreView(), baseWidth };
         const current = viewRef.current;
-        if (['x', 'y', 'w', 'h'].some(key => Math.abs(refit[key] - current[key]) > 1e-9)) {
+        // After a pending canvas fit (`framing` this render) one more render must follow, even for an equal view.
+        if (previous.needsFit || ['x', 'y', 'w', 'h'].some(key => Math.abs(refit[key] - current[key]) > 1e-9)) {
           viewRef.current = refit;
           setView(refit);
         }
@@ -433,7 +446,7 @@ export function useMapViewport(svgRef, resetKey, initialFocus, fitKey = null) {
     return () => events.forEach(type => window.removeEventListener(type, endDrag));
   }, [endDrag]);
 
-  return { view, size, zoom: baseWidth / view.w, panning, reset, zoomBy, reveal, fitBounds, restore, canRestore,
+  return { view, size, zoom: baseWidth / view.w, panning, framing, reset, zoomBy, reveal, fitBounds, restore, canRestore,
     didPan: () => suppressClick.current,
     handlers: { onMouseDown, onMouseMove, onMouseUp: endDrag, onDoubleClick: reset } };
 }

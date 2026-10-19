@@ -13,6 +13,7 @@ export const PACING_OPTIONS = setupModel.PACING_OPTIONS;
 export const RESOLUTION_OPTIONS = setupModel.RESOLUTION_OPTIONS;
 export const PACING_HELP = setupModel.PACING_HELP;
 export const campaignPreview = setupModel.campaignPreview;
+export const domesticDescription = setupModel.domesticDescription;
 
 const { SETUP_STEPS, TURN_ORDER_CARDS, TARGETING_CARDS, ROLE_CARDS, CONQUEST_RULES, UNCERTAINTY_HELP, FINALE_HELP } = setupModel;
 
@@ -20,9 +21,17 @@ const { SETUP_STEPS, TURN_ORDER_CARDS, TARGETING_CARDS, ROLE_CARDS, CONQUEST_RUL
 const SPACE_IGNORE = 'input, select, textarea, button, summary, a[href], [role="radio"], [role="button"], [role="dialog"], [aria-modal="true"], [contenteditable]:not([contenteditable="false"])';
 /** Stable default so an omitted `managerTeams` prop does not invalidate the model memo on every render. */
 const NO_TEAMS = Object.freeze([]);
+/** App's chosen-country map state when no country is chosen (`domesticStatus()` shape, without `onRetry`). */
+const IDLE_DOMESTIC = Object.freeze({ state: 'idle', message: null });
 
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });
+}
+
+/** Centre a list's checked row inside the list's own scroll box only (scrollIntoView would also scroll the page). */
+function centreChecked(list) {
+  const row = list?.querySelector?.('[aria-checked="true"]');
+  if (row) list.scrollTop += row.getBoundingClientRect().top - list.getBoundingClientRect().top - (list.clientHeight - row.offsetHeight) / 2;
 }
 
 function CheckMark() {
@@ -199,15 +208,48 @@ function TeamShortlist({ id, title, teams }) {
   );
 }
 
-/** The setup wizard. Props are App's (HEAD) setup props plus optional `onCancel` (header Cancel, only with a save). */
+/**
+ * Step 1's country card: the chosen country's sections in their starting clubs' kick-off pastels over the neighbouring
+ * land (`preview` from App, built by `setupModel.countryMapPreview`). Static and decorative — no camera, labels or
+ * territory attributes; the description and stats carry the same facts in text. Memoised: App re-renders setup on
+ * every state change, and `preview` keeps its identity per decoded map.
+ */
+const CountryMap = React.memo(function CountryMap({ name, preview, loading }) {
+  if (!preview && !loading) return null;
+  return (
+    <figure className="setup-country-map" aria-hidden="true" data-state={preview ? 'ready' : 'loading'}>
+      {preview ? (
+        <svg className="setup-country-map__chart" viewBox={preview.viewBox} preserveAspectRatio="xMidYMid meet" focusable="false">
+          <g className="setup-country-map__backdrop">
+            {preview.backdrop.map((shape, index) => <path key={`${shape.id}-${index}`} d={shape.d} />)}
+          </g>
+          <g className="setup-country-map__sections">
+            {preview.sections.map(section => <path key={section.id} d={section.d} fill={section.fill} />)}
+          </g>
+        </svg>
+      ) : <div className="setup-country-map__chart setup-country-map__placeholder" />}
+      <figcaption className="setup-country-map__caption">
+        {preview ? `${name} · ${preview.sections.length} sections, one per club` : `Loading the map of ${name}…`}
+      </figcaption>
+    </figure>
+  );
+});
+
+/**
+ * The setup wizard. Props are App's (HEAD) setup props plus optional `onCancel` (header Cancel, only with a save) and
+ * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
+ * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
+ */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
+  domestic = IDLE_DOMESTIC, launching = false, restoring = false,
 }) {
   const [step, setStep] = useState(1);
   const [confirmation, setConfirmation] = useState(null);
   const headings = useRef({});
   const nationList = useRef(null);
+  const theatreList = useRef(null);
   const navigated = useRef(false);
   const keepSaveButton = useRef(null);
   const clearSaveButton = useRef(null);
@@ -215,12 +257,37 @@ export default function SetupOverlay({
   const confirmationFocus = useRef(null);
   // App passes a fresh `onStart` arrow on every render; the Space listener reads the latest one through this ref.
   const startRef = useRef(onStart);
-  const model = useMemo(() => setupModel.buildSetupModel(setup, { managerTeams }), [setup, managerTeams]);
+  // App passes a fresh `domestic` object (with a fresh `onRetry`) every render: the model keys on its values only.
+  const mapState = domestic?.state || 'idle';
+  const mapMessage = domestic?.message || null;
+  const model = useMemo(() => setupModel.buildSetupModel(setup, {
+    managerTeams, domestic: { state: mapState, message: mapMessage }, launching,
+  }), [setup, managerTeams, mapState, mapMessage, launching]);
   const { rules } = model;
   const manager = model.role === 'manager';
+  /** Football clubs also offer one country's own top clubs: a long, scrolling theatre list in two groups. */
+  const countries = model.domesticScopes.length > 0;
 
   const pick = (key, value) => onPick?.(key, value);
   function choose(key, value, current) { if (value !== current) pick(key, value); }
+  function theatreRadio(scope) {
+    const checked = scope.id === model.scopeId;
+    const describedBy = scope.note ? `setup-theatre-note-${scope.id}`
+      : checked && model.country ? 'setup-theatre-description' : undefined;
+    return (
+      <button type="button" role="radio" key={scope.id} aria-checked={checked} tabIndex={checked ? 0 : -1}
+        className="setup-theatre" data-name={scope.label} aria-describedby={describedBy}
+        onClick={() => choose(model.scopeKey, scope.id, model.scopeId)} onKeyDown={moveRadio}>
+        <span className="setup-theatre__name">
+          {scope.label}{scope.note ? <span className="setup-theatre__mark" aria-hidden="true">*</span> : null}
+        </span>
+        <span className="setup-theatre__count num">{`${scope.count} ${model.nouns}`}</span>
+      </button>
+    );
+  }
+  const theatreChoices = rows => rows.map(scope => (
+    <option value={scope.id} key={scope.id}>{`${scope.label} · ${scope.count} ${model.nouns}`}</option>
+  ));
   function goTo(next) {
     const target = Math.min(3, Math.max(1, next));
     navigated.current = true;
@@ -235,8 +302,10 @@ export default function SetupOverlay({
 
   useEffect(() => { startRef.current = onStart; });
 
-  // On mount, move focus into the wizard (it covers the whole app) unless a modal dialog already holds it.
+  // On mount, move focus into the wizard (it covers the whole app) unless a modal dialog already holds it. A chosen
+  // country can sit far down the long theatre list: centre it there.
   useEffect(() => {
+    if (countries) centreChecked(theatreList.current);
     if (typeof document === 'undefined' || document.querySelector('[aria-modal="true"]')) return;
     focusQuietly(headings.current[1]);
   }, []);
@@ -245,10 +314,9 @@ export default function SetupOverlay({
   useEffect(() => {
     if (!navigated.current) return;
     headings.current[step]?.focus?.();
-    // Centre the chosen team inside its own scroll box only (scrollIntoView would also scroll the page).
-    const list = nationList.current;
-    const row = step === 3 ? list?.querySelector?.('[aria-checked="true"]') : null;
-    if (row) list.scrollTop += row.getBoundingClientRect().top - list.getBoundingClientRect().top - (list.clientHeight - row.offsetHeight) / 2;
+    // Centre the chosen team (or a chosen country) inside its own list.
+    if (step === 3) centreChecked(nationList.current);
+    else if (step === 1 && countries) centreChecked(theatreList.current);
   }, [step]);
 
   // Quick-resume confirmation: its trigger unmounts when it opens and its buttons unmount when it closes, so focus is
@@ -287,6 +355,7 @@ export default function SetupOverlay({
 
   function launch(event) {
     event.preventDefault();
+    if (launching) return;
     if (!model.canLaunch) { goTo(3); return; }
     onStart?.();
   }
@@ -325,7 +394,7 @@ export default function SetupOverlay({
             onClick={() => goTo(n + 1)}>{meta.next}</button>
         ) : (
           <button type="submit" className="btn-primary setup-foot__next setup-launch" data-key-hint="Space" data-bar-hint="Step 3 of 3"
-            disabled={!model.canLaunch}>Launch campaign</button>
+            disabled={!model.canLaunch} aria-busy={launching || undefined}>Launch campaign</button>
         )}
       </footer>
     );
@@ -398,7 +467,7 @@ export default function SetupOverlay({
           <span className="setup-head__wordmark">Imperialism</span>
           <span className="setup-head__rule" aria-hidden="true" />
           <h1 className="setup-head__title">New campaign</h1>
-          {onCancel ? <button type="button" className="setup-head__cancel" onClick={onCancel}>Cancel</button> : null}
+          {onCancel ? <button type="button" className="setup-head__cancel" disabled={restoring} onClick={onCancel}>Cancel</button> : null}
         </header>
 
         <nav className="setup-rail" aria-label="Setup steps">
@@ -442,7 +511,7 @@ export default function SetupOverlay({
                     <>
                       <div className="setup-save__text"><strong>Continue your campaign</strong><p>{savedText}</p></div>
                       <div className="setup-save__actions">
-                        <button type="button" className="btn-secondary setup-save__resume" onClick={onResume}>Resume</button>
+                        <button type="button" className="btn-secondary setup-save__resume" disabled={restoring} onClick={onResume}>Resume</button>
                         <button type="button" className="btn-link" ref={clearSaveButton} onClick={askDiscard}>Clear quick resume</button>
                       </div>
                     </>
@@ -482,20 +551,16 @@ export default function SetupOverlay({
 
               <div className="setup-group setup-group--list">
                 <Kicker id="setup-theatre-label" title="Theatre" />
-                <div className="setup-theatres" role="radiogroup" aria-labelledby="setup-theatre-label">
-                  {model.scopes.map(scope => {
-                    const checked = scope.id === model.scopeId;
-                    return (
-                      <button type="button" role="radio" key={scope.id} aria-checked={checked} tabIndex={checked ? 0 : -1}
-                        className="setup-theatre" aria-describedby={scope.note ? `setup-theatre-note-${scope.id}` : undefined}
-                        onClick={() => choose(model.scopeKey, scope.id, model.scopeId)} onKeyDown={moveRadio}>
-                        <span className="setup-theatre__name">
-                          {scope.label}{scope.note ? <span className="setup-theatre__mark" aria-hidden="true">*</span> : null}
-                        </span>
-                        <span className="setup-theatre__count num">{`${scope.count} ${model.nouns}`}</span>
-                      </button>
-                    );
-                  })}
+                {/* One radiogroup for leagues and countries: a single tab stop, and arrow keys walk from one into the other. */}
+                <div className="setup-theatres" role="radiogroup" aria-labelledby="setup-theatre-label" ref={theatreList}
+                  data-long={countries ? '' : undefined} onKeyDown={countries ? typeAhead : undefined}>
+                  {model.scopes.map(theatreRadio)}
+                  {countries ? (
+                    <>
+                      <p className="setup-theatres__group" aria-hidden="true">{model.domesticGroup}</p>
+                      {model.domesticScopes.map(theatreRadio)}
+                    </>
+                  ) : null}
                 </div>
                 {/* The data's "*" marker ("Asia & Oceania*") resolves to the scope's own description. */}
                 {model.theatreNotes.map(scope => (
@@ -503,17 +568,39 @@ export default function SetupOverlay({
                     <span aria-hidden="true">* </span>{scope.note}
                   </p>
                 ))}
+                {model.country ? (
+                  <>
+                    <p className="setup-theatres__note setup-domestic__note" id="setup-theatre-description">{model.countryNote}</p>
+                    {model.countryState === 'loading' ? (
+                      <p className="setup-domestic__status" role="status">{model.mapLoading}</p>
+                    ) : null}
+                    {model.countryState === 'error' ? (
+                      <div className="rule-note setup-domestic__error" role="alert">
+                        <Icon name="info" size={20} />
+                        <p>{model.countryMessage}{' '}
+                          <button type="button" className="btn-link rule-note__action" onClick={() => domestic?.onRetry?.()}>Retry</button>
+                        </p>
+                      </div>
+                    ) : null}
+                  </>
+                ) : null}
                 {/* Native mirror of the theatre radios: keeps `#setup-theatre` value-bound for automation (PLAN §4.7). */}
                 <select id="setup-theatre" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={model.scopeId}
                   onChange={event => pick(model.scopeKey, event.target.value)}>
-                  {model.scopes.map(scope => (
-                    <option value={scope.id} key={scope.id}>{`${scope.label} · ${scope.count} ${model.nouns}`}</option>
-                  ))}
+                  {countries ? (
+                    <>
+                      <optgroup label={model.leagueGroup}>{theatreChoices(model.scopes)}</optgroup>
+                      <optgroup label={model.domesticGroup}>{theatreChoices(model.domesticScopes)}</optgroup>
+                    </>
+                  ) : theatreChoices(model.scopes)}
                 </select>
               </div>
             </div>
 
             <div className="setup-side">
+              {model.country ? (
+                <CountryMap name={model.country.name} preview={domestic?.preview || null} loading={model.countryState === 'loading'} />
+              ) : null}
               <section className="setup-howto" aria-labelledby="setup-howto-title">
                 <Kicker id="setup-howto-title" title="How conquest works" />
                 <ol className="setup-rules">
@@ -660,7 +747,7 @@ export default function SetupOverlay({
                         );
                       })}
                     </div>
-                  ) : <p className="setup-empty">No {model.nouns} in this theatre.</p>}
+                  ) : <p className="setup-empty">{model.teamsEmpty}</p>}
                   {/* Native mirror of the team radios (PLAN §4.7 `#setup-managed-team`, value-bound). */}
                   <select id="setup-managed-team" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={setup.managedTeamId || ''}
                     onChange={event => pick('managedTeamId', event.target.value)}>

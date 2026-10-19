@@ -8,9 +8,12 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { exportCampaign, loadSave } from '../src/engine/storage.js';
 import { SAVE_KEY } from '../src/config.js';
 import { selectLineup } from '../src/data/teams.js';
-import { bundleApp, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { empireNeighbors } from '../src/engine/campaign.js';
+import { ROOT, bundleApp, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
-await bundleApp();
+const BundledApp = await bundleApp();
 
 const UI_ONLY = ['view', 'viewSource', 'squadReturn', 'tacticalPreview', 'phoneSheet', 'phoneMore', 'wholeMap', 'focusLayout',
   'targetHoverId'];
@@ -844,6 +847,92 @@ test('More sheet: Chronicle is disabled while a decision holds the screen and fo
     sheet = findElement(app.render(), 'PhoneMoreSheet');
     assert.equal(sheet.props.locked, true, 'A-13: the target choice locks the Chronicle link');
   }));
+});
+
+// ---------- country theatres (domestic campaigns on the v4 App) ----------
+
+/**
+ * A setup fixture on the real App lifecycle for country maps: `fetch` serves the shipped `public/domestic` files and
+ * a country's fitMap runs for real (the tiny world atlas has no projection, so a world fit stays the fixture's no-op).
+ */
+async function withCountry(fn) {
+  const fetchBefore = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  globalThis.fetch = async url => {
+    const file = path.join(ROOT, 'public', ...String(url).replace(/^\//, '').split('/'));
+    return { ok: true, status: 200, json: async () => JSON.parse(readFileSync(file, 'utf8')) };
+  };
+  const f = fixture({ phase: 'setup', settings: { sport: 'football', layer: 'clubs', clubScope: 'all', role: 'spectator', seed: '11' } });
+  f.app.fitMap = function fitMap(...args) { return this.domesticMap() ? BundledApp.prototype.fitMap.apply(this, args) : undefined; };
+  f.app.opening = BundledApp.prototype.opening;
+  try { return await fn(f); } finally {
+    f.close();
+    if (fetchBefore) Object.defineProperty(globalThis, 'fetch', fetchBefore); else delete globalThis.fetch;
+  }
+}
+
+test('a country theatre: wizard preview, kickoff on its sections, section names, victory and restore on its map', async () => {
+  await withCountry(async ({ app, time }) => {
+    // Choosing the country starts its (debounced) load; the wizard waits with an empty field.
+    app.pickSetup('clubScope', 'domestic:826');
+    assert.equal(app.domesticStatus().state, 'loading');
+    assert.deepEqual(app.setupTeams(), []);
+    assert.equal(app.scopeName(app.state.setup), 'England · top 100 clubs');
+    time.advance(200);
+    const loaded = await app.loadCountry('826');
+    await new Promise(resolve => setImmediate(resolve));
+    const status = app.domesticStatus();
+    assert.equal(status.state, 'ready');
+    assert.equal(app.geo, loaded.geo, 'the (inert) setup map behind the wizard shows the sections');
+    assert.equal(status.preview.sections.length, Object.keys(loaded.sectionNames).length, 'the step-1 card draws every section');
+    assert.equal(app.domesticStatus().preview, status.preview, 'the card data is memoised per map');
+    const teams = app.setupTeams();
+    assert.equal(teams.length, loaded.clubs.length);
+    assert.ok(teams.every(team => team.isClub && /^[A-Z]{3}$/.test(team.code) && Array.isArray(team.neighbours)),
+      'country clubs carry their own codes and fronts on the sections');
+    renderPure(app, 'country setup');
+
+    // Kickoff: one club per section, the map build stamped, routes aim across section borders.
+    app.startCampaign();
+    const st = app.state;
+    assert.equal(st.phase, 'playing');
+    assert.equal(st.settings.domesticVersion, loaded.meta.version);
+    assert.equal(st.settings.turnOrder, 'random');
+    for (const club of loaded.clubs) assert.equal(st.own[club.homeSection], club.id);
+    const board = app.board();
+    assert.equal(board.borderRoutes, true);
+    assert.ok(Array.isArray(board.obstacles));
+    assert.equal(app.viewContext().sectionNames, loaded.sectionNames);
+    assert.match(st.campaignName, /England · top 100 clubs/);
+    renderPure(app, 'country campaign');
+
+    // A conquest is reported in section names.
+    const [a] = st.aliveIds;
+    const b = [...empireNeighbors(board, a)][0];
+    app.startMatch(a, b);
+    forceResult(app, a, { aId: a, dId: b });
+    app.finishMatch();
+    const result = app.state.history.at(-1).result;
+    assert.ok(result.territoryNames.length > 0);
+    assert.deepEqual(result.territoryNames, result.territoryIds.map(cid => loaded.sectionNames[cid]));
+    app.clearTimers();
+
+    // The champion "has conquered England", not the theatre label.
+    app.setState({ phase: 'victory', aliveIds: [a] });
+    assert.match(app.victoryPanel().subtitle, /^has conquered England in \d+ battles$/);
+    app.setState({ phase: 'playing', aliveIds: st.aliveIds.filter(id => id !== b) });
+
+    // A save from another build of the map is moved club by club; its interrupted round-robin draw starts again.
+    const saved = { ...loadSave(), settings: { ...loadSave().settings, turnOrder: 'round-robin', domesticVersion: '826-00000000' },
+      turnQueue: st.aliveIds.slice(0, 4), turnIndex: 3, round: 1,
+      spin: { attackerId: st.aliveIds[2], targetId: st.aliveIds[3], key: 'stale' }, match: null };
+    app.continueSaved(saved);
+    assert.equal(app.geo, loaded.geo);
+    assert.equal(app.state.settings.domesticVersion, loaded.meta.version, 'the restored campaign is re-stamped');
+    assert.equal(app.state.spin, null, 'the stale draw is not replayed');
+    assert.equal(app.state.turnIndex, 2, 'the same attacker draws again');
+    assert.equal(app.state.saveStatus.message, 'Campaign restored on an updated map of England. The interrupted draw starts again.');
+    renderPure(app, 'country restore');
+  });
 });
 
 test('phone bar minute: floored at the last revealed event', async () => {

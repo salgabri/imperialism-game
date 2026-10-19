@@ -1,10 +1,11 @@
 // Owner: WP-MAP (see PLAN.md §4). The v4 flat map (README §Map rendering, DEC D18–D22, PLAN §3.5):
 // sea, graticule, pastel/you/opponent fills, conquest hatch, three border classes, your/opponent outlines,
 // capitals, Archivo Narrow labels, the line of attack and the draw compass, plus the your-turn reach veil, the
-// map chrome (modes, zoom, return, phone "Whole map"), anchored cards and the hover tooltip.
+// map chrome (modes, zoom, return, phone "Whole map"), anchored cards and the hover tooltip. A country map adds its
+// neighbouring land as an inert backdrop and shows every home town.
 // Stroke widths and glyph sizes are screen px multiplied by k (map units per px). Responsiveness that needs JS
 // (label tier, inset, fit windows) comes from the viewport class read in useViewportClass (A-6), never App.render.
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { memo, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
   useMapViewport, useViewportClass, MAP_INSET, LABEL_MAX_PX, LABEL_MIN_PX, THEATRE_LAYOUT, NEAR_LAYOUT,
   CONQUEST_ARTICLE_PX, conquestLayout,
@@ -20,6 +21,8 @@ import './map.css';
 const PAINT = Object.freeze({
   youFill: '#c4917c', opponentFill: '#c3cfff', ink: '#111417', opponent: '#2f54eb', white: '#ffffff',
   coast: '#9aa7ae', capital: '#30363b',
+  // Land outside the theatre (= --land-neutral): the backdrop around a country map, never an owner's colour.
+  backdrop: '#e8e9e4',
 });
 const MODES = [['political', 'Political'], ['strength', 'Strength'], ['fronts', 'Fronts'], ['flags', 'Flags']];
 const MAP_FONT = "'Archivo Narrow', 'Arial Narrow', sans-serif";
@@ -46,6 +49,20 @@ function identityFill(fill, ownerId, { meId, meFill, opponentId, mapMode }) {
   if (opponentId && ownerId === opponentId && mapMode !== 'fronts') return PAINT.opponentFill;
   return fill;
 }
+
+/**
+ * Neighbouring land around a country map, for context only: never territory, never interactive. The fill attribute
+ * repeats map.css for renderers without the stylesheet. Atlas ids can repeat (Australia and Ashmore share 036), so
+ * keys carry the position too.
+ */
+const Backdrop = memo(function Backdrop({ shapes }) {
+  if (!shapes?.length) return null;
+  return (
+    <g className="map-backdrop" aria-hidden="true" pointerEvents="none" fill={PAINT.backdrop}>
+      {shapes.map((shape, i) => <path key={`${shape.id}-${i}`} d={shape.d} />)}
+    </g>
+  );
+});
 
 /** Five-point star, first point straight up (v4 `star(cx, cy, R, r)`). */
 export function starPath(cx, cy, outer, inner) {
@@ -100,6 +117,8 @@ export default function WorldMap({
   conquestIds = EMPTY, followedId, selectedId, paused = false, focusBounds, focusKey, hidden = false,
   focusLayout = null, nearFocus = null, meId = null, opponentId = null, meFill = false, reach = null,
   wholeMap = false, onWholeMap, anchors = EMPTY,
+  // A country map: its neighbouring land (inert backdrop) and every home town shown at any zoom.
+  backdrop = EMPTY, showAllHomes = false,
   // Accepted for the App contract but not drawn in v4 (PLAN §3.5, DEC D21): battle scars, km scale, LAT/LON, legend, title.
   battleMarks, kmPerUnit, coordRef, legend, title,
 }) {
@@ -148,8 +167,9 @@ export default function WorldMap({
   const youOutline = outlineOf(meId), opponentOutline = opponentId === meId ? '' : outlineOf(opponentId);
   const identity = { meId, meFill, opponentId, mapMode };
   const isYou = home => !!home.you || (meId != null && home.id === meId);
+  // A crowded world map keeps capitals for closer zooms; a country map always shows its home towns.
   const shownHomes = homes.filter(home => (!choosing || kept.has(home.id))
-    && (isYou(home) || vp.zoom > 1.5 || homes.length < 55));
+    && (isYou(home) || showAllHomes || vp.zoom > 1.5 || homes.length < 55));
   const shownLabels = choosing ? labels.filter(label => kept.has(label.id)) : labels;
   const tip = tooltip || NO_TOOLTIP;
   const rightEdge = focusLayout === 'conquest' && (breakpoint === 'wide' || breakpoint === 'std')
@@ -250,6 +270,7 @@ export default function WorldMap({
         </defs>
         <path className="map-graticule" d={graticule?.d || ''} fill="none" stroke={PAINT.white} strokeOpacity={.55}
           strokeWidth={.6 * k} pointerEvents="none" />
+        <Backdrop shapes={backdrop} />
         <g className="country-shapes">
           {/* Hover: entering land shows its card; leaving it, or tabbing off it, drops that card (App's handleMapMove
               also drops it over the sea). A window blur has no relatedTarget and keeps the card. */}
@@ -325,9 +346,11 @@ export default function WorldMap({
           {oceanLabels.map(lb => <text key={lb.text} x={lb.x} y={lb.y} textAnchor="middle" fill={PAINT.coast}
             style={{ fontFamily: MAP_FONT, fontSize: 12 * k, fontWeight: 600, letterSpacing: .14 * 12 * k, textTransform: 'uppercase' }}>{lb.text}</text>)}
         </g>
-        <EmpireLabels geometry={labelGeometry} ownership={ownership} labels={shownLabels}
+        {/* Labels wait for the opening camera (laying out 100 names for a stand-in view is wasted work) and keep
+            their last layout while a drag is under way. */}
+        <EmpireLabels geometry={labelGeometry} ownership={ownership} labels={vp.framing ? EMPTY : shownLabels}
           viewBox={vp.view} unitsPerPixel={k} mapMode={mapMode} meId={meId}
-          maxFontPx={LABEL_MAX_PX[breakpoint]} minFontPx={LABEL_MIN_PX} />
+          maxFontPx={LABEL_MAX_PX[breakpoint]} minFontPx={LABEL_MIN_PX} holdCamera={vp.panning} />
         {attack && <AttackVector {...attack} k={k} paused={paused} />}
         {spin && <DrawCompass key={compassKey} {...compassProps} k={k} paused={paused} />}
       </svg>
