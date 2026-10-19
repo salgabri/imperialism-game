@@ -1,6 +1,33 @@
+// Owner: WP-LEDGER (see PLAN.md §4). Saved campaigns / import / recovery / conflict dialog, restyled to v4 in
+// campaignStorage.css. Stays `export default function CampaignStorageDialog` with no wrapper (manager-flow L239
+// matches element.type.name); copy and focus contract per campaign-storage-ui.test.mjs.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
+import { SCOPES } from '../data/teams.js';
+import { CLUB_SCOPES } from '../data/scopes.js';
+import { plainScopeName } from '../viewModels/format.js';
 import './campaignStorage.css';
+
+/** A league's scope id is its name, so the fixed club scopes ('all', 'elite') are the only ones to look up. */
+const CLUB_FIXED_SCOPES = CLUB_SCOPES({ clubs: [] });
+
+/** The theatre's display name, as App.scopeName reads it: 'UEFA' → 'Europe', a club league by name. */
+function theatreName(settings) {
+  if (settings.layer === 'clubs') {
+    const id = settings.clubScope;
+    return CLUB_FIXED_SCOPES.find(scope => scope.id === id)?.name || id || CLUB_FIXED_SCOPES[0].name;
+  }
+  return plainScopeName(SCOPES.find(scope => scope.id === settings.scope)?.name || 'World War');
+}
+
+/** The name field's default: "<current campaign> copy" for a fork from the slot list, else the checkpoint's name. */
+function defaultName(mode, campaign, campaigns, activeId) {
+  if (mode === 'slots') {
+    const current = campaigns.find(item => item.id === activeId)?.name || campaign?.campaignName;
+    return current ? `${current} copy` : 'Campaign copy';
+  }
+  return campaign?.campaignName || (mode === 'conflict' ? 'Campaign fork' : 'Imported campaign');
+}
 
 function CampaignPreview({ campaign }) {
   if (!campaign) return null;
@@ -8,7 +35,7 @@ function CampaignPreview({ campaign }) {
   const manager = campaign.teams?.[campaign.managedTeamId]?.name || campaign.managedTeamName;
   return <dl className="campaign-storage-preview">
     <div><dt>Sport</dt><dd>{settings.sport === 'basketball' ? 'Basketball' : 'Football'} · {settings.layer === 'clubs' ? 'Clubs' : 'Nations'}</dd></div>
-    <div><dt>Theatre</dt><dd>{settings.layer === 'clubs' ? settings.clubScope || 'All clubs' : settings.scope || 'World'}</dd></div>
+    <div><dt>Theatre</dt><dd>{theatreName(settings)}</dd></div>
     <div><dt>Progress</dt><dd>Round {campaign.round || 0} · {campaign.matches || 0} matches · {alive} remaining</dd></div>
     <div><dt>Seed</dt><dd>{campaign.seed ?? 'Legacy campaign'}</dd></div>
     {manager && <div><dt>Manager</dt><dd>{manager}</dd></div>}
@@ -20,7 +47,7 @@ export default function CampaignStorageDialog({ mode = 'slots', campaign, campai
   backup, message, error, onClose, onConfirmImport, onLoad, onRename, onFork, onReload, onRestoreBackup, onExportRaw, onExportCurrent }) {
   const ref = useRef(null), closeRef = useRef(null), callbacks = useRef({ onClose });
   callbacks.current = { onClose };
-  const [name, setName] = useState(campaign?.campaignName || (mode === 'conflict' ? 'Campaign fork' : 'Imported campaign'));
+  const [name, setName] = useState(() => defaultName(mode, campaign, campaigns, activeId));
   const [names, setNames] = useState({});
   const title = { slots: 'Saved campaigns', import: 'Preview imported campaign', recovery: 'Recover campaign', conflict: 'Campaign changed in another tab' }[mode];
   useEffect(() => {
@@ -39,7 +66,7 @@ export default function CampaignStorageDialog({ mode = 'slots', campaign, campai
   }, []);
   return <div className="campaign-storage-backdrop">
     <section className="campaign-storage" ref={ref} role="dialog" aria-modal="true" aria-labelledby="campaign-storage-title" aria-describedby="campaign-storage-description">
-      <div className="campaign-storage-heading"><h1 id="campaign-storage-title">{title}</h1><button ref={closeRef} type="button" className="icon-button" aria-label="Close saved campaigns" onClick={onClose}><Icon name="close" size={18} /></button></div>
+      <div className="campaign-storage-heading"><div><p className="campaign-storage-kicker">{mode === 'slots' ? 'Campaign storage' : mode === 'import' ? 'Import' : mode === 'recovery' ? 'Recovery' : 'Save conflict'}</p><h1 id="campaign-storage-title">{title}</h1></div><button ref={closeRef} type="button" className="icon-button" aria-label="Close saved campaigns" onClick={onClose}><Icon name="close" size={18} /></button></div>
       <p id="campaign-storage-description">{message || {
         slots: 'Choose a checkpoint to resume. Each campaign keeps its own progress and name.',
         import: 'Check this campaign before opening it. It will be saved in a new slot; your existing campaigns remain available.',
@@ -50,7 +77,7 @@ export default function CampaignStorageDialog({ mode = 'slots', campaign, campai
       {mode === 'slots' && <>
         {!campaigns.length && <p className="campaign-storage-empty">No named campaigns yet. Starting or resuming a campaign creates its first checkpoint.</p>}
         <ul className="campaign-storage-list">{campaigns.map(item => <li key={item.id}>
-          <div className="campaign-storage-slot-heading"><strong>{item.name}</strong>{item.id === activeId && <span>Current campaign</span>}</div>
+          <div className="campaign-storage-slot-heading"><strong>{item.name}</strong>{item.id === activeId && <span className="campaign-storage-current">Current campaign</span>}</div>
           <CampaignPreview campaign={item} />
           <p className="campaign-storage-date">{item.damaged ? 'Checkpoint damaged · the file is retained' : `Saved ${item.savedAt ? new Date(item.savedAt).toLocaleString() : 'previously'}`}</p>
           <div className="campaign-storage-slot-actions"><button type="button" className="button button-primary" disabled={!onLoad} onClick={() => onLoad?.(item.id)}>{item.damaged ? 'Recover' : 'Resume'} {item.name}</button>

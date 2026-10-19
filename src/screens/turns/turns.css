@@ -1,0 +1,314 @@
+/* Owner: WP-TURN (see PLAN.md §4). Turn strip, target panel and card, spectator panel (.turn-strip*, .target-*,
+   .spectator-panel*, .follow-*, .this-turn*). v4 restyle of boards 13/14 (M§4–§6, README "New rules"), docked in
+   the Map column per A-1; strip breakpoints per A-15. Breakpoints: wide ≥1600 · std 1200–1599 (base) ·
+   tablet 700–1199 · phone <700. Square corners, Archivo / Archivo Narrow only, tabular numbers. */
+
+/* =========================================================================================================
+   Turn strip (M§4, DEC D3) — 52px under the masthead; 40px on phones (A-15)
+   ========================================================================================================= */
+.turn-strip {
+  position:relative; z-index:2; flex:none;
+  height:52px; min-width:0; display:flex; align-items:center; gap:18px;
+  padding:var(--mast-pad); overflow:hidden; white-space:nowrap;
+  background:var(--surface); border-bottom:1px solid var(--rule); color:var(--ink);
+}
+.turn-strip__head { flex:none; display:flex; flex-direction:column; justify-content:center; line-height:1.2; }
+.turn-strip__label {
+  font:700 11px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--you-text);
+}
+.turn-strip__detail { font:600 15px/1.2 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--ink); }
+.turn-strip__phone { display:none; }
+
+/* Round robin: one flag per queue entry in turn order */
+.turn-strip__flags {
+  position:relative; flex:0 1 auto; min-width:0; display:flex; align-items:center; gap:6px;
+  margin:0; padding:3px; list-style:none;
+  overflow-x:auto; overflow-y:hidden; scrollbar-width:none; overscroll-behavior-x:contain;
+}
+.turn-strip__flags::-webkit-scrollbar { display:none; }
+.turn-strip__flag { position:relative; flex:none; display:block; line-height:0; }
+.turn-strip__flag .flag-chip, .turn-strip__flag .fi-team-monogram { width:20px; height:15px; }
+.turn-strip__flag[data-state=done], .turn-strip__flag[data-state=out] { opacity:.38; }
+/* DEC D3: eliminated entries keep their slot, struck through by a 1px ink diagonal (corner to corner of 20×15) */
+.turn-strip__flag[data-state=out]::after {
+  content:''; position:absolute; left:50%; top:50%; width:25px; height:1px; background:var(--ink);
+  transform:translate(-50%, -50%) rotate(-36.87deg); pointer-events:none;
+}
+.turn-strip__flag[data-state=current] .flag-chip,
+.turn-strip__flag[data-state=current] .fi-team-monogram { width:32px; height:24px; box-shadow:0 0 0 2px var(--you); }
+.turn-strip__next {
+  margin-left:auto; flex:none; min-width:0; overflow:hidden; text-overflow:ellipsis;
+  font:400 13px/1.2 var(--font-narrow); color:var(--muted);
+}
+
+/* Random draw: recent attackers */
+.turn-strip__divider { flex:none; width:1px; height:28px; background:var(--rule); }
+.turn-strip__recent-label {
+  flex:none; font:700 12px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+/* Only whole items show: the row wraps inside a one-line box, so an attacker that does not fit drops to the clipped
+   second line instead of being cut mid-glyph at the strip's edge (820 tablet, narrow desktop). Clipped items stay in
+   the accessibility tree, so the list still reads all six. */
+.turn-strip__recent {
+  flex:0 1 auto; min-width:0; height:20px; display:flex; flex-wrap:wrap; align-items:center; gap:20px 14px;
+  margin:0; padding:0; list-style:none; overflow:hidden;
+}
+.turn-strip__recent-item { flex:none; height:20px; display:flex; align-items:center; gap:6px; }
+.turn-strip__recent-item .flag-chip, .turn-strip__recent-item .fi-team-monogram { width:20px; height:15px; }
+.turn-strip__code { font:600 13px/1.2 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--text-2); }
+.turn-strip__roman { color:var(--muted); }
+.turn-strip__note { margin-left:auto; flex:none; font:400 12px/1.2 var(--font-sans); color:var(--muted); }
+
+/* Tablet (A-15): 52px, the round-robin flag row scrolls horizontally without a visible scrollbar; the random-draw
+   note gives its room to the recent attackers (which show as many whole items as fit). */
+@media (max-width:1199.98px) {
+  .turn-strip__note { display:none; }
+}
+
+/* Phone (A-15): 40px, one line. Round robin = "Turn 3 of 22" + current 24×18 + next 20×15 only;
+   random = "Random draw · 22 empires" + the 3 most recent attacker flags, no codes, no note. */
+@media (max-width:699.98px) {
+  .turn-strip { height:40px; gap:10px; }
+  .turn-strip__label, .turn-strip__tail { display:none; }
+  .turn-strip__detail { font-size:14px; }
+  .turn-strip__flags { flex:none; gap:8px; padding:3px; overflow:visible; }
+  .turn-strip__flag { display:none; }
+  .turn-strip__flag[data-state=current], .turn-strip__flag.is-next-up { display:block; opacity:1; }
+  .turn-strip__flag[data-state=current] .flag-chip,
+  .turn-strip__flag[data-state=current] .fi-team-monogram { width:24px; height:18px; }
+  .turn-strip__next { display:none; }   /* A-15: the is-next-up flag (sr-only "attacks next") says who is next */
+
+  .turn-strip[data-variant=random] .turn-strip__head,
+  .turn-strip__divider, .turn-strip__recent-label, .turn-strip__note, .turn-strip__code { display:none; }
+  .turn-strip__phone { display:block; flex:none; font:600 14px/1.2 var(--font-narrow); font-variant-numeric:tabular-nums; }
+  .turn-strip__recent { flex:none; gap:8px; }
+  .turn-strip__recent-item:nth-child(n+4) { display:none; }
+}
+
+/* =========================================================================================================
+   Choose a target (M§5.6 minus positioning, A-1): docked in the column in place of Next fixture
+   ========================================================================================================= */
+.target-panel {
+  --tp-flag-w:20px; --tp-flag-h:15px; --tp-name:14px; --tp-eff:13px; --tp-spoils:14px; --tp-win:15px;
+  display:flex; flex-direction:column; min-width:0; color:var(--ink);
+}
+.target-panel__head, .target-panel__row {
+  display:grid; grid-template-columns:14px var(--tp-flag-w) minmax(0,1fr) 34px 40px; column-gap:10px; align-items:center;
+}
+.target-panel__head {
+  margin:8px -8px 0; padding:0 8px 2px; white-space:nowrap;
+  font:700 11px/1.2 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+}
+.target-panel__head > span:first-child { grid-column:4; justify-self:end; }
+.target-panel__head > span:last-child { grid-column:5; justify-self:end; }
+.target-panel__rows { display:flex; flex-direction:column; margin:2px -8px 0; }
+.target-panel__row {
+  position:relative; height:max(var(--target-row-h), var(--tap)); padding:0 8px;
+  background:transparent; cursor:pointer; outline:none; -webkit-tap-highlight-color:transparent;
+}
+.target-panel__row:hover:not(.is-selected) { background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
+.target-panel__row.is-selected { background:var(--you-soft); box-shadow:inset 0 0 0 1.5px var(--you); }
+.target-panel__row:focus-visible { outline:2px solid var(--ink); outline-offset:-2px; }
+/* Keyboard ring on the checked row sits outside the 1.5px `you` inset so the clay selection stays readable */
+.target-panel__row.is-selected:focus-visible { outline-offset:1px; }
+.target-panel__mark { display:flex; line-height:0; }
+.target-panel__mark .flag-chip, .target-panel__mark .fi-team-monogram { width:var(--tp-flag-w); height:var(--tp-flag-h); }
+.target-panel__name {
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 var(--tp-name)/1.2 var(--font-sans); color:var(--ink);
+}
+.target-panel__eff {
+  margin-left:6px; font:400 var(--tp-eff)/1 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--muted);
+}
+.target-panel__spoils {
+  text-align:right; font:600 var(--tp-spoils)/1 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--text-2);
+}
+.target-panel__win { text-align:right; font:700 var(--tp-win)/1 var(--font-narrow); font-variant-numeric:tabular-nums; }
+.target-panel__foot {
+  margin:10px 0 0; padding-top:12px; border-top:1px solid var(--rule);
+  font:400 12px/1.5 var(--font-sans); color:var(--muted);
+}
+.target-panel__foot b { font-weight:600; color:var(--you-text); }
+
+@media (min-width:1600px) {
+  .target-panel { --tp-flag-w:24px; --tp-flag-h:18px; --tp-name:16px; --tp-eff:14px; --tp-spoils:15px; --tp-win:16px; }
+  .target-panel__foot { font-size:13px; }
+}
+@media (max-width:699.98px) {
+  .target-panel { --tp-name:16px; }
+  .target-panel__head { margin-top:6px; }
+  .target-panel__foot { display:none; }   /* the phone bar carries "Attack <team>" right below */
+}
+
+/* =========================================================================================================
+   Target card on the map (M§5.5): white, callout shadow, 4px opponent edge, 256px. Never takes pointer events.
+   ========================================================================================================= */
+.target-card {
+  display:block; width:256px; max-width:calc(100vw - 24px); padding:12px 14px; text-align:left;
+  background:var(--panel); box-shadow:var(--shadow-callout); border-left:4px solid var(--opponent);
+  color:var(--ink); pointer-events:none; white-space:normal;
+}
+.target-card__name {
+  display:block; font:700 18px/1.15 var(--font-narrow); letter-spacing:.06em; text-transform:uppercase;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.target-card__line { display:block; margin-top:6px; font:400 13px/1.35 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--text-2); }
+.target-card__win { display:block; margin-top:2px; font:600 13px/1.35 var(--font-sans); font-variant-numeric:tabular-nums; }
+.target-card__stakes { display:block; margin-top:8px; padding-top:8px; border-top:1px solid var(--rule); }
+.target-card__stake { display:block; font:400 12px/1.4 var(--font-sans); font-variant-numeric:tabular-nums; }
+.target-card__stake + .target-card__stake { margin-top:2px; }
+@media (max-width:699.98px) {
+  .target-card { width:196px; padding:8px 10px; }
+  .target-card__name { font-size:15px; }
+  .target-card__line, .target-card__win { font-size:12px; }
+  .target-card__stakes { display:none; }   /* phone map is 330px tall; the sheet lists the targets */
+}
+
+/* =========================================================================================================
+   Spectator panel (M§6.5 docked, A-1/A-14): This turn · Following · Autoplay
+   ========================================================================================================= */
+.spectator-panel {
+  --sp-gap:18px; --sp-name:18px; --sp-eff:15px; --sp-flag-w:28px; --sp-flag-h:21px; --sp-route:15px;
+  display:flex; flex-direction:column; gap:var(--sp-gap); min-width:0; color:var(--ink);
+}
+@media (min-width:1600px) { .spectator-panel { --sp-gap:28px; --sp-name:20px; --sp-eff:17px; --sp-flag-w:32px; --sp-flag-h:24px; --sp-route:18px; } }
+/* Tablet: sections 14px apart (the rest of the tablet rhythm is at the end of this section) */
+@media (min-width:700px) and (max-width:1199.98px) { .spectator-panel { --sp-gap:14px; } }
+@media (max-width:699.98px) {
+  .spectator-panel { --sp-gap:14px; --sp-route:14px; }
+  /* DEC D22 / A-14: the collapsed phone sheet shows "This turn" only; Following and Autoplay when expanded */
+  .spectator-panel[data-sheet=collapsed] > :not(.this-turn) { display:none; }
+}
+
+/* (a) This turn */
+.this-turn { display:flex; flex-direction:column; min-width:0; }
+.this-turn__card { margin-top:12px; min-width:0; }
+.this-turn__idle { min-width:0; }
+.this-turn__title {
+  margin:10px 0 0; font:700 var(--fs-fixture)/.94 var(--font-narrow); text-transform:uppercase; text-wrap:balance;
+  overflow-wrap:anywhere; color:var(--ink);
+}
+.this-turn__route { margin:6px 0 0; font:400 var(--sp-route)/1.35 var(--font-sans); color:var(--muted); }
+@media (min-width:1600px) { .this-turn__title { margin-top:14px; } }
+@media (max-width:699.98px) { .this-turn__title { margin-top:9px; } }
+
+.this-turn__draw { min-width:0; }
+.this-turn__team { display:flex; align-items:center; gap:10px; min-width:0; }
+.this-turn__team:first-child { margin-top:12px; }
+.this-turn__mark { flex:none; display:flex; line-height:0; }
+.this-turn__mark .flag-chip, .this-turn__mark .fi-team-monogram { width:var(--sp-flag-w); height:var(--sp-flag-h); }
+.this-turn__name {
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 var(--sp-name)/1.2 var(--font-sans); color:var(--ink);
+}
+.this-turn__eff { flex:none; font:600 var(--sp-eff)/1 var(--font-sans); font-variant-numeric:tabular-nums; }
+.this-turn__connector {
+  display:flex; align-items:center; gap:8px; margin:6px 0 6px calc(var(--sp-flag-w) + 10px);
+  font:700 12px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; color:var(--muted);
+}
+.this-turn__compass { flex:none; color:var(--you-text); }
+/* While the needle spins (DEC D19): the target stays unnamed; same words as the fixture block's route line */
+.this-turn__pending {
+  display:flex; align-items:center; gap:8px; margin:8px 0 0 calc(var(--sp-flag-w) + 10px);
+  font:400 var(--sp-route)/1.35 var(--font-sans); color:var(--muted);
+}
+.this-turn__odds { margin-top:14px; }
+.this-turn__bar { position:relative; display:flex; height:10px; background:var(--odds-track); }
+/* README: the 1.5px ink frame stays visible over the fill */
+.this-turn__bar::after { content:''; position:absolute; inset:0; box-shadow:inset 0 0 0 1.5px var(--ink); pointer-events:none; }
+.this-turn__fill { display:block; height:100%; background:var(--ink); }
+.this-turn__labels {
+  display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-top:6px; white-space:nowrap;
+  font:600 14px/1.2 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--ink);
+}
+.this-turn__labels-mid { font:500 12px/1.2 var(--font-sans); color:var(--muted); }
+@media (min-width:1600px) {
+  .this-turn__bar { height:12px; }
+  .this-turn__labels { font-size:15px; }
+  .this-turn__labels-mid { font-size:13px; }
+}
+
+/* (b) Following */
+.spectator-panel__follow { display:flex; flex-direction:column; min-width:0; }
+.follow-managed {
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 8px; margin-top:10px;
+  font:400 13px/1.4 var(--font-sans); color:var(--text-2);
+}
+.follow-managed__label {
+  font:700 11px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+.follow-managed__name { font-weight:700; color:var(--ink); }
+.follow-managed__status { color:var(--muted); }
+.follow-team { display:flex; align-items:center; gap:10px; min-width:0; margin-top:10px; }
+.follow-team__mark { flex:none; display:flex; line-height:0; margin-left:3px; }
+.follow-team__mark .flag-chip, .follow-team__mark .fi-team-monogram {
+  width:var(--sp-flag-w); height:var(--sp-flag-h); box-shadow:0 0 0 1px rgba(17,20,23,.14), 0 0 0 3px var(--you);
+}
+.follow-team__text { flex:1; min-width:0; display:flex; flex-direction:column; }
+.follow-team__name {
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:700 var(--sp-name)/1.2 var(--font-sans); color:var(--ink);
+}
+.follow-team[data-empty] .follow-team__name { color:var(--text-2); }
+.follow-team__detail { font:400 12px/1.35 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted); }
+/* "Change" is the visible face of the native picker: the select covers it, transparent (no JS popover). */
+.follow-change {
+  position:relative; flex:none; display:inline-flex; align-items:center; min-height:max(28px, var(--tap));
+  font:400 13px/1 var(--font-sans); color:var(--you-text); text-decoration:underline; text-underline-offset:3px; cursor:pointer;
+}
+.follow-change:hover { color:var(--ink); }
+.follow-change__label { cursor:pointer; }
+.follow-change:has(select:focus-visible) { outline:2px solid var(--you); outline-offset:2px; }
+.follow-change__select {
+  position:absolute; inset:0; width:100%; height:100%; margin:0; padding:0; border:0; opacity:0; cursor:pointer;
+  font-size:16px; appearance:none; -webkit-appearance:none;
+}
+.follow-pause {
+  display:flex; align-items:center; gap:10px; width:100%; min-height:max(28px, var(--tap)); margin-top:12px; padding:0;
+  border:0; background:none; text-align:left; cursor:pointer; font:400 13px/1.35 var(--font-sans); color:var(--text-2);
+}
+.follow-pause__track { position:relative; flex:none; width:34px; height:18px; background:#fff; box-shadow:inset 0 0 0 1px var(--control-line); }
+.follow-pause__track::before { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; background:var(--control-line); }
+.follow-pause[aria-checked=true] .follow-pause__track { background:var(--ink); box-shadow:none; }
+.follow-pause[aria-checked=true] .follow-pause__track::before { left:18px; background:#fff; }
+.follow-pause:hover { color:var(--ink); }
+
+/* (c) Autoplay */
+.follow-autoplay { display:flex; align-items:center; gap:12px; min-width:0; padding-top:12px; border-top:1px solid var(--rule); }
+.follow-autoplay__toggle {
+  display:inline-flex; align-items:center; gap:7px; min-height:max(28px, var(--tap)); padding:0; border:0; background:none;
+  font:400 13px/1 var(--font-sans); white-space:nowrap; color:var(--ink); cursor:pointer;
+}
+.follow-autoplay__dot { flex:none; width:8px; height:8px; background:var(--you); }
+.follow-autoplay__toggle[aria-checked=false] { color:var(--muted); }
+.follow-autoplay__toggle[aria-checked=false] .follow-autoplay__dot { background:transparent; box-shadow:inset 0 0 0 1px var(--muted); }
+.follow-autoplay__toggle:hover:not(:disabled) { color:var(--you-text); }
+.follow-autoplay__toggle:disabled { cursor:default; opacity:.6; }
+.follow-speed.segmented { margin-left:auto; flex:none; }
+.follow-speed.segmented > button {
+  min-height:max(30px, var(--tap)); min-width:max(0px, var(--tap)); padding:0 12px; color:var(--ink);
+  font:700 14px/1 var(--font-narrow); letter-spacing:0; text-transform:none; font-variant-numeric:tabular-nums;
+}
+/* (0,4,1) beats the primitive `.segmented > button:hover:not(:disabled)` (0,3,1), which loads after this file */
+.follow-speed.segmented > button[aria-pressed=true],
+.follow-speed.segmented > button[aria-pressed=true]:hover { background:var(--ink); color:#fff; }
+@media (min-width:1600px) {
+  .follow-pause, .follow-autoplay__toggle, .follow-change { font-size:15px; }
+  .follow-team__detail { font-size:13px; }
+  .follow-speed.segmented > button { font-size:15px; min-height:max(36px, var(--tap)); padding:0 14px; }
+}
+/* Tablet (M§8: "This turn + Following | Latest results"): the whole panel shares the left half of the body under the
+   map, so the done-state card (204px), Following and Autoplay must fit the 820×1180 column's 442px (22px padding)
+   without scrolling: 394px of 397 (std rhythm: 433px). Same type as std; only the vertical rhythm tightens (with
+   --sp-gap 14px above). The pause switch keeps a 24px target (WCAG 2.5.8); coarse pointers still get --tap. Placed
+   after the base rules so these win at equal specificity. */
+@media (min-width:700px) and (max-width:1199.98px) {
+  .this-turn__card { margin-top:10px; }   /* = the manager's .fixture__card (--col-fx-mt) */
+  .follow-team { margin-top:6px; }
+  .follow-pause { margin-top:4px; min-height:max(24px, var(--tap)); }
+  .follow-autoplay { padding-top:6px; }
+}
+
+/* Reduced motion: nothing here animates beyond the native focus ring; keep scroll snapping instant. */
+@media (prefers-reduced-motion:reduce) {
+  .turn-strip__flags { scroll-behavior:auto; }
+}

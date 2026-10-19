@@ -1,0 +1,102 @@
+/* Owner: WP-0 (see PLAN.md §4). v4 design tokens (PLAN §2.1), base element rules (§2.2) and the
+   legacy variable compatibility block (§2.3). Frozen in W2; the only W4 exception is --map-veil (A-9, WP-MAP). */
+
+:root {
+  color-scheme: light;
+  /* README §Colour */
+  --surface:#f5f5f2; --panel:#ffffff; --surface-2:#ebece7; --ink:#111417; --text-2:#3a4045; --muted:#646a6e;
+  --rule:#dcded8; --row-rule:#e3e5df; --control-line:#c6cbcd;
+  --you:#9c5a43; --you-text:#8c4a35; --you-fill:#c4917c; --you-soft:#f3ebe7; --you-on-dark:#d9a48e;
+  --opponent:#2f54eb; --opponent-fill:#c3cfff; --claimed:#0f7b83;
+  --gain:#138a4a; --loss:#d1342f; --even:#9a6700;
+  --sea:#dfe7eb; --land-neutral:#e8e9e4; --flag-bg:#d9dcd6;
+  /* README rating colours (text + 1.5px outline of the rating box) */
+  --tier-88:#8a5a00; --tier-84:#0f7b4d; --tier-80:#138a4a; --tier-75:#5b7a12; --tier-70:#a15c07; --tier-low:#c2352b;
+  /* values named in README prose (not in the token table) */
+  --odds-track:#dfe2dc; --grab:#d4d7d1; --chart-guide:#d4d7d1;
+  --map-coast:#9aa7ae; --map-capital:#30363b; --map-label:#2c3236;
+  --map-veil:rgba(17,20,23,.55);  /* DEC D21; the single veil switch (A-9) */
+  --map-hatch:rgba(255,255,255,.6);
+  --shadow-float:0 0 0 1px rgba(17,20,23,.08), 0 6px 20px rgba(17,20,23,.10);
+  --shadow-callout:0 1px 2px rgba(17,20,23,.1), 0 12px 32px rgba(17,20,23,.16);
+  --shadow-flag:0 0 0 1px rgba(17,20,23,.14);
+  --key-hint-border:rgba(255,255,255,.55);
+  /* fonts (README §Type: Archivo + Archivo Narrow only) */
+  --font-sans:'Archivo', 'Segoe UI', sans-serif;
+  --font-narrow:'Archivo Narrow', 'Arial Narrow', sans-serif;
+  --radius:0;
+  --safe-top:env(safe-area-inset-top, 0px); --safe-bottom:env(safe-area-inset-bottom, 0px);
+  /* ---- layout + type scale; base = std (1200–1599: 1366/1440) ---- */
+  --mast-h:76px; --mast-row2-h:28px; --mast-pad:0 20px; --mast-gap:18px;
+  --col-w:360px; --col-pad:18px 20px; --col-gap:18px; --map-inset:20px;
+  --fs-wordmark:30px; --fs-dateline:11px; --fs-nav:14px; --nav-bar:3px;
+  --fs-title:54px;        /* screen title (squad name) */
+  --fs-headline:74px;     /* big result headline */
+  --fs-fixture:34px;      /* fixture headline */
+  --fs-kicker:12px; --fs-body:15px; --fs-num:13px; --fs-label:11px; --fs-meta:11px;
+  --fs-score:124px;       /* live score */
+  --btn-h:36px; --btn-fs:14px; --btn-pad:0 10px 0 16px; --btn-gap:10px; --kbd-fs:10px; --kbd-pad:2px 6px;
+  --btn2-h:38px; --btn2-fs:13px;
+  --ticker-h:30px; --ticker-fs:12px;
+  --row-h:30px; --flag-w:20px; --target-row-h:40px;
+  --tap:0px;              /* minimum hit target on coarse/phone */
+}
+@media (min-width:1600px) { :root {
+  --mast-h:92px; --mast-row2-h:34px; --mast-pad:0 28px; --mast-gap:24px;
+  --col-w:500px; --col-pad:26px 30px; --col-gap:28px; --map-inset:30px;
+  --fs-wordmark:40px; --fs-dateline:13px; --fs-nav:16px; --nav-bar:4px;
+  --fs-fixture:54px; --fs-kicker:13px; --fs-body:17px; --fs-num:15px; --fs-label:12px; --fs-meta:12px;
+  --btn-h:46px; --btn-fs:17px; --btn-pad:0 14px 0 20px; --btn-gap:12px; --kbd-fs:11px; --kbd-pad:2px 6px;
+  --btn2-h:44px; --btn2-fs:15px; --ticker-h:36px; --ticker-fs:14px; --row-h:38px; --flag-w:24px; --target-row-h:44px;
+} }
+@media (max-width:1199.98px) { :root {
+  --mast-h:92px; --mast-row2-h:40px; --mast-pad:0 18px; --mast-gap:14px;
+  --col-pad:22px 26px; --col-gap:22px 30px; --map-inset:18px;
+  --fs-wordmark:26px; --fs-nav:13px; --fs-fixture:32px;
+  --fs-title:40px; --fs-headline:56px; --fs-score:88px;   /* [derived: README gives no 820 value; A-3] */
+  --btn-h:40px; --btn-pad:0 16px; --btn2-h:44px; --ticker-h:34px; --ticker-fs:13px; --row-h:34px;
+} }
+@media (max-width:699.98px) { :root {
+  --mast-h:88px; --mast-row2-h:40px; --mast-pad:0 18px; --map-inset:12px;
+  --col-pad:10px 18px 14px; --col-gap:0;
+  --fs-wordmark:24px; --fs-nav:12px; --fs-title:28px; --fs-headline:32px; --fs-fixture:28px;
+  --fs-kicker:11px; --fs-body:16px; --fs-score:58px;
+  --btn-h:56px; --btn-fs:17px; --btn2-h:44px; --tap:44px;
+  --phone-map-h:330px;    /* phone map row (shell.css) and the sheet's slide-up offset (campaign.css) */
+} }
+@media (pointer:coarse) { :root { --tap:44px; } }
+
+/* ---- Legacy variable compatibility (PLAN §2.3). W3 removed every name nothing references; the ones left are read by
+   inline styles built at runtime: MatchCard `var(--result-${statusTone})` (warning / positive / muted) and PlayerRow
+   `var(--result-rating-${tier})` (elite / solid / base) + `var(--result-muted)`. ---- */
+:root {
+  --result-muted:var(--muted); --result-positive:var(--gain); --result-warning:var(--even);
+  --result-rating-elite:var(--tier-88); --result-rating-solid:var(--ink); --result-rating-base:var(--text-2);
+}
+
+/* ---- Base element rules (PLAN §2.2) ---- */
+html, body, #root { height:100%; }
+body {
+  margin:0; background:var(--surface); color:var(--ink);
+  font:400 var(--fs-body)/1.35 var(--font-sans);
+  -webkit-font-smoothing:antialiased; font-synthesis:none; overscroll-behavior:none;
+}
+*, *::before, *::after { box-sizing:border-box; }
+/* Author display rules must never override the hidden attribute (WorldMap, inactive setup steps). */
+[hidden] { display:none !important; }
+button, input, select, textarea { font:inherit; color:inherit; }
+button { cursor:pointer; }
+button:disabled { opacity:.45; cursor:default; }
+button, a, select, summary, [tabindex] { -webkit-tap-highlight-color:transparent; }
+button svg { flex:none; }
+a { color:var(--you-text); text-underline-offset:3px; }
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible { outline:2px solid var(--you); outline-offset:2px; }
+
+@keyframes fiFlash { 0% { opacity:.35; } 100% { opacity:1; } }
+@keyframes fiPop { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fiBlink { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+@keyframes fiDash { from { stroke-dashoffset:100; } to { stroke-dashoffset:0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}

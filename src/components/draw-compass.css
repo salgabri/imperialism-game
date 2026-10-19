@@ -1,22 +1,25 @@
+/* Owner: WP-MAP (see PLAN.md §4). Draw compass (spectator draw) and the line of attack, v4 (DEC D20):
+   white disk, ink needle with a `you` tip; the arrow is a white halo, ink shaft, ink head and white origin ring.
+   The disk outline stays 1.1 (the locked pointer's 32.55 constant depends on it). */
 .draw-compass, .draw-route { pointer-events: none; }
-.draw-compass-disk { fill: #202b28; stroke: #aab5a9; stroke-width: 1.1; }
-.draw-compass-inner { fill: none; stroke: #657569; stroke-width: .65; }
-.draw-compass-ticks { stroke: #b9c2b5; stroke-width: 1; }
-.draw-compass-north { fill: #c3cabc; font: 600 8px var(--font-heading); }
+.draw-compass-disk { fill: var(--panel, #ffffff); stroke: var(--ink, #111417); stroke-width: 1.1; }
+.draw-compass-inner { fill: none; stroke: var(--rule, #dcded8); stroke-width: .65; }
+.draw-compass-ticks { stroke: var(--muted, #646a6e); stroke-width: 1; }
+.draw-compass-north { fill: var(--you-text, #8c4a35); font: 700 8px var(--font-narrow, 'Archivo Narrow', sans-serif); }
 .draw-compass-needle { transform-origin: 0 0; }
-.draw-compass-tail { fill: #7e9184; stroke: #14201b; stroke-width: .7; }
-.draw-compass-tip { fill: #f0eee4; stroke: #14201b; stroke-width: .7; stroke-linejoin: round; }
-.draw-compass-needle-seam { fill: none; stroke: #202b28; stroke-opacity: .4; stroke-width: .6; }
-.draw-compass-pivot { fill: #202b28; stroke: #e7e6dc; stroke-width: 1; }
-.draw-compass-pin { fill: #e7e6dc; }
-.draw-compass--locked .draw-compass-disk { stroke: #e7e6dc; }
+.draw-compass-tail { fill: var(--ink, #111417); stroke: var(--ink, #111417); stroke-width: .7; stroke-linejoin: round; }
+.draw-compass-tip { fill: var(--you, #9c5a43); stroke: var(--ink, #111417); stroke-width: .7; stroke-linejoin: round; }
+.draw-compass-needle-seam { fill: none; stroke: #ffffff; stroke-opacity: .5; stroke-width: .6; }
+.draw-compass-pivot { fill: var(--ink, #111417); stroke: #ffffff; stroke-width: 1; }
+.draw-compass-pin { fill: #ffffff; }
+.draw-compass--locked .draw-compass-disk { stroke: var(--ink, #111417); }
 .draw-route { animation: drawRouteEnter 150ms ease-out both; }
-.draw-route-casing { fill: none; stroke: #18241e; stroke-opacity: .92; stroke-linecap: round; }
-.draw-route-line { fill: none; stroke: #e7e6dc; stroke-linecap: round; }
-.draw-route-origin { fill: #e7e6dc; stroke: #18241e; }
-.draw-route-arrow { fill: #f0eee4; stroke: #18241e; stroke-linejoin: round; }
-.draw-route-target circle { fill: #202b28; stroke: #e7e6dc; }
-.draw-route-target path { fill: none; stroke: #e7e6dc; stroke-width: .8; }
+.draw-route-casing { fill: none; stroke: #ffffff; stroke-opacity: .9; stroke-linecap: round; stroke-linejoin: round; }
+.draw-route-line { fill: none; stroke: var(--ink, #111417); stroke-linecap: round; stroke-linejoin: round; }
+/* A routed line ends exactly at the target under the head: square ends keep the caps from poking past the tip. */
+.draw-route--routed .draw-route-casing, .draw-route--routed .draw-route-line { stroke-linecap: butt; }
+.draw-route-arrow { fill: var(--ink, #111417); stroke: #ffffff; stroke-linejoin: round; }
+.draw-route-origin { fill: #ffffff; stroke: var(--ink, #111417); }
 @keyframes drawRouteEnter { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   .draw-compass-needle { transition: none !important; }

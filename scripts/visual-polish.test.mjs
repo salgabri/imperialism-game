@@ -2,15 +2,13 @@ import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import React, { act, useState } from 'react';
+import React, { act } from 'react';
 import { JSDOM } from 'jsdom';
 import { build } from 'esbuild';
-import { selectLineup } from '../src/data/teams.js';
 
 const compiled = await build({
   stdin: { contents: `
     export {default as MatchCard} from './src/components/MatchCard.jsx';
-    export {default as Sidebar} from './src/components/Sidebar.jsx';
     export {default as PlaybackBar} from './src/components/PlaybackBar.jsx';
   `, resolveDir: fileURLToPath(new URL('../', import.meta.url)), loader: 'jsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'],
@@ -18,7 +16,7 @@ const compiled = await build({
 });
 const module = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
-const { MatchCard, Sidebar, PlaybackBar } = module.exports;
+const { MatchCard, PlaybackBar } = module.exports;
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost' });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
@@ -101,63 +99,10 @@ test('an acquired player opens the winner squad while keeping replacement and ze
   assert.match(view.host.querySelector('[data-testid="match-strength-gain"]').textContent, /No change/);
 });
 
-const players = [
-  { name: 'Emergency Guard', pos: 'SG', rating: 92 },
-  { name: 'Starting Shooter', pos: 'SG', rating: 93 },
-  { name: 'Starting Wing', pos: 'SF', rating: 83 },
-  { name: 'Starting Forward', pos: 'PF', rating: 82 },
-  { name: 'Starting Center', pos: 'C', rating: 81 },
-  { name: 'Reserve Shooter', pos: 'SG', rating: 90, from: 'LAL' },
-];
-const lineup = selectLineup({ sport: 'basketball', squad: players });
-const squad = { teamId: match.a.teamId, id: null, isClub: true, code: match.a.code, name: match.a.name,
-  status: 'ALIVE', eff: lineup.rating.toFixed(1), avg: '86.8', territories: 2, conquests: 1, stolen: 1,
-  players, starters: lineup.starters, bench: lineup.bench, lineupRating: lineup.rating,
-};
-const power = [{ tid: match.b.teamId, name: match.b.name, rank: 1, territories: 1, eff: '84.0' },
-  { tid: squad.teamId, name: squad.name, rank: 2, territories: 2, eff: squad.eff }];
-
-test('selecting a standings team focuses its dossier and Escape restores that team button', async context => {
-  function CampaignDetails() {
-    const [tab, setTab] = useState('power');
-    const [selectedTeamId, setSelectedTeamId] = useState(null);
-    return React.createElement(Sidebar, { tab, onTab: setTab, power,
-      squad: selectedTeamId === squad.teamId ? squad : null, selectedTeamId,
-      onSelectTeam: id => { setSelectedTeamId(id); setTab('squad'); },
-    });
-  }
-  const view = await mount(CampaignDetails, {}, context);
-  await act(async () => view.host.querySelector(`[data-team-id="${squad.teamId}"]`).click());
-  assert.equal(document.activeElement, view.host.querySelector('[role="tabpanel"]'));
-  assert.equal(document.activeElement.id, 'intel-panel-squad');
-  await act(async () => document.activeElement.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
-  assert.equal(document.activeElement.dataset.teamId, squad.teamId);
-  assert.equal(document.activeElement.getAttribute('aria-current'), 'true');
-  assert.equal(view.host.querySelector('[aria-selected="true"]').textContent, 'Standings');
-});
-
-test('squad groups the actual legal lineup, shows emergency assignments and retains acquired depth', async context => {
-  const view = await mount(Sidebar, { tab: 'squad', squad,
-    history: [{ round: 3, winnerId: squad.teamId, aId: squad.teamId, a: match.a, b: match.b,
-      result: { player: players.at(-1), strengthGain: 0, strengthBefore: lineup.rating, strengthAfter: lineup.rating } }],
-  }, context);
-  const starterNames = [...view.host.querySelectorAll('.is-starter .fi-player-identity > span')].map(item => item.textContent).sort();
-  assert.deepEqual(starterNames, lineup.starters.map(player => player.name).sort());
-  const depthNames = [...view.host.querySelectorAll('.is-depth .fi-player-identity > span')].map(item => item.textContent);
-  assert.deepEqual(depthNames, lineup.bench.map(player => player.name));
-  assert.deepEqual(depthNames, ['Reserve Shooter'], 'A high reserve rating must not replace a legal positional starter');
-  const pointGuards = view.host.querySelector('[aria-label="Point guards"]');
-  const emergencyStarter = lineup.starters.find(player => player.assignedPos === 'PG');
-  assert.ok(pointGuards.textContent.includes(emergencyStarter.name));
-  assert.match(pointGuards.textContent, /Natural SG · out of position/);
-  assert.equal(pointGuards.querySelector('.fi-player-position').textContent, 'PG');
-  assert.equal(pointGuards.querySelector('.fi-player-rating').textContent, String(emergencyStarter.effectiveRating));
-  const acquisition = view.host.querySelector('[aria-label="Latest acquisition"]');
-  assert.match(acquisition.textContent, /Reserve Shooter/);
-  assert.match(acquisition.textContent, /From Los Angeles Lakers/);
-  assert.match(acquisition.textContent, /Available in squad depth/);
-  assert.match(acquisition.textContent, /No change/);
-});
+// The two Sidebar tests moved with their screens (W3): standings → squad → Escape is covered by ledger-chronicle.test.mjs
+// (row → onSelectTeam, aria-current), squad-screen.test.mjs (Escape → onBack) and view-router.test.mjs (App focus to
+// #view-panel-squad and back to the [data-team-id] row); the squad groups, emergency assignment and acquired depth by
+// squad-screen.test.mjs ("ported Sidebar dossier…").
 
 test('manual pause offers a match resume, autoplay announces its state, and unavailable steps cannot fire', async context => {
   let stepped = 0, played = 0, resumed = 0;

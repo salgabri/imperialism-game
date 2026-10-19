@@ -1,0 +1,113 @@
+/* Owner: WP-CONQ (see PLAN.md §4). Map notices emitted by Popups.jsx (.fi-map-notice, .fi-result-notice*, .fi-transfer-*,
+   .fi-match-toast, .fi-toast-code, .fi-matchup-*, .fi-notice-label). v4 white floating panels (DEC D15, README
+   §Surfaces): square, callout shadow, 4px left rule (ink; claimed teal for the player transfer). Informational only
+   (pointer-events:none). Placement keeps clear of WP-MAP's chrome (map.css) and WP-COL's title card / key:
+   - ≥1200: top-right, toast above the notice (title card top-left, key bottom-left, modes + zoom bottom-right).
+   - 700–1199: the stack drops below the top-right mode switch and steps in by the zoom column, so on a short map
+     (the map row is 47.5dvh: iPad landscape, 1024×768) the zoom group rising from the bottom-right corner still
+     passes beside it; capped at 44% of the map minus that column so it never reaches the title card (≤56% wide).
+   - <700: notice under the title card, its right edge stopping short of the zoom column (top-right, 44px + gap);
+     toast full-width above "Whole map" (bottom-right). The key is hidden on phone.
+   Both are hidden on the conquest view: the article and the callout own the screen (A-2), and a goal toast whose
+   clear timer the acquisition gate cancelled must not linger over it. Reads WP-MAP's --wm-modes-h / --wm-zoom-size
+   (set on .world-map, the notices' parent) with the same fallbacks map.css uses. */
+
+.fi-map-notice {
+  position:absolute; z-index:25; top:calc(var(--map-inset) + 48px); right:var(--map-inset);
+  width:max-content; min-width:min(240px, calc(100% - 2 * var(--map-inset)));
+  max-width:min(360px, calc(100% - 2 * var(--map-inset)));
+  padding:12px 16px 14px 14px;
+  background:#fff; color:var(--ink); border-left:4px solid var(--ink); box-shadow:var(--shadow-callout);
+  font:400 13px/1.35 var(--font-sans); pointer-events:none;
+  animation:fi-notice-in 200ms ease-out both;
+}
+.fi-notice-label {
+  display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:2px 12px;
+  margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--rule);
+  font:700 11px/1.25 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+
+/* ---- Match-up (kick-off) ---- */
+.fi-matchup-notice-teams { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:12px; }
+.fi-matchup-side { display:flex; align-items:center; gap:8px; min-width:0; }
+.fi-matchup-team { display:flex; flex-direction:column; min-width:0; }
+.fi-matchup-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:700 15px/1.2 var(--font-sans); color:var(--ink); }
+.fi-matchup-eff { margin-top:2px; font:400 12px/1.2 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted); }
+.fi-matchup-vs { font:700 14px/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--you-text); }
+
+/* ---- Result ---- */
+.fi-result-notice-round { min-width:0; }
+.fi-result-notice-upset { color:var(--you-text); }
+.fi-result-notice-main { display:flex; flex-direction:column; gap:4px; }
+.fi-result-notice-title { font:700 24px/1 var(--font-narrow); letter-spacing:.01em; text-transform:uppercase; text-wrap:balance; color:var(--ink); }
+.fi-result-notice-score { font:600 14px/1.3 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--text-2); }
+.fi-result-notice-sub, .fi-transfer-sub {
+  margin:8px 0 0; font:700 12px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase;
+}
+.fi-result-notice-sub { color:var(--gain); }
+
+/* ---- Player transfer ---- */
+.fi-transfer-notice { border-left-color:var(--claimed); }
+.fi-transfer-notice .fi-notice-label { color:var(--claimed); }
+.fi-transfer-player { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 12px; }
+.fi-transfer-player strong { font:700 20px/1.2 var(--font-sans); color:var(--ink); }
+.fi-transfer-player span { font:400 12px/1.3 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+.fi-transfer-route { display:flex; align-items:center; gap:8px; margin-top:10px; }
+.fi-transfer-code { font:700 12px/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--ink); }
+.fi-transfer-arrow { display:inline-flex; margin:0 2px; color:var(--muted); }
+.fi-transfer-sub { color:var(--claimed); }
+
+/* ---- Toast (goals, draw problems) ---- */
+.fi-match-toast {
+  position:absolute; z-index:26; top:var(--map-inset); right:var(--map-inset);
+  display:flex; align-items:center; gap:10px;
+  max-width:min(440px, calc(100% - 2 * var(--map-inset)));
+  padding:6px 14px 6px 6px;
+  background:#fff; color:var(--ink); box-shadow:var(--shadow-float);
+  font:600 13px/1.35 var(--font-sans); pointer-events:none;
+  animation:fi-notice-in 160ms ease-out both;
+}
+.fi-toast-code {
+  flex:none; padding:4px 7px; background:var(--ink); color:#fff;
+  font:700 12px/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; font-variant-numeric:tabular-nums;
+}
+.fi-toast-text { min-width:0; }
+
+@keyframes fi-notice-in { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+
+/* ---- Conquest view: no notices over the article / callout (A-2) ---- */
+.app-shell[data-view=conquest] .fi-match-toast,
+.app-shell[data-view=conquest] .fi-map-notice { display:none; }
+
+/* ---- Tablet 700–1199: below the top-right mode switch, clear of the bottom-right zoom column ---- */
+@media (max-width:1199.98px) {
+  .fi-match-toast, .fi-map-notice { right:calc(var(--map-inset) + var(--wm-zoom-size, 36px) + 8px); }
+  .fi-match-toast {
+    top:calc(var(--map-inset) + var(--wm-modes-h, 31px) + 8px);
+    max-width:min(440px, calc(44% - var(--map-inset) - var(--wm-zoom-size, 36px) - 16px));
+  }
+  .fi-map-notice {
+    top:calc(var(--map-inset) + var(--wm-modes-h, 31px) + 8px + 56px); /* the narrower toast may wrap to 2 lines (47px) */
+    max-width:min(360px, calc(44% - var(--map-inset) - var(--wm-zoom-size, 36px) - 16px));
+  }
+}
+
+/* ---- Phone <700 ---- */
+@media (max-width:699.98px) {
+  .fi-map-notice {
+    top:calc(var(--map-inset) + 52px); bottom:auto; left:var(--map-inset);
+    right:calc(var(--map-inset) + var(--wm-zoom-size, 44px) + 8px); /* clear of the zoom −/+ column */
+    width:auto; min-width:0; max-width:none; padding:10px 12px 12px;
+  }
+  .fi-notice-label { margin-bottom:8px; }
+  .fi-result-notice-title { font-size:18px; }
+  .fi-transfer-player strong { font-size:17px; }
+  .fi-match-toast {
+    top:auto; bottom:calc(var(--map-inset) + 56px); left:var(--map-inset); right:var(--map-inset);
+    max-width:none; font-size:12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fi-map-notice, .fi-match-toast { animation:none; }
+}

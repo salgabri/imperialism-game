@@ -19,7 +19,8 @@ export function campaignSnapshot(state) {
     'queue', 'batchTotal', 'log', 'match', 'spin', 'seed', 'rngState', 'history', 'series',
     'followedId', 'pauseFollow', 'choice', 'metrics', 'startedAt', 'completedAt', 'conquestIds',
     'campaignId', 'revision', 'campaignName', 'managedTeamId', 'managementEnded', 'managerElimination',
-    'tacticalChoice', 'tactics', 'rules', 'historyFilter', 'selectedHistoryId', 'decisionLedger', 'initialSettings'];
+    'tacticalChoice', 'tactics', 'rules', 'historyFilter', 'selectedHistoryId', 'decisionLedger', 'initialSettings',
+    'turnQueue', 'turnIndex', 'pendingTarget'];
   return { v: SAVE_VERSION, savedAt: Date.now(), ...Object.fromEntries(keys.map(key => [key, state[key]])),
     phase: state.phase === 'victory' ? 'victory' : 'playing' };
 }
@@ -28,7 +29,7 @@ export function campaignSnapshot(state) {
 export function parseCampaign(text) {
   const data = JSON.parse(text);
   const invalid = message => { throw new Error(message); };
-  if (!record(data) || ![1, SAVE_VERSION].includes(data.v) || !record(data.teams)
+  if (!record(data) || ![1, 2, 3].includes(data.v) || !record(data.teams)
       || !record(data.own) || !record(data.settings) || !Array.isArray(data.aliveIds)
       || data.aliveIds.length < 1 || data.aliveIds.length > 200) {
     invalid('This file is not a supported Imperialism campaign.');
@@ -49,14 +50,15 @@ export function parseCampaign(text) {
   const settings = data.settings;
   const enums = { sport: ['football', 'basketball'], layer: ['nations', 'clubs'], pacing: ['duel', 'blitz', 'chaos'],
     resolution: ['ticker', 'instant'], role: ['spectator', 'manager'], uncertainty: ['predictable', 'balanced', 'wild'],
-    finale: ['single', 'best-of-three'], acquisitionPolicy: ['best-fit', 'highest-rated'], rosterPreset: ['authentic', 'competitive'] };
+    finale: ['single', 'best-of-three'], acquisitionPolicy: ['best-fit', 'highest-rated'], rosterPreset: ['authentic', 'competitive'],
+    turnOrder: ['round-robin', 'random'], targeting: ['player', 'compass'] };
   for (const configuration of [settings, data.initialSettings].filter(Boolean)) {
     for (const [key, values] of Object.entries(enums)) if (configuration[key] != null && !values.includes(configuration[key])) invalid(`Campaign ${key} setting is unsupported.`);
     if (configuration.managedTeamId != null && configuration.managedTeamId !== '' && !known(configuration.managedTeamId)) invalid('The managed team setting is unavailable.');
   }
   for (const key of ['round', 'matches', 'batchTotal', 'revision']) if (data[key] != null && !nonnegative(data[key])) invalid(`Campaign ${key} is invalid.`);
   for (const key of ['seed', 'rngState']) if (data[key] != null && !uint(data[key])) invalid('The saved random state is invalid.');
-  if (data.v === SAVE_VERSION && (!uint(data.seed) || !uint(data.rngState))) invalid('The saved random state is missing or invalid.');
+  if (data.v >= 2 && (!uint(data.seed) || !uint(data.rngState))) invalid('The saved random state is missing or invalid.');
   if (data.campaignId != null && (typeof data.campaignId !== 'string' || !/^[a-zA-Z0-9_-]{1,100}$/.test(data.campaignId))) invalid('Campaign identity is invalid.');
   if (data.campaignName != null && (typeof data.campaignName !== 'string' || data.campaignName.length > 80)) invalid('Campaign name is invalid.');
   if (data.phase != null && !['playing', 'victory'].includes(data.phase)) invalid('Campaign phase is invalid.');
@@ -132,6 +134,25 @@ export function parseCampaign(text) {
     if (choice.candidates.some(candidate => !record(candidate) || !Number.isInteger(candidate.index)
         || candidate.index < 0 || !loser.squad[candidate.index] || typeof candidate.name !== 'string'
         || !Number.isFinite(candidate.rating) || !Number.isFinite(candidate.gain))) invalid('A saved signing candidate is unavailable.');
+    if (choice.selected != null && !choice.candidates.some(candidate => candidate.index === choice.selected)) invalid('The saved signing selection is unavailable.');
+  }
+  // Round robin (DEC D3): the cycle's order (eliminated entries are kept and skipped) and the next entry to play.
+  const validTurn = (queue, index) => Array.isArray(queue) && queue.length <= 200 && queue.every(known)
+    && Number.isInteger(index) && index >= 0 && index <= queue.length;
+  if (data.turnQueue != null && (!Array.isArray(data.turnQueue) || data.turnQueue.length > 200 || !data.turnQueue.every(known))) invalid('The saved turn order references an unavailable team.');
+  if (data.turnIndex != null && !validTurn(data.turnQueue ?? [], data.turnIndex)) invalid('The saved turn position is invalid.');
+  if (data.pendingTarget != null) {
+    const target = data.pendingTarget, alive = id => known(id) && data.aliveIds.includes(id);
+    if (!record(target) || !alive(target.attackerId) || !Array.isArray(target.optionIds) || !target.optionIds.length
+        || target.optionIds.length > 200 || new Set(target.optionIds).size !== target.optionIds.length
+        || target.optionIds.some(id => !alive(id) || id === target.attackerId) || !target.optionIds.includes(target.selectedId)
+        || !nonnegative(target.round)) invalid('The saved target choice references an unavailable team.');
+    if ((target.openedAt != null && (!Number.isFinite(target.openedAt) || target.openedAt < 0))
+        || (target.resumeAutoplay != null && typeof target.resumeAutoplay !== 'boolean')
+        || (target.turn != null && (!record(target.turn) || !validTurn(target.turn.turnQueue, target.turn.turnIndex)
+          || !nonnegative(target.turn.round) || typeof target.turn.newRound !== 'boolean'
+          || (target.turn.attackerId != null && target.turn.attackerId !== target.attackerId)))) invalid('The saved target choice is incomplete.');
+    if ((data.match && !data.match.applied) || data.spin || data.choice || data.tacticalChoice) invalid('The saved target choice overlaps another pending decision.');
   }
   if (data.series != null) {
     const s = data.series;
@@ -144,7 +165,12 @@ export function parseCampaign(text) {
       || !known(data.managerElimination.teamId) || !known(data.managerElimination.opponentId)
       || !['teamName', 'opponentName', 'score'].every(key => typeof data.managerElimination[key] === 'string')
       || !['placement', 'conquests', 'signings'].every(key => nonnegative(data.managerElimination[key])))) invalid('The saved manager result is incomplete.');
+  // Saves from before turn modes (v1/v2) played the original random draw with compass targets.
+  const rules = configuration => configuration && { ...configuration,
+    turnOrder: configuration.turnOrder ?? 'random', targeting: configuration.targeting ?? 'compass' };
   return { ...data, v: SAVE_VERSION, history: data.history || [], log: data.log || [],
+    settings: rules(data.settings), ...(data.initialSettings ? { initialSettings: rules(data.initialSettings) } : {}),
+    turnQueue: data.turnQueue || [], turnIndex: data.turnIndex || 0, pendingTarget: data.pendingTarget || null,
     queue: data.queue || [], matches: data.matches || 0, round: data.round || 0,
     seed: data.seed ?? 1, rngState: data.rngState ?? data.seed ?? 1, legacy: data.v === 1,
     revision: data.revision || 0, decisionLedger: data.decisionLedger || [],
@@ -228,6 +254,34 @@ export function isCampaignStorageEvent(event, id) {
   return !!id && (event.key === campaignStorageKey(id) || event.key === null);
 }
 
+const quotaExceeded = error => ['QuotaExceededError', 'NS_ERROR_DOM_QUOTA_REACHED'].includes(error?.name)
+  || error?.code === 22 || error?.code === 1014;
+
+const sameJson = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+/**
+ * Whether `data` continues the id-less (legacy) campaign in the resume pointer: resuming such a save gives the running
+ * campaign a fresh id, and its first checkpoint must replace the singleton rather than migrate a frozen second copy
+ * of the same campaign. Resume keeps the save's seed and start time (stamping one when the save has none); a new
+ * campaign started over a legacy save has its own, and it lacks the legacy's played matches (or, before any match,
+ * its squads), so it is always archived.
+ */
+function continuesLegacy(legacy, data) {
+  if (!legacy || legacy.campaignId || data.seed !== legacy.seed || !Number.isFinite(data.startedAt)) return false;
+  if (Number.isFinite(legacy.startedAt) && data.startedAt !== legacy.startedAt) return false;
+  const teams = data.teams || {}, own = data.own || {}, alive = new Set(legacy.aliveIds);
+  if (!Object.keys(legacy.teams).every(id => Object.hasOwn(teams, id)) || !Object.keys(legacy.own).every(cid => Object.hasOwn(own, cid))
+      || !(data.aliveIds || []).every(id => alive.has(id))) return false;
+  if (!(legacy.matches > 0)) return sameJson(teams, legacy.teams) && sameJson(own, legacy.own);
+  if ((data.matches || 0) < legacy.matches) return false;
+  // History ids (`match-N`) repeat across campaigns: the pairings and winners must match too.
+  const history = new Map((data.history || []).map(entry => [entry?.id, entry]));
+  return legacy.history.every(entry => {
+    const mine = history.get(entry.id);
+    return !!mine && mine.aId === entry.aId && (mine.dId ?? mine.bId) === (entry.dId ?? entry.bId) && mine.winnerId === entry.winnerId;
+  });
+}
+
 /** Compare-and-save prevents a stale tab from replacing a newer checkpoint. */
 export function writeSave(state, { activate = true } = {}) {
   try {
@@ -247,24 +301,82 @@ export function writeSave(state, { activate = true } = {}) {
     index.unshift(campaignMetadata(data));
     const current = localStorage.getItem(SAVE_KEY);
     const currentCampaign = tryParse(current);
-    // A legacy singleton must remain reachable when a new campaign starts.
-    if (currentCampaign && !currentCampaign.campaignId) {
+    let retained = null;
+    // A legacy singleton must remain reachable when a new campaign starts (not when it is the campaign being saved:
+    // resuming it gave it a fresh id, and this checkpoint replaces it).
+    if (currentCampaign && !currentCampaign.campaignId && !(activate && continuesLegacy(currentCampaign, data))) {
       const migrated = { ...currentCampaign, campaignId: createCampaignId(), revision: 1,
         campaignName: cleanName(currentCampaign.campaignName || `${currentCampaign.settings.sport || 'Football'} legacy campaign`) };
-      localStorage.setItem(campaignStorageKey(migrated.campaignId), JSON.stringify(migrated));
+      retained = [campaignStorageKey(migrated.campaignId), JSON.stringify(migrated)];
       index.push(campaignMetadata(migrated));
     } else if (current && !currentCampaign) {
       // Retain damaged bytes even when the player chooses to start a fresh run.
-      localStorage.setItem(CAMPAIGN_DAMAGED_KEY, current);
+      retained = [CAMPAIGN_DAMAGED_KEY, current];
     }
-    if (previous && tryParse(previous)) localStorage.setItem(backupKey(data.campaignId), previous);
     const updatePointer = activate || currentCampaign?.campaignId === data.campaignId;
-    if (currentCampaign && updatePointer) localStorage.setItem(CAMPAIGN_BACKUP_KEY, current);
-    localStorage.setItem(CAMPAIGN_INDEX_KEY, JSON.stringify(index));
-    localStorage.setItem(key, text);
-    if (updatePointer) localStorage.setItem(SAVE_KEY, text);
-    return { ok: true, campaignId: data.campaignId, revision: data.revision, campaignName: data.campaignName,
-      savedAt: data.savedAt, message: 'Progress saved' };
+    const replacePointerBackup = !!currentCampaign && updatePointer;
+    // All or nothing: a failed write restores every key it touched. Otherwise a quota error after the slot was
+    // written (revision + 1) left the caller at the old revision, and its next save read as another tab's conflict.
+    const touched = [];
+    const put = (k, value) => { const prior = localStorage.getItem(k); localStorage.setItem(k, value); touched.push([k, prior]); };
+    const drop = k => { const value = localStorage.getItem(k); if (value != null) { touched.push([k, value]); localStorage.removeItem(k); } };
+    const rollback = () => {
+      for (const [k, value] of touched.reverse()) {
+        try { if (value == null) localStorage.removeItem(k); else localStorage.setItem(k, value); } catch { /* best effort */ }
+      }
+      touched.length = 0;
+    };
+    // Each checkpoint is stored up to four times (slot, resume pointer and a previous copy of each), so a world-sized
+    // campaign outgrows a ~5M-character origin quota within a few rounds. When storage is full the recovery copies
+    // give way before the checkpoint does: first the pointer's (normally the same bytes as the slot's), then the slot's,
+    // then (spareCopies) those of other checkpoints. The first tier writes exactly what it always did, in the same order.
+    const write = (slotBackup, pointerBackup, spare = []) => {
+      if (!slotBackup) drop(backupKey(data.campaignId));
+      if (!pointerBackup && replacePointerBackup) drop(CAMPAIGN_BACKUP_KEY);
+      for (const k of spare) drop(k);
+      if (retained) put(...retained);
+      if (slotBackup && previous) put(backupKey(data.campaignId), previous);
+      if (pointerBackup && replacePointerBackup) put(CAMPAIGN_BACKUP_KEY, current);
+      put(CAMPAIGN_INDEX_KEY, JSON.stringify(index));
+      put(key, text);
+      if (updatePointer) put(SAVE_KEY, text);
+      return { ok: true, campaignId: data.campaignId, revision: data.revision, campaignName: data.campaignName,
+        savedAt: data.savedAt, message: 'Progress saved' };
+    };
+    // Last tiers, still only on a full storage: recovery copies that only duplicate a readable checkpoint, dropped one
+    // at a time until the write fits (rollback restores them all if it never does). First the pointer's previous copy
+    // when the tiers above kept it (its campaign's slot holds the same or a newer revision; kept whenever the pointer
+    // is damaged, since that recovery offers it), then other campaigns' slot backups, oldest checkpoint first, each
+    // only while its own slot still reads. Another campaign's slot itself is never touched.
+    const spareCopies = () => {
+      const keys = [];
+      if (!replacePointerBackup && (!current || currentCampaign) && localStorage.getItem(CAMPAIGN_BACKUP_KEY) != null) {
+        keys.push(CAMPAIGN_BACKUP_KEY);
+      }
+      const others = index.filter(item => item.id !== data.campaignId)
+        .sort((a, b) => (Number(a.savedAt) || 0) - (Number(b.savedAt) || 0));
+      for (const item of others) {
+        if (localStorage.getItem(backupKey(item.id)) != null && tryParse(localStorage.getItem(campaignStorageKey(item.id)))) keys.push(backupKey(item.id));
+      }
+      return keys;
+    };
+    let failure = null;
+    for (const [slotBackup, pointerBackup] of [[true, true], [true, false], [false, false]]) {
+      try { return write(slotBackup, pointerBackup); } catch (error) {
+        rollback();
+        if (!quotaExceeded(error)) throw error;
+        failure = error;
+      }
+    }
+    const spare = spareCopies();
+    for (let n = 1; n <= spare.length; n++) {
+      try { return write(false, false, spare.slice(0, n)); } catch (error) {
+        rollback();
+        if (!quotaExceeded(error)) throw error;
+        failure = error;
+      }
+    }
+    throw failure;
   } catch {
     return { ok: false, savedAt: null, message: 'Progress could not be saved. Export your campaign to keep it.' };
   }

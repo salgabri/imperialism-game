@@ -181,3 +181,14 @@ export const basketball = {
     return { ga, gd, ev, tie, winner };
   },
 };
+
+/**
+ * Squad-screen strength profile (PLAN §3.7, engine-diff §4c): the offence and defence ratings `prepareMatch`
+ * turns into efficiencies, before any effective-strength adjustment → { offence, defence } on the player-rating
+ * scale. Takes a `selectLineup` result, or a team whose lineup is selected first. Read-only; no RNG.
+ */
+export function basketballProfile(lineup) {
+  const selected = Array.isArray(lineup?.slots) ? lineup : Array.isArray(lineup?.squad) ? selectLineup(lineup) : null;
+  if (!selected || !selected.slots.every(slot => slot.position in OFFENCE_WEIGHTS)) return { offence: 0, defence: 0 };
+  return { offence: weightedRating(selected, OFFENCE_WEIGHTS), defence: weightedRating(selected, DEFENCE_WEIGHTS) };
+}

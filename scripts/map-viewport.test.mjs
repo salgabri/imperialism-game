@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { computeFitView, computeRevealView, WORLD } from '../src/hooks/useMapViewport.js';
+import { viewportClass, conquestLayout, THEATRE_LAYOUT, NEAR_LAYOUT, MAP_INSET, LABEL_MAX_PX } from '../src/hooks/useMapViewport.js';
 
 const desktop = { width: 960, height: 540 };
 const zoomed = { x: 200, y: 100, w: 320, h: 180 };
@@ -145,4 +146,65 @@ test('varied route directions and canvas shapes remain visible, framed, and stab
       assert.equal(computeRevealView(revealed, points, size), revealed);
     }
   }
+});
+
+// ---- v4 framing (WP-MAP, PLAN §3.7, A-2, A-6): the design's fit() window as an optional fourth argument ----
+
+const screenOf = (point, view, size) => screenPoint(point, view, size);
+
+test('a layout window centres the bounds in its [l..r]×[t..b] fraction (D1 conquest framing)', () => {
+  const size = { width: 1440, height: 824 };
+  const bounds = { x: 430, y: 240, w: 20, h: 15 };
+  const layout = { l: .03, r: .5, t: .12, b: .88, pad: 2.6 };
+  const view = computeFitView(bounds, size, undefined, layout);
+  assertFramed(view, size);
+  const centre = screenOf({ x: 440, y: 247.5 }, view, size);
+  assert.ok(Math.abs(centre.x - 381.6) < 1e-6, `centre x ${centre.x} = .265 × 1440`);
+  assert.ok(Math.abs(centre.y - 412) < 1e-6, `centre y ${centre.y} = .5 × 824`);
+  const aspect = size.height / size.width;
+  const expected = Math.max(20 / .47, 15 / .76 / aspect) * 2.6;
+  assert.ok(Math.abs(view.w - expected) < 1e-9, 'w = max(b.w/(r−l), (b.h/(b−t))/a) · pad');
+  // pad 2.6: the taken land occupies at most 1/2.6 of the window, well left of a 650px article.
+  assertVisible([{ x: 430, y: 240 }, { x: 450, y: 255 }], view, size, { left: 43, right: 720, top: 99, bottom: 99 });
+});
+
+test('theatre windows keep the theatre clear of the title card and bottom chrome at each width', () => {
+  const theatre = { x: 360, y: 60, w: 260, h: 190 };
+  for (const [breakpoint, size] of [['wide', { width: 1420, height: 952 }], ['std', { width: 1006, height: 662 }],
+    ['tablet', { width: 820, height: 560 }], ['phone', { width: 390, height: 330 }]]) {
+    const layout = THEATRE_LAYOUT[breakpoint];
+    const view = computeFitView(theatre, size, undefined, layout);
+    assertFramed(view, size);
+    const slack = layout.pad < 1 ? (1 - layout.pad) * size.width : 0; // the tablet frame crops by 2%
+    assertVisible([{ x: theatre.x, y: theatre.y }, { x: theatre.x + theatre.w, y: theatre.y + theatre.h }], view, size, {
+      left: layout.l * size.width - slack, right: (1 - layout.r) * size.width - slack,
+      top: layout.t * size.height - slack, bottom: (1 - layout.b) * size.height - slack });
+  }
+  assert.deepEqual(NEAR_LAYOUT, { l: 0, r: 1, t: 0, b: 1, pad: 1.55 });
+});
+
+test('invalid or degenerate windows fall back to the whole canvas; the 3-argument form is unchanged', () => {
+  const bounds = { x: 440, y: 260, w: 40, h: 20 };
+  assert.deepEqual(computeFitView(bounds, desktop, undefined, { l: .6, r: .4, t: .9, b: .1, pad: 1 }),
+    computeFitView(bounds, desktop, undefined, { l: 0, r: 1, t: 0, b: 1, pad: 1 }));
+  assert.deepEqual(computeFitView(bounds, desktop, undefined, null), computeFitView(bounds, desktop));
+  const point = computeFitView({ x: 430, y: 240, w: 0, h: 0 }, desktop, undefined, NEAR_LAYOUT);
+  assertFramed(point, desktop);
+  assert.ok(Math.abs(point.w - WORLD.w / 16) < 1e-9, 'a single point frames at the maximum zoom');
+  assert.equal(computeFitView(null, desktop, undefined, NEAR_LAYOUT), null);
+});
+
+test('viewport classes, insets, label tiers and conquest windows follow the README breakpoints', () => {
+  for (const [width, expected] of [[1920, 'wide'], [1600, 'wide'], [1599.98, 'std'], [1440, 'std'], [1200, 'std'],
+    [1199.98, 'tablet'], [1024, 'tablet'], [820, 'tablet'], [700, 'tablet'], [699.98, 'phone'], [390, 'phone'], [NaN, 'std'], [undefined, 'std']]) {
+    assert.equal(viewportClass(width), expected, `${width}px`);
+  }
+  assert.deepEqual(MAP_INSET, { wide: 30, std: 20, tablet: 18, phone: 12 });
+  assert.deepEqual(LABEL_MAX_PX, { wide: 30, std: 22, tablet: 20, phone: 18 });
+  assert.deepEqual(conquestLayout('std', 1440), { l: .03, r: .5, t: .12, b: .88, pad: 2.6 });
+  assert.deepEqual(conquestLayout('wide', 1920), { l: .03, r: .5, t: .12, b: .88, pad: 2.6 });
+  const narrow = conquestLayout('std', 1200);
+  assert.ok(Math.abs(narrow.r - (1200 - 650 - 40) / 1200) < 1e-12, 'r stops 40px short of the 650px article');
+  assert.deepEqual(conquestLayout('tablet', 820), { l: 0, r: 1, t: .12, b: .88, pad: 2.6 });
+  assert.deepEqual(conquestLayout('phone', 390), { l: 0, r: 1, t: 0, b: 1, pad: 2.8 });
 });

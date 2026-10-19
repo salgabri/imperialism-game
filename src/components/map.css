@@ -1,39 +1,146 @@
-.world-map { position: relative; flex: 1; min-width: 0; min-height: 0; isolation: isolate; overflow: hidden; background: #1d323b url('/textures/cartographic-paper.png') center / 750px; }
-.political-map { width: 100%; height: 100%; display: block; touch-action: none; }
-.country-shapes path { transition: fill .35s ease, stroke .15s; }
-.country-shapes path[role=button]:hover { filter: brightness(1.12); stroke: #eee1bf; }
-.country-region:hover .country-flag-parts { filter: brightness(1.12); }
+/* Owner: WP-MAP (see PLAN.md §4). The v4 flat map (README §Map rendering, DEC D18–D22) and its chrome:
+   map modes (bottom-right; top-right on tablet; hidden on phone), zoom/reset group above them (hidden on phone,
+   which pinch-zooms), "Back to previous view", phone "Whole map", hover tooltip, anchored cards and the your-turn
+   veil (A-9: one switch, --map-veil).
+   Placement of .world-map inside the app grid belongs to shell.css; the title card and key belong to WP-COL.
+   Breakpoints: wide ≥1600 · std 1200–1599 (base) · tablet 700–1199 · phone <700. */
+
+.world-map {
+  --wm-modes-h: 31px;                         /* mode switch height (≈39 at ≥1600), used to stack the zoom group */
+  --wm-zoom-size: max(36px, var(--tap, 0px));
+  position: relative; flex: 1; min-width: 0; min-height: 0; isolation: isolate; overflow: hidden;
+  background: var(--sea); color: var(--ink);
+}
+.political-map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+/* ---- land ---- */
+.country-shapes path { transition: fill .35s ease; }
+.country-shapes path[role=button]:hover { filter: brightness(.97); }
+.country-region:hover .country-flag-parts { filter: brightness(1.06); }
 /* SVG's native pointer-focus box scales with the map; focus follows land instead. */
 .country-shapes path[data-country]:focus { outline: none; }
-.country-shapes path[data-country]:focus-visible { stroke: #fff2c9; stroke-width: 2.4px; vector-effect: non-scaling-stroke; }
-.map-heading { position: absolute; left: 28px; top: 25px; pointer-events: none; text-shadow: 0 2px 10px #13272c; }
-.map-heading h1 { margin: 0; font-family: var(--font-heading); font-size: 21px; line-height: 1.2; font-weight: 600; letter-spacing: .055em; text-transform: uppercase; color: #f1eee6; }
-.map-tooltip { position: absolute; left: -999px; top: -999px; z-index: 20; pointer-events: none; background: #202b28f5; border: 1px solid #69756d; border-radius: 2px; padding: 9px 12px; box-shadow: 0 4px 12px #09141b30; max-width: 240px; }
-.map-tooltip strong { display: block; font-size: 14px; font-weight: 550; }
-.map-tooltip span { display: block; font-size: 11px; color: #afbdc1; margin-top: 5px; line-height: 1.4; }
-.map-bottom { position: absolute; bottom: 34px; left: 24px; right: 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; z-index: 8; cursor: default; }
-.map-tools, .map-zoom { display: flex; align-items: center; gap: 6px; }
-.map-tools { gap: 14px; }
-.map-modes { display: flex; border: 1px solid #69756d; border-radius: 2px; overflow: hidden; background: #202b28f5; }
-.map-modes button { border: 0; min-height: 44px; padding: 0 15px; color: #b9c3bd; background: transparent; }
-.map-modes button + button { border-left: 1px solid #69756d; }
-.map-modes button[aria-pressed=true] { color: #f0eee4; box-shadow: inset 0 -2px #e7e6dc; background: #293630; border-radius: 0; }
-.map-modes button:hover { background: #39463f; }
-.map-reset { color: #c4d0d0; min-width: 34px; padding: 0 2px; min-height: 40px; background: none; border: none; font-size: 11px; }
-.map-return { min-height: 44px; padding: 0 10px; border: 1px solid #69756d; border-radius: 2px; color: #f0eee4; background: #202b28f5; font-size: 11px; }
-.map-return:hover { background: #39463f; }
-.map-tools:has(.map-return) { flex-wrap: wrap; }
-.map-footnote { position: absolute; bottom: 10px; left: 25px; right: 25px; display: flex; align-items: center; gap: 16px; color: #afc0c3; font-size: 10px; pointer-events: none; }
-.map-coordinates { margin-left: auto; }
-.map-distance { border-top: 1px solid #acbdbd; padding: 3px 0 0; min-width: 55px; text-align: center; }
-@media(max-width: 1200px) { .map-bottom { left: 16px; right: 16px; flex-wrap: wrap; gap: 10px; } .map-tools { gap: 8px; } .map-reset { display: none; } .map-modes button { padding: 0 10px; } .map-coordinates { display: none; } }
-@media(max-width: 900px) and (min-width: 701px) { .map-bottom { flex-direction: column; align-items: flex-start; } .map-heading { left: 18px; } }
-@media(max-width: 700px) { .world-map { flex: none; height: 58dvh; min-height: 400px; } .world-map--setup { height: calc(100dvh - 64px); min-height: 660px; } .map-heading { left: 18px; top: 18px; } .map-heading h1 { font-size: 18px; } .map-bottom { bottom: 32px; left: 14px; right: 14px; gap: 9px; } .map-footnote { left: 14px; right: 14px; font-size: 9px; } .map-distance { margin-left: auto; } .map-tools { width: 100%; justify-content: space-between; } .map-zoom .icon-button { min-height: 44px; height: 44px; width: 44px; } .map-modes button { min-height: 44px; } }
+.country-shapes path[data-country]:focus-visible { stroke: var(--ink); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+.country-shapes path[data-reach=out], .country-shapes path[data-reach=kept] { filter: none; }
 
-.map-skip-link { position: absolute; top: -100px; left: 14px; z-index: 30; padding: 11px 14px; color: #202725; background: #e7e6dc; font-size: 13px; text-decoration: none; }
-.map-skip-link:focus { top: 12px; }
-.country-shapes path[data-followed] { stroke-linejoin: round; }
-.country-shapes path[data-conquered] { stroke-linejoin: round; }
-@media(max-width: 700px) {
-  .map-bottom { bottom: 32px; }
+/* ---- your turn: out-of-reach land veiled (DEC D21, A-9) ---- */
+.reach-veil { fill: var(--map-veil); stroke: none; }
+
+/* ---- conquest hatch: fades in first, the callout follows (A-2) ---- */
+.conquest-hatch path { animation: mapHatchIn 240ms ease-out both; }
+@keyframes mapHatchIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---- skip link ---- */
+.map-skip-link {
+  position: absolute; top: -100px; left: var(--map-inset); z-index: 30; padding: 11px 14px;
+  background: var(--ink); color: #fff; text-decoration: none;
+  font: 700 13px/1 var(--font-narrow); letter-spacing: .1em; text-transform: uppercase;
+}
+.map-skip-link:focus { top: var(--map-inset); }
+
+/* ---- hover tooltip (README §Interactions: title-card style white panel) ---- */
+.map-tooltip {
+  position: absolute; left: -999px; top: -999px; z-index: 20; pointer-events: none;
+  width: 262px; max-width: calc(100% - 16px); padding: 12px 14px;
+  background: var(--panel); color: var(--ink); box-shadow: var(--shadow-float);
+}
+.map-tooltip__name { display: block; font: 700 18px/1.1 var(--font-narrow); letter-spacing: .06em; text-transform: uppercase; }
+.map-tooltip__held { display: block; margin-top: 6px; font: 400 13px/1.35 var(--font-sans); color: var(--text-2); }
+.map-tooltip__result { display: block; margin-top: 2px; font: 400 13px/1.35 var(--font-sans); color: var(--muted); font-variant-numeric: tabular-nums; }
+.map-tooltip__link {
+  display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule);
+  font: 400 12px/1.35 var(--font-sans); color: var(--you-text); text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* ---- map-anchored cards (conquest callout, your-turn target card); content styled by its owner ---- */
+.map-anchor { position: absolute; z-index: 7; pointer-events: none; transform: translate(-50%, -50%); }
+.map-anchor[data-align=beside] { transform: none; }
+.map-anchor[data-align=beside][data-side=left] { transform: translateX(-100%); }
+
+/* ---- map modes: a floating segmented switch (README §A, RM §1.9) ---- */
+.map-modes {
+  position: absolute; right: var(--map-inset); bottom: var(--map-inset); z-index: 6;
+  display: flex; background: var(--panel); box-shadow: var(--shadow-float); cursor: default;
+}
+.map-modes__btn {
+  display: inline-flex; align-items: center; height: var(--wm-modes-h); margin: 0; padding: 0 11px;
+  border: 0; border-radius: 0; background: transparent; color: var(--ink);
+  font: 700 12px/1 var(--font-narrow); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+}
+.map-modes__btn + .map-modes__btn { box-shadow: inset 1px 0 0 var(--rule); }
+.map-modes__btn:hover { background: var(--surface-2); }
+.map-modes__btn[aria-pressed=true] { background: var(--ink); color: #fff; box-shadow: none; }
+.map-modes__btn:focus-visible { outline-offset: -2px; }
+
+/* ---- zoom −/+/reset: a minimal vertical group above the mode switch (DEC D21) ---- */
+.map-zoom {
+  position: absolute; right: var(--map-inset); bottom: calc(var(--map-inset) + var(--wm-modes-h) + 8px); z-index: 6;
+  display: flex; flex-direction: column; background: var(--panel); box-shadow: var(--shadow-float); cursor: default;
+}
+.map-zoom__btn {
+  display: grid; place-items: center; width: var(--wm-zoom-size); height: var(--wm-zoom-size); margin: 0; padding: 0;
+  border: 0; border-radius: 0; background: transparent; color: var(--ink);
+}
+.map-zoom__btn + .map-zoom__btn { box-shadow: inset 0 1px 0 var(--rule); }
+.map-zoom__btn:hover { background: var(--surface-2); }
+.map-zoom__btn:focus-visible { outline-offset: -2px; }
+.map-reset { font: 500 11px/1 var(--font-sans); font-variant-numeric: tabular-nums; letter-spacing: .02em; color: var(--muted); }
+
+/* ---- Back to previous view: beside the zoom group ---- */
+.map-return {
+  position: absolute; right: calc(var(--map-inset) + var(--wm-zoom-size) + 8px);
+  bottom: calc(var(--map-inset) + var(--wm-modes-h) + 8px); z-index: 6;
+  display: inline-flex; align-items: center; height: var(--wm-zoom-size); margin: 0; padding: 0 14px;
+  border: 0; border-radius: 0; background: var(--panel); color: var(--ink); box-shadow: var(--shadow-float);
+  font: 700 12px/1 var(--font-narrow); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; cursor: pointer;
+}
+.map-return:hover { background: var(--surface-2); }
+
+/* ---- phone "Whole map" / "Your fronts" toggle (README §A 390, A4) ---- */
+.map-whole { display: none; }
+
+/* ---- conquest view: the article owns the screen; no map chrome (A-2) ---- */
+.app-shell[data-view=conquest] .world-map .map-modes,
+.app-shell[data-view=conquest] .world-map .map-zoom,
+.app-shell[data-view=conquest] .world-map .map-return,
+.app-shell[data-view=conquest] .world-map .map-whole { display: none; }
+
+/* ---- wide ≥1600 ---- */
+@media (min-width: 1600px) {
+  .world-map { --wm-modes-h: 39px; }
+  .map-modes__btn { padding: 0 16px; font-size: 14px; }
+}
+
+/* ---- touch: every map control is a ≥44px hit target (DEC misc); fine pointers keep the A1–A3 31/39px switch ---- */
+@media (pointer: coarse) {
+  .world-map { --wm-modes-h: max(31px, var(--tap, 44px)); }
+}
+@media (pointer: coarse) and (min-width: 1600px) {
+  .world-map { --wm-modes-h: max(39px, var(--tap, 44px)); }
+}
+
+/* ---- tablet 700–1199: modes move top-right, zoom drops to the bottom-right corner ---- */
+@media (max-width: 1199.98px) {
+  .map-modes { top: var(--map-inset); bottom: auto; }
+  .map-modes__btn { padding: 0 10px; }
+  .map-zoom, .map-return { bottom: var(--map-inset); }
+}
+
+/* ---- phone <700 (A4): no switch and no zoom buttons (pinch zooms, useMapViewport); 44px targets; Whole map
+   bottom-right; "Back to previous view" top-right ---- */
+@media (max-width: 699.98px) {
+  .world-map { --wm-zoom-size: 44px; }
+  .map-modes, .map-zoom { display: none; }
+  .map-return { top: var(--map-inset); right: var(--map-inset); bottom: auto; }
+  .map-whole {
+    position: absolute; right: var(--map-inset); bottom: var(--map-inset); z-index: 6;
+    display: inline-flex; align-items: center; height: 44px; margin: 0; padding: 0 14px;
+    border: 0; border-radius: 0; background: var(--panel); color: var(--ink); box-shadow: var(--shadow-float);
+    font: 700 12px/1 var(--font-narrow); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; cursor: pointer;
+  }
+  .map-tooltip { width: 236px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conquest-hatch path { animation: none; }
+  .country-shapes path { transition: none; }
 }

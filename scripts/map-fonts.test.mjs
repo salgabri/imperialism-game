@@ -13,7 +13,7 @@ const bundled = await build({
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'], logLevel: 'silent',
 });
 const componentCode = bundled.outputFiles[0].text;
-const fallback = "Georgia, 'Times New Roman', serif";
+const fallback = "'Arial Narrow', sans-serif";
 const props = {
   geometry: [{ id: 'A', rings: [[[100, 100], [700, 100], [700, 350], [100, 350], [100, 100]]] }],
   ownership: { A: 'A' }, labels: [{ id: 'A', text: 'ASYNCFONT' }],
@@ -39,7 +39,7 @@ async function fixture({ load, headless = false } = {}) {
     dom.window.SVGElement.prototype.getComputedTextLength = () => 100;
     const context = { font: '', measureText(text) {
       measurements.push({ text, font: this.font, webfontLoaded });
-      return { width: 100 * (this.font.includes('Alegreya') && webfontLoaded ? 4 : 8) };
+      return { width: 100 * (this.font.includes('Archivo Narrow') && webfontLoaded ? 4 : 8) };
     } };
     dom.window.HTMLCanvasElement.prototype.getContext = () => context;
   } else dom.window.HTMLCanvasElement.prototype.getContext = () => { throw new Error('headless path must not require canvas'); };
@@ -56,7 +56,7 @@ async function fixture({ load, headless = false } = {}) {
   const text = () => dom.window.document.querySelector('[data-empire-label="A"]');
   await render();
   return { dom, measurements, requests, render, text,
-    async complete(pending) { webfontLoaded = true; await act(async () => pending.resolve([{ family: 'Alegreya', status: 'loaded' }])); },
+    async complete(pending) { webfontLoaded = true; await act(async () => pending.resolve([{ family: 'Archivo Narrow', status: 'loaded' }])); },
     async unmount() { if (!unmounted) { await act(async () => root.unmount()); unmounted = true; } },
     async close() {
       if (!unmounted) await act(async () => root.unmount());
@@ -66,23 +66,23 @@ async function fixture({ load, headless = false } = {}) {
   };
 }
 
-test('delayed Alegreya loading keeps measured/rendered fallback together, then remeasures once', async () => {
+test('delayed Archivo Narrow loading keeps measured/rendered fallback together, then remeasures once', async () => {
   const pending = deferred(), f = await fixture({ load: () => pending.promise });
   try {
     assert.equal(f.requests.length, 1);
-    assert.match(f.requests[0].font, /^500 100px ['"]?Alegreya['"]?$/);
+    assert.match(f.requests[0].font, /^600 100px ['"]?Archivo Narrow['"]?$/);
     assert.ok(f.requests[0].characters.includes('A'));
     assert.equal(f.text().getAttribute('font-family'), fallback);
-    assert.equal(f.text().getAttribute('font-weight'), '500');
+    assert.equal(f.text().getAttribute('font-weight'), '600');
     assert.equal(f.measurements.length, 1);
-    assert.equal(f.measurements[0].font, `500 100px ${fallback}`);
+    assert.equal(f.measurements[0].font, `600 100px ${fallback}`);
     const before = Number(f.text().getAttribute('textLength'));
     await f.complete(pending);
     const loadedFamily = f.text().getAttribute('font-family');
-    assert.match(loadedFamily, /^['"]Alegreya['"],/);
+    assert.match(loadedFamily, /^['"]Archivo Narrow['"],/);
     assert.equal(f.measurements.length, 2, 'same name is remeasured after the face loads');
-    assert.equal(f.measurements[1].font, `500 100px ${loadedFamily}`, 'canvas and SVG use identical family and weight');
-    assert.ok(f.measurements[1].webfontLoaded, 'Alegreya was never measured while unloaded');
+    assert.equal(f.measurements[1].font, `600 100px ${loadedFamily}`, 'canvas and SVG use identical family and weight');
+    assert.ok(f.measurements[1].webfontLoaded, 'Archivo Narrow was never measured while unloaded');
     assert.ok(Number(f.text().getAttribute('textLength')) < before * .7, 'new advance invalidates geometric placement');
     await f.render({ labels: [{ ...props.labels[0] }], mapMode: 'political' });
     assert.equal(f.measurements.length, 2, 'equivalent names and map styling reuse measured widths');
@@ -100,10 +100,10 @@ test('a newly needed Unicode subset uses explicit fallback until that subset is 
     assert.equal(f.requests.length, 2);
     assert.ok(f.requests[1].characters.includes('Č'));
     assert.equal(f.text().getAttribute('font-family'), fallback, 'new glyphs cannot silently swap under old metrics');
-    assert.equal(f.measurements.at(-1).font, `500 100px ${fallback}`);
+    assert.equal(f.measurements.at(-1).font, `600 100px ${fallback}`);
     await f.complete(second);
-    assert.match(f.text().getAttribute('font-family'), /Alegreya/);
-    assert.equal(f.measurements.at(-1).font, `500 100px ${f.text().getAttribute('font-family')}`);
+    assert.match(f.text().getAttribute('font-family'), /Archivo Narrow/);
+    assert.equal(f.measurements.at(-1).font, `600 100px ${f.text().getAttribute('font-family')}`);
   } finally { await f.close(); }
 });
 
@@ -113,7 +113,7 @@ test('rejected, missing, and synchronously failing font loads retain visible saf
     try {
       assert.ok(f.text(), 'font failure never removes map labels');
       assert.equal(f.text().getAttribute('font-family'), fallback);
-      assert.ok(f.measurements.every(item => item.font === `500 100px ${fallback}`));
+      assert.ok(f.measurements.every(item => item.font === `600 100px ${fallback}`));
     } finally { await f.close(); }
   }
 });
@@ -137,5 +137,49 @@ test('late font completion after unmount does not measure or render a detached m
     await f.complete(pending);
     assert.equal(f.text(), null);
     assert.equal(f.measurements.length, before);
+  } finally { await f.close(); }
+});
+
+test('your own empire is measured and drawn at 700 in ink; other empires stay 600 at 72%', async () => {
+  const pending = deferred(), f = await fixture({ load: () => pending.promise });
+  try {
+    await f.render({ meId: 'A', mapMode: 'political' });
+    const own = f.text();
+    assert.equal(own.getAttribute('font-weight'), '700');
+    assert.equal(own.dataset.own, 'true');
+    assert.equal(f.measurements.at(-1).font, `700 100px ${fallback}`, 'the bold advance is measured, not reused');
+    assert.equal(own.getAttribute('fill'), '#111417');
+    assert.equal(Number(own.getAttribute('fill-opacity')), 1);
+    assert.equal(own.getAttribute('stroke'), '#ffffff');
+    assert.equal(Number(own.getAttribute('stroke-opacity')), .35);
+    await f.complete(pending);
+    assert.equal(f.measurements.at(-1).font, `700 100px ${f.text().getAttribute('font-family')}`);
+    assert.equal(f.requests.length, 1, 'one variable face serves both weights');
+
+    await f.render({ meId: 'B', mapMode: 'political' });
+    const other = f.text();
+    assert.equal(other.getAttribute('font-weight'), '600');
+    assert.equal(other.dataset.own, undefined);
+    assert.equal(other.getAttribute('fill'), '#2c3236');
+    assert.equal(Number(other.getAttribute('fill-opacity')), .72);
+    assert.equal(Number(other.getAttribute('stroke-opacity')), .5);
+    const size = Number(other.getAttribute('font-size'));
+    assert.ok(Math.abs(Number(other.getAttribute('stroke-width')) - size * .12) < 1e-9, 'halo = 12% of the font size');
+    assert.ok(Math.abs(Number(other.getAttribute('letter-spacing')) / size - .14) < 1e-9, '.14em tracking');
+    assert.equal(other.getAttribute('paint-order'), 'stroke');
+  } finally { await f.close(); }
+});
+
+test('flags mode switches to white letters on an ink halo without measuring again', async () => {
+  const f = await fixture({ load: () => Promise.reject(new Error('offline')) });
+  try {
+    await f.render({ mapMode: 'political' });
+    const measured = f.measurements.length;
+    const placement = f.text().getAttribute('transform');
+    await f.render({ mapMode: 'flags' });
+    assert.equal(f.text().getAttribute('fill'), '#ffffff');
+    assert.equal(f.text().getAttribute('stroke'), '#111417');
+    assert.equal(f.measurements.length, measured, 'map styling never remeasures');
+    assert.equal(f.text().getAttribute('transform'), placement, 'map styling never relays out');
   } finally { await f.close(); }
 });

@@ -539,7 +539,7 @@ function componentCandidates(component, definition, options, previous, coastal =
   const { unitsPerPixel: k, minFontPx, maxFontPx, viewBox } = options;
   const characters = Math.max(1, [...definition.text].length);
   const advance = Number.isFinite(definition.widthEm) && definition.widthEm > 0 ? definition.widthEm : characters * 0.72;
-  const trackingEm = characters > 1 ? TRACKING : 0;
+  const trackingEm = characters > 1 ? options.trackingEm ?? TRACKING : 0;
   const widthEm = advance + Math.max(0, characters - 1) * trackingEm;
   const minSize = minFontPx * k, maxSize = maxFontPx * k;
   const results = [];
@@ -632,12 +632,97 @@ export function createTerritoryComponentIndex(countryShapes = []) {
 }
 
 /**
+ * v4 label policy (README "Map rendering", DEC D19, PLAN A-6). Opt-in: pass
+ * these to layout() explicitly; layout()'s own defaults stay the pre-v4 ones.
+ * Archivo Narrow uppercase with .14em tracking, hidden below 9px except your
+ * own label (down to 6.5px), arching 5% of its width, coastal fallback as before.
+ */
+export const V4_LABEL_POLICY = Object.freeze({
+  trackingEm: 0.14,
+  curveRatio: 0.05,
+  minFontPx: 9,
+  ownMinFontPx: 6.5,
+  coastalAllowancePx: 10,
+  maxSeaFraction: 0.22,
+});
+
+/** Largest label size by viewport width class (README "Responsive rules"). */
+export const LABEL_SIZE_TIERS = Object.freeze([
+  Object.freeze({ minWidth: 1600, maxFontPx: 30 }),
+  Object.freeze({ minWidth: 1200, maxFontPx: 22 }),
+  Object.freeze({ minWidth: 700, maxFontPx: 20 }),
+  Object.freeze({ minWidth: 0, maxFontPx: 18 }),
+]);
+
+/**
+ * ≥1600 → 30, 1200–1599 → 22, 700–1199 → 20, <700 → 18 (screen px).
+ * An unknown width uses the 700–1199 tier, the class of jsdom's 1024px window.
+ */
+export function labelMaxFontPx(viewportWidth) {
+  if (!Number.isFinite(viewportWidth)) return 20;
+  return LABEL_SIZE_TIERS.find(tier => viewportWidth >= tier.minWidth)?.maxFontPx ?? 18;
+}
+
+/**
+ * The layout() input for v4 labels: the tier for `viewportWidth` (or an
+ * explicit `maxFontPx`), the 9px floor, and a per-label 6.5px floor for `meId`.
+ * Label objects other than your own are passed through unchanged.
+ */
+export function v4LabelOptions({ viewportWidth, maxFontPx, meId = null, labels = [] } = {}) {
+  const policy = V4_LABEL_POLICY;
+  const own = meId == null || meId === '' ? null : String(meId);
+  return {
+    labels: labels.map(label => own !== null && label && String(label.id) === own
+      ? { ...label, minFontPx: policy.ownMinFontPx } : label),
+    minFontPx: policy.minFontPx,
+    maxFontPx: Number.isFinite(maxFontPx) && maxFontPx > 0 ? maxFontPx : labelMaxFontPx(viewportWidth),
+    curveRatio: policy.curveRatio,
+    coastalAllowancePx: policy.coastalAllowancePx,
+    maxSeaFraction: policy.maxSeaFraction,
+    trackingEm: policy.trackingEm,
+  };
+}
+
+// Uppercase advance widths in em for a narrow grotesque (Arial metrics × .82,
+// close to Archivo Narrow / Arial Narrow). Used only where no canvas exists.
+const NARROW_ADVANCE_EM = {
+  A: 0.547, B: 0.547, C: 0.592, D: 0.592, E: 0.547, F: 0.501, G: 0.638, H: 0.592, I: 0.228,
+  J: 0.41, K: 0.547, L: 0.456, M: 0.683, N: 0.592, O: 0.638, P: 0.547, Q: 0.638, R: 0.592,
+  S: 0.547, T: 0.501, U: 0.592, V: 0.547, W: 0.774, X: 0.547, Y: 0.547, Z: 0.501,
+  ' ': 0.228, '.': 0.228, ',': 0.228, '-': 0.273, '\u2013': 0.456, "'": 0.157, '\u2019': 0.182,
+  '&': 0.547, '(': 0.273, ')': 0.273, '/': 0.228,
+};
+const NARROW_DIGIT_EM = 0.456;
+const NARROW_DEFAULT_EM = 0.56;
+
+/**
+ * Deterministic stand-in for canvas `measureText(text).width / 100` with the
+ * map font: the advance of the uppercased text in em, tracking excluded (the
+ * engine adds it). Accents are measured as their base letter; weights above
+ * 400 widen glyphs slightly (600 → +4%, 700 → +6%). Needs no DOM, so jsdom and
+ * Node give identical results.
+ */
+export function estimateLabelWidthEm(text, weight = 600) {
+  const letters = String(text ?? '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  let width = 0;
+  for (const character of letters) {
+    width += NARROW_ADVANCE_EM[character] ?? (character >= '0' && character <= '9' ? NARROW_DIGIT_EM : NARROW_DEFAULT_EM);
+  }
+  const boldness = clamp(((Number(weight) || 400) - 400) / 300, 0, 1);
+  return Math.round(width * (1 + 0.06 * boldness) * 10000) / 10000;
+}
+
+/**
  * Create once per fitted display geometry; reuse for every conquest and zoom.
  *
  * countryShapes: [{id, rings: [[[x,y],...], ...]}], SVG nonzero winding.
- * layout({ownership: {countryId: ownerId}, labels: [{id,text,widthEm}],
+ * layout({ownership: {countryId: ownerId}, labels: [{id,text,widthEm,minFontPx?}],
  *         viewBox:{x,y,w,h}, unitsPerPixel, minFontPx=11, maxFontPx=32,
- *         curveRatio=0, coastalAllowancePx=0, maxSeaFraction=.22})
+ *         curveRatio=0, coastalAllowancePx=0, maxSeaFraction=.22, trackingEm=.085})
+ *
+ * `trackingEm` is the letter-spacing added between characters (v4: .14). A
+ * label's own `minFontPx` replaces the shared minimum for that label only
+ * (v4: 6.5 for your empire); labels that cannot reach their minimum are omitted.
  *
  * Returned x/y/fontSize/letterSpacing/width/height are map units; angle is
  * degrees. `width` is textLength including tracking, while `footprint` is a
@@ -696,19 +781,23 @@ export function createEmpireLabelEngine(countryShapes = []) {
   }
 
   return {
-    layout({ ownership = {}, labels = [], viewBox = { x: 0, y: 0, w: 960, h: 540 }, unitsPerPixel = 1, minFontPx = 11, maxFontPx = 32, curveRatio = 0, coastalAllowancePx = 0, maxSeaFraction = 0.22 } = {}) {
+    layout({ ownership = {}, labels = [], viewBox = { x: 0, y: 0, w: 960, h: 540 }, unitsPerPixel = 1, minFontPx = 11, maxFontPx = 32, curveRatio = 0, coastalAllowancePx = 0, maxSeaFraction = 0.22, trackingEm } = {}) {
       if (!Number.isFinite(unitsPerPixel) || unitsPerPixel <= 0 || viewBox.w <= 0 || viewBox.h <= 0) return [];
       const groups = prepare(ownership);
       const definitions = labels.filter(l => l && l.text && groups.has(String(l.id))).map(l => ({ ...l, id: String(l.id), text: String(l.text) })).sort((a, b) => a.id.localeCompare(b.id));
-      const options = { unitsPerPixel, viewBox, minFontPx: Math.max(1, minFontPx), maxFontPx: Math.max(minFontPx, maxFontPx), curveRatio: Number.isFinite(curveRatio) ? clamp(curveRatio, 0, 0.15) : 0, coastalAllowancePx: Number.isFinite(coastalAllowancePx) ? Math.max(0, coastalAllowancePx) : 0, maxSeaFraction: Number.isFinite(maxSeaFraction) ? clamp(maxSeaFraction, 0, 0.22) : 0.22 };
-      const cacheKey = JSON.stringify([preparedKey, definitions.map(d => [d.id, d.text, d.widthEm]), options]);
+      const options = { unitsPerPixel, viewBox, minFontPx: Math.max(1, minFontPx), maxFontPx: Math.max(minFontPx, maxFontPx), curveRatio: Number.isFinite(curveRatio) ? clamp(curveRatio, 0, 0.15) : 0, coastalAllowancePx: Number.isFinite(coastalAllowancePx) ? Math.max(0, coastalAllowancePx) : 0, maxSeaFraction: Number.isFinite(maxSeaFraction) ? clamp(maxSeaFraction, 0, 0.22) : 0.22, trackingEm: Number.isFinite(trackingEm) ? clamp(trackingEm, 0, 0.3) : TRACKING };
+      const cacheKey = JSON.stringify([preparedKey, definitions.map(d => [d.id, d.text, d.widthEm, d.minFontPx]), options]);
       if (cacheKey === lastLayoutKey) return lastLayout;
       const output = [];
       for (const definition of definitions) {
         const group = groups.get(definition.id);
         const previous = previousLabels.get(definition.id);
+        // A label may carry its own legibility floor (v4: your empire 6.5px).
+        const labelMinFontPx = Number.isFinite(definition.minFontPx) && definition.minFontPx > 0
+          ? clamp(definition.minFontPx, 1, options.maxFontPx) : options.minFontPx;
+        const labelOptions = labelMinFontPx === options.minFontPx ? options : { ...options, minFontPx: labelMinFontPx };
         const ownedIds = new Set(group.countries.map(country => country.id));
-        const foreignCountries = options.coastalAllowancePx > 0 ? [...countries.values()].filter(country => !ownedIds.has(country.id)) : [];
+        const foreignCountries = labelOptions.coastalAllowancePx > 0 ? [...countries.values()].filter(country => !ownedIds.has(country.id)) : [];
         const strictlyFits = (footprint, component) => exactFootprint(group, footprint, component) && (!foreignCountries.length || !foreignLandIntersects(foreignCountries, footprint));
         // Rank the useful land *on screen*, not each island's worldwide area.
         // Otherwise a sliver of Greenland at the edge of a Europe view can steal
@@ -716,8 +805,8 @@ export function createEmpireLabelEngine(countryShapes = []) {
         // Area creates a bounded shortlist, not the final winner: the best
         // legible name on the continent should beat a smaller name squeezed
         // into a broad but awkward visible corner of an overseas possession.
-        const rankedComponents = group.components.filter(component => overlaps(component.bbox, viewBox) && component.bbox.w * component.bbox.h >= (options.minFontPx * unitsPerPixel) ** 2)
-          .map(component => ({ component, score: visibleUsableArea(component, viewBox, options.minFontPx * unitsPerPixel) }))
+        const rankedComponents = group.components.filter(component => overlaps(component.bbox, viewBox) && component.bbox.w * component.bbox.h >= (labelOptions.minFontPx * unitsPerPixel) ** 2)
+          .map(component => ({ component, score: visibleUsableArea(component, viewBox, labelOptions.minFontPx * unitsPerPixel) }))
           .filter(item => item.score > 0)
           .sort((a, b) => b.score - a.score || a.component.key.localeCompare(b.component.key));
         let chosen = null;
@@ -727,7 +816,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
         const priorComponent = rankedComponents.find(item => item.component.key === previous?.componentKey);
         if (priorComponent && !shortlist.includes(priorComponent)) shortlist.push(priorComponent);
         for (const { component, score: visibleArea } of shortlist) {
-          const componentLabel = strictComponentLabel(component, definition, options, previous, strictlyFits);
+          const componentLabel = strictComponentLabel(component, definition, labelOptions, previous, strictlyFits);
           if (!componentLabel) continue;
           // Font size/readability dominates. Visible useful area is a mild 6%
           // prior; the previous component receives only 5% hysteresis, so a
@@ -740,18 +829,18 @@ export function createEmpireLabelEngine(countryShapes = []) {
         }
         // Prefer every readable on-land fit. Use water only to restore a name
         // that otherwise cannot fit, never as an automatic text-size boost.
-        if (options.coastalAllowancePx > 0 && options.maxSeaFraction > 0 && !chosen) {
+        if (labelOptions.coastalAllowancePx > 0 && labelOptions.maxSeaFraction > 0 && !chosen) {
           for (const { component, score: visibleArea } of shortlist) {
-            const candidates = componentCandidates(component, definition, options, previous, true);
+            const candidates = componentCandidates(component, definition, labelOptions, previous, true);
             let componentLabel = null;
             for (const candidate of candidates.slice(0, 24)) {
-              const minimum = options.minFontPx * unitsPerPixel;
+              const minimum = labelOptions.minFontPx * unitsPerPixel;
               const sizes = [...new Set([candidate.fontSize, candidate.fontSize * 0.98, candidate.fontSize * 0.95, candidate.fontSize * 0.9, minimum].map(size => Math.max(minimum, size)))];
               for (const fontSize of sizes) {
                 const shrink = fontSize / candidate.fontSize;
                 const adjusted = shrink === 1 ? candidate : { ...candidate, fontSize, width: candidate.width * shrink, height: candidate.height * shrink, letterSpacing: candidate.letterSpacing * shrink, curveRise: candidate.curveRise * shrink };
                 adjusted.footprint = labelFootprint(adjusted.x, adjusted.y, adjusted.angle, adjusted.width, adjusted.fontSize, adjusted.curveRise);
-                const valid = coastalFootprint(group, foreignCountries, adjusted.footprint, options.coastalAllowancePx * unitsPerPixel, options.maxSeaFraction);
+                const valid = coastalFootprint(group, foreignCountries, adjusted.footprint, labelOptions.coastalAllowancePx * unitsPerPixel, labelOptions.maxSeaFraction);
                 if (valid) { componentLabel = { ...adjusted, ...valid }; break; }
               }
               if (componentLabel) break;
@@ -767,8 +856,8 @@ export function createEmpireLabelEngine(countryShapes = []) {
         // Keep the preferred arch wherever it works. Before hiding a narrow
         // inland name entirely, try one still-curved but gentler on-land ribbon;
         // no new sea allowance or foreign-land exception is introduced.
-        if (!chosen && options.curveRatio > 0.025) {
-          const gentleOptions = { ...options, curveRatio: 0.025 };
+        if (!chosen && labelOptions.curveRatio > 0.025) {
+          const gentleOptions = { ...labelOptions, curveRatio: 0.025 };
           for (const { component, score: visibleArea } of shortlist) {
             const componentLabel = strictComponentLabel(component, definition, gentleOptions, previous, strictlyFits);
             if (!componentLabel) continue;

@@ -1,0 +1,180 @@
+/* Owner: WP-0 (see PLAN.md §4). v4 masthead (CommandBar; RM Part 2 §2.1–2.8), settings popover and
+   SettingsPanel, and the PlaybackBar variants (bar / masthead / sheet). Frozen in W2.
+   Sizes switch with media queries only (no matchMedia in JS): wide ≥1600, std 1200–1599 (base),
+   tab 700–1199, phone <700. */
+
+/* ---------- header ---------- */
+.mast {
+  position:relative; z-index:30; display:flex; flex-direction:column;
+  height:var(--mast-h); background:var(--panel); color:var(--ink); border-bottom:1px solid var(--rule);
+}
+.mast__row1 { flex:1; min-height:0; display:flex; align-items:center; gap:var(--mast-gap); padding:var(--mast-pad); }
+.mast__wordmark { flex:none; font:700 var(--fs-wordmark)/1 var(--font-sans); letter-spacing:-.03em; white-space:nowrap; }
+.mast__divider { flex:none; align-self:stretch; width:1px; margin:10px 0; background:var(--rule); }
+.mast__dateline {
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 var(--fs-dateline)/1.2 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:.04em;
+  text-transform:uppercase; color:var(--muted);
+}
+.mast__spacer { flex:1; min-width:0; }
+.mast__nav { flex:none; align-self:stretch; display:flex; }
+.mast__tab {
+  display:flex; align-items:center; padding:0 12px; border:0; border-radius:0; background:none; color:var(--muted);
+  font:700 var(--fs-nav)/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;
+  box-shadow:inset 0 calc(-1 * var(--nav-bar)) 0 transparent; cursor:pointer;
+}
+.mast__tab:hover:not(:disabled) { color:var(--ink); }
+.mast__tab[aria-current=page] { color:var(--ink); box-shadow:inset 0 calc(-1 * var(--nav-bar)) 0 var(--you); }
+.mast__tab:focus-visible { outline:2px solid var(--ink); outline-offset:-2px; }
+/* Component CSS loads before primitives.css in the app (main.jsx imports App before index.css), so every rule that
+   must beat `.btn-primary` (display, flex) is written as `.btn-primary.mast__cta`. */
+.btn-primary.mast__cta { flex:none; }
+/* The label is its own span (textContent stays exactly the label) so it can ellipsize when row 1 runs short. */
+.mast__cta-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mast__round {
+  flex:none; white-space:nowrap;
+  font:600 13px/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--ink);
+}
+.mast__row1 > .mast__round { display:none; }
+.mast__mark { display:inline-flex; flex:none; }
+.mast__mark > img, .mast__mark > .fi-team-monogram { width:18px; height:13px; }
+.mast__mark > .fi-team-monogram { font-size:7px; letter-spacing:0; }
+.mast__mark--phone { display:none; }
+
+/* row 2: identity · stats · status */
+.mast__row2 {
+  flex:none; height:var(--mast-row2-h); display:flex; align-items:center; gap:20px; padding:var(--mast-pad);
+  border-top:1px solid var(--row-rule); min-width:0;
+}
+.mast__id { display:flex; align-items:center; gap:8px; min-width:0; white-space:nowrap; }
+.mast__team { font:700 13px/1 var(--font-narrow); letter-spacing:.06em; text-transform:uppercase; }
+.mast__role { font:400 12px/1 var(--font-sans); color:var(--muted); }
+.mast__stat { display:flex; align-items:baseline; gap:6px; white-space:nowrap; }
+.mast__label { font:700 11px/1 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.mast__label-short { display:none; }
+.mast__value { font:600 13px/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--ink); }
+.mast__delta { font:600 11px/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted); }
+.mast__delta[data-tone=gain] { color:var(--gain); }
+.mast__delta[data-tone=loss] { color:var(--loss); }
+.mast__delta[data-tone=muted] { color:var(--muted); }
+.mast__status {
+  margin-left:auto; display:flex; align-items:center; gap:14px; min-width:0; white-space:nowrap;
+  font:400 var(--fs-meta)/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted);
+}
+.mast__round--tab { display:none; font:400 var(--fs-meta)/1 var(--font-sans); color:var(--muted); }
+
+/* ---------- wide ≥1600 (RM §2.2) ---------- */
+@media (min-width:1600px) {
+  .mast__divider { margin:12px 0; }
+  .mast__tab { padding:0 15px; }
+  .mast__row2 { gap:26px; }
+  .mast__id { gap:10px; }
+  .mast__mark > img, .mast__mark > .fi-team-monogram { width:22px; height:16px; }
+  .mast__mark > .fi-team-monogram { font-size:8px; }
+  .mast__team { font-size:15px; }
+  .mast__role { font-size:14px; }
+  .mast__stat { gap:7px; }
+  .mast__label { font-size:12px; }
+  .mast__value { font-size:15px; }
+  .mast__delta { font-size:12px; }
+}
+
+/* ---------- tab 700–1199 (RM §2.4) ---------- */
+@media (max-width:1199.98px) {
+  .mast__divider, .mast__dateline { display:none; }
+  /* Without the dateline only the spacer gives way, so the primary shrinks (its label ellipsizes) before the
+     settings gear can be pushed past the right edge (.app-shell clips overflow). */
+  .btn-primary.mast__cta { flex:0 1 auto; min-width:0; }
+  .mast__tab { padding:0 9px; }
+  .mast__row2 { gap:18px; }
+  .mast__role { display:none; }
+  .mast__label-long { display:none; }
+  .mast__label-short { display:inline; }
+  .mast__round--tab { display:inline; }
+}
+
+/* ---------- phone <700 (RM §2.5) ---------- */
+@media (max-width:699.98px) {
+  .mast__row1 { gap:10px; }
+  .mast__mark--phone { display:inline-flex; }
+  .mast__mark--phone > img, .mast__mark--phone > .fi-team-monogram { width:20px; height:15px; }
+  /* The phone bar carries the primary (RM §2.9): `.btn-primary.mast__cta` outranks primitives' `.btn-primary`. */
+  .mast__nav, .btn-primary.mast__cta, .mast__row1 .command-extras { display:none; }
+  .mast__row1 > .mast__round { display:inline; }
+  .mast__row2 { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:0; padding:0; }
+  .mast__id, .mast__status { display:none; }
+  .mast__stat {
+    display:grid; grid-template-columns:auto minmax(0,1fr); grid-template-rows:auto auto; column-gap:4px; row-gap:3px;
+    align-content:center; align-items:baseline; min-width:0; height:100%; padding:0 0 0 12px;
+    box-shadow:inset -1px 0 0 var(--row-rule);
+  }
+  .mast__value { grid-row:1; grid-column:1; font-size:14px; }
+  .mast__delta { grid-row:1; grid-column:2; font-size:11px; }
+  .mast__label { grid-row:2; grid-column:1 / -1; min-width:0; overflow:hidden; text-overflow:ellipsis; font-size:11px; letter-spacing:.1em; }
+}
+
+/* ---------- row-1 extras: save warning, results, settings popover ---------- */
+.command-extras { flex:none; display:flex; align-items:center; gap:4px; }
+.command-save-warning {
+  min-height:max(36px, var(--tap)); padding:0 4px; border:0; background:transparent; color:var(--loss); cursor:pointer;
+  font:700 12px/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase;
+}
+.command-settings { position:relative; display:flex; align-items:center; }
+.command-popover {
+  position:absolute; top:calc(100% + 8px); right:0; z-index:50; width:320px;
+  max-height:calc(100dvh - var(--mast-h) - 24px); overflow:auto; overscroll-behavior:contain;
+  padding:14px 20px 20px; background:var(--panel); box-shadow:var(--shadow-float); color:var(--ink); text-align:left;
+}
+.command-popover-heading {
+  display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;
+  border-bottom:1px solid var(--ink);
+}
+.command-popover-heading h2 {
+  margin:0; font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase;
+}
+
+/* ---------- SettingsPanel (popover body and phone More sheet, A-10) ---------- */
+.settings-panel { display:flex; flex-direction:column; gap:12px; font-size:14px; }
+.settings-panel__note { margin:0; font-size:12px; line-height:1.45; color:var(--muted); }
+.settings-panel__seed strong { color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums; }
+.settings-panel__rules { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px 14px; }
+.settings-panel__new { display:flex; flex-direction:column; gap:8px; padding-top:14px; border-top:1px solid var(--rule); }
+.settings-panel__new p { margin:0; font-size:12px; line-height:1.45; color:var(--text-2); }
+.settings-panel__new .button { width:100%; }
+.settings-panel__results { width:100%; }
+
+/* ---------- PlaybackBar: default "bar" variant (kept for its contract; DEC D14) ---------- */
+.playback-bar { display:flex; align-items:center; flex-wrap:wrap; gap:10px 14px; }
+.playback-context { display:flex; align-items:baseline; gap:10px; min-width:0; }
+.playback-state { font:700 12px/1 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.playback-state.is-live { color:var(--you-text); }
+.playback-summary { font:600 13px/1 var(--font-sans); font-variant-numeric:tabular-nums; }
+.playback-actions { display:flex; align-items:center; }
+.playback-actions .button + .button { margin-left:-1px; }
+.playback-speed { font-variant-numeric:tabular-nums; }
+
+/* ---------- PlaybackBar: "masthead" variant (row 2 right; "AUTOPLAY OFF · SPEED 2×") ---------- */
+.playback-mast {
+  display:inline-flex; align-items:baseline; white-space:nowrap;
+  font:400 var(--fs-meta)/1 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:.02em;
+  text-transform:uppercase; color:var(--muted);
+}
+.playback-mast button {
+  min-height:var(--tap); padding:2px 0; border:0; border-radius:0; background:none; color:inherit; cursor:pointer;
+  font:inherit; letter-spacing:inherit; text-transform:inherit;
+}
+.playback-mast button:hover:not(:disabled) { color:var(--ink); text-decoration:underline; text-underline-offset:3px; }
+.playback-mast .playback-step { margin-right:14px; color:var(--ink); font-weight:600; }
+.playback-mast .playback-play[aria-pressed=true] { color:var(--ink); }
+.playback-mast__sep { white-space:pre; }
+
+/* ---------- PlaybackBar: "sheet" variant (phone More sheet) ---------- */
+.playback-sheet { display:flex; flex-direction:column; gap:8px; }
+/* A fixed heading over the controls; the live state is a muted sub-line, never the controls' title. */
+.playback-sheet__head { display:flex; flex-direction:column; gap:4px; padding-bottom:2px; }
+.playback-sheet__title {
+  margin:0; font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--ink);
+}
+.playback-sheet__state { margin:0; font:400 13px/1.35 var(--font-sans); color:var(--muted); }
+.playback-sheet__state .playback-summary { font-weight:600; color:var(--ink); }
+.playback-sheet .button { width:100%; min-height:44px; justify-content:space-between; }

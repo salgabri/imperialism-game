@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SAVE_KEY } from '../src/config.js';
+import { SAVE_KEY, SAVE_VERSION } from '../src/config.js';
 import { buildTeam, makeRng } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { CAMPAIGN_BACKUP_KEY, CAMPAIGN_DAMAGED_KEY, campaignStorageKey, createCampaignId, parseCampaign, writeSave,
@@ -172,3 +172,113 @@ test('starting a new campaign archives the old singleton instead of overwriting 
   const archived = loadCampaign(slots.find(item => item.id !== next.campaignId).id);
   assert.deepEqual(archived.own, legacy.own); assert.deepEqual(archived.teams, legacy.teams);
 }));
+
+// ---------- v3: turn order × targeting (DEC D8, PLAN §3.2) ----------
+function turnCheckpoint() {
+  const state = checkpoint();
+  state.teams['380'] = buildTeam('380', makeRng(9), getSport('football')); // eliminated, still known
+  state.settings = { ...state.settings, turnOrder: 'round-robin', targeting: 'player' };
+  state.initialSettings = { ...state.settings };
+  state.turnQueue = ['276', '380', '250']; state.turnIndex = 3;
+  state.pendingTarget = { attackerId: '250', optionIds: ['276'], selectedId: '276', round: 1, openedAt: 1_700_000_000_000,
+    resumeAutoplay: true, turn: { turnQueue: ['276', '380', '250'], turnIndex: 3, round: 1, newRound: false } };
+  return state;
+}
+const tactical = () => ({ aId: '250', dId: '276', managerName: 'France', opponentName: 'Germany',
+  options: ['attack', 'balanced', 'defend'].map(id => ({ id, label: id, description: 'Approach', strength: 84, bonus: 0, support: 0, drama: 6, baseDrama: 6 })) });
+
+test('v3 checkpoints keep the round-robin queue, the pending target and the locked turn rules', () => withStorage(({ storage }) => {
+  assert.equal(SAVE_VERSION, 3);
+  const state = turnCheckpoint();
+  assert.equal(writeSave(state).ok, true);
+  assert.equal(JSON.parse(storage.getItem(SAVE_KEY)).v, 3);
+  const loaded = loadSave();
+  assert.equal(loaded.v, SAVE_VERSION); assert.equal(loaded.legacy, false);
+  assert.deepEqual(loaded.turnQueue, state.turnQueue); assert.equal(loaded.turnIndex, 3);
+  assert.deepEqual(loaded.pendingTarget, state.pendingTarget);
+  assert.deepEqual([loaded.settings.turnOrder, loaded.settings.targeting], ['round-robin', 'player']);
+  assert.deepEqual(loaded.initialSettings, state.initialSettings);
+  // A pending target may follow an applied match, and a target turn may be absent (random order).
+  state.match = { ...match(), applied: true }; state.pendingTarget = { ...state.pendingTarget, turn: null };
+  delete state.pendingTarget.openedAt; delete state.pendingTarget.resumeAutoplay;
+  assert.equal(parseCampaign(saved(state)).pendingTarget.turn, null);
+  state.pendingTarget = null; state.turnQueue = []; state.turnIndex = 0;
+  assert.deepEqual(parseCampaign(saved(state)).turnQueue, []);
+}));
+
+test('version-two saves still load, as the random draw with compass targets', () => {
+  const v2 = campaignSnapshot(checkpoint()); v2.v = 2;
+  for (const key of ['turnQueue', 'turnIndex', 'pendingTarget']) delete v2[key];
+  const migrated = parseCampaign(JSON.stringify(v2));
+  assert.equal(migrated.v, SAVE_VERSION); assert.equal(migrated.legacy, false);
+  assert.deepEqual([migrated.turnQueue, migrated.turnIndex, migrated.pendingTarget], [[], 0, null]);
+  assert.deepEqual([migrated.settings.turnOrder, migrated.settings.targeting], ['random', 'compass']);
+  assert.equal(migrated.settings.pacing, 'duel', 'other settings are untouched');
+  assert.equal(migrated.initialSettings, undefined);
+  const withInitial = { ...v2, initialSettings: { ...v2.settings } };
+  assert.equal(parseCampaign(JSON.stringify(withInitial)).initialSettings.turnOrder, 'random');
+  for (const version of [2, 3]) {
+    const missing = { ...v2, v: version }; delete missing.rngState;
+    assert.throws(() => parseCampaign(JSON.stringify(missing)), /random state/, `v${version} still requires the RNG state`);
+  }
+  for (const version of [0, 4, '3']) assert.throws(() => parseCampaign(JSON.stringify({ ...v2, v: version })), /not a supported/);
+  const v1 = { ...v2, v: 1 }; delete v1.seed; delete v1.rngState;
+  assert.equal(parseCampaign(JSON.stringify(v1)).legacy, true, 'v1 saves keep loading without a seed');
+});
+
+test('strict import rejects malformed turn order, pending targets and overlapping decisions', () => withStorage(({ storage }) => {
+  const state = turnCheckpoint();
+  assert.equal(writeSave(state).ok, true);
+  const good = storage.getItem(SAVE_KEY);
+  const variants = [
+    [s => { s.turnQueue = ['250', 'missing']; }, /turn order/],
+    [s => { s.turnQueue = 'abc'; }, /turn order/],
+    [s => { s.turnQueue = Array(201).fill('250'); s.turnIndex = 0; }, /turn order/],
+    [s => { s.turnIndex = 4; }, /turn position/],
+    [s => { s.turnIndex = -1; }, /turn position/],
+    [s => { s.turnIndex = 1.5; }, /turn position/],
+    [s => { s.turnQueue = null; s.turnIndex = 2; }, /turn position/],
+    [s => { s.settings.turnOrder = 'swiss'; }, /turnOrder setting/],
+    [s => { s.initialSettings.targeting = 'auto'; }, /targeting setting/],
+    [s => { s.pendingTarget = 'yes'; }, /target choice references/],
+    [s => { s.pendingTarget.attackerId = 'missing'; }, /target choice references/],
+    [s => { s.pendingTarget.attackerId = '380'; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = []; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = '276'; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = ['250']; s.pendingTarget.selectedId = '250'; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = ['276', '380']; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = ['276', '276']; }, /target choice references/],
+    [s => { s.pendingTarget.selectedId = '380'; }, /target choice references/],
+    [s => { s.pendingTarget.selectedId = null; }, /target choice references/],
+    [s => { s.pendingTarget.round = -1; }, /target choice references/],
+    [s => { delete s.pendingTarget.round; }, /target choice references/],
+    [s => { s.pendingTarget.openedAt = 'now'; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.resumeAutoplay = 1; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.turn = { ...s.pendingTarget.turn, turnIndex: 9 }; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.turn = { ...s.pendingTarget.turn, turnQueue: ['missing'], turnIndex: 0 }; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.turn = { ...s.pendingTarget.turn, newRound: null }; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.turn = ['276']; }, /target choice is incomplete/],
+    [s => { s.match = match(); }, /overlaps another pending decision/],
+    [s => { s.spin = { attackerId: '250', targetId: '276', rotation: 0, x: 0, y: 0, targetX: 1, targetY: 1, spinMs: 0, holdMs: 480 }; }, /overlaps/],
+    [s => { s.tacticalChoice = tactical(); }, /overlaps/],
+  ];
+  for (const [mutate, expected] of variants) {
+    const invalid = structuredClone(state); mutate(invalid);
+    assert.throws(() => parseCampaign(saved(invalid)), expected);
+    assert.equal(storage.getItem(SAVE_KEY), good);
+  }
+}));
+
+test('a saved signing selection must be one of the offered candidates', () => {
+  const state = checkpoint(); state.match = match();
+  const squad = state.teams['276'].squad;
+  state.choice = { candidates: [{ ...squad[0], index: 0, gain: .3 }, { ...squad[1], index: 1, gain: .1 }], selected: 1,
+    winnerName: 'France', loserName: 'Germany' };
+  assert.equal(parseCampaign(saved(state)).choice.selected, 1);
+  delete state.choice.selected;
+  assert.equal(parseCampaign(saved(state)).choice.selected, undefined, 'older saves have no selection');
+  for (const selected of [2, '1', -1, 0.5]) {
+    state.choice.selected = selected;
+    assert.throws(() => parseCampaign(saved(state)), /signing selection/);
+  }
+});

@@ -3,6 +3,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { unstable_batchedUpdates } from 'react-dom';
+import { flushSync } from 'react-dom';
 import App from '../src/App.jsx';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
@@ -390,7 +391,10 @@ function empireLabelsSnapshot(app, { geography = false } = {}) {
     correctText: labels.every(label => label.textContent.trim() === expectedText(label.dataset.empireLabel)),
     currentMetadata: metadata.length === app.state.aliveIds.length
       && metadata.every(label => app.state.aliveIds.includes(label.id) && label.text === expectedText(label.id)),
-    fontSizes: placements.every(placement => placement && Number.isFinite(placement.fontPx) && placement.fontPx >= 11 - .001 && placement.fontPx <= 32 + .001),
+    // v4 tiers (A-6, DEC D19): jsdom's 1024px window is the tablet tier, max 20px with a 9px floor; the map's own
+    // empire (managed, else followed, A-7) may shrink to 6.5px.
+    fontSizes: placements.every(placement => placement && Number.isFinite(placement.fontPx)
+      && placement.fontPx >= (placement.id === (app.managedId() || app.state.followedId) ? 6.5 : 9) - .001 && placement.fontPx <= 20 + .001),
     textPathsValid: placements.every(placement => placement?.validReference && placement.validCurve)
       && new Set(references).size === labels.length && labelPaths.length === labels.length
       && new Set(labelPaths.map(path => path.id)).size === labelPaths.length,
@@ -577,9 +581,25 @@ async function select(id, value) {
   if (el.value !== value) throw new Error(`select rejected ${value}: ${id}`);
 }
 
-async function launch(mounted, { sport = 'football', layer = 'nations', scope = 'world', clubScope = 'all', pacing = 'blitz', resolution = 'instant', seed = 20260910 }) {
+/** Political (DEC D18): ownership fills only, with no flag pattern or flag part anywhere on the map. */
+function politicalMapShown(app) {
+  const paths = countryPaths();
+  const playing = app.state.phase === 'playing' || app.state.phase === 'victory';
+  return app.state.mapMode === 'political' && paths.length > 0
+    && countryFlagParts().length === 0 && !document.querySelector('pattern[id^="fi-flag-"]')
+    && paths.every(path => !String(path.getAttribute('fill') || '').startsWith('url('))
+    && (!playing || document.querySelector('.map-modes button[aria-pressed="true"]')?.textContent.trim() === 'Political');
+}
+
+async function launch(mounted, { sport = 'football', layer = 'nations', scope = 'world', clubScope = 'all', pacing = 'blitz', resolution = 'instant', seed = 20260910,
+  role = 'spectator', team = null, turnOrder = null, targeting = null }) {
   await until('map + setup screen', () => text().includes('Launch campaign'));
+  // Political is the default (DEC D18); Flags must still show every nation's own flag behind the wizard. mapMode is
+  // UI-only, so the setup check puts the default back before launching: the kickoff then shows what a campaign opens on.
+  const setupPolitical = politicalMapShown(mounted.app);
+  await setState(mounted.app, { mapMode: 'flags' });
   const setupFlags = expectedFlagsShown(mounted.app);
+  await setState(mounted.app, { mapMode: 'political' });
   button(sport === 'basketball' ? 'Basketball' : 'Football').click();
   await sleep(20);
   button(layer === 'clubs' ? 'Clubs' : 'Nations').click();
@@ -588,6 +608,19 @@ async function launch(mounted, { sport = 'football', layer = 'nations', scope = 
   document.querySelector('.setup-advanced').open = true;
   await select('setup-pacing', pacing);
   await select('setup-resolution', resolution);
+  if (turnOrder || targeting) {
+    // Rules of war through the real matrix cell (both settings at once); it is enabled only for duel pacing (DEC D2).
+    const cell = document.querySelector(`.rule-matrix__cell[data-turn-order="${turnOrder || 'random'}"][data-targeting="${targeting || 'compass'}"]`);
+    if (!cell || cell.disabled) throw new Error(`rules of war cell unavailable: ${turnOrder} × ${targeting}`);
+    if (cell.getAttribute('aria-checked') !== 'true') cell.click();
+    await until('rules of war chosen', () => mounted.app.state.setup.turnOrder === (turnOrder || 'random')
+      && mounted.app.state.setup.targeting === (targeting || 'compass'));
+  }
+  if (role === 'manager') {
+    document.querySelector('button[role="radio"][aria-labelledby="setup-role-manager-title"]').click();
+    await until('manager role chosen', () => mounted.app.state.setup.role === 'manager');
+    await select('setup-managed-team', team);
+  }
   // Intercept only startCampaign's RNG assignment to seed generated roster
   // gaps too. The one-shot setter immediately becomes a normal writable field;
   // clocks, timer implementations and production source remain untouched.
@@ -601,7 +634,10 @@ async function launch(mounted, { sport = 'football', layer = 'nations', scope = 
   await until('campaign running', () => mounted.app.state.phase === 'playing');
   mounted.app.rng = makeRng(seed);
   await setState(mounted.app, { speed: SPEED });
-  return { setupFlags, kickoffFlags: expectedFlagsShown(mounted.app), kickoffFlagScope: regionalFlagsSnapshot(mounted.app) };
+  const kickoffPolitical = politicalMapShown(mounted.app);
+  // Every flag snapshot below needs Flags chosen explicitly.
+  await setState(mounted.app, { mapMode: 'flags' });
+  return { setupPolitical, setupFlags, kickoffPolitical, kickoffFlags: expectedFlagsShown(mounted.app), kickoffFlagScope: regionalFlagsSnapshot(mounted.app) };
 }
 
 /** Adjacent conquests merge flags; overseas conquests cannot distort them. */
@@ -687,6 +723,8 @@ export async function runEmpireFlagCheck() {
     await until('empire flag save offered', () => text().includes('Launch campaign') && resumed.app.state.hasSave);
     button('Resume', document.querySelector('.setup-save')).click();
     await until('empire flag saved state restored', () => resumed.app.state.phase === 'playing');
+    // mapMode is UI-only (never saved): a reload opens on Political, so choose Flags again before the snapshot.
+    await setState(resumed.app, { mapMode: 'flags' });
     const restored = empireFlagsSnapshot(resumed.app);
     return {
       kickoff, firstConquest, neighboring, disjoint, archipelago, zoomed, resized, restored,
@@ -727,31 +765,48 @@ function ownershipSnapshot(app) {
   };
 }
 
+/**
+ * Screens other than the current one are not mounted (DEC D11): show `view` synchronously, read the DOM, then
+ * restore the previous view. Only UI-only state changes, so the campaign and its timers are untouched.
+ */
+function withView(app, view, read) {
+  const { view: previousView, viewSource: previousSource } = app.state;
+  if (previousView === view) return read();
+  flushSync(() => app.setState({ view, viewSource: 'user' }));
+  try {
+    return read();
+  } finally {
+    flushSync(() => app.setState({ view: previousView, viewSource: previousSource }));
+  }
+}
+
 /** Read the real table against current squads, independently of its view model. */
 function standingsSnapshot(app) {
-  const { aliveIds, teams } = app.state;
-  const expected = aliveIds.slice().sort((a, b) => teamEff(teams[b]) - teamEff(teams[a])
-    || teams[a].name.localeCompare(teams[b].name) || a.localeCompare(b));
-  const rows = [...document.querySelectorAll('.fi-standings tbody tr')];
-  const model = app.powerTable(true);
-  return {
-    sorted: model.length === expected.length && model.every((row, i) => row.tid === expected[i])
-      && rows.length === expected.length && rows.every((row, i) => row.cells[1].querySelector('.fi-standing-team > span[title]')?.textContent.trim() === teams[expected[i]].name
-        && row.cells[3].querySelector('.fi-standing-eff')?.textContent.trim() === teamEff(teams[expected[i]]).toFixed(1)),
-    ranks: model.every((row, i) => row.rank === i + 1)
-      && rows.every((row, i) => row.cells[0].textContent.trim() === String(i + 1)),
-    announced: document.querySelector('.fi-standings th[aria-sort="descending"]')?.textContent.trim() === 'Strength',
-    gainsCorrect: rows.length === expected.length && rows.every((row, i) => {
-      const team = teams[expected[i]];
-      const gain = roundedGain(teamEff(team), team.baseEff ?? teamEff(team));
-      const badge = row.cells[3].querySelector('[data-testid="standing-strength-gain"]');
-      return gain > 0
-        ? !!badge && badge.classList.contains('fi-strength-gain') && badge.textContent.trim() === `+${gain.toFixed(1)}`
-        : !badge;
-    }),
-    gains: rows.map(row => row.cells[3].querySelector('[data-testid="standing-strength-gain"]')?.textContent.trim() || null),
-    count: rows.length,
-  };
+  return withView(app, 'ledger', () => {
+    const { aliveIds, teams } = app.state;
+    const expected = aliveIds.slice().sort((a, b) => teamEff(teams[b]) - teamEff(teams[a])
+      || teams[a].name.localeCompare(teams[b].name) || a.localeCompare(b));
+    const rows = [...document.querySelectorAll('.fi-standings tbody tr')];
+    const model = app.powerTable(true);
+    return {
+      sorted: model.length === expected.length && model.every((row, i) => row.tid === expected[i])
+        && rows.length === expected.length && rows.every((row, i) => row.cells[1].querySelector('.fi-standing-team > span[title]')?.textContent.trim() === teams[expected[i]].name
+          && row.cells[3].querySelector('.fi-standing-eff')?.textContent.trim() === teamEff(teams[expected[i]]).toFixed(1)),
+      ranks: model.every((row, i) => row.rank === i + 1)
+        && rows.every((row, i) => row.cells[0].textContent.trim() === String(i + 1)),
+      announced: document.querySelector('.fi-standings th[aria-sort="descending"]')?.textContent.trim() === 'Strength',
+      gainsCorrect: rows.length === expected.length && rows.every((row, i) => {
+        const team = teams[expected[i]];
+        const gain = roundedGain(teamEff(team), team.baseEff ?? teamEff(team));
+        const badge = row.cells[3].querySelector('[data-testid="standing-strength-gain"]');
+        return gain > 0
+          ? !!badge && badge.classList.contains('fi-strength-gain') && badge.textContent.trim() === `+${gain.toFixed(1)}`
+          : !badge;
+      }),
+      gains: rows.map(row => row.cells[3].querySelector('[data-testid="standing-strength-gain"]')?.textContent.trim() || null),
+      count: rows.length,
+    };
+  });
 }
 
 /** Verify the earned rating comes from the squad, not territory or score. */
@@ -960,6 +1015,9 @@ export async function runResumeCheck(scenario = {}) {
     const labelsAfter = empireLabelsSnapshot(second.app);
     after.ownedByFirstAlive = Object.values(second.app.state.own).filter(owner => owner === before.firstAlive).length;
     const restoredMap = countryPaths().filter(path => path.dataset.owner).every(path => path.dataset.owner === second.app.state.own[path.dataset.country]);
+    // A reload starts on Political because mapMode is UI-only; Flags then shows the restored owners' flags.
+    const reloadPolitical = politicalMapShown(second.app);
+    await setState(second.app, { mapMode: 'flags' });
     const restoredFlags = expectedFlagsShown(second.app);
     const flagScopeAfter = regionalFlagsSnapshot(second.app);
 
@@ -968,7 +1026,7 @@ export async function runResumeCheck(scenario = {}) {
     button(second.app.state.match && !second.app.state.match.applied ? 'Finish match' : 'Next match').click();
     await until('resumed campaign finishes another match', () => second.app.state.matches > after.matches, 60000);
     return {
-      fielded, offeredResume, before, after, restoredMap, restoredFlags,
+      fielded, offeredResume, before, after, restoredMap, restoredFlags, reloadPolitical,
       kickoffFlagScope, flagScopeBefore, flagScopeAfter, flagScopeAfterMatch: regionalFlagsSnapshot(second.app),
       standingsBefore, standingsAfter, standingsAfterMatch: standingsSnapshot(second.app),
       labelsBefore, labelsAfter, labelsAfterMatch: empireLabelsSnapshot(second.app),
@@ -983,13 +1041,325 @@ export async function runResumeCheck(scenario = {}) {
   }
 }
 
+/** DEC D3: the round-robin queue for `aliveIds`: starting strength (baseEff, else live) desc, then name, then id. */
+function expectedRoundRobin(teams, aliveIds) {
+  const strength = id => (Number.isFinite(teams[id]?.baseEff) ? teams[id].baseEff : teamEff(teams[id]));
+  return aliveIds.slice().sort((a, b) => strength(b) - strength(a)
+    || String(teams[a].name).localeCompare(String(teams[b].name), 'en') || (a < b ? -1 : a > b ? 1 : 0));
+}
+
+/** Audit recorded round-robin turns (DEC D3): queue order per cycle, skips only of eliminated entries, round per cycle. */
+function roundRobinAudit(turns) {
+  const errors = [];
+  let previous = null, cycles = 0;
+  turns.forEach((turn, i) => {
+    const alive = new Set(turn.alive);
+    if (!previous || turn.newRound) {
+      cycles++;
+      if (!turn.newRound) errors.push(`turn ${i}: the first turn does not open a cycle`);
+      if (JSON.stringify(turn.turnQueue) !== JSON.stringify(turn.expected)) errors.push(`turn ${i}: queue ${turn.turnQueue.join(',')} is not ${turn.expected?.join(',')}`);
+      if (turn.turnIndex !== 1) errors.push(`turn ${i}: a cycle starts at index ${turn.turnIndex}`);
+      if (turn.round !== (previous ? previous.round + 1 : 1)) errors.push(`turn ${i}: cycle round ${turn.round} after ${previous?.round ?? 0}`);
+      if (previous && previous.turnQueue.slice(previous.turnIndex).some(id => alive.has(id))) errors.push(`turn ${i}: a cycle ended with survivors still to attack`);
+    } else {
+      if (JSON.stringify(turn.turnQueue) !== JSON.stringify(previous.turnQueue)) errors.push(`turn ${i}: the queue changed mid-cycle`);
+      if (turn.round !== previous.round) errors.push(`turn ${i}: round ${turn.round} changed mid-cycle (${previous.round})`);
+      if (turn.turnIndex <= previous.turnIndex) errors.push(`turn ${i}: index ${turn.turnIndex} did not advance from ${previous.turnIndex}`);
+      if (turn.turnQueue.slice(previous.turnIndex, turn.turnIndex - 1).some(id => alive.has(id))) errors.push(`turn ${i}: a surviving entry was skipped`);
+    }
+    if (turn.turnQueue[turn.turnIndex - 1] !== turn.attackerId || !alive.has(turn.attackerId)) errors.push(`turn ${i}: attacker ${turn.attackerId} is not the live queue entry`);
+    previous = turn;
+  });
+  return { valid: turns.length > 0 && errors.length === 0, errors: errors.slice(0, 5), cycles };
+}
+
+const mastheadPrimary = () => document.querySelector('.mast [data-primary]');
+const phonePrimary = () => document.querySelector('.phone-bar [data-primary]');
+/** The masthead CTA shows `mastLabel || label` and the phone bar `label`, as exact textContent (DEC D13). */
+const primaryShown = action => mastheadPrimary()?.textContent.trim() === (action.mastLabel || action.label)
+  && phonePrimary()?.textContent.trim() === action.label && mastheadPrimary().disabled === !!action.disabled;
+
+/** "You choose" (RF§2.5): panel row, map reach, panel model and both primaries name the same selection, on the Map. */
+function targetAgreement(app) {
+  const pending = app.state.pendingTarget;
+  const label = `Attack ${app.state.teams[pending.selectedId]?.name}`;
+  const checked = [...document.querySelectorAll('.target-panel [role="radio"][aria-checked="true"]')];
+  const reach = app.reachModel();
+  const action = app.primaryAction();
+  return checked.length === 1 && checked[0].dataset.teamId === pending.selectedId
+    && pending.optionIds.includes(pending.selectedId)
+    && app.targetPanelModel().selectedId === pending.selectedId
+    && reach?.selectedId === pending.selectedId && reach.ids.includes(pending.selectedId)
+    && document.querySelectorAll('[data-testid="world-map"] [data-reach="in"]').length > 0
+    && action?.id === 'attack' && action.label === label && primaryShown(action)
+    && app.currentView() === 'map' && document.querySelector('.app-shell')?.dataset.view === 'map';
+}
+
+/** The pending signing holds the conquest screen (DEC D11, D15); every label names the highlighted candidate. */
+function signingAgreement(app) {
+  const candidate = app.selectedCandidate(app.state.choice);
+  const checked = [...document.querySelectorAll('.screen--conquest .conquest-option[aria-checked="true"]')];
+  const action = app.primaryAction();
+  return !!candidate && app.currentView() === 'conquest' && document.querySelector('.app-shell')?.dataset.view === 'conquest'
+    && !!document.querySelector('.screen--conquest') && !document.getElementById('view-panel-ledger')
+    && document.getElementById('view-tab-map')?.getAttribute('aria-current') === 'page'
+    && !!document.getElementById('view-tab-ledger')?.disabled
+    && checked.length === 1 && Number(checked[0].dataset.index) === candidate.index
+    && document.querySelector('.screen--conquest .conquest-footer__label')?.textContent.trim() === `Sign ${candidate.name}`
+    && action?.id === 'sign' && action.label === `Sign ${candidate.name}` && action.mastLabel === 'Sign player' && primaryShown(action);
+}
+
+/**
+ * A manager campaign played only through the primary action (DEC D10, D13, D15; PLAN §4.12 task 3): round robin ×
+ * "You choose" target choice (Attack <team>), the tactical gate (Continue), live matches (Finish match) and signings
+ * (Sign <player>), until a champion — or, if the managed team falls, Continue as spectator and autoplay to the end.
+ */
+export async function runManagerCampaign({ team = '380', ...scenario }) {
+  const seen = new Set();
+  const mounted = mount();
+  let sampler = null;
+  try {
+    const { kickoffPolitical } = await launch(mounted, { ...scenario, role: 'manager', team, turnOrder: 'round-robin', targeting: 'player' });
+    const app = mounted.app;
+    const { settings } = app.state;
+    const settingsApplied = settings.role === 'manager' && settings.managedTeamId === team && app.managedId() === team
+      && settings.turnOrder === 'round-robin' && settings.targeting === 'player' && settings.pacing === 'duel'
+      && settings.resolution === 'ticker' && settings.scope === scenario.scope && !settings.express && app.playerTargets();
+    button('Political').click();
+    await until('manager map back on Political', () => app.state.mapMode === 'political');
+    const fielded = app.state.aliveIds.length;
+    const teamName = app.state.teams[team].name;
+
+    // Record every duel turn as the app commits it, with its campaign-RNG sample count (DEC D1: exactly three).
+    const turns = [];
+    let unscheduledTurns = 0;
+    const realBeginDuel = app.beginDuel;
+    app.beginDuel = function (turn, ...rest) {
+      const generator = this.rng;
+      let samples = 0;
+      const counting = Object.assign(() => { samples++; return generator(); }, { getState: generator.getState, setState: generator.setState });
+      const alive = this.state.aliveIds.slice();
+      const managed = this.managedId();
+      this.rng = counting;
+      try {
+        return realBeginDuel.call(this, turn, ...rest);
+      } finally {
+        this.rng = generator;
+        if (turn?.attackerId) {
+          turns.push({ attackerId: turn.attackerId, turnQueue: turn.turnQueue.slice(), turnIndex: turn.turnIndex, round: turn.round,
+            newRound: !!turn.newRound, alive, samples, managedAttacker: !!managed && turn.attackerId === managed,
+            expected: turn.newRound ? expectedRoundRobin(this.state.teams, alive) : null });
+        } else unscheduledTurns++;
+      }
+    };
+
+    const labelsAtKickoff = empireLabelsSnapshot(app);
+    const standingsAtKickoff = standingsSnapshot(app);
+    let standingsStayedSorted = standingsAtKickoff.sorted;
+    let standingsRanksStayedSequential = standingsAtKickoff.ranks;
+    let standingsGainsStayedCorrect = standingsAtKickoff.gainsCorrect;
+    let standingsSamples = 0, sampledMatches = 0, labelSampledMatches = 0, labelsStayedValid = true;
+    const labelFailures = [];
+    let decisionSamples = 0, timersWhileDeciding = 0, spectatorTargets = 0, awaitingMapReturn = false, autoReturns = 0;
+    let lastProgress = Date.now();
+    const progress = () => JSON.stringify({ phase: app.state.phase, round: app.state.round, turnIndex: app.state.turnIndex,
+      matches: app.state.matches, alive: app.state.aliveIds.length, primary: app.primaryAction()?.id ?? null,
+      spin: app.state.spin?.stage ?? null, match: app.state.match && { applied: app.state.match.applied, status: app.state.match.status },
+      choice: !!app.state.choice, pendingTarget: !!app.state.pendingTarget, tactical: !!app.state.tacticalChoice,
+      eliminated: !!app.state.managerElimination, managementEnded: app.state.managementEnded, view: app.state.view, timers: app.timers.size });
+    sampler = setInterval(() => {
+      const st = app.state;
+      // DEC D11: an automatic switch to the Match view goes back to the Map (signing, or the next turn's start).
+      if (st.view === 'match' && st.viewSource === 'auto') awaitingMapReturn = true;
+      else if (awaitingMapReturn && st.view === 'map') { awaitingMapReturn = false; autoReturns++; }
+      if (st.choice || st.pendingTarget) {
+        // The derived view holds conquest/map while a decision is pending: no Ledger samples now, and no clock timers.
+        decisionSamples++;
+        if (app.timers.size !== 0) timersWhileDeciding++;
+        if (st.pendingTarget && st.managementEnded) spectatorTargets++;
+        return;
+      }
+      if (st.matches !== sampledMatches) {
+        sampledMatches = st.matches;
+        const standings = standingsSnapshot(app);
+        standingsStayedSorted &&= standings.sorted;
+        standingsRanksStayedSequential &&= standings.ranks;
+        standingsGainsStayedCorrect &&= standings.gainsCorrect;
+        standingsSamples++;
+      }
+      // Labels are only laid out while the map is visible (the Match view hides it).
+      if (st.matches !== labelSampledMatches && app.currentView() === 'map') {
+        labelSampledMatches = st.matches;
+        const labels = empireLabelsSnapshot(app);
+        const failed = ['onePerOwner', 'onlyCurrentOwners', 'correctText', 'currentMetadata', 'fontSizes',
+          'withinViewport', 'textPathsValid', 'gentleArches', 'coastalPolicyValid', 'uiPolicyEnabled'].filter(key => !labels[key]);
+        if (failed.length) labelFailures.push({ matches: st.matches, failed, ids: labels.ids, alive: st.aliveIds });
+        labelsStayedValid &&= failed.length === 0;
+      }
+      if (document.querySelector('[data-testid="match-card"]')) seen.add('match-card');
+      if (document.querySelector('section.turn-strip[data-variant="round-robin"]')) seen.add('turn-strip');
+      if (st.spin) seen.add('spinner');
+      if (Date.now() - lastProgress >= 10000) {
+        lastProgress = Date.now();
+        console.log(`    progress: ${progress()}`);
+      }
+    }, 10);
+
+    const turnKey = s => [s.round, s.turnIndex, !!s.spin, !!s.pendingTarget, !!s.tacticalChoice, s.matches,
+      s.match ? s.match.applied : null, s.log.length, s.phase].join('|');
+    const clicks = {};
+    const targetKeys = new Set();
+    const optionCounts = [];
+    let targetAgree = true, retargeted = null, attackHitsChoice = true, expectedTarget = null;
+    let tacticalGates = 0, tacticalQuiet = true, previewOffered = true, autoSwitched = false, autoRevertFailures = 0;
+    let signings = 0, signAgree = true, resigned = null, claimedSelected = true, primariesShown = true;
+    let decisionsWithoutTimers = true, eliminated = null, eliminationShown = false, pendingAfterElimination = 0, spectated = false;
+    const deadline = Date.now() + 420000;
+    while (app.state.phase !== 'victory') {
+      if (Date.now() > deadline) throw new Error(`manager campaign stalled: ${progress()}`);
+      const st = app.state;
+      if (st.managerElimination) {
+        const dialog = document.querySelector('.manager-ending[role="dialog"]');
+        eliminated = { round: st.round, placement: st.managerElimination.placement, by: st.managerElimination.opponentName };
+        eliminationShown = !!dialog && document.getElementById('manager-ending-title')?.textContent.trim() === `${teamName} is out`
+          && app.primaryAction() === null && !mastheadPrimary() && app.timers.size === 0;
+        button('Continue as spectator', dialog).click();
+        await until('spectating after elimination', () => !app.state.managerElimination && app.state.managementEnded);
+        continue;
+      }
+      const action = app.primaryAction();
+      if (!action || action.disabled) { await sleep(10); continue; }
+      primariesShown &&= primaryShown(action);
+      clicks[action.id] = (clicks[action.id] || 0) + 1;
+      if (action.id === 'attack') {
+        const pending = st.pendingTarget;
+        if (st.managementEnded) pendingAfterElimination++;
+        const key = `${pending.round}:${pending.turn?.turnIndex}`;
+        if (!targetKeys.has(key)) { targetKeys.add(key); optionCounts.push(pending.optionIds.length); }
+        targetAgree &&= targetAgreement(app);
+        decisionsWithoutTimers &&= app.timers.size === 0;
+        if (retargeted === null && pending.optionIds.length >= 2) {
+          // Pick another row in the panel: the selection, the map and the primary must follow it.
+          const other = pending.optionIds.find(id => id !== pending.selectedId);
+          document.querySelector(`.target-panel [role="radio"][data-team-id="${other}"]`).click();
+          await until('another target selected', () => app.state.pendingTarget?.selectedId === other);
+          retargeted = targetAgreement(app) && app.primaryAction().label === `Attack ${app.state.teams[other].name}`;
+        }
+        expectedTarget = app.state.pendingTarget.selectedId;
+        mastheadPrimary().click();
+        await until('target confirmed', () => !app.state.pendingTarget);
+        continue;
+      }
+      if (action.id === 'kickoff') {
+        const gate = st.tacticalChoice;
+        tacticalGates++;
+        if (gate.aId === team && expectedTarget !== null) { attackHitsChoice &&= gate.dId === expectedTarget; expectedTarget = null; }
+        // DEC D10: the gate waits on the Map; the Match preview dialog no longer opens by itself.
+        tacticalQuiet &&= [gate.aId, gate.dId].includes(team) && !st.match && !st.tacticalPreview
+          && !document.querySelector('[aria-modal="true"]') && action.label === 'Continue';
+        if (app.currentView() === 'map') previewOffered &&= !!document.querySelector('.fixture__preview') && !!document.querySelector('.fixture__simulate');
+        mastheadPrimary().click();
+        await until('managed kickoff', () => !app.state.tacticalChoice && !!app.state.match);
+        autoSwitched ||= app.state.view === 'match' && app.state.viewSource === 'auto' && !!document.getElementById('view-panel-match');
+        continue;
+      }
+      if (action.id === 'finish') {
+        mastheadPrimary().click();
+        await until('match settled', () => { const s = app.state; return !s.match || s.match.applied || !!s.choice || !!s.managerElimination; });
+        continue;
+      }
+      if (action.id === 'sign') {
+        signings++;
+        const m = st.match;
+        const loserId = m.winner === m.aId ? m.dId : m.aId;
+        signAgree &&= signingAgreement(app);
+        decisionsWithoutTimers &&= app.timers.size === 0;
+        if (resigned === null && st.choice.candidates.length >= 2) {
+          const other = st.choice.candidates.find(candidate => candidate.index !== app.selectedCandidate(st.choice).index);
+          document.querySelector(`.screen--conquest .conquest-option[data-index="${other.index}"]`).click();
+          await until('another signing selected', () => app.state.choice?.selected === other.index);
+          resigned = signingAgreement(app);
+        }
+        const candidate = app.selectedCandidate(app.state.choice);
+        const round = app.state.round;
+        mastheadPrimary().click();
+        await until('signing applied', () => !app.state.choice && !!app.state.match?.applied);
+        const claimed = app.state.teams[team].squad.at(-1);
+        claimedSelected &&= claimed?.name === candidate.name && claimed.fromId === loserId && claimed.joined === round
+          && Number.isFinite(claimed.claimGain) && !app.state.aliveIds.includes(loserId) && app.state.view === 'map';
+        continue;
+      }
+      if (action.id === 'continue') {
+        const before = turnKey(app.state);
+        const wasAuto = st.viewSource === 'auto';
+        mastheadPrimary().click();
+        await until('next turn started', () => turnKey(app.state) !== before);
+        // The next turn starts on the Map unless it is already another managed kickoff.
+        if (wasAuto && app.state.view !== 'map' && !(app.state.view === 'match' && app.state.viewSource === 'auto')) autoRevertFailures++;
+        continue;
+      }
+      if (action.id === 'results') {
+        // The last conquest opens the results by itself; waiting avoids a second victory commit after View map.
+        await until('campaign results', () => app.state.phase === 'victory');
+        continue;
+      }
+      if (action.id === 'play' && st.managementEnded) {
+        // Spectating after elimination (DEC D2: targets come from the compass again): autoplay to the champion.
+        spectated = true;
+        mastheadPrimary().click();
+        await until('spectator campaign reaches a champion', () => app.state.phase === 'victory' || !!app.state.pendingTarget, 300000);
+        continue;
+      }
+      throw new Error(`unexpected primary action for the manager: ${action.id} "${action.label}" — ${progress()}`);
+    }
+    clearInterval(sampler);
+    app.beginDuel = realBeginDuel;
+
+    const champion = app.state.teams[app.state.aliveIds[0]];
+    const victoryDialog = document.querySelector('[role="dialog"][aria-labelledby="victory-title"]');
+    const victoryScreen = !!victoryDialog && victoryDialog.textContent.includes('Campaign complete')
+      && document.getElementById('victory-title').textContent === champion.name.toUpperCase();
+    button('View map', victoryDialog).click();
+    await until('manager victory dialog closes to map', () => !document.querySelector('[role="dialog"][aria-labelledby="victory-title"]'));
+    await until('manager campaign idle', () => app.timers.size === 0 && app.state.spin === null, 10000);
+    const ledger = app.state.decisionLedger || [];
+    const managedTurns = turns.filter(turn => turn.managedAttacker).length;
+    return {
+      fielded, teamName, settingsApplied, kickoffPolitical, seen: [...seen].sort(), clicks,
+      champion: champion.name, rounds: app.state.round, matches: app.state.matches,
+      fallen: app.state.fallen.length, territoriesHeld: Object.values(app.state.own).filter(owner => owner === champion.id).length,
+      totalTerritories: Object.keys(app.state.own).length,
+      roundRobin: roundRobinAudit(turns), turns: turns.length, unscheduledTurns,
+      threeSamples: turns.length > 0 && turns.every(turn => turn.samples === 3), sampleCounts: [...new Set(turns.map(turn => turn.samples))],
+      managedTurns, targetChoices: targetKeys.size, optionCounts,
+      targetAgree, retargeted, attackHitsChoice, pendingAfterElimination: pendingAfterElimination + spectatorTargets,
+      tacticalGates, tacticalQuiet, previewOffered, autoSwitched,
+      autoReturned: autoReturns > 0 && autoRevertFailures === 0 && (!awaitingMapReturn || app.state.view === 'map'), autoReturns,
+      signings, signAgree, resigned, claimedSelected, primariesShown,
+      noTimersWhileDeciding: decisionsWithoutTimers && timersWhileDeciding === 0, decisionSamples,
+      ledgerCounts: ledger.filter(entry => entry.type === 'target').length === targetKeys.size
+        && ledger.filter(entry => entry.type === 'tactic').length === tacticalGates
+        && ledger.filter(entry => entry.type === 'signing').length === signings,
+      managerConquestsSigned: (app.state.stats[team]?.conq ?? 0) === signings,
+      eliminated, eliminationShown, spectated,
+      standingsAtKickoff, standingsStayedSorted, standingsRanksStayedSequential, standingsGainsStayedCorrect, standingsSamples,
+      labelsAtKickoff, labelsStayedValid, labelFailures: labelFailures.slice(0, 3), labelsAtFinish: empireLabelsSnapshot(app),
+      victoryScreen, campaignIdle: app.state.spin === null && app.timers.size === 0,
+      saveWritten: !!localStorage.getItem('football_imperialism_v1'),
+    };
+  } finally {
+    clearInterval(sampler);
+    mounted.unmount();
+  }
+}
+
 export async function run(scenario) {
   const { layer = 'nations' } = scenario;
   const seen = new Set();
   const mounted = mount();
   let sampler;
   try {
-    const { setupFlags, kickoffFlags, kickoffFlagScope } = await launch(mounted, scenario);
+    const { setupPolitical, setupFlags, kickoffPolitical, kickoffFlags, kickoffFlagScope } = await launch(mounted, scenario);
     const app = mounted.app;
     // At normal speed there is an 80ms opening callback: pausing before it
     // fires must cancel its effect, including a duel's otherwise visible spin.
@@ -1012,8 +1382,8 @@ export async function run(scenario) {
     const labelFailures = [];
     let standingsSamples = 0;
     let sampledMatches = -1;
-    // Flags are the default; exercise Political explicitly before sampling its
-    // unchanged colour/conquest guarantees throughout a complete campaign.
+    // Political is the default (DEC D18); launch() left Flags on for its flag snapshots, so select Political
+    // explicitly before sampling its unchanged colour/conquest guarantees throughout a complete campaign.
     button('Political').click();
     await until('political map selected', () => app.state.mapMode === 'political');
     const initialHeld = countryPaths().filter(path => path.dataset.owner);
@@ -1107,18 +1477,18 @@ export async function run(scenario) {
     const stealsAllTeams = Object.values(app.state.stats).reduce((n, stats) => n + stats.steals.length, 0);
     const conquestsAllTeams = Object.values(app.state.stats).reduce((n, stats) => n + stats.conq, 0);
 
-    // Select through the map, then exercise every actual sidebar tab and panel.
+    // Select through the map, then open every masthead screen through its real nav button.
     heldPaths[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     await until('map opens the champion squad', () => app.state.selected === champion.id && app.state.tab === 'squad');
     const tabs = {};
-    for (const [tab, label] of [['feed', 'Activity'], ['power', 'Standings'], ['squad', 'Squad']]) {
+    for (const [view, label] of [['chronicle', 'Chronicle'], ['ledger', 'Ledger'], ['squad', 'Squad']]) {
       button(label).click();
-      await until(`${label} panel`, () => document.querySelector(`#intel-tab-${tab}[aria-selected="true"]`) && document.getElementById(`intel-panel-${tab}`));
-      tabs[tab] = document.getElementById(`intel-panel-${tab}`).textContent.length;
+      await until(`${label} screen`, () => document.querySelector(`#view-tab-${view}[aria-current="page"]`) && document.getElementById(`view-panel-${view}`));
+      tabs[view] = document.getElementById(`view-panel-${view}`).textContent.length;
     }
 
     return {
-      nations, fielded, layer, rapidPauseHeld, setupFlags, kickoffFlags, politicalAtStart, politicalConquest, structuredConsequences, finalFlags,
+      nations, fielded, layer, rapidPauseHeld, setupPolitical, setupFlags, kickoffPolitical, kickoffFlags, politicalAtStart, politicalConquest, structuredConsequences, finalFlags,
       kickoffFlagScope, firstConquestFlagScope, victoryFlagScope, finalFlagScope,
       standingsAtKickoff, standingsStayedSorted, standingsRanksStayedSequential, standingsGainsStayedCorrect, standingsSamples,
       labelsAtKickoff, labelsStayedValid, labelFailures, labelsAtFinish: empireLabelsSnapshot(app),

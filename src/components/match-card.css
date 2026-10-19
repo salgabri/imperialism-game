@@ -1,0 +1,223 @@
+/* Owner: WP-MATCH (see PLAN.md §4). MatchCard v4 restyle: every class emitted by MatchCard.jsx (PLAN §4.11),
+   plus .live-minute (LiveMinute.jsx). Full variant = archived/Chronicle card (DOM frozen, CSS only);
+   compact variant = the Map column's live/done fixture block (DEC D10/D17, A§5 type scale).
+   README: square corners, Archivo/Archivo Narrow only, tabular numbers, kicker + 1px ink rule, no glows. */
+
+.live-minute { font-variant-numeric:tabular-nums; }
+
+/* ---------- Full variant ---------- */
+.fi-match { position:relative; min-width:0; color:var(--ink); font-family:var(--font-sans); }
+
+.fi-match-heading {
+  display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+  padding-bottom:6px; border-bottom:1px solid var(--ink);
+}
+.fi-match-heading h2 {
+  min-width:0; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--ink);
+}
+.fi-match-status {
+  flex:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+  font:600 var(--fs-label)/1.2 var(--font-sans); letter-spacing:.06em; text-transform:uppercase; font-variant-numeric:tabular-nums;
+}
+.fi-match-heading .fi-match-status.is-live::before { content:''; display:block; width:8px; height:8px; background:var(--you); }
+
+.fi-scoreboard {
+  display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:16px; margin-top:16px;
+}
+.fi-score-team {
+  display:flex; flex-direction:column; align-items:center; gap:6px; min-width:0; text-align:center; color:var(--ink);
+}
+.fi-score-team-button {
+  width:100%; min-height:var(--tap); padding:4px 2px; border:0; border-radius:0; background:none; font:inherit; cursor:pointer;
+}
+.fi-score-team-button:hover .fi-score-team-name { color:var(--you-text); }
+.fi-score-team > .flag-chip, .fi-score-team > .fi-team-monogram { max-width:100%; }
+.fi-score-team-name {
+  max-width:100%; overflow-wrap:anywhere;
+  font:700 18px/1.05 var(--font-narrow); letter-spacing:.02em; text-transform:uppercase;
+}
+.fi-score-eff { font:400 var(--fs-meta)/1.3 var(--font-sans); color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.fi-score-eff-value { color:var(--text-2); font-weight:600; }
+.fi-score-number {
+  display:flex; align-items:baseline; white-space:nowrap;
+  font:700 48px/.9 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--ink);
+}
+.fi-score-dash { margin:0 6px; color:var(--you-text); }
+
+.fi-match-odds {
+  display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin:14px 0 0;
+  font:600 var(--fs-num)/1.3 var(--font-sans); font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--ink);
+}
+.fi-match-odds > span:nth-child(2) { min-width:0; overflow:hidden; text-overflow:ellipsis; text-align:center; font-weight:400; font-size:var(--fs-meta); color:var(--muted); }
+.fi-series-status {
+  margin:10px 0 0; padding:7px 0; border-block:1px solid var(--rule);
+  font:600 13px/1.4 var(--font-sans); color:var(--even); font-variant-numeric:tabular-nums;
+}
+.fi-match-route { margin:8px 0 0; font:400 13px/1.4 var(--font-sans); color:var(--muted); }
+.fi-match-rule { height:1px; margin:14px 0 10px; background:var(--rule); }
+
+.fi-penalties { display:grid; gap:6px; margin:0 0 12px; }
+.fi-penalty-row {
+  display:flex; align-items:center; gap:8px;
+  font:600 11px/1 var(--font-sans); letter-spacing:.04em; color:var(--muted); font-variant-numeric:tabular-nums;
+}
+.fi-penalty-row > span { min-width:32px; }
+.fi-penalty-row > div { display:flex; flex-wrap:wrap; gap:4px; }
+.fi-penalty-row i { display:block; width:8px; height:8px; box-shadow:inset 0 0 0 1.5px var(--ink); }
+.fi-penalty-row i.scored { background:var(--ink); }
+.fi-penalty-row i.missed { box-shadow:inset 0 0 0 1.5px var(--loss); }
+
+.fi-match-events { max-height:132px; overflow-y:auto; overscroll-behavior:contain; }
+.fi-match-event {
+  display:grid; grid-template-columns:44px minmax(0,1fr); gap:8px; align-items:baseline; padding:5px 0;
+  border-top:1px solid var(--row-rule); font:400 13px/1.4 var(--font-sans); color:var(--ink);
+}
+.fi-match-event:first-child { border-top:0; }
+.fi-match-event > i { display:none; }
+.fi-event-time { color:var(--you-text); font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.fi-match-wait { margin:4px 0; font:400 13px/1.45 var(--font-sans); color:var(--muted); }
+
+.fi-match-result { margin-top:4px; animation:fiFlash 240ms ease-out; }
+.fi-match-result h3 {
+  margin:0 0 8px; font:700 22px/1 var(--font-narrow); letter-spacing:.01em; text-transform:uppercase; text-wrap:balance; color:var(--ink);
+}
+.fi-upset-label { margin-bottom:4px; font:700 11px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--you-text); }
+.fi-result-tiebreak { margin:-2px 0 8px; font:400 13px/1.4 var(--font-sans); color:var(--muted); }
+.fi-spoils-row {
+  display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--row-rule);
+  font:400 14px/1.35 var(--font-sans); color:var(--ink);
+}
+.fi-spoils-row > svg { flex:none; color:var(--muted); }
+.fi-spoils-row > span { flex:1; min-width:0; overflow-wrap:anywhere; }
+.fi-spoils-row strong { font-weight:600; }
+.fi-spoils-row small { display:block; margin-top:2px; font:400 12px/1.4 var(--font-sans); color:var(--muted); font-variant-numeric:tabular-nums; }
+.fi-reward-label {
+  display:block; margin-bottom:2px;
+  font:700 11px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+.fi-reward-value { color:var(--gain); font-variant-numeric:tabular-nums; }
+.fi-strength-reward { justify-content:space-between; }
+.fi-strength-reward > strong { flex:none; font-size:16px; }
+.fi-player-inspect {
+  display:inline; padding:0; border:0; background:none; color:var(--you-text); cursor:pointer;
+  font:600 14px/1.35 var(--font-sans); text-decoration:underline; text-underline-offset:3px;
+}
+.fi-player-inspect:hover { color:var(--ink); }
+.fi-result-fallback { margin:0 0 8px; font:400 13px/1.5 var(--font-sans); color:var(--muted); }
+.fi-conquest-details { margin-top:4px; font:400 13px/1.45 var(--font-sans); color:var(--muted); }
+.fi-conquest-details summary {
+  display:list-item; min-height:max(32px, var(--tap)); padding-top:8px; cursor:pointer;
+  font:700 12px/1.2 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--ink);
+}
+.fi-conquest-details p { margin:0 0 8px; }
+.fi-match-result .fi-context-button { margin-top:4px; }
+
+.fi-match-report { margin-top:12px; border-top:1px solid var(--rule); }
+.fi-match-report > summary {
+  display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:max(36px, var(--tap));
+  cursor:pointer; list-style:none;
+  font:700 12px/1.2 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--ink);
+}
+.fi-match-report > summary::-webkit-details-marker { display:none; }
+.fi-match-report > summary::after { content:'+'; flex:none; font:400 16px/1 var(--font-sans); color:var(--muted); }
+.fi-match-report[open] > summary::after { content:'−'; }
+.fi-match-report-count { margin-left:auto; font:400 var(--fs-meta)/1.2 var(--font-sans); letter-spacing:.04em; text-transform:none; color:var(--muted); font-variant-numeric:tabular-nums; }
+.fi-match-events--report { max-height:none; padding-bottom:8px; }
+
+.fi-match--archived .fi-score-number { font-size:40px; }
+
+/* ---------- Compact variant: the fixture block's live / done state (Map column, This turn) ---------- */
+.fi-match--compact { display:flex; flex-direction:column; padding-top:12px; }
+.fi-match--compact .fi-scoreboard { margin-top:0; gap:10px; }
+.fi-match--compact .fi-score-team { gap:5px; }
+.fi-match--compact .fi-scoreboard > :first-child { align-items:flex-end; text-align:right; }
+.fi-match--compact .fi-scoreboard > :last-child { align-items:flex-start; text-align:left; }
+.fi-match--compact .fi-score-team-button { padding:2px 0; }
+.fi-match--compact .fi-score-team-name {
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; overflow-wrap:normal; font-size:18px; line-height:1.1;
+}
+.fi-match--compact .fi-score-number { font-size:46px; }
+.fi-match--compact .fi-match-status {
+  display:flex; justify-content:center; align-items:center; gap:7px; margin:10px 0 0;
+  font:600 12px/1.2 var(--font-sans); letter-spacing:.06em; color:var(--ink);
+}
+.fi-match--compact .fi-match-status-mark { display:block; flex:none; width:8px; height:8px; background:var(--muted); }
+.fi-match--compact .fi-match-status.is-live .fi-match-status-mark { background:var(--you); }
+
+/* A§5 odds row: "SRB 37%" [bar] "63% ITA"; the middle span keeps its text for assistive tech and tests. */
+.fi-match--compact .fi-match-odds {
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:10px; margin-top:12px;
+  font:600 13px/1.2 var(--font-sans);
+}
+.fi-match--compact .fi-match-odds > .fi-match-odds-bar {
+  position:relative; display:block; height:10px; overflow:hidden; background:var(--odds-track);
+  color:transparent; font-size:0; line-height:0; user-select:none;
+}
+.fi-match--compact .fi-match-odds-bar::before {
+  content:''; position:absolute; top:0; bottom:0; left:0; width:var(--odds-fill, 50%); background:var(--ink);
+}
+.fi-match--compact .fi-match-odds-bar::after { content:''; position:absolute; inset:0; box-shadow:inset 0 0 0 1.5px var(--ink); }
+.fi-match--compact .fi-match-route { margin-top:6px; }
+.fi-match--compact .fi-series-status { margin-top:10px; }
+.fi-match--compact .fi-penalties { margin:12px 0 0; }
+.fi-match--compact .fi-match-events {
+  margin-top:12px; max-height:calc(3 * 28px + 2px); border-top:1px solid var(--rule);
+}
+.fi-match--compact .fi-match-event { padding:4px 0; font-size:13px; text-transform:uppercase; letter-spacing:.02em; }
+
+/* Done (DEC D10 "result line", ≈200px): headline (+ upset tag) · one-line strength delta · collapsed details. */
+.fi-match--compact .fi-match-result { margin-top:10px; padding-top:8px; border-top:1px solid var(--ink); }
+.fi-match-result-head { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:2px 10px; }
+.fi-match--compact .fi-match-result h3 { min-width:0; margin:0; font-size:20px; }
+.fi-match-result-head > .fi-upset-label { flex:none; margin:0; }
+.fi-match--compact .fi-strength-reward { align-items:baseline; gap:10px; padding:6px 0 0; border-top:0; }
+.fi-match--compact .fi-strength-reward > span { display:flex; align-items:baseline; gap:8px; min-width:0; white-space:nowrap; }
+.fi-match--compact .fi-strength-reward .fi-reward-label { min-width:0; margin:0; overflow:hidden; text-overflow:ellipsis; }
+.fi-match--compact .fi-strength-reward small { flex:none; display:inline; margin:0; }
+.fi-match-spoils { margin-top:4px; }
+.fi-match-spoils > summary {
+  display:flex; align-items:center; gap:10px; min-height:max(28px, var(--tap)); cursor:pointer; list-style:none;
+  font:700 12px/1.2 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--ink);
+}
+.fi-match-spoils > summary::-webkit-details-marker { display:none; }
+.fi-match-spoils > summary::after { content:'+'; flex:none; font:400 16px/1 var(--font-sans); color:var(--muted); }
+.fi-match-spoils[open] > summary::after { content:'−'; }
+.fi-match-spoils-title { flex:none; }
+.fi-match-spoils-aside {
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:right;
+  font:400 var(--fs-meta)/1.2 var(--font-sans); letter-spacing:.02em; text-transform:none; color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.fi-match-spoils-body { padding-bottom:4px; }
+.fi-match--compact .fi-match-spoils-body > .fi-penalties { margin:6px 0 4px; }
+.fi-match--compact .fi-match-spoils-body > .fi-match-odds { margin-top:8px; }
+.fi-match--compact .fi-match-spoils-body > .fi-match-route { margin:6px 0 0; }
+.fi-match-spoils-body > .fi-context-button { margin-top:4px; }
+
+@media (min-width:1600px) {
+  .fi-match--compact .fi-score-team-name { font-size:22px; }
+  .fi-match--compact .fi-score-number { font-size:58px; }
+  .fi-match--compact .fi-match-odds { margin-top:14px; font-size:15px; }
+  .fi-match--compact .fi-match-odds > .fi-match-odds-bar { height:12px; }
+  .fi-match--compact .fi-match-status { font-size:13px; }
+  .fi-match--compact .fi-match-event { font-size:14px; }
+  .fi-match--compact .fi-match-result h3 { font-size:24px; }
+}
+@media (max-width:699.98px) {
+  .fi-match--compact { padding-top:9px; }
+  .fi-match--compact .fi-score-team-name { font-size:16px; }
+  .fi-match--compact .fi-score-number { font-size:40px; }
+  .fi-match--compact .fi-match-odds { margin-top:9px; }
+  .fi-match--compact .fi-match-events { max-height:calc(2 * 28px + 2px); }
+  .fi-player-inspect { display:inline-flex; align-items:center; min-height:44px; }
+  /* Done state in the collapsed phone sheet (≈285px at 390×844): same order, tighter rhythm, so a wrapped headline
+     or an upset tag still leaves "Match details" clear of the Continue bar. The 44px summary keeps its own air. */
+  .fi-match--compact .fi-match-status { margin-top:8px; }
+  .fi-match--compact .fi-match-result { margin-top:8px; padding-top:6px; }
+  .fi-match--compact .fi-strength-reward { padding-top:4px; }
+  .fi-match--compact .fi-match-spoils { margin-top:0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fi-match-result { animation:none; }
+}

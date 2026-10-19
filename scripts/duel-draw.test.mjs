@@ -206,3 +206,48 @@ test('an unreachable malformed owner retries the next attacker without consuming
   assert.equal(draw.reroutedAttacker, true);
   assert.equal(rng.calls(), 3);
 });
+
+// Round robin (DEC D1/D3): the queue names the attacker; the three samples are still drawn.
+test('a named attacker still consumes three samples and ignores the attacker roll', () => {
+  const board = boardOf({ a: [0, 0], b: [10, 10], c: [10, -10] },
+    { a: 'A', b: 'B', c: 'C' }, ['A', 'B', 'C'], { a: new Set(['b', 'c']) });
+  for (const attackerId of ['A', 'B', 'C']) {
+    for (const roll of [0, .34, .67, .999]) {
+      const rng = rngOf(roll, .125, .8);
+      const draw = createDuelDraw(rng, board, { attackerId });
+      finiteDraw(draw);
+      assert.equal(rng.calls(), 3);
+      assert.equal(draw.attackerId, attackerId);
+      assert.equal(draw.targetId, pickTarget(board, attackerId, 45).tid);
+      assert.equal(draw.reroutedAttacker, false);
+      assert.equal(draw.rotation, 360 * 3 + draw.bearing, 'decorative turns still come from the third sample');
+    }
+  }
+  const named = createDuelDraw(rngOf(0, .125, .8), board, { attackerId: 'A' });
+  assert.deepEqual(named, createDuelDraw(rngOf(0, .125, .8), board), 'same attacker → identical draw to the random path');
+});
+
+test('a named attacker is never rerouted: no route or no placement returns null after three samples', () => {
+  const board = boardOf({ far: [1e10, 0], b: [0, 0], c: [10, 0] }, { far: 'A', b: 'B', c: 'C' });
+  for (const attackerId of ['A', 'ghost']) {
+    const rng = rngOf(0, 0, .5);
+    assert.equal(createDuelDraw(rng, board, { attackerId }), null);
+    assert.equal(rng.calls(), 3);
+  }
+  const eliminated = boardOf({ a: [0, 0], b: [10, 0], c: [20, 0] }, { a: 'A', b: 'B', c: 'C' }, ['A', 'B']);
+  const rng = rngOf(0, 0, .5);
+  assert.equal(createDuelDraw(rng, eliminated, { attackerId: 'C' }), null, 'an eliminated queue entry gets no draw');
+  assert.equal(rng.calls(), 3);
+  for (const invalid of [null, boardOf({ a: [0, 0] }, { a: 'A', b: 'B' }, ['A', 'B'])]) {
+    const none = rngOf();
+    assert.equal(createDuelDraw(none, invalid, { attackerId: 'A' }), null);
+    assert.equal(none.calls(), 0, 'an unplayable field still draws nothing');
+  }
+});
+
+test('omitting attackerId (undefined or null) keeps the random draw byte for byte', () => {
+  const board = boardOf({ far: [1e10, 0], b: [0, 0], c: [10, 0] }, { far: 'A', b: 'B', c: 'C' });
+  const reference = JSON.stringify(createDuelDraw(rngOf(0, 0, .5), board));
+  for (const options of [{}, { attackerId: undefined }, { attackerId: null }, { speed: 1, reducedMotion: false }])
+    assert.equal(JSON.stringify(createDuelDraw(rngOf(0, 0, .5), board, options)), reference);
+});

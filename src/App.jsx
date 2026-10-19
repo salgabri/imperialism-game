@@ -1,61 +1,72 @@
 import React from 'react';
 import { CONFIG } from './config.js';
-import { C, FONT, pad3, tint, politicalColor } from './theme.js';
+import { C } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES } from './data/scopes.js';
-import { FLAG_CODES, flagUrl } from './data/flags.js';
-import { FLAG_SYMBOLS } from './data/flagSymbols.js';
 import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry, projPt } from './engine/geo.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
-import { layoutFlagSymbol } from './engine/flagSymbolLayout.js';
-import { getSport, DEFAULT_SPORT } from './sports/index.js';
-import {
-  drawBlitzPairs,
-  drawChaosPairs,
-  empireCenter,
-  seedClubs,
-  territories,
-} from './engine/campaign.js';
-import { createDuelDraw } from './engine/duelDraw.js';
+import { getSport } from './sports/index.js';
+import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns,
-  loadCampaign, inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent } from './engine/storage.js';
+  inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
-import { acquisitionOptions, automaticAcquisition, advanceSeries, campaignRecap, estimateSession, recordMatch } from './engine/campaignExperience.js';
 import { tacticalMatchParameters, tacticalOptions, competitiveBasketballTeams } from './engine/managerStrategy.js';
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
-import AcquisitionChoice from './components/AcquisitionChoice.jsx';
+import { createMinuteStore } from './engine/liveMinute.js';
+import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
+import { buildMasthead } from './viewModels/masthead.js';
+import { DEFAULT_SETUP, LOG_CAP } from './app/shared.js';
+import * as mapM from './app/mapMethods.jsx';
+import * as colM from './app/columnMethods.jsx';
+import * as matchM from './app/matchMethods.jsx';
+import * as squadM from './app/squadMethods.jsx';
+import * as conqM from './app/conquestMethods.jsx';
+import * as turnM from './app/turnMethods.jsx';
+import * as ledgerM from './app/ledgerMethods.jsx';
 import TacticalChoice from './components/TacticalChoice.jsx';
 import ManagerElimination from './components/ManagerElimination.jsx';
 import CampaignStorageDialog from './components/CampaignStorageDialog.jsx';
 import ExportCheckpoint from './components/ExportCheckpoint.jsx';
-import CommandBar from './components/CommandBar.jsx';
+import CommandBar, { SettingsPanel } from './components/CommandBar.jsx';
 import PlaybackBar from './components/PlaybackBar.jsx';
 import WorldMap from './components/WorldMap.jsx';
-import Sidebar from './components/Sidebar.jsx';
+import MatchCard from './components/MatchCard.jsx';
 import SetupOverlay from './components/SetupOverlay.jsx';
 import VictoryOverlay from './components/VictoryOverlay.jsx';
-import { MatchupPopup, ResultPopup, StealPopup, Toast } from './components/Popups.jsx';
+import { Toast } from './components/Popups.jsx';
+import { PhoneBar, PhoneTabBar, PhoneMoreSheet } from './components/PhoneChrome.jsx';
+import TurnStrip from './screens/turns/TurnStrip.jsx';
+import TargetPanel from './screens/turns/TargetPanel.jsx';
+import SpectatorPanel from './screens/turns/SpectatorPanel.jsx';
+import CampaignColumn from './screens/campaign/CampaignColumn.jsx';
+import MapOverlays from './screens/campaign/MapOverlays.jsx';
+import Ticker from './screens/campaign/Ticker.jsx';
+import ConquestScreen from './screens/conquest/ConquestScreen.jsx';
+import SquadScreen from './screens/squad/SquadScreen.jsx';
+import MatchScreen from './screens/match/MatchScreen.jsx';
+import LedgerScreen from './screens/ledger/LedgerScreen.jsx';
+import ChronicleScreen from './screens/ledger/ChronicleScreen.jsx';
 
 const MAP_URL = `${import.meta.env.BASE_URL}world-110m.v1.json`;
 const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
-const LOG_CAP = 220;
-const FEED_CAP = 90;
-const BATTLE_SCARS = 7;
-const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'UEFA', clubScope: 'all', pacing: 'duel', resolution: 'ticker',
-  preset: 'standard', seed: '', uncertainty: 'balanced', express: false, finale: 'single', role: 'spectator',
-  managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic' };
-
-/** A rating delta as an explicitly signed string, plus the colour to show it in. */
-function signed(delta) {
-  const rounded = Math.round(delta * 10) / 10;
-  if (Math.abs(rounded) < 0.05) return { text: '±0.0', color: C.textFaint };
-  return {
-    text: (rounded > 0 ? '+' : '−') + Math.abs(rounded).toFixed(1),
-    color: rounded > 0 ? C.green : C.red,
-  };
+/** True unless `a` and `b` are the same value or objects with the same keys holding identical values. */
+function contentChanged(a, b) {
+  if (a === b) return false;
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return true;
+  const keys = Object.keys(a);
+  return keys.length !== Object.keys(b).length || keys.some(key => !Object.prototype.hasOwnProperty.call(b, key) || a[key] !== b[key]);
 }
+
+/** Screens the masthead nav and the phone tab bar can choose (DEC D11). */
+const VIEWS = ['map', 'squad', 'match', 'ledger', 'chronicle'];
+/**
+ * Focus targets that keep their own Space behaviour (A-8). The phone More sheet takes focus when it opens: Space
+ * there scrolls the sheet instead of advancing the campaign out of sight behind it.
+ */
+const SPACE_IGNORE = 'input, select, textarea, summary, a, button, [contenteditable], [role=button], [role=tab], [role=radio], '
+  + '[role=switch], [role=dialog], [role=menu], .more-sheet';
 
 export default class App extends React.Component {
   state = {
@@ -79,8 +90,7 @@ export default class App extends React.Component {
     autoplay: false,
     speed: 1,
     tab: 'power',
-    mapMode: 'flags',
-    mobileView: 'map',
+    mapMode: mapM.DEFAULT_MAP_MODE,
     selected: null,
     hoverCid: null,
     flash: {},
@@ -97,6 +107,11 @@ export default class App extends React.Component {
     managedTeamId: null, managementEnded: false, managerElimination: null, tacticalChoice: null,
     historyFilter: '', decisionLedger: [], initialSettings: null,
     campaignId: null, revision: 0, campaignName: '', storageDialog: null, storageConflict: false,
+    // Saved turn-mode state (DEC D3, D8; WP-TURN adds it to campaignSnapshot and validation).
+    turnQueue: [], turnIndex: 0, pendingTarget: null,
+    // UI-only state (never saved, PLAN §3.1).
+    view: 'map', viewSource: 'user', squadReturn: null, tacticalPreview: false, phoneSheet: 'collapsed',
+    phoneMore: false, wholeMap: false, focusLayout: null, targetHoverId: null,
   };
 
   engagement = new SessionEngagement();
@@ -129,10 +144,19 @@ export default class App extends React.Component {
   coordRef = React.createRef();
   eventsRef = React.createRef();
 
+  /** One memo cache shared by every view-model builder (keys carry the owner prefix, PLAN §0.16). */
+  vmCache = new Map();
+  /** The live match minute lives outside React state (DEC D7); read through `useLiveMinute`. */
+  minuteStore = createMinuteStore();
+  minuteToken = null;
+  /** Clock tokens of the events, whistle and kicks the current match scheduled (WP-MATCH, A-12). */
+  matchTasks = new Set();
+
   componentDidMount() {
     window.addEventListener('storage', this.handleStorage);
     window.addEventListener('focus', this.handleFocus);
     window.addEventListener('blur', this.handleBlur);
+    window.addEventListener('keydown', this.handleKeyDown);
     document.addEventListener('visibilitychange', this.handleVisibility);
     this.boot();
   }
@@ -144,6 +168,7 @@ export default class App extends React.Component {
       window.removeEventListener('storage', this.handleStorage);
       window.removeEventListener('focus', this.handleFocus);
       window.removeEventListener('blur', this.handleBlur);
+      window.removeEventListener('keydown', this.handleKeyDown);
       document.removeEventListener('visibilitychange', this.handleVisibility);
     }
   }
@@ -152,8 +177,32 @@ export default class App extends React.Component {
     this.updateEngagement();
     const el = this.eventsRef.current;
     if (el) el.scrollTop = el.scrollHeight;
+    // Save when the match or spin CONTENT changed. Identity alone looped: when a click's sync update (revealAll's
+    // patchMatch) is queued behind a timer's not-yet-rendered default-priority update, every sync re-render rebases
+    // and re-runs the updater, minting an equal-but-new match; persist's own setState is such a re-render, so an
+    // identity test re-saved on every pass until React threw "Maximum update depth exceeded" (smoke, under load).
     if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading'
-        && (previous.match !== this.state.match || previous.spin !== this.state.spin)) this.persist();
+        && (contentChanged(previous.match, this.state.match) || contentChanged(previous.spin, this.state.spin))) this.persist();
+    // The signing screen and the target panel hold focus while they show; confirming unmounts them.
+    if (previous && ((previous.choice && !this.state.choice) || (previous.pendingTarget && !this.state.pendingTarget))) this.focusRescue = true;
+    if (this.focusRescue) this.rescueFocus();
+  }
+
+  /**
+   * After a decision screen unmounts with focus inside it, focus lands on the primary action (masthead or phone bar,
+   * whichever is rendered) instead of <body>. A disabled primary (the locked draw after an attack) is retried on later
+   * updates until one is enabled; any focus the user moves in the meantime cancels the rescue. DOM only, no timers.
+   */
+  rescueFocus() {
+    if (typeof document === 'undefined' || this.state.phase !== 'playing') { this.focusRescue = false; return; }
+    const active = document.activeElement;
+    if (active && active !== document.body && active.isConnected) { this.focusRescue = false; return; }
+    for (const button of document.querySelectorAll('[data-primary]')) {
+      if (button.disabled) continue;
+      button.focus?.({ preventScroll: true });
+      // A primary hidden by CSS (the masthead's on phone, the phone bar's on desktop) does not take focus.
+      if (document.activeElement === button) { this.focusRescue = false; return; }
+    }
   }
 
   // ---------- timing ----------
@@ -166,6 +215,8 @@ export default class App extends React.Component {
   clearTimers() {
     this.clearDraw();
     this.clock.clear();
+    this.matchTasks?.clear();
+    this.minuteToken = null;
   }
 
   /** Draw work has its own owner: reset, kickoff and unmount invalidate it. */
@@ -278,12 +329,13 @@ export default class App extends React.Component {
     this.viewResetKey = (this.viewResetKey || 0) + 1;
   }
 
+  /** The theatre's display name. The data's trailing "*" footnote marker ("Asia & Oceania*") is a setup-only device. */
   scopeName(settings = this.state.settings) {
     if (settings?.layer === 'clubs') {
       const scopes = CLUB_SCOPES(getSport(settings.sport));
-      return (scopes.find(x => x.id === settings.clubScope) || scopes[0]).name;
+      return plainScopeName((scopes.find(x => x.id === settings.clubScope) || scopes[0]).name);
     }
-    return SCOPES.find(x => x.id === settings?.scope)?.name || 'World War';
+    return plainScopeName(SCOPES.find(x => x.id === settings?.scope)?.name || 'World War');
   }
 
   // ---------- campaign lifecycle ----------
@@ -326,7 +378,11 @@ export default class App extends React.Component {
     const data = this.state.phase === 'setup' && this.saved ? this.saved
       : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState,
         metrics: { ...this.state.metrics, engagement: this.engagement.snapshot() } };
-    const pending = this.state.autoplay || !!this.state.spin || (this.state.match && !this.state.match.done);
+    const st = this.state;
+    // A decision gate (signing, approach, target, elimination) already holds the campaign with no timers armed, and
+    // the decision writes `paused: false` without touching the clock: pausing here would leave the clock frozen.
+    const gated = !!(st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination);
+    const pending = !gated && (st.autoplay || !!st.spin || (st.match && !st.match.done));
     if (pending) this.clock.pause();
     this.setState({ exportText: exportCampaign(data), exportFilename: `imperialism-${data.seed ?? 'campaign'}-match-${data.matches}.json`,
       ...(pending ? { autoplay: false, paused: true } : {}) });
@@ -376,11 +432,31 @@ export default class App extends React.Component {
     this.setState({ storageDialog: null, storageConflict: false }, () => this.resume());
   }
 
+  /**
+   * The wizard's team list (`managerTeams`): `{ id, name, rating, players, neighbours? }` sorted by name. `players` are
+   * the five best lineup starters of the built squad (so "Best players" matches the opening ratings, competitive
+   * presets included); `neighbours` are the land neighbours on the opening board, overseas territory included as at
+   * launch (board 03 "Fronts"). Uses its own seeded RNG, never `this.rng`; cached per setup key.
+   */
   setupTeams(setup = this.state.setup) {
-    const key = JSON.stringify([setup.sport, setup.layer, setup.scope, setup.clubScope, setup.seed, setup.rosterPreset]);
+    const key = JSON.stringify([setup.sport, setup.layer, setup.scope, setup.clubScope, setup.seed, setup.rosterPreset, !!this.geo]);
     if (this.setupTeamsCache?.key === key) return this.setupTeamsCache.teams;
-    const teams = this.opening(setup, makeRng(this.setupSeed(setup))).included
-      .map(team => ({ id: team.id, name: team.name, rating: teamEff(team) })).sort((a, b) => a.name.localeCompare(b.name));
+    const { included, own } = this.opening(setup, makeRng(this.setupSeed(setup)));
+    let board = null;
+    if (this.geo?.adj) {
+      const ids = new Set(included.map(team => team.id));
+      const opening = { ...own };
+      if (setup.layer !== 'clubs') {
+        for (const [shapeId, dep] of Object.entries(DEPENDENCIES)) if (ids.has(dep.of)) opening[shapeId] = dep.of;
+      }
+      board = { geo: this.geo, own: opening };
+    }
+    const teams = included.map(team => ({ id: team.id, name: team.name, rating: teamEff(team),
+      players: selectLineup(team).starters.filter(player => Number.isFinite(player?.rating))
+        .sort((a, b) => b.rating - a.rating || String(a.name).localeCompare(String(b.name))).slice(0, 5)
+        .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
+      ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) }))
+      .sort((a, b) => a.name.localeCompare(b.name));
     this.setupTeamsCache = { key, teams };
     return teams;
   }
@@ -396,7 +472,7 @@ export default class App extends React.Component {
     if (clubLayer) {
       const scope = CLUB_SCOPES(sport).find(x => x.id === su.clubScope) || CLUB_SCOPES(sport)[0];
       included = sport.clubs.filter(scope.filter).map(c => buildClub(c, sport));
-      scopeName = scope.name;
+      scopeName = plainScopeName(scope.name);
       if (this.geo) {
         own = seedClubs(this.geo, included);
         included = included.filter(c => Object.values(own).includes(c.id));
@@ -407,7 +483,7 @@ export default class App extends React.Component {
       included = su.scope === 'world' ? all : su.scope === 'elite'
         ? all.slice().sort((a, b) => b.str - a.str || teamEff(b) - teamEff(a)).slice(0, 32) : all.filter(scope.filter);
       for (const team of included) own[team.id] = team.id;
-      scopeName = scope.name;
+      scopeName = plainScopeName(scope.name);
     }
     if (sport.id === 'basketball' && su.rosterPreset === 'competitive')
       included = Object.values(competitiveBasketballTeams(Object.fromEntries(included.map(team => [team.id, team])), 'competitive'));
@@ -446,13 +522,17 @@ export default class App extends React.Component {
     this.setState(
       {
         phase: 'playing',
-        settings: { ...DEFAULT_SETUP, ...su, seed: String(seed) },
-        initialSettings: { ...DEFAULT_SETUP, ...su, seed: String(seed) },
+        settings: { ...DEFAULT_SETUP, ...su, ...this.launchRules(su), seed: String(seed) },
+        initialSettings: { ...DEFAULT_SETUP, ...su, ...this.launchRules(su), seed: String(seed) },
+        turnQueue: [], turnIndex: 0, pendingTarget: null, view: 'map', viewSource: 'user', tacticalPreview: false,
+        phoneMore: false, focusLayout: null, targetHoverId: null,
         managedTeamId: su.role === 'manager' ? su.managedTeamId : null, managementEnded: false,
         managerElimination: null, tacticalChoice: null, decisionLedger: [], historyFilter: '',
         campaignId: createCampaignId(), revision: 0,
         campaignName: `${getSport(su.sport).name} · ${scopeName}${su.role === 'manager' ? ' · ' + included.find(team => team.id === su.managedTeamId).name : ''}`,
         storageDialog: null, storageConflict: false,
+        // clearTimers() above dropped the tasks that would clear a previous campaign's notice and goal toast.
+        pu: null, toast: null,
         teams,
         own,
         aliveIds: included.map(t => t.id),
@@ -496,7 +576,7 @@ export default class App extends React.Component {
     this.rng = makeRng(s.seed ?? 1);
     this.rng.setState(s.rngState ?? s.seed ?? 1);
     this.fitMap(Object.keys(s.own), s.settings);
-    this.setState({
+    const restored = {
       phase: s.phase === 'victory' ? 'victory' : 'playing',
       settings: { ...DEFAULT_SETUP, ...s.settings },
       initialSettings: s.initialSettings || { ...DEFAULT_SETUP, ...s.settings },
@@ -506,6 +586,8 @@ export default class App extends React.Component {
       historyFilter: s.historyFilter || '', selectedHistoryId: s.selectedHistoryId || null,
       campaignId: s.campaignId || createCampaignId(), revision: s.revision || 0, campaignName: s.campaignName || `${getSport(s.settings.sport).name} · ${this.scopeName(s.settings)}`,
       storageDialog: null, storageConflict: false,
+      // clearTimers() above dropped the tasks that would clear the outgoing campaign's notice and goal toast.
+      pu: null, toast: null,
       teams: s.teams,
       own: s.own,
       aliveIds: s.aliveIds,
@@ -530,8 +612,17 @@ export default class App extends React.Component {
       startedAt: s.startedAt || Date.now(), completedAt: s.completedAt || (s.aliveIds.length === 1 ? s.savedAt : null),
       metrics: s.metrics || { leaderChanges: 0, acquisitions: [], previousLeader: null },
       saveStatus: s.legacy ? { ok: true, message: 'Legacy campaign restored. Future matches use the saved seed.' } : { ok: true, message: 'Campaign restored' },
-    }, () => {
-      if (s.choice || s.tacticalChoice || s.managerElimination) { this.persist(); return; }
+      turnQueue: s.turnQueue || [], turnIndex: s.turnIndex || 0, pendingTarget: s.pendingTarget || null,
+      view: 'map', viewSource: 'user', tacticalPreview: false, phoneMore: false, focusLayout: null, targetHoverId: null,
+    };
+    const gated = s.choice || s.tacticalChoice || s.managerElimination || s.pendingTarget;
+    // A restored unapplied match is presented again: the same auto-switch rule as a kickoff (DEC D11).
+    const autoView = !gated && s.match && !s.match.applied
+      ? this.autoMatchView({ ...this.state, ...restored }, s.match.aId, s.match.dId, { express: !!s.match.express, instant: !!s.match.instant }) : {};
+    // A reloaded signing is framed like a live one (A-2): the taken land beside the article (pure, no RNG).
+    const signingFocus = s.choice ? this.conquestFocus({ ...this.state, ...restored }) : {};
+    this.setState({ ...restored, ...autoView, ...signingFocus }, () => {
+      if (gated) { this.persist(); return; }
       if (s.match && !s.match.applied) this.presentMatch();
       else if (s.spin) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
       this.persist();
@@ -566,6 +657,8 @@ export default class App extends React.Component {
       toast: null,
       paused: false,
       tacticalChoice: null, choice: null, managerElimination: null,
+      turnQueue: [], turnIndex: 0, pendingTarget: null, view: 'map', viewSource: 'user', tacticalPreview: false,
+      phoneMore: false, focusLayout: null, targetHoverId: null,
     });
   }
 
@@ -576,7 +669,8 @@ export default class App extends React.Component {
 
   continueAsSpectator() {
     this.clock.resume();
-    this.setState({ managerElimination: null, managementEnded: true, autoplay: false, paused: false,
+    // The elimination cleared every timer, including the ones that would clear the final match's goal toast.
+    this.setState({ managerElimination: null, managementEnded: true, autoplay: false, paused: false, pu: null, toast: null,
       phase: this.state.aliveIds.length === 1 ? 'victory' : 'playing' }, () => this.persist());
   }
 
@@ -609,12 +703,14 @@ export default class App extends React.Component {
 
   nextAction() {
     const st = this.state;
-    if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict) return;
+    if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.pendingTarget) return;
     if (st.match && !st.match.applied) return;
     if (st.spin) return;
+    // A view switched automatically for the last match returns to the map at the next turn (DEC D11). No timers.
+    if (st.viewSource === 'auto') this.setState({ view: 'map', viewSource: 'user' });
     if (st.series && st.aliveIds.length === 2) {
       const [a, b] = st.series.teamIds;
-      this.setState({ round: st.round + 1, queue: [] }, () => this.startMatch(a, b));
+      this.setState({ round: st.round + 1, queue: [], turnQueue: [], turnIndex: 0 }, () => this.startMatch(a, b));
       return;
     }
 
@@ -624,81 +720,16 @@ export default class App extends React.Component {
       this.setState({ queue }, () => this.startMatch(next[0], next[1]));
       return;
     }
-    if (st.settings.pacing === 'duel') this.beginDuel();
+    if (st.settings.pacing === 'duel') this.beginTurn();
     else if (st.settings.pacing === 'blitz') this.beginBlitz();
     else this.beginChaos();
   }
 
-  beginDuel() {
-    const st = this.state;
-    if (st.phase !== 'playing' || st.spin || this.activeDrawKey != null || (st.match && !st.match.applied)) return;
-    const reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const draw = createDuelDraw(this.rng, this.board(), { speed: st.speed, reducedMotion });
-    if (!draw) {
-      this.setState({ autoplay: false });
-      this.showToast({ code: 'DRAW', txt: 'No clear route for this draw. Choose Next match to try again.', col: C.gold },
-        6000 * (st.speed || 1));
-      return;
-    }
-    if (st.settings.express && ![draw.attackerId, draw.targetId].includes(st.followedId) && st.aliveIds.length > 2) {
-      this.setState({ round: st.round + 1, match: null, pu: null, toast: null },
-        () => this.startMatch(draw.attackerId, draw.targetId, draw));
-      return;
-    }
-    const spinKey = (this.spinKey = (this.spinKey || 0) + 1);
-    this.activeDrawKey = spinKey;
+  beginDuel(...args) { return turnM.beginDuel.apply(this, args); }
 
-    this.setState({
-      round: st.round + 1,
-      spin: { ...draw, key: spinKey, tid: draw.attackerId, stage: 'ready', ang: reducedMotion ? draw.rotation : 0 },
-      atk: null,
-      match: null,
-      pu: null,
-      toast: null,
-    }, () => {
-      if (reducedMotion) this.drawAfter(draw.spinMs, spinKey, () => this.lockDuel(spinKey));
-      else {
-        // Give the initial needle one paint before changing its angle. The
-        // fallback also advances background tabs where rAF may be suspended.
-        this.drawFrame(spinKey, () => this.drawFrame(spinKey, () => this.animateDuel(spinKey)));
-        this.drawAfter(160, spinKey, () => this.animateDuel(spinKey));
-      }
-    });
-  }
+  animateDuel(...args) { return turnM.animateDuel.apply(this, args); }
 
-  animateDuel(key) {
-    if (this.activeDrawKey !== key || this.startedDrawKey === key) return;
-    this.startedDrawKey = key;
-    this.setState(state => this.activeDrawKey === key && state.spin?.key === key && state.spin.stage === 'ready'
-      ? { spin: { ...state.spin, stage: 'spinning', ang: state.spin.rotation } } : null, () => {
-      const draw = this.state.spin;
-      if (this.activeDrawKey === key && draw?.key === key && draw.stage === 'spinning') {
-        // A single timing snapshot drives CSS and kickoff. One paint of slack
-        // avoids cutting the last animation frame short at 4× playback.
-        this.drawAfter(draw.spinMs + 34, key, () => this.lockDuel(key));
-      }
-    });
-  }
-
-  lockDuel(key) {
-    if (this.activeDrawKey !== key || this.state.spin?.key !== key || this.lockedDrawKey === key) return;
-    this.lockedDrawKey = key;
-    this.setState(state => {
-      const draw = state.spin;
-      if (this.activeDrawKey !== key || draw?.key !== key || draw.stage === 'locked') return null;
-      return {
-        spin: { ...draw, stage: 'locked', ang: draw.rotation },
-        atk: { x1: draw.x, y1: draw.y, x2: draw.targetX, y2: draw.targetY,
-          col: state.teams[draw.attackerId].col, reducedMotion: draw.reducedMotion,
-          routePoints: draw.routePoints, routeD: draw.routeD, routeKind: draw.routeKind, routeLabel: draw.routeLabel },
-      };
-    }, () => {
-      const draw = this.state.spin;
-      if (this.activeDrawKey === key && draw?.key === key && draw.stage === 'locked') {
-        this.drawAfter(draw.holdMs, key, () => this.startMatch(draw.attackerId, draw.targetId, draw));
-      }
-    });
-  }
+  lockDuel(...args) { return turnM.lockDuel.apply(this, args); }
 
   beginBlitz() {
     const st = this.state;
@@ -743,7 +774,7 @@ export default class App extends React.Component {
     );
   }
 
-  startMatch(attackerId, defenderId, route = {}, tactic) {
+  startMatch(attackerId, defenderId, route = {}, tactic, options = {}) {
     const st = this.state;
     const a = st.teams[attackerId];
     const d = st.teams[defenderId];
@@ -764,7 +795,8 @@ export default class App extends React.Component {
       });
       this.setState({ managedTeamId: managedId, tacticalChoice: { aId: attackerId, dId: defenderId, route,
         managerName: manager.name, opponentName: opponent.name, options, resumeAutoplay: st.autoplay, openedAt: Date.now() },
-        match: null, spin: null, pu: null, toast: null, autoplay: false, paused: false }, () => this.persist());
+        // clearTimers() above also dropped applyConquest's hatch reset: clear the flash with the notice and toast.
+        match: null, spin: null, pu: null, toast: null, flash: {}, autoplay: false, paused: false, tacticalPreview: false }, () => this.persist());
       return;
     }
     const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic, drama: baseDrama });
@@ -800,15 +832,18 @@ export default class App extends React.Component {
         tactic: [attackerId, defenderId].includes(managedId) ? params.tactic : null,
         tacticalBonus: params.bonus, matchDrama: drama,
         express: !!st.settings.express && !important,
+        instant: !!options.instant,
+        live: this.matchLiveModel(sport, a, d, effA, effD, drama),
       },
       spin: null,
+      ...this.autoMatchView(st, attackerId, defenderId, { express: !!st.settings.express && !important, instant: !!options.instant }),
     }, () => {
       this.presentMatch();
       if (this.state.autoplay && this.state.pauseFollow && [attackerId, defenderId].includes(this.state.followedId)) this.pausePlayback();
     });
   }
 
-  chooseTactic(id) {
+  chooseTactic(id, options = {}) {
     const choice = this.state.tacticalChoice;
     const option = choice?.options.find(item => item.id === id);
     if (!option) return;
@@ -816,83 +851,20 @@ export default class App extends React.Component {
     const entry = { type: 'tactic', match: this.state.matches + 1, teamId: this.managedId(), opponentId: choice.aId === this.managedId() ? choice.dId : choice.aId,
       choice: id, expectedStrength: option.strength, variation: option.drama, options: choice.options.map(item => item.id),
       decisionMs: Math.max(0, Date.now() - choice.openedAt) };
-    this.setState({ tacticalChoice: null, autoplay: choice.resumeAutoplay,
-      decisionLedger: [...this.state.decisionLedger, entry] }, () => this.startMatch(choice.aId, choice.dId, choice.route, id));
+    this.setState({ tacticalChoice: null, tacticalPreview: false, autoplay: choice.resumeAutoplay,
+      decisionLedger: [...this.state.decisionLedger, entry] }, () => this.startMatch(choice.aId, choice.dId, choice.route, id, options));
   }
 
-  presentMatch() {
-    const st = this.state, m = st.match;
-    if (!m || m.applied || st.choice || st.tacticalChoice) return;
-    const sport = this.sport(), a = st.teams[m.aId], d = st.teams[m.dId];
-    const effA = m.effA, effD = m.effD;
-    if (m.express) { this.after(18, () => this.revealAll()); return; }
-
-    const instant = st.settings.resolution === 'instant' || st.settings.express;
-    this.showPopup(
-      {
-        kind: 'vs',
-        label: 'ROUND ' + st.round + ' — ' + a.name.toUpperCase() + ' ATTACKS ' + d.name.toUpperCase(),
-        aId: a.flagId,
-        bId: d.flagId,
-        aCode: a.code,
-        aCol: a.col,
-        aName: a.name,
-        aEff: effA.toFixed(1),
-        bCode: d.code,
-        bCol: d.col,
-        bName: d.name,
-        bEff: effD.toFixed(1),
-      },
-      instant ? 950 : 1650,
-    );
-
-    if (instant) {
-      this.after(380, () => this.revealAll());
-      return;
-    }
-
-    const { msPerUnit, length } = sport.clock;
-    const resumeMinute = m.shown.length ? m.shown.at(-1).m : 0;
-    for (const e of m.allEv.slice(m.shown.length)) this.after(450 + Math.max(0, e.m - resumeMinute) * msPerUnit, () => this.pushEvent(e));
-    // Overtime events run past the end of regulation, so wrap up after the last
-    // one rather than at a fixed whistle.
-    const lastTick = m.allEv.reduce((n, e) => Math.max(n, e.m), length);
-    this.after(450 + Math.max(0, lastTick + 1 - resumeMinute) * msPerUnit, () => {
-      const m = this.state.match;
-      if (!m || m.applied) return;
-      if (!m.tie) {
-        this.patchMatch({ status: sport.labels.end });
-        this.after(420, () => this.finishMatch());
-        return;
-      }
-      if (sport.tieBreak !== 'shootout') {
-        // Overtime has already been played out through the event feed.
-        this.patchMatch({ status: sport.labels.tie });
-        this.after(700, () => this.finishMatch());
-        return;
-      }
-      const shown = m.tieShown || { A: [], D: [] };
-      this.patchMatch({ status: sport.labels.tie, tieShown: shown });
-      const n = Math.max(m.tie.A.length, m.tie.D.length);
-      const sides = m.tie.first === 'D' ? ['D', 'A'] : ['A', 'D'];
-      const remaining = [];
-      for (let i = 0; i < n; i++) {
-        for (const side of sides) if (i >= shown[side].length && i < m.tie[side].length) remaining.push(side);
-      }
-      // Resume the remaining chronological sequence, including the opponent's
-      // pending reply when a save was captured between alternating kicks.
-      remaining.forEach((side, index) => this.after(350 + index * 250, () => this.pushKick(side)));
-      this.after(350 + remaining.length * 250 + 650, () => this.finishMatch());
-    });
-  }
+  presentMatch(...args) { return matchM.presentMatch.apply(this, args); }
 
   /** The sport this campaign is being played in. */
   sport() {
     return getSport(this.state.settings.sport);
   }
 
+  /** Patch the live (unapplied) match on the latest queued state; a settled match is never patched back to unapplied. */
   patchMatch(patch) {
-    if (this.state.match) this.setState({ match: { ...this.state.match, ...patch } });
+    this.setState(state => (state.match && !state.match.applied ? { match: { ...state.match, ...patch } } : null));
   }
 
   pushEvent(e) {
@@ -926,20 +898,7 @@ export default class App extends React.Component {
     });
   }
 
-  /** Jump straight to the final score — used by INSTANT resolution and by STEP. */
-  revealAll() {
-    const m = this.state.match;
-    if (!m || m.applied) return;
-    const sport = this.sport();
-    this.patchMatch({
-      shown: m.allEv,
-      ga: m.finalGa,
-      gd: m.finalGd,
-      tieShown: m.tie && sport.tieBreak === 'shootout' ? { A: m.tie.A, D: m.tie.D } : null,
-      status: m.tie ? sport.labels.tie : sport.labels.end,
-    });
-    this.after(m.express ? 18 : 500, () => this.finishMatch());
-  }
+  revealAll(...args) { return matchM.revealAll.apply(this, args); }
 
   fastForward() {
     this.engagement.count('skips');
@@ -948,43 +907,7 @@ export default class App extends React.Component {
     this.revealAll();
   }
 
-  /**
-   * Apply the result: the loser is eliminated, every territory it held passes to
-   * the winner, and its best player switches allegiance.
-   */
-  finishMatch() {
-    const st = this.state, m = st.match;
-    if (!m || m.applied || st.choice) return;
-    if (st.series && !m.seriesResolved) {
-      const next = advanceSeries(st.series, m.aId, m.dId, m.winner);
-      const seriesView = { aWins: next.series.wins[m.aId], bWins: next.series.wins[m.dId], bestOf: 3 };
-      if (!next.complete) {
-        const completed = { ...m, ga: m.finalGa, gd: m.finalGd, applied: true, done: true, seriesResolved: true,
-          noConquest: true, series: seriesView, status: this.sport().labels.end,
-          winnerName: st.teams[m.winner].name, resTitle: `${st.teams[m.winner].name} wins the series game`,
-          resText: 'First to two wins claims the opposing empire. No territory or player changes yet.' };
-        const view = this.matchCard(completed);
-        const entry = recordMatch({ ...st, sport: this.sport() }, completed, view);
-        this.setState({ series: next.series, match: completed, matches: st.matches + 1,
-          history: [...st.history, entry], queue: [],
-          log: [...st.log, { t: 'match', r: st.round, txt: `${completed.winnerName} wins finale game ${next.series.games}; series continues.`, chip: C.gold }] },
-          () => { this.persist(); if (this.state.autoplay) this.after(st.settings.express ? 120 : 1000, () => this.nextAction()); });
-        return;
-      }
-      this.setState({ series: next.series, match: { ...m, seriesResolved: true, series: seriesView } }, () => this.finishMatch());
-      return;
-    }
-    const loserId = m.winner === m.aId ? m.dId : m.aId;
-    if (this.managedId(st) === m.winner && st.teams[loserId].squad.length) {
-      this.clearTimers();
-      const candidates = acquisitionOptions(st.teams[m.winner], st.teams[loserId]);
-      this.setState({ choice: { winnerName: st.teams[m.winner].name, loserName: st.teams[loserId].name,
-        candidates, resumeAutoplay: st.autoplay, openedAt: Date.now() }, autoplay: false, paused: false,
-        match: { ...m, ga: m.finalGa, gd: m.finalGd, shown: m.allEv, status: 'Choose a signing' } }, () => this.persist());
-      return;
-    }
-    this.applyConquest();
-  }
+  finishMatch(...args) { return conqM.finishMatch.apply(this, args); }
 
   chooseAcquisition(index) {
     const choice = this.state.choice;
@@ -995,196 +918,33 @@ export default class App extends React.Component {
       player: candidate.name, strengthGain: candidate.gain, attackGain: candidate.attackGain || 0, defendGain: candidate.defendGain || 0,
       optionCount: choice.candidates.length, chosenIndex: choice.candidates.indexOf(candidate),
       decisionMs: Math.max(0, Date.now() - (choice.openedAt || Date.now())) };
-    this.setState({ choice: null, decisionLedger: [...this.state.decisionLedger, entry], autoplay: choice.resumeAutoplay && !this.state.pauseFollow }, () => this.applyConquest(index));
+    // applyConquest writes `paused: false` for the winner; the clock must agree or every task it schedules would
+    // sit unarmed (no-op when the clock already runs, as it does after finishMatch cleared it). A storage dialog keeps
+    // its own pause and restores the clock when it closes.
+    if (!this.state.storageDialog && !this.state.storageConflict) this.clock.resume();
+    this.setState({ choice: null, decisionLedger: [...this.state.decisionLedger, entry], autoplay: choice.resumeAutoplay && !this.state.pauseFollow,
+      view: 'map', viewSource: 'user' }, () => this.applyConquest(index));
   }
 
-  applyConquest(playerIndex) {
-    const st = this.state;
-    const m = st.match;
-    if (!m || m.applied) return;
-
-    const winnerId = m.winner;
-    const loserId = winnerId === m.aId ? m.dId : m.aId;
-    const battleAt = empireCenter(this.board(), loserId);
-
-    const teams = { ...st.teams };
-    const W = { ...teams[winnerId], squad: teams[winnerId].squad.slice() };
-    const L = { ...teams[loserId], squad: teams[loserId].squad.slice() };
-    const strengthBefore = teamEff(W);
-    const beforeLineup = selectLineup(W);
-    const selectedCandidate = Number.isInteger(playerIndex) ? null : automaticAcquisition(W, L, st.settings.acquisitionPolicy);
-    const stolen = L.squad[Number.isInteger(playerIndex) ? playerIndex : selectedCandidate?.index];
-    if (stolen) {
-      W.squad.push({ ...stolen, from: L.code });
-      L.squad = L.squad.filter(p => p !== stolen);
-    }
-    const strengthAfter = teamEff(W);
-    const afterLineup = selectLineup(W);
-    const replacedPlayer = beforeLineup.starters.find(p => !afterLineup.starters.some(q => q.originalIndex === p.originalIndex)) || null;
-    const strengthGained = Math.round((strengthAfter - strengthBefore) * 10) / 10;
-    teams[winnerId] = W;
-    teams[loserId] = L;
-
-    const own = { ...st.own };
-    const taken = [];
-    for (const cid in own) {
-      if (own[cid] === loserId) {
-        own[cid] = winnerId;
-        taken.push(cid);
-      }
-    }
-    const aliveIds = st.aliveIds.filter(t => t !== loserId);
-
-    const stats = { ...st.stats };
-    const ws = { ...(stats[winnerId] || { conq: 0, steals: [] }) };
-    ws.conq += 1;
-    if (stolen) ws.steals = ws.steals.concat([stolen.name]);
-    stats[winnerId] = ws;
-
-    const effW = winnerId === m.aId ? m.effA : m.effD;
-    const effL = winnerId === m.aId ? m.effD : m.effA;
-    const isUpset = effW + Number(CONFIG.upsetThreshold) <= effL;
-    const sport = this.sport();
-    const tieTxt = m.tie ? ' (' + m.tie.ga + '–' + m.tie.gd + ' ' + sport.labels.tieShort + ')' : '';
-    const A = teams[m.aId];
-    const B = teams[m.dId];
-    const terrWord = 'TERRITOR' + (taken.length === 1 ? 'Y' : 'IES');
-
-    const entries = [
-      { t: 'match', r: st.round, txt: A.code + ' ' + m.finalGa + '–' + m.finalGd + ' ' + B.code + tieTxt, chip: W.col, col: C.textSoft },
-    ];
-    if (isUpset) {
-      entries.push({
-        t: 'upset',
-        r: st.round,
-        txt: 'GIANT-KILLING — ' + W.name.toUpperCase() + ' (' + effW.toFixed(0) + ') TOPPLES ' + L.name.toUpperCase() + ' (' + effL.toFixed(0) + ')',
-        chip: C.gold,
-        col: C.gold,
-      });
-    }
-    entries.push({
-      t: 'elim',
-      r: st.round,
-      txt: L.name.toUpperCase() + ' FALLS — ' + taken.length + ' ' + terrWord + ' ANNEXED BY ' + W.name.toUpperCase(),
-      chip: C.red,
-      col: C.text,
-    });
-    if (stolen) {
-      entries.push({
-        t: 'steal',
-        r: st.round,
-        txt: W.code + ' CLAIMS ' + stolen.name.toUpperCase() + ' (' + stolen.rating + ' ' + stolen.pos + ') FROM ' + L.code,
-        chip: C.cyan,
-        col: C.cyan,
-      });
-    }
-    if (aliveIds.length === 1) {
-      entries.push({ t: 'champ', r: st.round, txt: W.name.toUpperCase() + ' RULES THE MAP — TOTAL CONQUEST', chip: W.col, col: C.gold });
-    }
-
-    const flash = {};
-    for (const cid of taken) flash[cid] = true;
-    const stealTxt = stolen ? ' · steals ' + stolen.name + ' (' + stolen.rating + ' ' + stolen.pos + ')' : '';
-    const completed = {
-      ...m, ga: m.finalGa, gd: m.finalGd, shown: m.allEv, applied: true, done: true,
-      status: sport.labels.end, isUpset,
-      resText: '+' + taken.length + ' territories' + stealTxt,
-      resTitle: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
-      wCol: W.col, winnerName: W.name, loserName: L.name, territoriesGained: taken.length,
-      territoryIds: taken, territoryNames: taken.map(cid => NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || cid),
-      playerTaken: stolen ? { ...stolen } : null,
-      replacedPlayer, strengthBefore, strengthAfter, strengthGained,
-      acquisitionPolicy: Number.isInteger(playerIndex) ? 'manager-choice' : st.settings.acquisitionPolicy,
-    };
-    const archived = recordMatch({ ...st, sport }, completed, this.matchCard(completed, teams));
-    const leader = aliveIds.slice().sort((a, b) => territories({ own }, b).length - territories({ own }, a).length)[0];
-    const metrics = { ...st.metrics, previousLeader: leader,
-      leaderChanges: (st.metrics?.leaderChanges || 0) + (st.metrics?.previousLeader && st.metrics.previousLeader !== leader ? 1 : 0),
-      acquisitions: [...(st.metrics?.acquisitions || []), strengthGained] };
-    const stopForFollow = st.pauseFollow && [m.aId, m.dId].includes(st.followedId);
-    const managerLost = this.managedId(st) === loserId;
-    if (m.express) this.engagement.count('compressedMatches');
-    const managerElimination = managerLost ? { teamId: loserId, opponentId: winnerId, matchId: archived.id,
-      teamName: L.name, opponentName: W.name, score: `${m.finalGa}–${m.finalGd}${tieTxt}`,
-      placement: aliveIds.length + 1, conquests: st.stats[loserId]?.conq || 0, signings: st.stats[loserId]?.steals?.length || 0 } : null;
-
-    this.setState(
-      {
-        teams,
-        own,
-        aliveIds,
-        stats,
-        fallen: st.fallen.concat([{ id: loserId, r: st.round }]),
-        flash,
-        atk: null,
-        battles: (st.battles || []).concat([{ x: battleAt.x, y: battleAt.y }]).slice(-BATTLE_SCARS),
-        matches: st.matches + 1,
-        log: st.log.concat(entries).slice(-LOG_CAP),
-        match: completed, history: [...st.history, archived], metrics, conquestIds: taken,
-        choice: null, autoplay: stopForFollow || managerLost ? false : st.autoplay,
-        managerElimination, paused: managerLost,
-        completedAt: aliveIds.length === 1 ? Date.now() : st.completedAt,
-      },
-      () => {
-        this.persist();
-        if (managerLost) { this.clearTimers(); this.clock.pause(); return; }
-        this.after(1500, () => this.setState({ flash: {} }));
-
-        if (st.settings.express) {
-          if (aliveIds.length === 1) this.after(200, () => this.setState({ phase: 'victory', autoplay: false }, () => this.persist()));
-          else if (this.state.autoplay) this.after(m.express ? 12 : 650, () => this.nextAction());
-          return;
-        }
-
-        this.showPopup(
-          {
-            kind: 'result',
-            label: (m.tie ? sport.labels.tie : sport.labels.end) + ' — ROUND ' + st.round,
-            score: A.code + ' ' + m.finalGa + '–' + m.finalGd + ' ' + B.code + (m.tie ? '  ·  ' + m.tie.ga + '–' + m.tie.gd + ' ' + sport.labels.tieShort : ''),
-            title: W.name.toUpperCase() + ' ANNEXES ' + L.name.toUpperCase(),
-            sub: '+' + taken.length + ' ' + terrWord,
-            upset: isUpset,
-            col: W.col,
-          },
-          1750,
-        );
-        if (stolen) {
-          this.after(1820, () =>
-            this.showPopup(
-              {
-                kind: 'steal',
-                sName: stolen.name,
-                sMeta: 'RATING ' + stolen.rating + ' · ' + stolen.pos,
-                sFrom: L.code,
-                sFromId: L.flagId,
-                sFromCol: L.col,
-                sTo: W.code,
-                sToId: W.flagId,
-                sToCol: W.col,
-                sSub: 'JOINS ' + W.name.toUpperCase(),
-              },
-              1900,
-            ),
-          );
-        }
-
-        const doneAt = stolen ? 3900 : 1950;
-        if (aliveIds.length === 1) {
-          this.after(doneAt + 250, () => this.setState({ phase: 'victory', autoplay: false }, () => this.persist()));
-        } else if (this.state.autoplay) {
-          // Mid-batch runs back-to-back; a fresh round gets a beat of breathing room.
-          this.after(this.state.queue.length ? doneAt : doneAt + 120, () => { if (this.state.autoplay) this.nextAction(); });
-        }
-        // Paused mid-batch: the next match waits for STEP.
-      },
-    );
+  /** The highlighted signing (DEC D15): `choice.selected`, else the best lineup fit. */
+  selectedCandidate(choice = this.state.choice) {
+    if (!choice?.candidates?.length) return null;
+    return choice.candidates.find(candidate => candidate.index === choice.selected) || choice.candidates[0];
   }
+
+  selectAcquisition(index) {
+    const choice = this.state.choice;
+    if (!choice?.candidates?.some(candidate => candidate.index === index)) return;
+    this.setState({ choice: { ...choice, selected: index } }, () => this.persist());
+  }
+
+  applyConquest(...args) { return conqM.applyConquest.apply(this, args); }
 
   // ---------- controls ----------
 
   step() {
     const st = this.state;
-    if (st.phase !== 'playing' || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.paused) return;
+    if (st.phase !== 'playing' || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.paused || st.pendingTarget) return;
     if (st.match && !st.match.applied) {
       this.fastForward();
       return;
@@ -1194,7 +954,7 @@ export default class App extends React.Component {
   }
 
   togglePlay() {
-    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict) return;
+    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict || this.state.pendingTarget) return;
     if (this.state.autoplay) { this.pausePlayback(); return; }
     this.clock.resume();
     this.setState({ autoplay: true, paused: false }, () => {
@@ -1206,7 +966,7 @@ export default class App extends React.Component {
   }
 
   pausePlayback() {
-    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict) return;
+    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict || this.state.pendingTarget) return;
     if (this.state.paused) {
       this.clock.resume();
       this.setState({ paused: false }, () => this.persist());
@@ -1221,21 +981,18 @@ export default class App extends React.Component {
     this.setState({ managedTeamId: this.managedId(), followedId: id || null, selected: id || this.state.selected }, () => this.persist());
   }
 
-  viewConquest(result = this.matchCard()?.result) {
-    const ids = result?.territoryIds || this.state.conquestIds;
-    const boxes = ids.map(id => (this.displayGeo?.paths[id] || this.geo.paths[id])?.bbox).filter(Boolean);
-    if (!boxes.length) return;
-    const x = Math.min(...boxes.map(b => b.x)), y = Math.min(...boxes.map(b => b.y));
-    const right = Math.max(...boxes.map(b => b.x + b.w)), bottom = Math.max(...boxes.map(b => b.y + b.h));
-    this.setState({ mobileView: 'map', conquestIds: ids, focusBounds: { x, y, w: right - x, h: bottom - y }, focusKey: this.state.focusKey + 1 }, () => {
-      this.mapRef.current?.scrollIntoView?.({ block: 'start', behavior: 'auto' });
-      this.mapRef.current?.focus?.({ preventScroll: true });
-    });
+  viewConquest(...args) { return mapM.viewConquest.apply(this, args); }
+
+  /** Speed 1×/2×/4× (DEC D14). A live ticker match is rescheduled at the new rate (A-12, WP-MATCH hook). */
+  setSpeed(n) {
+    const previous = this.state.speed;
+    if (![1, 2, 4].includes(n) || n === previous) return;
+    this.setState({ speed: n }, () => this.rescheduleForSpeed(previous));
   }
 
   cycleSpeed() {
     const s = this.state.speed;
-    this.setState({ speed: s === 1 ? 2 : s === 2 ? 4 : 1 });
+    this.setSpeed(s === 1 ? 2 : s === 2 ? 4 : 1);
   }
 
   setSetting(key, value) {
@@ -1245,399 +1002,286 @@ export default class App extends React.Component {
     this.setState(state => ({ settings: { ...state.settings, [key]: value } }), () => this.persist());
   }
 
-  selectCountry(cid) {
-    const tid = this.state.own[cid];
-    if (tid) this.selectTeam(tid);
-  }
+  selectCountry(...args) { return turnM.selectCountry.apply(this, args); }
 
+  /** Clicking land or a team row opens that team's Squad view (DEC D11); `tab` stays for smoke compatibility. */
   selectTeam(tid) {
     if (!this.state.teams[tid]) return;
-    this.setState({ selected: tid, tab: 'squad', mobileView: 'details' }, () => {
-      const panel = document.getElementById('intel-panel-squad');
-      panel?.focus({ preventScroll: true });
-      panel?.scrollIntoView({ block: 'start' });
+    const origin = this.navView(this.currentView());
+    // While a signing or target choice holds the screen (A-13) only the selection changes.
+    const locked = !!(this.state.choice || this.state.pendingTarget);
+    this.setState({ selected: tid, tab: 'squad', ...(locked ? {} : { view: 'squad', viewSource: 'user', phoneMore: false,
+      ...(origin && origin !== 'squad' ? { squadReturn: origin } : {}) }) }, () => {
+      if (typeof document === 'undefined') return;
+      const panel = document.getElementById('view-panel-squad');
+      panel?.focus?.({ preventScroll: true });
+      panel?.scrollIntoView?.({ block: 'start' });
     });
   }
 
   showDetails() {
-    this.setState({ mobileView: 'details' }, () => {
-      document.getElementById('campaign-details')?.focus({ preventScroll: true });
+    this.setView('map', () => {
+      if (typeof document !== 'undefined') document.getElementById('campaign-details')?.focus?.({ preventScroll: true });
     });
   }
 
-  // ---------- pointer readouts ----------
+  // ---------- v4 view router ----------
 
-  handleMapMove = e => {
-    const tip = this.tipRef.current;
-    const map = this.mapRef.current;
-    if (tip && map) {
-      const b = map.getBoundingClientRect();
-      tip.style.left = Math.max(8, Math.min(e.clientX - b.left + 14, b.width - 248)) + 'px';
-      tip.style.top = Math.min(e.clientY - b.top + 12, b.height - 80) + 'px';
+  /** Plain, render-safe context shared by every view-model builder (PLAN §3.3). Never touches the DOM or `this.rng`. */
+  viewContext(st = this.state) {
+    const managedId = st.settings ? this.managedId(st) : null;
+    const followedId = st.teams?.[st.followedId] ? st.followedId : null;
+    return {
+      board: this.geo ? this.board(st) : null, geo: this.geo || null, displayGeo: this.displayGeo || null,
+      sport: getSport(st.settings?.sport), managedId: managedId || null, followedId,
+      perspectiveId: managedId || followedId || null,
+      drama: UNCERTAINTY_PRESETS[st.settings?.uncertainty]?.drama ?? Number(CONFIG.matchDrama),
+      displayRound: displayRound(st), totalTeams: Object.keys(st.teams || {}).length,
+      labelGeometry: this.labelGeometry || [], viewFocus: this.viewFocus || null, cache: this.vmCache,
+    };
+  }
+
+  /** The effective view (DEC D11): setup, the signing screen and the target choice override the chosen view. */
+  currentView(st = this.state) {
+    if (st.phase === 'loading' || st.phase === 'setup') return 'setup';
+    if (st.choice) return 'conquest';
+    if (st.pendingTarget) return 'map';
+    return VIEWS.includes(st.view) ? st.view : 'map';
+  }
+
+  /** The nav entry a view highlights: the conquest screen belongs to Map; setup has none. */
+  navView(view) {
+    if (view === 'conquest') return 'map';
+    if (view === 'setup') return null;
+    return view;
+  }
+
+  setView(view, callback) {
+    const st = this.state;
+    if (!VIEWS.includes(view)) return;
+    if ((st.choice || st.pendingTarget) && view !== 'map') return; // A-13: the decision holds the screen.
+    // Board C1: a Squad opened from the nav has no origin to go back to (re-selecting Squad keeps the current one).
+    this.setState({ view, viewSource: 'user', phoneMore: false,
+      ...(view === 'squad' && st.view !== 'squad' ? { squadReturn: null } : {}) }, callback);
+  }
+
+  /** Back from a squad to the screen that opened it, with focus on that team's row (or the Chronicle's history row). */
+  squadBack() {
+    const origin = this.state.squadReturn || 'map';
+    const selected = this.state.selected;
+    this.setView(origin, () => {
+      if (typeof document === 'undefined') return;
+      const escaped = String(selected ?? '').replace(/["\\]/g, '\\$&');
+      const row = selected != null ? document.querySelector(`#view-panel-${origin} [data-team-id="${escaped}"]`) : null;
+      // The Chronicle has no team-row hook: return to the selected history entry instead of the panel.
+      const historyRow = !row && origin === 'chronicle'
+        ? document.querySelector('#view-panel-chronicle .fi-history-list [aria-pressed="true"]') : null;
+      (row || historyRow || document.getElementById(origin === 'map' ? 'campaign-details' : `view-panel-${origin}`))?.focus?.({ preventScroll: true });
+    });
+  }
+
+  /** The one primary action (DEC D13) shown by the masthead and the phone bar and run by Space. Pure. */
+  primaryAction(st = this.state) {
+    if (st.phase !== 'playing' || st.storageDialog || st.storageConflict || st.exportText || st.managerElimination) return null;
+    if (st.aliveIds.length <= 1) return { id: 'results', label: 'Results', run: () => this.setState({ phase: 'victory' }) };
+    if (st.pendingTarget) {
+      const target = st.teams[st.pendingTarget.selectedId];
+      return { id: 'attack', label: `Attack ${target?.name || 'target'}`, disabled: !target, run: () => this.confirmTarget() };
     }
-    const svg = this.svgRef.current;
-    const coord = this.coordRef.current;
-    if (coord && svg && svg.getScreenCTM) {
-      try {
-        const pt = svg.createSVGPoint();
-        pt.x = e.clientX;
-        pt.y = e.clientY;
-        const sp = pt.matrixTransform(svg.getScreenCTM().inverse());
-        const ll = this.geo && this.geo.invert(sp.x, sp.y);
-        if (ll) {
-          const lat = Math.max(-90, Math.min(90, ll[1]));
-          const lon = Math.max(-180, Math.min(180, ll[0]));
-          coord.textContent =
-            'LAT ' + Math.abs(lat).toFixed(1) + (lat >= 0 ? '°N' : '°S') +
-            ' · LON ' + Math.abs(lon).toFixed(1) + (lon >= 0 ? '°E' : '°W');
-        } else coord.textContent = '';
-      } catch {
-        /* the pointer left the SVG mid-measurement */
-      }
+    if (st.choice) {
+      const candidate = this.selectedCandidate(st.choice);
+      return { id: 'sign', label: `Sign ${candidate?.name || 'player'}`, mastLabel: 'Sign player', disabled: !candidate,
+        run: () => this.chooseAcquisition(this.selectedCandidate()?.index) };
     }
+    if (st.tacticalChoice) return { id: 'kickoff', label: 'Continue', run: () => this.chooseTactic('balanced') };
+    if (st.autoplay) return { id: 'pause', label: 'Pause', run: () => this.togglePlay() };
+    // DEC D13: a spectator's primary is Pause / Play campaign. Play also resumes a paused clock (togglePlay), so
+    // Pause then Play keeps the campaign running; a bare Resume would unpause with autoplay off and stop after this match.
+    if (!this.managedId(st)) return { id: 'play', label: 'Play campaign', run: () => this.togglePlay() };
+    if (st.paused) return { id: 'resume', label: 'Resume', run: () => this.pausePlayback() };
+    if (st.spin) return { id: 'drawing', label: 'Continue', disabled: true, run: () => {} };
+    if (st.match && !st.match.applied) return { id: 'finish', label: 'Finish match', run: () => this.step() };
+    return { id: 'continue', label: 'Continue', run: () => this.step() };
+  }
+
+  runPrimary() {
+    const action = this.primaryAction();
+    if (action && !action.disabled) action.run();
+  }
+
+  /** Space runs the primary action (A-8); focused controls keep their native Space. */
+  handleKeyDown = event => {
+    if (event.key !== ' ' || event.repeat || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (typeof document !== 'undefined' && document.querySelector('[aria-modal="true"]')) return;
+    const target = event.target;
+    const closest = selector => (typeof target?.closest === 'function' ? target.closest(selector) : null);
+    if (!closest('[data-space-primary] [role=radio]') && closest(SPACE_IGNORE)) return;
+    const action = this.primaryAction();
+    if (!action || action.disabled) return;
+    event.preventDefault();
+    action.run();
   };
 
-  // ---------- derived view models ----------
-
-  /** One regional banner across mainland and nearby islands, not tiny repeats. */
-  mapFlags(playing) {
-    const { mapMode, own, teams } = this.state;
-    const empty = { flagParts: new Map(), flagPatterns: [] };
-    if (mapMode !== 'flags' || !this.flagComponents) return empty;
-    if (playing && !Object.values(teams).some(team => team.flagId)) return empty;
-    const components = this.flagComponents.components(playing ? own : this.setupFlagOwnership);
-    const cached = this.flagLayoutCache;
-    if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
-
-    const flagParts = new Map();
-    const flagPatterns = [];
-    for (const component of components) {
-      const owner = playing ? teams[component.ownerId] : null;
-      const nationId = playing ? owner?.flagId : NATIONS[component.ownerId] ? component.ownerId : DEPENDENCIES[component.ownerId]?.of;
-      const url = flagUrl(nationId);
-      if (!url) continue;
-      // Owner + the lowest stable piece id is short and unique, including when
-      // a country's mainland and overseas polygons need different flag tiles.
-      const id = component.key.split('|').slice(0, 2).join('-').replace(/[^a-zA-Z0-9_-]/g, '-');
-      const b = component.bbox;
-      const symbolProfile = FLAG_SYMBOLS[FLAG_CODES[nationId]];
-      const symbolLayout = symbolProfile ? layoutFlagSymbol(component, symbolProfile) : null;
-      flagPatterns.push({ id, ownerId: component.ownerId, url, color: owner?.col || politicalColor(nationId),
-        symbolProfile, symbolLayout,
-        fieldUrl: symbolProfile ? `${import.meta.env.BASE_URL}${symbolProfile.fieldFile}` : null,
-        symbolUrl: symbolProfile ? `${import.meta.env.BASE_URL}${symbolProfile.symbolFile}` : null,
-        bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
-      for (const part of component.parts) {
-        if (!flagParts.has(part.countryId)) flagParts.set(part.countryId, []);
-        flagParts.get(part.countryId).push({ id, fill: `url(#fi-flag-${id})`,
-          d: part.rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join('') });
-      }
+  /** Phone primary bar right text (RM §2.9): the round, the live minute or the selected signing's gain. */
+  phoneBarModel() {
+    const st = this.state;
+    if (st.choice) {
+      const candidate = this.selectedCandidate(st.choice);
+      return { right: candidate ? signedDelta(candidate.gain).text : null, rightKind: candidate ? 'gain' : null, minuteFallback: 0 };
     }
-    const result = { flagParts, flagPatterns };
-    this.flagLayoutCache = { components, teams, playing, result };
-    return result;
+    const m = st.match;
+    // The bar floors the live minute at the last revealed event, as the Match view and the compact card do.
+    if (m && !m.done && !m.applied) {
+      return { right: null, rightKind: 'minute', minuteFallback: (m.shown || []).reduce((most, e) => Math.max(most, Number(e?.m) || 0), 0) };
+    }
+    const round = roman(displayRound(st));
+    return { right: round ? `Round ${round}` : null, rightKind: round ? 'round' : null, minuteFallback: 0 };
+  }
+
+  setPauseFollow(value) {
+    this.setState({ pauseFollow: !!value }, () => this.persist());
+  }
+
+  togglePhoneSheet() {
+    this.setState(state => ({ phoneSheet: state.phoneSheet === 'expanded' ? 'collapsed' : 'expanded' }));
+  }
+
+  togglePhoneMore() {
+    this.setState(state => ({ phoneMore: !state.phoneMore }));
   }
 
   /**
-   * Every map shape, plus the flag patterns held territory is filled with.
-   * A country flies its *owner's* flag, so an empire reads as one banner
-   * spreading across the map.
+   * DEC D11: a ticker kickoff involving the managed team (or the followed team while spectating) switches the Map to
+   * the Match view; returns the fields for the same setState. Never for express or "simulate the result" (instant).
    */
-  mapCountries() {
-    const { own, teams, selected, flash, phase } = this.state;
-    if (!this.geo) return { countries: [], flagPatterns: [] };
-    const playing = phase === 'playing' || phase === 'victory';
-
-    const countries = [];
-    const { flagParts, flagPatterns } = this.mapFlags(playing);
-    for (const c of this.geo.countries) {
-      const p = this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
-      if (!p) continue;
-      const ownerId = playing ? own[c.id] : null;
-      const owner = ownerId ? teams[ownerId] : null;
-      const isSelected = owner && selected === ownerId;
-      const parts = flagParts.get(c.id);
-
-      const unclaimedShade = (parseInt(c.id, 10) || c.id.charCodeAt(0)) % 2 ? C.landA : C.landB;
-      countries.push({
-        id: c.id,
-        ownerId,
-        ownerName: owner?.name,
-        selected: !!isSelected,
-        name: NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
-        d: p.d,
-        flagParts: parts,
-        fill: parts?.length ? 'transparent' : owner ? (owner.kind === 'club' ? owner.col : politicalColor(owner.id)) : phase === 'setup' && NATIONS[c.id] ? politicalColor(c.id) : unclaimedShade,
-        stroke: '#C0C7B2',
-        strokeWidth: 0.35,
-        cursor: owner ? 'pointer' : 'default',
-        animation: flash[c.id] ? 'fiFlash 0.9s ease-out' : 'none',
-        onClick: () => this.selectCountry(c.id),
-        onEnter: () => this.setState({ hoverCid: c.id }),
-      });
-    }
-    return { countries, flagPatterns };
+  autoMatchView(st, attackerId, defenderId, { express = false, instant = false } = {}) {
+    if (st.settings?.resolution !== 'ticker' || express || instant || st.view !== 'map') return {};
+    const managedId = this.managedId(st);
+    const ids = [attackerId, defenderId];
+    if (managedId ? ids.includes(managedId) : !!st.followedId && ids.includes(st.followedId)) return { view: 'match', viewSource: 'auto' };
+    return {};
   }
 
-  mapLabels(playing) {
-    if (!playing || !CONFIG.showLabels || !this.geo) return [];
-    const { aliveIds, teams } = this.state;
-    return aliveIds.filter(id => teams[id]).map(id => ({
-      id,
-      text: (teams[id].kind === 'club' ? teams[id].code : teams[id].name).toUpperCase(),
-    }));
+  /** DEC D10: the tactical gate no longer opens its dialog by itself; "Match preview" opens it. */
+  openMatchPreview() {
+    if (this.state.tacticalChoice) this.setState({ tacticalPreview: true });
   }
 
-  /** A diamond on every empire that still holds its own homeland. */
-  mapHomes(playing) {
-    const { aliveIds, own, teams } = this.state;
-    if (!playing || !this.geo) return [];
-    const out = [];
-    for (const tid of aliveIds) {
-      const team = teams[tid];
-      if (!team || own[team.home] !== tid) continue;
-      const p = this.geo.paths[team.home];
-      if (!p) continue;
-      out.push({ id: tid, x: p.cx, y: p.cy, color: teams[tid] ? teams[tid].col : C.gold });
-    }
-    return out;
+  closeMatchPreview() {
+    if (this.state.tacticalPreview) this.setState({ tacticalPreview: false });
   }
 
-  tooltip(playing) {
-    const { hoverCid, own, teams } = this.state;
-    const rec = hoverCid && NATIONS[hoverCid];
-    const dep = hoverCid && DEPENDENCIES[hoverCid];
-    if (!rec && !dep) return { visible: false, name: '', sub: '' };
-    const ownerId = own[hoverCid];
-    if (dep) {
-      const holder = ownerId ? teams[ownerId] : null;
-      return {
-        visible: true,
-        name: dep.name.toUpperCase(),
-        sub: holder ? 'HELD BY ' + holder.name.toUpperCase() : 'AWAITING CAMPAIGN',
-      };
-    }
-    let sub;
-    if (ownerId && ownerId !== hoverCid) {
-      sub = 'HELD BY ' + (teams[ownerId] ? teams[ownerId].name.toUpperCase() : '?');
-    } else if (ownerId) {
-      sub =
-        'EFF ' + (teams[ownerId] ? teamEff(teams[ownerId]).toFixed(1) : '—') +
-        ' · ' + territories(this.board(), ownerId).length + ' TERR';
-    } else {
-      sub = playing ? 'NOT IN THIS THEATRE' : 'AWAITING CAMPAIGN';
-    }
-    return { visible: true, name: rec[0].toUpperCase(), sub };
+  /** "or simulate the result": kick off with the default approach and reveal this match instantly. */
+  simulateResult() {
+    if (this.state.tacticalChoice) this.chooseTactic('balanced', { instant: true });
   }
 
-  /** Largest empire callout — the thing to watch on a crowded map. */
-  legend(playing) {
-    const { aliveIds, teams } = this.state;
-    if (!playing || aliveIds.length <= 1) return null;
-    const board = this.board();
-    let biggest = null;
-    let best = -1;
-    for (const tid of aliveIds) {
-      const n = territories(board, tid).length;
-      if (n > best) {
-        best = n;
-        biggest = tid;
-      }
-    }
-    if (!biggest || best <= 1) return null;
-    return {
-      text: 'Largest empire: ' + teams[biggest].name + ' · ' + best + ' territories',
-      color: teams[biggest].col,
-    };
+  mastheadModel() {
+    return buildMasthead(this.state, this.viewContext());
   }
 
-  matchCard(m = this.state.match, teams = this.state.teams) {
-    const { round, settings } = this.state;
-    if (!m) return null;
-    const sport = this.sport();
-    const A = teams[m.aId];
-    const B = teams[m.dId];
-    return {
-      round: pad3(round),
-      mode: settings.pacing.toUpperCase(),
-      status: m.status,
-      statusColor: m.done ? C.textMute : m.status === sport.labels.tie ? C.gold : C.green,
-      statusLive: !m.done,
-      startLabel: sport.labels.start,
-      a: { teamId: A.id, id: A.flagId, isClub: A.kind === 'club', code: A.code, color: A.col, name: A.name, eff: m.effA.toFixed(1), score: m.ga },
-      b: { teamId: B.id, id: B.flagId, isClub: B.kind === 'club', code: B.code, color: B.col, name: B.name, eff: m.effD.toFixed(1), score: m.gd },
-      // Only a shootout reveals kick by kick; overtime plays out through the feed.
-      kicks: m.tieShown ? { a: m.tieShown.A, b: m.tieShown.D } : null,
-      events: m.shown.map(e => {
-        const team = teams[e.tid];
-        const { when, text } = sport.formatEvent(e, team ? team.code : '');
-        return { when, text, color: team ? team.col : '#fff' };
-      }),
-      noEvents: m.shown.length === 0 && !m.done,
-      odds: m.odds, series: m.series, routeLabel: m.routeLabel,
-      result: m.done
-        ? { title: m.resTitle || '', text: m.resText || '', upset: !!m.isUpset, background: tint(m.wCol || C.gold, 0.1),
-          winnerId: m.winner, loserId: m.winner === m.aId ? m.dId : m.aId,
-          winnerName: m.winnerName, loserName: m.loserName, territories: m.territoriesGained, player: m.playerTaken,
-          strengthBefore: m.strengthBefore, strengthAfter: m.strengthAfter, strengthGain: m.strengthGained,
-          territoryNames: m.territoryNames || [], territoryIds: m.territoryIds || [], replacedPlayer: m.replacedPlayer,
-          tieText: m.tie ? (sport.tieBreak === 'shootout' ? `${m.tie.ga}–${m.tie.gd} on penalties` : `After ${m.tie.periods.length} overtime period${m.tie.periods.length === 1 ? '' : 's'}`) : null }
-        : null,
-    };
+  mapAnchors() {
+    return [...(this.targetAnchors() || []), ...(this.conquestAnchors() || [])];
   }
 
-  idleText() {
-    const { phase, match, spin, queue, settings } = this.state;
-    if (phase !== 'playing' || match || spin) return null;
-    if (queue.length) return 'The round is paused. Play the next match when you’re ready.';
-    if (settings.pacing === 'duel') {
-      return 'Choose Next match to draw the next fixture.';
-    }
-    if (settings.pacing === 'blitz') {
-      return 'Start a round of neighbouring rivals. Each match sends one team home.';
-    }
-    return 'Draw an unpredictable round of matches, then watch the map change hands.';
-  }
+  // ---------- module delegates (bodies in src/app/*Methods.jsx; owners per PLAN §4.10) ----------
 
-  powerTable(playing) {
-    const { aliveIds, teams } = this.state;
-    if (!playing) return [];
-    const board = this.board();
-    return aliveIds
-      .map(tid => ({ tid, eff: teamEff(teams[tid]), terr: territories(board, tid).length }))
-      .sort((a, b) => b.eff - a.eff || teams[a.tid].name.localeCompare(teams[b.tid].name) || a.tid.localeCompare(b.tid))
-      .map((r, i) => ({
-        tid: r.tid,
-        flagId: teams[r.tid].flagId,
-        isClub: teams[r.tid].kind === 'club',
-        rank: i + 1,
-        code: teams[r.tid].code,
-        color: teams[r.tid].col,
-        name: teams[r.tid].name,
-        territories: String(r.terr),
-        eff: r.eff.toFixed(1),
-        // How much of that rating was bought with conquest rather than born with.
-        effGain: signed(r.eff - (teams[r.tid].baseEff ?? r.eff)),
-      }));
-  }
+  // map (WP-MAP)
+  mapMeId(...args) { return mapM.mapMeId.apply(this, args); }
+  mapOpponentId(...args) { return mapM.mapOpponentId.apply(this, args); }
+  mapOwnership(...args) { return mapM.mapOwnership.apply(this, args); }
+  mapAttack(...args) { return mapM.mapAttack.apply(this, args); }
+  mapSpin(...args) { return mapM.mapSpin.apply(this, args); }
+  mapConquestIds(...args) { return mapM.mapConquestIds.apply(this, args); }
+  mapInitialFocus(...args) { return mapM.mapInitialFocus.apply(this, args); }
+  mapNearFocus(...args) { return mapM.mapNearFocus.apply(this, args); }
+  mapProps(...args) { return mapM.mapProps.apply(this, args); }
 
-  squadPanel() {
-    const { selected, teams, aliveIds, fallen, stats } = this.state;
-    const team = selected && teams[selected] ? teams[selected] : null;
-    if (!team) return null;
-    const alive = aliveIds.includes(team.id);
-    const fell = fallen.find(f => f.id === team.id);
-    const s = stats[team.id] || { conq: 0, steals: [] };
-    const lineup = selectLineup(team);
-    return {
-      teamId: team.id, starters: lineup.starters, bench: lineup.bench, lineupRating: lineup.rating,
-      id: team.flagId,
-      isClub: team.kind === 'club',
-      color: team.col,
-      code: team.code,
-      name: team.name,
-      meta: team.conf + ' · Starting strength ' + team.str,
-      eff: teamEff(team).toFixed(1),
-      effGain: signed(teamEff(team) - (team.baseEff ?? teamEff(team))),
-      avg: squadAverage(team).toFixed(1),
-      avgGain: signed(squadAverage(team) - (team.baseAvg ?? squadAverage(team))),
-      territories: String(territories(this.board(), team.id).length),
-      conquests: String(s.conq || 0),
-      stolen: String((s.steals || []).length),
-      status: alive ? 'ALIVE' : 'FALLEN R' + (fell ? fell.r : '?'),
-      statusColor: alive ? C.green : C.red,
-      players: team.squad.slice().sort((a, b) => b.rating - a.rating),
-    };
-  }
+  // column (WP-COL)
+  columnModel(...args) { return colM.columnModel.apply(this, args); }
+  mapOverlaysModel(...args) { return colM.mapOverlaysModel.apply(this, args); }
+  tickerModel(...args) { return colM.tickerModel.apply(this, args); }
 
-  warStage() {
-    const { phase, teams, fallen } = this.state;
-    if (phase === 'victory') return { text: 'CONQUEST COMPLETE', pulsing: false };
-    const total = Object.keys(teams).length;
-    const down = fallen.length;
-    const pct = total ? down / total : 0;
-    const text =
-      down === 0 ? 'COLD WAR' : pct < 0.25 ? 'ESCALATION' : pct < 0.6 ? 'TOTAL WAR' : pct < 0.9 ? 'ENDGAME' : 'LAST STAND';
-    return { text, pulsing: pct >= 0.25 };
-  }
+  // match (WP-MATCH)
+  matchLiveModel(...args) { return matchM.matchLiveModel.apply(this, args); }
+  rescheduleForSpeed(...args) { return matchM.rescheduleForSpeed.apply(this, args); }
+  startMinuteClock(...args) { return matchM.startMinuteClock.apply(this, args); }
+  stopMinuteClock(...args) { return matchM.stopMinuteClock.apply(this, args); }
+  liveMatchModel(...args) { return matchM.liveMatchModel.apply(this, args); }
 
-  victoryPanel() {
-    const { aliveIds, teams, stats, settings, round, matches } = this.state;
-    const champ = aliveIds.length ? teams[aliveIds[0]] : null;
-    if (!champ) return null;
-    const s = stats[champ.id] || { conq: 0, steals: [] };
-    const scope = this.scopeName(settings);
-    return {
-      id: champ.flagId,
-      code: champ.code,
-      isClub: champ.kind === 'club',
-      round: pad3(round),
-      name: champ.name.toUpperCase(),
-      color: champ.col,
-      subtitle:
-        'has conquered ' + (settings.layer !== 'clubs' && settings.scope === 'world' ? 'the world' : scope) +
-        ' in ' + matches + ' battles',
-      conquests: String(s.conq || 0),
-      steals: String((s.steals || []).length),
-      territories: String(territories(this.board(), champ.id).length),
-      effNow: teamEff(champ).toFixed(1),
-      effBase: (champ.baseEff ?? teamEff(champ)).toFixed(1),
-      effGain: signed(teamEff(champ) - (champ.baseEff ?? teamEff(champ))),
-      squad: selectLineup(champ).starters,
-      recap: { ...campaignRecap(this.state.history),
-        'Leader changes': this.state.metrics?.leaderChanges || 0,
-        'Acquisitions improving the lineup': (this.state.metrics?.acquisitions || []).filter(g => g > 0).length,
-        'Elapsed time': `${Math.max(1, Math.round(((this.state.completedAt || Date.now()) - (this.state.startedAt || Date.now())) / 60000))} min`,
-        'Active viewing': `${Math.round(this.engagement.snapshot().viewingMs / 1000)} sec`,
-        'Time choosing': `${Math.round(this.engagement.snapshot().decisionMs / 1000)} sec`,
-        'Skipped presentations': this.engagement.totals.skips },
-      seed: this.state.seed,
-    };
-  }
+  // squad (WP-SQUAD)
+  squadModel(...args) { return squadM.squadModel.apply(this, args); }
 
-  renderPopup() {
-    const pu = this.state.pu;
-    if (!pu) return null;
-    if (pu.kind === 'vs') {
-      return (
-        <MatchupPopup
-          label={pu.label}
-          a={{ id: pu.aId, code: pu.aCode, color: pu.aCol, name: pu.aName, eff: pu.aEff }}
-          b={{ id: pu.bId, code: pu.bCode, color: pu.bCol, name: pu.bName, eff: pu.bEff }}
-        />
-      );
-    }
-    if (pu.kind === 'result') {
-      return <ResultPopup label={pu.label} score={pu.score} title={pu.title} sub={pu.sub} upset={pu.upset} color={pu.col} />;
-    }
-    return (
-      <StealPopup
-        name={pu.sName}
-        meta={pu.sMeta}
-        from={pu.sFrom}
-        fromId={pu.sFromId}
-        fromColor={pu.sFromCol}
-        to={pu.sTo}
-        toId={pu.sToId}
-        toColor={pu.sToCol}
-        sub={pu.sSub}
-      />
-    );
-  }
+  // conquest (WP-CONQ)
+  conquestPreview(...args) { return conqM.conquestPreview.apply(this, args); }
+  conquestModel(...args) { return conqM.conquestModel.apply(this, args); }
+  eliminationModel(...args) { return conqM.eliminationModel.apply(this, args); }
+  conquestAnchors(...args) { return conqM.conquestAnchors.apply(this, args); }
+  conquestFocus(...args) { return conqM.conquestFocus.apply(this, args); }
+
+  // turns (WP-TURN)
+  launchRules(...args) { return turnM.launchRules.apply(this, args); }
+  playerTargets(...args) { return turnM.playerTargets.apply(this, args); }
+  beginTurn(...args) { return turnM.beginTurn.apply(this, args); }
+  openTargetChoice(...args) { return turnM.openTargetChoice.apply(this, args); }
+  selectTarget(...args) { return turnM.selectTarget.apply(this, args); }
+  hoverTarget(...args) { return turnM.hoverTarget.apply(this, args); }
+  confirmTarget(...args) { return turnM.confirmTarget.apply(this, args); }
+  turnStripModel(...args) { return turnM.turnStripModel.apply(this, args); }
+  reachModel(...args) { return turnM.reachModel.apply(this, args); }
+  targetPanelModel(...args) { return turnM.targetPanelModel.apply(this, args); }
+  spectatorPanelModel(...args) { return turnM.spectatorPanelModel.apply(this, args); }
+  targetAnchors(...args) { return turnM.targetAnchors.apply(this, args); }
+
+  // ledger (WP-LEDGER)
+  ledgerModel(...args) { return ledgerM.ledgerModel.apply(this, args); }
+  chronicleModel(...args) { return ledgerM.chronicleModel.apply(this, args); }
+  matchPreviewModel(...args) { return ledgerM.matchPreviewModel.apply(this, args); }
+
+  // ---------- pointer readouts ----------
+
+  handleMapMove = event => mapM.handleMapMove.call(this, event);
+
+  // ---------- derived view models ----------
+
+  mapFlags(...args) { return mapM.mapFlags.apply(this, args); }
+
+  mapCountries(...args) { return mapM.mapCountries.apply(this, args); }
+
+  mapLabels(...args) { return mapM.mapLabels.apply(this, args); }
+
+  mapHomes(...args) { return mapM.mapHomes.apply(this, args); }
+
+  tooltip(...args) { return mapM.tooltip.apply(this, args); }
+
+  matchCard(...args) { return matchM.matchCard.apply(this, args); }
+
+  idleText(...args) { return colM.idleText.apply(this, args); }
+
+  powerTable(...args) { return ledgerM.powerTable.apply(this, args); }
+
+  victoryPanel(...args) { return ledgerM.victoryPanel.apply(this, args); }
+
+  renderPopup(...args) { return conqM.renderPopup.apply(this, args); }
 
   render() {
     const st = this.state;
     const playing = st.phase === 'playing' || st.phase === 'victory';
+    const ctx = this.viewContext();
+    const view = this.currentView();                     // 'setup'|'map'|'conquest'|'squad'|'match'|'ledger'|'chronicle'
+    const primary = this.primaryAction();                // {id,label,mastLabel?,disabled?,run}|null — pure
     const scopeName = this.scopeName();
+    const sport = getSport(playing ? st.settings.sport : st.setup.sport);
     const victory = st.phase === 'victory' ? this.victoryPanel() : null;
     const { countries, flagPatterns } = this.mapCountries();
     const completed = playing && st.aliveIds.length <= 1;
     const liveMatch = !!st.match && !st.match.applied;
-    const playbackState = completed ? 'Completed' : st.tacticalChoice ? 'Choose an approach' : st.choice ? 'Choose a signing' : st.managerElimination ? 'Your campaign ended'
+    const mapVisible = view === 'setup' || view === 'map' || view === 'conquest';
+    const playbackState = completed ? 'Completed' : st.pendingTarget ? 'Choose a target'
+      : st.tacticalChoice ? 'Choose an approach' : st.choice ? 'Choose a signing' : st.managerElimination ? 'Your campaign ended'
       : st.paused ? st.spin ? 'Draw paused' : liveMatch ? 'Match paused' : 'Paused'
       : st.spin ? 'Drawing' : st.match && !st.match.done ? 'Live' : st.match?.done ? 'Full time' : 'Ready';
     const currentCard = this.matchCard();
-    const sport = getSport(playing ? st.settings.sport : st.setup.sport);
     const oceanLabels = !playing && this.geo ? [
       ['Pacific Ocean', -135, -5], ['Atlantic Ocean', -30, 0], ['Indian Ocean', 76, -25],
     ].map(([text, lon, lat]) => {
@@ -1645,89 +1289,96 @@ export default class App extends React.Component {
       const { s, tx, ty } = this.geo.fit;
       return { text, x: x * s + tx, y: y * s + ty };
     }) : [];
-    const campaignTitle = st.settings.layer !== 'clubs' && st.settings.scope === 'UEFA'
-      ? 'The European campaign'
-      : st.settings.layer !== 'clubs' && st.settings.scope === 'world'
-        ? 'The world campaign'
-        : scopeName + ' campaign';
-
+    const playback = { speed: st.speed, autoplay: st.autoplay, completed, paused: st.paused, live: liveMatch || !!st.spin,
+      busy: !!st.spin || !!st.choice || !!st.tacticalChoice || !!st.managerElimination || !!st.storageDialog || !!st.pendingTarget,
+      stepLabel: st.spin ? 'Drawing match…' : liveMatch ? 'Finish match' : 'Next match', stateLabel: playbackState,
+      summary: currentCard ? { text: `${currentCard.a.code} ${currentCard.a.score}–${currentCard.b.score} ${currentCard.b.code}`,
+        label: `${currentCard.a.name} ${currentCard.a.score}, ${currentCard.b.name} ${currentCard.b.score}` } : null,
+      onSpeed: () => this.cycleSpeed(), onStep: () => this.step(), onPlay: () => this.togglePlay(), onPause: () => this.pausePlayback() };
+    const settingsProps = {                              // shared by the masthead popover and the phone More sheet (A-10)
+      pacing: st.settings.pacing, resolution: st.settings.resolution, confirmNew: st.confirmNew,
+      busy: liveMatch || !!st.spin || !!st.tacticalChoice || !!st.choice || !!st.pendingTarget, completed,
+      onPacing: p => this.setSetting('pacing', p), onResolution: r => this.setSetting('resolution', r),
+      onNew: () => this.newCampaign(), onCancelNew: () => this.setState({ confirmNew: false }),
+      saveStatus: st.saveStatus, onExport: () => this.exportProgress(), onImport: file => this.importProgress(file),
+      onResults: () => this.setState({ phase: 'victory' }), seed: st.seed, settings: st.settings,
+      onSetting: (key, value) => this.setSetting(key, value), managementEnded: st.managementEnded,
+      onManageSaves: () => this.openStorageDialog('slots') };
+    const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore}
+      eventsRef={this.eventsRef} onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} /> : null;
     return (
-      <div className={`app-shell${playing ? ' has-campaign' : ''}`} data-mobile-view={st.mobileView}>
+      <div className={`app-shell${playing ? ' has-campaign' : ''}`} data-view={view} data-role={ctx.managedId ? 'manager' : 'spectator'}>
         <CommandBar
           show={playing} sportName={sport.name} layerName={st.settings.layer === 'clubs' ? 'Clubs' : 'Nations'}
-          scopeName={scopeName} round={st.round} alive={st.aliveIds.length}
-          pacing={st.settings.pacing} resolution={st.settings.resolution}
-          confirmNew={st.confirmNew} busy={liveMatch || !!st.spin || !!st.tacticalChoice || !!st.choice} completed={completed}
-          onPacing={p => this.setSetting('pacing', p)} onResolution={r => this.setSetting('resolution', r)}
-          onNew={() => this.newCampaign()}
-          onCancelNew={() => this.setState({ confirmNew: false })}
-          saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
-          onResults={() => this.setState({ phase: 'victory' })} seed={st.seed}
-          settings={st.settings} onSetting={(key, value) => this.setSetting(key, value)}
-          managementEnded={st.managementEnded} onManageSaves={() => this.openStorageDialog('slots')}
+          scopeName={scopeName} round={st.round} alive={st.aliveIds.length} {...settingsProps}
+          view={this.navView(view)} navLocked={!!st.choice || !!st.pendingTarget} onView={v => this.setView(v)}
+          primary={primary} onPrimary={() => this.runPrimary()}
+          masthead={playing ? this.mastheadModel() : null}
+          playback={playing ? <PlaybackBar variant="masthead" showStep={!ctx.managedId} {...playback} /> : null}
         />
-        {playing && <nav className="campaign-view-switch" aria-label="Campaign view">
-          <button type="button" aria-pressed={st.mobileView === 'map'} onClick={() => this.setState({ mobileView: 'map' })}>Map</button>
-          <button type="button" aria-pressed={st.mobileView === 'details'} onClick={() => this.setState({ mobileView: 'details' })}>Details</button>
-        </nav>}
-        <main className="campaign-layout">
+        {playing && <TurnStrip {...this.turnStripModel()} />}
+        {/* Behind the opaque setup wizard the map stays mounted but out of the tab order and the accessibility tree.
+            React 18 has no boolean `inert` prop, so the attribute is passed as an empty string. */}
+        <main className="campaign-layout" data-view={view} {...(view === 'setup' ? { inert: '' } : {})}>
           <WorldMap
             countries={countries} flagPatterns={flagPatterns}
             graticule={this.geo ? this.geo.graticule : { d: '', labels: [] }}
-            homes={this.mapHomes(playing)}
-            battleMarks={(st.battles || []).map((b, i, arr) => ({ x: b.x, y: b.y, op: .25 + .65 * (i + 1) / arr.length }))}
-            labels={this.mapLabels(playing)} labelGeometry={this.labelGeometry} ownership={st.own} oceanLabels={oceanLabels}
-            attack={st.atk}
-            conquestIds={st.conquestIds} followedId={st.followedId} paused={st.paused}
-            selectedId={st.selected}
-            onShowDetails={() => this.showDetails()}
-            focusBounds={st.focusBounds} focusKey={st.focusKey}
-            spin={st.spin ? { ...st.spin, angle: st.spin.ang, durationMs: st.spin.spinMs,
-              attackerName: st.teams[st.spin.attackerId]?.name, targetName: st.teams[st.spin.targetId]?.name } : null}
-            tooltip={this.tooltip(playing)} kmPerUnit={this.geo?.kmPerUnit || 0} legend={this.legend(playing)}
-            viewResetKey={this.viewResetKey} initialFocus={this.viewFocus}
-            title={campaignTitle} playing={playing} mapMode={st.mapMode}
-            onMapMode={mapMode => this.setState({ mapMode })}
+            homes={this.mapHomes(playing)} battleMarks={[]}
+            labels={this.mapLabels(playing)} labelGeometry={this.labelGeometry} ownership={this.mapOwnership()}
+            oceanLabels={oceanLabels} attack={this.mapAttack()} spin={this.mapSpin()}
+            conquestIds={this.mapConquestIds()} followedId={st.followedId} paused={st.paused} selectedId={st.selected}
+            onShowDetails={() => this.showDetails()} focusBounds={st.focusBounds} focusKey={st.focusKey} focusLayout={st.focusLayout}
+            tooltip={this.tooltip(playing)} kmPerUnit={0} legend={null} title={null}
+            viewResetKey={this.viewResetKey} initialFocus={this.mapInitialFocus()} nearFocus={this.mapNearFocus()}
+            playing={playing} mapMode={st.mapMode} onMapMode={mapMode => this.setState({ mapMode })}
+            meId={this.mapMeId()} opponentId={this.mapOpponentId()} reach={this.reachModel()}
+            hidden={!mapVisible} wholeMap={st.wholeMap} onWholeMap={() => this.setState({ wholeMap: !st.wholeMap })}
+            anchors={playing ? this.mapAnchors() : []}
             mapRef={this.mapRef} svgRef={this.svgRef} tipRef={this.tipRef} coordRef={this.coordRef}
             onPointerMove={this.handleMapMove} onPointerLeave={() => this.setState({ hoverCid: null })}
-            playback={playing && <PlaybackBar
-              speed={st.speed} autoplay={st.autoplay} busy={!!st.spin || !!st.choice || !!st.tacticalChoice || !!st.managerElimination || !!st.storageDialog} completed={completed}
-              stepLabel={st.spin ? 'Drawing match…' : liveMatch ? 'Finish match' : 'Next match'}
-              onSpeed={() => this.cycleSpeed()} onStep={() => this.step()} onPlay={() => this.togglePlay()}
-              paused={st.paused} live={liveMatch || !!st.spin} onPause={() => this.pausePlayback()}
-              stateLabel={playbackState}
-              summary={currentCard ? { text: `${currentCard.a.code} ${currentCard.a.score}–${currentCard.b.score} ${currentCard.b.code}`,
-                label: `${currentCard.a.name} ${currentCard.a.score}, ${currentCard.b.name} ${currentCard.b.score}` } : null}
-            />}
+            {...this.mapProps()}
           >
+            {playing && <MapOverlays {...this.mapOverlaysModel()} />}
             {st.toast && <Toast code={st.toast.code} text={st.toast.txt} color={st.toast.col} />}
             {this.renderPopup()}
           </WorldMap>
-          {playing && <Sidebar
-            match={currentCard} idleText={this.idleText()} queueLeft={st.queue.length}
-            draw={st.spin ? { stage: st.spin.stage, isNeighbor: st.spin.isNeighbor,
-              routeKind: st.spin.routeKind, routeLabel: st.spin.routeLabel,
-              attackerName: st.teams[st.spin.attackerId]?.name, targetName: st.teams[st.spin.targetId]?.name } : null}
-            tab={st.tab} onTab={tab => this.setState({ tab })}
-            feed={st.log.slice().reverse().slice(0, FEED_CAP).map(f => ({
-              round: 'R' + f.r, chip: f.chip || C.textMute, color: f.col || C.textSoft, text: f.txt,
-            }))}
-            power={this.powerTable(playing)} squad={this.squadPanel()} positionColors={sport.positionColors}
-            selectedTeamId={st.selected} onSelectTeam={tid => this.selectTeam(tid)} eventsRef={this.eventsRef}
-            followed={{ id: st.followedId, name: st.teams[st.followedId]?.name,
-              alive: st.followedId ? st.aliveIds.includes(st.followedId) : true,
-              controlled: false, pauseOnEvents: st.pauseFollow }}
-            managed={{ id: st.managedTeamId, name: st.teams[st.managedTeamId]?.name,
-              alive: st.aliveIds.includes(st.managedTeamId), ended: st.managementEnded }}
-            onFollow={id => this.followTeam(id)} onPauseFollow={pauseFollow => this.setState({ pauseFollow }, () => this.persist())}
-            history={st.history} historyTeams={Object.values(st.teams).map(team => ({ id: team.id, name: team.name, alive: st.aliveIds.includes(team.id) })).sort((a, b) => a.name.localeCompare(b.name))}
-            selectedHistory={st.history.find(entry => entry.id === st.selectedHistoryId)}
-            onHistorySelect={selectedHistoryId => this.setState({ selectedHistoryId }, () => this.persist())}
-            historyFilter={st.historyFilter} onHistoryFilter={historyFilter => this.setState({ historyFilter }, () => this.persist())}
-            onViewConquest={result => this.viewConquest(result)}
-            session={{ ...estimateSession(st.aliveIds.length, st.settings, st.speed, st.series), upTo: st.settings.finale === 'best-of-three' }} paused={st.paused || !!st.choice || !!st.tacticalChoice}
-          />}
+          {playing && view === 'map' && <CampaignColumn
+            {...this.columnModel()}
+            matchCard={matchCardNode}
+            targetPanel={st.pendingTarget ? <TargetPanel {...this.targetPanelModel()} onSelect={id => this.selectTarget(id)}
+              onHover={id => this.hoverTarget(id)} onConfirm={() => this.confirmTarget()} /> : null}
+            spectatorPanel={!ctx.managedId ? <SpectatorPanel {...this.spectatorPanelModel()} matchCard={matchCardNode}
+              onFollow={id => this.followTeam(id)} onPauseFollow={value => this.setPauseFollow(value)}
+              onToggleAutoplay={() => this.togglePlay()} onSpeed={n => this.setSpeed(n)} /> : null}
+            onPreview={() => this.openMatchPreview()} onSimulate={() => this.simulateResult()}
+            onToggleSheet={() => this.togglePhoneSheet()} onOpenChronicle={() => this.setView('chronicle')}
+            onSelectTeam={id => this.selectTeam(id)} />}
+          {playing && view === 'conquest' && <ConquestScreen {...this.conquestModel()}
+            onSelect={index => this.selectAcquisition(index)}
+            onConfirm={() => this.chooseAcquisition(this.selectedCandidate(st.choice)?.index)} />}
+          {playing && view === 'squad' && <SquadScreen {...this.squadModel()}
+            onFollow={id => this.followTeam(id)} onBack={() => this.squadBack()} onSelectTeam={id => this.selectTeam(id)} />}
+          {playing && view === 'match' && <MatchScreen {...this.liveMatchModel()} minuteStore={this.minuteStore}
+            speed={st.speed} paused={st.paused} onSpeed={n => this.setSpeed(n)} onPause={() => this.pausePlayback()}
+            onSelectTeam={id => this.selectTeam(id)} />}
+          {playing && view === 'ledger' && <LedgerScreen {...this.ledgerModel()} selectedTeamId={st.selected}
+            onSelectTeam={id => this.selectTeam(id)} />}
+          {playing && view === 'chronicle' && <ChronicleScreen {...this.chronicleModel()}
+            selectedHistory={st.history.find(entry => entry.id === st.selectedHistoryId)} historyFilter={st.historyFilter}
+            onHistorySelect={id => this.setState({ selectedHistoryId: id }, () => this.persist())}
+            onHistoryFilter={value => this.setState({ historyFilter: value }, () => this.persist())}
+            onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} />}
+          {playing && view === 'map' && <Ticker {...this.tickerModel()} />}
         </main>
+        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} onPrimary={() => this.runPrimary()} />}
+        {playing && <PhoneTabBar active={this.navView(view)} hidden={view === 'conquest'} locked={!!st.choice || !!st.pendingTarget}
+          moreOpen={st.phoneMore} onView={v => this.setView(v)} onMore={() => this.togglePhoneMore()} />}
+        {playing && st.phoneMore && <PhoneMoreSheet onClose={() => this.togglePhoneMore()} locked={!!st.choice || !!st.pendingTarget}
+          onChronicle={() => this.setView('chronicle', () => {
+            if (typeof document !== 'undefined') document.getElementById('view-panel-chronicle')?.focus?.({ preventScroll: true });
+          })}
+          settings={<SettingsPanel {...settingsProps} idPrefix="sheet-" />}
+          playback={<PlaybackBar variant="sheet" id="campaign-playback-sheet" showStep={!ctx.managedId} {...playback} />} />}
         {st.phase === 'setup' && <SetupOverlay
           setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()}
           savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
@@ -1737,6 +1388,7 @@ export default class App extends React.Component {
           onStart={() => this.startCampaign()}
           saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
           onManageSaves={() => this.openStorageDialog('slots')}
+          onCancel={st.hasSave ? () => this.resume() : undefined}
         />}
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           onClose={() => this.setState({ phase: 'playing' })}
@@ -1745,10 +1397,11 @@ export default class App extends React.Component {
             this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null, autoplay: false });
           }}
         />}
-        {st.tacticalChoice && !st.storageDialog && !st.exportText && <TacticalChoice choice={st.tacticalChoice} onChoose={id => this.chooseTactic(id)} />}
-        {st.choice && !st.storageDialog && !st.exportText && <AcquisitionChoice choice={st.choice} onChoose={index => this.chooseAcquisition(index)} />}
+        {st.tacticalChoice && st.tacticalPreview && !st.storageDialog && !st.exportText && <TacticalChoice choice={st.tacticalChoice}
+          preview={this.matchPreviewModel()} onSimulate={() => this.simulateResult()}
+          onChoose={id => this.chooseTactic(id)} onClose={() => this.closeMatchPreview()} />}
         {st.managerElimination && !st.storageDialog && !st.exportText && <ManagerElimination result={st.managerElimination}
-          onSpectate={() => this.continueAsSpectator()} onRetry={() => this.retryManager()} />}
+          model={this.eliminationModel()} onSpectate={() => this.continueAsSpectator()} onRetry={() => this.retryManager()} />}
         {st.storageDialog && !st.exportText && <CampaignStorageDialog key={st.storageDialog.mode} {...st.storageDialog}
           activeId={st.campaignId} campaigns={listCampaigns()} onClose={() => this.closeStorageDialog()}
           onConfirmImport={name => this.continueSaved(st.storageDialog.campaign, true, name)}

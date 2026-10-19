@@ -1,6 +1,6 @@
 import React from 'react';
 import { C, ratingColor } from '../theme.js';
-import './results.css';
+import './player-row.css';
 
 /** Claimed players retain their former team, keeping the campaign's story readable. */
 export default function PlayerRow({ player, positionColors = {}, roomy = false, role }) {

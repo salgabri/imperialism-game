@@ -211,7 +211,7 @@ test('campaign role, uncertainty, recruitment and finale stay locked between ser
   try {
     f.app.startMatch('250', '276'); forceResult(f.app); f.app.finishMatch();
     const series = structuredClone(f.app.state.series), settings = { ...f.app.state.settings };
-    for (const [key, value] of [['role', 'manager'], ['uncertainty', 'wild'], ['finale', 'single'], ['acquisitionPolicy', 'highest-rated'], ['pacing', 'chaos']]) f.app.setSetting(key, value);
+    for (const [key, value] of [['role', 'manager'], ['uncertainty', 'wild'], ['finale', 'single'], ['acquisitionPolicy', 'highest-rated'], ['pacing', 'chaos'], ['turnOrder', 'round-robin'], ['targeting', 'player']]) f.app.setSetting(key, value);
     assert.deepEqual(f.app.state.settings, settings); assert.deepEqual(f.app.state.series, series);
     f.app.setSetting('resolution', 'instant'); assert.equal(f.app.state.settings.resolution, 'instant');
     f.app.startMatch('250', '276'); assert.equal(f.app.state.match.series.aWins, 1); assert.equal(f.app.state.series.games, 1);

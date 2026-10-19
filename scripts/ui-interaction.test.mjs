@@ -11,8 +11,6 @@ const compiled = await build({
   stdin: { contents: `
     export {default as SetupOverlay} from './src/components/SetupOverlay.jsx';
     export {default as SaveControls} from './src/components/SaveControls.jsx';
-    export {default as Sidebar} from './src/components/Sidebar.jsx';
-    export {default as AcquisitionChoice} from './src/components/AcquisitionChoice.jsx';
     export {default as DrawCompass} from './src/components/DrawCompass.jsx';
     export {default as WorldMap} from './src/components/WorldMap.jsx';
     export {default as ExportCheckpoint} from './src/components/ExportCheckpoint.jsx';
@@ -22,7 +20,7 @@ const compiled = await build({
 });
 const module = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
-const { SetupOverlay, SaveControls, Sidebar, AcquisitionChoice, DrawCompass, WorldMap, ExportCheckpoint } = module.exports;
+const { SetupOverlay, SaveControls, DrawCompass, WorldMap, ExportCheckpoint } = module.exports;
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost' });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
@@ -64,31 +62,8 @@ test('import forwards the chosen file and permits the same file to be chosen aga
   await view.close();
 });
 
-test('history filters archived fixtures by team and selecting a result retains its identifier', async () => {
-  const selected = [];
-  const fixtures = [
-    { id: 'm1', round: 1, aId: 'a', dId: 'b', a: { name: 'Alfa', score: 2 }, b: { name: 'Beta', score: 1 } },
-    { id: 'm2', round: 2, aId: 'c', dId: 'd', a: { name: 'Gamma', score: 0 }, b: { name: 'Delta', score: 1 } },
-  ];
-  const view = await mount(Sidebar, { tab: 'history', history: fixtures, historyTeams: [{ id: 'a', name: 'Alfa' }], onHistorySelect: id => selected.push(id) });
-  const filter = view.host.querySelector('#history-team');
-  await act(async () => { filter.value = 'a'; filter.dispatchEvent(new dom.window.Event('change', { bubbles: true })); });
-  assert.equal(view.host.querySelectorAll('.fi-history-list button').length, 1);
-  await act(async () => view.host.querySelector('.fi-history-list button').click());
-  assert.deepEqual(selected, ['m1', 'm1'], 'Changing the filter selects its newest report before the explicit click');
-  await view.close();
-});
-
-test('manager choice shows lineup consequences and returns the actual candidate index', async () => {
-  const choices = [];
-  const view = await mount(AcquisitionChoice, { choice: { winnerName: 'Alfa', loserName: 'Beta', candidates: [{ index: 4, name: 'A Player', pos: 'MF', rating: 88, gain: 1.2, replaces: { name: 'Old Player' } }] }, onChoose: index => choices.push(index) });
-  assert.match(view.host.textContent, /Replaces Old Player/);
-  assert.match(view.host.textContent, /\+1\.2 strength/);
-  assert.equal(document.activeElement, view.host.querySelector('button'));
-  await act(async () => view.host.querySelector('button').click());
-  assert.deepEqual(choices, [4]);
-  await view.close();
-});
+// The Sidebar history test and the AcquisitionChoice test moved with their screens (W3): see ledger-chronicle.test.mjs
+// ("history filters archived fixtures…") and conquest-screen.test.mjs ("ported AcquisitionChoice contract…").
 
 test('compass pause controls its existing animation rather than restarting it', async () => {
   let created = 0, paused = 0, resumed = 0, canceled = 0;

@@ -9,6 +9,7 @@ import { CAPITALS } from '../src/data/capitals.js';
 import { NATIONS, makeRng, teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { WorldGeometry } from '../src/engine/geo.js';
+import { estimateWinProbability } from '../src/engine/odds.js';
 
 const compiled = await build({
   entryPoints: [fileURLToPath(new URL('../src/App.jsx', import.meta.url))],
@@ -75,12 +76,27 @@ class ProductionCampaign extends App {
   showToast() {}
 }
 
+// The runner's target policy: 'adaptive' attacks the option it is most likely to beat (display odds use their
+// own RNG, so the campaign stream never moves); every other policy keeps the panel's preselection (win% × spoils).
+function targetPolicyPick(state, managerPolicy) {
+  const pending = state.pendingTarget, attacker = state.teams[pending.attackerId];
+  if (managerPolicy !== 'adaptive' || !attacker) return pending.selectedId;
+  const territoriesOf = id => Object.values(state.own).filter(owner => owner === id).length;
+  const scored = pending.optionIds.filter(id => state.teams[id]).map(id => ({ id, n: territoriesOf(id),
+    p: estimateWinProbability({ sport: state.settings.sport, attacker, defender: state.teams[id], preset: state.settings.uncertainty }).attacker }));
+  scored.sort((a, b) => b.p - a.p || b.n - a.n || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  return scored[0]?.id ?? pending.selectedId;
+}
+
 export function runProductionCampaign({ seed = 20261002, sport = 'football', layer = 'nations', scope = 'elite',
   clubScope = 'elite', pacing = 'blitz', uncertainty = 'balanced', finale = 'single', acquisitionPolicy = 'highest-rated',
-  rosterPreset = 'authentic', managerPolicy = 'spectator', managedTeamId, managerRank, resolution = 'instant', express = false } = {}) {
+  rosterPreset = 'authentic', managerPolicy = 'spectator', managedTeamId, managerRank, resolution = 'instant', express = false,
+  turnOrder, targeting } = {}) {
   const role = managerPolicy === 'spectator' ? 'spectator' : 'manager';
+  // Turn rules are only passed when asked for, so default runs keep the App's own defaults (random × compass).
   const setup = { sport, layer, scope, clubScope, pacing, uncertainty, finale, acquisitionPolicy, rosterPreset,
-    role, managedTeamId: managedTeamId || '', seed: String(seed), resolution, express };
+    role, managedTeamId: managedTeamId || '', seed: String(seed), resolution, express,
+    ...(turnOrder ? { turnOrder } : {}), ...(targeting ? { targeting } : {}) };
   const app = new ProductionCampaign(setup);
   if (role === 'manager' && !setup.managedTeamId) {
     const included = app.opening(setup, makeRng(seed)).included.slice().sort((a, b) => teamEff(b) - teamEff(a) || a.id.localeCompare(b.id));
@@ -95,7 +111,7 @@ export function runProductionCampaign({ seed = 20261002, sport = 'football', lay
   const startingTeams = initialRank.length;
   const managerId = app.state.managedTeamId;
   let steps = 0, redraws = 0, firstDecisionMatch = null, eliminatedAt = null, managedPlacement = null, lastTactic = 'balanced';
-  let stoppedReason = null;
+  let stoppedReason = null, targetDecisions = 0;
   const tacticalChoices = { attack: 0, balanced: 0, defend: 0 }, signingChoices = {};
   const limit = Math.max(128, startingTeams * 16);
   while (app.state.aliveIds.length > 1 && steps++ < limit) {
@@ -122,6 +138,14 @@ export function runProductionCampaign({ seed = 20261002, sport = 'football', lay
       if (!selected) { stoppedReason = 'empty-manager-choice'; break; }
       signingChoices[selected.role || 'Unlabelled'] = (signingChoices[selected.role || 'Unlabelled'] || 0) + 1;
       app.chooseAcquisition(selected.index);
+    } else if (state.pendingTarget) {
+      // "You choose" turn (targeting: 'player'): confirm a policy pick through the production handlers.
+      if (typeof app.confirmTarget !== 'function') { stoppedReason = 'target-choice-unsupported'; break; }
+      firstDecisionMatch ??= state.matches + 1;
+      const pick = targetPolicyPick(state, managerPolicy);
+      if (pick !== state.pendingTarget.selectedId) app.selectTarget(pick);
+      targetDecisions++;
+      app.confirmTarget();
     } else if (state.match && !state.match.applied) {
       app.finishMatch();
     } else if (state.spin) {
@@ -132,7 +156,8 @@ export function runProductionCampaign({ seed = 20261002, sport = 'football', lay
       const previous = [state.matches, state.round, state.queue.length].join(':');
       app.nextAction();
       if (!app.state.match || app.state.match.applied) {
-        if (!app.state.spin && !app.state.tacticalChoice && previous === [app.state.matches, app.state.round, app.state.queue.length].join(':')) redraws++;
+        if (!app.state.spin && !app.state.tacticalChoice && !app.state.pendingTarget
+          && previous === [app.state.matches, app.state.round, app.state.queue.length].join(':')) redraws++;
       }
     }
   }
@@ -155,7 +180,7 @@ export function runProductionCampaign({ seed = 20261002, sport = 'football', lay
     managedMatches: managerMatches, managedConquests: managerId ? app.state.stats[managerId]?.conq || 0 : null,
     managedEliminatedAt: eliminatedAt, managedPlacement: managerId ? managedPlacement || (championId === managerId ? 1 : null) : null,
     managedChampion: managerId ? championId === managerId : null, firstDecisionMatch, tacticalChoices, signingChoices,
-    finalRngState: app.rng.getState(), decisionCount: app.state.decisionLedger.length,
+    finalRngState: app.rng.getState(), decisionCount: app.state.decisionLedger.length, targetDecisions,
     // Compact sequence is sufficient to compare deterministic replay and runner
     // equivalence without retaining every ticker event in large balance reports.
     outcomes: app.state.history.map(match => `${match.aId}:${match.dId}:${match.winnerId}:${match.a.score}:${match.b.score}`),
