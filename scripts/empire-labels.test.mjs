@@ -234,6 +234,33 @@ test('deterministic ownership order, stable camera movement, and eliminated-owne
   assert.deepEqual(engine.layout(options({}, [name()])), []);
 });
 
+test('a label reuses its last search only while that search would choose the same again', () => {
+  const shapes = [shape('c1', rect(100, 100, 150, 100)), shape('c2', rect(250, 100, 150, 100)), shape('c3', rect(400, 100, 150, 100)),
+    shape('c4', rect(100, 200, 150, 100)), shape('c5', rect(250, 200, 150, 100)), shape('c6', rect(400, 200, 150, 100)),
+    shape('c7', rect(650, 120, 90, 50))];
+  const start = { c1: 'A', c2: 'B', c3: 'C', c4: 'D', c5: 'E', c6: 'F', c7: 'G' };
+  const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map(id => name(id, `EMPIRE ${id}`, 4.5));
+  const zoom = { viewBox: { x: 60, y: 60, w: 720, h: 405 }, unitsPerPixel: .75 };
+  const steps = [
+    [start], [{ ...start, c1: 'B' }], [{ ...start, c1: 'B' }, labels.map(l => l.id === 'C' ? { ...l, widthEm: 3.9 } : l)],
+    [{ ...start, c1: 'B', c6: 'E' }], [{ ...start, c1: 'B', c6: 'E' }, labels, zoom], [{ ...start, c1: 'B', c6: 'E' }],
+    [{ ...start, c1: 'B', c6: 'E', c7: 'C' }], [{ ...start, c1: 'B', c6: 'E', c7: 'C' }, labels.map(l => l.id === 'D' ? { ...l, minFontPx: 6.5 } : l)],
+    [{ ...start, c1: 'B', c6: 'E', c7: 'C' }, labels.map(l => l.id === 'D' ? { ...l, minFontPx: 6.5 } : l), { maxFontPx: 20 }],
+  ];
+  // Before each step the twin lays out an empty offscreen view (placing nothing, so no previous label changes): none of
+  // its labels can reuse a search, and it searches them all again.
+  const engine = createEmpireLabelEngine(shapes), twin = createEmpireLabelEngine(shapes), offscreen = { viewBox: { ...WORLD, x: 5000 } };
+  let reused = 0, last = [];
+  steps.forEach(([ownership, names = labels, extra = {}], step) => {
+    const placed = engine.layout(options(ownership, names, extra));
+    assert.deepEqual(twin.layout(options(ownership, names, offscreen)), []);
+    assert.deepEqual(placed, twin.layout(options(ownership, names, extra)), `step ${step}`);
+    reused += placed.filter(label => last.includes(label)).length;
+    last = placed;
+  });
+  assert.ok(reused >= 4, `labels a conquest left alone were reused (${reused})`);
+});
+
 let atlasCache;
 function atlas() {
   if (atlasCache) return atlasCache;

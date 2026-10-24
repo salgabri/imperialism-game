@@ -1125,6 +1125,11 @@ export function estimateLabelWidthEm(text, weight = 600) {
   return Math.round(width * (1 + 0.06 * boldness) * 10000) / 10000;
 }
 
+/** The fields of a previous label that a label search reads: its component (hysteresis) and its anchor. */
+const previousFields = previous => previous ? { componentKey: previous.componentKey, x: previous.x, y: previous.y, angle: previous.angle, clearance: previous.clearance } : null;
+const samePrevious = (fields, previous) => fields === null ? !previous : !!previous && fields.componentKey === previous.componentKey
+  && Object.is(fields.x, previous.x) && Object.is(fields.y, previous.y) && Object.is(fields.angle, previous.angle) && Object.is(fields.clearance, previous.clearance);
+
 /**
  * Create once per fitted display geometry; reuse for every conquest and zoom.
  *
@@ -1148,6 +1153,10 @@ export function createEmpireLabelEngine(countryShapes = []) {
   const countries = new Map(countryShapes.map(makeCountry).filter(Boolean).sort((a, b) => a.id.localeCompare(b.id)).map(c => [c.id, c]));
   const groupCache = new Map();
   const previousLabels = new Map();
+  // Per label, the inputs of its last search and what it chose. A search reads only the owner's territory group, the
+  // label's text, width and minimum, the options and five fields of its previous label (the rest are pure geometry
+  // caches), so the same inputs give the same choice: after a conquest only the changed empires search again.
+  const labelMemo = new Map();
   let preparedKey = null, prepared = new Map(), lastLayoutKey = null, lastLayout = [];
 
   // Every land shape the owner does not hold, in engine order. Built once per
@@ -1210,6 +1219,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
       if (!activeKeys.has(key)) groupCache.delete(key);
     }
     for (const id of previousLabels.keys()) if (!prepared.has(id)) previousLabels.delete(id);
+    for (const [id, memo] of labelMemo) if (prepared.get(id) !== memo.group) labelMemo.delete(id);
     return prepared;
   }
 
@@ -1221,13 +1231,19 @@ export function createEmpireLabelEngine(countryShapes = []) {
       const options = { unitsPerPixel, viewBox, minFontPx: Math.max(1, minFontPx), maxFontPx: Math.max(minFontPx, maxFontPx), curveRatio: Number.isFinite(curveRatio) ? clamp(curveRatio, 0, 0.15) : 0, coastalAllowancePx: Number.isFinite(coastalAllowancePx) ? Math.max(0, coastalAllowancePx) : 0, maxSeaFraction: Number.isFinite(maxSeaFraction) ? clamp(maxSeaFraction, 0, 0.22) : 0.22, trackingEm: Number.isFinite(trackingEm) ? clamp(trackingEm, 0, 0.3) : TRACKING };
       const cacheKey = JSON.stringify([preparedKey, definitions.map(d => [d.id, d.text, d.widthEm, d.minFontPx]), options]);
       if (cacheKey === lastLayoutKey) return lastLayout;
-      const output = [];
+      const output = [], optionsKey = JSON.stringify(options);
       for (const definition of definitions) {
         const group = groups.get(definition.id);
         const previous = previousLabels.get(definition.id);
         // A label may carry its own legibility floor (v4: your empire 6.5px).
         const labelMinFontPx = Number.isFinite(definition.minFontPx) && definition.minFontPx > 0
           ? clamp(definition.minFontPx, 1, options.maxFontPx) : options.minFontPx;
+        const memo = labelMemo.get(definition.id);
+        if (memo && memo.group === group && memo.text === definition.text && Object.is(memo.widthEm, definition.widthEm)
+          && Object.is(memo.minFontPx, labelMinFontPx) && memo.optionsKey === optionsKey && samePrevious(memo.previous, previous)) {
+          if (memo.chosen) { previousLabels.set(definition.id, memo.chosen); output.push(memo.chosen); }
+          continue;
+        }
         const labelOptions = labelMinFontPx === options.minFontPx ? options : { ...options, minFontPx: labelMinFontPx };
         const foreignCountries = labelOptions.coastalAllowancePx > 0 ? foreignOf(group) : [];
         const checks = footprintChecks(group, `${unitsPerPixel}|${foreignCountries.length > 0}|${labelOptions.coastalAllowancePx}|${labelOptions.maxSeaFraction}`);
@@ -1303,6 +1319,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
             if (quality > bestQuality) { bestQuality = quality; chosen = componentLabel; }
           }
         }
+        labelMemo.set(definition.id, { group, text: definition.text, widthEm: definition.widthEm, minFontPx: labelMinFontPx, optionsKey, previous: previousFields(previous), chosen });
         if (chosen) { previousLabels.set(definition.id, chosen); output.push(chosen); }
       }
       lastLayoutKey = cacheKey; lastLayout = output;
