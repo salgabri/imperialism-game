@@ -5,7 +5,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
 import TeamMark from './TeamMark.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 import * as setupModel from '../screens/setup/setupModel.js';
+import { themedPaint } from '../theme.js';
 import './setup.css';
 
 // Frozen named exports (CommandBar imports the option lists). Definitions live in the pure model module.
@@ -225,7 +227,7 @@ const TheatreMap = React.memo(function TheatreMap({ preview, caption, loading = 
             {preview.backdrop.map((shape, index) => <path key={`${shape.id}-${index}`} d={shape.d} />)}
           </g>
           <g className="setup-map__sections">
-            {preview.sections.map(section => <path key={section.id} d={section.d} fill={section.fill} />)}
+            {preview.sections.map(section => <path key={section.id} d={section.d} fill={section.fill} style={{ fill: themedPaint(section.fill) }} />)}
           </g>
         </svg>
       ) : <div className="setup-map__chart setup-map__placeholder" />}
@@ -474,6 +476,7 @@ export default function SetupOverlay({
           <span className="setup-head__rule" aria-hidden="true" />
           <h1 className="setup-head__title">New campaign</h1>
           {onCancel ? <button type="button" className="setup-head__cancel" disabled={restoring} onClick={onCancel}>Cancel</button> : null}
+          <ThemeToggle className="setup-head__theme" />
         </header>
 
         <nav className="setup-rail" aria-label="Setup steps">

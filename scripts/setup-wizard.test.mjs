@@ -936,5 +936,5 @@ test('a pressed segment keeps its white label on hover (Teams toggle, history ki
   // The hover colour outranks the pressed rule, so it must skip the pressed segment or paint ink on the ink fill.
   assert.match(css, /\.segmented > button:hover:not\(:disabled\):not\(\[aria-pressed=true\]\):not\(\[aria-checked=true\]\) \{ color:var\(--ink\); \}/);
   assert.doesNotMatch(css, /\.segmented > button:hover:not\(:disabled\) \{/);
-  assert.match(css, /\.segmented > button\[aria-pressed=true\], \.segmented > button\[aria-checked=true\] \{ background:var\(--ink\); color:#fff;/);
+  assert.match(css, /\.segmented > button\[aria-pressed=true\], \.segmented > button\[aria-checked=true\] \{ background:var\(--ink\); color:var\(--on-ink\);/);
 });

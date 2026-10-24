@@ -679,7 +679,7 @@ test('turns.css: state rules the primitives would otherwise override, phone stri
     return css.slice(start, i + 1);
   };
   // The pressed speed chip keeps ink/white on hover: (0,4,1) beats `.segmented > button:hover:not(:disabled)` (0,3,1).
-  assert.match(css, /\.follow-speed\.segmented > button\[aria-pressed=true\]:hover\s*\{[^}]*background:var\(--ink\);\s*color:#fff;/);
+  assert.match(css, /\.follow-speed\.segmented > button\[aria-pressed=true\]:hover\s*\{[^}]*background:var\(--ink\);\s*color:var\(--on-ink\);/);
   // Wide chips stay at least 44px on coarse pointers.
   assert.match(block('@media (min-width:1600px) {\n  .follow-pause'), /\.follow-speed\.segmented > button \{[^}]*min-height:max\(36px, var\(--tap\)\)/);
   // A-15 phone strip: "Turn N of M" + current + next flag only.

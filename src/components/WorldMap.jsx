@@ -15,6 +15,7 @@ import EmpireLabels from './EmpireLabels.jsx';
 import DrawCompass, { AttackVector } from './DrawCompass.jsx';
 import FlagPattern from './FlagPattern.jsx';
 import { createMapBorderIndex } from '../engine/mapBorders.js';
+import { themedPaint } from '../theme.js';
 import './map.css';
 
 /** README §Map rendering values (tokens.css mirrors them; SVG attributes need literals). */
@@ -283,13 +284,14 @@ export default function WorldMap({
             const targetable = !choosing || reachState === 'in';
             const conquered = hatchSet.has(c.id);
             const tabbable = !!c.ownerId && targetable;
+            const fill = identityFill(c.fill, c.ownerId, identity);
             return (
               <g key={c.id} className="country-region" style={{ animation: c.animation }}>
                 <g className="country-flag-parts" pointerEvents="none">
                   {c.flagParts?.map((part, i) => <path key={`${part.id}-${i}`} data-flag-country={c.id}
                     data-flag-component={part.id} d={part.d} fill={part.fill} />)}
                 </g>
-                <path data-country={c.id} data-owner={c.ownerId || ''} d={c.d} fill={identityFill(c.fill, c.ownerId, identity)}
+                <path data-country={c.id} data-owner={c.ownerId || ''} d={c.d} fill={fill}
                   ref={element => { if (element) countryRefs.current.set(c.id, element); else countryRefs.current.delete(c.id); }}
                   data-conquered={conquered || undefined} data-followed={(c.ownerId && c.ownerId === followedId) || undefined}
                   data-selected={c.selected || undefined} data-reach={reachState}
@@ -308,7 +310,7 @@ export default function WorldMap({
                   }}
                   onBlur={event => { if (event.relatedTarget) c.onLeave?.(); }}
                   onKeyDown={event => navigateCountry(event, c)}
-                  style={{ cursor: targetable ? c.cursor : 'default' }} />
+                  style={{ cursor: targetable ? c.cursor : 'default', fill: themedPaint(fill) }} />
               </g>
             );
           })}
@@ -346,7 +348,7 @@ export default function WorldMap({
             : <rect key={home.id} data-capital={home.id} x={home.x - 1.9 * k} y={home.y - 1.9 * k} width={3.8 * k} height={3.8 * k}
               fill={PAINT.capital} stroke={PAINT.white} strokeWidth={.8 * k} />)}
         </g>
-        <g aria-hidden="true" pointerEvents="none">
+        <g className="map-ocean-labels" aria-hidden="true" pointerEvents="none">
           {oceanLabels.map(lb => <text key={lb.text} x={lb.x} y={lb.y} textAnchor="middle" fill={PAINT.coast}
             style={{ fontFamily: MAP_FONT, fontSize: 12 * k, fontWeight: 600, letterSpacing: .14 * 12 * k, textTransform: 'uppercase' }}>{lb.text}</text>)}
         </g>

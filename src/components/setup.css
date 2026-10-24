@@ -48,6 +48,8 @@
   font:700 var(--fs-nav)/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); white-space:nowrap;
 }
 .setup-head__cancel:hover { color:var(--ink); }
+.setup-head__theme { margin-left:auto; }
+.setup-head__cancel + .setup-head__theme { margin-left:0; }
 
 /* ---- Step rail (M§3.3) ---- */
 .setup-rail {
@@ -232,7 +234,7 @@
 .setup-map__backdrop path {
   fill:var(--land-neutral); stroke:var(--map-coast); stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round;
 }
-.setup-map__sections path { stroke:#fff; stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round; }
+.setup-map__sections path { stroke:var(--map-border); stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round; }
 .setup-map__caption {
   padding:10px 14px; border-top:1px solid var(--rule); font:400 12px/1.4 var(--font-sans); color:var(--muted);
 }
@@ -489,7 +491,10 @@
 
 /* ---- Phone <700: compact step bar, single column, 56px primary bar (M§8) ---- */
 @media (max-width:699.98px) {
-  .setup-head { gap:12px; }
+  .setup-head { gap:8px; }
+  /* The 44px theme target overhangs the gutter so its 20px glyph lines up with the edge, keeping room for the title. */
+  .setup-head__theme { margin-right:-12px; }
+  .setup-head__cancel + .setup-head__theme { margin-left:-8px; }
   .setup-head__rule { margin:16px 0; }
   .setup-rail { padding:0; }
   .setup-rail__steps { gap:0; }
@@ -508,7 +513,7 @@
   .setup-foot { align-items:stretch; gap:0; padding:0 0 var(--safe-bottom); }
   .setup-foot__note { display:none; }
   .setup-foot .setup-foot__back { flex:none; padding:0 20px; border:0; border-right:1px solid var(--rule); background:var(--panel); }
-  .setup-foot .setup-foot__back:hover:not(:disabled) { background:var(--ink); color:#fff; }
+  .setup-foot .setup-foot__back:hover:not(:disabled) { background:var(--ink); color:var(--on-ink); }
   .setup-foot .setup-foot__next { flex:1 1 auto; min-width:0; justify-content:space-between; padding:0 18px; }
   /* "Next: Nation & role" plus its hint must never push the bar past the screen edge: the hint gives way first, with an
      ellipsis (the narrow rule below keeps it whole down to 360). */
