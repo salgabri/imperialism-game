@@ -284,11 +284,12 @@ taken" callout. Beside it, an article reads "SERBIA IS OUT", with a
 winner-first standfirst and the territory and empire effects. **Claim one
 player** lists the candidates, with the best lineup fit preselected. Each one
 reads "FW · 86 rating · Starts ahead of <player>" or "Adds depth · the XI is
-unchanged", with the strength gain. A collapsible "Lineup before and after"
-compares the lineups, and **Sign <player>** confirms. If your team is knocked
-out, the same article layout ("ITALY IS OUT") offers **Continue as spectator**
-or **Retry this setup**. Conquests by other teams never wait: a notice on the
-map, the ticker and a brief hatch flash report them.
+unchanged", with the strength gain. The position lists every natural position,
+so a basketball combo guard reads "PG/SG · 88 rating". A collapsible "Lineup
+before and after" compares the lineups, and **Sign <player>** confirms. If your
+team is knocked out, the same article layout ("ITALY IS OUT") offers
+**Continue as spectator** or **Retry this setup**. Conquests by other teams
+never wait: a notice on the map, the ticker and a brief hatch flash report them.
 
 **Ledger** shows the standings (# · Team · Terr · Strength · Conq · Claimed),
 the share of the map and the fallen empires. **Chronicle** shows the match
@@ -391,15 +392,29 @@ position are curated in `scripts/fiba-squads.json`, and ratings are resolved fro
 the 2K export by name, with a curated rating for EuroLeague players it doesn't
 cover. Curating nationality is the right call regardless: FIBA squads are not NBA
 rosters (Serbia, Spain, Greece and Lithuania field mostly EuroLeague players, and
-eligibility follows the federation — Banchero plays for the USA, Siakam for
-Cameroon).
+eligibility follows the federation — Banchero plays for the USA rather than
+Italy). The fives were last checked against FIBA records in October 2026: every
+player has played for his national team since 2023, players who had retired
+from it were replaced by current internationals at the same position, and no
+five fields more than the one naturalized player FIBA allows.
+
+Basketball positions are fluid, so most players list two neighbouring positions,
+primary first: Dončić is PG/SG, Giannis PF/C, Melli PF/C. Pure point guards and
+centres such as Calathes and Jokić list one, and so do players whose sources
+show a single position. 133 of the 200 national players cover two positions.
+Every listed position is one the player really plays, and every five has a
+real player for each of the five positions. The lineup optimizer fields each
+five from these positions, so Italy starts Pajola (PG/SG) at shooting guard and
+Melli at centre.
 
 Nations with no roster in a sport fall back to *that sport's* baseline, never to
 another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
 An assignment optimizer fills all eleven football or five basketball slots.
-Playing outside a natural position costs 12 rating points. Missing legacy slots
+Playing outside a natural position costs 12 rating points. A player may have
+more than one natural position, and each one is penalty-free: a claimed PG/SG
+can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
 in match scoring and tie-break events. Squad lists separate starters from bench
 and identify positional penalties; bench depth does not directly inflate strength.
@@ -447,9 +462,14 @@ conquest, player theft) behaves identically.
 Club lineups come from the same two exports as the national squads:
 `clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
 `clubs.basketball.js` from the NBA 2K export. 2K carries no position, so each
-player's role is inferred from the attributes that define it — a centre by
-interior defence, rebounding and post play; a point guard by vision, handle and
-speed with the ball.
+player's positions are inferred from the attributes that define them — a centre
+by interior defence, rebounding and post play; a point guard by vision, handle
+and speed with the ball. Each fit is ranked as a league percentile, so the five
+scales compare. A player's best fit is his primary position. He also covers the
+better neighbouring position when it ranks within 15 percentiles of it. About
+three in four players in the export, and 131 of the 150 NBA starters, cover two
+positions. Each franchise's five is then the lineup the game itself would field
+from its whole roster.
 
 ## Domestic campaigns
 

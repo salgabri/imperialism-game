@@ -269,9 +269,14 @@ function genPlayer(rng, culture, pos, baseStr) {
   return { name: f[0] + '. ' + l, pos, rating, gen: true };
 }
 
-/** Preserve the database identity and rating evidence carried by each export. */
-function rosterPlayer([name, pos, rating, metadata]) {
+/**
+ * Preserve the database identity and rating evidence carried by each export.
+ * Basketball tuples list every natural position, primary first ('PG/SG').
+ */
+function rosterPlayer([name, listed, rating, metadata]) {
+  const [pos, ...others] = listed.split('/');
   const player = { name, pos, rating, gen: false };
+  if (others.length) player.positions = [pos, ...others];
   if (metadata) {
     player.sourceInfo = { ...metadata };
     if (metadata.id) player.id = metadata.id;

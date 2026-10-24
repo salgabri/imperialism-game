@@ -527,6 +527,27 @@ test('out-of-position starters show ↓ in role on desktop and a note on phone',
   assert.deepEqual(view.errors, []);
 });
 
+test('basketball: Natural lists both positions and a starter at his second one pays no penalty', async context => {
+  const players = [
+    { name: 'Point Guard', pos: 'PG', rating: 90 }, { name: 'Combo Guard', pos: 'PG', positions: ['PG', 'SG'], rating: 88 },
+    { name: 'Starting Wing', pos: 'SF', positions: ['SF', 'PF'], rating: 83 },
+    { name: 'Stretch Big', pos: 'PF', positions: ['PF', 'C'], rating: 82 }, { name: 'Starting Center', pos: 'C', rating: 81 },
+  ];
+  const team = { id: 'b', name: 'Bravo', code: 'BRA', kind: 'club', flagId: null, sport: 'basketball', squad: players };
+  const model = buildSquad({ teams: { b: team }, aliveIds: ['b'] }, { sport: { id: 'basketball' }, cache: new Map() }, 'b');
+  const combo = model.groups[0].rows.find(row => row.name === 'Combo Guard');
+  assert.deepEqual([combo.pos, combo.natural, combo.inRole, combo.outOfPosition], ['SG', 'PG / SG', '88', false]);
+  const view = await mount(model, context);
+  const row = [...view.host.querySelectorAll('.squad-main .squad-row')].find(item => item.textContent.includes('Combo Guard'));
+  assert.equal(text(row.querySelector('.squad-row__pos')), 'SG');
+  assert.equal(text(row.querySelector('.squad-row__natural')), 'PG / SG');
+  assert.equal(text(row.querySelector('.squad-row__role')), '88');
+  assert.equal(row.querySelector('.squad-row__oop'), null);
+  const phoneRow = [...view.host.querySelectorAll('.squad-prow')].find(item => item.textContent.includes('Combo Guard'));
+  assert.equal(text(phoneRow.querySelector('.squad-prow__meta')), 'PG / SG');
+  assert.deepEqual(view.errors, []);
+});
+
 test('Source cells keep the roster evidence: database title, sofifa / FM link (http only) and the full name', async context => {
   const st = campaign();
   const squad = st.teams[380].squad;

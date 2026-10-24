@@ -4,6 +4,7 @@ import { makeRng, selectLineup, teamEff, OUT_OF_POSITION_PENALTY } from '../src/
 import { football } from '../src/sports/football.js';
 import { basketball } from '../src/sports/basketball.js';
 import { pickScorer } from '../src/engine/random.js';
+import { acquisitionCandidates } from '../src/engine/campaignExperience.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from '../src/engine/odds.js';
 
 function team(sport, rating = 75, id = 'A') {
@@ -57,6 +58,29 @@ test('lineup selection finds the best whole assignment, including a stronger eme
   assert.equal(lineup.slots.find(slot => slot.position === 'PF').player.name, 'B');
   assert.equal(lineup.slots.find(slot => slot.position === 'PF').penalty, OUT_OF_POSITION_PENALTY);
   assert.deepEqual(lineup.bench.map(player => player.name), ['E']);
+});
+
+test('a basketball player covers either of his natural positions without the penalty', () => {
+  const side = team(basketball);
+  side.squad[1] = { name: 'Combo guard', pos: 'PG', positions: ['PG', 'SG'], rating: 75 };
+  const lineup = selectLineup(side);
+  const guard = lineup.slots.find(slot => slot.position === 'SG');
+  assert.equal(guard.player.name, 'Combo guard');
+  assert.equal(guard.outOfPosition, false);
+  assert.equal(lineup.rating, 75);
+  delete side.squad[1].positions;
+  assert.equal(selectLineup(side).rating, 72.6, 'a pure point guard at SG pays the penalty');
+});
+
+test('a claimed combo guard starts at his second position when his first is taken', () => {
+  const side = team(basketball);
+  side.squad[1].rating = 50; // a weak shooting guard beside a 75 point guard
+  const signing = { name: 'Combo guard', pos: 'PG', positions: ['PG', 'SG'], rating: 85 };
+  const [dual] = acquisitionCandidates(side, { squad: [signing] });
+  assert.equal(dual.gain, 7, 'he replaces the 50 at SG at his full rating');
+  assert.equal(dual.lineupPreview.after.find(slot => slot.position === 'SG').name, 'Combo guard');
+  const [single] = acquisitionCandidates(side, { squad: [{ ...signing, positions: undefined }] });
+  assert.equal(single.gain, 4.6, 'as a pure point guard he or the incumbent plays out of position');
 });
 
 test('legacy saves infer the correct sport and unfilled shirts remain visible', () => {
