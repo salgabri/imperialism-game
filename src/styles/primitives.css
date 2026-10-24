@@ -86,7 +86,8 @@
   font:700 12px/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; cursor:pointer;
 }
 .segmented > button + button { box-shadow:inset 1px 0 0 var(--rule); }
-.segmented > button:hover:not(:disabled) { color:var(--ink); }
+/* Hover skips the pressed segment, or it would outrank the rule below and paint the label ink on the ink fill. */
+.segmented > button:hover:not(:disabled):not([aria-pressed=true]):not([aria-checked=true]) { color:var(--ink); }
 .segmented > button[aria-pressed=true], .segmented > button[aria-checked=true] { background:var(--ink); color:var(--on-ink); box-shadow:none; }
 
 /* ---- Switch (M§6.5) ---- */

@@ -344,6 +344,23 @@ test('revealAll stops the chain, shows the final minute and drops pending ticker
   } finally { f.close(); }
 });
 
+test('Finish match drops the kickoff notice and goal toast whose clears it cancels', () => {
+  const f = syncAppFixture();
+  try {
+    f.app.finishMatch = () => {};
+    f.app.setState({ match: liveMatch(f.app, [[10, '250'], [40, '276']]) });
+    f.app.presentMatch();
+    f.time.advance(LEAD + 10 * UNIT);
+    assert.ok(f.app.state.pu, 'the kickoff notice is still up');
+    assert.ok(f.app.state.toast, 'the minute-10 goal toast is up');
+    f.app.fastForward();
+    assert.equal(f.app.state.pu, null);
+    assert.equal(f.app.state.toast, null);
+    f.time.advance(10000);
+    assert.equal(f.app.state.toast, null, 'nothing is left to show a stale goal over the result');
+  } finally { f.close(); }
+});
+
 test('instant and express reveals show the final minute and give the match clock nothing to re-time', () => {
   for (const [settings, extra] of [[{ resolution: 'instant' }, {}], [{}, { express: true }], [{}, { instant: true }]]) {
     const f = syncAppFixture({ settings });

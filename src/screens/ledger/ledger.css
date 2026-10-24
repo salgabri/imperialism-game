@@ -186,6 +186,9 @@
 .fi-history-tag.is-you { color:var(--you-text); box-shadow:inset 0 0 0 1px var(--you); }
 .fi-history-tag.is-upset { color:var(--even); box-shadow:inset 0 0 0 1px var(--even); }
 .fi-history__report > .kicker { margin-bottom:14px; }
+/* The aside is the whole match title here: it gives way, not the short "Result" heading. */
+.fi-history__report > .kicker > .kicker__title { flex:none; }
+.fi-history__report > .kicker > .kicker__aside { flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; }
 
 /* ---------- Chronicle: turning points + activity ---------- */
 .chronicle-turning__list { margin:0; }

@@ -399,7 +399,7 @@ test('launch: enabled for spectators from any step, requires a managed team for 
   assert.match(pick.textContent, /Selected nation/);
   assert.match(pick.textContent, /Italy/);
   assert.match(pick.textContent, /3 \/ 4/);
-  assert.match(pick.textContent, /Favourite/);
+  assert.match(pick.textContent, /Outsider/, 'third of a four-team field (tiers scale with the field)');
   assert.ok(pick.querySelectorAll('.setup-player').length > 0, 'best players come from the roster data');
   assert.equal(manager.button('Launch campaign').disabled, false);
   await manager.click(manager.button('Launch campaign'));
@@ -754,7 +754,11 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
   assert.equal(campaignFacts({ role: 'manager' }).at(0).value, 'Manager');
   const odd = campaignFacts({ pacing: 'x', uncertainty: 'x', finale: 'x', acquisitionPolicy: 'x', role: 'x', turnOrder: 'x', targeting: 'x' });
   assert.deepEqual(odd.map(row => row.stored), ['spectator', 'duel', 'compass', 'balanced', 'single', 'highest-rated']);
-  assert.deepEqual([1, 4, 5, 12, 13, 30, 31].map(tierOf), ['Favourite', 'Favourite', 'Contender', 'Contender', 'Outsider', 'Outsider', 'Long shot']);
+  assert.deepEqual([1, 4, 5, 12, 13, 30, 31].map(rank => tierOf(rank)), ['Favourite', 'Favourite', 'Contender', 'Contender', 'Outsider', 'Outsider', 'Long shot']);
+  assert.deepEqual([1, 4, 5, 12, 13, 30, 31].map(rank => tierOf(rank, 46)), ['Favourite', 'Favourite', 'Contender', 'Contender', 'Outsider', 'Outsider', 'Long shot'],
+    'a 46-team field keeps the board cut-offs');
+  assert.deepEqual([1, 2, 3, 4, 7, 8, 10].map(rank => tierOf(rank, 10)), ['Favourite', 'Contender', 'Contender', 'Outsider', 'Outsider', 'Long shot', 'Long shot'],
+    'a ten-club country scales them down: its weakest club is a long shot, not a contender');
 
   const setup = Object.freeze({ ...BASE, role: 'manager', managedTeamId: '380' });
   const teams = Object.freeze(TEAMS.map(team => Object.freeze({ ...team })));
@@ -1039,4 +1043,12 @@ test('world card: a theatre opening board in kick-off pastels over unclaimed lan
   const country = await mount(t, { setup: COUNTRY, theatreMap: preview, domestic: { state: 'loading', message: null, onRetry() {} } });
   assert.deepEqual(country.qa('.setup-map').map(element => element.dataset.kind), ['country']);
   assert.deepEqual([...nations.errors, ...clubs.errors, ...none.errors, ...country.errors], []);
+});
+
+test('a pressed segment keeps its white label on hover (Teams toggle, history kinds, squad view)', () => {
+  const css = readFileSync(new URL('../src/styles/primitives.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  // The hover colour outranks the pressed rule, so it must skip the pressed segment or paint ink on the ink fill.
+  assert.match(css, /\.segmented > button:hover:not\(:disabled\):not\(\[aria-pressed=true\]\):not\(\[aria-checked=true\]\) \{ color:var\(--ink\); \}/);
+  assert.doesNotMatch(css, /\.segmented > button:hover:not\(:disabled\) \{/);
+  assert.match(css, /\.segmented > button\[aria-pressed=true\], \.segmented > button\[aria-checked=true\] \{ background:var\(--ink\); color:var\(--on-ink\);/);
 });

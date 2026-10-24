@@ -172,7 +172,8 @@ export function parseCampaign(text) {
       || (team.id != null && team.id !== id) || typeof team.name !== 'string' || !team.name.trim()
       || !Array.isArray(team.squad) || team.squad.length > 250
       || team.squad.some(p => !record(p) || typeof p.name !== 'string' || !p.name.trim()
-        || !Number.isFinite(p.rating) || p.rating < 0 || p.rating > 120 || typeof p.pos !== 'string'))
+        || !Number.isFinite(p.rating) || p.rating < 0 || p.rating > 120 || typeof p.pos !== 'string'
+        || (p.positions != null && (!Array.isArray(p.positions) || p.positions.some(pos => typeof pos !== 'string')))))
       || data.aliveIds.some(id => !known(id)) || new Set(data.aliveIds).size !== data.aliveIds.length
       || Object.values(data.own).some(id => !known(id) || !data.aliveIds.includes(id))) {
     invalid('Campaign teams or territory data are incomplete.');
@@ -263,7 +264,7 @@ export function parseCampaign(text) {
         || ![m.finalGa, m.finalGd, m.effA, m.effD].every(Number.isFinite)
         || m.finalGa < 0 || m.finalGd < 0 || !Array.isArray(m.allEv)
         || !Array.isArray(m.shown) || m.shown.length > m.allEv.length || m.allEv.length > 2000
-        || m.allEv.some(e => !record(e) || !Number.isFinite(e.m) || e.m < 0 || ![m.aId, m.dId].includes(e.tid))) invalid('The saved match is incomplete.');
+        || [...m.allEv, ...m.shown].some(e => !record(e) || !Number.isFinite(e.m) || e.m < 0 || ![m.aId, m.dId].includes(e.tid))) invalid('The saved match is incomplete.');
     if (!m.applied && (!data.aliveIds.includes(m.aId) || !data.aliveIds.includes(m.dId))) invalid('The pending match includes an eliminated team.');
     if (m.tie != null && (!record(m.tie) || ![m.tie.ga, m.tie.gd].every(Number.isFinite))) invalid('The saved tie-break is incomplete.');
   }
@@ -339,9 +340,23 @@ export function inspectSave() {
 export function loadSave() { return inspectSave().campaign; }
 
 function indexData() {
-  const parsed = JSON.parse(localStorage.getItem(CAMPAIGN_INDEX_KEY) || '[]');
-  if (!Array.isArray(parsed)) throw new Error('Campaign index is damaged.');
-  return parsed.filter(item => record(item) && typeof item.id === 'string');
+  const raw = localStorage.getItem(CAMPAIGN_INDEX_KEY);
+  let parsed = null;
+  try { parsed = JSON.parse(raw || '[]'); } catch { /* damaged: rebuilt below */ }
+  if (Array.isArray(parsed)) return parsed.filter(item => record(item) && typeof item.id === 'string');
+  // A damaged index is rebuilt from the slots themselves: it used to fail every autosave and hide every campaign.
+  return storedSlotIds().map(id => tryParse(localStorage.getItem(campaignStorageKey(id))))
+    .filter(Boolean).map(campaignMetadata);
+}
+
+/** Ids of the campaign slots in storage (not their backups). */
+function storedSlotIds() {
+  const prefix = campaignStorageKey(''), ids = [];
+  for (let i = 0; i < (Number(localStorage.length) || 0); i++) {
+    const key = localStorage.key?.(i);
+    if (typeof key === 'string' && key.startsWith(prefix) && !key.endsWith(':backup')) ids.push(key.slice(prefix.length));
+  }
+  return ids;
 }
 
 export function campaignMetadata(data) {

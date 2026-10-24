@@ -42,6 +42,48 @@ function wrapLongitude(lon) {
   return lon < -180 || lon > 180 ? ((lon + 180) % 360 + 360) % 360 - 180 : lon;
 }
 
+/**
+ * The 50m atlas gives Australia and the Ashmore and Cartier Islands the same id,
+ * and id-keyed paths keep only the islet (Australia drew as a reef no route could
+ * reach). Merge every id's shapes into one MultiPolygon before decoding.
+ */
+export function mergeSharedIds(atlas) {
+  const objects = atlas?.objects || {};
+  const name = objects.countries?.type === 'GeometryCollection' ? 'countries'
+    : Object.keys(objects).find(key => objects[key]?.type === 'GeometryCollection');
+  if (!name) return atlas;
+  const merged = new Map(), geometries = [];
+  for (const g of objects[name].geometries || []) {
+    const id = g?.id == null || String(g.id) === '-99' ? null : String(g.id);
+    const polygons = g?.type === 'Polygon' ? [g.arcs] : g?.type === 'MultiPolygon' ? g.arcs : null;
+    const first = id && polygons ? merged.get(id) : null;
+    if (first) first.arcs.push(...polygons);
+    else {
+      const copy = id && polygons ? { ...g, type: 'MultiPolygon', arcs: [...polygons] } : g;
+      if (id && polygons) merged.set(id, copy);
+      geometries.push(copy);
+    }
+  }
+  return { ...atlas, objects: { ...objects, [name]: { ...objects[name], geometries } } };
+}
+
+const drawnPathsCache = new WeakMap();
+/**
+ * The display paths of the countries a map draws (`countries`: the rule geometry's
+ * list). The 50m atlas has ~60 shapes the 110m world map never paints
+ * (Liechtenstein, Malta, the Faroes…); routed as land they blocked attacks as
+ * invisible neutral ground. One object per paths object, so a route index built
+ * on it stays cached.
+ */
+export function drawnPaths(paths, countries) {
+  let drawn = drawnPathsCache.get(paths);
+  if (!drawn) {
+    drawn = Object.fromEntries(countries.filter(c => paths[c.id]).map(c => [c.id, paths[c.id]]));
+    drawnPathsCache.set(paths, drawn);
+  }
+  return drawn;
+}
+
 export class WorldGeometry {
   /**
    * `anchors` maps a shape id to a [lon, lat] marker point (a capital, a club's

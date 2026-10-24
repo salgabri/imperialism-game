@@ -360,9 +360,13 @@ export function sportNote(sport) {
   return `Nations · ${clubs.length} clubs from ${leagues.length} leagues`;
 }
 
-/** Board 03 tier (V1 L1969). */
-export function tierOf(rank) {
-  return rank <= 4 ? 'Favourite' : rank <= 12 ? 'Contender' : rank <= 30 ? 'Outsider' : 'Long shot';
+/**
+ * Board 03 tier (V1 L1969). The cut-offs (4 / 12 / 30) suit a field of Europe's 46 or more; a smaller field scales them
+ * down, so the last of ten clubs reads "Long shot" rather than "Contender".
+ */
+export function tierOf(rank, field = Infinity) {
+  const cut = limit => Math.min(limit, Math.ceil(field * limit / 46));
+  return rank <= cut(4) ? 'Favourite' : rank <= cut(12) ? 'Contender' : rank <= cut(30) ? 'Outsider' : 'Long shot';
 }
 
 /** Board 03 front label (V1 L1971): a neighbour more than one strength point away is Stronger / Weaker. */
@@ -486,7 +490,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     managed = {
       ...row(picked),
       meta: picked.meta || [identity.group || country?.name, `${sport.name} ${noun}`].filter(Boolean).join(' · '),
-      rankText: `${rank} / ${field}`, tier: tierOf(rank),
+      rankText: `${rank} / ${field}`, tier: tierOf(rank, field),
       players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
       })),

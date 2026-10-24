@@ -13,6 +13,7 @@ import {
   buildTurnStrip, buildReach, buildTargetPanel, buildTargetCard, buildSpectatorPanel, targetOptions, idleTurnCopy,
   targetCardAnchor, targetChoiceSeed, TARGET_ROWS,
 } from '../src/viewModels/turns.js';
+import { displayRound } from '../src/viewModels/format.js';
 
 const compiled = await build({
   stdin: { contents: `
@@ -170,6 +171,17 @@ test('round-robin strip: current, played, eliminated and next entries (DEC D3)',
   assert.equal(live.entries[1].state, 'current');
   const choosing = buildTurnStrip({ ...busy, spin: null, pendingTarget: pending() }, context());
   assert.equal(choosing.entries[1].state, 'current');
+});
+
+test('round robin between best-of-three finale games names the series attacker, not the stale queue', () => {
+  // App.nextAction plays every remaining game as series.teamIds[0] v [1], each in a round of its own.
+  const settings = { ...state().settings, turnOrder: 'round-robin', finale: 'best-of-three' };
+  const between = state({ settings, aliveIds: ['380', '348'], round: 3, turnQueue: ['348', '380'], turnIndex: 1,
+    series: { teamIds: ['348', '380'], wins: { 348: 0, 380: 1 }, games: 1 } });
+  const strip = buildTurnStrip(between, context());
+  assert.equal(strip.entries.find(entry => entry.state === 'current')?.teamId, '348', 'Hungary kicks off game 2');
+  assert.equal(idleTurnCopy(between, context()).title, 'Hungary to attack');
+  assert.equal(displayRound(between), 4, 'the next game opens Round IV, as nextAction numbers it');
 });
 
 test('random-draw strip: pool and the six most recent attackers, newest first', () => {
@@ -496,6 +508,10 @@ test('TargetPanel is a radiogroup in [data-space-primary] with roving tabindex, 
   await key(radios[after], 'Enter');
   assert.equal(calls.confirm, 1, 'Enter on another row only selects it');
   assert.equal(calls.select.at(-1), model.rows[after].teamId);
+  // A held Enter auto-repeats onto the row its first press selected: only a fresh press attacks.
+  const repeated = await key(radios[selectedAt], 'Enter', { repeat: true });
+  assert.equal(calls.confirm, 1, 'an auto-repeated Enter never confirms the attack');
+  assert.equal(repeated.defaultPrevented, true);
   await click(radios[2]);
   assert.equal(calls.select.at(-1), model.rows[2].teamId);
   // React emulates pointerenter/leave from pointerover/pointerout with a relatedTarget.
