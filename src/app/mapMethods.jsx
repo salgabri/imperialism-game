@@ -138,6 +138,25 @@ export function mapFlags(playing) {
 }
 
 /**
+ * A country's click and hover handlers, made once per country id (they only name the id), so every render hands
+ * the map the same functions instead of three new closures for each of ~240 shapes.
+ */
+function countryHandlers(app, cid) {
+  const cache = app.countryHandlers || (app.countryHandlers = new Map());
+  let handlers = cache.get(cid);
+  if (!handlers) {
+    handlers = {
+      onClick: () => app.selectCountry(cid),
+      onEnter: () => app.setState(s => (s.hoverCid === cid ? null : { hoverCid: cid })),
+      // Leaving this land (or tabbing off it) drops its hover, unless another country already took it over.
+      onLeave: () => app.setState(s => (s.hoverCid === cid ? { hoverCid: null } : null)),
+    };
+    cache.set(cid, handlers);
+  }
+  return handlers;
+}
+
+/**
  * Every map shape, plus the flag patterns held territory is filled with (README §Map rendering, DEC D18/D19).
  * Fills come from `mapVM.countryFill` per `st.mapMode`: Political empire pastels (`empireFill`), Strength ramp,
  * Fronts win-chance tints, Flags banners (a country flies its *owner's* flag, so an empire reads as one banner);
@@ -174,6 +193,8 @@ export function mapCountries() {
       selected: !!isSelected,
       name: domestic?.sectionNames[c.id] || NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
       d: p.d,
+      // The mainland's bounds: keyboard focus reveals these, never a date-line-split country's map-wide box.
+      bbox: p.bbox,
       flagParts: parts,
       fill: mapVM.countryFill({ countryId: c.id, ownerId, owner, mapMode, hasFlagParts: !!parts?.length,
         setup: phase === 'setup', ...identity, strength, fronts, preview: preview?.[c.id] || null }),
@@ -181,10 +202,7 @@ export function mapCountries() {
       strokeWidth: 0,
       cursor: owner ? 'pointer' : 'default',
       animation: flash[c.id] ? 'fiFlash 0.9s ease-out' : 'none',
-      onClick: () => this.selectCountry(c.id),
-      onEnter: () => this.setState(s => (s.hoverCid === c.id ? null : { hoverCid: c.id })),
-      // Leaving this land (or tabbing off it) drops its hover, unless another country already took it over.
-      onLeave: () => this.setState(s => (s.hoverCid === c.id ? { hoverCid: null } : null)),
+      ...countryHandlers(this, c.id),
     });
   }
   return { countries, flagPatterns };

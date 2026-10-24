@@ -8,7 +8,7 @@ import React from 'react';
 import { CONFIG } from '../config.js';
 import { C } from '../theme.js';
 import { selectLineup, teamEff } from '../data/teams.js';
-import { empireCenter, territories } from '../engine/campaign.js';
+import { empireCenter } from '../engine/campaign.js';
 import { acquisitionOptions, automaticAcquisition, advanceSeries, recordMatch } from '../engine/campaignExperience.js';
 import { MatchupPopup, ResultPopup, StealPopup } from '../components/Popups.jsx';
 import ConquestCallout from '../screens/conquest/ConquestCallout.jsx';
@@ -25,6 +25,16 @@ function inCampaign(st) {
 function sentenceCase(text) {
   const value = String(text || '');
   return value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : '';
+}
+
+/**
+ * The tie-break beside a level score: the shoot-out's kicks ("4–2 PENS"), or the overtime periods ("OT", "2OT").
+ * Overtime points are already in the final score (basketball's tie.ga/gd are those totals), so they are not repeated.
+ */
+function tieBreakText(m, sport) {
+  if (sport.tieBreak === 'shootout') return `${m.tie.ga}–${m.tie.gd} ${sport.labels.tieShort}`;
+  const periods = Array.isArray(m.tie.periods) ? m.tie.periods.length : 1;
+  return `${periods > 1 ? periods : ''}${sport.labels.tieShort}`;
 }
 
 /**
@@ -98,7 +108,7 @@ export function finishMatch() {
       recordSettlement(this, st, { match: completed, holds: state => !!state.history?.includes(entry) });
       this.setState({ series: next.series, match: completed, matches: st.matches + 1,
         history: [...st.history, entry], queue: [],
-        log: [...st.log, { t: 'match', r: st.round, txt: `${completed.winnerName} wins finale game ${next.series.games}; series continues.`, chip: C.gold }] },
+        log: [...st.log, { t: 'match', r: st.round, txt: `${completed.winnerName} wins finale game ${next.series.games}; series continues.`, chip: C.gold }].slice(-LOG_CAP) },
         () => { this.persist(); if (this.state.autoplay) this.after(st.settings.express ? 120 : 1000, () => this.nextAction()); });
       return;
     }
@@ -176,7 +186,7 @@ export function applyConquest(playerIndex) {
   const effL = winnerId === m.aId ? m.effD : m.effA;
   const isUpset = effW + Number(CONFIG.upsetThreshold) <= effL;
   const sport = this.sport();
-  const tieTxt = m.tie ? ' (' + m.tie.ga + '–' + m.tie.gd + ' ' + sport.labels.tieShort + ')' : '';
+  const tieTxt = m.tie ? ' (' + tieBreakText(m, sport) + ')' : '';
   const A = teams[m.aId];
   const B = teams[m.dId];
   const terrWord = 'TERRITOR' + (taken.length === 1 ? 'Y' : 'IES');
@@ -232,7 +242,10 @@ export function applyConquest(playerIndex) {
     acquisitionPolicy: Number.isInteger(playerIndex) ? 'manager-choice' : st.settings.acquisitionPolicy,
   };
   const archived = recordMatch({ ...st, sport }, completed, this.matchCard(completed, teams));
-  const leader = aliveIds.slice().sort((a, b) => territories({ own }, b).length - territories({ own }, a).length)[0];
+  // Territory counts in one pass (counting inside the comparator rescanned every territory per comparison).
+  const held = {};
+  for (const cid in own) held[own[cid]] = (held[own[cid]] || 0) + 1;
+  const leader = aliveIds.slice().sort((a, b) => (held[b] || 0) - (held[a] || 0))[0];
   const metrics = { ...st.metrics, previousLeader: leader,
     leaderChanges: (st.metrics?.leaderChanges || 0) + (st.metrics?.previousLeader && st.metrics.previousLeader !== leader ? 1 : 0),
     acquisitions: [...(st.metrics?.acquisitions || []), strengthGained] };
@@ -283,7 +296,7 @@ export function applyConquest(playerIndex) {
         {
           kind: 'result',
           label: roundNumeral ? `${resultLabel} — Round ${roundNumeral}` : resultLabel,
-          score: `${A.code} ${m.finalGa}–${m.finalGd} ${B.code}${m.tie ? ` · ${m.tie.ga}–${m.tie.gd} ${sport.labels.tieShort}` : ''}`,
+          score: `${A.code} ${m.finalGa}–${m.finalGd} ${B.code}${m.tie ? ` · ${tieBreakText(m, sport)}` : ''}`,
           title: `${W.name} annexes ${L.name}`,
           sub: `+${taken.length} ${territoryWord(taken.length)}`,
           upset: isUpset,

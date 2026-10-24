@@ -356,3 +356,23 @@ test('render-time conquest delegates are empty outside a campaign and never thro
     } finally { f.close(); }
   }
 });
+
+test('a level result names its tie-break without repeating the score: kicks for a shoot-out, periods for overtime', () => {
+  // Basketball's tie.ga/gd are the final totals, so "93–88 VEN (93–88 OT)" printed the score twice.
+  for (const [sport, finals, tie, suffix] of [
+    ['football', [1, 1], { ga: 4, gd: 2 }, ' (4–2 PENS)'],
+    ['basketball', [93, 88], { ga: 93, gd: 88, periods: [{ a: 9, d: 7 }] }, ' (OT)'],
+    ['basketball', [101, 99], { ga: 101, gd: 99, periods: [{ a: 8, d: 8 }, { a: 6, d: 4 }] }, ' (2OT)'],
+  ]) {
+    const f = syncAppFixture({ settings: { sport } });
+    try {
+      const { app } = f;
+      forceResult(app, '250', { aId: '250', dId: '276' });
+      app.setState({ match: { ...app.state.match, finalGa: finals[0], finalGd: finals[1], tie } });
+      app.finishMatch();
+      f.time.advance(5000);
+      const line = app.state.log.findLast(entry => entry.t === 'match')?.txt || '';
+      assert.ok(line.endsWith(`${finals[0]}–${finals[1]} ${app.state.teams['276'].code}${suffix}`), `${sport}: ${line}`);
+    } finally { f.close(); }
+  }
+});

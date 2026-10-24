@@ -80,66 +80,67 @@ npm run test:football-sets # CM 01/02 parser, data set builder, loader, setup an
 
 ### Setup
 
-A new campaign is set up in three steps: **Campaign → Rules → Nation & role**.
-Space moves to the next step and launches the campaign from the last one.
+A new campaign is set up in three steps: **Campaign → Rules → Your role**.
+Space moves to the next step and launches the campaign from the last one. Every
+default suits a first campaign, so pressing Space three times starts one.
 
-1. **Campaign** — choose a sport, nations or clubs, and a **theatre**. Nation
-   campaigns default to Europe (UEFA). The other choices are the whole world
-   (170 nations), another confederation, or the Elite 32. Club campaigns offer
-   individual leagues, all leagues, or the strongest 32 available clubs. The
-   step shows the actual number of teams, the number of matches and the
-   estimated duration at 1× autoplay. With clubs in football, a second theatre
-   group, **One country · top clubs**, starts a [domestic campaign](#domestic-campaigns).
-   When local [football seasons](#football-seasons) have been built, a **Season**
-   choice lists them after the built-in 2025/26. A quick-resume card appears when
-   a save exists.
-2. **Rules of war** — turn order and targeting (below). A collapsed **Match
-   settings** section holds pacing, match display, uncertainty, the final two,
-   automatic recruitment, basketball starting ratings, the campaign seed and
-   Express playback.
-3. **Nation & role** — **Manager** commits to one team. You choose an approach
-   before its matches and one of up to three signings after its wins.
-   **Spectator** leaves draws, results and signings to the game, and you can
-   follow any empire once the campaign starts. **Launch campaign** starts it.
+1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
+   the war is fought). Nation campaigns default to Europe (UEFA). The other
+   choices are the whole world (170 nations), another confederation, or the
+   Elite 32. Club campaigns offer individual leagues, all leagues, or the
+   strongest 32 available clubs. The step opens on a map of the chosen theatre:
+   the board it starts on, each team's land in its kick-off colour, framed as
+   the campaign's opening camera frames it (the continent for Europe). It also
+   shows the actual number of teams, the number of matches and the estimated
+   length; its note names the Show matches mode the estimate assumes. With
+   clubs in football, a second theatre group, **One country · top clubs**,
+   starts a [domestic campaign](#domestic-campaigns), and its map shows that
+   country. When local [football seasons](#football-seasons) have been built, a
+   **Season** choice lists them after the built-in 2025/26.
+   A quick-resume card appears when a save exists.
+2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
+   matches** picks *Live, minute by minute*, *Final score only* or
+   *Fast-forward*; it can be changed at any time during play. A collapsed
+   **More rules** section holds upsets, the final, computer signings,
+   basketball team strengths and the seed. Its line reads "Standard", or lists
+   only the rules you changed.
+3. **Your role** — **Manager** runs one team. You choose an approach before
+   its matches and one of up to three signings after its wins, and, under a
+   one-match draw, **who picks your opponent**. **Spectator** leaves draws,
+   results and signings to the game, and you can follow any empire once the
+   campaign starts. **Launch campaign** starts it.
 
-**Pacing** decides how matchups are drawn:
+### Rules of war
 
-| Mode | Draw |
-| --- | --- |
-| `duel` | One by one: a spinner (or the round-robin queue) picks the attacker, and a compass direction (or your choice) picks the opponent. One match per turn. |
-| `blitz` | Pair everyone, preferring neighbours; otherwise use another opponent. An odd team gets a bye. |
-| `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
+**The draw** decides how matches are made. Each card stores the existing
+`pacing` and `turnOrder` settings:
+
+| Card | Stored | Draw |
+| --- | --- | --- |
+| Random draw (recommended) | `duel` · `random` | One match per turn. Any surviving empire can be drawn to attack. |
+| Round robin | `duel` · `round-robin` | One match per turn. Every surviving empire attacks once per round, strongest first (by starting strength, then name). |
+| Blitz round | `blitz` | Pair everyone, preferring neighbours; otherwise use another opponent. An odd team gets a bye. |
+| Chaos draw | `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
 
 Blitz and chaos allow distant pairings without the directional route restrictions
 used in one-by-one mode. Neither mode annexes neutral land to connect teams.
 
-### Rules of war
+A manager under Random draw or Round robin also chooses, on the Your role step,
+**who picks your opponent** (`targeting`):
 
-Setup step 2 combines a **turn order** with a **target** rule:
-
-| Turn order | Who attacks |
+| Opponent | Whom they attack |
 | --- | --- |
-| Round robin | Every surviving empire attacks once per round, strongest first (by starting strength, then name). |
-| Random draw | Any surviving empire can be drawn each turn. |
-
-| Target | Whom they attack |
-| --- | --- |
-| You choose | Manager only. On your turns you pick any empire in reach; every other empire spins the compass. |
+| You choose | On your turns you pick any empire in reach; every other empire spins the compass. |
 | Compass | The compass picks the target for every attacker, you included. |
 
-A 2×2 explainer names the four combinations: *Your front, your call* (round
-robin × you choose), *Clockwork war* (round robin × compass), *Wait for the
-draw* (random × you choose) and *Pure chaos* (random × compass, the original
-Imperialism draw).
-
-The rules apply to one-by-one (`duel`) pacing only. Blitz and chaos always use a
-random draw and the compass, and setup shows the cards disabled with a note.
-Spectators always use the compass: *You choose* becomes the compass when a
-spectator launches it, and again when an eliminated manager continues as a
-spectator. Rules are fixed at launch. The defaults, **random draw × compass**,
-reproduce the original behaviour exactly. Every one-by-one turn consumes
-exactly three campaign random samples in every mode, so seeds recorded before
-the rules existed still replay the same campaign.
+Blitz and chaos always use a random draw and the compass; a manager who picks
+one sees a note, with a way back to the draw, instead of the opponent cards.
+Spectators never see the choice and always use the compass. A stored *You
+choose* becomes the compass when a spectator launches, and again when an
+eliminated manager continues as a spectator. Rules are fixed at launch. The
+defaults, **random draw × compass**, reproduce the original behaviour exactly.
+Every one-by-one turn consumes exactly three campaign random samples in every
+mode, so seeds recorded before the rules existed still replay the same campaign.
 
 An empire is **in reach** if it is a land neighbour with a legal direct route.
 If there is none, direct sea strikes count; after that, the fallback sea and
@@ -164,18 +165,22 @@ choice; no timer runs.
 
 ### Match rules
 
-**Resolution** is either a live ticker or an instant final score. Level games go
-to penalties in football and overtime in basketball. Pacing, the rules of war,
-uncertainty, the final-two format and your role are fixed at launch. During a
-campaign the masthead's **Settings** button shows them read-only and lets you
-change the match display and Express playback. Predictable, balanced and wild
-uncertainty presets adjust match-day rating variation; even Predictable retains
-scoring and tie-break randomness.
+**Show matches** is *Live, minute by minute* (a live ticker), *Final score
+only* (an instant final score) or *Fast-forward* (Express playback: final scores
+only, with shorter pauses for routine matches). It stores the existing
+`resolution` and `express` settings. Level games go to penalties in football and
+overtime in basketball. The draw, the opponent choice, upsets, the final, computer
+signings and your role are fixed at launch. During a campaign the masthead's
+**Settings** button (More on phones) changes Show matches at any time, except
+that switching between Live and Final score only waits for the current draw or
+match. Under **This campaign** it lists the launch rules as read-only text.
+**Upsets** has predictable, balanced and wild presets that adjust match-day
+rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
 offence/defence, form and shooting variance. Stronger teams are favourites, while
-every uncertainty setting retains scoring randomness and possible upsets.
+every Upsets setting retains scoring randomness and possible upsets.
 Pre-match percentages estimate this model with an independent seeded sample.
 They do not consume the campaign's random stream.
 Odds prepare the two lineups once and sample scores without building hundreds of
@@ -210,8 +215,9 @@ own Space, and open dialogs block it.
 
 **Pause** freezes the draw, the ticker and scheduled presentation. A pending
 target choice or signing holds the screen: only Map stays available in the
-navigation. **Express** compresses routine presentation while keeping followed
-matches, upsets and finales visible. It uses the same draw and match results.
+navigation. **Fast-forward** (Show matches) compresses routine presentation while
+keeping followed matches, upsets and finales visible. It uses the same draw and
+match results.
 
 ### Map view
 
@@ -268,8 +274,8 @@ claimed players tagged and ratings coloured by tier. A dark match feed lists
 events newest first and has 1× / 2× / 4× speed chips and Pause. When a live
 ticker match involving your team (or, as a spectator, the followed team) kicks
 off while you are on Map, the game switches to Match. It returns to Map at the
-next turn if the switch was automatic. Express and "simulate the result" never
-switch. Without a live match, the screen shows the last finished match, or the
+next turn if the switch was automatic. Fast-forward's routine matches and
+"simulate the result" never switch. Without a live match, the screen shows the last finished match, or the
 next fixture before the first one.
 
 **Squad** shows one team: the flag, "First team · N players · K claimed in
@@ -288,11 +294,12 @@ taken" callout. Beside it, an article reads "SERBIA IS OUT", with a
 winner-first standfirst and the territory and empire effects. **Claim one
 player** lists the candidates, with the best lineup fit preselected. Each one
 reads "FW · 86 rating · Starts ahead of <player>" or "Adds depth · the XI is
-unchanged", with the strength gain. A collapsible "Lineup before and after"
-compares the lineups, and **Sign <player>** confirms. If your team is knocked
-out, the same article layout ("ITALY IS OUT") offers **Continue as spectator**
-or **Retry this setup**. Conquests by other teams never wait: a notice on the
-map, the ticker and a brief hatch flash report them.
+unchanged", with the strength gain. The position lists every natural position,
+so a basketball combo guard reads "PG/SG · 88 rating". A collapsible "Lineup
+before and after" compares the lineups, and **Sign <player>** confirms. If your
+team is knocked out, the same article layout ("ITALY IS OUT") offers
+**Continue as spectator** or **Retry this setup**. Conquests by other teams
+never wait: a notice on the map, the ticker and a brief hatch flash report them.
 
 **Ledger** shows the standings (# · Team · Terr · Strength · Conq · Claimed),
 the share of the map and the fallen empires. **Chronicle** shows the match
@@ -318,8 +325,11 @@ seed reproduces a campaign when settings, manager choices and simulation version
 match. Updating the model can change future results for older seeds; already
 generated matches in saved campaigns retain their outcome and events.
 
-Progress autosaves during pending matches and after signings, preserving the
-seed, random state, queue, history and pending manager choice. Save status reports
+Progress autosaves at every draw, kickoff, final whistle and result, and after
+signings, preserving the seed, random state, queue, history and pending manager
+choice. A match's outcome is fixed at kickoff, so the goals and kicks revealed since
+are written with the next checkpoint, on pause, or when the page is hidden or
+closed; a save with nothing new to write is skipped. Save status reports
 storage errors. Each checkpoint is kept with a recovery copy. A save is all or
 nothing: when browser storage is full, a campaign may drop its own recovery copy to
 fit, but never another campaign's; otherwise nothing is written and save status
@@ -395,15 +405,29 @@ position are curated in `scripts/fiba-squads.json`, and ratings are resolved fro
 the 2K export by name, with a curated rating for EuroLeague players it doesn't
 cover. Curating nationality is the right call regardless: FIBA squads are not NBA
 rosters (Serbia, Spain, Greece and Lithuania field mostly EuroLeague players, and
-eligibility follows the federation — Banchero plays for the USA, Siakam for
-Cameroon).
+eligibility follows the federation — Banchero plays for the USA rather than
+Italy). The fives were last checked against FIBA records in October 2026: every
+player has played for his national team since 2023, players who had retired
+from it were replaced by current internationals at the same position, and no
+five fields more than the one naturalized player FIBA allows.
+
+Basketball positions are fluid, so most players list two neighbouring positions,
+primary first: Dončić is PG/SG, Giannis PF/C, Melli PF/C. Pure point guards and
+centres such as Calathes and Jokić list one, and so do players whose sources
+show a single position. 133 of the 200 national players cover two positions.
+Every listed position is one the player really plays, and every five has a
+real player for each of the five positions. The lineup optimizer fields each
+five from these positions, so Italy starts Pajola (PG/SG) at shooting guard and
+Melli at centre.
 
 Nations with no roster in a sport fall back to *that sport's* baseline, never to
 another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
 An assignment optimizer fills all eleven football or five basketball slots.
-Playing outside a natural position costs 12 rating points. Missing legacy slots
+Playing outside a natural position costs 12 rating points. A player may have
+more than one natural position, and each one is penalty-free: a claimed PG/SG
+can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
 in match scoring and tie-break events. Squad lists separate starters from bench
 and identify positional penalties; bench depth does not directly inflate strength.
@@ -451,9 +475,14 @@ conquest, player theft) behaves identically.
 Club lineups come from the same two exports as the national squads:
 `clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
 `clubs.basketball.js` from the NBA 2K export. 2K carries no position, so each
-player's role is inferred from the attributes that define it — a centre by
-interior defence, rebounding and post play; a point guard by vision, handle and
-speed with the ball.
+player's positions are inferred from the attributes that define them — a centre
+by interior defence, rebounding and post play; a point guard by vision, handle
+and speed with the ball. Each fit is ranked as a league percentile, so the five
+scales compare. A player's best fit is his primary position. He also covers the
+better neighbouring position when it ranks within 15 percentiles of it. About
+three in four players in the export, and 131 of the 150 NBA starters, cover two
+positions. Each franchise's five is then the lineup the game itself would field
+from its whole roster.
 
 ## Domestic campaigns
 
@@ -798,6 +827,9 @@ src/
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
+  data/sourceTable.js  compact player rows of the generated football files: one
+                       JSON line per nation or club, metadata keys and shared
+                       values written once (scripts/lib/data-module.mjs writes them)
   data/scopes.js       club theatre choices (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
   data/domesticScope.js  labels for 'domestic:<id>' theatres
@@ -830,6 +862,7 @@ public/
 scripts/
   test.mjs             runs every scripts/*.test.mjs (npm test)
   lib/app-harness.mjs  shared App/component harness for the jsdom tests
+  lib/data-module.mjs  writes the compact generated football data modules
   data/seed-replay.golden.json  determinism golden for seeded campaigns
   smoke.mjs            headless campaign test (jsdom)
   sync-flags.mjs       vendors flag SVGs from flag-icons

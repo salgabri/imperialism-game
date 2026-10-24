@@ -6,7 +6,7 @@
   /* README §Colour */
   --surface:#f5f5f2; --panel:#ffffff; --surface-2:#ebece7; --ink:#111417; --text-2:#3a4045; --muted:#646a6e;
   --rule:#dcded8; --row-rule:#e3e5df; --control-line:#c6cbcd;
-  --you:#9c5a43; --you-text:#8c4a35; --you-fill:#c4917c; --you-soft:#f3ebe7; --you-on-dark:#d9a48e;
+  --you:#9c5a43; --you-text:#8c4a35; --you-fill:#c4917c; --you-soft:#f3ebe7; --you-on-dark:#d9a48e; --you-strong:#8c4a35;
   --opponent:#2f54eb; --opponent-fill:#c3cfff; --claimed:#0f7b83;
   --gain:#138a4a; --loss:#d1342f; --even:#9a6700;
   --sea:#dfe7eb; --land-neutral:#e8e9e4; --flag-bg:#d9dcd6;
@@ -19,8 +19,18 @@
   --map-hatch:rgba(255,255,255,.6);
   --shadow-float:0 0 0 1px rgba(17,20,23,.08), 0 6px 20px rgba(17,20,23,.10);
   --shadow-callout:0 1px 2px rgba(17,20,23,.1), 0 12px 32px rgba(17,20,23,.16);
-  --shadow-flag:0 0 0 1px rgba(17,20,23,.14);
+  --shadow-flag:0 0 0 1px var(--hairline);
   --key-hint-border:rgba(255,255,255,.55);
+  /* theme roles: text on an ink fill, the ink strips (ticker, match feed), modal backdrop, hairline rings */
+  --on-ink:#ffffff; --strip:#111417; --on-strip:#f5f5f2; --backdrop:rgba(17,20,23,.35);
+  --hairline:rgba(17,20,23,.14); --shadow-sheet:0 -1px 0 var(--rule), 0 -12px 32px rgba(17,20,23,.16);
+  /* SVG map paint. WorldMap / EmpireLabels / setup repeat these light values as attributes for renderers without
+     the stylesheet; CSS rules and themedPaint() (theme.js) paint from the tokens. */
+  --map-border:#ffffff; --map-halo:#ffffff; --map-graticule:#ffffff;
+  --empire-1:#cfe0d6; --empire-2:#e6dcc7; --empire-3:#d6dbe8; --empire-4:#e9d6d9; --empire-5:#d8e4c4; --empire-6:#e3e0d0;
+  --empire-7:#cddfe2; --empire-8:#e8d9c2; --empire-9:#dcd3e6; --empire-10:#d1d8cc; --empire-11:#ebe2b9;
+  --strength-1:#e8e9e4; --strength-2:#d1d3d1; --strength-3:#b9bebe; --strength-4:#a2a8aa; --strength-5:#8a9297;
+  --fronts-gain:#acd6c0; --fronts-even:#dccaa6; --fronts-loss:#efb8b6;
   /* fonts (README §Type: Archivo + Archivo Narrow only) */
   --font-sans:'Archivo', 'Segoe UI', sans-serif;
   --font-narrow:'Archivo Narrow', 'Arial Narrow', sans-serif;
@@ -40,6 +50,32 @@
   --ticker-h:30px; --ticker-fs:12px;
   --row-h:30px; --flag-w:20px; --target-row-h:40px;
   --tap:0px;              /* minimum hit target on coarse/phone */
+}
+/* ---- Dark theme: the same roles on a near-black ground. `data-theme` on <html> comes from src/appearance.js
+   (the saved choice, else the system preference). Text pairs keep ≥4.5:1 on --panel; white on --you is 4.7:1. ---- */
+:root[data-theme=dark] {
+  color-scheme: dark;
+  --surface:#121416; --panel:#1b1e21; --surface-2:#25292d; --ink:#eceee9; --text-2:#c3c8cb; --muted:#8f979c;
+  --rule:#30353a; --row-rule:#282c30; --control-line:#454c52;
+  --you:#a8614a; --you-text:#e0a189; --you-fill:#8a5543; --you-soft:#2e2320; --you-on-dark:#e0a189; --you-strong:#94543f;
+  --opponent:#6f8cff; --opponent-fill:#34407a; --claimed:#3fb6be;
+  --gain:#3cc47a; --loss:#f0605a; --even:#d9a43a;
+  --sea:#171d22; --land-neutral:#2a2e30; --flag-bg:#33383b;
+  --tier-88:#e0b04a; --tier-84:#3fc48a; --tier-80:#3cc47a; --tier-75:#9cc24a; --tier-70:#e08a3a; --tier-low:#f0605a;
+  --odds-track:#30353a; --grab:#454c52; --chart-guide:#3a4045;
+  --map-coast:#56636b; --map-capital:#c9ced1; --map-label:#d4d8da;
+  --map-veil:rgba(0,0,0,.6);
+  --map-hatch:rgba(255,255,255,.3);
+  --shadow-float:0 0 0 1px rgba(255,255,255,.07), 0 6px 20px rgba(0,0,0,.45);
+  --shadow-callout:0 0 0 1px rgba(255,255,255,.07), 0 12px 32px rgba(0,0,0,.55);
+  --shadow-flag:0 0 0 1px rgba(255,255,255,.16);
+  --on-ink:#121416; --strip:#0b0c0e; --on-strip:#eceee9; --backdrop:rgba(0,0,0,.6);
+  --hairline:rgba(255,255,255,.16); --shadow-sheet:0 -1px 0 var(--rule), 0 -12px 32px rgba(0,0,0,.5);
+  --map-border:#14191d; --map-halo:#121416; --map-graticule:#2b363d;
+  --empire-1:#34493d; --empire-2:#4d4536; --empire-3:#353d52; --empire-4:#4f3439; --empire-5:#3f4c2e; --empire-6:#45433a;
+  --empire-7:#2f4a4f; --empire-8:#52402f; --empire-9:#413650; --empire-10:#3b4237; --empire-11:#4f4a2c;
+  --strength-1:#2a2e30; --strength-2:#3f4447; --strength-3:#545a5e; --strength-4:#687074; --strength-5:#7d868b;
+  --fronts-gain:#275840; --fronts-even:#5e4d2a; --fronts-loss:#663535;
 }
 @media (min-width:1600px) { :root {
   --mast-h:92px; --mast-row2-h:34px; --mast-pad:0 28px; --mast-gap:24px;

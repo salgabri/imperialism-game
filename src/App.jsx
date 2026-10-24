@@ -4,7 +4,7 @@ import { C } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
-import { WorldGeometry, projPt } from './engine/geo.js';
+import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel } from './data/domesticScope.js';
@@ -15,7 +15,7 @@ import { getSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
-  fitDomesticCampaign } from './engine/storage.js';
+  fitDomesticCampaign, CHECKPOINT_KEYS } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
 import { tacticalMatchParameters, tacticalOptions, competitiveBasketballTeams } from './engine/managerStrategy.js';
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
@@ -23,7 +23,7 @@ import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
-import { countryMapPreview } from './screens/setup/setupModel.js';
+import { countryMapPreview, theatreMapPreview } from './screens/setup/setupModel.js';
 import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
@@ -81,37 +81,30 @@ function setClubScope(setup) {
   return !sport || CLUB_SCOPES(sport).some(scope => scope.id === setup.clubScope) ? setup.clubScope : 'all';
 }
 
-/** True unless `a` and `b` are the same value or objects with the same keys holding identical values. */
-function contentChanged(a, b) {
-  if (a === b) return false;
-  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return true;
-  const keys = Object.keys(a);
-  return keys.length !== Object.keys(b).length || keys.some(key => !Object.prototype.hasOwnProperty.call(b, key) || a[key] !== b[key]);
-}
+/**
+ * Live presentation of an outcome already decided and saved at kickoff: the events and kicks revealed so far, and
+ * the draw compass's stage. A reload re-presents them from the last checkpoint with the same result.
+ */
+const MATCH_PROGRESS = new Set(['shown', 'ga', 'gd', 'tieShown']);
+const SPIN_PROGRESS = new Set(['stage', 'ang']);
 
 /**
- * The 50m atlas gives Australia and the Ashmore and Cartier Islands the same id,
- * and id-keyed paths keep only the islet. Country backdrops (and the land they
- * route around) merge such shapes; the world map keeps the atlas untouched.
+ * How `b` differs from `a`: null when they are the same value or objects with the same keys holding identical
+ * values, 'progress' when only `progress` keys changed, else 'checkpoint'.
  */
-function mergeSharedIds(atlas) {
-  const objects = atlas?.objects || {};
-  const name = objects.countries?.type === 'GeometryCollection' ? 'countries'
-    : Object.keys(objects).find(key => objects[key]?.type === 'GeometryCollection');
-  if (!name) return atlas;
-  const merged = new Map(), geometries = [];
-  for (const g of objects[name].geometries || []) {
-    const id = g?.id == null || String(g.id) === '-99' ? null : String(g.id);
-    const polygons = g?.type === 'Polygon' ? [g.arcs] : g?.type === 'MultiPolygon' ? g.arcs : null;
-    const first = id && polygons ? merged.get(id) : null;
-    if (first) first.arcs.push(...polygons);
-    else {
-      const copy = id && polygons ? { ...g, type: 'MultiPolygon', arcs: [...polygons] } : g;
-      if (id && polygons) merged.set(id, copy);
-      geometries.push(copy);
-    }
+function contentChange(a, b, progress) {
+  if (a === b) return null;
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return 'checkpoint';
+  const keys = Object.keys(a);
+  if (keys.length !== Object.keys(b).length) return 'checkpoint';
+  let change = null;
+  for (const key of keys) {
+    if (!Object.prototype.hasOwnProperty.call(b, key)) return 'checkpoint';
+    if (a[key] === b[key]) continue;
+    if (!progress.has(key)) return 'checkpoint';
+    change = 'progress';
   }
-  return { ...atlas, objects: { ...objects, [name]: { ...objects[name], geometries } } };
+  return change;
 }
 
 /** Screens the masthead nav and the phone tab bar can choose (DEC D11). */
@@ -190,10 +183,18 @@ export default class App extends React.Component {
   away = false;
   updateEngagement = () => this.engagement.switchMode(engagementMode(this.state,
     this.away || (typeof document !== 'undefined' && document.hidden)));
-  handleVisibility = () => this.updateEngagement();
+  handleVisibility = () => {
+    this.updateEngagement();
+    if (typeof document !== 'undefined' && document.hidden) this.flushProgress();
+  };
+  // The tab is closing or reloading: keep the live match where it was.
+  handlePageHide = () => this.flushProgress();
   handleFocus = () => { this.away = false; this.updateEngagement(); };
   handleBlur = () => { this.away = true; this.updateEngagement(); };
   handleStorage = event => {
+    // Only an open campaign can conflict. In setup the outgoing campaign's id lingers, and another tab resuming it
+    // trapped the setup screen in a conflict dialog it could not close; resuming the stale copy still checks.
+    if (this.state.phase !== 'playing' && this.state.phase !== 'victory') return;
     if (!isCampaignStorageEvent(event, this.state.campaignId)) return;
     const remote = detectSaveConflict(this.state);
     if (remote) this.openStorageDialog('conflict', { campaign: remote, message: 'This campaign advanced in another tab. Reload its checkpoint or keep your branch in a new slot.' });
@@ -228,6 +229,7 @@ export default class App extends React.Component {
     window.addEventListener('focus', this.handleFocus);
     window.addEventListener('blur', this.handleBlur);
     window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('pagehide', this.handlePageHide);
     document.addEventListener('visibilitychange', this.handleVisibility);
     this.boot();
   }
@@ -242,6 +244,7 @@ export default class App extends React.Component {
       window.removeEventListener('focus', this.handleFocus);
       window.removeEventListener('blur', this.handleBlur);
       window.removeEventListener('keydown', this.handleKeyDown);
+      window.removeEventListener('pagehide', this.handlePageHide);
       document.removeEventListener('visibilitychange', this.handleVisibility);
     }
   }
@@ -254,8 +257,15 @@ export default class App extends React.Component {
     // patchMatch) is queued behind a timer's not-yet-rendered default-priority update, every sync re-render rebases
     // and re-runs the updater, minting an equal-but-new match; persist's own setState is such a re-render, so an
     // identity test re-saved on every pass until React threw "Maximum update depth exceeded" (smoke, under load).
-    if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading'
-        && (contentChanged(previous.match, this.state.match) || contentChanged(previous.spin, this.state.spin))) this.persist();
+    // Revealing a match decided at kickoff, or turning the compass, is only presentation: it is written with the
+    // next checkpoint, or when the page is hidden or closed (a whole save per goal, kick and compass stage was
+    // most of the campaign's work).
+    if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading') {
+      const match = contentChange(previous.match, this.state.match, MATCH_PROGRESS);
+      const spin = contentChange(previous.spin, this.state.spin, SPIN_PROGRESS);
+      if (match === 'checkpoint' || spin === 'checkpoint') this.persist();
+      else if (match || spin) this.unsavedProgress = true;
+    }
     // The signing screen and the target panel hold focus while they show; confirming unmounts them.
     if (previous && ((previous.choice && !this.state.choice) || (previous.pendingTarget && !this.state.pendingTarget))) this.focusRescue = true;
     if (this.focusRescue) this.rescueFocus();
@@ -334,9 +344,10 @@ export default class App extends React.Component {
       this.geo = new WorldGeometry(await res.json(), CAPITALS);
       // Display-only detail keeps targeting, club seeding and existing saves
       // on the original topology. A missing visual atlas falls back gracefully.
-      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS) : null;
       // The atlas also draws a country map's neighbours in that map's projection.
       this.atlas = atlas ? mergeSharedIds(atlas) : null;
+      // Only the display atlas's fitted paths are ever read, so its lon/lat polygons go once projected.
+      this.displayGeo = this.atlas ? new WorldGeometry(this.atlas, CAPITALS, { keepPolys: false }) : null;
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
       const inspection = inspectSave();
@@ -367,8 +378,8 @@ export default class App extends React.Component {
    * shared borders; the world board is unchanged.
    */
   board(state = this.state) {
-    const board = { geo: this.geo, routingPaths: this.displayGeo?.paths || this.geo.paths,
-      own: state.own, aliveIds: state.aliveIds };
+    const routingPaths = this.displayGeo ? drawnPaths(this.displayGeo.paths, this.geo.countries) : this.geo.paths;
+    const board = { geo: this.geo, routingPaths, own: state.own, aliveIds: state.aliveIds };
     const domestic = this.domesticMap();
     return domestic ? { ...board, obstacles: this.surroundings(domestic).obstacles, borderRoutes: true } : board;
   }
@@ -473,16 +484,19 @@ export default class App extends React.Component {
       .map(country => [country.id, country.id]));
     // Russia and overseas islands remain playable, but the European opening
     // camera should show the continent. Zooming out always restores all land.
-    if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') {
-      const { s, tx, ty } = this.geo.fit;
-      const points = [[-15, 34], [44, 34], [-15, 71], [44, 71]].map(([lon, lat]) => {
-        const [x, y] = this.planePoint(lon, lat);
-        return [x * s + tx, y * s + ty];
-      });
-      const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
-      this.viewFocus = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
-    }
+    if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
     this.viewResetKey = (this.viewResetKey || 0) + 1;
+  }
+
+  /** The continent box the European opening camera frames, in the world chart's current fit. */
+  europeFocus() {
+    const { s, tx, ty } = this.geo.fit;
+    const points = [[-15, 34], [44, 34], [-15, 71], [44, 71]].map(([lon, lat]) => {
+      const [x, y] = this.planePoint(lon, lat);
+      return [x * s + tx, y * s + ty];
+    });
+    const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+    return { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
   }
 
   /**
@@ -622,17 +636,44 @@ export default class App extends React.Component {
     return plainScopeName(SCOPES.find(x => x.id === settings?.scope)?.name || 'World War');
   }
 
+  /** Quick-resume progress: "12 nations remaining", or "Campaign complete" once one team holds the map. */
+  savedProgress(meta) {
+    const alive = Number(meta?.alive) || 0;
+    if (alive <= 1) return 'Campaign complete';
+    return `${alive} ${meta.settings?.layer === 'clubs' ? 'clubs' : 'nations'} remaining`;
+  }
+
   // ---------- campaign lifecycle ----------
+
+  /**
+   * The saved state as persist would write it, minus what persist stamps on (the revision, the engagement clock),
+   * for an identity comparison with the last checkpoint.
+   */
+  checkpointSource(rngState) {
+    const st = this.state;
+    const { engagement: _clock, ...metrics } = st.metrics || {};
+    return { ...Object.fromEntries(CHECKPOINT_KEYS.map(key => [key, st[key]])), rngState, revision: null, metrics: null,
+      ...Object.fromEntries(Object.entries(metrics).map(([key, value]) => [`metrics.${key}`, value])), phase: st.phase === 'victory' };
+  }
 
   persist() {
     if (!Object.keys(this.state.teams).length || this.saving || this.state.storageConflict) return;
-    this.saving = true;
     const rngState = this.rng?.getState?.() ?? this.state.rngState;
+    // Unchanged since the last checkpoint (a decision both changes the match and saves in its callback): no write.
+    const source = this.checkpointSource(rngState), last = this.lastCheckpoint;
+    if (last && this.saved?.campaignId === this.state.campaignId && Object.keys(source).length === Object.keys(last).length
+        && Object.keys(source).every(key => source[key] === last[key])) {
+      this.unsavedProgress = false;
+      return;
+    }
+    this.saving = true;
     const snapshot = { ...this.state, rngState,
       ...(this.saved?.campaignId === this.state.campaignId ? { revision: this.saved.revision } : {}),
       metrics: { ...this.state.metrics, engagement: this.engagement.snapshot() } };
     const saveStatus = writeSave(snapshot);
     this.saving = false;
+    this.unsavedProgress = false;
+    this.lastCheckpoint = saveStatus.ok ? { ...source, campaignId: saveStatus.campaignId, campaignName: saveStatus.campaignName } : null;
     if (saveStatus.conflict) {
       this.setState({ saveStatus }, () => this.openStorageDialog('conflict', { campaign: saveStatus.conflict,
         message: 'A newer checkpoint exists in another tab. Choose which branch to continue.' }));
@@ -643,6 +684,12 @@ export default class App extends React.Component {
       metrics: snapshot.metrics,
       ...(saveStatus.ok ? { campaignId: saveStatus.campaignId, revision: saveStatus.revision, campaignName: saveStatus.campaignName } : {}),
       savedMeta: { round: snapshot.round, alive: snapshot.aliveIds.length, settings: snapshot.settings } });
+  }
+
+  /** Write live presentation no checkpoint has saved yet (the page is hidden or closing). */
+  flushProgress() {
+    if (!this.unsavedProgress || (this.state.phase !== 'playing' && this.state.phase !== 'victory')) return;
+    this.persist();
   }
 
   pickSetup(key, value) {
@@ -809,18 +856,15 @@ export default class App extends React.Component {
       domesticId ? loaded?.meta.version || 'loading' : null, dataSetOf(setup) ? sport?.dataVersion || 'loading' : null]);
     if (this.setupTeamsCache?.key === key) return this.setupTeamsCache.teams;
     const { included, own } = this.opening(setup, makeRng(this.setupSeed(setup)));
+    const ids = new Set(included.map(team => team.id));
+    const opening = { ...own };
+    if (setup.layer !== 'clubs') {
+      for (const [shapeId, holder] of heldShapes(sport)) if (ids.has(holder)) opening[shapeId] = holder;
+    }
     // Fronts on the board the campaign opens on: the country's sections, else the world (never a previewed country,
     // which this.geo may still show between a theatre pick and its showSetupMap callback).
     const geo = domesticId ? loaded?.geo : this.domesticId ? this.worldGeo : this.geo;
-    let board = null;
-    if (geo?.adj) {
-      const ids = new Set(included.map(team => team.id));
-      const opening = { ...own };
-      if (setup.layer !== 'clubs') {
-        for (const [shapeId, holder] of heldShapes(sport)) if (ids.has(holder)) opening[shapeId] = holder;
-      }
-      board = { geo, own: opening };
-    }
+    const board = geo?.adj ? { geo, own: opening } : null;
     // Country clubs (ids like "d826-679") are unknown to the sport's club list: pass their own code and kind.
     const teams = included.map(team => ({ id: team.id, name: team.name, code: team.code, isClub: team.kind === 'club',
       rating: teamEff(team),
@@ -830,8 +874,22 @@ export default class App extends React.Component {
         .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
       ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) }))
       .sort((a, b) => a.name.localeCompare(b.name));
-    this.setupTeamsCache = { key, teams };
+    this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own) };
     return teams;
+  }
+
+  /**
+   * Step 1's map of a world theatre: the board it opens on, framed as the campaign's opening camera frames it (Europe
+   * for the UEFA nations, else the teams' starting land). A country theatre has its own card (`domesticStatus`), and
+   * so does the moment a previewed country still holds this.geo after the theatre changed. Render-safe: no setState.
+   */
+  setupMapPreview(setup = this.state.setup) {
+    if (!this.geo || this.domesticId || domesticIdOf(setup)) return null;
+    this.setupTeams(setup);
+    const { opening, homes } = this.setupTeamsCache;
+    const focus = setup.layer !== 'clubs' && setup.scope === 'UEFA' ? this.europeFocus() : null;
+    return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
+      own: opening, frameIds: homes, focus });
   }
 
   setupSeed(setup = this.state.setup) {
@@ -1116,6 +1174,11 @@ export default class App extends React.Component {
       this.setState({ confirmNew: true });
       return;
     }
+    this.openSetup();
+  }
+
+  /** Back to setup with a fresh opening seed (a blank seed field means a new draw), from the masthead or the results. */
+  openSetup() {
     this.clearTimers();
     this.cancelRestore();
     this.flowToken++;
@@ -1394,7 +1457,8 @@ export default class App extends React.Component {
   fastForward() {
     this.engagement.count('skips');
     this.clearTimers();
-    this.setState({ paused: false });
+    // clearTimers() also dropped the tasks that would clear the kickoff popup and the last goal toast.
+    this.setState({ paused: false, pu: null, toast: null });
     this.revealAll();
   }
 
@@ -1469,7 +1533,9 @@ export default class App extends React.Component {
 
   followTeam(id) {
     if (id && !this.state.teams[id]) return;
-    this.setState({ managedTeamId: this.managedId(), followedId: id || null, selected: id || this.state.selected }, () => this.persist());
+    // managedId() is null once management ends; the eliminated team stays on record ("Your managed team", the save).
+    const managedTeamId = this.state.managementEnded ? this.state.managedTeamId : this.managedId();
+    this.setState({ managedTeamId, followedId: id || null, selected: id || this.state.selected }, () => this.persist());
   }
 
   viewConquest(...args) { return mapM.viewConquest.apply(this, args); }
@@ -1527,11 +1593,20 @@ export default class App extends React.Component {
       sport: getSport(st.settings?.sport), managedId: managedId || null, followedId,
       perspectiveId: managedId || followedId || null,
       drama: UNCERTAINTY_PRESETS[st.settings?.uncertainty]?.drama ?? Number(CONFIG.matchDrama),
-      displayRound: displayRound(st), totalTeams: Object.keys(st.teams || {}).length,
+      displayRound: displayRound(st), totalTeams: this.teamCount(st.teams),
       labelGeometry: this.labelGeometry || [], viewFocus: this.viewFocus || null, cache: this.vmCache,
       // A country map's section names (null on the world map), so pure view-models name sections without the loader.
       sectionNames: this.domesticMap()?.sectionNames || null,
     };
+  }
+
+  /** How many teams `teams` holds, counted once per teams object (every view-model builder asks, every render). */
+  teamCount(teams) {
+    if (this.countedTeams !== teams) {
+      this.countedTeams = teams;
+      this.teamTotal = Object.keys(teams || {}).length;
+    }
+    return this.teamTotal;
   }
 
   /** The effective view (DEC D11): setup, the signing screen and the target choice override the chosen view. */
@@ -1791,13 +1866,14 @@ export default class App extends React.Component {
         label: `${currentCard.a.name} ${currentCard.a.score}, ${currentCard.b.name} ${currentCard.b.score}` } : null,
       onSpeed: () => this.cycleSpeed(), onStep: () => this.step(), onPlay: () => this.togglePlay(), onPause: () => this.pausePlayback() };
     const settingsProps = {                              // shared by the masthead popover and the phone More sheet (A-10)
-      pacing: st.settings.pacing, resolution: st.settings.resolution, confirmNew: st.confirmNew,
-      busy: liveMatch || !!st.spin || !!st.tacticalChoice || !!st.choice || !!st.pendingTarget, completed,
-      onPacing: p => this.setSetting('pacing', p), onResolution: r => this.setSetting('resolution', r),
+      confirmNew: st.confirmNew, completed,
+      // Exactly when setSetting refuses a `resolution` change: a draw in progress or an unapplied match.
+      busy: liveMatch || !!st.spin,
       onNew: () => this.newCampaign(), onCancelNew: () => this.setState({ confirmNew: false }),
       saveStatus: st.saveStatus, onExport: () => this.exportProgress(), onImport: file => this.importProgress(file),
       onResults: () => this.setState({ phase: 'victory' }), seed: st.seed, settings: st.settings,
       onSetting: (key, value) => this.setSetting(key, value), managementEnded: st.managementEnded,
+      managedName: st.teams?.[st.managedTeamId]?.name || null,
       onManageSaves: () => this.openStorageDialog('slots') };
     const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore}
       eventsRef={this.eventsRef} onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} /> : null;
@@ -1847,7 +1923,7 @@ export default class App extends React.Component {
               onFollow={id => this.followTeam(id)} onPauseFollow={value => this.setPauseFollow(value)}
               onToggleAutoplay={() => this.togglePlay()} onSpeed={n => this.setSpeed(n)} /> : null}
             onPreview={() => this.openMatchPreview()} onSimulate={() => this.simulateResult()}
-            onToggleSheet={() => this.togglePhoneSheet()} onOpenChronicle={() => this.setView('chronicle')}
+            onToggleSheet={() => this.togglePhoneSheet()} onOpenChronicle={st.choice || st.pendingTarget ? undefined : () => this.setView('chronicle')}
             onSelectTeam={id => this.selectTeam(id)} />}
           {playing && view === 'conquest' && <ConquestScreen {...this.conquestModel()}
             onSelect={index => this.selectAcquisition(index)}
@@ -1877,9 +1953,9 @@ export default class App extends React.Component {
           playback={<PlaybackBar variant="sheet" id="campaign-playback-sheet" showStep={!ctx.managedId} {...playback} />} />}
         {st.phase === 'setup' && <SetupOverlay
           setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()} domestic={this.domesticStatus()}
+          theatreMap={this.setupMapPreview()}
           season={this.seasonStatus()}
-          savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
-            (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings)
+          savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + this.savedProgress(st.savedMeta) + ' · ' + this.scopeName(st.savedMeta.settings)
             + (st.savedMeta.settings?.dataSeason ? ' · ' + st.savedMeta.settings.dataSeason : '') : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
           onPick={(key, value) => this.pickSetup(key, value)}
@@ -1889,11 +1965,9 @@ export default class App extends React.Component {
           onCancel={st.hasSave ? () => this.resume() : undefined}
         />}
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
-          onClose={() => this.setState({ phase: 'playing' })}
-          onNew={() => {
-            this.clearTimers(); this.cancelRestore(); this.showSetupMap(st.setup, true); this.showSetupSet();
-            this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null, autoplay: false });
-          }}
+          // "View map" (and close): the final's automatic switch to the Match view is otherwise never undone.
+          onClose={() => this.setState({ phase: 'playing', view: 'map', viewSource: 'user' })}
+          onNew={() => this.openSetup()}
         />}
         {st.tacticalChoice && st.tacticalPreview && !st.storageDialog && !st.exportText && <TacticalChoice choice={st.tacticalChoice}
           preview={this.matchPreviewModel()} onSimulate={() => this.simulateResult()}
@@ -1915,14 +1989,19 @@ export default class App extends React.Component {
             catch (error) { this.setState({ storageDialog: { ...st.storageDialog, error: error.message } }); }
           }}
           onRename={(id, name) => {
-            const result = renameCampaign(id, name);
-            if (result.ok && id === st.campaignId) {
+            let result;
+            // A slot deleted in another tab while the dialog was open cannot be renamed: say so rather than throw.
+            try { result = renameCampaign(id, name); } catch (error) { result = { ok: false, message: error.message }; }
+            // The quick-resume copy (no campaign open yet after a reload) takes the new revision too, or resuming
+            // it reads as a change made in another tab.
+            if (result.ok && this.saved?.campaignId === id) {
               this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
-              this.setState({ revision: result.revision, campaignName: result.campaignName });
             }
+            if (result.ok && id === st.campaignId) this.setState({ revision: result.revision, campaignName: result.campaignName });
             this.setState({ storageDialog: { ...st.storageDialog, error: result.ok ? null : result.message, notice: null } });
           }}
-          onFork={Object.keys(st.teams).length || this.saved ? name => this.continueSaved(st.phase === 'setup' ? this.saved
+          // In setup the fork copies the quick-resume save; the outgoing campaign's teams may outlive a cleared one.
+          onFork={(st.phase === 'setup' ? this.saved : Object.keys(st.teams).length) ? name => this.continueSaved(st.phase === 'setup' ? this.saved
             : { ...st, rngState: this.rng.getState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
           onReload={() => this.continueSaved(st.storageDialog.campaign)}
           onRestoreBackup={() => this.continueSaved(st.storageDialog.backup, true, `${st.storageDialog.backup.campaignName || 'Campaign'} recovered`)}

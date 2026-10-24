@@ -736,7 +736,7 @@ test('dialog and ledger CSS: the match preview fits the viewport and Fallen is n
   assert.match(dialogs, /\.fi-tactical, \.fi-tactical\.has-preview \{[^}]*max-height:none/, 'phone: full-screen sheet');
   const foot = dialogs.match(/\n\.fi-tactical-foot \{([^}]*)\}/)?.[1] || '';
   assert.match(foot, /position:sticky; bottom:0/, 'the "simulate the result" line is a sticky footer');
-  assert.match(foot, /background:#fff/, 'the footer is opaque over the scrolled content');
+  assert.match(foot, /background:var\(--panel\)/, 'the footer is opaque over the scrolled content');
   // RC2: the whole preview fits 1440×900 and 1366×768 without scrolling — stepped rhythm by viewport height.
   assert.match(dialogs, /@media \(min-width:700px\) and \(max-height:979\.98px\) \{[^@]*\.fi-tactical-v \{ display:none; \}/);
   const short = dialogs.match(/@media \(min-width:700px\) and \(max-height:879\.98px\) \{([\s\S]*?)\n\}/)?.[1] || '';

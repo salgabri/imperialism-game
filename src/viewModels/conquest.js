@@ -138,7 +138,8 @@ export function conquestOptions(choice, selectedIndex = choice?.selected, sport)
     const index = Number.isInteger(candidate.index) ? candidate.index : position;
     const replaced = replacedName(candidate);
     const delta = signedDelta(Math.max(0, Number(candidate.gain) || 0));
-    const base = `${candidate.pos} · ${candidate.rating} rating`;
+    // Every natural position: a PG/SG fits either guard spot.
+    const base = `${candidate.positions?.length ? candidate.positions.join('/') : candidate.pos} · ${candidate.rating} rating`;
     const note = replaced ? `Starts ahead of ${replaced}`
       : candidate.entersLineup ? `Starts in the ${lineup}` : `Adds depth · the ${lineup} is unchanged`;
     return {

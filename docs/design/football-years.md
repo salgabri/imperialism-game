@@ -221,8 +221,10 @@ names the provider and reads "Game rating converted from CM current ability".
 
 ## Known limits
 
-- The setup map's flag preview shows every shape with its own flag. Only the
-  launched board applies the set's territory.
+- The flag map behind the setup wizard shows every shape with its own flag.
+  Step 1's theatre map card and the launched board apply the set's territory:
+  merged federations are held by their holder, and inactive shapes are
+  unclaimed.
 - Serbia keeps its modern name and flag in its Serbia and Montenegro years.
 - Seasons ending before 2002 need historic federations and are refused.
 - League detection uses stored competition names and CM0102Patcher's renames. A

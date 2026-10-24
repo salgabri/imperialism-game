@@ -156,7 +156,9 @@ function cleanDraw(f) {
 test('an attacker blocked by neutral land keeps autoplay moving on a coastal sea route', async () => {
   const f = await fixture({ speed: 4 });
   try {
-    // Both French-held capitals lie west of this neutral wall; Germany is east.
+    // Both French-held capitals lie west of this neutral wall; Germany is east. Neutral land is a country the map
+    // draws that no team holds (an undrawn display shape is not routing land).
+    f.app.geo.countries = [...f.app.geo.countries, { id: 'wall' }];
     f.app.displayGeo = { paths: { ...f.app.geo.paths,
       wall: { labelRings: [[[460, -1000], [465, -1000], [465, 1000], [460, 1000]]] },
     } };

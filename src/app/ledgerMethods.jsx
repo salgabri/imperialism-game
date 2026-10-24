@@ -81,7 +81,7 @@ export function victoryPanel() {
     color: champ.col,
     subtitle:
       'has conquered ' + (settings.layer !== 'clubs' && settings.scope === 'world' ? 'the world' : scope) +
-      ' in ' + matches + ' battles',
+      ' in ' + matches + (matches === 1 ? ' battle' : ' battles'),
     conquests: String(s.conq || 0),
     steals: String((s.steals || []).length),
     territories: String(territories(this.board(), champ.id).length),

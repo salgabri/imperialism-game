@@ -1,4 +1,6 @@
-// Owner: WP-SETUP (see PLAN.md §4). Pure view model for the three-step setup wizard (PLAN A-5, M§1.8, M§3).
+// Owner: WP-SETUP (see PLAN.md §4). Pure view model for the three-step setup wizard (PLAN A-5, M§1.8, M§3):
+// Campaign → Rules (the draw, Show matches, More rules) → Your role (role, team and, for a manager, the opponent choice).
+// The in-game settings panel reads the same option lists, Show matches helpers and `campaignFacts`.
 // Everything here is a pure function of the setup record and the opening teams App already computes
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
 import { NATIONS, SCOPES } from '../../data/teams.js';
@@ -27,51 +29,46 @@ export function campaignPreview(count, sport, setup) {
 
 /** Wizard steps (M§1.8, M§3.3). `pending` is the rail subtitle until the step is done. */
 export const SETUP_STEPS = Object.freeze([
-  { n: 1, id: 'campaign', title: 'Campaign', pending: 'Sport, teams, theatre', next: 'Next: Rules', note: 'Rules can be changed in step 2' },
-  { n: 2, id: 'rules', title: 'Rules', pending: 'Turn order, targeting, odds', next: 'Next: Nation & role', note: 'Rules are fixed once the campaign launches' },
-  { n: 3, id: 'role', title: 'Nation & role', pending: 'Manage a team, or watch', next: 'Launch campaign', note: 'Rules are fixed once the campaign launches' },
+  { n: 1, id: 'campaign', title: 'Campaign', pending: 'Sport, teams, theatre', next: 'Next: Rules', note: 'The default rules suit a first campaign' },
+  { n: 2, id: 'rules', title: 'Rules', pending: 'How matches are drawn', next: 'Next: Your role', note: 'Rules are fixed at launch; Show matches can change any time' },
+  { n: 3, id: 'role', title: 'Your role', pending: 'Manage a team, or watch', next: 'Launch campaign', note: 'Rules are fixed at launch' },
 ]);
 
-export const TURN_ORDER_OPTIONS = [['round-robin', 'Round robin'], ['random', 'Random draw']];
-export const TARGETING_OPTIONS = [['player', 'You choose'], ['compass', 'Compass']];
+/** The draw's name in setup, the rail summary and the in-game settings: one-by-one turn order, else the pacing. */
+export const DRAW_NAMES = Object.freeze({ random: 'Random draw', 'round-robin': 'Round robin', blitz: 'Blitz round', chaos: 'Chaos draw' });
 
 /**
- * Board 12 option cards (M§3.4), copy verbatim. `dots`: on | current | off squares. `dotStyle` picks the fill rule:
- * `rr` squares are always `you`; `rand` filled squares are `muted` until that card is selected.
+ * Step 2's one rules choice: pacing and the one-by-one turn order as four cards (M§3.4 card pattern). `pacing` /
+ * `turnOrder` are the stored values a card writes; Blitz and Chaos leave `turnOrder` alone (DEC D2 normalises it at
+ * launch). `dots`: on | current | off squares. `dotStyle` picks the fill rule: `rand` filled squares are `muted` until
+ * that card is selected; the others are always `you`.
  */
-export const TURN_ORDER_CARDS = Object.freeze([
-  { value: 'round-robin', title: 'Round robin', dotStyle: 'rr', dots: ['on', 'on', 'current', 'off', 'off'],
-    body: 'Every empire attacks once per round, strongest first. Everyone gets a turn.' },
-  { value: 'random', title: 'Random draw', dotStyle: 'rand', dots: ['off', 'on', 'off', 'off', 'on'],
-    body: 'Any surviving empire can be drawn to attack. Streaks, droughts and surprises.' },
+export const DRAW_CARDS = Object.freeze([
+  { value: 'random', title: DRAW_NAMES.random, tag: 'Recommended', tone: 'you', dotStyle: 'rand', dots: ['off', 'on', 'off', 'off', 'on'],
+    pacing: 'duel', turnOrder: 'random',
+    body: 'One match per turn. A random team is drawn to attack, so some teams attack often and some wait.' },
+  { value: 'round-robin', title: DRAW_NAMES['round-robin'], dotStyle: 'rr', dots: ['on', 'on', 'current', 'off', 'off'],
+    pacing: 'duel', turnOrder: 'round-robin',
+    body: 'One match per turn. Every team attacks once per round, strongest first.' },
+  { value: 'blitz', title: DRAW_NAMES.blitz, dotStyle: 'all', dots: ['on', 'on', 'on', 'on', 'on'], pacing: 'blitz',
+    body: 'Teams are paired off each round, with a neighbour where possible; with an odd number, one sits out. The field roughly halves each round.' },
+  { value: 'chaos', title: DRAW_NAMES.chaos, dotStyle: 'rand', dots: ['on', 'off', 'on', 'on', 'off'], pacing: 'chaos',
+    body: 'Matches are drawn, mostly between neighbours, until a team would play twice, so the number of matches each round varies.' },
 ]);
+
+/** Step 3's opponent choice: a manager under a one-match draw only (DEC D2). `body` is the help under the control. */
 export const TARGETING_CARDS = Object.freeze([
-  { value: 'player', title: 'You choose', tag: 'Manager only', tone: 'you',
-    body: 'On your turns, pick any neighbour on the map. Other empires spin the compass.' },
-  { value: 'compass', title: 'Compass', tag: 'Spectator-ready', tone: 'muted',
-    body: 'A spin of the compass picks a neighbour for every attacker — you included.' },
-]);
-
-/**
- * Board 12 explainer matrix (M§3.5), copy verbatim. The board's " · selected" tag suffix is drawn as a separate
- * "Selected" status line on the selected cell (`cell.selected`), so the tag itself stays one line (M§3.5 nowrap).
- */
-export const RULE_CELLS = Object.freeze([
-  { turnOrder: 'round-robin', targeting: 'player', title: 'Your front, your call', tag: 'Manager', tone: 'you',
-    body: 'Your turn comes once a round and you pick the neighbour. Everyone else spins.' },
-  { turnOrder: 'round-robin', targeting: 'compass', title: 'Clockwork war', tag: 'Spectator-ready', tone: 'muted',
-    body: 'Each empire in turn spins for a target. Fully automatic and easy to follow.' },
-  { turnOrder: 'random', targeting: 'player', title: 'Wait for the draw', tag: 'Manager', tone: 'you',
-    body: 'When the draw lands on you, choose the target. Your turns are not guaranteed.' },
-  { turnOrder: 'random', targeting: 'compass', title: 'Pure chaos', tag: 'Spectator-ready · classic', tone: 'muted',
-    body: 'Random attacker, random direction — the original Imperialism draw.' },
+  { value: 'player', title: 'You choose',
+    body: "On your team's turn you pick any rival in reach on the map. Every other team spins the compass." },
+  { value: 'compass', title: 'Compass',
+    body: 'A spinning compass picks your opponent, as it does for every other team.' },
 ]);
 
 export const ROLE_CARDS = Object.freeze([
   { value: 'manager', title: 'Manager',
-    body: 'Commit to one team. Choose an approach before its matches and among up to three signings after its wins.' },
+    body: 'Run one team. Choose its approach before each match and one of up to three signings after each win.' },
   { value: 'spectator', title: 'Spectator',
-    body: 'Automatic draws, results and signings. Follow a favourite for match alerts.' },
+    body: 'Watch the war play out on its own. Nothing waits for you, and you can follow any team once it starts.' },
 ]);
 
 /** The conquest rules the old setup intro listed (ui-interaction contract copy). */
@@ -81,28 +78,129 @@ export const CONQUEST_RULES = Object.freeze([
   'Last team standing wins.',
 ]);
 
-const PACING_TAIL = { duel: 'a compass picks each fixture', blitz: 'every team plays each round', chaos: 'round size varies' };
-const UNCERTAINTY_SUMMARY = {
-  predictable: 'Predictable — strength usually decides',
-  balanced: 'Balanced — strength matters, upsets happen',
-  wild: 'Wild — more match-day swings and upsets',
-};
+/** "More rules": the launch-fixed options behind step 2's disclosure, shared with the in-game settings. */
+export const UNCERTAINTY_OPTIONS = Object.freeze([['predictable', 'Predictable'], ['balanced', 'Balanced'], ['wild', 'Wild']]);
 export const UNCERTAINTY_HELP = {
-  predictable: 'Strength usually decides the winner.',
-  balanced: 'Strength matters, with room for surprises.',
-  wild: 'More match-day variation and potential upsets.',
+  predictable: 'The stronger team usually wins.',
+  balanced: 'The stronger team is favoured, but upsets happen.',
+  wild: 'Underdogs win more often.',
 };
-const FINALE_SUMMARY = { single: 'Single decisive match', 'best-of-three': 'Best of three — first to two wins' };
+export const FINALE_OPTIONS = Object.freeze([['single', 'Single match'], ['best-of-three', 'Best of three']]);
 export const FINALE_HELP = {
-  single: 'One decisive match crowns the champion.',
-  'best-of-three': 'First to two wins claims the final territories and player.',
+  single: 'One match decides the champion.',
+  'best-of-three': 'The last two teams play until one has won twice.',
 };
-const RECRUITMENT_SUMMARY = {
-  'highest-rated': 'Highest-rated player for unmanaged teams',
-  'best-fit': 'Best lineup fit for unmanaged teams',
+export const RECRUITMENT_OPTIONS = Object.freeze([['highest-rated', 'Best-rated player'], ['best-fit', 'Best lineup fit']]);
+export const RECRUITMENT_HELP = {
+  'highest-rated': "After a win, a team you don't manage signs the loser's highest-rated player.",
+  'best-fit': "After a win, a team you don't manage signs the loser's player who most improves its starting lineup.",
+};
+export const ROSTER_OPTIONS = Object.freeze([['authentic', 'Real-world'], ['competitive', 'Evened out']]);
+export const ROSTER_HELP = {
+  authentic: 'Teams start at their real-world strength.',
+  competitive: 'The gaps between strong and weak teams shrink; each roster keeps its own stars.',
 };
 
+/**
+ * "Show matches": `resolution` and `express` as one choice that can change any time. Express already reveals every
+ * match at once (matchMethods `presentMatch`), so Fast-forward is the third mode. Read: express wins over resolution.
+ */
+export const SHOW_MATCH_OPTIONS = Object.freeze([['ticker', 'Live, minute by minute'], ['instant', 'Final score only'], ['express', 'Fast-forward']]);
+export const SHOW_MATCH_HELP = {
+  ticker: 'Scores and events appear as the match clock runs.',
+  instant: 'Each match skips straight to its final score.',
+  express: 'Final scores only. Routine matches flash past; yours, upsets and the final still pause. Your decisions still wait.',
+};
+export const SHOW_MATCH_BUSY = 'You can switch between Live and Final score only after this draw or match.';
+
 const nameOf = (options, id, fallback) => (options.find(([key]) => key === id) || options.find(([key]) => key === fallback))[1];
+const valid = (options, id, fallback) => (options.some(([key]) => key === id) ? id : fallback);
+
+export const showMatchesOf = (settings = {}) => (settings?.express ? 'express' : settings?.resolution === 'instant' ? 'instant' : 'ticker');
+
+/**
+ * The [key, value] writes that select Show matches `mode`, only for keys that change. Fast-forward writes `express`
+ * only, so it never needs the `resolution` write `setSetting` refuses during a draw or a live match.
+ */
+export function showMatchesWrites(mode, settings = {}) {
+  const express = !!settings?.express;
+  const resolution = settings?.resolution === 'instant' ? 'instant' : 'ticker';
+  if (mode === 'express') return express ? [] : [['express', true]];
+  const writes = express ? [['express', false]] : [];
+  if ((mode === 'ticker' || mode === 'instant') && mode !== resolution) writes.push(['resolution', mode]);
+  return writes;
+}
+
+/** Show matches options; while `busy` (a draw or live match), the modes that need a `resolution` write are disabled. */
+export function showMatchOptions(settings = {}, { busy = false } = {}) {
+  const current = showMatchesOf(settings);
+  const resolution = settings?.resolution === 'instant' ? 'instant' : 'ticker';
+  return SHOW_MATCH_OPTIONS.map(([value, label]) => ({
+    value, label, disabled: busy && value !== current && value !== 'express' && value !== resolution,
+  }));
+}
+
+/** The More rules summary line: "Standard", or only what differs from the defaults. */
+export function moreRulesSummary(setup = {}) {
+  const parts = [];
+  const uncertainty = valid(UNCERTAINTY_OPTIONS, setup.uncertainty, 'balanced');
+  if (uncertainty !== 'balanced') parts.push(`Upsets: ${nameOf(UNCERTAINTY_OPTIONS, uncertainty)}`);
+  if (setup.finale === 'best-of-three') parts.push(`Final: ${nameOf(FINALE_OPTIONS, 'best-of-three')}`);
+  if (setup.acquisitionPolicy === 'best-fit') parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
+  if (setup.rosterPreset === 'competitive' && getSport(setup.sport).id === 'basketball') {
+    parts.push(`Team strengths: ${nameOf(ROSTER_OPTIONS, 'competitive')}`);
+  }
+  const seed = String(setup.seed ?? '').trim();
+  if (seed) parts.push(`Seed ${seed}`);
+  return parts.length ? parts.join(' · ') : 'Standard';
+}
+
+/**
+ * The in-game settings' read-only "This campaign" rows, from the launched settings. Missing or unknown values read as
+ * their defaults, so old saves and partial fixtures never show `undefined`. `stored` is the value behind the text.
+ * → [{ id, label, value, stored, inner?: { id, stored }, num? }]
+ */
+export function campaignFacts(settings = {}, { seed = null, managementEnded = false, managedName = null } = {}) {
+  const s = settings || {};
+  const pacing = valid(PACING_OPTIONS, s.pacing, 'duel');
+  const duel = pacing === 'duel';
+  const turnOrder = s.turnOrder === 'round-robin' ? 'round-robin' : 'random';
+  const targeting = s.targeting === 'player' ? 'player' : 'compass';
+  const role = s.role === 'manager' ? 'manager' : 'spectator';
+  const uncertainty = valid(UNCERTAINTY_OPTIONS, s.uncertainty, 'balanced');
+  const finale = valid(FINALE_OPTIONS, s.finale, 'single');
+  const recruitment = valid(RECRUITMENT_OPTIONS, s.acquisitionPolicy, 'highest-rated');
+  const roster = valid(ROSTER_OPTIONS, s.rosterPreset, 'authentic');
+  const roleText = role !== 'manager' ? 'Spectator'
+    : managementEnded ? (managedName ? `Spectator · ${managedName} knocked out` : 'Spectator · knocked out')
+      : managedName ? `Manager · ${managedName}` : 'Manager';
+  const rows = [
+    { id: 'role', label: 'Your role', value: roleText, stored: role },
+    { id: 'pacing', label: 'Draw', value: DRAW_NAMES[duel ? turnOrder : pacing], stored: pacing,
+      ...(duel ? { inner: { id: 'turn-order', stored: turnOrder } } : {}) },
+  ];
+  if (duel) {
+    const choosing = targeting === 'player' && role === 'manager' && !managementEnded;
+    rows.push({ id: 'targeting', label: 'Opponents', value: choosing ? 'You choose on your turns' : 'Compass', stored: targeting });
+  }
+  rows.push(
+    { id: 'uncertainty', label: 'Upsets', value: nameOf(UNCERTAINTY_OPTIONS, uncertainty), stored: uncertainty },
+    { id: 'finale', label: 'Final', value: nameOf(FINALE_OPTIONS, finale), stored: finale },
+    { id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment },
+  );
+  if (s.sport === 'basketball') rows.push({ id: 'roster-preset', label: 'Team strengths', value: nameOf(ROSTER_OPTIONS, roster), stored: roster });
+  if (seed != null && String(seed) !== '') rows.push({ id: 'seed', label: 'Seed', value: String(seed), stored: String(seed), num: true });
+  return rows;
+}
+
+/** Step 1's estimate footnote: which Show matches mode the length assumes, and what adds time. */
+export function estimateNote(showMatches, role) {
+  const mode = { ticker: 'live matches', instant: 'final scores only', express: 'Fast-forward' }[showMatches] || 'live matches';
+  const extra = role === 'manager'
+    ? (showMatches === 'ticker' ? ' Ties and your decisions add time.' : ' Your decisions add time.')
+    : (showMatches === 'ticker' ? ' Ties add time.' : '');
+  return `Estimated with ${mode} at 1× speed.${extra}`;
+}
 
 /** Setup caches key on the data set build, so a set's nations and clubs never collide with the built-in ones. */
 const sportKey = sport => sport.dataVersion || sport.id;
@@ -247,6 +345,49 @@ export function countryMapPreview(domestic, backdrop = null) {
   return value;
 }
 
+const theatrePreviewCache = new WeakMap();
+/**
+ * Step 1's world card, the country card's counterpart for every world theatre: the opening board, each held
+ * territory in its team's kick-off pastel (`empireFill(teamId)`, DEC D18) over the land nobody holds. `countries` is the
+ * chart's draw order ([{ id }]); a shape comes from `paths` (the display atlas, as WorldMap draws it), else `basePaths`
+ * (the topology), both fitted. `own` is territory → team at kick-off (overseas territory included). The card frames
+ * `focus` (a fitted { x, y, w, h }) when given, else the main polygons of `frameIds`, the teams' starting land.
+ * Pure; memoised per opening board, paths and focus.
+ * → { viewBox, teams, sections: [{ id, d, fill }], backdrop: [{ id, d }] } | null
+ */
+export function theatreMapPreview({ countries, paths = null, basePaths, own, frameIds = [], focus = null } = {}) {
+  if (!Array.isArray(countries) || !basePaths || !own) return null;
+  const focusKey = focus ? [focus.x, focus.y, focus.w, focus.h].join(' ') : '';
+  const hit = theatrePreviewCache.get(own);
+  if (hit && hit.countries === countries && hit.paths === paths && hit.basePaths === basePaths
+    && hit.frameIds === frameIds && hit.focusKey === focusKey) return hit.value;
+  const pathOf = id => paths?.[id] || basePaths[id];
+  const sections = [], backdrop = [];
+  for (const { id } of countries) {
+    const d = pathOf(id)?.d;
+    if (!d) continue;
+    if (own[id]) sections.push(Object.freeze({ id, d, fill: empireFill(own[id]) }));
+    else backdrop.push(Object.freeze({ id, d }));
+  }
+  if (!sections.length) return null;
+  let box = focus && focus.w > 0 && focus.h > 0 ? focus : null;
+  if (!box) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const id of frameIds) {
+      const b = pathOf(id)?.bbox;
+      if (!b) continue;
+      x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.w); y1 = Math.max(y1, b.y + b.h);
+    }
+    box = Number.isFinite(x0) && x1 > x0 && y1 > y0 ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : { x: 0, y: 0, w: 960, h: 540 };
+  }
+  const pad = Math.max(box.w, box.h) * .04;
+  const viewBox = [box.x - pad, box.y - pad, box.w + pad * 2, box.h + pad * 2].map(n => Number(n.toFixed(1))).join(' ');
+  const value = Object.freeze({ viewBox, teams: new Set(Object.values(own)).size,
+    sections: Object.freeze(sections), backdrop: Object.freeze(backdrop) });
+  theatrePreviewCache.set(own, { countries, paths, basePaths, frameIds, focusKey, value });
+  return value;
+}
+
 /** Sport card subtitle, derived from the sport's own club data so it never overstates the leagues. */
 export function sportNote(sport) {
   const clubs = sport.clubs || [];
@@ -256,9 +397,13 @@ export function sportNote(sport) {
   return `Nations · ${clubs.length} clubs from ${leagues.length} leagues`;
 }
 
-/** Board 03 tier (V1 L1969). */
-export function tierOf(rank) {
-  return rank <= 4 ? 'Favourite' : rank <= 12 ? 'Contender' : rank <= 30 ? 'Outsider' : 'Long shot';
+/**
+ * Board 03 tier (V1 L1969). The cut-offs (4 / 12 / 30) suit a field of Europe's 46 or more; a smaller field scales them
+ * down, so the last of ten clubs reads "Long shot" rather than "Contender".
+ */
+export function tierOf(rank, field = Infinity) {
+  const cut = limit => Math.min(limit, Math.ceil(field * limit / 46));
+  return rank <= cut(4) ? 'Favourite' : rank <= cut(12) ? 'Contender' : rank <= cut(30) ? 'Outsider' : 'Long shot';
 }
 
 /** Board 03 front label (V1 L1971): a neighbour more than one strength point away is Stronger / Weaker. */
@@ -284,34 +429,26 @@ function frontsOf(picked, managerTeams, row) {
   return { count, countText: `${count} land border${count === 1 ? '' : 's'}`, rows };
 }
 
-/** Effective rules (DEC D2): turn order × targeting apply to One by one pacing only. */
+/**
+ * Effective rules (DEC D2, the same outcome as engine/turns.js `launchRules` for a known pacing): turn order applies to
+ * one-by-one pacing only, and "You choose" to a manager under it (`canPick`). `draw` is the step-2 card; `stored` keeps
+ * the raw values a hidden choice leaves behind, which launch normalises.
+ */
 export function rulesOf(setup = {}) {
-  const pacing = PACING_OPTIONS.some(([id]) => id === setup.pacing) ? setup.pacing : 'duel';
+  const pacing = valid(PACING_OPTIONS, setup.pacing, 'duel');
   const turnOrder = setup.turnOrder === 'round-robin' ? 'round-robin' : 'random';
   const targeting = setup.targeting === 'player' ? 'player' : 'compass';
   const applies = pacing === 'duel';
-  const effective = applies ? { turnOrder, targeting } : { turnOrder: 'random', targeting: 'compass' };
-  const pacingName = nameOf(PACING_OPTIONS, pacing, 'duel');
+  const canPick = applies && setup.role === 'manager';
+  const draw = applies ? turnOrder : pacing;
+  const drawName = DRAW_NAMES[draw];
   return {
-    pacing, pacingName, applies, turnOrder: effective.turnOrder, targeting: effective.targeting,
+    pacing, pacingName: nameOf(PACING_OPTIONS, pacing, 'duel'), applies, canPick, draw, drawName,
+    turnOrder: applies ? turnOrder : 'random', targeting: canPick ? targeting : 'compass',
+    targetingHelp: TARGETING_CARDS.find(card => card.value === (canPick ? targeting : 'compass')).body,
     stored: { turnOrder, targeting },
-    note: applies ? '' : `Turn order and targeting apply to One by one pacing. ${pacingName} always uses a random draw and the compass.`,
-    summary: `${applies ? nameOf(TURN_ORDER_OPTIONS, effective.turnOrder) : pacingName} · ${nameOf(TARGETING_OPTIONS, effective.targeting)}`,
-    cells: RULE_CELLS.map(cell => {
-      const selected = cell.turnOrder === effective.turnOrder && cell.targeting === effective.targeting;
-      return { ...cell, id: `${cell.turnOrder}-${cell.targeting}`, selected };
-    }),
-  };
-}
-
-/** Read-only summary rows (board 02 L840-849, board 12 L218-225), bound to the setup values. */
-export function summaryOf(setup = {}) {
-  const rules = rulesOf(setup);
-  return {
-    pacing: `${rules.pacingName} — ${PACING_TAIL[rules.pacing]}`,
-    uncertainty: UNCERTAINTY_SUMMARY[setup.uncertainty] || UNCERTAINTY_SUMMARY.balanced,
-    finale: FINALE_SUMMARY[setup.finale] || FINALE_SUMMARY.single,
-    recruitment: RECRUITMENT_SUMMARY[setup.acquisitionPolicy] || RECRUITMENT_SUMMARY['highest-rated'],
+    note: applies ? '' : `${drawName} pairs every match itself, so there's no opponent to pick.`,
+    summary: drawName,
   };
 }
 
@@ -372,7 +509,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const count = country ? country.clubs : activeScope.count;
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
-  const resolution = RESOLUTION_OPTIONS.some(([id]) => id === setup.resolution) ? setup.resolution : 'ticker';
+  const showMatches = showMatchesOf(setup);
   const seasonRows = seasonOptions(football && Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS, dataSet, sport);
   const chosenSeason = seasonRows?.find(row => row.checked && row.id != null) || null;
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.
@@ -408,7 +545,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     managed = {
       ...row(picked),
       meta: picked.meta || [identity.group || country?.name, `${sport.name} ${noun}`].filter(Boolean).join(' · '),
-      rankText: `${rank} / ${field}`, tier: tierOf(rank),
+      rankText: `${rank} / ${field}`, tier: tierOf(rank, field),
       players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
       })),
@@ -456,16 +593,18 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     stats: [
       { id: 'teams', label: clubLayer ? 'Clubs' : 'Nations', value: pending ? '–' : String(count) },
       { id: 'matches', label: 'Matches', value: preview.matches },
-      { id: 'length', label: 'At 1× autoplay', value: preview.duration.replace(' at 1× autoplay', ''), small: true },
+      { id: 'length', label: 'Length', value: preview.duration.replace(' at 1× autoplay', ''), small: true },
     ],
     status: pending ? (seasonState === 'error' ? setFailed : setLoading) : `${count} ${nouns} · ${preview.matches} matches · ${preview.duration}`,
+    estimateNote: estimateNote(showMatches, setup.role),
     campaignSummary,
-    summary: summaryOf(setup),
     rules,
-    pacing: rules.pacing, resolution,
-    pacingName: rules.pacingName, resolutionName: nameOf(RESOLUTION_OPTIONS, resolution, 'ticker'),
-    uncertainty: UNCERTAINTY_HELP[setup.uncertainty] ? setup.uncertainty : 'balanced',
-    finale: FINALE_HELP[setup.finale] ? setup.finale : 'single',
+    showMatches, showMatchesHelp: SHOW_MATCH_HELP[showMatches],
+    uncertainty: valid(UNCERTAINTY_OPTIONS, setup.uncertainty, 'balanced'),
+    finale: valid(FINALE_OPTIONS, setup.finale, 'single'),
+    acquisitionPolicy: valid(RECRUITMENT_OPTIONS, setup.acquisitionPolicy, 'highest-rated'),
+    rosterPreset: valid(ROSTER_OPTIONS, setup.rosterPreset, 'authentic'),
+    moreRules: moreRulesSummary(setup),
     role, teams, field, managed, favourites, longShots, canLaunch,
     // Spectators pick no team, so their step-3 heading names what they do choose.
     roleTitle: role === 'manager' ? `Choose your ${noun}` : 'Choose your role',

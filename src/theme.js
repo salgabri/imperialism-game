@@ -113,3 +113,19 @@ export const RATING_TIERS = Object.freeze([[88, '88', '#8a5a00'], [84, '84', '#0
 export const ratingTierOf = r => RATING_TIERS.find(([min]) => r >= min)[1];
 export const ratingTierColor = r => RATING_TIERS.find(([min]) => r >= min)[2];
 export const WIN_TONE_COLORS = Object.freeze({ gain: '#138a4a', even: '#9a6700', loss: '#d1342f', muted: '#646a6e' });
+
+/**
+ * Map paint follows the theme: view models keep the light literals above (tests and attributes read them), and the
+ * renderer paints `themedPaint(fill)`: the tokens.css custom property holding that colour in the active theme, with
+ * the literal as fallback. Colours outside the palette (nation and club colours, flag patterns) pass through.
+ */
+const PAINT_TOKENS = new Map([
+  [V4.landNeutral, '--land-neutral'], [V4.youFill, '--you-fill'], [V4.opponentFill, '--opponent-fill'], [V4.flagBg, '--flag-bg'],
+  ...EMPIRE_PASTELS.map((hex, i) => [hex, `--empire-${i + 1}`]),
+  ...MAP.strengthRamp.slice(1).map((hex, i) => [hex, `--strength-${i + 2}`]),
+  ...Object.entries(MAP.frontsTint).map(([tone, hex]) => [hex, `--fronts-${tone}`]),
+]);
+export function themedPaint(fill) {
+  const token = typeof fill === 'string' && PAINT_TOKENS.get(fill.toLowerCase());
+  return token ? `var(${token}, ${fill})` : fill;
+}

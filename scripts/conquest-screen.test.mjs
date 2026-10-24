@@ -218,6 +218,14 @@ test('a basketball conquest reads "starting five" where football reads "XI" (DEC
   assert.equal(conquestOptions({ candidates: enters }, 2, sport)[0].note, 'Starts in the XI');
 });
 
+test('options list every natural position, so a combo guard reads PG/SG', () => {
+  const candidates = [
+    { index: 0, name: 'Combo Guard', pos: 'PG', positions: ['PG', 'SG'], rating: 88, gain: 7, entersLineup: true },
+    { index: 1, name: 'Pure Centre', pos: 'C', rating: 80, gain: 0, entersLineup: false },
+  ];
+  assert.deepEqual(conquestOptions({ candidates }, 0, 'basketball').map(option => option.base), ['PG/SG · 88 rating', 'C · 80 rating']);
+});
+
 // ---------- ConquestScreen ----------
 
 function Harness({ st, ctx, confirmed, selects = [] }) {

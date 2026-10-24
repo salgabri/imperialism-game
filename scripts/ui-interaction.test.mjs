@@ -44,7 +44,9 @@ test('setup presents rules, role, reproducible settings and honest session previ
   assert.match(markup, /up to three signings/);
   assert.match(markup, /31–33 matches/);
   assert.match(markup, /id="setup-seed"[^>]*value="42"/);
-  assert.match(markup, /neutral transit/i);
+  assert.match(markup, /Seed 42/, 'More rules names the changed rules');
+  assert.match(markup, /Who picks your opponent/);
+  assert.doesNotMatch(markup, /neutral transit/i, 'route internals stay out of the setup copy');
   assert.doesNotMatch(markup, /Progress saved after every match/);
 });
 

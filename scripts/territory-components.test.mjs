@@ -242,3 +242,14 @@ test('world conquest grouping is bounded and unchanged map frames reuse the resu
   assert.ok(cachedMs < 500, `100 cached frames took ${cachedMs.toFixed(0)} ms`);
   t.diagnostic(`world component grouping ${coldMs.toFixed(0)} ms; 100 cached frames ${cachedMs.toFixed(0)} ms`);
 });
+
+test('rings of plain numbers are used as they are, other points are converted (labels and flags keep no copy)', () => {
+  const plain = rect(0, 0, 100, 80), loose = [['0', '100'], ['60', '100'], ['60', '160'], ['0', '160']];
+  const shapes = [shape('plain', plain), shape('loose', loose)];
+  const parts = createTerritoryComponentIndex(shapes).components({ plain: 'A', loose: 'B' }).flatMap(component => component.parts);
+  const ringOf = id => parts.find(part => part.countryId === id).rings[0];
+  assert.strictEqual(ringOf('plain'), plain, 'the painted ring itself, not a copy of every point');
+  assert.notStrictEqual(ringOf('loose'), loose);
+  assert.deepEqual(ringOf('loose'), [[0, 100], [60, 100], [60, 160], [0, 160]], 'string coordinates become numbers');
+  assert.deepEqual(plain, rect(0, 0, 100, 80), 'the input ring is never changed');
+});

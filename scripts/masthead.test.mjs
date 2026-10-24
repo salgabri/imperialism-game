@@ -190,8 +190,8 @@ function barProps(overrides = {}) {
   const st = campaign();
   return {
     show: true, sportName: 'Football', layerName: 'Nations', scopeName: 'Europe', round: 18, alive: 3,
-    pacing: 'duel', resolution: 'ticker', confirmNew: false, busy: false, completed: false, saveStatus: { ok: true, message: 'Saved' },
-    onPacing: noop, onResolution: noop, onNew: noop, onCancelNew: noop, onExport: noop, onImport: noop, onResults: noop,
+    confirmNew: false, busy: false, completed: false, saveStatus: { ok: true, message: 'Saved' },
+    onNew: noop, onCancelNew: noop, onExport: noop, onImport: noop, onResults: noop,
     seed: 2026, settings: st.settings, onSetting: noop, managementEnded: false, onManageSaves: noop,
     view: 'map', navLocked: false, onView: noop, primary: { id: 'continue', label: 'Continue' }, onPrimary: noop,
     masthead: buildMasthead(st, ctxFor(st, { managedId: '380' })), playback: null,
@@ -301,17 +301,55 @@ test('CommandBar keeps the HEAD props working: no nav without onView, dateline f
   });
 });
 
-test('CommandBar settings popover holds SettingsPanel with read-only rules', async () => {
+test('CommandBar settings popover: Show matches is live, the launch rules are read-only facts', async () => {
   await withDom(async ({ mount }) => {
-    const view = await mount(CommandBar, barProps({ settings: { ...campaign().settings, turnOrder: 'round-robin', targeting: 'player' } }));
-    await act(async () => view.host.querySelector('button[aria-label="Settings"]').click());
-    const popover = view.host.querySelector('#campaign-settings');
+    const writes = [];
+    const managed = { ...campaign().settings, pacing: 'duel', turnOrder: 'round-robin', targeting: 'player', role: 'manager' };
+    const open = async props => {
+      const view = await mount(CommandBar, barProps({ onSetting: (key, value) => writes.push([key, value]), ...props }));
+      await act(async () => view.host.querySelector('button[aria-label="Settings"]').click());
+      return view.host.querySelector('#campaign-settings');
+    };
+    const popover = await open({ settings: managed, managedName: 'Italy' });
     assert.ok(popover);
-    assert.equal(popover.querySelector('#campaign-turn-order').value, 'round-robin');
-    assert.equal(popover.querySelector('#campaign-turn-order').disabled, true);
-    assert.equal(popover.querySelector('#campaign-targeting').value, 'player');
-    assert.equal(popover.querySelector('#campaign-targeting').disabled, true);
-    assert.equal(popover.querySelector('#campaign-pacing').disabled, true);
+    assert.equal(popover.querySelectorAll('select:disabled').length, 0, 'no greyed-out controls');
+    assert.match(popover.textContent, /This campaign/);
+    assert.match(popover.textContent, /Set at launch/);
+    assert.match(popover.textContent, /Start a new campaign to change these\./);
+    const fact = id => popover.querySelector(`#${id}`);
+    assert.equal(fact('campaign-pacing').tagName, 'DD');
+    assert.equal(fact('campaign-pacing').dataset.value, 'duel');
+    assert.equal(fact('campaign-pacing').textContent, 'Round robin');
+    assert.equal(fact('campaign-turn-order').dataset.value, 'round-robin');
+    assert.equal(fact('campaign-targeting').dataset.value, 'player');
+    assert.equal(fact('campaign-targeting').textContent, 'You choose on your turns');
+    assert.equal(fact('campaign-role').textContent, 'Manager · Italy');
+    assert.equal(fact('campaign-seed').textContent, '2026');
+    assert.deepEqual(['uncertainty', 'finale', 'recruitment'].map(id => fact(`campaign-${id}`).dataset.value), ['balanced', 'single', 'highest-rated']);
+
+    const show = popover.querySelector('#campaign-resolution');
+    assert.equal(show.disabled, false);
+    assert.equal(show.value, 'ticker');
+    show.value = 'express';
+    await act(async () => show.dispatchEvent(new window.Event('change', { bubbles: true })));
+    assert.deepEqual(writes, [['express', true]]);
+
+    const ended = await open({ settings: managed, managedName: 'Italy', managementEnded: true });
+    assert.equal(ended.querySelector('#campaign-role').textContent, 'Spectator · Italy knocked out');
+    assert.equal(ended.querySelector('#campaign-targeting').textContent, 'Compass');
+
+    const blitz = await open({ settings: { ...managed, pacing: 'blitz' } });
+    assert.equal(blitz.querySelector('#campaign-pacing').textContent, 'Blitz round');
+    assert.ok(!blitz.querySelector('#campaign-targeting'), 'no opponents row under Blitz');
+    assert.ok(!blitz.querySelector('#campaign-turn-order'), 'no turn order row under Blitz');
+
+    // During a draw or live match only the switch between Live and Final score only waits.
+    const busy = await open({ settings: managed, busy: true });
+    const option = value => [...busy.querySelector('#campaign-resolution').options].find(item => item.value === value);
+    assert.equal(option('instant').disabled, true);
+    assert.equal(option('express').disabled, false);
+    assert.equal(busy.querySelector('#campaign-resolution-help').textContent,
+      'You can switch between Live and Final score only after this draw or match.');
   });
 });
 
@@ -519,7 +557,7 @@ test('PhoneMoreSheet: Chronicle, playback and the shared SettingsPanel (A-10)', 
     const calls = [];
     const settingsProps = (overrides = {}) => ({ ...barProps(), onNew: () => calls.push('new'), onCancelNew: () => calls.push('cancel'),
       onExport: () => calls.push('export'), onImport: () => calls.push('import'), onSetting: (key, value) => calls.push(`${key}=${value}`),
-      onResolution: value => calls.push(`resolution=${value}`), idPrefix: 'sheet-', ...overrides });
+      idPrefix: 'sheet-', ...overrides });
     const sheet = (overrides = {}) => React.createElement(PhoneMoreSheet, {
       onClose: () => calls.push('close'), onChronicle: () => calls.push('chronicle'),
       settings: React.createElement(SettingsPanel, settingsProps(overrides)),
@@ -537,11 +575,12 @@ test('PhoneMoreSheet: Chronicle, playback and the shared SettingsPanel (A-10)', 
     await act(async () => { button('Export campaign').click(); button('New campaign').click(); });
     const resolution = root.querySelector('#sheet-campaign-resolution');
     assert.equal(resolution.disabled, false);
-    const express = root.querySelector('#sheet-campaign-express');
-    assert.equal(express.type, 'checkbox');
-    await act(async () => express.click());
+    assert.ok(!root.querySelector('#sheet-campaign-express'), 'Fast-forward is a Show matches option, not a checkbox');
+    resolution.value = 'express';
+    await act(async () => resolution.dispatchEvent(new window.Event('change', { bubbles: true })));
     for (const id of ['sheet-campaign-pacing', 'sheet-campaign-turn-order', 'sheet-campaign-targeting', 'sheet-campaign-uncertainty',
-      'sheet-campaign-finale', 'sheet-campaign-role']) assert.equal(root.querySelector(`#${id}`)?.disabled, true, `${id} is read-only`);
+      'sheet-campaign-finale', 'sheet-campaign-role']) assert.ok(root.querySelector(`#${id}`)?.dataset.value, `${id} shows its launch value`);
+    assert.equal(root.querySelectorAll('select:disabled').length, 0, 'the launch rules are text, not disabled selects');
     assert.ok(!root.querySelector('.settings-panel [id^="campaign-"]'), 'every settings control id carries the prefix');
     await act(async () => root.querySelector('button[aria-label="Close more"]').click());
     await act(async () => root.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));

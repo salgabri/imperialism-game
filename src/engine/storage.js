@@ -19,14 +19,16 @@ export function createCampaignId() {
   return globalThis.crypto?.randomUUID?.() || `campaign-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
 }
 
+/** The state keys a checkpoint stores (plus `phase`, as playing or victory). */
+export const CHECKPOINT_KEYS = Object.freeze(['settings', 'round', 'matches', 'own', 'aliveIds', 'fallen', 'stats', 'teams',
+  'queue', 'batchTotal', 'log', 'match', 'spin', 'seed', 'rngState', 'history', 'series',
+  'followedId', 'pauseFollow', 'choice', 'metrics', 'startedAt', 'completedAt', 'conquestIds',
+  'campaignId', 'revision', 'campaignName', 'managedTeamId', 'managementEnded', 'managerElimination',
+  'tacticalChoice', 'tactics', 'rules', 'historyFilter', 'selectedHistoryId', 'decisionLedger', 'initialSettings',
+  'turnQueue', 'turnIndex', 'pendingTarget']);
+
 export function campaignSnapshot(state) {
-  const keys = ['settings', 'round', 'matches', 'own', 'aliveIds', 'fallen', 'stats', 'teams',
-    'queue', 'batchTotal', 'log', 'match', 'spin', 'seed', 'rngState', 'history', 'series',
-    'followedId', 'pauseFollow', 'choice', 'metrics', 'startedAt', 'completedAt', 'conquestIds',
-    'campaignId', 'revision', 'campaignName', 'managedTeamId', 'managementEnded', 'managerElimination',
-    'tacticalChoice', 'tactics', 'rules', 'historyFilter', 'selectedHistoryId', 'decisionLedger', 'initialSettings',
-    'turnQueue', 'turnIndex', 'pendingTarget'];
-  return { v: SAVE_VERSION, savedAt: Date.now(), ...Object.fromEntries(keys.map(key => [key, state[key]])),
+  return { v: SAVE_VERSION, savedAt: Date.now(), ...Object.fromEntries(CHECKPOINT_KEYS.map(key => [key, state[key]])),
     phase: state.phase === 'victory' ? 'victory' : 'playing' };
 }
 
@@ -64,6 +66,21 @@ function mapPlayers(data, fn) {
   return out;
 }
 
+// Whether a player rebuilds exactly from its tuple depends on the record and the pack's source edition, not on its
+// club's index in one checkpoint. Player records are replaced, never changed in place, so each is checked once.
+// `unpack` is the pack's own rebuild: FM's for country campaigns, the CM one for data set campaigns.
+const exactPacks = new WeakMap();
+
+function packsExactly(player, tuple, pack, unpack = unpackPlayer) {
+  const source = [pack.kind || 'fm', ...Object.values(pack.source)].join('\u0000');
+  const known = exactPacks.get(player);
+  if (known?.source === source) return known.exact;
+  let exact;
+  try { exact = JSON.stringify(unpack(tuple, pack)) === JSON.stringify(player); } catch { exact = false; }
+  exactPacks.set(player, { source, exact });
+  return exact;
+}
+
 function packCampaign(data) {
   if (data.settings?.dataSet != null) return packCmCampaign(data);
   if (!isDomesticScope(data.settings?.clubScope)) return data;
@@ -78,7 +95,7 @@ function packCampaign(data) {
     const tuple = [Number(sourceInfo.id.slice(3)), name, sourceInfo.rawRating, sourceInfo.naturalPositions.join(','),
       sourceInfo.nationality || 0, clubs.get(sourceInfo.club)];
     if (Object.keys(extras).length) tuple.push(extras);
-    try { return JSON.stringify(unpackPlayer(tuple, pack)) === JSON.stringify(player) ? tuple : player; } catch { return player; }
+    return packsExactly(player, tuple, pack) ? tuple : player;
   });
   return { ...packed, playerPack: pack };
 }
@@ -128,7 +145,7 @@ function packCmCampaign(data) {
     const tuple = cmTupleOf(name, sourceInfo);
     if (!tuple) return player;
     if (Object.keys(extras).length) tuple.push(extras);
-    try { return JSON.stringify(unpackCmPlayer(tuple, pack)) === JSON.stringify(player) ? tuple : player; } catch { return player; }
+    return packsExactly(player, tuple, pack, unpackCmPlayer) ? tuple : player;
   });
   return { ...packed, playerPack: pack };
 }
@@ -210,7 +227,16 @@ function checkpointText(data) {
 
 /** Validate every value used by resume before touching the current campaign. */
 export function parseCampaign(text) {
-  let data = JSON.parse(text);
+  return validateCampaign(JSON.parse(text), true);
+}
+
+/**
+ * parseCampaign's checks on a campaign object, optionally without rebuilding roster sources. A save checks the
+ * snapshot it is about to write this way, as plain data: JSON keeps every value these checks read (a NaN or a
+ * dropped undefined fails them either way), so parsing the text again would only rebuild the same campaign.
+ */
+function validateCampaign(input, rebuildSources) {
+  let data = input;
   const invalid = message => { throw new Error(message); };
   if (record(data) && data.playerPack !== undefined) data = unpackCampaign(data, invalid);
   if (!record(data) || ![1, 2, 3, 4].includes(data.v) || !record(data.teams)
@@ -219,16 +245,19 @@ export function parseCampaign(text) {
     invalid('This file is not a supported Imperialism campaign.');
   }
   const teams = Object.entries(data.teams), known = id => typeof id === 'string' && Object.hasOwn(data.teams, id);
+  // Owners once, as sets: rebuilding Object.values(own) for every surviving team was most of a save's garbage.
+  const owners = Object.values(data.own), holding = new Set(owners), alive = new Set(data.aliveIds);
   if (!teams.length || teams.length > 200 || teams.some(([id, team]) => !record(team)
       || (team.id != null && team.id !== id) || typeof team.name !== 'string' || !team.name.trim()
       || !Array.isArray(team.squad) || team.squad.length > 250
       || team.squad.some(p => !record(p) || typeof p.name !== 'string' || !p.name.trim()
-        || !Number.isFinite(p.rating) || p.rating < 0 || p.rating > 120 || typeof p.pos !== 'string'))
-      || data.aliveIds.some(id => !known(id)) || new Set(data.aliveIds).size !== data.aliveIds.length
-      || Object.values(data.own).some(id => !known(id) || !data.aliveIds.includes(id))) {
+        || !Number.isFinite(p.rating) || p.rating < 0 || p.rating > 120 || typeof p.pos !== 'string'
+        || (p.positions != null && (!Array.isArray(p.positions) || p.positions.some(pos => typeof pos !== 'string')))))
+      || data.aliveIds.some(id => !known(id)) || alive.size !== data.aliveIds.length
+      || owners.some(id => !known(id) || !alive.has(id))) {
     invalid('Campaign teams or territory data are incomplete.');
   }
-  if (!Object.keys(data.own).length || data.aliveIds.some(id => !Object.values(data.own).includes(id))) {
+  if (!owners.length || data.aliveIds.some(id => !holding.has(id))) {
     invalid('Every surviving team must own territory.');
   }
   const settings = data.settings;
@@ -321,7 +350,7 @@ export function parseCampaign(text) {
         || ![m.finalGa, m.finalGd, m.effA, m.effD].every(Number.isFinite)
         || m.finalGa < 0 || m.finalGd < 0 || !Array.isArray(m.allEv)
         || !Array.isArray(m.shown) || m.shown.length > m.allEv.length || m.allEv.length > 2000
-        || m.allEv.some(e => !record(e) || !Number.isFinite(e.m) || e.m < 0 || ![m.aId, m.dId].includes(e.tid))) invalid('The saved match is incomplete.');
+        || [...m.allEv, ...m.shown].some(e => !record(e) || !Number.isFinite(e.m) || e.m < 0 || ![m.aId, m.dId].includes(e.tid))) invalid('The saved match is incomplete.');
     if (!m.applied && (!data.aliveIds.includes(m.aId) || !data.aliveIds.includes(m.dId))) invalid('The pending match includes an eliminated team.');
     if (m.tie != null && (!record(m.tie) || ![m.tie.ga, m.tie.gd].every(Number.isFinite))) invalid('The saved tie-break is incomplete.');
   }
@@ -367,8 +396,8 @@ export function parseCampaign(text) {
   const rules = configuration => configuration && { ...configuration,
     turnOrder: configuration.turnOrder ?? 'random', targeting: configuration.targeting ?? 'compass' };
   // v4 source references; v1–v3 saves hold every source inline and pass through unchanged.
-  const index = sourceIndex(settings.sport);
-  const sourced = index.size ? mapPlayers(data, player => rebuildSource(player, index)) : data;
+  const index = rebuildSources ? sourceIndex(settings.sport) : null;
+  const sourced = index?.size ? mapPlayers(data, player => rebuildSource(player, index)) : data;
   return { ...sourced, v: SAVE_VERSION, history: sourced.history || [], log: data.log || [],
     settings: rules(data.settings), ...(data.initialSettings ? { initialSettings: rules(data.initialSettings) } : {}),
     turnQueue: data.turnQueue || [], turnIndex: data.turnIndex || 0, pendingTarget: data.pendingTarget || null,
@@ -397,9 +426,23 @@ export function inspectSave() {
 export function loadSave() { return inspectSave().campaign; }
 
 function indexData() {
-  const parsed = JSON.parse(localStorage.getItem(CAMPAIGN_INDEX_KEY) || '[]');
-  if (!Array.isArray(parsed)) throw new Error('Campaign index is damaged.');
-  return parsed.filter(item => record(item) && typeof item.id === 'string');
+  const raw = localStorage.getItem(CAMPAIGN_INDEX_KEY);
+  let parsed = null;
+  try { parsed = JSON.parse(raw || '[]'); } catch { /* damaged: rebuilt below */ }
+  if (Array.isArray(parsed)) return parsed.filter(item => record(item) && typeof item.id === 'string');
+  // A damaged index is rebuilt from the slots themselves: it used to fail every autosave and hide every campaign.
+  return storedSlotIds().map(id => tryParse(localStorage.getItem(campaignStorageKey(id))))
+    .filter(Boolean).map(campaignMetadata);
+}
+
+/** Ids of the campaign slots in storage (not their backups). */
+function storedSlotIds() {
+  const prefix = campaignStorageKey(''), ids = [];
+  for (let i = 0; i < (Number(localStorage.length) || 0); i++) {
+    const key = localStorage.key?.(i);
+    if (typeof key === 'string' && key.startsWith(prefix) && !key.endsWith(':backup')) ids.push(key.slice(prefix.length));
+  }
+  return ids;
 }
 
 export function campaignMetadata(data) {
@@ -484,6 +527,14 @@ function continuesLegacy(legacy, data) {
   });
 }
 
+/**
+ * The checkpoint text this tab last wrote, with the campaign id and revision it holds. A save reads back the slot
+ * and the resume pointer first; while one still holds exactly this text (nothing else wrote since, the usual
+ * case), what parsing it would say is already known. Any other text is parsed as before.
+ */
+let lastWritten = null;
+const writtenSummary = text => (text != null && text === lastWritten?.text ? lastWritten : null);
+
 /** Compare-and-save prevents a stale tab from replacing a newer checkpoint. */
 export function writeSave(state, { activate = true } = {}) {
   try {
@@ -492,17 +543,18 @@ export function writeSave(state, { activate = true } = {}) {
     data.campaignName = cleanName(state.campaignName);
     const key = campaignStorageKey(data.campaignId), previous = localStorage.getItem(key);
     if (previous) {
-      const remote = parseCampaign(previous);
-      if (remote.revision !== (state.revision || 0)) return { ok: false, savedAt: null, conflict: remote,
+      const known = writtenSummary(previous), remote = known ? null : parseCampaign(previous);
+      if ((known || remote).revision !== (state.revision || 0)) return { ok: false, savedAt: null, conflict: remote || parseCampaign(previous),
         message: 'This campaign changed in another tab. Reload that checkpoint or fork your current progress.' };
     }
     data.revision = (state.revision || 0) + 1;
+    validateCampaign(data, false);
     const text = checkpointText(data);
-    parseCampaign(text);
     const index = indexData().filter(item => item.id !== data.campaignId);
     index.unshift(campaignMetadata(data));
     const current = localStorage.getItem(SAVE_KEY);
-    const currentCampaign = tryParse(current);
+    // A pointer holding this tab's last checkpoint is that campaign (never a legacy singleton: it has an id).
+    const currentCampaign = writtenSummary(current) || tryParse(current);
     const updatePointer = activate || currentCampaign?.campaignId === data.campaignId;
     const kept = [];
     if (updatePointer && currentCampaign && !currentCampaign.campaignId && !continuesLegacy(currentCampaign, data)) {
@@ -523,10 +575,14 @@ export function writeSave(state, { activate = true } = {}) {
       ...(slotCopy && previous ? [[backupKey(data.campaignId), previous]] : []),
       ...(pointerCopy && currentCampaign && updatePointer ? [[CAMPAIGN_BACKUP_KEY, current]] : []),
       [CAMPAIGN_INDEX_KEY, JSON.stringify(index)], [key, text], ...(updatePointer ? [[SAVE_KEY, text]] : [])];
-    const saved = message => ({ ok: true, campaignId: data.campaignId, revision: data.revision, campaignName: data.campaignName,
-      savedAt: data.savedAt, message });
+    const saved = message => {
+      lastWritten = { text, campaignId: data.campaignId, revision: data.revision };
+      return { ok: true, campaignId: data.campaignId, revision: data.revision, campaignName: data.campaignName,
+        savedAt: data.savedAt, message };
+    };
     try {
-      writeAll(steps(true, true));
+      // Both keys were just read: the first attempt need not read them again for its undo values.
+      writeAll(steps(true, true), new Map([[key, previous], [SAVE_KEY, current]]));
       return saved('Progress saved');
     } catch (error) {
       if (!isQuotaError(error)) throw error;
@@ -555,14 +611,19 @@ export function writeSave(state, { activate = true } = {}) {
 
 const FREE_SPACE = 'Delete campaigns you no longer need in Saved campaigns, or export this one to keep it.';
 
-/** Apply writes in order (null removes); if any fails, put every key back as it was and rethrow. */
-function writeAll(entries) {
+/**
+ * Apply writes in order (null removes); if any fails, put every key back as it was and rethrow. `stored` holds
+ * values the caller has just read (key → text or null), so those keys are not read again for the undo.
+ */
+function writeAll(entries, stored) {
   const done = [];
+  const values = new Map(stored);
   try {
     for (const [key, value] of entries) {
-      const before = localStorage.getItem(key);
+      const before = values.has(key) ? values.get(key) : localStorage.getItem(key);
       if (value == null) localStorage.removeItem(key);
       else localStorage.setItem(key, value);
+      values.set(key, value ?? null);
       done.push([key, before]);
     }
   } catch (error) {

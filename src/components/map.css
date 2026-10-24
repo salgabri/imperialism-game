@@ -21,6 +21,25 @@
 .country-shapes path[data-country]:focus { outline: none; }
 .country-shapes path[data-country]:focus-visible { stroke: var(--ink); stroke-width: 2px; vector-effect: non-scaling-stroke; }
 .country-shapes path[data-reach=out], .country-shapes path[data-reach=kept] { filter: none; }
+:root[data-theme=dark] .country-shapes path[role=button]:hover { filter: brightness(1.15); }
+:root[data-theme=dark] .country-shapes path[data-reach=out], :root[data-theme=dark] .country-shapes path[data-reach=kept] { filter: none; }
+
+/* ---- theme paint: WorldMap and EmpireLabels write the light values as attributes (renderers without this
+   stylesheet); these rules repaint them from tokens so the map follows the theme. Country fills use themedPaint(). ---- */
+.map-graticule { stroke: var(--map-graticule); }
+.internal-borders, .empire-borders { stroke: var(--map-border); }
+.coast-borders { stroke: var(--map-coast); }
+.map-ocean-labels text { fill: var(--map-coast); }
+.country-outline--you { stroke: var(--ink); }
+.country-outline--opponent, .reach-outline { stroke: var(--opponent); }
+.map-capitals path { fill: var(--ink); stroke: var(--map-halo); }
+.map-capitals rect { fill: var(--map-capital); stroke: var(--map-halo); }
+[data-conquest-hatch-pattern] rect { fill: var(--map-hatch); }
+.territory-labels text { fill: var(--map-label); stroke: var(--map-halo); }
+.territory-labels text[data-own] { fill: var(--ink); }
+/* Flags mode: white letters on an ink halo over the banners, in either theme. */
+.world-map[data-map-mode=flags] .territory-labels text { fill: #ffffff; stroke: #111417; }
+
 /* Neighbouring land around a country map: context only — never territory, never interactive (WorldMap repeats the
    fill as an attribute for renderers without this stylesheet). */
 .map-backdrop path {
@@ -38,7 +57,7 @@
 /* ---- skip link ---- */
 .map-skip-link {
   position: absolute; top: -100px; left: var(--map-inset); z-index: 30; padding: 11px 14px;
-  background: var(--ink); color: #fff; text-decoration: none;
+  background: var(--ink); color: var(--on-ink); text-decoration: none;
   font: 700 13px/1 var(--font-narrow); letter-spacing: .1em; text-transform: uppercase;
 }
 .map-skip-link:focus { top: var(--map-inset); }
@@ -74,7 +93,7 @@
 }
 .map-modes__btn + .map-modes__btn { box-shadow: inset 1px 0 0 var(--rule); }
 .map-modes__btn:hover { background: var(--surface-2); }
-.map-modes__btn[aria-pressed=true] { background: var(--ink); color: #fff; box-shadow: none; }
+.map-modes__btn[aria-pressed=true] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
 .map-modes__btn:focus-visible { outline-offset: -2px; }
 
 /* ---- zoom −/+/reset: a minimal vertical group above the mode switch (DEC D21) ---- */
