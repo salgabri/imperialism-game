@@ -11,6 +11,7 @@ import { selectLineup } from '../src/data/teams.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { empireNeighbors } from '../src/engine/campaign.js';
+import { empireFill } from '../src/theme.js';
 import { ROOT, bundleApp, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 const BundledApp = await bundleApp();
@@ -627,6 +628,35 @@ test('setupTeams: best five starters and opening-board land neighbours for the w
     }
     assert.equal(app.rng.getState(), rng, 'the wizard list never touches the campaign RNG');
     assert.equal(app.timers.size, 0);
+  });
+});
+
+test('setupMapPreview: the step-1 map card shows the board a world theatre opens on, framed like its opening camera', async () => {
+  await withApp({ ids: ['208', '276', '250'] }, ({ app }) => {
+    // Denmark's Greenland (304, an overseas dependency) east of the three nations, and a neutral shape further out.
+    const square = x => ({ cx: x + 20, cy: 100, bbox: { x, y: 80, w: 40, h: 40 }, d: `M${x},80h40v40h-40Z` });
+    app.geo = { ...app.geo, paths: { ...app.geo.paths, 304: square(380), 999: square(480) },
+      countries: [...app.geo.countries, { id: '304' }, { id: '999' }] };
+    app.setupTeamsCache = null;
+    const setup = { ...app.state.setup, sport: 'football', layer: 'nations', scope: 'world', seed: '7' };
+    const preview = app.setupMapPreview(setup);
+    // Greenland comes with Denmark, as at launch; the starting land alone sets the frame.
+    assert.deepEqual(preview.sections.map(section => [section.id, section.fill]),
+      [['208', empireFill('208')], ['276', empireFill('276')], ['250', empireFill('250')], ['304', empireFill('208')]]);
+    assert.deepEqual(preview.backdrop.map(shape => shape.id), ['999']);
+    assert.equal(preview.viewBox, '70.4 70.4 259.2 59.2', 'the tiny atlas homes at x 80–320, y 80–120, 4% margin');
+    assert.equal(preview.teams, app.setupTeams(setup).length);
+    assert.equal(app.setupMapPreview(setup), preview, 'memoised while the setup key holds');
+    // Europe frames the continent, exactly as the European opening camera does.
+    const europe = app.setupMapPreview({ ...setup, scope: 'UEFA' });
+    const focus = app.europeFocus();
+    const pad = Math.max(focus.w, focus.h) * .04;
+    assert.equal(europe.viewBox, [focus.x - pad, focus.y - pad, focus.w + pad * 2, focus.h + pad * 2].map(n => Number(n.toFixed(1))).join(' '));
+    // A country theatre has its own card.
+    assert.equal(app.setupMapPreview({ ...setup, layer: 'clubs', clubScope: 'domestic:826' }), null);
+  });
+  await withApp({ phase: 'setup' }, ({ app }) => {
+    assert.match(renderPure(app, 'setup with its map'), /class="setup-map" aria-hidden="true" data-state="ready" data-kind="world"/);
   });
 });
 

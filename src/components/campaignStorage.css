@@ -2,10 +2,10 @@
    (white dialog, kicker + Archivo title, v4 form rows, square corners). Classes: .campaign-storage*. */
 .campaign-storage-backdrop {
   position:fixed; inset:0; z-index:59; display:flex; align-items:center; padding:24px 18px; overflow:auto;
-  overscroll-behavior:contain; background:rgba(17,20,23,.35); color:var(--ink);
+  overscroll-behavior:contain; background:var(--backdrop); color:var(--ink);
 }
 .campaign-storage {
-  width:min(680px, 100%); margin:auto; padding:22px 28px 26px; background:#fff; color:var(--ink);
+  width:min(680px, 100%); margin:auto; padding:22px 28px 26px; background:var(--panel); color:var(--ink);
   box-shadow:var(--shadow-callout); border-radius:0; animation:fiPop .2s ease-out both; font-variant-numeric:tabular-nums;
 }
 .campaign-storage-heading {
@@ -21,13 +21,13 @@
   font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase;
 }
 .campaign-storage .campaign-storage-error {
-  margin:14px 0 0; padding:10px 12px; color:var(--loss); background:#fff; box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule);
+  margin:14px 0 0; padding:10px 12px; color:var(--loss); background:var(--panel); box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule);
   font:600 13px/1.4 var(--font-sans);
 }
 .campaign-storage .campaign-storage-empty { color:var(--muted); }
 /* A restore waiting for its country map (busy), and a done notice (a campaign deleted). */
 .campaign-storage .campaign-storage-busy, .campaign-storage .campaign-storage-notice {
-  margin:14px 0 0; padding:10px 12px; background:#fff; font:600 13px/1.4 var(--font-sans); color:var(--ink);
+  margin:14px 0 0; padding:10px 12px; background:var(--panel); font:600 13px/1.4 var(--font-sans); color:var(--ink);
   box-shadow:inset 3px 0 0 var(--even), inset 0 0 0 1px var(--rule);
 }
 .campaign-storage .campaign-storage-notice { box-shadow:inset 3px 0 0 var(--gain), inset 0 0 0 1px var(--rule); }
@@ -53,7 +53,7 @@
 }
 .campaign-storage input {
   width:100%; height:max(40px, var(--tap)); padding:0 10px; border:1px solid var(--control-line); border-radius:0;
-  background:#fff; color:var(--ink); font:400 14px/1 var(--font-sans);
+  background:var(--panel); color:var(--ink); font:400 14px/1 var(--font-sans);
 }
 .campaign-storage input:disabled { color:var(--muted); background:var(--surface); }
 .campaign-storage input:focus-visible { outline:2px solid var(--you); outline-offset:1px; }

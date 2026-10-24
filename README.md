@@ -86,10 +86,14 @@ default suits a first campaign, so pressing Space three times starts one.
    the war is fought). Nation campaigns default to Europe (UEFA). The other
    choices are the whole world (170 nations), another confederation, or the
    Elite 32. Club campaigns offer individual leagues, all leagues, or the
-   strongest 32 available clubs. The step shows the actual number of teams, the
-   number of matches and the estimated length; its note names the Show matches
-   mode the estimate assumes. With clubs in football, a second theatre group,
-   **One country · top clubs**, starts a [domestic campaign](#domestic-campaigns).
+   strongest 32 available clubs. The step opens on a map of the chosen theatre:
+   the board it starts on, each team's land in its kick-off colour, framed as
+   the campaign's opening camera frames it (the continent for Europe). It also
+   shows the actual number of teams, the number of matches and the estimated
+   length; its note names the Show matches mode the estimate assumes. With
+   clubs in football, a second theatre group, **One country · top clubs**,
+   starts a [domestic campaign](#domestic-campaigns), and its map shows that
+   country.
    A quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or

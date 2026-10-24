@@ -392,7 +392,8 @@ test('multiple instruments have no shared marker IDs, focus targets or pointer i
 
 test('v4 paint: white disk, ink needle with a clay tip, white halo, ink shaft and head, white origin ring', () => {
   const value = (selector, property) => rule(selector).style.getPropertyValue(property).trim();
-  const WHITE = /^(#ffffff|#fff|rgb\(255, 255, 255\))$/i;
+  // The halo is the --map-halo token: white in the light theme (its fallback), the page ground in dark.
+  const WHITE = /^(#ffffff|#fff|rgb\(255, 255, 255\)|var\(--map-halo, #ffffff\))$/i;
   assert.match(value('.draw-compass-disk', 'fill'), /--panel|#fff/i);
   assert.match(value('.draw-compass-disk', 'stroke'), /--ink|#111417/i);
   assert.match(value('.draw-compass-tail', 'fill'), /--ink|#111417/i);

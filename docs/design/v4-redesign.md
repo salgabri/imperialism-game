@@ -209,10 +209,14 @@ These settle layout questions the decisions above left open:
 
 - The your-turn and spectator panels are docked in the Map column. They
   replace the Next fixture block, and Fronts is hidden during a target choice.
-- The setup frame is opaque and the opening-partition preview map was dropped.
-  Step 2 shows the four draw cards, a visible Show matches control (`resolution`
-  and `express` as Live / Final score only / Fast-forward) and a collapsed
-  **More rules** `<details>`; the manager's opponent choice is on step 3.
+- The setup frame is opaque. The opening-partition map behind it was dropped,
+  but step 1 leads its side column with a static map card of the chosen
+  theatre's opening board (the country card's world counterpart): each starting
+  territory in its kick-off pastel over unclaimed land, framed like the opening
+  camera. Step 2 shows the four draw cards, a visible Show matches control
+  (`resolution` and `express` as Live / Final score only / Fast-forward) and a
+  collapsed **More rules** `<details>`; the manager's opponent choice is on
+  step 3.
 - Space on a focused option in the conquest or target list still runs the
   primary action. Setup handles its own Space (next step / launch).
 - While a signing or target choice is pending, every nav entry except Map is
@@ -252,6 +256,31 @@ nothing, and a campaign may drop only its own recovery copies to fit. Another
 campaign's recovery copy is never deleted; the save fails with a "storage is
 full" status instead, and **Saved campaigns** can delete a campaign to free
 space. `scripts/save-size.test.mjs` covers this.
+
+## Dark mode
+
+A sun/moon button in the masthead and the setup header switches between light
+and dark. Until the player picks one, the game follows the system setting. The
+choice is a UI preference in `localStorage` (`fi-theme`), never part of a
+campaign save.
+
+- **Mechanism:** `src/appearance.js` sets `data-theme` on `<html>`, and
+  `:root[data-theme=dark]` in `tokens.css` redefines every colour token. Light
+  values are unchanged.
+- **Roles added:** `--on-ink` (text on an ink fill, which turns light in dark),
+  `--strip` / `--on-strip` (the ticker and match feed stay dark strips),
+  `--backdrop`, `--hairline`, `--you-strong` (primary hover) and the map paint
+  tokens (`--map-border`, `--map-halo`, `--map-graticule`, `--empire-1…11`,
+  `--strength-1…5`, `--fronts-*`).
+- **Map:** view models and SVG attributes keep the light literals, so tests and
+  renderers without CSS see the same values. `map.css` repaints borders,
+  capitals, outlines and labels from tokens. Country and key fills go through
+  `themedPaint()` (theme.js), which turns a palette literal into
+  `var(--token, literal)`. Strength in dark runs from neutral land up to light
+  grey, so stronger is still "more ink". Flags mode keeps white labels on an ink
+  halo.
+- `scripts/dark-mode.test.mjs` checks that every colour token has a dark value
+  and that the CSS palette mirrors theme.js.
 
 ## Architecture
 

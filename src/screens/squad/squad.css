@@ -193,10 +193,10 @@
 }
 .pitch__dot {
   display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
-  background: var(--ink); color: #fff; font: 600 12px/1 var(--font-sans); font-variant-numeric: tabular-nums;
+  background: var(--ink); color: var(--on-ink); font: 600 12px/1 var(--font-sans); font-variant-numeric: tabular-nums;
 }
 .pitch__player.is-claimed .pitch__dot { background: var(--claimed); }
-.pitch__name { padding: 0 4px; background: #fff; color: var(--ink); white-space: nowrap; font: 400 12px/normal var(--font-sans); }
+.pitch__name { padding: 0 4px; background: var(--panel); color: var(--ink); white-space: nowrap; font: 400 12px/normal var(--font-sans); }
 /* Pitch tab (C§12): the pitch at full column width and 560px tall, discs 36px with 13px labels */
 .pitch--large { height: var(--sq-pitch-large-h); }
 .pitch--large .pitch__dot { width: 36px; height: 36px; font-size: 13px; }
@@ -381,7 +381,7 @@
     background: transparent; box-shadow: inset 0 0 0 1px var(--control-line);
   }
   .screen--squad .squad-seg > button { min-height: 44px; color: var(--ink); font: 700 12px/1 var(--font-narrow); letter-spacing: .1em; }
-  .screen--squad .squad-seg > button[aria-pressed=true] { background: var(--ink); color: #fff; box-shadow: none; }
+  .screen--squad .squad-seg > button[aria-pressed=true] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
   .squad-body { display: block; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0; }
   .squad-main, .squad-side { display: none; }
   .squad-phone { display: block; padding: 4px 18px 20px; }

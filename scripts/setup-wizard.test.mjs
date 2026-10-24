@@ -11,7 +11,7 @@ import { build } from 'esbuild';
 import {
   DRAW_CARDS, buildSetupModel, campaignFacts, campaignPreview as modelPreview, countryMapPreview, domesticDescription as modelDescription,
   domesticTheatres, estimateNote, frontRelation, moreRulesSummary, rulesOf, showMatchOptions, showMatchesOf, showMatchesWrites,
-  theatreRow, tierOf,
+  theatreMapPreview, theatreRow, tierOf,
 } from '../src/screens/setup/setupModel.js';
 import { launchRules } from '../src/engine/turns.js';
 import { SCOPES } from '../src/data/teams.js';
@@ -901,7 +901,7 @@ test('a chosen country: description, counts, summaries, and its map load gating 
   assert.equal(loading.q('#setup-theatre').value, 'domestic:826');
   assert.match(loading.q('.setup-stats').textContent, /100/);
   assert.equal(loading.button('Launch campaign').disabled, true);
-  assert.equal(loading.q('.setup-country-map').getAttribute('data-state'), 'loading');
+  assert.equal(loading.q('.setup-map').getAttribute('data-state'), 'loading');
   await loading.click(loading.qa('.setup-rail__step')[2]);
   assert.equal(loading.q('.setup-empty').textContent, 'Loading the map of England…');
   assert.equal(loading.section(3).querySelector('.setup-foot__note').textContent, 'Loading the map of England…');
@@ -927,7 +927,7 @@ test('a chosen country: description, counts, summaries, and its map load gating 
   // Ready: Launch works; while App prepares the campaign the button is busy and a second submit is ignored.
   const ready = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {} } });
   assert.equal(ready.q('.setup-domestic__status'), null);
-  assert.equal(ready.q('.setup-country-map'), null, 'no card without a preview from App');
+  assert.equal(ready.q('.setup-map'), null, 'no card without a preview from App');
   await ready.click(ready.button('Launch campaign'));
   assert.equal(ready.calls.start, 1);
   const launching = await mount(t, { setup: COUNTRY, launching: true, domestic: { state: 'ready', message: null, onRetry() {} } });
@@ -985,14 +985,58 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   assert.ok(real.viewBox.split(' ').map(Number).every(Number.isFinite));
 
   const view = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {}, preview } });
-  const card = view.q('.setup-step[data-step="1"] .setup-side > .setup-country-map');
+  const card = view.q('.setup-step[data-step="1"] .setup-side > .setup-map');
   assert.ok(card, 'the card leads the side column of step 1');
   assert.equal(card.getAttribute('aria-hidden'), 'true');
   assert.equal(card.querySelector('svg').getAttribute('viewBox'), preview.viewBox);
-  assert.equal(card.querySelectorAll('.setup-country-map__backdrop path').length, 1);
-  assert.deepEqual([...card.querySelectorAll('.setup-country-map__sections path')].map(path => path.getAttribute('fill')),
+  assert.equal(card.querySelectorAll('.setup-map__backdrop path').length, 1);
+  assert.deepEqual([...card.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
     preview.sections.map(section => section.fill));
   assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
   assert.equal(card.querySelector('figcaption').textContent, 'England · 3 sections, one per club');
   assert.deepEqual(view.errors, []);
+});
+
+test('world card: a theatre opening board in kick-off pastels over unclaimed land, framed on the teams or a focus', async t => {
+  const box = (x, y) => ({ x, y, w: 10, h: 10 });
+  const basePaths = {
+    a: { d: 'M0,0h10v10h-10Z', bbox: box(0, 0) }, b: { d: 'M10,0h10v10h-10Z', bbox: box(10, 0) },
+    c: { d: 'M90,90h10v10h-10Z', bbox: box(90, 90) }, n: { d: 'M50,50h10v10h-10Z', bbox: box(50, 50) }, gone: {},
+  };
+  const countries = ['n', 'a', 'b', 'c', 'gone'].map(id => ({ id }));
+  // `c` is overseas land of `a`: painted in a's pastel, but only the starting land (`frameIds`) sets the frame.
+  const own = { a: 'a', b: 'b', c: 'a' };
+  const frameIds = ['a', 'b'];
+  const preview = theatreMapPreview({ countries, basePaths, own, frameIds });
+  assert.deepEqual(preview.sections.map(section => [section.id, section.fill]), [['a', empireFill('a')], ['b', empireFill('b')], ['c', empireFill('a')]]);
+  assert.deepEqual(preview.backdrop, [{ id: 'n', d: 'M50,50h10v10h-10Z' }], 'unclaimed land is drawn; shapes without a path are not');
+  assert.equal(preview.viewBox, '-0.8 -0.8 21.6 11.6', 'framed on the starting land, 4% margin');
+  assert.equal(preview.teams, 2);
+  assert.equal(theatreMapPreview({ countries, basePaths, own, frameIds }), preview, 'memoised per board, paths and focus');
+  const focused = theatreMapPreview({ countries, basePaths, own, frameIds, focus: { x: 0, y: 0, w: 100, h: 50 } });
+  assert.equal(focused.viewBox, '-4 -4 108 58', 'a focus (the European camera) wins over the starting land');
+  const display = { a: { d: 'M0,0h5v5h-5Z', bbox: box(0, 0) } };
+  assert.equal(theatreMapPreview({ countries, paths: display, basePaths, own, frameIds }).sections[0].d, 'M0,0h5v5h-5Z',
+    'the display atlas draws a shape it has, the topology the rest');
+  assert.equal(theatreMapPreview({ countries, basePaths, own: {}, frameIds: [] }), null, 'no held land, no card');
+  assert.equal(theatreMapPreview(), null);
+
+  const nations = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: preview });
+  const card = nations.q('.setup-step[data-step="1"] .setup-side > .setup-map[data-kind="world"]');
+  assert.ok(card, 'every world theatre leads step 1 with its map');
+  assert.equal(card.getAttribute('aria-hidden'), 'true');
+  assert.equal(card.querySelector('svg').getAttribute('viewBox'), preview.viewBox);
+  assert.equal(card.querySelectorAll('.setup-map__backdrop path').length, 1);
+  assert.deepEqual([...card.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
+    preview.sections.map(section => section.fill));
+  assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
+  assert.equal(card.querySelector('figcaption').textContent, 'Europe · 2 nations, each on its own land');
+  const clubs = await mount(t, { setup: { layer: 'clubs', clubScope: 'all' }, theatreMap: preview });
+  assert.match(clubs.q('.setup-map figcaption').textContent, /^All Leagues · 2 clubs dealt onto the nearest free land$/i);
+  const none = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: null });
+  assert.equal(none.q('.setup-map'), null, 'no card before App has a board');
+  // A chosen country shows its own card, never a world board App may still hold while the country loads.
+  const country = await mount(t, { setup: COUNTRY, theatreMap: preview, domestic: { state: 'loading', message: null, onRetry() {} } });
+  assert.deepEqual(country.qa('.setup-map').map(element => element.dataset.kind), ['country']);
+  assert.deepEqual([...nations.errors, ...clubs.errors, ...none.errors, ...country.errors], []);
 });

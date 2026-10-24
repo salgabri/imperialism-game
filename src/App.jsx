@@ -21,7 +21,7 @@ import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
-import { countryMapPreview } from './screens/setup/setupModel.js';
+import { countryMapPreview, theatreMapPreview } from './screens/setup/setupModel.js';
 import { DEFAULT_SETUP, LOG_CAP, domesticIdOf } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
@@ -445,16 +445,19 @@ export default class App extends React.Component {
       .map(country => [country.id, country.id]));
     // Russia and overseas islands remain playable, but the European opening
     // camera should show the continent. Zooming out always restores all land.
-    if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') {
-      const { s, tx, ty } = this.geo.fit;
-      const points = [[-15, 34], [44, 34], [-15, 71], [44, 71]].map(([lon, lat]) => {
-        const [x, y] = this.planePoint(lon, lat);
-        return [x * s + tx, y * s + ty];
-      });
-      const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
-      this.viewFocus = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
-    }
+    if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
     this.viewResetKey = (this.viewResetKey || 0) + 1;
+  }
+
+  /** The continent box the European opening camera frames, in the world chart's current fit. */
+  europeFocus() {
+    const { s, tx, ty } = this.geo.fit;
+    const points = [[-15, 34], [44, 34], [-15, 71], [44, 71]].map(([lon, lat]) => {
+      const [x, y] = this.planePoint(lon, lat);
+      return [x * s + tx, y * s + ty];
+    });
+    const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+    return { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
   }
 
   /**
@@ -707,18 +710,15 @@ export default class App extends React.Component {
       domesticId ? loaded?.meta.version || 'loading' : null]);
     if (this.setupTeamsCache?.key === key) return this.setupTeamsCache.teams;
     const { included, own } = this.opening(setup, makeRng(this.setupSeed(setup)));
+    const ids = new Set(included.map(team => team.id));
+    const opening = { ...own };
+    if (setup.layer !== 'clubs') {
+      for (const [shapeId, dep] of Object.entries(DEPENDENCIES)) if (ids.has(dep.of)) opening[shapeId] = dep.of;
+    }
     // Fronts on the board the campaign opens on: the country's sections, else the world (never a previewed country,
     // which this.geo may still show between a theatre pick and its showSetupMap callback).
     const geo = domesticId ? loaded?.geo : this.domesticId ? this.worldGeo : this.geo;
-    let board = null;
-    if (geo?.adj) {
-      const ids = new Set(included.map(team => team.id));
-      const opening = { ...own };
-      if (setup.layer !== 'clubs') {
-        for (const [shapeId, dep] of Object.entries(DEPENDENCIES)) if (ids.has(dep.of)) opening[shapeId] = dep.of;
-      }
-      board = { geo, own: opening };
-    }
+    const board = geo?.adj ? { geo, own: opening } : null;
     // Country clubs (ids like "d826-679") are unknown to the sport's club list: pass their own code and kind.
     const teams = included.map(team => ({ id: team.id, name: team.name, code: team.code, isClub: team.kind === 'club',
       rating: teamEff(team),
@@ -728,8 +728,22 @@ export default class App extends React.Component {
         .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
       ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) }))
       .sort((a, b) => a.name.localeCompare(b.name));
-    this.setupTeamsCache = { key, teams };
+    this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own) };
     return teams;
+  }
+
+  /**
+   * Step 1's map of a world theatre: the board it opens on, framed as the campaign's opening camera frames it (Europe
+   * for the UEFA nations, else the teams' starting land). A country theatre has its own card (`domesticStatus`), and
+   * so does the moment a previewed country still holds this.geo after the theatre changed. Render-safe: no setState.
+   */
+  setupMapPreview(setup = this.state.setup) {
+    if (!this.geo || this.domesticId || domesticIdOf(setup)) return null;
+    this.setupTeams(setup);
+    const { opening, homes } = this.setupTeamsCache;
+    const focus = setup.layer !== 'clubs' && setup.scope === 'UEFA' ? this.europeFocus() : null;
+    return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
+      own: opening, frameIds: homes, focus });
   }
 
   setupSeed(setup = this.state.setup) {
@@ -1750,6 +1764,7 @@ export default class App extends React.Component {
           playback={<PlaybackBar variant="sheet" id="campaign-playback-sheet" showStep={!ctx.managedId} {...playback} />} />}
         {st.phase === 'setup' && <SetupOverlay
           setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()} domestic={this.domesticStatus()}
+          theatreMap={this.setupMapPreview()}
           savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
             (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings) : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
