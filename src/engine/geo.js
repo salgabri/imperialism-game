@@ -692,7 +692,9 @@ function insidePolygons(point, polys) {
   });
 }
 
-function segmentDistance2([px, py], [ax, ay], [bx, by]) {
+// Indexed reads here and in surfaceMetrics and pointInRing: array destructuring allocates in V8, and these run per edge.
+function segmentDistance2(p, a, b) {
+  const px = p[0], py = p[1], ax = a[0], ay = a[1], bx = b[0], by = b[1];
   const dx = bx - ax, dy = by - ay;
   const len = dx * dx + dy * dy;
   const t = len ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len)) : 0;
@@ -717,7 +719,7 @@ function surfaceMetrics(polys) {
   });
   if (!best) return { area: 0, point: null, index: -1 };
   let minY = Infinity, maxY = -Infinity;
-  for (const ring of best.rings) for (const [, y] of ring) { minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
+  for (const ring of best.rings) for (let i = 0; i < ring.length; i++) { const y = ring[i][1]; minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
   let point = null, clearance = -1;
   const lines = 24;
   for (let k = 0; k < lines && maxY > minY; k++) {
@@ -725,7 +727,7 @@ function surfaceMetrics(polys) {
     const xs = [];
     for (const ring of best.rings) {
       for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-        const [xi, yi] = ring[i], [xj, yj] = ring[j];
+        const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
         if (yi > y !== yj > y) xs.push(xi + (y - yi) * (xj - xi) / (yj - yi));
       }
     }
@@ -817,11 +819,11 @@ function ringCenter(ring) {
 }
 
 /** Even-odd point-in-polygon test, used to validate a capital against its country. */
-function pointInRing([px, py], ring) {
+function pointInRing(point, ring) {
+  const px = point[0], py = point[1];
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const [xi, yi] = ring[i];
-    const [xj, yj] = ring[j];
+    const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
     if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
   }
   return inside;

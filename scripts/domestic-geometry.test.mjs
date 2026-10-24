@@ -112,6 +112,26 @@ test('concave and holed sections anchor inside themselves, not at an outside cen
   assert.equal(anchored.capitals['997-002'], undefined, 'a home in the hole is not the ring section\'s anchor');
 });
 
+test('point-on-surface, area and routing anchor keep their exact values (pinned)', () => {
+  // The same C, ring and city; homes on the C's spine and at the ring's outer edge (pulled inward to route).
+  const c = [[20, 40], [24, 40], [24, 40.5], [20.5, 40.5], [20.5, 42.5], [24, 42.5], [24, 43], [20, 43], [20, 40]];
+  const donut = [rect(30, 40, 33, 43), rect(31, 41, 32, 42).reverse()];
+  const topo = build([feature('997-001', [c]), feature('997-002', donut), feature('997-003', [rect(31, 41, 32, 42)])]);
+  const ids = ['997-001', '997-002', '997-003'];
+  const geo = new WorldGeometry(topo, { '997-001': [20.1, 41.5], '997-002': [30.05, 41.5] },
+    { object: 'sections', projection: { lon0: 26.5, lat0: 41.5 } }).fitTo(ids);
+  const values = id => ['labelX', 'labelY', 'area', 'cx', 'cy', 'homeX', 'homeY'].map(key => geo.paths[id][key]);
+  assert.deepEqual(values('997-001'), [158.76958769587696, 383.1832342236853, 34018.98662970456, 23.138461538461684, 269.99999999999955,
+    23.138461538461684, 269.99999999999955]);
+  assert.deepEqual(values('997-002'), [836.9216492164921, 168.73079043143935, 54431.61691597723, 746.3536676905231, 257.3413488039295,
+    733.4153846153847, 269.99999999999955]);
+  assert.deepEqual(values('997-003'), [836.9262892628924, 260.0716461207294, 6803.620424733793, 836.9262892628924, 260.0716461207294,
+    836.9262892628924, 260.0716461207294]);
+  assert.deepEqual(ids.map(id => geo.surfaceOf(id).point), [[-0.058822779397999445, -0.7035858547102141],
+    [0.06535845495959718, -0.7428557628800865], [0.06535930463140703, -0.7261296908818075]]);
+  assert.deepEqual(geo.capitals, { '997-001': [20.1, 41.5], '997-002': [30.05, 41.5] });
+});
+
 test('(c) an antimeridian country stays contiguous with a rotated central meridian', () => {
   // Longitudes shifted at build time: 178E..178W is stored as 178..182.
   const cells = [];
