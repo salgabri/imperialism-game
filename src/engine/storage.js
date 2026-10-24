@@ -1,6 +1,8 @@
 import { SAVE_KEY, SAVE_VERSION } from '../config.js';
 import { DOMESTIC_PREFIX, domesticScopeId, isDomesticScope } from './domestic.js';
+import { expandSetPlayer, isDataYear, isFootballSetId, seasonOf } from './footballSets.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
+import { CM_ROLES, CM_SOURCE, cmTupleOf } from '../data/cmPlayers.js';
 import { getSport } from '../sports/index.js';
 
 export const CAMPAIGN_INDEX_KEY = `${SAVE_KEY}:campaigns`;
@@ -36,7 +38,7 @@ export function campaignSnapshot(state) {
 // [fmId, name, ability, positions, nationality, club index, extras?] under one
 // `playerPack` header, and parseCampaign rebuilds the identical records. A
 // player whose record would not rebuild exactly stays in full. World campaigns
-// are written exactly as before.
+// on the built-in data are written exactly as before.
 const fmPlayer = (player, source) => record(player) && typeof player.name === 'string' && record(player.sourceInfo)
   && player.sourceInfo.source === 'football-manager' && /^fm:\d{1,15}$/.test(player.sourceInfo.id)
   && Array.isArray(player.sourceInfo.naturalPositions) && typeof player.sourceInfo.club === 'string'
@@ -66,19 +68,21 @@ function mapPlayers(data, fn) {
 
 // Whether a player rebuilds exactly from its tuple depends on the record and the pack's source edition, not on its
 // club's index in one checkpoint. Player records are replaced, never changed in place, so each is checked once.
+// `unpack` is the pack's own rebuild: FM's for country campaigns, the CM one for data set campaigns.
 const exactPacks = new WeakMap();
 
-function packsExactly(player, tuple, pack) {
-  const source = `${pack.source.edition}\u0000${pack.source.version}\u0000${pack.source.snapshotDate}`;
+function packsExactly(player, tuple, pack, unpack = unpackPlayer) {
+  const source = [pack.kind || 'fm', ...Object.values(pack.source)].join('\u0000');
   const known = exactPacks.get(player);
   if (known?.source === source) return known.exact;
   let exact;
-  try { exact = JSON.stringify(unpackPlayer(tuple, pack)) === JSON.stringify(player); } catch { exact = false; }
+  try { exact = JSON.stringify(unpack(tuple, pack)) === JSON.stringify(player); } catch { exact = false; }
   exactPacks.set(player, { source, exact });
   return exact;
 }
 
 function packCampaign(data) {
+  if (data.settings?.dataSet != null) return packCmCampaign(data);
   if (!isDomesticScope(data.settings?.clubScope)) return data;
   const first = Object.values(data.teams || {}).flatMap(team => team?.squad || []).find(player => fmPlayer(player));
   if (!first) return data;
@@ -98,7 +102,8 @@ function packCampaign(data) {
 
 function unpackCampaign(data, invalid) {
   const { playerPack: pack, ...rest } = data;
-  if (!record(pack) || !record(pack.source) || !['version', 'snapshotDate'].every(key => typeof pack.source[key] === 'string')
+  if (record(pack) && pack.kind === CM_PACK) return unpackCmCampaign(rest, pack, invalid);
+  if (!record(pack) || pack.kind !== undefined || !record(pack.source) || !['version', 'snapshotDate'].every(key => typeof pack.source[key] === 'string')
       || (pack.source.edition != null && typeof pack.source.edition !== 'string')
       || !Array.isArray(pack.clubs) || pack.clubs.some(club => typeof club !== 'string')) invalid('Campaign squads are incomplete.');
   return mapPlayers(rest, value => {
@@ -108,6 +113,53 @@ function unpackCampaign(data, invalid) {
     if (value.length < 6 || value.length > 7 || typeof positions !== 'string' || !positions.split(',').every(key => Object.hasOwn(FM_ROLES, key))
         || !Number.isInteger(club) || club < 0 || club >= pack.clubs.length || (value.length === 7 && !record(extras))) invalid('Campaign squads are incomplete.');
     try { return unpackPlayer(value, pack); } catch { return invalid('Campaign squads are incomplete.'); }
+  });
+}
+
+// A data set campaign's players come from a CM 01/02 database and match no bundled roster. Its checkpoints store
+// each one as the data set's own tuple [cmId, name, fullName | 0, ca, positions, nationality, club, dateOfBirth,
+// extras?] under `playerPack: { kind: 'cm0102', source }`, so a save resumes without the data set. A player whose
+// record would not rebuild exactly stays in full. A pack without `kind` is the country campaigns' FM pack.
+const CM_PACK = 'cm0102';
+const CM_SOURCE_KEYS = ['edition', 'version', 'snapshotDate', 'url'];
+// The database's provider, when its data set names one (expandSetPlayer credits each player with it).
+const optionalText = value => value === undefined || (typeof value === 'string' && value.trim().length > 0);
+const cmPlayer = (player, source) => record(player) && typeof player.name === 'string' && record(player.sourceInfo)
+  && player.sourceInfo.source === CM_SOURCE && (source
+    ? [...CM_SOURCE_KEYS, 'provider'].every(key => player.sourceInfo[key] === source[key])
+    : CM_SOURCE_KEYS.every(key => typeof player.sourceInfo[key] === 'string') && optionalText(player.sourceInfo.provider));
+
+function unpackCmPlayer(packed, pack) {
+  const [, pos, rating, sourceInfo] = expandSetPlayer(packed.slice(0, 8), pack.source);
+  return { name: packed[1], pos, rating, gen: false, sourceInfo, id: sourceInfo.id, positions: [...sourceInfo.positions], ...packed[8] };
+}
+
+function packCmCampaign(data) {
+  const first = Object.values(data.teams || {}).flatMap(team => team?.squad || []).find(player => cmPlayer(player));
+  if (!first) return data;
+  const pack = { kind: CM_PACK, source: Object.fromEntries(['provider', ...CM_SOURCE_KEYS]
+    .filter(key => first.sourceInfo[key] !== undefined).map(key => [key, first.sourceInfo[key]])) };
+  const packed = mapPlayers(data, player => {
+    if (!cmPlayer(player, pack.source)) return player;
+    const { name, pos, rating, gen, sourceInfo, id, positions, ...extras } = player;
+    const tuple = cmTupleOf(name, sourceInfo);
+    if (!tuple) return player;
+    if (Object.keys(extras).length) tuple.push(extras);
+    return packsExactly(player, tuple, pack, unpackCmPlayer) ? tuple : player;
+  });
+  return { ...packed, playerPack: pack };
+}
+
+function unpackCmCampaign(rest, pack, invalid) {
+  if (!record(pack.source) || !CM_SOURCE_KEYS.every(key => typeof pack.source[key] === 'string')
+      || !optionalText(pack.source.provider)) invalid('Campaign squads are incomplete.');
+  return mapPlayers(rest, value => {
+    if (!Array.isArray(value)) return value;
+    const positions = value[4];
+    // Own keys only, as for FM: expandCmTuple alone would drop an unknown key instead of refusing it.
+    if (value.length < 8 || value.length > 9 || typeof positions !== 'string' || !positions.split(',').every(key => Object.hasOwn(CM_ROLES, key))
+        || (value.length === 9 && !record(value[8]))) invalid('Campaign squads are incomplete.');
+    try { return unpackCmPlayer(value, pack); } catch { return invalid('Campaign squads are incomplete.'); }
   });
 }
 
@@ -223,6 +275,13 @@ function validateCampaign(input, rebuildSources) {
         && (!domestic || !/^[0-9A-Za-z]{1,12}$/.test(domesticScopeId(clubScope)))) invalid('Campaign country setting is unsupported.');
     if (domesticVersion != null && (typeof domesticVersion !== 'string' || !/^[0-9A-Za-z]{1,12}-[0-9a-f]{8}$/.test(domesticVersion)
         || (domestic && !domesticVersion.startsWith(`${domesticScopeId(clubScope)}-`)))) invalid('Campaign map version is invalid.');
+    // A data set campaign names the set, the build it was played on and its season, or none of them. Country maps use
+    // the built-in data, so never a set.
+    const { dataSet, dataVersion, dataYear, dataSeason } = configuration;
+    if (dataSet == null ? [dataVersion, dataYear, dataSeason].some(value => value != null)
+      : !isFootballSetId(dataSet) || getSport(configuration.sport).id !== 'football' || isDomesticScope(clubScope)
+        || typeof dataVersion !== 'string' || !new RegExp(`^${dataSet}-[0-9a-f]{8}$`).test(dataVersion)
+        || !isDataYear(dataYear) || dataSeason !== seasonOf(dataYear)) invalid('Campaign data set is invalid.');
   }
   for (const key of ['round', 'matches', 'batchTotal', 'revision']) if (data[key] != null && !nonnegative(data[key])) invalid(`Campaign ${key} is invalid.`);
   for (const key of ['seed', 'rngState']) if (data[key] != null && !uint(data[key])) invalid('The saved random state is invalid.');

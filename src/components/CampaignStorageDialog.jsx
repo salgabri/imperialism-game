@@ -40,6 +40,8 @@ function CampaignPreview({ campaign }) {
   return <dl className="campaign-storage-preview">
     <div><dt>Sport</dt><dd>{settings.sport === 'basketball' ? 'Basketball' : 'Football'} · {settings.layer === 'clubs' ? 'Clubs' : 'Nations'}</dd></div>
     <div><dt>Theatre</dt><dd>{theatreName(settings)}</dd></div>
+    {/* Only a campaign played on a football data set names its season; the built-in season is implied. */}
+    {settings.dataSeason && <div><dt>Season</dt><dd>{settings.dataSeason} · {settings.dataSet}</dd></div>}
     <div><dt>Progress</dt><dd>Round {campaign.round || 0} · {campaign.matches || 0} matches · {alive} remaining</dd></div>
     <div><dt>Seed</dt><dd>{campaign.seed ?? 'Legacy campaign'}</dd></div>
     {manager && <div><dt>Manager</dt><dd>{manager}</dd></div>}

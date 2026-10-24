@@ -36,7 +36,9 @@
     "build-clubs": "node scripts/build-clubs.mjs",
     "sync:domestic-clubs": "node scripts/sync-domestic-clubs.mjs",
     "build:domestic": "node scripts/build-domestic.mjs",
-    "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs"
+    "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs",
+    "build:football-set": "node scripts/build-football-set.mjs",
+    "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

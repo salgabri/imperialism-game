@@ -9,12 +9,15 @@ export default function PlayerRow({ player, positionColors = {}, roomy = false, 
   const naturalPositions = player.positions?.length ? player.positions.join('/') : player.pos;
   const outOfPosition = player.outOfPosition ?? (player.assignedPos && player.assignedPos !== player.pos && !player.positions?.includes(player.assignedPos));
   const source = player.sourceInfo;
-  const sourceName = source?.source === 'ea-fc' ? 'EA FC' : 'Football Manager';
+  // A Championship Manager rating is the CM 01/02 Update Team's own assessment (docs/design/football-years.md).
+  const cm = source?.source === 'cm0102';
+  const sourceName = source?.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : 'Football Manager';
   const edition = String(source?.edition || '');
   const sourceLabel = edition ? /^\d+$/.test(edition) ? `${sourceName} ${edition}` : edition : sourceName;
-  const sourceTitle = source ? [sourceLabel, source.version && `Database ${source.version}`, source.snapshotDate && `Database snapshot ${source.snapshotDate}`,
+  const sourceTitle = source ? [sourceLabel, cm && (source.provider || 'CM 01/02 Update Team'), source.version && `Database ${source.version}`,
+    source.snapshotDate && `Database snapshot ${source.snapshotDate}`,
     Number.isFinite(source.rawRating) && `Source rating ${source.rawRating}${Number.isFinite(source.rawScale) ? `/${source.rawScale}` : source.rawScale ? ` (${source.rawScale} scale)` : ''}`,
-    source.conversion && `Game rating converted from Football Manager current ability: ${source.conversion}`].filter(Boolean).join(' · ') : '';
+    source.conversion && `Game rating converted from ${cm ? 'CM' : 'Football Manager'} current ability: ${source.conversion}`].filter(Boolean).join(' · ') : '';
   const ratingTitle = [Number.isFinite(player.effectiveRating) && player.effectiveRating !== player.rating
     ? `Base rating ${player.rating}; lineup rating ${player.effectiveRating.toFixed(1)}` : null, sourceTitle].filter(Boolean).join(' · ');
   return (

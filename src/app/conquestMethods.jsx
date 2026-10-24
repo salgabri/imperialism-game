@@ -399,11 +399,16 @@ export function conquestModel() {
   return conqVM.buildConquest(st, this.viewContext(), this.conquestPreview()) || stub;
 }
 
-/** ManagerElimination article model (§3.5, DEC D15): "<Team> is out" + winner-first standfirst; null when none. */
+/**
+ * ManagerElimination article model (§3.5, DEC D15): "<Team> is out" + winner-first standfirst; null when none. While
+ * Retry this setup loads a data set campaign's set, or after it failed to, the note says so in place of the save line.
+ */
 export function eliminationModel() {
   const st = this.state;
   if (!st?.managerElimination || !inCampaign(st)) return null;
-  return conqVM.buildElimination(st, this.viewContext());
+  const model = conqVM.buildElimination(st, this.viewContext());
+  const retry = st.retrySetup?.elimination === st.managerElimination ? st.retrySetup : null;
+  return retry && model ? { ...model, note: retry.message, noteTone: retry.state === 'error' ? 'unsaved' : null } : model;
 }
 
 /**

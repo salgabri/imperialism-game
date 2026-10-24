@@ -8,6 +8,7 @@ import { CLUB_SCOPES } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
+import { BUILT_IN_SEASON, fieldedNations } from '../../engine/footballSets.js';
 import { V4, empireFill, ratingTierOf } from '../../theme.js';
 
 export const PACING_OPTIONS = [['duel', 'One by one'], ['blitz', 'Blitz round'], ['chaos', 'Chaos draw']];
@@ -201,14 +202,20 @@ export function estimateNote(showMatches, role) {
   return `Estimated with ${mode} at 1× speed.${extra}`;
 }
 
-let nationCountCache = null;
-function nationCounts() {
-  if (nationCountCache) return nationCountCache;
-  const nations = Object.values(NATIONS);
-  nationCountCache = Object.fromEntries(SCOPES.map(scope => [scope.id, scope.id === 'world'
-    ? nations.length
-    : scope.id === 'elite' ? Math.min(32, nations.length) : nations.filter(nation => scope.filter({ conf: nation[2] })).length]));
-  return nationCountCache;
+/** Setup caches key on the data set build, so a set's nations and clubs never collide with the built-in ones. */
+const sportKey = sport => sport.dataVersion || sport.id;
+
+const nationCountCache = new Map();
+function nationCounts(sport) {
+  const key = sportKey(sport);
+  if (!nationCountCache.has(key)) {
+    // A data set's season can leave out shapes merged into another federation or with none.
+    const nations = fieldedNations(sport).map(id => NATIONS[id]);
+    nationCountCache.set(key, Object.fromEntries(SCOPES.map(scope => [scope.id, scope.id === 'world'
+      ? nations.length
+      : scope.id === 'elite' ? Math.min(32, nations.length) : nations.filter(nation => scope.filter({ conf: nation[2] })).length])));
+  }
+  return nationCountCache.get(key);
 }
 
 /**
@@ -225,23 +232,35 @@ export function theatreRow(scope, count) {
 
 const clubScopeCache = new Map();
 function clubTheatres(sport) {
-  if (!clubScopeCache.has(sport.id)) {
-    clubScopeCache.set(sport.id, CLUB_SCOPES(sport).map(scope => theatreRow(scope, sport.clubs.filter(scope.filter).length)));
+  const key = sportKey(sport);
+  if (!clubScopeCache.has(key)) {
+    clubScopeCache.set(key, CLUB_SCOPES(sport).map(scope => theatreRow(scope, sport.clubs.filter(scope.filter).length)));
   }
-  return clubScopeCache.get(sport.id);
+  return clubScopeCache.get(key);
 }
 
-const clubIndexCache = new Map();
+// Keyed on the club list itself: a data set's clubs hold every squad, so the index must not outlive the decoded set.
+const clubIndexCache = new WeakMap();
 function clubIndex(sport) {
-  if (!clubIndexCache.has(sport.id)) clubIndexCache.set(sport.id, new Map(sport.clubs.map(club => [club.id, club])));
-  return clubIndexCache.get(sport.id);
+  if (!clubIndexCache.has(sport.clubs)) clubIndexCache.set(sport.clubs, new Map(sport.clubs.map(club => [club.id, club])));
+  return clubIndexCache.get(sport.clubs);
 }
 
 /** Theatre rows for the active layer: [{ id, name, label, count, note }] (counts as in HEAD's setup). */
 export function theatreOptions(sport, clubLayer) {
   if (clubLayer) return clubTheatres(sport);
-  const counts = nationCounts();
+  const counts = nationCounts(sport);
   return SCOPES.map(scope => theatreRow(scope, counts[scope.id]));
+}
+
+/**
+ * Theatre rows while a chosen data set loads, with no counts (`count: null`): its nations and leagues are not known
+ * yet. Clubs offer every club and the elite, plus a league already chosen, which the set keeps or drops once loaded.
+ */
+function pendingTheatres(builtIn, clubLayer, clubScope) {
+  if (!clubLayer) return SCOPES.map(scope => theatreRow(scope, null));
+  const [all, elite, ...leagues] = CLUB_SCOPES(builtIn);
+  return [all, elite, ...leagues.filter(scope => scope.id === clubScope)].map(scope => theatreRow(scope, null));
 }
 
 /** Theatre list group headings (and the `#setup-theatre` mirror's optgroup labels) when countries are offered. */
@@ -261,7 +280,25 @@ export function domesticTheatres() {
   return domesticRowCache;
 }
 
-export const domesticOffered = (sport, clubLayer) => !!clubLayer && sport?.id === 'football';
+/** Country maps are built from the built-in data, so a chosen data set (`dataSet`) leaves them out. */
+export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer && sport?.id === 'football' && dataSet == null;
+
+/** Copy under the Season choice: where the other seasons come from. */
+export const SEASON_NOTE = 'Other seasons are local data sets, built on this computer from your own copy of the database.';
+
+/**
+ * The Season choice (docs/design/football-years.md): the built-in season, then each listed data set newest first, as
+ * `{ id, key, season, source, label, checked }`. Null when there is nothing to choose, so the setup is unchanged
+ * without data sets. `sport` names a chosen set the index no longer lists.
+ */
+function seasonOptions(sets, dataSet, sport) {
+  if (!sets.length && dataSet == null) return null;
+  const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
+    label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
+  const rows = [row(null, BUILT_IN_SEASON.season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
+  if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
+  return rows;
+}
 
 /** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
 export function domesticDescription(entry) {
@@ -439,22 +476,32 @@ function teamIdentity(sport, id, clubLayer) {
 }
 
 const NO_ROWS = Object.freeze([]);
+// What step 1 shows for a chosen data set that has not loaded: no clubs counted, no matches or length estimated.
+const NO_CLUBS = Object.freeze({ clubs: NO_ROWS });
+const PENDING_PREVIEW = Object.freeze({ matches: '–', duration: '–' });
 
 /**
  * The wizard model. `ctx.managerTeams` is App's `setupTeams()` list: [{ id, name, rating }] sorted by name
  * (optional extras: `code`, `isClub`, `meta`, `players: [{ pos, name, rating }]`, `neighbours: [teamId]`).
  * `ctx.domestic` is App's load state of the chosen country map ({ state: idle | loading | ready | error, message });
- * `ctx.launching` is true while App prepares a country campaign after Launch.
+ * `ctx.launching` is true while App prepares a country campaign after Launch. `ctx.season` is App's `seasonStatus()`:
+ * the listed data sets and the chosen one's load state ({ sets, state, message, sport }), `sport` once it has loaded.
  */
 export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
-  const sport = getSport(setup.sport);
+  const football = getSport(setup.sport).id === 'football';
+  // A chosen data set plays with its own nations and clubs once it has loaded.
+  const dataSet = football ? setup.dataSet ?? null : null;
+  const seasonCtx = ctx.season || {};
+  const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);
+  // Until then no figure from the built-in season stands in for the set's.
+  const pending = dataSet != null && sport.dataSet !== dataSet;
   const clubLayer = setup.layer === 'clubs';
   const noun = clubLayer ? 'club' : 'nation';
   const nouns = `${noun}s`;
-  const scopes = theatreOptions(sport, clubLayer);
+  const scopes = pending ? pendingTheatres(sport, clubLayer, setup.clubScope) : theatreOptions(sport, clubLayer);
   // One country's own top clubs: football clubs only, listed after the leagues.
-  const domesticOn = domesticOffered(sport, clubLayer);
+  const domesticOn = domesticOffered(sport, clubLayer, dataSet);
   const domesticScopes = domesticOn ? domesticTheatres() : NO_ROWS;
   const country = domesticOn && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
   // Changing sport can leave a league from the previous sport in the saved setup; same fallback as startCampaign.
@@ -462,14 +509,22 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const scopeId = country ? setup.clubScope : activeScope.id;
   const scopeName = country ? domesticLabel(setup.clubScope) : activeScope.label;
   const count = country ? country.clubs : activeScope.count;
-  const preview = campaignPreview(count, sport, setup);
+  const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
   const showMatches = showMatchesOf(setup);
+  const seasonRows = seasonOptions(football && Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS, dataSet, sport);
+  const chosenSeason = seasonRows?.find(row => row.checked && row.id != null) || null;
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.
-  const campaignSummary = `${sport.name} · ${clubLayer ? 'Clubs' : 'Nations'} · ${scopeName}`;
+  const campaignSummary = `${sport.name} · ${clubLayer ? 'Clubs' : 'Nations'} · ${scopeName}${chosenSeason?.season ? ` · ${chosenSeason.season}` : ''}`;
   const launching = !!ctx.launching;
   const countryState = country && ['loading', 'ready', 'error'].includes(ctx.domestic?.state) ? ctx.domestic.state : 'idle';
   const countryWaits = countryState === 'loading' || countryState === 'error';
+  // A chosen set is ready once its sport is here; a failed load stays failed until Retry.
+  const seasonState = dataSet == null ? 'idle' : !pending ? 'ready' : seasonCtx.state === 'error' ? 'error' : 'loading';
+  const seasonWaits = pending;
+  const setName = chosenSeason?.source || dataSet;
+  const setLoading = dataSet != null ? `Loading the ${setName} data set…` : '';
+  const setFailed = dataSet != null ? `The ${setName} data set could not be loaded.` : '';
 
   const ranked = managerTeams.slice().sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name)));
   const rankOf = new Map(ranked.map((team, index) => [team.id, index + 1]));
@@ -504,18 +559,26 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const longShots = [...new Set([.55, .7, .85].map(share => ranked[Math.round(field * share)]).filter(Boolean))]
     .filter(team => !favouriteIds.has(team.id)).map(row);
   const teamChosen = role !== 'manager' || !!picked;
-  // A country campaign also waits for its map (and never launches twice while App prepares it).
-  const canLaunch = teamChosen && !countryWaits && !launching;
+  // A country campaign also waits for its map (and never launches twice while App prepares it), a data set for its file.
+  const canLaunch = teamChosen && !countryWaits && !seasonWaits && !launching;
   const mapLoading = country ? `Loading the map of ${country.name}…` : '';
   const mapFailed = country ? `The map of ${country.name} could not be loaded.` : '';
   const launchNote = launching ? `Preparing the map of ${country?.name || 'the country'}…`
     : countryState === 'loading' ? mapLoading
       : countryState === 'error' ? mapFailed
-        : teamChosen ? SETUP_STEPS[2].note : `Choose a ${noun} to manage`;
+        : seasonState === 'loading' ? setLoading
+          : seasonState === 'error' ? setFailed
+            : teamChosen ? SETUP_STEPS[2].note : `Choose a ${noun} to manage`;
 
   return {
     sport: { id: sport.id, name: sport.name },
-    sports: SPORT_LIST.map(item => ({ id: item.id, name: item.name, note: sportNote(item), selected: item.id === sport.id })),
+    // The chosen set's card counts its own clubs.
+    sports: SPORT_LIST.map(item => ({ id: item.id, name: item.name,
+      note: item.id !== sport.id ? sportNote(item) : pending ? sportNote(NO_CLUBS) : sportNote(sport), selected: item.id === sport.id })),
+    season: seasonRows ? {
+      id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTE, loading: setLoading,
+      message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',
+    } : null,
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
     // `scopes` stays the league / region rows; countries are their own group (`domesticScopes`) after them.
     scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
@@ -526,14 +589,15 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
     mapLoading, launching,
     // Step 3's team list is empty until a country's map decodes.
-    teamsEmpty: countryState === 'loading' ? mapLoading : countryState === 'error' ? mapFailed : `No ${nouns} in this theatre.`,
+    teamsEmpty: countryState === 'loading' ? mapLoading : countryState === 'error' ? mapFailed
+      : seasonState === 'loading' ? setLoading : seasonState === 'error' ? setFailed : `No ${nouns} in this theatre.`,
     count, preview,
     stats: [
-      { id: 'teams', label: clubLayer ? 'Clubs' : 'Nations', value: String(count) },
+      { id: 'teams', label: clubLayer ? 'Clubs' : 'Nations', value: pending ? '–' : String(count) },
       { id: 'matches', label: 'Matches', value: preview.matches },
       { id: 'length', label: 'Length', value: preview.duration.replace(' at 1× autoplay', ''), small: true },
     ],
-    status: `${count} ${nouns} · ${preview.matches} matches · ${preview.duration}`,
+    status: pending ? (seasonState === 'error' ? setFailed : setLoading) : `${count} ${nouns} · ${preview.matches} matches · ${preview.duration}`,
     estimateNote: estimateNote(showMatches, setup.role),
     campaignSummary,
     rules,
@@ -546,7 +610,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     role, teams, field, managed, favourites, longShots, canLaunch,
     // Spectators pick no team, so their step-3 heading names what they do choose.
     roleTitle: role === 'manager' ? `Choose your ${noun}` : 'Choose your role',
-    roleMeta: `${scopeName} · ${sport.name} ${nouns} · ${count} ${nouns}`,
+    roleMeta: `${scopeName} · ${sport.name} ${nouns}${pending ? '' : ` · ${count} ${nouns}`}`,
     stepSummaries: {
       1: campaignSummary,
       2: rules.summary,

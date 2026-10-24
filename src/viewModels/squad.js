@@ -39,11 +39,11 @@ function sortByPosition(players, position) {
   return players.slice().sort((a, b) => order(a) - order(b) || (Number(b.rating) || 0) - (Number(a.rating) || 0));
 }
 
-/** `EA FC 26` / `FM 26`: the edition verbatim (DEC misc, C§15 #1); `—` without source data. */
+/** `EA FC 26` / `FM 26` / `CM 01/02`: the edition verbatim (DEC misc, C§15 #1); `—` without source data. */
 export function sourceLabel(player) {
   const info = player?.sourceInfo;
   if (!info) return '—';
-  const short = info.source === 'ea-fc' ? 'EA FC' : info.source === 'football-manager' ? 'FM' : '';
+  const short = info.source === 'ea-fc' ? 'EA FC' : info.source === 'football-manager' ? 'FM' : info.source === 'cm0102' ? 'CM 01/02' : '';
   const edition = String(info.edition || '');
   if (edition) return /^\d+$/.test(edition) && short ? `${short} ${edition}` : edition;
   return short || '—';
@@ -51,19 +51,23 @@ export function sourceLabel(player) {
 
 /**
  * The roster evidence PlayerRow exposed (sourced rosters): edition, database version and snapshot, the raw rating on
- * its own scale and the Football Manager conversion, joined by " · "; '' without source data.
+ * its own scale and the conversion from the database's current ability, joined by " · "; '' without source data. A
+ * Championship Manager rating is the CM 01/02 Update Team's own assessment, so the title names them.
  */
 export function sourceTitle(player) {
   const info = player?.sourceInfo;
   if (!info) return '';
-  const name = info.source === 'ea-fc' ? 'EA FC' : 'Football Manager';
+  const cm = info.source === 'cm0102';
+  const name = info.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : 'Football Manager';
   const edition = String(info.edition || '');
   const label = edition ? (/^\d+$/.test(edition) ? `${name} ${edition}` : edition) : name;
   const raw = Number.isFinite(info.rawRating)
     ? `Source rating ${info.rawRating}${Number.isFinite(info.rawScale) ? `/${info.rawScale}` : info.rawScale ? ` (${info.rawScale} scale)` : ''}`
     : null;
-  return [label, info.version && `Database ${info.version}`, info.snapshotDate && `Database snapshot ${info.snapshotDate}`, raw,
-    info.conversion && `Game rating converted from Football Manager current ability: ${info.conversion}`].filter(Boolean).join(' · ');
+  return [label, cm && (info.provider || 'CM 01/02 Update Team'), info.version && `Database ${info.version}`,
+    info.snapshotDate && `Database snapshot ${info.snapshotDate}`, raw,
+    info.conversion && `Game rating converted from ${cm ? 'CM' : 'Football Manager'} current ability: ${info.conversion}`]
+    .filter(Boolean).join(' · ');
 }
 
 /** The player's page on the source database (sofifa / FM), http(s) only; null otherwise. */

@@ -28,6 +28,8 @@ const SPACE_IGNORE = 'input, select, textarea, button, summary, a[href], [role="
 const NO_TEAMS = Object.freeze([]);
 /** App's chosen-country map state when no country is chosen (`domesticStatus()` shape, without `onRetry`). */
 const IDLE_DOMESTIC = Object.freeze({ state: 'idle', message: null });
+/** App's Season state with no data sets listed or chosen (`seasonStatus()` shape, without `onRetry`). */
+const IDLE_SEASON = Object.freeze({ sets: NO_TEAMS, state: 'idle', message: null, sport: null });
 
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });
@@ -230,11 +232,12 @@ function theatreCaption(model, preview) {
  * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
  * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
+ * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for football data sets.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
-  domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null,
+  domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON,
 }) {
   const [step, setStep] = useState(1);
   const [confirmation, setConfirmation] = useState(null);
@@ -251,9 +254,12 @@ export default function SetupOverlay({
   // App passes a fresh `domestic` object (with a fresh `onRetry`) every render: the model keys on its values only.
   const mapState = domestic?.state || 'idle';
   const mapMessage = domestic?.message || null;
+  // Likewise `season`: its list and sport keep their identity until they change.
+  const { sets: seasonSets = NO_TEAMS, state: seasonState = 'idle', message: seasonMessage = null, sport: seasonSport = null } = season || IDLE_SEASON;
   const model = useMemo(() => setupModel.buildSetupModel(setup, {
     managerTeams, domestic: { state: mapState, message: mapMessage }, launching,
-  }), [setup, managerTeams, mapState, mapMessage, launching]);
+    season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport },
+  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport]);
   const { rules } = model;
   const manager = model.role === 'manager';
   /** Football clubs also offer one country's own top clubs: a long, scrolling theatre list in two groups. */
@@ -272,12 +278,13 @@ export default function SetupOverlay({
         <span className="setup-theatre__name">
           {scope.label}{scope.note ? <span className="setup-theatre__mark" aria-hidden="true">*</span> : null}
         </span>
-        <span className="setup-theatre__count num">{`${scope.count} ${model.nouns}`}</span>
+        {/* A chosen data set's counts are unknown until it loads. */}
+        <span className="setup-theatre__count num">{scope.count == null ? '' : `${scope.count} ${model.nouns}`}</span>
       </button>
     );
   }
   const theatreChoices = rows => rows.map(scope => (
-    <option value={scope.id} key={scope.id}>{`${scope.label} · ${scope.count} ${model.nouns}`}</option>
+    <option value={scope.id} key={scope.id}>{scope.count == null ? scope.label : `${scope.label} · ${scope.count} ${model.nouns}`}</option>
   ));
   function goTo(next) {
     const target = Math.min(3, Math.max(1, next));
@@ -520,6 +527,39 @@ export default function SetupOverlay({
                   ))}
                 </div>
               </div>
+
+              {/* Football seasons: only when a local data set is listed (or chosen), so the built-in setup is unchanged. */}
+              {model.season ? (
+                <div className="setup-group setup-group--list">
+                  <Kicker id="setup-season-label" title="Season" />
+                  <div className="setup-theatres" role="radiogroup" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
+                    data-long={model.season.options.length > 5 ? '' : undefined}>
+                    {model.season.options.map(option => (
+                      <button type="button" role="radio" key={option.key} aria-checked={option.checked} tabIndex={option.checked ? 0 : -1}
+                        className="setup-theatre" data-name={option.label} aria-label={option.label}
+                        onClick={() => choose('dataSet', option.id, model.season.id)} onKeyDown={moveRadio}>
+                        <span className="setup-theatre__name">{option.season}</span>
+                        <span className="setup-theatre__count">{option.source}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="setup-theatres__note" id="setup-season-note">{model.season.note}</p>
+                  {model.season.state === 'loading' ? <p className="setup-domestic__status" role="status">{model.season.loading}</p> : null}
+                  {model.season.state === 'error' ? (
+                    <div className="rule-note setup-domestic__error" role="alert">
+                      <Icon name="info" size={20} />
+                      <p>{model.season.message}{' '}
+                        <button type="button" className="btn-link rule-note__action" onClick={() => season?.onRetry?.()}>Retry</button>
+                      </p>
+                    </div>
+                  ) : null}
+                  {/* Native mirror of the season radios, value-bound like `#setup-theatre` ('' is the built-in season). */}
+                  <select id="setup-season" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={model.season.id ?? ''}
+                    onChange={event => pick('dataSet', event.target.value || null)}>
+                    {model.season.options.map(option => <option value={option.id ?? ''} key={option.key}>{option.label}</option>)}
+                  </select>
+                </div>
+              ) : null}
 
               <div className="setup-group">
                 <Kicker id="setup-layer-label" title="Teams" />
