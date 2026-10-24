@@ -1694,8 +1694,9 @@ export default class App extends React.Component {
     // sit unarmed (no-op when the clock already runs, as it does after finishMatch cleared it). A storage dialog keeps
     // its own pause and restores the clock when it closes.
     if (!this.state.storageDialog && !this.state.storageConflict) this.clock.resume();
-    this.setState({ choice: null, decisionLedger: [...this.state.decisionLedger, entry], autoplay: choice.resumeAutoplay && !this.state.pauseFollow,
-      view: 'map', viewSource: 'user' }, () => this.applyConquest(index));
+    // One commit: a separate decision commit re-drew the pre-conquest map (and laid out its labels), never painted.
+    this.applyConquest(index, { choice: null, decisionLedger: [...this.state.decisionLedger, entry],
+      autoplay: choice.resumeAutoplay && !this.state.pauseFollow, view: 'map', viewSource: 'user' });
   }
 
   /** The highlighted signing (DEC D15): `choice.selected`, else the best lineup fit. */

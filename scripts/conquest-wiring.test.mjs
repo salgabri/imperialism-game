@@ -341,6 +341,43 @@ test('a deciding series game advances the series and annexes once even when a st
   } finally { f.close(); }
 });
 
+test('a signing commits with its conquest, and a second Sign before React commits settles nothing more', () => {
+  const f = pendingSigning();
+  try {
+    const { app } = f;
+    app.finishMatch();
+    const candidate = app.state.choice.candidates[1];
+    const commits = [], notices = [];
+    const didUpdate = app.componentDidUpdate, showPopup = app.showPopup;
+    app.componentDidUpdate = function (props, previous) { commits.push(this.state); return didUpdate.call(this, props, previous); };
+    app.showPopup = function (pu, ...rest) { notices.push(pu.kind); return showPopup.call(this, pu, ...rest); };
+    const commit = deferCommits(app);
+    app.chooseAcquisition(candidate.index);
+    app.chooseAcquisition(candidate.index); // the decision is not committed yet: the choice still reads as pending
+    commit();
+    assert.ok(commits.length > 0);
+    assert.ok(commits.every(state => state.choice || state.match.applied), 'no commit without the choice and without the conquest');
+    const [first] = commits;
+    assert.equal(first.choice, null);
+    assert.equal(first.own['276'], '250');
+    assert.equal(first.view, 'map');
+    assert.equal(first.decisionLedger.length, 1);
+    assert.equal(first.decisionLedger[0].choice, candidate.index);
+    assert.equal(first.focusLayout, null);
+    const after = campaignOf(app);
+    assert.equal(after.matches, 1);
+    assert.deepEqual(after.history, ['match-1']);
+    assert.equal(after.stats['250'].conq, 1);
+    assert.equal(after.stats['250'].steals.length, 1, 'one claimed player');
+    assert.equal(app.state.teams['250'].squad.filter(player => player.name === candidate.name).length, 1);
+    assert.equal(app.state.decisionLedger.length, 1);
+    f.time.advance(4000);
+    commit();
+    assert.equal(app.state.matches, 1, 'its timers settle nothing more');
+    assert.deepEqual(notices, ['result', 'steal'], 'one settlement: one result notice and one claimed player');
+  } finally { f.close(); }
+});
+
 test('render-time conquest delegates are empty outside a campaign and never throw', () => {
   for (const phase of ['loading', 'setup']) {
     const f = syncAppFixture({ phase });

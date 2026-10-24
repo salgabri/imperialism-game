@@ -136,13 +136,17 @@ export function finishMatch() {
   this.applyConquest();
 }
 
-export function applyConquest(playerIndex) {
-  const st = this.state;
+/**
+ * `decided` is the signing decision's state fields: the conquest reads them as committed and commits with them, in
+ * one update. The settlement still records `this.state`, the state nothing has committed over yet (settlementOf).
+ */
+export function applyConquest(playerIndex, decided = null) {
+  const st = decided ? { ...this.state, ...decided } : this.state;
   let m = st.match;
-  if (!m || m.applied) return;
+  if (!m || m.applied) { if (decided) this.setState(decided); return; }
   // Once per match: a repeated finish (stale read, see SETTLED) only restores the settled match.
   const settled = settlementOf(this, m);
-  if (settled?.match) { restoreSettled(this, settled.match); return; }
+  if (settled?.match) { if (decided) this.setState(decided); restoreSettled(this, settled.match); return; }
   if (settled?.series && !m.seriesResolved) m = { ...m, seriesResolved: true, series: settled.view };
 
   const winnerId = m.winner;
@@ -259,9 +263,10 @@ export function applyConquest(playerIndex) {
     teamName: L.name, opponentName: W.name, score: `${m.finalGa}–${m.finalGd}${tieTxt}`,
     placement: aliveIds.length + 1, conquests: st.stats[loserId]?.conq || 0, signings: st.stats[loserId]?.steals?.length || 0 } : null;
 
-  recordSettlement(this, st, { match: completed, holds: state => !!state.history?.includes(archived) });
+  recordSettlement(this, this.state, { match: completed, holds: state => !!state.history?.includes(archived) });
   this.setState(
     {
+      ...decided,
       teams,
       own,
       aliveIds,
