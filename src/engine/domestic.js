@@ -404,22 +404,47 @@ export function domesticSurroundings(atlas, domestic, margin = { x: 480, y: 800 
   const hit = surroundings.get(domestic);
   if (hit?.atlas === atlas && hit.key === key) return hit.value;
   const world = new WorldGeometry(atlas, {}, { projection: meta.projection });
-  const paths = world.buildPaths(s, tx, ty);
+  const X0 = -margin.x, X1 = 960 + margin.x, Y0 = -margin.y, Y1 = 540 + margin.y;
   // Ring by ring: a shape split at the far-side seam (Russia, the US) spans the
   // whole plane, but only its nearby rings can ever be on screen or on a route.
   const near = ring => {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const [x, y] of ring) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
-    return x0 < 960 + margin.x && x1 > -margin.x && y0 < 540 + margin.y && y1 > -margin.y;
+    return x0 < X1 && x1 > X0 && y0 < Y1 && y1 > Y0;
+  };
+  // A shape's rings fitted and rounded exactly as buildPaths rounds its painted
+  // labelRings (only these are drawn, so the rest of buildPaths is not needed).
+  // A ring whose unrounded box is clearly outside is skipped before rounding:
+  // rounding moves a point by at most 0.05. displayProjected is id-keyed like
+  // paths, so an id the atlas repeats keeps its last shape.
+  const nearRings = id => {
+    const rings = [];
+    for (const poly of world.displayProjected[id]) for (const parts of poly) for (const part of parts) {
+      if (part.length < 3) continue;
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const q of part) {
+        const x = q[0] * s + tx, y = q[1] * s + ty;
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+      if (!(x0 < X1 + 0.1 && x1 > X0 - 0.1 && y0 < Y1 + 0.1 && y1 > Y0 - 0.1)) continue;
+      const ring = part.map(q => [Number((q[0] * s + tx).toFixed(1)), Number((q[1] * s + ty).toFixed(1))]);
+      if (near(ring)) rings.push(ring);
+    }
+    return rings;
   };
   // A sport's own map names the world shapes it covers (the NBA's: the USA and Canada).
   const hosts = new Set(meta.hosts || [meta.id]);
-  const shapesOf = (list, at) => list.flatMap(country => {
-    const rings = (at[country.id]?.labelRings || []).filter(near);
+  const shapesOf = (list, ringsOf) => list.flatMap(country => {
+    const rings = ringsOf(country.id);
     return rings.length ? [{ id: country.id, d: rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join(''), rings }] : [];
   });
-  const emptyShapes = empty ? shapesOf(empty.countries, empty.buildPaths(s, tx, ty)) : [];
-  const worldShapes = shapesOf(world.countries.filter(country => !hosts.has(country.id) || meta.boundaries?.mask), paths);
+  // The empty land is a few shapes: its full paths are cheap.
+  const emptyPaths = empty ? empty.buildPaths(s, tx, ty) : null;
+  const emptyShapes = empty ? shapesOf(empty.countries, id => (emptyPaths[id]?.labelRings || []).filter(near)) : [];
+  const worldShapes = shapesOf(world.countries.filter(country => !hosts.has(country.id) || meta.boundaries?.mask), nearRings);
   // The masked host shape covers its own sections; overlaps elsewhere are
   // harmless (sections take precedence over obstacles in routing).
   const value = Object.freeze({ shapes: [...emptyShapes, ...worldShapes], obstacles: worldShapes.filter(shape => !hosts.has(shape.id)) });

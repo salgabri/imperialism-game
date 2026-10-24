@@ -11,7 +11,7 @@ import {
   decodeDomestic, domesticSurroundings, loadDomestic, clearDomesticCache, getLoadedDomestic,
   retainDomestic, loadedDomesticIds, DOMESTIC_CACHE_LIMIT,
 } from '../src/engine/domestic.js';
-import { WorldGeometry } from '../src/engine/geo.js';
+import { WorldGeometry, mergeSharedIds } from '../src/engine/geo.js';
 import { pickTarget, FOREIGN_TRANSIT_LABEL } from '../src/engine/campaign.js';
 import { createDuelDraw } from '../src/engine/duelDraw.js';
 import { createAttackRouteIndex, firstForeignLand, OBSTACLE_PREFIX } from '../src/engine/attackRoutes.js';
@@ -286,6 +286,28 @@ test('shipped maps with their foreign neighbours: kickoff routes stay off foreig
       const kaliningrad = country.clubs.find(club => club.name === 'Baltika Kaliningrad');
       assert.equal(pickTarget(board, kaliningrad.id, 0).routeKind, 'foreign-transit', 'the exclave crosses foreign land to reach Russia');
     }
+  }
+});
+
+test('surroundings are the painted rings buildPaths gives the atlas, kept where they reach the frame', () => {
+  // The backdrop fits and rounds rings itself: it must match buildPaths' labelRings exactly (England is masked,
+  // Russia and Fiji cross the far-side seam, Indonesia's merged atlas holds all of Australia under one id).
+  const merged = mergeSharedIds(atlas);
+  for (const [id, world, margin] of [['826', merged, undefined], ['643', merged, { x: 0, y: 0 }], ['242', atlas, { x: 120, y: 60 }],
+    ['360', merged, undefined]]) {
+    const country = load(id), { s, tx, ty } = country.geo.fit, m = margin || { x: 480, y: 800 };
+    const reference = new WorldGeometry(world, {}, { projection: country.meta.projection });
+    const paths = reference.buildPaths(s, tx, ty);
+    const near = ring => {
+      const [x0, y0, x1, y1] = ring.reduce(([a, b, c, d], [x, y]) => [Math.min(a, x), Math.min(b, y), Math.max(c, x), Math.max(d, y)],
+        [Infinity, Infinity, -Infinity, -Infinity]);
+      return x0 < 960 + m.x && x1 > -m.x && y0 < 540 + m.y && y1 > -m.y;
+    };
+    const expected = reference.countries.filter(c => c.id !== id || country.meta.boundaries?.mask)
+      .map(c => ({ id: c.id, rings: paths[c.id].labelRings.filter(near) })).filter(shape => shape.rings.length);
+    const { shapes } = domesticSurroundings(world, country, margin);
+    assert.deepEqual(shapes.map(({ id: shapeId, rings }) => ({ id: shapeId, rings })), expected, `${id}: the same rings`);
+    assert.ok(shapes.every(shape => shape.d === shape.rings.map(ring => 'M' + ring.join('L') + 'Z').join('')), `${id}: d draws the rings`);
   }
 });
 
