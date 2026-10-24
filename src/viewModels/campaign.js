@@ -460,7 +460,8 @@ function titleCardModel(st, ctx) {
   const seed = st.seed != null && st.seed !== '' ? ` · seed ${st.seed}` : '';
   return {
     variant: 'campaign', kicker,
-    title: campaignTitle(st.settings, ctx?.scopeName || scopeNameOf(st.settings)),
+    // A campaign on a football data set names its season ('The European Campaign · 2001/02').
+    title: `${campaignTitle(st.settings, ctx?.scopeName || scopeNameOf(st.settings))}${st.settings?.dataSeason ? ` · ${st.settings.dataSeason}` : ''}`,
     // Phone frames your empire and its opponent (DEC D22, A-7); "Whole map" restores the full title.
     phoneTitle: managedId ? 'Your fronts' : followed ? followed.name : null,
     meta: `${mapStateCopy(st, current)}${seed}`,

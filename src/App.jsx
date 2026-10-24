@@ -8,6 +8,8 @@ import { WorldGeometry, projPt } from './engine/geo.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel } from './data/domesticScope.js';
+import { clearFootballSetCache, fieldedNations, footballSport, getLoadedFootballSet, heldShapes, loadFootballSet,
+  loadFootballSetIndex, retainFootballSets, sportOf } from './engine/footballSets.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
@@ -22,7 +24,7 @@ import { createMinuteStore } from './engine/liveMinute.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { countryMapPreview } from './screens/setup/setupModel.js';
-import { DEFAULT_SETUP, LOG_CAP, domesticIdOf } from './app/shared.js';
+import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
 import * as matchM from './app/matchMethods.jsx';
@@ -61,6 +63,23 @@ const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
 // and ~770 above and below on a phone.
 const BACKDROP_MARGIN = { x: 480, y: 800 };
 const SETUP_LOAD_DELAY_MS = 120;
+
+/** The page's fetch; tests and Node have only the global one. */
+const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : globalThis.fetch);
+
+/** "Football · Europe"; a data set campaign names its season ("Football 2001/02 · Europe"). */
+const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}${settings.dataSeason ? ` ${settings.dataSeason}` : ''} · ${scopeName}`;
+
+/**
+ * A data set brings its own clubs, so the setup's club theatre must be one of them: a country map (built from the
+ * built-in data) and a league the set leaves out fall back to every club. Kept as it is while the set loads.
+ */
+function setClubScope(setup) {
+  if (setup.dataSet == null || getSport(setup.sport).id !== 'football') return setup.clubScope;
+  if (isDomesticScope(setup.clubScope)) return 'all';
+  const sport = sportOf(setup);
+  return !sport || CLUB_SCOPES(sport).some(scope => scope.id === setup.clubScope) ? setup.clubScope : 'all';
+}
 
 /** True unless `a` and `b` are the same value or objects with the same keys holding identical values. */
 function contentChanged(a, b) {
@@ -152,6 +171,9 @@ export default class App extends React.Component {
     // launch being prepared (UI-only: campaignSnapshot whitelists its keys, so none of these reach a save).
     domesticLoad: { id: null, state: 'idle', message: null },
     restoring: null, launching: false,
+    // The local football data sets on offer and the setup's chosen one loading (UI-only, like the country map's), and
+    // Retry this setup loading a data set campaign's set: { elimination, state: 'loading' | 'error', message }.
+    footballSets: [], footballSetLoad: { id: null, state: 'idle', message: null }, retrySetup: null,
   };
 
   engagement = new SessionEngagement();
@@ -162,6 +184,7 @@ export default class App extends React.Component {
   backdrop = [];
   // Async map loads compare these so a result the player has moved on from is dropped.
   setupMapToken = 0;
+  setupSetToken = 0;
   flowToken = 0;
   openingSeed = Date.now() >>> 0;
   away = false;
@@ -213,6 +236,7 @@ export default class App extends React.Component {
     this.clearTimers();
     clearTimeout(this.confirmTimer);
     clearTimeout(this.setupLoadTimer);
+    clearTimeout(this.setupSetTimer);
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', this.handleStorage);
       window.removeEventListener('focus', this.handleFocus);
@@ -331,6 +355,7 @@ export default class App extends React.Component {
       }
       this.fitMap(Object.keys(NATIONS));
       this.setState({ phase: 'setup' });
+      this.requestSeasons();
     } catch (e) {
       this.setState({ err: 'MAP DATA FAILED TO LOAD — ' + String((e && e.message) || e) });
     }
@@ -369,8 +394,11 @@ export default class App extends React.Component {
   }
 
   loadCountry(id) {
-    return loadDomestic(id, { baseUrl: import.meta.env.BASE_URL,
-      fetch: typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : globalThis.fetch });
+    return loadDomestic(id, { baseUrl: import.meta.env.BASE_URL, fetch: pageFetch() });
+  }
+
+  loadSet(id) {
+    return loadFootballSet(id, { baseUrl: import.meta.env.BASE_URL, fetch: pageFetch() });
   }
 
   /**
@@ -516,6 +544,69 @@ export default class App extends React.Component {
     return { state, message: state === 'error' ? load.message : null, preview, onRetry: () => this.retryDomestic() };
   }
 
+  /**
+   * Football setups offer the local data sets (docs/design/football-years.md). The index is read once, in the
+   * background; without one there is no Season choice and nothing to report. Resolves when the read is done.
+   */
+  requestSeasons() {
+    if (getSport(this.state.setup.sport).id !== 'football') return null;
+    this.seasonIndex ||= loadFootballSetIndex({ baseUrl: import.meta.env.BASE_URL, fetch: pageFetch() })
+      .then(sets => { if (sets.length) this.setState({ footballSets: sets }); });
+    return this.seasonIndex;
+  }
+
+  /** A data set's name for messages: its listed label ("CM 01/02 · May 2026"), else its id. */
+  setName(id) {
+    return this.state.footballSets.find(set => set.id === id)?.label || getLoadedFootballSet(id)?.meta.label || id;
+  }
+
+  /**
+   * Load the setup's chosen data set (loading, then ready or error), as the setup loads a country map. A failed load
+   * stays failed until Retry, and a result the player has since moved away from is ignored.
+   */
+  showSetupSet(setup = this.state.setup, retry = false) {
+    const id = dataSetOf(setup), loaded = id ? getLoadedFootballSet(id) : null, previous = this.state.footballSetLoad;
+    const token = ++this.setupSetToken;
+    retainFootballSets([id]);
+    clearTimeout(this.setupSetTimer);
+    if (id && !loaded && !retry && previous?.id === id && previous.state === 'error') return;
+    const footballSetLoad = { id, state: !id ? 'idle' : loaded ? 'ready' : 'loading', message: null };
+    if (previous?.id !== id || previous.state !== footballSetLoad.state) this.setState({ footballSetLoad });
+    if (!id || loaded) return;
+    const current = () => token === this.setupSetToken && this.state.phase === 'setup';
+    // Arrow keys on the Season list step through the sets, as on the Theatre list: fetch and decode only the one the
+    // player stays on.
+    this.setupSetTimer = setTimeout(() => current() && this.loadSet(id).then(() => {
+      if (!current()) return;
+      this.setState(state => {
+        const clubScope = setClubScope(state.setup);
+        return { footballSetLoad: { id, state: 'ready', message: null },
+          ...(clubScope !== state.setup.clubScope ? { setup: { ...state.setup, clubScope, managedTeamId: '' } } : {}) };
+      });
+    }, error => {
+      if (current()) this.setState({ footballSetLoad: { id, state: 'error', message: `The ${this.setName(id)} data set could not be loaded. ${error.message || error}` } });
+    }), SETUP_LOAD_DELAY_MS);
+  }
+
+  retrySet() {
+    const id = dataSetOf(this.state.setup);
+    if (!id) return;
+    clearFootballSetCache(id);
+    this.showSetupSet(this.state.setup, true);
+  }
+
+  /**
+   * What the setup's Season choice shows: the listed data sets, and the chosen one's state (idle, loading, ready or
+   * error) with its season-bound sport once loaded. Render-safe: no setState.
+   */
+  seasonStatus(setup = this.state.setup) {
+    const id = dataSetOf(setup), load = this.state.footballSetLoad;
+    const loaded = id ? getLoadedFootballSet(id) : null;
+    const failed = !loaded && load?.id === id && load.state === 'error';
+    return { sets: this.state.footballSets, state: !id ? 'idle' : loaded ? 'ready' : failed ? 'error' : 'loading',
+      message: failed ? load.message : null, sport: loaded ? footballSport(loaded) : null, onRetry: () => this.retrySet() };
+  }
+
   /** Display name of a territory: a country map's section, else a nation or dependency. */
   territoryName(cid) {
     return this.domesticMap()?.sectionNames[cid] || NATIONS[cid]?.[0] || DEPENDENCIES[cid]?.name || cid;
@@ -561,17 +652,27 @@ export default class App extends React.Component {
       if (key === 'preset') {
         setup.scope = value === 'short' ? 'elite' : value === 'world' ? 'world' : 'UEFA';
         // A chosen country is its own theatre; a session length does not replace it.
-        if (!domestic) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all' : CLUB_SCOPES(getSport(setup.sport))[2]?.id || 'all';
+        if (!domestic) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all'
+          : CLUB_SCOPES(sportOf(setup) || getSport(setup.sport))[2]?.id || 'all';
       } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
       // Country maps come with football data only.
       if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
+      // So do data sets, and they bring their own clubs.
+      if (setup.dataSet != null && getSport(setup.sport).id !== 'football') setup.dataSet = null;
+      const clubScope = setClubScope(setup);
+      if (clubScope !== setup.clubScope) setup.clubScope = clubScope;
       // The field changes with the theatre, so the managed team goes too, but a
       // preset leaves a chosen country's club theatre (and its clubs) as it was.
       const sameField = key === 'preset' && domestic && setup.layer === 'clubs';
-      if (['sport', 'layer', 'scope', 'clubScope', 'preset'].includes(key) && !sameField) setup.managedTeamId = '';
+      if (['sport', 'layer', 'scope', 'clubScope', 'preset', 'dataSet'].includes(key) && !sameField) setup.managedTeamId = '';
       return { setup };
-    }, () => { if (this.state.phase === 'setup') this.showSetupMap(); });
+    }, () => {
+      if (this.state.phase !== 'setup') return;
+      this.showSetupMap();
+      this.showSetupSet();
+      this.requestSeasons();
+    });
   }
 
   exportProgress() {
@@ -703,8 +804,9 @@ export default class App extends React.Component {
   setupTeams(setup = this.state.setup) {
     const domesticId = domesticIdOf(setup);
     const loaded = domesticId ? getLoadedDomestic(domesticId) : null;
+    const sport = sportOf(setup);
     const key = JSON.stringify([setup.sport, setup.layer, setup.scope, setup.clubScope, setup.seed, setup.rosterPreset, !!this.geo,
-      domesticId ? loaded?.meta.version || 'loading' : null]);
+      domesticId ? loaded?.meta.version || 'loading' : null, dataSetOf(setup) ? sport?.dataVersion || 'loading' : null]);
     if (this.setupTeamsCache?.key === key) return this.setupTeamsCache.teams;
     const { included, own } = this.opening(setup, makeRng(this.setupSeed(setup)));
     // Fronts on the board the campaign opens on: the country's sections, else the world (never a previewed country,
@@ -715,7 +817,7 @@ export default class App extends React.Component {
       const ids = new Set(included.map(team => team.id));
       const opening = { ...own };
       if (setup.layer !== 'clubs') {
-        for (const [shapeId, dep] of Object.entries(DEPENDENCIES)) if (ids.has(dep.of)) opening[shapeId] = dep.of;
+        for (const [shapeId, holder] of heldShapes(sport)) if (ids.has(holder)) opening[shapeId] = holder;
       }
       board = { geo, own: opening };
     }
@@ -738,7 +840,9 @@ export default class App extends React.Component {
   }
 
   opening(su, rng) {
-    const sport = getSport(su.sport), clubLayer = su.layer === 'clubs';
+    const sport = sportOf(su), clubLayer = su.layer === 'clubs';
+    // Nobody plays until a chosen data set has loaded, as with a country map.
+    if (!sport) return { included: [], own: {}, scopeName: this.scopeName(su) };
     let included, own = {}, scopeName;
     const domesticId = domesticIdOf(su);
     if (domesticId) {
@@ -758,7 +862,7 @@ export default class App extends React.Component {
         included = included.filter(c => Object.values(own).includes(c.id));
       }
     } else {
-      const all = Object.keys(NATIONS).map(id => buildTeam(id, rng, sport));
+      const all = fieldedNations(sport).map(id => buildTeam(id, rng, sport));
       const scope = SCOPES.find(x => x.id === su.scope) || SCOPES[0];
       included = su.scope === 'world' ? all : su.scope === 'elite'
         ? all.slice().sort((a, b) => b.str - a.str || teamEff(b) - teamEff(a)).slice(0, 32) : all.filter(scope.filter);
@@ -800,10 +904,11 @@ export default class App extends React.Component {
 
   startCampaign() {
     this.cancelRestore();
-    // No setup-screen map load outlives the setup screen.
+    // No setup-screen map or data set load outlives the setup screen.
     clearTimeout(this.setupLoadTimer);
+    clearTimeout(this.setupSetTimer);
     const su = this.state.setup;
-    const domesticId = domesticIdOf(su);
+    const domesticId = domesticIdOf(su), dataSet = dataSetOf(su);
     const token = ++this.flowToken;
     if (domesticId && !getLoadedDomestic(domesticId)) {
       // The setup screen waits for the map, but a retry or test may arrive first.
@@ -812,9 +917,17 @@ export default class App extends React.Component {
         if (token === this.flowToken) this.setState({ saveStatus: { ok: false, message: `The map of ${name} could not be loaded. ${error.message || error}` } });
       });
     }
+    if (dataSet && !getLoadedFootballSet(dataSet)) {
+      // As with a country map: the setup screen waits for the data set, a retried setup loads it first.
+      const name = this.setName(dataSet);
+      return this.loadSet(dataSet).then(() => token === this.flowToken && this.startCampaign(), error => {
+        if (token === this.flowToken) this.setState({ saveStatus: { ok: false, message: `The ${name} data set could not be loaded, so this setup cannot start. ${error.message || error}` } });
+      });
+    }
     const seed = this.setupSeed(su);
     this.rng = makeRng(seed);
     const clubLayer = su.layer === 'clubs';
+    const sport = sportOf(su);
     const { included, own, scopeName } = this.opening(su, this.rng);
     if (su.role === 'manager' && !included.some(team => team.id === su.managedTeamId)) {
       this.setState({ saveStatus: { ok: false, message: 'Choose the team you will manage before launching.' } });
@@ -822,10 +935,11 @@ export default class App extends React.Component {
     }
     this.clearTimers();
     this.engagement = new SessionEngagement();
-    // A stale map stamp from a retried country campaign never outlives its map.
-    const { domesticVersion: _previousMap, ...chosen } = su;
+    // Stale stamps from a retried campaign never outlive their map or data set.
+    const { domesticVersion: _previousMap, dataVersion: _previousSet, dataYear: _year, dataSeason: _season, ...chosen } = su;
     const settings = { ...DEFAULT_SETUP, ...chosen, ...this.launchRules(su), seed: String(seed),
-      ...(domesticId ? { domesticVersion: getLoadedDomestic(domesticId).meta.version } : {}) };
+      ...(domesticId ? { domesticVersion: getLoadedDomestic(domesticId).meta.version } : {}),
+      dataSet, ...(dataSet ? { dataVersion: sport.dataVersion, dataYear: sport.dataYear, dataSeason: sport.dataSeason } : {}) };
 
     const teams = {};
     const stats = {};
@@ -837,9 +951,9 @@ export default class App extends React.Component {
       t.baseAvg = squadAverage(t);
     }
     if (!clubLayer) {
-      // Overseas territory comes with its parent nation, if that nation is playing.
-      for (const [shapeId, dep] of Object.entries(DEPENDENCIES)) {
-        if (teams[dep.of]) own[shapeId] = dep.of;
+      // Overseas territory, and a data set's merged federations, come with their holder if it is playing.
+      for (const [shapeId, holder] of heldShapes(sport)) {
+        if (teams[holder]) own[shapeId] = holder;
       }
     }
     this.useGeometry(domesticId);
@@ -854,7 +968,7 @@ export default class App extends React.Component {
         managedTeamId: su.role === 'manager' ? su.managedTeamId : null, managementEnded: false,
         managerElimination: null, tacticalChoice: null, decisionLedger: [], historyFilter: '',
         campaignId: createCampaignId(), revision: 0,
-        campaignName: `${getSport(su.sport).name} · ${scopeName}${su.role === 'manager' ? ' · ' + included.find(team => team.id === su.managedTeamId).name : ''}`,
+        campaignName: `${campaignLabel(settings, scopeName)}${su.role === 'manager' ? ' · ' + included.find(team => team.id === su.managedTeamId).name : ''}`,
         storageDialog: null, storageConflict: false,
         // clearTimers() above dropped the tasks that would clear a previous campaign's notice and goal toast.
         pu: null, toast: null,
@@ -925,7 +1039,7 @@ export default class App extends React.Component {
       managementEnded: !!s.managementEnded, managerElimination: s.managerElimination || null,
       tacticalChoice: s.tacticalChoice || null, decisionLedger: s.decisionLedger || [],
       historyFilter: s.historyFilter || '', selectedHistoryId: s.selectedHistoryId || null,
-      campaignId: s.campaignId || createCampaignId(), revision: s.revision || 0, campaignName: s.campaignName || `${getSport(s.settings.sport).name} · ${this.scopeName(s.settings)}`,
+      campaignId: s.campaignId || createCampaignId(), revision: s.revision || 0, campaignName: s.campaignName || campaignLabel(s.settings, this.scopeName(s.settings)),
       storageDialog: null, storageConflict: false,
       // clearTimers() above dropped the tasks that would clear the outgoing campaign's notice and goal toast.
       pu: null, toast: null,
@@ -1008,6 +1122,7 @@ export default class App extends React.Component {
     this.openingSeed = Date.now() >>> 0;
     this.setupTeamsCache = null;
     this.showSetupMap(this.state.setup, true);
+    this.showSetupSet();
     this.setState({
       phase: 'setup',
       confirmNew: false,
@@ -1033,14 +1148,27 @@ export default class App extends React.Component {
   continueAsSpectator() {
     this.clock.resume();
     // The elimination cleared every timer, including the ones that would clear the final match's goal toast.
-    this.setState({ managerElimination: null, managementEnded: true, autoplay: false, paused: false, pu: null, toast: null,
+    this.setState({ managerElimination: null, retrySetup: null, managementEnded: true, autoplay: false, paused: false, pu: null, toast: null,
       phase: this.state.aliveIds.length === 1 ? 'victory' : 'playing' }, () => this.persist());
   }
 
   retryManager() {
-    this.clearTimers();
     const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings), seed: String(this.state.seed), managedTeamId: this.state.managedTeamId };
-    this.setState({ setup, managerElimination: null }, () => this.startCampaign());
+    // The save holds a data set campaign's players, but playing its setup again needs the set itself. The dialog
+    // reports the load, not the save status: the checkpoint was saved whatever happens to the set.
+    const dataSet = dataSetOf(setup), elimination = this.state.managerElimination;
+    if (dataSet && !getLoadedFootballSet(dataSet)) {
+      const token = ++this.flowToken, name = this.setName(dataSet);
+      // Gone once the player has followed the remaining teams instead, or another campaign has opened.
+      const current = () => token === this.flowToken && this.state.managerElimination === elimination;
+      this.setState({ retrySetup: { elimination, state: 'loading', message: `Loading the ${name} data set…` } });
+      return this.loadSet(dataSet).then(() => current() && this.retryManager(), error => {
+        if (current()) this.setState({ retrySetup: { elimination, state: 'error',
+          message: `This setup needs the ${name} data set, which could not be loaded. ${error.message || error}` } });
+      });
+    }
+    this.clearTimers();
+    this.setState({ setup, managerElimination: null, retrySetup: null }, () => this.startCampaign());
   }
 
   // ---------- transient overlays ----------
@@ -1749,8 +1877,10 @@ export default class App extends React.Component {
           playback={<PlaybackBar variant="sheet" id="campaign-playback-sheet" showStep={!ctx.managedId} {...playback} />} />}
         {st.phase === 'setup' && <SetupOverlay
           setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()} domestic={this.domesticStatus()}
+          season={this.seasonStatus()}
           savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
-            (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings) : ''}
+            (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings)
+            + (st.savedMeta.settings?.dataSeason ? ' · ' + st.savedMeta.settings.dataSeason : '') : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
           onPick={(key, value) => this.pickSetup(key, value)}
           onStart={() => this.launchCampaign()} launching={st.launching} restoring={!!st.restoring}
@@ -1761,7 +1891,7 @@ export default class App extends React.Component {
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           onClose={() => this.setState({ phase: 'playing' })}
           onNew={() => {
-            this.clearTimers(); this.cancelRestore(); this.showSetupMap(st.setup, true);
+            this.clearTimers(); this.cancelRestore(); this.showSetupMap(st.setup, true); this.showSetupSet();
             this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null, autoplay: false });
           }}
         />}

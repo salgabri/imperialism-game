@@ -72,6 +72,8 @@ npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # refresh country club snapshots (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries
 npm run test:domestic    # country maps, sections and seeded country campaigns
+npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
+npm run test:football-sets # CM 01/02 parser, data set builder, loader, setup and saves
 ```
 
 ## How a campaign plays
@@ -88,7 +90,9 @@ Space moves to the next step and launches the campaign from the last one.
    step shows the actual number of teams, the number of matches and the
    estimated duration at 1× autoplay. With clubs in football, a second theatre
    group, **One country · top clubs**, starts a [domestic campaign](#domestic-campaigns).
-   A quick-resume card appears when a save exists.
+   When local [football seasons](#football-seasons) have been built, a **Season**
+   choice lists them after the built-in 2025/26. A quick-resume card appears when
+   a save exists.
 2. **Rules of war** — turn order and targeting (below). A collapsed **Match
    settings** section holds pacing, match display, uncertainty, the final two,
    automatic recruitment, basketball starting ratings, the campaign seed and
@@ -565,6 +569,49 @@ The [design notes](docs/design/domestic-campaigns.md) give the sources and
 queries, the partition, the file format, saves, acceptance checks and known
 limitations.
 
+## Football seasons
+
+Football can also be played on an earlier (or later) season, built from a
+Championship Manager 01/02 database. The CM 01/02 community has updated the
+freeware game every season since 2001, so one database format covers 2001/02 to
+2025/26. The [sources note](docs/design/football-year-sources.md) compares
+every other source considered, back to 1872, and their terms.
+
+None of those databases grants redistribution, so seasons are **local** for now.
+Download a database from [champman0102.co.uk](https://www.champman0102.co.uk) (a
+free forum account is needed) into the ignored `data-src/cm0102/<folder>/`, then
+run:
+
+```bash
+npm run build:football-set -- --cm0102=data-src/cm0102/<folder>
+```
+
+The builder writes the season to the ignored `public/football/`, where setup
+finds it. The [permission requests](docs/design/football-year-permissions.md)
+ask the authors whether those files may be committed.
+
+- **What the builder does:**
+  - It identifies the release from its file sizes (48 known releases, each with
+    its season, author, forum topic and date shifts) and refuses seasons ending
+    before 2002.
+  - It reads the binary files with the game's own parser (`src/data/cm0102.js`,
+    format in [cm0102-format.md](docs/design/cm0102-format.md)).
+  - Every one of the 170 nations gets an entry, and clubs come from the seven
+    leagues the club layer already uses.
+  - Ratings are CM's current ability (1–200) converted once with
+    `round(ca * 99 / 200)`. Natural positions are the slots rated 20.
+  - It never invents a player or a rating. It stops on an unmapped nation unless
+    `--allow-unmapped` is given, and then leaves those players out.
+- **Federations by year:** a nation plays only once its association was a FIFA
+  member by the end of the season. Montenegro is held by Serbia until 2006, New
+  Caledonia by France until 2003 and South Sudan by Sudan until 2011. Timor-Leste
+  until 2005 and Kosovo until 2015 stay neutral.
+- **Saves are self-contained:** players are packed as compact CM tuples, so a
+  season campaign resumes or imports without its data set.
+
+The [design notes](docs/design/football-years.md) give the file format, the
+runtime, the saves and the known limits.
+
 ## Squad economics
 
 Beating a team claims one player. Strength (`EFF`) is the best-lineup rating, so
@@ -754,6 +801,8 @@ src/
   data/scopes.js       club theatre choices (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
   data/domesticScope.js  labels for 'domestic:<id>' theatres
+  data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
+  data/cmPlayers.js    CM player tuples, positions and rating conversion
   data/flags.js        nation id -> flag asset
   data/capitals.js     capital city coordinates
   hooks/               map zoom and pan viewport
@@ -766,6 +815,7 @@ src/
     winProbability.js  live win-probability model (football and basketball)
     liveMinute.js      live match minute store (outside saved state)
     domestic.js        loads and validates a country map: sections and club rows
+    footballSets.js    loads and validates a football season; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
                        wizard, match card, dialogs and overlays
@@ -788,6 +838,7 @@ scripts/
   build-clubs.mjs      builds the club layer for both sports
   sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
+  build-football-set.mjs  builds a local football season from a CM 01/02 database
 ```
 
 ### Tuning

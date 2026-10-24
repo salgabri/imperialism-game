@@ -37,9 +37,13 @@ function scopeNameOf(settings) {
   }
 }
 
-/** 'The European Campaign' etc. (DEC misc); `ctx.scopeName` wins when the caller passes it. */
+/**
+ * 'The European Campaign' etc. (DEC misc); `ctx.scopeName` wins when the caller passes it. A campaign on a football
+ * data set names its season ('The European Campaign · 2001/02').
+ */
 export function ledgerCampaignTitle(st, ctx) {
-  return campaignTitle(st?.settings, ctx?.scopeName || scopeNameOf(st?.settings));
+  const season = st?.settings?.dataSeason ? ` · ${st.settings.dataSeason}` : '';
+  return `${campaignTitle(st?.settings, ctx?.scopeName || scopeNameOf(st?.settings))}${season}`;
 }
 
 function countBy(own) {

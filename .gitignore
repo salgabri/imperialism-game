@@ -7,3 +7,7 @@ FM26 Season Update*/
 
 # Source dataset for npm run build-rosters (11MB, regenerable)
 data-src/
+
+# Football data sets built from CM 01/02 databases (npm run build:football-set) stay
+# local until the database authors allow redistribution: docs/design/football-year-permissions.md
+public/football/

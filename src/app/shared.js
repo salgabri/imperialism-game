@@ -10,11 +10,18 @@ export const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'U
   preset: 'standard', seed: '', uncertainty: 'balanced', express: false, finale: 'single', role: 'spectator',
   managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic',
   // Turn modes (DEC D1): the defaults reproduce the original random draw with compass targets.
-  turnOrder: 'random', targeting: 'compass' };
+  turnOrder: 'random', targeting: 'compass',
+  // A football data set id (docs/design/football-years.md); null plays the built-in season.
+  dataSet: null };
 
 /** The country whose own map a setup or saved campaign is played on, or null for the world. Pure. */
 export function domesticIdOf(settings) {
   return settings?.layer === 'clubs' && getSport(settings.sport).id === 'football' ? domesticScopeId(settings.clubScope) : null;
+}
+
+/** The data set a setup or saved campaign is played on, or null for the built-in data (country maps use it too). Pure. */
+export function dataSetOf(settings) {
+  return getSport(settings?.sport).id === 'football' && !domesticIdOf(settings) ? settings?.dataSet ?? null : null;
 }
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
