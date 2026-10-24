@@ -125,6 +125,18 @@ test('cached results are stable under ownership order, without mutating inputs',
   assert.equal(JSON.stringify({ shapes, ownership }), snapshot);
 });
 
+test('a region a regrouping leaves unchanged keeps its object, so per-region caches carry over', () => {
+  const shapes = [shape('a', rect(0, 0, 40, 30)), shape('b', rect(50, 0, 40, 30)), shape('c', rect(400, 0, 30, 20)),
+    shape('d', rect(435, 0, 30, 20))];
+  const index = createFlagRegionIndex(shapes, { maxGap: 10 }), fresh = createFlagRegionIndex(shapes, { maxGap: 10 });
+  const first = index.components({ a: 'A', b: 'A', c: 'C', d: 'D' });
+  const ownership = { a: 'A', b: 'A', c: 'C', d: 'C' }, next = index.components(ownership);
+  assert.deepEqual(next, fresh.components(ownership), 'the same regions as a fresh index');
+  assert.strictEqual(next.find(c => c.ownerId === 'A'), first.find(c => c.ownerId === 'A'), 'untouched region: same object');
+  assert.notStrictEqual(next.find(c => c.ownerId === 'C'), first.find(c => c.ownerId === 'C'), 'a changed region is new');
+  assertConserved(shapes, ownership, next);
+});
+
 test('refitting coordinates and scaling the geographic gap preserves regional membership', () => {
   const shapes = [shape('a', rect(0, 0, 40, 30)), shape('b', rect(55, 0, 40, 30)), shape('remote', rect(300, 0, 30, 20))];
   const ownership = { a: 'A', b: 'A', remote: 'A' }, scale = 3.25, dx = -37, dy = 61;

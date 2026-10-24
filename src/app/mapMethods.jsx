@@ -125,6 +125,8 @@ export function mapFlags(playing) {
   const components = this.flagComponents.components(playing ? mapSnapshot(this).own : this.setupFlagOwnership);
   const cached = this.flagLayoutCache;
   if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
+  // A part's path depends only on its rings, and parts are the index's fixed objects: reuse the last layout's.
+  const previousPaths = cached?.paths, paths = new Map();
 
   const flagParts = new Map();
   const flagPatterns = [];
@@ -148,12 +150,13 @@ export function mapFlags(playing) {
       bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
     for (const part of component.parts) {
       if (!flagParts.has(part.countryId)) flagParts.set(part.countryId, []);
-      const d = part.rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join('');
+      const d = previousPaths?.get(part) ?? part.rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join('');
+      paths.set(part, d);
       flagParts.get(part.countryId).push({ id, d });
     }
   }
   const result = { flagParts, flagPatterns };
-  this.flagLayoutCache = { components, teams, playing, result };
+  this.flagLayoutCache = { components, teams, playing, result, paths };
   return result;
 }
 

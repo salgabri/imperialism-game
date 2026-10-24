@@ -138,6 +138,7 @@ function makeProximityGraph(nodes, maxGap) {
  * shared flag canvas, not newly filled land or a rectangle painted over water.
  * Create once per fitted geometry. Ownership regrouping has a current-result
  * cache; results are read-only and stable when ownership key order changes.
+ * A region that survives a regrouping unchanged keeps its object identity.
  */
 export function createFlagRegionIndex(countryShapes = [], { maxGap = 0 } = {}) {
   const gap = Number.isFinite(maxGap) ? Math.max(0, maxGap) : 0;
@@ -170,10 +171,14 @@ export function createFlagRegionIndex(countryShapes = [], { maxGap = 0 } = {}) {
         if (!groups.has(root)) groups.set(root, []);
         groups.get(root).push(i);
       }
+      // A region is a function of its key (its owner and pieces fix its nodes, in index order), so one the last
+      // board also had is handed back as the same object and keeps its per-region caches (the flag emblem layout).
+      const previous = new Map(lastComponents.map(component => [component.key, component]));
       const result = [...groups.values()].map(indices => {
         const ownerId = owners[indices[0]];
-        return {
-          key: `${ownerId}|${indices.flatMap(i => nodes[i].key.split('|').slice(1)).sort().join('|')}`,
+        const key = `${ownerId}|${indices.flatMap(i => nodes[i].key.split('|').slice(1)).sort().join('|')}`;
+        return previous.get(key) || {
+          key,
           ownerId,
           bbox: combineBounds(indices.map(i => nodes[i].bbox)),
           parts: indices.flatMap(i => nodes[i].parts),

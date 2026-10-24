@@ -145,6 +145,11 @@ test('a fit keeps only the flag region source: the first Flags view builds the i
     const index = app.flagComponents;
     countryOf(app, '276');
     assert.equal(app.flagComponents, index, 'built once per fit');
+    // A conquest regroups the regions; every part keeps its path (reused from the last layout).
+    app.setState({ own: { ...app.state.own, 276: '250' } });
+    assert.deepEqual(['250', '276', '826'].map(id => countryOf(app, id).flagParts.map(part => [part.id, part.d])), [
+      [['250-250-0', 'M80,80L120,80L120,120L80,120Z']], [['250-250-0', 'M180,80L220,80L220,120L180,120Z']],
+      [['826-826-0', 'M280,80L320,80L320,120L280,120Z']]]);
 
     // A country map's clubs fly their crests: its fit drops the world's index and keeps its own source instead.
     app.domesticMap = () => ({ geo: app.geo, sectionNames: { 250: 'Paris', 276: 'Berlin', 826: 'London' }, focus: null });
