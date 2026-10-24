@@ -11,7 +11,7 @@ import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomestic
 import { domesticEntry, domesticLabel } from './data/domesticScope.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, seasonSport, setSportOf, sportOf } from './engine/footballSets.js';
-import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
+import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport, matchSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
@@ -552,10 +552,10 @@ export default class App extends React.Component {
     }));
     this.flagLayoutCache = null;
     this.viewFocus = null;
-    // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together.
-    this.flagComponents = createFlagRegionIndex(this.labelGeometry, {
-      maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit,
-    });
+    // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. mapFlags builds
+    // that index from its source on the first Flags view: most games never show one.
+    this.flagComponents = null;
+    this.flagRegionSource = { geometry: this.labelGeometry, maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit };
     if (domestic) {
       // Setup shows no flags on a country map (its clubs carry crests, not flags). The opening camera leaves out far outliers.
       this.setupFlagOwnership = {};

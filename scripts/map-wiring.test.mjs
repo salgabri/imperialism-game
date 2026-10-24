@@ -127,6 +127,37 @@ test('Strength and Fronts modes recolour through the view-model; Flags keeps pas
   } finally { f.close(); }
 });
 
+test('a fit keeps only the flag region source: the first Flags view builds the index, a country map from its own', () => {
+  const f = fixture();
+  try {
+    const { app } = f;
+    app.geo.fitTo = () => {};
+    App.prototype.fitMap.call(app, IDS);
+    assert.equal(app.flagComponents, null, 'fitMap builds no flag index');
+    assert.deepEqual(app.flagRegionSource, { geometry: app.labelGeometry, maxGap: 180 });
+    app.mapCountries();
+    assert.equal(app.flagComponents, null, 'Political never builds it');
+    app.setState({ mapMode: 'flags' });
+    const france = countryOf(app, '250');
+    assert.ok(app.flagComponents, 'built on the first Flags view');
+    assert.equal(france.fill, 'transparent', 'the land shows its flag parts');
+    assert.equal(france.flagParts[0].d, 'M80,80L120,80L120,120L80,120Z');
+    const index = app.flagComponents;
+    countryOf(app, '276');
+    assert.equal(app.flagComponents, index, 'built once per fit');
+
+    // A country map's clubs fly their crests: its fit drops the world's index and keeps its own source instead.
+    app.domesticMap = () => ({ geo: app.geo, sectionNames: { 250: 'Paris', 276: 'Berlin', 826: 'London' }, focus: null });
+    app.domesticBackdrop = () => [];
+    app.geo.focusView = () => null;
+    App.prototype.fitMap.call(app, IDS);
+    assert.equal(app.flagComponents, null);
+    assert.deepEqual(app.flagRegionSource, { geometry: app.labelGeometry, maxGap: 180 });
+    assert.equal(countryOf(app, '250').flagParts[0].d, 'M80,80L120,80L120,120L80,120Z');
+    assert.ok(app.flagComponents && app.flagComponents !== index, 'the country fit builds its own index on a Flags view');
+  } finally { f.close(); }
+});
+
 test('tooltip copy comes from tooltipModel', () => {
   const f = fixture();
   try {

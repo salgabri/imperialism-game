@@ -10,6 +10,7 @@ import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { FLAG_CODES, flagUrl } from '../data/flags.js';
 import { FLAG_SYMBOLS } from '../data/flagSymbols.js';
 import { clubLogoUrl } from '../data/clubLogos.js';
+import { createFlagRegionIndex } from '../engine/flagRegions.js';
 import { layoutFlagSymbol } from '../engine/flagSymbolLayout.js';
 import { memo } from '../viewModels/format.js';
 import * as mapVM from '../viewModels/map.js';
@@ -113,8 +114,13 @@ export function handleMapMove(e) {
 export function mapFlags(playing) {
   const { mapMode, teams } = this.state;
   const empty = { flagParts: new Map(), flagPatterns: [] };
-  if (mapMode !== 'flags' || !this.flagComponents) return empty;
+  if (mapMode !== 'flags') return empty;
   if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return empty;
+  // The region index of this fit, built on its first Flags view (fitMap keeps only its source).
+  if (!this.flagComponents && this.flagRegionSource) {
+    this.flagComponents = createFlagRegionIndex(this.flagRegionSource.geometry, { maxGap: this.flagRegionSource.maxGap });
+  }
+  if (!this.flagComponents) return empty;
   // While signing, the projected board: the taken land already flies the winner's banner (DEC D15).
   const components = this.flagComponents.components(playing ? mapSnapshot(this).own : this.setupFlagOwnership);
   const cached = this.flagLayoutCache;
