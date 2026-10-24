@@ -209,41 +209,47 @@ function TeamShortlist({ id, title, teams }) {
 }
 
 /**
- * Step 1's country card: the chosen country's sections in their starting clubs' kick-off pastels over the neighbouring
- * land (`preview` from App, built by `setupModel.countryMapPreview`). Static and decorative — no camera, labels or
- * territory attributes; the description and stats carry the same facts in text. Memoised: App re-renders setup on
- * every state change, and `preview` keeps its identity per decoded map.
+ * Step 1's map card: the theatre's opening board, each starting territory in its team's kick-off pastel over the land
+ * nobody holds. A world theatre's `preview` comes from `setupModel.theatreMapPreview`, a country's from
+ * `setupModel.countryMapPreview` (its sections over the neighbouring land). Static and decorative — no camera, labels or
+ * territory attributes; the caption, description and stats carry the same facts in text. Memoised: App re-renders
+ * setup on every state change, and `preview` keeps its identity per board.
  */
-const CountryMap = React.memo(function CountryMap({ name, preview, loading }) {
+const TheatreMap = React.memo(function TheatreMap({ preview, caption, loading = false, kind }) {
   if (!preview && !loading) return null;
   return (
-    <figure className="setup-country-map" aria-hidden="true" data-state={preview ? 'ready' : 'loading'}>
+    <figure className="setup-map" aria-hidden="true" data-state={preview ? 'ready' : 'loading'} data-kind={kind}>
       {preview ? (
-        <svg className="setup-country-map__chart" viewBox={preview.viewBox} preserveAspectRatio="xMidYMid meet" focusable="false">
-          <g className="setup-country-map__backdrop">
+        <svg className="setup-map__chart" viewBox={preview.viewBox} preserveAspectRatio="xMidYMid meet" focusable="false">
+          <g className="setup-map__backdrop">
             {preview.backdrop.map((shape, index) => <path key={`${shape.id}-${index}`} d={shape.d} />)}
           </g>
-          <g className="setup-country-map__sections">
+          <g className="setup-map__sections">
             {preview.sections.map(section => <path key={section.id} d={section.d} fill={section.fill} />)}
           </g>
         </svg>
-      ) : <div className="setup-country-map__chart setup-country-map__placeholder" />}
-      <figcaption className="setup-country-map__caption">
-        {preview ? `${name} · ${preview.sections.length} sections, one per club` : `Loading the map of ${name}…`}
-      </figcaption>
+      ) : <div className="setup-map__chart setup-map__placeholder" />}
+      <figcaption className="setup-map__caption">{caption}</figcaption>
     </figure>
   );
 });
+
+/** The world card's caption: "Europe · 46 nations, each on its own land" (clubs are dealt out, README §The club layer). */
+function theatreCaption(model, preview) {
+  const teams = `${preview.teams} ${preview.teams === 1 ? model.noun : model.nouns}`;
+  return `${model.scopeName} · ${teams}${model.clubLayer ? ' dealt onto the nearest free land' : ', each on its own land'}`;
+}
 
 /**
  * The setup wizard. Props are App's (HEAD) setup props plus optional `onCancel` (header Cancel, only with a save) and
  * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
+ * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
-  domestic = IDLE_DOMESTIC, launching = false, restoring = false,
+  domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null,
 }) {
   const [step, setStep] = useState(1);
   const [confirmation, setConfirmation] = useState(null);
@@ -599,8 +605,10 @@ export default function SetupOverlay({
 
             <div className="setup-side">
               {model.country ? (
-                <CountryMap name={model.country.name} preview={domestic?.preview || null} loading={model.countryState === 'loading'} />
-              ) : null}
+                <TheatreMap kind="country" preview={domestic?.preview || null} loading={model.countryState === 'loading'}
+                  caption={domestic?.preview ? `${model.country.name} · ${domestic.preview.sections.length} sections, one per club`
+                    : `Loading the map of ${model.country.name}…`} />
+              ) : theatreMap ? <TheatreMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)} /> : null}
               <section className="setup-howto" aria-labelledby="setup-howto-title">
                 <Kicker id="setup-howto-title" title="How conquest works" />
                 <ol className="setup-rules">

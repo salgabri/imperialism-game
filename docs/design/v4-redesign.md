@@ -204,8 +204,11 @@ These settle layout questions the decisions above left open:
 
 - The your-turn and spectator panels are docked in the Map column. They
   replace the Next fixture block, and Fronts is hidden during a target choice.
-- The setup frame is opaque and the opening-partition preview map was dropped.
-  Match settings live in a `<details>` on step 2.
+- The setup frame is opaque. The opening-partition map behind it was dropped,
+  but step 1 leads its side column with a static map card of the chosen
+  theatre's opening board (the country card's world counterpart): each starting
+  territory in its kick-off pastel over unclaimed land, framed like the opening
+  camera. Match settings live in a `<details>` on step 2.
 - Space on a focused option in the conquest or target list still runs the
   primary action. Setup handles its own Space (next step / launch).
 - While a signing or target choice is pending, every nav entry except Map is

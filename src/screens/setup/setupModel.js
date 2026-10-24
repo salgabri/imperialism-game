@@ -210,6 +210,49 @@ export function countryMapPreview(domestic, backdrop = null) {
   return value;
 }
 
+const theatrePreviewCache = new WeakMap();
+/**
+ * Step 1's world card, the country card's counterpart for every world theatre: the opening board, each held
+ * territory in its team's kick-off pastel (`empireFill(teamId)`, DEC D18) over the land nobody holds. `countries` is the
+ * chart's draw order ([{ id }]); a shape comes from `paths` (the display atlas, as WorldMap draws it), else `basePaths`
+ * (the topology), both fitted. `own` is territory → team at kick-off (overseas territory included). The card frames
+ * `focus` (a fitted { x, y, w, h }) when given, else the main polygons of `frameIds`, the teams' starting land.
+ * Pure; memoised per opening board, paths and focus.
+ * → { viewBox, teams, sections: [{ id, d, fill }], backdrop: [{ id, d }] } | null
+ */
+export function theatreMapPreview({ countries, paths = null, basePaths, own, frameIds = [], focus = null } = {}) {
+  if (!Array.isArray(countries) || !basePaths || !own) return null;
+  const focusKey = focus ? [focus.x, focus.y, focus.w, focus.h].join(' ') : '';
+  const hit = theatrePreviewCache.get(own);
+  if (hit && hit.countries === countries && hit.paths === paths && hit.basePaths === basePaths
+    && hit.frameIds === frameIds && hit.focusKey === focusKey) return hit.value;
+  const pathOf = id => paths?.[id] || basePaths[id];
+  const sections = [], backdrop = [];
+  for (const { id } of countries) {
+    const d = pathOf(id)?.d;
+    if (!d) continue;
+    if (own[id]) sections.push(Object.freeze({ id, d, fill: empireFill(own[id]) }));
+    else backdrop.push(Object.freeze({ id, d }));
+  }
+  if (!sections.length) return null;
+  let box = focus && focus.w > 0 && focus.h > 0 ? focus : null;
+  if (!box) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const id of frameIds) {
+      const b = pathOf(id)?.bbox;
+      if (!b) continue;
+      x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.w); y1 = Math.max(y1, b.y + b.h);
+    }
+    box = Number.isFinite(x0) && x1 > x0 && y1 > y0 ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : { x: 0, y: 0, w: 960, h: 540 };
+  }
+  const pad = Math.max(box.w, box.h) * .04;
+  const viewBox = [box.x - pad, box.y - pad, box.w + pad * 2, box.h + pad * 2].map(n => Number(n.toFixed(1))).join(' ');
+  const value = Object.freeze({ viewBox, teams: new Set(Object.values(own)).size,
+    sections: Object.freeze(sections), backdrop: Object.freeze(backdrop) });
+  theatrePreviewCache.set(own, { countries, paths, basePaths, frameIds, focusKey, value });
+  return value;
+}
+
 /** Sport card subtitle, derived from the sport's own club data so it never overstates the leagues. */
 export function sportNote(sport) {
   const clubs = sport.clubs || [];

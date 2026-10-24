@@ -222,17 +222,18 @@
 .rule-note.setup-domestic__error { margin-top:10px; background:var(--panel); box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule); }
 .rule-note.setup-domestic__error > svg { color:var(--loss); }
 
-/* Step 1 country card: the chosen country's sections in their kick-off pastels over the neighbouring land. Static
-   (no camera, labels or territory attributes); one fixed frame so switching countries never moves the column. */
-.setup-country-map { margin:0; background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
-.setup-country-map__chart {
+/* Step 1 map card: the theatre's opening board — each starting territory (a world theatre's nations or clubs, a
+   country's sections) in its kick-off pastel over the land nobody holds. Static (no camera, labels or territory
+   attributes); one fixed frame so switching theatres never moves the column. */
+.setup-map { margin:0; background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
+.setup-map__chart {
   display:block; width:100%; height:auto; aspect-ratio:3 / 2; max-height:300px; background:var(--sea);
 }
-.setup-country-map__backdrop path {
+.setup-map__backdrop path {
   fill:var(--land-neutral); stroke:var(--map-coast); stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round;
 }
-.setup-country-map__sections path { stroke:#fff; stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round; }
-.setup-country-map__caption {
+.setup-map__sections path { stroke:#fff; stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round; }
+.setup-map__caption {
   padding:10px 14px; border-top:1px solid var(--rule); font:400 12px/1.4 var(--font-sans); color:var(--muted);
 }
 
