@@ -4,6 +4,7 @@ import TeamMark from './TeamMark.jsx';
 import { PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS } from './SetupOverlay.jsx';
 import SaveControls from './SaveControls.jsx';
 import { roman } from '../viewModels/format.js';
+import ThemeToggle from './ThemeToggle.jsx';
 import './masthead.css';
 
 const VIEWS = [['map', 'Map'], ['squad', 'Squad'], ['match', 'Match'], ['ledger', 'Ledger'], ['chronicle', 'Chronicle']];
@@ -66,7 +67,7 @@ export function SettingsPanel({
 }
 
 /**
- * v4 masthead (RM Part 2; DEC D11–D14). Row 1: wordmark · dateline · screen nav · primary (Space) · settings.
+ * v4 masthead (RM Part 2; DEC D11–D14). Row 1: wordmark · dateline · screen nav · primary (Space) · settings · theme.
  * Row 2: managed/followed team · stats · playback. Sizes switch in CSS only. The primary's textContent is
  * exactly `primary.mastLabel || primary.label`; the SPACE chip is CSS (`data-key-hint`), never a text node.
  * Must stay a plain function named CommandBar, rendered as a direct child of App's root (tests read its props).
@@ -146,6 +147,7 @@ export default function CommandBar(props) {
             </div>
           </div>
         </>}
+        <ThemeToggle className="mast__theme" />
       </div>
       {show && masthead && (
         <div className="mast__row2">

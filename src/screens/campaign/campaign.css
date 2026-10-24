@@ -71,7 +71,7 @@
   .v4-column--expanded {
     /* Slide up over the phone map row (--phone-map-h, tokens.css phone block), leaving the peek. */
     z-index:20; margin-top:calc(var(--col-sheet-peek) - var(--phone-map-h, 330px));
-    box-shadow:0 -1px 0 var(--rule), 0 -12px 32px rgba(17,20,23,.16);
+    box-shadow:var(--shadow-sheet);
   }
 }
 
@@ -205,7 +205,7 @@
 .ticker {
   --ticker-pad:12px; --ticker-cursor-w:7px; --ticker-cursor-h:14px;   /* 16/9/16 · 12/7/14 · 14/8/15 */
   height:var(--ticker-h); display:flex; align-items:center; overflow:hidden;
-  background:var(--ink); color:var(--surface);
+  background:var(--strip); color:var(--on-strip);
   font:400 var(--ticker-fs)/1 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:.03em;
   text-transform:uppercase; white-space:nowrap;
 }
@@ -217,7 +217,7 @@
 }
 .ticker__cursor {
   flex:none; display:block; width:var(--ticker-cursor-w); height:var(--ticker-cursor-h);
-  margin:0 10px 0 var(--ticker-pad); background:var(--surface);
+  margin:0 10px 0 var(--ticker-pad); background:var(--on-strip);
 }
 .ticker__text { min-width:0; overflow:hidden; white-space:pre; }
 .ticker__empty { color:rgba(245,245,242,.62); }
@@ -299,7 +299,7 @@
 .map-key__arrow { color:var(--ink); }
 .map-key__dash { display:block; }
 /* Capitals on the map are 3.8px #30363b squares with a white stroke; the key shows them at 6px (DEC D21). */
-.map-key__capital { width:6px; height:6px; margin:0 8px; background:var(--map-capital); box-shadow:0 0 0 .8px #fff; }
+.map-key__capital { width:6px; height:6px; margin:0 8px; background:var(--map-capital); box-shadow:0 0 0 .8px var(--map-halo); }
 
 @media (min-width:1600px) {
   .map-key { padding:12px 16px 14px; font-size:14px; }
