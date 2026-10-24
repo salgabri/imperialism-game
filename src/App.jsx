@@ -583,13 +583,15 @@ export default class App extends React.Component {
   /**
    * Show the chosen theatre on the setup map: the world, or a country's sections
    * in their clubs' colours. A country that has not loaded yet loads here while
-   * the world stays on screen; a result the player has since moved away from is
-   * ignored. `refit` reframes even when the geometry does not change.
+   * the map stays as it was (the wizard hides it, so a country shown before is not
+   * swapped for a world refit in between; a failed load ends on the world); a result
+   * the player has since moved away from is ignored. `refit` reframes even when the
+   * geometry does not change.
    */
   showSetupMap(setup = this.state.setup, refit = false) {
     const id = domesticIdOf(setup), token = ++this.setupMapToken;
     const loaded = id ? getLoadedDomestic(id) : null;
-    const shown = loaded ? id : null;
+    const shown = loaded ? id : id && this.domesticId ? this.domesticId : null;
     if (refit || shown !== this.domesticId) {
       this.useGeometry(shown);
       this.fitMap(Object.keys(NATIONS));
@@ -604,6 +606,10 @@ export default class App extends React.Component {
     // only the one the player stays on.
     this.setupLoadTimer = setTimeout(() => current() && this.loadCountry(id).then(() => { if (current()) this.showSetupMap(); }, error => {
       if (!current()) return;
+      if (this.domesticId) {
+        this.useGeometry(null);
+        this.fitMap(Object.keys(NATIONS));
+      }
       const name = domesticEntry(setup.clubScope)?.name || 'this country';
       this.setState({ domesticLoad: { id, state: 'error', message: `The map of ${name} could not be loaded. ${error.message || error}` } });
     }), SETUP_LOAD_DELAY_MS);

@@ -1149,6 +1149,39 @@ test('a campaign keeps only its own country map decoded; the setup screen loads 
   });
 });
 
+test('the setup map keeps the shown country while the next one loads; a failed load ends on the world', async () => {
+  await withCountry(async ({ app, time }) => {
+    const settle = () => new Promise(resolve => setImmediate(resolve));
+    app.pickSetup('clubScope', 'domestic:528');
+    time.advance(200);
+    const netherlands = await app.loadCountry('528');
+    await settle();
+    assert.equal(app.geo, netherlands.geo);
+    // The wizard hides the map: no world refit in between, only the card says it is loading.
+    app.pickSetup('clubScope', 'domestic:056');
+    assert.equal(app.domesticStatus().state, 'loading');
+    assert.equal(app.domesticStatus().preview, null);
+    assert.deepEqual(app.setupTeams(), []);
+    assert.equal(app.geo, netherlands.geo, 'the shown country stays on the hidden map');
+    time.advance(200);
+    const belgium = await app.loadCountry('056');
+    await settle();
+    assert.equal(app.geo, belgium.geo);
+    assert.equal(app.domesticStatus().state, 'ready');
+    // A map that cannot load: the error is shown over the world, as when it was picked from the world.
+    const serve = globalThis.fetch;
+    globalThis.fetch = async url => /620\.json$/.test(url) ? { ok: false, status: 503 } : serve(url);
+    app.pickSetup('clubScope', 'domestic:620');
+    assert.equal(app.geo, belgium.geo);
+    time.advance(200);
+    await app.loadCountry('620').catch(() => {});
+    await settle();
+    assert.equal(app.domesticStatus().state, 'error');
+    assert.equal(app.domesticId, null);
+    assert.equal(app.geo, app.worldGeo, 'the world is back behind the error');
+  });
+});
+
 test('phone bar minute: floored at the last revealed event', async () => {
   await withApp(manager, ({ app }) => {
     app.setState({ match: { aId: '250', dId: '276', applied: false, done: false, shown: [{ m: 12 }, { m: 37 }, { m: 30 }] } });
