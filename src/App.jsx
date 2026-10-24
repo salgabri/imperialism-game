@@ -1663,13 +1663,14 @@ export default class App extends React.Component {
         label: `${currentCard.a.name} ${currentCard.a.score}, ${currentCard.b.name} ${currentCard.b.score}` } : null,
       onSpeed: () => this.cycleSpeed(), onStep: () => this.step(), onPlay: () => this.togglePlay(), onPause: () => this.pausePlayback() };
     const settingsProps = {                              // shared by the masthead popover and the phone More sheet (A-10)
-      pacing: st.settings.pacing, resolution: st.settings.resolution, confirmNew: st.confirmNew,
-      busy: liveMatch || !!st.spin || !!st.tacticalChoice || !!st.choice || !!st.pendingTarget, completed,
-      onPacing: p => this.setSetting('pacing', p), onResolution: r => this.setSetting('resolution', r),
+      confirmNew: st.confirmNew, completed,
+      // Exactly when setSetting refuses a `resolution` change: a draw in progress or an unapplied match.
+      busy: liveMatch || !!st.spin,
       onNew: () => this.newCampaign(), onCancelNew: () => this.setState({ confirmNew: false }),
       saveStatus: st.saveStatus, onExport: () => this.exportProgress(), onImport: file => this.importProgress(file),
       onResults: () => this.setState({ phase: 'victory' }), seed: st.seed, settings: st.settings,
       onSetting: (key, value) => this.setSetting(key, value), managementEnded: st.managementEnded,
+      managedName: st.teams?.[st.managedTeamId]?.name || null,
       onManageSaves: () => this.openStorageDialog('slots') };
     const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore}
       eventsRef={this.eventsRef} onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} /> : null;

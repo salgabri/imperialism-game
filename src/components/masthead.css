@@ -134,10 +134,18 @@
 }
 
 /* ---------- SettingsPanel (popover body and phone More sheet, A-10) ---------- */
-.settings-panel { display:flex; flex-direction:column; gap:12px; font-size:14px; }
+.settings-panel { display:flex; flex-direction:column; gap:18px; font-size:14px; }
+.settings-panel__section { display:flex; flex-direction:column; gap:10px; }
+.settings-panel__kicker { margin:0; }
 .settings-panel__note { margin:0; font-size:12px; line-height:1.45; color:var(--muted); }
-.settings-panel__seed strong { color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums; }
-.settings-panel__rules { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px 14px; }
+/* "This campaign": the launch rules as read-only label / value rows. */
+.settings-panel__facts {
+  display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 16px; margin:0; font:400 13px/1.4 var(--font-sans);
+}
+.settings-panel__facts > div { display:contents; }
+.settings-panel__facts dt { color:var(--muted); white-space:nowrap; }
+.settings-panel__facts dd { margin:0; min-width:0; color:var(--ink); }
+.settings-panel__facts dd.num { font-variant-numeric:tabular-nums; }
 .settings-panel__new { display:flex; flex-direction:column; gap:8px; padding-top:14px; border-top:1px solid var(--rule); }
 .settings-panel__new p { margin:0; font-size:12px; line-height:1.45; color:var(--text-2); }
 .settings-panel__new .button { width:100%; }

@@ -1,4 +1,4 @@
-/* Owner: WP-SETUP (see PLAN.md §4). Setup wizard (.setup-*, .rule-*, .spectator-note; SaveControls classes only nested under .setup-overlay). */
+/* Owner: WP-SETUP (see PLAN.md §4). Setup wizard (.setup-*, .rule-*; SaveControls classes only nested under .setup-overlay). */
 /* Board-12 frame (M§3.2) for all three steps (A-5), v4 tokens, square corners. Base = std (1200–1599); wide ≥1600;
    tablet 700–1199 (rail → 3-step bar, one column); phone <700 (56px primary bar). */
 
@@ -118,7 +118,7 @@
   clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; opacity:0; pointer-events:none;
 }
 
-/* ---- Option cards: rules, roles (M§3.4) and sports (board 02) ---- */
+/* ---- Option cards: the draw, opponents, roles (M§3.4) and sports (board 02) ---- */
 .setup-card-grid { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:12px; }
 .rule-card {
   --setup-card-bg:var(--panel);
@@ -127,15 +127,14 @@
   border:0; border-radius:0; background:var(--setup-card-bg); box-shadow:inset 0 0 0 1px var(--rule);
   color:var(--text-2); text-align:left; cursor:pointer;
 }
-.rule-card:hover:not(:disabled):not([aria-checked=true]) { box-shadow:inset 0 0 0 1px var(--control-line); }
+.rule-card:hover:not([aria-checked=true]) { box-shadow:inset 0 0 0 1px var(--control-line); }
 .rule-card[aria-checked=true] { --setup-card-bg:var(--you-soft); box-shadow:inset 0 0 0 1.5px var(--you); }
-.rule-card:disabled { cursor:default; }
 .rule-card__title {
   display:block; padding-right:32px; color:var(--text-2);
   font:700 24px/1.1 var(--font-sans); letter-spacing:-.01em;
 }
 .rule-card__body { display:block; margin-top:8px; font:400 13px/1.5 var(--font-sans); color:var(--muted); }
-.rule-card__tag + .rule-card__body, .rule-dots + .rule-card__body { margin-top:0; }
+.rule-card__tag + .rule-card__body, .rule-dots + .rule-card__body, .rule-dots + .rule-card__tag { margin-top:0; }
 .rule-card[aria-checked=true] .rule-card__title { color:var(--ink); }
 .rule-card[aria-checked=true] .rule-card__body { color:var(--text-2); }
 .rule-card__tag {
@@ -145,8 +144,8 @@
 .rule-card__tag--you { color:var(--you-text); }
 .rule-dots { display:flex; gap:5px; margin:10px 0; }
 .rule-dot { display:block; width:14px; height:14px; flex:none; box-shadow:inset 0 0 0 1px var(--control-line); }
-/* Round robin squares are always `you` (the ring gap follows the card: panel, or you-soft when selected);
-   Random draw's filled squares are `muted` until that card is selected (M§3.4). */
+/* Filled squares are `you` (the ring gap follows the card: panel, or you-soft when selected); the random draws'
+   (`rand`: Random draw, Chaos draw) are `muted` until that card is selected (M§3.4). */
 .rule-dot--on { background:var(--you); box-shadow:none; }
 .rule-dot--current { background:var(--you); box-shadow:0 0 0 2px var(--setup-card-bg), 0 0 0 3px var(--you); }
 .rule-card[data-dots=rand]:not([aria-checked=true]) .rule-dot--on { background:var(--muted); }
@@ -258,14 +257,6 @@
 .setup-stat dd { margin:4px 0 0; font:600 30px/1.1 var(--font-narrow); color:var(--ink); white-space:nowrap; }
 .setup-stat--small dd { margin-top:8px; font-size:19px; line-height:1.2; }
 .setup-estimate__note { margin:8px 0 0; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
-.setup-summary {
-  display:grid; grid-template-columns:auto minmax(0, 1fr); gap:9px 22px; margin:4px 0 0;
-  padding-top:16px; border-top:1px solid var(--rule); font:400 14px/1.4 var(--font-sans);
-}
-.setup-summary--plain { margin-top:0; padding-top:0; border-top:0; }
-.setup-summary__row { display:contents; }
-.setup-summary dt { color:var(--muted); white-space:nowrap; }
-.setup-summary dd { margin:0; min-width:0; color:var(--ink); }
 
 /* Saves: SaveControls restyled inside setup only (its classes belong to WP-LEDGER). */
 .setup-overlay .save-controls { display:flex; flex-direction:column; gap:6px; }
@@ -292,64 +283,20 @@
 .setup-save__text p { margin:4px 0 0; font:400 14px/1.4 var(--font-sans); color:var(--ink); }
 .setup-save__actions { margin-left:auto; flex:none; display:flex; align-items:center; gap:16px; }
 
-/* ---- Step 2: Rules of war (board 12) ---- */
+/* ---- Step 2: Rules of war (the draw) and step 3's opponent choice ---- */
 .rule-note {
   display:flex; align-items:flex-start; gap:12px; padding:12px 16px;
   background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); color:var(--text-2);
 }
 .rule-note > svg { flex:none; margin-top:1px; color:var(--you-text); }
 .rule-note p { margin:0; font:400 13px/1.5 var(--font-sans); }
-/* Inline on fine pointers (the primitive's min-height is var(--tap) = 0 there). On phone / coarse pointers it is the
-   only in-place way out of the DEC D2 disabled state, so it gets its own 44px line instead of a squeezed inline link. */
+/* Inline on fine pointers (the primitive's min-height is var(--tap) = 0 there). On phone / coarse pointers "Change the
+   draw" (step 3, a manager under Blitz or Chaos) gets its own 44px line instead of a squeezed inline link. */
 .rule-note__action { font-size:13px; }
 @media (max-width:699.98px), (pointer:coarse) {
   .rule-note__action { display:flex; width:max-content; max-width:100%; margin-top:2px; min-height:max(44px, var(--tap)); }
 }
-.spectator-note {
-  display:flex; align-items:flex-start; gap:14px; padding:14px 16px;
-  background:var(--surface-2); color:var(--text-2);
-}
-.spectator-note__icon { flex:none; margin-top:1px; color:var(--you-text); }
-.spectator-note p { margin:0; font:400 13px/1.5 var(--font-sans); }
-.spectator-note b { font-weight:600; color:var(--ink); }
-
-.rule-explainer__title { margin:0; font:700 26px/1.15 var(--font-sans); letter-spacing:-.02em; color:var(--ink); }
-.rule-explainer__sub { margin:4px 0 0; font:400 13px/1.45 var(--font-sans); color:var(--muted); }
-.rule-matrix { display:grid; grid-template-columns:104px minmax(0, 1fr) minmax(0, 1fr); gap:10px; }
-.rule-matrix__head, .rule-matrix__row {
-  white-space:nowrap; font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
-}
-.rule-matrix__head { align-self:end; }
-.rule-matrix__row { align-self:center; }
-.rule-matrix__cell {
-  display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start;
-  min-width:0; min-height:150px; padding:14px; margin:0;
-  border:0; border-radius:0; background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule);
-  color:var(--text-2); text-align:left; cursor:pointer;
-}
-.rule-matrix__cell:hover:not(:disabled):not([aria-checked=true]) { box-shadow:inset 0 0 0 1px var(--control-line); }
-.rule-matrix__cell[aria-checked=true] { background:var(--you-soft); box-shadow:inset 0 0 0 1.5px var(--you); }
-.rule-matrix__cell:disabled { cursor:default; }
-.rule-matrix__title { display:block; font:700 19px/1.2 var(--font-sans); color:var(--text-2); }
-.rule-matrix__body { display:block; margin-top:6px; font:400 13px/1.5 var(--font-sans); color:var(--muted); }
-.rule-matrix__cell[aria-checked=true] .rule-matrix__title { color:var(--ink); }
-.rule-matrix__cell[aria-checked=true] .rule-matrix__body { color:var(--text-2); }
-/* M§3.5 tags are nowrap: each band sizes them to fit their cell (low std band and phone below); only phones narrower
-   than the 390 target fall back to wrapping rather than spilling out of the cell. */
-.rule-matrix__tag {
-  display:block; margin-top:8px; white-space:nowrap;
-  font:700 12px/1.3 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
-}
-.rule-matrix__tag--you { color:var(--you-text); }
-/* The board's " · selected" tag suffix, drawn as its own status line so the tag itself never wraps. */
-.rule-matrix__selected {
-  display:flex; align-items:center; gap:6px; margin-top:4px; white-space:nowrap;
-  font:700 12px/1.3 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--you-text);
-}
-.rule-matrix__check { flex:none; width:13px; height:13px; display:grid; place-items:center; background:var(--you); color:#fff; }
-.rule-matrix__check svg { width:9px; height:9px; }
-
-/* Match settings disclosure (keeps every legacy field id, PLAN §4.7) */
+/* More rules disclosure (keeps every legacy field id, PLAN §4.7) */
 .setup-advanced { border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
 .setup-advanced > summary {
   display:flex; align-items:center; gap:10px; min-height:max(44px, var(--tap)); padding:0 2px;
@@ -365,12 +312,15 @@
 }
 .setup-settings-fields { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px 22px; padding:8px 0 20px; }
 .setup-settings-fields .control-help { font-size:12px; }
-.setup-express { align-self:start; }
 
-/* ---- Step 3: Nation & role (board 03, restyled) ---- */
-.setup-role-note {
-  margin:0; padding:14px 16px; background:var(--surface-2);
-  font:400 13px/1.5 var(--font-sans); color:var(--text-2);
+/* ---- Step 3: Your role (board 03, restyled) ---- */
+/* A manager's opponent choice sits under the role cards, before the team list (above the fold on phones too). Scoped:
+   `.control-help { margin:0 }` (primitives.css) loads after this file. */
+.setup-opponents .setup-opponents__help { display:block; margin-top:8px; }
+/* Two columns (≥1200): the team list gives up the opponent block's ~116px, so its bottom edge and the help under it
+   stay inside the step body at 1440 × 900 instead of leaving a nested scroller cut by the fold. */
+@media (min-width:1200px) {
+  .setup-opponents + .setup-group--list { --setup-list-h:clamp(228px, calc(100dvh - 640px), 456px); }
 }
 .setup-teams {
   max-height:var(--setup-list-h); overflow-y:auto; overscroll-behavior:contain;
@@ -441,7 +391,6 @@
 .setup-front__rel[data-tone=loss] { color:var(--loss); }
 .setup-front__rel[data-tone=gain] { color:var(--gain); }
 .setup-fronts__empty { margin:6px 0 0; font:400 13px/1.45 var(--font-sans); color:var(--text-2); }
-.setup-pick__note { margin:0; padding:14px 24px 18px; font:400 12px/1.5 var(--font-sans); color:var(--muted); }
 .setup-pick--empty { padding:22px 24px; }
 .setup-pick__placeholder { margin:6px 0 0; font:400 14px/1.45 var(--font-sans); color:var(--text-2); }
 
@@ -453,22 +402,16 @@
 }
 .setup-shortlist__name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:400 14px/1.2 var(--font-sans); }
 
-/* ---- Low std band 1200–1399: board 12 is drawn at 1440 and its 24px / 19px titles hold one line from ~1390 up.
-   Below that, tighten the rail and paddings and step the titles down so every option-card and matrix title holds one
-   line down to 1200 (measured in Chrome: "Random draw" 136px at 21px, "Your front, your call" 146px at 16px).
-   The rail text column is 146px here (224 − 2×12 − 10 − 6 − 28 badge − 10 gap), so the 12px subtitles hold one line
-   ("Football · Nations · Europe" 141px, "Turn order, targeting, odds" 139px); matrix cells are ≥159px inside at 1200,
-   so the 11px tags do too ("Spectator-ready · classic" 152px at 11px / .06em; 178px at 12px / .1em). ---- */
+/* ---- Low std band 1200–1399: board 12 is drawn at 1440 and its 24px titles hold one line from ~1390 up. Below that,
+   tighten the rail and paddings and step the titles down so every option-card title holds one line down to 1200
+   (measured in Chrome: "Random draw" 136px at 21px). The rail text column is 146px here (224 − 2×12 − 10 − 6 − 28 badge
+   − 10 gap), so the 12px subtitles hold one line ("Football · Nations · Europe" 141px). ---- */
 @media (min-width:1200px) and (max-width:1399.98px) {
   .setup-overlay { --setup-rail-w:224px; --setup-main-pad:28px; --setup-side-pad:28px 28px 28px 0; }
   .setup-rail { padding:28px 12px; }
   .setup-rail__step { gap:10px; padding:14px 6px 14px 10px; }
   .setup-rail__sub { font-size:12px; }
   .rule-card__title, .setup-card__button { font-size:21px; padding-right:26px; }
-  .rule-matrix { grid-template-columns:92px minmax(0, 1fr) minmax(0, 1fr); column-gap:8px; }
-  .rule-matrix__cell { padding:12px; }
-  .rule-matrix__title { font-size:16px; }
-  .rule-matrix__tag, .rule-matrix__selected { font-size:11px; letter-spacing:.06em; }
 }
 
 /* ---- Tablet 700–1199: rail → horizontal 3-step bar, one column (M§8) ---- */
@@ -509,7 +452,7 @@
   .setup-foot .setup-foot__back { flex:none; padding:0 20px; border:0; border-right:1px solid var(--rule); background:var(--panel); }
   .setup-foot .setup-foot__back:hover:not(:disabled) { background:var(--ink); color:#fff; }
   .setup-foot .setup-foot__next { flex:1 1 auto; min-width:0; justify-content:space-between; padding:0 18px; }
-  /* "Next: Nation & role" plus its hint must never push the bar past the screen edge: the hint gives way first, with an
+  /* "Next: Your role" plus its hint must never push the bar past the screen edge: the hint gives way first, with an
      ellipsis (the narrow rule below keeps it whole down to 360). */
   .setup-foot .btn-primary[data-bar-hint]::after {
     content:attr(data-bar-hint); display:block; flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
@@ -523,14 +466,6 @@
   .setup-stat dd { font-size:24px; }
   .setup-stat--small dd { font-size:16px; }
   .setup-stat + .setup-stat { padding-left:12px; }
-  .rule-matrix { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
-  .rule-matrix__corner { display:none; }
-  .rule-matrix__row { grid-column:1 / -1; margin-top:6px; }
-  .rule-matrix__cell { min-height:0; padding:12px; }
-  .rule-matrix__title { font-size:16px; }
-  /* 2-up cells are 149px inside at 390 (354 − 8 gap, ÷2, − 2×12): "Spectator-ready · classic" is 146.7px at
-     11px / .04em (152px at .06em, 178px at 12px / .1em; measured in Chrome), so the nowrap tag holds one line. */
-  .rule-matrix__tag, .rule-matrix__selected { font-size:11px; letter-spacing:.04em; }
   .setup-settings-fields { grid-template-columns:minmax(0, 1fr); }
   .setup-save, .setup-confirmation { flex-direction:column; align-items:stretch; gap:12px; }
   .setup-save__actions { margin-left:0; justify-content:space-between; }
@@ -538,14 +473,11 @@
   .setup-pick__name { font-size:28px; }
   .setup-pick__stats > div { padding-left:18px; }
   .setup-pick__players, .setup-pick__fronts { padding:14px 18px 6px; }
-  .setup-pick__note { padding:12px 18px 16px; }
   .setup-pick--empty { padding:18px; }
 }
 
-/* ---- Below the 390 phone target (e.g. 360 Android): the longest tag no longer fits its cell, so let it wrap
-   instead of spilling into the next cell (it still fits on one line down to ~386). ---- */
+/* ---- Below the 390 phone target (e.g. 360 Android): tighten the step bar. ---- */
 @media (max-width:389.98px) {
-  .rule-matrix__tag { white-space:normal; }
   /* At 360 the step-2 bar had ~41px for its 59px "Step 2 of 3" hint: tighter bar padding gives it the missing 24px. */
   .setup-foot .setup-foot__back { padding:0 14px; }
   .setup-foot .setup-foot__next { padding:0 12px; }

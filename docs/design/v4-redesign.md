@@ -50,10 +50,15 @@ gold-trimmed "war room" look.
   `createTargetedDraw` consumes none. Views, view-models and Space handling never
   touch `this.rng`.
 - **D2 — The rules apply to `pacing: 'duel'` only.** Blitz and chaos are
-  normalised to random/compass at launch, and setup shows the rule cards
-  disabled with a note. Spectator + "You choose" is allowed in setup but
-  normalised to compass at launch: spectators always use the compass. After
-  `continueAsSpectator` (`managementEnded`), targeting falls back to compass.
+  normalised to random/compass at launch. Setup offers pacing and turn order as
+  one choice, four draw cards (Random draw, Round robin, Blitz round, Chaos
+  draw), so no rule card is ever disabled. "You choose" is offered only on the
+  Your role step, to a manager under a one-match draw. A stored "player" left
+  by an earlier choice is still normalised to compass at launch, so spectators
+  always use the compass. After `continueAsSpectator` (`managementEnded`),
+  targeting falls back to compass. *(Setup half amended 2026-10-24 by the
+  settings simplification, which dropped the 2×2 rules matrix; the engine half
+  and `launchRules` are unchanged.)*
 - **D3 — Round robin.** The queue holds survivors sorted by starting strength
   (`baseEff`, fallback `teamEff`) descending, then name, then id. It is rebuilt
   at each round boundary, and `round` counts cycles. Random mode keeps one round
@@ -205,13 +210,16 @@ These settle layout questions the decisions above left open:
 - The your-turn and spectator panels are docked in the Map column. They
   replace the Next fixture block, and Fronts is hidden during a target choice.
 - The setup frame is opaque and the opening-partition preview map was dropped.
-  Match settings live in a `<details>` on step 2.
+  Step 2 shows the four draw cards, a visible Show matches control (`resolution`
+  and `express` as Live / Final score only / Fast-forward) and a collapsed
+  **More rules** `<details>`; the manager's opponent choice is on step 3.
 - Space on a focused option in the conquest or target list still runs the
   primary action. Setup handles its own Space (next step / launch).
 - While a signing or target choice is pending, every nav entry except Map is
   disabled.
-- The phone More sheet reuses the masthead's settings panel and adds the
-  Chronicle link and playback.
+- The phone More sheet reuses the masthead's settings panel (Show matches, a
+  read-only This campaign list, Saves, New campaign) and adds the Chronicle
+  link and playback.
 - The map key follows the map mode. Changing speed during a live match
   reschedules the rest of it from the current minute.
 - The turn strip shows on the Map view only. Under a random draw only

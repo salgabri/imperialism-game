@@ -1,6 +1,6 @@
-// Owner: WP-SETUP (see PLAN.md §4). Three-step campaign setup (PLAN A-5): Campaign → Rules → Nation & role, in the
+// Owner: WP-SETUP (see PLAN.md §4). Three-step campaign setup (PLAN A-5): Campaign → Rules → Your role, in the
 // board-12 frame and v4 tokens. Every step stays mounted (inactive ones carry `hidden`) so the DOM contract of PLAN
-// §4.7 holds on every step: theatre, match settings, managed team and the `Launch campaign` submit button.
+// §4.7 holds on every step: theatre, the draw and match settings, managed team and the `Launch campaign` submit button.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
@@ -8,14 +8,17 @@ import TeamMark from './TeamMark.jsx';
 import * as setupModel from '../screens/setup/setupModel.js';
 import './setup.css';
 
-// Frozen named exports (CommandBar imports the option lists). Definitions live in the pure model module.
+// Frozen named exports (kept for the module contract). Definitions live in the pure model module.
 export const PACING_OPTIONS = setupModel.PACING_OPTIONS;
 export const RESOLUTION_OPTIONS = setupModel.RESOLUTION_OPTIONS;
 export const PACING_HELP = setupModel.PACING_HELP;
 export const campaignPreview = setupModel.campaignPreview;
 export const domesticDescription = setupModel.domesticDescription;
 
-const { SETUP_STEPS, TURN_ORDER_CARDS, TARGETING_CARDS, ROLE_CARDS, CONQUEST_RULES, UNCERTAINTY_HELP, FINALE_HELP } = setupModel;
+const {
+  SETUP_STEPS, DRAW_CARDS, TARGETING_CARDS, ROLE_CARDS, CONQUEST_RULES, UNCERTAINTY_OPTIONS, UNCERTAINTY_HELP, FINALE_OPTIONS,
+  FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, SHOW_MATCH_OPTIONS, showMatchesWrites,
+} = setupModel;
 
 /** Focus inside one of these keeps Space for itself (A-8). */
 const SPACE_IGNORE = 'input, select, textarea, button, summary, a[href], [role="radio"], [role="button"], [role="dialog"], [aria-modal="true"], [contenteditable]:not([contenteditable="false"])';
@@ -38,15 +41,6 @@ function CheckMark() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 5 5 9-10" /></svg>
-  );
-}
-
-function EyeMark() {
-  return (
-    <svg className="spectator-note__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" />
-    </svg>
   );
 }
 
@@ -92,9 +86,9 @@ function Kicker({ id, title, aside }) {
 }
 
 /** Board-12 option card: the whole card is the radio (M§3.4). */
-function OptionCard({ idBase, card, checked, disabled = false, onSelect }) {
+function OptionCard({ idBase, card, checked, onSelect }) {
   return (
-    <button type="button" role="radio" aria-checked={checked} tabIndex={checked ? 0 : -1} disabled={disabled}
+    <button type="button" role="radio" aria-checked={checked} tabIndex={checked ? 0 : -1}
       className="rule-card" data-dots={card.dotStyle} aria-labelledby={`${idBase}-title`}
       aria-describedby={card.tag ? `${idBase}-tag ${idBase}-body` : `${idBase}-body`}
       onClick={() => { if (!checked) onSelect(card.value); }} onKeyDown={moveRadio}>
@@ -116,16 +110,6 @@ function RailSummary({ text }) {
   return String(text).split(' · ').map((part, index) => (
     <React.Fragment key={index}>{index ? ' · ' : null}<span className="setup-rail__part">{part}</span></React.Fragment>
   ));
-}
-
-function SummaryList({ rows, className = '' }) {
-  return (
-    <dl className={`setup-summary ${className}`.trim()}>
-      {rows.map(([label, value]) => (
-        <div className="setup-summary__row" key={label}><dt>{label}</dt><dd>{value}</dd></div>
-      ))}
-    </dl>
-  );
 }
 
 function TeamRowMark({ team, width = 24 }) {
@@ -185,7 +169,6 @@ function SelectedTeam({ team, noun }) {
           ) : <p className="setup-fronts__empty">No land borders — every war goes by sea.</p>}
         </div>
       ) : null}
-      <p className="setup-pick__note">You pick the approach before each match and the signing after each win.</p>
     </section>
   );
 }
@@ -295,9 +278,15 @@ export default function SetupOverlay({
     if (target !== 1) setConfirmation(null);
     setStep(target);
   }
-  function chooseCell(cell) {
-    choose('turnOrder', cell.turnOrder, rules.stored.turnOrder);
-    choose('targeting', cell.targeting, rules.stored.targeting);
+  /** A draw card writes its pacing and, for a one-match draw, its turn order (only the keys that change). */
+  function chooseDraw(value) {
+    const card = DRAW_CARDS.find(item => item.value === value);
+    if (!card) return;
+    choose('pacing', card.pacing, rules.pacing);
+    if (card.turnOrder) choose('turnOrder', card.turnOrder, rules.stored.turnOrder);
+  }
+  function showMatches(mode) {
+    for (const [key, value] of showMatchesWrites(mode, setup)) pick(key, value);
   }
 
   useEffect(() => { startRef.current = onStart; });
@@ -400,61 +389,45 @@ export default function SetupOverlay({
     );
   }
 
-  const advancedFields = (
+  const moreRules = (
     <details className="setup-advanced">
       <summary>
         <Icon name="chevron" size={16} />
-        <span className="setup-advanced__title">Match settings</span>
-        <small className="setup-advanced__values">{model.pacingName} · {model.resolutionName}</small>
+        <span className="setup-advanced__title">More rules</span>
+        <small className="setup-advanced__values" title={model.moreRules}>{model.moreRules}</small>
       </summary>
       <div className="setup-settings-fields">
-        <label className="control-field" htmlFor="setup-pacing"><span>Pacing</span>
-          <select id="setup-pacing" value={model.pacing} onChange={event => pick('pacing', event.target.value)}>
-            {PACING_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-          </select>
-          <small className="control-help">{PACING_HELP[model.pacing] || PACING_HELP.duel}</small>
-        </label>
-        <label className="control-field" htmlFor="setup-resolution"><span>Match display</span>
-          <select id="setup-resolution" value={model.resolution} onChange={event => pick('resolution', event.target.value)}>
-            {RESOLUTION_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-          </select>
-          <small className="control-help">{model.resolution === 'instant' ? 'Results appear at once.' : 'Events appear at their minute; Finish match reveals the result.'}</small>
-        </label>
-        <label className="control-field" htmlFor="setup-uncertainty"><span>Match uncertainty</span>
+        <label className="control-field" htmlFor="setup-uncertainty"><span>Upsets</span>
           <select id="setup-uncertainty" value={model.uncertainty} onChange={event => pick('uncertainty', event.target.value)}>
-            <option value="predictable">Predictable</option><option value="balanced">Balanced</option><option value="wild">Wild</option>
+            {UNCERTAINTY_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
           </select>
           <small className="control-help">{UNCERTAINTY_HELP[model.uncertainty]}</small>
         </label>
-        <label className="control-field" htmlFor="setup-finale"><span>Final two teams</span>
+        <label className="control-field" htmlFor="setup-finale"><span>Final</span>
           <select id="setup-finale" value={model.finale} onChange={event => pick('finale', event.target.value)}>
-            <option value="single">Single match</option><option value="best-of-three">Best of three</option>
+            {FINALE_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
           </select>
           <small className="control-help">{FINALE_HELP[model.finale]}</small>
         </label>
-        <label className="control-field" htmlFor="setup-recruitment"><span>Automatic recruitment</span>
-          <select id="setup-recruitment" value={setup.acquisitionPolicy || 'highest-rated'} onChange={event => pick('acquisitionPolicy', event.target.value)}>
-            <option value="highest-rated">Highest rated player</option><option value="best-fit">Best fit for the starting lineup</option>
+        <label className="control-field" htmlFor="setup-recruitment"><span>Computer signings</span>
+          <select id="setup-recruitment" value={model.acquisitionPolicy} onChange={event => pick('acquisitionPolicy', event.target.value)}>
+            {RECRUITMENT_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
           </select>
-          <small className="control-help">Applies to teams without a manager. Best fit maximizes legal lineup improvement, then rating.</small>
+          <small className="control-help">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
         </label>
         {model.sport.id === 'basketball' ? (
-          <label className="control-field" htmlFor="setup-roster-preset"><span>Starting ratings</span>
-            <select id="setup-roster-preset" value={setup.rosterPreset || 'authentic'} onChange={event => pick('rosterPreset', event.target.value)}>
-              <option value="authentic">Authentic</option><option value="competitive">Competitive field</option>
+          <label className="control-field" htmlFor="setup-roster-preset"><span>Team strengths</span>
+            <select id="setup-roster-preset" value={model.rosterPreset} onChange={event => pick('rosterPreset', event.target.value)}>
+              {ROSTER_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
             </select>
-            <small className="control-help">Competitive narrows the strength gaps between teams and preserves player differences within each roster.</small>
+            <small className="control-help">{ROSTER_HELP[model.rosterPreset]}</small>
           </label>
         ) : null}
-        <label className="control-field" htmlFor="setup-seed"><span>Campaign seed</span>
-          <input id="setup-seed" type="number" min="1" max="4294967295" step="1" inputMode="numeric" placeholder="Random seed"
+        <label className="control-field" htmlFor="setup-seed"><span>Seed (optional)</span>
+          <input id="setup-seed" type="number" min="1" max="4294967295" step="1" inputMode="numeric" placeholder="Random"
             value={setup.seed ?? ''} onChange={event => pick('seed', event.target.value)}
             onKeyDown={event => { if (event.key === 'Enter') event.preventDefault(); }} />
-          <small className="control-help">Share a seed and these settings to replay the same draw. Leave blank for a new seed.</small>
-        </label>
-        <label className="control-checkbox setup-express">
-          <input type="checkbox" checked={!!setup.express} onChange={event => pick('express', event.target.checked)} />
-          <span>Express playback<small>Shorter draw and result pauses. Manager choices still wait for you.</small></span>
+          <small className="control-help">Replays the same campaign with the same rules and choices. Leave blank for a new one.</small>
         </label>
       </div>
     </details>
@@ -550,7 +523,7 @@ export default function SetupOverlay({
               </div>
 
               <div className="setup-group setup-group--list">
-                <Kicker id="setup-theatre-label" title="Theatre" />
+                <Kicker id="setup-theatre-label" title="Theatre" aside="Where the war is fought" />
                 {/* One radiogroup for leagues and countries: a single tab stop, and arrow keys walk from one into the other. */}
                 <div className="setup-theatres" role="radiogroup" aria-labelledby="setup-theatre-label" ref={theatreList}
                   data-long={countries ? '' : undefined} onKeyDown={countries ? typeAhead : undefined}>
@@ -615,13 +588,9 @@ export default function SetupOverlay({
                     </div>
                   ))}
                 </dl>
-                <p className="setup-estimate__note">Ties and manager decisions may take longer.</p>
+                <p className="setup-estimate__note">{model.estimateNote}</p>
                 <p className="sr-only" role="status">{model.status}</p>
               </div>
-              <SummaryList className="setup-summary--plain" rows={[
-                ['Pacing', model.summary.pacing], ['Uncertainty', model.summary.uncertainty],
-                ['Final two', model.summary.finale], ['Recruitment', model.summary.recruitment],
-              ]} />
               <section className="setup-saves" aria-labelledby="setup-saves-title">
                 <Kicker id="setup-saves-title" title="Saves" />
                 <SaveControls status={saveStatus} onExport={hasSave ? onExport : undefined} onImport={onImport} onManageSaves={onManageSaves} />
@@ -631,86 +600,48 @@ export default function SetupOverlay({
           {footer(1)}
         </section>
 
-        {/* Step 2 — Rules of war (board 12) */}
+        {/* Step 2 — Rules of war: one draw choice, then Show matches and the collapsed More rules */}
         <section className="setup-step" id="setup-step-rules" data-step="2" hidden={step !== 2} aria-labelledby="setup-rules-title">
           <div className="setup-step__body">
             <div className="setup-main">
               <div className="setup-heading">
                 {stepHeading(2, 'setup-rules-title', 'Rules of war')}
-                <p className="setup-lede">Decide who attacks each turn — and who picks the target.</p>
-              </div>
-              {!rules.applies ? (
-                <div className="rule-note" role="note">
-                  <Icon name="info" size={20} />
-                  <p>{rules.note} <button type="button" className="btn-link rule-note__action" onClick={() => pick('pacing', 'duel')}>Use One by one</button></p>
-                </div>
-              ) : null}
-              <div className="rule-group">
-                <Kicker id="rule-order-label" title="Turn order · who attacks" />
-                <div className="setup-card-grid" role="radiogroup" aria-labelledby="rule-order-label" aria-disabled={!rules.applies || undefined}>
-                  {TURN_ORDER_CARDS.map(card => (
-                    <OptionCard key={card.value} idBase={`rule-order-${card.value}`} card={card} disabled={!rules.applies}
-                      checked={rules.turnOrder === card.value} onSelect={value => pick('turnOrder', value)} />
-                  ))}
-                </div>
+                <p className="setup-lede">Choose how matches are drawn. With Random draw or Round robin, a manager can also pick their own opponents in step 3.</p>
               </div>
               <div className="rule-group">
-                <Kicker id="rule-target-label" title="Target · whom they attack" />
-                <div className="setup-card-grid" role="radiogroup" aria-labelledby="rule-target-label" aria-disabled={!rules.applies || undefined}>
-                  {TARGETING_CARDS.map(card => (
-                    <OptionCard key={card.value} idBase={`rule-target-${card.value}`} card={card} disabled={!rules.applies}
-                      checked={rules.targeting === card.value} onSelect={value => pick('targeting', value)} />
+                <Kicker id="rule-draw-label" title="The draw" />
+                <div className="setup-card-grid" role="radiogroup" aria-labelledby="rule-draw-label">
+                  {DRAW_CARDS.map(card => (
+                    <OptionCard key={card.value} idBase={`rule-draw-${card.value}`} card={card}
+                      checked={rules.draw === card.value} onSelect={chooseDraw} />
                   ))}
                 </div>
-              </div>
-              <div className="spectator-note" role="note">
-                <EyeMark />
-                <p><b>Watching as a spectator?</b> Every combination works. Targets always come from the compass, nothing waits for input, and you can follow any empire.</p>
+                {/* Native mirror of the draw's pacing (PLAN §4.7 `#setup-pacing`, value-bound) for automation. */}
+                <select id="setup-pacing" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={rules.pacing}
+                  onChange={event => pick('pacing', event.target.value)}>
+                  {PACING_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                </select>
               </div>
             </div>
 
             <div className="setup-side">
-              <div className="rule-explainer__head">
-                <h3 className="rule-explainer__title" id="rule-matrix-title">How a turn plays</h3>
-                <p className="rule-explainer__sub">Your pick is highlighted. The other three are one click away.</p>
+              <div className="setup-group setup-playback">
+                <Kicker id="setup-playback-label" title="Show matches" aside="Change any time" />
+                <div className="control-field">
+                  <select id="setup-resolution" aria-labelledby="setup-playback-label" aria-describedby="setup-resolution-help"
+                    value={model.showMatches} onChange={event => showMatches(event.target.value)}>
+                    {SHOW_MATCH_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                  </select>
+                  <small className="control-help" id="setup-resolution-help">{model.showMatchesHelp}</small>
+                </div>
               </div>
-              <div className="rule-matrix" role="radiogroup" aria-labelledby="rule-matrix-title" aria-disabled={!rules.applies || undefined}>
-                <span className="rule-matrix__corner" aria-hidden="true" />
-                <span className="rule-matrix__head" aria-hidden="true">You choose</span>
-                <span className="rule-matrix__head" aria-hidden="true">Compass</span>
-                {rules.cells.map((cell, index) => (
-                  <React.Fragment key={cell.id}>
-                    {index % 2 === 0 ? (
-                      <span className="rule-matrix__row" aria-hidden="true">{cell.turnOrder === 'round-robin' ? 'Round robin' : 'Random'}</span>
-                    ) : null}
-                    <button type="button" role="radio" aria-checked={cell.selected} tabIndex={cell.selected ? 0 : -1} disabled={!rules.applies}
-                      className="rule-matrix__cell" data-turn-order={cell.turnOrder} data-targeting={cell.targeting}
-                      aria-label={`${cell.title}: ${cell.turnOrder === 'round-robin' ? 'Round robin' : 'Random draw'} and ${cell.targeting === 'player' ? 'You choose' : 'Compass'}`}
-                      aria-describedby={`rule-cell-${cell.id}-body rule-cell-${cell.id}-tag`}
-                      onClick={() => chooseCell(cell)} onKeyDown={moveRadio}>
-                      <span className="rule-matrix__title">{cell.title}</span>
-                      <span className="rule-matrix__body" id={`rule-cell-${cell.id}-body`}>{cell.body}</span>
-                      <span className={`rule-matrix__tag rule-matrix__tag--${cell.tone}`} id={`rule-cell-${cell.id}-tag`}>{cell.tag}</span>
-                      {/* The board's " · selected" suffix as its own line, so the tag never wraps (aria-checked carries it). */}
-                      {cell.selected ? (
-                        <span className="rule-matrix__selected" aria-hidden="true">
-                          <span className="rule-matrix__check"><CheckMark /></span>Selected
-                        </span>
-                      ) : null}
-                    </button>
-                  </React.Fragment>
-                ))}
-              </div>
-              <SummaryList rows={[
-                ['Uncertainty', model.summary.uncertainty], ['Final two', model.summary.finale], ['Recruitment', model.summary.recruitment],
-              ]} />
-              {advancedFields}
+              {moreRules}
             </div>
           </div>
           {footer(2)}
         </section>
 
-        {/* Step 3 — Nation & role (V1 board 03, restyled into the frame) */}
+        {/* Step 3 — Your role (V1 board 03, restyled into the frame); a manager also picks who chooses their opponents */}
         <section className="setup-step" id="setup-step-role" data-step="3" hidden={step !== 3} aria-labelledby="setup-role-title">
           <div className="setup-step__body">
             <div className="setup-main">
@@ -727,6 +658,34 @@ export default function SetupOverlay({
                   ))}
                 </div>
               </div>
+              {manager ? (
+                <div className="setup-group setup-opponents">
+                  <Kicker id="rule-target-label" title="Who picks your opponent" />
+                  {rules.applies ? (
+                    <>
+                      <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="rule-target-label"
+                        aria-describedby="rule-target-help">
+                        {TARGETING_CARDS.map(card => {
+                          const checked = rules.targeting === card.value;
+                          return (
+                            <button type="button" role="radio" key={card.value} aria-checked={checked} tabIndex={checked ? 0 : -1}
+                              aria-labelledby={`rule-target-${card.value}-title`}
+                              onClick={() => choose('targeting', card.value, rules.targeting)} onKeyDown={moveRadio}>
+                              <span id={`rule-target-${card.value}-title`}>{card.title}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <small className="control-help setup-opponents__help" id="rule-target-help">{rules.targetingHelp}</small>
+                    </>
+                  ) : (
+                    <div className="rule-note" role="note" id="rule-target-none">
+                      <Icon name="info" size={20} />
+                      <p>{rules.note} <button type="button" className="btn-link rule-note__action" onClick={() => goTo(2)}>Change the draw</button></p>
+                    </div>
+                  )}
+                </div>
+              ) : null}
               {manager ? (
                 <div className="setup-group setup-group--list">
                   <Kicker id="setup-team-label" title={`Your ${model.noun}`} aside={`${model.field} ${model.nouns} · A–Z`} />
@@ -754,11 +713,9 @@ export default function SetupOverlay({
                     <option value="" disabled>Choose your team</option>
                     {model.teams.map(team => <option key={team.id} value={team.id}>{`${team.name} · ${team.ratingText} strength`}</option>)}
                   </select>
-                  <p className="control-help setup-teams__help">Management stays with this team until elimination. You can follow any team independently.</p>
+                  <p className="control-help setup-teams__help">{`You manage this ${model.noun} until it is knocked out, then keep watching as a spectator.`}</p>
                 </div>
-              ) : (
-                <p className="setup-role-note">Spectators never wait for input: draws, results and signings run on their own. Follow any empire from the map once the campaign starts.</p>
-              )}
+              ) : null}
             </div>
 
             <div className="setup-side">
