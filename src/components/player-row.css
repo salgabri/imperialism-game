@@ -1,0 +1,36 @@
+/* Owner: WP-SQUAD (see PLAN.md §4). PlayerRow restyle only (.fi-player-*, .fi-out-of-position); PlayerRow DOM is frozen until W3.
+   v4 tokens: square, ink text, 1px row-rule dividers, Archivo tabular numbers, claimed in teal, no italics (README §Type).
+   PlayerRow sets the position colour inline as var(--result-position-<POS>, var(--result-muted)), so the row defines those
+   custom properties: positions read in ink (depth rows muted), like the v4 squad table. */
+
+.fi-player-list { display: flex; flex-direction: column; }
+.fi-player-row {
+  --result-position-GK: var(--ink); --result-position-DF: var(--ink); --result-position-MF: var(--ink); --result-position-FW: var(--ink);
+  --result-position-PG: var(--ink); --result-position-SG: var(--ink); --result-position-SF: var(--ink);
+  --result-position-PF: var(--ink); --result-position-C: var(--ink);
+  display: flex; align-items: center; gap: 10px; min-height: 30px; padding: 5px 0;
+  border-top: 1px solid var(--row-rule); color: var(--ink);
+  font-family: var(--font-sans); font-variant-numeric: tabular-nums; line-height: 1.3;
+}
+.fi-player-row.is-depth {
+  --result-position-GK: var(--muted); --result-position-DF: var(--muted); --result-position-MF: var(--muted); --result-position-FW: var(--muted);
+  --result-position-PG: var(--muted); --result-position-SG: var(--muted); --result-position-SF: var(--muted);
+  --result-position-PF: var(--muted); --result-position-C: var(--muted);
+}
+.fi-player-row.is-roomy { min-height: 40px; padding-block: 7px; }
+.fi-player-row.is-acquired { box-shadow: inset 3px 0 0 var(--claimed); padding-left: 9px; }
+
+.fi-player-position { flex: none; min-width: 28px; font: 600 12px/1.2 var(--font-sans); }
+.fi-player-identity {
+  flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px;
+  font-size: var(--fs-body, 15px); font-style: normal;
+}
+.fi-player-identity > span { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fi-player-identity.is-generated { font-style: normal; }
+.fi-player-identity sup { padding-left: 2px; font-size: 10px; color: var(--muted); }
+.fi-player-identity small { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.fi-player-source a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.fi-player-source a:hover { color: var(--ink); }
+.fi-player-identity .fi-player-origin { color: var(--claimed); }
+.fi-player-identity .fi-out-of-position { color: var(--you-text); }
+.fi-player-rating { flex: none; min-width: 30px; text-align: right; font: 600 var(--fs-num, 13px)/1.2 var(--font-sans); font-variant-numeric: tabular-nums; }

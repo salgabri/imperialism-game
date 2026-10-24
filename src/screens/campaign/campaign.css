@@ -1,0 +1,313 @@
+/* Owner: WP-COL (see PLAN.md §4). Campaign column, Next fixture, fronts, latest results, ticker, map title card
+   and key, phone sheet (classes per PLAN §4.11: .v4-column*, .fixture*, .odds*, .fronts*, .results-list*, .ticker*,
+   .map-title-card*, .map-key*, .sheet*). Values: README §A + A§3–§9 + DEC D21. Placement of .v4-column and .ticker
+   inside main lives in styles/shell.css (WP-0); everything inside them lives here.
+   Breakpoints: wide ≥1600 · std 1200–1599 (base) · tablet 700–1199 · phone <700. Square corners throughout. */
+
+/* =====================================================================================================
+   Column (A§2.1, A§2.2, A§9.1)
+   ===================================================================================================== */
+.v4-column {
+  /* WP-local scale (base = std 1366/1440) */
+  --col-fx-mt: 10px;          /* fixture headline / odds / actions top margin: 14 · 10 · 10 · 9 */
+  --col-route-fs: 15px;       /* route line: 18 · 15 · 15 · 14 */
+  --col-odds-fs: 13px;        /* odds row: 15 · 13 · 13 · 13 */
+  --col-bar-h: 10px;          /* odds bar: 12 · 10 · 10 · 10 */
+  --col-res-cols: 58px;       /* results numeral column: 78 · 58 · 58 */
+  --col-res-gap: 12px;        /* 14 · 12 · 12 */
+  --col-res-pad: 7px 0;       /* 10px 0 · 7px 0 · 8px 0 */
+  --col-res-num: 17px;        /* 22 · 17 · 17 */
+  --col-res-num-lh: 1.2;      /* 1.1 · 1.2 · 1.2 */
+  --col-res-title: 15px;      /* 18 · 15 · 16 */
+  --col-res-sub: 12px;        /* 13 · 12 · 12 */
+  --col-sheet-peek:64px;      /* phone: map still visible above the expanded sheet (A§9.1) */
+  position:relative;
+  display:flex; flex-direction:column; gap:var(--col-gap);
+  padding:var(--col-pad);
+  background:var(--surface); color:var(--ink);
+  border-left:1px solid var(--rule);
+}
+.v4-column:focus { outline:none; }
+.v4-column:focus-visible { outline:2px solid var(--you); outline-offset:-2px; }
+.v4-column__lead { min-width:0; }
+/* Section names ("Next fixture", "Your fronts", "Latest results") are h2s styled by the .kicker primitive. */
+.v4-column__heading { margin:0; font:inherit; letter-spacing:inherit; }
+
+@media (min-width:1600px) {
+  .v4-column {
+    --col-fx-mt:14px; --col-route-fs:18px; --col-odds-fs:15px; --col-bar-h:12px;
+    --col-res-cols:78px; --col-res-gap:14px; --col-res-pad:10px 0; --col-res-num:22px; --col-res-num-lh:1.1;
+    --col-res-title:18px; --col-res-sub:13px;
+  }
+}
+
+/* Tablet: map on top, the column's content in two columns below (A3: fixture | fronts, results full width). */
+@media (max-width:1199.98px) {
+  .v4-column {
+    --col-res-pad:8px 0; --col-res-title:16px;
+    display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-content:start; align-items:start;
+    border-left:0; border-top:1px solid var(--rule);
+  }
+  .v4-column > .v4-column__lead { grid-column:1; }
+  .v4-column > .fronts { grid-column:2; }
+  .v4-column > .results-list { grid-column:1 / -1; }
+  /* Without fronts (spectator, your turn) the results sit beside the panel (M§8). */
+  .v4-column--no-fronts > .results-list { grid-column:2; }
+}
+
+/* Phone: bottom sheet (A§9.1). Collapsed = the first block; expanded slides the sheet up over the map. */
+@media (max-width:699.98px) {
+  .v4-column {
+    --col-fx-mt:9px; --col-route-fs:14px; --col-res-pad:8px 0; --col-res-title:16px;
+    display:flex; flex-direction:column; align-items:stretch; gap:18px;
+    border-left:0; border-top:1px solid var(--rule);
+  }
+  .v4-column > .v4-column__lead, .v4-column > .fronts, .v4-column > .results-list { grid-column:auto; }
+  .v4-column[data-sheet=collapsed] > .fronts,
+  .v4-column[data-sheet=collapsed] > .results-list { display:none; }
+  /* A4: the collapsed sheet is the fixture block alone. After a result the Continue bar already names the next step
+     ("Continue · Round XI"), so the "Next draw" line waits in the expanded sheet instead of peeking under the bar. */
+  .v4-column[data-sheet=collapsed] .fixture__next { display:none; }
+  .v4-column--expanded {
+    /* Slide up over the phone map row (--phone-map-h, tokens.css phone block), leaving the peek. */
+    z-index:20; margin-top:calc(var(--col-sheet-peek) - var(--phone-map-h, 330px));
+    box-shadow:var(--shadow-sheet);
+  }
+}
+
+/* Grab handle (A§9.1): 40×4 bar in a 44px hit target; phone only. */
+.sheet__grab { display:none; }
+@media (max-width:699.98px) {
+  .sheet__grab {
+    position:relative; z-index:1; display:block; flex:none; align-self:stretch;
+    /* 44px target from the sheet's top edge; the next block starts 24px down (A§9.1), cancelling the 18px gap. */
+    height:44px; margin:-10px 0 -38px; padding:0;
+    border:0; background:none; cursor:pointer;
+  }
+  .sheet__grab::before {
+    content:''; position:absolute; top:10px; left:50%; width:40px; height:4px; margin-left:-20px;
+    background:var(--grab);
+  }
+  .sheet__grab:focus-visible { outline:none; }
+  .sheet__grab:focus-visible::before { outline:2px solid var(--you); outline-offset:4px; }
+}
+
+/* =====================================================================================================
+   Next fixture (A§5; DEC D10)
+   ===================================================================================================== */
+.fixture { display:flex; flex-direction:column; min-width:0; }
+.fixture__title {
+  margin:var(--col-fx-mt) 0 0;
+  font:700 var(--fs-fixture)/.94 var(--font-narrow); text-transform:uppercase; text-wrap:balance;
+  color:var(--ink); overflow-wrap:break-word;
+}
+.fixture__v { color:var(--you-text); }
+.fixture__route { margin:6px 0 0; font:400 var(--col-route-fs)/1.3 var(--font-sans); color:var(--muted); }
+.fixture__meta {
+  margin:6px 0 0; font:400 var(--fs-meta)/1.35 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted);
+}
+.fixture__actions { margin-top:var(--col-fx-mt); display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; }
+.fixture__simulate { white-space:nowrap; }
+.fixture__card { margin-top:var(--col-fx-mt); min-width:0; }
+.fixture__next {
+  margin:var(--col-fx-mt) 0 0; font:400 var(--fs-meta)/1.4 var(--font-sans); color:var(--muted);
+}
+.fixture__next-title {
+  font:700 var(--fs-label)/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--ink);
+}
+
+/* Odds row: labels · framed bar (track #dfe2dc, 1.5px ink frame drawn over the fill) · labels */
+.odds {
+  margin-top:var(--col-fx-mt);
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:10px;
+  font:600 var(--col-odds-fs)/1.2 var(--font-sans); font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--ink);
+}
+.odds__bar { position:relative; display:flex; height:var(--col-bar-h); min-width:0; background:var(--odds-track); }
+.odds__bar::after { content:''; position:absolute; inset:0; box-shadow:inset 0 0 0 1.5px var(--ink); pointer-events:none; }
+.odds__fill { display:block; flex:none; height:100%; background:var(--ink); }
+
+/* =====================================================================================================
+   Your fronts (A§6)
+   ===================================================================================================== */
+.fronts { min-width:0; }
+.fronts__table { width:100%; table-layout:fixed; border-collapse:collapse; border-spacing:0; }
+/* Column widths include the 10px column gap (A§6: flag | name | 50 | 44 | 50, gap 10). */
+.fronts__col-str, .fronts__col-win { width:60px; }
+.fronts__col-terr { width:54px; }
+.fronts__th {
+  padding:6px 0 4px 10px; border:0; text-align:right; white-space:nowrap;
+  font:400 11px/1.2 var(--font-sans); font-variant-numeric:tabular-nums; text-transform:uppercase; color:var(--muted);
+}
+.fronts__th--nation { padding-left:calc(var(--flag-w) + 10px); text-align:left; }
+.fronts__th abbr { text-decoration:none; cursor:inherit; }
+.fronts__cell {
+  height:max(var(--row-h), var(--tap)); padding:0 0 0 10px; border-top:1px solid var(--row-rule); vertical-align:middle;
+}
+.fronts__cell--nation { padding-left:0; }
+.fronts__nation { display:flex; align-items:center; gap:10px; min-width:0; }
+.fronts__flag { flex:none; display:flex; width:var(--flag-w); height:calc(var(--flag-w) * .75); }
+/* The mark fills its slot; two owned classes so these sizes beat the mark's own (primitives load after this file). */
+.fronts__nation > .fronts__flag > * { width:100%; height:100%; }
+.fronts__name {
+  display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 var(--fs-body)/1.25 var(--font-sans); color:var(--ink); text-align:left;
+}
+.fronts__name--button {
+  flex:0 1 auto; max-width:100%; min-height:max(28px, var(--tap)); padding:0; border:0; background:none; cursor:pointer;
+}
+.fronts__name--button:hover { color:var(--you-text); text-decoration:underline; text-underline-offset:3px; }
+.fronts__num {
+  text-align:right; white-space:nowrap;
+  font:400 var(--fs-num)/1.2 var(--font-sans); font-variant-numeric:tabular-nums;
+}
+.fronts__terr { color:var(--muted); }
+.fronts__win { font-weight:600; }
+.fronts__empty, .fronts__note { margin:8px 0 0; font:400 var(--fs-meta)/1.4 var(--font-sans); color:var(--muted); }
+/* std, tablet and phone show four fronts (A§1: "4 @ 30px"); wide shows up to five. */
+@media (max-width:1599.98px) { .fronts__row:nth-child(n+5) { display:none; } }
+
+/* =====================================================================================================
+   Latest results (A§7)
+   ===================================================================================================== */
+.results-list { min-width:0; }
+.results-list__more {
+  position:relative; padding:0; border:0; background:none; cursor:pointer;
+  font:inherit; letter-spacing:inherit; text-transform:inherit; color:var(--muted);
+}
+.results-list__more:hover { color:var(--ink); text-decoration:underline; text-underline-offset:3px; }
+/* Touch: a 44px target inside the kicker (DEC misc). The kicker grows to 30px (label on the rule) and the target
+   reaches up into the column gap (≥18px), never down into the first result row. */
+@media (max-width:699.98px), (pointer:coarse) {
+  .results-list > .results-list__kicker { min-height:30px; align-items:flex-end; }   /* (0,2,0): beats .kicker */
+  .results-list__more::before { content:''; position:absolute; left:-10px; right:-10px; bottom:-7px; height:44px; }
+}
+.results-list__rows { margin:0; padding:0; list-style:none; }
+.results-list__row {
+  display:grid; grid-template-columns:var(--col-res-cols) minmax(0,1fr); gap:var(--col-res-gap);
+  padding:var(--col-res-pad); border-bottom:1px solid var(--row-rule);
+}
+.results-list__round {
+  font:700 var(--col-res-num)/var(--col-res-num-lh) var(--font-sans); letter-spacing:-.02em;
+  color:var(--you-text); text-align:right; white-space:nowrap;
+}
+.results-list__body { min-width:0; }
+.results-list__title { margin:0; font:700 var(--col-res-title)/1.2 var(--font-sans); color:var(--ink); overflow-wrap:break-word; }
+.results-list__meta {
+  margin:3px 0 0; font:400 var(--col-res-sub)/1.3 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--muted);
+}
+.results-list__empty { margin:8px 0 0; font:400 var(--fs-meta)/1.4 var(--font-sans); color:var(--muted); }
+/* std and tablet show the two latest results; wide shows four; the expanded phone sheet shows four. */
+@media (min-width:700px) and (max-width:1599.98px) { .results-list__row:nth-child(n+3) { display:none; } }
+
+/* =====================================================================================================
+   Live ticker (A§8): ink bar, LIVE block, static cursor, one clipped line newest first
+   ===================================================================================================== */
+.ticker {
+  --ticker-pad:12px; --ticker-cursor-w:7px; --ticker-cursor-h:14px;   /* 16/9/16 · 12/7/14 · 14/8/15 */
+  height:var(--ticker-h); display:flex; align-items:center; overflow:hidden;
+  background:var(--strip); color:var(--on-strip);
+  font:400 var(--ticker-fs)/1 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:.03em;
+  text-transform:uppercase; white-space:nowrap;
+}
+@media (min-width:1600px) { .ticker { --ticker-pad:16px; --ticker-cursor-w:9px; --ticker-cursor-h:16px; } }
+@media (max-width:1199.98px) { .ticker { --ticker-pad:14px; --ticker-cursor-w:8px; --ticker-cursor-h:15px; } }
+.ticker__live {
+  flex:none; align-self:stretch; display:flex; align-items:center; padding:0 var(--ticker-pad);
+  background:var(--you); color:#fff; font-weight:700; letter-spacing:.1em;
+}
+.ticker__cursor {
+  flex:none; display:block; width:var(--ticker-cursor-w); height:var(--ticker-cursor-h);
+  margin:0 10px 0 var(--ticker-pad); background:var(--on-strip);
+}
+.ticker__text { min-width:0; overflow:hidden; white-space:pre; }
+.ticker__empty { color:rgba(245,245,242,.62); }
+
+/* =====================================================================================================
+   Map title card (top-left; A§3.3, RM §1.11, DEC D21) — #fff floating panel
+   ===================================================================================================== */
+.map-title-card {
+  position:absolute; top:var(--map-inset); left:var(--map-inset); z-index:2;
+  max-width:calc(100% - 2 * var(--map-inset));
+  padding:10px 14px 9px; background:var(--panel); box-shadow:var(--shadow-float); color:var(--ink);
+  pointer-events:none;
+}
+.map-title-card__kicker {
+  margin:0; font:400 12px/normal var(--font-sans); font-variant-numeric:tabular-nums;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--you-text); white-space:nowrap;
+}
+.map-title-card__title {
+  margin:2px 0 0; font:700 26px/1.05 var(--font-sans); letter-spacing:-.02em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.map-title-card__title-full, .map-title-card__title--phone { display:block; overflow:hidden; text-overflow:ellipsis; }
+.map-title-card__title--phone { display:none; }
+.map-title-card__meta {
+  margin:4px 0 0; font:400 13px/normal var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted); white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis;
+}
+/* "Your turn" (M§5.4) and "The draw" (M§6.4) carry a sentence under the title. */
+.map-title-card__sub { margin:4px 0 0; max-width:440px; font:400 14px/1.45 var(--font-sans); color:var(--text-2); }
+.map-title-card--draw .map-title-card__sub { max-width:560px; }
+
+@media (min-width:1600px) {
+  .map-title-card { padding:16px 22px 14px; }
+  .map-title-card__title { font-size:40px; }
+  .map-title-card__meta { font-size:16px; }
+  .map-title-card__sub { font-size:16px; }
+}
+@media (max-width:1199.98px) {
+  /* The mode switch sits top-right on tablet; keep the card clear of it. */
+  .map-title-card { max-width:calc(56% - var(--map-inset)); }
+  .map-title-card__title { font-size:24px; }
+  .map-title-card__meta { font-size:12px; }
+  .map-title-card__sub { font-size:13px; }
+}
+@media (max-width:699.98px) {
+  /* Keep clear of the 44px zoom column top-right (WP-MAP) and its 8px gap; the title ellipsises. */
+  .map-title-card { padding:6px 10px 6px; max-width:calc(100% - 2 * var(--map-inset) - max(36px, var(--tap)) - 8px); }
+  .map-title-card__title { font-size:16px; }
+  .map-title-card__meta, .map-title-card__sub { display:none; }
+  /* Phone frames your fronts (DEC D22); "Whole map" (wholeMap) restores the campaign title. */
+  .map-title-card--swap .map-title-card__title-full { display:none; }
+  .map-title-card--swap .map-title-card__title--phone { display:block; }
+}
+
+/* =====================================================================================================
+   Map key (bottom-left; A§3.4, A-11, DEC D21) — not on phone
+   ===================================================================================================== */
+.map-key {
+  position:absolute; left:var(--map-inset); bottom:var(--map-inset); z-index:2;
+  max-width:calc(100% - 2 * var(--map-inset));
+  padding:9px 12px 10px; background:var(--panel); box-shadow:var(--shadow-float); color:var(--ink);
+  font:400 12px/1.2 var(--font-narrow); pointer-events:none;
+}
+.map-key__heading {
+  margin:0 0 5px; font:400 10px/1.2 var(--font-sans); font-variant-numeric:tabular-nums;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+}
+.map-key__items {
+  margin:0; padding:0; list-style:none;
+  display:grid; grid-template-columns:auto auto; gap:5px 22px;
+}
+.map-key--reach .map-key__items { display:flex; flex-wrap:wrap; gap:5px 20px; }
+.map-key__item { display:flex; align-items:center; gap:8px; white-space:nowrap; }
+.map-key--strength .map-key__label { font-family:var(--font-sans); font-variant-numeric:tabular-nums; }
+.map-key__glyph { display:block; flex:none; }
+.map-key__swatch { width:22px; height:14px; }
+.map-key__swatch--outline { background:transparent; }
+.map-key__veil { background-color:var(--land-neutral); background-image:linear-gradient(var(--map-veil), var(--map-veil)); }
+.map-key__arrow { color:var(--ink); }
+.map-key__dash { display:block; }
+/* Capitals on the map are 3.8px #30363b squares with a white stroke; the key shows them at 6px (DEC D21). */
+.map-key__capital { width:6px; height:6px; margin:0 8px; background:var(--map-capital); box-shadow:0 0 0 .8px var(--map-halo); }
+
+@media (min-width:1600px) {
+  .map-key { padding:12px 16px 14px; font-size:14px; }
+  .map-key__heading { margin-bottom:8px; font-size:12px; }
+  .map-key__items { gap:8px 22px; }
+  .map-key--reach .map-key__items { gap:8px 20px; }
+}
+@media (max-width:1199.98px) { .map-key { padding:8px 12px 10px; } }
+@media (max-width:699.98px) { .map-key { display:none; } }
+
+/* Reduced motion: nothing here animates (static ticker, no sheet transition). */

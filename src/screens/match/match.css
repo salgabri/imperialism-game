@@ -1,0 +1,293 @@
+/* Owner: WP-MATCH (see PLAN.md §4). Live match screen (.match-*, .screen--match; PLAN §4.11).
+   Boards B1 (1440) / B2 (390) + A-3 breakpoints: wide ≥1600 (feed 500px) · std 1200–1599 (B1 as drawn) ·
+   tablet 700–1199 (stacked, feed below) · phone <700 (score band, Feed / Lineups / Stats segments).
+   Chart strokes are in viewBox units (800×132). Non-token feed colours are WP-local vars (B§0).
+   Cascade: main.jsx imports App (and this file) BEFORE index.css, so shell.css (`.screen`) and primitives.css
+   (`.kicker`, `.segmented`) come later. Any rule here that competes with them on the same element is
+   qualified (`.screen.screen--match`, `.screen--match .match-…`) so it wins on specificity, not order. */
+
+.screen.screen--match {
+  --match-feed-rule:#2b3136; --match-feed-muted:#8a9297; --match-feed-line:#4b5358;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+
+/* ---------- Score header (B§1.3) ---------- */
+.match-score {
+  flex:none; height:170px; min-width:0;
+  display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); grid-template-rows:auto auto auto;
+  align-content:center; column-gap:36px; row-gap:0; padding:0 40px; border-bottom:1px solid var(--rule);
+}
+.match-score__side { grid-row:1 / -1; align-self:center; min-width:0; }
+.match-score__side--a { grid-column:1; text-align:right; }
+.match-score__side--d { grid-column:3; text-align:left; }
+.match-score__label {
+  display:flex; align-items:center; gap:10px; min-height:21px;
+  font:400 12px/21px var(--font-sans); letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.match-score__side--a .match-score__label { justify-content:flex-end; }
+.match-score__side--d .match-score__label { justify-content:flex-start; }
+.match-score__mark { display:flex; flex:none; }
+.match-score__name {
+  margin:8px 0 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 56px/.95 var(--font-narrow); text-transform:uppercase; color:var(--ink);
+}
+.match-score__scorers {
+  min-height:20px; margin:6px 0 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 16px/20px var(--font-sans); color:var(--muted); font-variant-numeric:tabular-nums;
+}
+/* Known gap (README): every piece of the score is a flex item, so the dash's box equals its line box and
+   nothing reaches into the minute line below. */
+.match-score__digits {
+  grid-column:2; grid-row:1; display:flex; justify-content:center; align-items:baseline;
+  height:calc(var(--fs-score) * .85); white-space:nowrap;
+  font:700 var(--fs-score)/.85 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--ink);
+}
+.match-score__digits > span { display:block; line-height:inherit; }
+.match-score__dash { margin:0 14px; color:var(--you-text); }
+.match-score__minute {
+  grid-column:2; grid-row:2; justify-self:center; display:inline-flex; align-items:center; gap:8px; margin:10px 0 0;
+  font:600 14px/17px var(--font-sans); letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;
+  font-variant-numeric:tabular-nums; color:var(--ink);
+}
+.match-score__square { display:block; flex:none; width:9px; height:9px; background:var(--ink); }
+.match-score__minute.is-live .match-score__square { background:var(--you); }
+.match-score__pens { grid-column:2; grid-row:3; justify-self:center; display:flex; gap:14px; margin-top:8px; }
+.match-score__kicks { display:inline-flex; align-items:center; gap:4px; }
+.match-score__kicks-code { margin-right:2px; font:600 11px/1 var(--font-sans); letter-spacing:.04em; color:var(--muted); }
+.match-score__kicks > i { display:block; width:8px; height:8px; box-shadow:inset 0 0 0 1.5px var(--ink); }
+.match-score__kicks > i.is-scored { background:var(--ink); }
+.match-score__kicks > i.is-missed { box-shadow:inset 0 0 0 1.5px var(--loss); }
+
+/* Phone segments exist only below 700px (`.segmented` would otherwise show them). */
+.screen--match .match-segments, .match-stats { display:none; }
+
+/* ---------- Body (B§1.4–1.5) ---------- */
+.match-body { flex:1; min-height:0; min-width:0; display:grid; grid-template-columns:minmax(0,1fr) 420px; }
+.match-main {
+  min-width:0; min-height:0; overflow:auto; overscroll-behavior:contain;
+  padding:20px 32px; display:flex; flex-direction:column; gap:20px;
+}
+
+/* Win-probability chart (B§1.5.1–1.5.2) */
+.match-chart { flex:none; min-width:0; }
+/* Head = `.kicker` row (PLAN §2.5); the label is its `.kicker__title`, the big value its aside. */
+.match-chart__label { margin:0; font:inherit; }
+/* README B1: Archivo 30px 600, no tracking — the value sits in the kicker row but must not inherit its .14em / uppercase. */
+.match-chart__value {
+  flex:none; font:600 30px/1 var(--font-sans); letter-spacing:0; text-transform:none; font-variant-numeric:tabular-nums;
+  color:var(--you-text);
+}
+.match-chart__plot { margin-top:12px; }
+.match-chart__svg { display:block; width:100%; height:auto; aspect-ratio:800 / 132; overflow:visible; }
+.match-chart__bg { fill:var(--surface-2); }
+.match-chart__guide { fill:none; stroke:var(--chart-guide); stroke-width:.8; }
+.match-chart__even { fill:none; stroke:var(--ink); stroke-width:.8; stroke-dasharray:3 3; }
+.match-chart__hatch { fill:var(--you); fill-opacity:.55; }
+.match-chart__line { fill:none; stroke:var(--you); stroke-width:2.2; stroke-linejoin:round; }
+.match-chart__goal { fill:var(--ink); stroke:var(--panel); stroke-width:1.5; }
+.match-chart__now { fill:var(--you); stroke:var(--panel); stroke-width:1.5; }
+.match-chart__axis {
+  position:relative; height:13px; margin-top:6px;
+  font:400 11px/13px var(--font-sans); color:var(--muted); font-variant-numeric:tabular-nums;
+}
+.match-chart__axis > span { position:absolute; top:0; white-space:nowrap; }
+.match-chart__note { margin:10px 0 0; font:400 13px/1.45 var(--font-sans); color:var(--muted); }
+
+/* Two XI tables (B§1.5.3) */
+.match-lineups { flex:none; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; align-items:start; }
+.match-xi { min-width:0; }
+/* Kicker = `.kicker` row; the h3 is its `.kicker__title`, the squad button sits inside the heading.
+   README kicker: the label keeps its 1.2 line box and the ink rule sits 6px under it, on touch too. The 44px touch
+   target is an absolutely positioned ::after (the squad-tools pattern), so the heading and the button must not clip:
+   the ellipsis moves to the title span inside the button. */
+.match-xi__title.kicker__title { margin:0; font:inherit; overflow:visible; }
+.match-xi__title-button {
+  position:relative; display:flex; max-width:100%; min-width:0; padding:0; border:0; border-radius:0; background:none;
+  white-space:nowrap; text-align:left; cursor:pointer;
+  font:inherit; line-height:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit;
+}
+.match-xi__title-button::after {
+  content:''; position:absolute; left:0; right:0; top:50%; height:var(--tap); transform:translateY(-50%);
+}
+.match-xi__title-text { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* A plain (non-button) title still truncates inside the kicker row. */
+.match-xi__title > .match-xi__title-text { max-width:100%; }
+.match-xi__title-button:hover { color:var(--you-text); }
+.match-xi__title-button:focus-visible { outline-offset:2px; }
+/* Fixed layout: the <col> widths hold (auto layout would shrink pos/rating to min-content next to a 1fr name). */
+.match-xi__table { width:100%; table-layout:fixed; border-collapse:collapse; border-spacing:0; }
+.match-xi__col-pos { width:40px; }
+.match-xi__col-rating { width:44px; }
+.match-xi__head th {
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+.match-xi__row > td { height:27px; padding:0; border-top:1px solid var(--row-rule); vertical-align:middle; white-space:nowrap; }
+/* No double rule under the kicker's ink line (README "no double rules"). */
+.match-xi__row:first-child > td { border-top:0; }
+/* B§1.5.3 row = 30px · 1fr · auto · 34px with 10px gaps. The auto track is per row, so the claimed tag lives in
+   the player cell: pos 30+10 | name (1fr) + 10 + tag (auto, may be empty) | 10+34 rating. Every tag ends 10px
+   before the rating and an untagged name gets 462 − 94 = 368px at 1440. */
+.match-xi__row > .match-xi__pos { padding-right:10px; font:600 12px/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--ink); }
+.match-xi__row > .match-xi__name { font:400 var(--fs-body)/1.2 var(--font-sans); color:var(--ink); }
+.match-xi__player { display:flex; align-items:center; min-width:0; }
+.match-xi__player-name { flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.match-xi__claimed { flex:none; display:flex; margin-left:10px; }
+.match-xi__tag {
+  display:inline-flex; align-items:center; gap:5px;
+  font:400 11px/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--claimed); white-space:nowrap;
+}
+.match-xi__tag .fi-team-monogram { font-size:7px; }
+.match-xi__row > .match-xi__rating {
+  padding-left:10px; text-align:right;
+  font:600 var(--fs-num)/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--tier-low);
+}
+.match-xi__rating[data-tier='88'] { color:var(--tier-88); }
+.match-xi__rating[data-tier='84'] { color:var(--tier-84); }
+.match-xi__rating[data-tier='80'] { color:var(--tier-80); }
+.match-xi__rating[data-tier='75'] { color:var(--tier-75); }
+.match-xi__rating[data-tier='70'] { color:var(--tier-70); }
+
+/* ---------- Dark match feed (B§1.6) ---------- */
+.match-feed { min-width:0; min-height:0; display:flex; flex-direction:column; overflow:hidden; background:var(--strip); color:var(--on-strip); }
+.match-feed__head {
+  flex:none; height:42px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 18px;
+  background:var(--you); color:#fff; white-space:nowrap;
+  font:600 14px/1 var(--font-sans); letter-spacing:.1em; text-transform:uppercase; font-variant-numeric:tabular-nums;
+}
+.match-feed__title { margin:0; font:inherit; letter-spacing:inherit; }
+.match-feed__order { font-size:11px; font-weight:400; }
+.match-feed__body {
+  flex:1; min-height:0; overflow:hidden; padding:16px 18px; display:flex; flex-direction:column; gap:12px;
+}
+.match-feed__cursor { display:block; flex:none; width:10px; height:17px; background:var(--on-strip); }
+.match-feed__row {
+  flex:none; display:grid; grid-template-columns:44px minmax(0,1fr); gap:10px;
+  font:400 14px/1.45 var(--font-sans); text-transform:uppercase; font-variant-numeric:tabular-nums;
+}
+.match-feed__minute { color:var(--you-on-dark); font-weight:600; white-space:nowrap; }
+.match-feed__text { min-width:0; overflow-wrap:anywhere; color:var(--on-strip); }
+.match-feed__row[data-weight='700'] .match-feed__text { font-weight:700; }
+.match-feed__row[data-weight='600'] .match-feed__text { font-weight:600; }
+.match-feed__row[data-weight='500'] .match-feed__text { font-weight:500; }
+.match-feed__foot { flex:none; padding:14px 18px; border-top:1px solid var(--match-feed-rule); }
+
+/* Speed chips + Pause (B§1.6 footer; README "speed scales the clock") */
+.match-speed { display:flex; align-items:center; gap:8px; font:400 13px/1 var(--font-sans); font-variant-numeric:tabular-nums; }
+.match-speed__group { display:flex; align-items:center; gap:8px; }
+.match-speed__label { margin-right:6px; text-transform:uppercase; }
+.match-speed__chip, .match-speed__pause {
+  min-height:var(--tap); border:0; border-radius:0; background:transparent; cursor:pointer;
+  font:inherit; line-height:16px; white-space:nowrap;
+}
+/* DEC misc: ≥44px hit targets on touch — width as well as height (a two-character label is ~38px wide). */
+.match-speed__chip { min-width:var(--tap); padding:7px 11px; }
+.match-speed__pause { margin-left:auto; padding:7px 14px; text-transform:uppercase; }
+.match-speed--dark { width:100%; }
+.match-speed--dark .match-speed__label { color:var(--match-feed-muted); }
+.match-speed--dark .match-speed__chip { color:var(--on-strip); box-shadow:inset 0 0 0 1px var(--match-feed-line); }
+.match-speed--dark .match-speed__chip:hover { box-shadow:inset 0 0 0 1px var(--on-strip); }
+.match-speed--dark .match-speed__chip[aria-pressed=true] { background:var(--on-strip); color:var(--strip); font-weight:600; box-shadow:none; }
+.match-speed--dark .match-speed__pause { color:var(--on-strip); box-shadow:inset 0 0 0 1px var(--on-strip); }
+.match-speed--dark .match-speed__pause:hover, .match-speed--dark .match-speed__pause.is-paused { background:var(--on-strip); color:var(--strip); }
+.match-speed--dark :is(.match-speed__chip, .match-speed__pause):focus-visible { outline:2px solid var(--you-on-dark); outline-offset:2px; }
+
+/* ---------- Empty and legacy states ---------- */
+.match-screen__empty { width:100%; max-width:640px; margin:0 auto; padding:72px 32px; }
+.match-screen__kicker { margin:0 0 14px; }
+.match-screen__empty-title { margin:0; font:700 clamp(28px, 4vw, 40px)/1.05 var(--font-sans); letter-spacing:-.02em; }
+.match-screen__empty-text { margin:10px 0 0; font:400 15px/1.45 var(--font-sans); color:var(--muted); }
+.match-screen__legacy { width:100%; max-width:640px; margin:0 auto; padding:24px 32px; overflow:auto; }
+
+/* ---------- Wide ≥1600 (A-3): B1 structure, feed column matches the 500px map column ---------- */
+@media (min-width:1600px) {
+  .match-body { grid-template-columns:minmax(0,1fr) 500px; }
+}
+
+/* ---------- Tablet 700–1199 (A-3): header, chart, XIs side by side, then the feed (6 rows + footer) ---------- */
+@media (max-width:1199.98px) {
+  .screen.screen--match { display:block; overflow:auto; }
+  .match-score { height:auto; padding:20px 26px; column-gap:28px; }
+  .match-score__name { font-size:40px; }
+  .match-body { display:block; }
+  .match-main { overflow:visible; padding:20px 26px; }
+  .match-feed { margin:4px 26px 26px; }
+  .match-feed__body { flex:none; }
+  .match-feed__row:nth-of-type(n+7) { display:none; }
+}
+
+/* ---------- Phone <700 (B2): score band, segments, mini chart, 6-row feed ---------- */
+@media (max-width:699.98px) {
+  .screen.screen--match { display:flex; flex-direction:column; overflow:hidden; }
+  .match-score {
+    height:auto; grid-template-rows:auto auto; align-items:center; gap:10px; padding:14px 18px 12px;
+  }
+  .match-score__side { grid-row:1; }
+  .match-score__label-text, .match-score__scorers { display:none; }
+  .match-score__name { margin-top:6px; font-size:18px; line-height:1.1; }
+  .match-score__digits { height:auto; line-height:.9; }
+  .match-score__dash { margin:0 6px; }
+  .match-score__minute { grid-column:1 / -1; grid-row:2; margin:0; gap:7px; font-size:12px; line-height:15px; }
+  .match-score__square { width:8px; height:8px; }
+  .match-score__pens { grid-column:1 / -1; grid-row:3; margin:0; }
+
+  /* `.segmented` (PLAN §2.5) supplies type, outline and the pressed fill; B§2.4 overrides below: full-width
+     3-track grid on the surface, ink (not muted) idle text, dividers only between two idle neighbours. */
+  .screen--match .match-segments {
+    flex:none; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); height:44px; margin:10px 16px 0; background:transparent;
+  }
+  .screen--match .match-segments__item { min-height:44px; padding:0; color:var(--ink); box-shadow:none; }
+  .screen--match .match-segments > .match-segments__item[aria-pressed=true],
+  .screen--match .match-segments > .match-segments__item[aria-pressed=true]:hover { background:var(--ink); color:var(--on-ink); }
+  .screen--match .match-segments__item[aria-pressed=false] + .match-segments__item[aria-pressed=false] { box-shadow:inset 1px 0 0 var(--rule); }
+
+  .match-body { flex:1; min-height:0; display:flex; flex-direction:column; }
+  .match-main { flex:none; overflow:visible; padding:0; gap:0; }
+  .screen--match:is([data-segment=lineups], [data-segment=stats]) .match-main { flex:1; min-height:0; overflow:auto; }
+  .screen--match:not([data-segment=feed]) .match-feed { display:none; }
+  .screen--match[data-segment=lineups] .match-chart { display:none; }
+
+  .match-chart { padding:12px 16px 10px; }
+  .screen--match .match-chart__head { padding-bottom:0; margin-bottom:6px; border-bottom:0; }
+  .match-chart__label { font-size:11px; letter-spacing:.12em; }
+  .match-chart__value { font-size:18px; }
+  .match-chart__plot { margin-top:0; }
+  .match-chart__axis { display:none; }
+  .match-chart__note { margin-top:4px; }
+
+  .match-lineups { display:none; }
+  .screen--match[data-segment=lineups] .match-lineups { display:grid; grid-template-columns:minmax(0,1fr); gap:20px; padding:14px 16px 16px; }
+
+  .screen--match[data-segment=stats] .match-stats { display:block; padding:4px 16px 16px; }
+  .match-stats__kicker--playback { margin-top:18px; }
+  .match-stats__title { margin:0; font:inherit; }
+  .match-stats__odds {
+    display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:10px; margin-top:9px;
+    font:600 13px/1.2 var(--font-sans); font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .match-stats__bar { position:relative; display:block; height:10px; overflow:hidden; background:var(--odds-track); }
+  .match-stats__bar::after { content:''; position:absolute; inset:0; box-shadow:inset 0 0 0 1.5px var(--ink); }
+  .match-stats__fill { position:absolute; top:0; bottom:0; left:0; background:var(--ink); }
+  .match-stats__meta { margin:6px 0 0; font:400 11px/1.4 var(--font-sans); color:var(--muted); font-variant-numeric:tabular-nums; }
+  .match-speed--light { margin-top:10px; flex-wrap:wrap; }
+  .match-speed--light .match-speed__label { color:var(--muted); font:700 11px/1 var(--font-narrow); letter-spacing:.1em; }
+  .match-speed--light .match-speed__chip { min-width:52px; min-height:44px; color:var(--ink); box-shadow:inset 0 0 0 1px var(--control-line); }
+  .match-speed--light .match-speed__chip[aria-pressed=true] { background:var(--ink); color:var(--on-ink); font-weight:600; box-shadow:none; }
+  .match-speed--light .match-speed__pause {
+    min-height:44px; padding:0 18px; color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink);
+    font:700 13px/1 var(--font-narrow); letter-spacing:.1em;
+  }
+  .match-speed--light .match-speed__pause:hover, .match-speed--light .match-speed__pause.is-paused { background:var(--ink); color:var(--on-ink); }
+
+  .match-feed {
+    flex:1; min-height:0; margin:0 16px 14px; padding:12px 14px;
+  }
+  .match-feed__head, .match-feed__foot { display:none; }
+  .match-feed__body { flex:1; padding:0; gap:10px; }
+  .match-feed__cursor { width:8px; height:15px; }
+  .match-feed__row { grid-template-columns:36px minmax(0,1fr); gap:8px; font-size:12px; }
+  .match-feed__row:nth-of-type(n+7) { display:none; }
+
+  .match-screen__empty { padding:40px 18px; }
+  .match-screen__legacy { padding:16px 18px; }
+}

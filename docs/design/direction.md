@@ -1,3 +1,5 @@
+> **Superseded** by the [v4 redesign record](v4-redesign.md) (19 October 2026); kept as history.
+
 # Imperialism interface direction
 
 ## Intent

@@ -30,18 +30,18 @@ Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
 Claude Design project.
 
-The current interface combines Football Manager's readable management screens
-with Europa Universalis-style political cartography: a large map, a compact
-campaign form, a quiet header with settings, and a sidebar showing the latest
-result, territory gained, and the player claimed. Standings, activity, and squads
-share that sidebar. The [design direction](docs/design/direction.md) records the
-visual references and decisions, including the generated cartographic paper
-texture in `public/textures/cartographic-paper.png`.
-
-The current [match-ledger restyle](docs/design/ledger-restyle.md) pairs a warm-paper
-intelligence panel with the dark atlas. Archivo, Archivo Narrow and Alegreya are
-self-hosted with their open-font licenses in `public/fonts`; no external font
-service is needed. Map names wait for their font metrics before switching faces.
+The current interface is that project's **v4 redesign**: modern, flat and calm.
+It pairs a grand-strategy map (Europa Universalis) with dense football-management
+data (Football Manager). Surfaces are light (`#f5f5f2` with white panels) with
+square corners and no textures, glows or gradients. One clay accent (`#9c5a43`)
+marks your team and the primary action, and cobalt (`#2f54eb`) marks the next
+opponent. Archivo and Archivo Narrow are the only faces loaded. They are
+self-hosted with their open-font licenses in `public/fonts`, so no external font
+service is needed. The Alegreya files and `public/textures/cartographic-paper.png`
+remain in the repository but are no longer used. Map names wait for their font
+metrics before switching faces. The [v4 redesign record](docs/design/v4-redesign.md)
+lists the binding decisions, the architecture and the known deviations. Earlier
+notes in `docs/design/` are kept as history.
 
 ## Running it
 
@@ -52,6 +52,7 @@ npm run build       # production bundle into dist/
 npm test            # complete automated regression suite
 npm run smoke       # headless: plays campaigns to completion and checks invariants
 npm run smoke -- --scenarios=england # only the smoke scenarios whose names match
+npm run smoke -- --campaign-only=7   # one scenario by index (also --resume-only=<i>, --manager-only)
 npm run balance -- --runs=12 # seeded odds, acquisitions and campaign balance report
 npm run test:simulation # score distributions, RNG, tie-breaks, odds and live ticker
 npm run simulation:report -- --samples=200000 --out=docs/design/match-simulation-report.json
@@ -75,51 +76,245 @@ npm run test:domestic    # country maps, sections and seeded country campaigns
 
 ## How a campaign plays
 
-Choose a sport, nations or clubs, and a **theatre**. Nation campaigns default to
-Europe (UEFA); the other choices are the whole world (170 nations), another
-confederation, or the Elite 32. Club campaigns offer individual leagues, all
-leagues, or the strongest 32 available clubs. The setup shows the actual number
-of teams for each choice.
+### Setup
 
-Short, standard and world session presets show the field, games and estimated
-autoplay duration before launch. Choose **Spectator** for automatic signings or
-**Manager** to select a captured player when your managed team wins. The pinned
-team selector changes the team you follow or manage. Optional alerts pause for
-its matches; eliminated teams remain identified in the selector.
+A new campaign is set up in three steps: **Campaign → Rules → Your role**.
+Space moves to the next step and launches the campaign from the last one. Every
+default suits a first campaign, so pressing Space three times starts one.
 
-**Pacing** decides how matchups are drawn:
+1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
+   the war is fought). Nation campaigns default to Europe (UEFA). The other
+   choices are the whole world (170 nations), another confederation, or the
+   Elite 32. Club campaigns offer individual leagues, all leagues, or the
+   strongest 32 available clubs. The step opens on a map of the chosen theatre:
+   the board it starts on, each team's land in its kick-off colour, framed as
+   the campaign's opening camera frames it (the continent for Europe). It also
+   shows the actual number of teams, the number of matches and the estimated
+   length; its note names the Show matches mode the estimate assumes. With
+   clubs in football, a second theatre group, **One country · top clubs**,
+   starts a [domestic campaign](#domestic-campaigns), and its map shows that
+   country.
+   A quick-resume card appears when a save exists.
+2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
+   matches** picks *Live, minute by minute*, *Final score only* or
+   *Fast-forward*; it can be changed at any time during play. A collapsed
+   **More rules** section holds upsets, the final, computer signings,
+   basketball team strengths and the seed. Its line reads "Standard", or lists
+   only the rules you changed.
+3. **Your role** — **Manager** runs one team. You choose an approach before
+   its matches and one of up to three signings after its wins, and, under a
+   one-match draw, **who picks your opponent**. **Spectator** leaves draws,
+   results and signings to the game, and you can follow any empire once the
+   campaign starts. **Launch campaign** starts it.
 
-| Mode | Draw |
-| --- | --- |
-| `duel` | A spinner picks one attacker and a compass direction. One match per round. |
-| `blitz` | Pair everyone, preferring neighbours; otherwise use another opponent. An odd team gets a bye. |
-| `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
+### Rules of war
+
+**The draw** decides how matches are made. Each card stores the existing
+`pacing` and `turnOrder` settings:
+
+| Card | Stored | Draw |
+| --- | --- | --- |
+| Random draw (recommended) | `duel` · `random` | One match per turn. Any surviving empire can be drawn to attack. |
+| Round robin | `duel` · `round-robin` | One match per turn. Every surviving empire attacks once per round, strongest first (by starting strength, then name). |
+| Blitz round | `blitz` | Pair everyone, preferring neighbours; otherwise use another opponent. An odd team gets a bye. |
+| Chaos draw | `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
 
 Blitz and chaos allow distant pairings without the directional route restrictions
 used in one-by-one mode. Neither mode annexes neutral land to connect teams.
 
-**Resolution** is either a live ticker or an instant final score. Level games go
-to penalties in football and overtime in basketball. Pacing and resolution are
-under **Match settings** during setup and the header's **Settings** button during
-a campaign. Predictable, balanced and wild uncertainty presets adjust match-day
+A manager under Random draw or Round robin also chooses, on the Your role step,
+**who picks your opponent** (`targeting`):
+
+| Opponent | Whom they attack |
+| --- | --- |
+| You choose | On your turns you pick any empire in reach; every other empire spins the compass. |
+| Compass | The compass picks the target for every attacker, you included. |
+
+Blitz and chaos always use a random draw and the compass; a manager who picks
+one sees a note, with a way back to the draw, instead of the opponent cards.
+Spectators never see the choice and always use the compass. A stored *You
+choose* becomes the compass when a spectator launches, and again when an
+eliminated manager continues as a spectator. Rules are fixed at launch. The
+defaults, **random draw × compass**, reproduce the original behaviour exactly.
+Every one-by-one turn consumes exactly three campaign random samples in every
+mode, so seeds recorded before the rules existed still replay the same campaign.
+
+An empire is **in reach** if it is a land neighbour with a legal direct route.
+If there is none, direct sea strikes count; after that, the fallback sea and
+treaty routes. If nothing is in reach, that turn uses the compass and the log
+says so.
+
+Under round robin, a round is one full cycle. On the Map view a turn strip under
+the masthead shows "Turn N of M this round" and the flags in turn order. Played
+and fallen empires are dimmed (fallen ones are also struck through), the current
+attacker is ringed, and "Next" names the following attacker. A round-robin
+attacker with no route at all skips its turn. Under a random draw, spectators
+get a strip with the number of empires that can be drawn and the recent
+attackers.
+
+On your turn under *You choose*, every empire in reach gets a dashed cobalt
+outline and the land out of reach is veiled. The column's **Choose a target**
+panel lists flag, name, strength, the territories you would gain and your win
+chance. The list is sorted by win chance × territories, with the top row
+preselected. A card on the map spells out what winning and losing would mean,
+and the primary action becomes **Attack <team>**. The campaign waits for your
+choice; no timer runs.
+
+### Match rules
+
+**Show matches** is *Live, minute by minute* (a live ticker), *Final score
+only* (an instant final score) or *Fast-forward* (Express playback: final scores
+only, with shorter pauses for routine matches). It stores the existing
+`resolution` and `express` settings. Level games go to penalties in football and
+overtime in basketball. The draw, the opponent choice, upsets, the final, computer
+signings and your role are fixed at launch. During a campaign the masthead's
+**Settings** button (More on phones) changes Show matches at any time, except
+that switching between Live and Final score only waits for the current draw or
+match. Under **This campaign** it lists the launch rules as read-only text.
+**Upsets** has predictable, balanced and wild presets that adjust match-day
 rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
 offence/defence, form and shooting variance. Stronger teams are favourites, while
-every uncertainty setting retains scoring randomness and possible upsets.
+every Upsets setting retains scoring randomness and possible upsets.
 Pre-match percentages estimate this model with an independent seeded sample.
 They do not consume the campaign's random stream.
 Odds prepare the two lineups once and sample scores without building hundreds of
 event timelines. The [match simulation notes](docs/design/match-simulation.md)
 describe the rules, calibration checks and measured performance.
 
-**Next match** draws or advances a match; **Finish match** fast-forwards a live
-ticker to its result. **Play campaign** runs the campaign automatically, and
-**Pause** freezes the draw, ticker and scheduled presentation, and **Resume**
-continues them. Manual live matches also have a pause control. Speed cycles
-1× / 2× / 4×. **Express** compresses routine presentation while keeping followed
-matches, upsets and finales visible. It uses the same draw and match results.
+### Masthead and controls
+
+The masthead has two rows. Row 1 holds the wordmark, the dateline ("Round XIX ·
+22 of 55 remain"), the screen navigation **Map / Squad / Match / Ledger /
+Chronicle**, the one primary action and the Settings button. Row 2 shows your
+team (flag, name, "Managed by you") with Strength and its change since Round I,
+Territories, Conquests and Claimed. A spectator sees "Spectating · Following
+<team>" with Empires, Matches, Upsets and Largest. Row 2 ends with the playback
+controls, "Autoplay off · Speed 2×": the first toggles autoplay and the second
+cycles 1× / 2× / 4×. Spectators also get a step button there (**Next match** /
+**Finish match**).
+
+There is one primary action per screen, and **Space** runs it on desktop. At
+1200px and wider the button carries a "SPACE" hint. Focused controls keep their
+own Space, and open dialogs block it.
+
+| Primary | When |
+| --- | --- |
+| **Continue** | Draw the next match, move on after a result, or kick off at a tactical gate with the balanced approach |
+| **Finish match** | Reveal a live ticker match's result |
+| **Attack <team>** | Confirm your target under *You choose* |
+| **Sign <player>** | Confirm the signing on the conquest screen (the masthead button reads "Sign player") |
+| **Pause** / **Resume** | Autoplay is running / the clock is paused |
+| **Play campaign** | A spectator's primary (it becomes **Pause** while autoplay runs) |
+| **Results** | The campaign is over |
+
+**Pause** freezes the draw, the ticker and scheduled presentation. A pending
+target choice or signing holds the screen: only Map stays available in the
+navigation. **Fast-forward** (Show matches) compresses routine presentation while
+keeping followed matches, upsets and finales visible. It uses the same draw and
+match results.
+
+### Map view
+
+The map fills the screen next to a campaign column (500px at 1600px and wider,
+360px from 1200px). For a manager, the column shows:
+
+- **Next fixture.** Before the draw, round robin shows "<TEAM> to attack" with
+  "Compass decides the target" or "You choose the target". A random draw shows
+  "Next draw · Any of N empires can be drawn". Once the fixture is known, it
+  shows "<A> v <B>", the route ("Across a land border" / "By sea — no shared
+  border"), the odds bar and "Strength 82.1 v 78.4 · from N simulated matches".
+  When your team plays, **Match preview** opens the approach choice. **or
+  simulate the result** reveals this match at once with the default approach.
+  **Continue** kicks off with the balanced approach. During and after the match
+  the block holds the compact match card with the score and minute.
+- **Your fronts** — neighbouring empires with strength, territories and your
+  win chance: green at 60% or more, amber at 45–59%, red below 45%.
+- **Latest results** — "Germany beat Austria", the score and the claimed
+  player. **Chronicle** opens the full history.
+
+A spectator's column shows **This turn** instead: attacker, "compass points
+to", defender and the odds, then the live match card. It also shows
+**Following**, where you change the followed team and switch on "Pause when
+<team> plays", and the autoplay and speed controls.
+
+The map carries a title card (round, campaign title, "Map after Round XVIII ·
+seed 2026"), a key, the map-mode switch and the zoom −/+/reset control. A live
+ticker runs along the bottom: a LIVE label and results newest first, such as
+"R XVIII  GERMANY 2  AUSTRIA 0 · AUSTRIA OUT". It is static, not a marquee.
+
+Map modes:
+
+| Mode | Shows |
+| --- | --- |
+| **Political** (default) | A flat pastel per empire, picked by a hash of the team id. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
+| **Strength** | Five grey steps by strength percentile; your empire keeps its colour. |
+| **Fronts** | Your fronts tinted by your win chance (green / amber / red); other land is neutral. |
+| **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours. |
+
+The map mode is not saved: a reloaded campaign opens on Political. Hovering land
+shows its owner, since when it has been held and the deciding result. Clicking
+land opens that team's squad.
+
+### Match, squad and conquest screens
+
+**Match** shows the live match. A score header holds attack and defence, the
+scorers, the score and the minute ("67' · LIVE", then FULL TIME, FINAL for
+basketball, or PENALTIES). Below it, a **win-probability chart** follows the
+match from your side: the managed team, else the followed team, else the
+attacker. It marks goals and half-time. Football uses a Poisson model of the
+goals still to come, built from the match's own lineups. Basketball uses a
+normal approximation of the remaining margin. Both lineups follow, with
+claimed players tagged and ratings coloured by tier. A dark match feed lists
+events newest first and has 1× / 2× / 4× speed chips and Pause. When a live
+ticker match involving your team (or, as a spectator, the followed team) kicks
+off while you are on Map, the game switches to Match. It returns to Map at the
+next turn if the switch was automatic. Fast-forward's routine matches and
+"simulate the result" never switch. Without a live match, the screen shows the last finished match, or the
+next fixture before the first one.
+
+**Squad** shows one team: the flag, "First team · N players · K claimed in
+conquest", the starting-lineup strength and its change, and the claimed count.
+Tabs switch between **List**, **Pitch** and **Acquisitions**. The list columns
+are No · Pos · Player · Natural · In role · Rtg · Acquired · Source, grouped by
+position, followed by squad depth. The side column has the formation (claimed
+players in teal), a strength profile on a 60–95 scale and the latest claims.
+Basketball uses a court, Guards / Forwards / Centres and an offence/defence
+profile. Squad opens from the navigation, from map land or from a Ledger row;
+Back returns to where you came from.
+
+The **conquest screen** appears after your managed team wins, and the campaign
+waits for your choice. The map hatches the taken land under a "+N territories
+taken" callout. Beside it, an article reads "SERBIA IS OUT", with a
+winner-first standfirst and the territory and empire effects. **Claim one
+player** lists the candidates, with the best lineup fit preselected. Each one
+reads "FW · 86 rating · Starts ahead of <player>" or "Adds depth · the XI is
+unchanged", with the strength gain. The position lists every natural position,
+so a basketball combo guard reads "PG/SG · 88 rating". A collapsible "Lineup
+before and after" compares the lineups, and **Sign <player>** confirms. If your
+team is knocked out, the same article layout ("ITALY IS OUT") offers
+**Continue as spectator** or **Retry this setup**. Conquests by other teams
+never wait: a notice on the map, the ticker and a brief hatch flash report them.
+
+**Ledger** shows the standings (# · Team · Terr · Strength · Conq · Claimed),
+the share of the map and the fallen empires. **Chronicle** shows the match
+history, the archived match card, turning points and the activity feed.
+
+### Phones and tablets
+
+Below 700px the masthead shrinks to the flag, wordmark and round over four stat
+cells. The map zooms to your empire and the next opponent, with a **Whole map** /
+**Your fronts** toggle. The campaign column becomes a bottom sheet with a grab
+handle; tapping it expands the sheet to show your fronts and latest results. A
+full-width primary bar sits above a tab bar of **Map · Squad · Match · Ledger ·
+More**. **More** holds the Chronicle, the playback controls, Settings and saves.
+From 700px to 1199px the map sits on top and the column content runs in two
+columns below. Touch targets are at least 44px. Reduced motion keeps only
+opacity transitions.
+
+### Finale, seeds and saves
 
 The optional best-of-three finale starts when two teams remain. Interim games
 award no territory or player; the second win resolves one conquest. A numeric
@@ -127,8 +322,11 @@ seed reproduces a campaign when settings, manager choices and simulation version
 match. Updating the model can change future results for older seeds; already
 generated matches in saved campaigns retain their outcome and events.
 
-Progress autosaves during pending matches and after signings, preserving the
-seed, random state, queue, history and pending manager choice. Save status reports
+Progress autosaves at every draw, kickoff, final whistle and result, and after
+signings, preserving the seed, random state, queue, history and pending manager
+choice. A match's outcome is fixed at kickoff, so the goals and kicks revealed since
+are written with the next checkpoint, on pause, or when the page is hidden or
+closed; a save with nothing new to write is skipped. Save status reports
 storage errors. Each checkpoint is kept with a recovery copy. A save is all or
 nothing: when browser storage is full, a campaign may drop its own recovery copy to
 fit, but never another campaign's; otherwise nothing is written and save status
@@ -141,11 +339,13 @@ campaign setup retains the previous save until a replacement is launched.
 Older version-one saves migrate, but their original random stream was never
 recorded, so exact continuation from that historical stream cannot be recovered.
 
-History filters by team and opens full match events and conquest rewards.
-**View conquest on map** reveals the gained holdings. Final results include the
-largest upset, decisive match and most useful signing; the header trophy reopens
-them after viewing the map. On phones, playback stays at the bottom while
-scrolling. The map has one keyboard tab stop, arrow navigation and a skip link.
+The Chronicle's history filters by team and opens full match events and
+conquest rewards. **View conquest on map** reveals the gained holdings. Final
+results include the biggest upset, the decisive match and the transfer impact.
+The masthead trophy reopens them after you view the map. The map has one
+keyboard tab stop, arrow navigation and a skip link.
+
+### Draw compass, flags and navigation
 
 In one-by-one mode, the [draw compass](docs/design/duel-draw.md) selects an
 attacker, slows to the chosen opponent's exact bearing, and briefly reveals the
@@ -154,11 +354,9 @@ and kickoff use one captured playback speed; changing speed during a draw takes
 effect after that draw. Off-screen draws are brought into view, and reduced
 motion replaces spinning with a short, static directional reveal.
 
-The map starts in **Flags** mode: each nation has its flag as the territory
-background, and conquered land adopts its owner's banner. Countries outside the
-active campaign stay neutral without flags; setup still previews national flags.
-**Political** remains available for muted ownership colours. Clubs retain their
-own colours in both modes.
+In **Flags** mode each nation has its flag as the territory background, and
+conquered land adopts its owner's banner. Countries outside the active campaign
+stay neutral without flags. Clubs fly no flags and keep their own colours.
 
 Fourteen [symbol-aware flag designs](docs/design/flag-symbols.md) separate the
 continuous field from their emblem. Crosses, discs and coats of arms keep their
@@ -170,7 +368,7 @@ their original artwork.
 Scroll to zoom (up to 16×, anchored on the pointer), drag to pan, double-click or
 press the zoom readout to reset. The view is clamped to the world, so the map
 cannot be lost off-screen. Borders, labels and markers hold a constant weight on
-screen at every zoom level, and the scale bar re-snaps to a round distance.
+screen at every zoom level. The v4 map has no scale bar or coordinate readout.
 
 ## Squads
 
@@ -204,15 +402,29 @@ position are curated in `scripts/fiba-squads.json`, and ratings are resolved fro
 the 2K export by name, with a curated rating for EuroLeague players it doesn't
 cover. Curating nationality is the right call regardless: FIBA squads are not NBA
 rosters (Serbia, Spain, Greece and Lithuania field mostly EuroLeague players, and
-eligibility follows the federation — Banchero plays for the USA, Siakam for
-Cameroon).
+eligibility follows the federation — Banchero plays for the USA rather than
+Italy). The fives were last checked against FIBA records in October 2026: every
+player has played for his national team since 2023, players who had retired
+from it were replaced by current internationals at the same position, and no
+five fields more than the one naturalized player FIBA allows.
+
+Basketball positions are fluid, so most players list two neighbouring positions,
+primary first: Dončić is PG/SG, Giannis PF/C, Melli PF/C. Pure point guards and
+centres such as Calathes and Jokić list one, and so do players whose sources
+show a single position. 133 of the 200 national players cover two positions.
+Every listed position is one the player really plays, and every five has a
+real player for each of the five positions. The lineup optimizer fields each
+five from these positions, so Italy starts Pajola (PG/SG) at shooting guard and
+Melli at centre.
 
 Nations with no roster in a sport fall back to *that sport's* baseline, never to
 another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
 An assignment optimizer fills all eleven football or five basketball slots.
-Playing outside a natural position costs 12 rating points. Missing legacy slots
+Playing outside a natural position costs 12 rating points. A player may have
+more than one natural position, and each one is penalty-free: a claimed PG/SG
+can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
 in match scoring and tie-break events. Squad lists separate starters from bench
 and identify positional penalties; bench depth does not directly inflate strength.
@@ -260,9 +472,14 @@ conquest, player theft) behaves identically.
 Club lineups come from the same two exports as the national squads:
 `clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
 `clubs.basketball.js` from the NBA 2K export. 2K carries no position, so each
-player's role is inferred from the attributes that define it — a centre by
-interior defence, rebounding and post play; a point guard by vision, handle and
-speed with the ball.
+player's positions are inferred from the attributes that define them — a centre
+by interior defence, rebounding and post play; a point guard by vision, handle
+and speed with the ball. Each fit is ranked as a league percentile, so the five
+scales compare. A player's best fit is his primary position. He also covers the
+better neighbouring position when it ranks within 15 percentiles of it. About
+three in four players in the export, and 131 of the 150 NBA starters, cover two
+positions. Each franchise's five is then the lineup the game itself would field
+from its whole roster.
 
 ## Domestic campaigns
 
@@ -286,24 +503,38 @@ clear of the border), while the home marker shows the town itself. Tooltips and
 conquest results use section names, such as "Lancashire (east)", where Burnley
 starts.
 
+In the v4 interface, choosing **Clubs** in setup step 1 adds the **One country ·
+top clubs** group below the leagues (football only). Picking a country shows a
+preview card: its sections in their starting clubs' kick-off colours over the
+neighbouring land, captioned with the number of sections. The sectioned map
+uses the same flat style as the world map: pastel section fills, white borders
+and the clay and cobalt identity colours. Neighbouring countries form an inert
+land-neutral backdrop, and every home town is marked at any zoom. The title
+card reads the theatre itself, such as "England · top 100 clubs", and the key
+labels the marker **Home town** instead of Capital. Tooltips name the section
+and read "Home of Burnley", "Held by … since Round …" or "Unclaimed". The
+conquest screen and results name the sections taken. When an exclave's attack
+has to cross a neighbour, the Next fixture route line reads "Through foreign
+land — never claimed". In Flags mode, clubs keep their own colours.
+
 Each country is one file, `public/domestic/<id>.json`, fetched only when chosen.
-The setup screen shows a loading state, and Retry if the fetch fails. On wide
-screens it previews the country beside the setup panel, each section in its
-starting club's colour (hovering one names the club), and Launch shows that it
-is preparing the map. The file holds the sections as TopoJSON with shared
-borders, the clubs with their starting sections and squads, and a projection
-centred on the country, so the scale bar is a true distance at the map's centre.
-The generated index `src/data/domestic.js` lists the shipped countries. Saves
-record `clubScope: 'domestic:<id>'` and the map's version. Resuming, importing or
-reloading a save loads the map first. The saved-campaign dialog says so
-meanwhile, and closing it (or Cancel import, or Clear quick resume) cancels the
-restore. A save from another build of the same map resumes club by club: section
-ids follow club rank, and a club's starting sections always share one holder, so
-all of its new starting sections go to whoever held its old home section. Saves
-from the earlier one-section-per-club maps move onto the 100-section maps the
-same way. A moved save is re-stamped with the new version and restarts an
-interrupted draw. A save whose clubs differ from the new build's, or whose
-holdings split a starting group, is refused, and kept.
+The setup screen shows a loading state, and Retry if the fetch fails. The setup
+wizard previews the country in step 1, every section in the colour of the club
+that starts there, and Launch shows that it is preparing the map. The file holds
+the sections as TopoJSON with shared borders, the clubs with their starting
+sections and squads, and a projection centred on the country, so distances are
+true at the map's centre. The generated index `src/data/domestic.js` lists the
+shipped countries. Saves record `clubScope: 'domestic:<id>'` and the map's
+version. Resuming, importing or reloading a save loads the map first. The
+saved-campaign dialog says so meanwhile, and closing it (or Cancel import, or
+Clear quick resume) cancels the restore. A save from another build of the same
+map resumes club by club: section ids follow club rank, and a club's starting
+sections always share one holder, so all of its new starting sections go to
+whoever held its old home section. Saves from the earlier one-section-per-club
+maps move onto the 100-section maps the same way. A moved save is re-stamped
+with the new version and restarts an interrupted draw. A save whose clubs differ
+from the new build's, or whose holdings split a starting group, is refused, and
+kept.
 
 **Sources.** All of this is fetched at build time and committed; nothing loads
 from these services at runtime.
@@ -392,14 +623,15 @@ known limitations.
 
 ## Squad economics
 
-Beating a team claims one player. The squad panel tracks what that has
-actually done to a side: `EFF` is the best-lineup rating and only ever climbs, while
-`AVG` is the whole-squad mean and can *fall* when a strong nation absorbs a weak
-one's best player. Both are shown against their kick-off value. The standings
+Beating a team claims one player. Strength (`EFF`) is the best-lineup rating, so
+it only ever climbs; a claimed player who does not make the lineup adds depth
+but no strength. The squad screen and the masthead show it against its
+kick-off value. The Ledger standings
 always rank teams by live overall strength (EFF), highest first, and show strength
 gain since the campaign began. Equal strengths are ordered alphabetically;
 territory count is informational and never changes the rank order.
-Positive campaign gains appear as a green `+N` beside Strength (one decimal).
+Positive campaign gains appear as a green `+N` beside Strength (one decimal);
+an unchanged strength reads a muted `±0.0`.
 The latest match result also shows the winner's before/after strength and the
 gain from that conquest alone. A transfer that does not improve the rating says
 `No change`; territory itself adds no artificial strength bonus. Cumulative
@@ -409,9 +641,10 @@ gains remain available after resuming a saved campaign.
 
 In **Flags** mode, territory is filled with its **owner's** flag, so an empire
 reads as one banner spreading across the map — conquered land switches to the
-conqueror's colours the moment it is annexed. Political mode communicates the
-same ownership with solid colours. Flags also identify national teams in match
-results, popups, standings, squads, and the victory screen.
+conqueror's colours the moment it is annexed. Political mode, the default,
+communicates the same ownership with flat pastel fills. Flags also identify
+national teams in the masthead, match results, standings, squads and the
+victory screen.
 
 Each **geographic region of an empire** shares one SVG `<pattern>`. Neighboring
 conquered countries and nearby islands sample the same flag continuously:
@@ -425,9 +658,8 @@ visual grouping only, not a change to conquest adjacency. Multipart countries
 are drawn as separate flag parts beneath a single clickable outline, preserving holes and
 country selection. Bounds update after conquest, not on zoom or pan. Only land
 reveals the flag; seas and neutral countries stay untouched. A solid rectangle
-in the nation's colour is the fallback. Setup previews native flags with the
-same regional treatment; non-participants remain unflagged in continental
-campaigns, and clubs continue to use club colours.
+in the nation's colour is the fallback. Non-participants remain unflagged in
+continental campaigns, and clubs continue to use club colours.
 
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
@@ -455,13 +687,16 @@ ownership-aware interior-fit algorithm; their positions never affect targeting.
 Names span the current empire rather than staying attached to one original
 country. The label engine combines owned land across internal borders, separates
 disconnected landmasses, and searches for a safe interior text area. It tests
-horizontal and shape-aligned angles, measures the real serif text, and gives the
-name a gentle upward arch. The padded footprint includes the curve and halo.
+horizontal and shape-aligned angles, measures the real text (Archivo Narrow,
+uppercase, .14em tracking), and gives the name a gentle upward arch rising 5% of
+its width. The padded footprint includes the curve and halo.
 Cramped inland names can use a softer arch before being omitted.
 Coastlines, foreign enclaves, holes and sea gaps are checked against the rendered
 vector geometry.
 
-Names grow with usable territory while staying within an 11–32px readable range.
+Names grow with usable territory up to 30px at 1600px wide and above, 22px from
+1200px, 20px from 700px and 18px on phones. They are hidden below 9px, except
+your own empire's name, which can shrink to 6.5px.
 On-land fits are preferred. When necessary, a name may extend a little over water:
 at most 10 screen pixels from owned land, with no more than 22% of its padded
 envelope at sea. Its anchor stays on owned land, and foreign or neutral countries
@@ -537,9 +772,33 @@ coastline and date-line regressions.
 
 ```
 src/
-  App.jsx              campaign state machine, match flow, view models
-  config.js            simulation tunables (drama, upset threshold, labels)
-  theme.js             design tokens
+  App.jsx              campaign state, flow, view router, primary action, render;
+                       one-line delegates to src/app/
+  app/                 App method bodies by area, called as fn.apply(this, args)
+    mapMethods.jsx     map fills, flags, labels, tooltip, reach and conquest framing
+    columnMethods.jsx  campaign column, map title card and key, ticker
+    matchMethods.jsx   live match presentation, minute clock, match card
+    squadMethods.jsx   squad view
+    conquestMethods.jsx  result, signing gate, conquest screen, elimination
+    turnMethods.jsx    turn order, target choice, turn strip, spectator panel
+    ledgerMethods.jsx  standings, Ledger, Chronicle, victory, match preview
+    shared.js          constants shared by App and the method modules
+  viewModels/          pure build*(state, ctx) functions: masthead, campaign,
+                       map, match, squad, conquest, turns, ledger, odds, format
+  screens/             presentational v4 screens, one folder per area
+    campaign/          Next fixture, Your fronts, Latest results, ticker, map overlays
+    match/             score header, win-probability chart, XI tables, match feed
+    squad/             squad table, pitch/court, strength profile, claims
+    conquest/          conquest article and map callout
+    turns/             turn strip, Choose a target panel and card, spectator panel
+    ledger/            Ledger and Chronicle screens, standings, history
+    setup/             setup wizard model (steps, rules of war, summaries)
+  styles/
+    tokens.css         v4 colour, type and layout tokens (incl. --map-veil)
+    primitives.css     shared buttons, kickers, tables, panels
+    shell.css          app shell per view and breakpoint, phone chrome
+  config.js            simulation tunables (drama, upset threshold, labels), save version
+  theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
     basketball.js      starting five, 40 minutes, overtime
@@ -548,7 +807,12 @@ src/
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
+  data/sourceTable.js  compact player rows of the generated football files: one
+                       JSON line per nation or club, metadata keys and shared
+                       values written once (scripts/lib/data-module.mjs writes them)
   data/scopes.js       club theatre choices (per league, all, elite)
+  data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
+  data/domesticScope.js  labels for 'domestic:<id>' theatres
   data/flags.js        nation id -> flag asset
   data/capitals.js     capital city coordinates
   hooks/               map zoom and pan viewport
@@ -556,20 +820,34 @@ src/
     geo.js             TopoJSON decode, land adjacency, projection, SVG paths
     random.js          sampling shared by every sport
     campaign.js        territory ownership, targeting, round draws
-    storage.js         autosave
-  components/          command bar, map, sidebar, overlays, popups
+    duelDraw.js        one-by-one draw: attacker, compass bearing, route
+    turns.js           round-robin queue, "in reach" targets, launch rules
+    winProbability.js  live win-probability model (football and basketball)
+    liveMinute.js      live match minute store (outside saved state)
+    domestic.js        loads and validates a country map: sections and club rows
+    storage.js         autosave, save slots and versions
+  components/          masthead (CommandBar), playback, phone chrome, map, setup
+                       wizard, match card, dialogs and overlays
 public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
-  textures/            generated cartographic paper texture
+  domestic/            one sectioned map per country, fetched on demand
+  fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
+  textures/            former cartographic paper texture (unused since v4)
   flags/               170 vendored flag SVGs
 scripts/
+  test.mjs             runs every scripts/*.test.mjs (npm test)
+  lib/app-harness.mjs  shared App/component harness for the jsdom tests
+  lib/data-module.mjs  writes the compact generated football data modules
+  data/seed-replay.golden.json  determinism golden for seeded campaigns
   smoke.mjs            headless campaign test (jsdom)
   sync-flags.mjs       vendors flag SVGs from flag-icons
   build-rosters.mjs    builds football squads from an EA FC export
   build-basketball.mjs builds FIBA fives from NBA 2K + fiba-squads.json
   build-clubs.mjs      builds the club layer for both sports
+  sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
+  build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
 ```
 
 ### Tuning
@@ -589,8 +867,14 @@ scripts/
 campaigns** across all three pacings, both resolution modes, both sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map and one is Fiji's 16 clubs, each starting on a group of its 100
-sections. **Six interrupt-and-resume scenarios** cover a world-scale national
-campaign plus basketball nations, football clubs, NBA clubs and England and Fiji
+sections. A **manager campaign** (Italy, Europe, round robin × *You
+choose*, live ticker) is driven only through the primary action. It covers
+target choices, tactical gates, Finish match, signings on the conquest screen,
+the automatic switch to Match and back, and Continue as spectator after
+elimination. It also checks that every one-by-one turn draws exactly three
+campaign samples and that no clock timer runs while a decision is pending.
+**Six interrupt-and-resume scenarios** cover a world-scale national campaign
+plus basketball nations, football clubs, NBA clubs and England and Fiji
 domestic campaigns, which are played on to their champions after the reload.
 They verify that settings, ownership, squads, acquired players, and the remaining
 match queue survive a reload and that the campaign remains playable. The app's
@@ -604,9 +888,40 @@ every shipped country with legal duel draws.
 
 The suite asserts that each match eliminates exactly one team, that no territory
 is lost or duplicated, and that one player changes shirts per match. It checks
-political ownership colours, national flag ownership in Flags mode, club colours,
-structured result rewards, the sidebar tabs, victory, and absence of React
-warnings.
+that setup and kickoff open on the Political map, national flag ownership after
+switching to Flags, club colours, structured result rewards, the Chronicle,
+Ledger and Squad screens opened through the masthead, victory, and absence of
+React warnings.
+
+Focused runs skip every other section:
+
+```bash
+npm run smoke -- --campaign-only=0   # one of the ten campaigns (index 0–9; 7 and 8 are England, 9 is Fiji)
+npm run smoke -- --resume-only=0     # one resume scenario (index 0–5; 4 is England, 5 is Fiji)
+npm run smoke -- --manager-only      # the manager campaign
+npm run smoke -- --scenarios=england # scenarios whose names match; narrows the picks above
+```
+
+`npm test` runs every `scripts/*.test.mjs` file. Besides the engine, model and
+UI suites listed under [Running it](#running-it), the v4 redesign added:
+
+| Test file | Covers |
+| --- | --- |
+| `seed-replay` | Seeded campaigns replay the golden outcomes, final random state and decisions (`scripts/data/seed-replay.golden.json`) |
+| `contracts` | Static contracts between App, the `src/app/` method modules and the frozen pure modules |
+| `view-router` | Derived views, navigation locks, the primary-action table, Space, auto-switch to Match and back |
+| `masthead` | Masthead markup and model, playback variants and the phone chrome |
+| `turn-order` | Round-robin queue, "in reach" tiers, fixed-attacker and chosen-target draws |
+| `turn-panels`, `turn-wiring` | Turn strip, Choose a target, spectator panel, and the turn flow in the real App |
+| `win-probability` | The live win-probability model against the football and basketball match models |
+| `save-size` | Save size and storage-quota behaviour for 170-nation campaigns |
+| `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
+| `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
+| `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |
+| `column-wiring`, `match-wiring`, `squad-wiring`, `conquest-wiring`, `ledger-wiring`, `map-wiring` | Each screen wired to the running App |
+
+Domestic campaigns add `domestic-data`, `domestic-geometry`, `domestic-campaign`
+and `domestic-routing`, which `npm run test:domestic` also runs on their own.
 
 It also checks each sport's match model over 400 simulated games: that every match
 has a winner, that a level score always triggers a tie-break, that the event feed

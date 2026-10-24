@@ -12,8 +12,9 @@ export const DEPENDENCIES = {
   '304': { of: '208', name: 'Greenland' }, // Kingdom of Denmark
 };
 
-// Shapes drawn on the map that never belong to anyone.
-export const EXCLUDED_SHAPES = new Set(['010', '260', '238', '732']); // Antarctica, Fr.S.Lands, Falklands, W.Sahara
+// Shapes drawn on the map that never belong to anyone (club seeding never deals them).
+// Antarctica, Fr.S.Lands, Falklands, W.Sahara, N.Cyprus, Somaliland.
+export const EXCLUDED_SHAPES = new Set(['010', '260', '238', '732', 'XCYN', 'XSOL']);
 
 export const CONF_META = {
   UEFA:      { name: 'Europe (UEFA)',            baseStr: 63 },
@@ -269,9 +270,14 @@ function genPlayer(rng, culture, pos, baseStr) {
   return { name: f[0] + '. ' + l, pos, rating, gen: true };
 }
 
-/** Preserve the database identity and rating evidence carried by each export. */
-function rosterPlayer([name, pos, rating, metadata]) {
+/**
+ * Preserve the database identity and rating evidence carried by each export.
+ * Basketball tuples list every natural position, primary first ('PG/SG').
+ */
+function rosterPlayer([name, listed, rating, metadata]) {
+  const [pos, ...others] = listed.split('/');
   const player = { name, pos, rating, gen: false };
+  if (others.length) player.positions = [pos, ...others];
   if (metadata) {
     player.sourceInfo = { ...metadata };
     if (metadata.id) player.id = metadata.id;
@@ -350,7 +356,7 @@ export function buildClub(club, sport) {
     squad: club.squad.map(rosterPlayer),
     real: club.squad.length,
     kind: 'club',
-    // A domestic club starts on its own section of the country map.
+    // A domestic club's home is its home section; it starts on all of its startSections.
     home: club.homeSection ?? club.country,
     flagId: null,
     sport: sport.id,

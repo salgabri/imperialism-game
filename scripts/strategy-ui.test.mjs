@@ -6,17 +6,15 @@ import React, { act } from 'react';
 import { JSDOM } from 'jsdom';
 import { build } from 'esbuild';
 import { tacticalOptions } from '../src/engine/managerStrategy.js';
-import { acquisitionOptions } from '../src/engine/campaignExperience.js';
 import { getSport } from '../src/sports/index.js';
 
 const bundled = await build({ stdin: { contents: `
   export {default as TacticalChoice} from './src/components/TacticalChoice.jsx';
-  export {default as AcquisitionChoice} from './src/components/AcquisitionChoice.jsx';
 `, resolveDir: fileURLToPath(new URL('../', import.meta.url)), loader: 'jsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'], loader: { '.css': 'empty' }, logLevel: 'silent' });
 const module = { exports: {} };
 new Function('require', 'module', 'exports', bundled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
-const { TacticalChoice, AcquisitionChoice } = module.exports;
+const { TacticalChoice } = module.exports;
 const dom = new JSDOM('<html><body><button id="prior">Prior focus</button></body></html>');
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
@@ -46,19 +44,5 @@ test('tactical decision explains risk, commits the chosen ID and restores focus'
   assert.equal(document.activeElement.id, 'prior');
 });
 
-test('signing comparisons are accessible outside their claim buttons and inside the focus trap', async () => {
-  const winner = squad(80), loser = { ...squad(70), squad: [{ name: 'New defender', pos: 'DF', rating: 85 }] };
-  const view = await mount(AcquisitionChoice, { choice: { winnerName: 'Alfa', loserName: 'Beta', candidates: acquisitionOptions(winner, loser) }, onChoose() {} });
-  const summary = view.host.querySelector('summary');
-  assert.ok(summary);
-  assert.equal(view.host.querySelector('button summary'), null);
-  assert.equal(view.host.querySelectorAll('tbody tr').length, 11);
-  assert.match(view.host.querySelector('caption').textContent, /before and after signing New defender/);
-  assert.ok(view.host.querySelector('.is-changed'));
-  summary.focus();
-  await act(async () => summary.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })));
-  assert.equal(document.activeElement, view.host.querySelector('button'));
-  await act(async () => document.activeElement.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true })));
-  assert.equal(document.activeElement, summary);
-  await view.close();
-});
+// The AcquisitionChoice signing-comparison test moved to conquest-screen.test.mjs (W3, "ported signing comparison…"):
+// the comparison is a <details> on the conquest screen, which is not a modal, so the Tab trap became initial focus.

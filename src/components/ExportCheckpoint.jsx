@@ -1,6 +1,9 @@
+// Owner: WP-LEDGER (see PLAN.md §4). Export dialog in v4 (white dialog, kicker, Archivo textarea per the font rules).
+// Contract (ui-interaction L124-155): readOnly textarea labelled exactly "Campaign checkpoint JSON", buttons whose
+// text is exactly "Copy JSON" / "Download JSON" / "Close", copy fallback selects the text, Escape → onClose.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
-import './results.css';
+import './dialogs.css';
 
 /** The same checkpoint can be downloaded or copied when file downloads are unavailable. */
 export default function ExportCheckpoint({ text = '', filename = 'campaign.json', onDownload, onClose }) {
@@ -39,13 +42,23 @@ export default function ExportCheckpoint({ text = '', filename = 'campaign.json'
 
   return <div className="fi-export-backdrop">
     <section className="fi-export" ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="export-title" aria-describedby="export-description">
-      <div className="fi-export-heading"><h1 id="export-title">Export campaign</h1><button type="button" className="icon-button" aria-label="Close export" onClick={onClose}><Icon name="close" size={18} /></button></div>
-      <p id="export-description">Download this checkpoint, or copy it into a text file to keep your campaign.</p>
-      <p className="fi-export-filename">{filename}</p>
-      <label htmlFor="campaign-checkpoint-json">Campaign checkpoint JSON</label>
-      <textarea id="campaign-checkpoint-json" ref={textRef} readOnly value={text} rows={8} spellCheck={false} aria-describedby="export-description export-copy-status" />
+      <div className="fi-export-heading">
+        <div className="fi-export-titles">
+          <p className="fi-export-kicker">Campaign checkpoint</p>
+          <h1 id="export-title" className="fi-export-title">Export campaign</h1>
+        </div>
+        <button type="button" className="icon-button" aria-label="Close export" onClick={onClose}><Icon name="close" size={18} /></button>
+      </div>
+      <p id="export-description" className="fi-export-description">Download this checkpoint, or copy it into a text file to keep your campaign.</p>
+      <p className="fi-export-filename"><span>File</span> {filename}</p>
+      <label className="fi-export-label" htmlFor="campaign-checkpoint-json">Campaign checkpoint JSON</label>
+      <textarea id="campaign-checkpoint-json" className="fi-export-text" ref={textRef} readOnly value={text} rows={8} spellCheck={false} aria-describedby="export-description export-copy-status" />
       <p id="export-copy-status" className="fi-export-status" role="status" aria-live="polite">{copyStatus || 'Import this JSON file later to resume from this checkpoint.'}</p>
-      <div className="fi-export-actions"><button ref={copyRef} type="button" className="button button-primary" onClick={copy} disabled={!text}>Copy JSON</button><button type="button" className="button button-quiet" onClick={onDownload} disabled={!text}>Download JSON</button><button type="button" className="button button-quiet" onClick={onClose}>Close</button></div>
+      <div className="fi-export-actions">
+        <button ref={copyRef} type="button" className="button button-primary" onClick={copy} disabled={!text}>Copy JSON</button>
+        <button type="button" className="button button-quiet" onClick={onDownload} disabled={!text}>Download JSON</button>
+        <button type="button" className="button button-quiet fi-export-close" onClick={onClose}>Close</button>
+      </div>
     </section>
   </div>;
 }

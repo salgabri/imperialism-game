@@ -162,3 +162,15 @@ export const football = {
     return { ...result, ev: goalEvents(rng, result, prepared) };
   },
 };
+
+/**
+ * Squad-screen strength profile (PLAN §3.7, engine-diff §4c): the match model's own positional proxy
+ * (`profile` above) with no effective-strength offset → { attack, defence, keeper } on the player-rating scale.
+ * Takes a `selectLineup` result, or a team whose lineup is selected first. Read-only; no RNG.
+ */
+export function footballProfile(lineup) {
+  const selected = Array.isArray(lineup?.slots) ? lineup : Array.isArray(lineup?.squad) ? selectLineup(lineup) : null;
+  if (!selected) return { attack: 0, defence: 0, keeper: 0 };
+  const { attack, defence, keeper } = profile({ slots: selected.slots, starters: selected.starters || [] });
+  return { attack, defence, keeper };
+}

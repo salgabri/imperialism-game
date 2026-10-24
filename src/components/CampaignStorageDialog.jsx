@@ -1,7 +1,37 @@
+// Owner: WP-LEDGER (see PLAN.md §4). Saved campaigns / import / recovery / conflict dialog, restyled to v4 in
+// campaignStorage.css. Stays `export default function CampaignStorageDialog` with no wrapper (manager-flow L239
+// matches element.type.name); copy and focus contract per campaign-storage-ui.test.mjs.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
+import { SCOPES } from '../data/teams.js';
+import { CLUB_SCOPES } from '../data/scopes.js';
+import { plainScopeName } from '../viewModels/format.js';
 import { domesticLabel } from '../data/domesticScope.js';
 import './campaignStorage.css';
+
+/** A league's scope id is its name, so the fixed club scopes ('all', 'elite') are the only ones to look up. */
+const CLUB_FIXED_SCOPES = CLUB_SCOPES({ clubs: [] });
+
+/**
+ * The theatre's display name, as App.scopeName reads it: 'UEFA' → 'Europe', a club league by name, a country's own
+ * map as 'England · top 100 clubs'.
+ */
+function theatreName(settings) {
+  if (settings.layer === 'clubs') {
+    const id = settings.clubScope;
+    return domesticLabel(id) || CLUB_FIXED_SCOPES.find(scope => scope.id === id)?.name || id || CLUB_FIXED_SCOPES[0].name;
+  }
+  return plainScopeName(SCOPES.find(scope => scope.id === settings.scope)?.name || 'World War');
+}
+
+/** The name field's default: "<current campaign> copy" for a fork from the slot list, else the checkpoint's name. */
+function defaultName(mode, campaign, campaigns, activeId) {
+  if (mode === 'slots') {
+    const current = campaigns.find(item => item.id === activeId)?.name || campaign?.campaignName;
+    return current ? `${current} copy` : 'Campaign copy';
+  }
+  return campaign?.campaignName || (mode === 'conflict' ? 'Campaign fork' : 'Imported campaign');
+}
 
 function CampaignPreview({ campaign }) {
   if (!campaign) return null;
@@ -9,7 +39,7 @@ function CampaignPreview({ campaign }) {
   const manager = campaign.teams?.[campaign.managedTeamId]?.name || campaign.managedTeamName;
   return <dl className="campaign-storage-preview">
     <div><dt>Sport</dt><dd>{settings.sport === 'basketball' ? 'Basketball' : 'Football'} · {settings.layer === 'clubs' ? 'Clubs' : 'Nations'}</dd></div>
-    <div><dt>Theatre</dt><dd>{settings.layer === 'clubs' ? domesticLabel(settings.clubScope) || settings.clubScope || 'All clubs' : settings.scope || 'World'}</dd></div>
+    <div><dt>Theatre</dt><dd>{theatreName(settings)}</dd></div>
     <div><dt>Progress</dt><dd>Round {campaign.round || 0} · {campaign.matches || 0} matches · {alive} remaining</dd></div>
     <div><dt>Seed</dt><dd>{campaign.seed ?? 'Legacy campaign'}</dd></div>
     {manager && <div><dt>Manager</dt><dd>{manager}</dd></div>}
@@ -17,15 +47,16 @@ function CampaignPreview({ campaign }) {
 }
 
 /**
- * Preview and choose a checkpoint before altering the active campaign. While
- * `busy` (a campaign waits for its country map) every choice is held; Close and
- * Cancel stay available and abandon that restore.
+ * Preview and choose a checkpoint before altering the active campaign. While `busy` (a campaign waits for its country
+ * map) every choice is held; Close, Escape and Cancel stay available and abandon that restore. `lockedId` (the
+ * campaign in play) has no delete action; any other slot is deleted after a confirmation.
  */
 export default function CampaignStorageDialog({ mode = 'slots', campaign, campaigns = [], activeId, lockedId,
-  backup, message, notice, error, busy, onClose, onConfirmImport, onLoad, onRename, onFork, onReload, onRestoreBackup, onExportRaw, onExportCurrent, onDelete }) {
+  backup, message, notice, error, busy, onClose, onConfirmImport, onLoad, onRename, onFork, onReload, onRestoreBackup, onExportRaw,
+  onExportCurrent, onDelete }) {
   const ref = useRef(null), closeRef = useRef(null), callbacks = useRef({ onClose });
   callbacks.current = { onClose };
-  const [name, setName] = useState(campaign?.campaignName || (mode === 'conflict' ? 'Campaign fork' : 'Imported campaign'));
+  const [name, setName] = useState(() => defaultName(mode, campaign, campaigns, activeId));
   const [names, setNames] = useState({});
   const [deleting, setDeleting] = useState(null);
   const held = !!busy;
@@ -46,7 +77,7 @@ export default function CampaignStorageDialog({ mode = 'slots', campaign, campai
   }, []);
   return <div className="campaign-storage-backdrop">
     <section className="campaign-storage" ref={ref} role="dialog" aria-modal="true" aria-labelledby="campaign-storage-title" aria-describedby="campaign-storage-description" aria-busy={held || undefined}>
-      <div className="campaign-storage-heading"><h1 id="campaign-storage-title">{title}</h1><button ref={closeRef} type="button" className="icon-button" aria-label="Close saved campaigns" onClick={onClose}><Icon name="close" size={18} /></button></div>
+      <div className="campaign-storage-heading"><div><p className="campaign-storage-kicker">{mode === 'slots' ? 'Campaign storage' : mode === 'import' ? 'Import' : mode === 'recovery' ? 'Recovery' : 'Save conflict'}</p><h1 id="campaign-storage-title">{title}</h1></div><button ref={closeRef} type="button" className="icon-button" aria-label="Close saved campaigns" onClick={onClose}><Icon name="close" size={18} /></button></div>
       <p id="campaign-storage-description">{message || {
         slots: 'Choose a checkpoint to resume. Each campaign keeps its own progress and name.',
         import: 'Check this campaign before opening it. It will be saved in a new slot; your existing campaigns remain available.',
@@ -59,18 +90,18 @@ export default function CampaignStorageDialog({ mode = 'slots', campaign, campai
       {mode === 'slots' && <>
         {!campaigns.length && <p className="campaign-storage-empty">No named campaigns yet. Starting or resuming a campaign creates its first checkpoint.</p>}
         <ul className="campaign-storage-list">{campaigns.map(item => <li key={item.id}>
-          <div className="campaign-storage-slot-heading"><strong>{item.name}</strong>{item.id === activeId && <span>Current campaign</span>}</div>
+          <div className="campaign-storage-slot-heading"><strong>{item.name}</strong>{item.id === activeId && <span className="campaign-storage-current">Current campaign</span>}</div>
           <CampaignPreview campaign={item} />
           <p className="campaign-storage-date">{item.damaged ? 'Checkpoint damaged · the file is retained' : `Saved ${item.savedAt ? new Date(item.savedAt).toLocaleString() : 'previously'}`}</p>
           <div className="campaign-storage-slot-actions"><button type="button" className="button button-primary" disabled={!onLoad || held} onClick={() => onLoad?.(item.id)}>{item.damaged ? 'Recover' : 'Resume'} {item.name}</button>
-            <form onSubmit={event => { event.preventDefault(); onRename?.(item.id, names[item.id] ?? item.name); }}>
+            <form onSubmit={event => { event.preventDefault(); if (!held) onRename?.(item.id, names[item.id] ?? item.name); }}>
               <label htmlFor={`campaign-name-${item.id}`}>Campaign name</label>
               <input id={`campaign-name-${item.id}`} type="text" maxLength={80} value={names[item.id] ?? item.name} onChange={event => setNames(current => ({ ...current, [item.id]: event.target.value }))} disabled={item.damaged || !onRename || held} />
               <button type="submit" className="button button-quiet" disabled={item.damaged || !onRename || held || !(names[item.id] ?? item.name).trim()}>Rename</button>
             </form>
           </div>
           {onDelete && (item.id === lockedId
-            ? <p className="campaign-storage-date">This campaign is open. Start or resume another one to delete it.</p>
+            ? <p className="campaign-storage-date campaign-storage-locked">This campaign is open. Start or resume another one to delete it.</p>
             : deleting === item.id
               ? <div className="campaign-storage-confirm" role="alert">
                 <p>Delete {item.name}? Its checkpoint and recovery copy are removed from this browser. This cannot be undone.</p>
@@ -79,9 +110,9 @@ export default function CampaignStorageDialog({ mode = 'slots', campaign, campai
                   <button type="button" className="button button-primary campaign-storage-danger" disabled={held} onClick={() => { setDeleting(null); onDelete(item.id); }}>Delete permanently</button>
                 </div>
               </div>
-              : <button type="button" className="setup-text-button campaign-storage-delete" disabled={held} onClick={() => setDeleting(item.id)}>Delete {item.name}</button>)}
+              : <button type="button" className="btn-link campaign-storage-delete" disabled={held} onClick={() => setDeleting(item.id)}>Delete {item.name}</button>)}
         </li>)}</ul>
-        {onFork && <form className="campaign-storage-fork" onSubmit={event => { event.preventDefault(); onFork(name.trim()); }}>
+        {onFork && <form className="campaign-storage-fork" onSubmit={event => { event.preventDefault(); if (!held) onFork(name.trim()); }}>
           <label htmlFor="campaign-fork-name">Name a copy of your current campaign</label><div><input id="campaign-fork-name" maxLength={80} value={name} onChange={event => setName(event.target.value)} /><button type="submit" className="button button-quiet" disabled={!name.trim() || held}>Create fork</button></div>
         </form>}
       </>}

@@ -42,12 +42,56 @@ function wrapLongitude(lon) {
   return lon < -180 || lon > 180 ? ((lon + 180) % 360 + 360) % 360 - 180 : lon;
 }
 
+/**
+ * The 50m atlas gives Australia and the Ashmore and Cartier Islands the same id,
+ * and id-keyed paths keep only the islet (Australia drew as a reef no route could
+ * reach). Merge every id's shapes into one MultiPolygon before decoding.
+ */
+export function mergeSharedIds(atlas) {
+  const objects = atlas?.objects || {};
+  const name = objects.countries?.type === 'GeometryCollection' ? 'countries'
+    : Object.keys(objects).find(key => objects[key]?.type === 'GeometryCollection');
+  if (!name) return atlas;
+  const merged = new Map(), geometries = [];
+  for (const g of objects[name].geometries || []) {
+    const id = g?.id == null || String(g.id) === '-99' ? null : String(g.id);
+    const polygons = g?.type === 'Polygon' ? [g.arcs] : g?.type === 'MultiPolygon' ? g.arcs : null;
+    const first = id && polygons ? merged.get(id) : null;
+    if (first) first.arcs.push(...polygons);
+    else {
+      const copy = id && polygons ? { ...g, type: 'MultiPolygon', arcs: [...polygons] } : g;
+      if (id && polygons) merged.set(id, copy);
+      geometries.push(copy);
+    }
+  }
+  return { ...atlas, objects: { ...objects, [name]: { ...objects[name], geometries } } };
+}
+
+const drawnPathsCache = new WeakMap();
+/**
+ * The display paths of the countries a map draws (`countries`: the rule geometry's
+ * list). The 50m atlas has ~60 shapes the 110m world map never paints
+ * (Liechtenstein, Malta, the Faroes…); routed as land they blocked attacks as
+ * invisible neutral ground. One object per paths object, so a route index built
+ * on it stays cached.
+ */
+export function drawnPaths(paths, countries) {
+  let drawn = drawnPathsCache.get(paths);
+  if (!drawn) {
+    drawn = Object.fromEntries(countries.filter(c => paths[c.id]).map(c => [c.id, paths[c.id]]));
+    drawnPathsCache.set(paths, drawn);
+  }
+  return drawn;
+}
+
 export class WorldGeometry {
   /**
    * `anchors` maps a shape id to a [lon, lat] marker point (a capital, a club's
    * home town). `options.object` names the topology object (else its first
    * GeometryCollection); `options.projection = { lon0, lat0 }` sets the central
    * meridian and standard parallel. The defaults are the historical world chart.
+   * `options.keepPolys = false` releases each country's lon/lat `polys` once they
+   * are projected, for an atlas that is only ever drawn (fitted with buildPaths).
    */
   constructor(topo, anchors = {}, options = {}) {
     const { lon0 = DEFAULT_PROJECTION.lon0, lat0 = DEFAULT_PROJECTION.lat0 } = options.projection || {};
@@ -75,9 +119,34 @@ export class WorldGeometry {
     const plane = this.legacy ? projPt : (lon, lat) => [(lon * Math.PI / 180) * this.xScale, -lat * Math.PI / 180];
     const rotate = this.legacy ? ring => ring : ring => ring.map(([lon, lat]) => [wrapLongitude(lon - lon0), lat]);
     for (const c of this.countries) {
-      this.projected[c.id] = c.polys.map(poly => poly.map(ring => rotate(ring).map(pt => plane(pt[0], pt[1]))));
-      this.displayProjected[c.id] = c.polys.map(poly => poly.map(ring =>
-        splitAtAntimeridian(rotate(ring)).map(part => part.map(pt => plane(pt[0], pt[1])))));
+      const projected = [], display = [];
+      for (const poly of c.polys) {
+        const projectedPoly = [], displayPoly = [];
+        for (const ring of poly) {
+          const rotated = rotate(ring), atPlace = new Map();
+          projectedPoly.push(rotated.map(pt => {
+            const point = plane(pt[0], pt[1]);
+            if (!atPlace.has(pt[0])) atPlace.set(pt[0], []);
+            atPlace.get(pt[0]).push(pt[0], pt[1], point);
+            return point;
+          }));
+          // A display point at exactly a source point's lon/lat (every point of a ring that never meets the seam)
+          // projects to the same coordinates: it shares that array instead of holding a second copy. Object.is
+          // keeps -0 and 0 apart, which the map's keys would not.
+          const shared = ([lon, lat]) => {
+            const candidates = atPlace.get(lon) || [];
+            for (let i = 0; i < candidates.length; i += 3) {
+              if (Object.is(candidates[i], lon) && Object.is(candidates[i + 1], lat)) return candidates[i + 2];
+            }
+            return null;
+          };
+          displayPoly.push(splitAtAntimeridian(rotated).map(part => part.map(pt => shared(pt) || plane(pt[0], pt[1]))));
+        }
+        projected.push(projectedPoly);
+        display.push(displayPoly);
+      }
+      this.projected[c.id] = projected;
+      this.displayProjected[c.id] = display;
     }
 
     // Plane-space point-on-surface and area per shape (custom projections only).
@@ -90,6 +159,8 @@ export class WorldGeometry {
         if (anchored) this.capitals[c.id] = anchored;
       }
     }
+    // Projection and anchors were the polygons' last use here.
+    if (options.keepPolys === false) for (const c of this.countries) c.polys = null;
 
     this.fit = null;
     this.paths = {};

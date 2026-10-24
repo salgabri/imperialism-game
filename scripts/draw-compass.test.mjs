@@ -144,32 +144,53 @@ test('ready and spinning use the exact 64px disk at every zoom', () => {
   }
 });
 
-test('lock shrinks into a source pointer and never hides the destination on a short route', () => {
-  // ~25 screen px is the real Bosnia→Montenegro regression: the original 64px
-  // opaque disk covered the entire route and opponent marker after locking.
-  for (const distance of [1, 3, 10, 25, 30, 80, 300]) {
+test('lock turns the dial into a legible 13px source pointer that never hides the destination on a short route', () => {
+  // ~25 screen px is the real Bosnia→Montenegro regression: the original 64px opaque disk covered the entire route
+  // and opponent marker after locking. A pointer that shrank to .42d instead was 2–5px wide on a zoomed-out phone or
+  // tablet map, so the pointer keeps 13px and slides back from the origin, away from the target, on short routes.
+  const close = (actual, expected, message) => assert.ok(Math.abs(actual - expected) < 2e-3, `${message}: ${actual} ≠ ${expected}`);
+  for (const distance of [1, 3, 6, 10, 25, 30, 31, 80, 300]) {
     for (const k of [.1, .4, 1, 5]) {
-      const origin = [130, 200];
-      const target = [origin[0], origin[1] + distance * k];
-      const svg = render(DrawCompass, { x: origin[0], y: origin[1], targetX: target[0], targetY: target[1],
-        angle: 810, stage: 'locked', k });
-      const root = svg.querySelector('.draw-compass');
-      const instrument = svg.querySelector('.draw-compass-instrument');
-      const radius = Number(svg.querySelector('.draw-compass-disk').getAttribute('r'));
-      const outline = Number(rule('.draw-compass-disk').style.getPropertyValue('stroke-width'));
-      const transform = `${root.getAttribute('transform')} ${instrument.getAttribute('transform')}`;
-      const center = transformPoint(transform, [0, 0]);
-      const outerEdge = transformPoint(transform, [radius + outline / 2, 0]);
-      const outerRadiusPx = (outerEdge[0] - center[0]) / k;
-      assert.ok(outerRadiusPx <= Math.min(13, distance * .45) + 1e-8);
-      assert.ok(outerRadiusPx < 32, 'locked dial is always smaller than the draw disk');
-      assert.equal(cssRotation(svg.querySelector('.draw-compass-needle')), 810, 'shrinking does not change bearing');
-      assert.equal(svg.querySelector('.draw-compass-needle').style.transition, 'none');
-      assert.equal(svg.querySelectorAll('.draw-compass-north, .draw-compass-ticks, .draw-compass-inner').length, 0);
-      const route = render(AttackVector, { x1: origin[0], y1: origin[1], x2: target[0], y2: target[1], k });
-      const reticle = route.querySelector('.draw-route-target circle');
-      const targetNearEdge = distance - Number(reticle.getAttribute('r')) - Number(reticle.getAttribute('stroke-width')) / 2;
-      assert.ok(outerRadiusPx < targetNearEdge, `target reticle remains exposed at ${distance}px, k=${k}`);
+      for (const [ux, uy] of [[0, 1], [1, 0], [-.6, -.8], [.8, -.6]]) {
+        const origin = [130, 200];
+        const target = [origin[0] + ux * distance * k, origin[1] + uy * distance * k];
+        const svg = render(DrawCompass, { x: origin[0], y: origin[1], targetX: target[0], targetY: target[1],
+          angle: 810, stage: 'locked', k });
+        const root = svg.querySelector('.draw-compass');
+        const instrument = svg.querySelector('.draw-compass-instrument');
+        const radius = Number(svg.querySelector('.draw-compass-disk').getAttribute('r'));
+        const outline = Number(rule('.draw-compass-disk').style.getPropertyValue('stroke-width'));
+        const transform = `${root.getAttribute('transform')} ${instrument.getAttribute('transform')}`;
+        const center = transformPoint(transform, [0, 0]);
+        const outerEdge = transformPoint(transform, [radius + outline / 2, 0]);
+        const outerRadiusPx = Math.hypot(outerEdge[0] - center[0], outerEdge[1] - center[1]) / k;
+        const label = `${distance}px, k=${k}, (${ux}, ${uy})`;
+        close(outerRadiusPx, 13, `${label}: the locked pointer keeps its 13px radius`);
+        assert.ok(outerRadiusPx < 32, 'locked dial is always smaller than the draw disk');
+        // Its front edge along the route stops at 42% of the drawn arrow; on a long route it sits on the origin. The
+        // arrow is never drawn shorter than 28px (DEC D20, deliberate): a shorter route starts behind the origin, so
+        // the 42% is measured from that start (distance − 28).
+        const along = ((center[0] - origin[0]) * ux + (center[1] - origin[1]) * uy) / k;
+        const front = distance - Math.max(distance, 28) * .58;
+        assert.ok(along + outerRadiusPx <= Math.max(13, front) + 2e-3, `${label}: front edge ${along + outerRadiusPx}`);
+        if (front >= 13) close(Math.hypot(center[0] - origin[0], center[1] - origin[1]), 0, `${label}: centred on the origin`);
+        else close(along, front - 13, `${label}: slid straight back from the target`);
+        assert.equal(cssRotation(svg.querySelector('.draw-compass-needle')), 810, 'locking does not change bearing');
+        assert.equal(svg.querySelector('.draw-compass-needle').style.transition, 'none');
+        assert.equal(svg.querySelectorAll('.draw-compass-north, .draw-compass-ticks, .draw-compass-inner').length, 0);
+        // v4 (DEC D20): the arrow head replaces the old target reticle. Every head vertex lies outside the locked
+        // pointer, so the head is never covered.
+        const route = render(AttackVector, { x1: origin[0], y1: origin[1], x2: target[0], y2: target[1], k });
+        const routeTransform = route.querySelector('.draw-route').getAttribute('transform');
+        const head = numbers(route.querySelector('.draw-route-arrow').getAttribute('d'));
+        for (const i of [0, 2, 4]) {
+          const vertex = transformPoint(routeTransform, [head[i], head[i + 1]]);
+          const gap = Math.hypot(vertex[0] - center[0], vertex[1] - center[1]) / k;
+          assert.ok(gap > outerRadiusPx, `${label}: arrow head vertex ${i / 2} stays exposed (${gap} > ${outerRadiusPx})`);
+        }
+        assert.equal(route.querySelector('.draw-route-target'), null, 'v4 draws no target reticle');
+        assert.ok(!/NaN|Infinity|undefined/.test(svg.outerHTML));
+      }
     }
   }
   for (const target of [{ targetX: NaN, targetY: 20 }, { targetX: 20, targetY: Infinity }, {}]) {
@@ -177,50 +198,145 @@ test('lock shrinks into a source pointer and never hides the destination on a sh
     const scale = Number(svg.querySelector('.draw-compass-instrument').dataset.scale);
     assert.ok(Number.isFinite(scale) && scale > 0 && scale < 1, 'unknown target gets a calm bounded pointer');
     approx(scale * 32.55, 13);
+    assert.equal(svg.querySelector('.draw-compass-instrument').getAttribute('transform'), `scale(${scale})`, 'on the origin');
     assert.ok(!/NaN|Infinity|undefined/.test(svg.outerHTML));
   }
-  const coincident = render(DrawCompass, { x: 1, y: 2, targetX: 1, targetY: 2, stage: 'locked' });
-  assert.equal(Number(coincident.querySelector('.draw-compass-instrument').dataset.scale), 0);
+  // A coincident target keeps a visible pointer, slid back along the needle's bearing (90° = south → it sits north).
+  const coincident = render(DrawCompass, { x: 1, y: 2, targetX: 1, targetY: 2, angle: 450, stage: 'locked' });
+  const coincidentInstrument = coincident.querySelector('.draw-compass-instrument');
+  approx(Number(coincidentInstrument.dataset.scale) * 32.55, 13);
+  assert.deepEqual(numbers(coincidentInstrument.getAttribute('transform')).slice(0, 2), [0, -13]);
+  assert.ok(!/NaN|Infinity|undefined/.test(coincident.outerHTML));
 });
+
+// v4 line of attack (README §Map rendering, DEC D20): in the local frame the origin is (0,0) and the target is
+// (d,0) in screen px; the shaft is a quadratic bent 22% of d to the right of travel and ends at the head base.
+function headGeometry(svg) {
+  const [tipX, tipY, ax, ay, bx, by] = numbers(svg.querySelector('.draw-route-arrow').getAttribute('d'));
+  const base = [(ax + bx) / 2, (ay + by) / 2];
+  return { tip: [tipX, tipY], corners: [[ax, ay], [bx, by]], base,
+    length: Math.hypot(tipX - base[0], tipY - base[1]), halfWidth: Math.hypot(ax - bx, ay - by) / 2 };
+}
 
 test('route transform lands precisely on the requested destination in every direction and zoom', () => {
   for (const k of [.2, .75, 2.5]) {
     for (const [x2, y2] of [[380, 120], [80, 420], [-220, 120], [80, -180], [333, 307]]) {
       const svg = render(AttackVector, { x1: 80, y1: 120, x2, y2, k });
       const root = svg.querySelector('.draw-route');
-      const target = svg.querySelector('.draw-route-target');
-      const localTarget = transformPoint(target.getAttribute('transform'), [0, 0]);
-      const worldTarget = transformPoint(root.getAttribute('transform'), localTarget);
-      approx(worldTarget[0], x2, 'target x'); approx(worldTarget[1], y2, 'target y');
-      approx(Number(root.dataset.distancePx), Math.hypot(x2 - 80, y2 - 120) / k);
-      assert.equal(Number(target.querySelector('circle').getAttribute('r')), 4.5);
-      const head = numbers(svg.querySelector('.draw-route-arrow').getAttribute('d'));
-      approx(head[0] - head[2], 8, 'screen-constant head length');
-      approx(head[5] - head[3], 7, 'screen-constant head width');
+      const distance = Math.hypot(x2 - 80, y2 - 120) / k;
+      approx(Number(root.dataset.distancePx), distance);
+      const head = headGeometry(svg);
+      approx(head.tip[0], distance, 'head tip is the local target'); approx(head.tip[1], 0, 'head tip on the axis');
+      const worldTip = transformPoint(root.getAttribute('transform'), head.tip);
+      approx(worldTip[0], x2, 'target x'); approx(worldTip[1], y2, 'target y');
+      approx(head.length, Math.min(distance * .4, 18), 'head length min(.4d, 18px)');
+      approx(head.halfWidth, Math.min(distance * .24, 10), 'head half-width min(.24d, 10px)');
+      const shaft = numbers(svg.querySelector('.draw-route-line').getAttribute('d'));
+      assert.deepEqual(shaft.slice(0, 2), [0, 0], 'shaft starts at the origin');
+      approx(shaft[2], distance / 2, 'control point at the midpoint'); approx(shaft[3], distance * .22, 'bent 22% of the length');
+      approx(shaft[4], head.base[0], 'shaft ends at the head base x'); approx(shaft[5], head.base[1], 'shaft ends at the head base y');
+      assert.equal(svg.querySelector('.draw-route-casing').getAttribute('d'), svg.querySelector('.draw-route-line').getAttribute('d'));
+      assert.equal(Number(svg.querySelector('.draw-route-casing').getAttribute('stroke-width')), 7, 'white halo 7px');
+      assert.equal(Number(svg.querySelector('.draw-route-line').getAttribute('stroke-width')), 3.2, 'ink shaft 3.2px');
+      assert.equal(Number(svg.querySelector('.draw-route-arrow').getAttribute('stroke-width')), 1.2, 'head edge 1.2px');
+      assert.equal(Number(svg.querySelector('.draw-route-origin').getAttribute('r')), 3.4, 'origin r 3.4');
+      assert.equal(Number(svg.querySelector('.draw-route-origin').getAttribute('stroke-width')), 1.8, 'origin ring 1.8');
+      assert.equal(svg.querySelector('.draw-route-target'), null);
+      assert.equal(svg.querySelector('.draw-route-line').hasAttribute('stroke-dasharray'), false, 'a locked draw is solid');
     }
   }
+  // Paint order: halo, shaft, head, origin; the curve bends to the right-hand side of travel (local +y).
+  const order = [...render(AttackVector, { x1: 0, y1: 0, x2: 200, y2: 0 }).querySelector('.draw-route').children].map(node => node.getAttribute('class'));
+  assert.deepEqual(order, ['draw-route-casing', 'draw-route-line', 'draw-route-arrow', 'draw-route-origin']);
 });
 
-test('short routes shrink their head and reticle without crossing the origin or engulfing the route', () => {
-  for (const distance of [.5, 1, 3, 5, 12, 23.99, 24, 96, 96.01, 300]) {
+test('the your-turn preview dashes only the ink shaft, straight or routed', () => {
+  const straight = render(AttackVector, { x1: 0, y1: 0, x2: 150, y2: 40, k: .5, dashed: true });
+  assert.equal(straight.querySelector('.draw-route-line').getAttribute('stroke-dasharray'), '7 5');
+  assert.equal(straight.querySelector('.draw-route-casing').hasAttribute('stroke-dasharray'), false, 'the halo stays solid');
+  assert.equal(straight.querySelector('.draw-route').dataset.dashed, 'true');
+  // Routed (k 2): 100 map units = 50px; the head reaches 18px (36 units) back, so the shaft stops at 64.
+  const routeD = 'M0 0 L40 30 L90 30';
+  const routed = render(AttackVector, { x1: 0, y1: 0, x2: 90, y2: 30, k: 2, routeD, routeKind: 'sea', dashed: true,
+    routePoints: [[0, 0], [40, 30], [90, 30]] });
+  const line = routed.querySelector('.draw-route-line');
+  assert.equal(line.getAttribute('d'), routeD, 'the engine route is kept verbatim');
+  assert.equal(line.getAttribute('pathLength'), '100');
+  assert.equal(line.getAttribute('stroke-dasharray'), '14 10 14 10 14 110',
+    'screen-px 7/5 dashes × k up to the head base, then one gap past the end');
+  assert.equal(routed.querySelector('.draw-route-casing').getAttribute('stroke-dasharray'), '64 101', 'the halo stays solid to the head base');
+  const solid = render(AttackVector, { x1: 0, y1: 0, x2: 90, y2: 30, k: 2, routeD, routeKind: 'sea', routePoints: [[0, 0], [40, 30], [90, 30]] });
+  assert.equal(solid.querySelector('.draw-route-line').getAttribute('stroke-dasharray'), '64 101',
+    'sea routes are solid (one dash that ends at the head base) unless previewed');
+  assert.equal(Number(solid.querySelector('.draw-route-line').getAttribute('stroke-width')), 6.4, '3.2px × k');
+  const head = numbers(solid.querySelector('.draw-route-arrow').getAttribute('d'));
+  assert.deepEqual(head.slice(0, 2), [0, 0], 'routed head tip sits on the route end');
+  const group = solid.querySelector('.draw-route-arrow').parentNode;
+  const tip = transformPoint(group.getAttribute('transform'), [0, 0]);
+  approx(tip[0], 90); approx(tip[1], 30);
+});
+
+test('a routed head is sized from the whole route and the shaft stops at its base, even after a short last leg', () => {
+  // A sea route whose last leg (sea node → shore) is only 5px: the head must still out-size the halo and shaft.
+  const close = (actual, expected, message) => assert.ok(Math.abs(actual - expected) < 2e-3, `${message}: ${actual} ≠ ${expected}`);
+  for (const k of [.5, 1, 3]) {
+    const points = [[0, 0], [120, 0], [120, 80], [124, 83]].map(([x, y]) => [x * k, y * k]);
+    const routeD = points.map(([x, y], i) => `${i ? 'L' : 'M'}${x},${y}`).join('');
+    const svg = render(AttackVector, { x1: 0, y1: 0, x2: points[3][0], y2: points[3][1], k, routeD, routeKind: 'sea', routePoints: points });
+    const [tipX, tipY, backX, upperY, , lowerY] = numbers(svg.querySelector('.draw-route-arrow').getAttribute('d'));
+    assert.deepEqual([tipX, tipY], [0, 0]);
+    const headHalfWidth = (lowerY - upperY) / 2;
+    const shaftHalf = Number(svg.querySelector('.draw-route-line').getAttribute('stroke-width')) / k / 2;
+    const haloHalf = Number(svg.querySelector('.draw-route-casing').getAttribute('stroke-width')) / k / 2;
+    assert.equal(headHalfWidth, 10, 'full 10px half-width from the 205px route, not .24 × the 5px leg');
+    assert.ok(headHalfWidth >= shaftHalf && headHalfWidth >= haloHalf, 'the head is wider than the halo and the shaft');
+    // The head runs from the point 18px back along the route (on the 80px leg) to the end.
+    const group = svg.querySelector('.draw-route-arrow').parentNode.getAttribute('transform');
+    const tip = transformPoint(group, [0, 0]);
+    close(tip[0], 124 * k, 'tip x'); close(tip[1], 83 * k, 'tip y');
+    const base = transformPoint(group, [backX, 0]);
+    close(base[0], 120 * k, 'base x on the route'); close(base[1], 67 * k, 'base y 18px back along the route');
+    close(-backX, Math.hypot(4, 16), 'head length = the chord from its base to the tip');
+    // Halo and shaft end exactly at that base: one dash of (205 − 18) px × k over pathLength 205 px × k.
+    for (const selector of ['.draw-route-casing', '.draw-route-line']) {
+      const path = svg.querySelector(selector);
+      assert.equal(path.getAttribute('d'), routeD, `${selector} keeps the engine route`);
+      close(Number(path.getAttribute('pathLength')), 205 * k, `${selector} pathLength`);
+      const [dash, gap] = numbers(path.getAttribute('stroke-dasharray'));
+      close(dash, 187 * k, `${selector} stops at the head base`);
+      assert.ok(gap > 18 * k, `${selector} draws nothing under the head`);
+    }
+  }
+  // A route given only as routeD (no points) still gets a finite head and dash from the chord.
+  const bare = render(AttackVector, { x1: 0, y1: 0, x2: 100, y2: 0, routeD: 'M0,0L50,20L100,0', routeKind: 'sea' });
+  assert.ok(!/NaN|Infinity|undefined/.test(bare.outerHTML));
+  assert.equal(numbers(bare.querySelector('.draw-route-line').getAttribute('stroke-dasharray'))[0], 82);
+});
+
+// Deliberate change (DEC D20 allows it): a route shorter than 28px no longer shrinks to a dot. The arrow keeps a 28px
+// minimum on screen, starts behind the attacker's capital (local x = d − 28) and its tip stays exactly on the target.
+test('short routes keep a 28px minimum arrow whose tip stays on the target', () => {
+  for (const distance of [.5, 1, 3, 5, 12, 23.99, 24, 27.99, 28, 96, 96.01, 300]) {
     for (const k of [.2, 1, 4]) {
       const svg = render(AttackVector, { x1: 0, y1: 0, x2: distance * k, y2: 0, k });
       const root = svg.querySelector('.draw-route');
       assert.ok(root, `${distance}px is a drawable route`);
-      const radius = Number(svg.querySelector('.draw-route-target circle').getAttribute('r'));
-      const sourceRadius = Number(svg.querySelector('.draw-route-origin').getAttribute('r'));
-      const head = numbers(svg.querySelector('.draw-route-arrow').getAttribute('d'));
-      const [tipX, tipY, backX, lowY, secondBackX, highY] = head;
-      assert.equal(tipY, 0); assert.equal(secondBackX, backX);
-      assert.ok(sourceRadius < backX && backX < tipX && tipX < distance - radius);
-      assert.ok(lowY < 0 && highY > 0 && highY === -lowY);
-      assert.ok(radius * 2 <= Math.min(9, distance * .25) + 1e-9, 'reticle cannot dwarf a short route');
-      assert.equal(Boolean(svg.querySelector('.draw-route-target path')), distance >= 24);
-      // At fractional zoom, the nominal 96px boundary may be 96 + 1e-14.
-      // Check the exact switch at k=1 and both sides at every other zoom.
-      if (distance !== 96 || k === 1) {
-        assert.equal(Boolean(svg.querySelector('.draw-route-line')?.hasAttribute('stroke-dasharray')), distance > 96);
-      }
+      const shown = Math.max(distance, 28), start = distance - shown;
+      const origin = svg.querySelector('.draw-route-origin');
+      const sourceRadius = Number(origin.getAttribute('r'));
+      const head = headGeometry(svg);
+      approx(head.tip[0], distance); approx(head.tip[1], 0);
+      approx(head.length, Math.min(shown * .4, 18), 'head length min(.4 × shown, 18px)');
+      approx(head.halfWidth, Math.min(shown * .24, 10), 'head half-width min(.24 × shown, 10px)');
+      const shaft = numbers(svg.querySelector('.draw-route-line').getAttribute('d'));
+      approx(shaft[0], start, 'the shaft starts 28px before the tip on a short route'); approx(shaft[1], 0);
+      approx(Number(origin.getAttribute('cx') || 0), start, 'the origin ring sits at the arrow start');
+      assert.ok(head.corners.every(([x]) => x > start && x < distance), 'the head base lies between the arrow start and tip');
+      assert.ok(sourceRadius <= 3.4 + 1e-9 && start + sourceRadius < head.base[0], 'origin ring never reaches the head');
+      approx(sourceRadius, 3.4, 'a 28px arrow keeps the full origin ring');
+      approx(Number(svg.querySelector('.draw-route-line').getAttribute('stroke-width')), 3.2, 'and the full shaft');
+      assert.equal(svg.querySelector('.draw-route-target'), null);
+      assert.equal(svg.querySelector('.draw-route-line').hasAttribute('stroke-dasharray'), false, 'only the preview is dashed');
       for (const node of svg.querySelectorAll('[d], [transform], [r], [stroke-width]')) {
         for (const attr of ['d', 'transform', 'r', 'stroke-width']) {
           const value = node.getAttribute(attr);
@@ -272,4 +388,23 @@ test('multiple instruments have no shared marker IDs, focus targets or pointer i
     assert.equal(compass.dataset.targetX, '80');
     assert.equal(compass.dataset.targetY, '20');
   }
+});
+
+test('v4 paint: white disk, ink needle with a clay tip, white halo, ink shaft and head, white origin ring', () => {
+  const value = (selector, property) => rule(selector).style.getPropertyValue(property).trim();
+  // The halo is the --map-halo token: white in the light theme (its fallback), the page ground in dark.
+  const WHITE = /^(#ffffff|#fff|rgb\(255, 255, 255\)|var\(--map-halo, #ffffff\))$/i;
+  assert.match(value('.draw-compass-disk', 'fill'), /--panel|#fff/i);
+  assert.match(value('.draw-compass-disk', 'stroke'), /--ink|#111417/i);
+  assert.match(value('.draw-compass-tail', 'fill'), /--ink|#111417/i);
+  assert.match(value('.draw-compass-tip', 'fill'), /--you\b|#9c5a43/i);
+  assert.match(value('.draw-compass-north', 'fill'), /--you-text|#8c4a35/i);
+  assert.match(value('.draw-route-casing', 'stroke'), WHITE);
+  assert.equal(Number(value('.draw-route-casing', 'stroke-opacity')), .9);
+  assert.match(value('.draw-route-line', 'stroke'), /--ink|#111417/i);
+  assert.equal(value('.draw-route-line', 'stroke-linecap'), 'round');
+  assert.match(value('.draw-route-arrow', 'fill'), /--ink|#111417/i);
+  assert.match(value('.draw-route-arrow', 'stroke'), WHITE);
+  assert.match(value('.draw-route-origin', 'fill'), WHITE);
+  assert.ok(!/#202b28|#e7e6dc|#18241e|#f0eee4/i.test(css), 'no legacy dark-theme colours remain');
 });

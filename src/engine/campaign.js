@@ -7,6 +7,7 @@
 // and borderRoutes (country maps: aim at a neighbour's shared border when its
 // anchor is out of sight).
 
+import { EXCLUDED_SHAPES } from '../data/teams.js';
 import { closestPair } from './geo.js';
 import { borderApproachPoints, createAttackRouteIndex, firstForeignLand, findCoastalSeaRoute, routeLandCrossings } from './attackRoutes.js';
 
@@ -19,20 +20,30 @@ const BORDER_TRIES = 12;
  * Seed clubs onto the map.
  *
  * A club has a home country but shares it with every rival in its league, so
- * they cannot all start there. Working down the strength order, each club claims
- * the nearest country to its homeland that nobody has taken yet: the best club
- * in each league gets the homeland itself, and the rest fan outwards. Countries
- * nobody reaches stay neutral, exactly as non-participating nations do.
+ * they cannot all start there. The best club from each homeland takes it first;
+ * then, working down the strength order, every other club claims the nearest
+ * country to its homeland that nobody has taken yet, so the rest fan outwards
+ * (a stronger foreign club never lands on another league's homeland). Shapes
+ * that never belong to anyone (`excluded`) and countries nobody reaches stay
+ * neutral, exactly as non-participating nations do.
  */
-export function seedClubs(geo, clubs) {
+export function seedClubs(geo, clubs, excluded = EXCLUDED_SHAPES) {
   const own = {};
   const anchorOf = id => {
     const p = geo.paths[id];
     return p ? [p.cx, p.cy] : null;
   };
-  const available = Object.keys(geo.paths).filter(id => anchorOf(id));
+  const available = Object.keys(geo.paths).filter(id => anchorOf(id) && !excluded.has(id));
+  const ranked = clubs.slice().sort((a, b) => b.str - a.str);
+  const placed = new Set();
+  for (const club of ranked) {
+    if (own[club.home] || !available.includes(club.home)) continue;
+    own[club.home] = club.id;
+    placed.add(club.id);
+  }
 
-  for (const club of clubs.slice().sort((a, b) => b.str - a.str)) {
+  for (const club of ranked) {
+    if (placed.has(club.id)) continue;
     const from = anchorOf(club.home);
     if (!from) continue;
     let best = null;
@@ -95,6 +106,69 @@ export function empireNeighbors(board, tid) {
   return out;
 }
 
+const boardRouteIndex = board => board.routeIndex ?? createAttackRouteIndex(board.routingPaths || board.geo.paths, board.obstacles);
+// Default-parameter form: tolerates a missing board/geo (render-purity inputs) instead of throwing.
+const safeRouteIndex = board => (board?.geo?.paths ? boardRouteIndex(board) : null);
+
+/** The first pair in `list` whose line reaches `tid`'s land before any other land, clipped just inside it. */
+function aimAt(board, attackerId, routeIndex, tid, list) {
+  for (const pair of list) {
+    if (!routeIndex) return { cp: pair, anchorDistance: pair.dist };
+    const hit = firstForeignLand(routeIndex, board.own, attackerId, pair);
+    if (!hit || hit.ownerId !== tid) continue;
+    // Stop just inside the first target land, not beyond it at a capital that
+    // may lie past another border/enclave. The bearing is unchanged.
+    const t = hit.t + Math.min((hit.exitT - hit.t) / 2, .05 / Math.max(pair.dist, .001));
+    return { cp: { ax: pair.ax, ay: pair.ay,
+      bx: pair.ax + (pair.bx - pair.ax) * t,
+      by: pair.ay + (pair.by - pair.ay) * t, dist: pair.dist * t }, anchorDistance: pair.dist };
+  }
+  return null;
+}
+
+/**
+ * The direct (angle-free) route from an attacker's holdings to one target, or
+ * null. With a route index, pairs are tried by distance and the line must reach
+ * the target's land before any other owner's or neutral land; without one
+ * (point-only fixtures) the closest pair is used unchecked.
+ */
+function directRoute(board, attackerId, aPts, routeIndex, tid, neighbors = null) {
+  if (tid === attackerId) return null;
+  const bPts = territoryPoints(board, tid);
+  // An empire may have a blocked closest pair but an open route from another
+  // holding. Try pairs by distance, never falling back to an unchecked line.
+  const pairs = routeIndex ? aPts.flatMap(a => bPts.map(b => closestPair([a], [b])))
+    .filter(Boolean).sort((a, b) => a.dist - b.dist) : [closestPair(aPts, bPts)].filter(Boolean);
+  const route = aimAt(board, attackerId, routeIndex, tid, pairs);
+  if (route || !routeIndex || !board.borderRoutes || !(neighbors ?? empireNeighbors(board, attackerId)).has(tid)) return route;
+  // Country maps: when no anchor line reaches a land neighbour (a concave or
+  // foreign-bounded border, a section in between), aim across the shared border.
+  const across = [];
+  for (const cid of territories(board, attackerId)) for (const next of board.geo.adj[cid] || []) {
+    if (board.own[next] !== tid) continue;
+    const p = board.geo.paths[cid];
+    for (const point of borderApproachPoints(routeIndex, cid, next)) across.push(closestPair([[p.cx, p.cy]], [point]));
+  }
+  // Nearest first, then spread along the border: a river bend or a foreign
+  // salient can hide every point close to the anchor.
+  across.sort((a, b) => a.dist - b.dist);
+  const step = Math.max(1, (across.length - 1) / (BORDER_TRIES - 1));
+  return aimAt(board, attackerId, routeIndex, tid,
+    [...new Set(Array.from({ length: Math.min(BORDER_TRIES, across.length) }, (_, i) => across[Math.round(i * step)]))]);
+}
+
+/**
+ * Angle-free legal direct route from `attackerId` to `targetId` (the rule the
+ * compass applies to every candidate): `{ tid, cp, anchorDistance, isNeighbor }`
+ * or null. `pickTarget` uses the same rule and only adds the bearing difference.
+ */
+export function routeCandidate(board, attackerId, targetId, routeIndex = safeRouteIndex(board)) {
+  if (!board?.geo?.paths || !board.own || targetId == null || targetId === attackerId) return null;
+  const route = directRoute(board, attackerId, territoryPoints(board, attackerId), routeIndex, targetId);
+  return route && { tid: targetId, cp: route.cp, anchorDistance: route.anchorDistance,
+    isNeighbor: empireNeighbors(board, attackerId).has(targetId) };
+}
+
 /**
  * Resolve the spinner into a victim.
  *
@@ -106,47 +180,11 @@ export function empireNeighbors(board, tid) {
 export function pickTarget(board, attackerId, angle, { fallback = true } = {}) {
   const aPts = territoryPoints(board, attackerId);
   const neighbors = empireNeighbors(board, attackerId);
-  const routeIndex = board.routeIndex ?? createAttackRouteIndex(board.routingPaths || board.geo.paths, board.obstacles);
+  const routeIndex = boardRouteIndex(board);
   const candidateOf = tid => {
-    if (tid === attackerId) return null;
-    const bPts = territoryPoints(board, tid);
-    // An empire may have a blocked closest pair but an open route from another
-    // holding. Try pairs by distance, never falling back to an unchecked line.
-    const pairs = routeIndex ? aPts.flatMap(a => bPts.map(b => closestPair([a], [b])))
-      .filter(Boolean).sort((a, b) => a.dist - b.dist) : [closestPair(aPts, bPts)].filter(Boolean);
-    let cp = null, anchorDistance = 0;
-    const aim = list => {
-      for (const pair of list) {
-        if (!routeIndex) { cp = pair; anchorDistance = pair.dist; return; }
-        const hit = firstForeignLand(routeIndex, board.own, attackerId, pair);
-        if (!hit || hit.ownerId !== tid) continue;
-        // Stop just inside the first target land, not beyond it at a capital that
-        // may lie past another border/enclave. The bearing is unchanged.
-        const t = hit.t + Math.min((hit.exitT - hit.t) / 2, .05 / Math.max(pair.dist, .001));
-        cp = { ax: pair.ax, ay: pair.ay,
-          bx: pair.ax + (pair.bx - pair.ax) * t,
-          by: pair.ay + (pair.by - pair.ay) * t, dist: pair.dist * t };
-        anchorDistance = pair.dist;
-        return;
-      }
-    };
-    aim(pairs);
-    // Country maps: when no anchor line reaches a land neighbour (a concave or
-    // foreign-bounded border, a section in between), aim across the shared border.
-    if (!cp && routeIndex && board.borderRoutes && neighbors.has(tid)) {
-      const across = [];
-      for (const cid of territories(board, attackerId)) for (const next of board.geo.adj[cid] || []) {
-        if (board.own[next] !== tid) continue;
-        const p = board.geo.paths[cid];
-        for (const point of borderApproachPoints(routeIndex, cid, next)) across.push(closestPair([[p.cx, p.cy]], [point]));
-      }
-      // Nearest first, then spread along the border: a river bend or a foreign
-      // salient can hide every point close to the anchor.
-      across.sort((a, b) => a.dist - b.dist);
-      const step = Math.max(1, (across.length - 1) / (BORDER_TRIES - 1));
-      aim([...new Set(Array.from({ length: Math.min(BORDER_TRIES, across.length) }, (_, i) => across[Math.round(i * step)]))]);
-    }
-    if (!cp) return null;
+    const route = directRoute(board, attackerId, aPts, routeIndex, tid, neighbors);
+    if (!route) return null;
+    const { cp, anchorDistance } = route;
     const bearing = (Math.atan2(cp.by - cp.ay, cp.bx - cp.ax) * 180) / Math.PI;
     const diff = Math.abs(((((bearing - angle) % 360) + 540) % 360) - 180);
     return { tid, diff, cp, anchorDistance, isNeighbor: neighbors.has(tid) };
@@ -226,6 +264,58 @@ function pickFallbackTarget(board, attackerId, angle, routeIndex) {
       routeKind: transitCountryIds.length ? 'neutral-transit' : foreign ? 'foreign-transit' : 'straight',
       routeLabel: transitCountryIds.length ? 'Neutral transit treaty' : foreign ? FOREIGN_TRANSIT_LABEL : 'Direct challenge',
       routePoints, transitCountryIds };
+  }
+  return null;
+}
+
+// The coastal-route search memoises polylines per route index, and the first
+// computation of a pair wins. Player-facing queries (reach, chosen targets)
+// therefore run against an isolated index over the same frozen countries, so
+// rendering or choosing can never warm the cache a seeded compass draw reads.
+const isolatedIndexes = new WeakMap();
+export function isolatedRouteIndex(routeIndex) {
+  if (!routeIndex?.countries) return null;
+  if (!isolatedIndexes.has(routeIndex)) isolatedIndexes.set(routeIndex, Object.freeze({ countries: routeIndex.countries, ...(routeIndex.obstacles ? { obstacles: true } : {}) }));
+  return isolatedIndexes.get(routeIndex);
+}
+
+/**
+ * `pickFallbackTarget` restricted to one target: a checked coastal sea route,
+ * else a neutral transit treaty that stops at that target's land first.
+ * → { tid, cp, anchorDistance, isNeighbor, routeKind, routeLabel, routePoints, transitCountryIds } | null.
+ * Defaults to the isolated route index (see above); pass an index to override.
+ */
+export function fallbackRouteTo(board, attackerId, targetId, routeIndex = isolatedRouteIndex(safeRouteIndex(board))) {
+  if (!board?.geo?.paths || !board.own || !routeIndex || targetId == null || targetId === attackerId) return null;
+  const aPts = territoryPoints(board, attackerId), bPts = territoryPoints(board, targetId);
+  const closest = closestPair(aPts, bPts);
+  if (!closest) return null;
+  const routePoints = findCoastalSeaRoute(routeIndex, board.own, attackerId, targetId, aPts, bPts, {});
+  if (routePoints) {
+    const a = routePoints[0], b = routePoints[routePoints.length - 1];
+    return { tid: targetId, cp: { ax: a[0], ay: a[1], bx: b[0], by: b[1], dist: Math.hypot(b[0] - a[0], b[1] - a[1]) },
+      anchorDistance: closest.dist, isNeighbor: false, routeKind: 'sea', routeLabel: 'Coastal sea route',
+      routePoints, transitCountryIds: [] };
+  }
+  const survivors = new Set(board.aliveIds || []);
+  const transitOwnership = Object.fromEntries(routeIndex.countries.map(({ countryId }) => [countryId,
+    survivors.has(board.own[countryId]) ? board.own[countryId] : attackerId]));
+  // The closest pair first (pickFallbackTarget's line; a stable sort keeps it
+  // first), then the other holdings by distance, so a treaty to this target is
+  // found whenever one exists.
+  const pairs = aPts.flatMap(a => bPts.map(b => closestPair([a], [b]))).filter(Boolean).sort((x, y) => x.dist - y.dist);
+  for (const pair of pairs) {
+    const hit = firstForeignLand(routeIndex, transitOwnership, attackerId, pair);
+    if (!hit || hit.ownerId !== targetId) continue;
+    const cp = clippedRoute(pair, hit);
+    const crossed = routeLandCrossings(routeIndex, cp).filter(({ countryId }) => !survivors.has(board.own[countryId]));
+    const transitCountryIds = [...new Set(crossed.filter(({ obstacle }) => !obstacle).map(({ countryId }) => countryId))];
+    const foreign = !transitCountryIds.length && crossed.some(({ obstacle }) => obstacle);
+    return { tid: targetId, cp, anchorDistance: pair.dist,
+      isNeighbor: empireNeighbors(board, attackerId).has(targetId),
+      routeKind: transitCountryIds.length ? 'neutral-transit' : foreign ? 'foreign-transit' : 'straight',
+      routeLabel: transitCountryIds.length ? 'Neutral transit treaty' : foreign ? FOREIGN_TRANSIT_LABEL : 'Direct challenge',
+      routePoints: [[cp.ax, cp.ay], [cp.bx, cp.by]], transitCountryIds };
   }
   return null;
 }

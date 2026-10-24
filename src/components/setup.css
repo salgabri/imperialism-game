@@ -1,0 +1,490 @@
+/* Owner: WP-SETUP (see PLAN.md §4). Setup wizard (.setup-*, .rule-*; SaveControls classes only nested under .setup-overlay). */
+/* Board-12 frame (M§3.2) for all three steps (A-5), v4 tokens, square corners. Base = std (1200–1599); wide ≥1600;
+   tablet 700–1199 (rail → 3-step bar, one column); phone <700 (56px primary bar). */
+
+.setup-overlay {
+  --setup-head-h:64px; --setup-foot-h:76px; --setup-rail-w:272px;
+  --setup-pad-x:32px; --setup-main-pad:32px 40px; --setup-side-pad:32px 36px 32px 0;
+  --setup-cols:minmax(0, 568fr) minmax(0, 600fr);   /* = 568 | 600 at 1440 (272 | 1fr | 600), proportional below */
+  --setup-title:40px; --setup-btn-h:42px; --setup-row-h:38px;
+  --setup-list-h:clamp(228px, calc(100dvh - 520px), 456px);
+  position:fixed; inset:0; z-index:50;
+  display:flex; flex-direction:column;
+  padding-top:var(--safe-top);
+  background:var(--surface); color:var(--ink);
+  font:400 15px/1.35 var(--font-sans);
+}
+@media (min-width:1600px) {
+  .setup-overlay { --setup-rail-w:300px; --setup-cols:minmax(0, 1fr) 680px; --setup-btn-h:46px; }
+}
+@media (max-width:1199.98px) {
+  .setup-overlay {
+    --setup-pad-x:26px; --setup-main-pad:28px 26px 0; --setup-side-pad:28px 26px 32px;
+    --setup-cols:minmax(0, 1fr); --setup-title:34px; --setup-list-h:380px;
+  }
+}
+@media (max-width:699.98px) {
+  .setup-overlay {
+    --setup-head-h:56px; --setup-pad-x:18px; --setup-main-pad:22px 18px 0; --setup-side-pad:26px 18px 28px;
+    --setup-title:28px; --setup-btn-h:56px; --setup-row-h:44px; --setup-list-h:352px;
+  }
+}
+
+.setup-frame { position:relative; flex:1; min-height:0; display:flex; flex-direction:column; margin:0; }
+
+/* ---- Header (M§3.2) ---- */
+.setup-head {
+  flex:none; height:var(--setup-head-h); display:flex; align-items:center; gap:16px;
+  padding:0 var(--setup-pad-x); background:var(--panel); border-bottom:1px solid var(--rule);
+}
+.setup-head__wordmark { font:700 var(--fs-wordmark)/1 var(--font-sans); letter-spacing:-.03em; color:var(--ink); white-space:nowrap; }
+.setup-head__rule { width:1px; align-self:stretch; margin:18px 0; background:var(--rule); flex:none; }
+.setup-head__title {
+  margin:0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 var(--fs-nav)/1.2 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+}
+.setup-head__cancel {
+  margin-left:auto; flex:none; min-height:max(36px, var(--tap)); padding:0 4px; border:0; border-radius:0; background:none;
+  font:700 var(--fs-nav)/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); white-space:nowrap;
+}
+.setup-head__cancel:hover { color:var(--ink); }
+.setup-head__theme { margin-left:auto; }
+.setup-head__cancel + .setup-head__theme { margin-left:0; }
+
+/* ---- Step rail (M§3.3) ---- */
+.setup-rail {
+  position:absolute; z-index:1; left:0; top:var(--setup-head-h); bottom:var(--setup-foot-h); width:var(--setup-rail-w);
+  padding:34px 24px; overflow-y:auto; background:var(--surface); border-right:1px solid var(--rule);
+}
+.setup-rail__steps { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.setup-rail__step {
+  display:flex; align-items:flex-start; gap:14px; width:100%; padding:14px 12px;
+  border:0; border-radius:0; background:transparent; color:inherit; text-align:left; cursor:pointer;
+}
+.setup-rail__step:hover { background:var(--surface-2); }
+.setup-rail__step[data-state=current] { background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); }
+.setup-rail__badge {
+  width:28px; height:28px; flex:none; display:grid; place-items:center;
+  box-shadow:inset 0 0 0 1px var(--control-line); color:var(--muted);
+  font:700 15px/1 var(--font-narrow); font-variant-numeric:tabular-nums;
+}
+.setup-rail__step[data-state=done] .setup-rail__badge { box-shadow:inset 0 0 0 1px var(--you); color:var(--you-text); }
+.setup-rail__step[data-state=current] .setup-rail__badge { background:var(--you); color:#fff; box-shadow:none; }
+.setup-rail__text { display:block; min-width:0; }
+.setup-rail__title {
+  display:block; white-space:nowrap; color:var(--text-2);
+  font:600 16px/1.2 var(--font-narrow); letter-spacing:.08em; text-transform:uppercase;
+}
+.setup-rail__sub { display:block; margin-top:3px; font:400 13px/1.35 var(--font-sans); color:var(--muted); }
+.setup-rail__part { white-space:nowrap; }
+.setup-rail__step[data-state=current] .setup-rail__title { color:var(--ink); }
+.setup-rail__step[data-state=current] .setup-rail__sub { color:var(--text-2); }
+
+/* ---- Step frame: body (main | side) + footer spanning the rail column ---- */
+.setup-step {
+  flex:1; min-height:0; display:grid;
+  grid-template-columns:var(--setup-rail-w) minmax(0, 1fr);
+  grid-template-rows:minmax(0, 1fr) var(--setup-foot-h);
+}
+.setup-step__body {
+  grid-column:2; grid-row:1; min-height:0; overflow-y:auto; overscroll-behavior:contain;
+  display:grid; grid-template-columns:var(--setup-cols); align-items:start;
+}
+.setup-main { min-width:0; padding:var(--setup-main-pad); display:flex; flex-direction:column; gap:24px; }
+.setup-side { min-width:0; padding:var(--setup-side-pad); display:flex; flex-direction:column; gap:18px; }
+.setup-step[data-step="1"] .setup-main { gap:22px; }
+.setup-step[data-step="1"] .setup-side { gap:20px; }
+
+/* ---- Footer (M§3.2) ---- */
+.setup-foot {
+  grid-column:1 / -1; grid-row:2; min-width:0;
+  display:flex; align-items:center; gap:12px; padding:0 var(--setup-pad-x);
+  background:var(--panel); border-top:1px solid var(--rule);
+}
+.setup-foot__note {
+  margin:0 auto 0 0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 13px/1.35 var(--font-sans); color:var(--muted);
+}
+.setup-foot .setup-foot__back { height:var(--setup-btn-h); padding:0 20px; font-size:var(--btn-fs); }
+.setup-foot .setup-foot__next { height:var(--setup-btn-h); padding:0 12px 0 20px; gap:10px; }
+
+/* ---- Shared type ---- */
+.setup-title { margin:0; font:700 var(--setup-title)/1.05 var(--font-sans); letter-spacing:-.02em; color:var(--ink); text-wrap:balance; }
+.setup-title:focus { outline:none; }
+.setup-lede { margin:8px 0 0; max-width:62ch; font:400 15px/1.5 var(--font-sans); color:var(--muted); }
+.setup-lede--meta { font:400 15px/1.4 var(--font-narrow); letter-spacing:.06em; }
+.setup-kicker { margin-bottom:10px; }
+.setup-group, .rule-group { min-width:0; }
+.setup-mirror {
+  position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden;
+  clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; opacity:0; pointer-events:none;
+}
+
+/* ---- Option cards: the draw, opponents, roles (M§3.4) and sports (board 02) ---- */
+.setup-card-grid { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:12px; }
+.rule-card {
+  --setup-card-bg:var(--panel);
+  position:relative; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start;
+  width:100%; min-width:0; padding:16px 18px; margin:0;
+  border:0; border-radius:0; background:var(--setup-card-bg); box-shadow:inset 0 0 0 1px var(--rule);
+  color:var(--text-2); text-align:left; cursor:pointer;
+}
+.rule-card:hover:not([aria-checked=true]) { box-shadow:inset 0 0 0 1px var(--control-line); }
+.rule-card[aria-checked=true] { --setup-card-bg:var(--you-soft); box-shadow:inset 0 0 0 1.5px var(--you); }
+.rule-card__title {
+  display:block; padding-right:32px; color:var(--text-2);
+  font:700 24px/1.1 var(--font-sans); letter-spacing:-.01em;
+}
+.rule-card__body { display:block; margin-top:8px; font:400 13px/1.5 var(--font-sans); color:var(--muted); }
+.rule-card__tag + .rule-card__body, .rule-dots + .rule-card__body, .rule-dots + .rule-card__tag { margin-top:0; }
+.rule-card[aria-checked=true] .rule-card__title { color:var(--ink); }
+.rule-card[aria-checked=true] .rule-card__body { color:var(--text-2); }
+.rule-card__tag {
+  display:block; margin:6px 0 8px; white-space:nowrap;
+  font:700 12px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+.rule-card__tag--you { color:var(--you-text); }
+.rule-dots { display:flex; gap:5px; margin:10px 0; }
+.rule-dot { display:block; width:14px; height:14px; flex:none; box-shadow:inset 0 0 0 1px var(--control-line); }
+/* Filled squares are `you` (the ring gap follows the card: panel, or you-soft when selected); the random draws'
+   (`rand`: Random draw, Chaos draw) are `muted` until that card is selected (M§3.4). */
+.rule-dot--on { background:var(--you); box-shadow:none; }
+.rule-dot--current { background:var(--you); box-shadow:0 0 0 2px var(--setup-card-bg), 0 0 0 3px var(--you); }
+.rule-card[data-dots=rand]:not([aria-checked=true]) .rule-dot--on { background:var(--muted); }
+
+.setup-check {
+  position:absolute; right:14px; top:14px; width:22px; height:22px;
+  display:grid; place-items:center; color:#fff; box-shadow:inset 0 0 0 1px var(--control-line);
+}
+.setup-check svg { visibility:hidden; }
+.rule-card[aria-checked=true] > .setup-check, .setup-card[data-checked=true] > .setup-check { background:var(--you); box-shadow:none; }
+.rule-card[aria-checked=true] > .setup-check svg, .setup-card[data-checked=true] > .setup-check svg { visibility:visible; }
+
+/* Sport card: the radio is the title button (exact text "Football"), stretched over the card. */
+.setup-card {
+  position:relative; min-width:0; padding:16px 18px;
+  background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule);
+}
+.setup-card:hover:not([data-checked=true]) { box-shadow:inset 0 0 0 1px var(--control-line); }
+.setup-card[data-checked=true] { background:var(--you-soft); box-shadow:inset 0 0 0 1.5px var(--you); }
+.setup-card__button {
+  display:block; max-width:100%; padding:0 32px 0 0; margin:0; border:0; border-radius:0; background:none;
+  font:700 25px/1.1 var(--font-sans); letter-spacing:-.01em; color:var(--text-2); text-align:left; cursor:pointer;
+}
+.setup-card__button::after { content:''; position:absolute; inset:0; }
+.setup-card__button[aria-checked=true] { color:var(--ink); }
+.setup-card__button:focus-visible { outline:none; }
+.setup-card__button:focus-visible::after { outline:2px solid var(--you); outline-offset:2px; }
+.setup-card__note { display:block; margin-top:4px; font:400 13px/1.4 var(--font-sans); color:var(--muted); }
+.setup-card[data-checked=true] .setup-card__note { color:var(--text-2); }
+
+/* Teams segmented (board 02, v4 segmented primitive) */
+.segmented.setup-segmented { display:inline-flex; width:max-content; max-width:100%; }
+.segmented.setup-segmented > button {
+  min-height:max(40px, var(--tap)); padding:0 26px;
+  font:700 14px/1 var(--font-narrow); letter-spacing:.1em;
+}
+
+/* ---- Theatre list (board 02: 38px rows, name + count) ---- */
+.setup-theatres { display:flex; flex-direction:column; }
+.setup-group--list .setup-kicker { margin-bottom:0; }
+.setup-theatre {
+  display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0;
+  height:var(--setup-row-h); min-height:var(--tap); padding:0 14px; margin:0;
+  border:0; border-bottom:1px solid var(--row-rule); border-radius:0; background:transparent;
+  text-align:left; cursor:pointer;
+}
+.setup-theatre:hover:not([aria-checked=true]) { background:var(--panel); }
+.setup-theatre[aria-checked=true] { background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); }
+.setup-theatre:focus-visible, .setup-team:focus-visible { outline-offset:-2px; }
+.setup-theatre__name {
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:600 16px/1.2 var(--font-narrow); color:var(--text-2);
+}
+.setup-theatre[aria-checked=true] .setup-theatre__name { color:var(--ink); }
+.setup-theatre__count { flex:none; white-space:nowrap; font:400 14px/1 var(--font-narrow); color:var(--muted); }
+/* Footnote for a "*"-marked theatre ("Asia & Oceania*" → "AFC plus OFC — the whole east."), aligned with the row text. */
+.setup-theatres__note { margin:8px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
+
+/* One country's own top clubs (football clubs): the leagues and every shipped country make a long list, so it scrolls
+   in its own box (block layout, so rows never shrink to fit) and the countries sit under a sticky group heading.
+   The chosen country's description, its map-load status and a failed load (with Retry) follow the list. */
+.setup-theatres[data-long] {
+  display:block; max-height:var(--setup-list-h); overflow-y:auto; overscroll-behavior:contain;
+  border-bottom:1px solid var(--rule); scrollbar-width:thin;
+}
+.setup-theatres__group {
+  position:sticky; top:0; z-index:1; margin:0; padding:14px 14px 6px;
+  background:var(--surface); border-top:1px solid var(--rule); border-bottom:1px solid var(--row-rule);
+  font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+}
+.setup-theatres__note.setup-domestic__note { color:var(--text-2); }
+.setup-domestic__status { margin:6px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--text-2); }
+.rule-note.setup-domestic__error { margin-top:10px; background:var(--panel); box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule); }
+.rule-note.setup-domestic__error > svg { color:var(--loss); }
+
+/* Step 1 map card: the theatre's opening board — each starting territory (a world theatre's nations or clubs, a
+   country's sections) in its kick-off pastel over the land nobody holds. Static (no camera, labels or territory
+   attributes); one fixed frame so switching theatres never moves the column. */
+.setup-map { margin:0; background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
+.setup-map__chart {
+  display:block; width:100%; height:auto; aspect-ratio:3 / 2; max-height:300px; background:var(--sea);
+}
+.setup-map__backdrop path {
+  fill:var(--land-neutral); stroke:var(--map-coast); stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round;
+}
+.setup-map__sections path { stroke:var(--map-border); stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round; }
+.setup-map__caption {
+  padding:10px 14px; border-top:1px solid var(--rule); font:400 12px/1.4 var(--font-sans); color:var(--muted);
+}
+
+/* ---- Step 1 right column ---- */
+.setup-rules { list-style:none; margin:0; padding:0; counter-reset:setup-rule; }
+.setup-rules > li {
+  counter-increment:setup-rule; display:grid; grid-template-columns:22px minmax(0, 1fr); gap:12px; align-items:start;
+  padding:9px 0; border-bottom:1px solid var(--row-rule); font:400 14px/1.45 var(--font-sans); color:var(--text-2);
+}
+.setup-rules > li::before {
+  content:counter(setup-rule); display:grid; place-items:center; width:22px; height:22px; margin-top:-1px;
+  box-shadow:inset 0 0 0 1px var(--control-line); font:700 12px/1 var(--font-narrow); color:var(--ink);
+}
+.setup-stats {
+  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); margin:0;
+  border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+}
+.setup-stat { min-width:0; padding:14px 0; }
+.setup-stat + .setup-stat { padding-left:18px; border-left:1px solid var(--rule); }
+.setup-stat dt, .setup-pick__stats dt {
+  white-space:nowrap; font:700 11px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+.setup-stat dd { margin:4px 0 0; font:600 30px/1.1 var(--font-narrow); color:var(--ink); white-space:nowrap; }
+.setup-stat--small dd { margin-top:8px; font-size:19px; line-height:1.2; }
+.setup-estimate__note { margin:8px 0 0; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
+
+/* Saves: SaveControls restyled inside setup only (its classes belong to WP-LEDGER). */
+.setup-overlay .save-controls { display:flex; flex-direction:column; gap:6px; }
+/* Size only (no `font` shorthand), so WP-LEDGER's `.save-status.is-unsaved` keeps its 600 weight. */
+.setup-overlay .save-controls .save-status { margin:0; font-size:12px; line-height:1.45; color:var(--muted); }
+.setup-overlay .save-controls .save-status.is-unsaved { color:var(--loss); font-weight:600; }
+.setup-overlay .save-controls .save-file-actions { display:flex; flex-wrap:wrap; gap:0 18px; }
+.setup-overlay .save-controls .save-file-actions button {
+  display:inline-flex; align-items:center; min-height:max(30px, var(--tap)); padding:0; border:0; border-radius:0; background:none;
+  font:400 13px/1.35 var(--font-sans); color:var(--you-text); text-decoration:underline; text-underline-offset:3px; cursor:pointer;
+}
+.setup-overlay .save-controls .save-file-actions button:hover { color:var(--ink); }
+
+/* Quick-resume card (top of step 1) */
+.setup-save {
+  display:flex; align-items:center; gap:16px; padding:14px 18px;
+  background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); border-left:4px solid var(--you);
+}
+.setup-confirmation { display:flex; align-items:center; gap:16px; flex:1; min-width:0; }
+.setup-save__text { min-width:0; }
+.setup-save__text strong {
+  display:block; font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--you-text);
+}
+.setup-save__text p { margin:4px 0 0; font:400 14px/1.4 var(--font-sans); color:var(--ink); }
+.setup-save__actions { margin-left:auto; flex:none; display:flex; align-items:center; gap:16px; }
+
+/* ---- Step 2: Rules of war (the draw) and step 3's opponent choice ---- */
+.rule-note {
+  display:flex; align-items:flex-start; gap:12px; padding:12px 16px;
+  background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); color:var(--text-2);
+}
+.rule-note > svg { flex:none; margin-top:1px; color:var(--you-text); }
+.rule-note p { margin:0; font:400 13px/1.5 var(--font-sans); }
+/* Inline on fine pointers (the primitive's min-height is var(--tap) = 0 there). On phone / coarse pointers "Change the
+   draw" (step 3, a manager under Blitz or Chaos) gets its own 44px line instead of a squeezed inline link. */
+.rule-note__action { font-size:13px; }
+@media (max-width:699.98px), (pointer:coarse) {
+  .rule-note__action { display:flex; width:max-content; max-width:100%; margin-top:2px; min-height:max(44px, var(--tap)); }
+}
+/* More rules disclosure (keeps every legacy field id, PLAN §4.7) */
+.setup-advanced { border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
+.setup-advanced > summary {
+  display:flex; align-items:center; gap:10px; min-height:max(44px, var(--tap)); padding:0 2px;
+  list-style:none; cursor:pointer;
+}
+.setup-advanced > summary::-webkit-details-marker { display:none; }
+.setup-advanced > summary > svg { flex:none; color:var(--ink); }
+.setup-advanced[open] > summary > svg { transform:rotate(180deg); }
+.setup-advanced__title { font:700 13px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--ink); white-space:nowrap; }
+.setup-advanced__values {
+  margin-left:auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 13px/1.3 var(--font-sans); color:var(--muted);
+}
+.setup-settings-fields { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px 22px; padding:8px 0 20px; }
+.setup-settings-fields .control-help { font-size:12px; }
+
+/* ---- Step 3: Your role (board 03, restyled) ---- */
+/* A manager's opponent choice sits under the role cards, before the team list (above the fold on phones too). Scoped:
+   `.control-help { margin:0 }` (primitives.css) loads after this file. */
+.setup-opponents .setup-opponents__help { display:block; margin-top:8px; }
+/* Two columns (≥1200): the team list gives up the opponent block's ~116px, so its bottom edge and the help under it
+   stay inside the step body at 1440 × 900 instead of leaving a nested scroller cut by the fold. */
+@media (min-width:1200px) {
+  .setup-opponents + .setup-group--list { --setup-list-h:clamp(228px, calc(100dvh - 640px), 456px); }
+}
+.setup-teams {
+  max-height:var(--setup-list-h); overflow-y:auto; overscroll-behavior:contain;
+  border-bottom:1px solid var(--rule); scrollbar-width:thin;
+}
+.setup-team {
+  display:grid; grid-template-columns:24px minmax(0, 1fr) auto; align-items:center; gap:12px;
+  width:100%; height:var(--setup-row-h); min-height:var(--tap); padding:0 14px; margin:0;
+  border:0; border-bottom:1px solid var(--row-rule); border-radius:0; background:transparent; text-align:left; cursor:pointer;
+}
+.setup-team:last-child { border-bottom:0; }
+.setup-team:hover:not([aria-checked=true]) { background:var(--panel); }
+.setup-team[aria-checked=true] { background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); }
+.setup-team__name {
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 15px/1.2 var(--font-sans); color:var(--text-2);
+}
+.setup-team[aria-checked=true] .setup-team__name { color:var(--ink); font-weight:600; }
+.setup-team__eff, .setup-shortlist__eff { font:400 13px/1 var(--font-sans); color:var(--muted); white-space:nowrap; }
+.setup-team-mark { display:flex; align-items:center; justify-content:center; width:24px; flex:none; }
+/* 10px under the list so its last visible row reads as scrollable, not clipped (W4 final: flush at every width).
+   Scoped to the group because `.control-help { margin:0 }` (primitives.css) loads after this file and won a bare
+   single-class rule. The note still ends inside the 1366 × 768 frame (measured: 662.9–680.3 vs body bottom 692). */
+.setup-group--list .setup-teams__help { margin-top:10px; }
+.setup-empty { margin:10px 0 0; font:400 13px/1.45 var(--font-sans); color:var(--muted); }
+
+.setup-pick { background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
+.setup-pick__head { display:flex; align-items:center; gap:16px; padding:22px 24px 18px; border-bottom:1px solid var(--rule); }
+.setup-pick__flag { display:flex; flex:none; }
+.setup-pick__id { min-width:0; }
+.setup-pick__kicker {
+  margin:0; white-space:nowrap; font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--you-text);
+}
+.setup-pick__name {
+  margin:4px 0 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 38px/1 var(--font-sans); letter-spacing:-.02em; color:var(--ink);
+}
+.setup-pick__meta { margin:6px 0 0; font:400 13px/1.35 var(--font-sans); color:var(--muted); white-space:nowrap; }
+.setup-pick__stats { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); margin:0; border-bottom:1px solid var(--rule); }
+.setup-pick__stats > div { min-width:0; padding:12px 0 12px 24px; }
+.setup-pick__stats > div + div { padding-left:16px; border-left:1px solid var(--rule); }
+.setup-pick__stats dd { margin:4px 0 0; font:600 26px/1.1 var(--font-narrow); color:var(--ink); white-space:nowrap; }
+.setup-pick__stats .setup-pick__tier { margin-top:8px; font:700 21px/1.1 var(--font-narrow); color:var(--you-text); }
+.setup-pick__players { padding:16px 24px 6px; }
+.setup-pick__players .setup-kicker { margin-bottom:6px; }
+.setup-players { list-style:none; margin:0; padding:0; }
+.setup-player {
+  display:grid; grid-template-columns:26px minmax(0, 1fr) auto; align-items:center; gap:10px;
+  height:33px; border-bottom:1px solid var(--row-rule);
+}
+.setup-player:last-child { border-bottom:0; }
+.setup-player__pos { font:700 12px/1 var(--font-narrow); color:var(--muted); }
+.setup-player__name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:400 14px/1.2 var(--font-sans); }
+.setup-player__rating { font-size:13px; }
+/* Fronts (board 03, V1 L929-944): land-border neighbours, strongest first, with a Stronger / Level / Weaker label. */
+.setup-pick__fronts { padding:14px 24px 6px; }
+.setup-pick__fronts .setup-kicker { margin-bottom:6px; }
+.setup-fronts { list-style:none; margin:0; padding:0; }
+.setup-front {
+  display:grid; grid-template-columns:20px minmax(0, 1fr) auto 64px; align-items:center; gap:10px;
+  height:34px; border-bottom:1px solid var(--row-rule);
+}
+.setup-front:last-child { border-bottom:0; }
+.setup-front .setup-team-mark { width:20px; }
+.setup-front__name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:400 14px/1.2 var(--font-sans); color:var(--ink); }
+.setup-front__eff { font:400 14px/1 var(--font-narrow); color:var(--text-2); white-space:nowrap; }
+.setup-front__rel { text-align:right; white-space:nowrap; font:600 13px/1 var(--font-narrow); color:var(--even); }
+.setup-front__rel[data-tone=loss] { color:var(--loss); }
+.setup-front__rel[data-tone=gain] { color:var(--gain); }
+.setup-fronts__empty { margin:6px 0 0; font:400 13px/1.45 var(--font-sans); color:var(--text-2); }
+.setup-pick--empty { padding:22px 24px; }
+.setup-pick__placeholder { margin:6px 0 0; font:400 14px/1.45 var(--font-sans); color:var(--text-2); }
+
+.setup-shortlist .setup-kicker { margin-bottom:0; }
+.setup-shortlist__rows { list-style:none; margin:0; padding:0; }
+.setup-shortlist__row {
+  display:grid; grid-template-columns:24px minmax(0, 1fr) auto; align-items:center; gap:10px;
+  height:34px; border-bottom:1px solid var(--row-rule);
+}
+.setup-shortlist__name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:400 14px/1.2 var(--font-sans); }
+
+/* ---- Low std band 1200–1399: board 12 is drawn at 1440 and its 24px titles hold one line from ~1390 up. Below that,
+   tighten the rail and paddings and step the titles down so every option-card title holds one line down to 1200
+   (measured in Chrome: "Random draw" 136px at 21px). The rail text column is 146px here (224 − 2×12 − 10 − 6 − 28 badge
+   − 10 gap), so the 12px subtitles hold one line ("Football · Nations · Europe" 141px). ---- */
+@media (min-width:1200px) and (max-width:1399.98px) {
+  .setup-overlay { --setup-rail-w:224px; --setup-main-pad:28px; --setup-side-pad:28px 28px 28px 0; }
+  .setup-rail { padding:28px 12px; }
+  .setup-rail__step { gap:10px; padding:14px 6px 14px 10px; }
+  .setup-rail__sub { font-size:12px; }
+  .rule-card__title, .setup-card__button { font-size:21px; padding-right:26px; }
+}
+
+/* ---- Tablet 700–1199: rail → horizontal 3-step bar, one column (M§8) ---- */
+@media (max-width:1199.98px) {
+  .setup-rail {
+    position:static; flex:none; width:auto; padding:0 var(--setup-pad-x); overflow:visible;
+    border-right:0; border-bottom:1px solid var(--rule);
+  }
+  .setup-rail__steps { flex-direction:row; gap:4px; }
+  .setup-rail__steps > li { display:flex; flex:1 1 0; min-width:0; }
+  .setup-rail__step { align-items:center; gap:12px; padding:12px; }
+  .setup-rail__step[data-state=current] { box-shadow:inset 0 -3px 0 var(--you); }
+  .setup-rail__title, .setup-rail__sub { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .setup-step { grid-template-columns:minmax(0, 1fr); }
+  .setup-step__body { grid-column:1; }
+}
+
+/* ---- Phone <700: compact step bar, single column, 56px primary bar (M§8) ---- */
+@media (max-width:699.98px) {
+  .setup-head { gap:8px; }
+  /* The 44px theme target overhangs the gutter so its 20px glyph lines up with the edge, keeping room for the title. */
+  .setup-head__theme { margin-right:-12px; }
+  .setup-head__cancel + .setup-head__theme { margin-left:-8px; }
+  .setup-head__rule { margin:16px 0; }
+  .setup-rail { padding:0; }
+  .setup-rail__steps { gap:0; }
+  .setup-rail__steps > li { flex:none; }
+  .setup-rail__steps > li[data-state=current] { flex:1 1 auto; }
+  .setup-rail__step { min-height:48px; padding:0 14px; gap:10px; }
+  .setup-rail__badge { width:24px; height:24px; font-size:13px; }
+  .setup-rail__title { font-size:13px; }
+  .setup-rail__sub { display:none; }
+  .setup-rail__steps > li:not([data-state=current]) .setup-rail__text {
+    position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap;
+  }
+  .setup-step { grid-template-rows:minmax(0, 1fr) auto; }
+  .setup-main { gap:20px; }
+  .setup-step[data-step="1"] .setup-main { gap:20px; }
+  .setup-foot { align-items:stretch; gap:0; padding:0 0 var(--safe-bottom); }
+  .setup-foot__note { display:none; }
+  .setup-foot .setup-foot__back { flex:none; padding:0 20px; border:0; border-right:1px solid var(--rule); background:var(--panel); }
+  .setup-foot .setup-foot__back:hover:not(:disabled) { background:var(--ink); color:var(--on-ink); }
+  .setup-foot .setup-foot__next { flex:1 1 auto; min-width:0; justify-content:space-between; padding:0 18px; }
+  /* "Next: Your role" plus its hint must never push the bar past the screen edge: the hint gives way first, with an
+     ellipsis (the narrow rule below keeps it whole down to 360). */
+  .setup-foot .btn-primary[data-bar-hint]::after {
+    content:attr(data-bar-hint); display:block; flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    padding:0; border:0;
+    font:400 12px/1 var(--font-sans); letter-spacing:.02em; text-transform:none; opacity:.85;
+  }
+  .setup-card-grid { grid-template-columns:minmax(0, 1fr); }
+  .setup-card__button, .rule-card__title { font-size:22px; }
+  .segmented.setup-segmented { display:flex; width:100%; }
+  .segmented.setup-segmented > button { flex:1 1 0; }
+  .setup-stat dd { font-size:24px; }
+  .setup-stat--small dd { font-size:16px; }
+  .setup-stat + .setup-stat { padding-left:12px; }
+  .setup-settings-fields { grid-template-columns:minmax(0, 1fr); }
+  .setup-save, .setup-confirmation { flex-direction:column; align-items:stretch; gap:12px; }
+  .setup-save__actions { margin-left:0; justify-content:space-between; }
+  .setup-pick__head { gap:14px; padding:18px; }
+  .setup-pick__name { font-size:28px; }
+  .setup-pick__stats > div { padding-left:18px; }
+  .setup-pick__players, .setup-pick__fronts { padding:14px 18px 6px; }
+  .setup-pick--empty { padding:18px; }
+}
+
+/* ---- Below the 390 phone target (e.g. 360 Android): tighten the step bar. ---- */
+@media (max-width:389.98px) {
+  /* At 360 the step-2 bar had ~41px for its 59px "Step 2 of 3" hint: tighter bar padding gives it the missing 24px. */
+  .setup-foot .setup-foot__back { padding:0 14px; }
+  .setup-foot .setup-foot__next { padding:0 12px; }
+}

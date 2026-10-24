@@ -11,8 +11,9 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { NATIONS } from '../src/data/teams.js';
+import { NATIONS, selectLineup } from '../src/data/teams.js';
 import { loadEaPlayers, pickFootballSquad, playerTuple } from './lib/football-data.mjs';
+import { clubsModule } from './lib/data-module.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const MAX_RATING = 99;
@@ -34,7 +35,6 @@ const FOOTBALL_LEAGUE_IDS = { 'Premier League': 13, 'La Liga': 53, 'Serie A': 31
 
 const FOOTBALL_FORMATION = { GK: 1, DF: 4, MF: 4, FW: 2 };
 const FOOTBALL_SIZE = 11;
-const BASKETBALL_FORMATION = { PG: 1, SG: 1, SF: 1, PF: 1, C: 1 };
 const BASKETBALL_SIZE = 5;
 
 const ROLE_OF_POSITION = {
@@ -45,7 +45,8 @@ const ROLE_OF_POSITION = {
 };
 
 // NBA 2K carries no position, but it carries the attributes a position is made
-// of. Each role scores the skills that define it; a player takes his best fit.
+// of. Each role scores the skills that define it. Keys run PG to C, the order of
+// the floor, so neighbouring keys are neighbouring positions.
 const POSITION_FIT = {
   PG: p => p.passVision + p.passIQ + p.ballHandle + p.speedWithBall + p.agility,
   SG: p => p.threePointShot + p.midRangeShot + p.shotIQ + p.agility + p.speed,
@@ -53,6 +54,35 @@ const POSITION_FIT = {
   PF: p => p.offensiveRebound + p.defensiveRebound + p.strength + p.interiorDefense + p.standingDunk,
   C: p => p.interiorDefense + p.block + p.defensiveRebound + p.standingDunk + p.postControl,
 };
+const BASKETBALL_POSITIONS = Object.keys(POSITION_FIT);
+// Most players cover two neighbouring positions: a combo guard both guard spots,
+// a stretch big power forward and centre. 0.15 gives about three in four players
+// in the export a second position.
+const SECOND_POSITION_GAP = 0.15;
+
+/**
+ * Each player's natural positions, primary first. Raw fits sit on different
+ * scales (rebounding spreads far more than shooting), so each is ranked against
+ * the whole export as a league percentile. A player's best percentile is his
+ * primary position; he also covers the better neighbouring position when it ranks
+ * within SECOND_POSITION_GAP of it.
+ */
+function naturalPositions(pool) {
+  const league = Object.fromEntries(BASKETBALL_POSITIONS.map(pos => [pos, pool.map(POSITION_FIT[pos]).sort((a, b) => a - b)]));
+  // Mid-rank percentile: a run of equal fits shares the middle of its ranks.
+  const percentile = (pos, fit) => {
+    const sorted = league[pos];
+    return (sorted.findIndex(x => x >= fit) + sorted.findLastIndex(x => x <= fit) + 1) / 2 / sorted.length;
+  };
+  return player => {
+    const rank = Object.fromEntries(BASKETBALL_POSITIONS.map(pos => [pos, percentile(pos, POSITION_FIT[pos](player))]));
+    const primary = BASKETBALL_POSITIONS.reduce((best, pos) => (rank[pos] > rank[best] ? pos : best));
+    const at = BASKETBALL_POSITIONS.indexOf(primary);
+    const neighbour = [BASKETBALL_POSITIONS[at - 1], BASKETBALL_POSITIONS[at + 1]].filter(Boolean)
+      .reduce((best, pos) => (rank[pos] > rank[best] ? pos : best));
+    return rank[primary] - rank[neighbour] <= SECOND_POSITION_GAP ? [primary, neighbour] : [primary];
+  };
+}
 
 function parseCsv(text) {
   const rows = [];
@@ -105,26 +135,16 @@ function hashStr(s) {
 /** Distinct, readable colours spread around the hue wheel. */
 const colourFor = id => `oklch(0.72 0.16 ${hashStr(id) % 360})`;
 
-/** Fill the formation by rating, then top up with the best remaining players. */
-function pickLineup(pool, formation, size) {
+/**
+ * The five the game itself would field from a whole roster: the strongest
+ * assignment to the five positions, honouring both of a player's natural
+ * positions, then listed by rating.
+ */
+function startingFive(pool) {
   const byRating = pool.slice().sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
-  const taken = new Set();
-  const lineup = [];
-  for (const [pos, count] of Object.entries(formation)) {
-    for (const p of byRating) {
-      if (lineup.filter(x => x.pos === pos).length >= count) break;
-      if (taken.has(p) || p.pos !== pos) continue;
-      taken.add(p);
-      lineup.push(p);
-    }
-  }
-  for (const p of byRating) {
-    if (lineup.length >= size) break;
-    if (taken.has(p)) continue;
-    taken.add(p);
-    lineup.push(p);
-  }
-  return lineup.sort((a, b) => b.rating - a.rating);
+  return selectLineup({ sport: 'basketball', squad: byRating }).starters
+    .map(starter => byRating[starter.originalIndex])
+    .sort((a, b) => b.rating - a.rating);
 }
 
 const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
@@ -132,7 +152,7 @@ const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
 function emit(clubs, file, header) {
   const body = clubs
     .map(c => {
-      const players = c.squad.map(p => p.sourceInfo ? JSON.stringify(playerTuple(p)) : `[${JSON.stringify(p.name)},'${p.pos}',${p.rating}]`).join(',');
+      const players = c.squad.map(p => p.sourceInfo ? JSON.stringify(playerTuple(p)) : `[${JSON.stringify(p.name)},'${p.positions.join('/')}',${p.rating}]`).join(',');
       return `  { id: '${c.id}', name: ${JSON.stringify(c.name)}, code: '${c.code}', league: ${JSON.stringify(c.league)}, country: '${c.country}', col: '${c.col}', str: ${c.str}, squad: [${players}] },`;
     })
     .join('\n');
@@ -176,33 +196,36 @@ for (const c of footballClubs) {
   c.col = colourFor(c.id);
 }
 
-await emit(
-  footballClubs,
-  'clubs.football.js',
+// The football clubs carry full source metadata, so they are stored compactly (scripts/lib/data-module.mjs).
+await writeFile(path.join(root, 'src', 'data', 'clubs.football.js'), clubsModule(
+  footballClubs.map(c => ({ ...c, squad: c.squad.map(p => p.sourceInfo ? playerTuple(p) : [p.name, p.pos, p.rating]) })),
   `// GENERATED by scripts/build-clubs.mjs from the committed EA FC 26 snapshot (2025-09-19).
 // Player tuples retain database identity, all natural roles, original overall and source URL.
 //
 // Top-division clubs from the main European leagues, each with its best XI in a
 // 4-4-2 and a strength equal to that lineup's mean rating. \`country\` is the map
 // shape the club is seeded from when a club campaign starts.
+// Stored compactly: each line is JSON, and source metadata is a row under a
+// shared shape (src/data/sourceTable.js).
 `,
-);
+));
 
 // ---------------- basketball ----------------
 
 const nba = JSON.parse(await readFile(path.join(root, 'data-src', 'nba2k.json'), 'utf8'));
+const positionsOf = naturalPositions(nba);
 const byTeam = new Map();
 for (const p of nba) {
   if (!p.team) continue;
-  const pos = Object.keys(POSITION_FIT).reduce((best, k) => (POSITION_FIT[k](p) > POSITION_FIT[best](p) ? k : best), 'PG');
+  const positions = positionsOf(p);
   if (!byTeam.has(p.team)) byTeam.set(p.team, []);
-  byTeam.get(p.team).push({ name: p.name, pos, rating: Math.min(MAX_RATING, p.overallAttribute) });
+  byTeam.get(p.team).push({ name: p.name, pos: positions[0], positions, rating: Math.min(MAX_RATING, p.overallAttribute) });
 }
 
 const basketCodes = new Set();
 const basketballClubs = [...byTeam.entries()]
   .map(([name, players]) => {
-    const squad = pickLineup(players, BASKETBALL_FORMATION, BASKETBALL_SIZE);
+    const squad = startingFive(players);
     return {
       id: `b-${slug(name)}`,
       name,
@@ -225,9 +248,11 @@ await emit(
   `// GENERATED by scripts/build-clubs.mjs from an NBA 2K export.
 //
 // NBA franchises with their best starting five. The export carries no position,
-// so each player's role is inferred from the attributes that define it — a
-// centre by interior defence, rebounding and post play, a point guard by vision,
-// handle and speed with the ball.
+// so each player's positions are inferred from the attributes that define them —
+// a centre by interior defence, rebounding and post play, a point guard by vision,
+// handle and speed with the ball. Most players also cover a neighbouring position,
+// listed primary first ('PG/SG'), and each five is the strongest lineup the
+// franchise's positions allow.
 `,
 );
 
@@ -241,3 +266,5 @@ if (missing.length) console.log(`  leagues not found in the export: ${missing.jo
 console.log(`  strongest: ${footballClubs.slice(0, 6).map(c => `${c.name} ${c.str}`).join(', ')}`);
 console.log(`basketball: ${basketballClubs.length} franchises`);
 console.log(`  strongest: ${basketballClubs.slice(0, 6).map(c => `${c.name} ${c.str}`).join(', ')}`);
+const starters = basketballClubs.flatMap(c => c.squad);
+console.log(`  ${starters.filter(p => p.positions.length > 1).length} of ${starters.length} starters cover two positions`);

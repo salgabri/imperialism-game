@@ -64,8 +64,13 @@ function makeDisjointSet(n) {
   return { find, join: (a, b) => { a = find(a); b = find(b); if (a !== b) parent[Math.max(a, b)] = Math.min(a, b); } };
 }
 
+// A ring of plain [x, y] numbers (the painted label rings) is used as it is, since nothing here writes to a
+// ring; anything else is converted. A copy of every point of the world map doubled this engine's geometry.
+const numericPoint = p => Array.isArray(p) && p.length === 2 && typeof p[0] === 'number' && typeof p[1] === 'number';
+
 function makeCountry(shape) {
-  const rings = (shape.rings || []).filter(ring => ring.length >= 3).map(ring => ring.map(p => [Number(p[0]), Number(p[1])]))
+  const rings = (shape.rings || []).filter(ring => ring.length >= 3)
+    .map(ring => ring.every(numericPoint) ? ring : ring.map(p => [Number(p[0]), Number(p[1])]))
     .filter(ring => ring.every(p => p.every(Number.isFinite)) && Math.abs(ringArea(ring)) > EPS);
   if (!rings.length) return null;
   const ringBounds = rings.map(ring => boundsOf([ring]));
@@ -142,9 +147,20 @@ function edgesOf(rings) {
   for (const ring of rings) for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
     const a = ring[j], b = ring[i];
     if (a[0] === b[0] && a[1] === b[1]) continue;
-    edges.push({ a, b, bbox: { x: Math.min(a[0], b[0]), y: Math.min(a[1], b[1]), w: Math.abs(a[0] - b[0]), h: Math.abs(a[1] - b[1]) } });
+    edges.push({ a, b });
   }
   return edges;
+}
+
+// An edge's bounds are worked out where they are needed rather than kept on every edge (an object of four boxed
+// numbers per edge of the world map), with the same arithmetic, so every comparison comes out the same.
+const edgeBounds = ({ a, b }) => ({ x: Math.min(a[0], b[0]), y: Math.min(a[1], b[1]), w: Math.abs(a[0] - b[0]), h: Math.abs(a[1] - b[1]) });
+
+/** overlaps(edgeBounds(edge), box) without building the bounds. */
+function edgeOverlaps({ a, b }, box) {
+  const x = Math.min(a[0], b[0]), y = Math.min(a[1], b[1]);
+  return x <= box.x + box.w + EPS && x + Math.abs(a[0] - b[0]) + EPS >= box.x
+    && y <= box.y + box.h + EPS && y + Math.abs(a[1] - b[1]) + EPS >= box.y;
 }
 
 function exteriorEdges(pieces) {
@@ -254,32 +270,54 @@ function rasterize(component) {
     const i = y * nx + x;
     if (mask[i]) distance[i] = Math.min(distance[i], distance[i + 1] + 1, distance[i + nx] + 1, distance[i + nx + 1] + SQRT2, distance[i + nx - 1] + SQRT2);
   }
-  const emptyPrefix = new Uint16Array((nx + 1) * ny);
-  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) emptyPrefix[y * (nx + 1) + x + 1] = emptyPrefix[y * (nx + 1) + x] + (mask[y * nx + x] ? 0 : 1);
   const mx = sx / count, my = sy / count;
   let pca = Math.atan2(2 * (sxy / count - mx * my), sxx / count - mx * mx - (syy / count - my * my)) * 90 / Math.PI;
   if (pca > 90) pca -= 180;
   if (pca < -90) pca += 180;
   pca = clamp(pca, -60, 60);
-  const ranked = [];
-  for (let y = 1; y < ny - 1; y++) for (let x = 1; x < nx - 1; x++) {
-    const i = y * nx + x;
-    if (distance[i] > 0.9) ranked.push({ x: x0 + (x + 0.5) * cell, y: y0 + (y + 0.5) * cell, clearance: distance[i] * cell, d: distance[i], centrality: Math.hypot(x - mx, y - my) });
-  }
-  ranked.sort((a, z) => z.d - a.d || a.centrality - z.centrality || a.y - z.y || a.x - z.x);
+  // Land cells are exactly those at a positive distance (at least one cell), so the distances are the mask too.
+  // Every visible component is ranked by its usable area, but only a few are searched for a label: the sea-cell
+  // row sums and the candidate points are made when a search first needs them (emptyPrefixOf, candidatesOf).
+  return { nx, ny, cell, x0, y0, distance, pca, area: count * cell * cell, count, mx, my, bbox: b };
+}
+
+const landCell = (raster, index) => raster.distance[index] > 0;
+
+/** Sea cells before each cell of its row (prefix counts), so a row span is checked in constant time. */
+function emptyPrefixOf(raster) {
+  if (raster.emptyPrefix) return raster.emptyPrefix;
+  const { nx, ny } = raster;
+  const emptyPrefix = new Uint16Array((nx + 1) * ny);
+  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) emptyPrefix[y * (nx + 1) + x + 1] = emptyPrefix[y * (nx + 1) + x] + (landCell(raster, y * nx + x) ? 0 : 1);
+  return raster.emptyPrefix = emptyPrefix;
+}
+
+/** The raster's stable label points: the clearest well-spaced cells, plus the unsnapped centres on land. */
+function candidatesOf(raster) {
+  if (raster.candidates) return raster.candidates;
+  const { nx, ny, cell, x0, y0, distance, count, mx, my, bbox: b } = raster;
+  // Cells by clearance, then centrality, then y and x: the order of one ranked object per cell, without the objects.
+  const cells = [];
+  for (let y = 1; y < ny - 1; y++) for (let x = 1; x < nx - 1; x++) if (distance[y * nx + x] > 0.9) cells.push(y * nx + x);
+  const centrality = new Float64Array(cells.length);
+  cells.forEach((i, k) => { centrality[k] = Math.hypot(i % nx - mx, Math.floor(i / nx) - my); });
+  const cellX = i => x0 + (i % nx + 0.5) * cell, cellY = i => y0 + (Math.floor(i / nx) + 0.5) * cell;
+  const order = cells.map((_, k) => k).sort((p, q) => distance[cells[q]] - distance[cells[p]] || centrality[p] - centrality[q]
+    || cellY(cells[p]) - cellY(cells[q]) || cellX(cells[p]) - cellX(cells[q]));
   const candidates = [];
   const spacing = Math.max(cell * 3, Math.sqrt(count) * cell * 0.09);
-  for (const point of ranked) {
-    if (candidates.every(p => Math.hypot(p.x - point.x, p.y - point.y) >= spacing)) candidates.push(point);
+  for (const k of order) {
+    const i = cells[k], x = cellX(i), y = cellY(i);
+    if (candidates.every(p => Math.hypot(p.x - x, p.y - y) >= spacing)) candidates.push({ x, y, clearance: distance[i] * cell, record: null });
     if (candidates.length >= 28) break;
   }
   // Include unsnapped centers when they are genuinely on land; grid rounding
   // should not push an otherwise symmetric horizontal name toward one edge.
   for (const [x, y] of [[b.x + b.w / 2, b.y + b.h / 2], [x0 + (mx + 0.5) * cell, y0 + (my + 0.5) * cell]]) {
     const gx = Math.floor((x - x0) / cell), gy = Math.floor((y - y0) / cell);
-    if (gx >= 0 && gy >= 0 && gx < nx && gy < ny && mask[gy * nx + gx]) candidates.unshift({ x, y, clearance: distance[gy * nx + gx] * cell });
+    if (gx >= 0 && gy >= 0 && gx < nx && gy < ny && landCell(raster, gy * nx + gx)) candidates.unshift({ x, y, clearance: distance[gy * nx + gx] * cell });
   }
-  return { nx, ny, cell, x0, y0, mask, distance, emptyPrefix, candidates, pca, area: count * cell * cell };
+  return raster.candidates = candidates;
 }
 
 function labelFootprint(x, y, angle, width, fontSize, curveRise = 0) {
@@ -299,7 +337,7 @@ function inView(footprint, view, margin = 0) {
 
 function rasterCellFilled(raster, px, py) {
   const gx = Math.floor((px - raster.x0) / raster.cell), gy = Math.floor((py - raster.y0) / raster.cell);
-  return gx >= 0 && gy >= 0 && gx < raster.nx && gy < raster.ny && !!raster.mask[gy * raster.nx + gx];
+  return gx >= 0 && gy >= 0 && gx < raster.nx && gy < raster.ny && landCell(raster, gy * raster.nx + gx);
 }
 
 function rasterFits(raster, x, y, angle, width, fontSize, curveRise = 0, footprint = labelFootprint(x, y, angle, width, fontSize, curveRise)) {
@@ -313,6 +351,7 @@ function rasterFits(raster, x, y, angle, width, fontSize, curveRise = 0, footpri
   const maxY = Math.max(footprint[0][1], footprint[1][1], footprint[2][1], footprint[3][1]);
   const start = clamp(Math.ceil((minY - raster.y0) / raster.cell - 0.5), 0, raster.ny);
   const end = clamp(Math.ceil((maxY - raster.y0) / raster.cell - 0.5), 0, raster.ny);
+  const emptyPrefix = emptyPrefixOf(raster);
   for (let row = start; row < end; row++) {
     const py = raster.y0 + (row + 0.5) * raster.cell;
     let left = Infinity, right = -Infinity;
@@ -327,7 +366,7 @@ function rasterFits(raster, x, y, angle, width, fontSize, curveRise = 0, footpri
     const first = clamp(Math.ceil((left - raster.x0) / raster.cell - 0.5), 0, raster.nx);
     const stop = clamp(Math.ceil((right - raster.x0) / raster.cell - 0.5), 0, raster.nx);
     const offset = row * (raster.nx + 1);
-    if (raster.emptyPrefix[offset + stop] !== raster.emptyPrefix[offset + first]) return false;
+    if (emptyPrefix[offset + stop] !== emptyPrefix[offset + first]) return false;
   }
   return true;
 }
@@ -342,7 +381,9 @@ function edgeInsideRectangle(edge, footprint) {
   const dx = (edge.b[0] - edge.a[0]) * ux + (edge.b[1] - edge.a[1]) * uy;
   const dy = (edge.b[0] - edge.a[0]) * vx + (edge.b[1] - edge.a[1]) * vy;
   let lo = 0, hi = 1;
-  for (const [origin, delta, limit] of [[ax, dx, w], [ay, dy, h]]) {
+  // Both axes in turn, without building a list of them on every call (this runs for every nearby edge).
+  for (let axis = 0; axis < 2; axis++) {
+    const origin = axis ? ay : ax, delta = axis ? dy : dx, limit = axis ? h : w;
     if (Math.abs(delta) <= EPS) { if (origin <= EPS || origin >= limit - EPS) return null; }
     else {
       const a = (EPS - origin) / delta, b = (limit - EPS - origin) / delta;
@@ -361,7 +402,7 @@ function exactFootprint(group, footprint, component = null) {
   for (const part of parts) {
     if (!overlaps(part.bbox, bbox)) continue;
     for (const edge of part.edges) {
-      if (!overlaps(edge.bbox, bbox)) continue;
+      if (!edgeOverlaps(edge, bbox)) continue;
       const interval = edgeInsideRectangle(edge, footprint);
       if (!interval) continue;
       const dx = edge.b[0] - edge.a[0], dy = edge.b[1] - edge.a[1], len = Math.hypot(dx, dy);
@@ -425,7 +466,7 @@ function foreignLandIntersects(foreignCountries, footprint) {
     // Inspect every relevant vector edge, including edges wholly in the band.
     for (const piece of country.pieces) {
       if (!overlaps(piece.bbox, bbox)) continue;
-      for (const edge of piece.edges) if (overlaps(edge.bbox, bbox) && edgeInsideRectangle(edge, footprint)) return true;
+      for (const edge of piece.edges) if (edgeOverlaps(edge, bbox) && edgeInsideRectangle(edge, footprint)) return true;
     }
   }
   return false;
@@ -474,9 +515,10 @@ function ownedRectangleArea(group, footprint, frame) {
   // Between vertex/intersection heights, every boundary x(y) is linear. Exact
   // midpoint integration of union widths therefore measures full envelope area,
   // including holes, same-winding nested rings and overlapping owned polygons.
+  const bounds = allEdges.map(edgeBounds);
   for (let i = 0; i < allEdges.length; i++) for (let j = i + 1; j < allEdges.length; j++) {
     const a = allEdges[i], b = allEdges[j];
-    if (!overlaps(a.bbox, b.bbox)) continue;
+    if (!overlaps(bounds[i], bounds[j])) continue;
     const ax = a.b[0] - a.a[0], ay = a.b[1] - a.a[1], bx = b.b[0] - b.a[0], by = b.b[1] - b.a[1];
     const denominator = ax * by - ay * bx;
     if (Math.abs(denominator) <= EPS) continue;
@@ -518,8 +560,9 @@ function pointOwnedDistance(group, x, y) {
   for (const country of group.countries) for (const piece of country.pieces) {
     const dx = Math.max(0, piece.bbox.x - x, x - piece.bbox.x - piece.bbox.w), dy = Math.max(0, piece.bbox.y - y, y - piece.bbox.y - piece.bbox.h);
     if (dx * dx + dy * dy >= best) continue;
-    for (const { a, b, bbox } of piece.edges) {
-      const bx = Math.max(0, bbox.x - x, x - bbox.x - bbox.w), by = Math.max(0, bbox.y - y, y - bbox.y - bbox.h);
+    for (const { a, b } of piece.edges) {
+      const left = Math.min(a[0], b[0]), top = Math.min(a[1], b[1]);
+      const bx = Math.max(0, left - x, x - left - Math.abs(a[0] - b[0])), by = Math.max(0, top - y, y - top - Math.abs(a[1] - b[1]));
       if (bx * bx + by * by >= best) continue;
       const ex = b[0] - a[0], ey = b[1] - a[1], lengthSquared = ex * ex + ey * ey;
       const t = clamp(((x - a[0]) * ex + (y - a[1]) * ey) / lengthSquared, 0, 1);
@@ -583,20 +626,20 @@ function pointRecord(raster, point) {
   const key = `${point.x},${point.y}`;
   let record = records.get(key);
   if (!record) records.set(key, record = { x: point.x, y: point.y, limits: new Map(), coastalLimits: new Map() });
-  if (raster.candidates.includes(point)) point.record = record;
+  if (candidatesOf(raster).includes(point)) point.record = record;
   return record;
 }
 
 function rasterProbes(raster, record) {
   if (record.probes) return record.probes;
   const found = record.probes = [];
-  const { x, y } = record, { nx, ny, cell, x0, y0, mask } = raster;
+  const { x, y } = record, { nx, ny, cell, x0, y0 } = raster;
   for (let ray = 0; ray < PROBE_RAYS; ray++) {
     const theta = 2 * Math.PI * ray / PROBE_RAYS, dx = Math.cos(theta) * cell / 2, dy = Math.sin(theta) * cell / 2;
     for (let step = 1; ; step++) {
       const gx = Math.floor((x + dx * step - x0) / cell), gy = Math.floor((y + dy * step - y0) / cell);
       if (gx < 0 || gy < 0 || gx >= nx || gy >= ny) break;
-      if (!mask[gy * nx + gx]) { found.push(x0 + (gx + 0.5) * cell - x, y0 + (gy + 0.5) * cell - y); break; }
+      if (!landCell(raster, gy * nx + gx)) { found.push(x0 + (gx + 0.5) * cell - x, y0 + (gy + 0.5) * cell - y); break; }
     }
   }
   return found;
@@ -675,12 +718,15 @@ const SCALES_KEPT = 4;
 function scaleCache(holder, field, scale, create = () => new Map()) {
   const caches = holder[field] || (holder[field] = new Map());
   let cache = caches.get(scale);
+  // Already the most recent scale: moving it to the end again would only churn the map's table.
+  if (cache && caches.latest === scale) return cache;
   if (cache) caches.delete(scale);
   else {
     cache = create();
     if (caches.size >= SCALES_KEPT) caches.delete(caches.keys().next().value);
   }
   caches.set(scale, cache);
+  caches.latest = scale;
   return cache;
 }
 
@@ -728,7 +774,13 @@ function visibleUsableArea(component, view, minSize) {
   // keeps its count per clearance threshold; a partial window uses a summed-area
   // table per threshold. Either way the same cells are counted.
   if (x0 === 0 && y0 === 0 && x1 === raster.nx && y1 === raster.ny) {
-    const count = scaleCache(raster, 'usable', margin, () => raster.distance.reduce((sum, d) => sum + (d * raster.cell >= margin), 0));
+    const count = scaleCache(raster, 'usable', margin, () => {
+      // A plain loop: reduce() over a Float32Array boxes every cell for its callback.
+      const { distance, cell } = raster;
+      let usable = 0;
+      for (let i = 0; i < distance.length; i++) if (distance[i] * cell >= margin) usable++;
+      return usable;
+    });
     return count * raster.cell * raster.cell;
   }
   const table = clearanceTable(raster, margin), stride = raster.nx + 1;
@@ -757,10 +809,10 @@ function candidatePairs(component, definition, options, previous, coastal) {
   const { unitsPerPixel: k, minFontPx, maxFontPx, viewBox } = options;
   const characters = Math.max(1, [...definition.text].length);
   const advance = Number.isFinite(definition.widthEm) && definition.widthEm > 0 ? definition.widthEm : characters * 0.72;
-  const trackingEm = characters > 1 ? TRACKING : 0;
+  const trackingEm = characters > 1 ? options.trackingEm ?? TRACKING : 0;
   const widthEm = advance + Math.max(0, characters - 1) * trackingEm;
   const minSize = minFontPx * k, maxSize = maxFontPx * k;
-  const candidates = raster.candidates.slice();
+  const candidates = candidatesOf(raster).slice();
   if (previous && previous.componentKey === component.key && !candidates.some(p => p.x === previous.x && p.y === previous.y)) candidates.unshift({ x: previous.x, y: previous.y, clearance: previous.clearance || 0 });
   const angles = angleOptions(raster.pca);
   const curveRatio = options.curveRatio || 0;
@@ -802,7 +854,7 @@ function edgeGrid(country) {
   const cells = Array.from({ length: nx * ny }, () => []);
   const column = x => clamp(Math.floor((x - box.x) / side), 0, nx - 1), row = y => clamp(Math.floor((y - box.y) / side), 0, ny - 1);
   for (const edge of edges) {
-    const b = edge.bbox;
+    const b = edgeBounds(edge);
     for (let gy = row(b.y); gy <= row(b.y + b.h); gy++) for (let gx = column(b.x); gx <= column(b.x + b.w); gx++) cells[gy * nx + gx].push(edge);
   }
   return { cells, nx, column, row };
@@ -813,7 +865,7 @@ function someEdgeIn(country, box, visit) {
   if (!overlaps(country.bbox, box)) return false;
   const grid = country.grid || (country.grid = edgeGrid(country));
   for (let gy = grid.row(box.y); gy <= grid.row(box.y + box.h); gy++) for (let gx = grid.column(box.x); gx <= grid.column(box.x + box.w); gx++) {
-    for (const edge of grid.cells[gy * grid.nx + gx]) if (overlaps(edge.bbox, box) && visit(edge)) return true;
+    for (const edge of grid.cells[gy * grid.nx + gx]) if (edgeOverlaps(edge, box) && visit(edge)) return true;
   }
   return false;
 }
@@ -993,12 +1045,97 @@ export function createTerritoryComponentIndex(countryShapes = []) {
 }
 
 /**
+ * v4 label policy (README "Map rendering", DEC D19, PLAN A-6). Opt-in: pass
+ * these to layout() explicitly; layout()'s own defaults stay the pre-v4 ones.
+ * Archivo Narrow uppercase with .14em tracking, hidden below 9px except your
+ * own label (down to 6.5px), arching 5% of its width, coastal fallback as before.
+ */
+export const V4_LABEL_POLICY = Object.freeze({
+  trackingEm: 0.14,
+  curveRatio: 0.05,
+  minFontPx: 9,
+  ownMinFontPx: 6.5,
+  coastalAllowancePx: 10,
+  maxSeaFraction: 0.22,
+});
+
+/** Largest label size by viewport width class (README "Responsive rules"). */
+export const LABEL_SIZE_TIERS = Object.freeze([
+  Object.freeze({ minWidth: 1600, maxFontPx: 30 }),
+  Object.freeze({ minWidth: 1200, maxFontPx: 22 }),
+  Object.freeze({ minWidth: 700, maxFontPx: 20 }),
+  Object.freeze({ minWidth: 0, maxFontPx: 18 }),
+]);
+
+/**
+ * ≥1600 → 30, 1200–1599 → 22, 700–1199 → 20, <700 → 18 (screen px).
+ * An unknown width uses the 700–1199 tier, the class of jsdom's 1024px window.
+ */
+export function labelMaxFontPx(viewportWidth) {
+  if (!Number.isFinite(viewportWidth)) return 20;
+  return LABEL_SIZE_TIERS.find(tier => viewportWidth >= tier.minWidth)?.maxFontPx ?? 18;
+}
+
+/**
+ * The layout() input for v4 labels: the tier for `viewportWidth` (or an
+ * explicit `maxFontPx`), the 9px floor, and a per-label 6.5px floor for `meId`.
+ * Label objects other than your own are passed through unchanged.
+ */
+export function v4LabelOptions({ viewportWidth, maxFontPx, meId = null, labels = [] } = {}) {
+  const policy = V4_LABEL_POLICY;
+  const own = meId == null || meId === '' ? null : String(meId);
+  return {
+    labels: labels.map(label => own !== null && label && String(label.id) === own
+      ? { ...label, minFontPx: policy.ownMinFontPx } : label),
+    minFontPx: policy.minFontPx,
+    maxFontPx: Number.isFinite(maxFontPx) && maxFontPx > 0 ? maxFontPx : labelMaxFontPx(viewportWidth),
+    curveRatio: policy.curveRatio,
+    coastalAllowancePx: policy.coastalAllowancePx,
+    maxSeaFraction: policy.maxSeaFraction,
+    trackingEm: policy.trackingEm,
+  };
+}
+
+// Uppercase advance widths in em for a narrow grotesque (Arial metrics × .82,
+// close to Archivo Narrow / Arial Narrow). Used only where no canvas exists.
+const NARROW_ADVANCE_EM = {
+  A: 0.547, B: 0.547, C: 0.592, D: 0.592, E: 0.547, F: 0.501, G: 0.638, H: 0.592, I: 0.228,
+  J: 0.41, K: 0.547, L: 0.456, M: 0.683, N: 0.592, O: 0.638, P: 0.547, Q: 0.638, R: 0.592,
+  S: 0.547, T: 0.501, U: 0.592, V: 0.547, W: 0.774, X: 0.547, Y: 0.547, Z: 0.501,
+  ' ': 0.228, '.': 0.228, ',': 0.228, '-': 0.273, '\u2013': 0.456, "'": 0.157, '\u2019': 0.182,
+  '&': 0.547, '(': 0.273, ')': 0.273, '/': 0.228,
+};
+const NARROW_DIGIT_EM = 0.456;
+const NARROW_DEFAULT_EM = 0.56;
+
+/**
+ * Deterministic stand-in for canvas `measureText(text).width / 100` with the
+ * map font: the advance of the uppercased text in em, tracking excluded (the
+ * engine adds it). Accents are measured as their base letter; weights above
+ * 400 widen glyphs slightly (600 → +4%, 700 → +6%). Needs no DOM, so jsdom and
+ * Node give identical results.
+ */
+export function estimateLabelWidthEm(text, weight = 600) {
+  const letters = String(text ?? '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  let width = 0;
+  for (const character of letters) {
+    width += NARROW_ADVANCE_EM[character] ?? (character >= '0' && character <= '9' ? NARROW_DIGIT_EM : NARROW_DEFAULT_EM);
+  }
+  const boldness = clamp(((Number(weight) || 400) - 400) / 300, 0, 1);
+  return Math.round(width * (1 + 0.06 * boldness) * 10000) / 10000;
+}
+
+/**
  * Create once per fitted display geometry; reuse for every conquest and zoom.
  *
  * countryShapes: [{id, rings: [[[x,y],...], ...]}], SVG nonzero winding.
- * layout({ownership: {countryId: ownerId}, labels: [{id,text,widthEm}],
+ * layout({ownership: {countryId: ownerId}, labels: [{id,text,widthEm,minFontPx?}],
  *         viewBox:{x,y,w,h}, unitsPerPixel, minFontPx=11, maxFontPx=32,
- *         curveRatio=0, coastalAllowancePx=0, maxSeaFraction=.22})
+ *         curveRatio=0, coastalAllowancePx=0, maxSeaFraction=.22, trackingEm=.085})
+ *
+ * `trackingEm` is the letter-spacing added between characters (v4: .14). A
+ * label's own `minFontPx` replaces the shared minimum for that label only
+ * (v4: 6.5 for your empire); labels that cannot reach their minimum are omitted.
  *
  * Returned x/y/fontSize/letterSpacing/width/height are map units; angle is
  * degrees. `width` is textLength including tracking, while `footprint` is a
@@ -1077,19 +1214,23 @@ export function createEmpireLabelEngine(countryShapes = []) {
   }
 
   return {
-    layout({ ownership = {}, labels = [], viewBox = { x: 0, y: 0, w: 960, h: 540 }, unitsPerPixel = 1, minFontPx = 11, maxFontPx = 32, curveRatio = 0, coastalAllowancePx = 0, maxSeaFraction = 0.22 } = {}) {
+    layout({ ownership = {}, labels = [], viewBox = { x: 0, y: 0, w: 960, h: 540 }, unitsPerPixel = 1, minFontPx = 11, maxFontPx = 32, curveRatio = 0, coastalAllowancePx = 0, maxSeaFraction = 0.22, trackingEm } = {}) {
       if (!Number.isFinite(unitsPerPixel) || unitsPerPixel <= 0 || viewBox.w <= 0 || viewBox.h <= 0) return [];
       const groups = prepare(ownership);
       const definitions = labels.filter(l => l && l.text && groups.has(String(l.id))).map(l => ({ ...l, id: String(l.id), text: String(l.text) })).sort((a, b) => a.id.localeCompare(b.id));
-      const options = { unitsPerPixel, viewBox, minFontPx: Math.max(1, minFontPx), maxFontPx: Math.max(minFontPx, maxFontPx), curveRatio: Number.isFinite(curveRatio) ? clamp(curveRatio, 0, 0.15) : 0, coastalAllowancePx: Number.isFinite(coastalAllowancePx) ? Math.max(0, coastalAllowancePx) : 0, maxSeaFraction: Number.isFinite(maxSeaFraction) ? clamp(maxSeaFraction, 0, 0.22) : 0.22 };
-      const cacheKey = JSON.stringify([preparedKey, definitions.map(d => [d.id, d.text, d.widthEm]), options]);
+      const options = { unitsPerPixel, viewBox, minFontPx: Math.max(1, minFontPx), maxFontPx: Math.max(minFontPx, maxFontPx), curveRatio: Number.isFinite(curveRatio) ? clamp(curveRatio, 0, 0.15) : 0, coastalAllowancePx: Number.isFinite(coastalAllowancePx) ? Math.max(0, coastalAllowancePx) : 0, maxSeaFraction: Number.isFinite(maxSeaFraction) ? clamp(maxSeaFraction, 0, 0.22) : 0.22, trackingEm: Number.isFinite(trackingEm) ? clamp(trackingEm, 0, 0.3) : TRACKING };
+      const cacheKey = JSON.stringify([preparedKey, definitions.map(d => [d.id, d.text, d.widthEm, d.minFontPx]), options]);
       if (cacheKey === lastLayoutKey) return lastLayout;
       const output = [];
       for (const definition of definitions) {
         const group = groups.get(definition.id);
         const previous = previousLabels.get(definition.id);
-        const foreignCountries = options.coastalAllowancePx > 0 ? foreignOf(group) : [];
-        const checks = footprintChecks(group, `${unitsPerPixel}|${foreignCountries.length > 0}|${options.coastalAllowancePx}|${options.maxSeaFraction}`);
+        // A label may carry its own legibility floor (v4: your empire 6.5px).
+        const labelMinFontPx = Number.isFinite(definition.minFontPx) && definition.minFontPx > 0
+          ? clamp(definition.minFontPx, 1, options.maxFontPx) : options.minFontPx;
+        const labelOptions = labelMinFontPx === options.minFontPx ? options : { ...options, minFontPx: labelMinFontPx };
+        const foreignCountries = labelOptions.coastalAllowancePx > 0 ? foreignOf(group) : [];
+        const checks = footprintChecks(group, `${unitsPerPixel}|${foreignCountries.length > 0}|${labelOptions.coastalAllowancePx}|${labelOptions.maxSeaFraction}`);
         const strictlyFits = (footprint, component) => checks(`land|${component.key}|${footprint.join()}`,
           () => exactFootprint(group, footprint, component) && (!foreignCountries.length || !foreignLandIntersects(foreignCountries, footprint)));
         // Rank the useful land *on screen*, not each island's worldwide area.
@@ -1098,8 +1239,8 @@ export function createEmpireLabelEngine(countryShapes = []) {
         // Area creates a bounded shortlist, not the final winner: the best
         // legible name on the continent should beat a smaller name squeezed
         // into a broad but awkward visible corner of an overseas possession.
-        const rankedComponents = group.components.filter(component => overlaps(component.bbox, viewBox) && component.bbox.w * component.bbox.h >= (options.minFontPx * unitsPerPixel) ** 2)
-          .map(component => ({ component, score: visibleUsableArea(component, viewBox, options.minFontPx * unitsPerPixel) }))
+        const rankedComponents = group.components.filter(component => overlaps(component.bbox, viewBox) && component.bbox.w * component.bbox.h >= (labelOptions.minFontPx * unitsPerPixel) ** 2)
+          .map(component => ({ component, score: visibleUsableArea(component, viewBox, labelOptions.minFontPx * unitsPerPixel) }))
           .filter(item => item.score > 0)
           .sort((a, b) => b.score - a.score || a.component.key.localeCompare(b.component.key));
         let chosen = null;
@@ -1109,7 +1250,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
         const priorComponent = rankedComponents.find(item => item.component.key === previous?.componentKey);
         if (priorComponent && !shortlist.includes(priorComponent)) shortlist.push(priorComponent);
         for (const { component, score: visibleArea } of shortlist) {
-          const componentLabel = strictComponentLabel(component, definition, options, previous, strictlyFits);
+          const componentLabel = strictComponentLabel(component, definition, labelOptions, previous, strictlyFits);
           if (!componentLabel) continue;
           // Font size/readability dominates. Visible useful area is a mild 6%
           // prior; the previous component receives only 5% hysteresis, so a
@@ -1122,19 +1263,19 @@ export function createEmpireLabelEngine(countryShapes = []) {
         }
         // Prefer every readable on-land fit. Use water only to restore a name
         // that otherwise cannot fit, never as an automatic text-size boost.
-        if (options.coastalAllowancePx > 0 && options.maxSeaFraction > 0 && !chosen) {
+        if (labelOptions.coastalAllowancePx > 0 && labelOptions.maxSeaFraction > 0 && !chosen) {
           for (const { component, score: visibleArea } of shortlist) {
-            if (coastalBlocked(component, definition, options, previous, foreignCountries)) continue;
+            if (coastalBlocked(component, definition, labelOptions, previous, foreignCountries)) continue;
             let componentLabel = null;
-            for (const candidate of first(componentCandidates(component, definition, options, previous, true), 24)) {
-              const minimum = options.minFontPx * unitsPerPixel;
+            for (const candidate of first(componentCandidates(component, definition, labelOptions, previous, true), 24)) {
+              const minimum = labelOptions.minFontPx * unitsPerPixel;
               const sizes = [...new Set([candidate.fontSize, candidate.fontSize * 0.98, candidate.fontSize * 0.95, candidate.fontSize * 0.9, minimum].map(size => Math.max(minimum, size)))];
               for (const fontSize of sizes) {
                 const shrink = fontSize / candidate.fontSize;
                 const adjusted = shrink === 1 ? candidate : { ...candidate, fontSize, width: candidate.width * shrink, height: candidate.height * shrink, letterSpacing: candidate.letterSpacing * shrink, curveRise: candidate.curveRise * shrink };
                 adjusted.footprint = labelFootprint(adjusted.x, adjusted.y, adjusted.angle, adjusted.width, adjusted.fontSize, adjusted.curveRise);
                 const valid = checks(`coast|${adjusted.footprint.join()}`,
-                  () => coastalFootprint(group, foreignCountries, adjusted.footprint, options.coastalAllowancePx * unitsPerPixel, options.maxSeaFraction));
+                  () => coastalFootprint(group, foreignCountries, adjusted.footprint, labelOptions.coastalAllowancePx * unitsPerPixel, labelOptions.maxSeaFraction));
                 if (valid) { componentLabel = { ...adjusted, ...valid }; break; }
               }
               if (componentLabel) break;
@@ -1150,8 +1291,8 @@ export function createEmpireLabelEngine(countryShapes = []) {
         // Keep the preferred arch wherever it works. Before hiding a narrow
         // inland name entirely, try one still-curved but gentler on-land ribbon;
         // no new sea allowance or foreign-land exception is introduced.
-        if (!chosen && options.curveRatio > 0.025) {
-          const gentleOptions = { ...options, curveRatio: 0.025 };
+        if (!chosen && labelOptions.curveRatio > 0.025) {
+          const gentleOptions = { ...labelOptions, curveRatio: 0.025 };
           for (const { component, score: visibleArea } of shortlist) {
             const componentLabel = strictComponentLabel(component, definition, gentleOptions, previous, strictlyFits);
             if (!componentLabel) continue;

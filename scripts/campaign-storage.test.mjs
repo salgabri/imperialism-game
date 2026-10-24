@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SAVE_KEY } from '../src/config.js';
+import { SAVE_KEY, SAVE_VERSION } from '../src/config.js';
 import { buildClub, buildTeam, makeRng } from '../src/data/teams.js';
 import { expandFmTuple } from '../src/data/fmPlayers.js';
 import { getSport } from '../src/sports/index.js';
@@ -53,6 +53,9 @@ test('strict import rejects invalid state before it can replace the existing che
     [s => { s.tacticalChoice = { aId: '250', dId: 'missing' }; }, /tactical decision/],
     [s => { s.series = { teamIds: ['250', '276'], wins: { 250: 2, 276: 0 }, games: 1 }; }, /series/],
     [s => { s.phase = 'victory'; }, /one champion/],
+    // Both used to pass and then crash: lineup selection and PlayerRow call positions.includes, resume reads shown[i].m.
+    [s => { s.teams['250'].squad[0].positions = 'ST'; }, /territory data are incomplete/],
+    [s => { s.match = { ...match(), shown: [null] }; }, /match is incomplete/],
   ];
   for (const [mutate, expected] of variants) {
     const invalid = structuredClone(state); mutate(invalid);
@@ -175,6 +178,116 @@ test('starting a new campaign archives the old singleton instead of overwriting 
   assert.deepEqual(archived.own, legacy.own); assert.deepEqual(archived.teams, legacy.teams);
 }));
 
+// ---------- v3: turn order × targeting (DEC D8, PLAN §3.2) ----------
+function turnCheckpoint() {
+  const state = checkpoint();
+  state.teams['380'] = buildTeam('380', makeRng(9), getSport('football')); // eliminated, still known
+  state.settings = { ...state.settings, turnOrder: 'round-robin', targeting: 'player' };
+  state.initialSettings = { ...state.settings };
+  state.turnQueue = ['276', '380', '250']; state.turnIndex = 3;
+  state.pendingTarget = { attackerId: '250', optionIds: ['276'], selectedId: '276', round: 1, openedAt: 1_700_000_000_000,
+    resumeAutoplay: true, turn: { turnQueue: ['276', '380', '250'], turnIndex: 3, round: 1, newRound: false } };
+  return state;
+}
+const tactical = () => ({ aId: '250', dId: '276', managerName: 'France', opponentName: 'Germany',
+  options: ['attack', 'balanced', 'defend'].map(id => ({ id, label: id, description: 'Approach', strength: 84, bonus: 0, support: 0, drama: 6, baseDrama: 6 })) });
+
+test('v3 checkpoints keep the round-robin queue, the pending target and the locked turn rules', () => withStorage(({ storage }) => {
+  assert.equal(SAVE_VERSION, 4);
+  const state = turnCheckpoint();
+  assert.equal(writeSave(state).ok, true);
+  assert.equal(JSON.parse(storage.getItem(SAVE_KEY)).v, SAVE_VERSION);
+  const loaded = loadSave();
+  assert.equal(loaded.v, SAVE_VERSION); assert.equal(loaded.legacy, false);
+  assert.deepEqual(loaded.turnQueue, state.turnQueue); assert.equal(loaded.turnIndex, 3);
+  assert.deepEqual(loaded.pendingTarget, state.pendingTarget);
+  assert.deepEqual([loaded.settings.turnOrder, loaded.settings.targeting], ['round-robin', 'player']);
+  assert.deepEqual(loaded.initialSettings, state.initialSettings);
+  // A pending target may follow an applied match, and a target turn may be absent (random order).
+  state.match = { ...match(), applied: true }; state.pendingTarget = { ...state.pendingTarget, turn: null };
+  delete state.pendingTarget.openedAt; delete state.pendingTarget.resumeAutoplay;
+  assert.equal(parseCampaign(saved(state)).pendingTarget.turn, null);
+  state.pendingTarget = null; state.turnQueue = []; state.turnIndex = 0;
+  assert.deepEqual(parseCampaign(saved(state)).turnQueue, []);
+}));
+
+test('version-two saves still load, as the random draw with compass targets', () => {
+  const v2 = campaignSnapshot(checkpoint()); v2.v = 2;
+  for (const key of ['turnQueue', 'turnIndex', 'pendingTarget']) delete v2[key];
+  const migrated = parseCampaign(JSON.stringify(v2));
+  assert.equal(migrated.v, SAVE_VERSION); assert.equal(migrated.legacy, false);
+  assert.deepEqual([migrated.turnQueue, migrated.turnIndex, migrated.pendingTarget], [[], 0, null]);
+  assert.deepEqual([migrated.settings.turnOrder, migrated.settings.targeting], ['random', 'compass']);
+  assert.equal(migrated.settings.pacing, 'duel', 'other settings are untouched');
+  assert.equal(migrated.initialSettings, undefined);
+  const withInitial = { ...v2, initialSettings: { ...v2.settings } };
+  assert.equal(parseCampaign(JSON.stringify(withInitial)).initialSettings.turnOrder, 'random');
+  for (const version of [2, 3, 4]) {
+    const missing = { ...v2, v: version }; delete missing.rngState;
+    assert.throws(() => parseCampaign(JSON.stringify(missing)), /random state/, `v${version} still requires the RNG state`);
+  }
+  for (const version of [0, 5, '4']) assert.throws(() => parseCampaign(JSON.stringify({ ...v2, v: version })), /not a supported/);
+  const v1 = { ...v2, v: 1 }; delete v1.seed; delete v1.rngState;
+  assert.equal(parseCampaign(JSON.stringify(v1)).legacy, true, 'v1 saves keep loading without a seed');
+});
+
+test('strict import rejects malformed turn order, pending targets and overlapping decisions', () => withStorage(({ storage }) => {
+  const state = turnCheckpoint();
+  assert.equal(writeSave(state).ok, true);
+  const good = storage.getItem(SAVE_KEY);
+  const variants = [
+    [s => { s.turnQueue = ['250', 'missing']; }, /turn order/],
+    [s => { s.turnQueue = 'abc'; }, /turn order/],
+    [s => { s.turnQueue = Array(201).fill('250'); s.turnIndex = 0; }, /turn order/],
+    [s => { s.turnIndex = 4; }, /turn position/],
+    [s => { s.turnIndex = -1; }, /turn position/],
+    [s => { s.turnIndex = 1.5; }, /turn position/],
+    [s => { s.turnQueue = null; s.turnIndex = 2; }, /turn position/],
+    [s => { s.settings.turnOrder = 'swiss'; }, /turnOrder setting/],
+    [s => { s.initialSettings.targeting = 'auto'; }, /targeting setting/],
+    [s => { s.pendingTarget = 'yes'; }, /target choice references/],
+    [s => { s.pendingTarget.attackerId = 'missing'; }, /target choice references/],
+    [s => { s.pendingTarget.attackerId = '380'; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = []; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = '276'; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = ['250']; s.pendingTarget.selectedId = '250'; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = ['276', '380']; }, /target choice references/],
+    [s => { s.pendingTarget.optionIds = ['276', '276']; }, /target choice references/],
+    [s => { s.pendingTarget.selectedId = '380'; }, /target choice references/],
+    [s => { s.pendingTarget.selectedId = null; }, /target choice references/],
+    [s => { s.pendingTarget.round = -1; }, /target choice references/],
+    [s => { delete s.pendingTarget.round; }, /target choice references/],
+    [s => { s.pendingTarget.openedAt = 'now'; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.resumeAutoplay = 1; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.turn = { ...s.pendingTarget.turn, turnIndex: 9 }; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.turn = { ...s.pendingTarget.turn, turnQueue: ['missing'], turnIndex: 0 }; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.turn = { ...s.pendingTarget.turn, newRound: null }; }, /target choice is incomplete/],
+    [s => { s.pendingTarget.turn = ['276']; }, /target choice is incomplete/],
+    [s => { s.match = match(); }, /overlaps another pending decision/],
+    [s => { s.spin = { attackerId: '250', targetId: '276', rotation: 0, x: 0, y: 0, targetX: 1, targetY: 1, spinMs: 0, holdMs: 480 }; }, /overlaps/],
+    [s => { s.tacticalChoice = tactical(); }, /overlaps/],
+  ];
+  for (const [mutate, expected] of variants) {
+    const invalid = structuredClone(state); mutate(invalid);
+    assert.throws(() => parseCampaign(saved(invalid)), expected);
+    assert.equal(storage.getItem(SAVE_KEY), good);
+  }
+}));
+
+test('a saved signing selection must be one of the offered candidates', () => {
+  const state = checkpoint(); state.match = match();
+  const squad = state.teams['276'].squad;
+  state.choice = { candidates: [{ ...squad[0], index: 0, gain: .3 }, { ...squad[1], index: 1, gain: .1 }], selected: 1,
+    winnerName: 'France', loserName: 'Germany' };
+  assert.equal(parseCampaign(saved(state)).choice.selected, 1);
+  delete state.choice.selected;
+  assert.equal(parseCampaign(saved(state)).choice.selected, undefined, 'older saves have no selection');
+  for (const selected of [2, '1', -1, 0.5]) {
+    state.choice.selected = selected;
+    assert.throws(() => parseCampaign(saved(state)), /signing selection/);
+  }
+});
+
 // ---------- country checkpoints, full storage and deletion ----------
 
 const FM_SOURCE = { edition: 'FM 26', version: '26.3.0', snapshotDate: '2026-10-18' };
@@ -237,7 +350,7 @@ test('country checkpoints pack FM players and rebuild them exactly; world checkp
   assert.deepEqual(plain(parseCampaign(exportCampaign(state)).teams), plain(snapshot.teams));
 
   const world = campaignSnapshot(checkpoint());
-  assert.equal(serializeCampaign(world), JSON.stringify(world), 'world checkpoints are written exactly as before');
+  assert.equal(serializeCampaign(world), JSON.stringify(world), 'a world campaign\'s portable text is its plain snapshot');
   assert.equal(serializeCampaign(world, 2), JSON.stringify(world, null, 2));
 }));
 
@@ -313,7 +426,7 @@ test('when only its own recovery copy is in the way, a campaign saves without it
   Object.assign(state, writeSave(state)); Object.assign(state, writeSave(state));
   assert.ok(items.has(backupOf(state.campaignId)));
   storage.quota = storage.used + 8_000;
-  state.log = [{ t: 'sys', r: 0, txt: 'y'.repeat(26_000) }];
+  state.log = [{ t: 'sys', r: 0, txt: 'y'.repeat(40_000) }];
   const result = writeSave(state);
   assert.equal(result.ok, true);
   assert.match(result.message, /without a recovery copy.*Saved campaigns/);
@@ -433,4 +546,113 @@ test('a country save moves whole starting groups when a map gives each club seve
   const shared = { ...played, teams: { ...played.teams, 'd826-102': { ...played.teams['d826-102'], home: '826-001' } } };
   assert.match(fitDomesticCampaign(shared, second).error, /its clubs do not each start on their own section/);
   assert.equal(played.own['826-006'], 'd826-101', 'the save itself is untouched');
+});
+
+// ---------- v4: bundled roster sources stored by id ----------
+/** Every kind of saved player copy: squads, and a claimed and a replaced player in history and the match. */
+function sourcedCheckpoint() {
+  const state = checkpoint();
+  const claimed = state.teams['276'].squad[0], replaced = state.teams['250'].squad[1];
+  const mark = id => ({ name: state.teams[id].name, score: 1, eff: '80.0', id });
+  state.history = [{ id: 'match-1', aId: '250', dId: '276', winnerId: '250', a: mark('250'), b: mark('276'), events: [],
+    result: { title: 'France annexes Germany', player: { ...claimed, from: 'GER', fromId: '276', joined: 1 },
+      replacedPlayer: { ...replaced, originalIndex: 1 } } }];
+  state.match = { ...match(), playerTaken: { ...claimed }, replacedPlayer: { ...replaced, originalIndex: 1 } };
+  return state;
+}
+const SOURCED = ['teams', 'history', 'match'];
+const inlineSources = text => (text.match(/"sourceInfo":\s*\{/g) || []).length;
+
+test('v4 checkpoints store bundled roster sources by id and rebuild them exactly', () => withStorage(({ storage }) => {
+  const state = sourcedCheckpoint(), squad = state.teams['250'].squad;
+  assert.ok(squad.length >= 11 && squad.every(player => typeof player.sourceInfo?.id === 'string'), 'the fixture squads are sourced');
+  assert.equal(writeSave(state).ok, true);
+  const text = storage.getItem(SAVE_KEY), stored = JSON.parse(text);
+  assert.equal(stored.v, 4);
+  assert.equal(inlineSources(text), 0, 'no copy of a bundled source is stored inline');
+  assert.equal(stored.teams['250'].squad[0].sourceInfo, squad[0].sourceInfo.id);
+  assert.equal(stored.history[0].result.player.sourceInfo, state.teams['276'].squad[0].sourceInfo.id);
+  assert.equal(stored.match.replacedPlayer.sourceInfo, squad[1].sourceInfo.id);
+  assert.ok(text.length < saved(state).length * 0.6, 'sources were most of the checkpoint');
+  const loaded = loadSave();
+  for (const key of SOURCED) assert.deepEqual(loaded[key], plain(state[key]), `${key} rebuilt from the roster`);
+  assert.equal(JSON.stringify(loaded.teams), JSON.stringify(state.teams), 'in the same key order (squads are compared as JSON)');
+  // Each load gets its own copies: changing one never reaches the bundled roster or the next load.
+  loaded.teams['250'].squad[0].sourceInfo.positions.push('GK');
+  assert.deepEqual(loadSave().teams['250'].squad[0].sourceInfo, plain(squad[0].sourceInfo));
+}));
+
+test('v3 saves load with inline sources and move to references on their next checkpoint', () => withStorage(({ storage }) => {
+  const state = sourcedCheckpoint();
+  const v3 = JSON.stringify({ ...campaignSnapshot(state), v: 3 }); // v3 stored every source inline
+  storage.setItem(campaignStorageKey(state.campaignId), v3); storage.setItem(SAVE_KEY, v3);
+  const loaded = loadSave();
+  assert.equal(loaded.v, SAVE_VERSION);
+  for (const key of SOURCED) assert.deepEqual(loaded[key], plain(state[key]), `v3 ${key} unchanged`);
+  const result = writeSave(loaded);
+  assert.equal(result.ok, true); assert.equal(result.conflict, undefined); assert.equal(result.revision, 1);
+  const text = storage.getItem(SAVE_KEY);
+  assert.equal(JSON.parse(text).v, 4); assert.equal(inlineSources(text), 0);
+  assert.ok(text.length < v3.length * 0.6);
+  assert.equal(storage.getItem(backupOf(state.campaignId)), v3, 'the v3 bytes remain the recovery copy');
+  for (const key of SOURCED) assert.deepEqual(loadSave()[key], plain(state[key]), `migrated ${key} unchanged`);
+}));
+
+test('sources the bundle does not hold stay inline; a reference the bundle lost loads without a source', () => withStorage(({ storage }) => {
+  const state = checkpoint(), squad = state.teams['250'].squad;
+  squad[0] = { ...squad[0], sourceInfo: { ...squad[0].sourceInfo, snapshotDate: '2024-09-19' } }; // another roster snapshot
+  squad[1] = { ...squad[1], sourceInfo: { id: 'custom:1', fullName: 'Imported player' } };
+  assert.equal(writeSave(state).ok, true);
+  const stored = JSON.parse(storage.getItem(SAVE_KEY));
+  assert.deepEqual(stored.teams['250'].squad.slice(0, 2).map(player => player.sourceInfo), plain([squad[0].sourceInfo, squad[1].sourceInfo]));
+  assert.equal(typeof stored.teams['250'].squad[2].sourceInfo, 'string');
+  assert.deepEqual(loadSave().teams, plain(state.teams));
+  // A later roster update that drops a player keeps them in the squad, without source evidence.
+  stored.teams['250'].squad[2].sourceInfo = 'ea:0';
+  const kept = parseCampaign(JSON.stringify(stored)).teams['250'].squad[2];
+  assert.equal(kept.name, squad[2].name); assert.equal(kept.rating, squad[2].rating); assert.equal(kept.id, squad[2].id);
+  assert.equal(Object.hasOwn(kept, 'sourceInfo'), false);
+}));
+
+test('exports keep every source inline and import back to the same campaign', () => {
+  const state = sourcedCheckpoint(), text = exportCampaign(state);
+  assert.equal(JSON.parse(text).v, SAVE_VERSION);
+  assert.ok(inlineSources(text) >= state.teams['250'].squad.length, 'a file can outlive the bundled roster');
+  const imported = parseCampaign(text);
+  for (const key of SOURCED) assert.deepEqual(imported[key], plain(state[key]));
+});
+
+test('a country checkpoint packs its FM players first; a bundled roster player in it is stored by reference', () => withStorage(({ storage }) => {
+  const state = domesticCheckpoint(), rostered = checkpoint().teams['250'].squad[0];
+  state.teams['d826-101'].squad.push({ ...rostered });
+  assert.equal(writeSave(state).ok, true);
+  const text = storage.getItem(SAVE_KEY), stored = JSON.parse(text);
+  assert.ok(stored.playerPack, 'FM players are still packed');
+  assert.ok(stored.teams['d826-100'].squad.every(Array.isArray));
+  assert.equal(stored.teams['d826-101'].squad.at(-1).sourceInfo, rostered.sourceInfo.id);
+  assert.equal(inlineSources(text), 0);
+  assert.deepEqual(plain(loadSave().teams), plain(campaignSnapshot(state).teams));
+}));
+
+test('a damaged campaign index is rebuilt from the slots: saves go on and every campaign stays listed', () => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'localStorage'), items = new Map();
+  // A real Storage enumerates its keys; the index rebuild needs that.
+  const storage = { getItem: key => items.get(key) ?? null, setItem: (key, value) => items.set(key, String(value)),
+    removeItem: key => items.delete(key), key: i => [...items.keys()][i] ?? null, get length() { return items.size; } };
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
+  try {
+    const first = checkpoint(), second = { ...checkpoint(), campaignId: createCampaignId(), campaignName: 'Second' };
+    assert.equal(writeSave(first).ok, true);
+    assert.equal(writeSave(second).ok, true);
+    for (const damage of ['{not json', '{"a":1}']) {
+      storage.setItem(`${SAVE_KEY}:campaigns`, damage);
+      assert.deepEqual(listCampaigns().map(item => item.name).sort(), ['France campaign', 'Second']);
+      const again = writeSave({ ...second, revision: loadCampaign(second.campaignId).revision });
+      assert.equal(again.ok, true, `autosave works over a damaged index: ${again.message}`);
+      assert.deepEqual(JSON.parse(storage.getItem(`${SAVE_KEY}:campaigns`)).map(item => item.id).sort(),
+        [first.campaignId, second.campaignId].sort(), 'the save writes a repaired index');
+    }
+  } finally {
+    if (prior) Object.defineProperty(globalThis, 'localStorage', prior); else delete globalThis.localStorage;
+  }
 });

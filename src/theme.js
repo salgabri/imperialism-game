@@ -55,7 +55,7 @@ export const FONT = {
   head: "'Archivo Narrow', 'Arial Narrow', sans-serif",
   body: "'Archivo', 'Segoe UI', sans-serif",
   mono: "'Archivo Narrow', 'Arial Narrow', sans-serif",
-  map: "'Alegreya', Georgia, 'Times New Roman', serif",
+  map: "'Archivo Narrow', 'Arial Narrow', sans-serif",   // DEC D19 / misc: Archivo + Archivo Narrow only
 };
 
 /** Rating tiers: world class, solid, filler. */
@@ -76,20 +76,56 @@ export function tint(hex, alpha) {
 
 export const pad3 = n => String(n).padStart(3, '0');
 
-// Muted political colors make empires legible; full flag mode is still available.
-const POLITICAL_PALETTE = ['#87999D', '#849077', '#B59872', '#9C8277', '#8194A3', '#A0A291', '#8C839A', '#779997'];
-const POLITICAL_COLORS = {
-  '250': '#6486B0', '724': '#AB6C5F', '276': '#849A70', '380': '#C2A057',
-  '826': '#85979D', '620': '#8D9984', '528': '#B2906F', '056': '#B4A990',
-  '756': '#A87C78', '040': '#A4A194', '616': '#A5A59C', '804': '#8196A7',
-  '643': '#798889', '752': '#8A9CAA', '578': '#A1AFAB', '246': '#B2AE99',
-  '208': '#A79B86', '300': '#95A4AA', '792': '#A39C8A', '372': '#8D9D8A',
-  '840': '#A4A087', '124': '#8E9C9B', '076': '#8B9A70', '032': '#91A9B1',
-  '156': '#B09B7E', '356': '#A9AB90', '036': '#B5A578', '392': '#AC827B',
-};
-export function politicalColor(id) {
-  if (POLITICAL_COLORS[id]) return POLITICAL_COLORS[id];
-  let hash = 0;
-  for (const c of String(id)) hash = ((hash * 31) + c.charCodeAt(0)) >>> 0;
-  return POLITICAL_PALETTE[hash % POLITICAL_PALETTE.length];
+// The legacy political palette (`politicalColor`, POLITICAL_PALETTE / POLITICAL_COLORS) was retired in W3: the map
+// fills empires with `empireFill` below (PLAN §1.5).
+
+// ---------- v4 (WP-0, PLAN §2.4). Appended after the legacy exports above. ----------
+
+/** v4 design tokens (README §Design tokens). Mirrors src/styles/tokens.css for SVG/inline use. */
+export const V4 = Object.freeze({
+  surface: '#f5f5f2', panel: '#ffffff', surface2: '#ebece7', ink: '#111417', text2: '#3a4045', muted: '#646a6e',
+  rule: '#dcded8', rowRule: '#e3e5df', controlLine: '#c6cbcd',
+  you: '#9c5a43', youText: '#8c4a35', youFill: '#c4917c', youSoft: '#f3ebe7', youOnDark: '#d9a48e',
+  opponent: '#2f54eb', opponentFill: '#c3cfff', claimed: '#0f7b83',
+  gain: '#138a4a', loss: '#d1342f', even: '#9a6700',
+  sea: '#dfe7eb', landNeutral: '#e8e9e4', flagBg: '#d9dcd6',
+});
+/** Map-only values from README §Map rendering and DEC D18/D21. The veil is CSS-only (--map-veil, A-9). */
+export const MAP = Object.freeze({
+  coast: '#9aa7ae', capital: '#30363b', label: '#2c3236', labelOpacity: .72,
+  hatch: 'rgba(255,255,255,.6)', oddsTrack: '#dfe2dc', grab: '#d4d7d1',
+  // DEC D18 Strength mode: 5-step neutral→ink-grey ramp (#e8e9e4 → #8a9297), linear in sRGB [derived steps]
+  strengthRamp: ['#e8e9e4', '#d1d3d1', '#b9bebe', '#a2a8aa', '#8a9297'],
+  // DEC D18 Fronts mode: gain/even/loss mixed 35% colour + 65% white [derived]
+  frontsTint: { gain: '#acd6c0', even: '#dccaa6', loss: '#efb8b6' },
+});
+/** README: empire pastel fills, picked by hash of team id. */
+export const EMPIRE_PASTELS = Object.freeze(['#cfe0d6', '#e6dcc7', '#d6dbe8', '#e9d6d9', '#d8e4c4', '#e3e0d0',
+  '#cddfe2', '#e8d9c2', '#dcd3e6', '#d1d8cc', '#ebe2b9']);
+export function empireFill(id) {
+  let x = 0;
+  for (const ch of String(id)) x = (x * 31 + ch.charCodeAt(0)) >>> 0;
+  return EMPIRE_PASTELS[x % EMPIRE_PASTELS.length];
+}
+/** README rating tiers: 88+, 84–87, 80–83, 75–79, 70–74, <70. */
+export const RATING_TIERS = Object.freeze([[88, '88', '#8a5a00'], [84, '84', '#0f7b4d'], [80, '80', '#138a4a'],
+  [75, '75', '#5b7a12'], [70, '70', '#a15c07'], [-Infinity, 'low', '#c2352b']]);
+export const ratingTierOf = r => RATING_TIERS.find(([min]) => r >= min)[1];
+export const ratingTierColor = r => RATING_TIERS.find(([min]) => r >= min)[2];
+export const WIN_TONE_COLORS = Object.freeze({ gain: '#138a4a', even: '#9a6700', loss: '#d1342f', muted: '#646a6e' });
+
+/**
+ * Map paint follows the theme: view models keep the light literals above (tests and attributes read them), and the
+ * renderer paints `themedPaint(fill)`: the tokens.css custom property holding that colour in the active theme, with
+ * the literal as fallback. Colours outside the palette (nation and club colours, flag patterns) pass through.
+ */
+const PAINT_TOKENS = new Map([
+  [V4.landNeutral, '--land-neutral'], [V4.youFill, '--you-fill'], [V4.opponentFill, '--opponent-fill'], [V4.flagBg, '--flag-bg'],
+  ...EMPIRE_PASTELS.map((hex, i) => [hex, `--empire-${i + 1}`]),
+  ...MAP.strengthRamp.slice(1).map((hex, i) => [hex, `--strength-${i + 2}`]),
+  ...Object.entries(MAP.frontsTint).map(([tone, hex]) => [hex, `--fronts-${tone}`]),
+]);
+export function themedPaint(fill) {
+  const token = typeof fill === 'string' && PAINT_TOKENS.get(fill.toLowerCase());
+  return token ? `var(${token}, ${fill})` : fill;
 }

@@ -11,9 +11,9 @@ import { DOMESTIC } from '../src/data/domestic.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const publicDir = path.join(root, 'public');
-const outDir = path.join(root, 'node_modules', '.smoke');
+const outDir = path.join(root, 'node_modules', `.smoke-${process.pid}`);
 const startedAt = Date.now();
-// `--scenarios=<text>` runs only the campaign, resume and label scenarios whose
+// `--scenarios=<text>` runs only the campaign, resume, label and manager scenarios whose
 // names contain the text (any case), skipping the fixed checks between them.
 const scenarioFilter = process.argv.find(arg => arg.startsWith('--scenarios='))?.slice('--scenarios='.length).toLowerCase();
 const fixedChecks = scenarioFilter == null;
@@ -51,6 +51,35 @@ const LABEL_SCENARIOS = [
   { name: 'Premier League clubs', layer: 'clubs', clubScope: 'Premier League' },
   { name: 'England top clubs on their own map', ...ENGLAND },
 ];
+
+// The one manager campaign (PLAN §4.12 task 3): driven only through the primary action, under round robin × You choose.
+const MANAGER_SCENARIOS = [
+  { name: 'MANAGER · Italy · Europe · duel · ticker · round robin × You choose', sport: 'football', layer: 'nations', scope: 'UEFA',
+    pacing: 'duel', resolution: 'ticker', team: '380' },
+];
+
+// Focused subsets: `--campaign-only=<i>` runs only SCENARIOS[i], `--resume-only=<i>` only RESUME_SCENARIOS[i] and
+// `--manager-only` only the manager campaign; any of them skips every other section (together they run each pick).
+// The country scenarios come last, so they are `--campaign-only=7` (England duel, with the setup checks), `=8`
+// (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji). `--scenarios=<text>` composes with
+// these: it narrows whatever they leave.
+function onlyIndex(name, list) {
+  const arg = process.argv.find(value => value.startsWith(`--${name}=`));
+  if (!arg) return null;
+  const index = Number(arg.slice(name.length + 3));
+  if (!Number.isInteger(index) || index < 0 || index >= list.length) {
+    process.stderr.write(`--${name} expects an index from 0 to ${list.length - 1}\n`);
+    process.exit(2);
+  }
+  return index;
+}
+const campaignOnly = onlyIndex('campaign-only', SCENARIOS);
+const resumeOnly = onlyIndex('resume-only', RESUME_SCENARIOS);
+const managerOnly = process.argv.includes('--manager-only');
+const filtered = campaignOnly !== null || resumeOnly !== null || managerOnly;
+const campaignScenarios = filtered ? (campaignOnly === null ? [] : [SCENARIOS[campaignOnly]]) : SCENARIOS;
+const resumeScenarios = filtered ? (resumeOnly === null ? [] : [RESUME_SCENARIOS[resumeOnly]]) : RESUME_SCENARIOS;
+const managerScenarios = filtered && !managerOnly ? [] : MANAGER_SCENARIOS;
 
 async function bundle() {
   await mkdir(outDir, { recursive: true });
@@ -175,7 +204,7 @@ function checkEmpireFlags(label, snapshot) {
 function checkEmpireLabels(label, snapshot) {
   check(`${label}: at most one label per current owner`, snapshot.onePerOwner && snapshot.onlyCurrentOwners);
   check(`${label}: nation names or club codes match live metadata`, snapshot.correctText && snapshot.currentMetadata);
-  check(`${label}: labels stay within 11–32 screen pixels and the viewport`, snapshot.fontSizes && snapshot.withinViewport);
+  check(`${label}: labels stay within 9–20 screen pixels (own empire from 6.5) and the viewport`, snapshot.fontSizes && snapshot.withinViewport);
   check(`${label}: every name follows its valid unique quadratic text path`, snapshot.textPathsValid && snapshot.gentleArches);
   check(`${label}: coastal output respects the explicit 10px/22% UI policy`, snapshot.coastalPolicyValid && snapshot.uiPolicyEnabled);
   if (snapshot.geography) check(`${label}: owned anchor, no foreign land and tightly bounded sea spill`, snapshot.geography.valid, snapshot.geography.errors.join('; '));
@@ -187,9 +216,9 @@ function checkBackdrop(label, backdrop) {
   check(`${label}: the backdrop is muted, inert and never a territory`, backdrop.muted && backdrop.inert && backdrop.notTerritory, JSON.stringify(backdrop));
 }
 
-/** A country map: every section held and painted in its club's colour, no flags. */
+/** A country map: every section held and, in Flags mode, painted in its club's colour, no flags. */
 function checkDomesticMap(label, snapshot) {
-  check(`${label}: every section shows its holder's club colour and no flag`, snapshot.correct && snapshot.flagParts === 0 && snapshot.flagPatterns === 0);
+  check(`${label}: in Flags mode every section shows its holder's club colour and no flag`, snapshot.correct && snapshot.flagParts === 0 && snapshot.flagPatterns === 0);
   check(`${label}: every section is held, so no land is neutral`, snapshot.neutralCount === 0 && snapshot.sections === snapshot.expectedSections,
     `${snapshot.sections}/${snapshot.expectedSections} sections, ${snapshot.neutralCount} neutral`);
   checkEmpireFlags(label, snapshot.empireFlags);
@@ -220,19 +249,22 @@ function checkTheatres(scenario, theatre) {
 
 function checkDomesticSetup(setup, full) {
   check('the country map is fetched only once it is chosen', setup.lazy);
-  check('a polite loading status holds Start while the map loads', setup.sawLoading);
+  check('a polite loading status holds Launch campaign while the map loads', setup.sawLoading);
   if (full) {
-    check('a failed map load shows its message and Retry, with Start disabled', setup.errorShown);
+    check('a failed map load shows its message and Retry, with Launch campaign disabled', setup.errorShown);
     check('Retry loads the map', setup.retryLoaded);
     check('a session preset keeps the chosen country', setup.presetKeepsCountry);
     check('a session preset keeps the managed club of that country', setup.presetKeepsClub);
     check('switching to basketball drops the country theatre', setup.basketballResets);
   }
   check('the setup map shows exactly the country’s sections', setup.sectionsShown);
-  check('setup previews each section in the colour of the club starting there', setup.setupColours);
+  check('setup previews each section in its starting club’s kickoff colour (Political pastel, Flags club colour)', setup.setupColours,
+    JSON.stringify({ political: setup.politicalPreview, flags: setup.flagsPreview }));
   check('setup tooltips name each club’s home and the rest of its starting group', setup.setupTooltips && setup.groupedPreview);
+  check('the country card shows every section in its starting club’s pastel, with sections and clubs in the caption', setup.countryCard,
+    setup.countryCardText);
   check('setup counts the country’s clubs', setup.previewCount);
-  check('the theatre description names the leading clubs and the sections', setup.description);
+  check('the theatre description names the leading clubs, the sections and each club’s share', setup.description, setup.descriptionText);
   checkBackdrop('setup', setup.backdrop);
 }
 
@@ -242,12 +274,9 @@ function checkDomesticKickoff(label, state) {
     && state.startGroups && state.wholeGroups);
   check(`${label}: routing runs on the sections alone`, state.routingIsSections);
   check(`${label}: neighbouring land blocks routes and is never a section`, state.obstacles);
-  check(`${label}: header and map title name the country`, state.theatreLabel && state.mapTitle);
-  check(`${label}: the scale bar is a distance at the map’s centre`, state.scaleTitle);
+  check(`${label}: the Ledger header and the map title card name the country`, state.theatreLabel && state.mapTitle,
+    JSON.stringify({ ledger: state.ledgerKicker, title: state.titleText }));
   check(`${label}: every home marker shows at the opening zoom`, state.homesShown);
-  // Every club still holds just its starting group: a tie, not an empire to watch.
-  check(`${label}: the footnote names no largest empire before anyone has conquered`,
-    !!state.footnote && !state.footnote.includes('Largest empire'), state.footnote);
 }
 
 // React reports invalid props, missing keys and render crashes through console;
@@ -267,7 +296,8 @@ let failures = 0;
 
 // Every scenario fetches through this server, so prove it serves by path and
 // 404s honestly; then load each shipped country through the runtime loader.
-{
+// The focused `--*-only=<i>` runs skip it (decoding every shipped map takes a while).
+if (!filtered) {
   const dom = await installDom();
   console.log('\n  Static files and shipped country maps');
   try {
@@ -295,7 +325,7 @@ let failures = 0;
   }
 }
 
-if (fixedChecks && !process.argv.includes('--duel-frame-only') && !process.argv.includes('--empire-flags-only') && !process.argv.includes('--empire-labels-only')) {
+if (!filtered && fixedChecks && !process.argv.includes('--duel-frame-only') && !process.argv.includes('--empire-flags-only') && !process.argv.includes('--empire-labels-only')) {
   const dom = await installDom();
   console.log('\n  Live overall-strength standings');
   try {
@@ -330,7 +360,7 @@ if (process.argv.includes('--strength-standings-only')) {
   process.exit(failures || consoleIssues.length ? 1 : 0);
 }
 
-if (fixedChecks && !process.argv.includes('--duel-frame-only') && !process.argv.includes('--empire-labels-only')) {
+if (!filtered && fixedChecks && !process.argv.includes('--duel-frame-only') && !process.argv.includes('--empire-labels-only')) {
   const dom = await installDom();
   console.log('\n  Regional flags across nearby conquered land');
   try {
@@ -349,7 +379,7 @@ if (fixedChecks && !process.argv.includes('--duel-frame-only') && !process.argv.
     check('overseas conquests cannot distort the continental flag', r.mainlandUnchangedByJapan && r.mainlandUnchangedByFiji);
     check('zoom cannot retile or rescale the geographic flag', r.zoomPreservesPattern);
     check('responsive resize cannot retile or rescale the geographic flag', r.resizePreservesPattern);
-    check('reload restores identical shared flags and their territory ownership', r.reloadPreservesPattern && r.reloadPreservesOwnership);
+    check('reload restores identical shared flags in Flags mode and their territory ownership', r.reloadPreservesPattern && r.reloadPreservesOwnership);
   } catch (error) {
     failures++;
     fail(`    ${error.message}`);
@@ -357,7 +387,7 @@ if (fixedChecks && !process.argv.includes('--duel-frame-only') && !process.argv.
     dom.window.close();
   }
 }
-if (fixedChecks && !process.argv.includes('--duel-frame-only') && !process.argv.includes('--empire-labels-only')) {
+if (!filtered && fixedChecks && !process.argv.includes('--duel-frame-only') && !process.argv.includes('--empire-labels-only')) {
   const dom = await installDom();
   console.log('\n  Swiss flags across France, Italy and nearby islands');
   try {
@@ -386,7 +416,7 @@ if (process.argv.includes('--empire-flags-only')) {
   process.exit(failures || consoleIssues.length ? 1 : 0);
 }
 
-if (!process.argv.includes('--duel-frame-only')) {
+if (!filtered && !process.argv.includes('--duel-frame-only')) {
   for (const scenario of LABEL_SCENARIOS) {
     if (!wanted(scenario)) continue;
     const dom = await installDom();
@@ -426,7 +456,7 @@ if (process.argv.includes('--empire-labels-only')) {
 }
 
 // Reproduce the delayed-rAF/React-batching race without depending on host load.
-if (fixedChecks) {
+if (!filtered && fixedChecks) {
   const dom = await installDom();
   console.log('\n  Duel animation scheduling');
   try {
@@ -446,7 +476,7 @@ if (process.argv.includes('--duel-frame-only')) {
 }
 
 // A restore that waits for a country map must stop when the player says no.
-if (fixedChecks) {
+if (!filtered && fixedChecks) {
   const dom = await installDom();
   console.log('\n  Country restores while the map loads');
   try {
@@ -472,7 +502,7 @@ if (fixedChecks) {
 
 // Capitals anchor every marker on the map, and a bad id silently reverts a
 // nation to its centroid, so check the resolution rate rather than trusting it.
-if (fixedChecks) {
+if (!filtered && fixedChecks) {
   const { WorldGeometry } = await import('../src/engine/geo.js');
   const { CAPITALS } = await import('../src/data/capitals.js');
   const { NATIONS, DEPENDENCIES } = await import('../src/data/teams.js');
@@ -516,7 +546,7 @@ if (fixedChecks) {
 
 // Rosters are generated from a dataset that is not committed, so verify the
 // committed output still builds a legal XI for every nation on the map.
-if (fixedChecks) {
+if (!filtered && fixedChecks) {
   const { NATIONS, buildTeam, makeRng, teamEff } = await import('../src/data/teams.js');
   const { SPORT_LIST } = await import('../src/sports/index.js');
   const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'] };
@@ -634,7 +664,7 @@ if (fixedChecks) {
 }
 
 // Flag assets are vendored, so a stale map would 404 silently in the browser.
-if (fixedChecks) {
+if (!filtered && fixedChecks) {
   const { FLAG_CODES } = await import('../src/data/flags.js');
   const { FLAG_SYMBOLS } = await import('../src/data/flagSymbols.js');
   const { NATIONS } = await import('../src/data/teams.js');
@@ -655,7 +685,7 @@ if (fixedChecks) {
   }
 }
 
-for (const scenario of SCENARIOS) {
+for (const scenario of campaignScenarios) {
   if (!wanted(scenario)) continue;
   const dom = await installDom();
   console.log(`\n  ${scenario.name}`);
@@ -700,8 +730,10 @@ for (const scenario of SCENARIOS) {
     // Domestic squads hold up to 16 players, so measure growth from kickoff.
     check('squad grew by the spoils', r.championSquad === r.championInitialSquad + r.championConquests,
       `${r.championSquad} from ${r.championInitialSquad}`);
-    check('setup defaults to each country’s national flag', r.setupFlags);
-    check('campaign defaults to flags with the correct owner assets', r.kickoffFlags);
+    check('setup opens on the Political map', r.setupPolitical);
+    check('setup shows each country’s national flag in Flags mode', r.setupFlags);
+    check('campaign kickoff opens on the Political map', r.kickoffPolitical);
+    check('campaign Flags mode shows the correct owner assets', r.kickoffFlags);
     const continentalNations = r.layer !== 'clubs' && scenario.scope !== 'world';
     checkMapScope('kickoff', r.kickoffFlagScope, { continental: continentalNations });
     checkMapScope('first conquest', r.firstConquestFlagScope, { continental: continentalNations, conquered: r.layer !== 'clubs' });
@@ -713,7 +745,6 @@ for (const scenario of SCENARIOS) {
     if (r.domestic) {
       check('conquest summaries name the sections taken', r.domestic.resultsNameSections);
       check('a conquest takes whole starting groups, and the first takes exactly the loser’s', r.domestic.groupsStayedWhole && r.domestic.firstConquestTakesGroup);
-      check('the footnote names the largest empire once one outgrows every starting group, never before', r.domestic.legendStayedRight);
       check('the victory screen names the country', r.domestic.victoryNamesCountry);
     }
     if (r.layer === 'clubs') {
@@ -731,7 +762,7 @@ for (const scenario of SCENARIOS) {
     check('campaign autosaved', r.saveWritten);
     check('feed logged the war', r.logEntries > r.matches);
     check('match card appeared', r.seen.includes('match-card'));
-    check('all three tabs rendered', Object.values(r.tabs).every(n => n > 0), JSON.stringify(r.tabs));
+    check('all three screens rendered', Object.values(r.tabs).every(n => n > 0), JSON.stringify(r.tabs));
     if (scenario.pacing === 'duel') check('spinner ran', r.seen.includes('spinner'));
   } catch (e) {
     failures++;
@@ -741,8 +772,71 @@ for (const scenario of SCENARIOS) {
   }
 }
 
+// A manager campaign played only through the primary action: target choice, tactical gate, live match, signing.
+for (const scenario of managerScenarios) {
+  if (!wanted(scenario)) continue;
+  const dom = await installDom();
+  console.log(`\n  ${scenario.name}`);
+  try {
+    const mod = await import(`${new URL('file://' + entry.replace(/\\/g, '/'))}?manager=${Math.random()}`);
+    // The seed keeps Italy in charge for two cycles (target choices with one and five options, eight signings) before it
+    // falls, so every check below has something to verify, Continue as spectator included.
+    const r = await mod.runManagerCampaign({ ...scenario, seed: 20261026 + MANAGER_SCENARIOS.indexOf(scenario) });
+    console.log(
+      `    ${r.fielded} nations · ${r.roundRobin.cycles} cycles · ${r.turns} turns · ${r.matches} matches · champion ${r.champion} · ` +
+      `${r.teamName} ${r.eliminated ? `out in round ${r.eliminated.round} (placed ${r.eliminated.placement} of ${r.fielded}, by ${r.eliminated.by})` : 'won the campaign'}`,
+    );
+    console.log(`    decisions: ${r.targetChoices} targets (options ${r.optionCounts.join('/') || 'none'}), ${r.tacticalGates} tactical gates, ${r.signings} signings · primary clicks ${JSON.stringify(r.clicks)}`);
+    console.log(`    rendered: ${r.seen.join(', ')}`);
+
+    check('launched as the manager with round robin and You choose', r.settingsApplied);
+    check('campaign kickoff opens on the Political map', r.kickoffPolitical);
+    check('the round-robin queue follows starting strength every cycle and skips only fallen teams', r.roundRobin.valid && r.roundRobin.cycles > 1,
+      `${r.roundRobin.cycles} cycles; ${r.roundRobin.errors.join('; ')}`);
+    check('every duel turn draws exactly three campaign samples', r.threeSamples && r.unscheduledTurns === 0, `samples ${JSON.stringify(r.sampleCounts)}, ${r.unscheduledTurns} unscheduled`);
+    check('the turn strip shows the round-robin order', r.seen.includes('turn-strip'));
+    check('every managed turn opens Choose a target with options in reach', r.managedTurns > 0 && r.targetChoices === r.managedTurns && r.optionCounts.every(n => n >= 1),
+      `${r.targetChoices} choices for ${r.managedTurns} managed turns, options ${JSON.stringify(r.optionCounts)}`);
+    check('target panel, map reach and both primaries agree on the selection', r.targetAgree);
+    check('choosing another target moves the selection and the Attack label', r.retargeted === true, String(r.retargeted));
+    check('Attack kicks off against the chosen empire', r.attackHitsChoice);
+    check('tactical gates wait for Continue without opening the match preview', r.tacticalGates > 0 && r.tacticalQuiet && r.previewOffered);
+    check('managed kickoffs switch to the Match view, which returns to the Map afterwards', r.autoSwitched && r.autoReturned, `${r.autoReturns} returns`);
+    check('live matches finish through Finish match', (r.clicks.finish || 0) > 0);
+    check('a pending signing holds the conquest screen and names the selected player everywhere', r.signings > 0 && r.signAgree);
+    check('choosing another signing moves the selection and the Sign label', r.resigned === true, String(r.resigned));
+    check('the signed player joins with provenance', r.claimedSelected);
+    check('every managed conquest went through the signing screen', r.managerConquestsSigned);
+    check('masthead and phone primaries always show the primary action', r.primariesShown);
+    check('no clock timers while a target or signing is pending', r.noTimersWhileDeciding && r.decisionSamples > 0, `${r.decisionSamples} decision samples`);
+    check('the decision ledger records every target, approach and signing', r.ledgerCounts);
+    check('standings sampled outside decisions stay strength-sorted', r.standingsAtKickoff.sorted && r.standingsStayedSorted && r.standingsSamples > 1,
+      `${r.standingsSamples} snapshots`);
+    check('manager standings keep sequential ranks and true gains', r.standingsRanksStayedSequential && r.standingsGainsStayedCorrect);
+    checkEmpireLabels('manager kickoff', r.labelsAtKickoff);
+    check('manager labels follow only current owners throughout the campaign', r.labelsStayedValid, JSON.stringify(r.labelFailures));
+    checkEmpireLabels('manager finish', r.labelsAtFinish);
+    if (r.eliminated) {
+      check('elimination article offers Continue as spectator', r.eliminationShown);
+      check('the spectator plays on to a champion with compass targets', (r.spectated || r.eliminated.placement === 2) && r.pendingAfterElimination === 0);
+    }
+    check('every match eliminated exactly one nation', r.fallen === r.fielded - 1 && r.matches === r.fielded - 1, `${r.fallen} fallen, ${r.matches} matches of ${r.fielded}`);
+    check('champion holds the entire map', r.territoriesHeld === r.totalTerritories, `${r.territoriesHeld}/${r.totalTerritories}`);
+    check('match card appeared', r.seen.includes('match-card'));
+    check('spinner ran', r.seen.includes('spinner'));
+    check('victory screen rendered', r.victoryScreen);
+    check('completed campaign leaves no spinner or simulation timers', r.campaignIdle);
+    check('campaign autosaved', r.saveWritten);
+  } catch (e) {
+    failures++;
+    fail(`    ${e.message}`);
+  } finally {
+    dom.window.close();
+  }
+}
+
 // Autosave/reload through the real controls across both sports and team layers.
-for (const scenario of RESUME_SCENARIOS) {
+for (const scenario of resumeScenarios) {
   if (!wanted(scenario)) continue;
   const dom = await installDom();
   console.log(`\n  ${scenario.name} — interrupt and reload`);
@@ -782,7 +876,8 @@ for (const scenario of RESUME_SCENARIOS) {
       const k = r.domesticResumed;
       check('reload restores the country map, its version and section routing', k.scope && k.version && k.everySectionHeld && k.routingIsSections && k.obstacles);
       check('every starting group still has one holder after the reload', k.wholeGroups);
-      check('the reloaded header and scale bar still describe the country', k.theatreLabel && k.scaleTitle && k.homesShown);
+      check('the reloaded header still describes the country and every home marker shows', k.theatreLabel && k.homesShown,
+        JSON.stringify({ ledger: k.ledgerKicker }));
     }
     check('zoom in reframes the map', r.viewBoxZoomed !== r.viewBoxAtRest, r.viewBoxZoomed);
     check('zoom out clamps back to the world', r.viewBoxClamped === '0 0 960 540', r.viewBoxClamped);
@@ -793,7 +888,8 @@ for (const scenario of RESUME_SCENARIOS) {
     check('match count restored', r.after.matches === r.before.matches, `${r.after.matches} vs ${r.before.matches}`);
     check('map ownership restored', r.after.ownedByFirstAlive === r.before.ownedByFirstAlive, `${r.after.ownedByFirstAlive} vs ${r.before.ownedByFirstAlive}`);
     check('all ownership and map markers restored', r.after.ownership === r.before.ownership && r.restoredMap);
-    check('reloaded map defaults to the restored owners’ flags', r.restoredFlags);
+    check('reloaded map opens on the Political map (map style is not saved)', r.reloadPolitical);
+    check('reloaded map restores the owners’ flags after choosing Flags', r.restoredFlags);
     check('sport, team layer and match settings restored', r.after.settings === r.before.settings);
     check('all squads and acquired players restored', r.after.squads === r.before.squads);
     check('remaining match queue restored', r.after.queue === r.before.queue);

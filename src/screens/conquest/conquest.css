@@ -1,0 +1,203 @@
+/* Owner: WP-CONQ (see PLAN.md §4). Conquest screen and callout (.conquest-*, .callout*, .screen--conquest; PLAN §4.11).
+   Boards D1 (1440) / D2 (390); README §D wins on values (D§9). Placement of .screen--conquest (absolute 650px panel
+   at ≥1200, grid row 2 below) is WP-0's shell.css; everything inside is styled here. Base = std (1200–1599).
+   main.jsx imports App (and so this file) before index.css, so primitives.css loads AFTER this file: every
+   override of a primitive (.radio-square, .v4-table, .btn-primary) uses a higher-specificity selector. */
+
+/* ---- Article (D§2.5) ---- */
+.screen--conquest {
+  z-index:28; /* above map overlays/anchors, below the masthead (z 30) and its popover */
+  display:flex; flex-direction:column;
+  padding:28px 40px 0; /* the 26px bottom inset lives on the sticky footer, so it also clears the edge when stuck */
+  background:var(--surface); color:var(--ink);
+  border-left:1px solid var(--rule);
+}
+.screen--conquest > * { flex:none; min-width:0; }
+
+/* Dateline kicker: Archivo (not Narrow) 12px .1em, you-text 600 / muted, 1px rule (D§2.5) */
+.conquest-kicker {
+  display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+  padding-bottom:8px; border-bottom:1px solid var(--rule);
+  font:400 12px/1.2 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:.1em;
+  text-transform:uppercase; white-space:nowrap;
+}
+.conquest-kicker__title { min-width:0; overflow:hidden; text-overflow:ellipsis; color:var(--you-text); font-weight:600; }
+.conquest-kicker__aside { flex:none; color:var(--muted); }
+
+.conquest-headline {
+  margin:16px 0 0;
+  font:700 var(--fs-headline)/.9 var(--font-narrow); letter-spacing:0;
+  text-transform:uppercase; text-wrap:balance; overflow-wrap:anywhere; color:var(--ink);
+}
+.conquest-standfirst { margin:14px 0 0; font:400 20px/1.45 var(--font-sans); color:var(--text-2); text-wrap:pretty; }
+
+/* Effects: two cells, top + bottom 1px rule, no divider; values in gain (D§2.5) */
+.conquest-effects {
+  margin:18px 0 0; display:grid; grid-template-columns:1fr 1fr;
+  box-shadow:inset 0 1px 0 var(--rule), inset 0 -1px 0 var(--rule);
+}
+.conquest-effect { min-width:0; padding:10px 14px 10px 0; }
+.conquest-effect__label { font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+.conquest-effect__value { margin:0; font:600 30px/1.1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--gain); }
+/* Names clamp to 2 lines; "+ N more" sits outside the clamp at the end of the last line (D§10 #7). */
+.conquest-effect__detail {
+  margin:0; display:flex; align-items:flex-end; column-gap:.3em;
+  font:400 13px/1.35 var(--font-sans); color:var(--muted);
+}
+.conquest-effect__text {
+  flex:0 1 auto; min-width:0;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.conquest-effect__more { flex:none; white-space:nowrap; }
+
+/* "Claim one player" uses the shared .kicker (README 12px, D§9 #1) */
+.conquest-claim-head { margin-top:20px; }
+
+/* ---- Options (radio rows) ---- */
+.conquest-options { display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+.conquest-option {
+  display:grid; grid-template-columns:20px minmax(0,1fr) auto; align-items:center; gap:14px;
+  min-height:var(--tap); padding:10px 12px;
+  background:var(--panel); color:var(--ink); box-shadow:inset 0 0 0 1px var(--rule);
+  cursor:pointer; -webkit-user-select:none; user-select:none;
+}
+.conquest-option:hover:not([aria-checked=true]) { box-shadow:inset 0 0 0 1px var(--control-line); }
+.conquest-option[aria-checked=true] { background:var(--you-soft); box-shadow:inset 0 0 0 1.5px var(--you); }
+.conquest-option:focus { outline:none; }
+.conquest-option:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+.conquest-option > .conquest-option__radio { justify-self:start; background:transparent; }
+.conquest-option__body { display:block; min-width:0; }
+.conquest-option__name {
+  display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 19px/1.25 var(--font-sans); color:var(--ink);
+}
+.conquest-option__meta {
+  display:block; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 12px/1.3 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted);
+}
+.conquest-option__gain { font:600 22px/1 var(--font-sans); font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+/* ---- "Lineup before and after" (DEC D15; collapsed by default) ---- */
+.conquest-compare { margin-top:14px; }
+.conquest-compare__summary {
+  display:flex; align-items:center; gap:12px; min-height:max(36px, var(--tap)); padding:0;
+  border-bottom:1px solid var(--rule); list-style:none; cursor:pointer;
+  font:700 12px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--ink);
+}
+.conquest-compare__summary::-webkit-details-marker { display:none; }
+.conquest-compare__summary::marker { content:''; }
+.conquest-compare__summary:hover .conquest-compare__title { color:var(--you-text); }
+.conquest-compare__summary:focus { outline:none; }
+.conquest-compare__summary:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+.conquest-compare__title { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.conquest-compare__ratings {
+  flex:none; margin-left:auto;
+  font:600 12px/1 var(--font-sans); letter-spacing:0; font-variant-numeric:tabular-nums; text-transform:none; color:var(--muted);
+}
+.conquest-compare__chevron { flex:none; color:var(--muted); transition:transform .15s ease-out; }
+.conquest-compare[open] .conquest-compare__chevron { transform:rotate(180deg); }
+.conquest-compare__table { margin-top:2px; font:400 13px/1.3 var(--font-sans); }
+.conquest-compare__caption {
+  caption-side:top; padding:8px 0 2px; text-align:left;
+  font:400 12px/1.35 var(--font-sans); color:var(--muted);
+}
+.conquest-compare__table thead th:first-child { width:56px; }
+/* the primitive header cell has no side padding: keep "Position" clear of "Before" */
+.conquest-compare .conquest-compare__table thead th { padding-right:8px; }
+.conquest-compare .conquest-compare__table tbody th,
+.conquest-compare .conquest-compare__table td {
+  height:27px; padding:0 8px 0 0; border-top:1px solid var(--row-rule); border-bottom:0;
+  vertical-align:middle; text-align:left; text-transform:none; letter-spacing:0; white-space:normal;
+}
+.conquest-compare .conquest-compare__table tbody th { font:600 12px/1.2 var(--font-sans); color:var(--text-2); }
+.conquest-compare .conquest-compare__table tbody tr:first-child > * { border-top:0; }
+.conquest-compare__rating { font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--muted); }
+.conquest-compare tr.is-changed > * { background:var(--you-soft); }
+.conquest-compare tr.is-changed td:last-child { font-weight:600; }
+.conquest-compare__support { margin:8px 0 0; font:400 12px/1.4 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted); }
+
+/* ---- Footer: primary pinned to the bottom (D§2.5; no SPACE chip here, D§9 #4) ----
+   margin-top:auto pins it while the article fits; sticky keeps "Sign <player>" in view whenever the article scrolls
+   (short viewports, tablet, the comparison open). Its own surface padding covers the content scrolling beneath. */
+.conquest-footer {
+  position:sticky; bottom:0; z-index:1;
+  /* 12px top: only seen while the article scrolls; with 16px the D1 article overflowed 1366×768 by 2px */
+  margin-top:auto; padding:12px 0 26px;
+  display:flex; align-items:center; gap:16px;
+  background:var(--surface);
+}
+/* While content is hidden below the fold, a hairline marks the footer's top edge (scroll-driven, so it only shows
+   when the article actually scrolls and fades out at the end; browsers without scroll timelines show no rule). */
+@supports (animation-timeline: scroll()) {
+  .conquest-footer { animation:conquest-footer-edge linear both; animation-timeline:scroll(nearest block); }
+}
+@keyframes conquest-footer-edge {
+  from, 96% { box-shadow:0 -1px 0 var(--rule); }
+  to { box-shadow:0 -1px 0 transparent; }
+}
+.conquest-footer__cta.btn-primary {
+  flex:0 1 auto; min-width:0; max-width:100%;
+  height:50px; padding:0 22px; gap:10px; font-size:17px;
+}
+.conquest-footer__label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.conquest-footer__note { flex:0 1 auto; min-width:0; margin:0; font:400 14px/1.35 var(--font-sans); color:var(--muted); }
+
+/* ---- Callout card over the taken land (D§2.4); fades in after the hatch (A-2) ----
+   WorldMap centres the anchor on the taken land; the card then sits a quarter of its width left and a little up of
+   that point so most of the hatch stays visible (D§2.4 build rule: D1 ≈ 57px left / 21px up of a 224×62 card).
+   Percentages are of the card itself. The phone rule below lifts the card further (see there). */
+.callout {
+  display:flex; align-items:center; gap:13px; padding:12px 18px 12px 14px;
+  white-space:nowrap; color:var(--ink); pointer-events:none;
+  transform:translate(-25%, -33%);
+  animation:conquest-callout-in 220ms ease-out 240ms both;
+}
+.callout__figure { font:700 40px/1 var(--font-sans); letter-spacing:-.02em; font-variant-numeric:tabular-nums; color:var(--ink); }
+.callout__text { display:flex; flex-direction:column; gap:3px; }
+.callout__label { font:700 12px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--you-text); }
+.callout__sub { font:400 14px/1.25 var(--font-sans); color:var(--text-2); }
+.callout--compact { gap:10px; padding:9px 14px 9px 11px; }
+.callout--compact .callout__figure { font-size:30px; }
+.callout--compact .callout__label { font-size:11px; }
+.callout--compact .callout__sub { font-size:13px; }
+@keyframes conquest-callout-in { from { opacity:0; } to { opacity:1; } }
+
+/* ---- Tablet 700–1199: map on top, article below (A-2, DEC D22) ---- */
+@media (max-width:1199.98px) {
+  .screen--conquest { z-index:auto; padding:22px 26px 0; border-left:0; border-top:1px solid var(--rule); }
+  .conquest-standfirst { font-size:18px; }
+  .conquest-footer { padding-bottom:calc(24px + var(--safe-bottom, 0px)); }
+}
+
+/* ---- Phone <700 (D2): sheet content; the PhoneBar carries "Sign <player>" + gain ---- */
+@media (max-width:699.98px) {
+  .screen--conquest { padding:12px 18px 10px; }
+  .conquest-kicker { padding-bottom:6px; font-size:11px; letter-spacing:.08em; }
+  .conquest-kicker__aside { display:none; }
+  .conquest-headline { margin-top:8px; line-height:.92; }
+  .conquest-standfirst {
+    margin-top:8px; font-size:14px; line-height:1.5;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .conquest-effects, .screen--conquest .conquest-claim-head, .conquest-option__note, .conquest-footer { display:none; }
+  .conquest-options { margin-top:6px; } /* D2: every row 6px below the previous block */
+  .conquest-option { grid-template-columns:18px minmax(0,1fr) auto; gap:10px; padding:7px 10px; min-height:44px; }
+  .conquest-option > .conquest-option__radio { width:16px; height:16px; }
+  .conquest-option__name { font-size:16px; line-height:1.15; }
+  .conquest-option__meta { margin-top:0; font-size:11px; line-height:1.2; } /* 7 + 18.4 + 13.2 + 7 ≈ 46px (D2) */
+  .conquest-option__gain { font-size:17px; }
+  .conquest-compare { margin-top:10px; }
+  /* The D2 fit leaves the taken land at most ~139×104px, often far less (a zoom-limited Luxembourg is ~12×14), under
+     a ~190×50 card, so D2's "barely up" offset hid most or all of the hatch (58–100% of its box at 390). Lifting the
+     card by 60% of its height keeps its bottom edge just above the land's centre: it still sits over the land, the
+     lower half of the hatch always shows, and small lands stay visible (22–43% of the hatch box covered). */
+  .callout { gap:10px; padding:9px 14px 9px 11px; transform:translate(-25%, -60%); }
+  .callout__figure { font-size:30px; }
+  .callout__label { font-size:11px; }
+  .callout__sub { font-size:13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .callout { animation:none; }
+  .conquest-compare__chevron { transition:none; }
+}

@@ -519,24 +519,24 @@ clearance from the painted, rounded edge is at least 0.35 of that point's, else
 the first point toward it that is (16 steps). `homeX/homeY` is the home marker:
 the town where it lies on the painted section, else the anchor.
 
-**Setup.** With Clubs and football, the Theatre select gains the optgroup "One
-country · top clubs" ("England · 100 clubs", "Fiji · 16 clubs", value
-`domestic:<id>`). The description reads the index's `sections`: "… 16 clubs
-fighting over Fiji, split into 100 sections drawn from its administrative
-divisions; each club starts with 6 or 7 of them." (a 100-club country keeps the
-shorter sentence). Choosing one loads it after a 120 ms pause (Retry on failure)
-and previews the sections, each in the colour of the club starting there
-(`startOwners`), beside the panel on screens at least 1100 px wide; tooltips say
-"HOME OF <club>" on a home section and "<club> STARTS HERE" on the rest of its
-group. Session presets keep the country and the managed club. Launch shows a busy
-state while the map is prepared. Titles read "England · top 100 clubs".
+**Setup.** With Clubs and football, the Theatre list gains the group "One
+country · top clubs" (and the `#setup-theatre` mirror its optgroup: "England ·
+100 clubs", "Fiji · 16 clubs", value `domestic:<id>`). The description reads the
+index's `sections` (`clubs` for a format-1 entry): "… 16 clubs fighting over
+Fiji, split into 100 sections drawn from its administrative divisions; each club
+starts with 6 or 7 of them." An even split names one number, and a 100-club
+country keeps the shorter sentence. Choosing one loads it after a 120 ms pause
+(Retry on failure), and the setup wizard previews the country in step 1, every
+section (not only home sections) in the colour its starting club takes at
+kick-off (`startOwners`). The setup-phase tooltip (`tooltipModel` with
+`homeClubs`, on the inert map under the opaque wizard) reads "Home of <club>" on
+a club's home section and "<club> starts here" on the rest of its group. Session
+presets keep the country and the managed club. Launch shows a busy state while
+the map is prepared. Titles read "England · top 100 clubs".
 
 **Campaign.** `own = { ...startOwners }`; `team.home` is the home section and
 home markers stay there. The map fits the sections and opens on `focus`; every
-section is held, so there is no neutral land and never a transit treaty. The
-footnote names a largest empire only once one holds more sections than the
-largest starting group (on a 100-club map more than one, as in world campaigns),
-so a tie of equal groups at kickoff names nobody. Attacks
+section is held, so there is no neutral land and never a transit treaty. Attacks
 start from any section the club holds. The board adds `obstacles` (the
 surroundings, the same array every call so the route index stays cached) and
 `borderRoutes: true`; world boards get neither. Obstacles block straight routes,
@@ -579,7 +579,7 @@ has no holder, or the holdings split a starting group.
 ## Acceptance checks (as tested)
 
 `npm test` runs every test file below; `npm run test:domestic` runs the four
-`domestic-*` files (about 40 s), and `npm run smoke` takes about 4 minutes.
+`domestic-*` files (about 40 s), and `npm run smoke` takes several minutes.
 
 - `scripts/domestic-data.test.mjs`: the index lists every shipped map once, in
   name order, and ATTRIBUTION.txt names every version. Every shipped map: at most
@@ -614,9 +614,7 @@ has no holder, or the holdings split a starting group.
   A full England campaign on the app board crosses no neighbour.
 - `scripts/campaign-storage.test.mjs`: a made-up 3-club, 10-section map for the
   grouped remap (upgrade, reordered rebuild, refusals).
-- `npm run smoke`: England duel and blitz and a Fiji duel campaign (the footnote
-  names no largest empire at kickoff, and names the true one once it outgrows
-  every starting group), setup
+- `npm run smoke`: England duel and blitz and a Fiji duel campaign, setup
   loading/error/Retry, grouped preview colours and tooltips, inert backdrop,
   restore races and cancellation, England and Fiji interrupt-and-resume to the
   champion, a one-section-per-club save restored onto the 100-section map with
@@ -705,5 +703,4 @@ has no holder, or the holdings split a starting group.
   data test samples overlaps on a 60×60 grid per country, which misses them.
 - Arrows in sections under about 0.5 SVG units across stay that short at kickoff.
 - Section ids follow club rank, so every rebuild relies on the club-by-club remap.
-- The first label layout for 100 owners costs about 300 ms at launch; the preview
-  sits beside the panel only from 1100 px wide.
+- The first label layout for 100 owners costs about 300 ms at launch.
