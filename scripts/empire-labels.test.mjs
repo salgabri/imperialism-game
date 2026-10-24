@@ -565,6 +565,20 @@ test('sea allowances never grant permission to paint names across rival or neutr
   }
 });
 
+test('an island kept through a change of territory keeps only pure geometry caches: labels match a fresh engine', () => {
+  // A rival atoll rings the island, blocking every coastal fallback. Once the island's owner takes the atoll too, the
+  // island's component (with its raster and point records) serves the new territory group, and the name may spill over
+  // the strait. Caches on components, rasters and records must be pure functions of the pieces; coastalBlocked's
+  // verdicts depend on the foreign land too, so they are kept per territory group.
+  const shapes = [shape('island', rect(80, 80, 68, 30)), shape('atoll', rect(68, 68, 92, 54), [...rect(76, 76, 76, 38)].reverse())];
+  const labels = [name('A', 'COASTLAND', 6.5)], engine = createEmpireLabelEngine(shapes), held = { island: 'A', atoll: 'A' };
+  assert.deepEqual(engine.layout(options({ island: 'A', atoll: 'B' }, labels, CURVED_COAST)), []);
+  const placed = engine.layout(options(held, labels, CURVED_COAST));
+  assert.equal(placed.length, 1);
+  assert.equal(placed[0].coastal, true);
+  assert.deepEqual(placed, createEmpireLabelEngine(shapes).layout(options(held, labels, CURVED_COAST)));
+});
+
 test('tiny foreign and neutral enclaves cannot hide between coastal-validation samples', () => {
   const outer = rect(40, 40, 300, 130), ownership = { host: 'A' };
   const baseline = createEmpireLabelEngine([shape('host', outer)]).layout(options(ownership, [name()], CURVED_COAST))[0];

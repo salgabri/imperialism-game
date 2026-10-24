@@ -189,7 +189,11 @@ function touchingAtFlatBounds(a, b) {
   return false;
 }
 
-function ownerComponents(countries) {
+/**
+ * The connected components of the countries' pieces. `reusable` (component key -> component) hands back a component
+ * already built for the same piece set: its pieces come in the same order, so its bbox and edges are the same.
+ */
+function ownerComponents(countries, reusable = null) {
   const pieces = countries.flatMap(country => country.pieces);
   const sets = makeDisjointSet(pieces.length);
   const vertices = new Map();
@@ -209,7 +213,8 @@ function ownerComponents(countries) {
     if (!grouped.has(root)) grouped.set(root, []);
     grouped.get(root).push(pieces[i]);
   }
-  return [...grouped.values()].map(part => ({ pieces: part, bbox: unionBounds(part.map(p => p.bbox)), edges: exteriorEdges(part) }));
+  return [...grouped.values()].map(part => reusable?.get(part.map(p => p.id).sort().join('|'))
+    || { pieces: part, bbox: unionBounds(part.map(p => p.bbox)), edges: exteriorEdges(part) });
 }
 
 function rasterize(component) {
@@ -897,17 +902,18 @@ function foreignEdgeCrosses(countries, footprint) {
 // its inscribed circle, which settles every angle at once) therefore crosses
 // all of them, and foreignLandIntersects rejects them. When every pair is
 // blocked like this, the coastal search cannot produce a label: skip it.
-function coastalBlocked(component, definition, options, previous, foreign) {
+function coastalBlocked(component, definition, options, previous, foreign, groupUid) {
   const setup = candidatePairs(component, definition, options, previous, true);
   if (!setup?.pairs.length) return true;
   const { raster, pairs, widthEm, minSize, curveRatio } = setup;
   const size = minSize * (1 - 1e-3), [halfWidth, halfHeight] = footprintHalfSizes(widthEm, curveRatio);
   const inner = size * Math.min(halfWidth, halfHeight), margin = inner * 1e-3 + PROBE_MARGIN;
   const reach = size * (halfWidth + halfHeight) + raster.cell + PROBE_MARGIN, b = component.bbox;
-  const key = `${size}|${widthEm}|${curveRatio}`;
+  // The verdicts depend on this geometry, the size and the foreign land, so pans reuse them. The component may serve
+  // several territory groups (see prepare), each with its own foreign land: they are kept per group.
+  const key = `${groupUid}|${size}|${widthEm}|${curveRatio}`;
   let near = null, point = null, aroundPoint = false;
   for (const { candidate, angle, angleIndex } of pairs) {
-    // The verdicts depend only on this owner's geometry and the size, so pans reuse them.
     const record = pointRecord(raster, candidate);
     const blocked = scaleCache(record, 'blocked', key, () => []);
     if (blocked[angleIndex] === undefined) {
@@ -1157,7 +1163,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
   // label's text, width and minimum, the options and five fields of its previous label (the rest are pure geometry
   // caches), so the same inputs give the same choice: after a conquest only the changed empires search again.
   const labelMemo = new Map();
-  let preparedKey = null, prepared = new Map(), lastLayoutKey = null, lastLayout = [];
+  let preparedKey = null, prepared = new Map(), lastLayoutKey = null, lastLayout = [], groupCount = 0;
 
   // Every land shape the owner does not hold, in engine order. Built once per
   // owner group rather than once per label per camera frame.
@@ -1192,12 +1198,21 @@ export function createEmpireLabelEngine(countryShapes = []) {
     if (signature === preparedKey) return prepared;
     preparedKey = signature;
     prepared = new Map();
+    let reusable = null;
     for (const [id, ids] of byOwner) {
       const key = JSON.stringify(ids);
       let group = groupCache.get(key);
       if (!group) {
         const owned = ids.map(cid => countries.get(cid));
-        const components = ownerComponents(owned);
+        // An island or continent that did not change hands keeps its component, with its raster and search caches.
+        // Components, rasters and point records may therefore serve several territory groups (whoever holds those
+        // pieces), so every cache stored on them must be a pure function of the pieces; one that also depends on the
+        // group (coastalBlocked's verdicts depend on the foreign land) keys it by the group's uid.
+        if (!reusable) {
+          reusable = new Map();
+          for (const cached of groupCache.values()) for (const component of cached.components) reusable.set(component.key, component);
+        }
+        const components = ownerComponents(owned, reusable);
         for (const component of components) {
           component.key = component.pieces.map(p => p.id).sort().join('|');
           // Signed ring areas are only a priority estimate. Actual union area is
@@ -1205,7 +1220,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
           component.area = component.pieces.reduce((sum, p) => sum + Math.abs(p.rings.reduce((s, r) => s + ringArea(r), 0)), 0);
         }
         components.sort((a, b) => b.area - a.area || a.key.localeCompare(b.key));
-        group = { countries: owned, components, key };
+        group = { countries: owned, components, key, uid: ++groupCount };
       } else groupCache.delete(key);
       groupCache.set(key, group);
       prepared.set(id, group);
@@ -1281,7 +1296,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
         // that otherwise cannot fit, never as an automatic text-size boost.
         if (labelOptions.coastalAllowancePx > 0 && labelOptions.maxSeaFraction > 0 && !chosen) {
           for (const { component, score: visibleArea } of shortlist) {
-            if (coastalBlocked(component, definition, labelOptions, previous, foreignCountries)) continue;
+            if (coastalBlocked(component, definition, labelOptions, previous, foreignCountries, group.uid)) continue;
             let componentLabel = null;
             for (const candidate of first(componentCandidates(component, definition, labelOptions, previous, true), 24)) {
               const minimum = labelOptions.minFontPx * unitsPerPixel;
