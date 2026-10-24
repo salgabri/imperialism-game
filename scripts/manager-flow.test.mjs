@@ -195,6 +195,22 @@ test('tactical choice precedes production outcome RNG and cannot be stolen by ch
   } finally { f.close(); }
 });
 
+test('the kickoff decision commits with the match it starts, never as a gate-less in-between state', () => {
+  const f = fixture();
+  try {
+    f.app.setState({ autoplay: true }); f.app.startMatch('250', '276');
+    const commits = [], didUpdate = f.app.componentDidUpdate;
+    f.app.componentDidUpdate = function (...args) { commits.push(this.state); return didUpdate.apply(this, args); };
+    f.app.simulateResult();
+    assert.ok(commits.length > 0);
+    assert.ok(commits.every(state => state.tacticalChoice || state.match), 'no commit without the gate and without the match');
+    const [first] = commits;
+    assert.equal(first.tacticalChoice, null); assert.equal(first.tacticalPreview, false); assert.equal(first.autoplay, true);
+    assert.deepEqual([first.match.aId, first.match.dId, first.match.tactic, first.match.instant], ['250', '276', 'balanced', true]);
+    assert.deepEqual([first.decisionLedger.length, first.decisionLedger[0].choice], [1, 'balanced']);
+  } finally { f.close(); }
+});
+
 test('following a live winner grants no signing control when the actual manager loses', () => {
   const f = fixture();
   try {

@@ -1534,11 +1534,12 @@ export default class App extends React.Component {
     );
   }
 
-  startMatch(attackerId, defenderId, route = {}, tactic, options = {}) {
-    const st = this.state;
+  /** `decided` is the kickoff decision's state fields (chooseTactic): read as committed and committed with the match. */
+  startMatch(attackerId, defenderId, route = {}, tactic, options = {}, decided = null) {
+    const st = decided ? { ...this.state, ...decided } : this.state;
     const a = st.teams[attackerId];
     const d = st.teams[defenderId];
-    if (!a || !d) return;
+    if (!a || !d) { if (decided) this.setState(decided); return; }
     this.clearDraw();
 
     const sport = this.sport();
@@ -1578,6 +1579,7 @@ export default class App extends React.Component {
     const watch = !options.instant && (st.settings.express || st.settings.resolution === 'ticker') && this.ownMatch(st, attackerId, defenderId);
     if (watch && st.speed !== 1 && this.speedRestore == null) this.speedRestore = st.speed;
     this.setState({
+      ...decided,
       series,
       ...(watch ? { speed: 1 } : {}),
       match: {
@@ -1622,8 +1624,9 @@ export default class App extends React.Component {
     const entry = { type: 'tactic', match: this.state.matches + 1, teamId: this.managedId(), opponentId: choice.aId === this.managedId() ? choice.dId : choice.aId,
       choice: id, expectedStrength: option.strength, variation: option.drama, options: choice.options.map(item => item.id),
       decisionMs: Math.max(0, Date.now() - choice.openedAt) };
-    this.setState({ tacticalChoice: null, tacticalPreview: false, autoplay: choice.resumeAutoplay,
-      decisionLedger: [...this.state.decisionLedger, entry] }, () => this.startMatch(choice.aId, choice.dId, choice.route, id, options));
+    // One commit: a separate gate-less, match-less commit was never painted.
+    this.startMatch(choice.aId, choice.dId, choice.route, id, options, { tacticalChoice: null, tacticalPreview: false,
+      autoplay: choice.resumeAutoplay, decisionLedger: [...this.state.decisionLedger, entry] });
   }
 
   presentMatch(...args) { return matchM.presentMatch.apply(this, args); }
