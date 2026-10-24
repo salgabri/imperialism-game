@@ -1166,6 +1166,8 @@ export default class App extends React.Component {
       return;
     }
     this.clearTimers();
+    // The setup screen's team list and map card would pin its fitted paths for the whole campaign.
+    this.setupTeamsCache = null;
     this.engagement = new SessionEngagement();
     // Stale stamps from a retried campaign never outlive their map or data set.
     const { domesticVersion: _previousMap, dataVersion: _previousSet, dataYear: _year, dataSeason: _season, ...chosen } = su;
@@ -1259,6 +1261,7 @@ export default class App extends React.Component {
     this.flowToken++;
     this.endRestore();
     this.clearTimers();
+    this.setupTeamsCache = null;
     this.engagement = new SessionEngagement(s.metrics?.engagement);
     this.rng = makeRng(s.seed ?? 1);
     this.rng.setState(s.rngState ?? s.seed ?? 1);

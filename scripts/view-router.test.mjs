@@ -1074,6 +1074,7 @@ test('a country theatre: wizard preview, kickoff on its sections, section names,
     app.startCampaign();
     const st = app.state;
     assert.equal(st.phase, 'playing');
+    assert.equal(app.setupTeamsCache, null, 'the setup screen\'s team list (and the fit its card holds) does not outlive it');
     assert.equal(st.settings.domesticVersion, loaded.meta.version);
     assert.equal(st.settings.turnOrder, 'random');
     for (const club of loaded.clubs) assert.equal(st.own[club.homeSection], club.id);
@@ -1104,7 +1105,9 @@ test('a country theatre: wizard preview, kickoff on its sections, section names,
     const saved = { ...loadSave(), settings: { ...loadSave().settings, turnOrder: 'round-robin', domesticVersion: '826-00000000' },
       turnQueue: st.aliveIds.slice(0, 4), turnIndex: 3, round: 1,
       spin: { attackerId: st.aliveIds[2], targetId: st.aliveIds[3], key: 'stale' }, match: null };
+    app.setupTeams();
     app.continueSaved(saved);
+    assert.equal(app.setupTeamsCache, null, 'nor through a restore');
     assert.equal(app.geo, loaded.geo);
     assert.equal(app.state.settings.domesticVersion, loaded.meta.version, 'the restored campaign is re-stamped');
     assert.equal(app.state.spin, null, 'the stale draw is not replayed');
