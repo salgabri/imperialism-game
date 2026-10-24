@@ -12,8 +12,9 @@ export const DEPENDENCIES = {
   '304': { of: '208', name: 'Greenland' }, // Kingdom of Denmark
 };
 
-// Shapes drawn on the map that never belong to anyone.
-export const EXCLUDED_SHAPES = new Set(['010', '260', '238', '732']); // Antarctica, Fr.S.Lands, Falklands, W.Sahara
+// Shapes drawn on the map that never belong to anyone (club seeding never deals them).
+// Antarctica, Fr.S.Lands, Falklands, W.Sahara, N.Cyprus, Somaliland.
+export const EXCLUDED_SHAPES = new Set(['010', '260', '238', '732', 'XCYN', 'XSOL']);
 
 export const CONF_META = {
   UEFA:      { name: 'Europe (UEFA)',            baseStr: 63 },

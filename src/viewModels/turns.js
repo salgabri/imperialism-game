@@ -80,6 +80,15 @@ function turnAttackerId(st) {
   return null;
 }
 
+/**
+ * A best-of-three final under way: App.nextAction plays every remaining game as teamIds[0] v teamIds[1], each in a
+ * round of its own, outside the round-robin queue → that pair, or null.
+ */
+function finaleSeries(st) {
+  const ids = st?.series?.teamIds;
+  return (st?.aliveIds || []).length === 2 && Array.isArray(ids) && ids.length === 2 ? ids : null;
+}
+
 /** DEC D3 round-robin order of the survivors, memoised (teamEff walks every lineup). */
 function previewOrder(st, ctx) {
   return memo(ctx?.cache, 'turn:rr-order', [st.teams, st.aliveIds],
@@ -93,6 +102,8 @@ function previewOrder(st, ctx) {
  * roundRobinOrder (teamEff for every survivor) each time.
  */
 function nextRoundRobinAttacker(st, ctx) {
+  const series = finaleSeries(st);
+  if (series) return series[0];
   return memo(ctx?.cache, 'turn:rr-next', [st.turnQueue, st.turnIndex, st.aliveIds, st.teams, st.round], () => {
     const queue = Array.isArray(st.turnQueue) ? st.turnQueue : [];
     const from = Number.isInteger(st.turnIndex) && st.turnIndex > 0 ? st.turnIndex : 0;
@@ -161,6 +172,10 @@ function roundRobinStrip(st, ctx) {
       queue = previewOrder(st, ctx);
       current = attackerId ? queue.indexOf(attackerId) : -1;
     }
+  } else if (finaleSeries(st)) {
+    // Between finale games the series attacker plays next, whatever the stale queue says (as while a game runs).
+    queue = previewOrder(st, ctx);
+    current = queue.indexOf(finaleSeries(st)[0]);
   } else {
     current = stored.findIndex((id, i) => i >= index && alive.has(id));
     if (current < 0) {

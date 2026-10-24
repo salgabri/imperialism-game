@@ -83,7 +83,9 @@ test('indexes are cached immutable snapshots and rebuild only for a new paths id
   assert.equal(createAttackRouteIndex(paths), index);
   assert.ok(Object.isFrozen(index)); assert.ok(Object.isFrozen(index.countries));
   assert.ok(Object.isFrozen(index.countries[0])); assert.ok(Object.isFrozen(index.countries[0].bounds));
-  assert.ok(Object.isFrozen(index.countries[0].rings[0][0])); assert.ok(Object.isFrozen(index.countries[0].edges[0]));
+  // Edge coordinates are packed into the index's own typed arrays (which cannot be frozen), copied from the source.
+  assert.ok(index.countries[0].edges instanceof Float64Array); assert.ok(index.countries[0].chunks instanceof Float64Array);
+  assert.deepEqual([...index.countries[0].edges.subarray(0, 4)], [2, -1, 3, -1]);
   paths.land.labelRings[0].forEach(p => { p[0] += 10; });
   assert.equal(firstForeignLand(index, {}, 'A', route(0, 0, 4, 0)).x, 2, 'source mutation cannot alter a resolved snapshot');
   assert.equal(firstForeignLand(createAttackRouteIndex({ ...paths }), {}, 'A', route(0, 0, 4, 0)), null);

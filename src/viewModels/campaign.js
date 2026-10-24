@@ -478,6 +478,8 @@ function titleCardModel(st, ctx) {
 function mapStateCopy(st, current) {
   const history = Array.isArray(st.history) ? st.history : [];
   const R = roman(current);
+  // The champion's last match closed the campaign's last round, however few of its matches were played.
+  if (R && Array.isArray(st.aliveIds) && st.aliveIds.length === 1) return `Map after Round ${R}`;
   if (R && history.length && historyRound(history[history.length - 1]) === current) {
     const queued = Array.isArray(st.queue) && st.queue.length > 0;
     if (st.settings?.turnOrder === 'round-robin' && !queued && !st.series) {
@@ -534,8 +536,10 @@ function mapKeyModel(st, ctx) {
   if (mode === 'strength') {
     let steps = [];
     try { steps = strengthSteps(st, ctx) || []; } catch { steps = []; }
+    // With few empires several steps share a floor, and the map paints only the first of them: list each floor once.
+    const shown = steps.filter((step, i) => steps.findIndex(other => other.min === step.min) === i);
     return { variant: 'strength', heading: 'Strength', items: [
-      ...steps.map((step, i) => ({ key: `step-${i}`, kind: 'swatch', label: `${oneDecimal(step.min)}+`, color: step.color, ring: RING_RULE })),
+      ...shown.map((step, i) => ({ key: `step-${i}`, kind: 'swatch', label: `${oneDecimal(step.min)}+`, color: step.color, ring: RING_RULE })),
       me,
     ].filter(Boolean) };
   }

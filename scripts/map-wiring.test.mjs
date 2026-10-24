@@ -141,6 +141,19 @@ test('tooltip copy comes from tooltipModel', () => {
   } finally { f.close(); }
 });
 
+test('each country keeps its click and hover handlers across renders, so the map can skip unchanged land', () => {
+  const f = fixture();
+  try {
+    const first = countryOf(f.app, '250');
+    f.app.setState({ hoverCid: '276' });
+    const again = countryOf(f.app, '250');
+    assert.notEqual(again, first, 'a fresh row each render');
+    for (const key of ['onClick', 'onEnter', 'onLeave']) assert.equal(again[key], first[key], key);
+    again.onEnter();
+    assert.equal(f.app.state.hoverCid, '250');
+  } finally { f.close(); }
+});
+
 test('the hover tooltip never sticks: the sea, leaving the land and other views drop it (W4 final, minor #1)', () => {
   const f = fixture();
   try {

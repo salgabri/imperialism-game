@@ -12,14 +12,14 @@
    and no panel padding (each region pads itself). */
 .fi-victory-backdrop, .fi-tactical-backdrop {
   position:fixed; inset:0; z-index:60; display:flex; padding:24px 18px; overflow:auto; overscroll-behavior:contain;
-  background:rgba(17,20,23,.35);
+  background:var(--backdrop);
 }
 .dialog-backdrop.fi-victory-backdrop, .dialog-backdrop.fi-tactical-backdrop { align-items:flex-start; justify-content:flex-start; }
 .dialog.fi-victory, .dialog.fi-tactical { padding:0; }
 .fi-victory {
   position:relative; margin:auto; width:min(1180px, 100%); max-height:calc(100dvh - 48px);
   display:grid; grid-template-columns:minmax(0,1fr) 388px; overflow:hidden;
-  background:#fff; color:var(--ink); box-shadow:var(--shadow-callout); border-left:4px solid var(--you);
+  background:var(--panel); color:var(--ink); box-shadow:var(--shadow-callout); border-left:4px solid var(--you);
   font-variant-numeric:tabular-nums; animation:fiPop .24s ease-out both;
 }
 .fi-victory-close { position:absolute; top:10px; right:10px; z-index:1; }
@@ -88,7 +88,7 @@
   /* One scrolling panel: the close button sticks to the top of the scrollport (touch has no Escape). The negative
      bottom margin keeps it out of the flow; the eyebrow reserves its width. */
   .fi-victory > .fi-victory-close {
-    position:sticky; top:8px; z-index:3; display:grid; margin:8px 8px calc(-8px - max(36px, var(--tap))) auto; background:#fff;
+    position:sticky; top:8px; z-index:3; display:grid; margin:8px 8px calc(-8px - max(36px, var(--tap))) auto; background:var(--panel);
   }
   .fi-victory-eyebrow { padding-right:44px; }
   .fi-victory-main, .fi-victory-side { overflow:visible; }
@@ -123,14 +123,14 @@
 .fi-tactical {
   --tac-pad-x:32px; --tac-xi-w:280px;
   position:relative; margin:auto; width:min(760px, 100%); max-height:calc(100dvh - 48px); overflow:auto;
-  overscroll-behavior:contain; scroll-padding:52px 0 56px; background:#fff; color:var(--ink);
+  overscroll-behavior:contain; scroll-padding:52px 0 56px; background:var(--panel); color:var(--ink);
   box-shadow:var(--shadow-callout); font-variant-numeric:tabular-nums; animation:fiPop .2s ease-out both;
 }
 .fi-tactical.has-preview { width:min(1260px, 100%); }
 /* Sticky so the close button stays reachable while the (tall) preview scrolls inside the panel. */
 .fi-tactical-top {
   position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:12px; padding:8px 10px 0 var(--tac-pad-x);
-  background:#fff;
+  background:var(--panel);
 }
 .fi-tactical-kicker {
   flex:1; min-width:0; display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin:0;
@@ -198,7 +198,7 @@
 .fi-tactical-options { display:flex; flex-direction:column; gap:6px; margin-top:10px; }
 .fi-tactical-option {
   display:grid; grid-template-columns:20px minmax(0,1fr) auto; align-items:center; gap:14px; width:100%;
-  padding:10px 14px; border:0; border-radius:0; background:#fff; color:var(--ink); text-align:left; cursor:pointer;
+  padding:10px 14px; border:0; border-radius:0; background:var(--panel); color:var(--ink); text-align:left; cursor:pointer;
   box-shadow:inset 0 0 0 1px var(--rule); font:inherit;
 }
 .fi-tactical-option:hover { box-shadow:inset 0 0 0 1px var(--control-line); }
@@ -227,7 +227,7 @@
 /* Board 07 closing line ("Kick off to watch it live, or simulate the result"), centred, as a sticky panel footer. */
 .fi-tactical-foot {
   position:sticky; bottom:0; z-index:2; margin:0; padding:11px var(--tac-pad-x) 12px; border-top:1px solid var(--rule);
-  background:#fff; text-align:center; font:400 14px/1.4 var(--font-sans); color:var(--muted);
+  background:var(--panel); text-align:center; font:400 14px/1.4 var(--font-sans); color:var(--muted);
 }
 .fi-tactical-foot .btn-link { display:inline; min-height:0; font-size:inherit; }
 
@@ -355,10 +355,10 @@
 /* =========================== Export checkpoint =========================== */
 .fi-export-backdrop {
   position:fixed; inset:0; z-index:62; display:flex; padding:24px 18px; overflow:auto; overscroll-behavior:contain;
-  background:rgba(17,20,23,.35);
+  background:var(--backdrop);
 }
 .fi-export {
-  margin:auto; width:min(640px, 100%); padding:22px 28px 26px; background:#fff; color:var(--ink);
+  margin:auto; width:min(640px, 100%); padding:22px 28px 26px; background:var(--panel); color:var(--ink);
   box-shadow:var(--shadow-callout); animation:fiPop .2s ease-out both;
 }
 .fi-export-heading {

@@ -15,6 +15,7 @@ import EmpireLabels from './EmpireLabels.jsx';
 import DrawCompass, { AttackVector } from './DrawCompass.jsx';
 import FlagPattern from './FlagPattern.jsx';
 import { createMapBorderIndex } from '../engine/mapBorders.js';
+import { themedPaint } from '../theme.js';
 import './map.css';
 
 /** README §Map rendering values (tokens.css mirrors them; SVG attributes need literals). */
@@ -78,8 +79,89 @@ export function starPath(cx, cy, outer, inner) {
 function borderLayers(index, ownership) {
   if (typeof index.layers === 'function') return index.layers(ownership);
   const legacy = index.resolve(ownership);
-  return { coastD: '', innerD: legacy.internalD, outerD: legacy.borderD, ownerPaths: legacy.ownerPaths };
+  return { coastD: '', innerD: legacy.internalD, outerD: legacy.borderD, ownerPaths: legacy.ownerPaths, outline: legacy.outline };
 }
+
+/** One owner's chained outline: just that owner when the mesh can chain one alone. */
+function ownerOutline(mesh, id) {
+  if (id == null) return '';
+  if (typeof mesh.outline === 'function') return mesh.outline(id);
+  return mesh.ownerPaths.find(path => path.ownerId === String(id))?.d || '';
+}
+
+/**
+ * The land's event handlers, made once per map and outside any render: each reads the country from the element
+ * and the map's current state from `latest`. A handler made during a render keeps that render's whole scope
+ * (the world-sized border mesh among it) alive on every element still holding it.
+ */
+function countryActions(latest) {
+  const country = event => latest.current.byId.get(event.currentTarget.getAttribute('data-country'));
+  return {
+    click: event => {
+      const c = country(event), map = latest.current;
+      if (c && !map.didPan() && map.targetable(c)) c.onClick?.();
+    },
+    enter: event => { if (!latest.current.choosing) country(event)?.onEnter?.(); },
+    // Leaving this land (or tabbing off it) drops its hover, unless another country already took it over.
+    leave: event => country(event)?.onLeave?.(),
+    focus: event => {
+      const c = country(event), map = latest.current;
+      if (!c) return;
+      map.setKeyboardCountry(c.id);
+      if (!map.choosing) c.onEnter?.();
+      const bounds = event.currentTarget.getBoundingClientRect();
+      map.onPointerMove?.({ clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2, target: event.currentTarget });
+    },
+    blur: event => { if (event.relatedTarget) country(event)?.onLeave?.(); },
+    keyDown: event => {
+      const c = country(event);
+      if (c) latest.current.navigateCountry(event, c);
+    },
+  };
+}
+
+/** A stable ref callback per country id that keeps `refs` (id → path element) current. */
+function countryRef(refs, callbacks, id) {
+  let callback = callbacks.get(id);
+  if (!callback) {
+    callback = element => { if (element) refs.set(id, element); else refs.delete(id); };
+    callbacks.set(id, callback);
+  }
+  return callback;
+}
+
+/** Every prop CountryShape reads: memo compares exactly these (React's shallow compare lists each row's keys). */
+const COUNTRY_SHAPE_PROPS = ['id', 'd', 'fill', 'ownerId', 'flagParts', 'animation', 'conquered', 'followed', 'selected',
+  'reachState', 'label', 'role', 'tabIndex', 'cursor', 'stroke', 'strokeWidth', 'pathRef', 'actions'];
+
+function sameCountryShape(previous, next) {
+  for (const key of COUNTRY_SHAPE_PROPS) if (!Object.is(previous[key], next[key])) return false;
+  return true;
+}
+
+/**
+ * One country: its flag parts beneath and the interactive land. Its props are plain values (and the stable
+ * handlers), so an unchanged country skips rendering through camera moves, the ticker and hover.
+ */
+const CountryShape = memo(function CountryShape({ id, d, fill, ownerId, flagParts, animation, conquered, followed,
+  selected, reachState, label, role, tabIndex, cursor, stroke, strokeWidth, pathRef, actions }) {
+  return (
+    <g className="country-region" style={{ animation }}>
+      <g className="country-flag-parts" pointerEvents="none">
+        {flagParts?.map((part, i) => <path key={`${part.id}-${i}`} data-flag-country={id}
+          data-flag-component={part.id} d={part.d} fill={part.fill} />)}
+      </g>
+      <path data-country={id} data-owner={ownerId || ''} d={d} fill={fill} ref={pathRef}
+        data-conquered={conquered || undefined} data-followed={followed || undefined}
+        data-selected={selected || undefined} data-reach={reachState}
+        stroke={stroke} strokeWidth={strokeWidth}
+        onClick={actions.click} onMouseEnter={actions.enter} onMouseLeave={actions.leave}
+        aria-label={label} role={role} tabIndex={tabIndex}
+        onFocus={actions.focus} onBlur={actions.blur} onKeyDown={actions.keyDown}
+        style={{ cursor, fill: themedPaint(fill) }} />
+    </g>
+  );
+}, sameCountryShape);
 
 /**
  * Map units → px inside the map, clamped to the overlay inset (PLAN §3.5 anchors). `center` cards are centred on
@@ -139,6 +221,10 @@ export default function WorldMap({
   const { key: compassKey, ...compassProps } = spin || {};
   const revealedDraw = useRef(null);
   const countryRefs = useRef(new Map());
+  const countryRefCallbacks = useRef(new Map());
+  const latest = useRef(null);
+  const actions = useRef(null);
+  actions.current ??= countryActions(latest);
   const zoomInRef = useRef(null);
   const hatchId = `map-hatch-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const [keyboardCountry, setKeyboardCountry] = useState(null);
@@ -161,9 +247,9 @@ export default function WorldMap({
   const hatchSet = new Set(conquestIds || EMPTY);
   const hatched = countries.filter(country => hatchSet.has(country.id));
   const borderIndex = useMemo(() => createMapBorderIndex(labelGeometry || EMPTY), [labelGeometry]);
-  const mesh = borderLayers(borderIndex, playing ? ownership || {} : {});
+  const mesh = useMemo(() => borderLayers(borderIndex, playing ? ownership || {} : {}), [borderIndex, playing, ownership]);
   const meshReady = !!(mesh.coastD || mesh.innerD || mesh.outerD);
-  const outlineOf = id => (id == null ? '' : mesh.ownerPaths.find(path => path.ownerId === String(id))?.d || '');
+  const outlineOf = id => ownerOutline(mesh, id);
   const youOutline = outlineOf(meId), opponentOutline = opponentId === meId ? '' : outlineOf(opponentId);
   const identity = { meId, meFill, opponentId, mapMode };
   const isYou = home => !!home.you || (meId != null && home.id === meId);
@@ -179,6 +265,10 @@ export default function WorldMap({
     setKeyboardCountry(id);
     const path = countryRefs.current.get(id);
     path?.focus();
+    // The model's mainland box: getBBox() spans both sides of the date line for New Zealand, Fiji, Russia or the
+    // United States, and revealing that zoomed all the way out.
+    const box = countries.find(country => country.id === id)?.bbox;
+    if (box) { vp.reveal([{ x: box.x, y: box.y }, { x: box.x + box.w, y: box.y + box.h }]); return; }
     try {
       const bounds = path?.getBBox();
       if (bounds) vp.reveal([{ x: bounds.x, y: bounds.y }, { x: bounds.x + bounds.width, y: bounds.y + bounds.height }]);
@@ -239,7 +329,13 @@ export default function WorldMap({
     if (previous.context !== tipContext && (previous.visible || tip.visible)) onPointerLeave?.();
   });
   const veiled = choosing ? countries.filter(c => !kept.has(c.ownerId)) : EMPTY;
+  const veiledIds = veiled.map(c => c.id).join(' ');
+  // Every veiled shape in one path: rejoined only when the veiled land or the geometry changes, not per hover.
+  const veilD = useMemo(() => veiled.map(c => c.d).join(' '), [veiledIds, labelGeometry]);
   const showWhole = playing && typeof onWholeMap === 'function' && (!!nearFocus || wholeMap);
+  const targetableOf = country => !choosing || inReach.has(country.ownerId);
+  latest.current = { choosing, byId: new Map(countries.map(country => [country.id, country])), targetable: targetableOf,
+    didPan: vp.didPan, onPointerMove, navigateCountry, setKeyboardCountry };
 
   return (
     <section ref={mapRef} className={'world-map' + (playing ? '' : ' world-map--setup')} aria-label="Campaign map" tabIndex={-1}
@@ -276,37 +372,16 @@ export default function WorldMap({
               also drops it over the sea). A window blur has no relatedTarget and keeps the card. */}
           {countries.map(c => {
             const reachState = reachStateOf(c);
-            const targetable = !choosing || reachState === 'in';
-            const conquered = hatchSet.has(c.id);
+            const targetable = targetableOf(c);
             const tabbable = !!c.ownerId && targetable;
-            return (
-              <g key={c.id} className="country-region" style={{ animation: c.animation }}>
-                <g className="country-flag-parts" pointerEvents="none">
-                  {c.flagParts?.map((part, i) => <path key={`${part.id}-${i}`} data-flag-country={c.id}
-                    data-flag-component={part.id} d={part.d} fill={part.fill} />)}
-                </g>
-                <path data-country={c.id} data-owner={c.ownerId || ''} d={c.d} fill={identityFill(c.fill, c.ownerId, identity)}
-                  ref={element => { if (element) countryRefs.current.set(c.id, element); else countryRefs.current.delete(c.id); }}
-                  data-conquered={conquered || undefined} data-followed={(c.ownerId && c.ownerId === followedId) || undefined}
-                  data-selected={c.selected || undefined} data-reach={reachState}
-                  stroke={meshReady ? 'none' : c.stroke} strokeWidth={meshReady ? 0 : (c.strokeWidth || 0) * k}
-                  onClick={() => { if (!vp.didPan() && targetable) c.onClick?.(); }}
-                  onMouseEnter={choosing ? undefined : c.onEnter}
-                  onMouseLeave={c.onLeave}
-                  aria-label={c.ownerName ? `${c.name}, held by ${c.ownerName}.${actionPhrase(reachState)}` : c.name}
-                  role={tabbable ? 'button' : undefined}
-                  tabIndex={tabbable ? c.id === activeCountry ? 0 : -1 : undefined}
-                  onFocus={event => {
-                    setKeyboardCountry(c.id);
-                    if (!choosing) c.onEnter?.();
-                    const bounds = event.currentTarget.getBoundingClientRect();
-                    onPointerMove?.({ clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2, target: event.currentTarget });
-                  }}
-                  onBlur={event => { if (event.relatedTarget) c.onLeave?.(); }}
-                  onKeyDown={event => navigateCountry(event, c)}
-                  style={{ cursor: targetable ? c.cursor : 'default' }} />
-              </g>
-            );
+            return <CountryShape key={c.id} id={c.id} d={c.d} fill={identityFill(c.fill, c.ownerId, identity)} ownerId={c.ownerId}
+              flagParts={c.flagParts} animation={c.animation} conquered={hatchSet.has(c.id)}
+              followed={!!c.ownerId && c.ownerId === followedId} selected={!!c.selected} reachState={reachState}
+              label={c.ownerName ? `${c.name}, held by ${c.ownerName}.${actionPhrase(reachState)}` : c.name}
+              role={tabbable ? 'button' : undefined} tabIndex={tabbable ? c.id === activeCountry ? 0 : -1 : undefined}
+              cursor={targetable ? c.cursor : 'default'}
+              stroke={meshReady ? 'none' : c.stroke} strokeWidth={meshReady ? 0 : (c.strokeWidth || 0) * k}
+              pathRef={countryRef(countryRefs.current, countryRefCallbacks.current, c.id)} actions={actions.current} />;
           })}
         </g>
         {hatched.length > 0 && <g className="conquest-hatch" pointerEvents="none" aria-hidden="true">
@@ -319,8 +394,7 @@ export default function WorldMap({
         </g>
         {/* One veil path (nonzero fill): no per-country copies in the DOM and no anti-aliased seams between them. */}
         {choosing && <g className="reach-veil-layer" pointerEvents="none" aria-hidden="true">
-          {veiled.length > 0 && <path className="reach-veil" data-veil-countries={veiled.map(c => c.id).join(' ')}
-            d={veiled.map(c => c.d).join(' ')} />}
+          {veiled.length > 0 && <path className="reach-veil" data-veil-countries={veiledIds} d={veilD} />}
         </g>}
         <g className="country-outlines" pointerEvents="none" fill="none" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
           {/* DEC D21 dash 5 3 at 2px: butt caps, or round caps would grow each dash by 2px and close the 3px gaps.
@@ -342,7 +416,7 @@ export default function WorldMap({
             : <rect key={home.id} data-capital={home.id} x={home.x - 1.9 * k} y={home.y - 1.9 * k} width={3.8 * k} height={3.8 * k}
               fill={PAINT.capital} stroke={PAINT.white} strokeWidth={.8 * k} />)}
         </g>
-        <g aria-hidden="true" pointerEvents="none">
+        <g className="map-ocean-labels" aria-hidden="true" pointerEvents="none">
           {oceanLabels.map(lb => <text key={lb.text} x={lb.x} y={lb.y} textAnchor="middle" fill={PAINT.coast}
             style={{ fontFamily: MAP_FONT, fontSize: 12 * k, fontWeight: 600, letterSpacing: .14 * 12 * k, textTransform: 'uppercase' }}>{lb.text}</text>)}
         </g>

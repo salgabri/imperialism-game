@@ -1,63 +1,75 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import TeamMark from './TeamMark.jsx';
-import { PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS } from './SetupOverlay.jsx';
+import { SHOW_MATCH_BUSY, SHOW_MATCH_HELP, campaignFacts, showMatchOptions, showMatchesOf, showMatchesWrites } from '../screens/setup/setupModel.js';
 import SaveControls from './SaveControls.jsx';
 import { roman } from '../viewModels/format.js';
+import ThemeToggle from './ThemeToggle.jsx';
 import './masthead.css';
 
 const VIEWS = [['map', 'Map'], ['squad', 'Squad'], ['match', 'Match'], ['ledger', 'Ledger'], ['chronicle', 'Chronicle']];
-const SETTINGS_KEYS = ['pacing', 'resolution', 'confirmNew', 'onPacing', 'onResolution', 'onNew', 'busy', 'completed', 'saveStatus',
-  'onExport', 'onImport', 'onResults', 'onCancelNew', 'seed', 'settings', 'onSetting', 'onManageSaves', 'managementEnded'];
+const SETTINGS_KEYS = ['confirmNew', 'onNew', 'busy', 'completed', 'saveStatus', 'onExport', 'onImport', 'onResults', 'onCancelNew',
+  'seed', 'settings', 'onSetting', 'onManageSaves', 'managementEnded', 'managedName'];
+
+function PanelKicker({ id, title, aside }) {
+  return (
+    <h3 className="kicker settings-panel__kicker">
+      <span className="kicker__title" id={id}>{title}</span>
+      {aside ? <span className="kicker__aside">{aside}</span> : null}
+    </h3>
+  );
+}
 
 /**
  * Campaign settings: the masthead popover body and the phone More sheet (A-10). `idPrefix` is prefixed onto
- * every control id so both can be mounted at once. Draw rules are read-only after launch.
+ * every control id so both can be mounted at once. Show matches is the one live control (`resolution` / `express`
+ * through `onSetting`); the launch rules are read-only facts, each with its stored value in `data-value`.
  */
 export function SettingsPanel({
-  pacing, resolution, confirmNew, onPacing, onResolution, onNew, busy = false, completed = false,
-  saveStatus, onExport, onImport, onResults, onCancelNew, seed,
-  settings, onSetting, onManageSaves, managementEnded = false, idPrefix = '',
+  confirmNew, onNew, busy = false, completed = false, saveStatus, onExport, onImport, onResults, onCancelNew, seed,
+  settings, onSetting, onManageSaves, managementEnded = false, managedName = null, idPrefix = '',
 }) {
   const id = name => `${idPrefix}${name}`;
+  const mode = showMatchesOf(settings);
+  const facts = settings ? campaignFacts(settings, { seed, managementEnded, managedName }) : [];
   return (
     <div className="settings-panel">
-      <label className="control-field" htmlFor={id('campaign-pacing')}><span>Pacing</span>
-        <select id={id('campaign-pacing')} value={pacing} disabled title="Draw rules are fixed at launch" onChange={event => onPacing?.(event.target.value)}>
-          {PACING_OPTIONS.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
-        </select>
-      </label>
-      {PACING_HELP[pacing] && <p className="settings-panel__note">{PACING_HELP[pacing]}</p>}
-      <div className="settings-panel__rules">
-        <label className="control-field" htmlFor={id('campaign-turn-order')}><span>Turn order</span>
-          <select id={id('campaign-turn-order')} value={settings?.turnOrder === 'round-robin' ? 'round-robin' : 'random'} disabled title="Rules are fixed at launch" onChange={() => {}}>
-            <option value="random">Random draw</option><option value="round-robin">Round robin</option>
-          </select>
-        </label>
-        <label className="control-field" htmlFor={id('campaign-targeting')}><span>Target</span>
-          <select id={id('campaign-targeting')} value={settings?.targeting === 'player' ? 'player' : 'compass'} disabled title="Rules are fixed at launch" onChange={() => {}}>
-            <option value="compass">Compass</option><option value="player">You choose</option>
-          </select>
-        </label>
-      </div>
-      <label className="control-field" htmlFor={id('campaign-resolution')}><span>Match display</span>
-        <select id={id('campaign-resolution')} value={resolution} disabled={busy || completed} onChange={event => onResolution?.(event.target.value)}>
-          {RESOLUTION_OPTIONS.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
-        </select>
-      </label>
-      {busy && <p className="settings-panel__note">Match settings are available after this match.</p>}
-      {onSetting && <>
-        <label className="control-checkbox"><input type="checkbox" id={id('campaign-express')} checked={!!settings?.express} disabled={completed} onChange={event => onSetting('express', event.target.checked)} /><span>Express playback<small>Shorter waits from the next match.</small></span></label>
-        <label className="control-field" htmlFor={id('campaign-uncertainty')}><span>Match uncertainty</span><select id={id('campaign-uncertainty')} value={settings?.uncertainty || 'balanced'} disabled onChange={() => {}}><option value="predictable">Predictable</option><option value="balanced">Balanced</option><option value="wild">Wild</option></select></label>
-        <label className="control-field" htmlFor={id('campaign-finale')}><span>Final two teams</span><select id={id('campaign-finale')} value={settings?.finale || 'single'} disabled onChange={() => {}}><option value="single">Single match</option><option value="best-of-three">Best of three</option></select></label>
-        <label className="control-field" htmlFor={id('campaign-role')}><span>Your role at launch</span><select id={id('campaign-role')} value={settings?.role || 'spectator'} disabled onChange={() => {}}><option value="spectator">Spectator</option><option value="manager">Manager</option></select><small className="control-help">{managementEnded ? 'Your managed team was eliminated. You are watching as a spectator.' : 'Campaign rules and your managed team are fixed at launch.'}</small></label>
-        <p className="settings-panel__note">Recruitment: {settings?.acquisitionPolicy === 'best-fit' ? 'Best lineup fit' : 'Highest rated'}{settings?.sport === 'basketball' ? ` · ${settings.rosterPreset === 'competitive' ? 'Competitive' : 'Authentic'} ratings` : ''}</p>
-      </>}
-      {seed != null && <p className="settings-panel__note settings-panel__seed">Seed <strong>{seed}</strong></p>}
       {completed && onResults && <button type="button" className="button settings-panel__results" onClick={onResults}>Campaign results</button>}
-      <SaveControls status={saveStatus} onExport={onExport} onImport={onImport} onManageSaves={onManageSaves} compact />
+      <section className="settings-panel__section" aria-labelledby={id('settings-matches-title')}>
+        <PanelKicker id={id('settings-matches-title')} title="Show matches" aside="Change any time" />
+        <div className="control-field">
+          <select id={id('campaign-resolution')} aria-labelledby={id('settings-matches-title')} aria-describedby={id('campaign-resolution-help')}
+            value={mode} disabled={completed || !onSetting}
+            onChange={event => { for (const [key, value] of showMatchesWrites(event.target.value, settings)) onSetting?.(key, value); }}>
+            {showMatchOptions(settings, { busy }).map(option => (
+              <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>
+            ))}
+          </select>
+          <small className="control-help" id={id('campaign-resolution-help')}>{busy && !completed ? SHOW_MATCH_BUSY : SHOW_MATCH_HELP[mode]}</small>
+        </div>
+      </section>
+      {facts.length > 0 && (
+        <section className="settings-panel__section" aria-labelledby={id('settings-campaign-title')}>
+          <PanelKicker id={id('settings-campaign-title')} title="This campaign" aside="Set at launch" />
+          <dl className="settings-panel__facts">
+            {facts.map(row => (
+              <div key={row.id}>
+                <dt>{row.label}</dt>
+                <dd id={id(`campaign-${row.id}`)} data-value={row.stored} className={row.num ? 'num' : undefined}>
+                  {row.inner ? <span id={id(`campaign-${row.inner.id}`)} data-value={row.inner.stored}>{row.value}</span> : row.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className="settings-panel__note">Start a new campaign to change these.</p>
+        </section>
+      )}
+      <section className="settings-panel__section" aria-labelledby={id('settings-saves-title')}>
+        <PanelKicker id={id('settings-saves-title')} title="Saves" />
+        <SaveControls status={saveStatus} onExport={onExport} onImport={onImport} onManageSaves={onManageSaves} compact />
+      </section>
       <div className="settings-panel__new">
-        {confirmNew && <p role="alert">Choose a new campaign? This run remains available in Saved campaigns.</p>}
+        {confirmNew && <p role="alert">Start a new campaign? This one stays in Saved campaigns.</p>}
         <button type="button" className="button" onClick={onNew}>{confirmNew ? 'Confirm new campaign' : 'New campaign'}</button>
         {confirmNew && <button type="button" className="button" onClick={onCancelNew}>Cancel</button>}
       </div>
@@ -66,7 +78,7 @@ export function SettingsPanel({
 }
 
 /**
- * v4 masthead (RM Part 2; DEC D11–D14). Row 1: wordmark · dateline · screen nav · primary (Space) · settings.
+ * v4 masthead (RM Part 2; DEC D11–D14). Row 1: wordmark · dateline · screen nav · primary (Space) · settings · theme.
  * Row 2: managed/followed team · stats · playback. Sizes switch in CSS only. The primary's textContent is
  * exactly `primary.mastLabel || primary.label`; the SPACE chip is CSS (`data-key-hint`), never a text node.
  * Must stay a plain function named CommandBar, rendered as a direct child of App's root (tests read its props).
@@ -146,6 +158,7 @@ export default function CommandBar(props) {
             </div>
           </div>
         </>}
+        <ThemeToggle className="mast__theme" />
       </div>
       {show && masthead && (
         <div className="mast__row2">

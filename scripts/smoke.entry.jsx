@@ -852,21 +852,26 @@ async function launch(mounted, { sport = 'football', layer = 'nations', scope = 
   const domesticId = layer === 'clubs' ? domesticScopeId(clubScope) : null;
   const domesticSetup = domesticId ? await chooseDomestic(mounted.app, domesticId, { setupChecks }) : null;
   if (!domesticId) await select('setup-theatre', layer === 'clubs' ? clubScope : scope);
-  document.querySelector('.setup-advanced').open = true;
   await select('setup-pacing', pacing);
   await select('setup-resolution', resolution);
-  if (turnOrder || targeting) {
-    // Rules of war through the real matrix cell (both settings at once); it is enabled only for duel pacing (DEC D2).
-    const cell = document.querySelector(`.rule-matrix__cell[data-turn-order="${turnOrder || 'random'}"][data-targeting="${targeting || 'compass'}"]`);
-    if (!cell || cell.disabled) throw new Error(`rules of war cell unavailable: ${turnOrder} × ${targeting}`);
-    if (cell.getAttribute('aria-checked') !== 'true') cell.click();
-    await until('rules of war chosen', () => mounted.app.state.setup.turnOrder === (turnOrder || 'random')
-      && mounted.app.state.setup.targeting === (targeting || 'compass'));
-  }
   if (role === 'manager') {
     document.querySelector('button[role="radio"][aria-labelledby="setup-role-manager-title"]').click();
     await until('manager role chosen', () => mounted.app.state.setup.role === 'manager');
     await select('setup-managed-team', team);
+  }
+  if (turnOrder || targeting) {
+    // Rules of war through the real cards: the draw on step 2, then the manager's opponent choice on step 3 (offered
+    // only to a manager under a one-match draw, DEC D2).
+    const radio = id => document.getElementById(id)?.closest('[role="radio"]');
+    const draw = radio(`rule-draw-${turnOrder || 'random'}-title`);
+    if (!draw || draw.disabled) throw new Error(`draw card unavailable: ${turnOrder}`);
+    if (draw.getAttribute('aria-checked') !== 'true') draw.click();
+    await until('draw chosen', () => mounted.app.state.setup.pacing === 'duel'
+      && mounted.app.state.setup.turnOrder === (turnOrder || 'random'));
+    const target = radio(`rule-target-${targeting || 'compass'}-title`);
+    if (!target) throw new Error(`opponent card unavailable: ${targeting}`);
+    if (target.getAttribute('aria-checked') !== 'true') target.click();
+    await until('opponent choice made', () => mounted.app.state.setup.targeting === (targeting || 'compass'));
   }
   // Intercept only startCampaign's RNG assignment to seed generated roster
   // gaps too. The one-shot setter immediately becomes a normal writable field;

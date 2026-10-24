@@ -132,6 +132,8 @@ export function displayRound(st) {
   const busy = (st.match && !st.match.applied) || !!st.spin || !!st.pendingTarget || !!st.tacticalChoice || !!st.choice
     || (Array.isArray(st.queue) && st.queue.length > 0);
   if (busy) return round;
+  // Every best-of-three finale game opens a round of its own (App.nextAction), whatever the round-robin queue holds.
+  if (st.series && Array.isArray(st.aliveIds) && st.aliveIds.length === 2) return round + 1;
   if (st.settings?.turnOrder === 'round-robin') {
     const queue = Array.isArray(st.turnQueue) ? st.turnQueue : [];
     const index = Math.max(0, Number(st.turnIndex) || 0);

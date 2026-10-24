@@ -2,7 +2,7 @@
 // The fallen list never uses .fi-standings classes (smoke reads exactly one standings table).
 import React from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
-import { empireFill } from '../../theme.js';
+import { empireFill, themedPaint } from '../../theme.js';
 
 export function MapShare({ share }) {
   const rows = share?.rows || [];
@@ -17,14 +17,14 @@ export function MapShare({ share }) {
       <div className="ledger-share__bar" aria-hidden="true">
         {rows.map(row => (
           <i key={row.key} className={row.you ? 'is-you' : undefined}
-            style={{ width: `${row.width}%`, background: row.fill || empireFill(row.teamId) }} />
+            style={{ width: `${row.width}%`, background: themedPaint(row.fill || empireFill(row.teamId)) }} />
         ))}
         {others && <i className="is-others" style={{ width: `${others.width}%` }} />}
       </div>
       <ol className="ledger-share__list">
         {rows.map(row => (
           <li key={row.key} className={row.you ? 'is-you' : undefined}>
-            <i className="ledger-share__swatch" aria-hidden="true" style={{ background: row.fill || empireFill(row.teamId) }} />
+            <i className="ledger-share__swatch" aria-hidden="true" style={{ background: themedPaint(row.fill || empireFill(row.teamId)) }} />
             <span className="ledger-share__name">{row.name}</span>
             <span className="ledger-share__count">{row.territories}</span>
             <b className="ledger-share__pct">{row.pct}</b>

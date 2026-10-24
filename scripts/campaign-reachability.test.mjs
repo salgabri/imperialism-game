@@ -3,8 +3,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { WorldGeometry } from '../src/engine/geo.js';
-import { NATIONS, SCOPES, buildTeam, buildClub, makeRng } from '../src/data/teams.js';
+import { WorldGeometry, drawnPaths, mergeSharedIds } from '../src/engine/geo.js';
+import { EXCLUDED_SHAPES, NATIONS, SCOPES, buildTeam, buildClub, makeRng } from '../src/data/teams.js';
 import { CAPITALS } from '../src/data/capitals.js';
 import { SPORT_LIST } from '../src/sports/index.js';
 import { CLUB_SCOPES } from '../src/data/scopes.js';
@@ -16,7 +16,8 @@ import { advanceSeries } from '../src/engine/campaignExperience.js';
 const load = file => JSON.parse(readFileSync(new URL(`../public/${file}`, import.meta.url), 'utf8'));
 const world = new WorldGeometry(load('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS));
 const { s, tx, ty } = world.fit;
-const routingPaths = new WorldGeometry(load('countries-50m.json'), CAPITALS).buildPaths(s, tx, ty);
+// What App.board() routes over: the merged 50m shapes of the countries the map draws.
+const routingPaths = drawnPaths(new WorldGeometry(mergeSharedIds(load('countries-50m.json')), CAPITALS).buildPaths(s, tx, ty), world.countries);
 const routeIndex = createAttackRouteIndex(routingPaths);
 const baseBoard = { geo: world, routingPaths, routeIndex };
 
@@ -129,4 +130,21 @@ test('best-of-three tracks a split series immutably until the second win', () =>
   assert.equal(third.complete, true);
   assert.deepEqual(third.series.wins, { A: 1, B: 2 });
   assert.deepEqual(first.series.wins, { A: 1, B: 0 }, 'recording another game is immutable');
+});
+
+test('club seeding never deals a never-owned shape and gives every homeland to its own best club', () => {
+  for (const sport of SPORT_LIST) {
+    for (const scope of CLUB_SCOPES(sport)) {
+      const clubs = sport.clubs.filter(scope.filter).map(club => buildClub(club, sport));
+      const own = seedClubs(world, clubs);
+      const dealt = Object.keys(own).filter(id => EXCLUDED_SHAPES.has(id));
+      assert.deepEqual(dealt, [], `${sport.id} ${scope.id}: Western Sahara, Antarctica and the like stay neutral`);
+      for (const home of new Set(clubs.map(club => club.home))) {
+        const best = clubs.filter(club => club.home === home).sort((a, b) => b.str - a.str)[0];
+        // e.g. Barcelona fanning out from Spain used to take Portugal from Sporting CP.
+        assert.equal(own[home], best.id, `${sport.id} ${scope.id}: ${best.name} holds its homeland`);
+      }
+      assert.equal(new Set(Object.values(own)).size, clubs.length, `${sport.id} ${scope.id}: every club is dealt land`);
+    }
+  }
 });

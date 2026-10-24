@@ -318,6 +318,8 @@ test('save quota failure reaches the header and leaves exportable campaign state
     f.app.persist();
     const goodSave = f.storage.getItem(SAVE_KEY);
     f.storage.failWrites = true;
+    // A save with nothing new to write does not touch storage, so give it a change to save.
+    f.app.setState({ round: f.app.state.round + 1 });
     f.app.persist();
     assert.equal(f.app.state.saveStatus.ok, false);
     assert.match(f.app.state.saveStatus.message, /could not be saved.*Export/i);

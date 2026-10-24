@@ -2,6 +2,7 @@
 // DEC D21, A-11, RM §1.11. Rendered as WorldMap children; both panels are `pointer-events: none` so panning and
 // hovering the map keep working underneath. Renders nothing when both models are null (conquest view).
 import React from 'react';
+import { themedPaint } from '../../theme.js';
 import './campaign.css';
 
 function TitleCard({ variant = 'campaign', kicker = '', title = '', phoneTitle = null, meta = null, sub = null, wholeMap = false }) {
@@ -39,7 +40,7 @@ function KeyGlyph({ item }) {
   }
   if (item.kind === 'veil') return <i className="map-key__glyph map-key__swatch map-key__veil" aria-hidden="true" />;
   const style = {};
-  if (item.color) style.background = item.color;
+  if (item.color) style.background = themedPaint(item.color);
   if (item.ring) style.boxShadow = `0 0 0 ${item.ring.width}px ${item.ring.color}`;
   return <i className={`map-key__glyph map-key__swatch${item.color ? '' : ' map-key__swatch--outline'}`} style={style} aria-hidden="true" />;
 }

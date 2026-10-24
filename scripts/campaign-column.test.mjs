@@ -533,6 +533,11 @@ test('title card meta mid-round: round robin turns and blitz batches already cha
   assert.equal(metaOf({ ...batch, queue: [], match: null }), 'Map after Round V · seed 2026');
   // Random-draw duels keep the per-round formula.
   assert.equal(metaOf({ round: 5, history: [rec(4, 0), rec(5, 0)] }), 'Map after Round V · seed 2026');
+  // The champion's last match closes the campaign's last round, however few of its matches were played.
+  const won = { aliveIds: ['380'], own: Object.fromEntries(Object.keys(OWN).map(id => [id, '380'])) };
+  assert.equal(metaOf({ ...rrIdle, ...won, turnIndex: 1, history: [...rrIdle.history, rec(4, 0)], round: 4 }), 'Map after Round IV · seed 2026');
+  assert.equal(metaOf({ ...batch, ...won, queue: [], match: null, round: 6, history: [...batch.history, rec(6, 0)] }),
+    'Map after Round VI · seed 2026');
   assert.equal(metaOf({ round: 6, history: [rec(4, 0), rec(5, 0)], spin: spinOf('spinning') }), 'Map after Round V · seed 2026');
 });
 
@@ -603,6 +608,14 @@ test('map key follows the map mode (A-11) and the reach key replaces it while ch
   assert.equal(steps.length, 5);
   assert.deepEqual(strength.items.slice(0, 5).map(item => [item.label, item.color]), steps.map(step => [`${step.min.toFixed(1)}+`, step.color]));
   assert.equal(strength.items[5].label, 'Your empire');
+  // Two empires: five steps share two floors, and the map paints only the first step of each — the key lists two.
+  const duo = state({ mapMode: 'strength', aliveIds: ['380', '688'], own: { 380: '380', 688: '688' } });
+  const duoSteps = strengthSteps(duo, context(duo));
+  const duoKey = buildMapOverlays(duo, context(duo)).mapKey.items.filter(item => item.key.startsWith('step-'));
+  assert.equal(new Set(duoSteps.map(step => step.min)).size, 2);
+  assert.deepEqual(duoKey.map(item => item.label), [...new Set(duoSteps.map(step => `${step.min.toFixed(1)}+`))]);
+  assert.deepEqual(duoKey.map(item => item.color), duoSteps.filter((step, i) => duoSteps.findIndex(other => other.min === step.min) === i)
+    .map(step => step.color), 'each swatch is the colour the map paints at that floor');
 
   const fronts = keyOf({ mapMode: 'fronts' });
   assert.deepEqual(fronts.items.map(item => item.label), ['Your empire', 'Win ≥60%', '45–59%', '<45%']);

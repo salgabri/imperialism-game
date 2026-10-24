@@ -326,7 +326,10 @@ async function savedCampaign(App, storage, setup) {
       callback?.call(this);
     }
     persist() {
+      const before = this.state.saveStatus;
       super.persist();
+      // Nothing changed since the last checkpoint (a settlement saves from both its update and its callback): no write.
+      if (this.state.saveStatus === before) return;
       const status = this.state.saveStatus || {};
       saves.push({ matches: this.state.matches, ok: status.ok, conflict: status.conflict, revision: status.revision,
         message: status.message, size: storage.items.get(SAVE_KEY)?.length ?? 0, used: storage.used(),
@@ -381,7 +384,7 @@ for (const name of Object.keys(RUNS)) {
     const st = app.state;
     assert.equal(st.aliveIds.length, 1, 'the campaign reaches a champion');
     assert.equal(st.history.length, Object.keys(st.teams).length - 1);
-    assert.ok(saves.length > 3 * st.matches, `${saves.length} autosaves over ${st.matches} matches`);
+    assert.ok(saves.length >= 2 * st.matches, `${saves.length} autosaves over ${st.matches} matches`);
     saves.forEach((save, i) => {
       const at = `autosave ${i + 1} (match ${save.matches}, ${save.size} code units)`;
       assert.equal(save.ok, true, at);
