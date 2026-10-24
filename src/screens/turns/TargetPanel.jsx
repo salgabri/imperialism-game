@@ -32,6 +32,8 @@ export default function TargetPanel({ count = '', rows = [], selectedId = null, 
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.key === 'Enter') {
       event.preventDefault();
+      // A held key auto-repeats onto the row the first press just selected: only a fresh press may attack.
+      if (event.repeat) return;
       if (rows[position] === selected) onConfirm?.();
       else if (rows[position]) onSelect?.(rows[position].teamId);
       return;

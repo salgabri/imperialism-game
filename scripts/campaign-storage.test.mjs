@@ -53,6 +53,9 @@ test('strict import rejects invalid state before it can replace the existing che
     [s => { s.tacticalChoice = { aId: '250', dId: 'missing' }; }, /tactical decision/],
     [s => { s.series = { teamIds: ['250', '276'], wins: { 250: 2, 276: 0 }, games: 1 }; }, /series/],
     [s => { s.phase = 'victory'; }, /one champion/],
+    // Both used to pass and then crash: lineup selection and PlayerRow call positions.includes, resume reads shown[i].m.
+    [s => { s.teams['250'].squad[0].positions = 'ST'; }, /territory data are incomplete/],
+    [s => { s.match = { ...match(), shown: [null] }; }, /match is incomplete/],
   ];
   for (const [mutate, expected] of variants) {
     const invalid = structuredClone(state); mutate(invalid);
@@ -587,3 +590,26 @@ test('a country checkpoint packs its FM players first; a bundled roster player i
   assert.equal(inlineSources(text), 0);
   assert.deepEqual(plain(loadSave().teams), plain(campaignSnapshot(state).teams));
 }));
+
+test('a damaged campaign index is rebuilt from the slots: saves go on and every campaign stays listed', () => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'localStorage'), items = new Map();
+  // A real Storage enumerates its keys; the index rebuild needs that.
+  const storage = { getItem: key => items.get(key) ?? null, setItem: (key, value) => items.set(key, String(value)),
+    removeItem: key => items.delete(key), key: i => [...items.keys()][i] ?? null, get length() { return items.size; } };
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
+  try {
+    const first = checkpoint(), second = { ...checkpoint(), campaignId: createCampaignId(), campaignName: 'Second' };
+    assert.equal(writeSave(first).ok, true);
+    assert.equal(writeSave(second).ok, true);
+    for (const damage of ['{not json', '{"a":1}']) {
+      storage.setItem(`${SAVE_KEY}:campaigns`, damage);
+      assert.deepEqual(listCampaigns().map(item => item.name).sort(), ['France campaign', 'Second']);
+      const again = writeSave({ ...second, revision: loadCampaign(second.campaignId).revision });
+      assert.equal(again.ok, true, `autosave works over a damaged index: ${again.message}`);
+      assert.deepEqual(JSON.parse(storage.getItem(`${SAVE_KEY}:campaigns`)).map(item => item.id).sort(),
+        [first.campaignId, second.campaignId].sort(), 'the save writes a repaired index');
+    }
+  } finally {
+    if (prior) Object.defineProperty(globalThis, 'localStorage', prior); else delete globalThis.localStorage;
+  }
+});

@@ -179,6 +179,10 @@ export default function WorldMap({
     setKeyboardCountry(id);
     const path = countryRefs.current.get(id);
     path?.focus();
+    // The model's mainland box: getBBox() spans both sides of the date line for New Zealand, Fiji, Russia or the
+    // United States, and revealing that zoomed all the way out.
+    const box = countries.find(country => country.id === id)?.bbox;
+    if (box) { vp.reveal([{ x: box.x, y: box.y }, { x: box.x + box.w, y: box.y + box.h }]); return; }
     try {
       const bounds = path?.getBBox();
       if (bounds) vp.reveal([{ x: bounds.x, y: bounds.y }, { x: bounds.x + bounds.width, y: bounds.y + bounds.height }]);

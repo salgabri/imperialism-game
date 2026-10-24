@@ -4,7 +4,7 @@ import { C } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
-import { WorldGeometry, projPt } from './engine/geo.js';
+import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel } from './data/domesticScope.js';
@@ -68,31 +68,6 @@ function contentChanged(a, b) {
   if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return true;
   const keys = Object.keys(a);
   return keys.length !== Object.keys(b).length || keys.some(key => !Object.prototype.hasOwnProperty.call(b, key) || a[key] !== b[key]);
-}
-
-/**
- * The 50m atlas gives Australia and the Ashmore and Cartier Islands the same id,
- * and id-keyed paths keep only the islet. Country backdrops (and the land they
- * route around) merge such shapes; the world map keeps the atlas untouched.
- */
-function mergeSharedIds(atlas) {
-  const objects = atlas?.objects || {};
-  const name = objects.countries?.type === 'GeometryCollection' ? 'countries'
-    : Object.keys(objects).find(key => objects[key]?.type === 'GeometryCollection');
-  if (!name) return atlas;
-  const merged = new Map(), geometries = [];
-  for (const g of objects[name].geometries || []) {
-    const id = g?.id == null || String(g.id) === '-99' ? null : String(g.id);
-    const polygons = g?.type === 'Polygon' ? [g.arcs] : g?.type === 'MultiPolygon' ? g.arcs : null;
-    const first = id && polygons ? merged.get(id) : null;
-    if (first) first.arcs.push(...polygons);
-    else {
-      const copy = id && polygons ? { ...g, type: 'MultiPolygon', arcs: [...polygons] } : g;
-      if (id && polygons) merged.set(id, copy);
-      geometries.push(copy);
-    }
-  }
-  return { ...atlas, objects: { ...objects, [name]: { ...objects[name], geometries } } };
 }
 
 /** Screens the masthead nav and the phone tab bar can choose (DEC D11). */
@@ -171,6 +146,9 @@ export default class App extends React.Component {
   handleFocus = () => { this.away = false; this.updateEngagement(); };
   handleBlur = () => { this.away = true; this.updateEngagement(); };
   handleStorage = event => {
+    // Only an open campaign can conflict. In setup the outgoing campaign's id lingers, and another tab resuming it
+    // trapped the setup screen in a conflict dialog it could not close; resuming the stale copy still checks.
+    if (this.state.phase !== 'playing' && this.state.phase !== 'victory') return;
     if (!isCampaignStorageEvent(event, this.state.campaignId)) return;
     const remote = detectSaveConflict(this.state);
     if (remote) this.openStorageDialog('conflict', { campaign: remote, message: 'This campaign advanced in another tab. Reload its checkpoint or keep your branch in a new slot.' });
@@ -310,9 +288,9 @@ export default class App extends React.Component {
       this.geo = new WorldGeometry(await res.json(), CAPITALS);
       // Display-only detail keeps targeting, club seeding and existing saves
       // on the original topology. A missing visual atlas falls back gracefully.
-      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS) : null;
       // The atlas also draws a country map's neighbours in that map's projection.
       this.atlas = atlas ? mergeSharedIds(atlas) : null;
+      this.displayGeo = this.atlas ? new WorldGeometry(this.atlas, CAPITALS) : null;
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
       const inspection = inspectSave();
@@ -342,8 +320,8 @@ export default class App extends React.Component {
    * shared borders; the world board is unchanged.
    */
   board(state = this.state) {
-    const board = { geo: this.geo, routingPaths: this.displayGeo?.paths || this.geo.paths,
-      own: state.own, aliveIds: state.aliveIds };
+    const routingPaths = this.displayGeo ? drawnPaths(this.displayGeo.paths, this.geo.countries) : this.geo.paths;
+    const board = { geo: this.geo, routingPaths, own: state.own, aliveIds: state.aliveIds };
     const domestic = this.domesticMap();
     return domestic ? { ...board, obstacles: this.surroundings(domestic).obstacles, borderRoutes: true } : board;
   }
@@ -532,6 +510,13 @@ export default class App extends React.Component {
       return plainScopeName((scopes.find(x => x.id === settings.clubScope) || scopes[0]).name);
     }
     return plainScopeName(SCOPES.find(x => x.id === settings?.scope)?.name || 'World War');
+  }
+
+  /** Quick-resume progress: "12 nations remaining", or "Campaign complete" once one team holds the map. */
+  savedProgress(meta) {
+    const alive = Number(meta?.alive) || 0;
+    if (alive <= 1) return 'Campaign complete';
+    return `${alive} ${meta.settings?.layer === 'clubs' ? 'clubs' : 'nations'} remaining`;
   }
 
   // ---------- campaign lifecycle ----------
@@ -1016,6 +1001,11 @@ export default class App extends React.Component {
       this.setState({ confirmNew: true });
       return;
     }
+    this.openSetup();
+  }
+
+  /** Back to setup with a fresh opening seed (a blank seed field means a new draw), from the masthead or the results. */
+  openSetup() {
     this.clearTimers();
     this.cancelRestore();
     this.flowToken++;
@@ -1280,7 +1270,8 @@ export default class App extends React.Component {
   fastForward() {
     this.engagement.count('skips');
     this.clearTimers();
-    this.setState({ paused: false });
+    // clearTimers() also dropped the tasks that would clear the kickoff popup and the last goal toast.
+    this.setState({ paused: false, pu: null, toast: null });
     this.revealAll();
   }
 
@@ -1355,7 +1346,9 @@ export default class App extends React.Component {
 
   followTeam(id) {
     if (id && !this.state.teams[id]) return;
-    this.setState({ managedTeamId: this.managedId(), followedId: id || null, selected: id || this.state.selected }, () => this.persist());
+    // managedId() is null once management ends; the eliminated team stays on record ("Your managed team", the save).
+    const managedTeamId = this.state.managementEnded ? this.state.managedTeamId : this.managedId();
+    this.setState({ managedTeamId, followedId: id || null, selected: id || this.state.selected }, () => this.persist());
   }
 
   viewConquest(...args) { return mapM.viewConquest.apply(this, args); }
@@ -1733,7 +1726,7 @@ export default class App extends React.Component {
               onFollow={id => this.followTeam(id)} onPauseFollow={value => this.setPauseFollow(value)}
               onToggleAutoplay={() => this.togglePlay()} onSpeed={n => this.setSpeed(n)} /> : null}
             onPreview={() => this.openMatchPreview()} onSimulate={() => this.simulateResult()}
-            onToggleSheet={() => this.togglePhoneSheet()} onOpenChronicle={() => this.setView('chronicle')}
+            onToggleSheet={() => this.togglePhoneSheet()} onOpenChronicle={st.choice || st.pendingTarget ? undefined : () => this.setView('chronicle')}
             onSelectTeam={id => this.selectTeam(id)} />}
           {playing && view === 'conquest' && <ConquestScreen {...this.conquestModel()}
             onSelect={index => this.selectAcquisition(index)}
@@ -1764,8 +1757,7 @@ export default class App extends React.Component {
         {st.phase === 'setup' && <SetupOverlay
           setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()} domestic={this.domesticStatus()}
           theatreMap={this.setupMapPreview()}
-          savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + st.savedMeta.alive + ' ' +
-            (st.savedMeta.settings?.layer === 'clubs' ? 'clubs' : 'nations') + ' remaining · ' + this.scopeName(st.savedMeta.settings) : ''}
+          savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + this.savedProgress(st.savedMeta) + ' · ' + this.scopeName(st.savedMeta.settings) : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
           onPick={(key, value) => this.pickSetup(key, value)}
           onStart={() => this.launchCampaign()} launching={st.launching} restoring={!!st.restoring}
@@ -1774,11 +1766,9 @@ export default class App extends React.Component {
           onCancel={st.hasSave ? () => this.resume() : undefined}
         />}
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
-          onClose={() => this.setState({ phase: 'playing' })}
-          onNew={() => {
-            this.clearTimers(); this.cancelRestore(); this.showSetupMap(st.setup, true);
-            this.setState({ phase: 'setup', match: null, queue: [], pu: null, toast: null, autoplay: false });
-          }}
+          // "View map" (and close): the final's automatic switch to the Match view is otherwise never undone.
+          onClose={() => this.setState({ phase: 'playing', view: 'map', viewSource: 'user' })}
+          onNew={() => this.openSetup()}
         />}
         {st.tacticalChoice && st.tacticalPreview && !st.storageDialog && !st.exportText && <TacticalChoice choice={st.tacticalChoice}
           preview={this.matchPreviewModel()} onSimulate={() => this.simulateResult()}
@@ -1800,14 +1790,19 @@ export default class App extends React.Component {
             catch (error) { this.setState({ storageDialog: { ...st.storageDialog, error: error.message } }); }
           }}
           onRename={(id, name) => {
-            const result = renameCampaign(id, name);
-            if (result.ok && id === st.campaignId) {
+            let result;
+            // A slot deleted in another tab while the dialog was open cannot be renamed: say so rather than throw.
+            try { result = renameCampaign(id, name); } catch (error) { result = { ok: false, message: error.message }; }
+            // The quick-resume copy (no campaign open yet after a reload) takes the new revision too, or resuming
+            // it reads as a change made in another tab.
+            if (result.ok && this.saved?.campaignId === id) {
               this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
-              this.setState({ revision: result.revision, campaignName: result.campaignName });
             }
+            if (result.ok && id === st.campaignId) this.setState({ revision: result.revision, campaignName: result.campaignName });
             this.setState({ storageDialog: { ...st.storageDialog, error: result.ok ? null : result.message, notice: null } });
           }}
-          onFork={Object.keys(st.teams).length || this.saved ? name => this.continueSaved(st.phase === 'setup' ? this.saved
+          // In setup the fork copies the quick-resume save; the outgoing campaign's teams may outlive a cleared one.
+          onFork={(st.phase === 'setup' ? this.saved : Object.keys(st.teams).length) ? name => this.continueSaved(st.phase === 'setup' ? this.saved
             : { ...st, rngState: this.rng.getState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
           onReload={() => this.continueSaved(st.storageDialog.campaign)}
           onRestoreBackup={() => this.continueSaved(st.storageDialog.backup, true, `${st.storageDialog.backup.campaignName || 'Campaign'} recovered`)}

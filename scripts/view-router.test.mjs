@@ -948,7 +948,7 @@ test('a country theatre: wizard preview, kickoff on its sections, section names,
 
     // The champion "has conquered England", not the theatre label.
     app.setState({ phase: 'victory', aliveIds: [a] });
-    assert.match(app.victoryPanel().subtitle, /^has conquered England in \d+ battles$/);
+    assert.match(app.victoryPanel().subtitle, /^has conquered England in (1 battle|\d+ battles)$/);
     app.setState({ phase: 'playing', aliveIds: st.aliveIds.filter(id => id !== b) });
 
     // A save from another build of the map is moved club by club; its interrupted round-robin draw starts again.
@@ -971,5 +971,51 @@ test('phone bar minute: floored at the last revealed event', async () => {
     assert.deepEqual(app.phoneBarModel(), { right: null, rightKind: 'minute', minuteFallback: 37 });
     app.setState({ match: { aId: '250', dId: '276', applied: false, done: false, shown: [] } });
     assert.equal(app.phoneBarModel().minuteFallback, 0);
+  });
+});
+
+test('the quick-resume card counts the teams left in the plural and calls a won save complete', async () => {
+  await withApp({}, ({ app }) => {
+    assert.equal(app.savedProgress({ alive: 12, settings: { layer: 'nations' } }), '12 nations remaining');
+    assert.equal(app.savedProgress({ alive: 2, settings: { layer: 'clubs' } }), '2 clubs remaining');
+    assert.equal(app.savedProgress({ alive: 1, settings: { layer: 'clubs' } }), 'Campaign complete', 'never "1 clubs remaining"');
+  });
+});
+
+test('closing the results ("View map") returns to the map the final\'s automatic Match view replaced', async () => {
+  await withApp({}, ({ app }) => {
+    const champion = app.state.aliveIds[0];
+    app.setState({ view: 'match', viewSource: 'auto', aliveIds: [champion], phase: 'victory', completedAt: 1, matches: 1,
+      own: Object.fromEntries(Object.keys(app.state.own).map(id => [id, champion])) });
+    const overlay = findElement(app.render(), 'VictoryOverlay');
+    assert.match(overlay.props.subtitle, / in 1 battle$/, 'one battle, not "1 battles"');
+    overlay.props.onClose();
+    assert.equal(app.state.phase, 'playing');
+    assert.equal(app.currentView(), 'map');
+  });
+});
+
+test('the column\'s Chronicle link is not offered while a target choice holds the screen', async () => {
+  await withApp(manager, ({ app }) => {
+    assert.equal(typeof findElement(app.render(), 'CampaignColumn').props.onOpenChronicle, 'function');
+    app.setState({ pendingTarget: PENDING });
+    assert.equal(findElement(app.render(), 'CampaignColumn').props.onOpenChronicle, undefined,
+      'setView refuses the Chronicle during the choice: no link that does nothing');
+  });
+});
+
+test('following another team after the managed team falls keeps it on record as the managed team', async () => {
+  await withApp(manager, ({ app }) => {
+    app.startMatch('250', '276');
+    app.chooseTactic('balanced');
+    forceResult(app, '276', { aId: '250', dId: '276' });
+    app.finishMatch();
+    app.continueAsSpectator();
+    assert.equal(app.state.managedTeamId, '250');
+    app.followTeam('826');
+    assert.equal(app.state.followedId, '826');
+    assert.equal(app.state.managedTeamId, '250', 'the Spectator panel and the save still name the eliminated team');
+    assert.equal(app.spectatorPanelModel().managed?.id, '250');
+    app.clearTimers();
   });
 });

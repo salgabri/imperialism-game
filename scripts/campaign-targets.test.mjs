@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { pickTarget } from '../src/engine/campaign.js';
 import { createDuelDraw } from '../src/engine/duelDraw.js';
-import { WorldGeometry } from '../src/engine/geo.js';
+import { WorldGeometry, drawnPaths, mergeSharedIds } from '../src/engine/geo.js';
 import { CAPITALS } from '../src/data/capitals.js';
 import { NATIONS } from '../src/data/teams.js';
 
@@ -204,7 +204,8 @@ function europeBoard() {
     const ids = Object.entries(NATIONS).filter(([, nation]) => nation[2] === 'UEFA').map(([id]) => id);
     const geo = new WorldGeometry(load('world-110m.v1.json'), CAPITALS).fitTo([...ids, '304']);
     const { s, tx, ty } = geo.fit;
-    const routingPaths = new WorldGeometry(load('countries-50m.json'), CAPITALS).buildPaths(s, tx, ty);
+    const routingPaths = drawnPaths(new WorldGeometry(mergeSharedIds(load('countries-50m.json')), CAPITALS).buildPaths(s, tx, ty),
+      geo.countries);
     const own = Object.fromEntries(ids.filter(id => geo.paths[id]).map(id => [id, id]));
     atlasBoard = { geo, routingPaths, own, aliveIds: Object.keys(own) };
   }
@@ -244,4 +245,24 @@ test('real conquered borders use current owners rather than original country nam
     }
   }
   assert.ok(czechChallenges > 0, 'Czech-held Germany remains attackable after conquest');
+});
+
+test('the routed land is the drawn land: undrawn 50m islets never block, and Australia is all of Australia', () => {
+  const board = europeBoard();
+  // Liechtenstein, Malta and the Faroes exist only in the 50m atlas; the 110m map never paints them.
+  for (const id of ['438', '470', '234']) assert.equal(board.routingPaths[id], undefined, `undrawn ${id} is not routing land`);
+  assert.ok(Object.keys(board.routingPaths).every(id => board.geo.paths[id]), 'every routed shape is one the map draws');
+  board.aliveIds = ['756', '040'];
+  board.own = { 756: '756', '040': '040' };
+  const swiss = pickTarget(board, '756', 90);
+  assert.equal(swiss?.tid, '040');
+  assert.ok(!swiss.routeKind && !swiss.transitCountryIds, 'Switzerland reaches Austria directly, with no treaty through hidden Liechtenstein');
+
+  // The 50m atlas files Australia and the Ashmore reef under one id: merged, Australia keeps its continent.
+  const australia = board.routingPaths['036'];
+  assert.ok(australia.bbox.w > 50 && australia.bbox.h > 40, `Australia is drawn as a continent, not a reef: ${JSON.stringify(australia.bbox)}`);
+  for (const attacker of ['360', '554', '598']) {
+    const pair = { ...board, own: { [attacker]: attacker, '036': '036' }, aliveIds: [attacker, '036'] };
+    assert.equal(pickTarget(pair, attacker, 0)?.tid, '036', `${NATIONS[attacker][0]} can attack Australia`);
+  }
 });
