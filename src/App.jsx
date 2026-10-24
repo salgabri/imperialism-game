@@ -87,11 +87,14 @@ function mergeSharedIds(atlas) {
   return { ...atlas, objects: { ...objects, [name]: { ...objects[name], geometries } } };
 }
 
-const homeClubCache = new WeakMap();
-/** Section id -> the club that starts there, for the setup preview and tooltips. */
-function homeClubs(domestic) {
-  if (!homeClubCache.has(domestic)) homeClubCache.set(domestic, Object.fromEntries(domestic.clubs.map(club => [club.homeSection, club])));
-  return homeClubCache.get(domestic);
+const startClubCache = new WeakMap();
+/** Section id -> the club that starts there (every section of its group), for the setup preview and tooltips. */
+function startClubs(domestic) {
+  if (!startClubCache.has(domestic)) {
+    const byId = new Map(domestic.clubs.map(club => [club.id, club]));
+    startClubCache.set(domestic, Object.fromEntries(Object.entries(domestic.startOwners).map(([section, id]) => [section, byId.get(id)])));
+  }
+  return startClubCache.get(domestic);
 }
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
@@ -662,10 +665,11 @@ export default class App extends React.Component {
     let included, own = {}, scopeName;
     const domesticId = domesticIdOf(su);
     if (domesticId) {
-      // Each club starts on its own section. Nobody plays until the map has loaded.
+      // Each club starts on its group of sections (just its home on a 100-club
+      // map). Nobody plays until the map has loaded.
       const loaded = getLoadedDomestic(domesticId);
       included = loaded ? loaded.clubs.map(row => buildClub(row, sport)) : [];
-      for (const team of included) own[team.home] = team.id;
+      if (loaded) own = { ...loaded.startOwners };
       scopeName = domesticLabel(su.clubScope);
     } else if (clubLayer) {
       const scope = CLUB_SCOPES(sport).find(x => x.id === su.clubScope) || CLUB_SCOPES(sport)[0];
@@ -1702,7 +1706,7 @@ export default class App extends React.Component {
     const { flagParts, flagPatterns } = this.mapFlags(playing);
     const domestic = this.domesticMap();
     // The setup preview paints each section in the colour of the club starting there.
-    const preview = domestic && !playing ? homeClubs(domestic) : null;
+    const preview = domestic && !playing ? startClubs(domestic) : null;
     for (const c of this.geo.countries) {
       const p = this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
       if (!p) continue;
@@ -1765,9 +1769,11 @@ export default class App extends React.Component {
     if (domestic) {
       const section = hoverCid && domestic.sectionNames[hoverCid];
       if (!section) return { visible: false, name: '', sub: '' };
-      const holder = playing ? teams[own[hoverCid]] : homeClubs(domestic)[hoverCid];
+      const holder = playing ? teams[own[hoverCid]] : startClubs(domestic)[hoverCid];
+      const name = holder?.name.toUpperCase();
       return { visible: true, name: section.toUpperCase(),
-        sub: holder ? (playing ? 'HELD BY ' : 'HOME OF ') + holder.name.toUpperCase() : playing ? 'UNCLAIMED' : 'AWAITING CAMPAIGN' };
+        sub: !holder ? (playing ? 'UNCLAIMED' : 'AWAITING CAMPAIGN') : playing ? 'HELD BY ' + name
+          : holder.homeSection === hoverCid ? 'HOME OF ' + name : name + ' STARTS HERE' };
     }
     const rec = hoverCid && NATIONS[hoverCid];
     const dep = hoverCid && DEPENDENCIES[hoverCid];
@@ -1799,6 +1805,9 @@ export default class App extends React.Component {
     const { aliveIds, teams } = this.state;
     if (!playing || aliveIds.length <= 1) return null;
     const board = this.board();
+    // Nobody leads while no empire outgrows the largest start: one territory, or a
+    // club's starting group on a country map with fewer than 100 clubs.
+    const start = Math.max(1, ...(this.domesticMap()?.clubs.map(club => club.startSections.length) || []));
     let biggest = null;
     let best = -1;
     for (const tid of aliveIds) {
@@ -1808,7 +1817,7 @@ export default class App extends React.Component {
         biggest = tid;
       }
     }
-    if (!biggest || best <= 1) return null;
+    if (!biggest || best <= start) return null;
     return {
       text: 'Largest empire: ' + teams[biggest].name + ' · ' + best + ' territories',
       color: teams[biggest].col,

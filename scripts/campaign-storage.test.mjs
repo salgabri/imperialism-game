@@ -391,3 +391,46 @@ test('a save from another build of a country map moves club by club, or is refus
   const lost = fitDomesticCampaign(state, { ...same, sectionNames: { '826-001': 'One', '826-002': 'Two' } });
   assert.match(lost.error, /1 of its sections is missing/);
 });
+
+test('a country save moves whole starting groups when a map gives each club several sections', () => {
+  // Three clubs on ten sections: each starts on a run of ids from its home, in rank order.
+  const grouped = (version, groups) => {
+    const ids = Object.values(groups).flat();
+    return { meta: { name: 'England', version }, sectionNames: Object.fromEntries(ids.map(id => [id, `Section ${id}`])),
+      clubs: Object.entries(groups).map(([id, startSections]) => ({ id, homeSection: startSections[0], startSections })) };
+  };
+  const run = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => `826-${String(from + i).padStart(3, '0')}`);
+  const sorted = ids => [...ids].sort();
+  // The one-section-per-club save (Alpha holds Gamma's section) onto the grouped build.
+  const state = parseCampaign(serializeCampaign(campaignSnapshot(domesticCheckpoint())));
+  const first = grouped('826-11111111', { 'd826-100': run(1, 4), 'd826-101': run(5, 7), 'd826-102': run(8, 10) });
+  const { campaign: upgraded, error } = fitDomesticCampaign(state, first);
+  assert.equal(error, undefined);
+  assert.deepEqual(upgraded.own, Object.fromEntries([...run(1, 4).map(id => [id, 'd826-100']), ...run(5, 7).map(id => [id, 'd826-101']),
+    ...run(8, 10).map(id => [id, 'd826-100'])]), 'each club\'s whole group goes to the holder of its old section');
+  assert.deepEqual(Object.values(upgraded.teams).map(team => team.home), ['826-001', '826-005', '826-008']);
+  for (const ids of [upgraded.conquestIds, upgraded.match.territoryIds, upgraded.history[0].result.territoryIds]) {
+    assert.deepEqual(sorted(ids), run(8, 10), 'Gamma\'s conquered section becomes its whole group');
+  }
+  assert.deepEqual(upgraded.history[0].result.territoryNames, ['Gamma'], 'past summaries keep their names');
+  const played = parseCampaign(serializeCampaign(campaignSnapshot({ ...upgraded, settings: { ...upgraded.settings, domesticVersion: first.meta.version } })));
+  assert.equal(fitDomesticCampaign(played, first).campaign, played, 'the same build resumes as saved');
+
+  // A rebuild that reorders the clubs and resizes their groups: every group still follows its club.
+  const second = grouped('826-22222222', { 'd826-101': run(1, 4), 'd826-102': run(5, 7), 'd826-100': run(8, 10) });
+  const { campaign: moved } = fitDomesticCampaign(played, second);
+  assert.deepEqual(moved.own, Object.fromEntries([...run(1, 4).map(id => [id, 'd826-101']), ...run(5, 10).map(id => [id, 'd826-100'])]));
+  assert.deepEqual(Object.values(moved.teams).map(team => team.home), ['826-008', '826-001', '826-005']);
+  assert.deepEqual(sorted(moved.conquestIds), run(5, 7));
+  assert.deepEqual(sorted(moved.history[0].result.territoryIds), run(5, 7));
+
+  // Holdings that split a group, or a section the map it was played on never had, are refused and kept.
+  const split = { ...played, own: { ...played.own, '826-006': 'd826-100' } };
+  assert.match(fitDomesticCampaign(split, second).error, /holdings do not follow its clubs' starting sections.*save is kept/);
+  const { '826-010': _last, ...trimmed } = played.own;
+  const stray = { ...played, own: { ...trimmed, '826-012': 'd826-100' } };
+  assert.match(fitDomesticCampaign(stray, second).error, /1 of its sections is not on the map it was played on/);
+  const shared = { ...played, teams: { ...played.teams, 'd826-102': { ...played.teams['d826-102'], home: '826-001' } } };
+  assert.match(fitDomesticCampaign(shared, second).error, /its clubs do not each start on their own section/);
+  assert.equal(played.own['826-006'], 'd826-101', 'the save itself is untouched');
+});

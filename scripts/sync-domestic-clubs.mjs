@@ -26,7 +26,9 @@
 //     from scripts/data/domestic-names.json; an all-capitals name without an entry there
 //     stops the sync.
 //
-// Snapshot scripts/data/domestic/<nation id>.json (written only when N >= 10):
+// The sync also records each nation's N under the full rules (n, ships, why) in survey.json.
+//
+// Snapshot scripts/data/domestic/<nation id>.json (written only when N >= MIN_CLUBS, i.e. 2):
 // {
 //   "format": 1,
 //   "source": { provider, game, version: '26.3.0', fetchedAt (ISO, newest cached
@@ -119,13 +121,44 @@ function classify(club, stronger, squadsOf) {
   return null;
 }
 
+const count = (list, key) => list.reduce((acc, item) => { const k = key(item); acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+
 // ---- Survey ----
 
+const surveyFile = path.join(outDir, 'survey.json');
+const SURVEY_RULE = 'Club list pages only, except n, ships and why. estN = clubs in reputation order that are male, not reserve/youth/school/all-star by name, '
+  + `and list totalPlayers >= 11, capped at ${MAX_CLUBS}. n = N from the full sync, which also requires >= 11 natural-position players incl. a goalkeeper; `
+  + `ships when n >= ${MIN_CLUBS} (estN before a full sync); why gives the full sync's reasons for a nation that does not ship. `
+  + 'fetched = distinct clubs read: list pages of 100 plus tieSlices exact-reputation re-reads of the reputation at each page end.';
+
+const readSurvey = async () => existsSync(surveyFile) ? JSON.parse(await readFile(surveyFile, 'utf8')) : { source: {}, nations: [] };
+
+async function writeSurvey(source, entries) {
+  const nations = [...entries.values()].sort((a, b) => a.id.localeCompare(b.id));
+  await mkdir(outDir, { recursive: true });
+  await writeFile(surveyFile, '{\n"source":' + JSON.stringify({ ...source, rule: SURVEY_RULE }) + ',\n"nations":[\n' + nations.map(n => JSON.stringify(n)).join(',\n') + '\n]\n}\n');
+  console.log(`Survey: ${nations.filter(n => n.ships).length}/${nations.length} nations reach N >= ${MIN_CLUBS}; wrote ${path.relative(root, surveyFile)}`);
+}
+
+/** The full sync's outcome for a survey entry: { n, ships, why? } (why only when it does not ship). */
+function outcome(n, excluded) {
+  if (n >= MIN_CLUBS) return { n, ships: true };
+  const reasons = Object.entries(excluded).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([reason, k]) => `${k} ${reason}`);
+  return { n, ships: false, why: `${n} viable club${n === 1 ? '' : 's'}, a map needs ${MIN_CLUBS}; excluded: ${reasons.join(', ') || 'none listed'}` };
+}
+
+/** Entry with the outcome placed after estN, replacing any earlier one. */
+function withOutcome(entry, result) {
+  const { n, ships, why, ...rest } = entry;
+  const out = {};
+  for (const [key, value] of Object.entries(rest)) { out[key] = value; if (key === 'estN') Object.assign(out, result); }
+  return 'n' in out ? out : { ...out, ...result };
+}
+
 async function survey() {
-  const file = path.join(outDir, 'survey.json');
-  const previous = existsSync(file) ? JSON.parse(await readFile(file, 'utf8')).nations : [];
+  const { source: previousSource, nations: previous } = await readSurvey();
   const entries = new Map(previous.map(entry => [entry.id, entry]));
-  let lastFetch = previous.length ? JSON.parse(await readFile(file, 'utf8')).source.fetchedAt ?? '' : '';
+  let lastFetch = previousSource.fetchedAt ?? '';
   await Promise.all(ids.map(async id => {
     const nation = fmNation(id);
     const lister = createClubLister(efem, nation);
@@ -138,25 +171,19 @@ async function survey() {
     const { taken, excluded, rows } = result;
     const all = lister.union();
     for (const page of [...lister.pages, ...lister.ties]) if (page.fetchedAt > lastFetch) lastFetch = page.fetchedAt;
-    entries.set(id, {
+    // The full sync's outcome (n, why) outlives a survey rerun; without one, estN decides.
+    const known = entries.get(id);
+    const entry = {
       id, name: nation.name, fmName: nation.fmName, nationCode: nation.nationCode, query: lister.mode,
       totalMale: lister.count, fetched: all.length, tieSlices: lister.ties.length, otherNation: all.filter(c => !nation.codes.includes(c.nation?.nationCode)).length,
       examined: rows, estN: taken.length, ships: taken.length >= MIN_CLUBS,
       topRep: taken[0]?.reputation ?? null, lastRep: taken.at(-1)?.reputation ?? null,
-      excluded: excluded.reduce((acc, e) => { acc[e.reason] = (acc[e.reason] || 0) + 1; return acc; }, {}),
-    });
+      excluded: count(excluded, e => e.reason),
+    };
+    entries.set(id, Number.isInteger(known?.n) ? withOutcome(entry, { n: known.n, ships: known.ships, ...(known.why ? { why: known.why } : {}) }) : entry);
     console.log(`${id} ${nation.name}: ${lister.count} clubs (${lister.mode}), est. N ${taken.length}`);
   }));
-  const nations = [...entries.values()].sort((a, b) => a.id.localeCompare(b.id));
-  const source = {
-    provider: 'EFEM.club', version: VERSION, endpoint: CLUBS_ENDPOINT, fetchedAt: lastFetch,
-    rule: 'Club list pages only. estN = clubs in reputation order that are male, not reserve/youth/school/all-star by name, '
-      + 'and list totalPlayers >= 11, capped at 100. The full sync also requires >= 11 natural-position players incl. a goalkeeper. Ships when N >= 10. '
-      + 'fetched = distinct clubs read: list pages of 100 plus tieSlices exact-reputation re-reads of the reputation at each page end.',
-  };
-  await mkdir(outDir, { recursive: true });
-  await writeFile(file, '{\n"source":' + JSON.stringify(source) + ',\n"nations":[\n' + nations.map(n => JSON.stringify(n)).join(',\n') + '\n]\n}\n');
-  console.log(`Survey: ${nations.filter(n => n.ships).length}/${nations.length} nations reach N >= ${MIN_CLUBS}; wrote ${path.relative(root, file)}`);
+  await writeSurvey({ provider: 'EFEM.club', version: VERSION, endpoint: CLUBS_ENDPOINT, fetchedAt: lastFetch }, entries);
 }
 
 // ---- Players: every male player, in single-page slices ----
@@ -247,12 +274,14 @@ async function sync() {
   const wikidata = createWikidata({ cacheDir, refresh });
   const geoFiles = await ensureGeonames(cacheDir, refreshAll);
   await mkdir(outDir, { recursive: true });
+  const outcomes = new Map();
   for (const id of ids) {
     const started = Date.now(), before = efem.stats().requests, wdBefore = wikidata.stats().requests;
     const nation = fmNation(id);
     const lister = createClubLister(efem, nation);
     const { taken, excluded, rows } = await selectClubs(nation, lister, players.byClub);
-    if (taken.length < MIN_CLUBS) { console.log(`${id} ${nation.name}: only ${taken.length} viable clubs; no snapshot`); continue; }
+    outcomes.set(id, outcome(taken.length, count(excluded, e => e.reason)));
+    if (taken.length < MIN_CLUBS) { console.log(`${id} ${nation.name}: ${outcomes.get(id).why}; no snapshot`); continue; }
     const display = displayNames(nation, taken, names);
     const located = await locateClubs({
       nation, overrides, wikidata, geoFiles, region: REGIONS[id],
@@ -269,7 +298,6 @@ async function sync() {
         location: located.locations.get(club.clubId) ?? null, squad: pickSquad(natural),
       };
     });
-    const count = (list, key) => list.reduce((acc, item) => { const k = key(item); acc[k] = (acc[k] || 0) + 1; return acc; }, {});
     const tier = loc => !loc ? 'none' : loc.source.split(':')[0];
     const fetchedAt = [players.fetchedAt, located.wikidata.fetchedAt, ...[...lister.pages, ...lister.ties].map(p => p.fetchedAt)].sort().at(-1);
     const snapshot = {
@@ -305,6 +333,13 @@ async function sync() {
       + `locations ${JSON.stringify(s.locations)}; ${efem.stats().requests - before} EFEM + ${wikidata.stats().requests - wdBefore} Wikidata requests, `
       + `${((Date.now() - started) / 1000).toFixed(1)} s -> ${path.relative(root, file)}`);
   }
+  const { source, nations } = await readSurvey();
+  const entries = new Map(nations.map(entry => [entry.id, entry]));
+  for (const [id, result] of outcomes) {
+    const { name, fmName, nationCode } = fmNation(id);
+    entries.set(id, withOutcome(entries.get(id) ?? { id, name, fmName, nationCode }, result));
+  }
+  await writeSurvey(source, entries);
 }
 
 if (args.survey === 'true') await survey();

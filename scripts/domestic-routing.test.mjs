@@ -39,7 +39,8 @@ function clearance([px, py], rings) {
   }
   return best;
 }
-const kickoff = country => Object.fromEntries(country.clubs.map(club => [club.homeSection, club.id]));
+// Kickoff ownership: every club on its starting sections (just its home on a 100-club map).
+const kickoff = country => ({ ...country.startOwners });
 const routeLength = points => points.slice(1).reduce((sum, point, i) => sum + Math.hypot(point[0] - points[i][0], point[1] - points[i][1]), 0);
 
 // ---------- anchors ----------
@@ -49,9 +50,11 @@ test('every shipped section routes from an anchor well inside its own painted la
   for (const item of DOMESTIC) {
     const { geo, clubs } = load(item.id);
     const entries = Object.entries(geo.paths);
-    for (const club of clubs) {
-      const id = club.homeSection, p = geo.paths[id], anchor = [p.cx, p.cy];
-      const label = `${item.name} ${club.name} (${id})`;
+    const homeOf = new Map(clubs.map(club => [club.homeSection, club]));
+    // Home sections anchor at (or toward) the home town; the rest of a group at an interior point.
+    for (const [id, p] of entries) {
+      const club = homeOf.get(id), anchor = [p.cx, p.cy];
+      const label = `${item.name} ${club ? club.name : 'section'} (${id})`;
       anchors++;
       assert.ok(inside(anchor, p.labelRings), `${label}: anchor outside its painted section`);
       for (const [other, q] of entries) {
@@ -62,12 +65,13 @@ test('every shipped section routes from an anchor well inside its own painted la
       // start on a border where one neighbour's corner captures every bearing.
       const best = clearance([p.labelX, p.labelY], p.labelRings);
       assert.ok(clearance(anchor, p.labelRings) >= 0.3 * best, `${label}: anchor ${clearance(anchor, p.labelRings).toFixed(3)} from the edge, best ${best.toFixed(3)}`);
+      if (!club) continue;
       assert.ok(inside([p.homeX, p.homeY], p.labelRings), `${label}: home marker outside its section`);
       if (p.homeX !== p.cx || p.homeY !== p.cy) pulled++;
       else if (club.homePoint && geo.capitals[id]?.[0] === club.homePoint[0] && geo.capitals[id]?.[1] === club.homePoint[1]) atHome++;
     }
   }
-  assert.equal(anchors, DOMESTIC.reduce((n, item) => n + item.clubs, 0));
+  assert.equal(anchors, DOMESTIC.reduce((n, item) => n + (item.sections ?? item.clubs), 0), 'every indexed section is checked');
   // Many clubs still attack from their home town; the rest moved inward.
   assert.ok(atHome > (atHome + pulled) * 0.4 && pulled > 0, `${atHome} at home, ${pulled} pulled inward`);
 });
@@ -80,18 +84,22 @@ test('at kickoff no club with land neighbours is left with only sea routes, and 
     // As the app plays country maps: border routes on (obstacles are covered below).
     const board = { geo, routeIndex, own, aliveIds: country.clubs.map(club => club.id), borderRoutes: true };
     country.clubs.forEach((club, i) => {
-      const p = geo.paths[club.homeSection], label = `${item.name} ${club.name}`;
-      const neighbours = [...(geo.adj[club.homeSection] || [])];
-      if (neighbours.length) {
+      const label = `${item.name} ${club.name}`;
+      // Land neighbours of the club's whole starting group, held by other clubs.
+      const borders = club.startSections.flatMap(id => [...(geo.adj[id] || [])].filter(n => own[n] !== club.id).map(n => [id, n]));
+      if (borders.length) {
         // pickTarget only falls back to sea routes when no straight route reaches anyone.
-        const direct = neighbours.some(n => firstForeignLand(routeIndex, own, club.id,
-          { ax: p.cx, ay: p.cy, bx: geo.paths[n].cx, by: geo.paths[n].cy })?.ownerId === own[n]);
+        const direct = borders.some(([id, n]) => firstForeignLand(routeIndex, own, club.id,
+          { ax: geo.paths[id].cx, ay: geo.paths[id].cy, bx: geo.paths[n].cx, by: geo.paths[n].cy })?.ownerId === own[n]);
         assert.ok(direct || pickTarget(board, club.id, 0, { fallback: false }), `${label}: land neighbours but only sea routes`);
       }
       if (i % 4) return;
       const angle = (i * 137.5) % 360, draw = pickTarget(board, club.id, angle);
       const points = draw.routePoints || [[draw.cp.ax, draw.cp.ay], [draw.cp.bx, draw.cp.by]];
-      // An arrow must at least leave its own section, which the anchor keeps clear.
+      // An arrow must at least leave the section it starts from, which the anchor keeps clear.
+      const from = club.startSections.find(id => geo.paths[id].cx === points[0][0] && geo.paths[id].cy === points[0][1]);
+      assert.ok(from, `${label}: the arrow starts at one of its own sections' anchors`);
+      const p = geo.paths[from];
       assert.ok(routeLength(points) >= clearance([p.cx, p.cy], p.labelRings) - 1e-9, `${label}: arrow shorter than its own land`);
     });
   }

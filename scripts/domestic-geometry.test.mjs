@@ -10,6 +10,7 @@ import { WorldGeometry, projPt, EARTH_RADIUS_KM, PROJECTION_X_SCALE, niceDistanc
 import {
   loadDomestic, decodeDomestic, clearDomesticCache, getLoadedDomestic,
   DOMESTIC_PREFIX, isDomesticScope, domesticScopeId, domesticScope,
+  DOMESTIC_FORMAT, DOMESTIC_FORMATS, DOMESTIC_SECTIONS,
 } from '../src/engine/domestic.js';
 import { buildClub, NATIONS } from '../src/data/teams.js';
 import { CAPITALS } from '../src/data/capitals.js';
@@ -294,9 +295,13 @@ test('(i) loadDomestic builds section geometry and buildClub-shaped club rows', 
   assert.equal(Object.keys(data.geo.paths).length, 9);
   assert.equal(data.clubs.length, 9);
   const sport = getSport('football');
+  assert.deepEqual(data.startOwners, Object.fromEntries(data.clubs.map(club => [club.homeSection, club.id])), 'format 1: one section per club');
+  assert.ok(Object.isFrozen(data.startOwners), 'the shared kickoff map cannot be mutated');
   data.clubs.forEach((club, i) => {
     assert.equal(club.country, '999');
     assert.equal(club.homeSection, `999-00${i + 1}`);
+    assert.deepEqual(club.startSections, [club.homeSection]);
+    assert.ok(Object.isFrozen(club.startSections));
     assert.equal(club.code, `C${String.fromCharCode(65 + i)}A`);
     assert.equal(club.league, 'Test League');
     assert.equal(club.squad.length, POSITIONS.length);
@@ -349,9 +354,9 @@ test('(i) loadDomestic caches per id, shares concurrent loads and never caches f
   const broken = { ok: true, status: 200, json: async () => { throw new SyntaxError('Unexpected token <'); } };
   await assert.rejects(loadDomestic('998', { fetch: async () => broken }), /not valid JSON/);
   const bad = fixture();
-  bad.format = 2;
+  bad.format = 3;
   clearDomesticCache();
-  await assert.rejects(loadDomestic('999', { baseUrl: '/base/', fetch: fakeFetch(bad).fetch }), /unsupported format 2/);
+  await assert.rejects(loadDomestic('999', { baseUrl: '/base/', fetch: fakeFetch(bad).fetch }), /unsupported format 3 \(expected 1 or 2\)/);
   assert.equal(getLoadedDomestic('999'), null, 'an invalid file is not cached');
   clearDomesticCache();
 });
@@ -369,14 +374,25 @@ test('(i) format 1 validation names the offending field', () => {
     ['source', d => { delete d.source.version; }, /source/],
     ['unquantized', d => { delete d.topology.transform; }, /quantized/],
     ['object', d => { d.topology.objects = { countries: d.topology.objects.sections }; }, /objects\.sections/],
+    ['format 2', d => { d.format = 2; }, /format 2 needs exactly 100 sections, found 9/],
+    ['format 3', d => { d.format = 3; }, /unsupported format 3/],
     ['section id', d => { d.topology.objects.sections.geometries[0].id = '999-1'; }, /id must look like "999-001"/],
     ['section duplicate', d => { d.topology.objects.sections.geometries[1].id = '999-001'; }, /duplicated/],
+    ['section id range', d => {
+      d.topology.objects.sections.geometries[8].id = '999-010';
+      d.clubs[8].section = '999-010';
+    }, /section 8 .*id must be in 999-001\.\.999-009/],
+    ['section id zero', d => { d.topology.objects.sections.geometries[8].id = '999-000'; }, /id must be in 999-001\.\.999-009/],
+    ['one club', d => {
+      d.topology.objects.sections.geometries.length = 1;
+      d.clubs.length = 1;
+    }, /at least two clubs, found 1/],
     ['section name', d => { delete d.topology.objects.sections.geometries[2].properties.name; }, /has no name/],
     ['null section', d => { d.topology.objects.sections.geometries[2] = { type: null, id: '999-003' }; }, /Polygon or MultiPolygon/],
     ['club count', d => { d.clubs.pop(); }, /one club per section \(9\), found 8/],
     ['club id', d => { d.clubs[0].id = 'f-club'; }, /clubs\[0\].*id must be "d999-100"/],
     ['club section', d => { d.clubs[3].section = '999-042'; }, /clubs\[3\].*not in the topology/],
-    ['shared section', d => { d.clubs[3].section = d.clubs[2].section; }, /already belongs/],
+    ['shared section', d => { d.clubs[3].section = d.clubs[2].section; }, /clubs\[3\].*section 999-003 already belongs to clubs\[2\]/],
     ['code', d => { d.clubs[1].code = 'ca'; }, /three capitals/],
     ['code clash', d => { d.clubs[1].code = d.clubs[0].code; }, /code CAA is duplicated/],
     ['str', d => { d.clubs[0].str = 120; }, /str must be a rating/],
@@ -405,8 +421,18 @@ test('(i) format 1 validation names the offending field', () => {
     ['repeat player', d => { d.clubs[4].squad[3][0] = d.clubs[4].squad[2][0]; }, /repeats player/],
   ];
   assert.ok(decodeDomestic(fixture(), '999').clubs.length === 9, 'the fixture itself is valid');
+  assertInvalid(fixture, cases);
+  // `sections` means nothing in format 1: it is an unknown field there.
+  const stray = fixture();
+  stray.clubs[0].sections = ['999-005', 'junk'];
+  const decoded = decodeDomestic(stray, '999');
+  assert.deepEqual(decoded.clubs[0].startSections, ['999-001']);
+  assert.equal(decoded.startOwners['999-005'], 'd999-104');
+});
+
+function assertInvalid(make, cases) {
   for (const [name, mutate, expected] of cases) {
-    let data = fixture();
+    let data = make();
     const replaced = mutate(data);
     if (replaced !== undefined) data = replaced;
     assert.throws(() => decodeDomestic(data, '999'), error => {
@@ -415,6 +441,152 @@ test('(i) format 1 validation names the offending field', () => {
       return true;
     }, name);
   }
+}
+
+// ---------- format 2: 100 sections, clubs starting on contiguous groups ----------
+
+// 10x10 grid of 0.2° cells, lon 10–12, lat 45–47, numbered along a snake (east
+// along even rows, back west along odd ones) so consecutive ids always touch.
+const SNAKE = { lon0: 11, lat0: 46 };
+const snakeId = k => `999-${String(k + 1).padStart(3, '0')}`;
+const snakeCells = () => Array.from({ length: 100 }, (_, k) => {
+  const r = Math.floor(k / 10), c = r % 2 ? 9 - k % 10 : k % 10;
+  return { id: snakeId(k), r, c, centre: [10 + (2 * c + 1) / 10, 45 + (2 * r + 1) / 10] };
+});
+/** A format-2 file with n clubs: equal groups (the first 100 % n one larger), in rank order along the snake. */
+function groupedFixture(n = 9) {
+  const cells = snakeCells();
+  const features = cells.map(({ id, r, c }) => feature(id, [rect(10 + c / 5, 45 + r / 5, 10 + (c + 1) / 5, 45 + (r + 1) / 5)], `Cell ${id.slice(-3)}`));
+  let next = 0;
+  const clubs = Array.from({ length: n }, (_, i) => {
+    const size = Math.floor(100 / n) + (i < 100 % n ? 1 : 0);
+    const group = cells.slice(next, next += size);
+    // The last club has no known home, so its home section has no anchor.
+    const home = i === n - 1 ? null : group[0].centre;
+    return {
+      id: `d999-${100 + i}`, fm: 100 + i, name: `Club ${i + 1}`, code: `K${String(i).padStart(2, '0')}`,
+      col: `oklch(0.70 0.15 ${(i * 37) % 360})`, rep: 90 - i * 0.5, league: 'Test League', str: 40 + (i % 50),
+      section: group[0].id, sections: group.map(cell => cell.id), home, ...(home ? { homeSource: `wikidata:Q${i + 1}` } : {}),
+      squad: POSITIONS.map((pos, j) => [1000 * (i + 1) + j, `Player ${i + 1}-${j + 1}`, 70 - j, pos, 'ENG']),
+    };
+  });
+  return {
+    format: 2, id: '999', name: 'Testland', version: '999-0123abcd', projection: { ...SNAKE }, focus: [10, 45, 12, 47],
+    boundaries: { provider: 'synthetic', iso3: 'TST', level: 'ADM2', units: 100, license: 'test', source: 'test', url: 'about:blank' },
+    source: { ...SOURCE }, topology: build(features), clubs,
+  };
+}
+
+test('format 2 constants: the build writes format 2 and the loader still reads format 1', () => {
+  assert.equal(DOMESTIC_FORMAT, 2);
+  assert.deepEqual(DOMESTIC_FORMATS, [1, 2]);
+  assert.ok(Object.isFrozen(DOMESTIC_FORMATS));
+  assert.equal(DOMESTIC_SECTIONS, 100);
+});
+
+test('format 2 decodes 100 sections with each club starting on its contiguous group', async () => {
+  const raw = groupedFixture(9);
+  const data = decodeDomestic(raw, '999');
+  assert.equal(data.meta.format, 2);
+  const ids = snakeCells().map(cell => cell.id);
+  assert.deepEqual(Object.keys(data.sectionNames), ids);
+  assert.equal(data.sectionNames['999-042'], 'Cell 042');
+  assert.equal(Object.keys(data.geo.paths).length, 100);
+  assert.deepEqual(data.clubs.map(club => club.startSections.length), [12, 11, 11, 11, 11, 11, 11, 11, 11]);
+  assert.deepEqual(Object.keys(data.startOwners), ids, 'every section has an owner at kickoff, in id order');
+  assert.ok(Object.isFrozen(data.startOwners));
+  const sport = getSport('football');
+  const homes = new Set(data.clubs.map(club => club.homeSection));
+  data.clubs.forEach((club, i) => {
+    const rawClub = raw.clubs[i];
+    assert.equal(club.homeSection, rawClub.section);
+    assert.deepEqual(club.startSections, rawClub.sections, `${club.id}: starting sections, home first`);
+    assert.notEqual(club.startSections, rawClub.sections, 'a copy, not the file\'s array');
+    assert.ok(Object.isFrozen(club.startSections));
+    for (const s of club.startSections) assert.equal(data.startOwners[s], club.id);
+    assert.equal(buildClub(club, sport).home, club.homeSection, 'the team\'s home is its home section');
+    // One connected group on the decoded geometry.
+    const group = new Set(club.startSections), seen = new Set([club.homeSection]), queue = [club.homeSection];
+    while (queue.length) for (const next of data.geo.adj[queue.shift()] || []) if (group.has(next) && !seen.has(next)) { seen.add(next); queue.push(next); }
+    assert.equal(seen.size, group.size, `${club.id}: contiguous start`);
+    // Home towns anchor only the home section; the rest of the group anchors at interior points.
+    const path = data.geo.paths[club.homeSection];
+    if (club.homePoint) {
+      assert.equal(path.hasCapital, true, `${club.id}: anchored at its home town`);
+      const [x, y] = fitted(data.geo, ...club.homePoint);
+      assert.ok(Math.abs(path.cx - x) < 1e-9 && Math.abs(path.cy - y) < 1e-9);
+      assert.deepEqual([path.homeX, path.homeY], [path.cx, path.cy], 'the home marker is the anchor when the town is central');
+    } else assert.equal(path.hasCapital, false);
+  });
+  for (const id of ids) {
+    const p = data.geo.paths[id];
+    if (!homes.has(id)) assert.equal(p.hasCapital, false, `${id}: no home town`);
+    assert.ok(p.area > 0 && inside([p.cx, p.cy], p.labelRings), `${id}: area and interior anchor`);
+  }
+
+  // The loader serves format 2 like format 1.
+  clearDomesticCache();
+  const loaded = await loadDomestic('999', { baseUrl: '/base/', fetch: fakeFetch(raw).fetch });
+  assert.deepEqual(loaded.startOwners, data.startOwners);
+  assert.equal(getLoadedDomestic('999'), loaded);
+  clearDomesticCache();
+});
+
+test('format 2 with 100 clubs starts each on one section, exactly as format 1', () => {
+  const grouped = groupedFixture(100);
+  const two = decodeDomestic(grouped, '999');
+  assert.ok(two.clubs.every((club, i) => club.homeSection === snakeId(i) && club.startSections.length === 1));
+  const legacy = groupedFixture(100);
+  legacy.format = 1;
+  for (const club of legacy.clubs) delete club.sections;
+  const one = decodeDomestic(legacy, '999');
+  assert.deepEqual(two.startOwners, one.startOwners);
+  assert.deepEqual(two.clubs.map(club => club.startSections), one.clubs.map(club => club.startSections));
+});
+
+test('format 2 validation names the offending field', () => {
+  const geoms = d => d.topology.objects.sections.geometries;
+  const renameLast = (d, to) => { geoms(d)[99].id = to; d.clubs[8].sections[d.clubs[8].sections.length - 1] = to; };
+  const cases = [
+    ['format string', d => { d.format = '2'; }, /unsupported format "2" \(expected 1 or 2\)/],
+    ['99 sections', d => { geoms(d).pop(); d.clubs[8].sections.pop(); }, /format 2 needs exactly 100 sections, found 99/],
+    ['101 sections', d => {
+      geoms(d).push({ ...geoms(d)[99], id: '999-101', properties: { name: 'Extra' } });
+      d.clubs[8].sections.push('999-101');
+    }, /exactly 100 sections, found 101/],
+    ['id 000', d => renameLast(d, '999-000'), /section 99 .*id must be in 999-001\.\.999-100/],
+    ['id 101', d => renameLast(d, '999-101'), /section 99 .*id must be in 999-001\.\.999-100/],
+    ['id pattern', d => renameLast(d, '999-1000'), /id must look like "999-001"/],
+    ['id duplicate', d => { geoms(d)[1].id = '999-001'; }, /section 1 .*duplicated/],
+    ['no sections', d => { delete d.clubs[2].sections; }, /clubs\[2\].*sections must list its starting sections/],
+    ['empty sections', d => { d.clubs[2].sections = []; }, /clubs\[2\].*sections must list/],
+    ['sections not an array', d => { d.clubs[2].sections = d.clubs[2].section; }, /clubs\[2\].*sections must list/],
+    ['home not first', d => { d.clubs[2].sections.reverse(); }, /clubs\[2\].*sections must start with its home section 999-024/],
+    ['home left out', d => { d.clubs[2].sections.shift(); }, /clubs\[2\].*must start with its home section/],
+    ['home elsewhere', d => { d.clubs[2].section = '999-001'; }, /clubs\[2\].*must start with its home section 999-001/],
+    ['unknown section', d => { d.clubs[2].sections.push('999-142'); }, /clubs\[2\].*starting section "999-142" is not in the topology/],
+    ['non-string section', d => { d.clubs[2].sections.push(24); }, /clubs\[2\].*starting section 24 is not in the topology/],
+    ['listed twice', d => { d.clubs[2].sections.push(d.clubs[2].sections[1]); }, /clubs\[2\].*lists section 999-025 twice/],
+    ['in two clubs', d => { d.clubs[3].sections.push(d.clubs[2].sections[1]); }, /clubs\[3\].*section 999-025 already belongs to clubs\[2\]/],
+    ['home in another group', d => {
+      const taken = d.clubs[2].sections[1];
+      d.clubs[3].section = taken;
+      d.clubs[3].sections[0] = taken;
+    }, /clubs\[3\].*section 999-025 already belongs to clubs\[2\]/],
+    ['in no club', d => { d.clubs[8].sections.pop(); }, /no club starts on section 999-100$/],
+    ['several in no club', d => { d.clubs[8].sections.length = 3; }, /no club starts on section 999-093 \(and 7 more\)/],
+    ['one club', d => {
+      d.clubs[0].sections = geoms(d).map(g => g.id);
+      d.clubs.length = 1;
+    }, /at least two clubs, found 1/],
+    ['more clubs than sections', d => { d.clubs = Array.from({ length: 101 }, () => d.clubs[0]); }, /at most one club per section \(100\), found 101/],
+    ['no clubs', d => { delete d.clubs; }, /at most one club per section \(100\), found none/],
+    // Checks shared with format 1 still apply.
+    ['club id', d => { d.clubs[0].id = 'f-club'; }, /clubs\[0\].*id must be "d999-100"/],
+    ['no keeper', d => { d.clubs[4].squad[0][3] = 'cb'; }, /clubs\[4\].*no natural goalkeeper/],
+    ['projection elsewhere', d => { d.projection.lon0 = 160; }, /projection centre/],
+  ];
+  assertInvalid(() => groupedFixture(9), cases);
 });
 
 test('domestic scope helpers', () => {

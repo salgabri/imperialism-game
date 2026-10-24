@@ -462,7 +462,7 @@ const TRANSLIT_MARKS = /[\u02b0-\u02ff\u2018\u2019\u1e00-\u1eff]|z\u0327/;
  * nothing): there every name is checked against the places inside its unit. In any
  * layer a name that differs from such a place only where the place has accents takes
  * the place's spelling (SVK: "District of Pilina" for Žilina; EST: "Parnu").
- * Returns { garbled, name(unit), town(unit) }, memoised by unit id.
+ * Returns { garbled, name(unit), town(unit), place(place) }, memoised by unit id.
  */
 export function createNamer(units, { iso3, a2, places = [], regionAt = () => null }) {
   const romanised = ROMANISED.has(a2);
@@ -593,7 +593,9 @@ export function createNamer(units, { iso3, a2, places = [], regionAt = () => nul
     const key = matchKey(own);
     return [p.name, p.ascii, ...p.alt].some(t => matchKey(t) === key) ? own : placeName(p);
   };
-  return { garbled, name, town };
+  /** A GeoNames place as a section name (a section built around it), in Latin script. */
+  const place = p => { const s = placeName(p); return OTHER_SCRIPT.test(s) ? (p.ascii || s).replace(/`/g, "'") : s; };
+  return { garbled, name, town, place };
 }
 
 /** Boundary loader bound to one cache directory; `download` as from createDownloader. */

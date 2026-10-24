@@ -424,8 +424,9 @@ const sectionCount = (n, noun = 'section') => `${n} of its ${noun}s ${n === 1 ? 
  * Fit a country campaign to the loaded build of its map: `{ campaign }`, or
  * `{ error }` with the save left as it is. Section ids follow club rank, so a
  * rebuild can give an id to another club's land. A save from another build is
- * therefore moved club by club: each club's new starting section is held by
- * whoever held its old one. It must have exactly the map's clubs.
+ * therefore moved club by club: a club's starting sections always share one
+ * holder (a conquest takes everything), so all of its new starting sections go
+ * to whoever held its old home section. It must have exactly the map's clubs.
  */
 export function fitDomesticCampaign(campaign, { meta, clubs, sectionNames }) {
   const refuse = reason => ({ error: `This campaign no longer matches the map of ${meta.name}: ${reason}, so it cannot resume. The save is kept.` });
@@ -435,26 +436,42 @@ export function fitDomesticCampaign(campaign, { meta, clubs, sectionNames }) {
     const missing = new Set([...Object.keys(campaign.own || {}), ...teams.map(([, team]) => team?.home)].filter(id => !known(id)));
     return missing.size ? refuse(`${sectionCount(missing.size)} missing`) : { campaign };
   }
-  const homeOf = new Map(clubs.map(club => [club.id, club.homeSection]));
+  const rowOf = new Map(clubs.map(club => [club.id, club]));
   const clubOf = ([id, team]) => team?.origin || id;
-  const missing = teams.filter(entry => !homeOf.has(clubOf(entry)));
+  const missing = teams.filter(entry => !rowOf.has(clubOf(entry)));
   if (missing.length) return refuse(`${sectionCount(missing.length, 'club')} not on the updated map`);
   const saved = new Set(teams.map(clubOf));
   const added = clubs.filter(club => !saved.has(club.id)).length;
   if (added) return refuse(`the updated map adds ${added} club${added === 1 ? '' : 's'} it never had`);
-  // Old starting section -> the same club's new one.
-  const moved = new Map(teams.map(entry => [entry[1]?.home, homeOf.get(clubOf(entry))]));
-  if (moved.size !== teams.length || moved.has(undefined)) return refuse('its clubs do not each start on their own section');
-  const ownEntries = Object.entries(campaign.own || {});
-  const strays = ownEntries.filter(([section]) => !moved.has(section)).length;
-  if (strays) return refuse(`${sectionCount(strays)} not a club's starting section`);
-  if (ownEntries.length !== clubs.length) return refuse(`${clubs.length - ownEntries.length} of its sections have no holder`);
-  const move = ids => Array.isArray(ids) ? ids.filter(id => moved.has(id)).map(id => moved.get(id)) : ids;
+  // The old map's ids are <country>-001.. in club rank order, each club's
+  // starting group running from its home, so a section belongs to the last home at or before it.
+  const own = campaign.own || {}, ownEntries = Object.entries(own), prefix = `${domesticScopeId(campaign.settings?.clubScope)}-`;
+  const rank = id => typeof id === 'string' && id.startsWith(prefix) && /^\d{3}$/.test(id.slice(prefix.length))
+    ? Number(id.slice(prefix.length)) : NaN;
+  const roots = teams.map(entry => [rank(entry[1]?.home), entry]).sort((a, b) => a[0] - b[0]);
+  if (roots.some(([r], i) => !(r >= 1) || r === roots[i - 1]?.[0])) return refuse('its clubs do not each start on their own section');
+  const groupOf = id => {
+    const r = rank(id);
+    let found = null;
+    for (const [root, entry] of roots) {
+      if (!(root <= r)) break;
+      found = entry;
+    }
+    return found;
+  };
+  const strays = ownEntries.filter(([section]) => !(rank(section) <= ownEntries.length) || !groupOf(section)).length;
+  if (strays) return refuse(`${sectionCount(strays)} not on the map it was played on`);
+  const unheld = roots.filter(([, entry]) => !Object.hasOwn(own, entry[1].home)).length;
+  if (unheld) return refuse(`${unheld} of its clubs' home sections ${unheld === 1 ? 'has' : 'have'} no holder`);
+  if (ownEntries.some(([section, owner]) => own[groupOf(section)[1].home] !== owner)) return refuse("its holdings do not follow its clubs' starting sections");
+  const startsOf = entry => { const row = rowOf.get(clubOf(entry)); return row.startSections || [row.homeSection]; };
+  // An old section id -> every new starting section of the club that started there.
+  const move = ids => Array.isArray(ids) ? [...new Set(ids.flatMap(id => groupOf(id) ? startsOf(groupOf(id)) : []))] : ids;
   const withTerritories = value => value && Array.isArray(value.territoryIds) ? { ...value, territoryIds: move(value.territoryIds) } : value;
   return { campaign: {
     ...campaign,
-    own: Object.fromEntries(ownEntries.map(([section, owner]) => [moved.get(section), owner])),
-    teams: Object.fromEntries(teams.map(entry => [entry[0], { ...entry[1], home: homeOf.get(clubOf(entry)) }])),
+    own: Object.fromEntries(teams.flatMap(entry => startsOf(entry).map(section => [section, own[entry[1].home]]))),
+    teams: Object.fromEntries(teams.map(entry => [entry[0], { ...entry[1], home: rowOf.get(clubOf(entry)).homeSection }])),
     conquestIds: move(campaign.conquestIds),
     match: withTerritories(campaign.match),
     history: (campaign.history || []).map(entry => entry?.result ? { ...entry, result: withTerritories(entry.result) } : entry),

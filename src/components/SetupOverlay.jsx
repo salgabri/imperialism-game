@@ -31,7 +31,11 @@ const IDLE_DOMESTIC = { state: 'idle', message: null };
 export function domesticDescription(entry) {
   const top = entry.top || [];
   const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
-  return `${leaders} ${entry.clubs} clubs fighting over ${entry.name}, split into ${entry.clubs} sections drawn from its administrative divisions.`;
+  // Format-1 index entries have no `sections`: one section per club.
+  const clubs = entry.clubs, sections = entry.sections ?? clubs;
+  const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
+  const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
+  return `${leaders} ${clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`;
 }
 
 function SegmentedChoice({ label, options, value, onChange }) {

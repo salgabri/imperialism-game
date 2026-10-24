@@ -1,12 +1,17 @@
 // Domestic campaigns: one country's top clubs on that country's own map. Loads a
-// shipped `public/domestic/<id>.json` (format 1, see docs/design/domestic-campaigns.md),
+// shipped `public/domestic/<id>.json` (format 1 or 2, see docs/design/domestic-campaigns.md),
 // validates it, and turns it into section geometry plus buildClub source rows.
 
 import { WorldGeometry } from './geo.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 
 export const DOMESTIC_PREFIX = 'domestic:';
-export const DOMESTIC_FORMAT = 1;
+// The format the build writes. Format 1 (one section per club) still loads, so
+// files from an earlier build keep working.
+export const DOMESTIC_FORMAT = 2;
+export const DOMESTIC_FORMATS = Object.freeze([1, 2]);
+// A format-2 map always has this many sections; each club starts on a group of them.
+export const DOMESTIC_SECTIONS = 100;
 
 export const isDomesticScope = scope => typeof scope === 'string' && scope.length > DOMESTIC_PREFIX.length
   && scope.startsWith(DOMESTIC_PREFIX);
@@ -67,10 +72,10 @@ export function getLoadedDomestic(id) {
 }
 
 /**
- * Fetch, validate and decode one country. Resolves to
- * `{ meta, geo, clubs, sectionNames, focus }`; concurrent and repeated calls
- * share one request per id, and a failed load is not cached. The cache is
- * bounded (see retainDomestic), so an unretained country may load again later.
+ * Fetch, validate and decode one country. Resolves to `{ meta, geo, clubs,
+ * sectionNames, focus, startOwners }` (see decodeDomestic); concurrent and
+ * repeated calls share one request per id, and a failed load is not cached. The
+ * cache is bounded (see retainDomestic), so an unretained country may load again later.
  */
 export function loadDomestic(id, { baseUrl = '/', fetch: fetchImpl = globalThis.fetch } = {}) {
   const key = String(id);
@@ -109,7 +114,14 @@ export function loadDomestic(id, { baseUrl = '/', fetch: fetchImpl = globalThis.
   return entry.promise;
 }
 
-/** Validate a parsed format-1 file and build its geometry and club rows (no caching). */
+/**
+ * Validate a parsed format-1 or format-2 file and build its geometry and club
+ * rows (no caching). Club rows have the buildClub shape plus `country`,
+ * `homeSection` (the section holding or nearest the home town), `startSections`
+ * (frozen, home first; format 1: `[homeSection]`), `homePoint`, `fm` and `rep`.
+ * `startOwners` is the frozen kickoff ownership, section id -> club id for
+ * every section (copy it before mutating).
+ */
 export function decodeDomestic(data, id = data?.id) {
   validateDomestic(data, String(id));
   const { topology, clubs: rawClubs, ...meta } = data;
@@ -138,10 +150,12 @@ export function decodeDomestic(data, id = data?.id) {
     rep: club.rep ?? null,
     fm: club.fm,
     homeSection: club.section,
+    startSections: Object.freeze(meta.format === 1 ? [club.section] : [...club.sections]),
     homePoint: club.home || null,
     squad: club.squad.map(tuple => expandFmTuple(tuple, meta.source, club.name)),
   }));
-  return { meta, geo, clubs, sectionNames, focus: meta.focus };
+  const startOwners = Object.freeze(Object.fromEntries(clubs.flatMap(club => club.startSections.map(s => [s, club.id]))));
+  return { meta, geo, clubs, sectionNames, focus: meta.focus, startOwners };
 }
 
 function validateDomestic(data, id) {
@@ -153,7 +167,11 @@ function validateDomestic(data, id) {
 
   if (!ID_PATTERN.test(id)) fail('country id must be alphanumeric');
   if (!isObject(data)) fail('file is not a JSON object');
-  if (data.format !== DOMESTIC_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${DOMESTIC_FORMAT})`);
+  if (!DOMESTIC_FORMATS.includes(data.format)) {
+    fail(`unsupported format ${JSON.stringify(data.format)} (expected ${DOMESTIC_FORMATS.join(' or ')})`);
+  }
+  // Format 2: exactly DOMESTIC_SECTIONS sections, each club starting on a group of them.
+  const grouped = data.format !== 1;
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested country`);
   if (!text(data.name)) fail('name is missing');
   if (typeof data.version !== 'string' || !new RegExp(`^${id}-[0-9a-f]{8}$`).test(data.version)) {
@@ -190,7 +208,10 @@ function validateDomestic(data, id) {
   });
   const ringOk = ring => Array.isArray(ring) && ring.length > 0
     && ring.every(a => Number.isInteger(a) && (a < 0 ? ~a : a) < t.arcs.length);
+  const count = sections.geometries.length;
+  if (grouped && count !== DOMESTIC_SECTIONS) fail(`format ${data.format} needs exactly ${DOMESTIC_SECTIONS} sections, found ${count}`);
   const sectionPattern = new RegExp(`^${id}-\\d{3}$`);
+  const lastId = `${id}-${String(count).padStart(3, '0')}`;
   const sectionIds = new Set();
   sections.geometries.forEach((g, i) => {
     const at = `section ${i} (${JSON.stringify(g?.id)})`;
@@ -202,6 +223,9 @@ function validateDomestic(data, id) {
       fail(`${at} has an empty ring or an arc index outside the topology`);
     }
     if (typeof g.id !== 'string' || !sectionPattern.test(g.id)) fail(`${at} id must look like "${id}-001"`);
+    // Unique ids numbered 1..count are exactly <id>-001 .. the last.
+    const rank = Number(g.id.slice(-3));
+    if (rank < 1 || rank > count) fail(`${at} id must be in ${id}-001..${lastId}`);
     if (sectionIds.has(g.id)) fail(`${at} id is duplicated`);
     if (!text(g.properties?.name)) fail(`${at} has no name`);
     sectionIds.add(g.id);
@@ -209,10 +233,12 @@ function validateDomestic(data, id) {
   if (!sectionIds.size) fail('topology has no sections');
 
   const clubs = data.clubs;
-  if (!Array.isArray(clubs) || clubs.length !== sectionIds.size) {
-    fail(`expected one club per section (${sectionIds.size}), found ${Array.isArray(clubs) ? clubs.length : 'none'}`);
+  if (!Array.isArray(clubs) || (grouped ? clubs.length > sectionIds.size : clubs.length !== sectionIds.size)) {
+    fail(`expected ${grouped ? 'at most ' : ''}one club per section (${sectionIds.size}), found ${Array.isArray(clubs) ? clubs.length : 'none'}`);
   }
-  const clubIds = new Set(), codes = new Set(), claimed = new Set();
+  if (clubs.length < 2) fail(`a campaign needs at least two clubs, found ${clubs.length}`);
+  // Section id -> index of the club starting on it.
+  const clubIds = new Set(), codes = new Set(), claimed = new Map();
   clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
     if (!isObject(club)) fail(`${at} is not an object`);
@@ -230,8 +256,16 @@ function validateDomestic(data, id) {
     if (!finite(club.str) || club.str < 1 || club.str > 99) fail(`${at} str must be a rating 1-99`);
     if (club.rep != null && !finite(club.rep)) fail(`${at} rep must be a number`);
     if (!sectionIds.has(club.section)) fail(`${at} section ${JSON.stringify(club.section)} is not in the topology`);
-    if (claimed.has(club.section)) fail(`${at} section ${club.section} already belongs to another club`);
-    claimed.add(club.section);
+    const starts = grouped ? club.sections : [club.section];
+    if (!Array.isArray(starts) || !starts.length) fail(`${at} sections must list its starting sections`);
+    if (starts[0] !== club.section) fail(`${at} sections must start with its home section ${club.section}`);
+    for (const s of starts) {
+      if (!sectionIds.has(s)) fail(`${at} starting section ${JSON.stringify(s)} is not in the topology`);
+      if (claimed.has(s)) {
+        fail(claimed.get(s) === i ? `${at} lists section ${s} twice` : `${at} section ${s} already belongs to clubs[${claimed.get(s)}]`);
+      }
+      claimed.set(s, i);
+    }
     if (club.home != null && (!Array.isArray(club.home) || club.home.length !== 2 || !club.home.every(finite)
       || Math.abs(club.home[1]) > 90)) fail(`${at} home must be [lon, lat] or null`);
     if (!Array.isArray(club.squad) || club.squad.length < 11) fail(`${at} squad needs at least 11 players`);
@@ -257,6 +291,9 @@ function validateDomestic(data, id) {
     });
     if (!keeper) fail(`${at} squad has no natural goalkeeper`);
   });
+  // Every section has an owner at kickoff: there is no neutral land.
+  const free = [...sectionIds].filter(s => !claimed.has(s));
+  if (free.length) fail(`no club starts on section ${free[0]}${free.length > 1 ? ` (and ${free.length - 1} more)` : ''}`);
 }
 
 const wrapLongitude = lon => ((lon + 180) % 360 + 360) % 360 - 180;

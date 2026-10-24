@@ -1,12 +1,13 @@
 // Domestic campaigns: one country's top clubs fight over its own sections. Plays
-// seeded campaigns on the shipped England map with the real engine rules (draws,
-// match model, acquisitions, saves), and kicks off every other shipped country.
-// No React; the jsdom smoke covers the UI.
+// seeded campaigns on the shipped England map (one section per club) and Fiji map
+// (fewer clubs than sections, so each club starts on a group) with the real
+// engine rules (draws, match model, acquisitions, saves), and kicks off every
+// other shipped country. No React; the jsdom smoke covers the UI.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DOMESTIC } from '../src/data/domestic.js';
-import { decodeDomestic, domesticScope, domesticSurroundings } from '../src/engine/domestic.js';
+import { decodeDomestic, domesticScope, domesticSurroundings, DOMESTIC_SECTIONS } from '../src/engine/domestic.js';
 import { buildClub, makeRng, selectLineup, squadAverage, teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, territories, validateReachability } from '../src/engine/campaign.js';
@@ -17,47 +18,59 @@ import { tacticalMatchParameters } from '../src/engine/managerStrategy.js';
 import { UNCERTAINTY_PRESETS } from '../src/engine/odds.js';
 import { campaignSnapshot, fitDomesticCampaign, parseCampaign, serializeCampaign } from '../src/engine/storage.js';
 
-const ID = '826';
-const entry = DOMESTIC.find(item => item.id === ID);
-const raw = JSON.parse(readFileSync(new URL(`../public/domestic/${ID}.json`, import.meta.url), 'utf8'));
-const domestic = decodeDomestic(raw, ID);
-const { geo, sectionNames } = domestic;
 const sport = getSport('football');
-const sectionIds = geo.countries.map(country => country.id);
-const routeIndex = createAttackRouteIndex(geo.paths);
-// Sea routes are legitimate only where land contact is missing: a section with
-// no land neighbour, or one with detached parts such as Hampshire's Isle of Wight.
-const islandSections = new Set(geo.countries.filter(country => !geo.adj[country.id]?.size || country.polys.length > 1)
-  .map(country => country.id));
-const SETTINGS = { sport: 'football', layer: 'clubs', scope: 'UEFA', clubScope: domesticScope(ID), domesticVersion: domestic.meta.version,
-  pacing: 'duel', resolution: 'instant', preset: 'custom', uncertainty: 'balanced', express: false, finale: 'single',
-  role: 'spectator', managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic' };
 // Saves pack FM players (storage.js), so a 100-club campaign stays well inside browser storage.
 const MAX_CHECKPOINT_BYTES = 500_000;
+const readCountry = id => decodeDomestic(JSON.parse(readFileSync(new URL(`../public/domestic/${id}.json`, import.meta.url), 'utf8')), id);
 
-/** The contract's opening: every club starts alone on its home section. */
-function opening() {
-  const teams = {}, own = {}, stats = {};
-  for (const row of domestic.clubs) {
+/** A shipped country, decoded once, with what the rules and checks need. */
+function country(id) {
+  const entry = DOMESTIC.find(item => item.id === id);
+  const domestic = readCountry(id);
+  const { geo, sectionNames } = domestic;
+  // Sea routes are legitimate only where land contact is missing: a section with
+  // no land neighbour, or one with detached parts such as Hampshire's Isle of Wight.
+  const islandSections = new Set(geo.countries.filter(section => !geo.adj[section.id]?.size || section.polys.length > 1).map(section => section.id));
+  const settings = { sport: 'football', layer: 'clubs', scope: 'UEFA', clubScope: domesticScope(id), domesticVersion: domestic.meta.version,
+    pacing: 'duel', resolution: 'instant', preset: 'custom', uncertainty: 'balanced', express: false, finale: 'single',
+    role: 'spectator', managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic' };
+  return { id, entry, domestic, geo, sectionNames, sectionIds: geo.countries.map(section => section.id),
+    routeIndex: createAttackRouteIndex(geo.paths), islandSections, settings };
+}
+
+const ENGLAND = country('826');
+// Fiji: 16 clubs on 100 sections.
+const FIJI = country('242');
+const { domestic, geo, sectionNames, sectionIds, routeIndex, islandSections, entry } = ENGLAND;
+const ID = ENGLAND.id, SETTINGS = ENGLAND.settings;
+
+/** The contract's opening: every club starts on its own starting sections, home first. */
+function opening(land = ENGLAND) {
+  const teams = {}, stats = {};
+  for (const row of land.domestic.clubs) {
     const team = buildClub(row, sport);
     team.baseEff = teamEff(team);
     team.baseAvg = squadAverage(team);
     teams[team.id] = team;
-    own[team.home] = team.id;
     stats[team.id] = { conq: 0, steals: [] };
   }
-  return { teams, own, stats, aliveIds: domestic.clubs.map(club => club.id) };
+  const own = Object.fromEntries(land.domestic.clubs.flatMap(row => row.startSections.map(section => [section, row.id])));
+  return { teams, own, stats, aliveIds: land.domestic.clubs.map(club => club.id) };
 }
 
-function boardOf(state) {
-  return { geo, routingPaths: geo.paths, routeIndex, own: state.own, aliveIds: state.aliveIds };
+function boardOf(state, land = ENGLAND) {
+  return { geo: land.geo, routingPaths: land.geo.paths, routeIndex: land.routeIndex, own: state.own, aliveIds: state.aliveIds };
 }
 
-function assertConserved(state, label) {
+function assertConserved(state, label, land = ENGLAND) {
   const owners = Object.values(state.own);
-  assert.deepEqual(Object.keys(state.own).sort(), [...sectionIds].sort(), `${label}: every section stays owned`);
+  assert.deepEqual(Object.keys(state.own).sort(), [...land.sectionIds].sort(), `${label}: every section stays owned`);
   assert.ok(owners.every(owner => state.aliveIds.includes(owner)), `${label}: only survivors own land`);
   assert.ok(state.aliveIds.every(id => owners.includes(id)), `${label}: every survivor holds land`);
+  // A conquest takes everything, so a starting group never splits.
+  for (const club of land.domestic.clubs) {
+    assert.ok(club.startSections.every(section => state.own[section] === state.own[club.homeSection]), `${label}: ${club.name}'s starting group has one holder`);
+  }
 }
 
 /**
@@ -103,7 +116,7 @@ function card(state, match) {
 }
 
 /** Play one match and apply the conquest the way App.applyConquest does. */
-function playMatch(state, rng, attackerId, defenderId, route = {}) {
+function playMatch(state, rng, attackerId, defenderId, route = {}, land = ENGLAND) {
   const a = state.teams[attackerId], d = state.teams[defenderId];
   const { effA, effD, drama } = tacticalMatchParameters({ attacker: a, defender: d, managedId: null,
     drama: UNCERTAINTY_PRESETS[state.settings.uncertainty].drama });
@@ -129,11 +142,11 @@ function playMatch(state, rng, attackerId, defenderId, route = {}) {
     applied: true, done: true, odds: { a: .5, b: .5 }, routeLabel: route.routeLabel || '', routeKind: route.routeKind || 'straight',
     resTitle: `${W.name.toUpperCase()} ANNEXES ${L.name.toUpperCase()}`, resText: `+${taken.length} territories`,
     winnerName: W.name, loserName: L.name, territoriesGained: taken.length, territoryIds: taken,
-    territoryNames: taken.map(cid => sectionNames[cid]), playerTaken: { ...stolen },
+    territoryNames: taken.map(cid => land.sectionNames[cid]), playerTaken: { ...stolen },
     replacedPlayer: beforeLineup.starters.find(p => !afterLineup.starters.some(q => q.originalIndex === p.originalIndex)) || null,
     strengthBefore, strengthAfter: teamEff(W), strengthGained: Math.round((teamEff(W) - strengthBefore) * 10) / 10 };
   const next = { ...state, teams, own, aliveIds: state.aliveIds.filter(id => id !== loserId), matches: state.matches + 1,
-    fallen: [...state.fallen, { id: loserId, r: state.round }], match: completed, spin: null,
+    fallen: [...state.fallen, { id: loserId, r: state.round }], match: completed, spin: null, conquestIds: taken,
     stats: { ...state.stats, [winnerId]: { conq: state.stats[winnerId].conq + 1, steals: [...state.stats[winnerId].steals, stolen.name] } } };
   next.history = [...state.history, recordMatch({ ...state, teams, sport }, completed, card({ ...state, teams }, completed))];
   next.log = [...state.log, { t: 'match', r: state.round, txt: `${a.code} ${sim.ga}–${sim.gd} ${d.code}`, chip: W.col },
@@ -150,55 +163,68 @@ function playMatch(state, rng, attackerId, defenderId, route = {}) {
   return next;
 }
 
-function kickoff(settings) {
-  const { teams, own, stats, aliveIds } = opening();
+function kickoff(settings, land = ENGLAND) {
+  const { teams, own, stats, aliveIds } = opening(land);
   return { phase: 'playing', settings, initialSettings: settings, teams, own, aliveIds, stats, fallen: [], round: 0, matches: 0,
-    queue: [], batchTotal: 0, log: [{ t: 'sys', r: 0, txt: `CAMPAIGN START — ${aliveIds.length} CLUBS · THEATRE: ${entry.name.toUpperCase()}` }],
+    queue: [], batchTotal: 0, log: [{ t: 'sys', r: 0, txt: `CAMPAIGN START — ${aliveIds.length} CLUBS · THEATRE: ${land.entry.name.toUpperCase()}` }],
     history: [], match: null, spin: null, series: null, choice: null, tacticalChoice: null, followedId: null,
     managedTeamId: null, managementEnded: false, managerElimination: null, decisionLedger: [], conquestIds: [],
-    metrics: { leaderChanges: 0, acquisitions: [], previousLeader: null }, campaignId: `domestic-${settings.pacing}`, revision: 0,
-    campaignName: `Football · ${entry.name} · top ${entry.clubs} clubs`, startedAt: Date.now(), completedAt: null };
+    metrics: { leaderChanges: 0, acquisitions: [], previousLeader: null }, campaignId: `domestic-${land.id}-${settings.pacing}`, revision: 0,
+    campaignName: `Football · ${land.entry.name} · top ${land.entry.clubs} clubs`, startedAt: Date.now(), completedAt: null };
 }
 
 /** Seeded duel campaign to a champion; every draw and conquest is checked as it happens. */
-function playDuelCampaign(seed, { onMatch } = {}) {
+function playDuelCampaign(seed, { onMatch, land = ENGLAND, islands = land.islandSections } = {}) {
   const rng = makeRng(seed);
-  let state = { ...kickoff({ ...SETTINGS, seed: String(seed) }), seed, rngState: rng.getState() };
+  let state = { ...kickoff({ ...land.settings, seed: String(seed) }, land), seed, rngState: rng.getState() };
   const routes = { straight: 0, sea: 0, 'neutral-transit': 0 };
   while (state.aliveIds.length > 1) {
-    const board = boardOf(state);
+    const board = boardOf(state, land);
     const draw = createDuelDraw(rng, board, { speed: 80 });
-    assertLegalDraw(board, draw, `seed ${seed} match ${state.matches + 1}`);
+    assertLegalDraw(board, draw, `${land.entry.name} seed ${seed} match ${state.matches + 1}`, { islands });
     routes[draw.routeKind] = (routes[draw.routeKind] || 0) + 1;
     state = { ...state, round: state.round + 1, spin: { ...draw, key: state.round + 1, tid: draw.attackerId, stage: 'locked' } };
     onMatch?.(state);
-    state = playMatch(state, rng, draw.attackerId, draw.targetId, draw);
-    assertConserved(state, `seed ${seed} after match ${state.matches}`);
+    state = playMatch(state, rng, draw.attackerId, draw.targetId, draw, land);
+    assertConserved(state, `${land.entry.name} seed ${seed} after match ${state.matches}`, land);
   }
   return { state: { ...state, rngState: rng.getState(), phase: 'victory', completedAt: Date.now() }, routes };
 }
 
-test('the shipped England map matches its generated index and pairs every club with one section', () => {
-  assert.ok(entry, 'England is in the generated domestic index');
-  assert.equal(domestic.meta.version, entry.version);
-  assert.equal(domestic.clubs.length, entry.clubs);
-  assert.equal(sectionIds.length, entry.clubs);
-  assert.deepEqual(domestic.clubs.map((club, rank) => ({ club, rank })).sort((a, b) => b.club.str - a.club.str || a.rank - b.rank)
-    .slice(0, 3).map(({ club }) => club.name), entry.top, 'the index names the three strongest clubs');
-  const { teams, own, aliveIds } = opening();
-  assert.equal(new Set(Object.values(own)).size, entry.clubs, 'no section is double-booked');
-  assert.deepEqual(Object.keys(own).sort(), [...sectionIds].sort(), 'every section starts owned');
-  for (const id of aliveIds) {
-    assert.ok(sectionIds.includes(teams[id].home), `${teams[id].name} starts on a real section`);
-    assert.equal(own[teams[id].home], id);
-    assert.deepEqual(territories({ own }, id), [teams[id].home], `${teams[id].name} holds exactly its home section`);
-    assert.equal(teams[id].kind, 'club');
-    assert.equal(teams[id].flagId, null);
-    assert.match(teams[id].code, /^[A-Z0-9]{3}$/);
+/** Clubs whose starting group `owner` holds (a whole group or none of it). */
+const clubsHeld = (land, own, owner) => land.domestic.clubs.filter(club => own[club.homeSection] === owner).map(club => club.id).sort();
+
+test('the shipped England and Fiji maps match the index and start every club on its own group of sections', () => {
+  for (const land of [ENGLAND, FIJI]) {
+    const { entry: item, domestic: country, sectionIds: sections, geo: shapes } = land;
+    assert.ok(item, `${land.id} is in the generated domestic index`);
+    assert.equal(country.meta.version, item.version);
+    assert.equal(country.clubs.length, item.clubs);
+    assert.equal(sections.length, item.sections ?? item.clubs, `${item.name}: the index counts the sections`);
+    assert.deepEqual(country.clubs.map((club, rank) => ({ club, rank })).sort((a, b) => b.club.str - a.club.str || a.rank - b.rank)
+      .slice(0, 3).map(({ club }) => club.name), item.top, 'the index names the three strongest clubs');
+    const { teams, own, aliveIds } = opening(land);
+    assert.deepEqual(Object.keys(own).sort(), [...sections].sort(), `${item.name}: every section starts owned, once`);
+    assert.deepEqual(own, { ...country.startOwners }, 'the loader\'s kickoff ownership is the same');
+    // Equal groups: floor or ceil of sections / clubs, home first.
+    const fewer = Math.floor(sections.length / item.clubs), more = Math.ceil(sections.length / item.clubs);
+    for (const id of aliveIds) {
+      const team = teams[id], row = country.clubs.find(club => club.id === id);
+      assert.equal(team.home, row.homeSection, `${team.name} keeps its home section as home`);
+      assert.equal(row.startSections[0], row.homeSection, `${team.name}: its home comes first`);
+      assert.deepEqual(territories({ own }, id).sort(), [...row.startSections].sort(), `${team.name} holds exactly its starting group`);
+      assert.ok(row.startSections.length === fewer || row.startSections.length === more, `${team.name}: ${row.startSections.length} sections`);
+      assert.equal(team.kind, 'club');
+      assert.equal(team.flagId, null);
+      assert.match(team.code, /^[A-Z0-9]{3}$/);
+    }
+    assert.equal(new Set(aliveIds.map(id => teams[id].code)).size, aliveIds.length, 'club codes are unique in the country');
+    assert.ok(sections.every(id => Number.isFinite(shapes.paths[id].cx) && Number.isFinite(shapes.paths[id].cy) && shapes.paths[id].area > 0));
+    assert.ok(sections.every(id => typeof land.sectionNames[id] === 'string' && land.sectionNames[id].length > 0));
   }
-  assert.equal(new Set(aliveIds.map(id => teams[id].code)).size, aliveIds.length, 'club codes are unique in the country');
-  assert.ok(sectionIds.every(id => Number.isFinite(geo.paths[id].cx) && Number.isFinite(geo.paths[id].cy) && geo.paths[id].area > 0));
-  assert.ok(sectionIds.every(id => typeof sectionNames[id] === 'string' && sectionNames[id].length > 0));
+  // The format-2 contract: 100 sections whatever the number of clubs.
+  assert.equal(FIJI.sectionIds.length, DOMESTIC_SECTIONS, 'Fiji is split into 100 sections');
+  assert.ok(FIJI.entry.clubs < DOMESTIC_SECTIONS && FIJI.domestic.clubs.every(club => club.startSections.length > 1), 'each Fiji club starts on several');
 });
 
 test('every England club can open the campaign with a legal duel draw', () => {
@@ -240,7 +266,7 @@ test('seeded duel campaigns play to a champion with conserved territory and no t
     assert.equal(state.aliveIds.length, 1);
     assert.equal(state.matches, entry.clubs - 1, 'N clubs need exactly N - 1 matches');
     assert.equal(state.fallen.length, entry.clubs - 1);
-    assert.equal(territories(state, championId).length, entry.clubs, 'the champion holds every section');
+    assert.equal(territories(state, championId).length, sectionIds.length, 'the champion holds every section');
     assert.equal(state.stats[championId].conq, state.teams[championId].squad.filter(player => player.from).length);
     assert.equal(routes['neutral-transit'], 0);
     assert.equal(routes.straight + routes.sea, entry.clubs - 1);
@@ -251,24 +277,24 @@ test('seeded duel campaigns play to a champion with conserved territory and no t
 });
 
 test('seeded blitz and chaos campaigns also finish with one fewer club per match', () => {
-  for (const [pacing, draw] of [['blitz', drawBlitzPairs], ['chaos', drawChaosPairs]]) {
+  for (const land of [ENGLAND, FIJI]) for (const [pacing, draw] of [['blitz', drawBlitzPairs], ['chaos', drawChaosPairs]]) {
     const rng = makeRng(20261019);
-    let state = kickoff({ ...SETTINGS, pacing });
+    let state = kickoff({ ...land.settings, pacing }, land);
     let rounds = 0;
     while (state.aliveIds.length > 1) {
       rounds++;
-      const pairs = pacing === 'blitz' ? draw(rng, boardOf(state)).pairs : draw(rng, boardOf(state));
+      const pairs = pacing === 'blitz' ? draw(rng, boardOf(state, land)).pairs : draw(rng, boardOf(state, land));
       assert.ok(pairs.length > 0, `${pacing}: every round draws at least one match`);
       const ids = pairs.flat();
       assert.equal(new Set(ids).size, ids.length, `${pacing}: no club plays twice in one round`);
       if (pacing === 'blitz') assert.equal(pairs.length, Math.floor(state.aliveIds.length / 2), 'blitz pairs everyone but an odd bye');
       state = { ...state, round: rounds };
-      for (const [a, d] of pairs) state = playMatch(state, rng, a, d);
-      assertConserved(state, `${pacing} round ${rounds}`);
+      for (const [a, d] of pairs) state = playMatch(state, rng, a, d, {}, land);
+      assertConserved(state, `${land.entry.name} ${pacing} round ${rounds}`, land);
     }
-    assert.equal(state.matches, entry.clubs - 1);
-    assert.equal(territories(state, state.aliveIds[0]).length, entry.clubs);
-    if (pacing === 'blitz') assert.equal(rounds, Math.ceil(Math.log2(entry.clubs)), 'blitz halves the field each round');
+    assert.equal(state.matches, land.entry.clubs - 1);
+    assert.equal(territories(state, state.aliveIds[0]).length, land.sectionIds.length);
+    if (pacing === 'blitz') assert.equal(rounds, Math.ceil(Math.log2(land.entry.clubs)), 'blitz halves the field each round');
   }
 });
 
@@ -299,13 +325,16 @@ test('domestic checkpoints round-trip through storage and stay under 0.5 MB', ()
   }
 });
 
-test('every shipped country kicks off with one club per section and legal duel draws', () => {
+test('every shipped country kicks off with each club on its starting sections and legal duel draws', () => {
   for (const item of DOMESTIC) {
-    const country = decodeDomestic(JSON.parse(readFileSync(new URL(`../public/domestic/${item.id}.json`, import.meta.url), 'utf8')), item.id);
+    const country = readCountry(item.id);
     const sections = country.geo.countries.map(section => section.id);
-    const own = Object.fromEntries(country.clubs.map(club => [club.homeSection, club.id]));
+    const own = { ...country.startOwners };
     assert.equal(country.meta.version, item.version, `${item.name}: the file is the indexed build`);
+    assert.equal(sections.length, item.sections ?? item.clubs, `${item.name}: the index counts the sections`);
     assert.deepEqual(Object.keys(own).sort(), [...sections].sort(), `${item.name}: every section starts owned, once`);
+    assert.ok(country.clubs.every(club => club.startSections[0] === club.homeSection
+      && club.startSections.every(section => own[section] === club.id)), `${item.name}: each club starts on its group, home first`);
     const board = { geo: country.geo, routingPaths: country.geo.paths, routeIndex: createAttackRouteIndex(country.geo.paths),
       own, aliveIds: country.clubs.map(club => club.id) };
     assert.deepEqual(validateReachability(board).unplacedIds, [], `${item.name}: every club is placed`);
@@ -323,14 +352,20 @@ test('every shipped country kicks off with one club per section and legal duel d
   }
 });
 
+/** The same clubs on a rebuilt map where each club starts on the next one's group (ranks shifted by one). */
+function shiftedBuild(land, version) {
+  const clubs = land.domestic.clubs;
+  return { ...land.domestic, meta: { ...land.domestic.meta, version },
+    clubs: clubs.map((club, i) => ({ ...club, homeSection: clubs[(i + 1) % clubs.length].homeSection,
+      startSections: clubs[(i + 1) % clubs.length].startSections })) };
+}
+
 test('a save from a rebuilt England map moves club by club: every club keeps its land and its holder', () => {
   let paused = null;
   playDuelCampaign(20261021, { onMatch: state => { if (state.matches === 30) paused = state; } });
   const saved = parseCampaign(serializeCampaign(campaignSnapshot({ ...paused, seed: 1, rngState: 1 })));
   // A refreshed club list that shifts every club down one rank, so every section id now names another club's start.
-  const homes = domestic.clubs.map(club => club.homeSection);
-  const rebuilt = { ...domestic, meta: { ...domestic.meta, version: '826-0badf00d' },
-    clubs: domestic.clubs.map((club, i) => ({ ...club, homeSection: homes[(i + 1) % homes.length] })) };
+  const rebuilt = shiftedBuild(ENGLAND, '826-0badf00d');
   const { campaign: moved, error } = fitDomesticCampaign(saved, rebuilt);
   assert.equal(error, undefined);
   for (const club of rebuilt.clubs) {
@@ -368,4 +403,88 @@ test('the app board blocks neighbouring land: draws stay legal and only exclaves
   }
   assert.equal(createAttackRouteIndex(geo.paths, obstacles), createAttackRouteIndex(geo.paths, obstacles), 'one cached index per map');
   assert.equal(obstacleRoutes, 0, 'no direct challenge crosses a neighbouring country');
+});
+
+// ---------- fewer clubs than sections (Fiji: 16 clubs, 100 sections) ----------
+
+test('Fiji: every club opens with a legal draw, and every conquest moves whole starting groups to a champion', () => {
+  const state = kickoff(FIJI.settings, FIJI), board = boardOf(state, FIJI);
+  assert.deepEqual(validateReachability(board).unplacedIds, []);
+  state.aliveIds.forEach((id, i) => {
+    let calls = 0;
+    const samples = [(i + .01) / state.aliveIds.length, (i * .61803398875) % 1, .5];
+    const draw = createDuelDraw(() => samples[calls++], board);
+    assert.equal(draw?.attackerId, id, 'the requested attacker is never rerouted at kickoff');
+    // An archipelago: sea routes are fair from any group.
+    assertLegalDraw(board, draw, `Fiji kickoff ${state.teams[id].name}`, { islands: null });
+  });
+  const startOf = new Map(FIJI.domestic.clubs.map(club => [club.id, club.startSections]));
+  for (const seed of [20261024, 11]) {
+    const { state: done, routes } = playDuelCampaign(seed, { land: FIJI, islands: null });
+    const championId = done.aliveIds[0];
+    assert.equal(done.matches, FIJI.entry.clubs - 1, 'N clubs need exactly N - 1 matches');
+    assert.equal(territories(done, championId).length, DOMESTIC_SECTIONS, 'the champion holds all 100 sections');
+    assert.equal(routes['neutral-transit'], 0);
+    // Each conquest takes whole groups: the loser's own first, then those it had won.
+    const won = new Map(FIJI.domestic.clubs.map(club => [club.id, [club.id]]));
+    for (const match of done.history) {
+      const { winnerId, loserId, territoryIds, territories: count } = match.result;
+      const groups = won.get(loserId);
+      assert.deepEqual([...territoryIds].sort(), groups.flatMap(id => startOf.get(id)).sort(), `${match.id}: exactly the loser's groups`);
+      assert.equal(count, territoryIds.length);
+      won.set(winnerId, [...won.get(winnerId), ...groups]);
+      won.delete(loserId);
+    }
+    assert.equal(done.history[0].result.territoryIds.length, startOf.get(done.history[0].result.loserId).length,
+      'the first conquest takes exactly one starting group');
+  }
+});
+
+test('Fiji saves round-trip; a rebuilt map, or the old one-section-per-club map, moves whole groups club by club', () => {
+  let paused = null;
+  playDuelCampaign(20261025, { land: FIJI, islands: null, onMatch: state => { if (state.matches === 6) paused = state; } });
+  const text = serializeCampaign(campaignSnapshot({ ...paused, seed: 1, rngState: 1 }));
+  const saved = parseCampaign(text);
+  assert.deepEqual(saved.own, paused.own);
+  assert.deepEqual(saved.teams, JSON.parse(JSON.stringify(paused.teams)));
+  assert.equal(Object.keys(saved.own).length, DOMESTIC_SECTIONS);
+  assert.equal(fitDomesticCampaign(saved, FIJI.domestic).campaign, saved, 'the same build resumes as saved');
+
+  // Ranks shifted by one: each club's new group is another club's old one, and goes to whoever held it before.
+  const rebuilt = shiftedBuild(FIJI, '242-0badf00d');
+  const { campaign: moved, error } = fitDomesticCampaign(saved, rebuilt);
+  assert.equal(error, undefined);
+  for (const club of rebuilt.clubs) {
+    const holder = saved.own[FIJI.domestic.clubs.find(item => item.id === club.id).homeSection];
+    assert.ok(club.startSections.every(section => moved.own[section] === holder), `${club.name}: its whole new group keeps its holder`);
+    assert.equal(moved.teams[club.id].home, club.homeSection);
+  }
+  assert.deepEqual(Object.keys(moved.own).sort(), [...FIJI.sectionIds].sort(), 'every section is still held');
+  const movedLand = { ...FIJI, domestic: rebuilt };
+  for (const id of saved.aliveIds) assert.deepEqual(clubsHeld(movedLand, moved.own, id), clubsHeld(FIJI, saved.own, id), 'empires keep their clubs\' land');
+  // The last conquest's sections now name the rebuilt groups of the same clubs.
+  const lost = new Set(FIJI.domestic.clubs.filter(club => saved.conquestIds.includes(club.homeSection)).map(club => club.id));
+  assert.ok(lost.size > 0);
+  const expected = rebuilt.clubs.filter(club => lost.has(club.id)).flatMap(club => club.startSections).sort();
+  assert.deepEqual([...moved.conquestIds].sort(), expected);
+  assert.deepEqual([...moved.match.territoryIds].sort(), expected);
+  assert.doesNotThrow(() => parseCampaign(serializeCampaign(campaignSnapshot(moved))), 'the moved save is a valid checkpoint');
+
+  // A save from the one-section-per-club build: club k held only <id>-k.
+  const oldHome = new Map(FIJI.domestic.clubs.map((club, rank) => [club.id, `242-${String(rank + 1).padStart(3, '0')}`]));
+  const legacy = { ...saved, settings: { ...saved.settings, domesticVersion: '242-00000000' }, conquestIds: [], match: null, history: [],
+    teams: Object.fromEntries(Object.entries(saved.teams).map(([id, team]) => [id, { ...team, home: oldHome.get(id) }])),
+    own: Object.fromEntries(FIJI.domestic.clubs.map(club => [oldHome.get(club.id), saved.own[club.homeSection]])) };
+  const upgraded = fitDomesticCampaign(legacy, FIJI.domestic);
+  assert.equal(upgraded.error, undefined);
+  assert.deepEqual(upgraded.campaign.own, saved.own, 'each club\'s new group goes to the holder of its old section');
+  assert.ok(Object.values(upgraded.campaign.teams).every(team => team.home === FIJI.domestic.clubs.find(club => club.id === team.id).homeSection));
+
+  // Holdings that split a starting group cannot come from play: the save is refused, and kept.
+  const group = FIJI.domestic.clubs.find(club => club.startSections.length > 1);
+  const other = saved.aliveIds.find(id => id !== saved.own[group.homeSection]);
+  const split = { ...saved, own: { ...saved.own, [group.startSections[1]]: other } };
+  assert.match(fitDomesticCampaign(split, rebuilt).error, /holdings do not follow its clubs' starting sections.*save is kept/);
+  assert.equal(saved.own[group.startSections[1]], saved.own[group.homeSection], 'the save itself is untouched');
+  assert.match(fitDomesticCampaign(saved, { ...rebuilt, clubs: rebuilt.clubs.slice(1) }).error, /1 of its clubs is not on the updated map/);
 });

@@ -1,6 +1,8 @@
 // Section partition for domestic campaigns (docs/design/domestic-campaigns.md,
 // "Section partition"): admin units plus club home points become one section per
-// club, dissolved into a TopoJSON whose neighbouring sections share arcs.
+// club (format 1), or 100 sections in one group per club (format 2: each club's
+// section cut into its group), dissolved into a TopoJSON whose neighbouring sections
+// share arcs.
 // Beyond the spec's steps (partitionCountry runs them in order): multi-part units
 // are exploded into single polygons so sections stay contiguous, a unit shared by
 // clubs is also cut when seeding would push one of them far from home, and growth
@@ -317,6 +319,530 @@ export function placeClubs(units, homeOf, places, { spacingKm }) {
   return placed;
 }
 
+// ---- Format 2: a territory per club, cut into its group of sections ----
+
+// A candidate's weight grows slowly with its population, so a town beats a village only
+// where it would hold a comparable share of land: sections stay city-centred where people
+// live and region-sized where they do not. Admin-unit centres and land samples come
+// last, where no place fits.
+const POP_EXPONENT = 0.3;
+const VILLAGE_POP = 100; // a place without a population (GeoNames country files)
+const UNIT_POP = 4; // an admin unit's centre
+const GRID_POP = 1; // a land sample (named after its unit)
+
+/** Even-odd scanline crossings of the polygons' rings with each latitude row (row r at lat0 + (r + 0.5) * dy). */
+function rowCrossings(polys, lat0, dy) {
+  const rows = new Map();
+  for (const poly of polys) for (const ring of poly) {
+    for (let i = 0; i < ring.length - 1; i++) {
+      const [x1, y1] = ring[i], [x2, y2] = ring[i + 1];
+      if (y1 === y2) continue;
+      const lo = Math.min(y1, y2), hi = Math.max(y1, y2);
+      for (let r = Math.ceil((lo - lat0) / dy - 0.5); lat0 + (r + 0.5) * dy < hi; r++) {
+        const y = lat0 + (r + 0.5) * dy;
+        if (y < lo) continue;
+        if (!rows.has(r)) rows.set(r, []);
+        rows.get(r).push(x1 + (y - y1) * (x2 - x1) / (y2 - y1));
+      }
+    }
+  }
+  for (const xs of rows.values()) xs.sort((a, b) => a - b);
+  return rows;
+}
+
+/** Even-odd crossings of the polygons' rings with the latitude y, sorted. */
+function crossingsAt(polys, y) {
+  const xs = [];
+  for (const poly of polys) for (const ring of poly) {
+    for (let i = 0; i < ring.length - 1; i++) {
+      const [x1, y1] = ring[i], [x2, y2] = ring[i + 1];
+      if ((y1 <= y) !== (y2 <= y)) xs.push(x1 + (y - y1) * (x2 - x1) / (y2 - y1));
+    }
+  }
+  return xs.sort((a, b) => a - b);
+}
+
+/** A point inside the polygons: the centroid when it is inside, else the middle of the widest span through it. */
+export function interiorPoint(polys) {
+  const c = centroidOf(polys);
+  if (pointInPolys(c, polys)) return c;
+  const [, s, , n] = bboxOf(polys);
+  for (const y of [c[1], (s + n) / 2]) {
+    const xs = crossingsAt(polys, y);
+    let best = null;
+    for (let i = 0; i + 1 < xs.length; i += 2) if (!best || xs[i + 1] - xs[i] > best[1] - best[0]) best = [xs[i], xs[i + 1]];
+    if (best && best[1] > best[0]) return [(best[0] + best[1]) / 2, y];
+  }
+  return polys[0][0][0].slice();
+}
+
+/**
+ * Land as weighted points: a grid of about `target` points on an equal-area lattice over
+ * every unit, each worth its unit's area over its unit's point count; a unit the grid
+ * misses (an islet) counts once at its interior point. Returns [{ p, unit, w }].
+ */
+export function landSamples(units, target) {
+  const total = units.reduce((s, u) => s + u.area, 0);
+  const stepKm = Math.sqrt(total / target);
+  const dy = stepKm / (EARTH_KM * RAD);
+  const out = [];
+  for (const u of units) {
+    const pts = [];
+    for (const [r, xs] of rowCrossings(u.polys, -90, dy)) {
+      const y = -90 + (r + 0.5) * dy;
+      const dx = dy / Math.max(0.02, Math.cos(y * RAD));
+      for (let i = 0; i + 1 < xs.length; i += 2) {
+        for (let k = Math.ceil((xs[i] + 180) / dx - 0.5); -180 + (k + 0.5) * dx < xs[i + 1]; k++) pts.push([-180 + (k + 0.5) * dx, y]);
+      }
+    }
+    if (!pts.length) pts.push(interiorPoint(u.polys));
+    for (const p of pts) out.push({ p, unit: u.index, w: u.area / pts.length });
+  }
+  return out;
+}
+
+const unitVector = ([lon, lat]) => [Math.cos(lat * RAD) * Math.cos(lon * RAD), Math.cos(lat * RAD) * Math.sin(lon * RAD), Math.sin(lat * RAD)];
+const chordKm = km => 2 * Math.sin(Math.min(Math.PI, km / EARTH_KM) / 2);
+const unitAtPoint = (units, q) => units.find(u => inBox(q, u.bbox) && pointInPolys(q, u.polys))?.index ?? null;
+
+/** Starting group sizes: floor or ceil(count / clubs) sections, the stronger clubs the larger. */
+export function groupTargets(count, clubs) {
+  const q = Math.floor(count / clubs), r = count - q * clubs;
+  return Array.from({ length: clubs }, (_, c) => (c < r ? q + 1 : q));
+}
+
+/**
+ * Seeds for `count` more sections in one territory (`units`, holding the club's start
+ * `seed` in unit `seedUnit`): each step takes the candidate that would take the most of
+ * the territory's land from the seeds so far (land on the candidate's own landmass,
+ * `part(unit)`: a section grows over land), weighted by population^0.3 — GeoNames places (`places`, inside
+ * the territory), then admin-unit centres, then land samples — at least a quarter of a
+ * section's side from every seed and outside the units in `avoid` (around a small start,
+ * which they would box in) while any candidate is, else the best anywhere (a city
+ * territory cut into small sections). Lazy greedy (shares only shrink as seeds are
+ * added), deterministic. Returns [{ unit, point, place, kind }]: kind 'place' (named after
+ * the place) or 'unit' (named after a place it holds, else its unit).
+ */
+function territoryExtras(units, seed, seedUnit, places, count, { minKm2 = 0, avoid = new Set(), part = () => 0 } = {}) {
+  const area = units.reduce((s, u) => s + u.area, 0);
+  const samples = landSamples(units, Math.min(4000, Math.max(400, 200 * (count + 1))));
+  const m = samples.length;
+  const sx = new Float64Array(m), sy = new Float64Array(m), sz = new Float64Array(m), sw = new Float64Array(m), near = new Float64Array(m).fill(4);
+  samples.forEach((s, i) => { [sx[i], sy[i], sz[i]] = unitVector(s.p); sw[i] = s.w; });
+  const sp = samples.map(s => part(s.unit));
+  const candidates = [];
+  for (const p of places) candidates.push({ point: [p.lon, p.lat], unit: p.unit, place: p.source ?? p, kind: 'place', weight: Math.max(VILLAGE_POP, p.pop) ** POP_EXPONENT });
+  for (const u of [...units].filter(v => v.area >= minKm2).sort((a, b) => b.area - a.area || a.index - b.index).slice(0, 1000)) {
+    candidates.push({ point: interiorPoint(u.polys), unit: u.index, place: null, kind: 'unit', weight: UNIT_POP ** POP_EXPONENT });
+  }
+  for (const s of samples) candidates.push({ point: s.p, unit: s.unit, place: null, kind: 'unit', weight: GRID_POP ** POP_EXPONENT });
+  // A territory smaller than its sample grid: points inside its largest units.
+  if (candidates.length < 4 * (count + 1)) {
+    for (const u of [...units].sort((a, b) => b.area - a.area || a.index - b.index).slice(0, 8)) {
+      for (const p of interiorSamples(u, 60 * (count + 1))) candidates.push({ point: p, unit: u.index, place: null, kind: 'unit', weight: GRID_POP ** POP_EXPONENT });
+    }
+  }
+  const cv = candidates.map(c => unitVector(c.point));
+  const cp = candidates.map(c => part(c.unit));
+  const candNear = new Float64Array(candidates.length).fill(4);
+  const addSeed = (point, unit) => {
+    const [x, y, z] = unitVector(point);
+    const own = part(unit);
+    for (let i = 0; i < m; i++) {
+      const d = (sx[i] - x) ** 2 + (sy[i] - y) ** 2 + (sz[i] - z) ** 2;
+      if (sp[i] === own && d < near[i]) near[i] = d;
+    }
+    cv.forEach((v, j) => { const d = (v[0] - x) ** 2 + (v[1] - y) ** 2 + (v[2] - z) ** 2; if (d < candNear[j]) candNear[j] = d; });
+  };
+  addSeed(seed, seedUnit);
+  const minChord2 = chordKm(0.25 * Math.sqrt(area / (count + 1))) ** 2;
+  const share = k => {
+    const [x, y, z] = cv[k];
+    let sum = 0;
+    for (let i = 0; i < m; i++) if (sp[i] === cp[k] && (sx[i] - x) ** 2 + (sy[i] - y) ** 2 + (sz[i] - z) ** 2 < near[i]) sum += sw[i];
+    return sum;
+  };
+  // Upper bounds on each candidate's score, made exact when one reaches the top.
+  const bound = new Float64Array(candidates.length).fill(Infinity);
+  const stale = new Uint8Array(candidates.length).fill(1);
+  const used = new Uint8Array(candidates.length);
+  const best = spaced => {
+    for (;;) {
+      let top = -1;
+      for (let k = 0; k < candidates.length; k++) {
+        if (used[k] || candNear[k] < 1e-18 || (spaced && (candNear[k] < minChord2 || avoid.has(candidates[k].unit))) || !(bound[k] > 0)) continue;
+        if (top < 0 || bound[k] > bound[top]) top = k;
+      }
+      if (top < 0 || !stale[top]) return top;
+      bound[top] = share(top) * candidates[top].weight;
+      stale[top] = 0;
+    }
+  };
+  const out = [];
+  while (out.length < count) {
+    let k = best(true);
+    if (k < 0) k = best(false);
+    if (k < 0) throw new Error(`Only ${out.length} of ${count} extra sections found room in a territory`);
+    used[k] = 1;
+    const { point, unit, place, kind } = candidates[k];
+    out.push({ unit, point, place, kind });
+    addSeed(point, unit);
+    stale.fill(1);
+  }
+  return out;
+}
+
+/**
+ * Starts for clubs boxed in by others (format 2, every club on two or more sections, in
+ * a city with more clubs than a fan takes). A club needs `minSectionKm2` of land per
+ * section (land samples nearest its start, in units it can grow over from there: not
+ * across a strait, nor through other clubs' start units or fan sectors), or it would cut
+ * a few city blocks into sections too small to see. Strongest first, a club keeps its
+ * home as its start when it has that room and leaves every stronger club its room;
+ * otherwise it starts at the place or admin-unit centre nearest its home with four times
+ * that room, outside every fan zone, away from every other start and within `maxKm` of
+ * home (a club territory's width): the stronger clubs keep the city. Its home stays in
+ * the file, and its home section is the one nearest its home. `fixed` clubs (fanned) stay
+ * and are only obstacles; `force` clubs (found boxed in after growth) always move. Moves
+ * homeOf[i].point/.unit; returns the clubs moved.
+ */
+export function moveBoxedStarts(units, homeOf, targets, samples, places, { fixed = new Set(), minKm2 = 0, minSectionKm2 = 0, force = new Set(), maxKm = Infinity } = {}) {
+  const n = targets.length;
+  const room = c => minSectionKm2 * targets[c];
+  const m = samples.length;
+  const sv = samples.map(s => unitVector(s.p));
+  const { adjacency } = unitTopology(units);
+  const startIn = new Map(); // unit -> the club starting there
+  const mayTake = (c, u) => (startIn.get(u) ?? c) === c && (!units[u].fans || units[u].fans.every(k => k == null || k === c));
+  // Units club c could grow over from a start in `unit` (rebuilt as starts settle).
+  let reachCache = new Map();
+  const reachable = (c, unit) => {
+    const key = `${c}:${unit}`;
+    if (!reachCache.has(key)) {
+      const seen = new Uint8Array(units.length);
+      const stack = [unit];
+      seen[unit] = 1;
+      while (stack.length) for (const v of adjacency[stack.pop()]) if (!seen[v] && mayTake(c, v)) { seen[v] = 1; stack.push(v); }
+      reachCache.set(key, seen);
+    }
+    return reachCache.get(key);
+  };
+  const open = (i, c, unit) => reachable(c, unit)[samples[i].unit] === 1;
+  const zoned = u => Boolean(units[u].fans?.some(k => k != null));
+  const d2 = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+  const candidates = [
+    ...places.map(p => ({ point: [p.lon, p.lat], unit: unitAtPoint(units, [p.lon, p.lat]) })).filter(c => c.unit != null),
+    ...units.filter(u => u.area >= minKm2).map(u => ({ point: interiorPoint(u.polys), unit: u.index })),
+  ].filter(c => !zoned(c.unit));
+  // The starts decided so far (fanned clubs, then clubs by strength): nearest per sample.
+  const owner = new Int32Array(m).fill(-1), near = new Float64Array(m).fill(4);
+  const area = new Array(n).fill(0);
+  const placed = [];
+  const settle = (c, point, unit) => {
+    const v = unitVector(point);
+    sv.forEach((p, i) => {
+      const d = d2(p, v);
+      if (d >= near[i] || !open(i, c, unit)) return;
+      if (owner[i] >= 0) area[owner[i]] -= samples[i].w;
+      owner[i] = c; near[i] = d; area[c] += samples[i].w;
+    });
+    if (!startIn.has(unit)) { startIn.set(unit, c); reachCache = new Map(); }
+    placed.push(c);
+  };
+  // Land club c starting at `point` (in `unit`) would take, per club it takes it from.
+  const takes = (c, point, unit) => {
+    const v = unitVector(point);
+    const from = new Map();
+    let total = 0;
+    sv.forEach((p, i) => {
+      if (d2(p, v) >= near[i] || !open(i, c, unit)) return;
+      total += samples[i].w;
+      if (owner[i] >= 0) from.set(owner[i], (from.get(owner[i]) || 0) + samples[i].w);
+    });
+    return { total, from };
+  };
+  const leaves = from => [...from].every(([k, w]) => fixed.has(k) || area[k] < room(k) || area[k] - w >= room(k));
+  for (const c of fixed) if (homeOf[c]) settle(c, homeOf[c].point, homeOf[c].unit);
+  const moved = [];
+  for (let c = 0; c < n; c++) {
+    if (!homeOf[c] || fixed.has(c)) continue;
+    const here = takes(c, homeOf[c].point, homeOf[c].unit);
+    if (!force.has(c) && here.total >= room(c) && leaves(here.from)) { settle(c, homeOf[c].point, homeOf[c].unit); continue; }
+    const home = homeOf[c].point;
+    const spacing = Math.sqrt(room(c));
+    let best = null, tried = 0;
+    for (const cand of [...candidates].sort((a, b) => kmBetween(home, a.point) - kmBetween(home, b.point))) {
+      if (kmBetween(home, cand.point) > maxKm) break;
+      if (placed.some(k => kmBetween(homeOf[k].point, cand.point) < spacing)) continue;
+      if (++tried > 200) break;
+      const t = takes(c, cand.point, cand.unit);
+      const ok = t.total >= 4 * room(c) && leaves(t.from);
+      if (!best || (ok && !best.ok) || (ok === best.ok && t.total > best.total)) best = { ...cand, total: t.total, ok };
+      if (ok) break;
+    }
+    if (!best) { settle(c, home, homeOf[c].unit); continue; }
+    homeOf[c] = { ...homeOf[c], unit: best.unit, point: best.point, moved: true };
+    moved.push(c);
+    settle(c, best.point, best.unit);
+  }
+  return moved;
+}
+
+/** Maps a unit index of `before` to `after` (cut units go to the piece holding `point`, else the nearest). */
+function unitMapper(before, after) {
+  const byId = new Map(after.map(u => [u.id, u.index]));
+  return (index, point) => {
+    const id = before[index].id;
+    if (byId.has(id)) return byId.get(id);
+    const pieces = after.filter(u => u.id.startsWith(`${id}~`));
+    const holding = pieces.find(u => inBox(point, u.bbox) && pointInPolys(point, u.polys));
+    return (holding ?? pieces.reduce((a, u) => (!a || kmToPolys(point, u.polys) < kmToPolys(point, a.polys) ? u : a), null))?.index ?? null;
+  };
+}
+
+// More clubs than this around one city would get slivers rather than wedges.
+const FAN_MAX = 12;
+// A territory under this share of its sections' room (minSectionKm2 each) is boxed in.
+const BOXED = 0.5;
+
+/**
+ * Fans for clubs crowded into one city, when every club starts on two or more sections.
+ * Clubs whose homes link within `linkKm` form a cluster when there are three or more, or
+ * two sharing a town point: left alone, the inner ones are boxed in by their neighbours'
+ * sections and their groups stay in the city. Around such a cluster's centre, a zone
+ * wide enough for one corridor per club (and holding every club within it, at most
+ * FAN_MAX) is cut into one sector per club, of equal land within the zone, in the order
+ * of the homes' bearings (starting at the widest gap: the sea, for a port). Zone pieces
+ * are tagged with their club (`unit.fans[f]`) and only it may take them (growSections'
+ * allowed); beyond the zone the clubs grow freely, so their land follows the country's
+ * shape rather than straight rays. A club starts in the largest connected part of its
+ * sector: at its home when that holds it, else next to the centre. A cluster holding a
+ * `force` club (found boxed in after growth) is fanned whatever its size; `exclude` clubs
+ * (to start outside) take no part. Returns { units, fans: [{ centre, members, zoneKm }] }
+ * and moves homeOf[i].point/.unit of clubs starting away from home.
+ */
+export function fanSectors(units, homeOf, { linkKm, grain, force = new Set(), exclude = new Set() }) {
+  const n = homeOf.length;
+  const clubs = [...Array(n).keys()].filter(c => homeOf[c] && !exclude.has(c));
+  const root = [...Array(n).keys()];
+  const find = c => (root[c] === c ? c : (root[c] = find(root[c])));
+  for (const a of clubs) for (const b of clubs) if (a < b && kmBetween(homeOf[a].point, homeOf[b].point) <= linkKm) root[find(a)] = find(b);
+  const centreOf = list => [list.reduce((s, c) => s + homeOf[c].point[0], 0) / list.length, list.reduce((s, c) => s + homeOf[c].point[1], 0) / list.length];
+  const fans = [];
+  for (const head of clubs.filter(c => find(c) === c)) {
+    const linked = clubs.filter(c => find(c) === head);
+    const shared = linked.some(a => linked.some(b => a < b && kmBetween(homeOf[a].point, homeOf[b].point) < 0.5));
+    if (linked.length < 3 && !(linked.length === 2 && shared) && !(linked.length === 2 && linked.some(c => force.has(c)))) continue;
+    const centre = centreOf(linked);
+    const spread = Math.max(...linked.map(c => kmBetween(homeOf[c].point, centre)));
+    // Room for a corridor per club, within a few links of the city. Every club within the
+    // zone joins: another club's start there would block the corridors.
+    const zoneKm = Math.min(Math.max(2 * spread, linkKm, 1.5 * linked.length * grain / (2 * Math.PI)), 4 * Math.max(linkKm, spread));
+    const members = clubs.filter(c => kmBetween(homeOf[c].point, centre) <= zoneKm);
+    if (members.length > FAN_MAX || fans.some(f => f.members.some(c => members.includes(c)))) continue;
+    fans.push({ centre, members, zoneKm });
+  }
+  let list = units;
+  fans.forEach((fan, f) => {
+    const { centre: C, members, zoneKm } = fan;
+    const kx = Math.cos(C[1] * RAD) * EARTH_KM * RAD, ky = EARTH_KM * RAD;
+    const bearing = p => (Math.atan2((p[1] - C[1]) * ky, (p[0] - C[0]) * kx) + 2 * Math.PI) % (2 * Math.PI);
+    const at = c => (kmBetween(homeOf[c].point, C) < 0.05 ? null : bearing(homeOf[c].point));
+    const zone = list.filter(u => kmToPolys(C, u.polys) <= zoneKm);
+    const land = landSamples(zone, 2000).filter(s => kmBetween(s.p, C) <= zoneKm).map(s => [bearing(s.p), s.w]).sort((a, b) => a[0] - b[0]);
+    let start = 0, gap = 0;
+    land.forEach(([b], i) => {
+      const next = i + 1 < land.length ? land[i + 1][0] : land[0][0] + 2 * Math.PI;
+      if (next - b > gap) { gap = next - b; start = next % (2 * Math.PI); }
+    });
+    if (gap < Math.PI / 9) {
+      const first = members.map(at).filter(b => b != null).sort((a, b) => a - b)[0];
+      start = first == null ? 0 : (first - Math.PI / members.length + 2 * Math.PI) % (2 * Math.PI);
+    }
+    const turn = b => (b - start + 4 * Math.PI) % (2 * Math.PI);
+    // Homes at the centre itself have no bearing: they follow, strongest first.
+    members.sort((a, b) => (at(a) == null ? Infinity : turn(at(a))) - (at(b) == null ? Infinity : turn(at(b))) || a - b);
+    const turned = land.map(([b, w]) => [turn(b), w]).sort((a, b) => a[0] - b[0]);
+    const total = turned.reduce((s, [, w]) => s + w, 0);
+    // Sector edges (turned angles): equal land in the zone, or equal angles without land samples.
+    const edges = [0];
+    let acc = 0, j = 0;
+    for (let i = 1; i < members.length; i++) {
+      if (!total) { edges.push(2 * Math.PI * i / members.length); continue; }
+      while (j < turned.length && acc + turned[j][1] <= total * i / members.length) acc += turned[j++][1];
+      edges.push(j < turned.length ? turned[j][0] : 2 * Math.PI * i / members.length);
+    }
+    edges.push(2 * Math.PI);
+    const slot = p => { const b = turn(bearing(p)); let i = 0; while (i + 1 < members.length && b >= edges[i + 1]) i++; return i; };
+    const next = [];
+    const cut = [];
+    for (const u of list) {
+      const tags = u.fans ? [...u.fans] : [];
+      tags[f] = null;
+      if (!zone.includes(u)) { next.push({ ...u, fans: tags }); continue; }
+      const far = 1.2 * Math.max(...u.polys.flatMap(poly => poly[0].map(p => Math.hypot((p[0] - C[0]) * kx, (p[1] - C[1]) * ky)))) + 1;
+      const pieces = [];
+      let failed = false;
+      members.forEach((club, i) => {
+        if (failed) return;
+        const a0 = edges[i] + start, a1 = edges[i + 1] + start;
+        const ring = [C];
+        for (let k = 0, steps = Math.max(2, Math.ceil((a1 - a0) / (Math.PI / 36))); k <= steps; k++) {
+          const a = a0 + (a1 - a0) * k / steps;
+          ring.push([C[0] + far * Math.cos(a) / kx, C[1] + far * Math.sin(a) / ky]);
+        }
+        ring.push(C);
+        try {
+          const polys = polygonClipping.intersection(u.polys, [ring]).map(poly => poly.map(closeRing).filter(r => r.length >= 4)).filter(q => q.length);
+          if (polys.length) pieces.push({ club, i, polys });
+        } catch { failed = true; }
+      });
+      if (failed || pieces.length < 2) {
+        tags[f] = members[slot(u.centroid)];
+        next.push({ ...u, fans: tags });
+        continue;
+      }
+      const dirOf = pc => COMPASS[((Math.round(Math.atan2((pc[1] - C[1]) * ky, (pc[0] - C[0]) * kx) / (Math.PI / 4)) % 8) + 8) % 8];
+      const base = u.baseName ?? u.name;
+      for (const p of pieces) {
+        const dir = dirOf(centroidOf(p.polys));
+        for (const m of explodeUnits([{ id: `${u.id}~f${f}.${p.i}`, name: `${base} (${dir})`, baseName: base, qualifier: dir, polys: p.polys }])) {
+          const v = { ...m, fans: Object.assign([...tags], { [f]: p.club }) };
+          next.push(v);
+          cut.push(v);
+        }
+      }
+    }
+    if (cut.length) {
+      const boxes = cut.map(v => bboxOf(v.polys));
+      const hits = (a, b) => !(a[0] > b[2] + 1e-6 || a[2] < b[0] - 1e-6 || a[1] > b[3] + 1e-6 || a[3] < b[1] - 1e-6);
+      nodeRings(next.filter(v => cut.includes(v) || boxes.some(b => hits(bboxOf(v.polys), b))));
+    }
+    const before = list;
+    list = prepareUnits(next);
+    const map = unitMapper(before, list);
+    homeOf.forEach((h, c) => { if (h) homeOf[c] = { ...h, unit: map(h.unit, h.point) }; });
+  });
+  // Starts in the largest connected part of the club's own sector (a sector can break up
+  // near a centre on the water): at home when that part holds it, else next to the centre.
+  const { adjacency } = fans.length ? unitTopology(list) : { adjacency: [] };
+  fans.forEach((fan, f) => {
+    for (const c of fan.members) {
+      const home = homeOf[c].point;
+      const own = new Set(list.filter(u => u.fans[f] === c).map(u => u.index));
+      let part = null;
+      const seen = new Set();
+      for (const s of own) {
+        if (seen.has(s)) continue;
+        const members = [s];
+        seen.add(s);
+        for (let i = 0; i < members.length; i++) for (const v of adjacency[members[i]]) if (own.has(v) && !seen.has(v)) { seen.add(v); members.push(v); }
+        const area = members.reduce((sum, v) => sum + list[v].area, 0);
+        if (!part || area > part.area) part = { members, area };
+      }
+      if (!part) continue;
+      if (part.members.includes(homeOf[c].unit) && pointInPolys(home, list[homeOf[c].unit].polys)) continue;
+      const first = part.members.map(v => list[v]).reduce((best, u) => (!best || kmToPolys(fan.centre, u.polys) < kmToPolys(fan.centre, best.polys) ? u : best), null);
+      // The point of that unit nearest the centre: a wedge piece can reach far inland.
+      const point = interiorSamples(first, 400).filter(q => pointInPolys(q, first.polys))
+        .reduce((best, q) => (!best || kmBetween(q, fan.centre) < kmBetween(best, fan.centre) ? q : best), null) ?? interiorPoint(first.polys);
+      homeOf[c] = { ...homeOf[c], unit: first.index, point, fan: true };
+    }
+  });
+  return { units: list, fans };
+}
+
+/**
+ * Format 2 with fewer clubs than sections: each club's territory (its format-1 section,
+ * `owner` from growSections over `units` and their `adjacency`, started at
+ * `seedUnit`/`seedPoint`) is cut into
+ * its group of sections, so every group is one territory, contiguous as format-1
+ * sections are. Group sizes are floor or ceil(sections / clubs), the stronger clubs the
+ * larger, except that a territory too small for its larger size (under `minSectionKm2`
+ * a section: a club hemmed in by others in its city) gives that size to the strongest
+ * club with room. Each territory gets its extra seeds (territoryExtras, at `places`),
+ * units holding several starts are cut (splitUnits with crowdAll), and each territory
+ * grows its own sections (growSections on its units alone). Returns { units, topo,
+ * adjacency, owner: unit -> start (clubs, then extras), seedUnit, seedPoint, extras:
+ * [{ unit, point, place, kind, group }], targets, moved, splits, unitOf(old unit index,
+ * point) for indices into the new units }.
+ */
+export function subdivideTerritories(units, { owner, seedUnit, seedPoint, adjacency: unitAdjacency }, homeOf, places, sections, { reach, padKm, minKm2 = 0, minSectionKm2 = 0, log = () => {} } = {}) {
+  const n = seedUnit.length;
+  const targets = groupTargets(sections, n);
+  const q = Math.min(...targets);
+  const area = new Array(n).fill(0);
+  owner.forEach((c, u) => { area[c] += units[u].area; });
+  const moved = new Set();
+  for (let c = 0; c < n; c++) {
+    if (targets[c] !== q + 1 || area[c] / (q + 1) >= minSectionKm2) continue;
+    const taker = [...Array(n).keys()].find(d => targets[d] === q && area[d] / (q + 1) >= minSectionKm2);
+    if (taker == null) break;
+    targets[c] = q;
+    targets[taker] = q + 1;
+    moved.add(c).add(taker);
+  }
+  const tagged = units.map((u, i) => ({ ...u, territory: owner[i] }));
+  // Places by territory, most populous first.
+  const placesIn = Array.from({ length: n }, () => []);
+  for (const p of [...places].sort((a, b) => b.pop - a.pop || a.id - b.id)) {
+    const q2 = [p.lon, p.lat];
+    const unit = units.find(u => inBox(q2, u.bbox) && pointInPolys(q2, u.polys))?.index;
+    if (unit != null && placesIn[owner[unit]].length < 500) placesIn[owner[unit]].push({ ...p, unit });
+  }
+  // A club's start stays its format-1 start; a point inside that unit for the cut.
+  const starts = Array.from({ length: n }, (_, c) => {
+    const u = units[seedUnit[c]];
+    const point = pointInPolys(seedPoint[c], u.polys) ? seedPoint[c] : interiorPoint(u.polys);
+    return { unit: seedUnit[c], point, ...(homeOf[c]?.placed ? { placed: true } : {}) };
+  });
+  const extras = [];
+  for (let c = 0; c < n; c++) {
+    if (targets[c] < 2) continue;
+    const mine = tagged.filter(u => u.territory === c);
+    // A start smaller than a quarter of its sections' share keeps its neighbours for itself.
+    const small = units[seedUnit[c]].area < 0.25 * area[c] / targets[c];
+    const avoid = new Set(small ? [seedUnit[c], ...unitAdjacency[seedUnit[c]]] : []);
+    // The territory's landmasses.
+    const inside = new Set(mine.map(u => u.index));
+    const partOf = new Map();
+    for (const u of mine) {
+      if (partOf.has(u.index)) continue;
+      const stack = [u.index];
+      partOf.set(u.index, u.index);
+      while (stack.length) for (const v of unitAdjacency[stack.pop()]) if (inside.has(v) && !partOf.has(v)) { partOf.set(v, u.index); stack.push(v); }
+    }
+    for (const e of territoryExtras(mine, starts[c].point, seedUnit[c], placesIn[c], targets[c] - 1, { minKm2, avoid, part: u => partOf.get(u) })) extras.push({ ...e, group: c });
+  }
+  const seeds = [...starts, ...extras.map(e => ({ unit: e.unit, point: e.point }))];
+  const groupOf = k => (k < n ? k : extras[k - n].group);
+  const { units: cut, splits } = splitUnits(tagged, seeds, sections, { crowdAll: true, minKm2, log });
+  extras.forEach((e, i) => { e.unit = seeds[n + i].unit; });
+  const { topo, adjacency } = unitTopology(cut);
+  const out = new Array(cut.length).fill(-1);
+  const startUnit = new Array(seeds.length), startPoint = new Array(seeds.length);
+  for (let c = 0; c < n; c++) {
+    const mine = cut.filter(u => u.territory === c);
+    const local = new Map(mine.map((u, i) => [u.index, i]));
+    const sub = mine.map((u, i) => ({ ...u, index: i }));
+    const subAdjacency = mine.map(u => adjacency[u.index].filter(v => local.has(v)).map(v => local.get(v)));
+    const own = seeds.map((_, k) => k).filter(k => groupOf(k) === c);
+    const homes = own.map(k => {
+      if (!local.has(seeds[k].unit)) throw new Error(`A start of club ${c + 1} lies outside its territory`);
+      return { ...seeds[k], unit: local.get(seeds[k].unit) };
+    });
+    const grown = growSections(sub, subAdjacency, homes, { reach, padKm, minKm2 });
+    grown.owner.forEach((o, i) => { out[mine[i].index] = own[o]; });
+    own.forEach((k, j) => { startUnit[k] = mine[grown.seedUnit[j]].index; startPoint[k] = grown.seedPoint[j]; });
+  }
+  if (extras.length) log(`  ${extras.length} extra sections: ${extras.filter(e => e.kind === 'place').length} at places, ${extras.filter(e => e.kind !== 'place').length} at unit centres or land samples${moved.size ? `; sizes moved: ${[...moved].sort((a, b) => a - b).map(c => `#${c + 1}`).join(', ')}` : ''}`);
+  const unitOf = unitMapper(units, cut);
+  return {
+    units: cut, topo, adjacency, owner: out, seedUnit: startUnit, seedPoint: startPoint, extras, targets,
+    moved: [...moved].sort((a, b) => a - b), splits, unitOf,
+  };
+}
+
 // ---- Splitting crowded units ----
 
 const COMPASS = ['east', 'north-east', 'north', 'north-west', 'west', 'south-west', 'south', 'south-east'];
@@ -365,13 +891,22 @@ function interiorSamples(unit, target = 900) {
 
 /**
  * Cut one unit into pieces: Voronoi cells of `sites` (computed on a plane scaled
- * by cos(latitude), then mapped back to lon/lat) intersected with the unit.
+ * by cos(latitude), then mapped back to lon/lat) intersected with the unit. Sites on
+ * one line (places on a GeoNames grid) can break the diagram, a site losing its cell
+ * while another's covers the whole box: then they are nudged apart by a few centimetres,
+ * a little more on each try, until every site lies in its own cell.
  */
 function cutUnit(unit, sites) {
   const scale = Math.cos(((unit.bbox[1] + unit.bbox[3]) / 2) * RAD);
   const pad = 1;
-  const delaunay = Delaunay.from(sites.map(([x, y]) => [x * scale, y]));
-  const voronoi = delaunay.voronoi([(unit.bbox[0] - pad) * scale, unit.bbox[1] - pad, (unit.bbox[2] + pad) * scale, unit.bbox[3] + pad]);
+  const bounds = [(unit.bbox[0] - pad) * scale, unit.bbox[1] - pad, (unit.bbox[2] + pad) * scale, unit.bbox[3] + pad];
+  let voronoi;
+  for (let k = 0, at = sites.map(([x, y]) => [x * scale, y]); ; k++) {
+    voronoi = Delaunay.from(at).voronoi(bounds);
+    if (k === 4 || at.every((p, i) => { const cell = voronoi.cellPolygon(i); return cell && at.every((q, j) => pointInRing(q, cell) === (i === j)); })) break;
+    const eps = 1e-7 * 10 ** k;
+    at = sites.map(([x, y], i) => [x * scale + eps * Math.cos(2.4 * i), y + eps * Math.sin(2.4 * i)]);
+  }
   const pieces = [];
   sites.forEach((site, i) => {
     const cell = voronoi.cellPolygon(i);
@@ -536,7 +1071,7 @@ const clubsByUnit = homeOf => {
  * point still start side by side; a unit cut for its clubs is never cut again.
  * Updates `homeOf[i].unit`; returns the new unit list and a record of each split.
  */
-export function splitUnits(units, homeOf, n, { maxGapKm = Infinity, minKm2 = 0, log = () => {} } = {}) {
+export function splitUnits(units, homeOf, n, { maxGapKm = Infinity, minKm2 = 0, crowdAll = false, maxUnitKm2 = Infinity, log = () => {} } = {}) {
   let list = units.map(u => ({ ...u })); // nodeRings rewrites rings of the units it touches
   const splits = [];
   const crowdCut = new Set(); // pieces of a unit cut for its clubs: never cut for clubs again
@@ -546,13 +1081,33 @@ export function splitUnits(units, homeOf, n, { maxGapKm = Infinity, minKm2 = 0, 
   for (;;) {
     const clubsIn = clubsByUnit(homeOf);
     let pick = null;
-    if (list.filter(u => u.area >= minKm2).length < n) {
+    // With crowdAll (a territory's sections, subdivideTerritories), every unit holding
+    // several starts is cut, most first.
+    if (crowdAll) {
+      for (const u of list) {
+        const k = (clubsIn.get(u.index) || []).length;
+        if (k < 2 || crowdCut.has(u.id) || failed.has(u.id)) continue;
+        if (!pick || k > pick.k || (k === pick.k && u.area > pick.u.area)) pick = { u, k, crowd: true, why: `${k} starts` };
+      }
+      if (!pick) {
+        // A territory left with more starts than units (a cut short of pieces): halve its largest unit.
+        const count = new Map(), starts = new Map();
+        for (const u of list) count.set(u.territory, (count.get(u.territory) || 0) + 1);
+        homeOf.forEach(h => { if (h && h.unit != null) starts.set(list[h.unit].territory, (starts.get(list[h.unit].territory) || 0) + 1); });
+        const short = [...starts].find(([t, k]) => (count.get(t) || 0) < k)?.[0];
+        if (short !== undefined) {
+          for (const u of list) if (u.territory === short && !failed.has(u.id) && (!pick || u.area > pick.u.area)) pick = { u, k: 0, crowd: false, why: 'a territory short of units' };
+        }
+      }
+      if (!pick) break;
+    } else if (list.filter(u => u.area >= minKm2).length < n || list.some(u => u.area > maxUnitKm2 && !failed.has(u.id))) {
       for (const u of list) {
         const k = (clubsIn.get(u.index) || []).length;
         if (k < 2 || crowdCut.has(u.id) || failed.has(u.id)) continue;
         if (!pick || k > pick.k || (k === pick.k && u.area > pick.u.area)) pick = { u, k, crowd: true, why: `${k} clubs` };
       }
       if (!pick) {
+        // A unit larger than a section could be (format 2: maxUnitKm2) is halved too.
         for (const u of list) if (!failed.has(u.id) && (!pick || u.area > pick.u.area)) pick = { u, k: 0, crowd: false, why: 'largest unit' };
         if (!pick) throw new Error('No unit can be split further');
       }
@@ -617,7 +1172,7 @@ export function splitUnits(units, homeOf, n, { maxGapKm = Infinity, minKm2 = 0, 
       const name = `${base} (${qualifier})`;
       names.add(name);
       // A cell can cut a ragged unit into several parts; the site's part keeps the piece id.
-      return explodeUnits([{ id: `${u.id}~${p.i}`, name, baseName: base, qualifier, polys: p.polys }], () => sites[p.site]);
+      return explodeUnits([{ id: `${u.id}~${p.i}`, name, baseName: base, qualifier, ...(u.territory != null ? { territory: u.territory } : {}), ...(u.fans ? { fans: u.fans } : {}), polys: p.polys }], () => sites[p.site]);
     });
     if (crowd) for (const v of newUnits) crowdCut.add(v.id);
     splits.push({ unit: u.name, source: baseId(u.id), pieces: named.length, clubs: members.length, reason: why });
@@ -698,7 +1253,7 @@ const pickBy = (list, cost) => list.reduce((best, u) => (best < 0 || cost(u) < c
  * section while a larger unit qualifies. Returns { owner: unit -> club or -1,
  * seedUnit, seedPoint }.
  */
-export function seedSections(units, adjacency, homes, { minKm2 = 0 } = {}) {
+export function seedSections(units, adjacency, homes, { minKm2 = 0, allowed = null } = {}) {
   const n = homes.length;
   const big = list => list.filter(v => units[v].area >= minKm2);
   const sized = list => (big(list).length ? big(list) : list);
@@ -711,8 +1266,9 @@ export function seedSections(units, adjacency, homes, { minKm2 = 0 } = {}) {
   homes.forEach((h, club) => { if (h && owner[h.unit] < 0) claim(club, h.unit, inside(h, h.unit)); });
   homes.forEach((h, club) => {
     if (!h || seedUnit[club] >= 0) return;
-    const near = adjacency[h.unit].filter(v => owner[v] < 0);
-    const all = units.map((_, v) => v).filter(v => owner[v] < 0);
+    const free = v => owner[v] < 0 && (!allowed || allowed(club, v));
+    const near = adjacency[h.unit].filter(free);
+    const all = units.map((_, v) => v).filter(free);
     const pool = [big(near), big(all), near, all].find(list => list.length) || [];
     const gap = new Map(pool.map(v => [v, kmToPolys(h.point, units[v].polys)]));
     const u = pickBy(pool, v => gap.get(v));
@@ -735,11 +1291,18 @@ export function seedSections(units, adjacency, homes, { minKm2 = 0 } = {}) {
 
 /**
  * Assign every unit to a club section: seedSections, then growth. Returns
- * { owner: unit -> club, seedUnit: club -> unit }.
+ * { owner: unit -> club, seedUnit: club -> unit }. Format 2 territories may pass
+ * `share` (sizes compare as area / share), `cap` (km² past which a club takes land only
+ * when no club under its cap can) and `allowed(club, unit)` (land a club may take while
+ * any club allowed there can reach it).
  */
-export function growSections(units, adjacency, homes, { reach = REACH, padKm = grainKm(units), minKm2 = 0 } = {}) {
+export function growSections(units, adjacency, homes, { reach = REACH, padKm = grainKm(units), minKm2 = 0, share = null, cap = null, allowed = null } = {}) {
   const n = homes.length;
-  const { owner, seedUnit, seedPoint } = seedSections(units, adjacency, homes, { minKm2 });
+  const { owner, seedUnit, seedPoint } = seedSections(units, adjacency, homes, { minKm2, allowed });
+  const fits = (club, u) => !allowed || allowed(club, u);
+  const size = club => (share ? area[club] / share[club] : area[club]);
+  // Claims rank by tier: allowed and under its cap, allowed, then anything.
+  const tier = (club, u) => (!fits(club, u) ? 2 : cap && area[club] >= cap[club] ? 1 : 0);
   const near = (u, p) => kmBetween(units[u].centroid, p);
 
   // Smallest section first takes its adjacent free unit nearest to its seed, but only
@@ -752,7 +1315,8 @@ export function growSections(units, adjacency, homes, { reach = REACH, padKm = g
   const stretch = (club, u) => (near(u, seedPoint[club]) + pad) / (nearest[u] + pad);
   // A club at an estimated home (placeClubs) takes only land nearer to it than to any other
   // start: smallest first, it would otherwise outgrow its neighbours into contested land.
-  const reachOf = club => (homes[club]?.placed ? 1 : reach);
+  // `reach` may be per club (format 2: a fanned club's sector is its own, at any distance).
+  const reachOf = club => (homes[club]?.placed ? 1 : Array.isArray(reach) ? reach[club] : reach);
   const area = seedUnit.map(u => units[u].area);
   const frontier = seedUnit.map(u => new Set(adjacency[u]));
   let left = owner.filter(o => o < 0).length;
@@ -774,10 +1338,10 @@ export function growSections(units, adjacency, homes, { reach = REACH, padKm = g
       for (const v of frontier[c]) if (owner[v] >= 0) frontier[c].delete(v);
       if (frontier[c].size) order.push(c);
     }
-    order.sort((a, b) => area[a] - area[b] || a - b);
+    order.sort((a, b) => size(a) - size(b) || a - b);
     let grown = false;
     for (const club of order) {
-      const u = pickBy([...frontier[club]].filter(v => stretch(club, v) <= reachOf(club)), v => near(v, seedPoint[club]));
+      const u = pickBy([...frontier[club]].filter(v => stretch(club, v) <= reachOf(club) && tier(club, v) === 0), v => near(v, seedPoint[club]));
       if (u < 0) continue;
       frontier[club].delete(u);
       take(club, u);
@@ -790,8 +1354,10 @@ export function growSections(units, adjacency, homes, { reach = REACH, padKm = g
       // the least stretched claim wins.
       let best = null;
       for (const club of order) for (const u of frontier[club]) {
-        const k = stretch(club, u);
-        if (!best || k < best.k || (k === best.k && (area[club] < area[best.club] || (area[club] === area[best.club] && (club < best.club || (club === best.club && u < best.u)))))) best = { k, club, u };
+        // Past every cap, land goes to the club least over its cap, so the clubs bordering
+        // a desert share it rather than the nearest taking it all.
+        const g = tier(club, u), k = g === 1 ? area[club] / cap[club] : stretch(club, u);
+        if (!best || g < best.g || (g === best.g && (k < best.k || (k === best.k && (area[club] < area[best.club] || (area[club] === area[best.club] && (club < best.club || (club === best.club && u < best.u)))))))) best = { k, g, club, u };
       }
       frontier[best.club].delete(best.u);
       take(best.club, best.u);
@@ -831,8 +1397,9 @@ export function growSections(units, adjacency, homes, { reach = REACH, padKm = g
 
   /**
    * The club an island joins: one holding land within a short hop of it (twice the
-   * nearest hop, or that plus `seaStep`). As on land the claim must be within reach,
-   * the nearest such land winning; with none in reach the least stretched claim wins.
+   * nearest hop, or that plus `seaStep`); one under its cap and at most twice as far as
+   * the nearest first. As on land the claim must be within reach, the nearest such land
+   * winning; with none in reach the least stretched claim wins.
    * Joining whoever holds the nearest land would chain an archipelago to one club,
    * island by island (Rhodes to Lesbos), whatever its distance from home.
    */
@@ -854,7 +1421,12 @@ export function growSections(units, adjacency, homes, { reach = REACH, padKm = g
       if (d <= window && d < (hop.get(club) ?? Infinity)) hop.set(club, d);
     }
     let best = null;
-    for (const [club, d] of [...hop].sort((a, b) => a[0] - b[0])) {
+    // Allowed clubs under their cap first (format 2), among those about as near as the
+    // nearest: an archipelago off a city whose clubs are all fanned would otherwise go to
+    // the one sector facing it, while a sliver touching land stays with that land.
+    const fitting = [...hop].filter(([club]) => fits(club, u));
+    const under = fitting.filter(([club, d]) => cap && area[club] < cap[club] && d <= 2 * nearestKm);
+    for (const [club, d] of (under.length ? under : fitting.length ? fitting : [...hop]).sort((a, b) => a[0] - b[0])) {
       const k = stretch(club, u), ok = k <= reachOf(club);
       const better = !best || (ok !== best.ok ? ok
         : ok ? d < best.d || (d === best.d && club < best.club)
@@ -863,6 +1435,36 @@ export function growSections(units, adjacency, homes, { reach = REACH, padKm = g
     }
     return best.club;
   }
+}
+
+// ---- Club groups (format 2) ----
+
+/**
+ * Clubs (indices) whose starting group is split on one landmass: two of its parts, each
+ * connected through shared borders, lie in one land-connected set of sections. Parts on
+ * different islands are fine.
+ */
+export function splitOnLand(geoms, clubAt) {
+  const adj = neighbors(geoms);
+  const { comp } = components(adj);
+  const out = [];
+  for (let c = 0; c <= Math.max(...clubAt); c++) {
+    const own = clubAt.map((o, p) => p).filter(p => clubAt[p] === c);
+    const part = new Map();
+    for (const p of own) {
+      if (part.has(p)) continue;
+      const stack = [p];
+      part.set(p, p);
+      while (stack.length) for (const v of adj[stack.pop()]) if (clubAt[v] === c && !part.has(v)) { part.set(v, p); stack.push(v); }
+    }
+    const lands = new Map();
+    for (const p of own) {
+      const seen = lands.get(comp[p]);
+      if (seen != null && seen !== part.get(p)) { out.push(c); break; }
+      lands.set(comp[p], part.get(p));
+    }
+  }
+  return out;
 }
 
 /** Side of the median source unit in km: the grain of the boundary layer. */
@@ -883,10 +1485,19 @@ export const gapLimitKm = units => Math.max(3, grainKm(units) / 2);
  * The whole partition for one country (spec steps 1-4). `rawUnits` are
  * { id, name, polys } in source order, `rawHomes` [lon, lat] or null per club in
  * rank order, `places` GeoNames places { id, lon, lat, pop } for clubs without a home
- * (placeClubs; `placed` returns the place per club). Longitudes come back shifted
- * when the country crosses the antimeridian.
+ * (placeClubs; `placed` returns the place per club). With `sections` (format 2: 100)
+ * above the club count, each club's territory, grown as a format-1 section, is cut into
+ * its group (subdivideTerritories), at `extraPlaces` where it can. When every club gets
+ * two or more sections, territories also stop near their fair share of land (growth
+ * caps; units larger than a section are halved), clubs crowded into a city are fanned
+ * out (fanSectors) and clubs still boxed in start just outside it (moveBoxedStarts);
+ * a club whose territory still comes out too small is fanned or moved and the partition
+ * redone. Then `seedUnit`, `seedPoint` and `owner` cover the clubs and, after them, the extra
+ * starts `extras` ({ unit, point, place, kind, group }); `targets` are the group sizes,
+ * `moved` the clubs whose size moved, `fans` and `movedStarts` the clubs starting away
+ * from home. Longitudes come back shifted when the country crosses the antimeridian.
  */
-export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], log = () => {} } = {}) {
+export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], extraPlaces = places, sections = rawHomes.length, log = () => {} } = {}) {
   const n = rawHomes.length;
   const frame = (list, shift) => {
     const units = prepareUnits(list.map(u => ({ ...u, polys: shift ? shiftPolys(u.polys) : u.polys })));
@@ -924,13 +1535,94 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
   const limit = maxGapKm ?? gapLimitKm(units);
   const padKm = grainKm(units);
   const minKm2 = 0.01 * padKm ** 2; // a hundredth of a median unit: smaller parts are slivers
-  let splits;
-  ({ units, splits } = splitUnits(units, homeOf, n, { maxGapKm: limit, minKm2, log }));
-  const { topo, adjacency: unitAdjacency } = unitTopology(units);
-  const { owner, seedUnit, seedPoint } = growSections(units, unitAdjacency, homeOf, { reach, padKm, minKm2 });
+  // Format 2 where every club starts on two or more sections: territories of about
+  // their fair share of land (capped growth), clubs crowded into a city fanned out.
+  const grouped = sections > n && Math.floor(sections / n) >= 2;
+  const share = groupTargets(sections, n);
+  // Sections under about 6 px across at the country's opening fit are too small to see.
+  const [bw, bs, be, bn] = bboxOf(units.flatMap(u => u.polys));
+  const extentKm = Math.max(kmBetween([bw, (bs + bn) / 2], [be, (bs + bn) / 2]), kmBetween([bw, bs], [bw, bn]));
+  const minSectionKm2 = (6 * extentKm / 900) ** 2;
+  const linkKm = Math.min(15, Math.max(3, 0.1 * Math.sqrt(sourceAreaKm2 / n)));
+  // The land-share estimates miss a club shut in by its neighbours' land as they grow
+  // (Bangui's two clubs, Honiara's eight): one whose territory still ends up under
+  // BOXED of its sections' room is fanned with the clubs of its city, or when it already
+  // is, starts outside; the partition is then redone from the same units. The attempt
+  // whose boxed-in clubs fall least short (squared shortfalls, the earliest of equals) is
+  // kept, and only its lines are logged.
+  const baseUnits = units, baseHomes = homeOf.map(h => h && { ...h });
+  const forceFan = new Set(), forceMove = new Set();
+  let fans, movedStarts, splits, topo, unitAdjacency, owner, seedUnit, seedPoint, lines, best = null;
+  for (;;) {
+    lines = [];
+    const note = line => lines.push(line);
+    units = baseUnits;
+    baseHomes.forEach((h, c) => { homeOf[c] = h && { ...h }; });
+    fans = []; movedStarts = [];
+    if (grouped) {
+      ({ units, fans } = fanSectors(units, homeOf, { linkKm, grain: padKm, force: forceFan, exclude: forceMove }));
+      if (fans.length) note(`  fanned ${fans.map(f => f.members.length).join(' + ')} clubs around ${fans.length} cities`);
+      movedStarts = moveBoxedStarts(units, homeOf, share, landSamples(units, 12000), framed, {
+        fixed: new Set(fans.flatMap(f => f.members)), minKm2, minSectionKm2, force: forceMove, maxKm: Math.sqrt(sourceAreaKm2 / n),
+      });
+      if (movedStarts.length) note(`  moved the starts of ${movedStarts.length} boxed-in clubs: ${movedStarts.map(c => `#${c + 1}`).join(', ')}`);
+    }
+    const fanOf = Array.from({ length: n }, (_, c) => fans.map((f, i) => (f.members.includes(c) ? i : -1)).filter(i => i >= 0));
+    ({ units, splits } = splitUnits(units, homeOf, sections, { maxGapKm: limit, minKm2, log: note, ...(grouped ? { maxUnitKm2: sourceAreaKm2 / sections } : {}) }));
+    ({ topo, adjacency: unitAdjacency } = unitTopology(units));
+    const grownUnits = units;
+    ({ owner, seedUnit, seedPoint } = growSections(units, unitAdjacency, homeOf, {
+      reach, padKm, minKm2,
+      ...(grouped ? {
+        reach: fanOf.map(list => (list.length ? Infinity : reach ?? REACH)),
+        share, cap: share.map(t => 1.5 * sourceAreaKm2 * t / sections),
+        allowed: (club, u) => !grownUnits[u].fans || grownUnits[u].fans.every(m => m == null || m === club),
+      } : {}),
+    }));
+    if (!grouped) break;
+    const land = new Array(n).fill(0);
+    owner.forEach((c, u) => { land[c] += units[u].area; });
+    const ratio = c => land[c] / (BOXED * minSectionKm2 * share[c]);
+    const boxed = [...Array(n).keys()].filter(c => baseHomes[c] && ratio(c) < 1);
+    const shortfall = boxed.reduce((sum, c) => sum + (1 - ratio(c)) ** 2, 0);
+    if (boxed.length) note(`  boxed in: ${boxed.map(c => `#${c + 1}`).join(', ')}`);
+    if (!best || shortfall < best.shortfall) {
+      best = { shortfall, units, homes: homeOf.slice(), fans, movedStarts, splits, topo, unitAdjacency, owner, seedUnit, seedPoint, lines };
+    }
+    const escalated = [];
+    const move = c => { forceMove.add(c); escalated.push(`#${c + 1} moved`); };
+    for (const c of boxed) {
+      if (forceMove.has(c) || fanOf[c].length) continue;
+      const linked = baseHomes.some((h, d) => d !== c && h && !forceMove.has(d) && kmBetween(h.point, baseHomes[c].point) <= linkKm);
+      if (linked && !forceFan.has(c)) { forceFan.add(c); escalated.push(`#${c + 1} fanned`); } else move(c);
+    }
+    // A fan with boxed members gives up as many of its weakest: the stronger keep the city.
+    for (const fan of fans) {
+      const count = fan.members.filter(c => boxed.includes(c)).length;
+      fan.members.filter(c => !forceMove.has(c)).sort((a, b) => b - a).slice(0, count).forEach(move);
+    }
+    if (!escalated.length) break;
+    log(`  boxed in after growth, redone: ${escalated.join(', ')}`);
+  }
+  if (best) {
+    ({ units, fans, movedStarts, splits, topo, unitAdjacency, owner, seedUnit, seedPoint, lines } = best);
+    best.homes.forEach((h, c) => { homeOf[c] = h; });
+  }
+  lines.forEach(line => log(line));
+  // Format 2 with fewer clubs than sections: each club's section is cut into its group.
+  let extras = [], targets = groupTargets(n, n), moved = [];
+  if (sections > n) {
+    const extraFramed = extraPlaces === places ? framed : extraPlaces.map(p => ({ ...p, lon: shift ? shiftLon(p.lon) : p.lon, source: p }));
+    const sub = subdivideTerritories(units, { owner, seedUnit, seedPoint, adjacency: unitAdjacency }, homeOf, extraFramed, sections, {
+      reach, padKm, minKm2, minSectionKm2, log,
+    });
+    homeOf.forEach((h, i) => { if (h) homeOf[i] = { ...h, unit: sub.unitOf(h.unit, h.point) }; });
+    ({ units, topo, adjacency: unitAdjacency, owner, seedUnit, seedPoint, extras, targets, moved } = sub);
+    splits = [...splits, ...sub.splits];
+  }
   return {
-    shift, units, adjacency: unitAdjacency, topo, homes, homeOf, located, placed, dropped, splits,
-    sourceUnits, sourceAreaKm2, maxGapKm: limit, owner, seedUnit, seedPoint,
+    shift, units, adjacency: unitAdjacency, topo, homes, homeOf, located, placed, extras, targets, moved, fans, movedStarts, dropped, splits,
+    sourceUnits, sourceAreaKm2, maxGapKm: limit, padKm, owner, seedUnit, seedPoint,
   };
 }
 

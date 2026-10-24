@@ -18,7 +18,8 @@ export const TIE_PAGE_SIZE = 2000;
 export const SLICE_PAGE_SIZE = 5000;
 export const SQUAD_SIZE = 16;
 export const MAX_CLUBS = 100;
-export const MIN_CLUBS = 10;
+// Every map has 100 sections whatever N (format 2), so two clubs make a campaign.
+export const MIN_CLUBS = 2;
 const POSITIONS = Object.keys(FM_ROLES);
 
 // ---- HTTP: concurrency-limited, paced, retried ----

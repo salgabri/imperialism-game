@@ -20,6 +20,8 @@ const fixedChecks = scenarioFilter == null;
 const wanted = scenario => fixedChecks || scenario.name.toLowerCase().includes(scenarioFilter);
 // A country campaign on its own map; the duel run also exercises the setup flow.
 const ENGLAND = { layer: 'clubs', clubScope: 'domestic:826' };
+// Fewer clubs than sections: each Fiji club starts on a group of islands and districts.
+const FIJI = { layer: 'clubs', clubScope: 'domestic:242' };
 
 const SCENARIOS = [
   { name: 'South America · duel · ticker', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
@@ -31,6 +33,7 @@ const SCENARIOS = [
   { name: 'CLUBS · NBA · chaos · instant', sport: 'basketball', layer: 'clubs', clubScope: 'NBA', pacing: 'chaos', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', setupChecks: true },
   { name: 'DOMESTIC · England top clubs · blitz · instant', ...ENGLAND, pacing: 'blitz', resolution: 'instant' },
+  { name: 'DOMESTIC · Fiji top clubs · duel · instant', ...FIJI, pacing: 'duel', resolution: 'instant' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -39,6 +42,7 @@ const RESUME_SCENARIOS = [
   { name: 'CLUBS · Premier League · blitz · instant', layer: 'clubs', clubScope: 'Premier League', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NBA · chaos · instant', sport: 'basketball', layer: 'clubs', clubScope: 'NBA', pacing: 'chaos', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', finish: true },
+  { name: 'DOMESTIC · Fiji top clubs · chaos · instant', ...FIJI, pacing: 'chaos', resolution: 'instant', finish: true },
 ];
 
 const LABEL_SCENARIOS = [
@@ -225,7 +229,8 @@ function checkDomesticSetup(setup, full) {
     check('switching to basketball drops the country theatre', setup.basketballResets);
   }
   check('the setup map shows exactly the country’s sections', setup.sectionsShown);
-  check('setup previews each section in its home club’s colour', setup.setupColours);
+  check('setup previews each section in the colour of the club starting there', setup.setupColours);
+  check('setup tooltips name each club’s home and the rest of its starting group', setup.setupTooltips && setup.groupedPreview);
   check('setup counts the country’s clubs', setup.previewCount);
   check('the theatre description names the leading clubs and the sections', setup.description);
   checkBackdrop('setup', setup.backdrop);
@@ -233,12 +238,16 @@ function checkDomesticSetup(setup, full) {
 
 function checkDomesticKickoff(label, state) {
   check(`${label}: settings name the country and the loaded map version`, state.scope && state.version);
-  check(`${label}: every club starts alone on its own section`, state.fielded && state.everySectionHeld && state.homeSections);
+  check(`${label}: every club starts on its own starting sections, its home among them`, state.fielded && state.everySectionHeld
+    && state.startGroups && state.wholeGroups);
   check(`${label}: routing runs on the sections alone`, state.routingIsSections);
   check(`${label}: neighbouring land blocks routes and is never a section`, state.obstacles);
   check(`${label}: header and map title name the country`, state.theatreLabel && state.mapTitle);
   check(`${label}: the scale bar is a distance at the map’s centre`, state.scaleTitle);
   check(`${label}: every home marker shows at the opening zoom`, state.homesShown);
+  // Every club still holds just its starting group: a tie, not an empire to watch.
+  check(`${label}: the footnote names no largest empire before anyone has conquered`,
+    !!state.footnote && !state.footnote.includes('Largest empire'), state.footnote);
 }
 
 // React reports invalid props, missing keys and render crashes through console;
@@ -269,8 +278,11 @@ let failures = 0;
     check('requests cannot leave public/', await status('/domestic/..%2f..%2fpackage.json') === 404);
     for (const country of DOMESTIC) {
       const loaded = await loadDomestic(country.id, { baseUrl: '/', fetch: globalThis.fetch });
+      // Format-1 index entries have no `sections`: one per club.
+      const sections = country.sections ?? country.clubs;
       check(`${country.name}: the runtime loader accepts the shipped map and it matches the index`,
-        loaded.meta.version === country.version && loaded.clubs.length === country.clubs && loaded.geo.countries.length === country.clubs,
+        loaded.meta.version === country.version && loaded.clubs.length === country.clubs && loaded.geo.countries.length === sections
+          && Object.keys(loaded.startOwners).length === sections,
         `${loaded.meta.version} · ${loaded.clubs.length} clubs · ${loaded.geo.countries.length} sections`);
       // All decoded countries together hold ~700 MB; keep none past its check.
       clearDomesticCache(country.id);
@@ -661,7 +673,7 @@ for (const scenario of SCENARIOS) {
     checkTheatres(scenario, r.theatre);
     if (r.domestic) {
       check(`map decoded all ${r.domestic.sections} sections of ${r.domestic.name}`, r.nations === r.domestic.sections, `${r.nations}`);
-      check('every club of the country takes the field', r.fielded === r.domestic.sections, `${r.fielded}`);
+      check('every club of the country takes the field', r.fielded === r.domestic.clubs, `${r.fielded}`);
       checkDomesticSetup(r.domesticSetup, !!scenario.setupChecks);
       checkDomesticKickoff('kickoff', r.domesticKickoff);
       check('tooltips name the hovered section and its holder', r.domesticPointer.tooltip, `${r.domesticPointer.section}: ${r.domesticPointer.tooltipText}`);
@@ -700,6 +712,8 @@ for (const scenario of SCENARIOS) {
     checkMapScope('completed map', r.finalFlagScope, { continental: continentalNations, conquered: r.layer !== 'clubs' });
     if (r.domestic) {
       check('conquest summaries name the sections taken', r.domestic.resultsNameSections);
+      check('a conquest takes whole starting groups, and the first takes exactly the loser’s', r.domestic.groupsStayedWhole && r.domestic.firstConquestTakesGroup);
+      check('the footnote names the largest empire once one outgrows every starting group, never before', r.domestic.legendStayedRight);
       check('the victory screen names the country', r.domestic.victoryNamesCountry);
     }
     if (r.layer === 'clubs') {
@@ -762,10 +776,12 @@ for (const scenario of RESUME_SCENARIOS) {
       check('a save from an earlier map build resumes, re-stamped with the loaded version', k.updatedMap.restamped);
       check('that resume says the map changed and the stale draw is dropped', k.updatedMap.told && k.updatedMap.staleDrawDropped,
         JSON.stringify(k.updatedMap));
+      check('a one-section-per-club save gives each club’s whole group to the holder of its old section', k.updatedMap.ownershipKept);
     }
     if (r.domesticResumed) {
       const k = r.domesticResumed;
       check('reload restores the country map, its version and section routing', k.scope && k.version && k.everySectionHeld && k.routingIsSections && k.obstacles);
+      check('every starting group still has one holder after the reload', k.wholeGroups);
       check('the reloaded header and scale bar still describe the country', k.theatreLabel && k.scaleTitle && k.homesShown);
     }
     check('zoom in reframes the map', r.viewBoxZoomed !== r.viewBoxAtRest, r.viewBoxZoomed);

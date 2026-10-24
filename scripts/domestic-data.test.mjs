@@ -9,10 +9,10 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { feature, neighbors } from 'topojson-client';
 import { DOMESTIC, DOMESTIC_FORMAT } from '../src/data/domestic.js';
-import { decodeDomestic } from '../src/engine/domestic.js';
+import { decodeDomestic, DOMESTIC_SECTIONS } from '../src/engine/domestic.js';
 import { expandFmTuple, FM_ROLES } from '../src/data/fmPlayers.js';
 import { FOREIGN_DEPTH_KM, hostShapes, loadWorldMap } from './lib/domestic-boundaries.mjs';
-import { bboxOf, facingKm, facingSections, kmToPolys, pointInPolys, polysAreaKm2 } from './lib/domestic-partition.mjs';
+import { bboxOf, facingKm, facingSections, kmToPolys, pointInPolys, polysAreaKm2, splitOnLand } from './lib/domestic-partition.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const shippedDir = path.join(root, 'public/domestic');
@@ -68,21 +68,29 @@ for (const entry of DOMESTIC) {
     const { version, ...rest } = doc;
     assert.equal(version, `${id}-${createHash('sha256').update(JSON.stringify(rest)).digest('hex').slice(0, 8)}`, 'version is not the content hash');
     assert.equal(entry.clubs, n);
+    assert.equal(entry.sections, DOMESTIC_SECTIONS);
     assert.equal(entry.level, doc.boundaries.level);
     const strongest = doc.clubs.map((c, i) => [c.str, i]).sort((a, b) => b[0] - a[0] || a[1] - b[1]).slice(0, 3).map(([, i]) => doc.clubs[i].name);
     assert.deepEqual(entry.top, strongest);
     assert.equal(doc.source.version, snapshot.source.version);
     assert.equal(doc.source.snapshotDate, snapshot.source.fetchedAt.slice(0, 10));
 
-    // Sections = clubs = N, one-to-one, section 001 for the top club.
-    assert.ok(n >= 10 && n <= 100, `N = ${n}`);
+    // 100 sections <id>-001..100 shared out as N club groups: home first, ids in club rank
+    // order, sizes floor or ceil(100 / N) with exactly 100 mod N larger groups.
+    const S = DOMESTIC_SECTIONS;
+    assert.ok(n >= 2 && n <= S, `N = ${n}`);
     const geoms = doc.topology.objects.sections.geometries;
-    assert.equal(geoms.length, n, 'sections');
+    assert.equal(geoms.length, S, 'sections');
     assert.equal(doc.clubs.length, n, 'clubs');
     const sectionIds = geoms.map(g => g.id);
-    assert.equal(new Set(sectionIds).size, n, 'duplicate section ids');
-    doc.clubs.forEach((club, i) => assert.equal(club.section, `${id}-${String(i + 1).padStart(3, '0')}`, `${club.name} section`));
-    assert.deepEqual([...sectionIds].sort(), doc.clubs.map(c => c.section).sort(), 'club <-> section is not a bijection');
+    assert.deepEqual(sectionIds, Array.from({ length: S }, (_, k) => `${id}-${String(k + 1).padStart(3, '0')}`), 'section ids');
+    doc.clubs.forEach(club => assert.equal(club.sections[0], club.section, `${club.name}: home section first`));
+    assert.deepEqual(doc.clubs.flatMap(c => c.sections), sectionIds, 'club groups do not list every section once, in club rank order');
+    const q = Math.floor(S / n);
+    const sizes = doc.clubs.map(c => c.sections.length);
+    assert.ok(sizes.every(k => k === q || k === q + 1), `group sizes ${[...new Set(sizes)].join('/')}`);
+    assert.equal(sizes.filter(k => k === q + 1).length, S - q * n, 'number of larger groups');
+    const clubAt = geoms.map(g => doc.clubs.findIndex(c => c.sections.includes(g.id)));
     assert.equal(new Set(doc.clubs.map(c => c.id)).size, n, 'duplicate club ids');
     assert.equal(new Set(doc.clubs.map(c => c.code)).size, n, 'duplicate codes');
 
@@ -148,8 +156,11 @@ for (const entry of DOMESTIC) {
         if (j !== main) assert.ok(poly[0].some(a => use.get(a < 0 ? ~a : a) === 1), `${g.id} part ${j} is landlocked by other sections`);
       });
     });
+    // A club's group is contiguous except across water: one part per landmass.
+    const split = splitOnLand(geoms, clubAt).map(c => doc.clubs[c].name);
+    assert.deepEqual(split, [], `groups split on land: ${split.join(', ')}`);
 
-    // Neighbouring starting sections differ clearly in colour (OKLab distance).
+    // Neighbouring clubs' groups differ clearly in colour (OKLab distance).
     const lab = col => {
       const [l, c, h] = col.match(/^oklch\(([\d.]+) ([\d.]+) ([\d.]+)\)$/).slice(1).map(Number);
       return [l, c * Math.cos(h * Math.PI / 180), c * Math.sin(h * Math.PI / 180)];
@@ -158,14 +169,16 @@ for (const entry of DOMESTIC) {
     const colours = doc.clubs.map(c => lab(c.col));
     const across = facingSections(sectionPolys, facingKm(doc.focus));
     neighbors(geoms).forEach((list, i) => [...list, ...across[i]].forEach(j => {
-      const d = Math.hypot(...colours[i].map((v, k) => v - colours[j][k]));
+      const [a, b] = [clubAt[i], clubAt[j]];
+      if (a === b) return;
+      const d = Math.hypot(...colours[a].map((v, k) => v - colours[b][k]));
       assert.ok(d >= 0.1, `${geoms[i].id} and ${geoms[j].id} are neighbours with similar colours (${d.toFixed(3)})`);
     }));
 
     // Section names read well and tell sections apart.
     const names = geoms.map(g => g.properties.name);
     names.forEach((name, i) => assert.equal(nameProblem(name), null, `${geoms[i].id} is named ${JSON.stringify(name)}`));
-    assert.equal(new Set(names.map(name => name.toLowerCase())).size, n, 'section names repeat');
+    assert.equal(new Set(names.map(name => name.toLowerCase())).size, S, 'section names repeat');
 
     // Area within 2% of the source units; no overlaps on a sample grid.
     const areas = sectionPolys.map(polysAreaKm2);
@@ -192,19 +205,28 @@ for (const entry of DOMESTIC) {
     }
     assert.ok(hits > 0, 'no sample point hit any section');
 
-    // A club's home is in its own section or a stronger club's: where clubs share a town,
-    // the strongest holds it (simplified borders may shift by a few hundred metres).
+    // A club's home is in its own group or a stronger club's: where clubs share a town,
+    // the strongest holds it (simplified borders may shift by a few hundred metres). When
+    // every club starts on several sections, clubs crowded into one city are fanned out
+    // from it or start just outside it: a home may then lie in a weaker club's group, but
+    // the club's home section stays within a club territory's width of it.
     const frame = ([lon, lat]) => [w > 0 && lon < 0 ? lon + 360 : lon, lat];
+    const groupPolys = c => doc.clubs[c].sections.flatMap(sid => sectionPolys[sectionIds.indexOf(sid)]);
+    const reachKm = Math.sqrt(doc.boundaries.areaKm2 / n);
     doc.clubs.forEach((club, i) => {
       if (!club.home || /^placed:/.test(club.homeSource)) return;
       const p = frame(club.home);
       const k = sectionAt(p);
-      if (k > i) assert.ok(kmToPolys(p, sectionPolys[i]) <= 0.6, `${club.name}'s home lies in weaker ${doc.clubs[k].name}'s section ${geoms[k].id}`);
+      if (k < 0 || clubAt[k] <= i || kmToPolys(p, groupPolys(i)) <= 0.6) return;
+      const gap = kmToPolys(p, sectionPolys[sectionIds.indexOf(club.section)]);
+      assert.ok(q >= 2 && gap <= reachKm, `${club.name}'s home lies in weaker ${doc.clubs[clubAt[k]].name}'s section ${geoms[k].id} (${gap.toFixed(1)} km from its own)`);
     });
 
     // A club placed at a GeoNames place (no usable home) gets an ordinary share of the land.
     doc.clubs.forEach((club, i) => {
-      if (/^placed:/.test(club.homeSource ?? '')) assert.ok(areas[i] <= 6 * total / n, `placed ${club.name} holds ${(100 * areas[i] / total).toFixed(1)}% of the land`);
+      if (!/^placed:/.test(club.homeSource ?? '')) return;
+      const own = club.sections.reduce((t, sid) => t + areas[sectionIds.indexOf(sid)], 0);
+      assert.ok(own <= 6 * total / n, `placed ${club.name} holds ${(100 * own / total).toFixed(1)}% of the land`);
     });
 
     // No land the game's world map draws for another country, beyond its coarse borders.
@@ -216,9 +238,9 @@ for (const entry of DOMESTIC) {
       if (sectionAt(p) < 0) continue;
       const cell = Math.cos(p[1] * Math.PI / 180) * ((e - w) / grid) * ((nn - s) / grid) * 111.195 ** 2; // km²
       land += cell;
-      const q = [p[0] > 180 ? p[0] - 360 : p[0], p[1]];
-      if (host.some(h => h.contains(q)) || !world.some(shape => !host.includes(shape) && shape.contains(q))) continue;
-      if (!host.some(h => h.near(q, FOREIGN_DEPTH_KM))) foreign += cell;
+      const r = [p[0] > 180 ? p[0] - 360 : p[0], p[1]];
+      if (host.some(h => h.contains(r)) || !world.some(shape => !host.includes(shape) && shape.contains(r))) continue;
+      if (!host.some(h => h.near(r, FOREIGN_DEPTH_KM))) foreign += cell;
     }
     assert.ok(foreign <= Math.max(0.005 * land, 50), `${Math.round(foreign)} km² (${(100 * foreign / land).toFixed(2)}%) of the map is another country's land on the world map`);
   });

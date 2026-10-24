@@ -1,0 +1,40 @@
+{
+"format":1,
+"source":{"provider":"EFEM.club","game":"Football Manager 26","version":"26.3.0","fetchedAt":"2026-10-24T14:36:58.370Z","endpoints":{"clubs":"https://efem.club/api/clubs/filter","players":"https://efem.club/api/players/filter"},"clubsQuery":"https://efem.club/api/clubs/filter?filterString=pageSize=100&page=1&version=26.3.0&filter=gender%3D0,nation%3DCentral%20African%20Republic&orderBy=reputation%20desc","playersQuery":"Every male 26.3.0 player, read in single-page slices (playerbase.gender=0, currentAbility=<v>, age range; pageSize 5000) and grouped by exact clubId.","selection":"Male clubs of the FM nation (exact nation name, nation.nationCode checked) in reputation order (ties: efemScore desc, clubId asc), read in list pages of 100 with the reputation at each page end re-read whole (filter reputation=<v>), since pages shuffle tied clubs. Excluded: reserve, B/II, youth, under-N, university/school (outside senior competitions) and all-star sides (name rules plus EXCLUDED_CLUBS in scripts/lib/domestic-sync.mjs); fewer than 11 natural-position (proficiency >= 90) players or no natural goalkeeper. A club without an FM competition stays in as \"Regional football\". N = min(100, viable); a nation ships when N >= 2.","squad":"Up to 16 players: the strongest natural 4-4-2 (1 GK, 4 DF, 4 MF, 2 FW) in the game's roles (FM_ROLES: lw/rw are forwards), players seated in Current Ability order whenever the filled shirts can be rearranged to fit them, then the best remaining by Current Ability.","loans":"Not applied: EFEM's player list (views Default, ValueAndWage and Profile checked) gives only the contract clubId and no loan club, so a player out on loan is in his parent club's squad, not the squad of the club he plays for.","locations":"Manual overrides (scripts/data/domestic-locations.json), then Wikidata football clubs of the country (venue P115 > P625 > HQ P159 > P131; multi-word exact/core name matches first, then one-word and leading-word subset matches pooled by sitelinks, dissolved items last; each item used once in reputation order; Brazilian state hints; when the club name holds a town, the first item property within 50 km of it is used, and a weak match whose own names hold another town must lie within 15 km of it), then the longest GeoNames cities1000 place name in the club name (own names beat other places' alternate names, alternate names only from places with a population, shortened ones weakest; limited to a province named in the club name or competition).","names":"FM's own names, except unlicensed placeholders (e.g. \"BRG\") replaced from scripts/data/domestic-names.json; fmName/fmShort keep FM's.","attribution":{"geonames":"GeoNames (geonames.org), CC BY 4.0","wikidata":"Wikidata, CC0"},"updateCommand":"node scripts/sync-domestic-clubs.mjs --only=140"},
+"nation":{"id":"140","name":"Central African Rep.","fmName":"Central African Republic","nationCode":"CTA","wikidata":"Q929","geonames":{"country":"CF","admin1":null}},
+"stats":{"candidates":30,"clubs":2,"excluded":{"fewer than 11 players":28},"locations":{"override":0,"wikidata":1,"geonames":1,"none":0},"wikidataVia":{"P115":1},"squad":{"min":13,"max":16},"totalPlayersMismatch":0},
+"clubs":[
+{"fm":5390070,"name":"Association Sportive Tempête Mocaf","short":"AS Tempête Mocaf","rep":41,"efemScore":40,"competition":"Central African Premier Division","totalPlayers":16,"natural":16,"location":{"lon":18.5644,"lat":4.3744,"source":"wikidata:Q182646","label":"AS Tempête Mocaf","via":"P115"},"squad":[[2000114593,"Melky Ndokomandji",55,"dm","CTA"],[13231076,"Hippolyte Koyassa",52,"am","CTA"],[13128566,"Gervais Kago",51,"dm","CTA"],[13162026,"Elvis Samolah",51,"gk","CTA"],[13128579,"Thérence Kethevoama",50,"cb","CTA"],[13231080,"Lois Kaya",50,"st","CTA"],[13234012,"Prince Mohanda",50,"st","CTA"],[2000085141,"Emmanuel Takolingba",50,"gk","CTA"],[2000477240,"Ange Zoumara",50,"rw","CTA"],[13234856,"Landry Pelembi",49,"am","CTA"],[13129700,"Parfait Tamboulas",48,"cb","CTA"],[13231061,"Billy Nyetobouko",46,"lb","CTA"],[2000085143,"Aime du Christ-Graslin Fioguende",46,"cm","CTA"],[2000085146,"Fanuel Franck Koyakogue",46,"cm","CTA"],[2000250121,"Rufus Betto",44,"rb","CTA"],[2000250128,"Dieudonné Bondade",38,"lw","CTA"]]},
+{"fm":13101276,"name":"Olympique Réal de Bangui","short":"ORB","rep":41,"efemScore":37,"competition":"Central African Premier Division","totalPlayers":13,"natural":13,"location":{"lon":18.555,"lat":4.3612,"source":"geonames:2389853","label":"Bangui"},"squad":[[2000085162,"Flory Yangao",53,"rb","CTA"],[2000250133,"Max Gomesse",51,"am","CTA"],[2000190525,"Sylvester Kokassa",50,"st","CTA"],[2000477237,"Isaac Souango",50,"dm","CTA"],[13234861,"Hervé Bongotoutet",49,"cb","CTA"],[2000085137,"Henoc Kpeko Damona",49,"am","CTA"],[2000190527,"Kenny Mbiafolo",49,"lw","CTA"],[2000367217,"Jospin Christopher Bimako",47,"gk","CTA"],[13162025,"Levant Gbwaito",46,"gk","CTA"],[2000085147,"Maurille Abimala",46,"gk","CTA"],[2000250162,"Cyrille Kokpakpa",46,"cb","CTA"],[2000250166,"Dimitri Kogbeto",46,"st","CTA"],[2000250165,"Paul Njengan",42,"cm","CTA"]]}
+],
+"excluded":[
+{"fm":13103519,"name":"Stade Centrafricain Tocages","reason":"fewer than 11 players"},
+{"fm":13116986,"name":"Diplomates du 8ème Arrondissement","reason":"fewer than 11 players"},
+{"fm":13227393,"name":"Les Anges de Fatima","reason":"fewer than 11 players"},
+{"fm":13190081,"name":"Red Star FC de Bangui","reason":"fewer than 11 players"},
+{"fm":13162039,"name":"Association Sportive des Postes Télécommunications","reason":"fewer than 11 players"},
+{"fm":13103518,"name":"Tout Pouissant Union Sportive Centrafricaine","reason":"fewer than 11 players"},
+{"fm":2000371003,"name":"AS Caisse Nationale de Sécurité Sociale","reason":"fewer than 11 players"},
+{"fm":13162040,"name":"Association Sport Gbangré","reason":"fewer than 11 players"},
+{"fm":2000011832,"name":"Racing Club du 3ème Arrondissement","reason":"fewer than 11 players"},
+{"fm":2000371002,"name":"SOS Pius Njawé FC","reason":"fewer than 11 players"},
+{"fm":13101272,"name":"AS Kpèténè Star","reason":"fewer than 11 players"},
+{"fm":13162029,"name":"Réal Comboni","reason":"fewer than 11 players"},
+{"fm":13162036,"name":"Université Football Club de Bangui","reason":"fewer than 11 players"},
+{"fm":13162042,"name":"Espoir Club de Bégoua","reason":"fewer than 11 players"},
+{"fm":13227390,"name":"Castel Foot","reason":"fewer than 11 players"},
+{"fm":13162028,"name":"Sica Sport","reason":"fewer than 11 players"},
+{"fm":13162030,"name":"Espérance du 5ème Arrondissement","reason":"fewer than 11 players"},
+{"fm":13227391,"name":"Forces de Défense et de Sécurité","reason":"fewer than 11 players"},
+{"fm":12079078,"name":"Acadjo Centrafrique FC","reason":"fewer than 11 players"},
+{"fm":13162031,"name":"Sporting Club de Bangui","reason":"fewer than 11 players"},
+{"fm":13162032,"name":"Armée Centrafricaine FC","reason":"fewer than 11 players"},
+{"fm":13162041,"name":"Jeunesse Sportive de Boeing","reason":"fewer than 11 players"},
+{"fm":13204382,"name":"Club Athlétique de Bangui","reason":"fewer than 11 players"},
+{"fm":13101271,"name":"Asset de Gbongo","reason":"fewer than 11 players"},
+{"fm":13204379,"name":"Fondation Julia Kolingba (CTA)","reason":"fewer than 11 players"},
+{"fm":13204384,"name":"Ecole Foot Djimy Yanibada","reason":"fewer than 11 players"},
+{"fm":13215608,"name":"Union Sportive Cattin","reason":"fewer than 11 players"},
+{"fm":13217487,"name":"Ouham-Pendé","reason":"fewer than 11 players"}
+]
+}
