@@ -306,10 +306,10 @@ export function buildFronts(st, ctx = {}, { limit = 5, reach = null } = {}) {
   const teams = st?.teams || {};
   const board = ctx?.board;
   if (!managedId || !teams[managedId] || !board || !aliveSet(st).has(managedId) || st?.pendingTarget) return null;
-  const override = fixtureOverride(st, ctx);
-  return memo(ctx.cache, 'col:fronts',
-    [st.own, st.teams, st.aliveIds, managedId, limit, reach, ctx.sport, ctx.drama, ctx.homeAdvantage, st.settings?.layer ?? null,
-      override?.opponentId ?? null, override?.win ?? null, override?.tone ?? null],
+  // Reach, rows and win chances hang on the board alone; the pending fixture only relabels its opponent's row (below),
+  // so a gate, a kickoff or a result does not re-run reachableTargets and every row's estimate.
+  const base = memo(ctx.cache, 'col:fronts-base',
+    [st.own, st.teams, st.aliveIds, managedId, limit, reach, ctx.sport, ctx.drama, ctx.homeAdvantage, st.settings?.layer ?? null],
     () => {
       let targets = reach;
       if (!Array.isArray(targets)) {
@@ -326,12 +326,8 @@ export function buildFronts(st, ctx = {}, { limit = 5, reach = null } = {}) {
         .slice(0, Math.max(0, Number(limit) || 0))
         .map(({ id, team, eff }) => {
           let win = '—', tone = 'muted';
-          if (override && override.opponentId === id) {
-            ({ win, tone } = override);
-          } else {
-            const p = winChanceFor(st, ctx, managedId, id);
-            if (p != null && Number.isFinite(Number(p))) { win = formatWinChance(Number(p)); tone = winTone(Number(p)); }
-          }
+          const p = winChanceFor(st, ctx, managedId, id);
+          if (p != null && Number.isFinite(Number(p))) { win = formatWinChance(Number(p)); tone = winTone(Number(p)); }
           let terr = 0;
           try { terr = territories(board, id).length; } catch { terr = 0; }
           return {
@@ -347,6 +343,12 @@ export function buildFronts(st, ctx = {}, { limit = 5, reach = null } = {}) {
         empty: rows.length ? null : 'No rival is within reach.',
       };
     });
+  const override = fixtureOverride(st, ctx);
+  const opponentId = override?.opponentId ?? null;
+  return memo(ctx.cache, 'col:fronts', [base, opponentId, override?.win ?? null, override?.tone ?? null],
+    () => (override && base.rows.some(row => row.teamId === opponentId)
+      ? { ...base, rows: base.rows.map(row => (row.teamId === opponentId ? { ...row, win: override.win, tone: override.tone } : row)) }
+      : base));
 }
 
 /**

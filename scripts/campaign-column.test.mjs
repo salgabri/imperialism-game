@@ -422,6 +422,30 @@ test('fronts list the land tier strongest first with territories and win chances
   assert.equal(fronts.rows.find(row => row.teamId === '348').terr, '2');
 });
 
+test('the pending fixture only relabels its opponent’s row: the board-level rows are kept, not recomputed', () => {
+  const idle = state({ round: 7 });
+  const ctx = context(idle);
+  const board = buildFronts(idle, ctx, { reach: LAND });
+  const kept = fronts => fronts.rows.filter(row => row.teamId !== '688')
+    .every(row => row === board.rows.find(other => other.teamId === row.teamId));
+  const gate = { ...idle, tacticalChoice: { aId: '688', dId: '380', route: { isNeighbor: true, routeKind: 'straight' },
+    options: [], managerName: 'Italy', opponentName: 'Serbia' } };
+  const atGate = buildFronts(gate, ctx, { reach: LAND });
+  assert.deepEqual(atGate.rows.map(row => row.teamId), board.rows.map(row => row.teamId));
+  assert.equal(`${atGate.rows.find(row => row.teamId === '688').win} ITA`, buildFixture(gate, ctx).odds.bLabel);
+  assert.ok(kept(atGate), 'the other rows are the board-level objects');
+  const live = { ...idle, match: { aId: '688', dId: '380', applied: false, done: false, odds: { a: .375, b: .625 },
+    effA: 80, effD: 82, routeKind: 'straight' } };
+  const kickedOff = buildFronts(live, ctx, { reach: LAND });
+  assert.deepEqual(['win', 'tone'].map(key => kickedOff.rows.find(row => row.teamId === '688')[key]), ['62%', 'gain']);
+  assert.ok(kept(kickedOff));
+  assert.equal(buildFronts(live, ctx, { reach: LAND }), kickedOff, 'memoised on the fixture label');
+  assert.equal(buildFronts(idle, ctx, { reach: LAND }), board, 'without a fixture: the board-level table itself');
+  // A fixture opponent outside the table leaves it as it is.
+  const far = LAND.filter(entry => entry.tid !== '688');
+  assert.equal(buildFronts(gate, ctx, { reach: far }), buildFronts(idle, ctx, { reach: far }));
+});
+
 test('fronts fall back to the reachable list, show an empty note, and stay off for spectators and target choice', () => {
   const st = state();
   const ctx = context(st);
