@@ -7,6 +7,7 @@
 // and borderRoutes (country maps: aim at a neighbour's shared border when its
 // anchor is out of sight).
 
+import { EXCLUDED_SHAPES } from '../data/teams.js';
 import { closestPair } from './geo.js';
 import { borderApproachPoints, createAttackRouteIndex, firstForeignLand, findCoastalSeaRoute, routeLandCrossings } from './attackRoutes.js';
 
@@ -19,20 +20,30 @@ const BORDER_TRIES = 12;
  * Seed clubs onto the map.
  *
  * A club has a home country but shares it with every rival in its league, so
- * they cannot all start there. Working down the strength order, each club claims
- * the nearest country to its homeland that nobody has taken yet: the best club
- * in each league gets the homeland itself, and the rest fan outwards. Countries
- * nobody reaches stay neutral, exactly as non-participating nations do.
+ * they cannot all start there. The best club from each homeland takes it first;
+ * then, working down the strength order, every other club claims the nearest
+ * country to its homeland that nobody has taken yet, so the rest fan outwards
+ * (a stronger foreign club never lands on another league's homeland). Shapes
+ * that never belong to anyone (`excluded`) and countries nobody reaches stay
+ * neutral, exactly as non-participating nations do.
  */
-export function seedClubs(geo, clubs) {
+export function seedClubs(geo, clubs, excluded = EXCLUDED_SHAPES) {
   const own = {};
   const anchorOf = id => {
     const p = geo.paths[id];
     return p ? [p.cx, p.cy] : null;
   };
-  const available = Object.keys(geo.paths).filter(id => anchorOf(id));
+  const available = Object.keys(geo.paths).filter(id => anchorOf(id) && !excluded.has(id));
+  const ranked = clubs.slice().sort((a, b) => b.str - a.str);
+  const placed = new Set();
+  for (const club of ranked) {
+    if (own[club.home] || !available.includes(club.home)) continue;
+    own[club.home] = club.id;
+    placed.add(club.id);
+  }
 
-  for (const club of clubs.slice().sort((a, b) => b.str - a.str)) {
+  for (const club of ranked) {
+    if (placed.has(club.id)) continue;
     const from = anchorOf(club.home);
     if (!from) continue;
     let best = null;

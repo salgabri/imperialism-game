@@ -28,6 +28,16 @@ function sentenceCase(text) {
 }
 
 /**
+ * The tie-break beside a level score: the shoot-out's kicks ("4–2 PENS"), or the overtime periods ("OT", "2OT").
+ * Overtime points are already in the final score (basketball's tie.ga/gd are those totals), so they are not repeated.
+ */
+function tieBreakText(m, sport) {
+  if (sport.tieBreak === 'shootout') return `${m.tie.ga}–${m.tie.gd} ${sport.labels.tieShort}`;
+  const periods = Array.isArray(m.tie.periods) ? m.tie.periods.length : 1;
+  return `${periods > 1 ? periods : ''}${sport.labels.tieShort}`;
+}
+
+/**
  * Camera fields for the signing screen (A-2, DEC D15) computed on the would-be state `st` (with its `choice` and
  * decided `match`): fit the taken land (overseas dependencies excluded) beside the article. Returned for a setState;
  * `focusBounds`/`focusKey` only when there is geometry to frame. Pure (no setState, no RNG).
@@ -98,7 +108,7 @@ export function finishMatch() {
       recordSettlement(this, st, { match: completed, holds: state => !!state.history?.includes(entry) });
       this.setState({ series: next.series, match: completed, matches: st.matches + 1,
         history: [...st.history, entry], queue: [],
-        log: [...st.log, { t: 'match', r: st.round, txt: `${completed.winnerName} wins finale game ${next.series.games}; series continues.`, chip: C.gold }] },
+        log: [...st.log, { t: 'match', r: st.round, txt: `${completed.winnerName} wins finale game ${next.series.games}; series continues.`, chip: C.gold }].slice(-LOG_CAP) },
         () => { this.persist(); if (this.state.autoplay) this.after(st.settings.express ? 120 : 1000, () => this.nextAction()); });
       return;
     }
@@ -176,7 +186,7 @@ export function applyConquest(playerIndex) {
   const effL = winnerId === m.aId ? m.effD : m.effA;
   const isUpset = effW + Number(CONFIG.upsetThreshold) <= effL;
   const sport = this.sport();
-  const tieTxt = m.tie ? ' (' + m.tie.ga + '–' + m.tie.gd + ' ' + sport.labels.tieShort + ')' : '';
+  const tieTxt = m.tie ? ' (' + tieBreakText(m, sport) + ')' : '';
   const A = teams[m.aId];
   const B = teams[m.dId];
   const terrWord = 'TERRITOR' + (taken.length === 1 ? 'Y' : 'IES');
@@ -286,7 +296,7 @@ export function applyConquest(playerIndex) {
         {
           kind: 'result',
           label: roundNumeral ? `${resultLabel} — Round ${roundNumeral}` : resultLabel,
-          score: `${A.code} ${m.finalGa}–${m.finalGd} ${B.code}${m.tie ? ` · ${m.tie.ga}–${m.tie.gd} ${sport.labels.tieShort}` : ''}`,
+          score: `${A.code} ${m.finalGa}–${m.finalGd} ${B.code}${m.tie ? ` · ${tieBreakText(m, sport)}` : ''}`,
           title: `${W.name} annexes ${L.name}`,
           sub: `+${taken.length} ${territoryWord(taken.length)}`,
           upset: isUpset,

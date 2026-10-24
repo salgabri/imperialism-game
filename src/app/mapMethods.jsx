@@ -193,6 +193,8 @@ export function mapCountries() {
       selected: !!isSelected,
       name: domestic?.sectionNames[c.id] || NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
       d: p.d,
+      // The mainland's bounds: keyboard focus reveals these, never a date-line-split country's map-wide box.
+      bbox: p.bbox,
       flagParts: parts,
       fill: mapVM.countryFill({ countryId: c.id, ownerId, owner, mapMode, hasFlagParts: !!parts?.length,
         setup: phase === 'setup', ...identity, strength, fronts, preview: preview?.[c.id] || null }),

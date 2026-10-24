@@ -3,7 +3,7 @@
    <700: full-width sheet with stacked 56/44px buttons. primitives.css loads after this file, so primitive
    overrides use two-class selectors. */
 
-.manager-backdrop { position:fixed; inset:0; z-index:90; background:rgba(17,20,23,.35); }
+.manager-backdrop { position:fixed; inset:0; z-index:90; background:var(--backdrop); }
 
 .manager-ending {
   position:absolute; top:calc(var(--safe-top) + var(--mast-h)); right:0; bottom:0; width:min(650px, 100%);

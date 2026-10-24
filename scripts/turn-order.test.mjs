@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { WorldGeometry } from '../src/engine/geo.js';
+import { WorldGeometry, drawnPaths, mergeSharedIds } from '../src/engine/geo.js';
 import { CAPITALS } from '../src/data/capitals.js';
 import { NATIONS, SCOPES, buildTeam, makeRng, teamEff } from '../src/data/teams.js';
 import { getSport, SPORT_LIST } from '../src/sports/index.js';
@@ -69,7 +69,8 @@ function realAtlas() {
   if (!atlas) {
     const world = new WorldGeometry(load('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS));
     const { s, tx, ty } = world.fit;
-    const routingPaths = new WorldGeometry(load('countries-50m.json'), CAPITALS).buildPaths(s, tx, ty);
+    const routingPaths = drawnPaths(new WorldGeometry(mergeSharedIds(load('countries-50m.json')), CAPITALS).buildPaths(s, tx, ty),
+      world.countries);
     atlas = { world, routingPaths, routeIndex: createAttackRouteIndex(routingPaths) };
   }
   return atlas;

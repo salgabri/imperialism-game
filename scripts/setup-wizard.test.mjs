@@ -1,4 +1,4 @@
-// Owner: WP-SETUP (see PLAN.md §5.2). Setup wizard: steps, DOM contract, rules of war, launch and Space handling.
+// Owner: WP-SETUP (see PLAN.md §5.2). Setup wizard: steps, DOM contract, the draw, opponents, launch and Space handling.
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -9,9 +9,11 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { JSDOM } from 'jsdom';
 import { build } from 'esbuild';
 import {
-  TURN_ORDER_CARDS, buildSetupModel, campaignPreview as modelPreview, countryMapPreview, domesticDescription as modelDescription,
-  domesticTheatres, frontRelation, rulesOf, summaryOf, theatreRow, tierOf,
+  DRAW_CARDS, buildSetupModel, campaignFacts, campaignPreview as modelPreview, countryMapPreview, domesticDescription as modelDescription,
+  domesticTheatres, estimateNote, frontRelation, moreRulesSummary, rulesOf, showMatchOptions, showMatchesOf, showMatchesWrites,
+  theatreMapPreview, theatreRow, tierOf,
 } from '../src/screens/setup/setupModel.js';
+import { launchRules } from '../src/engine/turns.js';
 import { SCOPES } from '../src/data/teams.js';
 import { DOMESTIC } from '../src/data/domestic.js';
 import { getSport } from '../src/sports/index.js';
@@ -155,17 +157,34 @@ test('static markup keeps the whole DOM contract on every step', t => {
       assert.equal(doc.querySelectorAll(`#${id}`).length, 1, `#${id} is mounted once`);
     }
     const advanced = doc.querySelector('details.setup-advanced');
-    for (const id of ['setup-pacing', 'setup-resolution', 'setup-uncertainty', 'setup-finale', 'setup-recruitment', 'setup-seed']) {
-      assert.ok(advanced.querySelector(`#${id}`), `#${id} lives in the Match settings disclosure`);
+    for (const id of ['setup-uncertainty', 'setup-finale', 'setup-recruitment', 'setup-seed']) {
+      assert.ok(advanced.querySelector(`#${id}`), `#${id} lives in the More rules disclosure`);
     }
-    assert.equal(!!advanced.querySelector('#setup-roster-preset'), sport === 'basketball', 'starting ratings are a basketball setting');
+    assert.equal(!!advanced.querySelector('#setup-roster-preset'), sport === 'basketball', 'team strengths are a basketball setting');
+    assert.equal(advanced.querySelector('.setup-advanced__values').textContent, 'Final: Best of three · Seed 42', 'only changed rules are summarised');
+    // The draw's pacing mirror sits with the draw cards, outside the disclosure (hidden, value-bound).
+    const pacing = doc.querySelector('#setup-pacing');
+    assert.equal(pacing.closest('details'), null);
+    assert.ok(pacing.closest('section[data-step="2"] .setup-main .rule-group'));
+    assert.ok(pacing.classList.contains('setup-mirror'));
+    assert.equal(pacing.getAttribute('aria-hidden'), 'true');
+    // Show matches is visible on step 2 and changeable in play: resolution and express as one choice.
+    const resolution = doc.querySelector('#setup-resolution');
+    assert.equal(resolution.closest('details'), null);
+    assert.ok(resolution.closest('section[data-step="2"] .setup-playback'));
+    assert.deepEqual([...resolution.options].map(option => option.value), ['ticker', 'instant', 'express']);
+    // The manager's opponent choice sits under the role cards on step 3, before the team list.
+    const opponents = doc.querySelector('section[data-step="3"] .setup-main #rule-target-label');
+    assert.ok(opponents);
+    assert.ok(opponents.compareDocumentPosition(doc.querySelector('.setup-teams')) & 4, 'above the team list');
+    assert.ok(!doc.querySelector('section[data-step="2"] #rule-target-label'));
     assert.equal(doc.querySelector('#setup-seed').getAttribute('value'), '42');
     assert.ok(doc.querySelector('section[data-step="3"] #setup-managed-team'));
     const launch = [...doc.querySelectorAll('button')].filter(button => button.textContent.trim() === 'Launch campaign');
     assert.equal(launch.length, 1);
     assert.equal(launch[0].getAttribute('type'), 'submit');
     assert.ok(launch[0].closest('section[data-step="3"] footer'), 'Launch campaign sits in step 3\'s footer');
-    for (const label of ['Football', 'Basketball', 'Nations', 'Clubs', 'Next: Rules', 'Next: Nation & role', 'Cancel']) {
+    for (const label of ['Football', 'Basketball', 'Nations', 'Clubs', 'Next: Rules', 'Next: Your role', 'Cancel']) {
       assert.ok([...doc.querySelectorAll('button')].some(button => button.textContent.trim() === label), `button ${label}`);
     }
     const save = doc.querySelector('.setup-save');
@@ -175,7 +194,8 @@ test('static markup keeps the whole DOM contract on every step', t => {
     assert.match(markup, /some signings add bench options/);
     assert.match(markup, /up to three signings/);
     assert.match(markup, /31–33 matches/);
-    assert.match(markup, /neutral transit/i);
+    assert.doesNotMatch(markup, /neutral transit/i, 'route internals stay out of the setup copy');
+    assert.doesNotMatch(markup, /rule-matrix|Spectator-ready|Match settings/, 'no duplicate rules matrix or hidden pacing');
     assert.doesNotMatch(markup, /Progress saved after every match/);
     assert.doesNotMatch(markup, /aria-modal/);
     assert.ok(doc.querySelector('.setup-overlay'));
@@ -204,7 +224,7 @@ test('rail, Next and Back move between the three mounted steps and focus the ste
   assert.equal(document.activeElement, view.q('#setup-rules-title'));
   assert.match(view.q('.setup-rail__step[data-state="done"]').textContent, /Football · Nations · Europe/);
 
-  await view.click(view.button('Next: Nation & role', view.section(2)));
+  await view.click(view.button('Next: Your role', view.section(2)));
   assert.deepEqual(view.visibleStep(), ['3']);
   await view.click(view.button('Back', view.section(3)));
   assert.deepEqual(view.visibleStep(), ['2']);
@@ -254,70 +274,110 @@ test('step 1 binds sport, teams and theatre; the theatre mirror select stays val
   assert.deepEqual(view.errors, []);
 });
 
-/**
- * M§3.5: every matrix tag is the board's verbatim copy (one line); the board's " · selected" suffix is a separate
- * "Selected" status line on the selected cell only (decorative: aria-checked carries the state).
- */
-function assertSelectedCell(step, selected, tag) {
-  const tags = [...step.querySelectorAll('.rule-matrix__tag')].map(element => element.textContent);
-  assert.deepEqual(tags, ['Manager', 'Spectator-ready', 'Manager', 'Spectator-ready · classic']);
-  assert.equal(selected.querySelector('.rule-matrix__tag').textContent, tag);
-  const status = [...step.querySelectorAll('.rule-matrix__selected')];
-  assert.equal(status.length, 1, 'one status line, on the selected cell');
-  assert.equal(status[0].closest('.rule-matrix__cell'), selected);
-  assert.equal(status[0].textContent, 'Selected');
-  assert.equal(status[0].getAttribute('aria-hidden'), 'true');
-  assert.ok(status[0].previousElementSibling.classList.contains('rule-matrix__tag'), 'the status line follows the tag');
-  assert.doesNotMatch(step.querySelector('.rule-matrix').textContent, /· selected/i);
-}
-
-test('rules of war: radio cards, matrix cells set both switches, disabled note away from One by one', async t => {
+test('rules of war: one draw choice, Show matches and More rules', async t => {
   const view = await mount(t);
   await view.click(view.button('Next: Rules'));
   const step = view.section(2);
   const groups = [...step.querySelectorAll('.setup-main [role="radiogroup"]')];
-  assert.equal(groups.length, 2);
-  for (const group of groups) {
-    const radios = [...group.querySelectorAll('[role="radio"]')];
-    assert.equal(radios.length, 2);
-    assert.equal(radios.filter(radio => radio.getAttribute('aria-checked') === 'true').length, 1);
-    assert.equal(radios.filter(radio => radio.tabIndex === 0).length, 1, 'roving tabindex');
-    assert.ok(group.getAttribute('aria-labelledby'));
+  assert.equal(groups.length, 1, 'the draw is the only rules choice');
+  const radios = [...groups[0].querySelectorAll('[role="radio"]')];
+  assert.deepEqual(radios.map(radio => radio.querySelector('.rule-card__title').textContent), ['Random draw', 'Round robin', 'Blitz round', 'Chaos draw']);
+  assert.equal(radios.filter(radio => radio.getAttribute('aria-checked') === 'true').length, 1);
+  assert.equal(radios[0].getAttribute('aria-checked'), 'true', 'Random draw by default (DEC D1)');
+  assert.equal(radios.filter(radio => radio.tabIndex === 0).length, 1, 'roving tabindex');
+  assert.equal(groups[0].getAttribute('aria-labelledby'), 'rule-draw-label');
+  assert.equal(step.querySelector('#rule-draw-random-tag').textContent, 'Recommended');
+  assert.ok(radios.every(radio => !radio.disabled), 'no draw card is ever disabled');
+  for (const selector of ['.rule-matrix', '.rule-note', '.spectator-note', '.setup-summary', '#rule-target-label']) {
+    assert.ok(!step.querySelector(selector), `${selector} is not on step 2`);
   }
-  const roundRobin = step.querySelector('#rule-order-round-robin-title').closest('[role="radio"]');
+
+  const roundRobin = step.querySelector('#rule-draw-round-robin-title').closest('[role="radio"]');
   await view.click(roundRobin);
-  assert.deepEqual(view.calls.picks.at(-1), ['turnOrder', 'round-robin']);
+  assert.deepEqual(view.calls.picks, [['turnOrder', 'round-robin']], 'a one-match draw writes only what changes');
   assert.equal(roundRobin.getAttribute('aria-checked'), 'true');
   await view.key(roundRobin, 'ArrowRight');
-  assert.deepEqual(view.calls.picks.at(-1), ['turnOrder', 'random']);
-
-  const cell = step.querySelector('.rule-matrix__cell[data-turn-order="round-robin"][data-targeting="player"]');
+  assert.deepEqual(view.calls.picks.at(-1), ['pacing', 'blitz'], 'Blitz leaves the stored turn order alone');
+  assert.equal(step.querySelector('#rule-draw-blitz-title').closest('[role="radio"]').getAttribute('aria-checked'), 'true');
   view.calls.picks.length = 0;
-  await view.click(cell);
-  assert.deepEqual(view.calls.picks, [['turnOrder', 'round-robin'], ['targeting', 'player']]);
-  assert.equal(cell.getAttribute('aria-checked'), 'true');
-  assertSelectedCell(step, cell, 'Manager');
-  assert.equal(step.querySelectorAll('.rule-matrix__cell[aria-checked="true"]').length, 1);
-  assert.equal(step.querySelector('#rule-target-player-title').closest('[role="radio"]').getAttribute('aria-checked'), 'true');
-  assert.match(step.querySelector('.setup-summary').textContent, /Balanced — strength matters, upsets happen/);
-  assert.match(step.textContent, /Watching as a spectator\?/);
-  assert.equal(step.querySelector('.rule-note'), null);
+  await view.click(step.querySelector('#rule-draw-random-title').closest('[role="radio"]'));
+  assert.deepEqual(view.calls.picks, [['pacing', 'duel'], ['turnOrder', 'random']]);
 
-  // Blitz: rules cards disabled with a note; the matrix shows the effective random × compass draw.
+  // The hidden pacing mirror stays value-bound for automation.
   const pacing = view.q('#setup-pacing');
+  assert.equal(pacing.value, 'duel');
+  pacing.value = 'chaos';
+  await act(async () => pacing.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(view.calls.picks.at(-1), ['pacing', 'chaos']);
+  assert.equal(step.querySelector('#rule-draw-chaos-title').closest('[role="radio"]').getAttribute('aria-checked'), 'true');
+  assert.match(view.q('.setup-rail__step[aria-controls="setup-step-rules"]').textContent, /How matches are drawn/);
+
+  assert.equal(step.querySelector('.setup-advanced').open, false, 'More rules starts collapsed');
+  assert.equal(step.querySelector('.setup-advanced__title').textContent, 'More rules');
+  assert.equal(step.querySelector('.setup-advanced__values').textContent, 'Standard');
+  const upsets = view.q('#setup-uncertainty');
+  upsets.value = 'wild';
+  await act(async () => upsets.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(view.calls.picks.at(-1), ['uncertainty', 'wild']);
+  assert.equal(step.querySelector('.setup-advanced__values').textContent, 'Upsets: Wild');
+
+  // Show matches: Fast-forward writes express only; the other modes switch it off and set the resolution.
+  const show = view.q('#setup-resolution');
+  assert.equal(show.value, 'ticker');
+  view.calls.picks.length = 0;
+  show.value = 'express';
+  await act(async () => show.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(view.calls.picks, [['express', true]]);
+  assert.equal(show.value, 'express');
+  assert.match(view.q('#setup-resolution-help').textContent, /Your decisions still wait/);
+  view.calls.picks.length = 0;
+  show.value = 'instant';
+  await act(async () => show.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(view.calls.picks, [['express', false], ['resolution', 'instant']]);
+  assert.match(view.q('.setup-estimate__note').textContent, /final scores only/);
+  assert.deepEqual(view.errors, []);
+});
+
+test('opponent choice: a manager under a one-match draw picks on step 3; spectators never see it', async t => {
+  const manager = await mount(t, { setup: { role: 'manager' } });
+  await manager.click(manager.qa('.setup-rail__step')[2]);
+  const main = manager.section(3).querySelector('.setup-main');
+  const group = main.querySelector('[role="radiogroup"][aria-labelledby="rule-target-label"]');
+  assert.ok(group, "the opponent choice sits in step 3's main column, under the role cards");
+  assert.ok(group.compareDocumentPosition(manager.q('.setup-teams')) & dom.window.Node.DOCUMENT_POSITION_FOLLOWING, 'before the team list');
+  const options = [...group.querySelectorAll('[role="radio"]')];
+  assert.deepEqual(options.map(option => option.textContent), ['You choose', 'Compass']);
+  assert.equal(options[1].getAttribute('aria-checked'), 'true', 'Compass by default (DEC D1)');
+  assert.equal(options.filter(option => option.tabIndex === 0).length, 1, 'roving tabindex');
+  const help = manager.q(`#${group.getAttribute('aria-describedby')}`);
+  assert.match(help.textContent, /A spinning compass picks your opponent/);
+  await manager.click(options[0]);
+  assert.deepEqual(manager.calls.picks.at(-1), ['targeting', 'player']);
+  assert.equal(options[0].getAttribute('aria-checked'), 'true');
+  assert.match(help.textContent, /you pick any rival in reach/);
+  await manager.click(options[0]);
+  assert.equal(manager.calls.picks.filter(([key]) => key === 'targeting').length, 1, 're-selecting the current option writes nothing');
+
+  // Blitz pairs every match itself: a note with a way back to the draw replaces the choice.
+  const pacing = manager.q('#setup-pacing');
   pacing.value = 'blitz';
   await act(async () => pacing.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
-  assert.deepEqual(view.calls.picks.at(-1), ['pacing', 'blitz']);
-  const note = step.querySelector('.rule-note');
-  assert.match(note.textContent, /apply to One by one pacing/);
-  assert.ok([...step.querySelectorAll('.rule-card, .rule-matrix__cell')].every(button => button.disabled));
-  assert.equal(step.querySelector('.rule-matrix__cell[aria-checked="true"]').dataset.turnOrder, 'random');
-  assertSelectedCell(step, step.querySelector('.rule-matrix__cell[aria-checked="true"]'), 'Spectator-ready · classic');
-  await view.click(view.button('Use One by one', note));
-  assert.deepEqual(view.calls.picks.at(-1), ['pacing', 'duel']);
-  assert.equal(step.querySelector('.rule-note'), null);
-  assert.equal(step.querySelector('.rule-matrix__cell[aria-checked="true"]').dataset.targeting, 'player', 'stored choice returns');
-  assert.deepEqual(view.errors, []);
+  assert.ok(!main.querySelector('[aria-labelledby="rule-target-label"][role="radiogroup"]'));
+  const note = manager.q('#rule-target-none');
+  assert.match(note.textContent, /Blitz round pairs every match itself, so there's no opponent to pick\./);
+  await manager.click(manager.button('Change the draw', note));
+  assert.deepEqual(manager.visibleStep(), ['2']);
+  assert.equal(document.activeElement, manager.q('#setup-rules-title'));
+  await manager.click(manager.q('#rule-draw-round-robin-title').closest('[role="radio"]'));
+  assert.equal(manager.q('#rule-target-player-title').closest('[role="radio"]').getAttribute('aria-checked'), 'true', 'stored choice returns');
+
+  await manager.click(manager.q('#setup-role-spectator-title').closest('[role="radio"]'));
+  assert.ok(!manager.q('#rule-target-label'), 'a spectator has no opponent to pick');
+  assert.deepEqual(manager.errors, []);
+
+  const spectator = await mount(t, { setup: { targeting: 'player' } });
+  assert.ok(!spectator.q('#rule-target-label'));
+  assert.ok(!spectator.q('.setup-role-note'));
 });
 
 test('launch: enabled for spectators from any step, requires a managed team for managers', async t => {
@@ -339,7 +399,7 @@ test('launch: enabled for spectators from any step, requires a managed team for 
   assert.match(pick.textContent, /Selected nation/);
   assert.match(pick.textContent, /Italy/);
   assert.match(pick.textContent, /3 \/ 4/);
-  assert.match(pick.textContent, /Favourite/);
+  assert.match(pick.textContent, /Outsider/, 'third of a four-team field (tiers scale with the field)');
   assert.ok(pick.querySelectorAll('.setup-player').length > 0, 'best players come from the roster data');
   assert.equal(manager.button('Launch campaign').disabled, false);
   await manager.click(manager.button('Launch campaign'));
@@ -484,7 +544,7 @@ test('setup.css keeps the reviewed token and hit-target rules', () => {
     assert.ok(at >= 0, `rule ${selector}`);
     return css.slice(at, css.indexOf('}', at));
   };
-  // M§3.4: Round robin squares are always `you`; only an unselected Random draw paints its filled squares muted.
+  // M§3.4: filled squares are `you`; only an unselected random draw (Random draw, Chaos draw) paints them muted.
   assert.match(rule('.rule-dot--on'), /background:var\(--you\)/);
   assert.match(rule('.rule-dot--current'), /background:var\(--you\).*0 0 0 3px var\(--you\)/);
   assert.match(rule('.rule-card[data-dots=rand]:not([aria-checked=true]) .rule-dot--on'), /background:var\(--muted\)/);
@@ -495,48 +555,37 @@ test('setup.css keeps the reviewed token and hit-target rules', () => {
   // WP-LEDGER's `.save-status.is-unsaved` weight survives the setup restyle.
   assert.doesNotMatch(rule('.setup-overlay .save-controls .save-status'), /font:/);
   assert.match(rule('.setup-overlay .save-controls .save-status.is-unsaved'), /font-weight:600/);
-  // Low std band (1200–1399) tightens the frame so option-card and matrix titles hold one line down to 1200.
+  // Low std band (1200–1399) tightens the frame so option-card titles hold one line down to 1200.
   const bandQuery = '@media (min-width:1200px) and (max-width:1399.98px) {';
   assert.ok(css.includes(bandQuery));
   const band = css.slice(css.indexOf(bandQuery) + bandQuery.length);   // up to the next @media: this band's rules
   assert.match(band, /^[^@]*--setup-rail-w:224px;/);
   assert.match(band, /^[^@]*\.rule-card__title, \.setup-card__button \{ font-size:21px;/);
-  assert.match(band, /^[^@]*\.rule-matrix__title \{ font-size:16px; \}/);
-  // ...and the rail subtitles and matrix tags hold one line there too (W4 review: they wrapped at 1366). Measured in
-  // Chrome: 146px rail text column vs "Football · Nations · Europe" 141px at 12px; cells ≥159px inside at 1200 vs
-  // "Spectator-ready · classic" 152px at 11px / .06em.
+  // ...and the rail subtitles hold one line there too (W4 review: they wrapped at 1366). Measured in Chrome: 146px
+  // rail text column vs "Football · Nations · Europe" 141px at 12px.
   assert.match(band, /^[^@]*\.setup-rail \{ padding:28px 12px; \}/);
   assert.match(band, /^[^@]*\.setup-rail__step \{ gap:10px; padding:14px 6px 14px 10px; \}/);
   assert.match(band, /^[^@]*\.setup-rail__sub \{ font-size:12px; \}/);
-  assert.match(band, /^[^@]*\.rule-matrix \{ grid-template-columns:92px minmax\(0, 1fr\) minmax\(0, 1fr\); column-gap:8px; \}/);
-  assert.match(band, /^[^@]*\.rule-matrix__tag, \.rule-matrix__selected \{ font-size:11px; letter-spacing:\.06em; \}/);
   // Step 3: 8–12px between the nation list and the "Management stays…" note (W4 final: flush, so the list read as
   // clipped). A bare `.setup-teams__help` loses to `.control-help { margin:0 }` (primitives.css loads later): the rule
   // must out-rank it (measured in Chrome before: computed margin-top 0px at 1366/1440/1920/820/390).
   assert.match(rule('.setup-group--list .setup-teams__help'), /margin-top:(8|9|10|11|12)px/);
   assert.doesNotMatch(css, /(^|\})\s*\.setup-teams__help \{/, 'no single-class rule that .control-help overrides');
-  // The "Selected" status line never wraps; done-summary parts stay whole so a long summary wraps at a separator.
-  assert.match(rule('.rule-matrix__selected'), /white-space:nowrap/);
+  // Done-summary parts stay whole so a long summary wraps at a separator.
   assert.match(rule('.setup-rail__part'), /white-space:nowrap/);
-  // M§3.5: matrix tags are nowrap at every band down to the 390 phone (RC2 review: "Spectator-ready · classic" wrapped
-  // in the 149px phone cell). Measured in Chrome: 146.7px at 11px / .04em. Phones narrower than 390 wrap instead of
-  // spilling out of the cell.
-  assert.match(rule('.rule-matrix__tag'), /white-space:nowrap/);
+  // The rules matrix and the spectator note are gone (one draw choice; the opponent choice is a manager's, on step 3).
+  assert.doesNotMatch(css, /rule-matrix|spectator-note|setup-summary|setup-role-note|setup-pick__note/);
   const phoneQuery = '@media (max-width:699.98px) {';
   const phone = css.slice(css.lastIndexOf(phoneQuery) + phoneQuery.length);   // the layout band (the first holds tokens)
-  assert.match(phone, /^[^@]*\.rule-matrix__cell \{ min-height:0; padding:12px; \}/);
-  assert.match(phone, /^[^@]*\.rule-matrix__tag, \.rule-matrix__selected \{ font-size:11px; letter-spacing:\.04em; \}/);
-  assert.doesNotMatch(phone.split('@')[0], /white-space:normal/, 'the phone band itself keeps the tags on one line');
   const narrowQuery = '@media (max-width:389.98px) {';
-  assert.ok(css.indexOf(narrowQuery) > css.lastIndexOf(phoneQuery), 'the sub-390 fallback follows (and so overrides) the phone band');
+  assert.ok(css.indexOf(narrowQuery) > css.lastIndexOf(phoneQuery), 'the sub-390 rules follow (and so override) the phone band');
   const narrow = css.slice(css.indexOf(narrowQuery) + narrowQuery.length);
-  assert.match(narrow, /^\s*\.rule-matrix__tag \{ white-space:normal; \}/);
   // The phone step bar never overflows the screen: "Next: Nation & role" + its "Step 2 of 3" hint spilled past the
   // right edge at 360. The hint may ellipsize before the bar overflows, and below 390 the bar's padding tightens so
   // the hint stays whole (measured in Chrome at 360: 41px free for the 59px hint before, 64.5px after; 390 unchanged).
   assert.match(phone, /^[^@]*\.setup-foot \.setup-foot__next \{ flex:1 1 auto; min-width:0;/);
   assert.match(rule('.setup-foot .btn-primary[data-bar-hint]::after'), /min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;/);
-  assert.match(narrow, /^[^@]*\.setup-foot \.setup-foot__back \{ padding:0 14px; \}\s*\.setup-foot \.setup-foot__next \{ padding:0 12px; \}\s*\}/);
+  assert.match(narrow, /^\s*\.setup-foot \.setup-foot__back \{ padding:0 14px; \}\s*\.setup-foot \.setup-foot__next \{ padding:0 12px; \}\s*\}/);
 });
 
 test('theatre footnote: a "*"-marked scope name resolves to its description; summaries drop the marker', async t => {
@@ -588,13 +637,16 @@ test('theatre footnote: a "*"-marked scope name resolves to its description; sum
   assert.deepEqual(view.errors, []);
 });
 
-test('turn-order cards mark their dot style for the CSS', async t => {
-  assert.deepEqual(TURN_ORDER_CARDS.map(card => card.dotStyle), ['rr', 'rand']);
-  const view = await mount(t);
+test('draw cards mark their dot style for the CSS', async t => {
+  assert.deepEqual(DRAW_CARDS.map(card => card.dotStyle), ['rand', 'rr', 'all', 'rand']);
+  assert.deepEqual(DRAW_CARDS.map(card => [card.value, card.pacing, card.turnOrder ?? null]),
+    [['random', 'duel', 'random'], ['round-robin', 'duel', 'round-robin'], ['blitz', 'blitz', null], ['chaos', 'chaos', null]]);
+  // Blitz copy keeps the odd team's bye (engine/campaign.js drawBlitzPairs).
+  assert.match(DRAW_CARDS.find(card => card.value === 'blitz').body, /one sits out/);
+  const view = await mount(t, { setup: { role: 'manager' } });
   await view.click(view.button('Next: Rules'));
-  const card = value => view.q(`#rule-order-${value}-title`).closest('[role="radio"]');
-  assert.equal(card('round-robin').dataset.dots, 'rr');
-  assert.equal(card('random').dataset.dots, 'rand');
+  const card = value => view.q(`#rule-draw-${value}-title`).closest('[role="radio"]');
+  for (const item of DRAW_CARDS) assert.equal(card(item.value).dataset.dots, item.dotStyle);
   assert.equal(card('round-robin').querySelectorAll('.rule-dot--current').length, 1);
   assert.equal(view.q('#rule-target-player-title').closest('[role="radio"]').hasAttribute('data-dots'), false);
 });
@@ -616,7 +668,7 @@ test('step 3 heading follows the role; the Selected panel shows board 03 Fronts 
     row.querySelector('.setup-front__rel').textContent, row.querySelector('.setup-front__rel').dataset.tone,
   ]);
   assert.deepEqual(rows, [['France', '86.1', 'Stronger', 'loss'], ['Spain', '85.0', 'Level', 'even'], ['Hungary', '76.4', 'Weaker', 'gain']]);
-  assert.ok(fronts.compareDocumentPosition(view.q('.setup-pick__note')) & dom.window.Node.DOCUMENT_POSITION_FOLLOWING, 'Fronts sit above the note');
+  assert.ok(!view.q('.setup-pick__note'), 'no repeated manager note');
 
   await view.click(view.qa('.setup-team').find(row => /Belgium/.test(row.textContent)));
   assert.match(view.q('.setup-pick__fronts').textContent, /0 land borders/);
@@ -630,17 +682,83 @@ test('step 3 heading follows the role; the Selected panel shows board 03 Fronts 
 
 test('view model: rules normalisation, summaries, tiers and pure inputs', () => {
   assert.deepEqual([rulesOf({}).turnOrder, rulesOf({}).targeting], ['random', 'compass'], 'defaults reproduce HEAD (DEC D1)');
-  const chaos = rulesOf({ pacing: 'chaos', turnOrder: 'round-robin', targeting: 'player' });
+  assert.equal(rulesOf({}).draw, 'random');
+  const chaos = rulesOf({ pacing: 'chaos', turnOrder: 'round-robin', targeting: 'player', role: 'manager' });
   assert.equal(chaos.applies, false);
-  assert.deepEqual([chaos.turnOrder, chaos.targeting], ['random', 'compass']);
+  assert.equal(chaos.canPick, false);
+  assert.deepEqual([chaos.draw, chaos.turnOrder, chaos.targeting], ['chaos', 'random', 'compass']);
   assert.deepEqual(chaos.stored, { turnOrder: 'round-robin', targeting: 'player' });
-  assert.equal(chaos.cells.filter(cell => cell.selected).length, 1);
-  assert.equal(rulesOf({ pacing: 'duel', turnOrder: 'round-robin', targeting: 'player' }).summary, 'Round robin · You choose');
-  assert.deepEqual(summaryOf({}), {
-    pacing: 'One by one — a compass picks each fixture', uncertainty: 'Balanced — strength matters, upsets happen',
-    finale: 'Single decisive match', recruitment: 'Highest-rated player for unmanaged teams',
-  });
-  assert.deepEqual([1, 4, 5, 12, 13, 30, 31].map(tierOf), ['Favourite', 'Favourite', 'Contender', 'Contender', 'Outsider', 'Outsider', 'Long shot']);
+  assert.equal(chaos.note, "Chaos draw pairs every match itself, so there's no opponent to pick.");
+  const roundRobin = rulesOf({ pacing: 'duel', turnOrder: 'round-robin', targeting: 'player' });
+  assert.equal(roundRobin.summary, 'Round robin');
+  assert.equal(roundRobin.targeting, 'compass', 'a spectator always uses the compass (DEC D2)');
+  const managed = rulesOf({ pacing: 'duel', turnOrder: 'round-robin', targeting: 'player', role: 'manager' });
+  assert.deepEqual([managed.canPick, managed.targeting], [true, 'player']);
+  // The wizard shows exactly what launch stores (engine/turns.js launchRules) for every known pacing.
+  for (const pacing of ['duel', 'blitz', 'chaos']) {
+    for (const turnOrder of ['round-robin', 'random', undefined, 'x']) {
+      for (const targeting of ['player', 'compass', undefined]) {
+        for (const role of ['manager', 'spectator', undefined]) {
+          const setup = { pacing, turnOrder, targeting, role };
+          const shown = rulesOf(setup);
+          assert.deepEqual({ turnOrder: shown.turnOrder, targeting: shown.targeting }, launchRules(setup), JSON.stringify(setup));
+        }
+      }
+    }
+  }
+  // More rules: "Standard", or only what differs from the defaults (team strengths only matter in basketball).
+  assert.equal(moreRulesSummary({}), 'Standard');
+  assert.equal(moreRulesSummary(BASE), 'Standard');
+  assert.equal(moreRulesSummary({ ...BASE, uncertainty: 'predictable', finale: 'best-of-three', acquisitionPolicy: 'best-fit', seed: ' 7 ' }),
+    'Upsets: Predictable · Final: Best of three · Computer signings: Best lineup fit · Seed 7');
+  assert.equal(moreRulesSummary({ ...BASE, rosterPreset: 'competitive' }), 'Standard');
+  assert.equal(moreRulesSummary({ ...BASE, sport: 'basketball', rosterPreset: 'competitive' }), 'Team strengths: Evened out');
+  // Show matches: express wins over the resolution; writes only touch what changes.
+  assert.equal(showMatchesOf({}), 'ticker');
+  assert.equal(showMatchesOf({ resolution: 'instant' }), 'instant');
+  assert.equal(showMatchesOf({ resolution: 'ticker', express: true }), 'express');
+  assert.deepEqual(showMatchesWrites('express', { resolution: 'ticker' }), [['express', true]]);
+  assert.deepEqual(showMatchesWrites('express', { express: true }), []);
+  assert.deepEqual(showMatchesWrites('ticker', { resolution: 'instant', express: true }), [['express', false], ['resolution', 'ticker']]);
+  assert.deepEqual(showMatchesWrites('instant', { resolution: 'instant', express: true }), [['express', false]]);
+  assert.deepEqual(showMatchesWrites('ticker', { resolution: 'ticker' }), []);
+  assert.deepEqual(showMatchesWrites('bogus', { resolution: 'ticker' }), []);
+  // While a draw or match is live, only the modes that need a refused `resolution` write are locked.
+  const locked = settings => showMatchOptions(settings, { busy: true }).map(option => option.disabled);
+  assert.deepEqual(locked({ resolution: 'ticker' }), [false, true, false]);
+  assert.deepEqual(locked({ resolution: 'instant', express: true }), [true, false, false]);
+  assert.deepEqual(showMatchOptions({ resolution: 'ticker' }).map(option => option.disabled), [false, false, false]);
+  // Step 1's estimate footnote names the mode it assumes.
+  assert.deepEqual(['ticker', 'instant', 'express'].flatMap(mode => ['spectator', 'manager'].map(role => estimateNote(mode, role))), [
+    'Estimated with live matches at 1× speed. Ties add time.',
+    'Estimated with live matches at 1× speed. Ties and your decisions add time.',
+    'Estimated with final scores only at 1× speed.',
+    'Estimated with final scores only at 1× speed. Your decisions add time.',
+    'Estimated with Fast-forward at 1× speed.',
+    'Estimated with Fast-forward at 1× speed. Your decisions add time.',
+  ]);
+  // In-game "This campaign": launched values as read-only facts; unknown values read as their defaults.
+  const ids = rows => rows.map(row => row.id);
+  assert.deepEqual(ids(campaignFacts({})), ['role', 'pacing', 'targeting', 'uncertainty', 'finale', 'recruitment']);
+  assert.deepEqual(campaignFacts({}).map(row => row.value), ['Spectator', 'Random draw', 'Compass', 'Balanced', 'Single match', 'Best-rated player']);
+  assert.deepEqual(campaignFacts({ pacing: 'duel', turnOrder: 'round-robin' })[1].inner, { id: 'turn-order', stored: 'round-robin' });
+  const blitz = campaignFacts({ pacing: 'blitz', turnOrder: 'round-robin', targeting: 'player', role: 'manager' });
+  assert.deepEqual(ids(blitz), ['role', 'pacing', 'uncertainty', 'finale', 'recruitment']);
+  assert.equal(blitz[1].value, 'Blitz round');
+  assert.equal(blitz[1].inner, undefined);
+  assert.deepEqual(ids(campaignFacts({ sport: 'basketball' }, { seed: 42 })).slice(-2), ['roster-preset', 'seed']);
+  const manager = { pacing: 'duel', targeting: 'player', role: 'manager' };
+  assert.deepEqual(campaignFacts(manager, { managedName: 'Italy' }).map(row => row.value).slice(0, 3), ['Manager · Italy', 'Random draw', 'You choose on your turns']);
+  assert.deepEqual(campaignFacts(manager, { managedName: 'Italy', managementEnded: true }).map(row => row.value).slice(0, 3),
+    ['Spectator · Italy knocked out', 'Random draw', 'Compass']);
+  assert.equal(campaignFacts({ role: 'manager' }).at(0).value, 'Manager');
+  const odd = campaignFacts({ pacing: 'x', uncertainty: 'x', finale: 'x', acquisitionPolicy: 'x', role: 'x', turnOrder: 'x', targeting: 'x' });
+  assert.deepEqual(odd.map(row => row.stored), ['spectator', 'duel', 'compass', 'balanced', 'single', 'highest-rated']);
+  assert.deepEqual([1, 4, 5, 12, 13, 30, 31].map(rank => tierOf(rank)), ['Favourite', 'Favourite', 'Contender', 'Contender', 'Outsider', 'Outsider', 'Long shot']);
+  assert.deepEqual([1, 4, 5, 12, 13, 30, 31].map(rank => tierOf(rank, 46)), ['Favourite', 'Favourite', 'Contender', 'Contender', 'Outsider', 'Outsider', 'Long shot'],
+    'a 46-team field keeps the board cut-offs');
+  assert.deepEqual([1, 2, 3, 4, 7, 8, 10].map(rank => tierOf(rank, 10)), ['Favourite', 'Contender', 'Contender', 'Outsider', 'Outsider', 'Long shot', 'Long shot'],
+    'a ten-club country scales them down: its weakest club is a long shot, not a contender');
 
   const setup = Object.freeze({ ...BASE, role: 'manager', managedTeamId: '380' });
   const teams = Object.freeze(TEAMS.map(team => Object.freeze({ ...team })));
@@ -787,7 +905,7 @@ test('a chosen country: description, counts, summaries, and its map load gating 
   assert.equal(loading.q('#setup-theatre').value, 'domestic:826');
   assert.match(loading.q('.setup-stats').textContent, /100/);
   assert.equal(loading.button('Launch campaign').disabled, true);
-  assert.equal(loading.q('.setup-country-map').getAttribute('data-state'), 'loading');
+  assert.equal(loading.q('.setup-map').getAttribute('data-state'), 'loading');
   await loading.click(loading.qa('.setup-rail__step')[2]);
   assert.equal(loading.q('.setup-empty').textContent, 'Loading the map of England…');
   assert.equal(loading.section(3).querySelector('.setup-foot__note').textContent, 'Loading the map of England…');
@@ -813,7 +931,7 @@ test('a chosen country: description, counts, summaries, and its map load gating 
   // Ready: Launch works; while App prepares the campaign the button is busy and a second submit is ignored.
   const ready = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {} } });
   assert.equal(ready.q('.setup-domestic__status'), null);
-  assert.equal(ready.q('.setup-country-map'), null, 'no card without a preview from App');
+  assert.equal(ready.q('.setup-map'), null, 'no card without a preview from App');
   await ready.click(ready.button('Launch campaign'));
   assert.equal(ready.calls.start, 1);
   const launching = await mount(t, { setup: COUNTRY, launching: true, domestic: { state: 'ready', message: null, onRetry() {} } });
@@ -871,14 +989,66 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   assert.ok(real.viewBox.split(' ').map(Number).every(Number.isFinite));
 
   const view = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {}, preview } });
-  const card = view.q('.setup-step[data-step="1"] .setup-side > .setup-country-map');
+  const card = view.q('.setup-step[data-step="1"] .setup-side > .setup-map');
   assert.ok(card, 'the card leads the side column of step 1');
   assert.equal(card.getAttribute('aria-hidden'), 'true');
   assert.equal(card.querySelector('svg').getAttribute('viewBox'), preview.viewBox);
-  assert.equal(card.querySelectorAll('.setup-country-map__backdrop path').length, 1);
-  assert.deepEqual([...card.querySelectorAll('.setup-country-map__sections path')].map(path => path.getAttribute('fill')),
+  assert.equal(card.querySelectorAll('.setup-map__backdrop path').length, 1);
+  assert.deepEqual([...card.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
     preview.sections.map(section => section.fill));
   assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
   assert.equal(card.querySelector('figcaption').textContent, 'England · 3 sections, one per club');
   assert.deepEqual(view.errors, []);
+});
+
+test('world card: a theatre opening board in kick-off pastels over unclaimed land, framed on the teams or a focus', async t => {
+  const box = (x, y) => ({ x, y, w: 10, h: 10 });
+  const basePaths = {
+    a: { d: 'M0,0h10v10h-10Z', bbox: box(0, 0) }, b: { d: 'M10,0h10v10h-10Z', bbox: box(10, 0) },
+    c: { d: 'M90,90h10v10h-10Z', bbox: box(90, 90) }, n: { d: 'M50,50h10v10h-10Z', bbox: box(50, 50) }, gone: {},
+  };
+  const countries = ['n', 'a', 'b', 'c', 'gone'].map(id => ({ id }));
+  // `c` is overseas land of `a`: painted in a's pastel, but only the starting land (`frameIds`) sets the frame.
+  const own = { a: 'a', b: 'b', c: 'a' };
+  const frameIds = ['a', 'b'];
+  const preview = theatreMapPreview({ countries, basePaths, own, frameIds });
+  assert.deepEqual(preview.sections.map(section => [section.id, section.fill]), [['a', empireFill('a')], ['b', empireFill('b')], ['c', empireFill('a')]]);
+  assert.deepEqual(preview.backdrop, [{ id: 'n', d: 'M50,50h10v10h-10Z' }], 'unclaimed land is drawn; shapes without a path are not');
+  assert.equal(preview.viewBox, '-0.8 -0.8 21.6 11.6', 'framed on the starting land, 4% margin');
+  assert.equal(preview.teams, 2);
+  assert.equal(theatreMapPreview({ countries, basePaths, own, frameIds }), preview, 'memoised per board, paths and focus');
+  const focused = theatreMapPreview({ countries, basePaths, own, frameIds, focus: { x: 0, y: 0, w: 100, h: 50 } });
+  assert.equal(focused.viewBox, '-4 -4 108 58', 'a focus (the European camera) wins over the starting land');
+  const display = { a: { d: 'M0,0h5v5h-5Z', bbox: box(0, 0) } };
+  assert.equal(theatreMapPreview({ countries, paths: display, basePaths, own, frameIds }).sections[0].d, 'M0,0h5v5h-5Z',
+    'the display atlas draws a shape it has, the topology the rest');
+  assert.equal(theatreMapPreview({ countries, basePaths, own: {}, frameIds: [] }), null, 'no held land, no card');
+  assert.equal(theatreMapPreview(), null);
+
+  const nations = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: preview });
+  const card = nations.q('.setup-step[data-step="1"] .setup-side > .setup-map[data-kind="world"]');
+  assert.ok(card, 'every world theatre leads step 1 with its map');
+  assert.equal(card.getAttribute('aria-hidden'), 'true');
+  assert.equal(card.querySelector('svg').getAttribute('viewBox'), preview.viewBox);
+  assert.equal(card.querySelectorAll('.setup-map__backdrop path').length, 1);
+  assert.deepEqual([...card.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
+    preview.sections.map(section => section.fill));
+  assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
+  assert.equal(card.querySelector('figcaption').textContent, 'Europe · 2 nations, each on its own land');
+  const clubs = await mount(t, { setup: { layer: 'clubs', clubScope: 'all' }, theatreMap: preview });
+  assert.match(clubs.q('.setup-map figcaption').textContent, /^All Leagues · 2 clubs dealt onto the nearest free land$/i);
+  const none = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: null });
+  assert.equal(none.q('.setup-map'), null, 'no card before App has a board');
+  // A chosen country shows its own card, never a world board App may still hold while the country loads.
+  const country = await mount(t, { setup: COUNTRY, theatreMap: preview, domestic: { state: 'loading', message: null, onRetry() {} } });
+  assert.deepEqual(country.qa('.setup-map').map(element => element.dataset.kind), ['country']);
+  assert.deepEqual([...nations.errors, ...clubs.errors, ...none.errors, ...country.errors], []);
+});
+
+test('a pressed segment keeps its white label on hover (Teams toggle, history kinds, squad view)', () => {
+  const css = readFileSync(new URL('../src/styles/primitives.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  // The hover colour outranks the pressed rule, so it must skip the pressed segment or paint ink on the ink fill.
+  assert.match(css, /\.segmented > button:hover:not\(:disabled\):not\(\[aria-pressed=true\]\):not\(\[aria-checked=true\]\) \{ color:var\(--ink\); \}/);
+  assert.doesNotMatch(css, /\.segmented > button:hover:not\(:disabled\) \{/);
+  assert.match(css, /\.segmented > button\[aria-pressed=true\], \.segmented > button\[aria-checked=true\] \{ background:var\(--ink\); color:var\(--on-ink\);/);
 });

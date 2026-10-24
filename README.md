@@ -78,64 +78,66 @@ npm run test:domestic    # country maps, sections and seeded country campaigns
 
 ### Setup
 
-A new campaign is set up in three steps: **Campaign → Rules → Nation & role**.
-Space moves to the next step and launches the campaign from the last one.
+A new campaign is set up in three steps: **Campaign → Rules → Your role**.
+Space moves to the next step and launches the campaign from the last one. Every
+default suits a first campaign, so pressing Space three times starts one.
 
-1. **Campaign** — choose a sport, nations or clubs, and a **theatre**. Nation
-   campaigns default to Europe (UEFA). The other choices are the whole world
-   (170 nations), another confederation, or the Elite 32. Club campaigns offer
-   individual leagues, all leagues, or the strongest 32 available clubs. The
-   step shows the actual number of teams, the number of matches and the
-   estimated duration at 1× autoplay. With clubs in football, a second theatre
-   group, **One country · top clubs**, starts a [domestic campaign](#domestic-campaigns).
+1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
+   the war is fought). Nation campaigns default to Europe (UEFA). The other
+   choices are the whole world (170 nations), another confederation, or the
+   Elite 32. Club campaigns offer individual leagues, all leagues, or the
+   strongest 32 available clubs. The step opens on a map of the chosen theatre:
+   the board it starts on, each team's land in its kick-off colour, framed as
+   the campaign's opening camera frames it (the continent for Europe). It also
+   shows the actual number of teams, the number of matches and the estimated
+   length; its note names the Show matches mode the estimate assumes. With
+   clubs in football, a second theatre group, **One country · top clubs**,
+   starts a [domestic campaign](#domestic-campaigns), and its map shows that
+   country.
    A quick-resume card appears when a save exists.
-2. **Rules of war** — turn order and targeting (below). A collapsed **Match
-   settings** section holds pacing, match display, uncertainty, the final two,
-   automatic recruitment, basketball starting ratings, the campaign seed and
-   Express playback.
-3. **Nation & role** — **Manager** commits to one team. You choose an approach
-   before its matches and one of up to three signings after its wins.
-   **Spectator** leaves draws, results and signings to the game, and you can
-   follow any empire once the campaign starts. **Launch campaign** starts it.
+2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
+   matches** picks *Live, minute by minute*, *Final score only* or
+   *Fast-forward*; it can be changed at any time during play. A collapsed
+   **More rules** section holds upsets, the final, computer signings,
+   basketball team strengths and the seed. Its line reads "Standard", or lists
+   only the rules you changed.
+3. **Your role** — **Manager** runs one team. You choose an approach before
+   its matches and one of up to three signings after its wins, and, under a
+   one-match draw, **who picks your opponent**. **Spectator** leaves draws,
+   results and signings to the game, and you can follow any empire once the
+   campaign starts. **Launch campaign** starts it.
 
-**Pacing** decides how matchups are drawn:
+### Rules of war
 
-| Mode | Draw |
-| --- | --- |
-| `duel` | One by one: a spinner (or the round-robin queue) picks the attacker, and a compass direction (or your choice) picks the opponent. One match per turn. |
-| `blitz` | Pair everyone, preferring neighbours; otherwise use another opponent. An odd team gets a bye. |
-| `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
+**The draw** decides how matches are made. Each card stores the existing
+`pacing` and `turnOrder` settings:
+
+| Card | Stored | Draw |
+| --- | --- | --- |
+| Random draw (recommended) | `duel` · `random` | One match per turn. Any surviving empire can be drawn to attack. |
+| Round robin | `duel` · `round-robin` | One match per turn. Every surviving empire attacks once per round, strongest first (by starting strength, then name). |
+| Blitz round | `blitz` | Pair everyone, preferring neighbours; otherwise use another opponent. An odd team gets a bye. |
+| Chaos draw | `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
 
 Blitz and chaos allow distant pairings without the directional route restrictions
 used in one-by-one mode. Neither mode annexes neutral land to connect teams.
 
-### Rules of war
+A manager under Random draw or Round robin also chooses, on the Your role step,
+**who picks your opponent** (`targeting`):
 
-Setup step 2 combines a **turn order** with a **target** rule:
-
-| Turn order | Who attacks |
+| Opponent | Whom they attack |
 | --- | --- |
-| Round robin | Every surviving empire attacks once per round, strongest first (by starting strength, then name). |
-| Random draw | Any surviving empire can be drawn each turn. |
-
-| Target | Whom they attack |
-| --- | --- |
-| You choose | Manager only. On your turns you pick any empire in reach; every other empire spins the compass. |
+| You choose | On your turns you pick any empire in reach; every other empire spins the compass. |
 | Compass | The compass picks the target for every attacker, you included. |
 
-A 2×2 explainer names the four combinations: *Your front, your call* (round
-robin × you choose), *Clockwork war* (round robin × compass), *Wait for the
-draw* (random × you choose) and *Pure chaos* (random × compass, the original
-Imperialism draw).
-
-The rules apply to one-by-one (`duel`) pacing only. Blitz and chaos always use a
-random draw and the compass, and setup shows the cards disabled with a note.
-Spectators always use the compass: *You choose* becomes the compass when a
-spectator launches it, and again when an eliminated manager continues as a
-spectator. Rules are fixed at launch. The defaults, **random draw × compass**,
-reproduce the original behaviour exactly. Every one-by-one turn consumes
-exactly three campaign random samples in every mode, so seeds recorded before
-the rules existed still replay the same campaign.
+Blitz and chaos always use a random draw and the compass; a manager who picks
+one sees a note, with a way back to the draw, instead of the opponent cards.
+Spectators never see the choice and always use the compass. A stored *You
+choose* becomes the compass when a spectator launches, and again when an
+eliminated manager continues as a spectator. Rules are fixed at launch. The
+defaults, **random draw × compass**, reproduce the original behaviour exactly.
+Every one-by-one turn consumes exactly three campaign random samples in every
+mode, so seeds recorded before the rules existed still replay the same campaign.
 
 An empire is **in reach** if it is a land neighbour with a legal direct route.
 If there is none, direct sea strikes count; after that, the fallback sea and
@@ -160,18 +162,22 @@ choice; no timer runs.
 
 ### Match rules
 
-**Resolution** is either a live ticker or an instant final score. Level games go
-to penalties in football and overtime in basketball. Pacing, the rules of war,
-uncertainty, the final-two format and your role are fixed at launch. During a
-campaign the masthead's **Settings** button shows them read-only and lets you
-change the match display and Express playback. Predictable, balanced and wild
-uncertainty presets adjust match-day rating variation; even Predictable retains
-scoring and tie-break randomness.
+**Show matches** is *Live, minute by minute* (a live ticker), *Final score
+only* (an instant final score) or *Fast-forward* (Express playback: final scores
+only, with shorter pauses for routine matches). It stores the existing
+`resolution` and `express` settings. Level games go to penalties in football and
+overtime in basketball. The draw, the opponent choice, upsets, the final, computer
+signings and your role are fixed at launch. During a campaign the masthead's
+**Settings** button (More on phones) changes Show matches at any time, except
+that switching between Live and Final score only waits for the current draw or
+match. Under **This campaign** it lists the launch rules as read-only text.
+**Upsets** has predictable, balanced and wild presets that adjust match-day
+rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
 offence/defence, form and shooting variance. Stronger teams are favourites, while
-every uncertainty setting retains scoring randomness and possible upsets.
+every Upsets setting retains scoring randomness and possible upsets.
 Pre-match percentages estimate this model with an independent seeded sample.
 They do not consume the campaign's random stream.
 Odds prepare the two lineups once and sample scores without building hundreds of
@@ -206,8 +212,9 @@ own Space, and open dialogs block it.
 
 **Pause** freezes the draw, the ticker and scheduled presentation. A pending
 target choice or signing holds the screen: only Map stays available in the
-navigation. **Express** compresses routine presentation while keeping followed
-matches, upsets and finales visible. It uses the same draw and match results.
+navigation. **Fast-forward** (Show matches) compresses routine presentation while
+keeping followed matches, upsets and finales visible. It uses the same draw and
+match results.
 
 ### Map view
 
@@ -264,8 +271,8 @@ claimed players tagged and ratings coloured by tier. A dark match feed lists
 events newest first and has 1× / 2× / 4× speed chips and Pause. When a live
 ticker match involving your team (or, as a spectator, the followed team) kicks
 off while you are on Map, the game switches to Match. It returns to Map at the
-next turn if the switch was automatic. Express and "simulate the result" never
-switch. Without a live match, the screen shows the last finished match, or the
+next turn if the switch was automatic. Fast-forward's routine matches and
+"simulate the result" never switch. Without a live match, the screen shows the last finished match, or the
 next fixture before the first one.
 
 **Squad** shows one team: the flag, "First team · N players · K claimed in

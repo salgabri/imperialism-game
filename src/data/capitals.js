@@ -63,8 +63,10 @@ export const CAPITALS = {
   '268': [44.79, 41.72],   // Tbilisi
   '051': [44.51, 40.18],   // Yerevan
   '031': [49.87, 40.41],   // Baku
-  '376': [35.21, 31.77],   // Jerusalem
-  '196': [33.36, 35.17],   // Nicosia
+  // Both capitals straddle a dividing line the simplified outlines blur: their centres
+  // fall in the West Bank and in Northern Cyprus, which then blocked every route out.
+  '376': [35.15, 31.78],   // Jerusalem (west)
+  '196': [33.36, 35.15],   // Nicosia (south)
   '398': [71.43, 51.13],   // Astana
   '112': [27.57, 53.90],   // Minsk
   '498': [28.86, 47.01],   // Chișinău

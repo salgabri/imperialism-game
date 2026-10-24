@@ -15,6 +15,7 @@ import EmpireLabels from './EmpireLabels.jsx';
 import DrawCompass, { AttackVector } from './DrawCompass.jsx';
 import FlagPattern from './FlagPattern.jsx';
 import { createMapBorderIndex } from '../engine/mapBorders.js';
+import { themedPaint } from '../theme.js';
 import './map.css';
 
 /** README §Map rendering values (tokens.css mirrors them; SVG attributes need literals). */
@@ -157,7 +158,7 @@ const CountryShape = memo(function CountryShape({ id, d, fill, ownerId, flagPart
         onClick={actions.click} onMouseEnter={actions.enter} onMouseLeave={actions.leave}
         aria-label={label} role={role} tabIndex={tabIndex}
         onFocus={actions.focus} onBlur={actions.blur} onKeyDown={actions.keyDown}
-        style={{ cursor }} />
+        style={{ cursor, fill: themedPaint(fill) }} />
     </g>
   );
 }, sameCountryShape);
@@ -264,6 +265,10 @@ export default function WorldMap({
     setKeyboardCountry(id);
     const path = countryRefs.current.get(id);
     path?.focus();
+    // The model's mainland box: getBBox() spans both sides of the date line for New Zealand, Fiji, Russia or the
+    // United States, and revealing that zoomed all the way out.
+    const box = countries.find(country => country.id === id)?.bbox;
+    if (box) { vp.reveal([{ x: box.x, y: box.y }, { x: box.x + box.w, y: box.y + box.h }]); return; }
     try {
       const bounds = path?.getBBox();
       if (bounds) vp.reveal([{ x: bounds.x, y: bounds.y }, { x: bounds.x + bounds.width, y: bounds.y + bounds.height }]);
@@ -411,7 +416,7 @@ export default function WorldMap({
             : <rect key={home.id} data-capital={home.id} x={home.x - 1.9 * k} y={home.y - 1.9 * k} width={3.8 * k} height={3.8 * k}
               fill={PAINT.capital} stroke={PAINT.white} strokeWidth={.8 * k} />)}
         </g>
-        <g aria-hidden="true" pointerEvents="none">
+        <g className="map-ocean-labels" aria-hidden="true" pointerEvents="none">
           {oceanLabels.map(lb => <text key={lb.text} x={lb.x} y={lb.y} textAnchor="middle" fill={PAINT.coast}
             style={{ fontFamily: MAP_FONT, fontSize: 12 * k, fontWeight: 600, letterSpacing: .14 * 12 * k, textTransform: 'uppercase' }}>{lb.text}</text>)}
         </g>

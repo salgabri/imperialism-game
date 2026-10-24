@@ -11,6 +11,7 @@ import { selectLineup } from '../src/data/teams.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { empireNeighbors } from '../src/engine/campaign.js';
+import { empireFill } from '../src/theme.js';
 import { ROOT, bundleApp, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 const BundledApp = await bundleApp();
@@ -630,6 +631,35 @@ test('setupTeams: best five starters and opening-board land neighbours for the w
   });
 });
 
+test('setupMapPreview: the step-1 map card shows the board a world theatre opens on, framed like its opening camera', async () => {
+  await withApp({ ids: ['208', '276', '250'] }, ({ app }) => {
+    // Denmark's Greenland (304, an overseas dependency) east of the three nations, and a neutral shape further out.
+    const square = x => ({ cx: x + 20, cy: 100, bbox: { x, y: 80, w: 40, h: 40 }, d: `M${x},80h40v40h-40Z` });
+    app.geo = { ...app.geo, paths: { ...app.geo.paths, 304: square(380), 999: square(480) },
+      countries: [...app.geo.countries, { id: '304' }, { id: '999' }] };
+    app.setupTeamsCache = null;
+    const setup = { ...app.state.setup, sport: 'football', layer: 'nations', scope: 'world', seed: '7' };
+    const preview = app.setupMapPreview(setup);
+    // Greenland comes with Denmark, as at launch; the starting land alone sets the frame.
+    assert.deepEqual(preview.sections.map(section => [section.id, section.fill]),
+      [['208', empireFill('208')], ['276', empireFill('276')], ['250', empireFill('250')], ['304', empireFill('208')]]);
+    assert.deepEqual(preview.backdrop.map(shape => shape.id), ['999']);
+    assert.equal(preview.viewBox, '70.4 70.4 259.2 59.2', 'the tiny atlas homes at x 80–320, y 80–120, 4% margin');
+    assert.equal(preview.teams, app.setupTeams(setup).length);
+    assert.equal(app.setupMapPreview(setup), preview, 'memoised while the setup key holds');
+    // Europe frames the continent, exactly as the European opening camera does.
+    const europe = app.setupMapPreview({ ...setup, scope: 'UEFA' });
+    const focus = app.europeFocus();
+    const pad = Math.max(focus.w, focus.h) * .04;
+    assert.equal(europe.viewBox, [focus.x - pad, focus.y - pad, focus.w + pad * 2, focus.h + pad * 2].map(n => Number(n.toFixed(1))).join(' '));
+    // A country theatre has its own card.
+    assert.equal(app.setupMapPreview({ ...setup, layer: 'clubs', clubScope: 'domestic:826' }), null);
+  });
+  await withApp({ phase: 'setup' }, ({ app }) => {
+    assert.match(renderPure(app, 'setup with its map'), /class="setup-map" aria-hidden="true" data-state="ready" data-kind="world"/);
+  });
+});
+
 test('render is pure for every view of an idle spectator campaign, with the phone sheets open', async () => {
   await withApp({}, ({ app }) => {
     const markers = { map: 'id="campaign-details"', squad: 'id="view-panel-squad"', match: 'id="view-panel-match"',
@@ -918,7 +948,7 @@ test('a country theatre: wizard preview, kickoff on its sections, section names,
 
     // The champion "has conquered England", not the theatre label.
     app.setState({ phase: 'victory', aliveIds: [a] });
-    assert.match(app.victoryPanel().subtitle, /^has conquered England in \d+ battles$/);
+    assert.match(app.victoryPanel().subtitle, /^has conquered England in (1 battle|\d+ battles)$/);
     app.setState({ phase: 'playing', aliveIds: st.aliveIds.filter(id => id !== b) });
 
     // A save from another build of the map is moved club by club; its interrupted round-robin draw starts again.
@@ -941,5 +971,51 @@ test('phone bar minute: floored at the last revealed event', async () => {
     assert.deepEqual(app.phoneBarModel(), { right: null, rightKind: 'minute', minuteFallback: 37 });
     app.setState({ match: { aId: '250', dId: '276', applied: false, done: false, shown: [] } });
     assert.equal(app.phoneBarModel().minuteFallback, 0);
+  });
+});
+
+test('the quick-resume card counts the teams left in the plural and calls a won save complete', async () => {
+  await withApp({}, ({ app }) => {
+    assert.equal(app.savedProgress({ alive: 12, settings: { layer: 'nations' } }), '12 nations remaining');
+    assert.equal(app.savedProgress({ alive: 2, settings: { layer: 'clubs' } }), '2 clubs remaining');
+    assert.equal(app.savedProgress({ alive: 1, settings: { layer: 'clubs' } }), 'Campaign complete', 'never "1 clubs remaining"');
+  });
+});
+
+test('closing the results ("View map") returns to the map the final\'s automatic Match view replaced', async () => {
+  await withApp({}, ({ app }) => {
+    const champion = app.state.aliveIds[0];
+    app.setState({ view: 'match', viewSource: 'auto', aliveIds: [champion], phase: 'victory', completedAt: 1, matches: 1,
+      own: Object.fromEntries(Object.keys(app.state.own).map(id => [id, champion])) });
+    const overlay = findElement(app.render(), 'VictoryOverlay');
+    assert.match(overlay.props.subtitle, / in 1 battle$/, 'one battle, not "1 battles"');
+    overlay.props.onClose();
+    assert.equal(app.state.phase, 'playing');
+    assert.equal(app.currentView(), 'map');
+  });
+});
+
+test('the column\'s Chronicle link is not offered while a target choice holds the screen', async () => {
+  await withApp(manager, ({ app }) => {
+    assert.equal(typeof findElement(app.render(), 'CampaignColumn').props.onOpenChronicle, 'function');
+    app.setState({ pendingTarget: PENDING });
+    assert.equal(findElement(app.render(), 'CampaignColumn').props.onOpenChronicle, undefined,
+      'setView refuses the Chronicle during the choice: no link that does nothing');
+  });
+});
+
+test('following another team after the managed team falls keeps it on record as the managed team', async () => {
+  await withApp(manager, ({ app }) => {
+    app.startMatch('250', '276');
+    app.chooseTactic('balanced');
+    forceResult(app, '276', { aId: '250', dId: '276' });
+    app.finishMatch();
+    app.continueAsSpectator();
+    assert.equal(app.state.managedTeamId, '250');
+    app.followTeam('826');
+    assert.equal(app.state.followedId, '826');
+    assert.equal(app.state.managedTeamId, '250', 'the Spectator panel and the save still name the eliminated team');
+    assert.equal(app.spectatorPanelModel().managed?.id, '250');
+    app.clearTimers();
   });
 });

@@ -315,9 +315,10 @@ test('flattening the map preserves geographic capital anchors and projects them 
   // Captured before the deliberate Robinson -> flat projection change. Pin
   // lon/lat anchors rather than obsolete Robinson-specific pixel/area hashes:
   // projection changes coordinates, never which geographic capital was chosen.
+  // Re-pinned once when Jerusalem and Nicosia moved off the borders the outlines blur (see the next test).
   const expected = {
-    'countries-50m.json': '0d0afa02b9e98502bbce7e94306a3039848b3e162c8bf6d72752da9731873e56',
-    'world-110m.v1.json': '39657f15e99193d2aa1dc8df40e7124b7816d5a9a4b7dcedade66a4159590113',
+    'countries-50m.json': '08b15e498d8177c38fbdcf7965a9fd237c0cda6e2ea8579e6c24338a0cda558d',
+    'world-110m.v1.json': '925ebe81e090f9d7a7d85195b2b0c8c43e01b348590c4ff10e724bde54a3784e',
   };
   const fits = {
     world: new geometry.WorldGeometry(topologies('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS)).fit,
@@ -345,4 +346,32 @@ test('flattening the map preserves geographic capital anchors and projects them 
         'building a theatre cannot mutate geographic anchors or source geometry');
     }
   }
+});
+
+test('every nation\'s route anchor lies in its own drawn land and in no other country, in both atlases', () => {
+  // Routes start at path.cx/cy. Rule geometry is 110m; routing land is the merged 50m shapes the map draws.
+  const evenOdd = (rings, [x, y]) => {
+    let inside = false;
+    for (const ring of rings) for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if (yi > y !== yj > y && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  };
+  const world = new geometry.WorldGeometry(topologies('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS));
+  const { s, tx, ty } = world.fit;
+  const display = new geometry.WorldGeometry(geometry.mergeSharedIds(topologies('countries-50m.json')), CAPITALS);
+  const routing = geometry.drawnPaths(display.buildPaths(s, tx, ty), world.countries);
+  const misplaced = [];
+  for (const id of Object.keys(NATIONS)) {
+    for (const [atlas, paths] of [['110m', world.paths], ['50m', routing]]) {
+      const anchor = [paths[id].cx, paths[id].cy];
+      const foreign = Object.keys(paths).filter(other => other !== id && evenOdd(paths[other].labelRings, anchor));
+      if (!evenOdd(paths[id].labelRings, anchor) || foreign.length) misplaced.push(`${NATIONS[id][0]} (${atlas}) in ${foreign.join(',') || 'the sea'}`);
+    }
+  }
+  // Island anchors that miss a coarse coastline fall back to the centroid and may sit offshore; none may sit in a
+  // neighbour. South Africa's 110m label rings carry no hole for enclaved Lesotho (its 50m shape does).
+  assert.deepEqual(misplaced.filter(line => !line.endsWith('the sea') && line !== 'Lesotho (110m) in 710'), [],
+    'no anchor inside another country');
 });
