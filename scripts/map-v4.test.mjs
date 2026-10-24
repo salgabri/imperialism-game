@@ -1084,3 +1084,30 @@ test('labels wait for the opening camera, and keep their last layout while a dra
     } finally { await view.close(); }
   });
 });
+
+test('re-rendering the map leaves unchanged land alone, and the newest callbacks are the ones that run', async () => {
+  // A land path keeps the props of the render that last changed it, so handlers made in each render kept every past
+  // render's map state alive (a 1.2M-character coastline per conquest). Memoised rows with stable handlers keep none.
+  const { props, calls } = mapProps();
+  const view = await mount(props);
+  try {
+    const path = id => view.q(`path[data-country="${id}"]`);
+    const reactProps = node => node[Object.keys(node).find(key => key.startsWith('__reactProps$'))];
+    const serbia = reactProps(path('688')), italy = reactProps(path('380'));
+    await act(async () => view.q('[aria-label="Zoom in"]').click());
+    assert.equal(reactProps(path('688')), serbia, 'a camera move does not re-render the land');
+    // App builds a fresh list with fresh callbacks on every render: equal rows still skip rendering.
+    const next = mapProps();
+    await view.render(next.props);
+    assert.equal(reactProps(path('688')), serbia, 'an equal row is not re-rendered');
+    await act(async () => path('688').dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true })));
+    await act(async () => path('688').dispatchEvent(new dom.window.MouseEvent('mouseover', { bubbles: true })));
+    assert.deepEqual([next.calls.click, next.calls.enter], [['688'], ['688']], 'the latest callbacks run');
+    assert.deepEqual([calls.click, calls.enter], [[], []], 'the first render’s callbacks are not kept');
+    // A real change re-renders that country alone.
+    await view.render({ ...next.props, countries: next.props.countries.map(c => c.id === '688' ? { ...c, fill: '#000000' } : c) });
+    assert.notEqual(reactProps(path('688')), serbia);
+    assert.equal(path('688').getAttribute('fill'), '#000000');
+    assert.equal(reactProps(path('380')), italy);
+  } finally { await view.close(); }
+});

@@ -8,7 +8,7 @@ import React from 'react';
 import { CONFIG } from '../config.js';
 import { C } from '../theme.js';
 import { selectLineup, teamEff } from '../data/teams.js';
-import { empireCenter, territories } from '../engine/campaign.js';
+import { empireCenter } from '../engine/campaign.js';
 import { acquisitionOptions, automaticAcquisition, advanceSeries, recordMatch } from '../engine/campaignExperience.js';
 import { MatchupPopup, ResultPopup, StealPopup } from '../components/Popups.jsx';
 import ConquestCallout from '../screens/conquest/ConquestCallout.jsx';
@@ -232,7 +232,10 @@ export function applyConquest(playerIndex) {
     acquisitionPolicy: Number.isInteger(playerIndex) ? 'manager-choice' : st.settings.acquisitionPolicy,
   };
   const archived = recordMatch({ ...st, sport }, completed, this.matchCard(completed, teams));
-  const leader = aliveIds.slice().sort((a, b) => territories({ own }, b).length - territories({ own }, a).length)[0];
+  // Territory counts in one pass (counting inside the comparator rescanned every territory per comparison).
+  const held = {};
+  for (const cid in own) held[own[cid]] = (held[own[cid]] || 0) + 1;
+  const leader = aliveIds.slice().sort((a, b) => (held[b] || 0) - (held[a] || 0))[0];
   const metrics = { ...st.metrics, previousLeader: leader,
     leaderChanges: (st.metrics?.leaderChanges || 0) + (st.metrics?.previousLeader && st.metrics.previousLeader !== leader ? 1 : 0),
     acquisitions: [...(st.metrics?.acquisitions || []), strengthGained] };

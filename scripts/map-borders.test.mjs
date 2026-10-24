@@ -297,6 +297,20 @@ test('layers: cached separately from resolve(), invalidated by in-place ownershi
   assert.deepEqual(edgeKeys(first.outerD), [shared], 'earlier results are not mutated');
 });
 
+test('layers: outline(id) chains one owner exactly as ownerPaths does, and the coast never depends on ownership', () => {
+  const index = createMapBorderIndex(pair());
+  const rivals = index.layers({ a: 'red', b: 'blue' });
+  assert.deepEqual(Object.keys(rivals).sort(), ['coastD', 'innerD', 'outerD', 'ownerPaths'], 'outline is not a layer');
+  assert.equal(rivals.outline('red'), ownerPath(rivals, 'red'));
+  assert.equal(rivals.outline('blue'), ownerPath(rivals, 'blue'));
+  assert.equal(rivals.outline('nobody'), '');
+  assert.equal(rivals.outline(null), '');
+  const conquered = index.layers({ a: 'red', b: 'red' });
+  assert.equal(conquered.coastD, rivals.coastD);
+  assert.deepEqual(edgeKeys(conquered.outline('red')), edgeKeys(conquered.outerD + conquered.coastD));
+  assert.equal(index.resolve({ a: 'red', b: 'blue' }).outline('red'), rivals.outline('red'), 'resolve() offers the same outline');
+});
+
 test('layers: empty and degenerate geometry produces empty layers', () => {
   assert.deepEqual(createMapBorderIndex().layers(), { coastD: '', innerD: '', outerD: '', ownerPaths: [] });
   const layers = createMapBorderIndex([{ id: 'a', rings: [[], [[0, 0]], [[1, 1], [1, 1]]] }]).layers({ a: 'empire' });

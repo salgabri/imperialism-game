@@ -13,7 +13,7 @@ import { getSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
-  fitDomesticCampaign } from './engine/storage.js';
+  fitDomesticCampaign, CHECKPOINT_KEYS } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
 import { tacticalMatchParameters, tacticalOptions, competitiveBasketballTeams } from './engine/managerStrategy.js';
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
@@ -62,12 +62,30 @@ const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
 const BACKDROP_MARGIN = { x: 480, y: 800 };
 const SETUP_LOAD_DELAY_MS = 120;
 
-/** True unless `a` and `b` are the same value or objects with the same keys holding identical values. */
-function contentChanged(a, b) {
-  if (a === b) return false;
-  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return true;
+/**
+ * Live presentation of an outcome already decided and saved at kickoff: the events and kicks revealed so far, and
+ * the draw compass's stage. A reload re-presents them from the last checkpoint with the same result.
+ */
+const MATCH_PROGRESS = new Set(['shown', 'ga', 'gd', 'tieShown']);
+const SPIN_PROGRESS = new Set(['stage', 'ang']);
+
+/**
+ * How `b` differs from `a`: null when they are the same value or objects with the same keys holding identical
+ * values, 'progress' when only `progress` keys changed, else 'checkpoint'.
+ */
+function contentChange(a, b, progress) {
+  if (a === b) return null;
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return 'checkpoint';
   const keys = Object.keys(a);
-  return keys.length !== Object.keys(b).length || keys.some(key => !Object.prototype.hasOwnProperty.call(b, key) || a[key] !== b[key]);
+  if (keys.length !== Object.keys(b).length) return 'checkpoint';
+  let change = null;
+  for (const key of keys) {
+    if (!Object.prototype.hasOwnProperty.call(b, key)) return 'checkpoint';
+    if (a[key] === b[key]) continue;
+    if (!progress.has(key)) return 'checkpoint';
+    change = 'progress';
+  }
+  return change;
 }
 
 /**
@@ -167,7 +185,12 @@ export default class App extends React.Component {
   away = false;
   updateEngagement = () => this.engagement.switchMode(engagementMode(this.state,
     this.away || (typeof document !== 'undefined' && document.hidden)));
-  handleVisibility = () => this.updateEngagement();
+  handleVisibility = () => {
+    this.updateEngagement();
+    if (typeof document !== 'undefined' && document.hidden) this.flushProgress();
+  };
+  // The tab is closing or reloading: keep the live match where it was.
+  handlePageHide = () => this.flushProgress();
   handleFocus = () => { this.away = false; this.updateEngagement(); };
   handleBlur = () => { this.away = true; this.updateEngagement(); };
   handleStorage = event => {
@@ -205,6 +228,7 @@ export default class App extends React.Component {
     window.addEventListener('focus', this.handleFocus);
     window.addEventListener('blur', this.handleBlur);
     window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('pagehide', this.handlePageHide);
     document.addEventListener('visibilitychange', this.handleVisibility);
     this.boot();
   }
@@ -218,6 +242,7 @@ export default class App extends React.Component {
       window.removeEventListener('focus', this.handleFocus);
       window.removeEventListener('blur', this.handleBlur);
       window.removeEventListener('keydown', this.handleKeyDown);
+      window.removeEventListener('pagehide', this.handlePageHide);
       document.removeEventListener('visibilitychange', this.handleVisibility);
     }
   }
@@ -230,8 +255,15 @@ export default class App extends React.Component {
     // patchMatch) is queued behind a timer's not-yet-rendered default-priority update, every sync re-render rebases
     // and re-runs the updater, minting an equal-but-new match; persist's own setState is such a re-render, so an
     // identity test re-saved on every pass until React threw "Maximum update depth exceeded" (smoke, under load).
-    if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading'
-        && (contentChanged(previous.match, this.state.match) || contentChanged(previous.spin, this.state.spin))) this.persist();
+    // Revealing a match decided at kickoff, or turning the compass, is only presentation: it is written with the
+    // next checkpoint, or when the page is hidden or closed (a whole save per goal, kick and compass stage was
+    // most of the campaign's work).
+    if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading') {
+      const match = contentChange(previous.match, this.state.match, MATCH_PROGRESS);
+      const spin = contentChange(previous.spin, this.state.spin, SPIN_PROGRESS);
+      if (match === 'checkpoint' || spin === 'checkpoint') this.persist();
+      else if (match || spin) this.unsavedProgress = true;
+    }
     // The signing screen and the target panel hold focus while they show; confirming unmounts them.
     if (previous && ((previous.choice && !this.state.choice) || (previous.pendingTarget && !this.state.pendingTarget))) this.focusRescue = true;
     if (this.focusRescue) this.rescueFocus();
@@ -310,7 +342,8 @@ export default class App extends React.Component {
       this.geo = new WorldGeometry(await res.json(), CAPITALS);
       // Display-only detail keeps targeting, club seeding and existing saves
       // on the original topology. A missing visual atlas falls back gracefully.
-      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS) : null;
+      // Only its fitted paths are ever read, so its lon/lat polygons go once projected.
+      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS, { keepPolys: false }) : null;
       // The atlas also draws a country map's neighbours in that map's projection.
       this.atlas = atlas ? mergeSharedIds(atlas) : null;
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
@@ -533,15 +566,35 @@ export default class App extends React.Component {
 
   // ---------- campaign lifecycle ----------
 
+  /**
+   * The saved state as persist would write it, minus what persist stamps on (the revision, the engagement clock),
+   * for an identity comparison with the last checkpoint.
+   */
+  checkpointSource(rngState) {
+    const st = this.state;
+    const { engagement: _clock, ...metrics } = st.metrics || {};
+    return { ...Object.fromEntries(CHECKPOINT_KEYS.map(key => [key, st[key]])), rngState, revision: null, metrics: null,
+      ...Object.fromEntries(Object.entries(metrics).map(([key, value]) => [`metrics.${key}`, value])), phase: st.phase === 'victory' };
+  }
+
   persist() {
     if (!Object.keys(this.state.teams).length || this.saving || this.state.storageConflict) return;
-    this.saving = true;
     const rngState = this.rng?.getState?.() ?? this.state.rngState;
+    // Unchanged since the last checkpoint (a decision both changes the match and saves in its callback): no write.
+    const source = this.checkpointSource(rngState), last = this.lastCheckpoint;
+    if (last && this.saved?.campaignId === this.state.campaignId && Object.keys(source).length === Object.keys(last).length
+        && Object.keys(source).every(key => source[key] === last[key])) {
+      this.unsavedProgress = false;
+      return;
+    }
+    this.saving = true;
     const snapshot = { ...this.state, rngState,
       ...(this.saved?.campaignId === this.state.campaignId ? { revision: this.saved.revision } : {}),
       metrics: { ...this.state.metrics, engagement: this.engagement.snapshot() } };
     const saveStatus = writeSave(snapshot);
     this.saving = false;
+    this.unsavedProgress = false;
+    this.lastCheckpoint = saveStatus.ok ? { ...source, campaignId: saveStatus.campaignId, campaignName: saveStatus.campaignName } : null;
     if (saveStatus.conflict) {
       this.setState({ saveStatus }, () => this.openStorageDialog('conflict', { campaign: saveStatus.conflict,
         message: 'A newer checkpoint exists in another tab. Choose which branch to continue.' }));
@@ -552,6 +605,12 @@ export default class App extends React.Component {
       metrics: snapshot.metrics,
       ...(saveStatus.ok ? { campaignId: saveStatus.campaignId, revision: saveStatus.revision, campaignName: saveStatus.campaignName } : {}),
       savedMeta: { round: snapshot.round, alive: snapshot.aliveIds.length, settings: snapshot.settings } });
+  }
+
+  /** Write live presentation no checkpoint has saved yet (the page is hidden or closing). */
+  flushProgress() {
+    if (!this.unsavedProgress || (this.state.phase !== 'playing' && this.state.phase !== 'victory')) return;
+    this.persist();
   }
 
   pickSetup(key, value) {
@@ -1399,11 +1458,20 @@ export default class App extends React.Component {
       sport: getSport(st.settings?.sport), managedId: managedId || null, followedId,
       perspectiveId: managedId || followedId || null,
       drama: UNCERTAINTY_PRESETS[st.settings?.uncertainty]?.drama ?? Number(CONFIG.matchDrama),
-      displayRound: displayRound(st), totalTeams: Object.keys(st.teams || {}).length,
+      displayRound: displayRound(st), totalTeams: this.teamCount(st.teams),
       labelGeometry: this.labelGeometry || [], viewFocus: this.viewFocus || null, cache: this.vmCache,
       // A country map's section names (null on the world map), so pure view-models name sections without the loader.
       sectionNames: this.domesticMap()?.sectionNames || null,
     };
+  }
+
+  /** How many teams `teams` holds, counted once per teams object (every view-model builder asks, every render). */
+  teamCount(teams) {
+    if (this.countedTeams !== teams) {
+      this.countedTeams = teams;
+      this.teamTotal = Object.keys(teams || {}).length;
+    }
+    return this.teamTotal;
   }
 
   /** The effective view (DEC D11): setup, the signing screen and the target choice override the chosen view. */

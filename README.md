@@ -314,8 +314,11 @@ seed reproduces a campaign when settings, manager choices and simulation version
 match. Updating the model can change future results for older seeds; already
 generated matches in saved campaigns retain their outcome and events.
 
-Progress autosaves during pending matches and after signings, preserving the
-seed, random state, queue, history and pending manager choice. Save status reports
+Progress autosaves at every draw, kickoff, final whistle and result, and after
+signings, preserving the seed, random state, queue, history and pending manager
+choice. A match's outcome is fixed at kickoff, so the goals and kicks revealed since
+are written with the next checkpoint, on pause, or when the page is hidden or
+closed; a save with nothing new to write is skipped. Save status reports
 storage errors. Each checkpoint is kept with a recovery copy. A save is all or
 nothing: when browser storage is full, a campaign may drop its own recovery copy to
 fit, but never another campaign's; otherwise nothing is written and save status
@@ -751,6 +754,9 @@ src/
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
+  data/sourceTable.js  compact player rows of the generated football files: one
+                       JSON line per nation or club, metadata keys and shared
+                       values written once (scripts/lib/data-module.mjs writes them)
   data/scopes.js       club theatre choices (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
   data/domesticScope.js  labels for 'domestic:<id>' theatres
@@ -780,6 +786,7 @@ public/
 scripts/
   test.mjs             runs every scripts/*.test.mjs (npm test)
   lib/app-harness.mjs  shared App/component harness for the jsdom tests
+  lib/data-module.mjs  writes the compact generated football data modules
   data/seed-replay.golden.json  determinism golden for seeded campaigns
   smoke.mjs            headless campaign test (jsdom)
   sync-flags.mjs       vendors flag SVGs from flag-icons

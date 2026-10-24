@@ -10,6 +10,7 @@ import { bundleApp, bundleComponents, syncAppFixture, findElement, withDom, moun
 import { teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { liveModelFor } from '../src/engine/winProbability.js';
+import { SAVE_KEY } from '../src/config.js';
 
 await bundleApp();
 const { MatchScreen } = await bundleComponents({ MatchScreen: 'src/screens/match/MatchScreen.jsx' });
@@ -495,6 +496,40 @@ test('module stays render-pure: no React state and no RNG in the minute chain', 
     assert.equal(renders, 0, 'fifty minutes pass without a setState');
     assert.equal(f.app.rng.getState(), rng);
     assert.equal(React.isValidElement(f.app.render()), true);
+  } finally { f.close(); }
+});
+
+test('a ticker match saves at kickoff, whistle and result, not per goal; a hidden or closing page saves the reveal', () => {
+  // A whole checkpoint per revealed goal (and per compass stage) was most of a campaign's work: the outcome is fixed
+  // at kickoff, so the reveal rides along with the next checkpoint, or is written when the page goes away.
+  const f = syncAppFixture();
+  try {
+    quiet(f.app);
+    const writes = [];
+    const setItem = f.storage.setItem;
+    f.storage.setItem = (key, value) => {
+      if (key === SAVE_KEY) writes.push(JSON.parse(value).match);
+      return setItem.call(f.storage, key, value);
+    };
+    f.app.setState({ match: liveMatch(f.app, [[10, '250'], [40, '276'], [70, '250']]) });
+    assert.equal(writes.length, 1, 'the kickoff is a checkpoint');
+    assert.equal(writes[0].shown.length, 0);
+    f.app.presentMatch();
+    f.time.advance(LEAD + 75 * UNIT);
+    assert.equal(f.app.state.match.shown.length, 3, 'three goals revealed');
+    assert.equal(writes.length, 1, 'revealing goals decided at kickoff writes nothing');
+    f.app.handlePageHide();
+    assert.equal(writes.length, 2, 'closing the page saves the reveal');
+    assert.equal(writes[1].shown.length, 3);
+    f.app.handlePageHide();
+    assert.equal(writes.length, 2, 'nothing new, nothing written');
+    f.time.advance(WHISTLE - (LEAD + 75 * UNIT));
+    assert.equal(writes.length, 3, 'the final whistle is a checkpoint');
+    assert.equal(writes[2].status, FOOTBALL.labels.end);
+    f.time.advance(420);
+    assert.equal(f.app.state.match.applied, true);
+    assert.equal(writes.length, 4, 'the result saves once, though its update and its callback both ask');
+    assert.equal(writes[3].applied, true);
   } finally { f.close(); }
 });
 

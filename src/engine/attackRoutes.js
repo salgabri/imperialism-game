@@ -14,41 +14,46 @@ const clampUnit = n => Math.max(0, Math.min(1, n));
 // Consecutive edges share a bounding box, so the exact tests below skip whole
 // runs that cannot touch a segment or point (large foreign outlines, mostly).
 const CHUNK = 16;
+// Edges are packed as [ax, ay, bx, by, …] and chunks as [minX, minY, maxX, maxY,
+// startEdge, endEdge, …] in Float64Arrays: the same doubles in the same order, at
+// a fifth of the memory of one frozen array (and four boxed numbers) per edge.
+const EDGE = 4, CHUNK_FIELDS = 6;
 
 function edgeChunks(edges) {
-  const chunks = [];
-  for (let start = 0; start < edges.length; start += CHUNK) {
-    const end = Math.min(edges.length, start + CHUNK);
+  const count = edges.length / EDGE;
+  const chunks = new Float64Array(Math.ceil(count / CHUNK) * CHUNK_FIELDS);
+  for (let start = 0, c = 0; start < count; start += CHUNK, c += CHUNK_FIELDS) {
+    const end = Math.min(count, start + CHUNK);
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (let i = start; i < end; i++) {
-      const [ax, ay, bx, by] = edges[i];
+    for (let o = start * EDGE; o < end * EDGE; o += EDGE) {
+      const ax = edges[o], ay = edges[o + 1], bx = edges[o + 2], by = edges[o + 3];
       minX = Math.min(minX, ax, bx); minY = Math.min(minY, ay, by);
       maxX = Math.max(maxX, ax, bx); maxY = Math.max(maxY, ay, by);
     }
-    chunks.push(Object.freeze([minX, minY, maxX, maxY, start, end]));
+    chunks.set([minX, minY, maxX, maxY, start, end], c);
   }
-  return Object.freeze(chunks);
+  return chunks;
 }
 
 function prepareLand(countryId, sourceRings, extra) {
-  const rings = [];
-  const edges = [];
+  const coordinates = [];
+  let rings = 0;
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  for (const source of sourceRings || []) {
-    if (!Array.isArray(source) || source.length < 3 ||
-      source.some(p => !Array.isArray(p) || !Number.isFinite(p[0]) || !Number.isFinite(p[1]))) continue;
-    const ring = source.map(([x, y]) => Object.freeze([x, y]));
+  for (const ring of sourceRings || []) {
+    if (!Array.isArray(ring) || ring.length < 3 ||
+      ring.some(p => !Array.isArray(p) || !Number.isFinite(p[0]) || !Number.isFinite(p[1]))) continue;
     for (let i = 0; i < ring.length; i++) {
       const a = ring[i], b = ring[(i + 1) % ring.length];
       minX = Math.min(minX, a[0]); minY = Math.min(minY, a[1]);
       maxX = Math.max(maxX, a[0]); maxY = Math.max(maxY, a[1]);
-      if (a[0] !== b[0] || a[1] !== b[1]) edges.push(Object.freeze([a[0], a[1], b[0], b[1]]));
+      if (a[0] !== b[0] || a[1] !== b[1]) coordinates.push(a[0], a[1], b[0], b[1]);
     }
-    rings.push(Object.freeze(ring));
+    rings++;
   }
-  if (!rings.length) return null;
-  return Object.freeze({ countryId, ...extra, rings: Object.freeze(rings), edges: Object.freeze(edges),
-    bounds: Object.freeze({ minX, minY, maxX, maxY }), chunks: edgeChunks(edges) });
+  if (!rings) return null;
+  // A copy: changing the source rings later cannot alter this snapshot.
+  const edges = Float64Array.from(coordinates);
+  return Object.freeze({ countryId, ...extra, edges, bounds: Object.freeze({ minX, minY, maxX, maxY }), chunks: edgeChunks(edges) });
 }
 
 /**
@@ -89,12 +94,12 @@ export function createAttackRouteIndex(paths, obstacles) {
 
 function windingAt(country, x, y, nx = 0, ny = 0) {
   let winding = 0;
-  const { edges } = country;
-  for (const [, minY, , maxY, start, end] of country.chunks) {
+  const { edges, chunks } = country;
+  for (let c = 0; c < chunks.length; c += CHUNK_FIELDS) {
     // An edge wholly above or below the point never changes the winding.
-    if (maxY < y || minY > y) continue;
-    for (let i = start; i < end; i++) {
-      const [ax, ay, bx, by] = edges[i];
+    if (chunks[c + 3] < y || chunks[c + 1] > y) continue;
+    for (let o = chunks[c + 4] * EDGE, last = chunks[c + 5] * EDGE; o < last; o += EDGE) {
+      const ax = edges[o], ay = edges[o + 1], bx = edges[o + 2], by = edges[o + 3];
       const ex = bx - ax, ey = by - ay, px = x - ax, py = y - ay;
       let side = cross(ex, ey, px, py);
       const tolerance = ROUNDING * (Math.abs(ex * py) + Math.abs(ey * px));
@@ -111,12 +116,12 @@ function windingAt(country, x, y, nx = 0, ny = 0) {
 }
 
 function interiorAt(country, x, y, dx, dy) {
-  const { edges } = country;
-  for (const [minX, minY, maxX, maxY, start, end] of country.chunks) {
+  const { edges, chunks } = country;
+  for (let c = 0; c < chunks.length; c += CHUNK_FIELDS) {
     // Only an edge whose box holds the point can carry it.
-    if (x < minX || x > maxX || y < minY || y > maxY) continue;
-    for (let i = start; i < end; i++) {
-      const [ax, ay, bx, by] = edges[i];
+    if (x < chunks[c] || x > chunks[c + 2] || y < chunks[c + 1] || y > chunks[c + 3]) continue;
+    for (let o = chunks[c + 4] * EDGE, last = chunks[c + 5] * EDGE; o < last; o += EDGE) {
+      const ax = edges[o], ay = edges[o + 1], bx = edges[o + 2], by = edges[o + 3];
       const ex = bx - ax, ey = by - ay, px = x - ax, py = y - ay;
       const side = cross(ex, ey, px, py);
       // Contact along a border is not a crossing of land. This machine-scale
@@ -135,20 +140,21 @@ function interiorAt(country, x, y, dx, dy) {
 
 function countryIntervals(country, ax, ay, dx, dy, lengthSquared) {
   const cuts = [0, 1];
-  const { edges } = country;
+  const { edges, chunks } = country;
   // Far looser than every tolerance below: a skipped run lies clear of the segment.
   const margin = 1e-9 * (1 + Math.abs(ax) + Math.abs(ay) + Math.abs(dx) + Math.abs(dy));
   const x0 = Math.min(ax, ax + dx) - margin, x1 = Math.max(ax, ax + dx) + margin;
   const y0 = Math.min(ay, ay + dy) - margin, y1 = Math.max(ay, ay + dy) + margin;
   const lineMargin = margin * Math.sqrt(lengthSquared);
-  for (const [minX, minY, maxX, maxY, start, end] of country.chunks) {
+  for (let c = 0; c < chunks.length; c += CHUNK_FIELDS) {
+    const minX = chunks[c], minY = chunks[c + 1], maxX = chunks[c + 2], maxY = chunks[c + 3];
     if (maxX < x0 || minX > x1 || maxY < y0 || minY > y1) continue;
     // All four corners strictly on one side of the segment's line.
     const c1 = cross(dx, dy, minX - ax, minY - ay), c2 = cross(dx, dy, maxX - ax, minY - ay);
     const c3 = cross(dx, dy, minX - ax, maxY - ay), c4 = cross(dx, dy, maxX - ax, maxY - ay);
     if (Math.min(c1, c2, c3, c4) > lineMargin || Math.max(c1, c2, c3, c4) < -lineMargin) continue;
-    for (let i = start; i < end; i++) {
-      const [ex, ey, fx, fy] = edges[i];
+    for (let o = chunks[c + 4] * EDGE, last = chunks[c + 5] * EDGE; o < last; o += EDGE) {
+      const ex = edges[o], ey = edges[o + 1], fx = edges[o + 2], fy = edges[o + 3];
       const sx = fx - ex, sy = fy - ey, qx = ex - ax, qy = ey - ay;
       const denominator = cross(dx, dy, sx, sy);
       const parallelTolerance = ROUNDING * (Math.abs(dx * sy) + Math.abs(dy * sx));
@@ -186,13 +192,16 @@ function countryIntervals(country, ax, ay, dx, dy, lengthSquared) {
 
 function boundsEntry(bounds, ax, ay, dx, dy) {
   let entry = 0, exit = 1;
-  for (const [origin, delta, min, max] of [[ax, dx, bounds.minX, bounds.maxX], [ay, dy, bounds.minY, bounds.maxY]]) {
+  // Both axes in turn, without building arrays: this runs for every country on every route test.
+  for (let axis = 0; axis < 2; axis++) {
+    const origin = axis ? ay : ax, delta = axis ? dy : dx;
+    const min = axis ? bounds.minY : bounds.minX, max = axis ? bounds.maxY : bounds.maxX;
     if (!delta) {
       if (origin < min || origin > max) return null;
       continue;
     }
     let start = (min - origin) / delta, end = (max - origin) / delta;
-    if (start > end) [start, end] = [end, start];
+    if (start > end) { const swap = start; start = end; end = swap; }
     entry = Math.max(entry, start); exit = Math.min(exit, end);
     if (entry > exit) return null;
   }
@@ -310,9 +319,14 @@ export function borderApproachPoints(index, fromId, toId) {
   if (cache.points.has(key)) return cache.points.get(key);
   const from = cache.byId.get(fromId), to = cache.byId.get(toId), points = [];
   if (from && to && !from.obstacle && !to.obstacle) {
-    if (!cache.edges.has(fromId)) cache.edges.set(fromId, new Set(from.edges.map(edge => edge.join(','))));
-    const own = cache.edges.get(fromId);
-    for (const [ax, ay, bx, by] of to.edges) {
+    if (!cache.edges.has(fromId)) {
+      const keys = new Set(), edges = from.edges;
+      for (let o = 0; o < edges.length; o += EDGE) keys.add(`${edges[o]},${edges[o + 1]},${edges[o + 2]},${edges[o + 3]}`);
+      cache.edges.set(fromId, keys);
+    }
+    const own = cache.edges.get(fromId), edges = to.edges;
+    for (let o = 0; o < edges.length; o += EDGE) {
+      const ax = edges[o], ay = edges[o + 1], bx = edges[o + 2], by = edges[o + 3];
       if (!own.has(`${bx},${by},${ax},${ay}`) && !own.has(`${ax},${ay},${bx},${by}`)) continue;
       const length = Math.hypot(bx - ax, by - ay), epsilon = Math.min(length / 4, .01);
       const nx = -(by - ay) / length * epsilon, ny = (bx - ax) / length * epsilon;
@@ -354,14 +368,15 @@ function oceanGraph(index) {
 
 function coastalAnchors(index, graph, country) {
   if (graph.coasts.has(country.countryId)) return graph.coasts.get(country.countryId);
-  const points = [], edges = country.edges;
+  const points = [], edges = country.edges, count = edges.length / EDGE;
+  const edgeLength = i => Math.hypot(edges[i * EDGE + 2] - edges[i * EDGE], edges[i * EDGE + 3] - edges[i * EDGE + 1]);
   // Include long edges and a distributed sample: both small islands and mainland
   // coastlines should get a chance even when most of a country is a land border.
-  const sampled = new Set(edges.slice().sort((a, b) =>
-    Math.hypot(b[2] - b[0], b[3] - b[1]) - Math.hypot(a[2] - a[0], a[3] - a[1])).slice(0, 24));
-  const stride = Math.max(1, Math.floor(edges.length / 64));
-  for (let i = 0; i < edges.length; i += stride) sampled.add(edges[i]);
-  for (const [ax, ay, bx, by] of sampled) {
+  const sampled = new Set(Array.from({ length: count }, (_, i) => i).sort((a, b) => edgeLength(b) - edgeLength(a)).slice(0, 24));
+  const stride = Math.max(1, Math.floor(count / 64));
+  for (let i = 0; i < count; i += stride) sampled.add(i);
+  for (const i of sampled) {
+    const ax = edges[i * EDGE], ay = edges[i * EDGE + 1], bx = edges[i * EDGE + 2], by = edges[i * EDGE + 3];
     const length = Math.hypot(bx - ax, by - ay);
     if (!(length > 0)) continue;
     const mid = [(ax + bx) / 2, (ay + by) / 2];

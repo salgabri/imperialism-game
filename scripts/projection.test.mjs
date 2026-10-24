@@ -160,3 +160,21 @@ test('kilometres-per-unit is the exact equatorial horizontal reference for this 
     }
   }
 });
+
+test('display rings share the projected points they repeat, and an atlas built only to draw can drop its polygons', () => {
+  const detailed = load('countries-50m.json');
+  const full = new geometry.WorldGeometry(detailed, CAPITALS);
+  let shared = 0, total = 0;
+  for (const country of full.countries) {
+    const projected = new Set(full.projected[country.id].flat(2));
+    for (const point of full.displayProjected[country.id].flat(3)) { total++; if (projected.has(point)) shared++; }
+  }
+  assert.ok(shared / total > .9, `${shared} of ${total} display points reuse their projected arrays`);
+  // A seam-split ring (Russia, Fiji) still gets its own points where the cut adds them.
+  assert.ok(shared < total);
+  const lean = new geometry.WorldGeometry(detailed, CAPITALS, { keepPolys: false });
+  assert.ok(lean.countries.every(country => country.polys === null), 'the lon/lat polygons are released');
+  assert.ok(full.countries.every(country => Array.isArray(country.polys)), 'by default they stay');
+  assert.deepEqual(lean.capitals, full.capitals);
+  assert.equal(JSON.stringify(lean.buildPaths(1.3, 10, 5)), JSON.stringify(full.buildPaths(1.3, 10, 5)), 'drawn paths are unchanged');
+});
