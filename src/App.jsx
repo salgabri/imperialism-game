@@ -520,7 +520,8 @@ export default class App extends React.Component {
       return;
     }
     this.fittedDomestic = domestic;
-    this.geo.fitTo(domestic ? Object.keys(domestic.sectionNames) : ids);
+    // decodeDomestic fits a country on all its sections, the only frame a country map takes: keep its paths.
+    if (!domestic || !this.geo.fit) this.geo.fitTo(domestic ? Object.keys(domestic.sectionNames) : ids);
     if (this.displayGeo) {
       const { s, tx, ty } = this.geo.fit;
       this.displayGeo.paths = this.displayGeo.buildPaths(s, tx, ty);

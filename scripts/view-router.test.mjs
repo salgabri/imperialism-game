@@ -1058,6 +1058,12 @@ test('a country theatre: wizard preview, kickoff on its sections, section names,
     assert.equal(app.geo, loaded.geo, 'the (inert) setup map behind the wizard shows the sections');
     assert.equal(status.preview.sections.length, Object.keys(loaded.sectionNames).length, 'the step-1 card draws every section');
     assert.equal(app.domesticStatus().preview, status.preview, 'the card data is memoised per map');
+    // decodeDomestic fitted the sections: framing the map again keeps their paths (and every cache built on them).
+    const { paths, fit } = loaded.geo;
+    app.fittedDomestic = null;
+    app.fitMap([]);
+    assert.equal(loaded.geo.paths, paths, 'a decoded country is not fitted a second time');
+    assert.equal(loaded.geo.fit, fit);
     const teams = app.setupTeams();
     assert.equal(teams.length, loaded.clubs.length);
     assert.ok(teams.every(team => team.isClub && /^[A-Z]{3}$/.test(team.code) && Array.isArray(team.neighbours)),
