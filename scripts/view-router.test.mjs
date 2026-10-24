@@ -1114,6 +1114,41 @@ test('a country theatre: wizard preview, kickoff on its sections, section names,
   });
 });
 
+test('a campaign keeps only its own country map decoded; the setup screen loads the others again', async () => {
+  await withCountry(async ({ app, time }) => {
+    const serve = globalThis.fetch, fetched = {};
+    globalThis.fetch = async url => { const id = String(url).match(/(\w+)\.json$/)[1]; fetched[id] = (fetched[id] || 0) + 1; return serve(url); };
+    const show = async (id, fetches) => {
+      app.pickSetup('clubScope', `domestic:${id}`);
+      time.advance(200);
+      await app.loadCountry(id);
+      await new Promise(resolve => setImmediate(resolve));
+      assert.equal(app.domesticStatus().state, 'ready', `${id} on the setup map`);
+      assert.equal(fetched[id], fetches, `${id} fetched ${fetches} time(s)`);
+    };
+    // Browsing keeps recent countries decoded.
+    await show('724', 1); await show('250', 1); await show('724', 1); await show('250', 1);
+    app.startCampaign();
+    const france = loadSave();
+    app.openSetup();
+    await show('724', 2);
+    // A one-shot trim: the next load stays decoded and reaches the map.
+    app.startCampaign();
+    assert.equal(app.state.settings.clubScope, 'domestic:724');
+    // A restore refused on its map, or dropped while the map loads, leaves no map behind either.
+    await app.continueSaved({ ...france, own: { ...france.own, '250-999': france.aliveIds[0] } });
+    assert.equal(fetched['250'], 2);
+    assert.equal(app.state.saveStatus.ok, false, 'the mismatched save is refused');
+    const pending = app.continueSaved(france);
+    app.cancelRestore();
+    await pending;
+    assert.equal(fetched['250'], 3);
+    assert.equal(app.state.settings.clubScope, 'domestic:724', 'the campaign in play is unchanged');
+    app.openSetup();
+    await show('250', 4);
+  });
+});
+
 test('phone bar minute: floored at the last revealed event', async () => {
   await withApp(manager, ({ app }) => {
     app.setState({ match: { aId: '250', dId: '276', applied: false, done: false, shown: [{ m: 12 }, { m: 37 }, { m: 30 }] } });

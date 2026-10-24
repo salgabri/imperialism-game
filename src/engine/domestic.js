@@ -35,8 +35,7 @@ function touch(key, entry) {
   cache.set(key, entry);
 }
 
-function trimCache() {
-  let spare = DOMESTIC_CACHE_LIMIT;
+function trimCache(spare = DOMESTIC_CACHE_LIMIT) {
   for (const [key, entry] of [...cache].reverse()) {
     if (!entry.value || retained.has(key)) continue;
     if (spare > 0) spare--;
@@ -53,11 +52,13 @@ export function clearDomesticCache(id) {
 /**
  * Keep exactly these countries loaded however many others are browsed (null
  * and undefined ids are ignored); every other decoded country is evicted
- * least recently used first beyond DOMESTIC_CACHE_LIMIT. Replaces the previous set.
+ * least recently used first beyond `spare` of them. Replaces the previous set.
+ * `spare` holds for this trim only: later loads keep DOMESTIC_CACHE_LIMIT again,
+ * so a load that completes before its caller retains it is never evicted.
  */
-export function retainDomestic(ids = []) {
+export function retainDomestic(ids = [], spare = DOMESTIC_CACHE_LIMIT) {
   retained = new Set([...ids].filter(id => id != null).map(String));
-  trimCache();
+  trimCache(spare);
 }
 
 /** Decoded country ids in the cache, least recently used first (diagnostics and tests). */

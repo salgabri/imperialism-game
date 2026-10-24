@@ -456,9 +456,12 @@ export default class App extends React.Component {
     return domesticSurroundings(this.atlas, domestic, BACKDROP_MARGIN);
   }
 
-  /** Keep the maps in use decoded: the one on screen and the one a restore waits for. */
-  retainMaps() {
-    retainDomestic([this.domesticId, this.pendingDomesticId]);
+  /**
+   * Keep the maps in use decoded: the one on screen and the one a restore waits for. A few others stay for browsing
+   * the setup screen; `retainMaps(0)` drops them once, when a campaign takes over (they load again if picked later).
+   */
+  retainMaps(spare) {
+    retainDomestic([this.domesticId, this.pendingDomesticId], spare);
   }
 
   /** Lon/lat on the current chart's unfitted plane (duck-typed test atlases have no project). */
@@ -949,6 +952,8 @@ export default class App extends React.Component {
       const fitted = fitDomesticCampaign(campaign, loaded);
       if (fitted.error) {
         this.refuseRestore(fitted.error);
+        // A campaign in play keeps no map it is not using.
+        if (this.state.phase !== 'setup') this.retainMaps(0);
         return false;
       }
       return then(loaded, fitted.campaign);
@@ -964,7 +969,12 @@ export default class App extends React.Component {
       this.endRestore();
       return true;
     };
-    return this.loadCountry(id).then(() => current() && this.withCampaignMap(campaign, then), error => {
+    return this.loadCountry(id).then(() => {
+      if (current()) return this.withCampaignMap(campaign, then);
+      // Nor the map of a restore dropped while it loaded.
+      if (this.state.phase !== 'setup') this.retainMaps(0);
+      return false;
+    }, error => {
       if (current()) this.refuseRestore(`The map of ${name} could not be loaded, so the campaign cannot resume. ${error.message || error}`);
       return false;
     });
@@ -1173,6 +1183,7 @@ export default class App extends React.Component {
       }
     }
     this.useGeometry(domesticId);
+    this.retainMaps(0);
     this.fitMap(Object.keys(own), su);
     this.setState(
       {
@@ -1246,6 +1257,7 @@ export default class App extends React.Component {
     this.rng = makeRng(s.seed ?? 1);
     this.rng.setState(s.rngState ?? s.seed ?? 1);
     this.useGeometry(loaded ? loaded.meta.id : null);
+    this.retainMaps(0);
     this.fitMap(Object.keys(s.own), s.settings);
     // A save from another build was moved club by club onto this map; its saved draw is stale.
     const remapped = !!loaded && s.settings.domesticVersion !== loaded.meta.version;

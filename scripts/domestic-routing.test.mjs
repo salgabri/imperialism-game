@@ -365,3 +365,19 @@ test('the decoded-map cache keeps retained countries plus a few recent ones', as
   assert.ok(loadedDomesticIds().length <= DOMESTIC_CACHE_LIMIT);
   clearDomesticCache();
 });
+
+test('retaining with no spares drops every other decoded country once; later loads keep the usual few', async () => {
+  clearDomesticCache();
+  retainDomestic(['901']);
+  for (const id of ['901', '902', '903']) await loadDomestic(id, { fetch });
+  assert.deepEqual(loadedDomesticIds(), ['901', '902', '903']);
+  const inFlight = loadDomestic('904', { fetch });
+  retainDomestic(['901'], 0);
+  assert.deepEqual(loadedDomesticIds(), ['901'], 'only the retained country stays decoded');
+  await inFlight;
+  assert.deepEqual(loadedDomesticIds(), ['901', '904'], 'a load in flight is kept, and the trim does not outlive the call');
+  await loadDomestic('905', { fetch });
+  assert.deepEqual(loadedDomesticIds(), ['901', '904', '905']);
+  retainDomestic([]);
+  clearDomesticCache();
+});

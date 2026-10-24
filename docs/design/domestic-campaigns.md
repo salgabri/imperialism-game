@@ -539,7 +539,9 @@ kickoff ownership, section id → club id for every section; callers copy it. On
 home sections anchor at home towns (`hasCapital`, `homeX/homeY`); the other
 sections of a group anchor at interior points. The decoded cache is bounded: the
 ids passed to `retainDomestic(ids)` plus `DOMESTIC_CACHE_LIMIT = 2` recent others
-(`getLoadedDomestic` returns null once evicted; callers load again).
+(`getLoadedDomestic` returns null once evicted; callers load again). Starting or
+restoring a campaign calls `retainDomestic(ids, 0)` once, so countries browsed on
+the setup screen do not stay decoded through the campaign.
 `domesticSurroundings(atlas, domestic, margin)` returns `{ shapes, obstacles }`
 for a decoded map and fit, cached with the map: world-map rings near the frame,
 projected like the sections. The host shape is drawn only for masked England and
