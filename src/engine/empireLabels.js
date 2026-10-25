@@ -345,7 +345,9 @@ function rasterize(component) {
   // Land cells are exactly those at a positive distance (at least one cell), so the distances are the mask too.
   // Every visible component is ranked by its usable area, but only a few are searched for a label: the sea-cell
   // row sums and the candidate points are made when a search first needs them (emptyPrefixOf, candidatesOf).
-  return { nx, ny, cell, x0, y0, distance, pca, area: count * cell * cell, count, mx, my, bbox: b };
+  // Those lazy caches are declared up front, so every raster keeps one shape and the hot loops' loads stay monomorphic.
+  return { nx, ny, cell, x0, y0, distance, pca, area: count * cell * cell, count, mx, my, bbox: b,
+    emptyPrefix: null, candidates: null, records: null, hull: null, clearance: null, usable: null };
 }
 
 const landCell = (raster, index) => raster.distance[index] > 0;
@@ -711,7 +713,7 @@ function pointRecord(raster, point) {
   const records = raster.records || (raster.records = new Map());
   const key = `${point.x},${point.y}`;
   let record = records.get(key);
-  if (!record) records.set(key, record = { x: point.x, y: point.y, limits: new Map(), coastalLimits: new Map() });
+  if (!record) records.set(key, record = { x: point.x, y: point.y, limits: new Map(), coastalLimits: new Map(), probes: null, searches: null, blocked: null });
   if (candidatesOf(raster).includes(point)) point.record = record;
   return record;
 }
