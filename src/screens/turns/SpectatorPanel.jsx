@@ -4,7 +4,7 @@
 // slot whenever a match exists (A-14, DEC D17); (b) Following — followed empire, picker (select#followed-team
 // behind "Change"), "Pause when <team> plays" switch and the managed-team note after a manager's exit (DEC D16);
 // (c) Autoplay status + 1×/2×/4× speed. Phone collapsed sheet shows (a) only (CSS via `sheet`).
-import React from 'react';
+import React, { useMemo } from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
 import './turns.css';
 
@@ -72,6 +72,10 @@ export default function SpectatorPanel({
   const pickerWord = follow ? 'Change' : 'Choose';
   // `managed` is set only after the manager's exit (DEC D16); `ended: false` is the W1 stub's live manager.
   const managedNote = managed?.id && managed?.name && managed.ended !== false ? managed : null;
+  // ~170 options on a world map: built once per team list (memoised by the view-model), not on every App render.
+  const teamOptions = useMemo(() => teams.map(team => (
+    <option key={team.id} value={team.id}>{team.name}{team.alive === false ? ' · eliminated' : ''}</option>
+  )), [teams]);
   return (
     <section className="spectator-panel" aria-label="Spectator" data-sheet={sheet}>
       <section className="this-turn" data-state={turn.state} aria-labelledby="this-turn-title">
@@ -117,9 +121,7 @@ export default function SpectatorPanel({
               <select id="followed-team" className="follow-change__select" value={follow?.id || ''}
                 onChange={event => onFollow(event.target.value)}>
                 <option value="">No followed team</option>
-                {teams.map(team => (
-                  <option key={team.id} value={team.id}>{team.name}{team.alive === false ? ' · eliminated' : ''}</option>
-                ))}
+                {teamOptions}
               </select>
             </span>
           )}

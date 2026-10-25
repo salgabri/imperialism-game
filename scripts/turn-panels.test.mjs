@@ -411,6 +411,16 @@ test('spectator panel model: this turn states, following, managed note and playb
 // =========================================================================================================
 // components
 
+test('SpectatorPanel rebuilds the follow options from a new team list (an elimination marks its option)', async t => {
+  const teams = [{ id: 'a', name: 'Alfa', alive: true }, { id: 'b', name: 'Beta', alive: true }];
+  const options = view => [...view.host.querySelectorAll('#followed-team option')].map(option => option.textContent);
+  const view = await mount(SpectatorPanel, { teams, onFollow() {} }, t);
+  await view.render({ teams, autoplay: true, onFollow() {} });
+  assert.deepEqual(options(view), ['No followed team', 'Alfa', 'Beta']);
+  await view.render({ teams: [teams[0], { ...teams[1], alive: false }], autoplay: true, onFollow() {} });
+  assert.deepEqual(options(view), ['No followed team', 'Alfa', 'Beta · eliminated']);
+});
+
 test('TurnStrip renders the round-robin queue with states, current ring size and next', async t => {
   const settings = { ...state().settings, turnOrder: 'round-robin' };
   const model = buildTurnStrip(state({ settings, turnQueue: ['276', '380', '348', '688', '250'], turnIndex: 2,
