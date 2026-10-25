@@ -164,6 +164,7 @@ function edgeOverlaps({ a, b }, box) {
 }
 
 function exteriorEdges(pieces) {
+  if (pieces.every(piece => piece.pointIds)) return exteriorEdgesById(pieces);
   const edges = new Map();
   for (const piece of pieces) for (const edge of piece.edges) {
     const a = keyPoint(edge.a), b = keyPoint(edge.b), forward = a < b;
@@ -176,6 +177,56 @@ function exteriorEdges(pieces) {
   // unmatched edge is safe: the exact check below also recognizes shared edges
   // whose neighbors use a different vertex subdivision.
   return [...edges.values()].filter(e => e.count !== 0).map(e => e.edge);
+}
+
+// exteriorEdges with point ids for the keyPoint strings: the same edges in the same order. Equal points have equal ids
+// as they have equal strings; orienting an edge by id rather than by string only flips the sign of its key's count,
+// never whether it is zero, and the first edge seen per key is kept as before.
+function exteriorEdgesById(pieces) {
+  const edges = new Map();
+  for (const piece of pieces) {
+    const { edgeA, edgeB, space } = piece.pointIds, list = piece.edges;
+    for (let e = 0; e < list.length; e++) {
+      const a = edgeA[e], b = edgeB[e], forward = a < b, key = forward ? a * space.count + b : b * space.count + a;
+      const previous = edges.get(key);
+      if (previous) previous.count += forward ? 1 : -1;
+      else edges.set(key, { edge: list[e], count: forward ? 1 : -1 });
+    }
+  }
+  return [...edges.values()].filter(e => e.count !== 0).map(e => e.edge);
+}
+
+/**
+ * Give each piece the ids of its ring points (ring order) and of its edges' ends (piece.edges order), one id per
+ * distinct keyPoint string over all the countries, so ownerComponents and exteriorEdges need no strings. A piece
+ * whose edges do not line up with its rings gets none and keeps the string path.
+ */
+function assignPointIds(countries) {
+  const ids = new Map(), space = { count: 0, first: null };
+  const idOf = p => {
+    const key = keyPoint(p);
+    let id = ids.get(key);
+    if (id === undefined) ids.set(key, id = ids.size);
+    return id;
+  };
+  for (const country of countries) for (const piece of country.pieces) {
+    const vertexIds = new Int32Array(piece.rings.reduce((sum, ring) => sum + ring.length, 0));
+    const edgeA = new Int32Array(piece.edges.length), edgeB = new Int32Array(piece.edges.length);
+    let k = 0, e = 0;
+    for (const ring of piece.rings) {
+      const start = k;
+      for (const p of ring) vertexIds[k++] = idOf(p);
+      // edgesOf's walk, which skips zero-length edges.
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const a = ring[j], b = ring[i];
+        if (a[0] === b[0] && a[1] === b[1]) continue;
+        if (e < edgeA.length) { edgeA[e] = vertexIds[start + j]; edgeB[e] = vertexIds[start + i]; }
+        e++;
+      }
+    }
+    if (e === piece.edges.length) piece.pointIds = { vertexIds, edgeA, edgeB, space };
+  }
+  space.count = ids.size;
 }
 
 function touchingAtFlatBounds(a, b) {
@@ -196,11 +247,22 @@ function touchingAtFlatBounds(a, b) {
 function ownerComponents(countries, reusable = null) {
   const pieces = countries.flatMap(country => country.pieces);
   const sets = makeDisjointSet(pieces.length);
-  const vertices = new Map();
-  for (let i = 0; i < pieces.length; i++) for (const ring of pieces[i].rings) for (const p of ring) {
-    const key = keyPoint(p), previous = vertices.get(key);
-    if (previous !== undefined) sets.join(i, previous);
-    else vertices.set(key, i);
+  if (pieces.length && pieces.every(piece => piece.pointIds)) {
+    // The same joins in the same order, by point id. The first piece seen per id is kept in one array per engine,
+    // cleared again after.
+    const space = pieces[0].pointIds.space, seen = space.first || (space.first = new Int32Array(space.count).fill(-1));
+    for (let i = 0; i < pieces.length; i++) for (const id of pieces[i].pointIds.vertexIds) {
+      if (seen[id] !== -1) sets.join(i, seen[id]);
+      else seen[id] = i;
+    }
+    for (const piece of pieces) for (const id of piece.pointIds.vertexIds) seen[id] = -1;
+  } else {
+    const vertices = new Map();
+    for (let i = 0; i < pieces.length; i++) for (const ring of pieces[i].rings) for (const p of ring) {
+      const key = keyPoint(p), previous = vertices.get(key);
+      if (previous !== undefined) sets.join(i, previous);
+      else vertices.set(key, i);
+    }
   }
   // Natural Earth's shared arcs already match exactly. The cheap bounds-only
   // fallback also handles rectangular custom fixtures without identical vertices.
@@ -1204,7 +1266,9 @@ export function createEmpireLabelEngine(countryShapes = []) {
     };
   }
 
+  let pointIdsReady = false;
   function prepare(ownership = {}) {
+    if (!pointIdsReady) { assignPointIds(countries.values()); pointIdsReady = true; }
     const byOwner = new Map();
     for (const id of [...countries.keys()]) {
       const owner = ownership[id];
