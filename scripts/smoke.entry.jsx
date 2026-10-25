@@ -562,6 +562,14 @@ function empireLabelsSnapshot(app, { geography = false } = {}) {
   };
 }
 
+/** Flags mode: an owner whose crest is drawn on its land has no code printed over it (README "Club crests"). */
+function crestLabelsSnapshot() {
+  const drawn = new Set([...document.querySelectorAll('pattern[data-flag-layout="crest"]')]
+    .filter(pattern => pattern.querySelector('image')).map(pattern => pattern.dataset.owner));
+  const labelled = [...document.querySelectorAll('text[data-empire-label]')].map(label => label.dataset.empireLabel);
+  return { drawn: drawn.size, labelledOverCrest: labelled.filter(id => drawn.has(id)).length };
+}
+
 /** Nation and club campaigns exercise the same owner-wide label wiring. */
 export async function runEmpireLabelCheck(scenario) {
   const mounted = mount();
@@ -570,6 +578,15 @@ export async function runEmpireLabelCheck(scenario) {
     await launch(mounted, scenario);
     const app = mounted.app;
     await sleep(20); // Allow the theatre camera's initial effect to settle.
+    // launch() leaves Flags on, where a club's drawn crest replaces its code. Club label checks start from Political,
+    // which labels every club, after recording that rule.
+    let crestLabels = null;
+    if (scenario.layer === 'clubs') {
+      crestLabels = crestLabelsSnapshot();
+      button('Political').click();
+      await until('club labels start from Political', () => app.state.mapMode === 'political');
+      await sleep(20);
+    }
     const kickoff = empireLabelsSnapshot(app, { geography: true });
     const initialViewBox = document.querySelector('[data-testid="world-map"]').getAttribute('viewBox');
     const stableGeometry = app.labelGeometry;
@@ -671,7 +688,7 @@ export async function runEmpireLabelCheck(scenario) {
     const restored = empireLabelsSnapshot(resumed.app, { geography: true });
     const resumedRules = ownershipSnapshot(resumed.app);
     return {
-      kickoff, political, zoomed, reset, conquered, restored, geometryMatchesMap,
+      kickoff, political, zoomed, reset, conquered, restored, geometryMatchesMap, crestLabels,
       hoverCached, tickerCached, styleCached, hoverReferencesStable, tickerReferencesStable, styleReferencesStable,
       ownerReferencesStable, cameraReusesGeometry, conquestKeepsGeometryCache, nonRuleInteractionsUnchanged,
       zoomChangesPlacement: zoomed.some(snapshot => snapshot.signature !== kickoff.signature),
@@ -1946,16 +1963,18 @@ export async function run(scenario) {
     let standingsStayedSorted = standingsAtKickoff.sorted;
     let standingsRanksStayedSequential = standingsAtKickoff.ranks;
     let standingsGainsStayedCorrect = standingsAtKickoff.gainsCorrect;
-    const labelsAtKickoff = empireLabelsSnapshot(app);
+    const crestLabelsAtKickoff = crestLabelsSnapshot();
     let labelsStayedValid = true;
     const labelFailures = [];
     let standingsSamples = 0;
     let sampledMatches = -1;
     let groupsStayedWhole = !reference || wholeGroups(app.state.own, reference);
     // Political is the default (DEC D18); launch() left Flags on for its flag snapshots, so select Political
-    // explicitly before sampling its unchanged colour/conquest guarantees throughout a complete campaign.
+    // explicitly before sampling its unchanged colour/conquest guarantees throughout a complete campaign. The opening
+    // labels are read there too: in Flags a club's drawn crest stands in for its code.
     button('Political').click();
     await until('political map selected', () => app.state.mapMode === 'political');
+    const labelsAtKickoff = empireLabelsSnapshot(app);
     const initialHeld = countryPaths().filter(path => path.dataset.owner);
     const kickoffColors = Object.fromEntries(initialHeld.map(path => [path.dataset.owner, path.getAttribute('fill')]));
     const politicalAtStart = app.state.mapMode === 'political'
@@ -2077,7 +2096,7 @@ export async function run(scenario) {
       theatre, domesticSetup, domesticKickoff, domesticPointer, domestic, championInitialSquad: initialSquads[champion.id],
       kickoffFlagScope, firstConquestFlagScope, victoryFlagScope, finalFlagScope,
       standingsAtKickoff, standingsStayedSorted, standingsRanksStayedSequential, standingsGainsStayedCorrect, standingsSamples,
-      labelsAtKickoff, labelsStayedValid, labelFailures, labelsAtFinish: empireLabelsSnapshot(app),
+      labelsAtKickoff, crestLabelsAtKickoff, labelsStayedValid, labelFailures, labelsAtFinish: empireLabelsSnapshot(app),
       rounds: app.state.round,
       matches: app.state.matches,
       fallen: app.state.fallen.length,

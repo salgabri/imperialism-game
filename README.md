@@ -727,8 +727,10 @@ A club with a crest shows it wherever a nation shows its flag: the masthead,
 popups, standings, fronts, the turn strip, match and squad screens, setup and the
 victory screen. In **Flags** mode its land keeps the club colour and carries the
 crest, placed like a flag's emblem: one undistorted crest per region, fitted on
-owned land at up to about a quarter of it. Land too small for one stays plain. A
-club without a crest keeps its monogram chip.
+owned land at up to about 30% of it. Land too small for one stays plain. The
+crest stands in for the club's code there: a club whose crest is on the map has
+no code printed over its land, while a club whose crest fits nowhere keeps its
+code. A club without a crest keeps its monogram chip and its code on the map.
 
 The crests come from Wikipedia. `npm run sync:club-logos` finds each club's
 Wikidata item, takes the lead image of its English Wikipedia article (the infobox
@@ -941,7 +943,8 @@ scripts/
   Scoring and tie-break randomness remains at zero variance.
 - `upsetThreshold` (2–15) — rating gap at which a win is flagged as an upset.
 - `showLabels` — draw empire names (club codes for clubs) over their largest held
-  shape; labels are spaced to remain readable at the current zoom.
+  shape; labels are spaced to remain readable at the current zoom. In Flags mode a
+  club whose crest is on the map shows the crest instead of its code.
 
 ## Verification
 

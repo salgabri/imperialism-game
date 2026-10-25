@@ -442,6 +442,8 @@ if (!filtered && !process.argv.includes('--duel-frame-only')) {
       if (r.domestic) check('every section is held, so labels follow owners only', r.neutralTerritories === 0 && r.restored.onlyCurrentOwners);
       else check('uninvolved territories do not acquire empire labels', r.neutralTerritories > 0 && r.restored.onlyCurrentOwners);
       if (scenario.layer === 'clubs') check('club territory labels use club codes', r.usesClubCodes && r.restored.count > 0);
+      if (scenario.layer === 'clubs') check('Flags mode prints no club code over a drawn crest', r.crestLabels.drawn > 0 && r.crestLabels.labelledOverCrest === 0,
+        JSON.stringify(r.crestLabels));
     } catch (error) {
       failures++;
       fail(`    ${error.message}`);
@@ -711,6 +713,10 @@ for (const scenario of campaignScenarios) {
       check('the opening map labels sections with club codes', r.labelsAtKickoff.count > 0);
     } else {
       check('map decoded all shapes', r.nations > 150, `${r.nations}`);
+    }
+    if (r.layer === 'clubs') {
+      check('in Flags mode a drawn crest replaces its club code', r.crestLabelsAtKickoff.drawn > 0 && r.crestLabelsAtKickoff.labelledOverCrest === 0,
+        JSON.stringify(r.crestLabelsAtKickoff));
     }
     check('theatre fielded a full bracket', r.fielded > 1, `${r.fielded}`);
     check('rapid play then pause leaves the campaign idle', r.rapidPauseHeld);

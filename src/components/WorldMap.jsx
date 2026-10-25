@@ -256,7 +256,9 @@ export default function WorldMap({
   // A crowded world map keeps capitals for closer zooms; a country map always shows its home towns.
   const shownHomes = homes.filter(home => (!choosing || kept.has(home.id))
     && (isYou(home) || showAllHomes || vp.zoom > 1.5 || homes.length < 55));
-  const shownLabels = choosing ? labels.filter(label => kept.has(label.id)) : labels;
+  // Flags mode: a club whose crest is drawn on its land is known by the crest, so its code is not printed over it.
+  const crestOwners = useMemo(() => new Set(flagPatterns.filter(f => f.crestUrl && f.symbolLayout).map(f => f.ownerId)), [flagPatterns]);
+  const shownLabels = labels.filter(label => (!choosing || kept.has(label.id)) && !crestOwners.has(label.id));
   const tip = tooltip || NO_TOOLTIP;
   const rightEdge = focusLayout === 'conquest' && (breakpoint === 'wide' || breakpoint === 'std')
     ? vp.size.width - CONQUEST_ARTICLE_PX : Infinity;

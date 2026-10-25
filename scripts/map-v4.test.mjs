@@ -409,6 +409,23 @@ test('conquest hatch is its own overlay, after the land and before the borders, 
   } finally { await view.close(); }
 });
 
+test('Flags mode: a club whose crest is drawn shows the crest, not its code; one whose crest fits nowhere keeps it', async () => {
+  const crest = (ownerId, x, symbolLayout) => ({ id: `${ownerId}-crest`, ownerId, url: `/club-logos/${ownerId}.webp`,
+    crestUrl: `/club-logos/${ownerId}.webp`, color: '#888', bbox: { x, y: 100, w: 300, h: 200 }, symbolLayout });
+  const flagPatterns = [crest('688', 400, { field: { x: 400, y: 100, w: 300, h: 200 }, symbol: { x: 500, y: 150, w: 80, h: 80 } }),
+    crest('040', 700, null)];
+  const labelIds = () => globalThis.__mapV4LastLayout.labels.map(label => label.id).sort();
+  const { props } = mapProps({ mapMode: 'flags', flagPatterns });
+  const view = await mount(props);
+  try {
+    assert.equal(view.qa('pattern[data-flag-layout="crest"] image').length, 1, 'one crest is drawn');
+    assert.deepEqual(labelIds(), ['040', '380'], 'the club with a drawn crest gets no code; the others keep their labels');
+    assert.ok(!view.qa('text[data-empire-label]').some(label => label.dataset.empireLabel === '688'));
+    await view.render({ ...props, mapMode: 'political', flagPatterns: [] });
+    assert.deepEqual(labelIds(), ['040', '380', '688'], 'every other mode labels every empire');
+  } finally { await view.close(); }
+});
+
 test('labels: 700 for your empire, 600 for others, capped by the viewport tier (A-6)', async () => {
   globalThis.__mapV4Layouts = 0;
   const tiers = [[1920, 'wide', 30], [1440, 'std', 22], [1024, 'tablet', 20], [390, 'phone', 18]];

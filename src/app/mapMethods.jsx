@@ -17,10 +17,11 @@ import * as mapVM from '../viewModels/map.js';
 const NONE = Object.freeze([]);
 /**
  * A club's crest on its land in Flags mode, placed like a flag's emblem (engine/flagSymbolLayout.js): one undistorted
- * square, centred in a 4:3 field the size of the land, on the club's colour. Up to about a quarter of the land.
+ * square, centred in a 4:3 field the size of the land, on the club's colour. Up to about 30% of the land: the crest
+ * stands in for the club's code, which WorldMap leaves off land that shows one.
  */
 const CREST_PROFILE = Object.freeze({ id: 'club-crest', sourceWidth: 640, sourceHeight: 480,
-  bounds: Object.freeze({ x: 210, y: 130, w: 220, h: 220 }) });
+  bounds: Object.freeze({ x: 190, y: 110, w: 260, h: 260 }) });
 /** A team's crest URL when it is a club with one. */
 const crestOf = team => (team?.kind === 'club' ? clubLogoUrl(team.id) : null);
 const NO_IDENTITY = Object.freeze({ meId: null, meFill: false, opponentId: null });
