@@ -521,14 +521,34 @@ export function campaignMetadata(data) {
     managedTeamName: data.teams?.[data.managedTeamId]?.name || null };
 }
 
+// What listCampaigns made of each text it read last time (storage key → { raw, metadata }, null for a damaged one). A key
+// still holding the same text, or holding the text another key just gave (the resume pointer is usually its campaign's
+// slot), is not parsed again. Only the keys read by the latest call are kept.
+let listedTexts = new Map();
+
+function listedMetadata(key, known, read) {
+  const raw = localStorage.getItem(key);
+  let entry = known.get(key);
+  if (entry?.raw !== raw) entry = [...read.values()].find(other => other.raw === raw);
+  if (!entry) {
+    const saved = tryParse(raw);
+    entry = { raw, metadata: saved && campaignMetadata(saved) };
+  }
+  read.set(key, entry);
+  return entry.metadata;
+}
+
 export function listCampaigns() {
   try {
+    const known = listedTexts, read = new Map();
     const listed = indexData().map(item => {
-      const saved = tryParse(localStorage.getItem(campaignStorageKey(item.id)));
-      return saved ? campaignMetadata(saved) : { ...item, damaged: true };
+      const metadata = listedMetadata(campaignStorageKey(item.id), known, read);
+      return metadata ? { ...metadata } : { ...item, damaged: true };
     });
-    const current = loadSave();
-    if (current?.campaignId && !listed.some(item => item.id === current.campaignId)) listed.push(campaignMetadata(current));
+    let current = null;
+    try { current = listedMetadata(SAVE_KEY, known, read); } catch { /* an unreadable pointer is left out, as loadSave leaves it */ }
+    listedTexts = read;
+    if (current?.id && !listed.some(item => item.id === current.id)) listed.push({ ...current });
     return listed.sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
   } catch { return []; }
 }

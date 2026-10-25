@@ -735,3 +735,39 @@ test('a damaged campaign index is rebuilt from the slots: saves go on and every 
     if (prior) Object.defineProperty(globalThis, 'localStorage', prior); else delete globalThis.localStorage;
   }
 });
+
+/** A second copy of the storage module, with none of the first one's caches. */
+const freshStorage = () => import(`../src/engine/storage.js?fresh=${Math.random()}`);
+
+test('the saved campaigns list parses a slot again only when its text changed, and never a resume pointer a slot holds', async () => {
+  const oracles = await Promise.all(Array.from({ length: 5 }, freshStorage)); // no memo: each parses every text it lists
+  const parse = JSON.parse, parsed = [];
+  JSON.parse = (text, ...rest) => {
+    if (typeof text === 'string' && text.startsWith('{"v":')) parsed.push(text.match(/"campaignName":"([^"]*)"/)?.[1] ?? 'damaged');
+    return parse(text, ...rest);
+  };
+  try {
+    withStorage(({ storage }) => {
+      const listed = (oracle, names) => {
+        parsed.length = 0;
+        const list = listCampaigns();
+        assert.deepEqual(parsed.sort(), names);
+        assert.deepEqual(list, oracle.listCampaigns());
+        return list;
+      };
+      const first = checkpoint(), second = forkCampaign(first, 'Second');
+      Object.assign(first, writeSave(first));
+      Object.assign(second, writeSave(second));
+      listed(oracles[0], ['France campaign', 'Second']);
+      listed(oracles[1], []);
+      Object.assign(second, writeSave({ ...second, round: 2 }));
+      listed(oracles[2], ['Second']);
+      // Another tab renames the first campaign.
+      const slot = campaignStorageKey(first.campaignId);
+      storage.setItem(slot, storage.getItem(slot).replace('"France campaign"', '"Renamed elsewhere"'));
+      assert.deepEqual(listed(oracles[3], ['Renamed elsewhere']).map(item => item.name), ['Second', 'Renamed elsewhere']);
+      storage.setItem(SAVE_KEY, '{"v":4,"damaged');
+      assert.equal(listed(oracles[4], ['damaged']).length, 2);
+    });
+  } finally { JSON.parse = parse; }
+});
