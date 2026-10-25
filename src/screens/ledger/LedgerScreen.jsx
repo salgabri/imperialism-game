@@ -13,7 +13,7 @@ export default function LedgerScreen({
 }) {
   const aside = standingsAside || `${rows.length} ${rows.length === 1 ? 'empire' : 'empires'}`;
   // One handler calling the latest onSelectTeam (App passes a new one per render), so the memoised standings table
-  // is skipped while its rows are unchanged.
+  // and fallen list are skipped while their rows are unchanged.
   const selectRef = useRef(onSelectTeam);
   selectRef.current = onSelectTeam;
   const selectTeam = useCallback(id => selectRef.current?.(id), []);
@@ -36,7 +36,7 @@ export default function LedgerScreen({
             {/* The ad follows the bounded share list, never the fallen list that grows all campaign. */}
             <AdSlot />
             {/* Without a built model (W1 stub { rows }) the fallen list is omitted rather than claiming none have fallen. */}
-            {Array.isArray(fallen) && <FallenList fallen={fallen} aside={fallenAside} onSelectTeam={onSelectTeam} />}
+            {Array.isArray(fallen) && <FallenList fallen={fallen} aside={fallenAside} onSelectTeam={selectTeam} />}
           </aside>
         </div>
       </div>

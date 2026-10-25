@@ -44,7 +44,9 @@ export function MapShare({ share }) {
   );
 }
 
-export function FallenList({ fallen = [], aside = '', onSelectTeam }) {
+// Memoised: the rows are memoised by the view-model and LedgerScreen's handler is stable, so the list renders when
+// an empire falls rather than on every render of a match.
+export const FallenList = React.memo(function FallenList({ fallen = [], aside = '', onSelectTeam }) {
   return (
     <section className="ledger-fallen" aria-labelledby="ledger-fallen-title">
       <div className="kicker">
@@ -69,4 +71,4 @@ export function FallenList({ fallen = [], aside = '', onSelectTeam }) {
       ) : <p className="ledger-empty">No empire has fallen yet.</p>}
     </section>
   );
-}
+});

@@ -103,7 +103,8 @@ function fallenRows(st, ctx) {
   return memo(ctx?.cache, 'ledger:fallen', [st?.fallen, st?.teams, st?.history], () => {
     const teams = st?.teams || {};
     const byLoser = eliminations(st, ctx);
-    return (st?.fallen || []).slice().reverse().map((entry, i) => {
+    const list = st?.fallen || [];
+    return list.slice().reverse().map((entry, i) => {
       const id = entry?.id;
       const team = teams[id];
       const chip = teamChip(team) || { teamId: id ?? null, flagId: null, isClub: false, code: '', name: String(id ?? '') };
@@ -111,9 +112,11 @@ function fallenRows(st, ctx) {
       const byName = elimination?.result?.winnerName || elimination?.winnerName || '';
       const round = Number(entry?.r) || historyRound(elimination);
       const numeral = roman(round);
+      // Counted from the oldest entry: a newly fallen empire (listed first) leaves every other row's key, and so its
+      // row, flag and keyboard focus, as they were.
       return {
-        key: `${id}-${round}-${i}`, teamId: chip.teamId, flagId: chip.flagId, isClub: chip.isClub, code: chip.code,
-        name: chip.name || String(id ?? ''), roman: numeral, byName,
+        key: `${id}-${round}-${list.length - 1 - i}`, teamId: chip.teamId, flagId: chip.flagId, isClub: chip.isClub,
+        code: chip.code, name: chip.name || String(id ?? ''), roman: numeral, byName,
         line: [numeral ? `Round ${numeral}` : '', byName ? `to ${byName}` : ''].filter(Boolean).join(' · '),
       };
     });

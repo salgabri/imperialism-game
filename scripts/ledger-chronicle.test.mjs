@@ -351,6 +351,23 @@ test('standings and fallen rows call the latest select handler', async context =
   assertConsoleClean();
 });
 
+test('an elimination adds one fallen row: the others keep their keys, rows and keyboard focus', async context => {
+  const st = baseState();
+  const rows = [powerRow(0)];
+  const before = ledgerVM.buildLedger(st, ctxFor(), rows);
+  const view = await mount(LedgerScreen, { ...before, onSelectTeam() {} }, context);
+  const austria = view.host.querySelector('.ledger-fallen [data-team-id="040"]');
+  austria.focus();
+  const later = { ...st, aliveIds: ['380', '276'], fallen: [...st.fallen, { id: '688', r: 2 }] };
+  const after = ledgerVM.buildLedger(later, ctxFor(), rows);
+  assert.deepEqual(after.fallen.map(row => row.teamId), ['688', '040'], 'newest first');
+  assert.equal(after.fallen[1].key, before.fallen[0].key, 'keys count from the oldest entry');
+  await view.render({ ...after, onSelectTeam() {} });
+  assert.ok(view.host.querySelector('.ledger-fallen [data-team-id="040"]') === austria, 'the row is kept, not rebuilt');
+  assert.ok(document.activeElement === austria, 'keyboard focus survives the elimination');
+  assertConsoleClean();
+});
+
 // ---------- Chronicle screen (ported Sidebar History tests) ----------
 const fixtures = [
   { id: 'm1', round: 1, aId: 'a', bId: 'b', a: { teamId: 'a', name: 'Alfa', code: 'ALF', score: 2 }, b: { teamId: 'b', name: 'Beta', code: 'BET', score: 1 } },
