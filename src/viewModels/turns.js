@@ -37,9 +37,24 @@ function playingPhase(st) {
   return st?.phase === 'playing' || st?.phase === 'victory';
 }
 
-/** Current XI strength, falling back to the stored starting strength for malformed fixtures. */
+const strengths = new WeakMap();
+
+/**
+ * currentStrength, once per team object. Committed teams are replaced, never edited in place (applyConquest copies
+ * both sides), so the lineup search runs once per team rather than for both sides of the fixture and the followed
+ * team on every render. The squad check only guards code that pushes to a squad it already showed.
+ */
 function strengthOf(team) {
   if (!team) return null;
+  const known = strengths.get(team);
+  if (known && known.squad === team.squad && known.length === team.squad?.length) return known.value;
+  const value = currentStrength(team);
+  if (typeof team === 'object') strengths.set(team, { squad: team.squad, length: team.squad?.length, value });
+  return value;
+}
+
+/** Current XI strength, falling back to the stored starting strength for malformed fixtures. */
+function currentStrength(team) {
   const value = attempt(() => teamEff(team), null);
   if (Number.isFinite(value)) return value;
   return Number.isFinite(team.baseEff) ? team.baseEff : Number.isFinite(team.str) ? team.str : null;

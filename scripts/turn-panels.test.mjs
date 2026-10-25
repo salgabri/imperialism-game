@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import React, { act } from 'react';
 import { JSDOM } from 'jsdom';
 import { build } from 'esbuild';
-import { makeRng, buildTeam } from '../src/data/teams.js';
+import { makeRng, buildTeam, teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import {
   buildTurnStrip, buildReach, buildTargetPanel, buildTargetCard, buildSpectatorPanel, targetOptions, idleTurnCopy,
@@ -406,6 +406,33 @@ test('spectator panel model: this turn states, following, managed note and playb
   const loading = buildSpectatorPanel({ phase: 'loading', teams: {}, aliveIds: [] }, { board: null });
   assert.equal(loading.followed, null);
   assert.deepEqual(loading.teams, []);
+});
+
+test('spectator strengths: one lineup search per team object, and a team replaced by a conquest shows its new strength', () => {
+  const ctx = context({ followedId: '380' });
+  const match = { aId: '380', dId: '688', done: false, applied: false };
+  const before = buildSpectatorPanel(state({ followedId: '380', match }), ctx);
+  assert.equal(before.thisTurn.a.eff, teamEff(TEAMS['380']).toFixed(1));
+  // applyConquest stores a copy of the winner with its new squad; the committed object itself never changes.
+  const stronger = { ...TEAMS['380'], squad: TEAMS['380'].squad.map(player => ({ ...player, rating: player.rating + 5 })) };
+  const after = buildSpectatorPanel(state({ followedId: '380', match, teams: { ...TEAMS, 380: stronger } }), ctx);
+  assert.equal(after.thisTurn.a.eff, teamEff(stronger).toFixed(1));
+  assert.notEqual(after.thisTurn.a.eff, before.thisTurn.a.eff);
+  assert.ok(after.followed.detail.endsWith(`strength ${teamEff(stronger).toFixed(1)}`));
+  assert.equal(after.thisTurn.b.eff, before.thisTurn.b.eff, 'the unchanged defender keeps its strength');
+  assert.deepEqual(buildSpectatorPanel(state({ followedId: '380', match }), ctx).thisTurn, before.thisTurn);
+
+  // selectLineup reads `sport`: one lineup search per team object, however many renders show it.
+  let reads = 0;
+  const counted = Object.defineProperty({ ...TEAMS['380'], squad: TEAMS['380'].squad.slice() }, 'sport', { get() { reads++; return 'football'; } });
+  const render = () => buildSpectatorPanel(state({ followedId: '380', match, teams: { ...TEAMS, 380: counted } }), context({ followedId: '380' }));
+  render();
+  const once = reads;
+  render(); render();
+  assert.ok(once > 0 && reads === once, 'the lineup search runs once per team object');
+  counted.squad.push({ ...counted.squad[0] });
+  render();
+  assert.ok(reads > once, 'a squad that grew in place is searched again');
 });
 
 // =========================================================================================================
