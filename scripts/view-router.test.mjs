@@ -1259,6 +1259,26 @@ test('boot without a readable atlas: no display atlas and no neighbours, as befo
   });
 });
 
+test('a country map keeps no world display atlas; the way back builds it again, drawn the same', async () => {
+  await withBoot(atlasOk(), async ({ app }) => {
+    app.fitMap = BundledApp.prototype.fitMap;
+    const ids = ['250', '276', '826'];
+    const drawn = () => JSON.stringify({ countries: app.displayGeo.countries, paths: app.displayGeo.paths, rings: app.labelGeometry });
+    app.fitMap(ids);
+    const world = app.displayGeo, before = drawn();
+    await app.loadCountry('826');
+    app.useGeometry('826');
+    app.fitMap(ids);
+    assert.equal(app.displayGeo, null);
+    assert.ok(Object.values(app).every(value => value !== world), 'nothing on the App holds the world display atlas');
+    app.useGeometry(null);
+    app.fitMap(ids);
+    assert.equal(app.geo, app.worldGeo, 'the rules geometry is the one kept');
+    assert.notEqual(app.displayGeo, world, 'the display atlas is built again');
+    assert.equal(drawn(), before, 'and draws the world as before');
+  });
+});
+
 test('phone bar minute: floored at the last revealed event', async () => {
   await withApp(manager, ({ app }) => {
     app.setState({ match: { aId: '250', dId: '276', applied: false, done: false, shown: [{ m: 12 }, { m: 37 }, { m: 30 }] } });

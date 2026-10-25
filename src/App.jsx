@@ -500,22 +500,22 @@ export default class App extends React.Component {
   /**
    * Rules and display run on one geometry: the world (id null) or a loaded
    * country's sections. Sections are their own routing paths, so there is no
-   * display atlas; the world pair is kept for the way back.
+   * display atlas. The world's rules geometry is kept for the way back (setup
+   * reads it while a country is shown); its display atlas is not, as fitMap
+   * redraws it on return anyway: it is built again from the atlas, as boot does.
    */
   useGeometry(id) {
     if (id) {
       const loaded = getLoadedDomestic(id);
       if (!loaded) throw new Error(`The map for country ${id} has not loaded.`);
-      if (!this.domesticId) {
-        this.worldGeo = this.geo;
-        this.worldDisplayGeo = this.displayGeo;
-      }
+      if (!this.domesticId) this.worldGeo = this.geo;
       this.geo = loaded.geo;
       this.displayGeo = null;
       this.domesticId = id;
     } else if (this.domesticId) {
+      const atlas = this.worldAtlas();
       this.geo = this.worldGeo;
-      this.displayGeo = this.worldDisplayGeo;
+      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS, { keepPolys: false }) : null;
       this.domesticId = null;
       this.backdrop = [];
     }
