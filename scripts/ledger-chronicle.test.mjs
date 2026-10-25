@@ -384,6 +384,26 @@ test('history rows call the latest select handler and follow the perspective and
   assertConsoleClean();
 });
 
+test('the activity feed keeps its rows when entries arrive, also once the capped log drops its oldest', async context => {
+  const entry = i => ({ t: i % 4 ? 'match' : 'elim', r: Math.floor(i / 3) + 1, txt: `ENTRY ${i}` });
+  const log = Array.from({ length: 30 }, (_, i) => entry(i));
+  const show = list => screen.render({ history: [], historyTeams: [], feed: ledgerVM.buildChronicle({ ...baseState(), log: list }, ctxFor()).feed });
+  const screen = await mount(ChronicleScreen, { history: [], historyTeams: [], feed: [] }, context);
+  await show(log);
+  const item = n => [...screen.host.querySelectorAll('.fi-activity-text')].find(el => el.textContent === `ENTRY ${n}`).closest('li');
+  const kept = [item(20), item(4)];
+  const group = kept[0].closest('.fi-activity-group');
+  const unchanged = () => item(20) === kept[0] && item(4) === kept[1] && item(20).closest('.fi-activity-group') === group;
+  await show([...log, entry(30), entry(31)]);
+  assert.equal(screen.host.querySelector('.fi-activity-round').textContent, 'Round XI', 'a new round on top');
+  assert.ok(unchanged(), 'a new round inserts its rows and keeps the others');
+  // At LOG_CAP every new entry drops the oldest, so each entry's log position (the model key) moves.
+  await show([...log.slice(4), entry(30), entry(31), entry(32), entry(33)]);
+  assert.ok(unchanged(), 'a capped log keeps the rows too');
+  assert.equal(screen.host.querySelectorAll('.fi-activity-item').length, 30);
+  assertConsoleClean();
+});
+
 // ---------- Chronicle screen (ported Sidebar History tests) ----------
 const fixtures = [
   { id: 'm1', round: 1, aId: 'a', bId: 'b', a: { teamId: 'a', name: 'Alfa', code: 'ALF', score: 2 }, b: { teamId: 'b', name: 'Beta', code: 'BET', score: 1 } },
