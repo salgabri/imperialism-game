@@ -13,6 +13,8 @@ import path from 'node:path';
 import { empireNeighbors } from '../src/engine/campaign.js';
 import { recommendedTactic } from '../src/engine/managerStrategy.js';
 import { politicalFill } from '../src/data/empireColours.js';
+import { decodeDomestic } from '../src/engine/domestic.js';
+import { mergeSharedIds } from '../src/engine/geo.js';
 import { ROOT, bundleApp, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 const BundledApp = await bundleApp();
@@ -1182,6 +1184,78 @@ test('the setup map keeps the shown country while the next one loads; a failed l
     assert.equal(app.domesticStatus().state, 'error');
     assert.equal(app.domesticId, null);
     assert.equal(app.geo, app.worldGeo, 'the world is back behind the error');
+  });
+});
+
+// ---------- boot: the shipped world maps ----------
+
+const publicText = file => readFileSync(path.join(ROOT, 'public', ...file.split('/')), 'utf8');
+const ATLAS_TEXT = publicText('countries-50m.json');
+
+/**
+ * Run the real boot on a setup fixture: `fetch` serves the shipped `public` files, and `atlas()` answers the 50m
+ * atlas request. Resolves to `{ app, time }` once boot has settled; the fixture stays open until `fn` returns.
+ */
+async function withBoot(atlas, fn) {
+  const fetchBefore = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  globalThis.fetch = async url => {
+    const file = String(url).replace(/^\//, '');
+    if (file === 'countries-50m.json') return atlas();
+    let text = null;
+    try { text = publicText(file); } catch { /* not shipped */ }
+    return text == null ? { ok: false, status: 404 } : { ok: true, status: 200, json: async () => JSON.parse(text), text: async () => text };
+  };
+  const f = fixture({ phase: 'loading' });
+  try {
+    await BundledApp.prototype.boot.call(f.app);
+    return await fn(f);
+  } finally {
+    f.close();
+    if (fetchBefore) Object.defineProperty(globalThis, 'fetch', fetchBefore); else delete globalThis.fetch;
+  }
+}
+const atlasOk = (text = ATLAS_TEXT) => () => ({ ok: true, status: 200, text: async () => text });
+
+test('boot keeps the 50m atlas as text: a country map parses it once, merged; world maps never do', async () => {
+  const england = decodeDomestic(JSON.parse(publicText('domestic/826.json')), '826');
+  await withBoot(atlasOk(), ({ app }) => {
+    assert.equal(app.state.phase, 'setup');
+    assert.equal(app.atlas, null, 'no parsed atlas on the world map');
+    assert.equal(app.atlasText, ATLAS_TEXT);
+    const ids = app.displayGeo.countries.map(country => country.id);
+    assert.equal(new Set(ids).size, ids.length, 'the display atlas is built from the merged atlas');
+    assert.ok(ids.includes('036') && ids.includes('KOS'));
+    const { shapes } = app.surroundings(england);
+    assert.ok(shapes.length > 3 && shapes.some(shape => shape.id === '372'), 'the neighbours of a country map');
+    assert.equal(app.atlasText, null, 'the text goes once parsed');
+    const atlas = app.worldAtlas();
+    assert.equal(app.worldAtlas(), atlas, 'parsed once, then kept');
+    assert.equal(JSON.stringify(atlas), JSON.stringify(mergeSharedIds(JSON.parse(ATLAS_TEXT))));
+    assert.equal(app.surroundings(england).shapes, shapes, 'the surroundings stay cached against it');
+  });
+});
+
+test('boot without a readable atlas: no display atlas and no neighbours, as before; a non-topology still fails boot', async () => {
+  const england = decodeDomestic(JSON.parse(publicText('domestic/826.json')), '826');
+  const unreadable = {
+    'a failed response': () => ({ ok: false, status: 503 }),
+    'a failed request': () => { throw new TypeError('offline'); },
+    'a failed body': () => ({ ok: true, status: 200, text: async () => { throw new TypeError('reset'); } }),
+    'an empty body': atlasOk(''),
+    'invalid JSON': atlasOk(ATLAS_TEXT.slice(0, 5000)),
+    'a null atlas': atlasOk('null'),
+  };
+  for (const [name, atlas] of Object.entries(unreadable)) {
+    await withBoot(atlas, ({ app }) => {
+      assert.equal(app.state.phase, 'setup', `${name}: boot reaches setup`);
+      assert.equal(app.displayGeo, null, name);
+      assert.equal(app.worldAtlas(), null, name);
+      assert.deepEqual(app.surroundings(england), { shapes: [], obstacles: [] }, name);
+    });
+  }
+  await withBoot(atlasOk('{"type":"Topology","objects":{}}'), ({ app }) => {
+    assert.notEqual(app.state.phase, 'setup');
+    assert.match(app.state.err, /^MAP DATA FAILED TO LOAD — /);
   });
 });
 

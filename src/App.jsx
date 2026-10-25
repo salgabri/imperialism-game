@@ -394,18 +394,21 @@ export default class App extends React.Component {
 
   async boot() {
     try {
-      const [res, atlas] = await Promise.all([
+      const [res, atlasText] = await Promise.all([
         fetch(MAP_URL),
-        fetch(ATLAS_URL).then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch(ATLAS_URL).then(r => r.ok ? r.text() : null).catch(() => null),
       ]);
       if (!res.ok) throw new Error('map fetch ' + res.status);
       this.geo = new WorldGeometry(await res.json(), CAPITALS);
       // Display-only detail keeps targeting, club seeding and existing saves
-      // on the original topology. A missing visual atlas falls back gracefully.
-      // The atlas also draws a country map's neighbours in that map's projection.
-      this.atlas = atlas ? mergeSharedIds(atlas) : null;
+      // on the original topology. A missing or unreadable visual atlas falls back gracefully.
+      let atlas = null;
+      try { atlas = JSON.parse(atlasText); } catch { /* not JSON: no atlas */ }
+      // The atlas also draws a country map's neighbours: until one needs it, it waits as text (worldAtlas).
+      this.atlas = null;
+      this.atlasText = atlas ? atlasText : null;
       // Only the display atlas's fitted paths are ever read, so its lon/lat polygons go once projected.
-      this.displayGeo = this.atlas ? new WorldGeometry(this.atlas, CAPITALS, { keepPolys: false }) : null;
+      this.displayGeo = atlas ? new WorldGeometry(mergeSharedIds(atlas), CAPITALS, { keepPolys: false }) : null;
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
 
       const inspection = inspectSave();
@@ -453,7 +456,19 @@ export default class App extends React.Component {
 
   /** Neighbouring land of a country map, built once per map and fit (and freed with the map). */
   surroundings(domestic) {
-    return domesticSurroundings(this.atlas, domestic, BACKDROP_MARGIN);
+    return domesticSurroundings(this.worldAtlas(), domestic, BACKDROP_MARGIN);
+  }
+
+  /**
+   * The 50m atlas with merged ids, parsed from its text the first time it is needed and then kept, never parsed
+   * twice: surroundings are cached against this object. A session on world maps only never holds it parsed.
+   */
+  worldAtlas() {
+    if (!this.atlas && this.atlasText) {
+      this.atlas = mergeSharedIds(JSON.parse(this.atlasText));
+      this.atlasText = null;
+    }
+    return this.atlas;
   }
 
   /**
