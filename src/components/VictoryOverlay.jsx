@@ -36,7 +36,7 @@ function toneOf(text) {
 
 /** A campaign's final reward, with the map and new campaign one action away. */
 export default function VictoryOverlay({
-  id, code, isClub, round, name = '', color, subtitle, conquests, steals, territories,
+  id, teamId, code, isClub, round, name = '', color, subtitle, conquests, steals, territories,
   effNow, effBase, effGain, squad = [], positionColors, onClose, onNew, onChronicle,
   recap, seed,
 }) {
@@ -74,7 +74,7 @@ export default function VictoryOverlay({
         <button ref={closeRef} type="button" className="icon-button fi-victory-close" onClick={onClose} aria-label="Close campaign results"><Icon name="close" size={19} /></button>
         <div className="fi-victory-main">
           <div className="fi-victory-eyebrow">
-            <span className="fi-victory-emblem"><TeamMark id={id} code={code || name.slice(0, 3)} color={color} isClub={isClub || !id} width={48} /></span>
+            <span className="fi-victory-emblem"><TeamMark id={id} teamId={teamId} code={code || name.slice(0, 3)} color={color} isClub={isClub || !id} width={48} /></span>
             <span className="fi-victory-kicker">Campaign complete · Round {roundNumber ? roman(roundNumber) : round}</span>
           </div>
           <h1 id="victory-title" className="fi-victory-title">{name}</h1>

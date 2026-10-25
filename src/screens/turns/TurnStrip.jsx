@@ -21,7 +21,7 @@ function centreCurrent(list) {
 /** Flag (or club monogram) at the strip's sizes: current 32×24, others 20×15 (CSS resizes them on phones). */
 function Mark({ entry, current = false }) {
   const width = current ? 32 : 20;
-  return <TeamMark id={entry.flagId} code={entry.code} color={entry.color} isClub={entry.isClub} width={width} height={width * .75} />;
+  return <TeamMark id={entry.flagId} teamId={entry.teamId} code={entry.code} color={entry.color} isClub={entry.isClub} width={width} height={width * .75} />;
 }
 
 function Detail({ detail, detailShort }) {

@@ -38,7 +38,7 @@ export default function FrontsTable({ fronts = null, onSelectTeam }) {
               <td className="fronts__cell fronts__cell--nation">
                 <span className="fronts__nation">
                   <span className="fronts__flag" aria-hidden="true">
-                    <TeamMark id={row.flagId} code={row.code} color={row.color} isClub={row.isClub} width={24} height={18} />
+                    <TeamMark id={row.flagId} teamId={row.teamId} code={row.code} color={row.color} isClub={row.isClub} width={24} height={18} />
                   </span>
                   {select
                     ? <button type="button" className="fronts__name fronts__name--button" aria-label={`View ${row.name} squad`}

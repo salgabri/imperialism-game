@@ -119,7 +119,7 @@ test('buildSquad reproduces board C1: kicker, XI, groups, table cells, depth, pi
   assert.equal(byName['M. Kean'].source, 'FM 26');
   assert.equal(byName['A. Bastoni'].source, 'EA FC 26');
   assert.equal(byName['A. Bastoni'].acquired, null);
-  assert.deepEqual(byName['J. Gvardiol'].acquired, { flagId: '191', isClub: false, code: 'CRO', roman: 'R XX', label: 'CRO · R XX' });
+  assert.deepEqual(byName['J. Gvardiol'].acquired, { flagId: '191', teamId: '191', isClub: false, code: 'CRO', roman: 'R XX', label: 'CRO · R XX' });
   assert.equal(byName['S. Milinković-Savić'].acquired.label, 'SRB · R XXVII');
 
   assert.deepEqual(model.depth.rows.map(row => [row.no, row.pos, row.name, row.inRole]),

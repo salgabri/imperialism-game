@@ -15,7 +15,7 @@ export default function ClaimedList({ rows = [] }) {
           {rows.map(row => (
             <li key={row.key} className="claimed-row">
               <span className="claimed-row__round">{row.roman}</span>
-              <SquadFlag flagId={row.flagId} isClub={row.isClub} width={18} height={13} />
+              <SquadFlag flagId={row.flagId} teamId={row.teamId} isClub={row.isClub} width={18} height={13} />
               <span className="claimed-row__name" title={`${row.name} · ${row.fromName}`}>
                 {row.name} <span className="claimed-row__from">· {row.fromName}</span>
               </span>

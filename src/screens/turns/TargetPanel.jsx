@@ -69,7 +69,7 @@ export default function TargetPanel({ count = '', rows = [], selectedId = null, 
               onPointerEnter={() => onHover?.(row.teamId)}>
               <span className="radio-square radio-square--sm" aria-hidden="true" />
               <span className="target-panel__mark" aria-hidden="true">
-                <TeamMark id={row.flagId} code={row.code} color={row.color} isClub={row.isClub} width={20} height={15} />
+                <TeamMark id={row.flagId} teamId={row.teamId} code={row.code} color={row.color} isClub={row.isClub} width={20} height={15} />
               </span>
               <span className="target-panel__name">{row.name}<span className="target-panel__eff num">{row.eff}</span></span>
               <span className="target-panel__spoils num">{row.spoils}</span>

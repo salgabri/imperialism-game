@@ -518,7 +518,7 @@ test('match preview keeps the tactical contract, adds the board-07 preview and c
   st.tacticalChoice = { aId: '688', dId: '380', route: { routeKind: 'sea', isNeighbor: false }, managerName: 'Italy', opponentName: 'Serbia', options };
   const preview = ledgerVM.buildMatchPreview(st, ctxFor());
   const claimedRow = preview.b.lineup.find(row => row.claimed);
-  assert.deepEqual({ ...claimedRow.claimed, color: undefined }, { code: 'AUT', roman: 'R XII', label: 'AUT · R XII', flagId: '040', isClub: false, color: undefined });
+  assert.deepEqual({ ...claimedRow.claimed, color: undefined }, { code: 'AUT', roman: 'R XII', label: 'AUT · R XII', flagId: '040', isClub: false, teamId: '040', color: undefined });
   assert.ok(preview.b.lineup.some(row => row.outOfPosition));
   const chosen = [], closed = [], simulated = [];
   const view = await mount(TacticalChoice, { choice: st.tacticalChoice, preview, onChoose: id => chosen.push(id),

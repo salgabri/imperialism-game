@@ -182,8 +182,8 @@ export default function SquadScreen({
     );
   }
   const tools = { back, home, canFollow, following, alive, teamId, onBack, onFollow, onSelectTeam };
-  const mark = team ? <TeamMark id={team.flagId} code={team.code} color={team.color} isClub={team.isClub} width={48} height={36} /> : null;
-  const phoneMark = team ? <TeamMark id={team.flagId} code={team.code} color={team.color} isClub={team.isClub} width={32} height={24} /> : null;
+  const mark = team ? <TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={48} height={36} /> : null;
+  const phoneMark = team ? <TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={32} height={24} /> : null;
 
   return (
     <section {...root} data-tab={tab} data-layout={layout}>

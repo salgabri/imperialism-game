@@ -74,6 +74,7 @@ export function victoryPanel() {
     : this.scopeName(settings);
   return {
     id: champ.flagId,
+    teamId: champ.id,
     code: champ.code,
     isClub: champ.kind === 'club',
     round: pad3(round),

@@ -123,6 +123,9 @@
   color:var(--ink); background:var(--surface-2); border:1px solid var(--rule); border-radius:0;
   font:700 clamp(7px, calc(var(--mark-h, 24px) * .42), 16px)/1 var(--font-narrow); letter-spacing:.02em; text-transform:uppercase;
 }
+/* A club's crest in the monogram's box: the crest alone, whole, on no chip. */
+.fi-team-monogram--logo { background:none; border:0; }
+.fi-team-monogram--logo > img { display:block; width:100%; height:100%; object-fit:contain; filter:var(--crest-filter); }
 
 /* ---- Rating box and tones ---- */
 .rating-box {

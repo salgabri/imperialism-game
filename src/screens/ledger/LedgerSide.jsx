@@ -56,7 +56,7 @@ export function FallenList({ fallen = [], aside = '', onSelectTeam }) {
             <li key={entry.key} className="ledger-fallen__row">
               <button type="button" className="ledger-fallen__team" data-team-id={entry.teamId}
                 onClick={() => onSelectTeam?.(entry.teamId)}>
-                <span className="ledger-fallen__mark" aria-hidden="true"><TeamMark id={entry.flagId} code={entry.code} isClub={entry.isClub} width={24} /></span>
+                <span className="ledger-fallen__mark" aria-hidden="true"><TeamMark id={entry.flagId} teamId={entry.teamId} code={entry.code} isClub={entry.isClub} width={24} /></span>
                 <span className="ledger-fallen__text">
                   <span className="ledger-fallen__name">{entry.name}</span>
                   {entry.line && <span className="ledger-fallen__line">{entry.line}</span>}

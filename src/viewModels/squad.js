@@ -170,7 +170,7 @@ function acquiredOf(prov) {
   if (!prov) return null;
   const code = prov.from || '';
   const round = prov.joined ? `R ${roman(prov.joined)}` : '';
-  return { flagId: prov.flagId, isClub: prov.isClub, code, roman: round, label: [code, round].filter(Boolean).join(' · ') };
+  return { flagId: prov.flagId, teamId: prov.fromId, isClub: prov.isClub, code, roman: round, label: [code, round].filter(Boolean).join(' · ') };
 }
 
 function gainOf(prov) {
@@ -285,7 +285,7 @@ function computeSquad(st, ctx, team) {
       const rating = Math.round(Number(player.rating) || 0);
       return {
         key: `c-${index}`, roman: prov.joined ? `R ${roman(prov.joined)}` : '', joined: prov.joined,
-        flagId: prov.flagId, isClub: prov.isClub, code: prov.from || '', name: player.name || '',
+        flagId: prov.flagId, teamId: prov.fromId, isClub: prov.isClub, code: prov.from || '', name: player.name || '',
         fromName: prov.fromName || prov.from || '', gain: gain.text, tone: gain.tone,
         pos: player.pos || '', rating, tier: ratingTier(rating),
         status: starter ? 'Starter' : 'Depth', detail: starter && prov.replaced ? `Starts ahead of ${prov.replaced}` : null,

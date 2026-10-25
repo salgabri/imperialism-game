@@ -70,6 +70,7 @@ npm run build-rosters   # regenerate football squads from an EA FC player CSV
 npm run build-basketball # regenerate basketball squads from an NBA 2K export
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # refresh country club snapshots (network, cached)
+npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
@@ -359,7 +360,8 @@ motion replaces spinning with a short, static directional reveal.
 
 In **Flags** mode each nation has its flag as the territory background, and
 conquered land adopts its owner's banner. Countries outside the active campaign
-stay neutral without flags. Clubs fly no flags and keep their own colours.
+stay neutral without flags. Clubs keep their own colours and fly their
+[crest](#club-crests) on them.
 
 Fourteen [symbol-aware flag designs](docs/design/flag-symbols.md) separate the
 continuous field from their emblem. Crosses, discs and coats of arms keep their
@@ -467,10 +469,10 @@ homeland itself and the rest fan outwards, which is why an all-leagues campaign
 opens with Europe carved up and the strongest sides at its centre. Countries
 nobody reaches stay neutral, exactly as non-participating nations do.
 
-Clubs have no crest in either dataset, so their territory is painted in a
-generated colour rather than a flag — identical national flags would tell you
-nothing. Everything else (capital markers, the power table, squad panels,
-conquest, player theft) behaves identically.
+A club's territory is painted in a generated colour rather than a flag —
+identical national flags would tell you nothing — and wherever a nation shows its
+flag, a club shows its [crest](#club-crests). Everything else (capital markers,
+the power table, squad panels, conquest, player theft) behaves identically.
 
 Club lineups come from the same two exports as the national squads:
 `clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
@@ -518,7 +520,7 @@ labels the marker **Home town** instead of Capital. Tooltips name the section
 and read "Home of Burnley", "Held by … since Round …" or "Unclaimed". The
 conquest screen and results name the sections taken. When an exclave's attack
 has to cross a neighbour, the Next fixture route line reads "Through foreign
-land — never claimed". In Flags mode, clubs keep their own colours.
+land — never claimed". In Flags mode, clubs keep their own colours and carry their crests.
 
 Each country is one file, `public/domestic/<id>.json`, fetched only when chosen.
 The setup screen shows a loading state, and Retry if the fetch fails. The setup
@@ -705,7 +707,8 @@ are drawn as separate flag parts beneath a single clickable outline, preserving 
 country selection. Bounds update after conquest, not on zoom or pan. Only land
 reveals the flag; seas and neutral countries stay untouched. A solid rectangle
 in the nation's colour is the fallback. Non-participants remain unflagged in
-continental campaigns, and clubs continue to use club colours.
+continental campaigns. A club's land keeps its club colour with its crest placed
+on it, below.
 
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
@@ -717,6 +720,33 @@ Natural Earth attribute table with two football-specific overrides: England
 numeric code. The SVGs are vendored into `public/flags/` from the MIT-licensed
 [`flag-icons`](https://github.com/lipis/flag-icons) package, so the built app has
 no runtime dependency on it.
+
+### Club crests
+
+A club with a crest shows it wherever a nation shows its flag: the masthead,
+popups, standings, fronts, the turn strip, match and squad screens, setup and the
+victory screen. In **Flags** mode its land keeps the club colour and carries the
+crest, placed like a flag's emblem: one undistorted crest per region, fitted on
+owned land at up to about a quarter of it. Land too small for one stays plain. A
+club without a crest keeps its monogram chip.
+
+The crests come from Wikipedia. `npm run sync:club-logos` finds each club's
+Wikidata item, takes the lead image of its English Wikipedia article (the infobox
+crest, else the item's logo image on Wikimedia Commons), and saves it as a WebP
+fitting 128×128 in `public/club-logos/<club id>.webp`. Domestic clubs reuse the
+item their home town came from. An all-leagues club shares its domestic twin's
+file: the club of its country whose FM26 squad shares the most players with its
+EA FC 26 lineup. NBA franchises are matched by name. Overrides go in
+`scripts/data/club-logos.json`: `items` maps a club id to a Wikidata item, and
+`files` maps it to a file name, or to `null` for no crest. Responses and
+images are cached in the ignored `data-src/club-logos/`, so reruns are offline;
+`--refresh` asks Wikidata and Wikipedia again.
+
+Crests are the clubs' trademarks, and most are non-free files that Wikipedia
+hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records
+each club's file, its licence as Wikipedia records it, and its file page.
+`src/data/clubLogos.js` lists which clubs have a crest, so the game never
+requests a missing file.
 
 ## Capitals
 
@@ -885,6 +915,7 @@ public/
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
   flags/               170 vendored flag SVGs
+  club-logos/          club crests from Wikipedia, with SOURCES.tsv
 scripts/
   test.mjs             runs every scripts/*.test.mjs (npm test)
   lib/app-harness.mjs  shared App/component harness for the jsdom tests
@@ -897,6 +928,7 @@ scripts/
   build-clubs.mjs      builds the club layer for both sports
   sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
+  sync-club-logos.mjs  vendors club crests from Wikipedia
   build-football-set.mjs  builds a local football season from a CM 01/02 database
 ```
 
@@ -939,7 +971,7 @@ every shipped country with legal duel draws.
 The suite asserts that each match eliminates exactly one team, that no territory
 is lost or duplicated, and that one player changes shirts per match. It checks
 that setup and kickoff open on the Political map, national flag ownership after
-switching to Flags, club colours, structured result rewards, the Chronicle,
+switching to Flags, club colours and crests, structured result rewards, the Chronicle,
 Ledger and Squad screens opened through the masthead, victory, and absence of
 React warnings.
 

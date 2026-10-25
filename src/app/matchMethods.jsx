@@ -87,6 +87,8 @@ export function presentMatch() {
       label: `Round ${roman(st.round) || st.round} — ${a.name} attacks ${d.name}`,
       aId: a.flagId,
       bId: d.flagId,
+      aTeamId: a.id,
+      bTeamId: d.id,
       aCode: a.code,
       aCol: a.col,
       aName: a.name,

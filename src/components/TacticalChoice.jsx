@@ -13,7 +13,7 @@ import './dialogs.css';
 function Side({ team, align }) {
   return (
     <div className={`fi-tactical-side fi-tactical-side--${align}${team.you ? ' is-you' : ''}`}>
-      <span className="fi-tactical-side__mark"><TeamMark id={team.flagId} code={team.code} color={team.color} isClub={team.isClub} width={48} /></span>
+      <span className="fi-tactical-side__mark"><TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={48} /></span>
       <div className="fi-tactical-side__text">
         <span className="fi-tactical-side__role">{team.role}{team.you ? ' · You' : ''}</span>
         <span className="fi-tactical-side__name">{team.name}</span>
@@ -57,7 +57,7 @@ function LineupRow({ row }) {
         <span className="fi-tactical-xi__claimed" title="Claimed in conquest">
           {(claimed.flagId || claimed.isClub) && (
             <span className="fi-tactical-xi__from" aria-hidden="true">
-              <TeamMark id={claimed.flagId} code={claimed.code} color={claimed.color} isClub={claimed.isClub} width={16} height={12} />
+              <TeamMark id={claimed.flagId} teamId={claimed.teamId} code={claimed.code} color={claimed.color} isClub={claimed.isClub} width={16} height={12} />
             </span>
           )}
           <span className="sr-only">claimed from </span>{claimedLabel}

@@ -349,7 +349,7 @@ export function lineupCopy(sportId) {
   return sportId === 'basketball' ? { label: 'Starting five', short: 'Five' } : { label: 'Starting XI', short: 'XI' };
 }
 
-/** Former team of a claimed player: `fromId` (DEC D8) → the team with that code. A flag only for nations. */
+/** Former team of a claimed player: `fromId` (DEC D8) → the team with that code. A flag only for nations; a club's crest by its id. */
 function claimedFrom(player, teams) {
   if (player?.from == null && player?.fromId == null) return null;
   const byId = player.fromId != null ? teams[player.fromId] : null;
@@ -361,6 +361,7 @@ function claimedFrom(player, teams) {
     code, roman: numeral, label: [code, numeral].filter(Boolean).join(' · '),
     flagId: from && from.kind !== 'club' ? from.flagId ?? from.id ?? null : null,
     isClub: from ? from.kind === 'club' : false,
+    teamId: from?.id ?? null,
     color: from?.col ?? null,
   };
 }

@@ -26,7 +26,7 @@ export default function SquadAcquisitions({ acquisitions }) {
           {rows.map(row => (
             <div key={row.key} className={`squad-acq__row${row.detail ? ' has-detail' : ''}`} role="row">
               <span className="squad-acq__round" role="cell">{row.roman}</span>
-              <span role="cell"><SquadFlag flagId={row.flagId} isClub={row.isClub} width={18} height={13} /></span>
+              <span role="cell"><SquadFlag flagId={row.flagId} teamId={row.teamId} isClub={row.isClub} width={18} height={13} /></span>
               <span className="squad-acq__player" role="cell">
                 <span className="squad-acq__name" title={row.name}>{row.name}</span>
                 {row.detail && <span className="squad-acq__detail">{row.detail}</span>}

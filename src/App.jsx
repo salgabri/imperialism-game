@@ -466,9 +466,12 @@ export default class App extends React.Component {
     }));
     this.flagLayoutCache = null;
     this.viewFocus = null;
+    // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together.
+    this.flagComponents = createFlagRegionIndex(this.labelGeometry, {
+      maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit,
+    });
     if (domestic) {
-      // Clubs fly no flags. The opening camera leaves out far outliers.
-      this.flagComponents = null;
+      // Setup shows no flags on a country map (its clubs carry crests, not flags). The opening camera leaves out far outliers.
       this.setupFlagOwnership = {};
       this.backdrop = this.domesticBackdrop(domestic);
       this.viewFocus = this.geo.focusView(domestic.focus);
@@ -476,9 +479,6 @@ export default class App extends React.Component {
       return;
     }
     this.backdrop = [];
-    this.flagComponents = createFlagRegionIndex(this.labelGeometry, {
-      maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit,
-    });
     this.setupFlagOwnership = Object.fromEntries(this.geo.countries
       .filter(country => NATIONS[country.id] || DEPENDENCIES[country.id])
       .map(country => [country.id, country.id]));

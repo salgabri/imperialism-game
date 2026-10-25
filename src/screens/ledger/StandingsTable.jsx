@@ -46,7 +46,7 @@ export default function StandingsTable({ rows = [], selectedTeamId = null, youLa
               <td className="fi-standings__team">
                 <button type="button" className="fi-standing-team" data-team-id={team.tid} onClick={() => onSelectTeam?.(team.tid)}
                   aria-label={`View ${team.name} squad`} aria-current={selected ? 'true' : undefined}>
-                  <TeamMark id={team.flagId} code={team.code} color={team.color} isClub={team.isClub} width={20} />
+                  <TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={20} />
                   <span title={team.name}>{team.name}</span>
                   {team.you && youLabel && <span className="fi-standing-you" aria-hidden="true">{youLabel}</span>}
                 </button>

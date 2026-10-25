@@ -37,6 +37,7 @@
     "sync:domestic-clubs": "node scripts/sync-domestic-clubs.mjs",
     "build:domestic": "node scripts/build-domestic.mjs",
     "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs",
+    "sync:club-logos": "node scripts/sync-club-logos.mjs",
     "build:football-set": "node scripts/build-football-set.mjs",
     "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs"
   },
@@ -52,6 +53,7 @@
     "flag-icons": "^7.5.0",
     "jsdom": "^30.0.1",
     "polygon-clipping": "^0.15.7",
+    "sharp": "^0.34.5",
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",
     "topojson-simplify": "^3.0.3",

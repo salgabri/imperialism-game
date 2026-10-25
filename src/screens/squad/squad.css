@@ -44,6 +44,8 @@
   background: var(--flag-bg); box-shadow: var(--shadow-flag);
 }
 .squad-flag .squad-flag__img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.squad-flag.squad-flag--logo { background: none; box-shadow: none; }
+.squad-flag--logo .squad-flag__img { object-fit: contain; filter: var(--crest-filter); }
 
 /* ---- desktop / tablet header (C§3) ---- */
 .squad-head {

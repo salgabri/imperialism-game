@@ -4,7 +4,7 @@ import TeamMark from '../../components/TeamMark.jsx';
 import { useMatchMinute } from './useMatchMinute.js';
 
 function Side({ team, align }) {
-  const mark = <TeamMark id={team.flagId} code={team.code} color={team.color} isClub={team.isClub} width={28} height={21} />;
+  const mark = <TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={28} height={21} />;
   return (
     <div className={`match-score__side match-score__side--${align}`}>
       <div className="match-score__label">

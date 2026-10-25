@@ -53,7 +53,7 @@ export default function SquadRow({ row, showSource = true }) {
       <span className="squad-row__rtg" role="cell"><span className="rating-box" data-tier={row.tier}>{row.rating}</span></span>
       <span className="squad-row__acq" role="cell">
         {acquired && <>
-          <SquadFlag flagId={acquired.flagId} isClub={acquired.isClub} width={16} height={12} />
+          <SquadFlag flagId={acquired.flagId} teamId={acquired.teamId} isClub={acquired.isClub} width={16} height={12} />
           <span className="squad-row__acq-label">{acquired.label}</span>
         </>}
       </span>

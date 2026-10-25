@@ -1,6 +1,7 @@
 // Owner: WP-CONQ (see PLAN.md §4). Transient map notices and the match toast, restyled as v4 white floating panels
 // (DEC D15; README §Surfaces). FROZEN named exports and props: Toast({ code, text, color }),
 // MatchupPopup({ label, a, b }), ResultPopup({ label, score, title, sub, upset, color }), StealPopup({ … }).
+// A side's optional `teamId` (`fromTeamId`/`toTeamId`) finds a club's crest.
 // v4 drops team colours from chrome, so `color`/`fromColor`/`toColor` only reach club monograms.
 import React from 'react';
 import TeamMark from './TeamMark.jsx';
@@ -20,7 +21,7 @@ export function Toast({ code, text }) {
 function MatchupSide({ team = {} }) {
   return (
     <div className="fi-matchup-side">
-      <TeamMark id={team.id} code={team.code} color={team.color} isClub={team.isClub || !team.id} width={28} />
+      <TeamMark id={team.id} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub || !team.id} width={28} />
       <span className="fi-matchup-team">
         <strong className="fi-matchup-name">{team.name}</strong>
         {team.eff != null && team.eff !== '' && <small className="fi-matchup-eff">Strength {team.eff}</small>}
@@ -63,16 +64,16 @@ export function ResultPopup({ label, score, title, sub, upset }) {
 }
 
 /** The claimed player moving from the loser to the winner. */
-export function StealPopup({ name, meta, from, fromId, fromColor, to, toId, toColor, sub }) {
+export function StealPopup({ name, meta, from, fromId, fromTeamId, fromColor, to, toId, toTeamId, toColor, sub }) {
   return (
     <div className="fi-map-notice fi-transfer-notice" role="status" data-testid="transfer-notice">
       <div className="fi-notice-label">Player claimed</div>
       <div className="fi-transfer-player"><strong>{name}</strong>{meta && <span>{meta}</span>}</div>
       <div className="fi-transfer-route">
-        <TeamMark id={fromId} code={from} color={fromColor} isClub={!fromId} width={24} />
+        <TeamMark id={fromId} teamId={fromTeamId} code={from} color={fromColor} isClub={!fromId} width={24} />
         <span className="fi-transfer-code">{from}</span>
         <span className="fi-transfer-arrow"><Icon name="arrow" size={16} strokeWidth="2" /><span className="sr-only">to</span></span>
-        <TeamMark id={toId} code={to} color={toColor} isClub={!toId} width={24} />
+        <TeamMark id={toId} teamId={toTeamId} code={to} color={toColor} isClub={!toId} width={24} />
         <span className="fi-transfer-code">{to}</span>
       </div>
       {sub && <p className="fi-transfer-sub">{sub}</p>}

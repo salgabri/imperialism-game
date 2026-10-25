@@ -313,9 +313,11 @@ export function applyConquest(playerIndex) {
               sMeta: `Rating ${stolen.rating} · ${stolen.pos}`,
               sFrom: L.code,
               sFromId: L.flagId,
+              sFromTeamId: L.id,
               sFromCol: L.col,
               sTo: W.code,
               sToId: W.flagId,
+              sToTeamId: W.id,
               sToCol: W.col,
               sSub: `Joins ${W.name}`,
             },
@@ -348,8 +350,8 @@ export function renderPopup() {
     return (
       <MatchupPopup
         label={pu.label}
-        a={{ id: pu.aId, code: pu.aCode, color: pu.aCol, name: pu.aName, eff: pu.aEff }}
-        b={{ id: pu.bId, code: pu.bCode, color: pu.bCol, name: pu.bName, eff: pu.bEff }}
+        a={{ id: pu.aId, teamId: pu.aTeamId, code: pu.aCode, color: pu.aCol, name: pu.aName, eff: pu.aEff }}
+        b={{ id: pu.bId, teamId: pu.bTeamId, code: pu.bCode, color: pu.bCol, name: pu.bName, eff: pu.bEff }}
       />
     );
   }
@@ -362,9 +364,11 @@ export function renderPopup() {
       meta={pu.sMeta}
       from={pu.sFrom}
       fromId={pu.sFromId}
+      fromTeamId={pu.sFromTeamId}
       fromColor={pu.sFromCol}
       to={pu.sTo}
       toId={pu.sToId}
+      toTeamId={pu.sToTeamId}
       toColor={pu.sToCol}
       sub={pu.sSub}
     />

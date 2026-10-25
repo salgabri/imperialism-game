@@ -20,6 +20,7 @@
   --shadow-float:0 0 0 1px rgba(17,20,23,.08), 0 6px 20px rgba(17,20,23,.10);
   --shadow-callout:0 1px 2px rgba(17,20,23,.1), 0 12px 32px rgba(17,20,23,.16);
   --shadow-flag:0 0 0 1px var(--hairline);
+  --crest-filter:none;    /* a club crest sits on no chip; dark mode lifts dark crests off the ground */
   --key-hint-border:rgba(255,255,255,.55);
   /* theme roles: text on an ink fill, the ink strips (ticker, match feed), modal backdrop, hairline rings */
   --on-ink:#ffffff; --strip:#111417; --on-strip:#f5f5f2; --backdrop:rgba(17,20,23,.35);
@@ -69,6 +70,7 @@
   --shadow-float:0 0 0 1px rgba(255,255,255,.07), 0 6px 20px rgba(0,0,0,.45);
   --shadow-callout:0 0 0 1px rgba(255,255,255,.07), 0 12px 32px rgba(0,0,0,.55);
   --shadow-flag:0 0 0 1px rgba(255,255,255,.16);
+  --crest-filter:drop-shadow(0 0 1px rgba(255,255,255,.45));
   --on-ink:#121416; --strip:#0b0c0e; --on-strip:#eceee9; --backdrop:rgba(0,0,0,.6);
   --hairline:rgba(255,255,255,.16); --shadow-sheet:0 -1px 0 var(--rule), 0 -12px 32px rgba(0,0,0,.5);
   --map-border:#14191d; --map-halo:#121416; --map-graticule:#2b363d;

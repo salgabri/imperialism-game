@@ -26,7 +26,7 @@ function TeamRow({ side, role }) {
   return (
     <div className="this-turn__team" data-side={role}>
       <span className="this-turn__mark" aria-hidden="true">
-        <TeamMark id={side.flagId} code={side.code} color={side.color} isClub={side.isClub} width={28} height={21} />
+        <TeamMark id={side.flagId} teamId={side.teamId} code={side.code} color={side.color} isClub={side.isClub} width={28} height={21} />
       </span>
       <span className="this-turn__name">{side.name}</span>
       {side.eff && <span className="this-turn__eff num"><span className="sr-only">strength </span>{side.eff}</span>}
@@ -101,7 +101,7 @@ export default function SpectatorPanel({
         <div className="follow-team" data-empty={follow ? undefined : ''}>
           {follow && (
             <span className="follow-team__mark" aria-hidden="true">
-              <TeamMark id={follow.flagId} code={follow.code} color={follow.color} isClub={follow.isClub} width={28} height={21} />
+              <TeamMark id={follow.flagId} teamId={follow.teamId} code={follow.code} color={follow.color} isClub={follow.isClub} width={28} height={21} />
             </span>
           )}
           <span className="follow-team__text">

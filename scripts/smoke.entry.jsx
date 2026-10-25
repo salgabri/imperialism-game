@@ -7,6 +7,7 @@ import { flushSync } from 'react-dom';
 import App from '../src/App.jsx';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
+import { clubLogoUrl } from '../src/data/clubLogos.js';
 import { DEPENDENCIES, NATIONS, buildClub, makeRng, teamEff } from '../src/data/teams.js';
 import { SAVE_KEY } from '../src/config.js';
 import { campaignStorageKey, exportCampaign, listCampaigns, writeSave } from '../src/engine/storage.js';
@@ -143,19 +144,61 @@ function flagAssetsMatch(pattern, code) {
     && sx >= px - eps && sy >= py - eps && sx + sw <= px + pw + eps && sy + sh <= py + ph + eps;
 }
 
+/** A club's crest URL when it has one (README "Club crests"). */
+const crestOf = team => (team?.kind === 'club' ? clubLogoUrl(team.id) : null);
+/** Whether a team's land carries a banner in Flags mode: a nation's flag or a club's crest. */
+const flies = team => !!(FLAG_CODES[team?.flagId] || crestOf(team));
+
+/** A club crest tile: the club colour across the region and at most one undistorted crest inside it. */
+function crestAssetsMatch(pattern, team) {
+  const crest = crestOf(team);
+  if (!pattern || !crest || pattern.dataset.flagSource !== crest || pattern.dataset.flagLayout !== 'crest'
+    || pattern.getAttribute('patternUnits') !== 'userSpaceOnUse' || pattern.getAttribute('patternContentUnits') !== 'userSpaceOnUse'
+    || pattern.hasAttribute('viewBox') || pattern.hasAttribute('patternTransform') || pattern.getAttribute('pointer-events') !== 'none') return false;
+  const numericBox = node => ['x', 'y', 'width', 'height'].map(name => Number(node.getAttribute(name)));
+  const [, , pw, ph] = numericBox(pattern);
+  const fallback = pattern.querySelector('rect');
+  const images = [...pattern.querySelectorAll('image')];
+  if (pattern.querySelectorAll('rect').length !== 1 || JSON.stringify(numericBox(fallback)) !== JSON.stringify([0, 0, pw, ph])
+    || fallback.getAttribute('fill') !== team.col || images.length > 1
+    || pattern.children.length !== images.length + 1) return false;
+  if (!images.length) return true;
+  const [x, y, w, h] = numericBox(images[0]);
+  const eps = 1e-6;
+  return images[0].getAttribute('href') === crest && images[0].getAttribute('preserveAspectRatio') === 'xMidYMid meet'
+    && w > 0 && h > 0 && x >= -eps && y >= -eps && x + w <= pw + eps && y + h <= ph + eps;
+}
+
+/** The right banner for a region's owner: its crest for a club with one, else its flag. */
+const ownerAssetsMatch = (pattern, team) => (crestOf(team) ? crestAssetsMatch(pattern, team) : flagAssetsMatch(pattern, FLAG_CODES[team?.flagId]));
+
+/** A country's flag parts exactly repaint its filled rings with its owner's banner. */
+function bannerPartsMatch(app, path, owner) {
+  const parts = countryFlagParts(path.dataset.country);
+  return parts.length > 0 && path.getAttribute('fill') === 'transparent'
+    && JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(parts.map(part => part.getAttribute('d')).join('')))
+    && parts.every(part => {
+      const pattern = flagPattern(part);
+      return pattern?.id === `fi-flag-${part.dataset.flagComponent}` && ownerAssetsMatch(pattern, owner);
+    });
+}
+
 /** Validate the actual multipart fills, leaving logical hit/stroke paths intact. */
 function expectedFlagsShown(app) {
   const playing = app.state.phase === 'playing' || app.state.phase === 'victory';
   const paths = countryPaths();
   const domestic = domesticOf(app);
   if (domestic) {
-    // A country map is exactly its sections, painted in club colours: no flags.
+    // A country map is exactly its sections, each in its club's colour with the club's crest when it has one.
+    // Setup flies nothing.
     const ids = paths.map(path => path.dataset.country);
-    if (app.state.mapMode !== 'flags' || ids.length !== domestic.sectionIds.size || !ids.every(id => domestic.sectionIds.has(id))
-      || countryFlagParts().length || document.querySelector('pattern[id^="fi-flag-"]')) return false;
-    return !playing || paths.every(path => {
+    if (app.state.mapMode !== 'flags' || ids.length !== domestic.sectionIds.size || !ids.every(id => domestic.sectionIds.has(id))) return false;
+    if (!playing) return !countryFlagParts().length && !document.querySelector('pattern[id^="fi-flag-"]');
+    return paths.every(path => {
       const owner = app.state.teams[app.state.own[path.dataset.country]];
-      return owner?.kind === 'club' && path.getAttribute('fill') === owner.col && !flagPattern(path);
+      if (owner?.kind !== 'club') return false;
+      if (!crestOf(owner)) return path.getAttribute('fill') === owner.col && !flagPattern(path);
+      return filledRings(path.getAttribute('d')).length ? bannerPartsMatch(app, path, owner) : countryFlagParts(path.dataset.country).length === 0;
     });
   }
   const nationPaths = paths.filter(path => NATIONS[path.dataset.country]);
@@ -165,7 +208,8 @@ function expectedFlagsShown(app) {
     const owner = playing ? app.state.teams[app.state.own[id]] : null;
     const flagId = playing ? owner?.flagId : FLAG_CODES[id] ? id : DEPENDENCIES[id]?.of;
     const parts = countryFlagParts(id);
-    if (owner?.kind === 'club') return parts.length === 0 && !flagPattern(path) && path.getAttribute('fill') === owner.col;
+    if (owner?.kind === 'club' && !crestOf(owner)) return parts.length === 0 && !flagPattern(path) && path.getAttribute('fill') === owner.col;
+    if (owner?.kind === 'club') return filledRings(path.getAttribute('d')).length === 0 ? parts.length === 0 : bannerPartsMatch(app, path, owner);
     if (!FLAG_CODES[flagId]) return parts.length === 0 && !flagPattern(path);
     if (filledRings(path.getAttribute('d')).length === 0) return parts.length === 0;
     return parts.length > 0 && path.getAttribute('fill') === 'transparent'
@@ -219,8 +263,7 @@ function empireFlagsSnapshot(app) {
     if (!pattern) { localBounds = false; coversEveryPolygon = false; correctOwner = false; continue; }
     correctOwner &&= componentParts.every(part => {
       const ownerId = app.state.own[part.dataset.flagCountry];
-      return pattern.dataset.owner === ownerId
-        && flagAssetsMatch(pattern, FLAG_CODES[app.state.teams[ownerId]?.flagId]);
+      return pattern.dataset.owner === ownerId && ownerAssetsMatch(pattern, app.state.teams[ownerId]);
     });
     const bounds = patternBounds(pattern);
     const points = componentParts.flatMap(pathPoints);
@@ -235,10 +278,10 @@ function empireFlagsSnapshot(app) {
   const exactCountryCoverage = countryPaths().every(path => {
     const heldParts = parts.filter(part => part.dataset.flagCountry === path.dataset.country);
     const owner = app.state.teams[app.state.own[path.dataset.country]];
-    if (!FLAG_CODES[owner?.flagId]) return heldParts.length === 0;
+    if (!flies(owner)) return heldParts.length === 0;
     return JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(heldParts.map(part => part.getAttribute('d')).join('')));
   });
-  const unpaintedOwners = app.state.aliveIds.filter(id => FLAG_CODES[app.state.teams[id]?.flagId] && !owners.has(id));
+  const unpaintedOwners = app.state.aliveIds.filter(id => flies(app.state.teams[id]) && !owners.has(id));
   return {
     ownerCount: owners.size,
     componentCount: groups.size,
@@ -247,7 +290,7 @@ function empireFlagsSnapshot(app) {
     unpaintedOwnersHaveNoFillArea: unpaintedOwners.every(id => countryPaths()
       .filter(path => app.state.own[path.dataset.country] === id).every(path => filledRings(path.getAttribute('d')).length === 0)),
     onePatternPerComponent: patterns.length === groups.size && new Set(patterns.map(pattern => pattern.id)).size === groups.size,
-    oneBannerPerPattern: patterns.every(pattern => flagAssetsMatch(pattern, FLAG_CODES[app.state.teams[pattern.dataset.owner]?.flagId])),
+    oneBannerPerPattern: patterns.every(pattern => ownerAssetsMatch(pattern, app.state.teams[pattern.dataset.owner])),
     sharedReferences, localBounds, coversEveryPolygon, correctOwner, exactCountryCoverage,
     signature: JSON.stringify(patterns.map(pattern => ({ id: pattern.id, bounds: patternBounds(pattern), source: pattern.dataset.flagSource,
       layers: [...pattern.querySelectorAll('image')].map(image => ({ url: image.getAttribute('href'), bounds: patternBounds(image), fit: image.getAttribute('preserveAspectRatio') }))
@@ -353,7 +396,7 @@ function regionalFlagsSnapshot(app) {
     const owner = app.state.teams[app.state.own[path.dataset.country]];
     const parts = countryFlagParts(path.dataset.country);
     if (filledRings(path.getAttribute('d')).length === 0) return parts.length === 0;
-    return parts.length > 0 && parts.every(part => flagAssetsMatch(flagPattern(part), FLAG_CODES[owner?.flagId]));
+    return parts.length > 0 && parts.every(part => ownerAssetsMatch(flagPattern(part), owner));
   };
   const neutralMatches = path => !path.getAttribute('fill').startsWith('url(')
     && countryFlagParts(path.dataset.country).length === 0;
@@ -365,9 +408,10 @@ function regionalFlagsSnapshot(app) {
     conqueredCount: conquered.length,
     conqueredKeepOwnerFlags: conquered.every(ownerFlagMatches),
     empireFlags: empireFlagsSnapshot(app),
+    // A held dependency flies its owner's banner (a club's crest); land held by a club without one, or nobody, has none.
     dependenciesCorrect: paths.filter(path => DEPENDENCIES[path.dataset.country]).every(path => {
       const owner = app.state.teams[app.state.own[path.dataset.country]];
-      return owner?.kind !== 'club' && owner ? ownerFlagMatches(path) : neutralMatches(path);
+      return owner && (owner.kind !== 'club' || crestOf(owner)) ? ownerFlagMatches(path) : neutralMatches(path);
     }),
   };
 }
@@ -2002,12 +2046,12 @@ export async function run(scenario) {
     const politicalConquest = countryPaths().filter(path => path.dataset.owner).every(path =>
       path.dataset.owner === champion.id && path.getAttribute('fill') === kickoffColors[champion.id]);
 
-    // Return to Flags: only owned territory receives the current owner's flag.
+    // Return to Flags: only owned territory receives the current owner's flag (a club's crest).
     button('Flags').click();
     await until('flag map selected', () => app.state.mapMode === 'flags');
     const heldPaths = countryPaths().filter(path => path.dataset.owner);
     const patterns = [...new Set(countryFlagParts().map(flagPattern).filter(Boolean))];
-    const championFlag = patterns.filter(pattern => flagAssetsMatch(pattern, FLAG_CODES[champion.flagId]));
+    const championFlag = patterns.filter(pattern => ownerAssetsMatch(pattern, champion));
     const flagFills = heldPaths.filter(path => countryFlagParts(path.dataset.country).length > 0).length;
     const paintableTerritories = heldPaths.filter(path => filledRings(path.getAttribute('d')).length > 0).length;
     const uniqueHeldPatterns = new Set(patterns.map(pattern => pattern.id)).size;
@@ -2049,6 +2093,7 @@ export async function run(scenario) {
       uniqueHeldPatterns,
       championFill, flagFills, paintableTerritories,
       patternsFlyingChampionFlag: championFlag.length,
+      championCrest: !!crestOf(champion),
       logEntries: app.state.log.length,
       victoryScreen,
       campaignIdle: app.state.spin === null && app.timers.size === 0,

@@ -122,7 +122,7 @@ export default function CommandBar(props) {
   const dateline = masthead ? `${masthead.roundLabel} · ${masthead.remain}` : `Round ${numeral || round || 0} · ${alive ?? 0} remaining`;
   const roundShort = masthead?.roundShort ?? (numeral ? `R ${numeral}` : '');
   const team = masthead?.team || null;
-  const mark = team ? <TeamMark id={team.flagId} code={team.code} color={team.color} isClub={team.isClub} width={22} height={16} /> : null;
+  const mark = team ? <TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={22} height={16} /> : null;
 
   return (
     <header className="mast" data-variant={masthead?.variant}>

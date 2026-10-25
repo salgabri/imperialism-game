@@ -75,6 +75,24 @@ function assertUserSpace(pattern, flag) {
   assert.equal(fallback.hasAttribute('stroke'), false);
 }
 
+test('a club crest is one undistorted emblem on the club colour, and small land keeps the plain colour', () => {
+  const crest = nativeFlag({ id: 'f-arsenal-826', ownerId: 'f-arsenal', url: '/club-logos/f-arsenal.webp', crestUrl: '/club-logos/f-arsenal.webp',
+    color: 'oklch(0.72 0.16 138)', symbolLayout: { field: { x: 120, y: -40, w: 270, h: 90 }, symbol: { x: 200, y: -25, w: 30, h: 30 } } });
+  const pattern = render(crest).querySelector('pattern');
+  assertUserSpace(pattern, crest);
+  assert.equal(pattern.dataset.flagLayout, 'crest');
+  const images = pattern.querySelectorAll('image');
+  assert.equal(images.length, 1, 'the crest alone: no field artwork behind it');
+  assert.equal(images[0].getAttribute('href'), crest.crestUrl);
+  assert.equal(images[0].getAttribute('preserveAspectRatio'), 'xMidYMid meet');
+  assert.deepEqual(worldBox(images[0], pattern), crest.symbolLayout.symbol, 'the crest sits where the layout placed it');
+
+  const tiny = { ...crest, symbolLayout: null };
+  const plain = render(tiny).querySelector('pattern');
+  assertUserSpace(plain, tiny);
+  assert.equal(plain.querySelectorAll('image').length, 0, 'no stretched crest on land too small for one');
+});
+
 test('native banners keep one original owner asset at the geographic pattern origin', () => {
   const flag = nativeFlag();
   const pattern = render(flag).querySelector('pattern');

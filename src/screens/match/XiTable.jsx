@@ -37,7 +37,7 @@ export default function XiTable({ title = '', teamId = null, rows = [], onSelect
                   <span className="match-xi__claimed">
                     {row.claimed && (
                       <span className="match-xi__tag" title={row.claimed.label}>
-                        <TeamMark id={row.claimed.flagId} code={row.claimed.code} color={row.claimed.color}
+                        <TeamMark id={row.claimed.flagId} teamId={row.claimed.teamId} code={row.claimed.code} color={row.claimed.color}
                           isClub={row.claimed.isClub} width={14} height={10} />
                         <span className="match-xi__tag-text" aria-hidden="true">{row.claimed.roman || row.claimed.code}</span>
                         <span className="sr-only">{`, ${row.claimed.label}`}</span>
