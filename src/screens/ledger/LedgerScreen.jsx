@@ -1,6 +1,6 @@
 // Owner: WP-LEDGER (see PLAN.md §4). Ledger view (DEC D16): standings in the v4 table pattern with Conq./Claimed
 // columns, share of the map and the fallen empires. Model: buildLedger(st, ctx, powerRows) (src/viewModels/ledger.js).
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import LedgerHead from './LedgerHead.jsx';
 import StandingsTable from './StandingsTable.jsx';
 import { FallenList, MapShare } from './LedgerSide.jsx';
@@ -12,6 +12,11 @@ export default function LedgerScreen({
   standingsAside = '', fallenAside = '', selectedTeamId = null, onSelectTeam,
 }) {
   const aside = standingsAside || `${rows.length} ${rows.length === 1 ? 'empire' : 'empires'}`;
+  // One handler calling the latest onSelectTeam (App passes a new one per render), so the memoised standings table
+  // is skipped while its rows are unchanged.
+  const selectRef = useRef(onSelectTeam);
+  selectRef.current = onSelectTeam;
+  const selectTeam = useCallback(id => selectRef.current?.(id), []);
   return (
     <section id="view-panel-ledger" className="screen screen--ledger" aria-labelledby="view-tab-ledger" tabIndex={-1}>
       <div className="ledger">
@@ -24,7 +29,7 @@ export default function LedgerScreen({
                 ? <span className="kicker__aside" data-testid="session-remaining" role="status">{session}</span>
                 : <span className="kicker__aside">{aside}</span>}
             </div>
-            <StandingsTable rows={rows} selectedTeamId={selectedTeamId} youLabel={youLabel || (youId ? 'You' : '')} onSelectTeam={onSelectTeam} />
+            <StandingsTable rows={rows} selectedTeamId={selectedTeamId} youLabel={youLabel || (youId ? 'You' : '')} onSelectTeam={selectTeam} />
           </section>
           <aside className="ledger-side" aria-label="Map share and fallen empires">
             <MapShare share={share} />

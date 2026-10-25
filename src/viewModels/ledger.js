@@ -152,7 +152,8 @@ export function buildLedger(st, ctx, powerRows) {
   const stats = st?.stats || {};
   const teams = st?.teams || {};
   const youId = ctx?.perspectiveId ?? ctx?.managedId ?? null;
-  const rows = source.map(row => {
+  // One rows array per standings, stats and perspective, so the memoised table skips the renders of a match.
+  const rows = memo(ctx?.cache, 'ledger:rows', [source, st?.stats, youId], () => source.map(row => {
     const gainText = row?.effGain?.text ?? '±0.0';
     return {
       ...row,
@@ -161,7 +162,7 @@ export function buildLedger(st, ctx, powerRows) {
       delta: { text: gainText, tone: toneOfText(gainText) },
       you: youId != null && row.tid === youId,
     };
-  });
+  }));
   const fallen = fallenRows(st, ctx);
   const total = Object.keys(teams).length;
   const alive = (st?.aliveIds || []).length;

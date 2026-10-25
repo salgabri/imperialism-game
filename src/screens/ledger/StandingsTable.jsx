@@ -22,7 +22,8 @@ function StrengthCell({ eff, effGain, delta }) {
   );
 }
 
-export default function StandingsTable({ rows = [], selectedTeamId = null, youLabel = 'You', onSelectTeam }) {
+// Memoised: the rows keep their identity until the standings change and LedgerScreen passes a stable handler.
+export default React.memo(function StandingsTable({ rows = [], selectedTeamId = null, youLabel = 'You', onSelectTeam }) {
   return (
     <table className="fi-standings">
       <caption className="sr-only">Empires still in the campaign, strongest first. Select a team to view its squad.</caption>
@@ -61,4 +62,4 @@ export default function StandingsTable({ rows = [], selectedTeamId = null, youLa
       </tbody>
     </table>
   );
-}
+});

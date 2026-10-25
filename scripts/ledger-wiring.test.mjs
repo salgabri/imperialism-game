@@ -205,6 +205,26 @@ test('the vm cache memoises the chronicle feed and fallen list across renders', 
   } finally { f.close(); }
 });
 
+test('the vm cache builds the standings once per survivors, squads, holdings and stats', () => {
+  const f = syncAppFixture({ ids: ['250', '276', '826'] });
+  try {
+    const ledger = f.app.ledgerModel();
+    assert.equal(ledger.rows.length, 3);
+    assert.equal(f.app.powerTable(true), f.app.powerTable(true), 'one lineup search per alive team, not one per render');
+    assert.equal(f.app.ledgerModel().rows, ledger.rows, 'the memoised standings table gets the same rows between changes');
+    f.app.setState({ stats: { '250': { conq: 4, steals: [{ name: 'p' }] } } });
+    const france = f.app.ledgerModel().rows.find(row => row.tid === '250');
+    assert.deepEqual([france.conq, france.claimed], ['4', '1'], 'new stats rebuild the rows');
+    f.app.setState({ own: { ...f.app.state.own, '826': '250' } });
+    assert.equal(f.app.ledgerModel().rows.find(row => row.tid === '250').territories, '2', 'new holdings rebuild the table');
+    const teams = { ...f.app.state.teams, '276': { ...f.app.state.teams['276'], name: 'Renamed' } };
+    f.app.setState({ teams });
+    assert.equal(f.app.powerTable(true).find(row => row.tid === '276').name, 'Renamed', 'new teams rebuild the table');
+    f.app.setState({ aliveIds: ['250', '276'] });
+    assert.deepEqual(f.app.powerTable(true).map(row => row.tid).sort(), ['250', '276'], 'new survivors rebuild the table');
+  } finally { f.close(); }
+});
+
 test('match preview model frames the pending tactical gate from the manager side', () => {
   const f = syncAppFixture({ ids: ['250', '276', '826'], role: 'manager' });
   try {

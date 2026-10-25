@@ -340,6 +340,17 @@ test('ledger renders the built model and an empty fallen list', async context =>
   assertConsoleClean();
 });
 
+test('standings and fallen rows call the latest select handler', async context => {
+  const ledger = ledgerVM.buildLedger(baseState(), ctxFor(), [powerRow(0)]);
+  const picked = [];
+  const view = await mount(LedgerScreen, { ...ledger, onSelectTeam: id => picked.push(['old', id]) }, context);
+  await view.render({ ...ledger, onSelectTeam: id => picked.push(['new', id]) });
+  await act(async () => view.host.querySelector('.fi-standings [data-team-id="t0"]').click());
+  await act(async () => view.host.querySelector('.ledger-fallen [data-team-id="040"]').click());
+  assert.deepEqual(picked, [['new', 't0'], ['new', '040']]);
+  assertConsoleClean();
+});
+
 // ---------- Chronicle screen (ported Sidebar History tests) ----------
 const fixtures = [
   { id: 'm1', round: 1, aId: 'a', bId: 'b', a: { teamId: 'a', name: 'Alfa', code: 'ALF', score: 2 }, b: { teamId: 'b', name: 'Beta', code: 'BET', score: 1 } },

@@ -10,6 +10,7 @@ import { campaignRecap } from '../engine/campaignExperience.js';
 import { getLoadedDomestic } from '../engine/domestic.js';
 import { domesticEntry } from '../data/domesticScope.js';
 import * as ledgerVM from '../viewModels/ledger.js';
+import { memo } from '../viewModels/format.js';
 import { domesticIdOf, signed } from './shared.js';
 
 function isPlaying(st) {
@@ -42,28 +43,32 @@ function ledgerContext() {
  * Ledger's `conq` / `claimed` counts (`stats: {}` tolerated).
  */
 export function powerTable(playing) {
-  const { aliveIds, teams, stats } = this.state;
+  const { aliveIds, teams, stats, own } = this.state;
   if (!playing || !this.geo) return [];
-  const board = this.board();
-  return aliveIds
-    .map(tid => ({ tid, eff: teamEff(teams[tid]), terr: territories(board, tid).length }))
-    .sort((a, b) => b.eff - a.eff || teams[a.tid].name.localeCompare(teams[b.tid].name) || a.tid.localeCompare(b.tid))
-    .map((r, i) => ({
-      tid: r.tid,
-      flagId: teams[r.tid].flagId,
-      isClub: teams[r.tid].kind === 'club',
-      rank: i + 1,
-      code: teams[r.tid].code,
-      color: teams[r.tid].col,
-      name: teams[r.tid].name,
-      territories: String(r.terr),
-      eff: r.eff.toFixed(1),
-      // How much of that rating was bought with conquest rather than born with.
-      effGain: signed(r.eff - (teams[r.tid].baseEff ?? r.eff)),
-      teamId: r.tid,
-      conq: String(stats?.[r.tid]?.conq ?? 0),
-      claimed: String(stats?.[r.tid]?.steals?.length ?? 0),
-    }));
+  // A lineup search per alive team: built once per change of survivors, squads, holdings or stats (state replaces
+  // them, never edits them) rather than on every render of the Ledger. territories() reads only `own`.
+  return memo(this.vmCache, 'ledger:power', [aliveIds, teams, stats, own], () => {
+    const board = this.board();
+    return aliveIds
+      .map(tid => ({ tid, eff: teamEff(teams[tid]), terr: territories(board, tid).length }))
+      .sort((a, b) => b.eff - a.eff || teams[a.tid].name.localeCompare(teams[b.tid].name) || a.tid.localeCompare(b.tid))
+      .map((r, i) => ({
+        tid: r.tid,
+        flagId: teams[r.tid].flagId,
+        isClub: teams[r.tid].kind === 'club',
+        rank: i + 1,
+        code: teams[r.tid].code,
+        color: teams[r.tid].col,
+        name: teams[r.tid].name,
+        territories: String(r.terr),
+        eff: r.eff.toFixed(1),
+        // How much of that rating was bought with conquest rather than born with.
+        effGain: signed(r.eff - (teams[r.tid].baseEff ?? r.eff)),
+        teamId: r.tid,
+        conq: String(stats?.[r.tid]?.conq ?? 0),
+        claimed: String(stats?.[r.tid]?.steals?.length ?? 0),
+      }));
+  });
 }
 
 /**
