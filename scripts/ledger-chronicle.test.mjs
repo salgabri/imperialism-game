@@ -368,6 +368,22 @@ test('an elimination adds one fallen row: the others keep their keys, rows and k
   assertConsoleClean();
 });
 
+test('history rows call the latest select handler and follow the perspective and the selection', async context => {
+  const chronicle = ledgerVM.buildChronicle(baseState(), ctxFor());
+  const selected = [];
+  const screen = await mount(ChronicleScreen, { ...chronicle, onHistorySelect: id => selected.push(['old', id]) }, context);
+  await screen.render({ ...chronicle, onHistorySelect: id => selected.push(['new', id]) });
+  await act(async () => screen.host.querySelector('[data-history-id="m1"]').click());
+  assert.deepEqual(selected, [['new', 'm1']]);
+  const row = id => screen.host.querySelector(`[data-history-id="${id}"]`);
+  assert.deepEqual([row('m1').getAttribute('aria-pressed'), row('m2').getAttribute('aria-pressed')], ['true', 'false']);
+  assert.match(row('m2').textContent, /Your match/);
+  await screen.render({ ...chronicle, managedId: null, followedId: '276' });
+  assert.doesNotMatch(row('m2').textContent, /Your match/);
+  assert.match(row('m1').textContent, /Followed/);
+  assertConsoleClean();
+});
+
 // ---------- Chronicle screen (ported Sidebar History tests) ----------
 const fixtures = [
   { id: 'm1', round: 1, aId: 'a', bId: 'b', a: { teamId: 'a', name: 'Alfa', code: 'ALF', score: 2 }, b: { teamId: 'b', name: 'Beta', code: 'BET', score: 1 } },

@@ -3,7 +3,7 @@
 // [aria-pressed], the archived full MatchCard inside .fi-history, copy "No matches for this team yet.".
 // Board 06 chips (All matches / Your matches / Upsets / Signings) are an extra, component-local filter on top of the
 // team select: ChronicleScreen owns their state and passes `kinds`, `kind` and `onKind`.
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import MatchCard from '../../components/MatchCard.jsx';
 import { historyRow } from '../../viewModels/ledger.js';
 import { historyRound, roman } from '../../viewModels/format.js';
@@ -20,7 +20,9 @@ function emptyCopy(entries, teamShown, kind, managedId) {
   return KIND_EMPTY[kind] || 'No matches for this team yet.';
 }
 
-function HistoryItem({ entry, pressed, managedId, followedId, onSelect }) {
+// Memoised: history entries are never edited once recorded and HistoryBrowser's handler is stable, so a render
+// touches only the new entry and the rows whose pressed state flips.
+const HistoryItem = React.memo(function HistoryItem({ entry, pressed, managedId, followedId, onSelect }) {
   const row = historyRow(entry, { managedId, followedId });
   const score = `${row.a.code || row.a.name} ${row.a.score}–${row.b.score} ${row.b.code || row.b.name}`;
   const meta = [score + (row.tie ? ` (${row.tie})` : ''), row.claim].filter(Boolean).join(' · ');
@@ -41,13 +43,17 @@ function HistoryItem({ entry, pressed, managedId, followedId, onSelect }) {
       </button>
     </li>
   );
-}
+});
 
 export default function HistoryBrowser({
   entries = [], shown = [], teamShown = shown, teams = [], report = null, filter = '', managedId = null, followedId = null,
   kinds = [], kind = 'all', onKind, onFilter, onSelect, onViewConquest, onSelectTeam,
 }) {
   const reportRow = report ? historyRow(report) : null;
+  // One handler for every row, calling the latest onSelect (ChronicleScreen passes a new one per render).
+  const selectRef = useRef(onSelect);
+  selectRef.current = onSelect;
+  const selectRow = useCallback(id => selectRef.current?.(id), []);
   return (
     <section className="fi-history" aria-label="Match history">
       <div className="fi-history__index">
@@ -79,7 +85,7 @@ export default function HistoryBrowser({
             <ol className="fi-history-list">
               {shown.slice().reverse().map((entry, i) => (
                 <HistoryItem key={entry.id ?? i} entry={entry} pressed={report?.id === entry.id}
-                  managedId={managedId} followedId={followedId} onSelect={id => onSelect?.(id)} />
+                  managedId={managedId} followedId={followedId} onSelect={selectRow} />
               ))}
             </ol>
           )}
