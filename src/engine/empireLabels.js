@@ -304,17 +304,36 @@ function candidatesOf(raster) {
   // Cells by clearance, then centrality, then y and x: the order of one ranked object per cell, without the objects.
   const cells = [];
   for (let y = 1; y < ny - 1; y++) for (let x = 1; x < nx - 1; x++) if (distance[y * nx + x] > 0.9) cells.push(y * nx + x);
-  const centrality = new Float64Array(cells.length);
-  cells.forEach((i, k) => { centrality[k] = Math.hypot(i % nx - mx, Math.floor(i / nx) - my); });
-  const cellX = i => x0 + (i % nx + 0.5) * cell, cellY = i => y0 + (Math.floor(i / nx) + 0.5) * cell;
-  const order = cells.map((_, k) => k).sort((p, q) => distance[cells[q]] - distance[cells[p]] || centrality[p] - centrality[q]
-    || cellY(cells[p]) - cellY(cells[q]) || cellX(cells[p]) - cellX(cells[q]));
+  const n = cells.length, clear = new Float64Array(n), centrality = new Float64Array(n), cx = new Float64Array(n), cy = new Float64Array(n);
+  cells.forEach((i, k) => {
+    clear[k] = distance[i]; centrality[k] = Math.hypot(i % nx - mx, Math.floor(i / nx) - my);
+    cx[k] = x0 + (i % nx + 0.5) * cell; cy[k] = y0 + (Math.floor(i / nx) + 0.5) * cell;
+  });
+  // That order comes from a binary heap rather than a full sort, since the search below rarely reads a quarter of the
+  // cells. Ties left after y and x (if any) go by position in `cells`, as a stable sort leaves them.
+  const before = (p, q) => (clear[q] - clear[p] || centrality[p] - centrality[q] || cy[p] - cy[q] || cx[p] - cx[q] || p - q) < 0;
+  const heap = new Int32Array(n);
+  for (let k = 0; k < n; k++) heap[k] = k;
+  const sift = (k, size) => {
+    for (;;) {
+      const left = 2 * k + 1, right = left + 1;
+      let best = k;
+      if (left < size && before(heap[left], heap[best])) best = left;
+      if (right < size && before(heap[right], heap[best])) best = right;
+      if (best === k) return;
+      const swap = heap[k]; heap[k] = heap[best]; heap[best] = swap;
+      k = best;
+    }
+  };
+  for (let k = (n >> 1) - 1; k >= 0; k--) sift(k, n);
   const candidates = [];
   const spacing = Math.max(cell * 3, Math.sqrt(count) * cell * 0.09);
-  for (const k of order) {
-    const i = cells[k], x = cellX(i), y = cellY(i);
-    if (candidates.every(p => Math.hypot(p.x - x, p.y - y) >= spacing)) candidates.push({ x, y, clearance: distance[i] * cell, record: null });
-    if (candidates.length >= 28) break;
+  for (let size = n; size > 0 && candidates.length < 28;) {
+    const k = heap[0];
+    heap[0] = heap[--size];
+    sift(0, size);
+    const x = cx[k], y = cy[k];
+    if (candidates.every(p => Math.hypot(p.x - x, p.y - y) >= spacing)) candidates.push({ x, y, clearance: clear[k] * cell, record: null });
   }
   // Include unsnapped centers when they are genuinely on land; grid rounding
   // should not push an otherwise symmetric horizontal name toward one edge.
