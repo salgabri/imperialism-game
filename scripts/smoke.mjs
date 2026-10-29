@@ -8,6 +8,7 @@ import path from 'node:path';
 import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
 import { DOMESTIC } from '../src/data/domestic.js';
+import { nationPriority } from '../src/data/domesticTiers.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const publicDir = path.join(root, 'public');
@@ -239,11 +240,11 @@ function checkTheatres(scenario, theatre) {
   }
   const leagues = theatre.groups.find(group => group.label === 'European leagues');
   const domestic = theatre.groups.find(group => group.label === 'One country · top clubs');
-  const expected = DOMESTIC.slice().sort((a, b) => a.name.localeCompare(b.name))
+  const expected = DOMESTIC.slice().sort((a, b) => nationPriority(a.id) - nationPriority(b.id))
     .map(entry => ({ value: `domestic:${entry.id}`, text: `${entry.name} · ${entry.clubs} clubs` }));
   check('existing club theatres are grouped as European leagues', JSON.stringify(leagues?.options.map(option => option.value)) === JSON.stringify(theatre.clubScopes),
     JSON.stringify(theatre.groups.map(group => group.label)));
-  check('every shipped country is offered by name with its club count', JSON.stringify(domestic?.options) === JSON.stringify(expected),
+  check('every shipped country is offered by name with its club count, in priority order', JSON.stringify(domestic?.options) === JSON.stringify(expected),
     JSON.stringify(domestic?.options));
 }
 

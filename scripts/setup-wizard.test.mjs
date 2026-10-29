@@ -16,6 +16,7 @@ import {
 import { launchRules } from '../src/engine/turns.js';
 import { SCOPES } from '../src/data/teams.js';
 import { DOMESTIC } from '../src/data/domestic.js';
+import { nationPriority } from '../src/data/domesticTiers.js';
 import { getSport } from '../src/sports/index.js';
 import { empireFill } from '../src/theme.js';
 
@@ -807,12 +808,15 @@ const ENGLAND = DOMESTIC.find(entry => entry.id === '826');
 const COUNTRY = { layer: 'clubs', clubScope: 'domestic:826' };
 
 test('football clubs list every shipped country after the leagues, in one radio group; the mirror groups them', async t => {
-  const sorted = DOMESTIC.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const sorted = DOMESTIC.slice().sort((a, b) => nationPriority(a.id) - nationPriority(b.id));
   const rows = domesticTheatres();
   assert.deepEqual(rows.map(row => row.id), sorted.map(entry => `domestic:${entry.id}`));
+  assert.deepEqual(rows.slice(0, 5).map(row => row.name), ['England', 'Spain', 'Germany', 'Italy', 'France'], 'the biggest leagues first');
   assert.deepEqual(rows[0], { id: `domestic:${sorted[0].id}`, name: sorted[0].name, label: sorted[0].name, count: sorted[0].clubs, note: '' });
   const clubs = buildSetupModel({ ...BASE, layer: 'clubs' });
   assert.ok(clubs.scopes.length > 1 && !clubs.scopes.some(scope => scope.id.startsWith('domestic:')), 'model.scopes stays the league rows');
+  assert.deepEqual(clubs.scopes.map(scope => scope.id),
+    ['all', 'elite', 'Premier League', 'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1', 'Liga Portugal', 'Eredivisie'], 'the leagues in the same order');
   assert.equal(clubs.domesticScopes, rows);
   for (const setup of [{ ...BASE }, { ...BASE, sport: 'basketball', layer: 'clubs' }, { ...BASE, sport: 'basketball' }]) {
     assert.deepEqual(buildSetupModel(setup).domesticScopes, [], `${setup.sport} ${setup.layer}: no single-country theatres`);
@@ -830,7 +834,7 @@ test('football clubs list every shipped country after the leagues, in one radio 
   const england = view.qa('.setup-theatre').find(row => row.dataset.name === 'England');
   assert.equal(england.querySelector('.setup-theatre__count').textContent, `${ENGLAND.clubs} clubs`);
 
-  // The mirror: "European leagues" holds the league ids in order; the countries read "Name · N clubs", A–Z.
+  // The mirror: "European leagues" holds the league ids in order; the countries read "Name · N clubs", in priority order.
   const mirror = view.q('#setup-theatre');
   const groups = [...mirror.querySelectorAll('optgroup')];
   assert.deepEqual(groups.map(group => group.getAttribute('label')), ['European leagues', 'One country · top clubs']);

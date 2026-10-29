@@ -6,6 +6,7 @@
 import { NATIONS, SCOPES } from '../../data/teams.js';
 import { CLUB_SCOPES } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
+import { nationPriority } from '../../data/domesticTiers.js';
 import { domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
 import { BUILT_IN_SEASON, fieldedNations } from '../../engine/footballSets.js';
@@ -269,12 +270,13 @@ export const DOMESTIC_GROUP = 'One country · top clubs';
 
 let domesticRowCache = null;
 /**
- * One country's own top clubs (docs/design/domestic-campaigns.md): one row per shipped map, A–Z, in the theatre row
- * shape. Offered for football clubs only (`domesticOffered`).
+ * One country's own top clubs (docs/design/domestic-campaigns.md): one row per shipped map, in the leagues' priority
+ * order (data/domesticTiers.js), in the theatre row shape. Offered for football clubs only (`domesticOffered`).
  */
 export function domesticTheatres() {
   if (!domesticRowCache) {
-    domesticRowCache = Object.freeze([...DOMESTIC].sort((a, b) => a.name.localeCompare(b.name))
+    domesticRowCache = Object.freeze([...DOMESTIC]
+      .sort((a, b) => nationPriority(a.id) - nationPriority(b.id) || a.name.localeCompare(b.name))
       .map(entry => Object.freeze({ id: `domestic:${entry.id}`, name: entry.name, label: entry.name, count: entry.clubs, note: '' })));
   }
   return domesticRowCache;

@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { feature, neighbors } from 'topojson-client';
 import { DOMESTIC, DOMESTIC_FORMAT } from '../src/data/domestic.js';
+import { DOMESTIC_TIERS, domesticCap } from '../src/data/domesticTiers.js';
+import { NATIONS } from '../src/data/teams.js';
 import { decodeDomestic, DOMESTIC_SECTIONS } from '../src/engine/domestic.js';
 import { expandFmTuple, FM_ROLES } from '../src/data/fmPlayers.js';
 import { FOREIGN_DEPTH_KM, hostShapes, loadWorldMap } from './lib/domestic-boundaries.mjs';
@@ -46,6 +48,15 @@ test('the index lists every shipped map once, in name order', () => {
   for (const e of DOMESTIC) assert.ok(attribution.includes(`(${e.id}), ${e.version}:`), `ATTRIBUTION.txt lacks ${e.id} ${e.version}`);
 });
 
+test('every nation sits in one tier, and the tiers shrink', () => {
+  const ids = DOMESTIC_TIERS.flatMap(tier => tier.ids);
+  assert.equal(new Set(ids).size, ids.length, 'a nation is listed twice');
+  assert.deepEqual([...ids].sort(), Object.keys(NATIONS).sort(), 'the tiers and NATIONS differ');
+  const sizes = DOMESTIC_TIERS.map(tier => tier.clubs);
+  assert.equal(sizes[0], DOMESTIC_SECTIONS);
+  assert.ok(sizes.every((k, i) => i === 0 || k < sizes[i - 1]), `tier sizes ${sizes.join('/')}`);
+});
+
 const polysOf = (topo, g) => {
   const geometry = feature(topo, g).geometry;
   return geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
@@ -78,7 +89,7 @@ for (const entry of DOMESTIC) {
     // 100 sections <id>-001..100 shared out as N club groups: home first, ids in club rank
     // order, sizes floor or ceil(100 / N) with exactly 100 mod N larger groups.
     const S = DOMESTIC_SECTIONS;
-    assert.ok(n >= 2 && n <= S, `N = ${n}`);
+    assert.ok(n >= 2 && n <= domesticCap(id), `N = ${n}, tier ${domesticCap(id)}`);
     const geoms = doc.topology.objects.sections.geometries;
     assert.equal(geoms.length, S, 'sections');
     assert.equal(doc.clubs.length, n, 'clubs');

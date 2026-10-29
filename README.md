@@ -18,8 +18,9 @@ And pick who fights:
 - **Nations** — 170 national teams, each starting on its own homeland.
 - **Clubs** — 132 football clubs from seven European leagues, or all 30 NBA
   franchises. Real Madrid annexes territory exactly the way Spain does.
-- **One country's clubs** — a country's top football clubs (up to 100) on that
-  country's own map, split into 100 sections ([domestic campaigns](#domestic-campaigns)).
+- **One country's clubs** — a country's top football clubs (100 for the biggest
+  leagues, fewer for smaller ones) on that country's own map, split into 100
+  sections ([domestic campaigns](#domestic-campaigns)).
 
 Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
@@ -489,25 +490,30 @@ from its whole roster.
 
 ## Domestic campaigns
 
-With **Clubs** and football, the Theatre list has a second group, **One country ·
-top clubs**. Pick a country and its top clubs fight over that country alone: 100
-of them, or fewer where the database has fewer viable sides (a country ships with
-at least two; every club is real). The map is always split into 100 sections,
-built from the country's real administrative divisions. Each club starts on the
-section around its home town; with fewer than 100 clubs it also starts on the
-sections around that one, a group of 100/N rounded down or up (the stronger clubs
-take the extra ones where they have room), so Fiji's 16 clubs start with 6 or 7
-sections each and Belize's two with 50. Conquest is unchanged: the winner annexes
-everything the loser holds and claims one player, so a starting group always
-changes hands whole. Every section is held from kick-off, so there is no neutral
-land and no transit treaty. Neighbouring
+With **Clubs** and football, the Theatre list has a second group, **One country
+· top clubs**, listed biggest leagues first. Pick a country and its top clubs
+fight over that country alone. How many depends on the league's tier
+(`src/data/domesticTiers.js`): 100 for England, Spain, Germany, Italy, France,
+Turkey, Brazil and Argentina; 60 for strong leagues such as Portugal, the
+Netherlands and Japan; 40 for established ones such as Austria, Croatia and
+Colombia; 24 for smaller leagues; 16 for the smallest nations. A country with
+fewer viable sides plays with all of them (Mexico 58, the United States 81; a
+country ships with at least two, and every club is real). The map is always
+split into 100 sections, built from the country's real administrative divisions.
+Each club starts on the section around its home town; with fewer than 100 clubs
+it also starts on the sections around that one, a group of 100/N rounded down or
+up (the stronger clubs take the extra ones where they have room), so Fiji's 16
+clubs start with 6 or 7 sections each and Belize's two with 50. Conquest is
+unchanged: the winner annexes everything the loser holds and claims one player,
+so a starting group always changes hands whole. Every section is held from
+kick-off, so there is no neutral land and no transit treaty. Neighbouring
 countries are drawn as muted land beneath the map. They are never territory, but
 attacks go around them, by sea if need be; only an exclave (Nakhchivan, Gaza,
-Kaliningrad) may have to cross one, labelled "Crossing foreign territory". Attack
-routes start from a point well inside each section (the home town when it is
-clear of the border), while the home marker shows the town itself. Tooltips and
-conquest results use section names, such as "Lancashire (east)", where Burnley
-starts.
+Kaliningrad) may have to cross one, labelled "Crossing foreign territory".
+Attack routes start from a point well inside each section (the home town when it
+is clear of the border), while the home marker shows the town itself. Tooltips
+and conquest results use section names, such as "Lancashire (east)", where
+Burnley starts.
 
 In the v4 interface, choosing **Clubs** in setup step 1 adds the **One country ·
 top clubs** group below the leagues (football only). Picking a country shows a
@@ -558,7 +564,7 @@ from these services at runtime.
 - **Home towns**: manual overrides in `scripts/data/domestic-locations.json`, then
   Wikidata (CC0), then GeoNames `cities1000` (CC BY 4.0). Each club records which
   one placed it. Some overrides are region-level (marked "approximate:"), and the
-  87 clubs with no known home start at a populous place no other club holds
+  38 clubs with no known home start at a populous place no other club holds
   (`homeSource` `placed:<geonameid>`, an estimate).
 - **Boundaries**: [geoBoundaries](https://www.geoboundaries.org) gbOpen layers,
   pinned to one commit, with Natural Earth admin-1 (public domain) as a fallback;
@@ -570,8 +576,8 @@ from these services at runtime.
 
 `public/domestic/ATTRIBUTION.txt` is generated with every build and lists each
 country's boundary source and licence, its cuts and fills, plus the GeoNames,
-Wikidata and EFEM notes. 163 of the game's 170 nations ship, with 6,364 clubs (22
-countries have 100, nine have two); the maps total 23.9 MB (34–250 KB each), and
+Wikidata and EFEM notes. 163 of the game's 170 nations ship, with 4,343 clubs (8
+countries have 100, nine have two); the maps total 22.1 MB (34–250 KB each), and
 a session fetches only the one chosen. Sri Lanka, Cuba, Eritrea, Afghanistan,
 the Bahamas, Namibia and Sierra Leone have fewer than two viable clubs, so they
 do not ship.
@@ -892,6 +898,7 @@ src/
   data/scopes.js       club theatre choices (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
   data/domesticScope.js  labels for 'domestic:<id>' theatres
+  data/domesticTiers.js  each nation's club cap and the setup lists' priority order
   data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
   data/cmPlayers.js    CM player tuples, positions and rating conversion
   data/flags.js        nation id -> flag asset

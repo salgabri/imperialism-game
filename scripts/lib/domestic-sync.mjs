@@ -8,6 +8,7 @@ import path from 'node:path';
 import { gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate';
 import { NATIONS } from '../../src/data/teams.js';
 import { FM_ROLES, FM_ORIGIN, expandFmTuple, fmNaturalPositions } from '../../src/data/fmPlayers.js';
+import { domesticCap } from '../../src/data/domesticTiers.js';
 
 export const VERSION = '26.3.0';
 export const USER_AGENT = 'imperialism-game-build/1.0 (offline data build)';
@@ -17,7 +18,6 @@ export const CLUB_PAGE_SIZE = 100;
 export const TIE_PAGE_SIZE = 2000;
 export const SLICE_PAGE_SIZE = 5000;
 export const SQUAD_SIZE = 16;
-export const MAX_CLUBS = 100;
 // Every map has 100 sections whatever N (format 2), so two clubs make a campaign.
 export const MIN_CLUBS = 2;
 const POSITIONS = Object.keys(FM_ROLES);
@@ -326,7 +326,8 @@ export function validateSnapshot(snapshot) {
   if (snapshot.source?.version !== VERSION) fail(`version must be ${VERSION}`);
   if (!/^\d{4}-\d{2}-\d{2}T/.test(snapshot.source?.fetchedAt || '')) fail('fetchedAt must be an ISO date');
   const { clubs, excluded } = snapshot;
-  if (!Array.isArray(clubs) || clubs.length > MAX_CLUBS || clubs.length < MIN_CLUBS) fail(`club count ${clubs?.length} outside ${MIN_CLUBS}-${MAX_CLUBS}`);
+  const cap = domesticCap(snapshot.nation?.id);
+  if (!Array.isArray(clubs) || clubs.length > cap || clubs.length < MIN_CLUBS) fail(`club count ${clubs?.length} outside ${MIN_CLUBS}-${cap}`);
   const clubIds = new Set(), playerIds = new Set();
   const source = { version: VERSION, snapshotDate: snapshot.source.fetchedAt.slice(0, 10) };
   clubs.forEach((club, i) => {
