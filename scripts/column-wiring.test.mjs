@@ -54,7 +54,7 @@ test('spectator idle: DEC D10 idle fixture, campaign title card, mode key and em
     const { titleCard, mapKey } = f.app.mapOverlaysModel();
     assert.equal(titleCard.variant, 'campaign');
     assert.equal(titleCard.title, 'The European Campaign');
-    assert.match(titleCard.meta, /seed 728491$/);
+    assert.equal(titleCard.meta, 'Map after Round I', 'the seed lives in Settings, not on the map');
     assert.equal(mapKey.variant, expectedKeyVariant(f.app.state.mapMode));
     assert.deepEqual(f.app.tickerModel(), { items: [] });
 
@@ -185,7 +185,7 @@ test('your turn without a land border: the title card and the target panel both 
     assert.match(count, /^\d+ targets? in reach$/);
     const { titleCard } = app.mapOverlaysModel();
     assert.equal(titleCard.variant, 'your-turn');
-    assert.equal(titleCard.sub, 'Pick a target to attack. Everyone else’s targets come from the compass.');
+    assert.equal(titleCard.sub, 'Pick a target to attack');
     assert.equal(findElement(app.render(), 'MapOverlays').props.titleCard.sub, titleCard.sub);
   } finally { f.close(); }
 });

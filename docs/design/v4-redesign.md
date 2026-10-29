@@ -177,8 +177,15 @@ gold-trimmed "war room" look.
   (`.draw-route-line` `d === routeD`, no ids or markers, reduced-motion CSS) is
   kept. The compass is restyled with a white disk, an ink needle and a `you`
   tip.
-- **D21 — Overlays.** Title card top-left; key bottom-left; mode switch
-  bottom-right (top-right on tablet). Zoom −/+/reset is kept as a minimal
+- **D21 — Overlays.** A one-line caption top-left, no taller than the mode
+  switch (31px; 39px at 1600px and up; 28px on phone). It reads title │ detail:
+  the theatre │ the map state ("Map after Round III") at rest; "Your turn │
+  Pick a neighbour to attack" while you choose a target; for spectators
+  "Finland to attack", then "Finland attacks Sweden │ Across a land border"
+  from the lock to the result. It carries no round (the masthead does) and no
+  seed (Settings › This campaign, Saved campaigns and the Chronicle kicker do).
+  "Everyone else’s targets come from the compass" sits in the target panel
+  foot. Key bottom-left; mode switch bottom-right (top-right on tablet). Zoom −/+/reset is kept as a minimal
   vertical control. The tooltip is a white panel. On your turn, in-reach empires
   get a dashed cobalt outline (2px, dash 5 3) and out-of-reach land an ink veil.
   Battle scars, the LAT/LON readout and the km scale bar are gone.
@@ -186,7 +193,8 @@ gold-trimmed "war room" look.
   the next opponent, with a "Whole map" / "Your fronts" toggle. A bottom sheet
   with a grab handle expands on tap. Then a 56px primary bar and an 84px tab
   bar. From 700 to 1199px the map sits on top (≈47% height), with the column
-  content in two columns below.
+  content in two columns below. The phone caption shows its title only ("Your
+  fronts", the followed team, or the campaign title with Whole map on).
 
 ### Copy and values
 
@@ -194,7 +202,7 @@ gold-trimmed "war room" look.
 - The strength profile uses a 60–95 segment mapping; its kicker reads "Scale
   60–95".
 - The campaign title comes from `campaignTitle` ("The European Campaign").
-  Round 0 reads "Before the first match · seed 2026".
+  Round 0 reads "Before the first match"; the map state carries no seed.
 - Basketball squads: a court with 5 discs (PG SG SF PF C), the groups Guards /
   Forwards / Centres, an Offence / Defence profile, and "Starting five".
 - The ticker is static, clipped and newest first, with no marquee.
@@ -242,7 +250,7 @@ They were merged into the redesign in `159f2ac`. They follow the v4 patterns:
 - **Map:** the sectioned map renders in the v4 flat style: pastel fills, white
   borders, and the clay/cobalt identity colours. Neighbouring countries form an
   inert land-neutral backdrop, and every home town is marked at any zoom.
-- **Overlays:** the title card reads the theatre itself ("England · top 100
+- **Overlays:** the map caption reads the theatre itself ("England · top 100
   clubs") instead of "… Campaign". The key labels the marker **Home town**
   instead of Capital.
 - **Names:** tooltips, conquest results and the conquest screen name sections

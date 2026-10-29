@@ -19,7 +19,7 @@ import {
 } from './format.js';
 
 const NO_ACTIONS = Object.freeze({ preview: false, simulate: false });
-/** Route line while the compass spins (fixture block and the spectator's draw card). */
+/** Route line while the compass spins (fixture block). */
 const COMPASS_CHOOSING = 'The compass is choosing the target';
 
 // ---------- small helpers ----------
@@ -402,7 +402,7 @@ export function buildTicker(st, ctx = {}, { limit = 7 } = {}) {
   }));
 }
 
-// ---------- map overlays: title card and key ----------
+// ---------- map overlays: caption and key ----------
 
 function followedTeam(st, ctx) {
   const id = ctx?.followedId ?? st?.followedId ?? null;
@@ -431,40 +431,37 @@ function titleCardModel(st, ctx) {
   const teams = st.teams || {};
   const managedId = ctx?.managedId && teams[ctx.managedId] ? ctx.managedId : null;
   const current = displayRound(st);
-  const kicker = roundLabel(current);
   const wholeMap = !!st.wholeMap;
 
+  // No round kicker and no seed: the masthead carries the round, Settings › This campaign the seed.
   if (managedId && st.pendingTarget) {
-    return { variant: 'your-turn', kicker, title: 'Your turn', phoneTitle: null, meta: null, wholeMap,
-      sub: `Pick a ${pendingReachNoun(st, ctx)} to attack. Everyone else’s targets come from the compass.` };
+    return { variant: 'your-turn', title: 'Your turn', phoneTitle: null, meta: null, wholeMap,
+      sub: `Pick a ${pendingReachNoun(st, ctx)} to attack` };
   }
 
-  // Spectators watch the duel draw (M§6.4): the drawn attacker and the compass target, until the result.
+  // Spectators watch the duel draw (M§6.4): the drawn attacker, then the pairing and its route until the result.
+  // The compass target and the score are in the column's This turn; the route is said only here.
   const pending = !managedId && st.settings?.pacing === 'duel' ? pendingFixture(st) : null;
   if (pending) {
     const A = teams[pending.aId], B = teams[pending.dId];
-    const roundRobin = st.settings?.turnOrder === 'round-robin';
+    // Same rule as the fixture block: the target is named once the needle locks (DEC D19).
+    if (pending.kind === 'drawing') {
+      return { variant: 'draw', title: `${A.name} to attack`, phoneTitle: null, meta: null, sub: null, wholeMap };
+    }
     const route = routeLine(ctx, pending.aId, pending.dId, pending.kind === 'live'
       ? { routeKind: pending.match.routeKind } : pending.route);
-    return {
-      variant: 'draw', kicker: roundRobin ? kicker : 'The draw',
-      title: roundRobin ? `${A.name} to attack` : `${A.name} is drawn to attack`,
-      phoneTitle: null, meta: null, wholeMap,
-      // Same rule as the fixture block: the target is named once the needle locks (DEC D19).
-      sub: pending.kind === 'drawing' ? COMPASS_CHOOSING
-        : `The compass points to ${B.name}${route ? ` · ${route.toLowerCase()}` : ''}`,
-    };
+    return { variant: 'draw', title: `${A.name} attacks ${B.name}`, phoneTitle: null, meta: null, sub: route, wholeMap };
   }
 
   const followed = managedId ? null : followedTeam(st, ctx);
-  const seed = st.seed != null && st.seed !== '' ? ` · seed ${st.seed}` : '';
   return {
-    variant: 'campaign', kicker,
+    variant: 'campaign',
     // A campaign on a football data set names its season ('The European Campaign · 2001/02').
     title: `${campaignTitle(st.settings, ctx?.scopeName || scopeNameOf(st.settings))}${st.settings?.dataSeason ? ` · ${st.settings.dataSeason}` : ''}`,
     // Phone frames your empire and its opponent (DEC D22, A-7); "Whole map" restores the full title.
     phoneTitle: managedId ? 'Your fronts' : followed ? followed.name : null,
-    meta: `${mapStateCopy(st, current)}${seed}`,
+    // The masthead's round is the next one while the board shows the last: this line reconciles the two.
+    meta: mapStateCopy(st, current),
     sub: null, wholeMap,
   };
 }
@@ -568,8 +565,9 @@ function mapKeyModel(st, ctx) {
 }
 
 /**
- * Map title card (top-left) and key (bottom-left) → { titleCard, mapKey } (PLAN §3.5 MapOverlays, DEC D21, A-11).
- * titleCard: { variant: 'campaign'|'your-turn'|'draw', kicker, title, phoneTitle, meta, sub, wholeMap }
+ * Map caption (top-left, one line) and key (bottom-left) → { titleCard, mapKey } (PLAN §3.5 MapOverlays, DEC D21, A-11).
+ * titleCard: { variant: 'campaign'|'your-turn'|'draw', title, phoneTitle, meta, sub, wholeMap } — meta (the map state)
+ * or sub (the instruction or route) is the detail after the divider, never both.
  * mapKey: { variant: 'political'|'strength'|'fronts'|'flags'|'reach', heading, items: [{ key, kind, label, color?, ring? }] }
  * Both null outside a running campaign and in the conquest view (st.choice).
  */

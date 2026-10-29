@@ -44,7 +44,7 @@ export function columnModel() {
 }
 
 /**
- * Map title card and key (PLAN §3.5 MapOverlays, DEC D21, A-11). Both null outside a running campaign, on the
+ * Map caption and key (PLAN §3.5 MapOverlays, DEC D21, A-11). Both null outside a running campaign, on the
  * conquest screen (`st.choice`) and while another view hides the map, so hidden overlays cost nothing.
  */
 export function mapOverlaysModel() {

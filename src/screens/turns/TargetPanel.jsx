@@ -80,7 +80,8 @@ export default function TargetPanel({ count = '', rows = [], selectedId = null, 
       </div>
       {ctaLabel && (
         <p className="target-panel__foot">
-          Spoils are the territories you would annex. Confirm with <b>{ctaLabel}</b> in the bar.
+          Spoils are the territories you would annex. Confirm with <b>{ctaLabel}</b> in the bar. Everyone else’s targets
+          come from the compass.
         </p>
       )}
     </section>

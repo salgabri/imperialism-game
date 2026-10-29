@@ -199,7 +199,7 @@ names the provider and reads "Game rating converted from CM current ability".
   - Setup caches key on the set version.
 - **Launch**: `opening()` builds teams from `sportOf(setup)` and applies
   `territory`. Settings record `dataSet`, `dataVersion`, `dataYear` and
-  `dataSeason`. The campaign name, map title card and saved-campaign rows carry
+  `dataSeason`. The campaign name, map caption and saved-campaign rows carry
   the season (for example "Football 2007/08 · Europe"), only for set campaigns.
   While a chosen set loads, step 1 shows no built-in counts, and Launch waits for
   it.

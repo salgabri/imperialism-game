@@ -1,4 +1,4 @@
-/* Owner: WP-COL (see PLAN.md §4). Campaign column, Next fixture, fronts, latest results, ticker, map title card
+/* Owner: WP-COL (see PLAN.md §4). Campaign column, Next fixture, fronts, latest results, ticker, map caption
    and key, phone sheet (classes per PLAN §4.11: .v4-column*, .fixture*, .odds*, .fronts*, .results-list*, .ticker*,
    .map-title-card*, .map-key*, .sheet*). Values: README §A + A§3–§9 + DEC D21. Placement of .v4-column and .ticker
    inside main lives in styles/shell.css (WP-0); everything inside them lives here.
@@ -223,53 +223,48 @@
 .ticker__empty { color:rgba(245,245,242,.62); }
 
 /* =====================================================================================================
-   Map title card (top-left; A§3.3, RM §1.11, DEC D21) — #fff floating panel
+   Map caption (top-left; A§3.3, RM §1.11, DEC D21 as amended) — one line, no taller than the mode switch:
+   title │ detail (the map state, the your-turn instruction or the draw's route). The round lives in the masthead and
+   the seed in Settings, so the caption carries neither. Fixed px heights, not --wm-modes-h: a caption is not a
+   control, so coarse pointers don't grow it to 44px.
    ===================================================================================================== */
 .map-title-card {
+  --mtc-h:31px; --mtc-pad:12px; --mtc-fs:14px; --mtc-gap:10px;   /* 39/16/16/12 · 31/12/14/10 · 31/10/13/8 · 28/10/14/8 */
   position:absolute; top:var(--map-inset); left:var(--map-inset); z-index:2;
-  max-width:calc(100% - 2 * var(--map-inset));
-  padding:10px 14px 9px; background:var(--panel); box-shadow:var(--shadow-float); color:var(--ink);
-  pointer-events:none;
-}
-.map-title-card__kicker {
-  margin:0; font:400 12px/normal var(--font-sans); font-variant-numeric:tabular-nums;
-  letter-spacing:.08em; text-transform:uppercase; color:var(--you-text); white-space:nowrap;
+  display:flex; align-items:center; height:var(--mtc-h); max-width:min(560px, calc(100% - 2 * var(--map-inset)));
+  padding:0 var(--mtc-pad); overflow:hidden; background:var(--panel); box-shadow:var(--shadow-float); color:var(--ink);
+  font:400 var(--mtc-fs)/1.25 var(--font-sans); white-space:nowrap; pointer-events:none;
 }
 .map-title-card__title {
-  margin:2px 0 0; font:700 26px/1.05 var(--font-sans); letter-spacing:-.02em;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  flex:0 1 auto; min-width:4em; margin:0; overflow:hidden; text-overflow:ellipsis;
+  font:inherit; font-weight:700; letter-spacing:-.005em; color:var(--ink);
 }
-.map-title-card__title-full, .map-title-card__title--phone { display:block; overflow:hidden; text-overflow:ellipsis; }
 .map-title-card__title--phone { display:none; }
-.map-title-card__meta {
-  margin:4px 0 0; font:400 13px/normal var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted); white-space:nowrap;
-  overflow:hidden; text-overflow:ellipsis;
+.map-title-card--your-turn .map-title-card__title { color:var(--you-text); }
+/* The detail never gives way (its longest copy, "Map after turn 12 of Round XXVIII", is ≈205px at 14px): the title
+   ellipsises first. A 1px rule divides the two, as the masthead divides wordmark and dateline. */
+.map-title-card__meta, .map-title-card__sub {
+  flex:0 0 auto; max-width:22em; margin:0 0 0 var(--mtc-gap); padding-left:var(--mtc-gap);
+  border-left:1px solid var(--rule); overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums;
 }
-/* "Your turn" (M§5.4) and "The draw" (M§6.4) carry a sentence under the title. */
-.map-title-card__sub { margin:4px 0 0; max-width:440px; font:400 14px/1.45 var(--font-sans); color:var(--text-2); }
-.map-title-card--draw .map-title-card__sub { max-width:560px; }
+.map-title-card__meta { color:var(--muted); }
+.map-title-card__sub { color:var(--text-2); }
 
 @media (min-width:1600px) {
-  .map-title-card { padding:16px 22px 14px; }
-  .map-title-card__title { font-size:40px; }
-  .map-title-card__meta { font-size:16px; }
-  .map-title-card__sub { font-size:16px; }
+  .map-title-card { --mtc-h:39px; --mtc-pad:16px; --mtc-fs:16px; --mtc-gap:12px; max-width:min(720px, calc(100% - 2 * var(--map-inset))); }
 }
 @media (max-width:1199.98px) {
-  /* The mode switch sits top-right on tablet; keep the card clear of it. */
-  .map-title-card { max-width:calc(56% - var(--map-inset)); }
-  .map-title-card__title { font-size:24px; }
-  .map-title-card__meta { font-size:12px; }
-  .map-title-card__sub { font-size:13px; }
+  /* The mode switch sits top-right on tablet (≈293px wide): 54% keeps the caption ≥11px clear of it at 700px. */
+  .map-title-card { --mtc-pad:10px; --mtc-fs:13px; --mtc-gap:8px; max-width:calc(54% - var(--map-inset)); }
 }
 @media (max-width:699.98px) {
-  /* Keep clear of the 44px zoom column top-right (WP-MAP) and its 8px gap; the title ellipsises. */
-  .map-title-card { padding:6px 10px 6px; max-width:calc(100% - 2 * var(--map-inset) - max(36px, var(--tap)) - 8px); }
-  .map-title-card__title { font-size:16px; }
+  /* Title only; clear of the 44px "Back to previous view" top-right and its 8px gap; the title ellipsises. */
+  .map-title-card { --mtc-h:28px; --mtc-fs:14px; max-width:calc(100% - 2 * var(--map-inset) - max(36px, var(--tap)) - 8px); }
+  .map-title-card__title { min-width:0; }
   .map-title-card__meta, .map-title-card__sub { display:none; }
   /* Phone frames your fronts (DEC D22); "Whole map" (wholeMap) restores the campaign title. */
   .map-title-card--swap .map-title-card__title-full { display:none; }
-  .map-title-card--swap .map-title-card__title--phone { display:block; }
+  .map-title-card--swap .map-title-card__title--phone { display:inline; }
 }
 
 /* =====================================================================================================

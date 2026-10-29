@@ -1,5 +1,5 @@
 // Owner: WP-COL (see PLAN.md §5.2). Campaign column (Next fixture / Your fronts / Latest results), ticker, map
-// title card and key: view-models (pure builders) and components (jsdom).
+// caption and key: view-models (pure builders) and components (jsdom).
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -472,22 +472,22 @@ test('ticker: last seven, newest first, "R XXVI  CZECHIA 0  GERMANY 1 · CZECHIA
 });
 
 // =====================================================================================================
-// Map overlays: title card and key (DEC D21, A-11, RM §1.11, M§5.4, M§6.4)
+// Map overlays: caption and key (DEC D21, A-11, RM §1.11, M§5.4, M§6.4)
 // =====================================================================================================
 
-test('title card: campaign title, round kicker, round-0 copy, phone title and Whole map', () => {
+test('map caption: campaign title, round-0 copy, phone title and Whole map; no round kicker or seed', () => {
   const opening = state();
   const first = buildMapOverlays(opening, context(opening)).titleCard;
-  assert.deepEqual(first, { variant: 'campaign', kicker: 'Round I', title: 'The European Campaign', phoneTitle: 'Your fronts',
-    meta: 'Before the first match · seed 2026', sub: null, wholeMap: false });
+  assert.deepEqual(first, { variant: 'campaign', title: 'The European Campaign', phoneTitle: 'Your fronts',
+    meta: 'Before the first match', sub: null, wholeMap: false });
   const later = state({ round: 18, wholeMap: true });
   const card = buildMapOverlays(later, context(later)).titleCard;
-  assert.equal(card.kicker, 'Round XIX');
-  assert.equal(card.meta, 'Map after Round XVIII · seed 2026');
+  assert.ok(!('kicker' in card), 'the round lives in the masthead');
+  assert.equal(card.meta, 'Map after Round XVIII');
   assert.equal(card.wholeMap, true);
   // Busy (live) round: the map still shows the state after the previous round.
   const busy = state({ round: 19, match: { aId: '380', dId: '040', applied: false, done: false } });
-  assert.equal(buildMapOverlays(busy, context(busy)).titleCard.meta, 'Map after Round XVIII · seed 2026');
+  assert.equal(buildMapOverlays(busy, context(busy)).titleCard.meta, 'Map after Round XVIII');
   const world = state({ settings: { ...state().settings, scope: 'world' } });
   assert.equal(buildMapOverlays(world, context(world)).titleCard.title, 'The World Campaign');
   const southAmerica = state({ settings: { ...state().settings, scope: 'CONMEBOL' } });
@@ -498,7 +498,7 @@ test('title card: campaign title, round kicker, round-0 copy, phone title and Wh
   assert.equal(buildMapOverlays(state(), context(state(), { managedId: null })).titleCard.phoneTitle, null);
 });
 
-test('title card meta mid-round: round robin turns and blitz batches already changed the map', () => {
+test('map caption meta mid-round: round robin turns and blitz batches already changed the map', () => {
   const rec = (round, i) => ({ id: `r${round}-${i}`, round: String(round).padStart(3, '0'), aId: '380', dId: '040', winnerId: '380',
     a: { teamId: '380', code: 'ITA', name: 'Italy', score: 1 }, b: { teamId: '040', code: 'AUT', name: 'Austria', score: 0 },
     result: { winnerName: 'Italy', loserName: 'Austria' } });
@@ -507,63 +507,67 @@ test('title card meta mid-round: round robin turns and blitz batches already cha
   const queue = ['276', '250', '380', '040', '348', '688'];
   // Idle after turn 2 of cycle III (DEC D3: every turn of a cycle shares round 3).
   const rrIdle = { round: 3, settings: rrSettings, turnQueue: queue, turnIndex: 2, history: [rec(2, 0), rec(3, 0), rec(3, 1)] };
-  assert.equal(metaOf(rrIdle), 'Map after turn 2 of Round III · seed 2026');
+  assert.equal(metaOf(rrIdle), 'Map after turn 2 of Round III');
   // Turn 3 in progress (turnIndex already consumed): the map still shows turn 2.
   assert.equal(metaOf({ ...rrIdle, turnIndex: 3, spin: spinOf('locked', { attackerId: '380', targetId: '040' }) }),
-    'Map after turn 2 of Round III · seed 2026');
+    'Map after turn 2 of Round III');
   assert.equal(metaOf({ ...rrIdle, turnIndex: 3, match: { aId: '380', dId: '040', applied: false, done: false } }),
-    'Map after turn 2 of Round III · seed 2026');
+    'Map after turn 2 of Round III');
   // Turn 3 finished (applied, not continued yet).
   assert.equal(metaOf({ ...rrIdle, turnIndex: 3, history: [...rrIdle.history, rec(3, 2)],
-    match: { aId: '380', dId: '040', applied: true, done: true } }), 'Map after turn 3 of Round III · seed 2026');
+    match: { aId: '380', dId: '040', applied: true, done: true } }), 'Map after turn 3 of Round III');
   // First turn of cycle IV in progress: nothing of round IV is on the map yet.
   assert.equal(metaOf({ ...rrIdle, round: 4, turnIndex: 1, spin: spinOf('spinning', { attackerId: '276', targetId: '250' }) }),
-    'Map after Round III · seed 2026');
+    'Map after Round III');
   // Cycle boundary (idle, queue exhausted): the next round is IV, the map is after round III.
-  assert.equal(metaOf({ ...rrIdle, turnIndex: 6 }), 'Map after Round III · seed 2026');
+  assert.equal(metaOf({ ...rrIdle, turnIndex: 6 }), 'Map after Round III');
 
   // Blitz: one round per batch; after the first applied match the queue still holds the rest.
   const blitz = { ...state().settings, pacing: 'blitz' };
   const batch = { round: 5, settings: blitz, history: [rec(4, 0), rec(5, 0)], queue: [['250', '276']],
     match: { aId: '380', dId: '040', applied: true, done: true } };
-  assert.equal(metaOf(batch), 'Map after match 1 of Round V · seed 2026');
+  assert.equal(metaOf(batch), 'Map after match 1 of Round V');
   assert.equal(metaOf({ ...batch, queue: [], history: [...batch.history, rec(5, 1)],
-    match: { aId: '250', dId: '276', applied: false, done: false } }), 'Map after match 2 of Round V · seed 2026');
+    match: { aId: '250', dId: '276', applied: false, done: false } }), 'Map after match 2 of Round V');
   // Batch over (idle): Round VI is next, the map is after Round V.
-  assert.equal(metaOf({ ...batch, queue: [], match: null }), 'Map after Round V · seed 2026');
+  assert.equal(metaOf({ ...batch, queue: [], match: null }), 'Map after Round V');
   // Random-draw duels keep the per-round formula.
-  assert.equal(metaOf({ round: 5, history: [rec(4, 0), rec(5, 0)] }), 'Map after Round V · seed 2026');
+  assert.equal(metaOf({ round: 5, history: [rec(4, 0), rec(5, 0)] }), 'Map after Round V');
   // The champion's last match closes the campaign's last round, however few of its matches were played.
   const won = { aliveIds: ['380'], own: Object.fromEntries(Object.keys(OWN).map(id => [id, '380'])) };
-  assert.equal(metaOf({ ...rrIdle, ...won, turnIndex: 1, history: [...rrIdle.history, rec(4, 0)], round: 4 }), 'Map after Round IV · seed 2026');
+  assert.equal(metaOf({ ...rrIdle, ...won, turnIndex: 1, history: [...rrIdle.history, rec(4, 0)], round: 4 }), 'Map after Round IV');
   assert.equal(metaOf({ ...batch, ...won, queue: [], match: null, round: 6, history: [...batch.history, rec(6, 0)] }),
-    'Map after Round VI · seed 2026');
-  assert.equal(metaOf({ round: 6, history: [rec(4, 0), rec(5, 0)], spin: spinOf('spinning') }), 'Map after Round V · seed 2026');
+    'Map after Round VI');
+  assert.equal(metaOf({ round: 6, history: [rec(4, 0), rec(5, 0)], spin: spinOf('spinning') }), 'Map after Round V');
 });
 
-test('title card variants: your turn while choosing, the draw for spectators, nothing in the conquest view', () => {
+test('map caption variants: your turn while choosing, the draw for spectators, nothing in the conquest view', () => {
   const choosing = state({ round: 4, pendingTarget: { attackerId: '380', optionIds: ['040'], selectedId: '040', round: 5 } });
   const yourTurn = buildMapOverlays(choosing, context(choosing)).titleCard;
   assert.equal(yourTurn.variant, 'your-turn');
   assert.equal(yourTurn.title, 'Your turn');
-  assert.equal(yourTurn.sub, 'Pick a neighbour to attack. Everyone else’s targets come from the compass.');
+  assert.equal(yourTurn.sub, 'Pick a neighbour to attack');
 
   const spec = { managedId: null, followedId: '380' };
   const drawing = state({ round: 3, spin: spinOf('spinning'), followedId: '380' });
   const draw = buildMapOverlays(drawing, context(drawing, spec)).titleCard;
   assert.equal(draw.variant, 'draw');
-  assert.equal(draw.kicker, 'The draw');
-  assert.equal(draw.title, 'Serbia is drawn to attack');
-  assert.equal(draw.sub, 'The compass is choosing the target', 'the target is named once the needle locks');
+  assert.ok(!('kicker' in draw));
+  assert.equal(draw.title, 'Serbia to attack');
+  assert.equal(draw.sub, null, 'the target is named once the needle locks');
+  assert.doesNotMatch(draw.title, /Italy/);
   const lockedDraw = state({ round: 3, spin: spinOf('locked'), followedId: '380' });
-  assert.equal(buildMapOverlays(lockedDraw, context(lockedDraw, spec)).titleCard.sub,
-    'The compass points to Italy · across a land border');
+  const locked = buildMapOverlays(lockedDraw, context(lockedDraw, spec)).titleCard;
+  assert.equal(locked.title, 'Serbia attacks Italy');
+  assert.equal(locked.sub, 'Across a land border');
   const live = state({ round: 3, followedId: '380', match: { aId: '688', dId: '380', applied: false, done: false, routeKind: 'sea' } });
-  assert.equal(buildMapOverlays(live, context(live, spec)).titleCard.sub, 'The compass points to Italy · by sea — no shared border');
+  const liveCard = buildMapOverlays(live, context(live, spec)).titleCard;
+  assert.equal(liveCard.title, 'Serbia attacks Italy');
+  assert.equal(liveCard.sub, 'By sea — no shared border');
   const rr = state({ round: 3, spin: spinOf('locked'), settings: { ...state().settings, turnOrder: 'round-robin' } });
   const rrCard = buildMapOverlays(rr, context(rr, spec)).titleCard;
-  assert.equal(rrCard.title, 'Serbia to attack');
-  assert.equal(rrCard.kicker, 'Round III');
+  assert.equal(rrCard.title, 'Serbia attacks Italy');
+  assert.ok(!('kicker' in rrCard));
   // Managers keep the campaign card during an AI duel; blitz spectators too.
   assert.equal(buildMapOverlays(drawing, context(drawing)).titleCard.variant, 'campaign');
   const blitz = state({ match: { aId: '688', dId: '380', applied: false }, settings: { ...state().settings, pacing: 'blitz' } });
@@ -573,18 +577,16 @@ test('title card variants: your turn while choosing, the draw for spectators, no
   assert.deepEqual(buildMapOverlays(signing, context(signing)), { titleCard: null, mapKey: null });
 });
 
-test('your-turn card names the reach as the target panel does: neighbours on land, targets by sea (DEC D4)', () => {
+test('your-turn caption names the reach as the target panel does: neighbours on land, targets by sea (DEC D4)', () => {
   const choosing = state({ round: 4, pendingTarget: { attackerId: '380', optionIds: ['040', '250'], selectedId: '040', round: 5 } });
   const ctxOn = board => ({ ...context(choosing), board, geo: board.geo, cache: new Map() });
   const land = ctxOn(placedBoard(choosing));
-  assert.equal(buildMapOverlays(choosing, land).titleCard.sub,
-    'Pick a neighbour to attack. Everyone else’s targets come from the compass.');
+  assert.equal(buildMapOverlays(choosing, land).titleCard.sub, 'Pick a neighbour to attack');
   assert.match(buildTargetPanel(choosing, land).count, / neighbours in reach$/);
   // No land border (an island): the options are direct sea strikes, so both say "target".
   const island = ctxOn(placedBoard(choosing, {}));
   assert.ok(reachableTargets(island.board, '380').every(entry => entry.tier !== 'land'));
-  assert.equal(buildMapOverlays(choosing, island).titleCard.sub,
-    'Pick a target to attack. Everyone else’s targets come from the compass.');
+  assert.equal(buildMapOverlays(choosing, island).titleCard.sub, 'Pick a target to attack');
   assert.match(buildTargetPanel(choosing, island).count, / targets in reach$/);
   // No board yet: the land copy.
   assert.match(buildMapOverlays(choosing, { ...context(choosing), board: null }).titleCard.sub, /^Pick a neighbour/);
@@ -824,7 +826,7 @@ test('Ticker: LIVE block, cursor, items separated by eight spaces; never a marqu
   assert.equal(text(view.host.querySelector('.ticker__text')), 'No results yet');
 });
 
-test('MapOverlays: nothing in conquest, title card variants, phone swap and key glyphs', async context => {
+test('MapOverlays: nothing in conquest, one-line caption variants, phone swap and key glyphs', async context => {
   const view = await mount(MapOverlays, { titleCard: null, mapKey: null }, context);
   assert.equal(view.host.innerHTML, '');
 
@@ -833,10 +835,11 @@ test('MapOverlays: nothing in conquest, title card variants, phone swap and key 
   await view.render(overlays);
   const card = view.host.querySelector('.map-title-card.map-title-card--campaign');
   assert.ok(card.classList.contains('map-title-card--swap'));
-  assert.equal(text(card.querySelector('.map-title-card__kicker')), 'Round XIX');
-  assert.equal(text(card.querySelector('.map-title-card__title-full')), 'The European Campaign');
+  assert.equal(card.querySelector('.map-title-card__kicker'), null);
+  assert.equal(text(card.querySelector('h2.map-title-card__title .map-title-card__title-full')), 'The European Campaign');
   assert.equal(text(card.querySelector('.map-title-card__title--phone')), 'Your fronts');
-  assert.equal(text(card.querySelector('.map-title-card__meta')), 'Map after Round XVIII · seed 2026');
+  assert.equal(text(card.querySelector('.map-title-card__meta')), 'Map after Round XVIII');
+  assert.doesNotMatch(card.textContent, /seed|Round XIX/, 'the masthead carries the round, Settings the seed');
   const key = view.host.querySelector('.map-key.map-key--political');
   assert.equal(key.getAttribute('role'), 'group');
   assert.equal(key.getAttribute('aria-label'), 'Map key');
@@ -854,8 +857,8 @@ test('MapOverlays: nothing in conquest, title card variants, phone swap and key 
 
   const choosing = state({ pendingTarget: { attackerId: '380', optionIds: ['040'], selectedId: '040' } });
   await view.render(buildMapOverlays(choosing, contextOf(choosing)));
-  assert.equal(text(view.host.querySelector('.map-title-card--your-turn .map-title-card__sub')),
-    'Pick a neighbour to attack. Everyone else’s targets come from the compass.');
+  assert.equal(text(view.host.querySelector('.map-title-card--your-turn .map-title-card__title')), 'Your turn');
+  assert.equal(text(view.host.querySelector('.map-title-card--your-turn .map-title-card__sub')), 'Pick a neighbour to attack');
   const reach = view.host.querySelector('.map-key--reach');
   assert.equal(reach.querySelector('.map-key__heading'), null);
   assert.equal(reach.querySelector('svg.map-key__dash rect').getAttribute('stroke-dasharray'), '5 3');

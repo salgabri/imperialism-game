@@ -94,7 +94,7 @@ main.campaign-layout {
 .tabbar__item[aria-current=page] .tabbar__ind, .tabbar__item[aria-expanded=true] .tabbar__ind { width:18px; height:4px; background:var(--you); box-shadow:none; }
 
 /* ---- Phone "More" sheet (A-10) ----
-   Anchored from under the masthead to the tab bar, so nothing of the map (its title-card chip) peeks above it. */
+   Anchored from under the masthead to the tab bar, so nothing of the map (its caption) peeks above it. */
 .more-sheet {
   position:fixed; left:0; right:0; top:calc(var(--safe-top) + var(--mast-h)); bottom:calc(64px + max(20px, var(--safe-bottom))); z-index:45;
   max-height:none; overflow:auto; overscroll-behavior:contain;

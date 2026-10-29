@@ -1,15 +1,15 @@
-// Owner: WP-COL (see PLAN.md §4). Map title card (top-left) and key (bottom-left) — PLAN §3.5 MapOverlays,
-// DEC D21, A-11, RM §1.11. Rendered as WorldMap children; both panels are `pointer-events: none` so panning and
-// hovering the map keep working underneath. Renders nothing when both models are null (conquest view).
+// Owner: WP-COL (see PLAN.md §4). Map caption (top-left: one line, title │ map state, instruction or route) and key
+// (bottom-left) — PLAN §3.5 MapOverlays, DEC D21, A-11, RM §1.11. Rendered as WorldMap children; both panels are
+// `pointer-events: none` so panning and hovering the map keep working underneath. Renders nothing when both models
+// are null (conquest view).
 import React from 'react';
 import { themedPaint } from '../../theme.js';
 import './campaign.css';
 
-function TitleCard({ variant = 'campaign', kicker = '', title = '', phoneTitle = null, meta = null, sub = null, wholeMap = false }) {
+function TitleCard({ variant = 'campaign', title = '', phoneTitle = null, meta = null, sub = null, wholeMap = false }) {
   const swap = !!phoneTitle && !wholeMap;
   return (
     <div className={`map-title-card map-title-card--${variant}${swap ? ' map-title-card--swap' : ''}`}>
-      {kicker ? <p className="map-title-card__kicker">{kicker}</p> : null}
       <h2 className="map-title-card__title">
         <span className="map-title-card__title-full">{title}</span>
         {swap ? <span className="map-title-card__title--phone">{phoneTitle}</span> : null}

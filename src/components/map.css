@@ -2,7 +2,7 @@
    map modes (bottom-right; top-right on tablet; hidden on phone), zoom/reset group above them (hidden on phone,
    which pinch-zooms), "Back to previous view", phone "Whole map", hover tooltip, anchored cards and the your-turn
    veil (A-9: one switch, --map-veil).
-   Placement of .world-map inside the app grid belongs to shell.css; the title card and key belong to WP-COL.
+   Placement of .world-map inside the app grid belongs to shell.css; the map caption and key belong to WP-COL.
    Breakpoints: wide ≥1600 · std 1200–1599 (base) · tablet 700–1199 · phone <700. */
 
 .world-map {

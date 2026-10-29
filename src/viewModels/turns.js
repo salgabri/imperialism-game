@@ -13,7 +13,7 @@ import { matchupOdds, winChanceFor } from './odds.js';
 export const TARGET_ROWS = 6;
 /** Recent attackers in the random-draw strip (M§1.7). */
 export const RECENT_ATTACKERS = 6;
-/** The spectator's "This turn" while the needle spins: the same words as the fixture block and the map title card. */
+/** The spectator's "This turn" while the needle spins: the same words as the fixture block. */
 export const COMPASS_CHOOSING = 'The compass is choosing the target';
 
 const EMPTY_STRIP = Object.freeze({
@@ -500,7 +500,7 @@ function oddsModel(a, b, attackerP, defenderP) {
 
 /**
  * "This turn" (A-14). While the needle is still spinning (stage 'ready'/'spinning') only the attacker is known on
- * screen: the defender and the odds stay hidden until the lock, like the fixture block, the map title card and the
+ * screen: the defender and the odds stay hidden until the lock, like the fixture block, the map caption and the
  * opponent fill (DEC D19), so the panel never names the target before the compass has stopped.
  */
 function thisTurnModel(st, ctx) {

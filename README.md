@@ -244,8 +244,9 @@ to", defender and the odds, then the live match card. It also shows
 **Following**, where you change the followed team and switch on "Pause when
 <team> plays", and the autoplay and speed controls.
 
-The map carries a title card (round, campaign title, "Map after Round XVIII ·
-seed 2026"), a key, the map-mode switch and the zoom −/+/reset control. A live
+The map carries a one-line caption (campaign title │ "Map after Round XVIII";
+"Your turn │ Pick a neighbour to attack"; the spectator draw and its route), a
+key, the map-mode switch and the zoom −/+/reset control. A live
 ticker runs along the bottom: a LIVE label and results newest first, such as
 "R XVIII  GERMANY 2  AUSTRIA 0 · AUSTRIA OUT". It is static, not a marquee.
 
@@ -854,7 +855,7 @@ src/
                        one-line delegates to src/app/
   app/                 App method bodies by area, called as fn.apply(this, args)
     mapMethods.jsx     map fills, flags, labels, tooltip, reach and conquest framing
-    columnMethods.jsx  campaign column, map title card and key, ticker
+    columnMethods.jsx  campaign column, map caption and key, ticker
     matchMethods.jsx   live match presentation, minute clock, match card
     squadMethods.jsx   squad view
     conquestMethods.jsx  result, signing gate, conquest screen, elimination

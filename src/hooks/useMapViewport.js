@@ -22,13 +22,13 @@ export const OWN_LABEL_MIN_PX = 6.5;
 
 /**
  * Design `fit()` windows (v4 L1445–1450): the bounds' centre sits in the [l..r]×[t..b] fraction of the canvas,
- * scaled by `pad`. Theatre framing leaves room for the title card (top) and the key/mode switch (bottom).
+ * scaled by `pad`. Theatre framing leaves room for the map caption (top) and the key/mode switch (bottom).
  */
 export const THEATRE_LAYOUT = Object.freeze({
   wide: Object.freeze({ l: .02, r: .98, t: .08, b: .9, pad: 1 }),
   std: Object.freeze({ l: .02, r: .98, t: .12, b: .86, pad: 1 }),
   tablet: Object.freeze({ l: 0, r: 1, t: .1, b: .9, pad: .98 }),
-  // [derived] the phone "Whole map": clear of the title card (top) and the Whole map button (bottom).
+  // [derived] the phone "Whole map": clear of the map caption (top) and the Whole map button (bottom).
   phone: Object.freeze({ l: 0, r: 1, t: .12, b: .86, pad: 1 }),
 });
 /** A4: your empire + next opponent fill the 330px phone map (v4 L1448). */

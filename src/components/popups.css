@@ -1,12 +1,12 @@
 /* Owner: WP-CONQ (see PLAN.md §4). Map notices emitted by Popups.jsx (.fi-map-notice, .fi-result-notice*, .fi-transfer-*,
    .fi-match-toast, .fi-toast-code, .fi-matchup-*, .fi-notice-label). v4 white floating panels (DEC D15, README
    §Surfaces): square, callout shadow, 4px left rule (ink; claimed teal for the player transfer). Informational only
-   (pointer-events:none). Placement keeps clear of WP-MAP's chrome (map.css) and WP-COL's title card / key:
-   - ≥1200: top-right, toast above the notice (title card top-left, key bottom-left, modes + zoom bottom-right).
+   (pointer-events:none). Placement keeps clear of WP-MAP's chrome (map.css) and WP-COL's map caption / key:
+   - ≥1200: top-right, toast above the notice (map caption top-left, key bottom-left, modes + zoom bottom-right).
    - 700–1199: the stack drops below the top-right mode switch and steps in by the zoom column, so on a short map
      (the map row is 47.5dvh: iPad landscape, 1024×768) the zoom group rising from the bottom-right corner still
-     passes beside it; capped at 44% of the map minus that column so it never reaches the title card (≤56% wide).
-   - <700: notice under the title card, its right edge stopping short of the zoom column (top-right, 44px + gap);
+     passes beside it; capped at 44% of the map minus that column so it never reaches the map caption (≤54% wide).
+   - <700: notice under the 28px map caption, its right edge stopping short of the zoom column (top-right, 44px + gap);
      toast full-width above "Whole map" (bottom-right). The key is hidden on phone.
    Both are hidden on the conquest view: the article and the callout own the screen (A-2), and a goal toast whose
    clear timer the acquisition gate cancelled must not linger over it. Reads WP-MAP's --wm-modes-h / --wm-zoom-size
@@ -95,7 +95,7 @@
 /* ---- Phone <700 ---- */
 @media (max-width:699.98px) {
   .fi-map-notice {
-    top:calc(var(--map-inset) + 52px); bottom:auto; left:var(--map-inset);
+    top:calc(var(--map-inset) + 36px); bottom:auto; left:var(--map-inset);   /* under the 28px map caption + 8px */
     right:calc(var(--map-inset) + var(--wm-zoom-size, 44px) + 8px); /* clear of the zoom −/+ column */
     width:auto; min-width:0; max-width:none; padding:10px 12px 12px;
   }
