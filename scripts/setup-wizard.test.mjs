@@ -248,7 +248,8 @@ test('step 1 binds sport, teams and theatre; the theatre mirror select stays val
   assert.equal(view.calls.picks.length, 1, 're-selecting the current sport does not reset the setup');
   await view.click(view.button('Clubs'));
   assert.deepEqual(view.calls.picks.at(-1), ['layer', 'clubs']);
-  assert.ok(view.qa('.setup-theatre').some(row => /All Leagues/.test(row.textContent)));
+  // Basketball clubs have one theatre: the NBA, on its own map of the USA and Canada.
+  assert.deepEqual(view.qa('.setup-theatre').map(row => row.dataset.name), ['NBA']);
   await view.click(view.button('Nations'));
 
   const africa = view.qa('.setup-theatre').find(row => /Africa/.test(row.textContent));
@@ -797,7 +798,8 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
   assert.equal(empty.teams.length, 0);
   assert.equal(empty.canLaunch, true);
   const stale = buildSetupModel({ ...BASE, sport: 'basketball', layer: 'clubs', clubScope: 'Serie A' });
-  assert.equal(stale.scopeId, 'all');
+  assert.equal(stale.scopeId, 'domestic:nba', "basketball clubs' only theatre");
+  assert.equal(stale.country, null, 'no map until App settles the theatre (setClubScope)');
   assert.match(stale.sports.find(sport => sport.id === 'basketball').note, /NBA/);
 });
 
@@ -900,7 +902,8 @@ test('a chosen country: description, counts, summaries, and its map load gating 
   assert.equal(busy.launchNote, 'Preparing the map of England…');
   // A country is a football-clubs theatre only: elsewhere the stale scope falls back like a stale league.
   const basketball = buildSetupModel({ ...BASE, ...COUNTRY, sport: 'basketball' }, { domestic: { state: 'loading' } });
-  assert.equal(basketball.scopeId, 'all');
+  assert.equal(basketball.scopeId, 'domestic:nba');
+  assert.equal(basketball.country, null);
   assert.equal(basketball.canLaunch, true);
 
   // Loading: polite status under the description, Launch disabled, step 3 explains the empty club list.

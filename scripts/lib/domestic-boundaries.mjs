@@ -872,5 +872,5 @@ export function createBoundarySource({ cacheDir, worldFile, offline = false, log
     };
   }
 
-  return { meta, layers, unitsFor, places, regions, world };
+  return { meta, layers, features: gbFeatures, unitsFor, places, regions, world };
 }

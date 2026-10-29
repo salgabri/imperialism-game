@@ -12,8 +12,8 @@ import { DEPENDENCIES, NATIONS, buildClub, makeRng, teamEff } from '../src/data/
 import { SAVE_KEY } from '../src/config.js';
 import { campaignStorageKey, exportCampaign, listCampaigns, writeSave } from '../src/engine/storage.js';
 import { CLUB_SCOPES } from '../src/data/scopes.js';
-import { DOMESTIC } from '../src/data/domestic.js';
-import { domesticLabel } from '../src/data/domesticScope.js';
+import { domesticEntry, domesticLabel } from '../src/data/domesticScope.js';
+import { domesticIdOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
 import { clearDomesticCache, decodeDomestic, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
 import { getSport } from '../src/sports/index.js';
@@ -53,7 +53,7 @@ async function loadReference(id) {
   const decoded = decodeDomestic(await response.json(), id);
   const byId = new Map(decoded.clubs.map(club => [club.id, club]));
   domesticReference = {
-    id, entry: DOMESTIC.find(item => item.id === id), scope: domesticScope(id), label: domesticLabel(domesticScope(id)),
+    id, entry: domesticEntry(domesticScope(id)), scope: domesticScope(id), label: domesticLabel(domesticScope(id)),
     meta: decoded.meta, sectionNames: decoded.sectionNames, sectionIds: new Set(Object.keys(decoded.sectionNames)),
     // Every section names the club starting on it: one per club on a 100-club map, a group each otherwise.
     clubs: decoded.clubs, startOwners: decoded.startOwners,
@@ -69,7 +69,7 @@ const wholeGroups = (own, reference) => reference.clubs.every(club => club.start
 function domesticOf(app) {
   const playing = app.state.phase === 'playing' || app.state.phase === 'victory';
   const settings = playing ? app.state.settings : app.state.setup;
-  const id = settings?.layer === 'clubs' && settings.sport === 'football' ? domesticScopeId(settings.clubScope) : null;
+  const id = domesticIdOf(settings);
   return id && domesticReference?.id === id ? domesticReference : null;
 }
 
@@ -775,7 +775,7 @@ function theatreSnapshot(sport) {
  * `setupChecks` the first request also fails, to exercise the error and Retry.
  */
 async function chooseDomestic(app, id, { setupChecks = false } = {}) {
-  const entry = DOMESTIC.find(item => item.id === id);
+  const entry = domesticEntry(domesticScope(id));
   if (!entry) throw new Error(`no shipped domestic map for ${id}`);
   const file = `domestic/${id}.json`, plan = globalThis.__smokeFetch;
   const sectionPattern = new RegExp(`^${id}-\\d{3}$`);
@@ -826,8 +826,10 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const note = document.getElementById('setup-theatre-description')?.textContent.trim() || '';
   const fewer = Math.floor(sections / entry.clubs), more = Math.ceil(sections / entry.clubs);
   const share = sections === entry.clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
-  result.description = entry.top.every(name => note.includes(name))
-    && note.endsWith(`${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
+  // A sport's own map (the NBA's) names its league and splits the land around the arenas.
+  result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.league
+    ? `the ${entry.clubs} ${entry.league} clubs, each starting on the land nearest its arena: ${entry.name} split into ${sections} territories along county and regional borders.`
+    : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
   // Step 1's country card: every section in its starting club's pastel (the card has no ids, so compare the fills
   // as a multiset), captioned with the sections and, unless there is one each, the clubs.
@@ -873,9 +875,10 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
     roleCard('spectator').click();
     await until('spectator role chosen again', () => app.state.setup.role === 'spectator');
     button('Basketball').click();
-    await waitFor(() => app.state.setup.clubScope === 'all', 2000);
-    result.basketballResets = app.state.setup.clubScope === 'all'
-      && !theatreSnapshot('basketball').options.some(item => item.value.startsWith('domestic:'));
+    await waitFor(() => app.state.setup.clubScope === 'domestic:nba', 2000);
+    // Basketball clubs have one theatre, the NBA's own map; no country is offered.
+    result.basketballResets = app.state.setup.clubScope === 'domestic:nba'
+      && JSON.stringify(theatreSnapshot('basketball').options.map(item => item.value)) === '["domestic:nba"]';
     button('Football').click();
     await sleep(20);
     await select('setup-theatre', domesticScope(id));

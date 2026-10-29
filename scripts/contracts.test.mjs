@@ -383,6 +383,11 @@ test('FROZEN pure-module exports are real values at runtime', async () => {
   assert.equal(shared.domesticIdOf({ layer: 'nations', sport: 'football', clubScope: 'domestic:826' }), null);
   assert.equal(shared.domesticIdOf({ layer: 'clubs', sport: 'basketball', clubScope: 'domestic:826' }), null);
   assert.equal(shared.domesticIdOf({ layer: 'clubs', sport: 'football', clubScope: 'all' }), null);
+  // Basketball clubs play the NBA's own map; a world campaign saved before it ('all', 'NBA') stays on the world.
+  assert.equal(shared.domesticIdOf({ layer: 'clubs', sport: 'basketball', clubScope: 'domestic:nba' }), 'nba');
+  assert.equal(shared.domesticIdOf({ layer: 'clubs', sport: 'football', clubScope: 'domestic:nba' }), null);
+  assert.equal(shared.domesticIdOf({ layer: 'nations', sport: 'basketball', clubScope: 'domestic:nba' }), null);
+  assert.equal(shared.domesticIdOf({ layer: 'clubs', sport: 'basketball', clubScope: 'NBA' }), null);
   assert.equal(shared.domesticIdOf(null), null);
 });
 

@@ -1,9 +1,11 @@
-// Domestic campaigns: one country's top clubs on that country's own map. Loads a
-// shipped `public/domestic/<id>.json` (format 1 or 2, see docs/design/domestic-campaigns.md),
+// Domestic campaigns: one country's top clubs on that country's own map, or a
+// sport's own map (the NBA's USA and Canada). Loads a shipped
+// `public/domestic/<id>.json` (format 1 or 2, see docs/design/domestic-campaigns.md),
 // validates it, and turns it into section geometry plus buildClub source rows.
 
 import { WorldGeometry } from './geo.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
+import { SPORTS } from '../sports/index.js';
 
 export const DOMESTIC_PREFIX = 'domestic:';
 // The format the build writes. Format 1 (one section per club) still loads, so
@@ -138,24 +140,34 @@ export function decodeDomestic(data, id = data?.id) {
       throw new Error(`Domestic map ${id}: section ${g.id} has no drawable land`);
     }
   }
-  const clubs = rawClubs.map(club => ({
-    id: club.id,
-    name: club.name,
-    short: club.short || club.name,
-    code: club.code,
-    league: club.league,
-    country: meta.id,
-    col: club.col,
-    str: club.str,
-    rep: club.rep ?? null,
-    fm: club.fm,
-    homeSection: club.section,
-    startSections: Object.freeze(meta.format === 1 ? [club.section] : [...club.sections]),
-    homePoint: club.home || null,
-    squad: club.squad.map(tuple => expandFmTuple(tuple, meta.source, club.name)),
-  }));
+  const builtIn = builtInClubs(data);
+  const clubs = rawClubs.map(raw => {
+    // A sport's own map gives the game's club its land and colour; name, squad and strength stay the club's.
+    const club = builtIn ? { ...builtIn.get(raw.id), ...raw } : raw;
+    return {
+      id: club.id,
+      name: club.name,
+      short: club.short || club.name,
+      code: club.code,
+      league: club.league,
+      country: meta.id,
+      col: club.col,
+      str: club.str,
+      rep: club.rep ?? null,
+      fm: club.fm,
+      homeSection: club.section,
+      startSections: Object.freeze(meta.format === 1 ? [club.section] : [...club.sections]),
+      homePoint: club.home || null,
+      squad: builtIn ? club.squad : club.squad.map(tuple => expandFmTuple(tuple, meta.source, club.name)),
+    };
+  });
   const startOwners = Object.freeze(Object.fromEntries(clubs.flatMap(club => club.startSections.map(s => [s, club.id]))));
   return { meta, geo, clubs, sectionNames, focus: meta.focus, startOwners };
+}
+
+/** The game's clubs by id for a sport's own map (`sport` set), else null: a country map carries its own clubs. */
+function builtInClubs(data) {
+  return data.sport == null ? null : new Map(SPORTS[data.sport].clubs.map(club => [club.id, club]));
 }
 
 function validateDomestic(data, id) {
@@ -186,8 +198,12 @@ function validateDomestic(data, id) {
     fail('focus must be [west, south, east, north] with east > west and north > south');
   }
   if (!isObject(data.boundaries)) fail('boundaries attribution is missing');
+  if (data.hosts != null && (!Array.isArray(data.hosts) || !data.hosts.length || !data.hosts.every(text))) fail('hosts must list world shape ids');
+  if (data.sport != null && !SPORTS[data.sport]?.clubs) fail(`unknown sport ${JSON.stringify(data.sport)}`);
+  // A sport's own map (the NBA's) lists the game's clubs of that sport; a country map carries its FM clubs.
+  const builtIn = builtInClubs(data);
   const src = data.source;
-  if (!isObject(src) || !text(src.version) || !text(src.snapshotDate)) fail('source must name the FM data version and snapshotDate');
+  if (!builtIn && (!isObject(src) || !text(src.version) || !text(src.snapshotDate))) fail('source must name the FM data version and snapshotDate');
 
   const t = data.topology;
   if (!isObject(t) || t.type !== 'Topology' || !Array.isArray(t.arcs)) fail('topology is not a TopoJSON Topology');
@@ -242,19 +258,25 @@ function validateDomestic(data, id) {
   clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
     if (!isObject(club)) fail(`${at} is not an object`);
-    if (!Number.isInteger(club.fm) || club.fm < 0) fail(`${at} fm must be the FM club id`);
-    if (club.id !== `d${id}-${club.fm}`) fail(`${at} id must be "d${id}-${club.fm}"`);
+    if (builtIn) {
+      if (!builtIn.has(club.id)) fail(`${at} is not one of the game's ${data.sport} clubs`);
+    } else {
+      if (!Number.isInteger(club.fm) || club.fm < 0) fail(`${at} fm must be the FM club id`);
+      if (club.id !== `d${id}-${club.fm}`) fail(`${at} id must be "d${id}-${club.fm}"`);
+    }
     if (clubIds.has(club.id)) fail(`${at} id is duplicated`);
     clubIds.add(club.id);
-    if (!text(club.name)) fail(`${at} has no name`);
-    if (club.short != null && !text(club.short)) fail(`${at} short name is empty`);
-    if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
-    if (codes.has(club.code)) fail(`${at} code ${club.code} is duplicated`);
-    codes.add(club.code);
     if (!text(club.col)) fail(`${at} has no colour`);
-    if (!text(club.league)) fail(`${at} has no league`);
-    if (!finite(club.str) || club.str < 1 || club.str > 99) fail(`${at} str must be a rating 1-99`);
-    if (club.rep != null && !finite(club.rep)) fail(`${at} rep must be a number`);
+    if (!builtIn) {
+      if (!text(club.name)) fail(`${at} has no name`);
+      if (club.short != null && !text(club.short)) fail(`${at} short name is empty`);
+      if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
+      if (codes.has(club.code)) fail(`${at} code ${club.code} is duplicated`);
+      codes.add(club.code);
+      if (!text(club.league)) fail(`${at} has no league`);
+      if (!finite(club.str) || club.str < 1 || club.str > 99) fail(`${at} str must be a rating 1-99`);
+      if (club.rep != null && !finite(club.rep)) fail(`${at} rep must be a number`);
+    }
     if (!sectionIds.has(club.section)) fail(`${at} section ${JSON.stringify(club.section)} is not in the topology`);
     const starts = grouped ? club.sections : [club.section];
     if (!Array.isArray(starts) || !starts.length) fail(`${at} sections must list its starting sections`);
@@ -268,6 +290,8 @@ function validateDomestic(data, id) {
     }
     if (club.home != null && (!Array.isArray(club.home) || club.home.length !== 2 || !club.home.every(finite)
       || Math.abs(club.home[1]) > 90)) fail(`${at} home must be [lon, lat] or null`);
+    // A sport's own map takes squads from the game's clubs.
+    if (builtIn) return;
     if (!Array.isArray(club.squad) || club.squad.length < 11) fail(`${at} squad needs at least 11 players`);
     const players = new Set();
     let keeper = false;
@@ -348,14 +372,16 @@ export function domesticSurroundings(atlas, domestic, margin = { x: 480, y: 800 
     for (const [x, y] of ring) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
     return x0 < 960 + margin.x && x1 > -margin.x && y0 < 540 + margin.y && y1 > -margin.y;
   };
+  // A sport's own map names the world shapes it covers (the NBA's: the USA and Canada).
+  const hosts = new Set(meta.hosts || [meta.id]);
   const shapes = world.countries.flatMap(country => {
-    if (country.id === meta.id && !meta.boundaries?.mask) return [];
+    if (hosts.has(country.id) && !meta.boundaries?.mask) return [];
     const rings = (paths[country.id]?.labelRings || []).filter(near);
     return rings.length ? [{ id: country.id, d: rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join(''), rings }] : [];
   });
   // The masked host shape covers its own sections; overlaps elsewhere are
   // harmless (sections take precedence over obstacles in routing).
-  const value = Object.freeze({ shapes, obstacles: shapes.filter(shape => shape.id !== meta.id) });
+  const value = Object.freeze({ shapes, obstacles: shapes.filter(shape => !hosts.has(shape.id)) });
   surroundings.set(domestic, { atlas, key, value });
   return value;
 }
