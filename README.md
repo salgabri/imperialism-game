@@ -17,7 +17,8 @@ And pick who fights:
 
 - **Nations** — 170 national teams, each starting on its own homeland.
 - **Clubs** — 132 football clubs from seven European leagues, or all 30 NBA
-  franchises. Real Madrid annexes territory exactly the way Spain does.
+  franchises on [their own map](#the-nba-map) of the USA and Canada. Real Madrid
+  annexes territory exactly the way Spain does.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
@@ -89,8 +90,9 @@ default suits a first campaign, so pressing Space three times starts one.
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
    choices are the whole world (170 nations), another confederation, or the
-   Elite 32. Club campaigns offer individual leagues, all leagues, or the
-   strongest 32 available clubs. The step opens on a map of the chosen theatre:
+   Elite 32. Football club campaigns offer individual leagues, all leagues, or
+   the strongest 32 available clubs; basketball clubs play the NBA on its own
+   map of the USA and Canada. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). It also
    shows the actual number of teams, the number of matches and the estimated
@@ -469,7 +471,8 @@ onto it: working down the strength order, each club claims the nearest country t
 its homeland that nobody has taken. The best club in each league gets the
 homeland itself and the rest fan outwards, which is why an all-leagues campaign
 opens with Europe carved up and the strongest sides at its centre. Countries
-nobody reaches stay neutral, exactly as non-participating nations do.
+nobody reaches stay neutral, exactly as non-participating nations do. The NBA is
+not dealt: its franchises split [the USA and Canada](#the-nba-map) between them.
 
 A club's territory is painted in a generated colour rather than a flag —
 identical national flags would tell you nothing — and wherever a nation shows its
@@ -632,6 +635,31 @@ routing (anchors, foreign land, border routes) is tested by
 ones included. The [design notes](docs/design/domestic-campaigns.md) give the
 sources and queries, the partition, the file format, saves, acceptance checks and
 known limitations.
+
+### The NBA map
+
+Basketball clubs have one theatre, **NBA**: the 30 franchises fight over the USA
+and Canada and nothing else. The two countries are split into 30 territories, one
+per franchise, grown from its arena over US counties and Canadian economic
+regions (geoBoundaries) by the same partition as the country maps: each territory
+takes the land nearest its arena, so Portland holds the Northwest with British
+Columbia and Alaska, Toronto Quebec and Newfoundland, and the Nets Brooklyn and
+Long Island. The two layers draw the border slightly apart, so the build fits the
+Canadian side to the US line: a franchise with land in both countries holds one
+territory, and neighbours across the border share it. Territories are named after
+their cities and coloured apart from their neighbours; the franchises keep their
+own names, crests and fives. Mexico, Greenland and the rest of the world lie
+beneath as inert land. The map is `public/domestic/nba.json`, played through the
+country-map runtime; NBA campaigns saved before it still resume on the world map.
+
+```bash
+npm run build:nba-map                      # boundaries + arenas → public/domestic/nba.json, src/data/clubMaps.js (about a minute)
+npm run build:nba-map -- --check           # offline rebuild must match the committed files byte for byte
+```
+
+Arenas are in `scripts/data/nba-arenas.json`; the
+[design notes](docs/design/domestic-campaigns.md#the-nba-map) cover the border
+fitting and the file additions.
 
 ## Football seasons
 
@@ -897,7 +925,8 @@ src/
                        values written once (scripts/lib/data-module.mjs writes them)
   data/scopes.js       club theatre choices (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
-  data/domesticScope.js  labels for 'domestic:<id>' theatres
+  data/clubMaps.js     GENERATED index of a sport's own club map: the NBA's (npm run build:nba-map)
+  data/domesticScope.js  labels for 'domestic:<id>' theatres, and a sport's own map
   data/domesticTiers.js  each nation's club cap and the setup lists' priority order
   data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
   data/cmPlayers.js    CM player tuples, positions and rating conversion
@@ -921,7 +950,7 @@ public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
-  domestic/            one sectioned map per country, fetched on demand
+  domestic/            one sectioned map per country, and the NBA's (nba.json), fetched on demand
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
   flags/               170 vendored flag SVGs
@@ -938,6 +967,7 @@ scripts/
   build-clubs.mjs      builds the club layer for both sports
   sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
+  build-nba-map.mjs    builds the NBA's map of the USA and Canada from the arenas
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-football-set.mjs  builds a local football season from a CM 01/02 database
 ```

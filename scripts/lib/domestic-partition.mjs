@@ -189,6 +189,24 @@ export function unitTopology(units) {
   return { topo, adjacency };
 }
 
+/**
+ * Units from two sources (a map of two countries, each from its own layer) meet
+ * without shared arcs: their border vertices differ. Units of different `realm`s
+ * whose borders come within `km` of each other, with no other unit between, are
+ * linked as neighbours too. Returns a new adjacency.
+ */
+export function joinRealms(units, adjacency, km) {
+  const border = units.map((u, i) => i).filter(i => units[i].realm != null
+    && units.some(v => v.realm != null && v.realm !== units[i].realm && boxKm(units[i].bbox, v.bbox) <= km));
+  const across = facingSections(border.map(i => units[i].polys), km);
+  const out = adjacency.map(list => new Set(list));
+  across.forEach((list, a) => list.forEach(b => {
+    const i = border[a], j = border[b];
+    if (units[i].realm !== units[j].realm) { out[i].add(j); out[j].add(i); }
+  }));
+  return out.map(set => [...set].sort((a, b) => a - b));
+}
+
 export function components(adjacency) {
   const comp = new Array(adjacency.length).fill(-1);
   let count = 0;
@@ -1172,7 +1190,8 @@ export function splitUnits(units, homeOf, n, { maxGapKm = Infinity, minKm2 = 0, 
       const name = `${base} (${qualifier})`;
       names.add(name);
       // A cell can cut a ragged unit into several parts; the site's part keeps the piece id.
-      return explodeUnits([{ id: `${u.id}~${p.i}`, name, baseName: base, qualifier, ...(u.territory != null ? { territory: u.territory } : {}), ...(u.fans ? { fans: u.fans } : {}), polys: p.polys }], () => sites[p.site]);
+      return explodeUnits([{ id: `${u.id}~${p.i}`, name, baseName: base, qualifier, ...(u.territory != null ? { territory: u.territory } : {}), ...(u.fans ? { fans: u.fans } : {}),
+        ...(u.realm != null ? { realm: u.realm } : {}), polys: p.polys }], () => sites[p.site]);
     });
     if (crowd) for (const v of newUnits) crowdCut.add(v.id);
     splits.push({ unit: u.name, source: baseId(u.id), pieces: named.length, clubs: members.length, reason: why });
@@ -1496,9 +1515,15 @@ export const gapLimitKm = units => Math.max(3, grainKm(units) / 2);
  * starts `extras` ({ unit, point, place, kind, group }); `targets` are the group sizes,
  * `moved` the clubs whose size moved, `fans` and `movedStarts` the clubs starting away
  * from home. Longitudes come back shifted when the country crosses the antimeridian.
+ * With `joinKm`, units of different `realm`s that come that close are neighbours
+ * (joinRealms), so territories grow across a border two sources draw differently.
  */
-export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], extraPlaces = places, sections = rawHomes.length, log = () => {} } = {}) {
+export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], extraPlaces = places, sections = rawHomes.length, joinKm = 0, log = () => {} } = {}) {
   const n = rawHomes.length;
+  const topologyOf = list => {
+    const unitTopo = unitTopology(list);
+    return joinKm ? { ...unitTopo, adjacency: joinRealms(list, unitTopo.adjacency, joinKm) } : unitTopo;
+  };
   const frame = (list, shift) => {
     const units = prepareUnits(list.map(u => ({ ...u, polys: shift ? shiftPolys(u.polys) : u.polys })));
     if (!shift) return units;
@@ -1512,7 +1537,7 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
   let shift = needsShift(rawUnits);
   let units = frame(rawUnits, shift);
   let homes = homesIn(shift);
-  let { adjacency } = unitTopology(units);
+  let { adjacency } = topologyOf(units);
   const overseas = dropOverseas(units, adjacency, homes);
   const dropped = [...new Set(overseas.dropped.map(u => u.name))].sort();
   if (dropped.length) {
@@ -1522,7 +1547,7 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
     shift = needsShift(kept);
     units = frame(kept, shift);
     homes = homesIn(shift);
-    ({ adjacency } = unitTopology(units));
+    ({ adjacency } = topologyOf(units));
   }
   const sourceUnits = new Set(units.map(u => baseId(u.id))).size;
   const sourceAreaKm2 = units.reduce((s, u) => s + u.area, 0);
@@ -1569,7 +1594,7 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
     }
     const fanOf = Array.from({ length: n }, (_, c) => fans.map((f, i) => (f.members.includes(c) ? i : -1)).filter(i => i >= 0));
     ({ units, splits } = splitUnits(units, homeOf, sections, { maxGapKm: limit, minKm2, log: note, ...(grouped ? { maxUnitKm2: sourceAreaKm2 / sections } : {}) }));
-    ({ topo, adjacency: unitAdjacency } = unitTopology(units));
+    ({ topo, adjacency: unitAdjacency } = topologyOf(units));
     const grownUnits = units;
     ({ owner, seedUnit, seedPoint } = growSections(units, unitAdjacency, homeOf, {
       reach, padKm, minKm2,

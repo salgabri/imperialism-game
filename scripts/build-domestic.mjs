@@ -18,7 +18,6 @@
 //          src/data/domestic.js (index for the setup screen), docs/design/domestic-audit.json.
 import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
 import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { format } from 'node:util';
@@ -28,6 +27,7 @@ import { feature, neighbors } from 'topojson-client';
 import { buildClub, selectLineup } from '../src/data/teams.js';
 import { expandFmTuple, FM_CONVERSION, FM_ORIGIN } from '../src/data/fmPlayers.js';
 import { decodeDomestic, DOMESTIC_FORMAT, DOMESTIC_SECTIONS } from '../src/engine/domestic.js';
+import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
 import { createBoundarySource, createDownloader, createNamer, GB_CITATION, GN_CITATION, sameName } from './lib/domestic-boundaries.mjs';
 import {
   arcPoints, baseId, bboxOf, components, dissolve, facingKm, facingSections, kmBetween, kmToPolys, partitionCountry, pointInPolys, polysAreaKm2,
@@ -112,37 +112,7 @@ function makeCode(rawName, taken) {
   throw new Error(`No free code for ${rawName}`);
 }
 
-// Two lightness levels over a 24-step hue wheel; greedy over the section graph so
-// neighbours (and, where possible, neighbours of neighbours) differ clearly.
-const PALETTE = [0.74, 0.6].flatMap(l => Array.from({ length: 24 }, (_, i) => ({ l, c: 0.15, h: i * 15 })));
-const lab = ({ l, c, h }) => [l, c * Math.cos(h * Math.PI / 180), c * Math.sin(h * Math.PI / 180)];
-const deltaE = (a, b) => { const p = lab(a), q = lab(b); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
-const colourText = ({ l, c, h }) => `oklch(${l.toFixed(2)} ${c.toFixed(2)} ${h})`;
-
-function colourSections(adjacency) {
-  const chosen = new Array(adjacency.length).fill(-1);
-  const used = new Array(PALETTE.length).fill(0);
-  for (let i = 0; i < adjacency.length; i++) {
-    const near = adjacency[i].filter(j => chosen[j] >= 0).map(j => PALETTE[chosen[j]]);
-    const second = [...new Set(adjacency[i].flatMap(j => adjacency[j]))]
-      .filter(j => j !== i && !adjacency[i].includes(j) && chosen[j] >= 0).map(j => PALETTE[chosen[j]]);
-    let best = -1, bestKey = null;
-    PALETTE.forEach((colour, k) => {
-      const d1 = near.length ? Math.min(...near.map(o => deltaE(colour, o))) : 1;
-      const d2 = second.length ? Math.min(...second.map(o => deltaE(colour, o))) : 1;
-      // Neighbours dominate (capped: any clear difference is enough), then second
-      // neighbours, then the least-used colour; ties keep the lower palette index.
-      const key = [Math.min(d1, 0.12), Math.min(d2, 0.08), -used[k], d1];
-      const at = bestKey ? key.findIndex((v, idx) => v !== bestKey[idx]) : 0;
-      if (!bestKey || (at >= 0 && key[at] > bestKey[at])) { best = k; bestKey = key; }
-    });
-    chosen[i] = best;
-    used[best]++;
-  }
-  return chosen.map(k => colourText(PALETTE[k]));
-}
-
-const COMPASS = ['east', 'north-east', 'north', 'north-west', 'west', 'south-west', 'south', 'south-east'];
+const COMPASS =['east', 'north-east', 'north', 'north-west', 'west', 'south-west', 'south', 'south-east'];
 const qualify = (name, q) => (name.endsWith(')') ? `${name.slice(0, -1)}, ${q})` : `${name} (${q})`);
 // A name that reads as one (Latin script, words of letters, not a code), for GeoNames
 // places a section may be named after.
@@ -493,29 +463,6 @@ function focusBox(qtopo, units, comp, count, homeOf) {
   const padX = (box[2] - box[0]) * 0.02, padY = (box[3] - box[1]) * 0.02;
   return [Math.floor((box[0] - padX) * 10) / 10, Math.floor((box[1] - padY) * 10) / 10,
     Math.ceil((box[2] + padX) * 10) / 10, Math.ceil((box[3] + padY) * 10) / 10].map(v => fixed(v));
-}
-
-/** Version hash: sha256 of the document without its version field, as compact JSON. */
-function contentHash(doc) {
-  const { version, ...rest } = doc;
-  return createHash('sha256').update(JSON.stringify(rest)).digest('hex').slice(0, 8);
-}
-
-/** One top-level field per line; arcs, geometries and clubs one per line for readable diffs. */
-function serialize(doc) {
-  const { topology: t, clubs, ...head } = doc;
-  const lines = Object.entries(head).map(([k, v]) => `${JSON.stringify(k)}: ${JSON.stringify(v)}`);
-  const { arcs, objects, ...topoHead } = t;
-  const sections = objects.sections;
-  const topo = `{${Object.entries(topoHead).map(([k, v]) => `${JSON.stringify(k)}:${JSON.stringify(v)}`).join(',')},`
-    + `"objects":{"sections":{"type":${JSON.stringify(sections.type)},"geometries":[\n${sections.geometries.map(g => JSON.stringify(g)).join(',\n')}\n]}},`
-    + `"arcs":[\n${arcs.map(a => JSON.stringify(a)).join(',\n')}\n]}`;
-  lines.push(`"topology": ${topo}`);
-  lines.push(`"clubs": [\n${clubs.map(c => JSON.stringify(c)).join(',\n')}\n]`);
-  const text = `{\n${lines.join(',\n')}\n}\n`;
-  // The layout must round-trip to the hashed document exactly.
-  if (JSON.stringify(JSON.parse(text)) !== JSON.stringify(doc)) throw new Error('serialize does not round-trip');
-  return text;
 }
 
 // ---- Index, attribution, audit ----

@@ -7,7 +7,7 @@ import { NATIONS, SCOPES } from '../../data/teams.js';
 import { CLUB_SCOPES } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
-import { domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
+import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
 import { BUILT_IN_SEASON, fieldedNations } from '../../engine/footballSets.js';
 import { V4, empireFill, ratingTierOf } from '../../theme.js';
@@ -247,9 +247,21 @@ function clubIndex(sport) {
   return clubIndexCache.get(sport.clubs);
 }
 
+const clubMapRows = new Map();
+/** The one theatre of a sport whose clubs have their own map: 'NBA', on the USA and Canada. */
+function clubMapTheatre(map) {
+  if (!clubMapRows.has(map.id)) {
+    clubMapRows.set(map.id, Object.freeze([Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' })]));
+  }
+  return clubMapRows.get(map.id);
+}
+
 /** Theatre rows for the active layer: [{ id, name, label, count, note }] (counts as in HEAD's setup). */
 export function theatreOptions(sport, clubLayer) {
-  if (clubLayer) return clubTheatres(sport);
+  if (clubLayer) {
+    const map = clubMapOf(sport.id);
+    return map ? clubMapTheatre(map) : clubTheatres(sport);
+  }
   const counts = nationCounts(sport);
   return SCOPES.map(scope => theatreRow(scope, counts[scope.id]));
 }
@@ -308,6 +320,10 @@ export function domesticDescription(entry) {
   const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
+  if (entry.league) {
+    return `${leaders} the ${clubs} ${entry.league} clubs, each starting on the land nearest its arena: ${entry.name} split into `
+      + `${sections} territories along county and regional borders.`;
+  }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
   return `${leaders} ${clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`;
@@ -505,7 +521,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   // One country's own top clubs: football clubs only, listed after the leagues.
   const domesticOn = domesticOffered(sport, clubLayer, dataSet);
   const domesticScopes = domesticOn ? domesticTheatres() : NO_ROWS;
-  const country = domesticOn && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
+  // A chosen country (football), or the map a sport's clubs play on (basketball: the NBA's USA and Canada).
+  const chosenMap = clubLayer && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
+  const country = chosenMap && (chosenMap.sport ? chosenMap.sport === sport.id : domesticOn) ? chosenMap : null;
   // Changing sport can leave a league from the previous sport in the saved setup; same fallback as startCampaign.
   const activeScope = scopes.find(scope => scope.id === (clubLayer ? setup.clubScope : setup.scope)) || scopes[0];
   const scopeId = country ? setup.clubScope : activeScope.id;

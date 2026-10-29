@@ -23,6 +23,8 @@ const wanted = scenario => fixedChecks || scenario.name.toLowerCase().includes(s
 const ENGLAND = { layer: 'clubs', clubScope: 'domestic:826' };
 // Fewer clubs than sections: each Fiji club starts on a group of islands and districts.
 const FIJI = { layer: 'clubs', clubScope: 'domestic:242' };
+// Basketball clubs: the 30 NBA franchises on their own map of the USA and Canada.
+const NBA = { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nba' };
 
 const SCENARIOS = [
   { name: 'South America · duel · ticker', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
@@ -31,7 +33,7 @@ const SCENARIOS = [
   { name: 'BASKETBALL · South America · duel · ticker', sport: 'basketball', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
   { name: 'BASKETBALL · Europe · blitz · instant', sport: 'basketball', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Premier League · blitz · instant', layer: 'clubs', clubScope: 'Premier League', pacing: 'blitz', resolution: 'instant' },
-  { name: 'CLUBS · NBA · chaos · instant', sport: 'basketball', layer: 'clubs', clubScope: 'NBA', pacing: 'chaos', resolution: 'instant' },
+  { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', setupChecks: true },
   { name: 'DOMESTIC · England top clubs · blitz · instant', ...ENGLAND, pacing: 'blitz', resolution: 'instant' },
   { name: 'DOMESTIC · Fiji top clubs · duel · instant', ...FIJI, pacing: 'duel', resolution: 'instant' },
@@ -41,7 +43,7 @@ const RESUME_SCENARIOS = [
   { name: 'World war · blitz · instant', scope: 'world', pacing: 'blitz', resolution: 'instant', expectedField: 170 },
   { name: 'BASKETBALL · South America · blitz · instant', sport: 'basketball', scope: 'CONMEBOL', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Premier League · blitz · instant', layer: 'clubs', clubScope: 'Premier League', pacing: 'blitz', resolution: 'instant' },
-  { name: 'CLUBS · NBA · chaos · instant', sport: 'basketball', layer: 'clubs', clubScope: 'NBA', pacing: 'chaos', resolution: 'instant' },
+  { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', finish: true },
   { name: 'DOMESTIC · Fiji top clubs · chaos · instant', ...FIJI, pacing: 'chaos', resolution: 'instant', finish: true },
 ];
@@ -231,9 +233,14 @@ function checkMapScope(label, snapshot, options) {
   else checkFlagScope(label, snapshot, options);
 }
 
-/** Football clubs offer every shipped country, grouped apart from the leagues; nothing else does. */
+/** Football clubs offer every shipped country, grouped apart from the leagues; basketball clubs only the NBA's map. */
 function checkTheatres(scenario, theatre) {
   const countries = theatre.options.filter(option => option.value.startsWith('domestic:'));
+  if (scenario.layer === 'clubs' && scenario.sport === 'basketball') {
+    check('basketball clubs play only the NBA’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:nba', text: 'NBA · 30 clubs' }]),
+      JSON.stringify(theatre.options));
+    return;
+  }
   if (scenario.layer !== 'clubs' || (scenario.sport || 'football') !== 'football') {
     check('only football clubs offer single-country theatres', countries.length === 0, countries.map(option => option.text).join(', '));
     return;
@@ -256,7 +263,7 @@ function checkDomesticSetup(setup, full) {
     check('Retry loads the map', setup.retryLoaded);
     check('a session preset keeps the chosen country', setup.presetKeepsCountry);
     check('a session preset keeps the managed club of that country', setup.presetKeepsClub);
-    check('switching to basketball drops the country theatre', setup.basketballResets);
+    check('switching to basketball swaps the country for the NBA’s own map', setup.basketballResets);
   }
   check('the setup map shows exactly the country’s sections', setup.sectionsShown);
   check('setup previews each section in its starting club’s kickoff colour (Political pastel, Flags club colour)', setup.setupColours,

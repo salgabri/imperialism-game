@@ -2,6 +2,7 @@
 import { C } from '../theme.js';
 import { DEFAULT_SPORT, getSport } from '../sports/index.js';
 import { domesticScopeId } from '../engine/domestic.js';
+import { CLUB_MAPS } from '../data/clubMaps.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -14,9 +15,15 @@ export const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'U
   // A football data set id (docs/design/football-years.md); null plays the built-in season.
   dataSet: null };
 
-/** The country whose own map a setup or saved campaign is played on, or null for the world. Pure. */
+/**
+ * The map a setup or saved campaign is played on instead of the world: a country's (football clubs) or a sport's own
+ * (basketball clubs: the NBA's USA and Canada), or null for the world. Pure.
+ */
 export function domesticIdOf(settings) {
-  return settings?.layer === 'clubs' && getSport(settings.sport).id === 'football' ? domesticScopeId(settings.clubScope) : null;
+  const id = settings?.layer === 'clubs' ? domesticScopeId(settings.clubScope) : null;
+  if (!id) return null;
+  const own = CLUB_MAPS.find(map => map.id === id);
+  return (own ? own.sport : 'football') === getSport(settings.sport).id ? id : null;
 }
 
 /** The data set a setup or saved campaign is played on, or null for the built-in data (country maps use it too). Pure. */

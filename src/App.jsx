@@ -7,7 +7,7 @@ import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
-import { domesticEntry, domesticLabel } from './data/domesticScope.js';
+import { clubMapScope, domesticEntry, domesticLabel } from './data/domesticScope.js';
 import { clearFootballSetCache, fieldedNations, footballSport, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, sportOf } from './engine/footballSets.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
@@ -71,10 +71,15 @@ const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.
 const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}${settings.dataSeason ? ` ${settings.dataSeason}` : ''} · ${scopeName}`;
 
 /**
- * A data set brings its own clubs, so the setup's club theatre must be one of them: a country map (built from the
- * built-in data) and a league the set leaves out fall back to every club. Kept as it is while the set loads.
+ * The setup's club theatre. A sport with its own map plays only there (basketball: the NBA's USA and Canada), and
+ * another sport's map falls back to every club. A data set brings its own clubs, so the theatre must be one of them: a
+ * country map (built from the built-in data) and a league the set leaves out fall back to every club. Kept as it is
+ * while the set loads.
  */
 function setClubScope(setup) {
+  const own = clubMapScope(getSport(setup.sport).id);
+  if (own) return own;
+  if (domesticEntry(setup.clubScope)?.sport) return 'all';
   if (setup.dataSet == null || getSport(setup.sport).id !== 'football') return setup.clubScope;
   if (isDomesticScope(setup.clubScope)) return 'all';
   const sport = sportOf(setup);
@@ -702,7 +707,7 @@ export default class App extends React.Component {
         if (!domestic) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all'
           : CLUB_SCOPES(sportOf(setup) || getSport(setup.sport))[2]?.id || 'all';
       } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
-      // Country maps come with football data only.
+      // Country maps come with football data only (basketball clubs take the NBA's map below, in setClubScope).
       if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
       // So do data sets, and they bring their own clubs.
