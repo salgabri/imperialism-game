@@ -5,5 +5,5 @@
 // { id, sport, league, name, clubs, sections, version, top: three strongest clubs }
 
 export const CLUB_MAPS = [
-  {"id":"nba","sport":"basketball","league":"NBA","name":"USA and Canada","clubs":30,"sections":30,"version":"nba-f7925ecf","top":["Boston Celtics","Dallas Mavericks","Denver Nuggets"]},
+  {"id":"nba","sport":"basketball","league":"NBA","name":"USA and Canada","clubs":30,"sections":30,"version":"nba-a6718730","top":["Boston Celtics","Dallas Mavericks","Denver Nuggets"]},
 ];

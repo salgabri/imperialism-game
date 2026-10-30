@@ -162,7 +162,10 @@ export function decodeDomestic(data, id = data?.id) {
     };
   });
   const startOwners = Object.freeze(Object.fromEntries(clubs.flatMap(club => club.startSections.map(s => [s, club.id]))));
-  return { meta, geo, clubs, sectionNames, focus: meta.focus, startOwners };
+  // Land no club starts on (topology.objects.empty), only ever drawn: see domesticSurroundings.
+  const empty = topology.objects.empty?.geometries.length
+    ? new WorldGeometry(topology, {}, { object: 'empty', projection: meta.projection, keepPolys: false }) : null;
+  return { meta, geo, clubs, sectionNames, focus: meta.focus, startOwners, empty };
 }
 
 /** The game's clubs by id for a sport's own map (`sport` set), else null: a country map carries its own clubs. */
@@ -247,6 +250,27 @@ function validateDomestic(data, id) {
     sectionIds.add(g.id);
   });
   if (!sectionIds.size) fail('topology has no sections');
+  // Optional land nobody starts on (the NBA map's empty states): drawn beneath, never territory.
+  const empty = t.objects.empty;
+  if (empty != null) {
+    if (!isObject(empty) || empty.type !== 'GeometryCollection' || !Array.isArray(empty.geometries)) {
+      fail('topology.objects.empty must be a GeometryCollection');
+    }
+    const emptyIds = new Set();
+    empty.geometries.forEach((g, i) => {
+      const at = `empty land ${i} (${JSON.stringify(g?.id)})`;
+      if (!isObject(g) || (g.type !== 'Polygon' && g.type !== 'MultiPolygon') || !Array.isArray(g.arcs) || !g.arcs.length) {
+        fail(`${at} must be a non-empty Polygon or MultiPolygon`);
+      }
+      const polygons = g.type === 'Polygon' ? [g.arcs] : g.arcs;
+      if (!polygons.every(poly => Array.isArray(poly) && poly.length > 0 && poly.every(ringOk))) {
+        fail(`${at} has an empty ring or an arc index outside the topology`);
+      }
+      if (!text(g.id) || sectionIds.has(g.id) || emptyIds.has(g.id)) fail(`${at} needs an id of its own`);
+      if (!text(g.properties?.name)) fail(`${at} has no name`);
+      emptyIds.add(g.id);
+    });
+  }
 
   const clubs = data.clubs;
   if (!Array.isArray(clubs) || (grouped ? clubs.length > sectionIds.size : clubs.length !== sectionIds.size)) {
@@ -351,13 +375,15 @@ const surroundings = new WeakMap();
  * `shapes` are `[{ id, d, rings }]` to draw (rings in fitted SVG units, rounded
  * like the painted sections, only those reaching within `margin` of the
  * 960×540 frame); the host's own world shape is drawn only for a masked map
- * (England keeps its own shape beneath it). `obstacles` is the same land minus the
+ * (England keeps its own shape beneath it). A map's empty land (the NBA's empty
+ * states) comes first, drawn like its neighbours. `obstacles` is the world land minus the
  * host shape, ready for board.obstacles: never territory, it blocks routes as
- * neutral land would. Repeated calls for one map and fit return the same
- * objects, so route indexes built from them stay cached.
+ * neutral land would. Empty land is no obstacle, like the host shape beneath
+ * England: it lies inside the hosts. Repeated calls for one map and fit return
+ * the same objects, so route indexes built from them stay cached.
  */
 export function domesticSurroundings(atlas, domestic, margin = { x: 480, y: 800 }) {
-  const { meta, geo } = domestic || {};
+  const { meta, geo, empty } = domestic || {};
   if (!atlas || !meta || !geo?.fit) return { shapes: [], obstacles: [] };
   const { s, tx, ty } = geo.fit;
   const key = [s, tx, ty, margin.x, margin.y].join('|');
@@ -374,14 +400,15 @@ export function domesticSurroundings(atlas, domestic, margin = { x: 480, y: 800 
   };
   // A sport's own map names the world shapes it covers (the NBA's: the USA and Canada).
   const hosts = new Set(meta.hosts || [meta.id]);
-  const shapes = world.countries.flatMap(country => {
-    if (hosts.has(country.id) && !meta.boundaries?.mask) return [];
-    const rings = (paths[country.id]?.labelRings || []).filter(near);
+  const shapesOf = (list, at) => list.flatMap(country => {
+    const rings = (at[country.id]?.labelRings || []).filter(near);
     return rings.length ? [{ id: country.id, d: rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join(''), rings }] : [];
   });
+  const emptyShapes = empty ? shapesOf(empty.countries, empty.buildPaths(s, tx, ty)) : [];
+  const worldShapes = shapesOf(world.countries.filter(country => !hosts.has(country.id) || meta.boundaries?.mask), paths);
   // The masked host shape covers its own sections; overlaps elsewhere are
   // harmless (sections take precedence over obstacles in routing).
-  const value = Object.freeze({ shapes, obstacles: shapes.filter(shape => !hosts.has(shape.id)) });
+  const value = Object.freeze({ shapes: [...emptyShapes, ...worldShapes], obstacles: worldShapes.filter(shape => !hosts.has(shape.id)) });
   surroundings.set(domestic, { atlas, key, value });
   return value;
 }
