@@ -1,8 +1,11 @@
 // The built-in earlier football seasons (docs/design/football-years.md): one roster of one EA FIFA / FC edition
 // becomes that season's national squads, top-flight clubs and territory, in the data set format the game loads
-// (src/engine/footballSets.js, kind 'ea'). No I/O here: scripts/build-ea-seasons.mjs reads the export and writes the
+// (src/engine/footballSets.js, kind 'ea'). No I/O here: scripts/build-ea-seasons.mjs reads the sources and writes the
 // files, and tests build seasons from invented rows. Every player written is EA's own record, rating unchanged; a
 // nation with fewer than eleven natural players keeps exactly the ones it has.
+//
+// buildEaSeason reads the FIFA 15 – EA FC 24 export; scripts/lib/ea-legacy-seasons.mjs joins the FIFA 07 – FIFA 14
+// sources. Both hand their players to assembleEaSeason, so every season is made the same way.
 import { NATIONS, selectLineup } from '../../src/data/teams.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../../src/data/eaPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
@@ -31,7 +34,7 @@ export const EA_NO_TEAM = [
   'Andorra', 'Antigua and Barbuda', 'Aruba', 'Bahrain', 'Barbados', 'Bermuda', 'Cape Verde Islands', 'Comoros', 'Curacao',
   'Faroe Islands', 'Gibraltar', 'Grenada', 'Guam', 'Hong Kong', 'Liechtenstein', 'Macau', 'Malta', 'Mauritius',
   'Montserrat', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'San Marino',
-  'São Tomé e Príncipe', 'Singapore',
+  'São Tomé e Príncipe', 'Singapore', 'Turks and Caicos Islands',
 ];
 
 /** The CSV columns the build reads. */
@@ -55,9 +58,6 @@ const count = (map, key) => { map[key] = (map[key] || 0) + 1; };
  */
 export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { dataset, federations = FOOTBALL_FEDERATIONS } = {}) {
   if (!SET_ID.test(id)) throw new Error(`Season id ${id} is not like ea-fifa-15 or ea-fc-24`);
-  const warnings = [];
-  const warn = message => warnings.push(message);
-  const year = 2000 + fifaVersion;
   const mine = rows.filter(row => Number(row.fifa_version) === fifaVersion && Number(row.fifa_update) === update);
   if (!mine.length) throw new Error(`${edition}: the export has no rows of roster update ${update}`);
   const dates = [...new Set(mine.map(row => row.update_as_of))];
@@ -70,29 +70,51 @@ export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { data
   }
   if (rosters.size !== 1) throw new Error(`${edition}: rows from rosters ${[...rosters].join(', ')}, not one`);
   const source = { provider: 'EA Sports', edition, update, roster: [...rosters][0], snapshotDate: dates[0], url: dataset, rawScale: EA_SCALE };
+  const records = mine.map(row => ({
+    eaId: row.player_id, name: row.short_name, fullName: row.long_name, overall: row.overall, positions: row.player_positions,
+    keys: row.player_positions.split(',').map(key => key.trim()), dob: row.dob, nationality: row.nationality_name,
+    club: row.club_name, slug: PLAYER_LINK.exec(row.player_url)[2],
+    // Clubs by EA's competition id: the export names each club's league as it is in a later edition (FIFA 15's
+    // Burnley sits in "Championship"), but its id is the edition's own.
+    clubKey: Number(row.club_team_id) || null, league: EA_LEAGUES[Number(row.league_id)] || null,
+  }));
+  return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition, update, source, federations });
+}
+
+/**
+ * One season from its players, whatever the source. `records` are EA's player records:
+ * `{ eaId, name, fullName, overall, positions, keys, dob, nationality, club, slug, clubKey, league }`, where `keys`
+ * are EA position codes, `positions` the source's own text of them (for messages), `dob` is YYYY-MM-DD or empty,
+ * `clubKey` groups a club's players and `league` is an EA_LEAGUES entry `[game league, map shape]` or null (not one of
+ * the seven). The season is `{ id, year, edition, update, source, federations }`, plus `auditExtra` (fields the audit
+ * adds after the snapshot date) and `everyLeague` (stop, not warn, on a league left with no club). Returns
+ * `{ doc, text, audit, warnings }`.
+ */
+export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false }) {
+  const warnings = [];
+  const warn = message => warnings.push(message);
 
   const nationIds = new Map(Object.entries(NATIONS).map(([nation, rec]) => [rec[0], nation]));
   const noTeamNames = new Set(EA_NO_TEAM);
   const unmapped = {}, noTeam = {}, seen = new Set();
-  const players = mine.map(row => {
-    const eaId = Number(row.player_id);
-    if (!Number.isInteger(eaId) || seen.has(eaId)) throw new Error(`${edition}: invalid or repeated player id ${row.player_id}`);
+  const players = records.map(record => {
+    const eaId = Number(record.eaId);
+    if (!Number.isInteger(eaId) || seen.has(eaId)) throw new Error(`${edition}: invalid or repeated player id ${record.eaId}`);
     seen.add(eaId);
-    const keys = row.player_positions.split(',').map(key => key.trim());
-    if (keys.some(key => !Object.hasOwn(EA_ROLES, key))) throw new Error(`${edition}: player ${eaId} has positions ${row.player_positions}`);
-    const overall = Number(row.overall);
-    if (!Number.isInteger(overall) || overall < 1 || overall > EA_SCALE) throw new Error(`${edition}: player ${eaId} has overall ${row.overall}`);
-    if (row.dob && !/^\d{4}-\d{2}-\d{2}$/.test(row.dob)) throw new Error(`${edition}: player ${eaId} has date of birth ${row.dob}`);
-    const name = row.short_name.trim(), fullName = row.long_name.trim(), nationality = row.nationality_name.trim();
+    const { keys } = record;
+    if (keys.some(key => !Object.hasOwn(EA_ROLES, key))) throw new Error(`${edition}: player ${eaId} has positions ${record.positions}`);
+    const overall = Number(record.overall);
+    if (!Number.isInteger(overall) || overall < 1 || overall > EA_SCALE) throw new Error(`${edition}: player ${eaId} has overall ${record.overall}`);
+    if (record.dob && !/^\d{4}-\d{2}-\d{2}$/.test(record.dob)) throw new Error(`${edition}: player ${eaId} has date of birth ${record.dob}`);
+    const name = record.name.trim(), fullName = record.fullName.trim(), nationality = record.nationality.trim();
     if (!name || !nationality) throw new Error(`${edition}: player ${eaId} has no name or nationality`);
     const nationId = nationIds.get(EA_NATION_ALIASES[nationality] || nationality) ?? null;
     if (!nationId) count(noTeamNames.has(nationality) ? noTeam : unmapped, nationality);
     const tuple = [eaId, name, fullName && fullName !== name ? fullName : 0, overall, keys.join(','), nationality,
-      row.club_name.trim(), row.dob || '', PLAYER_LINK.exec(row.player_url)[2]];
+      record.club.trim(), record.dob || '', record.slug];
     const [, pos, rating, sourceInfo] = expandEaTuple(tuple, source);
     if (JSON.stringify(eaTupleOf(name, sourceInfo)) !== JSON.stringify(tuple)) throw new Error(`${edition}: player ${eaId} does not rebuild from its tuple`);
-    return { name, pos, positions: sourceInfo.positions, rating, sourceInfo, tuple, nationId,
-      clubId: Number(row.club_team_id) || null, leagueId: Number(row.league_id) || null };
+    return { name, pos, positions: sourceInfo.positions, rating, sourceInfo, tuple, nationId, clubKey: record.clubKey, league: record.league };
   });
   const unmappedNames = Object.keys(unmapped).sort();
   if (unmappedNames.length) {
@@ -112,15 +134,13 @@ export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { data
       naturalLineup: squad.length === CLUB_SIZE && lineup.slots.every(slot => slot.player && !slot.outOfPosition) });
   }
 
-  // Clubs by EA's competition id: the export names each club's league as it is in a later edition (FIFA 15's
-  // Burnley sits in "Championship"), but its id is the edition's own.
   const byClub = new Map();
   for (const player of players) {
-    const league = EA_LEAGUES[player.leagueId];
-    if (!league || !player.clubId) continue;
-    if (!byClub.has(player.clubId)) byClub.set(player.clubId, { name: player.sourceInfo.club, league: league[0], country: league[1], pool: [] });
-    const club = byClub.get(player.clubId);
-    if (club.name !== player.sourceInfo.club || club.league !== league[0]) throw new Error(`${edition}: club ${player.clubId} has two names or leagues`);
+    const { league } = player;
+    if (!league || !player.clubKey) continue;
+    if (!byClub.has(player.clubKey)) byClub.set(player.clubKey, { name: player.sourceInfo.club, league: league[0], country: league[1], pool: [] });
+    const club = byClub.get(player.clubKey);
+    if (club.name !== player.sourceInfo.club || club.league !== league[0]) throw new Error(`${edition}: club ${player.clubKey} has two names or leagues`);
     club.pool.push(player);
   }
   const built = [], leagueAudit = Object.fromEntries(Object.values(EA_LEAGUES).map(([league]) => [league, { clubs: 0, short: [] }]));
@@ -133,7 +153,11 @@ export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { data
     leagueAudit[club.league].clubs++;
     built.push({ name: club.name, league: club.league, country: club.country, str: Math.round(mean(squad.map(p => p.rating))), squad });
   }
-  for (const [league, { clubs }] of Object.entries(leagueAudit)) if (!clubs) warn(`No ${league} clubs in ${edition}`);
+  for (const [league, { clubs }] of Object.entries(leagueAudit)) {
+    if (clubs) continue;
+    if (everyLeague) throw new Error(`${edition}: no ${league} club has eleven players`);
+    warn(`No ${league} clubs in ${edition}`);
+  }
   const clubs = presentClubs(built, warn);
 
   const territory = territoryFor(federations, year);
@@ -147,7 +171,7 @@ export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { data
   doc.version = `${id}-${contentHash(doc)}`;
   // The nations short of a natural XI, as "id name (players)": the rest is in the season file itself.
   const shortNations = nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`);
-  const audit = { id, version: doc.version, edition, update, roster: source.roster, snapshotDate: source.snapshotDate,
-    rows: mine.length, noTeam, coverage, leagues: leagueAudit, territory, shortNations, warnings };
+  const audit = { id, version: doc.version, edition, update, roster: source.roster, snapshotDate: source.snapshotDate, ...auditExtra,
+    rows: records.length, noTeam, coverage, leagues: leagueAudit, territory, shortNations, warnings };
   return { doc, text: serializeFootballSet(doc), audit, warnings };
 }

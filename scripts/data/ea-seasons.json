@@ -1,5 +1,5 @@
 {
-  "note": "The built-in earlier football seasons: one launch roster per EA FIFA / FC edition, from one export. npm run build:ea-seasons reads the export from data-src/ea-leone/ (ignored) and checks it against sha256. See docs/design/football-years.md.",
+  "note": "The built-in earlier football seasons: one roster per EA FIFA / FC edition. FIFA 15 – EA FC 24 are launch rosters from one export (dataset, editions); FIFA 07 – FIFA 14 join two scrapes by EA player id (legacy). npm run build:ea-seasons reads every file from data-src/ (ignored) and checks it against its sha256. See docs/design/football-years.md.",
   "dataset": {
     "name": "EA Sports FC 24 complete player dataset (stefanoleone992)",
     "url": "https://www.kaggle.com/datasets/stefanoleone992/ea-sports-fc-24-complete-player-dataset",
@@ -21,5 +21,184 @@
     { "id": "ea-fifa-17", "fifaVersion": 17, "edition": "FIFA 17", "update": 2 },
     { "id": "ea-fifa-16", "fifaVersion": 16, "edition": "FIFA 16", "update": 2 },
     { "id": "ea-fifa-15", "fifaVersion": 15, "edition": "FIFA 15", "update": 2 }
-  ]
+  ],
+  "legacy": {
+    "note": "FIFA 07 – FIFA 14 (scripts/lib/ea-legacy-seasons.mjs). EA's overall, positions, full name and date of birth come from the ratings files; nationality, club, league, short name and SoFIFA link from the clubs files, whose own rating (bov) is SoFIFA's best overall and is never read. A player missing from either file is left out. Each edition names the roster each file holds and how that is known; where they differ, the season's snapshotDate is the clubs roster's date and ratingsDate the ratings roster's. SoFIFA's dates for FIFA 07–12 are nominal (Aug 30 and Feb 22 every year), so the roster ids identify the snapshots. Evidence that names hugomathien refers to the European Soccer Database (Kaggle hugomathien/soccer), EA ratings by SoFIFA date for 11 European leagues, 2008–2016.",
+    "ratings": {
+      "name": "FIFA 21 to FIFA 05 complete player attributes (daguizer, a FIFA Index mirror)",
+      "url": "https://www.kaggle.com/datasets/daguizer/fifa-2021-to-2005-complete-player-attributes",
+      "download": "https://www.kaggle.com/api/v1/datasets/download/daguizer/fifa-2021-to-2005-complete-player-attributes",
+      "archive": { "file": "daguizer.zip", "sha256": "f27f8ac623f7efe908e101261b5e0ce112c24ba8873392f5f9f8814811e25b5b" },
+      "folder": "fifa-daguizer/x",
+      "licence": "\"other\", as set by the compiler on Kaggle; FIFA Index's terms ban scraping, and EA's own rights in the ratings are not cleared",
+      "retrieved": "2026-10-30"
+    },
+    "clubs": {
+      "name": "Big-Data-FC datasets (a SoFIFA scrape)",
+      "url": "https://github.com/Big-Data-FC/datasets/tree/c6da23fc6e5fccef901d0b421b727bb6c2be7a1d",
+      "commit": "c6da23fc6e5fccef901d0b421b727bb6c2be7a1d",
+      "folder": "fifa-bigdatafc",
+      "licence": "none stated: the repository has no licence file, SoFIFA states none, and EA's own rights are not cleared",
+      "retrieved": "2026-10-30"
+    },
+    "dates": {
+      "name": "SoFIFA's roster dates, each edition's rosters in order (the n-th FIFA 07 date is roster 07000n)",
+      "file": "fifa-moradi/dates.json",
+      "sha256": "bb2ab11ea13f8bfc977add62f4d46bb3c2eefdf1275e5691784349d26f417a96",
+      "retrieved": "2026-10-30"
+    },
+    "editions": [
+      {
+        "id": "ea-fifa-14", "fifaVersion": 14, "edition": "FIFA 14",
+        "ratings": { "file": "fifa14.csv", "sha256": "dc96f08f774ea920aa7ca4f6c45dc1fb24c06691906c285796e5bd484bcf92bb", "roster": "140052" },
+        "clubs": { "file": "14.csv", "sha256": "c98e42b9301f69c01cb5b51d3de09fa46be62ec8374c1ebc44432c774b581953", "roster": "140052" },
+        "evidence": "The clubs file links every player to 140052, FIFA 14's last roster. Ball control, dribbling and marking agree between the files for all 16,113 players in both, and the ratings match hugomathien's last FIFA 14 update (2014-07-18) for 92% of its players.",
+        "leagues": { "Premier League": ["English Premier League"], "La Liga": ["Spain Primera Division"], "Serie A": ["Italian Serie A"], "Bundesliga": ["German 1. Bundesliga"], "Ligue 1": ["French Ligue 1"], "Eredivisie": ["Holland Eredivisie"], "Liga Portugal": ["Portuguese Liga ZON SAGRES"] }
+      },
+      {
+        "id": "ea-fifa-13", "fifaVersion": 13, "edition": "FIFA 13",
+        "ratings": { "file": "fifa13.csv", "sha256": "01386f3aee2611c319bb3f17cb7ebad89d38b0fbad5ac2f399d55589c49f6d0d", "roster": "130034" },
+        "clubs": { "file": "13.csv", "sha256": "c77dda6845e1660d51c94d703d0c213777a484b5d66cb116d21c9bf70fe031ce", "roster": "130034" },
+        "evidence": "The clubs file links every player to 130034, FIFA 13's last roster. Ball control, dribbling and marking agree for 14,555 of the 14,557 players in both files, and the ratings match hugomathien's last FIFA 13 update (2013-08-16) for 91% of its players.",
+        "leagues": { "Premier League": ["English Premier League"], "La Liga": ["Spain Primera Division"], "Serie A": ["Italian Serie A"], "Bundesliga": ["German 1. Bundesliga"], "Ligue 1": ["French Ligue 1"], "Eredivisie": ["Holland Eredivisie"], "Liga Portugal": ["Portuguese Liga ZON SAGRES"] }
+      },
+      {
+        "id": "ea-fifa-12", "fifaVersion": 12, "edition": "FIFA 12",
+        "ratings": { "file": "fifa12.csv", "sha256": "49414d56600b61af72ea0f39cfbdc399c49c7fa6ca255ff3258795ca1898398d", "roster": "120002" },
+        "clubs": { "file": "12.csv", "sha256": "a5d4ffba239262d8462054d3726508cebfe394eb01ecfc38e01c18162d73a925", "roster": "120002" },
+        "evidence": "The clubs file links every player to 120002, the winter roster. Ball control, dribbling and marking agree for all 13,987 players in both files; of the 3,347 players whose hugomathien overall changed between 2011-08-30 and 2012-02-22, the ratings file gives 3,186 the February value and none the August one.",
+        "leagues": { "Premier League": ["English Premier League"], "La Liga": ["Spain Primera Division"], "Serie A": ["Italian Serie A"], "Bundesliga": ["German 1. Bundesliga"], "Ligue 1": ["French Ligue 1"], "Eredivisie": ["Holland Eredivisie"], "Liga Portugal": ["Portuguese Liga ZON SAGRES"] }
+      },
+      {
+        "id": "ea-fifa-11", "fifaVersion": 11, "edition": "FIFA 11",
+        "ratings": { "file": "fifa11.csv", "sha256": "053fe0c960952874e72cd6ab2efb58df4022a9f81b9dca63d121a63d03cbaffb", "roster": "110001" },
+        "clubs": { "file": "11.csv", "sha256": "63fff3627c82c24067c9ecd032888c3b85697929fa2ed2c2afe04e3a547fe521", "roster": "110002" },
+        "evidence": "The ratings file is the launch roster: of the 3,356 players whose hugomathien overall changed between 2010-08-30 and 2011-02-22 it gives 3,355 the August value. The clubs file links every player to 110002, the winter roster, and holds 814 EA ids above the ratings file's highest, players EA added after launch.",
+        "leagues": { "Premier League": ["English Premier League"], "La Liga": ["Spain Primera Division"], "Serie A": ["Italian Serie A"], "Bundesliga": ["German 1. Bundesliga"], "Ligue 1": ["French Ligue 1"], "Eredivisie": ["Holland Eredivisie"], "Liga Portugal": ["Portuguese Liga ZON SAGRES"] }
+      },
+      {
+        "id": "ea-fifa-10", "fifaVersion": 10, "edition": "FIFA 10",
+        "ratings": { "file": "fifa10.csv", "sha256": "98910bb6188c4be3a2c82f614ec5771c4eacebb1f077d9bb17aeaa1833fd397b", "roster": "100001" },
+        "clubs": { "file": "10.csv", "sha256": "9c24f305d788792dbf2cb1caec2075a8963c87faced6f0be258b2f647b3ad660", "roster": "100002" },
+        "evidence": "The ratings file is the launch roster: of the 2,638 players whose hugomathien overall changed between 2009-08-30 and 2010-02-22 it gives 2,637 the August value. The clubs file links every player to 100002, the winter roster, and holds 876 EA ids above the ratings file's highest.",
+        "leagues": { "Premier League": ["English Premier League"], "La Liga": ["Spain Primera Division"], "Serie A": ["Italian Serie A"], "Bundesliga": ["German 1. Bundesliga"], "Ligue 1": ["French Ligue 1"], "Eredivisie": ["Holland Eredivisie"], "Liga Portugal": ["Portuguese Liga ZON SAGRES"] }
+      },
+      {
+        "id": "ea-fifa-09", "fifaVersion": 9, "edition": "FIFA 09",
+        "ratings": { "file": "fifa09.csv", "sha256": "46352397653de001531b98a3e615e9d614734db4a270dc5988ebdaf55b7f3ff2", "roster": "090001" },
+        "clubs": { "file": "09.csv", "sha256": "bfe39656ebcc5a1435a28d26ba9a4d7ae911834b1cb2181ce51a6a1509044edd", "roster": "090002" },
+        "evidence": "The ratings file is the launch roster: of the 1,716 players whose hugomathien overall changed between 2008-08-30 and 2009-02-22 it gives 1,714 the August value. The clubs file links every player to 090002, the winter roster, and holds 631 EA ids above the ratings file's highest.",
+        "leagues": { "Premier League": ["English Premier League"], "La Liga": ["Spain Primera Division"], "Serie A": ["Italian Serie A"], "Bundesliga": ["German 1. Bundesliga"], "Ligue 1": ["French Ligue 1"], "Eredivisie": ["Holland Eredivisie"], "Liga Portugal": ["Portuguese Liga ZON SAGRES"] }
+      },
+      {
+        "id": "ea-fifa-08", "fifaVersion": 8, "edition": "FIFA 08",
+        "ratings": { "file": "fifa08.csv", "sha256": "4984531a5eac407cbbe441c2726c610981857f47fb6ac1a033f1ce7cffafc59d", "roster": "080001" },
+        "clubs": { "file": "08.csv", "sha256": "1b6bb8751c2b9b3d3bbb13c8095f4770a930755347950bc1cf0d5ed6ca7cf770", "roster": "080002" },
+        "evidence": "The ratings file is the launch roster: the clubs file (every player linked to 080002, the winter roster) holds 62 EA ids above its highest, players EA added in the winter update, and the 6 players whose hugomathien attributes changed on 2008-02-22 have their August values in the ratings file and their February ones in the clubs file. That update changed few ratings: ball control, dribbling and marking agree for 11,994 of the 12,004 players in both files.",
+        "leagues": { "Premier League": ["English Premier League"], "La Liga": ["Spain Primera Division"], "Serie A": ["Italian Serie A"], "Bundesliga": ["German 1. Bundesliga"], "Ligue 1": ["French Ligue 1"], "Eredivisie": ["Holland Eredivisie"], "Liga Portugal": ["Portuguese Liga ZON SAGRES"] }
+      },
+      {
+        "id": "ea-fifa-07", "fifaVersion": 7, "edition": "FIFA 07",
+        "ratings": { "file": "fifa07.csv", "sha256": "dcab9fd2e070d3e4e10c834dd494f892c491eabc094d48c8e5858c9f2bac22a2", "roster": "070001" },
+        "clubs": { "file": "07.csv", "sha256": "8c4f1ca4cb18405f41ca4f73ce46df408aae34b2a53f7ffb9154f2ce34a03b14", "roster": "070002" },
+        "evidence": "The ratings file is the launch roster: the clubs file (every player linked to 070002, the winter roster) holds 42 EA ids above its highest, players EA added in the winter update. That update changed almost no ratings: ball control, dribbling and marking agree for 10,148 of the 10,149 players in both files. hugomathien starts at 2007-02-22, so it cannot tell the two rosters apart.",
+        "leagues": { "Premier League": ["English Premier League"], "La Liga": ["Spain Primera Division"], "Serie A": ["Italian Serie A"], "Bundesliga": ["German 1. Bundesliga"], "Ligue 1": ["French Ligue 1"], "Eredivisie": ["Holland Eredivisie"], "Liga Portugal": ["Portuguese Liga ZON SAGRES"] }
+      }
+    ],
+    "exclusions": [
+      {
+        "player": "Adrian Mutu",
+        "evidence": "EA id 21195 is Adrian Mutu in FIFA 05 and 'Petrovici Teodor' in FIFA 06 (the ratings files); FIFA 07 gives that name to id 177848, a Romanian striker at Fiorentina. hugomathien names EA id 184410, 'Andrei Murgu' at Fiorentina, Cesena and AC Ajaccio in FIFA 08–13, Adrian Mutu. No edition from FIFA 06 on names Mutu.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177848, "name": "Teodor Petrovici" },
+          { "edition": "FIFA 08", "eaId": 184410, "name": "Andrei Murgu" },
+          { "edition": "FIFA 09", "eaId": 184410, "name": "Andrei Murgu" },
+          { "edition": "FIFA 12", "eaId": 184410, "name": "Andrei Murgu" },
+          { "edition": "FIFA 13", "eaId": 184410, "name": "Andrei Murgu" }
+        ]
+      },
+      {
+        "player": "Marco Materazzi",
+        "evidence": "EA id 7569 is Marco Materazzi in FIFA 05 and 'Valerio Bernado' in FIFA 06; FIFA 07's id 177844, 'Bernado Valerio' at Inter, is Marco Materazzi in FIFA 08–11 and in hugomathien.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177844, "name": "Bernado Valerio" }
+        ]
+      },
+      {
+        "player": "Olivier Renard",
+        "evidence": "EA id 107491 is Olivier Renard in FIFA 05 and 'Rabret Sylvain' in FIFA 06; FIFA 07 (id 177833) and FIFA 08–13 (id 184412) call him 'Sylvain Rabret', a Belgian goalkeeper at Standard de Liège, then KV Mechelen. hugomathien names EA id 184412 Olivier Renard.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177833, "name": "Sylvain Rabret" },
+          { "edition": "FIFA 08", "eaId": 184412, "name": "Sylvain Rabret" },
+          { "edition": "FIFA 09", "eaId": 184412, "name": "Sylvain Rabret" },
+          { "edition": "FIFA 10", "eaId": 184412, "name": "Sylvain Rabret" },
+          { "edition": "FIFA 11", "eaId": 184412, "name": "Sylvain Rabret" },
+          { "edition": "FIFA 12", "eaId": 184412, "name": "Sylvain Rabret" },
+          { "edition": "FIFA 13", "eaId": 184412, "name": "Sylvain Rabret" }
+        ]
+      },
+      {
+        "player": "Marko Baša",
+        "evidence": "EA id 192615 is Marko Baša (born 1982-12-29) in FIFA 12–17 and in hugomathien; FIFA 10 and 11 call it 'Milo Bašic', born 1982-06-02, a Montenegrin centre back at Lokomotiv Moscow.",
+        "records": [
+          { "edition": "FIFA 10", "eaId": 192615, "name": "Milo Bašic" },
+          { "edition": "FIFA 11", "eaId": 192615, "name": "Milo Bašic" }
+        ]
+      },
+      {
+        "player": "Axel Lawarée",
+        "evidence": "EA id 15612 is Axel Lawarée in FIFA 05 and 'Tellot Yves' in FIFA 06; FIFA 07 gives that name to id 177835, a Belgian striker at FC Augsburg, and FIFA 10 calls the same id 'Alex Lauwens', at Fortuna Düsseldorf.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177835, "name": "Yves Tellot" },
+          { "edition": "FIFA 10", "eaId": 177835, "name": "Alex Lauwens" }
+        ]
+      },
+      {
+        "player": "Giovanni Tedesco",
+        "evidence": "EA id 4587 is Giovanni Tedesco in FIFA 05 and 'Marcuccilli Silvio' in FIFA 06; FIFA 07 gives that name to id 177843, an Italian central midfielder born in 1972 at Palermo. FIFA 08–10's 'Giuseppe Tedaldo' (id 184411) takes that place, same club, nationality, position and birth year, among the ids EA gave its FIFA 08 stand-ins (184409–184415, with Mutu's 184410 and Renard's 184412); the name is in no other edition and not in hugomathien.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177843, "name": "Silvio Marcuccilli" },
+          { "edition": "FIFA 08", "eaId": 184411, "name": "Giuseppe Tedaldo" },
+          { "edition": "FIFA 09", "eaId": 184411, "name": "Giuseppe Tedaldo" },
+          { "edition": "FIFA 10", "eaId": 184411, "name": "Giuseppe Tedaldo" }
+        ]
+      },
+      {
+        "player": "Iulian Filipescu",
+        "evidence": "EA id 6375 is Iulian Filipescu in FIFA 05 and 'Sturdza Corneliu' in FIFA 06; FIFA 07 gives that name to id 177851, a Romanian centre back born in 1974 at MSV Duisburg. FIFA 08's 'Ionel Florescu' (id 184413) takes that place, same club, nationality, position and birth year, among EA's FIFA 08 stand-in ids; the name is in no other edition.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177851, "name": "Corneliu Sturdza" },
+          { "edition": "FIFA 08", "eaId": 184413, "name": "Ionel Florescu" }
+        ]
+      },
+      {
+        "player": "Frank Defays",
+        "evidence": "EA id 35398 is Frank Defays in FIFA 05 and 'Kurtz Kambert' in FIFA 06; FIFA 07 gives that name to id 177837, a Belgian defender born in 1974 at Charleroi. FIFA 08–09's 'Fredric Deboey' (id 184414) takes that place, same club, nationality and birth year, among EA's FIFA 08 stand-in ids; the name is in no other edition.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177837, "name": "Kambert Kurtz" },
+          { "edition": "FIFA 08", "eaId": 184414, "name": "Fredric Deboey" },
+          { "edition": "FIFA 09", "eaId": 184414, "name": "Fredric Deboey" }
+        ]
+      },
+      {
+        "player": "Mahamoudou Kéré",
+        "evidence": "EA id 33141 is Mahamoudou Kéré in FIFA 05 and 'Daddah Ankoma' in FIFA 06; FIFA 07 gives that name to id 177840, a midfielder from Burkina Faso born in 1982 at Charleroi. FIFA 08–11's 'Amadou Konare' (id 184415) takes that place, same club, nationality and birth year, among EA's FIFA 08 stand-in ids; the name is in no other edition.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177840, "name": "Ankoma Daddah" },
+          { "edition": "FIFA 08", "eaId": 184415, "name": "Amadou Konare" },
+          { "edition": "FIFA 09", "eaId": 184415, "name": "Amadou Konare" },
+          { "edition": "FIFA 10", "eaId": 184415, "name": "Amadou Konare" },
+          { "edition": "FIFA 11", "eaId": 184415, "name": "Amadou Konare" }
+        ]
+      },
+      {
+        "player": "a Romanian attacking midfielder born 1979-08-22, not identified",
+        "evidence": "One player, the same date of birth, nationality and position, has two unrelated names in consecutive editions: 'Matthias Seicaru' (FIFA 07, id 177847, KAA Gent, among the ids EA gave its FIFA 07 stand-ins, 177833–177851) and 'Anghel Stinga' (FIFA 08, id 184409, Excelsior Mouscron, among its FIFA 08 stand-in ids). Neither name is in any other edition or in hugomathien.",
+        "records": [
+          { "edition": "FIFA 07", "eaId": 177847, "name": "Matthias Seicaru" },
+          { "edition": "FIFA 08", "eaId": 184409, "name": "Anghel Stinga" }
+        ]
+      }
+    ]
+  }
 }

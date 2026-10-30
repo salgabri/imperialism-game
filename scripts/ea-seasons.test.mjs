@@ -1,6 +1,7 @@
 // The built-in earlier football seasons (docs/design/football-years.md): EA player tuples (src/data/eaPlayers.js), the
-// season builder (scripts/lib/ea-seasons.mjs) on invented rows, saves of an EA season campaign, and the committed
-// files in public/football/ checked against their listing (src/data/footballSeasons.js) and their own content hash.
+// season builders (scripts/lib/ea-seasons.mjs for FIFA 15 – EA FC 24, scripts/lib/ea-legacy-seasons.mjs for FIFA 07 –
+// FIFA 14) on invented rows, saves of an EA season campaign, and the committed files in public/football/ checked
+// against their listing (src/data/footballSeasons.js), their own content hash and the manifest.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -13,6 +14,10 @@ import { BUILT_IN_SETS, decodeFootballSet, setKindOf, setSportOf } from '../src/
 import { parseCampaign, serializeCampaign } from '../src/engine/storage.js';
 import { sourceLabel, sourceTitle, sourceUrl } from '../src/viewModels/squad.js';
 import { EA_LEAGUES, EA_NATION_ALIASES, EA_NO_TEAM, buildEaSeason } from './lib/ea-seasons.mjs';
+import {
+  LEGACY_POSITIONS, buildLegacyEaSeason, isoDate, legacyExclusions, legacyPositionKeys, readClubRows, readRatingsRows, rosterDate,
+  rosterDates,
+} from './lib/ea-legacy-seasons.mjs';
 
 const MANIFEST = JSON.parse(readFileSync(new URL('./data/ea-seasons.json', import.meta.url), 'utf8'));
 const EDITION = { id: 'ea-fifa-18', fifaVersion: 18, edition: 'FIFA 18', update: 2 };
@@ -146,6 +151,204 @@ test('the nation map names only game nations, and keeps every name EA spells dif
     [...new Set(getSport('football').clubs.map(club => club.league))].sort());
 });
 
+// ---------- the FIFA 07 – FIFA 14 builder, on invented rows ----------
+
+// What a decoder writes for bytes it could not read.
+const GARBLED = String.fromCharCode(0xfffd);
+const LEGACY_EDITION = {
+  id: 'ea-fifa-09', fifaVersion: 9, edition: 'FIFA 09', ratings: { roster: '090001' }, clubs: { roster: '090002' },
+  leagues: { 'Premier League': ['Test Premier League'], 'La Liga': ['Test Primera'], 'Serie A': ['Test Serie A'], Bundesliga: ['Test Bundesliga'],
+    'Ligue 1': ['Test Ligue 1'], Eredivisie: ['Test Eredivisie'], 'Liga Portugal': ['Test Liga', 'Test Liga Sagres'] },
+};
+// SoFIFA's FIFA 09 dates: the launch roster (090001) and the winter one (090002).
+const LEGACY_DATES = rosterDates({ data: [['Aug 30, 2008', 0, 0, 0, 0, '', 'FIFA 09'], ['Feb 22, 2009', 0, 0, 0, 0, '', 'FIFA 09']] });
+const LEGACY_OPTIONS = { ratingsUrl: 'https://example.test/ratings', clubsUrl: 'https://example.test/clubs', dates: LEGACY_DATES };
+const LEGACY_SOURCE = { provider: 'EA Sports', edition: 'FIFA 09', update: 2, roster: '090002', snapshotDate: '2009-02-22', ratingsDate: '2008-08-30',
+  url: 'https://example.test/ratings', clubsUrl: 'https://example.test/clubs', rawScale: 99 };
+
+let legacyId = 1;
+/** One invented player: his ratings row (FIFA Index's columns) and his clubs row (SoFIFA's, with a `bov` never read). */
+function legacyPlayer({ id, positions = 'ST', rating = '70', dob = '01/01/1990', fullName, name, nationality = 'England', club = '', league = '',
+  roster = '090002' } = {}) {
+  const eaId = String(id ?? legacyId++);
+  return {
+    rating: { id: eaId, Fullname: fullName ?? `Invented Player${eaId}`, current_rating: rating, birth_date: dob, preferred_positions: positions },
+    club: { sofifa_id: eaId, player_url: `/player/${eaId}/invented-player-${eaId}/${roster}/`, short_name: name ?? `I. Player${eaId}`,
+      nationality, club_name: club, league_name: league, bov: '99' },
+  };
+}
+const LEGACY_XI = ['GK', 'LB', 'CB', 'CB', 'RB', 'LM', 'CM', 'CM', 'RM', 'ST', 'ST'];
+/** An invented club of eleven, a natural 4-4-2, in one of the table's leagues. */
+const legacyClub = (club, league, nationality, codes = LEGACY_XI) => codes.map((positions, i) => legacyPlayer({ positions, rating: String(60 + i), nationality, club, league }));
+
+function legacySample() {
+  legacyId = 1;
+  return [
+    // England's eleven, in FIFA Index's old codes: a sweeper, the wide midfielders and a right forward.
+    ...legacyClub('Testford United', 'Test Premier League', 'England', ['GK', 'LB', 'CB-SW', 'SW', 'RB', 'LWM', 'CM', 'CM', 'RWM-RM', 'RF-ST', 'ST']),
+    ...legacyClub('Real Ficticio', 'Test Primera', 'Spain'),
+    ...legacyClub('Inventus', 'Test Serie A', 'Italy'),
+    ...legacyClub('FC Erfunden', 'Test Bundesliga', 'Germany'),
+    ...legacyClub('Olympique Imaginaire', 'Test Ligue 1', 'France'),
+    ...legacyClub('Verzonnen FC', 'Test Eredivisie', 'Netherlands'),
+    ...legacyClub('Inventado FC', 'Test Liga Sagres', 'Portugal'),
+    // Liga Portugal's other name: a club short of eleven.
+    legacyPlayer({ id: 808, nationality: 'Portugal', club: 'Sagres Club', league: 'Test Liga' }),
+    // In one file only: left out, nothing borrowed.
+    { rating: legacyPlayer({ id: 801, rating: '90', nationality: 'Brazil' }).rating },
+    { club: legacyPlayer({ id: 802, nationality: 'Brazil' }).club },
+    // EA's stand-in under an invented name, excluded by the manifest's list.
+    legacyPlayer({ id: 900, fullName: 'Invented Standin', rating: '85', nationality: 'Romania', club: 'Inventus', league: 'Test Serie A' }),
+    // A nation without a shape, an old spelling, a club outside the table's leagues and a date of birth to convert.
+    legacyPlayer({ id: 803, nationality: 'Turks and Caicos Islands' }),
+    legacyPlayer({ id: 804, nationality: 'Czech Republic', club: 'Elsewhere FC', league: 'Test Serie B', dob: '04/01/1977' }),
+    // A short name equal to the full name, and a short name the scrape garbled.
+    legacyPlayer({ id: 805, nationality: 'Ghana', fullName: 'Kofi', name: 'Kofi' }),
+    legacyPlayer({ id: 806, nationality: 'Latvia', fullName: 'Aleksejs Invented', name: `A. Inv${GARBLED} nted` }),
+  ];
+}
+const EXCLUSIONS = legacyExclusions([{ player: 'Someone Real', evidence: 'the same EA id names him in another edition',
+  records: [{ edition: 'FIFA 09', eaId: 900, name: 'Invented Standin' }] }]);
+/** The sample as the builder takes it: the two files' rows. */
+const legacyInput = (players = legacySample()) => ({ ratings: players.filter(p => p.rating).map(p => p.rating), clubs: players.filter(p => p.club).map(p => p.club) });
+const buildLegacy = (input = legacyInput(), edition = LEGACY_EDITION, options = {}) => buildLegacyEaSeason(input, edition, { ...LEGACY_OPTIONS, exclusions: EXCLUSIONS, ...options });
+
+test('an old season joins its two files by EA id: EA\'s rating, positions and birth date from one, nationality and club from the other', () => {
+  const { doc, text, audit, warnings } = buildLegacy();
+  assert.deepEqual([doc.format, doc.kind, doc.id, doc.year, doc.season, doc.label], [1, 'ea', 'ea-fifa-09', 2009, '2008/09', 'FIFA 09']);
+  assert.deepEqual(doc.source, LEGACY_SOURCE, 'the clubs roster dates the season; the ratings roster has its own date');
+  assert.equal(doc.version, `ea-fifa-09-${contentHash(doc)}`);
+  assert.equal(text, `${JSON.stringify(doc)}\n`);
+  assert.deepEqual(warnings, []);
+
+  // England: FIFA Index's old codes become EA's modern ones, repeats dropped; the rating is FIFA Index's, never SoFIFA's bov.
+  const england = doc.nations['826'][2];
+  assert.equal(england.length, 11);
+  const byName = Object.fromEntries(england.map(tuple => [tuple[2], tuple]));
+  assert.deepEqual(['Invented Player3', 'Invented Player4', 'Invented Player6', 'Invented Player9', 'Invented Player10'].map(name => byName[name][4]),
+    ['CB', 'CB', 'LM', 'RM', 'CF,ST']);
+  assert.ok(england.every(tuple => tuple[3] >= 60 && tuple[3] <= 70), 'ratings from the ratings file');
+  assert.deepEqual(byName['Invented Player1'], [1, 'I. Player1', 'Invented Player1', 60, 'GK', 'England', 'Testford United', '1990-01-01', 'invented-player-1']);
+  assert.deepEqual(audit.mappedPositions, { 'LWM→LM': 1, 'RF→CF': 1, 'RWM→RM': 1, 'SW→CB': 2 });
+
+  // Players in one file only are left out; the stand-in is excluded and named in the audit.
+  const written = [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)].map(tuple => tuple[0]);
+  for (const missing of [801, 802, 900]) assert.ok(!written.includes(missing), `player ${missing} is not written`);
+  assert.equal(doc.nations['076'][1], 0, 'Brazil has nobody: each of its players is in one file only');
+  assert.deepEqual(audit.join, { ratingsRows: 84, clubsRows: 84, clubsDuplicates: 0, joined: 83, ratingsOnly: 1, clubsOnly: 1, excluded: 1 });
+  assert.deepEqual(audit.excluded, ['900 Invented Standin (stands for Someone Real)']);
+  assert.equal(audit.rows, 82);
+
+  // Nations: the old spelling is Czechia, Turks and Caicos has no team, a short name equal to the full name keeps 0, and a
+  // garbled short name gives way to the full name.
+  assert.deepEqual(doc.nations['203'][2].map(tuple => [tuple[5], tuple[7]]), [['Czech Republic', '1977-01-04']]);
+  assert.deepEqual(audit.noTeam, { 'Turks and Caicos Islands': 1 });
+  assert.deepEqual(doc.nations['288'][2][0].slice(1, 3), ['Kofi', 0]);
+  assert.deepEqual(doc.nations['428'][2][0].slice(1, 3), ['Aleksejs Invented', 0]);
+  assert.deepEqual(audit.namesFromRatings, [`806 "A. Inv${GARBLED} nted" → "Aleksejs Invented"`]);
+
+  // Clubs by the edition's league table, both of Liga Portugal's names accepted; a league outside the table holds no club.
+  assert.deepEqual(doc.clubs.map(club => club.league).sort(), Object.values(EA_LEAGUES).map(([league]) => league).sort());
+  assert.deepEqual(doc.clubs.find(club => club.name === 'Inventado FC').country, '620');
+  assert.deepEqual(audit.leagues['Liga Portugal'], { clubs: 1, short: [{ name: 'Sagres Club', players: 1 }] });
+  assert.ok(!doc.clubs.some(club => club.name === 'Elsewhere FC'));
+  assert.deepEqual(doc.territory, { merged: { 728: '729' }, inactive: ['KOS'] }, 'South Sudan and Kosovo were not FIFA members by mid-2009');
+  assert.deepEqual([audit.ratingsRoster, audit.ratingsDate, audit.roster, audit.snapshotDate], ['090001', '2008-08-30', '090002', '2009-02-22']);
+
+  // The loader takes it, and each player links to his page on the clubs file's roster.
+  const set = decodeFootballSet(structuredClone(doc));
+  const [, , rating, info] = set.rosters['826'][2][0];
+  assert.equal(rating, info.rawRating);
+  assert.equal(info.url, `https://sofifa.com/player/${info.id.slice(3)}/invented-player-${info.id.slice(3)}/090002`);
+  assert.equal(info.snapshotDate, '2009-02-22');
+  assert.equal(buildLegacy().text, text, 'the same rows build the same file');
+
+  // One roster in both files: no separate ratings date.
+  const same = buildLegacy(legacyInput(), { ...LEGACY_EDITION, ratings: { roster: '090002' } }).doc.source;
+  assert.ok(!('ratingsDate' in same));
+  assert.deepEqual([same.roster, same.update, same.snapshotDate], ['090002', 2, '2009-02-22']);
+});
+
+test('an old season stops rather than guess', () => {
+  const players = () => legacySample();
+  const withPlayer = over => legacyInput([...players(), legacyPlayer({ id: 807, ...over })]);
+  assert.throws(() => buildLegacy(withPlayer({ positions: 'ST-XX' })), /FIFA 09: player 807 has positions ST-XX, a code neither EA's nor in LEGACY_POSITIONS/);
+  assert.throws(() => buildLegacy(withPlayer({ dob: '31/02/1990' })), /player 807 has date of birth 31\/02\/1990/);
+  assert.throws(() => buildLegacy(withPlayer({ rating: '0' })), /player 807 has overall 0/);
+  assert.throws(() => buildLegacy(withPlayer({ nationality: 'Fictionland' })), /nationalities with no game nation, and not listed as having no team: Fictionland \(1 players\)/);
+  assert.throws(() => buildLegacy(withPlayer({ nationality: `Lat${GARBLED}ia` })), /player 807 has a damaged nationality/);
+  assert.throws(() => buildLegacy(withPlayer({ roster: '090003' })), /the clubs file holds rosters 090002, 090003, not 090002/);
+
+  const input = legacyInput();
+  assert.throws(() => buildLegacy({ ...input, clubs: [...input.clubs, { ...input.clubs[0], club_name: 'Another Club' }] }), /the clubs file has two different rows for player 1/);
+  assert.throws(() => buildLegacy({ ...input, ratings: [...input.ratings, input.ratings[0]] }), /the ratings file repeats player 1/);
+  assert.throws(() => buildLegacy({ ...input, clubs: input.clubs.map((row, i) => (i ? row : { ...row, player_url: '/player/2/invented-player-2/090002/' })) }), /player 1 links to/);
+  // The league table: every league named, every name found in the clubs file, and each league with a club of eleven.
+  const { 'Serie A': _serieA, ...six } = LEGACY_EDITION.leagues;
+  assert.throws(() => buildLegacy(input, { ...LEGACY_EDITION, leagues: six }), /the league table names .*, not the seven game leagues/);
+  assert.throws(() => buildLegacy(input, { ...LEGACY_EDITION, leagues: { ...LEGACY_EDITION.leagues, 'Serie A': ['Missing League'] } }),
+    /no player of the clubs file is in "Missing League" \(Serie A\)/);
+  const withoutKeeper = players().filter(p => !(p.club?.club_name === 'Inventado FC' && p.rating.preferred_positions === 'GK'));
+  assert.throws(() => buildLegacy(legacyInput(withoutKeeper)), /FIFA 09: no Liga Portugal club has eleven players/);
+  // The exclusions name players of the edition as the data spells them.
+  const exclude = records => buildLegacy(input, LEGACY_EDITION, { exclusions: legacyExclusions([{ player: 'Someone', evidence: 'shown', records }]) });
+  assert.throws(() => exclude([{ edition: 'FIFA 09', eaId: 999, name: 'Nobody' }]), /the exclusion of 999 \(Nobody\) names no player of this edition/);
+  assert.throws(() => exclude([{ edition: 'FIFA 09', eaId: 801, name: 'Invented Player801' }]), /names no player of this edition/, 'in the ratings file only');
+  assert.throws(() => exclude([{ edition: 'FIFA 09', eaId: 900, name: 'Someone Else' }]), /player 900 is Invented Standin, not Someone Else/);
+  // Rosters: each the edition's own, and each with a date.
+  assert.throws(() => buildLegacy(input, { ...LEGACY_EDITION, ratings: { roster: '090005' } }), /the roster dates give no date for roster 090005/);
+  assert.throws(() => buildLegacy(input, { ...LEGACY_EDITION, clubs: { roster: '100002' } }), /roster 100002 is not one of FIFA 09's/);
+  assert.throws(() => buildLegacy(input, { ...LEGACY_EDITION, id: 'fifa-09' }), /not like ea-fifa-07/);
+});
+
+test('the old files are read as they are laid out: the ratings file\'s shifted columns, the clubs file\'s duplicate rows, SoFIFA\'s roster dates', () => {
+  // FIFA 11–14 name one column more than their rows hold, and FIFA 11's last row is cut short: the columns read come first.
+  const ratingsText = ['id;Fullname;current_rating;potential_rating;height;weight;preferred_foot;birth_date;preferred_positions;work_rate;composure;vision;penalties',
+    '3721;Nenad Dzodic;72;75;188;75;Right;04/01/1977;CB-RB-SW;;46;66', '193030;Milan Lukac;65;72;197;88;Right;04/10/1985;GK'].join('\n');
+  assert.deepEqual(readRatingsRows(ratingsText), [
+    { id: '3721', Fullname: 'Nenad Dzodic', current_rating: '72', birth_date: '04/01/1977', preferred_positions: 'CB-RB-SW' },
+    { id: '193030', Fullname: 'Milan Lukac', current_rating: '65', birth_date: '04/10/1985', preferred_positions: 'GK' }]);
+  assert.throws(() => readRatingsRows(`${ratingsText}\n1;Too Short;60;61;180;80;Right;01/01/1990`), /Ratings row 4 has 8 fields/);
+  assert.throws(() => readRatingsRows('id;Name\n1;X'), /no "Fullname" column/);
+
+  // Exact duplicates are dropped and counted; a quoted club name keeps its comma.
+  const clubsText = ['sofifa_id,player_url,short_name,age,nationality,club_name,league_name,bov',
+    '1179,/player/1179/gianluigi-buffon/070002/,G. Buffon,28,Italy,Juventus,Italian Serie B,93',
+    '1179,/player/1179/gianluigi-buffon/070002/,G. Buffon,28,Italy,Juventus,Italian Serie B,93',
+    '4,/player/4/someone/070002/,S. One,30,Spain,"Club, Deportivo",Spain Primera Division,70', ''].join('\r\n');
+  const { rows, duplicates } = readClubRows(clubsText);
+  assert.equal(duplicates, 1);
+  assert.deepEqual(rows.map(row => [row.sofifa_id, row.club_name, row.league_name]), [['1179', 'Juventus', 'Italian Serie B'], ['4', 'Club, Deportivo', 'Spain Primera Division']]);
+  assert.ok(!('bov' in rows[0]), 'SoFIFA\'s best overall is never read');
+  assert.throws(() => readClubRows('sofifa_id,player_url,short_name,nationality,club_name,league_name\n1,x'), /Clubs row 2 has 2 fields; expected 6/);
+
+  // Each edition's rosters in order; a row that names its roster must sit at its place.
+  const dates = rosterDates({ data: [['Aug 29, 2014', 0, 0, 0, 0, '', 'FIFA 15'], ['Sep 18, 2014', 0, 0, 0, 0, '', 'FIFA 15'],
+    ['Feb 6, 2015', '79', '63', 210000, 4000, '150003', 'FIFA 15'], ['Aug 30, 2006', 0, 0, 0, 0, '', 'FIFA 07']] });
+  assert.deepEqual(dates, { 'FIFA 15': ['2014-08-29', '2014-09-18', '2015-02-06'], 'FIFA 07': ['2006-08-30'] });
+  assert.equal(rosterDate(dates, 'FIFA 15', '150002'), '2014-09-18');
+  assert.throws(() => rosterDate(dates, 'FIFA 07', '070002'), /FIFA 07: the roster dates give no date for roster 070002/);
+  assert.throws(() => rosterDates({ data: [['Feb 6, 2015', '79', '63', 210000, 4000, '150026', 'FIFA 15']] }), /is number 1 of FIFA 15, not roster 150026/);
+  assert.throws(() => rosterDates({}), /no data list/);
+
+  // Dates of birth are real days; positions map once, in order.
+  assert.deepEqual(['29/02/1984', '29/02/1985', '1984-02-29', '00/01/1990'].map(isoDate), ['1984-02-29', null, null, null]);
+  assert.deepEqual(legacyPositionKeys('CB-RB-SW'), { keys: ['CB', 'RB'], mapped: ['SW→CB'] });
+  assert.deepEqual(legacyPositionKeys('LF-ST-LW-CF'), { keys: ['CF', 'ST', 'LW'], mapped: ['LF→CF'] });
+  assert.deepEqual(legacyPositionKeys('LCDM-RAM-LS'), { keys: ['CDM', 'CAM', 'ST'], mapped: ['LCDM→CDM', 'RAM→CAM', 'LS→ST'] });
+  assert.equal(legacyPositionKeys('ST-XX'), null);
+  for (const [code, key] of Object.entries(LEGACY_POSITIONS)) {
+    assert.ok(Object.hasOwn(EA_ROLES, key) && !Object.hasOwn(EA_ROLES, code), `${code} → ${key} maps a code EA no longer uses to one it does`);
+  }
+
+  // Exclusions: whom each stands for and how that is known, each player once.
+  assert.deepEqual(EXCLUSIONS, [{ edition: 'FIFA 09', eaId: 900, name: 'Invented Standin', player: 'Someone Real' }]);
+  assert.throws(() => legacyExclusions([{ player: 'Someone', records: [{ edition: 'FIFA 09', eaId: 1, name: 'X' }] }]), /must name the player, its evidence and its records/);
+  assert.throws(() => legacyExclusions([{ player: 'A', evidence: 'e', records: [{ edition: 'FIFA 09', eaId: 1, name: 'X' }] },
+    { player: 'B', evidence: 'e', records: [{ edition: 'FIFA 09', eaId: 1, name: 'X' }] }]), /FIFA 09: player 1 is excluded twice/);
+  assert.throws(() => legacyExclusions([{ player: 'A', evidence: 'e', records: [{ edition: 'FIFA 09', eaId: '1', name: 'X' }] }]), /is incomplete/);
+});
+
 // ---------- saves ----------
 
 test('an EA season campaign packs its players as EA tuples; a damaged pack is refused', () => {
@@ -186,21 +389,66 @@ test('an EA season\'s player is labelled with its edition and links to that rost
 
 // ---------- the committed seasons ----------
 
+// Coverage the setup note promises: most strong nations, and all seven leagues. EA rated fewer nations' players before
+// FIFA 11 and the FIFA 07–14 sources join two scrapes, so those seasons have their own lower floors.
+const FLOORS = {
+  default: { completeXIs: 65, nations: 125, clubs: 125 },
+  'ea-fifa-14': { completeXIs: 60 }, 'ea-fifa-11': { completeXIs: 60 }, 'ea-fifa-10': { completeXIs: 60 },
+  'ea-fifa-09': { completeXIs: 45, nations: 120 }, 'ea-fifa-08': { completeXIs: 50, nations: 115 }, 'ea-fifa-07': { completeXIs: 50, nations: 110 },
+};
+const committed = id => JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
+const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)];
+
 test('every built-in earlier season is committed, matches its listing and its own hash, and decodes', () => {
-  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.id), MANIFEST.editions.map(edition => edition.id), 'one per manifest edition, newest first');
+  const editions = [...MANIFEST.editions, ...MANIFEST.legacy.editions];
+  assert.equal(editions.length, 18, 'FIFA 07 to EA FC 24');
+  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.id), editions.map(edition => edition.id), 'one per manifest edition, newest first');
+  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.year), editions.map((_, i) => 2024 - i));
   assert.deepEqual(BUILT_IN_SETS.filter(set => setSportOf(set.id) === 'football').map(set => set.id), BUILT_IN_SEASONS.map(set => set.id));
   for (const [i, listed] of BUILT_IN_SEASONS.entries()) {
-    const edition = MANIFEST.editions[i];
-    const doc = JSON.parse(readFileSync(new URL(`../public/football/${listed.id}.json`, import.meta.url), 'utf8'));
+    const edition = editions[i];
+    const doc = committed(listed.id);
     assert.equal(setKindOf(listed.id), 'ea');
     assert.deepEqual([doc.id, doc.version, doc.year, doc.season, doc.label], [listed.id, listed.version, listed.year, listed.season, listed.label]);
     assert.deepEqual([doc.year, doc.label], [2000 + edition.fifaVersion, edition.edition]);
     assert.equal(doc.version, `${doc.id}-${contentHash(doc)}`, `${doc.id} is the file its version names`);
-    assert.equal(doc.source.url, MANIFEST.dataset.url);
+    if (edition.clubs) {
+      // FIFA 07–14: the clubs file's roster dates the season; a ratings file of another roster has its own date.
+      assert.deepEqual([doc.source.url, doc.source.clubsUrl, doc.source.roster, doc.source.update],
+        [MANIFEST.legacy.ratings.url, MANIFEST.legacy.clubs.url, edition.clubs.roster, Number(edition.clubs.roster.slice(2))]);
+      assert.equal('ratingsDate' in doc.source, edition.ratings.roster !== edition.clubs.roster, `${doc.id} ratings date`);
+      assert.ok(!doc.source.ratingsDate || doc.source.ratingsDate < doc.source.snapshotDate);
+    } else {
+      assert.equal(doc.source.url, MANIFEST.dataset.url);
+    }
     const set = decodeFootballSet(doc);
-    // Coverage the setup note promises: most strong nations, and all seven leagues.
-    assert.ok(doc.coverage.completeXIs >= 65 && doc.coverage.nations >= 125, `${doc.id} coverage ${JSON.stringify(doc.coverage)}`);
+    const floor = { ...FLOORS.default, ...FLOORS[doc.id] };
+    assert.ok(doc.coverage.completeXIs >= floor.completeXIs && doc.coverage.nations >= floor.nations, `${doc.id} coverage ${JSON.stringify(doc.coverage)}`);
     assert.deepEqual([...new Set(set.clubs.map(club => club.league))].sort(), Object.values(EA_LEAGUES).map(([league]) => league).sort());
-    assert.ok(set.clubs.length >= 125, `${doc.id} has ${set.clubs.length} clubs`);
+    assert.ok(set.clubs.length >= floor.clubs, `${doc.id} has ${set.clubs.length} clubs`);
+  }
+});
+
+test('the FIFA 07–14 seasons name every input by its SHA-256, and none writes a player EA renamed with an invented name', () => {
+  const { legacy } = MANIFEST;
+  const hex = /^[0-9a-f]{64}$/;
+  assert.ok(hex.test(legacy.dates.sha256) && hex.test(legacy.ratings.archive.sha256));
+  for (const edition of legacy.editions) {
+    const version = String(edition.fifaVersion).padStart(2, '0');
+    assert.ok(hex.test(edition.ratings.sha256) && hex.test(edition.clubs.sha256), `${edition.edition} pins both files`);
+    assert.ok([edition.ratings.roster, edition.clubs.roster].every(roster => new RegExp(`^${version}\\d{4}$`).test(roster)));
+    assert.ok(edition.evidence?.trim(), `${edition.edition} says how its rosters are known`);
+    assert.deepEqual(Object.keys(edition.leagues).sort(), Object.values(EA_LEAGUES).map(([league]) => league).sort());
+  }
+  const exclusions = legacyExclusions(legacy.exclusions);
+  assert.ok(exclusions.length > 0);
+  for (const { edition, eaId, name } of exclusions) {
+    const built = legacy.editions.find(e => e.edition === edition);
+    assert.ok(built, `${edition} is built`);
+    assert.ok(!tuplesOf(committed(built.id)).some(tuple => tuple[0] === eaId), `${edition} leaves out ${eaId} ${name}`);
+  }
+  // Nothing the scrapes could not decode reaches a season.
+  for (const { id } of legacy.editions) {
+    assert.ok(!tuplesOf(committed(id)).some(tuple => tuple.some(field => String(field).includes(GARBLED))), `${id} has no damaged text`);
   }
 });
