@@ -40,6 +40,7 @@
     "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs scripts/nba-map.test.mjs",
     "sync:club-logos": "node scripts/sync-club-logos.mjs",
     "build:club-colours": "node scripts/build-club-colours.mjs",
+    "build:nation-colours": "node scripts/build-nation-colours.mjs",
     "build:football-set": "node scripts/build-football-set.mjs",
     "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs"
   },
