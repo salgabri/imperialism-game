@@ -10,6 +10,283 @@
     "sha256": "fd788f7809a62e9715f0cfa4e45c92a97dd716bd6d64dc48a71a0e86369a0a7e",
     "retrieved": "2026-10-30"
   },
+  "legacy": {
+    "note": "FIFA 07 – FIFA 14 (scripts/lib/ea-legacy-seasons.mjs). EA's overall, positions, full name and date of birth come from the ratings files; nationality, club, league, short name and SoFIFA link from the clubs files, whose own rating (bov) is SoFIFA's best overall and is never read. A player missing from either file is left out. Each edition names the roster each file holds and how that is known; where they differ, the season's snapshotDate is the clubs roster's date and ratingsDate the ratings roster's. SoFIFA's dates for FIFA 07–12 are nominal (Aug 30 and Feb 22 every year), so the roster ids identify the snapshots. Evidence that names hugomathien refers to the European Soccer Database (Kaggle hugomathien/soccer), EA ratings by SoFIFA date for 11 European leagues, 2008–2016.",
+    "ratings": {
+      "name": "FIFA 21 to FIFA 05 complete player attributes (daguizer, a FIFA Index mirror)",
+      "url": "https://www.kaggle.com/datasets/daguizer/fifa-2021-to-2005-complete-player-attributes",
+      "download": "https://www.kaggle.com/api/v1/datasets/download/daguizer/fifa-2021-to-2005-complete-player-attributes",
+      "archive": {
+        "file": "daguizer.zip",
+        "sha256": "f27f8ac623f7efe908e101261b5e0ce112c24ba8873392f5f9f8814811e25b5b"
+      },
+      "folder": "fifa-daguizer/x",
+      "licence": "\"other\", as set by the compiler on Kaggle; FIFA Index's terms ban scraping, and EA's own rights in the ratings are not cleared",
+      "retrieved": "2026-10-30"
+    },
+    "clubs": {
+      "name": "Big-Data-FC datasets (a SoFIFA scrape)",
+      "url": "https://github.com/Big-Data-FC/datasets/tree/c6da23fc6e5fccef901d0b421b727bb6c2be7a1d",
+      "commit": "c6da23fc6e5fccef901d0b421b727bb6c2be7a1d",
+      "folder": "fifa-bigdatafc",
+      "licence": "none stated: the repository has no licence file, SoFIFA states none, and EA's own rights are not cleared",
+      "retrieved": "2026-10-30"
+    },
+    "dates": {
+      "name": "SoFIFA's roster dates, each edition's rosters in order (the n-th FIFA 07 date is roster 07000n)",
+      "file": "fifa-moradi/dates.json",
+      "sha256": "bb2ab11ea13f8bfc977add62f4d46bb3c2eefdf1275e5691784349d26f417a96",
+      "retrieved": "2026-10-30"
+    },
+    "positions": {
+      "SW": "CB",
+      "LCB": "CB",
+      "RCB": "CB",
+      "LDM": "CDM",
+      "RDM": "CDM",
+      "LCDM": "CDM",
+      "RCDM": "CDM",
+      "LCM": "CM",
+      "RCM": "CM",
+      "LAM": "CAM",
+      "RAM": "CAM",
+      "LCAM": "CAM",
+      "RCAM": "CAM",
+      "LWM": "LM",
+      "RWM": "RM",
+      "LF": "CF",
+      "RF": "CF",
+      "LS": "ST",
+      "RS": "ST"
+    },
+    "exclusions": [
+      {
+        "player": "Adrian Mutu",
+        "evidence": "EA id 21195 is Adrian Mutu in FIFA 05 and 'Petrovici Teodor' in FIFA 06 (the ratings files); FIFA 07 gives that name to id 177848, a Romanian striker at Fiorentina. hugomathien names EA id 184410, 'Andrei Murgu' at Fiorentina, Cesena and AC Ajaccio in FIFA 08–13, Adrian Mutu. No edition from FIFA 06 on names Mutu.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177848,
+            "name": "Teodor Petrovici"
+          },
+          {
+            "edition": "FIFA 08",
+            "eaId": 184410,
+            "name": "Andrei Murgu"
+          },
+          {
+            "edition": "FIFA 09",
+            "eaId": 184410,
+            "name": "Andrei Murgu"
+          },
+          {
+            "edition": "FIFA 12",
+            "eaId": 184410,
+            "name": "Andrei Murgu"
+          },
+          {
+            "edition": "FIFA 13",
+            "eaId": 184410,
+            "name": "Andrei Murgu"
+          }
+        ]
+      },
+      {
+        "player": "Marco Materazzi",
+        "evidence": "EA id 7569 is Marco Materazzi in FIFA 05 and 'Valerio Bernado' in FIFA 06; FIFA 07's id 177844, 'Bernado Valerio' at Inter, is Marco Materazzi in FIFA 08–11 and in hugomathien.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177844,
+            "name": "Bernado Valerio"
+          }
+        ]
+      },
+      {
+        "player": "Olivier Renard",
+        "evidence": "EA id 107491 is Olivier Renard in FIFA 05 and 'Rabret Sylvain' in FIFA 06; FIFA 07 (id 177833) and FIFA 08–13 (id 184412) call him 'Sylvain Rabret', a Belgian goalkeeper at Standard de Liège, then KV Mechelen. hugomathien names EA id 184412 Olivier Renard.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177833,
+            "name": "Sylvain Rabret"
+          },
+          {
+            "edition": "FIFA 08",
+            "eaId": 184412,
+            "name": "Sylvain Rabret"
+          },
+          {
+            "edition": "FIFA 09",
+            "eaId": 184412,
+            "name": "Sylvain Rabret"
+          },
+          {
+            "edition": "FIFA 10",
+            "eaId": 184412,
+            "name": "Sylvain Rabret"
+          },
+          {
+            "edition": "FIFA 11",
+            "eaId": 184412,
+            "name": "Sylvain Rabret"
+          },
+          {
+            "edition": "FIFA 12",
+            "eaId": 184412,
+            "name": "Sylvain Rabret"
+          },
+          {
+            "edition": "FIFA 13",
+            "eaId": 184412,
+            "name": "Sylvain Rabret"
+          }
+        ]
+      },
+      {
+        "player": "Marko Baša",
+        "evidence": "EA id 192615 is Marko Baša (born 1982-12-29) in FIFA 12–17 and in hugomathien; FIFA 10 and 11 call it 'Milo Bašic', born 1982-06-02, a Montenegrin centre back at Lokomotiv Moscow.",
+        "records": [
+          {
+            "edition": "FIFA 10",
+            "eaId": 192615,
+            "name": "Milo Bašic"
+          },
+          {
+            "edition": "FIFA 11",
+            "eaId": 192615,
+            "name": "Milo Bašic"
+          }
+        ]
+      },
+      {
+        "player": "Axel Lawarée",
+        "evidence": "EA id 15612 is Axel Lawarée in FIFA 05 and 'Tellot Yves' in FIFA 06; FIFA 07 gives that name to id 177835, a Belgian striker at FC Augsburg, and FIFA 10 calls the same id 'Alex Lauwens', at Fortuna Düsseldorf.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177835,
+            "name": "Yves Tellot"
+          },
+          {
+            "edition": "FIFA 10",
+            "eaId": 177835,
+            "name": "Alex Lauwens"
+          }
+        ]
+      },
+      {
+        "player": "Giovanni Tedesco",
+        "evidence": "EA id 4587 is Giovanni Tedesco in FIFA 05 and 'Marcuccilli Silvio' in FIFA 06; FIFA 07 gives that name to id 177843, an Italian central midfielder born in 1972 at Palermo. FIFA 08–10's 'Giuseppe Tedaldo' (id 184411) takes that place, same club, nationality, position and birth year, among the ids EA gave its FIFA 08 stand-ins (184409–184415, with Mutu's 184410 and Renard's 184412); the name is in no other edition and not in hugomathien.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177843,
+            "name": "Silvio Marcuccilli"
+          },
+          {
+            "edition": "FIFA 08",
+            "eaId": 184411,
+            "name": "Giuseppe Tedaldo"
+          },
+          {
+            "edition": "FIFA 09",
+            "eaId": 184411,
+            "name": "Giuseppe Tedaldo"
+          },
+          {
+            "edition": "FIFA 10",
+            "eaId": 184411,
+            "name": "Giuseppe Tedaldo"
+          }
+        ]
+      },
+      {
+        "player": "Iulian Filipescu",
+        "evidence": "EA id 6375 is Iulian Filipescu in FIFA 05 and 'Sturdza Corneliu' in FIFA 06; FIFA 07 gives that name to id 177851, a Romanian centre back born in 1974 at MSV Duisburg. FIFA 08's 'Ionel Florescu' (id 184413) takes that place, same club, nationality, position and birth year, among EA's FIFA 08 stand-in ids; the name is in no other edition.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177851,
+            "name": "Corneliu Sturdza"
+          },
+          {
+            "edition": "FIFA 08",
+            "eaId": 184413,
+            "name": "Ionel Florescu"
+          }
+        ]
+      },
+      {
+        "player": "Frank Defays",
+        "evidence": "EA id 35398 is Frank Defays in FIFA 05 and 'Kurtz Kambert' in FIFA 06; FIFA 07 gives that name to id 177837, a Belgian defender born in 1974 at Charleroi. FIFA 08–09's 'Fredric Deboey' (id 184414) takes that place, same club, nationality and birth year, among EA's FIFA 08 stand-in ids; the name is in no other edition.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177837,
+            "name": "Kambert Kurtz"
+          },
+          {
+            "edition": "FIFA 08",
+            "eaId": 184414,
+            "name": "Fredric Deboey"
+          },
+          {
+            "edition": "FIFA 09",
+            "eaId": 184414,
+            "name": "Fredric Deboey"
+          }
+        ]
+      },
+      {
+        "player": "Mahamoudou Kéré",
+        "evidence": "EA id 33141 is Mahamoudou Kéré in FIFA 05 and 'Daddah Ankoma' in FIFA 06; FIFA 07 gives that name to id 177840, a midfielder from Burkina Faso born in 1982 at Charleroi. FIFA 08–11's 'Amadou Konare' (id 184415) takes that place, same club, nationality and birth year, among EA's FIFA 08 stand-in ids; the name is in no other edition.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177840,
+            "name": "Ankoma Daddah"
+          },
+          {
+            "edition": "FIFA 08",
+            "eaId": 184415,
+            "name": "Amadou Konare"
+          },
+          {
+            "edition": "FIFA 09",
+            "eaId": 184415,
+            "name": "Amadou Konare"
+          },
+          {
+            "edition": "FIFA 10",
+            "eaId": 184415,
+            "name": "Amadou Konare"
+          },
+          {
+            "edition": "FIFA 11",
+            "eaId": 184415,
+            "name": "Amadou Konare"
+          }
+        ]
+      },
+      {
+        "player": "a Romanian attacking midfielder born 1979-08-22, not identified",
+        "evidence": "One player, the same date of birth, nationality and position, has two unrelated names in consecutive editions: 'Matthias Seicaru' (FIFA 07, id 177847, KAA Gent, among the ids EA gave its FIFA 07 stand-ins, 177833–177851) and 'Anghel Stinga' (FIFA 08, id 184409, Excelsior Mouscron, among its FIFA 08 stand-in ids). Neither name is in any other edition or in hugomathien.",
+        "records": [
+          {
+            "edition": "FIFA 07",
+            "eaId": 177847,
+            "name": "Matthias Seicaru"
+          },
+          {
+            "edition": "FIFA 08",
+            "eaId": 184409,
+            "name": "Anghel Stinga"
+          }
+        ]
+      }
+    ]
+  },
   "seasons": [
     {
       "id": "ea-fc-24",
@@ -1695,6 +1972,1674 @@
         "051 Armenia (6)",
         "031 Azerbaijan (2)",
         "024 Angola (6)",
+        "072 Botswana (0)",
+        "084 Belize (0)",
+        "044 Bahamas (0)",
+        "096 Brunei (0)",
+        "050 Bangladesh (0)",
+        "064 Bhutan (0)",
+        "004 Afghanistan (0)",
+        "090 Solomon Islands (0)"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "ea-fifa-14",
+      "version": "ea-fifa-14-a4af7d4c",
+      "edition": "FIFA 14",
+      "update": 52,
+      "roster": "140052",
+      "snapshotDate": "2014-09-19",
+      "ratingsRoster": "140052",
+      "join": {
+        "ratingsRows": 17270,
+        "clubsRows": 16316,
+        "clubsDuplicates": 135,
+        "joined": 16113,
+        "ratingsOnly": 1157,
+        "clubsOnly": 203,
+        "excluded": 0
+      },
+      "excluded": [],
+      "mappedPositions": {},
+      "namesFromRatings": [],
+      "rows": 16113,
+      "noTeam": {
+        "Barbados": 3,
+        "Antigua and Barbuda": 6,
+        "Grenada": 3,
+        "Comoros": 3,
+        "Liechtenstein": 3,
+        "Saint Kitts and Nevis": 2,
+        "Curacao": 5,
+        "Faroe Islands": 3,
+        "Cape Verde Islands": 21,
+        "Malta": 2,
+        "Montserrat": 1,
+        "Guam": 1,
+        "Bermuda": 2,
+        "São Tomé e Príncipe": 1,
+        "Saint Lucia": 1,
+        "Bahrain": 1
+      },
+      "coverage": {
+        "players": 2159,
+        "nations": 130,
+        "completeXIs": 64,
+        "clubs": 132,
+        "leagues": 7
+      },
+      "leagues": {
+        "Eredivisie": {
+          "clubs": 18,
+          "short": []
+        },
+        "Premier League": {
+          "clubs": 20,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "short": []
+        },
+        "La Liga": {
+          "clubs": 20,
+          "short": []
+        },
+        "Liga Portugal": {
+          "clubs": 16,
+          "short": []
+        }
+      },
+      "territory": {
+        "merged": {},
+        "inactive": [
+          "KOS"
+        ]
+      },
+      "shortNations": [
+        "104 Myanmar (0)",
+        "108 Burundi (2)",
+        "112 Belarus (11)",
+        "116 Cambodia (1)",
+        "140 Central African Rep. (4)",
+        "144 Sri Lanka (0)",
+        "148 Chad (0)",
+        "156 China (1)",
+        "158 Chinese Taipei (0)",
+        "178 Congo (11)",
+        "192 Cuba (2)",
+        "196 Cyprus (2)",
+        "204 Benin (11)",
+        "214 Dominican Rep. (1)",
+        "218 Ecuador (11)",
+        "222 El Salvador (0)",
+        "226 Eq. Guinea (4)",
+        "231 Ethiopia (0)",
+        "232 Eritrea (0)",
+        "233 Estonia (10)",
+        "242 Fiji (1)",
+        "262 Djibouti (0)",
+        "266 Gabon (10)",
+        "268 Georgia (11)",
+        "270 Gambia (11)",
+        "275 Palestine (2)",
+        "320 Guatemala (2)",
+        "328 Guyana (0)",
+        "332 Haiti (8)",
+        "340 Honduras (11)",
+        "356 India (1)",
+        "360 Indonesia (1)",
+        "364 Iran (7)",
+        "368 Iraq (3)",
+        "376 Israel (11)",
+        "398 Kazakhstan (3)",
+        "400 Jordan (6)",
+        "404 Kenya (6)",
+        "408 North Korea (1)",
+        "414 Kuwait (0)",
+        "417 Kyrgyzstan (0)",
+        "418 Laos (0)",
+        "422 Lebanon (4)",
+        "426 Lesotho (0)",
+        "428 Latvia (11)",
+        "430 Liberia (5)",
+        "434 Libya (2)",
+        "440 Lithuania (10)",
+        "442 Luxembourg (5)",
+        "450 Madagascar (4)",
+        "454 Malawi (0)",
+        "458 Malaysia (0)",
+        "478 Mauritania (3)",
+        "496 Mongolia (0)",
+        "498 Moldova (9)",
+        "508 Mozambique (5)",
+        "512 Oman (3)",
+        "516 Namibia (0)",
+        "524 Nepal (0)",
+        "540 New Caledonia (3)",
+        "548 Vanuatu (0)",
+        "558 Nicaragua (0)",
+        "562 Niger (2)",
+        "586 Pakistan (0)",
+        "591 Panama (9)",
+        "598 Papua New Guinea (0)",
+        "608 Philippines (5)",
+        "624 Guinea-Bissau (9)",
+        "626 Timor-Leste (1)",
+        "630 Puerto Rico (0)",
+        "634 Qatar (0)",
+        "646 Rwanda (1)",
+        "694 Sierra Leone (8)",
+        "704 Vietnam (0)",
+        "706 Somalia (0)",
+        "716 Zimbabwe (11)",
+        "728 South Sudan (0)",
+        "729 Sudan (0)",
+        "740 Suriname (2)",
+        "748 Eswatini (0)",
+        "760 Syria (1)",
+        "762 Tajikistan (0)",
+        "764 Thailand (0)",
+        "768 Togo (11)",
+        "780 Trinidad & Tobago (11)",
+        "784 United Arab Emirates (0)",
+        "788 Tunisia (11)",
+        "795 Turkmenistan (1)",
+        "800 Uganda (4)",
+        "818 Egypt (11)",
+        "834 Tanzania (0)",
+        "854 Burkina Faso (11)",
+        "860 Uzbekistan (5)",
+        "887 Yemen (0)",
+        "894 Zambia (6)",
+        "068 Bolivia (1)",
+        "KOS Kosovo (0)",
+        "051 Armenia (8)",
+        "031 Azerbaijan (5)",
+        "012 Algeria (11)",
+        "024 Angola (9)",
+        "072 Botswana (0)",
+        "084 Belize (0)",
+        "044 Bahamas (0)",
+        "096 Brunei (0)",
+        "050 Bangladesh (0)",
+        "064 Bhutan (0)",
+        "004 Afghanistan (0)",
+        "090 Solomon Islands (0)"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "ea-fifa-13",
+      "version": "ea-fifa-13-f9810843",
+      "edition": "FIFA 13",
+      "update": 34,
+      "roster": "130034",
+      "snapshotDate": "2013-09-20",
+      "ratingsRoster": "130034",
+      "join": {
+        "ratingsRows": 15686,
+        "clubsRows": 14717,
+        "clubsDuplicates": 99,
+        "joined": 14557,
+        "ratingsOnly": 1129,
+        "clubsOnly": 160,
+        "excluded": 2
+      },
+      "excluded": [
+        "184410 Andrei Murgu (stands for Adrian Mutu)",
+        "184412 Sylvain Rabret (stands for Olivier Renard)"
+      ],
+      "mappedPositions": {},
+      "namesFromRatings": [],
+      "rows": 14555,
+      "noTeam": {
+        "Barbados": 4,
+        "Liechtenstein": 3,
+        "Cape Verde Islands": 18,
+        "Grenada": 4,
+        "Antigua and Barbuda": 5,
+        "Comoros": 5,
+        "Saint Kitts and Nevis": 2,
+        "Mauritius": 1,
+        "Faroe Islands": 6,
+        "Malta": 2,
+        "Guam": 2,
+        "Montserrat": 1,
+        "Bermuda": 4,
+        "Curacao": 3,
+        "São Tomé e Príncipe": 1,
+        "Bahrain": 2,
+        "Gibraltar": 1
+      },
+      "coverage": {
+        "players": 2156,
+        "nations": 135,
+        "completeXIs": 67,
+        "clubs": 132,
+        "leagues": 7
+      },
+      "leagues": {
+        "Eredivisie": {
+          "clubs": 18,
+          "short": []
+        },
+        "Premier League": {
+          "clubs": 20,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "short": []
+        },
+        "La Liga": {
+          "clubs": 20,
+          "short": []
+        },
+        "Liga Portugal": {
+          "clubs": 16,
+          "short": []
+        }
+      },
+      "territory": {
+        "merged": {},
+        "inactive": [
+          "KOS"
+        ]
+      },
+      "shortNations": [
+        "104 Myanmar (0)",
+        "108 Burundi (3)",
+        "116 Cambodia (0)",
+        "140 Central African Rep. (6)",
+        "144 Sri Lanka (0)",
+        "148 Chad (1)",
+        "156 China (2)",
+        "158 Chinese Taipei (0)",
+        "178 Congo (11)",
+        "192 Cuba (2)",
+        "196 Cyprus (1)",
+        "204 Benin (9)",
+        "214 Dominican Rep. (1)",
+        "218 Ecuador (11)",
+        "222 El Salvador (4)",
+        "226 Eq. Guinea (4)",
+        "231 Ethiopia (1)",
+        "232 Eritrea (0)",
+        "233 Estonia (11)",
+        "242 Fiji (0)",
+        "262 Djibouti (0)",
+        "266 Gabon (10)",
+        "270 Gambia (11)",
+        "275 Palestine (3)",
+        "320 Guatemala (2)",
+        "328 Guyana (1)",
+        "332 Haiti (10)",
+        "340 Honduras (11)",
+        "352 Iceland (11)",
+        "356 India (0)",
+        "360 Indonesia (2)",
+        "364 Iran (6)",
+        "368 Iraq (2)",
+        "398 Kazakhstan (4)",
+        "400 Jordan (3)",
+        "404 Kenya (7)",
+        "408 North Korea (1)",
+        "414 Kuwait (1)",
+        "417 Kyrgyzstan (1)",
+        "418 Laos (0)",
+        "422 Lebanon (4)",
+        "426 Lesotho (0)",
+        "428 Latvia (6)",
+        "430 Liberia (5)",
+        "434 Libya (4)",
+        "442 Luxembourg (3)",
+        "450 Madagascar (3)",
+        "454 Malawi (0)",
+        "458 Malaysia (0)",
+        "478 Mauritania (1)",
+        "496 Mongolia (0)",
+        "498 Moldova (6)",
+        "508 Mozambique (2)",
+        "512 Oman (6)",
+        "516 Namibia (2)",
+        "524 Nepal (0)",
+        "540 New Caledonia (2)",
+        "548 Vanuatu (0)",
+        "558 Nicaragua (0)",
+        "562 Niger (0)",
+        "586 Pakistan (0)",
+        "591 Panama (7)",
+        "598 Papua New Guinea (0)",
+        "600 Paraguay (11)",
+        "608 Philippines (5)",
+        "624 Guinea-Bissau (9)",
+        "626 Timor-Leste (0)",
+        "630 Puerto Rico (1)",
+        "634 Qatar (1)",
+        "646 Rwanda (1)",
+        "694 Sierra Leone (11)",
+        "704 Vietnam (0)",
+        "706 Somalia (1)",
+        "716 Zimbabwe (11)",
+        "728 South Sudan (0)",
+        "729 Sudan (0)",
+        "740 Suriname (2)",
+        "748 Eswatini (0)",
+        "760 Syria (5)",
+        "762 Tajikistan (0)",
+        "764 Thailand (0)",
+        "768 Togo (11)",
+        "780 Trinidad & Tobago (11)",
+        "784 United Arab Emirates (0)",
+        "788 Tunisia (11)",
+        "795 Turkmenistan (0)",
+        "800 Uganda (2)",
+        "804 Ukraine (8)",
+        "834 Tanzania (0)",
+        "854 Burkina Faso (11)",
+        "860 Uzbekistan (5)",
+        "887 Yemen (0)",
+        "894 Zambia (5)",
+        "068 Bolivia (3)",
+        "KOS Kosovo (0)",
+        "051 Armenia (6)",
+        "031 Azerbaijan (1)",
+        "024 Angola (7)",
+        "072 Botswana (0)",
+        "084 Belize (0)",
+        "044 Bahamas (0)",
+        "096 Brunei (0)",
+        "050 Bangladesh (0)",
+        "064 Bhutan (0)",
+        "004 Afghanistan (0)",
+        "090 Solomon Islands (1)"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "ea-fifa-12",
+      "version": "ea-fifa-12-48c86de3",
+      "edition": "FIFA 12",
+      "update": 2,
+      "roster": "120002",
+      "snapshotDate": "2012-02-22",
+      "ratingsRoster": "120002",
+      "join": {
+        "ratingsRows": 14922,
+        "clubsRows": 14159,
+        "clubsDuplicates": 100,
+        "joined": 13987,
+        "ratingsOnly": 935,
+        "clubsOnly": 172,
+        "excluded": 2
+      },
+      "excluded": [
+        "184410 Andrei Murgu (stands for Adrian Mutu)",
+        "184412 Sylvain Rabret (stands for Olivier Renard)"
+      ],
+      "mappedPositions": {},
+      "namesFromRatings": [
+        "168649 \"A. Viš� akovs\" → \"Aleksejs Višŋakovs\""
+      ],
+      "rows": 13985,
+      "noTeam": {
+        "Barbados": 4,
+        "Grenada": 5,
+        "Antigua and Barbuda": 3,
+        "Mauritius": 1,
+        "Comoros": 4,
+        "Malta": 4,
+        "Liechtenstein": 2,
+        "Saint Kitts and Nevis": 1,
+        "Faroe Islands": 3,
+        "Curacao": 1,
+        "Cape Verde Islands": 17,
+        "Bahrain": 1,
+        "Montserrat": 1,
+        "Bermuda": 3,
+        "São Tomé e Príncipe": 1
+      },
+      "coverage": {
+        "players": 2105,
+        "nations": 130,
+        "completeXIs": 69,
+        "clubs": 132,
+        "leagues": 7
+      },
+      "leagues": {
+        "Eredivisie": {
+          "clubs": 18,
+          "short": []
+        },
+        "Premier League": {
+          "clubs": 20,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "short": []
+        },
+        "La Liga": {
+          "clubs": 20,
+          "short": []
+        },
+        "Liga Portugal": {
+          "clubs": 16,
+          "short": []
+        }
+      },
+      "territory": {
+        "merged": {},
+        "inactive": [
+          "KOS"
+        ]
+      },
+      "shortNations": [
+        "104 Myanmar (0)",
+        "108 Burundi (4)",
+        "116 Cambodia (0)",
+        "140 Central African Rep. (6)",
+        "144 Sri Lanka (0)",
+        "148 Chad (0)",
+        "156 China (5)",
+        "158 Chinese Taipei (1)",
+        "192 Cuba (2)",
+        "196 Cyprus (2)",
+        "204 Benin (6)",
+        "214 Dominican Rep. (0)",
+        "218 Ecuador (11)",
+        "222 El Salvador (3)",
+        "226 Eq. Guinea (5)",
+        "231 Ethiopia (0)",
+        "232 Eritrea (1)",
+        "233 Estonia (11)",
+        "242 Fiji (0)",
+        "262 Djibouti (0)",
+        "266 Gabon (8)",
+        "270 Gambia (11)",
+        "275 Palestine (0)",
+        "320 Guatemala (1)",
+        "324 Guinea (11)",
+        "328 Guyana (1)",
+        "332 Haiti (10)",
+        "340 Honduras (11)",
+        "356 India (0)",
+        "360 Indonesia (3)",
+        "364 Iran (3)",
+        "368 Iraq (3)",
+        "398 Kazakhstan (3)",
+        "400 Jordan (0)",
+        "404 Kenya (7)",
+        "408 North Korea (2)",
+        "414 Kuwait (0)",
+        "417 Kyrgyzstan (1)",
+        "418 Laos (0)",
+        "422 Lebanon (0)",
+        "426 Lesotho (0)",
+        "428 Latvia (9)",
+        "430 Liberia (3)",
+        "434 Libya (1)",
+        "442 Luxembourg (2)",
+        "450 Madagascar (1)",
+        "454 Malawi (0)",
+        "458 Malaysia (0)",
+        "478 Mauritania (2)",
+        "496 Mongolia (0)",
+        "498 Moldova (11)",
+        "508 Mozambique (3)",
+        "512 Oman (1)",
+        "516 Namibia (4)",
+        "524 Nepal (0)",
+        "540 New Caledonia (0)",
+        "548 Vanuatu (0)",
+        "558 Nicaragua (0)",
+        "562 Niger (3)",
+        "586 Pakistan (0)",
+        "591 Panama (5)",
+        "598 Papua New Guinea (0)",
+        "608 Philippines (5)",
+        "624 Guinea-Bissau (7)",
+        "626 Timor-Leste (0)",
+        "630 Puerto Rico (0)",
+        "634 Qatar (1)",
+        "646 Rwanda (1)",
+        "682 Saudi Arabia (1)",
+        "694 Sierra Leone (11)",
+        "704 Vietnam (0)",
+        "706 Somalia (1)",
+        "716 Zimbabwe (11)",
+        "728 South Sudan (0)",
+        "729 Sudan (0)",
+        "740 Suriname (2)",
+        "748 Eswatini (0)",
+        "760 Syria (2)",
+        "762 Tajikistan (0)",
+        "764 Thailand (0)",
+        "768 Togo (11)",
+        "780 Trinidad & Tobago (11)",
+        "784 United Arab Emirates (0)",
+        "795 Turkmenistan (0)",
+        "800 Uganda (2)",
+        "818 Egypt (3)",
+        "834 Tanzania (2)",
+        "854 Burkina Faso (11)",
+        "860 Uzbekistan (1)",
+        "887 Yemen (0)",
+        "894 Zambia (4)",
+        "068 Bolivia (4)",
+        "008 Albania (11)",
+        "KOS Kosovo (0)",
+        "051 Armenia (7)",
+        "031 Azerbaijan (1)",
+        "072 Botswana (0)",
+        "084 Belize (0)",
+        "044 Bahamas (0)",
+        "096 Brunei (0)",
+        "050 Bangladesh (0)",
+        "064 Bhutan (0)",
+        "004 Afghanistan (1)",
+        "090 Solomon Islands (0)"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "ea-fifa-11",
+      "version": "ea-fifa-11-a14ca4f5",
+      "edition": "FIFA 11",
+      "update": 2,
+      "roster": "110002",
+      "snapshotDate": "2011-02-22",
+      "ratingsRoster": "110001",
+      "ratingsDate": "2010-08-30",
+      "join": {
+        "ratingsRows": 15020,
+        "clubsRows": 15003,
+        "clubsDuplicates": 137,
+        "joined": 13243,
+        "ratingsOnly": 1777,
+        "clubsOnly": 1760,
+        "excluded": 3
+      },
+      "excluded": [
+        "184412 Sylvain Rabret (stands for Olivier Renard)",
+        "192615 Milo Bašic (stands for Marko Baša)",
+        "184415 Amadou Konare (stands for Mahamoudou Kéré)"
+      ],
+      "mappedPositions": {
+        "LF→CF": 557,
+        "RF→CF": 691,
+        "SW→CB": 267
+      },
+      "namesFromRatings": [],
+      "rows": 13240,
+      "noTeam": {
+        "Barbados": 7,
+        "Liechtenstein": 2,
+        "Cape Verde Islands": 11,
+        "Grenada": 3,
+        "Antigua and Barbuda": 1,
+        "Comoros": 2,
+        "Malta": 3,
+        "Andorra": 1,
+        "Faroe Islands": 3,
+        "Curacao": 3,
+        "Bahrain": 2,
+        "Bermuda": 1
+      },
+      "coverage": {
+        "players": 2096,
+        "nations": 130,
+        "completeXIs": 64,
+        "clubs": 132,
+        "leagues": 7
+      },
+      "leagues": {
+        "Eredivisie": {
+          "clubs": 18,
+          "short": []
+        },
+        "Premier League": {
+          "clubs": 20,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "short": []
+        },
+        "La Liga": {
+          "clubs": 20,
+          "short": []
+        },
+        "Liga Portugal": {
+          "clubs": 16,
+          "short": []
+        }
+      },
+      "territory": {
+        "merged": {
+          "728": "729"
+        },
+        "inactive": [
+          "KOS"
+        ]
+      },
+      "shortNations": [
+        "104 Myanmar (0)",
+        "108 Burundi (3)",
+        "116 Cambodia (0)",
+        "140 Central African Rep. (4)",
+        "144 Sri Lanka (0)",
+        "148 Chad (1)",
+        "156 China (8)",
+        "158 Chinese Taipei (1)",
+        "180 DR Congo (11)",
+        "192 Cuba (1)",
+        "196 Cyprus (4)",
+        "204 Benin (4)",
+        "214 Dominican Rep. (2)",
+        "218 Ecuador (9)",
+        "222 El Salvador (1)",
+        "226 Eq. Guinea (3)",
+        "231 Ethiopia (0)",
+        "232 Eritrea (0)",
+        "233 Estonia (10)",
+        "242 Fiji (0)",
+        "262 Djibouti (0)",
+        "266 Gabon (10)",
+        "270 Gambia (11)",
+        "275 Palestine (0)",
+        "320 Guatemala (1)",
+        "324 Guinea (11)",
+        "328 Guyana (0)",
+        "332 Haiti (4)",
+        "340 Honduras (11)",
+        "356 India (0)",
+        "360 Indonesia (2)",
+        "364 Iran (3)",
+        "368 Iraq (3)",
+        "398 Kazakhstan (2)",
+        "400 Jordan (0)",
+        "404 Kenya (4)",
+        "408 North Korea (1)",
+        "414 Kuwait (0)",
+        "417 Kyrgyzstan (0)",
+        "418 Laos (0)",
+        "422 Lebanon (1)",
+        "426 Lesotho (0)",
+        "428 Latvia (7)",
+        "430 Liberia (5)",
+        "434 Libya (1)",
+        "442 Luxembourg (2)",
+        "450 Madagascar (1)",
+        "454 Malawi (1)",
+        "458 Malaysia (0)",
+        "478 Mauritania (0)",
+        "496 Mongolia (0)",
+        "498 Moldova (9)",
+        "508 Mozambique (5)",
+        "512 Oman (1)",
+        "516 Namibia (1)",
+        "524 Nepal (0)",
+        "540 New Caledonia (0)",
+        "548 Vanuatu (0)",
+        "558 Nicaragua (0)",
+        "562 Niger (1)",
+        "566 Nigeria (11)",
+        "586 Pakistan (0)",
+        "591 Panama (2)",
+        "598 Papua New Guinea (0)",
+        "604 Peru (11)",
+        "608 Philippines (2)",
+        "624 Guinea-Bissau (2)",
+        "626 Timor-Leste (0)",
+        "630 Puerto Rico (2)",
+        "634 Qatar (1)",
+        "646 Rwanda (1)",
+        "682 Saudi Arabia (0)",
+        "694 Sierra Leone (10)",
+        "704 Vietnam (0)",
+        "706 Somalia (1)",
+        "716 Zimbabwe (11)",
+        "728 South Sudan (0)",
+        "729 Sudan (0)",
+        "740 Suriname (2)",
+        "748 Eswatini (0)",
+        "760 Syria (1)",
+        "762 Tajikistan (0)",
+        "764 Thailand (1)",
+        "780 Trinidad & Tobago (9)",
+        "784 United Arab Emirates (0)",
+        "795 Turkmenistan (0)",
+        "800 Uganda (2)",
+        "804 Ukraine (11)",
+        "818 Egypt (4)",
+        "834 Tanzania (1)",
+        "854 Burkina Faso (10)",
+        "860 Uzbekistan (4)",
+        "862 Venezuela (11)",
+        "887 Yemen (0)",
+        "894 Zambia (5)",
+        "068 Bolivia (2)",
+        "008 Albania (11)",
+        "KOS Kosovo (0)",
+        "051 Armenia (4)",
+        "031 Azerbaijan (2)",
+        "024 Angola (8)",
+        "072 Botswana (0)",
+        "084 Belize (0)",
+        "044 Bahamas (0)",
+        "096 Brunei (0)",
+        "050 Bangladesh (0)",
+        "064 Bhutan (0)",
+        "004 Afghanistan (0)",
+        "090 Solomon Islands (0)"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "ea-fifa-10",
+      "version": "ea-fifa-10-ab6df036",
+      "edition": "FIFA 10",
+      "update": 2,
+      "roster": "100002",
+      "snapshotDate": "2010-02-22",
+      "ratingsRoster": "100001",
+      "ratingsDate": "2009-08-30",
+      "join": {
+        "ratingsRows": 14975,
+        "clubsRows": 15026,
+        "clubsDuplicates": 70,
+        "joined": 13309,
+        "ratingsOnly": 1666,
+        "clubsOnly": 1717,
+        "excluded": 5
+      },
+      "excluded": [
+        "184412 Sylvain Rabret (stands for Olivier Renard)",
+        "192615 Milo Bašic (stands for Marko Baša)",
+        "177835 Alex Lauwens (stands for Axel Lawarée)",
+        "184411 Giuseppe Tedaldo (stands for Giovanni Tedesco)",
+        "184415 Amadou Konare (stands for Mahamoudou Kéré)"
+      ],
+      "mappedPositions": {
+        "LF→CF": 80,
+        "LWM→LM": 272,
+        "RF→CF": 112,
+        "RWM→RM": 344,
+        "SW→CB": 10
+      },
+      "namesFromRatings": [],
+      "rows": 13304,
+      "noTeam": {
+        "Curacao": 5,
+        "Barbados": 7,
+        "Liechtenstein": 4,
+        "Cape Verde Islands": 11,
+        "Grenada": 3,
+        "Saint Lucia": 2,
+        "Antigua and Barbuda": 2,
+        "Andorra": 1,
+        "Mauritius": 1,
+        "Malta": 3,
+        "Saint Kitts and Nevis": 1,
+        "Faroe Islands": 2,
+        "Bahrain": 2,
+        "Bermuda": 1
+      },
+      "coverage": {
+        "players": 2105,
+        "nations": 127,
+        "completeXIs": 60,
+        "clubs": 132,
+        "leagues": 7
+      },
+      "leagues": {
+        "Eredivisie": {
+          "clubs": 18,
+          "short": []
+        },
+        "Premier League": {
+          "clubs": 20,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "short": []
+        },
+        "La Liga": {
+          "clubs": 20,
+          "short": []
+        },
+        "Liga Portugal": {
+          "clubs": 16,
+          "short": []
+        }
+      },
+      "territory": {
+        "merged": {
+          "728": "729"
+        },
+        "inactive": [
+          "KOS"
+        ]
+      },
+      "shortNations": [
+        "104 Myanmar (0)",
+        "108 Burundi (3)",
+        "112 Belarus (11)",
+        "116 Cambodia (0)",
+        "140 Central African Rep. (3)",
+        "144 Sri Lanka (0)",
+        "148 Chad (0)",
+        "156 China (7)",
+        "158 Chinese Taipei (0)",
+        "180 DR Congo (11)",
+        "188 Costa Rica (11)",
+        "192 Cuba (2)",
+        "196 Cyprus (1)",
+        "204 Benin (6)",
+        "214 Dominican Rep. (0)",
+        "218 Ecuador (9)",
+        "222 El Salvador (2)",
+        "226 Eq. Guinea (2)",
+        "231 Ethiopia (0)",
+        "232 Eritrea (0)",
+        "233 Estonia (11)",
+        "242 Fiji (0)",
+        "262 Djibouti (0)",
+        "266 Gabon (9)",
+        "270 Gambia (11)",
+        "275 Palestine (0)",
+        "320 Guatemala (2)",
+        "328 Guyana (0)",
+        "332 Haiti (5)",
+        "340 Honduras (11)",
+        "356 India (0)",
+        "360 Indonesia (1)",
+        "364 Iran (4)",
+        "368 Iraq (2)",
+        "392 Japan (11)",
+        "398 Kazakhstan (1)",
+        "400 Jordan (0)",
+        "404 Kenya (4)",
+        "408 North Korea (2)",
+        "414 Kuwait (0)",
+        "417 Kyrgyzstan (0)",
+        "418 Laos (0)",
+        "422 Lebanon (2)",
+        "426 Lesotho (1)",
+        "428 Latvia (8)",
+        "430 Liberia (5)",
+        "434 Libya (0)",
+        "440 Lithuania (11)",
+        "442 Luxembourg (2)",
+        "450 Madagascar (1)",
+        "454 Malawi (1)",
+        "458 Malaysia (0)",
+        "478 Mauritania (1)",
+        "496 Mongolia (0)",
+        "498 Moldova (8)",
+        "499 Montenegro (11)",
+        "508 Mozambique (2)",
+        "512 Oman (1)",
+        "516 Namibia (3)",
+        "524 Nepal (0)",
+        "540 New Caledonia (0)",
+        "548 Vanuatu (0)",
+        "558 Nicaragua (0)",
+        "562 Niger (1)",
+        "566 Nigeria (11)",
+        "586 Pakistan (1)",
+        "591 Panama (4)",
+        "598 Papua New Guinea (0)",
+        "604 Peru (11)",
+        "608 Philippines (0)",
+        "624 Guinea-Bissau (2)",
+        "626 Timor-Leste (0)",
+        "630 Puerto Rico (2)",
+        "634 Qatar (0)",
+        "646 Rwanda (0)",
+        "682 Saudi Arabia (0)",
+        "694 Sierra Leone (10)",
+        "704 Vietnam (0)",
+        "706 Somalia (2)",
+        "716 Zimbabwe (11)",
+        "728 South Sudan (0)",
+        "729 Sudan (0)",
+        "740 Suriname (2)",
+        "748 Eswatini (1)",
+        "760 Syria (3)",
+        "762 Tajikistan (1)",
+        "764 Thailand (1)",
+        "768 Togo (11)",
+        "784 United Arab Emirates (0)",
+        "795 Turkmenistan (0)",
+        "800 Uganda (2)",
+        "818 Egypt (5)",
+        "834 Tanzania (0)",
+        "854 Burkina Faso (11)",
+        "860 Uzbekistan (2)",
+        "862 Venezuela (11)",
+        "887 Yemen (0)",
+        "894 Zambia (5)",
+        "068 Bolivia (2)",
+        "008 Albania (10)",
+        "KOS Kosovo (0)",
+        "051 Armenia (4)",
+        "031 Azerbaijan (0)",
+        "012 Algeria (11)",
+        "024 Angola (11)",
+        "072 Botswana (1)",
+        "084 Belize (0)",
+        "044 Bahamas (0)",
+        "096 Brunei (0)",
+        "050 Bangladesh (0)",
+        "064 Bhutan (0)",
+        "004 Afghanistan (0)",
+        "090 Solomon Islands (0)"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "ea-fifa-09",
+      "version": "ea-fifa-09-2cff6600",
+      "edition": "FIFA 09",
+      "update": 2,
+      "roster": "090002",
+      "snapshotDate": "2009-02-22",
+      "ratingsRoster": "090001",
+      "ratingsDate": "2008-08-30",
+      "join": {
+        "ratingsRows": 14800,
+        "clubsRows": 14479,
+        "clubsDuplicates": 110,
+        "joined": 13052,
+        "ratingsOnly": 1748,
+        "clubsOnly": 1427,
+        "excluded": 5
+      },
+      "excluded": [
+        "184410 Andrei Murgu (stands for Adrian Mutu)",
+        "184412 Sylvain Rabret (stands for Olivier Renard)",
+        "184411 Giuseppe Tedaldo (stands for Giovanni Tedesco)",
+        "184414 Fredric Deboey (stands for Frank Defays)",
+        "184415 Amadou Konare (stands for Mahamoudou Kéré)"
+      ],
+      "mappedPositions": {
+        "LF→CF": 91,
+        "LWM→LM": 274,
+        "RF→CF": 119,
+        "RWM→RM": 303,
+        "SW→CB": 14
+      },
+      "namesFromRatings": [],
+      "rows": 13047,
+      "noTeam": {
+        "Saint Kitts and Nevis": 2,
+        "Cape Verde Islands": 9,
+        "Curacao": 4,
+        "Liechtenstein": 7,
+        "São Tomé e Príncipe": 1,
+        "Turks and Caicos Islands": 1,
+        "Grenada": 2,
+        "Saint Lucia": 2,
+        "Barbados": 8,
+        "Malta": 3,
+        "Mauritius": 1,
+        "Montserrat": 1,
+        "San Marino": 1,
+        "Faroe Islands": 1,
+        "Bahrain": 1
+      },
+      "coverage": {
+        "players": 2082,
+        "nations": 122,
+        "completeXIs": 49,
+        "clubs": 132,
+        "leagues": 7
+      },
+      "leagues": {
+        "Eredivisie": {
+          "clubs": 18,
+          "short": []
+        },
+        "Premier League": {
+          "clubs": 20,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "short": []
+        },
+        "La Liga": {
+          "clubs": 20,
+          "short": []
+        },
+        "Liga Portugal": {
+          "clubs": 16,
+          "short": []
+        }
+      },
+      "territory": {
+        "merged": {
+          "728": "729"
+        },
+        "inactive": [
+          "KOS"
+        ]
+      },
+      "shortNations": [
+        "100 Bulgaria (11)",
+        "104 Myanmar (0)",
+        "108 Burundi (3)",
+        "112 Belarus (4)",
+        "116 Cambodia (0)",
+        "140 Central African Rep. (3)",
+        "144 Sri Lanka (0)",
+        "148 Chad (0)",
+        "156 China (4)",
+        "158 Chinese Taipei (0)",
+        "178 Congo (11)",
+        "188 Costa Rica (11)",
+        "192 Cuba (1)",
+        "196 Cyprus (2)",
+        "204 Benin (6)",
+        "214 Dominican Rep. (0)",
+        "218 Ecuador (10)",
+        "222 El Salvador (0)",
+        "226 Eq. Guinea (1)",
+        "231 Ethiopia (0)",
+        "232 Eritrea (0)",
+        "233 Estonia (8)",
+        "242 Fiji (0)",
+        "262 Djibouti (0)",
+        "266 Gabon (8)",
+        "268 Georgia (11)",
+        "270 Gambia (11)",
+        "275 Palestine (0)",
+        "288 Ghana (11)",
+        "320 Guatemala (1)",
+        "324 Guinea (11)",
+        "328 Guyana (0)",
+        "332 Haiti (2)",
+        "340 Honduras (9)",
+        "356 India (0)",
+        "360 Indonesia (0)",
+        "364 Iran (7)",
+        "368 Iraq (1)",
+        "376 Israel (11)",
+        "388 Jamaica (11)",
+        "392 Japan (9)",
+        "398 Kazakhstan (1)",
+        "400 Jordan (0)",
+        "404 Kenya (4)",
+        "408 North Korea (1)",
+        "414 Kuwait (0)",
+        "417 Kyrgyzstan (0)",
+        "418 Laos (0)",
+        "422 Lebanon (2)",
+        "426 Lesotho (1)",
+        "428 Latvia (4)",
+        "430 Liberia (6)",
+        "434 Libya (0)",
+        "440 Lithuania (11)",
+        "442 Luxembourg (2)",
+        "450 Madagascar (2)",
+        "454 Malawi (4)",
+        "458 Malaysia (0)",
+        "466 Mali (11)",
+        "478 Mauritania (2)",
+        "496 Mongolia (0)",
+        "498 Moldova (2)",
+        "508 Mozambique (3)",
+        "512 Oman (1)",
+        "516 Namibia (2)",
+        "524 Nepal (0)",
+        "540 New Caledonia (0)",
+        "548 Vanuatu (0)",
+        "558 Nicaragua (0)",
+        "562 Niger (1)",
+        "586 Pakistan (1)",
+        "591 Panama (6)",
+        "598 Papua New Guinea (0)",
+        "604 Peru (11)",
+        "608 Philippines (0)",
+        "624 Guinea-Bissau (3)",
+        "626 Timor-Leste (0)",
+        "630 Puerto Rico (1)",
+        "634 Qatar (0)",
+        "642 Romania (11)",
+        "643 Russia (5)",
+        "646 Rwanda (1)",
+        "682 Saudi Arabia (0)",
+        "694 Sierra Leone (10)",
+        "704 Vietnam (0)",
+        "706 Somalia (1)",
+        "716 Zimbabwe (11)",
+        "728 South Sudan (0)",
+        "729 Sudan (0)",
+        "740 Suriname (1)",
+        "748 Eswatini (0)",
+        "760 Syria (1)",
+        "762 Tajikistan (0)",
+        "764 Thailand (0)",
+        "768 Togo (10)",
+        "780 Trinidad & Tobago (11)",
+        "784 United Arab Emirates (0)",
+        "788 Tunisia (11)",
+        "795 Turkmenistan (0)",
+        "800 Uganda (2)",
+        "804 Ukraine (11)",
+        "807 N. Macedonia (11)",
+        "818 Egypt (7)",
+        "834 Tanzania (0)",
+        "854 Burkina Faso (11)",
+        "860 Uzbekistan (0)",
+        "862 Venezuela (11)",
+        "887 Yemen (0)",
+        "894 Zambia (6)",
+        "068 Bolivia (3)",
+        "008 Albania (11)",
+        "KOS Kosovo (0)",
+        "051 Armenia (6)",
+        "031 Azerbaijan (1)",
+        "012 Algeria (11)",
+        "024 Angola (11)",
+        "072 Botswana (0)",
+        "084 Belize (0)",
+        "044 Bahamas (0)",
+        "096 Brunei (0)",
+        "050 Bangladesh (0)",
+        "064 Bhutan (0)",
+        "004 Afghanistan (0)",
+        "090 Solomon Islands (0)"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "ea-fifa-08",
+      "version": "ea-fifa-08-e7c7f73e",
+      "edition": "FIFA 08",
+      "update": 2,
+      "roster": "080002",
+      "snapshotDate": "2008-02-22",
+      "ratingsRoster": "080001",
+      "ratingsDate": "2007-08-30",
+      "join": {
+        "ratingsRows": 12763,
+        "clubsRows": 12505,
+        "clubsDuplicates": 78,
+        "joined": 12004,
+        "ratingsOnly": 759,
+        "clubsOnly": 501,
+        "excluded": 7
+      },
+      "excluded": [
+        "184410 Andrei Murgu (stands for Adrian Mutu)",
+        "184412 Sylvain Rabret (stands for Olivier Renard)",
+        "184411 Giuseppe Tedaldo (stands for Giovanni Tedesco)",
+        "184413 Ionel Florescu (stands for Iulian Filipescu)",
+        "184414 Fredric Deboey (stands for Frank Defays)",
+        "184415 Amadou Konare (stands for Mahamoudou Kéré)",
+        "184409 Anghel Stinga (stands for a Romanian attacking midfielder born 1979-08-22, not identified)"
+      ],
+      "mappedPositions": {
+        "LF→CF": 72,
+        "LWM→LM": 229,
+        "RF→CF": 108,
+        "RWM→RM": 266,
+        "SW→CB": 26
+      },
+      "namesFromRatings": [],
+      "rows": 11997,
+      "noTeam": {
+        "Cape Verde Islands": 10,
+        "Saint Kitts and Nevis": 3,
+        "Saint Vincent and the Grenadines": 2,
+        "Liechtenstein": 3,
+        "São Tomé e Príncipe": 1,
+        "Turks and Caicos Islands": 1,
+        "Faroe Islands": 3,
+        "Grenada": 2,
+        "Barbados": 3,
+        "Malta": 2,
+        "Andorra": 2,
+        "Mauritius": 1,
+        "Curacao": 2,
+        "Bermuda": 1
+      },
+      "coverage": {
+        "players": 2059,
+        "nations": 119,
+        "completeXIs": 50,
+        "clubs": 132,
+        "leagues": 7
+      },
+      "leagues": {
+        "Eredivisie": {
+          "clubs": 18,
+          "short": []
+        },
+        "Premier League": {
+          "clubs": 20,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "short": []
+        },
+        "La Liga": {
+          "clubs": 20,
+          "short": []
+        },
+        "Liga Portugal": {
+          "clubs": 16,
+          "short": []
+        }
+      },
+      "territory": {
+        "merged": {
+          "728": "729"
+        },
+        "inactive": [
+          "KOS"
+        ]
+      },
+      "shortNations": [
+        "104 Myanmar (0)",
+        "108 Burundi (1)",
+        "112 Belarus (3)",
+        "116 Cambodia (0)",
+        "140 Central African Rep. (3)",
+        "144 Sri Lanka (0)",
+        "148 Chad (0)",
+        "156 China (6)",
+        "158 Chinese Taipei (0)",
+        "178 Congo (11)",
+        "180 DR Congo (11)",
+        "188 Costa Rica (11)",
+        "192 Cuba (1)",
+        "196 Cyprus (4)",
+        "204 Benin (4)",
+        "214 Dominican Rep. (0)",
+        "218 Ecuador (11)",
+        "222 El Salvador (0)",
+        "226 Eq. Guinea (0)",
+        "231 Ethiopia (1)",
+        "232 Eritrea (0)",
+        "233 Estonia (6)",
+        "242 Fiji (0)",
+        "262 Djibouti (0)",
+        "266 Gabon (5)",
+        "268 Georgia (11)",
+        "270 Gambia (7)",
+        "275 Palestine (0)",
+        "288 Ghana (11)",
+        "320 Guatemala (2)",
+        "324 Guinea (11)",
+        "328 Guyana (0)",
+        "332 Haiti (2)",
+        "340 Honduras (7)",
+        "356 India (0)",
+        "360 Indonesia (0)",
+        "364 Iran (6)",
+        "368 Iraq (1)",
+        "376 Israel (10)",
+        "392 Japan (9)",
+        "398 Kazakhstan (1)",
+        "400 Jordan (0)",
+        "404 Kenya (2)",
+        "408 North Korea (1)",
+        "414 Kuwait (0)",
+        "417 Kyrgyzstan (0)",
+        "418 Laos (0)",
+        "422 Lebanon (2)",
+        "426 Lesotho (1)",
+        "428 Latvia (4)",
+        "430 Liberia (6)",
+        "434 Libya (0)",
+        "440 Lithuania (11)",
+        "442 Luxembourg (2)",
+        "450 Madagascar (0)",
+        "454 Malawi (3)",
+        "458 Malaysia (0)",
+        "466 Mali (11)",
+        "478 Mauritania (0)",
+        "496 Mongolia (0)",
+        "498 Moldova (1)",
+        "499 Montenegro (11)",
+        "508 Mozambique (2)",
+        "512 Oman (1)",
+        "516 Namibia (2)",
+        "524 Nepal (0)",
+        "540 New Caledonia (0)",
+        "548 Vanuatu (0)",
+        "558 Nicaragua (0)",
+        "562 Niger (0)",
+        "586 Pakistan (1)",
+        "591 Panama (3)",
+        "598 Papua New Guinea (0)",
+        "600 Paraguay (11)",
+        "604 Peru (11)",
+        "608 Philippines (0)",
+        "624 Guinea-Bissau (2)",
+        "626 Timor-Leste (0)",
+        "630 Puerto Rico (0)",
+        "634 Qatar (1)",
+        "643 Russia (6)",
+        "646 Rwanda (1)",
+        "682 Saudi Arabia (0)",
+        "694 Sierra Leone (10)",
+        "704 Vietnam (0)",
+        "706 Somalia (1)",
+        "716 Zimbabwe (11)",
+        "728 South Sudan (0)",
+        "729 Sudan (0)",
+        "740 Suriname (2)",
+        "748 Eswatini (0)",
+        "760 Syria (1)",
+        "762 Tajikistan (0)",
+        "764 Thailand (0)",
+        "768 Togo (11)",
+        "784 United Arab Emirates (0)",
+        "788 Tunisia (11)",
+        "795 Turkmenistan (0)",
+        "800 Uganda (3)",
+        "804 Ukraine (10)",
+        "807 N. Macedonia (11)",
+        "818 Egypt (7)",
+        "834 Tanzania (0)",
+        "854 Burkina Faso (11)",
+        "860 Uzbekistan (0)",
+        "862 Venezuela (9)",
+        "887 Yemen (0)",
+        "894 Zambia (6)",
+        "068 Bolivia (4)",
+        "008 Albania (11)",
+        "KOS Kosovo (0)",
+        "051 Armenia (3)",
+        "031 Azerbaijan (3)",
+        "012 Algeria (11)",
+        "024 Angola (11)",
+        "072 Botswana (0)",
+        "084 Belize (0)",
+        "044 Bahamas (0)",
+        "096 Brunei (0)",
+        "050 Bangladesh (0)",
+        "064 Bhutan (0)",
+        "004 Afghanistan (0)",
+        "090 Solomon Islands (0)"
+      ],
+      "warnings": []
+    },
+    {
+      "id": "ea-fifa-07",
+      "version": "ea-fifa-07-ac742262",
+      "edition": "FIFA 07",
+      "update": 2,
+      "roster": "070002",
+      "snapshotDate": "2007-02-22",
+      "ratingsRoster": "070001",
+      "ratingsDate": "2006-08-30",
+      "join": {
+        "ratingsRows": 10912,
+        "clubsRows": 10686,
+        "clubsDuplicates": 82,
+        "joined": 10149,
+        "ratingsOnly": 763,
+        "clubsOnly": 537,
+        "excluded": 9
+      },
+      "excluded": [
+        "177848 Teodor Petrovici (stands for Adrian Mutu)",
+        "177844 Bernado Valerio (stands for Marco Materazzi)",
+        "177833 Sylvain Rabret (stands for Olivier Renard)",
+        "177835 Yves Tellot (stands for Axel Lawarée)",
+        "177843 Silvio Marcuccilli (stands for Giovanni Tedesco)",
+        "177851 Corneliu Sturdza (stands for Iulian Filipescu)",
+        "177837 Kambert Kurtz (stands for Frank Defays)",
+        "177840 Ankoma Daddah (stands for Mahamoudou Kéré)",
+        "177847 Matthias Seicaru (stands for a Romanian attacking midfielder born 1979-08-22, not identified)"
+      ],
+      "mappedPositions": {
+        "LF→CF": 62,
+        "LWM→LM": 193,
+        "RF→CF": 88,
+        "RWM→RM": 242,
+        "SW→CB": 27
+      },
+      "namesFromRatings": [],
+      "rows": 10140,
+      "noTeam": {
+        "Saint Vincent and the Grenadines": 2,
+        "Cape Verde Islands": 12,
+        "Liechtenstein": 3,
+        "Grenada": 3,
+        "Barbados": 1,
+        "Faroe Islands": 2,
+        "Malta": 1,
+        "Andorra": 1,
+        "Mauritius": 1,
+        "Curacao": 3,
+        "Saint Kitts and Nevis": 1
+      },
+      "coverage": {
+        "players": 2001,
+        "nations": 113,
+        "completeXIs": 52,
+        "clubs": 132,
+        "leagues": 7
+      },
+      "leagues": {
+        "Eredivisie": {
+          "clubs": 18,
+          "short": []
+        },
+        "Premier League": {
+          "clubs": 20,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "short": []
+        },
+        "La Liga": {
+          "clubs": 20,
+          "short": []
+        },
+        "Liga Portugal": {
+          "clubs": 16,
+          "short": []
+        }
+      },
+      "territory": {
+        "merged": {
+          "728": "729"
+        },
+        "inactive": [
+          "KOS"
+        ]
+      },
+      "shortNations": [
+        "100 Bulgaria (11)",
+        "104 Myanmar (0)",
+        "108 Burundi (0)",
+        "112 Belarus (2)",
+        "116 Cambodia (0)",
+        "140 Central African Rep. (2)",
+        "144 Sri Lanka (0)",
+        "148 Chad (0)",
+        "156 China (4)",
+        "158 Chinese Taipei (0)",
+        "178 Congo (11)",
+        "180 DR Congo (11)",
+        "188 Costa Rica (9)",
+        "192 Cuba (0)",
+        "196 Cyprus (5)",
+        "204 Benin (3)",
+        "214 Dominican Rep. (0)",
+        "218 Ecuador (7)",
+        "222 El Salvador (0)",
+        "226 Eq. Guinea (0)",
+        "231 Ethiopia (1)",
+        "232 Eritrea (0)",
+        "233 Estonia (8)",
+        "242 Fiji (0)",
+        "262 Djibouti (0)",
+        "266 Gabon (3)",
+        "268 Georgia (11)",
+        "270 Gambia (6)",
+        "275 Palestine (0)",
+        "320 Guatemala (3)",
+        "324 Guinea (11)",
+        "328 Guyana (0)",
+        "332 Haiti (3)",
+        "340 Honduras (7)",
+        "356 India (0)",
+        "360 Indonesia (0)",
+        "364 Iran (6)",
+        "368 Iraq (0)",
+        "376 Israel (5)",
+        "392 Japan (7)",
+        "398 Kazakhstan (1)",
+        "400 Jordan (1)",
+        "404 Kenya (3)",
+        "408 North Korea (1)",
+        "414 Kuwait (0)",
+        "417 Kyrgyzstan (0)",
+        "418 Laos (0)",
+        "422 Lebanon (2)",
+        "426 Lesotho (1)",
+        "428 Latvia (0)",
+        "430 Liberia (5)",
+        "434 Libya (1)",
+        "440 Lithuania (9)",
+        "442 Luxembourg (1)",
+        "450 Madagascar (0)",
+        "454 Malawi (2)",
+        "458 Malaysia (0)",
+        "478 Mauritania (0)",
+        "496 Mongolia (0)",
+        "498 Moldova (0)",
+        "499 Montenegro (0)",
+        "508 Mozambique (5)",
+        "512 Oman (1)",
+        "516 Namibia (2)",
+        "524 Nepal (0)",
+        "540 New Caledonia (0)",
+        "548 Vanuatu (0)",
+        "554 New Zealand (8)",
+        "558 Nicaragua (0)",
+        "562 Niger (0)",
+        "586 Pakistan (1)",
+        "591 Panama (1)",
+        "598 Papua New Guinea (0)",
+        "604 Peru (9)",
+        "608 Philippines (0)",
+        "624 Guinea-Bissau (6)",
+        "626 Timor-Leste (0)",
+        "630 Puerto Rico (0)",
+        "634 Qatar (0)",
+        "643 Russia (8)",
+        "646 Rwanda (3)",
+        "682 Saudi Arabia (0)",
+        "694 Sierra Leone (7)",
+        "704 Vietnam (0)",
+        "706 Somalia (0)",
+        "716 Zimbabwe (6)",
+        "728 South Sudan (0)",
+        "729 Sudan (0)",
+        "740 Suriname (5)",
+        "748 Eswatini (0)",
+        "760 Syria (0)",
+        "762 Tajikistan (0)",
+        "764 Thailand (0)",
+        "768 Togo (10)",
+        "784 United Arab Emirates (0)",
+        "795 Turkmenistan (0)",
+        "800 Uganda (1)",
+        "804 Ukraine (9)",
+        "807 N. Macedonia (11)",
+        "818 Egypt (8)",
+        "834 Tanzania (0)",
+        "854 Burkina Faso (11)",
+        "860 Uzbekistan (1)",
+        "862 Venezuela (4)",
+        "887 Yemen (0)",
+        "894 Zambia (7)",
+        "068 Bolivia (2)",
+        "008 Albania (11)",
+        "KOS Kosovo (0)",
+        "051 Armenia (1)",
+        "031 Azerbaijan (1)",
+        "012 Algeria (11)",
+        "024 Angola (11)",
         "072 Botswana (0)",
         "084 Belize (0)",
         "044 Bahamas (0)",
