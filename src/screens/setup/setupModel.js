@@ -320,7 +320,7 @@ export function domesticDescription(entry) {
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
   if (entry.league) {
     return `${leaders} the ${clubs} ${entry.league} clubs, each starting on the land nearest its arena: ${entry.name} split into `
-      + `${sections} territories along county and regional borders.`;
+      + `${sections} territories along state and province lines.`;
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;

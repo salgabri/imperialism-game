@@ -634,16 +634,20 @@ known limitations.
 
 Basketball clubs have one theatre, **NBA**: the 30 franchises fight over the USA
 and Canada and nothing else. The two countries are split into 30 territories, one
-per franchise, grown from its arena over US counties and Canadian economic
-regions (geoBoundaries) by the same partition as the country maps: each territory
-takes the land nearest its arena, so Portland holds the Northwest with British
-Columbia and Alaska, Toronto Quebec and Newfoundland, and the Nets Brooklyn and
-Long Island. The two layers draw the border slightly apart, so the build fits the
-Canadian side to the US line: a franchise with land in both countries holds one
-territory, and neighbours across the border share it. Territories are named after
-their cities and coloured apart from their neighbours; the franchises keep their
-own names, crests and fives. Mexico, Greenland and the rest of the world lie
-beneath as inert land. The map is `public/domestic/nba.json`, played through the
+per franchise, grown from its arena by the same partition as the country maps,
+over whole states and provinces (geoBoundaries): each territory takes the states
+nearest its arena, so Portland holds Washington, Oregon and Idaho, Utah Montana
+and Wyoming, Toronto Ontario and Boston New England with the Maritimes. Only
+California, Texas, Florida and New York, which host two or more franchises, are
+split between them along county lines (the Nets hold Brooklyn, Queens and Long
+Island). States and provinces whose centre lies over 1,000 km from every arena
+(Alaska, the North, British Columbia, the Prairies, Quebec, Newfoundland and
+Labrador) stay empty: drawn as land, nobody's. The two layers draw the border
+slightly apart, so the build fits the Canadian side to the US line, and
+neighbours across it share it. Territories are named after their cities and
+coloured apart from their neighbours; the franchises keep their own names, crests
+and fives. Mexico, Greenland and the rest of the world lie beneath as inert
+land. The map is `public/domestic/nba.json`, played through the
 country-map runtime; NBA campaigns saved before it still resume on the world map.
 
 ```bash

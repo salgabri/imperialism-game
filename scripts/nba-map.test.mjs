@@ -1,12 +1,13 @@
 // The NBA's own map (docs/design/domestic-campaigns.md, "The NBA map"): public/domestic/nba.json against
-// its index, its arenas and the game's basketball clubs; the USA and Canada are its only land, and neighbours
-// across their border share it; seeded campaigns on the app's board reach a champion; and the running App
-// plays basketball clubs there while a world NBA save stays on the world.
+// its index, its arenas and the game's basketball clubs; the USA and Canada are its only land, split along
+// state and province lines, with the states and provinces far from every arena left empty; neighbours across
+// their border share it; seeded campaigns on the app's board reach a champion; and the running App plays
+// basketball clubs there while a world NBA save stays on the world.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { neighbors } from 'topojson-client';
+import { feature, neighbors } from 'topojson-client';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { CLUBS } from '../src/data/clubs.basketball.js';
 import { buildClub, makeRng, teamEff } from '../src/data/teams.js';
@@ -16,7 +17,7 @@ import { territories, validateReachability } from '../src/engine/campaign.js';
 import { createDuelDraw } from '../src/engine/duelDraw.js';
 import { createAttackRouteIndex, routeLandCrossings } from '../src/engine/attackRoutes.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
-import { kmToPolys, polysAreaKm2 } from './lib/domestic-partition.mjs';
+import { kmToPolys, pointInPolys, polysAreaKm2, polysOf } from './lib/domestic-partition.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -62,29 +63,64 @@ test('the NBA map gives every franchise one territory around its arena, as the i
   }
 });
 
-test('the USA and Canada are all its land; the rest of the world lies beneath, never territory', () => {
+const EMPTY = DOC.topology.objects.empty.geometries;
+const sectionAt = point => geo.countries.find(section => pointInPolys(point, section.polys))?.id ?? null;
+const emptyAt = point => EMPTY.find(g => pointInPolys(point, polysOf(feature(DOC.topology, g).geometry)))?.properties.name ?? null;
+
+test('the USA and Canada are all its land; empty states and the rest of the world lie beneath, never territory', () => {
   const total = geo.countries.reduce((sum, section) => sum + polysAreaKm2(section.polys), 0);
   assert.ok(Math.abs(total - DOC.boundaries.areaKm2) / DOC.boundaries.areaKm2 < 0.02, 'the sections cover the source units');
-  // Nothing south of Florida's keys or across the Bering Strait.
+  // Nothing south of Florida's keys or north of the 49th parallel's west (British Columbia and the Prairies are empty).
   const lats = geo.countries.flatMap(section => section.polys.flatMap(poly => poly[0].map(([, lat]) => lat)));
   const lons = geo.countries.flatMap(section => section.polys.flatMap(poly => poly[0].map(([lon]) => lon)));
-  assert.ok(Math.min(...lats) > 24 && Math.max(...lons) < -50 && Math.min(...lons) >= -180);
+  assert.ok(Math.min(...lats) > 24 && Math.max(...lons) < -50 && Math.min(...lons) > -125);
+  // States and provinces whose centre lies over 1,000 km from every arena are nobody's.
+  assert.deepEqual(EMPTY.map(g => g.properties.name).sort(), ['Alaska', 'Alberta', 'British Columbia', 'Manitoba', 'Newfoundland and Labrador',
+    'Northwest Territories', 'Nunavut', 'Quebec', 'Saskatchewan', 'Yukon']);
+  const emptyIds = new Set(EMPTY.map(g => g.id));
   const { shapes, obstacles } = domesticSurroundings(ATLAS, MAP);
   const ids = new Set(shapes.map(shape => shape.id));
   assert.ok(!ids.has('840') && !ids.has('124'), 'the hosts are not drawn beneath their own sections');
   assert.ok(ids.has('484') && ids.has('304'), 'Mexico and Greenland are');
-  assert.deepEqual(obstacles, shapes);
+  assert.ok([...emptyIds].every(id => ids.has(id)), 'so is the empty land');
+  assert.deepEqual(obstacles, shapes.filter(shape => !emptyIds.has(shape.id)), 'empty land lies inside the hosts and blocks no route');
+  // Empty land and the sections are one topology: Ontario meets Quebec and Manitoba on shared arcs.
+  const all = [...DOC.topology.objects.sections.geometries, ...EMPTY];
+  const toronto = MAP.clubs.findIndex(club => club.id === 'b-toronto-raptors');
+  const touching = neighbors(all)[toronto].map(k => all[k].properties.name);
+  assert.ok(touching.includes('Quebec') && touching.includes('Manitoba'), touching.join(', '));
+});
+
+test('a state or province goes whole to one franchise, or stays empty; shared states split between their own', () => {
+  // Inland towns, clear of the simplified coasts.
+  const sameState = {
+    Washington: [[-120.51, 46.6], [-117.43, 47.66]], Michigan: [[-84.55, 42.73], [-87.67, 46.49]],
+    Pennsylvania: [[-76.88, 40.27], [-79.99, 40.44]], Ohio: [[-82.99, 39.96], [-84.19, 39.76]], Georgia: [[-84.39, 33.75], [-83.63, 32.84]],
+    Montana: [[-108.5, 45.78], [-113.99, 46.87]], Illinois: [[-89.65, 39.8], [-89.22, 37.73]], Ontario: [[-80.99, 46.49], [-89.25, 48.38]],
+  };
+  for (const [state, [a, b]] of Object.entries(sameState)) {
+    assert.ok(sectionAt(a), `${state} is land of the map`);
+    assert.equal(sectionAt(a), sectionAt(b), `${state} belongs to one franchise`);
+  }
+  for (const [place, point] of Object.entries({ Anchorage: [-149.9, 61.22], Kamloops: [-120.33, 50.67], Calgary: [-114.07, 51.05],
+    Winnipeg: [-97.14, 49.9], Montreal: [-73.57, 45.5] })) {
+    assert.equal(sectionAt(point), null, `${place} is nobody's`);
+    assert.ok(emptyAt(point), `${place} lies on empty land`);
+  }
+  // New York is the Knicks' and the Nets' alone: the Nets hold Queens and Long Island beside Brooklyn.
+  const home = id => MAP.clubs.find(club => club.id === id).homeSection;
+  for (const point of [[-73.8, 40.73], [-72.66, 40.92]]) assert.equal(sectionAt(point), home('b-brooklyn-nets'));
+  for (const point of [[-73.86, 40.85], [-76.15, 43.05]]) assert.equal(sectionAt(point), home('b-new-york-knicks'));
 });
 
 test('neighbours across the national border share it, and every pair of neighbours differs in colour', () => {
   const name = id => MAP.sectionNames[id];
   const across = id => [...geo.adj[sectionIds[MAP.clubs.findIndex(club => club.id === id)]]].map(name);
-  // Toronto meets the Great Lakes franchises by land and river; Portland's Washington and British Columbia are one territory.
-  assert.ok(across('b-toronto-raptors').includes('Detroit'));
-  assert.ok(across('b-toronto-raptors').includes('New York'));
-  const portland = geo.countries.find(section => section.id === MAP.clubs.find(club => club.id === 'b-portland-trail-blazers').homeSection);
-  const mainland = portland.polys.reduce((best, poly) => (polysAreaKm2([poly]) > polysAreaKm2([best]) ? poly : best));
-  assert.ok(kmToPolys([-120.33, 50.67], [mainland]) === 0 && kmToPolys([-122.7, 45.5], [mainland]) === 0, 'Kamloops and Portland on one landmass');
+  // Toronto meets Minnesota by land and the Great Lakes franchises by river; Boston's Maine and New Brunswick are one territory.
+  for (const city of ['Detroit', 'New York', 'Minneapolis']) assert.ok(across('b-toronto-raptors').includes(city), city);
+  const boston = geo.countries.find(section => section.id === MAP.clubs.find(club => club.id === 'b-boston-celtics').homeSection);
+  const mainland = boston.polys.reduce((best, poly) => (polysAreaKm2([poly]) > polysAreaKm2([best]) ? poly : best));
+  assert.ok(kmToPolys([-66.06, 45.27], [mainland]) === 0 && kmToPolys([-71.06, 42.36], [mainland]) <= 1, 'Saint John and Boston on one landmass');
   const shared = neighbors(DOC.topology.objects.sections.geometries);
   shared.forEach((list, i) => list.forEach(j => assert.notEqual(DOC.clubs[i].col, DOC.clubs[j].col, `${name(sectionIds[i])} / ${name(sectionIds[j])}`)));
   for (const [id, list] of Object.entries(geo.adj)) for (const other of list) assert.notEqual(colourOf[id], colourOf[other]);
@@ -116,7 +152,7 @@ test('seeded duel campaigns on the app board reach a champion, attacking only by
       aliveIds = aliveIds.filter(id => id !== loser);
     }
     assert.deepEqual(Object.keys(own).sort(), [...sectionIds].sort(), 'every territory stays owned');
-    assert.ok(Object.values(own).every(id => id === aliveIds[0]), 'the champion holds the USA and Canada');
+    assert.ok(Object.values(own).every(id => id === aliveIds[0]), 'the champion holds every territory');
   }
 });
 
@@ -127,6 +163,9 @@ test('the loader takes a sport map\'s clubs from the game, and refuses a club or
   assert.throws(broken(doc => { doc.sport = 'hockey'; }), /unknown sport "hockey"/);
   assert.throws(broken(doc => { doc.hosts = []; }), /hosts must list world shape ids/);
   assert.throws(broken(doc => { delete doc.clubs[2].col; }), /has no colour/);
+  assert.throws(broken(doc => { doc.topology.objects.empty.geometries[0].id = 'nba-001'; }), /empty land 0 .* needs an id of its own/);
+  assert.throws(broken(doc => { delete doc.topology.objects.empty.geometries[1].properties.name; }), /empty land 1 .* has no name/);
+  assert.throws(broken(doc => { doc.topology.objects.empty = { type: 'Topology' }; }), /objects\.empty must be a GeometryCollection/);
 });
 
 // ---------- the running App ----------
