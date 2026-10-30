@@ -547,7 +547,7 @@ test('Add a season… reads a chosen Data folder in this browser, then lists, ch
       assert.deepEqual(app.state.seasonAdd, { state: 'building', message: 'Building 2007/08 from CM 01/02 · November 2007…' });
       await whileTicking(adding, time);
       assert.equal(app.state.seasonAdd.state, 'done');
-      assert.equal(app.state.seasonAdd.message, 'Added 2007/08 · CM 01/02 · November 2007. 7 of 170 nations field a full XI; '
+      assert.equal(app.state.seasonAdd.message, 'Added 2007/08 · CM 01/02 · November 2007. 7 of 173 nations field a full XI; '
         + '7 clubs from 7 leagues. Its files differ from the published November 2007, so it may have been edited. '
         + 'This browser cannot keep it, so it lasts until the page closes.');
       assert.deepEqual(app.state.footballSets.map(set => [set.id, set.added]), [[ADDED, true]]);

@@ -1,8 +1,8 @@
 // ISO-3166 numeric id -> flag asset basename in public/flags/.
 //
 // Derived from the iso_a2 column of the Natural Earth 110m attribute table, with
-// two football-specific overrides: the campaign fields England rather than the
-// United Kingdom, and Kosovo has no ISO numeric code of its own.
+// football-specific overrides: the United Kingdom's shape is England, beside
+// Scotland, Wales and Northern Ireland, and Kosovo has no ISO numeric code of its own.
 //
 // Assets are vendored from the MIT-licensed `flag-icons` package; re-sync them
 // with `npm run sync-flags` after changing this map.
@@ -149,6 +149,9 @@ export const FLAG_CODES = {
   '807': 'mk',        // N. Macedonia
   '818': 'eg',        // Egypt
   '826': 'gb-eng',    // England
+  'SCO': 'gb-sct',    // Scotland
+  'WAL': 'gb-wls',    // Wales
+  'NIR': 'gb-nir',    // Northern Ireland
   '834': 'tz',        // Tanzania
   '840': 'us',        // United States
   '854': 'bf',        // Burkina Faso

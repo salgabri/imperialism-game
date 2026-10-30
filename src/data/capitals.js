@@ -29,6 +29,9 @@ export const CAPITALS = {
   '250': [2.35, 48.86],    // Paris
   '724': [-3.70, 40.42],   // Madrid
   '826': [-0.13, 51.51],   // London
+  'SCO': [-3.19, 55.95],   // Edinburgh
+  'WAL': [-3.18, 51.48],   // Cardiff
+  'NIR': [-5.93, 54.60],   // Belfast
   '620': [-9.14, 38.72],   // Lisbon
   '528': [4.90, 52.37],    // Amsterdam
   '276': [13.40, 52.52],   // Berlin

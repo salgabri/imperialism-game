@@ -4,6 +4,7 @@ import { expandSetPlayer, isDataYear, isFootballSetId, seasonOf } from './footba
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 import { CM_ROLES, CM_SOURCE, cmTupleOf } from '../data/cmPlayers.js';
 import { getSport } from '../sports/index.js';
+import { HOME_NATIONS } from '../data/teams.js';
 
 export const CAMPAIGN_INDEX_KEY = `${SAVE_KEY}:campaigns`;
 export const CAMPAIGN_BACKUP_KEY = `${SAVE_KEY}:backup`;
@@ -239,7 +240,7 @@ function validateCampaign(input, rebuildSources) {
   let data = input;
   const invalid = message => { throw new Error(message); };
   if (record(data) && data.playerPack !== undefined) data = unpackCampaign(data, invalid);
-  if (!record(data) || ![1, 2, 3, 4].includes(data.v) || !record(data.teams)
+  if (!record(data) || ![1, 2, 3, 4, 5].includes(data.v) || !record(data.teams)
       || !record(data.own) || !record(data.settings) || !Array.isArray(data.aliveIds)
       || data.aliveIds.length < 1 || data.aliveIds.length > 200) {
     invalid('This file is not a supported Imperialism campaign.');
@@ -398,7 +399,11 @@ function validateCampaign(input, rebuildSources) {
   // v4 source references; v1–v3 saves hold every source inline and pass through unchanged.
   const index = rebuildSources ? sourceIndex(settings.sport) : null;
   const sourced = index?.size ? mapPlayers(data, player => rebuildSource(player, index)) : data;
-  return { ...sourced, v: SAVE_VERSION, history: sourced.history || [], log: data.log || [],
+  // Before v5 the world map's 826 was the whole United Kingdom: its holder keeps Scotland, Wales and Northern Ireland.
+  // A country map's sections are never world shape ids.
+  const ukHolder = data.v < 5 && data.own['826'];
+  const own = ukHolder ? { ...data.own, ...Object.fromEntries(HOME_NATIONS.map(id => [id, ukHolder])) } : data.own;
+  return { ...sourced, v: SAVE_VERSION, own, history: sourced.history || [], log: data.log || [],
     settings: rules(data.settings), ...(data.initialSettings ? { initialSettings: rules(data.initialSettings) } : {}),
     turnQueue: data.turnQueue || [], turnIndex: data.turnIndex || 0, pendingTarget: data.pendingTarget || null,
     queue: data.queue || [], matches: data.matches || 0, round: data.round || 0,

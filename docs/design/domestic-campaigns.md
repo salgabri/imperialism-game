@@ -48,7 +48,7 @@ A nation missing from the table would get the smallest tier; the data test
 requires every nation of `NATIONS` exactly once. Mexico (58 viable clubs) and the
 United States (81) stay below their tier; so do many smaller nations.
 
-**What ships:** 163 countries of the game's 170 nations, **4,343 clubs**, 16,300
+**What ships:** 163 countries of the game's 173 nations, **4,343 clubs**, 16,300
 sections. Maps total 22.1 MB (7.7 MB gzipped), 34–250 KB per country, fetched
 only when chosen; the generated index is 29 KB.
 
@@ -791,8 +791,8 @@ through the country-map checks.
   strips of land it gives to neighbours (East Jerusalem's core on Israel's map,
   along Cyprus's Green Line). Where a 1:50m outline overlaps sections (N. Cyprus,
   Crimea) sections win in routing. Russia's map has no Crimea (no RUS layer has
-  it) and shows blank there. On England the UK shape is not an obstacle, so Wales
-  and Scotland do not block routes. On coarse layers a fan zone spills outside its
+  it) and shows blank there. On England, Wales and Scotland are world shapes of
+  their own and block routes like any neighbour. On coarse layers a fan zone spills outside its
   circle, since whole units touching it are cut into sectors (Israel ADM2).
 - 48 located homes lie outside every shipped section: 38 lie just outside the
   boundary layer and were snapped to it (N. Cyprus refugee clubs, Bishkek's six,

@@ -2,7 +2,7 @@ import { C } from '../theme.js';
 import { ROSTERS } from '../data/rosters.basketball.js';
 import { CLUBS } from '../data/clubs.basketball.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
-import { selectLineup } from '../data/teams.js';
+import { HOME_NATIONS, selectLineup } from '../data/teams.js';
 
 const MINUTES = 40; // FIBA: four ten-minute quarters
 const QUARTER = 10;
@@ -119,6 +119,8 @@ export const basketball = {
   blurb: 'Starting fives, forty minutes. Scores in the eighties — level games go to overtime.',
   rosters: ROSTERS,
   clubs: CLUBS,
+  // Great Britain is one FIBA team: the home nations' shapes start in the United Kingdom's (826) empire.
+  territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
 
   squadSize: 5,
   formation: { PG: 1, SG: 1, SF: 1, PF: 1, C: 1 },

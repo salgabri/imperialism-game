@@ -254,7 +254,7 @@ test('a known release is built in the browser with the shipped release list, kep
   assert.deepEqual(result.audit.database.digests, { club: 'mismatch', staff: 'mismatch' }, 'the padded copy is not the published one');
   assert.deepEqual(await listLocalSets(), [entry]);
   assert.deepEqual(await getLocalSet(doc.id), doc);
-  assert.equal(importedMessage(result), 'Added 2007/08 · CM 01/02 · November 2007. 7 of 170 nations field a full XI; '
+  assert.equal(importedMessage(result), 'Added 2007/08 · CM 01/02 · November 2007. 7 of 173 nations field a full XI; '
     + '7 clubs from 7 leagues. Its files differ from the published November 2007, so it may have been edited. '
     + 'This browser cannot keep it, so it lasts until the page closes.');
 

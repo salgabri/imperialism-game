@@ -127,9 +127,10 @@ Montenegro" needs the same identity overrides as the pre-2002 seasons.
 }
 ```
 
-- `nations` has an entry for **every** one of the 170 nations, even an empty
+- `nations` has an entry for **every** one of the 173 nations, even an empty
   one, so the hand-tuned built-in `fallbackStrength` never applies to another
-  season. An empty entry is `[40, 0, []]`, which is what `build-rosters` writes
+  season. A set built before the map had the home nations lists none of
+  `SCO`, `WAL` and `NIR`: it still loads, and England holds their land. An empty entry is `[40, 0, []]`, which is what `build-rosters` writes
   for an empty pool.
 - A **player tuple** is `[cmId, name, fullName, ca, positionKeys, nationality,
   club, dateOfBirth]`:

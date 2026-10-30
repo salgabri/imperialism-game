@@ -193,7 +193,7 @@ const tactical = () => ({ aId: '250', dId: '276', managerName: 'France', opponen
   options: ['attack', 'balanced', 'defend'].map(id => ({ id, label: id, description: 'Approach', strength: 84, bonus: 0, support: 0, drama: 6, baseDrama: 6 })) });
 
 test('v3 checkpoints keep the round-robin queue, the pending target and the locked turn rules', () => withStorage(({ storage }) => {
-  assert.equal(SAVE_VERSION, 4);
+  assert.equal(SAVE_VERSION, 5);
   const state = turnCheckpoint();
   assert.equal(writeSave(state).ok, true);
   assert.equal(JSON.parse(storage.getItem(SAVE_KEY)).v, SAVE_VERSION);
@@ -222,11 +222,11 @@ test('version-two saves still load, as the random draw with compass targets', ()
   assert.equal(migrated.initialSettings, undefined);
   const withInitial = { ...v2, initialSettings: { ...v2.settings } };
   assert.equal(parseCampaign(JSON.stringify(withInitial)).initialSettings.turnOrder, 'random');
-  for (const version of [2, 3, 4]) {
+  for (const version of [2, 3, 4, 5]) {
     const missing = { ...v2, v: version }; delete missing.rngState;
     assert.throws(() => parseCampaign(JSON.stringify(missing)), /random state/, `v${version} still requires the RNG state`);
   }
-  for (const version of [0, 5, '4']) assert.throws(() => parseCampaign(JSON.stringify({ ...v2, v: version })), /not a supported/);
+  for (const version of [0, 6, '4']) assert.throws(() => parseCampaign(JSON.stringify({ ...v2, v: version })), /not a supported/);
   const v1 = { ...v2, v: 1 }; delete v1.seed; delete v1.rngState;
   assert.equal(parseCampaign(JSON.stringify(v1)).legacy, true, 'v1 saves keep loading without a seed');
 });
@@ -568,7 +568,7 @@ test('v4 checkpoints store bundled roster sources by id and rebuild them exactly
   assert.ok(squad.length >= 11 && squad.every(player => typeof player.sourceInfo?.id === 'string'), 'the fixture squads are sourced');
   assert.equal(writeSave(state).ok, true);
   const text = storage.getItem(SAVE_KEY), stored = JSON.parse(text);
-  assert.equal(stored.v, 4);
+  assert.equal(stored.v, SAVE_VERSION);
   assert.equal(inlineSources(text), 0, 'no copy of a bundled source is stored inline');
   assert.equal(stored.teams['250'].squad[0].sourceInfo, squad[0].sourceInfo.id);
   assert.equal(stored.history[0].result.player.sourceInfo, state.teams['276'].squad[0].sourceInfo.id);
@@ -582,6 +582,20 @@ test('v4 checkpoints store bundled roster sources by id and rebuild them exactly
   assert.deepEqual(loadSave().teams['250'].squad[0].sourceInfo, plain(squad[0].sourceInfo));
 }));
 
+test('a save from before the home nations gives Scotland, Wales and Northern Ireland to whoever held England', () => {
+  const rng = makeRng(7), sport = getSport('football');
+  const state = { ...checkpoint(), teams: Object.fromEntries(['250', '826'].map(id => [id, buildTeam(id, rng, sport)])),
+    own: { 250: '250', 826: '250' }, aliveIds: ['250'], followedId: '250', managedTeamId: '250',
+    fallen: [{ id: '826', r: 1 }] };
+  const v4 = { ...campaignSnapshot(state), v: 4 };
+  assert.deepEqual(parseCampaign(JSON.stringify(v4)).own, { 250: '250', 826: '250', SCO: '250', WAL: '250', NIR: '250' });
+  // A v5 save already has the home nations it plays with; one that leaves them neutral keeps them neutral.
+  assert.deepEqual(parseCampaign(JSON.stringify({ ...v4, v: 5 })).own, { 250: '250', 826: '250' });
+  // Without England on the board (another theatre, a country map) nothing changes.
+  const france = { ...v4, own: { 250: '250' } };
+  assert.deepEqual(parseCampaign(JSON.stringify(france)).own, { 250: '250' });
+});
+
 test('v3 saves load with inline sources and move to references on their next checkpoint', () => withStorage(({ storage }) => {
   const state = sourcedCheckpoint();
   const v3 = JSON.stringify({ ...campaignSnapshot(state), v: 3 }); // v3 stored every source inline
@@ -592,7 +606,7 @@ test('v3 saves load with inline sources and move to references on their next che
   const result = writeSave(loaded);
   assert.equal(result.ok, true); assert.equal(result.conflict, undefined); assert.equal(result.revision, 1);
   const text = storage.getItem(SAVE_KEY);
-  assert.equal(JSON.parse(text).v, 4); assert.equal(inlineSources(text), 0);
+  assert.equal(JSON.parse(text).v, SAVE_VERSION); assert.equal(inlineSources(text), 0);
   assert.ok(text.length < v3.length * 0.6);
   assert.equal(storage.getItem(backupOf(state.campaignId)), v3, 'the v3 bytes remain the recovery copy');
   for (const key of SOURCED) assert.deepEqual(loadSave()[key], plain(state[key]), `migrated ${key} unchanged`);
