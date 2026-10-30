@@ -5,11 +5,11 @@ import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, 
 import { CLUB_SCOPES } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
-import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
+import { clearDomesticCache, domesticScope, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { clubMapScope, domesticEntry, domesticLabel } from './data/domesticScope.js';
-import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, footballSport, getLoadedFootballSet, heldShapes, loadFootballSet,
-  loadFootballSetIndex, retainFootballSets, sportOf } from './engine/footballSets.js';
+import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
+  loadFootballSetIndex, retainFootballSets, seasonMapOf, seasonSport, setSportOf, sportOf } from './engine/footballSets.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
@@ -71,20 +71,26 @@ const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.
 const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}${settings.dataSeason ? ` ${settings.dataSeason}` : ''} · ${scopeName}`;
 
 /**
- * The setup's club theatre. A sport with its own map plays only there (basketball: the NBA's USA and Canada), and
- * another sport's map falls back to every club. A data set brings its own clubs, so the theatre must be one of them: a
- * country map (built from the built-in data) and a league the set leaves out fall back to every club. Kept as it is
- * while the set loads.
+ * The setup's club theatre. A sport with its own map plays only there (basketball: the NBA's USA and Canada, or an
+ * earlier season's map of its own era), and another sport's map falls back to every club. A football data set brings
+ * its own clubs, so the theatre must be one of them: a country map (built from the built-in data) and a league the set
+ * leaves out fall back to every club. Kept as it is while the set loads.
  */
 function setClubScope(setup) {
-  const own = clubMapScope(getSport(setup.sport).id);
+  const sportId = getSport(setup.sport).id;
+  const era = setup.dataSet != null && setSportOf(setup.dataSet) === sportId ? seasonMapOf(setup.dataSet) : null;
+  if (era) return domesticScope(era);
+  const own = clubMapScope(sportId);
   if (own) return own;
   if (domesticEntry(setup.clubScope)?.sport) return 'all';
-  if (setup.dataSet == null || getSport(setup.sport).id !== 'football') return setup.clubScope;
+  if (setup.dataSet == null || sportId !== 'football') return setup.clubScope;
   if (isDomesticScope(setup.clubScope)) return 'all';
   const sport = sportOf(setup);
   return !sport || CLUB_SCOPES(sport).some(scope => scope.id === setup.clubScope) ? setup.clubScope : 'all';
 }
+
+/** A club map's row as one of a basketball season's clubs: the season's name, code, strength and five on the map's land. */
+const seasonClub = (row, club) => ({ ...row, name: club.name, code: club.code, league: club.league, str: club.str, squad: club.squad });
 
 /**
  * Live presentation of an outcome already decided and saved at kickoff: the events and kicks revealed so far, and
@@ -625,7 +631,7 @@ export default class App extends React.Component {
     const loaded = id ? getLoadedFootballSet(id) : null;
     const failed = !loaded && load?.id === id && load.state === 'error';
     return { sets: this.state.footballSets, state: !id ? 'idle' : loaded ? 'ready' : failed ? 'error' : 'loading',
-      message: failed ? load.message : null, sport: loaded ? footballSport(loaded) : null, onRetry: () => this.retrySet() };
+      message: failed ? load.message : null, sport: loaded ? seasonSport(loaded) : null, onRetry: () => this.retrySet() };
   }
 
   /** Display name of a territory: a country map's section, else a nation or dependency. */
@@ -712,8 +718,13 @@ export default class App extends React.Component {
       // Country maps come with football data only (basketball clubs take the NBA's map below, in setClubScope).
       if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
-      // So do data sets, and they bring their own clubs.
-      if (setup.dataSet != null && getSport(setup.sport).id !== 'football') setup.dataSet = null;
+      // A data set plays in its own sport and brings its own clubs. A basketball season has clubs only: choosing it
+      // takes the clubs, and choosing nations goes back to the built-in season.
+      if (setup.dataSet != null && setSportOf(setup.dataSet) !== getSport(setup.sport).id) setup.dataSet = null;
+      if (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball') {
+        if (key === 'layer' && value !== 'clubs') setup.dataSet = null;
+        else setup.layer = 'clubs';
+      }
       const clubScope = setClubScope(setup);
       if (clubScope !== setup.clubScope) setup.clubScope = clubScope;
       // The field changes with the theatre, so the managed team goes too, but a
@@ -912,9 +923,11 @@ export default class App extends React.Component {
     const domesticId = domesticIdOf(su);
     if (domesticId) {
       // Each club starts on its group of sections (just its home on a 100-club
-      // map). Nobody plays until the map has loaded.
+      // map). Nobody plays until the map has loaded. A basketball season's
+      // clubs take their map's land and colours, with the season's players.
       const loaded = getLoadedDomestic(domesticId);
-      included = loaded ? loaded.clubs.map(row => buildClub(row, sport)) : [];
+      const season = sport.clubMap ? new Map(sport.clubs.map(club => [club.id, club])) : null;
+      included = loaded ? loaded.clubs.map(row => buildClub(season ? seasonClub(row, season.get(row.id)) : row, sport)) : [];
       if (loaded) own = { ...loaded.startOwners };
       scopeName = domesticLabel(su.clubScope);
     } else if (clubLayer) {

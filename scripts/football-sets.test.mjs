@@ -16,7 +16,7 @@ import { WorldGeometry } from '../src/engine/geo.js';
 import { getSport } from '../src/sports/index.js';
 import {
   BUILT_IN_SEASON, BUILT_IN_SETS, FOOTBALL_SET_CACHE_LIMIT, clearFootballSetCache, clearFootballSetIndex, decodeFootballSet, fieldedNations,
-  footballSport, getLoadedFootballSet, heldShapes, loadFootballSet, loadFootballSetIndex, loadedFootballSetIds,
+  seasonSport, getLoadedFootballSet, heldShapes, loadFootballSet, loadFootballSetIndex, loadedFootballSetIds,
   retainFootballSets, sportOf,
 } from '../src/engine/footballSets.js';
 import { campaignSnapshot, createCampaignId, exportCampaign, loadCampaign, parseCampaign, serializeCampaign, writeSave }
@@ -188,19 +188,20 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
   assert.deepEqual(none.calls, ['/base/football/index.json']);
   assert.equal(await loadFootballSetIndex({ fetch: none.fetch }), BUILT_IN_SETS, 'the answer is kept');
   assert.equal(none.calls.length, 1, 'read once');
-  assert.ok(BUILT_IN_SETS.length > 0 && BUILT_IN_SETS.every(set => /^ea-(fifa|fc)-\d{2}$/.test(set.id)));
+  assert.ok(BUILT_IN_SETS.length > 0 && BUILT_IN_SETS.every(set => /^(ea-(fifa|fc)-|nba-2k)\d{2}$/.test(set.id)));
 
   const sets = [syntheticSet({ id: 'cm0102-2001-12', year: 2002, label: 'CM 01/02 · December 2001' }), SET,
     syntheticSet({ id: 'cm0102-2026-05', year: 2026, label: 'CM 01/02 · May 2026' })];
+  const earlier = BUILT_IN_SETS.filter(set => set.id.startsWith('ea-'));
   const listed = { format: 1, sets: [...sets.map(entryOf), { id: '../evil', year: 2002, season: '2001/02', label: 'x' },
     { ...entryOf(SET), id: 'cm0102-2003-05' }, { ...entryOf(SET), season: '2002/03', id: 'cm0102-2002-06' },
-    { ...entryOf(SET), id: BUILT_IN_SETS[0].id, year: BUILT_IN_SETS[0].year, season: BUILT_IN_SETS[0].season, version: null }] };
+    { ...entryOf(SET), id: earlier[0].id, year: earlier[0].year, season: earlier[0].season, version: null }] };
   clearFootballSetIndex();
   const index = await loadFootballSetIndex({ fetch: fakeFetch({ '/football/index.json': listed }).fetch });
   const local = index.filter(set => set.id.startsWith('cm0102-'));
   assert.deepEqual(local.map(set => set.id), ['cm0102-2026-05', ID, 'cm0102-2001-12'], 'newest season, then latest release');
   assert.deepEqual(local[1], { id: ID, version: SET.version, year: 2002, season: '2001/02', label: 'CM 01/02 · Test 2002' });
-  assert.deepEqual(index.filter(set => set.id.startsWith('ea-')), BUILT_IN_SETS, 'a local file never stands in for a built-in season');
+  assert.deepEqual(index.filter(set => set.id.startsWith('ea-')), earlier, 'a local file never stands in for a built-in season');
   assert.deepEqual(index.map(set => set.year), index.map(set => set.year).sort((a, b) => b - a), 'all newest first');
 
   for (const fetch of [async () => { throw new Error('offline'); }, fakeFetch({ '/football/index.json': { format: 2, sets: listed.sets } }).fetch,
@@ -255,7 +256,7 @@ test('a small LRU keeps the retained set and the most recently used others', asy
 
 // ---------- the season-bound sport ----------
 
-test('footballSport binds the set to the football sport; sportOf picks it only once loaded', async () => {
+test('seasonSport binds the set to the football sport; sportOf picks it only once loaded', async () => {
   fresh();
   const football = getSport('football');
   assert.deepEqual(BUILT_IN_SEASON, { year: 2026, season: '2025/26' });
@@ -266,7 +267,7 @@ test('footballSport binds the set to the football sport; sportOf picks it only o
 
   const set = await loadFootballSet(ID, { fetch: fakeFetch({ [`/football/${ID}.json`]: SET }).fetch });
   const sport = sportOf({ sport: 'football', dataSet: ID });
-  assert.equal(sport, footballSport(set), 'memoised while the set is loaded');
+  assert.equal(sport, seasonSport(set), 'memoised while the set is loaded');
   assert.equal(sportOf({ sport: 'football', dataSet: ID }), sport);
   assert.equal(sport.id, 'football');
   assert.equal(sport.simulate, football.simulate, 'the same match model');
@@ -324,7 +325,7 @@ function withStorage(run) {
     if (prior) Object.defineProperty(globalThis, 'localStorage', prior); else delete globalThis.localStorage;
   }
 }
-const setSport = () => footballSport(decodeFootballSet(structuredClone(SET), ID));
+const setSport = () => seasonSport(decodeFootballSet(structuredClone(SET), ID));
 
 test('a set campaign packs its CM players as tuples and rebuilds them exactly, without the data set', () => withStorage(() => {
   fresh();
@@ -461,7 +462,7 @@ test('a player credits the database that rated him, through the loader and saves
   // Five known databases are not the Update Team's: SI's own 3.9.x releases among them.
   const si = structuredClone(SET);
   si.source.provider = 'Sports Interactive';
-  const sport = footballSport(decodeFootballSet(si, ID));
+  const sport = seasonSport(decodeFootballSet(si, ID));
   const [name, pos, rating, sourceInfo] = sport.rosters['250'][2][0];
   assert.equal(sourceInfo.provider, 'Sports Interactive');
   const title = sourceTitle({ sourceInfo });
@@ -482,7 +483,7 @@ test('a player credits the database that rated him, through the loader and saves
   const restored = parseCampaign(text);
   assert.equal(JSON.stringify(restored.teams), JSON.stringify(snapshot.teams), 'rebuilt exactly, key order included');
   assert.equal(restored.teams['250'].squad[0].sourceInfo.provider, 'Sports Interactive');
-  const unnamedSnapshot = campaignSnapshot(setCheckpoint(footballSport(decodeFootballSet(unnamed, ID))));
+  const unnamedSnapshot = campaignSnapshot(setCheckpoint(seasonSport(decodeFootballSet(unnamed, ID))));
   const unnamedText = serializeCampaign(unnamedSnapshot);
   assert.equal(Object.hasOwn(JSON.parse(unnamedText).playerPack.source, 'provider'), false);
   assert.equal(JSON.stringify(parseCampaign(unnamedText).teams), JSON.stringify(unnamedSnapshot.teams));

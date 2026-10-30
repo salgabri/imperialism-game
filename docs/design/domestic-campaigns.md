@@ -722,6 +722,17 @@ loads and previews the map like a country, and titles read "NBA · USA and Canad
 The victory names "USA and Canada". Basketball squads are not FM players, so
 checkpoints store them in full (no `playerPack`).
 
+**Era maps** (2026-10-30). The earlier basketball seasons
+([football-years.md](football-years.md#era-maps)) play on maps of their own eras,
+built by the same command from `scripts/data/nba-seasons.json`: one map per era of
+franchises and arenas (`nba2000` … `nba2014`, nine in all), each from that era's
+arenas and with section ids in today's strength order (a moved franchise ranks as
+its successor). Such a map adds `seasons` (the set ids it serves) to its file and
+index entry, its rows add the franchise's `name`, and the loader then takes no
+club from the game's data: the season gives each row its name, code, strength and
+five at kick-off. Today's `nba.json` is unchanged and also serves the seasons from
+2014/15, whose franchises are today's. The build now takes about 15 minutes.
+
 **Checks**: `scripts/nba-map.test.mjs` (in `npm run test:domestic`): file, index,
 arenas and clubs agree; the USA and Canada are all the land and the hosts are not
 drawn beneath it; cross-border land neighbours and neighbour colours; seeded duel

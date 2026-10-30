@@ -1,0 +1,73 @@
+{
+  "note": "The built-in earlier basketball seasons: each NBA 2K edition's ratings, team and position per player, as compiled by 2K Archive, for NBA clubs only. npm run build:nba-seasons reads the page from data-src/bball-2karchive/ (ignored) and checks it against sha256; npm run build:nba-map builds each era's map from these teams and arenas. See docs/design/football-years.md, 'Built-in earlier basketball seasons'.",
+  "source": {
+    "name": "2K Archive",
+    "url": "https://2karchive.com/",
+    "file": "home.html",
+    "terms": "robots.txt allows every agent; the site asks only not to overload it and grants no licence (© 2K Archive). Its ratings are 2K's: launch rosters, the 2K00–2K13 ones transcribed from roster screens",
+    "sha256": "86f0936ff0d51d671d8abaa4ed1ab8b000b438217d9b172e82932068129b695c",
+    "retrieved": "2026-10-30"
+  },
+  "builtIn": { "year": 2025, "season": "2024/25", "edition": "NBA 2K25" },
+  "seasons": [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+  "skipped": {
+    "2012": "2K Archive's NBA 2K12 lists 1 Philadelphia and 2 San Antonio players (it shipped with 2010/11 rosters), so two teams cannot field a five"
+  },
+  "teams": {
+    "ATL": [{ "id": "b-atlanta-hawks", "name": "Atlanta Hawks" }],
+    "BOS": [{ "id": "b-boston-celtics", "name": "Boston Celtics" }],
+    "BKN": [{ "from": 2013, "id": "b-brooklyn-nets", "name": "Brooklyn Nets" }],
+    "NJN": [{ "to": 2012, "id": "b-new-jersey-nets", "name": "New Jersey Nets", "city": "New Jersey", "arena": "Continental Airlines Arena", "home": [-74.0675, 40.8117] }],
+    "CHH": [{ "to": 2002, "id": "b-charlotte-hornets", "name": "Charlotte Hornets", "city": "Charlotte", "arena": "Charlotte Coliseum", "home": [-80.9128, 35.1864] }],
+    "CHA": [
+      { "from": 2005, "to": 2005, "id": "b-charlotte-bobcats", "name": "Charlotte Bobcats", "city": "Charlotte", "arena": "Charlotte Coliseum", "home": [-80.9128, 35.1864] },
+      { "from": 2006, "to": 2014, "id": "b-charlotte-bobcats", "name": "Charlotte Bobcats", "city": "Charlotte", "arena": "Charlotte Bobcats Arena", "home": [-80.8392, 35.2251] },
+      { "from": 2015, "id": "b-charlotte-hornets", "name": "Charlotte Hornets" }
+    ],
+    "CHI": [{ "id": "b-chicago-bulls", "name": "Chicago Bulls" }],
+    "CLE": [{ "id": "b-cleveland-cavaliers", "name": "Cleveland Cavaliers" }],
+    "DAL": [{ "id": "b-dallas-mavericks", "name": "Dallas Mavericks" }],
+    "DEN": [{ "id": "b-denver-nuggets", "name": "Denver Nuggets" }],
+    "DET": [{ "id": "b-detroit-pistons", "name": "Detroit Pistons" }],
+    "GSW": [{ "id": "b-golden-state-warriors", "name": "Golden State Warriors" }],
+    "HOU": [{ "id": "b-houston-rockets", "name": "Houston Rockets" }],
+    "IND": [{ "id": "b-indiana-pacers", "name": "Indiana Pacers" }],
+    "LAC": [{ "id": "b-los-angeles-clippers", "name": "Los Angeles Clippers" }],
+    "LAL": [{ "id": "b-los-angeles-lakers", "name": "Los Angeles Lakers" }],
+    "VAN": [{ "to": 2001, "id": "b-vancouver-grizzlies", "name": "Vancouver Grizzlies", "city": "Vancouver", "arena": "General Motors Place", "home": [-123.1089, 49.2778] }],
+    "MEM": [{ "from": 2002, "id": "b-memphis-grizzlies", "name": "Memphis Grizzlies" }],
+    "MIA": [{ "id": "b-miami-heat", "name": "Miami Heat" }],
+    "MIL": [{ "id": "b-milwaukee-bucks", "name": "Milwaukee Bucks" }],
+    "MIN": [{ "id": "b-minnesota-timberwolves", "name": "Minnesota Timberwolves" }],
+    "NOH": [
+      { "from": 2003, "to": 2005, "id": "b-new-orleans-hornets", "name": "New Orleans Hornets", "city": "New Orleans", "arena": "New Orleans Arena", "home": [-90.0819, 29.9489] },
+      { "from": 2006, "to": 2007, "id": "b-new-orleans-oklahoma-city-hornets", "name": "New Orleans/Oklahoma City Hornets", "city": "Oklahoma City", "arena": "Ford Center", "home": [-97.5151, 35.4634] },
+      { "from": 2008, "to": 2013, "id": "b-new-orleans-hornets", "name": "New Orleans Hornets", "city": "New Orleans", "arena": "New Orleans Arena", "home": [-90.0819, 29.9489] }
+    ],
+    "NOP": [{ "from": 2014, "id": "b-new-orleans-pelicans", "name": "New Orleans Pelicans" }],
+    "NYK": [{ "id": "b-new-york-knicks", "name": "New York Knicks" }],
+    "SEA": [{ "to": 2008, "id": "b-seattle-supersonics", "name": "Seattle SuperSonics", "city": "Seattle", "arena": "KeyArena", "home": [-122.354, 47.622] }],
+    "OKC": [{ "from": 2009, "id": "b-oklahoma-city-thunder", "name": "Oklahoma City Thunder" }],
+    "ORL": [{ "id": "b-orlando-magic", "name": "Orlando Magic" }],
+    "PHI": [{ "id": "b-philadelphia-76ers", "name": "Philadelphia 76ers" }],
+    "PHX": [{ "id": "b-phoenix-suns", "name": "Phoenix Suns" }],
+    "POR": [{ "id": "b-portland-trail-blazers", "name": "Portland Trail Blazers" }],
+    "SAC": [{ "id": "b-sacramento-kings", "name": "Sacramento Kings" }],
+    "SAS": [{ "id": "b-san-antonio-spurs", "name": "San Antonio Spurs" }],
+    "TOR": [{ "id": "b-toronto-raptors", "name": "Toronto Raptors" }],
+    "UTA": [{ "id": "b-utah-jazz", "name": "Utah Jazz" }],
+    "WAS": [{ "id": "b-washington-wizards", "name": "Washington Wizards" }]
+  },
+  "maps": [
+    { "id": "nba2000", "seasons": [2000, 2001] },
+    { "id": "nba2002", "seasons": [2002] },
+    { "id": "nba2003", "seasons": [2003, 2004] },
+    { "id": "nba2005", "seasons": [2005] },
+    { "id": "nba2006", "seasons": [2006, 2007] },
+    { "id": "nba2008", "seasons": [2008] },
+    { "id": "nba2009", "seasons": [2009, 2010, 2011] },
+    { "id": "nba2013", "seasons": [2013] },
+    { "id": "nba2014", "seasons": [2014] },
+    { "id": "nba", "seasons": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024] }
+  ]
+}

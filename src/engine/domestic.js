@@ -158,16 +158,20 @@ export function decodeDomestic(data, id = data?.id) {
       homeSection: club.section,
       startSections: Object.freeze(meta.format === 1 ? [club.section] : [...club.sections]),
       homePoint: club.home || null,
-      squad: builtIn ? club.squad : club.squad.map(tuple => expandFmTuple(tuple, meta.source, club.name)),
+      // An era map's squads come from its season when a campaign starts.
+      squad: builtIn ? club.squad : meta.seasons ? [] : club.squad.map(tuple => expandFmTuple(tuple, meta.source, club.name)),
     };
   });
   const startOwners = Object.freeze(Object.fromEntries(clubs.flatMap(club => club.startSections.map(s => [s, club.id]))));
   return { meta, geo, clubs, sectionNames, focus: meta.focus, startOwners };
 }
 
-/** The game's clubs by id for a sport's own map (`sport` set), else null: a country map carries its own clubs. */
+/**
+ * The game's clubs by id for a sport's own map (`sport` set), else null: a country map carries its own clubs, and an
+ * era's map (`seasons`) its season's.
+ */
 function builtInClubs(data) {
-  return data.sport == null ? null : new Map(SPORTS[data.sport].clubs.map(club => [club.id, club]));
+  return data.sport == null || data.seasons != null ? null : new Map(SPORTS[data.sport].clubs.map(club => [club.id, club]));
 }
 
 function validateDomestic(data, id) {
@@ -200,10 +204,15 @@ function validateDomestic(data, id) {
   if (!isObject(data.boundaries)) fail('boundaries attribution is missing');
   if (data.hosts != null && (!Array.isArray(data.hosts) || !data.hosts.length || !data.hosts.every(text))) fail('hosts must list world shape ids');
   if (data.sport != null && !SPORTS[data.sport]?.clubs) fail(`unknown sport ${JSON.stringify(data.sport)}`);
-  // A sport's own map (the NBA's) lists the game's clubs of that sport; a country map carries its FM clubs.
+  // A sport's own map (the NBA's) lists the game's clubs of that sport; a country map carries its FM clubs. An earlier
+  // era's map of a sport (`seasons`) names its own clubs, whose squads come from those built-in seasons at kickoff.
+  const seasonal = data.seasons != null;
+  if (seasonal && (data.sport == null || !Array.isArray(data.seasons) || !data.seasons.length || !data.seasons.every(text))) {
+    fail('seasons must list the built-in seasons the map serves');
+  }
   const builtIn = builtInClubs(data);
   const src = data.source;
-  if (!builtIn && (!isObject(src) || !text(src.version) || !text(src.snapshotDate))) fail('source must name the FM data version and snapshotDate');
+  if (!builtIn && !seasonal && (!isObject(src) || !text(src.version) || !text(src.snapshotDate))) fail('source must name the FM data version and snapshotDate');
 
   const t = data.topology;
   if (!isObject(t) || t.type !== 'Topology' || !Array.isArray(t.arcs)) fail('topology is not a TopoJSON Topology');
@@ -260,6 +269,8 @@ function validateDomestic(data, id) {
     if (!isObject(club)) fail(`${at} is not an object`);
     if (builtIn) {
       if (!builtIn.has(club.id)) fail(`${at} is not one of the game's ${data.sport} clubs`);
+    } else if (seasonal) {
+      if (typeof club.id !== 'string' || !/^[a-z]-[a-z0-9-]{1,62}$/.test(club.id)) fail(`${at} id must look like "b-<name>"`);
     } else {
       if (!Number.isInteger(club.fm) || club.fm < 0) fail(`${at} fm must be the FM club id`);
       if (club.id !== `d${id}-${club.fm}`) fail(`${at} id must be "d${id}-${club.fm}"`);
@@ -270,6 +281,9 @@ function validateDomestic(data, id) {
     if (!builtIn) {
       if (!text(club.name)) fail(`${at} has no name`);
       if (club.short != null && !text(club.short)) fail(`${at} short name is empty`);
+    }
+    // A season gives an era map's clubs their codes and strengths.
+    if (!builtIn && !seasonal) {
       if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
       if (codes.has(club.code)) fail(`${at} code ${club.code} is duplicated`);
       codes.add(club.code);
@@ -290,8 +304,8 @@ function validateDomestic(data, id) {
     }
     if (club.home != null && (!Array.isArray(club.home) || club.home.length !== 2 || !club.home.every(finite)
       || Math.abs(club.home[1]) > 90)) fail(`${at} home must be [lon, lat] or null`);
-    // A sport's own map takes squads from the game's clubs.
-    if (builtIn) return;
+    // A sport's own map takes squads from the game's clubs, an era's map from its season.
+    if (builtIn || seasonal) return;
     if (!Array.isArray(club.squad) || club.squad.length < 11) fail(`${at} squad needs at least 11 players`);
     const players = new Set();
     let keeper = false;

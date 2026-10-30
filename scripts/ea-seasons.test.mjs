@@ -9,7 +9,7 @@ import { getSport } from '../src/sports/index.js';
 import { EA_ROLES, eaRosterOf, eaTupleOf, expandEaTuple } from '../src/data/eaPlayers.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { contentHash } from '../src/data/footballSetBuild.js';
-import { BUILT_IN_SETS, decodeFootballSet, setKindOf } from '../src/engine/footballSets.js';
+import { BUILT_IN_SETS, decodeFootballSet, setKindOf, setSportOf } from '../src/engine/footballSets.js';
 import { parseCampaign, serializeCampaign } from '../src/engine/storage.js';
 import { sourceLabel, sourceTitle, sourceUrl } from '../src/viewModels/squad.js';
 import { EA_LEAGUES, EA_NATION_ALIASES, EA_NO_TEAM, buildEaSeason } from './lib/ea-seasons.mjs';
@@ -185,7 +185,7 @@ test('an EA season\'s player is labelled with its edition and links to that rost
 
 test('every built-in earlier season is committed, matches its listing and its own hash, and decodes', () => {
   assert.deepEqual(BUILT_IN_SEASONS.map(set => set.id), MANIFEST.editions.map(edition => edition.id), 'one per manifest edition, newest first');
-  assert.deepEqual(BUILT_IN_SETS.map(set => set.id), BUILT_IN_SEASONS.map(set => set.id));
+  assert.deepEqual(BUILT_IN_SETS.filter(set => setSportOf(set.id) === 'football').map(set => set.id), BUILT_IN_SEASONS.map(set => set.id));
   for (const [i, listed] of BUILT_IN_SEASONS.entries()) {
     const edition = MANIFEST.editions[i];
     const doc = JSON.parse(readFileSync(new URL(`../public/football/${listed.id}.json`, import.meta.url), 'utf8'));

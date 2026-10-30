@@ -3,6 +3,7 @@ import { C } from '../theme.js';
 import { DEFAULT_SPORT, getSport } from '../sports/index.js';
 import { domesticScopeId } from '../engine/domestic.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
+import { setSportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -12,7 +13,7 @@ export const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'U
   managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic',
   // Turn modes (DEC D1): the defaults reproduce the original random draw with compass targets.
   turnOrder: 'random', targeting: 'compass',
-  // A football data set id (docs/design/football-years.md); null plays the built-in season.
+  // An earlier season's data set id (docs/design/football-years.md); null plays the built-in season.
   dataSet: null };
 
 /**
@@ -26,9 +27,15 @@ export function domesticIdOf(settings) {
   return (own ? own.sport : 'football') === getSport(settings.sport).id ? id : null;
 }
 
-/** The data set a setup or saved campaign is played on, or null for the built-in data (country maps use it too). Pure. */
+/**
+ * The data set a setup or saved campaign is played on, or null for the built-in data. A set plays in its own sport:
+ * a football season on the world (country maps use the built-in data), a basketball season with clubs only, on its
+ * era's map. Pure.
+ */
 export function dataSetOf(settings) {
-  return getSport(settings?.sport).id === 'football' && !domesticIdOf(settings) ? settings?.dataSet ?? null : null;
+  const id = settings?.dataSet ?? null, sport = getSport(settings?.sport).id;
+  if (id == null || setSportOf(id) !== sport) return null;
+  return (sport === 'football' ? !domesticIdOf(settings) : settings.layer === 'clubs') ? id : null;
 }
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */

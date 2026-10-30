@@ -232,7 +232,7 @@ function theatreCaption(model, preview) {
  * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
  * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
- * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for football data sets.
+ * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
@@ -528,7 +528,7 @@ export default function SetupOverlay({
                 </div>
               </div>
 
-              {/* Football seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this
+              {/* The sport's seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this
                   computer. Its own classes, so `.setup-theatre` rows and notes stay the Theatre list's. */}
               {model.season ? (
                 <div className="setup-group setup-group--list">

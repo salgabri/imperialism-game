@@ -1,25 +1,36 @@
-// Football data sets: one dated database's nations and clubs, played instead of the built-in season. A set is one of
-// the built-in earlier seasons (an EA FIFA / FC launch roster, src/data/footballSeasons.js) or a CM 01/02 database
-// built on this computer; either is a `public/football/<id>.json` (format 1, see docs/design/football-years.md),
-// validated strictly and exposed as a football sport bound to that season. The built-in data (src/data/rosters.js,
-// clubs.football.js) never changes.
+// Data sets: one dated database's nations and clubs, played instead of a sport's built-in season. A football set is
+// one of the built-in earlier seasons (an EA FIFA / FC launch roster, src/data/footballSeasons.js) or a CM 01/02
+// database built on this computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition,
+// src/data/basketballSeasons.js), clubs only, on its era's map. Each is a `public/<sport>/<id>.json` (format 1, see
+// docs/design/football-years.md), validated strictly and exposed as that sport bound to the season. The built-in data
+// (src/data/rosters.js, clubs.football.js, the basketball modules) never changes.
 
 import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
 import { BUILT_IN_SEASONS } from '../data/footballSeasons.js';
+import { BUILT_IN_BASKETBALL_SEASONS } from '../data/basketballSeasons.js';
+import { CLUB_MAPS } from '../data/clubMaps.js';
+import { basketball } from '../sports/basketball.js';
 import { football } from '../sports/football.js';
 import { getSport } from '../sports/index.js';
 
 export const FOOTBALL_SET_FORMAT = 1;
 /** The built-in data's season (EA FC 26 + FM 26). Year N is the season ending in N. */
 export const BUILT_IN_SEASON = Object.freeze({ year: 2026, season: '2025/26' });
+// Basketball's built-in clubs are NBA 2K25's (2024/25).
+const BUILT_IN_SEASONS_OF = Object.freeze({ football: BUILT_IN_SEASON, basketball: Object.freeze({ year: 2025, season: '2024/25' }) });
+/** The season a sport's built-in data plays. */
+export const builtInSeasonOf = sportId => BUILT_IN_SEASONS_OF[getSport(sportId).id];
 
-// `cm0102-<release month>[-variant]` for a CM 01/02 database, `ea-fifa-<nn>` / `ea-fc-<nn>` for an EA edition.
-const SET_ID = /^(?:cm0102-\d{4}-\d{2}(-[a-z0-9]+)?|ea-(?:fifa|fc)-\d{2})$/;
+// `cm0102-<release month>[-variant]` for a CM 01/02 database, `ea-fifa-<nn>` / `ea-fc-<nn>` for an EA edition,
+// `nba-2k<nn>` for an NBA 2K edition.
+const SET_ID = /^(?:cm0102-\d{4}-\d{2}(-[a-z0-9]+)?|ea-(?:fifa|fc)-\d{2}|nba-2k\d{2})$/;
 export const isFootballSetId = id => typeof id === 'string' && SET_ID.test(id);
-/** Whose players a set holds, by its id: 'ea' or 'cm0102'. */
-export const setKindOf = id => (String(id).startsWith('ea-') ? 'ea' : 'cm0102');
+/** Whose players a set holds, by its id: 'ea', 'nba2k' or 'cm0102'. */
+export const setKindOf = id => (String(id).startsWith('ea-') ? 'ea' : String(id).startsWith('nba-') ? 'nba2k' : 'cm0102');
+/** The sport a set is played in, by its id. */
+export const setSportOf = id => (setKindOf(id) === 'nba2k' ? 'basketball' : 'football');
 export const isDataYear = year => Number.isInteger(year) && year >= 1872 && year <= 2100;
 /** '2025/26' for 2026. */
 export const seasonOf = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
@@ -45,10 +56,10 @@ export function clearFootballSetIndex() {
 const newestFirst = (a, b) => b.year - a.year || (a.id < b.id ? 1 : -1);
 
 /**
- * The data sets present, newest season first: `[{ id, version, year, season, label }]`. The built-in earlier seasons
- * are always there; CM 01/02 sets built on this computer are read once from `football/index.json`, where a missing or
- * unreadable index means none. A listing that fails the checks is skipped (each set is validated in full when it
- * loads).
+ * The data sets present, newest season first: `[{ id, version, year, season, label, map? }]` (`map`: a basketball
+ * season's era map), every sport's together (`setSportOf` tells them apart). The built-in earlier seasons are always
+ * there; CM 01/02 sets built on this computer are read once from `football/index.json`, where a missing or unreadable
+ * index means none. A listing that fails the checks is skipped (each set is validated in full when it loads).
  */
 export function loadFootballSetIndex({ baseUrl = '/', fetch: fetchImpl = globalThis.fetch } = {}) {
   index ||= (async () => {
@@ -59,7 +70,8 @@ export function loadFootballSetIndex({ baseUrl = '/', fetch: fetchImpl = globalT
     } catch {
       files = [];
     }
-    const local = files.filter(set => !BUILT_IN_SETS.some(builtIn => builtIn.id === set.id));
+    // Only CM 01/02 builds are local: every basketball season is built in.
+    const local = files.filter(set => setSportOf(set.id) === 'football' && !BUILT_IN_SETS.some(builtIn => builtIn.id === set.id));
     return local.length ? Object.freeze([...BUILT_IN_SETS, ...local].sort(newestFirst)) : BUILT_IN_SETS;
   })();
   return index;
@@ -73,13 +85,25 @@ function listing(data) {
   const seen = new Set();
   const valid = entries.filter(entry => entry && isFootballSetId(entry.id) && !seen.has(entry.id) && seen.add(entry.id)
     && isDataYear(entry.year) && entry.season === seasonOf(entry.year) && typeof entry.label === 'string' && entry.label.trim()
-    && (entry.version == null || (typeof entry.version === 'string' && versionPattern(entry.id).test(entry.version))));
-  return Object.freeze(valid.sort(newestFirst)
-    .map(({ id, version = null, year, season, label }) => Object.freeze({ id, version, year, season, label: label.trim() })));
+    && (entry.version == null || (typeof entry.version === 'string' && versionPattern(entry.id).test(entry.version)))
+    && (setKindOf(entry.id) !== 'nba2k' || eraMapOf(entry.id, entry.map) != null));
+  return Object.freeze(valid.sort(newestFirst).map(({ id, version = null, year, season, label, map }) => Object.freeze({
+    id, version, year, season, label: label.trim(), ...(setKindOf(id) === 'nba2k' ? { map } : {}) })));
 }
 
-/** The built-in earlier seasons, newest first, as the index lists them. */
-export const BUILT_IN_SETS = listing(BUILT_IN_SEASONS);
+// A basketball season's map (src/data/clubMaps.js), or null: an earlier era's that lists the season, or today's for a
+// season with today's teams in today's arenas.
+const eraMapOf = (id, map) => CLUB_MAPS.find(entry => entry.id === map && entry.sport === 'basketball'
+  && (entry.seasons == null || entry.seasons.includes(id))) || null;
+
+/** Whether a club map is an earlier era's, played only with its seasons' clubs. */
+export const isEraMap = id => CLUB_MAPS.some(entry => entry.id === id && entry.seasons != null);
+
+/** The built-in earlier seasons of every sport, newest first, as the index lists them. */
+export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS]);
+
+/** The era map a basketball season plays on (null for any other set). */
+export const seasonMapOf = id => BUILT_IN_SETS.find(set => set.id === id)?.map ?? null;
 
 // ---------- loading ----------
 
@@ -145,7 +169,7 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
     if (typeof fetchImpl !== 'function') throw new Error('No fetch available to load football data sets');
     let res;
     try {
-      res = await fetchImpl(`${baseUrl}football/${key}.json`);
+      res = await fetchImpl(`${baseUrl}${setSportOf(key)}/${key}.json`);
     } catch (e) {
       throw new Error(`Football data set ${key} failed to load: ${(e && e.message) || e}`);
     }
@@ -172,10 +196,15 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
 
 /**
  * Validate a parsed format-1 file and expand its players (no caching): `{ meta, rosters, clubs, territory }`, where
- * `rosters` and `clubs` have the built-in shapes buildTeam and buildClub read.
+ * `rosters` and `clubs` have the built-in shapes buildTeam and buildClub read. A basketball season has clubs only
+ * (`rosters` null), whose `[name, positions, rating]` players are already the built-in shape.
  */
 export function decodeFootballSet(data, id = data?.id) {
   validateFootballSet(data, String(id));
+  if (setKindOf(data.id) === 'nba2k') {
+    const { clubs, ...meta } = data;
+    return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(player => [...player]) })), territory: NO_TERRITORY };
+  }
   const { nations, clubs, territory, ...meta } = data;
   const expand = tuple => expandSetPlayer(tuple, meta.source, setKindOf(meta.id));
   return {
@@ -215,7 +244,17 @@ const KINDS = {
       ? 'source must name the edition, roster update, SoFIFA roster and snapshotDate'
       : src.rawScale !== EA_SCALE ? `source rawScale must be ${EA_SCALE}`
         : src.conversion !== undefined ? 'EA ratings are not converted' : '') },
+  // Clubs only, each player `[name, positions, rating]` as the built-in basketball clubs hold them.
+  nba2k: { size: 3,
+    source: src => (!['edition', 'compiler'].every(key => typeof src[key] === 'string' && src[key].trim())
+      ? 'source must name the edition and who compiled its ratings'
+      : src.rawScale !== NBA_SCALE ? `source rawScale must be ${NBA_SCALE}`
+        : src.conversion !== undefined ? 'NBA 2K ratings are not converted' : '') },
 };
+const NBA_SCALE = 99;
+const BASKETBALL_POSITIONS = ['PG', 'SG', 'SF', 'PF', 'C'];
+// The built-in basketball clubs' `b-<slug>` ids, with the same guard against Object.prototype names.
+const BASKETBALL_CLUB_ID = /^b-[a-z0-9-]{1,62}$/;
 
 function validateFootballSet(data, id) {
   const fail = message => { throw new Error(`Football data set ${id}: ${message}`); };
@@ -224,7 +263,7 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>" or "ea-fifa-<nn>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "ea-fifa-<nn>" or "nba-2k<nn>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
@@ -246,6 +285,7 @@ function validateFootballSet(data, id) {
   if (typeof src.url !== 'string' || !/^https?:\/\/\S+$/i.test(src.url)) fail('source url must be an http(s) link');
   if (data.coverage != null && (!isObject(data.coverage)
     || Object.values(data.coverage).some(n => !Number.isInteger(n) || n < 0))) fail('coverage must hold counts');
+  if (setKindOf(id) === 'nba2k') return validateBasketballClubs(data, id, fail);
 
   // The builder writes only tuples that rebuild exactly, so anything else (an unknown or repeated position key, a
   // full name equal to the name, a malformed date) is a file it did not write.
@@ -328,23 +368,75 @@ function validateFootballSet(data, id) {
   }
 }
 
+/**
+ * A basketball season's clubs: the NBA's of that season, one per section of its era's map (`map`), each with its best
+ * five as `[name, 'PG' or 'PG/SG', rating]`. Saved names resolve against them, so ids, codes and leagues follow the
+ * built-in clubs' rules.
+ */
+function validateBasketballClubs(data, id, fail) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
+  const text = v => typeof v === 'string' && v.trim().length > 0;
+  const rating = v => Number.isInteger(v) && v >= 1 && v <= 99;
+  if (data.nations !== undefined || data.territory !== undefined) fail('an NBA season has clubs only');
+  const map = eraMapOf(id, data.map);
+  if (!map) fail(`map ${JSON.stringify(data.map)} is not a basketball map listing this season`);
+  if (!Array.isArray(data.clubs)) fail('clubs must be a list');
+  if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
+  const leagues = new Set(basketball.clubs.map(club => club.league));
+  const ids = new Set(), codes = new Set();
+  data.clubs.forEach((club, i) => {
+    const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
+    if (!isObject(club)) fail(`${at} is not an object`);
+    if (typeof club.id !== 'string' || !BASKETBALL_CLUB_ID.test(club.id)) fail(`${at} id ${JSON.stringify(club.id)} must look like "b-<name>"`);
+    if (ids.has(club.id)) fail(`${at} id is duplicated`);
+    ids.add(club.id);
+    if (!text(club.name)) fail(`${at} has no name`);
+    if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
+    if (codes.has(club.code)) fail(`${at} code ${club.code} is duplicated`);
+    codes.add(club.code);
+    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
+    if (typeof club.country !== 'string' || !Object.hasOwn(NATIONS, club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
+    if (!text(club.col)) fail(`${at} has no colour`);
+    if (!rating(club.str)) fail(`${at} str must be a rating 1-99`);
+    if (!Array.isArray(club.squad) || club.squad.length < BASKETBALL_POSITIONS.length) fail(`${at} squad needs at least five players`);
+    const names = new Set();
+    club.squad.forEach((player, j) => {
+      const where = `${at} squad[${j}]`;
+      if (!Array.isArray(player) || player.length !== KINDS.nba2k.size) fail(`${where} is not [name, positions, rating]`);
+      const [name, positions, value] = player;
+      if (!text(name) || name !== name.trim()) fail(`${where} has no name`);
+      if (names.has(name)) fail(`${where} repeats ${name}`);
+      names.add(name);
+      // One position, or two neighbouring ones (primary first), as the built-in clubs list them.
+      const [first, second, ...rest] = String(positions).split('/');
+      const at1 = BASKETBALL_POSITIONS.indexOf(first), at2 = BASKETBALL_POSITIONS.indexOf(second);
+      if (typeof positions !== 'string' || at1 < 0 || rest.length || (second !== undefined && (at2 < 0 || Math.abs(at1 - at2) !== 1))) {
+        fail(`${where} positions ${JSON.stringify(positions)} must be one position or two neighbouring ones`);
+      }
+      if (!rating(value)) fail(`${where} rating must be a whole number 1-99`);
+    });
+  });
+}
+
 // ---------- the season-bound sport ----------
 
 const sports = new WeakMap();
 
 /**
- * The football sport bound to a decoded data set: its nations, clubs and territory in place of the built-in ones,
- * plus the set's identity for setup caches and settings. Memoised per decoded set, so a version keeps one sport
- * while it stays loaded.
+ * The sport bound to a decoded data set, plus the set's identity for setup caches and settings. A football set's
+ * nations, clubs and territory replace the built-in ones; a basketball season's clubs replace the built-in clubs and
+ * play on its era's map (`clubMap`), its national teams never playing with it. Memoised per decoded set, so a version
+ * keeps one sport while it stays loaded.
  */
-export function footballSport(set) {
+export function seasonSport(set) {
   let sport = sports.get(set);
   if (!sport) {
     const { meta, rosters, clubs, territory } = set;
-    sport = { ...football, rosters, clubs, territory,
-      // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
-      fallbackStrength: () => EMPTY_STRENGTH,
-      dataSet: meta.id, dataVersion: meta.version, dataYear: meta.year, dataSeason: meta.season, dataLabel: meta.label };
+    const identity = { dataSet: meta.id, dataVersion: meta.version, dataYear: meta.year, dataSeason: meta.season, dataLabel: meta.label };
+    sport = setKindOf(meta.id) === 'nba2k' ? { ...basketball, clubs, clubMap: meta.map, ...identity }
+      : { ...football, rosters, clubs, territory,
+        // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
+        fallbackStrength: () => EMPTY_STRENGTH, ...identity };
     sports.set(set, sport);
   }
   return sport;
@@ -352,13 +444,14 @@ export function footballSport(set) {
 
 /**
  * The sport a setup or saved campaign's settings play with: the data set's once it has loaded (null until then),
- * else the built-in sport. Data sets are football only.
+ * else the built-in sport. A set plays only in its own sport, and a basketball season only with clubs.
  */
 export function sportOf(config) {
   const sport = getSport(config?.sport);
-  if (sport.id !== 'football' || config?.dataSet == null) return sport;
-  const loaded = getLoadedFootballSet(config.dataSet);
-  return loaded ? footballSport(loaded) : null;
+  const id = config?.dataSet;
+  if (id == null || setSportOf(id) !== sport.id || (sport.id === 'basketball' && config.layer !== 'clubs')) return sport;
+  const loaded = getLoadedFootballSet(id);
+  return loaded ? seasonSport(loaded) : null;
 }
 
 /** Nations fielding a team in the sport's season: a data set leaves out shapes merged into another federation or with none. */

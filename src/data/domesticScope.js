@@ -13,8 +13,12 @@ export function domesticEntry(scope) {
   return id ? DOMESTIC.find(entry => entry.id === id) || CLUB_MAPS.find(entry => entry.id === id) || null : null;
 }
 
-/** The map a sport's clubs always play on (basketball: the NBA's USA and Canada), or null. */
-export const clubMapOf = sportId => CLUB_MAPS.find(entry => entry.sport === sportId) || null;
+/**
+ * The map a sport's clubs always play on (basketball: the NBA's USA and Canada), or null. An earlier season names its
+ * own era's map (`mapId`, a basketball season's `clubMap`).
+ */
+export const clubMapOf = (sportId, mapId = null) => CLUB_MAPS.find(entry => entry.sport === sportId
+  && (mapId == null ? entry.seasons == null : entry.id === mapId)) || null;
 
 /** That map's club theatre ('domestic:nba'), or null. */
 export function clubMapScope(sportId) {

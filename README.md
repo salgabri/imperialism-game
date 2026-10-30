@@ -77,7 +77,8 @@ npm run build:domestic   # rebuild country maps from snapshots and boundaries (a
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
-npm run test:football-sets # EA seasons, CM 01/02 parser and builder, loader, setup and saves
+npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page in data-src/bball-2karchive/
+npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 ```
 
 ## How a campaign plays
@@ -102,7 +103,10 @@ default suits a first campaign, so pressing Space three times starts one.
    starts a [domestic campaign](#domestic-campaigns), and its map shows that
    country. Football also has a **Season** choice: the built-in 2025/26, then
    the [earlier seasons](#football-seasons) 2023/24 back to 2014/15 (EA FIFA
-   ratings of each), and any local CM 01/02 season built on this computer. A
+   ratings of each), and any local CM 01/02 season built on this computer.
+   Basketball's lists the built-in 2024/25, then its
+   [earlier seasons](#basketball-seasons) 2023/24 back to 1999/00 (NBA 2K
+   ratings of each), which play NBA clubs on the map of their era. A
    quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
@@ -653,9 +657,14 @@ their cities and coloured apart from their neighbours; the franchises keep their
 own names, crests and fives. Mexico, Greenland and the rest of the world lie
 beneath as inert land. The map is `public/domestic/nba.json`, played through the
 country-map runtime; NBA campaigns saved before it still resume on the world map.
+Each [earlier season](#basketball-seasons) plays on a map of its own era, drawn
+the same way from the arenas of that season: the Grizzlies start in Vancouver
+until 2000/01 and the SuperSonics hold Seattle until 2007/08. Nine era maps
+(`public/domestic/nba2000.json` to `nba2014.json`) cover 1999/00 to 2013/14;
+later seasons have today's franchises and play on this map.
 
 ```bash
-npm run build:nba-map                      # boundaries + arenas → public/domestic/nba.json, src/data/clubMaps.js (about a minute)
+npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 15 minutes)
 npm run build:nba-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
 
@@ -731,6 +740,41 @@ considered, back to 1872, and their terms.
 
 The [design notes](docs/design/football-years.md) give the file format, the
 runtime, the saves and the known limits.
+
+## Basketball seasons
+
+Basketball can be played on 24 earlier seasons as well as the built-in 2024/25:
+1999/00 to 2023/24, each from that season's NBA 2K (NBA 2K to NBA 2K24). Pick
+one under **Season** in setup; it plays NBA clubs only, so it switches Teams to
+clubs. Each season is a file in `public/basketball/` (about 12 KB) that loads
+only when chosen, with the map of its era.
+
+- **What a season holds:** the franchises of that season, each with the best
+  five its players' positions allow. Ratings are 2K's overalls, unchanged.
+  Franchises that have moved since keep their name and city of the time: the
+  Vancouver Grizzlies, Seattle SuperSonics, New Jersey Nets, Charlotte Bobcats
+  and the New Orleans (and, for 2005/06 and 2006/07, Oklahoma City) Hornets.
+- **What is missing:** 2011/12, whose ratings the source lists for only three
+  players of two teams, and any national team: NBA 2K rates NBA players only.
+- **Source:** [2K Archive](https://2karchive.com/), a fan compilation of every
+  edition's ratings that names no licence (2K's own rights are not cleared, as
+  for the built-in NBA 2K25 data). `scripts/data/nba-seasons.json` pins one
+  saved copy of its page by SHA-256 and lists each season's franchises and the
+  arenas of those that moved. To rebuild, save the page as
+  `data-src/bball-2karchive/home.html` (ignored) and run:
+
+  ```bash
+  npm run build:nba-seasons
+  ```
+
+  It writes the season files, their listing `src/data/basketballSeasons.js` and
+  `docs/design/basketball-seasons-audit.json`; `npm run build:nba-map` then
+  draws the era maps.
+- **Saves** hold every player as played, so a season campaign resumes without
+  its season file. It still needs its era's map, as any NBA campaign does.
+
+The [design notes](docs/design/football-years.md#earlier-basketball-seasons)
+give the file format, the era maps and the known limits.
 
 ## Squad economics
 
@@ -953,13 +997,14 @@ src/
                        values written once (scripts/lib/data-module.mjs writes them)
   data/scopes.js       club theatre choices (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
-  data/clubMaps.js     GENERATED index of a sport's own club map: the NBA's (npm run build:nba-map)
+  data/clubMaps.js     GENERATED index of a sport's own club maps: the NBA's, today's and its eras' (npm run build:nba-map)
   data/domesticScope.js  labels for 'domestic:<id>' theatres, and a sport's own map
   data/domesticTiers.js  each nation's club cap and the setup lists' priority order
   data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
   data/cmPlayers.js    CM player tuples, positions and rating conversion
   data/eaPlayers.js    EA player tuples of the built-in earlier seasons
   data/footballSeasons.js  GENERATED listing of the earlier seasons (npm run build:ea-seasons)
+  data/basketballSeasons.js  GENERATED listing of the earlier basketball seasons (npm run build:nba-seasons)
   data/footballSetBuild.js  CM 01/02 data set builder (pure; Node and browser)
   data/cm0102Releases.js, cm0102Nations.js, footballFederations.js  its manifests:
                        known releases, CM nation names, federations by year
@@ -977,7 +1022,7 @@ src/
     winProbability.js  live win-probability model (football and basketball)
     liveMinute.js      live match minute store (outside saved state)
     domestic.js        loads and validates a country map: sections and club rows
-    footballSets.js    lists, loads and validates football seasons; season-bound sport
+    footballSets.js    lists, loads and validates earlier seasons of both sports; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
                        wizard, match card, dialogs and overlays
@@ -985,7 +1030,9 @@ public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
-  domestic/            one sectioned map per country, and the NBA's (nba.json), fetched on demand
+  domestic/            one sectioned map per country, and the NBA's (nba.json, nba2000.json …), fetched on demand
+  football/            the built-in earlier football seasons (ea-*.json), fetched when chosen
+  basketball/          the built-in earlier basketball seasons (nba-2k*.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
   flags/               170 vendored flag SVGs
@@ -1002,7 +1049,8 @@ scripts/
   build-clubs.mjs      builds the club layer for both sports
   sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
-  build-nba-map.mjs    builds the NBA's map of the USA and Canada from the arenas
+  build-nba-map.mjs    builds the NBA's maps of the USA and Canada from the arenas, today's and each era's
+  build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
