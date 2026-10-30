@@ -1,7 +1,8 @@
 # Football years: data sets beyond the built-in season
 
-Status: implemented for local data sets, 2026-10-24. Not yet run on a real
-database (the files need a forum login). Sources and terms are in
+Status: implemented for local data sets, 2026-10-24; seasons added in the
+browser (Add a season…) and an always-visible Season choice, 2026-10-30. Not yet
+run on a real database (the files need a forum login). Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
 [football-year-permissions.md](football-year-permissions.md).
 
@@ -14,11 +15,13 @@ built-in data (EA FC 26 + FM 26, season 2025/26) stays the default and does not
 change: same files, same seeds, same saves.
 
 Until the database authors allow redistribution, data sets are **local**. The
-user downloads a database into the ignored `data-src/cm0102/`, the builder writes
-the data set to the ignored `public/football/`, and nothing derived from the
-database is committed. When permission arrives, the same files can be committed
-by removing one `.gitignore` line, and its scope should be recorded in the
-permissions note first.
+user downloads a database and either adds it in the game (**Add a season…**,
+which keeps the data set in the browser's IndexedDB) or puts it in the ignored
+`data-src/cm0102/`, where the command-line builder writes the data set to the
+ignored `public/football/`. Nothing derived from the database is committed. When
+permission arrives, the built files can be committed by removing one
+`.gitignore` line, and its scope should be recorded in the permissions note
+first.
 
 ## Terms
 
@@ -36,18 +39,19 @@ permissions note first.
 ## Pipeline
 
 ```
-data-src/cm0102/<folder>/Data/*.dat        user's own download (ignored)
-        │  npm run build:football-set -- --cm0102=data-src/cm0102/<folder>
-        ▼
+data-src/cm0102/<folder>/Data/*.dat        a Data folder chosen with Add a season…
+        │  npm run build:football-set            │  src/engine/seasonImport.js (lazy chunk)
+        ▼                                        ▼
 src/data/cm0102.js        parse the binary files (pure; Node and browser)
-scripts/data/cm0102-databases.json   known databases: label, season, release date, topic URL, DOB shift, file signature
-scripts/data/cm0102-nations.json     CM nation name → game nation id, plus names deliberately without a team
-scripts/data/football-federations.json  per year: shapes held by another federation, shapes with no federation
-        ▼
-public/football/<id>.json  one data set (ignored)
-public/football/index.json  every data set present (ignored), rebuilt each run
-        ▼
-src/engine/footballSets.js  load, validate, decode; year-bound sport
+src/data/footballSetBuild.js  build the data set (pure; Node and browser), from:
+src/data/cm0102Releases.js   known databases: label, season, release date, topic URL, DOB shift, file signature
+src/data/cm0102Nations.js    CM nation name → game nation id, plus names deliberately without a team
+src/data/footballFederations.js  per year: shapes held by another federation, shapes with no federation
+        ▼                                        ▼
+public/football/<id>.json (ignored)      IndexedDB imperialism-football-sets
+public/football/index.json (ignored)       (src/engine/localSets.js)
+        ▼                                        ▼
+src/engine/footballSets.js  list both, load (the browser's copy first), validate, decode; year-bound sport
 ```
 
 The builder fails rather than guess:
@@ -64,7 +68,7 @@ players are then left out, not guessed.
 
 The format is in [cm0102-format.md](cm0102-format.md). A database is identified
 by the sizes of its `club.dat` and `staff.dat`, a pair that is unique across the
-48 releases in `cm0102-databases.json`. The manifest gives each release's season,
+48 releases in `cm0102Releases.js`. The manifest gives each release's season,
 release month, forum topic, author and per-field date shifts, and SI's own 3.9.x
 databases are recognised the same way. The builder also estimates the birth-year
 shift from famous players' known birthdays, counting each person once. For an
@@ -145,7 +149,7 @@ Montenegro" needs the same identity overrides as the pre-2002 seasons.
   Montenegro is with Serbia until 2006, the same as Greenland with Denmark.
   `territory.inactive` shapes have no federation that year (Kosovo before 2016,
   Timor-Leste before 2006). They stay neutral land, as non-participants do in a
-  continental theatre. Both come from `football-federations.json`, keyed by
+  continental theatre. Both come from `footballFederations.js`, keyed by
   year.
 
 ### Ratings and positions
@@ -176,10 +180,54 @@ Sports Interactive's 3.9.x, Sawczuk's October 2003 and Helvete's September 2005.
 The Source column reads "CM 01/02" and links to the database topic. The tooltip
 names the provider and reads "Game rating converted from CM current ability".
 
+## Adding a season in the browser
+
+**Add a season…** builds a data set from a Data folder the player chooses, with
+the same builder and manifests as the command line, so both make the same file.
+
+- **Choosing the folder.** The button opens a folder picker (`webkitdirectory`).
+  `dataFolderOf` groups the chosen files by folder and takes the one folder that
+  holds all ten files the reader opens (`CM_DATA_FILES` in `src/data/cm0102.js`:
+  index, continent, nation, club, club and nation competitions, the three name
+  tables and staff), matching base names in any case. Picking the game folder
+  around `Data` works. Two complete Data folders are refused rather than
+  guessed between, and a packed `.zip`, `.rar` or `.7z` gets a hint to extract
+  it. Only those ten files are read, so histories and stadiums stay unread.
+- **Known releases only.** The browser has no flags to name an unknown database,
+  so a folder that is not one of the 48 known releases is refused, with a
+  pointer to the command-line builder. Every known release ends in 2002 or later.
+- **Building.** `src/engine/seasonImport.js` reports `reading`, then `building`,
+  and waits for a paint (or 100 ms when the page is not drawn) before the
+  synchronous build. Unmapped nations do not stop the build
+  (`allowUnmapped: true`): their players are left out and counted in the
+  status line. The digests of `club.dat` and `staff.dat` are checked as on the
+  command line, and a mismatch is reported as a possibly edited copy. The doc
+  must pass `decodeFootballSet` before it is stored.
+- **Storage.** `src/engine/localSets.js` keeps one IndexedDB database
+  (`imperialism-football-sets`, version 1) with two object stores written in
+  one transaction: `listing` (the index entry plus `addedAt`, keyed by `id`) and
+  `sets` (the data set file). The Season list reads only `listing`. Where
+  IndexedDB is missing or refuses to open, seasons are kept in memory and the
+  status line says the season lasts until the page closes.
+- **Listing and loading.** `loadFootballSetIndex()` reads `football/index.json`
+  once and the browser's listing on every call, marks the browser's sets
+  `added: true` and lets one stand in for a file with the same id.
+  `loadFootballSet(id)` reads the browser's copy first and fetches the file only
+  without one. A 404 says the set is neither in this browser nor built on this
+  computer, as for a season added in another browser.
+- **After an import** the listing is read again, the new season is chosen, and
+  the status line reads "Added 2007/08 · CM 01/02 · November 2007. N of 170
+  nations field a full XI; M clubs from L leagues.", from the set's coverage.
+  Adding the same
+  folder again says "Already added"; a different build of the same release says
+  "Updated". **Remove from this browser** appears for a chosen added season; it
+  deletes both records, and a setup on that season goes back to the built-in one.
+
 ## Runtime
 
 - `src/engine/footballSets.js`:
-  - `loadFootballSetIndex()` reads `football/index.json`; missing means no sets.
+  - `loadFootballSetIndex()` lists the sets built on this computer
+    (`football/index.json`, missing means none) and those added in this browser.
   - `loadFootballSet(id)` and `getLoadedFootballSet(id)` follow
     `src/engine/domestic.js`: one shared promise per id, failed loads not cached,
     a small LRU, and strict validation of format, id, version and tuples.
@@ -189,8 +237,12 @@ names the provider and reads "Game rating converted from CM current ability".
   - `sportOf(settingsOrSetup)` returns that sport, or the built-in sport for no
     set.
 - **Setup**:
-  - Step 1 gains a **Season** choice for football: the built-in season, then
-    each data set newest first.
+  - Step 1 always has a **Season** choice for football: the built-in season,
+    then each data set newest first, then **Add a season…** with its status
+    line, and **Known seasons**, a collapsed list of the 48 releases (latest
+    first) that links each to its forum download page and marks the ones
+    added. The Season list has its own classes (`.setup-season`), so
+    `.setup-theatre` still means a Theatre row.
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
   - Country maps are built from the built-in FM data, so the "One country" group
@@ -229,6 +281,13 @@ names the provider and reads "Game rating converted from CM current ability".
 - Seasons ending before 2002 need historic federations and are refused.
 - League detection uses stored competition names and CM0102Patcher's renames. A
   top division renamed some other way is reported missing, not guessed.
+- Add a season… builds on the page's main thread. With the padded test folder
+  (44 MB) it takes under a second; a real database has not been timed yet.
+- A season added in the browser lives in that browser profile only. A save
+  exported to another browser still resumes (saves are self-contained), but
+  Retry this setup there needs the season added again.
+- Browsers may clear IndexedDB under storage pressure; the game does not ask
+  for persistent storage.
 
 ## Invariants kept
 

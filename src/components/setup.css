@@ -185,31 +185,32 @@
   font:700 14px/1 var(--font-narrow); letter-spacing:.1em;
 }
 
-/* ---- Theatre list (board 02: 38px rows, name + count) ---- */
-.setup-theatres { display:flex; flex-direction:column; }
+/* ---- Theatre list (board 02: 38px rows, name + count); the Season list (football) shares its rows ---- */
+.setup-theatres, .setup-seasons { display:flex; flex-direction:column; }
 .setup-group--list .setup-kicker { margin-bottom:0; }
-.setup-theatre {
+.setup-theatre, .setup-season {
   display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0;
   height:var(--setup-row-h); min-height:var(--tap); padding:0 14px; margin:0;
   border:0; border-bottom:1px solid var(--row-rule); border-radius:0; background:transparent;
   text-align:left; cursor:pointer;
 }
-.setup-theatre:hover:not([aria-checked=true]) { background:var(--panel); }
-.setup-theatre[aria-checked=true] { background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); }
-.setup-theatre:focus-visible, .setup-team:focus-visible { outline-offset:-2px; }
+.setup-theatre:hover:not([aria-checked=true]), .setup-season:hover:not([aria-checked=true]) { background:var(--panel); }
+.setup-theatre[aria-checked=true], .setup-season[aria-checked=true] { background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); }
+.setup-theatre:focus-visible, .setup-season:focus-visible, .setup-team:focus-visible { outline-offset:-2px; }
 .setup-theatre__name {
   min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   font:600 16px/1.2 var(--font-narrow); color:var(--text-2);
 }
-.setup-theatre[aria-checked=true] .setup-theatre__name { color:var(--ink); }
+.setup-theatre[aria-checked=true] .setup-theatre__name, .setup-season[aria-checked=true] .setup-theatre__name { color:var(--ink); }
 .setup-theatre__count { flex:none; white-space:nowrap; font:400 14px/1 var(--font-narrow); color:var(--muted); }
 /* Footnote for a "*"-marked theatre ("Asia & Oceania*" → "AFC plus OFC — the whole east."), aligned with the row text. */
-.setup-theatres__note { margin:8px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
+.setup-theatres__note, .setup-season__note { margin:8px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
 
 /* One country's own top clubs (football clubs): the leagues and every shipped country make a long list, so it scrolls
    in its own box (block layout, so rows never shrink to fit) and the countries sit under a sticky group heading.
-   The chosen country's description, its map-load status and a failed load (with Retry) follow the list. */
-.setup-theatres[data-long] {
+   The chosen country's description, its map-load status and a failed load (with Retry) follow the list. A long
+   Season list scrolls the same way. */
+.setup-theatres[data-long], .setup-seasons[data-long] {
   display:block; max-height:var(--setup-list-h); overflow-y:auto; overscroll-behavior:contain;
   border-bottom:1px solid var(--rule); scrollbar-width:thin;
 }
@@ -219,9 +220,45 @@
   font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
 }
 .setup-theatres__note.setup-domestic__note { color:var(--text-2); }
-.setup-domestic__status { margin:6px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--text-2); }
-.rule-note.setup-domestic__error { margin-top:10px; background:var(--panel); box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule); }
-.rule-note.setup-domestic__error > svg { color:var(--loss); }
+.setup-domestic__status, .setup-season__status { margin:6px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--text-2); }
+.rule-note.setup-domestic__error, .rule-note.setup-season__error {
+  margin-top:10px; background:var(--panel); box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule);
+}
+.rule-note.setup-domestic__error > svg, .rule-note.setup-season__error > svg { color:var(--loss); }
+
+/* Season: Add a season… (and Remove for a season added in this browser), its status line (a live region, so it stays
+   mounted and takes no room while empty) and the known seasons, each linking to its download page. */
+.setup-season__actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; margin-top:12px; padding:0 14px; }
+.setup-season__status:empty { margin:0; }
+.setup-known { margin-top:12px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
+.setup-known > summary {
+  display:flex; align-items:center; gap:10px; min-height:max(44px, var(--tap)); padding:0 2px;
+  list-style:none; cursor:pointer;
+}
+.setup-known > summary::-webkit-details-marker { display:none; }
+.setup-known > summary > svg { flex:none; color:var(--ink); }
+.setup-known[open] > summary > svg { transform:rotate(180deg); }
+.setup-known__title { font:700 13px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--ink); white-space:nowrap; }
+.setup-known__values {
+  margin-left:auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:400 13px/1.3 var(--font-sans); color:var(--muted);
+}
+.setup-known > .setup-season__note { margin:0 0 8px; }
+.setup-known__list {
+  margin:0 0 12px; padding:0; list-style:none; max-height:var(--setup-list-h); overflow-y:auto; overscroll-behavior:contain;
+  border-top:1px solid var(--row-rule); scrollbar-width:thin;
+}
+.setup-known__row {
+  display:flex; align-items:baseline; gap:12px; min-width:0; padding:9px 14px; border-bottom:1px solid var(--row-rule);
+  font:400 13px/1.3 var(--font-sans); color:var(--muted);
+}
+.setup-known__link { flex:none; font:600 15px/1.3 var(--font-narrow); color:var(--you-text); text-decoration:none; }
+.setup-known__link:hover { text-decoration:underline; }
+.setup-known__provider { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.setup-known__added {
+  margin-left:auto; flex:none; font:700 11px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase;
+  color:var(--gain);
+}
 
 /* Step 1 map card: the theatre's opening board — each starting territory (a world theatre's nations or clubs, a
    country's sections) in its kick-off pastel over the land nobody holds. Static (no camera, labels or territory

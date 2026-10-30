@@ -28,8 +28,9 @@ const SPACE_IGNORE = 'input, select, textarea, button, summary, a[href], [role="
 const NO_TEAMS = Object.freeze([]);
 /** App's chosen-country map state when no country is chosen (`domesticStatus()` shape, without `onRetry`). */
 const IDLE_DOMESTIC = Object.freeze({ state: 'idle', message: null });
-/** App's Season state with no data sets listed or chosen (`seasonStatus()` shape, without `onRetry`). */
-const IDLE_SEASON = Object.freeze({ sets: NO_TEAMS, state: 'idle', message: null, sport: null });
+/** App's Season state with no data sets listed or chosen (`seasonStatus()` shape, without its handlers). */
+const IDLE_ADD = Object.freeze({ state: 'idle', message: null });
+const IDLE_SEASON = Object.freeze({ sets: NO_TEAMS, state: 'idle', message: null, sport: null, adding: IDLE_ADD });
 
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });
@@ -232,7 +233,8 @@ function theatreCaption(model, preview) {
  * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
  * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
- * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for football data sets.
+ * `season` is App's `seasonStatus()` ({ sets, state, message, sport, adding, onRetry, onAdd, onRemove }) for football
+ * data sets: `onAdd(files)` builds a chosen Data folder in the browser, `onRemove(id)` forgets a season added there.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
@@ -244,6 +246,7 @@ export default function SetupOverlay({
   const headings = useRef({});
   const nationList = useRef(null);
   const theatreList = useRef(null);
+  const folderInput = useRef(null);
   const navigated = useRef(false);
   const keepSaveButton = useRef(null);
   const clearSaveButton = useRef(null);
@@ -254,12 +257,13 @@ export default function SetupOverlay({
   // App passes a fresh `domestic` object (with a fresh `onRetry`) every render: the model keys on its values only.
   const mapState = domestic?.state || 'idle';
   const mapMessage = domestic?.message || null;
-  // Likewise `season`: its list and sport keep their identity until they change.
-  const { sets: seasonSets = NO_TEAMS, state: seasonState = 'idle', message: seasonMessage = null, sport: seasonSport = null } = season || IDLE_SEASON;
+  // Likewise `season`: its list, sport and import progress keep their identity until they change.
+  const { sets: seasonSets = NO_TEAMS, state: seasonState = 'idle', message: seasonMessage = null, sport: seasonSport = null,
+    adding: seasonAdding = IDLE_ADD } = season || IDLE_SEASON;
   const model = useMemo(() => setupModel.buildSetupModel(setup, {
     managerTeams, domestic: { state: mapState, message: mapMessage }, launching,
-    season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport },
-  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport]);
+    season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport, adding: seasonAdding },
+  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, seasonAdding]);
   const { rules } = model;
   const manager = model.role === 'manager';
   /** Football clubs also offer one country's own top clubs: a long, scrolling theatre list in two groups. */
@@ -528,31 +532,78 @@ export default function SetupOverlay({
                 </div>
               </div>
 
-              {/* Football seasons: only when a local data set is listed (or chosen), so the built-in setup is unchanged. */}
+              {/* Football seasons: the built-in one and those present, Add a season… and every database it knows. Its own
+                  classes, so `.setup-theatre` rows and notes stay the Theatre list's. */}
               {model.season ? (
                 <div className="setup-group setup-group--list">
                   <Kicker id="setup-season-label" title="Season" />
-                  <div className="setup-theatres" role="radiogroup" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
+                  <div className="setup-seasons" role="radiogroup" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
                     data-long={model.season.options.length > 5 ? '' : undefined}>
                     {model.season.options.map(option => (
                       <button type="button" role="radio" key={option.key} aria-checked={option.checked} tabIndex={option.checked ? 0 : -1}
-                        className="setup-theatre" data-name={option.label} aria-label={option.label}
+                        className="setup-season" data-name={option.label} aria-label={option.label}
                         onClick={() => choose('dataSet', option.id, model.season.id)} onKeyDown={moveRadio}>
                         <span className="setup-theatre__name">{option.season}</span>
                         <span className="setup-theatre__count">{option.source}</span>
                       </button>
                     ))}
                   </div>
-                  <p className="setup-theatres__note" id="setup-season-note">{model.season.note}</p>
-                  {model.season.state === 'loading' ? <p className="setup-domestic__status" role="status">{model.season.loading}</p> : null}
+                  <p className="setup-season__note" id="setup-season-note">{model.season.note}</p>
+                  {model.season.state === 'loading' ? (
+                    <p className="setup-season__status setup-season__loading" role="status">{model.season.loading}</p>
+                  ) : null}
                   {model.season.state === 'error' ? (
-                    <div className="rule-note setup-domestic__error" role="alert">
+                    <div className="rule-note setup-season__error" role="alert">
                       <Icon name="info" size={20} />
                       <p>{model.season.message}{' '}
                         <button type="button" className="btn-link rule-note__action" onClick={() => season?.onRetry?.()}>Retry</button>
                       </p>
                     </div>
                   ) : null}
+                  <div className="setup-season__actions">
+                    <button type="button" className="btn-secondary setup-season__add" disabled={model.season.addBusy}
+                      aria-busy={model.season.addBusy || undefined} onClick={() => folderInput.current?.click()}>Add a season…</button>
+                    {model.season.removable ? (
+                      <button type="button" className="btn-link setup-season__remove"
+                        onClick={() => season?.onRemove?.(model.season.removable.id)}>Remove from this browser</button>
+                    ) : null}
+                    {/* The folder picker behind Add a season… (any folder holding a CM 01/02 Data folder). */}
+                    <input type="file" ref={folderInput} className="setup-mirror" aria-hidden="true" tabIndex={-1}
+                      webkitdirectory="" directory="" multiple onChange={event => {
+                        const files = [...(event.target.files || [])];
+                        // Choosing the same folder again must fire again.
+                        event.target.value = '';
+                        if (files.length) season?.onAdd?.(files);
+                      }} />
+                  </div>
+                  {model.season.adding === 'error' ? (
+                    <div className="rule-note setup-season__error" role="alert">
+                      <Icon name="info" size={20} />
+                      <p>{model.season.addMessage}</p>
+                    </div>
+                  ) : null}
+                  <p className="setup-season__status setup-season__import" role="status">
+                    {model.season.adding === 'error' ? '' : model.season.addMessage}
+                  </p>
+                  <details className="setup-known">
+                    <summary>
+                      <Icon name="chevron" size={16} />
+                      <span className="setup-known__title">Known seasons</span>
+                      <small className="setup-known__values">{model.season.known.summary}</small>
+                    </summary>
+                    <p className="setup-season__note">{model.season.known.howTo}</p>
+                    <ul className="setup-known__list">
+                      {model.season.known.rows.map(row => (
+                        <li className="setup-known__row" key={row.id} data-added={row.added || undefined}>
+                          <a className="setup-known__link" href={row.url} target="_blank" rel="noreferrer">
+                            {row.season} · {row.release}<span className="sr-only"> (opens in a new tab)</span>
+                          </a>
+                          <span className="setup-known__provider">{row.provider}</span>
+                          {row.added ? <span className="setup-known__added">Added</span> : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
                   {/* Native mirror of the season radios, value-bound like `#setup-theatre` ('' is the built-in season). */}
                   <select id="setup-season" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={model.season.id ?? ''}
                     onChange={event => pick('dataSet', event.target.value || null)}>

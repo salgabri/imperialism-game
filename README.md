@@ -76,7 +76,7 @@ npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
-npm run test:football-sets # CM 01/02 parser, data set builder, loader, setup and saves
+npm run test:football-sets # CM 01/02 parser, data set builder, browser import, loader, setup and saves
 ```
 
 ## How a campaign plays
@@ -99,9 +99,11 @@ default suits a first campaign, so pressing Space three times starts one.
    length; its note names the Show matches mode the estimate assumes. With
    clubs in football, a second theatre group, **One country · top clubs**,
    starts a [domestic campaign](#domestic-campaigns), and its map shows that
-   country. When local [football seasons](#football-seasons) have been built, a
-   **Season** choice lists them after the built-in 2025/26.
-   A quick-resume card appears when a save exists.
+   country. Football also has a **Season** choice: the built-in 2025/26, then
+   every [football season](#football-seasons) added in this browser or built on
+   this computer. **Add a season…** reads a downloaded CM 01/02 Data folder,
+   and **Known seasons** links each of the 48 databases it can add to its
+   download page. A quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
@@ -671,16 +673,29 @@ every other source considered, back to 1872, and their terms.
 
 None of those databases grants redistribution, so seasons are **local** for now.
 Download a database from [champman0102.co.uk](https://www.champman0102.co.uk) (a
-free forum account is needed) into the ignored `data-src/cm0102/<folder>/`, then
-run:
+free forum account is needed) and extract it. Then add it in one of two ways:
 
-```bash
-npm run build:football-set -- --cm0102=data-src/cm0102/<folder>
-```
+- **In the game:** in setup, choose **Add a season…** under Season and pick the
+  database's Data folder (or a folder holding it). The browser reads the ten
+  files the parser needs, builds the season and keeps it in IndexedDB, so it
+  stays on this computer and nothing is uploaded. The new season is chosen at
+  once. **Remove from this browser** forgets an added season. Only the 48 known
+  releases can be added this way. Where the browser refuses IndexedDB, as some
+  private windows do, a season lasts until the page closes.
+- **From the command line:** put the database in the ignored
+  `data-src/cm0102/<folder>/` and run:
 
-The builder writes the season to the ignored `public/football/`, where setup
-finds it. The [permission requests](docs/design/football-year-permissions.md)
-ask the authors whether those files may be committed.
+  ```bash
+  npm run build:football-set -- --cm0102=data-src/cm0102/<folder>
+  ```
+
+  The builder writes the season to the ignored `public/football/`, where setup
+  finds it. It also takes a database it does not know, once you name its
+  season and date shift (`--label`, `--released`, `--url`, `--dob-shift`).
+
+Both ways run the same builder and make the same season. The
+[permission requests](docs/design/football-year-permissions.md) ask the authors
+whether those files may be committed.
 
 - **What the builder does:**
   - It identifies the release from its file sizes (48 known releases, each with
@@ -930,6 +945,11 @@ src/
   data/domesticTiers.js  each nation's club cap and the setup lists' priority order
   data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
   data/cmPlayers.js    CM player tuples, positions and rating conversion
+  data/footballSetBuild.js  CM 01/02 data set builder (pure; Node and browser)
+  data/cm0102Releases.js, cm0102Nations.js, footballFederations.js  its manifests:
+                       known releases, CM nation names, federations by year
+  data/footballSquad.js  eleven-player squad pick shared by the football builders
+  data/sha256.js       synchronous SHA-256 for the data set builder
   data/flags.js        nation id -> flag asset
   data/capitals.js     capital city coordinates
   hooks/               map zoom and pan viewport
@@ -943,6 +963,8 @@ src/
     liveMinute.js      live match minute store (outside saved state)
     domestic.js        loads and validates a country map: sections and club rows
     footballSets.js    loads and validates a football season; season-bound sport
+    localSets.js       seasons added in this browser (IndexedDB, else memory)
+    seasonImport.js    Add a season…: picks the Data folder, builds and keeps it
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
                        wizard, match card, dialogs and overlays

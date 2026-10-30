@@ -10,6 +10,7 @@ import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
 import { BUILT_IN_SEASON, fieldedNations } from '../../engine/footballSets.js';
+import { CM0102_RELEASES } from '../../data/cm0102Releases.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
 
@@ -299,20 +300,40 @@ export function domesticTheatres() {
 export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer && sport?.id === 'football' && dataSet == null;
 
 /** Copy under the Season choice: where the other seasons come from. */
-export const SEASON_NOTE = 'Other seasons are local data sets, built on this computer from your own copy of the database.';
+export const SEASON_NOTE = 'Add other seasons from a Championship Manager 01/02 database you have downloaded. Its files are '
+  + 'read in this browser, and the season stays on this computer.';
+/** The known seasons' lead: how to get one. */
+export const SEASON_HOW_TO = 'Download a database from its page on champman0102.co.uk (a free account), extract it, then '
+  + 'add its Data folder with the button above.';
 
 /**
  * The Season choice (docs/design/football-years.md): the built-in season, then each listed data set newest first, as
- * `{ id, key, season, source, label, checked }`. Null when there is nothing to choose, so the setup is unchanged
- * without data sets. `sport` names a chosen set the index no longer lists.
+ * `{ id, key, season, source, label, added, checked }`; `added` marks a season added in this browser. `sport` names
+ * a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
-  if (!sets.length && dataSet == null) return null;
-  const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
+  const row = (id, season, source, added = false) => ({ id, key: id ?? 'built-in', season, source, added,
     label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
-  const rows = [row(null, BUILT_IN_SEASON.season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
+  const rows = [row(null, BUILT_IN_SEASON.season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label, !!set.added))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
   return rows;
+}
+
+let knownRows = null;
+/**
+ * Every database Add a season… knows (src/data/cm0102Releases.js), latest release first, as `{ id, season, release,
+ * provider, url, added }`, plus a one-line summary.
+ */
+export function knownSeasons(sets = NO_ROWS) {
+  knownRows ||= Object.freeze(CM0102_RELEASES.map(({ id, season, label, provider, url }) => Object.freeze({ id, season, release: label, provider, url }))
+    .sort((a, b) => (a.id < b.id ? 1 : -1)));
+  const added = new Set(sets.filter(set => set.added).map(set => set.id));
+  const seasons = knownRows.map(row => row.season).sort();
+  const count = knownRows.filter(row => added.has(row.id)).length;
+  return {
+    rows: knownRows.map(row => ({ ...row, added: added.has(row.id) })),
+    summary: `${knownRows.length} databases · ${seasons[0]} to ${seasons.at(-1)}${count ? ` · ${count} added` : ''}`,
+  };
 }
 
 /** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
@@ -504,7 +525,8 @@ const PENDING_PREVIEW = Object.freeze({ matches: '–', duration: '–' });
  * (optional extras: `code`, `isClub`, `meta`, `players: [{ pos, name, rating }]`, `neighbours: [teamId]`).
  * `ctx.domestic` is App's load state of the chosen country map ({ state: idle | loading | ready | error, message });
  * `ctx.launching` is true while App prepares a country campaign after Launch. `ctx.season` is App's `seasonStatus()`:
- * the listed data sets and the chosen one's load state ({ sets, state, message, sport }), `sport` once it has loaded.
+ * the listed data sets, the chosen one's load state and Add a season…'s progress ({ sets, state, message, sport,
+ * adding }), `sport` once it has loaded.
  */
 export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
@@ -533,7 +555,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
   const showMatches = showMatchesOf(setup);
-  const seasonRows = seasonOptions(football && Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS, dataSet, sport);
+  const seasonSets = Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS;
+  const seasonRows = football ? seasonOptions(seasonSets, dataSet, sport) : null;
   const chosenSeason = seasonRows?.find(row => row.checked && row.id != null) || null;
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.
   const campaignSummary = `${sport.name} · ${clubLayer ? 'Clubs' : 'Nations'} · ${scopeName}${chosenSeason?.season ? ` · ${chosenSeason.season}` : ''}`;
@@ -546,6 +569,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const setName = chosenSeason?.source || dataSet;
   const setLoading = dataSet != null ? `Loading the ${setName} data set…` : '';
   const setFailed = dataSet != null ? `The ${setName} data set could not be loaded.` : '';
+  // Add a season… reads and builds (busy), then reports what it added or why it could not.
+  const adding = ['reading', 'building', 'done', 'error'].includes(seasonCtx.adding?.state) ? seasonCtx.adding.state : 'idle';
 
   const ranked = managerTeams.slice().sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name)));
   const rankOf = new Map(ranked.map((team, index) => [team.id, index + 1]));
@@ -599,6 +624,10 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     season: seasonRows ? {
       id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTE, loading: setLoading,
       message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',
+      adding, addBusy: adding === 'reading' || adding === 'building', addMessage: adding === 'idle' ? '' : seasonCtx.adding.message || '',
+      // Only a season added in this browser can be removed from it.
+      removable: seasonRows.find(row => row.checked && row.added) || null,
+      known: { ...knownSeasons(seasonSets), howTo: SEASON_HOW_TO },
     } : null,
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
     // `scopes` stays the league / region rows; countries are their own group (`domesticScopes`) after them.

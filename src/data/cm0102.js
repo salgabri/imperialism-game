@@ -225,6 +225,13 @@ export function decodeCmDate(date, shift = 0) {
   return `${pad(year, 4)}-${pad(monthDay.month)}-${pad(day)}`;
 }
 
+/**
+ * The files readCm0102 reads, as every known Data folder names them in index.dat. The rest of a folder (histories,
+ * stadiums, officials, ...) is never opened, so a browser import reads only these.
+ */
+export const CM_DATA_FILES = Object.freeze(['index.dat', 'continent.dat', 'nation.dat', 'club_comp.dat', 'nation_comp.dat',
+  'club.dat', 'first_names.dat', 'second_names.dat', 'common_names.dat', 'staff.dat']);
+
 /** What identifies a database: club.dat and staff.dat byte sizes, and the staff format flag. */
 export function fileSignature(files) {
   const byName = lowerCaseFiles(files);

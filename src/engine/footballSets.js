@@ -1,11 +1,13 @@
-// Football data sets: one dated database's nations and clubs, played instead of the built-in season. Loads a local
-// `public/football/<id>.json` (format 1, see docs/design/football-years.md), validates it strictly and exposes it as a
-// football sport bound to that season. The built-in data (src/data/rosters.js, clubs.football.js) never changes.
+// Football data sets: one dated database's nations and clubs, played instead of the built-in season. Loads a season
+// added in this browser (src/engine/localSets.js) or a local `public/football/<id>.json` (format 1, see
+// docs/design/football-years.md), validates it strictly and exposes it as a football sport bound to that season. The
+// built-in data (src/data/rosters.js, clubs.football.js) never changes.
 
 import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { football } from '../sports/football.js';
 import { getSport } from '../sports/index.js';
+import { getLocalSet, listLocalSets } from './localSets.js';
 
 export const FOOTBALL_SET_FORMAT = 1;
 /** The built-in data's season (EA FC 26 + FM 26). Year N is the season ending in N. */
@@ -35,9 +37,11 @@ export function clearFootballSetIndex() {
 }
 
 /**
- * The local data sets present, newest season first: `[{ id, version, year, season, label }]`, read once from
- * `football/index.json`. A missing or unreadable index means no sets; a listing that fails the checks is skipped
- * (each set file is validated in full when it loads).
+ * The data sets present, newest season first: `[{ id, version, year, season, label, added? }]`. Sets built on this
+ * computer are read once from `football/index.json`, where a missing or unreadable index means none. Seasons added in
+ * this browser are read on every call and carry `added: true`; one stands in for a file of the same id, as
+ * loadFootballSet reads it first. A listing that fails the checks is skipped (each set is validated in full when it
+ * loads).
  */
 export function loadFootballSetIndex({ baseUrl = '/', fetch: fetchImpl = globalThis.fetch } = {}) {
   index ||= (async () => {
@@ -48,8 +52,16 @@ export function loadFootballSetIndex({ baseUrl = '/', fetch: fetchImpl = globalT
       return [];
     }
   })();
-  return index;
+  return Promise.all([index, listLocalSets()]).then(([files, entries]) => {
+    const added = listing(entries).map(set => Object.freeze({ ...set, added: true }));
+    if (!added.length) return files;
+    const ids = new Set(added.map(set => set.id));
+    return Object.freeze([...added, ...files.filter(set => !ids.has(set.id))].sort(newestFirst));
+  });
 }
+
+// Ids carry the release month, so within a season the later release sorts first.
+const newestFirst = (a, b) => b.year - a.year || (a.id < b.id ? 1 : -1);
 
 function listing(data) {
   // The builder writes `{ format: 1, sets }`; an index of another format lists nothing this build can read.
@@ -60,8 +72,7 @@ function listing(data) {
   const valid = entries.filter(entry => entry && isFootballSetId(entry.id) && !seen.has(entry.id) && seen.add(entry.id)
     && isDataYear(entry.year) && entry.season === seasonOf(entry.year) && typeof entry.label === 'string' && entry.label.trim()
     && (entry.version == null || (typeof entry.version === 'string' && versionPattern(entry.id).test(entry.version))));
-  // Ids carry the release month, so within a season the later release sorts first.
-  return Object.freeze(valid.sort((a, b) => b.year - a.year || (a.id < b.id ? 1 : -1))
+  return Object.freeze(valid.sort(newestFirst)
     .map(({ id, version = null, year, season, label }) => Object.freeze({ id, version, year, season, label: label.trim() })));
 }
 
@@ -113,8 +124,9 @@ export function getLoadedFootballSet(id) {
 }
 
 /**
- * Fetch, validate and decode one data set. Resolves to `{ meta, rosters, clubs, territory }`; concurrent and repeated
- * calls share one request per id, and a failed load is not cached.
+ * Read, validate and decode one data set: the season added in this browser with that id, else its file. Resolves to
+ * `{ meta, rosters, clubs, territory }`; concurrent and repeated calls share one read per id, and a failed load is not
+ * cached.
  */
 export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalThis.fetch } = {}) {
   const key = String(id);
@@ -126,20 +138,13 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
   const entry = {};
   entry.promise = (async () => {
     if (!isFootballSetId(key)) throw new Error(`Unknown football data set "${key}"`);
-    if (typeof fetchImpl !== 'function') throw new Error('No fetch available to load football data sets');
-    let res;
-    try {
-      res = await fetchImpl(`${baseUrl}football/${key}.json`);
-    } catch (e) {
-      throw new Error(`Football data set ${key} failed to load: ${(e && e.message) || e}`);
-    }
-    if (!res || !res.ok) throw new Error(`Football data set ${key} failed to load (HTTP ${res?.status ?? '?'})`);
     let data;
     try {
-      data = await res.json();
+      data = await getLocalSet(key);
     } catch (e) {
-      throw new Error(`Football data set ${key} is not valid JSON: ${(e && e.message) || e}`);
+      throw new Error(`Football data set ${key} could not be read from this browser: ${(e && e.message) || e}`);
     }
+    if (data == null) data = await fetchSet(key, baseUrl, fetchImpl);
     entry.value = decodeFootballSet(data, key);
     if (cache.get(key) === entry) {
       touch(key, entry);
@@ -150,6 +155,25 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
   entry.promise.catch(() => { if (cache.get(key) === entry) cache.delete(key); });
   cache.set(key, entry);
   return entry.promise;
+}
+
+/** A set file built on this computer, parsed. */
+async function fetchSet(key, baseUrl, fetchImpl) {
+  if (typeof fetchImpl !== 'function') throw new Error('No fetch available to load football data sets');
+  let res;
+  try {
+    res = await fetchImpl(`${baseUrl}football/${key}.json`);
+  } catch (e) {
+    throw new Error(`Football data set ${key} failed to load: ${(e && e.message) || e}`);
+  }
+  // A season added in another browser, or removed from this one, has no file either.
+  if (res?.status === 404) throw new Error(`Football data set ${key} is not in this browser or among the sets built on this computer (HTTP 404)`);
+  if (!res || !res.ok) throw new Error(`Football data set ${key} failed to load (HTTP ${res?.status ?? '?'})`);
+  try {
+    return await res.json();
+  } catch (e) {
+    throw new Error(`Football data set ${key} is not valid JSON: ${(e && e.message) || e}`);
+  }
 }
 
 // ---------- decoding ----------

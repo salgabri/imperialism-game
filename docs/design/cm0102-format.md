@@ -1,7 +1,7 @@
 # CM 01/02 database format, as read
 
 Status: implemented 2026-10-24 in `src/data/cm0102.js` (reader) and
-`scripts/lib/football-set.mjs` (data set builder). The data sets themselves are
+`src/data/footballSetBuild.js` (data set builder). The data sets themselves are
 described in [football-years.md](football-years.md). This note records what the
 reader assumes, so that a file that breaks an assumption fails loudly instead of
 being half read.
@@ -81,7 +81,7 @@ year becomes the 28th.
 
 ## Identifying a database
 
-No file carries a version or season. `scripts/data/cm0102-databases.json` lists
+No file carries a version or season. `src/data/cm0102Releases.js` lists
 the 48 known releases by the byte sizes of `club.dat` and `staff.dat`, a pair
 that is unique across them (the club size alone collides once), with SHA-256
 digests where known, the season, release month, forum topic and shifts. SI's

@@ -21,6 +21,7 @@ import {
 } from '../src/engine/footballSets.js';
 import { campaignSnapshot, createCampaignId, exportCampaign, loadCampaign, parseCampaign, serializeCampaign, writeSave }
   from '../src/engine/storage.js';
+import { deleteLocalSet, memoryLocalSets, putLocalSet, useLocalSets } from '../src/engine/localSets.js';
 import { sourceLabel, sourceTitle } from '../src/viewModels/squad.js';
 import { bundleApp, bundleComponents } from './lib/app-harness.mjs';
 
@@ -92,7 +93,7 @@ const credited = (tuple, source = SOURCE) => {
   const [name, pos, rating, info] = expandCmTuple(tuple, source);
   return [name, pos, rating, { ...info, provider: source.provider }];
 };
-const fresh = () => { clearFootballSetCache(); clearFootballSetIndex(); retainFootballSets([]); };
+const fresh = () => { clearFootballSetCache(); clearFootballSetIndex(); retainFootballSets([]); useLocalSets(memoryLocalSets()); };
 
 // ---------- decoding and validation ----------
 
@@ -217,7 +218,8 @@ test('one shared request per data set; a failed load is not cached and can be re
   assert.equal(await loadFootballSet(ID, { baseUrl: '/base/', fetch }), a, 'a loaded set is reused');
   assert.equal(calls.length, 1);
 
-  await assert.rejects(loadFootballSet('cm0102-2003-05', { baseUrl: '/base/', fetch }), /failed to load \(HTTP 404\)/);
+  await assert.rejects(loadFootballSet('cm0102-2003-05', { baseUrl: '/base/', fetch }),
+    /cm0102-2003-05 is not in this browser or among the sets built on this computer \(HTTP 404\)/);
   files['/base/football/cm0102-2003-05.json'] = syntheticSet({ id: 'cm0102-2003-05', year: 2003 });
   assert.equal((await loadFootballSet('cm0102-2003-05', { baseUrl: '/base/', fetch })).meta.year, 2003, 'retried after a failure');
   await assert.rejects(loadFootballSet('../rosters', { fetch }), /Unknown football data set/);
@@ -232,6 +234,59 @@ test('one shared request per data set; a failed load is not cached and can be re
   clearFootballSetCache(ID);
   assert.equal(getLoadedFootballSet(ID), null);
   assert.notEqual(await loadFootballSet(ID, { baseUrl: '/base/', fetch }), a, 'a cleared set loads again');
+});
+
+test('seasons added in this browser are listed with the built ones, marked added, and stand in for a file of their id', async () => {
+  fresh();
+  const may = syntheticSet({ id: 'cm0102-2026-05', year: 2026, label: 'CM 01/02 · May 2026' });
+  const file = { ...entryOf(SET), label: 'CM 01/02 · Test 2002 (file)' };
+  const { fetch, calls } = fakeFetch({ '/football/index.json': { format: 1, sets: [file] } });
+  await putLocalSet(may);
+  await putLocalSet(SET);
+  const index = await loadFootballSetIndex({ fetch });
+  assert.deepEqual(index.map(set => [set.id, set.label, set.added ?? false]),
+    [['cm0102-2026-05', 'CM 01/02 · May 2026', true], [ID, 'CM 01/02 · Test 2002', true]], 'the browser\'s copy, not the file\'s');
+  assert.ok(Object.isFrozen(index) && index.every(Object.isFrozen));
+
+  // Each call reads the browser's seasons again; the file index is still read once.
+  await deleteLocalSet(ID);
+  assert.deepEqual((await loadFootballSetIndex({ fetch })).map(set => [set.id, set.label, set.added ?? false]),
+    [['cm0102-2026-05', 'CM 01/02 · May 2026', true], [ID, 'CM 01/02 · Test 2002 (file)', false]]);
+  await deleteLocalSet('cm0102-2026-05');
+  const files = await loadFootballSetIndex({ fetch });
+  assert.deepEqual(files, [{ id: ID, version: SET.version, year: 2002, season: '2001/02', label: 'CM 01/02 · Test 2002 (file)' }]);
+  assert.equal(await loadFootballSetIndex({ fetch }), files, 'with none added, the file listing keeps its identity');
+  assert.deepEqual(calls, ['/football/index.json']);
+
+  // A listing the browser holds is checked like a file's.
+  await putLocalSet({ ...may, id: '../evil' });
+  assert.deepEqual((await loadFootballSetIndex({ fetch })).map(set => set.id), [ID]);
+});
+
+test('a season added in this browser loads with no request; once removed, the file of that id loads', async () => {
+  fresh();
+  const { fetch, calls } = fakeFetch({ '/football/cm0102-2002-05.json': SET });
+  const added = { ...structuredClone(SET), label: 'CM 01/02 · Test 2002 (added)' };
+  added.version = `${ID}-${hash(added)}`;
+  await putLocalSet(added);
+  const set = await loadFootballSet(ID, { fetch });
+  assert.equal(set.meta.label, 'CM 01/02 · Test 2002 (added)');
+  assert.deepEqual(calls, [], 'read from this browser');
+  assert.equal(await loadFootballSet(ID, { fetch: undefined }), set, 'a loaded set needs no fetch');
+
+  await deleteLocalSet(ID);
+  clearFootballSetCache(ID);
+  assert.equal((await loadFootballSet(ID, { fetch })).meta.label, 'CM 01/02 · Test 2002');
+  assert.deepEqual(calls, ['/football/cm0102-2002-05.json']);
+
+  // An added copy the loader would refuse is refused, never half read; a store that cannot be read says so.
+  clearFootballSetCache(ID);
+  await putLocalSet({ ...structuredClone(SET), version: ID });
+  await assert.rejects(loadFootballSet(ID, { fetch }), /Football data set cm0102-2002-05: version "cm0102-2002-05" must look like/);
+  clearFootballSetCache(ID);
+  useLocalSets({ ...memoryLocalSets(), get: async () => { throw new Error('quota'); } });
+  await assert.rejects(loadFootballSet(ID, { fetch }), /cm0102-2002-05 could not be read from this browser: quota/);
+  assert.equal(calls.length, 1);
 });
 
 test('a small LRU keeps the retained set and the most recently used others', async () => {
