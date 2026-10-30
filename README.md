@@ -75,8 +75,9 @@ npm run sync:domestic-clubs # refresh country club snapshots (network, cached)
 npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
+npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
-npm run test:football-sets # CM 01/02 parser, data set builder, browser import, loader, setup and saves
+npm run test:football-sets # EA seasons, CM 01/02 parser and builder, loader, setup and saves
 ```
 
 ## How a campaign plays
@@ -100,10 +101,9 @@ default suits a first campaign, so pressing Space three times starts one.
    clubs in football, a second theatre group, **One country · top clubs**,
    starts a [domestic campaign](#domestic-campaigns), and its map shows that
    country. Football also has a **Season** choice: the built-in 2025/26, then
-   every [football season](#football-seasons) added in this browser or built on
-   this computer. **Add a season…** reads a downloaded CM 01/02 Data folder,
-   and **Known seasons** links each of the 48 databases it can add to its
-   download page. A quick-resume card appears when a save exists.
+   the [earlier seasons](#football-seasons) 2023/24 back to 2014/15 (EA FIFA
+   ratings of each), and any local CM 01/02 season built on this computer. A
+   quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
@@ -665,39 +665,52 @@ fitting and the file additions.
 
 ## Football seasons
 
-Football can also be played on an earlier (or later) season, built from a
-Championship Manager 01/02 database. The CM 01/02 community has updated the
-freeware game every season since 2001, so one database format covers 2001/02 to
-2025/26. The [sources note](docs/design/football-year-sources.md) compares
-every other source considered, back to 1872, and their terms.
+Football can be played on ten earlier seasons as well as the built-in 2025/26:
+2014/15 to 2023/24, each from EA's FIFA (FIFA 15 to EA FC 24) launch roster of
+that season. They ship with the game: pick one under **Season** in setup. Each
+is a file in `public/football/` (about 310 KB) that loads only when chosen.
 
-None of those databases grants redistribution, so seasons are **local** for now.
-Download a database from [champman0102.co.uk](https://www.champman0102.co.uk) (a
-free forum account is needed) and extract it. Then add it in one of two ways:
-
-- **In the game:** in setup, choose **Add a season…** under Season and pick the
-  database's Data folder (or a folder holding it). The browser reads the ten
-  files the parser needs, builds the season and keeps it in IndexedDB, so it
-  stays on this computer and nothing is uploaded. The new season is chosen at
-  once. **Remove from this browser** forgets an added season. Only the 48 known
-  releases can be added this way. Where the browser refuses IndexedDB, as some
-  private windows do, a season lasts until the page closes.
-- **From the command line:** put the database in the ignored
-  `data-src/cm0102/<folder>/` and run:
+- **What a season holds:** every nation's best natural XI by EA nationality,
+  and the clubs of the seven leagues the club layer uses, picked by EA's
+  competition id (132–134 clubs a season). Ratings are EA's overalls,
+  unchanged. EA rates only part of the world, so 70–79 nations field a full XI
+  each season and the rest field the players they have, as an empty or thin
+  built-in nation does. Scotland, Wales, Northern Ireland and other places with
+  no shape on the map have no team; their players still play for their clubs.
+- **Source:** one Kaggle export of every FIFA 15 – EA FC 24 launch roster
+  (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
+  labelled CC0 by its compiler; EA's own rights are not cleared, as for the
+  built-in EA FC 26 data). `scripts/data/ea-seasons.json` pins its SHA-256. To
+  rebuild, download it into the ignored `data-src/ea-leone/`, unzip it and run:
 
   ```bash
-  npm run build:football-set -- --cm0102=data-src/cm0102/<folder>
+  npm run build:ea-seasons
   ```
 
-  The builder writes the season to the ignored `public/football/`, where setup
-  finds it. It also takes a database it does not know, once you name its
-  season and date shift (`--label`, `--released`, `--url`, `--dob-shift`).
+  It writes the season files, their listing `src/data/footballSeasons.js` and
+  `docs/design/football-seasons-audit.json`, and every file rebuilds byte for
+  byte.
 
-Both ways run the same builder and make the same season. The
+Seasons before 2014/15 have no EA source. They can come from a Championship
+Manager 01/02 database, which covers 2001/02 to 2025/26 but whose authors have
+not allowed redistribution, so those seasons stay **local**. Download a database
+from [champman0102.co.uk](https://www.champman0102.co.uk) (a free forum account
+is needed) into the ignored `data-src/cm0102/<folder>/`, then run:
+
+```bash
+npm run build:football-set -- --cm0102=data-src/cm0102/<folder>
+```
+
+The builder writes the season to `public/football/` (those files are ignored),
+where setup lists it beside the built-in ones. It also takes a database it does
+not know, once you name its season and date shift (`--label`, `--released`,
+`--url`, `--dob-shift`). The
 [permission requests](docs/design/football-year-permissions.md) ask the authors
-whether those files may be committed.
+whether those files may be committed, and the
+[sources note](docs/design/football-year-sources.md) compares every other source
+considered, back to 1872, and their terms.
 
-- **What the builder does:**
+- **What the CM 01/02 builder does:**
   - It identifies the release from its file sizes (48 known releases, each with
     its season, author, forum topic and date shifts) and refuses seasons ending
     before 2002.
@@ -713,8 +726,8 @@ whether those files may be committed.
   member by the end of the season. Montenegro is held by Serbia until 2006, New
   Caledonia by France until 2003 and South Sudan by Sudan until 2011. Timor-Leste
   until 2005 and Kosovo until 2015 stay neutral.
-- **Saves are self-contained:** players are packed as compact CM tuples, so a
-  season campaign resumes or imports without its data set.
+- **Saves are self-contained:** players are packed as compact EA or CM tuples,
+  so a season campaign resumes or imports without its season file.
 
 The [design notes](docs/design/football-years.md) give the file format, the
 runtime, the saves and the known limits.
@@ -945,6 +958,8 @@ src/
   data/domesticTiers.js  each nation's club cap and the setup lists' priority order
   data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
   data/cmPlayers.js    CM player tuples, positions and rating conversion
+  data/eaPlayers.js    EA player tuples of the built-in earlier seasons
+  data/footballSeasons.js  GENERATED listing of the earlier seasons (npm run build:ea-seasons)
   data/footballSetBuild.js  CM 01/02 data set builder (pure; Node and browser)
   data/cm0102Releases.js, cm0102Nations.js, footballFederations.js  its manifests:
                        known releases, CM nation names, federations by year
@@ -962,9 +977,7 @@ src/
     winProbability.js  live win-probability model (football and basketball)
     liveMinute.js      live match minute store (outside saved state)
     domestic.js        loads and validates a country map: sections and club rows
-    footballSets.js    loads and validates a football season; season-bound sport
-    localSets.js       seasons added in this browser (IndexedDB, else memory)
-    seasonImport.js    Add a season…: picks the Data folder, builds and keeps it
+    footballSets.js    lists, loads and validates football seasons; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
                        wizard, match card, dialogs and overlays
@@ -991,6 +1004,7 @@ scripts/
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
   build-nba-map.mjs    builds the NBA's map of the USA and Canada from the arenas
   sync-club-logos.mjs  vendors club crests from Wikipedia
+  build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
 ```
 

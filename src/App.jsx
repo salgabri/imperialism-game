@@ -8,10 +8,8 @@ import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { clubMapScope, domesticEntry, domesticLabel } from './data/domesticScope.js';
-import { clearFootballSetCache, fieldedNations, footballSport, getLoadedFootballSet, heldShapes, loadFootballSet,
+import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, footballSport, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, sportOf } from './engine/footballSets.js';
-import { deleteLocalSet } from './engine/localSets.js';
-import { CM0102_RELEASES } from './data/cm0102Releases.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
@@ -65,7 +63,6 @@ const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
 // and ~770 above and below on a phone.
 const BACKDROP_MARGIN = { x: 480, y: 800 };
 const SETUP_LOAD_DELAY_MS = 120;
-const IDLE_SEASON_ADD = Object.freeze({ state: 'idle', message: null });
 
 /** The page's fetch; tests and Node have only the global one. */
 const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : globalThis.fetch);
@@ -172,11 +169,10 @@ export default class App extends React.Component {
     // launch being prepared (UI-only: campaignSnapshot whitelists its keys, so none of these reach a save).
     domesticLoad: { id: null, state: 'idle', message: null },
     restoring: null, launching: false,
-    // The local football data sets on offer and the setup's chosen one loading (UI-only, like the country map's), and
-    // Retry this setup loading a data set campaign's set: { elimination, state: 'loading' | 'error', message }.
-    footballSets: [], footballSetLoad: { id: null, state: 'idle', message: null }, retrySetup: null,
-    // Add a season… and Remove: { state: 'idle' | 'reading' | 'building' | 'done' | 'error', message }.
-    seasonAdd: IDLE_SEASON_ADD,
+    // The football seasons on offer (the built-in earlier ones, then any CM 01/02 sets built on this computer) and the
+    // setup's chosen one loading (UI-only, like the country map's), and Retry this setup loading a season campaign's
+    // set: { elimination, state: 'loading' | 'error', message }.
+    footballSets: BUILT_IN_SETS, footballSetLoad: { id: null, state: 'idle', message: null }, retrySetup: null,
   };
 
   engagement = new SessionEngagement();
@@ -569,58 +565,20 @@ export default class App extends React.Component {
   }
 
   /**
-   * Football setups offer the data sets present (docs/design/football-years.md): built on this computer, or added in
-   * this browser. They are listed once, in the background, and again after `refresh` (an import or a removal); with
-   * none the Season choice holds the built-in season alone. Resolves when the read is done.
+   * Football setups offer the built-in earlier seasons and any CM 01/02 sets built on this computer
+   * (docs/design/football-years.md). The local index is read once, in the background; without one the built-in
+   * seasons stand alone. Resolves when the read is done.
    */
-  requestSeasons(refresh = false) {
-    if (refresh) this.seasonIndex = null;
+  requestSeasons() {
     if (getSport(this.state.setup.sport).id !== 'football') return null;
     this.seasonIndex ||= loadFootballSetIndex({ baseUrl: import.meta.env.BASE_URL, fetch: pageFetch() })
-      .then(sets => { if (sets.length || this.state.footballSets.length) this.setState({ footballSets: sets }); });
+      .then(sets => { if (sets !== this.state.footballSets) this.setState({ footballSets: sets }); });
     return this.seasonIndex;
   }
 
-  /**
-   * Add a season…: build the chosen CM 01/02 Data folder in this browser and keep it there (engine/seasonImport.js,
-   * loaded only now, so its reader and builder stay out of the main bundle), then list it and choose it. One import at
-   * a time; each stage and the outcome go to the Season choice's status line.
-   */
-  addSeason(files) {
-    if (this.seasonAdding) return this.seasonAdding;
-    const report = (state, message) => this.setState({ seasonAdd: { state, message } });
-    report('reading', 'Reading the Data folder…');
-    this.seasonAdding = import('./engine/seasonImport.js')
-      .then(({ importSeason, importedMessage }) => importSeason(files, { onProgress: ({ state, message }) => report(state, message) })
-        .then(result => {
-          clearFootballSetCache(result.doc.id);
-          return Promise.resolve(this.requestSeasons(true)).then(() => {
-            report('done', importedMessage(result));
-            if (this.state.phase === 'setup' && getSport(this.state.setup.sport).id === 'football') this.pickSetup('dataSet', result.doc.id);
-          });
-        }))
-      .catch(error => report('error', `The season could not be added. ${(error && error.message) || error}`))
-      .finally(() => { this.seasonAdding = null; });
-    return this.seasonAdding;
-  }
-
-  /** Forget a season added in this browser. A setup that had it chosen goes back to the built-in season. */
-  removeSeason(id) {
-    const set = this.state.footballSets.find(item => item.id === id);
-    const name = set ? `${set.season} · ${set.label}` : this.setName(id);
-    return deleteLocalSet(id).then(() => {
-      clearFootballSetCache(id);
-      if (dataSetOf(this.state.setup) === id) this.pickSetup('dataSet', null);
-      return this.requestSeasons(true);
-    }).then(() => this.setState({ seasonAdd: { state: 'done', message: `Removed ${name} from this browser.` } }),
-      error => this.setState({ seasonAdd: { state: 'error', message: `${name} could not be removed. ${(error && error.message) || error}` } }));
-  }
-
-  /** A data set's name for messages: its listed label ("CM 01/02 · May 2026"), a known release's, else its id. */
+  /** A season's name for messages: its listed label ("FIFA 18", "CM 01/02 · May 2026"), else its id. */
   setName(id) {
-    const release = CM0102_RELEASES.find(item => item.id === id);
-    return this.state.footballSets.find(set => set.id === id)?.label || getLoadedFootballSet(id)?.meta.label
-      || (release ? `CM 01/02 · ${release.label}` : id);
+    return this.state.footballSets.find(set => set.id === id)?.label || getLoadedFootballSet(id)?.meta.label || id;
   }
 
   /**
@@ -647,7 +605,7 @@ export default class App extends React.Component {
           ...(clubScope !== state.setup.clubScope ? { setup: { ...state.setup, clubScope, managedTeamId: '' } } : {}) };
       });
     }, error => {
-      if (current()) this.setState({ footballSetLoad: { id, state: 'error', message: `The ${this.setName(id)} data set could not be loaded. ${error.message || error}` } });
+      if (current()) this.setState({ footballSetLoad: { id, state: 'error', message: `The ${this.setName(id)} season could not be loaded. ${error.message || error}` } });
     }), SETUP_LOAD_DELAY_MS);
   }
 
@@ -659,16 +617,15 @@ export default class App extends React.Component {
   }
 
   /**
-   * What the setup's Season choice shows: the listed data sets, the chosen one's state (idle, loading, ready or
-   * error) with its season-bound sport once loaded, and Add a season…'s progress (`adding`). Render-safe: no setState.
+   * What the setup's Season choice shows: the listed data sets, and the chosen one's state (idle, loading, ready or
+   * error) with its season-bound sport once loaded. Render-safe: no setState.
    */
   seasonStatus(setup = this.state.setup) {
     const id = dataSetOf(setup), load = this.state.footballSetLoad;
     const loaded = id ? getLoadedFootballSet(id) : null;
     const failed = !loaded && load?.id === id && load.state === 'error';
     return { sets: this.state.footballSets, state: !id ? 'idle' : loaded ? 'ready' : failed ? 'error' : 'loading',
-      message: failed ? load.message : null, sport: loaded ? footballSport(loaded) : null, adding: this.state.seasonAdd,
-      onRetry: () => this.retrySet(), onAdd: files => this.addSeason(files), onRemove: setId => this.removeSeason(setId) };
+      message: failed ? load.message : null, sport: loaded ? footballSport(loaded) : null, onRetry: () => this.retrySet() };
   }
 
   /** Display name of a territory: a country map's section, else a nation or dependency. */
@@ -1030,7 +987,7 @@ export default class App extends React.Component {
       // As with a country map: the setup screen waits for the data set, a retried setup loads it first.
       const name = this.setName(dataSet);
       return this.loadSet(dataSet).then(() => token === this.flowToken && this.startCampaign(), error => {
-        if (token === this.flowToken) this.setState({ saveStatus: { ok: false, message: `The ${name} data set could not be loaded, so this setup cannot start. ${error.message || error}` } });
+        if (token === this.flowToken) this.setState({ saveStatus: { ok: false, message: `The ${name} season could not be loaded, so this setup cannot start. ${error.message || error}` } });
       });
     }
     const seed = this.setupSeed(su);
@@ -1239,8 +1196,6 @@ export default class App extends React.Component {
     this.showSetupSet();
     this.setState({
       phase: 'setup',
-      // Add a season…'s last outcome belongs to the visit it was made in.
-      ...(this.seasonAdding ? {} : { seasonAdd: IDLE_SEASON_ADD }),
       confirmNew: false,
       autoplay: false,
       match: null,
@@ -1277,10 +1232,10 @@ export default class App extends React.Component {
       const token = ++this.flowToken, name = this.setName(dataSet);
       // Gone once the player has followed the remaining teams instead, or another campaign has opened.
       const current = () => token === this.flowToken && this.state.managerElimination === elimination;
-      this.setState({ retrySetup: { elimination, state: 'loading', message: `Loading the ${name} data set…` } });
+      this.setState({ retrySetup: { elimination, state: 'loading', message: `Loading the ${name} season…` } });
       return this.loadSet(dataSet).then(() => current() && this.retryManager(), error => {
         if (current()) this.setState({ retrySetup: { elimination, state: 'error',
-          message: `This setup needs the ${name} data set, which could not be loaded. ${error.message || error}` } });
+          message: `This setup needs the ${name} season, which could not be loaded. ${error.message || error}` } });
       });
     }
     this.clearTimers();
