@@ -9,5 +9,7 @@ FM26 Season Update*/
 data-src/
 
 # Football data sets built from CM 01/02 databases (npm run build:football-set) stay
-# local until the database authors allow redistribution: docs/design/football-year-permissions.md
-public/football/
+# local until the database authors allow redistribution: docs/design/football-year-permissions.md.
+# The built-in EA seasons beside them (public/football/ea-*.json, npm run build:ea-seasons) are committed.
+public/football/cm0102-*
+public/football/index.json

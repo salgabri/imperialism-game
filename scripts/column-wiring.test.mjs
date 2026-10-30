@@ -8,7 +8,7 @@ import { reachableTargets } from '../src/engine/turns.js';
 import { winChanceFor } from '../src/viewModels/odds.js';
 import { formatWinChance, winTone } from '../src/viewModels/format.js';
 import { teamEff } from '../src/data/teams.js';
-import { empireFill } from '../src/theme.js';
+import { politicalFill } from '../src/data/empireColours.js';
 
 await bundleApp();
 
@@ -201,7 +201,7 @@ test('map key: the followed empire swatch matches its map fill in every mode, or
       const fill = app.mapCountries().countries.find(country => country.id === '250').fill;
       if (mapMode === 'political') assert.equal(you.color, fill, 'political: the pastel the map paints');
       else {
-        if (mapMode !== 'flags') assert.notEqual(fill, empireFill('250'), `${mapMode}: the map does not paint the pastel`);
+        if (mapMode !== 'flags') assert.notEqual(fill, politicalFill('250'), `${mapMode}: the map does not paint the pastel`);
         assert.equal(you.color, null, `${mapMode}: so the key shows the outline alone`);
       }
       assert.deepEqual(you.ring, { color: 'var(--ink)', width: 1.4 });

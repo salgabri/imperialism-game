@@ -15,12 +15,14 @@ Pick your sport at kick-off:
 
 And pick who fights:
 
-- **Nations** — 170 national teams, each starting on its own homeland.
+- **Nations** — 173 national teams, each starting on its own homeland. England,
+  Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
 - **Clubs** — 132 football clubs from seven European leagues, or all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada. Real Madrid
   annexes territory exactly the way Spain does.
-- **One country's clubs** — a country's top football clubs (up to 100) on that
-  country's own map, split into 100 sections ([domestic campaigns](#domestic-campaigns)).
+- **One country's clubs** — a country's top football clubs (100 for the biggest
+  leagues, fewer for smaller ones) on that country's own map, split into 100
+  sections ([domestic campaigns](#domestic-campaigns)).
 
 Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
@@ -74,8 +76,9 @@ npm run sync:domestic-clubs # refresh country club snapshots (network, cached)
 npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
+npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
-npm run test:football-sets # CM 01/02 parser, data set builder, loader, setup and saves
+npm run test:football-sets # EA seasons, CM 01/02 parser and builder, loader, setup and saves
 ```
 
 ## How a campaign plays
@@ -88,7 +91,7 @@ default suits a first campaign, so pressing Space three times starts one.
 
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
-   choices are the whole world (170 nations), another confederation, or the
+   choices are the whole world (173 nations), another confederation, or the
    Elite 32. Football club campaigns offer individual leagues, all leagues, or
    the strongest 32 available clubs; basketball clubs play the NBA on its own
    map of the USA and Canada. The step opens on a map of the chosen theatre:
@@ -98,9 +101,10 @@ default suits a first campaign, so pressing Space three times starts one.
    length; its note names the Show matches mode the estimate assumes. With
    clubs in football, a second theatre group, **One country · top clubs**,
    starts a [domestic campaign](#domestic-campaigns), and its map shows that
-   country. When local [football seasons](#football-seasons) have been built, a
-   **Season** choice lists them after the built-in 2025/26.
-   A quick-resume card appears when a save exists.
+   country. Football also has a **Season** choice: the built-in 2025/26, then
+   the [earlier seasons](#football-seasons) 2023/24 back to 2014/15 (EA FIFA
+   ratings of each), and any local CM 01/02 season built on this computer. A
+   quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
@@ -256,7 +260,7 @@ Map modes:
 
 | Mode | Shows |
 | --- | --- |
-| **Political** (default) | A flat pastel per empire, picked by a hash of the team id. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
+| **Political** (default) | A flat pastel of each empire's own colour: a nation's colour (England, Poland and Finland, who play in white, take their flag's), a club's crest colour (`npm run build:club-colours`, corrected in `scripts/data/club-colours.json`). White and black teams are grey, and one of three lightness steps by team id keeps same-coloured neighbours apart. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
 | **Strength** | Five grey steps by strength percentile; your empire keeps its colour. |
 | **Fronts** | Your fronts tinted by your win chance (green / amber / red); other land is neutral. |
 | **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours. |
@@ -386,7 +390,7 @@ Game ratings use a 1–99 display range, with the original source values retaine
 **Football** — `src/data/rosters.js` combines the committed EA FC 26 update 4
 snapshot (19 September 2025; 18,405 records) with Football Manager 26 database
 26.3.0 from [EFEM.club](https://efem.club/players), retrieved on 2 October 2026.
-All **170 nations field eleven source-backed players**, with natural coverage for
+All **173 nations field eleven source-backed players**, with natural coverage for
 a 4-4-2. The builder prioritises unchanged EA overall ratings and uses FM to fill
 coverage gaps. It retains database IDs, full/display names, all natural roles,
 source URLs, versions, dates and original ratings through transfers and saves.
@@ -492,25 +496,30 @@ from its whole roster.
 
 ## Domestic campaigns
 
-With **Clubs** and football, the Theatre list has a second group, **One country ·
-top clubs**. Pick a country and its top clubs fight over that country alone: 100
-of them, or fewer where the database has fewer viable sides (a country ships with
-at least two; every club is real). The map is always split into 100 sections,
-built from the country's real administrative divisions. Each club starts on the
-section around its home town; with fewer than 100 clubs it also starts on the
-sections around that one, a group of 100/N rounded down or up (the stronger clubs
-take the extra ones where they have room), so Fiji's 16 clubs start with 6 or 7
-sections each and Belize's two with 50. Conquest is unchanged: the winner annexes
-everything the loser holds and claims one player, so a starting group always
-changes hands whole. Every section is held from kick-off, so there is no neutral
-land and no transit treaty. Neighbouring
+With **Clubs** and football, the Theatre list has a second group, **One country
+· top clubs**, listed biggest leagues first. Pick a country and its top clubs
+fight over that country alone. How many depends on the league's tier
+(`src/data/domesticTiers.js`): 100 for England, Spain, Germany, Italy, France,
+Turkey, Brazil and Argentina; 60 for strong leagues such as Portugal, the
+Netherlands and Japan; 40 for established ones such as Austria, Croatia and
+Colombia; 24 for smaller leagues; 16 for the smallest nations. A country with
+fewer viable sides plays with all of them (Mexico 58, the United States 81; a
+country ships with at least two, and every club is real). The map is always
+split into 100 sections, built from the country's real administrative divisions.
+Each club starts on the section around its home town; with fewer than 100 clubs
+it also starts on the sections around that one, a group of 100/N rounded down or
+up (the stronger clubs take the extra ones where they have room), so Fiji's 16
+clubs start with 6 or 7 sections each and Belize's two with 50. Conquest is
+unchanged: the winner annexes everything the loser holds and claims one player,
+so a starting group always changes hands whole. Every section is held from
+kick-off, so there is no neutral land and no transit treaty. Neighbouring
 countries are drawn as muted land beneath the map. They are never territory, but
 attacks go around them, by sea if need be; only an exclave (Nakhchivan, Gaza,
-Kaliningrad) may have to cross one, labelled "Crossing foreign territory". Attack
-routes start from a point well inside each section (the home town when it is
-clear of the border), while the home marker shows the town itself. Tooltips and
-conquest results use section names, such as "Lancashire (east)", where Burnley
-starts.
+Kaliningrad) may have to cross one, labelled "Crossing foreign territory".
+Attack routes start from a point well inside each section (the home town when it
+is clear of the border), while the home marker shows the town itself. Tooltips
+and conquest results use section names, such as "Lancashire (east)", where
+Burnley starts.
 
 In the v4 interface, choosing **Clubs** in setup step 1 adds the **One country ·
 top clubs** group below the leagues (football only). Picking a country shows a
@@ -561,7 +570,7 @@ from these services at runtime.
 - **Home towns**: manual overrides in `scripts/data/domestic-locations.json`, then
   Wikidata (CC0), then GeoNames `cities1000` (CC BY 4.0). Each club records which
   one placed it. Some overrides are region-level (marked "approximate:"), and the
-  87 clubs with no known home start at a populous place no other club holds
+  38 clubs with no known home start at a populous place no other club holds
   (`homeSource` `placed:<geonameid>`, an estimate).
 - **Boundaries**: [geoBoundaries](https://www.geoboundaries.org) gbOpen layers,
   pinned to one commit, with Natural Earth admin-1 (public domain) as a fallback;
@@ -573,8 +582,8 @@ from these services at runtime.
 
 `public/domestic/ATTRIBUTION.txt` is generated with every build and lists each
 country's boundary source and licence, its cuts and fills, plus the GeoNames,
-Wikidata and EFEM notes. 163 of the game's 170 nations ship, with 6,364 clubs (22
-countries have 100, nine have two); the maps total 23.9 MB (34–250 KB each), and
+Wikidata and EFEM notes. 163 of the game's 173 nations ship, with 4,343 clubs (8
+countries have 100, nine have two); the maps total 22.1 MB (34–250 KB each), and
 a session fetches only the one chosen. Sri Lanka, Cuba, Eritrea, Afghanistan,
 the Bahamas, Namibia and Sierra Leone have fewer than two viable clubs, so they
 do not ship.
@@ -661,32 +670,59 @@ fitting and the file additions.
 
 ## Football seasons
 
-Football can also be played on an earlier (or later) season, built from a
-Championship Manager 01/02 database. The CM 01/02 community has updated the
-freeware game every season since 2001, so one database format covers 2001/02 to
-2025/26. The [sources note](docs/design/football-year-sources.md) compares
-every other source considered, back to 1872, and their terms.
+Football can be played on ten earlier seasons as well as the built-in 2025/26:
+2014/15 to 2023/24, each from EA's FIFA (FIFA 15 to EA FC 24) launch roster of
+that season. They ship with the game: pick one under **Season** in setup. Each
+is a file in `public/football/` (about 310 KB) that loads only when chosen.
 
-None of those databases grants redistribution, so seasons are **local** for now.
-Download a database from [champman0102.co.uk](https://www.champman0102.co.uk) (a
-free forum account is needed) into the ignored `data-src/cm0102/<folder>/`, then
-run:
+- **What a season holds:** every nation's best natural XI by EA nationality,
+  and the clubs of the seven leagues the club layer uses, picked by EA's
+  competition id (132–134 clubs a season). Ratings are EA's overalls,
+  unchanged. EA rates only part of the world, so 73–82 nations field a full XI
+  each season and the rest field the players they have, as an empty or thin
+  built-in nation does. Scotland, Wales and Northern Ireland field their own
+  teams; places with no shape on the map (Malta, the Faroe Islands, …) have
+  none, and their players still play for their clubs.
+- **Source:** one Kaggle export of every FIFA 15 – EA FC 24 launch roster
+  (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
+  labelled CC0 by its compiler; EA's own rights are not cleared, as for the
+  built-in EA FC 26 data). `scripts/data/ea-seasons.json` pins its SHA-256. To
+  rebuild, download it into the ignored `data-src/ea-leone/`, unzip it and run:
+
+  ```bash
+  npm run build:ea-seasons
+  ```
+
+  It writes the season files, their listing `src/data/footballSeasons.js` and
+  `docs/design/football-seasons-audit.json`, and every file rebuilds byte for
+  byte.
+
+Seasons before 2014/15 have no EA source. They can come from a Championship
+Manager 01/02 database, which covers 2001/02 to 2025/26 but whose authors have
+not allowed redistribution, so those seasons stay **local**. Download a database
+from [champman0102.co.uk](https://www.champman0102.co.uk) (a free forum account
+is needed) into the ignored `data-src/cm0102/<folder>/`, then run:
 
 ```bash
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder>
 ```
 
-The builder writes the season to the ignored `public/football/`, where setup
-finds it. The [permission requests](docs/design/football-year-permissions.md)
-ask the authors whether those files may be committed.
+The builder writes the season to `public/football/` (those files are ignored),
+where setup lists it beside the built-in ones. It also takes a database it does
+not know, once you name its season and date shift (`--label`, `--released`,
+`--url`, `--dob-shift`). The
+[permission requests](docs/design/football-year-permissions.md) ask the authors
+whether those files may be committed, and the
+[sources note](docs/design/football-year-sources.md) compares every other source
+considered, back to 1872, and their terms.
 
-- **What the builder does:**
+- **What the CM 01/02 builder does:**
   - It identifies the release from its file sizes (48 known releases, each with
     its season, author, forum topic and date shifts) and refuses seasons ending
     before 2002.
   - It reads the binary files with the game's own parser (`src/data/cm0102.js`,
     format in [cm0102-format.md](docs/design/cm0102-format.md)).
-  - Every one of the 170 nations gets an entry, and clubs come from the seven
+  - Every one of the 173 nations gets an entry, and clubs come from the seven
     leagues the club layer already uses.
   - Ratings are CM's current ability (1–200) converted once with
     `round(ca * 99 / 200)`. Natural positions are the slots rated 20.
@@ -696,8 +732,8 @@ ask the authors whether those files may be committed.
   member by the end of the season. Montenegro is held by Serbia until 2006, New
   Caledonia by France until 2003 and South Sudan by Sudan until 2011. Timor-Leste
   until 2005 and Kosovo until 2015 stay neutral.
-- **Saves are self-contained:** players are packed as compact CM tuples, so a
-  season campaign resumes or imports without its data set.
+- **Saves are self-contained:** players are packed as compact EA or CM tuples,
+  so a season campaign resumes or imports without its season file.
 
 The [design notes](docs/design/football-years.md) give the file format, the
 runtime, the saves and the known limits.
@@ -748,8 +784,9 @@ regressions, and `npm run test:territories` for the underlying exact landmass,
 overseas, winding, date-line and geometry-cache regressions.
 
 `src/data/flags.js` maps ISO-3166 numeric ids to flag basenames, derived from the
-Natural Earth attribute table with two football-specific overrides: England
-(`gb-eng`) rather than the United Kingdom, and Kosovo (`xk`), which has no ISO
+Natural Earth attribute table with football-specific overrides: the home nations
+England (`gb-eng`, on the United Kingdom's id), Scotland (`gb-sct`), Wales
+(`gb-wls`) and Northern Ireland (`gb-nir`), and Kosovo (`xk`), which has no ISO
 numeric code. The SVGs are vendored into `public/flags/` from the MIT-licensed
 [`flag-icons`](https://github.com/lipis/flag-icons) package, so the built app has
 no runtime dependency on it.
@@ -823,10 +860,10 @@ for real-app integration coverage.
 
 ## Capital data and dependencies
 
-`src/data/capitals.js` holds lon/lat for all 170. Coastline generalisation at
+`src/data/capitals.js` holds lon/lat for all 173. Coastline generalisation at
 110m in the rule geometry leaves some real capitals fractionally offshore, so a
 capital that misses its own outline is walked toward the country's centre until
-it lands; 166 of 170
+it lands; 169 of 173
 anchor on the city itself and the rest fall back to the centroid rather than
 stranding a marker at sea.
 
@@ -866,6 +903,18 @@ detailed coastlines. Its ISC licence is included in
 drives rule geography, adjacency, capital anchors, and candidate distances.
 The detailed display shapes also validate duel routes, so an arrow cannot pass
 through a visible country merely because its capital lies elsewhere.
+
+Football nations are not political ones: England, Scotland, Wales and Northern
+Ireland each have their own association and team. Both atlases draw one United
+Kingdom (826), so `npm run build:home-nations` (`scripts/build-home-nations.mjs`)
+cuts it along Natural Earth 1:10m's borders between them (public domain): 826 is
+England, and `SCO`, `WAL` and `NIR` are the others. Past the shore each border
+follows an estuary's middle (Solway Firth, Dee, Severn) to wherever the coarser
+coast leaves the island. Every other shape and arc stays world-atlas's, pinned by
+SHA-256; `--check` rebuilds offline and compares. Saves from before the cut (v1–v4)
+give the new shapes to whoever held 826, CM 01/02 data sets built before it let
+England hold them, and basketball, where Great Britain is one FIBA team, plays
+the United Kingdom as one.
 
 Closed coastline rings are clipped at ±180° longitude before projection, so
 date-line crossings cannot create diagonal closure wedges through Russia or
@@ -913,7 +962,7 @@ src/
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
     basketball.js      starting five, 40 minutes, overtime
-  data/teams.js        170 nations: identity, squad building
+  data/teams.js        173 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
@@ -925,8 +974,16 @@ src/
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
   data/clubMaps.js     GENERATED index of a sport's own club map: the NBA's (npm run build:nba-map)
   data/domesticScope.js  labels for 'domestic:<id>' theatres, and a sport's own map
+  data/domesticTiers.js  each nation's club cap and the setup lists' priority order
   data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
   data/cmPlayers.js    CM player tuples, positions and rating conversion
+  data/eaPlayers.js    EA player tuples of the built-in earlier seasons
+  data/footballSeasons.js  GENERATED listing of the earlier seasons (npm run build:ea-seasons)
+  data/footballSetBuild.js  CM 01/02 data set builder (pure; Node and browser)
+  data/cm0102Releases.js, cm0102Nations.js, footballFederations.js  its manifests:
+                       known releases, CM nation names, federations by year
+  data/footballSquad.js  eleven-player squad pick shared by the football builders
+  data/sha256.js       synchronous SHA-256 for the data set builder
   data/flags.js        nation id -> flag asset
   data/capitals.js     capital city coordinates
   hooks/               map zoom and pan viewport
@@ -939,7 +996,7 @@ src/
     winProbability.js  live win-probability model (football and basketball)
     liveMinute.js      live match minute store (outside saved state)
     domestic.js        loads and validates a country map: sections and club rows
-    footballSets.js    loads and validates a football season; season-bound sport
+    footballSets.js    lists, loads and validates football seasons; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
                        wizard, match card, dialogs and overlays
@@ -950,7 +1007,7 @@ public/
   domestic/            one sectioned map per country, and the NBA's (nba.json), fetched on demand
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
-  flags/               170 vendored flag SVGs
+  flags/               173 vendored flag SVGs
   club-logos/          club crests from Wikipedia, with SOURCES.tsv
 scripts/
   test.mjs             runs every scripts/*.test.mjs (npm test)
@@ -966,6 +1023,7 @@ scripts/
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
   build-nba-map.mjs    builds the NBA's map of the USA and Canada from the arenas
   sync-club-logos.mjs  vendors club crests from Wikipedia
+  build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
 ```
 
@@ -1034,7 +1092,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `turn-order` | Round-robin queue, "in reach" tiers, fixed-attacker and chosen-target draws |
 | `turn-panels`, `turn-wiring` | Turn strip, Choose a target, spectator panel, and the turn flow in the real App |
 | `win-probability` | The live win-probability model against the football and basketball match models |
-| `save-size` | Save size and storage-quota behaviour for 170-nation campaigns |
+| `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |

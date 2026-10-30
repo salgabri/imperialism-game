@@ -1,8 +1,12 @@
 // Theatre choices for a club campaign: one league, everything, or the elite.
 // Nation theatres live in SCOPES in teams.js.
+import { nationPriority } from './domesticTiers.js';
 
 export function CLUB_SCOPES(sport) {
-  const leagues = [...new Set(sport.clubs.map(c => c.league))];
+  // Leagues in their countries' priority order (domesticTiers.js), else as the clubs first list them.
+  const rank = new Map();
+  for (const c of sport.clubs) rank.set(c.league, Math.min(rank.get(c.league) ?? Infinity, nationPriority(c.country)));
+  const leagues = [...rank.keys()].sort((a, b) => rank.get(a) - rank.get(b) || 0);
   return [
     {
       id: 'all',

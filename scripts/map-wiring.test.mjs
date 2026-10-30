@@ -1,9 +1,10 @@
 // Owner: WP-MAP (wiring pass, see PLAN.md §4.2). App → WorldMap wiring in src/app/mapMethods.jsx: Political default
-// (DEC D18), v4 fills via empireFill / countryFill, identity props (A-7, DEC D19), the signing projection and hatch
+// (DEC D18), v4 fills via politicalFill / countryFill, identity props (A-7, DEC D19), the signing projection and hatch
 // (DEC D15), the dashed target preview and hover (C-18), tooltip copy, conquest framing reset, render purity (§0.9).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { empireFill, MAP, V4 } from '../src/theme.js';
+import { MAP, V4 } from '../src/theme.js';
+import { politicalFill } from '../src/data/empireColours.js';
 import { bundleApp, syncAppFixture, findElement } from './lib/app-harness.mjs';
 
 const App = await bundleApp();
@@ -47,7 +48,7 @@ test('loading and setup: render-called map delegates return their empty values a
       else {
         assert.equal(countries.length, IDS.length);
         for (const country of countries) {
-          assert.equal(country.fill, empireFill(country.id), 'setup shows each nation in its pastel');
+          assert.equal(country.fill, politicalFill(country.id), 'setup shows each nation in its pastel');
           assert.equal(country.stroke, 'none');
           assert.equal(country.ownerId, null);
         }
@@ -60,18 +61,18 @@ test('loading and setup: render-called map delegates return their empty values a
   }
 });
 
-test('Political fills use empireFill; the spectator\'s followed empire keeps its pastel but is the map\'s "you" (A-7)', () => {
+test('Political fills use politicalFill; the spectator\'s followed empire keeps its pastel but is the map\'s "you" (A-7)', () => {
   const f = fixture();
   try {
     const { app } = f;
-    for (const id of IDS) assert.equal(countryOf(app, id).fill, empireFill(id));
+    for (const id of IDS) assert.equal(countryOf(app, id).fill, politicalFill(id));
     assert.equal(app.mapMeId(), null, 'nobody followed → no "you"');
     assert.deepEqual(app.mapProps(), { meFill: false });
 
     app.setState({ followedId: '276' });
     assert.equal(app.mapMeId(), '276');
     assert.deepEqual(app.mapProps(), { meFill: false }, 'a followed empire is never you-fill');
-    assert.equal(countryOf(app, '276').fill, empireFill('276'));
+    assert.equal(countryOf(app, '276').fill, politicalFill('276'));
     const homes = app.mapHomes(true);
     assert.deepEqual(homes.map(home => [home.id, home.you]), [['250', false], ['276', true], ['826', false]]);
     assert.ok(homes.every(home => !('color' in home)), 'capitals carry no team colour');
@@ -121,8 +122,8 @@ test('Strength and Fronts modes recolour through the view-model; Flags keeps pas
     const allowed = new Set([V4.landNeutral, V4.youFill, ...Object.values(MAP.frontsTint)]);
     for (const id of IDS) assert.ok(allowed.has(countryOf(app, id).fill), `fronts fill for ${id}`);
     app.setState({ mapMode: 'flags' });
-    assert.equal(countryOf(app, '276').fill, empireFill('276'), 'no flag regions in the fixture → pastel, never you-fill');
-    assert.equal(countryOf(app, '250').fill, empireFill('250'));
+    assert.equal(countryOf(app, '276').fill, politicalFill('276'), 'no flag regions in the fixture → pastel, never you-fill');
+    assert.equal(countryOf(app, '250').fill, politicalFill('250'));
   } finally { f.close(); }
 });
 
@@ -314,7 +315,7 @@ test('a country map: setup paints each section as its starting club and names it
     app.domesticMap = () => domestic;
     const paris = countryOf(app, '250');
     assert.equal(paris.name, 'Paris');
-    assert.equal(paris.fill, empireFill(club.id), 'Political: the pastel the club takes at kick-off');
+    assert.equal(paris.fill, politicalFill(club.id), 'Political: the pastel the club takes at kick-off');
     assert.equal(paris.ownerId, null, 'no owner, so no tab stops behind the wizard');
     app.setState({ mapMode: 'flags' });
     assert.equal(countryOf(app, '250').fill, club.col, 'Flags: the club colour');
@@ -330,8 +331,8 @@ test('a country map: setup paints each section as its starting club and names it
   try {
     const { app } = h;
     app.domesticMap = () => grouped;
-    assert.deepEqual(['250', '276'].map(id => countryOf(app, id).fill), [empireFill(club.id), empireFill(club.id)]);
-    assert.notEqual(countryOf(app, '826').fill, empireFill(club.id), 'land nobody starts on keeps its own fill');
+    assert.deepEqual(['250', '276'].map(id => countryOf(app, id).fill), [politicalFill(club.id), politicalFill(club.id)]);
+    assert.notEqual(countryOf(app, '826').fill, politicalFill(club.id), 'land nobody starts on keeps its own fill');
     app.setState({ hoverCid: '250' });
     assert.equal(app.tooltip(false).held, 'Home of Paris FC');
     app.setState({ hoverCid: '276' });

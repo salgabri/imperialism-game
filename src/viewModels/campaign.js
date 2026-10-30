@@ -10,7 +10,8 @@ import { getSport } from '../sports/index.js';
 import { domesticIdOf } from '../app/shared.js';
 import { empireNeighbors, territories } from '../engine/campaign.js';
 import { reachableTargets } from '../engine/turns.js';
-import { empireFill, MAP } from '../theme.js';
+import { MAP } from '../theme.js';
+import { politicalFill } from '../data/empireColours.js';
 import { idleTurnCopy } from './turns.js';
 import { strengthSteps } from './map.js';
 import { matchupOdds, winChanceFor } from './odds.js';
@@ -513,7 +514,7 @@ function meItem(st, ctx, mode) {
   }
   const followed = followedTeam(st, ctx);
   if (!followed) return null;
-  return { key: 'you', kind: 'swatch', label: 'Followed empire', color: mode === 'political' ? empireFill(followed.id) : null,
+  return { key: 'you', kind: 'swatch', label: 'Followed empire', color: mode === 'political' ? politicalFill(followed.id) : null,
     ring: RING_INK };
 }
 

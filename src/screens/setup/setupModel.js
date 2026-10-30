@@ -6,10 +6,12 @@
 import { NATIONS, SCOPES } from '../../data/teams.js';
 import { CLUB_SCOPES } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
+import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
 import { BUILT_IN_SEASON, fieldedNations } from '../../engine/footballSets.js';
-import { V4, empireFill, ratingTierOf } from '../../theme.js';
+import { V4, ratingTierOf } from '../../theme.js';
+import { politicalFill } from '../../data/empireColours.js';
 
 export const PACING_OPTIONS = [['duel', 'One by one'], ['blitz', 'Blitz round'], ['chaos', 'Chaos draw']];
 export const RESOLUTION_OPTIONS = [['ticker', 'Live ticker'], ['instant', 'Instant result']];
@@ -281,12 +283,13 @@ export const DOMESTIC_GROUP = 'One country · top clubs';
 
 let domesticRowCache = null;
 /**
- * One country's own top clubs (docs/design/domestic-campaigns.md): one row per shipped map, A–Z, in the theatre row
- * shape. Offered for football clubs only (`domesticOffered`).
+ * One country's own top clubs (docs/design/domestic-campaigns.md): one row per shipped map, in the leagues' priority
+ * order (data/domesticTiers.js), in the theatre row shape. Offered for football clubs only (`domesticOffered`).
  */
 export function domesticTheatres() {
   if (!domesticRowCache) {
-    domesticRowCache = Object.freeze([...DOMESTIC].sort((a, b) => a.name.localeCompare(b.name))
+    domesticRowCache = Object.freeze([...DOMESTIC]
+      .sort((a, b) => nationPriority(a.id) - nationPriority(b.id) || a.name.localeCompare(b.name))
       .map(entry => Object.freeze({ id: `domestic:${entry.id}`, name: entry.name, label: entry.name, count: entry.clubs, note: '' })));
   }
   return domesticRowCache;
@@ -295,21 +298,22 @@ export function domesticTheatres() {
 /** Country maps are built from the built-in data, so a chosen data set (`dataSet`) leaves them out. */
 export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer && sport?.id === 'football' && dataSet == null;
 
-/** Copy under the Season choice: where the other seasons come from. */
-export const SEASON_NOTE = 'Other seasons are local data sets, built on this computer from your own copy of the database.';
+/** Copy under the Season choice: where the earlier seasons' players come from, and what that leaves short. */
+export const SEASON_NOTE = 'Earlier seasons use EA FIFA ratings from the start of that season. Nations without eleven '
+  + 'rated players start short-handed.';
 
 /**
  * The Season choice (docs/design/football-years.md): the built-in season, then each listed data set newest first, as
- * `{ id, key, season, source, label, checked }`. Null when there is nothing to choose, so the setup is unchanged
- * without data sets. `sport` names a chosen set the index no longer lists.
+ * `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
-  if (!sets.length && dataSet == null) return null;
   const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
     label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
   const rows = [row(null, BUILT_IN_SEASON.season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
-  return rows;
+  // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
+  const shared = season => !season || rows.filter(other => other.season === season).length > 1;
+  return rows.map(option => ({ ...option, name: shared(option.season) ? option.label : option.season }));
 }
 
 /** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
@@ -330,7 +334,7 @@ export function domesticDescription(entry) {
 const countryPreviewCache = new WeakMap();
 /**
  * Step 1's static country card (the v4 form of the setup preview): a decoded country map's sections, each in the
- * pastel its starting club takes at kick-off (`empireFill(club.id)`, DEC D18), over the neighbouring land
+ * pastel its starting club takes at kick-off (`politicalFill(club.id)`, DEC D18), over the neighbouring land
  * (`backdrop`: [{ id, d }], App's `surroundings(map).shapes`). Framed on the map's opening focus, else on all sections,
  * in the fitted 960×540 frame. Pure; memoised per decoded map, fitted paths and backdrop.
  * → { viewBox, sections: [{ id, d, fill }], backdrop: [{ id, d }] } | null
@@ -344,7 +348,7 @@ export function countryMapPreview(domestic, backdrop = null) {
   const starter = domestic.startOwners || Object.fromEntries((domestic.clubs || []).map(club => [club.homeSection, club.id]));
   const ids = Object.keys(domestic.sectionNames).filter(id => paths[id]?.d);
   if (!ids.length) return null;
-  const sections = ids.map(id => Object.freeze({ id, d: paths[id].d, fill: starter[id] ? empireFill(starter[id]) : V4.landNeutral }));
+  const sections = ids.map(id => Object.freeze({ id, d: paths[id].d, fill: starter[id] ? politicalFill(starter[id]) : V4.landNeutral }));
   let box = domestic.focus && typeof domestic.geo.focusView === 'function' ? domestic.geo.focusView(domestic.focus) : null;
   if (!(box && box.w > 0 && box.h > 0)) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -366,7 +370,7 @@ export function countryMapPreview(domestic, backdrop = null) {
 const theatrePreviewCache = new WeakMap();
 /**
  * Step 1's world card, the country card's counterpart for every world theatre: the opening board, each held
- * territory in its team's kick-off pastel (`empireFill(teamId)`, DEC D18) over the land nobody holds. `countries` is the
+ * territory in its team's kick-off pastel (`politicalFill(teamId)`, DEC D18) over the land nobody holds. `countries` is the
  * chart's draw order ([{ id }]); a shape comes from `paths` (the display atlas, as WorldMap draws it), else `basePaths`
  * (the topology), both fitted. `own` is territory → team at kick-off (overseas territory included). The card frames
  * `focus` (a fitted { x, y, w, h }) when given, else the main polygons of `frameIds`, the teams' starting land.
@@ -384,7 +388,7 @@ export function theatreMapPreview({ countries, paths = null, basePaths, own, fra
   for (const { id } of countries) {
     const d = pathOf(id)?.d;
     if (!d) continue;
-    if (own[id]) sections.push(Object.freeze({ id, d, fill: empireFill(own[id]) }));
+    if (own[id]) sections.push(Object.freeze({ id, d, fill: politicalFill(own[id]) }));
     else backdrop.push(Object.freeze({ id, d }));
   }
   if (!sections.length) return null;
@@ -530,7 +534,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
   const showMatches = showMatchesOf(setup);
-  const seasonRows = seasonOptions(football && Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS, dataSet, sport);
+  const seasonSets = Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS;
+  const seasonRows = football ? seasonOptions(seasonSets, dataSet, sport) : null;
   const chosenSeason = seasonRows?.find(row => row.checked && row.id != null) || null;
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.
   const campaignSummary = `${sport.name} · ${clubLayer ? 'Clubs' : 'Nations'} · ${scopeName}${chosenSeason?.season ? ` · ${chosenSeason.season}` : ''}`;
@@ -541,8 +546,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const seasonState = dataSet == null ? 'idle' : !pending ? 'ready' : seasonCtx.state === 'error' ? 'error' : 'loading';
   const seasonWaits = pending;
   const setName = chosenSeason?.source || dataSet;
-  const setLoading = dataSet != null ? `Loading the ${setName} data set…` : '';
-  const setFailed = dataSet != null ? `The ${setName} data set could not be loaded.` : '';
+  const setLoading = dataSet != null ? `Loading the ${setName} season…` : '';
+  const setFailed = dataSet != null ? `The ${setName} season could not be loaded.` : '';
 
   const ranked = managerTeams.slice().sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name)));
   const rankOf = new Map(ranked.map((team, index) => [team.id, index + 1]));

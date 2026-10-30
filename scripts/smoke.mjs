@@ -8,6 +8,7 @@ import path from 'node:path';
 import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
 import { DOMESTIC } from '../src/data/domestic.js';
+import { nationPriority } from '../src/data/domesticTiers.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const publicDir = path.join(root, 'public');
@@ -39,7 +40,7 @@ const SCENARIOS = [
 ];
 
 const RESUME_SCENARIOS = [
-  { name: 'World war · blitz · instant', scope: 'world', pacing: 'blitz', resolution: 'instant', expectedField: 170 },
+  { name: 'World war · blitz · instant', scope: 'world', pacing: 'blitz', resolution: 'instant', expectedField: 173 },
   { name: 'BASKETBALL · South America · blitz · instant', sport: 'basketball', scope: 'CONMEBOL', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Premier League · blitz · instant', layer: 'clubs', clubScope: 'Premier League', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
@@ -246,11 +247,11 @@ function checkTheatres(scenario, theatre) {
   }
   const leagues = theatre.groups.find(group => group.label === 'European leagues');
   const domestic = theatre.groups.find(group => group.label === 'One country · top clubs');
-  const expected = DOMESTIC.slice().sort((a, b) => a.name.localeCompare(b.name))
+  const expected = DOMESTIC.slice().sort((a, b) => nationPriority(a.id) - nationPriority(b.id))
     .map(entry => ({ value: `domestic:${entry.id}`, text: `${entry.name} · ${entry.clubs} clubs` }));
   check('existing club theatres are grouped as European leagues', JSON.stringify(leagues?.options.map(option => option.value)) === JSON.stringify(theatre.clubScopes),
     JSON.stringify(theatre.groups.map(group => group.label)));
-  check('every shipped country is offered by name with its club count', JSON.stringify(domestic?.options) === JSON.stringify(expected),
+  check('every shipped country is offered by name with its club count, in priority order', JSON.stringify(domestic?.options) === JSON.stringify(expected),
     JSON.stringify(domestic?.options));
 }
 
@@ -338,7 +339,7 @@ if (!filtered && fixedChecks && !process.argv.includes('--duel-frame-only') && !
   try {
     const mod = await import(`${new URL('file://' + entry.replace(/\\/g, '/'))}?strength-standings`);
     const r = await mod.runStrengthStandingsCheck();
-    check('world standings rank all 170 teams by current strength', r.world.sorted && r.world.count === 170);
+    check('world standings rank all 173 teams by current strength', r.world.sorted && r.world.count === 173);
     check('ranks remain sequential and untruncated beyond 99', r.world.ranks);
     check('strength column announces descending order', r.world.announced);
     check('a weaker large empire ranks below a stronger small team', r.weakerEmpireBelow && r.fixture.sorted);
@@ -374,8 +375,8 @@ if (!filtered && fixedChecks && !process.argv.includes('--duel-frame-only') && !
     const mod = await import(`${new URL('file://' + entry.replace(/\\/g, '/'))}?empire-flags`);
     const r = await mod.runEmpireFlagCheck();
     for (const state of ['kickoff', 'firstConquest', 'neighboring', 'disjoint', 'archipelago', 'zoomed', 'resized', 'restored']) checkEmpireFlags(state, r[state]);
-    check('world kickoff covers all 170 owners with paintable land and separates offshore pieces', r.kickoff.ownerCount + r.kickoff.unpaintedOwners.length === 170
-      && r.kickoff.unpaintedOwnersHaveNoFillArea && r.kickoff.patternCount > 170 && r.franceAtKickoffDetached,
+    check('world kickoff covers all 173 owners with paintable land and separates offshore pieces', r.kickoff.ownerCount + r.kickoff.unpaintedOwners.length === 173
+      && r.kickoff.unpaintedOwnersHaveNoFillArea && r.kickoff.patternCount > 173 && r.franceAtKickoffDetached,
       `${r.kickoff.ownerCount} painted owners, ${r.kickoff.patternCount} components, collapsed: ${r.kickoff.unpaintedOwners.join(', ')}`);
     check('conquered Danish mainland joins Germany’s flag', r.denmarkConnected && r.grewWithNeighbor && r.germanAssetAfterDenmark);
     check('Greenland gets a separate flag instead of stretching Germany’s', r.greenlandDetached);

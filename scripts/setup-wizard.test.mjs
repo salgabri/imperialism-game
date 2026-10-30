@@ -16,8 +16,9 @@ import {
 import { launchRules } from '../src/engine/turns.js';
 import { SCOPES } from '../src/data/teams.js';
 import { DOMESTIC } from '../src/data/domestic.js';
+import { nationPriority } from '../src/data/domesticTiers.js';
 import { getSport } from '../src/sports/index.js';
-import { empireFill } from '../src/theme.js';
+import { politicalFill } from '../src/data/empireColours.js';
 
 const compiled = await build({
   stdin: { contents: `
@@ -809,12 +810,15 @@ const ENGLAND = DOMESTIC.find(entry => entry.id === '826');
 const COUNTRY = { layer: 'clubs', clubScope: 'domestic:826' };
 
 test('football clubs list every shipped country after the leagues, in one radio group; the mirror groups them', async t => {
-  const sorted = DOMESTIC.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const sorted = DOMESTIC.slice().sort((a, b) => nationPriority(a.id) - nationPriority(b.id));
   const rows = domesticTheatres();
   assert.deepEqual(rows.map(row => row.id), sorted.map(entry => `domestic:${entry.id}`));
+  assert.deepEqual(rows.slice(0, 5).map(row => row.name), ['England', 'Spain', 'Germany', 'Italy', 'France'], 'the biggest leagues first');
   assert.deepEqual(rows[0], { id: `domestic:${sorted[0].id}`, name: sorted[0].name, label: sorted[0].name, count: sorted[0].clubs, note: '' });
   const clubs = buildSetupModel({ ...BASE, layer: 'clubs' });
   assert.ok(clubs.scopes.length > 1 && !clubs.scopes.some(scope => scope.id.startsWith('domestic:')), 'model.scopes stays the league rows');
+  assert.deepEqual(clubs.scopes.map(scope => scope.id),
+    ['all', 'elite', 'Premier League', 'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1', 'Liga Portugal', 'Eredivisie'], 'the leagues in the same order');
   assert.equal(clubs.domesticScopes, rows);
   for (const setup of [{ ...BASE }, { ...BASE, sport: 'basketball', layer: 'clubs' }, { ...BASE, sport: 'basketball' }]) {
     assert.deepEqual(buildSetupModel(setup).domesticScopes, [], `${setup.sport} ${setup.layer}: no single-country theatres`);
@@ -832,7 +836,7 @@ test('football clubs list every shipped country after the leagues, in one radio 
   const england = view.qa('.setup-theatre').find(row => row.dataset.name === 'England');
   assert.equal(england.querySelector('.setup-theatre__count').textContent, `${ENGLAND.clubs} clubs`);
 
-  // The mirror: "European leagues" holds the league ids in order; the countries read "Name · N clubs", A–Z.
+  // The mirror: "European leagues" holds the league ids in order; the countries read "Name · N clubs", in priority order.
   const mirror = view.q('#setup-theatre');
   const groups = [...mirror.querySelectorAll('optgroup')];
   assert.deepEqual(groups.map(group => group.getAttribute('label')), ['European leagues', 'One country · top clubs']);
@@ -981,11 +985,11 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   const preview = countryMapPreview(map, backdrop);
   assert.equal(preview.viewBox, '-0.8 -0.8 21.6 11.6', 'framed on the opening focus, 4% margin');
   assert.deepEqual(preview.sections.map(section => [section.id, section.fill]),
-    [['s1', empireFill('d999-1')], ['s2', empireFill('d999-2')], ['s3', '#e8e9e4']], 'no startOwners (format 1): home sections only');
+    [['s1', politicalFill('d999-1')], ['s2', politicalFill('d999-2')], ['s3', '#e8e9e4']], 'no startOwners (format 1): home sections only');
   // Format 2: every section of a club's starting group takes its pastel, not just the home.
   const grouped = countryMapPreview({ ...map, startOwners: { s1: 'd999-1', s2: 'd999-2', s3: 'd999-1' } }, backdrop);
   assert.deepEqual(grouped.sections.map(section => [section.id, section.fill]),
-    [['s1', empireFill('d999-1')], ['s2', empireFill('d999-2')], ['s3', empireFill('d999-1')]]);
+    [['s1', politicalFill('d999-1')], ['s2', politicalFill('d999-2')], ['s3', politicalFill('d999-1')]]);
   assert.deepEqual(preview.backdrop, [{ id: '250', d: 'M-5,-5L0,-5L0,0Z' }]);
   assert.equal(countryMapPreview(map, backdrop), preview, 'memoised per map, paths and backdrop');
   assert.notEqual(countryMapPreview(map, [...backdrop]), preview);
@@ -1001,14 +1005,14 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   const real = countryMapPreview(decoded, []);
   assert.equal(real.sections.length, ENGLAND.clubs);
   const home = new Map(decoded.clubs.map(club => [club.homeSection, club.id]));
-  assert.ok(real.sections.every(section => section.fill === empireFill(home.get(section.id))));
+  assert.ok(real.sections.every(section => section.fill === politicalFill(home.get(section.id))));
   assert.ok(real.viewBox.split(' ').map(Number).every(Number.isFinite));
   // Fiji: 16 clubs on 100 sections, every section painted as the club starting there.
   const fiji = decodeDomestic(JSON.parse(readFileSync(new URL('../public/domestic/242.json', import.meta.url), 'utf8')), '242');
   const fijiCard = countryMapPreview(fiji, []);
   assert.equal(fijiCard.sections.length, 100);
   assert.ok(fiji.clubs.length < 100);
-  assert.ok(fijiCard.sections.every(section => section.fill === empireFill(fiji.startOwners[section.id])), 'no neutral section');
+  assert.ok(fijiCard.sections.every(section => section.fill === politicalFill(fiji.startOwners[section.id])), 'no neutral section');
   assert.equal(new Set(fijiCard.sections.map(section => fiji.startOwners[section.id])).size, fiji.clubs.length);
 
   const view = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {}, preview } });
@@ -1038,7 +1042,7 @@ test('world card: a theatre opening board in kick-off pastels over unclaimed lan
   const own = { a: 'a', b: 'b', c: 'a' };
   const frameIds = ['a', 'b'];
   const preview = theatreMapPreview({ countries, basePaths, own, frameIds });
-  assert.deepEqual(preview.sections.map(section => [section.id, section.fill]), [['a', empireFill('a')], ['b', empireFill('b')], ['c', empireFill('a')]]);
+  assert.deepEqual(preview.sections.map(section => [section.id, section.fill]), [['a', politicalFill('a')], ['b', politicalFill('b')], ['c', politicalFill('a')]]);
   assert.deepEqual(preview.backdrop, [{ id: 'n', d: 'M50,50h10v10h-10Z' }], 'unclaimed land is drawn; shapes without a path are not');
   assert.equal(preview.viewBox, '-0.8 -0.8 21.6 11.6', 'framed on the starting land, 4% margin');
   assert.equal(preview.teams, 2);

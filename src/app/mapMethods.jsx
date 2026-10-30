@@ -172,7 +172,7 @@ function countryHandlers(app, cid) {
 
 /**
  * Every map shape, plus the flag patterns held territory is filled with (README §Map rendering, DEC D18/D19).
- * Fills come from `mapVM.countryFill` per `st.mapMode`: Political empire pastels (`empireFill`), Strength ramp,
+ * Fills come from `mapVM.countryFill` per `st.mapMode`: Political pastels of each empire's own colour (`politicalFill`), Strength ramp,
  * Fronts win-chance tints, Flags banners (a country flies its *owner's* flag, so an empire reads as one banner);
  * then you-fill (managed only, A-7) and opponent-fill once the fixture is known. Borders come from WorldMap's mesh,
  * so the shapes carry no stroke. Setup shows the nations' pastels (or their flags) on neutral land; a previewed

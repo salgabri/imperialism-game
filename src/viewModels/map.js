@@ -3,7 +3,8 @@
 // tolerates the tests' tiny atlas, phase 'loading'/'setup', `stats: {}` and matches without odds/route/live fields.
 // strengthSteps was written final by WP-0 in W1: its signature and semantics are FROZEN (WP-COL's key reads it).
 import { teamEff, NATIONS, DEPENDENCIES } from '../data/teams.js';
-import { MAP, V4, empireFill } from '../theme.js';
+import { MAP, V4 } from '../theme.js';
+import { politicalFill } from '../data/empireColours.js';
 import { memo, roman, historyRound, winTone } from './format.js';
 import { matchupOdds, winChanceFor } from './odds.js';
 import { reachableTargets } from '../engine/turns.js';
@@ -163,20 +164,21 @@ export function identityFill(baseFill, { ownerId, meId, meFill, opponentId, mapM
  * One country's fill (mapCountries). Rules in order: flag parts → transparent; unowned → a country map's setup
  * preview (`preview`: the club starting in that section) in the colour it takes at kick-off, else setup nations
  * pastel, otherwise land-neutral; Flags mode → club colour (clubs fly no flag) or pastel; Strength → ramp; Fronts →
- * tint for your fronts, land-neutral elsewhere; Political → empire pastel by hash; then identityFill().
+ * tint for your fronts, land-neutral elsewhere; Political → the pastel of the empire's own colour (politicalFill); then
+ * identityFill().
  */
 export function countryFill({ countryId, ownerId = null, owner = null, mapMode = DEFAULT_MAP_MODE, hasFlagParts = false,
   setup = false, meId = null, meFill = false, opponentId = null, strength = null, fronts = null, preview = null } = {}) {
   if (hasFlagParts) return 'transparent';
   if (!ownerId || !owner) {
     // Decoded club rows carry no `kind`, hence their own parameter: Flags = the club colour, Political = its pastel.
-    if (preview?.id) return mapMode === 'flags' && preview.col ? preview.col : empireFill(preview.id);
-    return setup && NATIONS[countryId] ? empireFill(countryId) : V4.landNeutral;
+    if (preview?.id) return mapMode === 'flags' && preview.col ? preview.col : politicalFill(preview.id);
+    return setup && NATIONS[countryId] ? politicalFill(countryId) : V4.landNeutral;
   }
-  if (mapMode === 'flags') return owner.kind === 'club' && owner.col ? owner.col : empireFill(ownerId);
-  const base = mapMode === 'strength' ? strength?.[ownerId] || empireFill(ownerId)
+  if (mapMode === 'flags') return owner.kind === 'club' && owner.col ? owner.col : politicalFill(ownerId);
+  const base = mapMode === 'strength' ? strength?.[ownerId] || politicalFill(ownerId)
     : mapMode === 'fronts' && fronts ? fronts[ownerId] || V4.landNeutral
-      : empireFill(ownerId);
+      : politicalFill(ownerId);
   return identityFill(base, { ownerId, meId, meFill, opponentId, mapMode });
 }
 

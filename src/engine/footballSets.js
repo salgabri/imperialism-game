@@ -1,9 +1,13 @@
-// Football data sets: one dated database's nations and clubs, played instead of the built-in season. Loads a local
-// `public/football/<id>.json` (format 1, see docs/design/football-years.md), validates it strictly and exposes it as a
-// football sport bound to that season. The built-in data (src/data/rosters.js, clubs.football.js) never changes.
+// Football data sets: one dated database's nations and clubs, played instead of the built-in season. A set is one of
+// the built-in earlier seasons (an EA FIFA / FC launch roster, src/data/footballSeasons.js) or a CM 01/02 database
+// built on this computer; either is a `public/football/<id>.json` (format 1, see docs/design/football-years.md),
+// validated strictly and exposed as a football sport bound to that season. The built-in data (src/data/rosters.js,
+// clubs.football.js) never changes.
 
-import { DEPENDENCIES, NATIONS } from '../data/teams.js';
+import { DEPENDENCIES, HOME_NATIONS, NATIONS } from '../data/teams.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
+import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
+import { BUILT_IN_SEASONS } from '../data/footballSeasons.js';
 import { football } from '../sports/football.js';
 import { getSport } from '../sports/index.js';
 
@@ -11,8 +15,11 @@ export const FOOTBALL_SET_FORMAT = 1;
 /** The built-in data's season (EA FC 26 + FM 26). Year N is the season ending in N. */
 export const BUILT_IN_SEASON = Object.freeze({ year: 2026, season: '2025/26' });
 
-const SET_ID = /^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$/;
+// `cm0102-<release month>[-variant]` for a CM 01/02 database, `ea-fifa-<nn>` / `ea-fc-<nn>` for an EA edition.
+const SET_ID = /^(?:cm0102-\d{4}-\d{2}(-[a-z0-9]+)?|ea-(?:fifa|fc)-\d{2})$/;
 export const isFootballSetId = id => typeof id === 'string' && SET_ID.test(id);
+/** Whose players a set holds, by its id: 'ea' or 'cm0102'. */
+export const setKindOf = id => (String(id).startsWith('ea-') ? 'ea' : 'cm0102');
 export const isDataYear = year => Number.isInteger(year) && year >= 1872 && year <= 2100;
 /** '2025/26' for 2026. */
 export const seasonOf = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
@@ -24,6 +31,9 @@ const CLUB_ID = /^f-[a-z0-9-]{0,62}$/;
 // What build-rosters writes for a nation with no players.
 const EMPTY_STRENGTH = 40;
 const NO_TERRITORY = Object.freeze({ merged: Object.freeze({}), inactive: Object.freeze([]) });
+// A set built before the map had the home nations lists none of them: England holds their land, as it did on the map
+// the set was built for, and their players played for no nation.
+const beforeHomeNations = nations => HOME_NATIONS.every(id => !Object.hasOwn(nations, id));
 
 // ---------- index ----------
 
@@ -34,19 +44,26 @@ export function clearFootballSetIndex() {
   index = null;
 }
 
+// Within a season the later id sorts first: a later CM release, or an EA edition before a CM database.
+const newestFirst = (a, b) => b.year - a.year || (a.id < b.id ? 1 : -1);
+
 /**
- * The local data sets present, newest season first: `[{ id, version, year, season, label }]`, read once from
- * `football/index.json`. A missing or unreadable index means no sets; a listing that fails the checks is skipped
- * (each set file is validated in full when it loads).
+ * The data sets present, newest season first: `[{ id, version, year, season, label }]`. The built-in earlier seasons
+ * are always there; CM 01/02 sets built on this computer are read once from `football/index.json`, where a missing or
+ * unreadable index means none. A listing that fails the checks is skipped (each set is validated in full when it
+ * loads).
  */
 export function loadFootballSetIndex({ baseUrl = '/', fetch: fetchImpl = globalThis.fetch } = {}) {
   index ||= (async () => {
+    let files = [];
     try {
       const res = await fetchImpl(`${baseUrl}football/index.json`);
-      return res?.ok ? listing(await res.json()) : [];
+      if (res?.ok) files = listing(await res.json());
     } catch {
-      return [];
+      files = [];
     }
+    const local = files.filter(set => !BUILT_IN_SETS.some(builtIn => builtIn.id === set.id));
+    return local.length ? Object.freeze([...BUILT_IN_SETS, ...local].sort(newestFirst)) : BUILT_IN_SETS;
   })();
   return index;
 }
@@ -60,10 +77,12 @@ function listing(data) {
   const valid = entries.filter(entry => entry && isFootballSetId(entry.id) && !seen.has(entry.id) && seen.add(entry.id)
     && isDataYear(entry.year) && entry.season === seasonOf(entry.year) && typeof entry.label === 'string' && entry.label.trim()
     && (entry.version == null || (typeof entry.version === 'string' && versionPattern(entry.id).test(entry.version))));
-  // Ids carry the release month, so within a season the later release sorts first.
-  return Object.freeze(valid.sort((a, b) => b.year - a.year || (a.id < b.id ? 1 : -1))
+  return Object.freeze(valid.sort(newestFirst)
     .map(({ id, version = null, year, season, label }) => Object.freeze({ id, version, year, season, label: label.trim() })));
 }
+
+/** The built-in earlier seasons, newest first, as the index lists them. */
+export const BUILT_IN_SETS = listing(BUILT_IN_SEASONS);
 
 // ---------- loading ----------
 
@@ -161,28 +180,47 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
 export function decodeFootballSet(data, id = data?.id) {
   validateFootballSet(data, String(id));
   const { nations, clubs, territory, ...meta } = data;
-  const expand = tuple => expandSetPlayer(tuple, meta.source);
+  const expand = tuple => expandSetPlayer(tuple, meta.source, setKindOf(meta.id));
+  const englandHolds = beforeHomeNations(nations);
   return {
     meta,
     rosters: Object.fromEntries(Object.keys(NATIONS).map(nation => {
-      const [str, pool, players] = nations[nation];
+      const [str, pool, players] = nations[nation] || [EMPTY_STRENGTH, 0, []];
       return [nation, [str, pool, players.map(expand)]];
     })),
     clubs: clubs.map(club => ({ ...club, squad: club.squad.map(expand) })),
-    territory: { merged: { ...territory.merged }, inactive: [...territory.inactive] },
+    territory: { merged: { ...territory.merged, ...(englandHolds ? Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])) : {}) },
+      inactive: [...territory.inactive] },
   };
 }
 
 /**
- * One player of a data set as buildTeam and buildClub read it: expandCmTuple's record, credited to the database's
- * provider. expandCmTuple leaves the provider out, and not every database is the Update Team's (SI's own releases
- * among them), so the record names it. Saves rebuild players through this too.
+ * One player of a data set as buildTeam and buildClub read it. A CM player is expandCmTuple's record, credited to the
+ * database's provider: expandCmTuple leaves the provider out, and not every database is the Update Team's (SI's own
+ * releases among them), so the record names it. An EA player is expandEaTuple's record. Saves rebuild players through
+ * this too.
  */
-export function expandSetPlayer(tuple, source) {
+export function expandSetPlayer(tuple, source, kind = 'cm0102') {
+  if (kind === 'ea') return expandEaTuple(tuple, source);
   const player = expandCmTuple(tuple, source);
   if (source.provider != null && player[3].provider === undefined) player[3].provider = source.provider;
   return player;
 }
+
+// Each kind's player tuples (the position keys are their fifth field, the date of birth their eighth) and source block.
+const KINDS = {
+  cm0102: { size: 8, roles: CM_ROLES, tupleOf: cmTupleOf,
+    source: src => (!['edition', 'version', 'snapshotDate'].every(key => typeof src[key] === 'string' && src[key].trim())
+      ? 'source must name the edition, database version and snapshotDate'
+      : src.rawScale !== CM_SCALE ? `source rawScale must be ${CM_SCALE}`
+        : src.conversion !== CM_CONVERSION ? `source conversion must be "${CM_CONVERSION}"` : '') },
+  ea: { size: 9, roles: EA_ROLES, tupleOf: eaTupleOf,
+    source: src => (!['edition', 'snapshotDate'].every(key => typeof src[key] === 'string' && src[key].trim())
+      || !Number.isInteger(src.update) || src.update < 0 || !/^\d{6}$/.test(String(src.roster))
+      ? 'source must name the edition, roster update, SoFIFA roster and snapshotDate'
+      : src.rawScale !== EA_SCALE ? `source rawScale must be ${EA_SCALE}`
+        : src.conversion !== undefined ? 'EA ratings are not converted' : '') },
+};
 
 function validateFootballSet(data, id) {
   const fail = message => { throw new Error(`Football data set ${id}: ${message}`); };
@@ -191,10 +229,13 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>" or "ea-fifa-<nn>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
+  // A set without `kind` is a CM 01/02 one, as every set was before the EA seasons.
+  const kind = KINDS[setKindOf(id)];
+  if ((data.kind ?? 'cm0102') !== setKindOf(id)) fail(`kind ${JSON.stringify(data.kind)} is not the kind its id names`);
   if (typeof data.version !== 'string' || !versionPattern(id).test(data.version)) {
     fail(`version ${JSON.stringify(data.version)} must look like "${id}-<8 hex>"`);
   }
@@ -203,13 +244,11 @@ function validateFootballSet(data, id) {
   if (!text(data.label)) fail('label is missing');
   if (data.local != null && typeof data.local !== 'boolean') fail('local must be true or false');
   const src = data.source;
-  if (!isObject(src) || !['edition', 'version', 'snapshotDate'].every(key => text(src[key]))) {
-    fail('source must name the edition, database version and snapshotDate');
-  }
+  if (!isObject(src)) fail('source is missing');
+  const sourceProblem = kind.source(src);
+  if (sourceProblem) fail(sourceProblem);
   if (src.provider != null && !text(src.provider)) fail('source provider is empty');
   if (typeof src.url !== 'string' || !/^https?:\/\/\S+$/i.test(src.url)) fail('source url must be an http(s) link');
-  if (src.rawScale !== CM_SCALE) fail(`source rawScale must be ${CM_SCALE}`);
-  if (src.conversion !== CM_CONVERSION) fail(`source conversion must be "${CM_CONVERSION}"`);
   if (data.coverage != null && (!isObject(data.coverage)
     || Object.values(data.coverage).some(n => !Number.isInteger(n) || n < 0))) fail('coverage must hold counts');
 
@@ -220,20 +259,20 @@ function validateFootballSet(data, id) {
     const ids = new Set();
     tuples.forEach((tuple, j) => {
       const where = `${at}[${j}]`;
-      if (!Array.isArray(tuple) || tuple.length !== 8) fail(`${where} is not a CM player tuple`);
-      const [cmId, , , , positions, , , dateOfBirth] = tuple;
-      if (ids.has(cmId)) fail(`${where} repeats player ${cmId}`);
-      ids.add(cmId);
+      if (!Array.isArray(tuple) || tuple.length !== kind.size) fail(`${where} is not ${setKindOf(id) === 'ea' ? 'an EA' : 'a CM'} player tuple`);
+      const [playerId, , , , positions, , , dateOfBirth] = tuple;
+      if (ids.has(playerId)) fail(`${where} repeats player ${playerId}`);
+      ids.add(playerId);
       const keys = String(positions).split(',');
       // Own keys only: 'constructor' must not pass as a position.
-      if (!keys.every(key => Object.hasOwn(CM_ROLES, key)) || new Set(keys).size !== keys.length) {
+      if (!keys.every(key => Object.hasOwn(kind.roles, key)) || new Set(keys).size !== keys.length) {
         fail(`${where} has unknown or repeated positions ${JSON.stringify(positions)}`);
       }
       if (dateOfBirth !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) fail(`${where} date of birth ${JSON.stringify(dateOfBirth)} is not YYYY-MM-DD`);
       let rebuilt;
       try {
-        const [name, , , sourceInfo] = expandCmTuple(tuple, src);
-        rebuilt = cmTupleOf(name, sourceInfo);
+        const [name, , , sourceInfo] = expandSetPlayer(tuple, src, setKindOf(id));
+        rebuilt = kind.tupleOf(name, sourceInfo);
       } catch (e) {
         fail(`${where}: ${e.message}`);
       }
@@ -246,7 +285,8 @@ function validateFootballSet(data, id) {
   if (!isObject(nations)) fail('nations is missing');
   const unknown = Object.keys(nations).filter(key => !nation(key));
   if (unknown.length) fail(`nations has unknown ids ${unknown.slice(0, 5).join(', ')}`);
-  const missing = Object.keys(NATIONS).filter(key => !Object.hasOwn(nations, key));
+  const older = beforeHomeNations(nations);
+  const missing = Object.keys(NATIONS).filter(key => !Object.hasOwn(nations, key) && !(older && HOME_NATIONS.includes(key)));
   if (missing.length) fail(`nations must list all ${Object.keys(NATIONS).length} nations; missing ${missing.slice(0, 5).join(', ')}`);
   for (const [key, entry] of Object.entries(nations)) {
     const at = `nations[${key}]`;

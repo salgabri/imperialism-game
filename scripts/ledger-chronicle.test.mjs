@@ -21,7 +21,8 @@ const bundled = await build({
     export * as ledgerVM from './src/viewModels/ledger.js';
     export {tacticalOptions} from './src/engine/managerStrategy.js';
     export {getSport} from './src/sports/index.js';
-    export {empireFill, V4} from './src/theme.js';
+    export {V4} from './src/theme.js';
+    export {politicalFill} from './src/data/empireColours.js';
     export {FEED_CAP as SHARED_FEED_CAP} from './src/app/shared.js';
   `, resolveDir: fileURLToPath(new URL('../', import.meta.url)), loader: 'jsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'],
@@ -31,7 +32,7 @@ const module = { exports: {} };
 new Function('require', 'module', 'exports', bundled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
 const {
   LedgerScreen, ChronicleScreen, TacticalChoice, VictoryOverlay, CampaignStorageDialog, ExportCheckpoint, SaveControls,
-  ledgerVM, tacticalOptions, getSport, empireFill, V4, SHARED_FEED_CAP,
+  ledgerVM, tacticalOptions, getSport, politicalFill, V4, SHARED_FEED_CAP,
 } = module.exports;
 
 const dom = new JSDOM('<!doctype html><html><body><button id="prior">Prior focus</button></body></html>', { url: 'http://localhost' });
@@ -128,12 +129,12 @@ test('buildLedger extends power rows, lists the fallen with their conqueror and 
   assert.equal(model.header.kicker, 'The European Campaign · Round III', 'idle: the round about to be played');
   assert.equal(model.share.rows[0].pct, '67%');
   assert.equal(model.share.rows[0].fill, V4.youFill, 'the managed empire is you-fill, as on the map');
-  assert.equal(model.share.rows[1].fill, empireFill('688'));
+  assert.equal(model.share.rows[1].fill, politicalFill('688'));
   assert.equal(model.paused, false);
   // A-7: a spectator's followed empire keeps its map pastel; only the ink ring (`you`) marks it.
   const spectator = ledgerVM.buildLedger(st, ctxFor({ managedId: null, followedId: '380', perspectiveId: '380' }), rows);
   assert.equal(spectator.share.rows[0].you, true);
-  assert.equal(spectator.share.rows[0].fill, empireFill('380'));
+  assert.equal(spectator.share.rows[0].fill, politicalFill('380'));
   assert.equal(spectator.youLabel, 'Following');
   // HEAD Sidebar: " · Paused" while paused, a signing pending or a tactical choice pending.
   assert.equal(ledgerVM.sessionLine({ ...st, paused: true }), '2 games remaining · ~1 min · Paused');

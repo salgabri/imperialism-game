@@ -54,8 +54,9 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
+import { domesticCap } from '../src/data/domesticTiers.js';
 import {
-  CLUBS_ENDPOINT, MAX_CLUBS, MIN_CLUBS, PLAYERS_ENDPOINT, SLICE_PAGE_SIZE, VERSION,
+  CLUBS_ENDPOINT, MIN_CLUBS, PLAYERS_ENDPOINT, SLICE_PAGE_SIZE, VERSION,
   createClubLister, createEfem, fmNation, foldedNames, nameReason, naturalPlayers, pickSquad,
   playerSliceUrl, trimPlayer, validateSnapshot,
 } from './lib/domestic-sync.mjs';
@@ -83,17 +84,19 @@ const efem = createEfem({ cacheDir, refresh });
 
 /**
  * Walk a nation's clubs in rank order, reading more list pages as needed.
- * Returns { taken (up to 100 viable), excluded (non-viable clubs ranked above the cut), rows (clubs examined) }.
+ * Returns { taken (viable, up to the nation's tier in src/data/domesticTiers.js), excluded (non-viable clubs ranked
+ * above the cut), rows (clubs examined) }.
  * Without `squadsOf` (the survey) viability is estimated from totalPlayers.
  */
 async function selectClubs(nation, lister, squadsOf) {
+  const cap = domesticCap(nation.id);
   await lister.next();
   for (;;) {
     const rows = lister.rows();
     const taken = [], excluded = [], stronger = new Set();
     let last = null;
     for (const club of rows) {
-      if (taken.length >= MAX_CLUBS) break;
+      if (taken.length >= cap) break;
       last = club;
       const reason = classify(club, stronger, squadsOf);
       for (const name of foldedNames(club)) stronger.add(name);
@@ -102,7 +105,7 @@ async function selectClubs(nation, lister, squadsOf) {
     }
     // rows are complete down to the last fetched reputation (the lister re-reads the tie
     // at each page end), so a full list needs no further page.
-    if (taken.length < MAX_CLUBS && lister.more && await lister.next()) continue;
+    if (taken.length < cap && lister.more && await lister.next()) continue;
     return { taken, excluded, rows: rows.indexOf(last) + 1 };
   }
 }
@@ -127,7 +130,7 @@ const count = (list, key) => list.reduce((acc, item) => { const k = key(item); a
 
 const surveyFile = path.join(outDir, 'survey.json');
 const SURVEY_RULE = 'Club list pages only, except n, ships and why. estN = clubs in reputation order that are male, not reserve/youth/school/all-star by name, '
-  + `and list totalPlayers >= 11, capped at ${MAX_CLUBS}. n = N from the full sync, which also requires >= 11 natural-position players incl. a goalkeeper; `
+  + `and list totalPlayers >= 11, capped at the nation's tier (src/data/domesticTiers.js). n = N from the full sync, which also requires >= 11 natural-position players incl. a goalkeeper; `
   + `ships when n >= ${MIN_CLUBS} (estN before a full sync); why gives the full sync's reasons for a nation that does not ship. `
   + 'fetched = distinct clubs read: list pages of 100 plus tieSlices exact-reputation re-reads of the reputation at each page end.';
 
@@ -232,10 +235,11 @@ async function loadPlayers() {
 // ---- Sync ----
 
 const REGIONAL = 'Regional football';
-const SELECTION = `Male clubs of the FM nation (exact nation name, nation.nationCode checked) in reputation order (ties: efemScore desc, clubId asc), `
+const selection = cap => `Male clubs of the FM nation (exact nation name, nation.nationCode checked) in reputation order (ties: efemScore desc, clubId asc), `
   + `read in list pages of 100 with the reputation at each page end re-read whole (filter reputation=<v>), since pages shuffle tied clubs. `
   + `Excluded: reserve, B/II, youth, under-N, university/school (outside senior competitions) and all-star sides (name rules plus EXCLUDED_CLUBS in scripts/lib/domestic-sync.mjs); `
-  + `fewer than 11 natural-position (proficiency >= 90) players or no natural goalkeeper. A club without an FM competition stays in as "${REGIONAL}". N = min(${MAX_CLUBS}, viable); a nation ships when N >= ${MIN_CLUBS}.`;
+  + `fewer than 11 natural-position (proficiency >= 90) players or no natural goalkeeper. A club without an FM competition stays in as "${REGIONAL}". `
+  + `N = min(${cap}, viable), ${cap} being the nation's tier in src/data/domesticTiers.js; a nation ships when N >= ${MIN_CLUBS}.`;
 const SQUAD = `Up to 16 players: the strongest natural 4-4-2 (1 GK, 4 DF, 4 MF, 2 FW) in the game's roles (FM_ROLES: lw/rw are forwards), `
   + 'players seated in Current Ability order whenever the filled shirts can be rearranged to fit them, then the best remaining by Current Ability.';
 const LOANS = `Not applied: EFEM's player list (views Default, ValueAndWage and Profile checked) gives only the contract clubId and no loan club, `
@@ -307,7 +311,7 @@ async function sync() {
         endpoints: { clubs: CLUBS_ENDPOINT, players: PLAYERS_ENDPOINT },
         clubsQuery: lister.query(),
         playersQuery: `Every male ${VERSION} player, read in single-page slices (playerbase.gender=0, currentAbility=<v>, age range; pageSize ${SLICE_PAGE_SIZE}) and grouped by exact clubId.`,
-        selection: SELECTION, squad: SQUAD, loans: LOANS, locations: LOCATIONS, names: NAMES,
+        selection: selection(domesticCap(id)), squad: SQUAD, loans: LOANS, locations: LOCATIONS, names: NAMES,
         attribution: { geonames: 'GeoNames (geonames.org), CC BY 4.0', wikidata: 'Wikidata, CC0' },
         updateCommand: `node scripts/sync-domestic-clubs.mjs --only=${id}`,
       },

@@ -1,6 +1,6 @@
-// The football data set builder (scripts/lib/football-set.mjs, scripts/build-football-set.mjs;
+// The football data set builder (src/data/footballSetBuild.js, scripts/build-football-set.mjs;
 // docs/design/football-years.md) on synthetic CM 01/02 folders from scripts/lib/cm0102-fixture.mjs,
-// and the manifests it reads.
+// and the manifests it reads (src/data/cm0102Releases.js, cm0102Nations.js, footballFederations.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -12,18 +12,17 @@ import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
 import { CM_ROLES, cmTupleOf, expandCmTuple } from '../src/data/cmPlayers.js';
 import { fileSignature } from '../src/data/cm0102.js';
-import { decodeFootballSet } from '../src/engine/footballSets.js';
+import { CM0102_RELEASES as databases } from '../src/data/cm0102Releases.js';
+import { CM0102_NATIONS as nationMap } from '../src/data/cm0102Nations.js';
+import { FOOTBALL_FEDERATIONS as federations } from '../src/data/footballFederations.js';
 import {
   buildFootballIndex, buildFootballSet, contentHash, estimateBirthShift, LAST_YEAR, LEAGUES, nationResolver, NO_TEAM, resolveDatabase,
   seasonOfRelease, seasonYear, territoryFor,
-} from './lib/football-set.mjs';
+} from '../src/data/footballSetBuild.js';
+import { decodeFootballSet } from '../src/engine/footballSets.js';
 import { sampleDatabase, writeCm0102Files } from './lib/cm0102-fixture.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const manifest = file => JSON.parse(readFileSync(path.join(root, 'scripts/data', file), 'utf8'));
-const databases = manifest('cm0102-databases.json').databases;
-const nationMap = manifest('cm0102-nations.json');
-const federations = manifest('football-federations.json');
 const identity = { label: 'Fixture', released: '2007-10', url: 'https://example.test/fixture', dobShift: 6 };
 const build = (db = sampleDatabase({ birthYearShift: 6 }), options = {}) => buildFootballSet(writeCm0102Files(db, options.write), {
   databases, nationMap, federations, identity, ...options,
@@ -107,7 +106,9 @@ test('every stored CM nation name maps to a game nation or is listed as having n
   assert.equal(resolve('Yugoslavia'), '688');
   assert.equal(resolve('Republic of Ireland'), '372');
   assert.equal(resolve('  south   korea '), '410');
-  assert.equal(resolve('Scotland'), NO_TEAM);
+  assert.equal(resolve('Scotland'), 'SCO');
+  assert.equal(resolve('Northern Ireland'), 'NIR');
+  assert.equal(resolve('Gibraltar'), NO_TEAM);
   assert.equal(resolve('Fictionland'), null);
   assert.throws(() => nationResolver({ aliases: { Atlantis: '999' } }), /not a game nation/);
   assert.throws(() => nationResolver({ noTeam: ['England'] }), /maps to 826/);
@@ -174,13 +175,32 @@ test('a known database is identified by its sizes, with digests confirmed', () =
     url: 'https://example.test/known', shifts: { birth: 6, joined: 6, contract: 6 },
     signatures: [{ club: clubSize, staff: staffSize, clubSha256: sha(files['club.dat']), staffSha256: '0'.repeat(64) }],
   };
-  const { doc, audit, warnings } = buildFootballSet(files, { databases: [entry], nationMap, federations, identity: { label: 'Ignored' } });
+  const { doc, text, audit, warnings } = buildFootballSet(files, { databases: [entry], nationMap, federations, identity: { label: 'Ignored' } });
   assert.equal(doc.source.version, 'Fixture known');
   assert.equal(doc.source.provider, 'Fixture makers');
   assert.equal(doc.label, 'CM 01/02 · Fixture known');
   assert.deepEqual(audit.database.digests, { club: 'match', staff: 'mismatch' });
   assert.ok(warnings.some(w => /staff\.dat has the size of Fixture known but not its SHA-256/.test(w)));
   assert.ok(warnings.some(w => /--label is ignored/.test(w)));
+  // verifyFiles: false skips the digests, which a browser import may not want to pay for, and builds the same set.
+  const quick = buildFootballSet(files, { databases: [entry], nationMap, federations, verifyFiles: false });
+  assert.deepEqual(quick.audit.database.digests, { club: 'not checked', staff: 'not checked' });
+  assert.ok(!quick.warnings.some(w => /SHA-256/.test(w)));
+  assert.equal(quick.text, text);
+  const unlisted = { ...entry, signatures: [{ club: clubSize, staff: staffSize }] };
+  assert.deepEqual(buildFootballSet(files, { databases: [unlisted], nationMap, federations, verifyFiles: false }).audit.database.digests,
+    { club: 'not known', staff: 'not known' });
+});
+
+test('the builder defaults to the src manifests, so the CLI and the browser build the same set', () => {
+  const files = writeCm0102Files(sampleDatabase({ birthYearShift: 6 }));
+  const given = buildFootballSet(files, { databases, nationMap, federations, identity });
+  const defaulted = buildFootballSet(files, { identity });
+  assert.equal(defaulted.text, given.text);
+  assert.deepEqual(defaulted.audit, given.audit);
+  assert.throws(() => buildFootballSet(files), /Unknown CM 01\/02 database .*: it is not in src\/data\/cm0102Releases\.js/);
+  assert.throws(() => buildFootballSet(writeCm0102Files(sampleDatabase({ birthYearShift: 6, unmapped: true })), { identity }),
+    /Fictionland \(2 players\)\. Add them to src\/data\/cm0102Nations\.js/);
 });
 
 test('seasons ending before 2002 are refused', () => {
@@ -277,7 +297,7 @@ test('a data set has every game nation, its source block and a content version',
   const { version, ...rest } = JSON.parse(text);
   assert.equal(version, `cm0102-2007-10-${createHash('sha256').update(JSON.stringify(rest)).digest('hex').slice(0, 8)}`);
   assert.equal(text, `${JSON.stringify(doc)}\n`);
-  assert.deepEqual(doc.coverage, { players: new Set(tuplesOf(doc).map(t => t[0])).size, nations: 8, completeXIs: 7, clubs: 7, leagues: 7 });
+  assert.deepEqual(doc.coverage, { players: new Set(tuplesOf(doc).map(t => t[0])).size, nations: 9, completeXIs: 7, clubs: 7, leagues: 7 });
 });
 
 test('never invents: every tuple is a stored fixture player, and rebuilds exactly', () => {
@@ -309,10 +329,13 @@ test('never invents: every tuple is a stored fixture player, and rebuilds exactl
 
 test('players of teamless nations stay at clubs; the dropped are counted', () => {
   const { doc, audit } = build();
-  assert.deepEqual(audit.noTeam, { Scotland: 1, Curaçao: 1 });
+  assert.deepEqual(audit.noTeam, { Curaçao: 1 });
   assert.deepEqual(audit.players.dropped, { nameless: 0, noAbility: 1, noPositions: 1, noNationality: 1, unmapped: 0, duplicates: 1 });
   const national = Object.values(doc.nations).flatMap(([, , squad]) => squad);
-  assert.ok(!national.some(t => ['Scotland', 'Curaçao'].includes(t[5])));
+  assert.ok(!national.some(t => t[5] === 'Curaçao'));
+  // A home nation plays for itself, not for England.
+  assert.deepEqual(doc.nations.SCO[2].map(t => [t[1], t[5]]), [['Undated Fixtureson', 'Scotland']]);
+  assert.ok(!doc.nations['826'][2].some(t => t[5] === 'Scotland'));
   const england = audit.nations.find(n => n.id === '826');
   assert.equal(england.pool, doc.nations['826'][1]);
   assert.equal(england.naturalLineup, true);
@@ -465,7 +488,7 @@ test('the CLI writes the set, its audit and the index, and rebuilds the same byt
   withFolder(({ game, out }) => {
     const first = run(`--cm0102=${game}`, `--out=${out}`, ...flags);
     assert.equal(first.status, 0, first.stderr);
-    assert.match(first.stdout, /National squads: 7\/170 complete natural XIs/);
+    assert.match(first.stdout, /National squads: 7\/173 complete natural XIs/);
     assert.match(first.stdout, /Clubs: 7 \(Premier League 1, La Liga 1/);
     assert.deepEqual(readdirSync(out).sort(), ['cm0102-2007-10.audit.json', 'cm0102-2007-10.json', 'index.json']);
     const text = readFileSync(path.join(out, 'cm0102-2007-10.json'), 'utf8');
