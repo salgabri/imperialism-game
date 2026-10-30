@@ -128,7 +128,7 @@ async function pickSeason(document, id) {
   select.value = id;
   await act(async () => select.dispatchEvent(new document.defaultView.Event('change', { bubbles: true })));
 }
-/** The Season dropdown's names for the built-in earlier seasons: "2023/24" … "2014/15", without their source. */
+/** The Season dropdown's names for the built-in earlier seasons: "2023/24" … "2006/07", without their source. */
 const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
 
 // ---------- setup ----------
@@ -147,7 +147,7 @@ test('the Season choice offers the built-in season, then every earlier season bu
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
       assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER]);
       assert.deepEqual(EARLIER.slice(0, 2), ['2023/24', '2022/23']);
-      assert.equal(EARLIER.at(-1), '2014/15');
+      assert.equal(EARLIER.at(-1), '2006/07');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
       assert.equal(seasonPicker(document).value, '');
       assert.match(document.getElementById('setup-season-note').textContent, /Earlier seasons use EA FIFA ratings/);

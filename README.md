@@ -103,7 +103,7 @@ default suits a first campaign, so pressing Space three times starts one.
    clubs in football, a second theatre group, **One country · top clubs**,
    starts a [domestic campaign](#domestic-campaigns), and its map shows that
    country. Football also has a **Season** choice: the built-in 2025/26, then
-   the [earlier seasons](#football-seasons) 2023/24 back to 2014/15 (EA FIFA
+   the [earlier seasons](#football-seasons) 2023/24 back to 2006/07 (EA FIFA
    ratings of each), and any local CM 01/02 season built on this computer.
    Basketball's lists the built-in 2024/25, then its
    [earlier seasons](#basketball-seasons) 2023/24 back to 1999/00 (NBA 2K
@@ -680,24 +680,35 @@ fitting and the file additions.
 
 ## Football seasons
 
-Football can be played on ten earlier seasons as well as the built-in 2025/26:
-2014/15 to 2023/24, each from EA's FIFA (FIFA 15 to EA FC 24) launch roster of
-that season. They ship with the game: pick one under **Season** in setup. Each
-is a file in `public/football/` (about 310 KB) that loads only when chosen.
+Football can be played on eighteen earlier seasons as well as the built-in
+2025/26: 2006/07 to 2023/24, each from EA's FIFA of that season (FIFA 07 to EA
+FC 24). They ship with the game: pick one under **Season** in setup. Each is a
+file in `public/football/` (250–315 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
-  and the clubs of the seven leagues the club layer uses, picked by EA's
-  competition id (132–134 clubs a season). Ratings are EA's overalls,
-  unchanged. EA rates only part of the world, so 73–82 nations field a full XI
-  each season and the rest field the players they have, as an empty or thin
+  and the clubs of the seven leagues the club layer uses (132–134 clubs a
+  season). Ratings are EA's overalls, unchanged. EA rates only part of the
+  world, so 49–82 nations field a full XI each season (fewer in the older
+  editions) and the rest field the players they have, as an empty or thin
   built-in nation does. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
   none, and their players still play for their clubs.
-- **Source:** one Kaggle export of every FIFA 15 – EA FC 24 launch roster
+- **Rosters:** FIFA 15 to EA FC 24 are each edition's launch roster. FIFA 07 to
+  FIFA 11 take their ratings from the launch roster and the clubs and
+  nationalities from the winter update; FIFA 12 to FIFA 14 use one roster each,
+  from later in the season.
+- **Sources:** FIFA 15 – EA FC 24 come from one Kaggle export
   (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
-  labelled CC0 by its compiler; EA's own rights are not cleared, as for the
-  built-in EA FC 26 data). `scripts/data/ea-seasons.json` pins its SHA-256. To
-  rebuild, download it into the ignored `data-src/ea-leone/`, unzip it and run:
+  labelled CC0 by its compiler). FIFA 07 – FIFA 14 join two scrapes by EA's
+  player id: a FIFA Index mirror on Kaggle
+  (`daguizer/fifa-2021-to-2005-complete-player-attributes`, licence "other";
+  FIFA Index's terms forbid scraping) for the overall, positions, full name and
+  date of birth, and a SoFIFA scrape on GitHub (`Big-Data-FC/datasets`, no
+  licence stated) for the nationality and club. SoFIFA's own rating is never
+  read, and a player missing from either file is left out. EA's own rights are
+  not cleared, as for the built-in EA FC 26 data. `scripts/data/ea-seasons.json`
+  pins every file by SHA-256. To rebuild, download them into the ignored
+  `data-src/` (the manifest names each folder) and run:
 
   ```bash
   npm run build:ea-seasons
@@ -707,7 +718,8 @@ is a file in `public/football/` (about 310 KB) that loads only when chosen.
   `docs/design/football-seasons-audit.json`, and every file rebuilds byte for
   byte.
 
-Seasons before 2014/15 have no EA source. They can come from a Championship
+Seasons before 2006/07 have no EA source here: the SoFIFA scrape, the only
+source of nationality and club, starts with FIFA 07. They can come from a Championship
 Manager 01/02 database, which covers 2001/02 to 2025/26 but whose authors have
 not allowed redistribution, so those seasons stay **local**. Download a database
 from [champman0102.co.uk](https://www.champman0102.co.uk) (a free forum account

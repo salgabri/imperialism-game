@@ -2,8 +2,9 @@
 
 Status: implemented for local CM 01/02 data sets, 2026-10-24; the built-in
 earlier seasons from EA's FIFA 15 – EA FC 24 launch rosters and an
-always-visible Season choice, 2026-10-30; the earlier basketball seasons from
-2K Archive's NBA 2K ratings, on maps of their eras, 2026-10-30. The CM 01/02 path has not yet run on a
+always-visible Season choice, 2026-10-30; FIFA 07 – FIFA 14 from two scrapes of
+EA's rosters, and the earlier basketball seasons from 2K Archive's NBA 2K
+ratings, on maps of their eras, 2026-10-30. The CM 01/02 path has not yet run on a
 real database (the files need a forum login). Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
 [football-year-permissions.md](football-year-permissions.md).
@@ -14,7 +15,7 @@ A football campaign can be played on a **data set** other than the built-in one.
 A data set is one dated database turned into nations and clubs. There are two
 kinds:
 
-- **The built-in earlier seasons** (2014/15 to 2023/24): one EA FIFA / FC launch
+- **The built-in earlier seasons** (2006/07 to 2023/24): one EA FIFA / FC
   roster each, committed under `public/football/ea-*.json` and offered in every
   setup. See [Built-in earlier seasons](#built-in-earlier-seasons).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
@@ -189,8 +190,9 @@ names the provider and reads "Game rating converted from CM current ability".
 
 ## Built-in earlier seasons
 
-Ten seasons ship with the game, 2014/15 to 2023/24: the launch roster (update 2)
-of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
+Eighteen seasons ship with the game, 2006/07 to 2023/24. FIFA 07 to FIFA 14 are
+described [below](#fifa-07-to-fifa-14). The other ten, 2014/15 to 2023/24, are
+the launch roster (update 2) of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
 (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
 180,021 rows, labelled CC0 by its compiler; EA's own rights are not cleared, as
 for the built-in EA FC 26 data). `scripts/data/ea-seasons.json` names the export,
@@ -227,7 +229,7 @@ How a season is made:
   requires: 132–134 clubs a season. Ids, codes and colours come from the same
   `presentClubs` as the CM builder.
 - **Territory** is `territoryFor(FOOTBALL_FEDERATIONS, year)`, as for CM sets:
-  Kosovo has no team in 2014/15.
+  Kosovo has no team before 2015/16, and Sudan holds South Sudan in the older seasons.
 - **Ratings** are EA's overall, 1–99, unchanged.
 
 An EA set's `source` is `{ provider: 'EA Sports', edition: 'FIFA 18', update: 2,
@@ -238,6 +240,59 @@ overall, 'ST,LW', nationality, club, dateOfBirth, slug]`. `expandEaTuple` in
 with `source: 'ea-fc'`, the edition, update, snapshot date and the player's
 SoFIFA page for that roster, and `eaTupleOf` folds it back. The Source column
 reads "FIFA 18" and links to that page.
+
+### FIFA 07 to FIFA 14
+
+No single export covers the editions before FIFA 15, so these eight seasons
+join two scrapes of EA's rosters by EA's player id
+(`scripts/lib/ea-legacy-seasons.mjs`, run by the same `npm run build:ea-seasons`
+through the same `assembleEaSeason`):
+
+- **Ratings** from a FIFA Index mirror on Kaggle
+  (`daguizer/fifa-2021-to-2005-complete-player-attributes`, licence "other" as
+  set by its compiler; FIFA Index's terms forbid scraping): EA's overall,
+  positions, full name and date of birth, but no nationality or club.
+- **Nationality and club** from a SoFIFA scrape on GitHub (`Big-Data-FC/datasets`
+  at commit `c6da23f`, no licence stated): nationality, club, league, short name
+  and the player's SoFIFA page. Its own rating (`bov`) is SoFIFA's best overall
+  at any position, not EA's, and is never read.
+- **Roster dates** from a list of SoFIFA's dates per roster (`dates.json`,
+  pinned by SHA-256; it has no source link).
+
+`scripts/data/ea-seasons.json` (`legacy`) pins every file by SHA-256 and names,
+per edition, the roster each file holds and the evidence for it. A player
+missing from either file is left out, and nothing is borrowed from another
+edition. Clubs come from each edition's seven SoFIFA league names (the same
+seven every year, such as `Portuguese Liga ZON SAGRES`): 132 clubs a season.
+`Turks and Caicos Islands` joins `EA_NO_TEAM`.
+
+- **Two rosters for FIFA 07 to FIFA 11.** The ratings file holds the August
+  launch roster (`070001` …) and the clubs file the February winter update
+  (`070002` …): the clubs file has players EA added in winter, and the six
+  FIFA 08 players whose attributes changed in February keep their August values
+  in the ratings file. These seasons carry `ratingsDate` (August) beside
+  `snapshotDate` (February). Ratings barely moved in between: attributes agree
+  for all but one of 10,149 FIFA 07 players and ten of 12,004 FIFA 08 players.
+- **One roster for FIFA 12 to FIFA 14**: `120002` (February 2012), and each
+  edition's last roster for FIFA 13 and 14, `130034` and `140052`. SoFIFA dates
+  those September 2013 and 2014, but their squads are the season's: Bale is at
+  Tottenham in 2012/13 and Vidić at Manchester United in 2013/14.
+- **Positions.** FIFA Index's older codes map onto EA's current ones
+  (`LEGACY_POSITIONS`: `SW` to `CB`, `LWM` / `RWM` to `LM` / `RM`, `LF` / `RF` to
+  `CF`, and the side variants of central roles to the central role).
+- **Invented names left out.** EA gave some players stand-in names (Mutu
+  appears as "Teodor Petrovici" and "Andrei Murgu"). The manifest lists 33 such
+  records of 10 people with the evidence for each: the same EA id under the real
+  name in another edition, a second database naming the stand-in, or, for four
+  FIFA 08–11 names, the same club, nationality and birth year as a proven FIFA 07
+  stand-in. The build stops if a listed id or name is missing from its edition.
+- **Damaged text stops the build**, except FIFA 12 player 168649, whose short name
+  the scrape garbled: the build uses the ratings file's full name ("Aleksejs
+  Višŋakovs", as spelt there) and records it in the audit.
+
+A legacy season's `source` adds `clubsUrl` (the SoFIFA scrape) to `url` (the
+ratings mirror), and `ratingsDate` where the two rosters differ. Full XIs run
+from 49 (FIFA 09) to 69 (FIFA 12) of 173 nations.
 
 ## Earlier basketball seasons
 
@@ -389,19 +444,28 @@ season's own three strongest clubs once it has loaded.
 - Seasons ending before 2002 need historic federations and are refused.
 - League detection uses stored competition names and CM0102Patcher's renames. A
   top division renamed some other way is reported missing, not guessed.
-- EA seasons cover the nations EA rates: about 95 of the 173 field fewer than
-  eleven natural players each season. Seasons before 2014/15 have no EA source
-  and need a local CM 01/02 database.
+- EA seasons cover the nations EA rates: 91–124 of the 173 field fewer than
+  eleven natural players each season, more in the older editions. Seasons before
+  2006/07 have no EA source here (the SoFIFA scrape, the only source of
+  nationality and club, starts with FIFA 07) and need a local CM 01/02 database.
 - An EA season's XI is the best by EA nationality, like the built-in data, not
   the squad a national coach picked.
+- In FIFA 07 to FIFA 10 wingers play as midfielders: FIFA Index has no `LW` /
+  `RW` in those editions, and its `LWM` / `RWM`, its label for EA's wingers
+  (C. Ronaldo, Robben, Joaquín), map to `LM` / `RM`.
+- The Source column shows a season's `snapshotDate`: for FIFA 07 to FIFA 11 the
+  February roster's date, though the ratings are August's (`ratingsDate`).
+- FIFA Index's FIFA 07 and FIFA 08 overalls are one point lower than a second
+  database's (the European Soccer Database on Kaggle) for about 35–40% of
+  players; the build uses FIFA Index's.
 - Basketball seasons have no national teams, and none before 1999/00: NBA 2K
   begins with the 1999/00 season. 2011/12 is missing (above).
 - Era maps follow franchises that changed city, not moves within one area:
   seasons from 2014/15 use today's arenas, so the Warriors' territory is named
   San Francisco though they played in Oakland until 2019, and the Clippers'
   Inglewood though they played in Los Angeles until 2024. The New Jersey Nets
-  are placed at East Rutherford for their Newark seasons (2010/11, 2011/12), and
-  the Pistons at Detroit for their Auburn Hills years (until 2016/17).
+  are placed at East Rutherford for their Newark season (2010/11), and the
+  Pistons at Detroit for their Auburn Hills years (until 2016/17).
 - A franchise's code and colour are the game's when it kept its id; a moved one
   gets a code and colour of its own, not its historic ones.
 

@@ -304,7 +304,7 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
-  football: 'Earlier seasons use EA FIFA ratings from the start of that season. Nations without eleven rated players '
+  football: 'Earlier seasons use EA FIFA ratings of that season. Nations without eleven rated players '
     + 'start short-handed.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
     + 'only: the franchises of that season, on the map of their day.',

@@ -1,5 +1,5 @@
 // Data sets: one dated database's nations and clubs, played instead of a sport's built-in season. A football set is
-// one of the built-in earlier seasons (an EA FIFA / FC launch roster, src/data/footballSeasons.js) or a CM 01/02
+// one of the built-in earlier seasons (an EA FIFA / FC roster, src/data/footballSeasons.js) or a CM 01/02
 // database built on this computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition,
 // src/data/basketballSeasons.js), clubs only, on its era's map. Each is a `public/<sport>/<id>.json` (format 1, see
 // docs/design/football-years.md), validated strictly and exposed as that sport bound to the season. The built-in data
