@@ -10,7 +10,8 @@ import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
 import { BUILT_IN_SEASON, fieldedNations } from '../../engine/footballSets.js';
-import { V4, empireFill, ratingTierOf } from '../../theme.js';
+import { V4, ratingTierOf } from '../../theme.js';
+import { politicalFill } from '../../data/empireColours.js';
 
 export const PACING_OPTIONS = [['duel', 'One by one'], ['blitz', 'Blitz round'], ['chaos', 'Chaos draw']];
 export const RESOLUTION_OPTIONS = [['ticker', 'Live ticker'], ['instant', 'Instant result']];
@@ -332,7 +333,7 @@ export function domesticDescription(entry) {
 const countryPreviewCache = new WeakMap();
 /**
  * Step 1's static country card (the v4 form of the setup preview): a decoded country map's sections, each in the
- * pastel its starting club takes at kick-off (`empireFill(club.id)`, DEC D18), over the neighbouring land
+ * pastel its starting club takes at kick-off (`politicalFill(club.id)`, DEC D18), over the neighbouring land
  * (`backdrop`: [{ id, d }], App's `surroundings(map).shapes`). Framed on the map's opening focus, else on all sections,
  * in the fitted 960×540 frame. Pure; memoised per decoded map, fitted paths and backdrop.
  * → { viewBox, sections: [{ id, d, fill }], backdrop: [{ id, d }] } | null
@@ -346,7 +347,7 @@ export function countryMapPreview(domestic, backdrop = null) {
   const starter = domestic.startOwners || Object.fromEntries((domestic.clubs || []).map(club => [club.homeSection, club.id]));
   const ids = Object.keys(domestic.sectionNames).filter(id => paths[id]?.d);
   if (!ids.length) return null;
-  const sections = ids.map(id => Object.freeze({ id, d: paths[id].d, fill: starter[id] ? empireFill(starter[id]) : V4.landNeutral }));
+  const sections = ids.map(id => Object.freeze({ id, d: paths[id].d, fill: starter[id] ? politicalFill(starter[id]) : V4.landNeutral }));
   let box = domestic.focus && typeof domestic.geo.focusView === 'function' ? domestic.geo.focusView(domestic.focus) : null;
   if (!(box && box.w > 0 && box.h > 0)) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -368,7 +369,7 @@ export function countryMapPreview(domestic, backdrop = null) {
 const theatrePreviewCache = new WeakMap();
 /**
  * Step 1's world card, the country card's counterpart for every world theatre: the opening board, each held
- * territory in its team's kick-off pastel (`empireFill(teamId)`, DEC D18) over the land nobody holds. `countries` is the
+ * territory in its team's kick-off pastel (`politicalFill(teamId)`, DEC D18) over the land nobody holds. `countries` is the
  * chart's draw order ([{ id }]); a shape comes from `paths` (the display atlas, as WorldMap draws it), else `basePaths`
  * (the topology), both fitted. `own` is territory → team at kick-off (overseas territory included). The card frames
  * `focus` (a fitted { x, y, w, h }) when given, else the main polygons of `frameIds`, the teams' starting land.
@@ -386,7 +387,7 @@ export function theatreMapPreview({ countries, paths = null, basePaths, own, fra
   for (const { id } of countries) {
     const d = pathOf(id)?.d;
     if (!d) continue;
-    if (own[id]) sections.push(Object.freeze({ id, d, fill: empireFill(own[id]) }));
+    if (own[id]) sections.push(Object.freeze({ id, d, fill: politicalFill(own[id]) }));
     else backdrop.push(Object.freeze({ id, d }));
   }
   if (!sections.length) return null;

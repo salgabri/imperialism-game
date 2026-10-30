@@ -257,7 +257,7 @@ Map modes:
 
 | Mode | Shows |
 | --- | --- |
-| **Political** (default) | A flat pastel per empire, picked by a hash of the team id. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
+| **Political** (default) | A flat pastel of each empire's own colour: a nation's colour (England, Poland and Finland, who play in white, take their flag's), a club's crest colour (`npm run build:club-colours`, corrected in `scripts/data/club-colours.json`). White and black teams are grey, and one of three lightness steps by team id keeps same-coloured neighbours apart. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
 | **Strength** | Five grey steps by strength percentile; your empire keeps its colour. |
 | **Fronts** | Your fronts tinted by your win chance (green / amber / red); other land is neutral. |
 | **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours. |

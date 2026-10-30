@@ -19,6 +19,7 @@ const compiled = await build({
     export { matchupOdds, winChanceFor } from './src/viewModels/odds.js';
     export { winTone } from './src/viewModels/format.js';
     export { empireFill, V4, MAP } from './src/theme.js';
+    export { politicalFill } from './src/data/empireColours.js';
     export { buildTeam, makeRng, teamEff } from './src/data/teams.js';
     export { getSport } from './src/sports/index.js';
   `, resolveDir: root, loader: 'jsx' },
@@ -44,7 +45,7 @@ function createEmpireLabelEngine(...args) {
 });
 const bundle = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), bundle, bundle.exports);
-const { WorldMap, placeAnchor, starPath, mapVM, matchupOdds, winChanceFor, winTone, empireFill, V4, MAP, buildTeam, makeRng,
+const { WorldMap, placeAnchor, starPath, mapVM, matchupOdds, winChanceFor, winTone, empireFill, politicalFill, V4, MAP, buildTeam, makeRng,
   teamEff, getSport, computeFitView, conquestLayout, THEATRE_LAYOUT } = bundle.exports;
 
 const css = await readFile(new URL('../src/components/map.css', import.meta.url), 'utf8');
@@ -123,7 +124,7 @@ const cssRule = selector => [...style.sheet.cssRules].find(rule => rule.selector
 
 // ---- pure view-models ----
 
-test('empire pastels follow the README hash (verified fixture values)', () => {
+test('an empire without a colour of its own takes the pastel picked by hash (verified fixture values)', () => {
   for (const [id, fill] of [['380', '#dcd3e6'], ['688', '#cddfe2'], ['276', '#e6dcc7'], ['250', '#ebe2b9'],
     ['348', '#d6dbe8'], ['040', '#d8e4c4'], ['724', '#e8d9c2']]) assert.equal(empireFill(id), fill, id);
 });
@@ -134,20 +135,20 @@ test('country fills follow the rule order: flags, neutral, flags mode, strength,
   const fill = args => mapVM.countryFill({ countryId: '380', ownerId: '380', owner: italy, ...args });
   assert.equal(fill({ hasFlagParts: true, meId: '380', meFill: true }), 'transparent', 'flag patterns are never recoloured');
   assert.equal(mapVM.countryFill({ countryId: '999' }), V4.landNeutral, 'unowned land is land-neutral');
-  assert.equal(mapVM.countryFill({ countryId: '380', setup: true }), empireFill('380'), 'setup shows nation pastels');
-  assert.equal(fill({}), empireFill('380'), 'political = pastel by hash');
-  assert.equal(fill({ meId: '380', meFill: false }), empireFill('380'), 'a followed (spectator) empire keeps its pastel');
+  assert.equal(mapVM.countryFill({ countryId: '380', setup: true }), politicalFill('380'), 'setup shows nation pastels');
+  assert.equal(fill({}), politicalFill('380'), 'political = the pastel of its own colour');
+  assert.equal(fill({ meId: '380', meFill: false }), politicalFill('380'), 'a followed (spectator) empire keeps its pastel');
   assert.equal(fill({ meId: '380', meFill: true }), V4.youFill, 'a managed empire is you-fill');
   assert.equal(fill({ opponentId: '380' }), V4.opponentFill, 'the known next opponent is opponent-fill');
-  assert.equal(fill({ mapMode: 'flags', meId: '380', meFill: true }), empireFill('380'), 'flags mode never shows you-fill');
+  assert.equal(fill({ mapMode: 'flags', meId: '380', meFill: true }), politicalFill('380'), 'flags mode never shows you-fill');
   assert.equal(mapVM.countryFill({ countryId: 'x', ownerId: 'c1', owner: club, mapMode: 'flags' }), '#123456', 'clubs fly their colour in Flags');
-  assert.equal(mapVM.countryFill({ countryId: 'x', ownerId: 'c1', owner: club }), empireFill('c1'), 'clubs are pastel in Political');
+  assert.equal(mapVM.countryFill({ countryId: 'x', ownerId: 'c1', owner: club }), politicalFill('c1'), 'clubs are pastel in Political');
   assert.equal(fill({ mapMode: 'strength', strength: { '380': MAP.strengthRamp[3] } }), MAP.strengthRamp[3]);
   assert.equal(fill({ mapMode: 'strength', strength: { '380': MAP.strengthRamp[3] }, meId: '380', meFill: true }), V4.youFill);
   assert.equal(fill({ mapMode: 'fronts', fronts: { '688': MAP.frontsTint.gain } }), V4.landNeutral, 'non-fronts are neutral');
   assert.equal(mapVM.countryFill({ countryId: '688', ownerId: '688', owner: teams['688'], mapMode: 'fronts',
     fronts: { '688': MAP.frontsTint.gain }, opponentId: '688' }), MAP.frontsTint.gain, 'fronts keep the win-chance tint');
-  assert.equal(fill({ mapMode: 'fronts', fronts: null }), empireFill('380'), 'no perspective → stays political');
+  assert.equal(fill({ mapMode: 'fronts', fronts: null }), politicalFill('380'), 'no perspective → stays political');
 });
 
 const playingState = (extra = {}) => ({ phase: 'playing', teams, aliveIds: Object.keys(teams), own: { ...OWN },
@@ -352,7 +353,7 @@ test('managed identity: you-fill, ink 1.4 outline and star capital; opponent fil
   try {
     assert.equal(view.q('path[data-country="380"]').getAttribute('fill'), V4.youFill);
     assert.equal(view.q('path[data-country="688"]').getAttribute('fill'), V4.opponentFill);
-    assert.equal(view.q('path[data-country="040"]').getAttribute('fill'), empireFill('040'));
+    assert.equal(view.q('path[data-country="040"]').getAttribute('fill'), politicalFill('040'));
     assert.equal(view.q('path[data-country="999"]').getAttribute('fill'), V4.landNeutral);
     const you = view.q('[data-outline="you"]'), opponent = view.q('[data-outline="opponent"]');
     assert.deepEqual([you.getAttribute('stroke'), num(you, 'stroke-width')], ['#111417', 1.4]);
@@ -370,13 +371,13 @@ test('managed identity: you-fill, ink 1.4 outline and star capital; opponent fil
     assert.deepEqual(tip, [0, -5.2], 'the star points straight up');
 
     await view.render({ ...props, meFill: false, opponentId: null });
-    assert.equal(view.q('path[data-country="380"]').getAttribute('fill'), empireFill('380'), 'spectator: pastel kept');
+    assert.equal(view.q('path[data-country="380"]').getAttribute('fill'), politicalFill('380'), 'spectator: pastel kept');
     assert.ok(view.q('[data-outline="you"]'), 'spectator: ink outline kept (A-7)');
     assert.equal(view.q('[data-capital="380"]').tagName.toLowerCase(), 'path', 'spectator: star kept');
     assert.equal(view.q('[data-outline="opponent"]'), null);
 
     await view.render({ ...props, mapMode: 'flags' });
-    assert.equal(view.q('path[data-country="380"]').getAttribute('fill'), empireFill('380'), 'Flags mode keeps base fills');
+    assert.equal(view.q('path[data-country="380"]').getAttribute('fill'), politicalFill('380'), 'Flags mode keeps base fills');
   } finally { await view.close(); }
 });
 
@@ -1015,12 +1016,12 @@ test('phone: no zoom buttons (A4); two fingers pinch-zoom around their midpoint 
 
 test('a country map: the setup preview paints each section as its starting club; tooltips name the sections', () => {
   const club = { id: 'd826-679', name: 'Manchester City', col: 'oklch(0.74 0.15 0)' };
-  assert.equal(mapVM.countryFill({ countryId: '826-001', setup: true, preview: club }), empireFill(club.id),
+  assert.equal(mapVM.countryFill({ countryId: '826-001', setup: true, preview: club }), politicalFill(club.id),
     'Political: the pastel the club takes at kick-off');
   assert.equal(mapVM.countryFill({ countryId: '826-001', setup: true, preview: club, mapMode: 'flags' }), club.col,
     'Flags: the club colour, as an owned club flies it');
   assert.equal(mapVM.countryFill({ countryId: '826-001', setup: true }), V4.landNeutral, 'no starting club: neutral land');
-  assert.equal(mapVM.countryFill({ countryId: '826-001', ownerId: '380', owner: teams['380'], preview: club }), empireFill('380'),
+  assert.equal(mapVM.countryFill({ countryId: '826-001', ownerId: '380', owner: teams['380'], preview: club }), politicalFill('380'),
     'an owner always wins over the preview');
   assert.equal(mapVM.countryFill({ countryId: '826-001', hasFlagParts: true, preview: club }), 'transparent');
 

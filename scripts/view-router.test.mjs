@@ -11,7 +11,7 @@ import { selectLineup } from '../src/data/teams.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { empireNeighbors } from '../src/engine/campaign.js';
-import { empireFill } from '../src/theme.js';
+import { politicalFill } from '../src/data/empireColours.js';
 import { ROOT, bundleApp, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 const BundledApp = await bundleApp();
@@ -642,7 +642,7 @@ test('setupMapPreview: the step-1 map card shows the board a world theatre opens
     const preview = app.setupMapPreview(setup);
     // Greenland comes with Denmark, as at launch; the starting land alone sets the frame.
     assert.deepEqual(preview.sections.map(section => [section.id, section.fill]),
-      [['208', empireFill('208')], ['276', empireFill('276')], ['250', empireFill('250')], ['304', empireFill('208')]]);
+      [['208', politicalFill('208')], ['276', politicalFill('276')], ['250', politicalFill('250')], ['304', politicalFill('208')]]);
     assert.deepEqual(preview.backdrop.map(shape => shape.id), ['999']);
     assert.equal(preview.viewBox, '70.4 70.4 259.2 59.2', 'the tiny atlas homes at x 80–320, y 80–120, 4% margin');
     assert.equal(preview.teams, app.setupTeams(setup).length);

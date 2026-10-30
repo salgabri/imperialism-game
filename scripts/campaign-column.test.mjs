@@ -9,7 +9,8 @@ import { JSDOM } from 'jsdom';
 import { build } from 'esbuild';
 import { buildTeam, makeRng, teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
-import { empireFill, MAP } from '../src/theme.js';
+import { MAP } from '../src/theme.js';
+import { politicalFill } from '../src/data/empireColours.js';
 import { formatWinChance, winTone } from '../src/viewModels/format.js';
 import { matchupOdds } from '../src/viewModels/odds.js';
 import { buildTargetPanel, idleTurnCopy } from '../src/viewModels/turns.js';
@@ -635,7 +636,7 @@ test('map key follows the map mode (A-11) and the reach key replaces it while ch
   assert.deepEqual(spectatorNone.items.map(item => item.key), ['attack', 'capital']);
   const following = keyOf({ followedId: '688' }, { managedId: null, followedId: '688' });
   assert.equal(following.items[0].label, 'Followed empire');
-  assert.equal(following.items[0].color, empireFill('688'));
+  assert.equal(following.items[0].color, politicalFill('688'));
   assert.equal(following.items[1].label, 'Next opponent');
 });
 
@@ -647,7 +648,7 @@ test('the "you" swatch is filled as the map paints that empire in each mode (A-7
   const spectator = { managedId: null, followedId: '688' };
   // A followed empire keeps its base fill: its pastel in Political only. The Strength ramp and the Fronts
   // land-neutral are not its colour, so there (as in Flags) the key shows the ink outline alone.
-  for (const [mapMode, color] of [['political', empireFill('688')], ['strength', null], ['fronts', null], ['flags', null]]) {
+  for (const [mapMode, color] of [['political', politicalFill('688')], ['strength', null], ['fronts', null], ['flags', null]]) {
     const item = youOf({ mapMode, followedId: '688' }, spectator);
     assert.equal(item.label, 'Followed empire', mapMode);
     assert.equal(item.color, color, mapMode);
@@ -661,7 +662,7 @@ test('the "you" swatch is filled as the map paints that empire in each mode (A-7
     assert.equal(reach.color, color, `${mapMode} reach key`);
   }
   // An unknown mode paints as Political.
-  assert.equal(youOf({ mapMode: 'weird', followedId: '688' }, spectator).color, empireFill('688'));
+  assert.equal(youOf({ mapMode: 'weird', followedId: '688' }, spectator).color, politicalFill('688'));
 });
 
 // =====================================================================================================

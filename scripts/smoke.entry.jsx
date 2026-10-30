@@ -17,7 +17,8 @@ import { domesticIdOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
 import { clearDomesticCache, decodeDomestic, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
 import { getSport } from '../src/sports/index.js';
-import { EMPIRE_PASTELS, empireFill } from '../src/theme.js';
+import { EMPIRE_PASTELS } from '../src/theme.js';
+import { politicalFill } from '../src/data/empireColours.js';
 import { createEmpireLabelEngine as createLabelValidator } from '../src/engine/empireLabels.js';
 
 const SPEED = 80;
@@ -81,7 +82,7 @@ function backdropSnapshot(app) {
   const shapes = svg.querySelector('g.country-shapes');
   const paths = [...group.querySelectorAll('path')];
   // Owner colours in both map modes: club colours (Flags) and the Political pastels (DEC D18).
-  const ownerColours = new Set([...Object.values(app.state.teams).map(team => team.col), ...EMPIRE_PASTELS]);
+  const ownerColours = new Set([...Object.values(app.state.teams).flatMap(team => [team.col, politicalFill(team.id)]), ...EMPIRE_PASTELS]);
   const noPointer = el => el.getAttribute('pointer-events') === 'none' || el.style?.pointerEvents === 'none';
   const fillOf = el => el.getAttribute('fill') || el.style?.fill || '';
   return {
@@ -808,7 +809,7 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   // starting group and not just its home: the club's pastel in Political (the default), the club's colour in Flags.
   const previewFills = mode => countryPaths().every(path => {
     const club = reference.clubBySection[path.dataset.country];
-    return !!club && path.getAttribute('fill') === (mode === 'flags' ? club.col : empireFill(club.id));
+    return !!club && path.getAttribute('fill') === (mode === 'flags' ? club.col : politicalFill(club.id));
   });
   const previousMode = app.state.mapMode;
   await setState(app, { mapMode: 'political' });
@@ -834,7 +835,7 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   // Step 1's country card: every section in its starting club's pastel (the card has no ids, so compare the fills
   // as a multiset), captioned with the sections and, unless there is one each, the clubs.
   const cardFills = [...document.querySelectorAll('.setup-map[data-kind="country"] .setup-map__sections path')].map(path => path.getAttribute('fill')).sort();
-  const startFills = Object.values(reference.startOwners).map(club => empireFill(club)).sort();
+  const startFills = Object.values(reference.startOwners).map(club => politicalFill(club)).sort();
   const caption = document.querySelector('.setup-map[data-kind="country"] .setup-map__caption')?.textContent.trim() || '';
   result.countryCard = JSON.stringify(cardFills) === JSON.stringify(startFills)
     && caption === `${entry.name} · ${sections} sections, ${sections === entry.clubs ? 'one per club' : `${entry.clubs} clubs`}`;

@@ -10,7 +10,8 @@ import { basketballProfile } from '../sports/basketball.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
 import { FEED_CAP, domesticIdOf } from '../app/shared.js';
-import { empireFill, V4 } from '../theme.js';
+import { V4 } from '../theme.js';
+import { politicalFill } from '../data/empireColours.js';
 import {
   campaignTitle, displayRound, formatOddsPair, historyRound, plainScopeName, memo, ratingTier, roman, routeCopy, teamChip,
   territoryWord,
@@ -132,7 +133,7 @@ function shareRows(rows, youId, managedId, limit = 5) {
     const n = Number(row.territories) || 0;
     return { key: row.tid, teamId: row.tid, flagId: row.flagId, isClub: !!row.isClub, code: row.code, name: row.name,
       territories: n, pct: label(n), width: Math.round(pct(n) * 10) / 10, you: row.tid === youId,
-      fill: managedId != null && row.tid === managedId ? V4.youFill : empireFill(row.tid) };
+      fill: managedId != null && row.tid === managedId ? V4.youFill : politicalFill(row.tid) };
   });
   const rest = total - shown.reduce((sum, row) => sum + row.territories, 0);
   const others = sorted.length > limit && rest > 0

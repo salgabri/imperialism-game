@@ -163,7 +163,7 @@ gold-trimmed "war room" look.
   - *Flags:* the existing flag patterns with v4 borders and labels.
 - **D19 — Map styling** follows the handoff README:
   - Sea `#dfe7eb` with no paper texture; a white graticule at 0.6 / 55%.
-  - Pastel empire fills by hash (11 colours). The next opponent is
+  - Pastel empire fills (now drawn from each empire's own colour; see README §Map rendering). The next opponent is
     opponent-filled only once the fixture is known.
   - Borders: white 1.5 between empires and 0.6 @75% inside one; coast `#9aa7ae`
     0.6. Your outline is ink 1.4, the opponent's `#2f54eb` 1.8.
