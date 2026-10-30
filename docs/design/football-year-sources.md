@@ -223,8 +223,8 @@ which federation holds which shapes, which generalises `DEPENDENCIES` in
 - Shapes with no federation in that year (South Sudan before 2012, Bosnia
   before 1996, Palestine and Eritrea before 1998) stay neutral.
 - East Germany and the Saar have no modern shape.
-- Scotland, Wales and Northern Ireland are missing from the map (826 is England
-  only). They have 901, 750 and 711 internationals in the results data, and every
+- Scotland, Wales and Northern Ireland were missing from the map (826 was
+  England only); they now have shapes of their own (`npm run build:home-nations`). They have 901, 750 and 711 internationals in the results data, and every
   rated source carries their players, so historic years need them as shapes
   (Natural Earth map units can supply them) or an explicit exclusion.
 - From 1995 at most about 12 shapes differ from today's map. True historical
@@ -284,8 +284,8 @@ From a read of the current pipeline:
    nations a year.
 3. **Years with no player ratings** (before 1985, and between the special years):
    offer them as strength-only campaigns, or keep the picker to rated years.
-4. **Scotland, Wales and Northern Ireland**: add shapes for historic years, or
-   leave them out.
+4. **Scotland, Wales and Northern Ireland**: settled. They have shapes and teams
+   (`scripts/build-home-nations.mjs`), and CM 01/02 seasons field them.
 5. **Which roster represents a year**: the launch roster (start of season, what
    EA editions use) or the final one.
 6. **Rating scales**: CM CA 1–200 and SWOS skills 0–7 need a documented

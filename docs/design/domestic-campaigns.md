@@ -48,7 +48,7 @@ A nation missing from the table would get the smallest tier; the data test
 requires every nation of `NATIONS` exactly once. Mexico (58 viable clubs) and the
 United States (81) stay below their tier; so do many smaller nations.
 
-**What ships:** 163 countries of the game's 170 nations, **4,343 clubs**, 16,300
+**What ships:** 163 countries of the game's 173 nations, **4,343 clubs**, 16,300
 sections. Maps total 22.1 MB (7.7 MB gzipped), 34–250 KB per country, fetched
 only when chosen; the generated index is 29 KB.
 
@@ -664,7 +664,9 @@ has no holder, or the holdings split a starting group.
 
 Status: implemented 2026-10-29. Basketball clubs have one theatre, **NBA**, played
 on `public/domestic/nba.json`: the USA and Canada and nothing else, split into 30
-territories, one per franchise. It reuses this whole runtime (loader, country
+territories, one per franchise, along state and province lines, with the states
+and provinces far from every arena left empty (since 2026-10-30; the first build
+split every county of both countries). It reuses this whole runtime (loader, country
 chart, backdrop, routing, saves) as a format-1 map whose clubs are the game's own.
 
 **Build** (`npm run build:nba-map`, `scripts/build-nba-map.mjs`, about a minute;
@@ -676,40 +678,66 @@ chart, backdrop, routing, saves) as a format-1 map whose clubs are the game's ow
   cut per country (`cutForeignLand`: Puerto Rico and the other territories go),
   Aleutian parts beyond the antimeridian are dropped and the overseas rule drops
   Hawaii. Alaska stays: it joins Canada by land.
+- **States and provinces**: each unit is tagged with the ADM1 region (state,
+  province; same sources and licences) holding its interior point. A region that
+  hosts at most one arena is merged from its units into one `whole` unit (on their
+  shared arcs, so its borders keep their vertices; `explodeUnits` leaves it in one
+  piece, so Michigan's two peninsulas go together). The units of California (4
+  franchises), Texas (3), Florida and New York (2 each) stay as counties, and
+  `allowed` gives them only to that state's own franchises. A territory is
+  therefore whole states and provinces, plus its share of its own state when that
+  state is shared.
+- **Empty land**: a region without an arena whose centroid lies over 1,000 km
+  (`EMPTY_KM`) from every arena is left out of the partition: Alaska, Yukon, the
+  Northwest Territories, Nunavut, British Columbia, Alberta, Saskatchewan,
+  Manitoba, Quebec, and Newfoundland and Labrador (the next nearest, Ontario at
+  813 km, is Toronto's home anyway). Those on the landmass go into the file as
+  empty land; those off it (Hawaii, with Puerto Rico and the other territories
+  already cut) are dropped.
 - **Homes**: each franchise's arena, `scripts/data/nba-arenas.json` (`[lon, lat]`
   to about 100 m, with the city that names the territory).
 - **Partition**: `partitionCountry` with one section per club (the format-1
   rules: the smallest territory takes the adjacent free unit nearest its arena,
   within reach). The two layers draw the national border up to ~3 km apart, so
   `joinKm: 5` links units of different realms that come that close
-  (`joinRealms`). Los Angeles County is cut for the Lakers and the Clippers.
+  (`joinRealms`). Los Angeles County is cut for the Lakers and the Clippers. With
+  `spare`, a club passes over a unit that is another club's last way out when the
+  unit lies nearer that club's arena: Brooklyn's only land neighbour is Queens, and
+  the Knicks, smaller at the start with Manhattan alone, would otherwise take it and
+  shut the Nets in. The build fails if a shared state's county goes to another
+  state's franchise.
 - **Border fitting** (`fitBorder`): each franchise's land is dissolved per
-  country; every Canadian edge within 3 km of US land is widened into a band, then
+  country, and each empty region is a piece of its own; every Canadian edge within 3 km of US land is widened into a band, then
   US land and the other Canadian pieces are cut away, and `nodeRings` gives the
   US rings the crossing points. Both sides then share the line vertex for vertex,
   so a franchise holding land in both countries is one territory and neighbours
   across the border are land neighbours in the game (`geo.adj`, border routes).
 - **Output** as the country maps (simplify to 14,000 points, quantize, colours
-  that differ across borders and water), plus `src/data/clubMaps.js` (the setup's
+  that differ across borders and water). Empty land is simplified with the
+  sections, in one topology, so the two share every border; it is then moved to
+  its own object. Plus `src/data/clubMaps.js` (the setup's
   index entry: `CLUB_MAPS`) and `public/domestic/ATTRIBUTION-nba.txt`. The file is
-  about 147 KB.
+  about 150 KB.
 
 **File additions** to format 1: `sport: "basketball"`, `league: "NBA"`, `hosts:
 ["840", "124"]` (the world shapes it covers, never drawn beneath it: the backdrop
 shows Mexico, Greenland and the Russian Far East), and `boundaries.layers` (one
-entry per source layer). Clubs are `{ id, col, section, home, arena }`: the id is
+entry per source layer; the ADM1 layers carry `use: "grouping"`), and
+`topology.objects.empty`: the empty land, one geometry per region with its ISO
+code as id (`CA-QC`) and `properties.name`, on the sections' arcs. Clubs are `{ id, col, section, home, arena }`: the id is
 a basketball club (`b-boston-celtics`), and the loader takes its name, code,
 league, strength and five from the game's data, so a 2K refresh needs no map
 rebuild unless a franchise moves. Section ids `nba-001` … `nba-030` follow club
-strength. The loader refuses an unknown sport or club, a repeated club and empty
-`hosts`; the FM checks apply to country maps only.
+strength. The loader refuses an unknown sport or club, a repeated club, empty
+`hosts` and empty land that is not a GeometryCollection of named, uniquely
+identified polygons; the FM checks apply to country maps only.
 
-**Result** (2026-10-29 build): Portland holds the Northwest with British Columbia,
-Yukon and Alaska; Minnesota the Prairies' east, northern Ontario and the Arctic
-islands; Utah Alberta and Saskatchewan's north; Toronto Quebec, Newfoundland and
-Labrador; Boston New England and the Maritimes; the Knicks southern Quebec. Areas
-range from the Nets' 4,000 km² (Brooklyn and Long Island) to Portland's 4.6 M km²:
-the land nearest each arena, as on the usual NBA imperialism maps.
+**Result** (2026-10-30 build): Portland holds Washington, Oregon and Idaho;
+Minnesota the Dakotas; Utah Montana and Wyoming; Denver Nebraska; Toronto Ontario;
+the Knicks upstate New York, New Jersey and Connecticut; Boston New England and
+the Maritimes; the Wizards Virginia, West Virginia, Maryland and Delaware. Areas
+range from the Nets' 4,000 km² (Brooklyn, Queens and Long Island) to Toronto's
+983,000 km².
 
 **Runtime.** The scope is `domestic:nba`. `domesticIdOf` maps a scope to a map
 only for its sport (a football country for football, the NBA map for basketball),
@@ -719,6 +747,10 @@ restores on the world. `setClubScope` (App) moves basketball clubs to
 every club. The setup lists the one row "NBA · 30 clubs", describes the split
 ("… lead the 30 NBA clubs, each starting on the land nearest its arena …"),
 loads and previews the map like a country, and titles read "NBA · USA and Canada".
+`decodeDomestic` returns the empty land as `empty` (a `WorldGeometry`, only ever
+drawn), and `domesticSurroundings` draws it first among the shapes beneath the
+map, in the backdrop's neutral grey. It is not an obstacle: like the host shape beneath
+England it lies inside the hosts, so a route over it reads as open ground.
 The victory names "USA and Canada". Basketball squads are not FM players, so
 checkpoints store them in full (no `playerPack`).
 
@@ -735,7 +767,10 @@ five at kick-off. Today's `nba.json` is unchanged and also serves the seasons fr
 
 **Checks**: `scripts/nba-map.test.mjs` (in `npm run test:domestic`): file, index,
 arenas and clubs agree; the USA and Canada are all the land and the hosts are not
-drawn beneath it; cross-border land neighbours and neighbour colours; seeded duel
+drawn beneath it; the empty regions are the expected ten, drawn but no obstacle, on
+the sections' arcs; towns of one state fall in one territory, towns of empty land
+in none, and New York splits between the Knicks and the Nets only; cross-border
+land neighbours and neighbour colours; seeded duel
 campaigns on the app board reach a champion without treaties or third-party
 crossings; loader refusals; the App sets up, launches and titles an NBA campaign
 and keeps an old world NBA save on the world. The smoke's NBA scenarios run
@@ -802,8 +837,8 @@ through the country-map checks.
   strips of land it gives to neighbours (East Jerusalem's core on Israel's map,
   along Cyprus's Green Line). Where a 1:50m outline overlaps sections (N. Cyprus,
   Crimea) sections win in routing. Russia's map has no Crimea (no RUS layer has
-  it) and shows blank there. On England the UK shape is not an obstacle, so Wales
-  and Scotland do not block routes. On coarse layers a fan zone spills outside its
+  it) and shows blank there. On England, Wales and Scotland are world shapes of
+  their own and block routes like any neighbour. On coarse layers a fan zone spills outside its
   circle, since whole units touching it are cut into sectors (Israel ADM2).
 - 48 located homes lie outside every shipped section: 38 lie just outside the
   boundary layer and were snapped to it (N. Cyprus refugee clubs, Bishkek's six,

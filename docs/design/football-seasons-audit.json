@@ -13,18 +13,15 @@
   "seasons": [
     {
       "id": "ea-fc-24",
-      "version": "ea-fc-24-4c59bff5",
+      "version": "ea-fc-24-698e9225",
       "edition": "EA FC 24",
       "update": 2,
       "roster": "240002",
       "snapshotDate": "2023-09-22",
       "rows": 18350,
       "noTeam": {
-        "Scotland": 267,
         "Malta": 5,
-        "Wales": 142,
         "Cape Verde Islands": 25,
-        "Northern Ireland": 81,
         "Comoros": 12,
         "Curacao": 12,
         "Grenada": 8,
@@ -42,9 +39,9 @@
         "Gibraltar": 2
       },
       "coverage": {
-        "players": 2295,
-        "nations": 140,
-        "completeXIs": 72,
+        "players": 2322,
+        "nations": 143,
+        "completeXIs": 75,
         "clubs": 132,
         "leagues": 7
       },
@@ -186,16 +183,13 @@
     },
     {
       "id": "ea-fifa-23",
-      "version": "ea-fifa-23-58d37d93",
+      "version": "ea-fifa-23-11260815",
       "edition": "FIFA 23",
       "update": 2,
       "roster": "230002",
       "snapshotDate": "2022-09-26",
       "rows": 18533,
       "noTeam": {
-        "Scotland": 272,
-        "Wales": 163,
-        "Northern Ireland": 72,
         "Cape Verde Islands": 29,
         "Malta": 4,
         "Comoros": 11,
@@ -218,9 +212,9 @@
         "Barbados": 1
       },
       "coverage": {
-        "players": 2334,
-        "nations": 137,
-        "completeXIs": 79,
+        "players": 2353,
+        "nations": 140,
+        "completeXIs": 82,
         "clubs": 134,
         "leagues": 7
       },
@@ -355,16 +349,13 @@
     },
     {
       "id": "ea-fifa-22",
-      "version": "ea-fifa-22-72b18d96",
+      "version": "ea-fifa-22-c17c871b",
       "edition": "FIFA 22",
       "update": 2,
       "roster": "220002",
       "snapshotDate": "2021-09-23",
       "rows": 19239,
       "noTeam": {
-        "Scotland": 293,
-        "Wales": 137,
-        "Northern Ireland": 78,
         "Cape Verde Islands": 21,
         "Curacao": 11,
         "Saint Kitts and Nevis": 5,
@@ -384,9 +375,9 @@
         "Hong Kong": 2
       },
       "coverage": {
-        "players": 2301,
-        "nations": 143,
-        "completeXIs": 75,
+        "players": 2324,
+        "nations": 146,
+        "completeXIs": 78,
         "clubs": 134,
         "leagues": 7
       },
@@ -525,16 +516,13 @@
     },
     {
       "id": "ea-fifa-21",
-      "version": "ea-fifa-21-440b7a88",
+      "version": "ea-fifa-21-b294312b",
       "edition": "FIFA 21",
       "update": 2,
       "roster": "210002",
       "snapshotDate": "2020-09-23",
       "rows": 18892,
       "noTeam": {
-        "Scotland": 287,
-        "Wales": 124,
-        "Northern Ireland": 80,
         "Cape Verde Islands": 23,
         "Curacao": 13,
         "Saint Kitts and Nevis": 2,
@@ -556,9 +544,9 @@
         "Hong Kong": 2
       },
       "coverage": {
-        "players": 2289,
-        "nations": 140,
-        "completeXIs": 74,
+        "players": 2312,
+        "nations": 143,
+        "completeXIs": 77,
         "clubs": 132,
         "leagues": 7
       },
@@ -698,16 +686,13 @@
     },
     {
       "id": "ea-fifa-20",
-      "version": "ea-fifa-20-58e7241c",
+      "version": "ea-fifa-20-a635a7ac",
       "edition": "FIFA 20",
       "update": 2,
       "roster": "200002",
       "snapshotDate": "2019-09-19",
       "rows": 18483,
       "noTeam": {
-        "Scotland": 277,
-        "Wales": 117,
-        "Northern Ireland": 81,
         "Cape Verde Islands": 20,
         "Curacao": 16,
         "Comoros": 9,
@@ -730,9 +715,9 @@
         "Macau": 1
       },
       "coverage": {
-        "players": 2283,
-        "nations": 139,
-        "completeXIs": 75,
+        "players": 2308,
+        "nations": 142,
+        "completeXIs": 78,
         "clubs": 134,
         "leagues": 7
       },
@@ -871,17 +856,14 @@
     },
     {
       "id": "ea-fifa-19",
-      "version": "ea-fifa-19-22ed7445",
+      "version": "ea-fifa-19-0ebd8d6d",
       "edition": "FIFA 19",
       "update": 2,
       "roster": "190002",
       "snapshotDate": "2018-08-21",
       "rows": 18086,
       "noTeam": {
-        "Wales": 123,
-        "Scotland": 288,
         "Cape Verde Islands": 21,
-        "Northern Ireland": 78,
         "Curacao": 12,
         "Liechtenstein": 4,
         "São Tomé e Príncipe": 1,
@@ -902,9 +884,9 @@
         "Bahrain": 1
       },
       "coverage": {
-        "players": 2262,
-        "nations": 139,
-        "completeXIs": 75,
+        "players": 2290,
+        "nations": 142,
+        "completeXIs": 78,
         "clubs": 134,
         "leagues": 7
       },
@@ -1043,17 +1025,14 @@
     },
     {
       "id": "ea-fifa-18",
-      "version": "ea-fifa-18-b49e395a",
+      "version": "ea-fifa-18-018a1734",
       "edition": "FIFA 18",
       "update": 2,
       "roster": "180002",
       "snapshotDate": "2017-09-18",
       "rows": 17954,
       "noTeam": {
-        "Wales": 125,
         "Cape Verde Islands": 22,
-        "Northern Ireland": 86,
-        "Scotland": 300,
         "Curacao": 11,
         "Liechtenstein": 3,
         "Bermuda": 4,
@@ -1074,9 +1053,9 @@
         "San Marino": 1
       },
       "coverage": {
-        "players": 2285,
-        "nations": 143,
-        "completeXIs": 74,
+        "players": 2310,
+        "nations": 146,
+        "completeXIs": 77,
         "clubs": 134,
         "leagues": 7
       },
@@ -1216,17 +1195,14 @@
     },
     {
       "id": "ea-fifa-17",
-      "version": "ea-fifa-17-b5408d46",
+      "version": "ea-fifa-17-c5adb9ec",
       "edition": "FIFA 17",
       "update": 2,
       "roster": "170002",
       "snapshotDate": "2016-09-20",
       "rows": 17596,
       "noTeam": {
-        "Wales": 124,
-        "Northern Ireland": 91,
         "Cape Verde Islands": 23,
-        "Scotland": 302,
         "Curacao": 13,
         "São Tomé e Príncipe": 1,
         "Liechtenstein": 7,
@@ -1247,9 +1223,9 @@
         "Saint Lucia": 1
       },
       "coverage": {
-        "players": 2264,
-        "nations": 140,
-        "completeXIs": 74,
+        "players": 2286,
+        "nations": 143,
+        "completeXIs": 77,
         "clubs": 134,
         "leagues": 7
       },
@@ -1389,17 +1365,14 @@
     },
     {
       "id": "ea-fifa-16",
-      "version": "ea-fifa-16-16dea461",
+      "version": "ea-fifa-16-db213566",
       "edition": "FIFA 16",
       "update": 2,
       "roster": "160002",
       "snapshotDate": "2015-09-21",
       "rows": 16706,
       "noTeam": {
-        "Wales": 129,
-        "Northern Ireland": 93,
         "Cape Verde Islands": 20,
-        "Scotland": 319,
         "Curacao": 11,
         "Bahrain": 1,
         "Guam": 1,
@@ -1419,9 +1392,9 @@
         "Faroe Islands": 2
       },
       "coverage": {
-        "players": 2247,
-        "nations": 134,
-        "completeXIs": 73,
+        "players": 2271,
+        "nations": 137,
+        "completeXIs": 76,
         "clubs": 134,
         "leagues": 7
       },
@@ -1562,16 +1535,13 @@
     },
     {
       "id": "ea-fifa-15",
-      "version": "ea-fifa-15-c96519db",
+      "version": "ea-fifa-15-6de54fe6",
       "edition": "FIFA 15",
       "update": 2,
       "roster": "150002",
       "snapshotDate": "2014-09-18",
       "rows": 16182,
       "noTeam": {
-        "Wales": 118,
-        "Northern Ireland": 91,
-        "Scotland": 323,
         "Cape Verde Islands": 26,
         "Barbados": 2,
         "Curacao": 5,
@@ -1590,9 +1560,9 @@
         "Montserrat": 1
       },
       "coverage": {
-        "players": 2219,
-        "nations": 130,
-        "completeXIs": 70,
+        "players": 2241,
+        "nations": 133,
+        "completeXIs": 73,
         "clubs": 134,
         "leagues": 7
       },

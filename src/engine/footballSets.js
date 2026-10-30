@@ -5,7 +5,7 @@
 // docs/design/football-years.md), validated strictly and exposed as that sport bound to the season. The built-in data
 // (src/data/rosters.js, clubs.football.js, the basketball modules) never changes.
 
-import { DEPENDENCIES, NATIONS } from '../data/teams.js';
+import { DEPENDENCIES, HOME_NATIONS, NATIONS } from '../data/teams.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
 import { BUILT_IN_SEASONS } from '../data/footballSeasons.js';
@@ -42,6 +42,9 @@ const CLUB_ID = /^f-[a-z0-9-]{0,62}$/;
 // What build-rosters writes for a nation with no players.
 const EMPTY_STRENGTH = 40;
 const NO_TERRITORY = Object.freeze({ merged: Object.freeze({}), inactive: Object.freeze([]) });
+// A set built before the map had the home nations lists none of them: England holds their land, as it did on the map
+// the set was built for, and their players played for no nation.
+const beforeHomeNations = nations => HOME_NATIONS.every(id => !Object.hasOwn(nations, id));
 
 // ---------- index ----------
 
@@ -207,14 +210,16 @@ export function decodeFootballSet(data, id = data?.id) {
   }
   const { nations, clubs, territory, ...meta } = data;
   const expand = tuple => expandSetPlayer(tuple, meta.source, setKindOf(meta.id));
+  const englandHolds = beforeHomeNations(nations);
   return {
     meta,
     rosters: Object.fromEntries(Object.keys(NATIONS).map(nation => {
-      const [str, pool, players] = nations[nation];
+      const [str, pool, players] = nations[nation] || [EMPTY_STRENGTH, 0, []];
       return [nation, [str, pool, players.map(expand)]];
     })),
     clubs: clubs.map(club => ({ ...club, squad: club.squad.map(expand) })),
-    territory: { merged: { ...territory.merged }, inactive: [...territory.inactive] },
+    territory: { merged: { ...territory.merged, ...(englandHolds ? Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])) : {}) },
+      inactive: [...territory.inactive] },
   };
 }
 
@@ -320,7 +325,8 @@ function validateFootballSet(data, id) {
   if (!isObject(nations)) fail('nations is missing');
   const unknown = Object.keys(nations).filter(key => !nation(key));
   if (unknown.length) fail(`nations has unknown ids ${unknown.slice(0, 5).join(', ')}`);
-  const missing = Object.keys(NATIONS).filter(key => !Object.hasOwn(nations, key));
+  const older = beforeHomeNations(nations);
+  const missing = Object.keys(NATIONS).filter(key => !Object.hasOwn(nations, key) && !(older && HOME_NATIONS.includes(key)));
   if (missing.length) fail(`nations must list all ${Object.keys(NATIONS).length} nations; missing ${missing.slice(0, 5).join(', ')}`);
   for (const [key, entry] of Object.entries(nations)) {
     const at = `nations[${key}]`;

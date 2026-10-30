@@ -30,9 +30,9 @@
   "omittedPossibleDuplicates": 4951,
   "unknownAbility": [],
   "conversion": "round(EFEM currentAbility * 99 / 100)",
-  "nationalTeams": 170,
-  "fullXIs": 170,
-  "eaShirts": 1194,
+  "nationalTeams": 173,
+  "fullXIs": 173,
+  "eaShirts": 1227,
   "fmShirts": 676,
   "generatedShirts": 0,
   "coverage": [
@@ -1398,6 +1398,33 @@
     {
       "id": "068",
       "name": "Bolivia",
+      "players": 11,
+      "ea": 11,
+      "fm": 0,
+      "goalkeeper": true,
+      "naturalLineup": true
+    },
+    {
+      "id": "SCO",
+      "name": "Scotland",
+      "players": 11,
+      "ea": 11,
+      "fm": 0,
+      "goalkeeper": true,
+      "naturalLineup": true
+    },
+    {
+      "id": "WAL",
+      "name": "Wales",
+      "players": 11,
+      "ea": 11,
+      "fm": 0,
+      "goalkeeper": true,
+      "naturalLineup": true
+    },
+    {
+      "id": "NIR",
+      "name": "Northern Ireland",
       "players": 11,
       "ea": 11,
       "fm": 0,

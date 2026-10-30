@@ -515,7 +515,7 @@ export default class App extends React.Component {
    * Neighbouring land beneath a country map, in its projection and fit. It is
    * drawn and blocks routes, but is never territory, labels or adjacency. The
    * host's own world shape is drawn only where the sections cover part of it
-   * (England keeps the UK beneath, so Wales and Scotland read as land).
+   * (England keeps its own shape beneath).
    */
   domesticBackdrop(domestic) {
     return this.surroundings(domestic).shapes;

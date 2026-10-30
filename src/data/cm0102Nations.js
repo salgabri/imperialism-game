@@ -1,15 +1,14 @@
 // CM 01/02 nation names (nation.dat long names) and the game nation each one plays for. A name equal to a
 // game nation's name (src/data/teams.js NATIONS, compared without accents, case or extra spaces) maps to it
 // without being listed here. 'aliases' maps the other spellings; 'noTeam' lists names deliberately without a
-// team: nations with no shape among the 170 (Scotland, Wales and Northern Ireland, which 826 England does not
-// cover, and small territories) and SI's historic placeholders. Their players still play for their clubs. A
-// name in neither list stops the build. Only stored spellings are listed: SI 3.9.60 and 3.9.68 (213 records
-// each; 3.9.60 has Taiwan for Chinese Taipei), the Update Team additions BOS and CM0102Patcher name (Serbia,
-// Montenegro, Kosovo, Gibraltar, North Macedonia, Curaçao, Martinique, eSwatini) and the spellings
-// TransferTool's lookup accepts (Serbia and Montenegro, Southern Sudan, Macedonia, Netherlands). With them
-// every one of the 170 game nations has a CM name, Montenegro, Kosovo and South Sudan only in the databases
-// that add them. Yugoslavia is FR Yugoslavia, then Serbia and Montenegro, so it plays as Serbia; Timor, an SI
-// placeholder that Update Team data keeps, is Timor-Leste. The dead records Update Team data keeps beside
+// team: nations with no shape on the map (small territories) and SI's historic placeholders. Their players
+// still play for their clubs. A name in neither list stops the build. Only stored spellings are listed: SI
+// 3.9.60 and 3.9.68 (213 records each; 3.9.60 has Taiwan for Chinese Taipei), the Update Team additions BOS and
+// CM0102Patcher name (Serbia, Montenegro, Kosovo, Gibraltar, North Macedonia, Curaçao, Martinique, eSwatini) and
+// the spellings TransferTool's lookup accepts (Serbia and Montenegro, Southern Sudan, Macedonia, Netherlands).
+// With them every one of the 173 game nations has a CM name, Montenegro, Kosovo and South Sudan only in the
+// databases that add them. Yugoslavia is FR Yugoslavia, then Serbia and Montenegro, so it plays as Serbia; Timor,
+// an SI placeholder that Update Team data keeps, is Timor-Leste. The dead records Update Team data keeps beside
 // their successors (Yugoslavia, Swaziland, Netherlands Antilles) hold 0-2 players. See
 // docs/design/cm0102-format.md.
 
@@ -73,12 +72,10 @@ export const CM0102_NATIONS = {
     'Mauritius',
     'Montserrat',
     'Netherlands Antilles',
-    'Northern Ireland',
     'Pays Basque',
     'Saint Lucia',
     'Samoa',
     'San Marino',
-    'Scotland',
     'Seychelles',
     'Singapore',
     'Soviet Union',
@@ -89,7 +86,6 @@ export const CM0102_NATIONS = {
     'Tonga',
     'Turks and Caicos Islands',
     'US Virgin Islands',
-    'Wales',
     'West Germany',
     'Zaire',
   ],

@@ -7,7 +7,7 @@
 // { id, sport, league, name, seasons?, clubs, sections, version, top?: three strongest clubs }
 
 export const CLUB_MAPS = [
-  {"id":"nba","sport":"basketball","league":"NBA","name":"USA and Canada","clubs":30,"sections":30,"version":"nba-f7925ecf","top":["Boston Celtics","Dallas Mavericks","Denver Nuggets"]},
+  {"id":"nba","sport":"basketball","league":"NBA","name":"USA and Canada","clubs":30,"sections":30,"version":"nba-a6718730","top":["Boston Celtics","Dallas Mavericks","Denver Nuggets"]},
   {"id":"nba2000","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k00","nba-2k01"],"clubs":29,"sections":29,"version":"nba2000-51fa2896"},
   {"id":"nba2002","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k02"],"clubs":29,"sections":29,"version":"nba2002-cd8315b3"},
   {"id":"nba2003","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k03","nba-2k04"],"clubs":29,"sections":29,"version":"nba2003-17b59f17"},

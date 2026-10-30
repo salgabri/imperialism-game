@@ -1,6 +1,8 @@
 // The NBA's own map (docs/design/domestic-campaigns.md, "The NBA map"): the USA and
-// Canada split into one territory per franchise, each grown from its arena over the
-// two countries' admin units by the domestic partition (format 1: one section per club).
+// Canada split into one territory per franchise, each grown from its arena by the
+// domestic partition (format 1: one section per club) over whole states and provinces.
+// Only a state with two or more franchises is split, along its counties, between them,
+// and states and provinces far from every arena stay empty: land, but nobody's.
 // The earlier basketball seasons (scripts/data/nba-seasons.json) play on maps of their
 // own era, built the same way from that era's teams and arenas: Seattle, Vancouver and
 // New Jersey where they played. Today's map is unchanged by them.
@@ -10,8 +12,9 @@
 //     --check    rebuild offline from the caches and compare every output byte for byte
 //     --dry-run  build and verify (downloading boundaries as needed) but write nothing
 //
-// Inputs:  geoBoundaries gbOpen USA ADM2 (counties) and CAN ADM2 (economic regions),
-//          cached under the gitignored data-src/boundaries/; the game's world map
+// Inputs:  geoBoundaries gbOpen USA and CAN ADM2 (counties, economic regions) grouped by
+//          their ADM1 (states, provinces), cached under the gitignored
+//          data-src/boundaries/; the game's world map
 //          public/countries-50m.json (land it gives to other countries is cut); the
 //          arenas in scripts/data/nba-arenas.json; the franchises in src/data/clubs.basketball.js;
 //          each era's teams and moved arenas in scripts/data/nba-seasons.json.
@@ -30,8 +33,9 @@ import { createBoundarySource, cutForeignLand, GB_CITATION } from './lib/domesti
 import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
 import { seasonIdOf, teamsOf } from './lib/nba-seasons.mjs';
 import {
-  arcPoints, bboxOf, components, dissolve, EARTH_KM, facingKm, facingSections, kmBetween, kmToPolys, nodeRings, partitionCountry, polysAreaKm2,
-  polysOf, quantize, sectionTopology, simplifyTopology, splitOnLand,
+  arcPoints, bboxOf, centroidOf, components, dissolve, EARTH_KM, facingKm, facingSections, interiorPoint, joinRealms, kmBetween, kmToPolys,
+  nodeRings, partitionCountry, pointInPolys, polysAreaKm2, polysOf, prepareUnits, quantize, sectionTopology, simplifyTopology, splitOnLand,
+  unitTopology,
 } from './lib/domestic-partition.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -47,7 +51,14 @@ const ID = 'nba';
 const NAME = 'USA and Canada';
 const LEAGUE = 'NBA';
 // The game's world shapes these units come from: never drawn beneath the map.
-const COUNTRIES = [{ id: '840', iso3: 'USA', level: 'ADM2' }, { id: '124', iso3: 'CAN', level: 'ADM2' }];
+const COUNTRIES = [{ id: '840', iso3: 'USA' }, { id: '124', iso3: 'CAN' }];
+// Territories take states and provinces (REGION_LEVEL) whole, built from their counties
+// and economic regions (UNIT_LEVEL) so that both share every border vertex for vertex.
+const UNIT_LEVEL = 'ADM2';
+const REGION_LEVEL = 'ADM1';
+// A state or province whose centre lies farther than this from every arena stays empty
+// (Alaska, the North, the Prairies, Quebec): drawn as land beneath the map, never territory.
+const EMPTY_KM = 1000;
 // The two layers draw the 49th parallel and the Alaska border a little differently:
 // units of the two countries this close count as neighbours, and Canadian edges this
 // close to US land are fitted to the US line (fitBorder).
@@ -70,10 +81,24 @@ function circularMeanLon(points) {
   return Math.atan2(y, x) * 180 / Math.PI;
 }
 
-/** A country's admin units as { id, name, polys, realm }, minus land the world map gives to others. */
-async function countryUnits(source, { id, iso3, level }, log) {
-  const row = (await source.layers(iso3)).find(r => r.boundaryType === level);
-  if (!row) throw new Error(`No geoBoundaries ${iso3} ${level} layer`);
+const layerOf = (row, extra = {}) => {
+  const clean = text => String(text ?? '').replace(/\s+/g, ' ').trim() || undefined;
+  return {
+    iso3: row.boundaryISO, level: row.boundaryType, license: row.boundaryLicense, source: clean(row.boundarySource),
+    year: clean(row.boundaryYearRepresented), boundaryId: row.boundaryID, url: row.simplifiedGeometryGeoJSON, ...extra,
+  };
+};
+
+/**
+ * A country's admin units as { id, name, polys, realm, region, regionName }, minus land
+ * the world map gives to others; `region` is the ISO code of the state or province
+ * holding the unit's interior point (else the nearest).
+ */
+async function countryUnits(source, { id, iso3 }, log) {
+  const layers = await source.layers(iso3);
+  const row = layers.find(r => r.boundaryType === UNIT_LEVEL);
+  const regionRow = layers.find(r => r.boundaryType === REGION_LEVEL);
+  if (!row || !regionRow) throw new Error(`No geoBoundaries ${iso3} ${row ? REGION_LEVEL : UNIT_LEVEL} layer`);
   const units = (await source.features(row))
     .filter(f => f.geometry && (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon'))
     // The Aleutians beyond the antimeridian would wrap the map round the globe.
@@ -82,15 +107,61 @@ async function countryUnits(source, { id, iso3, level }, log) {
     .filter(u => u.polys.length);
   const { units: kept, cut } = cutForeignLand(id, units, await source.world(), log);
   if (cut.length) log(`  ${iso3}: cut land the world map gives to others: ${cut.map(c => `${c.shape} ${c.km2} km²`).join(', ')}`);
-  const clean = text => String(text ?? '').replace(/\s+/g, ' ').trim() || undefined;
+  const regions = (await source.features(regionRow))
+    .filter(f => f.geometry && (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon'))
+    .map(f => ({ id: f.properties.shapeISO || `${iso3}-${f.properties.shapeName}`, name: f.properties.shapeName, polys: polysOf(f.geometry) }))
+    .map(r => ({ ...r, bbox: bboxOf(r.polys) }));
+  const inBox = ([x, y], [w, s, e, n]) => x >= w && x <= e && y >= s && y <= n;
+  for (const u of kept) {
+    const p = interiorPoint(u.polys);
+    const region = regions.find(r => inBox(p, r.bbox) && pointInPolys(p, r.polys))
+      ?? regions.reduce((best, r) => (!best || kmToPolys(p, r.polys) < kmToPolys(p, best.polys) ? r : best), null);
+    u.region = region.id;
+    u.regionName = region.name;
+  }
   return {
     units: kept,
-    layer: {
-      iso3, level, license: row.boundaryLicense, source: clean(row.boundarySource), year: clean(row.boundaryYearRepresented),
-      boundaryId: row.boundaryID, url: row.simplifiedGeometryGeoJSON,
-      ...(cut.length ? { foreign: cut.map(({ shape, km2 }) => ({ shape, km2 })) } : {}),
-    },
+    layers: [
+      layerOf(row, cut.length ? { foreign: cut.map(({ shape, km2 }) => ({ shape, km2 })) } : {}),
+      layerOf(regionRow, { use: 'grouping' }),
+    ],
   };
+}
+
+/**
+ * Units merged into one `whole` unit per region (state, province), at the place of the
+ * region's first unit, except in the regions of `split`, whose units stay as they are.
+ * The merge runs on the units' shared arcs, so merged borders keep their vertices.
+ */
+function mergeRegions(units, split) {
+  const topo = topology({ units: { type: 'FeatureCollection', features: units.map((u, i) => ({
+    type: 'Feature', id: i, properties: {}, geometry: { type: 'MultiPolygon', coordinates: u.polys } })) } });
+  const geoms = topo.objects.units.geometries;
+  const members = new Map();
+  units.forEach((u, i) => {
+    if (split.has(u.region)) return;
+    if (!members.has(u.region)) members.set(u.region, []);
+    members.get(u.region).push(i);
+  });
+  return units.flatMap((u, i) => {
+    if (split.has(u.region)) return [u];
+    const list = members.get(u.region);
+    if (list[0] !== i) return [];
+    const polys = polysOf(feature(topo, mergeArcs(topo, list.map(k => geoms[k]))).geometry);
+    return [{ id: u.region, name: u.regionName, realm: u.realm, region: u.region, regionName: u.regionName, whole: true, polys }];
+  });
+}
+
+/**
+ * The units `isEmpty` picks, on the same landmass as the others (adjacent through
+ * shared borders or across the national border), and those off it (Hawaii).
+ */
+function emptyLand(units, isEmpty) {
+  const prepared = prepareUnits(units);
+  const { comp } = components(joinRealms(prepared, unitTopology(prepared).adjacency, JOIN_KM));
+  const played = new Set(prepared.filter(u => !isEmpty(u)).map(u => comp[u.index]));
+  const all = prepared.filter(isEmpty);
+  return { empty: all.filter(u => played.has(comp[u.index])), off: all.filter(u => !played.has(comp[u.index])) };
 }
 
 /**
@@ -202,16 +273,34 @@ async function build({ source, log, spec }) {
   const n = clubs.length;
 
   const layers = [];
-  const rawUnits = [];
+  const countryList = [];
   for (const country of COUNTRIES) {
-    const { units, layer } = await countryUnits(source, country, log);
-    rawUnits.push(...units);
-    layers.push(layer);
-    log(`${country.iso3} ${country.level}: ${units.length} units`);
+    const { units, layers: used } = await countryUnits(source, country, log);
+    countryList.push(units);
+    layers.push(...used);
+    log(`${country.iso3} ${UNIT_LEVEL}: ${units.length} units in ${new Set(units.map(u => u.region)).size} ${REGION_LEVEL} regions`);
   }
   const rawHomes = clubs.map(c => c.home);
+  // Each arena's state or province: that of the unit it stands in, else the nearest unit.
+  const allUnits = countryList.flat();
+  const regionOf = clubs.map((c, i) => allUnits.reduce((best, u) => {
+    const km = kmToPolys(rawHomes[i], u.polys);
+    return !best || km < best.km ? { km, region: u.region } : best;
+  }, null).region);
+  const regionName = new Map(allUnits.map(u => [u.region, u.regionName]));
+  const shared = new Set(regionOf.filter((r, i) => regionOf.indexOf(r) !== i));
+  log(`  split between their franchises: ${[...shared].map(r => `${regionName.get(r)} (${regionOf.filter(x => x === r).length})`).join(', ')}`);
+  const merged = countryList.flatMap(list => mergeRegions(list, shared));
+  const isEmpty = u => u.whole && !regionOf.includes(u.region)
+    && Math.min(...rawHomes.map(h => kmBetween(centroidOf(u.polys), h))) > EMPTY_KM;
+  const { empty, off } = emptyLand(merged, isEmpty);
+  log(`  empty: ${empty.map(u => `${u.regionName} ${Math.round(u.area / 1000)}k km²`).join(', ')}`);
+  if (off.length) log(`  dropped off the landmass: ${off.map(u => u.regionName).join(', ')}`);
+  const rawUnits = merged.filter(u => !isEmpty(u));
+  // A shared state's counties go only to its own franchises; whole states to anyone.
+  const allowed = (club, unit) => !shared.has(unit.region) || unit.region === regionOf[club];
   const { shift, units, adjacency, topo: unitTopo, homes, homeOf, located, dropped, splits, sourceUnits, sourceAreaKm2, owner } = partitionCountry(
-    rawUnits, rawHomes, { sections: n, joinKm: JOIN_KM, log });
+    rawUnits, rawHomes, { sections: n, joinKm: JOIN_KM, allowed, spare: true, log });
   if (shift) throw new Error('The map crosses the antimeridian');
   const unlocated = clubs.filter((_, i) => !homeOf[i] || located[i].status === 'discarded').map(c => c.name);
   if (unlocated.length) throw new Error(`Arenas off the map: ${unlocated.join(', ')}`);
@@ -230,18 +319,26 @@ async function build({ source, log, spec }) {
   const extentKm = Math.max(kmBetween([mainBox[0], (mainBox[1] + mainBox[3]) / 2], [mainBox[2], (mainBox[1] + mainBox[3]) / 2]),
     kmBetween([mainBox[0], mainBox[1]], [mainBox[0], mainBox[3]]));
   const minAreaKm2 = fixed(4 * (extentKm / 900) ** 2, 3);
-  // Each franchise's land per country, the Canadian pieces fitted to the US line, then joined again.
+  // Each franchise's land per country and each empty region (club -1), the Canadian pieces
+  // fitted to the US line, then joined again.
   const realms = COUNTRIES.map(c => c.id);
   const pieceOf = units.map((u, i) => owner[i] * realms.length + realms.indexOf(u.realm));
   const pieces = dissolve(unitTopo, pieceOf, n * realms.length)
     .map((geometry, k) => ({ club: Math.floor(k / realms.length), realm: realms[k % realms.length], polys: polysOf(geometry) }))
+    .concat(empty.map(u => ({ club: -1, realm: u.realm, region: u.region, name: u.regionName, polys: u.polys })))
     .filter(piece => piece.polys.length);
   fitBorder(pieces, '840', log);
   const fitted = topology({ pieces: { type: 'FeatureCollection', features: pieces.map((piece, k) => ({
     type: 'Feature', id: k, properties: {}, geometry: { type: 'MultiPolygon', coordinates: piece.polys } })) } });
   const sectionGeoms = clubs.map((_, c) => feature(fitted, mergeArcs(fitted,
     fitted.objects.pieces.geometries.filter((_, k) => pieces[k].club === c))).geometry);
-  const filtered = sectionTopology(sectionGeoms, { ids, names, unitCounts, minAreaKm2, keepPoints: homes });
+  // Empty land is simplified with the sections, so the two keep one border.
+  const emptyPieces = pieces.filter(piece => piece.club < 0);
+  const emptyGeoms = emptyPieces.map(piece => feature(fitted, fitted.objects.pieces.geometries[pieces.indexOf(piece)]).geometry);
+  const filtered = sectionTopology([...sectionGeoms, ...emptyGeoms], {
+    ids: [...ids, ...emptyPieces.map(piece => piece.region)], names: [...names, ...emptyPieces.map(piece => piece.name)],
+    unitCounts: [...unitCounts, ...emptyPieces.map(() => 1)], minAreaKm2, keepPoints: homes,
+  });
 
   const meta = {
     format: 1,
@@ -264,6 +361,11 @@ async function build({ source, log, spec }) {
   for (;;) {
     qtopo = quantize(simplifyTopology(filtered.topo, target), 1e5);
     delete qtopo.bbox;
+    const all = qtopo.objects.sections.geometries;
+    qtopo.objects = {
+      sections: { type: 'GeometryCollection', geometries: all.slice(0, n) },
+      empty: { type: 'GeometryCollection', geometries: all.slice(n).map(({ properties, ...g }) => ({ ...g, properties: { name: properties.name } })) },
+    };
     const geoms = qtopo.objects.sections.geometries;
     const sectionPolys = geoms.map(g => geomPolys(qtopo, g));
     const box = bboxOf(sectionPolys.flat());
@@ -293,9 +395,13 @@ async function build({ source, log, spec }) {
   const landSplit = splitOnLand(qtopo.objects.sections.geometries, ids.map((_, i) => i)).map(c => clubs[c].name);
   if (landSplit.length) log(`  split on land: ${landSplit.join(', ')}`);
   log(`  ${sourceUnits} units -> ${n} territories; dropped ${dropped.length} overseas units; ${splits.length} units split for shared cities`);
+  const strays = units.filter((u, k) => shared.has(u.region) && u.region !== regionOf[owner[k]]);
+  if (strays.length) throw new Error(`Counties of a shared state went to another state's franchise: ${strays.map(u => u.name).join(', ')}`);
   clubs.forEach((c, i) => {
     const km = kmToPolys(homes[i], sectionPolys[i]);
-    log(`  ${ids[i]} ${names[i].padEnd(15)} ${c.name.padEnd(24)} ${String(Math.round(areas[i] / 1000)).padStart(5)}k km² ${unitCounts[i]} units${km ? `, arena ${fixed(km)} km outside` : ''}`);
+    const held = units.filter((_, k) => owner[k] === i);
+    const regions = [...new Set(held.map(u => (u.whole ? '' : 'part of ') + regionName.get(u.region)))];
+    log(`  ${ids[i]} ${names[i].padEnd(15)} ${c.name.padEnd(24)} ${String(Math.round(areas[i] / 1000)).padStart(5)}k km² ${regions.join(', ')}${km ? `, arena ${fixed(km)} km outside` : ''}`);
   });
   log(`  ${arcPoints(qtopo)} arc points, ${(Buffer.byteLength(text) / 1024).toFixed(1)} KB, ${Object.keys(decoded.sectionNames).length} sections decode`);
 
@@ -330,7 +436,7 @@ function attributionText(doc) {
     'Territory shapes are derived (dissolved, simplified, quantized) from the administrative',
     'boundary layers below; each layer keeps its own licence.',
     '',
-    'geoBoundaries (https://www.geoboundaries.org), gbOpen release, files pinned to commit 9469f09:',
+    'geoBoundaries (https://www.geoboundaries.org), gbOpen release, each file pinned to the commit in its URL:',
     `  ${GB_CITATION}`,
     "Land the game's world map (public/countries-50m.json: world-atlas 2.0.2, ISC; Natural Earth 1:50m,",
     '  public domain) draws for another country is cut; see "Cut" lines below.',
@@ -338,7 +444,7 @@ function attributionText(doc) {
       : 'Arena locations: scripts/data/nba-arenas.json.',
   ];
   for (const b of doc.boundaries.layers) {
-    lines.push('', `${b.iso3} ${b.level}`);
+    lines.push('', `${b.iso3} ${b.level}${b.use === 'grouping' ? ' (only groups the units above by state or province)' : ''}`);
     lines.push(`  Source: ${b.source}${b.year ? ` (${b.year})` : ''}`);
     lines.push(`  Licence: ${b.license}`);
     lines.push(`  File: ${b.url}`);

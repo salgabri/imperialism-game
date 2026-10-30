@@ -315,10 +315,11 @@ test('flattening the map preserves geographic capital anchors and projects them 
   // Captured before the deliberate Robinson -> flat projection change. Pin
   // lon/lat anchors rather than obsolete Robinson-specific pixel/area hashes:
   // projection changes coordinates, never which geographic capital was chosen.
-  // Re-pinned once when Jerusalem and Nicosia moved off the borders the outlines blur (see the next test).
+  // Re-pinned once when Jerusalem and Nicosia moved off the borders the outlines blur (see the next test), and
+  // when the home nations got shapes: that added Edinburgh, Cardiff and Belfast and moved no other anchor.
   const expected = {
-    'countries-50m.json': '08b15e498d8177c38fbdcf7965a9fd237c0cda6e2ea8579e6c24338a0cda558d',
-    'world-110m.v1.json': '925ebe81e090f9d7a7d85195b2b0c8c43e01b348590c4ff10e724bde54a3784e',
+    'countries-50m.json': '6c66393c2146d6a47453a3a6a730fced3ea6590b6742aff9e1fa83cb5d2b4395',
+    'world-110m.v1.json': 'ff66d18e714aba34f1db1f3d0b40f6b45445813ac88f16f0fcdbc8da3c15eacd',
   };
   const fits = {
     world: new geometry.WorldGeometry(topologies('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS)).fit,

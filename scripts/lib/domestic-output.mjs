@@ -46,9 +46,11 @@ export function serialize(doc) {
   const { topology: t, clubs, ...head } = doc;
   const lines = Object.entries(head).map(([k, v]) => `${JSON.stringify(k)}: ${JSON.stringify(v)}`);
   const { arcs, objects, ...topoHead } = t;
-  const sections = objects.sections;
+  // Every object (the sections, and the NBA map's empty land), one geometry per line.
+  const objectText = Object.entries(objects).map(([name, o]) => `${JSON.stringify(name)}:{"type":${JSON.stringify(o.type)},"geometries":[\n`
+    + `${o.geometries.map(g => JSON.stringify(g)).join(',\n')}\n]}`).join(',');
   const topo = `{${Object.entries(topoHead).map(([k, v]) => `${JSON.stringify(k)}:${JSON.stringify(v)}`).join(',')},`
-    + `"objects":{"sections":{"type":${JSON.stringify(sections.type)},"geometries":[\n${sections.geometries.map(g => JSON.stringify(g)).join(',\n')}\n]}},`
+    + `"objects":{${objectText}},`
     + `"arcs":[\n${arcs.map(a => JSON.stringify(a)).join(',\n')}\n]}`;
   lines.push(`"topology": ${topo}`);
   lines.push(`"clubs": [\n${clubs.map(c => JSON.stringify(c)).join(',\n')}\n]`);

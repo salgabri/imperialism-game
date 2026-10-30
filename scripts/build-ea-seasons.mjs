@@ -12,6 +12,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { EA_COLUMNS, buildEaSeason } from './lib/ea-seasons.mjs';
+import { NATIONS } from '../src/data/teams.js';
 import { parseCsv } from './lib/football-data.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -69,7 +70,7 @@ async function main() {
   for (const { doc, text, audit } of results) {
     const { coverage } = doc;
     console.log(`${doc.id} ${doc.season} ${doc.label} (${audit.snapshotDate}, ${audit.rows} players): `
-      + `${coverage.completeXIs}/170 full XIs, ${coverage.nations} nations with players, ${coverage.clubs} clubs, ${Math.round(Buffer.byteLength(text) / 1024)} KB`);
+      + `${coverage.completeXIs}/${Object.keys(NATIONS).length} full XIs, ${coverage.nations} nations with players, ${coverage.clubs} clubs, ${Math.round(Buffer.byteLength(text) / 1024)} KB`);
     for (const warning of audit.warnings) console.log(`  warning: ${warning}`);
   }
   if (args.check) {

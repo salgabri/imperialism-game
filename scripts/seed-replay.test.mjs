@@ -3,6 +3,8 @@
 // RNG state, match count, champion and manager decision count. Never regenerate
 // this golden to make a change pass; only the orchestrator may, with a written reason.
 // Regenerate (orchestrator only): UPDATE_GOLDEN=1 node --test scripts/seed-replay.test.mjs
+// Regenerated once for the home nations: Scotland (XI 79) joined the Elite 32 and the British map was cut in four,
+// so c-elite-blitz plays a different field; the two CONMEBOL cases replay unchanged.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';

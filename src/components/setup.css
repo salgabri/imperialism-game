@@ -185,32 +185,41 @@
   font:700 14px/1 var(--font-narrow); letter-spacing:.1em;
 }
 
-/* ---- Theatre list (board 02: 38px rows, name + count); the Season list (football) shares its rows ---- */
-.setup-theatres, .setup-seasons { display:flex; flex-direction:column; }
+/* ---- Season dropdown (football): a native select in the Theatre rows' type ---- */
+.setup-season {
+  display:block; width:100%; max-width:320px; height:var(--setup-row-h); min-height:var(--tap); padding:0 10px; margin:0;
+  border:1px solid var(--control-line); border-radius:0; background:var(--panel); color:var(--ink);
+  font:600 16px/1.2 var(--font-narrow); cursor:pointer;
+}
+/* Its note and loading line sit flush with the box. */
+.setup-season__note { margin:8px 0 0; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
+.setup-season__status { margin:6px 0 0; font:400 12px/1.45 var(--font-sans); color:var(--text-2); }
+
+/* ---- Theatre list (board 02: 38px rows, name + count) ---- */
+.setup-theatres { display:flex; flex-direction:column; }
 .setup-group--list .setup-kicker { margin-bottom:0; }
-.setup-theatre, .setup-season {
+.setup-theatre {
   display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0;
   height:var(--setup-row-h); min-height:var(--tap); padding:0 14px; margin:0;
   border:0; border-bottom:1px solid var(--row-rule); border-radius:0; background:transparent;
   text-align:left; cursor:pointer;
 }
-.setup-theatre:hover:not([aria-checked=true]), .setup-season:hover:not([aria-checked=true]) { background:var(--panel); }
-.setup-theatre[aria-checked=true], .setup-season[aria-checked=true] { background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); }
-.setup-theatre:focus-visible, .setup-season:focus-visible, .setup-team:focus-visible { outline-offset:-2px; }
+.setup-theatre:hover:not([aria-checked=true]) { background:var(--panel); }
+.setup-theatre[aria-checked=true] { background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); }
+.setup-theatre:focus-visible, .setup-team:focus-visible { outline-offset:-2px; }
 .setup-theatre__name {
   min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   font:600 16px/1.2 var(--font-narrow); color:var(--text-2);
 }
-.setup-theatre[aria-checked=true] .setup-theatre__name, .setup-season[aria-checked=true] .setup-theatre__name { color:var(--ink); }
+.setup-theatre[aria-checked=true] .setup-theatre__name { color:var(--ink); }
 .setup-theatre__count { flex:none; white-space:nowrap; font:400 14px/1 var(--font-narrow); color:var(--muted); }
 /* Footnote for a "*"-marked theatre ("Asia & Oceania*" → "AFC plus OFC — the whole east."), aligned with the row text. */
-.setup-theatres__note, .setup-season__note { margin:8px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
+.setup-theatres__note { margin:8px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--muted); }
 
 /* One country's own top clubs (football clubs): the leagues and every shipped country make a long list, so it scrolls
    in its own box (block layout, so rows never shrink to fit) and the countries sit under a sticky group heading.
-   The chosen country's description, its map-load status and a failed load (with Retry) follow the list. A long
-   Season list scrolls the same way. */
-.setup-theatres[data-long], .setup-seasons[data-long] {
+   The chosen country's description, its map-load status and a failed load (with Retry) follow the list. */
+.setup-theatres[data-long] {
   display:block; max-height:var(--setup-list-h); overflow-y:auto; overscroll-behavior:contain;
   border-bottom:1px solid var(--rule); scrollbar-width:thin;
 }
@@ -220,7 +229,7 @@
   font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
 }
 .setup-theatres__note.setup-domestic__note { color:var(--text-2); }
-.setup-domestic__status, .setup-season__status { margin:6px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--text-2); }
+.setup-domestic__status { margin:6px 0 0; padding:0 14px; font:400 12px/1.45 var(--font-sans); color:var(--text-2); }
 .rule-note.setup-domestic__error, .rule-note.setup-season__error {
   margin-top:10px; background:var(--panel); box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule);
 }

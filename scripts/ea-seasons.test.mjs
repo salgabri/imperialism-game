@@ -43,8 +43,10 @@ function sampleRows() {
       league_id: '53.0', nationality_name: 'Spain' })),
     // An old spelling, a nation without a shape, a free agent and a player at a club outside the seven leagues.
     ...['GK', 'CB', 'ST'].map(position => row({ player_positions: position, nationality_name: 'Czech Republic' })),
-    row({ nationality_name: 'Scotland', club_team_id: '501', club_name: 'Testford United', league_id: '13.0', player_positions: 'CAM, ST' }),
-    row({ nationality_name: 'Scotland' }),
+    row({ nationality_name: 'Malta', club_team_id: '501', club_name: 'Testford United', league_id: '13.0', player_positions: 'CAM, ST' }),
+    row({ nationality_name: 'Malta' }),
+    // A home nation plays for itself, not for England.
+    row({ nationality_name: 'Scotland', player_positions: 'CB' }),
     row({ nationality_name: 'France', club_team_id: '900', club_name: 'Elsewhere FC', league_id: '68.0' }),
     // An absolute SoFIFA link, as older rows of the export have.
     row({ nationality_name: 'France', player_url: 'https://sofifa.com/player/77/absolute-link/180002', player_id: '77', dob: '' }),
@@ -95,8 +97,9 @@ test('a season is one edition\'s roster: nations by nationality, clubs by EA\'s 
   assert.deepEqual(doc.nations['203'][2].map(tuple => tuple[5]), ['Czech Republic', 'Czech Republic', 'Czech Republic']);
   assert.deepEqual(doc.nations['442'], [40, 0, []], 'a nation with no players is empty');
   assert.equal(Object.keys(doc.nations).length, Object.keys(NATIONS).length, 'every nation has an entry');
-  assert.deepEqual(audit.noTeam, { Scotland: 2 }, 'Scotland has no shape, so no team');
-  assert.ok(!Object.values(doc.nations).some(([, , squad]) => squad.some(tuple => tuple[5] === 'Scotland')));
+  assert.deepEqual(audit.noTeam, { Malta: 2 }, 'Malta has no shape, so no team');
+  assert.ok(!Object.values(doc.nations).some(([, , squad]) => squad.some(tuple => tuple[5] === 'Malta')));
+  assert.deepEqual(doc.nations.SCO[2].map(tuple => tuple[5]), ['Scotland']);
   const slugs = doc.nations['250'][2].map(tuple => tuple[8]).sort();
   assert.ok(slugs.length === 2 && slugs[0] === 'absolute-link' && /^fake-player-\d+$/.test(slugs[1]), `both link forms: ${slugs}`);
 
@@ -106,7 +109,7 @@ test('a season is one edition\'s roster: nations by nationality, clubs by EA\'s 
   assert.equal(doc.clubs[0].squad.length, 11);
   assert.deepEqual(audit.leagues['La Liga'], { clubs: 0, short: [{ name: 'Real Ficticio', players: 5 }] });
   assert.ok(warnings.includes('No La Liga clubs in FIFA 18'));
-  assert.deepEqual(doc.coverage, { players: 22, nations: 4, completeXIs: 1, clubs: 1, leagues: 1 });
+  assert.deepEqual(doc.coverage, { players: 23, nations: 5, completeXIs: 1, clubs: 1, leagues: 1 });
   assert.deepEqual(doc.territory, { merged: {}, inactive: [] }, 'every federation of the map was a FIFA member by mid-2018');
   assert.deepEqual(buildEaSeason(sampleRows(), { id: 'ea-fifa-15', fifaVersion: 15, edition: 'FIFA 15', update: 2 }, { dataset: DATASET })
     .doc.territory.inactive, ['KOS'], 'Kosovo joined FIFA in May 2016');

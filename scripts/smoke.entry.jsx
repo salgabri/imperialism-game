@@ -829,7 +829,7 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const share = sections === entry.clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
   // A sport's own map (the NBA's) names its league and splits the land around the arenas.
   result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.league
-    ? `the ${entry.clubs} ${entry.league} clubs, each starting on the land nearest its arena: ${entry.name} split into ${sections} territories along county and regional borders.`
+    ? `the ${entry.clubs} ${entry.league} clubs, each starting on the land nearest its arena: ${entry.name} split into ${sections} territories along state and province lines.`
     : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
   // Step 1's country card: every section in its starting club's pastel (the card has no ids, so compare the fills

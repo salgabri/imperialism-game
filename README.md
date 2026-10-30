@@ -15,7 +15,8 @@ Pick your sport at kick-off:
 
 And pick who fights:
 
-- **Nations** — 170 national teams, each starting on its own homeland.
+- **Nations** — 173 national teams, each starting on its own homeland. England,
+  Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
 - **Clubs** — 132 football clubs from seven European leagues, or all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada. Real Madrid
   annexes territory exactly the way Spain does.
@@ -91,7 +92,7 @@ default suits a first campaign, so pressing Space three times starts one.
 
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
-   choices are the whole world (170 nations), another confederation, or the
+   choices are the whole world (173 nations), another confederation, or the
    Elite 32. Football club campaigns offer individual leagues, all leagues, or
    the strongest 32 available clubs; basketball clubs play the NBA on its own
    map of the USA and Canada. The step opens on a map of the chosen theatre:
@@ -263,7 +264,7 @@ Map modes:
 
 | Mode | Shows |
 | --- | --- |
-| **Political** (default) | A flat pastel of each empire's own colour: a nation's colour (England, Poland and Finland, who play in white, take their flag's), a club's crest colour (`npm run build:club-colours`, corrected in `scripts/data/club-colours.json`). White and black teams are grey, and one of three lightness steps by team id keeps same-coloured neighbours apart. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
+| **Political** (default) | A flat pastel of each empire's own colour. A nation takes its own colour, a shade of it or one of its flag's, whichever keeps it apart from its neighbours: the largest nations keep theirs and smaller neighbours make room (`npm run build:nation-colours` solves the world once). A club takes its crest colour (`npm run build:club-colours`, corrected in `scripts/data/club-colours.json`) in one of three lightness steps by team id. White and black teams are grey. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
 | **Strength** | Five grey steps by strength percentile; your empire keeps its colour. |
 | **Fronts** | Your fronts tinted by your win chance (green / amber / red); other land is neutral. |
 | **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours. |
@@ -393,7 +394,7 @@ Game ratings use a 1–99 display range, with the original source values retaine
 **Football** — `src/data/rosters.js` combines the committed EA FC 26 update 4
 snapshot (19 September 2025; 18,405 records) with Football Manager 26 database
 26.3.0 from [EFEM.club](https://efem.club/players), retrieved on 2 October 2026.
-All **170 nations field eleven source-backed players**, with natural coverage for
+All **173 nations field eleven source-backed players**, with natural coverage for
 a 4-4-2. The builder prioritises unchanged EA overall ratings and uses FM to fill
 coverage gaps. It retains database IDs, full/display names, all natural roles,
 source URLs, versions, dates and original ratings through transfers and saves.
@@ -585,7 +586,7 @@ from these services at runtime.
 
 `public/domestic/ATTRIBUTION.txt` is generated with every build and lists each
 country's boundary source and licence, its cuts and fills, plus the GeoNames,
-Wikidata and EFEM notes. 163 of the game's 170 nations ship, with 4,343 clubs (8
+Wikidata and EFEM notes. 163 of the game's 173 nations ship, with 4,343 clubs (8
 countries have 100, nine have two); the maps total 22.1 MB (34–250 KB each), and
 a session fetches only the one chosen. Sri Lanka, Cuba, Eritrea, Afghanistan,
 the Bahamas, Namibia and Sierra Leone have fewer than two viable clubs, so they
@@ -646,16 +647,20 @@ known limitations.
 
 Basketball clubs have one theatre, **NBA**: the 30 franchises fight over the USA
 and Canada and nothing else. The two countries are split into 30 territories, one
-per franchise, grown from its arena over US counties and Canadian economic
-regions (geoBoundaries) by the same partition as the country maps: each territory
-takes the land nearest its arena, so Portland holds the Northwest with British
-Columbia and Alaska, Toronto Quebec and Newfoundland, and the Nets Brooklyn and
-Long Island. The two layers draw the border slightly apart, so the build fits the
-Canadian side to the US line: a franchise with land in both countries holds one
-territory, and neighbours across the border share it. Territories are named after
-their cities and coloured apart from their neighbours; the franchises keep their
-own names, crests and fives. Mexico, Greenland and the rest of the world lie
-beneath as inert land. The map is `public/domestic/nba.json`, played through the
+per franchise, grown from its arena by the same partition as the country maps,
+over whole states and provinces (geoBoundaries): each territory takes the states
+nearest its arena, so Portland holds Washington, Oregon and Idaho, Utah Montana
+and Wyoming, Toronto Ontario and Boston New England with the Maritimes. Only
+California, Texas, Florida and New York, which host two or more franchises, are
+split between them along county lines (the Nets hold Brooklyn, Queens and Long
+Island). States and provinces whose centre lies over 1,000 km from every arena
+(Alaska, the North, British Columbia, the Prairies, Quebec, Newfoundland and
+Labrador) stay empty: drawn as land, nobody's. The two layers draw the border
+slightly apart, so the build fits the Canadian side to the US line, and
+neighbours across it share it. Territories are named after their cities and
+coloured apart from their neighbours; the franchises keep their own names, crests
+and fives. Mexico, Greenland and the rest of the world lie beneath as inert
+land. The map is `public/domestic/nba.json`, played through the
 country-map runtime; NBA campaigns saved before it still resume on the world map.
 Each [earlier season](#basketball-seasons) plays on a map of its own era, drawn
 the same way from the arenas of that season: the Grizzlies start in Vancouver
@@ -682,10 +687,11 @@ is a file in `public/football/` (about 310 KB) that loads only when chosen.
 - **What a season holds:** every nation's best natural XI by EA nationality,
   and the clubs of the seven leagues the club layer uses, picked by EA's
   competition id (132–134 clubs a season). Ratings are EA's overalls,
-  unchanged. EA rates only part of the world, so 70–79 nations field a full XI
+  unchanged. EA rates only part of the world, so 73–82 nations field a full XI
   each season and the rest field the players they have, as an empty or thin
-  built-in nation does. Scotland, Wales, Northern Ireland and other places with
-  no shape on the map have no team; their players still play for their clubs.
+  built-in nation does. Scotland, Wales and Northern Ireland field their own
+  teams; places with no shape on the map (Malta, the Faroe Islands, …) have
+  none, and their players still play for their clubs.
 - **Source:** one Kaggle export of every FIFA 15 – EA FC 24 launch roster
   (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
   labelled CC0 by its compiler; EA's own rights are not cleared, as for the
@@ -725,7 +731,7 @@ considered, back to 1872, and their terms.
     before 2002.
   - It reads the binary files with the game's own parser (`src/data/cm0102.js`,
     format in [cm0102-format.md](docs/design/cm0102-format.md)).
-  - Every one of the 170 nations gets an entry, and clubs come from the seven
+  - Every one of the 173 nations gets an entry, and clubs come from the seven
     leagues the club layer already uses.
   - Ratings are CM's current ability (1–200) converted once with
     `round(ca * 99 / 200)`. Natural positions are the slots rated 20.
@@ -822,8 +828,9 @@ regressions, and `npm run test:territories` for the underlying exact landmass,
 overseas, winding, date-line and geometry-cache regressions.
 
 `src/data/flags.js` maps ISO-3166 numeric ids to flag basenames, derived from the
-Natural Earth attribute table with two football-specific overrides: England
-(`gb-eng`) rather than the United Kingdom, and Kosovo (`xk`), which has no ISO
+Natural Earth attribute table with football-specific overrides: the home nations
+England (`gb-eng`, on the United Kingdom's id), Scotland (`gb-sct`), Wales
+(`gb-wls`) and Northern Ireland (`gb-nir`), and Kosovo (`xk`), which has no ISO
 numeric code. The SVGs are vendored into `public/flags/` from the MIT-licensed
 [`flag-icons`](https://github.com/lipis/flag-icons) package, so the built app has
 no runtime dependency on it.
@@ -897,10 +904,10 @@ for real-app integration coverage.
 
 ## Capital data and dependencies
 
-`src/data/capitals.js` holds lon/lat for all 170. Coastline generalisation at
+`src/data/capitals.js` holds lon/lat for all 173. Coastline generalisation at
 110m in the rule geometry leaves some real capitals fractionally offshore, so a
 capital that misses its own outline is walked toward the country's centre until
-it lands; 166 of 170
+it lands; 169 of 173
 anchor on the city itself and the rest fall back to the centroid rather than
 stranding a marker at sea.
 
@@ -940,6 +947,18 @@ detailed coastlines. Its ISC licence is included in
 drives rule geography, adjacency, capital anchors, and candidate distances.
 The detailed display shapes also validate duel routes, so an arrow cannot pass
 through a visible country merely because its capital lies elsewhere.
+
+Football nations are not political ones: England, Scotland, Wales and Northern
+Ireland each have their own association and team. Both atlases draw one United
+Kingdom (826), so `npm run build:home-nations` (`scripts/build-home-nations.mjs`)
+cuts it along Natural Earth 1:10m's borders between them (public domain): 826 is
+England, and `SCO`, `WAL` and `NIR` are the others. Past the shore each border
+follows an estuary's middle (Solway Firth, Dee, Severn) to wherever the coarser
+coast leaves the island. Every other shape and arc stays world-atlas's, pinned by
+SHA-256; `--check` rebuilds offline and compares. Saves from before the cut (v1–v4)
+give the new shapes to whoever held 826, CM 01/02 data sets built before it let
+England hold them, and basketball, where Great Britain is one FIBA team, plays
+the United Kingdom as one.
 
 Closed coastline rings are clipped at ±180° longitude before projection, so
 date-line crossings cannot create diagonal closure wedges through Russia or
@@ -987,7 +1006,7 @@ src/
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
     basketball.js      starting five, 40 minutes, overtime
-  data/teams.js        170 nations: identity, squad building
+  data/teams.js        173 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
@@ -1035,7 +1054,7 @@ public/
   basketball/          the built-in earlier basketball seasons (nba-2k*.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
-  flags/               170 vendored flag SVGs
+  flags/               173 vendored flag SVGs
   club-logos/          club crests from Wikipedia, with SOURCES.tsv
 scripts/
   test.mjs             runs every scripts/*.test.mjs (npm test)
@@ -1121,7 +1140,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `turn-order` | Round-robin queue, "in reach" tiers, fixed-attacker and chosen-target draws |
 | `turn-panels`, `turn-wiring` | Turn strip, Choose a target, spectator panel, and the turn flow in the real App |
 | `win-probability` | The live win-probability model against the football and basketball match models |
-| `save-size` | Save size and storage-quota behaviour for 170-nation campaigns |
+| `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |

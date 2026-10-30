@@ -312,14 +312,17 @@ export const SEASON_NOTES = Object.freeze({
 
 /**
  * The Season choice (docs/design/football-years.md): the sport's built-in season, then each of its listed data sets
- * newest first, as `{ id, key, season, source, label, checked }`. `sport` names a chosen set the listing no longer has.
+ * newest first, as `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no
+ * longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
   const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
     label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
   const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
-  return rows;
+  // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
+  const shared = season => !season || rows.filter(other => other.season === season).length > 1;
+  return rows.map(option => ({ ...option, name: shared(option.season) ? option.label : option.season }));
 }
 
 /** A sport's three strongest clubs' names, as a club map's index lists them. */
@@ -333,7 +336,7 @@ export function domesticDescription(entry) {
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
   if (entry.league) {
     return `${leaders} the ${clubs} ${entry.league} clubs, each starting on the land nearest its arena: ${entry.name} split into `
-      + `${sections} territories along county and regional borders.`;
+      + `${sections} territories along state and province lines.`;
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;

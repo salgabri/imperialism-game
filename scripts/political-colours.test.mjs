@@ -1,27 +1,27 @@
-// Political fills come from each empire's own colour (src/data/empireColours.js): a nation's colour, a club's crest
+// Political fills come from each empire's own colour (src/data/empireColours.js): a nation's colour chosen to fit it
+// and stand apart from its neighbours (src/data/nationColours.js, `npm run build:nation-colours`), a club's crest
 // colour (src/data/clubColours.js, `npm run build:club-colours`), as a pastel that keeps the colour's hue
 // (theme.js empireFill) with its own dark-theme twin (themedPaint).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { EMPIRE_PASTELS, V4, empireFill, themedPaint } from '../src/theme.js';
 import { empireColour, politicalFill } from '../src/data/empireColours.js';
+import { NATION_COLOURS } from '../src/data/nationColours.js';
 import { clubColour } from '../src/data/clubColours.js';
-import { NATIONS } from '../src/data/teams.js';
+import { NATIONS, DEPENDENCIES } from '../src/data/teams.js';
 import { CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as NBA } from '../src/data/clubs.basketball.js';
+import { WorldGeometry } from '../src/engine/geo.js';
+import { toOklch } from '../src/engine/colour.js';
 
-const toLinear = c => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
 /** '#rrggbb' → { L, C, H } in OKLCH. */
-function lch(hex) {
-  const [r, g, b] = [1, 3, 5].map(i => toLinear(parseInt(hex.slice(i, i + 2), 16) / 255));
-  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
-  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
-  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-  const A = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
-  const B = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
-  return { L: 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, C: Math.hypot(A, B), H: (Math.atan2(B, A) * 180 / Math.PI + 360) % 360 };
-}
+const lch = hex => {
+  const [L, C, H] = toOklch(hex);
+  return { L, C, H };
+};
 const hueGap = (a, b) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
 const darkTwin = fill => /^light-dark\(#[0-9a-f]{6}, (#[0-9a-f]{6})\)$/.exec(themedPaint(fill))?.[1];
 
@@ -32,8 +32,8 @@ test('a team colour gives a soft pastel of the same hue', () => {
     assert.match(fill, /^#[0-9a-f]{6}$/, colour);
     const pastel = lch(fill);
     assert.ok(hueGap(pastel.H, source.H) < 12, `${colour}: hue ${source.H.toFixed(0)} kept (${pastel.H.toFixed(0)})`);
-    assert.ok(pastel.L > 0.82 && pastel.L < 0.92, `${colour}: light pastel (${pastel.L.toFixed(3)})`);
-    assert.ok(pastel.C > 0.02 && pastel.C < 0.06, `${colour}: soft but coloured (${pastel.C.toFixed(3)})`);
+    assert.ok(pastel.L > 0.77 && pastel.L < 0.92, `${colour}: light pastel (${pastel.L.toFixed(3)})`);
+    assert.ok(pastel.C > 0.03 && pastel.C < 0.09, `${colour}: soft but coloured (${pastel.C.toFixed(3)})`);
   }
 });
 
@@ -60,7 +60,7 @@ test('a team pastel paints through light-dark() with a dark twin of the same hue
   const fill = empireFill('724', '#F0483E');
   const dark = darkTwin(fill);
   assert.ok(dark, themedPaint(fill));
-  assert.ok(lch(dark).L < 0.5 && hueGap(lch(dark).H, lch(fill).H) < 15, 'dark, same hue');
+  assert.ok(lch(dark).L < 0.52 && hueGap(lch(dark).H, lch(fill).H) < 15, 'dark, same hue');
   const grey = empireFill('276', '#E8E8EC');
   assert.ok(lch(darkTwin(grey)).L > lch('#2a2e30').L + 0.08, 'a dark grey still stands off dark neutral land');
   assert.equal(themedPaint(EMPIRE_PASTELS[2]), `var(--empire-3, ${EMPIRE_PASTELS[2]})`);
@@ -70,17 +70,48 @@ test('a team pastel paints through light-dark() with a dark twin of the same hue
   assert.match(css, /:root\[data-theme=dark\] \{\s*color-scheme: dark;/, 'and the dark one');
 });
 
-test('nations use their own colour; England, Poland and Finland (white kits) take their flag colour', () => {
-  const near = (id, hue) => assert.ok(hueGap(lch(politicalFill(id)).H, hue) < 25, `${NATIONS[id][0]}: hue ${lch(politicalFill(id)).H.toFixed(0)}`);
+test('nations take a colour that fits them: their own, a shade of it, or one of their flag', () => {
+  for (const id of Object.keys(NATIONS)) {
+    const [colour, step] = NATION_COLOURS[id] ?? [];
+    assert.ok(toOklch(colour ?? '') && [0, 1, 2].includes(step), `${NATIONS[id][0]} has a colour and a step`);
+    assert.equal(empireColour(id), colour);
+    assert.equal(politicalFill(id), empireFill(id, colour, step));
+  }
+  const near = (id, hue) => assert.ok(hueGap(lch(politicalFill(id)).H, hue) < 30, `${NATIONS[id][0]}: hue ${lch(politicalFill(id)).H.toFixed(0)}`);
   near('724', 25);   // Spain red
-  near('826', 25);   // England red (St George)
-  near('616', 20);   // Poland red
+  near('643', 0);    // Russia red
+  near('826', 25);   // England red (St George; the team plays in white)
   near('250', 265);  // France blue
-  near('246', 260);  // Finland blue
-  near('076', 95);   // Brazil yellow
-  near('528', 55);   // Netherlands orange
+  near('752', 90);   // Sweden yellow
+  near('076', 90);   // Brazil yellow
+  near('528', 60);   // Netherlands orange
   assert.ok(lch(politicalFill('276')).C < 0.005, 'Germany (white and black) is grey');
-  for (const id of Object.keys(NATIONS)) assert.ok(empireColour(id), `${id} has a colour`);
+});
+
+test('bordering nations stand apart in both themes', () => {
+  // The solver's distance (scripts/build-nation-colours.mjs): OKLab with lightness at 0.4, the nearer theme.
+  const lab = hex => {
+    const { L, C, H } = lch(hex);
+    return [L * 0.4, C * Math.cos(H * Math.PI / 180), C * Math.sin(H * Math.PI / 180)];
+  };
+  const twins = id => [politicalFill(id), darkTwin(politicalFill(id))].map(lab);
+  const distance = (a, b) => Math.min(...twins(a).map((p, i) => Math.hypot(...p.map((v, k) => v - twins(b)[i][k]))));
+  const geo = new WorldGeometry(JSON.parse(readFileSync(new URL('../public/world-110m.v1.json', import.meta.url), 'utf8')));
+  const ownerOf = shape => (NATIONS[shape] ? shape : DEPENDENCIES[shape]?.of ?? null);
+  const alike = [];
+  for (const [shape, adjacent] of Object.entries(geo.adj)) {
+    for (const other of adjacent) {
+      const [a, b] = [ownerOf(shape), ownerOf(other)];
+      if (a && b && a < b && distance(a, b) < 0.0325) alike.push(`${NATIONS[a][0]}–${NATIONS[b][0]}`);
+    }
+  }
+  assert.deepEqual(alike, []);
+});
+
+test('the nation colour table is what build-nation-colours writes', () => {
+  const script = fileURLToPath(new URL('./build-nation-colours.mjs', import.meta.url));
+  const run = spawnSync(process.execPath, [script, '--check'], { encoding: 'utf8' });
+  assert.equal(run.status, 0, run.stderr || run.stdout);
 });
 
 test('clubs use their crest colour, with corrections where the crest misleads', () => {

@@ -106,7 +106,9 @@ test('every stored CM nation name maps to a game nation or is listed as having n
   assert.equal(resolve('Yugoslavia'), '688');
   assert.equal(resolve('Republic of Ireland'), '372');
   assert.equal(resolve('  south   korea '), '410');
-  assert.equal(resolve('Scotland'), NO_TEAM);
+  assert.equal(resolve('Scotland'), 'SCO');
+  assert.equal(resolve('Northern Ireland'), 'NIR');
+  assert.equal(resolve('Gibraltar'), NO_TEAM);
   assert.equal(resolve('Fictionland'), null);
   assert.throws(() => nationResolver({ aliases: { Atlantis: '999' } }), /not a game nation/);
   assert.throws(() => nationResolver({ noTeam: ['England'] }), /maps to 826/);
@@ -295,7 +297,7 @@ test('a data set has every game nation, its source block and a content version',
   const { version, ...rest } = JSON.parse(text);
   assert.equal(version, `cm0102-2007-10-${createHash('sha256').update(JSON.stringify(rest)).digest('hex').slice(0, 8)}`);
   assert.equal(text, `${JSON.stringify(doc)}\n`);
-  assert.deepEqual(doc.coverage, { players: new Set(tuplesOf(doc).map(t => t[0])).size, nations: 8, completeXIs: 7, clubs: 7, leagues: 7 });
+  assert.deepEqual(doc.coverage, { players: new Set(tuplesOf(doc).map(t => t[0])).size, nations: 9, completeXIs: 7, clubs: 7, leagues: 7 });
 });
 
 test('never invents: every tuple is a stored fixture player, and rebuilds exactly', () => {
@@ -327,10 +329,13 @@ test('never invents: every tuple is a stored fixture player, and rebuilds exactl
 
 test('players of teamless nations stay at clubs; the dropped are counted', () => {
   const { doc, audit } = build();
-  assert.deepEqual(audit.noTeam, { Scotland: 1, Curaçao: 1 });
+  assert.deepEqual(audit.noTeam, { Curaçao: 1 });
   assert.deepEqual(audit.players.dropped, { nameless: 0, noAbility: 1, noPositions: 1, noNationality: 1, unmapped: 0, duplicates: 1 });
   const national = Object.values(doc.nations).flatMap(([, , squad]) => squad);
-  assert.ok(!national.some(t => ['Scotland', 'Curaçao'].includes(t[5])));
+  assert.ok(!national.some(t => t[5] === 'Curaçao'));
+  // A home nation plays for itself, not for England.
+  assert.deepEqual(doc.nations.SCO[2].map(t => [t[1], t[5]]), [['Undated Fixtureson', 'Scotland']]);
+  assert.ok(!doc.nations['826'][2].some(t => t[5] === 'Scotland'));
   const england = audit.nations.find(n => n.id === '826');
   assert.equal(england.pool, doc.nations['826'][1]);
   assert.equal(england.naturalLineup, true);
@@ -483,7 +488,7 @@ test('the CLI writes the set, its audit and the index, and rebuilds the same byt
   withFolder(({ game, out }) => {
     const first = run(`--cm0102=${game}`, `--out=${out}`, ...flags);
     assert.equal(first.status, 0, first.stderr);
-    assert.match(first.stdout, /National squads: 7\/170 complete natural XIs/);
+    assert.match(first.stdout, /National squads: 7\/173 complete natural XIs/);
     assert.match(first.stdout, /Clubs: 7 \(Premier League 1, La Liga 1/);
     assert.deepEqual(readdirSync(out).sort(), ['cm0102-2007-10.audit.json', 'cm0102-2007-10.json', 'index.json']);
     const text = readFileSync(path.join(out, 'cm0102-2007-10.json'), 'utf8');

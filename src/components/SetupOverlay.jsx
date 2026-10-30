@@ -529,21 +529,14 @@ export default function SetupOverlay({
               </div>
 
               {/* The sport's seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this
-                  computer. Its own classes, so `.setup-theatre` rows and notes stay the Theatre list's. */}
+                  computer, in a native dropdown ('' is the built-in season). */}
               {model.season ? (
-                <div className="setup-group setup-group--list">
+                <div className="setup-group">
                   <Kicker id="setup-season-label" title="Season" />
-                  <div className="setup-seasons" role="radiogroup" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
-                    data-long={model.season.options.length > 5 ? '' : undefined}>
-                    {model.season.options.map(option => (
-                      <button type="button" role="radio" key={option.key} aria-checked={option.checked} tabIndex={option.checked ? 0 : -1}
-                        className="setup-season" data-name={option.label} aria-label={option.label}
-                        onClick={() => choose('dataSet', option.id, model.season.id)} onKeyDown={moveRadio}>
-                        <span className="setup-theatre__name">{option.season}</span>
-                        <span className="setup-theatre__count">{option.source}</span>
-                      </button>
-                    ))}
-                  </div>
+                  <select id="setup-season" className="setup-season" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
+                    value={model.season.id ?? ''} onChange={event => pick('dataSet', event.target.value || null)}>
+                    {model.season.options.map(option => <option value={option.id ?? ''} key={option.key}>{option.name}</option>)}
+                  </select>
                   <p className="setup-season__note" id="setup-season-note">{model.season.note}</p>
                   {model.season.state === 'loading' ? (
                     <p className="setup-season__status setup-season__loading" role="status">{model.season.loading}</p>
@@ -556,11 +549,6 @@ export default function SetupOverlay({
                       </p>
                     </div>
                   ) : null}
-                  {/* Native mirror of the season radios, value-bound like `#setup-theatre` ('' is the built-in season). */}
-                  <select id="setup-season" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={model.season.id ?? ''}
-                    onChange={event => pick('dataSet', event.target.value || null)}>
-                    {model.season.options.map(option => <option value={option.id ?? ''} key={option.key}>{option.label}</option>)}
-                  </select>
                 </div>
               ) : null}
 

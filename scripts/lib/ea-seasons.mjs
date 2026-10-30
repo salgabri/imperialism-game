@@ -30,8 +30,8 @@ export const EA_NATION_ALIASES = {
 export const EA_NO_TEAM = [
   'Andorra', 'Antigua and Barbuda', 'Aruba', 'Bahrain', 'Barbados', 'Bermuda', 'Cape Verde Islands', 'Comoros', 'Curacao',
   'Faroe Islands', 'Gibraltar', 'Grenada', 'Guam', 'Hong Kong', 'Liechtenstein', 'Macau', 'Malta', 'Mauritius',
-  'Montserrat', 'Northern Ireland', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
-  'San Marino', 'São Tomé e Príncipe', 'Scotland', 'Singapore', 'Wales',
+  'Montserrat', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'San Marino',
+  'São Tomé e Príncipe', 'Singapore',
 ];
 
 /** The CSV columns the build reads. */

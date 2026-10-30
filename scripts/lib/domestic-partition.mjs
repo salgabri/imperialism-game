@@ -163,7 +163,8 @@ function samplePoints(polys) {
  */
 export function explodeUnits(units, anchorOf = () => null) {
   return units.flatMap(u => {
-    if (u.polys.length < 2) return [u];
+    // A `whole` unit (a state merged from its counties) goes to one club, every part of it.
+    if (u.polys.length < 2 || u.whole) return [u];
     const anchor = anchorOf(u);
     let main = anchor ? u.polys.findIndex(poly => pointInPoly(anchor, poly)) : -1;
     if (main < 0) {
@@ -1191,7 +1192,7 @@ export function splitUnits(units, homeOf, n, { maxGapKm = Infinity, minKm2 = 0, 
       names.add(name);
       // A cell can cut a ragged unit into several parts; the site's part keeps the piece id.
       return explodeUnits([{ id: `${u.id}~${p.i}`, name, baseName: base, qualifier, ...(u.territory != null ? { territory: u.territory } : {}), ...(u.fans ? { fans: u.fans } : {}),
-        ...(u.realm != null ? { realm: u.realm } : {}), polys: p.polys }], () => sites[p.site]);
+        ...(u.realm != null ? { realm: u.realm } : {}), ...(u.region != null ? { region: u.region } : {}), polys: p.polys }], () => sites[p.site]);
     });
     if (crowd) for (const v of newUnits) crowdCut.add(v.id);
     splits.push({ unit: u.name, source: baseId(u.id), pieces: named.length, clubs: members.length, reason: why });
@@ -1313,9 +1314,11 @@ export function seedSections(units, adjacency, homes, { minKm2 = 0, allowed = nu
  * { owner: unit -> club, seedUnit: club -> unit }. Format 2 territories may pass
  * `share` (sizes compare as area / share), `cap` (km² past which a club takes land only
  * when no club under its cap can) and `allowed(club, unit)` (land a club may take while
- * any club allowed there can reach it).
+ * any club allowed there can reach it). With `spare`, a club passes over a free unit
+ * that is another club's last way out when that unit is nearer the other club's seed
+ * (Brooklyn, whose one land neighbour is Queens, against the Knicks in Manhattan).
  */
-export function growSections(units, adjacency, homes, { reach = REACH, padKm = grainKm(units), minKm2 = 0, share = null, cap = null, allowed = null } = {}) {
+export function growSections(units, adjacency, homes, { reach = REACH, padKm = grainKm(units), minKm2 = 0, share = null, cap = null, allowed = null, spare = false } = {}) {
   const n = homes.length;
   const { owner, seedUnit, seedPoint } = seedSections(units, adjacency, homes, { minKm2, allowed });
   const fits = (club, u) => !allowed || allowed(club, u);
@@ -1345,6 +1348,7 @@ export function growSections(units, adjacency, homes, { reach = REACH, padKm = g
     for (const v of adjacency[u]) if (owner[v] < 0) frontier[club].add(v);
     left--;
   };
+  const lastWayOut = (club, u) => frontier.some((f, c) => c !== club && f.size === 1 && f.has(u) && near(u, seedPoint[c]) < near(u, seedPoint[club]));
   // Island attachment bookkeeping: nearest assigned unit per free unit, updated incrementally.
   const bestLink = new Map();
   const listed = new Uint8Array(units.length);
@@ -1360,7 +1364,8 @@ export function growSections(units, adjacency, homes, { reach = REACH, padKm = g
     order.sort((a, b) => size(a) - size(b) || a - b);
     let grown = false;
     for (const club of order) {
-      const u = pickBy([...frontier[club]].filter(v => stretch(club, v) <= reachOf(club) && tier(club, v) === 0), v => near(v, seedPoint[club]));
+      const u = pickBy([...frontier[club]].filter(v => stretch(club, v) <= reachOf(club) && tier(club, v) === 0 && !(spare && lastWayOut(club, v))),
+        v => near(v, seedPoint[club]));
       if (u < 0) continue;
       frontier[club].delete(u);
       take(club, u);
@@ -1517,8 +1522,11 @@ export const gapLimitKm = units => Math.max(3, grainKm(units) / 2);
  * from home. Longitudes come back shifted when the country crosses the antimeridian.
  * With `joinKm`, units of different `realm`s that come that close are neighbours
  * (joinRealms), so territories grow across a border two sources draw differently.
+ * Format 1 may pass `allowed(club, unit)`: land a club may take while any club allowed
+ * there can reach it (growSections; `unit` is the unit itself, crowd-cut pieces included),
+ * and `spare`: no club takes another's last way out to land nearer that club (growSections).
  */
-export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], extraPlaces = places, sections = rawHomes.length, joinKm = 0, log = () => {} } = {}) {
+export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], extraPlaces = places, sections = rawHomes.length, joinKm = 0, allowed = null, spare = false, log = () => {} } = {}) {
   const n = rawHomes.length;
   const topologyOf = list => {
     const unitTopo = unitTopology(list);
@@ -1602,7 +1610,10 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
         reach: fanOf.map(list => (list.length ? Infinity : reach ?? REACH)),
         share, cap: share.map(t => 1.5 * sourceAreaKm2 * t / sections),
         allowed: (club, u) => !grownUnits[u].fans || grownUnits[u].fans.every(m => m == null || m === club),
-      } : {}),
+      } : {
+        spare,
+        ...(allowed ? { allowed: (club, u) => allowed(club, grownUnits[u]) } : {}),
+      }),
     }));
     if (!grouped) break;
     const land = new Array(n).fill(0);

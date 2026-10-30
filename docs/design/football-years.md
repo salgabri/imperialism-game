@@ -133,9 +133,10 @@ Montenegro" needs the same identity overrides as the pre-2002 seasons.
 }
 ```
 
-- `nations` has an entry for **every** one of the 170 nations, even an empty
+- `nations` has an entry for **every** one of the 173 nations, even an empty
   one, so the hand-tuned built-in `fallbackStrength` never applies to another
-  season. An empty entry is `[40, 0, []]`, which is what `build-rosters` writes
+  season. A set built before the map had the home nations lists none of
+  `SCO`, `WAL` and `NIR`: it still loads, and England holds their land. An empty entry is `[40, 0, []]`, which is what `build-rosters` writes
   for an empty pool.
 - A **player tuple** is `[cmId, name, fullName, ca, positionKeys, nationality,
   club, dateOfBirth]`:
@@ -213,11 +214,11 @@ How a season is made:
 - **Nations by EA nationality.** The built-in rosters' aliases plus EA's older
   spellings (`Czech Republic`, `Guinea Bissau`, `Korea DPR`, `Swaziland`,
   `Brunei Darussalam`) map nationalities to game nations. `EA_NO_TEAM` lists the
-  nationalities without a shape on the map (Scotland, Wales, Northern Ireland,
-  Malta, the Faroe Islands and other small states); their players still play
-  for their clubs. Any other unmapped name stops the build. Each nation fields
+  nationalities without a shape on the map (Malta, the Faroe Islands and other
+  small states); their players still play for their clubs. Scotland, Wales and
+  Northern Ireland have shapes and teams. Any other unmapped name stops the build. Each nation fields
   its best natural XI with the squad pick the built-in rosters use. EA rates
-  only part of the world, so 70–79 nations a season field a full XI and the rest
+  only part of the world, so 73–82 nations a season field a full XI and the rest
   keep the players they have (an empty nation plays at 40).
 - **Clubs by competition id.** The export names each club's league as it is in a
   later edition (FIFA 15's Burnley is in "Championship"), but its `league_id` is
@@ -333,12 +334,12 @@ season's own three strongest clubs once it has loaded.
     set. A set plays only in its own sport, and a basketball one only with
     clubs.
 - **Setup**:
-  - Step 1 always has a **Season** choice for football: the built-in season,
-    then each data set newest first ("2017/18 · FIFA 18"), listed before any
-    fetch. A note says the earlier seasons use EA ratings and that nations
-    without eleven rated players start short-handed. The Season list has its
-    own classes (`.setup-season`), so `.setup-theatre` still means a Theatre
-    row.
+  - Step 1 always has a **Season** dropdown for football (`#setup-season`, a
+    native select): the built-in season, then each data set newest first,
+    listed before any fetch. Options name the season alone ("2017/18"); a set
+    that shares its season with another keeps its source ("2001/02 · CM 01/02
+    · Test 2002"). A note says the earlier seasons use EA ratings and that
+    nations without eleven rated players start short-handed.
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
   - Country maps are built from the built-in FM data, so the "One country" group
@@ -388,7 +389,7 @@ season's own three strongest clubs once it has loaded.
 - Seasons ending before 2002 need historic federations and are refused.
 - League detection uses stored competition names and CM0102Patcher's renames. A
   top division renamed some other way is reported missing, not guessed.
-- EA seasons cover the nations EA rates: about 95 of the 170 field fewer than
+- EA seasons cover the nations EA rates: about 95 of the 173 field fewer than
   eleven natural players each season. Seasons before 2014/15 have no EA source
   and need a local CM 01/02 database.
 - An EA season's XI is the best by EA nationality, like the built-in data, not
