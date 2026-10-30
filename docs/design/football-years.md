@@ -1,34 +1,39 @@
 # Football years: data sets beyond the built-in season
 
-Status: implemented for local data sets, 2026-10-24; seasons added in the
-browser (Add a season…) and an always-visible Season choice, 2026-10-30. Not yet
-run on a real database (the files need a forum login). Sources and terms are in
+Status: implemented for local CM 01/02 data sets, 2026-10-24; the built-in
+earlier seasons from EA's FIFA 15 – EA FC 24 launch rosters and an
+always-visible Season choice, 2026-10-30. The CM 01/02 path has not yet run on a
+real database (the files need a forum login). Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
 [football-year-permissions.md](football-year-permissions.md).
 
 ## Goal
 
 A football campaign can be played on a **data set** other than the built-in one.
-A data set is one dated database turned into nations and clubs. Today the only
-source is a Championship Manager 01/02 database the user has downloaded. The
-built-in data (EA FC 26 + FM 26, season 2025/26) stays the default and does not
-change: same files, same seeds, same saves.
+A data set is one dated database turned into nations and clubs. There are two
+kinds:
 
-Until the database authors allow redistribution, data sets are **local**. The
-user downloads a database and either adds it in the game (**Add a season…**,
-which keeps the data set in the browser's IndexedDB) or puts it in the ignored
-`data-src/cm0102/`, where the command-line builder writes the data set to the
-ignored `public/football/`. Nothing derived from the database is committed. When
-permission arrives, the built files can be committed by removing one
-`.gitignore` line, and its scope should be recorded in the permissions note
-first.
+- **The built-in earlier seasons** (2014/15 to 2023/24): one EA FIFA / FC launch
+  roster each, committed under `public/football/ea-*.json` and offered in every
+  setup. See [Built-in earlier seasons](#built-in-earlier-seasons).
+- **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
+  downloaded, built on their computer. Until the database authors allow
+  redistribution these stay local: the user puts the database in the ignored
+  `data-src/cm0102/`, and the command-line builder writes the data set to
+  `public/football/cm0102-*.json`, which git ignores. When permission arrives,
+  those files can be committed by removing one `.gitignore` line, and its scope
+  should be recorded in the permissions note first.
+
+The built-in data (EA FC 26 + FM 26, season 2025/26) stays the default and does
+not change: same files, same seeds, same saves.
 
 ## Terms
 
 - **Data set id**: `cm0102-<yyyy>-<mm>`, from the database's release month, e.g.
   `cm0102-2026-05` (May 2026 update, season 2025/26). Two releases in one month
   take their variant as a suffix (`cm0102-2012-03-odb`, `cm0102-2012-03-sim`).
-  The built-in data has no id (`null`).
+  An EA season is `ea-fifa-<nn>` or `ea-fc-<nn>` after its edition
+  (`ea-fifa-18`, `ea-fc-24`). The built-in data has no id (`null`).
 - **Year**: the season-end year, as in the sources note. `cm0102-2026-05` is year
   2026 and season "2025/26", like the built-in data, so a season can have several
   data sets (the built-in one, CM's December and May updates).
@@ -39,19 +44,19 @@ first.
 ## Pipeline
 
 ```
-data-src/cm0102/<folder>/Data/*.dat        a Data folder chosen with Add a season…
-        │  npm run build:football-set            │  src/engine/seasonImport.js (lazy chunk)
-        ▼                                        ▼
+data-src/cm0102/<folder>/Data/*.dat        user's own download (ignored)
+        │  npm run build:football-set -- --cm0102=data-src/cm0102/<folder>
+        ▼
 src/data/cm0102.js        parse the binary files (pure; Node and browser)
 src/data/footballSetBuild.js  build the data set (pure; Node and browser), from:
 src/data/cm0102Releases.js   known databases: label, season, release date, topic URL, DOB shift, file signature
 src/data/cm0102Nations.js    CM nation name → game nation id, plus names deliberately without a team
 src/data/footballFederations.js  per year: shapes held by another federation, shapes with no federation
-        ▼                                        ▼
-public/football/<id>.json (ignored)      IndexedDB imperialism-football-sets
-public/football/index.json (ignored)       (src/engine/localSets.js)
-        ▼                                        ▼
-src/engine/footballSets.js  list both, load (the browser's copy first), validate, decode; year-bound sport
+        ▼
+public/football/cm0102-<id>.json  one data set (ignored)
+public/football/index.json  every local data set present (ignored), rebuilt each run
+        ▼
+src/engine/footballSets.js  list (with the built-in earlier seasons), load, validate, decode; year-bound sport
 ```
 
 The builder fails rather than guess:
@@ -181,54 +186,65 @@ Sports Interactive's 3.9.x, Sawczuk's October 2003 and Helvete's September 2005.
 The Source column reads "CM 01/02" and links to the database topic. The tooltip
 names the provider and reads "Game rating converted from CM current ability".
 
-## Adding a season in the browser
+## Built-in earlier seasons
 
-**Add a season…** builds a data set from a Data folder the player chooses, with
-the same builder and manifests as the command line, so both make the same file.
+Ten seasons ship with the game, 2014/15 to 2023/24: the launch roster (update 2)
+of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
+(`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
+180,021 rows, labelled CC0 by its compiler; EA's own rights are not cleared, as
+for the built-in EA FC 26 data). `scripts/data/ea-seasons.json` names the export,
+its download link and SHA-256, and the editions. `npm run build:ea-seasons`
+(`scripts/build-ea-seasons.mjs`, logic in `scripts/lib/ea-seasons.mjs`) stops on
+any other file, so every season rebuilds byte for byte. It writes:
 
-- **Choosing the folder.** The button opens a folder picker (`webkitdirectory`).
-  `dataFolderOf` groups the chosen files by folder and takes the one folder that
-  holds all ten files the reader opens (`CM_DATA_FILES` in `src/data/cm0102.js`:
-  index, continent, nation, club, club and nation competitions, the three name
-  tables and staff), matching base names in any case. Picking the game folder
-  around `Data` works. Two complete Data folders are refused rather than
-  guessed between, and a packed `.zip`, `.rar` or `.7z` gets a hint to extract
-  it. Only those ten files are read, so histories and stadiums stay unread.
-- **Known releases only.** The browser has no flags to name an unknown database,
-  so a folder that is not one of the 48 known releases is refused, with a
-  pointer to the command-line builder. Every known release ends in 2002 or later.
-- **Building.** `src/engine/seasonImport.js` reports `reading`, then `building`,
-  and waits for a paint (or 100 ms when the page is not drawn) before the
-  synchronous build. Unmapped nations do not stop the build
-  (`allowUnmapped: true`): their players are left out and counted in the
-  status line. The digests of `club.dat` and `staff.dat` are checked as on the
-  command line, and a mismatch is reported as a possibly edited copy. The doc
-  must pass `decodeFootballSet` before it is stored.
-- **Storage.** `src/engine/localSets.js` keeps one IndexedDB database
-  (`imperialism-football-sets`, version 1) with two object stores written in
-  one transaction: `listing` (the index entry plus `addedAt`, keyed by `id`) and
-  `sets` (the data set file). The Season list reads only `listing`. Where
-  IndexedDB is missing or refuses to open, seasons are kept in memory and the
-  status line says the season lasts until the page closes.
-- **Listing and loading.** `loadFootballSetIndex()` reads `football/index.json`
-  once and the browser's listing on every call, marks the browser's sets
-  `added: true` and lets one stand in for a file with the same id.
-  `loadFootballSet(id)` reads the browser's copy first and fetches the file only
-  without one. A 404 says the set is neither in this browser nor built on this
-  computer, as for a season added in another browser.
-- **After an import** the listing is read again, the new season is chosen, and
-  the status line reads "Added 2007/08 · CM 01/02 · November 2007. N of 170
-  nations field a full XI; M clubs from L leagues.", from the set's coverage.
-  Adding the same
-  folder again says "Already added"; a different build of the same release says
-  "Updated". **Remove from this browser** appears for a chosen added season; it
-  deletes both records, and a setup on that season goes back to the built-in one.
+- `public/football/<id>.json`, one data set per edition (about 310 KB), with
+  `kind: 'ea'` (below);
+- `src/data/footballSeasons.js`, the listing the setup shows before anything is
+  fetched;
+- `docs/design/football-seasons-audit.json`, per season: rows, coverage, the
+  players of nations without a team, clubs per league and the clubs short of an
+  XI.
+
+How a season is made:
+
+- **One roster.** An edition's rows must share one roster id (from each
+  player's SoFIFA link, `/player/<id>/<slug>/<roster>`, absolute in older rows
+  and relative in newer ones) and one roster date, or the build stops.
+- **Nations by EA nationality.** The built-in rosters' aliases plus EA's older
+  spellings (`Czech Republic`, `Guinea Bissau`, `Korea DPR`, `Swaziland`,
+  `Brunei Darussalam`) map nationalities to game nations. `EA_NO_TEAM` lists the
+  nationalities without a shape on the map (Malta, the Faroe Islands and other
+  small states); their players still play for their clubs. Scotland, Wales and
+  Northern Ireland have shapes and teams. Any other unmapped name stops the build. Each nation fields
+  its best natural XI with the squad pick the built-in rosters use. EA rates
+  only part of the world, so 73–82 nations a season field a full XI and the rest
+  keep the players they have (an empty nation plays at 40).
+- **Clubs by competition id.** The export names each club's league as it is in a
+  later edition (FIFA 15's Burnley is in "Championship"), but its `league_id` is
+  the edition's own, so clubs are taken from ids 13, 53, 31, 19, 16, 10 and 308,
+  the club layer's seven leagues. A club needs a natural XI, as build-clubs
+  requires: 132–134 clubs a season. Ids, codes and colours come from the same
+  `presentClubs` as the CM builder.
+- **Territory** is `territoryFor(FOOTBALL_FEDERATIONS, year)`, as for CM sets:
+  Kosovo has no team in 2014/15.
+- **Ratings** are EA's overall, 1–99, unchanged.
+
+An EA set's `source` is `{ provider: 'EA Sports', edition: 'FIFA 18', update: 2,
+roster: '180002', snapshotDate: '2017-09-18', url: <the export's page>, rawScale:
+99 }`, with no `conversion`. A player tuple is `[eaId, name, fullName | 0,
+overall, 'ST,LW', nationality, club, dateOfBirth, slug]`. `expandEaTuple` in
+`src/data/eaPlayers.js` rebuilds the game's `[name, pos, rating, sourceInfo]`,
+with `source: 'ea-fc'`, the edition, update, snapshot date and the player's
+SoFIFA page for that roster, and `eaTupleOf` folds it back. The Source column
+reads "FIFA 18" and links to that page.
 
 ## Runtime
 
 - `src/engine/footballSets.js`:
-  - `loadFootballSetIndex()` lists the sets built on this computer
-    (`football/index.json`, missing means none) and those added in this browser.
+  - `loadFootballSetIndex()` lists the built-in earlier seasons (`BUILT_IN_SETS`,
+    from `src/data/footballSeasons.js`) and the CM 01/02 sets built on this
+    computer (`football/index.json`, read once; missing means none). A local file
+    never stands in for a built-in season.
   - `loadFootballSet(id)` and `getLoadedFootballSet(id)` follow
     `src/engine/domestic.js`: one shared promise per id, failed loads not cached,
     a small LRU, and strict validation of format, id, version and tuples.
@@ -239,11 +255,11 @@ the same builder and manifests as the command line, so both make the same file.
     set.
 - **Setup**:
   - Step 1 always has a **Season** choice for football: the built-in season,
-    then each data set newest first, then **Add a season…** with its status
-    line, and **Known seasons**, a collapsed list of the 48 releases (latest
-    first) that links each to its forum download page and marks the ones
-    added. The Season list has its own classes (`.setup-season`), so
-    `.setup-theatre` still means a Theatre row.
+    then each data set newest first ("2017/18 · FIFA 18"), listed before any
+    fetch. A note says the earlier seasons use EA ratings and that nations
+    without eleven rated players start short-handed. The Season list has its
+    own classes (`.setup-season`), so `.setup-theatre` still means a Theatre
+    row.
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
   - Country maps are built from the built-in FM data, so the "One country" group
@@ -258,16 +274,20 @@ the same builder and manifests as the command line, so both make the same file.
   it.
 - **Saves are self-contained.** A campaign never re-reads roster data after
   kick-off. The one exception is the v4 source index, which is built from the
-  built-in rosters and so never matches a CM player. So a set's players are
-  packed the way country campaigns pack FM players: `[cmId, …]` tuples under one
-  `playerPack` header with `kind: 'cm0102'`, rebuilt exactly on load. Resuming
+  built-in rosters: a CM player never matches it, and an EA season's player
+  shares at most an id with an FC 26 record, never its edition. So a set's
+  players are packed the way country campaigns pack FM players: the set's own
+  tuples under one `playerPack` header with `kind: 'cm0102'` or `kind: 'ea'`
+  (whose source names the edition, update, snapshot date and roster), rebuilt
+  exactly on load. Resuming
   or importing a set campaign needs no fetch, and works on a machine without
   that data set.
 - **Retry this setup** does need the set. It loads the set first, shows the
   loading state and any error in the elimination dialog, and proceeds only if
   that dialog is still open. It plays the version of the set loaded now, which
   can differ from the saved `dataVersion`, as country maps can.
-- `parseCampaign` accepts `dataSet` (`^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$`),
+- `parseCampaign` accepts `dataSet` (`^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$` or
+  `^ea-(fifa|fc)-\d{2}$`),
   `dataVersion` (`<dataSet>-<8 hex>`), `dataYear` (an integer from 1872 to 2100)
   and `dataSeason` (the season of `dataYear`), all four or none. It also rejects
   a set on basketball or on a country map.
@@ -282,18 +302,17 @@ the same builder and manifests as the command line, so both make the same file.
 - Seasons ending before 2002 need historic federations and are refused.
 - League detection uses stored competition names and CM0102Patcher's renames. A
   top division renamed some other way is reported missing, not guessed.
-- Add a season… builds on the page's main thread. With the padded test folder
-  (44 MB) it takes under a second; a real database has not been timed yet.
-- A season added in the browser lives in that browser profile only. A save
-  exported to another browser still resumes (saves are self-contained), but
-  Retry this setup there needs the season added again.
-- Browsers may clear IndexedDB under storage pressure; the game does not ask
-  for persistent storage.
+- EA seasons cover the nations EA rates: about 95 of the 173 field fewer than
+  eleven natural players each season. Seasons before 2014/15 have no EA source
+  and need a local CM 01/02 database.
+- An EA season's XI is the best by EA nationality, like the built-in data, not
+  the squad a national coach picked.
 
 ## Invariants kept
 
 - The built-in data path is untouched: `src/data/rosters.js` and
   `clubs.football.js` are not regenerated, and the seed-replay golden,
   save-size budgets and roster tests pass unchanged.
-- No data set file, database file or derived player list is committed.
+- No CM 01/02 data set file, database file or derived player list is committed.
+  The EA seasons are committed on the same terms as the built-in EA FC 26 data.
 - The domestic pack format is unchanged. A pack without `kind` is FM.

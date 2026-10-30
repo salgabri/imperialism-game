@@ -85,6 +85,26 @@ function hashStr(s) {
 
 const colourFor = id => `oklch(0.72 0.16 ${hashStr(id) % 360})`;
 
+/**
+ * A set's club rows, strongest first, from `built` ([{ name, league, country, str, squad }], each squad player
+ * carrying its `tuple`): `f-<slug>` ids (a clash gets a suffix, and a warning), three-capital codes and colours, as
+ * build-clubs makes them. Shared by the CM 01/02 and EA season builders.
+ */
+export function presentClubs(built, warn) {
+  const codes = new Set(), ids = new Set();
+  return built.slice().sort((a, b) => b.str - a.str || byText(a.name, b.name)).map(club => {
+    const base = `f-${slug(club.name)}`;
+    let id = base;
+    for (let n = 2; ids.has(id); n++) id = `${base}-${n}`;
+    if (id !== base) warn(`Two clubs make the id ${base}; the weaker is ${id}`);
+    ids.add(id);
+    const code = makeCode(ascii(club.name), codes);
+    if (!/^[A-Z0-9]{3}$/.test(code)) throw new Error(`No three-capital code for the club ${club.name} (got ${code})`);
+    return { id, name: club.name, code, league: club.league, country: club.country, col: colourFor(id),
+      str: club.str, squad: club.squad.map(p => p.tuple) };
+  });
+}
+
 // ---- Identification ----
 
 /** The manifest entry whose club.dat and staff.dat sizes match, with the matching signature, or null. */
@@ -371,19 +391,7 @@ export function buildFootballSet(files, {
     }
     leagueAudit.push({ league, country, competition: comp.name, members: members.length, clubs: members.length - short.length, short });
   }
-  built.sort((a, b) => b.str - a.str || byText(a.name, b.name));
-  const codes = new Set(), ids = new Set();
-  const clubs = built.map(club => {
-    const base = `f-${slug(club.name)}`;
-    let id = base;
-    for (let n = 2; ids.has(id); n++) id = `${base}-${n}`;
-    if (id !== base) warn(`Two clubs make the id ${base}; the weaker is ${id}`);
-    ids.add(id);
-    const code = makeCode(ascii(club.name), codes);
-    if (!/^[A-Z0-9]{3}$/.test(code)) throw new Error(`No three-capital code for the club ${club.name} (got ${code})`);
-    return { id, name: club.name, code, league: club.league, country: club.country, col: colourFor(id),
-      str: club.str, squad: club.squad.map(p => p.tuple) };
-  });
+  const clubs = presentClubs(built, warn);
 
   const territory = territoryFor(federations, database.year);
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));

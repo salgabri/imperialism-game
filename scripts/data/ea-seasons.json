@@ -1,0 +1,25 @@
+{
+  "note": "The built-in earlier football seasons: one launch roster per EA FIFA / FC edition, from one export. npm run build:ea-seasons reads the export from data-src/ea-leone/ (ignored) and checks it against sha256. See docs/design/football-years.md.",
+  "dataset": {
+    "name": "EA Sports FC 24 complete player dataset (stefanoleone992)",
+    "url": "https://www.kaggle.com/datasets/stefanoleone992/ea-sports-fc-24-complete-player-dataset",
+    "download": "https://www.kaggle.com/api/v1/datasets/download/stefanoleone992/ea-sports-fc-24-complete-player-dataset/male_players.csv",
+    "file": "male_players.csv",
+    "licence": "CC0-1.0, as set by the compiler on Kaggle; EA's own rights in the ratings are not cleared, as for the built-in EA FC 26 data",
+    "rows": 180021,
+    "sha256": "fd788f7809a62e9715f0cfa4e45c92a97dd716bd6d64dc48a71a0e86369a0a7e",
+    "retrieved": "2026-10-30"
+  },
+  "editions": [
+    { "id": "ea-fc-24", "fifaVersion": 24, "edition": "EA FC 24", "update": 2 },
+    { "id": "ea-fifa-23", "fifaVersion": 23, "edition": "FIFA 23", "update": 2 },
+    { "id": "ea-fifa-22", "fifaVersion": 22, "edition": "FIFA 22", "update": 2 },
+    { "id": "ea-fifa-21", "fifaVersion": 21, "edition": "FIFA 21", "update": 2 },
+    { "id": "ea-fifa-20", "fifaVersion": 20, "edition": "FIFA 20", "update": 2 },
+    { "id": "ea-fifa-19", "fifaVersion": 19, "edition": "FIFA 19", "update": 2 },
+    { "id": "ea-fifa-18", "fifaVersion": 18, "edition": "FIFA 18", "update": 2 },
+    { "id": "ea-fifa-17", "fifaVersion": 17, "edition": "FIFA 17", "update": 2 },
+    { "id": "ea-fifa-16", "fifaVersion": 16, "edition": "FIFA 16", "update": 2 },
+    { "id": "ea-fifa-15", "fifaVersion": 15, "edition": "FIFA 15", "update": 2 }
+  ]
+}

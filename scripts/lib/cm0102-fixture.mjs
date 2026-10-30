@@ -197,34 +197,6 @@ export function patchIndexEntry(files, tableId, { count, offset, format }) {
   throw new Error(`No index entry for table ${tableId}`);
 }
 
-/**
- * A format-2 folder padded to the club.dat and staff.dat sizes of a known release (its first signature), so the
- * builder identifies it as that release with the shipped manifest: blank clubs (id = row, no name) fill club.dat and
- * preference rows, staff.dat's last table, fill staff.dat with under one row to spare. The digests still differ, as
- * an edited copy's would. Returns new files; `files` is left as it was.
- */
-export function padToRelease(files, release) {
-  const { club, staff } = release.signatures[0];
-  if (club % SIZE.club || club < files['club.dat'].length || staff < files['staff.dat'].length) {
-    throw new Error(`${release.id}'s sizes cannot hold this folder`);
-  }
-  const count = (bytes, tableId) => {
-    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    for (let k = 0; k < 22; k++) if (view.getInt32(8 + 67 * k + 51, true) === tableId) return view.getInt32(8 + 67 * k + 55, true);
-    throw new Error(`No index entry for table ${tableId}`);
-  };
-  const clubs = new Uint8Array(club);
-  clubs.set(files['club.dat']);
-  const view = new DataView(clubs.buffer);
-  for (let row = files['club.dat'].length / SIZE.club; row < club / SIZE.club; row++) view.setInt32(row * SIZE.club, row, true);
-  const people = new Uint8Array(staff);
-  people.set(files['staff.dat']);
-  const padded = { ...files, 'index.dat': files['index.dat'].slice(), 'club.dat': clubs, 'staff.dat': people };
-  patchIndexEntry(padded, 0, { count: club / SIZE.club });
-  patchIndexEntry(padded, 22, { count: count(files['index.dat'], 22) + Math.floor((staff - files['staff.dat'].length) / SIZE.prefs) });
-  return padded;
-}
-
 /** A Mac 3.9.62-style folder: big-endian 68-byte index entries, 584-byte clubs and the 0xF1FFFFF1 trailer. */
 export function writeMacFiles(db) {
   const clubs = (db.clubs || []).map((c, row) => {

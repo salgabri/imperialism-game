@@ -42,7 +42,8 @@
     "build:club-colours": "node scripts/build-club-colours.mjs",
     "build:home-nations": "node scripts/build-home-nations.mjs",
     "build:football-set": "node scripts/build-football-set.mjs",
-    "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-core.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs scripts/season-import.test.mjs"
+    "build:ea-seasons": "node scripts/build-ea-seasons.mjs",
+    "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-core.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs scripts/ea-seasons.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

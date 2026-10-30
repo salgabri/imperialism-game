@@ -226,40 +226,6 @@
 }
 .rule-note.setup-domestic__error > svg, .rule-note.setup-season__error > svg { color:var(--loss); }
 
-/* Season: Add a season… (and Remove for a season added in this browser), its status line (a live region, so it stays
-   mounted and takes no room while empty) and the known seasons, each linking to its download page. */
-.setup-season__actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; margin-top:12px; padding:0 14px; }
-.setup-season__status:empty { margin:0; }
-.setup-known { margin-top:12px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
-.setup-known > summary {
-  display:flex; align-items:center; gap:10px; min-height:max(44px, var(--tap)); padding:0 2px;
-  list-style:none; cursor:pointer;
-}
-.setup-known > summary::-webkit-details-marker { display:none; }
-.setup-known > summary > svg { flex:none; color:var(--ink); }
-.setup-known[open] > summary > svg { transform:rotate(180deg); }
-.setup-known__title { font:700 13px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--ink); white-space:nowrap; }
-.setup-known__values {
-  margin-left:auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  font:400 13px/1.3 var(--font-sans); color:var(--muted);
-}
-.setup-known > .setup-season__note { margin:0 0 8px; }
-.setup-known__list {
-  margin:0 0 12px; padding:0; list-style:none; max-height:var(--setup-list-h); overflow-y:auto; overscroll-behavior:contain;
-  border-top:1px solid var(--row-rule); scrollbar-width:thin;
-}
-.setup-known__row {
-  display:flex; align-items:baseline; gap:12px; min-width:0; padding:9px 14px; border-bottom:1px solid var(--row-rule);
-  font:400 13px/1.3 var(--font-sans); color:var(--muted);
-}
-.setup-known__link { flex:none; font:600 15px/1.3 var(--font-narrow); color:var(--you-text); text-decoration:none; }
-.setup-known__link:hover { text-decoration:underline; }
-.setup-known__provider { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.setup-known__added {
-  margin-left:auto; flex:none; font:700 11px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase;
-  color:var(--gain);
-}
-
 /* Step 1 map card: the theatre's opening board — each starting territory (a world theatre's nations or clubs, a
    country's sections) in its kick-off pastel over the land nobody holds. Static (no camera, labels or territory
    attributes); one fixed frame so switching theatres never moves the column. */
