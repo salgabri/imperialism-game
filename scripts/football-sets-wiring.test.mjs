@@ -118,9 +118,16 @@ async function chooseSet(app, time) {
 
 const setNames = nation => SET.nations[nation][2].map(tuple => tuple[1]);
 
-const seasonRadios = document => [...document.querySelectorAll('[role=radiogroup][aria-labelledby="setup-season-label"] [role=radio]')];
-/** The Season list's rows for the built-in earlier seasons: "2023/24 · EA FC 24" … "2014/15 · FIFA 15". */
-const EARLIER = BUILT_IN_SEASONS.map(set => `${set.season} · ${set.label}`);
+const seasonPicker = document => document.getElementById('setup-season');
+const seasonNames = document => [...seasonPicker(document).options].map(option => option.textContent);
+/** Pick a season in the dropdown as the player does. */
+async function pickSeason(document, id) {
+  const select = seasonPicker(document);
+  select.value = id;
+  await act(async () => select.dispatchEvent(new document.defaultView.Event('change', { bubbles: true })));
+}
+/** The Season dropdown's names for the built-in earlier seasons: "2023/24" … "2014/15", without their source. */
+const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
 
 // ---------- setup ----------
 
@@ -134,12 +141,13 @@ test('the Season choice offers the built-in season, then every earlier season bu
     assert.equal(app.state.saveStatus, null, 'a missing index reports nothing');
     await withDom(async ({ document, mount }) => {
       await mountPart(app, mount, 'SetupOverlay');
-      assert.deepEqual(seasonRadios(document).map(radio => radio.getAttribute('aria-label')), ['2025/26 · built in', ...EARLIER]);
-      assert.deepEqual(EARLIER.slice(0, 2), ['2023/24 · EA FC 24', '2022/23 · FIFA 23']);
-      assert.equal(EARLIER.at(-1), '2014/15 · FIFA 15');
-      assert.deepEqual(seasonRadios(document).map(radio => radio.getAttribute('aria-checked')).filter(checked => checked === 'true').length, 1);
-      assert.equal(seasonRadios(document)[0].getAttribute('aria-checked'), 'true', 'the built-in season by default');
-      assert.equal(document.getElementById('setup-season').value, '');
+      assert.equal(seasonPicker(document).tagName, 'SELECT', 'the seasons are a dropdown');
+      assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
+      assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER]);
+      assert.deepEqual(EARLIER.slice(0, 2), ['2023/24', '2022/23']);
+      assert.equal(EARLIER.at(-1), '2014/15');
+      assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
+      assert.equal(seasonPicker(document).value, '');
       assert.match(document.getElementById('setup-season-note').textContent, /Earlier seasons use EA FIFA ratings/);
       assert.ok(!document.querySelector('input[webkitdirectory]')
         && ![...document.querySelectorAll('button')].some(button => /season/i.test(button.textContent)), 'no season to load from files');
@@ -158,13 +166,10 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
     assert.deepEqual(app.state.footballSets.map(set => set.id), [...BUILT_IN_SEASONS.map(set => set.id), ID], 'the local set after the built-in ones');
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
-      const radios = () => seasonRadios(document);
-      const local = () => radios().at(-1);
-      assert.deepEqual(radios().map(radio => radio.getAttribute('aria-label')), ['2025/26 · built in', ...EARLIER, '2001/02 · CM 01/02 · Test 2002']);
-      assert.deepEqual([radios()[0], local()].map(radio => radio.getAttribute('aria-checked')), ['true', 'false']);
-      assert.equal(document.getElementById('setup-season').value, '', 'the mirror names the built-in season');
+      assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER, '2001/02']);
+      assert.equal(seasonPicker(document).value, '', 'the built-in season is chosen');
 
-      await act(async () => local().click());
+      await pickSeason(document, ID);
       assert.equal(app.state.setup.dataSet, ID);
       assert.equal(app.seasonStatus().state, 'loading');
       assert.deepEqual(app.setupTeams(), [], 'nobody is listed until the set loads');
@@ -179,8 +184,7 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
       await settle();
       assert.deepEqual(app.state.footballSetLoad, { id: ID, state: 'ready', message: null });
       await view.refresh();
-      assert.deepEqual([radios()[0], local()].map(radio => radio.getAttribute('aria-checked')), ['false', 'true']);
-      assert.equal(document.getElementById('setup-season').value, ID);
+      assert.equal(seasonPicker(document).value, ID);
       assert.ok(!document.querySelector('.setup-season__loading'), 'the loading line is gone');
       assert.equal(document.querySelector('.setup-launch').disabled, false);
     });
@@ -237,6 +241,8 @@ test('stepping through the seasons fetches only the set the player stays on', as
   await withSetup(files, async ({ app, calls, time }) => {
     await app.requestSeasons();
     assert.deepEqual(app.state.footballSets.filter(set => set.id.startsWith('cm0102-')).map(set => set.id), [ID, december.id], 'the later release first');
+    assert.deepEqual(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).season.options.slice(-2).map(option => option.name),
+      ['2001/02 · CM 01/02 · Test 2002', '2001/02 · CM 01/02 · December 2001'], 'two sets of one season keep their source');
     app.pickSetup('dataSet', december.id);
     time.advance(50);
     app.pickSetup('dataSet', ID);
@@ -483,8 +489,8 @@ test('an earlier season loads its own file and plays that season\'s EA players; 
     await app.requestSeasons();
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
-      const radio = seasonRadios(document).find(row => row.getAttribute('aria-label') === '2017/18 · FIFA 18');
-      await act(async () => radio.click());
+      assert.equal(seasonPicker(document).options[seasonNames(document).indexOf('2017/18')].value, EA_ID);
+      await pickSeason(document, EA_ID);
       assert.equal(app.state.setup.dataSet, EA_ID);
       await view.refresh();
       assert.equal(document.querySelector('.setup-season__loading[role=status]')?.textContent, 'Loading the FIFA 18 season…');

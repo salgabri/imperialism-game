@@ -254,12 +254,12 @@ reads "FIFA 18" and links to that page.
   - `sportOf(settingsOrSetup)` returns that sport, or the built-in sport for no
     set.
 - **Setup**:
-  - Step 1 always has a **Season** choice for football: the built-in season,
-    then each data set newest first ("2017/18 · FIFA 18"), listed before any
-    fetch. A note says the earlier seasons use EA ratings and that nations
-    without eleven rated players start short-handed. The Season list has its
-    own classes (`.setup-season`), so `.setup-theatre` still means a Theatre
-    row.
+  - Step 1 always has a **Season** dropdown for football (`#setup-season`, a
+    native select): the built-in season, then each data set newest first,
+    listed before any fetch. Options name the season alone ("2017/18"); a set
+    that shares its season with another keeps its source ("2001/02 · CM 01/02
+    · Test 2002"). A note says the earlier seasons use EA ratings and that
+    nations without eleven rated players start short-handed.
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
   - Country maps are built from the built-in FM data, so the "One country" group

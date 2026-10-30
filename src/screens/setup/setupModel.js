@@ -304,14 +304,16 @@ export const SEASON_NOTE = 'Earlier seasons use EA FIFA ratings from the start o
 
 /**
  * The Season choice (docs/design/football-years.md): the built-in season, then each listed data set newest first, as
- * `{ id, key, season, source, label, checked }`. `sport` names a chosen set the listing no longer has.
+ * `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
   const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
     label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
   const rows = [row(null, BUILT_IN_SEASON.season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
-  return rows;
+  // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
+  const shared = season => !season || rows.filter(other => other.season === season).length > 1;
+  return rows.map(option => ({ ...option, name: shared(option.season) ? option.label : option.season }));
 }
 
 /** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
