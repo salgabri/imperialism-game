@@ -8,13 +8,13 @@
 
 export const CLUB_MAPS = [
   {"id":"nba","sport":"basketball","league":"NBA","name":"USA and Canada","clubs":30,"sections":30,"version":"nba-a6718730","top":["Boston Celtics","Dallas Mavericks","Denver Nuggets"]},
-  {"id":"nba2000","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k00","nba-2k01"],"clubs":29,"sections":29,"version":"nba2000-51fa2896"},
-  {"id":"nba2002","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k02"],"clubs":29,"sections":29,"version":"nba2002-cd8315b3"},
-  {"id":"nba2003","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k03","nba-2k04"],"clubs":29,"sections":29,"version":"nba2003-17b59f17"},
-  {"id":"nba2005","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k05"],"clubs":30,"sections":30,"version":"nba2005-3c8fb36a"},
-  {"id":"nba2006","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k06","nba-2k07"],"clubs":30,"sections":30,"version":"nba2006-7c6ab008"},
-  {"id":"nba2008","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k08"],"clubs":30,"sections":30,"version":"nba2008-1b6fb616"},
-  {"id":"nba2009","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k09","nba-2k10","nba-2k11"],"clubs":30,"sections":30,"version":"nba2009-0e1b6d80"},
-  {"id":"nba2013","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k13"],"clubs":30,"sections":30,"version":"nba2013-d20d732d"},
-  {"id":"nba2014","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k14"],"clubs":30,"sections":30,"version":"nba2014-4eb4095b"},
+  {"id":"nba2000","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k00","nba-2k01"],"clubs":29,"sections":29,"version":"nba2000-5dc528a4"},
+  {"id":"nba2002","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k02"],"clubs":29,"sections":29,"version":"nba2002-a3210c97"},
+  {"id":"nba2003","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k03","nba-2k04"],"clubs":29,"sections":29,"version":"nba2003-a1d7efdf"},
+  {"id":"nba2005","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k05"],"clubs":30,"sections":30,"version":"nba2005-571077e8"},
+  {"id":"nba2006","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k06","nba-2k07"],"clubs":30,"sections":30,"version":"nba2006-d8bb40c3"},
+  {"id":"nba2008","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k08"],"clubs":30,"sections":30,"version":"nba2008-c729cd25"},
+  {"id":"nba2009","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k09","nba-2k10","nba-2k11"],"clubs":30,"sections":30,"version":"nba2009-ae4834eb"},
+  {"id":"nba2013","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k13"],"clubs":30,"sections":30,"version":"nba2013-fd2e4b2b"},
+  {"id":"nba2014","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k14"],"clubs":30,"sections":30,"version":"nba2014-3182fe4c"},
 ];

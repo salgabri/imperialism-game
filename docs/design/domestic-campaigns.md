@@ -669,7 +669,7 @@ and provinces far from every arena left empty (since 2026-10-30; the first build
 split every county of both countries). It reuses this whole runtime (loader, country
 chart, backdrop, routing, saves) as a format-1 map whose clubs are the game's own.
 
-**Build** (`npm run build:nba-map`, `scripts/build-nba-map.mjs`, about a minute;
+**Build** (`npm run build:nba-map`, `scripts/build-nba-map.mjs`, about 7 minutes with the era maps;
 `--check` rebuilds offline and compares, `--dry-run` writes nothing):
 
 - **Units**: geoBoundaries gbOpen USA ADM2 (counties, public domain) and CAN ADM2
@@ -763,7 +763,7 @@ its successor). Such a map adds `seasons` (the set ids it serves) to its file an
 index entry, its rows add the franchise's `name`, and the loader then takes no
 club from the game's data: the season gives each row its name, code, strength and
 five at kick-off. Today's `nba.json` is unchanged and also serves the seasons from
-2014/15, whose franchises are today's. The build now takes about 15 minutes.
+2014/15, whose franchises are today's.
 
 **Checks**: `scripts/nba-map.test.mjs` (in `npm run test:domestic`): file, index,
 arenas and clubs agree; the USA and Canada are all the land and the hosts are not

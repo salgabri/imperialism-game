@@ -344,9 +344,9 @@ season's own three strongest clubs once it has loaded.
     country map, and Launch waits for it.
   - Country maps are built from the built-in FM data, so the "One country" group
     is not offered for another set.
-  - Basketball has its own Season choice: the built-in 2024/25, then its
-    earlier seasons ("2007/08 · NBA 2K8"), with a note that they use 2K
-    Archive's NBA 2K ratings and have NBA clubs only. Picking one switches Teams
+  - Basketball has its own Season dropdown: the built-in 2024/25, then its
+    earlier seasons ("2007/08"), with a note that they use 2K Archive's NBA 2K
+    ratings and have NBA clubs only. Picking one switches Teams
     to clubs and the theatre to its map (`domestic:nba2008`); picking nations
     goes back to the built-in season. The map and the set load side by side, and
     Launch waits for both.

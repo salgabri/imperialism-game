@@ -663,13 +663,14 @@ and fives. Mexico, Greenland and the rest of the world lie beneath as inert
 land. The map is `public/domestic/nba.json`, played through the
 country-map runtime; NBA campaigns saved before it still resume on the world map.
 Each [earlier season](#basketball-seasons) plays on a map of its own era, drawn
-the same way from the arenas of that season: the Grizzlies start in Vancouver
-until 2000/01 and the SuperSonics hold Seattle until 2007/08. Nine era maps
+the same way from the arenas of that season: the Grizzlies hold British Columbia
+and Alberta until 2000/01, the SuperSonics Washington until 2007/08 and the Nets
+New Jersey until 2010/11. Nine era maps
 (`public/domestic/nba2000.json` to `nba2014.json`) cover 1999/00 to 2013/14;
 later seasons have today's franchises and play on this map.
 
 ```bash
-npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 15 minutes)
+npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 7 minutes)
 npm run build:nba-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
 

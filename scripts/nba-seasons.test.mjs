@@ -270,6 +270,8 @@ test('basketball\'s Season choice lists its own seasons; one takes the clubs ont
     assert.deepEqual(model.season.options.map(option => option.label),
       ['2024/25 · built in', ...BUILT_IN_BASKETBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
     assert.equal(model.season.options.at(-1).label, '1999/00 · NBA 2K');
+    assert.deepEqual(model.season.options.map(option => option.name), ['2024/25', ...BUILT_IN_BASKETBALL_SEASONS.map(set => set.season)],
+      'the dropdown names each by its season alone');
     assert.match(model.season.note, /NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs only/);
     assert.equal(model.season.id, null);
 
