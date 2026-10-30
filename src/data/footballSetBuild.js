@@ -1,14 +1,18 @@
 // Football data sets beyond the built-in season (docs/design/football-years.md). A
 // Championship Manager 01/02 Data folder, read by src/data/cm0102.js, becomes one season's
-// national squads, top-flight clubs and territory. No I/O here: scripts/build-football-set.mjs
-// reads the folder and writes the results, and tests build sets from synthetic folders.
+// national squads, top-flight clubs and territory. No I/O here, and only src/ imports, so
+// the same build runs in Node and in the browser: scripts/build-football-set.mjs reads the
+// folder and writes the results, and tests build sets from synthetic folders.
 // Every player written is a stored CM record that rebuilds exactly from its tuple; a
 // nation with fewer than eleven natural players keeps exactly the ones it has.
-import { createHash } from 'node:crypto';
-import { NATIONS, selectLineup } from '../../src/data/teams.js';
-import { CM_CONVERSION, CM_SCALE, cmNaturalPositions, cmTupleOf, expandCmTuple } from '../../src/data/cmPlayers.js';
-import { cmMonthDay, decodeCmDate, fileSignature, readCm0102 } from '../../src/data/cm0102.js';
-import { pickFootballSquad } from './football-data.mjs';
+import { NATIONS, selectLineup } from './teams.js';
+import { CM_CONVERSION, CM_SCALE, cmNaturalPositions, cmTupleOf, expandCmTuple } from './cmPlayers.js';
+import { cmMonthDay, decodeCmDate, fileSignature, readCm0102 } from './cm0102.js';
+import { CM0102_RELEASES } from './cm0102Releases.js';
+import { CM0102_NATIONS } from './cm0102Nations.js';
+import { FOOTBALL_FEDERATIONS } from './footballFederations.js';
+import { pickFootballSquad } from './footballSquad.js';
+import { sha256 } from './sha256.js';
 
 export const FOOTBALL_SET_FORMAT = 1;
 export const SET_ID = /^cm0102-\d{4}-\d{2}(?:-[a-z0-9]+)?$/;
@@ -81,6 +85,26 @@ function hashStr(s) {
 
 const colourFor = id => `oklch(0.72 0.16 ${hashStr(id) % 360})`;
 
+/**
+ * A set's club rows, strongest first, from `built` ([{ name, league, country, str, squad }], each squad player
+ * carrying its `tuple`): `f-<slug>` ids (a clash gets a suffix, and a warning), three-capital codes and colours, as
+ * build-clubs makes them. Shared by the CM 01/02 and EA season builders.
+ */
+export function presentClubs(built, warn) {
+  const codes = new Set(), ids = new Set();
+  return built.slice().sort((a, b) => b.str - a.str || byText(a.name, b.name)).map(club => {
+    const base = `f-${slug(club.name)}`;
+    let id = base;
+    for (let n = 2; ids.has(id); n++) id = `${base}-${n}`;
+    if (id !== base) warn(`Two clubs make the id ${base}; the weaker is ${id}`);
+    ids.add(id);
+    const code = makeCode(ascii(club.name), codes);
+    if (!/^[A-Z0-9]{3}$/.test(code)) throw new Error(`No three-capital code for the club ${club.name} (got ${code})`);
+    return { id, name: club.name, code, league: club.league, country: club.country, col: colourFor(id),
+      str: club.str, squad: club.squad.map(p => p.tuple) };
+  });
+}
+
 // ---- Identification ----
 
 /** The manifest entry whose club.dat and staff.dat sizes match, with the matching signature, or null. */
@@ -128,7 +152,7 @@ export function resolveDatabase(signature, databases, identity = {}) {
   const missing = ['label', 'released', 'url', 'dobShift'].filter(key => !given.includes(key));
   if (missing.length) {
     throw new Error(`Unknown CM 01/02 database (club.dat ${signature.clubSize} bytes, staff.dat ${signature.staffSize} bytes, `
-      + `staff format ${signature.staffFormat}): it is not in scripts/data/cm0102-databases.json. Name it with `
+      + `staff format ${signature.staffFormat}): it is not in src/data/cm0102Releases.js. Name it with `
       + `${missing.map(key => `${FLAGS[key]}=...`).join(' ')} (and optionally --id, --season, --provider)`);
   }
   const { label, released, url } = flag;
@@ -156,19 +180,17 @@ function fileNamed(files, name) {
   return key ? files[key] : null;
 }
 
-const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-
 // ---- Mapping, territory, birth shift ----
 
-/** CM nation name -> game nation id, NO_TEAM, or null when neither cm0102-nations.json nor a game nation's name knows it. */
+/** CM nation name -> game nation id, NO_TEAM, or null when neither cm0102Nations.js nor a game nation's name knows it. */
 export function nationResolver({ aliases = {}, noTeam = [] } = {}) {
   const map = new Map(Object.entries(NATIONS).map(([id, rec]) => [fold(rec[0]), id]));
   for (const [name, id] of Object.entries(aliases)) {
-    if (!NATIONS[id]) throw new Error(`cm0102-nations.json maps "${name}" to ${id}, which is not a game nation`);
+    if (!NATIONS[id]) throw new Error(`cm0102Nations.js maps "${name}" to ${id}, which is not a game nation`);
     map.set(fold(name), id);
   }
   for (const name of noTeam) {
-    if (map.has(fold(name))) throw new Error(`cm0102-nations.json lists "${name}" as having no team, but it maps to ${map.get(fold(name))}`);
+    if (map.has(fold(name))) throw new Error(`cm0102Nations.js lists "${name}" as having no team, but it maps to ${map.get(fold(name))}`);
     map.set(fold(name), NO_TEAM);
   }
   return name => map.get(fold(name)) ?? null;
@@ -181,7 +203,7 @@ export function nationResolver({ aliases = {}, noTeam = [] } = {}) {
 export function territoryFor({ cutoff = '06-30', shapes = {} } = {}, year) {
   const merged = {}, inactive = [];
   for (const [shape, federation] of Object.entries(shapes).sort(([a], [b]) => byText(a, b))) {
-    if (!NATIONS[shape] || (federation.heldBy && !NATIONS[federation.heldBy])) throw new Error(`football-federations.json names ${shape} held by ${federation.heldBy}, not both game nations`);
+    if (!NATIONS[shape] || (federation.heldBy && !NATIONS[federation.heldBy])) throw new Error(`footballFederations.js names ${shape} held by ${federation.heldBy}, not both game nations`);
     if (federation.member <= `${year}-${cutoff}`) continue;
     if (federation.heldBy) merged[shape] = federation.heldBy;
     else inactive.push(shape);
@@ -230,18 +252,22 @@ export function estimateBirthShift(players, famous = FAMOUS_BIRTHDAYS) {
 /** Version hash: the first 8 hex of the SHA-256 of the set's compact JSON without its version field. */
 export function contentHash(doc) {
   const { version, ...rest } = doc;
-  return createHash('sha256').update(JSON.stringify(rest)).digest('hex').slice(0, 8);
+  return sha256(JSON.stringify(rest)).slice(0, 8);
 }
 
 export const serializeFootballSet = doc => `${JSON.stringify(doc)}\n`;
 
 /**
- * Build one data set from a Data folder `{ fileName: Uint8Array }`. Options: `databases` (cm0102-databases.json's
- * list), `nationMap` (cm0102-nations.json), `federations` (football-federations.json), `identity` (the flags for an
- * unknown folder), `allowUnmapped`, and `famous` (birthdays for the shift check). Returns `{ doc, text, audit,
- * summary, warnings }`; throws on an unknown layout, an unmapped nation (unless allowed) or an unnamed database.
+ * Build one data set from a Data folder `{ fileName: Uint8Array }`. Options: `databases` (default CM0102_RELEASES),
+ * `nationMap` (default CM0102_NATIONS), `federations` (default FOOTBALL_FEDERATIONS), `identity` (the flags for an
+ * unknown folder), `allowUnmapped`, `famous` (birthdays for the shift check) and `verifyFiles` (false skips the
+ * SHA-256 of a known database's club.dat and staff.dat, tens of MB). Returns `{ doc, text, audit, summary,
+ * warnings }`; throws on an unknown layout, an unmapped nation (unless allowed) or an unnamed database.
  */
-export function buildFootballSet(files, { databases = [], nationMap, federations, identity = {}, allowUnmapped = false, famous = FAMOUS_BIRTHDAYS } = {}) {
+export function buildFootballSet(files, {
+  databases = CM0102_RELEASES, nationMap = CM0102_NATIONS, federations = FOOTBALL_FEDERATIONS, identity = {}, allowUnmapped = false,
+  famous = FAMOUS_BIRTHDAYS, verifyFiles = true,
+} = {}) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const signature = fileSignature(files);
@@ -255,7 +281,8 @@ export function buildFootballSet(files, { databases = [], nationMap, federations
   if (database.match) {
     for (const key of ['club', 'staff']) {
       const expected = database.match[`${key}Sha256`];
-      digests[key] = !expected ? 'not known' : sha256(fileNamed(files, `${key}.dat`)) === expected ? 'match' : 'mismatch';
+      digests[key] = !expected ? 'not known' : !verifyFiles ? 'not checked'
+        : sha256(fileNamed(files, `${key}.dat`)) === expected ? 'match' : 'mismatch';
       if (digests[key] === 'mismatch') warn(`${key}.dat has the size of ${database.label} but not its SHA-256: the folder may have been edited`);
     }
   }
@@ -310,7 +337,7 @@ export function buildFootballSet(files, { databases = [], nationMap, federations
   const unmappedNames = Object.keys(unmapped).sort(byText);
   if (unmappedNames.length && !allowUnmapped) {
     throw new Error(`CM nations with no game nation, and not listed as having no team: ${unmappedNames.map(name => `${name} (${unmapped[name]} players)`).join(', ')}. `
-      + 'Add them to scripts/data/cm0102-nations.json (aliases or noTeam), or pass --allow-unmapped to leave their players out');
+      + 'Add them to src/data/cm0102Nations.js (aliases or noTeam), or pass --allow-unmapped to leave their players out');
   }
   if (unmappedNames.length) warn(`Left out the players of unmapped nations: ${unmappedNames.map(name => `${name} (${unmapped[name]})`).join(', ')}`);
 
@@ -364,19 +391,7 @@ export function buildFootballSet(files, { databases = [], nationMap, federations
     }
     leagueAudit.push({ league, country, competition: comp.name, members: members.length, clubs: members.length - short.length, short });
   }
-  built.sort((a, b) => b.str - a.str || byText(a.name, b.name));
-  const codes = new Set(), ids = new Set();
-  const clubs = built.map(club => {
-    const base = `f-${slug(club.name)}`;
-    let id = base;
-    for (let n = 2; ids.has(id); n++) id = `${base}-${n}`;
-    if (id !== base) warn(`Two clubs make the id ${base}; the weaker is ${id}`);
-    ids.add(id);
-    const code = makeCode(ascii(club.name), codes);
-    if (!/^[A-Z0-9]{3}$/.test(code)) throw new Error(`No three-capital code for the club ${club.name} (got ${code})`);
-    return { id, name: club.name, code, league: club.league, country: club.country, col: colourFor(id),
-      str: club.str, squad: club.squad.map(p => p.tuple) };
-  });
+  const clubs = presentClubs(built, warn);
 
   const territory = territoryFor(federations, database.year);
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));

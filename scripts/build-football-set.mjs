@@ -8,9 +8,9 @@
 //     --cm0102          the Data folder (index.dat, staff.dat, ...) or the folder holding it
 //     --out             where data sets are written (default public/football)
 //     --check           identify, read and build, and report, but write nothing
-//     --allow-unmapped  leave out the players of nations scripts/data/cm0102-nations.json does not know,
+//     --allow-unmapped  leave out the players of nations src/data/cm0102Nations.js does not know,
 //                       instead of stopping
-//   A database that is not in scripts/data/cm0102-databases.json must be named:
+//   A database that is not in src/data/cm0102Releases.js must be named:
 //     --label=<May 2026> --released=<yyyy-mm> --url=<forum topic> --dob-shift=<years>   (required)
 //     --id=<cm0102-yyyy-mm[-variant]> --season=<yyyy/yy> --provider=<name>             (optional)
 //
@@ -20,7 +20,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { buildFootballIndex, buildFootballSet, SET_ID } from './lib/football-set.mjs';
+import { buildFootballIndex, buildFootballSet, SET_ID } from '../src/data/footballSetBuild.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SWITCHES = ['check', 'allow-unmapped'];
@@ -81,11 +81,7 @@ async function otherSets(dir, id) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const folder = await dataFolder(path.resolve(args.cm0102));
-  const manifest = async file => JSON.parse(await readFile(path.join(root, 'scripts/data', file), 'utf8'));
   const result = buildFootballSet(await readDataFolder(folder), {
-    databases: (await manifest('cm0102-databases.json')).databases,
-    nationMap: await manifest('cm0102-nations.json'),
-    federations: await manifest('football-federations.json'),
     identity: { id: args.id, label: args.label, provider: args.provider, season: args.season, released: args.released, url: args.url, dobShift: args['dob-shift'] },
     allowUnmapped: !!args['allow-unmapped'],
   });

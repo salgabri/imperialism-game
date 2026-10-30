@@ -351,7 +351,7 @@ const surroundings = new WeakMap();
  * `shapes` are `[{ id, d, rings }]` to draw (rings in fitted SVG units, rounded
  * like the painted sections, only those reaching within `margin` of the
  * 960×540 frame); the host's own world shape is drawn only for a masked map
- * (England keeps the UK beneath it). `obstacles` is the same land minus the
+ * (England keeps its own shape beneath it). `obstacles` is the same land minus the
  * host shape, ready for board.obstacles: never territory, it blocks routes as
  * neutral land would. Repeated calls for one map and fit return the same
  * objects, so route indexes built from them stay cached.

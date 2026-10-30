@@ -350,7 +350,9 @@ test('version-one saves migrate and resume without rewriting ownership or squads
     assert.equal(migrated.rngState, 1);
     f.app.saved = migrated;
     f.app.resume();
-    assert.deepEqual(f.app.state.own, old.own);
+    // Before v5, 826 was the whole United Kingdom: its holder keeps the home nations' shapes too.
+    const uk = old.own['826'];
+    assert.deepEqual(f.app.state.own, { ...old.own, SCO: uk, WAL: uk, NIR: uk });
     assert.deepEqual(f.app.state.teams, old.teams);
     assert.equal(f.app.state.round, 7);
     assert.equal(f.app.state.matches, 3);

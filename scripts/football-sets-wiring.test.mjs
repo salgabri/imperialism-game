@@ -1,12 +1,15 @@
 // Football data sets in the running App (docs/design/football-years.md): the setup's Season choice and its loading,
 // error and Retry states, a launch built from a set (territory included), saves that resume with no data set, the
-// season in names, and the built-in path left as it was. A synthetic set is served through an injected fetch.
+// season in names, and the built-in path left as it was. A synthetic CM set is served through an injected fetch, and
+// so is one of the built-in earlier seasons, read from public/football/.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { act } from 'react';
 import { SAVE_KEY } from '../src/config.js';
 import { CM_CONVERSION, expandCmTuple } from '../src/data/cmPlayers.js';
+import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { NATIONS, selectLineup } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { parseCampaign } from '../src/engine/storage.js';
@@ -115,19 +118,39 @@ async function chooseSet(app, time) {
 
 const setNames = nation => SET.nations[nation][2].map(tuple => tuple[1]);
 
+const seasonPicker = document => document.getElementById('setup-season');
+const seasonNames = document => [...seasonPicker(document).options].map(option => option.textContent);
+/** Pick a season in the dropdown as the player does. */
+async function pickSeason(document, id) {
+  const select = seasonPicker(document);
+  select.value = id;
+  await act(async () => select.dispatchEvent(new document.defaultView.Event('change', { bubbles: true })));
+}
+/** The Season dropdown's names for the built-in earlier seasons: "2023/24" … "2014/15", without their source. */
+const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
+
 // ---------- setup ----------
 
-test('without a data set index the setup is unchanged: no Season choice, and the index is read once', async () => {
+test('the Season choice offers the built-in season, then every earlier season built in, and reads the local index once', async () => {
   await withSetup({}, async ({ app, calls }) => {
+    assert.deepEqual(app.state.footballSets.map(set => set.id), BUILT_IN_SEASONS.map(set => set.id), 'listed before any request');
     await app.requestSeasons();
     assert.deepEqual(calls, ['/football/index.json']);
-    assert.deepEqual(app.state.footballSets, []);
+    assert.deepEqual(app.state.footballSets.map(set => set.id), BUILT_IN_SEASONS.map(set => set.id));
     assert.equal(app.seasonStatus().state, 'idle');
     assert.equal(app.state.saveStatus, null, 'a missing index reports nothing');
     await withDom(async ({ document, mount }) => {
       await mountPart(app, mount, 'SetupOverlay');
-      assert.ok(document.querySelector('#setup-theatre'), 'the wizard rendered');
-      assert.ok(!document.querySelector('#setup-season') && !document.getElementById('setup-season-label'), 'no Season choice');
+      assert.equal(seasonPicker(document).tagName, 'SELECT', 'the seasons are a dropdown');
+      assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
+      assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER]);
+      assert.deepEqual(EARLIER.slice(0, 2), ['2023/24', '2022/23']);
+      assert.equal(EARLIER.at(-1), '2014/15');
+      assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
+      assert.equal(seasonPicker(document).value, '');
+      assert.match(document.getElementById('setup-season-note').textContent, /Earlier seasons use EA FIFA ratings/);
+      assert.ok(!document.querySelector('input[webkitdirectory]')
+        && ![...document.querySelectorAll('button')].some(button => /season/i.test(button.textContent)), 'no season to load from files');
     });
     app.pickSetup('layer', 'clubs');
     await settle();
@@ -140,21 +163,18 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
   const files = { '/football/index.json': INDEX, [SET_URL]: gate.promise.then(() => SET) };
   await withSetup(files, async ({ app, calls, time }) => {
     await app.requestSeasons();
-    assert.deepEqual(app.state.footballSets.map(set => set.id), [ID]);
+    assert.deepEqual(app.state.footballSets.map(set => set.id), [...BUILT_IN_SEASONS.map(set => set.id), ID], 'the local set after the built-in ones');
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
-      const radios = () => [...document.querySelectorAll('[role=radiogroup][aria-labelledby="setup-season-label"] [role=radio]')];
-      assert.deepEqual(radios().map(radio => radio.getAttribute('aria-label')), ['2025/26 · built in', '2001/02 · CM 01/02 · Test 2002']);
-      assert.deepEqual(radios().map(radio => radio.getAttribute('aria-checked')), ['true', 'false']);
-      assert.match(document.getElementById('setup-season-note').textContent, /built on this computer from your own copy of the database/);
-      assert.equal(document.getElementById('setup-season').value, '', 'the mirror names the built-in season');
+      assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER, '2001/02']);
+      assert.equal(seasonPicker(document).value, '', 'the built-in season is chosen');
 
-      await act(async () => radios()[1].click());
+      await pickSeason(document, ID);
       assert.equal(app.state.setup.dataSet, ID);
       assert.equal(app.seasonStatus().state, 'loading');
       assert.deepEqual(app.setupTeams(), [], 'nobody is listed until the set loads');
       await view.refresh();
-      assert.equal(document.querySelector('.setup-domestic__status[role=status]')?.textContent, 'Loading the CM 01/02 · Test 2002 data set…');
+      assert.equal(document.querySelector('.setup-season__loading[role=status]')?.textContent, 'Loading the CM 01/02 · Test 2002 season…');
       assert.equal(document.querySelector('.setup-launch').disabled, true, 'Launch waits for the set');
 
       assert.ok(!calls.includes(SET_URL), 'the request waits for the player to stay on the season');
@@ -164,9 +184,8 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
       await settle();
       assert.deepEqual(app.state.footballSetLoad, { id: ID, state: 'ready', message: null });
       await view.refresh();
-      assert.deepEqual(radios().map(radio => radio.getAttribute('aria-checked')), ['false', 'true']);
-      assert.equal(document.getElementById('setup-season').value, ID);
-      assert.ok(!document.querySelector('.setup-domestic__status'), 'the loading line is gone');
+      assert.equal(seasonPicker(document).value, ID);
+      assert.ok(!document.querySelector('.setup-season__loading'), 'the loading line is gone');
       assert.equal(document.querySelector('.setup-launch').disabled, false);
     });
     const teams = app.setupTeams(), byId = new Map(teams.map(team => [team.id, team]));
@@ -190,13 +209,13 @@ test('a set that cannot load shows the error with Retry; Retry loads it again', 
     await settle();
     const status = app.seasonStatus();
     assert.equal(status.state, 'error');
-    assert.equal(status.message, 'The CM 01/02 · Test 2002 data set could not be loaded. Football data set cm0102-2002-05 failed to load: offline');
+    assert.equal(status.message, 'The CM 01/02 · Test 2002 season could not be loaded. Football data set cm0102-2002-05 failed to load: offline');
     app.pickSetup('pacing', 'blitz');
     await settle();
     assert.equal(calls.filter(url => url === SET_URL).length, 1, 'a failed set stays failed until Retry');
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
-      const alert = document.querySelector('.setup-domestic__error[role=alert]');
+      const alert = document.querySelector('.setup-season__error[role=alert]');
       assert.match(alert?.textContent || '', /could not be loaded\. Football data set cm0102-2002-05 failed to load: offline/);
       assert.equal(document.querySelector('.setup-launch').disabled, true);
       files[SET_URL] = SET;
@@ -208,7 +227,7 @@ test('a set that cannot load shows the error with Retry; Retry loads it again', 
       await settle();
       assert.equal(app.seasonStatus().state, 'ready');
       await view.refresh();
-      assert.ok(!document.querySelector('.setup-domestic__error'));
+      assert.ok(!document.querySelector('.setup-season__error'));
       assert.equal(document.querySelector('.setup-launch').disabled, false);
     });
     assert.equal(calls.filter(url => url === SET_URL).length, 2);
@@ -221,7 +240,9 @@ test('stepping through the seasons fetches only the set the player stays on', as
   const files = { '/football/index.json': index, [SET_URL]: SET, '/football/cm0102-2001-12.json': december };
   await withSetup(files, async ({ app, calls, time }) => {
     await app.requestSeasons();
-    assert.deepEqual(app.state.footballSets.map(set => set.id), [ID, december.id], 'the later release first');
+    assert.deepEqual(app.state.footballSets.filter(set => set.id.startsWith('cm0102-')).map(set => set.id), [ID, december.id], 'the later release first');
+    assert.deepEqual(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).season.options.slice(-2).map(option => option.name),
+      ['2001/02 · CM 01/02 · Test 2002', '2001/02 · CM 01/02 · December 2001'], 'two sets of one season keep their source');
     app.pickSetup('dataSet', december.id);
     time.advance(50);
     app.pickSetup('dataSet', ID);
@@ -250,7 +271,7 @@ test('while a chosen set loads, step 1 shows none of the built-in season\'s figu
     assert.equal(loading.scopeId, 'Premier League');
     assert.equal(loading.sports.find(sport => sport.id === 'football').note, 'Nations', 'no built-in club count on the card');
     assert.deepEqual(loading.stats.map(stat => stat.value), ['–', '–', '–']);
-    assert.equal(loading.status, 'Loading the CM 01/02 · Test 2002 data set…');
+    assert.equal(loading.status, 'Loading the CM 01/02 · Test 2002 season…');
     assert.equal(loading.canLaunch, false);
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
@@ -401,14 +422,14 @@ test('Retry this setup loads the set first, and refuses clearly when it cannot',
       assert.match(note().textContent, /^Your run is saved\./);
       const retrying = app.retryManager();
       await view.refresh();
-      assert.equal(note().textContent, 'Loading the CM 01/02 · Test 2002 data set…', 'the dialog says what Retry waits for');
+      assert.equal(note().textContent, 'Loading the CM 01/02 · Test 2002 season…', 'the dialog says what Retry waits for');
       gate.resolve();
       await retrying;
       await view.refresh();
       assert.ok(app.state.managerElimination, 'the dialog stays open');
       assert.equal(app.state.campaignId, first, 'the campaign stays as it is');
       assert.equal(note().textContent,
-        'This setup needs the CM 01/02 · Test 2002 data set, which could not be loaded. Football data set cm0102-2002-05 failed to load: offline');
+        'This setup needs the CM 01/02 · Test 2002 season, which could not be loaded. Football data set cm0102-2002-05 failed to load: offline');
       assert.ok(note().classList.contains('manager-note--unsaved'));
       assert.deepEqual(app.state.saveStatus, { ok: true, message: 'Progress saved' }, 'the run was saved, and the status still says so');
     });
@@ -453,5 +474,57 @@ test('the built-in season launches exactly as before, beside a listed set', asyn
     assert.deepEqual(st.teams['499'].squad.map(player => player.name), football.rosters['499'][2].map(row => row[0]));
     assert.equal(st.own['499'], '499');
     assert.equal(calls.filter(url => url === SET_URL).length, 1);
+  });
+});
+
+// ---------- the built-in earlier seasons ----------
+
+const EA_ID = 'ea-fifa-18';
+const EA_URL = `/football/${EA_ID}.json`;
+const EA_SET = JSON.parse(readFileSync(new URL(`../public${EA_URL}`, import.meta.url), 'utf8'));
+
+test('an earlier season loads its own file and plays that season\'s EA players; its campaigns resume without the file', async () => {
+  const files = { [EA_URL]: EA_SET };
+  await withSetup(files, async ({ app, items, calls, time }) => {
+    await app.requestSeasons();
+    await withDom(async ({ document, mount }) => {
+      const view = await mountPart(app, mount, 'SetupOverlay');
+      assert.equal(seasonPicker(document).options[seasonNames(document).indexOf('2017/18')].value, EA_ID);
+      await pickSeason(document, EA_ID);
+      assert.equal(app.state.setup.dataSet, EA_ID);
+      await view.refresh();
+      assert.equal(document.querySelector('.setup-season__loading[role=status]')?.textContent, 'Loading the FIFA 18 season…');
+    });
+    time.advance(200);
+    await app.loadSet(EA_ID);
+    await settle();
+    assert.equal(app.seasonStatus().state, 'ready');
+    assert.equal(calls.filter(url => url === EA_URL).length, 1);
+    const model = buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), season: app.seasonStatus() });
+    assert.equal(model.campaignSummary, 'Football · Nations · Europe · 2017/18');
+
+    app.startCampaign();
+    const st = app.state;
+    assert.equal(st.phase, 'playing');
+    assert.deepEqual([st.settings.dataSet, st.settings.dataVersion, st.settings.dataYear, st.settings.dataSeason],
+      [EA_ID, EA_SET.version, 2018, '2017/18']);
+    assert.equal(st.campaignName, 'Football 2017/18 · Europe');
+    assert.deepEqual(st.teams['250'].squad.map(player => player.name), EA_SET.nations['250'][2].map(tuple => tuple[1]), 'France\'s FIFA 18 XI');
+    assert.ok(st.teams['250'].squad.every(player => player.sourceInfo.source === 'ea-fc' && player.sourceInfo.edition === 'FIFA 18'
+      && player.sourceInfo.url.endsWith('/180002') && player.rating === player.sourceInfo.rawRating), 'EA ratings, unchanged');
+    assert.ok(st.teams.KOS, 'Kosovo had joined FIFA by the end of 2017/18');
+
+    // The checkpoint packs the season's players as EA tuples and needs no file to come back.
+    const text = items.get(SAVE_KEY);
+    assert.deepEqual(JSON.parse(text).playerPack, { kind: 'ea', source: { edition: 'FIFA 18', update: 2, snapshotDate: '2017-09-18', roster: '180002' } });
+    B.clearFootballSetCache();
+    files[EA_URL] = new Error('the season file is gone');
+    const before = calls.length;
+    const saved = parseCampaign(text);
+    assert.equal(JSON.stringify(saved.teams), JSON.stringify(st.teams), 'squads rebuild exactly');
+    app.continueSaved(saved);
+    assert.equal(app.state.phase, 'playing', 'resumed at once');
+    assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams));
+    assert.equal(calls.length, before, 'resuming fetched nothing');
   });
 });

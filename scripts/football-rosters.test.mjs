@@ -118,8 +118,8 @@ test('player rows expose database evidence and distinguish secondary roles from 
   } finally { fm.window.close(); }
 });
 
-test('all 170 football nations field a complete natural XI of source-backed players', () => {
-  assert.equal(Object.keys(NATIONS).length, 170);
+test('all 173 football nations field a complete natural XI of source-backed players', () => {
+  assert.equal(Object.keys(NATIONS).length, 173);
   const ids = new Set();
   for (const id of Object.keys(NATIONS)) {
     const team = buildTeam(id, makeRng(1), football);

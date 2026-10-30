@@ -15,7 +15,7 @@ import { DEPENDENCIES, NATIONS, buildClub, buildTeam, makeRng, selectLineup } fr
 import { WorldGeometry } from '../src/engine/geo.js';
 import { getSport } from '../src/sports/index.js';
 import {
-  BUILT_IN_SEASON, FOOTBALL_SET_CACHE_LIMIT, clearFootballSetCache, clearFootballSetIndex, decodeFootballSet, fieldedNations,
+  BUILT_IN_SEASON, BUILT_IN_SETS, FOOTBALL_SET_CACHE_LIMIT, clearFootballSetCache, clearFootballSetIndex, decodeFootballSet, fieldedNations,
   footballSport, getLoadedFootballSet, heldShapes, loadFootballSet, loadFootballSetIndex, loadedFootballSetIds,
   retainFootballSets, sportOf,
 } from '../src/engine/footballSets.js';
@@ -181,27 +181,32 @@ test('anything the builder would not write is refused with a reason', () => {
 
 // ---------- the index and the loader ----------
 
-test('the index lists the local sets newest first; a missing, failing or foreign index means none', async () => {
+test('the index lists the built-in seasons and the local sets newest first; a missing, failing or foreign index adds none', async () => {
   fresh();
   const none = fakeFetch({});
-  assert.deepEqual(await loadFootballSetIndex({ baseUrl: '/base/', fetch: none.fetch }), []);
+  assert.equal(await loadFootballSetIndex({ baseUrl: '/base/', fetch: none.fetch }), BUILT_IN_SETS);
   assert.deepEqual(none.calls, ['/base/football/index.json']);
-  assert.deepEqual(await loadFootballSetIndex({ fetch: none.fetch }), [], 'the answer is kept');
+  assert.equal(await loadFootballSetIndex({ fetch: none.fetch }), BUILT_IN_SETS, 'the answer is kept');
   assert.equal(none.calls.length, 1, 'read once');
+  assert.ok(BUILT_IN_SETS.length > 0 && BUILT_IN_SETS.every(set => /^ea-(fifa|fc)-\d{2}$/.test(set.id)));
 
   const sets = [syntheticSet({ id: 'cm0102-2001-12', year: 2002, label: 'CM 01/02 · December 2001' }), SET,
     syntheticSet({ id: 'cm0102-2026-05', year: 2026, label: 'CM 01/02 · May 2026' })];
   const listed = { format: 1, sets: [...sets.map(entryOf), { id: '../evil', year: 2002, season: '2001/02', label: 'x' },
-    { ...entryOf(SET), id: 'cm0102-2003-05' }, { ...entryOf(SET), season: '2002/03', id: 'cm0102-2002-06' }] };
+    { ...entryOf(SET), id: 'cm0102-2003-05' }, { ...entryOf(SET), season: '2002/03', id: 'cm0102-2002-06' },
+    { ...entryOf(SET), id: BUILT_IN_SETS[0].id, year: BUILT_IN_SETS[0].year, season: BUILT_IN_SETS[0].season, version: null }] };
   clearFootballSetIndex();
   const index = await loadFootballSetIndex({ fetch: fakeFetch({ '/football/index.json': listed }).fetch });
-  assert.deepEqual(index.map(set => set.id), ['cm0102-2026-05', ID, 'cm0102-2001-12'], 'newest season, then latest release');
-  assert.deepEqual(index[1], { id: ID, version: SET.version, year: 2002, season: '2001/02', label: 'CM 01/02 · Test 2002' });
+  const local = index.filter(set => set.id.startsWith('cm0102-'));
+  assert.deepEqual(local.map(set => set.id), ['cm0102-2026-05', ID, 'cm0102-2001-12'], 'newest season, then latest release');
+  assert.deepEqual(local[1], { id: ID, version: SET.version, year: 2002, season: '2001/02', label: 'CM 01/02 · Test 2002' });
+  assert.deepEqual(index.filter(set => set.id.startsWith('ea-')), BUILT_IN_SETS, 'a local file never stands in for a built-in season');
+  assert.deepEqual(index.map(set => set.year), index.map(set => set.year).sort((a, b) => b - a), 'all newest first');
 
   for (const fetch of [async () => { throw new Error('offline'); }, fakeFetch({ '/football/index.json': { format: 2, sets: listed.sets } }).fetch,
     async () => ({ ok: true, status: 200, json: async () => { throw new SyntaxError('Unexpected token'); } })]) {
     clearFootballSetIndex();
-    assert.deepEqual(await loadFootballSetIndex({ fetch }), []);
+    assert.equal(await loadFootballSetIndex({ fetch }), BUILT_IN_SETS);
   }
 });
 

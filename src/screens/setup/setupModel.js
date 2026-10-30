@@ -298,21 +298,22 @@ export function domesticTheatres() {
 /** Country maps are built from the built-in data, so a chosen data set (`dataSet`) leaves them out. */
 export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer && sport?.id === 'football' && dataSet == null;
 
-/** Copy under the Season choice: where the other seasons come from. */
-export const SEASON_NOTE = 'Other seasons are local data sets, built on this computer from your own copy of the database.';
+/** Copy under the Season choice: where the earlier seasons' players come from, and what that leaves short. */
+export const SEASON_NOTE = 'Earlier seasons use EA FIFA ratings from the start of that season. Nations without eleven '
+  + 'rated players start short-handed.';
 
 /**
  * The Season choice (docs/design/football-years.md): the built-in season, then each listed data set newest first, as
- * `{ id, key, season, source, label, checked }`. Null when there is nothing to choose, so the setup is unchanged
- * without data sets. `sport` names a chosen set the index no longer lists.
+ * `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
-  if (!sets.length && dataSet == null) return null;
   const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
     label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
   const rows = [row(null, BUILT_IN_SEASON.season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
-  return rows;
+  // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
+  const shared = season => !season || rows.filter(other => other.season === season).length > 1;
+  return rows.map(option => ({ ...option, name: shared(option.season) ? option.label : option.season }));
 }
 
 /** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
@@ -533,7 +534,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
   const showMatches = showMatchesOf(setup);
-  const seasonRows = seasonOptions(football && Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS, dataSet, sport);
+  const seasonSets = Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS;
+  const seasonRows = football ? seasonOptions(seasonSets, dataSet, sport) : null;
   const chosenSeason = seasonRows?.find(row => row.checked && row.id != null) || null;
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.
   const campaignSummary = `${sport.name} · ${clubLayer ? 'Clubs' : 'Nations'} · ${scopeName}${chosenSeason?.season ? ` · ${chosenSeason.season}` : ''}`;
@@ -544,8 +546,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const seasonState = dataSet == null ? 'idle' : !pending ? 'ready' : seasonCtx.state === 'error' ? 'error' : 'loading';
   const seasonWaits = pending;
   const setName = chosenSeason?.source || dataSet;
-  const setLoading = dataSet != null ? `Loading the ${setName} data set…` : '';
-  const setFailed = dataSet != null ? `The ${setName} data set could not be loaded.` : '';
+  const setLoading = dataSet != null ? `Loading the ${setName} season…` : '';
+  const setFailed = dataSet != null ? `The ${setName} season could not be loaded.` : '';
 
   const ranked = managerTeams.slice().sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name)));
   const rankOf = new Map(ranked.map((team, index) => [team.id, index + 1]));

@@ -1,5 +1,6 @@
 // Football Imperialism — nation identity and squad building.
-// Keyed by ISO-3166 numeric id (matches world-110m TopoJSON geometry ids). 'KOS' = Kosovo (-99 shape).
+// Keyed by ISO-3166 numeric id (matches world-110m TopoJSON geometry ids). 'KOS' = Kosovo (-99 shape); 'SCO', 'WAL'
+// and 'NIR' = the home nations (HOME_NATIONS below).
 //
 // Squads come from the sport registry (src/sports), which supplies the roster
 // data, lineup shape and match model. This file holds nation identity only.
@@ -11,6 +12,12 @@
 export const DEPENDENCIES = {
   '304': { of: '208', name: 'Greenland' }, // Kingdom of Denmark
 };
+
+// Football's home nations: England, Scotland, Wales and Northern Ireland each field a team, so the map cuts the
+// United Kingdom (826, which is England) into four shapes (scripts/build-home-nations.mjs). These are the three cut
+// from it. Saves and data sets from before the cut give their land to whoever holds England, and basketball, where
+// Great Britain is one FIBA team, still plays the United Kingdom as one.
+export const HOME_NATIONS = Object.freeze(['SCO', 'WAL', 'NIR']);
 
 // Shapes drawn on the map that never belong to anyone (club seeding never deals them).
 // Antarctica, Fr.S.Lands, Falklands, W.Sahara, N.Cyprus, Somaliland.
@@ -70,6 +77,9 @@ export const NATIONS = {
   '250': ['France', 'FRA', 'UEFA', 'fra', 91, '#4A7DF0', [['K. Mbappé','FW',92],['A. Tchouaméni','MF',86],['W. Saliba','DF',87],['E. Camavinga','MF',85],['A. Griezmann','FW',84]]],
   '724': ['Spain', 'ESP', 'UEFA', 'lat', 91, '#F0483E', [['L. Yamal','FW',93],['Rodri','MF',90],['Pedri','MF',89],['N. Williams','FW',86],['U. Simón','GK',84]]],
   '826': ['England', 'ENG', 'UEFA', 'eng', 90, '#F0F0F5', [['J. Bellingham','MF',91],['B. Saka','FW',89],['H. Kane','FW',88],['D. Rice','MF',87],['P. Foden','MF',87]]],
+  'SCO': ['Scotland', 'SCO', 'UEFA', 'eng', 74, '#2B4FA8', [['S. McTominay','MF',86],['A. Robertson','DF',84],['J. McGinn','MF',81],['K. Tierney','DF',79]]],
+  'WAL': ['Wales', 'WAL', 'UEFA', 'eng', 72, '#D8303F', [['B. Johnson','FW',81],['H. Wilson','FW',80],['E. Ampadu','MF',78]]],
+  'NIR': ['Northern Ireland', 'NIR', 'UEFA', 'eng', 66, '#1F8F6A', [['C. Bradley','DF',79]]],
   '620': ['Portugal', 'POR', 'UEFA', 'bra', 88, '#E5334D', [['R. Dias','DF',88],['B. Fernandes','MF',87],['Vitinha','MF',87],['R. Leão','FW',86],['C. Ronaldo','FW',84]]],
   '528': ['Netherlands', 'NED', 'UEFA', 'ger', 87, '#FF7A26', [['V. van Dijk','DF',87],['F. de Jong','MF',86],['C. Gakpo','FW',85],['X. Simons','MF',84]]],
   '276': ['Germany', 'GER', 'UEFA', 'ger', 86, '#E8E8EC', [['F. Wirtz','MF',90],['J. Musiala','MF',89],['J. Kimmich','MF',86],['K. Havertz','FW',85]]],

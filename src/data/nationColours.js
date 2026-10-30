@@ -77,7 +77,7 @@ export const NATION_COLOURS = Object.freeze({
   '360': ['#d0433e', 1], // Indonesia
   '364': ['#4c9e60', 0], // Iran
   '368': ['#bf3d6c', 0], // Iraq
-  '372': ['#4ea860', 1], // Ireland
+  '372': ['#4ea860', 0], // Ireland
   '376': ['#4b8be8', 1], // Israel
   '380': ['#009246', 1], // Italy
   '384': ['#f87c58', 2], // Côte d'Ivoire
@@ -175,4 +175,7 @@ export const NATION_COLOURS = Object.freeze({
   '887': ['#c44048', 1], // Yemen
   '894': ['#4ca86a', 1], // Zambia
   'KOS': ['#0896d5', 0], // Kosovo
+  'NIR': ['#048e80', 2], // Northern Ireland
+  'SCO': ['#2b4fa8', 1], // Scotland
+  'WAL': ['#00ab39', 2], // Wales
 });
