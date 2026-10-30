@@ -381,27 +381,40 @@ export function squadAverage(team) {
 }
 
 export const OUT_OF_POSITION_PENALTY = 12;
+// American football's positions are far more specialised: a tight end on the offensive line, or a receiver at
+// cornerback, is an emergency, not a rotation.
+const PENALTY_OF = { 'american-football': 25 };
+/** Rating points a starter loses outside his natural positions, in a sport ('football', 'basketball', …). */
+export const outOfPositionPenalty = sportId => PENALTY_OF[sportId] ?? OUT_OF_POSITION_PENALTY;
 const LINEUP_PLANS = {
   football: ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'],
   basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
+  // Eleven on offence (three receivers), eleven on defence (the nickel) and the kicker.
+  'american-football': ['QB', 'RB', 'WR', 'WR', 'WR', 'TE', 'OL', 'OL', 'OL', 'OL', 'OL',
+    'DL', 'DL', 'DL', 'DL', 'LB', 'LB', 'CB', 'CB', 'CB', 'S', 'S', 'K'],
 };
 const BASKETBALL_POSITIONS = new Set(LINEUP_PLANS.basketball);
+const GRIDIRON_POSITIONS = new Set(LINEUP_PLANS['american-football']);
 const canPlay = (player, position) => player.pos === position || player.positions?.includes(position);
 
 /** Legacy saves can predate the sport field; their positions identify the plan. */
 export function teamSportId(team) {
   if (LINEUP_PLANS[team?.sport]) return team.sport;
+  // Basketball's centre and the offensive line never share a code: 'C' is basketball's, 'OL' American football's.
+  if (team?.squad?.some(player => GRIDIRON_POSITIONS.has(player.pos) && !BASKETBALL_POSITIONS.has(player.pos))) return 'american-football';
   return team?.squad?.some(player => BASKETBALL_POSITIONS.has(player.pos)) ? 'basketball' : 'football';
 }
 
 /**
  * Select the strongest assignment to the sport's actual playing positions.
- * A player may cover another position, but the assignment and 12-point penalty
+ * A player may cover another position, but the assignment and penalty (12 points, 25 in American football)
  * are explicit. Optimising the whole assignment means an acquisition cannot
  * reduce strength by evicting a better emergency starter.
  */
 export function selectLineup(team) {
-  const plan = LINEUP_PLANS[teamSportId(team)];
+  const sportId = teamSportId(team);
+  const plan = LINEUP_PLANS[sportId];
+  const penalty = outOfPositionPenalty(sportId);
   const squad = Array.isArray(team?.squad) ? team.squad : [];
   const rowCount = plan.length;
   const columnCount = Math.max(rowCount, squad.length);
@@ -409,7 +422,7 @@ export function selectLineup(team) {
     const player = squad[column];
     if (!player) return 40; // Unfilled shirts affect strength without inventing a player.
     const rating = Number.isFinite(player.rating) ? player.rating : 40;
-    return Math.max(1, rating - (canPlay(player, plan[row]) ? 0 : OUT_OF_POSITION_PENALTY));
+    return Math.max(1, rating - (canPlay(player, plan[row]) ? 0 : penalty));
   };
 
   // Rectangular Hungarian assignment: rows are shirts, columns are players.
@@ -458,7 +471,7 @@ export function selectLineup(team) {
     const outOfPosition = !!source && !canPlay(source, position);
     const effectiveRating = effective(row, playerIndex);
     const player = source ? { ...source, originalIndex: playerIndex, assignedPos: position, effectiveRating, outOfPosition } : null;
-    return { position, player, effectiveRating, outOfPosition, penalty: outOfPosition ? OUT_OF_POSITION_PENALTY : 0 };
+    return { position, player, effectiveRating, outOfPosition, penalty: outOfPosition ? penalty : 0 };
   });
   return {
     starters: slots.filter(slot => slot.player).map(slot => slot.player),

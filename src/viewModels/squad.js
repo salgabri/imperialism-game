@@ -3,16 +3,24 @@
 import { selectLineup, teamSportId } from '../data/teams.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
+import { americanFootballProfile } from '../sports/americanFootball.js';
+import { getSport, SPORTS } from '../sports/index.js';
 import { historyRound, memo, ratingTier, roman, shortName, signedDelta, teamChip } from './format.js';
 
 /** Position order for the table, groups and formation fill (C§5.7; basketball C§17). Unknown codes sort last. */
-const POSITION_ORDER = { GK: 0, DF: 1, MF: 2, FW: 3, PG: 0, SG: 1, SF: 2, PF: 3, C: 4 };
+const POSITION_ORDER = { GK: 0, DF: 1, MF: 2, FW: 3, PG: 0, SG: 1, SF: 2, PF: 3, C: 4,
+  QB: 0, RB: 1, WR: 2, TE: 3, OL: 4, DL: 5, LB: 6, CB: 7, S: 8, K: 9 };
 /** Group-header copy (C§5.3; DEC misc for basketball: Guards / Forwards / Centres). */
 const GROUPS = {
   GK: 'Goalkeeper', DF: 'Defence', MF: 'Midfield', FW: 'Attack',
   PG: 'Guards', SG: 'Guards', SF: 'Forwards', PF: 'Forwards', C: 'Centres',
+  QB: 'Quarterback', RB: 'Running back', WR: 'Receivers', TE: 'Receivers', OL: 'Offensive line',
+  DL: 'Defensive line', LB: 'Linebackers', CB: 'Secondary', S: 'Secondary', K: 'Kicker',
 };
-/** Formation slots in % of the pitch box (C§7.4, design V442) and the basketball half court (C§17). */
+/**
+ * Formation slots in % of the pitch box (C§7.4, design V442), the basketball half court (C§17) and the American football
+ * field: the offence driving up from below the line of scrimmage, the nickel defence above it, the kicker aside.
+ */
 const SLOTS = {
   football: {
     GK: [[50, 88]],
@@ -21,6 +29,21 @@ const SLOTS = {
     FW: [[36, 20], [64, 20]],
   },
   basketball: { PG: [[50, 82]], SG: [[20, 62]], SF: [[80, 62]], PF: [[30, 30]], C: [[70, 30]] },
+  'american-football': {
+    OL: [[50, 60], [37, 63], [63, 63], [24, 60], [76, 60]],
+    WR: [[8, 58], [92, 58], [16, 68]],
+    TE: [[88, 70]], QB: [[50, 74]], RB: [[50, 87]], K: [[88, 90]],
+    DL: [[37, 41], [63, 41], [24, 44], [76, 44]],
+    LB: [[38, 29], [62, 29]],
+    CB: [[8, 40], [92, 40], [18, 30]],
+    S: [[30, 13], [70, 13]],
+  },
+};
+/** Squad-screen copy per sport: the box the lineup is drawn on and its names. */
+const LAYOUTS = {
+  football: { layout: 'pitch', viewLabel: 'Pitch' },
+  basketball: { layout: 'court', viewLabel: 'Court' },
+  'american-football': { layout: 'field', viewLabel: 'Field' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
 const DEPTH_ROWS = 5;
@@ -30,7 +53,7 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const finite = value => (Number.isFinite(Number(value)) && value !== null && value !== '' ? Number(value) : null);
 
 function byPosition(position) {
-  return player => POSITION_ORDER[position(player)] ?? 9;
+  return player => POSITION_ORDER[position(player)] ?? 99;
 }
 
 /** Stable sort by position order, then base rating descending (design `byPos`, C§5.7). */
@@ -85,13 +108,16 @@ export function profileSegments(value) {
 }
 
 /**
- * Attack / Defence / Goalkeeping (football) or Offence / Defence (basketball) from the sports engines' positional
- * profiles of the lineup (ED§4c; no match-day offset), with the C1 segment count.
+ * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball) or Offence / Defence / Kicking (American
+ * football) from the sports engines' positional profiles of the lineup (ED§4c; no match-day offset), with the C1
+ * segment count.
  */
 export function strengthProfile(lineup, sportId) {
   const rows = sportId === 'basketball'
     ? (({ offence, defence }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence]])(basketballProfile(lineup))
-    : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
+    : sportId === 'american-football'
+      ? (({ offence, defence, kicking }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence], ['kicking', 'Kicking', kicking]])(americanFootballProfile(lineup))
+      : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
   return rows.map(([key, label, value]) => {
     const raw = Number.isFinite(Number(value)) ? Number(value) : 0;
     return { key, label, value: raw.toFixed(1), raw: Math.round(raw * 10) / 10, segments: profileSegments(raw) };
@@ -196,8 +222,10 @@ export function buildSquad(st, ctx, teamId) {
 function computeSquad(st, ctx, team) {
   const teams = st.teams || {};
   const teamId = team.id;
-  const sportId = ctx?.sport?.id === 'basketball' || ctx?.sport?.id === 'football' ? ctx.sport.id : teamSportId(team);
-  const basketball = sportId === 'basketball';
+  const sportId = Object.hasOwn(SPORTS, ctx?.sport?.id ?? '') ? ctx.sport.id : teamSportId(team);
+  const words = getSport(sportId).words;
+  // Football's lineup has a shape ("4-4-2"); a five and an NFL lineup are named instead.
+  const shaped = sportId === 'football';
   const squad = Array.isArray(team.squad) ? team.squad : [];
   const lineup = selectLineup(team);
   const plan = lineup.slots.length;
@@ -272,7 +300,7 @@ function computeSquad(st, ctx, team) {
 
   const counts = {};
   for (const slot of lineup.slots) counts[slot.position] = (counts[slot.position] || 0) + 1;
-  const formation = basketball ? 'Starting five' : ['DF', 'MF', 'FW'].map(pos => counts[pos] || 0).join('-');
+  const formation = shaped ? ['DF', 'MF', 'FW'].map(pos => counts[pos] || 0).join('-') : words.lineup;
 
   const starterSet = new Set(lineup.starters.map(player => player.originalIndex));
   const claims = squad
@@ -310,22 +338,23 @@ function computeSquad(st, ctx, team) {
     teamId,
     team: teamChip(team),
     name: team.name || '',
-    sport: basketball ? 'basketball' : 'football',
-    layout: basketball ? 'court' : 'pitch',
+    sport: sportId,
+    layout: LAYOUTS[sportId].layout,
     kicker: `First team · ${plural(squad.length, 'player')} · ${claimedCount} claimed in conquest`,
     phoneMeta: `${plural(squad.length, 'player')} · ${claimedCount} claimed in conquest`,
     playerCount: squad.length,
     xi: {
-      label: basketball ? 'Starting five' : 'Starting XI', short: basketball ? 'Five' : 'XI',
+      label: words.lineup, short: words.lineupShort,
       value: lineup.rating.toFixed(1), delta: delta.text, tone: delta.tone,
     },
     claimedCount,
     formation,
-    // Basketball reads "Court" / "Starting five" (DEC misc); the football kicker carries the shape (C§7.1).
-    viewLabel: basketball ? 'Court' : 'Pitch',
-    formationTitle: basketball ? 'Starting five' : 'Formation',
-    formationAside: basketball ? '● claimed' : `${formation} · ● claimed`,
-    pitchLabel: basketball ? 'Court, starting five' : `Formation ${formation}`,
+    // Basketball reads "Court" / "Starting five" (DEC misc), American football "Field" / "Starting lineup"; the
+    // football kicker carries the shape (C§7.1).
+    viewLabel: LAYOUTS[sportId].viewLabel,
+    formationTitle: shaped ? 'Formation' : words.lineup,
+    formationAside: shaped ? `${formation} · ● claimed` : '● claimed',
+    pitchLabel: shaped ? `Formation ${formation}` : `${LAYOUTS[sportId].viewLabel}, ${words.lineup.toLowerCase()}`,
     groups,
     depth,
     showSource,

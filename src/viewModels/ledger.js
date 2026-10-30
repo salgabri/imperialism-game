@@ -7,6 +7,7 @@ import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
+import { americanFootballProfile } from '../sports/americanFootball.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
 import { FEED_CAP, domesticIdOf } from '../app/shared.js';
@@ -345,9 +346,13 @@ function sportIdOf(st, ctx, team) {
   return fromCtx || st?.settings?.sport || team?.sport || 'football';
 }
 
-/** DEC misc: basketball lineups read "Starting five"; `short` labels the lineup rating ("XI 84.6" / "Five 84.6"). */
+/**
+ * DEC misc: basketball lineups read "Starting five", American football's "Starting lineup"; `short` labels the lineup
+ * rating ("XI 84.6" / "Five 84.6" / "Starters 84.6").
+ */
 export function lineupCopy(sportId) {
-  return sportId === 'basketball' ? { label: 'Starting five', short: 'Five' } : { label: 'Starting XI', short: 'XI' };
+  const { lineup, lineupShort } = getSport(sportId).words;
+  return { label: lineup, short: lineupShort };
 }
 
 /** Former team of a claimed player: `fromId` (DEC D8) → the team with that code. A flag only for nations; a club's crest by its id. */
@@ -404,7 +409,8 @@ function tapeRow(key, label, a, b) {
 
 /**
  * Board 07 tale of the tape: the positional profile (football Attack / Defence / Goalkeeping, basketball Offence /
- * Defence) from the sports engines' frozen profile exports, then the lineup rating.
+ * Defence, American football Offence / Defence / Kicking) from the sports engines' frozen profile exports, then the
+ * lineup rating.
  */
 function tapeRows(sportId, lineupA, lineupD, copy) {
   if (!lineupA || !lineupD) return [];
@@ -413,6 +419,10 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
     if (sportId === 'basketball') {
       const pA = basketballProfile(lineupA), pD = basketballProfile(lineupD);
       rows = [['offence', 'Offence', pA.offence, pD.offence], ['defence', 'Defence', pA.defence, pD.defence]];
+    } else if (sportId === 'american-football') {
+      const pA = americanFootballProfile(lineupA), pD = americanFootballProfile(lineupD);
+      rows = [['offence', 'Offence', pA.offence, pD.offence], ['defence', 'Defence', pA.defence, pD.defence],
+        ['kicking', 'Kicking', pA.kicking, pD.kicking]];
     } else {
       const pA = footballProfile(lineupA), pD = footballProfile(lineupD);
       rows = [['attack', 'Attack', pA.attack, pD.attack], ['defence', 'Defence', pA.defence, pD.defence],

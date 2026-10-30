@@ -30,6 +30,11 @@
     "f-casa-pia": "#000000",
     "f-rcd-espanyol": "#007fc8",
     "f-1-fc-union-berlin": "#eb1923",
-    "b-charlotte-hornets": "#00788c"
+    "b-charlotte-hornets": "#00788c",
+    "nfl-minnesota-vikings": "#4f2683",
+    "nfl-philadelphia-eagles": "#004c54",
+    "nfl-jacksonville-jaguars": "#006778",
+    "nfl-los-angeles-rams": "#003594",
+    "nfl-pittsburgh-steelers": "#ffb612"
   }
 }

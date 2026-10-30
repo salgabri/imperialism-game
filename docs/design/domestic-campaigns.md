@@ -669,7 +669,7 @@ and provinces far from every arena left empty (since 2026-10-30; the first build
 split every county of both countries). It reuses this whole runtime (loader, country
 chart, backdrop, routing, saves) as a format-1 map whose clubs are the game's own.
 
-**Build** (`npm run build:nba-map`, `scripts/build-nba-map.mjs`, about 7 minutes with the era maps;
+**Build** (`npm run build:nba-map`, `scripts/build-club-maps.mjs --league=nba`, about 6 minutes with the era maps;
 `--check` rebuilds offline and compares, `--dry-run` writes nothing):
 
 - **Units**: geoBoundaries gbOpen USA ADM2 (counties, public domain) and CAN ADM2
@@ -775,6 +775,46 @@ campaigns on the app board reach a champion without treaties or third-party
 crossings; loader refusals; the App sets up, launches and titles an NBA campaign
 and keeps an old world NBA save on the world. The smoke's NBA scenarios run
 through the country-map checks.
+
+## The NFL map
+
+Status: implemented 2026-10-31. American football ([american-football.md](american-football.md))
+has one theatre, **NFL**, played on `public/domestic/nfl.json`: the USA split into
+32 territories, one per franchise, along state lines. It is built by the same
+command and partition as the NBA's: `scripts/build-nba-map.mjs` became
+`scripts/build-club-maps.mjs`, with one entry per league in `LEAGUES` (`npm run
+build:club-maps` builds both; `build:nba-map` and `build:nfl-map` one each, the
+index keeping the other league's entries as they are). The NBA maps rebuild byte
+for byte; only their attribution files name the new script.
+
+- **Units**: the USA's counties grouped by state, as for the NBA, with no second
+  country, so no border fitting. Puerto Rico and the other territories are cut;
+  Alaska and Hawaii lie off the landmass and are dropped. No state lies over
+  1,000 km from every stadium, so there is no empty land.
+- **Homes**: `scripts/data/nfl-teams.json`, each franchise's stadium, except the
+  four that share one, which grow from their training grounds (see
+  [american-football.md](american-football.md#data)).
+- **Shared states**: California and Florida (three franchises each), Texas,
+  Pennsylvania, Ohio, Maryland and New Jersey (two each) split along county lines.
+  MetLife Stadium stands in New Jersey, but the Giants and Jets are New York's, so
+  the league joins New York to New Jersey (`joins: { 'US-NJ': ['US-NY'] }`): New
+  York's counties go to the Bills or to either New Jersey franchise. The Giants,
+  nearer the city, hold Manhattan, Long Island and Connecticut; the Bills the rest
+  of the state. Los Angeles County is cut between the Rams and the Chargers.
+- **Result** (2026-10-31 build): Denver holds Colorado, Wyoming and Montana; Las
+  Vegas Nevada and Utah; Kansas City Missouri, Kansas and Nebraska; Minnesota the
+  Dakotas; Seattle Washington, Oregon and Idaho; Tennessee Arkansas and Alabama;
+  Washington Virginia, DC and southern Maryland; Baltimore northern Maryland and
+  Delaware. Areas range from the Jets' 19,000 km² (northern New Jersey) to Denver's
+  902,000 km². The file is about 134 KB; the index entry adds `venue: "stadium"` and
+  `lines: "state"`, so the setup reads "… each starting on the land nearest its
+  stadium: USA split into 32 territories along state lines."
+
+**Checks**: `scripts/american-football.test.mjs`: file, index, stadiums and clubs
+agree; every stadium (or training ground) lies inside its territory; Manhattan is
+the Giants', Buffalo the Bills', Morris County the Jets', the San Fernando Valley
+the Rams' and San Diego the Chargers'; seeded duel campaigns reach a champion; the
+App launches on the map. The smoke runs an NFL duel and an NFL resume.
 
 ## Known limitations
 

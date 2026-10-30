@@ -1,5 +1,5 @@
-// Club crests for every club the game ships: the all-leagues football layer, the NBA
-// franchises and every country's domestic clubs. A club with a crest shows it wherever
+// Club crests for every club the game ships: the all-leagues football layer, the NBA and
+// NFL franchises and every country's domestic clubs. A club with a crest shows it wherever
 // a nation shows its flag; a club without one keeps its monogram chip.
 //
 // Usage:
@@ -10,8 +10,8 @@
 //   - Each club's Wikidata item (CC0). Domestic clubs reuse the item their home town came
 //     from (scripts/data/domestic/<nation>.json, location.source "wikidata:Q..", or location.qid); an
 //     all-leagues club takes the item of its domestic twin, the club of its country whose
-//     FM26 squad shares the most players with its EA FC 26 lineup; NBA franchises are
-//     matched by English label. scripts/data/club-logos.json overrides any of these.
+//     FM26 squad shares the most players with its EA FC 26 lineup; NBA and NFL franchises
+//     are matched by English label. scripts/data/club-logos.json overrides any of these.
 //   - The crest: the lead image of the club's English Wikipedia article (its infobox
 //     crest), else the item's logo image (P154) on Wikimedia Commons. Most crests are
 //     non-free files on English Wikipedia; SOURCES.tsv records each file and its licence.
@@ -31,6 +31,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
+import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { cachedGz, createLimiter } from './lib/domestic-sync.mjs';
 import { norm } from './lib/domestic-locate.mjs';
 
@@ -45,6 +46,7 @@ const USER_AGENT = 'imperialism-game-build/1.0 (https://github.com/salgabri/impe
 const SPARQL = 'https://query.wikidata.org/sparql';
 const ENWIKI = 'https://en.wikipedia.org/w/api.php';
 const NBA = 'Q155223', BASKETBALL_TEAM = 'Q13393265';
+const NFL = 'Q1215884', AMERICAN_FOOTBALL_TEAM = 'Q17156793';
 const THUMB_WIDTH = 250; // one of Wikimedia's standard thumbnail steps
 const BOX = 128; // a crest fits this square: twice the largest mark the game draws (60px)
 // The fewest lineup players an all-leagues club must share with a domestic club to be its twin.
@@ -144,8 +146,9 @@ function twinOf(club, domestic) {
   return best && best.shared >= MIN_SHARED ? best : null;
 }
 
-async function nbaItems() {
-  const rows = await sparql(`SELECT ?team ?label WHERE { ?team wdt:P118 wd:${NBA}; wdt:P31/wdt:P279* wd:${BASKETBALL_TEAM}; rdfs:label ?label .
+/** A league's current franchises by English label: the NBA's, or (`league`, `kind`) the NFL's. */
+async function leagueItems(league = NBA, kind = BASKETBALL_TEAM) {
+  const rows = await sparql(`SELECT ?team ?label WHERE { ?team wdt:P118 wd:${league}; wdt:P31/wdt:P279* wd:${kind}; rdfs:label ?label .
     FILTER(lang(?label) = 'en') FILTER NOT EXISTS { ?team wdt:P576 [] } }`);
   return new Map(rows.map(row => [row.label, qidOf(row.team)]));
 }
@@ -253,7 +256,8 @@ const itemOverrides = overrides.items || {}, fileOverrides = overrides.files || 
 
 const domestic = await domesticClubs();
 const domesticById = new Map(domestic.map(club => [club.id, club]));
-const nba = await nbaItems();
+const nba = await leagueItems();
+const nfl = await leagueItems(NFL, AMERICAN_FOOTBALL_TEAM);
 const clubs = []; // { id, name, qid, twin? }
 const problems = [];
 
@@ -263,9 +267,9 @@ for (const club of FOOTBALL_CLUBS) {
   if (!twin && !itemOverrides[club.id]) problems.push(`${club.id}: no domestic twin (add it to ${path.relative(root, overridesFile)} "items")`);
   clubs.push({ id: club.id, name: club.name, qid: twin?.club.qid ?? null, twin: twin?.club.id ?? null });
 }
-for (const club of BASKETBALL_CLUBS) {
-  const qid = nba.get(club.name) || null;
-  if (!qid && !itemOverrides[club.id]) problems.push(`${club.id}: no NBA item labelled "${club.name}"`);
+for (const [league, items, list] of [['NBA', nba, BASKETBALL_CLUBS], ['NFL', nfl, NFL_CLUBS]]) for (const club of list) {
+  const qid = items.get(club.name) || null;
+  if (!qid && !itemOverrides[club.id]) problems.push(`${club.id}: no ${league} item labelled "${club.name}"`);
   clubs.push({ id: club.id, name: club.name, qid });
 }
 for (const [id, qid] of Object.entries(itemOverrides)) {
@@ -381,12 +385,13 @@ export function clubLogoUrl(id) {
 
 const count = list => list.filter(club => crests.has(club.id)).length;
 const worldClubs = clubs.filter(club => club.id.startsWith('f-')), nbaClubs = clubs.filter(club => club.id.startsWith('b-'));
+const nflClubs = clubs.filter(club => club.id.startsWith('nfl-'));
 console.log(`Crests: ${crests.size} of ${clubs.length} clubs`);
-console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
+console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
 console.log(`  domestic clubs with a Wikidata item: ${domestic.filter(club => club.qid).length}`);
 for (const [reason, list] of Object.entries(rejected)) console.log(`  rejected (${reason}): ${list.length}${list.length <= 12 ? '\n    ' + list.join('\n    ') : ''}`);
-const missing = [...worldClubs, ...nbaClubs].filter(club => !crests.has(club.id));
-if (missing.length) console.log(`  all-leagues and NBA clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
+const missing = [...worldClubs, ...nbaClubs, ...nflClubs].filter(club => !crests.has(club.id));
+if (missing.length) console.log(`  all-leagues, NBA and NFL clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
 for (const problem of problems) console.log(`  ${problem}`);
 const sizes = await Promise.all([...new Set([...crests.values()].map(crest => crest.file))].map(async file => (await readFile(path.join(outDir, `${file}.webp`))).length));
 console.log(`  ${sizes.length} files, ${(sizes.reduce((a, b) => a + b, 0) / 1048576).toFixed(1)} MB, module ${(Buffer.byteLength(await readFile(moduleFile, 'utf8')) / 1024).toFixed(1)} KB`);

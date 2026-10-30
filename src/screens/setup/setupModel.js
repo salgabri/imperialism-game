@@ -308,6 +308,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'start short-handed.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
     + 'only: the franchises of that season, on the map of their day.',
+  'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
+    + 'of the United States.',
 });
 
 /**
@@ -335,8 +337,8 @@ export function domesticDescription(entry) {
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
   if (entry.league) {
-    return `${leaders} the ${clubs} ${entry.league} clubs, each starting on the land nearest its arena: ${entry.name} split into `
-      + `${sections} territories along state and province lines.`;
+    return `${leaders} the ${clubs} ${entry.league} clubs, each starting on the land nearest its ${entry.venue || 'arena'}: ${entry.name} split `
+      + `into ${sections} territories along ${entry.lines || 'state and province'} lines.`;
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
@@ -427,6 +429,8 @@ export function sportNote(sport) {
   const clubs = sport.clubs || [];
   const leagues = [...new Set(clubs.map(club => club.league))];
   if (!clubs.length) return 'Nations';
+  // A sport with clubs only (American football) has no nations to offer.
+  if (sport.clubsOnly) return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs` : `${clubs.length} clubs`;
   if (leagues.length === 1) return `Nations · ${clubs.length} ${leagues[0]} clubs`;
   return `Nations · ${clubs.length} clubs from ${leagues.length} leagues`;
 }
@@ -616,6 +620,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
       message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',
     },
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
+    // A sport with clubs only names its league ('NFL'): the Nations choice is off.
+    clubsOnly: sport.clubsOnly ? [...new Set(sport.clubs.map(club => club.league))].join(' and ') : null,
     // `scopes` stays the league / region rows; countries are their own group (`domesticScopes`) after them.
     scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
     theatreNotes: scopes.filter(scope => scope.note),

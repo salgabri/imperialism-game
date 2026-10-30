@@ -18,6 +18,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
+import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { clubLogoFile } from '../src/data/clubLogos.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -86,7 +87,7 @@ for (const name of files) {
 
 // ---- Corrections ----
 const { colours: overrides } = JSON.parse(await readFile(overridesFile, 'utf8'));
-const knownIds = new Set([...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS].map(club => club.id));
+const knownIds = new Set([...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...NFL_CLUBS].map(club => club.id));
 for (const [id, colour] of Object.entries(overrides)) {
   if (!knownIds.has(id) && !DOMESTIC_ID.test(id)) throw new Error(`club-colours.json: no club ${id}`);
   if (!/^#[0-9a-f]{6}$/i.test(colour)) throw new Error(`club-colours.json: ${id} needs a #rrggbb colour, not ${colour}`);

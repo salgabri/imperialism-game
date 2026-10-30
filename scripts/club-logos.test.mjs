@@ -11,6 +11,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { JSDOM } from 'jsdom';
 import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
+import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { DOMESTIC } from '../src/data/domestic.js';
 
 const root = new URL('../', import.meta.url);
@@ -40,7 +41,7 @@ const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(na
 const sources = readFileSync(new URL('public/club-logos/SOURCES.tsv', root), 'utf8').split('\n')
   .filter(line => line && !line.startsWith('#')).slice(1).map(line => line.split('\t'));
 const domesticIds = DOMESTIC.flatMap(entry => JSON.parse(readFileSync(new URL(`public/domestic/${entry.id}.json`, root), 'utf8')).clubs.map(club => club.id));
-const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS].map(club => club.id).concat(domesticIds);
+const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...NFL_CLUBS].map(club => club.id).concat(domesticIds);
 const withCrest = allClubIds.filter(id => clubLogoFile(id));
 
 test('every club the list gives a crest has its file, a source row, and nothing else ships', () => {
@@ -60,7 +61,8 @@ test('every club the list gives a crest has its file, a source row, and nothing 
 
 test('the big clubs carry crests, and an all-leagues club shares its domestic twin\'s file', () => {
   for (const id of ['f-real-madrid', 'f-liverpool', 'f-manchester-city', 'f-arsenal', 'f-fc-barcelona', 'f-fc-bayern-munchen', 'f-inter',
-    'b-boston-celtics', 'b-los-angeles-lakers']) assert.ok(clubLogoFile(id), `${id} has a crest`);
+    'b-boston-celtics', 'b-los-angeles-lakers', 'nfl-kansas-city-chiefs', 'nfl-green-bay-packers']) assert.ok(clubLogoFile(id), `${id} has a crest`);
+  assert.ok(NFL_CLUBS.every(club => clubLogoFile(club.id)), 'every NFL franchise has a crest');
   const madrid = clubLogoFile('f-real-madrid');
   assert.match(madrid, /^d724-\d+$/, 'Real Madrid uses its La Liga twin\'s file');
   assert.equal(clubLogoUrl('f-real-madrid'), `/club-logos/${madrid}.webp`);

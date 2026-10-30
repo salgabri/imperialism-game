@@ -4,7 +4,7 @@ import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, seasonMapOf, se
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 import { CM_ROLES, CM_SOURCE, cmTupleOf } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SOURCE, eaRosterOf, eaTupleOf } from '../data/eaPlayers.js';
-import { getSport } from '../sports/index.js';
+import { getSport, SPORT_LIST } from '../sports/index.js';
 import { HOME_NATIONS } from '../data/teams.js';
 
 export const CAMPAIGN_INDEX_KEY = `${SAVE_KEY}:campaigns`;
@@ -287,7 +287,7 @@ function validateCampaign(input, rebuildSources) {
     invalid('Every surviving team must own territory.');
   }
   const settings = data.settings;
-  const enums = { sport: ['football', 'basketball'], layer: ['nations', 'clubs'], pacing: ['duel', 'blitz', 'chaos'],
+  const enums = { sport: SPORT_LIST.map(sport => sport.id), layer: ['nations', 'clubs'], pacing: ['duel', 'blitz', 'chaos'],
     resolution: ['ticker', 'instant'], role: ['spectator', 'manager'], uncertainty: ['predictable', 'balanced', 'wild'],
     finale: ['single', 'best-of-three'], acquisitionPolicy: ['best-fit', 'highest-rated'], rosterPreset: ['authentic', 'competitive'],
     turnOrder: ['round-robin', 'random'], targeting: ['player', 'compass'] };

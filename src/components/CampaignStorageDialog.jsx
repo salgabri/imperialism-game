@@ -7,6 +7,7 @@ import { SCOPES } from '../data/teams.js';
 import { CLUB_SCOPES } from '../data/scopes.js';
 import { plainScopeName } from '../viewModels/format.js';
 import { domesticLabel } from '../data/domesticScope.js';
+import { getSport } from '../sports/index.js';
 import './campaignStorage.css';
 
 /** A league's scope id is its name, so the fixed club scopes ('all', 'elite') are the only ones to look up. */
@@ -38,7 +39,7 @@ function CampaignPreview({ campaign }) {
   const settings = campaign.settings || {}, alive = campaign.aliveIds?.length ?? campaign.alive;
   const manager = campaign.teams?.[campaign.managedTeamId]?.name || campaign.managedTeamName;
   return <dl className="campaign-storage-preview">
-    <div><dt>Sport</dt><dd>{settings.sport === 'basketball' ? 'Basketball' : 'Football'} · {settings.layer === 'clubs' ? 'Clubs' : 'Nations'}</dd></div>
+    <div><dt>Sport</dt><dd>{getSport(settings.sport).name} · {settings.layer === 'clubs' ? 'Clubs' : 'Nations'}</dd></div>
     <div><dt>Theatre</dt><dd>{theatreName(settings)}</dd></div>
     {/* Only a campaign played on a football data set names its season; the built-in season is implied. */}
     {settings.dataSeason && <div><dt>Season</dt><dd>{settings.dataSeason} · {settings.dataSet}</dd></div>}

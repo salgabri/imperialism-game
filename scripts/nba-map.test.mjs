@@ -33,8 +33,8 @@ const sectionIds = geo.countries.map(section => section.id);
 const colourOf = Object.fromEntries(MAP.clubs.map(club => [club.homeSection, club.col]));
 
 test('the NBA map gives every franchise one territory around its arena, as the index lists it', () => {
-  // Today's map; the earlier eras' list their seasons (scripts/nba-seasons.test.mjs).
-  assert.deepEqual(CLUB_MAPS.filter(entry => !entry.seasons).map(entry => entry.id), ['nba']);
+  // Today's map; the earlier eras' list their seasons (scripts/nba-seasons.test.mjs), and the NFL's is American football's.
+  assert.deepEqual(CLUB_MAPS.filter(entry => !entry.seasons && entry.sport === 'basketball').map(entry => entry.id), ['nba']);
   assert.deepEqual({ format: DOC.format, sport: DOC.sport, league: DOC.league, name: DOC.name, hosts: DOC.hosts },
     { format: 1, sport: 'basketball', league: 'NBA', name: 'USA and Canada', hosts: ['840', '124'] });
   const { version, ...rest } = DOC;

@@ -12,22 +12,25 @@ Pick your sport at kick-off:
 | --- | --- | --- | --- |
 | Football | XI in a 4-4-2 | 90 minutes | penalty shootout |
 | Basketball | starting five | 40 minutes | overtime periods |
+| American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 
 And pick who fights:
 
 - **Nations** — 173 national teams, each starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-- **Clubs** — 132 football clubs from seven European leagues, or all 30 NBA
-  franchises on [their own map](#the-nba-map) of the USA and Canada. Real Madrid
-  annexes territory exactly the way Spain does.
+- **Clubs** — 132 football clubs from seven European leagues, all 30 NBA
+  franchises on [their own map](#the-nba-map) of the USA and Canada, or all 32 NFL
+  franchises on [theirs](#the-nfl-map) of the USA. Real Madrid annexes territory
+  exactly the way Spain does. American football is played by clubs only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
 
 Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
-data, lineup shape, match model and vocabulary from `src/sports/`; adding a third
-is a single module and a roster file.
+data, lineup shape, match model and vocabulary (`words`) from `src/sports/`; adding
+American football took one module, its club file, its lineup plan and its squad
+field ([design notes](docs/design/american-football.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -79,6 +82,8 @@ npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page in data-src/bball-2karchive/
+npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
+npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 ```
 
@@ -95,7 +100,8 @@ default suits a first campaign, so pressing Space three times starts one.
    choices are the whole world (173 nations), another confederation, or the
    Elite 32. Football club campaigns offer individual leagues, all leagues, or
    the strongest 32 available clubs; basketball clubs play the NBA on its own
-   map of the USA and Canada. The step opens on a map of the chosen theatre:
+   map of the USA and Canada, and American football (clubs only: choosing it
+   switches Teams to clubs and disables Nations) the NFL on its map of the USA. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). It also
    shows the actual number of teams, the number of matches and the estimated
@@ -107,7 +113,8 @@ default suits a first campaign, so pressing Space three times starts one.
    ratings of each), and any local CM 01/02 season built on this computer.
    Basketball's lists the built-in 2024/25, then its
    [earlier seasons](#basketball-seasons) 2023/24 back to 1999/00 (NBA 2K
-   ratings of each), which play NBA clubs on the map of their era. A
+   ratings of each), which play NBA clubs on the map of their era. American
+   football's lists its built-in 2026 season (Madden NFL 27). A
    quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
@@ -180,7 +187,7 @@ choice; no timer runs.
 only* (an instant final score) or *Fast-forward* (Express playback: final scores
 only, with shorter pauses for routine matches). It stores the existing
 `resolution` and `express` settings. Level games go to penalties in football and
-overtime in basketball. The draw, the opponent choice, upsets, the final, computer
+overtime in basketball and American football. The draw, the opponent choice, upsets, the final, computer
 signings and your role are fixed at launch. During a campaign the masthead's
 **Settings** button (More on phones) changes Show matches at any time, except
 that switching between Live and Final score only waits for the current draw or
@@ -190,7 +197,9 @@ rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
-offence/defence, form and shooting variance. Stronger teams are favourites, while
+offence/defence, form and shooting variance. American football plays about 11
+possessions a side, each ending in a touchdown, a field goal or nothing by its
+offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
 Pre-match percentages estimate this model with an independent seeded sample.
 They do not consume the campaign's random stream.
@@ -410,6 +419,18 @@ nationality**, including international retirees, rather than current call-ups.
 Existing campaigns retain their saved squads; start a new campaign to use the
 updated data. See `docs/design/football-roster-audit.json` for per-nation coverage.
 
+**American football** — `src/data/clubs.american-football.js`, the 32 NFL
+franchises of Madden NFL 27 (Week 7 Ratings, retrieved 2026-10-30 from EA SPORTS'
+ratings site; `scripts/data/madden-nfl-27.json` holds all 1,946 players). Madden's
+positions are grouped into ten (its five line spots are OL, edges and tackles DL,
+Sam, Mike and Will LB, both safeties S); punters and long snappers are left out.
+Each franchise fields 23 starters at natural positions (QB, RB, three WR, TE, five
+OL; four DL, two LB, three CB, two S; K) and keeps eleven backups. Ratings are
+Madden's overalls, unchanged. Positions are specialised, so playing out of
+position costs 25 points in this sport, not 12. There are no national teams: no
+source rates American football players by nation. See the
+[design notes](docs/design/american-football.md).
+
 **Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
 2K has real 1–99 overalls but no country, and every NBA bio dataset with a
@@ -437,8 +458,9 @@ Nations with no roster in a sport fall back to *that sport's* baseline, never to
 another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
-An assignment optimizer fills all eleven football or five basketball slots.
-Playing outside a natural position costs 12 rating points. A player may have
+An assignment optimizer fills all eleven football, five basketball or 23 American
+football slots. Playing outside a natural position costs 12 rating points (25 in
+American football). A player may have
 more than one natural position, and each one is penalty-free: a claimed PG/SG
 can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
@@ -485,6 +507,8 @@ A club's territory is painted in a generated colour rather than a flag —
 identical national flags would tell you nothing — and wherever a nation shows its
 flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
+
+NFL franchises are not dealt either: they split [the USA](#the-nfl-map) between them.
 
 Club lineups come from the same two exports as the national squads:
 `clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
@@ -670,13 +694,35 @@ New Jersey until 2010/11. Nine era maps
 later seasons have today's franchises and play on this map.
 
 ```bash
-npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 7 minutes)
+npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 6 minutes)
 npm run build:nba-map -- --check           # offline rebuild must match the committed files byte for byte
+npm run build:club-maps                    # the NBA's and the NFL's maps together
 ```
 
 Arenas are in `scripts/data/nba-arenas.json`; the
 [design notes](docs/design/domestic-campaigns.md#the-nba-map) cover the border
-fitting and the file additions.
+fitting and the file additions. `scripts/build-club-maps.mjs` builds every
+league's map (`--league=nba` or `nfl` for one; the index keeps the other's entries).
+
+### The NFL map
+
+American football has one theatre, **NFL**: the 32 franchises fight over the USA,
+split into 32 territories grown from their stadiums by the same partition as the
+NBA's, over whole states. California and Florida (three franchises each), Texas,
+Pennsylvania, Ohio, Maryland and New Jersey (two each) are split between their
+franchises along county lines. The Giants and Jets share MetLife Stadium in New
+Jersey, and the Rams and Chargers SoFi Stadium, so those four grow from their
+training grounds; and because the Giants and Jets are New York's, New York's
+counties may go to them as well as to the Bills: the Giants hold Manhattan, Long
+Island and Connecticut, the Bills upstate New York. Denver holds Colorado, Wyoming
+and Montana, Kansas City Missouri, Kansas and Nebraska. Alaska and Hawaii lie off
+the map; Canada and Mexico lie beneath as inert land. The map is
+`public/domestic/nfl.json` (134 KB); stadiums are in `scripts/data/nfl-teams.json`.
+
+```bash
+npm run build:nfl-map                      # boundaries + stadiums → public/domestic/nfl.json and its index entry (seconds)
+npm run build:nfl-map -- --check           # offline rebuild must match the committed files byte for byte
+```
 
 ## Football seasons
 
@@ -865,7 +911,7 @@ crest, else the item's logo image on Wikimedia Commons), and saves it as a WebP
 fitting 128×128 in `public/club-logos/<club id>.webp`. Domestic clubs reuse the
 item their home town came from. An all-leagues club shares its domestic twin's
 file: the club of its country whose FM26 squad shares the most players with its
-EA FC 26 lineup. NBA franchises are matched by name. Overrides go in
+EA FC 26 lineup. NBA and NFL franchises are matched by name. Overrides go in
 `scripts/data/club-logos.json`: `items` maps a club id to a Wikidata item, and
 `files` maps it to a file name, or to `null` for no crest. Responses and
 images are cached in the ignored `data-src/club-logos/`, so reruns are offline;
@@ -1019,17 +1065,19 @@ src/
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
     basketball.js      starting five, 40 minutes, overtime
+    americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
   data/teams.js        173 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
+  data/clubs.american-football.js  GENERATED NFL lineups and backups (npm run build-nfl)
   data/sourceTable.js  compact player rows of the generated football files: one
                        JSON line per nation or club, metadata keys and shared
                        values written once (scripts/lib/data-module.mjs writes them)
   data/scopes.js       club theatre choices (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
-  data/clubMaps.js     GENERATED index of a sport's own club maps: the NBA's, today's and its eras' (npm run build:nba-map)
+  data/clubMaps.js     GENERATED index of a sport's own club maps: the NBA's, today's and its eras', and the NFL's (npm run build:club-maps)
   data/domesticScope.js  labels for 'domestic:<id>' theatres, and a sport's own map
   data/domesticTiers.js  each nation's club cap and the setup lists' priority order
   data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
@@ -1051,7 +1099,7 @@ src/
     campaign.js        territory ownership, targeting, round draws
     duelDraw.js        one-by-one draw: attacker, compass bearing, route
     turns.js           round-robin queue, "in reach" targets, launch rules
-    winProbability.js  live win-probability model (football and basketball)
+    winProbability.js  live win-probability model (football, basketball and American football)
     liveMinute.js      live match minute store (outside saved state)
     domestic.js        loads and validates a country map: sections and club rows
     footballSets.js    lists, loads and validates earlier seasons of both sports; season-bound sport
@@ -1062,7 +1110,7 @@ public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
-  domestic/            one sectioned map per country, and the NBA's (nba.json, nba2000.json …), fetched on demand
+  domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …) and the NFL's (nfl.json), fetched on demand
   football/            the built-in earlier football seasons (ea-*.json), fetched when chosen
   basketball/          the built-in earlier basketball seasons (nba-2k*.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
@@ -1081,7 +1129,9 @@ scripts/
   build-clubs.mjs      builds the club layer for both sports
   sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
-  build-nba-map.mjs    builds the NBA's maps of the USA and Canada from the arenas, today's and each era's
+  build-club-maps.mjs  builds the NBA's maps of the USA and Canada (today's and each era's) and the NFL's of the USA
+  sync-madden.mjs      snapshots Madden NFL ratings from EA's ratings site
+  build-nfl.mjs        builds the NFL clubs from that snapshot
   build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
@@ -1102,18 +1152,18 @@ scripts/
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **ten full
-campaigns** across all three pacings, both resolution modes, both sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **eleven full
+campaigns** across all three pacings, both resolution modes, all three sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
-their own map and one is Fiji's 16 clubs, each starting on a group of its 100
-sections. A **manager campaign** (Italy, Europe, round robin × *You
+their own map, one is Fiji's 16 clubs, each starting on a group of its 100
+sections, and one the NFL's 32 franchises on theirs, with the live ticker. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after
 elimination. It also checks that every one-by-one turn draws exactly three
 campaign samples and that no clock timer runs while a decision is pending.
-**Six interrupt-and-resume scenarios** cover a world-scale national campaign
-plus basketball nations, football clubs, NBA clubs and England and Fiji
+**Seven interrupt-and-resume scenarios** cover a world-scale national campaign
+plus basketball nations, football clubs, NBA clubs, NFL clubs and England and Fiji
 domestic campaigns, which are played on to their champions after the reload.
 They verify that settings, ownership, squads, acquired players, and the remaining
 match queue survive a reload and that the campaign remains playable. The app's
@@ -1135,8 +1185,8 @@ React warnings.
 Focused runs skip every other section:
 
 ```bash
-npm run smoke -- --campaign-only=0   # one of the ten campaigns (index 0–9; 7 and 8 are England, 9 is Fiji)
-npm run smoke -- --resume-only=0     # one resume scenario (index 0–5; 4 is England, 5 is Fiji)
+npm run smoke -- --campaign-only=0   # one of the eleven campaigns (index 0–10; 7 and 8 are England, 9 is Fiji, 10 the NFL)
+npm run smoke -- --resume-only=0     # one resume scenario (index 0–6; 4 is England, 5 is Fiji, 6 the NFL)
 npm run smoke -- --manager-only      # the manager campaign
 npm run smoke -- --scenarios=england # scenarios whose names match; narrows the picks above
 ```
@@ -1153,6 +1203,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `turn-order` | Round-robin queue, "in reach" tiers, fixed-attacker and chosen-target draws |
 | `turn-panels`, `turn-wiring` | Turn strip, Choose a target, spectator panel, and the turn flow in the real App |
 | `win-probability` | The live win-probability model against the football and basketball match models |
+| `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
@@ -1162,7 +1213,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 Domestic campaigns add `domestic-data`, `domestic-geometry`, `domestic-campaign`
 and `domestic-routing`, which `npm run test:domestic` also runs on their own.
 
-It also checks each sport's match model over 400 simulated games: that every match
+It also checks each sport's match model over 400 simulated games (American
+football's over 3,000 in its own test file): that every match
 has a winner, that a level score always triggers a tie-break, that the event feed
 adds up to the final score, and that scoring lands in the right range for the
 sport.

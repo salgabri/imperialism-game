@@ -3,6 +3,7 @@
 // window/document/timers/RNG, and every builder tolerates missing geometry, odds, sport or history.
 import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { roman, signedDelta, territoryWord } from './format.js';
+import { getSport } from '../sports/index.js';
 
 function territoryName(ctx, cid) {
   // A country map's sections first (ctx.sectionNames); the geometry fallback below is an O(n) find.
@@ -122,11 +123,12 @@ export function selectedOption(choice, selectedIndex = choice?.selected) {
 }
 
 /**
- * The lineup noun in the conquest copy (DEC misc, as squad/match/preview): basketball reads "starting five", football
- * keeps DEC D15's "XI". `sport` is the sport object or its id; anything else is football.
+ * The lineup noun in the conquest copy (DEC misc, as squad/match/preview): basketball reads "starting five", American
+ * football "starting lineup", football keeps DEC D15's "XI". `sport` is the sport object or its id; anything else is
+ * football.
  */
 function lineupNoun(sport) {
-  return (typeof sport === 'string' ? sport : sport?.id) === 'basketball' ? 'starting five' : 'XI';
+  return getSport(typeof sport === 'string' ? sport : sport?.id).words.lineupNoun;
 }
 
 /** One v4 option row per candidate (D§2.5, D§7, DEC D15); `sport` picks the lineup noun (football by default). */
