@@ -2,11 +2,11 @@
 "format": 2,
 "id": "218",
 "name": "Ecuador",
-"version": "218-8760fe3e",
+"version": "218-58aa508e",
 "projection": {"lon0":-78.8,"lat0":-1.8},
 "focus": [-81.3,-5.2,-75,1.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"ECU","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"INEC - Instituto Nacional de Estadística y Censos, OCHA ROLAC","year":"2019","canonical":"Cantons","boundaryId":"ECU-ADM2-8360857","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ECU/ADM2/geoBoundaries-ECU-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Peru","km2":134},{"shape":"Colombia","km2":117}]},"units":224,"areaKm2":256607},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00016474946011460137,0.00006469319581195778],"translate":[-91.66192781499996,-5.016110626999932]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"218-001","properties":{"name":"Quito (east)","units":5}},
 {"type":"Polygon","arcs":[[4,5,6,7,-4,8]],"id":"218-002","properties":{"name":"Puerto Francisco de Orellana","units":5}},

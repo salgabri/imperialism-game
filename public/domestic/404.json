@@ -2,11 +2,11 @@
 "format": 2,
 "id": "404",
 "name": "Kenya",
-"version": "404-48347f1b",
+"version": "404-8aa93b67",
 "projection": {"lon0":37.8,"lat0":0.4},
 "focus": [33.7,-4.9,42.1,5.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"KEN","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"IEBC, OCHA ROSEA","year":"2020","canonical":"Sub-Counties","boundaryId":"KEN-ADM2-3690345","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KEN/ADM2/geoBoundaries-KEN-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Ethiopia","km2":471},{"shape":"Somalia","km2":26}]},"units":290,"areaKm2":593711},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0000799581276212762,0.00010091076164108585],"translate":[33.910288655000045,-4.67687988299997]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"404-001","properties":{"name":"Makadara (south)","units":7}},
 {"type":"Polygon","arcs":[[4,5,6,7,-1,8,9]],"id":"404-002","properties":{"name":"Isinya","units":3}},

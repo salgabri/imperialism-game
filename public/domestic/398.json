@@ -2,11 +2,11 @@
 "format": 2,
 "id": "398",
 "name": "Kazakhstan",
-"version": "398-9fb6f0be",
+"version": "398-5566dd01",
 "projection": {"lon0":67.2,"lat0":48},
 "focus": [45.7,40.2,88.2,55.8],
 "boundaries": {"provider":"geoBoundaries","iso3":"KAZ","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"District","boundaryId":"KAZ-ADM2-9891525","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KAZ/ADM2/geoBoundaries-KAZ-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Uzbekistan","km2":1659},{"shape":"Russia","km2":1237},{"shape":"China","km2":42},{"shape":"Kyrgyzstan","km2":26}]},"units":174,"areaKm2":2719631},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00040755223946470294,0.0001485532449845578],"translate":[46.557843823054384,40.576636341166214]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7,8]],"id":"398-001","properties":{"name":"Tselinogradskiy (south-west)","units":4}},
 {"type":"Polygon","arcs":[[9,10,11,-6]],"id":"398-002","properties":{"name":"Egindikol","units":2}},

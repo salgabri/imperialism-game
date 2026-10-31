@@ -2,11 +2,11 @@
 "format": 2,
 "id": "642",
 "name": "Romania",
-"version": "642-e1c21642",
+"version": "642-2123b42e",
 "projection": {"lon0":25,"lat0":46},
 "focus": [20,43.5,29.9,48.4],
 "boundaries": {"provider":"geoBoundaries","iso3":"ROU","level":"ADM2","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","licenseDetail":"License on source page. Additional information in linked PDF.","source":"Agentia Nationala de Cadastru si Publicitate Imobiliara","year":"2016","canonical":"municipalities","boundaryId":"ROU-ADM2-2599482","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ROU/ADM2/geoBoundaries-ROU-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["TULCEA"],"license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","source":"World Bank","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ROU/ADM1/geoBoundaries-ROU-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Bulgaria","km2":414},{"shape":"Serbia","km2":41}]},"units":3236,"areaKm2":237372},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00009443386992869914,0.00004626073731135397],"translate":[20.26199490500005,43.63831072860198]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"642-001","properties":{"name":"Sector 1 (east)","units":5}},
 {"type":"Polygon","arcs":[[4,-1,5,6,7]],"id":"642-002","properties":{"name":"Pantelimon","units":11}},

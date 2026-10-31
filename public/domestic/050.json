@@ -2,11 +2,11 @@
 "format": 2,
 "id": "050",
 "name": "Bangladesh",
-"version": "050-d9626a5a",
+"version": "050-95fea29c",
 "projection": {"lon0":90.3,"lat0":23.7},
 "focus": [87.9,20.4,92.8,26.8],
 "boundaries": {"provider":"geoBoundaries","iso3":"BGD","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Bangladesh Bureau of Statistics (BBS), OCHA ROAP","year":"2020","canonical":"subdistricts","boundaryId":"BGD-ADM3-5055444","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BGD/ADM3/geoBoundaries-BGD-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"India","km2":543},{"shape":"Myanmar","km2":23}]},"units":544,"areaKm2":139585},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00004662506863067545,0.000060181988840283234],"translate":[88.00862798600008,20.59075009000003]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"050-001","properties":{"name":"Motijheel (south-west)","units":10}},
 {"type":"Polygon","arcs":[[3,-1,4,5,6,7]],"id":"050-002","properties":{"name":"Dohar","units":6}},

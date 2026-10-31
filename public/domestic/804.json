@@ -2,11 +2,11 @@
 "format": 2,
 "id": "804",
 "name": "Ukraine",
-"version": "804-b15d6596",
+"version": "804-fcd19b9d",
 "projection": {"lon0":31.3,"lat0":48.8},
 "focus": [21.7,44,40.6,52.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"UKR","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikimedia Commons","year":"2006","canonical":"Raions","boundaryId":"UKR-ADM2-74538382","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UKR/ADM2/geoBoundaries-UKR-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Russia","km2":26068},{"shape":"Belarus","km2":744},{"shape":"Romania","km2":678},{"shape":"Moldova","km2":583},{"shape":"Hungary","km2":76}]},"units":479,"areaKm2":571270},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0001805550300981922,0.00008136378346333513],"translate":[22.12840866512903,44.24167093340549]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4]],"id":"804-001","properties":{"name":"Yasynuvata","units":5}},
 {"type":"Polygon","arcs":[[5,6,7,8,9,-2]],"id":"804-002","properties":{"name":"Kramatorsk","units":3}},

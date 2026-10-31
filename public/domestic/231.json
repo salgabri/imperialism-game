@@ -2,11 +2,11 @@
 "format": 2,
 "id": "231",
 "name": "Ethiopia",
-"version": "231-c0f48a0e",
+"version": "231-9fedb519",
 "projection": {"lon0":39.6,"lat0":9.1},
 "focus": [32.7,3.1,48.3,15.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"ETH","level":"ADM3","license":"Open Data Commons Open Database License 1.0","licenseDetail":"opendefinition.org/licenses/cc-by/","source":"Open Africa, Code for Ethiopia","year":"2016","canonical":"Unknown","boundaryId":"ETH-ADM3-50319843","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ETH/ADM3/geoBoundaries-ETH-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Eritrea","km2":1667},{"shape":"Somalia","km2":1061},{"shape":"S. Sudan","km2":19},{"shape":"Somaliland","km2":14}]},"units":690,"areaKm2":1128284},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00014957162854900859,0.00011445270211291617],"translate":[33.00224221639698,3.400365379220962]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"231-001","properties":{"name":"Lideta (north-east)","units":12}},
 {"type":"Polygon","arcs":[[4,-1,5,6,7]],"id":"231-002","properties":{"name":"Debre Birhan","units":9}},

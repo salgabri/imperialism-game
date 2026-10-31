@@ -2,11 +2,11 @@
 "format": 2,
 "id": "626",
 "name": "Timor-Leste",
-"version": "626-af3d8ea4",
+"version": "626-e20e7dcc",
 "projection": {"lon0":125.9,"lat0":-8.9},
 "focus": [123.9,-9.5,127.5,-8.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"TLS","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"WHO, OCHA ROAP","year":"2020","canonical":"Administrative Posts","boundaryId":"TLS-ADM2-22284137","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TLS/ADM2/geoBoundaries-TLS-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Indonesia","km2":65}]},"units":64,"areaKm2":14893},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00003296946116461106,0.000013334331343313448],"translate":[124.04493713400007,-9.46028995499995]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"626-001","properties":{"name":"Vera Cruz (south, south)","units":3}},
 {"type":"Polygon","arcs":[[3,4,5,-1,6]],"id":"626-002","properties":{"name":"Aileu","units":2}},

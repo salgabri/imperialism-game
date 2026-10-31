@@ -2,11 +2,11 @@
 "format": 2,
 "id": "454",
 "name": "Malawi",
-"version": "454-b4e3d4b9",
+"version": "454-3bad28d2",
 "projection": {"lon0":34.3,"lat0":-13.2},
 "focus": [32.6,-17.3,36,-9.2],
 "boundaries": {"provider":"geoBoundaries","iso3":"MWI","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"National Statistics Office of Malawi, OCHA ROSEA","year":"2020","canonical":"district","boundaryId":"MWI-ADM2-42251766","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MWI/ADM2/geoBoundaries-MWI-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Northern Region"],"license":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MWI/ADM1/geoBoundaries-MWI-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Mozambique","km2":43}]},"units":29,"areaKm2":96304},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0000324674367799072,0.00007762667635098545],"translate":[32.67170594657222,-17.12627881421588]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7]],"id":"454-001","properties":{"name":"Blantyre (south)","units":1}},
 {"type":"Polygon","arcs":[[8,9,10,11,-5,12,-3,13,14,15,16,17,18]],"id":"454-002","properties":{"name":"Chiradzulu","units":2}},

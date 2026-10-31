@@ -2,11 +2,11 @@
 "format": 2,
 "id": "191",
 "name": "Croatia",
-"version": "191-b64bd548",
+"version": "191-70c70cbd",
 "projection": {"lon0":16.4,"lat0":44.7},
 "focus": [13.3,42.3,19.6,46.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"HRV","level":"ADM2","license":"Creative Commons Attribution-ShareAlike 2.0","source":"Open Street Map, geoBoundaries","year":"2021","canonical":"Municipalities and Towns","boundaryId":"HRV-ADM2-41942358","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/HRV/ADM2/geoBoundaries-HRV-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Bosnia and Herz.","km2":57}]},"units":560,"areaKm2":56333},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00005957428774516158,0.00004162602026062684],"translate":[13.489902099202538,42.39243909998453]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"191-001","properties":{"name":"Zagreb (west 2)","units":1}},
 {"type":"Polygon","arcs":[[3,4,5]],"id":"191-002","properties":{"name":"Dugo Selo","units":1}},

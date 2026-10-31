@@ -2,11 +2,11 @@
 "format": 2,
 "id": "242",
 "name": "Fiji",
-"version": "242-7808c767",
+"version": "242-7370036d",
 "projection": {"lon0":178.5,"lat0":-17.8},
 "focus": [176.7,-19.3,181.8,-15.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"FJI","level":"ADM4","license":"Creative Commons Attribution 4.0 (CC BY 4.0)","source":"Pacific Data Hub","year":"2007","canonical":"Enumeration Areas","boundaryId":"FJI-ADM4-49741210","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FJI/ADM4/geoBoundaries-FJI-ADM4_simplified.geojson","filled":{"level":"ADM3","units":["Malhaha","Itutiu"],"license":"Open Data Commons Open Database License 1.0","source":"SOPAC, Fiji Islands Bureau of Statistics, PacGeo","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FJI/ADM3/geoBoundaries-FJI-ADM3_simplified.geojson"},"units":1599,"areaKm2":20966},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00004887231032063885,0.00008192859754543047],"translate":[176.8713947999822,-20.67230736419392]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4]],"id":"242-001","properties":{"name":"Vadraulailai Settlement","units":46}},
 {"type":"Polygon","arcs":[[-3,5,6,7,8]],"id":"242-002","properties":{"name":"Soweri Settlement","units":29}},

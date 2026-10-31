@@ -2,11 +2,11 @@
 "format": 2,
 "id": "036",
 "name": "Australia",
-"version": "036-f053b1f8",
+"version": "036-5b49ef99",
 "projection": {"lon0":134.4,"lat0":-24.9},
 "focus": [112.1,-44.4,154.5,-8.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"AUS","level":"ADM2","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","source":"Australian Bureau of Statistics","year":"2022","canonical":"Local Government Areas","boundaryId":"AUS-ADM2-25037944","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AUS/ADM2/geoBoundaries-AUS-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Indian Ocean Ter.","km2":137},{"shape":"Norfolk Island","km2":37}]},"units":545,"areaKm2":7702677},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00040717874389743883,0.000342685447804478],"translate":[112.92113458600011,-43.63335960599994]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"036-001","properties":{"name":"Parramatta","units":8}},
 {"type":"Polygon","arcs":[[6,-2,7]],"id":"036-002","properties":{"name":"Wahroonga","units":16}},

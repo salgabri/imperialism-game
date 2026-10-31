@@ -2,11 +2,11 @@
 "format": 2,
 "id": "705",
 "name": "Slovenia",
-"version": "705-e739d8ce",
+"version": "705-f22710fe",
 "projection": {"lon0":14.8,"lat0":46.1},
 "focus": [13.3,45.3,16.7,47],
 "boundaries": {"provider":"geoBoundaries","iso3":"SVN","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"SVN-ADM2-79292919","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SVN/ADM2/geoBoundaries-SVN-ADM2_simplified.geojson","units":212,"areaKm2":20409},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00003221332813328134,0.000014552423524235272],"translate":[13.3754696,45.4214425]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"705-001","properties":{"name":"Maribor (east)","units":2}},
 {"type":"Polygon","arcs":[[4,5,6,7,8,9,-1]],"id":"705-002","properties":{"name":"Limbuš","units":3}},

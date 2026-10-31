@@ -2,11 +2,11 @@
 "format": 2,
 "id": "499",
 "name": "Montenegro",
-"version": "499-d7bac1e8",
+"version": "499-f4f60fef",
 "projection": {"lon0":19.3,"lat0":42.7},
 "focus": [18.3,41.8,20.4,43.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"MNE","level":"ADM1","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"MNE-ADM1-59799669","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MNE/ADM1/geoBoundaries-MNE-ADM1_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Serbia","km2":41}]},"units":23,"areaKm2":13822},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000019206391063910657,0.000017121528215282197],"translate":[18.4334249,41.8463704]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"499-001","properties":{"name":"Podgorica Municipality (east 2)","units":2}},
 {"type":"Polygon","arcs":[[-5,6,7,8]],"id":"499-002","properties":{"name":"Stijena","units":1}},

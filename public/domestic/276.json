@@ -2,11 +2,11 @@
 "format": 2,
 "id": "276",
 "name": "Germany",
-"version": "276-62e89bcb",
+"version": "276-bf27009e",
 "projection": {"lon0":10.4,"lat0":51.2},
 "focus": [5.6,47.1,15.3,55.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"DEU","level":"ADM3","license":"Data license Germany - Attribution - Version 2.0","source":"Federal Agency for Cartography and Geodesy","year":"2021","canonical":"Independent City or District","boundaryId":"DEU-ADM3-24449704","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DEU/ADM3/geoBoundaries-DEU-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Netherlands","km2":34},{"shape":"Switzerland","km2":15},{"shape":"Austria","km2":9}]},"units":428,"areaKm2":356383},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00009172008702086992,0.0000778859059590598],"translate":[5.866250351000076,47.270265007000035]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"276-001","properties":{"name":"München, Kreisfreie Stadt","units":3}},
 {"type":"Polygon","arcs":[[6,7,8,9,10]],"id":"276-002","properties":{"name":"Dortmund, Kreisfreie Stadt","units":3}},

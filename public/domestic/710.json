@@ -2,11 +2,11 @@
 "format": 2,
 "id": "710",
 "name": "South Africa",
-"version": "710-30773df8",
+"version": "710-dbfc499f",
 "projection": {"lon0":25.1,"lat0":-28.5},
 "focus": [16.1,-35.1,33.3,-21.8],
 "boundaries": {"provider":"geoBoundaries","iso3":"ZAF","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"OCHA ROSEA, South African Municipal Demarcation Board","year":"2020","canonical":"Local municipality","boundaryId":"ZAF-ADM3-15628383","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ZAF/ADM3/geoBoundaries-ZAF-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Mozambique","km2":52},{"shape":"Namibia","km2":16},{"shape":"Lesotho","km2":4}]},"units":213,"areaKm2":1222374},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00016493259877598822,0.00012708477029770306],"translate":[16.45189,-34.83382000199998]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"710-001","properties":{"name":"City of Johannesburg (west)","units":9}},
 {"type":"Polygon","arcs":[[7,8,9,10,-3,11,12,13]],"id":"710-002","properties":{"name":"Klerksdorp","units":3}},

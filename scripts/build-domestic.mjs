@@ -33,6 +33,7 @@ import {
   arcPoints, baseId, bboxOf, components, dissolve, facingKm, facingSections, kmBetween, kmToPolys, partitionCountry, pointInPolys, polysAreaKm2,
   quantileOf, quantize, sectionTopology, simplifyTopology, splitOnLand,
 } from './lib/domestic-partition.mjs';
+import { DATABASE_DATE, VERSION } from './lib/domestic-sync.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const snapshotDir = path.join(root, 'scripts/data/domestic');
@@ -320,7 +321,7 @@ async function buildCountry(id, snapshot, source) {
     boundaries: { ...picked.boundaries, units: sourceUnits, areaKm2: Math.round(sourceAreaKm2) },
     source: {
       provider: 'EFEM.club', game: 'Football Manager 26', edition: 'FM 26', version: snapshot.source.version,
-      snapshotDate: snapshot.source.fetchedAt.slice(0, 10), rawScale: 100, conversion: FM_CONVERSION, origin: FM_ORIGIN,
+      snapshotDate: DATABASE_DATE, rawScale: 100, conversion: FM_CONVERSION, origin: FM_ORIGIN,
     },
   };
   const taken = new Set();
@@ -504,9 +505,9 @@ function attributionText(docs) {
     '  (cities1000, or the country file for a garbled layer) or by the Natural Earth admin-1 region.',
     "Land the game's world map (public/countries-50m.json: world-atlas 2.0.2, ISC; Natural Earth 1:50m,",
     '  public domain) draws for another country is cut from a domestic map; see "Cut" lines below.',
-    'Clubs, squads and player abilities: Football Manager 26 data as published by EFEM.club',
-    '  (https://efem.club), version 26.3.0, retrieved at build time. Football Manager is a trademark',
-    '  of Sports Interactive; this game is not affiliated with or endorsed by them or EFEM.club.',
+    `Clubs, squads and player abilities: Football Manager 26 database ${VERSION} (released ${DATABASE_DATE}),`,
+    '  as published by EFEM.club (https://efem.club). Football Manager is a trademark of Sports',
+    '  Interactive; this game is not affiliated with or endorsed by them or EFEM.club.',
     '',
     'Per country:',
   ];
@@ -529,6 +530,8 @@ function attributionText(docs) {
 async function buildOne(id, source) {
   try {
     const snapshot = JSON.parse(await readFile(path.join(snapshotDir, `${id}.json`), 'utf8'));
+    // Ratings are dated by the database release, which DATABASE_DATE gives for VERSION only.
+    if (snapshot.source.version !== VERSION) throw new Error(`snapshot is FM ${snapshot.source.version}; DATABASE_DATE dates ${VERSION}`);
     return { result: await buildCountry(id, snapshot, source) };
   } catch (error) {
     log(`${id} FAILED: ${error.stack || error.message}`);

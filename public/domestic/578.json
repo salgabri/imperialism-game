@@ -2,11 +2,11 @@
 "format": 2,
 "id": "578",
 "name": "Norway",
-"version": "578-8eefd766",
+"version": "578-66baa1c8",
 "projection": {"lon0":13.1,"lat0":64.6},
 "focus": [4.1,57.7,31.6,71.5],
 "boundaries": {"provider":"geoBoundaries","iso3":"NOR","level":"ADM2","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","source":"Geonorge, Mapping Authority of Norway","year":"2013","canonical":"Unknown","boundaryId":"NOR-ADM2-86288312","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NOR/ADM2/geoBoundaries-NOR-ADM2_simplified.geojson","units":431,"areaKm2":321009},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0002642209902099022,0.00013205699056990542],"translate":[4.641404400000018,57.97992890000003]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"MultiPolygon","arcs":[[[0,1,2,3]],[[4]],[[5]],[[6]],[[7]],[[8]],[[9]],[[10]],[[11]],[[12]],[[13]],[[14]],[[15]],[[16]],[[17]],[[18]]],"id":"578-001","properties":{"name":"Bodø","units":56}},
 {"type":"MultiPolygon","arcs":[[[19]],[[20]],[[21,22,-1,23]],[[24]],[[25]],[[26]],[[27]],[[28]],[[29]],[[30]],[[31]],[[32]]],"id":"578-002","properties":{"name":"Mo i Rana","units":53}},

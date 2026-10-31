@@ -2,11 +2,11 @@
 "format": 2,
 "id": "410",
 "name": "South Korea",
-"version": "410-b9d0b226",
+"version": "410-12a4bdf5",
 "projection": {"lon0":127.8,"lat0":36.4},
 "focus": [124.4,33,131.1,38.8],
 "boundaries": {"provider":"geoBoundaries","iso3":"KOR","level":"ADM2","license":"Creative Commons Attribution 3.0 License","source":"geoBoundaries, citypopulation.de","year":"2020","canonical":"Si, Kun (districts and city districts)","boundaryId":"KOR-ADM2-91817680","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KOR/ADM2/geoBoundaries-KOR-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["North Jeolla"],"license":"Public Domain","source":"Natural Earth","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KOR/ADM1/geoBoundaries-KOR-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"North Korea","km2":89}]},"units":229,"areaKm2":99380},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0000630326069160695,0.00005404679168791658],"translate":[124.61116754900002,33.193832185000076]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"410-001","properties":{"name":"Nam-gu","units":5}},
 {"type":"Polygon","arcs":[[7,-1,8,9,10,11]],"id":"410-002","properties":{"name":"Cheongdo-gun (north-east)","units":1}},

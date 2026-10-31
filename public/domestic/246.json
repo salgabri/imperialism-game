@@ -2,11 +2,11 @@
 "format": 2,
 "id": "246",
 "name": "Finland",
-"version": "246-e94b3e4b",
+"version": "246-c9557e64",
 "projection": {"lon0":26.2,"lat0":65},
 "focus": [19.2,59.6,31.9,70.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"FIN","level":"ADM3","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"FIN-ADM3-76405175","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FIN/ADM3/geoBoundaries-FIN-ADM3_simplified.geojson","units":312,"areaKm2":335091},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00012113328233282333,0.00010283465034650346],"translate":[19.4735,59.8087489]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"246-001","properties":{"name":"Kuopio (south)","units":3}},
 {"type":"Polygon","arcs":[[4,5,6,7,8,9,10,-4,11]],"id":"246-002","properties":{"name":"Siilinjärvi","units":8}},

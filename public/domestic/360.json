@@ -2,11 +2,11 @@
 "format": 2,
 "id": "360",
 "name": "Indonesia",
-"version": "360-8d8c85fe",
+"version": "360-cebb3dbc",
 "projection": {"lon0":117.3,"lat0":0.1},
 "focus": [94.1,-11.4,142,6.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"IDN","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Badan Pusat Statistik (BPS - Statistics Indonesia), World Food Programme, OCHA ROAP","year":"2020","canonical":"regency, city","boundaryId":"IDN-ADM2-22746128","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/ADM2/geoBoundaries-IDN-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["South Kalimantan","West Papua"],"license":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/ADM1/geoBoundaries-IDN-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Malaysia","km2":94},{"shape":"Timor-Leste","km2":11}]},"units":521,"areaKm2":1899395},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00045981109811098106,0.00016913782137821377],"translate":[95.03875,-11.007615099999953]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"360-001","properties":{"name":"Kota Bandung","units":3}},
 {"type":"Polygon","arcs":[[-6,6,7,8]],"id":"360-002","properties":{"name":"Purwakarta","units":3}},

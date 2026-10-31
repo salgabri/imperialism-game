@@ -2,11 +2,11 @@
 "format": 2,
 "id": "040",
 "name": "Austria",
-"version": "040-efee2347",
+"version": "040-06d7d166",
 "projection": {"lon0":14.1,"lat0":47.7},
 "focus": [9.3,46.3,17.4,49.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"AUT","level":"ADM3","license":"Creative Commons Attribution-ShareAlike 2.0","source":"Federal Office for Metrology and Survey, Austria, Derived from ADM4 layer","year":"2017","canonical":"Unknown","boundaryId":"AUT-ADM3-71698017","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AUT/ADM3/geoBoundaries-AUT-ADM3_simplified.geojson","units":2097,"areaKm2":83698},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00007631192504659913,0.00002648391461376381],"translate":[9.530952372466038,46.37280163438445]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7,8]],"id":"040-001","properties":{"name":"Wals-Siezenheim","units":12}},
 {"type":"Polygon","arcs":[[9,10,11,12,13]],"id":"040-002","properties":{"name":"Henndorf am Wallersee","units":3}},

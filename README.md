@@ -75,7 +75,7 @@ npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
 npm run build-basketball # regenerate basketball squads from an NBA 2K export
 npm run build-clubs      # regenerate the club layer for both sports
-npm run sync:domestic-clubs # refresh country club snapshots (network, cached)
+npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
 npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
@@ -608,7 +608,8 @@ kept.
 **Sources.** All of this is fetched at build time and committed; nothing loads
 from these services at runtime.
 
-- **Clubs and squads**: Football Manager 26 database 26.3.0 from
+- **Clubs and squads**: Football Manager 26 database 26.3.0 (released 30 March
+  2026, the date shown as its rating date) from
   [EFEM.club](https://efem.club), in reputation order (clubs of equal reputation
   are re-read whole, since EFEM's pages shuffle them). A club is viable if it is a
   men's first team (not a reserve, B, academy or youth side of a stronger club)
@@ -682,7 +683,11 @@ npm run test:domestic                      # shipped data, section geometry, see
 Both stages cache downloads under the ignored `data-src/`, so reruns work offline;
 from a warm cache the sync of every nation takes about 30 s. The sync is polite:
 three requests at a time with pauses and retries. Leave out `--only` to process
-every nation. A full build or `--check` runs countries in parallel worker threads
+every nation. **EFEM's `/api/`, which the sync reads, is disallowed by
+[efem.club/robots.txt](https://efem.club/robots.txt)**, so without
+`--efem-permission-granted` the sync uses only cached EFEM responses and stops at
+any request that would reach EFEM (an uncached nation, or `--refresh`). Do not
+pass the flag until EFEM grants permission. A full build or `--check` runs countries in parallel worker threads
 (`--jobs=N`, up to 8 by default) and is best run in the background. Country
 routing (anchors, foreign land, border routes) is tested by
 `scripts/domestic-routing.test.mjs`; `npm test` runs every test file, the domestic

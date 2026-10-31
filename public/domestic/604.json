@@ -2,11 +2,11 @@
 "format": 2,
 "id": "604",
 "name": "Peru",
-"version": "604-19867960",
+"version": "604-170ad922",
 "projection": {"lon0":-74.4,"lat0":-9.2},
 "focus": [-81.6,-18.8,-68.3,0.4],
 "boundaries": {"provider":"geoBoundaries","iso3":"PER","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Instituto Geográfico Nacional - IGN, OCHA ROLAC","year":"2020","canonical":"Provinces","boundaryId":"PER-ADM2-86281439","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PER/ADM2/geoBoundaries-PER-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["El Callao"],"license":"Public Domain","source":"Wikimedia Commons","url":"https://github.com/wmgeolab/geoBoundaries/raw/90a1d52/releaseData/gbOpen/PER/ADM1/geoBoundaries-PER-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Bolivia","km2":1045},{"shape":"Brazil","km2":149},{"shape":"Colombia","km2":148},{"shape":"Chile","km2":45},{"shape":"Ecuador","km2":40}]},"units":197,"areaKm2":1290660},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00012675130916786883,0.00018312504893048935],"translate":[-81.32819536499994,-18.35092773599996]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"604-001","properties":{"name":"Lima (north-east, north-west)","units":3}},
 {"type":"Polygon","arcs":[[4,-4,5,6,7]],"id":"604-002","properties":{"name":"Lachaqui","units":2}},

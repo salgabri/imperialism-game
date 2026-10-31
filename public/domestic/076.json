@@ -2,11 +2,11 @@
 "format": 2,
 "id": "076",
 "name": "Brazil",
-"version": "076-ca188dcd",
+"version": "076-2160b29c",
 "projection": {"lon0":-53.1,"lat0":-14.2},
 "focus": [-74.8,-34.6,-34,6.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"BRA","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Instituto Brasileiro de Geografia e Estatística (IBGE), OCHA ROLAC","year":"2020","canonical":"municipality","boundaryId":"BRA-ADM2-56859067","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BRA/ADM2/geoBoundaries-BRA-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Colombia","km2":641},{"shape":"Venezuela","km2":281},{"shape":"Argentina","km2":23}]},"units":5570,"areaKm2":8528679},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00039195948600486,0.00039014794444944446],"translate":[-73.99047851599994,-33.74328613299997]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"076-001","properties":{"name":"Rio de Janeiro (east)","units":3}},
 {"type":"Polygon","arcs":[[6,7,8,9,10,11,12,13,14,15]],"id":"076-002","properties":{"name":"São Paulo","units":12}},

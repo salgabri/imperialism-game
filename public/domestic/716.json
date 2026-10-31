@@ -2,11 +2,11 @@
 "format": 2,
 "id": "716",
 "name": "Zimbabwe",
-"version": "716-8d504b9c",
+"version": "716-75f773b7",
 "projection": {"lon0":29.9,"lat0":-19},
 "focus": [25,-22.6,33.2,-15.4],
 "boundaries": {"provider":"geoBoundaries","iso3":"ZWE","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"OCHA ROSEA, Zimbabwe National Statistics Agency","year":"2020","canonical":"Ward","boundaryId":"ZWE-ADM3-86381464","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ZWE/ADM3/geoBoundaries-ZWE-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Mozambique","km2":468},{"shape":"South Africa","km2":14}]},"units":1958,"areaKm2":391484},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00007801947020558768,0.00006813971372713746],"translate":[25.237597177000055,-22.42104925899997]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4]],"id":"716-001","properties":{"name":"Harare 6 (south-west)","units":26}},
 {"type":"Polygon","arcs":[[5,6,7,8,9,10,11,-5]],"id":"716-002","properties":{"name":"Beatrice","units":23}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "348",
 "name": "Hungary",
-"version": "348-8f9a8321",
+"version": "348-343d83a6",
 "projection": {"lon0":19.4,"lat0":47.2},
 "focus": [15.9,45.6,23.1,48.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"HUN","level":"ADM3","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"HUN-ADM3-24034025","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/HUN/ADM3/geoBoundaries-HUN-ADM3_simplified.geojson","units":3357,"areaKm2":92759},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00006782822528225284,0.00002848157481574816],"translate":[16.1138867,45.737128]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"348-001","properties":{"name":"Kerepesdűlő (south-east, south-west)","units":62}},
 {"type":"Polygon","arcs":[[7,8,-6,9,10,11]],"id":"348-002","properties":{"name":"Szolnok","units":13}},

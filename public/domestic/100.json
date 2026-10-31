@@ -2,11 +2,11 @@
 "format": 2,
 "id": "100",
 "name": "Bulgaria",
-"version": "100-438f2814",
+"version": "100-4e8dbb37",
 "projection": {"lon0":25.2,"lat0":42.7},
 "focus": [22.2,41.1,28.8,44.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"BGR","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikimedia","year":"2019","canonical":"Municipality","boundaryId":"BGR-ADM2-11073933","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BGR/ADM2/geoBoundaries-BGR-ADM2_simplified.geojson","units":265,"areaKm2":110767},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00006261580806220238,0.0000297651614520384],"translate":[22.348202858175398,41.23383687647072]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"100-001","properties":{"name":"Razgrad","units":6}},
 {"type":"Polygon","arcs":[[6,7,8,9,10,11,-6]],"id":"100-002","properties":{"name":"Popovo","units":2}},

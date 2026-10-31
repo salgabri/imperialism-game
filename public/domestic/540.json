@@ -2,11 +2,11 @@
 "format": 2,
 "id": "540",
 "name": "New Caledonia",
-"version": "540-33a3d645",
+"version": "540-3743f937",
 "projection": {"lon0":165.7,"lat0":-21.2},
 "focus": [163.5,-22.8,168.3,-19.5],
 "boundaries": {"provider":"Natural Earth","iso3":"NCL","level":"admin-1","license":"Public Domain","source":"Natural Earth 1:10m Cultural Vectors, Admin 1 – States, Provinces (v5.1.2)","url":"https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson","units":3,"areaKm2":18892},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00004528528285282847,0.000030469864698646967],"translate":[163.615733,-22.670668]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"540-001","properties":{"name":"Nord (south-east 8)","units":6}},
 {"type":"Polygon","arcs":[[6,7,8,9,-2]],"id":"540-002","properties":{"name":"Ouyaguette","units":4}},

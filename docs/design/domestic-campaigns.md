@@ -92,7 +92,7 @@ Two offline stages; nothing is fetched from these services at runtime.
 
 | File | Role |
 | --- | --- |
-| `scripts/sync-domestic-clubs.mjs`, `scripts/lib/domestic-sync.mjs`, `scripts/lib/domestic-locate.mjs` | Stage 1 (network, cached): EFEM clubs and squads, home towns → snapshots. |
+| `scripts/sync-domestic-clubs.mjs`, `scripts/lib/domestic-sync.mjs`, `scripts/lib/domestic-locate.mjs` | Stage 1 (network, cached; EFEM only with `--efem-permission-granted`): EFEM clubs and squads, home towns → snapshots. |
 | `scripts/data/domestic/<id>.json`, `survey.json` | Committed snapshot per nation (written only when N ≥ 2, `MIN_CLUBS`); the survey records every nation's club-list estimate `estN` and the full sync's `n`, `ships` and, for a nation that does not ship, `why`. |
 | `scripts/data/domestic-locations.json` | Manual home-town overrides, keyed by FM club id. |
 | `scripts/data/domestic-names.json` | Real names for FM's placeholder club names, keyed by FM club id. |
@@ -110,7 +110,9 @@ Every download is cached under the ignored `data-src/` (`domestic/efem`,
 `boundaries/geonames`), so reruns are offline. Requests send the User-Agent
 `imperialism-game-build/1.0 (offline data build)`. EFEM: three at a time, 0.5 s
 apart per slot, three retries with backoff on network errors, 429, 5xx and empty
-bodies. Wikidata: one at a time, 1 s apart. Boundary downloads: one at a time
+bodies, and only with `--efem-permission-granted`: efem.club/robots.txt disallows
+`/api/` (checked 18 October 2026), so without the flag the sync replays cached
+responses and refuses any EFEM request. Wikidata: one at a time, 1 s apart. Boundary downloads: one at a time
 (worker threads ask the main thread), 0.5 s apart, four tries. Nominatim is never
 used. From a warm cache the sync of every nation takes about 30 s. A full build
 takes 4.5 to 6.5 minutes: nearly all of it is Canada, whose partition runs three
@@ -461,13 +463,13 @@ clubs pushed off their unit by a stronger club.
 "format": 2,
 "id": "242",
 "name": "Fiji",
-"version": "242-7808c767",
+"version": "242-7370036d",
 "projection": {"lon0":178.5,"lat0":-17.8},
 "focus": [176.7,-19.3,181.8,-15.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"FJI","level":"ADM4","license":"…","source":"…",
   "units":1599,"areaKm2":20966,"filled":{…}},
 "source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0",
-  "snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+  "snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{…},"objects":{"sections":{"type":"GeometryCollection","geometries":[
   {"type":"Polygon","arcs":[[…]],"id":"242-001","properties":{"name":"Vadraulailai Settlement","units":46}},
   {"type":"Polygon","arcs":[[…]],"id":"242-002","properties":{"name":"Soweri Settlement","units":29}}, …]}},"arcs":[…]},

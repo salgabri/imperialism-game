@@ -2,11 +2,11 @@
 "format": 2,
 "id": "400",
 "name": "Jordan",
-"version": "400-5b4a24f2",
+"version": "400-a2e8c525",
 "projection": {"lon0":36.8,"lat0":31.3},
 "focus": [34.8,29.1,39.4,33.5],
 "boundaries": {"provider":"geoBoundaries","iso3":"JOR","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikimedia Commons","year":"2006","canonical":"Nahias","boundaryId":"JOR-ADM2-86222999","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/JOR/ADM2/geoBoundaries-JOR-ADM2_simplified.geojson","units":52,"areaKm2":89228},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000043421546435227026,0.00004190747797021408],"translate":[34.9586828422768,29.18443994838043]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"400-001","properties":{"name":"Wadi al-Sayr (east)","units":2}},
 {"type":"Polygon","arcs":[[4,5,6,7,-4,8,9,10,11]],"id":"400-002","properties":{"name":"Suwaylih","units":3}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "032",
 "name": "Argentina",
-"version": "032-67bc95e8",
+"version": "032-30cb3caf",
 "projection": {"lon0":-64.9,"lat0":-37.1},
 "focus": [-74,-55.8,-53.2,-21.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"ARG","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Instituto Geografico Nacional and UNHCR, OCHA ROLAC","year":"2020","canonical":"departments","boundaryId":"ARG-ADM2-61730980","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARG/ADM2/geoBoundaries-ARG-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Tierra del Fuego"],"license":"Creative Commons Attribution 2.5 Generic","source":"geoBoundaries, Wikimedia","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARG/ADM1/geoBoundaries-ARG-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Chile","km2":637},{"shape":"Brazil","km2":63},{"shape":"Paraguay","km2":15}]},"units":526,"areaKm2":2780187},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00019916733458463803,0.00033276896429267804],"translate":[-73.55390373515822,-55.05769845418918]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"032-001","properties":{"name":"Comuna 13","units":1}},
 {"type":"Polygon","arcs":[[4,5,6,7,8,9,10,11,12]],"id":"032-002","properties":{"name":"Comuna 4","units":1}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "096",
 "name": "Brunei",
-"version": "096-1ecc786d",
+"version": "096-879c4f01",
 "projection": {"lon0":114.8,"lat0":4.5},
 "focus": [114,3.9,115.4,5.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"BRN","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikimedia Commons; credit to user 'Rarelibra'","year":"2006","canonical":"Mukim","boundaryId":"BRN-ADM2-61948251","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BRN/ADM2/geoBoundaries-BRN-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Brunei-Muara"],"license":"Public Domain","source":"geoBoundaries, Wikimedia Commons; credit to user 'Tachymetre'","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BRN/ADM1/geoBoundaries-BRN-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Malaysia","km2":118}]},"units":39,"areaKm2":5834},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000012769000486464484,0.000010436962959629524],"translate":[114.08054525900002,4.001830178000034]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"096-001","properties":{"name":"Berakas A (south-west 4)","units":1}},
 {"type":"Polygon","arcs":[[-2,3,4,5]],"id":"096-002","properties":{"name":"Kampung Anggerek Desa","units":1}},

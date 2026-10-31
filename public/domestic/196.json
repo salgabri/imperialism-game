@@ -2,11 +2,11 @@
 "format": 2,
 "id": "196",
 "name": "Cyprus",
-"version": "196-adff5947",
+"version": "196-b2d09bd5",
 "projection": {"lon0":33,"lat0":34.9},
 "focus": [32.2,34.5,34.2,35.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"CYP","level":"ADM2","license":"Creative Commons Attribution-ShareAlike 3.0 Unported","source":"Wikipedia, Cyprus Department of Land Registry and Geometry","year":"2009","canonical":"Unknown","boundaryId":"CYP-ADM2-46923920","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CYP/ADM2/geoBoundaries-CYP-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"N. Cyprus","km2":3193}]},"units":423,"areaKm2":6076},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000018184502223914265,0.000006451447587222864],"translate":[32.26958311973395,34.56232389720144]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"196-001","properties":{"name":"Strovolos (south-east)","units":2}},
 {"type":"Polygon","arcs":[[6,-1,7,8,9]],"id":"196-002","properties":{"name":"Stavros","units":1}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "818",
 "name": "Egypt",
-"version": "818-c9333bba",
+"version": "818-c8443920",
 "projection": {"lon0":29.9,"lat0":26.8},
 "focus": [24.4,21.8,37.2,31.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"EGY","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"OCHA ROMENA/HDX, Central Agency for Public Mobilization and Statistics (CAPMAS)","year":"2020","canonical":"marakiz and aqsam","boundaryId":"EGY-ADM2-37247803","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/EGY/ADM2/geoBoundaries-EGY-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["North Sinai Governorate","Red Sea Governorate"],"license":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/EGY/ADM1/geoBoundaries-EGY-ADM1_simplified.geojson"},"units":367,"areaKm2":996466},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00012214321930219287,0.00009671248926489225],"translate":[24.69450759500006,21.999127739000073]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"818-001","properties":{"name":"Madinat Nasr-2","units":4}},
 {"type":"Polygon","arcs":[[7,8,-3,9,10,11]],"id":"818-002","properties":{"name":"Al Khusus","units":6}},

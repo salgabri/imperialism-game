@@ -2,11 +2,11 @@
 "format": 2,
 "id": "031",
 "name": "Azerbaijan",
-"version": "031-e3ec68dd",
+"version": "031-9ab22558",
 "projection": {"lon0":47.5,"lat0":40.2},
 "focus": [44.6,38.3,50.8,42],
 "boundaries": {"provider":"geoBoundaries","iso3":"AZE","level":"ADM2","license":"Creative Commons Attribution-ShareAlike 3.0 Unported","licenseDetail":"Creative Commons Attribution-ShareAlike 3.0 Unported","source":"Wikipedia","year":"2020","canonical":"Unknown","boundaryId":"AZE-ADM2-54616110","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AZE/ADM2/geoBoundaries-AZE-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Iran","km2":44},{"shape":"Armenia","km2":43},{"shape":"Georgia","km2":9},{"shape":"Russia","km2":8}]},"units":79,"areaKm2":86067},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00005855195731957305,0.00003530328881288811],"translate":[44.765151796000055,38.39114714500005]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"031-001","properties":{"name":"Baku City (west 4)","units":1}},
 {"type":"Polygon","arcs":[[-3,6,7,8,9,10]],"id":"031-002","properties":{"name":"Yeni Suraxanı","units":1}},

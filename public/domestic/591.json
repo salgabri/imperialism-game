@@ -2,11 +2,11 @@
 "format": 2,
 "id": "591",
 "name": "Panama",
-"version": "591-72831c35",
+"version": "591-dd16bd98",
 "projection": {"lon0":-80.1,"lat0":8.4},
 "focus": [-83.2,7.1,-77,9.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"PAN","level":"ADM3","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","licenseDetail":"need to update","source":"Milton Solano, of the Smithsonian Tropical Research Institute, on ArcGIS online, GIS Laboratory. Smithsonian Tropical Research Institute, Panama, 2013","year":"2012","canonical":"Unknown","boundaryId":"PAN-ADM3-15828444","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PAN/ADM3/geoBoundaries-PAN-ADM3_simplified.geojson","filled":{"level":"ADM2","units":["David"],"license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","source":"Milton Solano, of the Smithsonian Tropical Research Institute, on ArcGIS online, GIS Laboratory. Smithsonian Tropical Research Institute, Panama, 2012","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PAN/ADM2/geoBoundaries-PAN-ADM2_simplified.geojson"},"units":633,"areaKm2":74527},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00005895591100337571,0.0000243728126112395],"translate":[-83.05193016969527,7.203949490865957]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"591-001","properties":{"name":"El Coco (Coclé)","units":16}},
 {"type":"Polygon","arcs":[[7,8,9,10,11,-4,12,13]],"id":"591-002","properties":{"name":"Pocrí","units":6}},

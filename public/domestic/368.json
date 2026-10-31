@@ -2,11 +2,11 @@
 "format": 2,
 "id": "368",
 "name": "Iraq",
-"version": "368-49d10a61",
+"version": "368-61589643",
 "projection": {"lon0":43.8,"lat0":33.2},
 "focus": [38.5,28.9,48.9,37.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"IRQ","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Iraq Central Statistics Office, OCHA Iraq","year":"2021","canonical":"Districts","boundaryId":"IRQ-ADM2-34846034","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IRQ/ADM2/geoBoundaries-IRQ-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Iran","km2":313},{"shape":"Turkey","km2":48}]},"units":101,"areaKm2":436137},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00009829057054570538,0.00008307820145201457],"translate":[38.794836202000056,29.06952693900007]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"368-001","properties":{"name":"Al-Thawra (east)","units":3}},
 {"type":"Polygon","arcs":[[3,4,5,-2]],"id":"368-002","properties":{"name":"Nazl Fa'iq Bin Hasan","units":1}},

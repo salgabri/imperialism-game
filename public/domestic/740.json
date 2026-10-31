@@ -2,11 +2,11 @@
 "format": 2,
 "id": "740",
 "name": "Suriname",
-"version": "740-52adbb26",
+"version": "740-27f70115",
 "projection": {"lon0":-55.9,"lat0":4},
 "focus": [-58.2,1.8,-53.9,6.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"SUR","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikimedia Commons","year":"2021","canonical":"Ressorten","boundaryId":"SUR-ADM2-93971198","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SUR/ADM2/geoBoundaries-SUR-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Guyana","km2":225}]},"units":59,"areaKm2":144225},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000040842715623951556,0.000040589752863832285],"translate":[-58.06925938072197,1.948590174903282]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"740-001","properties":{"name":"Moengo","units":1}},
 {"type":"Polygon","arcs":[[-4,6,7,8,9]],"id":"740-002","properties":{"name":"Mongo Tapoe","units":1}},

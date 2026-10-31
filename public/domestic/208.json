@@ -2,11 +2,11 @@
 "format": 2,
 "id": "208",
 "name": "Denmark",
-"version": "208-7ef0f96c",
+"version": "208-3ea7f91f",
 "projection": {"lon0":10.1,"lat0":55.9},
 "focus": [7.9,54.5,15.3,57.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"DNK","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikimedia Commons","year":"2018","canonical":"kommune","boundaryId":"DNK-ADM2-71786716","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DNK/ADM2/geoBoundaries-DNK-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Midtjylland","Sjælland","Syddanmark"],"license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","source":"geoBoundaries, Web Vectors Map","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DNK/ADM1/geoBoundaries-DNK-ADM1_simplified.geojson"},"units":101,"areaKm2":43566},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00007080516657261015,0.00003194020817592987],"translate":[8.071461666123014,54.56587011661264]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"208-001","properties":{"name":"Copenhagen (north, west)","units":2}},
 {"type":"Polygon","arcs":[[3,-3,4,5]],"id":"208-002","properties":{"name":"Kongens Lyngby","units":1}},

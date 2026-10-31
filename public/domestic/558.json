@@ -2,11 +2,11 @@
 "format": 2,
 "id": "558",
 "name": "Nicaragua",
-"version": "558-383dfcb7",
+"version": "558-26c46a0c",
 "projection": {"lon0":-85,"lat0":12.9},
 "focus": [-87.8,10.6,-82.6,15.2],
 "boundaries": {"provider":"geoBoundaries","iso3":"NIC","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"NIC-ADM2-1004716","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NIC/ADM2/geoBoundaries-NIC-ADM2_simplified.geojson","units":153,"areaKm2":128990},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000049576786767867735,0.00004322090120901195],"translate":[-87.69194439999998,10.707656500000036]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"558-001","properties":{"name":"Ocotal","units":9}},
 {"type":"Polygon","arcs":[[6,-2,7,8,9,10,11,12,13]],"id":"558-002","properties":{"name":"Las Praderas","units":4}},

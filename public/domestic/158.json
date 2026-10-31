@@ -2,11 +2,11 @@
 "format": 2,
 "id": "158",
 "name": "Chinese Taipei",
-"version": "158-ccc3f667",
+"version": "158-beb8032e",
 "projection": {"lon0":121,"lat0":23.6},
 "focus": [118.1,21.8,122.1,26.5],
 "boundaries": {"provider":"geoBoundaries","iso3":"TWN","level":"ADM2","license":"Creative Commons Attribution-ShareAlike 2.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Townships","boundaryId":"TWN-ADM2-52511910","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TWN/ADM2/geoBoundaries-TWN-ADM2_simplified.geojson","units":368,"areaKm2":36510},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00005295528355283554,0.000056866329663296635],"translate":[116.7109295,20.6972222]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"158-001","properties":{"name":"Zuoying","units":2}},
 {"type":"Polygon","arcs":[[3,4,5,6,7,-1]],"id":"158-002","properties":{"name":"Houjing","units":2}},

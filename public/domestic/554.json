@@ -2,11 +2,11 @@
 "format": 2,
 "id": "554",
 "name": "New Zealand",
-"version": "554-565b7b5c",
+"version": "554-261ef023",
 "projection": {"lon0":172.8,"lat0":-43.6},
 "focus": [166.1,-47.6,178.8,-34.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"NZL","level":"ADM3","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","licenseDetail":"Creative Commons Attribution 4.0","source":"NZ Stats","year":"2017","canonical":"Unknown","boundaryId":"NZL-ADM3-7338077","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NZL/ADM3/geoBoundaries-NZL-ADM3_simplified.geojson","units":245,"areaKm2":267528},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00017419652916074186,0.00012897310523442103],"translate":[166.42613241546405,-47.28981173257407]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1]],"id":"554-001","properties":{"name":"Lambton Ward (north)","units":8}},
 {"type":"Polygon","arcs":[[2,-1,3,4,5]],"id":"554-002","properties":{"name":"Johnsonville","units":1}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "724",
 "name": "Spain",
-"version": "724-31fca115",
+"version": "724-9e363175",
 "projection": {"lon0":-3.7,"lat0":39.9},
 "focus": [-9.6,35,4.7,44],
 "boundaries": {"provider":"geoBoundaries","iso3":"ESP","level":"ADM3","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","licenseDetail":"Found on the Instituto Geográfico Nacional website from ESRI","source":"Open Data ESRI, IGN Central Registry of Cartography Area","year":"2018","canonical":"MUNICIPIOS","boundaryId":"ESP-ADM3-28895703","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ESP/ADM3/geoBoundaries-ESP-ADM3_simplified.geojson","units":8205,"areaKm2":505492},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0002248874345743457,0.00016153749917499207],"translate":[-18.160734529999957,27.63773346000005]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"MultiPolygon","arcs":[[[0,1,2,3,4,5]],[[6]]],"id":"724-001","properties":{"name":"Barcelona","units":138}},
 {"type":"Polygon","arcs":[[7,8,9,10,11]],"id":"724-002","properties":{"name":"Madrid (north-west)","units":2}},
