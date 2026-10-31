@@ -9,7 +9,9 @@ import { build } from 'esbuild';
 import { buildClub, buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
 import { football } from '../src/sports/football.js';
 import { basketball } from '../src/sports/basketball.js';
-import { readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
 import { loadEaPlayers, fmGameRating, parseCsv } from './lib/football-data.mjs';
 
@@ -145,7 +147,7 @@ test('every shipped rating and identity resolves to its exact committed database
   const eaById = new Map(ea.players.map(player => [player.sourceInfo.id, player]));
   const fm = JSON.parse(await readFile(new URL('./data/fm26-players.json', import.meta.url), 'utf8'));
   const fmById = new Map(fm.players.map(player => [`fm:${player.id}`, player]));
-  assert.equal(ea.fictional, 280);
+  assert.equal(ea.fictional, 316);
   assert.ok(!eaById.has('ea:230481'), 'Ronaldo Cabrais is a fictional Brazilian squad member');
   const teams = [...Object.keys(NATIONS).map(id => buildTeam(id, makeRng(1), football)),
     ...football.clubs.map(club => buildClub(club, football))];
@@ -168,10 +170,56 @@ test('every shipped rating and identity resolves to its exact committed database
         assert.equal(evidence.rawScale, 100);
         assert.equal(player.rating, fmGameRating(record.currentAbility));
         assert.equal(evidence.version, fm.source.version);
+        assert.equal(evidence.edition, fm.source.edition);
+        assert.equal(evidence.snapshotDate, fm.source.databaseDate, 'FM ratings are dated by the database release, not the fetch');
         assert.equal(record.nationId, team.id);
       }
     }
   }
+});
+
+test('generated EA clubs are excluded by 29-February births without touching real clubs', async () => {
+  const csv = await readFile(new URL('./data/ea-fc26.csv', import.meta.url), 'utf8');
+  const [header, ...rows] = parseCsv(csv);
+  const ea = await loadEaPlayers(new URL('./data/ea-fc26.csv', import.meta.url));
+  const records = new Map(ea.players.map(player => [player.sourceInfo.id, player]));
+  const generated = new Set(ea.fictionalFilter.clubs.map(club => club.clubId));
+  // Regression: India's XI shipped this generated Mohammedan SC defender.
+  assert.ok(!records.has('ea:279319'), 'M. Radhakrishnann (born 1996-02-29) is a generated player');
+  assert.ok(!buildTeam('356', makeRng(1), football).squad.some(player => player.id === 'ea:279319'));
+  assert.ok(generated.has(111633) && generated.has(114023), 'Mohammedan SC and Western United are generated in FC 26');
+  const leagueRows = id => rows.filter(row => Number(row[header.indexOf('league_id')]) === id).length;
+  assert.equal(ea.fictionalFilter.clubs.filter(club => club.league === 'Série A').length, 14);
+  assert.equal(ea.players.filter(player => player.leagueId === 7).length, 0, 'every generated Brazilian Série A club stays excluded');
+  assert.equal(ea.players.filter(player => player.leagueId === 31).length, leagueRows(31), "Italy's Serie A is untouched");
+  assert.equal(ea.fictionalFilter.clubPlayers + ea.fictionalFilter.clubless.length, ea.fictional);
+  assert.equal(ea.fictionalFilter.keptRealClubLeapDayBirths, 16);
+  for (const id of ['ea:241461', 'ea:277031', 'ea:245741', 'ea:241775']) assert.ok(records.has(id), `${id} is a real 29-February birth`);
+  const teams = [...Object.keys(NATIONS).map(id => buildTeam(id, makeRng(1), football)),
+    ...football.clubs.map(club => buildClub(club, football))];
+  for (const player of teams.flatMap(team => team.squad)) assert.ok(!generated.has(player.sourceInfo.clubId), `${player.id} plays for a generated club`);
+});
+
+test('the 29-February filter drops half-generated clubs and clubless players only', async () => {
+  const columns = ['player_id', 'player_url', 'fifa_version', 'fifa_update', 'fifa_update_date', 'short_name', 'long_name',
+    'player_positions', 'overall', 'nationality_name', 'club_name', 'club_team_id', 'league_id', 'league_name', 'league_level', 'dob'];
+  const row = (id, club, clubId, dob) => [id, `/player/${id}/p/260004/`, '26', '4', '2025-09-19', `P. ${id}`, `Player ${id}`,
+    'CM', '70', 'Spain', club, clubId, clubId ? '53' : '', clubId ? 'La Liga' : '', clubId ? '1' : '', dob].join(',');
+  const dir = await mkdtemp(path.join(tmpdir(), 'ea-fictional-'));
+  const file = path.join(dir, 'ea.csv');
+  try {
+    await writeFile(file, [columns.join(','),
+      row(1, 'Half Generated', '900.0', '1990-02-29'), row(2, 'Half Generated', '900.0', '1991-02-29'),
+      row(3, 'Half Generated', '900.0', '1992-03-01'), row(4, 'Half Generated', '900.0', '1993-05-05'),
+      row(5, 'Real Club', '901.0', '2000-02-29'), row(6, 'Real Club', '901.0', '1995-06-01'), row(7, 'Real Club', '901.0', '1996-07-02'),
+      row(8, '', '', '1996-02-29'), row(9, '', '', '1996-02-28')].join('\n') + '\n');
+    const ea = await loadEaPlayers(file);
+    assert.deepEqual(ea.players.map(player => player.sourceInfo.id), ['ea:5', 'ea:6', 'ea:7', 'ea:9']);
+    assert.equal(ea.fictional, 5);
+    assert.deepEqual(ea.fictionalFilter.clubs, [{ clubId: 900, club: 'Half Generated', league: 'La Liga', players: 4 }]);
+    assert.deepEqual(ea.fictionalFilter.clubless, ['ea:8']);
+    assert.equal(ea.fictionalFilter.keptRealClubLeapDayBirths, 1);
+  } finally { await rm(dir, { recursive: true, force: true }); }
 });
 
 test('competition IDs keep foreign namesakes out of the European club leagues', async () => {

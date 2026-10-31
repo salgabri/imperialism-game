@@ -8,12 +8,119 @@
       }
     ],
     "records": 18405,
-    "excludedFictional": 280
+    "excludedFictional": 316,
+    "fictionalFilter": {
+      "rule": "Drop clubs (club_team_id) where at least half the squad is born on 29 February, and clubless players born on 29 February.",
+      "clubs": [
+        {
+          "clubId": 517,
+          "club": "Botafogo",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 1048,
+          "club": "Internacional",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 567,
+          "club": "Fluminense",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 1719,
+          "club": "Vitória",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 383,
+          "club": "Palmeiras",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 1035,
+          "club": "Atlético Mineiro",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 569,
+          "club": "Vasco da Gama",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 1041,
+          "club": "Corinthians",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 1629,
+          "club": "Grêmio",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 598,
+          "club": "São Paulo",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 1598,
+          "club": "Bahia",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 1043,
+          "club": "Flamengo",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 568,
+          "club": "Cruzeiro",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 111052,
+          "club": "Fortaleza",
+          "league": "Série A",
+          "players": 20
+        },
+        {
+          "clubId": 111633,
+          "club": "Mohammedan SC",
+          "league": "Super League",
+          "players": 18
+        },
+        {
+          "clubId": 114023,
+          "club": "Western United",
+          "league": "A-League Men",
+          "players": 18
+        }
+      ],
+      "clubPlayers": 316,
+      "clubless": [],
+      "keptRealClubLeapDayBirths": 16
+    }
   },
   "fm": {
     "provider": "EFEM.club",
     "game": "Football Manager 26",
+    "edition": "FM 26",
     "version": "26.3.0",
+    "databaseDate": "2026-03-30",
+    "databaseDateNote": "Release date of the FM26 26.3.0 data update; fetchedAt is only the retrieval time.",
     "fetchedAt": "2026-10-02T18:01:50.147Z",
     "url": "https://efem.club/players",
     "endpoint": "https://efem.club/api/players/filter",
@@ -28,6 +135,121 @@
   },
   "fmRecords": 16856,
   "omittedPossibleDuplicates": 4951,
+  "unmappedPlayers": 106,
+  "unmappedNationalities": [
+    {
+      "nationality": "Cabo Verde",
+      "players": 29,
+      "ea": 29,
+      "fm": 0,
+      "bestRating": 77
+    },
+    {
+      "nationality": "Curacao",
+      "players": 15,
+      "ea": 15,
+      "fm": 0,
+      "bestRating": 71
+    },
+    {
+      "nationality": "Comoros",
+      "players": 13,
+      "ea": 13,
+      "fm": 0,
+      "bestRating": 77
+    },
+    {
+      "nationality": "Hong Kong",
+      "players": 9,
+      "ea": 9,
+      "fm": 0,
+      "bestRating": 67
+    },
+    {
+      "nationality": "Grenada",
+      "players": 8,
+      "ea": 8,
+      "fm": 0,
+      "bestRating": 69
+    },
+    {
+      "nationality": "Malta",
+      "players": 8,
+      "ea": 8,
+      "fm": 0,
+      "bestRating": 75
+    },
+    {
+      "nationality": "Antigua and Barbuda",
+      "players": 4,
+      "ea": 4,
+      "fm": 0,
+      "bestRating": 65
+    },
+    {
+      "nationality": "Faroe Islands",
+      "players": 4,
+      "ea": 4,
+      "fm": 0,
+      "bestRating": 64
+    },
+    {
+      "nationality": "Saint Kitts and Nevis",
+      "players": 4,
+      "ea": 4,
+      "fm": 0,
+      "bestRating": 64
+    },
+    {
+      "nationality": "Montserrat",
+      "players": 3,
+      "ea": 3,
+      "fm": 0,
+      "bestRating": 65
+    },
+    {
+      "nationality": "Saint Lucia",
+      "players": 3,
+      "ea": 3,
+      "fm": 0,
+      "bestRating": 66
+    },
+    {
+      "nationality": "Bermuda",
+      "players": 2,
+      "ea": 2,
+      "fm": 0,
+      "bestRating": 70
+    },
+    {
+      "nationality": "Andorra",
+      "players": 1,
+      "ea": 1,
+      "fm": 0,
+      "bestRating": 67
+    },
+    {
+      "nationality": "Barbados",
+      "players": 1,
+      "ea": 1,
+      "fm": 0,
+      "bestRating": 63
+    },
+    {
+      "nationality": "Gibraltar",
+      "players": 1,
+      "ea": 1,
+      "fm": 0,
+      "bestRating": 52
+    },
+    {
+      "nationality": "Liechtenstein",
+      "players": 1,
+      "ea": 1,
+      "fm": 0,
+      "bestRating": 58
+    }
+  ],
   "unknownAbility": [],
   "conversion": "round(EFEM currentAbility * 99 / 100)",
   "nationalTeams": 173,

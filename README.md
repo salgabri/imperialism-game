@@ -402,13 +402,19 @@ Game ratings use a 1–99 display range, with the original source values retaine
 
 **Football** — `src/data/rosters.js` combines the committed EA FC 26 update 4
 snapshot (19 September 2025; 18,405 records) with Football Manager 26 database
-26.3.0 from [EFEM.club](https://efem.club/players), retrieved on 2 October 2026.
+26.3.0 (released 30 March 2026, the date shown as its rating date) from
+[EFEM.club](https://efem.club/players), retrieved on 2 October 2026.
 All **173 nations field eleven source-backed players**, with natural coverage for
 a 4-4-2. The builder prioritises unchanged EA overall ratings and uses FM to fill
 coverage gaps. It retains database IDs, full/display names, all natural roles,
 source URLs, versions, dates and original ratings through transfers and saves.
-The 280 generic Brazilian domestic players in EA's unlicensed `Série A` are
-excluded; this does not exclude the Italian `Serie A`.
+EA fills unlicensed clubs with generated players born on 29 February. The builder
+drops any club where at least half the squad has that birthday, plus clubless
+29-February players. That removes 316 players: 14 Brazilian `Série A` clubs, plus
+Mohammedan SC and Western United. The Italian `Serie A` and isolated 29-February
+births at real clubs (Ferran Torres, Khusanov) are kept. Nationalities with no
+map nation (16 names, such as Cabo Verde and Malta) are listed in the audit
+rather than silently dropped.
 
 EFEM displays FM Current Ability on a normalised 1–100 scale. The game converts
 it once using `round(currentAbility * 99 / 100)` and exposes both values in the
@@ -418,6 +424,20 @@ does not claim an official equivalence. These are **dated fantasy XIs by databas
 nationality**, including international retirees, rather than current call-ups.
 Existing campaigns retain their saved squads; start a new campaign to use the
 updated data. See `docs/design/football-roster-audit.json` for per-nation coverage.
+
+**Football data sources and attribution.** `scripts/data/ea-fc26.csv` is a reduced
+copy (selected columns only) of
+[*FC 26 (FIFA 26) Player Data*](https://www.kaggle.com/datasets/rovnez/fc-26-fifa-26-player-data)
+by rovnez on Kaggle, licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). That dataset was collected
+from [sofifa.com](https://sofifa.com), which squad rows link to as rating evidence.
+`src/data/rosters.js` and `src/data/clubs.football.js` are derived from it. FM
+ratings come from Football Manager 26 database 26.3.0 as displayed by EFEM.club.
+
+This project is not affiliated with, endorsed or sponsored by Electronic Arts
+(EA SPORTS FC, FIFA, Madden NFL), Sports Interactive and SEGA (Football Manager),
+2K (NBA 2K), the NBA, the NFL, or the clubs, leagues and federations it names.
+All trademarks, names and ratings belong to their respective owners.
 
 **American football** — `src/data/clubs.american-football.js`, the 32 NFL
 franchises of Madden NFL 27 (Week 7 Ratings, retrieved 2026-10-30 from EA SPORTS'
@@ -477,17 +497,20 @@ To rebuild after swapping datasets:
 
 ```bash
 npm run build-rosters [path/to/players.csv]   # football
-npm run sync:football-manager                # refresh the pinned FM database supplement
 npm run build-basketball                     # basketball
 ```
 
 Football builders default to the committed reduced source snapshots in
 `scripts/data/`, so regeneration works without network access. An optional EA
 CSV must also include player IDs/URLs, full names, database version/update/date,
-birth dates and club/competition IDs. The FM refresh reads the same public
-endpoint and filters as EFEM's player grid. The original large exports remain in
+birth dates and club/competition IDs. The original large exports remain in
 ignored `data-src/`; only fields used for roster construction and evidence are
 retained in the committed snapshots.
+
+**Do not run `npm run sync:football-manager`.** It refreshes the FM supplement
+through EFEM's `/api/`, which [efem.club/robots.txt](https://efem.club/robots.txt)
+disallows. It must not be run until EFEM grants permission, and it refuses to
+fetch without `--efem-permission-granted`.
 
 ## The club layer
 

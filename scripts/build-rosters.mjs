@@ -11,12 +11,21 @@ const source = process.argv[2] || path.join(root, 'scripts/data/ea-fc26.csv');
 const fmSource = process.argv[3] || path.join(root, 'scripts/data/fm26-players.json');
 const data = await loadFootballData(source, fmSource);
 const nameToId = Object.fromEntries(Object.entries(NATIONS).map(([id, rec]) => [rec[0], id]));
-const pools = {};
+const pools = {}, unmapped = new Map();
 for (const player of data.players) {
   const id = nameToId[player.nation];
-  if (!id) continue;
+  if (!id) {
+    // Off-map nations (Cabo Verde, Malta) land here, but so would a missing alias.
+    const row = unmapped.get(player.nation) || { nationality: player.nation, players: 0, ea: 0, fm: 0, bestRating: 0 };
+    row.players++;
+    row[player.sourceInfo.source === 'ea-fc' ? 'ea' : 'fm']++;
+    row.bestRating = Math.max(row.bestRating, player.rating);
+    unmapped.set(player.nation, row);
+    continue;
+  }
   (pools[id] ||= []).push(player);
 }
+const unmappedNationalities = [...unmapped.values()].sort((a, b) => b.players - a.players || a.nationality.localeCompare(b.nationality));
 
 const rosters = {}, coverage = [];
 for (const [id, rec] of Object.entries(NATIONS)) {
@@ -47,8 +56,9 @@ const eaSnapshots = [...new Map(data.ea.players.map(player => {
   return [`${edition}:${update}:${snapshotDate}`, { edition, update, snapshotDate }];
 })).values()];
 const report = { ea: { snapshots: eaSnapshots,
-  records: data.ea.rows, excludedFictional: data.ea.fictional }, fm: data.fm,
+  records: data.ea.rows, excludedFictional: data.ea.fictional, fictionalFilter: data.ea.fictionalFilter }, fm: data.fm,
   fmRecords: data.fmCount, omittedPossibleDuplicates: data.duplicateCandidates,
+  unmappedPlayers: unmappedNationalities.reduce((total, row) => total + row.players, 0), unmappedNationalities,
   unknownAbility: data.unknownAbility, conversion: 'round(EFEM currentAbility * 99 / 100)',
   nationalTeams: coverage.length, fullXIs: coverage.filter(r => r.players === 11).length,
   eaShirts: coverage.reduce((total, row) => total + row.ea, 0),
@@ -56,6 +66,12 @@ const report = { ea: { snapshots: eaSnapshots,
   coverage };
 await writeFile(path.join(root, 'docs/design/football-roster-audit.json'), `${JSON.stringify(report, null, 2)}\n`);
 console.log(`National squads: ${report.fullXIs}/${report.nationalTeams} complete XIs; ${report.eaShirts} EA + ${report.fmShirts} FM players; zero generated.`);
-console.log(`Excluded ${data.ea.fictional} fictional EA Brazilian domestic players; omitted ${data.duplicateCandidates} possible duplicate FM identities.`);
+const { fictionalFilter } = data.ea;
+console.log(`Excluded ${data.ea.fictional} generated EA players: ${fictionalFilter.clubPlayers} at ${fictionalFilter.clubs.length} clubs where at least half the squad is born on 29 February, ${fictionalFilter.clubless.length} clubless; kept ${fictionalFilter.keptRealClubLeapDayBirths} 29-February births at real clubs.`);
+console.log(`Omitted ${data.duplicateCandidates} possible duplicate FM identities.`);
+if (unmappedNationalities.length) {
+  console.log(`Skipped ${report.unmappedPlayers} players whose nationality has no map nation (${unmappedNationalities.length} names): `
+    + unmappedNationalities.map(row => `${row.nationality} ${row.players}`).join(', '));
+}
 const incomplete = coverage.filter(row => row.players < 11 || !row.goalkeeper || !row.naturalLineup);
 if (incomplete.length) console.log('Coverage requiring attention:', incomplete);

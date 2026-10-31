@@ -1,15 +1,35 @@
+// ============================================================================
+// DO NOT RUN THIS SCRIPT until EFEM.club grants written permission.
+// https://efem.club/robots.txt disallows /api/ (checked 18 October 2026), and
+// every request below goes to /api/players/filter. The builders use the
+// committed scripts/data/fm26-players.json and never need this script.
+// It refuses to fetch unless --efem-permission-granted is passed; pass that
+// only once EFEM has said yes. See the Squads section of README.md.
+// ============================================================================
+//
 // Refresh the small, reproducible FM26 supplement used by the football builders.
-// This reads the same public endpoint and filters used by EFEM.club's player grid.
+// This reads the same endpoint and filters used by EFEM.club's player grid.
 // It deliberately requests Current Ability, never EFEM Score or potential.
-// Usage: node scripts/sync-football-manager.mjs [output.json]
+// Usage: node scripts/sync-football-manager.mjs --efem-permission-granted [output.json]
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
 
+const PERMISSION_FLAG = '--efem-permission-granted';
+console.warn(`WARNING: efem.club/robots.txt disallows /api/, which this script uses.
+Do not run it until EFEM grants permission. The committed FM snapshot is used by the builders.`);
+if (!process.argv.includes(PERMISSION_FLAG)) {
+  console.warn(`Refusing to fetch. Pass ${PERMISSION_FLAG} only once EFEM has granted permission.`);
+  process.exit(1);
+}
+
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const output = process.argv[2] || path.join(root, 'scripts/data/fm26-players.json');
+const output = process.argv.slice(2).find(arg => arg !== PERMISSION_FLAG) || path.join(root, 'scripts/data/fm26-players.json');
+const EDITION = 'FM 26';
 const VERSION = '26.3.0';
+// Release date of the FM26 26.3.0 data update: the ratings' as-of date.
+const DATABASE_DATE = '2026-03-30';
 const PAGE_SIZE = 100;
 const LIMIT = 100;
 const CONCURRENCY = 4;
@@ -116,7 +136,10 @@ const data = {
   source: {
     provider: 'EFEM.club',
     game: 'Football Manager 26',
+    edition: EDITION,
     version: VERSION,
+    databaseDate: DATABASE_DATE,
+    databaseDateNote: `Release date of the FM26 ${VERSION} data update; fetchedAt is only the retrieval time.`,
     fetchedAt: new Date().toISOString(),
     url: `${ORIGIN}/players`,
     endpoint: `${ORIGIN}/api/players/filter`,
@@ -127,7 +150,7 @@ const data = {
     naturalPositionMinimum: NATURAL_POSITION_MIN,
     selection: `Up to ${LIMIT} highest Current Ability male players per map nation; exact primary nationality code; known natural position; no inferred identity or ratings.`,
     identityNote: 'Names are the database display names. The public Default view does not expose date of birth or EA player IDs.',
-    updateCommand: 'node scripts/sync-football-manager.mjs',
+    updateCommand: 'node scripts/sync-football-manager.mjs --efem-permission-granted',
   },
   nations: results.map(({ players: nationPlayers, ...result }) => ({ ...result, selected: nationPlayers.length, queryUrl: requestUrl(result.query) })),
   players,

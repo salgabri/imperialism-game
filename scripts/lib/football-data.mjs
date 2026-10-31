@@ -46,14 +46,37 @@ export async function loadEaPlayers(filename) {
     if (index < 0) throw new Error(`EA CSV is missing "${name}"`);
     return [name, index];
   }));
-  const seen = new Set(), players = [];
-  let fictional = 0;
   for (const [index, row] of rows.entries()) {
     if (row.length !== header.length) throw new Error(`EA CSV row ${index + 2} has ${row.length} fields; expected ${header.length}`);
+  }
+  // EA fills unlicensed squads with generated players, all born on 29 February:
+  // Brazil's Série A clubs, and in FC 26 also Mohammedan SC and Western United.
+  // League names cannot find them (Leone's files call Brazil's and Italy's
+  // leagues both "Serie A"), so key on the club: drop a club when at least half
+  // its squad is born on 29 February, and drop clubless 29-February players one
+  // by one. Isolated 29-February births at real clubs (Ferran Torres) stay.
+  const leapDay = row => row[columns.dob].slice(5) === '02-29';
+  const clubs = new Map();
+  for (const row of rows) {
+    const clubId = Number(row[columns.club_team_id]);
+    if (!clubId) continue;
+    const club = clubs.get(clubId) || { clubId, club: row[columns.club_name], league: row[columns.league_name], players: 0, leapDay: 0 };
+    club.players++;
+    if (leapDay(row)) club.leapDay++;
+    clubs.set(clubId, club);
+  }
+  const generatedClubs = [...clubs.values()].filter(club => club.leapDay * 2 >= club.players);
+  const generatedIds = new Set(generatedClubs.map(club => club.clubId));
+  const seen = new Set(), players = [], clubless = [];
+  let fictional = 0;
+  for (const row of rows) {
     const get = name => row[columns[name]];
-    // EA's unlicensed Brazilian domestic squads use invented identities.
-    // This accented league name is distinct from the Italian "Serie A".
-    if (get('league_name') === 'Série A') { fictional++; continue; }
+    const clubId = Number(get('club_team_id'));
+    if (clubId ? generatedIds.has(clubId) : leapDay(row)) {
+      fictional++;
+      if (!clubId) clubless.push(`ea:${get('player_id')}`);
+      continue;
+    }
     const id = `ea:${get('player_id')}`;
     if (!/^ea:\d+$/.test(id) || seen.has(id)) throw new Error(`Invalid or duplicate EA player ID: ${id}`);
     seen.add(id);
@@ -75,7 +98,15 @@ export async function loadEaPlayers(filename) {
         dateOfBirth: get('dob'), naturalPositions: natural },
     });
   }
-  return { players, fictional, rows: rows.length };
+  const fictionalFilter = {
+    rule: 'Drop clubs (club_team_id) where at least half the squad is born on 29 February, and clubless players born on 29 February.',
+    clubs: generatedClubs.map(({ leapDay: _, ...club }) => club),
+    clubPlayers: generatedClubs.reduce((total, club) => total + club.players, 0),
+    clubless,
+    keptRealClubLeapDayBirths: [...clubs.values()].filter(club => !generatedIds.has(club.clubId))
+      .reduce((total, club) => total + club.leapDay, 0),
+  };
+  return { players, fictional, fictionalFilter, rows: rows.length };
 }
 
 export const playerTuple = player => [player.name, player.pos, player.rating, player.sourceInfo];
@@ -113,7 +144,9 @@ function mayBeSamePlayer(ea, fm) {
 export async function loadFootballData(eaFilename, fmFilename) {
   const ea = await loadEaPlayers(eaFilename);
   const snapshot = JSON.parse(await readFile(fmFilename, 'utf8'));
-  if (!snapshot.source?.version || !Array.isArray(snapshot.players)) throw new Error('Missing FM snapshot metadata/players');
+  const { edition, version, databaseDate } = snapshot.source || {};
+  // The database date is the FM data update's release, not when it was fetched.
+  if (!edition || !version || !/^\d{4}-\d{2}-\d{2}$/.test(databaseDate || '') || !Array.isArray(snapshot.players)) throw new Error('Missing FM snapshot metadata/players');
   const fmNationNames = new Map(snapshot.nations.map(nation => [nation.nationId, nation.nationName]));
   const seen = new Set(), fmPlayers = [], unknownAbility = [];
   for (const record of snapshot.players) {
@@ -132,8 +165,8 @@ export async function loadFootballData(eaFilename, fmFilename) {
     fmPlayers.push({ name, pos: positions[0], positions, rating: fmGameRating(record.currentAbility),
       nation: fmNationNames.get(record.nationId),
       club: record.clubName || '',
-      sourceInfo: { id, fullName: name, positions, source: 'football-manager', edition: 'FM 26',
-        version: snapshot.source.version, snapshotDate: snapshot.source.fetchedAt.slice(0, 10),
+      sourceInfo: { id, fullName: name, positions, source: 'football-manager', edition,
+        version, snapshotDate: databaseDate,
         url: record.url || `https://efem.club/players/${record.id}-${encodeURIComponent(name.replace(/\s+/g, '-'))}`,
         rawRating: record.currentAbility, rawScale: 100, conversion: 'round(currentAbility * 99 / 100)',
         nationality: record.primaryNationality.name, club: record.clubName || '', naturalPositions: natural },
