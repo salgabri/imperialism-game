@@ -2,11 +2,11 @@
 "format": 2,
 "id": "356",
 "name": "India",
-"version": "356-eb7bf492",
+"version": "356-44006f62",
 "projection": {"lon0":79.6,"lat0":21.8},
 "focus": [67.5,6.1,98,36.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"IND","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"Pathways Data Pvt. Ltd., lgdirectory.gov.in","year":"2021","canonical":"District","boundaryId":"IND-ADM2-76128533","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IND/ADM2/geoBoundaries-IND-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Pakistan","km2":77765},{"shape":"China","km2":37724},{"shape":"Siachen Glacier","km2":2314},{"shape":"Myanmar","km2":532},{"shape":"Afghanistan","km2":309},{"shape":"Bangladesh","km2":128},{"shape":"Bhutan","km2":90},{"shape":"Nepal","km2":52}]},"units":734,"areaKm2":3162247},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0002920218380403522,0.0002876633240479362],"translate":[68.17939,6.75862]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7]],"id":"356-001","properties":{"name":"North Twenty Four Parganas (west)","units":13}},
 {"type":"Polygon","arcs":[[8,9,10,11,12,13,-7,14]],"id":"356-002","properties":{"name":"Patna","units":25}},

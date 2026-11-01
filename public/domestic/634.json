@@ -2,11 +2,11 @@
 "format": 2,
 "id": "634",
 "name": "Qatar",
-"version": "634-8df8c65e",
+"version": "634-aac5b488",
 "projection": {"lon0":51.2,"lat0":25.3},
 "focus": [50.7,24.4,51.7,26.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"QAT","level":"ADM2","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","source":"geoBoundaries, Qatar Open Data Portal","year":"2015","canonical":"Unknown","boundaryId":"QAT-ADM2-91078587","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/QAT/ADM2/geoBoundaries-QAT-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Saudi Arabia","km2":241}]},"units":79,"areaKm2":11340},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00000912037620376209,0.000016512941890386907],"translate":[50.750012,24.5318785239032]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7,8,9]],"id":"634-001","properties":{"name":"Fariq al Ghanim al Jadid","units":3}},
 {"type":"Polygon","arcs":[[10,11,-9,12,13]],"id":"634-002","properties":{"name":"Wadi Jallal","units":3}},

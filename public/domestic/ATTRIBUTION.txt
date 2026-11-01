@@ -18,178 +18,178 @@ Section names: the boundary layers' unit names; broken or cut-off ones are repla
   (cities1000, or the country file for a garbled layer) or by the Natural Earth admin-1 region.
 Land the game's world map (public/countries-50m.json: world-atlas 2.0.2, ISC; Natural Earth 1:50m,
   public domain) draws for another country is cut from a domestic map; see "Cut" lines below.
-Clubs, squads and player abilities: Football Manager 26 data as published by EFEM.club
-  (https://efem.club), version 26.3.0, retrieved at build time. Football Manager is a trademark
-  of Sports Interactive; this game is not affiliated with or endorsed by them or EFEM.club.
+Clubs, squads and player abilities: Football Manager 26 database 26.3.0 (released 2026-03-30),
+  as published by EFEM.club (https://efem.club). Football Manager is a trademark of Sports
+  Interactive; this game is not affiliated with or endorsed by them or EFEM.club.
 
 Per country:
 
-Albania (008), 008-ae6b5796: geoBoundaries ALB ADM3, 373 units
+Albania (008), 008-36afec88: geoBoundaries ALB ADM3, 373 units
   Source: OpenStreetMap, Wambacher (2013)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ALB/ADM3/geoBoundaries-ALB-ADM3_simplified.geojson
 
-Algeria (012), 012-c09ded06: geoBoundaries DZA ADM3, 1539 units
+Algeria (012), 012-178affdc: geoBoundaries DZA ADM3, 1539 units
   Source: Open Street Map (2021)
   Licence: Creative Commons Attribution-ShareAlike 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DZA/ADM3/geoBoundaries-DZA-ADM3_simplified.geojson
   Cut (the world map's Libya 539 km², Tunisia 450 km², Morocco 92 km², Mali 21 km²)
 
-Angola (024), 024-69970358: geoBoundaries AGO ADM3, 558 units
+Angola (024), 024-4fecf84b: geoBoundaries AGO ADM3, 558 units
   Source: geoBoundaries, Instituto Nacional de Estatística, República de Angola; citypopulation.de (2014)
   Licence: Creative Commons Attribution 3.0 License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AGO/ADM3/geoBoundaries-AGO-ADM3_simplified.geojson
   Cut (the world map's Zambia 304 km², Dem. Rep. Congo 282 km², Congo 11 km²)
 
-Argentina (032), 032-67bc95e8: geoBoundaries ARG ADM2, 526 units
+Argentina (032), 032-30cb3caf: geoBoundaries ARG ADM2, 526 units
   Source: Instituto Geografico Nacional and UNHCR, OCHA ROLAC (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARG/ADM2/geoBoundaries-ARG-ADM2_simplified.geojson
   Filled from ADM1 (Tierra del Fuego): geoBoundaries, Wikimedia, Creative Commons Attribution 2.5 Generic, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARG/ADM1/geoBoundaries-ARG-ADM1_simplified.geojson
   Cut (the world map's Chile 637 km², Brazil 63 km², Paraguay 15 km²)
 
-Armenia (051), 051-05d1e09f: geoBoundaries ARM ADM2, 40 units
+Armenia (051), 051-284fcea7: geoBoundaries ARM ADM2, 40 units
   Source: Government of Armenia, OCHA ROCCA (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARM/ADM2/geoBoundaries-ARM-ADM2_simplified.geojson
   Filled from ADM1 (Gegharkunik): geoBoundaries, Wikimedia, Creative Commons Attribution 2.5 Generic, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARM/ADM1/geoBoundaries-ARM-ADM1_simplified.geojson
   Cut (the world map's Azerbaijan 61 km²)
 
-Australia (036), 036-f053b1f8: geoBoundaries AUS ADM2, 545 units
+Australia (036), 036-5b49ef99: geoBoundaries AUS ADM2, 545 units
   Source: Australian Bureau of Statistics (2022)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AUS/ADM2/geoBoundaries-AUS-ADM2_simplified.geojson
   Cut (the world map's Indian Ocean Ter. 137 km², Norfolk Island 37 km²)
 
-Austria (040), 040-efee2347: geoBoundaries AUT ADM3, 2097 units
+Austria (040), 040-06d7d166: geoBoundaries AUT ADM3, 2097 units
   Source: Federal Office for Metrology and Survey, Austria, Derived from ADM4 layer (2017)
   Licence: Creative Commons Attribution-ShareAlike 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AUT/ADM3/geoBoundaries-AUT-ADM3_simplified.geojson
 
-Azerbaijan (031), 031-e3ec68dd: geoBoundaries AZE ADM2, 79 units
+Azerbaijan (031), 031-9ab22558: geoBoundaries AZE ADM2, 79 units
   Source: Wikipedia (2020)
   Licence: Creative Commons Attribution-ShareAlike 3.0 Unported - Creative Commons Attribution-ShareAlike 3.0 Unported
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AZE/ADM2/geoBoundaries-AZE-ADM2_simplified.geojson
   Cut (the world map's Iran 44 km², Armenia 43 km², Georgia 9 km², Russia 8 km²)
 
-Bangladesh (050), 050-d9626a5a: geoBoundaries BGD ADM3, 544 units
+Bangladesh (050), 050-95fea29c: geoBoundaries BGD ADM3, 544 units
   Source: Bangladesh Bureau of Statistics (BBS), OCHA ROAP (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BGD/ADM3/geoBoundaries-BGD-ADM3_simplified.geojson
   Cut (the world map's India 543 km², Myanmar 23 km²)
 
-Belarus (112), 112-868efa18: geoBoundaries BLR ADM2, 118 units
+Belarus (112), 112-d73213c0: geoBoundaries BLR ADM2, 118 units
   Source: geoBoundaries, CIESIN (2005)
   Licence: Creative Commons Attribution 3.0 License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BLR/ADM2/geoBoundaries-BLR-ADM2_simplified.geojson
   Cut (the world map's Russia 28 km², Ukraine 8 km², Lithuania 4 km²)
 
-Belgium (056), 056-54599d87: geoBoundaries BEL ADM4, 589 units
+Belgium (056), 056-9fc2b84a: geoBoundaries BEL ADM4, 589 units
   Source: Namur Capitale, Statistics Belgium (2018)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BEL/ADM4/geoBoundaries-BEL-ADM4_simplified.geojson
 
-Belize (084), 084-ba8ab21d: geoBoundaries BLZ ADM2, 31 units
+Belize (084), 084-ca9f33e0: geoBoundaries BLZ ADM2, 31 units
   Source: geoBoundaries, Wikipedia (2008)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BLZ/ADM2/geoBoundaries-BLZ-ADM2_simplified.geojson
 
-Benin (204), 204-dd4dc064: geoBoundaries BEN ADM3, 546 units
+Benin (204), 204-c9c24f0d: geoBoundaries BEN ADM3, 546 units
   Source: uMap, Open Street Map (2021)
   Licence: Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BEN/ADM3/geoBoundaries-BEN-ADM3_simplified.geojson
 
-Bhutan (064), 064-bd9a84dc: geoBoundaries BTN ADM2, 205 units
+Bhutan (064), 064-9bb2fd04: geoBoundaries BTN ADM2, 205 units
   Source: OCHA ROAP (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BTN/ADM2/geoBoundaries-BTN-ADM2_simplified.geojson
   Cut (the world map's India 36 km², China 10 km²)
 
-Bolivia (068), 068-86ec6ae6: geoBoundaries BOL ADM3, 339 units
+Bolivia (068), 068-20ee7aef: geoBoundaries BOL ADM3, 339 units
   Source: GeoBolivia (2015)
   Licence: Public Domain - Public Domain; free use and access to information
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BOL/ADM3/geoBoundaries-BOL-ADM3_simplified.geojson
   Cut (the world map's Paraguay 281 km², Brazil 212 km²)
 
-Bosnia & Herz. (070), 070-f9ea18e4: geoBoundaries BIH ADM3, 142 units
+Bosnia & Herz. (070), 070-fdecd84e: geoBoundaries BIH ADM3, 142 units
   Source: Wikimedia Commons (2013)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/f549eab/releaseData/gbOpen/BIH/ADM3/geoBoundaries-BIH-ADM3_simplified.geojson
   Cut (the world map's Serbia 5 km²)
 
-Botswana (072), 072-34fa0f4d: geoBoundaries BWA ADM2, 25 units
+Botswana (072), 072-65e4e4b0: geoBoundaries BWA ADM2, 25 units
   Source: RCMRD (2015)
   Licence: Public Domain - PD
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BWA/ADM2/geoBoundaries-BWA-ADM2_simplified.geojson
   Cut (the world map's South Africa 47 km²)
 
-Brazil (076), 076-ca188dcd: geoBoundaries BRA ADM2, 5570 units
+Brazil (076), 076-2160b29c: geoBoundaries BRA ADM2, 5570 units
   Source: Instituto Brasileiro de Geografia e Estatística (IBGE), OCHA ROLAC (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BRA/ADM2/geoBoundaries-BRA-ADM2_simplified.geojson
   Cut (the world map's Colombia 641 km², Venezuela 281 km², Argentina 23 km²)
 
-Brunei (096), 096-1ecc786d: geoBoundaries BRN ADM2, 39 units
+Brunei (096), 096-879c4f01: geoBoundaries BRN ADM2, 39 units
   Source: geoBoundaries, Wikimedia Commons; credit to user 'Rarelibra' (2006)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BRN/ADM2/geoBoundaries-BRN-ADM2_simplified.geojson
   Filled from ADM1 (Brunei-Muara): geoBoundaries, Wikimedia Commons; credit to user 'Tachymetre', Public Domain, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BRN/ADM1/geoBoundaries-BRN-ADM1_simplified.geojson
   Cut (the world map's Malaysia 118 km²)
 
-Bulgaria (100), 100-438f2814: geoBoundaries BGR ADM2, 265 units
+Bulgaria (100), 100-4e8dbb37: geoBoundaries BGR ADM2, 265 units
   Source: geoBoundaries, Wikimedia (2019)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BGR/ADM2/geoBoundaries-BGR-ADM2_simplified.geojson
 
-Burkina Faso (854), 854-8ed69334: geoBoundaries BFA ADM3, 351 units
+Burkina Faso (854), 854-dd072f15: geoBoundaries BFA ADM3, 351 units
   Source: New York University Spatial Data Repository, Stanford University, Map Maker Limited (2007)
   Licence: Public Domain - License on metadata pop-up on source page
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BFA/ADM3/geoBoundaries-BFA-ADM3_simplified.geojson
   Cut (the world map's Mali 80 km², Côte d'Ivoire 56 km², Niger 35 km²)
 
-Burundi (108), 108-22e5be1d: geoBoundaries BDI ADM3, 2619 units
+Burundi (108), 108-d4a982a1: geoBoundaries BDI ADM3, 2619 units
   Source: Regional Centre For Mapping Of Resources For Development (RCMRD) (2015)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BDI/ADM3/geoBoundaries-BDI-ADM3_simplified.geojson
   Filled from ADM2 (Kigamba, Muha, Mukaza, Ntahangwa): New York University Spatial Data Repository, Stanford University, Map Maker Limited, Public Domain, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BDI/ADM2/geoBoundaries-BDI-ADM2_simplified.geojson
 
-Cambodia (116), 116-1ba9742d: geoBoundaries KHM ADM3, 1633 units
+Cambodia (116), 116-c5fcaee5: geoBoundaries KHM ADM3, 1633 units
   Source: Open Development Mekong, Open Development Cambodia (2014)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - Creative Commons
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KHM/ADM3/geoBoundaries-KHM-ADM3_simplified.geojson
   Cut (the world map's Vietnam 112 km²)
 
-Cameroon (120), 120-10fe9a04: geoBoundaries CMR ADM3, 360 units
+Cameroon (120), 120-6693b29d: geoBoundaries CMR ADM3, 360 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CMR/ADM3/geoBoundaries-CMR-ADM3_simplified.geojson
   Cut (the world map's Central African Rep. 783 km², Chad 342 km², Nigeria 301 km², Gabon 8 km²)
 
-Canada (124), 124-10b43079: geoBoundaries CAN ADM3, 5162 units
+Canada (124), 124-2967f2c1: geoBoundaries CAN ADM3, 5162 units
   Source: Statistics Canada (StatCan) (2016)
   Licence: Open Data Commons Open Database License 1.0 - Statistics Canada Open License Agreement www.statcan.gc.ca/eng/reference/licence
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CAN/ADM3/geoBoundaries-CAN-ADM3_simplified.geojson
 
-Central African Rep. (140), 140-1054aed3: geoBoundaries CAF ADM3, 175 units
+Central African Rep. (140), 140-45e17620: geoBoundaries CAF ADM3, 175 units
   Source: Agency for Technical Cooperation and Development (ACTED), OCHA Central African Republic (2018)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CAF/ADM3/geoBoundaries-CAF-ADM3_simplified.geojson
   Cut (the world map's Sudan 318 km², Chad 306 km², S. Sudan 287 km², Dem. Rep. Congo 177 km², Congo 157 km²)
 
-Chad (148), 148-1d84408b: geoBoundaries TCD ADM2, 70 units
+Chad (148), 148-900d806c: geoBoundaries TCD ADM2, 70 units
   Source: OCHA Chad, OCHA Chad (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TCD/ADM2/geoBoundaries-TCD-ADM2_simplified.geojson
   Cut (the world map's Sudan 160 km², Cameroon 18 km²)
 
-Chile (152), 152-3a1d1ac3: geoBoundaries CHL ADM3, 347 units
+Chile (152), 152-8c8f311b: geoBoundaries CHL ADM3, 347 units
   Source: La Biblioteca del Congreso Nacional de Chile (BCN), OCHA ROLAC (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHL/ADM3/geoBoundaries-CHL-ADM3_simplified.geojson
   Filled from ADM2 (Provincia de Magallanes, Provincia de la Antártica Chilena, Provincia de Última Esperanza): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHL/ADM2/geoBoundaries-CHL-ADM2_simplified.geojson
   Cut (the world map's Argentina 1,835 km², Bolivia 75 km²)
 
-China (156), 156-d9367afc: geoBoundaries CHN ADM2, 2370 units
+China (156), 156-40474f6b: geoBoundaries CHN ADM2, 2370 units
   Source: National Administration of Surveying, Mapping and Geoinformation of China, Revolutionary GIS (2017)
   Licence: Open Data Commons Public Domain Dedication and License (PDDL) v1.0 - revolutionarygis.wordpress.com/2017/04/11/china-shapefile-data/
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHN/ADM2/geoBoundaries-CHN-ADM2_simplified.geojson
@@ -197,781 +197,781 @@ China (156), 156-d9367afc: geoBoundaries CHN ADM2, 2370 units
   Excluded TWN, HKG, MAC (own football associations): Natural Earth 1:10m Admin 1 (v5.1.2), Public Domain, https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson
   Cut (the world map's India 66,765 km², Kyrgyzstan 2,622 km², Bhutan 1,100 km², Mongolia 1,032 km², Kazakhstan 867 km², Myanmar 642 km², Russia 365 km², Tajikistan 258 km², Laos 242 km², North Korea 186 km², Nepal 72 km², Vietnam 34 km²)
 
-Chinese Taipei (158), 158-ccc3f667: geoBoundaries TWN ADM2, 368 units
+Chinese Taipei (158), 158-beb8032e: geoBoundaries TWN ADM2, 368 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Creative Commons Attribution-ShareAlike 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TWN/ADM2/geoBoundaries-TWN-ADM2_simplified.geojson
 
-Colombia (170), 170-3310664b: geoBoundaries COL ADM2, 1122 units
+Colombia (170), 170-4013530a: geoBoundaries COL ADM2, 1122 units
   Source: Departamento Administrativo Nacional de Estadistica (2020)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - Noted by CC icon on web page
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/COL/ADM2/geoBoundaries-COL-ADM2_simplified.geojson
   Cut (the world map's Peru 434 km², Ecuador 140 km², Venezuela 110 km², Brazil 100 km²)
 
-Congo (178), 178-5c78ed6b: geoBoundaries COG ADM2, 46 units
+Congo (178), 178-5ef4cd44: geoBoundaries COG ADM2, 46 units
   Source: New York University Spatial Data Repository, Stanford University, Map Maker Limited (2007)
   Licence: Public Domain - License on metadata pop-up on source page
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/COG/ADM2/geoBoundaries-COG-ADM2_simplified.geojson
   Cut (the world map's Dem. Rep. Congo 103 km², Gabon 69 km², Angola 32 km²)
 
-Costa Rica (188), 188-8b147ab3: geoBoundaries CRI ADM3, 475 units
+Costa Rica (188), 188-4a08103e: geoBoundaries CRI ADM3, 475 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CRI/ADM3/geoBoundaries-CRI-ADM3_simplified.geojson
   Filled from ADM2 (Coto Brus, Puntarenas, Parrita): geoBoundaries, Wikimedia Commons, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CRI/ADM2/geoBoundaries-CRI-ADM2_simplified.geojson
 
-Côte d'Ivoire (384), 384-fd9ec8dd: geoBoundaries CIV ADM3, 510 units
+Côte d'Ivoire (384), 384-25b2ac77: geoBoundaries CIV ADM3, 510 units
   Source: Comité National de Télédétection et d'Information Géographique (CNTIG), OCHA ROWCA (2021)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CIV/ADM3/geoBoundaries-CIV-ADM3_simplified.geojson
   Cut (the world map's Ghana 89 km²)
 
-Croatia (191), 191-b64bd548: geoBoundaries HRV ADM2, 560 units
+Croatia (191), 191-70c70cbd: geoBoundaries HRV ADM2, 560 units
   Source: Open Street Map, geoBoundaries (2021)
   Licence: Creative Commons Attribution-ShareAlike 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/HRV/ADM2/geoBoundaries-HRV-ADM2_simplified.geojson
   Cut (the world map's Bosnia and Herz. 57 km²)
 
-Cyprus (196), 196-adff5947: geoBoundaries CYP ADM2, 423 units
+Cyprus (196), 196-b2d09bd5: geoBoundaries CYP ADM2, 423 units
   Source: Wikipedia, Cyprus Department of Land Registry and Geometry (2009)
   Licence: Creative Commons Attribution-ShareAlike 3.0 Unported
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CYP/ADM2/geoBoundaries-CYP-ADM2_simplified.geojson
   Cut (the world map's N. Cyprus 3,193 km²)
 
-Czechia (203), 203-3a3037e7: geoBoundaries CZE ADM3, 6257 units
+Czechia (203), 203-fe20afe8: geoBoundaries CZE ADM3, 6257 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CZE/ADM3/geoBoundaries-CZE-ADM3_simplified.geojson
 
-Denmark (208), 208-7ef0f96c: geoBoundaries DNK ADM2, 101 units
+Denmark (208), 208-3ea7f91f: geoBoundaries DNK ADM2, 101 units
   Source: geoBoundaries, Wikimedia Commons (2018)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DNK/ADM2/geoBoundaries-DNK-ADM2_simplified.geojson
   Filled from ADM1 (Midtjylland, Sjælland, Syddanmark): geoBoundaries, Web Vectors Map, Creative Commons Attribution 4.0 International (CC BY 4.0), https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DNK/ADM1/geoBoundaries-DNK-ADM1_simplified.geojson
 
-Djibouti (262), 262-a2cb8250: geoBoundaries DJI ADM2, 11 units
+Djibouti (262), 262-1f7c6b51: geoBoundaries DJI ADM2, 11 units
   Source: FEWS, OCHA FISS (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DJI/ADM2/geoBoundaries-DJI-ADM2_simplified.geojson
   Cut (the world map's Ethiopia 39 km², Somaliland 33 km²)
 
-Dominican Rep. (214), 214-a60c73f7: geoBoundaries DOM ADM2, 155 units
+Dominican Rep. (214), 214-4bfd3f0b: geoBoundaries DOM ADM2, 155 units
   Source: Caribbean GeoPortal, N/A (2020)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DOM/ADM2/geoBoundaries-DOM-ADM2_simplified.geojson
 
-DR Congo (180), 180-8c2cdb5d: geoBoundaries COD ADM2, 189 units
+DR Congo (180), 180-45b60487: geoBoundaries COD ADM2, 189 units
   Source: Referenciel Géographique Commun, OCHA DR Congo (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/COD/ADM2/geoBoundaries-COD-ADM2_simplified.geojson
   Cut (the world map's Zambia 1,011 km², Tanzania 706 km², Central African Rep. 413 km², S. Sudan 292 km², Uganda 291 km², Angola 266 km², Congo 174 km², Rwanda 38 km²)
 
-Ecuador (218), 218-8760fe3e: geoBoundaries ECU ADM2, 224 units
+Ecuador (218), 218-58aa508e: geoBoundaries ECU ADM2, 224 units
   Source: INEC - Instituto Nacional de Estadística y Censos, OCHA ROLAC (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ECU/ADM2/geoBoundaries-ECU-ADM2_simplified.geojson
   Cut (the world map's Peru 134 km², Colombia 117 km²)
 
-Egypt (818), 818-c9333bba: geoBoundaries EGY ADM2, 367 units
+Egypt (818), 818-c8443920: geoBoundaries EGY ADM2, 367 units
   Source: OCHA ROMENA/HDX, Central Agency for Public Mobilization and Statistics (CAPMAS) (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/EGY/ADM2/geoBoundaries-EGY-ADM2_simplified.geojson
   Filled from ADM1 (North Sinai Governorate, Red Sea Governorate): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/EGY/ADM1/geoBoundaries-EGY-ADM1_simplified.geojson
 
-El Salvador (222), 222-7afc1855: geoBoundaries SLV ADM2, 273 units
+El Salvador (222), 222-1f762846: geoBoundaries SLV ADM2, 273 units
   Source: geoBoundaries (2007)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SLV/ADM2/geoBoundaries-SLV-ADM2_simplified.geojson
   Filled from ADM1 (Departamento de La Unión): Open Street Map, Creative Commons Attribution-ShareAlike 2.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SLV/ADM1/geoBoundaries-SLV-ADM1_simplified.geojson
   Cut (the world map's Honduras 28 km²)
 
-England (826), 826-dc40d4b5: geoBoundaries GBR ADM2, 151 units
+England (826), 826-0aaa1974: geoBoundaries GBR ADM2, 151 units
   Source: Office for National Statistics Open Geography Portal (2019)
   Licence: Open Government Licence v3.0 - www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GBR/ADM2/geoBoundaries-GBR-ADM2_simplified.geojson
   Mask GB-ENG: Eurostat- European Commission (Creative Commons Attribution 4.0 International (CC BY 4.0)), https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GBR/ADM1/geoBoundaries-GBR-ADM1_simplified.geojson
 
-Eq. Guinea (226), 226-e79a98b5: geoBoundaries GNQ ADM2, 28 units
+Eq. Guinea (226), 226-cc6a6a80: geoBoundaries GNQ ADM2, 28 units
   Source: World Resources Institute, Congo Forest Basin Atlas (2013)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - Creative Commons BY 4.0 - Noted by CC icon on web page
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GNQ/ADM2/geoBoundaries-GNQ-ADM2_simplified.geojson
   Cut (the world map's Gabon 116 km²)
 
-Estonia (233), 233-d5645880: geoBoundaries EST ADM2, 214 units
+Estonia (233), 233-91ad76f3: geoBoundaries EST ADM2, 214 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/EST/ADM2/geoBoundaries-EST-ADM2_simplified.geojson
 
-Eswatini (748), 748-f8ce1a30: geoBoundaries SWZ ADM2, 53 units
+Eswatini (748), 748-92b1020a: geoBoundaries SWZ ADM2, 53 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SWZ/ADM2/geoBoundaries-SWZ-ADM2_simplified.geojson
 
-Ethiopia (231), 231-c0f48a0e: geoBoundaries ETH ADM3, 690 units
+Ethiopia (231), 231-9fedb519: geoBoundaries ETH ADM3, 690 units
   Source: Open Africa, Code for Ethiopia (2016)
   Licence: Open Data Commons Open Database License 1.0 - opendefinition.org/licenses/cc-by/
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ETH/ADM3/geoBoundaries-ETH-ADM3_simplified.geojson
   Cut (the world map's Eritrea 1,667 km², Somalia 1,061 km², S. Sudan 19 km², Somaliland 14 km²)
 
-Fiji (242), 242-7808c767: geoBoundaries FJI ADM4, 1599 units
+Fiji (242), 242-7370036d: geoBoundaries FJI ADM4, 1599 units
   Source: Pacific Data Hub (2007)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FJI/ADM4/geoBoundaries-FJI-ADM4_simplified.geojson
   Filled from ADM3 (Malhaha, Itutiu): SOPAC, Fiji Islands Bureau of Statistics, PacGeo, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FJI/ADM3/geoBoundaries-FJI-ADM3_simplified.geojson
 
-Finland (246), 246-e94b3e4b: geoBoundaries FIN ADM3, 312 units
+Finland (246), 246-c9557e64: geoBoundaries FIN ADM3, 312 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FIN/ADM3/geoBoundaries-FIN-ADM3_simplified.geojson
 
-France (250), 250-03e69c00: geoBoundaries FRA ADM3, 320 units
+France (250), 250-8d99f411: geoBoundaries FRA ADM3, 320 units
   Source: Institut national de l'information géographique et forestière (IGN-F) (2022)
   Licence: Etalab Open License 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FRA/ADM3/geoBoundaries-FRA-ADM3_simplified.geojson
   Cut (the world map's Italy 3 km²)
 
-Gabon (266), 266-6cb07aab: geoBoundaries GAB ADM2, 49 units
+Gabon (266), 266-aee46f95: geoBoundaries GAB ADM2, 49 units
   Source: geoBoundaries, Wikimedia (2018)
   Licence: Creative Commons Attribution 3.0 License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GAB/ADM2/geoBoundaries-GAB-ADM2_simplified.geojson
   Cut (the world map's Congo 2,134 km²)
 
-Gambia (270), 270-32f948c4: geoBoundaries GMB ADM3, 120 units
+Gambia (270), 270-fbd6b370: geoBoundaries GMB ADM3, 120 units
   Source: Knippenberg, Erwin, & Moritz, Meyer. “The Hidden Potential of Mobile Phone Data Insights on COVID-19 in the Gambia.” Data Blog, The World Bank Data Catalog (2020)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GMB/ADM3/geoBoundaries-GMB-ADM3_simplified.geojson
   Cut (the world map's Senegal 65 km²)
 
-Georgia (268), 268-7a5dc6ee: geoBoundaries GEO ADM2, 68 units
+Georgia (268), 268-79f8a7be: geoBoundaries GEO ADM2, 68 units
   Source: geoBoundaries, Wikimedia Commons (2007)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GEO/ADM2/geoBoundaries-GEO-ADM2_simplified.geojson
   Cut (the world map's Russia 42 km², Azerbaijan 22 km²)
 
-Germany (276), 276-62e89bcb: geoBoundaries DEU ADM3, 428 units
+Germany (276), 276-bf27009e: geoBoundaries DEU ADM3, 428 units
   Source: Federal Agency for Cartography and Geodesy (2021)
   Licence: Data license Germany - Attribution - Version 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DEU/ADM3/geoBoundaries-DEU-ADM3_simplified.geojson
   Cut (the world map's Netherlands 34 km², Switzerland 15 km², Austria 9 km²)
 
-Ghana (288), 288-78e5b8b4: geoBoundaries GHA ADM2, 260 units
+Ghana (288), 288-8329579d: geoBoundaries GHA ADM2, 260 units
   Source: USAID Ghana HPNO, Ghana Statistical Service (2019)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GHA/ADM2/geoBoundaries-GHA-ADM2_simplified.geojson
   Cut (the world map's Togo 88 km²)
 
-Greece (300), 300-271ffff0: geoBoundaries GRC ADM3, 331 units
+Greece (300), 300-3c83e7c9: geoBoundaries GRC ADM3, 331 units
   Source: geoBoundaries, Wikimedia Commons (2010)
   Licence: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication - source 2 and 3-Creative Commons Attribution 3.0 License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GRC/ADM3/geoBoundaries-GRC-ADM3_simplified.geojson
   Filled from ADM2 (Thessalias, Ionion Nison, Peloponnisoy, Attikis, Notioy Aigaioy): EuroGeoGraphics, Regional IM Working Group - Europe, Creative Commons Attribution 4.0 International (CC BY 4.0), https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GRC/ADM2/geoBoundaries-GRC-ADM2_simplified.geojson
 
-Guatemala (320), 320-a92e343c: geoBoundaries GTM ADM2, 342 units
+Guatemala (320), 320-3385b82e: geoBoundaries GTM ADM2, 342 units
   Source: Coordinadora Nacional Para La Reducción De Desastres, OCHA FISS (2021)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GTM/ADM2/geoBoundaries-GTM-ADM2_simplified.geojson
   Cut (the world map's Belize 37 km²)
 
-Guinea (324), 324-deb97406: geoBoundaries GIN ADM3, 340 units
+Guinea (324), 324-154e5eae: geoBoundaries GIN ADM3, 340 units
   Source: World Food Programme, OCHA ROWCA (2021)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GIN/ADM3/geoBoundaries-GIN-ADM3_simplified.geojson
   Cut (the world map's Mali 71 km², Côte d'Ivoire 34 km², Sierra Leone 4 km²)
 
-Guinea-Bissau (624), 624-d363254b: geoBoundaries GNB ADM2, 39 units
+Guinea-Bissau (624), 624-90615e9b: geoBoundaries GNB ADM2, 39 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GNB/ADM2/geoBoundaries-GNB-ADM2_simplified.geojson
   Cut (the world map's Guinea 42 km²)
 
-Guyana (328), 328-41e71576: geoBoundaries GUY ADM2, 28 units
+Guyana (328), 328-1db5cf60: geoBoundaries GUY ADM2, 28 units
   Source: DEVInfo LAC project, OCHA FISS (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GUY/ADM2/geoBoundaries-GUY-ADM2_simplified.geojson
   Filled from ADM1 (Essequibo Islands-West Demerara): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GUY/ADM1/geoBoundaries-GUY-ADM1_simplified.geojson
   Cut (the world map's Venezuela 153 km²)
 
-Haiti (332), 332-a94da98d: geoBoundaries HTI ADM3, 140 units
+Haiti (332), 332-3aa59e4d: geoBoundaries HTI ADM3, 140 units
   Source: FEWS NET (2018)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/HTI/ADM3/geoBoundaries-HTI-ADM3_simplified.geojson
   Cut (the world map's Dominican Rep. 26 km²)
 
-Honduras (340), 340-ddf6210f: geoBoundaries HND ADM2, 299 units
+Honduras (340), 340-70a8e5ce: geoBoundaries HND ADM2, 299 units
   Source: ICF - Instituto Nacional de Conservación y Desarrollo Forestal, Áreas Protegidas y Vida Silvestre, Gobierno de la República de Honduras (2019)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/905b0ba/releaseData/gbOpen/HND/ADM2/geoBoundaries-HND-ADM2_simplified.geojson
   Filled from ADM1 (Valle): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/HND/ADM1/geoBoundaries-HND-ADM1_simplified.geojson
 
-Hungary (348), 348-8f9a8321: geoBoundaries HUN ADM3, 3357 units
+Hungary (348), 348-343d83a6: geoBoundaries HUN ADM3, 3357 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/HUN/ADM3/geoBoundaries-HUN-ADM3_simplified.geojson
 
-Iceland (352), 352-63ed1897: geoBoundaries ISL ADM2, 74 units
+Iceland (352), 352-d2e4ad21: geoBoundaries ISL ADM2, 74 units
   Source: National Land Survey of Iceland (2016)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ISL/ADM2/geoBoundaries-ISL-ADM2_simplified.geojson
 
-India (356), 356-eb7bf492: geoBoundaries IND ADM2, 734 units
+India (356), 356-44006f62: geoBoundaries IND ADM2, 734 units
   Source: Pathways Data Pvt. Ltd., lgdirectory.gov.in (2021)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IND/ADM2/geoBoundaries-IND-ADM2_simplified.geojson
   Cut (the world map's Pakistan 77,765 km², China 37,724 km², Siachen Glacier 2,314 km², Myanmar 532 km², Afghanistan 309 km², Bangladesh 128 km², Bhutan 90 km², Nepal 52 km²)
 
-Indonesia (360), 360-8d8c85fe: geoBoundaries IDN ADM2, 521 units
+Indonesia (360), 360-cebb3dbc: geoBoundaries IDN ADM2, 521 units
   Source: Badan Pusat Statistik (BPS - Statistics Indonesia), World Food Programme, OCHA ROAP (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/ADM2/geoBoundaries-IDN-ADM2_simplified.geojson
   Filled from ADM1 (South Kalimantan, West Papua): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/ADM1/geoBoundaries-IDN-ADM1_simplified.geojson
   Cut (the world map's Malaysia 94 km², Timor-Leste 11 km²)
 
-Iran (364), 364-c73288df: geoBoundaries IRN ADM2, 432 units
+Iran (364), 364-f475c757: geoBoundaries IRN ADM2, 432 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IRN/ADM2/geoBoundaries-IRN-ADM2_simplified.geojson
   Cut (the world map's Pakistan 382 km², Afghanistan 160 km², Turkmenistan 42 km²)
 
-Iraq (368), 368-49d10a61: geoBoundaries IRQ ADM2, 101 units
+Iraq (368), 368-61589643: geoBoundaries IRQ ADM2, 101 units
   Source: Iraq Central Statistics Office, OCHA Iraq (2021)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IRQ/ADM2/geoBoundaries-IRQ-ADM2_simplified.geojson
   Cut (the world map's Iran 313 km², Turkey 48 km²)
 
-Ireland (372), 372-e5618339: geoBoundaries IRL ADM2, 166 units
+Ireland (372), 372-aada3ba8: geoBoundaries IRL ADM2, 166 units
   Source: Ordce Survey Ireland (2015)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IRL/ADM2/geoBoundaries-IRL-ADM2_simplified.geojson
 
-Israel (376), 376-105cae58: geoBoundaries ISR ADM2, 15 units
+Israel (376), 376-ba62eb09: geoBoundaries ISR ADM2, 15 units
   Source: geoBoundaries, Wikimedia Commons (2021)
   Licence: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ISR/ADM2/geoBoundaries-ISR-ADM2_simplified.geojson
   Cut (the world map's Palestine 60 km²)
 
-Italy (380), 380-c87080f0: geoBoundaries ITA ADM4, 7901 units
+Italy (380), 380-92d958f5: geoBoundaries ITA ADM4, 7901 units
   Source: ISTAT, National Institute of Statistics (2023)
   Licence: Creative Commons Attribution 3.0 License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ITA/ADM4/geoBoundaries-ITA-ADM4_simplified.geojson
 
-Jamaica (388), 388-aedca098: geoBoundaries JAM ADM2, 828 units
+Jamaica (388), 388-d825b62b: geoBoundaries JAM ADM2, 828 units
   Source: Justin Meyers, Planning Office of Jamaica (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/JAM/ADM2/geoBoundaries-JAM-ADM2_simplified.geojson
   Filled from ADM1 (Saint Catherine): OpenStreetMap, Wambacher, Creative Commons Attribution-ShareAlike 2.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/JAM/ADM1/geoBoundaries-JAM-ADM1_simplified.geojson
 
-Japan (392), 392-0b401a6e: geoBoundaries JPN ADM2, 1742 units
+Japan (392), 392-270b15fa: geoBoundaries JPN ADM2, 1742 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Creative Commons Attribution-ShareAlike 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/JPN/ADM2/geoBoundaries-JPN-ADM2_simplified.geojson
 
-Jordan (400), 400-5b4a24f2: geoBoundaries JOR ADM2, 52 units
+Jordan (400), 400-a2e8c525: geoBoundaries JOR ADM2, 52 units
   Source: geoBoundaries, Wikimedia Commons (2006)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/JOR/ADM2/geoBoundaries-JOR-ADM2_simplified.geojson
 
-Kazakhstan (398), 398-9fb6f0be: geoBoundaries KAZ ADM2, 174 units
+Kazakhstan (398), 398-5566dd01: geoBoundaries KAZ ADM2, 174 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KAZ/ADM2/geoBoundaries-KAZ-ADM2_simplified.geojson
   Cut (the world map's Uzbekistan 1,659 km², Russia 1,237 km², China 42 km², Kyrgyzstan 26 km²)
 
-Kenya (404), 404-48347f1b: geoBoundaries KEN ADM2, 290 units
+Kenya (404), 404-8aa93b67: geoBoundaries KEN ADM2, 290 units
   Source: IEBC, OCHA ROSEA (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KEN/ADM2/geoBoundaries-KEN-ADM2_simplified.geojson
   Cut (the world map's Ethiopia 471 km², Somalia 26 km²)
 
-Kosovo (KOS), KOS-dcc692a0: geoBoundaries XKX ADM2, 38 units
+Kosovo (KOS), KOS-28ca4672: geoBoundaries XKX ADM2, 38 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Creative Commons Attribution-ShareAlike 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/XKX/ADM2/geoBoundaries-XKX-ADM2_simplified.geojson
   Cut (the world map's Serbia 26 km²)
 
-Kuwait (414), 414-efffa171: geoBoundaries KWT ADM2, 138 units
+Kuwait (414), 414-07d7c23e: geoBoundaries KWT ADM2, 138 units
   Source: OpenStreetMap, Wambacher (2011)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KWT/ADM2/geoBoundaries-KWT-ADM2_simplified.geojson
   Filled from ADM1 (Jahra): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KWT/ADM1/geoBoundaries-KWT-ADM1_simplified.geojson
 
-Kyrgyzstan (417), 417-e14817cf: geoBoundaries KGZ ADM2, 41 units
+Kyrgyzstan (417), 417-f47f3864: geoBoundaries KGZ ADM2, 41 units
   Source: geoBoundaries, Wikipedia, Districts of Kyrgyzstan (2010)
   Licence: Creative Commons Attribution-ShareAlike 3.0 Unported
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KGZ/ADM2/geoBoundaries-KGZ-ADM2_simplified.geojson
   Cut (the world map's Uzbekistan 158 km², Tajikistan 73 km², Kazakhstan 12 km², China 4 km²)
 
-Laos (418), 418-9fd67b19: geoBoundaries LAO ADM2, 148 units
+Laos (418), 418-30982347: geoBoundaries LAO ADM2, 148 units
   Source: National Geographic Department, OCHA ROAP (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LAO/ADM2/geoBoundaries-LAO-ADM2_simplified.geojson
   Cut (the world map's Cambodia 377 km², Vietnam 345 km², Thailand 34 km², China 3 km²)
 
-Latvia (428), 428-a14acd1e: geoBoundaries LVA ADM2, 589 units
+Latvia (428), 428-54cdc3cd: geoBoundaries LVA ADM2, 589 units
   Source: Valsts zemes dienests (2021)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LVA/ADM2/geoBoundaries-LVA-ADM2_simplified.geojson
 
-Lebanon (422), 422-dd9b11a8: geoBoundaries LBN ADM2, 26 units
+Lebanon (422), 422-2c1ca6d9: geoBoundaries LBN ADM2, 26 units
   Source: geoBoundaries, Wikipedia (2021)
   Licence: Public Domain - We also attribute credit to Wikimedia Commons user Rarelibra
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LBN/ADM2/geoBoundaries-LBN-ADM2_simplified.geojson
 
-Lesotho (426), 426-060caedc: geoBoundaries LSO ADM2, 78 units
+Lesotho (426), 426-59ee0b5e: geoBoundaries LSO ADM2, 78 units
   Source: FAO and the Ministry of Local Government, OCHA ROSEA (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LSO/ADM2/geoBoundaries-LSO-ADM2_simplified.geojson
   Cut (the world map's South Africa 152 km²)
 
-Liberia (430), 430-e7fd3407: geoBoundaries LBR ADM2, 136 units
+Liberia (430), 430-b0eb1b83: geoBoundaries LBR ADM2, 136 units
   Source: UNMIL, OCHA ROWCA (2021)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LBR/ADM2/geoBoundaries-LBR-ADM2_simplified.geojson
   Cut (the world map's Guinea 16 km², Côte d'Ivoire 8 km²)
 
-Libya (434), 434-2de8579d: geoBoundaries LBY ADM1, 22 units
+Libya (434), 434-6c91691e: geoBoundaries LBY ADM1, 22 units
   Source: Natural Earth (2021)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LBY/ADM1/geoBoundaries-LBY-ADM1_simplified.geojson
 
-Lithuania (440), 440-efe9b505: geoBoundaries LTU ADM3, 543 units
+Lithuania (440), 440-b07ee960: geoBoundaries LTU ADM3, 543 units
   Source: digitized from https//commons.wikimedia.org/wiki/File (2017)
   Licence: Public Domain - Photo is public domain; shapefile digitized from photo Vilniaus_seniunijos_numeracija.png
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LTU/ADM3/geoBoundaries-LTU-ADM3_simplified.geojson
 
-Luxembourg (442), 442-fd53bf65: geoBoundaries LUX ADM2, 105 units
+Luxembourg (442), 442-951e1acd: geoBoundaries LUX ADM2, 105 units
   Source: OpenStreetMap, Public Domain (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LUX/ADM2/geoBoundaries-LUX-ADM2_simplified.geojson
 
-Madagascar (450), 450-6d02adea: geoBoundaries MDG ADM3, 1579 units
+Madagascar (450), 450-d3d4f949: geoBoundaries MDG ADM3, 1579 units
   Source: Madagascar National Disaster Management Office (BNGRC), OCHA ROSA (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MDG/ADM3/geoBoundaries-MDG-ADM3_simplified.geojson
 
-Malawi (454), 454-b4e3d4b9: geoBoundaries MWI ADM2, 29 units
+Malawi (454), 454-3bad28d2: geoBoundaries MWI ADM2, 29 units
   Source: National Statistics Office of Malawi, OCHA ROSEA (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MWI/ADM2/geoBoundaries-MWI-ADM2_simplified.geojson
   Filled from ADM1 (Northern Region): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MWI/ADM1/geoBoundaries-MWI-ADM1_simplified.geojson
   Cut (the world map's Mozambique 43 km²)
 
-Malaysia (458), 458-381e408c: geoBoundaries MYS ADM2, 162 units
+Malaysia (458), 458-51894300: geoBoundaries MYS ADM2, 162 units
   Source: geoBoundaries, citypopulation.de (2020)
   Licence: Creative Commons Attribution 3.0 License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MYS/ADM2/geoBoundaries-MYS-ADM2_simplified.geojson
   Filled from ADM1 (Johor, Sabah, Kedah): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MYS/ADM1/geoBoundaries-MYS-ADM1_simplified.geojson
   Cut (the world map's Indonesia 480 km²)
 
-Mali (466), 466-f1a25f69: geoBoundaries MLI ADM3, 701 units
+Mali (466), 466-e55175f6: geoBoundaries MLI ADM3, 701 units
   Source: DNCT - Direction Nationale des Colelctivités Territorielles, DNP - Direction Nationale de la Population, United Nations Office for the Coordination of Humanitarian Affairs, Mali (2017)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - Noted in metadata tab
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MLI/ADM3/geoBoundaries-MLI-ADM3_simplified.geojson
   Cut (the world map's Algeria 816 km², Mauritania 184 km², Burkina Faso 129 km², Niger 41 km²)
 
-Mauritania (478), 478-3014eb89: geoBoundaries MRT ADM2, 58 units
+Mauritania (478), 478-526dd60c: geoBoundaries MRT ADM2, 58 units
   Source: World Food Programme, OCHA ROWCA (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MRT/ADM2/geoBoundaries-MRT-ADM2_simplified.geojson
   Filled from ADM1 (Dakhlet Nouadhibou): Princeton University Library, Creative Commons Attribution-ShareAlike 3.0 Unported, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MRT/ADM1/geoBoundaries-MRT-ADM1_simplified.geojson
   Cut (the world map's W. Sahara 1,198 km², Mali 219 km², Algeria 129 km², Senegal 26 km²)
 
-Mexico (484), 484-df955201: geoBoundaries MEX ADM2, 2457 units
+Mexico (484), 484-15735ed0: geoBoundaries MEX ADM2, 2457 units
   Source: World Bank (2012)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MEX/ADM2/geoBoundaries-MEX-ADM2_simplified.geojson
 
-Moldova (498), 498-cc77eb66: geoBoundaries MDA ADM1, 37 units
+Moldova (498), 498-2f4af52e: geoBoundaries MDA ADM1, 37 units
   Source: UNHCR, OCHA FISS (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MDA/ADM1/geoBoundaries-MDA-ADM1_simplified.geojson
   Cut (the world map's Ukraine 146 km²)
 
-Mongolia (496), 496-70f65e37: geoBoundaries MNG ADM2, 339 units
+Mongolia (496), 496-40a938f4: geoBoundaries MNG ADM2, 339 units
   Source: National Statistical Office of Mongolia, OCHA ROAP (2021)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MNG/ADM2/geoBoundaries-MNG-ADM2_simplified.geojson
   Cut (the world map's Russia 202 km²)
 
-Montenegro (499), 499-d7bac1e8: geoBoundaries MNE ADM1, 23 units
+Montenegro (499), 499-f4f60fef: geoBoundaries MNE ADM1, 23 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MNE/ADM1/geoBoundaries-MNE-ADM1_simplified.geojson
   Cut (the world map's Serbia 41 km²)
 
-Morocco (504), 504-a8c6abdb: geoBoundaries MAR ADM2, 75 units
+Morocco (504), 504-748d79fe: geoBoundaries MAR ADM2, 75 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MAR/ADM2/geoBoundaries-MAR-ADM2_simplified.geojson
   Cut (the world map's W. Sahara 86,179 km², Algeria 9,641 km², Mauritania 383 km²)
 
-Mozambique (508), 508-f5b5f092: geoBoundaries MOZ ADM3, 411 units
+Mozambique (508), 508-d083c31b: geoBoundaries MOZ ADM3, 411 units
   Source: Mozambique INE (Instituto Nacional de Estatistica), OCHA ROSEA (2021)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MOZ/ADM3/geoBoundaries-MOZ-ADM3_simplified.geojson
   Cut (the world map's Malawi 146 km², Tanzania 79 km², Zimbabwe 7 km²)
 
-Myanmar (104), 104-be4719a0: geoBoundaries MMR ADM3, 330 units
+Myanmar (104), 104-0ddfed2c: geoBoundaries MMR ADM3, 330 units
   Source: The Myanmar Analytics Project, USAID (2019)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MMR/ADM3/geoBoundaries-MMR-ADM3_simplified.geojson
   Cut (the world map's China 220 km², Thailand 186 km², Bangladesh 24 km², India 16 km²)
 
-N. Macedonia (807), 807-98929047: geoBoundaries MKD ADM2, 84 units
+N. Macedonia (807), 807-62020130: geoBoundaries MKD ADM2, 84 units
   Source: EuroGeographics, Regional IM Working Group - Europe (2016)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - Noted in metadata tab
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MKD/ADM2/geoBoundaries-MKD-ADM2_simplified.geojson
 
-Nepal (524), 524-728db4de: geoBoundaries NPL ADM3, 773 units
+Nepal (524), 524-4fff8edb: geoBoundaries NPL ADM3, 773 units
   Source: Open Data Nepal, Ministry of Federal Affairs and General Administration (2019)
   Licence: Creative Commons Attribution-ShareAlike 4.0 International License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NPL/ADM3/geoBoundaries-NPL-ADM3_simplified.geojson
   Cut (the world map's China 515 km², India 82 km²)
 
-Netherlands (528), 528-529ef3d3: geoBoundaries NLD ADM2, 344 units
+Netherlands (528), 528-a1097076: geoBoundaries NLD ADM2, 344 units
   Source: National Georegister (2022)
   Licence: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NLD/ADM2/geoBoundaries-NLD-ADM2_simplified.geojson
 
-New Caledonia (540), 540-33a3d645: Natural Earth NCL admin-1, 3 units
+New Caledonia (540), 540-3743f937: Natural Earth NCL admin-1, 3 units
   Source: Natural Earth 1:10m Cultural Vectors, Admin 1 – States, Provinces (v5.1.2)
   Licence: Public Domain
   File: https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson
 
-New Zealand (554), 554-565b7b5c: geoBoundaries NZL ADM3, 245 units
+New Zealand (554), 554-261ef023: geoBoundaries NZL ADM3, 245 units
   Source: NZ Stats (2017)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - Creative Commons Attribution 4.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NZL/ADM3/geoBoundaries-NZL-ADM3_simplified.geojson
 
-Nicaragua (558), 558-383dfcb7: geoBoundaries NIC ADM2, 153 units
+Nicaragua (558), 558-26c46a0c: geoBoundaries NIC ADM2, 153 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NIC/ADM2/geoBoundaries-NIC-ADM2_simplified.geojson
 
-Niger (562), 562-16555cf5: geoBoundaries NER ADM3, 266 units
+Niger (562), 562-969a754c: geoBoundaries NER ADM3, 266 units
   Source: OCHA ROWCA, Open Street Map (2012)
   Licence: Creative Commons Attribution 3.0 License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NER/ADM3/geoBoundaries-NER-ADM3_simplified.geojson
   Cut (the world map's Chad 1,578 km², Mali 472 km², Nigeria 33 km²)
 
-Nigeria (566), 566-88e2b3e7: geoBoundaries NGA ADM2, 774 units
+Nigeria (566), 566-4e7933bf: geoBoundaries NGA ADM2, 774 units
   Source: GRID3 (2022)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NGA/ADM2/geoBoundaries-NGA-ADM2_simplified.geojson
   Cut (the world map's Cameroon 1,349 km², Niger 70 km², Benin 24 km²)
 
-North Korea (408), 408-53e34838: geoBoundaries PRK ADM2, 179 units
+North Korea (408), 408-b0d402c5: geoBoundaries PRK ADM2, 179 units
   Source: World Food Programme, OCHA ROAP (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PRK/ADM2/geoBoundaries-PRK-ADM2_simplified.geojson
 
-Norway (578), 578-8eefd766: geoBoundaries NOR ADM2, 431 units
+Norway (578), 578-66baa1c8: geoBoundaries NOR ADM2, 431 units
   Source: Geonorge, Mapping Authority of Norway (2013)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NOR/ADM2/geoBoundaries-NOR-ADM2_simplified.geojson
 
-Oman (512), 512-01a7dfc6: geoBoundaries OMN ADM1, 7 units
+Oman (512), 512-65a0cb88: geoBoundaries OMN ADM1, 7 units
   Source: OpenStreetMap, Wambacher (2010)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/OMN/ADM1/geoBoundaries-OMN-ADM1_simplified.geojson
   Cut (the world map's United Arab Emirates 19 km²)
 
-Pakistan (586), 586-837b4aad: geoBoundaries PAK ADM2, 126 units
+Pakistan (586), 586-1289f550: geoBoundaries PAK ADM2, 126 units
   Source: geoBoundaries, Wikipedia (2019)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PAK/ADM2/geoBoundaries-PAK-ADM2_simplified.geojson
   Cut (the world map's Siachen Glacier 1,986 km², India 1,081 km², China 1,044 km², Afghanistan 352 km², Iran 110 km²)
 
-Palestine (275), 275-42709f1f: geoBoundaries PSE ADM2, 16 units
+Palestine (275), 275-6f05e87a: geoBoundaries PSE ADM2, 16 units
   Source: Open Data Watch (2017)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PSE/ADM2/geoBoundaries-PSE-ADM2_simplified.geojson
 
-Panama (591), 591-72831c35: geoBoundaries PAN ADM3, 633 units
+Panama (591), 591-dd16bd98: geoBoundaries PAN ADM3, 633 units
   Source: Milton Solano, of the Smithsonian Tropical Research Institute, on ArcGIS online, GIS Laboratory. Smithsonian Tropical Research Institute, Panama, 2013 (2012)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - need to update
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PAN/ADM3/geoBoundaries-PAN-ADM3_simplified.geojson
   Filled from ADM2 (David): Milton Solano, of the Smithsonian Tropical Research Institute, on ArcGIS online, GIS Laboratory. Smithsonian Tropical Research Institute, Panama, 2012, Creative Commons Attribution 4.0 International (CC BY 4.0), https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PAN/ADM2/geoBoundaries-PAN-ADM2_simplified.geojson
 
-Papua New Guinea (598), 598-9493eb40: geoBoundaries PNG ADM3, 326 units
+Papua New Guinea (598), 598-52e7b4df: geoBoundaries PNG ADM3, 326 units
   Source: Papua New Guinea National Statistics Office, OCHA ROAP (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PNG/ADM3/geoBoundaries-PNG-ADM3_simplified.geojson
 
-Paraguay (600), 600-4fcf34b2: geoBoundaries PRY ADM2, 247 units
+Paraguay (600), 600-377acae6: geoBoundaries PRY ADM2, 247 units
   Source: Direcion General de Estadica, Encuestas y Censos (2012)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/f549eab/releaseData/gbOpen/PRY/ADM2/geoBoundaries-PRY-ADM2_simplified.geojson
 
-Peru (604), 604-19867960: geoBoundaries PER ADM2, 197 units
+Peru (604), 604-170ad922: geoBoundaries PER ADM2, 197 units
   Source: Instituto Geográfico Nacional - IGN, OCHA ROLAC (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PER/ADM2/geoBoundaries-PER-ADM2_simplified.geojson
   Filled from ADM1 (El Callao): Wikimedia Commons, Public Domain, https://github.com/wmgeolab/geoBoundaries/raw/90a1d52/releaseData/gbOpen/PER/ADM1/geoBoundaries-PER-ADM1_simplified.geojson
   Cut (the world map's Bolivia 1,045 km², Brazil 149 km², Colombia 148 km², Chile 45 km², Ecuador 40 km²)
 
-Philippines (608), 608-1541affe: geoBoundaries PHL ADM3, 1647 units
+Philippines (608), 608-20437cfb: geoBoundaries PHL ADM3, 1647 units
   Source: National Mapping and Resource Information Authority (NAMRIA), Philippines Statistics Authority (PSA), OCHA Philippines (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PHL/ADM3/geoBoundaries-PHL-ADM3_simplified.geojson
 
-Poland (616), 616-cb89b2a0: geoBoundaries POL ADM2, 380 units
+Poland (616), 616-0429ba07: geoBoundaries POL ADM2, 380 units
   Source: Geoboundaries, OpenStreetMap (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/POL/ADM2/geoBoundaries-POL-ADM2_simplified.geojson
 
-Portugal (620), 620-21541ff4: geoBoundaries PRT ADM2, 311 units
+Portugal (620), 620-00728e9c: geoBoundaries PRT ADM2, 311 units
   Source: Wikipedia (2020)
   Licence: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
   File: https://github.com/wmgeolab/geoBoundaries/raw/90a1d52/releaseData/gbOpen/PRT/ADM2/geoBoundaries-PRT-ADM2_simplified.geojson
   Cut (the world map's Spain 113 km²)
 
-Puerto Rico (630), 630-b139e549: geoBoundaries PRI ADM3, 901 units
+Puerto Rico (630), 630-ca3ef1b5: geoBoundaries PRI ADM3, 901 units
   Source: United States Census Bureau, MAF/TIGER (2021)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PRI/ADM3/geoBoundaries-PRI-ADM3_simplified.geojson
 
-Qatar (634), 634-8df8c65e: geoBoundaries QAT ADM2, 79 units
+Qatar (634), 634-aac5b488: geoBoundaries QAT ADM2, 79 units
   Source: geoBoundaries, Qatar Open Data Portal (2015)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/QAT/ADM2/geoBoundaries-QAT-ADM2_simplified.geojson
   Cut (the world map's Saudi Arabia 241 km²)
 
-Romania (642), 642-e1c21642: geoBoundaries ROU ADM2, 3236 units
+Romania (642), 642-2123b42e: geoBoundaries ROU ADM2, 3236 units
   Source: Agentia Nationala de Cadastru si Publicitate Imobiliara (2016)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - License on source page. Additional information in linked PDF.
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ROU/ADM2/geoBoundaries-ROU-ADM2_simplified.geojson
   Filled from ADM1 (TULCEA): World Bank, Creative Commons Attribution 4.0 International (CC BY 4.0), https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ROU/ADM1/geoBoundaries-ROU-ADM1_simplified.geojson
   Cut (the world map's Bulgaria 414 km², Serbia 41 km²)
 
-Russia (643), 643-049aedff: geoBoundaries RUS ADM2, 2329 units
+Russia (643), 643-fd752597: geoBoundaries RUS ADM2, 2329 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RUS/ADM2/geoBoundaries-RUS-ADM2_simplified.geojson
   Filled from ADM1 (Moscow, Saint Petersburg): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RUS/ADM1/geoBoundaries-RUS-ADM1_simplified.geojson
   Cut (the world map's Kazakhstan 759 km², Poland 175 km²)
 
-Rwanda (646), 646-ddc500be: geoBoundaries RWA ADM3, 415 units
+Rwanda (646), 646-2afa3035: geoBoundaries RWA ADM3, 415 units
   Source: Open Data Rwanda (2012)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RWA/ADM3/geoBoundaries-RWA-ADM3_simplified.geojson
   Cut (the world map's Burundi 82 km²)
 
-Saudi Arabia (682), 682-bab49ad6: geoBoundaries SAU ADM2, 147 units
+Saudi Arabia (682), 682-26cbdbbe: geoBoundaries SAU ADM2, 147 units
   Source: geoBoundaries, OpenStreetMap (2021)
   Licence: Creative Commons Attribution-ShareAlike 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SAU/ADM2/geoBoundaries-SAU-ADM2_simplified.geojson
   Cut (the world map's Iraq 506 km², Yemen 442 km², Kuwait 52 km²)
 
-Senegal (686), 686-87db6c32: geoBoundaries SEN ADM3, 121 units
+Senegal (686), 686-82948622: geoBoundaries SEN ADM3, 121 units
   Source: Government of Senegal, OCHA ROWCA (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SEN/ADM3/geoBoundaries-SEN-ADM3_simplified.geojson
   Cut (the world map's Gambia 25 km², Mali 21 km², Guinea-Bissau 12 km²)
 
-Serbia (688), 688-2763e420: geoBoundaries SRB ADM2, 145 units
+Serbia (688), 688-7cdae6c3: geoBoundaries SRB ADM2, 145 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SRB/ADM2/geoBoundaries-SRB-ADM2_simplified.geojson
   Cut (the world map's Croatia 25 km², Hungary 4 km²)
 
-Slovakia (703), 703-405e0278: geoBoundaries SVK ADM3, 2927 units
+Slovakia (703), 703-f80a3c8e: geoBoundaries SVK ADM3, 2927 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SVK/ADM3/geoBoundaries-SVK-ADM3_simplified.geojson
 
-Slovenia (705), 705-e739d8ce: geoBoundaries SVN ADM2, 212 units
+Slovenia (705), 705-f22710fe: geoBoundaries SVN ADM2, 212 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SVN/ADM2/geoBoundaries-SVN-ADM2_simplified.geojson
 
-Solomon Islands (090), 090-633dafd9: geoBoundaries SLB ADM2, 53 units
+Solomon Islands (090), 090-eefee046: geoBoundaries SLB ADM2, 53 units
   Source: Solomon Islands National Statistics Office (SINSO), OCHA ROAP (2018)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SLB/ADM2/geoBoundaries-SLB-ADM2_simplified.geojson
   Filled from ADM1 (Temotu, Malaita, Western): Natural Earth, Public Domain, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SLB/ADM1/geoBoundaries-SLB-ADM1_simplified.geojson
 
-Somalia (706), 706-d1528942: geoBoundaries SOM ADM2, 102 units
+Somalia (706), 706-89c54623: geoBoundaries SOM ADM2, 102 units
   Source: Global Polio Eradication Initiative (GPEI), Frank Salet (2022)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0) - Licensed by originating party (Frank Salet) May 2022
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SOM/ADM2/geoBoundaries-SOM-ADM2_simplified.geojson
   Cut (the world map's Somaliland 166,217 km², Ethiopia 1,937 km²)
 
-South Africa (710), 710-30773df8: geoBoundaries ZAF ADM3, 213 units
+South Africa (710), 710-dbfc499f: geoBoundaries ZAF ADM3, 213 units
   Source: OCHA ROSEA, South African Municipal Demarcation Board (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ZAF/ADM3/geoBoundaries-ZAF-ADM3_simplified.geojson
   Cut (the world map's Mozambique 52 km², Namibia 16 km², Lesotho 4 km²)
 
-South Korea (410), 410-b9d0b226: geoBoundaries KOR ADM2, 229 units
+South Korea (410), 410-12a4bdf5: geoBoundaries KOR ADM2, 229 units
   Source: geoBoundaries, citypopulation.de (2020)
   Licence: Creative Commons Attribution 3.0 License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KOR/ADM2/geoBoundaries-KOR-ADM2_simplified.geojson
   Filled from ADM1 (North Jeolla): Natural Earth, Public Domain, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KOR/ADM1/geoBoundaries-KOR-ADM1_simplified.geojson
   Cut (the world map's North Korea 89 km²)
 
-South Sudan (728), 728-2deac85b: geoBoundaries SSD ADM2, 78 units
+South Sudan (728), 728-4f7b998b: geoBoundaries SSD ADM2, 78 units
   Source: South Sudan Information Management Working Group (IMWG), National Bureau of Statistics (NBS), and OCHA, OCHA South Sudan (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SSD/ADM2/geoBoundaries-SSD-ADM2_simplified.geojson
   Cut (the world map's Kenya 9,003 km², Sudan 1,711 km², Ethiopia 1,681 km², Uganda 12 km²)
 
-Spain (724), 724-31fca115: geoBoundaries ESP ADM3, 8205 units
+Spain (724), 724-9e363175: geoBoundaries ESP ADM3, 8205 units
   Source: Open Data ESRI, IGN Central Registry of Cartography Area (2018)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - Found on the Instituto Geográfico Nacional website from ESRI
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ESP/ADM3/geoBoundaries-ESP-ADM3_simplified.geojson
 
-Sudan (729), 729-b73c431d: geoBoundaries SDN ADM2, 189 units
+Sudan (729), 729-5153c07a: geoBoundaries SDN ADM2, 189 units
   Source: OCHA ROSEA, Information Management Working Group (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SDN/ADM2/geoBoundaries-SDN-ADM2_simplified.geojson
   Cut (the world map's Egypt 17,328 km², S. Sudan 2,387 km², Ethiopia 165 km², Central African Rep. 62 km², Eritrea 47 km², Chad 25 km²)
 
-Suriname (740), 740-52adbb26: geoBoundaries SUR ADM2, 59 units
+Suriname (740), 740-27f70115: geoBoundaries SUR ADM2, 59 units
   Source: geoBoundaries, Wikimedia Commons (2021)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SUR/ADM2/geoBoundaries-SUR-ADM2_simplified.geojson
   Cut (the world map's Guyana 225 km²)
 
-Sweden (752), 752-17df38d6: geoBoundaries SWE ADM2, 296 units
+Sweden (752), 752-78f57615: geoBoundaries SWE ADM2, 296 units
   Source: geoBoundaries, Wikimedia Commons (2017)
   Licence: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication - license of second source is Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SWE/ADM2/geoBoundaries-SWE-ADM2_simplified.geojson
   Filled from ADM1 (Gävleborgs län, Västra Götalands län, Skåne län, Blekinge län, Kalmar län, Stockholms län): geoBoundaries, Erik Frohne, Creative Commons Attribution 3.0 License, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SWE/ADM1/geoBoundaries-SWE-ADM1_simplified.geojson
   Cut (the world map's Norway 29 km²)
 
-Switzerland (756), 756-b70016a0: geoBoundaries CHE ADM3, 2262 units
+Switzerland (756), 756-d6673c46: geoBoundaries CHE ADM3, 2262 units
   Source: Federal Office of Topography swisstopo (2022)
   Licence: Federal Office of Topography swisstopo License
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHE/ADM3/geoBoundaries-CHE-ADM3_simplified.geojson
   Cut (the world map's Liechtenstein 83 km², Austria 36 km²)
 
-Syria (760), 760-9e5b9fbc: geoBoundaries SYR ADM3, 269 units
+Syria (760), 760-7af0ee47: geoBoundaries SYR ADM3, 269 units
   Source: United Nations Cartographic Section (UNCS) and United Nations Office for the Coordination of Humanitarian Affairs (UNOCHA), OCHA ROSC (2017)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SYR/ADM3/geoBoundaries-SYR-ADM3_simplified.geojson
   Cut (the world map's Israel 1,190 km², Iraq 197 km²)
 
-Tajikistan (762), 762-abb69495: geoBoundaries TJK ADM2, 58 units
+Tajikistan (762), 762-173d6f8a: geoBoundaries TJK ADM2, 58 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TJK/ADM2/geoBoundaries-TJK-ADM2_simplified.geojson
   Cut (the world map's Kyrgyzstan 93 km², Uzbekistan 79 km²)
 
-Tanzania (834), 834-ffdd58f9: geoBoundaries TZA ADM3, 3645 units
+Tanzania (834), 834-107f2e96: geoBoundaries TZA ADM3, 3645 units
   Source: OpenStreetMap (2015)
   Licence: Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TZA/ADM3/geoBoundaries-TZA-ADM3_simplified.geojson
   Filled from ADM2 (Mafia): Tanzania National Bureau of Statistics / UN OCHA ROSA, OCHA ROSA, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO), https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TZA/ADM2/geoBoundaries-TZA-ADM2_simplified.geojson
 
-Thailand (764), 764-8acba058: geoBoundaries THA ADM2, 928 units
+Thailand (764), 764-cba8e5d0: geoBoundaries THA ADM2, 928 units
   Source: Royal Thai Survey Department, OCHA ROAP (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/THA/ADM2/geoBoundaries-THA-ADM2_simplified.geojson
   Cut (the world map's Laos 344 km², Cambodia 47 km², Myanmar 34 km²)
 
-Timor-Leste (626), 626-af3d8ea4: geoBoundaries TLS ADM2, 64 units
+Timor-Leste (626), 626-e20e7dcc: geoBoundaries TLS ADM2, 64 units
   Source: WHO, OCHA ROAP (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TLS/ADM2/geoBoundaries-TLS-ADM2_simplified.geojson
   Cut (the world map's Indonesia 65 km²)
 
-Togo (768), 768-aaaa8341: geoBoundaries TGO ADM2, 37 units
+Togo (768), 768-aec11ccf: geoBoundaries TGO ADM2, 37 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Creative Commons Attribution-ShareAlike 2.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TGO/ADM2/geoBoundaries-TGO-ADM2_simplified.geojson
   Cut (the world map's Ghana 17 km², Benin 7 km²)
 
-Trinidad & Tobago (780), 780-2a4a2a4a: geoBoundaries TTO ADM1, 14 units
+Trinidad & Tobago (780), 780-648211bb: geoBoundaries TTO ADM1, 14 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TTO/ADM1/geoBoundaries-TTO-ADM1_simplified.geojson
 
-Tunisia (788), 788-199303b3: geoBoundaries TUN ADM2, 264 units
+Tunisia (788), 788-34342d6a: geoBoundaries TUN ADM2, 264 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUN/ADM2/geoBoundaries-TUN-ADM2_simplified.geojson
   Cut (the world map's Libya 237 km²)
 
-Turkey (792), 792-08248979: geoBoundaries TUR ADM2, 975 units
+Turkey (792), 792-cd8d2d73: geoBoundaries TUR ADM2, 975 units
   Source: OpenStreetMap, OSM Boundaries (2021)
   Licence: Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUR/ADM2/geoBoundaries-TUR-ADM2_simplified.geojson
   Filled from ADM1 (Bursa, İzmir): Open Street Map, Creative Commons Attribution-ShareAlike 2.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUR/ADM1/geoBoundaries-TUR-ADM1_simplified.geojson
   Cut (the world map's Iran 6 km²)
 
-Turkmenistan (795), 795-e9d1fbca: geoBoundaries TKM ADM2, 59 units
+Turkmenistan (795), 795-16be223f: geoBoundaries TKM ADM2, 59 units
   Source: CIESIN (2009)
   Licence: Creative Commons Attribution-ShareAlike 3.0 Unported - Digitized. License noted on map image
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TKM/ADM2/geoBoundaries-TKM-ADM2_simplified.geojson
   Cut (the world map's Afghanistan 199 km², Uzbekistan 102 km², Iran 28 km²)
 
-Uganda (800), 800-624af415: geoBoundaries UGA ADM2, 151 units
+Uganda (800), 800-5ce6165e: geoBoundaries UGA ADM2, 151 units
   Source: geoBoundaries, Wikimedia Commons (2006)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UGA/ADM2/geoBoundaries-UGA-ADM2_simplified.geojson
   Cut (the world map's Kenya 61 km², S. Sudan 5 km²)
 
-Ukraine (804), 804-b15d6596: geoBoundaries UKR ADM2, 479 units
+Ukraine (804), 804-fcd19b9d: geoBoundaries UKR ADM2, 479 units
   Source: geoBoundaries, Wikimedia Commons (2006)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UKR/ADM2/geoBoundaries-UKR-ADM2_simplified.geojson
   Cut (the world map's Russia 26,068 km², Belarus 744 km², Romania 678 km², Moldova 583 km², Hungary 76 km²)
 
-United Arab Emirates (784), 784-a93666e7: geoBoundaries ARE ADM1, 7 units
+United Arab Emirates (784), 784-1cf739c8: geoBoundaries ARE ADM1, 7 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARE/ADM1/geoBoundaries-ARE-ADM1_simplified.geojson
   Cut (the world map's Oman 211 km²)
 
-United States (840), 840-f5ff3256: geoBoundaries USA ADM2, 3108 units
+United States (840), 840-0c524e51: geoBoundaries USA ADM2, 3108 units
   Source: United States Census Bureau, MAF/TIGER Database (2018)
   Licence: Public Domain
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/USA/ADM2/geoBoundaries-USA-ADM2_simplified.geojson
   Cut (the world map's Puerto Rico 9,007 km², Guam 582 km², N. Mariana Is. 481 km², U.S. Virgin Is. 439 km², American Samoa 173 km², Canada 87 km², Mexico 60 km²)
 
-Uruguay (858), 858-301e55da: geoBoundaries URY ADM1, 19 units
+Uruguay (858), 858-170945c3: geoBoundaries URY ADM1, 19 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0 - Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/URY/ADM1/geoBoundaries-URY-ADM1_simplified.geojson
 
-Uzbekistan (860), 860-c57525cb: geoBoundaries UZB ADM2, 199 units
+Uzbekistan (860), 860-13048de9: geoBoundaries UZB ADM2, 199 units
   Source: OCHA ROCCA (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UZB/ADM2/geoBoundaries-UZB-ADM2_simplified.geojson
   Cut (the world map's Kazakhstan 1,892 km², Tajikistan 122 km², Kyrgyzstan 23 km²)
 
-Vanuatu (548), 548-736797d1: geoBoundaries VUT ADM2, 67 units
+Vanuatu (548), 548-aaf37c48: geoBoundaries VUT ADM2, 67 units
   Source: Secretarial of the Pacific Community (SPC), Statistics for Development Division, OCHA ROP (2019)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VUT/ADM2/geoBoundaries-VUT-ADM2_simplified.geojson
   Filled from ADM1 (Sanma, Torba): OpenStreetMap, Wambacher, Open Data Commons Open Database License 1.0, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VUT/ADM1/geoBoundaries-VUT-ADM1_simplified.geojson
 
-Venezuela (862), 862-c11a7130: geoBoundaries VEN ADM1, 25 units
+Venezuela (862), 862-344591ae: geoBoundaries VEN ADM1, 25 units
   Source: OCHA Venezuela, Instituto Nacional de Estadística (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VEN/ADM1/geoBoundaries-VEN-ADM1_simplified.geojson
   Cut (the world map's Brazil 152 km², Guyana 40 km²)
 
-Vietnam (704), 704-df8d4437: geoBoundaries VNM ADM2, 713 units
+Vietnam (704), 704-e63f22d1: geoBoundaries VNM ADM2, 713 units
   Source: OCHA ROAP, Government of Viet Nam (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VNM/ADM2/geoBoundaries-VNM-ADM2_simplified.geojson
   Filled from ADM1 (Bình Thuận, Hải Phòng, Khánh Hòa, Kiên Giang, Quảng Ninh): geoBoundaries, Wikipedia, Public Domain, https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VNM/ADM1/geoBoundaries-VNM-ADM1_simplified.geojson
   Cut (the world map's China 266 km², Laos 69 km²)
 
-Yemen (887), 887-62c937c4: geoBoundaries YEM ADM2, 335 units
+Yemen (887), 887-b5be9a61: geoBoundaries YEM ADM2, 335 units
   Source: Central Statistical Organization (CSO), OCHA Yemen (2021)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/YEM/ADM2/geoBoundaries-YEM-ADM2_simplified.geojson
   Cut (the world map's Oman 399 km², Saudi Arabia 65 km²)
 
-Zambia (894), 894-7a3ae845: geoBoundaries ZMB ADM2, 116 units
+Zambia (894), 894-4652d989: geoBoundaries ZMB ADM2, 116 units
   Source: GRID3, Office of the Surveyor General (2020)
   Licence: Creative Commons Attribution 4.0 (CC BY 4.0)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ZMB/ADM2/geoBoundaries-ZMB-ADM2_simplified.geojson
   Cut (the world map's Dem. Rep. Congo 63 km², Malawi 34 km², Tanzania 19 km², Zimbabwe 11 km²)
 
-Zimbabwe (716), 716-8d504b9c: geoBoundaries ZWE ADM3, 1958 units
+Zimbabwe (716), 716-75f773b7: geoBoundaries ZWE ADM3, 1958 units
   Source: OCHA ROSEA, Zimbabwe National Statistics Agency (2020)
   Licence: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ZWE/ADM3/geoBoundaries-ZWE-ADM3_simplified.geojson

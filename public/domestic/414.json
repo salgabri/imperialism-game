@@ -2,11 +2,11 @@
 "format": 2,
 "id": "414",
 "name": "Kuwait",
-"version": "414-efffa171",
+"version": "414-07d7c23e",
 "projection": {"lon0":47.6,"lat0":29.3},
 "focus": [46.5,28.4,48.5,30.2],
 "boundaries": {"provider":"geoBoundaries","iso3":"KWT","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2011","canonical":"Areas","boundaryId":"KWT-ADM2-36326507","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KWT/ADM2/geoBoundaries-KWT-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Jahra"],"license":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KWT/ADM1/geoBoundaries-KWT-ADM1_simplified.geojson"},"units":138,"areaKm2":17053},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00001870861666952583,0.00001581511233790966],"translate":[46.55892688526757,28.524845335244095]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"414-001","properties":{"name":"Kifan (south-west, north-west)","units":1}},
 {"type":"Polygon","arcs":[[4,5,-3,6,7,8]],"id":"414-002","properties":{"name":"Suwaikh Commercial","units":2}},

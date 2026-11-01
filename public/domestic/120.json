@@ -2,11 +2,11 @@
 "format": 2,
 "id": "120",
 "name": "Cameroon",
-"version": "120-10fe9a04",
+"version": "120-6693b29d",
 "projection": {"lon0":12.7,"lat0":7.4},
 "focus": [8.3,1.4,16.4,13.4],
 "boundaries": {"provider":"geoBoundaries","iso3":"CMR","level":"ADM3","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"CMR-ADM3-9386221","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CMR/ADM3/geoBoundaries-CMR-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Central African Rep.","km2":783},{"shape":"Chad","km2":342},{"shape":"Nigeria","km2":301},{"shape":"Gabon","km2":8}]},"units":360,"areaKm2":466957},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00007693271732717326,0.00011428781387813878],"translate":[8.4989528,1.6546659]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"120-001","properties":{"name":"Garoua II","units":9}},
 {"type":"Polygon","arcs":[[7,8,9,10,-4]],"id":"120-002","properties":{"name":"Figuil","units":6}},

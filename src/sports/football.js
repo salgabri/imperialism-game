@@ -149,6 +149,9 @@ export const football = {
     tieShort: 'PENS',
   },
 
+  // The feed's and the lineup's words (match, squad, ledger and conquest screens).
+  words: { kickoff: 'Kick-off', end: 'Full time', lineup: 'Starting XI', lineupShort: 'XI', lineupNoun: 'XI', lineupTitle: 'XI' },
+
   /** `Q`-free: football events are simply minute-stamped goals. */
   formatEvent: (e, code) => ({ when: `${e.m}'`, text: `GOAL — ${e.name} (${code})` }),
   formatToast: e => `${e.m}' GOAL — ${e.name.toUpperCase()}`,

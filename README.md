@@ -12,22 +12,25 @@ Pick your sport at kick-off:
 | --- | --- | --- | --- |
 | Football | XI in a 4-4-2 | 90 minutes | penalty shootout |
 | Basketball | starting five | 40 minutes | overtime periods |
+| American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 
 And pick who fights:
 
 - **Nations** — 173 national teams, each starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-- **Clubs** — 132 football clubs from seven European leagues, or all 30 NBA
-  franchises on [their own map](#the-nba-map) of the USA and Canada. Real Madrid
-  annexes territory exactly the way Spain does.
+- **Clubs** — 132 football clubs from seven European leagues, all 30 NBA
+  franchises on [their own map](#the-nba-map) of the USA and Canada, or all 32 NFL
+  franchises on [theirs](#the-nfl-map) of the USA. Real Madrid annexes territory
+  exactly the way Spain does. American football is played by clubs only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
 
 Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
-data, lineup shape, match model and vocabulary from `src/sports/`; adding a third
-is a single module and a roster file.
+data, lineup shape, match model and vocabulary (`words`) from `src/sports/`; adding
+American football took one module, its club file, its lineup plan and its squad
+field ([design notes](docs/design/american-football.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -69,16 +72,20 @@ npm run test:targeting # intervening borders, islands, neutral land and real Eur
 npm run test:flag-symbols # symbol proportions, land fitting and generated asset integrity
 npm run build:flag-symbols # regenerate reviewed field/emblem assets after source review
 npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
+npm run sync:ea-fc       # snapshot EA FC 27 from EA's ratings API into scripts/data/ea-fc27.csv (network, cached)
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
-npm run build-basketball # regenerate basketball squads from an NBA 2K export
+npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
 npm run build-clubs      # regenerate the club layer for both sports
-npm run sync:domestic-clubs # refresh country club snapshots (network, cached)
+npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
 npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
-npm run test:football-sets # EA seasons, CM 01/02 parser and builder, loader, setup and saves
+npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page in data-src/bball-2karchive/
+npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
+npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
+npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 ```
 
 ## How a campaign plays
@@ -94,16 +101,21 @@ default suits a first campaign, so pressing Space three times starts one.
    choices are the whole world (173 nations), another confederation, or the
    Elite 32. Football club campaigns offer individual leagues, all leagues, or
    the strongest 32 available clubs; basketball clubs play the NBA on its own
-   map of the USA and Canada. The step opens on a map of the chosen theatre:
+   map of the USA and Canada, and American football (clubs only: choosing it
+   switches Teams to clubs and disables Nations) the NFL on its map of the USA. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). It also
    shows the actual number of teams, the number of matches and the estimated
    length; its note names the Show matches mode the estimate assumes. With
    clubs in football, a second theatre group, **One country · top clubs**,
    starts a [domestic campaign](#domestic-campaigns), and its map shows that
-   country. Football also has a **Season** choice: the built-in 2025/26, then
-   the [earlier seasons](#football-seasons) 2023/24 back to 2014/15 (EA FIFA
-   ratings of each), and any local CM 01/02 season built on this computer. A
+   country. Football also has a **Season** choice: the built-in 2026/27 (the
+   current season), then the [earlier seasons](#football-seasons) 2025/26 back
+   to 2006/07 (EA FIFA ratings of each; there is no 2024/25), and any local
+   CM 01/02 season built on this computer. Basketball's lists the built-in
+   2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
+   1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
+   football's lists its built-in 2026 season (Madden NFL 27). A
    quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
@@ -173,10 +185,13 @@ choice; no timer runs.
 ### Match rules
 
 **Show matches** is *Live, minute by minute* (a live ticker), *Final score
-only* (an instant final score) or *Fast-forward* (Express playback: final scores
-only, with shorter pauses for routine matches). It stores the existing
-`resolution` and `express` settings. Level games go to penalties in football and
-overtime in basketball. The draw, the opponent choice, upsets, the final, computer
+only* (an instant final score) or *Fast-forward* (Express playback: final scores,
+with shorter pauses for routine matches, but your team's matches still on the live
+ticker). It stores the existing `resolution` and `express` settings. Under Live and
+Fast-forward your team's match (the managed team, or the followed team while
+spectating) plays at 1× whatever the speed, and the chosen speed returns with the
+result; a speed picked during the match is kept. Level games go to penalties in football and
+overtime in basketball and American football. The draw, the opponent choice, upsets, the final, computer
 signings and your role are fixed at launch. During a campaign the masthead's
 **Settings** button (More on phones) changes Show matches at any time, except
 that switching between Live and Final score only waits for the current draw or
@@ -186,7 +201,9 @@ rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
-offence/defence, form and shooting variance. Stronger teams are favourites, while
+offence/defence, form and shooting variance. American football plays about 11
+possessions a side, each ending in a touchdown, a field goal or nothing by its
+offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
 Pre-match percentages estimate this model with an independent seeded sample.
 They do not consume the campaign's random stream.
@@ -212,7 +229,7 @@ own Space, and open dialogs block it.
 
 | Primary | When |
 | --- | --- |
-| **Continue** | Draw the next match, move on after a result, or kick off at a tactical gate with the balanced approach |
+| **Continue** | Draw the next match, move on after a result, or kick off at a tactical gate with the recommended approach (the best displayed win chance; Balanced on a tie) |
 | **Finish match** | Reveal a live ticker match's result |
 | **Attack <team>** | Confirm your target under *You choose* |
 | **Sign <player>** | Confirm the signing on the conquest screen (the masthead button reads "Sign player") |
@@ -223,8 +240,8 @@ own Space, and open dialogs block it.
 **Pause** freezes the draw, the ticker and scheduled presentation. A pending
 target choice or signing holds the screen: only Map stays available in the
 navigation. **Fast-forward** (Show matches) compresses routine presentation while
-keeping followed matches, upsets and finales visible. It uses the same draw and
-match results.
+keeping your team's matches live and upsets and finales visible. It uses the same
+draw and match results.
 
 ### Map view
 
@@ -236,10 +253,13 @@ The map fills the screen next to a campaign column (500px at 1600px and wider,
   "Next draw · Any of N empires can be drawn". Once the fixture is known, it
   shows "<A> v <B>", the route ("Across a land border" / "By sea — no shared
   border"), the odds bar and "Strength 82.1 v 78.4 · from N simulated matches".
-  When your team plays, **Match preview** opens the approach choice. **or
-  simulate the result** reveals this match at once with the default approach.
-  **Continue** kicks off with the balanced approach. During and after the match
-  the block holds the compact match card with the score and minute.
+  When your team plays, the odds bar and strength line show the **recommended
+  approach** (the one with the best displayed win chance; Balanced on a tie), and
+  a line names it: "Continue kicks off with Attack, the recommended approach."
+  **Match preview** opens the approach choice, with that option tagged
+  Recommended and focused. **or simulate the result** reveals this match at once
+  with the recommended approach, and **Continue** kicks off with it. During and
+  after the match the block holds the compact match card with the score and minute.
 - **Your fronts** — neighbouring empires with strength, territories and your
   win chance: green at 60% or more, amber at 45–59%, red below 45%.
 - **Latest results** — "Germany beat Austria", the score and the claimed
@@ -281,9 +301,10 @@ normal approximation of the remaining margin. Both lineups follow, with
 claimed players tagged and ratings coloured by tier. A dark match feed lists
 events newest first and has 1× / 2× / 4× speed chips and Pause. When a live
 ticker match involving your team (or, as a spectator, the followed team) kicks
-off while you are on Map, the game switches to Match. It returns to Map at the
-next turn if the switch was automatic. Fast-forward's routine matches and
-"simulate the result" never switch. Without a live match, the screen shows the last finished match, or the
+off while you are on Map, the game switches to Match, under Fast-forward too; the
+match plays at 1×. It returns to Map at the next turn if the switch was
+automatic. Fast-forward's routine matches and "simulate the result" never switch.
+Without a live match, the screen shows the last finished match, or the
 next fixture before the first one.
 
 **Squad** shows one team: the flag, "First team · N players · K claimed in
@@ -320,7 +341,10 @@ cells. The map zooms to your empire and the next opponent, with a **Whole map** 
 **Your fronts** toggle. The campaign column becomes a bottom sheet with a grab
 handle; tapping it expands the sheet to show your fronts and latest results. A
 full-width primary bar sits above a tab bar of **Map · Squad · Match · Ledger ·
-More**. **More** holds the Chronicle, the playback controls, Settings and saves.
+More**. While nothing waits on a decision, the bar ends with **Auto** (a manager's
+autoplay toggle; a spectator's primary already plays and pauses) and the speed
+button (1× / 2× / 4×). **More** holds the Chronicle, the playback controls,
+Settings and saves.
 From 700px to 1199px the map sits on top and the column content runs in two
 columns below. Touch targets are at least 44px. Reduced motion keeps only
 opacity transitions.
@@ -352,8 +376,14 @@ recorded, so exact continuation from that historical stream cannot be recovered.
 
 The Chronicle's history filters by team and opens full match events and
 conquest rewards. **View conquest on map** reveals the gained holdings. Final
-results include the biggest upset, the decisive match and the transfer impact.
-The masthead trophy reopens them after you view the map. The map has one
+results include the biggest upset, the decisive match, the transfer impact, the
+leader changes and the elapsed time. A manager whose team fell gets a **Your
+campaign** block: the placement ("25th of 49"), who knocked the team out and with
+what score, what became of that team, conquests, signings, territories taken and
+the biggest haul; a manager who won sees "Managed by you". The playtest timing
+(active viewing, time choosing, skipped presentations, acquisitions improving the
+lineup) appears only with `?playtest` in the address; exports always carry it.
+The masthead trophy reopens the results after you view the map. The map has one
 keyboard tab stop, arrow navigation and a skip link.
 
 ### Draw compass, flags and navigation
@@ -387,15 +417,29 @@ screen at every zoom level. The v4 map has no scale bar or coordinate readout.
 Football fields source-backed players; each squad row links to its rating evidence.
 Game ratings use a 1–99 display range, with the original source values retained.
 
-**Football** — `src/data/rosters.js` combines the committed EA FC 26 update 4
-snapshot (19 September 2025; 18,405 records) with Football Manager 26 database
-26.3.0 from [EFEM.club](https://efem.club/players), retrieved on 2 October 2026.
-All **173 nations field eleven source-backed players**, with natural coverage for
-a 4-4-2. The builder prioritises unchanged EA overall ratings and uses FM to fill
-coverage gaps. It retains database IDs, full/display names, all natural roles,
-source URLs, versions, dates and original ratings through transfers and saves.
-The 280 generic Brazilian domestic players in EA's unlicensed `Série A` are
-excluded; this does not exclude the Italian `Serie A`.
+**Football** — `src/data/rosters.js` is the current season, 2026/27. It combines
+the committed EA SPORTS FC 27 snapshot (EA's ratings site as of 1 November 2026;
+17,849 men) with Football Manager 26 database 26.3.0 (released 30 March 2026,
+the date shown as its rating date) from [EFEM.club](https://efem.club/players),
+retrieved on 2 October 2026. FM is a season behind EA until a Football Manager
+27 database is available.
+All **173 nations field eleven source-backed players** (1,257 EA and 646 FM
+shirts), with natural coverage for a 4-4-2. The builder prioritises unchanged EA
+overall ratings and uses FM to fill coverage gaps. It retains database IDs,
+full/display names, all natural roles, source URLs, versions, dates and original
+ratings through transfers and saves. An FM player fills a gap only when he is not
+an EA player of the same nation. EA's ratings site gives first and last names
+only, so where FM's name is longer, FM's age must also fit the EA birth date. EA
+fills unlicensed clubs with generated players born on 29 February; the builder
+drops any club where at least half the squad has that birthday, plus clubless
+29-February players. EA's ratings site lists none, so the rule removes nothing
+from EA FC 27 (it removed 316 from EA FC 26, now the 2025/26
+[earlier season](#football-seasons)). EA FC 27's unlicensed Serie A clubs carry
+placeholder names on EA's site (Lombardia FC is Inter, Milano FC AC Milan, Bergamo
+Calcio Atalanta). The snapshot keeps each club's EA FC 26 name, so clubs keep the
+same id, crest and colour from season to season. Nationalities with no map nation
+(18 names, such as Cabo Verde and Malta) are listed in the audit rather than
+silently dropped.
 
 EFEM displays FM Current Ability on a normalised 1–100 scale. The game converts
 it once using `round(currentAbility * 99 / 100)` and exposes both values in the
@@ -404,15 +448,55 @@ EA overall and FM Current Ability remain different measures; the conversion
 does not claim an official equivalence. These are **dated fantasy XIs by database
 nationality**, including international retirees, rather than current call-ups.
 Existing campaigns retain their saved squads; start a new campaign to use the
-updated data. See `docs/design/football-roster-audit.json` for per-nation coverage.
+updated data. A campaign saved on the 2025/26 data keeps every player's name,
+positions and rating, but its EA FC 26 players lose their evidence link, because
+the game now holds EA FC 27's records (a checkpoint names the source editions it
+referenced, and an exported file keeps its sources inline). See
+`docs/design/football-roster-audit.json` for per-nation coverage.
+
+**Football data sources and attribution.** `scripts/data/ea-fc27.csv` holds
+selected columns of every man in EA SPORTS FC 27. They come from EA's public
+ratings API (`drop-api.ea.com`, the data behind EA's ratings site), and
+`npm run sync:ea-fc` reduces it with nations, leagues and club names spelt as in
+EA FC 26. Squad rows link to each player's page on EA's ratings site as rating
+evidence. EA's User Agreement allows non-commercial use only.
+`src/data/rosters.js` and `src/data/clubs.football.js` are derived from it.
+`scripts/data/ea-fc26.csv` is a reduced copy (selected columns only) of
+[*FC 26 (FIFA 26) Player Data*](https://www.kaggle.com/datasets/rovnez/fc-26-fifa-26-player-data)
+by rovnez on Kaggle, licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). That dataset was
+collected from [sofifa.com](https://sofifa.com), which the 2025/26 season's
+squad rows link to. It is the 2025/26 season, and the reference the FC 27
+snapshot takes its names from. FM ratings come from Football Manager 26 database
+26.3.0 as displayed by EFEM.club.
+
+This project is not affiliated with, endorsed or sponsored by Electronic Arts
+(EA SPORTS FC, FIFA, Madden NFL), Sports Interactive and SEGA (Football Manager),
+2K (NBA 2K), the NBA, the NFL, or the clubs, leagues and federations it names.
+All trademarks, names and ratings belong to their respective owners.
+
+**American football** — `src/data/clubs.american-football.js`, the 32 NFL
+franchises of Madden NFL 27 (Week 7 Ratings, retrieved 2026-10-30 from EA SPORTS'
+ratings site; `scripts/data/madden-nfl-27.json` holds all 1,946 players). Madden's
+positions are grouped into ten (its five line spots are OL, edges and tackles DL,
+Sam, Mike and Will LB, both safeties S); punters and long snappers are left out.
+Each franchise fields 23 starters at natural positions (QB, RB, three WR, TE, five
+OL; four DL, two LB, three CB, two S; K) and keeps eleven backups. Ratings are
+Madden's overalls, unchanged. Positions are specialised, so playing out of
+position costs 25 points in this sport, not 12. There are no national teams: no
+source rates American football players by nation. See the
+[design notes](docs/design/american-football.md).
 
 **Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
 2K has real 1–99 overalls but no country, and every NBA bio dataset with a
 country column stops in 2014. So the split is deliberate — nationality and
-position are curated in `scripts/fiba-squads.json`, and ratings are resolved from
-the 2K export by name, with a curated rating for EuroLeague players it doesn't
-cover. Curating nationality is the right call regardless: FIBA squads are not NBA
+position are curated in `scripts/fiba-squads.json`, and ratings are resolved by
+name from NBA 2K27 (2026/27, as [2K Archive](https://2karchive.com/) compiles it:
+the page the [basketball seasons](#basketball-seasons) come from), with a curated
+rating for EuroLeague players it doesn't cover. A listed NBA player who has left
+the league since keeps his latest NBA 2K rating: ten of them, such as Valančiūnas
+(79, NBA 2K26) and Theis (74, NBA 2K24). Curating nationality is the right call regardless: FIBA squads are not NBA
 rosters (Serbia, Spain, Greece and Lithuania field mostly EuroLeague players, and
 eligibility follows the federation — Banchero plays for the USA rather than
 Italy). The fives were last checked against FIBA records in October 2026: every
@@ -433,8 +517,9 @@ Nations with no roster in a sport fall back to *that sport's* baseline, never to
 another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
-An assignment optimizer fills all eleven football or five basketball slots.
-Playing outside a natural position costs 12 rating points. A player may have
+An assignment optimizer fills all eleven football, five basketball or 23 American
+football slots. Playing outside a natural position costs 12 rating points (25 in
+American football). A player may have
 more than one natural position, and each one is penalty-free: a claimed PG/SG
 can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
@@ -451,17 +536,20 @@ To rebuild after swapping datasets:
 
 ```bash
 npm run build-rosters [path/to/players.csv]   # football
-npm run sync:football-manager                # refresh the pinned FM database supplement
 npm run build-basketball                     # basketball
 ```
 
 Football builders default to the committed reduced source snapshots in
 `scripts/data/`, so regeneration works without network access. An optional EA
 CSV must also include player IDs/URLs, full names, database version/update/date,
-birth dates and club/competition IDs. The FM refresh reads the same public
-endpoint and filters as EFEM's player grid. The original large exports remain in
+birth dates and club/competition IDs. The original large exports remain in
 ignored `data-src/`; only fields used for roster construction and evidence are
 retained in the committed snapshots.
+
+**Do not run `npm run sync:football-manager`.** It refreshes the FM supplement
+through EFEM's `/api/`, which [efem.club/robots.txt](https://efem.club/robots.txt)
+disallows. It must not be run until EFEM grants permission, and it refuses to
+fetch without `--efem-permission-granted`.
 
 ## The club layer
 
@@ -482,17 +570,16 @@ identical national flags would tell you nothing — and wherever a nation shows 
 flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
-Club lineups come from the same two exports as the national squads:
-`clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
-`clubs.basketball.js` from the NBA 2K export. 2K carries no position, so each
-player's positions are inferred from the attributes that define them — a centre
-by interior defence, rebounding and post play; a point guard by vision, handle
-and speed with the ball. Each fit is ranked as a league percentile, so the five
-scales compare. A player's best fit is his primary position. He also covers the
-better neighbouring position when it ranks within 15 percentiles of it. About
-three in four players in the export, and 131 of the 150 NBA starters, cover two
-positions. Each franchise's five is then the lineup the game itself would field
-from its whole roster.
+NFL franchises are not dealt either: they split [the USA](#the-nfl-map) between them.
+
+Club lineups come from the same sources as the national squads:
+`clubs.football.js` from the EA FC 27 snapshot filtered to the seven tier-one
+leagues (132 clubs, among them the promoted Coventry City, Hull City, Ipswich
+Town, Schalke 04, Málaga and Monza), and `clubs.basketball.js` from NBA 2K27 as
+2K Archive compiles it. 2K Archive lists each player's positions as 2K gives
+them, primary first; a second position that is not the first's neighbour is
+dropped, and 123 of the 150 NBA starters cover two positions. Each franchise's
+five is then the lineup the game itself would field from its whole roster.
 
 ## Domestic campaigns
 
@@ -557,7 +644,8 @@ kept.
 **Sources.** All of this is fetched at build time and committed; nothing loads
 from these services at runtime.
 
-- **Clubs and squads**: Football Manager 26 database 26.3.0 from
+- **Clubs and squads**: Football Manager 26 database 26.3.0 (released 30 March
+  2026, the date shown as its rating date) from
   [EFEM.club](https://efem.club), in reputation order (clubs of equal reputation
   are re-read whole, since EFEM's pages shuffle them). A club is viable if it is a
   men's first team (not a reserve, B, academy or youth side of a stronger club)
@@ -631,7 +719,11 @@ npm run test:domestic                      # shipped data, section geometry, see
 Both stages cache downloads under the ignored `data-src/`, so reruns work offline;
 from a warm cache the sync of every nation takes about 30 s. The sync is polite:
 three requests at a time with pauses and retries. Leave out `--only` to process
-every nation. A full build or `--check` runs countries in parallel worker threads
+every nation. **EFEM's `/api/`, which the sync reads, is disallowed by
+[efem.club/robots.txt](https://efem.club/robots.txt)**, so without
+`--efem-permission-granted` the sync uses only cached EFEM responses and stops at
+any request that would reach EFEM (an uncached nation, or `--refresh`). Do not
+pass the flag until EFEM grants permission. A full build or `--check` runs countries in parallel worker threads
 (`--jobs=N`, up to 8 by default) and is best run in the background. Country
 routing (anchors, foreign land, border routes) is tested by
 `scripts/domestic-routing.test.mjs`; `npm test` runs every test file, the domestic
@@ -658,36 +750,80 @@ coloured apart from their neighbours; the franchises keep their own names, crest
 and fives. Mexico, Greenland and the rest of the world lie beneath as inert
 land. The map is `public/domestic/nba.json`, played through the
 country-map runtime; NBA campaigns saved before it still resume on the world map.
+Each [earlier season](#basketball-seasons) plays on a map of its own era, drawn
+the same way from the arenas of that season: the Grizzlies hold British Columbia
+and Alberta until 2000/01, the SuperSonics Washington until 2007/08 and the Nets
+New Jersey until 2010/11. Nine era maps
+(`public/domestic/nba2000.json` to `nba2014.json`) cover 1999/00 to 2013/14;
+later seasons have today's franchises and play on this map.
 
 ```bash
-npm run build:nba-map                      # boundaries + arenas → public/domestic/nba.json, src/data/clubMaps.js (about a minute)
+npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 6 minutes)
 npm run build:nba-map -- --check           # offline rebuild must match the committed files byte for byte
+npm run build:club-maps                    # the NBA's and the NFL's maps together
 ```
 
 Arenas are in `scripts/data/nba-arenas.json`; the
 [design notes](docs/design/domestic-campaigns.md#the-nba-map) cover the border
-fitting and the file additions.
+fitting and the file additions. `scripts/build-club-maps.mjs` builds every
+league's map (`--league=nba` or `nfl` for one; the index keeps the other's entries).
+
+### The NFL map
+
+American football has one theatre, **NFL**: the 32 franchises fight over the USA,
+split into 32 territories grown from their stadiums by the same partition as the
+NBA's, over whole states. California and Florida (three franchises each), Texas,
+Pennsylvania, Ohio, Maryland and New Jersey (two each) are split between their
+franchises along county lines. The Giants and Jets share MetLife Stadium in New
+Jersey, and the Rams and Chargers SoFi Stadium, so those four grow from their
+training grounds; and because the Giants and Jets are New York's, New York's
+counties may go to them as well as to the Bills: the Giants hold Manhattan, Long
+Island and Connecticut, the Bills upstate New York. Denver holds Colorado, Wyoming
+and Montana, Kansas City Missouri, Kansas and Nebraska. Alaska and Hawaii lie off
+the map; Canada and Mexico lie beneath as inert land. The map is
+`public/domestic/nfl.json` (134 KB); stadiums are in `scripts/data/nfl-teams.json`.
+
+```bash
+npm run build:nfl-map                      # boundaries + stadiums → public/domestic/nfl.json and its index entry (seconds)
+npm run build:nfl-map -- --check           # offline rebuild must match the committed files byte for byte
+```
 
 ## Football seasons
 
-Football can be played on ten earlier seasons as well as the built-in 2025/26:
-2014/15 to 2023/24, each from EA's FIFA (FIFA 15 to EA FC 24) launch roster of
-that season. They ship with the game: pick one under **Season** in setup. Each
-is a file in `public/football/` (about 310 KB) that loads only when chosen.
+Football can be played on nineteen earlier seasons as well as the built-in
+2026/27: 2006/07 to 2025/26, each from EA's FIFA of that season (FIFA 07 to EA
+FC 26; no source here has EA FC 25, so there is no 2024/25). They ship with the
+game: pick one under **Season** in setup. Each is a file in `public/football/`
+(250–335 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
-  and the clubs of the seven leagues the club layer uses, picked by EA's
-  competition id (132–134 clubs a season). Ratings are EA's overalls,
-  unchanged. EA rates only part of the world, so 73–82 nations field a full XI
-  each season and the rest field the players they have, as an empty or thin
+  and the clubs of the seven leagues the club layer uses (132–134 clubs a
+  season). Ratings are EA's overalls, unchanged. EA rates only part of the
+  world, so 49–82 nations field a full XI each season (fewer in the older
+  editions) and the rest field the players they have, as an empty or thin
   built-in nation does. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
   none, and their players still play for their clubs.
-- **Source:** one Kaggle export of every FIFA 15 – EA FC 24 launch roster
+- **Rosters:** EA FC 26 is update 4 of 19 September 2025, the snapshot the
+  built-in season came from until 2026/27, so its clubs are the built-in clubs
+  of 2025/26; FM no longer fills its nations, so 80 field a full XI. FIFA 15 to
+  EA FC 24 are each edition's launch roster. FIFA 07 to
+  FIFA 11 take their ratings from the launch roster and the clubs and
+  nationalities from the winter update; FIFA 12 to FIFA 14 use one roster each,
+  from later in the season.
+- **Sources:** EA FC 26 is the committed `scripts/data/ea-fc26.csv` (rovnez on
+  Kaggle, CC BY 4.0; its 316 generated players stay out). FIFA 15 – EA FC 24 come from one Kaggle export
   (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
-  labelled CC0 by its compiler; EA's own rights are not cleared, as for the
-  built-in EA FC 26 data). `scripts/data/ea-seasons.json` pins its SHA-256. To
-  rebuild, download it into the ignored `data-src/ea-leone/`, unzip it and run:
+  labelled CC0 by its compiler). FIFA 07 – FIFA 14 join two scrapes by EA's
+  player id: a FIFA Index mirror on Kaggle
+  (`daguizer/fifa-2021-to-2005-complete-player-attributes`, licence "other";
+  FIFA Index's terms forbid scraping) for the overall, positions, full name and
+  date of birth, and a SoFIFA scrape on GitHub (`Big-Data-FC/datasets`, no
+  licence stated) for the nationality and club. SoFIFA's own rating is never
+  read, and a player missing from either file is left out. EA's own rights are
+  not cleared, as for the built-in EA FC 27 data. `scripts/data/ea-seasons.json`
+  pins every file by SHA-256. To rebuild, download them into the ignored
+  `data-src/` (the manifest names each folder) and run:
 
   ```bash
   npm run build:ea-seasons
@@ -697,7 +833,8 @@ is a file in `public/football/` (about 310 KB) that loads only when chosen.
   `docs/design/football-seasons-audit.json`, and every file rebuilds byte for
   byte.
 
-Seasons before 2014/15 have no EA source. They can come from a Championship
+Seasons before 2006/07 have no EA source here: the SoFIFA scrape, the only
+source of nationality and club, starts with FIFA 07. They can come from a Championship
 Manager 01/02 database, which covers 2001/02 to 2025/26 but whose authors have
 not allowed redistribution, so those seasons stay **local**. Download a database
 from [champman0102.co.uk](https://www.champman0102.co.uk) (a free forum account
@@ -737,6 +874,41 @@ considered, back to 1872, and their terms.
 
 The [design notes](docs/design/football-years.md) give the file format, the
 runtime, the saves and the known limits.
+
+## Basketball seasons
+
+Basketball can be played on 26 earlier seasons as well as the built-in 2026/27:
+1999/00 to 2025/26, each from that season's NBA 2K (NBA 2K to NBA 2K26). Pick
+one under **Season** in setup; it plays NBA clubs only, so it switches Teams to
+clubs. Each season is a file in `public/basketball/` (about 12 KB) that loads
+only when chosen, with the map of its era.
+
+- **What a season holds:** the franchises of that season, each with the best
+  five its players' positions allow. Ratings are 2K's overalls, unchanged.
+  Franchises that have moved since keep their name and city of the time: the
+  Vancouver Grizzlies, Seattle SuperSonics, New Jersey Nets, Charlotte Bobcats
+  and the New Orleans (and, for 2005/06 and 2006/07, Oklahoma City) Hornets.
+- **What is missing:** 2011/12, whose ratings the source lists for only three
+  players of two teams, and any national team: NBA 2K rates NBA players only.
+- **Source:** [2K Archive](https://2karchive.com/), a fan compilation of every
+  edition's ratings that names no licence (2K's own rights are not cleared).
+  The built-in season, NBA 2K27, comes from the same page.
+  `scripts/data/nba-seasons.json` pins one saved copy of its page by SHA-256
+  and lists each season's franchises and the arenas of those that moved. To rebuild, save the page as
+  `data-src/bball-2karchive/home.html` (ignored) and run:
+
+  ```bash
+  npm run build:nba-seasons
+  ```
+
+  It writes the season files, their listing `src/data/basketballSeasons.js` and
+  `docs/design/basketball-seasons-audit.json`; `npm run build:nba-map` then
+  draws the era maps.
+- **Saves** hold every player as played, so a season campaign resumes without
+  its season file. It still needs its era's map, as any NBA campaign does.
+
+The [design notes](docs/design/football-years.md#earlier-basketball-seasons)
+give the file format, the era maps and the known limits.
 
 ## Squad economics
 
@@ -807,10 +979,14 @@ Wikidata item, takes the lead image of its English Wikipedia article (the infobo
 crest, else the item's logo image on Wikimedia Commons), and saves it as a WebP
 fitting 128×128 in `public/club-logos/<club id>.webp`. Domestic clubs reuse the
 item their home town came from. An all-leagues club shares its domestic twin's
-file: the club of its country whose FM26 squad shares the most players with its
-EA FC 26 lineup. NBA franchises are matched by name. Overrides go in
-`scripts/data/club-logos.json`: `items` maps a club id to a Wikidata item, and
-`files` maps it to a file name, or to `null` for no crest. Responses and
+file: the club of its country whose FM26 squad shares at least four players with
+its EA lineup, the most of any. The all-leagues clubs are the built-in ones and
+those of the earlier seasons no older than the FM26 squads (EA FC 26), so a club
+relegated since 2025/26 keeps its crest there. NBA and NFL franchises are matched
+by name. Overrides go in `scripts/data/club-logos.json`: `items` maps a club id
+to a Wikidata item, `files` maps it to a file name, or to `null` for no crest,
+and `twins` names a domestic twin the lineups miss (Venezia, promoted for 2026/27,
+shares only three players with its 2025/26 squad). Responses and
 images are cached in the ignored `data-src/club-logos/`, so reruns are offline;
 `--refresh` asks Wikidata and Wikipedia again.
 
@@ -1003,23 +1179,26 @@ src/
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
     basketball.js      starting five, 40 minutes, overtime
+    americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
   data/teams.js        173 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
+  data/clubs.american-football.js  GENERATED NFL lineups and backups (npm run build-nfl)
   data/sourceTable.js  compact player rows of the generated football files: one
                        JSON line per nation or club, metadata keys and shared
                        values written once (scripts/lib/data-module.mjs writes them)
   data/scopes.js       club theatre choices (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
-  data/clubMaps.js     GENERATED index of a sport's own club map: the NBA's (npm run build:nba-map)
+  data/clubMaps.js     GENERATED index of a sport's own club maps: the NBA's, today's and its eras', and the NFL's (npm run build:club-maps)
   data/domesticScope.js  labels for 'domestic:<id>' theatres, and a sport's own map
   data/domesticTiers.js  each nation's club cap and the setup lists' priority order
   data/cm0102.js       CM 01/02 database reader (pure; Node and browser)
   data/cmPlayers.js    CM player tuples, positions and rating conversion
   data/eaPlayers.js    EA player tuples of the built-in earlier seasons
   data/footballSeasons.js  GENERATED listing of the earlier seasons (npm run build:ea-seasons)
+  data/basketballSeasons.js  GENERATED listing of the earlier basketball seasons (npm run build:nba-seasons)
   data/footballSetBuild.js  CM 01/02 data set builder (pure; Node and browser)
   data/cm0102Releases.js, cm0102Nations.js, footballFederations.js  its manifests:
                        known releases, CM nation names, federations by year
@@ -1034,10 +1213,10 @@ src/
     campaign.js        territory ownership, targeting, round draws
     duelDraw.js        one-by-one draw: attacker, compass bearing, route
     turns.js           round-robin queue, "in reach" targets, launch rules
-    winProbability.js  live win-probability model (football and basketball)
+    winProbability.js  live win-probability model (football, basketball and American football)
     liveMinute.js      live match minute store (outside saved state)
     domestic.js        loads and validates a country map: sections and club rows
-    footballSets.js    lists, loads and validates football seasons; season-bound sport
+    footballSets.js    lists, loads and validates earlier seasons of both sports; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
                        wizard, match card, dialogs and overlays, the ad slot
@@ -1045,7 +1224,9 @@ public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
-  domestic/            one sectioned map per country, and the NBA's (nba.json), fetched on demand
+  domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …) and the NFL's (nfl.json), fetched on demand
+  football/            the built-in earlier football seasons (ea-*.json), fetched when chosen
+  basketball/          the built-in earlier basketball seasons (nba-2k*.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
   flags/               173 vendored flag SVGs
@@ -1062,7 +1243,10 @@ scripts/
   build-clubs.mjs      builds the club layer for both sports
   sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
-  build-nba-map.mjs    builds the NBA's map of the USA and Canada from the arenas
+  build-club-maps.mjs  builds the NBA's maps of the USA and Canada (today's and each era's) and the NFL's of the USA
+  sync-madden.mjs      snapshots Madden NFL ratings from EA's ratings site
+  build-nfl.mjs        builds the NFL clubs from that snapshot
+  build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
@@ -1082,18 +1266,18 @@ scripts/
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **ten full
-campaigns** across all three pacings, both resolution modes, both sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **eleven full
+campaigns** across all three pacings, both resolution modes, all three sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
-their own map and one is Fiji's 16 clubs, each starting on a group of its 100
-sections. A **manager campaign** (Italy, Europe, round robin × *You
+their own map, one is Fiji's 16 clubs, each starting on a group of its 100
+sections, and one the NFL's 32 franchises on theirs, with the live ticker. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after
 elimination. It also checks that every one-by-one turn draws exactly three
 campaign samples and that no clock timer runs while a decision is pending.
-**Six interrupt-and-resume scenarios** cover a world-scale national campaign
-plus basketball nations, football clubs, NBA clubs and England and Fiji
+**Seven interrupt-and-resume scenarios** cover a world-scale national campaign
+plus basketball nations, football clubs, NBA clubs, NFL clubs and England and Fiji
 domestic campaigns, which are played on to their champions after the reload.
 They verify that settings, ownership, squads, acquired players, and the remaining
 match queue survive a reload and that the campaign remains playable. The app's
@@ -1115,8 +1299,8 @@ React warnings.
 Focused runs skip every other section:
 
 ```bash
-npm run smoke -- --campaign-only=0   # one of the ten campaigns (index 0–9; 7 and 8 are England, 9 is Fiji)
-npm run smoke -- --resume-only=0     # one resume scenario (index 0–5; 4 is England, 5 is Fiji)
+npm run smoke -- --campaign-only=0   # one of the eleven campaigns (index 0–10; 7 and 8 are England, 9 is Fiji, 10 the NFL)
+npm run smoke -- --resume-only=0     # one resume scenario (index 0–6; 4 is England, 5 is Fiji, 6 the NFL)
 npm run smoke -- --manager-only      # the manager campaign
 npm run smoke -- --scenarios=england # scenarios whose names match; narrows the picks above
 ```
@@ -1133,6 +1317,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `turn-order` | Round-robin queue, "in reach" tiers, fixed-attacker and chosen-target draws |
 | `turn-panels`, `turn-wiring` | Turn strip, Choose a target, spectator panel, and the turn flow in the real App |
 | `win-probability` | The live win-probability model against the football and basketball match models |
+| `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
@@ -1142,7 +1327,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 Domestic campaigns add `domestic-data`, `domestic-geometry`, `domestic-campaign`
 and `domestic-routing`, which `npm run test:domestic` also runs on their own.
 
-It also checks each sport's match model over 400 simulated games: that every match
+It also checks each sport's match model over 400 simulated games (American
+football's over 3,000 in its own test file): that every match
 has a winner, that a level score always triggers a tie-break, that the event feed
 adds up to the final score, and that scoring lands in the right range for the
 sport.

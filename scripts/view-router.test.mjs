@@ -11,6 +11,7 @@ import { selectLineup } from '../src/data/teams.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { empireNeighbors } from '../src/engine/campaign.js';
+import { recommendedTactic } from '../src/engine/managerStrategy.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { ROOT, bundleApp, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
@@ -457,7 +458,7 @@ test('a spectator auto-switches only for the followed team, and nextAction rever
   });
 });
 
-test('the match preview opens and closes the tactical dialog; Continue kicks off with balanced', async () => {
+test('the match preview opens and closes the tactical dialog; Continue kicks off with the recommended approach', async () => {
   await withApp(manager, ({ app }) => {
     app.startMatch('250', '276');
     assert.ok(!renderPure(app, 'gate').includes('data-tactic'), 'no auto-open');
@@ -476,19 +477,34 @@ test('the match preview opens and closes the tactical dialog; Continue kicks off
     const chosen = [];
     const original = app.chooseTactic.bind(app);
     app.chooseTactic = (id, options) => { chosen.push(id); return original(id, options); };
+    const recommended = recommendedTactic(app.state.tacticalChoice.options);
     app.runPrimary();
-    assert.deepEqual(chosen, ['balanced']);
+    assert.deepEqual(chosen, [recommended]);
     assert.ok(app.state.match && !app.state.tacticalChoice);
   });
 });
 
-test('the preview dialog "simulate the result" link kicks off an instant match with the default approach', async () => {
+test('Continue at the gate picks the best displayed chance, not Balanced', async () => {
   await withApp(manager, ({ app }) => {
     app.startMatch('250', '276');
+    // Rig the estimates so Attack reads best: Continue must kick off with it.
+    const odds = { attack: .58, balanced: .5, defend: .44 };
+    app.setState({ tacticalChoice: { ...app.state.tacticalChoice,
+      options: app.state.tacticalChoice.options.map(option => ({ ...option, winProbability: odds[option.id] })) } });
+    assert.equal(app.primaryAction().label, 'Continue');
+    app.runPrimary();
+    assert.equal(app.state.match.tactic, 'attack');
+  });
+});
+
+test('the preview dialog "simulate the result" link kicks off an instant match with the recommended approach', async () => {
+  await withApp(manager, ({ app }) => {
+    app.startMatch('250', '276');
+    const recommended = recommendedTactic(app.state.tacticalChoice.options);
     app.openMatchPreview();
     findElement(app.render(), 'TacticalChoice').props.onSimulate();
     assert.ok(app.state.match && !app.state.tacticalChoice && !app.state.tacticalPreview);
-    assert.deepEqual([app.state.match.instant, app.state.match.tactic], [true, 'balanced']);
+    assert.deepEqual([app.state.match.instant, app.state.match.tactic], [true, recommended]);
     assert.deepEqual([app.state.view, app.state.viewSource], ['map', 'user'], 'an instant match never auto-switches');
   });
 });
@@ -507,6 +523,133 @@ test('setSpeed and cycleSpeed hand the previous speed to rescheduleForSpeed', as
     app.cycleSpeed();
     assert.deepEqual(calls, [[1, 4], [4, 1], [1, 2], [2, 4]]);
     assert.equal(app.timers.size, 0);
+  });
+});
+
+/** Kick off the managed 250 v 276 past the tactical gate. */
+function kickOffOwn(app) {
+  app.startMatch('250', '276');
+  app.chooseTactic('balanced');
+}
+/** The live ticker tracks its events and whistle; an instant or express reveal tracks none. */
+const onTicker = app => app.matchTasks.size > 0;
+
+test('your match plays live at 1× and the chosen speed returns with the result', async () => {
+  await withApp(manager, ({ app }) => {
+    app.setSpeed(4);
+    app.startMatch('250', '276');
+    assert.equal(app.state.speed, 4, 'the tactical gate keeps the speed');
+    app.chooseTactic('balanced');
+    assert.equal(app.state.speed, 1, 'kick-off of your match slows to 1×');
+    assert.ok(onTicker(app), 'on the live ticker');
+    forceResult(app, '250', { aId: '250', dId: '276' });
+    app.finishMatch();
+    assert.ok(app.state.choice, 'the signing choice');
+    assert.equal(app.state.speed, 4, 'the chosen speed is back');
+  });
+});
+
+test('a speed picked during your match is kept after it', async () => {
+  await withApp(manager, ({ app }) => {
+    app.setSpeed(4);
+    kickOffOwn(app);
+    app.setSpeed(2);
+    forceResult(app, '250', { aId: '250', dId: '276' });
+    app.finishMatch();
+    assert.equal(app.state.speed, 2);
+  });
+  await withApp(manager, ({ app }) => {
+    app.setSpeed(4);
+    kickOffOwn(app);
+    app.setSpeed(1);
+    forceResult(app, '250', { aId: '250', dId: '276' });
+    app.finishMatch();
+    assert.equal(app.state.speed, 1, 'even choosing the 1× it already plays at');
+  });
+  await withApp(manager, ({ app }) => {
+    app.setState({ speed: 80 }); // the smoke harness's test speed
+    kickOffOwn(app);
+    assert.equal(app.state.speed, 1);
+    forceResult(app, '250', { aId: '250', dId: '276' });
+    app.finishMatch();
+    assert.equal(app.state.speed, 80, 'any speed it was slowed from comes back');
+  });
+});
+
+test('Fast-forward plays your match live on the Match view; other matches still skip the ticker', async () => {
+  await withApp({ ...manager, settings: { express: true } }, ({ app }) => {
+    app.setSpeed(4);
+    kickOffOwn(app);
+    assert.equal(app.state.match.express, false);
+    assert.ok(onTicker(app), 'your match is on the live ticker');
+    assert.equal(app.state.speed, 1);
+    assert.deepEqual([app.state.view, app.state.viewSource], ['match', 'auto']);
+  });
+  await withApp({ ...manager, settings: { express: true, resolution: 'instant' } }, ({ app }) => {
+    kickOffOwn(app);
+    assert.ok(onTicker(app), 'Fast-forward wins over a stored Final score only');
+  });
+  await withApp({ ...manager, settings: { express: true } }, ({ app }) => {
+    app.setSpeed(4);
+    app.startMatch('276', '826');
+    assert.ok(!onTicker(app), 'a match without your team is never on the ticker');
+    assert.equal(app.state.speed, 4);
+    assert.equal(app.state.view, 'map');
+  });
+});
+
+test('Final score only and "simulate the result" keep your match instant at the chosen speed', async () => {
+  await withApp({ ...manager, settings: { resolution: 'instant' } }, ({ app }) => {
+    app.setSpeed(4);
+    kickOffOwn(app);
+    assert.ok(!onTicker(app));
+    assert.equal(app.state.speed, 4);
+  });
+  await withApp(manager, ({ app }) => {
+    app.setSpeed(2);
+    app.startMatch('250', '276');
+    app.simulateResult();
+    assert.ok(app.state.match.instant && !onTicker(app));
+    assert.equal(app.state.speed, 2);
+  });
+});
+
+test('phonePlaybackModel: Auto for a manager, speed for everyone, nothing while a decision waits', async () => {
+  await withApp(manager, ({ app }) => {
+    assert.deepEqual(app.phonePlaybackModel(), { autoplay: false, speed: 1, showAutoplay: true });
+    app.setSpeed(4);
+    app.startMatch('250', '276');
+    assert.equal(app.phonePlaybackModel(), null, 'the tactical gate');
+    app.chooseTactic('balanced');
+    assert.deepEqual(app.phonePlaybackModel(), { autoplay: false, speed: 1, showAutoplay: true }, 'your live match');
+    forceResult(app, '250', { aId: '250', dId: '276' });
+    app.finishMatch();
+    assert.equal(app.phonePlaybackModel(), null, 'the signing choice');
+    const bar = findElement(app.render(), 'PhoneBar');
+    assert.equal(bar.props.playback, null);
+    assert.equal(typeof bar.props.onAutoplay, 'function');
+    assert.equal(typeof bar.props.onSpeed, 'function');
+  });
+  await withApp({}, ({ app }) => {
+    assert.deepEqual(app.phonePlaybackModel(), { autoplay: false, speed: 1, showAutoplay: false }, 'a spectator');
+    app.setState({ aliveIds: ['250'] });
+    assert.equal(app.phonePlaybackModel(), null, 'a finished campaign');
+  });
+});
+
+test('a spectator\'s followed team plays at 1×; other matches keep the speed', async () => {
+  await withApp({}, ({ app }) => {
+    app.followTeam('276');
+    app.setSpeed(4);
+    app.startMatch('250', '826');
+    assert.equal(app.state.speed, 4, 'not the followed team');
+    forceResult(app, '250', { aId: '250', dId: '826' });
+    app.finishMatch();
+    app.startMatch('250', '276');
+    assert.equal(app.state.speed, 1, 'the followed team');
+    forceResult(app, '250', { aId: '250', dId: '276' });
+    app.finishMatch();
+    assert.equal(app.state.speed, 4);
   });
 });
 

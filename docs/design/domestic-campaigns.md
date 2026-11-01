@@ -92,7 +92,7 @@ Two offline stages; nothing is fetched from these services at runtime.
 
 | File | Role |
 | --- | --- |
-| `scripts/sync-domestic-clubs.mjs`, `scripts/lib/domestic-sync.mjs`, `scripts/lib/domestic-locate.mjs` | Stage 1 (network, cached): EFEM clubs and squads, home towns → snapshots. |
+| `scripts/sync-domestic-clubs.mjs`, `scripts/lib/domestic-sync.mjs`, `scripts/lib/domestic-locate.mjs` | Stage 1 (network, cached; EFEM only with `--efem-permission-granted`): EFEM clubs and squads, home towns → snapshots. |
 | `scripts/data/domestic/<id>.json`, `survey.json` | Committed snapshot per nation (written only when N ≥ 2, `MIN_CLUBS`); the survey records every nation's club-list estimate `estN` and the full sync's `n`, `ships` and, for a nation that does not ship, `why`. |
 | `scripts/data/domestic-locations.json` | Manual home-town overrides, keyed by FM club id. |
 | `scripts/data/domestic-names.json` | Real names for FM's placeholder club names, keyed by FM club id. |
@@ -110,7 +110,9 @@ Every download is cached under the ignored `data-src/` (`domestic/efem`,
 `boundaries/geonames`), so reruns are offline. Requests send the User-Agent
 `imperialism-game-build/1.0 (offline data build)`. EFEM: three at a time, 0.5 s
 apart per slot, three retries with backoff on network errors, 429, 5xx and empty
-bodies. Wikidata: one at a time, 1 s apart. Boundary downloads: one at a time
+bodies, and only with `--efem-permission-granted`: efem.club/robots.txt disallows
+`/api/` (checked 18 October 2026), so without the flag the sync replays cached
+responses and refuses any EFEM request. Wikidata: one at a time, 1 s apart. Boundary downloads: one at a time
 (worker threads ask the main thread), 0.5 s apart, four tries. Nominatim is never
 used. From a warm cache the sync of every nation takes about 30 s. A full build
 takes 4.5 to 6.5 minutes: nearly all of it is Canada, whose partition runs three
@@ -461,13 +463,13 @@ clubs pushed off their unit by a stronger club.
 "format": 2,
 "id": "242",
 "name": "Fiji",
-"version": "242-7808c767",
+"version": "242-7370036d",
 "projection": {"lon0":178.5,"lat0":-17.8},
 "focus": [176.7,-19.3,181.8,-15.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"FJI","level":"ADM4","license":"…","source":"…",
   "units":1599,"areaKm2":20966,"filled":{…}},
 "source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0",
-  "snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+  "snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{…},"objects":{"sections":{"type":"GeometryCollection","geometries":[
   {"type":"Polygon","arcs":[[…]],"id":"242-001","properties":{"name":"Vadraulailai Settlement","units":46}},
   {"type":"Polygon","arcs":[[…]],"id":"242-002","properties":{"name":"Soweri Settlement","units":29}}, …]}},"arcs":[…]},
@@ -669,7 +671,7 @@ and provinces far from every arena left empty (since 2026-10-30; the first build
 split every county of both countries). It reuses this whole runtime (loader, country
 chart, backdrop, routing, saves) as a format-1 map whose clubs are the game's own.
 
-**Build** (`npm run build:nba-map`, `scripts/build-nba-map.mjs`, about a minute;
+**Build** (`npm run build:nba-map`, `scripts/build-club-maps.mjs --league=nba`, about 6 minutes with the era maps;
 `--check` rebuilds offline and compares, `--dry-run` writes nothing):
 
 - **Units**: geoBoundaries gbOpen USA ADM2 (counties, public domain) and CAN ADM2
@@ -754,6 +756,17 @@ England it lies inside the hosts, so a route over it reads as open ground.
 The victory names "USA and Canada". Basketball squads are not FM players, so
 checkpoints store them in full (no `playerPack`).
 
+**Era maps** (2026-10-30). The earlier basketball seasons
+([football-years.md](football-years.md#era-maps)) play on maps of their own eras,
+built by the same command from `scripts/data/nba-seasons.json`: one map per era of
+franchises and arenas (`nba2000` … `nba2014`, nine in all), each from that era's
+arenas and with section ids in today's strength order (a moved franchise ranks as
+its successor). Such a map adds `seasons` (the set ids it serves) to its file and
+index entry, its rows add the franchise's `name`, and the loader then takes no
+club from the game's data: the season gives each row its name, code, strength and
+five at kick-off. Today's `nba.json` is unchanged and also serves the seasons from
+2014/15, whose franchises are today's.
+
 **Checks**: `scripts/nba-map.test.mjs` (in `npm run test:domestic`): file, index,
 arenas and clubs agree; the USA and Canada are all the land and the hosts are not
 drawn beneath it; the empty regions are the expected ten, drawn but no obstacle, on
@@ -764,6 +777,46 @@ campaigns on the app board reach a champion without treaties or third-party
 crossings; loader refusals; the App sets up, launches and titles an NBA campaign
 and keeps an old world NBA save on the world. The smoke's NBA scenarios run
 through the country-map checks.
+
+## The NFL map
+
+Status: implemented 2026-10-31. American football ([american-football.md](american-football.md))
+has one theatre, **NFL**, played on `public/domestic/nfl.json`: the USA split into
+32 territories, one per franchise, along state lines. It is built by the same
+command and partition as the NBA's: `scripts/build-nba-map.mjs` became
+`scripts/build-club-maps.mjs`, with one entry per league in `LEAGUES` (`npm run
+build:club-maps` builds both; `build:nba-map` and `build:nfl-map` one each, the
+index keeping the other league's entries as they are). The NBA maps rebuild byte
+for byte; only their attribution files name the new script.
+
+- **Units**: the USA's counties grouped by state, as for the NBA, with no second
+  country, so no border fitting. Puerto Rico and the other territories are cut;
+  Alaska and Hawaii lie off the landmass and are dropped. No state lies over
+  1,000 km from every stadium, so there is no empty land.
+- **Homes**: `scripts/data/nfl-teams.json`, each franchise's stadium, except the
+  four that share one, which grow from their training grounds (see
+  [american-football.md](american-football.md#data)).
+- **Shared states**: California and Florida (three franchises each), Texas,
+  Pennsylvania, Ohio, Maryland and New Jersey (two each) split along county lines.
+  MetLife Stadium stands in New Jersey, but the Giants and Jets are New York's, so
+  the league joins New York to New Jersey (`joins: { 'US-NJ': ['US-NY'] }`): New
+  York's counties go to the Bills or to either New Jersey franchise. The Giants,
+  nearer the city, hold Manhattan, Long Island and Connecticut; the Bills the rest
+  of the state. Los Angeles County is cut between the Rams and the Chargers.
+- **Result** (2026-10-31 build): Denver holds Colorado, Wyoming and Montana; Las
+  Vegas Nevada and Utah; Kansas City Missouri, Kansas and Nebraska; Minnesota the
+  Dakotas; Seattle Washington, Oregon and Idaho; Tennessee Arkansas and Alabama;
+  Washington Virginia, DC and southern Maryland; Baltimore northern Maryland and
+  Delaware. Areas range from the Jets' 19,000 km² (northern New Jersey) to Denver's
+  902,000 km². The file is about 134 KB; the index entry adds `venue: "stadium"` and
+  `lines: "state"`, so the setup reads "… each starting on the land nearest its
+  stadium: USA split into 32 territories along state lines."
+
+**Checks**: `scripts/american-football.test.mjs`: file, index, stadiums and clubs
+agree; every stadium (or training ground) lies inside its territory; Manhattan is
+the Giants', Buffalo the Bills', Morris County the Jets', the San Fernando Valley
+the Rams' and San Diego the Chargers'; seeded duel campaigns reach a champion; the
+App launches on the map. The smoke runs an NFL duel and an NFL resume.
 
 ## Known limitations
 

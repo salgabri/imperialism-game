@@ -58,9 +58,10 @@ export function powerTable(playing) {
 }
 
 /**
- * VictoryOverlay props (spread by render). Every HEAD key and every `recap` key is kept (campaign-experience reads
- * `recap['Elapsed time']`). v4 adds `onChronicle` (board 11 "Read the chronicle"): close the results and open the
- * Chronicle. It travels in this model because render spreads it into VictoryOverlay (PLAN §1.2 note).
+ * VictoryOverlay props (spread by render). Every HEAD key is kept (campaign-experience reads `recap['Elapsed time']`);
+ * the playtest timing keys of `recap` need `this.playtest` (?playtest). v4 adds `onChronicle` (board 11 "Read the
+ * chronicle"): close the results and open the Chronicle. It travels in this model because render spreads it into
+ * VictoryOverlay (PLAN §1.2 note). `you` is the manager's own run (ledgerVM.buildManagerRecap).
  */
 export function victoryPanel() {
   const { aliveIds, teams, stats, settings, round, matches } = this.state;
@@ -94,11 +95,15 @@ export function victoryPanel() {
     recap: { ...campaignRecap(this.state.history),
       biggestUpset: ledgerVM.biggestUpsetLine(this.state.history) || 'No upsets recorded',
       'Leader changes': this.state.metrics?.leaderChanges || 0,
-      'Acquisitions improving the lineup': (this.state.metrics?.acquisitions || []).filter(g => g > 0).length,
       'Elapsed time': `${Math.max(1, Math.round(((this.state.completedAt || Date.now()) - (this.state.startedAt || Date.now())) / 60000))} min`,
-      'Active viewing': `${Math.round(this.engagement.snapshot().viewingMs / 1000)} sec`,
-      'Time choosing': `${Math.round(this.engagement.snapshot().decisionMs / 1000)} sec`,
-      'Skipped presentations': this.engagement.totals.skips },
+      // Playtest timing (docs/design/playtest.md) shows only with ?playtest; the export always carries it.
+      ...(this.playtest ? {
+        'Acquisitions improving the lineup': (this.state.metrics?.acquisitions || []).filter(g => g > 0).length,
+        'Active viewing': `${Math.round(this.engagement.snapshot().viewingMs / 1000)} sec`,
+        'Time choosing': `${Math.round(this.engagement.snapshot().decisionMs / 1000)} sec`,
+        'Skipped presentations': this.engagement.totals.skips,
+      } : {}) },
+    you: ledgerVM.buildManagerRecap(this.state, ledgerContext.call(this)),
     seed: this.state.seed,
     onChronicle: () => this.setState({ phase: 'playing' }, () => this.setView('chronicle')),
   };

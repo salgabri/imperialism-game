@@ -1,12 +1,14 @@
 // Owner: WP-LEDGER (see PLAN.md §4). "Match preview" dialog (DEC D10): v1 board 07 mapped to v4 tokens.
 // Opened from the Next fixture block; no longer auto-opens. Contract (strategy-ui L36-47): [data-tactic] buttons
 // commit immediately, copy "You are the underdog" / "Matchday variation 11.0" / "Scoring luck remains", initial
-// focus on data-tactic="balanced", focus restored on close, role="dialog" aria-modal="true". Escape → onClose.
+// focus on the recommended approach (the one Continue kicks off with), focus restored on close, role="dialog"
+// aria-modal="true". Escape → onClose.
 // Optional `preview` (buildMatchPreview(st, ctx), src/viewModels/ledger.js) adds the fixture header, stakes,
 // tale of the tape and both XIs; optional `onSimulate` adds the "simulate the result" link.
 import React, { useEffect, useRef } from 'react';
 import Icon from './Icon.jsx';
 import TeamMark from './TeamMark.jsx';
+import { recommendedTactic } from '../engine/managerStrategy.js';
 import { formatWinChance, winTone } from '../viewModels/format.js';
 import './dialogs.css';
 
@@ -110,10 +112,11 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
   const dialogRef = useRef(null);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
+  const recommended = recommendedTactic(choice?.options || []);
   useEffect(() => {
     const previous = document.activeElement;
     const dialog = dialogRef.current;
-    dialog?.querySelector('[data-tactic="balanced"]')?.focus();
+    dialog?.querySelector(`[data-tactic="${recommended}"]`)?.focus();
     const keys = event => {
       if (event.key === 'Escape' && closeRef.current) { event.preventDefault(); closeRef.current(); return; }
       if (event.key !== 'Tab') return;
@@ -166,18 +169,18 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
               <p id="tactical-description" className="fi-tactical-standfirst">{standfirst}</p>
               <div className="fi-tactical-options">
                 {options.map(option => {
-                  const recommended = option.id === 'balanced';
+                  const isDefault = option.id === recommended;
                   const bonus = Number(option.bonus) || 0;
                   const support = Number(option.support) || 0;
                   return (
                     <button type="button" key={option.id} data-tactic={option.id} onClick={() => onChoose(option.id)}
-                      className={`fi-tactical-option${recommended ? ' is-default' : ''}`}>
+                      className={`fi-tactical-option${isDefault ? ' is-default' : ''}`}>
                       <span className="radio-square" aria-hidden="true" />
                       <span className="fi-tactical-option__body">
-                        {/* Reserve support is a tag on the name row (beside "Default", which only Balanced carries and
-                            Balanced never has support), so it never adds a line to the row. */}
+                        {/* Recommended and reserve support are tags on the name row; the row may wrap when Attack or
+                            Defend carries both. */}
                         <span className="fi-tactical-option__name"><strong>{option.label}</strong>
-                          {recommended && <span className="fi-tactical-option__tag">Default</span>}
+                          {isDefault && <span className="fi-tactical-option__tag">Recommended</span>}
                           {support > 0 && <span className="fi-tactical-option__support" title={`Reserve support contributes +${support.toFixed(2)} to this approach.`}>Reserve support +{support.toFixed(2)}</span>}
                         </span>
                         <span className="fi-tactical-option__desc">{option.description}</span>

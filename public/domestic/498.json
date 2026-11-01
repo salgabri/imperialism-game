@@ -2,11 +2,11 @@
 "format": 2,
 "id": "498",
 "name": "Moldova",
-"version": "498-cc77eb66",
+"version": "498-2f4af52e",
 "projection": {"lon0":28.5,"lat0":47},
 "focus": [26.5,45.4,30.3,48.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"MDA","level":"ADM1","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"UNHCR, OCHA FISS","year":"2020","canonical":"Districts","boundaryId":"MDA-ADM1-25212430","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MDA/ADM1/geoBoundaries-MDA-ADM1_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Ukraine","km2":146}]},"units":37,"areaKm2":33619},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00003546818968189686,0.000030242492424994616],"translate":[26.61635499999977,45.46727999905676]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"498-001","properties":{"name":"Transnistria (north-west 2)","units":2}},
 {"type":"Polygon","arcs":[[-4,6,7,8]],"id":"498-002","properties":{"name":"Tiraspol","units":2}},

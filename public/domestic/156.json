@@ -2,11 +2,11 @@
 "format": 2,
 "id": "156",
 "name": "China",
-"version": "156-d9367afc",
+"version": "156-40474f6b",
 "projection": {"lon0":103.6,"lat0":36.9},
 "focus": [72.3,17.4,136,54.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"CHN","level":"ADM2","license":"Open Data Commons Public Domain Dedication and License (PDDL) v1.0","licenseDetail":"revolutionarygis.wordpress.com/2017/04/11/china-shapefile-data/","source":"National Administration of Surveying, Mapping and Geoinformation of China, Revolutionary GIS","year":"2017","canonical":"County Level","boundaryId":"CHN-ADM2-17275852","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHN/ADM2/geoBoundaries-CHN-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Shanghai Municipality","Guangzhou Province"],"license":"Public Domain","source":"geoBoundaries, Wikimedia Commons","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHN/ADM1/geoBoundaries-CHN-ADM1_simplified.geojson"},"excluded":["TWN","HKG","MAC"],"excludedSource":"Natural Earth 1:10m Admin 1 (v5.1.2), Public Domain","excludedUrl":"https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"India","km2":66765},{"shape":"Kyrgyzstan","km2":2622},{"shape":"Bhutan","km2":1100},{"shape":"Mongolia","km2":1032},{"shape":"Kazakhstan","km2":867},{"shape":"Myanmar","km2":642},{"shape":"Russia","km2":365},{"shape":"Tajikistan","km2":258},{"shape":"Laos","km2":242},{"shape":"North Korea","km2":186},{"shape":"Nepal","km2":72},{"shape":"Vietnam","km2":34}]},"units":2370,"areaKm2":9358104},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0006113434254045437,0.0003536904965449653],"translate":[73.57684030197106,18.16324718800007]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"156-001","properties":{"name":"Shanghai (south-east)","units":1}},
 {"type":"Polygon","arcs":[[-6,6,7,8,9]],"id":"156-002","properties":{"name":"Jiading","units":3}},

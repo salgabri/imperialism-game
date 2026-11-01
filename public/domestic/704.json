@@ -2,11 +2,11 @@
 "format": 2,
 "id": "704",
 "name": "Vietnam",
-"version": "704-df8d4437",
+"version": "704-e63f22d1",
 "projection": {"lon0":106.4,"lat0":16},
 "focus": [101.9,6.9,112.3,23.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"VNM","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"OCHA ROAP, Government of Viet Nam","year":"2020","canonical":"District","boundaryId":"VNM-ADM2-81297802","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VNM/ADM2/geoBoundaries-VNM-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Bình Thuận","Hải Phòng","Khánh Hòa","Kiên Giang","Quảng Ninh"],"license":"Public Domain","source":"geoBoundaries, Wikipedia","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VNM/ADM1/geoBoundaries-VNM-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"China","km2":266},{"shape":"Laos","km2":69}]},"units":713,"areaKm2":336071},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0001569153600636005,0.00016183506602331928],"translate":[102.14407834700006,7.180931477000058]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"704-001","properties":{"name":"Đống Đa (north-east)","units":22}},
 {"type":"Polygon","arcs":[[6,-4,7,8,9]],"id":"704-002","properties":{"name":"Thái Nguyên","units":7}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "756",
 "name": "Switzerland",
-"version": "756-b70016a0",
+"version": "756-d6673c46",
 "projection": {"lon0":8.2,"lat0":46.8},
 "focus": [5.8,45.7,10.6,47.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"CHE","level":"ADM3","license":"Federal Office of Topography swisstopo License","source":"Federal Office of Topography swisstopo","year":"2022","canonical":"Municipality","boundaryId":"CHE-ADM3-14041887","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHE/ADM3/geoBoundaries-CHE-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Liechtenstein","km2":83},{"shape":"Austria","km2":36}]},"units":2262,"areaKm2":41228},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00004536206793067913,0.000019905157201572326],"translate":[5.955901422000068,45.81795851000004]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"756-001","properties":{"name":"Basel (south)","units":7}},
 {"type":"Polygon","arcs":[[6,7,8,-2,9,10]],"id":"756-002","properties":{"name":"Pratteln","units":37}},

@@ -3,6 +3,7 @@
 import { teamEff } from '../data/teams.js';
 import { territories } from '../engine/campaign.js';
 import { displayRound, memo, roman, signedDelta, teamChip } from './format.js';
+import { getSport } from '../sports/index.js';
 
 function territoryCounts(own) {
   const counts = new Map();
@@ -27,7 +28,7 @@ function managerStats(st, ctx, id) {
   const terr = ctx.board ? territories(ctx.board, id).length : 0;
   return [
     { key: 'strength', label: 'Strength', short: 'Str', value: eff.toFixed(1), delta: delta.text, tone: delta.tone,
-      tip: `${sportIdOf(st, ctx) === 'basketball' ? 'Starting five' : 'Starting XI'} strength · change since Round I` },
+      tip: `${getSport(sportIdOf(st, ctx)).words.lineup} strength · change since Round I` },
     { key: 'territories', label: 'Territories', short: 'Terr', value: String(terr), delta: '', tone: 'muted', tip: 'Land held' },
     { key: 'conquests', label: 'Conquests', short: 'Conq', value: String(st.stats?.[id]?.conq ?? 0), delta: '', tone: 'muted',
       tip: 'Empires annexed' },

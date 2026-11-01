@@ -2,11 +2,11 @@
 "format": 2,
 "id": "064",
 "name": "Bhutan",
-"version": "064-bd9a84dc",
+"version": "064-9bb2fd04",
 "projection": {"lon0":90.4,"lat0":27.5},
 "focus": [88.6,26.6,92.2,28.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"BTN","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"OCHA ROAP","year":"2020","canonical":"Gewog","boundaryId":"BTN-ADM2-84629894","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BTN/ADM2/geoBoundaries-BTN-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"India","km2":36},{"shape":"China","km2":10}]},"units":205,"areaKm2":38781},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000033787467324673425,0.000015470392343923605],"translate":[88.74604141400005,26.700655537000046]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"064-001","properties":{"name":"Wangchang (south)","units":6}},
 {"type":"Polygon","arcs":[[4,-1,5,6]],"id":"064-002","properties":{"name":"Drugyel Dzong","units":1}},

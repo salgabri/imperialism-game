@@ -2,11 +2,11 @@
 "format": 2,
 "id": "170",
 "name": "Colombia",
-"version": "170-3310664b",
+"version": "170-4013530a",
 "projection": {"lon0":-73.1,"lat0":4.1},
 "focus": [-82.1,-4.6,-66.5,13.8],
 "boundaries": {"provider":"geoBoundaries","iso3":"COL","level":"ADM2","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","licenseDetail":"Noted by CC icon on web page","source":"Departamento Administrativo Nacional de Estadistica","year":"2020","canonical":"Unknown","boundaryId":"COL-ADM2-7082276","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/COL/ADM2/geoBoundaries-COL-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Peru","km2":434},{"shape":"Ecuador","km2":140},{"shape":"Venezuela","km2":110},{"shape":"Brazil","km2":100}]},"units":1122,"areaKm2":1142474},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00014888543109431118,0.00017618637022805635],"translate":[-81.735609651,-4.232850488860897]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"170-001","properties":{"name":"Medellín (north)","units":10}},
 {"type":"Polygon","arcs":[[3,4,5,6,7]],"id":"170-002","properties":{"name":"Yarumal","units":15}},

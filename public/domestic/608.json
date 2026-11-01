@@ -2,11 +2,11 @@
 "format": 2,
 "id": "608",
 "name": "Philippines",
-"version": "608-1541affe",
+"version": "608-20437cfb",
 "projection": {"lon0":122.9,"lat0":15.6},
 "focus": [116.9,4.3,126.8,21.2],
 "boundaries": {"provider":"geoBoundaries","iso3":"PHL","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"National Mapping and Resource Information Authority (NAMRIA), Philippines Statistics Authority (PSA), OCHA Philippines","year":"2020","canonical":"Municipalities","boundaryId":"PHL-ADM3-30758251","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PHL/ADM3/geoBoundaries-PHL-ADM3_simplified.geojson","units":1647,"areaKm2":294634},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00009676113082130841,0.00016194258634586305],"translate":[116.92894110700001,4.642097964000072]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"MultiPolygon","arcs":[[[0]],[[1,2,3,4]],[[5]],[[6]],[[7]]],"id":"608-001","properties":{"name":"Iloilo City","units":44}},
 {"type":"Polygon","arcs":[[8,-2,9,10,11]],"id":"608-002","properties":{"name":"Tigbauan","units":5}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "178",
 "name": "Congo",
-"version": "178-5c78ed6b",
+"version": "178-5ef4cd44",
 "projection": {"lon0":15.2,"lat0":-0.7},
 "focus": [11,-5.3,18.8,3.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"COG","level":"ADM2","license":"Public Domain","licenseDetail":"License on metadata pop-up on source page","source":"New York University Spatial Data Repository, Stanford University, Map Maker Limited","year":"2007","canonical":"Unknown","boundaryId":"COG-ADM2-1427508","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/COG/ADM2/geoBoundaries-COG-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Dem. Rep. Congo","km2":103},{"shape":"Gabon","km2":69},{"shape":"Angola","km2":32}]},"units":46,"areaKm2":343028},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0000744490444903758,0.00008731479997904766],"translate":[11.205010000005132,-5.028312683105469]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"178-001","properties":{"name":"Mbomo (south)","units":1}},
 {"type":"Polygon","arcs":[[4,5,6,-2,7]],"id":"178-002","properties":{"name":"Tchikapika","units":3}},

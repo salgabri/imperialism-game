@@ -2,11 +2,11 @@
 "format": 2,
 "id": "762",
 "name": "Tajikistan",
-"version": "762-abb69495",
+"version": "762-173d6f8a",
 "projection": {"lon0":71,"lat0":38.9},
 "focus": [67.1,36.5,75.4,41.2],
 "boundaries": {"provider":"geoBoundaries","iso3":"TJK","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"TJK-ADM2-16282066","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TJK/ADM2/geoBoundaries-TJK-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Kyrgyzstan","km2":93},{"shape":"Uzbekistan","km2":79}]},"units":58,"areaKm2":140977},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00007823160831608322,0.000043740219402193914],"translate":[67.3308737,36.67111530000001]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"762-001","properties":{"name":"Rudaki District (north-west)","units":1}},
 {"type":"Polygon","arcs":[[-4,4,5,6,7]],"id":"762-002","properties":{"name":"Loyob","units":1}},

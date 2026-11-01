@@ -143,6 +143,10 @@ export const basketball = {
     tieShort: 'OT',
   },
 
+  // DEC misc: basketball lineups read "Starting five".
+  words: { kickoff: 'Tip-off', end: 'Final', lineup: 'Starting five', lineupShort: 'Five', lineupNoun: 'starting five',
+    lineupTitle: 'Starting five' },
+
   formatEvent: (e, code) => ({
     when: e.m > MINUTES ? 'OT' : `Q${Math.min(4, Math.ceil(e.m / QUARTER))}`,
     text: `+${e.pts} — ${e.name} (${code})`,

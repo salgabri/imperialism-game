@@ -2,11 +2,15 @@
 // home towns, committed as one snapshot per nation (docs/design/domestic-campaigns.md).
 //
 // Usage:
-//   node scripts/sync-domestic-clubs.mjs [--only=826,724] [--survey] [--refresh]
+//   node scripts/sync-domestic-clubs.mjs [--only=826,724] [--survey] [--refresh] [--efem-permission-granted]
 //     --survey   club list pages only: writes scripts/data/domestic/survey.json
 //     --only     limit to these game nation ids (default: every nation in NATIONS)
 //     --refresh  download club lists and Wikidata again for these nations
 //     --refresh=all  also the global player listing (~700 requests) and GeoNames
+//     --efem-permission-granted  allow requests to EFEM; without it only cached EFEM
+//                responses are used, and a request that would reach EFEM stops the sync.
+//                efem.club/robots.txt disallows /api/ (checked 18 October 2026): do not
+//                pass it until EFEM grants written permission.
 //
 // Sources (all cached under the gitignored data-src/domestic/, so reruns are offline):
 //   - EFEM.club clubs, exact nation name, male, reputation order:
@@ -56,7 +60,7 @@ import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
 import { domesticCap } from '../src/data/domesticTiers.js';
 import {
-  CLUBS_ENDPOINT, MIN_CLUBS, PLAYERS_ENDPOINT, SLICE_PAGE_SIZE, VERSION,
+  CLUBS_ENDPOINT, EFEM_PERMISSION_FLAG, MIN_CLUBS, PLAYERS_ENDPOINT, SLICE_PAGE_SIZE, VERSION,
   createClubLister, createEfem, fmNation, foldedNames, nameReason, naturalPlayers, pickSquad,
   playerSliceUrl, trimPlayer, validateSnapshot,
 } from './lib/domestic-sync.mjs';
@@ -78,7 +82,9 @@ const ids = args.only ? args.only.split(',').map(s => pad(s.trim())).filter(Bool
 for (const id of ids) if (!NATIONS[id]) throw new Error(`Unknown nation id ${id}`);
 const refresh = args.refresh === 'true' || args.refresh === 'all';
 const refreshAll = args.refresh === 'all';
-const efem = createEfem({ cacheDir, refresh });
+const permission = process.argv.includes(EFEM_PERMISSION_FLAG);
+if (!permission) console.warn(`EFEM requests are off (efem.club/robots.txt disallows /api/): cached responses only. Pass ${EFEM_PERMISSION_FLAG} only once EFEM has granted permission.`);
+const efem = createEfem({ cacheDir, refresh, permission });
 
 // ---- Club classification ----
 

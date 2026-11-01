@@ -2,11 +2,11 @@
 "format": 2,
 "id": "792",
 "name": "Turkey",
-"version": "792-08248979",
+"version": "792-cd8d2d73",
 "projection": {"lon0":35.2,"lat0":39},
 "focus": [25.2,35.6,45.2,42.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"TUR","level":"ADM2","license":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, OSM Boundaries","year":"2021","canonical":"Districts","boundaryId":"TUR-ADM2-54988432","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUR/ADM2/geoBoundaries-TUR-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Bursa","İzmir"],"license":"Creative Commons Attribution-ShareAlike 2.0","source":"Open Street Map","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUR/ADM1/geoBoundaries-TUR-ADM1_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Iran","km2":6}]},"units":975,"areaKm2":779395},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00019150384303843036,0.00006296815168151682],"translate":[25.6654487,35.8080486]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"792-001","properties":{"name":"Sarıyer","units":1}},
 {"type":"Polygon","arcs":[[3,4,5]],"id":"792-002","properties":{"name":"Kadıköy","units":15}},

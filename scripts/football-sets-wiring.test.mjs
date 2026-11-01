@@ -117,6 +117,8 @@ async function chooseSet(app, time) {
 }
 
 const setNames = nation => SET.nations[nation][2].map(tuple => tuple[1]);
+/** The listed football seasons' ids (basketball's are listed with them: scripts/nba-seasons.test.mjs). */
+const footballSetIds = app => app.state.footballSets.filter(set => !set.id.startsWith('nba-')).map(set => set.id);
 
 const seasonPicker = document => document.getElementById('setup-season');
 const seasonNames = document => [...seasonPicker(document).options].map(option => option.textContent);
@@ -126,26 +128,26 @@ async function pickSeason(document, id) {
   select.value = id;
   await act(async () => select.dispatchEvent(new document.defaultView.Event('change', { bubbles: true })));
 }
-/** The Season dropdown's names for the built-in earlier seasons: "2023/24" … "2014/15", without their source. */
+/** The Season dropdown's names for the built-in earlier seasons: "2023/24" … "2006/07", without their source. */
 const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
 
 // ---------- setup ----------
 
 test('the Season choice offers the built-in season, then every earlier season built in, and reads the local index once', async () => {
   await withSetup({}, async ({ app, calls }) => {
-    assert.deepEqual(app.state.footballSets.map(set => set.id), BUILT_IN_SEASONS.map(set => set.id), 'listed before any request');
+    assert.deepEqual(footballSetIds(app), BUILT_IN_SEASONS.map(set => set.id), 'listed before any request');
     await app.requestSeasons();
     assert.deepEqual(calls, ['/football/index.json']);
-    assert.deepEqual(app.state.footballSets.map(set => set.id), BUILT_IN_SEASONS.map(set => set.id));
+    assert.deepEqual(footballSetIds(app), BUILT_IN_SEASONS.map(set => set.id));
     assert.equal(app.seasonStatus().state, 'idle');
     assert.equal(app.state.saveStatus, null, 'a missing index reports nothing');
     await withDom(async ({ document, mount }) => {
       await mountPart(app, mount, 'SetupOverlay');
       assert.equal(seasonPicker(document).tagName, 'SELECT', 'the seasons are a dropdown');
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
-      assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER]);
-      assert.deepEqual(EARLIER.slice(0, 2), ['2023/24', '2022/23']);
-      assert.equal(EARLIER.at(-1), '2014/15');
+      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER]);
+      assert.deepEqual(EARLIER.slice(0, 2), ['2025/26', '2023/24'], 'the last built-in season, then the earlier ones (no 2024/25)');
+      assert.equal(EARLIER.at(-1), '2006/07');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
       assert.equal(seasonPicker(document).value, '');
       assert.match(document.getElementById('setup-season-note').textContent, /Earlier seasons use EA FIFA ratings/);
@@ -163,10 +165,10 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
   const files = { '/football/index.json': INDEX, [SET_URL]: gate.promise.then(() => SET) };
   await withSetup(files, async ({ app, calls, time }) => {
     await app.requestSeasons();
-    assert.deepEqual(app.state.footballSets.map(set => set.id), [...BUILT_IN_SEASONS.map(set => set.id), ID], 'the local set after the built-in ones');
+    assert.deepEqual(footballSetIds(app), [...BUILT_IN_SEASONS.map(set => set.id), ID], 'the local set after the built-in ones');
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
-      assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER, '2001/02']);
+      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER, '2001/02']);
       assert.equal(seasonPicker(document).value, '', 'the built-in season is chosen');
 
       await pickSeason(document, ID);
@@ -305,7 +307,7 @@ test('while a chosen set loads, step 1 shows none of the built-in season\'s figu
   });
 });
 
-test('basketball has no data sets, and a set keeps the built-in season\'s country maps out of the club theatres', async () => {
+test('a set keeps the built-in season\'s country maps out of the club theatres, and stays with football', async () => {
   await withSetup({ '/football/index.json': INDEX, [SET_URL]: SET }, async ({ app, time }) => {
     await app.requestSeasons();
     app.pickSetup('layer', 'clubs');
@@ -326,7 +328,8 @@ test('basketball has no data sets, and a set keeps the built-in season\'s countr
 
     app.pickSetup('sport', 'basketball');
     assert.equal(app.state.setup.dataSet, null, 'basketball resets the season');
-    assert.equal(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).season, null);
+    assert.ok(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).season.options
+      .every(option => option.id == null || option.id.startsWith('nba-')), 'basketball lists its own seasons');
     app.pickSetup('sport', 'football');
     assert.equal(app.state.setup.dataSet, null);
   });

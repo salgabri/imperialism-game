@@ -122,6 +122,8 @@
 
 /* ---- Option cards: the draw, opponents, roles (M§3.4) and sports (board 02) ---- */
 .setup-card-grid { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:12px; }
+/* Three sports in two columns: the last one takes the whole row rather than half of it. */
+.setup-card-grid--sports > .setup-card:last-child:nth-child(odd) { grid-column:1 / -1; }
 .rule-card {
   --setup-card-bg:var(--panel);
   position:relative; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start;

@@ -91,6 +91,8 @@ export function finishMatch() {
   const st = this.state;
   let m = st.match;
   if (!m || m.applied || st.choice) return;
+  // Your match played at 1× (App.startMatch): the speed you had chosen returns with the result.
+  this.restoreSpeed();
   const settled = settlementOf(this, m);
   if (settled?.match) { restoreSettled(this, settled.match); return; }
   // The series already counted this game (only a stale copy lost the flag): go on to the conquest.

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "760",
 "name": "Syria",
-"version": "760-9e5b9fbc",
+"version": "760-7af0ee47",
 "projection": {"lon0":38.5,"lat0":34.8},
 "focus": [35.5,32.2,42.6,37.5],
 "boundaries": {"provider":"geoBoundaries","iso3":"SYR","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"United Nations Cartographic Section (UNCS) and United Nations Office for the Coordination of Humanitarian Affairs (UNOCHA), OCHA ROSC","year":"2017","canonical":"sub-district","boundaryId":"SYR-ADM3-7960031","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SYR/ADM3/geoBoundaries-SYR-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Israel","km2":1190},{"shape":"Iraq","km2":197}]},"units":269,"areaKm2":186768},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00006657872975729702,0.000050027470174701785],"translate":[35.72723579400008,32.31644249000004]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"760-001","properties":{"name":"Lattakia (east)","units":3}},
 {"type":"Polygon","arcs":[[-3,6,7,8,9]],"id":"760-002","properties":{"name":"Al Haffah","units":3}},

@@ -159,7 +159,7 @@
 .squad-tier[data-tier='75'] { color: var(--tier-75); }
 .squad-tier[data-tier='70'] { color: var(--tier-70); }
 
-/* ---- formation pitch / basketball court (C§7, C§17) ---- */
+/* ---- formation pitch / basketball court (C§7, C§17) / American football field ---- */
 .squad-formation .pitch { margin-top: 10px; }
 .pitch {
   position: relative; height: var(--sq-pitch-h); overflow: hidden;
@@ -189,6 +189,16 @@
   position: absolute; left: 50%; top: 22px; width: 12px; height: 12px; margin: -6px 0 0 -6px;
   border-radius: 50%; box-shadow: inset 0 0 0 1px var(--ink);
 }
+/* American football: yard lines, the line of scrimmage at midfield, and 23 smaller discs */
+.pitch--field .pitch__outline { overflow: hidden; }
+.pitch__yards { position: absolute; inset: 0; background: linear-gradient(var(--row-rule) 1px, transparent 1px) 0 0 / 100% 10%; }
+.pitch__scrimmage { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--ink); }
+.pitch--field .pitch__player { gap: 2px; }
+.pitch--field .pitch__dot { width: 24px; height: 24px; font-size: 11px; }
+.pitch--field .pitch__name { padding: 0 2px; font-size: 11px; }
+.pitch--field.pitch--large .pitch__dot { width: 30px; height: 30px; font-size: 12px; }
+.pitch--field.pitch--large .pitch__name { font-size: 12px; }
+.pitch--field.pitch--phone .pitch__name { display: none; }
 .pitch__player {
   position: absolute; z-index: 1; transform: translate(-50%, -50%);
   display: flex; flex-direction: column; align-items: center; gap: 3px;

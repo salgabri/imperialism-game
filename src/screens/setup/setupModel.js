@@ -9,7 +9,7 @@ import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
-import { BUILT_IN_SEASON, fieldedNations } from '../../engine/footballSets.js';
+import { builtInSeasonOf, fieldedNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
 
@@ -104,14 +104,15 @@ export const ROSTER_HELP = {
 };
 
 /**
- * "Show matches": `resolution` and `express` as one choice that can change any time. Express already reveals every
- * match at once (matchMethods `presentMatch`), so Fast-forward is the third mode. Read: express wins over resolution.
+ * "Show matches": `resolution` and `express` as one choice that can change any time. Express reveals every match at
+ * once except your team's, which plays live (matchMethods `presentMatch`), so Fast-forward is the third mode. Read:
+ * express wins over resolution.
  */
 export const SHOW_MATCH_OPTIONS = Object.freeze([['ticker', 'Live, minute by minute'], ['instant', 'Final score only'], ['express', 'Fast-forward']]);
 export const SHOW_MATCH_HELP = {
-  ticker: 'Scores and events appear as the match clock runs.',
+  ticker: 'Scores and events appear as the match clock runs. Your team’s matches play at 1× whatever the speed.',
   instant: 'Each match skips straight to its final score.',
-  express: 'Final scores only. Routine matches flash past; yours, upsets and the final still pause. Your decisions still wait.',
+  express: 'Routine matches flash past; upsets and the final pause on their score. Your team’s matches still play live. Your decisions still wait.',
 };
 export const SHOW_MATCH_BUSY = 'You can switch between Live and Final score only after this draw or match.';
 
@@ -260,7 +261,8 @@ function clubMapTheatre(map) {
 /** Theatre rows for the active layer: [{ id, name, label, count, note }] (counts as in HEAD's setup). */
 export function theatreOptions(sport, clubLayer) {
   if (clubLayer) {
-    const map = clubMapOf(sport.id);
+    // A basketball season plays on its era's map (`clubMap`).
+    const map = clubMapOf(sport.id, sport.clubMap);
     return map ? clubMapTheatre(map) : clubTheatres(sport);
   }
   const counts = nationCounts(sport);
@@ -270,9 +272,12 @@ export function theatreOptions(sport, clubLayer) {
 /**
  * Theatre rows while a chosen data set loads, with no counts (`count: null`): its nations and leagues are not known
  * yet. Clubs offer every club and the elite, plus a league already chosen, which the set keeps or drops once loaded.
+ * A basketball season's era map is known already, clubs counted.
  */
 function pendingTheatres(builtIn, clubLayer, clubScope) {
   if (!clubLayer) return SCOPES.map(scope => theatreRow(scope, null));
+  const map = domesticEntry(clubScope);
+  if (map?.sport === builtIn.id) return clubMapTheatre(map);
   const [all, elite, ...leagues] = CLUB_SCOPES(builtIn);
   return [all, elite, ...leagues.filter(scope => scope.id === clubScope)].map(scope => theatreRow(scope, null));
 }
@@ -298,23 +303,33 @@ export function domesticTheatres() {
 /** Country maps are built from the built-in data, so a chosen data set (`dataSet`) leaves them out. */
 export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer && sport?.id === 'football' && dataSet == null;
 
-/** Copy under the Season choice: where the earlier seasons' players come from, and what that leaves short. */
-export const SEASON_NOTE = 'Earlier seasons use EA FIFA ratings from the start of that season. Nations without eleven '
-  + 'rated players start short-handed.';
+/** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
+export const SEASON_NOTES = Object.freeze({
+  football: 'Earlier seasons use EA FIFA ratings of that season. Nations without eleven rated players '
+    + 'start short-handed.',
+  basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
+    + 'only: the franchises of that season, on the map of their day.',
+  'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
+    + 'of the United States.',
+});
 
 /**
- * The Season choice (docs/design/football-years.md): the built-in season, then each listed data set newest first, as
- * `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no longer has.
+ * The Season choice (docs/design/football-years.md): the sport's built-in season, then each of its listed data sets
+ * newest first, as `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no
+ * longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
   const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
     label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
-  const rows = [row(null, BUILT_IN_SEASON.season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
+  const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
   // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
   const shared = season => !season || rows.filter(other => other.season === season).length > 1;
   return rows.map(option => ({ ...option, name: shared(option.season) ? option.label : option.season }));
 }
+
+/** A sport's three strongest clubs' names, as a club map's index lists them. */
+const strongestClubs = sport => sport.clubs.slice().sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
 
 /** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
 export function domesticDescription(entry) {
@@ -323,8 +338,8 @@ export function domesticDescription(entry) {
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
   if (entry.league) {
-    return `${leaders} the ${clubs} ${entry.league} clubs, each starting on the land nearest its arena: ${entry.name} split into `
-      + `${sections} territories along state and province lines.`;
+    return `${leaders} the ${clubs} ${entry.league} clubs, each starting on the land nearest its ${entry.venue || 'arena'}: ${entry.name} split `
+      + `into ${sections} territories along ${entry.lines || 'state and province'} lines.`;
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
@@ -415,6 +430,8 @@ export function sportNote(sport) {
   const clubs = sport.clubs || [];
   const leagues = [...new Set(clubs.map(club => club.league))];
   if (!clubs.length) return 'Nations';
+  // A sport with clubs only (American football) has no nations to offer.
+  if (sport.clubsOnly) return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs` : `${clubs.length} clubs`;
   if (leagues.length === 1) return `Nations · ${clubs.length} ${leagues[0]} clubs`;
   return `Nations · ${clubs.length} clubs from ${leagues.length} leagues`;
 }
@@ -509,9 +526,10 @@ const PENDING_PREVIEW = Object.freeze({ matches: '–', duration: '–' });
  */
 export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
-  const football = getSport(setup.sport).id === 'football';
-  // A chosen data set plays with its own nations and clubs once it has loaded.
-  const dataSet = football ? setup.dataSet ?? null : null;
+  const sportId = getSport(setup.sport).id;
+  // A chosen data set plays with its own nations and clubs once it has loaded; a basketball season with clubs only.
+  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId && (sportId === 'football' || setup.layer === 'clubs')
+    ? setup.dataSet : null;
   const seasonCtx = ctx.season || {};
   const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);
   // Until then no figure from the built-in season stands in for the set's.
@@ -534,9 +552,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
   const showMatches = showMatchesOf(setup);
-  const seasonSets = Array.isArray(seasonCtx.sets) ? seasonCtx.sets : NO_ROWS;
-  const seasonRows = football ? seasonOptions(seasonSets, dataSet, sport) : null;
-  const chosenSeason = seasonRows?.find(row => row.checked && row.id != null) || null;
+  const seasonSets = Array.isArray(seasonCtx.sets) ? seasonCtx.sets.filter(set => setSportOf(set.id) === sportId) : NO_ROWS;
+  const seasonRows = seasonOptions(seasonSets, dataSet, sport);
+  const chosenSeason = seasonRows.find(row => row.checked && row.id != null) || null;
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.
   const campaignSummary = `${sport.name} · ${clubLayer ? 'Clubs' : 'Nations'} · ${scopeName}${chosenSeason?.season ? ` · ${chosenSeason.season}` : ''}`;
   const launching = !!ctx.launching;
@@ -598,17 +616,20 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     // The chosen set's card counts its own clubs.
     sports: SPORT_LIST.map(item => ({ id: item.id, name: item.name,
       note: item.id !== sport.id ? sportNote(item) : pending ? sportNote(NO_CLUBS) : sportNote(sport), selected: item.id === sport.id })),
-    season: seasonRows ? {
-      id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTE, loading: setLoading,
+    season: {
+      id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTES[sportId] || '', loading: setLoading,
       message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',
-    } : null,
+    },
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
+    // A sport with clubs only names its league ('NFL'): the Nations choice is off.
+    clubsOnly: sport.clubsOnly ? [...new Set(sport.clubs.map(club => club.league))].join(' and ') : null,
     // `scopes` stays the league / region rows; countries are their own group (`domesticScopes`) after them.
     scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
     theatreNotes: scopes.filter(scope => scope.note),
     domesticScopes, leagueGroup: LEAGUE_GROUP, domesticGroup: DOMESTIC_GROUP,
     country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs } : null,
-    countryNote: country ? domesticDescription(country) : '',
+    // A basketball season's own strongest clubs lead its map, named once it has loaded.
+    countryNote: !country ? '' : domesticDescription(dataSet == null ? country : { ...country, top: pending ? [] : strongestClubs(sport) }),
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
     mapLoading, launching,
     // Step 3's team list is empty until a country's map decodes.

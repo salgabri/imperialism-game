@@ -2,11 +2,11 @@
 "format": 2,
 "id": "748",
 "name": "Eswatini",
-"version": "748-f8ce1a30",
+"version": "748-92b1020a",
 "projection": {"lon0":31.5,"lat0":-26.5},
 "focus": [30.7,-27.4,32.2,-25.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"SWZ","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"SWZ-ADM2-25544865","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SWZ/ADM2/geoBoundaries-SWZ-ADM2_simplified.geojson","units":53,"areaKm2":17393},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000013439957399574,0.000015987760877608773],"translate":[30.79101,-27.3175201]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"748-001","properties":{"name":"Inkhundla Lobamba (north 2)","units":1}},
 {"type":"Polygon","arcs":[[4,5,6,7,8,-1,9]],"id":"748-002","properties":{"name":"Inkhundla Lobamba (north-east 2)","units":1}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "226",
 "name": "Eq. Guinea",
-"version": "226-e79a98b5",
+"version": "226-cc6a6a80",
 "projection": {"lon0":10.3,"lat0":1.6},
 "focus": [8.3,0.8,11.5,3.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"GNQ","level":"ADM2","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","licenseDetail":"Creative Commons BY 4.0 - Noted by CC icon on web page","source":"World Resources Institute, Congo Forest Basin Atlas","year":"2013","canonical":"Unknown","boundaryId":"GNQ-ADM2-11065452","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GNQ/ADM2/geoBoundaries-GNQ-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Gabon","km2":116}]},"units":28,"areaKm2":26910},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00005741968831087161,0.000052486067197798614],"translate":[5.616197635017985,-1.464578202757545]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4]],"id":"226-001","properties":{"name":"Mongomo (south-east)","units":1}},
 {"type":"Polygon","arcs":[[5,6,7,-2,8]],"id":"226-002","properties":{"name":"Ndele","units":2}},

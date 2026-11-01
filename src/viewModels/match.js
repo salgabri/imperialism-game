@@ -7,8 +7,11 @@ import { liveModelFor } from '../engine/winProbability.js';
 import { roman, historyRound, formatOddsPair, ratingTier, shortName, memo } from './format.js';
 import { idleTurnCopy } from './turns.js';
 
-const BASKETBALL_GROUPS = ['PG', 'SG', 'SF', 'PF', 'C'];
-const FOOTBALL_GROUPS = ['GK', 'DF', 'MF', 'FW'];
+const GROUPS = {
+  football: ['GK', 'DF', 'MF', 'FW'],
+  basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
+  'american-football': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'],
+};
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const scoreText = (base, a, b) => `${base.aCode} ${a}–${b} ${base.bCode}`;
@@ -22,10 +25,25 @@ function oddsOf(odds) {
   return { a, b };
 }
 
-/** "Chiesa 23' · Raspadori 61'" (football) or "Jokić 14 pts · Murray 9 pts" (basketball: top two scorers). */
+/**
+ * "Chiesa 23' · Raspadori 61'" (football), "Jokić 14 pts · Murray 9 pts" (basketball: top two scorers) or
+ * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score).
+ */
 export function scorersLine(shown, teamId, teams, sportId = 'football') {
   const own = (Array.isArray(shown) ? shown : []).filter(e => e && e.tid === teamId && e.name);
   if (!own.length) return '';
+  if (sportId === 'american-football') {
+    const totals = new Map();
+    for (const e of own) {
+      const row = totals.get(e.name) || { pts: 0, td: 0, fg: 0 };
+      const pts = Number(e.pts) || 0;
+      row.pts += pts;
+      if (pts === 3) row.fg++; else row.td++;
+      totals.set(e.name, row);
+    }
+    return [...totals.entries()].sort((x, y) => y[1].pts - x[1].pts).slice(0, 2)
+      .map(([name, { td, fg }]) => `${shortName(name)} ${[td && `${td} TD`, fg && `${fg} FG`].filter(Boolean).join(', ')}`).join(' · ');
+  }
   if (sportId === 'basketball') {
     const totals = new Map();
     for (const e of own) totals.set(e.name, (totals.get(e.name) || 0) + (Number(e.pts) || 0));
@@ -62,7 +80,7 @@ function xiTable(team, st, sportId) {
   if (!team) return { title: '', teamId: null, rows: [] };
   let lineup;
   try { lineup = selectLineup(team); } catch { lineup = { starters: [] }; }
-  const groups = sportId === 'basketball' ? BASKETBALL_GROUPS : FOOTBALL_GROUPS;
+  const groups = GROUPS[sportId] || GROUPS.football;
   const rank = pos => { const i = groups.indexOf(pos); return i < 0 ? groups.length : i; };
   const rows = (lineup.starters || []).map((p, i) => ({ p, i, pos: p.assignedPos || p.pos || '' }))
     .sort((x, y) => rank(x.pos) - rank(y.pos) || (Number(y.p.rating) || 0) - (Number(x.p.rating) || 0) || x.i - y.i)
@@ -71,8 +89,8 @@ function xiTable(team, st, sportId) {
       return { key: `${team.id}-${p.originalIndex ?? p.name}`, pos, name: p.name || '', natural: p.pos || pos,
         rating, tier: ratingTier(rating), outOfPosition: !!p.outOfPosition, claimed: claimedTag(p, team, st) };
     });
-  // DECISIONS (Misc): basketball lineups read "Starting five".
-  const title = sportId === 'basketball' ? `${team.name} · Starting five` : `${team.name} · XI`;
+  // DECISIONS (Misc): basketball lineups read "Starting five", American football's "Starters".
+  const title = `${team.name} · ${getSport(sportId).words.lineupTitle}`;
   return { title, teamId: team.id ?? null, rows };
 }
 
@@ -120,19 +138,21 @@ function overtimeEnd(sport, length, periods) {
 }
 
 /**
- * History keeps each event's formatted copy only ("GOAL — Name (ITA)", "+3 — Name (SRB)"): read the scorer and the
- * side back from it, so an archived full-time header carries the same scorer lines as the live one.
+ * History keeps each event's formatted copy only ("GOAL — Name (ITA)", "+3 — Name (SRB)", "TD — Name (KCC)"): read
+ * the scorer and the side back from it, so an archived full-time header carries the same scorer lines as the live one.
  */
-const EVENT_COPY = /^(?:GOAL|\+(\d+))\s+—\s+(.+?)\s+\(([^()]*)\)$/;
+const EVENT_COPY = /^(?:GOAL|\+(\d+)|(TD|FG))\s+—\s+(.+?)\s+\(([^()]*)\)$/;
+const SCORE_POINTS = { TD: 7, FG: 3 };
 function historyShown(entry, aId, dId, aCode, dCode) {
   const shown = [];
   for (const e of Array.isArray(entry?.events) ? entry.events : []) {
     const match = EVENT_COPY.exec(String(e?.text || '').trim());
     if (!match) continue;
-    const tid = match[3] === aCode ? aId : match[3] === dCode ? dId : null;
+    const tid = match[4] === aCode ? aId : match[4] === dCode ? dId : null;
     if (tid == null) continue;
     const minute = parseInt(e?.when, 10);
-    shown.push({ tid, name: match[2], m: Number.isFinite(minute) ? minute : 0, pts: match[1] ? Number(match[1]) : 1 });
+    shown.push({ tid, name: match[3], m: Number.isFinite(minute) ? minute : 0,
+      pts: match[1] ? Number(match[1]) : SCORE_POINTS[match[2]] || 1 });
   }
   return shown;
 }
@@ -240,7 +260,7 @@ function fromMatch(st, ctx, sport, m) {
     feedBase: {
       sport: sport.id, state, aCode: A.code || A.name, bCode: D.code || D.name, aName: A.name, bName: D.name,
       aId: m.aId, dId: m.dId, length, half: length / 2, finalMinute, scoreA, scoreB,
-      kickoff: sport.id === 'basketball' ? 'Tip-off' : 'Kick-off', endLabel: sport.id === 'basketball' ? 'Final' : 'Full time',
+      kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: sport.tieBreak === 'overtime',
       kicks: kicks ? { a: kicks.a, b: kicks.b } : null, tieDetail,
       events: shown.map((e, i) => ({ key: `e${i}`, m: Number(e.m) || 0, label: `${Number(e.m) || 0}'`, tid: e.tid,
         pts: Number(e.pts) || 1, text: sport.formatEvent(e, codeOf(e.tid)).text })),
@@ -288,7 +308,7 @@ function fromHistory(st, ctx, sport, entry) {
     feedBase: {
       sport: sport.id, state: 'full-time', aCode: A.code || A.name, bCode: D.code || D.name, aName: A.name, bName: D.name,
       aId, dId, length, half: length / 2, finalMinute, scoreA, scoreB,
-      kickoff: sport.id === 'basketball' ? 'Tip-off' : 'Kick-off', endLabel: sport.id === 'basketball' ? 'Final' : 'Full time',
+      kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: sport.tieBreak === 'overtime',
       kicks: null, tieDetail, events, roundLabel: historyRound(entry) ? `Round ${roman(historyRound(entry))}` : null,
     },
     kicks: null,
@@ -327,7 +347,7 @@ export function buildFeedRows(model, minute) {
     rows.push({ key: 'half', n: base.half + .5, i: -1, minute: `${base.half}'`, weight: 500,
       text: `Half-time — ${scoreText(base, scored(base.aId, base.half), scored(base.dId, base.half))}` });
   }
-  if (known && base.sport === 'basketball' && (state !== 'live' ? base.finalMinute > base.length : now > base.length)) {
+  if (known && base.overtime && (state !== 'live' ? base.finalMinute > base.length : now > base.length)) {
     const ra = scored(base.aId, base.length), rb = scored(base.dId, base.length);
     rows.push({ key: 'overtime', n: base.length + .5, i: -1, minute: `${base.length}'`, weight: 500,
       text: `Overtime — ${scoreText(base, ra, rb)}` });
@@ -337,7 +357,7 @@ export function buildFeedRows(model, minute) {
   let top;
   if (state === 'live') {
     const left = base.length - now;
-    const tail = left > 0 ? `${plural(left, 'minute')} left` : base.sport === 'basketball' && now > base.length ? 'overtime' : 'final minute';
+    const tail = left > 0 ? `${plural(left, 'minute')} left` : base.overtime && now > base.length ? 'overtime' : 'final minute';
     top = { key: 'status', minute: `${now}'`, weight: 600, live: true, text: `Live — ${scoreText(base, base.scoreA, base.scoreB)} · ${tail}` };
   } else if (state === 'penalties') {
     top = { key: 'status', minute: `${base.finalMinute}'`, weight: 600, live: false,

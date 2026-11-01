@@ -2,11 +2,11 @@
 "format": 2,
 "id": "598",
 "name": "Papua New Guinea",
-"version": "598-9493eb40",
+"version": "598-52e7b4df",
 "projection": {"lon0":145.3,"lat0":-6.7},
 "focus": [140.5,-11.4,153.4,-1.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"PNG","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Papua New Guinea National Statistics Office, OCHA ROAP","year":"2019","canonical":"Local Government Areas","boundaryId":"PNG-ADM3-22992897","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PNG/ADM3/geoBoundaries-PNG-ADM3_simplified.geojson","units":326,"areaKm2":463861},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00018641338493384916,0.0001034030339303396],"translate":[140.84064108000007,-11.654704979999963]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"598-001","properties":{"name":"National Capital District (east)","units":8}},
 {"type":"Polygon","arcs":[[6,7,-3,8,9]],"id":"598-002","properties":{"name":"Waifanomu","units":3}},

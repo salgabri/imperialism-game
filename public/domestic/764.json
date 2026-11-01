@@ -2,11 +2,11 @@
 "format": 2,
 "id": "764",
 "name": "Thailand",
-"version": "764-8acba058",
+"version": "764-cba8e5d0",
 "projection": {"lon0":101,"lat0":13},
 "focus": [97.1,5.3,105.9,20.8],
 "boundaries": {"provider":"geoBoundaries","iso3":"THA","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Royal Thai Survey Department, OCHA ROAP","year":"2019","canonical":"districts","boundaryId":"THA-ADM2-78962969","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/THA/ADM2/geoBoundaries-THA-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Laos","km2":344},{"shape":"Cambodia","km2":47},{"shape":"Myanmar","km2":34}]},"units":928,"areaKm2":516818},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00008287163703379776,0.00014851422047220512],"translate":[97.34965558125731,5.613087686000028]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"764-001","properties":{"name":"Mueang Buri Ram","units":25}},
 {"type":"Polygon","arcs":[[7,8,-7,9]],"id":"764-002","properties":{"name":"Surin","units":30}},

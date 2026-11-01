@@ -2,11 +2,11 @@
 "format": 2,
 "id": "780",
 "name": "Trinidad & Tobago",
-"version": "780-2a4a2a4a",
+"version": "780-648211bb",
 "projection": {"lon0":-61.3,"lat0":10.4},
 "focus": [-62,10,-60.4,11.4],
 "boundaries": {"provider":"geoBoundaries","iso3":"TTO","level":"ADM1","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"TTO-ADM1-22272344","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TTO/ADM1/geoBoundaries-TTO-ADM1_simplified.geojson","units":14,"areaKm2":5162},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000014126404264042635,0.00001304249242492425],"translate":[-61.930258,10.0424201]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"780-001","properties":{"name":"Diego Martin (east)","units":1}},
 {"type":"Polygon","arcs":[[6,7,8,-2]],"id":"780-002","properties":{"name":"Petit Bourg","units":2}},

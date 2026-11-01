@@ -2,11 +2,11 @@
 "format": 2,
 "id": "548",
 "name": "Vanuatu",
-"version": "548-736797d1",
+"version": "548-aaf37c48",
 "projection": {"lon0":167.7,"lat0":-15.2},
 "focus": [166.4,-19.8,169.7,-12.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"VUT","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Secretarial of the Pacific Community (SPC), Statistics for Development Division, OCHA ROP","year":"2019","canonical":"Municipalities","boundaryId":"VUT-ADM2-77236927","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VUT/ADM2/geoBoundaries-VUT-ADM2_simplified.geojson","filled":{"level":"ADM1","units":["Sanma","Torba"],"license":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/VUT/ADM1/geoBoundaries-VUT-ADM1_simplified.geojson"},"units":67,"areaKm2":12259},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000036966127261272346,0.00007179849966499613],"translate":[166.54156380000006,-20.252379667999946]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"548-001","properties":{"name":"Port Vila (north, north-west)","units":2}},
 {"type":"Polygon","arcs":[[4,5,-4,6,7]],"id":"548-002","properties":{"name":"Mele (north)","units":1}},

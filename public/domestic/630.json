@@ -2,11 +2,11 @@
 "format": 2,
 "id": "630",
 "name": "Puerto Rico",
-"version": "630-b139e549",
+"version": "630-ca3ef1b5",
 "projection": {"lon0":-66.5,"lat0":18.2},
 "focus": [-68,17.8,-65.1,18.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"PRI","level":"ADM3","license":"Public Domain","source":"United States Census Bureau, MAF/TIGER","year":"2021","canonical":"Barrio","boundaryId":"PRI-ADM3-40160450","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PRI/ADM3/geoBoundaries-PRI-ADM3_simplified.geojson","units":901,"areaKm2":9037},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000027247282472824687,0.00000632409324093241],"translate":[-67.945404,17.88328]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"630-001","properties":{"name":"Cataño","units":5}},
 {"type":"Polygon","arcs":[[6,7,8,9,-6]],"id":"630-002","properties":{"name":"Bayamón","units":6}},

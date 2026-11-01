@@ -58,7 +58,8 @@ const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
 
 const slug = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-function makeCode(name, taken) {
+/** A club's three-letter code, unique within `taken` (which it extends), as build-clubs makes it. */
+export function makeCode(name, taken) {
   const words = name.replace(/[^A-Za-zÀ-ÿ ]/g, ' ').split(/\s+/).filter(w => w.length > 1 && !/^(de|do|da|of|the|fc|cf|ac|sc|as|ss|us|club|calcio|deportivo)$/i.test(w));
   const candidates = [];
   if (words.length >= 3) candidates.push(words.slice(0, 3).map(w => w[0]).join(''));
@@ -83,7 +84,8 @@ function hashStr(s) {
   return h >>> 0;
 }
 
-const colourFor = id => `oklch(0.72 0.16 ${hashStr(id) % 360})`;
+/** A club's colour from its id, as build-clubs gives it. */
+export const colourFor = id => `oklch(0.72 0.16 ${hashStr(id) % 360})`;
 
 /**
  * A set's club rows, strongest first, from `built` ([{ name, league, country, str, squad }], each squad player

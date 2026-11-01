@@ -232,7 +232,7 @@ function theatreCaption(model, preview) {
  * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
  * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
- * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for football data sets.
+ * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
@@ -515,7 +515,7 @@ export default function SetupOverlay({
 
               <div className="setup-group">
                 <Kicker id="setup-sport-label" title="Sport" />
-                <div className="setup-card-grid" role="radiogroup" aria-labelledby="setup-sport-label">
+                <div className="setup-card-grid setup-card-grid--sports" role="radiogroup" aria-labelledby="setup-sport-label">
                   {model.sports.map(item => (
                     <div className="setup-card" data-checked={item.selected} key={item.id}>
                       <button type="button" role="radio" aria-checked={item.selected} tabIndex={item.selected ? 0 : -1}
@@ -528,7 +528,7 @@ export default function SetupOverlay({
                 </div>
               </div>
 
-              {/* Football seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this
+              {/* The sport's seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this
                   computer, in a native dropdown ('' is the built-in season). */}
               {model.season ? (
                 <div className="setup-group">
@@ -554,12 +554,16 @@ export default function SetupOverlay({
 
               <div className="setup-group">
                 <Kicker id="setup-layer-label" title="Teams" />
-                <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="setup-layer-label">
+                <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="setup-layer-label"
+                  aria-describedby={model.clubsOnly ? 'setup-layer-note' : undefined}>
                   {[['nations', 'Nations'], ['clubs', 'Clubs']].map(([id, name]) => (
                     <button type="button" role="radio" key={id} aria-checked={model.layer === id} tabIndex={model.layer === id ? 0 : -1}
+                      disabled={id === 'nations' && !!model.clubsOnly}
                       onClick={() => choose('layer', id, model.layer)} onKeyDown={moveRadio}>{name}</button>
                   ))}
                 </div>
+                {/* A sport with clubs only (American football) has no national teams to field. */}
+                {model.clubsOnly ? <p className="setup-season__note" id="setup-layer-note">{model.sport.name} is played by {model.clubsOnly} clubs only.</p> : null}
               </div>
 
               <div className="setup-group setup-group--list">

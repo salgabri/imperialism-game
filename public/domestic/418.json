@@ -2,11 +2,11 @@
 "format": 2,
 "id": "418",
 "name": "Laos",
-"version": "418-9fd67b19",
+"version": "418-30982347",
 "projection": {"lon0":103.8,"lat0":18.2},
 "focus": [99.9,13.7,107.8,22.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"LAO","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"National Geographic Department, OCHA ROAP","year":"2019","canonical":"Districts","boundaryId":"LAO-ADM2-54806243","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LAO/ADM2/geoBoundaries-LAO-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Cambodia","km2":377},{"shape":"Vietnam","km2":345},{"shape":"Thailand","km2":34},{"shape":"China","km2":3}]},"units":148,"areaKm2":230364},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00007551428111281118,0.00008597971428227032],"translate":[100.08371576300004,13.911321364487298]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"418-001","properties":{"name":"Chanthabuly (south-west)","units":1}},
 {"type":"Polygon","arcs":[[7,8,9,-4]],"id":"418-002","properties":{"name":"Viengxai","units":1}},

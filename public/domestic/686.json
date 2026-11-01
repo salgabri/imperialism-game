@@ -2,11 +2,11 @@
 "format": 2,
 "id": "686",
 "name": "Senegal",
-"version": "686-87db6c32",
+"version": "686-82948622",
 "projection": {"lon0":-14.5,"lat0":14.5},
 "focus": [-17.7,12.2,-11.2,16.8],
 "boundaries": {"provider":"geoBoundaries","iso3":"SEN","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Government of Senegal, OCHA ROWCA","year":"2019","canonical":"arrondissement","boundaryId":"SEN-ADM3-17353745","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SEN/ADM3/geoBoundaries-SEN-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Gambia","km2":25},{"shape":"Mali","km2":21},{"shape":"Guinea-Bissau","km2":12}]},"units":121,"areaKm2":197355},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00006182703100031001,0.00004386012115121174],"translate":[-17.530647065999972,12.307766467000022]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"686-001","properties":{"name":"Pikine Dagoudane (north-east)","units":7}},
 {"type":"Polygon","arcs":[[6,-2,7,8,9]],"id":"686-002","properties":{"name":"Guédiawaye","units":2}},

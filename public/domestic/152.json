@@ -2,11 +2,11 @@
 "format": 2,
 "id": "152",
 "name": "Chile",
-"version": "152-3a1d1ac3",
+"version": "152-8c8f311b",
 "projection": {"lon0":-71.2,"lat0":-35.7},
 "focus": [-75.9,-56.7,-66.2,-16.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"CHL","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"La Biblioteca del Congreso Nacional de Chile (BCN), OCHA ROLAC","year":"2020","canonical":"Communes","boundaryId":"CHL-ADM3-31580391","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHL/ADM3/geoBoundaries-CHL-ADM3_simplified.geojson","filled":{"level":"ADM2","units":["Provincia de Magallanes","Provincia de la Antártica Chilena","Provincia de Última Esperanza"],"license":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHL/ADM2/geoBoundaries-CHL-ADM2_simplified.geojson"},"foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Argentina","km2":1835},{"shape":"Bolivia","km2":75}]},"units":347,"areaKm2":752298},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00009270242949429498,0.00038412719956384625],"translate":[-75.68882570599999,-55.91586272599994]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"152-001","properties":{"name":"San Joaquín (east)","units":3}},
 {"type":"Polygon","arcs":[[3,4,5,6,-2,7]],"id":"152-002","properties":{"name":"Peñalolén","units":7}},

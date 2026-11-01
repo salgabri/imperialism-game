@@ -2,11 +2,11 @@
 "format": 2,
 "id": "384",
 "name": "Côte d'Ivoire",
-"version": "384-fd9ec8dd",
+"version": "384-25b2ac77",
 "projection": {"lon0":-5.6,"lat0":7.6},
 "focus": [-8.8,4.2,-2.3,10.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"CIV","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Comité National de Télédétection et d'Information Géographique (CNTIG), OCHA ROWCA","year":"2021","canonical":"Departments","boundaryId":"CIV-ADM3-97208781","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CIV/ADM3/geoBoundaries-CIV-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Ghana","km2":89}]},"units":510,"areaKm2":322884},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00006091898569985692,0.00006385161318613224],"translate":[-8.584146518999944,4.360553222000021]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"384-001","properties":{"name":"Abidjan (east)","units":4}},
 {"type":"Polygon","arcs":[[-6,6,7,8,9]],"id":"384-002","properties":{"name":"Bonoua","units":3}},

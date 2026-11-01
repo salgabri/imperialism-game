@@ -2,11 +2,11 @@
 "format": 2,
 "id": "466",
 "name": "Mali",
-"version": "466-f1a25f69",
+"version": "466-e55175f6",
 "projection": {"lon0":-3.5,"lat0":17.6},
 "focus": [-12.6,9.8,4.6,25.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"MLI","level":"ADM3","license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","licenseDetail":"Noted in metadata tab","source":"DNCT - Direction Nationale des Colelctivités Territorielles, DNP - Direction Nationale de la Population, United Nations Office for the Coordination of Humanitarian Affairs, Mali","year":"2017","canonical":"Commune","boundaryId":"MLI-ADM3-61693064","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MLI/ADM3/geoBoundaries-MLI-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Algeria","km2":816},{"shape":"Mauritania","km2":184},{"shape":"Burkina Faso","km2":129},{"shape":"Niger","km2":41}]},"units":701,"areaKm2":1257212},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0001648407210572106,0.00014858289221892222],"translate":[-12.239236905999954,10.14137134400005]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"466-001","properties":{"name":"Commune VI (south)","units":14}},
 {"type":"Polygon","arcs":[[7,8,9,-3,10,11,12]],"id":"466-002","properties":{"name":"Bougouni","units":14}},

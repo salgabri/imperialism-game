@@ -25,11 +25,21 @@
 //   from level), with a ±0.5 continuity correction. Measured robust: tip-off within ≈ 1 point of the Monte Carlo
 //   odds at every uncertainty preset, and calibrated mid-game against full simulations (test file).
 //
+// American football — a normal approximation of src/sports/americanFootball.js: each side has about 11 possessions
+//   (± 1.1), each worth 7 (a touchdown), 3 (a field goal) or 0 with the drive odds of its edge (its offence minus the
+//   opposing defence). Over R remaining possessions a side the margin is ≈ Normal(R·(μA − μD), R·(σA² + σD²)
+//   + (R·slope·formSd)² + (μA − μD)²·σ_R² + 1/6), where slope is how much both sides' means move per rating point of
+//   match-day form; P(A wins) = P(margin ≥ 1) + P(margin = 0)·P(A wins from level). The overtime chain (both sides
+//   possess once, then the next score wins; the last period ends in a decisive field goal) is exact for the model's
+//   drive odds, before form. In overtime a lead is charted as the trailing side's one possession to answer it.
+//
 // Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE) and
-// src/sports/basketball.js (scorePeriod variance, pace spread, form deviation, overtime rules). The tests compare
-// this module against those models, so a change there that is not mirrored here fails loudly.
+// src/sports/basketball.js (scorePeriod variance, pace spread, form deviation, overtime rules); American football's
+// come from its own module (DRIVE_MODEL, driveOdds). The tests compare this module against those models, so a change
+// there that is not mirrored here fails loudly.
 
 import { getSport } from '../sports/index.js';
+import { DRIVE_MODEL, driveMoments, driveOdds } from '../sports/americanFootball.js';
 
 const BASE_GOALS = 1.28;
 const MAX_LOG_EDGE = 1.5;
@@ -43,6 +53,7 @@ const FORM_PER_DRAMA = 0.0125;
 const DECISIVE_SLOPE = 3;
 const ROUNDING_VARIANCE = 1 / 6; // two independently rounded period scores, 1/12 each
 const DEFAULT_DRAMA = 6;
+const DECISIVE_FIELD_GOAL = 0.08;
 
 const num = value => (typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : NaN);
 const isNum = value => Number.isFinite(num(value));
@@ -63,6 +74,9 @@ export function footballRate(log) {
  * The live model a match keeps in `match.live` (PLAN §3.1; small plain JSON, persisted with the match):
  * → { kind:'poisson', rA, rD, length:90 } (football)
  * | { kind:'normal', pace, effA, effD, formSd, length:40, ot:5, maxOt:4 } (basketball; effA/effD are efficiencies)
+ * | { kind:'drives', drives, muA, muD, varA, varD, slope, formSd, driveSd, length:60, ot:10, maxOt:3, otChain,
+ *     tdA, fgA, tdD, fgD } (American football; μ/σ² are a possession's points, otChain[k] A's chance from level with
+ *     k overtimes left, td/fg a possession's chance of a touchdown / field goal)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
  * is the match's uncertainty (football ignores it, as the README formula does). Calls only the sport's
@@ -82,6 +96,10 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama) {
   if (model.tieBreak === 'shootout' && isNum(prepared.logA) && isNum(prepared.logD)) {
     return { kind: 'poisson', rA: footballRate(prepared.logA), rD: footballRate(prepared.logD), length: length || 90 };
   }
+  if (model.tieBreak === 'overtime' && isNum(prepared.edgeA) && isNum(prepared.edgeD) && positive(prepared.drives)) {
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    return drivesModel(prepared, variation, length || 60);
+  }
   if (model.tieBreak === 'overtime' && isNum(prepared.efficiencyA) && isNum(prepared.efficiencyD) && positive(prepared.pace)) {
     const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
     return {
@@ -92,6 +110,51 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama) {
   return null;
 }
 
+/** A's chance in one overtime period that `first` ('A' | 'D') opens → [A wins, still level]. */
+function overtimePeriodChance(a, d, first) {
+  const [x, y] = first === 'A' ? [a, d] : [d, a];
+  // Both possess once: a touchdown beats a field goal beats nothing; level, the next score wins.
+  const xWins = x.td * (y.fg + y.none) + x.fg * y.none;
+  const yWins = y.td * (x.fg + x.none) + y.fg * x.none;
+  let open = x.td * y.td + x.fg * y.fg + x.none * y.none;
+  let xTotal = xWins, yTotal = yWins;
+  for (let k = 0; k < DRIVE_MODEL.SUDDEN_DEATH * 2; k++) {
+    const side = k % 2 === 0 ? x : y;
+    if (k % 2 === 0) xTotal += open * (1 - side.none); else yTotal += open * (1 - side.none);
+    open *= side.none;
+  }
+  return [first === 'A' ? xTotal : yTotal, open];
+}
+
+/**
+ * The live model of an American football match: a possession's mean and variance per side, how fast both move with
+ * form, and the overtime chain.
+ */
+function drivesModel(prepared, variation, length) {
+  const { DRIVES, DRIVE_SD, OVERTIME, MAX_OVERTIMES, FORM_PER_DRAMA } = DRIVE_MODEL;
+  const outcomes = odds => {
+    const fg = (1 - odds.td) * odds.fgTry * odds.make;
+    return { td: odds.td, fg, none: 1 - odds.td - fg };
+  };
+  const meanAt = (edge, kicking) => driveMoments(driveOdds(edge, kicking)).mean;
+  const oddsA = driveOdds(prepared.edgeA, prepared.kickingA), oddsD = driveOdds(prepared.edgeD, prepared.kickingD);
+  const a = driveMoments(oddsA), d = driveMoments(oddsD);
+  const slope = (meanAt(prepared.edgeA + 1, prepared.kickingA) - meanAt(prepared.edgeA - 1, prepared.kickingA)) / 2
+    + (meanAt(prepared.edgeD + 1, prepared.kickingD) - meanAt(prepared.edgeD - 1, prepared.kickingD)) / 2;
+  const sideA = outcomes(oddsA), sideD = outcomes(oddsD);
+  const [winFirst, openFirst] = overtimePeriodChance(sideA, sideD, 'A');
+  const [winSecond, openSecond] = overtimePeriodChance(sideA, sideD, 'D');
+  const win = (winFirst + winSecond) / 2, open = (openFirst + openSecond) / 2;
+  // otChain[0]: the decisive field goal; otChain[k]: k periods still to play.
+  const otChain = [1 / (1 + Math.exp(-DECISIVE_FIELD_GOAL * (prepared.edgeA - prepared.edgeD)))];
+  for (let k = 1; k <= MAX_OVERTIMES; k++) otChain.push(win + open * otChain[k - 1]);
+  return {
+    kind: 'drives', drives: num(prepared.drives) || DRIVES, muA: a.mean, muD: d.mean, varA: a.variance, varD: d.variance, slope,
+    formSd: variation * FORM_PER_DRAMA, driveSd: DRIVE_SD, length, ot: OVERTIME, maxOt: MAX_OVERTIMES, otChain,
+    tdA: sideA.td, fgA: sideA.fg, tdD: sideD.td, fgD: sideD.fg,
+  };
+}
+
 /** True for a well-formed `liveModelFor` result (e.g. one read back from a save). */
 export function isLiveModel(model) {
   if (!model || typeof model !== 'object') return false;
@@ -100,6 +163,14 @@ export function isLiveModel(model) {
   if (model.kind === 'normal') {
     return finite('pace') && model.pace > 0 && finite('effA') && finite('effD') && finite('formSd') && model.formSd >= 0
       && finite('length') && model.length > 0 && finite('ot') && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0;
+  }
+  if (model.kind === 'drives') {
+    return ['drives', 'muA', 'muD', 'varA', 'varD', 'slope', 'formSd', 'driveSd', 'length', 'ot', 'tdA', 'fgA', 'tdD', 'fgD'].every(finite)
+      && ['tdA', 'fgA', 'tdD', 'fgD'].every(key => model[key] >= 0 && model[key] <= 1)
+      && model.drives > 0 && model.muA >= 0 && model.muD >= 0 && model.varA >= 0 && model.varD >= 0 && model.formSd >= 0
+      && model.driveSd >= 0 && model.length > 0 && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0
+      && Array.isArray(model.otChain) && model.otChain.length === model.maxOt + 1
+      && model.otChain.every(p => typeof p === 'number' && p >= 0 && p <= 1);
   }
   return false;
 }
@@ -189,9 +260,54 @@ function overtimeChance(model, periodsLeft) {
   return chance;
 }
 
-/** The last minute a model can reach: 90 for football, 40 + 5·4 for basketball. */
+/**
+ * American football's normal approximation: P(side A wins) from the current margin (A − D points) and the
+ * possessions each side still has. `tieA` is A's chance from a level score once they are played (½ by default).
+ * remainingDrives = 0 is an exact step: 1 / 0 / tieA.
+ */
+export function drivesWinProbability({ muA, muD, varA = 0, varD = 0, slope = 0, formSd = 0, margin = 0, remainingDrives = 0, tieA = 0.5, driveSd = 0 } = {}) {
+  const lead = isNum(margin) ? num(margin) : 0;
+  const level = isNum(tieA) ? clamp01(num(tieA)) : 0.5;
+  const R = positive(remainingDrives);
+  if (!(R > 0)) return step(lead, level);
+  const a = isNum(muA) ? num(muA) : 2, d = isNum(muD) ? num(muD) : a;
+  const edge = a - d;
+  const mean = lead + R * edge;
+  const variance = R * (positive(varA) + positive(varD)) + (R * positive(slope) * positive(formSd)) ** 2
+    + (edge * positive(driveSd)) ** 2 + ROUNDING_VARIANCE;
+  const sd = Math.sqrt(Math.max(variance, 1e-9));
+  const upToZero = normalCdf((0.5 - mean) / sd);
+  const belowZero = normalCdf((-0.5 - mean) / sd);
+  return clamp01((1 - upToZero) + (upToZero - belowZero) * level);
+}
+
+function drivesAt(model, t, margin) {
+  const { drives, length, ot, maxOt, otChain } = model;
+  const minute = clamp(t, 0, lastMinute(model));
+  if (minute <= length) {
+    return drivesWinProbability({ muA: model.muA, muD: model.muD, varA: model.varA, varD: model.varD, slope: model.slope,
+      formSd: model.formSd, margin, remainingDrives: drives * (length - minute) / length, tieA: otChain[maxOt],
+      driveSd: model.driveSd * (length - minute) / length });
+  }
+  // Overtime is a possession or two, too few for a normal curve. Level, the period's own chain; a lead, the trailing
+  // side's one answer: a touchdown answers anything, a field goal only levels a field goal's lead.
+  const period = Math.min(maxOt - 1, Math.ceil((minute - length) / ot) - 1);
+  const level = otChain[maxOt - period];
+  if (minute >= length + ot * maxOt) return step(margin, otChain[0]);
+  if (margin === 0) return level;
+  const [td, fg] = margin > 0 ? [model.tdD, model.fgD] : [model.tdA, model.fgA];
+  const lead = Math.abs(margin);
+  const trailer = lead > 7 ? 0 : lead > 3 ? td * (lead === 7 ? (margin > 0 ? 1 - level : level) : 1)
+    : td + fg * (margin > 0 ? 1 - level : level);
+  return margin > 0 ? clamp01(1 - trailer) : clamp01(trailer);
+}
+
+/** Models with overtime periods after regulation: basketball's and American football's. */
+const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives';
+
+/** The last minute a model can reach: 90 for football, 40 + 5·4 for basketball, 60 + 10·3 for American football. */
 function lastMinute(model) {
-  return model.kind === 'normal' ? model.length + model.ot * model.maxOt : model.length;
+  return hasOvertime(model) ? model.length + model.ot * model.maxOt : model.length;
 }
 
 function basketballAt(model, t, margin, chains) {
@@ -229,6 +345,7 @@ export function winProbabilityAt(model, minute, diff = 0) {
   const t = isNum(minute) ? num(minute) : 0;
   const lead = isNum(diff) ? num(diff) : 0;
   if (model.kind === 'normal') return basketballAt(model, t, lead);
+  if (model.kind === 'drives') return drivesAt(model, t, lead);
   return footballWinProbability({ rA: model.rA, rD: model.rD, diff: lead, remaining: (model.length - clamp(t, 0, model.length)) / model.length });
 }
 
@@ -269,7 +386,7 @@ function revealedEvents(goals) {
 /** Last minute the revealed events reach, rounded up to the end of its period (basketball overtime), else the regulation length. */
 function endMinute(model, events) {
   const latest = events.reduce((max, event) => Math.max(max, num(event.m)), 0);
-  if (model.kind !== 'normal' || latest <= model.length) return model.length;
+  if (!hasOvertime(model) || latest <= model.length) return model.length;
   return Math.min(lastMinute(model), model.length + model.ot * Math.ceil((latest - model.length) / model.ot));
 }
 
@@ -306,6 +423,7 @@ export function winSeries({ model, goals = [], aId, dId, minute = 0, perspective
     diff += delta[t];
     const p = model.kind === 'normal'
       ? basketballAt(model, t, diff, chains)
+      : model.kind === 'drives' ? drivesAt(model, t, diff)
       : footballWinProbability({ rA: model.rA, rD: model.rD, diff, remaining: (model.length - Math.min(t, model.length)) / model.length });
     series.push({ t, p });
   }
@@ -332,10 +450,11 @@ export function winMarkers(series, goals = [], { aId, model = null, includeRuns 
 /**
  * The chart's x-domain for a model at the current minute → { length, half, ticks, guides }.
  * Football: 0'…90', ticks every 15', half-time at 45'. Basketball: 0'…40' plus each overtime period reached,
- * ticks at the quarters and overtime ends, half-time at 20', quarter guides at 10'/20'/30'.
+ * ticks at the quarters and overtime ends, half-time at 20', quarter guides at 10'/20'/30'. American football the
+ * same over 0'…60' and its ten-minute overtimes.
  */
 export function chartDomain(model, minute = 0) {
-  if (isLiveModel(model) && model.kind === 'normal') {
+  if (isLiveModel(model) && hasOvertime(model)) {
     const t = isNum(minute) ? num(minute) : 0;
     const periods = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;
     const quarter = model.length / 4;

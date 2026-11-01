@@ -2,11 +2,11 @@
 "format": 2,
 "id": "826",
 "name": "England",
-"version": "826-dc40d4b5",
+"version": "826-0aaa1974",
 "projection": {"lon0":-1.5,"lat0":52.9},
 "focus": [-6.6,49.7,2,56],
 "boundaries": {"provider":"geoBoundaries","iso3":"GBR","level":"ADM2","mask":"GB-ENG","license":"Open Government Licence v3.0","licenseDetail":"www.nationalarchives.gov.uk/doc/open-government-licence/version/3/","source":"Office for National Statistics Open Geography Portal","year":"2019","canonical":"Counties and Unitary Authorities","boundaryId":"GBR-ADM2-9080712","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GBR/ADM2/geoBoundaries-GBR-ADM2_simplified.geojson","maskSource":"Eurostat- European Commission","maskLicense":"Creative Commons Attribution 4.0 International (CC BY 4.0)","maskUrl":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GBR/ADM1/geoBoundaries-GBR-ADM1_simplified.geojson","units":151,"areaKm2":130193},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000081121445260435,0.00005908162812477167],"translate":[-6.348383297679531,49.90298499705262]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"826-001","properties":{"name":"Manchester","units":2}},
 {"type":"Polygon","arcs":[[7,8,9,10,11]],"id":"826-002","properties":{"name":"Liverpool","units":3}},

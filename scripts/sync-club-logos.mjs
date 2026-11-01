@@ -1,5 +1,5 @@
-// Club crests for every club the game ships: the all-leagues football layer, the NBA
-// franchises and every country's domestic clubs. A club with a crest shows it wherever
+// Club crests for every club the game ships: the all-leagues football layer, the NBA and
+// NFL franchises and every country's domestic clubs. A club with a crest shows it wherever
 // a nation shows its flag; a club without one keeps its monogram chip.
 //
 // Usage:
@@ -10,8 +10,11 @@
 //   - Each club's Wikidata item (CC0). Domestic clubs reuse the item their home town came
 //     from (scripts/data/domestic/<nation>.json, location.source "wikidata:Q..", or location.qid); an
 //     all-leagues club takes the item of its domestic twin, the club of its country whose
-//     FM26 squad shares the most players with its EA FC 26 lineup; NBA franchises are
-//     matched by English label. scripts/data/club-logos.json overrides any of these.
+//     FM26 squad shares the most players with its EA lineup; NBA and NFL franchises
+//     are matched by English label. scripts/data/club-logos.json overrides any of these ("items"),
+//     or names a twin the lineups do not find ("twins"). The all-leagues clubs are the built-in
+//     ones plus those of the earlier EA seasons no older than the domestic squads (EA FC 26), so
+//     a club that has left the seven leagues keeps its crest in the seasons it played.
 //   - The crest: the lead image of the club's English Wikipedia article (its infobox
 //     crest), else the item's logo image (P154) on Wikimedia Commons. Most crests are
 //     non-free files on English Wikipedia; SOURCES.tsv records each file and its licence.
@@ -31,7 +34,9 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
-import { cachedGz, createLimiter } from './lib/domestic-sync.mjs';
+import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
+import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
+import { cachedGz, createLimiter, DATABASE_DATE } from './lib/domestic-sync.mjs';
 import { norm } from './lib/domestic-locate.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -45,6 +50,7 @@ const USER_AGENT = 'imperialism-game-build/1.0 (https://github.com/salgabri/impe
 const SPARQL = 'https://query.wikidata.org/sparql';
 const ENWIKI = 'https://en.wikipedia.org/w/api.php';
 const NBA = 'Q155223', BASKETBALL_TEAM = 'Q13393265';
+const NFL = 'Q1215884', AMERICAN_FOOTBALL_TEAM = 'Q17156793';
 const THUMB_WIDTH = 250; // one of Wikimedia's standard thumbnail steps
 const BOX = 128; // a crest fits this square: twice the largest mark the game draws (60px)
 // The fewest lineup players an all-leagues club must share with a domestic club to be its twin.
@@ -132,9 +138,9 @@ async function domesticClubs() {
 
 const surname = name => norm(name).split(' ').filter(Boolean).pop();
 
-/** An all-leagues club's domestic twin: the club of its country sharing the most lineup players. */
+/** An all-leagues club's domestic twin: the club of its country sharing the most lineup players (`players`, names). */
 function twinOf(club, domestic) {
-  const lineup = new Set(club.squad.map(player => surname(player[0])));
+  const lineup = new Set(club.players.map(surname));
   let best = null;
   for (const candidate of domestic) {
     if (candidate.nation !== club.country) continue;
@@ -144,8 +150,9 @@ function twinOf(club, domestic) {
   return best && best.shared >= MIN_SHARED ? best : null;
 }
 
-async function nbaItems() {
-  const rows = await sparql(`SELECT ?team ?label WHERE { ?team wdt:P118 wd:${NBA}; wdt:P31/wdt:P279* wd:${BASKETBALL_TEAM}; rdfs:label ?label .
+/** A league's current franchises by English label: the NBA's, or (`league`, `kind`) the NFL's. */
+async function leagueItems(league = NBA, kind = BASKETBALL_TEAM) {
+  const rows = await sparql(`SELECT ?team ?label WHERE { ?team wdt:P118 wd:${league}; wdt:P31/wdt:P279* wd:${kind}; rdfs:label ?label .
     FILTER(lang(?label) = 'en') FILTER NOT EXISTS { ?team wdt:P576 [] } }`);
   return new Map(rows.map(row => [row.label, qidOf(row.team)]));
 }
@@ -249,23 +256,42 @@ async function crestWebp(bytes) {
 // ---- Main ----
 
 const overrides = existsSync(overridesFile) ? JSON.parse(await readFile(overridesFile, 'utf8')) : {};
-const itemOverrides = overrides.items || {}, fileOverrides = overrides.files || {};
+const itemOverrides = overrides.items || {}, fileOverrides = overrides.files || {}, twinOverrides = overrides.twins || {};
 
 const domestic = await domesticClubs();
 const domesticById = new Map(domestic.map(club => [club.id, club]));
-const nba = await nbaItems();
+const nba = await leagueItems();
+const nfl = await leagueItems(NFL, AMERICAN_FOOTBALL_TEAM);
 const clubs = []; // { id, name, qid, twin? }
 const problems = [];
 
+// The all-leagues clubs: the built-in ones, then those of the earlier EA seasons whose squads are no older than the
+// domestic ones (the season ending in 2026 for FM 26 26.3.0), newest first, that no built-in club already names.
+const domesticSeason = Number(DATABASE_DATE.slice(0, 4)) + (DATABASE_DATE.slice(5) >= '07-01' ? 1 : 0);
+const footballClubs = FOOTBALL_CLUBS.map(club => ({ id: club.id, name: club.name, country: club.country, players: club.squad.map(player => player[0]), builtIn: true }));
+for (const season of BUILT_IN_SEASONS.filter(set => set.year >= domesticSeason)) {
+  const { clubs: seasonClubs } = JSON.parse(await readFile(path.join(root, 'public/football', `${season.id}.json`), 'utf8'));
+  for (const club of seasonClubs) {
+    if (footballClubs.some(entry => entry.id === club.id)) continue;
+    footballClubs.push({ id: club.id, name: club.name, country: club.country, players: club.squad.map(tuple => tuple[1]), builtIn: false });
+  }
+}
+
 for (const club of domestic) clubs.push({ id: club.id, name: club.name, qid: club.qid });
-for (const club of FOOTBALL_CLUBS) {
-  const twin = itemOverrides[club.id] ? null : twinOf(club, domestic);
-  if (!twin && !itemOverrides[club.id]) problems.push(`${club.id}: no domestic twin (add it to ${path.relative(root, overridesFile)} "items")`);
+for (const club of footballClubs) {
+  const named = twinOverrides[club.id];
+  if (named && !domesticById.has(named)) throw new Error(`club-logos.json twins ${club.id} with unknown domestic club ${named}`);
+  const twin = itemOverrides[club.id] ? null : named ? { club: domesticById.get(named) } : twinOf(club, domestic);
+  if (!twin && !itemOverrides[club.id]) {
+    // An earlier season's club without a twin keeps its monogram; a built-in one is reported.
+    if (club.builtIn) problems.push(`${club.id}: no domestic twin (add it to ${path.relative(root, overridesFile)} "twins" or "items")`);
+    else continue;
+  }
   clubs.push({ id: club.id, name: club.name, qid: twin?.club.qid ?? null, twin: twin?.club.id ?? null });
 }
-for (const club of BASKETBALL_CLUBS) {
-  const qid = nba.get(club.name) || null;
-  if (!qid && !itemOverrides[club.id]) problems.push(`${club.id}: no NBA item labelled "${club.name}"`);
+for (const [league, items, list] of [['NBA', nba, BASKETBALL_CLUBS], ['NFL', nfl, NFL_CLUBS]]) for (const club of list) {
+  const qid = items.get(club.name) || null;
+  if (!qid && !itemOverrides[club.id]) problems.push(`${club.id}: no ${league} item labelled "${club.name}"`);
   clubs.push({ id: club.id, name: club.name, qid });
 }
 for (const [id, qid] of Object.entries(itemOverrides)) {
@@ -381,12 +407,13 @@ export function clubLogoUrl(id) {
 
 const count = list => list.filter(club => crests.has(club.id)).length;
 const worldClubs = clubs.filter(club => club.id.startsWith('f-')), nbaClubs = clubs.filter(club => club.id.startsWith('b-'));
+const nflClubs = clubs.filter(club => club.id.startsWith('nfl-'));
 console.log(`Crests: ${crests.size} of ${clubs.length} clubs`);
-console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
+console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
 console.log(`  domestic clubs with a Wikidata item: ${domestic.filter(club => club.qid).length}`);
 for (const [reason, list] of Object.entries(rejected)) console.log(`  rejected (${reason}): ${list.length}${list.length <= 12 ? '\n    ' + list.join('\n    ') : ''}`);
-const missing = [...worldClubs, ...nbaClubs].filter(club => !crests.has(club.id));
-if (missing.length) console.log(`  all-leagues and NBA clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
+const missing = [...worldClubs, ...nbaClubs, ...nflClubs].filter(club => !crests.has(club.id));
+if (missing.length) console.log(`  all-leagues, NBA and NFL clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
 for (const problem of problems) console.log(`  ${problem}`);
 const sizes = await Promise.all([...new Set([...crests.values()].map(crest => crest.file))].map(async file => (await readFile(path.join(outDir, `${file}.webp`))).length));
 console.log(`  ${sizes.length} files, ${(sizes.reduce((a, b) => a + b, 0) / 1048576).toFixed(1)} MB, module ${(Buffer.byteLength(await readFile(moduleFile, 'utf8')) / 1024).toFixed(1)} KB`);

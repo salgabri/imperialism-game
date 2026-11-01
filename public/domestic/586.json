@@ -2,11 +2,11 @@
 "format": 2,
 "id": "586",
 "name": "Pakistan",
-"version": "586-837b4aad",
+"version": "586-1289f550",
 "projection": {"lon0":69.2,"lat0":30.4},
 "focus": [60.5,23.4,77.5,37.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"PAK","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikipedia","year":"2019","canonical":"Districts","boundaryId":"PAK-ADM2-60131773","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PAK/ADM2/geoBoundaries-PAK-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Siachen Glacier","km2":1986},{"shape":"India","km2":1081},{"shape":"China","km2":1044},{"shape":"Afghanistan","km2":352},{"shape":"Iran","km2":110}]},"units":126,"areaKm2":872485},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00016216611567354634,0.00013272595109383334],"translate":[60.87688104972074,23.731318744064822]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6]],"id":"586-001","properties":{"name":"Islamabad Capital Territory (south-east)","units":2}},
 {"type":"Polygon","arcs":[[7,8,-7,9,10,11,12,13]],"id":"586-002","properties":{"name":"Gujrat","units":2}},

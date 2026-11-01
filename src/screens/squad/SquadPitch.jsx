@@ -1,9 +1,10 @@
-// Owner: WP-SQUAD (see PLAN.md §4). Formation pitch (C§7, board C1) and the basketball half court (C§17, DEC misc).
+// Owner: WP-SQUAD (see PLAN.md §4). Formation pitch (C§7, board C1), the basketball half court (C§17, DEC misc) and the
+// American football field.
 import React from 'react';
 
 /**
  * `slots`: [{ key, x: '50%', y: '88%', name, fullName, rating, claimed }] positioned in % of the box.
- * `layout`: 'pitch' | 'court'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
+ * `layout`: 'pitch' | 'court' | 'field'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
  */
 export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side', label = 'Formation' }) {
   return (
@@ -14,6 +15,12 @@ export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side'
           <i className="pitch__ft" />
           <i className="pitch__arc" />
           <i className="pitch__hoop" />
+        </i>
+      ) : layout === 'field' ? (
+        // The offence below the line of scrimmage, the defence above it; yard lines every ten yards.
+        <i className="pitch__outline" aria-hidden="true">
+          <i className="pitch__yards" />
+          <i className="pitch__scrimmage" />
         </i>
       ) : <>
         <i className="pitch__outline" aria-hidden="true" />

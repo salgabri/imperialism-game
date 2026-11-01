@@ -2,11 +2,11 @@
 "format": 2,
 "id": "417",
 "name": "Kyrgyzstan",
-"version": "417-e14817cf",
+"version": "417-f47f3864",
 "projection": {"lon0":74.4,"lat0":41.2},
 "focus": [69,39,80.5,43.4],
 "boundaries": {"provider":"geoBoundaries","iso3":"KGZ","level":"ADM2","license":"Creative Commons Attribution-ShareAlike 3.0 Unported","source":"geoBoundaries, Wikipedia, Districts of Kyrgyzstan","year":"2010","canonical":"Raions","boundaryId":"KGZ-ADM2-92254566","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KGZ/ADM2/geoBoundaries-KGZ-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Uzbekistan","km2":158},{"shape":"Tajikistan","km2":73},{"shape":"Kazakhstan","km2":12},{"shape":"China","km2":4}]},"units":41,"areaKm2":192112},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00010964736647366481,0.000040679572145721975],"translate":[69.26495230000006,39.172738200000026]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7,8]],"id":"417-001","properties":{"name":"Ak-Suu (south-west 2)","units":5}},
 {"type":"Polygon","arcs":[[9,10,-6,11,12,13]],"id":"417-002","properties":{"name":"Tyup","units":1}},

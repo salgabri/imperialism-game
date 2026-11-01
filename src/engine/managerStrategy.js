@@ -14,6 +14,8 @@ export const TACTICS = [
 const SUPPORT = {
   football: { FW: [1, 0], MF: [.65, .65], DF: [0, 1], GK: [0, 1] },
   basketball: { PG: [.75, .25], SG: [1, 0], SF: [1, .4], PF: [0, 1], C: [0, 1] },
+  'american-football': { QB: [1, 0], RB: [1, 0], WR: [1, 0], TE: [.8, .2], OL: [.65, .35], DL: [0, 1], LB: [0, 1], CB: [0, 1],
+    S: [0, 1], K: [.3, .3] },
 };
 
 export function tacticalProfile(team) {
@@ -44,6 +46,22 @@ export function tacticalOptions(team, opponent, drama = 6) {
       context: strength < opponentStrength - 2 ? 'You are the underdog.' : strength > opponentStrength + 2
         ? 'Your lineup has the quality advantage.' : 'These starting lineups are closely matched.' };
   });
+}
+
+/**
+ * The approach Continue (and "simulate the result") kicks off with: the best displayed win chance, compared as the
+ * whole percentages the player reads, so the tag never sits on an option that shows the same number as Balanced.
+ * Ties keep Balanced, then the TACTICS order. Options without estimates (older saves) keep Balanced.
+ */
+export function recommendedTactic(options = []) {
+  const shown = option => Number.isFinite(option?.winProbability) ? Math.round(option.winProbability * 100) : null;
+  const balanced = options.find(option => option.id === 'balanced');
+  let best = balanced && shown(balanced) != null ? balanced : null;
+  for (const option of options) {
+    if (shown(option) == null) continue;
+    if (!best || shown(option) > shown(best)) best = option;
+  }
+  return best?.id || 'balanced';
 }
 
 /** Pure parameters used by BOTH the real outcome and the displayed odds. */

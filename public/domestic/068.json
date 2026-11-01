@@ -2,11 +2,11 @@
 "format": 2,
 "id": "068",
 "name": "Bolivia",
-"version": "068-86ec6ae6",
+"version": "068-20ee7aef",
 "projection": {"lon0":-64.6,"lat0":-16.3},
 "focus": [-69.9,-23.2,-57.2,-9.4],
 "boundaries": {"provider":"geoBoundaries","iso3":"BOL","level":"ADM3","license":"Public Domain","licenseDetail":"Public Domain; free use and access to information","source":"GeoBolivia","year":"2015","canonical":"Unknown","boundaryId":"BOL-ADM3-33444609","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BOL/ADM3/geoBoundaries-BOL-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Paraguay","km2":281},{"shape":"Brazil","km2":212}]},"units":339,"areaKm2":1071862},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00012190934417399021,0.00013237067747269964],"translate":[-69.64524603576484,-22.906568378770086]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"068-001","properties":{"name":"Nuestra Señora de La Paz (south)","units":11}},
 {"type":"Polygon","arcs":[[4,5,6,7,-4]],"id":"068-002","properties":{"name":"Viacha","units":5}},

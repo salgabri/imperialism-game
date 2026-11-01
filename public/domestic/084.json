@@ -2,11 +2,11 @@
 "format": 2,
 "id": "084",
 "name": "Belize",
-"version": "084-ba8ab21d",
+"version": "084-ca9f33e0",
 "projection": {"lon0":-88.7,"lat0":17.2},
 "focus": [-89.3,15.8,-87.4,18.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"BLZ","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikipedia","year":"2008","canonical":"Constituencies","boundaryId":"BLZ-ADM2-1456440","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BLZ/ADM2/geoBoundaries-BLZ-ADM2_simplified.geojson","units":31,"areaKm2":21970},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00001735901058883475,0.000026101211010953925],"translate":[-89.22620829997305,15.88590600006188]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7]],"id":"084-001","properties":{"name":"Cayo North East (south)","units":3}},
 {"type":"Polygon","arcs":[[-6,8,9]],"id":"084-002","properties":{"name":"Billy White","units":1}},

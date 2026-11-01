@@ -5,6 +5,8 @@
 // Regenerate (orchestrator only): UPDATE_GOLDEN=1 node --test scripts/seed-replay.test.mjs
 // Regenerated once for the home nations: Scotland (XI 79) joined the Elite 32 and the British map was cut in four,
 // so c-elite-blitz plays a different field; the two CONMEBOL cases replay unchanged.
+// Regenerated again for the current season: the built-in rosters became 2026/27 (EA FC 27 + FM 26), so every case
+// fields new squads and plays different matches from the same seeds.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';

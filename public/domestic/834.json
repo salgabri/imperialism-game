@@ -2,11 +2,11 @@
 "format": 2,
 "id": "834",
 "name": "Tanzania",
-"version": "834-ffdd58f9",
+"version": "834-107f2e96",
 "projection": {"lon0":35,"lat0":-6.4},
 "focus": [29.3,-12,40.7,-0.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"TZA","level":"ADM3","license":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap","year":"2015","canonical":"Unknown","boundaryId":"TZA-ADM3-66589294","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TZA/ADM3/geoBoundaries-TZA-ADM3_simplified.geojson","filled":{"level":"ADM2","units":["Mafia"],"license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Tanzania National Bureau of Statistics / UN OCHA ROSA, OCHA ROSA","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TZA/ADM2/geoBoundaries-TZA-ADM2_simplified.geojson"},"units":3645,"areaKm2":889610},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00010854812451322756,0.00010760015203415889],"translate":[29.590433120727596,-11.745695114135685]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"834-001","properties":{"name":"Miburani (south-west)","units":25}},
 {"type":"Polygon","arcs":[[4,-2,5]],"id":"834-002","properties":{"name":"Mkuranga","units":3}},

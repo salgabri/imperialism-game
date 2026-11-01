@@ -2,11 +2,11 @@
 "format": 2,
 "id": "430",
 "name": "Liberia",
-"version": "430-e7fd3407",
+"version": "430-b0eb1b83",
 "projection": {"lon0":-9.3,"lat0":6.5},
 "focus": [-11.6,4.2,-7.2,8.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"LBR","level":"ADM2","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"UNMIL, OCHA ROWCA","year":"2021","canonical":"Districts","boundaryId":"LBR-ADM2-62588387","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LBR/ADM2/geoBoundaries-LBR-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Guinea","km2":16},{"shape":"Côte d'Ivoire","km2":8}]},"units":136,"areaKm2":96234},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000041318711067110717,0.00004198534539345434],"translate":[-11.500396555999941,4.354004312000029]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"430-001","properties":{"name":"Greater Monrovia (east)","units":4}},
 {"type":"Polygon","arcs":[[-2,4,5,6,7]],"id":"430-002","properties":{"name":"Sammy Kodebli","units":2}},

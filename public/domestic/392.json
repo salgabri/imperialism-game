@@ -2,11 +2,11 @@
 "format": 2,
 "id": "392",
 "name": "Japan",
-"version": "392-0b401a6e",
+"version": "392-270b15fa",
 "projection": {"lon0":137.8,"lat0":37.5},
 "focus": [128.2,27.7,146.2,45.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"JPN","level":"ADM2","license":"Creative Commons Attribution-ShareAlike 2.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Subprefectures","boundaryId":"JPN-ADM2-22064153","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/JPN/ADM2/geoBoundaries-JPN-ADM2_simplified.geojson","units":1742,"areaKm2":372537},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00022877086970869695,0.0002147667196671969],"translate":[122.93945480000002,24.045616]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"MultiPolygon","arcs":[[[0,1,2,3,4]],[[5]],[[6]]],"id":"392-001","properties":{"name":"Kobe","units":23}},
 {"type":"Polygon","arcs":[[7,-5,8,9]],"id":"392-002","properties":{"name":"Himeji","units":10}},

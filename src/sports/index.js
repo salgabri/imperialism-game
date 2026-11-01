@@ -4,9 +4,10 @@
 
 import { football } from './football.js';
 import { basketball } from './basketball.js';
+import { americanFootball } from './americanFootball.js';
 
-export const SPORTS = { football, basketball };
-export const SPORT_LIST = [football, basketball];
+export const SPORTS = { football, basketball, 'american-football': americanFootball };
+export const SPORT_LIST = [football, basketball, americanFootball];
 export const DEFAULT_SPORT = 'football';
 
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "688",
 "name": "Serbia",
-"version": "688-2763e420",
+"version": "688-7cdae6c3",
 "projection": {"lon0":20.8,"lat0":44.2},
 "focus": [18.7,42.1,23.1,46.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"SRB","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"SRB-ADM2-33768554","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SRB/ADM2/geoBoundaries-SRB-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Croatia","km2":25},{"shape":"Hungary","km2":4}]},"units":145,"areaKm2":77418},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00004171056041291396,0.00003957848478484781],"translate":[18.835260669269015,42.2322435]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"688-001","properties":{"name":"Belgrade (south-east)","units":2}},
 {"type":"Polygon","arcs":[[6,7,-3,8,9,10,11]],"id":"688-002","properties":{"name":"Smederevska Palanka","units":2}},

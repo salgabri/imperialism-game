@@ -2,11 +2,11 @@
 "format": 2,
 "id": "616",
 "name": "Poland",
-"version": "616-cb89b2a0",
+"version": "616-0429ba07",
 "projection": {"lon0":19.4,"lat0":51.9},
 "focus": [13.9,48.8,24.4,55],
 "boundaries": {"provider":"geoBoundaries","iso3":"POL","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"Geoboundaries, OpenStreetMap","year":"2017","canonical":"Unknown","boundaryId":"POL-ADM2-97123803","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/POL/ADM2/geoBoundaries-POL-ADM2_simplified.geojson","units":380,"areaKm2":310790},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00010022328223282235,0.00005833322933229332],"translate":[14.123555,49.0023872]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4]],"id":"616-001","properties":{"name":"Warszawa","units":2}},
 {"type":"Polygon","arcs":[[5,6,7,8,-5,9,10]],"id":"616-002","properties":{"name":"Otwock","units":3}},

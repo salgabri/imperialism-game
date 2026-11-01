@@ -2,11 +2,11 @@
 "format": 2,
 "id": "442",
 "name": "Luxembourg",
-"version": "442-fd53bf65",
+"version": "442-951e1acd",
 "projection": {"lon0":6.1,"lat0":49.8},
 "focus": [5.7,49.4,6.6,50.2],
 "boundaries": {"provider":"geoBoundaries","iso3":"LUX","level":"ADM2","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Public Domain","year":"2017","canonical":"Unknown","boundaryId":"LUX-ADM2-21775719","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LUX/ADM2/geoBoundaries-LUX-ADM2_simplified.geojson","units":105,"areaKm2":2586},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000007951970519705197,0.000007349246492464918],"translate":[5.735708,49.4478539]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4]],"id":"442-001","properties":{"name":"Dudelange (south)","units":1}},
 {"type":"Polygon","arcs":[[5,-1,6,7]],"id":"442-002","properties":{"name":"Dudelange (south-west)","units":1}},

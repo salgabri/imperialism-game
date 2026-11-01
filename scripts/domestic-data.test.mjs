@@ -15,6 +15,7 @@ import { decodeDomestic, DOMESTIC_SECTIONS } from '../src/engine/domestic.js';
 import { expandFmTuple, FM_ROLES } from '../src/data/fmPlayers.js';
 import { FOREIGN_DEPTH_KM, hostShapes, loadWorldMap } from './lib/domestic-boundaries.mjs';
 import { bboxOf, facingKm, facingSections, kmToPolys, pointInPolys, polysAreaKm2, splitOnLand } from './lib/domestic-partition.mjs';
+import { DATABASE_DATE } from './lib/domestic-sync.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const shippedDir = path.join(root, 'public/domestic');
@@ -84,7 +85,7 @@ for (const entry of DOMESTIC) {
     const strongest = doc.clubs.map((c, i) => [c.str, i]).sort((a, b) => b[0] - a[0] || a[1] - b[1]).slice(0, 3).map(([, i]) => doc.clubs[i].name);
     assert.deepEqual(entry.top, strongest);
     assert.equal(doc.source.version, snapshot.source.version);
-    assert.equal(doc.source.snapshotDate, snapshot.source.fetchedAt.slice(0, 10));
+    assert.equal(doc.source.snapshotDate, DATABASE_DATE, 'FM ratings are dated by the database release, not the fetch');
 
     // 100 sections <id>-001..100 shared out as N club groups: home first, ids in club rank
     // order, sizes floor or ceil(100 / N) with exactly 100 mod N larger groups.

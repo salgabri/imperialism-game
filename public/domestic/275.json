@@ -2,11 +2,11 @@
 "format": 2,
 "id": "275",
 "name": "Palestine",
-"version": "275-42709f1f",
+"version": "275-6f05e87a",
 "projection": {"lon0":35.2,"lat0":31.9},
 "focus": [34.1,31.1,35.7,32.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"PSE","level":"ADM2","license":"Creative Commons Attribution 4.0 (CC BY 4.0)","source":"Open Data Watch","year":"2017","canonical":"governorate","boundaryId":"PSE-ADM2-87354302","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PSE/ADM2/geoBoundaries-PSE-ADM2_simplified.geojson","units":16,"areaKm2":6011},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000013547451094510994,0.00001327774844748344],"translate":[34.2186651850001,31.2243847880001]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"275-001","properties":{"name":"Jerusalem (south-west 2)","units":1}},
 {"type":"Polygon","arcs":[[-4,6,7,8,9]],"id":"275-002","properties":{"name":"Geva Binyamin","units":1}},

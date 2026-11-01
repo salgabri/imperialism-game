@@ -5,11 +5,11 @@ import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, 
 import { CLUB_SCOPES } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
-import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
+import { clearDomesticCache, domesticScope, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { clubMapScope, domesticEntry, domesticLabel } from './data/domesticScope.js';
-import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, footballSport, getLoadedFootballSet, heldShapes, loadFootballSet,
-  loadFootballSetIndex, retainFootballSets, sportOf } from './engine/footballSets.js';
+import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
+  loadFootballSetIndex, retainFootballSets, seasonMapOf, seasonSport, setSportOf, sportOf } from './engine/footballSets.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
@@ -17,7 +17,7 @@ import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectS
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
   fitDomesticCampaign, CHECKPOINT_KEYS } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
-import { tacticalMatchParameters, tacticalOptions, competitiveBasketballTeams } from './engine/managerStrategy.js';
+import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiveBasketballTeams } from './engine/managerStrategy.js';
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
@@ -71,20 +71,26 @@ const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.
 const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}${settings.dataSeason ? ` ${settings.dataSeason}` : ''} · ${scopeName}`;
 
 /**
- * The setup's club theatre. A sport with its own map plays only there (basketball: the NBA's USA and Canada), and
- * another sport's map falls back to every club. A data set brings its own clubs, so the theatre must be one of them: a
- * country map (built from the built-in data) and a league the set leaves out fall back to every club. Kept as it is
- * while the set loads.
+ * The setup's club theatre. A sport with its own map plays only there (basketball: the NBA's USA and Canada, or an
+ * earlier season's map of its own era), and another sport's map falls back to every club. A football data set brings
+ * its own clubs, so the theatre must be one of them: a country map (built from the built-in data) and a league the set
+ * leaves out fall back to every club. Kept as it is while the set loads.
  */
 function setClubScope(setup) {
-  const own = clubMapScope(getSport(setup.sport).id);
+  const sportId = getSport(setup.sport).id;
+  const era = setup.dataSet != null && setSportOf(setup.dataSet) === sportId ? seasonMapOf(setup.dataSet) : null;
+  if (era) return domesticScope(era);
+  const own = clubMapScope(sportId);
   if (own) return own;
   if (domesticEntry(setup.clubScope)?.sport) return 'all';
-  if (setup.dataSet == null || getSport(setup.sport).id !== 'football') return setup.clubScope;
+  if (setup.dataSet == null || sportId !== 'football') return setup.clubScope;
   if (isDomesticScope(setup.clubScope)) return 'all';
   const sport = sportOf(setup);
   return !sport || CLUB_SCOPES(sport).some(scope => scope.id === setup.clubScope) ? setup.clubScope : 'all';
 }
+
+/** A club map's row as one of a basketball season's clubs: the season's name, code, strength and five on the map's land. */
+const seasonClub = (row, club) => ({ ...row, name: club.name, code: club.code, league: club.league, str: club.str, squad: club.squad });
 
 /**
  * Live presentation of an outcome already decided and saved at kickoff: the events and kicks revealed so far, and
@@ -229,8 +235,13 @@ export default class App extends React.Component {
   minuteToken = null;
   /** Clock tokens of the events, whistle and kicks the current match scheduled (WP-MATCH, A-12). */
   matchTasks = new Set();
+  /** The speed your match was slowed from (startMatch), handed back by restoreSpeed; UI-only, never saved. */
+  speedRestore = null;
+  /** `?playtest` in the address: the results also show the playtest timing (docs/design/playtest.md). */
+  playtest = false;
 
   componentDidMount() {
+    try { this.playtest = new URLSearchParams(window.location.search).has('playtest'); } catch { this.playtest = false; }
     window.addEventListener('storage', this.handleStorage);
     window.addEventListener('focus', this.handleFocus);
     window.addEventListener('blur', this.handleBlur);
@@ -625,7 +636,7 @@ export default class App extends React.Component {
     const loaded = id ? getLoadedFootballSet(id) : null;
     const failed = !loaded && load?.id === id && load.state === 'error';
     return { sets: this.state.footballSets, state: !id ? 'idle' : loaded ? 'ready' : failed ? 'error' : 'loading',
-      message: failed ? load.message : null, sport: loaded ? footballSport(loaded) : null, onRetry: () => this.retrySet() };
+      message: failed ? load.message : null, sport: loaded ? seasonSport(loaded) : null, onRetry: () => this.retrySet() };
   }
 
   /** Display name of a territory: a country map's section, else a nation or dependency. */
@@ -712,8 +723,15 @@ export default class App extends React.Component {
       // Country maps come with football data only (basketball clubs take the NBA's map below, in setClubScope).
       if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
-      // So do data sets, and they bring their own clubs.
-      if (setup.dataSet != null && getSport(setup.sport).id !== 'football') setup.dataSet = null;
+      // A data set plays in its own sport and brings its own clubs. A basketball season has clubs only: choosing it
+      // takes the clubs, and choosing nations goes back to the built-in season.
+      if (setup.dataSet != null && setSportOf(setup.dataSet) !== getSport(setup.sport).id) setup.dataSet = null;
+      if (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball') {
+        if (key === 'layer' && value !== 'clubs') setup.dataSet = null;
+        else setup.layer = 'clubs';
+      }
+      // A sport with clubs only (American football: the NFL's) has no nations to choose.
+      if (getSport(setup.sport).clubsOnly) setup.layer = 'clubs';
       const clubScope = setClubScope(setup);
       if (clubScope !== setup.clubScope) setup.clubScope = clubScope;
       // The field changes with the theatre, so the managed team goes too, but a
@@ -912,9 +930,11 @@ export default class App extends React.Component {
     const domesticId = domesticIdOf(su);
     if (domesticId) {
       // Each club starts on its group of sections (just its home on a 100-club
-      // map). Nobody plays until the map has loaded.
+      // map). Nobody plays until the map has loaded. A basketball season's
+      // clubs take their map's land and colours, with the season's players.
       const loaded = getLoadedDomestic(domesticId);
-      included = loaded ? loaded.clubs.map(row => buildClub(row, sport)) : [];
+      const season = sport.clubMap ? new Map(sport.clubs.map(club => [club.id, club])) : null;
+      included = loaded ? loaded.clubs.map(row => buildClub(season ? seasonClub(row, season.get(row.id)) : row, sport)) : [];
       if (loaded) own = { ...loaded.startOwners };
       scopeName = domesticLabel(su.clubScope);
     } else if (clubLayer) {
@@ -1369,8 +1389,13 @@ export default class App extends React.Component {
       || (sim.winner === attackerId ? effA + CONFIG.upsetThreshold <= effD : effD + CONFIG.upsetThreshold <= effA);
     const series = st.aliveIds.length === 2 && st.settings.finale === 'best-of-three'
       ? st.series || { teamIds: [attackerId, defenderId], wins: { [attackerId]: 0, [defenderId]: 0 }, games: 0 } : null;
+    // Your match plays live at 1× whatever speed skims the rest (Fast-forward included); finishMatch hands the chosen
+    // speed back, unless you change the speed during the match.
+    const watch = !options.instant && (st.settings.express || st.settings.resolution === 'ticker') && this.ownMatch(st, attackerId, defenderId);
+    if (watch && st.speed !== 1 && this.speedRestore == null) this.speedRestore = st.speed;
     this.setState({
       series,
+      ...(watch ? { speed: 1 } : {}),
       match: {
         aId: attackerId,
         dId: defenderId,
@@ -1551,8 +1576,18 @@ export default class App extends React.Component {
   /** Speed 1×/2×/4× (DEC D14). A live ticker match is rescheduled at the new rate (A-12, WP-MATCH hook). */
   setSpeed(n) {
     const previous = this.state.speed;
-    if (![1, 2, 4].includes(n) || n === previous) return;
+    if (![1, 2, 4].includes(n)) return;
+    // A speed picked during your match is kept after it (startMatch slowed the match to 1×).
+    this.speedRestore = null;
+    if (n === previous) return;
     this.setState({ speed: n }, () => this.rescheduleForSpeed(previous));
+  }
+
+  /** Your match has ended (finishMatch): the speed it was slowed from returns. Idempotent. */
+  restoreSpeed() {
+    const speed = Number(this.speedRestore);
+    this.speedRestore = null;
+    if (speed > 0 && speed !== 1 && this.state.speed === 1) this.setState({ speed });
   }
 
   cycleSpeed() {
@@ -1669,7 +1704,7 @@ export default class App extends React.Component {
       return { id: 'sign', label: `Sign ${candidate?.name || 'player'}`, mastLabel: 'Sign player', disabled: !candidate,
         run: () => this.chooseAcquisition(this.selectedCandidate()?.index) };
     }
-    if (st.tacticalChoice) return { id: 'kickoff', label: 'Continue', run: () => this.chooseTactic('balanced') };
+    if (st.tacticalChoice) return { id: 'kickoff', label: 'Continue', run: () => this.chooseTactic(recommendedTactic(st.tacticalChoice.options)) };
     if (st.autoplay) return { id: 'pause', label: 'Pause', run: () => this.togglePlay() };
     // DEC D13: a spectator's primary is Pause / Play campaign. Play also resumes a paused clock (togglePlay), so
     // Pause then Play keeps the campaign running; a bare Resume would unpause with autoplay off and stop after this match.
@@ -1714,6 +1749,17 @@ export default class App extends React.Component {
     return { right: round ? `Round ${round}` : null, rightKind: round ? 'round' : null, minuteFallback: 0 };
   }
 
+  /**
+   * Phone bar Auto and speed (PhoneBar `playback`) while the campaign runs and nothing waits on a decision. Auto only
+   * for a manager: a spectator's primary already plays and pauses the campaign. → { autoplay, speed, showAutoplay } | null
+   */
+  phonePlaybackModel() {
+    const st = this.state;
+    if (st.phase !== 'playing' || st.aliveIds.length <= 1) return null;
+    if (st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination) return null;
+    return { autoplay: !!st.autoplay, speed: st.speed || 1, showAutoplay: !!this.managedId(st) };
+  }
+
   setPauseFollow(value) {
     this.setState({ pauseFollow: !!value }, () => this.persist());
   }
@@ -1726,16 +1772,21 @@ export default class App extends React.Component {
     this.setState(state => ({ phoneMore: !state.phoneMore }));
   }
 
-  /**
-   * DEC D11: a ticker kickoff involving the managed team (or the followed team while spectating) switches the Map to
-   * the Match view; returns the fields for the same setState. Never for express or "simulate the result" (instant).
-   */
-  autoMatchView(st, attackerId, defenderId, { express = false, instant = false } = {}) {
-    if (st.settings?.resolution !== 'ticker' || express || instant || st.view !== 'map') return {};
+  /** Your match: the managed team plays in it, or, while spectating, the followed team does. */
+  ownMatch(st, attackerId, defenderId) {
     const managedId = this.managedId(st);
     const ids = [attackerId, defenderId];
-    if (managedId ? ids.includes(managedId) : !!st.followedId && ids.includes(st.followedId)) return { view: 'match', viewSource: 'auto' };
-    return {};
+    return managedId ? ids.includes(managedId) : !!st.followedId && ids.includes(st.followedId);
+  }
+
+  /**
+   * DEC D11: a live kickoff of your match (ownMatch; Fast-forward plays it live too) switches the Map to the Match
+   * view; returns the fields for the same setState. Never for "simulate the result" (instant) or Final score only.
+   */
+  autoMatchView(st, attackerId, defenderId, { express = false, instant = false } = {}) {
+    const live = st.settings?.express || st.settings?.resolution === 'ticker';
+    if (!live || express || instant || st.view !== 'map') return {};
+    return this.ownMatch(st, attackerId, defenderId) ? { view: 'match', viewSource: 'auto' } : {};
   }
 
   /** DEC D10: the tactical gate no longer opens its dialog by itself; "Match preview" opens it. */
@@ -1747,9 +1798,10 @@ export default class App extends React.Component {
     if (this.state.tacticalPreview) this.setState({ tacticalPreview: false });
   }
 
-  /** "or simulate the result": kick off with the default approach and reveal this match instantly. */
+  /** "or simulate the result": kick off with the recommended approach and reveal this match instantly. */
   simulateResult() {
-    if (this.state.tacticalChoice) this.chooseTactic('balanced', { instant: true });
+    const choice = this.state.tacticalChoice;
+    if (choice) this.chooseTactic(recommendedTactic(choice.options), { instant: true });
   }
 
   mastheadModel() {
@@ -1950,7 +2002,8 @@ export default class App extends React.Component {
             onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} />}
           {playing && view === 'map' && <Ticker {...this.tickerModel()} />}
         </main>
-        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} onPrimary={() => this.runPrimary()} />}
+        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} onPrimary={() => this.runPrimary()}
+          playback={this.phonePlaybackModel()} onAutoplay={() => this.togglePlay()} onSpeed={() => this.cycleSpeed()} />}
         {playing && <PhoneTabBar active={this.navView(view)} hidden={view === 'conquest'} locked={!!st.choice || !!st.pendingTarget}
           moreOpen={st.phoneMore} onView={v => this.setView(v)} onMore={() => this.togglePhoneMore()} />}
         {playing && st.phoneMore && <PhoneMoreSheet onClose={() => this.togglePhoneMore()} locked={!!st.choice || !!st.pendingTarget}

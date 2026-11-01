@@ -2,11 +2,11 @@
 "format": 2,
 "id": "600",
 "name": "Paraguay",
-"version": "600-4fcf34b2",
+"version": "600-377acae6",
 "projection": {"lon0":-58.4,"lat0":-23.4},
 "focus": [-62.9,-27.8,-54,-19.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"PRY","level":"ADM2","license":"Creative Commons Attribution 4.0 (CC BY 4.0)","source":"Direcion General de Estadica, Encuestas y Censos","year":"2012","canonical":"gbOpen","boundaryId":"PRY-ADM2-47425931","url":"https://github.com/wmgeolab/geoBoundaries/raw/f549eab/releaseData/gbOpen/PRY/ADM2/geoBoundaries-PRY-ADM2_simplified.geojson","units":247,"areaKm2":400629},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00008385777385152757,0.00008302316587321388],"translate":[-62.64461743786239,-27.59183356463177]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4]],"id":"600-001","properties":{"name":"Asunción (south-east)","units":1}},
 {"type":"Polygon","arcs":[[5,-5,6,7]],"id":"600-002","properties":{"name":"Asunción","units":1}},

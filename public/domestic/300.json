@@ -2,11 +2,11 @@
 "format": 2,
 "id": "300",
 "name": "Greece",
-"version": "300-271ffff0",
+"version": "300-3c83e7c9",
 "projection": {"lon0":23,"lat0":39.1},
 "focus": [19.2,34.6,28.5,41.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"GRC","level":"ADM3","license":"CC0 1.0 Universal (CC0 1.0) Public Domain Dedication","licenseDetail":"source 2 and 3-Creative Commons Attribution 3.0 License","source":"geoBoundaries, Wikimedia Commons","year":"2010","canonical":"municipality","boundaryId":"GRC-ADM3-53547021","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GRC/ADM3/geoBoundaries-GRC-ADM3_simplified.geojson","filled":{"level":"ADM2","units":["Thessalias","Ionion Nison","Peloponnisoy","Attikis","Notioy Aigaioy"],"license":"Creative Commons Attribution 4.0 International (CC BY 4.0)","source":"EuroGeoGraphics, Regional IM Working Group - Europe","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GRC/ADM2/geoBoundaries-GRC-ADM2_simplified.geojson"},"units":331,"areaKm2":131540},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00010214292029714953,0.00006931493228066718],"translate":[19.379007964988375,34.809379282449356]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"300-001","properties":{"name":"Athens (west)","units":14}},
 {"type":"Polygon","arcs":[[6,-6,7]],"id":"300-002","properties":{"name":"Perama","units":4}},

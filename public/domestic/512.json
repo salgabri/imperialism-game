@@ -2,11 +2,11 @@
 "format": 2,
 "id": "512",
 "name": "Oman",
-"version": "512-01a7dfc6",
+"version": "512-65a0cb88",
 "projection": {"lon0":56.1,"lat0":20.8},
 "focus": [51.8,16.4,60,26.6],
 "boundaries": {"provider":"geoBoundaries","iso3":"OMN","level":"ADM1","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2010","canonical":"Unknown","boundaryId":"OMN-ADM1-34121849","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/OMN/ADM1/geoBoundaries-OMN-ADM1_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"United Arab Emirates","km2":19}]},"units":7,"areaKm2":309020},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00007839496494964995,0.00009738442450762122],"translate":[52,16.650211433662548]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"512-001","properties":{"name":"Dhofar (south-west 8)","units":1}},
 {"type":"Polygon","arcs":[[-3,4,5,6]],"id":"512-002","properties":{"name":"Sarfayt","units":1}},

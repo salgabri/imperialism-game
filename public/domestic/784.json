@@ -2,11 +2,11 @@
 "format": 2,
 "id": "784",
 "name": "United Arab Emirates",
-"version": "784-a93666e7",
+"version": "784-1cf739c8",
 "projection": {"lon0":54.3,"lat0":24.4},
 "focus": [51.4,22.5,56.5,26.2],
 "boundaries": {"provider":"geoBoundaries","iso3":"ARE","level":"ADM1","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"ARE-ADM1-86790563","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARE/ADM1/geoBoundaries-ARE-ADM1_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Oman","km2":211}]},"units":7,"areaKm2":70913},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00004849903399033987,0.00003437941279412796],"translate":[51.5317798,22.6316214]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3]],"id":"784-001","properties":{"name":"Abu Dhabi (north-west 8)","units":1}},
 {"type":"Polygon","arcs":[[4,5,6,-1]],"id":"784-002","properties":{"name":"As Sad","units":1}},

@@ -2,11 +2,11 @@
 "format": 2,
 "id": "858",
 "name": "Uruguay",
-"version": "858-301e55da",
+"version": "858-170945c3",
 "projection": {"lon0":-56,"lat0":-32.5},
 "focus": [-58.7,-35.1,-53,-29.9],
 "boundaries": {"provider":"geoBoundaries","iso3":"URY","level":"ADM1","license":"Open Data Commons Open Database License 1.0","licenseDetail":"Open Data Commons Open Database License 1.0","source":"OpenStreetMap, Wambacher","year":"2017","canonical":"Unknown","boundaryId":"URY-ADM1-27058087","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/URY/ADM1/geoBoundaries-URY-ADM1_simplified.geojson","units":19,"areaKm2":176930},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.000053126320172957244,0.00004888506683151604],"translate":[-58.4948438,-34.97393429808477]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5]],"id":"858-001","properties":{"name":"Montevideo (north)","units":1}},
 {"type":"Polygon","arcs":[[6,-1,7,8]],"id":"858-002","properties":{"name":"Montevideo","units":4}},

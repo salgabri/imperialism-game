@@ -1,6 +1,9 @@
 // EFEM.club (FM26) access for the domestic-club sync: polite cached HTTP, game
 // nation -> FM nation mapping, club viability rules and the 16-player squad pick.
 // Network results are cached under data-src/domestic/ so reruns are offline.
+// efem.club/robots.txt disallows /api/ (checked 18 October 2026), which every EFEM
+// request here uses, so createEfem serves only its cache unless given `permission`
+// (the sync's --efem-permission-granted), to be passed only once EFEM has said yes.
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -11,6 +14,10 @@ import { FM_ROLES, FM_ORIGIN, expandFmTuple, fmNaturalPositions } from '../../sr
 import { domesticCap } from '../../src/data/domesticTiers.js';
 
 export const VERSION = '26.3.0';
+// Release date of the FM26 26.3.0 data update: the ratings' as-of date (a snapshot's
+// fetchedAt is only when EFEM was read). Change it with VERSION.
+export const DATABASE_DATE = '2026-03-30';
+export const EFEM_PERMISSION_FLAG = '--efem-permission-granted';
 export const USER_AGENT = 'imperialism-game-build/1.0 (offline data build)';
 export const CLUBS_ENDPOINT = `${FM_ORIGIN}/api/clubs/filter`;
 export const PLAYERS_ENDPOINT = `${FM_ORIGIN}/api/players/filter`;
@@ -86,7 +93,7 @@ const sha1 = text => createHash('sha1').update(text).digest('hex');
 
 // ---- EFEM requests ----
 
-export function createEfem({ cacheDir, refresh = false, concurrency = 3, spacing = 500 }) {
+export function createEfem({ cacheDir, refresh = false, permission = false, concurrency = 3, spacing = 500 }) {
   const limit = createLimiter(concurrency, spacing);
   const fresh = new Set(); // URLs already re-downloaded by this run
   let requests = 0, cached = 0;
@@ -95,6 +102,8 @@ export function createEfem({ cacheDir, refresh = false, concurrency = 3, spacing
     const hash = sha1(url);
     const file = path.join(cacheDir, 'efem', hash.slice(0, 2), `${hash}.json.gz`);
     if ((!(options.refresh ?? refresh) || fresh.has(url)) && existsSync(file)) { cached++; return readGzJson(file); }
+    if (!permission) throw new Error(`Refusing to request ${url.slice(0, 200)}: efem.club/robots.txt disallows /api/. `
+      + `Cached responses need no permission; pass ${EFEM_PERMISSION_FLAG} only once EFEM has granted it.`);
     return cachedGz(file, true, () => limit(async () => {
       requests++;
       fresh.add(url);
@@ -329,7 +338,7 @@ export function validateSnapshot(snapshot) {
   const cap = domesticCap(snapshot.nation?.id);
   if (!Array.isArray(clubs) || clubs.length > cap || clubs.length < MIN_CLUBS) fail(`club count ${clubs?.length} outside ${MIN_CLUBS}-${cap}`);
   const clubIds = new Set(), playerIds = new Set();
-  const source = { version: VERSION, snapshotDate: snapshot.source.fetchedAt.slice(0, 10) };
+  const source = { version: VERSION, snapshotDate: DATABASE_DATE };
   clubs.forEach((club, i) => {
     if (!Number.isInteger(club.fm) || clubIds.has(club.fm)) fail(`duplicate or invalid club id ${club.fm}`);
     clubIds.add(club.fm);

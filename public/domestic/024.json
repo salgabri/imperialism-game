@@ -2,11 +2,11 @@
 "format": 2,
 "id": "024",
 "name": "Angola",
-"version": "024-69970358",
+"version": "024-4fecf84b",
 "projection": {"lon0":17.5,"lat0":-11.9},
 "focus": [11.4,-18.4,24.4,-4.1],
 "boundaries": {"provider":"geoBoundaries","iso3":"AGO","level":"ADM3","license":"Creative Commons Attribution 3.0 License","source":"geoBoundaries, Instituto Nacional de Estatística, República de Angola; citypopulation.de","year":"2014","canonical":"Communes","boundaryId":"AGO-ADM3-77060369","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AGO/ADM3/geoBoundaries-AGO-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Zambia","km2":304},{"shape":"Dem. Rep. Congo","km2":282},{"shape":"Congo","km2":11}]},"units":558,"areaKm2":1251626},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00012419536586434851,0.00013634332464617114],"translate":[11.668473244144934,-18.03910400004952]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7,8]],"id":"024-001","properties":{"name":"Camama (south)","units":15}},
 {"type":"Polygon","arcs":[[9,10,-7,11,12,13]],"id":"024-002","properties":{"name":"Sumbe","units":7}},

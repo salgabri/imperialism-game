@@ -2,11 +2,11 @@
 "format": 2,
 "id": "112",
 "name": "Belarus",
-"version": "112-868efa18",
+"version": "112-d73213c0",
 "projection": {"lon0":28,"lat0":53.7},
 "focus": [22.9,51.1,33,56.3],
 "boundaries": {"provider":"geoBoundaries","iso3":"BLR","level":"ADM2","license":"Creative Commons Attribution 3.0 License","source":"geoBoundaries, CIESIN","year":"2005","canonical":"Raion","boundaryId":"BLR-ADM2-67162791","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BLR/ADM2/geoBoundaries-BLR-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Russia","km2":28},{"shape":"Ukraine","km2":8},{"shape":"Lithuania","km2":4}]},"units":118,"areaKm2":207002},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.00009587827103586829,0.00004908535335593586],"translate":[23.179592366094937,51.27641526325391]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2]],"id":"112-001","properties":{"name":"Minsk City (west)","units":3}},
 {"type":"Polygon","arcs":[[3,4,5,6,-1,7,8]],"id":"112-002","properties":{"name":"Rakaw","units":3}},

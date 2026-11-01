@@ -2,11 +2,11 @@
 "format": 2,
 "id": "268",
 "name": "Georgia",
-"version": "268-7a5dc6ee",
+"version": "268-79f8a7be",
 "projection": {"lon0":43.5,"lat0":42.3},
 "focus": [39.8,41,46.9,43.7],
 "boundaries": {"provider":"geoBoundaries","iso3":"GEO","level":"ADM2","license":"Public Domain","source":"geoBoundaries, Wikimedia Commons","year":"2007","canonical":"Municipality","boundaryId":"GEO-ADM2-92138335","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GEO/ADM2/geoBoundaries-GEO-ADM2_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Russia","km2":42},{"shape":"Azerbaijan","km2":22}]},"units":68,"areaKm2":69903},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-18","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0000673167353882605,0.000025354836936047323],"translate":[39.99113784212716,41.05539350602612]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4,5,6,7]],"id":"268-001","properties":{"name":"Tbilisi (north-west)","units":3}},
 {"type":"Polygon","arcs":[[8,9,-7,10,-5,11]],"id":"268-002","properties":{"name":"Sakurtkhisi","units":2}},

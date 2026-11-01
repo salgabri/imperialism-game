@@ -2,11 +2,11 @@
 "format": 2,
 "id": "140",
 "name": "Central African Rep.",
-"version": "140-1054aed3",
+"version": "140-45e17620",
 "projection": {"lon0":20.5,"lat0":6.6},
 "focus": [14.1,2,27.7,11.2],
 "boundaries": {"provider":"geoBoundaries","iso3":"CAF","level":"ADM3","license":"Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)","source":"Agency for Technical Cooperation and Development (ACTED), OCHA Central African Republic","year":"2018","canonical":"Municipalities","boundaryId":"CAF-ADM3-52401652","url":"https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CAF/ADM3/geoBoundaries-CAF-ADM3_simplified.geojson","foreign":{"source":"the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)","cut":[{"shape":"Sudan","km2":318},{"shape":"Chad","km2":306},{"shape":"S. Sudan","km2":287},{"shape":"Dem. Rep. Congo","km2":177},{"shape":"Congo","km2":157}]},"units":175,"areaKm2":621727},
-"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-10-24","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
+"source": {"provider":"EFEM.club","game":"Football Manager 26","edition":"FM 26","version":"26.3.0","snapshotDate":"2026-03-30","rawScale":100,"conversion":"round(currentAbility * 99 / 100)","origin":"https://efem.club"},
 "topology": {"type":"Topology","transform":{"scale":[0.0001300665671657967,0.00008775178472459182],"translate":[14.420095,2.232471279325542]},"objects":{"sections":{"type":"GeometryCollection","geometries":[
 {"type":"Polygon","arcs":[[0,1,2,3,4]],"id":"140-001","properties":{"name":"Arrondissement 1 (north-east)","units":8}},
 {"type":"Polygon","arcs":[[-2,5,6,7,8]],"id":"140-002","properties":{"name":"Damara","units":2}},

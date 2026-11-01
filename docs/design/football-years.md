@@ -2,7 +2,9 @@
 
 Status: implemented for local CM 01/02 data sets, 2026-10-24; the built-in
 earlier seasons from EA's FIFA 15 – EA FC 24 launch rosters and an
-always-visible Season choice, 2026-10-30. The CM 01/02 path has not yet run on a
+always-visible Season choice, 2026-10-30; FIFA 07 – FIFA 14 from two scrapes of
+EA's rosters, and the earlier basketball seasons from 2K Archive's NBA 2K
+ratings, on maps of their eras, 2026-10-30. The CM 01/02 path has not yet run on a
 real database (the files need a forum login). Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
 [football-year-permissions.md](football-year-permissions.md).
@@ -13,7 +15,7 @@ A football campaign can be played on a **data set** other than the built-in one.
 A data set is one dated database turned into nations and clubs. There are two
 kinds:
 
-- **The built-in earlier seasons** (2014/15 to 2023/24): one EA FIFA / FC launch
+- **The built-in earlier seasons** (2006/07 to 2023/24): one EA FIFA / FC
   roster each, committed under `public/football/ea-*.json` and offered in every
   setup. See [Built-in earlier seasons](#built-in-earlier-seasons).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
@@ -24,8 +26,9 @@ kinds:
   those files can be committed by removing one `.gitignore` line, and its scope
   should be recorded in the permissions note first.
 
-The built-in data (EA FC 26 + FM 26, season 2025/26) stays the default and does
-not change: same files, same seeds, same saves.
+The built-in data is the current season and the default: 2026/27, EA FC 27 + FM 26
+for football and NBA 2K27 for basketball (until 1 November 2026 it was 2025/26,
+EA FC 26 + FM 26, and 2024/25, NBA 2K25; both now play as earlier seasons, below).
 
 ## Terms
 
@@ -35,8 +38,8 @@ not change: same files, same seeds, same saves.
   An EA season is `ea-fifa-<nn>` or `ea-fc-<nn>` after its edition
   (`ea-fifa-18`, `ea-fc-24`). The built-in data has no id (`null`).
 - **Year**: the season-end year, as in the sources note. `cm0102-2026-05` is year
-  2026 and season "2025/26", like the built-in data, so a season can have several
-  data sets (the built-in one, CM's December and May updates).
+  2026 and season "2025/26", like the EA FC 26 season, so a season can have several
+  data sets (EA's, CM's December and May updates).
 - **Version**: `<id>-<8 hex>`, the first 8 hex of the SHA-256 of the data set
   file's content without its `version` field. A save names the version it was
   built from.
@@ -188,14 +191,24 @@ names the provider and reads "Game rating converted from CM current ability".
 
 ## Built-in earlier seasons
 
-Ten seasons ship with the game, 2014/15 to 2023/24: the launch roster (update 2)
-of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
+Nineteen seasons ship with the game, 2006/07 to 2025/26, without 2024/25 (no
+source here has EA FC 25). FIFA 07 to FIFA 14 are described
+[below](#fifa-07-to-fifa-14). Ten, 2014/15 to 2023/24, are the launch roster
+(update 2) of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
 (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
 180,021 rows, labelled CC0 by its compiler; EA's own rights are not cleared, as
-for the built-in EA FC 26 data). `scripts/data/ea-seasons.json` names the export,
-its download link and SHA-256, and the editions. `npm run build:ea-seasons`
-(`scripts/build-ea-seasons.mjs`, logic in `scripts/lib/ea-seasons.mjs`) stops on
-any other file, so every season rebuilds byte for byte. It writes:
+for the built-in EA FC 27 data). `scripts/data/ea-seasons.json` names the export,
+its download link and SHA-256, and the editions. 2025/26 is EA FC 26 update 4
+(19 September 2025), the committed snapshot `scripts/data/ea-fc26.csv` the
+built-in season came from until 2026/27 (manifest `snapshots`, pinned by
+SHA-256). Like the other EA seasons it has EA's players only, so 80 nations
+field a full XI where the built-in 2025/26 filled all 173 with FM. Its 316
+generated players (EA's unlicensed Brazilian clubs, Mohammedan SC and Western
+United, all born on 29 February) stay out, as they did from the built-in data.
+
+`npm run build:ea-seasons` (`scripts/build-ea-seasons.mjs`, logic in
+`scripts/lib/ea-seasons.mjs`) stops on any other file, so every season rebuilds
+byte for byte. It writes:
 
 - `public/football/<id>.json`, one data set per edition (about 310 KB), with
   `kind: 'ea'` (below);
@@ -226,7 +239,7 @@ How a season is made:
   requires: 132–134 clubs a season. Ids, codes and colours come from the same
   `presentClubs` as the CM builder.
 - **Territory** is `territoryFor(FOOTBALL_FEDERATIONS, year)`, as for CM sets:
-  Kosovo has no team in 2014/15.
+  Kosovo has no team before 2015/16, and Sudan holds South Sudan in the older seasons.
 - **Ratings** are EA's overall, 1–99, unchanged.
 
 An EA set's `source` is `{ provider: 'EA Sports', edition: 'FIFA 18', update: 2,
@@ -238,21 +251,155 @@ with `source: 'ea-fc'`, the edition, update, snapshot date and the player's
 SoFIFA page for that roster, and `eaTupleOf` folds it back. The Source column
 reads "FIFA 18" and links to that page.
 
+### FIFA 07 to FIFA 14
+
+No single export covers the editions before FIFA 15, so these eight seasons
+join two scrapes of EA's rosters by EA's player id
+(`scripts/lib/ea-legacy-seasons.mjs`, run by the same `npm run build:ea-seasons`
+through the same `assembleEaSeason`):
+
+- **Ratings** from a FIFA Index mirror on Kaggle
+  (`daguizer/fifa-2021-to-2005-complete-player-attributes`, licence "other" as
+  set by its compiler; FIFA Index's terms forbid scraping): EA's overall,
+  positions, full name and date of birth, but no nationality or club.
+- **Nationality and club** from a SoFIFA scrape on GitHub (`Big-Data-FC/datasets`
+  at commit `c6da23f`, no licence stated): nationality, club, league, short name
+  and the player's SoFIFA page. Its own rating (`bov`) is SoFIFA's best overall
+  at any position, not EA's, and is never read.
+- **Roster dates** from a list of SoFIFA's dates per roster (`dates.json`,
+  pinned by SHA-256; it has no source link).
+
+`scripts/data/ea-seasons.json` (`legacy`) pins every file by SHA-256 and names,
+per edition, the roster each file holds and the evidence for it. A player
+missing from either file is left out, and nothing is borrowed from another
+edition. Clubs come from each edition's seven SoFIFA league names (the same
+seven every year, such as `Portuguese Liga ZON SAGRES`): 132 clubs a season.
+`Turks and Caicos Islands` joins `EA_NO_TEAM`.
+
+- **Two rosters for FIFA 07 to FIFA 11.** The ratings file holds the August
+  launch roster (`070001` …) and the clubs file the February winter update
+  (`070002` …): the clubs file has players EA added in winter, and the six
+  FIFA 08 players whose attributes changed in February keep their August values
+  in the ratings file. These seasons carry `ratingsDate` (August) beside
+  `snapshotDate` (February). Ratings barely moved in between: attributes agree
+  for all but one of 10,149 FIFA 07 players and ten of 12,004 FIFA 08 players.
+- **One roster for FIFA 12 to FIFA 14**: `120002` (February 2012), and each
+  edition's last roster for FIFA 13 and 14, `130034` and `140052`. SoFIFA dates
+  those September 2013 and 2014, but their squads are the season's: Bale is at
+  Tottenham in 2012/13 and Vidić at Manchester United in 2013/14.
+- **Positions.** FIFA Index's older codes map onto EA's current ones
+  (`LEGACY_POSITIONS`: `SW` to `CB`, `LWM` / `RWM` to `LM` / `RM`, `LF` / `RF` to
+  `CF`, and the side variants of central roles to the central role).
+- **Invented names left out.** EA gave some players stand-in names (Mutu
+  appears as "Teodor Petrovici" and "Andrei Murgu"). The manifest lists 33 such
+  records of 10 people with the evidence for each: the same EA id under the real
+  name in another edition, a second database naming the stand-in, or, for four
+  FIFA 08–11 names, the same club, nationality and birth year as a proven FIFA 07
+  stand-in. The build stops if a listed id or name is missing from its edition.
+- **Damaged text stops the build**, except FIFA 12 player 168649, whose short name
+  the scrape garbled: the build uses the ratings file's full name ("Aleksejs
+  Višŋakovs", as spelt there) and records it in the audit.
+
+A legacy season's `source` adds `clubsUrl` (the SoFIFA scrape) to `url` (the
+ratings mirror), and `ratingsDate` where the two rosters differ. Full XIs run
+from 49 (FIFA 09) to 69 (FIFA 12) of 173 nations.
+
+## Earlier basketball seasons
+
+Basketball has 26 earlier seasons, 1999/00 to 2025/26 without 2011/12: the NBA
+clubs of each NBA 2K edition from NBA 2K to NBA 2K26, as compiled by
+[2K Archive](https://2karchive.com/). The built-in basketball clubs are NBA
+2K27's (2026/27), from the same page (`builtIn` in the manifest, built by
+`npm run build-clubs`), and its NBA ratings rate the built-in national fives
+(`npm run build-basketball`). The compilation names no licence, and 2K's own
+rights are not cleared. Its page holds every edition's
+ratings as one table (`const YEARS = {...}`: name, overall, position and team
+code per player). `scripts/data/nba-seasons.json` pins one saved copy of the
+page by SHA-256 and maps each edition's team codes to franchises by season.
+`npm run build:nba-seasons` (`scripts/build-nba-seasons.mjs`, logic in
+`scripts/lib/nba-seasons.mjs`) reads the table as data, cutting the object
+literal out by matching braces and parsing it as JSON, so nothing on the page
+runs. It stops on any other copy of the page and writes:
+
+- `public/basketball/nba-2k<nn>.json`, one data set per edition (about 12 KB),
+  with `kind: 'nba2k'` (below);
+- `src/data/basketballSeasons.js`, the listing, each entry naming its map;
+- `docs/design/basketball-seasons-audit.json`, per season: rows, the positions
+  filled from another edition and the players left out.
+
+How a season is made:
+
+- **Franchises of the season.** Each team code maps to a franchise for a span of
+  seasons. A franchise that kept its id keeps the game's code and colour
+  (`b-boston-celtics`). One that has since moved gets its own id, name and
+  arena: the Vancouver Grizzlies until 2000/01, the Seattle SuperSonics until
+  2007/08, the New Jersey Nets until 2011/12, the Charlotte Bobcats from 2004/05
+  to 2013/14, and the Hornets in New Orleans, then Oklahoma City for 2005/06 and
+  2006/07. Its code comes from `makeCode` and its colour from `colourFor`, both
+  in `footballSetBuild.js`. Every code in an edition must be a franchise of that
+  season and every franchise must have players, or the build stops. Free agents
+  play for nobody.
+- **The best five.** Each franchise fields the strongest lineup its players'
+  positions allow (`selectLineup`, as build-clubs picks the built-in fives). A
+  listed second position that is not the first's neighbour is dropped, as the
+  game allows. A blank position takes the player's own from the nearest edition
+  that lists him, earlier first. A player with no position in any edition is
+  left out, never guessed.
+- **Ratings** are 2K's overall, 1–99, unchanged. A club's `str` is its five's
+  mean.
+- **NBA 2K12 (2011/12) is left out.** The compilation lists one Philadelphia
+  and two San Antonio players for it, so no five can be fielded. The manifest
+  says so in `skipped`.
+
+A basketball set has clubs only: no national team is rated, so `nations` and
+`territory` are absent and a basketball season is played with clubs alone. Its
+`source` is `{ provider: '2K Sports', edition: 'NBA 2K8', compiler: '2K Archive',
+url, rawScale: 99 }`, and each club holds `[name, 'PG/SG', rating]` players, the
+built-in clubs' shape. Saves hold them as plain records, as for the built-in
+clubs, so no `playerPack` is needed.
+
+### Era maps
+
+A season plays on the map of its own era: the franchises of that season, each
+territory grown from the arena it played in, with the
+[NBA map](domestic-campaigns.md#the-nba-map)'s partition. A season's `map` names
+it. `npm run build:nba-map` builds today's map and one map per era of the
+manifest's `maps`: `nba2000` (1999/00 and 2000/01), `nba2002`, `nba2003`
+(2002/03, 2003/04), `nba2005`, `nba2006` (2005/06, 2006/07), `nba2008`,
+`nba2009` (2008/09 to 2010/11), `nba2013` and `nba2014`. Every season of an era
+must have the same franchises in the same arenas, or the build stops. From
+2014/15 the franchises are today's, so those seasons play on today's map
+(`nba`), whose file is unchanged.
+
+An era map's file and index entry have `seasons` (the set ids it serves). Its
+club rows name their franchise and carry no code, strength or squad: those come
+from the season at kick-off, when each row takes its season club's name, code,
+strength and five and keeps the map's land and colour. The loader accepts such a
+map only with a sport. The index entry has no `top`: the setup names the chosen
+season's own three strongest clubs once it has loaded.
+
 ## Runtime
 
 - `src/engine/footballSets.js`:
-  - `loadFootballSetIndex()` lists the built-in earlier seasons (`BUILT_IN_SETS`,
-    from `src/data/footballSeasons.js`) and the CM 01/02 sets built on this
-    computer (`football/index.json`, read once; missing means none). A local file
-    never stands in for a built-in season.
+  - `loadFootballSetIndex()` lists the built-in earlier seasons of both sports
+    (`BUILT_IN_SETS`, from `src/data/footballSeasons.js` and
+    `src/data/basketballSeasons.js`; `setSportOf(id)` tells them apart) and the
+    CM 01/02 sets built on this computer (`football/index.json`, read once;
+    missing means none). A local file never stands in for a built-in season,
+    and never adds a basketball one.
   - `loadFootballSet(id)` and `getLoadedFootballSet(id)` follow
     `src/engine/domestic.js`: one shared promise per id, failed loads not cached,
-    a small LRU, and strict validation of format, id, version and tuples.
-  - `footballSport(set)` returns `{ ...football, rosters, clubs, dataSet, dataVersion, dataYear, dataSeason, territory }`.
+    a small LRU, and strict validation of format, id, version and tuples. A set
+    is fetched from its sport's folder (`football/` or `basketball/`). A
+    basketball set must name a basketball club map that serves it (an era map
+    listing it, or today's) and have exactly that map's number of clubs.
+  - `seasonSport(set)` returns `{ ...football, rosters, clubs, dataSet, dataVersion, dataYear, dataSeason, territory }`,
+    or for a basketball season `{ ...basketball, clubs, clubMap, dataSet, … }`.
     It is memoised per decoded set, not per version, so an evicted set does not
     stay in memory.
   - `sportOf(settingsOrSetup)` returns that sport, or the built-in sport for no
-    set.
+    set. A set plays only in its own sport, and a basketball one only with
+    clubs.
 - **Setup**:
   - Step 1 always has a **Season** dropdown for football (`#setup-season`, a
     native select): the built-in season, then each data set newest first,
@@ -264,7 +411,13 @@ reads "FIFA 18" and links to that page.
     country map, and Launch waits for it.
   - Country maps are built from the built-in FM data, so the "One country" group
     is not offered for another set.
-  - Basketball has no sets and resets the choice.
+  - Basketball has its own Season dropdown: the built-in 2026/27, then its
+    earlier seasons ("2007/08"), with a note that they use 2K Archive's NBA 2K
+    ratings and have NBA clubs only. Picking one switches Teams
+    to clubs and the theatre to its map (`domestic:nba2008`); picking nations
+    goes back to the built-in season. The map and the set load side by side, and
+    Launch waits for both.
+  - Changing sport resets a set of the other sport.
   - Setup caches key on the set version.
 - **Launch**: `opening()` builds teams from `sportOf(setup)` and applies
   `territory`. Settings record `dataSet`, `dataVersion`, `dataYear` and
@@ -275,7 +428,10 @@ reads "FIFA 18" and links to that page.
 - **Saves are self-contained.** A campaign never re-reads roster data after
   kick-off. The one exception is the v4 source index, which is built from the
   built-in rosters: a CM player never matches it, and an EA season's player
-  shares at most an id with an FC 26 record, never its edition. So a set's
+  shares at most an id with an FC 27 record, never its edition. (The index also
+  lists its editions in each checkpoint, `sourceEditions`: a reference rebuilds
+  only from a record of an edition its checkpoint named, so a checkpoint saved
+  on the EA FC 26 built-in data never takes an FC 27 record's evidence.) So a set's
   players are packed the way country campaigns pack FM players: the set's own
   tuples under one `playerPack` header with `kind: 'cm0102'` or `kind: 'ea'`
   (whose source names the edition, update, snapshot date and roster), rebuilt
@@ -286,11 +442,12 @@ reads "FIFA 18" and links to that page.
   loading state and any error in the elimination dialog, and proceeds only if
   that dialog is still open. It plays the version of the set loaded now, which
   can differ from the saved `dataVersion`, as country maps can.
-- `parseCampaign` accepts `dataSet` (`^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$` or
-  `^ea-(fifa|fc)-\d{2}$`),
+- `parseCampaign` accepts `dataSet` (`^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$`,
+  `^ea-(fifa|fc)-\d{2}$` or `^nba-2k\d{2}$`),
   `dataVersion` (`<dataSet>-<8 hex>`), `dataYear` (an integer from 1872 to 2100)
   and `dataSeason` (the season of `dataYear`), all four or none. It also rejects
-  a set on basketball or on a country map.
+  a set of another sport, a football set on a country map, a basketball set
+  with nations or on any map but its own, and an era map without its season.
 
 ## Known limits
 
@@ -302,17 +459,37 @@ reads "FIFA 18" and links to that page.
 - Seasons ending before 2002 need historic federations and are refused.
 - League detection uses stored competition names and CM0102Patcher's renames. A
   top division renamed some other way is reported missing, not guessed.
-- EA seasons cover the nations EA rates: about 95 of the 173 field fewer than
-  eleven natural players each season. Seasons before 2014/15 have no EA source
-  and need a local CM 01/02 database.
+- EA seasons cover the nations EA rates: 91–124 of the 173 field fewer than
+  eleven natural players each season, more in the older editions. Seasons before
+  2006/07 have no EA source here (the SoFIFA scrape, the only source of
+  nationality and club, starts with FIFA 07) and need a local CM 01/02 database.
 - An EA season's XI is the best by EA nationality, like the built-in data, not
   the squad a national coach picked.
+- In FIFA 07 to FIFA 10 wingers play as midfielders: FIFA Index has no `LW` /
+  `RW` in those editions, and its `LWM` / `RWM`, its label for EA's wingers
+  (C. Ronaldo, Robben, Joaquín), map to `LM` / `RM`.
+- The Source column shows a season's `snapshotDate`: for FIFA 07 to FIFA 11 the
+  February roster's date, though the ratings are August's (`ratingsDate`).
+- FIFA Index's FIFA 07 and FIFA 08 overalls are one point lower than a second
+  database's (the European Soccer Database on Kaggle) for about 35–40% of
+  players; the build uses FIFA Index's.
+- Basketball seasons have no national teams, and none before 1999/00: NBA 2K
+  begins with the 1999/00 season. 2011/12 is missing (above).
+- Era maps follow franchises that changed city, not moves within one area:
+  seasons from 2014/15 use today's arenas, so the Warriors' territory is named
+  San Francisco though they played in Oakland until 2019, and the Clippers'
+  Inglewood though they played in Los Angeles until 2024. The New Jersey Nets
+  are placed at East Rutherford for their Newark season (2010/11), and the
+  Pistons at Detroit for their Auburn Hills years (until 2016/17).
+- A franchise's code and colour are the game's when it kept its id; a moved one
+  gets a code and colour of its own, not its historic ones.
 
 ## Invariants kept
 
-- The built-in data path is untouched: `src/data/rosters.js` and
-  `clubs.football.js` are not regenerated, and the seed-replay golden,
-  save-size budgets and roster tests pass unchanged.
+- Data sets leave the built-in data path alone: building or loading one never
+  regenerates `src/data/rosters.js` or `clubs.football.js`, and the seed-replay
+  golden, save-size budgets and roster tests pass unchanged. (Moving the
+  built-in season to 2026/27 regenerated those files, and the golden with them.)
 - No CM 01/02 data set file, database file or derived player list is committed.
-  The EA seasons are committed on the same terms as the built-in EA FC 26 data.
+  The EA seasons are committed on the same terms as the built-in EA FC 27 data.
 - The domestic pack format is unchanged. A pack without `kind` is FM.
