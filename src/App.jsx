@@ -4,6 +4,7 @@ import { C, V4 } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
+import { teamMarkUrls } from './data/teamMarks.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
@@ -21,6 +22,7 @@ import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiv
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
+import { cacheForOffline } from './serviceWorker.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { countryMapPreview, theatreMapPreview } from './screens/setup/setupModel.js';
@@ -42,6 +44,7 @@ import TacticalChoice from './components/TacticalChoice.jsx';
 import ManagerElimination from './components/ManagerElimination.jsx';
 import CampaignStorageDialog from './components/CampaignStorageDialog.jsx';
 import ExportCheckpoint from './components/ExportCheckpoint.jsx';
+import UpdatePrompt from './components/UpdatePrompt.jsx';
 import CommandBar, { SettingsPanel } from './components/CommandBar.jsx';
 import PlaybackBar from './components/PlaybackBar.jsx';
 import WorldMap from './components/WorldMap.jsx';
@@ -1188,7 +1191,11 @@ export default class App extends React.Component {
           },
         ],
       },
-      () => this.persist(),
+      () => {
+        this.persist();
+        // Every team's crest or flag, so the campaign looks the same offline (README §Running it).
+        cacheForOffline(teamMarkUrls(teams));
+      },
     );
   }
 
@@ -1267,6 +1274,7 @@ export default class App extends React.Component {
       if (!gated && s.match && !s.match.applied) this.presentMatch();
       else if (!gated && s.spin && !remapped) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
       this.persist();
+      cacheForOffline(teamMarkUrls(s.teams));
       // The checkpoint re-stamps the map version; keep telling the player why the draw restarts.
       if (remapped) this.setState(state => state.saveStatus?.ok && !state.storageConflict ? { saveStatus: { ...state.saveStatus, message } } : null);
     });
@@ -2201,6 +2209,7 @@ export default class App extends React.Component {
         />}
         {st.exportText && <ExportCheckpoint text={st.exportText} filename={st.exportFilename}
           onDownload={() => this.downloadProgress()} onClose={() => this.setState({ exportText: null })} />}
+        <UpdatePrompt campaign={playing} />
         {st.phase === 'loading' && <div className="loading-screen" role={st.err ? 'alert' : 'status'}>
           <span>{st.err || 'Opening the atlas…'}</span>
           {st.err && <button className="button" onClick={() => { this.setState({ err: null }); this.boot(); }}>Try again</button>}
