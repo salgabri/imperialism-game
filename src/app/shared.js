@@ -13,6 +13,8 @@ export const BATTLE_SCARS = 7;
 export const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'UEFA', clubScope: 'all', pacing: 'duel', resolution: 'ticker',
   preset: 'standard', seed: '', uncertainty: 'balanced', express: false, finale: 'single', role: 'spectator',
   managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic',
+  // Home advantage: 'on' plays every match at the defender's home; 'off' (the default) at a neutral venue.
+  homeAdvantage: 'off',
   // Turn modes (DEC D1): the defaults reproduce the original random draw with compass targets.
   turnOrder: 'random', targeting: 'compass',
   // An earlier season's data set id (docs/design/football-years.md); null plays the built-in season.

@@ -114,7 +114,10 @@ Strength is the mean effective rating of the thirteen, as in the other sports.
   not played when the home side leads, and the hit that puts the home side ahead in
   the ninth or later ends the game with every run it drives in (a walk-off home run
   with men on wins by more than one). Batting last is no advantage in the model:
-  neither rule changes who wins.
+  neither rule changes who wins. With the campaign's Home advantage rule on, the
+  side batting last also gains 1.4 rating points of edge in its half-innings and
+  the visitors lose as much in theirs, so equal sides win 53% at home, as MLB home
+  sides do ([match simulation](match-simulation.md#home-advantage-optional)).
 - **Extra innings**, MLB's regular-season rule: each half starts with a runner on
   second, so a run comes with `logistic(logit(0.6) + 0.05·edge)`. After six extra
   innings still level, a decisive run goes to either side with

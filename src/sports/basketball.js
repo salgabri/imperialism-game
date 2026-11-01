@@ -37,6 +37,10 @@ const BUZZER_LEVEL = [0.3, 0.2];
 // The bench is credited 32% of a side's runs; with the buzzer's baskets a starter's, it scores about 31% of the
 // points, as NBA benches did in 2023-25 (30.1% and 31.2%). The starting five share the rest.
 const BENCH_SHARE = 0.32;
+// Home advantage, a campaign option (off: every match is at a neutral venue). The defender, at home, scores
+// HOME_EFFICIENCY / 2 points a possession more and the visitors as much less: 2.4 points a game in the NBA, 1.8 under
+// FIBA rules. Equal sides then win 56–57% at home, as NBA home sides do (54–58% in 2021/22–2024/25).
+const HOME_EFFICIENCY = 0.024;
 /** The scorer of a bench run: the dataset names each side's starting five only. */
 export const BENCH = 'Bench';
 const DECISIVE_SLOPE = 3;
@@ -52,10 +56,14 @@ function weightedRating(lineup, weights) {
   return lineup.slots.reduce((sum, slot) => sum + slot.effectiveRating * weights[slot.position], 0);
 }
 
-/** Prepare a matchup once, including position assignments, for cheap resampling. FIBA rules unless told otherwise. */
-export function prepareMatch(attacker, defender, effA, effD, rules = FIBA) {
+/**
+ * Prepare a matchup once, including position assignments, for cheap resampling. FIBA rules unless told otherwise.
+ * `venue.home`: the defender plays at home (the campaign's home advantage); a neutral venue otherwise.
+ */
+export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}, rules = FIBA) {
   const lineupA = selectLineup(attacker);
   const lineupD = selectLineup(defender);
+  const edge = home ? HOME_EFFICIENCY / 2 : 0;
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
   const adjustmentD = (Number.isFinite(effD) ? effD : lineupD.rating) - lineupD.rating;
   const offenceA = weightedRating(lineupA, OFFENCE_WEIGHTS) + adjustmentA;
@@ -71,8 +79,8 @@ export function prepareMatch(attacker, defender, effA, effD, rules = FIBA) {
     // Equal 74-rated fives average approximately 81 points in a FIBA regulation, 112 in a 2025/26 NBA one.
     // Quality changes points per possession, not the number of possessions.
     pace: rules.pace,
-    efficiencyA: clamp(BASE_EFFICIENCY + (offenceA - 74) * 0.012 - (defenceD - 74) * 0.0078, 0.54, 1.67) * rules.scoring,
-    efficiencyD: clamp(BASE_EFFICIENCY + (offenceD - 74) * 0.012 - (defenceA - 74) * 0.0078, 0.54, 1.67) * rules.scoring,
+    efficiencyA: clamp(BASE_EFFICIENCY + (offenceA - 74) * 0.012 - (defenceD - 74) * 0.0078, 0.54, 1.67) * rules.scoring - edge,
+    efficiencyD: clamp(BASE_EFFICIENCY + (offenceD - 74) * 0.012 - (defenceA - 74) * 0.0078, 0.54, 1.67) * rules.scoring + edge,
   };
 }
 
@@ -303,8 +311,8 @@ export const basketball = {
   prepareMatch,
   sampleResult,
 
-  simulate(rng, attacker, defender, drama, effA, effD) {
-    return playMatch(rng, prepareMatch(attacker, defender, effA, effD), attacker, defender, drama);
+  simulate(rng, attacker, defender, drama, effA, effD, venue) {
+    return playMatch(rng, prepareMatch(attacker, defender, effA, effD, venue), attacker, defender, drama);
   },
 };
 
@@ -326,10 +334,10 @@ export function nbaBasketballIn(season) {
       simulationVersion: 5,
       clock: { length: rules.minutes, msPerUnit: 79 },
       formatEvent: eventFormat(rules),
-      prepareMatch: (attacker, defender, effA, effD) => prepareMatch(attacker, defender, effA, effD, rules),
+      prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, rules),
 
-      simulate(rng, attacker, defender, drama, effA, effD) {
-        return playMatch(rng, prepareMatch(attacker, defender, effA, effD, rules), attacker, defender, drama);
+      simulate(rng, attacker, defender, drama, effA, effD, venue) {
+        return playMatch(rng, prepareMatch(attacker, defender, effA, effD, venue, rules), attacker, defender, drama);
       },
     });
   }

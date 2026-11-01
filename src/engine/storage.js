@@ -307,7 +307,7 @@ function validateCampaign(input, rebuildSources) {
   const enums = { sport: SPORT_LIST.map(sport => sport.id), layer: ['nations', 'clubs'], pacing: ['duel', 'blitz', 'chaos'],
     resolution: ['ticker', 'instant'], role: ['spectator', 'manager'], uncertainty: ['predictable', 'balanced', 'wild'],
     finale: ['single', 'best-of-three'], acquisitionPolicy: ['best-fit', 'highest-rated'], rosterPreset: ['authentic', 'competitive'],
-    turnOrder: ['round-robin', 'random'], targeting: ['player', 'compass'] };
+    turnOrder: ['round-robin', 'random'], targeting: ['player', 'compass'], homeAdvantage: ['off', 'on'] };
   for (const configuration of [settings, data.initialSettings].filter(Boolean)) {
     for (const [key, values] of Object.entries(enums)) if (configuration[key] != null && !values.includes(configuration[key])) invalid(`Campaign ${key} setting is unsupported.`);
     if (configuration.managedTeamId != null && configuration.managedTeamId !== '' && !known(configuration.managedTeamId)) invalid('The managed team setting is unavailable.');

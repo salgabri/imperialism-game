@@ -22,7 +22,8 @@ export const domesticDescription = setupModel.domesticDescription;
 
 const {
   SETUP_STEPS, DRAW_CARDS, TARGETING_CARDS, ROLE_CARDS, CONQUEST_RULES, UNCERTAINTY_OPTIONS, UNCERTAINTY_HELP, FINALE_OPTIONS,
-  FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, SHOW_MATCH_OPTIONS, showMatchesWrites,
+  FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, HOME_OPTIONS, HOME_HELP, SHOW_MATCH_OPTIONS,
+  showMatchesWrites,
 } = setupModel;
 
 /** Focus inside one of these keeps Space for itself (A-8). */
@@ -437,6 +438,12 @@ export default function SetupOverlay({
             {RECRUITMENT_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
           </select>
           <small className="control-help">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
+        </label>
+        <label className="control-field" htmlFor="setup-home-advantage"><span>Home advantage</span>
+          <select id="setup-home-advantage" value={model.homeAdvantage} onChange={event => pick('homeAdvantage', event.target.value)}>
+            {HOME_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+          </select>
+          <small className="control-help">{HOME_HELP[model.homeAdvantage]}</small>
         </label>
         {model.sport.id === 'basketball' ? (
           <label className="control-field" htmlFor="setup-roster-preset"><span>Team strengths</span>

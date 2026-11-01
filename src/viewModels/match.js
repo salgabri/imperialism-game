@@ -250,8 +250,8 @@ function fromMatch(st, ctx, sport, m) {
   const statusDetail = state === 'penalties' ? `${kicks?.a ?? 0}–${kicks?.b ?? 0}` : tieDetail;
   let model = m.live ?? null;
   if (!model && !m.applied) {
-    model = memo(ctx?.cache, 'match:live', [A, D, m.effA, m.effD, sport.id], () => {
-      try { return liveModelFor(sport, A, D, m.effA, m.effD, m.matchDrama ?? ctx?.drama) ?? null; } catch { return null; }
+    model = memo(ctx?.cache, 'match:live', [A, D, m.effA, m.effD, sport.id, !!ctx?.homeAdvantage], () => {
+      try { return liveModelFor(sport, A, D, m.effA, m.effD, m.matchDrama ?? ctx?.drama, !!ctx?.homeAdvantage) ?? null; } catch { return null; }
     });
   }
   const winnerSide = m.winner === m.aId ? 'A' : m.winner === m.dId ? 'D' : scoreA > scoreB ? 'A' : scoreB > scoreA ? 'D' : null;

@@ -68,8 +68,11 @@ export function recommendedTactic(options = []) {
   return best?.id || 'balanced';
 }
 
-/** Pure parameters used by BOTH the real outcome and the displayed odds. */
-export function tacticalMatchParameters({ attacker, defender, managedId, tactic = 'balanced', drama = 6 }) {
+/**
+ * Pure parameters used by BOTH the real outcome and the displayed odds. `home`: the defender plays at home (the
+ * campaign's home advantage), passed on as `home: true`; a neutral venue adds nothing.
+ */
+export function tacticalMatchParameters({ attacker, defender, managedId, tactic = 'balanced', drama = 6, home = false }) {
   const isAttacker = managedId === attacker.id, isDefender = managedId === defender.id;
   const option = isAttacker || isDefender
     ? tacticalOptions(isAttacker ? attacker : defender, isAttacker ? defender : attacker, drama)
@@ -80,6 +83,7 @@ export function tacticalMatchParameters({ attacker, defender, managedId, tactic 
     effD: teamEff(defender) + (isDefender ? selected.bonus : 0),
     drama: selected.drama, tactic: selected.id, bonus: selected.bonus,
     support: selected.support, varianceMultiplier: selected.varianceMultiplier,
+    ...(home ? { home: true } : {}),
   };
 }
 

@@ -28,6 +28,10 @@ const SCORE_SCALE = 0.038;
 const FORM_PER_DRAMA = 0.6;
 // The last extra inning, still level, ends on a decisive run: an even coin flip between equals.
 const DECISIVE_RUN = 0.08;
+// Home advantage, a campaign option (off: every match is at a neutral venue, and batting last alone is worth nothing):
+// the home side, which bats last, gains HOME_EDGE rating points of edge in its half-innings and the visitors lose as
+// much in theirs. Equal sides then win 53% at home, as MLB home sides do.
+const HOME_EDGE = 1.4;
 // Runs a half-inning can reach in the live model's distributions (the rest is a vanishing tail).
 const RUN_CAP = 15;
 /** The strength of a nation with no MLB players, and of a lineup slot a nation's own players cannot fill. */
@@ -79,21 +83,25 @@ export function runMasses(score) {
   return masses;
 }
 
-/** Prepare a matchup once, including position assignments, for cheap resampling. */
-export function prepareMatch(attacker, defender, effA, effD) {
+/**
+ * Prepare a matchup once, including position assignments, for cheap resampling. `venue.home`: the defender, which
+ * bats last, plays at home (the campaign's home advantage); a neutral venue otherwise.
+ */
+export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}) {
   const lineupA = selectLineup(attacker);
   const lineupD = selectLineup(defender);
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
   const adjustmentD = (Number.isFinite(effD) ? effD : lineupD.rating) - lineupD.rating;
   const a = profile(lineupA), d = profile(lineupD);
+  const edge = home ? HOME_EDGE : 0;
   return {
     attackerId: attacker.id,
     defenderId: defender.id,
     lineupA,
     lineupD,
     innings: INNINGS,
-    edgeA: a.batting + adjustmentA - (d.defence + adjustmentD),
-    edgeD: d.batting + adjustmentD - (a.defence + adjustmentA),
+    edgeA: a.batting + adjustmentA - (d.defence + adjustmentD) - edge,
+    edgeD: d.batting + adjustmentD - (a.defence + adjustmentA) + edge,
   };
 }
 
@@ -254,8 +262,8 @@ export const baseball = {
   prepareMatch,
   sampleResult,
 
-  simulate(rng, attacker, defender, drama, effA, effD) {
-    const prepared = prepareMatch(attacker, defender, effA, effD);
+  simulate(rng, attacker, defender, drama, effA, effD, venue) {
+    const prepared = prepareMatch(attacker, defender, effA, effD, venue);
     const { ga, gd, regA, regD, tie, halves, winner } = sampleResult(rng, prepared, drama);
     const batterA = createScorerSampler(prepared.lineupA, RBI_WEIGHTS, 50);
     const batterD = createScorerSampler(prepared.lineupD, RBI_WEIGHTS, 50);

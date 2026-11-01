@@ -207,9 +207,9 @@ default suits a first campaign, so pressing Space three times starts one.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
-   **More rules** section holds upsets, the final, computer signings,
-   basketball team strengths and the seed. Its line reads "Standard", or lists
-   only the rules you changed.
+   **More rules** section holds upsets, the final, computer signings, home
+   advantage, basketball team strengths and the seed. Its line reads "Standard",
+   or lists only the rules you changed.
 3. **Your role** — **Manager** runs one team. You choose an approach before
    its matches and one of up to three signings after its wins, and, under a
    one-match draw, **who picks your opponent**. **Spectator** leaves draws,
@@ -280,7 +280,7 @@ Fast-forward your team's match (the managed team, or the followed team while
 spectating) plays at 1× whatever the speed, and the chosen speed returns with the
 result; a speed picked during the match is kept. Level games go to penalties in football and
 overtime in basketball and American football. The draw, the opponent choice, upsets, the final, computer
-signings and your role are fixed at launch. During a campaign the masthead's
+signings, home advantage and your role are fixed at launch. During a campaign the masthead's
 **Settings** button (More on phones) changes Show matches at any time, except
 that switching between Live and Final score only waits for the current draw or
 match. Under **This campaign** it lists the launch rules as read-only text.
@@ -299,6 +299,14 @@ a field goal, now and then a safety, or nothing by its offence against the oppos
 with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime.
 Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
+**Home advantage** is off by default: every match is played on neutral ground, so
+the defending team wins half of even games. On, the defender plays at home and
+wins about as often as home teams do in its sport's league: 45% of even football
+games in ninety minutes (58% with the shoot-outs), 56% in basketball, 54% in
+American football and 53% in baseball. Attacks fail more often, and a failed
+attack hands the defender the attacker's territory, so conquests change hands but
+campaigns run as many matches. A best-of-three final keeps its attacker, so its
+defender hosts every game.
 Pre-match percentages estimate this model with an independent seeded sample.
 They do not consume the campaign's random stream.
 Odds prepare the two lineups once and sample scores without building hundreds of
@@ -538,6 +546,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | `upsets` | Upsets | `predictable`, `balanced`, `wild` | Balanced |
 | `final` | Final | `single`, `best-of-three` | Single match |
 | `signings` | Computer signings | `highest-rated`, `best-fit` | Best-rated player |
+| `home` | Home advantage | `off`, `on` | Off |
 | `strengths` | Team strengths (basketball) | `authentic`, `competitive` | Real-world |
 | `role` | Your role | `manager`, `spectator` | Spectator |
 | `team` | A manager's team | a team id: `276` (Germany), `f-real-madrid`, `d826-679` | no team chosen |

@@ -1,6 +1,8 @@
 // Plays whole league seasons with the built-in clubs and measures what a fan of each league would look at:
 // scores, draws and overtime, margins, standings, and who scores. Each measure sits beside the real league's
-// figure (REAL below, with its seasons). Run: node scripts/simulation-realism.mjs [--seasons=40] [--json]
+// figure (REAL below, with its seasons). The defender of each fixture is its home side: at a neutral venue, as
+// campaigns play by default, or at home with `--home` (the Home advantage launch rule).
+// Run: node scripts/simulation-realism.mjs [--seasons=40] [--home] [--json]
 import { pathToFileURL } from 'node:url';
 import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
@@ -61,9 +63,10 @@ function positionsByName(team) {
 /**
  * Plays `seasons` seasons of `games` rounds between `teams` under `sport` and returns every game and the
  * per-season tables. `full` builds the event feeds (scorers, minutes); otherwise only scores are drawn, with the
- * score-only path's own record of the game (American football's possessions, `plays`).
+ * score-only path's own record of the game (American football's possessions, `plays`). `venue` is the sport's
+ * ({ home: true }: the defender, `j`, plays at home; neutral by default).
  */
-function playSeasons({ sport, teams, games, seasons, seed, full = true }) {
+function playSeasons({ sport, teams, games, seasons, seed, full = true, venue }) {
   const rng = makeRng(seed);
   const eff = teams.map(teamEff);
   const prepared = new Map();
@@ -75,10 +78,10 @@ function playSeasons({ sport, teams, games, seasons, seed, full = true }) {
     for (const [i, j] of schedule(teams.length, games, rng)) {
       const a = teams[i], d = teams[j];
       let result;
-      if (full) result = sport.simulate(rng, a, d, DRAMA, eff[i], eff[j]);
+      if (full) result = sport.simulate(rng, a, d, DRAMA, eff[i], eff[j], venue);
       else {
         const key = `${i}:${j}`;
-        if (!prepared.has(key)) prepared.set(key, sport.prepareMatch(a, d, eff[i], eff[j]));
+        if (!prepared.has(key)) prepared.set(key, sport.prepareMatch(a, d, eff[i], eff[j], venue));
         result = sport.sampleResult(rng, prepared.get(key), DRAMA);
       }
       const regA = result.regA ?? result.ga, regD = result.regD ?? result.gd;
@@ -123,10 +126,10 @@ function seasonSpread(tables, games, key = 'win') {
 
 // ---- Football -------------------------------------------------------------------------------------------------
 
-function footballLeague(league, seasons, seed) {
+function footballLeague(league, seasons, seed, venue) {
   const clubs = FOOTBALL_CLUBS.filter(c => c.league === league).map(c => buildClub(c, football));
   const games = 2 * (clubs.length - 1);
-  const { played, tables } = playSeasons({ sport: football, teams: clubs, games, seasons, seed });
+  const { played, tables } = playSeasons({ sport: football, teams: clubs, games, seasons, seed, venue });
   const totals = played.map(g => g.regA + g.regD);
   const teamGoals = played.flatMap(g => [g.regA, g.regD]);
   const scorelines = new Map();
@@ -152,6 +155,7 @@ function footballLeague(league, seasons, seed) {
     league, clubs: clubs.length, games,
     goalsPerGame: mean(totals), teamGoalsVarianceToMean: sd(teamGoals) ** 2 / mean(teamGoals),
     drawRate: share(played, g => g.regA === g.regD), goallessRate: share(played, g => g.regA + g.regD === 0),
+    homeWins: share(played, g => g.regD > g.regA),
     overFiveRate: share(totals, t => t >= 6),
     marginThreePlus: share(played, g => Math.abs(g.regA - g.regD) >= 3),
     commonScores: commonest(scorelines, 6, played.length),
@@ -167,10 +171,10 @@ function footballLeague(league, seasons, seed) {
 
 // ---- Basketball (NBA) -----------------------------------------------------------------------------------------
 
-function nbaSeason(seasons, seed) {
+function nbaSeason(seasons, seed, venue) {
   const sport = nbaBasketballIn();
   const clubs = NBA_CLUBS.map(c => buildClub(c, sport));
-  const { played, tables } = playSeasons({ sport, teams: clubs, games: 82, seasons, seed });
+  const { played, tables } = playSeasons({ sport, teams: clubs, games: 82, seasons, seed, venue });
   const regTotals = played.map(g => g.regA + g.regD);
   const teamPoints = played.flatMap(g => [g.ga, g.gd]);
   const margins = played.map(g => Math.abs(g.ga - g.gd));
@@ -201,9 +205,9 @@ function nbaSeason(seasons, seed) {
 
 // ---- American football (NFL) ----------------------------------------------------------------------------------
 
-function nflSeason(seasons, seed) {
+function nflSeason(seasons, seed, venue) {
   const clubs = NFL_CLUBS.map(c => buildClub(c, americanFootball));
-  const { played, tables } = playSeasons({ sport: americanFootball, teams: clubs, games: 17, seasons, seed });
+  const { played, tables } = playSeasons({ sport: americanFootball, teams: clubs, games: 17, seasons, seed, venue });
   const teamPoints = played.flatMap(g => [g.ga, g.gd]);
   const margins = played.map(g => Math.abs(g.ga - g.gd));
   const scores = new Map();
@@ -222,7 +226,7 @@ function nflSeason(seasons, seed) {
   }
   // Tries and safeties, from the possessions of a score-only run: the feed keeps a touchdown's points, not its try.
   const tries = { touchdowns: 0, kicks: 0, kicked: 0, twos: 0, converted: 0, safeties: 0 };
-  for (const { plays } of playSeasons({ sport: americanFootball, teams: clubs, games: 17, seasons, seed: seed + 1, full: false }).played) {
+  for (const { plays } of playSeasons({ sport: americanFootball, teams: clubs, games: 17, seasons, seed: seed + 1, full: false, venue }).played) {
     for (const p of plays) {
       if (p.pts === 2) tries.safeties++;
       if (p.pts < 6) continue;
@@ -250,9 +254,9 @@ function nflSeason(seasons, seed) {
 
 // ---- Baseball (MLB) -------------------------------------------------------------------------------------------
 
-function mlbSeason(seasons, seed) {
+function mlbSeason(seasons, seed, venue) {
   const clubs = MLB_CLUBS.map(c => buildClub(c, baseball));
-  const { played, tables } = playSeasons({ sport: baseball, teams: clubs, games: 162, seasons, seed, full: false });
+  const { played, tables } = playSeasons({ sport: baseball, teams: clubs, games: 162, seasons, seed, full: false, venue });
   const teamRuns = played.flatMap(g => [g.ga, g.gd]);
   const margins = played.map(g => Math.abs(g.ga - g.gd));
   const spread = seasonSpread(tables, 162);
@@ -290,6 +294,9 @@ export const REAL = Object.freeze({
     firstHalfShare: [0.44, 0.48],
     // World Cup shoot-outs 1982–2026 68.6%, Euros 1976–2024 77.0%, the major tournaments 73.1%.
     penaltyConversion: [0.686, 0.77],
+    // Home wins in ninety minutes: the Premier League's 40.8% in 2024/25 and 42.9% in 2021/22 (FootballRates), La
+    // Liga's 47.9% in 2022/23 (Statista), the five leagues' mean 45.8% in 2022/23 and 43.0% in 2023/24.
+    homeWins: [0.408, 0.479],
   },
   nba: {
     note: 'NBA regular seasons 2021/22–2024/25 (2025/26 for the points a team the built-in season plays at)',
@@ -324,18 +331,21 @@ const row = (label, value, range, format = num) => {
   return `  ${inside ? ' ' : '!'} ${label.padEnd(34)} ${String(format(value)).padStart(10)}   ${real}`;
 };
 
-export function realismReport({ seasons = 40, seed = 20261101 } = {}) {
+/** `home`: every fixture is played at its defender's home (the Home advantage launch rule); neutral by default. */
+export function realismReport({ seasons = 40, seed = 20261101, home = false } = {}) {
   const leagues = ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1'];
+  const venue = home ? { home: true } : undefined;
   return {
-    football: leagues.map(league => footballLeague(league, seasons, hashStr(`${seed}:${league}`))),
-    nba: nbaSeason(seasons, hashStr(`${seed}:nba`)),
-    nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`)),
-    mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`)),
+    home,
+    football: leagues.map(league => footballLeague(league, seasons, hashStr(`${seed}:${league}`), venue)),
+    nba: nbaSeason(seasons, hashStr(`${seed}:nba`), venue),
+    nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`), venue),
+    mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`), venue),
   };
 }
 
 function print(report) {
-  const lines = [];
+  const lines = [`Venue: ${report.home ? 'the defender at home (Home advantage on)' : 'neutral (Home advantage off, the default)'}`];
   for (const f of report.football) {
     const scale = 38 / f.games;
     const r = REAL.football;
@@ -343,6 +353,7 @@ function print(report) {
     lines.push(row('goals a game', f.goalsPerGame, r.goalsPerGame));
     lines.push(row('team goals variance / mean', f.teamGoalsVarianceToMean, r.teamGoalsVarianceToMean));
     lines.push(row('draws', f.drawRate, r.drawRate, pct));
+    lines.push(row('home (defending) side wins in 90', f.homeWins, r.homeWins, pct));
     lines.push(row('0-0', f.goallessRate, r.goallessRate, pct));
     lines.push(row('six or more goals', f.overFiveRate, null, pct));
     lines.push(row('won by three or more', f.marginThreePlus, null, pct));
@@ -413,6 +424,6 @@ function print(report) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const option = name => process.argv.find(arg => arg.startsWith(`--${name}=`))?.split('=')[1];
-  const report = realismReport({ seasons: Number(option('seasons')) || 40 });
+  const report = realismReport({ seasons: Number(option('seasons')) || 40, home: process.argv.includes('--home') });
   process.stdout.write(process.argv.includes('--json') ? `${JSON.stringify(report, null, 2)}\n` : `${print(report)}\n`);
 }

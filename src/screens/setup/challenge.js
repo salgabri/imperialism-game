@@ -10,19 +10,19 @@ import { SPORT_LIST, getSport } from '../../sports/index.js';
 import { BUILT_IN_SETS, setSportOf } from '../../engine/footballSets.js';
 import { DEFAULT_SETUP, dataSetOf, setClubScope } from '../../app/shared.js';
 import {
-  DRAW_CARDS, FINALE_OPTIONS, RECRUITMENT_OPTIONS, ROSTER_OPTIONS, SHOW_MATCH_OPTIONS, TARGETING_CARDS, UNCERTAINTY_OPTIONS,
-  rulesOf, showMatchesOf,
+  DRAW_CARDS, FINALE_OPTIONS, HOME_OPTIONS, RECRUITMENT_OPTIONS, ROSTER_OPTIONS, SHOW_MATCH_OPTIONS, TARGETING_CARDS,
+  UNCERTAINTY_OPTIONS, rulesOf, showMatchesOf,
 } from './setupModel.js';
 
 /** A link's query keys, in the order it writes them. */
 export const CHALLENGE_KEYS = Object.freeze(['sport', 'teams', 'theatre', 'season', 'draw', 'opponent', 'show', 'upsets', 'final',
-  'signings', 'strengths', 'role', 'team', 'seed']);
+  'signings', 'home', 'strengths', 'role', 'team', 'seed']);
 
 /** How setup names each key, for the note that lists the ones a link could not use. */
 export const CHALLENGE_LABELS = Object.freeze({
   sport: 'sport', teams: 'teams', theatre: 'theatre', season: 'season', draw: 'draw', opponent: 'opponent choice',
-  show: 'Show matches', upsets: 'upsets', final: 'final', signings: 'computer signings', strengths: 'team strengths',
-  role: 'role', team: 'team', seed: 'seed',
+  show: 'Show matches', upsets: 'upsets', final: 'final', signings: 'computer signings', home: 'home advantage',
+  strengths: 'team strengths', role: 'role', team: 'team', seed: 'seed',
 });
 
 // The seed field's range (an unsigned 32-bit number), written in plain digits.
@@ -90,6 +90,7 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   take('upsets', value => offers(UNCERTAINTY_OPTIONS, value), value => { setup.uncertainty = value; });
   take('final', value => offers(FINALE_OPTIONS, value), value => { setup.finale = value; });
   take('signings', value => offers(RECRUITMENT_OPTIONS, value), value => { setup.acquisitionPolicy = value; });
+  take('home', value => offers(HOME_OPTIONS, value), value => { setup.homeAdvantage = value; });
   // Team strengths is a basketball rule.
   take('strengths', value => sport.id === 'basketball' && offers(ROSTER_OPTIONS, value), value => { setup.rosterPreset = value; });
   take('role', value => value === 'manager' || value === 'spectator', value => { setup.role = value; });
@@ -136,6 +137,7 @@ export function challengeQuery(settings = {}, seed = settings?.seed) {
     upsets: s.uncertainty !== 'balanced' && offers(UNCERTAINTY_OPTIONS, s.uncertainty) ? s.uncertainty : null,
     final: s.finale === 'best-of-three' ? s.finale : null,
     signings: s.acquisitionPolicy === 'best-fit' ? s.acquisitionPolicy : null,
+    home: s.homeAdvantage === 'on' ? s.homeAdvantage : null,
     strengths: sport.id === 'basketball' && s.rosterPreset === 'competitive' ? s.rosterPreset : null,
     role: manager ? 'manager' : null,
     team: manager && s.managedTeamId ? String(s.managedTeamId) : null,
