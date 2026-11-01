@@ -74,7 +74,7 @@ test('the precache is the app shell only; seasons, maps, flags and crests are ca
   const bytes = shell.reduce((sum, file) => sum + statSync(publicFile(file)).size, 0);
   assert.ok(bytes < 1_500_000, `the public part of the shell is ${bytes} bytes`);
   assert.ok(shell.includes('world-110m.v1.json') && shell.includes('countries-50m.json'));
-  assert.ok(!shell.some(file => /^(football|basketball|domestic|flags|flags-symbols|club-logos|textures)\//.test(file)), shell.join(', '));
+  assert.ok(!shell.some(file => /^(football|basketball|baseball|domestic|flags|flags-symbols|club-logos|textures)\//.test(file)), shell.join(', '));
   // Every font fonts.css loads is in it, and only those.
   const fonts = [...readFileSync(path.join(ROOT, 'src/fonts.css'), 'utf8').matchAll(/url\('\/(fonts\/[^']+)'\)/g)].map(match => match[1]);
   assert.deepEqual(shell.filter(file => file.startsWith('fonts/')), [...new Set(fonts)].sort());
@@ -83,14 +83,14 @@ test('the precache is the app shell only; seasons, maps, flags and crests are ca
   // Every file but the licences and source lists beside the data, which the game never loads.
   const files = folder => readdirSync(publicFile(folder)).filter(file => !/^(README\.md|LICENSE|SOURCES\.tsv|ATTRIBUTION[\w-]*\.txt)$/.test(file))
     .map(file => `${folder}/${file}`);
-  for (const folder of ['football', 'basketball', 'domestic']) {
+  for (const folder of ['football', 'basketball', 'baseball', 'domestic']) {
     for (const file of files(folder)) assert.equal(cacheOf(file), 'imperialism-data', file);
   }
   for (const folder of ['flags', 'flags-symbols', 'club-logos']) {
     for (const file of files(folder)) assert.equal(cacheOf(file), 'imperialism-images', file);
   }
   for (const cache of RUNTIME_CACHES) {
-    const count = cache.cacheName === 'imperialism-data' ? ['football', 'basketball', 'domestic'].flatMap(files).length
+    const count = cache.cacheName === 'imperialism-data' ? ['football', 'basketball', 'baseball', 'domestic'].flatMap(files).length
       : ['flags', 'flags-symbols', 'club-logos', 'textures'].flatMap(files).length;
     assert.ok(cache.maxEntries > count, `${cache.cacheName} holds all ${count} files`);
   }

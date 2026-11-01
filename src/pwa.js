@@ -8,7 +8,7 @@ export const APP_MANIFEST = Object.freeze({
   short_name: 'Imperialism',
   // index.html's description: what an install dialog shows.
   description: 'Sport decides the borders. Win a match to take all of the loser’s territory and one of its players. '
-    + 'Football, basketball and American football in your browser.',
+    + 'Football, basketball, American football and baseball in your browser.',
   lang: 'en',
   start_url: './',
   scope: './',
@@ -44,7 +44,7 @@ export const PRECACHE = Object.freeze(['index.html', 'assets/**/*', 'fonts/archi
  */
 export const RUNTIME_CACHES = Object.freeze([
   Object.freeze({ cacheName: 'imperialism-data', handler: 'NetworkFirst', maxEntries: 400,
-    pattern: /\/(?:football|basketball|domestic)\/[^/?#]+\.json$/ }),
+    pattern: /\/(?:football|basketball|baseball|domestic)\/[^/?#]+\.json$/ }),
   Object.freeze({ cacheName: 'imperialism-images', handler: 'StaleWhileRevalidate', maxEntries: 5000,
     pattern: /\/(?:flags|flags-symbols|club-logos|textures)\/[^/?#]+\.(?:svg|webp|png)$/ }),
 ]);

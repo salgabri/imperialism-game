@@ -9,7 +9,7 @@ import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
-import { builtInSeasonOf, fieldedNations, setSportOf } from '../../engine/footballSets.js';
+import { builtInSeasonOf, fieldedNations, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
 
@@ -313,8 +313,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
     + 'of the United States.',
-  baseball: 'MLB The Show 26 ratings, as of the roster update of 2 October 2026. Clubs play on their own map of the United '
-    + 'States and Canada; nations field the players born there.',
+  baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October). Nations field the players '
+    + 'born there; clubs play on the map of their day, the Athletics in Oakland until 2024.',
 });
 
 /**
@@ -532,7 +532,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
   const sportId = getSport(setup.sport).id;
   // A chosen data set plays with its own nations and clubs once it has loaded; a basketball season with clubs only.
-  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId && (sportId === 'football' || setup.layer === 'clubs')
+  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId && (setHasNations(setup.dataSet) || setup.layer === 'clubs')
     ? setup.dataSet : null;
   const seasonCtx = ctx.season || {};
   const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);

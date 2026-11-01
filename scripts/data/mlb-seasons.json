@@ -1,0 +1,21 @@
+{
+  "note": "The built-in earlier baseball seasons: each MLB The Show edition's Live series at its last roster update, read from the game's public API (npm run sync:mlb-the-show -- --edition=<nn> writes scripts/data/mlb-the-show-<nn>.json). npm run build:mlb-seasons builds each season's clubs and nations; npm run build:mlb-map builds each era's map from these teams and ballparks. `teams` lists, by The Show's code, the eras in which a franchise played under another name or in another ballpark than today's (scripts/data/mlb-teams.json): such an era keeps today's id, name, code, city and home unless it names its own. `unreliableBirthplaces` names the editions whose birthplaces the build does not trust. Editions before MLB The Show 21 have no API left (their mlb17–mlb20 hosts are gone), so 2021 is the first season.",
+  "source": { "name": "MLB The Show", "provider": "San Diego Studio", "docs": "https://mlb26.theshow.com/apis/docs" },
+  "builtIn": { "year": 2026, "edition": "MLB The Show 26" },
+  "seasons": [2021, 2022, 2023, 2024, 2025],
+  "unreliableBirthplaces": {
+    "2024": "MLB The Show 24's API names the wrong country for players born outside the United States (Juan Soto and Ketel Marte 'At Sea', Ronald Acuña Jr. 'Slovenia', Shohei Ohtani 'Honduras'), though its US states are right: each foreign-born player's birthplace comes from the nearest other edition."
+  },
+  "teams": {
+    "CLE": [{ "to": 2021, "id": "mlb-cleveland-indians", "name": "Cleveland Indians" }],
+    "OAK": [{ "to": 2024, "id": "mlb-oakland-athletics", "name": "Oakland Athletics", "code": "OAK", "city": "Oakland", "ballpark": "Oakland Coliseum", "home": [-122.2006, 37.7517] }],
+    "TB": [{ "from": 2025, "to": 2025, "ballpark": "George M. Steinbrenner Field", "home": [-82.5067, 27.9803] }],
+    "CWS": [{ "to": 2024, "ballpark": "Guaranteed Rate Field" }],
+    "HOU": [{ "to": 2024, "ballpark": "Minute Maid Park" }]
+  },
+  "maps": [
+    { "id": "mlb2021", "seasons": [2021] },
+    { "id": "mlb2022", "seasons": [2022, 2023, 2024] },
+    { "id": "mlb2025", "seasons": [2025] }
+  ]
+}

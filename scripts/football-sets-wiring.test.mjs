@@ -13,6 +13,7 @@ import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { NATIONS, selectLineup } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { parseCampaign } from '../src/engine/storage.js';
+import { setSportOf } from '../src/engine/footballSets.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { bundleComponents, findElement, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
@@ -118,7 +119,8 @@ async function chooseSet(app, time) {
 
 const setNames = nation => SET.nations[nation][2].map(tuple => tuple[1]);
 /** The listed football seasons' ids (basketball's are listed with them: scripts/nba-seasons.test.mjs). */
-const footballSetIds = app => app.state.footballSets.filter(set => !set.id.startsWith('nba-')).map(set => set.id);
+// Football's sets: the list holds every sport's earlier seasons.
+const footballSetIds = app => app.state.footballSets.filter(set => setSportOf(set.id) === 'football').map(set => set.id);
 
 const seasonPicker = document => document.getElementById('setup-season');
 const seasonNames = document => [...seasonPicker(document).options].map(option => option.textContent);

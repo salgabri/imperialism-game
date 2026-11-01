@@ -3,9 +3,10 @@
 // every club, its ratings moved by each roster update; the other series (legends, award and event cards) are left
 // out. The API is JSON throughout: nothing here reads a page or runs a script.
 //
-// Usage: node scripts/sync-mlb-the-show.mjs [--edition=26] [--refresh]
+// Usage: node scripts/sync-mlb-the-show.mjs [--edition=26] [--refresh] [--parallel=1]
 //   --edition  the edition to read (mlb<edition>.theshow.com); the default is the one the game ships
 //   --refresh  download the pages again instead of reading data-src/mlb-the-show/mlb<edition>/
+//   --parallel pages requested at once, at most 4 (default 1): the older editions' hosts take 15-25 s a page
 // Output: scripts/data/mlb-the-show-<edition>.json (committed), read by scripts/build-mlb.mjs.
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -18,6 +19,7 @@ const arg = name => args.find(a => a.startsWith(`--${name}=`))?.slice(name.lengt
 const edition = arg('edition') || '26';
 if (!/^\d\d$/.test(edition)) throw new Error(`--edition takes two digits (26 for MLB The Show 26), not ${edition}`);
 const refresh = args.includes('--refresh');
+const parallel = Math.max(1, Math.min(4, Number(arg('parallel')) || 1));
 
 const EDITION = `MLB The Show ${edition}`;
 // The Show's edition N rates the season of the year 20N.
@@ -75,19 +77,24 @@ const pages = first.body.total_pages;
 if (!Number.isInteger(pages) || pages < 1) throw new Error('The items API gives no page count');
 const cards = new Map(), teams = new Map();
 let all = 0;
-for (let page = 1; page <= pages; page++) {
-  const data = page === 1 ? first : await readJson(`items-${page}`, itemsUrl(page));
-  if (data.body.total_pages !== pages) throw new Error(`Page ${page} counts ${data.body.total_pages} pages, page 1 ${pages}`);
-  data.body.items.forEach((item, i) => {
-    all++;
-    const row = card(item, `page ${page} item ${i + 1}`);
-    if (!row) return;
-    if (cards.has(row.uuid)) throw new Error(`${row.name} (${row.uuid}) is listed twice`);
-    cards.set(row.uuid, row);
-    if (teams.has(row.team) && teams.get(row.team) !== row.teamName) throw new Error(`${row.team} is both ${teams.get(row.team)} and ${row.teamName}`);
-    teams.set(row.team, row.teamName);
+for (let batch = 1; batch <= pages; batch += parallel) {
+  const numbers = Array.from({ length: Math.min(parallel, pages - batch + 1) }, (_, k) => batch + k);
+  const read = await Promise.all(numbers.map(page => (page === 1 ? first : readJson(`items-${page}`, itemsUrl(page)))));
+  // Pages are read in order, whatever order they arrived in.
+  read.forEach((data, k) => {
+    const page = numbers[k];
+    if (data.body.total_pages !== pages) throw new Error(`Page ${page} counts ${data.body.total_pages} pages, page 1 ${pages}`);
+    data.body.items.forEach((item, i) => {
+      all++;
+      const row = card(item, `page ${page} item ${i + 1}`);
+      if (!row) return;
+      if (cards.has(row.uuid)) throw new Error(`${row.name} (${row.uuid}) is listed twice`);
+      cards.set(row.uuid, row);
+      if (teams.has(row.team) && teams.get(row.team) !== row.teamName) throw new Error(`${row.team} is both ${teams.get(row.team)} and ${row.teamName}`);
+      teams.set(row.team, row.teamName);
+    });
+    console.log(`page ${page}/${pages}: ${data.body.items.length} cards`);
   });
-  console.log(`page ${page}/${pages}: ${data.body.items.length} cards`);
 }
 
 const snapshot = {

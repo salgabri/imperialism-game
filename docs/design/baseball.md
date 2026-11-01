@@ -25,8 +25,9 @@ state or a country. Each club has its 40-man roster (1,200 cards); the other 884
 free agents, as The Show files every player off a 40-man roster, the injured among
 them. Sony's rights are not cleared, as for the built-in EA and 2K data.
 
-`--edition=<NN>` reads another edition: mlb21.theshow.com still answers, so the
-seasons 2021 to 2025 are one sync each away (not built yet).
+`--edition=<NN>` reads another edition and `--parallel=<n>` (at most 4) asks for several
+pages at once: the older editions' hosts take 15–25 s a page. The earlier seasons
+(below) are built from editions 21 to 25.
 
 **Clubs.** `scripts/data/mlb-teams.json` names each club, its scoreboard code, the
 place its territory is named after, its ballpark and the point its territory grows
@@ -191,10 +192,50 @@ Ontario, campaigns to a champion); setup; the squad screen; and the running App
 launching on the MLB map and saving. `npm run smoke` adds an MLB duel campaign with
 the live ticker, a baseball nations campaign and an MLB resume.
 
+## Earlier seasons
+
+Five more seasons ship beside the built-in 2026: 2021 to 2025, each MLB The Show
+edition's Live series at its last roster update (5 November 2021, 11 November 2022,
+10 November 2023, 8 November 2024 and the 2025 edition's last), read from that
+edition's own API host (mlb21 to mlb25.theshow.com). Nothing older exists to read:
+the mlb17–mlb20 hosts are gone, the Wayback Machine holds two pages of the MLB 19
+API, and no dataset of every player's ratings for those years turned up. The only
+lead, a fan project that computes Show-like ratings from real statistics back to
+1897, estimates ratings rather than reading them, so it is not used.
+
+- **Building.** `npm run build:mlb-seasons` (`scripts/build-mlb-seasons.mjs`) builds
+  each season from its committed snapshot by the built-in season's rules, now in
+  `scripts/lib/mlb.mjs`: `public/baseball/mlb-the-show-<nn>.json` (kind `show`), their
+  listing `src/data/baseballSeasons.js` and `docs/design/baseball-seasons-audit.json`.
+  `--check` rebuilds every file byte for byte, offline.
+- **Clubs of their day.** `scripts/data/mlb-seasons.json` names the eras in which a
+  franchise played under another name or elsewhere: the Cleveland Indians (2021),
+  the Oakland Athletics at the Oakland Coliseum (to 2024), the Rays at George M.
+  Steinbrenner Field in Tampa (2025, Tropicana Field being repaired after Hurricane
+  Milton), and the old names of Guaranteed Rate Field and Minute Maid Park (to 2024).
+  A club of another era has its own id (`mlb-cleveland-indians`,
+  `mlb-oakland-athletics`), as the NBA's moved franchises do, so it has no crest.
+- **Era maps.** `npm run build:mlb-map` also draws `mlb2021`, `mlb2022` (2022–24) and
+  `mlb2025` from the manifest; each lists the seasons it serves, and a season's clubs
+  play only there. Their clubs rank as their franchises rank today, so section ids
+  follow one order on every map. Cook County is cut between the Chicago clubs on
+  every map.
+- **Nations.** A season keeps both layers, unlike an NBA season: its nations
+  replace the built-in ones (a nation it does not list is the sport's minnow, 45),
+  and its clubs the built-in clubs, on its era's map. The loader (`seasonSport` in
+  `src/engine/footballSets.js`) binds baseball to both; saves name the set, its
+  version and its season ('2024', a calendar year).
+- **A source error.** MLB The Show 24's API gives the wrong country for players born
+  outside the United States (Juan Soto and Ketel Marte "At Sea", Ronald Acuña Jr.
+  "Slovenia", Shohei Ohtani "Honduras"); its US states are right. The manifest marks
+  that edition (`unreliableBirthplaces`), and the build takes each foreign-born
+  player's birthplace from the nearest sound edition, earlier first. The audit lists
+  every one, and any player no other edition names, who then plays for his club only.
+  The other editions agree with 2026 on all but a handful of players.
+
 ## Known limits
 
-- One season. The Show's earlier editions (2021–2025) answer on the same API but are
-  not built yet.
+- Six seasons, 2021 to 2026: nothing older can be read.
 - Nations by birthplace, not eligibility; no NPB, KBO or CPBL players.
 - The ace starts every game, and a run scores as runs batted in only: no errors, wild
   pitches or unearned runs, no home runs as such.

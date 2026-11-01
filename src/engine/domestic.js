@@ -294,7 +294,7 @@ function validateDomestic(data, id) {
     if (builtIn) {
       if (!builtIn.has(club.id)) fail(`${at} is not one of the game's ${data.sport} clubs`);
     } else if (seasonal) {
-      if (typeof club.id !== 'string' || !/^[a-z]-[a-z0-9-]{1,62}$/.test(club.id)) fail(`${at} id must look like "b-<name>"`);
+      if (typeof club.id !== 'string' || !/^[a-z]{1,3}-[a-z0-9-]{1,62}$/.test(club.id)) fail(`${at} id must look like "b-<name>" or "mlb-<name>"`);
     } else {
       if (!Number.isInteger(club.fm) || club.fm < 0) fail(`${at} fm must be the FM club id`);
       if (club.id !== `d${id}-${club.fm}`) fail(`${at} id must be "d${id}-${club.fm}"`);
