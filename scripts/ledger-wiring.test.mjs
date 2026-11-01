@@ -15,8 +15,9 @@ const ledgerM = await bundleComponents({ matchPreviewModel: ['src/app/ledgerMeth
 const previewOf = app => (typeof app.matchPreviewModel === 'function' ? app.matchPreviewModel() : ledgerM.matchPreviewModel.call(app));
 
 const HEAD_ROW_KEYS = ['tid', 'rank', 'eff', 'territories', 'effGain', 'name', 'code', 'flagId', 'isClub', 'color'];
-const RECAP_KEYS = ['biggestUpset', 'decisiveMatch', 'transferImpact', 'Leader changes', 'Acquisitions improving the lineup',
-  'Elapsed time', 'Active viewing', 'Time choosing', 'Skipped presentations'];
+const RECAP_KEYS = ['biggestUpset', 'decisiveMatch', 'transferImpact', 'Leader changes', 'Elapsed time'];
+/** Playtest timing (docs/design/playtest.md): on the results only with ?playtest (App.playtest). */
+const PLAYTEST_KEYS = ['Acquisitions improving the lineup', 'Active viewing', 'Time choosing', 'Skipped presentations'];
 
 /** Calls `fn` and asserts it scheduled nothing, moved no campaign RNG and called no setState. */
 function pure(f, fn, label) {
@@ -249,10 +250,55 @@ test('victoryPanel keeps every HEAD and recap key and adds a Chronicle exit that
     assert.equal(typeof overlay.props.onChronicle, 'function', 'render spreads onChronicle into VictoryOverlay');
     assert.deepEqual(Object.keys(overlay.props.recap), RECAP_KEYS);
 
+    assert.equal(panel.you, null, 'a spectator campaign has no "Your campaign"');
+
+    f.app.playtest = true;
+    assert.deepEqual(Object.keys(f.app.victoryPanel().recap), [...RECAP_KEYS, ...PLAYTEST_KEYS], '?playtest adds the timing');
+    f.app.playtest = false;
+
     overlay.props.onChronicle();
     assert.equal(f.app.state.phase, 'playing');
     assert.equal(f.app.state.view, 'chronicle');
     assert.equal(f.app.currentView(), 'chronicle');
     assert.ok(findElement(f.app.render(), 'ChronicleScreen'), 'the Chronicle opens after the results close');
+  } finally { f.close(); }
+});
+
+test('"Your campaign": a fallen manager\'s placement, exit, aftermath and biggest haul reach the results', () => {
+  const f = syncAppFixture({ ids: ['250', '276', '826', '380'], role: 'manager' });
+  try {
+    const { teams } = f.app.state;
+    // France (managed) takes Italy (3 territories), then falls 0–0 on penalties to Germany, who wins it all.
+    const haul = historyEntry(f.app, '250', '380', { round: '001', result: { ...historyEntry(f.app, '250', '380').result, territories: 3 } });
+    const exit = historyEntry(f.app, '276', '250', { id: 'm-exit', round: '002', a: { ...historyEntry(f.app, '276', '250').a, score: 0 },
+      result: { ...historyEntry(f.app, '276', '250').result, tieText: '4–3 on penalties', territories: 4 } });
+    const final = historyEntry(f.app, '276', '826', { round: '003' });
+    f.app.setState({ phase: 'victory', managementEnded: true, aliveIds: ['276'], history: [haul, exit, final],
+      fallen: [{ id: '380', r: 1 }, { id: '250', r: 2 }, { id: '826', r: 3 }],
+      stats: { ...f.app.state.stats, '250': { conq: 1, steals: [{ name: 'X' }] } }, matches: 3, round: 3 });
+    const you = pure(f, () => f.app.victoryPanel(), 'victoryPanel').you;
+    assert.equal(you.champion, false);
+    assert.equal(you.team.name, teams['250'].name);
+    assert.equal(you.placement, '3rd of 4');
+    assert.equal(you.line, `Knocked out by ${teams['276'].name} in Round II, 0–0, 4–3 on penalties.`);
+    assert.equal(you.aftermath, `${teams['276'].name} went on to win it all.`);
+    assert.deepEqual(you.stats.map(stat => [stat.label, stat.value]), [['Conquests', '1'], ['Signings', '1'], ['Territories taken', '3']]);
+    assert.equal(you.haul, `Biggest haul: 3 territories from ${teams['380'].name} in Round I.`);
+    const html = renderToStaticMarkup(f.app.render());
+    assert.match(html, /Your campaign/);
+    assert.match(html, /3rd of 4/);
+
+    // The team that ended the run fell in turn: the aftermath says to whom.
+    f.app.setState({ aliveIds: ['826'], history: [haul, exit, historyEntry(f.app, '826', '276', { round: '003' })],
+      fallen: [{ id: '380', r: 1 }, { id: '250', r: 2 }, { id: '276', r: 3 }] });
+    assert.equal(f.app.victoryPanel().you.aftermath, `${teams['276'].name} fell in turn in Round III, to ${teams['826'].name}.`);
+
+    // The managed team won: no block, a "Managed by you" line instead.
+    f.app.setState({ managementEnded: false, aliveIds: ['250'], fallen: [{ id: '380', r: 1 }, { id: '276', r: 2 }, { id: '826', r: 3 }] });
+    assert.deepEqual(f.app.victoryPanel().you, { champion: true, team: { teamId: '250', flagId: teams['250'].flagId, isClub: false,
+      code: teams['250'].code, color: teams['250'].col, name: teams['250'].name } });
+    const won = renderToStaticMarkup(f.app.render());
+    assert.match(won, /Managed by you/);
+    assert.doesNotMatch(won, /Your campaign/);
   } finally { f.close(); }
 });

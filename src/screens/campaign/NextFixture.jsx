@@ -21,7 +21,8 @@ export function OddsRow({ odds }) {
  * - idle: placeholder title ("Next draw" / "Italy to attack") + route line, no odds;
  * - drawing (compass still spinning): "<A> to attack" + "The compass is choosing the target", no odds yet;
  * - locked: "<A> v <B>" + route + odds + meta;
- * - tactical: the same + "Match preview" (onPreview) and "or simulate the result" (onSimulate);
+ * - tactical: the same + the approach Continue kicks off with, "Match preview" (onPreview) and "or simulate the
+ *   result" (onSimulate);
  * - live / done: the compact MatchCard slot (score, minute, result), then what comes next.
  * The `matchCard` slot is rendered whenever App passes it (i.e. whenever `st.match` exists).
  * Headings: the section name ("Next fixture") is the h2, the matchup an h3 under it.
@@ -50,6 +51,7 @@ export default function NextFixture({ fixture = null, idleText = null, matchCard
         {route ? <p className="fixture__route">{route}</p> : null}
         <OddsRow odds={model.odds} />
         {model.meta ? <p className="fixture__meta">{model.meta}</p> : null}
+        {model.approach ? <p className="fixture__approach">Continue kicks off with <b>{model.approach}</b>, the recommended approach.</p> : null}
       </>}
       {(preview || simulate) && <div className="fixture__actions">
         {preview && <button type="button" className="btn-secondary fixture__preview" onClick={() => onPreview()}>Match preview</button>}
