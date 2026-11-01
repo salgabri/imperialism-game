@@ -191,6 +191,8 @@ test('manager elimination stops autoplay and all clocks until spectator continua
     f.app.continueAsSpectator();
     assert.equal(f.app.state.managementEnded, true); assert.equal(f.app.managedId(), null); assert.equal(f.app.state.managerElimination, null);
     assert.equal(f.app.state.paused, false); assert.equal(f.app.clock.paused, false);
+    assert.equal(f.app.state.followedId, '276', 'spectating follows the team that knocked you out');
+    assert.equal(f.app.state.managedTeamId, '250', 'the fallen team stays on record as the managed team');
   } finally { f.close(); }
 });
 
@@ -204,6 +206,32 @@ test('retrying management creates a fresh campaign while retaining the eliminate
     assert.equal(f.app.state.seed, old.seed); assert.equal(f.app.state.matches, 0); assert.equal(f.app.state.managerElimination, null);
     assert.deepEqual(loadCampaign(originalId).aliveIds, old.aliveIds); assert.ok(loadCampaign(originalId).managerElimination);
   } finally { f.close(); }
+});
+
+test('a new draw keeps the team and the rules but reshuffles the opening; Another team opens Your role with no team', () => {
+  const f = fixture();
+  try {
+    f.app.persist(); const originalId = f.app.state.campaignId, settings = { ...f.app.state.settings };
+    forceResult(f.app, '276'); f.app.finishMatch(); const old = loadCampaign(originalId);
+    f.app.retryManager({ newDraw: true });
+    assert.notEqual(f.app.state.campaignId, originalId); assert.equal(f.app.state.managedTeamId, '250');
+    assert.notEqual(f.app.state.seed, old.seed, 'another opening'); assert.equal(f.app.state.matches, 0);
+    for (const key of ['sport', 'scope', 'pacing', 'turnOrder', 'targeting', 'uncertainty', 'finale', 'role']) assert.equal(f.app.state.settings[key], settings[key], key);
+    assert.ok(loadCampaign(originalId).managerElimination, 'the eliminated slot stays');
+  } finally { f.close(); }
+  const g = fixture();
+  try {
+    g.app.persist(); const settings = { ...g.app.state.settings };
+    forceResult(g.app, '276'); g.app.finishMatch();
+    g.app.chooseAnotherTeam();
+    assert.equal(g.app.state.phase, 'setup'); assert.equal(g.app.state.setupStep, 3, 'the wizard opens on Your role');
+    assert.equal(g.app.state.managerElimination, null);
+    const { setup } = g.app.state;
+    assert.deepEqual([setup.role, setup.managedTeamId, setup.seed], ['manager', '', ''], 'a manager with no team yet, and a new draw');
+    for (const key of ['sport', 'scope', 'pacing', 'uncertainty', 'finale']) assert.equal(setup[key], settings[key], key);
+    g.app.openSetup();
+    assert.equal(g.app.state.setupStep, 1, 'New campaign still opens on the first step');
+  } finally { g.close(); }
 });
 
 test('campaign role, uncertainty, recruitment and finale stay locked between series games', () => {

@@ -391,8 +391,13 @@ unchanged", with the strength gain. The position lists every natural position,
 so a basketball combo guard reads "PG/SG · 88 rating". A collapsible "Lineup
 before and after" compares the lineups, and **Sign <player>** confirms. If your
 team is knocked out, the same article layout ("ITALY IS OUT") offers
-**Continue as spectator** or **Retry this setup**. Conquests by other teams
-never wait: a notice on the map, the ticker and a brief hatch flash report them.
+**Continue as spectator**, which follows the team that knocked you out (change it
+under Following), or **Try again**: **Same draw** replays the campaign's seed, so
+the opening repeats; **New draw** keeps the team and the rules with a fresh seed;
+**Another team** opens setup on Your role with the same campaign and rules and no
+team chosen. The eliminated campaign stays saved until a new one is launched.
+Conquests by other teams never wait: a notice on the map, the ticker and a brief
+hatch flash report them.
 
 **Ledger** shows the standings (# · Team · Terr · Strength · Conq · Claimed),
 the share of the map and the fallen empires. **Chronicle** shows the match

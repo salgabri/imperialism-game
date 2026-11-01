@@ -438,8 +438,9 @@ season's own three strongest clubs once it has loaded.
   exactly on load. Resuming
   or importing a set campaign needs no fetch, and works on a machine without
   that data set.
-- **Retry this setup** does need the set. It loads the set first, shows the
-  loading state and any error in the elimination dialog, and proceeds only if
+- **Same draw** and **New draw** (the elimination dialog's Try again, once
+  Retry this setup) do need the set. They load the set first, show the
+  loading state and any error in the elimination dialog, and proceed only if
   that dialog is still open. It plays the version of the set loaded now, which
   can differ from the saved `dataVersion`, as country maps can.
 - `parseCampaign` accepts `dataSet` (`^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$`,
