@@ -1,0 +1,30 @@
+{
+  "note": "EA team ids that stand for a club the reference export lists under another id. EA's ratings API gives FC 27's unlicensed Serie A clubs new ids and placeholder names (Lombardia FC is Inter). scripts/sync-ea-fc.mjs maps each id to its reference id before the reference club-name and league lookups, so the club keeps its FC 26 name and therefore its f- club id; club_team_id keeps EA's own id. The reduce checks each alias against the data (most of the squad the reference also had was at the reference club, which the API no longer lists) and fails when a club of the club layer's seven leagues is new to the reference yet mostly one vanished reference club, with no alias here.",
+  "editions": {
+    "27": {
+      "reference": "ea-fc26.csv",
+      "clubs": {
+        "115841": {
+          "referenceId": 46,
+          "name": "Lazio",
+          "label": "SS Lazio"
+        },
+        "115845": {
+          "referenceId": 39,
+          "name": "Atalanta",
+          "label": "Bergamo Calcio"
+        },
+        "131681": {
+          "referenceId": 47,
+          "name": "AC Milan",
+          "label": "Milano FC"
+        },
+        "131682": {
+          "referenceId": 44,
+          "name": "Inter",
+          "label": "Lombardia FC"
+        }
+      }
+    }
+  }
+}

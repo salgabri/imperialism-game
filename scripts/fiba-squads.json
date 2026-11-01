@@ -1,9 +1,11 @@
 {
   "_comment": [
     "Curated FIBA national-team squads: [player, positions, ratingIfNotInNBA].",
-    "Ratings are left null for NBA players and resolved from the NBA 2K export at",
-    "build time (real 1-99 overalls). Players outside the NBA carry a curated",
-    "rating on the same scale, since no public dataset covers EuroLeague.",
+    "Ratings are left null for NBA players and resolved from the built-in season's",
+    "NBA 2K (2K Archive's page, scripts/data/nba-seasons.json) at build time (real",
+    "1-99 overalls); one who has left the NBA since keeps his latest NBA 2K rating.",
+    "Players outside the NBA carry a curated rating on the same scale, since no",
+    "public dataset covers EuroLeague.",
     "",
     "Nationality is curated rather than taken from a dataset because FIBA squads",
     "are not NBA rosters: Serbia, Spain, Greece and Lithuania field mostly",

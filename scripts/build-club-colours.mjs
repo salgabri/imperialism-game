@@ -89,7 +89,8 @@ for (const name of files) {
 const { colours: overrides } = JSON.parse(await readFile(overridesFile, 'utf8'));
 const knownIds = new Set([...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...NFL_CLUBS].map(club => club.id));
 for (const [id, colour] of Object.entries(overrides)) {
-  if (!knownIds.has(id) && !DOMESTIC_ID.test(id)) throw new Error(`club-colours.json: no club ${id}`);
+  // A club that has left the built-in leagues keeps its crest for the earlier seasons it played, so its correction too.
+  if (!knownIds.has(id) && !DOMESTIC_ID.test(id) && !clubLogoFile(id)) throw new Error(`club-colours.json: no club ${id}`);
   if (!/^#[0-9a-f]{6}$/i.test(colour)) throw new Error(`club-colours.json: ${id} needs a #rrggbb colour, not ${colour}`);
   colours.set(clubLogoFile(id) ?? id, colour.slice(1).toLowerCase());
 }

@@ -14,6 +14,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
 import { loadEaPlayers, fmGameRating, parseCsv } from './lib/football-data.mjs';
+import { decodeFootballSet } from '../src/engine/footballSets.js';
 
 const evidence = {
   id: 'ea:123', fullName: 'Verified Player', positions: ['MF', 'FW'],
@@ -143,12 +144,13 @@ test('all 173 football nations field a complete natural XI of source-backed play
 });
 
 test('every shipped rating and identity resolves to its exact committed database record', async () => {
-  const ea = await loadEaPlayers(new URL('./data/ea-fc26.csv', import.meta.url));
+  const ea = await loadEaPlayers(new URL('./data/ea-fc27.csv', import.meta.url));
   const eaById = new Map(ea.players.map(player => [player.sourceInfo.id, player]));
   const fm = JSON.parse(await readFile(new URL('./data/fm26-players.json', import.meta.url), 'utf8'));
   const fmById = new Map(fm.players.map(player => [`fm:${player.id}`, player]));
-  assert.equal(ea.fictional, 316);
-  assert.ok(!eaById.has('ea:230481'), 'Ronaldo Cabrais is a fictional Brazilian squad member');
+  // EA's ratings site lists no generated squads, so the 29-February rule finds none in EA FC 27.
+  assert.equal(ea.fictional, 0);
+  assert.equal(ea.fictionalFilter.keptRealClubLeapDayBirths, 18);
   const teams = [...Object.keys(NATIONS).map(id => buildTeam(id, makeRng(1), football)),
     ...football.clubs.map(club => buildClub(club, football))];
   for (const team of teams) {
@@ -184,9 +186,14 @@ test('generated EA clubs are excluded by 29-February births without touching rea
   const ea = await loadEaPlayers(new URL('./data/ea-fc26.csv', import.meta.url));
   const records = new Map(ea.players.map(player => [player.sourceInfo.id, player]));
   const generated = new Set(ea.fictionalFilter.clubs.map(club => club.clubId));
+  assert.equal(ea.fictional, 316);
+  assert.ok(!records.has('ea:230481'), 'Ronaldo Cabrais is a fictional Brazilian squad member');
+  // EA FC 26 plays as the 2025/26 season (public/football/ea-fc-26.json), built from these records.
+  const season = decodeFootballSet(JSON.parse(await readFile(new URL('../public/football/ea-fc-26.json', import.meta.url), 'utf8')));
+  const seasonSport = { ...football, rosters: season.rosters, clubs: season.clubs, fallbackStrength: () => 40 };
   // Regression: India's XI shipped this generated Mohammedan SC defender.
   assert.ok(!records.has('ea:279319'), 'M. Radhakrishnann (born 1996-02-29) is a generated player');
-  assert.ok(!buildTeam('356', makeRng(1), football).squad.some(player => player.id === 'ea:279319'));
+  assert.ok(!buildTeam('356', makeRng(1), seasonSport).squad.some(player => player.id === 'ea:279319'));
   assert.ok(generated.has(111633) && generated.has(114023), 'Mohammedan SC and Western United are generated in FC 26');
   const leagueRows = id => rows.filter(row => Number(row[header.indexOf('league_id')]) === id).length;
   assert.equal(ea.fictionalFilter.clubs.filter(club => club.league === 'Série A').length, 14);
@@ -195,9 +202,11 @@ test('generated EA clubs are excluded by 29-February births without touching rea
   assert.equal(ea.fictionalFilter.clubPlayers + ea.fictionalFilter.clubless.length, ea.fictional);
   assert.equal(ea.fictionalFilter.keptRealClubLeapDayBirths, 16);
   for (const id of ['ea:241461', 'ea:277031', 'ea:245741', 'ea:241775']) assert.ok(records.has(id), `${id} is a real 29-February birth`);
-  const teams = [...Object.keys(NATIONS).map(id => buildTeam(id, makeRng(1), football)),
-    ...football.clubs.map(club => buildClub(club, football))];
-  for (const player of teams.flatMap(team => team.squad)) assert.ok(!generated.has(player.sourceInfo.clubId), `${player.id} plays for a generated club`);
+  const teams = [...Object.keys(NATIONS).map(id => buildTeam(id, makeRng(1), seasonSport)),
+    ...seasonSport.clubs.map(club => buildClub(club, seasonSport))];
+  const players = teams.flatMap(team => team.squad);
+  assert.ok(players.length > 2000, 'the season fields its EA players');
+  for (const player of players) assert.ok(records.has(player.id), `${player.id} plays for a generated club`);
 });
 
 test('the 29-February filter drops half-generated clubs and clubless players only', async () => {
@@ -223,7 +232,7 @@ test('the 29-February filter drops half-generated clubs and clubless players onl
 });
 
 test('competition IDs keep foreign namesakes out of the European club leagues', async () => {
-  const ea = await loadEaPlayers(new URL('./data/ea-fc26.csv', import.meta.url));
+  const ea = await loadEaPlayers(new URL('./data/ea-fc27.csv', import.meta.url));
   const records = new Map(ea.players.map(player => [player.sourceInfo.id, player]));
   const expected = { 'Premier League': [13, 20], 'La Liga': [53, 20], 'Serie A': [31, 20],
     Bundesliga: [19, 18], 'Ligue 1': [16, 18], Eredivisie: [10, 18], 'Liga Portugal': [308, 18] };
