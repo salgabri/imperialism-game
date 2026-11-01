@@ -216,9 +216,12 @@ choice; no timer runs.
 ### Match rules
 
 **Show matches** is *Live, minute by minute* (a live ticker), *Final score
-only* (an instant final score) or *Fast-forward* (Express playback: final scores
-only, with shorter pauses for routine matches). It stores the existing
-`resolution` and `express` settings. Level games go to penalties in football and
+only* (an instant final score) or *Fast-forward* (Express playback: final scores,
+with shorter pauses for routine matches, but your team's matches still on the live
+ticker). It stores the existing `resolution` and `express` settings. Under Live and
+Fast-forward your team's match (the managed team, or the followed team while
+spectating) plays at 1× whatever the speed, and the chosen speed returns with the
+result; a speed picked during the match is kept. Level games go to penalties in football and
 overtime in basketball and American football. The draw, the opponent choice, upsets, the final, computer
 signings and your role are fixed at launch. During a campaign the masthead's
 **Settings** button (More on phones) changes Show matches at any time, except
@@ -257,7 +260,7 @@ own Space, and open dialogs block it.
 
 | Primary | When |
 | --- | --- |
-| **Continue** | Draw the next match, move on after a result, or kick off at a tactical gate with the balanced approach |
+| **Continue** | Draw the next match, move on after a result, or kick off at a tactical gate with the recommended approach (the best displayed win chance; Balanced on a tie) |
 | **Finish match** | Reveal a live ticker match's result |
 | **Attack <team>** | Confirm your target under *You choose* |
 | **Sign <player>** | Confirm the signing on the conquest screen (the masthead button reads "Sign player") |
@@ -268,8 +271,8 @@ own Space, and open dialogs block it.
 **Pause** freezes the draw, the ticker and scheduled presentation. A pending
 target choice or signing holds the screen: only Map stays available in the
 navigation. **Fast-forward** (Show matches) compresses routine presentation while
-keeping followed matches, upsets and finales visible. It uses the same draw and
-match results.
+keeping your team's matches live and upsets and finales visible. It uses the same
+draw and match results.
 
 ### Map view
 
@@ -281,10 +284,13 @@ The map fills the screen next to a campaign column (500px at 1600px and wider,
   "Next draw · Any of N empires can be drawn". Once the fixture is known, it
   shows "<A> v <B>", the route ("Across a land border" / "By sea — no shared
   border"), the odds bar and "Strength 82.1 v 78.4 · from N simulated matches".
-  When your team plays, **Match preview** opens the approach choice. **or
-  simulate the result** reveals this match at once with the default approach.
-  **Continue** kicks off with the balanced approach. During and after the match
-  the block holds the compact match card with the score and minute.
+  When your team plays, the odds bar and strength line show the **recommended
+  approach** (the one with the best displayed win chance; Balanced on a tie), and
+  a line names it: "Continue kicks off with Attack, the recommended approach."
+  **Match preview** opens the approach choice, with that option tagged
+  Recommended and focused. **or simulate the result** reveals this match at once
+  with the recommended approach, and **Continue** kicks off with it. During and
+  after the match the block holds the compact match card with the score and minute.
 - **Your fronts** — neighbouring empires with strength, territories and your
   win chance: green at 60% or more, amber at 45–59%, red below 45%.
 - **Latest results** — "Germany beat Austria", the score and the claimed
@@ -326,9 +332,10 @@ normal approximation of the remaining margin. Both lineups follow, with
 claimed players tagged and ratings coloured by tier. A dark match feed lists
 events newest first and has 1× / 2× / 4× speed chips and Pause. When a live
 ticker match involving your team (or, as a spectator, the followed team) kicks
-off while you are on Map, the game switches to Match. It returns to Map at the
-next turn if the switch was automatic. Fast-forward's routine matches and
-"simulate the result" never switch. Without a live match, the screen shows the last finished match, or the
+off while you are on Map, the game switches to Match, under Fast-forward too; the
+match plays at 1×. It returns to Map at the next turn if the switch was
+automatic. Fast-forward's routine matches and "simulate the result" never switch.
+Without a live match, the screen shows the last finished match, or the
 next fixture before the first one.
 
 **Squad** shows one team: the flag, "First team · N players · K claimed in
@@ -365,7 +372,10 @@ cells. The map zooms to your empire and the next opponent, with a **Whole map** 
 **Your fronts** toggle. The campaign column becomes a bottom sheet with a grab
 handle; tapping it expands the sheet to show your fronts and latest results. A
 full-width primary bar sits above a tab bar of **Map · Squad · Match · Ledger ·
-More**. **More** holds the Chronicle, the playback controls, Settings and saves.
+More**. While nothing waits on a decision, the bar ends with **Auto** (a manager's
+autoplay toggle; a spectator's primary already plays and pauses) and the speed
+button (1× / 2× / 4×). **More** holds the Chronicle, the playback controls,
+Settings and saves.
 From 700px to 1199px the map sits on top and the column content runs in two
 columns below. Touch targets are at least 44px. Reduced motion keeps only
 opacity transitions.
@@ -405,8 +415,14 @@ the message and the first stack frames.
 
 The Chronicle's history filters by team and opens full match events and
 conquest rewards. **View conquest on map** reveals the gained holdings. Final
-results include the biggest upset, the decisive match and the transfer impact.
-The masthead trophy reopens them after you view the map. The map has one
+results include the biggest upset, the decisive match, the transfer impact, the
+leader changes and the elapsed time. A manager whose team fell gets a **Your
+campaign** block: the placement ("25th of 49"), who knocked the team out and with
+what score, what became of that team, conquests, signings, territories taken and
+the biggest haul; a manager who won sees "Managed by you". The playtest timing
+(active viewing, time choosing, skipped presentations, acquisitions improving the
+lineup) appears only with `?playtest` in the address; exports always carry it.
+The masthead trophy reopens the results after you view the map. The map has one
 keyboard tab stop, arrow navigation and a skip link.
 
 ### Draw compass, flags and navigation

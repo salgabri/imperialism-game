@@ -32,6 +32,8 @@ Use five new players for the first pass. Run the short preset with a recorded se
 | Replay intent | Record intent and reason; do not set an arbitrary quota | Ask whether the player would replay the same setup with a different decision, try another team or leave. |
 | Abandonment | Record phase, elapsed and active time, reason and last action | A faster completed campaign can still be less engaging; compare recall and replay intent alongside completion. |
 
+Open the game with `?playtest` in the address (for example `http://localhost:5173/?playtest`) so the campaign results also show the session timing: active viewing, time choosing, skipped presentations and acquisitions improving the lineup. Players do not see these by default; Export campaign always carries the underlying data (`metrics.engagement` and `metrics.acquisitions`).
+
 Record abandoned clicks, scrolling to find playback, misunderstood abbreviations and how often a player checks their followed team. Ask which transfer or upset they remember at the end. Treat a beautiful map with no remembered campaign moment as a narrative-feedback failure. Keep player explanations alongside the local campaign metrics export: automated measurements can identify long waits or repeated choices, but cannot establish that a player understood the decision.
 
 ## Decision and pacing comparisons

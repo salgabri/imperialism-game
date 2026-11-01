@@ -109,6 +109,12 @@ gold-trimmed "war room" look.
     restyled TacticalChoice dialog, which no longer opens by itself), and "or
     simulate the result" (balanced approach, instant reveal for this match
     only). Continue / Space kicks off with the balanced approach.
+    *(Amended 2026-11-01 by the UX quick wins: Continue, Space and "simulate the
+    result" use the recommended approach, `recommendedTactic` in
+    `managerStrategy.js`: the best displayed win chance, Balanced on a tie. The
+    gate's odds and strength line show it, a line names it, and the dialog tags
+    it Recommended and focuses it. Balanced was the best option in only about a
+    fifth of real UEFA matchups.)*
   - *Live:* score and minute; the primary is Finish match.
   - *Done:* the result; the primary is Continue.
 - **D11 — Views.** The masthead nav is Map / Squad / Match / Ledger / Chronicle.
@@ -120,6 +126,11 @@ gold-trimmed "war room" look.
   next turn if the switch was automatic. Clicking land or a ledger row opens that
   team's Squad. With no live match, Match shows the last finished match or an
   empty state. View changes never use clock timers.
+  *(Amended 2026-11-01: your team's match (`App.ownMatch`) now plays on the live
+  ticker under express too, so it switches to Match there as well, and it plays at
+  1× whatever the speed; `finishMatch` hands the chosen speed back unless the
+  player changed it during the match. The phone bar adds Auto (managers) and the
+  speed button while no decision waits.)*
 - **D12 — Mounting.** WorldMap stays mounted in every view and is hidden when
   not visible. `CommandBar` (the masthead) and `CampaignStorageDialog` stay
   direct children of App's root. `render()` stays pure.

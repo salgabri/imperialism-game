@@ -526,7 +526,8 @@ test('match preview keeps the tactical contract, adds the board-07 preview and c
     onClose: () => closed.push(true), onSimulate: () => simulated.push(true) }, context);
   const dialog = view.host.querySelector('[role="dialog"]');
   assert.equal(dialog.getAttribute('aria-modal'), 'true');
-  assert.equal(document.activeElement.dataset.tactic, 'balanced', 'initial focus on the default approach');
+  // Defend shows the best chance (51%), so it is the recommended approach Continue would kick off with.
+  assert.equal(document.activeElement.dataset.tactic, 'defend', 'initial focus on the recommended approach');
   assert.match(view.host.textContent, /Matchday variation 11\.0/);
   assert.match(view.host.textContent, /Scoring luck remains/);
   assert.match(view.host.querySelector('.fi-tactical-fixture').textContent, /Attack.*Serbia.*By sea — no shared border.*Defend · You.*Italy/);
@@ -534,7 +535,9 @@ test('match preview keeps the tactical contract, adds the board-07 preview and c
   assert.equal(view.host.querySelectorAll('.fi-tactical-xi').length, 2);
   assert.equal(view.host.querySelectorAll('.fi-tactical-xi__row').length, 22);
   assert.equal(view.host.querySelectorAll('[data-tactic]').length, 3);
-  assert.ok(view.host.querySelector('[data-tactic="balanced"]').classList.contains('is-default'));
+  assert.deepEqual([...view.host.querySelectorAll('.fi-tactical-option.is-default')].map(n => n.dataset.tactic), ['defend']);
+  assert.deepEqual([...view.host.querySelectorAll('.fi-tactical-option__tag')].map(n => n.textContent), ['Recommended']);
+  assert.ok(view.host.querySelector('[data-tactic="defend"] .fi-tactical-option__tag'));
   assert.match(view.host.querySelector('[data-tactic="attack"]').textContent, /42%/);
   // DEC D5: win chance coloured by the displayed integer.
   assert.equal(view.host.querySelector('[data-tactic="attack"] .fi-tactical-option__chance b').className, 'tone-loss');
@@ -591,6 +594,8 @@ test('match preview: reserve support is a tag on the option name row, never an e
   const choice = { managerName: 'Alfa', opponentName: 'Beta', options: tacticalOptions(team('a', 'Alfa', 'ALF', 75), team('b', 'Beta', 'BET', 85), 6)
     .map(option => option.id === 'balanced' ? option : { ...option, support: option.id === 'attack' ? .45 : 1.02 }) };
   const view = await mount(TacticalChoice, { choice, onChoose() {} }, context);
+  // No estimates on these options: Balanced stays the recommended approach.
+  assert.equal(view.host.querySelector('.fi-tactical-option.is-default').dataset.tactic, 'balanced');
   const tag = view.host.querySelector('[data-tactic="attack"] .fi-tactical-option__name > .fi-tactical-option__support');
   assert.equal(tag.textContent, 'Reserve support +0.45');
   assert.equal(tag.getAttribute('title'), 'Reserve support contributes +0.45 to this approach.');
