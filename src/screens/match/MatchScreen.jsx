@@ -54,7 +54,7 @@ export default function MatchScreen(props) {
   const minuteProps = { live, minuteStore, minuteFallback, minuteFloor };
   return (
     <Shell state={state} segment={segment}>
-      <ScoreHeader a={a} b={b} statusLabel={statusLabel} statusDetail={statusDetail} kicks={kicks} {...minuteProps} />
+      <ScoreHeader a={a} b={b} sport={sport} statusLabel={statusLabel} statusDetail={statusDetail} kicks={kicks} {...minuteProps} />
       <div className="segmented match-segments" role="group" aria-label="Match details">
         {SEGMENTS.map(([id, label]) => (
           <button key={id} type="button" className="match-segments__item" aria-pressed={segment === id}

@@ -159,7 +159,7 @@
 .squad-tier[data-tier='75'] { color: var(--tier-75); }
 .squad-tier[data-tier='70'] { color: var(--tier-70); }
 
-/* ---- formation pitch / basketball court (C§7, C§17) / American football field ---- */
+/* ---- formation pitch / basketball court (C§7, C§17) / American football field / baseball diamond ---- */
 .squad-formation .pitch { margin-top: 10px; }
 .pitch {
   position: relative; height: var(--sq-pitch-h); overflow: hidden;
@@ -199,6 +199,15 @@
 .pitch--field.pitch--large .pitch__dot { width: 30px; height: 30px; font-size: 12px; }
 .pitch--field.pitch--large .pitch__name { font-size: 12px; }
 .pitch--field.pitch--phone .pitch__name { display: none; }
+/* Baseball: the diamond drawn over the box, the bullpen and the designated hitter aside, and 13 smaller discs */
+.pitch--diamond .pitch__outline, .pitch__diamond { position: absolute; left: 10px; top: 10px; width: calc(100% - 20px); height: calc(100% - 20px); }
+.pitch__diamond path, .pitch__diamond ellipse { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.pitch--diamond .pitch__player { gap: 2px; }
+.pitch--diamond .pitch__dot { width: 26px; height: 26px; font-size: 11px; }
+.pitch--diamond .pitch__name { padding: 0 2px; font-size: 11px; }
+.pitch--diamond.pitch--large .pitch__dot { width: 32px; height: 32px; font-size: 12px; }
+.pitch--diamond.pitch--large .pitch__name { font-size: 12px; }
+.pitch--diamond.pitch--phone .pitch__name { display: none; }
 .pitch__player {
   position: absolute; z-index: 1; transform: translate(-50%, -50%);
   display: flex; flex-direction: column; align-items: center; gap: 3px;

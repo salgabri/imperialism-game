@@ -8,6 +8,7 @@ import { getSport } from '../sports/index.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
+import { baseballProfile } from '../sports/baseball.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
 import { FEED_CAP, domesticIdOf } from '../app/shared.js';
@@ -481,8 +482,8 @@ function tapeRow(key, label, a, b) {
 
 /**
  * Board 07 tale of the tape: the positional profile (football Attack / Defence / Goalkeeping, basketball Offence /
- * Defence, American football Offence / Defence / Kicking) from the sports engines' frozen profile exports, then the
- * lineup rating.
+ * Defence, American football Offence / Defence / Kicking, baseball Batting / Pitching / Fielding) from the sports
+ * engines' frozen profile exports, then the lineup rating.
  */
 function tapeRows(sportId, lineupA, lineupD, copy) {
   if (!lineupA || !lineupD) return [];
@@ -495,6 +496,10 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
       const pA = americanFootballProfile(lineupA), pD = americanFootballProfile(lineupD);
       rows = [['offence', 'Offence', pA.offence, pD.offence], ['defence', 'Defence', pA.defence, pD.defence],
         ['kicking', 'Kicking', pA.kicking, pD.kicking]];
+    } else if (sportId === 'baseball') {
+      const pA = baseballProfile(lineupA), pD = baseballProfile(lineupD);
+      rows = [['batting', 'Batting', pA.batting, pD.batting], ['pitching', 'Pitching', pA.pitching, pD.pitching],
+        ['fielding', 'Fielding', pA.fielding, pD.fielding]];
     } else {
       const pA = footballProfile(lineupA), pD = footballProfile(lineupD);
       rows = [['attack', 'Attack', pA.attack, pD.attack], ['defence', 'Defence', pA.defence, pD.defence],

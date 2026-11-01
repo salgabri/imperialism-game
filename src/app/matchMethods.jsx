@@ -9,6 +9,7 @@
 import React from 'react';
 import { C, pad3, tint } from '../theme.js';
 import { liveModelFor } from '../engine/winProbability.js';
+import { overtimeText } from '../sports/index.js';
 import { roman } from '../viewModels/format.js';
 import * as matchVM from '../viewModels/match.js';
 
@@ -194,6 +195,9 @@ export function revealAll() {
  * summary, viewConquest, the column, the ticker and the Chronicle. Pure. Called by render for the current match, so it
  * returns null outside a campaign (rule 9) and for a match whose teams are missing.
  */
+/** "after 11 innings" → "After 11 innings": a tie-break text opening a line. */
+const sentence = text => text.charAt(0).toUpperCase() + text.slice(1);
+
 export function matchCard(m = this.state.match, teams = this.state.teams) {
   const { round, settings, phase } = this.state;
   if (!m) return null;
@@ -228,7 +232,7 @@ export function matchCard(m = this.state.match, teams = this.state.teams) {
         winnerName: m.winnerName, loserName: m.loserName, territories: m.territoriesGained, player: m.playerTaken,
         strengthBefore: m.strengthBefore, strengthAfter: m.strengthAfter, strengthGain: m.strengthGained,
         territoryNames: m.territoryNames || [], territoryIds: m.territoryIds || [], replacedPlayer: m.replacedPlayer,
-        tieText: m.tie ? (sport.tieBreak === 'shootout' ? `${m.tie.ga}–${m.tie.gd} on penalties` : `After ${m.tie.periods.length} overtime period${m.tie.periods.length === 1 ? '' : 's'}`) : null }
+        tieText: m.tie ? (sport.tieBreak === 'shootout' ? `${m.tie.ga}–${m.tie.gd} on penalties` : sentence(overtimeText(sport, m.tie.periods.length))) : null }
       : null,
   };
 }

@@ -8,7 +8,7 @@ import { CLUB_SCOPES } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
-import { SPORT_LIST, getSport } from '../../sports/index.js';
+import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
@@ -24,7 +24,9 @@ export const PACING_HELP = {
 export function campaignPreview(count, sport, setup) {
   const matches = Math.max(0, count - 1);
   const extra = setup.finale === 'best-of-three' ? '–' + (matches + 2) : '';
-  const seconds = setup.express ? 2.5 : setup.resolution === 'instant' ? 5 : sport.clock.length * sport.clock.msPerUnit / 1000 + 7;
+  // The clock of the rules the campaign will play (a season's sport object carries the built-in one's).
+  const { clock } = matchSport({ sport: sport.id, layer: setup.layer });
+  const seconds = setup.express ? 2.5 : setup.resolution === 'instant' ? 5 : clock.length * clock.msPerUnit / 1000 + 7;
   const minutes = Math.max(1, Math.ceil(matches * seconds / 60));
   return { matches: `${matches}${extra}`, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
 }
@@ -311,6 +313,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
     + 'of the United States.',
+  baseball: 'MLB The Show 26 ratings, as of the roster update of 2 October 2026. Clubs play on their own map of the United '
+    + 'States and Canada; nations field the players born there.',
 });
 
 /**

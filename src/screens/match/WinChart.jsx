@@ -4,6 +4,7 @@ import React from 'react';
 import { winSeries, chartGeometry } from '../../engine/winProbability.js';
 import { formatWinChance } from '../../viewModels/format.js';
 import { useMatchMinute } from './useMatchMinute.js';
+import { clockLabel, clockTick, getSport } from '../../sports/index.js';
 
 const W = 800, H = 132;
 
@@ -14,7 +15,9 @@ function axisLength(length, ot, minute) {
 }
 
 function ticksFor(sport, length, axis, ot) {
-  const step = sport === 'basketball' ? 10 : 15;
+  // A sport's own tick (baseball: every inning); basketball ticks its quarters (ten minutes under FIBA rules, twelve in
+  // the NBA); the others every 15'.
+  const step = Number(getSport(sport).clock?.tick) || (sport === 'basketball' ? length / 4 : 15);
   const ticks = [];
   for (let t = 0; t <= length; t += step) ticks.push(t);
   if (ticks.at(-1) !== length) ticks.push(length);
@@ -78,7 +81,7 @@ export default function WinChart({ sport = 'football', live = false, model = nul
       </div>
       <div className="match-chart__plot">
         <svg className="match-chart__svg" viewBox={`0 0 ${W} ${H}`} role="img"
-          aria-label={`${label} ${value} at ${minute}'`} focusable="false">
+          aria-label={`${label} ${value} at ${clockLabel(sport, minute)}`} focusable="false">
           <defs>
             <pattern id={patternId} patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
               <rect width="1.2" height="5" className="match-chart__hatch" />
@@ -96,7 +99,7 @@ export default function WinChart({ sport = 'football', live = false, model = nul
         <div className="match-chart__axis" aria-hidden="true">
           {ticks.map(t => {
             const frac = axis ? t / axis : 0;
-            return <span key={t} style={{ left: `${frac * 100}%`, transform: `translateX(${-frac * 100}%)` }}>{`${t}'`}</span>;
+            return <span key={t} style={{ left: `${frac * 100}%`, transform: `translateX(${-frac * 100}%)` }}>{clockTick(sport, t)}</span>;
           })}
         </div>
       </div>

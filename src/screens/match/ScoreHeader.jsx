@@ -2,6 +2,7 @@
 import React from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
 import { useMatchMinute } from './useMatchMinute.js';
+import { clockLabel } from '../../sports/index.js';
 
 function Side({ team, align }) {
   const mark = <TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={28} height={21} />;
@@ -18,9 +19,9 @@ function Side({ team, align }) {
   );
 }
 
-function StatusLine({ live, statusLabel, statusDetail, minuteStore, minuteFallback, minuteFloor }) {
+function StatusLine({ sport, live, statusLabel, statusDetail, minuteStore, minuteFallback, minuteFloor }) {
   const minute = useMatchMinute({ live, minuteStore, minuteFallback, minuteFloor });
-  const text = live ? `${minute}' · ${statusLabel}` : `${statusLabel}${statusDetail ? ` · ${statusDetail}` : ''}`;
+  const text = live ? `${clockLabel(sport, minute)} · ${statusLabel}` : `${statusLabel}${statusDetail ? ` · ${statusDetail}` : ''}`;
   return (
     <p className={`match-score__minute${live ? ' is-live' : ''}`}>
       <i className="match-score__square" aria-hidden="true" />
@@ -39,8 +40,11 @@ function Kicks({ code, kicks }) {
   );
 }
 
-/** Attack | score + minute | Defend. The attacker always comes first, whichever side you manage (B§1.7). */
-export default function ScoreHeader({ a, b, live = false, statusLabel = '', statusDetail = null, kicks = null,
+/**
+ * Attack | score + minute | Defend. The attacker always comes first, whichever side you manage (B§1.7). The minute is
+ * the sport's clock (`sport`: baseball shows the half-inning).
+ */
+export default function ScoreHeader({ a, b, sport = 'football', live = false, statusLabel = '', statusDetail = null, kicks = null,
   minuteStore = null, minuteFallback = 0, minuteFloor = 0 }) {
   return (
     <header className="match-score">
@@ -50,7 +54,7 @@ export default function ScoreHeader({ a, b, live = false, statusLabel = '', stat
         <span>{a.score}</span><span className="match-score__dash">–</span><span>{b.score}</span>
       </div>
       <Side team={b} align="d" />
-      <StatusLine live={live} statusLabel={statusLabel} statusDetail={statusDetail}
+      <StatusLine sport={sport} live={live} statusLabel={statusLabel} statusDetail={statusDetail}
         minuteStore={minuteStore} minuteFallback={minuteFallback} minuteFloor={minuteFloor} />
       {kicks && (kicks.a?.length || kicks.b?.length) ? (
         <div className="match-score__pens">
