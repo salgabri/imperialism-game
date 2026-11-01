@@ -123,27 +123,30 @@ updates. The page looks for a new version every hour and when you return to it.
 
 ## Deployment
 
-The game is live at <https://imperialism-game.vercel.app>. A push to `main` is a
-release once its tests pass.
+The game is live at <https://imperialism-game.vercel.app>. Vercel builds and
+deploys `main` on every push, so a push to `main` is a release.
 
 **Continuous integration and deploys.**
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `npm test`,
 `npm run build` and `npm run smoke` on Node 26 for every push, in about eight
 minutes. GitHub Actions is free for public repositories. On `main`, its deploy
 job then builds the tested commit with the Vercel CLI (pinned at 64.7.0) and
-deploys it to production. `vercel.json` turns off Vercel's own Git deploys of
-`main` (`git.deploymentEnabled`), so a commit reaches production only after its
-run passes, about ten minutes after the push. A newer push cancels the older
-run, so only the newest commit deploys. A failed run deploys nothing, and the
-site keeps serving the last good deployment.
+deploys it to production. A newer push cancels the older run, so only the
+newest commit deploys. The job reads three repository secrets: `VERCEL_TOKEN`,
+`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`. They go under GitHub → Settings →
+Secrets and variables → Actions → **Repository secrets**, not Variables and not
+an environment's secrets. Without all three, the job leaves the notice "Not
+deploying" and skips its Vercel steps.
 
-The deploy job reads three repository secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`
-and `VERCEL_PROJECT_ID` (GitHub → Settings → Secrets and variables → Actions).
-Without them, it leaves a notice and skips. When the token expires, create a new
-one from your Vercel account's tokens page and replace the `VERCEL_TOKEN`
-secret. `npx vercel link` in a checkout writes the org and project ids to
-`.vercel/project.json`, which git ignores. To hand deploys back to Vercel, delete
-the `git` block from `vercel.json`.
+To make production wait for the tests, Vercel's own Git deploys of `main` have
+to be turned off with `"git": { "deploymentEnabled": { "main": false } }` in
+`vercel.json`. Turn them off only after a run's deploy job has actually run its
+`vercel deploy` step and succeeded. Until then, both deploy each push, which is
+harmless. On 1 November 2026 the switch went in while the job still could not
+see the secrets: production stopped updating until it was reverted. When the
+token expires, create a new one from your Vercel account's tokens page and
+replace the `VERCEL_TOKEN` secret. `npx vercel link` in a checkout writes the org
+and project ids to `.vercel/project.json`, which git ignores.
 
 **Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
 immutable for a year. Fonts, flags and club crests are cached for a day and
@@ -1517,7 +1520,7 @@ scripts/
   build-football-set.mjs  builds a local football season from a CM 01/02 database
   build-icons.mjs      renders the site icons from public/favicon.svg
 .github/workflows/ci.yml  tests, build and smoke on every push; deploys main once the Vercel secrets exist
-vercel.json            cache headers; turns off Vercel's own Git deploys of main (CI deploys it)
+vercel.json            cache headers for the deployed site
 ```
 
 ### Tuning
