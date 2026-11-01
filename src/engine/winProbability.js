@@ -17,9 +17,10 @@
 //   under 'predictable' and ≈ 12 points under 'wild'. DEC D6 ships the formula as specified.
 //
 // Basketball — engine-diff §4a.2 normal approximation of the repo's own model (src/sports/basketball.js):
-//   each period score is Normal(poss·eff, poss·(0.72 + 0.5·eff)) rounded; possessions ~ 73 ± 4.5; match-day form
-//   N(0, drama·0.0125) per side persists through overtime; shared conditions cancel in the margin; level after 40'
-//   goes to 5' overtimes (at most 4, the last ends in a decisive play won with logistic(3·(effA − effD))).
+//   each period score is Normal(poss·eff, poss·(0.72 + 0.5·eff)) rounded; possessions ~ pace ± 4.5 (73 over FIBA's
+//   40', the season's 90–100 over the NBA's 48'); match-day form N(0, drama·0.0125) per side persists through
+//   overtime; shared conditions cancel in the margin; level after regulation goes to 5' overtimes (at most 4, the
+//   last ends in a decisive play won with logistic(3·(effA − effD))).
 //   The remaining margin is therefore ≈ Normal(R·(effA − effD), R·(1.44 + 0.5·(effA + effD)) + 2·(formSd·R)²
 //   + (effA − effD)²·σ_R² + 1/6) for R remaining possessions; P(A wins) = P(margin ≥ 1) + P(margin = 0)·P(A wins
 //   from level), with a ±0.5 continuity correction. Measured robust: tip-off within ≈ 1 point of the Monte Carlo
@@ -33,13 +34,23 @@
 //   possess once, then the next score wins; the last period ends in a decisive field goal) is exact for the model's
 //   drive odds, before form. In overtime a lead is charted as the trailing side's one possession to answer it.
 //
+// Baseball — the model's own distributions (src/sports/baseball.js): the clock counts outs (three a half-inning, 54 in
+//   nine innings), and each half-inning's runs follow the model's distribution for the batting side's edge
+//   (runMasses). The runs still to come are the convolution of the half-innings left, the one in progress with its
+//   chance to score scaled by the outs it has left (the one approximation); P(A wins) = P(final margin ≥ 1) +
+//   P(level)·P(A wins the extra innings), where the extra innings (a runner on second, at most six, then a decisive
+//   run) are an exact chain. Neither the unplayed bottom of the ninth nor a walk-off changes who wins, so the full nine
+//   are counted. Match-day form, which moves both edges, is integrated over its normal spread with seven-point
+//   Gauss–Hermite quadrature.
+//
 // Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE) and
 // src/sports/basketball.js (scorePeriod variance, pace spread, form deviation, overtime rules); American football's
-// come from its own module (DRIVE_MODEL, driveOdds). The tests compare this module against those models, so a change
-// there that is not mirrored here fails loudly.
+// and baseball's come from their own modules (DRIVE_MODEL, driveOdds; INNING_MODEL, inningOdds, runMasses). The tests
+// compare this module against those models, so a change there that is not mirrored here fails loudly.
 
 import { getSport } from '../sports/index.js';
 import { DRIVE_MODEL, driveMoments, driveOdds } from '../sports/americanFootball.js';
+import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
 
 const BASE_GOALS = 1.28;
 const MAX_LOG_EDGE = 1.5;
@@ -73,10 +84,13 @@ export function footballRate(log) {
 /**
  * The live model a match keeps in `match.live` (PLAN §3.1; small plain JSON, persisted with the match):
  * → { kind:'poisson', rA, rD, length:90 } (football)
- * | { kind:'normal', pace, effA, effD, formSd, length:40, ot:5, maxOt:4 } (basketball; effA/effD are efficiencies)
+ * | { kind:'normal', pace, effA, effD, formSd, length:40, ot:5, maxOt:4 } (basketball, length 48 under NBA rules;
+ *     effA/effD are efficiencies)
  * | { kind:'drives', drives, muA, muD, varA, varD, slope, formSd, driveSd, length:60, ot:10, maxOt:3, otChain,
  *     tdA, fgA, tdD, fgD } (American football; μ/σ² are a possession's points, otChain[k] A's chance from level with
  *     k overtimes left, td/fg a possession's chance of a touchdown / field goal)
+ * | { kind:'innings', edgeA, edgeD, formSd, length:54, ot:6, maxOt:6 } (baseball; the clock counts outs, edges are each
+ *     side's batting minus the opposing defence, formSd the spread of match-day form in rating points)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
  * is the match's uncertainty (football ignores it, as the README formula does). Calls only the sport's
@@ -99,6 +113,13 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama) {
   if (model.tieBreak === 'overtime' && isNum(prepared.edgeA) && isNum(prepared.edgeD) && positive(prepared.drives)) {
     const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
     return drivesModel(prepared, variation, length || 60);
+  }
+  if (model.tieBreak === 'overtime' && isNum(prepared.edgeA) && isNum(prepared.edgeD) && positive(prepared.innings)) {
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    return {
+      kind: 'innings', edgeA: num(prepared.edgeA), edgeD: num(prepared.edgeD), formSd: variation * INNING_MODEL.FORM_PER_DRAMA,
+      length: INNING_MODEL.LENGTH, ot: INNING_MODEL.INNING, maxOt: INNING_MODEL.MAX_EXTRA,
+    };
   }
   if (model.tieBreak === 'overtime' && isNum(prepared.efficiencyA) && isNum(prepared.efficiencyD) && positive(prepared.pace)) {
     const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
@@ -171,6 +192,10 @@ export function isLiveModel(model) {
       && model.driveSd >= 0 && model.length > 0 && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0
       && Array.isArray(model.otChain) && model.otChain.length === model.maxOt + 1
       && model.otChain.every(p => typeof p === 'number' && p >= 0 && p <= 1);
+  }
+  if (model.kind === 'innings') {
+    return ['edgeA', 'edgeD', 'formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
+      && Number.isInteger(model.maxOt) && model.maxOt >= 0;
   }
   return false;
 }
@@ -302,10 +327,114 @@ function drivesAt(model, t, margin) {
   return margin > 0 ? clamp01(1 - trailer) : clamp01(trailer);
 }
 
-/** Models with overtime periods after regulation: basketball's and American football's. */
-const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives';
+// Seven-point Gauss–Hermite quadrature for E[f(X)], X ~ N(0, σ²): nodes x = √2·σ·t, weights w/√π.
+const HERMITE = [[0, 0.8102646175568073], [0.8162878828589647, 0.4256072526101278], [-0.8162878828589647, 0.4256072526101278],
+  [1.6735516287674714, 0.05451558281912703], [-1.6735516287674714, 0.05451558281912703],
+  [2.651961356835233, 0.0009717812450995192], [-2.651961356835233, 0.0009717812450995192]].map(([t, w]) => [t * Math.SQRT2, w / Math.sqrt(Math.PI)]);
+// A side's runs still to come, the last bucket holding "this many or more".
+const RUNS_MAX = 40;
+const innings = new WeakMap();
 
-/** The last minute a model can reach: 90 for football, 40 + 5·4 for basketball, 60 + 10·3 for American football. */
+function convolve(a, b) {
+  const out = new Array(Math.min(a.length + b.length - 1, RUNS_MAX + 1)).fill(0);
+  for (let i = 0; i < a.length; i++) {
+    if (!a[i]) continue;
+    for (let j = 0; j < b.length; j++) out[Math.min(i + j, RUNS_MAX)] += a[i] * b[j];
+  }
+  return out;
+}
+
+/**
+ * A baseball model's tables, built once per model: for each form node, each side's runs over k whole half-innings
+ * (k = 0…9), the half-inning masses (regulation and extra) and the extra-inning chain (chain[k]: A's chance from level
+ * with k extra innings still to play; chain[0] the decisive run). Also a cache of computed values by minute and margin.
+ */
+function inningTables(model) {
+  if (innings.has(model)) return innings.get(model);
+  const { INNINGS, DECISIVE_RUN } = INNING_MODEL;
+  const decisive = 1 / (1 + Math.exp(-DECISIVE_RUN * (model.edgeA - model.edgeD)));
+  const nodes = HERMITE.map(([t, weight]) => {
+    const form = t * model.formSd;
+    const oddsA = inningOdds(model.edgeA + form), oddsD = inningOdds(model.edgeD - form);
+    const side = odds => {
+      const masses = runMasses(odds.score), powers = [[1]];
+      for (let k = 1; k <= INNINGS; k++) powers.push(convolve(powers[k - 1], masses));
+      return { score: odds.score, extraScore: odds.extra, powers, extra: runMasses(odds.extra) };
+    };
+    const A = side(oddsA), D = side(oddsD);
+    let win = 0, level = 0;
+    A.extra.forEach((a, i) => D.extra.forEach((d, j) => { if (i > j) win += a * d; else if (i === j) level += a * d; }));
+    const chain = [decisive];
+    for (let k = 1; k <= model.maxOt; k++) chain.push(win + level * chain[k - 1]);
+    return { weight, A, D, chain };
+  });
+  const tables = { nodes, cache: new Map() };
+  innings.set(model, tables);
+  return tables;
+}
+
+/** P(A wins) from `margin` (A − D) with `remA` and `remD` the runs each side still has to come, level → `tieA`. */
+function marginChance(remA, remD, margin, tieA) {
+  let chance = 0;
+  for (let i = 0; i < remA.length; i++) {
+    if (!remA[i]) continue;
+    for (let j = 0; j < remD.length; j++) {
+      const final = margin + i - j;
+      chance += remA[i] * remD[j] * (final > 0 ? 1 : final === 0 ? tieA : 0);
+    }
+  }
+  return chance;
+}
+
+/**
+ * Baseball: P(side A wins) at clock `t` (outs) with run margin `margin`, averaged over the form nodes. Regulation counts
+ * the half-innings left, the one in progress by the outs it has left; in the extra innings, the rest of the inning, then
+ * the chain.
+ */
+function inningsAt(model, t, margin) {
+  const { OUTS, INNINGS } = INNING_MODEL;
+  const minute = clamp(t, 0, lastMinute(model));
+  const { nodes, cache } = inningTables(model);
+  const key = `${minute}|${margin}`;
+  if (cache.has(key)) return cache.get(key);
+  let chance;
+  if (minute >= lastMinute(model)) chance = step(margin, nodes.reduce((s, n) => s + n.weight * n.chain[0], 0));
+  else if (minute <= model.length) {
+    // Half-inning h is in progress (h = 18: regulation is over); even halves are the attacker's.
+    const h = Math.floor(minute / OUTS), left = (OUTS - (minute - h * OUTS)) / OUTS;
+    const halves = 2 * INNINGS;
+    const after = side => { let n = 0; for (let k = h + 1; k < halves; k++) if ((k % 2 === 0) === (side === 'A')) n++; return n; };
+    chance = nodes.reduce((sum, node) => {
+      const rest = side => {
+        const own = side === 'A' ? node.A : node.D;
+        const whole = own.powers[after(side)];
+        const batting = h < halves && (h % 2 === 0) === (side === 'A');
+        return batting && left > 0 ? convolve(runMasses(own.score * left), whole) : whole;
+      };
+      return sum + node.weight * marginChance(rest('A'), rest('D'), margin, node.chain[model.maxOt]);
+    }, 0);
+  } else {
+    // Extra inning k (1-based), u outs into it: the attacker's top, then the defender's bottom.
+    const k = Math.min(model.maxOt, Math.ceil((minute - model.length) / model.ot));
+    const u = minute - model.length - (k - 1) * model.ot;
+    chance = nodes.reduce((sum, node) => {
+      const top = u < OUTS ? runMasses(node.A.extraScore * (OUTS - u) / OUTS) : [1];
+      const bottom = u < OUTS ? node.D.extra : u < 2 * OUTS ? runMasses(node.D.extraScore * (2 * OUTS - u) / OUTS) : [1];
+      return sum + node.weight * marginChance(top, bottom, margin, node.chain[model.maxOt - k]);
+    }, 0);
+  }
+  chance = clamp01(chance);
+  cache.set(key, chance);
+  return chance;
+}
+
+/** Models with overtime periods after regulation: basketball's and American football's, and baseball's extra innings. */
+const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives' || model.kind === 'innings';
+
+/**
+ * The last minute a model can reach: 90 for football, 40 + 5·4 for basketball (48 + 5·4 in the NBA), 60 + 10·3 for
+ * American football and 54 + 6·6 outs for baseball.
+ */
 function lastMinute(model) {
   return hasOvertime(model) ? model.length + model.ot * model.maxOt : model.length;
 }
@@ -346,6 +475,7 @@ export function winProbabilityAt(model, minute, diff = 0) {
   const lead = isNum(diff) ? num(diff) : 0;
   if (model.kind === 'normal') return basketballAt(model, t, lead);
   if (model.kind === 'drives') return drivesAt(model, t, lead);
+  if (model.kind === 'innings') return inningsAt(model, t, lead);
   return footballWinProbability({ rA: model.rA, rD: model.rD, diff: lead, remaining: (model.length - clamp(t, 0, model.length)) / model.length });
 }
 
@@ -424,6 +554,7 @@ export function winSeries({ model, goals = [], aId, dId, minute = 0, perspective
     const p = model.kind === 'normal'
       ? basketballAt(model, t, diff, chains)
       : model.kind === 'drives' ? drivesAt(model, t, diff)
+      : model.kind === 'innings' ? inningsAt(model, t, diff)
       : footballWinProbability({ rA: model.rA, rD: model.rD, diff, remaining: (model.length - Math.min(t, model.length)) / model.length });
     series.push({ t, p });
   }
@@ -450,10 +581,19 @@ export function winMarkers(series, goals = [], { aId, model = null, includeRuns 
 /**
  * The chart's x-domain for a model at the current minute → { length, half, ticks, guides }.
  * Football: 0'…90', ticks every 15', half-time at 45'. Basketball: 0'…40' plus each overtime period reached,
- * ticks at the quarters and overtime ends, half-time at 20', quarter guides at 10'/20'/30'. American football the
- * same over 0'…60' and its ten-minute overtimes.
+ * ticks at the quarters and overtime ends, half-time at 20', quarter guides at 10'/20'/30' (NBA rules: 0'…48', the
+ * quarters every 12'). American football the same over 0'…60' and its ten-minute overtimes. Baseball: 54 outs, a tick
+ * at the end of every inning, extra innings included, and a guide after the third and the sixth.
  */
 export function chartDomain(model, minute = 0) {
+  if (isLiveModel(model) && model.kind === 'innings') {
+    const t = isNum(minute) ? num(minute) : 0;
+    const extras = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;
+    const length = model.length + extras * model.ot;
+    const ticks = [];
+    for (let k = 0; k <= length; k += model.ot) ticks.push(k);
+    return { length, half: model.length / 2, ticks, guides: [model.length / 3, 2 * model.length / 3] };
+  }
   if (isLiveModel(model) && hasOvertime(model)) {
     const t = isNum(minute) ? num(minute) : 0;
     const periods = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;

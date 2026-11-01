@@ -402,11 +402,36 @@ test('conquest hatch is its own overlay, after the land and before the borders, 
     const group = view.q('.conquest-hatch');
     assert.equal(group.previousElementSibling.getAttribute('class'), 'country-shapes');
     assert.equal(group.nextElementSibling.getAttribute('class'), 'ownership-borders');
-    assert.ok(view.q('pattern#fi-flag-380-1'), 'flag tiles are untouched');
+    assert.ok(view.q('g#fi-flag-380-1'), 'flag banners are untouched');
     assert.match(cssRule('.conquest-hatch path').style.getPropertyValue('animation'), /240ms/, 'fades in (opacity, A-2)');
     await view.render({ ...props, conquestIds: [] });
     assert.equal(view.q('.conquest-hatch'), null);
     assert.equal(view.q('pattern[data-conquest-hatch-pattern]'), null);
+  } finally { await view.close(); }
+});
+
+test('Flags mode: each flag part shows its region’s one banner, clipped to the part’s own outline', async () => {
+  const banner = { id: '380-1', ownerId: '380', url: '/flags/it.svg', color: '#d9dcd6', bbox: { x: 99.9, y: 99.9, w: 600.2, h: 200.2 } };
+  const { props } = mapProps({ mapMode: 'flags', flagPatterns: [banner] });
+  // Italy's region also covers Serbia's land after a conquest: two parts, one banner.
+  const parts = { '380': [{ id: '380-1', d: pathD(SHAPES[0].ring) }], '688': [{ id: '380-1', d: pathD(SHAPES[1].ring) }] };
+  const countries = props.countries.map(c => (parts[c.id] ? { ...c, ownerId: '380', flagParts: parts[c.id], fill: 'transparent' } : c));
+  const view = await mount({ ...props, countries });
+  try {
+    assert.equal(view.q('pattern[id^="fi-flag-"]'), null, 'no pattern fill, which the browser re-rendered per part on every repaint');
+    assert.ok(view.q('defs > g#fi-flag-380-1'), 'the banner is drawn once, in the defs');
+    const uses = view.qa('use[data-flag-component="380-1"]');
+    assert.deepEqual(uses.map(use => use.dataset.flagCountry), ['380', '688']);
+    for (const use of uses) {
+      assert.equal(use.getAttribute('href'), '#fi-flag-380-1');
+      const clip = document.getElementById(use.getAttribute('clip-path').match(/^url\(#(.+)\)$/)[1]);
+      assert.equal(clip.localName, 'clipPath');
+      assert.equal(clip.querySelector('path').getAttribute('d'), parts[use.dataset.flagCountry][0].d, 'clipped to exactly its part');
+      assert.ok(use.closest('.country-region .country-flag-parts'), 'inside its country: the conquest flash and hover still reach it');
+      assert.equal(use.closest('.country-flag-parts').getAttribute('pointer-events'), 'none');
+    }
+    assert.equal(new Set(uses.map(use => use.getAttribute('clip-path'))).size, 2, 'one clip per part');
+    assert.equal(view.q('path[data-country="688"]').getAttribute('fill'), 'transparent', 'the land above stays clickable and clear');
   } finally { await view.close(); }
 });
 
@@ -419,7 +444,7 @@ test('Flags mode: a club whose crest is drawn shows the crest, not its code; one
   const { props } = mapProps({ mapMode: 'flags', flagPatterns });
   const view = await mount(props);
   try {
-    assert.equal(view.qa('pattern[data-flag-layout="crest"] image').length, 1, 'one crest is drawn');
+    assert.equal(view.qa('[data-flag-layout="crest"] image').length, 1, 'one crest is drawn');
     assert.deepEqual(labelIds(), ['040', '380'], 'the club with a drawn crest gets no code; the others keep their labels');
     assert.ok(!view.qa('text[data-empire-label]').some(label => label.dataset.empireLabel === '688'));
     await view.render({ ...props, mapMode: 'political', flagPatterns: [] });

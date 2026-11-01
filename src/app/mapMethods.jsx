@@ -142,8 +142,8 @@ export function mapFlags(playing) {
       bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
     for (const part of component.parts) {
       if (!flagParts.has(part.countryId)) flagParts.set(part.countryId, []);
-      flagParts.get(part.countryId).push({ id, fill: `url(#fi-flag-${id})`,
-        d: part.rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join('') });
+      const d = part.rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join('');
+      flagParts.get(part.countryId).push({ id, d });
     }
   }
   const result = { flagParts, flagPatterns };
@@ -171,7 +171,7 @@ function countryHandlers(app, cid) {
 }
 
 /**
- * Every map shape, plus the flag patterns held territory is filled with (README §Map rendering, DEC D18/D19).
+ * Every map shape, plus the banners held territory flies in Flags mode (README §Map rendering, DEC D18/D19).
  * Fills come from `mapVM.countryFill` per `st.mapMode`: Political pastels of each empire's own colour (`politicalFill`), Strength ramp,
  * Fronts win-chance tints, Flags banners (a country flies its *owner's* flag, so an empire reads as one banner);
  * then you-fill (managed only, A-7) and opponent-fill once the fixture is known. Borders come from WorldMap's mesh,

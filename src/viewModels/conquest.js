@@ -3,7 +3,7 @@
 // window/document/timers/RNG, and every builder tolerates missing geometry, odds, sport or history.
 import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { roman, signedDelta, territoryWord } from './format.js';
-import { getSport } from '../sports/index.js';
+import { getSport, overtimeText } from '../sports/index.js';
 
 function territoryName(ctx, cid) {
   // A country map's sections first (ctx.sectionNames); the geometry fallback below is an O(n) find.
@@ -66,7 +66,7 @@ const isFiniteScore = value => value !== null && value !== '' && Number.isFinite
 
 /**
  * Winner-first result score with sport-aware tie-break text (DEC D15):
- * '2–1' · '1–1, 4–3 on penalties' (shoot-out kicks, winner first) · '98–95 after 1 overtime period'.
+ * '2–1' · '1–1, 4–3 on penalties' (shoot-out kicks, winner first) · '98–95 after 1 overtime period' · '5–4 after 11 innings'.
  * `m` is a live/finished match ({ aId, dId, finalGa|ga, finalGd|gd, tie }); '' when the score is unknown.
  */
 export function winnerScore(m, winnerId, sport) {
@@ -79,8 +79,7 @@ export function winnerScore(m, winnerId, sport) {
   if (tie) {
     const tieBreak = sport?.tieBreak || (Array.isArray(tie.periods) ? 'overtime' : 'shootout');
     if (tieBreak === 'overtime') {
-      const periods = Array.isArray(tie.periods) && tie.periods.length ? tie.periods.length : 1;
-      text += ` after ${periods} overtime period${periods === 1 ? '' : 's'}`;
+      text += ` ${overtimeText(sport, Array.isArray(tie.periods) && tie.periods.length ? tie.periods.length : 1)}`;
     } else if (isFiniteScore(tie.ga) && isFiniteScore(tie.gd)) {
       text += `, ${winnerIsA ? tie.ga : tie.gd}–${winnerIsA ? tie.gd : tie.ga} on penalties`;
     } else {
@@ -278,20 +277,25 @@ function ordinal(n) {
   return `${value}${ORDINAL[ordinalRules ? ordinalRules.select(value) : 'other'] || 'th'}`;
 }
 
-const ELIMINATION_NEXT = 'Follow the remaining teams or try the same opening again.';
+/**
+ * What comes next: spectating follows the team that knocked you out (App.continueAsSpectator), or, after a lost
+ * final (`over`), opens the results; or a restart.
+ */
+const eliminationNext = (opponentName, over) => `Continue as spectator to ${over ? 'see the results'
+  : `follow ${opponentName || 'the team that knocked you out'}`}, or try again: the same draw replays this opening, a new draw reshuffles it.`;
 
 /**
  * The closing note follows the last save (`st.saveStatus`, written by the persist that records the defeat): the
  * "saved" line only after a successful write; after a failed one (the masthead shows "Unsaved") it points to the
- * export; with no status yet it makes no claim. → { note, noteTone: 'unsaved' | null }
+ * export; with no status yet it makes no claim. `over`: the defeat was the final. → { note, noteTone: 'unsaved' | null }
  */
-export function eliminationNote(saveStatus) {
-  if (saveStatus?.ok === true) return { note: `Your run is saved. ${ELIMINATION_NEXT}`, noteTone: null };
+export function eliminationNote(saveStatus, opponentName, { over = false } = {}) {
+  if (saveStatus?.ok === true) return { note: `Your run is saved. ${eliminationNext(opponentName, over)}`, noteTone: null };
   if (saveStatus?.ok === false) {
-    return { note: 'Your run could not be saved. Continue as spectator and use Export campaign in Settings to keep a copy, or try the same opening again.',
+    return { note: 'Your run could not be saved. Continue as spectator and use Export campaign in Settings to keep a copy, or try again.',
       noteTone: 'unsaved' };
   }
-  return { note: ELIMINATION_NEXT, noteTone: null };
+  return { note: eliminationNext(opponentName, over), noteTone: null };
 }
 
 /**
@@ -313,7 +317,7 @@ export function eliminationFromResult(result, extra = {}) {
       { key: 'conquests', label: 'Conquests', value: String(result.conquests ?? 0) },
       { key: 'signings', label: 'Signings', value: String(result.signings ?? 0) },
     ],
-    ...eliminationNote(extra.saveStatus),
+    ...eliminationNote(extra.saveStatus, result.opponentName, { over: !!extra.over }),
   };
 }
 
@@ -359,5 +363,7 @@ export function buildElimination(st, ctx = {}) {
     kicker: round ? `Round ${round} · Eliminated` : 'Eliminated',
     standfirst: `${sentence || resultSentence(winnerName, teamName, winnerAttacked, score)}${takenLine} Your campaign ends here.`,
     saveStatus: st.saveStatus,
+    // A lost final leaves one empire: Continue as spectator opens the results, with nobody left to follow.
+    over: Array.isArray(st.aliveIds) && st.aliveIds.length === 1,
   });
 }

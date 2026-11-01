@@ -948,8 +948,8 @@ test('loading, restarting or spectating after an elimination drops the previous 
     assert.equal(app.state.matches, 0);
     assert.deepEqual([app.state.pu, app.state.toast], [null, null], 'startCampaign');
   });
-  // The elimination cancels the toast's clear task; both ways out of it drop the toast.
-  for (const exit of ['continueAsSpectator', 'retryManager']) {
+  // The elimination cancels the toast's clear task; every way out of it drops the toast.
+  for (const exit of ['continueAsSpectator', 'retryManager', 'chooseAnotherTeam']) {
     await withApp(manager, ({ app, time }) => {
       app.startMatch('250', '276');
       app.chooseTactic('balanced');

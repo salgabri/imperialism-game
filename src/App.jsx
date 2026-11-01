@@ -11,7 +11,7 @@ import { clubMapScope, domesticEntry, domesticLabel } from './data/domesticScope
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, seasonMapOf, seasonSport, setSportOf, sportOf } from './engine/footballSets.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
-import { getSport } from './sports/index.js';
+import { getSport, matchSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
@@ -169,7 +169,7 @@ export default class App extends React.Component {
     // Saved turn-mode state (DEC D3, D8; WP-TURN adds it to campaignSnapshot and validation).
     turnQueue: [], turnIndex: 0, pendingTarget: null,
     // UI-only state (never saved, PLAN §3.1).
-    view: 'map', viewSource: 'user', squadReturn: null, tacticalPreview: false, phoneSheet: 'collapsed',
+    view: 'map', viewSource: 'user', squadReturn: null, tacticalPreview: false, phoneSheet: 'collapsed', setupStep: 1,
     phoneMore: false, wholeMap: false, focusLayout: null, targetHoverId: null,
     // The setup's chosen country map, a restore waiting for its country map ({ message, status }) and a country
     // launch being prepared (UI-only: campaignSnapshot whitelists its keys, so none of these reach a save).
@@ -1205,8 +1205,11 @@ export default class App extends React.Component {
     this.openSetup();
   }
 
-  /** Back to setup with a fresh opening seed (a blank seed field means a new draw), from the masthead or the results. */
-  openSetup() {
+  /**
+   * Back to setup with a fresh opening seed (a blank seed field means a new draw), from the masthead or the results.
+   * `step` is the wizard step it opens on (3, Your role, for "Another team" after a defeat).
+   */
+  openSetup({ step = 1 } = {}) {
     this.clearTimers();
     this.cancelRestore();
     this.flowToken++;
@@ -1216,6 +1219,7 @@ export default class App extends React.Component {
     this.showSetupSet();
     this.setState({
       phase: 'setup',
+      setupStep: step,
       confirmNew: false,
       autoplay: false,
       match: null,
@@ -1238,13 +1242,22 @@ export default class App extends React.Component {
 
   continueAsSpectator() {
     this.clock.resume();
+    // Follow the team that knocked you out (it just won, so it is still in): its story carries on from yours. The fallen
+    // team stays on record as the managed team.
+    const conqueror = this.state.managerElimination?.opponentId;
+    const followedId = conqueror && this.state.aliveIds.includes(conqueror) ? conqueror : this.state.followedId;
     // The elimination cleared every timer, including the ones that would clear the final match's goal toast.
-    this.setState({ managerElimination: null, retrySetup: null, managementEnded: true, autoplay: false, paused: false, pu: null, toast: null,
-      phase: this.state.aliveIds.length === 1 ? 'victory' : 'playing' }, () => this.persist());
+    this.setState({ managerElimination: null, retrySetup: null, managementEnded: true, followedId, autoplay: false, paused: false,
+      pu: null, toast: null, phase: this.state.aliveIds.length === 1 ? 'victory' : 'playing' }, () => this.persist());
   }
 
-  retryManager() {
-    const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings), seed: String(this.state.seed), managedTeamId: this.state.managedTeamId };
+  /**
+   * Try again after a defeat with the same team and rules: the same draw (the campaign's seed, so the opening replays)
+   * or, with `newDraw`, a fresh one (a blank seed draws `openingSeed`, moved off the old seed).
+   */
+  retryManager({ newDraw = false } = {}) {
+    const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings),
+      seed: newDraw ? '' : String(this.state.seed), managedTeamId: this.state.managedTeamId };
     // The save holds a data set campaign's players, but playing its setup again needs the set itself. The dialog
     // reports the load, not the save status: the checkpoint was saved whatever happens to the set.
     const dataSet = dataSetOf(setup), elimination = this.state.managerElimination;
@@ -1253,13 +1266,23 @@ export default class App extends React.Component {
       // Gone once the player has followed the remaining teams instead, or another campaign has opened.
       const current = () => token === this.flowToken && this.state.managerElimination === elimination;
       this.setState({ retrySetup: { elimination, state: 'loading', message: `Loading the ${name} season…` } });
-      return this.loadSet(dataSet).then(() => current() && this.retryManager(), error => {
+      return this.loadSet(dataSet).then(() => current() && this.retryManager({ newDraw }), error => {
         if (current()) this.setState({ retrySetup: { elimination, state: 'error',
           message: `This setup needs the ${name} season, which could not be loaded. ${error.message || error}` } });
       });
     }
+    if (newDraw) {
+      const fresh = Date.now() >>> 0;
+      this.openingSeed = fresh === Number(this.state.seed) ? (fresh + 1) >>> 0 : fresh;
+    }
     this.clearTimers();
     this.setState({ setup, managerElimination: null, retrySetup: null }, () => this.startCampaign());
+  }
+
+  /** "Another team" after a defeat: the same campaign's setup, opened on Your role with no team chosen yet. */
+  chooseAnotherTeam() {
+    const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings), role: 'manager', managedTeamId: '', seed: '' };
+    this.setState({ setup, retrySetup: null }, () => this.openSetup({ step: 3 }));
   }
 
   // ---------- transient overlays ----------
@@ -1444,9 +1467,9 @@ export default class App extends React.Component {
 
   presentMatch(...args) { return matchM.presentMatch.apply(this, args); }
 
-  /** The sport this campaign is being played in. */
+  /** The sport this campaign is being played in, under its rules (NBA rules for basketball clubs). */
   sport() {
-    return getSport(this.state.settings.sport);
+    return matchSport(this.state.settings);
   }
 
   /** Patch the live (unapplied) match on the latest queued state; a settled match is never patched back to unapplied. */
@@ -1633,7 +1656,7 @@ export default class App extends React.Component {
     const followedId = st.teams?.[st.followedId] ? st.followedId : null;
     return {
       board: this.geo ? this.board(st) : null, geo: this.geo || null, displayGeo: this.displayGeo || null,
-      sport: getSport(st.settings?.sport), managedId: managedId || null, followedId,
+      sport: matchSport(st.settings), managedId: managedId || null, followedId,
       perspectiveId: managedId || followedId || null,
       drama: UNCERTAINTY_PRESETS[st.settings?.uncertainty]?.drama ?? Number(CONFIG.matchDrama),
       displayRound: displayRound(st), totalTeams: this.teamCount(st.teams),
@@ -1935,7 +1958,7 @@ export default class App extends React.Component {
       onSetting: (key, value) => this.setSetting(key, value), managementEnded: st.managementEnded,
       managedName: st.teams?.[st.managedTeamId]?.name || null,
       onManageSaves: () => this.openStorageDialog('slots') };
-    const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore}
+    const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore} clockSport={sport.id}
       eventsRef={this.eventsRef} onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} /> : null;
     return (
       <div className={`app-shell${playing ? ' has-campaign' : ''}`} data-view={view} data-role={ctx.managedId ? 'manager' : 'spectator'}>
@@ -2002,7 +2025,7 @@ export default class App extends React.Component {
             onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} />}
           {playing && view === 'map' && <Ticker {...this.tickerModel()} />}
         </main>
-        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} onPrimary={() => this.runPrimary()}
+        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} clockSport={sport.id} onPrimary={() => this.runPrimary()}
           playback={this.phonePlaybackModel()} onAutoplay={() => this.togglePlay()} onSpeed={() => this.cycleSpeed()} />}
         {playing && <PhoneTabBar active={this.navView(view)} hidden={view === 'conquest'} locked={!!st.choice || !!st.pendingTarget}
           moreOpen={st.phoneMore} onView={v => this.setView(v)} onMore={() => this.togglePhoneMore()} />}
@@ -2024,6 +2047,7 @@ export default class App extends React.Component {
           saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
           onManageSaves={() => this.openStorageDialog('slots')}
           onCancel={st.hasSave ? () => this.resume() : undefined}
+          initialStep={st.setupStep}
         />}
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           // "View map" (and close): the final's automatic switch to the Match view is otherwise never undone.
@@ -2034,7 +2058,8 @@ export default class App extends React.Component {
           preview={this.matchPreviewModel()} onSimulate={() => this.simulateResult()}
           onChoose={id => this.chooseTactic(id)} onClose={() => this.closeMatchPreview()} />}
         {st.managerElimination && !st.storageDialog && !st.exportText && <ManagerElimination result={st.managerElimination}
-          model={this.eliminationModel()} onSpectate={() => this.continueAsSpectator()} onRetry={() => this.retryManager()} />}
+          model={this.eliminationModel()} onSpectate={() => this.continueAsSpectator()} onRetry={() => this.retryManager()}
+          onNewDraw={() => this.retryManager({ newDraw: true })} onAnotherTeam={() => this.chooseAnotherTeam()} />}
         {st.storageDialog && !st.exportText && <CampaignStorageDialog key={st.storageDialog.mode} {...st.storageDialog}
           activeId={st.campaignId} campaigns={listCampaigns()} onClose={() => this.closeStorageDialog()}
           busy={st.restoring?.message || null} lockedId={playing ? st.campaignId : null}

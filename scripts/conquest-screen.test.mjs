@@ -441,7 +441,8 @@ test('elimination model restates the defeat winner-first in the article pattern'
 
 test('the elimination note follows the last save: saved, failed (export pointer) or unknown (no claim)', async () => {
   const saved = buildElimination({ ...eliminationState(), saveStatus: { ok: true, savedAt: 1 } }, { sport });
-  assert.equal(saved.note, 'Your run is saved. Follow the remaining teams or try the same opening again.');
+  assert.equal(saved.note, 'Your run is saved. Continue as spectator to follow Serbia, or try again: the same draw replays this opening, '
+    + 'a new draw reshuffles it.');
   assert.equal(saved.noteTone, null);
   const failed = buildElimination({ ...eliminationState(),
     saveStatus: { ok: false, message: 'Progress could not be saved. Export your campaign to keep it.' } }, { sport });
@@ -449,8 +450,12 @@ test('the elimination note follows the last save: saved, failed (export pointer)
   assert.match(failed.note, /could not be saved.*Export campaign/);
   assert.equal(failed.noteTone, 'unsaved');
   const unknown = buildElimination(eliminationState(), { sport });
-  assert.equal(unknown.note, 'Follow the remaining teams or try the same opening again.');
+  assert.equal(unknown.note, 'Continue as spectator to follow Serbia, or try again: the same draw replays this opening, a new draw reshuffles it.');
   assert.doesNotMatch(eliminationFromResult(eliminationState().managerElimination).note, /saved/);
+  assert.match(eliminationFromResult({ ...eliminationState().managerElimination, opponentName: '' }).note,
+    /^Continue as spectator to follow the team that knocked you out, /, 'no name: no guess');
+  const final = buildElimination({ ...eliminationState(), aliveIds: ['688'], saveStatus: { ok: true, savedAt: 1 } }, { sport });
+  assert.match(final.note, /^Your run is saved\. Continue as spectator to see the results, or try again: /, 'a lost final leaves nobody to follow');
   const view = await mount(React.createElement(ManagerElimination, { result: eliminationState().managerElimination, model: failed,
     onSpectate() {}, onRetry() {} }));
   const note = view.host.querySelector('.manager-note');
@@ -467,27 +472,32 @@ test('ManagerElimination keeps its dialog, focus trap and exact button copy', as
   const calls = [];
   const st = eliminationState();
   const view = await mount(React.createElement(ManagerElimination, { result: st.managerElimination, model: buildElimination(st, { sport }),
-    onSpectate: () => calls.push('spectate'), onRetry: () => calls.push('retry') }));
+    onSpectate: () => calls.push('spectate'), onRetry: () => calls.push('retry'), onNewDraw: () => calls.push('new draw'),
+    onAnotherTeam: () => calls.push('another team') }));
   const dialog = view.host.querySelector('section.manager-ending[role=dialog]');
   assert.equal(dialog.getAttribute('aria-modal'), 'true');
   assert.equal(document.getElementById(dialog.getAttribute('aria-labelledby')).textContent, 'Italy is out');
   assert.match(document.getElementById(dialog.getAttribute('aria-describedby')).textContent, /^Serbia beat Italy 2–1\./);
   const buttons = [...dialog.querySelectorAll('button')];
-  assert.deepEqual(buttons.map(button => button.textContent), ['Continue as spectator', 'Retry this setup']);
+  assert.deepEqual(buttons.map(button => button.textContent), ['Continue as spectator', 'Same draw', 'New draw', 'Another team']);
   assert.ok(buttons.every(button => button.type === 'button'));
+  const retry = dialog.querySelector('.manager-retry[role=group]');
+  assert.equal(document.getElementById(retry.getAttribute('aria-labelledby')).textContent, 'Try again');
+  assert.deepEqual([...retry.querySelectorAll('button')], buttons.slice(1), 'the three restarts sit in the Try again group');
   assert.equal(document.activeElement, buttons[0]);
   await key(buttons[0], 'Tab', { shiftKey: true });
-  assert.equal(document.activeElement, buttons[1], 'Shift+Tab wraps to the last button');
-  await key(buttons[1], 'Tab');
+  assert.equal(document.activeElement, buttons[3], 'Shift+Tab wraps to the last button');
+  await key(buttons[3], 'Tab');
   assert.equal(document.activeElement, buttons[0], 'Tab wraps to the first button');
-  await click(buttons[0]);
-  await click(buttons[1]);
-  assert.deepEqual(calls, ['spectate', 'retry']);
+  for (const button of buttons) await click(button);
+  assert.deepEqual(calls, ['spectate', 'retry', 'new draw', 'another team']);
   assert.equal(dialog.querySelectorAll('.manager-stat').length, 3);
   await view.close();
   assert.equal(document.activeElement.id, 'prior', 'focus returns to where it was');
 
   const legacy = await mount(React.createElement(ManagerElimination, { result: st.managerElimination, onSpectate() {}, onRetry() {} }));
+  assert.deepEqual([...legacy.host.querySelectorAll('button')].map(button => button.textContent), ['Continue as spectator', 'Same draw'],
+    'New draw and Another team need their handlers');
   assert.equal(legacy.host.querySelector('h1').textContent, 'Italy is out');
   assert.match(legacy.host.textContent, /Serbia won the decisive match\. Your campaign ends here\./);
   assert.doesNotMatch(legacy.host.textContent, /2–1/, 'the attacker-first legacy score is not shown');

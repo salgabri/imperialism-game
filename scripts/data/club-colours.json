@@ -35,6 +35,11 @@
     "nfl-philadelphia-eagles": "#004c54",
     "nfl-jacksonville-jaguars": "#006778",
     "nfl-los-angeles-rams": "#003594",
-    "nfl-pittsburgh-steelers": "#ffb612"
+    "nfl-pittsburgh-steelers": "#ffb612",
+    "mlb-new-york-yankees": "#0c2340",
+    "mlb-philadelphia-phillies": "#e81828",
+    "mlb-san-francisco-giants": "#fd5a1e",
+    "mlb-athletics": "#003831",
+    "mlb-san-diego-padres": "#2f241d"
   }
 }

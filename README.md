@@ -11,16 +11,18 @@ Pick your sport at kick-off:
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
 | Football | XI in a 4-4-2 | 90 minutes | penalty shootout |
-| Basketball | starting five | 40 minutes | overtime periods |
+| Basketball | starting five | 40 minutes for nations (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
+| Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
 
 And pick who fights:
 
 - **Nations** — 173 national teams, each starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
 - **Clubs** — 132 football clubs from seven European leagues, all 30 NBA
-  franchises on [their own map](#the-nba-map) of the USA and Canada, or all 32 NFL
-  franchises on [theirs](#the-nfl-map) of the USA. Real Madrid annexes territory
+  franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
+  franchises on [theirs](#the-nfl-map) of the USA, or all 30 MLB clubs on
+  [theirs](#the-mlb-map) of the USA and Canada. Real Madrid annexes territory
   exactly the way Spain does. American football is played by clubs only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
@@ -30,7 +32,9 @@ Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
 data, lineup shape, match model and vocabulary (`words`) from `src/sports/`; adding
 American football took one module, its club file, its lineup plan and its squad
-field ([design notes](docs/design/american-football.md)).
+field ([design notes](docs/design/american-football.md)). Baseball added the sport's
+own match clock (half-innings, not minutes) and nations by birthplace
+([design notes](docs/design/baseball.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -85,8 +89,57 @@ npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season f
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page in data-src/bball-2karchive/
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
+npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
+npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
+npm run build:mlb-map    # rebuild MLB's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
+npm run build:icons      # render favicon.ico and apple-touch-icon.png from public/favicon.svg
 ```
+
+## Deployment
+
+The game is live at <https://imperialism-game.vercel.app>. A push to `main` is a
+release.
+
+**Continuous integration.** [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+runs `npm test`, `npm run build` and `npm run smoke` on Node 26 for every push,
+in about eight minutes. GitHub Actions is free for public repositories. On `main`,
+its deploy job then builds the tested commit and deploys it to production with
+the Vercel CLI (pinned at 64.7.0). A newer push cancels the older run, so only
+the newest commit deploys. The deploy job does nothing until the repository has
+the three secrets below. Until then, and until `vercel.json` turns off Vercel's
+own Git deploys of `main`, Vercel deploys every push without waiting for the
+tests.
+
+To make production wait for the tests:
+
+1. Create a Vercel access token from your account's tokens page, scoped as
+   narrowly as Vercel allows and with an expiry.
+2. Find the org and project ids. `npx vercel link` in a checkout writes both to
+   `.vercel/project.json` (ignored by git). The project's id is also in its
+   General settings, and the org id is your account's or team's id.
+3. Add them as repository secrets named `VERCEL_TOKEN`, `VERCEL_ORG_ID` and
+   `VERCEL_PROJECT_ID` (GitHub → Settings → Secrets and variables → Actions).
+4. Set `"git": { "deploymentEnabled": { "main": false } }` in `vercel.json` and
+   push. From that commit on, only a green run deploys `main`. Between steps 3
+   and 4, both deploy each push, which is harmless.
+
+**Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
+immutable for a year. Fonts, flags and club crests are cached for a day and
+revalidated in the background for a week; a stale image is harmless.
+Everything else revalidates on every load: `index.html`, the maps and the
+season and country files keep their names from one release to the next and
+must match the code that reads them.
+
+**Link previews.** `index.html` carries a description, a canonical URL, and
+Open Graph and Twitter tags, so a shared link shows a card. Crawlers need
+absolute URLs, so the canonical URL, `og:url` and `og:image` name
+`imperialism-game.vercel.app`: change them with the address.
+`public/og-image.png` (1200×630) is a Europe campaign after 29 matches,
+captured from the game with its overlays hidden, beside the wordmark.
+`public/favicon.svg` is the draw compass's needle on the clay accent, and
+`npm run build:icons` renders `favicon.ico` (16, 32 and 48 px) and the 180 px
+`apple-touch-icon.png` from it. `public/robots.txt` allows every crawler.
 
 ## How a campaign plays
 
@@ -101,8 +154,9 @@ default suits a first campaign, so pressing Space three times starts one.
    choices are the whole world (173 nations), another confederation, or the
    Elite 32. Football club campaigns offer individual leagues, all leagues, or
    the strongest 32 available clubs; basketball clubs play the NBA on its own
-   map of the USA and Canada, and American football (clubs only: choosing it
-   switches Teams to clubs and disables Nations) the NFL on its map of the USA. The step opens on a map of the chosen theatre:
+   map of the USA and Canada, American football (clubs only: choosing it
+   switches Teams to clubs and disables Nations) the NFL on its map of the USA,
+   and baseball clubs MLB on its map of the USA and Canada. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). It also
    shows the actual number of teams, the number of matches and the estimated
@@ -115,7 +169,8 @@ default suits a first campaign, so pressing Space three times starts one.
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
-   football's lists its built-in 2026 season (Madden NFL 27). A
+   football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
+   built-in 2026 (MLB The Show 26). A
    quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
@@ -201,7 +256,10 @@ rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
-offence/defence, form and shooting variance. American football plays about 11
+offence/defence, form and shooting variance. Nations play FIBA's four ten-minute
+quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
+quarters at their season's league pace and scoring rate, so games score like
+their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
 possessions a side, each ending in a touchdown, a field goal or nothing by its
 offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
@@ -327,8 +385,13 @@ unchanged", with the strength gain. The position lists every natural position,
 so a basketball combo guard reads "PG/SG · 88 rating". A collapsible "Lineup
 before and after" compares the lineups, and **Sign <player>** confirms. If your
 team is knocked out, the same article layout ("ITALY IS OUT") offers
-**Continue as spectator** or **Retry this setup**. Conquests by other teams
-never wait: a notice on the map, the ticker and a brief hatch flash report them.
+**Continue as spectator**, which follows the team that knocked you out (change it
+under Following), or **Try again**: **Same draw** replays the campaign's seed, so
+the opening repeats; **New draw** keeps the team and the rules with a fresh seed;
+**Another team** opens setup on Your role with the same campaign and rules and no
+team chosen. The eliminated campaign stays saved until a new one is launched.
+Conquests by other teams never wait: a notice on the map, the ticker and a brief
+hatch flash report them.
 
 **Ledger** shows the standings (# · Team · Terr · Strength · Conq · Claimed),
 the share of the map and the fallen empires. **Chronicle** shows the match
@@ -373,6 +436,14 @@ and clipboard copy options. Entering new
 campaign setup retains the previous save until a replacement is launched.
 Older version-one saves migrate, but their original random stream was never
 recorded, so exact continuation from that historical stream cannot be recovered.
+
+An error while rendering shows a **crash screen** instead of a blank page
+(`src/components/ErrorBoundary.jsx`, around the App in `main.jsx`). The App's
+autosaves stop with it, so the stored checkpoint is the last good one.
+**Reload** returns to setup and its resume card. **Export campaign** downloads
+that checkpoint exactly as stored, which Import campaign reads. **Report it on
+GitHub** opens a new issue with the error filled in, and **Error details** shows
+the message and the first stack frames.
 
 The Chronicle's history filters by team and opens full match events and
 conquest rewards. **View conquest on map** reveals the gained holdings. Final
@@ -472,7 +543,8 @@ snapshot takes its names from. FM ratings come from Football Manager 26 database
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL), Sports Interactive and SEGA (Football Manager),
-2K (NBA 2K), the NBA, the NFL, or the clubs, leagues and federations it names.
+2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), the NBA, the NFL, MLB,
+or the clubs, leagues and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
 **American football** — `src/data/clubs.american-football.js`, the 32 NFL
@@ -486,6 +558,21 @@ Madden's overalls, unchanged. Positions are specialised, so playing out of
 position costs 25 points in this sport, not 12. There are no national teams: no
 source rates American football players by nation. See the
 [design notes](docs/design/american-football.md).
+
+**Baseball** — `src/data/clubs.baseball.js` and `src/data/rosters.baseball.js`, from
+MLB The Show 26's Live series as of roster update 26 (2 October 2026), read from the
+game's public JSON API (`scripts/data/mlb-the-show-26.json` holds all 2,084 cards). The
+30 MLB clubs come from their 40-man rosters; each fields the lineup the game picks (C,
+1B, 2B, 3B, SS, LF, CF, RF and a designated hitter; the starter and three relievers)
+and keeps the rest of an active roster of 26. Positions are The Show's primary one first,
+then the others it lists; any hitter can be the designated hitter. A position outside a
+player's list costs 20 points, a hitter pitching or a pitcher hitting 40. The **nations**
+are every Live card (free agents included) by **birthplace**: a US state is the United
+States', Curaçao and Aruba are the Kingdom of the Netherlands', as in the World Baseball
+Classic. 23 nations field players, from the United States (88) and the Dominican
+Republic (85) down; a lineup place a nation's own players cannot fill gets a generated
+player, and a nation with no MLB players is a minnow (45). Ratings are The Show's
+overalls, unchanged. See the [design notes](docs/design/baseball.md).
 
 **Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
@@ -517,9 +604,10 @@ Nations with no roster in a sport fall back to *that sport's* baseline, never to
 another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
-An assignment optimizer fills all eleven football, five basketball or 23 American
-football slots. Playing outside a natural position costs 12 rating points (25 in
-American football). A player may have
+An assignment optimizer fills all eleven football, five basketball, 23 American
+football or 13 baseball slots. Playing outside a natural position costs 12 rating
+points (25 in American football, 20 in baseball, where a hitter pitching or a pitcher
+hitting costs 40 and any hitter can be the designated hitter). A player may have
 more than one natural position, and each one is penalty-free: a claimed PG/SG
 can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
@@ -570,7 +658,8 @@ identical national flags would tell you nothing — and wherever a nation shows 
 flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
-NFL franchises are not dealt either: they split [the USA](#the-nfl-map) between them.
+NFL franchises are not dealt either: they split [the USA](#the-nfl-map) between them, and
+MLB clubs [the USA and Canada](#the-mlb-map).
 
 Club lineups come from the same sources as the national squads:
 `clubs.football.js` from the EA FC 27 snapshot filtered to the seven tier-one
@@ -788,6 +877,25 @@ npm run build:nfl-map                      # boundaries + stadiums → public/do
 npm run build:nfl-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
 
+### The MLB map
+
+Baseball clubs have one theatre, **MLB**: the 30 clubs fight over the USA and
+Canada, split into 30 territories grown from their ballparks by the same
+partition, over whole states and provinces. California (five clubs), New York,
+Illinois, Texas, Florida, Ohio, Pennsylvania and Missouri (two each) are split
+between their clubs along county lines; Wrigley Field and Rate Field both stand in
+Cook County, so the map cuts that county between the Cubs (the North Side) and the
+White Sox (the South Side). The Yankees grow from the Bronx and the Mets from
+Queens; Toronto holds Ontario and Seattle British Columbia, and the Prairies, Quebec
+and the North stay empty, as on the NBA's map. The map is `public/domestic/mlb.json`
+(155 KB); ballparks are in `scripts/data/mlb-teams.json`, their coordinates
+Wikidata's.
+
+```bash
+npm run build:mlb-map                      # boundaries + ballparks → public/domestic/mlb.json and its index entry (about 2 minutes)
+npm run build:mlb-map -- --check           # offline rebuild must match the committed files byte for byte
+```
+
 ## Football seasons
 
 Football can be played on nineteen earlier seasons as well as the built-in
@@ -935,7 +1043,7 @@ communicates the same ownership with flat pastel fills. Flags also identify
 national teams in the masthead, match results, standings, squads and the
 victory screen.
 
-Each **geographic region of an empire** shares one SVG `<pattern>`. Neighboring
+Each **geographic region of an empire** shares one banner. Neighboring
 conquered countries and nearby islands sample the same flag continuously:
 Corsica, Sardinia and Sicily do not each restart a miniature Swiss cross when
 Switzerland owns France and Italy. Regions connect through coast-to-coast gaps
@@ -950,6 +1058,14 @@ reveals the flag; seas and neutral countries stay untouched. A solid rectangle
 in the nation's colour is the fallback. Non-participants remain unflagged in
 continental campaigns. A club's land keeps its club colour with its crest placed
 on it, below.
+
+Each banner is drawn once and shown through the outline of each land part, and
+its SVG artwork comes from a bitmap: the first time Flags mode shows a flag, its
+SVG is rasterised in the background at 1024 px on the longer side. Wherever a
+banner is drawn larger than that, it keeps the SVG, so flags stay sharp at any
+zoom. Drawn as SVG `<pattern>` fills, every flag's shapes were re-rendered on
+each repaint, and panning, zooming, hovering and the draw compass lagged in
+Flags mode.
 
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
@@ -1199,14 +1315,18 @@ src/
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
-    basketball.js      starting five, 40 minutes, overtime
+    basketball.js      starting five, 40 minutes (FIBA) or 48 (NBA clubs), overtime
     americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
+    baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings
+    index.js           the registry, and each sport's clock and tie-break copy (clockLabel, overtimeText)
   data/teams.js        173 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
   data/clubs.american-football.js  GENERATED NFL lineups and backups (npm run build-nfl)
+  data/clubs.baseball.js      GENERATED MLB lineups and active rosters (npm run build-mlb)
+  data/rosters.baseball.js    GENERATED baseball nations by birthplace (npm run build-mlb)
   data/sourceTable.js  compact player rows of the generated football files: one
                        JSON line per nation or club, metadata keys and shared
                        values written once (scripts/lib/data-module.mjs writes them)
@@ -1240,7 +1360,8 @@ src/
     footballSets.js    lists, loads and validates earlier seasons of both sports; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
-                       wizard, match card, dialogs and overlays, the ad slot
+                       wizard, match card, dialogs and overlays, crash screen
+                       (ErrorBoundary), the ad slot
 public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
@@ -1252,6 +1373,9 @@ public/
   textures/            former cartographic paper texture (unused since v4)
   flags/               173 vendored flag SVGs
   club-logos/          club crests from Wikipedia, with SOURCES.tsv
+  favicon.svg          site icon (npm run build:icons renders favicon.ico and apple-touch-icon.png)
+  og-image.png         1200×630 link-preview card
+  robots.txt           allows every crawler
 scripts/
   test.mjs             runs every scripts/*.test.mjs (npm test)
   lib/app-harness.mjs  shared App/component harness for the jsdom tests
@@ -1264,13 +1388,18 @@ scripts/
   build-clubs.mjs      builds the club layer for both sports
   sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
-  build-club-maps.mjs  builds the NBA's maps of the USA and Canada (today's and each era's) and the NFL's of the USA
+  build-club-maps.mjs  builds the NBA's maps of the USA and Canada (today's and each era's), the NFL's of the USA and MLB's of the USA and Canada
   sync-madden.mjs      snapshots Madden NFL ratings from EA's ratings site
   build-nfl.mjs        builds the NFL clubs from that snapshot
+  sync-mlb-the-show.mjs  snapshots MLB The Show's Live cards from its public API
+  build-mlb.mjs        builds the MLB clubs and the baseball nations from that snapshot
   build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
+  build-icons.mjs      renders the site icons from public/favicon.svg
+.github/workflows/ci.yml  tests, build and smoke on every push; deploys main once the Vercel secrets exist
+vercel.json            cache headers for the deployed site
 ```
 
 ### Tuning
@@ -1287,18 +1416,19 @@ scripts/
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **eleven full
-campaigns** across all three pacings, both resolution modes, all three sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **thirteen full
+campaigns** across all three pacings, both resolution modes, all four sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
-sections, and one the NFL's 32 franchises on theirs, with the live ticker. A **manager campaign** (Italy, Europe, round robin × *You
+sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
+clubs on theirs, also live, and one baseball's nations of North and Central America. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after
 elimination. It also checks that every one-by-one turn draws exactly three
 campaign samples and that no clock timer runs while a decision is pending.
-**Seven interrupt-and-resume scenarios** cover a world-scale national campaign
-plus basketball nations, football clubs, NBA clubs, NFL clubs and England and Fiji
+**Eight interrupt-and-resume scenarios** cover a world-scale national campaign
+plus basketball nations, football clubs, NBA clubs, NFL clubs, MLB clubs and England and Fiji
 domestic campaigns, which are played on to their champions after the reload.
 They verify that settings, ownership, squads, acquired players, and the remaining
 match queue survive a reload and that the campaign remains playable. The app's
@@ -1340,6 +1470,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `win-probability` | The live win-probability model against the football and basketball match models |
 | `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
+| `error-boundary` | The crash screen: a render error shows it with focus on its heading, Export campaign downloads the stored checkpoint unchanged, and the report link carries the error |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |

@@ -34,6 +34,9 @@ const { SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignP
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost' });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
+// appearance.js reads the saved theme from a bare `localStorage`. Without --localstorage-file, Node 26's own global
+// answers that with an ExperimentalWarning, which the console guard below would count against the test.
+Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: dom.window.localStorage });
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createRoot } = await import('react-dom/client');
 after(() => dom.window.close());
@@ -235,6 +238,21 @@ test('rail, Next and Back move between the three mounted steps and focus the ste
   assert.deepEqual(view.visibleStep(), ['3']);
   assert.equal(document.activeElement, view.q('#setup-role-title'));
   assert.equal(view.qa('.setup-rail__step[aria-current="step"]').length, 1);
+  assert.deepEqual(view.errors, []);
+});
+
+test('initialStep opens the wizard on Your role ("Another team" after a defeat), with Back to the rules', async t => {
+  const view = await mount(t, { setup: { role: 'manager', managedTeamId: '' }, initialStep: 3 });
+  assert.deepEqual(view.visibleStep(), ['3']);
+  assert.deepEqual(view.qa('.setup-rail__step').map(step => step.dataset.state), ['done', 'done', 'current']);
+  assert.equal(document.activeElement, view.q('#setup-role-title'), 'focus starts on the step it opened on');
+  assert.equal(view.button('Launch campaign').disabled, true, 'no team chosen yet');
+  await view.click(view.button('Back', view.section(3)));
+  assert.deepEqual(view.visibleStep(), ['2']);
+  for (const initialStep of [0, 9, 'x']) {
+    const odd = await mount(t, { initialStep });
+    assert.equal(odd.visibleStep().length, 1, `initialStep ${initialStep} still shows one step`);
+  }
   assert.deepEqual(view.errors, []);
 });
 

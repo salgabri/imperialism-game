@@ -3,9 +3,20 @@ import { ROSTERS } from '../data/rosters.basketball.js';
 import { CLUBS } from '../data/clubs.basketball.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 import { HOME_NATIONS, selectLineup } from '../data/teams.js';
+import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../data/nbaLeagueAverages.js';
 
-const MINUTES = 40; // FIBA: four ten-minute quarters
-const QUARTER = 10;
+// Two rulebooks, one model. Nations play FIBA's four ten-minute quarters at about 73 possessions a game. Clubs are
+// NBA franchises and play the NBA's four twelve-minute quarters at their season's league pace and scoring rate:
+// 90 possessions and 103 points per 100 in 2003/04, 99 and 116 in 2025/26. `paceRange` bounds a game's sampled
+// possessions and `scoring` scales the ratings' points per possession. Both play five-minute overtimes.
+const FIBA = Object.freeze({ minutes: 40, quarter: 10, pace: 73, paceRange: [55, 94], scoring: 1 });
+// 2K rates players against their own era, so ratings alone give an NBA starting five about 1.14 points a possession
+// in any season. Scaling that by the season's league rate (points per 100) over 113 brings its games to the
+// league's points a game, overtime included.
+const NBA_RATE = 113;
+const nbaRules = ({ pace, rating }) => Object.freeze({ minutes: 48, quarter: 12, pace, paceRange: [pace - 18, pace + 21],
+  scoring: rating / NBA_RATE });
+const PACE_SD = 4.5;
 const OVERTIME = 5;
 const MAX_OVERTIMES = 4;
 const BASE_EFFICIENCY = 1.11;
@@ -19,8 +30,8 @@ function weightedRating(lineup, weights) {
   return lineup.slots.reduce((sum, slot) => sum + slot.effectiveRating * weights[slot.position], 0);
 }
 
-/** Prepare a matchup once, including position assignments, for cheap resampling. */
-export function prepareMatch(attacker, defender, effA, effD) {
+/** Prepare a matchup once, including position assignments, for cheap resampling. FIBA rules unless told otherwise. */
+export function prepareMatch(attacker, defender, effA, effD, rules = FIBA) {
   const lineupA = selectLineup(attacker);
   const lineupD = selectLineup(defender);
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
@@ -34,11 +45,12 @@ export function prepareMatch(attacker, defender, effA, effD) {
     defenderId: defender.id,
     lineupA,
     lineupD,
-    // Equal 74-rated fives average approximately 81 points in regulation.
+    rules,
+    // Equal 74-rated fives average approximately 81 points in a FIBA regulation, 113 in a 2025/26 NBA one.
     // Quality changes points per possession, not the number of possessions.
-    pace: 73,
-    efficiencyA: clamp(BASE_EFFICIENCY + (offenceA - 74) * 0.010 - (defenceD - 74) * 0.0065, 0.54, 1.67),
-    efficiencyD: clamp(BASE_EFFICIENCY + (offenceD - 74) * 0.010 - (defenceA - 74) * 0.0065, 0.54, 1.67),
+    pace: rules.pace,
+    efficiencyA: clamp(BASE_EFFICIENCY + (offenceA - 74) * 0.010 - (defenceD - 74) * 0.0065, 0.54, 1.67) * rules.scoring,
+    efficiencyD: clamp(BASE_EFFICIENCY + (offenceD - 74) * 0.010 - (defenceA - 74) * 0.0065, 0.54, 1.67) * rules.scoring,
   };
 }
 
@@ -53,7 +65,8 @@ function scorePeriod(rng, possessions, efficiency) {
 /** Lightweight outcome draw; no scorers, events or repeated lineup selection. */
 export function sampleResult(rng, prepared, drama = 6) {
   const variation = Number.isFinite(drama) ? clamp(drama, 0, 12) : 6;
-  const possessions = clamp(prepared.pace + gauss(rng) * 4.5, 55, 94);
+  const { rules } = prepared;
+  const possessions = clamp(prepared.pace + gauss(rng) * PACE_SD, ...rules.paceRange);
   const conditions = gauss(rng) * 0.018;
   // Matchday form persists through overtime. Each side gets its own draw; the
   // uncertainty setting changes this component rather than removing shot luck.
@@ -68,7 +81,7 @@ export function sampleResult(rng, prepared, drama = 6) {
   if (ga === gd) {
     const periods = [];
     for (let period = 0; period < MAX_OVERTIMES && ga === gd; period++) {
-      const overtimePossessions = clamp(possessions * OVERTIME / MINUTES + gauss(rng) * 0.7, 5, 14);
+      const overtimePossessions = clamp(possessions * OVERTIME / rules.minutes + gauss(rng) * 0.7, 5, 14);
       let a = scorePeriod(rng, overtimePossessions, efficiencyA);
       let d = scorePeriod(rng, overtimePossessions, efficiencyD);
       if (period === MAX_OVERTIMES - 1 && a === d) {
@@ -112,11 +125,49 @@ function toRuns(rng, total) {
   return runs;
 }
 
+/** A complete match from a prepared matchup: the score-only outcome, then each side's points as timed runs. */
+function playMatch(rng, prepared, attacker, defender, drama) {
+  const { minutes } = prepared.rules;
+  const { ga, gd, regA, regD, tie, winner } = sampleResult(rng, prepared, drama);
+  const scorerA = createScorerSampler(prepared.lineupA, SCORER_WEIGHTS, 45);
+  const scorerD = createScorerSampler(prepared.lineupD, SCORER_WEIGHTS, 45);
+  const ev = [];
+  const push = (teamId, total, scorer, offset, span) => {
+    const runs = toRuns(rng, total);
+    runs.forEach((pts, i) => {
+      ev.push({
+        m: offset + Math.min(span, Math.max(1, Math.round(((i + 1) / (runs.length + 1)) * span + gauss(rng)))),
+        tid: teamId,
+        name: scorer(rng),
+        pts,
+      });
+    });
+  };
+  push(attacker.id, regA, scorerA, 0, minutes);
+  push(defender.id, regD, scorerD, 0, minutes);
+  if (tie) {
+    tie.periods.forEach(([a, d], i) => {
+      const offset = minutes + i * OVERTIME;
+      push(attacker.id, a, scorerA, offset, OVERTIME);
+      push(defender.id, d, scorerD, offset, OVERTIME);
+    });
+  }
+  ev.sort((x, y) => x.m - y.m);
+
+  return { ga, gd, ev, tie, winner };
+}
+
+/** Ticker lines under `rules`: the quarter a run ends in (OT after regulation) and its points. */
+const eventFormat = rules => (e, code) => ({
+  when: e.m > rules.minutes ? 'OT' : `Q${Math.min(4, Math.ceil(e.m / rules.quarter))}`,
+  text: `+${e.pts} — ${e.name} (${code})`,
+});
+
 export const basketball = {
   id: 'basketball',
   simulationVersion: 2,
   name: 'Basketball',
-  blurb: 'Starting fives, forty minutes. Scores in the eighties — level games go to overtime.',
+  blurb: 'Starting fives: forty minutes between nations, forty-eight in the NBA. Level games go to overtime.',
   rosters: ROSTERS,
   clubs: CLUBS,
   // Great Britain is one FIBA team: the home nations' shapes start in the United Kingdom's (826) empire.
@@ -132,7 +183,7 @@ export const basketball = {
   fallbackStrength: (rec, confMeta) => Math.max(40, confMeta[rec[2]].baseStr - 8),
   requiredPositions: [],
 
-  clock: { length: MINUTES, msPerUnit: 95 },
+  clock: { length: FIBA.minutes, msPerUnit: 95 },
   tieBreak: 'overtime',
   labels: {
     score: 'POINTS',
@@ -147,46 +198,46 @@ export const basketball = {
   words: { kickoff: 'Tip-off', end: 'Final', lineup: 'Starting five', lineupShort: 'Five', lineupNoun: 'starting five',
     lineupTitle: 'Starting five' },
 
-  formatEvent: (e, code) => ({
-    when: e.m > MINUTES ? 'OT' : `Q${Math.min(4, Math.ceil(e.m / QUARTER))}`,
-    text: `+${e.pts} — ${e.name} (${code})`,
-  }),
+  formatEvent: eventFormat(FIBA),
   formatToast: e => `+${e.pts} ${e.name.toUpperCase()}`,
 
   prepareMatch,
   sampleResult,
 
   simulate(rng, attacker, defender, drama, effA, effD) {
-    const prepared = prepareMatch(attacker, defender, effA, effD);
-    const { ga, gd, regA, regD, tie, winner } = sampleResult(rng, prepared, drama);
-    const scorerA = createScorerSampler(prepared.lineupA, SCORER_WEIGHTS, 45);
-    const scorerD = createScorerSampler(prepared.lineupD, SCORER_WEIGHTS, 45);
-    const ev = [];
-    const push = (teamId, total, scorer, offset, span) => {
-      const runs = toRuns(rng, total);
-      runs.forEach((pts, i) => {
-        ev.push({
-          m: offset + Math.min(span, Math.max(1, Math.round(((i + 1) / (runs.length + 1)) * span + gauss(rng)))),
-          tid: teamId,
-          name: scorer(rng),
-          pts,
-        });
-      });
-    };
-    push(attacker.id, regA, scorerA, 0, MINUTES);
-    push(defender.id, regD, scorerD, 0, MINUTES);
-    if (tie) {
-      tie.periods.forEach(([a, d], i) => {
-        const offset = MINUTES + i * OVERTIME;
-        push(attacker.id, a, scorerA, offset, OVERTIME);
-        push(defender.id, d, scorerD, offset, OVERTIME);
-      });
-    }
-    ev.sort((x, y) => x.m - y.m);
-
-    return { ga, gd, ev, tie, winner };
+    return playMatch(rng, prepareMatch(attacker, defender, effA, effD), attacker, defender, drama);
   },
 };
+
+const nbaSeasons = new Map();
+
+/**
+ * Basketball between NBA franchises in `season` ('2003/04'): the same model under NBA rules, at that season's pace
+ * and scoring rate. A season without league averages, such as the built-in 2026/27, plays the latest full season's.
+ * Club campaigns play it (`matchSport` in src/sports/index.js), nations `basketball`. The clock runs faster, so a
+ * match lasts about as long on screen. Version 4: version 3 played every season at one pace.
+ */
+export function nbaBasketballIn(season) {
+  const key = Object.hasOwn(NBA_LEAGUE_AVERAGES, season) ? season : LATEST_NBA_SEASON;
+  if (!nbaSeasons.has(key)) {
+    const rules = nbaRules(NBA_LEAGUE_AVERAGES[key]);
+    nbaSeasons.set(key, {
+      ...basketball,
+      simulationVersion: 4,
+      clock: { length: rules.minutes, msPerUnit: 79 },
+      formatEvent: eventFormat(rules),
+      prepareMatch: (attacker, defender, effA, effD) => prepareMatch(attacker, defender, effA, effD, rules),
+
+      simulate(rng, attacker, defender, drama, effA, effD) {
+        return playMatch(rng, prepareMatch(attacker, defender, effA, effD, rules), attacker, defender, drama);
+      },
+    });
+  }
+  return nbaSeasons.get(key);
+}
+
+/** Basketball between NBA franchises in the built-in season. */
+export const nbaBasketball = nbaBasketballIn();
 
 /**
  * Squad-screen strength profile (PLAN §3.7, engine-diff §4c): the offence and defence ratings `prepareMatch`

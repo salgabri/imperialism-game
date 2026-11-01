@@ -234,13 +234,14 @@ function theatreCaption(model, preview) {
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
  * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
  * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
+ * `initialStep` (1–3) is the step it opens on: Your role (3) for "Another team" after a defeat.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
-  domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON,
+  domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON, initialStep = 1,
 }) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(() => Math.min(3, Math.max(1, Math.round(Number(initialStep)) || 1)));
   const [confirmation, setConfirmation] = useState(null);
   const headings = useRef({});
   const nationList = useRef(null);
@@ -307,12 +308,13 @@ export default function SetupOverlay({
 
   useEffect(() => { startRef.current = onStart; });
 
-  // On mount, move focus into the wizard (it covers the whole app) unless a modal dialog already holds it. A chosen
-  // country can sit far down the long theatre list: centre it there.
+  // On mount, move focus into the wizard (it covers the whole app) to the step it opened on, unless a modal dialog
+  // already holds it. A chosen country can sit far down the long theatre list: centre it there.
   useEffect(() => {
     if (countries) centreChecked(theatreList.current);
+    if (step === 3) centreChecked(nationList.current);
     if (typeof document === 'undefined' || document.querySelector('[aria-modal="true"]')) return;
-    focusQuietly(headings.current[1]);
+    focusQuietly(headings.current[step]);
   }, []);
 
   // After a step change, move focus to that step's heading (the scroll body is per step, so it starts at the top).
