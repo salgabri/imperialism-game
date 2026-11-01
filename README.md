@@ -124,32 +124,27 @@ updates. The page looks for a new version every hour and when you return to it.
 
 ## Deployment
 
-The game is live at <https://imperialism-game.vercel.app>. Vercel builds and
-deploys `main` on every push, so a push to `main` is a release.
+The game is live at <https://imperialism-game.vercel.app>. Vercel builds every
+push to `main`, and the build goes live once its tests pass.
 
-**Continuous integration and deploys.**
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `npm test`,
-`npm run build` and `npm run smoke` on Node 26 for every push, in about eight
-minutes. GitHub Actions is free for public repositories. On `main`, its deploy
-job then builds the tested commit with the Vercel CLI (pinned at 64.7.0) and
-deploys it to production. A newer push cancels the older run, so only the
-newest commit deploys. The job links the Vercel project by name
-(`imperialism-game` in the `wappen-der-schweiz` scope; its deployments' addresses
-show both), so its one secret is a Vercel access token, `VERCEL_TOKEN`. It runs
-in the **Production** environment. The token can be an environment secret there
-(GitHub → Settings → Environments → Production), the tighter choice because no
-other job can read it, or a repository secret (Settings → Secrets and variables
-→ Actions → Secrets). A Variable does not work. Without the token, the job leaves
-the notice "Not deploying" and skips its Vercel steps.
+**Continuous integration.** [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+runs `npm test`, `npm run build` and `npm run smoke` on Node 26 for every push,
+in about eight minutes, as the job **Tests, build and smoke**. GitHub Actions is
+free for public repositories. A newer push cancels the older run, and the Actions
+tab's **Run workflow** button runs it without a push.
 
-To make production wait for the tests, Vercel's own Git deploys of `main` have
-to be turned off with `"git": { "deploymentEnabled": { "main": false } }` in
-`vercel.json`. Turn them off only after a run's deploy job has actually run its
-`vercel deploy` step and succeeded. Until then, both deploy each push, which is
-harmless. On 1 November 2026 the switch went in while the job still could not
-see its secrets: production stopped updating until it was reverted. When the
-token expires, create a new one from your Vercel account's tokens page and
-replace the `VERCEL_TOKEN` secret.
+**Deploys wait for the tests.** Vercel's [Deployment Checks](https://vercel.com/docs/deployment-checks)
+(project Settings → Build and Deployment → Deployment Checks) require the GitHub
+check **Tests, build and smoke**. Vercel still builds each push to `main` itself,
+but holds the build back from the production domain until that check passes. A
+failed or cancelled run leaves the last good deployment live. **Force Promote** on
+a deployment's page skips the wait. The check is matched by the job's name, so
+renaming the job means updating the check. Vercel's native **Lint** and
+**TypeCheck** checks are listed there too. They are skipped because `package.json`
+has no `lint` or `typecheck` script; adding either script would turn them into
+real gates. This needs no tokens or secrets. A first attempt that deployed from
+CI with the Vercel CLI was dropped on 1 November 2026, because the CLI rejected
+the Hobby account's access tokens ("User not found. (404)").
 
 **Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
 immutable for a year. Fonts, flags and club crests are cached for a day and
@@ -1562,7 +1557,7 @@ scripts/
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
   build-icons.mjs      renders the site icons from public/favicon.svg
-.github/workflows/ci.yml  tests, build and smoke on every push; deploys main once the Vercel secrets exist
+.github/workflows/ci.yml  tests, build and smoke on every push; Vercel waits for it before going live
 vercel.json            cache headers for the deployed site
 ```
 

@@ -1,7 +1,7 @@
 node_modules
 dist
 .snap
-# Written by `vercel link` and the deploy job's `vercel pull`
+# Written by `vercel link`
 .vercel
 
 # Local Vite env files, such as the AdSense ids (README "Advertising")
