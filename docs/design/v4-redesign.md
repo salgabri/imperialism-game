@@ -154,6 +154,11 @@ gold-trimmed "war room" look.
   ManagerElimination in the same article layout ("ITALY IS OUT", Continue as
   spectator / Retry this setup). Spectator and AI conquests do not wait: a
   notice, the ticker and a hatch flash report them.
+  *(Amended 2026-11-01: Continue as spectator follows the team that knocked you
+  out; Retry this setup became a Try again group of Same draw (`retryManager()`,
+  the old behaviour), New draw (`retryManager({ newDraw: true })`, a fresh seed)
+  and Another team (`chooseAnotherTeam()`, setup opened on Your role through
+  `openSetup({ step: 3 })` and SetupOverlay's `initialStep`).)*
 - **D16 — Ledger and Chronicle.** Ledger shows the full-screen standings
   (`.fi-standings`, columns #, Team, Terr, Strength first) and the fallen list.
   Chronicle shows the history, the archived match card and the activity feed

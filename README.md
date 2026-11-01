@@ -123,16 +123,27 @@ updates. The page looks for a new version every hour and when you return to it.
 
 ## Deployment
 
-The game is live at <https://imperialism-game.vercel.app>. Vercel builds and
-deploys `main` on every push, so a push to `main` is a release.
+The game is live at <https://imperialism-game.vercel.app>. A push to `main` is a
+release once its tests pass.
 
-**Continuous integration.** [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
-runs `npm test`, `npm run build` and `npm run smoke` on Node 26 for every push.
-GitHub Actions is free for public repositories. The check reports failures; it
-does not hold back Vercel's deploy yet. To make production wait for it, add a
-Vercel token and the project's org and project ids as repository secrets, deploy
-from the workflow with the Vercel CLI once the tests pass, and turn off Vercel's
-own deploys of `main` (`git.deploymentEnabled` in `vercel.json`).
+**Continuous integration and deploys.**
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `npm test`,
+`npm run build` and `npm run smoke` on Node 26 for every push, in about eight
+minutes. GitHub Actions is free for public repositories. On `main`, its deploy
+job then builds the tested commit with the Vercel CLI (pinned at 64.7.0) and
+deploys it to production. `vercel.json` turns off Vercel's own Git deploys of
+`main` (`git.deploymentEnabled`), so a commit reaches production only after its
+run passes, about ten minutes after the push. A newer push cancels the older
+run, so only the newest commit deploys. A failed run deploys nothing, and the
+site keeps serving the last good deployment.
+
+The deploy job reads three repository secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`
+and `VERCEL_PROJECT_ID` (GitHub → Settings → Secrets and variables → Actions).
+Without them, it leaves a notice and skips. When the token expires, create a new
+one from your Vercel account's tokens page and replace the `VERCEL_TOKEN`
+secret. `npx vercel link` in a checkout writes the org and project ids to
+`.vercel/project.json`, which git ignores. To hand deploys back to Vercel, delete
+the `git` block from `vercel.json`.
 
 **Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
 immutable for a year. Fonts, flags and club crests are cached for a day and
@@ -272,8 +283,8 @@ opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
 offence/defence, form and shooting variance. Nations play FIBA's four ten-minute
 quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
-quarters at about 100, so club games score about 115 a side, near the league's
-own, rather than in the eighties. American football plays about 11
+quarters at their season's league pace and scoring rate, so games score like
+their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
 possessions a side, each ending in a touchdown, a field goal or nothing by its
 offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
@@ -399,8 +410,13 @@ unchanged", with the strength gain. The position lists every natural position,
 so a basketball combo guard reads "PG/SG · 88 rating". A collapsible "Lineup
 before and after" compares the lineups, and **Sign <player>** confirms. If your
 team is knocked out, the same article layout ("ITALY IS OUT") offers
-**Continue as spectator** or **Retry this setup**. Conquests by other teams
-never wait: a notice on the map, the ticker and a brief hatch flash report them.
+**Continue as spectator**, which follows the team that knocked you out (change it
+under Following), or **Try again**: **Same draw** replays the campaign's seed, so
+the opening repeats; **New draw** keeps the team and the rules with a fresh seed;
+**Another team** opens setup on Your role with the same campaign and rules and no
+team chosen. The eliminated campaign stays saved until a new one is launched.
+Conquests by other teams never wait: a notice on the map, the ticker and a brief
+hatch flash report them.
 
 **Ledger** shows the standings (# · Team · Terr · Strength · Conq · Claimed),
 the share of the map and the fallen empires. **Chronicle** shows the match
@@ -1362,8 +1378,8 @@ scripts/
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
   build-icons.mjs      renders the site icons from public/favicon.svg
-.github/workflows/ci.yml  tests, build and smoke on every push
-vercel.json            cache headers for the deployed site
+.github/workflows/ci.yml  tests, build and smoke on every push; deploys main once the Vercel secrets exist
+vercel.json            cache headers; turns off Vercel's own Git deploys of main (CI deploys it)
 ```
 
 ### Tuning

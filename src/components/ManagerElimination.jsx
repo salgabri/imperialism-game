@@ -1,12 +1,13 @@
 // Owner: WP-CONQ (see PLAN.md §4). The manager's defeat, restyled with the conquest article pattern (DEC D15):
-// "ITALY IS OUT" headline, winner-first standfirst, stats, Continue as spectator / Retry this setup.
+// "ITALY IS OUT" headline, winner-first standfirst, stats, Continue as spectator, then Try again: Same draw (onRetry),
+// New draw (onNewDraw) and Another team (onAnotherTeam), each shown when its handler is passed.
 // FROZEN props { result, onSpectate, onRetry } + optional `model` (buildElimination). Stays a modal dialog with a
 // focus trap (primaryAction is null while it is open) and restores focus on close.
 import React, { useEffect, useRef } from 'react';
 import { eliminationFromResult } from '../viewModels/conquest.js';
 import './manager.css';
 
-export default function ManagerElimination({ result, model = null, onSpectate, onRetry }) {
+export default function ManagerElimination({ result, model = null, onSpectate, onRetry, onNewDraw, onAnotherTeam }) {
   const ref = useRef(null);
   useEffect(() => {
     const previous = document.activeElement;
@@ -46,7 +47,12 @@ export default function ManagerElimination({ result, model = null, onSpectate, o
         {note && <p className={`manager-note${noteTone === 'unsaved' ? ' manager-note--unsaved' : ''}`}>{note}</p>}
         <div className="manager-ending-actions">
           <button type="button" className="btn-primary manager-ending__primary" onClick={onSpectate}>Continue as spectator</button>
-          <button type="button" className="btn-secondary manager-ending__secondary" onClick={onRetry}>Retry this setup</button>
+          <div className="manager-retry" role="group" aria-labelledby="manager-retry-label">
+            <span id="manager-retry-label" className="manager-retry__label">Try again</span>
+            <button type="button" className="btn-secondary manager-ending__secondary" onClick={onRetry}>Same draw</button>
+            {onNewDraw && <button type="button" className="btn-secondary manager-ending__secondary" onClick={onNewDraw}>New draw</button>}
+            {onAnotherTeam && <button type="button" className="btn-secondary manager-ending__secondary" onClick={onAnotherTeam}>Another team</button>}
+          </div>
         </div>
       </section>
     </div>
