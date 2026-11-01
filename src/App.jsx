@@ -1898,7 +1898,7 @@ export default class App extends React.Component {
       onSetting: (key, value) => this.setSetting(key, value), managementEnded: st.managementEnded,
       managedName: st.teams?.[st.managedTeamId]?.name || null,
       onManageSaves: () => this.openStorageDialog('slots') };
-    const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore}
+    const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore} clockSport={sport.id}
       eventsRef={this.eventsRef} onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} /> : null;
     return (
       <div className={`app-shell${playing ? ' has-campaign' : ''}`} data-view={view} data-role={ctx.managedId ? 'manager' : 'spectator'}>
@@ -1965,7 +1965,7 @@ export default class App extends React.Component {
             onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} />}
           {playing && view === 'map' && <Ticker {...this.tickerModel()} />}
         </main>
-        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} onPrimary={() => this.runPrimary()} />}
+        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} clockSport={sport.id} onPrimary={() => this.runPrimary()} />}
         {playing && <PhoneTabBar active={this.navView(view)} hidden={view === 'conquest'} locked={!!st.choice || !!st.pendingTarget}
           moreOpen={st.phoneMore} onView={v => this.setView(v)} onMore={() => this.togglePhoneMore()} />}
         {playing && st.phoneMore && <PhoneMoreSheet onClose={() => this.togglePhoneMore()} locked={!!st.choice || !!st.pendingTarget}

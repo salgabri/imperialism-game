@@ -3,7 +3,7 @@
 // window/document/timers/RNG, and every builder tolerates missing geometry, odds, sport or history.
 import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { roman, signedDelta, territoryWord } from './format.js';
-import { getSport } from '../sports/index.js';
+import { getSport, overtimeText } from '../sports/index.js';
 
 function territoryName(ctx, cid) {
   // A country map's sections first (ctx.sectionNames); the geometry fallback below is an O(n) find.
@@ -66,7 +66,7 @@ const isFiniteScore = value => value !== null && value !== '' && Number.isFinite
 
 /**
  * Winner-first result score with sport-aware tie-break text (DEC D15):
- * '2–1' · '1–1, 4–3 on penalties' (shoot-out kicks, winner first) · '98–95 after 1 overtime period'.
+ * '2–1' · '1–1, 4–3 on penalties' (shoot-out kicks, winner first) · '98–95 after 1 overtime period' · '5–4 after 11 innings'.
  * `m` is a live/finished match ({ aId, dId, finalGa|ga, finalGd|gd, tie }); '' when the score is unknown.
  */
 export function winnerScore(m, winnerId, sport) {
@@ -79,8 +79,7 @@ export function winnerScore(m, winnerId, sport) {
   if (tie) {
     const tieBreak = sport?.tieBreak || (Array.isArray(tie.periods) ? 'overtime' : 'shootout');
     if (tieBreak === 'overtime') {
-      const periods = Array.isArray(tie.periods) && tie.periods.length ? tie.periods.length : 1;
-      text += ` after ${periods} overtime period${periods === 1 ? '' : 's'}`;
+      text += ` ${overtimeText(sport, Array.isArray(tie.periods) && tie.periods.length ? tie.periods.length : 1)}`;
     } else if (isFiniteScore(tie.ga) && isFiniteScore(tie.gd)) {
       text += `, ${winnerIsA ? tie.ga : tie.gd}–${winnerIsA ? tie.gd : tie.ga} on penalties`;
     } else {

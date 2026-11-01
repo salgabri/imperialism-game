@@ -16,6 +16,10 @@ const SUPPORT = {
   basketball: { PG: [.75, .25], SG: [1, 0], SF: [1, .4], PF: [0, 1], C: [0, 1] },
   'american-football': { QB: [1, 0], RB: [1, 0], WR: [1, 0], TE: [.8, .2], OL: [.65, .35], DL: [0, 1], LB: [0, 1], CB: [0, 1],
     S: [0, 1], K: [.3, .3] },
+  // Hitters help a lineup score (the corners and the designated hitter most), up the middle they also field; the
+  // pitchers keep runs off the board.
+  baseball: { C: [.6, .6], '1B': [1, .3], '2B': [.8, .5], '3B': [.9, .4], SS: [.7, .6], LF: [1, .3], CF: [.8, .5], RF: [1, .3],
+    DH: [1, 0], SP: [0, 1], RP: [0, 1] },
 };
 
 export function tacticalProfile(team) {

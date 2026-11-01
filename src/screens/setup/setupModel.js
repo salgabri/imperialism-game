@@ -310,6 +310,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
     + 'of the United States.',
+  baseball: 'MLB The Show 26 ratings, as of the roster update of 2 October 2026. Clubs play on their own map of the United '
+    + 'States and Canada; nations field the players born there.',
 });
 
 /**

@@ -13,14 +13,16 @@ Pick your sport at kick-off:
 | Football | XI in a 4-4-2 | 90 minutes | penalty shootout |
 | Basketball | starting five | 40 minutes | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
+| Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
 
 And pick who fights:
 
 - **Nations** — 173 national teams, each starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
 - **Clubs** — 132 football clubs from seven European leagues, all 30 NBA
-  franchises on [their own map](#the-nba-map) of the USA and Canada, or all 32 NFL
-  franchises on [theirs](#the-nfl-map) of the USA. Real Madrid annexes territory
+  franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
+  franchises on [theirs](#the-nfl-map) of the USA, or all 30 MLB clubs on
+  [theirs](#the-mlb-map) of the USA and Canada. Real Madrid annexes territory
   exactly the way Spain does. American football is played by clubs only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
@@ -30,7 +32,9 @@ Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
 data, lineup shape, match model and vocabulary (`words`) from `src/sports/`; adding
 American football took one module, its club file, its lineup plan and its squad
-field ([design notes](docs/design/american-football.md)).
+field ([design notes](docs/design/american-football.md)). Baseball added the sport's
+own match clock (half-innings, not minutes) and nations by birthplace
+([design notes](docs/design/baseball.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -84,6 +88,9 @@ npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season f
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page in data-src/bball-2karchive/
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
+npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
+npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
+npm run build:mlb-map    # rebuild MLB's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 ```
 
@@ -100,8 +107,9 @@ default suits a first campaign, so pressing Space three times starts one.
    choices are the whole world (173 nations), another confederation, or the
    Elite 32. Football club campaigns offer individual leagues, all leagues, or
    the strongest 32 available clubs; basketball clubs play the NBA on its own
-   map of the USA and Canada, and American football (clubs only: choosing it
-   switches Teams to clubs and disables Nations) the NFL on its map of the USA. The step opens on a map of the chosen theatre:
+   map of the USA and Canada, American football (clubs only: choosing it
+   switches Teams to clubs and disables Nations) the NFL on its map of the USA,
+   and baseball clubs MLB on its map of the USA and Canada. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). It also
    shows the actual number of teams, the number of matches and the estimated
@@ -114,7 +122,8 @@ default suits a first campaign, so pressing Space three times starts one.
    Basketball's lists the built-in 2024/25, then its
    [earlier seasons](#basketball-seasons) 2023/24 back to 1999/00 (NBA 2K
    ratings of each), which play NBA clubs on the map of their era. American
-   football's lists its built-in 2026 season (Madden NFL 27). A
+   football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
+   built-in 2026 (MLB The Show 26). A
    quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
@@ -436,7 +445,8 @@ ratings come from Football Manager 26 database 26.3.0 as displayed by EFEM.club.
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL), Sports Interactive and SEGA (Football Manager),
-2K (NBA 2K), the NBA, the NFL, or the clubs, leagues and federations it names.
+2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), the NBA, the NFL, MLB,
+or the clubs, leagues and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
 **American football** — `src/data/clubs.american-football.js`, the 32 NFL
@@ -450,6 +460,21 @@ Madden's overalls, unchanged. Positions are specialised, so playing out of
 position costs 25 points in this sport, not 12. There are no national teams: no
 source rates American football players by nation. See the
 [design notes](docs/design/american-football.md).
+
+**Baseball** — `src/data/clubs.baseball.js` and `src/data/rosters.baseball.js`, from
+MLB The Show 26's Live series as of roster update 26 (2 October 2026), read from the
+game's public JSON API (`scripts/data/mlb-the-show-26.json` holds all 2,084 cards). The
+30 MLB clubs come from their 40-man rosters; each fields the lineup the game picks (C,
+1B, 2B, 3B, SS, LF, CF, RF and a designated hitter; the starter and three relievers)
+and keeps the rest of an active roster of 26. Positions are The Show's primary one first,
+then the others it lists; any hitter can be the designated hitter. A position outside a
+player's list costs 20 points, a hitter pitching or a pitcher hitting 40. The **nations**
+are every Live card (free agents included) by **birthplace**: a US state is the United
+States', Curaçao and Aruba are the Kingdom of the Netherlands', as in the World Baseball
+Classic. 23 nations field players, from the United States (88) and the Dominican
+Republic (85) down; a lineup place a nation's own players cannot fill gets a generated
+player, and a nation with no MLB players is a minnow (45). Ratings are The Show's
+overalls, unchanged. See the [design notes](docs/design/baseball.md).
 
 **Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
@@ -478,9 +503,10 @@ Nations with no roster in a sport fall back to *that sport's* baseline, never to
 another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
-An assignment optimizer fills all eleven football, five basketball or 23 American
-football slots. Playing outside a natural position costs 12 rating points (25 in
-American football). A player may have
+An assignment optimizer fills all eleven football, five basketball, 23 American
+football or 13 baseball slots. Playing outside a natural position costs 12 rating
+points (25 in American football, 20 in baseball, where a hitter pitching or a pitcher
+hitting costs 40 and any hitter can be the designated hitter). A player may have
 more than one natural position, and each one is penalty-free: a claimed PG/SG
 can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
@@ -531,7 +557,8 @@ identical national flags would tell you nothing — and wherever a nation shows 
 flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
-NFL franchises are not dealt either: they split [the USA](#the-nfl-map) between them.
+NFL franchises are not dealt either: they split [the USA](#the-nfl-map) between them, and
+MLB clubs [the USA and Canada](#the-mlb-map).
 
 Club lineups come from the same two exports as the national squads:
 `clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
@@ -750,6 +777,25 @@ the map; Canada and Mexico lie beneath as inert land. The map is
 ```bash
 npm run build:nfl-map                      # boundaries + stadiums → public/domestic/nfl.json and its index entry (seconds)
 npm run build:nfl-map -- --check           # offline rebuild must match the committed files byte for byte
+```
+
+### The MLB map
+
+Baseball clubs have one theatre, **MLB**: the 30 clubs fight over the USA and
+Canada, split into 30 territories grown from their ballparks by the same
+partition, over whole states and provinces. California (five clubs), New York,
+Illinois, Texas, Florida, Ohio, Pennsylvania and Missouri (two each) are split
+between their clubs along county lines; Wrigley Field and Rate Field both stand in
+Cook County, so the map cuts that county between the Cubs (the North Side) and the
+White Sox (the South Side). The Yankees grow from the Bronx and the Mets from
+Queens; Toronto holds Ontario and Seattle British Columbia, and the Prairies, Quebec
+and the North stay empty, as on the NBA's map. The map is `public/domestic/mlb.json`
+(155 KB); ballparks are in `scripts/data/mlb-teams.json`, their coordinates
+Wikidata's.
+
+```bash
+npm run build:mlb-map                      # boundaries + ballparks → public/domestic/mlb.json and its index entry (about 2 minutes)
+npm run build:mlb-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
 
 ## Football seasons
@@ -1094,12 +1140,16 @@ src/
     football.js        4-4-2, 90 minutes, penalty shootouts
     basketball.js      starting five, 40 minutes, overtime
     americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
+    baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings
+    index.js           the registry, and each sport's clock and tie-break copy (clockLabel, overtimeText)
   data/teams.js        173 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
   data/clubs.american-football.js  GENERATED NFL lineups and backups (npm run build-nfl)
+  data/clubs.baseball.js      GENERATED MLB lineups and active rosters (npm run build-mlb)
+  data/rosters.baseball.js    GENERATED baseball nations by birthplace (npm run build-mlb)
   data/sourceTable.js  compact player rows of the generated football files: one
                        JSON line per nation or club, metadata keys and shared
                        values written once (scripts/lib/data-module.mjs writes them)
@@ -1157,9 +1207,11 @@ scripts/
   build-clubs.mjs      builds the club layer for both sports
   sync-domestic-clubs.mjs  snapshots each country's clubs, squads and home towns
   build-domestic.mjs   builds the country maps, index and ATTRIBUTION.txt
-  build-club-maps.mjs  builds the NBA's maps of the USA and Canada (today's and each era's) and the NFL's of the USA
+  build-club-maps.mjs  builds the NBA's maps of the USA and Canada (today's and each era's), the NFL's of the USA and MLB's of the USA and Canada
   sync-madden.mjs      snapshots Madden NFL ratings from EA's ratings site
   build-nfl.mjs        builds the NFL clubs from that snapshot
+  sync-mlb-the-show.mjs  snapshots MLB The Show's Live cards from its public API
+  build-mlb.mjs        builds the MLB clubs and the baseball nations from that snapshot
   build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
@@ -1180,18 +1232,19 @@ scripts/
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **eleven full
-campaigns** across all three pacings, both resolution modes, all three sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **thirteen full
+campaigns** across all three pacings, both resolution modes, all four sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
-sections, and one the NFL's 32 franchises on theirs, with the live ticker. A **manager campaign** (Italy, Europe, round robin × *You
+sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
+clubs on theirs, also live, and one baseball's nations of North and Central America. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after
 elimination. It also checks that every one-by-one turn draws exactly three
 campaign samples and that no clock timer runs while a decision is pending.
-**Seven interrupt-and-resume scenarios** cover a world-scale national campaign
-plus basketball nations, football clubs, NBA clubs, NFL clubs and England and Fiji
+**Eight interrupt-and-resume scenarios** cover a world-scale national campaign
+plus basketball nations, football clubs, NBA clubs, NFL clubs, MLB clubs and England and Fiji
 domestic campaigns, which are played on to their champions after the reload.
 They verify that settings, ownership, squads, acquired players, and the remaining
 match queue survive a reload and that the campaign remains playable. The app's

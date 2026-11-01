@@ -6,7 +6,7 @@
 import { SCOPES, teamEff } from '../data/teams.js';
 import { CLUB_SCOPES } from '../data/scopes.js';
 import { domesticLabel } from '../data/domesticScope.js';
-import { getSport } from '../sports/index.js';
+import { getSport, overtimePeriodsOf, overtimeShort } from '../sports/index.js';
 import { domesticIdOf } from '../app/shared.js';
 import { empireNeighbors, territories } from '../engine/campaign.js';
 import { reachableTargets } from '../engine/turns.js';
@@ -351,6 +351,9 @@ function tieSuffix(entry, ctx) {
   if (!text) return '';
   if (/penalt/i.test(text)) return ' (pens)';
   if (/overtime/i.test(text)) return ' (OT)';
+  // A baseball game decided in extra innings: " (F/11)".
+  const innings = /innings/i.test(text) ? overtimePeriodsOf(ctx?.sport, text) : null;
+  if (innings) return ` (${overtimeShort(ctx?.sport, innings)})`;
   return ctx?.sport?.tieBreak === 'overtime' ? ' (OT)' : ' (pens)';
 }
 

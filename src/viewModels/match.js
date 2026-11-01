@@ -1,7 +1,7 @@
 // Owner: WP-MATCH (see PLAN.md §4). Live match view-models (PLAN §3.6, B§5, DEC D6/D7/D11).
 // Pure: no window/document/timers/RNG. The live minute is NOT read here (it lives in the minute store, DEC D7);
 // components pass it to buildFeedRows and to the win-probability series.
-import { getSport } from '../sports/index.js';
+import { clockLabel, getSport, overtimePeriodsOf, overtimeText } from '../sports/index.js';
 import { selectLineup } from '../data/teams.js';
 import { liveModelFor } from '../engine/winProbability.js';
 import { roman, historyRound, formatOddsPair, ratingTier, shortName, memo } from './format.js';
@@ -11,6 +11,7 @@ const GROUPS = {
   football: ['GK', 'DF', 'MF', 'FW'],
   basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
   'american-football': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'],
+  baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP'],
 };
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -26,12 +27,19 @@ function oddsOf(odds) {
 }
 
 /**
- * "Chiesa 23' · Raspadori 61'" (football), "Jokić 14 pts · Murray 9 pts" (basketball: top two scorers) or
- * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score).
+ * "Chiesa 23' · Raspadori 61'" (football), "Jokić 14 pts · Murray 9 pts" (basketball: top two scorers),
+ * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score) or
+ * "Judge 3 RBI · Soto 1 RBI" (baseball: the two who drove in most runs).
  */
 export function scorersLine(shown, teamId, teams, sportId = 'football') {
   const own = (Array.isArray(shown) ? shown : []).filter(e => e && e.tid === teamId && e.name);
   if (!own.length) return '';
+  if (sportId === 'baseball') {
+    const totals = new Map();
+    for (const e of own) totals.set(e.name, (totals.get(e.name) || 0) + (Number(e.pts) || 0));
+    return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2)
+      .map(([name, rbi]) => `${shortName(name)} ${rbi} RBI`).join(' · ');
+  }
   if (sportId === 'american-football') {
     const totals = new Map();
     for (const e of own) {
@@ -130,6 +138,9 @@ function lineups(st, ctx, aId, dId, sportId, moved = null) {
     });
 }
 
+/** The half-time minute the feed marks: half the regulation length, or none in a sport without one (baseball). */
+const halfOf = (sport, length) => (sport?.words?.half === null ? 0 : length / 2);
+
 /** Overtime tie-breaks end at the last period played (DEC D6 "the end of the last overtime played"). */
 const otOf = sport => Number(sport?.clock?.ot) || (sport?.tieBreak === 'overtime' ? 5 : 0);
 function overtimeEnd(sport, length, periods) {
@@ -138,21 +149,22 @@ function overtimeEnd(sport, length, periods) {
 }
 
 /**
- * History keeps each event's formatted copy only ("GOAL — Name (ITA)", "+3 — Name (SRB)", "TD — Name (KCC)"): read
- * the scorer and the side back from it, so an archived full-time header carries the same scorer lines as the live one.
+ * History keeps each event's formatted copy only ("GOAL — Name (ITA)", "+3 — Name (SRB)", "TD — Name (KCC)",
+ * "2 RBI — Name (NYY)"): read the scorer and the side back from it, so an archived full-time header carries the same
+ * scorer lines as the live one.
  */
-const EVENT_COPY = /^(?:GOAL|\+(\d+)|(TD|FG))\s+—\s+(.+?)\s+\(([^()]*)\)$/;
+const EVENT_COPY = /^(?:GOAL|\+(\d+)|(TD|FG)|(\d+) RBI)\s+—\s+(.+?)\s+\(([^()]*)\)$/;
 const SCORE_POINTS = { TD: 7, FG: 3 };
 function historyShown(entry, aId, dId, aCode, dCode) {
   const shown = [];
   for (const e of Array.isArray(entry?.events) ? entry.events : []) {
     const match = EVENT_COPY.exec(String(e?.text || '').trim());
     if (!match) continue;
-    const tid = match[4] === aCode ? aId : match[4] === dCode ? dId : null;
+    const tid = match[5] === aCode ? aId : match[5] === dCode ? dId : null;
     if (tid == null) continue;
     const minute = parseInt(e?.when, 10);
-    shown.push({ tid, name: match[3], m: Number.isFinite(minute) ? minute : 0,
-      pts: match[1] ? Number(match[1]) : SCORE_POINTS[match[2]] || 1 });
+    shown.push({ tid, name: match[4], m: Number.isFinite(minute) ? minute : 0,
+      pts: match[1] ? Number(match[1]) : match[3] ? Number(match[3]) : SCORE_POINTS[match[2]] || 1 });
   }
   return shown;
 }
@@ -230,7 +242,7 @@ function fromMatch(st, ctx, sport, m) {
   if (state === 'full-time' && m.tie) {
     tieDetail = shootout
       ? `${m.tie.ga ?? kicks?.a ?? 0}–${m.tie.gd ?? kicks?.b ?? 0} on penalties`
-      : `after ${plural((m.tie.periods || []).length || 1, 'overtime period')}`;
+      : overtimeText(sport, (m.tie.periods || []).length || 1);
   }
   const statusLabel = state === 'live' ? labels.live : state === 'penalties' ? labels.tie : labels.end;
   const statusDetail = state === 'penalties' ? `${kicks?.a ?? 0}–${kicks?.b ?? 0}` : tieDetail;
@@ -259,10 +271,10 @@ function fromMatch(st, ctx, sport, m) {
       ? { player: m.playerTaken, winnerId: m.winner, loserId: m.winner === m.aId ? m.dId : m.aId } : null),
     feedBase: {
       sport: sport.id, state, aCode: A.code || A.name, bCode: D.code || D.name, aName: A.name, bName: D.name,
-      aId: m.aId, dId: m.dId, length, half: length / 2, finalMinute, scoreA, scoreB,
+      aId: m.aId, dId: m.dId, length, half: halfOf(sport, length), finalMinute, scoreA, scoreB,
       kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: sport.tieBreak === 'overtime',
       kicks: kicks ? { a: kicks.a, b: kicks.b } : null, tieDetail,
-      events: shown.map((e, i) => ({ key: `e${i}`, m: Number(e.m) || 0, label: `${Number(e.m) || 0}'`, tid: e.tid,
+      events: shown.map((e, i) => ({ key: `e${i}`, m: Number(e.m) || 0, label: clockLabel(sport, e.m), tid: e.tid,
         pts: Number(e.pts) || 1, text: sport.formatEvent(e, codeOf(e.tid)).text })),
     },
     kicks: kicks ? { a: kicks.kicksA, b: kicks.kicksB } : null,
@@ -285,7 +297,7 @@ function fromHistory(st, ctx, sport, entry) {
   const winnerId = entry.result?.winnerId ?? entry.winnerId;
   const tieDetail = entry.result?.tieText || null;
   // The minute the match ended: the last timed event, or the end of the overtime the tie text records.
-  const periods = /after\s+(\d+)\s+overtime\s+period/i.exec(tieDetail || '')?.[1];
+  const periods = overtimePeriodsOf(sport, tieDetail);
   const lastEvent = events.reduce((n, e) => Math.max(n, Number(e.m) || 0), 0);
   const finalMinute = Math.max(length, lastEvent, overtimeEnd(sport, length, periods));
   const aCode = entry.a?.code || A.code, dCode = entry.b?.code || D.code;
@@ -307,7 +319,7 @@ function fromHistory(st, ctx, sport, entry) {
     lineups: lineups(st, ctx, aId, dId, sport.id, moved),
     feedBase: {
       sport: sport.id, state: 'full-time', aCode: A.code || A.name, bCode: D.code || D.name, aName: A.name, bName: D.name,
-      aId, dId, length, half: length / 2, finalMinute, scoreA, scoreB,
+      aId, dId, length, half: halfOf(sport, length), finalMinute, scoreA, scoreB,
       kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: sport.tieBreak === 'overtime',
       kicks: null, tieDetail, events, roundLabel: historyRound(entry) ? `Round ${roman(historyRound(entry))}` : null,
     },
@@ -339,31 +351,34 @@ export function buildFeedRows(model, minute) {
   const now = Math.max(0, Math.floor(Number(minute) || 0));
   const state = base.state || 'live';
   const events = Array.isArray(base.events) ? base.events : [];
-  const rows = events.map((e, i) => ({ key: e.key || `e${i}`, n: e.m ?? i, i, minute: e.label || `${e.m ?? 0}'`, text: e.text, weight: 700 }));
+  const sport = getSport(base.sport);
+  const clock = m => clockLabel(sport, m);
+  const rows = events.map((e, i) => ({ key: e.key || `e${i}`, n: e.m ?? i, i, minute: e.label || clock(e.m), text: e.text, weight: 700 }));
   const scored = (tid, limit) => events.reduce((n, e) => n + (e.tid === tid && e.m != null && e.m <= limit ? (e.pts || 1) : 0), 0);
   const known = events.every(e => e.tid != null && e.m != null);
   const reached = state !== 'live' || now >= base.half;
   if (known && reached && base.half > 0) {
-    rows.push({ key: 'half', n: base.half + .5, i: -1, minute: `${base.half}'`, weight: 500,
+    rows.push({ key: 'half', n: base.half + .5, i: -1, minute: clock(base.half), weight: 500,
       text: `Half-time — ${scoreText(base, scored(base.aId, base.half), scored(base.dId, base.half))}` });
   }
   if (known && base.overtime && (state !== 'live' ? base.finalMinute > base.length : now > base.length)) {
     const ra = scored(base.aId, base.length), rb = scored(base.dId, base.length);
-    rows.push({ key: 'overtime', n: base.length + .5, i: -1, minute: `${base.length}'`, weight: 500,
-      text: `Overtime — ${scoreText(base, ra, rb)}` });
+    rows.push({ key: 'overtime', n: base.length + .5, i: -1, minute: clock(base.length), weight: 500,
+      text: `${sport.words.overtime || 'Overtime'} — ${scoreText(base, ra, rb)}` });
   }
-  rows.push({ key: 'kickoff', n: -1, i: -1, minute: "0'", weight: 500, text: `${base.kickoff} — ${base.aName} attack ${base.bName}` });
+  rows.push({ key: 'kickoff', n: -1, i: -1, minute: clock(0), weight: 500, text: `${base.kickoff} — ${base.aName} attack ${base.bName}` });
   rows.sort((x, y) => y.n - x.n || y.i - x.i);
   let top;
   if (state === 'live') {
     const left = base.length - now;
-    const tail = left > 0 ? `${plural(left, 'minute')} left` : base.overtime && now > base.length ? 'overtime' : 'final minute';
-    top = { key: 'status', minute: `${now}'`, weight: 600, live: true, text: `Live — ${scoreText(base, base.scoreA, base.scoreB)} · ${tail}` };
+    const tail = typeof sport.clockLeft === 'function' ? sport.clockLeft(now, base.length)
+      : left > 0 ? `${plural(left, 'minute')} left` : base.overtime && now > base.length ? 'overtime' : 'final minute';
+    top = { key: 'status', minute: clock(now), weight: 600, live: true, text: `Live — ${scoreText(base, base.scoreA, base.scoreB)} · ${tail}` };
   } else if (state === 'penalties') {
-    top = { key: 'status', minute: `${base.finalMinute}'`, weight: 600, live: false,
+    top = { key: 'status', minute: clock(base.finalMinute), weight: 600, live: false,
       text: `Penalties — ${scoreText(base, base.scoreA, base.scoreB)} · ${base.kicks?.a ?? 0}–${base.kicks?.b ?? 0}` };
   } else {
-    top = { key: 'status', minute: `${base.finalMinute}'`, weight: 600, live: false,
+    top = { key: 'status', minute: clock(base.finalMinute), weight: 600, live: false,
       text: `${base.endLabel} — ${scoreText(base, base.scoreA, base.scoreB)}${base.tieDetail ? ` · ${base.tieDetail}` : ''}` };
   }
   return [{ ...top, status: true }, ...rows.map(({ key, minute: label, text, weight }) => ({ key, minute: label, text, weight, status: false, live: false }))];

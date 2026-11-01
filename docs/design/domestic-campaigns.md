@@ -818,6 +818,43 @@ the Giants', Buffalo the Bills', Morris County the Jets', the San Fernando Valle
 the Rams' and San Diego the Chargers'; seeded duel campaigns reach a champion; the
 App launches on the map. The smoke runs an NFL duel and an NFL resume.
 
+## The MLB map
+
+Status: implemented 2026-11-01. Baseball clubs ([baseball.md](baseball.md)) have one
+theatre, **MLB**, played on `public/domestic/mlb.json`: the USA and Canada split into
+30 territories, one per club, along state and province lines, by the same command
+and partition (`LEAGUES.mlb` in `scripts/build-club-maps.mjs`; `npm run
+build:mlb-map`). The NBA and NFL maps rebuild byte for byte.
+
+- **Units**: the USA's counties and Canada's economic regions grouped by state and
+  province, fitted to the US line, as for the NBA. Alaska, the Prairies, Quebec,
+  Newfoundland and Labrador and the North lie over 1,000 km from every ballpark and
+  stay empty; Hawaii, Puerto Rico and the other territories are dropped.
+- **Homes**: `scripts/data/mlb-teams.json`, each club's ballpark at its Wikidata
+  coordinates. No two clubs share a ballpark.
+- **Shared states**: California (five clubs), New York, Illinois, Texas, Florida, Ohio,
+  Pennsylvania and Missouri (two each) split along county lines. Wrigley Field and
+  Rate Field both stand in Cook County, 16 km apart, which is under the partition's
+  own limit for cutting a shared county (half the grain, about 20 km of US county), so
+  the White Sox first started outside their territory. The league sets `maxGapKm: 5`
+  instead, and Cook County is cut between the Cubs (the North Side) and the White Sox
+  (the South Side). The Yankees (the Bronx) and the Mets (Queens) have counties of
+  their own.
+- **Result** (2026-11-01 build): Boston holds New England (Connecticut is the
+  Yankees') and the Maritimes; Toronto Ontario; Seattle Washington, Idaho and British Columbia; Colorado Colorado, Utah,
+  Wyoming and Montana; Minnesota the Dakotas; Arizona New Mexico; Washington Virginia,
+  DC and North Carolina; Atlanta Georgia, Alabama and South Carolina. Areas range from
+  the Mets' 4,000 km² to Seattle's 1.33 million. The file is about 155 KB; the index
+  entry adds `venue: "ballpark"`, so the setup reads "… each starting on the land
+  nearest its ballpark: USA and Canada split into 30 territories along state and
+  province lines."
+
+**Checks**: `scripts/baseball.test.mjs`: file, index, ballparks and clubs agree; every
+ballpark lies inside its territory; Wrigley Field is the Cubs', Rate Field the White
+Sox's, Yankee Stadium the Yankees', Citi Field the Mets' and Ottawa the Blue Jays';
+seeded duel campaigns reach a champion; the App launches on the map. The smoke runs
+an MLB duel and an MLB resume.
+
 ## Known limitations
 
 - **Coverage.** Seven nations have fewer than two viable clubs and do not ship
