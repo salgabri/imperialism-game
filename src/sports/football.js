@@ -5,8 +5,11 @@ import { clamp, createScorerSampler, gauss, poisson } from '../engine/random.js'
 import { selectLineup } from '../data/teams.js';
 
 const MINUTES = 90;
-/** Chances fall to the front line, and to quality above a 55-rating floor. */
-const SCORER_WEIGHTS = { FW: 5, MF: 2.4, DF: 0.7, GK: 0.06 };
+/**
+ * Chances fall to the front line, and to quality above a 55-rating floor: forwards score about half the goals,
+ * midfielders a third and defenders one in eight, as in Europe's top leagues.
+ */
+const SCORER_WEIGHTS = { FW: 5, MF: 1.7, DF: 0.6, GK: 0.06 };
 
 const ATTACK_WEIGHTS = { FW: .56, MF: .36, DF: .08, GK: 0 };
 const DEFENCE_WEIGHTS = { FW: .02, MF: .16, DF: .58, GK: .24 };
@@ -14,6 +17,15 @@ const BASE_GOALS = 1.28;
 const RATING_SCALE = .075;
 const MAX_LOG_EDGE = 1.5;
 const TEMPO_SD = .18;
+// Match-day form's spread, in log scoring rate: 0.28 at Balanced (drama 6). Goals are already Poisson luck; the old
+// 0.45 made one game in eleven a four-goal rout and cut draws below a fifth. It grows with the square of the drama, so
+// Wild (12) and an all-out Attack (11) still swing a match hard (1.12, 0.94) and Defend (2) barely does (0.03): a
+// favourite that defends still steadies its odds.
+const FORM_AT_BALANCED = .28;
+const formSpread = variation => FORM_AT_BALANCED * (variation / 6) ** 2;
+// Real scores hold more 0-0 and 1-1 draws, and fewer 1-0 wins, than two independent Poisson counts (Dixon and
+// Coles, 1997). The correction keeps each side's mean, and so its chance of winning a level game's shoot-out.
+const LOW_SCORE_RHO = -.12;
 
 function profile(lineup, effective) {
   const means = {};
@@ -35,9 +47,10 @@ function profile(lineup, effective) {
 export function prepareFootballMatch(attacker, defender, effA, effD) {
   const lineupA = selectLineup(attacker), lineupD = selectLineup(defender);
   const a = profile(lineupA, effA), d = profile(lineupD, effD);
+  // About 73% of shoot-out kicks are scored, as at the World Cups and Euros (68.6% and 77.0%).
   const penalties = (side, opposingKeeper) => {
     const ratings = side.takers.length ? side.takers.map(player => player.effectiveRating) : [40];
-    return ratings.map(rating => clamp(.76 + (rating - 75) * .003 - (opposingKeeper - 75) * .0035, .55, .9));
+    return ratings.map(rating => clamp(.74 + (rating - 75) * .003 - (opposingKeeper - 75) * .0035, .55, .9));
   };
   return {
     aId: attacker.id, dId: defender.id, lineupA, lineupD,
@@ -86,28 +99,43 @@ function shootout(rng, prepared) {
   return result();
 }
 
+/**
+ * A score inside the 0–1 block redrawn from its Dixon–Coles masses for rates `la` and `ld`: the block's total mass is
+ * unchanged, so a score outside it costs no draw.
+ */
+function lowScoreCorrection(rng, ga, gd, la, ld) {
+  if (ga > 1 || gd > 1) return [ga, gd];
+  const masses = [1 - la * ld * LOW_SCORE_RHO, la * (1 + ld * LOW_SCORE_RHO), ld * (1 + la * LOW_SCORE_RHO), la * ld * (1 - LOW_SCORE_RHO)];
+  let roll = clamp(rng(), 0, 1 - Number.EPSILON) * (1 + la + ld + la * ld);
+  for (const [i, mass] of masses.entries()) {
+    roll -= mass;
+    if (roll < 0 || i === 3) return [i === 1 || i === 3 ? 1 : 0, i >= 2 ? 1 : 0];
+  }
+}
+
 /** Score-only path: neutral venue, correlated tempo and stochastic finishing. */
 export function sampleFootballResult(rng, prepared, drama = 6) {
   const variation = Number.isFinite(drama) ? clamp(drama, 0, 12) : 6;
-  const form = gauss(rng) * variation * RATING_SCALE;
+  const form = gauss(rng) * formSpread(variation);
   const tempo = Math.exp(clamp(gauss(rng), -2.5, 2.5) * TEMPO_SD - TEMPO_SD ** 2 / 2);
   // Smooth saturation keeps huge rating gaps plausible without a hard score cap
   // or a zero probability of an underdog scoring. Poisson goals remain random
   // even with the Predictable (zero form variation) setting.
   const rate = log => BASE_GOALS * tempo * Math.exp(MAX_LOG_EDGE * Math.tanh(log / MAX_LOG_EDGE));
-  const ga = poisson(rng, rate(prepared.logA + form));
-  const gd = poisson(rng, rate(prepared.logD - form));
+  const la = rate(prepared.logA + form), ld = rate(prepared.logD - form);
+  const [ga, gd] = lowScoreCorrection(rng, poisson(rng, la), poisson(rng, ld), la, ld);
   const tie = ga === gd ? shootout(rng, prepared) : null;
   return { ga, gd, tie, winner: (tie ? tie.ga > tie.gd : ga > gd) ? prepared.aId : prepared.dId };
 }
 
 function goalMinute(rng) {
-  // More opportunities arrive late as legs tire and teams chase the result.
-  // Two goals may share a displayed minute, as they can in a real match.
+  // More opportunities arrive late as legs tire and teams chase the result: 29%, 33% and 38% of goals by thirds,
+  // 45.5% before half-time, as in Europe's top leagues. Two goals may share a displayed minute, as they can in a real
+  // match.
   const roll = clamp(rng(), 0, 1 - Number.EPSILON);
-  if (roll < .28) return 1 + Math.floor(roll / .28 * 30);
-  if (roll < .60) return 31 + Math.floor((roll - .28) / .32 * 30);
-  return 61 + Math.floor((roll - .60) / .40 * 30);
+  if (roll < .29) return 1 + Math.floor(roll / .29 * 30);
+  if (roll < .62) return 31 + Math.floor((roll - .29) / .33 * 30);
+  return 61 + Math.floor((roll - .62) / .38 * 30);
 }
 
 function goalEvents(rng, result, prepared) {
@@ -123,7 +151,7 @@ function goalEvents(rng, result, prepared) {
 
 export const football = {
   id: 'football',
-  simulationVersion: 2,
+  simulationVersion: 3,
   name: 'Football',
   blurb: 'Eleven a side, ninety minutes. Low scores, high drama — level games go to penalties.',
   rosters: ROSTERS,

@@ -12,7 +12,7 @@ import { estimateWinProbability, UNCERTAINTY_PRESETS } from '../src/engine/odds.
 // the mix of opponents, tactics, extra time and tournament formats in these data.
 export const DESIGN_TARGETS = Object.freeze({
   football: Object.freeze({ regulationTotalMean: [2.2, 3.6], regulationTieRate: [.17, .36], regulationTotalSd: [1.35, 2.3] }),
-  basketball: Object.freeze({ regulationTotalMean: [155, 181], regulationTieRate: [.012, .065], regulationTotalSd: [10, 27], regulationMarginSd: [10, 24] }),
+  basketball: Object.freeze({ regulationTotalMean: [155, 181], regulationTieRate: [.03, .11], regulationTotalSd: [10, 27], regulationMarginSd: [8.5, 24] }),
 });
 
 export const EMPIRICAL_REFERENCES = Object.freeze([

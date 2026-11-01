@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
 import { football } from '../src/sports/football.js';
-import { basketball } from '../src/sports/basketball.js';
+import { BENCH, basketball } from '../src/sports/basketball.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from '../src/engine/odds.js';
 import { DESIGN_TARGETS, regulationScore, sampleMatchStatistics, syntheticTeam } from './match-simulation-report.mjs';
 
@@ -78,7 +78,8 @@ for (const sport of sports) {
   test(`${sport.id}: rating gaps produce stronger favourites without eliminating modest-gap upsets`, () => {
     const defender = syntheticTeam(sport, 55, 'D');
     const results = [0, 5, 10, 20, 40].map(gap => probe(sport, syntheticTeam(sport, 55 + gap), defender, { samples: 15000, seed: hashStr(`${sport.id}:gap:${gap}`) }));
-    for (let i = 1; i < results.length; i++) assert.ok(results[i].attackerWinRate > results[i - 1].attackerWinRate + .01,
+    // Each gap must help, until the favourite is all but certain.
+    for (let i = 1; i < results.length; i++) assert.ok(results[i].attackerWinRate > results[i - 1].attackerWinRate + .01 || results[i].attackerWinRate > .99,
       `${sport.id}: gap improvement ${results.map(row => row.attackerWinRate).join(', ')}`);
     between(results[1].attackerWinRate, .56, .87, 'five-rating-point favourite');
     between(results[2].attackerWinRate, .66, .98, 'ten-rating-point favourite');
@@ -125,7 +126,7 @@ test('basketball equal-side scores retain a realistic spread of totals and margi
   between(result.regulationTotal.sd, ...target.regulationTotalSd, 'regulation total standard deviation');
   between(result.regulationMargin.sd, ...target.regulationMarginSd, 'regulation margin standard deviation');
   between(result.regulationTieRate, ...target.regulationTieRate, 'overtime rate');
-  between(result.blowoutRate, .08, .4, 'twenty-point margins');
+  between(result.blowoutRate, .02, .2, 'twenty-point margins');
   assert.ok(result.regulationTotal.p05 < 155 && result.regulationTotal.p95 > 185, 'both low- and high-scoring games must occur');
   assert.ok(result.finalTotalMean > result.regulationTotal.mean, 'overtime must add points to the final totals');
 });
@@ -171,7 +172,8 @@ test('complete-match events reconcile to scores, eligible scorers and legal cloc
         assert.ok(Number.isInteger(event.m) && event.m >= 1 && event.m <= lastMinute, `invalid clock ${event.m}/${lastMinute}`);
         assert.ok(event.m >= previousMinute, 'events must be ordered by clock'); previousMinute = event.m;
         assert.ok(names.has(event.tid), 'every event must belong to a match participant');
-        assert.ok(names.get(event.tid).has(event.name), 'only selected starters may score');
+        // Basketball credits a third of its points to the side's bench as a whole; a named reserve never scores.
+      assert.ok(names.get(event.tid).has(event.name) || (sport === basketball && event.name === BENCH), 'only selected starters may score');
         assert.ok(Number.isInteger(event.pts) && event.pts > 0, 'points must be positive integers');
         if (sport.id === 'football') assert.equal(event.pts, 1);
         sums[event.tid] += event.pts;

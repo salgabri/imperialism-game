@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeRng, selectLineup, teamEff, OUT_OF_POSITION_PENALTY } from '../src/data/teams.js';
 import { football } from '../src/sports/football.js';
-import { basketball } from '../src/sports/basketball.js';
+import { BENCH, basketball } from '../src/sports/basketball.js';
 import { pickScorer } from '../src/engine/random.js';
 import { acquisitionCandidates } from '../src/engine/campaignExperience.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from '../src/engine/odds.js';
@@ -111,7 +111,9 @@ test('a useful acquisition upgrades the appropriate shirt, a bench player cannot
     const opponent = team(sport, 75, 'B');
     for (let i = 0; i < 40; i++) {
       const result = sport.simulate(rng, side, opponent, 6, teamEff(side), teamEff(opponent));
-      assert.ok(result.ev.filter(event => event.tid === side.id).every(event => starters.has(event.name)));
+      // Basketball credits a third of its points to the side's bench as a whole; a named reserve still never scores.
+      assert.ok(result.ev.filter(event => event.tid === side.id).every(event => starters.has(event.name)
+        || (sport === basketball && event.name === BENCH)));
     }
   }
 });

@@ -14,7 +14,7 @@ import {
 } from '../src/engine/winProbability.js';
 
 const { football, prepareFootballMatch, footballProfile } = footballModule;
-const { basketball, basketballProfile, nbaBasketball, nbaBasketballIn } = basketballModule;
+const { BASKETBALL_MODEL, basketball, basketballProfile, nbaBasketball, nbaBasketballIn } = basketballModule;
 
 const nationId = code => Object.keys(NATIONS).find(id => NATIONS[id][1] === code);
 const nation = (sport, code) => buildTeam(nationId(code), makeRng(1), sport);
@@ -187,12 +187,13 @@ test('liveModelFor returns small persistable models and null when it cannot mode
   assert.deepEqual(Object.keys(basketballModel), ['kind', 'pace', 'effA', 'effD', 'formSd', 'length', 'ot', 'maxOt']);
   const prepared = basketball.prepareMatch(ba, bd);
   assert.deepEqual(basketballModel, { kind: 'normal', pace: prepared.pace, effA: prepared.efficiencyA, effD: prepared.efficiencyD,
-    formSd: 6 * 0.0125, length: 40, ot: 5, maxOt: 4 });
+    formSd: 6 * BASKETBALL_MODEL.FORM_PER_DRAMA, length: 40, ot: 5, maxOt: 4 });
   const tactical = liveModelFor('basketball', ba, bd, 82, 77, 6);
   const preparedTactical = basketball.prepareMatch(ba, bd, 82, 77);
   assert.equal(tactical.effA, preparedTactical.efficiencyA);
   assert.equal(tactical.effD, preparedTactical.efficiencyD);
-  for (const [drama, formSd] of [[0, 0], [12, 0.15], [20, 0.15], [undefined, 0.075], [NaN, 0.075]]) {
+  const perDrama = BASKETBALL_MODEL.FORM_PER_DRAMA;
+  for (const [drama, formSd] of [[0, 0], [12, 12 * perDrama], [20, 12 * perDrama], [undefined, 6 * perDrama], [NaN, 6 * perDrama]]) {
     close(liveModelFor(basketball, ba, bd, undefined, undefined, drama).formSd, formSd, 1e-12, `drama ${drama}`);
   }
 
@@ -282,7 +283,7 @@ test('NBA rules: the live model runs 48 minutes at its season\'s pace and matche
   const model = liveModelFor(nbaBasketball, club(0), club(1), undefined, undefined, 6);
   const prepared = nbaBasketball.prepareMatch(club(0), club(1));
   assert.deepEqual(model, { kind: 'normal', pace: 99.4, effA: prepared.efficiencyA, effD: prepared.efficiencyD,
-    formSd: 6 * 0.0125, length: 48, ot: 5, maxOt: 4 });
+    formSd: 6 * BASKETBALL_MODEL.FORM_PER_DRAMA, length: 48, ot: 5, maxOt: 4 });
   assert.ok(isLiveModel(model));
   // The built-in season at 2025/26's pace, and the slow, low-scoring 2003/04 (the same clubs, its pace and rate).
   const slow = nbaBasketballIn('2003/04');
@@ -506,8 +507,8 @@ test('the live model never touches an RNG and stays pure', () => {
 test('sport profile exports: the match model\'s positional ratings, without the effective offset', () => {
   // Append-only exports: every existing export is still there and the sport objects are unchanged.
   assert.deepEqual(Object.keys(footballModule).sort(), ['football', 'footballProfile', 'prepareFootballMatch', 'sampleFootballResult']);
-  assert.deepEqual(Object.keys(basketballModule).sort(), ['basketball', 'basketballProfile', 'nbaBasketball', 'nbaBasketballIn', 'prepareMatch',
-    'sampleResult']);
+  assert.deepEqual(Object.keys(basketballModule).sort(), ['BASKETBALL_MODEL', 'BENCH', 'basketball', 'basketballProfile', 'nbaBasketball',
+    'nbaBasketballIn', 'prepareMatch', 'sampleResult']);
   assert.equal(football.prepareMatch, prepareFootballMatch);
   assert.equal(basketball.prepareMatch, basketballModule.prepareMatch);
 
@@ -537,8 +538,8 @@ test('sport profile exports: the match model\'s positional ratings, without the 
     const prepared = basketball.prepareMatch(attacker, defender);
     const pa = basketballProfile(selectLineup(attacker)), pd = basketballProfile(selectLineup(defender));
     assert.deepEqual(Object.keys(pa), ['offence', 'defence']);
-    assert.equal(clamp(1.11 + (pa.offence - 74) * 0.010 - (pd.defence - 74) * 0.0065, 0.54, 1.67), prepared.efficiencyA);
-    assert.equal(clamp(1.11 + (pd.offence - 74) * 0.010 - (pa.defence - 74) * 0.0065, 0.54, 1.67), prepared.efficiencyD);
+    assert.equal(clamp(1.11 + (pa.offence - 74) * 0.012 - (pd.defence - 74) * 0.0078, 0.54, 1.67), prepared.efficiencyA);
+    assert.equal(clamp(1.11 + (pd.offence - 74) * 0.012 - (pa.defence - 74) * 0.0078, 0.54, 1.67), prepared.efficiencyD);
     assert.deepEqual(basketballProfile(attacker), pa);
   }
   const five = uniform(basketball, 'F', [80, 70, 75, 75, 90]); // PG SG SF PF C

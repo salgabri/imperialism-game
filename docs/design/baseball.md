@@ -101,14 +101,20 @@ Strength is the mean effective rating of the thirteen, as in the other sports.
   facing an average staff should be an even edge. A side's **edge** is its batting
   minus the opposing defence. Tactics and Upsets act through the same
   effective-strength offset as the other sports.
-- **A half-inning** scores with probability `logistic(logit(0.28) + 0.05·edge)`, and
-  a scoring half-inning brings one run plus a geometric run of more (ratio 3/7): 1.75
-  runs, 0.49 a half-inning between equals, 4.4 a game, as in MLB.
+- **A half-inning** scores with probability `logistic(logit(0.265) + 0.038·edge)`,
+  and a scoring half-inning brings one run plus a geometric run of more (ratio 0.46):
+  1.85 runs, 0.49 a half-inning between equals, 4.4 a game, as in MLB. The ratio
+  fits MLB's scoring innings (54% bring one run, a quarter two, one in nine three)
+  and its spread of a side's runs (a 3.1 standard deviation); 0.038 a rating point
+  spreads a 162-game season as MLB's did in 2022–2025 (about 106 wins to 56). The old
+  0.28, 3/7 and 0.05 gave the best club 112 wins and three games in ten decided by
+  a run.
 - **Home and away.** The attacker bats first (the top of each inning); the defender,
   holding the territory, is the home side and bats last. The bottom of the ninth is
-  not played when the home side leads, and a run that puts the home side ahead in the
-  ninth or later ends the game (the winning run ends it). Batting last is no
-  advantage in the model: neither rule changes who wins.
+  not played when the home side leads, and the hit that puts the home side ahead in
+  the ninth or later ends the game with every run it drives in (a walk-off home run
+  with men on wins by more than one). Batting last is no advantage in the model:
+  neither rule changes who wins.
 - **Extra innings**, MLB's regular-season rule: each half starts with a runner on
   second, so a run comes with `logistic(logit(0.6) + 0.05·edge)`. After six extra
   innings still level, a decisive run goes to either side with
@@ -121,11 +127,11 @@ Strength is the mean effective rating of the thirteen, as in the other sports.
   LF and 3B 1.15, CF 1, SS 0.95, 2B 0.9, C 0.8 by weight, times the rating above 50);
   pitchers never do.
 
-Measured over 20,000 seeded games of the 30 clubs: 4.35 runs a team in nine innings,
-9.3% of games to extra innings, three in ten won by a run, a median margin of 3; the
-bottom of the ninth goes unplayed in 41% of games and one in ten ends on a walk-off.
-The strongest club beats the weakest 83% (Predictable), 81% (Balanced) and 78% (Wild)
-of the time: baseball is the most even of the four sports, as it is in life.
+Measured over 20,000 seeded games of the 30 clubs: 4.34 runs a team in nine innings,
+9.4% of games to extra innings, 27.5% won by a run, a median margin of 3; the bottom
+of the ninth goes unplayed in 41% of games and one in eleven ends on a walk-off. The
+strongest club beats the weakest 75% (Predictable) and 74% (Balanced and Wild) of the
+time: baseball is the most even of the four sports, as it is in life.
 
 ## The clock
 

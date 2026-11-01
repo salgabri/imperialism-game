@@ -73,13 +73,23 @@ guard. Every franchise fields all 23 at natural positions.
   sports.
 - **Possessions.** About 11 a side (± 1.1, 8 to 15), alternating from a coin toss.
 - **A possession** ends in a touchdown with probability
-  `logistic(logit(0.22) + 0.06·edge)`, else in a field-goal try with
-  `logistic(logit(0.21) + 0.02·edge)`, made `0.85 + 0.006·(kicker − 80)` of the time
+  `logistic(logit(0.22) + 0.075·edge)`, else in a field-goal try with
+  `logistic(logit(0.21) + 0.025·edge)`, made `0.85 + 0.006·(kicker − 80)` of the time
   (between 60% and 97%). A touchdown is 7: the extra point is taken as made. There
   are no safeties or two-point tries.
-- **Form.** One match-day draw, `N(0, drama·0.6)` rating points, raises the
+- **Form.** One match-day draw, `N(0, drama·0.35)` rating points, raises the
   attacker's edge and lowers the defender's, as football's form does. Predictable
-  (0) leaves all the drive luck.
+  (0) leaves all the drive luck. With the drive odds' 0.075 per rating point, a
+  17-game season spreads the 32 franchises as the NFL's do (from about 14.6 wins
+  to 2.4); the old 0.06 and 0.6 bunched them between 13.9 and 2.9 and let the
+  rating favourite win 63% of games, against the NFL's two in three.
+- **Late-game play-calling.** Over each side's last three possessions of regulation
+  the drive odds follow the score before it: two scores up a side runs the clock
+  (touchdown ×0.5), a score up it plays safe (×0.8), level or within a field goal it
+  plays for three (field-goal try ×1.6), needing a touchdown it goes for it on fourth
+  down (touchdown ×1.25, field-goal try ×0.25), far behind it chases (×1.2, ×0.7).
+  Games end about 11 points apart, nearly half within a score, as the NFL's do;
+  independent drives left them 13 apart. Who wins hardly moves.
 - **Overtime**, playoff rules, ten-minute periods: both sides possess once
   (toss for the first); still level, possessions alternate and the next score
   wins, two more each at most. After a third level period a decisive field goal
@@ -88,14 +98,17 @@ guard. Every franchise fields all 23 at natural positions.
 - **Events.** Each score is logged at the end of its possession, the possessions
   sharing the 60 minutes (or their overtime period) evenly with a little jitter:
   "TD — Travis Kelce (KCC)" or "FG — Harrison Butker (KCC)", by quarter (Q1–Q4,
-  OT). Receivers and backs finish most touchdowns (WR 3, RB 2.6, TE 1.8, QB 0.5 by
-  weight, times the rating above 50), the defence returns a few, and field goals
-  are the kicker's.
+  OT). Receivers and backs finish most touchdowns (RB 4.25, TE 2.1, WR 1.9 each of
+  three, QB 1.1 by weight, times the rating above 50) and the defence and returners
+  a few, so receivers score about 38% of touchdowns, backs 34%, tight ends 14.5%,
+  quarterbacks' own runs 8% and returns or the defence 6%, as in the NFL's 2023–2025
+  seasons. Field goals are the kicker's.
 
-Measured over 20,000 seeded games of the 32 franchises: 22.5 points a team in
-regulation, 4.4% of games to overtime, a median margin of 11; the commonest finals
-are 17, 24, 20, 27, 10 and 13. The strongest franchise beats the weakest 91%
-(Predictable), 88% (Balanced) and 84% (Wild) of the time.
+Measured over 20,000 seeded games of the 32 franchises: 22.1 points a team in
+regulation, 5.7% of games to overtime, a median margin of 10; the commonest finals
+are 17, 24, 20, 27, 10 and 31. The strongest franchise beats the weakest 96%
+(Predictable), 95% (Balanced) and 92% (Wild) of the time: the Rams' lineup rates
+8.6 points above the Dolphins', far more than any other pairing.
 
 ## Live win probability
 

@@ -65,8 +65,9 @@ npm run smoke       # headless: plays campaigns to completion and checks invaria
 npm run smoke -- --scenarios=england # only the smoke scenarios whose names match
 npm run smoke -- --campaign-only=7   # one scenario by index (also --resume-only=<i>, --manager-only)
 npm run balance -- --runs=12 # seeded odds, acquisitions and campaign balance report
-npm run test:simulation # score distributions, RNG, tie-breaks, odds and live ticker
+npm run test:simulation # score distributions, RNG, tie-breaks, odds, live ticker and real-league realism
 npm run simulation:report -- --samples=200000 --out=docs/design/match-simulation-report.json
+npm run simulation:realism -- --seasons=40 # whole league seasons beside the real leagues' figures
 npm run test:experience # pause, manager choice, series and checkpoint integration
 npm run test:reachability # every offered theatre and disconnected final opponents
 npm run test:map-fonts # font-loading, fallback and geographic remeasurement checks
@@ -292,8 +293,9 @@ match. Under **This campaign** it lists the launch rules as read-only text.
 rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
-produce varied low-scoring games. Basketball uses shared possessions, positional
-offence/defence, form and shooting variance. Nations play FIBA's four ten-minute
+produce varied low-scoring games, with as many draws as Europe's top leagues.
+Basketball uses shared possessions, positional offence/defence, form and shooting
+variance, scaled to the NBA's margins and its share of overtime games. Nations play FIBA's four ten-minute
 quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
 quarters at their season's league pace and scoring rate, so games score like
 their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
