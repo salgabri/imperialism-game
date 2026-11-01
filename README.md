@@ -138,10 +138,12 @@ check **Tests, build and smoke**. Vercel still builds each push to `main` itself
 but holds the build back from the production domain until that check passes. A
 failed or cancelled run leaves the last good deployment live. **Force Promote** on
 a deployment's page skips the wait. The check is matched by the job's name, so
-renaming the job means updating the check. This needs no tokens or secrets. A
-first attempt that deployed from CI with the Vercel CLI was dropped on
-1 November 2026, because the CLI rejected the Hobby account's access tokens
-("User not found. (404)").
+renaming the job means updating the check. Vercel's native **Lint** and
+**TypeCheck** checks are listed there too. They are skipped because `package.json`
+has no `lint` or `typecheck` script; adding either script would turn them into
+real gates. This needs no tokens or secrets. A first attempt that deployed from
+CI with the Vercel CLI was dropped on 1 November 2026, because the CLI rejected
+the Hobby account's access tokens ("User not found. (404)").
 
 **Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
 immutable for a year. Fonts, flags and club crests are cached for a day and
