@@ -116,7 +116,7 @@ export function fixtureWinChance(st, ctx = {}, me = mapMeId(st, ctx)) {
     p = m.odds ? Number(attacking ? m.odds.a : m.odds.b) : null;
   } else {
     const odds = memo(ctx?.cache, 'map:fixture-odds',
-      [st.teams, pair.aId, pair.dId, ctx?.managedId ?? null, ctx?.drama, ctx?.sport],
+      [st.teams, pair.aId, pair.dId, ctx?.managedId ?? null, ctx?.drama, ctx?.homeAdvantage, ctx?.sport],
       () => matchupOdds(st, ctx, pair.aId, pair.dId));
     p = odds ? (attacking ? odds.attacker : odds.defender) : null;
   }
@@ -134,7 +134,7 @@ export function frontsFills(st, ctx = {}) {
   if (!me || !ctx?.board || !isPlaying(st)) return null;
   const fixture = fixtureWinChance(st, ctx, me);
   return memo(ctx.cache, 'map:fronts-fills',
-    [st.own, st.teams, st.aliveIds, me, ctx.sport, ctx.drama, fixture?.opponentId ?? null, fixture?.p ?? null], () => {
+    [st.own, st.teams, st.aliveIds, me, ctx.sport, ctx.drama, ctx.homeAdvantage, fixture?.opponentId ?? null, fixture?.p ?? null], () => {
       let reach = [];
       try { reach = reachableTargets(ctx.board, me) || []; } catch { reach = []; }
       const land = reach.filter(row => row.tier === 'land');

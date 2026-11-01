@@ -1,6 +1,6 @@
 # Every push runs the regression suite, the production build and the headless smoke campaigns.
-# On main, a push that passes them is deployed to production by the deploy job, once the Vercel
-# secrets exist (README "Deployment"). A newer push cancels the older run, so only the newest commit deploys.
+# Vercel builds each push to main itself, and its Deployment Checks hold the build back from the live domain
+# until this job, "Tests, build and smoke", passes (README "Deployment"). Renaming the job means updating that check.
 name: CI
 
 on:
@@ -29,39 +29,3 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run smoke
-
-  deploy:
-    name: Deploy to production
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-    steps:
-      # Without the three secrets nothing deploys from here, and Vercel's own Git deploys stay in charge.
-      - name: Check the Vercel secrets
-        id: vercel
-        run: |
-          if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::Not deploying: add VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID as repository secrets (README \"Deployment\")."
-          fi
-      - if: steps.vercel.outputs.ready == 'true'
-        uses: actions/checkout@v7
-      - if: steps.vercel.outputs.ready == 'true'
-        uses: actions/setup-node@v7
-        with:
-          node-version: 26
-          cache: npm
-      - if: steps.vercel.outputs.ready == 'true'
-        run: npm install --global vercel@64.7.0
-      - if: steps.vercel.outputs.ready == 'true'
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-      - if: steps.vercel.outputs.ready == 'true'
-        run: vercel build --prod --token="$VERCEL_TOKEN"
-      - if: steps.vercel.outputs.ready == 'true'
-        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

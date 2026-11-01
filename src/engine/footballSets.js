@@ -1,17 +1,21 @@
 // Data sets: one dated database's nations and clubs, played instead of a sport's built-in season. A football set is
 // one of the built-in earlier seasons (an EA FIFA / FC roster, src/data/footballSeasons.js) or a CM 01/02
 // database built on this computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition,
-// src/data/basketballSeasons.js), clubs only, on its era's map. Each is a `public/<sport>/<id>.json` (format 1, see
-// docs/design/football-years.md), validated strictly and exposed as that sport bound to the season. The built-in data
-// (src/data/rosters.js, clubs.football.js, the basketball modules) never changes.
+// src/data/basketballSeasons.js), clubs only, on its era's map; a baseball set a built-in earlier MLB season (an MLB
+// The Show edition, src/data/baseballSeasons.js), its nations by birthplace and its clubs on its era's map. Each is a
+// `public/<sport>/<id>.json` (format 1, see docs/design/football-years.md), validated strictly and exposed as that sport
+// bound to the season. The built-in data (src/data/rosters.js, clubs.football.js, the basketball and baseball modules)
+// never changes.
 
 import { DEPENDENCIES, HOME_NATIONS, NATIONS } from '../data/teams.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
 import { BUILT_IN_SEASONS } from '../data/footballSeasons.js';
 import { BUILT_IN_BASKETBALL_SEASONS } from '../data/basketballSeasons.js';
+import { BUILT_IN_BASEBALL_SEASONS } from '../data/baseballSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { basketball } from '../sports/basketball.js';
+import { baseball } from '../sports/baseball.js';
 import { football } from '../sports/football.js';
 import { getSport } from '../sports/index.js';
 
@@ -26,16 +30,24 @@ const BUILT_IN_SEASONS_OF = Object.freeze({ football: BUILT_IN_SEASON, basketbal
 export const builtInSeasonOf = sportId => BUILT_IN_SEASONS_OF[getSport(sportId).id];
 
 // `cm0102-<release month>[-variant]` for a CM 01/02 database, `ea-fifa-<nn>` / `ea-fc-<nn>` for an EA edition,
-// `nba-2k<nn>` for an NBA 2K edition.
-const SET_ID = /^(?:cm0102-\d{4}-\d{2}(-[a-z0-9]+)?|ea-(?:fifa|fc)-\d{2}|nba-2k\d{2})$/;
+// `nba-2k<nn>` for an NBA 2K edition, `mlb-the-show-<nn>` for an MLB The Show edition.
+const SET_ID = /^(?:cm0102-\d{4}-\d{2}(-[a-z0-9]+)?|ea-(?:fifa|fc)-\d{2}|nba-2k\d{2}|mlb-the-show-\d{2})$/;
 export const isFootballSetId = id => typeof id === 'string' && SET_ID.test(id);
-/** Whose players a set holds, by its id: 'ea', 'nba2k' or 'cm0102'. */
-export const setKindOf = id => (String(id).startsWith('ea-') ? 'ea' : String(id).startsWith('nba-') ? 'nba2k' : 'cm0102');
+/** Whose players a set holds, by its id: 'ea', 'nba2k', 'show' or 'cm0102'. */
+export const setKindOf = id => (String(id).startsWith('ea-') ? 'ea' : String(id).startsWith('nba-') ? 'nba2k'
+  : String(id).startsWith('mlb-') ? 'show' : 'cm0102');
+const SPORT_OF_KIND = { nba2k: 'basketball', show: 'baseball' };
 /** The sport a set is played in, by its id. */
-export const setSportOf = id => (setKindOf(id) === 'nba2k' ? 'basketball' : 'football');
+export const setSportOf = id => SPORT_OF_KIND[setKindOf(id)] || 'football';
+/** Whether a set fields national teams: every one but an NBA season, which has clubs only. */
+export const setHasNations = id => setKindOf(id) !== 'nba2k';
+// Sets whose clubs play on a map of their era (src/data/clubMaps.js) rather than on the world.
+const MAPPED = new Set(['nba2k', 'show']);
 export const isDataYear = year => Number.isInteger(year) && year >= 1872 && year <= 2100;
 /** '2025/26' for 2026. */
 export const seasonOf = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
+/** A set's season as it names it: football's and basketball's '2025/26', baseball's calendar year, '2025'. */
+export const seasonLabelOf = (id, year) => (setSportOf(id) === 'baseball' ? String(year) : seasonOf(year));
 const versionPattern = id => new RegExp(`^${id}-[0-9a-f]{8}$`);
 // The builder's `f-<slug>` ids. The fixed prefix also keeps a club clear of Object.prototype names such as
 // `__proto__`, which the campaign's team maps would swallow.
@@ -89,25 +101,25 @@ function listing(data) {
   if (!Array.isArray(entries)) return [];
   const seen = new Set();
   const valid = entries.filter(entry => entry && isFootballSetId(entry.id) && !seen.has(entry.id) && seen.add(entry.id)
-    && isDataYear(entry.year) && entry.season === seasonOf(entry.year) && typeof entry.label === 'string' && entry.label.trim()
+    && isDataYear(entry.year) && entry.season === seasonLabelOf(entry.id, entry.year) && typeof entry.label === 'string' && entry.label.trim()
     && (entry.version == null || (typeof entry.version === 'string' && versionPattern(entry.id).test(entry.version)))
-    && (setKindOf(entry.id) !== 'nba2k' || eraMapOf(entry.id, entry.map) != null));
+    && (!MAPPED.has(setKindOf(entry.id)) || eraMapOf(entry.id, entry.map) != null));
   return Object.freeze(valid.sort(newestFirst).map(({ id, version = null, year, season, label, map }) => Object.freeze({
-    id, version, year, season, label: label.trim(), ...(setKindOf(id) === 'nba2k' ? { map } : {}) })));
+    id, version, year, season, label: label.trim(), ...(MAPPED.has(setKindOf(id)) ? { map } : {}) })));
 }
 
-// A basketball season's map (src/data/clubMaps.js), or null: an earlier era's that lists the season, or today's for a
-// season with today's teams in today's arenas.
-const eraMapOf = (id, map) => CLUB_MAPS.find(entry => entry.id === map && entry.sport === 'basketball'
+// A basketball or baseball season's map (src/data/clubMaps.js), or null: an earlier era's that lists the season, or
+// today's for a season with today's teams in today's arenas.
+const eraMapOf = (id, map) => CLUB_MAPS.find(entry => entry.id === map && entry.sport === setSportOf(id)
   && (entry.seasons == null || entry.seasons.includes(id))) || null;
 
 /** Whether a club map is an earlier era's, played only with its seasons' clubs. */
 export const isEraMap = id => CLUB_MAPS.some(entry => entry.id === id && entry.seasons != null);
 
 /** The built-in earlier seasons of every sport, newest first, as the index lists them. */
-export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS]);
+export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS]);
 
-/** The era map a basketball season plays on (null for any other set). */
+/** The era map a basketball or baseball season's clubs play on (null for any other set). */
 export const seasonMapOf = id => BUILT_IN_SETS.find(set => set.id === id)?.map ?? null;
 
 // ---------- loading ----------
@@ -210,6 +222,15 @@ export function decodeFootballSet(data, id = data?.id) {
     const { clubs, ...meta } = data;
     return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(player => [...player]) })), territory: NO_TERRITORY };
   }
+  if (setKindOf(data.id) === 'show') {
+    const { nations, clubs, territory, ...meta } = data;
+    return {
+      meta,
+      rosters: Object.fromEntries(Object.entries(nations).map(([nation, [str, real, players]]) => [nation, [str, real, players.map(player => [...player])]])),
+      clubs: clubs.map(club => ({ ...club, squad: club.squad.map(player => [...player]) })),
+      territory: { merged: { ...territory.merged }, inactive: [...territory.inactive] },
+    };
+  }
   const { nations, clubs, territory, ...meta } = data;
   const expand = tuple => expandSetPlayer(tuple, meta.source, setKindOf(meta.id));
   const englandHolds = beforeHomeNations(nations);
@@ -257,8 +278,15 @@ const KINDS = {
       ? 'source must name the edition and who compiled its ratings'
       : src.rawScale !== NBA_SCALE ? `source rawScale must be ${NBA_SCALE}`
         : src.conversion !== undefined ? 'NBA 2K ratings are not converted' : '') },
+  // Nations and clubs, each player `[name, positions, rating]` as the built-in baseball teams hold them.
+  show: { size: 3,
+    source: src => (!['edition', 'update', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
+      ? 'source must name the edition, its roster update and when it was read'
+      : src.rawScale !== SHOW_SCALE ? `source rawScale must be ${SHOW_SCALE}`
+        : src.conversion !== undefined ? 'MLB The Show ratings are not converted' : '') },
 };
 const NBA_SCALE = 99;
+const SHOW_SCALE = 99;
 const BASKETBALL_POSITIONS = ['PG', 'SG', 'SF', 'PF', 'C'];
 // The built-in basketball clubs' `b-<slug>` ids, with the same guard against Object.prototype names.
 const BASKETBALL_CLUB_ID = /^b-[a-z0-9-]{1,62}$/;
@@ -281,7 +309,7 @@ function validateFootballSet(data, id) {
     fail(`version ${JSON.stringify(data.version)} must look like "${id}-<8 hex>"`);
   }
   if (!isDataYear(data.year)) fail(`year ${JSON.stringify(data.year)} must be an integer from 1872 to 2100`);
-  if (data.season !== seasonOf(data.year)) fail(`season ${JSON.stringify(data.season)} must be "${seasonOf(data.year)}", the season ending in ${data.year}`);
+  if (data.season !== seasonLabelOf(id, data.year)) fail(`season ${JSON.stringify(data.season)} must be "${seasonLabelOf(id, data.year)}", the season ending in ${data.year}`);
   if (!text(data.label)) fail('label is missing');
   if (data.local != null && typeof data.local !== 'boolean') fail('local must be true or false');
   const src = data.source;
@@ -293,6 +321,7 @@ function validateFootballSet(data, id) {
   if (data.coverage != null && (!isObject(data.coverage)
     || Object.values(data.coverage).some(n => !Number.isInteger(n) || n < 0))) fail('coverage must hold counts');
   if (setKindOf(id) === 'nba2k') return validateBasketballClubs(data, id, fail);
+  if (setKindOf(id) === 'show') return validateBaseballSeason(data, id, fail);
 
   // The builder writes only tuples that rebuild exactly, so anything else (an unknown or repeated position key, a
   // full name equal to the name, a malformed date) is a file it did not write.
@@ -426,6 +455,83 @@ function validateBasketballClubs(data, id, fail) {
   });
 }
 
+const BASEBALL_POSITIONS = new Set(['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP']);
+// The built-in baseball clubs' `mlb-<slug>` ids, with the same guard against Object.prototype names.
+const BASEBALL_CLUB_ID = /^mlb-[a-z0-9-]{1,62}$/;
+
+/**
+ * A baseball season: its nations (only those with players; the rest are the sport's minnows) and the MLB's clubs of
+ * that season, one per section of its era's map (`map`), each player `[name, 'SS/2B', rating]`, and the home nations
+ * merged into the United Kingdom. Saved names resolve against them, so ids, codes and leagues follow the built-in
+ * clubs' rules.
+ */
+function validateBaseballSeason(data, id, fail) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
+  const text = v => typeof v === 'string' && v.trim().length > 0;
+  const rating = v => Number.isInteger(v) && v >= 1 && v <= 99;
+  const squad = (at, list, least) => {
+    if (!Array.isArray(list) || list.length < least) fail(`${at} needs at least ${least} players`);
+    const names = new Set();
+    list.forEach((player, j) => {
+      const where = `${at}[${j}]`;
+      if (!Array.isArray(player) || player.length !== KINDS.show.size) fail(`${where} is not [name, positions, rating]`);
+      const [name, positions, value] = player;
+      if (!text(name) || name !== name.trim()) fail(`${where} has no name`);
+      if (names.has(name)) fail(`${where} repeats ${name}`);
+      names.add(name);
+      const listed = typeof positions === 'string' ? positions.split('/') : [];
+      if (!listed.length || !listed.every(pos => BASEBALL_POSITIONS.has(pos)) || new Set(listed).size !== listed.length) {
+        fail(`${where} positions ${JSON.stringify(positions)} must be baseball positions, primary first`);
+      }
+      if (!rating(value)) fail(`${where} rating must be a whole number 1-99`);
+    });
+  };
+  const map = eraMapOf(id, data.map);
+  if (!map) fail(`map ${JSON.stringify(data.map)} is not a baseball map listing this season`);
+
+  const nations = data.nations;
+  if (!isObject(nations)) fail('nations is missing');
+  for (const [key, entry] of Object.entries(nations)) {
+    const at = `nations[${key}]`;
+    if (!Object.hasOwn(NATIONS, key)) fail(`${at} is not a nation id`);
+    if (!Array.isArray(entry) || entry.length !== 3) fail(`${at} must be [strength, players, squad]`);
+    const [str, real, list] = entry;
+    if (!rating(str)) fail(`${at} strength must be a whole number 1-99`);
+    squad(`${at} squad`, list, 1);
+    if (real !== list.length) fail(`${at} counts ${real} players but lists ${list.length}`);
+  }
+
+  if (!Array.isArray(data.clubs)) fail('clubs must be a list');
+  if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
+  const leagues = new Set(baseball.clubs.map(club => club.league));
+  const ids = new Set(), codes = new Set();
+  data.clubs.forEach((club, i) => {
+    const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
+    if (!isObject(club)) fail(`${at} is not an object`);
+    if (typeof club.id !== 'string' || !BASEBALL_CLUB_ID.test(club.id)) fail(`${at} id ${JSON.stringify(club.id)} must look like "mlb-<name>"`);
+    if (ids.has(club.id)) fail(`${at} id is duplicated`);
+    ids.add(club.id);
+    if (!text(club.name)) fail(`${at} has no name`);
+    if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
+    if (codes.has(club.code)) fail(`${at} code ${club.code} is duplicated`);
+    codes.add(club.code);
+    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
+    if (typeof club.country !== 'string' || !Object.hasOwn(NATIONS, club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
+    if (!text(club.col)) fail(`${at} has no colour`);
+    if (typeof club.str !== 'number' || !(club.str >= 1 && club.str <= 99)) fail(`${at} str must be a rating 1-99`);
+    squad(`${at} squad`, club.squad, 13);
+  });
+
+  const territory = data.territory;
+  if (!isObject(territory) || !isObject(territory.merged) || !Array.isArray(territory.inactive)) {
+    fail('territory must be { merged: { shape: holder }, inactive: [shape] }');
+  }
+  for (const [shape, holder] of Object.entries(territory.merged)) {
+    if (!Object.hasOwn(NATIONS, shape) || !Object.hasOwn(NATIONS, holder) || holder === shape) fail(`territory.merged ${shape} names no other nation as its holder`);
+  }
+  if (!territory.inactive.every(shape => Object.hasOwn(NATIONS, shape))) fail('territory.inactive lists a shape that is not a nation');
+}
+
 // ---------- the season-bound sport ----------
 
 const sports = new WeakMap();
@@ -433,7 +539,8 @@ const sports = new WeakMap();
 /**
  * The sport bound to a decoded data set, plus the set's identity for setup caches and settings. A football set's
  * nations, clubs and territory replace the built-in ones; a basketball season's clubs replace the built-in clubs and
- * play on its era's map (`clubMap`), its national teams never playing with it. Memoised per decoded set, so a version
+ * play on its era's map (`clubMap`), its national teams never playing with it; a baseball season's nations and clubs
+ * replace the built-in ones, its clubs on its era's map, and a nation it does not list is the sport's minnow. Memoised per decoded set, so a version
  * keeps one sport while it stays loaded.
  */
 export function seasonSport(set) {
@@ -442,6 +549,7 @@ export function seasonSport(set) {
     const { meta, rosters, clubs, territory } = set;
     const identity = { dataSet: meta.id, dataVersion: meta.version, dataYear: meta.year, dataSeason: meta.season, dataLabel: meta.label };
     sport = setKindOf(meta.id) === 'nba2k' ? { ...basketball, clubs, clubMap: meta.map, ...identity }
+      : setKindOf(meta.id) === 'show' ? { ...baseball, rosters, clubs, territory, clubMap: meta.map, ...identity }
       : { ...football, rosters, clubs, territory,
         // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
         fallbackStrength: () => EMPTY_STRENGTH, ...identity };

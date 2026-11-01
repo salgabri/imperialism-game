@@ -20,4 +20,7 @@ export const CLUB_MAPS = [
   {"id":"nba2014","sport":"basketball","league":"NBA","name":"USA and Canada","seasons":["nba-2k14"],"clubs":30,"sections":30,"version":"nba2014-345b6b50"},
   {"id":"nfl","sport":"american-football","league":"NFL","name":"USA","clubs":32,"sections":32,"venue":"stadium","lines":"state","version":"nfl-5b094a79","top":["Los Angeles Rams","San Francisco 49ers","Baltimore Ravens"]},
   {"id":"mlb","sport":"baseball","league":"MLB","name":"USA and Canada","clubs":30,"sections":30,"venue":"ballpark","version":"mlb-fca21cf2","top":["Los Angeles Dodgers","New York Yankees","Atlanta Braves"]},
+  {"id":"mlb2021","sport":"baseball","league":"MLB","name":"USA and Canada","seasons":["mlb-the-show-21"],"clubs":30,"sections":30,"venue":"ballpark","version":"mlb2021-215fc3ec"},
+  {"id":"mlb2022","sport":"baseball","league":"MLB","name":"USA and Canada","seasons":["mlb-the-show-22","mlb-the-show-23","mlb-the-show-24"],"clubs":30,"sections":30,"venue":"ballpark","version":"mlb2022-5892e782"},
+  {"id":"mlb2025","sport":"baseball","league":"MLB","name":"USA and Canada","seasons":["mlb-the-show-25"],"clubs":30,"sections":30,"venue":"ballpark","version":"mlb2025-b4d2968f"},
 ];

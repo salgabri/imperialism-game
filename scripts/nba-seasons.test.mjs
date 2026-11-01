@@ -106,7 +106,8 @@ test('the builder stops on an edition whose teams are not the manifest\'s, or a 
 
 // ---------- the shipped seasons ----------
 
-const ERA_MAPS = CLUB_MAPS.filter(entry => entry.seasons);
+// Basketball's era maps; baseball's are scripts/baseball-seasons.test.mjs's.
+const ERA_MAPS = CLUB_MAPS.filter(entry => entry.seasons && entry.sport === 'basketball');
 
 test('the built-in seasons are the manifest\'s, newest first, 2011/12 left out as its source is broken', () => {
   assert.deepEqual(BUILT_IN_BASKETBALL_SEASONS.map(set => set.year), MANIFEST.seasons.slice().sort((a, b) => b - a));

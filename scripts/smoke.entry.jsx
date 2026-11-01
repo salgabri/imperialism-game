@@ -1436,6 +1436,82 @@ const dialogText = () => document.querySelector('[aria-labelledby="campaign-stor
  * Cancel import must each stop it, and the dialog says it is loading meanwhile.
  * A saved campaign can be deleted from Saved campaigns.
  */
+/** Mount the app at a page address: App reads a challenge link from it as it mounts. */
+async function mountAt(address) {
+  window.history.replaceState(null, '', address);
+  const mounted = mount();
+  await until(`setup at ${address}`, () => mounted.app?.state.phase === 'setup' && text().includes('Launch campaign'));
+  return mounted;
+}
+
+/**
+ * Challenge links (README §Sharing a campaign): a link fills in setup without launching, setup shows its choices,
+ * "Copy challenge link" writes the same link back and Launch plays it; a country map's link keeps its club once the
+ * map has loaded; a stale link falls back to the defaults and says which choices it could not use.
+ */
+export async function runChallengeCheck() {
+  const link = '/?sport=basketball&theatre=CONMEBOL&draw=round-robin&upsets=wild&role=manager&team=076&seed=4242';
+  let copied = null;
+  Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText: async value => { copied = value; } } });
+  const result = {};
+  let mounted = await mountAt(link);
+  try {
+    const app = mounted.app;
+    // Past the team check: on the world map it settles at once.
+    await sleep(200);
+    const setup = result.setup = app.state.setup;
+    result.prefilled = setup.sport === 'basketball' && setup.layer === 'nations' && setup.scope === 'CONMEBOL' && setup.pacing === 'duel'
+      && setup.turnOrder === 'round-robin' && setup.uncertainty === 'wild' && setup.role === 'manager' && setup.managedTeamId === '076'
+      && setup.seed === '4242' && setup.dataSet == null;
+    result.notLaunched = app.state.phase === 'setup' && Object.keys(app.state.teams).length === 0;
+    const radio = id => document.getElementById(id)?.closest('[role="radio"]');
+    result.rendered = button('Basketball').getAttribute('aria-checked') === 'true'
+      && document.getElementById('setup-theatre').value === 'CONMEBOL'
+      && radio('rule-draw-round-robin-title')?.getAttribute('aria-checked') === 'true'
+      && document.getElementById('setup-uncertainty').value === 'wild'
+      && roleCard('manager').getAttribute('aria-checked') === 'true'
+      && document.getElementById('setup-managed-team').value === '076'
+      && document.getElementById('setup-seed').value === '4242'
+      && /seed, 4242, came from the link/.test(document.querySelector('.setup-challenge')?.textContent || '');
+    button('Copy challenge link').click();
+    await until('the link is copied', () => copied != null, 5000);
+    result.copied = copied;
+    result.roundTrip = copied === `http://localhost${link}`;
+    button('Launch campaign').click();
+    await until('the challenge launches', () => app.state.phase === 'playing');
+    const settings = result.settings = app.state.settings;
+    result.launched = settings.sport === 'basketball' && settings.scope === 'CONMEBOL' && settings.turnOrder === 'round-robin'
+      && settings.uncertainty === 'wild' && settings.seed === '4242' && app.state.seed === 4242 && app.state.managedTeamId === '076'
+      && !document.querySelector('.setup-challenge');
+    mounted.unmount();
+
+    // One country's clubs: the club is checked against the country's map once it has loaded.
+    const albania = await loadReference('008');
+    const club = albania.clubs.at(-1);
+    mounted = await mountAt(`/?teams=clubs&theatre=domestic:008&role=manager&team=${club.id}&seed=7`);
+    await until('the map of Albania loads', () => mounted.app.domesticStatus().state === 'ready', 20000);
+    await sleep(200);
+    result.country = { scope: mounted.app.state.setup.clubScope, team: mounted.app.state.setup.managedTeamId, club: club.id };
+    result.countryTeam = result.country.scope === 'domestic:008' && result.country.team === club.id
+      && document.getElementById('setup-managed-team').value === club.id;
+    mounted.unmount();
+
+    // A stale link: a sport, season, theatre, draw and seed this build doesn't offer, and a team the theatre lacks.
+    mounted = await mountAt('/?sport=hockey&theatre=Mars&season=ea-fifa-99&draw=sometimes&role=manager&team=XYZ&seed=abc');
+    await until('the unknown team is cleared', () => mounted.app.state.setup.managedTeamId === '', 5000);
+    const stale = result.staleSetup = mounted.app.state.setup;
+    result.stale = stale.sport === 'football' && stale.layer === 'nations' && stale.scope === 'UEFA' && stale.dataSet == null
+      && stale.pacing === 'duel' && stale.turnOrder === 'random' && stale.seed === '' && stale.role === 'manager';
+    result.staleNote = /sport, season, theatre, draw, seed and team aren’t offered here/
+      .test(document.querySelector('.setup-challenge')?.textContent || '');
+  } finally {
+    mounted.unmount();
+    window.history.replaceState(null, '', '/');
+    delete window.navigator.clipboard;
+  }
+  return result;
+}
+
 export async function runRestoreRaceCheck() {
   const plan = globalThis.__smokeFetch, file = 'domestic/826.json';
   const { reference, campaign: england } = await storeEnglandCampaign('smoke-england');

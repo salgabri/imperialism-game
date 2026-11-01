@@ -42,8 +42,9 @@ test('the bounded long-shootout fallback can award either side a recorded decisi
     let draws = 0;
     const rng = () => {
       const index = draws++;
-      if (index === 6) return first === 'A' ? 0 : .9;
-      if (index === 57) return coin;
+      // Draw 6 settles the goalless score's low-score correction; 7 picks the first kicker.
+      if (index === 7) return first === 'A' ? 0 : .9;
+      if (index === 58) return coin;
       return 0;
     };
     const result = football.simulate(rng, attacker, defender, 0);
@@ -55,6 +56,6 @@ test('the bounded long-shootout fallback can award either side a recorded decisi
     assert.equal(result.tie.D.at(-1), winner === 'D' ? 1 : 0);
     assert.equal(result.tie.ga, result.tie.A.reduce((sum, kick) => sum + kick, 0));
     assert.equal(result.tie.gd, result.tie.D.reduce((sum, kick) => sum + kick, 0));
-    assert.equal(draws, 58);
+    assert.equal(draws, 59);
   }
 });

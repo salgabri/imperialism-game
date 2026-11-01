@@ -3,6 +3,7 @@
 // components pass it to buildFeedRows and to the win-probability series.
 import { clockLabel, getSport, matchSport, overtimePeriodsOf, overtimeText } from '../sports/index.js';
 import { selectLineup } from '../data/teams.js';
+import { BENCH } from '../sports/basketball.js';
 import { liveModelFor } from '../engine/winProbability.js';
 import { roman, historyRound, formatOddsPair, ratingTier, shortName, memo } from './format.js';
 import { idleTurnCopy } from './turns.js';
@@ -27,7 +28,7 @@ function oddsOf(odds) {
 }
 
 /**
- * "Chiesa 23' · Raspadori 61'" (football), "Jokić 14 pts · Murray 9 pts" (basketball: top two scorers),
+ * "Chiesa 23' · Raspadori 61'" (football), "Jokić 14 pts · Murray 9 pts" (basketball: top two scorers, never the bench),
  * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score) or
  * "Judge 3 RBI · Soto 1 RBI" (baseball: the two who drove in most runs).
  */
@@ -54,7 +55,7 @@ export function scorersLine(shown, teamId, teams, sportId = 'football') {
   }
   if (sportId === 'basketball') {
     const totals = new Map();
-    for (const e of own) totals.set(e.name, (totals.get(e.name) || 0) + (Number(e.pts) || 0));
+    for (const e of own) if (e.name !== BENCH) totals.set(e.name, (totals.get(e.name) || 0) + (Number(e.pts) || 0));
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2)
       .map(([name, pts]) => `${shortName(name)} ${pts} pts`).join(' · ');
   }
@@ -248,8 +249,8 @@ function fromMatch(st, ctx, sport, m) {
   const statusDetail = state === 'penalties' ? `${kicks?.a ?? 0}–${kicks?.b ?? 0}` : tieDetail;
   let model = m.live ?? null;
   if (!model && !m.applied) {
-    model = memo(ctx?.cache, 'match:live', [A, D, m.effA, m.effD, sport.id], () => {
-      try { return liveModelFor(sport, A, D, m.effA, m.effD, m.matchDrama ?? ctx?.drama) ?? null; } catch { return null; }
+    model = memo(ctx?.cache, 'match:live', [A, D, m.effA, m.effD, sport.id, !!ctx?.homeAdvantage], () => {
+      try { return liveModelFor(sport, A, D, m.effA, m.effD, m.matchDrama ?? ctx?.drama, !!ctx?.homeAdvantage) ?? null; } catch { return null; }
     });
   }
   const winnerSide = m.winner === m.aId ? 'A' : m.winner === m.dId ? 'D' : scoreA > scoreB ? 'A' : scoreB > scoreA ? 'D' : null;

@@ -1,11 +1,12 @@
 import { SAVE_KEY, SAVE_VERSION } from '../config.js';
 import { DOMESTIC_PREFIX, domesticScopeId, isDomesticScope } from './domestic.js';
-import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, seasonMapOf, seasonOf, setKindOf, setSportOf } from './footballSets.js';
+import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, seasonLabelOf, seasonMapOf, setHasNations, setKindOf, setSportOf } from './footballSets.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 import { CM_ROLES, CM_SOURCE, cmTupleOf } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SOURCE, eaRosterOf, eaTupleOf } from '../data/eaPlayers.js';
 import { getSport, SPORT_LIST } from '../sports/index.js';
 import { HOME_NATIONS } from '../data/teams.js';
+import { keepSaves } from './persistence.js';
 
 export const CAMPAIGN_INDEX_KEY = `${SAVE_KEY}:campaigns`;
 export const CAMPAIGN_BACKUP_KEY = `${SAVE_KEY}:backup`;
@@ -306,7 +307,7 @@ function validateCampaign(input, rebuildSources) {
   const enums = { sport: SPORT_LIST.map(sport => sport.id), layer: ['nations', 'clubs'], pacing: ['duel', 'blitz', 'chaos'],
     resolution: ['ticker', 'instant'], role: ['spectator', 'manager'], uncertainty: ['predictable', 'balanced', 'wild'],
     finale: ['single', 'best-of-three'], acquisitionPolicy: ['best-fit', 'highest-rated'], rosterPreset: ['authentic', 'competitive'],
-    turnOrder: ['round-robin', 'random'], targeting: ['player', 'compass'] };
+    turnOrder: ['round-robin', 'random'], targeting: ['player', 'compass'], homeAdvantage: ['off', 'on'] };
   for (const configuration of [settings, data.initialSettings].filter(Boolean)) {
     for (const [key, values] of Object.entries(enums)) if (configuration[key] != null && !values.includes(configuration[key])) invalid(`Campaign ${key} setting is unsupported.`);
     if (configuration.managedTeamId != null && configuration.managedTeamId !== '' && !known(configuration.managedTeamId)) invalid('The managed team setting is unavailable.');
@@ -319,14 +320,15 @@ function validateCampaign(input, rebuildSources) {
         || (domestic && !domesticVersion.startsWith(`${domesticScopeId(clubScope)}-`)))) invalid('Campaign map version is invalid.');
     // A data set campaign names the set, the build it was played on and its season, or none of them. A set plays in its
     // own sport: a football one never on a country map (those use the built-in data), a basketball one with clubs on
-    // its era's map, which no other campaign plays on.
+    // its era's map, which no other campaign plays on, and a baseball one with its nations or its clubs on its era's map.
     const { dataSet, dataVersion, dataYear, dataSeason } = configuration;
     const sport = getSport(configuration.sport).id;
     if (dataSet == null ? [dataVersion, dataYear, dataSeason].some(value => value != null) || (domestic && isEraMap(domesticScopeId(clubScope)))
       : !isFootballSetId(dataSet) || setSportOf(dataSet) !== sport
-        || (sport === 'football' ? domestic : configuration.layer !== 'clubs' || !domestic || domesticScopeId(clubScope) !== seasonMapOf(dataSet))
+        || (sport === 'football' ? domestic : configuration.layer !== 'clubs' ? !setHasNations(dataSet)
+          : !domestic || domesticScopeId(clubScope) !== seasonMapOf(dataSet))
         || typeof dataVersion !== 'string' || !new RegExp(`^${dataSet}-[0-9a-f]{8}$`).test(dataVersion)
-        || !isDataYear(dataYear) || dataSeason !== seasonOf(dataYear)) invalid('Campaign data set is invalid.');
+        || !isDataYear(dataYear) || dataSeason !== seasonLabelOf(dataSet, dataYear)) invalid('Campaign data set is invalid.');
   }
   for (const key of ['round', 'matches', 'batchTotal', 'revision']) if (data[key] != null && !nonnegative(data[key])) invalid(`Campaign ${key} is invalid.`);
   for (const key of ['seed', 'rngState']) if (data[key] != null && !uint(data[key])) invalid('The saved random state is invalid.');
@@ -629,6 +631,8 @@ export function writeSave(state, { activate = true } = {}) {
       [CAMPAIGN_INDEX_KEY, JSON.stringify(index)], [key, text], ...(updatePointer ? [[SAVE_KEY, text]] : [])];
     const saved = message => {
       lastWritten = { text, campaignId: data.campaignId, revision: data.revision };
+      // The first checkpoint asks the browser to keep the saves through storage eviction (persistence.js).
+      keepSaves();
       return { ok: true, campaignId: data.campaignId, revision: data.revision, campaignName: data.campaignName,
         savedAt: data.savedAt, message };
     };

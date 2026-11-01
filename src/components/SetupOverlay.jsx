@@ -4,9 +4,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
+import ShareCampaign from './ShareCampaign.jsx';
 import TeamMark from './TeamMark.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
+import AdSlot from './AdSlot.jsx';
 import * as setupModel from '../screens/setup/setupModel.js';
+import { challengeNote, dailyField } from '../screens/setup/challenge.js';
 import { themedPaint } from '../theme.js';
 import './setup.css';
 
@@ -19,7 +22,8 @@ export const domesticDescription = setupModel.domesticDescription;
 
 const {
   SETUP_STEPS, DRAW_CARDS, TARGETING_CARDS, ROLE_CARDS, CONQUEST_RULES, UNCERTAINTY_OPTIONS, UNCERTAINTY_HELP, FINALE_OPTIONS,
-  FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, SHOW_MATCH_OPTIONS, showMatchesWrites,
+  FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, HOME_OPTIONS, HOME_HELP, SHOW_MATCH_OPTIONS,
+  showMatchesWrites,
 } = setupModel;
 
 /** Focus inside one of these keeps Space for itself (A-8). */
@@ -236,12 +240,14 @@ function theatreCaption(model, preview) {
  * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
  * `initialStep` (1–3) is the step it opens on: Your role (3) for "Another team" after a defeat. `suggestTeam` (default
  * true) lets a manager with no team picked launch the suggested one; "Another team" turns it off.
+ * Sharing (README §Sharing a campaign): `challenge` is the link setup was filled in from ({ seed, ignored }) or null,
+ * `challengeLink` this setup's own link for step 3, and `daily` today's campaign card ({ label, active }, `onDaily`).
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
   domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON, initialStep = 1,
-  suggestTeam = true,
+  suggestTeam = true, challenge = null, challengeLink = '', daily = null, onDaily,
 }) {
   const [step, setStep] = useState(() => Math.min(3, Math.max(1, Math.round(Number(initialStep)) || 1)));
   const [confirmation, setConfirmation] = useState(null);
@@ -435,6 +441,12 @@ export default function SetupOverlay({
           </select>
           <small className="control-help">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
         </label>
+        <label className="control-field" htmlFor="setup-home-advantage"><span>Home advantage</span>
+          <select id="setup-home-advantage" value={model.homeAdvantage} onChange={event => pick('homeAdvantage', event.target.value)}>
+            {HOME_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+          </select>
+          <small className="control-help">{HOME_HELP[model.homeAdvantage]}</small>
+        </label>
         {model.sport.id === 'basketball' ? (
           <label className="control-field" htmlFor="setup-roster-preset"><span>Team strengths</span>
             <select id="setup-roster-preset" value={model.rosterPreset} onChange={event => pick('rosterPreset', event.target.value)}>
@@ -464,25 +476,29 @@ export default function SetupOverlay({
           <ThemeToggle className="setup-head__theme" />
         </header>
 
-        <nav className="setup-rail" aria-label="Setup steps">
-          <ol className="setup-rail__steps">
-            {SETUP_STEPS.map(item => {
-              const state = item.n < step ? 'done' : item.n === step ? 'current' : 'upcoming';
-              return (
-                <li key={item.id} data-state={state}>
-                  <button type="button" className="setup-rail__step" data-state={state} aria-current={state === 'current' ? 'step' : undefined}
-                    aria-controls={`setup-step-${item.id}`} onClick={() => goTo(item.n)}>
-                    <span className="setup-rail__badge" aria-hidden="true">{state === 'done' ? <CheckMark /> : item.n}</span>
-                    <span className="setup-rail__text">
-                      <span className="setup-rail__title">{state === 'done' ? <span className="sr-only">Done: </span> : null}{item.title}</span>
-                      <span className="setup-rail__sub">{state === 'done' ? <RailSummary text={model.stepSummaries[item.n]} /> : item.pending}</span>
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
+        <div className="setup-rail">
+          <nav aria-label="Setup steps">
+            <ol className="setup-rail__steps">
+              {SETUP_STEPS.map(item => {
+                const state = item.n < step ? 'done' : item.n === step ? 'current' : 'upcoming';
+                return (
+                  <li key={item.id} data-state={state}>
+                    <button type="button" className="setup-rail__step" data-state={state} aria-current={state === 'current' ? 'step' : undefined}
+                      aria-controls={`setup-step-${item.id}`} onClick={() => goTo(item.n)}>
+                      <span className="setup-rail__badge" aria-hidden="true">{state === 'done' ? <CheckMark /> : item.n}</span>
+                      <span className="setup-rail__text">
+                        <span className="setup-rail__title">{state === 'done' ? <span className="sr-only">Done: </span> : null}{item.title}</span>
+                        <span className="setup-rail__sub">{state === 'done' ? <RailSummary text={model.stepSummaries[item.n]} /> : item.pending}</span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+          {/* The rail's empty foot, well below the steps; shown only on desktops tall enough to leave that gap (setup.css). */}
+          <AdSlot className="setup-rail__ad" size={[200, 200]} />
+        </div>
 
         {/* Step 1 — Campaign (V1 board 02) */}
         <section className="setup-step" id="setup-step-campaign" data-step="1" hidden={step !== 1} aria-labelledby="setup-campaign-title">
@@ -510,6 +526,28 @@ export default function SetupOverlay({
                       </div>
                     </>
                   )}
+                </div>
+              ) : null}
+
+              {challenge ? (
+                <div className="setup-challenge" role="note" aria-labelledby="setup-challenge-title">
+                  <strong id="setup-challenge-title">Challenge link</strong>
+                  <p>{challengeNote(challenge)}</p>
+                </div>
+              ) : null}
+
+              {/* Today's campaign for the chosen sport: setup fills it in, then step 3 asks for your team. A page opened
+                  from a challenge link is there to play that challenge, so the card waits until the note goes. */}
+              {daily && !challenge ? (
+                <div className="setup-daily" data-active={daily.active || undefined}>
+                  <div className="setup-daily__text">
+                    <strong>Daily campaign · {model.sport.name} · {daily.label}</strong>
+                    <p>{daily.active ? `Today’s campaign is set up. Choose your ${model.noun} and launch it.`
+                      : `Today’s campaign: ${dailyField(model.sport.id)} on Fast-forward, with the same seed for everyone. Pick your team and see how far it goes.`}</p>
+                  </div>
+                  <button type="button" className="btn-secondary setup-daily__play" onClick={() => { if (!daily.active) onDaily?.(); goTo(3); }}>
+                    {daily.active ? `Choose your ${model.noun}` : 'Play today’s campaign'}
+                  </button>
                 </div>
               ) : null}
 
@@ -782,6 +820,13 @@ export default function SetupOverlay({
               ) : null}
               <TeamShortlist id="setup-favourites" title="Favourites" teams={model.favourites} />
               <TeamShortlist id="setup-long-shots" title="Long shots" teams={model.longShots} />
+              {challengeLink ? (
+                <section className="setup-share" aria-labelledby="setup-share-title">
+                  <Kicker id="setup-share-title" title="Challenge a friend" />
+                  <ShareCampaign link={challengeLink}
+                    note="The link holds this setup and its seed. It opens ready to launch, and plays the same campaign." />
+                </section>
+              ) : null}
             </div>
           </div>
           {footer(3)}

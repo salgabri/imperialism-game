@@ -7,6 +7,9 @@
 // so c-elite-blitz plays a different field; the two CONMEBOL cases replay unchanged.
 // Regenerated again for the current season: the built-in rosters became 2026/27 (EA FC 27 + FM 26), so every case
 // fields new squads and plays different matches from the same seeds.
+// Regenerated for the realism pass (football simulation version 3): match-day form's spread at Balanced fell from
+// 0.45 to 0.28, low scores take the Dixon–Coles correction and shoot-out kicks go in 73% of the time, so the same
+// seeds draw different scores (scripts/simulation-realism.mjs measures the model against Europe's top leagues).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';

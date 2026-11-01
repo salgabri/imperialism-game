@@ -89,6 +89,9 @@
 .fi-victory .fi-victory-actions > button { height:46px; }
 .fi-victory .fi-victory-actions > .fi-victory-primary { padding:0 18px 0 22px; font-size:16px; }
 .fi-victory .fi-victory-actions > .btn-secondary { padding:0 20px; font-size:15px; }
+/* Challenge a friend (README §Sharing a campaign): the challenge link and the share image, under the actions. */
+.fi-victory-share { margin-top:24px; padding-top:18px; border-top:1px solid var(--rule); }
+.fi-victory-share > .kicker { margin-bottom:10px; }
 .fi-victory-squad-heading { margin-bottom:6px; }
 .fi-victory-squad { display:flex; flex-direction:column; }
 

@@ -5,7 +5,8 @@
 //
 // Football — README §B "Win probability per minute", exactly:
 //   rate(l) = 1.28·exp(1.5·tanh(l/1.5)); rA = rate(logA), rD = rate(logD) where logA/logD come from the repo's
-//   prepareFootballMatch(attacker, defender, effA, effD) called with the MATCH's own effA/effD (tactics included).
+//   prepareFootballMatch(attacker, defender, effA, effD, venue) called with the MATCH's own effA/effD (tactics
+//   included) and venue (a home defender's edge is in logA/logD, as every sport's is in its prepared match).
 //   With r = (90 − t)/90 the goals still to come are Poisson(rA·r) and Poisson(rD·r);
 //   P(A wins) = P(final goal difference > 0) + ½·P(level)   (the shoot-out is a 50/50).
 //   The double sum runs over i, j ∈ 0..15, where 15 stands for "15 or more" so the masses sum to 1 and
@@ -13,18 +14,20 @@
 //   up to 3 and ≈ 2e-5 for 6, at the model's largest rate (1.28·e^1.5 ≈ 5.74 goals per 90).
 //   Calibration note (measured on repo rosters, see scripts/win-probability.test.mjs): the formula omits match-day
 //   form, tempo and real shoot-out skill, so the 0' value differs from the fixture odds (estimateWinProbability):
-//   mean |gap| ≈ 2 points and at most ≈ 5–6 points under the default 'balanced' uncertainty, up to ≈ 3 points
-//   under 'predictable' and ≈ 12 points under 'wild'. DEC D6 ships the formula as specified.
+//   mean |gap| ≈ 1 point and at most ≈ 2.5 points under the default 'balanced' and 'predictable' uncertainty, and
+//   ≈ 6 points (at most ≈ 12) under 'wild'. DEC D6 ships the formula as specified.
 //
 // Basketball — engine-diff §4a.2 normal approximation of the repo's own model (src/sports/basketball.js):
-//   each period score is Normal(poss·eff, poss·(0.72 + 0.5·eff)) rounded; possessions ~ pace ± 4.5 (73 over FIBA's
-//   40', the season's 90–100 over the NBA's 48'); match-day form N(0, drama·0.0125) per side persists through
-//   overtime; shared conditions cancel in the margin; level after regulation goes to 5' overtimes (at most 4, the
-//   last ends in a decisive play won with logistic(3·(effA − effD))).
-//   The remaining margin is therefore ≈ Normal(R·(effA − effD), R·(1.44 + 0.5·(effA + effD)) + 2·(formSd·R)²
+//   each period score is Normal(poss·eff, poss·(0.36 + 0.25·eff)) rounded; possessions ~ pace ± 4.5 (73 over FIBA's
+//   40', the season's 90–100 over the NBA's 48'); match-day form N(0, drama·0.0095) per side persists through
+//   overtime; shared conditions cancel in the margin; a side one or two behind at the end of regulation draws level
+//   at the buzzer with BUZZER_LEVEL; level after regulation goes to 5' overtimes (at most 4, the last ends in a
+//   decisive play won with logistic(3·(effA − effD))).
+//   The remaining margin is therefore ≈ Normal(R·(effA − effD), R·(0.72 + 0.25·(effA + effD)) + 2·(formSd·R)²
 //   + (effA − effD)²·σ_R² + 1/6) for R remaining possessions; P(A wins) = P(margin ≥ 1) + P(margin = 0)·P(A wins
-//   from level), with a ±0.5 continuity correction. Measured robust: tip-off within ≈ 1 point of the Monte Carlo
-//   odds at every uncertainty preset, and calibrated mid-game against full simulations (test file).
+//   from level), with a ±0.5 continuity correction, and in regulation the buzzer moves each one- and two-point
+//   finish's share to level. Measured robust: tip-off within ≈ 1 point of the Monte Carlo odds at every uncertainty
+//   preset, and calibrated mid-game against full simulations (test file).
 //
 // American football — a normal approximation of src/sports/americanFootball.js: each side has about 11 possessions
 //   (± 1.1), each worth 7 (a touchdown), 3 (a field goal) or 0 with the drive odds of its edge (its offence minus the
@@ -33,6 +36,8 @@
 //   match-day form; P(A wins) = P(margin ≥ 1) + P(margin = 0)·P(A wins from level). The overtime chain (both sides
 //   possess once, then the next score wins; the last period ends in a decisive field goal) is exact for the model's
 //   drive odds, before form. In overtime a lead is charted as the trailing side's one possession to answer it.
+//   Late-game play-calling (each side's last three possessions follow the score) is left out: it narrows the final
+//   margin far more than it moves who wins.
 //
 // Baseball — the model's own distributions (src/sports/baseball.js): the clock counts outs (three a half-inning, 54 in
 //   nine innings), and each half-inning's runs follow the model's distribution for the batting side's edge
@@ -43,12 +48,13 @@
 //   are counted. Match-day form, which moves both edges, is integrated over its normal spread with seven-point
 //   Gauss–Hermite quadrature.
 //
-// Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE) and
-// src/sports/basketball.js (scorePeriod variance, pace spread, form deviation, overtime rules); American football's
-// and baseball's come from their own modules (DRIVE_MODEL, driveOdds; INNING_MODEL, inningOdds, runMasses). The tests
-// compare this module against those models, so a change there that is not mirrored here fails loudly.
+// Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE); basketball's,
+// American football's and baseball's come from their own modules (BASKETBALL_MODEL; DRIVE_MODEL, driveOdds;
+// INNING_MODEL, inningOdds, runMasses). The tests compare this module against those models, so a change there that is
+// not mirrored here fails loudly.
 
 import { getSport } from '../sports/index.js';
+import { BASKETBALL_MODEL } from '../sports/basketball.js';
 import { DRIVE_MODEL, driveMoments, driveOdds } from '../sports/americanFootball.js';
 import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
 
@@ -56,12 +62,10 @@ const BASE_GOALS = 1.28;
 const MAX_LOG_EDGE = 1.5;
 const GOAL_CAP = 15;
 
-const SHOT_VARIANCE_BASE = 0.72;
-const SHOT_VARIANCE_PER_EFFICIENCY = 0.5;
-const PACE_SD = 4.5;
-const OVERTIME_PACE_SD = 0.7;
-const FORM_PER_DRAMA = 0.0125;
-const DECISIVE_SLOPE = 3;
+const {
+  SHOT_BASE: SHOT_VARIANCE_BASE, SHOT_PER_EFFICIENCY: SHOT_VARIANCE_PER_EFFICIENCY, PACE_SD, OVERTIME_PACE_SD,
+  FORM_PER_DRAMA, DECISIVE_SLOPE, BUZZER_LEVEL,
+} = BASKETBALL_MODEL;
 const ROUNDING_VARIANCE = 1 / 6; // two independently rounded period scores, 1/12 each
 const DEFAULT_DRAMA = 6;
 const DECISIVE_FIELD_GOAL = 0.08;
@@ -93,15 +97,17 @@ export function footballRate(log) {
  *     side's batting minus the opposing defence, formSd the spread of match-day form in rating points)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
- * is the match's uncertainty (football ignores it, as the README formula does). Calls only the sport's
- * deterministic `prepareMatch`; consumes no RNG.
+ * is the match's uncertainty (football ignores it, as the README formula does); `home`, that the defender plays at
+ * home (the campaign's home advantage: its edge is in the prepared rates, efficiencies and edges, so every kind
+ * carries it). Calls only the sport's deterministic `prepareMatch`; consumes no RNG.
  */
-export function liveModelFor(sport, attacker, defender, effA, effD, drama) {
+export function liveModelFor(sport, attacker, defender, effA, effD, drama, home = false) {
   const model = typeof sport === 'string' ? getSport(sport) : sport;
   if (!model || typeof model.prepareMatch !== 'function' || !attacker || !defender) return null;
   let prepared;
   try {
-    prepared = model.prepareMatch(attacker, defender, isNum(effA) ? num(effA) : undefined, isNum(effD) ? num(effD) : undefined);
+    prepared = model.prepareMatch(attacker, defender, isNum(effA) ? num(effA) : undefined, isNum(effD) ? num(effD) : undefined,
+      home ? { home: true } : undefined);
   } catch {
     return null;
   }
@@ -253,10 +259,12 @@ function normalCdf(z) {
 /**
  * Basketball normal approximation: P(side A wins) from the current margin (A − D points) and the possessions
  * still to play. `tieA` is A's chance from a level score once those possessions are gone (½ by default; the
- * series passes the overtime chain); `possessionSd` is the spread of the remaining possession count.
+ * series passes the overtime chain); `possessionSd` is the spread of the remaining possession count; `buzzer[k − 1]`
+ * is the chance a side k points behind once they are played draws level (regulation's buzzer; none by default).
  * remainingPossessions = 0 is an exact step: 1 / 0 / tieA.
  */
-export function basketballWinProbability({ effA, effD, formSd = 0, margin = 0, remainingPossessions = 0, tieA = 0.5, possessionSd = 0 } = {}) {
+export function basketballWinProbability({ effA, effD, formSd = 0, margin = 0, remainingPossessions = 0, tieA = 0.5, possessionSd = 0,
+  buzzer = [] } = {}) {
   const lead = isNum(margin) ? num(margin) : 0;
   const level = isNum(tieA) ? clamp01(num(tieA)) : 0.5;
   const R = positive(remainingPossessions);
@@ -269,9 +277,14 @@ export function basketballWinProbability({ effA, effD, formSd = 0, margin = 0, r
   const variance = R * (2 * SHOT_VARIANCE_BASE + SHOT_VARIANCE_PER_EFFICIENCY * (a + d))
     + 2 * (form * R) ** 2 + (edge * spread) ** 2 + ROUNDING_VARIANCE;
   const sd = Math.sqrt(Math.max(variance, 1e-9));
-  const upToZero = normalCdf((0.5 - mean) / sd);
-  const belowZero = normalCdf((-0.5 - mean) / sd);
-  return clamp01((1 - upToZero) + (upToZero - belowZero) * level);
+  const below = points => normalCdf((points - 0.5 - mean) / sd);
+  const finish = points => below(points + 1) - below(points);
+  let chance = (1 - below(1)) + finish(0) * level;
+  // A finish k points up is level with buzzer[k − 1], as is one k points down.
+  (Array.isArray(buzzer) ? buzzer : []).forEach((p, i) => {
+    chance += clamp01(num(p) || 0) * (finish(-(i + 1)) * level - finish(i + 1) * (1 - level));
+  });
+  return clamp01(chance);
 }
 
 /** A's chance from a level score with `periodsLeft` overtime periods still to play (the last ends in a decisive play). */
@@ -461,6 +474,7 @@ function basketballAt(model, t, margin, chains) {
   return basketballWinProbability({
     effA: model.effA, effD: model.effD, formSd: model.formSd, margin,
     remainingPossessions: pace * remainingMinutes / length, tieA: chain, possessionSd,
+    buzzer: minute < length ? BUZZER_LEVEL : [],
   });
 }
 

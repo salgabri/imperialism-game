@@ -17,10 +17,27 @@ const SUDDEN_DEATH = 2;
 // time, made 85% of the time by an 80-rated kicker. That is about two points a drive, 22 a game.
 const BASE_TD = 0.22;
 const BASE_FG_TRY = 0.21;
-const TD_SCALE = 0.06;
-const FG_SCALE = 0.02;
+// Each rating point of edge moves a drive's touchdown odds by 0.075 in logit, a field-goal try's by 0.025: a 17-game
+// season then spreads the franchises as the NFL's do, and the rating favourite wins two games in three.
+const TD_SCALE = 0.075;
+const FG_SCALE = 0.025;
 // Match-day form in rating points, shifting both sides' edges (the attacker's up, the defender's down).
-const FORM_PER_DRAMA = 0.6;
+const FORM_PER_DRAMA = 0.35;
+// Home advantage, a campaign option (off: every match is at a neutral venue): the defender's drives gain HOME_EDGE rating
+// points of edge at home and the visitors' lose as much. Equal sides then win 54% at home, as NFL home sides do.
+const HOME_EDGE = 0.65;
+// Late-game play-calling over each side's last three possessions of regulation, by its lead before the drive: two
+// scores up it runs the clock, a score up it plays safe, level or within a field goal it plays for three, needing a
+// touchdown it goes for it on fourth down, far behind it chases. NFL games end closer than independent drives would
+// have them, about 11 points apart on average; who wins hardly moves. [lead at least, touchdown ×, field-goal try ×]
+const LATE_DRIVES = 3;
+const LATE_CALLS = [[9, 0.5, 1], [1, 0.8, 1], [0, 1, 1.6], [-3, 1, 1.6], [-8, 1.25, 0.25], [-Infinity, 1.2, 0.7]];
+
+/** A drive's odds under late-game play-calling, for a side leading by `lead` (negative when behind). */
+function lateCall(odds, lead) {
+  const [, td, fgTry] = LATE_CALLS.find(([least]) => lead >= least);
+  return { ...odds, td: Math.min(0.9, odds.td * td), fgTry: Math.min(0.95, odds.fgTry * fgTry) };
+}
 
 /** Group weights: the quarterback and his line carry an offence; the pass rush and the secondary a defence. */
 const OFFENCE_WEIGHTS = { QB: 0.3, RB: 0.08, WR: 0.24, TE: 0.08, OL: 0.3 };
@@ -53,21 +70,25 @@ export function driveMoments({ td, fgTry, make }) {
   return { mean, variance: 49 * td + 9 * fg - mean * mean, score: td + fg };
 }
 
-/** Prepare a matchup once, including position assignments, for cheap resampling. */
-export function prepareMatch(attacker, defender, effA, effD) {
+/**
+ * Prepare a matchup once, including position assignments, for cheap resampling. `venue.home`: the defender plays at
+ * home (the campaign's home advantage); a neutral venue otherwise.
+ */
+export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}) {
   const lineupA = selectLineup(attacker);
   const lineupD = selectLineup(defender);
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
   const adjustmentD = (Number.isFinite(effD) ? effD : lineupD.rating) - lineupD.rating;
   const a = profile(lineupA), d = profile(lineupD);
+  const edge = home ? HOME_EDGE : 0;
   return {
     attackerId: attacker.id,
     defenderId: defender.id,
     lineupA,
     lineupD,
     drives: DRIVES,
-    edgeA: a.offence + adjustmentA - (d.defence + adjustmentD),
-    edgeD: d.offence + adjustmentD - (a.defence + adjustmentA),
+    edgeA: a.offence + adjustmentA - (d.defence + adjustmentD) - edge,
+    edgeD: d.offence + adjustmentD - (a.defence + adjustmentA) + edge,
     kickingA: a.kicking + adjustmentA,
     kickingD: d.kicking + adjustmentD,
   };
@@ -101,8 +122,9 @@ function overtimePeriod(rng, oddsA, oddsD, first) {
 }
 
 /**
- * Score-only path: possessions, form and drive luck. Also returns the scoring sequence (`plays`: each possession in
- * order, `{ side, pts, period }`, period 0 being regulation) so the full simulation can time its events.
+ * Score-only path: possessions, form, drive luck and late-game play-calling. Also returns the scoring sequence
+ * (`plays`: each possession in order, `{ side, pts, period }`, period 0 being regulation) so the full simulation can
+ * time its events.
  */
 export function sampleResult(rng, prepared, drama = 6) {
   const variation = Number.isFinite(drama) ? clamp(drama, 0, 12) : 6;
@@ -115,7 +137,8 @@ export function sampleResult(rng, prepared, drama = 6) {
   let regA = 0, regD = 0;
   for (let k = 0; k < drives * 2; k++) {
     const side = (k % 2 === 0) === (first === 'A') ? 'A' : 'D';
-    const pts = drive(rng, side === 'A' ? oddsA : oddsD);
+    const odds = side === 'A' ? oddsA : oddsD;
+    const pts = drive(rng, k >= 2 * (drives - LATE_DRIVES) ? lateCall(odds, side === 'A' ? regA - regD : regD - regA) : odds);
     plays.push({ side, pts, period: 0 });
     if (side === 'A') regA += pts; else regD += pts;
   }
@@ -145,7 +168,7 @@ export function sampleResult(rng, prepared, drama = 6) {
  * Who finishes a touchdown drive: receivers and backs above all, a quarterback's own run now and then, and the
  * defence's return touchdowns. Field goals go to the kicker.
  */
-const TD_WEIGHTS = { WR: 3, RB: 2.6, TE: 1.8, QB: 0.5, CB: 0.07, S: 0.05, LB: 0.04, DL: 0.02, OL: 0.0001, K: 0.0001 };
+const TD_WEIGHTS = { WR: 1.9, RB: 4.25, TE: 2.1, QB: 1.1, CB: 0.13, S: 0.09, LB: 0.07, DL: 0.035, OL: 0.0001, K: 0.0001 };
 
 /** The minute a possession ends: possessions share their period evenly, with a little jitter, never past its end. */
 function playMinute(rng, index, count, offset, span) {
@@ -155,7 +178,7 @@ function playMinute(rng, index, count, offset, span) {
 
 export const americanFootball = {
   id: 'american-football',
-  simulationVersion: 1,
+  simulationVersion: 2,
   name: 'American football',
   blurb: 'Eleven on offence, eleven on defence, sixty minutes. Touchdowns and field goals — level games go to overtime.',
   // No source rates national teams: American football is played by NFL clubs, on their own map of the USA.
@@ -197,8 +220,8 @@ export const americanFootball = {
   prepareMatch,
   sampleResult,
 
-  simulate(rng, attacker, defender, drama, effA, effD) {
-    const prepared = prepareMatch(attacker, defender, effA, effD);
+  simulate(rng, attacker, defender, drama, effA, effD, venue) {
+    const prepared = prepareMatch(attacker, defender, effA, effD, venue);
     const { ga, gd, regA, regD, tie, plays, winner } = sampleResult(rng, prepared, drama);
     const scorerA = createScorerSampler(prepared.lineupA, TD_WEIGHTS, 50);
     const scorerD = createScorerSampler(prepared.lineupD, TD_WEIGHTS, 50);

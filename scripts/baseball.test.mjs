@@ -155,21 +155,26 @@ test('matches always produce a winner, the feed adds up, and scores look like ML
   assert.ok(oneRun / games > 0.24 && oneRun / games < 0.38, `about three in ten games are won by a run (${(oneRun / games * 100).toFixed(1)}%)`);
 });
 
-test('the home side does not bat in the ninth when ahead, and a walk-off ends the game on the winning run', () => {
+test('the home side does not bat in the ninth when ahead, and a walk-off ends the game on the winning hit', () => {
   const prepared = sport.prepareMatch(teams[0], teams[29]);
   const rng = makeRng(9);
-  let skipped = 0, walkoffs = 0;
+  let skipped = 0, walkoffs = 0, byMore = 0;
   for (let i = 0; i < 3000; i++) {
     const { ga, gd, halves, tie } = sport.sampleResult(rng, prepared, 6);
     const last = halves.at(-1);
     if (last.side === 'A' && last.half === 16) { skipped++; assert.ok(gd > ga, 'no bottom of the ninth only when the home side leads'); }
     if (last.side === 'D' && last.half >= 17 && gd > ga && last.runs > 0) {
       walkoffs++;
-      assert.equal(gd - ga, 1, 'the winning run ends it');
+      // The winning hit ends it with every run it drives in (up to four), and the home side was not ahead before it.
+      const winning = (last.hits ?? [last.runs]).at(-1);
+      assert.ok(gd - ga >= 1 && gd - ga <= winning && winning <= 4, 'the winning hit ends it');
+      assert.ok(gd - winning <= ga, 'not ahead before the winning hit');
+      byMore += gd - ga > 1;
     }
     if (!tie) assert.ok(halves.length === 17 || halves.length === 18);
   }
   assert.ok(skipped > 300 && walkoffs > 30, `${skipped} unplayed ninths, ${walkoffs} walk-offs`);
+  assert.ok(byMore > 0 && byMore < walkoffs / 2, `${byMore} of ${walkoffs} walk-offs won by more than a run`);
 });
 
 test('stronger teams are favourites, and Upsets widens the underdog\'s chance without removing inning luck', () => {
@@ -184,9 +189,9 @@ test('stronger teams are favourites, and Upsets widens the underdog\'s chance wi
 
 test('the half-inning odds and the feed copy: runs batted in, by half-inning', () => {
   const even = inningOdds(0);
-  assert.ok(Math.abs(even.score - 0.28) < 1e-9 && even.extra > 0.5, 'a run in 28% of half-innings, most extra ones');
+  assert.ok(Math.abs(even.score - 0.265) < 1e-9 && even.extra > 0.5, 'a run in 26.5% of half-innings, most extra ones');
   assert.ok(inningOdds(5).score > even.score && inningOdds(-5).score < even.score);
-  const masses = runMasses(0.28);
+  const masses = runMasses(0.265);
   assert.ok(Math.abs(masses.reduce((s, v) => s + v, 0) - 1) < 1e-12);
   assert.ok(Math.abs(masses.reduce((s, v, k) => s + v * k, 0) - 0.49) < 0.01, 'about 0.49 runs a half-inning');
   assert.deepEqual([inningLabel(1), inningLabel(3), inningLabel(4), inningLabel(54), inningLabel(55), inningLabel(0)],

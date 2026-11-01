@@ -4,6 +4,7 @@
 // button whose text is exactly "View map", Escape → onClose, focus starts on the close button and is restored.
 import React, { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import PlayerRow from './PlayerRow.jsx';
+import ShareCampaign from './ShareCampaign.jsx';
 import TeamMark from './TeamMark.jsx';
 import Icon from './Icon.jsx';
 import { roman } from '../viewModels/format.js';
@@ -56,11 +57,15 @@ function YourCampaign({ you }) {
   );
 }
 
-/** A campaign's final reward, with the map and new campaign one action away. */
+/**
+ * A campaign's final reward, with the map and new campaign one action away. Sharing (README §Sharing a campaign):
+ * `challengeLink` replays the campaign for a friend; `onShareImage` shares or saves the final map as an image, which
+ * `onPrepareImage` starts drawing as the results open.
+ */
 export default function VictoryOverlay({
   id, teamId, code, isClub, round, name = '', color, subtitle, conquests, steals, territories,
   effNow, effBase, effGain, squad = [], positionColors, onClose, onNew, onChronicle,
-  recap, seed, you = null,
+  recap, seed, you = null, challengeLink = '', onShareImage, onPrepareImage,
 }) {
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
@@ -84,6 +89,10 @@ export default function VictoryOverlay({
     document.addEventListener('keydown', onKeyDown);
     return () => { document.removeEventListener('keydown', onKeyDown); if (previous?.isConnected) previous.focus(); };
   }, []);
+  // Ready before the tap: a phone opens its share sheet only while the tap still counts as the player's.
+  const prepareImage = useRef(onPrepareImage);
+  prepareImage.current = onPrepareImage;
+  useEffect(() => { prepareImage.current?.(); }, []);
 
   const roundNumber = Number(round) || 0;
   const entries = Object.entries(recap || {}).filter(([, value]) => value != null && value !== '');
@@ -127,6 +136,13 @@ export default function VictoryOverlay({
             <button type="button" className="btn-secondary" onClick={onClose}>View map</button>
             {onChronicle && <button type="button" className="btn-secondary" onClick={onChronicle}>Read the chronicle</button>}
           </div>
+          {challengeLink || onShareImage ? (
+            <section className="fi-victory-share" aria-labelledby="victory-share-title">
+              <div className="kicker"><h2 className="kicker__title" id="victory-share-title">Challenge a friend</h2></div>
+              <ShareCampaign link={challengeLink} onShareImage={onShareImage}
+                note="The link sets up this campaign, seed and all, for a friend to play. The image shows the final map." />
+            </section>
+          ) : null}
         </div>
         <aside className="fi-victory-side" aria-labelledby="victory-squad-title">
           <div className="kicker fi-victory-squad-heading">

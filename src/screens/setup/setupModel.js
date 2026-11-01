@@ -9,7 +9,7 @@ import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
-import { builtInSeasonOf, fieldedNations, setSportOf } from '../../engine/footballSets.js';
+import { builtInSeasonOf, fieldedNations, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
 
@@ -104,6 +104,11 @@ export const ROSTER_HELP = {
   authentic: 'Teams start at their real-world strength.',
   competitive: 'The gaps between strong and weak teams shrink; each roster keeps its own stars.',
 };
+export const HOME_OPTIONS = Object.freeze([['off', 'Off'], ['on', 'On']]);
+export const HOME_HELP = {
+  off: 'Every match is played on neutral ground.',
+  on: 'The defending team plays at home and wins a little more often, as home teams do, so conquests are harder.',
+};
 
 /**
  * "Show matches": `resolution` and `express` as one choice that can change any time. Express reveals every match at
@@ -152,6 +157,7 @@ export function moreRulesSummary(setup = {}) {
   if (uncertainty !== 'balanced') parts.push(`Upsets: ${nameOf(UNCERTAINTY_OPTIONS, uncertainty)}`);
   if (setup.finale === 'best-of-three') parts.push(`Final: ${nameOf(FINALE_OPTIONS, 'best-of-three')}`);
   if (setup.acquisitionPolicy === 'best-fit') parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
+  if (setup.homeAdvantage === 'on') parts.push(`Home advantage: ${nameOf(HOME_OPTIONS, 'on')}`);
   if (setup.rosterPreset === 'competitive' && getSport(setup.sport).id === 'basketball') {
     parts.push(`Team strengths: ${nameOf(ROSTER_OPTIONS, 'competitive')}`);
   }
@@ -163,6 +169,7 @@ export function moreRulesSummary(setup = {}) {
 /**
  * The in-game settings' read-only "This campaign" rows, from the launched settings. Missing or unknown values read as
  * their defaults, so old saves and partial fixtures never show `undefined`. `stored` is the value behind the text.
+ * Home advantage has a row only when it is on, as team strengths has one only in basketball.
  * → [{ id, label, value, stored, inner?: { id, stored }, num? }]
  */
 export function campaignFacts(settings = {}, { seed = null, managementEnded = false, managedName = null } = {}) {
@@ -193,6 +200,7 @@ export function campaignFacts(settings = {}, { seed = null, managementEnded = fa
     { id: 'finale', label: 'Final', value: nameOf(FINALE_OPTIONS, finale), stored: finale },
     { id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment },
   );
+  if (s.homeAdvantage === 'on') rows.push({ id: 'home-advantage', label: 'Home advantage', value: nameOf(HOME_OPTIONS, 'on'), stored: 'on' });
   if (s.sport === 'basketball') rows.push({ id: 'roster-preset', label: 'Team strengths', value: nameOf(ROSTER_OPTIONS, roster), stored: roster });
   if (seed != null && String(seed) !== '') rows.push({ id: 'seed', label: 'Seed', value: String(seed), stored: String(seed), num: true });
   return rows;
@@ -313,8 +321,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
     + 'of the United States.',
-  baseball: 'MLB The Show 26 ratings, as of the roster update of 2 October 2026. Clubs play on their own map of the United '
-    + 'States and Canada; nations field the players born there.',
+  baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October). Nations field the players '
+    + 'born there; clubs play on the map of their day, the Athletics in Oakland until 2024.',
 });
 
 /**
@@ -546,7 +554,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
   const sportId = getSport(setup.sport).id;
   // A chosen data set plays with its own nations and clubs once it has loaded; a basketball season with clubs only.
-  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId && (sportId === 'football' || setup.layer === 'clubs')
+  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId && (setHasNations(setup.dataSet) || setup.layer === 'clubs')
     ? setup.dataSet : null;
   const seasonCtx = ctx.season || {};
   const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);
@@ -671,6 +679,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     finale: valid(FINALE_OPTIONS, setup.finale, 'single'),
     acquisitionPolicy: valid(RECRUITMENT_OPTIONS, setup.acquisitionPolicy, 'highest-rated'),
     rosterPreset: valid(ROSTER_OPTIONS, setup.rosterPreset, 'authentic'),
+    homeAdvantage: valid(HOME_OPTIONS, setup.homeAdvantage, 'off'),
     moreRules: moreRulesSummary(setup),
     role, teams, field, managed, managedId: role === 'manager' ? picked?.id ?? null : null, favourites, longShots, canLaunch,
     // Spectators pick no team, so their step-3 heading names what they do choose.

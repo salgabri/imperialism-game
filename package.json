@@ -9,8 +9,9 @@
     "test:ui": "node --test scripts/ui-interaction.test.mjs",
     "test:reachability": "node --test scripts/campaign-reachability.test.mjs",
     "test:balance": "node --test scripts/squad-balance.test.mjs",
-    "test:simulation": "node --test scripts/match-simulation.test.mjs scripts/match-random-odds.test.mjs scripts/football-shootout.test.mjs scripts/basketball-simulation.test.mjs scripts/match-ticker.test.mjs scripts/match-odds-display.test.mjs",
+    "test:simulation": "node --test scripts/match-simulation.test.mjs scripts/match-random-odds.test.mjs scripts/football-shootout.test.mjs scripts/basketball-simulation.test.mjs scripts/match-ticker.test.mjs scripts/match-odds-display.test.mjs scripts/simulation-realism.test.mjs",
     "simulation:report": "node scripts/match-simulation-report.mjs",
+    "simulation:realism": "node scripts/simulation-realism.mjs",
     "balance": "node scripts/balance.mjs",
     "dev": "vite",
     "build": "vite build",
@@ -46,9 +47,10 @@
     "build-nfl": "node scripts/build-nfl.mjs",
     "sync:mlb-the-show": "node scripts/sync-mlb-the-show.mjs",
     "build-mlb": "node scripts/build-mlb.mjs",
+    "build:mlb-seasons": "node scripts/build-mlb-seasons.mjs",
     "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs scripts/nba-map.test.mjs",
     "test:american-football": "node --test scripts/american-football.test.mjs",
-    "test:baseball": "node --test scripts/baseball.test.mjs",
+    "test:baseball": "node --test scripts/baseball.test.mjs scripts/baseball-seasons.test.mjs",
     "sync:club-logos": "node scripts/sync-club-logos.mjs",
     "build:club-colours": "node scripts/build-club-colours.mjs",
     "build:nation-colours": "node scripts/build-nation-colours.mjs",
@@ -74,6 +76,7 @@
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",
     "topojson-simplify": "^3.0.3",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "vite-plugin-pwa": "^1.3.0"
   }
 }

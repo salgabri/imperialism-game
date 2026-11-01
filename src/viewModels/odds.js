@@ -10,9 +10,9 @@ export function matchupOdds(st, ctx, attackerId, defenderId, { tactic = 'balance
   const defender = st?.teams?.[defenderId];
   if (!attacker || !defender || attackerId === defenderId || !ctx?.sport) return null;
   try {
-    const params = tacticalMatchParameters({ attacker, defender, managedId: ctx.managedId ?? null, tactic, drama: ctx.drama });
-    const { effA, effD, drama } = params;
-    const odds = estimateWinProbability({ sport: ctx.sport, attacker, defender, drama, effA, effD, samples });
+    const params = tacticalMatchParameters({ attacker, defender, managedId: ctx.managedId ?? null, tactic, drama: ctx.drama, home: !!ctx.homeAdvantage });
+    const { effA, effD, drama, home } = params;
+    const odds = estimateWinProbability({ sport: ctx.sport, attacker, defender, drama, effA, effD, home, samples });
     return { attacker: odds.attacker, defender: odds.defender, samples: odds.samples, effA, effD };
   } catch {
     return null;

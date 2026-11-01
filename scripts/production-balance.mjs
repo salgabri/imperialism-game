@@ -83,7 +83,8 @@ function targetPolicyPick(state, managerPolicy) {
   if (managerPolicy !== 'adaptive' || !attacker) return pending.selectedId;
   const territoriesOf = id => Object.values(state.own).filter(owner => owner === id).length;
   const scored = pending.optionIds.filter(id => state.teams[id]).map(id => ({ id, n: territoriesOf(id),
-    p: estimateWinProbability({ sport: state.settings.sport, attacker, defender: state.teams[id], preset: state.settings.uncertainty }).attacker }));
+    p: estimateWinProbability({ sport: state.settings.sport, attacker, defender: state.teams[id], preset: state.settings.uncertainty,
+      home: state.settings.homeAdvantage === 'on' }).attacker }));
   scored.sort((a, b) => b.p - a.p || b.n - a.n || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return scored[0]?.id ?? pending.selectedId;
 }
@@ -91,12 +92,13 @@ function targetPolicyPick(state, managerPolicy) {
 export function runProductionCampaign({ seed = 20261002, sport = 'football', layer = 'nations', scope = 'elite',
   clubScope = 'elite', pacing = 'blitz', uncertainty = 'balanced', finale = 'single', acquisitionPolicy = 'highest-rated',
   rosterPreset = 'authentic', managerPolicy = 'spectator', managedTeamId, managerRank, resolution = 'instant', express = false,
-  turnOrder, targeting } = {}) {
+  turnOrder, targeting, homeAdvantage } = {}) {
   const role = managerPolicy === 'spectator' ? 'spectator' : 'manager';
-  // Turn rules are only passed when asked for, so default runs keep the App's own defaults (random × compass).
+  // Turn rules and home advantage are only passed when asked for, so default runs keep the App's own defaults
+  // (random × compass, neutral venues).
   const setup = { sport, layer, scope, clubScope, pacing, uncertainty, finale, acquisitionPolicy, rosterPreset,
     role, managedTeamId: managedTeamId || '', seed: String(seed), resolution, express,
-    ...(turnOrder ? { turnOrder } : {}), ...(targeting ? { targeting } : {}) };
+    ...(turnOrder ? { turnOrder } : {}), ...(targeting ? { targeting } : {}), ...(homeAdvantage ? { homeAdvantage } : {}) };
   const app = new ProductionCampaign(setup);
   if (role === 'manager' && !setup.managedTeamId) {
     const included = app.opening(setup, makeRng(seed)).included.slice().sort((a, b) => teamEff(b) - teamEff(a) || a.id.localeCompare(b.id));
@@ -175,6 +177,7 @@ export function runProductionCampaign({ seed = 20261002, sport = 'football', lay
     championId, champion: championId ? app.state.teams[championId].name : null,
     championInitialRank: championId ? initialRank.indexOf(championId) + 1 : null,
     matches: app.state.matches, conquests: app.state.fallen.length, redraws, usefulAcquisitions: useful, acquisitions,
+    attackerWins: app.state.history.filter(match => match.winnerId === match.aId).length,
     acquisitionGain: Math.round(app.state.metrics.acquisitions.reduce((sum, gain) => sum + gain, 0) * 100) / 100,
     managedTeamId: managerId, managedInitialRank: managerId ? initialRank.indexOf(managerId) + 1 : null,
     managedMatches: managerMatches, managedConquests: managerId ? app.state.stats[managerId]?.conq || 0 : null,
@@ -221,6 +224,8 @@ export function summarizeProduction(results) {
     topFiveChampionShare: topFive / Math.max(1, completed.length), topFiveChampionShare95: wilsonInterval(topFive, completed.length),
     usefulAcquisitionShare: useful / Math.max(1, acquisitions), usefulAcquisitionShare95: wilsonInterval(useful, acquisitions),
     meanMatches: mean('matches'), meanConquests: mean('conquests'), meanRedraws: mean('redraws'), meanAcquisitionGain: mean('acquisitionGain'),
+    // Matches (each final series game counts) the attacker won.
+    attackerWinShare: results.reduce((total, result) => total + (result.attackerWins || 0), 0) / Math.max(1, sum('matches')),
     meanManagedMatches: mean('managedMatches', managed), meanManagedConquests: mean('managedConquests', managed),
     meanManagedPlacement: mean('managedPlacement', managed), meanManagedEliminatedAt: mean('managedEliminatedAt', managed),
     managedChampionShare: managed.length ? managed.filter(result => result.managedChampion).length / managed.length : null,
@@ -266,7 +271,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const seedStart = Number(args.seed) >>> 0 || 20261002;
   let matrix = productionMatrix(args.matrix || 'coverage');
   const fields = { sport: 'sport', layer: 'layer', scope: 'scope', 'club-scope': 'clubScope', pacing: 'pacing',
-    uncertainty: 'uncertainty', finale: 'finale', acquisition: 'acquisitionPolicy', roster: 'rosterPreset', 'manager-policy': 'managerPolicy' };
+    uncertainty: 'uncertainty', finale: 'finale', acquisition: 'acquisitionPolicy', roster: 'rosterPreset', 'manager-policy': 'managerPolicy',
+    home: 'homeAdvantage' };
   if (Object.keys(fields).some(key => args[key])) {
     // Explicit fields build a targeted Cartesian matrix over the baseline.
     matrix = [productionMatrix()[0]];

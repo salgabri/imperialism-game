@@ -241,11 +241,12 @@ export function matchCard(m = this.state.match, teams = this.state.teams) {
 
 /**
  * Live win-probability model numbers stored on the match at kickoff (§3.7, DEC D6): small plain JSON from the
- * sport's deterministic `prepareMatch` (no RNG), or null when the approximation does not cover the match.
+ * sport's deterministic `prepareMatch` (no RNG), or null when the approximation does not cover the match. `home`: the
+ * defender plays at home (the campaign's home advantage).
  */
-export function matchLiveModel(sport, a, d, effA, effD, drama) {
+export function matchLiveModel(sport, a, d, effA, effD, drama, home = false) {
   try {
-    return liveModelFor(sport, a, d, effA, effD, drama) ?? null;
+    return liveModelFor(sport, a, d, effA, effD, drama, home) ?? null;
   } catch {
     return null;
   }

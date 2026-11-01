@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { buildClub, makeRng } from '../src/data/teams.js';
 import { BUILT_IN_BASKETBALL_SEASONS } from '../src/data/basketballSeasons.js';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
-import { basketball, nbaBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
+import { BENCH, basketball, nbaBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
 import { matchSport } from '../src/sports/index.js';
 
 const side = (id, ratings = 74) => ({
@@ -30,7 +30,7 @@ test('basketball presentation uses exactly the score-only outcome and selected s
     assert.equal(full.ev.filter(event => event.tid === 'A').reduce((sum, event) => sum + event.pts, 0), full.ga);
     assert.equal(full.ev.filter(event => event.tid === 'D').reduce((sum, event) => sum + event.pts, 0), full.gd);
     assert.ok(full.ev.every((event, i) => Number.isInteger(event.m) && event.m > 0 && event.pts > 0
-      && (event.tid === 'A' ? namesA : namesD).has(event.name) && (!i || full.ev[i - 1].m <= event.m)));
+      && ((event.tid === 'A' ? namesA : namesD).has(event.name) || event.name === BENCH) && (!i || full.ev[i - 1].m <= event.m)));
     assert.equal(full.ev.filter(event => event.m <= 40 && event.tid === 'A').reduce((sum, event) => sum + event.pts, 0), outcome.regA);
     assert.equal(full.ev.filter(event => event.m <= 40 && event.tid === 'D').reduce((sum, event) => sum + event.pts, 0), outcome.regD);
     if (full.tie) {
@@ -104,9 +104,11 @@ test('matched basketball teams have varied plausible scores, shared pace and fai
     / Math.sqrt((a2 / count - meanA ** 2) * (d2 / count - meanD ** 2));
   assert.ok(meanA > 78 && meanA < 84 && meanD > 78 && meanD < 84);
   assert.ok(wins / count > 0.48 && wins / count < 0.52);
-  assert.ok(Math.sqrt(margin2 / count) > 14 && Math.sqrt(margin2 / count) < 18);
-  assert.ok(correlation > 0.08 && correlation < 0.4, 'both teams share pace without sharing shooting luck');
-  assert.ok(overtime / count > 0.015 && overtime / count < 0.045);
+  // A FIBA game's margin between equals varies by about 11 points, its pace and conditions shared, its shooting luck
+  // each side's own; the buzzer's equalisers send about one level game in fifteen to overtime.
+  assert.ok(Math.sqrt(margin2 / count) > 9.5 && Math.sqrt(margin2 / count) < 12.5);
+  assert.ok(correlation > 0.25 && correlation < 0.55, 'both teams share pace and conditions without sharing shooting luck');
+  assert.ok(overtime / count > 0.05 && overtime / count < 0.11);
   assert.ok(scorelines.size > 2000);
 });
 
@@ -189,8 +191,10 @@ test('NBA pace: matched fives score about 113 a side in 2025/26, the built-in fr
   }
   assert.ok(a / count > 110 && a / count < 116 && d / count > 110 && d / count < 116, `${a / count}–${d / count}`);
   assert.ok(wins / count > 0.48 && wins / count < 0.52);
-  assert.ok(Math.sqrt(margin2 / count) > 16 && Math.sqrt(margin2 / count) < 23);
-  assert.ok(overtime / count > 0.01 && overtime / count < 0.04);
+  // An NBA margin between equals varies by about 14 points (NBA games end about 12.5 apart); one in eighteen goes to
+  // overtime.
+  assert.ok(Math.sqrt(margin2 / count) > 12 && Math.sqrt(margin2 / count) < 15.5);
+  assert.ok(overtime / count > 0.045 && overtime / count < 0.09);
 
   // Every pairing of the built-in clubs: NBA rules lift them from FIBA's mid-eighties to the league's level.
   const clubs = basketball.clubs.map(club => buildClub(club, basketball));
@@ -199,7 +203,7 @@ test('NBA pace: matched fives score about 113 a side in 2025/26, the built-in fr
   assert.ok(fiba > 80 && fiba < 88, `FIBA rules: ${fiba}`);
 });
 
-/** Mean regulation points a side over every pairing of `clubs`, four draws each, under `sport`. */
+/** Mean points a side, overtime included as in the league's averages, over every pairing of `clubs`, four draws each. */
 function clubScoring(sport, clubs) {
   const rng = makeRng(7);
   let points = 0, sides = 0;
@@ -209,7 +213,7 @@ function clubScoring(sport, clubs) {
       const pairing = sport.prepareMatch(attacker, defender);
       for (let k = 0; k < 4; k++) {
         const result = sport.sampleResult(rng, pairing, 6);
-        points += result.regA + result.regD;
+        points += result.ga + result.gd;
         sides += 2;
       }
     }
