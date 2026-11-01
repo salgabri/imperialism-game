@@ -29,7 +29,8 @@ function oddsOf(odds) {
 
 /**
  * "Chiesa 23' · Raspadori 61'" (football), "Jokić 14 pts · Murray 9 pts" (basketball: top two scorers, never the bench),
- * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score) or
+ * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score, a safety the
+ * 2-point one, a touchdown 6 to 8 with its try, ranked as 6 since the archived copy keeps no try) or
  * "Judge 3 RBI · Soto 1 RBI" (baseball: the two who drove in most runs).
  */
 export function scorersLine(shown, teamId, teams, sportId = 'football') {
@@ -44,14 +45,14 @@ export function scorersLine(shown, teamId, teams, sportId = 'football') {
   if (sportId === 'american-football') {
     const totals = new Map();
     for (const e of own) {
-      const row = totals.get(e.name) || { pts: 0, td: 0, fg: 0 };
+      const row = totals.get(e.name) || { pts: 0, td: 0, fg: 0, sf: 0 };
       const pts = Number(e.pts) || 0;
-      row.pts += pts;
-      if (pts === 3) row.fg++; else row.td++;
+      if (pts === 3) { row.fg++; row.pts += 3; } else if (pts === 2) { row.sf++; row.pts += 2; } else { row.td++; row.pts += 6; }
       totals.set(e.name, row);
     }
     return [...totals.entries()].sort((x, y) => y[1].pts - x[1].pts).slice(0, 2)
-      .map(([name, { td, fg }]) => `${shortName(name)} ${[td && `${td} TD`, fg && `${fg} FG`].filter(Boolean).join(', ')}`).join(' · ');
+      .map(([name, { td, fg, sf }]) => `${shortName(name)} ${[td && `${td} TD`, fg && `${fg} FG`,
+        sf && `${sf} ${sf === 1 ? 'safety' : 'safeties'}`].filter(Boolean).join(', ')}`).join(' · ');
   }
   if (sportId === 'basketball') {
     const totals = new Map();
@@ -151,11 +152,11 @@ function overtimeEnd(sport, length, periods) {
 
 /**
  * History keeps each event's formatted copy only ("GOAL — Name (ITA)", "+3 — Name (SRB)", "TD — Name (KCC)",
- * "2 RBI — Name (NYY)"): read the scorer and the side back from it, so an archived full-time header carries the same
- * scorer lines as the live one.
+ * "SAFETY — Name (KCC)", "2 RBI — Name (NYY)"): read the scorer and the side back from it, so an archived full-time
+ * header carries the same scorer lines as the live one. The copy keeps no touchdown's try, so a touchdown reads as 6.
  */
-const EVENT_COPY = /^(?:GOAL|\+(\d+)|(TD|FG)|(\d+) RBI)\s+—\s+(.+?)\s+\(([^()]*)\)$/;
-const SCORE_POINTS = { TD: 7, FG: 3 };
+const EVENT_COPY = /^(?:GOAL|\+(\d+)|(TD|FG|SAFETY)|(\d+) RBI)\s+—\s+(.+?)\s+\(([^()]*)\)$/;
+const SCORE_POINTS = { TD: 6, FG: 3, SAFETY: 2 };
 function historyShown(entry, aId, dId, aCode, dCode) {
   const shown = [];
   for (const e of Array.isArray(entry?.events) ? entry.events : []) {

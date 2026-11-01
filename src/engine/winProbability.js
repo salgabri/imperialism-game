@@ -30,14 +30,15 @@
 //   preset, and calibrated mid-game against full simulations (test file).
 //
 // American football — a normal approximation of src/sports/americanFootball.js: each side has about 11 possessions
-//   (± 1.1), each worth 7 (a touchdown), 3 (a field goal) or 0 with the drive odds of its edge (its offence minus the
-//   opposing defence). Over R remaining possessions a side the margin is ≈ Normal(R·(μA − μD), R·(σA² + σD²)
-//   + (R·slope·formSd)² + (μA − μD)²·σ_R² + 1/6), where slope is how much both sides' means move per rating point of
-//   match-day form; P(A wins) = P(margin ≥ 1) + P(margin = 0)·P(A wins from level). The overtime chain (both sides
-//   possess once, then the next score wins; the last period ends in a decisive field goal) is exact for the model's
-//   drive odds, before form. In overtime a lead is charted as the trailing side's one possession to answer it.
-//   Late-game play-calling (each side's last three possessions follow the score) is left out: it narrows the final
-//   margin far more than it moves who wins.
+//   (± 1.1), each worth 6, 7 or 8 (a touchdown and its try), 3 (a field goal), −2 (a safety) or 0 with the drive odds
+//   of its edge (its offence minus the opposing defence). Over R remaining possessions a side the margin is
+//   ≈ Normal(R·(μA − μD), R·(σA² + σD²) + (R·slope·formSd)² + (μA − μD)²·σ_R² + 1/6), where slope is how much both
+//   sides' means move per rating point of match-day form; P(A wins) = P(margin ≥ 1) + P(margin = 0)·P(A wins from
+//   level). The overtime chain (both sides possess once, the second playing to the first's score, then the next score
+//   wins; the last period ends in a decisive field goal) is exact for the model's drive odds, before form. In overtime
+//   a lead is charted as the trailing side's one possession to answer it. Late-game play-calling and the two-point
+//   chart (each side's last three possessions follow the score) are left out: they shape the final margin far more
+//   than they move who wins.
 //
 // Baseball — the model's own distributions (src/sports/baseball.js): the clock counts outs (three a half-inning, 54 in
 //   nine innings), and each half-inning's runs follow the model's distribution for the batting side's edge
@@ -49,13 +50,13 @@
 //   Gauss–Hermite quadrature.
 //
 // Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE); basketball's,
-// American football's and baseball's come from their own modules (BASKETBALL_MODEL; DRIVE_MODEL, driveOdds;
+// American football's and baseball's come from their own modules (BASKETBALL_MODEL; DRIVE_MODEL, driveOdds, lateCall;
 // INNING_MODEL, inningOdds, runMasses). The tests compare this module against those models, so a change there that is
 // not mirrored here fails loudly.
 
 import { getSport } from '../sports/index.js';
 import { BASKETBALL_MODEL } from '../sports/basketball.js';
-import { DRIVE_MODEL, driveMoments, driveOdds } from '../sports/americanFootball.js';
+import { DRIVE_MODEL, driveMoments, driveOdds, lateCall } from '../sports/americanFootball.js';
 import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
 
 const BASE_GOALS = 1.28;
@@ -91,8 +92,9 @@ export function footballRate(log) {
  * | { kind:'normal', pace, effA, effD, formSd, length:40, ot:5, maxOt:4 } (basketball, length 48 under NBA rules;
  *     effA/effD are efficiencies)
  * | { kind:'drives', drives, muA, muD, varA, varD, slope, formSd, driveSd, length:60, ot:10, maxOt:3, otChain,
- *     tdA, fgA, tdD, fgD } (American football; μ/σ² are a possession's points, otChain[k] A's chance from level with
- *     k overtimes left, td/fg a possession's chance of a touchdown / field goal)
+ *     tdA, fgA, xpA, twoA, tdD, fgD, xpD, twoD } (American football; μ/σ² are a possession's points, otChain[k] A's
+ *     chance from level with k overtimes left, td/fg a possession's chance of a touchdown / field goal, xp/two a
+ *     touchdown's chance of its extra point / two points; a model saved before tries has no xp/two)
  * | { kind:'innings', edgeA, edgeD, formSd, length:54, ot:6, maxOt:6 } (baseball; the clock counts outs, edges are each
  *     side's batting minus the opposing defence, formSd the spread of match-day form in rating points)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
@@ -137,20 +139,28 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
   return null;
 }
 
-/** A's chance in one overtime period that `first` ('A' | 'D') opens → [A wins, still level]. */
+/**
+ * A's chance in one overtime period that `first` ('A' | 'D') opens → [A wins, still level], by the simulation's rules:
+ * the first side kicks after a touchdown; the second answers with its odds for how far behind it is (`answer`), a
+ * touchdown that puts it ahead winning outright and one that levels a 6 or a 7 kicked to win or draw level; still level,
+ * the next score wins. A safety wins for the defence.
+ */
 function overtimePeriodChance(a, d, first) {
   const [x, y] = first === 'A' ? [a, d] : [d, a];
-  // Both possess once: a touchdown beats a field goal beats nothing; level, the next score wins.
-  const xWins = x.td * (y.fg + y.none) + x.fg * y.none;
-  const yWins = y.td * (x.fg + x.none) + y.fg * x.none;
-  let open = x.td * y.td + x.fg * y.fg + x.none * y.none;
-  let xTotal = xWins, yTotal = yWins;
+  // y's answer level, a field goal down, and a touchdown down after a missed or a made extra point.
+  const [level, fieldGoal, missed, made] = [0, 3, 6, 7].map(behind => y.answer[behind]);
+  let xWins = x.td * x.xp * (1 - made.td * y.xp) + x.td * (1 - x.xp) * (1 - missed.td)
+    + x.fg * (1 - fieldGoal.td - fieldGoal.fg) + x.none * level.sf;
+  let yWins = x.sf + x.td * (1 - x.xp) * missed.td * y.xp + x.fg * fieldGoal.td + x.none * (level.td + level.fg);
+  let open = x.td * x.xp * made.td * y.xp + x.td * (1 - x.xp) * missed.td * (1 - y.xp) + x.fg * fieldGoal.fg
+    + x.none * level.none;
   for (let k = 0; k < DRIVE_MODEL.SUDDEN_DEATH * 2; k++) {
     const side = k % 2 === 0 ? x : y;
-    if (k % 2 === 0) xTotal += open * (1 - side.none); else yTotal += open * (1 - side.none);
+    const scores = open * (side.td + side.fg), safety = open * side.sf;
+    if (k % 2 === 0) { xWins += scores; yWins += safety; } else { yWins += scores; xWins += safety; }
     open *= side.none;
   }
-  return [first === 'A' ? xTotal : yTotal, open];
+  return [first === 'A' ? xWins : yWins, open];
 }
 
 /**
@@ -158,17 +168,20 @@ function overtimePeriodChance(a, d, first) {
  * form, and the overtime chain.
  */
 function drivesModel(prepared, variation, length) {
-  const { DRIVES, DRIVE_SD, OVERTIME, MAX_OVERTIMES, FORM_PER_DRAMA } = DRIVE_MODEL;
+  const { DRIVES, DRIVE_SD, OVERTIME, MAX_OVERTIMES, FORM_PER_DRAMA, SAFETY } = DRIVE_MODEL;
   const outcomes = odds => {
     const fg = (1 - odds.td) * odds.fgTry * odds.make;
-    return { td: odds.td, fg, none: 1 - odds.td - fg };
+    return { td: odds.td, fg, sf: SAFETY, none: 1 - odds.td - fg - SAFETY, xp: odds.xp, two: odds.two };
   };
+  // A side's overtime possession, and its answer to a lead of 0, 3, 6 or 7 under late-game play-calling.
+  const side = odds => ({ ...outcomes(odds),
+    answer: Object.fromEntries([0, 3, 6, 7].map(behind => [behind, outcomes(lateCall(odds, -behind))])) });
   const meanAt = (edge, kicking) => driveMoments(driveOdds(edge, kicking)).mean;
   const oddsA = driveOdds(prepared.edgeA, prepared.kickingA), oddsD = driveOdds(prepared.edgeD, prepared.kickingD);
   const a = driveMoments(oddsA), d = driveMoments(oddsD);
   const slope = (meanAt(prepared.edgeA + 1, prepared.kickingA) - meanAt(prepared.edgeA - 1, prepared.kickingA)) / 2
     + (meanAt(prepared.edgeD + 1, prepared.kickingD) - meanAt(prepared.edgeD - 1, prepared.kickingD)) / 2;
-  const sideA = outcomes(oddsA), sideD = outcomes(oddsD);
+  const sideA = side(oddsA), sideD = side(oddsD);
   const [winFirst, openFirst] = overtimePeriodChance(sideA, sideD, 'A');
   const [winSecond, openSecond] = overtimePeriodChance(sideA, sideD, 'D');
   const win = (winFirst + winSecond) / 2, open = (openFirst + openSecond) / 2;
@@ -178,7 +191,7 @@ function drivesModel(prepared, variation, length) {
   return {
     kind: 'drives', drives: num(prepared.drives) || DRIVES, muA: a.mean, muD: d.mean, varA: a.variance, varD: d.variance, slope,
     formSd: variation * FORM_PER_DRAMA, driveSd: DRIVE_SD, length, ot: OVERTIME, maxOt: MAX_OVERTIMES, otChain,
-    tdA: sideA.td, fgA: sideA.fg, tdD: sideD.td, fgD: sideD.fg,
+    tdA: sideA.td, fgA: sideA.fg, xpA: sideA.xp, twoA: sideA.two, tdD: sideD.td, fgD: sideD.fg, xpD: sideD.xp, twoD: sideD.two,
   };
 }
 
@@ -192,8 +205,9 @@ export function isLiveModel(model) {
       && finite('length') && model.length > 0 && finite('ot') && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0;
   }
   if (model.kind === 'drives') {
-    return ['drives', 'muA', 'muD', 'varA', 'varD', 'slope', 'formSd', 'driveSd', 'length', 'ot', 'tdA', 'fgA', 'tdD', 'fgD'].every(finite)
-      && ['tdA', 'fgA', 'tdD', 'fgD'].every(key => model[key] >= 0 && model[key] <= 1)
+    const tries = ['xpA', 'twoA', 'xpD', 'twoD'].filter(key => model[key] !== undefined);
+    return ['drives', 'muA', 'muD', 'varA', 'varD', 'slope', 'formSd', 'driveSd', 'length', 'ot', 'tdA', 'fgA', 'tdD', 'fgD', ...tries].every(finite)
+      && ['tdA', 'fgA', 'tdD', 'fgD', ...tries].every(key => model[key] >= 0 && model[key] <= 1)
       && model.drives > 0 && model.muA >= 0 && model.muD >= 0 && model.varA >= 0 && model.varD >= 0 && model.formSd >= 0
       && model.driveSd >= 0 && model.length > 0 && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0
       && Array.isArray(model.otChain) && model.otChain.length === model.maxOt + 1
@@ -328,15 +342,18 @@ function drivesAt(model, t, margin) {
       driveSd: model.driveSd * (length - minute) / length });
   }
   // Overtime is a possession or two, too few for a normal curve. Level, the period's own chain; a lead, the trailing
-  // side's one answer: a touchdown answers anything, a field goal only levels a field goal's lead.
+  // side's one answer: a touchdown wins against up to 5 and, with its extra point, against 6, and levels 7 with the
+  // extra point and 8 with two points; a field goal wins against 1 or 2 and levels 3. A model saved before tries
+  // kicks every extra point.
   const period = Math.min(maxOt - 1, Math.ceil((minute - length) / ot) - 1);
   const level = otChain[maxOt - period];
   if (minute >= length + ot * maxOt) return step(margin, otChain[0]);
   if (margin === 0) return level;
-  const [td, fg] = margin > 0 ? [model.tdD, model.fgD] : [model.tdA, model.fgA];
+  const [td, fg, xp = 1, two = 0] = margin > 0 ? [model.tdD, model.fgD, model.xpD, model.twoD] : [model.tdA, model.fgA, model.xpA, model.twoA];
   const lead = Math.abs(margin);
-  const trailer = lead > 7 ? 0 : lead > 3 ? td * (lead === 7 ? (margin > 0 ? 1 - level : level) : 1)
-    : td + fg * (margin > 0 ? 1 - level : level);
+  const levelled = margin > 0 ? 1 - level : level;
+  const trailer = lead > 8 ? 0 : lead === 8 ? td * two * levelled : lead === 7 ? td * xp * levelled
+    : lead === 6 ? td * (xp + (1 - xp) * levelled) : lead > 3 ? td : lead === 3 ? td + fg * levelled : td + fg;
   return margin > 0 ? clamp01(1 - trailer) : clamp01(trailer);
 }
 

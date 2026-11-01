@@ -167,8 +167,9 @@ measure beside the real league's range over recent seasons; `REAL` in the script
 names the seasons and sources, and `scripts/simulation-realism.test.mjs` holds the
 sourced measures the models set out to match. The real figures were gathered on
 2026-11-01 from ESPN's and NFL.com's season tables (league totals computed from
-the per-team tables), Land of Basketball, StatMuse, TSN, The Analyst, RSSSF and
-NFL margin data for 1999–2025.
+the per-team tables), Land of Basketball, StatMuse, TSN, The Analyst, RSSSF,
+NFL margin data for 1999–2025 and Laura Albert's NFL analytics recaps
+(UW–Madison) for two-point tries.
 
 The first run, before this pass, measured the models as they shipped; "now" is 40
 seasons of each league after it (football: the five leagues' mean).
@@ -194,15 +195,22 @@ seasons of each league after it (football: the five leagues' mean).
 | Team's top scorer / 40-point games / 50-point games | 39.7 / 45.6% / 12.8% | 27.6 / 6.3% / 0.74% | — / 4.8–8.3% / 0.7–1.0% |
 | Bench's share of the points | none | 30.8% | 30.1–31.2% |
 
-| NFL | Before | Now | Real (2021–2025) |
-| --- | --- | --- | --- |
-| Points a team | 22.6 | 22.3 | 21.8–23.0 |
-| Overtime | 4.7% | 5.5% | 4.8–7.7% |
-| Mean margin | 13.0 | 11.3 | 11.1 |
-| One-score games (8 or fewer) | 41.4% | 47.4% | 50.7–57.6% |
-| Decided by exactly 3 / exactly 7 | 8.5% / 11.0% | 10.8% / 13.5% | 15.2% / 7.7% |
-| Spread of winning percentages | 0.157 | 0.175 | 0.159–0.215 |
-| Touchdowns: WR / RB / TE / QB / returns and defence | 60 / 21 / 12 / 4 / 3% | 38 / 34 / 15 / 8 / 6% | 35–40 / 32–35 / 13–17 / 7.5–9 / 5–6% |
+The NFL has a third column: its scoring values (touchdown tries, safeties and the
+late-game play-calling that sets the key margins, simulation version 3), measured
+after the pass.
+
+| NFL | Before | Pass | Now | Real (2021–2025) |
+| --- | --- | --- | --- | --- |
+| Points a team | 22.6 | 22.3 | 22.7 | 21.8–23.0 |
+| Overtime | 4.7% | 5.5% | 5.6% | 4.8–7.7% |
+| Mean margin | 13.0 | 11.3 | 11.3 | 11.1 |
+| One-score games (8 or fewer) | 41.4% | 47.4% | 53.6% | 50.7–57.6% |
+| Decided by exactly 3 / exactly 7 | 8.5% / 11.0% | 10.8% / 13.5% | 15.2% / 7.9% | 15.2% / 7.7% |
+| Spread of winning percentages | 0.157 | 0.175 | 0.172 | 0.159–0.215 |
+| Touchdowns: WR / RB / TE / QB / returns and defence | 60 / 21 / 12 / 4 / 3% | 38 / 34 / 15 / 8 / 6% | 38 / 34 / 15 / 8 / 6% | 35–40 / 32–35 / 13–17 / 7.5–9 / 5–6% |
+| Extra points made | all | all | 94.5% | 93.4–95.9% |
+| Touchdowns going for two / made | none | none | 9.9% / 49% | 9.8% (2024) / 40–56.5% |
+| Safeties a season | none | none | 13 | 8–17 |
 
 | MLB | Before | Now | Real (2022–2025) |
 | --- | --- | --- | --- |
@@ -218,9 +226,6 @@ Known gaps, reported but not tested:
   campaign turns on Home advantage (below), so the defending side wins half its
   games. Real home sides win 41–48% of football games in ninety minutes, 54–58% in
   the NBA, 52–56% in the NFL and 52–54% in MLB.
-- **The NFL's key margins.** A touchdown is always 7 (no missed extra points,
-  two-point tries or safeties), so exactly-7 margins run high and exactly-3 ones
-  low, and a few too few games end within a score.
 - **Football leagues' styles.** Every league scores at one base rate, so La Liga
   (2.5–2.6 goals a game in life) scores like the Bundesliga (3.1–3.2). Top-32
   nations score about 2.9 a game against about 2.5 in World Cup group stages.
@@ -318,9 +323,10 @@ presentation delays, and are not timing requirements in the tests.
 
 All randomness comes from the injected campaign generator. Identical seeds,
 settings, model version and manager choices reproduce campaigns. RNG state
-resumes from saves; existing generated match outcomes remain stored. Football and
-FIBA basketball have simulation version 3, NBA basketball version 5, American
-football and baseball version 2 (the realism pass below). Club campaigns played
+resumes from saves; existing generated match outcomes remain stored. Football,
+FIBA basketball and American football have simulation version 3, NBA basketball
+version 5 and baseball version 2 (the realism pass above; American football's
+version 3 added its touchdown tries and safeties). Club campaigns played
 FIBA rules before NBA version 3, and version 3 played every season at one pace.
 New results from an older seed can differ after upgrading the model.
 
