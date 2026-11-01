@@ -72,8 +72,9 @@ npm run test:targeting # intervening borders, islands, neutral land and real Eur
 npm run test:flag-symbols # symbol proportions, land fitting and generated asset integrity
 npm run build:flag-symbols # regenerate reviewed field/emblem assets after source review
 npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
+npm run sync:ea-fc       # snapshot EA FC 27 from EA's ratings API into scripts/data/ea-fc27.csv (network, cached)
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
-npm run build-basketball # regenerate basketball squads from an NBA 2K export
+npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
 npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
@@ -108,12 +109,12 @@ default suits a first campaign, so pressing Space three times starts one.
    length; its note names the Show matches mode the estimate assumes. With
    clubs in football, a second theatre group, **One country · top clubs**,
    starts a [domestic campaign](#domestic-campaigns), and its map shows that
-   country. Football also has a **Season** choice: the built-in 2025/26, then
-   the [earlier seasons](#football-seasons) 2023/24 back to 2006/07 (EA FIFA
-   ratings of each), and any local CM 01/02 season built on this computer.
-   Basketball's lists the built-in 2024/25, then its
-   [earlier seasons](#basketball-seasons) 2023/24 back to 1999/00 (NBA 2K
-   ratings of each), which play NBA clubs on the map of their era. American
+   country. Football also has a **Season** choice: the built-in 2026/27 (the
+   current season), then the [earlier seasons](#football-seasons) 2025/26 back
+   to 2006/07 (EA FIFA ratings of each; there is no 2024/25), and any local
+   CM 01/02 season built on this computer. Basketball's lists the built-in
+   2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
+   1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
    football's lists its built-in 2026 season (Madden NFL 27). A
    quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
@@ -400,21 +401,29 @@ screen at every zoom level. The v4 map has no scale bar or coordinate readout.
 Football fields source-backed players; each squad row links to its rating evidence.
 Game ratings use a 1–99 display range, with the original source values retained.
 
-**Football** — `src/data/rosters.js` combines the committed EA FC 26 update 4
-snapshot (19 September 2025; 18,405 records) with Football Manager 26 database
-26.3.0 (released 30 March 2026, the date shown as its rating date) from
-[EFEM.club](https://efem.club/players), retrieved on 2 October 2026.
-All **173 nations field eleven source-backed players**, with natural coverage for
-a 4-4-2. The builder prioritises unchanged EA overall ratings and uses FM to fill
-coverage gaps. It retains database IDs, full/display names, all natural roles,
-source URLs, versions, dates and original ratings through transfers and saves.
-EA fills unlicensed clubs with generated players born on 29 February. The builder
+**Football** — `src/data/rosters.js` is the current season, 2026/27. It combines
+the committed EA SPORTS FC 27 snapshot (EA's ratings site as of 1 November 2026;
+17,849 men) with Football Manager 26 database 26.3.0 (released 30 March 2026,
+the date shown as its rating date) from [EFEM.club](https://efem.club/players),
+retrieved on 2 October 2026. FM is a season behind EA until a Football Manager
+27 database is available.
+All **173 nations field eleven source-backed players** (1,257 EA and 646 FM
+shirts), with natural coverage for a 4-4-2. The builder prioritises unchanged EA
+overall ratings and uses FM to fill coverage gaps. It retains database IDs,
+full/display names, all natural roles, source URLs, versions, dates and original
+ratings through transfers and saves. An FM player fills a gap only when he is not
+an EA player of the same nation. EA's ratings site gives first and last names
+only, so where FM's name is longer, FM's age must also fit the EA birth date. EA
+fills unlicensed clubs with generated players born on 29 February; the builder
 drops any club where at least half the squad has that birthday, plus clubless
-29-February players. That removes 316 players: 14 Brazilian `Série A` clubs, plus
-Mohammedan SC and Western United. The Italian `Serie A` and isolated 29-February
-births at real clubs (Ferran Torres, Khusanov) are kept. Nationalities with no
-map nation (16 names, such as Cabo Verde and Malta) are listed in the audit
-rather than silently dropped.
+29-February players. EA's ratings site lists none, so the rule removes nothing
+from EA FC 27 (it removed 316 from EA FC 26, now the 2025/26
+[earlier season](#football-seasons)). EA FC 27's unlicensed Serie A clubs carry
+placeholder names on EA's site (Lombardia FC is Inter, Milano FC AC Milan, Bergamo
+Calcio Atalanta). The snapshot keeps each club's EA FC 26 name, so clubs keep the
+same id, crest and colour from season to season. Nationalities with no map nation
+(18 names, such as Cabo Verde and Malta) are listed in the audit rather than
+silently dropped.
 
 EFEM displays FM Current Ability on a normalised 1–100 scale. The game converts
 it once using `round(currentAbility * 99 / 100)` and exposes both values in the
@@ -423,16 +432,27 @@ EA overall and FM Current Ability remain different measures; the conversion
 does not claim an official equivalence. These are **dated fantasy XIs by database
 nationality**, including international retirees, rather than current call-ups.
 Existing campaigns retain their saved squads; start a new campaign to use the
-updated data. See `docs/design/football-roster-audit.json` for per-nation coverage.
+updated data. A campaign saved on the 2025/26 data keeps every player's name,
+positions and rating, but its EA FC 26 players lose their evidence link, because
+the game now holds EA FC 27's records (a checkpoint names the source editions it
+referenced, and an exported file keeps its sources inline). See
+`docs/design/football-roster-audit.json` for per-nation coverage.
 
-**Football data sources and attribution.** `scripts/data/ea-fc26.csv` is a reduced
-copy (selected columns only) of
+**Football data sources and attribution.** `scripts/data/ea-fc27.csv` holds
+selected columns of every man in EA SPORTS FC 27. They come from EA's public
+ratings API (`drop-api.ea.com`, the data behind EA's ratings site), and
+`npm run sync:ea-fc` reduces it with nations, leagues and club names spelt as in
+EA FC 26. Squad rows link to each player's page on EA's ratings site as rating
+evidence. EA's User Agreement allows non-commercial use only.
+`src/data/rosters.js` and `src/data/clubs.football.js` are derived from it.
+`scripts/data/ea-fc26.csv` is a reduced copy (selected columns only) of
 [*FC 26 (FIFA 26) Player Data*](https://www.kaggle.com/datasets/rovnez/fc-26-fifa-26-player-data)
 by rovnez on Kaggle, licensed under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). That dataset was collected
-from [sofifa.com](https://sofifa.com), which squad rows link to as rating evidence.
-`src/data/rosters.js` and `src/data/clubs.football.js` are derived from it. FM
-ratings come from Football Manager 26 database 26.3.0 as displayed by EFEM.club.
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). That dataset was
+collected from [sofifa.com](https://sofifa.com), which the 2025/26 season's
+squad rows link to. It is the 2025/26 season, and the reference the FC 27
+snapshot takes its names from. FM ratings come from Football Manager 26 database
+26.3.0 as displayed by EFEM.club.
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL), Sports Interactive and SEGA (Football Manager),
@@ -455,9 +475,12 @@ source rates American football players by nation. See the
 No public dataset carries both current basketball ratings *and* nationality: NBA
 2K has real 1–99 overalls but no country, and every NBA bio dataset with a
 country column stops in 2014. So the split is deliberate — nationality and
-position are curated in `scripts/fiba-squads.json`, and ratings are resolved from
-the 2K export by name, with a curated rating for EuroLeague players it doesn't
-cover. Curating nationality is the right call regardless: FIBA squads are not NBA
+position are curated in `scripts/fiba-squads.json`, and ratings are resolved by
+name from NBA 2K27 (2026/27, as [2K Archive](https://2karchive.com/) compiles it:
+the page the [basketball seasons](#basketball-seasons) come from), with a curated
+rating for EuroLeague players it doesn't cover. A listed NBA player who has left
+the league since keeps his latest NBA 2K rating: ten of them, such as Valančiūnas
+(79, NBA 2K26) and Theis (74, NBA 2K24). Curating nationality is the right call regardless: FIBA squads are not NBA
 rosters (Serbia, Spain, Greece and Lithuania field mostly EuroLeague players, and
 eligibility follows the federation — Banchero plays for the USA rather than
 Italy). The fives were last checked against FIBA records in October 2026: every
@@ -533,17 +556,14 @@ the power table, squad panels, conquest, player theft) behaves identically.
 
 NFL franchises are not dealt either: they split [the USA](#the-nfl-map) between them.
 
-Club lineups come from the same two exports as the national squads:
-`clubs.football.js` from the EA Sports FC CSV filtered to tier-one leagues, and
-`clubs.basketball.js` from the NBA 2K export. 2K carries no position, so each
-player's positions are inferred from the attributes that define them — a centre
-by interior defence, rebounding and post play; a point guard by vision, handle
-and speed with the ball. Each fit is ranked as a league percentile, so the five
-scales compare. A player's best fit is his primary position. He also covers the
-better neighbouring position when it ranks within 15 percentiles of it. About
-three in four players in the export, and 131 of the 150 NBA starters, cover two
-positions. Each franchise's five is then the lineup the game itself would field
-from its whole roster.
+Club lineups come from the same sources as the national squads:
+`clubs.football.js` from the EA FC 27 snapshot filtered to the seven tier-one
+leagues (132 clubs, among them the promoted Coventry City, Hull City, Ipswich
+Town, Schalke 04, Málaga and Monza), and `clubs.basketball.js` from NBA 2K27 as
+2K Archive compiles it. 2K Archive lists each player's positions as 2K gives
+them, primary first; a second position that is not the first's neighbour is
+dropped, and 123 of the 150 NBA starters cover two positions. Each franchise's
+five is then the lineup the game itself would field from its whole roster.
 
 ## Domestic campaigns
 
@@ -754,10 +774,11 @@ npm run build:nfl-map -- --check           # offline rebuild must match the comm
 
 ## Football seasons
 
-Football can be played on eighteen earlier seasons as well as the built-in
-2025/26: 2006/07 to 2023/24, each from EA's FIFA of that season (FIFA 07 to EA
-FC 24). They ship with the game: pick one under **Season** in setup. Each is a
-file in `public/football/` (250–315 KB) that loads only when chosen.
+Football can be played on nineteen earlier seasons as well as the built-in
+2026/27: 2006/07 to 2025/26, each from EA's FIFA of that season (FIFA 07 to EA
+FC 26; no source here has EA FC 25, so there is no 2024/25). They ship with the
+game: pick one under **Season** in setup. Each is a file in `public/football/`
+(250–335 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
   and the clubs of the seven leagues the club layer uses (132–134 clubs a
@@ -767,11 +788,15 @@ file in `public/football/` (250–315 KB) that loads only when chosen.
   built-in nation does. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
   none, and their players still play for their clubs.
-- **Rosters:** FIFA 15 to EA FC 24 are each edition's launch roster. FIFA 07 to
+- **Rosters:** EA FC 26 is update 4 of 19 September 2025, the snapshot the
+  built-in season came from until 2026/27, so its clubs are the built-in clubs
+  of 2025/26; FM no longer fills its nations, so 80 field a full XI. FIFA 15 to
+  EA FC 24 are each edition's launch roster. FIFA 07 to
   FIFA 11 take their ratings from the launch roster and the clubs and
   nationalities from the winter update; FIFA 12 to FIFA 14 use one roster each,
   from later in the season.
-- **Sources:** FIFA 15 – EA FC 24 come from one Kaggle export
+- **Sources:** EA FC 26 is the committed `scripts/data/ea-fc26.csv` (rovnez on
+  Kaggle, CC BY 4.0; its 316 generated players stay out). FIFA 15 – EA FC 24 come from one Kaggle export
   (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
   labelled CC0 by its compiler). FIFA 07 – FIFA 14 join two scrapes by EA's
   player id: a FIFA Index mirror on Kaggle
@@ -780,7 +805,7 @@ file in `public/football/` (250–315 KB) that loads only when chosen.
   date of birth, and a SoFIFA scrape on GitHub (`Big-Data-FC/datasets`, no
   licence stated) for the nationality and club. SoFIFA's own rating is never
   read, and a player missing from either file is left out. EA's own rights are
-  not cleared, as for the built-in EA FC 26 data. `scripts/data/ea-seasons.json`
+  not cleared, as for the built-in EA FC 27 data. `scripts/data/ea-seasons.json`
   pins every file by SHA-256. To rebuild, download them into the ignored
   `data-src/` (the manifest names each folder) and run:
 
@@ -836,8 +861,8 @@ runtime, the saves and the known limits.
 
 ## Basketball seasons
 
-Basketball can be played on 24 earlier seasons as well as the built-in 2024/25:
-1999/00 to 2023/24, each from that season's NBA 2K (NBA 2K to NBA 2K24). Pick
+Basketball can be played on 26 earlier seasons as well as the built-in 2026/27:
+1999/00 to 2025/26, each from that season's NBA 2K (NBA 2K to NBA 2K26). Pick
 one under **Season** in setup; it plays NBA clubs only, so it switches Teams to
 clubs. Each season is a file in `public/basketball/` (about 12 KB) that loads
 only when chosen, with the map of its era.
@@ -850,10 +875,10 @@ only when chosen, with the map of its era.
 - **What is missing:** 2011/12, whose ratings the source lists for only three
   players of two teams, and any national team: NBA 2K rates NBA players only.
 - **Source:** [2K Archive](https://2karchive.com/), a fan compilation of every
-  edition's ratings that names no licence (2K's own rights are not cleared, as
-  for the built-in NBA 2K25 data). `scripts/data/nba-seasons.json` pins one
-  saved copy of its page by SHA-256 and lists each season's franchises and the
-  arenas of those that moved. To rebuild, save the page as
+  edition's ratings that names no licence (2K's own rights are not cleared).
+  The built-in season, NBA 2K27, comes from the same page.
+  `scripts/data/nba-seasons.json` pins one saved copy of its page by SHA-256
+  and lists each season's franchises and the arenas of those that moved. To rebuild, save the page as
   `data-src/bball-2karchive/home.html` (ignored) and run:
 
   ```bash
@@ -938,10 +963,14 @@ Wikidata item, takes the lead image of its English Wikipedia article (the infobo
 crest, else the item's logo image on Wikimedia Commons), and saves it as a WebP
 fitting 128×128 in `public/club-logos/<club id>.webp`. Domestic clubs reuse the
 item their home town came from. An all-leagues club shares its domestic twin's
-file: the club of its country whose FM26 squad shares the most players with its
-EA FC 26 lineup. NBA and NFL franchises are matched by name. Overrides go in
-`scripts/data/club-logos.json`: `items` maps a club id to a Wikidata item, and
-`files` maps it to a file name, or to `null` for no crest. Responses and
+file: the club of its country whose FM26 squad shares at least four players with
+its EA lineup, the most of any. The all-leagues clubs are the built-in ones and
+those of the earlier seasons no older than the FM26 squads (EA FC 26), so a club
+relegated since 2025/26 keeps its crest there. NBA and NFL franchises are matched
+by name. Overrides go in `scripts/data/club-logos.json`: `items` maps a club id
+to a Wikidata item, `files` maps it to a file name, or to `null` for no crest,
+and `twins` names a domestic twin the lineups miss (Venezia, promoted for 2026/27,
+shares only three players with its 2025/26 squad). Responses and
 images are cached in the ignored `data-src/club-logos/`, so reruns are offline;
 `--refresh` asks Wikidata and Wikipedia again.
 

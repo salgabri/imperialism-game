@@ -201,19 +201,33 @@ export function serializeCampaign(data, space) {
 // copy that still equals its roster entry, and parseCampaign rebuilds it. Anything else (another roster snapshot's data,
 // edited data, a country campaign's FM players) is stored as before. Exports keep sources inline: a file can outlive
 // the bundle it was played with.
+// A checkpoint also lists the editions its references name (`sourceEditions`, as 'EA FC 27@2026-11-01'), and a
+// reference rebuilds only from a bundled record of one of them: after a roster update keeps a player's id but moves
+// him to another edition, he keeps his name, positions and rating without source evidence, never another edition's.
+// Checkpoints from before the list referenced the EA FC 26 + FM 26 bundle.
+const LEGACY_SOURCE_EDITIONS = Object.freeze(['EA FC 26@2025-09-19', 'FM 26@2026-03-30']);
+const sourceEditionOf = meta => `${meta.edition}@${meta.snapshotDate}`;
 const rosterSources = new Map();
 
-/** Source id → the bundled metadata JSON of one sport's national rosters and clubs (built once per sport). */
+/**
+ * One sport's national rosters and clubs (built once per sport): `records`, source id → the bundled metadata JSON,
+ * and `editions`, the editions those records come from.
+ */
 function sourceIndex(sportId) {
   const sport = getSport(sportId);
   let index = rosterSources.get(sport.id);
   if (!index) {
-    index = new Map();
+    const records = new Map(), editions = new Set();
     const add = players => {
-      for (const [, , , meta] of players || []) if (typeof meta?.id === 'string' && !index.has(meta.id)) index.set(meta.id, JSON.stringify(meta));
+      for (const [, , , meta] of players || []) {
+        if (typeof meta?.id !== 'string' || records.has(meta.id)) continue;
+        records.set(meta.id, JSON.stringify(meta));
+        editions.add(sourceEditionOf(meta));
+      }
     };
     for (const roster of Object.values(sport.rosters || {})) add(roster?.[2]);
     for (const club of sport.clubs || []) add(club?.squad);
+    index = { records, editions: [...editions].sort() };
     rosterSources.set(sport.id, index);
   }
   return index;
@@ -222,12 +236,12 @@ function sourceIndex(sportId) {
 /** Each `sourceInfo` object → its id when it equals the roster entry, else false (squads share these objects). */
 const sourceRefs = new WeakMap();
 
-function referenceSource(player, index) {
+function referenceSource(player, records) {
   const info = player?.sourceInfo;
   if (!record(info) || typeof info.id !== 'string') return player;
   let ref = sourceRefs.get(info);
   if (ref === undefined) {
-    ref = index.get(info.id) === JSON.stringify(info) ? info.id : false;
+    ref = records.get(info.id) === JSON.stringify(info) ? info.id : false;
     sourceRefs.set(info, ref);
   }
   return ref ? { ...player, sourceInfo: ref } : player;
@@ -235,20 +249,22 @@ function referenceSource(player, index) {
 
 /**
  * A referenced player gets a fresh copy of its roster entry in the same key position (squads are compared as JSON);
- * a source the bundle no longer has is left out.
+ * a source the bundle no longer has, or now has from an edition the checkpoint did not reference (`editions`), is
+ * left out.
  */
-function rebuildSource(player, index) {
+function rebuildSource(player, records, editions) {
   if (typeof player?.sourceInfo !== 'string') return player;
-  const json = index.get(player.sourceInfo);
-  if (json) return { ...player, sourceInfo: JSON.parse(json) };
+  const json = records.get(player.sourceInfo);
+  const meta = json && JSON.parse(json);
+  if (meta && editions.has(sourceEditionOf(meta))) return { ...player, sourceInfo: meta };
   const { sourceInfo: _missing, ...rest } = player;
   return rest;
 }
 
 /** The stored text of a checkpoint: the portable form with bundled roster sources as references. */
 function checkpointText(data) {
-  const packed = packCampaign(data), index = sourceIndex(data.settings?.sport);
-  return JSON.stringify(index.size ? mapPlayers(packed, player => referenceSource(player, index)) : packed);
+  const packed = packCampaign(data), { records, editions } = sourceIndex(data.settings?.sport);
+  return JSON.stringify(records.size ? { ...mapPlayers(packed, player => referenceSource(player, records)), sourceEditions: editions } : packed);
 }
 
 /** Validate every value used by resume before touching the current campaign. */
@@ -425,8 +441,11 @@ function validateCampaign(input, rebuildSources) {
   const rules = configuration => configuration && { ...configuration,
     turnOrder: configuration.turnOrder ?? 'random', targeting: configuration.targeting ?? 'compass' };
   // v4 source references; v1–v3 saves hold every source inline and pass through unchanged.
-  const index = rebuildSources ? sourceIndex(settings.sport) : null;
-  const sourced = index?.size ? mapPlayers(data, player => rebuildSource(player, index)) : data;
+  if (data.sourceEditions != null && (!Array.isArray(data.sourceEditions) || data.sourceEditions.length > 50
+      || data.sourceEditions.some(edition => typeof edition !== 'string'))) invalid('Campaign source editions are invalid.');
+  const { sourceEditions, ...unsourced } = data;
+  const index = rebuildSources ? sourceIndex(settings.sport) : null, editions = new Set(sourceEditions ?? LEGACY_SOURCE_EDITIONS);
+  const sourced = index?.records.size ? mapPlayers(unsourced, player => rebuildSource(player, index.records, editions)) : unsourced;
   // Before v5 the world map's 826 was the whole United Kingdom: its holder keeps Scotland, Wales and Northern Ireland.
   // A country map's sections are never world shape ids.
   const ukHolder = data.v < 5 && data.own['826'];

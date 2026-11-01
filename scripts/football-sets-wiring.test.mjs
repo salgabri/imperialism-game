@@ -145,8 +145,8 @@ test('the Season choice offers the built-in season, then every earlier season bu
       await mountPart(app, mount, 'SetupOverlay');
       assert.equal(seasonPicker(document).tagName, 'SELECT', 'the seasons are a dropdown');
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
-      assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER]);
-      assert.deepEqual(EARLIER.slice(0, 2), ['2023/24', '2022/23']);
+      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER]);
+      assert.deepEqual(EARLIER.slice(0, 2), ['2025/26', '2023/24'], 'the last built-in season, then the earlier ones (no 2024/25)');
       assert.equal(EARLIER.at(-1), '2006/07');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
       assert.equal(seasonPicker(document).value, '');
@@ -168,7 +168,7 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
     assert.deepEqual(footballSetIds(app), [...BUILT_IN_SEASONS.map(set => set.id), ID], 'the local set after the built-in ones');
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
-      assert.deepEqual(seasonNames(document), ['2025/26', ...EARLIER, '2001/02']);
+      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER, '2001/02']);
       assert.equal(seasonPicker(document).value, '', 'the built-in season is chosen');
 
       await pickSeason(document, ID);

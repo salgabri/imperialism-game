@@ -15,6 +15,7 @@ import { NATIONS, DEPENDENCIES } from '../src/data/teams.js';
 import { CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as NBA } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL } from '../src/data/clubs.american-football.js';
+import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { WorldGeometry } from '../src/engine/geo.js';
 import { toOklch } from '../src/engine/colour.js';
 
@@ -132,7 +133,9 @@ test('clubs use their crest colour, with corrections where the crest misleads', 
 
 test('every correction names a club the game ships', () => {
   const { colours } = JSON.parse(readFileSync(new URL('./data/club-colours.json', import.meta.url), 'utf8'));
-  const ids = new Set([...CLUBS, ...NBA, ...NFL].map(club => club.id));
+  // A club the built-in leagues have lost still plays in the earlier seasons the game ships (public/football/).
+  const seasonClubs = BUILT_IN_SEASONS.flatMap(set => JSON.parse(readFileSync(new URL(`../public/football/${set.id}.json`, import.meta.url), 'utf8')).clubs);
+  const ids = new Set([...CLUBS, ...NBA, ...NFL, ...seasonClubs].map(club => club.id));
   for (const [id, colour] of Object.entries(colours)) {
     assert.ok(ids.has(id) || /^d[0-9A-Za-z]+-\d+$/.test(id), id);
     assert.equal(clubColour(id), colour.toLowerCase(), `${id} applied`);
