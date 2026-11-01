@@ -17,14 +17,14 @@ const compiled = await build({
     export {default as LiveMinute, useLiveMinute} from './src/components/LiveMinute.jsx';
     export {buildLiveMatch, buildFeedRows, scorersLine} from './src/viewModels/match.js';
     export {createMinuteStore} from './src/engine/liveMinute.js';
-    export {getSport} from './src/sports/index.js';
+    export {getSport, matchSport} from './src/sports/index.js';
   `, resolveDir: fileURLToPath(new URL('../', import.meta.url)), loader: 'jsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react', 'react-dom'],
   loader: { '.css': 'empty' }, define: { 'import.meta.env.BASE_URL': '"/"' }, logLevel: 'silent',
 });
 const module = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
-const { MatchScreen, MatchCard, buildLiveMatch, buildFeedRows, scorersLine, createMinuteStore, getSport } = module.exports;
+const { MatchScreen, MatchCard, buildLiveMatch, buildFeedRows, scorersLine, createMinuteStore, getSport, matchSport } = module.exports;
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost' });
 globalThis.window = dom.window;
@@ -434,6 +434,30 @@ test('MatchScreen renders a basketball match at full time: FINAL · after overti
   } else {
     assert.ok(chart.querySelector('.match-chart__note'));
   }
+});
+
+test('MatchScreen renders an NBA club match on the NBA clock: 12-minute quarters, overtime from 48\'', async context => {
+  const settings = { sport: 'basketball', layer: 'clubs' };
+  const nba = matchSport(settings);
+  const five = (prefix, base) => ['PG', 'SG', 'SF', 'PF', 'C'].map((pos, i) => ({ name: `${prefix} ${pos}`, pos, rating: base - i }));
+  const t = { bos: { id: 'bos', name: 'Boston Celtics', code: 'BCE', kind: 'club', squad: five('Boston', 90) },
+    dal: { id: 'dal', name: 'Dallas Mavericks', code: 'DMA', kind: 'club', squad: five('Dallas', 89) } };
+  const shown = [{ m: 12, tid: 'bos', name: 'Jayson Tatum', pts: 7 }, { m: 47, tid: 'dal', name: 'Luka Doncic', pts: 5 },
+    { m: 48, tid: 'bos', name: 'Jaylen Brown', pts: 2 }, { m: 51, tid: 'dal', name: 'Kyrie Irving', pts: 3 }];
+  const st = { phase: 'playing', round: 2, settings, teams: t, aliveIds: ['bos', 'dal'], history: [],
+    match: { aId: 'bos', dId: 'dal', effA: 87, effD: 86, ga: 9, gd: 8, shown, allEv: shown, status: 'OVERTIME', applied: false, done: true,
+      winner: 'bos', tie: { periods: [{ a: 0, b: 0 }] } } };
+  // App's view context resolves the club rules; without one the view model resolves them from the settings.
+  assert.equal(buildLiveMatch(st, { cache: new Map() }).length, 48);
+  const model = buildLiveMatch(st, { sport: nba, managedId: 'bos', cache: new Map() });
+  assert.equal(model.length, 48);
+  assert.equal(model.model?.length, 48);
+  const view = await mount(MatchScreen, { ...model, minuteStore: createMinuteStore(12), speed: 1, paused: false }, context);
+  // The final minute is the end of the overtime played (48 + 5), not the last run (51').
+  assert.equal(view.host.querySelector('.match-feed__row').textContent, "53'Final — BCE 9–8 DMA · after 1 overtime period");
+  const chart = view.host.querySelector('.match-chart');
+  assert.deepEqual([...chart.querySelectorAll('.match-chart__axis span')].map(n => n.textContent), ["0'", "12'", "24'", "36'", "48'", "53'"]);
+  assert.deepEqual(shown.map(e => nba.formatEvent(e, 'BCE').when), ['Q1', 'Q4', 'Q4', 'OT']);
 });
 
 test('phone segments switch between Feed, Lineups and Stats (component state, A-3)', async context => {

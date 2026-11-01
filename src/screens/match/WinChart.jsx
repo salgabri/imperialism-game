@@ -14,7 +14,8 @@ function axisLength(length, ot, minute) {
 }
 
 function ticksFor(sport, length, axis, ot) {
-  const step = sport === 'basketball' ? 10 : 15;
+  // Basketball ticks its quarters (ten minutes under FIBA rules, twelve in the NBA); the others every 15'.
+  const step = sport === 'basketball' ? length / 4 : 15;
   const ticks = [];
   for (let t = 0; t <= length; t += step) ticks.push(t);
   if (ticks.at(-1) !== length) ticks.push(length);

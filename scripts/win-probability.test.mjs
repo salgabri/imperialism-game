@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildTeam, makeRng, NATIONS, selectLineup } from '../src/data/teams.js';
+import { buildClub, buildTeam, makeRng, NATIONS, selectLineup } from '../src/data/teams.js';
 import { clamp } from '../src/engine/random.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
 import * as footballModule from '../src/sports/football.js';
@@ -14,7 +14,7 @@ import {
 } from '../src/engine/winProbability.js';
 
 const { football, prepareFootballMatch, footballProfile } = footballModule;
-const { basketball, basketballProfile } = basketballModule;
+const { basketball, basketballProfile, nbaBasketball } = basketballModule;
 
 const nationId = code => Object.keys(NATIONS).find(id => NATIONS[id][1] === code);
 const nation = (sport, code) => buildTeam(nationId(code), makeRng(1), sport);
@@ -43,6 +43,9 @@ const FOOTBALL_PAIRS = [['ITA', 'HUN'], ['GER', 'AUT'], ['ESP', 'BUL'], ['ITA', 
   ['NED', 'POR'], ['SRB', 'ITA'], ['USA', 'MEX'], ['JPN', 'KOR'], ['NGA', 'CMR'], ['LUX', 'QAT']];
 const BASKETBALL_PAIRS = [['ESP', 'FRA'], ['SRB', 'ITA'], ['USA', 'NGA'], ['GER', 'GRE'], ['CMR', 'CHN'], ['FIN', 'IRN'],
   ['ANG', 'AUS'], ['LTU', 'SVN']];
+// NBA franchises by their index in the built-in clubs (strongest first): close and lopsided pairings.
+const club = index => buildClub(basketball.clubs[index], basketball);
+const NBA_PAIRS = [[0, 1], [3, 7], [0, 29], [12, 18], [20, 5], [27, 24]];
 
 test('footballRate is the README rate and the football model\'s mean scoring rate', () => {
   assert.equal(footballRate(0), 1.28);
@@ -275,6 +278,44 @@ test('basketball mid-game values are calibrated against full simulated matches',
   }
 });
 
+test('NBA rules: the live model runs 48 minutes at NBA pace and matches the simulated odds', () => {
+  const model = liveModelFor(nbaBasketball, club(0), club(1), undefined, undefined, 6);
+  const prepared = nbaBasketball.prepareMatch(club(0), club(1));
+  assert.deepEqual(model, { kind: 'normal', pace: 100, effA: prepared.efficiencyA, effD: prepared.efficiencyD,
+    formSd: 6 * 0.0125, length: 48, ot: 5, maxOt: 4 });
+  assert.ok(isLiveModel(model));
+  for (const drama of [0, 6, 12]) {
+    for (const [a, d] of NBA_PAIRS) {
+      const attacker = club(a), defender = club(d);
+      const live = liveModelFor(nbaBasketball, attacker, defender, undefined, undefined, drama);
+      const odds = estimateWinProbability({ sport: nbaBasketball, attacker, defender, drama, samples: 20000 }).attacker;
+      close(winProbabilityAt(live, 0, 0), odds, 0.025, `${attacker.code}-${defender.code} drama ${drama}`);
+    }
+  }
+  // Mid-game, against full NBA matches: the quarter after half-time and the last minute of regulation.
+  const attacker = { ...club(3), id: 'SIM-A' }, defender = { ...club(7), id: 'SIM-D' };
+  const live = liveModelFor(nbaBasketball, attacker, defender, undefined, undefined, 6);
+  const count = 2500;
+  for (const minute of [30, 47]) {
+    let predicted = 0, wins = 0, brier = 0, baseline = 0;
+    const p0 = winProbabilityAt(live, 0, 0);
+    for (let seed = 0; seed < count; seed++) {
+      const match = nbaBasketball.simulate(makeRng(7000 + seed), attacker, defender, 6);
+      const p = winSeries({ model: live, goals: match.ev.filter(event => event.m <= minute), aId: attacker.id, minute }).at(-1).p;
+      const won = match.winner === attacker.id ? 1 : 0;
+      predicted += p; wins += won;
+      brier += (p - won) ** 2; baseline += (p0 - won) ** 2;
+    }
+    close(predicted / count, wins / count, 0.03, `mean chance at ${minute}'`);
+    assert.ok(brier < baseline * 0.9, `the live value carries information at ${minute}'`);
+  }
+  // Level at the buzzer, the NBA game goes to overtime, which runs from 48' to 53'.
+  const series = winSeries({ model: live, goals: [], aId: attacker.id, minute: 53 });
+  assert.equal(series.length, 54);
+  assert.equal(series[48].p, winProbabilityAt(live, 48, 0));
+  assert.equal(winSeries({ model: live, goals: [], aId: attacker.id, minute: 99 }).length, 69, 'four overtimes at most');
+});
+
 test('winSeries: one point per minute from 0\', goals step at their minute, the perspective flips', () => {
   const attacker = nation(football, 'ITA'), defender = nation(football, 'HUN');
   const model = liveModelFor(football, attacker, defender);
@@ -402,6 +443,10 @@ test('winMarkers, chartDomain and liveWinChart give the chart its markers, axis 
   assert.deepEqual(chartDomain(bModel, 30), { length: 40, half: 20, ticks: [0, 10, 20, 30, 40], guides: [10, 20, 30] });
   assert.deepEqual(chartDomain(bModel, 47), { length: 50, half: 20, ticks: [0, 10, 20, 30, 40, 45, 50], guides: [10, 20, 30] });
   assert.equal(chartDomain(bModel, 99).length, 60);
+  const nbaModel = liveModelFor(nbaBasketball, club(0), club(1), undefined, undefined, 6);
+  assert.deepEqual(chartDomain(nbaModel, 30), { length: 48, half: 24, ticks: [0, 12, 24, 36, 48], guides: [12, 24, 36] });
+  assert.deepEqual(chartDomain(nbaModel, 50), { length: 53, half: 24, ticks: [0, 12, 24, 36, 48, 53], guides: [12, 24, 36] });
+  assert.equal(chartDomain(nbaModel, 99).length, 68);
   assert.deepEqual(winMarkers(winSeries({ model: bModel, goals: [{ m: 4, tid: 'x', pts: 6 }], aId: 'x', minute: 10 }),
     [{ m: 4, tid: 'x', pts: 6 }], { aId: 'x', model: bModel }), [], 'basketball scoring runs carry no markers by default');
 
@@ -456,7 +501,7 @@ test('the live model never touches an RNG and stays pure', () => {
 test('sport profile exports: the match model\'s positional ratings, without the effective offset', () => {
   // Append-only exports: every existing export is still there and the sport objects are unchanged.
   assert.deepEqual(Object.keys(footballModule).sort(), ['football', 'footballProfile', 'prepareFootballMatch', 'sampleFootballResult']);
-  assert.deepEqual(Object.keys(basketballModule).sort(), ['basketball', 'basketballProfile', 'prepareMatch', 'sampleResult']);
+  assert.deepEqual(Object.keys(basketballModule).sort(), ['basketball', 'basketballProfile', 'nbaBasketball', 'prepareMatch', 'sampleResult']);
   assert.equal(football.prepareMatch, prepareFootballMatch);
   assert.equal(basketball.prepareMatch, basketballModule.prepareMatch);
 
