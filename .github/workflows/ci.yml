@@ -42,13 +42,18 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       # Without the three secrets nothing deploys from here, and Vercel's own Git deploys stay in charge.
+      # The notice names any secret this job cannot read, never a value.
       - name: Check the Vercel secrets
         id: vercel
         run: |
-          if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+          missing=""
+          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -z "$missing" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::Not deploying: add VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID as repository secrets (README \"Deployment\")."
+            echo "::notice::Not deploying: this job cannot read the repository secrets$missing (README \"Deployment\")."
           fi
       - if: steps.vercel.outputs.ready == 'true'
         uses: actions/checkout@v7
