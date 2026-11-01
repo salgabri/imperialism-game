@@ -1263,6 +1263,67 @@ projection; the first-visible-foreign-land targeting rule remains enforced.
 Run `npm run test:geography` for straight-grid/inverse-projection, source-atlas
 coastline and date-line regressions.
 
+## Advertising
+
+The game can show AdSense banner ads, and shows none until a build names a
+publisher (placeholders can be previewed sooner, below). `src/ads.js` loads
+Google's script and reads the switches below;
+`src/components/AdSlot.jsx` is the only ad unit. There are no full-screen ad
+breaks.
+
+Banners sit only in space the game leaves empty, each under a muted
+"Advertisements" kicker (AdSense allows only that label or "Sponsored Links"):
+
+- **Setup:** a 200×200 square at the foot of the step rail, at least 40px below
+  the last step and far from the footer's buttons. It shows only where the rail
+  is a column (1200px wide and up) and the window is at least 740px tall.
+- **Ledger:** a 300×250 unit in the side column, after Share of the map.
+- **Chronicle:** a 300×250 unit in the side column, after Turning points and
+  above the activity feed.
+
+The game shows at most one banner at a time. Each unit holds its size from the
+first paint, so nothing moves when the ad arrives, and asks for an ad only once
+it is on screen. It disappears when Google has no ad for it, when the script is
+blocked, and (the 300×250 units) on phones narrower than 336px. The map, match,
+conquest and squad screens never show a banner. Google asks for at least 150px
+between an ad and a game, and on those screens the game is the whole screen.
+The Squad side column is also full.
+
+The switches are read at build time, from the environment or a Vite env file
+such as `.env.production.local` (ignored by git):
+
+```bash
+VITE_ADSENSE_CLIENT=ca-pub-1234567890123456 # your publisher id: turns ads on
+VITE_ADSENSE_SLOT=1234567890                # a display ad unit, created as Responsive
+VITE_ADSENSE_TEST=on                        # mark requests as tests (also loads ads on a dev server)
+```
+
+All three banners share the one ad unit. Create it as a display ad with
+**Responsive** size; the game sets each banner's exact size inline on the unit,
+as Google's exact-size example does, without its `data-ad-format` line.
+`npm run build` checks both ids and writes `dist/ads.txt`. AdSense reads that
+file only at the root of the domain, so a game served from a subfolder needs a
+copy there. The test bundles have no Vite env, so the tests never load ads.
+
+To see where the banners go before there are any ads, add `?ads=preview` to the
+game's address, for example `https://imperialism-game.vercel.app/?ads=preview`.
+Every build supports it, with or without a publisher: each banner shows as a
+dashed "Ad space" box of its exact size, and nothing is asked of Google.
+Players who open the plain address see no banners. `npm run dev` shows the
+same placeholders whenever a publisher and a slot are set, unless
+`VITE_ADSENSE_TEST=on`. An ad blocker may hide the placeholders too.
+
+In the AdSense account, keep Auto ads off for the site: they would add an anchor
+banner over the phone tab bar and drop units into the campaign column. Publish a
+European regulations message under Privacy & messaging for visitors in the EEA,
+the UK and Switzerland. It runs through the AdSense script the game already
+loads, and it needs the URL of a privacy policy that mentions the saves kept in
+the browser and the ad cookies. Ads make the game commercial, and much of its
+data is licensed for personal or non-commercial use only: see
+[Rights and terms](docs/design/football-year-sources.md#rights-and-terms).
+Hosting is affected too: Vercel's free Hobby plan allows only non-commercial use
+and counts AdSense as commercial, so ads need a paid plan or another host.
+
 ## Layout
 
 ```
@@ -1293,6 +1354,7 @@ src/
     primitives.css     shared buttons, kickers, tables, panels
     shell.css          app shell per view and breakpoint, phone chrome
   config.js            simulation tunables (drama, upset threshold, labels), save version
+  ads.js               AdSense script and banner settings (off by default)
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
@@ -1341,7 +1403,8 @@ src/
     footballSets.js    lists, loads and validates earlier seasons of both sports; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
-                       wizard, match card, dialogs and overlays, crash screen (ErrorBoundary)
+                       wizard, match card, dialogs and overlays, crash screen
+                       (ErrorBoundary), the ad slot
 public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display

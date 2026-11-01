@@ -4,6 +4,7 @@ import React from 'react';
 import LedgerHead from './LedgerHead.jsx';
 import StandingsTable from './StandingsTable.jsx';
 import { FallenList, MapShare } from './LedgerSide.jsx';
+import AdSlot from '../../components/AdSlot.jsx';
 import './ledger.css';
 
 export default function LedgerScreen({
@@ -27,6 +28,8 @@ export default function LedgerScreen({
           </section>
           <aside className="ledger-side" aria-label="Map share and fallen empires">
             <MapShare share={share} />
+            {/* The ad follows the bounded share list, never the fallen list that grows all campaign. */}
+            <AdSlot />
             {/* Without a built model (W1 stub { rows }) the fallen list is omitted rather than claiming none have fallen. */}
             {Array.isArray(fallen) && <FallenList fallen={fallen} aside={fallenAside} onSelectTeam={onSelectTeam} />}
           </aside>

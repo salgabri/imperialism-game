@@ -4,6 +4,9 @@ dist
 # Written by `vercel link` and the deploy job's `vercel pull`
 .vercel
 
+# Local Vite env files, such as the AdSense ids (README "Advertising")
+.env*.local
+
 # Third-party data drop, not part of the app
 FM26 Season Update*/
 

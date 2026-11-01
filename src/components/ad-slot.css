@@ -1,0 +1,24 @@
+/* A banner (AdSlot, src/ads.js): a unit under a muted kicker. 300×250 after the first section of the Ledger and Chronicle
+   side columns; a 200×200 square at the foot of the setup rail (placed in setup.css). Its label and rule are quieter
+   than a section's, so it never reads as game data. */
+
+.ad-slot { flex:none; display:flex; flex-direction:column; gap:10px; min-width:0; }
+.ad-slot .kicker { border-bottom-color:var(--rule); }
+.ad-slot .kicker__title { color:var(--muted); }
+/* The unit's inline size holds from the first paint, so nothing below it moves when the ad arrives. */
+.ad-slot__unit { display:block; background:var(--surface-2); text-decoration:none; }
+
+/* Nothing to show: Google could not fill the request, or the script was blocked. The slot goes, label included.
+   Two rules, so a browser without :has() still drops a blocked slot. */
+.ad-slot:has(.ad-slot__unit[data-ad-status=unfilled]) { display:none; }
+:root[data-ads=blocked] .ad-slot { display:none; }
+/* A phone under 336px leaves less than 300px between the 18px gutters. */
+@media (max-width:335.98px) { .ad-slot { display:none; } }
+
+/* Preview (?ads=preview, or a dev server without VITE_ADSENSE_TEST): the reserved box with a dashed edge and its size,
+   so it reads as a placeholder. */
+.ad-slot__unit--preview {
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  outline:1px dashed var(--control-line); outline-offset:-1px;
+  font:400 var(--fs-meta)/1.3 var(--font-sans); letter-spacing:.04em; font-variant-numeric:tabular-nums; color:var(--muted);
+}
