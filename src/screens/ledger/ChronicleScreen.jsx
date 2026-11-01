@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import LedgerHead from './LedgerHead.jsx';
 import HistoryBrowser from './HistoryBrowser.jsx';
 import { ActivityFeed, TurningPoints } from './ChronicleSide.jsx';
+import AdSlot from '../../components/AdSlot.jsx';
 import { inHistoryFilter, inHistoryKind } from '../../viewModels/ledger.js';
 import './ledger.css';
 
@@ -53,6 +54,8 @@ export default function ChronicleScreen({
             onFilter={changeFilter} onSelect={select} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} />
           <aside className="chronicle-side" aria-label="Turning points and activity">
             <TurningPoints items={turning} />
+            {/* Above the activity feed, which runs to its cap: below it the ad would sit far out of view. */}
+            <AdSlot />
             <ActivityFeed entries={feed} />
           </aside>
         </div>
