@@ -1,7 +1,7 @@
 // Owner: WP-MATCH (see PLAN.md §4). Live match view-models (PLAN §3.6, B§5, DEC D6/D7/D11).
 // Pure: no window/document/timers/RNG. The live minute is NOT read here (it lives in the minute store, DEC D7);
 // components pass it to buildFeedRows and to the win-probability series.
-import { clockLabel, getSport, overtimePeriodsOf, overtimeText } from '../sports/index.js';
+import { clockLabel, getSport, matchSport, overtimePeriodsOf, overtimeText } from '../sports/index.js';
 import { selectLineup } from '../data/teams.js';
 import { liveModelFor } from '../engine/winProbability.js';
 import { roman, historyRound, formatOddsPair, ratingTier, shortName, memo } from './format.js';
@@ -330,7 +330,7 @@ function fromHistory(st, ctx, sport, entry) {
 
 /** The Match view model (PLAN §3.5 MatchScreen, B§5). Tolerates loading/setup phases and partial fixtures. */
 export function buildLiveMatch(st, ctx) {
-  const sport = ctx?.sport || getSport(st?.settings?.sport);
+  const sport = ctx?.sport || matchSport(st?.settings);
   const teams = st?.teams || {};
   const m = st?.match;
   if (m && teams[m.aId] && teams[m.dId]) return fromMatch({ ...st, teams }, ctx, sport, m);

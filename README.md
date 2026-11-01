@@ -11,7 +11,7 @@ Pick your sport at kick-off:
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
 | Football | XI in a 4-4-2 | 90 minutes | penalty shootout |
-| Basketball | starting five | 40 minutes | overtime periods |
+| Basketball | starting five | 40 minutes for nations (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
 
@@ -93,7 +93,38 @@ npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public A
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
 npm run build:mlb-map    # rebuild MLB's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
+npm run build:icons      # render favicon.ico and apple-touch-icon.png from public/favicon.svg
 ```
+
+## Deployment
+
+The game is live at <https://imperialism-game.vercel.app>. Vercel builds and
+deploys `main` on every push, so a push to `main` is a release.
+
+**Continuous integration.** [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+runs `npm test`, `npm run build` and `npm run smoke` on Node 26 for every push.
+GitHub Actions is free for public repositories. The check reports failures; it
+does not hold back Vercel's deploy yet. To make production wait for it, add a
+Vercel token and the project's org and project ids as repository secrets, deploy
+from the workflow with the Vercel CLI once the tests pass, and turn off Vercel's
+own deploys of `main` (`git.deploymentEnabled` in `vercel.json`).
+
+**Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
+immutable for a year. Fonts, flags and club crests are cached for a day and
+revalidated in the background for a week; a stale image is harmless.
+Everything else revalidates on every load: `index.html`, the maps and the
+season and country files keep their names from one release to the next and
+must match the code that reads them.
+
+**Link previews.** `index.html` carries a description, a canonical URL, and
+Open Graph and Twitter tags, so a shared link shows a card. Crawlers need
+absolute URLs, so the canonical URL, `og:url` and `og:image` name
+`imperialism-game.vercel.app`: change them with the address.
+`public/og-image.png` (1200×630) is a Europe campaign after 29 matches,
+captured from the game with its overlays hidden, beside the wordmark.
+`public/favicon.svg` is the draw compass's needle on the clay accent, and
+`npm run build:icons` renders `favicon.ico` (16, 32 and 48 px) and the 180 px
+`apple-touch-icon.png` from it. `public/robots.txt` allows every crawler.
 
 ## How a campaign plays
 
@@ -210,7 +241,10 @@ rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
-offence/defence, form and shooting variance. American football plays about 11
+offence/defence, form and shooting variance. Nations play FIBA's four ten-minute
+quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
+quarters at about 100, so club games score about 115 a side, near the league's
+own, rather than in the eighties. American football plays about 11
 possessions a side, each ending in a touchdown, a field goal or nothing by its
 offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
@@ -382,6 +416,14 @@ and clipboard copy options. Entering new
 campaign setup retains the previous save until a replacement is launched.
 Older version-one saves migrate, but their original random stream was never
 recorded, so exact continuation from that historical stream cannot be recovered.
+
+An error while rendering shows a **crash screen** instead of a blank page
+(`src/components/ErrorBoundary.jsx`, around the App in `main.jsx`). The App's
+autosaves stop with it, so the stored checkpoint is the last good one.
+**Reload** returns to setup and its resume card. **Export campaign** downloads
+that checkpoint exactly as stored, which Import campaign reads. **Report it on
+GitHub** opens a new issue with the error filled in, and **Error details** shows
+the message and the first stack frames.
 
 The Chronicle's history filters by team and opens full match events and
 conquest rewards. **View conquest on map** reveals the gained holdings. Final
@@ -981,7 +1023,7 @@ communicates the same ownership with flat pastel fills. Flags also identify
 national teams in the masthead, match results, standings, squads and the
 victory screen.
 
-Each **geographic region of an empire** shares one SVG `<pattern>`. Neighboring
+Each **geographic region of an empire** shares one banner. Neighboring
 conquered countries and nearby islands sample the same flag continuously:
 Corsica, Sardinia and Sicily do not each restart a miniature Swiss cross when
 Switzerland owns France and Italy. Regions connect through coast-to-coast gaps
@@ -996,6 +1038,14 @@ reveals the flag; seas and neutral countries stay untouched. A solid rectangle
 in the nation's colour is the fallback. Non-participants remain unflagged in
 continental campaigns. A club's land keeps its club colour with its crest placed
 on it, below.
+
+Each banner is drawn once and shown through the outline of each land part, and
+its SVG artwork comes from a bitmap: the first time Flags mode shows a flag, its
+SVG is rasterised in the background at 1024 px on the longer side. Wherever a
+banner is drawn larger than that, it keeps the SVG, so flags stay sharp at any
+zoom. Drawn as SVG `<pattern>` fills, every flag's shapes were re-rendered on
+each repaint, and panning, zooming, hovering and the draw compass lagged in
+Flags mode.
 
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
@@ -1183,7 +1233,7 @@ src/
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
-    basketball.js      starting five, 40 minutes, overtime
+    basketball.js      starting five, 40 minutes (FIBA) or 48 (NBA clubs), overtime
     americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
     baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings
     index.js           the registry, and each sport's clock and tie-break copy (clockLabel, overtimeText)
@@ -1228,7 +1278,7 @@ src/
     footballSets.js    lists, loads and validates earlier seasons of both sports; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
-                       wizard, match card, dialogs and overlays
+                       wizard, match card, dialogs and overlays, crash screen (ErrorBoundary)
 public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
@@ -1240,6 +1290,9 @@ public/
   textures/            former cartographic paper texture (unused since v4)
   flags/               173 vendored flag SVGs
   club-logos/          club crests from Wikipedia, with SOURCES.tsv
+  favicon.svg          site icon (npm run build:icons renders favicon.ico and apple-touch-icon.png)
+  og-image.png         1200×630 link-preview card
+  robots.txt           allows every crawler
 scripts/
   test.mjs             runs every scripts/*.test.mjs (npm test)
   lib/app-harness.mjs  shared App/component harness for the jsdom tests
@@ -1261,6 +1314,9 @@ scripts/
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
+  build-icons.mjs      renders the site icons from public/favicon.svg
+.github/workflows/ci.yml  tests, build and smoke on every push
+vercel.json            cache headers for the deployed site
 ```
 
 ### Tuning
@@ -1331,6 +1387,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `win-probability` | The live win-probability model against the football and basketball match models |
 | `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
+| `error-boundary` | The crash screen: a render error shows it with focus on its heading, Export campaign downloads the stored checkpoint unchanged, and the report link carries the error |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |

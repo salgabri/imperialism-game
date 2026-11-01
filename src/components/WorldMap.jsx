@@ -13,7 +13,7 @@ import {
 import Icon from './Icon.jsx';
 import EmpireLabels from './EmpireLabels.jsx';
 import DrawCompass, { AttackVector } from './DrawCompass.jsx';
-import FlagPattern from './FlagPattern.jsx';
+import FlagArt from './FlagArt.jsx';
 import { createMapBorderIndex } from '../engine/mapBorders.js';
 import { themedPaint } from '../theme.js';
 import './map.css';
@@ -142,14 +142,20 @@ function sameCountryShape(previous, next) {
 /**
  * One country: its flag parts beneath and the interactive land. Its props are plain values (and the stable
  * handlers), so an unchanged country skips rendering through camera moves, the ticker and hover.
+ * A flag part is its region's banner (FlagArt, in the defs) clipped to the part's outline. Filling the part with an
+ * SVG pattern instead made the browser re-render the pattern tile for every part on every repaint.
  */
 const CountryShape = memo(function CountryShape({ id, d, fill, ownerId, flagParts, animation, conquered, followed,
   selected, reachState, label, role, tabIndex, cursor, stroke, strokeWidth, pathRef, actions }) {
+  const clipPrefix = `fi-clip-${String(id).replace(/[^a-zA-Z0-9_-]/g, '-')}`;
   return (
     <g className="country-region" style={{ animation }}>
       <g className="country-flag-parts" pointerEvents="none">
-        {flagParts?.map((part, i) => <path key={`${part.id}-${i}`} data-flag-country={id}
-          data-flag-component={part.id} d={part.d} fill={part.fill} />)}
+        {flagParts?.map((part, i) => <React.Fragment key={`${part.id}-${i}`}>
+          <clipPath id={`${clipPrefix}-${i}`}><path d={part.d} /></clipPath>
+          <use data-flag-country={id} data-flag-component={part.id} href={`#fi-flag-${part.id}`}
+            clipPath={`url(#${clipPrefix}-${i})`} />
+        </React.Fragment>)}
       </g>
       <path data-country={id} data-owner={ownerId || ''} d={d} fill={fill} ref={pathRef}
         data-conquered={conquered || undefined} data-followed={followed || undefined}
@@ -218,6 +224,9 @@ export default function WorldMap({
   // The breakpoint is the fit key: an untouched conquest fit re-resolves conquestLayout(breakpoint) when it changes.
   const vp = useMapViewport(svg, viewResetKey, cameraFocus, breakpoint);
   const k = vp.view.w / (vp.size.width || 960);
+  // Device px per map unit, rounded up to a quarter octave: banners pick bitmap or SVG artwork by it (FlagArt), and
+  // the rounding spares them a re-render on most camera frames.
+  const flagScale = 2 ** (Math.ceil(Math.log2((typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1) / k) * 4) / 4);
   const { key: compassKey, ...compassProps } = spin || {};
   const revealedDraw = useRef(null);
   const countryRefs = useRef(new Map());
@@ -359,7 +368,7 @@ export default function WorldMap({
         viewBox={`${vp.view.x} ${vp.view.y} ${vp.view.w} ${vp.view.h}`} preserveAspectRatio="xMidYMid meet">
         <defs>
           {/* Mainland and nearby islands share a banner; distant regions don't. */}
-          {flagPatterns.map(f => <FlagPattern key={f.id} flag={f} />)}
+          {flagPatterns.map(f => <FlagArt key={f.id} flag={f} scale={flagScale} />)}
           {/* README: white 1.6px lines every 5px at 45°, 60% opacity — its own pattern, never a flag tile. */}
           {hatched.length > 0 && <pattern id={hatchId} data-conquest-hatch-pattern="" patternUnits="userSpaceOnUse"
             width={5 * k} height={5 * k} patternTransform="rotate(45)">
