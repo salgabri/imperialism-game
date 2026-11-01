@@ -35,6 +35,8 @@ const CASES = [
     'sport=basketball&teams=clubs&seed=17'],
   ['the NFL, managed', setupOf({ sport: 'american-football', layer: 'clubs', clubScope: 'domestic:nfl', role: 'manager',
     managedTeamId: 'nfl-baltimore-ravens', seed: '19' }), 'sport=american-football&role=manager&team=nfl-baltimore-ravens&seed=19'],
+  ['baseball clubs on the MLB map', setupOf({ sport: 'baseball', layer: 'clubs', clubScope: 'domestic:mlb', seed: '23' }),
+    'sport=baseball&teams=clubs&seed=23'],
 ];
 
 test('a page without a challenge opens a new setup', () => {
@@ -176,17 +178,17 @@ test('a link’s seed is the number the campaign launches with', () => {
 
 test('the daily seed is fixed for each sport and day', () => {
   // Pinned: changing how a daily seed is made would change everyone's daily campaign mid-day.
-  assert.deepEqual(['football', 'basketball', 'american-football'].map(sport => dailySeed(sport, '2026-11-01')),
-    [2163291708, 382462174, 3840094371]);
+  const sports = ['football', 'basketball', 'american-football', 'baseball'];
+  assert.deepEqual(sports.map(sport => dailySeed(sport, '2026-11-01')), [2163291708, 382462174, 3840094371, 293440551]);
   assert.equal(dailySeed('football', '2026-11-02'), dailySeed('football', '2026-11-02'));
   assert.notEqual(dailySeed('football', '2026-11-02'), dailySeed('football', '2026-11-01'));
   const seeds = new Set();
-  for (let day = 1; day <= 30; day++) for (const sport of ['football', 'basketball', 'american-football']) {
+  for (let day = 1; day <= 30; day++) for (const sport of sports) {
     const seed = dailySeed(sport, `2026-11-${String(day).padStart(2, '0')}`);
     assert.ok(Number.isInteger(seed) && seed >= 1 && seed <= 0xffffffff);
     seeds.add(seed);
   }
-  assert.equal(seeds.size, 90, 'a month of dailies never repeats a seed');
+  assert.equal(seeds.size, 120, 'a month of dailies never repeats a seed');
   assert.equal(dailySeed('hockey', '2026-11-01'), dailySeed('football', '2026-11-01'), 'an unknown sport is the default sport');
 });
 
@@ -197,6 +199,8 @@ test('the daily campaign is a short fixed setup per sport', () => {
     seed: '382462174' }));
   assert.deepEqual(dailySetup('american-football', day), setupOf({ sport: 'american-football', layer: 'clubs', scope: 'elite',
     clubScope: 'domestic:nfl', express: true, role: 'manager', seed: '3840094371' }));
+  assert.deepEqual(dailySetup('baseball', day), setupOf({ sport: 'baseball', scope: 'elite', express: true, role: 'manager',
+    seed: '293440551' }));
   // It is still the daily with your own team, role, opponent choice and Show matches; not another day's or theatre.
   const daily = dailySetup('football', day);
   assert.ok(isDaily(daily, day));

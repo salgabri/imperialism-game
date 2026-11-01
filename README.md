@@ -458,9 +458,9 @@ Each key names a setup choice, and a key left at its default is left out:
 
 | Key | Setup choice | Values | Left out when |
 | --- | --- | --- | --- |
-| `sport` | Sport | `football`, `basketball`, `american-football` | football |
+| `sport` | Sport | `football`, `basketball`, `american-football`, `baseball` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs `all`, `elite`, a league (`Premier+League`) or a country (`domestic:826`) | Europe for nations, all clubs for clubs, a sport's own map (NBA, NFL) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs `all`, `elite`, a league (`Premier+League`) or a country (`domestic:826`) | Europe for nations, all clubs for clubs, a sport's own map (NBA, NFL, MLB) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
