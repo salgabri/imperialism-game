@@ -58,7 +58,8 @@ notes in `docs/design/` are kept as history.
 ```bash
 npm install
 npm run dev         # dev server, prints a localhost URL
-npm run build       # production bundle into dist/
+npm run build       # production bundle into dist/: installable, plays offline
+npm run preview     # serve dist/ locally (the dev server has no service worker)
 npm test            # complete automated regression suite
 npm run smoke       # headless: plays campaigns to completion and checks invariants
 npm run smoke -- --scenarios=england # only the smoke scenarios whose names match
@@ -93,8 +94,29 @@ npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public A
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
 npm run build:mlb-map    # rebuild MLB's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
-npm run build:icons      # render favicon.ico and apple-touch-icon.png from public/favicon.svg
+npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 ```
+
+The production build installs as an app (Chrome's install button, or Share › Add
+to Home Screen on an iPhone) and plays offline. `npm run build` writes
+`manifest.webmanifest` and a service worker, `sw.js`, which
+[vite-plugin-pwa](https://vite-pwa-org.netlify.app/) builds from `src/pwa.js`.
+The worker precaches only the app shell, under 3 MB: `index.html`, the hashed
+bundle in `assets/`, the Archivo fonts and the two world maps. Everything else in
+`public/` (about 60 MB) is cached the first time the game uses it. Seasons and
+country maps come from the network while online, so they always match the
+deployed build, and from the cache offline. Flags and crests show from the cache
+at once and refresh in the background. After one online visit the game opens
+offline and plays nations and club campaigns, plus every country whose map was
+opened online. A country never opened online fails to load, with **Retry**, and
+a flag or crest the game has not yet shown online stays blank.
+
+A new version never reloads the page by itself. Its worker downloads in the
+background and waits, and a **New version ready** panel offers **Reload** or
+**Later**. Reload writes the open campaign's checkpoint, as closing the page
+does, and reloads that tab only. Other tabs keep the version they loaded until
+they reload. Later hides the panel for that page; closing every tab also
+updates. The page looks for a new version every hour and when you return to it.
 
 ## Deployment
 
@@ -114,7 +136,8 @@ immutable for a year. Fonts, flags and club crests are cached for a day and
 revalidated in the background for a week; a stale image is harmless.
 Everything else revalidates on every load: `index.html`, the maps and the
 season and country files keep their names from one release to the next and
-must match the code that reads them.
+must match the code that reads them. That includes `sw.js`, which must never be
+cached for long, or players would only see a release once the cache expired.
 
 **Link previews.** `index.html` carries a description, a canonical URL, and
 Open Graph and Twitter tags, so a shared link shows a card. Crawlers need
@@ -123,8 +146,11 @@ absolute URLs, so the canonical URL, `og:url` and `og:image` name
 `public/og-image.png` (1200×630) is a Europe campaign after 29 matches,
 captured from the game with its overlays hidden, beside the wordmark.
 `public/favicon.svg` is the draw compass's needle on the clay accent, and
-`npm run build:icons` renders `favicon.ico` (16, 32 and 48 px) and the 180 px
-`apple-touch-icon.png` from it. `public/robots.txt` allows every crawler.
+`npm run build:icons` renders from it `favicon.ico` (16, 32 and 48 px), the 180 px
+`apple-touch-icon.png` and the web app manifest's `icon-192.png` and
+`icon-512.png`. The manifest's maskable icon, `icon-maskable-512.png`, shrinks the
+needle into the central circle that every icon mask keeps. `public/robots.txt`
+allows every crawler.
 
 ## How a campaign plays
 
@@ -417,10 +443,28 @@ campaign setup retains the previous save until a replacement is launched.
 Older version-one saves migrate, but their original random stream was never
 recorded, so exact continuation from that historical stream cannot be recovered.
 
+Saves live in the browser's `localStorage` for the site, so they belong to one
+browser on one device. After its first checkpoint a page asks the browser to keep
+them (`navigator.storage.persist()`). Chrome grants that by engagement or
+installation without asking; Firefox asks you. Without it a browser may clear the
+site's storage when the disk runs low. Safari also clears it after seven days of
+Safari use without a visit, unless the game runs from the Home Screen. On an
+iPhone or iPad, add Imperialism to the Home Screen to keep campaigns: Home Screen
+apps are exempt from the seven-day rule, and Safari 17 weighs them in granting
+the request. The Home Screen app has its own storage, apart from Safari's, so
+move a campaign into it with Export in Safari and Import in the app. Export any
+campaign you can't afford to lose.
+Checkpoints stay in `localStorage` rather than IndexedDB. Both sit in the same
+storage bucket, so IndexedDB is cleared by the same eviction. Its writes are also
+asynchronous, while compare-and-save across tabs, the all-or-nothing write and the
+checkpoint written as the page closes all rely on a save that finishes before
+the next line runs.
+
 An error while rendering shows a **crash screen** instead of a blank page
 (`src/components/ErrorBoundary.jsx`, around the App in `main.jsx`). The App's
 autosaves stop with it, so the stored checkpoint is the last good one.
-**Reload** returns to setup and its resume card. **Export campaign** downloads
+**Reload** returns to setup and its resume card, on the new version when one is
+waiting (a plain reload would open the cached one). **Export campaign** downloads
 that checkpoint exactly as stored, which Import campaign reads. **Report it on
 GitHub** opens a new issue with the error filled in, and **Error details** shows
 the message and the first stack frames.

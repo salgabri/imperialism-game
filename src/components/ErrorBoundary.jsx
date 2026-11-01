@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { SAVE_KEY } from '../config.js';
+import { applyUpdate } from '../serviceWorker.js';
 import './crash.css';
 
 const ISSUES_URL = 'https://github.com/salgabri/imperialism-game/issues/new';
@@ -38,6 +39,10 @@ function CrashScreen({ error }) {
   const details = useMemo(() => errorText(error), [error]);
   useEffect(() => { heading.current?.focus(); }, []);
 
+  // A plain reload opens the version the offline worker has cached, so a new one waiting (perhaps the fix) takes over
+  // first and reloads the page itself.
+  const reload = () => { if (!applyUpdate()) window.location.reload(); };
+
   const exportCampaign = () => {
     const anchor = document.createElement('a');
     // Never revoked: this screen only leaves by reloading the page.
@@ -59,7 +64,7 @@ function CrashScreen({ error }) {
             : 'The game hit an error and stopped. Reload to start again.'}
         </p>
         <div className="crash-screen__actions">
-          <button type="button" className="button button-primary" onClick={() => window.location.reload()}>Reload</button>
+          <button type="button" className="button button-primary" onClick={reload}>Reload</button>
           {saved ? <button type="button" className="button" onClick={exportCampaign}>Export campaign</button> : null}
           <a className="btn-link" href={reportUrl(details)} target="_blank" rel="noreferrer">Report it on GitHub</a>
         </div>
