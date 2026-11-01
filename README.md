@@ -11,7 +11,7 @@ Pick your sport at kick-off:
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
 | Football | XI in a 4-4-2 | 90 minutes | penalty shootout |
-| Basketball | starting five | 40 minutes | overtime periods |
+| Basketball | starting five | 40 minutes for nations (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 
 And pick who fights:
@@ -232,7 +232,10 @@ rating variation; even Predictable retains scoring and tie-break randomness.
 Football uses the selected forwards and midfield to create chances against the
 opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
-offence/defence, form and shooting variance. American football plays about 11
+offence/defence, form and shooting variance. Nations play FIBA's four ten-minute
+quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
+quarters at about 100, so club games score about 115 a side, near the league's
+own, rather than in the eighties. American football plays about 11
 possessions a side, each ending in a touchdown, a field goal or nothing by its
 offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
@@ -1176,7 +1179,7 @@ src/
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
-    basketball.js      starting five, 40 minutes, overtime
+    basketball.js      starting five, 40 minutes (FIBA) or 48 (NBA clubs), overtime
     americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
   data/teams.js        173 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)

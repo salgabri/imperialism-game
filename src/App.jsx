@@ -11,7 +11,7 @@ import { clubMapScope, domesticEntry, domesticLabel } from './data/domesticScope
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, seasonMapOf, seasonSport, setSportOf, sportOf } from './engine/footballSets.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
-import { getSport } from './sports/index.js';
+import { getSport, matchSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
@@ -1444,9 +1444,9 @@ export default class App extends React.Component {
 
   presentMatch(...args) { return matchM.presentMatch.apply(this, args); }
 
-  /** The sport this campaign is being played in. */
+  /** The sport this campaign is being played in, under its rules (NBA rules for basketball clubs). */
   sport() {
-    return getSport(this.state.settings.sport);
+    return matchSport(this.state.settings);
   }
 
   /** Patch the live (unapplied) match on the latest queued state; a settled match is never patched back to unapplied. */
@@ -1633,7 +1633,7 @@ export default class App extends React.Component {
     const followedId = st.teams?.[st.followedId] ? st.followedId : null;
     return {
       board: this.geo ? this.board(st) : null, geo: this.geo || null, displayGeo: this.displayGeo || null,
-      sport: getSport(st.settings?.sport), managedId: managedId || null, followedId,
+      sport: matchSport(st.settings), managedId: managedId || null, followedId,
       perspectiveId: managedId || followedId || null,
       drama: UNCERTAINTY_PRESETS[st.settings?.uncertainty]?.drama ?? Number(CONFIG.matchDrama),
       displayRound: displayRound(st), totalTeams: this.teamCount(st.teams),

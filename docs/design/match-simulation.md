@@ -36,30 +36,40 @@ displayed minute.
 
 ## Basketball scoring and overtime
 
-The game uses 40-minute FIBA matches for both national and club squads, including
-NBA clubs. Both sides share a sampled possession count around 73. Guard and wing
-ratings carry more offensive weight, while big players contribute more to defence.
-Expected points per possession depend on offence and the opposing defence.
+One model plays two rulebooks. National teams play FIBA matches: four ten-minute
+quarters, with both sides sharing a sampled possession count around 73. Clubs are
+NBA franchises and play NBA matches: four twelve-minute quarters at the league's
+faster pace, about 100 possessions (99.6 in 2024/25). A club campaign picks the
+NBA rules (`matchSport` in `src/sports/index.js`); every NBA season, current or
+historical, plays at that pace. The NBA clock runs faster, 79 ms a minute against
+95, so a match lasts about as long on screen. Guard and wing ratings carry more
+offensive weight, while big players contribute more to defence. Expected points
+per possession depend on offence and the opposing defence, under either rulebook.
 
 An aggregate scoring distribution represents shooting luck without running every
 possession. Each team receives independent form variation, which persists into
-overtime. Equal 74-rated teams average approximately 81 points each in regulation;
-ratings and opponents change that expectation. Scores have no arbitrary floor of
-48 or ceiling of 140 points.
+overtime. Equal 74-rated teams average approximately 81 points each in a FIBA
+regulation and 111 in an NBA one; ratings and opponents change that expectation.
+Every pairing of the built-in NBA clubs averages about 115 points a side, close to
+the league's own scoring, about 114 a game in recent seasons; under FIBA rules
+they averaged 84. Scores have no arbitrary floor or ceiling.
 
-Tied regulation scores lead to five-minute overtime periods. Every period's points
-appear within its own clock interval and contribute to the final score. After four
-tied periods, a sampled decisive scoring play keeps execution bounded; it can favour
-either side and belongs to the last period. Commentary groups points into short
-runs, with a single point allowed for a free throw.
+Tied regulation scores lead to five-minute overtime periods, from 40' under FIBA
+rules and from 48' in the NBA. Every period's points appear within its own clock
+interval and contribute to the final score. After four tied periods, a sampled
+decisive scoring play keeps execution bounded; it can favour either side and
+belongs to the last period. Commentary groups points into short runs, with a
+single point allowed for a free throw, and labels each run with its quarter.
 
 ## Statistical verification
 
 The checked-in [report](match-simulation-report.json) samples 200,000 outcomes per
 pairing, eight million outcomes overall, plus 20,000 complete timelines for timing.
 It covers three uncertainty settings, five rating gaps, equal teams and eight
-pairings built from national rosters. These equal-team results use 75-rated
-starters and Balanced uncertainty.
+pairings built from national rosters, so its basketball figures are FIBA's. These
+equal-team results use 75-rated starters and Balanced uncertainty. The NBA rules
+are checked in `scripts/basketball-simulation.test.mjs` and
+`scripts/win-probability.test.mjs`.
 
 | Measure | Football | Basketball |
 | --- | --- | --- |
@@ -101,9 +111,10 @@ and are not timing requirements in the tests.
 
 All randomness comes from the injected campaign generator. Identical seeds,
 settings, model version and manager choices reproduce campaigns. RNG state
-resumes from saves; existing generated match outcomes remain stored. Both sport
-models have simulation version 2, so new results from an older seed can differ
-after upgrading the model.
+resumes from saves; existing generated match outcomes remain stored. Football and
+FIBA basketball have simulation version 2; NBA basketball has version 3, because
+club campaigns played FIBA rules before it. New results from an older seed can
+differ after upgrading the model.
 
 Run `npm run test:simulation` for distribution, symmetry, positional strength,
 seed replay, RNG endpoint, penalty/overtime and event-accounting checks. React
