@@ -3,7 +3,7 @@
 // spinner, conquest, autosave — is sport-agnostic.
 
 import { football } from './football.js';
-import { basketball, nbaBasketball } from './basketball.js';
+import { basketball, nbaBasketballIn } from './basketball.js';
 import { americanFootball } from './americanFootball.js';
 import { baseball } from './baseball.js';
 
@@ -14,12 +14,13 @@ export const DEFAULT_SPORT = 'football';
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];
 
 /**
- * The sport a campaign's matches are played under, from its settings or a setup (`sport`, `layer`). Basketball's
- * clubs are NBA franchises and play NBA rules; its nations play FIBA's. Every other sport has one rulebook.
+ * The sport a campaign's matches are played under, from its settings or a setup (`sport`, `layer`, `dataSeason`).
+ * Basketball's clubs are NBA franchises and play NBA rules at their season's pace; its nations play FIBA's. Every
+ * other sport has one rulebook.
  */
 export function matchSport(settings) {
   const sport = getSport(settings?.sport);
-  return sport === basketball && settings?.layer === 'clubs' ? nbaBasketball : sport;
+  return sport === basketball && settings?.layer === 'clubs' ? nbaBasketballIn(settings.dataSeason) : sport;
 }
 
 const sportOf = sport => (sport && typeof sport === 'object' ? sport : getSport(sport));
