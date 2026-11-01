@@ -26,8 +26,9 @@ kinds:
   those files can be committed by removing one `.gitignore` line, and its scope
   should be recorded in the permissions note first.
 
-The built-in data (EA FC 26 + FM 26, season 2025/26) stays the default and does
-not change: same files, same seeds, same saves.
+The built-in data is the current season and the default: 2026/27, EA FC 27 + FM 26
+for football and NBA 2K27 for basketball (until 1 November 2026 it was 2025/26,
+EA FC 26 + FM 26, and 2024/25, NBA 2K25; both now play as earlier seasons, below).
 
 ## Terms
 
@@ -37,8 +38,8 @@ not change: same files, same seeds, same saves.
   An EA season is `ea-fifa-<nn>` or `ea-fc-<nn>` after its edition
   (`ea-fifa-18`, `ea-fc-24`). The built-in data has no id (`null`).
 - **Year**: the season-end year, as in the sources note. `cm0102-2026-05` is year
-  2026 and season "2025/26", like the built-in data, so a season can have several
-  data sets (the built-in one, CM's December and May updates).
+  2026 and season "2025/26", like the EA FC 26 season, so a season can have several
+  data sets (EA's, CM's December and May updates).
 - **Version**: `<id>-<8 hex>`, the first 8 hex of the SHA-256 of the data set
   file's content without its `version` field. A save names the version it was
   built from.
@@ -190,15 +191,24 @@ names the provider and reads "Game rating converted from CM current ability".
 
 ## Built-in earlier seasons
 
-Eighteen seasons ship with the game, 2006/07 to 2023/24. FIFA 07 to FIFA 14 are
-described [below](#fifa-07-to-fifa-14). The other ten, 2014/15 to 2023/24, are
-the launch roster (update 2) of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
+Nineteen seasons ship with the game, 2006/07 to 2025/26, without 2024/25 (no
+source here has EA FC 25). FIFA 07 to FIFA 14 are described
+[below](#fifa-07-to-fifa-14). Ten, 2014/15 to 2023/24, are the launch roster
+(update 2) of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
 (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
 180,021 rows, labelled CC0 by its compiler; EA's own rights are not cleared, as
-for the built-in EA FC 26 data). `scripts/data/ea-seasons.json` names the export,
-its download link and SHA-256, and the editions. `npm run build:ea-seasons`
-(`scripts/build-ea-seasons.mjs`, logic in `scripts/lib/ea-seasons.mjs`) stops on
-any other file, so every season rebuilds byte for byte. It writes:
+for the built-in EA FC 27 data). `scripts/data/ea-seasons.json` names the export,
+its download link and SHA-256, and the editions. 2025/26 is EA FC 26 update 4
+(19 September 2025), the committed snapshot `scripts/data/ea-fc26.csv` the
+built-in season came from until 2026/27 (manifest `snapshots`, pinned by
+SHA-256). Like the other EA seasons it has EA's players only, so 80 nations
+field a full XI where the built-in 2025/26 filled all 173 with FM. Its 316
+generated players (EA's unlicensed Brazilian clubs, Mohammedan SC and Western
+United, all born on 29 February) stay out, as they did from the built-in data.
+
+`npm run build:ea-seasons` (`scripts/build-ea-seasons.mjs`, logic in
+`scripts/lib/ea-seasons.mjs`) stops on any other file, so every season rebuilds
+byte for byte. It writes:
 
 - `public/football/<id>.json`, one data set per edition (about 310 KB), with
   `kind: 'ea'` (below);
@@ -296,11 +306,13 @@ from 49 (FIFA 09) to 69 (FIFA 12) of 173 nations.
 
 ## Earlier basketball seasons
 
-Basketball has 24 earlier seasons, 1999/00 to 2023/24 without 2011/12: the NBA
-clubs of each NBA 2K edition from NBA 2K to NBA 2K24, as compiled by
+Basketball has 26 earlier seasons, 1999/00 to 2025/26 without 2011/12: the NBA
+clubs of each NBA 2K edition from NBA 2K to NBA 2K26, as compiled by
 [2K Archive](https://2karchive.com/). The built-in basketball clubs are NBA
-2K25's (2024/25). The compilation names no licence, and 2K's own rights are not
-cleared, as for the built-in NBA 2K25 data. Its page holds every edition's
+2K27's (2026/27), from the same page (`builtIn` in the manifest, built by
+`npm run build-clubs`), and its NBA ratings rate the built-in national fives
+(`npm run build-basketball`). The compilation names no licence, and 2K's own
+rights are not cleared. Its page holds every edition's
 ratings as one table (`const YEARS = {...}`: name, overall, position and team
 code per player). `scripts/data/nba-seasons.json` pins one saved copy of the
 page by SHA-256 and maps each edition's team codes to franchises by season.
@@ -399,7 +411,7 @@ season's own three strongest clubs once it has loaded.
     country map, and Launch waits for it.
   - Country maps are built from the built-in FM data, so the "One country" group
     is not offered for another set.
-  - Basketball has its own Season dropdown: the built-in 2024/25, then its
+  - Basketball has its own Season dropdown: the built-in 2026/27, then its
     earlier seasons ("2007/08"), with a note that they use 2K Archive's NBA 2K
     ratings and have NBA clubs only. Picking one switches Teams
     to clubs and the theatre to its map (`domestic:nba2008`); picking nations
@@ -416,7 +428,10 @@ season's own three strongest clubs once it has loaded.
 - **Saves are self-contained.** A campaign never re-reads roster data after
   kick-off. The one exception is the v4 source index, which is built from the
   built-in rosters: a CM player never matches it, and an EA season's player
-  shares at most an id with an FC 26 record, never its edition. So a set's
+  shares at most an id with an FC 27 record, never its edition. (The index also
+  lists its editions in each checkpoint, `sourceEditions`: a reference rebuilds
+  only from a record of an edition its checkpoint named, so a checkpoint saved
+  on the EA FC 26 built-in data never takes an FC 27 record's evidence.) So a set's
   players are packed the way country campaigns pack FM players: the set's own
   tuples under one `playerPack` header with `kind: 'cm0102'` or `kind: 'ea'`
   (whose source names the edition, update, snapshot date and roster), rebuilt
@@ -471,9 +486,10 @@ season's own three strongest clubs once it has loaded.
 
 ## Invariants kept
 
-- The built-in data path is untouched: `src/data/rosters.js` and
-  `clubs.football.js` are not regenerated, and the seed-replay golden,
-  save-size budgets and roster tests pass unchanged.
+- Data sets leave the built-in data path alone: building or loading one never
+  regenerates `src/data/rosters.js` or `clubs.football.js`, and the seed-replay
+  golden, save-size budgets and roster tests pass unchanged. (Moving the
+  built-in season to 2026/27 regenerated those files, and the golden with them.)
 - No CM 01/02 data set file, database file or derived player list is committed.
-  The EA seasons are committed on the same terms as the built-in EA FC 26 data.
+  The EA seasons are committed on the same terms as the built-in EA FC 27 data.
 - The domestic pack format is unchanged. A pack without `kind` is FM.

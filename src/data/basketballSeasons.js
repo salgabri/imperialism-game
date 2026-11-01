@@ -3,6 +3,8 @@
 // The built-in earlier basketball seasons, newest first: NBA clubs only. Each is public/basketball/<id>.json, loaded
 // when a setup chooses it (src/engine/footballSets.js), and plays on its era's map (`map`, public/domestic/<map>.json).
 export const BUILT_IN_BASKETBALL_SEASONS = Object.freeze([
+  Object.freeze({ id: 'nba-2k26', version: 'nba-2k26-ea2e3bfa', year: 2026, season: '2025/26', label: 'NBA 2K26', map: 'nba' }),
+  Object.freeze({ id: 'nba-2k25', version: 'nba-2k25-e963415e', year: 2025, season: '2024/25', label: 'NBA 2K25', map: 'nba' }),
   Object.freeze({ id: 'nba-2k24', version: 'nba-2k24-6450daa7', year: 2024, season: '2023/24', label: 'NBA 2K24', map: 'nba' }),
   Object.freeze({ id: 'nba-2k23', version: 'nba-2k23-bbf975ca', year: 2023, season: '2022/23', label: 'NBA 2K23', map: 'nba' }),
   Object.freeze({ id: 'nba-2k22', version: 'nba-2k22-7f7fdb2b', year: 2022, season: '2021/22', label: 'NBA 2K22', map: 'nba' }),

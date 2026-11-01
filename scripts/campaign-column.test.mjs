@@ -230,6 +230,28 @@ test('tactical gate offers Match preview and simulate with the balanced pre-matc
   const serbia = fronts.rows.find(row => row.teamId === '688');
   assert.equal(`${serbia.win} ITA`, fixture.odds.bLabel);
   assert.equal(serbia.tone, winTone(Number(serbia.win.replace(/[<>%]/g, '')) / 100));
+  assert.equal(fixture.approach, null, 'no estimates, no approach line');
+});
+
+test('tactical gate odds and approach line follow the recommended approach Continue kicks off with', () => {
+  const options = [['attack', 'Attack', .41], ['balanced', 'Balanced', .4], ['defend', 'Defend', .47]]
+    .map(([id, label, winProbability]) => ({ id, label, winProbability }));
+  const st = state({ round: 7, tacticalChoice: { aId: '688', dId: '380', route: { isNeighbor: true, routeKind: 'straight' },
+    options, managerName: 'Italy', opponentName: 'Serbia' } });
+  const ctx = context(st);
+  const fixture = buildFixture(st, ctx);
+  const odds = matchupOdds(st, ctx, '688', '380', { tactic: 'defend' });
+  assert.equal(fixture.approach, 'Defend');
+  assert.equal(fixture.odds.fill, Math.round(odds.attacker * 1000) / 10);
+  assert.equal(fixture.meta, `Strength ${odds.effA.toFixed(1)} v ${odds.effD.toFixed(1)} · from 512 simulated matches`);
+  // The same estimate reaches the fronts row, so the fixture and fronts never disagree.
+  const serbia = buildFronts(st, ctx, { reach: LAND }).rows.find(row => row.teamId === '688');
+  assert.equal(`${serbia.win} ITA`, fixture.odds.bLabel);
+  // Before the gate (the compass has locked) the odds stay the balanced baseline, with no approach line.
+  const lockedState = state({ round: 7, spin: spinOf('locked') });
+  const locked = buildFixture(lockedState, context(lockedState));
+  assert.equal(locked.approach, null);
+  assert.equal(locked.odds.fill, Math.round(matchupOdds(lockedState, context(lockedState), '688', '380').attacker * 1000) / 10);
 });
 
 test('odds pairs always read 100%: the attacker is rounded once, the defender shows the rest (k/512 halves)', () => {
@@ -721,6 +743,9 @@ test('NextFixture tactical state: headline, odds bar, Match preview and simulate
   await click(preview);
   await click(simulate);
   assert.deepEqual(calls, ['preview', 'simulate']);
+  assert.equal(view.host.querySelector('.fixture__approach'), null, 'no estimates, no approach line');
+  await view.render({ fixture: { ...fixture, approach: 'Attack' } });
+  assert.equal(text(view.host.querySelector('.fixture__approach')), 'Continue kicks off with Attack, the recommended approach.');
   await view.render({ fixture });
   assert.equal(view.host.querySelector('button'), null, 'no actions without handlers');
 });

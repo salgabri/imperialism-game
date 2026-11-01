@@ -259,7 +259,7 @@ test('a small LRU keeps the retained set and the most recently used others', asy
 test('seasonSport binds the set to the football sport; sportOf picks it only once loaded', async () => {
   fresh();
   const football = getSport('football');
-  assert.deepEqual(BUILT_IN_SEASON, { year: 2026, season: '2025/26' });
+  assert.deepEqual(BUILT_IN_SEASON, { year: 2027, season: '2026/27' });
   assert.equal(sportOf({ sport: 'football' }), football);
   assert.equal(sportOf({ sport: 'football', dataSet: null }), football);
   assert.equal(sportOf({ sport: 'basketball', dataSet: ID }), getSport('basketball'), 'data sets are football only');

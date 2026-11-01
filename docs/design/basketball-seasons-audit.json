@@ -13,6 +13,30 @@
   },
   "seasons": [
     {
+      "id": "nba-2k26",
+      "version": "nba-2k26-ea2e3bfa",
+      "edition": "NBA 2K26",
+      "rows": 533,
+      "map": "nba",
+      "clubs": 30,
+      "filledPositions": [],
+      "droppedNoPosition": [],
+      "narrowedPositions": 10,
+      "warnings": []
+    },
+    {
+      "id": "nba-2k25",
+      "version": "nba-2k25-e963415e",
+      "edition": "NBA 2K25",
+      "rows": 534,
+      "map": "nba",
+      "clubs": 30,
+      "filledPositions": [],
+      "droppedNoPosition": [],
+      "narrowedPositions": 10,
+      "warnings": []
+    },
+    {
       "id": "nba-2k24",
       "version": "nba-2k24-6450daa7",
       "edition": "NBA 2K24",

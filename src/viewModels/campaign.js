@@ -9,6 +9,7 @@ import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
 import { domesticIdOf } from '../app/shared.js';
 import { empireNeighbors, territories } from '../engine/campaign.js';
+import { recommendedTactic } from '../engine/managerStrategy.js';
 import { reachableTargets } from '../engine/turns.js';
 import { MAP } from '../theme.js';
 import { politicalFill } from '../data/empireColours.js';
@@ -114,13 +115,24 @@ function pendingFixture(st) {
   return null;
 }
 
+/** The tactical gate's recommended option for this pair (the approach Continue kicks off with), else null. */
+function gateApproach(st, aId, dId) {
+  const tc = st?.tacticalChoice;
+  if (!tc || tc.aId !== aId || tc.dId !== dId) return null;
+  const options = Array.isArray(tc.options) ? tc.options : [];
+  const id = recommendedTactic(options);
+  return { id, label: options.find(option => option.id === id)?.label || null };
+}
+
 /**
- * Pre-match estimate for a drawn pair with the default ('balanced') approach — the odds the tactical gate's
- * "Continue" kicks off with, and the same call shape as App.startMatch, so the estimator cache is shared.
+ * Pre-match estimate for a drawn pair: at the tactical gate with the recommended approach, otherwise with the
+ * balanced one — the odds "Continue" kicks off with, and the same call shape as App.startMatch, so the estimator
+ * cache is shared.
  */
 function fixtureOdds(st, ctx, aId, dId) {
-  return memo(ctx?.cache, 'col:fixture-odds', [st?.teams, aId, dId, ctx?.managedId ?? null, ctx?.drama, ctx?.sport],
-    () => matchupOdds(st, ctx, aId, dId));
+  const tactic = gateApproach(st, aId, dId)?.id || 'balanced';
+  return memo(ctx?.cache, 'col:fixture-odds', [st?.teams, aId, dId, ctx?.managedId ?? null, ctx?.drama, ctx?.sport, tactic],
+    () => matchupOdds(st, ctx, aId, dId, { tactic }));
 }
 
 /**
@@ -201,7 +213,8 @@ export function buildColumn(st, ctx = {}) {
 /**
  * Next fixture block (DEC D10) → FixtureModel:
  * { state: 'idle'|'drawing'|'locked'|'tactical'|'live'|'done', kicker, kickerRight, idleTitle, headline: {a, b}|null,
- *   route, odds: {aLabel, bLabel, fill, aria}|null, meta, actions: {preview, simulate}, next: {title, route}|null }
+ *   route, odds: {aLabel, bLabel, fill, aria}|null, meta, approach: 'Attack'|null (tactical: what Continue kicks off
+ *   with), actions: {preview, simulate}, next: {title, route}|null }
  * drawing (spin 'ready'/'spinning') keeps the placeholder form ('Serbia to attack' / 'The compass is choosing the
  * target'); the matchup, odds and meta appear from the locked spin on (DEC D19).
  * live/done carry the compact MatchCard (the `matchCard` slot, DEC D17); headline/odds stay as a fallback.
@@ -242,6 +255,8 @@ export function buildFixture(st, ctx = {}) {
     const A = teams[pending.aId], B = teams[pending.dId];
     const odds = fixtureOdds(st, ctx, pending.aId, pending.dId);
     const effA = odds?.effA ?? strengthOf(A), effD = odds?.effD ?? strengthOf(B);
+    const tactical = pending.kind === 'tactical';
+    const approach = tactical ? gateApproach(st, pending.aId, pending.dId) : null;
     return {
       ...base,
       state: pending.kind,
@@ -249,7 +264,8 @@ export function buildFixture(st, ctx = {}) {
       route: routeLine(ctx, pending.aId, pending.dId, pending.route),
       odds: oddsRow(A, B, odds?.attacker),
       meta: strengthMeta(effA, effD, odds?.samples),
-      actions: pending.kind === 'tactical' ? { preview: true, simulate: true } : NO_ACTIONS,
+      approach: approach?.label || null,
+      actions: tactical ? { preview: true, simulate: true } : NO_ACTIONS,
     };
   }
 

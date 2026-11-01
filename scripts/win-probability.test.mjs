@@ -64,8 +64,8 @@ test('footballRate is the README rate and the football model\'s mean scoring rat
 });
 
 test('the kick-off value is the README formula on the match\'s prepareFootballMatch logA/logD with its effA/effD', () => {
-  // engine-diff §4a.1 measured these README values on the repo rosters.
-  const pinned = { 'ITA-HUN': 0.762, 'GER-AUT': 0.810, 'ESP-BUL': 0.947, 'ITA-GER': 0.447 };
+  // The README formula's values on the built-in 2026/27 rosters (EA FC 27 + FM 26), as engine-diff §4a.1 first measured them.
+  const pinned = { 'ITA-HUN': 0.731, 'GER-AUT': 0.768, 'ESP-BUL': 0.951, 'ITA-GER': 0.461 };
   for (const [a, d] of FOOTBALL_PAIRS.slice(0, 4)) {
     const attacker = nation(football, a), defender = nation(football, d);
     const plain = liveModelFor(football, attacker, defender);

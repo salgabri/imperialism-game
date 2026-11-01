@@ -1,5 +1,5 @@
 {
-  "note": "The built-in earlier basketball seasons: each NBA 2K edition's ratings, team and position per player, as compiled by 2K Archive, for NBA clubs only. npm run build:nba-seasons reads the page from data-src/bball-2karchive/ (ignored) and checks it against sha256; npm run build:nba-map builds each era's map from these teams and arenas. See docs/design/football-years.md, 'Built-in earlier basketball seasons'.",
+  "note": "The built-in earlier basketball seasons: each NBA 2K edition's ratings, team and position per player, as compiled by 2K Archive, for NBA clubs only. npm run build:nba-seasons reads the page from data-src/bball-2karchive/ (ignored) and checks it against sha256; npm run build:nba-map builds each era's map from these teams and arenas. The built-in season (builtIn) comes from the same page: npm run build-clubs writes its NBA clubs and npm run build-basketball rates its national fives' NBA players. See docs/design/football-years.md, 'Built-in earlier basketball seasons'.",
   "source": {
     "name": "2K Archive",
     "url": "https://2karchive.com/",
@@ -8,8 +8,8 @@
     "sha256": "86f0936ff0d51d671d8abaa4ed1ab8b000b438217d9b172e82932068129b695c",
     "retrieved": "2026-10-30"
   },
-  "builtIn": { "year": 2025, "season": "2024/25", "edition": "NBA 2K25" },
-  "seasons": [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+  "builtIn": { "year": 2027, "season": "2026/27", "edition": "NBA 2K27" },
+  "seasons": [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
   "skipped": {
     "2012": "2K Archive's NBA 2K12 lists 1 Philadelphia and 2 San Antonio players (it shipped with 2010/11 rosters), so two teams cannot field a five"
   },
@@ -68,6 +68,6 @@
     { "id": "nba2009", "seasons": [2009, 2010, 2011] },
     { "id": "nba2013", "seasons": [2013] },
     { "id": "nba2014", "seasons": [2014] },
-    { "id": "nba", "seasons": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024] }
+    { "id": "nba", "seasons": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026] }
   ]
 }

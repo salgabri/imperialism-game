@@ -400,10 +400,11 @@ const committed = id => JSON.parse(readFileSync(new URL(`../public/football/${id
 const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)];
 
 test('every built-in earlier season is committed, matches its listing and its own hash, and decodes', () => {
-  const editions = [...MANIFEST.editions, ...MANIFEST.legacy.editions];
-  assert.equal(editions.length, 18, 'FIFA 07 to EA FC 24');
+  const editions = [...MANIFEST.snapshots, ...MANIFEST.editions, ...MANIFEST.legacy.editions];
+  assert.equal(editions.length, 19, 'FIFA 07 to EA FC 24, and EA FC 26');
   assert.deepEqual(BUILT_IN_SEASONS.map(set => set.id), editions.map(edition => edition.id), 'one per manifest edition, newest first');
-  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.year), editions.map((_, i) => 2024 - i));
+  // EA FC 25 (2024/25) has no source here.
+  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.year), [2026, ...Array.from({ length: 18 }, (_, i) => 2024 - i)]);
   assert.deepEqual(BUILT_IN_SETS.filter(set => setSportOf(set.id) === 'football').map(set => set.id), BUILT_IN_SEASONS.map(set => set.id));
   for (const [i, listed] of BUILT_IN_SEASONS.entries()) {
     const edition = editions[i];
@@ -418,6 +419,10 @@ test('every built-in earlier season is committed, matches its listing and its ow
         [MANIFEST.legacy.ratings.url, MANIFEST.legacy.clubs.url, edition.clubs.roster, Number(edition.clubs.roster.slice(2))]);
       assert.equal('ratingsDate' in doc.source, edition.ratings.roster !== edition.clubs.roster, `${doc.id} ratings date`);
       assert.ok(!doc.source.ratingsDate || doc.source.ratingsDate < doc.source.snapshotDate);
+    } else if (edition.file) {
+      // EA FC 26: the committed snapshot the built-in 2025/26 was built from, its generated players left out.
+      assert.deepEqual([doc.source.url, doc.source.update, doc.source.roster, doc.source.snapshotDate],
+        [edition.url, edition.update, '260004', '2025-09-19']);
     } else {
       assert.equal(doc.source.url, MANIFEST.dataset.url);
     }
