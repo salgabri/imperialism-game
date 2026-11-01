@@ -1,22 +1,38 @@
-// The side-column ad (src/ads.js): one fixed 300×250 AdSense unit under an "Advertisements" kicker, the only label
-// AdSense allows besides "Sponsored Links". Renders nothing until src/ads.js has a publisher and a slot.
+// An AdSense banner (src/ads.js): one unit under an "Advertisements" kicker, the only label AdSense allows besides
+// "Sponsored Links". `size` is set inline on the unit, as AdSense supports (not from a stylesheet); `className` lets the
+// placement's CSS position the slot and hide it where it doesn't fit. Renders nothing until src/ads.js has a publisher
+// and a slot.
 import React, { useEffect, useId, useRef } from 'react';
 import { AD_CLIENT, AD_SLOT, AD_TEST, fillAdUnit } from '../ads.js';
 import './ad-slot.css';
 
-export default function AdSlot() {
+export default function AdSlot({ className = '', size = [300, 250] }) {
   const titleId = useId();
   const slotRef = useRef(null);
   useEffect(() => {
-    // A slot ad-slot.css hides (a phone narrower than the unit) asks for nothing.
     const slot = slotRef.current;
-    if (slot && slot.ownerDocument.defaultView.getComputedStyle(slot).display !== 'none') fillAdUnit();
+    if (!slot) return undefined;
+    const view = slot.ownerDocument.defaultView;
+    // The ad is requested once the slot has a size, so a slot that CSS hides (a phone narrower than the unit, a short
+    // window) asks for nothing until it shows.
+    if (!view.ResizeObserver) {
+      if (view.getComputedStyle(slot).display !== 'none') fillAdUnit();
+      return undefined;
+    }
+    const observer = new view.ResizeObserver(entries => {
+      if (!entries.some(entry => entry.contentRect.width > 0)) return;
+      observer.disconnect();
+      fillAdUnit();
+    });
+    observer.observe(slot);
+    return () => observer.disconnect();
   }, []);
   if (!AD_SLOT) return null;
+  const [width, height] = size;
   return (
-    <section ref={slotRef} className="ad-slot" aria-labelledby={titleId}>
+    <section ref={slotRef} className={className ? `ad-slot ${className}` : 'ad-slot'} aria-labelledby={titleId}>
       <div className="kicker"><span className="kicker__title" id={titleId}>Advertisements</span></div>
-      <ins className="adsbygoogle ad-slot__unit" data-ad-client={AD_CLIENT} data-ad-slot={AD_SLOT}
+      <ins className="adsbygoogle ad-slot__unit" style={{ width, height }} data-ad-client={AD_CLIENT} data-ad-slot={AD_SLOT}
         {...(AD_TEST ? { 'data-adtest': 'on' } : {})} />
     </section>
   );

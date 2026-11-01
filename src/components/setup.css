@@ -54,8 +54,14 @@
 /* ---- Step rail (M§3.3) ---- */
 .setup-rail {
   position:absolute; z-index:1; left:0; top:var(--setup-head-h); bottom:var(--setup-foot-h); width:var(--setup-rail-w);
+  display:flex; flex-direction:column;
   padding:34px 24px; overflow-y:auto; background:var(--surface); border-right:1px solid var(--rule);
 }
+/* The rail's ad (AdSlot, ad-slot.css): a 200×200 square at the rail's foot, at least 40px below the last step. Only where
+   the rail is a column (its narrowest leaves 200px inside) and the window leaves room for both: 140px of head and foot,
+   34px pads, steps up to ~250px (wrapped summaries) and the 271px ad block need 740px. */
+.setup-rail .setup-rail__ad { display:none; margin-top:auto; padding-top:40px; }
+@media (min-width:1200px) and (min-height:740px) { .setup-rail .setup-rail__ad { display:flex; } }
 .setup-rail__steps { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
 .setup-rail__step {
   display:flex; align-items:flex-start; gap:14px; width:100%; padding:14px 12px;

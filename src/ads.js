@@ -1,4 +1,4 @@
-// AdSense: Google's script and the side-column display unit (components/AdSlot.jsx). All of it stays off until
+// AdSense: Google's script and the banner unit (components/AdSlot.jsx). All of it stays off until
 // VITE_ADSENSE_CLIENT names a publisher (README "Advertising"). A dev server requests no ads unless
 // VITE_ADSENSE_TEST=on: it shows the reserved slots instead.
 
@@ -6,7 +6,7 @@
 const env = import.meta.env || {};
 
 export const AD_CLIENT = env.VITE_ADSENSE_CLIENT || null;
-/** The display ad unit in the Ledger and Chronicle side columns. */
+/** The display ad unit behind every banner; each placement's CSS sets its exact size. */
 export const AD_SLOT = (AD_CLIENT && env.VITE_ADSENSE_SLOT) || null;
 /** Test requests: the display unit sends data-adtest. */
 export const AD_TEST = !!AD_CLIENT && env.VITE_ADSENSE_TEST === 'on';
@@ -37,7 +37,10 @@ export function loadAds(doc = globalThis.document) {
   scriptAdded = true;
 }
 
-/** Queues one freshly mounted <ins class="adsbygoogle"> for an ad; Google fills them in document order. */
+/**
+ * Queues one freshly mounted <ins class="adsbygoogle"> for an ad. Google fills the first unfilled unit in the page, which
+ * is the right one because the game shows at most one: the setup rail's, the Ledger's or the Chronicle's.
+ */
 export function fillAdUnit(win = globalThis.window) {
   if (!scriptAdded || !win) return;
   // An ad blocker can swap adsbygoogle for a stub that throws.

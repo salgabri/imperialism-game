@@ -6,6 +6,7 @@ import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
 import TeamMark from './TeamMark.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
+import AdSlot from './AdSlot.jsx';
 import * as setupModel from '../screens/setup/setupModel.js';
 import { themedPaint } from '../theme.js';
 import './setup.css';
@@ -459,25 +460,29 @@ export default function SetupOverlay({
           <ThemeToggle className="setup-head__theme" />
         </header>
 
-        <nav className="setup-rail" aria-label="Setup steps">
-          <ol className="setup-rail__steps">
-            {SETUP_STEPS.map(item => {
-              const state = item.n < step ? 'done' : item.n === step ? 'current' : 'upcoming';
-              return (
-                <li key={item.id} data-state={state}>
-                  <button type="button" className="setup-rail__step" data-state={state} aria-current={state === 'current' ? 'step' : undefined}
-                    aria-controls={`setup-step-${item.id}`} onClick={() => goTo(item.n)}>
-                    <span className="setup-rail__badge" aria-hidden="true">{state === 'done' ? <CheckMark /> : item.n}</span>
-                    <span className="setup-rail__text">
-                      <span className="setup-rail__title">{state === 'done' ? <span className="sr-only">Done: </span> : null}{item.title}</span>
-                      <span className="setup-rail__sub">{state === 'done' ? <RailSummary text={model.stepSummaries[item.n]} /> : item.pending}</span>
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
+        <div className="setup-rail">
+          <nav aria-label="Setup steps">
+            <ol className="setup-rail__steps">
+              {SETUP_STEPS.map(item => {
+                const state = item.n < step ? 'done' : item.n === step ? 'current' : 'upcoming';
+                return (
+                  <li key={item.id} data-state={state}>
+                    <button type="button" className="setup-rail__step" data-state={state} aria-current={state === 'current' ? 'step' : undefined}
+                      aria-controls={`setup-step-${item.id}`} onClick={() => goTo(item.n)}>
+                      <span className="setup-rail__badge" aria-hidden="true">{state === 'done' ? <CheckMark /> : item.n}</span>
+                      <span className="setup-rail__text">
+                        <span className="setup-rail__title">{state === 'done' ? <span className="sr-only">Done: </span> : null}{item.title}</span>
+                        <span className="setup-rail__sub">{state === 'done' ? <RailSummary text={model.stepSummaries[item.n]} /> : item.pending}</span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+          {/* The rail's empty foot, well below the steps; shown only on desktops tall enough to leave that gap (setup.css). */}
+          <AdSlot className="setup-rail__ad" size={[200, 200]} />
+        </div>
 
         {/* Step 1 — Campaign (V1 board 02) */}
         <section className="setup-step" id="setup-step-campaign" data-step="1" hidden={step !== 1} aria-labelledby="setup-campaign-title">

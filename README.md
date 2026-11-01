@@ -1111,29 +1111,41 @@ publisher. `src/ads.js` loads Google's script and reads the switches below;
 `src/components/AdSlot.jsx` is the only ad unit. There are no full-screen ad
 breaks.
 
-One fixed 300×250 unit sits in the side column of the Ledger (after Share of
-the map) and the Chronicle (after Turning points, above the activity feed),
-under a muted "Advertisements" kicker. AdSense allows only that label or
-"Sponsored Links". The unit holds its size from the first paint. It disappears
-when Google has no ad for it, when the script is blocked, and on phones narrower
-than 336px. The map, match, conquest, squad and setup screens never show a
-banner: Google asks for at least 150px between an ad and a game, and on those
-screens the game is the whole screen.
+Banners sit only in space the game leaves empty, each under a muted
+"Advertisements" kicker (AdSense allows only that label or "Sponsored Links"):
+
+- **Setup:** a 200×200 square at the foot of the step rail, at least 40px below
+  the last step and far from the footer's buttons. It shows only where the rail
+  is a column (1200px wide and up) and the window is at least 740px tall.
+- **Ledger:** a 300×250 unit in the side column, after Share of the map.
+- **Chronicle:** a 300×250 unit in the side column, after Turning points and
+  above the activity feed.
+
+The game shows at most one banner at a time. Each unit holds its size from the
+first paint, so nothing moves when the ad arrives, and asks for an ad only once
+it is on screen. It disappears when Google has no ad for it, when the script is
+blocked, and (the 300×250 units) on phones narrower than 336px. The map, match,
+conquest and squad screens never show a banner. Google asks for at least 150px
+between an ad and a game, and on those screens the game is the whole screen.
+The Squad side column is also full.
 
 The switches are read at build time, from the environment or a Vite env file
 such as `.env.production.local` (ignored by git):
 
 ```bash
 VITE_ADSENSE_CLIENT=ca-pub-1234567890123456 # your publisher id: turns ads on
-VITE_ADSENSE_SLOT=1234567890                # a fixed-size 300×250 display ad unit
+VITE_ADSENSE_SLOT=1234567890                # a display ad unit, created as Responsive
 VITE_ADSENSE_TEST=on                        # mark requests as tests (also loads ads on a dev server)
 ```
 
+All three banners share the one ad unit. Create it as a display ad with
+**Responsive** size; the game sets each banner's exact size inline on the unit,
+as Google's exact-size example does, without its `data-ad-format` line.
 `npm run build` checks both ids and writes `dist/ads.txt`. AdSense reads that
 file only at the root of the domain, so a game served from a subfolder needs a
 copy there. `npm run dev` requests no ad unless `VITE_ADSENSE_TEST=on`. With a
-publisher and a slot set it shows the reserved slots as empty "300 × 250 ad"
-boxes instead. The test bundles have no Vite env, so the tests never load ads.
+publisher and a slot set it shows each banner as an empty "Ad space" box
+instead. The test bundles have no Vite env, so the tests never load ads.
 
 In the AdSense account, keep Auto ads off for the site: they would add an anchor
 banner over the phone tab bar and drop units into the campaign column. Publish a
@@ -1143,6 +1155,8 @@ loads, and it needs the URL of a privacy policy that mentions the saves kept in
 the browser and the ad cookies. Ads make the game commercial, and much of its
 data is licensed for personal or non-commercial use only: see
 [Rights and terms](docs/design/football-year-sources.md#rights-and-terms).
+Hosting is affected too: Vercel's free Hobby plan allows only non-commercial use
+and counts AdSense as commercial, so ads need a paid plan or another host.
 
 ## Layout
 

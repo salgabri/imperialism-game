@@ -1,11 +1,12 @@
-/* The side-column ad (AdSlot, src/ads.js): a fixed 300×250 unit under a muted kicker, after the first section of the
-   Ledger and Chronicle side columns. Its label and rule are quieter than a section's, so it never reads as game data. */
+/* A banner (AdSlot, src/ads.js): a unit under a muted kicker. 300×250 after the first section of the Ledger and Chronicle
+   side columns; a 200×200 square at the foot of the setup rail (placed in setup.css). Its label and rule are quieter
+   than a section's, so it never reads as game data. */
 
 .ad-slot { flex:none; display:flex; flex-direction:column; gap:10px; min-width:0; }
 .ad-slot .kicker { border-bottom-color:var(--rule); }
 .ad-slot .kicker__title { color:var(--muted); }
-/* The unit holds its size from the first paint, so nothing below it moves when the ad arrives. */
-.ad-slot__unit { display:block; width:300px; height:250px; background:var(--surface-2); }
+/* The unit's inline size holds from the first paint, so nothing below it moves when the ad arrives. */
+.ad-slot__unit { display:block; background:var(--surface-2); text-decoration:none; }
 
 /* Nothing to show: Google could not fill the request, or the script was blocked. The slot goes, label included.
    Two rules, so a browser without :has() still drops a blocked slot. */
@@ -19,4 +20,4 @@
   display:flex; align-items:center; justify-content:center;
   font:400 var(--fs-meta)/1 var(--font-sans); letter-spacing:.04em; color:var(--muted);
 }
-:root[data-ads=preview] .ad-slot__unit::after { content:'300 × 250 ad'; }
+:root[data-ads=preview] .ad-slot__unit::after { content:'Ad space'; }
