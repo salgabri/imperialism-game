@@ -241,6 +241,21 @@ test('rail, Next and Back move between the three mounted steps and focus the ste
   assert.deepEqual(view.errors, []);
 });
 
+test('initialStep opens the wizard on Your role ("Another team" after a defeat), with Back to the rules', async t => {
+  const view = await mount(t, { setup: { role: 'manager', managedTeamId: '' }, initialStep: 3 });
+  assert.deepEqual(view.visibleStep(), ['3']);
+  assert.deepEqual(view.qa('.setup-rail__step').map(step => step.dataset.state), ['done', 'done', 'current']);
+  assert.equal(document.activeElement, view.q('#setup-role-title'), 'focus starts on the step it opened on');
+  assert.equal(view.button('Launch campaign').disabled, true, 'no team chosen yet');
+  await view.click(view.button('Back', view.section(3)));
+  assert.deepEqual(view.visibleStep(), ['2']);
+  for (const initialStep of [0, 9, 'x']) {
+    const odd = await mount(t, { initialStep });
+    assert.equal(odd.visibleStep().length, 1, `initialStep ${initialStep} still shows one step`);
+  }
+  assert.deepEqual(view.errors, []);
+});
+
 test('step 1 binds sport, teams and theatre; the theatre mirror select stays value-bound', async t => {
   const view = await mount(t);
   const football = view.button('Football');

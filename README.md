@@ -58,7 +58,8 @@ notes in `docs/design/` are kept as history.
 ```bash
 npm install
 npm run dev         # dev server, prints a localhost URL
-npm run build       # production bundle into dist/
+npm run build       # production bundle into dist/: installable, plays offline
+npm run preview     # serve dist/ locally (the dev server has no service worker)
 npm test            # complete automated regression suite
 npm run smoke       # headless: plays campaigns to completion and checks invariants
 npm run smoke -- --scenarios=england # only the smoke scenarios whose names match
@@ -93,38 +94,82 @@ npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public A
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
 npm run build:mlb-map    # rebuild MLB's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
-npm run build:icons      # render favicon.ico and apple-touch-icon.png from public/favicon.svg
+npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 ```
+
+The production build installs as an app (Chrome's install button, or Share › Add
+to Home Screen on an iPhone) and plays offline. `npm run build` writes
+`manifest.webmanifest` and a service worker, `sw.js`, which
+[vite-plugin-pwa](https://vite-pwa-org.netlify.app/) builds from `src/pwa.js`.
+The worker precaches only the app shell, under 3 MB: `index.html`, the hashed
+bundle in `assets/`, the Archivo fonts and the two world maps. Everything else in
+`public/` (about 60 MB) is cached the first time the game uses it. Seasons and
+country maps come from the network while online, so they always match the
+deployed build, and from the cache offline. Flags and crests show from the cache
+at once and refresh in the background. Starting or resuming a campaign online
+also fetches every one of its teams' crests and flags that is not cached yet, a
+few at a time, so teams the game never showed online still show offline. After
+one online visit the game opens offline and plays nations and club campaigns,
+plus every country whose map was opened online. A country never opened online
+fails to load, with **Retry**, and a flag or crest the game has neither shown
+nor kept for a campaign online stays blank.
+
+A new version never reloads the page by itself. Its worker downloads in the
+background and waits, and a **New version ready** panel offers **Reload** or
+**Later**. Reload writes the open campaign's checkpoint, as closing the page
+does, and reloads that tab only. Other tabs keep the version they loaded until
+they reload. Later hides the panel for that page; closing every tab also
+updates. The page looks for a new version every hour and when you return to it.
 
 ## Deployment
 
 The game is live at <https://imperialism-game.vercel.app>. Vercel builds and
 deploys `main` on every push, so a push to `main` is a release.
 
-**Continuous integration.** [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
-runs `npm test`, `npm run build` and `npm run smoke` on Node 26 for every push.
-GitHub Actions is free for public repositories. The check reports failures; it
-does not hold back Vercel's deploy yet. To make production wait for it, add a
-Vercel token and the project's org and project ids as repository secrets, deploy
-from the workflow with the Vercel CLI once the tests pass, and turn off Vercel's
-own deploys of `main` (`git.deploymentEnabled` in `vercel.json`).
+**Continuous integration and deploys.**
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `npm test`,
+`npm run build` and `npm run smoke` on Node 26 for every push, in about eight
+minutes. GitHub Actions is free for public repositories. On `main`, its deploy
+job then builds the tested commit with the Vercel CLI (pinned at 64.7.0) and
+deploys it to production. A newer push cancels the older run, so only the
+newest commit deploys. The job reads three repository secrets: `VERCEL_TOKEN`,
+`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`. They go under GitHub → Settings →
+Secrets and variables → Actions → **Repository secrets**, not Variables and not
+an environment's secrets. Without all three, the job leaves the notice "Not
+deploying" and skips its Vercel steps.
+
+To make production wait for the tests, Vercel's own Git deploys of `main` have
+to be turned off with `"git": { "deploymentEnabled": { "main": false } }` in
+`vercel.json`. Turn them off only after a run's deploy job has actually run its
+`vercel deploy` step and succeeded. Until then, both deploy each push, which is
+harmless. On 1 November 2026 the switch went in while the job still could not
+see the secrets: production stopped updating until it was reverted. When the
+token expires, create a new one from your Vercel account's tokens page and
+replace the `VERCEL_TOKEN` secret. `npx vercel link` in a checkout writes the org
+and project ids to `.vercel/project.json`, which git ignores.
 
 **Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
 immutable for a year. Fonts, flags and club crests are cached for a day and
 revalidated in the background for a week; a stale image is harmless.
 Everything else revalidates on every load: `index.html`, the maps and the
 season and country files keep their names from one release to the next and
-must match the code that reads them.
+must match the code that reads them. That includes `sw.js`, which must never be
+cached for long, or players would only see a release once the cache expired.
 
 **Link previews.** `index.html` carries a description, a canonical URL, and
 Open Graph and Twitter tags, so a shared link shows a card. Crawlers need
-absolute URLs, so the canonical URL, `og:url` and `og:image` name
-`imperialism-game.vercel.app`: change them with the address.
+absolute URLs, so the canonical URL and `og:image` name
+`imperialism-game.vercel.app`: change them with the address. There is no
+`og:url`: Facebook would open every shared challenge link at the address it
+names, and without it a share keeps its own.
 `public/og-image.png` (1200×630) is a Europe campaign after 29 matches,
 captured from the game with its overlays hidden, beside the wordmark.
 `public/favicon.svg` is the draw compass's needle on the clay accent, and
-`npm run build:icons` renders `favicon.ico` (16, 32 and 48 px) and the 180 px
-`apple-touch-icon.png` from it. `public/robots.txt` allows every crawler.
+`npm run build:icons` renders from it `favicon.ico` (16, 32 and 48 px), the 180 px
+`apple-touch-icon.png` and the web app manifest's `icon-192.png` and
+`icon-512.png`. The manifest's maskable icon, `icon-maskable-512.png`, shrinks the
+needle into the central circle that every icon mask keeps. `public/robots.txt`
+allows every crawler.
 
 ## How a campaign plays
 
@@ -157,7 +202,10 @@ default suits a first campaign, so pressing Space three times starts one.
    football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
    2025 back to 2021, with nations or with clubs on the map of their day. A
-   quick-resume card appears when a save exists.
+   quick-resume card appears when a save exists. Below it, the **Daily campaign**
+   card offers today's campaign for the chosen sport. A page opened from a
+   challenge link shows a note about the link instead
+   ([Sharing a campaign](#sharing-a-campaign)).
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
@@ -168,7 +216,8 @@ default suits a first campaign, so pressing Space three times starts one.
    its matches and one of up to three signings after its wins, and, under a
    one-match draw, **who picks your opponent**. **Spectator** leaves draws,
    results and signings to the game, and you can follow any empire once the
-   campaign starts. **Launch campaign** starts it.
+   campaign starts. **Challenge a friend** copies a link to this setup and its
+   seed. **Launch campaign** starts it.
 
 ### Rules of war
 
@@ -244,8 +293,8 @@ opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
 offence/defence, form and shooting variance. Nations play FIBA's four ten-minute
 quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
-quarters at about 100, so club games score about 115 a side, near the league's
-own, rather than in the eighties. American football plays about 11
+quarters at their season's league pace and scoring rate, so games score like
+their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
 possessions a side, each ending in a touchdown, a field goal or nothing by its
 offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
@@ -371,8 +420,13 @@ unchanged", with the strength gain. The position lists every natural position,
 so a basketball combo guard reads "PG/SG · 88 rating". A collapsible "Lineup
 before and after" compares the lineups, and **Sign <player>** confirms. If your
 team is knocked out, the same article layout ("ITALY IS OUT") offers
-**Continue as spectator** or **Retry this setup**. Conquests by other teams
-never wait: a notice on the map, the ticker and a brief hatch flash report them.
+**Continue as spectator**, which follows the team that knocked you out (change it
+under Following), or **Try again**: **Same draw** replays the campaign's seed, so
+the opening repeats; **New draw** keeps the team and the rules with a fresh seed;
+**Another team** opens setup on Your role with the same campaign and rules and no
+team chosen. The eliminated campaign stays saved until a new one is launched.
+Conquests by other teams never wait: a notice on the map, the ticker and a brief
+hatch flash report them.
 
 **Ledger** shows the standings (# · Team · Terr · Strength · Conq · Claimed),
 the share of the map and the fallen empires. **Chronicle** shows the match
@@ -399,7 +453,8 @@ The optional best-of-three finale starts when two teams remain. Interim games
 award no territory or player; the second win resolves one conquest. A numeric
 seed reproduces a campaign when settings, manager choices and simulation version
 match. Updating the model can change future results for older seeds; already
-generated matches in saved campaigns retain their outcome and events.
+generated matches in saved campaigns retain their outcome and events. A
+[challenge link](#sharing-a-campaign) carries a setup and its seed to someone else.
 
 Progress autosaves at every draw, kickoff, final whistle and result, and after
 signings, preserving the seed, random state, queue, history and pending manager
@@ -418,10 +473,28 @@ campaign setup retains the previous save until a replacement is launched.
 Older version-one saves migrate, but their original random stream was never
 recorded, so exact continuation from that historical stream cannot be recovered.
 
+Saves live in the browser's `localStorage` for the site, so they belong to one
+browser on one device. After its first checkpoint a page asks the browser to keep
+them (`navigator.storage.persist()`). Chrome grants that by engagement or
+installation without asking; Firefox asks you. Without it a browser may clear the
+site's storage when the disk runs low. Safari also clears it after seven days of
+Safari use without a visit, unless the game runs from the Home Screen. On an
+iPhone or iPad, add Imperialism to the Home Screen to keep campaigns: Home Screen
+apps are exempt from the seven-day rule, and Safari 17 weighs them in granting
+the request. The Home Screen app has its own storage, apart from Safari's, so
+move a campaign into it with Export in Safari and Import in the app. Export any
+campaign you can't afford to lose.
+Checkpoints stay in `localStorage` rather than IndexedDB. Both sit in the same
+storage bucket, so IndexedDB is cleared by the same eviction. Its writes are also
+asynchronous, while compare-and-save across tabs, the all-or-nothing write and the
+checkpoint written as the page closes all rely on a save that finishes before
+the next line runs.
+
 An error while rendering shows a **crash screen** instead of a blank page
 (`src/components/ErrorBoundary.jsx`, around the App in `main.jsx`). The App's
 autosaves stop with it, so the stored checkpoint is the last good one.
-**Reload** returns to setup and its resume card. **Export campaign** downloads
+**Reload** returns to setup and its resume card, on the new version when one is
+waiting (a plain reload would open the cached one). **Export campaign** downloads
 that checkpoint exactly as stored, which Import campaign reads. **Report it on
 GitHub** opens a new issue with the error filled in, and **Error details** shows
 the message and the first stack frames.
@@ -437,6 +510,74 @@ the biggest haul; a manager who won sees "Managed by you". The playtest timing
 lineup) appears only with `?playtest` in the address; exports always carry it.
 The masthead trophy reopens the results after you view the map. The map has one
 keyboard tab stop, arrow navigation and a skip link.
+
+### Sharing a campaign
+
+Sharing needs no server: a campaign travels in its link.
+
+**Challenge links.** **Copy challenge link** copies a link to the game with a
+setup in its query. It is on the last setup step, under **Challenge a friend**,
+and on the final results. Opening the link fills in setup without launching it,
+and a note at the top of step 1 says so. **Launch campaign** then plays the same
+campaign, since a seed replays a campaign when the settings and the manager's
+choices match. The setup's link names the seed that setup would launch, so a blank
+seed field shares the opening seed. The results' link names the seed that was
+played. Where the browser won't copy, the link shows selected for a manual copy.
+Each key names a setup choice, and a key left at its default is left out:
+
+| Key | Setup choice | Values | Left out when |
+| --- | --- | --- | --- |
+| `sport` | Sport | `football`, `basketball`, `american-football`, `baseball` | football |
+| `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs `all`, `elite`, a league (`Premier+League`) or a country (`domestic:826`) | Europe for nations, all clubs for clubs, a sport's own map (NBA, NFL, MLB) |
+| `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`) | the built-in season |
+| `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
+| `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
+| `show` | Show matches | `ticker`, `instant`, `express` | Live |
+| `upsets` | Upsets | `predictable`, `balanced`, `wild` | Balanced |
+| `final` | Final | `single`, `best-of-three` | Single match |
+| `signings` | Computer signings | `highest-rated`, `best-fit` | Best-rated player |
+| `strengths` | Team strengths (basketball) | `authentic`, `competitive` | Real-world |
+| `role` | Your role | `manager`, `spectator` | Spectator |
+| `team` | A manager's team | a team id: `276` (Germany), `f-real-madrid`, `d826-679` | no team chosen |
+| `seed` | Seed | 0 to 4294967295 | never |
+
+For example, `https://imperialism-game.vercel.app/?sport=basketball&theatre=CONMEBOL&draw=round-robin&role=manager&team=076&seed=4242`
+sets up Brazil's basketball five against South America under round robin.
+
+A value this version doesn't offer stays at its default: an unknown sport, draw or
+seed, a theatre or season no longer built in, a CM 01/02 season built on another
+computer, a country map with an earlier season, team strengths outside basketball,
+a team for a spectator. A manager's team is checked once its theatre's teams are
+known, after a country map or season has loaded. If the team doesn't play there,
+setup asks for one. The note on step 1 lists what the link could not use. Other
+query keys (`?playtest`) are left alone, and the address stays as opened.
+`src/screens/setup/challenge.js` writes and reads links (`scripts/challenge-link.test.mjs`),
+and nothing in it draws from a campaign's random stream.
+
+**Daily campaign.** Step 1 offers today's campaign for the chosen sport: the Elite
+32 nations (American football: the NFL's 32 clubs) with Random draw, Fast-forward,
+the built-in season and the standard More rules, managed by you. **Play today's
+campaign** fills it in and moves on to Your role to pick a team. The seed is a
+hash of the sport and the player's calendar date (`dailySeed`, pinned by the
+tests), so everyone plays the same campaign that day and a new one from midnight.
+Your team, role, opponent choice and Show matches stay yours to change: it is
+still the daily. The card then reads "Today's campaign is set up", and its share
+image says "Daily campaign · Sunday 1 November".
+
+**Share image.** **Share image** on the final results makes a 1200×630 picture,
+drawn at twice that so it stays sharp on a phone. The final map is framed as the
+campaign's opening camera framed its theatre (Europe for the UEFA nations, a
+country's own frame), with the champion's land in the colour the map gave it (clay
+for the team you managed). A band under it holds the champion's flag or crest,
+"Campaign complete · Round IX", the champion and one line of stats: "has conquered
+Europe in 45 battles · 12 conquests · 9 players claimed". On a phone or tablet
+whose browser can share files, the share sheet opens with the image and a line
+carrying the challenge link. Elsewhere, or if sharing fails, the image downloads
+as `imperialism-<champion>-<seed>.png`. Drawing starts when the results open, so
+the share sheet opens straight from the tap. The image is drawn on a canvas from
+the map's own paths, without flag patterns or labels (`src/viewModels/shareCard.js`,
+`src/engine/shareImage.js`).
 
 ### Draw compass, flags and navigation
 
@@ -1236,6 +1377,67 @@ projection; the first-visible-foreign-land targeting rule remains enforced.
 Run `npm run test:geography` for straight-grid/inverse-projection, source-atlas
 coastline and date-line regressions.
 
+## Advertising
+
+The game can show AdSense banner ads, and shows none until a build names a
+publisher (placeholders can be previewed sooner, below). `src/ads.js` loads
+Google's script and reads the switches below;
+`src/components/AdSlot.jsx` is the only ad unit. There are no full-screen ad
+breaks.
+
+Banners sit only in space the game leaves empty, each under a muted
+"Advertisements" kicker (AdSense allows only that label or "Sponsored Links"):
+
+- **Setup:** a 200×200 square at the foot of the step rail, at least 40px below
+  the last step and far from the footer's buttons. It shows only where the rail
+  is a column (1200px wide and up) and the window is at least 740px tall.
+- **Ledger:** a 300×250 unit in the side column, after Share of the map.
+- **Chronicle:** a 300×250 unit in the side column, after Turning points and
+  above the activity feed.
+
+The game shows at most one banner at a time. Each unit holds its size from the
+first paint, so nothing moves when the ad arrives, and asks for an ad only once
+it is on screen. It disappears when Google has no ad for it, when the script is
+blocked, and (the 300×250 units) on phones narrower than 336px. The map, match,
+conquest and squad screens never show a banner. Google asks for at least 150px
+between an ad and a game, and on those screens the game is the whole screen.
+The Squad side column is also full.
+
+The switches are read at build time, from the environment or a Vite env file
+such as `.env.production.local` (ignored by git):
+
+```bash
+VITE_ADSENSE_CLIENT=ca-pub-1234567890123456 # your publisher id: turns ads on
+VITE_ADSENSE_SLOT=1234567890                # a display ad unit, created as Responsive
+VITE_ADSENSE_TEST=on                        # mark requests as tests (also loads ads on a dev server)
+```
+
+All three banners share the one ad unit. Create it as a display ad with
+**Responsive** size; the game sets each banner's exact size inline on the unit,
+as Google's exact-size example does, without its `data-ad-format` line.
+`npm run build` checks both ids and writes `dist/ads.txt`. AdSense reads that
+file only at the root of the domain, so a game served from a subfolder needs a
+copy there. The test bundles have no Vite env, so the tests never load ads.
+
+To see where the banners go before there are any ads, add `?ads=preview` to the
+game's address, for example `https://imperialism-game.vercel.app/?ads=preview`.
+Every build supports it, with or without a publisher: each banner shows as a
+dashed "Ad space" box of its exact size, and nothing is asked of Google.
+Players who open the plain address see no banners. `npm run dev` shows the
+same placeholders whenever a publisher and a slot are set, unless
+`VITE_ADSENSE_TEST=on`. An ad blocker may hide the placeholders too.
+
+In the AdSense account, keep Auto ads off for the site: they would add an anchor
+banner over the phone tab bar and drop units into the campaign column. Publish a
+European regulations message under Privacy & messaging for visitors in the EEA,
+the UK and Switzerland. It runs through the AdSense script the game already
+loads, and it needs the URL of a privacy policy that mentions the saves kept in
+the browser and the ad cookies. Ads make the game commercial, and much of its
+data is licensed for personal or non-commercial use only: see
+[Rights and terms](docs/design/football-year-sources.md#rights-and-terms).
+Hosting is affected too: Vercel's free Hobby plan allows only non-commercial use
+and counts AdSense as commercial, so ads need a paid plan or another host.
+
 ## Layout
 
 ```
@@ -1266,6 +1468,7 @@ src/
     primitives.css     shared buttons, kickers, tables, panels
     shell.css          app shell per view and breakpoint, phone chrome
   config.js            simulation tunables (drama, upset threshold, labels), save version
+  ads.js               AdSense script and banner settings (off by default)
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
@@ -1315,7 +1518,8 @@ src/
     footballSets.js    lists, loads and validates earlier seasons of both sports; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
-                       wizard, match card, dialogs and overlays, crash screen (ErrorBoundary)
+                       wizard, match card, dialogs and overlays, crash screen
+                       (ErrorBoundary), the ad slot
 public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
@@ -1354,7 +1558,7 @@ scripts/
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
   build-icons.mjs      renders the site icons from public/favicon.svg
-.github/workflows/ci.yml  tests, build and smoke on every push
+.github/workflows/ci.yml  tests, build and smoke on every push; deploys main once the Vercel secrets exist
 vercel.json            cache headers for the deployed site
 ```
 
@@ -1394,7 +1598,11 @@ the neighbouring-land backdrop stays inert. The domestic resume also refuses a
 save naming missing sections and a map that cannot load, resumes from a cold
 map cache, and restores a one-section-per-club save onto the 100-section map,
 each starting group whole with its holder. `npm run test:domestic` kicks off
-every shipped country with legal duel draws.
+every shipped country with legal duel draws. A **challenge link** check opens the
+app at a link and finds setup filled in but not launched. Copy challenge link
+writes the same link back, and Launch plays its settings and seed. A country map's
+link keeps its club once the map loads, and a stale link falls back to the
+defaults and says so.
 
 The suite asserts that each match eliminates exactly one team, that no territory
 is lost or duplicated, and that one player changes shirts per match. It checks
@@ -1431,6 +1639,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |
 | `column-wiring`, `match-wiring`, `squad-wiring`, `conquest-wiring`, `ledger-wiring`, `map-wiring` | Each screen wired to the running App |
+| `challenge-link` | Challenge links written and read back, the fallback for unknown and stale values, and the daily seeds and setups |
+| `share-ui` | The share card, App's wiring of links, the daily campaign and the share image, and the setup and results controls |
 
 Domestic campaigns add `domestic-data`, `domestic-geometry`, `domestic-campaign`
 and `domestic-routing`, which `npm run test:domestic` also runs on their own.

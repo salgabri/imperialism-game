@@ -6,6 +6,7 @@ import { CM_ROLES, CM_SOURCE, cmTupleOf } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SOURCE, eaRosterOf, eaTupleOf } from '../data/eaPlayers.js';
 import { getSport, SPORT_LIST } from '../sports/index.js';
 import { HOME_NATIONS } from '../data/teams.js';
+import { keepSaves } from './persistence.js';
 
 export const CAMPAIGN_INDEX_KEY = `${SAVE_KEY}:campaigns`;
 export const CAMPAIGN_BACKUP_KEY = `${SAVE_KEY}:backup`;
@@ -630,6 +631,8 @@ export function writeSave(state, { activate = true } = {}) {
       [CAMPAIGN_INDEX_KEY, JSON.stringify(index)], [key, text], ...(updatePointer ? [[SAVE_KEY, text]] : [])];
     const saved = message => {
       lastWritten = { text, campaignId: data.campaignId, revision: data.revision };
+      // The first checkpoint asks the browser to keep the saves through storage eviction (persistence.js).
+      keepSaves();
       return { ok: true, campaignId: data.campaignId, revision: data.revision, campaignName: data.campaignName,
         savedAt: data.savedAt, message };
     };

@@ -54,8 +54,14 @@
 /* ---- Step rail (M§3.3) ---- */
 .setup-rail {
   position:absolute; z-index:1; left:0; top:var(--setup-head-h); bottom:var(--setup-foot-h); width:var(--setup-rail-w);
+  display:flex; flex-direction:column;
   padding:34px 24px; overflow-y:auto; background:var(--surface); border-right:1px solid var(--rule);
 }
+/* The rail's ad (AdSlot, ad-slot.css): a 200×200 square at the rail's foot, at least 40px below the last step. Only where
+   the rail is a column (its narrowest leaves 200px inside) and the window leaves room for both: 140px of head and foot,
+   34px pads, steps up to ~250px (wrapped summaries) and the 271px ad block need 740px. */
+.setup-rail .setup-rail__ad { display:none; margin-top:auto; padding-top:40px; }
+@media (min-width:1200px) and (min-height:740px) { .setup-rail .setup-rail__ad { display:flex; } }
 .setup-rail__steps { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
 .setup-rail__step {
   display:flex; align-items:flex-start; gap:14px; width:100%; padding:14px 12px;
@@ -300,6 +306,19 @@
 .setup-save__text p { margin:4px 0 0; font:400 14px/1.4 var(--font-sans); color:var(--ink); }
 .setup-save__actions { margin-left:auto; flex:none; display:flex; align-items:center; gap:16px; }
 
+/* A challenge link's note and the daily campaign card (top of step 1; README §Sharing a campaign) */
+.setup-challenge, .setup-daily { padding:14px 18px; background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
+.setup-challenge { border-left:4px solid var(--opponent); }
+.setup-daily { display:flex; align-items:center; gap:16px; }
+.setup-daily[data-active] { border-left:4px solid var(--you); }
+.setup-challenge strong, .setup-daily__text strong {
+  display:block; font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--text-2);
+}
+.setup-challenge strong { color:var(--opponent); }
+.setup-challenge p, .setup-daily__text p { margin:4px 0 0; font:400 14px/1.4 var(--font-sans); color:var(--ink); }
+.setup-daily__text { min-width:0; }
+.setup-daily__play { margin-left:auto; flex:none; }
+
 /* ---- Step 2: Rules of war (the draw) and step 3's opponent choice ---- */
 .rule-note {
   display:flex; align-items:flex-start; gap:12px; padding:12px 16px;
@@ -487,8 +506,9 @@
   .setup-stat--small dd { font-size:16px; }
   .setup-stat + .setup-stat { padding-left:12px; }
   .setup-settings-fields { grid-template-columns:minmax(0, 1fr); }
-  .setup-save, .setup-confirmation { flex-direction:column; align-items:stretch; gap:12px; }
+  .setup-save, .setup-confirmation, .setup-daily { flex-direction:column; align-items:stretch; gap:12px; }
   .setup-save__actions { margin-left:0; justify-content:space-between; }
+  .setup-daily__play { margin-left:0; }
   .setup-pick__head { gap:14px; padding:18px; }
   .setup-pick__name { font-size:28px; }
   .setup-pick__stats > div { padding-left:18px; }

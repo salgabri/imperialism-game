@@ -460,6 +460,16 @@ test('Retry this setup loads the set first, and refuses clearly when it cannot',
     assert.equal(app.state.settings.dataVersion, SET.version);
     assert.equal(app.state.own['499'], '688');
     assert.equal(app.state.retrySetup, null);
+
+    // New draw takes the same loading path, then starts the set again on a fresh seed.
+    const sameDraw = { id: app.state.campaignId, seed: app.state.seed };
+    B.clearFootballSetCache();
+    eliminate();
+    await app.retryManager({ newDraw: true });
+    assert.notEqual(app.state.campaignId, sameDraw.id);
+    assert.notEqual(app.state.seed, sameDraw.seed, 'a fresh seed');
+    assert.equal(app.state.managedTeamId, '688');
+    assert.equal(app.state.settings.dataVersion, SET.version);
   });
 });
 

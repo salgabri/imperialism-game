@@ -533,6 +533,27 @@ if (!filtered && fixedChecks) {
   }
 }
 
+// A challenge link fills in setup without launching; a stale one falls back to the defaults (README §Sharing a campaign).
+if (!filtered && fixedChecks) {
+  const dom = await installDom();
+  console.log('\n  Challenge links');
+  try {
+    const mod = await import(`${new URL('file://' + entry.replace(/\\/g, '/'))}?challenge`);
+    const r = await mod.runChallengeCheck();
+    check('a challenge link fills in setup without launching it', r.prefilled && r.notLaunched, JSON.stringify(r.setup));
+    check('setup shows the link’s sport, theatre, draw, upsets, role, team and seed, and says where they came from', r.rendered);
+    check('Copy challenge link writes the same link back', r.roundTrip, r.copied);
+    check('Launch plays the link’s settings with its seed', r.launched, JSON.stringify(r.settings));
+    check('a country map’s link keeps its club once the map has loaded', r.countryTeam, JSON.stringify(r.country));
+    check('a stale link falls back to the defaults and says which choices it could not use', r.stale && r.staleNote, JSON.stringify(r.staleSetup));
+  } catch (error) {
+    failures++;
+    fail(`    ${error.message}`);
+  } finally {
+    dom.window.close();
+  }
+}
+
 // Capitals anchor every marker on the map, and a bad id silently reverts a
 // nation to its centroid, so check the resolution rate rather than trusting it.
 if (!filtered && fixedChecks) {

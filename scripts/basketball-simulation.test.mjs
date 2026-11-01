@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { buildClub, makeRng } from '../src/data/teams.js';
-import { basketball, nbaBasketball } from '../src/sports/basketball.js';
+import { BUILT_IN_BASKETBALL_SEASONS } from '../src/data/basketballSeasons.js';
+import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
+import { basketball, nbaBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
 import { matchSport } from '../src/sports/index.js';
 
 const side = (id, ratings = 74) => ({
@@ -107,8 +110,16 @@ test('matched basketball teams have varied plausible scores, shared pace and fai
   assert.ok(scorelines.size > 2000);
 });
 
-test('club campaigns play NBA rules, nation campaigns FIBA rules', () => {
+test('club campaigns play NBA rules at their season\'s pace, nation campaigns FIBA rules', () => {
   assert.equal(matchSport({ sport: 'basketball', layer: 'clubs' }), nbaBasketball);
+  // A season campaign plays its own season; one without league averages (the built-in 2026/27) the latest full one.
+  assert.equal(matchSport({ sport: 'basketball', layer: 'clubs', dataSeason: '2003/04' }), nbaBasketballIn('2003/04'));
+  assert.equal(nbaBasketballIn('2026/27'), nbaBasketball);
+  assert.equal(nbaBasketballIn(LATEST_NBA_SEASON), nbaBasketball);
+  assert.equal(LATEST_NBA_SEASON, '2025/26');
+  assert.equal(nbaBasketballIn('2003/04').prepareMatch(side('A'), side('D')).pace, 90.1);
+  assert.equal(nbaBasketball.prepareMatch(side('A'), side('D')).pace, 99.4);
+  assert.equal(matchSport({ sport: 'basketball', layer: 'nations', dataSeason: '2003/04' }), basketball);
   assert.equal(matchSport({ sport: 'basketball', layer: 'nations' }), basketball);
   assert.equal(matchSport({ sport: 'basketball' }), basketball);
   assert.equal(matchSport({ sport: 'football', layer: 'clubs' }).id, 'football');
@@ -163,9 +174,8 @@ test('NBA matches run 48 minutes, then five-minute overtimes, and their events a
   assert.ok(overtimes > 0, 'the fixture seeds must exercise overtime accounting');
 });
 
-test('NBA pace: matched fives score about 111 a side, the built-in franchises about the league\'s own 114', () => {
+test('NBA pace: matched fives score about 113 a side in 2025/26, the built-in franchises about the league\'s 116', () => {
   const prepared = nbaBasketball.prepareMatch(side('A'), side('D'));
-  assert.equal(prepared.pace, 100);
   const rng = makeRng(20261101);
   const count = 30000;
   let a = 0, d = 0, margin2 = 0, wins = 0, overtime = 0;
@@ -177,30 +187,46 @@ test('NBA pace: matched fives score about 111 a side, the built-in franchises ab
     wins += result.winner === 'A';
     overtime += !!result.tie;
   }
-  assert.ok(a / count > 108 && a / count < 114 && d / count > 108 && d / count < 114, `${a / count}–${d / count}`);
+  assert.ok(a / count > 110 && a / count < 116 && d / count > 110 && d / count < 116, `${a / count}–${d / count}`);
   assert.ok(wins / count > 0.48 && wins / count < 0.52);
   assert.ok(Math.sqrt(margin2 / count) > 16 && Math.sqrt(margin2 / count) < 23);
   assert.ok(overtime / count > 0.01 && overtime / count < 0.04);
 
   // Every pairing of the built-in clubs: NBA rules lift them from FIBA's mid-eighties to the league's level.
   const clubs = basketball.clubs.map(club => buildClub(club, basketball));
-  const mean = sport => {
-    const clubRng = makeRng(7);
-    let points = 0, sides = 0;
-    for (const attacker of clubs) {
-      for (const defender of clubs) {
-        if (attacker === defender) continue;
-        const pairing = sport.prepareMatch(attacker, defender);
-        for (let k = 0; k < 4; k++) {
-          const result = sport.sampleResult(clubRng, pairing, 6);
-          points += result.regA + result.regD;
-          sides += 2;
-        }
+  const nba = clubScoring(nbaBasketball, clubs), fiba = clubScoring(basketball, clubs);
+  assert.ok(Math.abs(nba - NBA_LEAGUE_AVERAGES['2025/26'].points) < 2.5, `NBA rules: ${nba}`);
+  assert.ok(fiba > 80 && fiba < 88, `FIBA rules: ${fiba}`);
+});
+
+/** Mean regulation points a side over every pairing of `clubs`, four draws each, under `sport`. */
+function clubScoring(sport, clubs) {
+  const rng = makeRng(7);
+  let points = 0, sides = 0;
+  for (const attacker of clubs) {
+    for (const defender of clubs) {
+      if (attacker === defender) continue;
+      const pairing = sport.prepareMatch(attacker, defender);
+      for (let k = 0; k < 4; k++) {
+        const result = sport.sampleResult(rng, pairing, 6);
+        points += result.regA + result.regD;
+        sides += 2;
       }
     }
-    return points / sides;
-  };
-  const nba = mean(nbaBasketball), fiba = mean(basketball);
-  assert.ok(nba > 110 && nba < 120, `NBA rules: ${nba}`);
-  assert.ok(fiba > 80 && fiba < 88, `FIBA rules: ${fiba}`);
+  }
+  return points / sides;
+}
+
+test('every NBA season scores like its league: 93 a side in 2003/04, 114 in 2023/24', () => {
+  const root = new URL('../', import.meta.url);
+  for (const season of BUILT_IN_BASKETBALL_SEASONS) {
+    const league = NBA_LEAGUE_AVERAGES[season.season];
+    assert.ok(league, `${season.season} has league averages`);
+    const set = JSON.parse(readFileSync(new URL(`public/basketball/${season.id}.json`, root), 'utf8'));
+    const clubs = set.clubs.map(club => buildClub(club, basketball));
+    const sport = matchSport({ sport: 'basketball', layer: 'clubs', dataSeason: season.season });
+    assert.equal(sport.prepareMatch(clubs[0], clubs[1]).pace, league.pace);
+    const points = clubScoring(sport, clubs);
+    assert.ok(Math.abs(points - league.points) < 2.5, `${season.season}: ${points.toFixed(1)} against the league's ${league.points}`);
+  }
 });

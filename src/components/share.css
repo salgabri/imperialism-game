@@ -1,0 +1,10 @@
+/* Sharing a campaign (ShareCampaign.jsx; README §Sharing a campaign): setup's last step and the final results. */
+.share-campaign { display:flex; flex-direction:column; gap:10px; min-width:0; }
+.share-campaign__note { margin:0; font:400 13px/1.45 var(--font-sans); color:var(--text-2); }
+.share-campaign__actions { display:flex; flex-wrap:wrap; gap:10px 12px; }
+.share-campaign__field {
+  width:100%; min-width:0; height:max(36px, var(--tap)); padding:0 10px; border:1px solid var(--control-line); border-radius:0;
+  background:var(--panel); color:var(--ink); font:400 13px/1 var(--font-sans);
+}
+.share-campaign__field:focus-visible { outline:2px solid var(--you); outline-offset:1px; }
+.share-campaign__status { margin:0; font:400 12px/1.45 var(--font-sans); color:var(--muted); }

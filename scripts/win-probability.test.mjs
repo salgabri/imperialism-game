@@ -14,7 +14,7 @@ import {
 } from '../src/engine/winProbability.js';
 
 const { football, prepareFootballMatch, footballProfile } = footballModule;
-const { basketball, basketballProfile, nbaBasketball } = basketballModule;
+const { basketball, basketballProfile, nbaBasketball, nbaBasketballIn } = basketballModule;
 
 const nationId = code => Object.keys(NATIONS).find(id => NATIONS[id][1] === code);
 const nation = (sport, code) => buildTeam(nationId(code), makeRng(1), sport);
@@ -278,18 +278,23 @@ test('basketball mid-game values are calibrated against full simulated matches',
   }
 });
 
-test('NBA rules: the live model runs 48 minutes at NBA pace and matches the simulated odds', () => {
+test('NBA rules: the live model runs 48 minutes at its season\'s pace and matches the simulated odds', () => {
   const model = liveModelFor(nbaBasketball, club(0), club(1), undefined, undefined, 6);
   const prepared = nbaBasketball.prepareMatch(club(0), club(1));
-  assert.deepEqual(model, { kind: 'normal', pace: 100, effA: prepared.efficiencyA, effD: prepared.efficiencyD,
+  assert.deepEqual(model, { kind: 'normal', pace: 99.4, effA: prepared.efficiencyA, effD: prepared.efficiencyD,
     formSd: 6 * 0.0125, length: 48, ot: 5, maxOt: 4 });
   assert.ok(isLiveModel(model));
-  for (const drama of [0, 6, 12]) {
-    for (const [a, d] of NBA_PAIRS) {
-      const attacker = club(a), defender = club(d);
-      const live = liveModelFor(nbaBasketball, attacker, defender, undefined, undefined, drama);
-      const odds = estimateWinProbability({ sport: nbaBasketball, attacker, defender, drama, samples: 20000 }).attacker;
-      close(winProbabilityAt(live, 0, 0), odds, 0.025, `${attacker.code}-${defender.code} drama ${drama}`);
+  // The built-in season at 2025/26's pace, and the slow, low-scoring 2003/04 (the same clubs, its pace and rate).
+  const slow = nbaBasketballIn('2003/04');
+  assert.equal(liveModelFor(slow, club(0), club(1), undefined, undefined, 6).pace, 90.1);
+  for (const sport of [nbaBasketball, slow]) {
+    for (const drama of [0, 6, 12]) {
+      for (const [a, d] of NBA_PAIRS) {
+        const attacker = club(a), defender = club(d);
+        const live = liveModelFor(sport, attacker, defender, undefined, undefined, drama);
+        const odds = estimateWinProbability({ sport, attacker, defender, drama, samples: 20000 }).attacker;
+        close(winProbabilityAt(live, 0, 0), odds, 0.025, `${attacker.code}-${defender.code} drama ${drama} pace ${live.pace}`);
+      }
     }
   }
   // Mid-game, against full NBA matches: the quarter after half-time and the last minute of regulation.
@@ -501,7 +506,8 @@ test('the live model never touches an RNG and stays pure', () => {
 test('sport profile exports: the match model\'s positional ratings, without the effective offset', () => {
   // Append-only exports: every existing export is still there and the sport objects are unchanged.
   assert.deepEqual(Object.keys(footballModule).sort(), ['football', 'footballProfile', 'prepareFootballMatch', 'sampleFootballResult']);
-  assert.deepEqual(Object.keys(basketballModule).sort(), ['basketball', 'basketballProfile', 'nbaBasketball', 'prepareMatch', 'sampleResult']);
+  assert.deepEqual(Object.keys(basketballModule).sort(), ['basketball', 'basketballProfile', 'nbaBasketball', 'nbaBasketballIn', 'prepareMatch',
+    'sampleResult']);
   assert.equal(football.prepareMatch, prepareFootballMatch);
   assert.equal(basketball.prepareMatch, basketballModule.prepareMatch);
 
