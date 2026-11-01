@@ -4,6 +4,7 @@ import { C } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
+import { teamMarkUrls } from './data/teamMarks.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
 import { clearDomesticCache, domesticScope, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
@@ -21,6 +22,7 @@ import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiv
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
+import { cacheForOffline } from './serviceWorker.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { countryMapPreview, theatreMapPreview } from './screens/setup/setupModel.js';
@@ -1090,7 +1092,11 @@ export default class App extends React.Component {
           },
         ],
       },
-      () => this.persist(),
+      () => {
+        this.persist();
+        // Every team's crest or flag, so the campaign looks the same offline (README §Running it).
+        cacheForOffline(teamMarkUrls(teams));
+      },
     );
   }
 
@@ -1169,6 +1175,7 @@ export default class App extends React.Component {
       if (!gated && s.match && !s.match.applied) this.presentMatch();
       else if (!gated && s.spin && !remapped) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
       this.persist();
+      cacheForOffline(teamMarkUrls(s.teams));
       // The checkpoint re-stamps the map version; keep telling the player why the draw restarts.
       if (remapped) this.setState(state => state.saveStatus?.ok && !state.storageConflict ? { saveStatus: { ...state.saveStatus, message } } : null);
     });

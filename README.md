@@ -106,10 +106,13 @@ bundle in `assets/`, the Archivo fonts and the two world maps. Everything else i
 `public/` (about 60 MB) is cached the first time the game uses it. Seasons and
 country maps come from the network while online, so they always match the
 deployed build, and from the cache offline. Flags and crests show from the cache
-at once and refresh in the background. After one online visit the game opens
-offline and plays nations and club campaigns, plus every country whose map was
-opened online. A country never opened online fails to load, with **Retry**, and
-a flag or crest the game has not yet shown online stays blank.
+at once and refresh in the background. Starting or resuming a campaign online
+also fetches every one of its teams' crests and flags that is not cached yet, a
+few at a time, so teams the game never showed online still show offline. After
+one online visit the game opens offline and plays nations and club campaigns,
+plus every country whose map was opened online. A country never opened online
+fails to load, with **Retry**, and a flag or crest the game has neither shown
+nor kept for a campaign online stays blank.
 
 A new version never reloads the page by itself. Its worker downloads in the
 background and waits, and a **New version ready** panel offers **Reload** or

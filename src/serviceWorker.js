@@ -1,18 +1,22 @@
 // Registers the offline worker that vite-plugin-pwa builds (src/pwa.js) and runs its updates. A new version never
 // reloads a page by itself: its worker waits until the player chooses Reload in the update prompt, and only that tab
-// reloads (pagehide writes the campaign's checkpoint first). Other open tabs keep the version they loaded. UI-only:
-// nothing here touches a campaign.
+// reloads (pagehide writes the campaign's checkpoint first). Other open tabs keep the version they loaded. It also
+// fetches a campaign's crests and flags through the worker, so they show offline (cacheForOffline). UI-only: nothing
+// here touches a campaign.
 import { useEffect, useState } from 'react';
 import { isRuntimeCached } from './pwa.js';
 
 const CHECK_EVERY_MS = 60 * 60 * 1000;
 // Coming back to the tab checks again, at most this often.
 const CHECK_AGAIN_MS = 10 * 60 * 1000;
+// cacheForOffline's fetches at once, beside the game's own requests.
+const OFFLINE_FETCHES = 4;
 
 const listeners = new Set();
 let waiting = null;       // a new version's installed worker, while it waits for the player
 let dismissed = null;     // the waiting worker the player put off ("Later") for this page
 let session = null;       // { env, registration, reloading }
+let deferred = null;      // files cacheForOffline was given before a worker controlled the page
 
 const shown = () => (waiting && waiting !== dismissed ? waiting : null);
 
@@ -66,10 +70,40 @@ export async function registerServiceWorker(url = './sw.js', env = globalThis) {
   return registration;
 }
 
-/** Fetch again, now through the worker, the seasons, maps, flags and crests the page loaded before it took over. */
+/**
+ * Fetch again, now through the worker, the seasons, maps, flags and crests the page loaded before it took over, and
+ * the campaign's crests and flags cacheForOffline was given before then.
+ */
 function warmRuntimeCache(env) {
-  const urls = new Set((env.performance?.getEntriesByType?.('resource') || []).map(entry => entry.name).filter(isRuntimeCached));
-  for (const url of urls) Promise.resolve().then(() => env.fetch(url)).catch(() => { /* cached on its next use */ });
+  const loaded = (env.performance?.getEntriesByType?.('resource') || []).map(entry => entry.name);
+  const marks = deferred || [];
+  deferred = null;
+  cacheForOffline([...loaded, ...marks], env);
+}
+
+/**
+ * Keep `urls` (a campaign's crests and flags: src/data/teamMarks.js) for offline play, so a team the game never showed
+ * online still shows offline. Each file the worker caches on first use (isRuntimeCached) and has not cached yet is
+ * fetched through the worker, a few at a time. Only while online with a worker controlling the page; a page the first
+ * worker has yet to take over fetches them when it does. Errors are ignored: a file missed here is cached on its first
+ * use. Resolves once every fetch has settled and never rejects. `env` stands in for the browser's globals in tests.
+ */
+export async function cacheForOffline(urls, env = globalThis) {
+  const container = env.navigator?.serviceWorker;
+  if (!container || env.navigator.onLine === false) return;
+  const queue = [...new Set(urls)].filter(isRuntimeCached);
+  if (!container.controller) {
+    deferred = queue;
+    return;
+  }
+  const fetchNext = async () => {
+    for (let url = queue.shift(); url !== undefined; url = queue.shift()) {
+      try {
+        if (!(await env.caches?.match(url))) await env.fetch(url);
+      } catch { /* cached on its first use instead */ }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(OFFLINE_FETCHES, queue.length) }, fetchNext));
 }
 
 /** Reload into the waiting version: its worker takes over, then this tab reloads. False when nothing waits. */
@@ -101,9 +135,10 @@ export function useAppUpdate() {
   return worker;
 }
 
-/** Forget the registration and any waiting version (tests). */
+/** Forget the registration, any waiting version and any deferred files (tests). */
 export function resetServiceWorker() {
   session = null;
   waiting = null;
   dismissed = null;
+  deferred = null;
 }

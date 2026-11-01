@@ -1,6 +1,6 @@
 // The installable, offline game (README §Running it): the manifest and icons, what the service worker precaches and
-// what it caches on first use, the update flow that never reloads a campaign on its own, and the persist() request
-// that keeps saves through storage eviction.
+// what it caches on first use, the crests and flags a campaign keeps for offline play, the update flow that never
+// reloads a campaign on its own, and the persist() request that keeps saves through storage eviction.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, globSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -9,10 +9,12 @@ import React, { act } from 'react';
 import sharp from 'sharp';
 import { APP_MANIFEST, FILE_NAVIGATION, PAGE_ICONS, PRECACHE, RUNTIME_CACHES, isRuntimeCached } from '../src/pwa.js';
 import { keepSaves, resetKeepSaves } from '../src/engine/persistence.js';
-import { writeSave } from '../src/engine/storage.js';
-import { buildTeam, makeRng } from '../src/data/teams.js';
+import { loadSave, writeSave } from '../src/engine/storage.js';
+import { decodeDomestic } from '../src/engine/domestic.js';
+import { fieldedNations } from '../src/engine/footballSets.js';
+import { buildClub, buildTeam, makeRng } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
-import { ROOT, bundleComponents, withDom } from './lib/app-harness.mjs';
+import { ROOT, bundleApp, bundleComponents, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 const PUBLIC = path.join(ROOT, 'public');
 const publicFile = file => path.join(PUBLIC, file);
@@ -107,12 +109,15 @@ test('offline, every navigation in scope gets the game, but opening a data file 
 
 // ---------- updates ----------
 
-const { ErrorBoundary, UpdatePrompt, registerServiceWorker, applyUpdate, resetServiceWorker } = await bundleComponents({
+const { ErrorBoundary, UpdatePrompt, registerServiceWorker, applyUpdate, resetServiceWorker, cacheForOffline,
+  teamMarkUrls } = await bundleComponents({
   ErrorBoundary: 'src/components/ErrorBoundary.jsx',
   UpdatePrompt: 'src/components/UpdatePrompt.jsx',
   registerServiceWorker: ['src/serviceWorker.js', 'registerServiceWorker'],
   applyUpdate: ['src/serviceWorker.js', 'applyUpdate'],
   resetServiceWorker: ['src/serviceWorker.js', 'resetServiceWorker'],
+  cacheForOffline: ['src/serviceWorker.js', 'cacheForOffline'],
+  teamMarkUrls: ['src/data/teamMarks.js', 'teamMarkUrls'],
 });
 
 class Target {
@@ -282,6 +287,116 @@ test('a long session looks for new versions every hour', async () => {
   env.document.dispatch('visibilitychange');
   await flush();
   assert.equal(registration.updates, 1);
+});
+
+// ---------- a campaign's crests and flags, kept for offline play ----------
+
+const football = getSport('football');
+const clubsOf = (rows, sport = football) => Object.fromEntries(rows.map(row => [row.id, buildClub(row, sport)]));
+const montenegro = () => decodeDomestic(JSON.parse(readFileSync(publicFile('domestic/499.json'), 'utf8'))).clubs;
+
+test('a campaign keeps each team\'s crest or flag once, with the field and emblem the map draws a flag from', () => {
+  // Clubs: Arsenal and Real Madrid share their domestic twins' crests; Union Berlin has only its monogram.
+  const clubs = clubsOf(['f-arsenal', 'f-real-madrid', 'f-1-fc-union-berlin'].map(id => football.clubs.find(club => club.id === id)));
+  assert.deepEqual(teamMarkUrls(clubs), ['/club-logos/d826-602.webp', '/club-logos/d724-1736.webp']);
+  assert.deepEqual(teamMarkUrls({ old: { ...clubs['f-arsenal'], id: 'old' } }), ['/club-logos/d826-602.webp'], 'found by its origin');
+  // Nations: France's flag; Portugal's, which the map lays out from a field and an emblem.
+  const rng = makeRng(20261101);
+  const nations = Object.fromEntries(['250', '620'].map(id => [id, buildTeam(id, rng, football)]));
+  assert.deepEqual(teamMarkUrls(nations), ['/flags/fr.svg', '/flags/pt.svg', '/flags-symbols/pt-field.svg', '/flags-symbols/pt-symbol.svg']);
+  // A country: Montenegro's 16 clubs, one of them without a crest.
+  const rows = montenegro();
+  const crests = rows.filter(row => existsSync(publicFile(`club-logos/${row.id}.webp`))).map(row => `/club-logos/${row.id}.webp`);
+  assert.equal(crests.length, rows.length - 1);
+  assert.deepEqual(teamMarkUrls(clubsOf(rows)), crests);
+});
+
+test('every crest and flag a campaign can keep is in public/, and the worker caches it on first use', () => {
+  const rng = makeRng(1);
+  const world = Object.fromEntries(fieldedNations(football).map(id => [id, buildTeam(id, rng, football)]));
+  const urls = [teamMarkUrls(world), teamMarkUrls(clubsOf(montenegro())),
+    ...['football', 'basketball', 'american-football', 'baseball'].map(id => teamMarkUrls(clubsOf(getSport(id).clubs, getSport(id))))].flat();
+  assert.ok(urls.some(url => url.startsWith('/flags-symbols/')) && urls.length > 300, `${urls.length} files`);
+  for (const url of urls) {
+    assert.ok(existsSync(publicFile(url.slice(1))), url);
+    assert.ok(isRuntimeCached(`https://imperialism.test${url}`), url);
+  }
+});
+
+test('cacheForOffline fetches through the worker a few at a time, once each, only what it caches and lacks, past errors', async () => {
+  resetServiceWorker();
+  const site = 'http://imperialism.test/';
+  const { env } = browser({ controller: new Worker('activated') });
+  env.navigator.onLine = true;
+  let open = 0, most = 0;
+  env.fetch = url => {
+    env.fetched.push(url);
+    most = Math.max(most, ++open);
+    return new Promise((resolve, reject) => setTimeout(() => {
+      open--;
+      if (url.endsWith('gone.webp')) reject(new TypeError('Failed to fetch')); else resolve({ ok: true });
+    }, 1));
+  };
+  // Shown online already, so in the worker's cache.
+  env.caches = { match: async url => (url === `${site}flags/fr.svg` ? { ok: true } : undefined) };
+  const crests = Array.from({ length: 10 }, (_, i) => `${site}club-logos/d826-${600 + i}.webp`);
+  const result = cacheForOffline([`${site}club-logos/gone.webp`, ...crests, `${site}flags/fr.svg`, `${site}flags/pt.svg`,
+    `${site}flags/pt.svg`, `${site}assets/index-abc123.js`, `${site}world-110m.v1.json`], env);
+  assert.equal(await result, undefined, 'resolves past the failed fetch');
+  assert.deepEqual(env.fetched.sort(), [`${site}club-logos/gone.webp`, ...crests, `${site}flags/pt.svg`].sort());
+  assert.ok(most > 1 && most <= 4, `${most} at once`);
+});
+
+test('cacheForOffline does nothing without a worker or offline; before the first worker takes over, it waits for it', async () => {
+  resetServiceWorker();
+  const urls = ['/club-logos/d826-602.webp', '/flags/pt.svg', '/flags-symbols/pt-field.svg'];
+  const bare = { navigator: {}, fetched: [], fetch(url) { bare.fetched.push(url); return Promise.resolve({ ok: true }); } };
+  await cacheForOffline(urls, bare);
+  assert.deepEqual(bare.fetched, [], 'no service workers');
+  const offline = browser({ controller: new Worker('activated') }).env;
+  offline.navigator.onLine = false;
+  await cacheForOffline(urls, offline);
+  assert.deepEqual(offline.fetched, [], 'offline');
+  // A first visit: the campaign starts before the first worker controls the page.
+  const loaded = 'http://imperialism.test/flags/de.svg';
+  const { env, container, registration } = browser({ resources: [loaded] });
+  await registerServiceWorker('./sw.js', env);
+  await cacheForOffline(urls, env);
+  assert.deepEqual(env.fetched, []);
+  const first = new Worker('installing');
+  registration.install(first);
+  first.become('activated');
+  container.controller = first;
+  container.dispatch('controllerchange');
+  await flush();
+  assert.deepEqual(env.fetched.sort(), [loaded, ...urls].sort(), 'with what the page loaded before it took over');
+});
+
+test('launching or resuming a campaign online keeps all of its crests and flags', async () => {
+  await bundleApp();
+  const fetched = [];
+  const priorFetch = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: { controller: {} } });
+  Object.defineProperty(globalThis, 'fetch', { configurable: true, writable: true,
+    value: async url => { fetched.push(url); return { ok: true }; } });
+  // The fixture runs the page's timers on a manual clock.
+  const settle = () => new Promise(resolve => setImmediate(resolve));
+  const f = syncAppFixture({ ids: ['250', '620', '826'] });
+  try {
+    const marks = ['/flags/fr.svg', '/flags/pt.svg', '/flags-symbols/pt-field.svg', '/flags-symbols/pt-symbol.svg', '/flags/gb-eng.svg'];
+    f.app.startCampaign();
+    await settle();
+    assert.deepEqual(fetched.sort(), marks.slice().sort());
+    fetched.length = 0;
+    f.app.saved = loadSave();
+    f.app.resume();
+    await settle();
+    assert.deepEqual(fetched.sort(), marks.slice().sort());
+  } finally {
+    f.close();
+    delete navigator.serviceWorker;
+    Object.defineProperty(globalThis, 'fetch', priorFetch);
+  }
 });
 
 // ---------- persistent storage ----------
