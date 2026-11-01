@@ -104,14 +104,15 @@ export const ROSTER_HELP = {
 };
 
 /**
- * "Show matches": `resolution` and `express` as one choice that can change any time. Express already reveals every
- * match at once (matchMethods `presentMatch`), so Fast-forward is the third mode. Read: express wins over resolution.
+ * "Show matches": `resolution` and `express` as one choice that can change any time. Express reveals every match at
+ * once except your team's, which plays live (matchMethods `presentMatch`), so Fast-forward is the third mode. Read:
+ * express wins over resolution.
  */
 export const SHOW_MATCH_OPTIONS = Object.freeze([['ticker', 'Live, minute by minute'], ['instant', 'Final score only'], ['express', 'Fast-forward']]);
 export const SHOW_MATCH_HELP = {
-  ticker: 'Scores and events appear as the match clock runs.',
+  ticker: 'Scores and events appear as the match clock runs. Your team’s matches play at 1× whatever the speed.',
   instant: 'Each match skips straight to its final score.',
-  express: 'Final scores only. Routine matches flash past; yours, upsets and the final still pause. Your decisions still wait.',
+  express: 'Routine matches flash past; upsets and the final pause on their score. Your team’s matches still play live. Your decisions still wait.',
 };
 export const SHOW_MATCH_BUSY = 'You can switch between Live and Final score only after this draw or match.';
 

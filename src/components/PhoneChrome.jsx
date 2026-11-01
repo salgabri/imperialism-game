@@ -20,9 +20,12 @@ function PhoneMinute({ store, floor = 0, sport = 'football' }) {
 /**
  * The phone's primary action. The right text (round, live minute or signing gain) sits outside the button's
  * text content (DEC D13), so exact textContent lookups match the label alone. For the live minute,
- * `minuteFallback` is the last revealed event's minute and floors the store's value.
+ * `minuteFallback` is the last revealed event's minute and floors the store's value. `playback`
+ * (App.phonePlaybackModel: { autoplay, speed, showAutoplay } | null) adds the Auto toggle and the speed button at the
+ * bar's end, above the bar-wide primary target, so skimming never needs the More sheet.
  */
-export function PhoneBar({ primary, right = null, rightKind = null, minuteFallback = 0, minuteStore = null, clockSport = 'football', onPrimary }) {
+export function PhoneBar({ primary, right = null, rightKind = null, minuteFallback = 0, minuteStore = null, clockSport = 'football', onPrimary,
+  playback = null, onAutoplay, onSpeed }) {
   if (!primary) return null;
   return (
     <div className="phone-bar">
@@ -34,6 +37,16 @@ export function PhoneBar({ primary, right = null, rightKind = null, minuteFallba
       <span className="phone-bar__right" aria-hidden="true">
         {rightKind === 'minute' && minuteStore ? <PhoneMinute store={minuteStore} floor={minuteFallback} sport={clockSport} /> : right}
       </span>
+      {playback && (
+        <div className="phone-bar__playback" role="group" aria-label="Campaign playback">
+          {playback.showAutoplay && (
+            <button type="button" className="phone-bar__tool phone-bar__auto" aria-label="Autoplay" aria-pressed={!!playback.autoplay}
+              onClick={onAutoplay}><Icon name={playback.autoplay ? 'pause' : 'play'} size={14} /><span aria-hidden="true">Auto</span></button>
+          )}
+          <button type="button" className="phone-bar__tool phone-bar__speed" aria-label={`Playback speed ${playback.speed} times. Change speed.`}
+            onClick={onSpeed}>{`${playback.speed}×`}</button>
+        </div>
+      )}
     </div>
   );
 }

@@ -58,6 +58,15 @@ function pruneMatchTasks() {
   for (const token of [...(this.matchTasks || [])]) if (!tasks?.has(token)) this.matchTasks.delete(token);
 }
 
+/**
+ * Whether the match runs on the live ticker: Live shows every match minute by minute; Fast-forward only yours
+ * (App.ownMatch); Final score only and "simulate the result" none.
+ */
+function playsLive(st, m) {
+  if (m.instant || m.express) return false;
+  return st.settings.express ? this.ownMatch(st, m.aId, m.dId) : st.settings.resolution !== 'instant';
+}
+
 /** The shoot-out kicks still to reveal, in chronological order (HEAD presentMatch). */
 function remainingKicks(tie, shown) {
   const n = Math.max(tie.A.length, tie.D.length);
@@ -80,7 +89,7 @@ export function presentMatch() {
   // Instant and express reveals show the final minute (the store is reset at every kickoff, so no stale minute).
   if (m.express) { this.minuteStore?.set(lastTick); this.after(18, () => this.revealAll()); return; }
 
-  const instant = st.settings.resolution === 'instant' || st.settings.express || m.instant;
+  const instant = !playsLive.call(this, st, m);
   this.showPopup(
     {
       kind: 'vs',
@@ -251,7 +260,7 @@ export function matchLiveModel(sport, a, d, effA, effD, drama) {
  */
 export function rescheduleForSpeed(previousSpeed) {
   const st = this.state, m = st.match;
-  if (!m || m.applied || m.express || m.instant || st.settings?.resolution !== 'ticker') return;
+  if (!m || m.applied || !st.settings || !playsLive.call(this, st, m)) return;
   const speed = Number(st.speed) || 1;
   if (Number(previousSpeed) === speed) return;
   const pending = pendingTasks.call(this).map(token => ({ token, ...TASKS.get(token) }));

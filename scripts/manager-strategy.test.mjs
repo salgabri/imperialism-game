@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeRng, teamEff, buildTeam, selectLineup } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
-import { tacticalOptions, tacticalMatchParameters, tacticalProfile, competitiveBasketballTeams } from '../src/engine/managerStrategy.js';
+import { tacticalOptions, tacticalMatchParameters, tacticalProfile, competitiveBasketballTeams, recommendedTactic } from '../src/engine/managerStrategy.js';
 import { acquisitionCandidates, acquisitionOptions, automaticAcquisition } from '../src/engine/campaignExperience.js';
 
 function team(id, rating = 75, sportId = 'football') {
@@ -105,6 +105,21 @@ test('competitive basketball compresses starting gaps, preserves player gaps and
   }
   const football = { a: team('a') };
   assert.equal(competitiveBasketballTeams(football, 'competitive').a, football.a);
+});
+
+test('the recommended approach is the best displayed chance; ties and missing estimates keep Balanced', () => {
+  const options = (attack, balanced, defend) => [['attack', attack], ['balanced', balanced], ['defend', defend]]
+    .map(([id, winProbability]) => ({ id, winProbability }));
+  assert.equal(recommendedTactic(options(.22, .17, .09)), 'attack', 'an underdog');
+  assert.equal(recommendedTactic(options(.56, .49, .48)), 'attack', 'a close match where the attack bonus tells');
+  assert.equal(recommendedTactic(options(.7, .74, .78)), 'defend', 'a favourite');
+  assert.equal(recommendedTactic(options(.5, .51, .49)), 'balanced');
+  // Compared as the whole percentages the player reads: 52.3% and 51.8% both show 52%.
+  assert.equal(recommendedTactic(options(.523, .518, .4)), 'balanced');
+  assert.equal(recommendedTactic(options(.61, .55, .61)), 'attack', 'Attack before Defend on a tie, as listed');
+  assert.equal(recommendedTactic(options(undefined, undefined, undefined)), 'balanced', 'older saves without estimates');
+  assert.equal(recommendedTactic([]), 'balanced');
+  assert.equal(recommendedTactic(), 'balanced');
 });
 
 // Outcome evidence uses the sport's production score sampler, not an invented

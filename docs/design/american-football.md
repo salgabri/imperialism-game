@@ -21,7 +21,7 @@ The snapshot `scripts/data/madden-nfl-27.json` (85 KB, committed) holds one upda
 **Week 7 Ratings** (`madden-ratings-week-7`, retrieved 2026-10-30), 1,946 players of
 the 32 teams, each `[EA id, name, team id, Madden position, overall, jersey]`. The
 raw pages are cached in the ignored `data-src/madden/<update>/`. EA's own rights
-are not cleared, as for the built-in EA FC 26 and NBA 2K25 data.
+are not cleared, as for the built-in EA FC 27 and NBA 2K27 data.
 
 **Franchises.** `scripts/data/nfl-teams.json` names each franchise (EA shortens the
 New York teams to "NY Giants" and "NY Jets"), gives its scoreboard code, the place

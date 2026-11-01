@@ -628,6 +628,31 @@ test('sources the bundle does not hold stay inline; a reference the bundle lost 
   assert.equal(Object.hasOwn(kept, 'sourceInfo'), false);
 }));
 
+test('a reference rebuilds only from an edition its checkpoint referenced; older checkpoints referenced EA FC 26 and FM 26', () => withStorage(({ storage }) => {
+  const sport = getSport('football'), state = checkpoint();
+  // Belarus fields EA and FM players.
+  state.teams['112'] = buildTeam('112', makeRng(42), sport);
+  Object.assign(state, { own: { ...state.own, 112: '112' }, aliveIds: [...state.aliveIds, '112'] });
+  const squad = state.teams['112'].squad;
+  assert.ok(squad.some(player => player.sourceInfo.source === 'ea-fc') && squad.some(player => player.sourceInfo.source === 'football-manager'));
+  const bundled = [...Object.values(sport.rosters).flatMap(roster => roster[2]), ...sport.clubs.flatMap(club => club.squad)];
+  const editions = [...new Set(bundled.map(([, , , meta]) => `${meta.edition}@${meta.snapshotDate}`))].sort();
+  assert.equal(writeSave(state).ok, true);
+  const stored = JSON.parse(storage.getItem(SAVE_KEY));
+  assert.deepEqual(stored.sourceEditions, editions, 'a checkpoint names the editions its references come from');
+  assert.equal(typeof stored.teams['112'].squad[0].sourceInfo, 'string');
+  assert.deepEqual(loadSave().teams, plain(state.teams), 'its own editions rebuild every source');
+  // Before the list, checkpoints referenced the EA FC 26 + FM 26 bundle: their FM 26 players keep their evidence, and
+  // their EA players, whose ids the bundle now holds as EA FC 27 records, come back without any.
+  const { sourceEditions: _listed, ...legacy } = stored;
+  parseCampaign(JSON.stringify(legacy)).teams['112'].squad.forEach((player, i) => {
+    assert.deepEqual([player.name, player.rating, player.positions, player.id], [squad[i].name, squad[i].rating, squad[i].positions, squad[i].id]);
+    if (squad[i].sourceInfo.source === 'football-manager') assert.deepEqual(player.sourceInfo, plain(squad[i].sourceInfo));
+    else assert.equal(Object.hasOwn(player, 'sourceInfo'), false, `${player.name} keeps no EA FC 27 evidence`);
+  });
+  assert.throws(() => parseCampaign(JSON.stringify({ ...stored, sourceEditions: 'EA FC 27' })), /source editions are invalid/);
+}));
+
 test('exports keep every source inline and import back to the same campaign', () => {
   const state = sourcedCheckpoint(), text = exportCampaign(state);
   assert.equal(JSON.parse(text).v, SAVE_VERSION);

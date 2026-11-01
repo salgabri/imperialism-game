@@ -110,8 +110,8 @@ const ERA_MAPS = CLUB_MAPS.filter(entry => entry.seasons);
 
 test('the built-in seasons are the manifest\'s, newest first, 2011/12 left out as its source is broken', () => {
   assert.deepEqual(BUILT_IN_BASKETBALL_SEASONS.map(set => set.year), MANIFEST.seasons.slice().sort((a, b) => b - a));
-  assert.equal(BUILT_IN_BASKETBALL_SEASONS.length, 24);
-  assert.deepEqual([BUILT_IN_BASKETBALL_SEASONS[0].label, BUILT_IN_BASKETBALL_SEASONS.at(-1).label], ['NBA 2K24', 'NBA 2K']);
+  assert.equal(BUILT_IN_BASKETBALL_SEASONS.length, 26);
+  assert.deepEqual([BUILT_IN_BASKETBALL_SEASONS[0].label, BUILT_IN_BASKETBALL_SEASONS.at(-1).label], ['NBA 2K26', 'NBA 2K']);
   assert.ok(!MANIFEST.seasons.includes(2012) && /Philadelphia/.test(MANIFEST.skipped['2012']), 'the skip says why');
   assert.deepEqual(builtInSeasonOf('basketball'), { year: MANIFEST.builtIn.year, season: MANIFEST.builtIn.season });
   // Listed with the football seasons, each with its map; a local index never adds a basketball season.
@@ -268,9 +268,9 @@ test('basketball\'s Season choice lists its own seasons; one takes the clubs ont
   await withApp(async ({ app, time }) => {
     const model = modelOf(app);
     assert.deepEqual(model.season.options.map(option => option.label),
-      ['2024/25 · built in', ...BUILT_IN_BASKETBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
+      ['2026/27 · built in', ...BUILT_IN_BASKETBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
     assert.equal(model.season.options.at(-1).label, '1999/00 · NBA 2K');
-    assert.deepEqual(model.season.options.map(option => option.name), ['2024/25', ...BUILT_IN_BASKETBALL_SEASONS.map(set => set.season)],
+    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27', ...BUILT_IN_BASKETBALL_SEASONS.map(set => set.season)],
       'the dropdown names each by its season alone');
     assert.match(model.season.note, /NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs only/);
     assert.equal(model.season.id, null);

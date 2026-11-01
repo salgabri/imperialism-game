@@ -4,8 +4,9 @@
 // files, and tests build seasons from invented rows. Every player written is EA's own record, rating unchanged; a
 // nation with fewer than eleven natural players keeps exactly the ones it has.
 //
-// buildEaSeason reads the FIFA 15 – EA FC 24 export; scripts/lib/ea-legacy-seasons.mjs joins the FIFA 07 – FIFA 14
-// sources. Both hand their players to assembleEaSeason, so every season is made the same way.
+// buildEaSeason reads the FIFA 15 – EA FC 24 export, buildSnapshotEaSeason the committed EA FC 26 snapshot and
+// scripts/lib/ea-legacy-seasons.mjs joins the FIFA 07 – FIFA 14 sources. All hand their players to assembleEaSeason,
+// so every season is made the same way.
 import { NATIONS, selectLineup } from '../../src/data/teams.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../../src/data/eaPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
@@ -31,7 +32,7 @@ export const EA_NATION_ALIASES = {
  * their clubs. The built-in rosters leave the same people out of every nation.
  */
 export const EA_NO_TEAM = [
-  'Andorra', 'Antigua and Barbuda', 'Aruba', 'Bahrain', 'Barbados', 'Bermuda', 'Cape Verde Islands', 'Comoros', 'Curacao',
+  'Andorra', 'Antigua and Barbuda', 'Aruba', 'Bahrain', 'Barbados', 'Bermuda', 'Cabo Verde', 'Cape Verde Islands', 'Comoros', 'Curacao',
   'Faroe Islands', 'Gibraltar', 'Grenada', 'Guam', 'Hong Kong', 'Liechtenstein', 'Macau', 'Malta', 'Mauritius',
   'Montserrat', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'San Marino',
   'São Tomé e Príncipe', 'Singapore', 'Turks and Caicos Islands',
@@ -78,6 +79,31 @@ export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { data
     // Burnley sits in "Championship"), but its id is the edition's own.
     clubKey: Number(row.club_team_id) || null, league: EA_LEAGUES[Number(row.league_id)] || null,
   }));
+  return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition, update, source, federations });
+}
+
+/**
+ * Build one season from a committed EA snapshot (scripts/data/ea-fc26.csv): the players loadEaPlayers keeps, so EA's
+ * generated players are already gone, all of one SoFIFA roster and date. `edition` is a snapshots entry of
+ * scripts/data/ea-seasons.json; `dataset` the snapshot's page. Returns `{ doc, text, audit, warnings }`.
+ */
+export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, update }, { dataset, federations = FOOTBALL_FEDERATIONS } = {}) {
+  if (!SET_ID.test(id)) throw new Error(`Season id ${id} is not like ea-fifa-15 or ea-fc-24`);
+  const rosters = new Set(), dates = new Set();
+  const records = players.map(player => {
+    const info = player.sourceInfo;
+    const link = PLAYER_LINK.exec(info.url);
+    if (!link || `ea:${link[1]}` !== info.id) throw new Error(`${edition}: player ${info.id} links to ${JSON.stringify(info.url)}`);
+    if (info.edition !== edition || info.update !== update) throw new Error(`${edition}: player ${info.id} is from ${info.edition} update ${info.update}`);
+    rosters.add(link[3]);
+    dates.add(info.snapshotDate);
+    return { eaId: link[1], name: player.name, fullName: info.fullName, overall: player.rating, positions: info.naturalPositions.join(', '),
+      keys: info.naturalPositions, dob: info.dateOfBirth, nationality: info.nationality, club: info.club, slug: link[2],
+      clubKey: info.clubId, league: EA_LEAGUES[player.leagueId] || null };
+  });
+  if (rosters.size !== 1) throw new Error(`${edition}: rows from rosters ${[...rosters].join(', ')}, not one`);
+  if (dates.size !== 1) throw new Error(`${edition}: roster dates ${[...dates].join(', ')}, not one`);
+  const source = { provider: 'EA Sports', edition, update, roster: [...rosters][0], snapshotDate: [...dates][0], url: dataset, rawScale: EA_SCALE };
   return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition, update, source, federations });
 }
 

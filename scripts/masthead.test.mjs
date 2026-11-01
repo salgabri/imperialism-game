@@ -521,6 +521,32 @@ test('PhoneBar: the label alone is the button text; round, minute and gain sit o
   });
 });
 
+test('PhoneBar: Auto and speed sit outside the primary, with their own names and handlers', async () => {
+  await withDom(async ({ mount }) => {
+    const calls = [];
+    const props = playback => ({ primary: { id: 'continue', label: 'Continue' }, right: 'Round XI', rightKind: 'round', playback,
+      onPrimary: () => calls.push('primary'), onAutoplay: () => calls.push('auto'), onSpeed: () => calls.push('speed') });
+    const view = await mount(PhoneBar, props({ autoplay: false, speed: 2, showAutoplay: true }));
+    const group = view.host.querySelector('.phone-bar__playback[role="group"][aria-label="Campaign playback"]');
+    const auto = group.querySelector('button[aria-label="Autoplay"]');
+    const speed = group.querySelector('button[aria-label="Playback speed 2 times. Change speed."]');
+    assert.equal(auto.getAttribute('aria-pressed'), 'false');
+    assert.equal(speed.textContent, '2×');
+    assert.equal(view.host.querySelector('.phone-bar__btn').textContent, 'Continue', 'the primary label is unchanged');
+    assert.equal(view.host.querySelector('.phone-bar__btn').contains(group), false);
+    await act(async () => auto.click());
+    await act(async () => speed.click());
+    assert.deepEqual(calls, ['auto', 'speed']);
+    await view.render(props({ autoplay: true, speed: 4, showAutoplay: true }));
+    assert.equal(view.host.querySelector('.phone-bar__auto').getAttribute('aria-pressed'), 'true');
+    await view.render(props({ autoplay: false, speed: 1, showAutoplay: false }));
+    assert.equal(view.host.querySelector('.phone-bar__auto'), null, 'a spectator plays and pauses with the primary');
+    assert.equal(view.host.querySelector('.phone-bar__speed').textContent, '1×');
+    await view.render(props(null));
+    assert.equal(view.host.querySelector('.phone-bar__playback'), null, 'a decision hides the playback controls');
+  });
+});
+
 test('PhoneBar minute never trails the last revealed event (the Match view rule)', async () => {
   await withDom(async ({ mount }) => {
     const store = createMinuteStore(34);

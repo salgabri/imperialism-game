@@ -1,5 +1,19 @@
 {
-  "note": "The built-in earlier football seasons: one roster per EA FIFA / FC edition. FIFA 15 – EA FC 24 are launch rosters from one export (dataset, editions); FIFA 07 – FIFA 14 join two scrapes by EA player id (legacy). npm run build:ea-seasons reads every file from data-src/ (ignored) and checks it against its sha256. See docs/design/football-years.md.",
+  "note": "The built-in earlier football seasons: one roster per EA FIFA / FC edition. EA FC 26 is the committed snapshot the built-in 2025/26 came from (snapshots); FIFA 15 – EA FC 24 are launch rosters from one export (dataset, editions); FIFA 07 – FIFA 14 join two scrapes by EA player id (legacy). npm run build:ea-seasons reads the snapshot from scripts/data/ and every other file from data-src/ (ignored), and checks each against its sha256. See docs/design/football-years.md.",
+  "snapshots": [
+    {
+      "id": "ea-fc-26",
+      "fifaVersion": 26,
+      "edition": "EA FC 26",
+      "update": 4,
+      "file": "scripts/data/ea-fc26.csv",
+      "name": "FC 26 (FIFA 26) Player Data (rovnez), reduced to the columns the builds read",
+      "url": "https://www.kaggle.com/datasets/rovnez/fc-26-fifa-26-player-data",
+      "licence": "CC BY 4.0; EA's own rights in the ratings are not cleared",
+      "rows": 18405,
+      "sha256": "7f6b46dd4f9abafad7ebe9206164b8669ef6cbc82a45c2b1aa999949341d316f"
+    }
+  ],
   "dataset": {
     "name": "EA Sports FC 24 complete player dataset (stefanoleone992)",
     "url": "https://www.kaggle.com/datasets/stefanoleone992/ea-sports-fc-24-complete-player-dataset",

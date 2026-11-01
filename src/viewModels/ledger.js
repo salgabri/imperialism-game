@@ -245,6 +245,78 @@ export function biggestUpsetLine(history) {
     : `${name} won as the underdog`;
 }
 
+const ORDINAL_SUFFIX = { one: 'st', two: 'nd', few: 'rd', other: 'th' };
+const ordinalRules = typeof Intl !== 'undefined' && Intl.PluralRules ? new Intl.PluralRules('en', { type: 'ordinal' }) : null;
+const ordinal = n => `${n}${ORDINAL_SUFFIX[ordinalRules ? ordinalRules.select(n) : 'other'] || 'th'}`;
+const sameId = (a, b) => a != null && b != null && String(a) === String(b);
+
+/** "4–0", "0–0, 4–3 on penalties" or "98–97 after 2 overtime periods", winner first, from a history entry. */
+function winnerFirstScore(entry, winnerId) {
+  const a = entry?.a?.score, b = entry?.b?.score;
+  if (a == null || a === '' || b == null || b === '') return '';
+  const attackerWon = sameId(winnerId, entry?.aId ?? entry?.a?.tid);
+  let score = attackerWon ? `${a}–${b}` : `${b}–${a}`;
+  const tieText = entry?.result?.tieText || '';
+  const kicks = tieText.match(/^(\d+)–(\d+) on penalties$/);
+  if (kicks) score += `, ${attackerWon ? `${kicks[1]}–${kicks[2]}` : `${kicks[2]}–${kicks[1]}`} on penalties`;
+  else if (/^after/i.test(tieText)) score += ` ${tieText.replace(/^After/, 'after')}`;
+  return score;
+}
+
+/**
+ * "Your campaign" on the results, for a manager whose team fell: where it finished, who ended the run and what became
+ * of them, and its biggest haul → { champion: false, team, placement: '20th of 49', line, aftermath, stats, haul };
+ * { champion: true, team } when the managed team won; null without a managed team. Read from saved state only
+ * (history, fallen, stats), so it is the same after a reload and for older saves.
+ */
+export function buildManagerRecap(st, ctx = {}) {
+  const id = st?.managedTeamId;
+  const team = id != null ? st?.teams?.[id] : null;
+  if (!team) return null;
+  const chip = teamChip(team);
+  const alive = Array.isArray(st.aliveIds) ? st.aliveIds : [];
+  if (alive.length === 1 && sameId(alive[0], id)) return { champion: true, team: chip };
+  const fallen = Array.isArray(st.fallen) ? st.fallen : [];
+  const fellAt = fallen.findIndex(entry => sameId(entry?.id, id));
+  if (fellAt < 0) return null;
+  const field = alive.length + fallen.length;
+  const history = Array.isArray(st.history) ? st.history : [];
+  const byLoser = eliminations(st, ctx);
+  const exit = byLoser.get(String(id)) || null;
+  const winnerId = exit?.result?.winnerId ?? exit?.winnerId ?? null;
+  const winnerName = exit?.result?.winnerName || exit?.winnerName || st.teams?.[winnerId]?.name || '';
+  const round = roman(Number(fallen[fellAt]?.r) || historyRound(exit));
+  const score = exit ? winnerFirstScore(exit, winnerId) : '';
+  const line = winnerName
+    ? `Knocked out by ${winnerName}${round ? ` in Round ${round}` : ''}${score ? `, ${score}` : ''}.`
+    : `Knocked out${round ? ` in Round ${round}` : ''}.`;
+  // What became of the team that ended the run: the champion, or fallen in turn.
+  let aftermath = null;
+  if (winnerName && alive.length === 1 && sameId(alive[0], winnerId)) aftermath = `${winnerName} went on to win it all.`;
+  else if (winnerName && byLoser.has(String(winnerId))) {
+    const later = byLoser.get(String(winnerId));
+    const by = later?.result?.winnerName || later?.winnerName || '';
+    const when = roman(historyRound(later));
+    if (by) aftermath = `${winnerName} fell in turn${when ? ` in Round ${when}` : ''}, to ${by}.`;
+  }
+  const wins = history.filter(entry => sameId(entry?.result?.winnerId ?? entry?.winnerId, id)
+    && Number.isFinite(entry?.result?.territories));
+  const taken = wins.reduce((sum, entry) => sum + entry.result.territories, 0);
+  const best = wins.reduce((most, entry) => (!most || entry.result.territories >= most.result.territories ? entry : most), null);
+  const haulRound = roman(historyRound(best));
+  const haul = best && best.result.territories > 0 ? `Biggest haul: ${best.result.territories} ${territoryWord(best.result.territories)} from ${
+    best.result.loserName || 'a rival'}${haulRound ? ` in Round ${haulRound}` : ''}.` : null;
+  const stats = st.stats?.[id] || {};
+  return {
+    champion: false, team: chip, placement: `${ordinal(field - fellAt)} of ${field}`, line, aftermath, haul,
+    stats: [
+      { key: 'conquests', label: 'Conquests', value: String(stats.conq || 0) },
+      { key: 'signings', label: 'Signings', value: String((stats.steals || []).length) },
+      { key: 'taken', label: 'Territories taken', value: String(taken) },
+    ],
+  };
+}
+
 /** Matches the history filter (HEAD Sidebar belongsToHistoryFilter). */
 export function inHistoryFilter(entry, filter) {
   return !filter || String(entry?.aId ?? entry?.a?.teamId ?? entry?.a?.id) === String(filter)

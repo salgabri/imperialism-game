@@ -34,11 +34,33 @@ function toneOf(text) {
   return value.startsWith('+') ? 'gain' : /^[−-]/.test(value) ? 'loss' : 'muted';
 }
 
+/** "Your campaign": the manager's own run when the team fell before the end (ledgerVM.buildManagerRecap). */
+function YourCampaign({ you }) {
+  const { team } = you;
+  return (
+    <section className="fi-victory-you" aria-labelledby="victory-you-title">
+      <div className="kicker">
+        <h2 className="kicker__title" id="victory-you-title">Your campaign</h2>
+        <span className="kicker__aside">{you.placement}</span>
+      </div>
+      <p className="fi-victory-you__team">
+        <span className="fi-victory-you__mark"><TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={28} /></span>
+        <strong>{team.name}</strong>
+      </p>
+      <p className="fi-victory-you__line">{you.line}{you.aftermath ? ` ${you.aftermath}` : ''}</p>
+      <dl className="fi-victory-you__stats">
+        {you.stats.map(stat => <div key={stat.key}><dt>{stat.label}</dt><dd>{stat.value}</dd></div>)}
+      </dl>
+      {you.haul && <p className="fi-victory-you__haul">{you.haul}</p>}
+    </section>
+  );
+}
+
 /** A campaign's final reward, with the map and new campaign one action away. */
 export default function VictoryOverlay({
   id, teamId, code, isClub, round, name = '', color, subtitle, conquests, steals, territories,
   effNow, effBase, effGain, squad = [], positionColors, onClose, onNew, onChronicle,
-  recap, seed,
+  recap, seed, you = null,
 }) {
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
@@ -79,12 +101,14 @@ export default function VictoryOverlay({
           </div>
           <h1 id="victory-title" className="fi-victory-title">{name}</h1>
           <p id="victory-description" className="fi-victory-standfirst">{subtitle}</p>
+          {you?.champion && <p className="fi-victory-managed">Managed by you</p>}
           <dl className="fi-victory-stats">
             <div><dt>Conquests</dt><dd>{conquests}</dd></div>
             <div><dt>Players claimed</dt><dd className="tone-claimed">{steals}</dd></div>
             <div><dt>Territories</dt><dd>{territories}</dd></div>
             <div><dt>Strength gained</dt><dd className={`tone-${toneOf(gainText)}`}>{gainText}</dd></div>
           </dl>
+          {you && !you.champion && <YourCampaign you={you} />}
           {highlights.length > 0 && (
             <div className="fi-victory-recap" role="group" aria-label="Campaign highlights">
               {highlights.map(([key, value]) => (
