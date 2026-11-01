@@ -1,6 +1,8 @@
 node_modules
 dist
 .snap
+# Written by `vercel link` and the deploy job's `vercel pull`
+.vercel
 
 # Third-party data drop, not part of the app
 FM26 Season Update*/

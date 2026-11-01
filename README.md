@@ -98,16 +98,31 @@ npm run build:icons      # render favicon.ico and apple-touch-icon.png from publ
 
 ## Deployment
 
-The game is live at <https://imperialism-game.vercel.app>. Vercel builds and
-deploys `main` on every push, so a push to `main` is a release.
+The game is live at <https://imperialism-game.vercel.app>. A push to `main` is a
+release.
 
 **Continuous integration.** [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
-runs `npm test`, `npm run build` and `npm run smoke` on Node 26 for every push.
-GitHub Actions is free for public repositories. The check reports failures; it
-does not hold back Vercel's deploy yet. To make production wait for it, add a
-Vercel token and the project's org and project ids as repository secrets, deploy
-from the workflow with the Vercel CLI once the tests pass, and turn off Vercel's
-own deploys of `main` (`git.deploymentEnabled` in `vercel.json`).
+runs `npm test`, `npm run build` and `npm run smoke` on Node 26 for every push,
+in about eight minutes. GitHub Actions is free for public repositories. On `main`,
+its deploy job then builds the tested commit and deploys it to production with
+the Vercel CLI (pinned at 64.7.0). A newer push cancels the older run, so only
+the newest commit deploys. The deploy job does nothing until the repository has
+the three secrets below. Until then, and until `vercel.json` turns off Vercel's
+own Git deploys of `main`, Vercel deploys every push without waiting for the
+tests.
+
+To make production wait for the tests:
+
+1. Create a Vercel access token from your account's tokens page, scoped as
+   narrowly as Vercel allows and with an expiry.
+2. Find the org and project ids. `npx vercel link` in a checkout writes both to
+   `.vercel/project.json` (ignored by git). The project's id is also in its
+   General settings, and the org id is your account's or team's id.
+3. Add them as repository secrets named `VERCEL_TOKEN`, `VERCEL_ORG_ID` and
+   `VERCEL_PROJECT_ID` (GitHub → Settings → Secrets and variables → Actions).
+4. Set `"git": { "deploymentEnabled": { "main": false } }` in `vercel.json` and
+   push. From that commit on, only a green run deploys `main`. Between steps 3
+   and 4, both deploy each push, which is harmless.
 
 **Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
 immutable for a year. Fonts, flags and club crests are cached for a day and
@@ -243,8 +258,8 @@ opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
 offence/defence, form and shooting variance. Nations play FIBA's four ten-minute
 quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
-quarters at about 100, so club games score about 115 a side, near the league's
-own, rather than in the eighties. American football plays about 11
+quarters at their season's league pace and scoring rate, so games score like
+their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
 possessions a side, each ending in a touchdown, a field goal or nothing by its
 offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
@@ -1320,7 +1335,7 @@ scripts/
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
   build-icons.mjs      renders the site icons from public/favicon.svg
-.github/workflows/ci.yml  tests, build and smoke on every push
+.github/workflows/ci.yml  tests, build and smoke on every push; deploys main once the Vercel secrets exist
 vercel.json            cache headers for the deployed site
 ```
 

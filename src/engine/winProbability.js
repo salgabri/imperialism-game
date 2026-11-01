@@ -18,9 +18,9 @@
 //
 // Basketball — engine-diff §4a.2 normal approximation of the repo's own model (src/sports/basketball.js):
 //   each period score is Normal(poss·eff, poss·(0.72 + 0.5·eff)) rounded; possessions ~ pace ± 4.5 (73 over FIBA's
-//   40', 100 over the NBA's 48'); match-day form N(0, drama·0.0125) per side persists through overtime; shared
-//   conditions cancel in the margin; level after regulation goes to 5' overtimes (at most 4, the last ends in a
-//   decisive play won with logistic(3·(effA − effD))).
+//   40', the season's 90–100 over the NBA's 48'); match-day form N(0, drama·0.0125) per side persists through
+//   overtime; shared conditions cancel in the margin; level after regulation goes to 5' overtimes (at most 4, the
+//   last ends in a decisive play won with logistic(3·(effA − effD))).
 //   The remaining margin is therefore ≈ Normal(R·(effA − effD), R·(1.44 + 0.5·(effA + effD)) + 2·(formSd·R)²
 //   + (effA − effD)²·σ_R² + 1/6) for R remaining possessions; P(A wins) = P(margin ≥ 1) + P(margin = 0)·P(A wins
 //   from level), with a ±0.5 continuity correction. Measured robust: tip-off within ≈ 1 point of the Monte Carlo
