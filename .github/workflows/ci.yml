@@ -42,22 +42,15 @@ jobs:
     timeout-minutes: 15
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
-      # Without the three secrets nothing deploys from here, and Vercel's own Git deploys stay in charge.
-      # The notice names any secret this job cannot read, never a value.
-      - name: Check the Vercel secrets
+      # Without the token nothing deploys from here, and Vercel's own Git deploys stay in charge.
+      - name: Check the Vercel token
         id: vercel
         run: |
-          missing=""
-          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
-            [ -n "${!name}" ] || missing="$missing $name"
-          done
-          if [ -z "$missing" ]; then
+          if [ -n "$VERCEL_TOKEN" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::Not deploying: this job cannot read$missing as Production environment or repository secrets (README \"Deployment\")."
+            echo "::notice::Not deploying: this job cannot read VERCEL_TOKEN as a Production environment or repository secret (README \"Deployment\")."
           fi
       - if: steps.vercel.outputs.ready == 'true'
         uses: actions/checkout@v7
@@ -68,6 +61,9 @@ jobs:
           cache: npm
       - if: steps.vercel.outputs.ready == 'true'
         run: npm install --global vercel@64.7.0
+      # The project is found by name and scope (its deployments' addresses show both), so only the token is secret.
+      - if: steps.vercel.outputs.ready == 'true'
+        run: vercel link --yes --project imperialism-game --scope wappen-der-schweiz --token="$VERCEL_TOKEN"
       - if: steps.vercel.outputs.ready == 'true'
         run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
       - if: steps.vercel.outputs.ready == 'true'

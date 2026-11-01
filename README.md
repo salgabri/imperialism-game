@@ -132,23 +132,23 @@ deploys `main` on every push, so a push to `main` is a release.
 minutes. GitHub Actions is free for public repositories. On `main`, its deploy
 job then builds the tested commit with the Vercel CLI (pinned at 64.7.0) and
 deploys it to production. A newer push cancels the older run, so only the
-newest commit deploys. The job runs in the **Production** environment and reads
-three secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`.
-Production's environment secrets (GitHub → Settings → Environments → Production)
-are the tighter choice, because no other job can read them. Repository secrets
-(Settings → Secrets and variables → Actions) work too, but Variables do not.
-Without all three, the job leaves the notice "Not deploying", names the missing
-ones and skips its Vercel steps.
+newest commit deploys. The job links the Vercel project by name
+(`imperialism-game` in the `wappen-der-schweiz` scope; its deployments' addresses
+show both), so its one secret is a Vercel access token, `VERCEL_TOKEN`. It runs
+in the **Production** environment. The token can be an environment secret there
+(GitHub → Settings → Environments → Production), the tighter choice because no
+other job can read it, or a repository secret (Settings → Secrets and variables
+→ Actions → Secrets). A Variable does not work. Without the token, the job leaves
+the notice "Not deploying" and skips its Vercel steps.
 
 To make production wait for the tests, Vercel's own Git deploys of `main` have
 to be turned off with `"git": { "deploymentEnabled": { "main": false } }` in
 `vercel.json`. Turn them off only after a run's deploy job has actually run its
 `vercel deploy` step and succeeded. Until then, both deploy each push, which is
 harmless. On 1 November 2026 the switch went in while the job still could not
-see the secrets: production stopped updating until it was reverted. When the
+see its secrets: production stopped updating until it was reverted. When the
 token expires, create a new one from your Vercel account's tokens page and
-replace the `VERCEL_TOKEN` secret. `npx vercel link` in a checkout writes the org
-and project ids to `.vercel/project.json`, which git ignores.
+replace the `VERCEL_TOKEN` secret.
 
 **Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
 immutable for a year. Fonts, flags and club crests are cached for a day and
