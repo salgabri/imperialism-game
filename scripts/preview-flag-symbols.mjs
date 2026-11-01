@@ -1,4 +1,4 @@
-// Local visual regression sheet using the production SVG pattern renderer.
+// Local visual regression sheet using the production flag renderer (FlagArt, clipped to the land as on the map).
 // Run after build-flag-symbols; open /docs/design/flag-symbols-review.html in Vite.
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -14,11 +14,11 @@ import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
 import { NATIONS } from '../src/data/teams.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const bundled = await build({ entryPoints: [path.join(root, 'src/components/FlagPattern.jsx')],
+const bundled = await build({ entryPoints: [path.join(root, 'src/components/FlagArt.jsx')],
   bundle: true, write: false, format: 'cjs', platform: 'node', external: ['react'], jsx: 'automatic' });
 const module = { exports: {} };
 new Function('require', 'module', 'exports', bundled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
-const FlagPattern = module.exports.default;
+const FlagArt = module.exports.default;
 const geometry = new WorldGeometry(JSON.parse(await readFile(path.join(root, 'public/countries-50m.json'), 'utf8')))
   .fitTo(Object.keys(NATIONS));
 const fixtures = [
@@ -46,8 +46,8 @@ for (const [title, code, countries] of fixtures) {
   const pad = Math.max(b.w, b.h) * .045;
   const render = (mode, before) => {
     const id = flag.id + mode;
-    const pattern = renderToStaticMarkup(React.createElement(FlagPattern, { flag: { ...flag, id, ...(before ? { symbolLayout: null } : {}) } }));
-    return `<div><span>${mode}</span><svg viewBox="${b.x - pad} ${b.y - pad} ${b.w + pad * 2} ${b.h + pad * 2}" aria-label="${title} ${mode}"><defs>${pattern}</defs><path d="${d}" fill="url(#fi-flag-${id})" stroke="#c0c7b2" stroke-width=".6" vector-effect="non-scaling-stroke"/></svg></div>`;
+    const art = renderToStaticMarkup(React.createElement(FlagArt, { flag: { ...flag, id, ...(before ? { symbolLayout: null } : {}) } }));
+    return `<div><span>${mode}</span><svg viewBox="${b.x - pad} ${b.y - pad} ${b.w + pad * 2} ${b.h + pad * 2}" aria-label="${title} ${mode}"><defs>${art}<clipPath id="clip-${id}"><path d="${d}"/></clipPath></defs><use href="#fi-flag-${id}" clip-path="url(#clip-${id})"/><path d="${d}" fill="none" stroke="#c0c7b2" stroke-width=".6" vector-effect="non-scaling-stroke"/></svg></div>`;
   };
   cards.push(`<article><h2>${title}</h2><section>${render('Before', true)}${render('After', false)}</section></article>`);
 }

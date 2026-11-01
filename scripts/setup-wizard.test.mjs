@@ -34,6 +34,9 @@ const { SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignP
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost' });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
+// appearance.js reads the saved theme from a bare `localStorage`. Without --localstorage-file, Node 26's own global
+// answers that with an ExperimentalWarning, which the console guard below would count against the test.
+Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: dom.window.localStorage });
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createRoot } = await import('react-dom/client');
 after(() => dom.window.close());

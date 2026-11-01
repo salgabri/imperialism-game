@@ -58,7 +58,7 @@ is the mean effective rating of those 23, as in the other sports.
 Positions are far more specialised than in football or basketball: a tight end on
 the offensive line or a receiver at cornerback is an emergency, not a rotation. So
 American football's out-of-position penalty is **25** rating points
-(`outOfPositionPenalty` in `src/data/teams.js`; the other sports keep 12). With 12,
+(`outOfPositionPenalty` in `src/data/teams.js`; football and basketball keep 12, baseball 20). With 12,
 the optimiser started a tight end at guard for the Giants rather than a 69-rated
 guard. Every franchise fields all 23 at natural positions.
 

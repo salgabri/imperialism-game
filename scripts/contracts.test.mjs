@@ -174,7 +174,7 @@ const GLOBALS = new Set([
   'structuredClone', 'undefined',
   // browser (render paths are additionally restricted by the purity checks below)
   'Blob', 'CSS', 'CustomEvent', 'DOMParser', 'Element', 'Event', 'File', 'FileReader', 'FocusEvent', 'HTMLElement', 'Image',
-  'KeyboardEvent', 'MouseEvent', 'MutationObserver', 'Node', 'PointerEvent', 'ResizeObserver', 'SVGElement', 'TextDecoder',
+  'KeyboardEvent', 'MouseEvent', 'MutationObserver', 'Node', 'OffscreenCanvas', 'PointerEvent', 'ResizeObserver', 'SVGElement', 'TextDecoder',
   'TextEncoder', 'URL', 'URLSearchParams', 'cancelAnimationFrame', 'clearInterval', 'clearTimeout', 'document', 'fetch',
   'getComputedStyle', 'localStorage', 'location', 'matchMedia', 'navigator', 'performance', 'requestAnimationFrame', 'sessionStorage',
   'setInterval', 'setTimeout', 'window',

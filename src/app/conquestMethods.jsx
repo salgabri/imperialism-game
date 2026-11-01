@@ -15,6 +15,7 @@ import ConquestCallout from '../screens/conquest/ConquestCallout.jsx';
 import * as conqVM from '../viewModels/conquest.js';
 import { memo, roman, territoryWord } from '../viewModels/format.js';
 import { BATTLE_SCARS, LOG_CAP } from './shared.js';
+import { overtimeShort } from '../sports/index.js';
 
 /** Render-time builders only run on a campaign (PLAN rule 9). */
 function inCampaign(st) {
@@ -28,13 +29,13 @@ function sentenceCase(text) {
 }
 
 /**
- * The tie-break beside a level score: the shoot-out's kicks ("4–2 PENS"), or the overtime periods ("OT", "2OT").
+ * The tie-break beside a level score: the shoot-out's kicks ("4–2 PENS"), or the overtime periods ("OT", "2OT"; a
+ * baseball game's final inning, "F/11").
  * Overtime points are already in the final score (basketball's tie.ga/gd are those totals), so they are not repeated.
  */
 function tieBreakText(m, sport) {
   if (sport.tieBreak === 'shootout') return `${m.tie.ga}–${m.tie.gd} ${sport.labels.tieShort}`;
-  const periods = Array.isArray(m.tie.periods) ? m.tie.periods.length : 1;
-  return `${periods > 1 ? periods : ''}${sport.labels.tieShort}`;
+  return overtimeShort(sport, Array.isArray(m.tie.periods) ? m.tie.periods.length : 1);
 }
 
 /**

@@ -3,16 +3,18 @@
 import React, { useEffect, useRef } from 'react';
 import Icon from './Icon.jsx';
 import { useLiveMinute } from './LiveMinute.jsx';
+import { clockLabel } from '../sports/index.js';
 
 const TABS = [['map', 'Map'], ['squad', 'Squad'], ['match', 'Match'], ['ledger', 'Ledger']];
 
 /**
  * The live minute, never below the last revealed event (`floor`): the same rule as the Match view's
- * `useMatchMinute` and the compact MatchCard, so the bar never trails the score band and feed.
+ * `useMatchMinute` and the compact MatchCard, so the bar never trails the score band and feed. `sport` shows the
+ * sport's own clock (baseball's half-inning).
  */
-function PhoneMinute({ store, floor = 0, suffix = "'" }) {
+function PhoneMinute({ store, floor = 0, sport = 'football' }) {
   const minute = useLiveMinute(store, floor);
-  return <span className="live-minute">{`${Math.max(Number(minute) || 0, Number(floor) || 0)}${suffix}`}</span>;
+  return <span className="live-minute">{clockLabel(sport, Math.max(Number(minute) || 0, Number(floor) || 0))}</span>;
 }
 
 /**
@@ -22,7 +24,7 @@ function PhoneMinute({ store, floor = 0, suffix = "'" }) {
  * (App.phonePlaybackModel: { autoplay, speed, showAutoplay } | null) adds the Auto toggle and the speed button at the
  * bar's end, above the bar-wide primary target, so skimming never needs the More sheet.
  */
-export function PhoneBar({ primary, right = null, rightKind = null, minuteFallback = 0, minuteStore = null, onPrimary,
+export function PhoneBar({ primary, right = null, rightKind = null, minuteFallback = 0, minuteStore = null, clockSport = 'football', onPrimary,
   playback = null, onAutoplay, onSpeed }) {
   if (!primary) return null;
   return (
@@ -33,7 +35,7 @@ export function PhoneBar({ primary, right = null, rightKind = null, minuteFallba
           strokeWidth="2.6" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6" /></svg>
       </button>
       <span className="phone-bar__right" aria-hidden="true">
-        {rightKind === 'minute' && minuteStore ? <PhoneMinute store={minuteStore} floor={minuteFallback} /> : right}
+        {rightKind === 'minute' && minuteStore ? <PhoneMinute store={minuteStore} floor={minuteFallback} sport={clockSport} /> : right}
       </span>
       {playback && (
         <div className="phone-bar__playback" role="group" aria-label="Campaign playback">
