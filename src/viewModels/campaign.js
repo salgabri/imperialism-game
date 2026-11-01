@@ -166,6 +166,23 @@ function fixtureOverride(st, ctx) {
   };
 }
 
+/**
+ * "Skip to my next match" (App.skipToNextMatch) → null when not offered; { active: false } when it can start: a
+ * manager's team still in, nothing waiting on a decision, and the match in progress (if any) not its own; or
+ * { active: true, played } while it runs, `played` counting the matches since it started. App.canSkipAhead starts it
+ * on this same rule.
+ */
+export function skipAheadModel(st, managedId) {
+  if (!managedId || st?.phase !== 'playing') return null;
+  const alive = Array.isArray(st.aliveIds) ? st.aliveIds : [];
+  if (alive.length <= 1 || !alive.includes(managedId)) return null;
+  if (st.skipAhead) return { active: true, played: Math.max(0, (Number(st.matches) || 0) - (Number(st.skipAhead.from) || 0)) };
+  if (st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination || st.storageDialog || st.storageConflict) return null;
+  const m = st.match;
+  if (m && !m.applied && (m.aId === managedId || m.dId === managedId)) return null;
+  return { active: false };
+}
+
 /** Idle copy (DEC D10) comes from turnVM.idleTurnCopy (FROZEN), which covers every turn order and pacing. */
 function idleCopy(st, ctx) {
   try {
@@ -214,7 +231,7 @@ export function buildColumn(st, ctx = {}) {
  * Next fixture block (DEC D10) → FixtureModel:
  * { state: 'idle'|'drawing'|'locked'|'tactical'|'live'|'done', kicker, kickerRight, idleTitle, headline: {a, b}|null,
  *   route, odds: {aLabel, bLabel, fill, aria}|null, meta, approach: 'Attack'|null (tactical: what Continue kicks off
- *   with), actions: {preview, simulate}, next: {title, route}|null }
+ *   with), actions: {preview, simulate}, next: {title, route}|null, skip: skipAheadModel(…) }
  * drawing (spin 'ready'/'spinning') keeps the placeholder form ('Serbia to attack' / 'The compass is choosing the
  * target'); the matchup, odds and meta appear from the locked spin on (DEC D19).
  * live/done carry the compact MatchCard (the `matchCard` slot, DEC D17); headline/odds stay as a fallback.
@@ -224,7 +241,7 @@ export function buildFixture(st, ctx = {}) {
   const current = roundLabel(displayRound(st));
   const base = {
     state: 'idle', kicker: 'Next fixture', kickerRight: current, idleTitle: null, headline: null, route: null,
-    odds: null, meta: null, actions: NO_ACTIONS, next: null,
+    odds: null, meta: null, actions: NO_ACTIONS, next: null, skip: st ? skipAheadModel(st, ctx?.managedId) : null,
   };
   if (!st) return base;
 

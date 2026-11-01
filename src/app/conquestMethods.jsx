@@ -112,7 +112,7 @@ export function finishMatch() {
       this.setState({ series: next.series, match: completed, matches: st.matches + 1,
         history: [...st.history, entry], queue: [],
         log: [...st.log, { t: 'match', r: st.round, txt: `${completed.winnerName} wins finale game ${next.series.games}; series continues.`, chip: C.gold }].slice(-LOG_CAP) },
-        () => { this.persist(); if (this.state.autoplay) this.after(st.settings.express ? 120 : 1000, () => this.nextAction()); });
+        () => { this.persist(); if (this.state.autoplay) this.after(this.fastPlayback(st) ? 120 : 1000, () => this.nextAction()); });
       return;
     }
     recordSettlement(this, st, { series: next.series, view: seriesView, holds: state => state.series === next.series });
@@ -286,7 +286,8 @@ export function applyConquest(playerIndex) {
       if (managerLost) { this.clearTimers(); this.clock.pause(); return; }
       this.after(1500, () => this.setState({ flash: {} }));
 
-      if (st.settings.express) {
+      // Fast-forward, or a skip ahead: no notices, straight on.
+      if (this.fastPlayback(st)) {
         if (aliveIds.length === 1) this.after(200, () => this.setState({ phase: 'victory', autoplay: false }, () => this.persist()));
         else if (this.state.autoplay) this.after(m.express ? 12 : 650, () => this.nextAction());
         return;

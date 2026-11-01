@@ -14,14 +14,15 @@ import './campaign.css';
 export default function CampaignColumn({
   role = 'manager', sheet = 'collapsed', fixture = null, fronts = null, results = null, idleText = null,
   matchCard = null, targetPanel = null, spectatorPanel = null,
-  onPreview, onSimulate, onToggleSheet, onOpenChronicle, onSelectTeam,
+  onPreview, onSimulate, onSkip, onStopSkip, onToggleSheet, onOpenChronicle, onSelectTeam,
 }) {
   const spectator = role === 'spectator' && !!spectatorPanel;
   const showFronts = !spectator && !targetPanel && !!fronts;
   const expanded = sheet === 'expanded';
   const toggle = typeof onToggleSheet === 'function' ? onToggleSheet : null;
   const lead = spectator ? spectatorPanel : targetPanel || (
-    <NextFixture fixture={fixture} idleText={idleText} matchCard={matchCard} onPreview={onPreview} onSimulate={onSimulate} />
+    <NextFixture fixture={fixture} idleText={idleText} matchCard={matchCard} onPreview={onPreview} onSimulate={onSimulate}
+      onSkip={onSkip} onStopSkip={onStopSkip} />
   );
   const className = ['v4-column', `v4-column--${spectator ? 'spectator' : 'manager'}`,
     showFronts ? 'v4-column--fronts' : 'v4-column--no-fronts', expanded ? 'v4-column--expanded' : null].filter(Boolean).join(' ');

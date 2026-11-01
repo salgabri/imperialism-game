@@ -96,7 +96,7 @@ export function beginDuel(turnArg) {
     return;
   }
   const extra = notes.length ? { log: st.log.concat(notes).slice(-LOG_CAP) } : {};
-  if (st.settings.express && ![draw.attackerId, draw.targetId].includes(st.followedId) && st.aliveIds.length > 2) {
+  if (this.fastPlayback(st) && ![draw.attackerId, draw.targetId].includes(st.followedId) && st.aliveIds.length > 2) {
     this.setState({ round, ...turnFields(turn), ...extra, match: null, pu: null, toast: null },
       () => this.startMatch(draw.attackerId, draw.targetId, draw));
     return;
@@ -225,9 +225,12 @@ export function openTargetChoice(attackerId, turnArg = null) {
   // commit (DEC D15: the hatch lasts the flash duration, never through the target choice), as pu/toast are.
   this.clearTimers();
   const round = turn ? turn.round : st.round + 1;
+  // A skip ahead stops at your target choice: its speed comes back, and its starting autoplay resumes after Attack.
+  const skip = st.skipAhead;
   this.setState({
-    pendingTarget: { attackerId, optionIds, selectedId, round, openedAt: Date.now(), resumeAutoplay: !!st.autoplay,
+    pendingTarget: { attackerId, optionIds, selectedId, round, openedAt: Date.now(), resumeAutoplay: skip ? skip.autoplay : !!st.autoplay,
       turn: turn ? { turnQueue: turn.turnQueue, turnIndex: turn.turnIndex, round: turn.round, newRound: !!turn.newRound } : null },
+    ...(skip ? { skipAhead: null, speed: skip.speed } : {}),
     round, ...turnFields(turn),
     spin: null, atk: null, match: null, pu: null, toast: null, flash: {}, autoplay: false, paused: false, targetHoverId: null,
   }, () => this.persist());

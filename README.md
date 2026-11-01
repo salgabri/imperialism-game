@@ -147,7 +147,8 @@ captured from the game with its overlays hidden, beside the wordmark.
 
 A new campaign is set up in three steps: **Campaign → Rules → Your role**.
 Space moves to the next step and launches the campaign from the last one. Every
-default suits a first campaign, so pressing Space three times starts one.
+default suits a first campaign, so pressing Space three times starts one: as the
+manager of the theatre's favourite, with decisions from the first match.
 
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
@@ -180,9 +181,14 @@ default suits a first campaign, so pressing Space three times starts one.
    only the rules you changed.
 3. **Your role** — **Manager** runs one team. You choose an approach before
    its matches and one of up to three signings after its wins, and, under a
-   one-match draw, **who picks your opponent**. **Spectator** leaves draws,
-   results and signings to the game, and you can follow any empire once the
-   campaign starts. **Launch campaign** starts it.
+   one-match draw, **who picks your opponent**. Manager is the default. Until
+   you pick a team, the theatre's strongest is **Suggested** ("The favourite,
+   for a long first campaign"): checked in the list and launched if you pick
+   none. **Another team** after a defeat turns the suggestion off, so Launch
+   waits for a pick. **Spectator** leaves draws, results and signings to the
+   game, and you can follow any empire once the campaign starts. **Launch
+   campaign** starts it. Saves from before the role existed still load as
+   spectator campaigns.
 
 ### Rules of war
 
@@ -318,6 +324,12 @@ The map fills the screen next to a campaign column (500px at 1600px and wider,
   Recommended and focused. **or simulate the result** reveals this match at once
   with the recommended approach, and **Continue** kicks off with it. During and
   after the match the block holds the compact match card with the score and minute.
+  Between your decisions the block offers **Skip to your next match**: every
+  match without your team plays at Fast-forward pace (4×, autoplay on) until
+  your next tactical gate or target choice, which hands back the speed and
+  autoplay you had. While it runs the block reads "Skipping to your next match ·
+  N matches played" with **Stop**; Pause also ends it, and a speed picked
+  meanwhile is the one handed back.
 - **Your fronts** — neighbouring empires with strength, territories and your
   win chance: green at 60% or more, amber at 45–59%, red below 45%.
 - **Latest results** — "Germany beat Austria", the score and the claimed
@@ -406,7 +418,10 @@ handle; tapping it expands the sheet to show your fronts and latest results. A
 full-width primary bar sits above a tab bar of **Map · Squad · Match · Ledger ·
 More**. While nothing waits on a decision, the bar ends with **Auto** (a manager's
 autoplay toggle; a spectator's primary already plays and pauses) and the speed
-button (1× / 2× / 4×). **More** holds the Chronicle, the playback controls,
+button (1× / 2× / 4×). A manager also gets **Skip** there (Skip to your next
+match), in place of the round, because the sheet's own Skip button sits below
+its fold whenever a match card fills it. Under 360px these keep their 44px
+targets as icons and figures. **More** holds the Chronicle, the playback controls,
 Settings and saves.
 From 700px to 1199px the map sits on top and the column content runs in two
 columns below. Touch targets are at least 44px. Reduced motion keeps only

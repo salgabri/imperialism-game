@@ -107,6 +107,12 @@
   margin:6px 0 0; font:400 var(--fs-meta)/1.35 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted);
 }
 .fixture__approach { margin:6px 0 0; font:400 var(--fs-meta)/1.35 var(--font-sans); color:var(--muted); }
+/* Skip to my next match: a secondary under the fixture; while it runs, its progress and Stop. */
+.fixture__skip { margin-top:var(--col-fx-mt); }
+.fixture__skipping {
+  margin:var(--col-fx-mt) 0 0; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px;
+  font:400 var(--fs-meta)/1.4 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted);
+}
 .fixture__approach b { font-weight:700; color:var(--ink); }
 .fixture__actions { margin-top:var(--col-fx-mt); display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; }
 .fixture__simulate { white-space:nowrap; }

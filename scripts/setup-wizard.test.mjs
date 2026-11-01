@@ -11,7 +11,7 @@ import { build } from 'esbuild';
 import {
   DRAW_CARDS, buildSetupModel, campaignFacts, campaignPreview as modelPreview, countryMapPreview, domesticDescription as modelDescription,
   domesticTheatres, estimateNote, frontRelation, moreRulesSummary, rulesOf, showMatchOptions, showMatchesOf, showMatchesWrites,
-  theatreMapPreview, theatreRow, tierOf,
+  suggestedTeamId, theatreMapPreview, theatreRow, tierOf,
 } from '../src/screens/setup/setupModel.js';
 import { launchRules } from '../src/engine/turns.js';
 import { SCOPES } from '../src/data/teams.js';
@@ -241,8 +241,26 @@ test('rail, Next and Back move between the three mounted steps and focus the ste
   assert.deepEqual(view.errors, []);
 });
 
+test('a manager with no pick has the favourite suggested: checked, described and launchable until another is picked', async t => {
+  const view = await mount(t, { setup: { role: 'manager' } });
+  await view.click(view.qa('.setup-rail__step')[2]);
+  const france = view.qa('.setup-team').find(row => /France/.test(row.textContent));
+  assert.equal(france.getAttribute('aria-checked'), 'true', 'the strongest nation is checked');
+  assert.equal(view.q('#setup-managed-team').value, '250', 'the native mirror names it too');
+  const pick = view.q('.setup-pick');
+  assert.match(pick.querySelector('.setup-pick__kicker').textContent, /^Suggested nation$/);
+  assert.match(pick.querySelector('.setup-pick__suggested').textContent, /The favourite, for a long first campaign\. Pick any nation to manage it instead\./);
+  assert.equal(view.button('Launch campaign').disabled, false, 'Space ×3 still launches a first campaign');
+  await view.click(view.button('Launch campaign'));
+  assert.equal(view.calls.start, 1);
+  const italy = view.qa('.setup-team').find(row => /Italy/.test(row.textContent));
+  await view.click(italy);
+  assert.deepEqual(view.calls.picks.at(-1), ['managedTeamId', '380'], 'clicking any nation picks it');
+  assert.deepEqual(view.errors, []);
+});
+
 test('initialStep opens the wizard on Your role ("Another team" after a defeat), with Back to the rules', async t => {
-  const view = await mount(t, { setup: { role: 'manager', managedTeamId: '' }, initialStep: 3 });
+  const view = await mount(t, { setup: { role: 'manager', managedTeamId: '' }, initialStep: 3, suggestTeam: false });
   assert.deepEqual(view.visibleStep(), ['3']);
   assert.deepEqual(view.qa('.setup-rail__step').map(step => step.dataset.state), ['done', 'done', 'current']);
   assert.equal(document.activeElement, view.q('#setup-role-title'), 'focus starts on the step it opened on');
@@ -407,7 +425,8 @@ test('launch: enabled for spectators from any step, requires a managed team for 
   await spectator.click(launch);   // smoke clicks it while step 1 is showing
   assert.equal(spectator.calls.start, 1);
 
-  const manager = await mount(t, { setup: { role: 'manager' } });
+  // With the suggestion off ("Another team" after a defeat) a manager must pick before launching.
+  const manager = await mount(t, { setup: { role: 'manager' }, suggestTeam: false });
   assert.equal(manager.button('Launch campaign').disabled, true);
   await manager.click(manager.qa('.setup-rail__step')[2]);
   assert.match(manager.section(3).querySelector('.setup-foot__note').textContent, /Choose a nation to manage/);
@@ -789,7 +808,16 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
   assert.deepEqual(model.favourites.map(team => team.name), ['France', 'Spain', 'Italy', 'Hungary']);
   assert.equal(model.canLaunch, true);
   assert.equal(model.managed.fronts, null, 'no neighbour data: the Fronts block is left out');
-  assert.equal(buildSetupModel({ ...BASE, role: 'manager' }, { managerTeams: teams }).canLaunch, false);
+  assert.equal(model.managed.suggested, false, 'a picked team is not a suggestion');
+  // No pick: the favourite is suggested (and launches), unless the suggestion is off.
+  const suggested = buildSetupModel({ ...BASE, role: 'manager' }, { managerTeams: teams });
+  assert.deepEqual([suggested.canLaunch, suggested.managed.name, suggested.managed.suggested, suggested.stepSummaries[3]],
+    [true, 'France', true, 'Manager · France']);
+  assert.equal(suggested.managedId, suggestedTeamId(teams));
+  assert.equal(buildSetupModel({ ...BASE, role: 'manager' }, { managerTeams: teams, suggest: false }).canLaunch, false);
+  assert.equal(buildSetupModel({ ...BASE, role: 'manager' }, { managerTeams: [] }).canLaunch, false, 'nothing to suggest yet');
+  assert.equal(suggestedTeamId([]), null);
+  assert.equal(buildSetupModel({ ...BASE, role: 'spectator' }, { managerTeams: teams }).managedId, null);
   // Step 3 heading: managers choose a nation / club, spectators choose only their role.
   assert.equal(model.roleTitle, 'Choose your nation');
   assert.equal(buildSetupModel({ ...BASE, role: 'spectator' }, { managerTeams: teams }).roleTitle, 'Choose your role');

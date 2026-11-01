@@ -22,11 +22,14 @@ function PhoneMinute({ store, floor = 0, sport = 'football' }) {
  * text content (DEC D13), so exact textContent lookups match the label alone. For the live minute,
  * `minuteFallback` is the last revealed event's minute and floors the store's value. `playback`
  * (App.phonePlaybackModel: { autoplay, speed, showAutoplay } | null) adds the Auto toggle and the speed button at the
- * bar's end, above the bar-wide primary target, so skimming never needs the More sheet.
+ * bar's end, above the bar-wide primary target, so skimming never needs the More sheet. `skip` (App.canSkipAhead) adds
+ * Skip to your next match there too, in place of the right text: on a phone the fixture block's own Skip button sits
+ * below the sheet's fold whenever a match card fills it.
  */
 export function PhoneBar({ primary, right = null, rightKind = null, minuteFallback = 0, minuteStore = null, clockSport = 'football', onPrimary,
-  playback = null, onAutoplay, onSpeed }) {
+  playback = null, onAutoplay, onSpeed, skip = false, onSkip }) {
   if (!primary) return null;
+  const skipShown = !!skip && !!playback && typeof onSkip === 'function';
   return (
     <div className="phone-bar">
       <button type="button" className="phone-bar__btn" data-primary disabled={!!primary.disabled} onClick={onPrimary}>
@@ -34,11 +37,15 @@ export function PhoneBar({ primary, right = null, rightKind = null, minuteFallba
         <svg className="phone-bar__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           strokeWidth="2.6" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6" /></svg>
       </button>
-      <span className="phone-bar__right" aria-hidden="true">
+      {!skipShown && <span className="phone-bar__right" aria-hidden="true">
         {rightKind === 'minute' && minuteStore ? <PhoneMinute store={minuteStore} floor={minuteFallback} sport={clockSport} /> : right}
-      </span>
+      </span>}
       {playback && (
         <div className="phone-bar__playback" role="group" aria-label="Campaign playback">
+          {skipShown && (
+            <button type="button" className="phone-bar__tool phone-bar__skip" aria-label="Skip to your next match"
+              onClick={onSkip}><Icon name="next" size={14} /><span aria-hidden="true">Skip</span></button>
+          )}
           {playback.showAutoplay && (
             <button type="button" className="phone-bar__tool phone-bar__auto" aria-label="Autoplay" aria-pressed={!!playback.autoplay}
               onClick={onAutoplay}><Icon name={playback.autoplay ? 'pause' : 'play'} size={14} /><span aria-hidden="true">Auto</span></button>

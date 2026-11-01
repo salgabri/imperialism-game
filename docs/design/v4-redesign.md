@@ -117,6 +117,13 @@ gold-trimmed "war room" look.
     fifth of real UEFA matchups.)*
   - *Live:* score and minute; the primary is Finish match.
   - *Done:* the result; the primary is Continue.
+  *(Amended 2026-11-01, item 6 of the UX review: between a manager's decisions
+  the block also offers Skip to your next match (`skipAheadModel` in
+  campaign.js, `App.skipToNextMatch`). It sets a UI-only `skipAhead`, never
+  saved, which `App.fastPlayback` treats like Fast-forward for every match
+  without your team, at 4× with autoplay on. Your tactical gate or target
+  choice ends it and hands back the speed and autoplay it started from;
+  Stop and Pause end it too.)*
 - **D11 — Views.** The masthead nav is Map / Squad / Match / Ledger / Chronicle.
   The phone tab bar is Map, Squad, Match, Ledger, More, where More holds the
   Chronicle, settings and saves. `view` is UI-only state and is never saved.
@@ -240,7 +247,11 @@ These settle layout questions the decisions above left open:
   camera. Step 2 shows the four draw cards, a visible Show matches control
   (`resolution` and `express` as Live / Final score only / Fast-forward) and a
   collapsed **More rules** `<details>`; the manager's opponent choice is on
-  step 3.
+  step 3. *(Amended 2026-11-01: a new campaign's setup defaults to Manager,
+  and with no team picked the theatre's strongest is suggested
+  (`suggestedTeamId` in setupModel.js), checked, labelled Suggested and
+  launched. DEFAULT_SETUP keeps Spectator, because it also fills the settings
+  of saves made before the role existed.)*
 - Space on a focused option in the conquest or target list still runs the
   primary action. Setup handles its own Space (next step / launch).
 - While a signing or target choice is pending, every nav entry except Map is

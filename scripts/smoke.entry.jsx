@@ -968,11 +968,10 @@ async function launch(mounted, { sport = 'football', layer = 'nations', scope = 
   if (!domesticId) await select('setup-theatre', layer === 'clubs' ? clubScope : scope);
   await select('setup-pacing', pacing);
   await select('setup-resolution', resolution);
-  if (role === 'manager') {
-    document.querySelector('button[role="radio"][aria-labelledby="setup-role-manager-title"]').click();
-    await until('manager role chosen', () => mounted.app.state.setup.role === 'manager');
-    await select('setup-managed-team', team);
-  }
+  // A new campaign defaults to Manager with a suggested team, so a spectator scenario picks Spectator explicitly.
+  if (roleCard(role).getAttribute('aria-checked') !== 'true') roleCard(role).click();
+  await until(`${role} role chosen`, () => mounted.app.state.setup.role === role);
+  if (role === 'manager') await select('setup-managed-team', team);
   if (turnOrder || targeting) {
     // Rules of war through the real cards: the draw on step 2, then the manager's opponent choice on step 3 (offered
     // only to a manager under a one-match draw, DEC D2).

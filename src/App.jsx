@@ -23,7 +23,8 @@ import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
-import { countryMapPreview, theatreMapPreview } from './screens/setup/setupModel.js';
+import { skipAheadModel } from './viewModels/campaign.js';
+import { countryMapPreview, suggestedTeamId, theatreMapPreview } from './screens/setup/setupModel.js';
 import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
@@ -131,7 +132,9 @@ export default class App extends React.Component {
   state = {
     phase: 'loading',
     err: null,
-    setup: { ...DEFAULT_SETUP },
+    // A new campaign manages a team (the suggested one until the player picks), so a first campaign has decisions to
+    // make. DEFAULT_SETUP keeps Spectator: it also fills settings that saves from before the role existed lack.
+    setup: { ...DEFAULT_SETUP, role: 'manager' },
     settings: { ...DEFAULT_SETUP },
     teams: {},
     own: {},
@@ -170,6 +173,9 @@ export default class App extends React.Component {
     turnQueue: [], turnIndex: 0, pendingTarget: null,
     // UI-only state (never saved, PLAN §3.1).
     view: 'map', viewSource: 'user', squadReturn: null, tacticalPreview: false, phoneSheet: 'collapsed', setupStep: 1,
+    // Setup suggests a team for a manager with none picked (off for "Another team"); skipAhead is "Skip to my next
+    // match" while it runs: { speed, autoplay, from } to hand back, from = the match count it started at.
+    setupSuggest: true, skipAhead: null,
     phoneMore: false, wholeMap: false, focusLayout: null, targetHoverId: null,
     // The setup's chosen country map, a restore waiting for its country map ({ message, status }) and a country
     // launch being prepared (UI-only: campaignSnapshot whitelists its keys, so none of these reach a save).
@@ -993,7 +999,7 @@ export default class App extends React.Component {
     // No setup-screen map or data set load outlives the setup screen.
     clearTimeout(this.setupLoadTimer);
     clearTimeout(this.setupSetTimer);
-    const su = this.state.setup;
+    let su = this.state.setup;
     const domesticId = domesticIdOf(su), dataSet = dataSetOf(su);
     const token = ++this.flowToken;
     if (domesticId && !getLoadedDomestic(domesticId)) {
@@ -1015,6 +1021,12 @@ export default class App extends React.Component {
     const clubLayer = su.layer === 'clubs';
     const sport = sportOf(su);
     const { included, own, scopeName } = this.opening(su, this.rng);
+    // No team picked: launch the one the wizard suggested (the same seed builds the same opening, ranked the same
+    // way), unless setup was opened to pick another team.
+    if (su.role === 'manager' && !included.some(team => team.id === su.managedTeamId) && this.state.setupSuggest !== false) {
+      const suggested = suggestedTeamId(included.map(team => ({ id: team.id, name: team.name, rating: teamEff(team) })));
+      if (suggested) su = { ...su, managedTeamId: suggested };
+    }
     if (su.role === 'manager' && !included.some(team => team.id === su.managedTeamId)) {
       this.setState({ saveStatus: { ok: false, message: 'Choose the team you will manage before launching.' } });
       return;
@@ -1071,6 +1083,8 @@ export default class App extends React.Component {
         queue: [],
         batchTotal: 0,
         autoplay: false,
+        // A skip ahead never carries into another campaign; its speed does come back.
+        skipAhead: null, ...(this.state.skipAhead ? { speed: this.state.skipAhead.speed } : {}),
         selected: null,
         flash: {},
         tab: 'power',
@@ -1156,6 +1170,7 @@ export default class App extends React.Component {
       turnQueue: s.turnQueue || [], turnIndex: redraw ? Math.max(0, (s.turnIndex || 0) - 1) : s.turnIndex || 0,
       pendingTarget: s.pendingTarget || null,
       view: 'map', viewSource: 'user', tacticalPreview: false, phoneMore: false, focusLayout: null, targetHoverId: null,
+      skipAhead: null, ...(this.state.skipAhead ? { speed: this.state.skipAhead.speed } : {}),
     };
     const gated = s.choice || s.tacticalChoice || s.managerElimination || s.pendingTarget;
     // A restored unapplied match is presented again: the same auto-switch rule as a kickoff (DEC D11).
@@ -1207,9 +1222,10 @@ export default class App extends React.Component {
 
   /**
    * Back to setup with a fresh opening seed (a blank seed field means a new draw), from the masthead or the results.
-   * `step` is the wizard step it opens on (3, Your role, for "Another team" after a defeat).
+   * `step` is the wizard step it opens on (3, Your role, for "Another team" after a defeat); `suggest: false` makes a
+   * manager pick a team instead of launching the suggested one.
    */
-  openSetup({ step = 1 } = {}) {
+  openSetup({ step = 1, suggest = true } = {}) {
     this.clearTimers();
     this.cancelRestore();
     this.flowToken++;
@@ -1220,6 +1236,8 @@ export default class App extends React.Component {
     this.setState({
       phase: 'setup',
       setupStep: step,
+      setupSuggest: suggest !== false,
+      skipAhead: null, ...(this.state.skipAhead ? { speed: this.state.skipAhead.speed } : {}),
       confirmNew: false,
       autoplay: false,
       match: null,
@@ -1279,10 +1297,13 @@ export default class App extends React.Component {
     this.setState({ setup, managerElimination: null, retrySetup: null }, () => this.startCampaign());
   }
 
-  /** "Another team" after a defeat: the same campaign's setup, opened on Your role with no team chosen yet. */
+  /**
+   * "Another team" after a defeat: the same campaign's setup, opened on Your role with no team chosen yet (and none
+   * suggested, so Launch waits for the pick).
+   */
   chooseAnotherTeam() {
     const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings), role: 'manager', managedTeamId: '', seed: '' };
-    this.setState({ setup, retrySetup: null }, () => this.openSetup({ step: 3 }));
+    this.setState({ setup, retrySetup: null }, () => this.openSetup({ step: 3, suggest: false }));
   }
 
   // ---------- transient overlays ----------
@@ -1398,8 +1419,12 @@ export default class App extends React.Component {
         const odds = estimateWinProbability({ sport, attacker: a, defender: d, ...params, samples: 512 });
         return { ...option, winProbability: managedId === attackerId ? odds.attacker : odds.defender };
       });
+      // A skip ahead stops here, your next decision: it hands back its speed, and the autoplay it started from is what
+      // resumes after the kick-off.
+      const skip = st.skipAhead;
       this.setState({ managedTeamId: managedId, tacticalChoice: { aId: attackerId, dId: defenderId, route,
-        managerName: manager.name, opponentName: opponent.name, options, resumeAutoplay: st.autoplay, openedAt: Date.now() },
+        managerName: manager.name, opponentName: opponent.name, options, resumeAutoplay: skip ? skip.autoplay : st.autoplay, openedAt: Date.now() },
+        ...(skip ? { skipAhead: null, speed: skip.speed } : {}),
         // clearTimers() above also dropped applyConquest's hatch reset: clear the flash with the notice and toast.
         match: null, spin: null, pu: null, toast: null, flash: {}, autoplay: false, paused: false, tacticalPreview: false }, () => this.persist());
       return;
@@ -1441,12 +1466,12 @@ export default class App extends React.Component {
         routeLabel: route.routeLabel || '', routeKind: route.routeKind || 'straight',
         tactic: [attackerId, defenderId].includes(managedId) ? params.tactic : null,
         tacticalBonus: params.bonus, matchDrama: drama,
-        express: !!st.settings.express && !important,
+        express: this.fastPlayback(st) && !important,
         instant: !!options.instant,
         live: this.matchLiveModel(sport, a, d, effA, effD, drama),
       },
       spin: null,
-      ...this.autoMatchView(st, attackerId, defenderId, { express: !!st.settings.express && !important, instant: !!options.instant }),
+      ...this.autoMatchView(st, attackerId, defenderId, { express: this.fastPlayback(st) && !important, instant: !!options.instant }),
     }, () => {
       this.presentMatch();
       if (this.state.autoplay && this.state.pauseFollow && [attackerId, defenderId].includes(this.state.followedId)) this.pausePlayback();
@@ -1584,7 +1609,9 @@ export default class App extends React.Component {
       return;
     }
     this.clock.pause();
-    this.setState({ paused: true, autoplay: false }, () => this.persist());
+    // Pausing also ends a skip ahead, at the speed it started from.
+    const skip = this.state.skipAhead;
+    this.setState({ paused: true, autoplay: false, ...(skip ? { skipAhead: null, speed: skip.speed } : {}) }, () => this.persist());
   }
 
   followTeam(id) {
@@ -1600,10 +1627,51 @@ export default class App extends React.Component {
   setSpeed(n) {
     const previous = this.state.speed;
     if (![1, 2, 4].includes(n)) return;
-    // A speed picked during your match is kept after it (startMatch slowed the match to 1×).
+    // A speed picked during your match is kept after it (startMatch slowed the match to 1×), and one picked while
+    // skipping ahead is the speed the skip hands back.
     this.speedRestore = null;
+    if (this.state.skipAhead) this.setState(state => (state.skipAhead ? { skipAhead: { ...state.skipAhead, speed: n } } : null));
     if (n === previous) return;
     this.setState({ speed: n }, () => this.rescheduleForSpeed(previous));
+  }
+
+  // ---------- skip to my next match ----------
+
+  /** Fast-forward presentation: the Show matches setting, or "Skip to my next match" while it runs. */
+  fastPlayback(st = this.state) {
+    return !!st.settings?.express || !!st.skipAhead;
+  }
+
+  /** "Skip to my next match" can start: see campaign.js skipAheadModel (the fixture block offers it on the same rule). */
+  canSkipAhead(st = this.state) {
+    return skipAheadModel(st, this.managedId(st))?.active === false;
+  }
+
+  /**
+   * "Skip to my next match": every match without your team plays at Fast-forward pace (4×, autoplay on) until your
+   * team's next decision, its tactical gate or target choice, which hands the speed and autoplay back (skipEndFields).
+   */
+  skipToNextMatch() {
+    const st = this.state;
+    if (!this.canSkipAhead(st)) return;
+    this.clock.resume();
+    this.setState({ skipAhead: { speed: st.speed || 1, autoplay: !!st.autoplay, from: st.matches }, speed: 4, autoplay: true, paused: false },
+      () => {
+        const s = this.state;
+        // A match in progress is not yours (canSkipAhead): reveal it now; a draw in progress plays on into it.
+        if (s.match && !s.match.applied) this.fastForward();
+        else if (!s.spin) this.after(80, () => { if (this.state.autoplay) this.nextAction(); });
+      });
+  }
+
+  /** Stop skipping (the fixture block's Stop): the speed and autoplay it started from come back. */
+  stopSkip() {
+    if (this.state.skipAhead) this.setState(this.skipEndFields());
+  }
+
+  /** The fields that end a skip, for the same setState as the decision that ends it. {} when none runs. */
+  skipEndFields(st = this.state) {
+    return st.skipAhead ? { skipAhead: null, speed: st.skipAhead.speed, autoplay: st.skipAhead.autoplay } : {};
   }
 
   /** Your match has ended (finishMatch): the speed it was slowed from returns. Idempotent. */
@@ -2006,6 +2074,7 @@ export default class App extends React.Component {
               onFollow={id => this.followTeam(id)} onPauseFollow={value => this.setPauseFollow(value)}
               onToggleAutoplay={() => this.togglePlay()} onSpeed={n => this.setSpeed(n)} /> : null}
             onPreview={() => this.openMatchPreview()} onSimulate={() => this.simulateResult()}
+            onSkip={() => this.skipToNextMatch()} onStopSkip={() => this.stopSkip()}
             onToggleSheet={() => this.togglePhoneSheet()} onOpenChronicle={st.choice || st.pendingTarget ? undefined : () => this.setView('chronicle')}
             onSelectTeam={id => this.selectTeam(id)} />}
           {playing && view === 'conquest' && <ConquestScreen {...this.conquestModel()}
@@ -2026,7 +2095,8 @@ export default class App extends React.Component {
           {playing && view === 'map' && <Ticker {...this.tickerModel()} />}
         </main>
         {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} clockSport={sport.id} onPrimary={() => this.runPrimary()}
-          playback={this.phonePlaybackModel()} onAutoplay={() => this.togglePlay()} onSpeed={() => this.cycleSpeed()} />}
+          playback={this.phonePlaybackModel()} onAutoplay={() => this.togglePlay()} onSpeed={() => this.cycleSpeed()}
+          skip={this.canSkipAhead()} onSkip={() => this.skipToNextMatch()} />}
         {playing && <PhoneTabBar active={this.navView(view)} hidden={view === 'conquest'} locked={!!st.choice || !!st.pendingTarget}
           moreOpen={st.phoneMore} onView={v => this.setView(v)} onMore={() => this.togglePhoneMore()} />}
         {playing && st.phoneMore && <PhoneMoreSheet onClose={() => this.togglePhoneMore()} locked={!!st.choice || !!st.pendingTarget}
@@ -2047,7 +2117,7 @@ export default class App extends React.Component {
           saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
           onManageSaves={() => this.openStorageDialog('slots')}
           onCancel={st.hasSave ? () => this.resume() : undefined}
-          initialStep={st.setupStep}
+          initialStep={st.setupStep} suggestTeam={st.setupSuggest !== false}
         />}
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           // "View map" (and close): the final's automatic switch to the Match view is otherwise never undone.

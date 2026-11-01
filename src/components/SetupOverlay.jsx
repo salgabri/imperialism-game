@@ -132,11 +132,12 @@ function SelectedTeam({ team, noun }) {
           <TeamMark id={team.id} code={team.code} isClub={team.isClub} width={60} />
         </span>
         <div className="setup-pick__id">
-          <p className="setup-pick__kicker">Selected {noun}</p>
+          <p className="setup-pick__kicker">{team.suggested ? 'Suggested' : 'Selected'} {noun}</p>
           <h3 className="setup-pick__name" id="setup-pick-name">{team.name}</h3>
           <p className="setup-pick__meta">{team.meta}</p>
         </div>
       </div>
+      {team.suggested && <p className="setup-pick__suggested">{`The favourite, for a long first campaign. Pick any ${noun} to manage it instead.`}</p>}
       <dl className="setup-pick__stats">
         <div><dt>Strength</dt><dd className="num">{team.ratingText}</dd></div>
         <div><dt>Rank</dt><dd className="num">{team.rankText}</dd></div>
@@ -233,12 +234,14 @@ function theatreCaption(model, preview) {
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
  * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
  * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
- * `initialStep` (1–3) is the step it opens on: Your role (3) for "Another team" after a defeat.
+ * `initialStep` (1–3) is the step it opens on: Your role (3) for "Another team" after a defeat. `suggestTeam` (default
+ * true) lets a manager with no team picked launch the suggested one; "Another team" turns it off.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
   domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON, initialStep = 1,
+  suggestTeam = true,
 }) {
   const [step, setStep] = useState(() => Math.min(3, Math.max(1, Math.round(Number(initialStep)) || 1)));
   const [confirmation, setConfirmation] = useState(null);
@@ -259,8 +262,8 @@ export default function SetupOverlay({
   const { sets: seasonSets = NO_TEAMS, state: seasonState = 'idle', message: seasonMessage = null, sport: seasonSport = null } = season || IDLE_SEASON;
   const model = useMemo(() => setupModel.buildSetupModel(setup, {
     managerTeams, domestic: { state: mapState, message: mapMessage }, launching,
-    season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport },
-  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport]);
+    season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport }, suggest: suggestTeam,
+  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam]);
   const { rules } = model;
   const manager = model.role === 'manager';
   /** Football clubs also offer one country's own top clubs: a long, scrolling theatre list in two groups. */
@@ -742,7 +745,8 @@ export default function SetupOverlay({
                     <div className="setup-teams" role="radiogroup" aria-labelledby="setup-team-label" aria-required="true"
                       ref={nationList} onKeyDown={typeAhead}>
                       {model.teams.map((team, index) => {
-                        const checked = team.id === setup.managedTeamId;
+                        // The suggested team is checked until the player picks one (model.managedId).
+                        const checked = team.id === model.managedId;
                         const focusable = checked || (!model.managed && index === 0);
                         return (
                           <button type="button" role="radio" key={team.id} aria-checked={checked} tabIndex={focusable ? 0 : -1}
@@ -757,7 +761,7 @@ export default function SetupOverlay({
                     </div>
                   ) : <p className="setup-empty">{model.teamsEmpty}</p>}
                   {/* Native mirror of the team radios (PLAN §4.7 `#setup-managed-team`, value-bound). */}
-                  <select id="setup-managed-team" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={setup.managedTeamId || ''}
+                  <select id="setup-managed-team" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={model.managedId || ''}
                     onChange={event => pick('managedTeamId', event.target.value)}>
                     <option value="" disabled>Choose your team</option>
                     {model.teams.map(team => <option key={team.id} value={team.id}>{`${team.name} · ${team.ratingText} strength`}</option>)}

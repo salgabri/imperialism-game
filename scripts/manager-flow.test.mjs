@@ -9,6 +9,7 @@ import { buildTeam, makeRng, teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { PlaybackClock } from '../src/engine/playbackClock.js';
 import { loadSave, loadCampaign, parseCampaign, exportCampaign } from '../src/engine/storage.js';
+import { suggestedTeamId } from '../src/screens/setup/setupModel.js';
 import { SAVE_KEY } from '../src/config.js';
 
 const bundled = await build({
@@ -111,7 +112,8 @@ test('manager launch requires an included team and records that immutable team o
   const f = fixture();
   try {
     f.app.persist(); const previous = f.storage.getItem(SAVE_KEY);
-    f.app.setState({ phase: 'setup', setup: { ...f.app.state.settings, managedTeamId: '', seed: String(f.app.state.seed) } });
+    // Without the suggestion ("Another team" after a defeat) a manager must pick.
+    f.app.setState({ phase: 'setup', setupSuggest: false, setup: { ...f.app.state.settings, managedTeamId: '', seed: String(f.app.state.seed) } });
     f.app.startCampaign();
     assert.equal(f.app.state.phase, 'setup'); assert.match(f.app.state.saveStatus.message, /Choose the team/);
     assert.equal(f.storage.getItem(SAVE_KEY), previous);
@@ -119,6 +121,61 @@ test('manager launch requires an included team and records that immutable team o
     assert.equal(f.app.state.phase, 'playing'); assert.equal(f.app.state.managedTeamId, '276');
     assert.equal(f.app.state.initialSettings.managedTeamId, '276');
   } finally { f.close(); }
+});
+
+test('a new campaign manages by default and launches the suggested favourite when no team is picked', () => {
+  const f = fixture();
+  try {
+    assert.equal(f.app.state.setup.role, 'manager', 'the new-campaign default');
+    assert.equal(f.app.state.setup.managedTeamId, '');
+    assert.equal(f.app.state.setupSuggest, true);
+    f.app.setState({ phase: 'setup' });
+    const favourite = suggestedTeamId(f.app.setupTeams());
+    assert.ok(favourite);
+    f.app.startCampaign();
+    assert.equal(f.app.state.phase, 'playing');
+    assert.deepEqual([f.app.state.managedTeamId, f.app.state.followedId, f.app.state.settings.managedTeamId], [favourite, favourite, favourite]);
+    assert.match(f.app.state.campaignName, new RegExp(` · ${f.app.state.teams[favourite].name}$`));
+    const strongest = Object.values(f.app.state.teams).sort((a, b) => teamEff(b) - teamEff(a))[0];
+    assert.equal(favourite, strongest.id, 'the suggestion is the strongest team');
+  } finally { f.close(); }
+});
+
+test('Skip to my next match plays on at Fast-forward pace and stops at your next decision with your speed and autoplay', () => {
+  const f = fixture({ ids: ['250', '276', '826', '380'] });
+  try {
+    assert.equal(f.app.canSkipAhead(), true);
+    f.app.setSpeed(2);
+    f.app.skipToNextMatch();
+    assert.deepEqual(f.app.state.skipAhead, { speed: 2, autoplay: false, from: 0 });
+    assert.deepEqual([f.app.state.speed, f.app.state.autoplay], [4, true]);
+    assert.equal(f.app.canSkipAhead(), false, 'not twice');
+    for (let i = 0; i < 400 && !f.app.state.tacticalChoice && !f.app.state.pendingTarget; i++) f.time.advance(50);
+    assert.ok(f.app.state.tacticalChoice, 'stopped at your tactical gate');
+    assert.equal(f.app.state.skipAhead, null);
+    assert.deepEqual([f.app.state.speed, f.app.state.autoplay], [2, false], 'your speed and autoplay are back');
+    assert.equal(f.app.state.tacticalChoice.resumeAutoplay, false, 'the kick-off resumes the autoplay you had before skipping');
+    assert.equal(f.app.canSkipAhead(), false, 'a decision is waiting');
+    assert.ok(f.app.state.matches >= 0);
+  } finally { f.close(); }
+  const g = fixture({ ids: ['250', '276', '826', '380'] });
+  try {
+    g.app.skipToNextMatch();
+    g.app.stopSkip();
+    assert.deepEqual([g.app.state.skipAhead, g.app.state.speed, g.app.state.autoplay], [null, 1, false], 'Stop hands everything back');
+    g.app.skipToNextMatch();
+    g.app.pausePlayback();
+    assert.deepEqual([g.app.state.skipAhead, g.app.state.speed, g.app.state.paused], [null, 1, true], 'Pause ends the skip too');
+    g.app.pausePlayback();
+    g.app.skipToNextMatch();
+    g.app.setSpeed(2);
+    g.app.stopSkip();
+    assert.equal(g.app.state.speed, 2, 'a speed picked while skipping is the one handed back');
+  } finally { g.close(); }
+  const spectator = fixture({ role: 'spectator' });
+  try {
+    assert.equal(spectator.app.canSkipAhead(), false, 'a spectator has no next match of their own to skip to');
+  } finally { spectator.close(); }
 });
 
 test('tactical choice precedes production outcome RNG and cannot be stolen by changing favourite', () => {

@@ -86,6 +86,12 @@ main.campaign-layout {
 }
 .phone-bar__tool[aria-pressed=true] { background:#fff; color:var(--you); box-shadow:none; }
 .phone-bar__tool:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+/* Under 360px Skip, Auto and the speed keep their 44px targets as icons and figures, so the primary keeps its label. */
+@media (max-width:359.98px) {
+  .phone-bar { gap:8px; padding:0 14px; }
+  .phone-bar__tool { padding:0; }
+  .phone-bar__tool > span { display:none; }
+}
 .app-shell[data-view=conquest] > .phone-bar { height:calc(56px + max(22px, var(--safe-bottom))); padding-bottom:max(22px, var(--safe-bottom)); }
 
 /* ---- Phone tab bar (RM §2.10) ---- */

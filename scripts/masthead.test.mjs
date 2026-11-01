@@ -544,6 +544,18 @@ test('PhoneBar: Auto and speed sit outside the primary, with their own names and
     assert.equal(view.host.querySelector('.phone-bar__speed').textContent, '1×');
     await view.render(props(null));
     assert.equal(view.host.querySelector('.phone-bar__playback'), null, 'a decision hides the playback controls');
+
+    // Skip to your next match takes the right text's place, ahead of Auto.
+    await view.render({ ...props({ autoplay: false, speed: 1, showAutoplay: true }), skip: true, onSkip: () => calls.push('skip') });
+    const tools = [...view.host.querySelectorAll('.phone-bar__playback button')];
+    assert.deepEqual(tools.map(button => button.getAttribute('aria-label')),
+      ['Skip to your next match', 'Autoplay', 'Playback speed 1 times. Change speed.']);
+    assert.equal(view.host.querySelector('.phone-bar__right'), null, 'the round makes room');
+    await act(async () => tools[0].click());
+    assert.equal(calls.at(-1), 'skip');
+    await view.render({ ...props({ autoplay: true, speed: 4, showAutoplay: true }), skip: false, onSkip() {} });
+    assert.equal(view.host.querySelector('.phone-bar__skip'), null, 'not while skipping or waiting on a decision');
+    assert.equal(view.host.querySelector('.phone-bar__right').textContent, 'Round XI');
   });
 });
 

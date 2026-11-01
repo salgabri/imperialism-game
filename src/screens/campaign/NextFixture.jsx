@@ -27,7 +27,7 @@ export function OddsRow({ odds }) {
  * The `matchCard` slot is rendered whenever App passes it (i.e. whenever `st.match` exists).
  * Headings: the section name ("Next fixture") is the h2, the matchup an h3 under it.
  */
-export default function NextFixture({ fixture = null, idleText = null, matchCard = null, onPreview, onSimulate }) {
+export default function NextFixture({ fixture = null, idleText = null, matchCard = null, onPreview, onSimulate, onSkip, onStopSkip }) {
   const model = fixture || {};
   const state = model.state || 'idle';
   const kicker = model.kicker || 'Next fixture';
@@ -38,6 +38,10 @@ export default function NextFixture({ fixture = null, idleText = null, matchCard
   const preview = !!actions.preview && typeof onPreview === 'function';
   const simulate = !!actions.simulate && typeof onSimulate === 'function';
   const next = model.next || null;
+  // "Skip to my next match" (fixture.skip, campaign.js skipAheadModel): offered between your decisions, Stop while it runs.
+  const skip = model.skip || null;
+  const skipping = !!skip?.active;
+  const skipOffered = !!skip && !skipping && typeof onSkip === 'function';
   return (
     <section className={`fixture fixture--${state}`} aria-labelledby="fixture-kicker">
       <div className="kicker">
@@ -60,6 +64,11 @@ export default function NextFixture({ fixture = null, idleText = null, matchCard
       {next && next.title ? <p className="fixture__next">
         <span className="fixture__next-title">{next.title}</span>{next.route ? ` · ${next.route}` : null}
       </p> : null}
+      {skipOffered && <button type="button" className="btn-secondary fixture__skip" onClick={() => onSkip()}>Skip to your next match</button>}
+      {skipping && <p className="fixture__skipping" role="status">
+        <span>{`Skipping to your next match · ${skip.played} ${skip.played === 1 ? 'match' : 'matches'} played`}</span>
+        {typeof onStopSkip === 'function' && <button type="button" className="btn-link fixture__skip-stop" onClick={() => onStopSkip()}>Stop</button>}
+      </p>}
     </section>
   );
 }

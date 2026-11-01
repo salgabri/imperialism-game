@@ -59,12 +59,12 @@ function pruneMatchTasks() {
 }
 
 /**
- * Whether the match runs on the live ticker: Live shows every match minute by minute; Fast-forward only yours
- * (App.ownMatch); Final score only and "simulate the result" none.
+ * Whether the match runs on the live ticker: Live shows every match minute by minute; Fast-forward (or a skip ahead,
+ * App.fastPlayback) only yours (App.ownMatch); Final score only and "simulate the result" none.
  */
 function playsLive(st, m) {
   if (m.instant || m.express) return false;
-  return st.settings.express ? this.ownMatch(st, m.aId, m.dId) : st.settings.resolution !== 'instant';
+  return this.fastPlayback(st) ? this.ownMatch(st, m.aId, m.dId) : st.settings.resolution !== 'instant';
 }
 
 /** The shoot-out kicks still to reveal, in chronological order (HEAD presentMatch). */

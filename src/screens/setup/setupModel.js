@@ -521,12 +521,26 @@ const NO_ROWS = Object.freeze([]);
 const NO_CLUBS = Object.freeze({ clubs: NO_ROWS });
 const PENDING_PREVIEW = Object.freeze({ matches: '–', duration: '–' });
 
+/** Strongest first, then by name: the order of the Favourites list and the suggested team's tie-break. */
+const byRating = (a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name));
+
+/**
+ * The team a manager plays when none is picked: the favourite, the strongest in the theatre, for a long first campaign
+ * with decisions to make. Shared by the wizard (shown as suggested) and App's launch, so both name the same team.
+ * `managerTeams` is App's `setupTeams()` list → an id, or null for an empty list.
+ */
+export function suggestedTeamId(managerTeams = []) {
+  return Array.isArray(managerTeams) && managerTeams.length ? managerTeams.slice().sort(byRating)[0].id : null;
+}
+
 /**
  * The wizard model. `ctx.managerTeams` is App's `setupTeams()` list: [{ id, name, rating }] sorted by name
  * (optional extras: `code`, `isClub`, `meta`, `players: [{ pos, name, rating }]`, `neighbours: [teamId]`).
  * `ctx.domestic` is App's load state of the chosen country map ({ state: idle | loading | ready | error, message });
  * `ctx.launching` is true while App prepares a country campaign after Launch. `ctx.season` is App's `seasonStatus()`:
  * the listed data sets and the chosen one's load state ({ sets, state, message, sport }), `sport` once it has loaded.
+ * A manager with no team picked has the suggested one (suggestedTeamId) unless `ctx.suggest` is false ("Another team"
+ * after a defeat waits for a pick).
  */
 export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
@@ -571,7 +585,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const setLoading = dataSet != null ? `Loading the ${setName} season…` : '';
   const setFailed = dataSet != null ? `The ${setName} season could not be loaded.` : '';
 
-  const ranked = managerTeams.slice().sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name)));
+  const ranked = managerTeams.slice().sort(byRating);
   const rankOf = new Map(ranked.map((team, index) => [team.id, index + 1]));
   const field = managerTeams.length;
   const row = team => {
@@ -584,7 +598,10 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   };
   const teams = managerTeams.map(row);
   const role = setup.role === 'manager' ? 'manager' : 'spectator';
-  const picked = managerTeams.find(team => team.id === setup.managedTeamId) || null;
+  const chosenTeam = managerTeams.find(team => team.id === setup.managedTeamId) || null;
+  // No pick yet: the suggested team stands in (checked, described and launched) until the player picks another.
+  const suggestion = role === 'manager' && !chosenTeam && ctx.suggest !== false && ranked.length ? ranked[0] : null;
+  const picked = chosenTeam || suggestion;
   let managed = null;
   if (role === 'manager' && picked) {
     const identity = teamIdentity(sport, picked.id, clubLayer);
@@ -592,7 +609,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     managed = {
       ...row(picked),
       meta: picked.meta || [identity.group || country?.name, `${sport.name} ${noun}`].filter(Boolean).join(' · '),
-      rankText: `${rank} / ${field}`, tier: tierOf(rank, field),
+      rankText: `${rank} / ${field}`, tier: tierOf(rank, field), suggested: !!suggestion,
       players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
       })),
@@ -655,7 +672,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     acquisitionPolicy: valid(RECRUITMENT_OPTIONS, setup.acquisitionPolicy, 'highest-rated'),
     rosterPreset: valid(ROSTER_OPTIONS, setup.rosterPreset, 'authentic'),
     moreRules: moreRulesSummary(setup),
-    role, teams, field, managed, favourites, longShots, canLaunch,
+    role, teams, field, managed, managedId: role === 'manager' ? picked?.id ?? null : null, favourites, longShots, canLaunch,
     // Spectators pick no team, so their step-3 heading names what they do choose.
     roleTitle: role === 'manager' ? `Choose your ${noun}` : 'Choose your role',
     roleMeta: `${scopeName} · ${sport.name} ${nouns}${pending ? '' : ` · ${count} ${nouns}`}`,

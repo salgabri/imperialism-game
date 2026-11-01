@@ -18,7 +18,7 @@ import { strengthSteps } from '../src/viewModels/map.js';
 import { empireNeighbors } from '../src/engine/campaign.js';
 import { reachableTargets } from '../src/engine/turns.js';
 import {
-  buildColumn, buildFixture, buildFronts, buildLatestResults, buildMapOverlays, buildTicker,
+  buildColumn, buildFixture, buildFronts, buildLatestResults, buildMapOverlays, buildTicker, skipAheadModel,
 } from '../src/viewModels/campaign.js';
 
 // ---------- component bundle (classic JSX, CSS empty — the visual-polish/ui-interaction harness) ----------
@@ -231,6 +231,38 @@ test('tactical gate offers Match preview and simulate with the balanced pre-matc
   assert.equal(`${serbia.win} ITA`, fixture.odds.bLabel);
   assert.equal(serbia.tone, winTone(Number(serbia.win.replace(/[<>%]/g, '')) / 100));
   assert.equal(fixture.approach, null, 'no estimates, no approach line');
+});
+
+test('skipAheadModel: offered to a manager between decisions, counting while it runs, never to spectators', () => {
+  assert.deepEqual(skipAheadModel(state(), '380'), { active: false });
+  assert.deepEqual(buildFixture(state(), context(state())).skip, { active: false }, 'the fixture block carries it');
+  assert.deepEqual(skipAheadModel(state({ matches: 7, skipAhead: { speed: 1, autoplay: false, from: 3 } }), '380'), { active: true, played: 4 });
+  assert.equal(skipAheadModel(state(), null), null, 'a spectator');
+  assert.equal(skipAheadModel(state({ aliveIds: ['688', '040'] }), '380'), null, 'a fallen manager');
+  assert.equal(skipAheadModel(state({ phase: 'victory' }), '380'), null);
+  for (const gate of [{ tacticalChoice: { aId: '688', dId: '380' } }, { choice: {} }, { pendingTarget: {} }, { managerElimination: {} }]) {
+    assert.equal(skipAheadModel(state(gate), '380'), null, `waiting on ${Object.keys(gate)[0]}`);
+  }
+  assert.equal(skipAheadModel(state({ match: { aId: '688', dId: '380', applied: false } }), '380'), null, 'your own match is on');
+  assert.deepEqual(skipAheadModel(state({ match: { aId: '688', dId: '040', applied: false } }), '380'), { active: false }, 'another match is on');
+  assert.deepEqual(skipAheadModel(state({ match: { aId: '688', dId: '380', applied: true } }), '380'), { active: false }, 'yours is over');
+});
+
+test('NextFixture: Skip to your next match, then its progress and Stop', async context => {
+  const calls = [];
+  const fixture = { ...buildFixture(state(), contextOf(state())), skip: { active: false } };
+  const view = await mount(NextFixture, { fixture, onSkip: () => calls.push('skip'), onStopSkip: () => calls.push('stop') }, context);
+  const skip = [...view.host.querySelectorAll('button')].find(button => button.textContent === 'Skip to your next match');
+  assert.ok(skip.classList.contains('btn-secondary'));
+  await click(skip);
+  await view.render({ fixture: { ...fixture, skip: { active: true, played: 1 } }, onSkip: () => calls.push('skip'), onStopSkip: () => calls.push('stop') });
+  const status = view.host.querySelector('.fixture__skipping[role="status"]');
+  assert.equal(text(status.querySelector('span')), 'Skipping to your next match · 1 match played');
+  assert.equal([...view.host.querySelectorAll('button')].some(button => button.textContent === 'Skip to your next match'), false);
+  await click(status.querySelector('button'));
+  assert.deepEqual(calls, ['skip', 'stop']);
+  await view.render({ fixture: { ...fixture, skip: null } });
+  assert.equal(view.host.querySelector('.fixture__skip, .fixture__skipping'), null, 'not offered: nothing shown');
 });
 
 test('tactical gate odds and approach line follow the recommended approach Continue kicks off with', () => {
