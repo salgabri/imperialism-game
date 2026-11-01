@@ -1,5 +1,6 @@
-// Reproducible, headless balance report. Run: node scripts/balance.mjs --runs=12
-// These are probes of the game's model, not forecasts of real sporting results.
+// Reproducible, headless balance report. Run: node scripts/balance.mjs --runs=12 [--home]
+// These are probes of the game's model, not forecasts of real sporting results. `--home` plays every match at the
+// defender's home (the Home advantage launch rule); matches are at a neutral venue otherwise, as campaigns default.
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { NATIONS, DEPENDENCIES, buildTeam, hashStr, makeRng, teamEff } from '../src/data/teams.js';
@@ -23,7 +24,8 @@ function world() {
   return geography;
 }
 
-export function probeCampaign({ sport, seed = 1, scope = 'elite', pacing = 'blitz', preset = 'balanced', finalSeries = 1, acquisition = 'best-rating' }) {
+export function probeCampaign({ sport, seed = 1, scope = 'elite', pacing = 'blitz', preset = 'balanced', finalSeries = 1, acquisition = 'best-rating',
+  home = false }) {
   const rosterRng = makeRng(hashStr(`rosters:${seed}`));
   let included = Object.keys(NATIONS).map(id => buildTeam(id, rosterRng, sport));
   if (scope === 'elite') included = included.sort((a, b) => b.str - a.str || teamEff(b) - teamEff(a)).slice(0, 32);
@@ -37,7 +39,7 @@ export function probeCampaign({ sport, seed = 1, scope = 'elite', pacing = 'blit
   const drawRng = makeRng(hashStr(`draws:${seed}`));
   const drama = UNCERTAINTY_PRESETS[preset]?.drama ?? 6;
   let queue = [];
-  let fixtures = 0, games = 0, redraws = 0, emptyDraws = 0;
+  let fixtures = 0, games = 0, redraws = 0, emptyDraws = 0, attackerWins = 0;
   let strengthTurnovers = 0, territoryTurnovers = 0, usefulAcquisitions = 0, unchangedAcquisitions = 0;
   let acquisitionGain = 0;
   const leader = by => board.aliveIds.slice().sort((a, b) => by(b) - by(a) || a.localeCompare(b))[0];
@@ -68,10 +70,12 @@ export function probeCampaign({ sport, seed = 1, scope = 'elite', pacing = 'blit
     const winsNeeded = Math.floor(seriesLength / 2) + 1;
     let aWins = 0, dWins = 0;
     while (aWins < winsNeeded && dWins < winsNeeded) {
-      const result = sport.simulate(matchRng, a, d, drama, teamEff(a), teamEff(d));
+      // A final series replays the same attacker, so with home advantage its defender hosts every game.
+      const result = sport.simulate(matchRng, a, d, drama, teamEff(a), teamEff(d), { home });
       if (result.winner === aId) aWins++; else dWins++;
       games++;
     }
+    if (aWins > dWins) attackerWins++;
     const winner = aWins > dWins ? a : d;
     const loser = winner === a ? d : a;
     const before = teamEff(winner);
@@ -96,12 +100,12 @@ export function probeCampaign({ sport, seed = 1, scope = 'elite', pacing = 'blit
   }
   const championId = board.aliveIds.length === 1 ? board.aliveIds[0] : null;
   return {
-    seed, sport: sport.id, scope, pacing, preset, finalSeries, acquisition,
+    seed, sport: sport.id, scope, pacing, preset, finalSeries, acquisition, home,
     completed: !!championId, stalled, startingTeams: included.length, survivors: board.aliveIds.length,
     champion: championId ? teams[championId].name : null,
     championInitialRank: championId ? initialRank.indexOf(championId) + 1 : null,
     championStrengthGain: championId ? Math.round((teamEff(teams[championId]) - initialRatings[championId]) * 10) / 10 : null,
-    fixtures, games, redraws, strengthTurnovers, territoryTurnovers,
+    fixtures, games, redraws, attackerWins, strengthTurnovers, territoryTurnovers,
     usefulAcquisitions, unchangedAcquisitions, acquisitionGain: Math.round(acquisitionGain * 10) / 10,
   };
 }
@@ -112,9 +116,15 @@ export function summarizeCampaigns(results) {
   const mean = key => Math.round(results.reduce((total, result) => total + result[key], 0) / Math.max(1, results.length) * 100) / 100;
   const champions = {};
   for (const result of completed) champions[result.champion] = (champions[result.champion] || 0) + 1;
+  const fixtures = results.reduce((total, result) => total + result.fixtures, 0);
   return {
     runs: results.length, completed: completed.length, stalled: results.filter(result => result.stalled).length,
-    champions, topFiveChampionShare: completed.filter(result => result.championInitialRank <= 5).length / Math.max(1, completed.length),
+    champions, distinctChampions: Object.keys(champions).length,
+    leadingChampionShare: Math.max(0, ...Object.values(champions)) / Math.max(1, completed.length),
+    topFiveChampionShare: completed.filter(result => result.championInitialRank <= 5).length / Math.max(1, completed.length),
+    meanChampionInitialRank: Math.round(completed.reduce((total, result) => total + result.championInitialRank, 0) / Math.max(1, completed.length) * 100) / 100,
+    // Fixtures (a final series counts once) the attacker won, taking the defender's territory.
+    attackerWinShare: results.reduce((total, result) => total + (result.attackerWins || 0), 0) / Math.max(1, fixtures),
     meanFixtures: mean('fixtures'), meanGames: mean('games'), meanRedraws: mean('redraws'),
     meanStrengthLeaderTurnovers: mean('strengthTurnovers'), meanTerritoryLeaderTurnovers: mean('territoryTurnovers'),
     usefulAcquisitionShare: results.reduce((total, result) => total + result.usefulAcquisitions, 0) / Math.max(1, acquisitions),
@@ -126,17 +136,18 @@ export function summarizeCampaigns(results) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const requestedRuns = Number(process.argv.find(argument => argument.startsWith('--runs='))?.split('=')[1] || 12);
   const runs = Math.max(1, Math.min(200, Number.isFinite(requestedRuns) ? Math.round(requestedRuns) : 12));
+  const home = process.argv.includes('--home');
   const report = { note: 'Seeded model probes; single and series variants share roster, draw and per-fixture random streams.',
-    scope: 'elite', campaignPreset: 'balanced', acquisition: 'best-rating', seedStart: 20261002,
+    scope: 'elite', campaignPreset: 'balanced', acquisition: 'best-rating', homeAdvantage: home, seedStart: 20261002,
     seriesStartsAt: 2, runs, ratingGapProbes: [], campaigns: [] };
   for (const sport of SPORT_LIST) {
     const synthetic = (rating, id) => ({ id, sport: sport.id, squad: sport.positionPlan.map((pos, index) => ({ name: `${id}-${index}`, pos, rating })) });
     for (const preset of Object.keys(UNCERTAINTY_PRESETS)) for (const gap of [0, 5, 10, 20]) {
-      const odds = estimateWinProbability({ sport, attacker: synthetic(65 + gap, 'A'), defender: synthetic(65, 'D'), preset, samples: 5000 });
+      const odds = estimateWinProbability({ sport, attacker: synthetic(65 + gap, 'A'), defender: synthetic(65, 'D'), preset, home, samples: 5000 });
       report.ratingGapProbes.push({ sport: sport.id, preset, gap, favouriteWinChance: odds.attacker, samples: odds.samples });
     }
     for (const pacing of ['blitz', 'chaos', 'duel']) for (const finalSeries of [1, 3]) {
-      const results = Array.from({ length: runs }, (_, index) => probeCampaign({ sport, seed: 20261002 + index, pacing, finalSeries }));
+      const results = Array.from({ length: runs }, (_, index) => probeCampaign({ sport, seed: 20261002 + index, pacing, finalSeries, home }));
       report.campaigns.push({ sport: sport.id, pacing, finalSeries, ...summarizeCampaigns(results) });
       console.error(`${sport.id} ${pacing} finalSeries=${finalSeries}: ${results.filter(result => result.completed).length}/${runs} completed`);
     }

@@ -261,7 +261,7 @@ export function targetOptions(st, ctx, attackerId) {
     && st.pendingTarget.optionIds.length ? st.pendingTarget.optionIds : null;
   const reach = pending ? null : reachOf(st, ctx, attackerId);
   return memo(ctx?.cache, `turn:options:${attackerId}`,
-    [st.teams, st.own, st.aliveIds, pending, reach, ctx?.sport, ctx?.drama, ctx?.managedId], () => {
+    [st.teams, st.own, st.aliveIds, pending, reach, ctx?.sport, ctx?.drama, ctx?.homeAdvantage, ctx?.managedId], () => {
       const alive = new Set(st.aliveIds || []);
       const ids = [...new Set(pending || reach.map(item => item.tid))]
         .filter(id => id !== attackerId && st.teams[id] && alive.has(id));

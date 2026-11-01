@@ -104,6 +104,11 @@ export const ROSTER_HELP = {
   authentic: 'Teams start at their real-world strength.',
   competitive: 'The gaps between strong and weak teams shrink; each roster keeps its own stars.',
 };
+export const HOME_OPTIONS = Object.freeze([['off', 'Off'], ['on', 'On']]);
+export const HOME_HELP = {
+  off: 'Every match is played on neutral ground.',
+  on: 'The defending team plays at home and wins a little more often, as home teams do, so conquests are harder.',
+};
 
 /**
  * "Show matches": `resolution` and `express` as one choice that can change any time. Express reveals every match at
@@ -152,6 +157,7 @@ export function moreRulesSummary(setup = {}) {
   if (uncertainty !== 'balanced') parts.push(`Upsets: ${nameOf(UNCERTAINTY_OPTIONS, uncertainty)}`);
   if (setup.finale === 'best-of-three') parts.push(`Final: ${nameOf(FINALE_OPTIONS, 'best-of-three')}`);
   if (setup.acquisitionPolicy === 'best-fit') parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
+  if (setup.homeAdvantage === 'on') parts.push(`Home advantage: ${nameOf(HOME_OPTIONS, 'on')}`);
   if (setup.rosterPreset === 'competitive' && getSport(setup.sport).id === 'basketball') {
     parts.push(`Team strengths: ${nameOf(ROSTER_OPTIONS, 'competitive')}`);
   }
@@ -163,6 +169,7 @@ export function moreRulesSummary(setup = {}) {
 /**
  * The in-game settings' read-only "This campaign" rows, from the launched settings. Missing or unknown values read as
  * their defaults, so old saves and partial fixtures never show `undefined`. `stored` is the value behind the text.
+ * Home advantage has a row only when it is on, as team strengths has one only in basketball.
  * → [{ id, label, value, stored, inner?: { id, stored }, num? }]
  */
 export function campaignFacts(settings = {}, { seed = null, managementEnded = false, managedName = null } = {}) {
@@ -193,6 +200,7 @@ export function campaignFacts(settings = {}, { seed = null, managementEnded = fa
     { id: 'finale', label: 'Final', value: nameOf(FINALE_OPTIONS, finale), stored: finale },
     { id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment },
   );
+  if (s.homeAdvantage === 'on') rows.push({ id: 'home-advantage', label: 'Home advantage', value: nameOf(HOME_OPTIONS, 'on'), stored: 'on' });
   if (s.sport === 'basketball') rows.push({ id: 'roster-preset', label: 'Team strengths', value: nameOf(ROSTER_OPTIONS, roster), stored: roster });
   if (seed != null && String(seed) !== '') rows.push({ id: 'seed', label: 'Seed', value: String(seed), stored: String(seed), num: true });
   return rows;
@@ -654,6 +662,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     finale: valid(FINALE_OPTIONS, setup.finale, 'single'),
     acquisitionPolicy: valid(RECRUITMENT_OPTIONS, setup.acquisitionPolicy, 'highest-rated'),
     rosterPreset: valid(ROSTER_OPTIONS, setup.rosterPreset, 'authentic'),
+    homeAdvantage: valid(HOME_OPTIONS, setup.homeAdvantage, 'off'),
     moreRules: moreRulesSummary(setup),
     role, teams, field, managed, favourites, longShots, canLaunch,
     // Spectators pick no team, so their step-3 heading names what they do choose.

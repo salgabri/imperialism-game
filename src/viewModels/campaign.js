@@ -131,7 +131,7 @@ function gateApproach(st, aId, dId) {
  */
 function fixtureOdds(st, ctx, aId, dId) {
   const tactic = gateApproach(st, aId, dId)?.id || 'balanced';
-  return memo(ctx?.cache, 'col:fixture-odds', [st?.teams, aId, dId, ctx?.managedId ?? null, ctx?.drama, ctx?.sport, tactic],
+  return memo(ctx?.cache, 'col:fixture-odds', [st?.teams, aId, dId, ctx?.managedId ?? null, ctx?.drama, ctx?.homeAdvantage, ctx?.sport, tactic],
     () => matchupOdds(st, ctx, aId, dId, { tactic }));
 }
 
@@ -291,7 +291,7 @@ export function buildFronts(st, ctx = {}, { limit = 5, reach = null } = {}) {
   if (!managedId || !teams[managedId] || !board || !aliveSet(st).has(managedId) || st?.pendingTarget) return null;
   const override = fixtureOverride(st, ctx);
   return memo(ctx.cache, 'col:fronts',
-    [st.own, st.teams, st.aliveIds, managedId, limit, reach, ctx.sport, ctx.drama, st.settings?.layer ?? null,
+    [st.own, st.teams, st.aliveIds, managedId, limit, reach, ctx.sport, ctx.drama, ctx.homeAdvantage, st.settings?.layer ?? null,
       override?.opponentId ?? null, override?.win ?? null, override?.tone ?? null],
     () => {
       let targets = reach;

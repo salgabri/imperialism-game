@@ -214,9 +214,10 @@ seasons of each league after it (football: the five leagues' mean).
 
 Known gaps, reported but not tested:
 
-- **No home advantage.** Every sport plays at a neutral venue, so the defending
-  side wins half its games. Real home sides win 54–58% in the NBA, 52–56% in the
-  NFL and 52–54% in MLB.
+- **No home advantage by default.** Every sport plays at a neutral venue unless a
+  campaign turns on Home advantage (below), so the defending side wins half its
+  games. Real home sides win 41–48% of football games in ninety minutes, 54–58% in
+  the NBA, 52–56% in the NFL and 52–54% in MLB.
 - **The NFL's key margins.** A touchdown is always 7 (no missed extra points,
   two-point tries or safeties), so exactly-7 margins run high and exactly-3 ones
   low, and a few too few games end within a score.
@@ -228,6 +229,83 @@ Known gaps, reported but not tested:
   strong nations, against about 20% of World Cup knockout games after extra time.
 - **MLB's worst clubs** win about 56 games, where the real worst won 41–55: The
   Show's lowest-rated lineups sit closer to the middle than the worst real clubs.
+
+## Home advantage (optional)
+
+Matches are at a neutral venue unless a campaign turns on **Home advantage** at
+launch (More rules; off by default, listed under This campaign when on, and
+carried by challenge links as `home=on`). On, the defender, which holds the
+territory under attack, plays at home. Each sport's edge lives in its prepared
+match (`prepareMatch(attacker, defender, effA, effD, { home: true })`), so the
+result, the pre-match odds and the live chart read the same edge. The odds add a
+`|home` to their cache key and sample seed; a neutral match keeps the key it always
+had, so neutral campaigns replay exactly as before. Each edge is sized so that equal
+sides win at home about as often as home sides do in the sport's league:
+
+| Sport | The edge at home | Worth | Equal sides win at home | Real home sides |
+| --- | --- | --- | --- | --- |
+| Football | ±0.15 in log scoring rate: 0.39 goals a game | 2.1 rating points | 44–45% in 90 minutes, 58% after the (even) shoot-out | 40.8–47.9% in 90 minutes |
+| Basketball | ±0.012 points a possession: 2.4 points a game (NBA), 1.8 (FIBA) | 1.2 | 57% (NBA), 56% (FIBA) | 54.3–58.0% (NBA) |
+| American football | ±0.65 rating points of drive edge: 1.2 points a game | 0.65 | 54% | 51.5–55.7% |
+| Baseball | ±1.4 rating points of half-inning edge for the side batting last: 0.34 runs a game | 1.4 | 53% | 52.1–54.3% |
+
+"Worth" is the rating advantage an attacker needs for an even match against a home
+defender; a manager's Attack approach adds 0.6 rating points, plus up to 1.2 for
+bench support.
+
+Whole league seasons with the rule on (`npm run simulation:realism -- --home`, 40
+seasons) put every league's home sides inside the real range: 44.5–45.4% home wins
+in ninety minutes across the five football leagues (40.8% in the 2024/25 Premier
+League to 47.9% in the 2022/23 La Liga, from FootballRates and Statista), 55.9% in
+the NBA, 53.4% in the NFL and 53.1% in MLB. Every other measure stays in its range;
+football's draws stay at 23–25%. `scripts/simulation-realism.test.mjs` checks the
+home sides with the rule on, and half the decided games without it;
+`scripts/home-advantage.test.mjs` covers the setting from setup to saves.
+
+### What it does to a campaign
+
+`npm run balance -- --runs=200`, with and without `--home`: the elite 32 nations
+under the blitz, chaos and one-by-one draws, each with a single and a best-of-three
+final, so 1,200 campaigns a sport. American football's nations are fallback
+strengths, as no source rates national teams. Distinct champions are per 200
+campaigns:
+
+| Elite-32 nations | Attackers win | Top-five champions | Most frequent champion | Champion's starting rank | Distinct champions |
+| --- | --- | --- | --- | --- | --- |
+| Football | 47.4% → 39.7% | 42% → 43% | 11% → 11% | 9.9 → 9.8 | 31 → 31 |
+| Basketball | 47.2% → 42.6% | 84% → 85% | 65% → 63% | 3.1 → 3.1 | 17 → 17 |
+| American football | 49.9% → 46.1% | 34% → 38% | 9% → 9% | 11.6 → 10.8 | 48 → 47 |
+| Baseball | 47.4% → 45.0% | 76% → 75% | 33% → 33% | 3.6 → 3.6 | 14 → 15 |
+
+The App's own campaigns (`node scripts/production-balance.mjs --home=off,on`, 80
+for each setup: elite nations with a manager, elite European clubs, and the NBA,
+NFL and MLB clubs) agree.
+
+- **Campaigns are as long.** Every match still ends with the loser's whole empire
+  changing hands, so 32 teams still take 31 matches (32.1–32.5 games with a
+  best-of-three final), and the lead changes hands as often. A failed attack hands
+  the defender the attacker's territory, so the rule moves conquests from attackers
+  to defenders rather than slowing the war.
+- **Attacks fail more often**, in every probe and every App setup: by 6 to 9
+  points in football, where the edge is worth two rating points, and by 2 to 7
+  elsewhere.
+- **Champions are as predictable.** The favourites' share of titles, the most
+  frequent champion's (basketball's USA) and the champion's starting rank stay
+  within a few points. Only American football's fallback nations lean a little
+  towards the favourites. At 40 campaigns a setup the champions seemed to spread
+  out; at 200 that was noise.
+- **A manager's run is unchanged.** In 80 App campaigns a sport (elite nations,
+  random one-by-one draw, a mid-ranked team managed by the best displayed odds), the
+  managed team plays 1.6–1.8 matches and finishes 13th to 17th either way. Every
+  target it picks under "You choose" is now an away match, so the pick matters
+  more.
+- **A best-of-three final keeps its attacker**, so its defender hosts all three
+  games: between equal football sides it wins the series 62% of the time (58% a
+  game). Alternating the venue, the second game at the attacker's home, would make
+  it 54%; that needs a venue per game rather than per campaign.
+
+The rule stays off by default: whether conquest should favour the defender is a
+balance decision, not a realism one.
 
 ## Performance and reproduction
 

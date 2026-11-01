@@ -26,6 +26,11 @@ const formSpread = variation => FORM_AT_BALANCED * (variation / 6) ** 2;
 // Real scores hold more 0-0 and 1-1 draws, and fewer 1-0 wins, than two independent Poisson counts (Dixon and
 // Coles, 1997). The correction keeps each side's mean, and so its chance of winning a level game's shoot-out.
 const LOW_SCORE_RHO = -.12;
+// Home advantage, a campaign option (off: every match is at a neutral venue). The defender, at home, scores at a
+// higher rate and concedes at a lower one, HOME_EDGE apart in log scoring rate: 0.39 goals a game. Between equal sides
+// it then wins 44–45% of games in ninety minutes, as home sides do in Europe's top five leagues (41–48%), and 58% in all:
+// the shoot-out stays even.
+const HOME_EDGE = .3;
 
 function profile(lineup, effective) {
   const means = {};
@@ -43,10 +48,14 @@ function profile(lineup, effective) {
   return { attack: weighted(ATTACK_WEIGHTS), defence: weighted(DEFENCE_WEIGHTS), keeper: means.GK, takers };
 }
 
-/** Reuse the assigned starters and positional matchups across all odds trials. */
-export function prepareFootballMatch(attacker, defender, effA, effD) {
+/**
+ * Reuse the assigned starters and positional matchups across all odds trials. `venue.home`: the defender plays at home
+ * (the campaign's home advantage); a neutral venue otherwise.
+ */
+export function prepareFootballMatch(attacker, defender, effA, effD, { home = false } = {}) {
   const lineupA = selectLineup(attacker), lineupD = selectLineup(defender);
   const a = profile(lineupA, effA), d = profile(lineupD, effD);
+  const edge = home ? HOME_EDGE / 2 : 0;
   // About 73% of shoot-out kicks are scored, as at the World Cups and Euros (68.6% and 77.0%).
   const penalties = (side, opposingKeeper) => {
     const ratings = side.takers.length ? side.takers.map(player => player.effectiveRating) : [40];
@@ -54,8 +63,8 @@ export function prepareFootballMatch(attacker, defender, effA, effD) {
   };
   return {
     aId: attacker.id, dId: defender.id, lineupA, lineupD,
-    logA: (a.attack - d.defence) * RATING_SCALE,
-    logD: (d.attack - a.defence) * RATING_SCALE,
+    logA: (a.attack - d.defence) * RATING_SCALE - edge,
+    logD: (d.attack - a.defence) * RATING_SCALE + edge,
     penaltyA: penalties(a, d.keeper), penaltyD: penalties(d, a.keeper),
   };
 }
@@ -113,7 +122,7 @@ function lowScoreCorrection(rng, ga, gd, la, ld) {
   }
 }
 
-/** Score-only path: neutral venue, correlated tempo and stochastic finishing. */
+/** Score-only path: the venue's edge (in `prepared`), correlated tempo and stochastic finishing. */
 export function sampleFootballResult(rng, prepared, drama = 6) {
   const variation = Number.isFinite(drama) ? clamp(drama, 0, 12) : 6;
   const form = gauss(rng) * formSpread(variation);
@@ -187,8 +196,8 @@ export const football = {
   prepareMatch: prepareFootballMatch,
   sampleResult: sampleFootballResult,
 
-  simulate(rng, attacker, defender, drama, effA, effD) {
-    const prepared = prepareFootballMatch(attacker, defender, effA, effD);
+  simulate(rng, attacker, defender, drama, effA, effD, venue) {
+    const prepared = prepareFootballMatch(attacker, defender, effA, effD, venue);
     const result = sampleFootballResult(rng, prepared, drama);
     return { ...result, ev: goalEvents(rng, result, prepared) };
   },

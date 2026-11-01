@@ -23,6 +23,9 @@ const TD_SCALE = 0.075;
 const FG_SCALE = 0.025;
 // Match-day form in rating points, shifting both sides' edges (the attacker's up, the defender's down).
 const FORM_PER_DRAMA = 0.35;
+// Home advantage, a campaign option (off: every match is at a neutral venue): the defender's drives gain HOME_EDGE rating
+// points of edge at home and the visitors' lose as much. Equal sides then win 54% at home, as NFL home sides do.
+const HOME_EDGE = 0.65;
 // Late-game play-calling over each side's last three possessions of regulation, by its lead before the drive: two
 // scores up it runs the clock, a score up it plays safe, level or within a field goal it plays for three, needing a
 // touchdown it goes for it on fourth down, far behind it chases. NFL games end closer than independent drives would
@@ -67,21 +70,25 @@ export function driveMoments({ td, fgTry, make }) {
   return { mean, variance: 49 * td + 9 * fg - mean * mean, score: td + fg };
 }
 
-/** Prepare a matchup once, including position assignments, for cheap resampling. */
-export function prepareMatch(attacker, defender, effA, effD) {
+/**
+ * Prepare a matchup once, including position assignments, for cheap resampling. `venue.home`: the defender plays at
+ * home (the campaign's home advantage); a neutral venue otherwise.
+ */
+export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}) {
   const lineupA = selectLineup(attacker);
   const lineupD = selectLineup(defender);
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
   const adjustmentD = (Number.isFinite(effD) ? effD : lineupD.rating) - lineupD.rating;
   const a = profile(lineupA), d = profile(lineupD);
+  const edge = home ? HOME_EDGE : 0;
   return {
     attackerId: attacker.id,
     defenderId: defender.id,
     lineupA,
     lineupD,
     drives: DRIVES,
-    edgeA: a.offence + adjustmentA - (d.defence + adjustmentD),
-    edgeD: d.offence + adjustmentD - (a.defence + adjustmentA),
+    edgeA: a.offence + adjustmentA - (d.defence + adjustmentD) - edge,
+    edgeD: d.offence + adjustmentD - (a.defence + adjustmentA) + edge,
     kickingA: a.kicking + adjustmentA,
     kickingD: d.kicking + adjustmentD,
   };
@@ -213,8 +220,8 @@ export const americanFootball = {
   prepareMatch,
   sampleResult,
 
-  simulate(rng, attacker, defender, drama, effA, effD) {
-    const prepared = prepareMatch(attacker, defender, effA, effD);
+  simulate(rng, attacker, defender, drama, effA, effD, venue) {
+    const prepared = prepareMatch(attacker, defender, effA, effD, venue);
     const { ga, gd, regA, regD, tie, plays, winner } = sampleResult(rng, prepared, drama);
     const scorerA = createScorerSampler(prepared.lineupA, TD_WEIGHTS, 50);
     const scorerD = createScorerSampler(prepared.lineupD, TD_WEIGHTS, 50);

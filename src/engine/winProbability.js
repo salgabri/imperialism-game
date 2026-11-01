@@ -5,7 +5,8 @@
 //
 // Football — README §B "Win probability per minute", exactly:
 //   rate(l) = 1.28·exp(1.5·tanh(l/1.5)); rA = rate(logA), rD = rate(logD) where logA/logD come from the repo's
-//   prepareFootballMatch(attacker, defender, effA, effD) called with the MATCH's own effA/effD (tactics included).
+//   prepareFootballMatch(attacker, defender, effA, effD, venue) called with the MATCH's own effA/effD (tactics
+//   included) and venue (a home defender's edge is in logA/logD, as every sport's is in its prepared match).
 //   With r = (90 − t)/90 the goals still to come are Poisson(rA·r) and Poisson(rD·r);
 //   P(A wins) = P(final goal difference > 0) + ½·P(level)   (the shoot-out is a 50/50).
 //   The double sum runs over i, j ∈ 0..15, where 15 stands for "15 or more" so the masses sum to 1 and
@@ -96,15 +97,17 @@ export function footballRate(log) {
  *     side's batting minus the opposing defence, formSd the spread of match-day form in rating points)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
- * is the match's uncertainty (football ignores it, as the README formula does). Calls only the sport's
- * deterministic `prepareMatch`; consumes no RNG.
+ * is the match's uncertainty (football ignores it, as the README formula does); `home`, that the defender plays at
+ * home (the campaign's home advantage: its edge is in the prepared rates, efficiencies and edges, so every kind
+ * carries it). Calls only the sport's deterministic `prepareMatch`; consumes no RNG.
  */
-export function liveModelFor(sport, attacker, defender, effA, effD, drama) {
+export function liveModelFor(sport, attacker, defender, effA, effD, drama, home = false) {
   const model = typeof sport === 'string' ? getSport(sport) : sport;
   if (!model || typeof model.prepareMatch !== 'function' || !attacker || !defender) return null;
   let prepared;
   try {
-    prepared = model.prepareMatch(attacker, defender, isNum(effA) ? num(effA) : undefined, isNum(effD) ? num(effD) : undefined);
+    prepared = model.prepareMatch(attacker, defender, isNum(effA) ? num(effA) : undefined, isNum(effD) ? num(effD) : undefined,
+      home ? { home: true } : undefined);
   } catch {
     return null;
   }

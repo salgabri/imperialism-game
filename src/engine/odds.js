@@ -17,7 +17,9 @@ const estimates = new Map();
 const modelIdentities = new WeakMap();
 let nextModelIdentity = 1;
 
-export function estimateWinProbability({ sport, attacker, defender, preset = 'balanced', drama, effA: overrideA, effD: overrideD, samples = DEFAULT_SAMPLES }) {
+/** `home`: the defender plays at home (the campaign's home advantage); a neutral venue otherwise. */
+export function estimateWinProbability({ sport, attacker, defender, preset = 'balanced', drama, effA: overrideA, effD: overrideD, home = false,
+  samples = DEFAULT_SAMPLES }) {
   const model = typeof sport === 'string' ? getSport(sport) : sport;
   if (!model?.simulate || !attacker || !defender) throw new TypeError('Odds need a sport and both teams.');
   const selectedPreset = UNCERTAINTY_PRESETS[preset] || UNCERTAINTY_PRESETS.balanced;
@@ -25,14 +27,16 @@ export function estimateWinProbability({ sport, attacker, defender, preset = 'ba
   const count = Number.isFinite(samples) ? Math.max(128, Math.min(20000, Math.round(samples))) : DEFAULT_SAMPLES;
   const a = { ...attacker, id: 'estimate-attacker' };
   const d = { ...defender, id: 'estimate-defender' };
+  const venue = home ? { home: true } : undefined;
   const fast = typeof model.prepareMatch === 'function' && typeof model.sampleResult === 'function';
-  const prepared = fast ? model.prepareMatch(a, d, overrideA, overrideD) : null;
+  const prepared = fast ? model.prepareMatch(a, d, overrideA, overrideD, venue) : null;
   const lineupA = prepared?.lineupA || selectLineup(a);
   const lineupD = prepared?.lineupD || selectLineup(d);
   const lineupSignature = lineup => lineup.slots.map(slot => `${slot.position}:${slot.effectiveRating}:${slot.player ? 1 : 0}`).join(',');
   const effA = Number.isFinite(overrideA) ? overrideA : lineupA.rating;
   const effD = Number.isFinite(overrideD) ? overrideD : lineupD.rating;
-  const modelKey = `${model.id}|${model.simulationVersion || 1}|${variation}|${count}|${effA}|${effD}|${lineupSignature(lineupA)}|${lineupSignature(lineupD)}`;
+  // A home venue is its own estimate and sample stream; a neutral one keeps the key (and seeds) it always had.
+  const modelKey = `${model.id}|${model.simulationVersion || 1}|${variation}|${count}|${effA}|${effD}|${lineupSignature(lineupA)}|${lineupSignature(lineupD)}${home ? '|home' : ''}`;
   // Two custom sport objects may share an ID but supply different models.
   // Keep their caches separate without changing reproducible sample seeds.
   if (!modelIdentities.has(model)) modelIdentities.set(model, nextModelIdentity++);
@@ -49,7 +53,7 @@ export function estimateWinProbability({ sport, attacker, defender, preset = 'ba
     // Full timelines and repeated lineup assignment have no bearing on odds.
     // Both paths use the sport's actual score/tie-break model, never a second
     // approximation of its win probabilities.
-    const result = fast ? model.sampleResult(rng, prepared, variation) : model.simulate(rng, a, d, variation, effA, effD);
+    const result = fast ? model.sampleResult(rng, prepared, variation) : model.simulate(rng, a, d, variation, effA, effD, venue);
     wins += result.winner === a.id ? 1 : 0;
   }
   const probability = wins / count;

@@ -1498,12 +1498,14 @@ export default class App extends React.Component {
     const sport = this.sport();
     const managedId = this.managedId(st);
     const baseDrama = UNCERTAINTY_PRESETS[st.settings.uncertainty]?.drama ?? Number(CONFIG.matchDrama);
+    // Home advantage (a launch rule, off by default): the defender plays at home.
+    const home = st.settings.homeAdvantage === 'on';
     if ([attackerId, defenderId].includes(managedId) && !tactic) {
       if (st.tacticalChoice) return;
       this.clearTimers();
       const manager = st.teams[managedId], opponent = managedId === attackerId ? d : a;
       const options = tacticalOptions(manager, opponent, baseDrama).map(option => {
-        const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic: option.id, drama: baseDrama });
+        const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic: option.id, drama: baseDrama, home });
         const odds = estimateWinProbability({ sport, attacker: a, defender: d, ...params, samples: 512 });
         return { ...option, winProbability: managedId === attackerId ? odds.attacker : odds.defender };
       });
@@ -1513,10 +1515,10 @@ export default class App extends React.Component {
         match: null, spin: null, pu: null, toast: null, flash: {}, autoplay: false, paused: false, tacticalPreview: false }, () => this.persist());
       return;
     }
-    const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic, drama: baseDrama });
+    const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic, drama: baseDrama, home });
     const { effA, effD, drama } = params;
-    const sim = sport.simulate(this.rng, a, d, drama, effA, effD);
-    const probabilities = estimateWinProbability({ sport, attacker: a, defender: d, drama, effA, effD, samples: 512 });
+    const sim = sport.simulate(this.rng, a, d, drama, effA, effD, { home });
+    const probabilities = estimateWinProbability({ sport, attacker: a, defender: d, drama, effA, effD, home, samples: 512 });
     const important = [attackerId, defenderId].includes(st.followedId) || [attackerId, defenderId].includes(managedId) || st.aliveIds.length === 2
       || (sim.winner === attackerId ? effA + CONFIG.upsetThreshold <= effD : effD + CONFIG.upsetThreshold <= effA);
     const series = st.aliveIds.length === 2 && st.settings.finale === 'best-of-three'
@@ -1552,7 +1554,7 @@ export default class App extends React.Component {
         tacticalBonus: params.bonus, matchDrama: drama,
         express: !!st.settings.express && !important,
         instant: !!options.instant,
-        live: this.matchLiveModel(sport, a, d, effA, effD, drama),
+        live: this.matchLiveModel(sport, a, d, effA, effD, drama, home),
       },
       spin: null,
       ...this.autoMatchView(st, attackerId, defenderId, { express: !!st.settings.express && !important, instant: !!options.instant }),
@@ -1768,6 +1770,7 @@ export default class App extends React.Component {
       sport: matchSport(st.settings), managedId: managedId || null, followedId,
       perspectiveId: managedId || followedId || null,
       drama: UNCERTAINTY_PRESETS[st.settings?.uncertainty]?.drama ?? Number(CONFIG.matchDrama),
+      homeAdvantage: st.settings?.homeAdvantage === 'on',
       displayRound: displayRound(st), totalTeams: this.teamCount(st.teams),
       labelGeometry: this.labelGeometry || [], viewFocus: this.viewFocus || null, cache: this.vmCache,
       // A country map's section names (null on the world map), so pure view-models name sections without the loader.

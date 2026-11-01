@@ -1,7 +1,8 @@
 // Whole league seasons played with the built-in clubs land in each real league's range (REAL in
-// simulation-realism.mjs, with its seasons and sources). Only what the models set out to match is held here. The known
-// gaps are reported by `npm run simulation:realism` and not tested: no home advantage in any sport, the NFL's key
-// margins (3 and 7) and one-score share, NBA games decided by three or fewer, MLB's worst club.
+// simulation-realism.mjs, with its seasons and sources). Only what the models set out to match is held here. Matches
+// are at a neutral venue unless a campaign turns Home advantage on, so the home sides' wins are checked with it on.
+// The known gaps are reported by `npm run simulation:realism` and not tested: the NFL's key margins (3 and 7) and
+// one-score share, NBA games decided by three or fewer, MLB's worst club.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
@@ -67,4 +68,21 @@ test('MLB: runs, close games, extra innings and the standings look like an MLB s
   // (27.8–29.4%).
   within(mlb.extraInnings, real.extraInnings, 'extra innings', 0.015);
   within(mlb.oneRun, real.oneRun, 'one-run games', 0.01);
+});
+
+test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
+  for (const [label, share] of [['NBA', report.nba.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins]]) {
+    assert.ok(Math.abs(share - 0.5) < 0.015, `${label} neutral: the defender won ${share}`);
+  }
+  for (const league of report.football) {
+    assert.ok(Math.abs(league.homeWins - (1 - league.drawRate) / 2) < 0.02, `${league.league} neutral: ${league.homeWins}`);
+  }
+  const home = realismReport({ seasons: 12, home: true });
+  for (const league of home.football) {
+    within(league.homeWins, REAL.football.homeWins, `${league.league} home wins in ninety minutes`);
+    within(league.drawRate, REAL.football.drawRate, `${league.league} draws at home`);
+  }
+  within(home.nba.homeWins, REAL.nba.homeWins, 'NBA home wins');
+  within(home.nfl.homeWins, REAL.nfl.homeWins, 'NFL home wins');
+  within(home.mlb.homeWins, REAL.mlb.homeWins, 'MLB home wins');
 });
