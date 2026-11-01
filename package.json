@@ -28,6 +28,7 @@
     "test:geography": "node --test scripts/geography.test.mjs scripts/projection.test.mjs",
     "sync-flags": "node scripts/sync-flags.mjs",
     "build:flag-symbols": "node scripts/build-flag-symbols.mjs",
+    "build:icons": "node scripts/build-icons.mjs",
     "preview:flag-symbols": "node scripts/preview-flag-symbols.mjs",
     "build-rosters": "node scripts/build-rosters.mjs",
     "sync:football-manager": "node scripts/sync-football-manager.mjs",
