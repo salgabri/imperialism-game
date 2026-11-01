@@ -894,7 +894,7 @@ communicates the same ownership with flat pastel fills. Flags also identify
 national teams in the masthead, match results, standings, squads and the
 victory screen.
 
-Each **geographic region of an empire** shares one SVG `<pattern>`. Neighboring
+Each **geographic region of an empire** shares one banner. Neighboring
 conquered countries and nearby islands sample the same flag continuously:
 Corsica, Sardinia and Sicily do not each restart a miniature Swiss cross when
 Switzerland owns France and Italy. Regions connect through coast-to-coast gaps
@@ -909,6 +909,14 @@ reveals the flag; seas and neutral countries stay untouched. A solid rectangle
 in the nation's colour is the fallback. Non-participants remain unflagged in
 continental campaigns. A club's land keeps its club colour with its crest placed
 on it, below.
+
+Each banner is drawn once and shown through the outline of each land part, and
+its SVG artwork comes from a bitmap: the first time Flags mode shows a flag, its
+SVG is rasterised in the background at 1024 px on the longer side. Wherever a
+banner is drawn larger than that, it keeps the SVG, so flags stay sharp at any
+zoom. Drawn as SVG `<pattern>` fills, every flag's shapes were re-rendered on
+each repaint, and panning, zooming, hovering and the draw compass lagged in
+Flags mode.
 
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
