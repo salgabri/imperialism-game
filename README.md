@@ -928,6 +928,46 @@ projection; the first-visible-foreign-land targeting rule remains enforced.
 Run `npm run test:geography` for straight-grid/inverse-projection, source-atlas
 coastline and date-line regressions.
 
+## Advertising
+
+The game can show AdSense banner ads, and shows none until a build names a
+publisher. `src/ads.js` loads Google's script and reads the switches below;
+`src/components/AdSlot.jsx` is the only ad unit. There are no full-screen ad
+breaks.
+
+One fixed 300×250 unit sits in the side column of the Ledger (after Share of
+the map) and the Chronicle (after Turning points, above the activity feed),
+under a muted "Advertisements" kicker. AdSense allows only that label or
+"Sponsored Links". The unit holds its size from the first paint. It disappears
+when Google has no ad for it, when the script is blocked, and on phones narrower
+than 336px. The map, match, conquest, squad and setup screens never show a
+banner: Google asks for at least 150px between an ad and a game, and on those
+screens the game is the whole screen.
+
+The switches are read at build time, from the environment or a Vite env file
+such as `.env.production.local` (ignored by git):
+
+```bash
+VITE_ADSENSE_CLIENT=ca-pub-1234567890123456 # your publisher id: turns ads on
+VITE_ADSENSE_SLOT=1234567890                # a fixed-size 300×250 display ad unit
+VITE_ADSENSE_TEST=on                        # mark requests as tests (also loads ads on a dev server)
+```
+
+`npm run build` checks both ids and writes `dist/ads.txt`. AdSense reads that
+file only at the root of the domain, so a game served from a subfolder needs a
+copy there. `npm run dev` requests no ad unless `VITE_ADSENSE_TEST=on`. With a
+publisher and a slot set it shows the reserved slots as empty "300 × 250 ad"
+boxes instead. The test bundles have no Vite env, so the tests never load ads.
+
+In the AdSense account, keep Auto ads off for the site: they would add an anchor
+banner over the phone tab bar and drop units into the campaign column. Publish a
+European regulations message under Privacy & messaging for visitors in the EEA,
+the UK and Switzerland. It runs through the AdSense script the game already
+loads, and it needs the URL of a privacy policy that mentions the saves kept in
+the browser and the ad cookies. Ads make the game commercial, and much of its
+data is licensed for personal or non-commercial use only: see
+[Rights and terms](docs/design/football-year-sources.md#rights-and-terms).
+
 ## Layout
 
 ```
@@ -958,6 +998,7 @@ src/
     primitives.css     shared buttons, kickers, tables, panels
     shell.css          app shell per view and breakpoint, phone chrome
   config.js            simulation tunables (drama, upset threshold, labels), save version
+  ads.js               AdSense script and banner settings (off by default)
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
@@ -999,7 +1040,7 @@ src/
     footballSets.js    lists, loads and validates football seasons; season-bound sport
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
-                       wizard, match card, dialogs and overlays
+                       wizard, match card, dialogs and overlays, the ad slot
 public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display

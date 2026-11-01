@@ -2,6 +2,9 @@ node_modules
 dist
 .snap
 
+# Local Vite env files, such as the AdSense ids (README "Advertising")
+.env*.local
+
 # Third-party data drop, not part of the app
 FM26 Season Update*/
 
