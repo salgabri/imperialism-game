@@ -172,14 +172,21 @@ test('basketball clubs play under NBA rules: kickoff simulates 48 minutes and th
     assert.equal(f.app.state.match.status, sport.labels.end);
     f.app.clearTimers();
 
-    // A real kickoff: NBA scoring and an NBA live model.
+    // A real kickoff: NBA scoring and an NBA live model, at the built-in season's pace (2025/26's).
     f.app.setState({ match: null });
     f.app.startMatch('250', '276');
     const m = f.app.state.match;
     assert.equal(m.live.length, 48);
-    assert.equal(m.live.pace, 100);
+    assert.equal(m.live.pace, 99.4);
     assert.ok(m.allEv.some(event => event.m > 40 && event.m <= 48), 'runs land in the NBA\'s last eight minutes');
     assert.ok(m.allEv.every(event => event.m <= (m.tie ? 48 + 5 * m.tie.periods.length : 48)));
+    f.app.clearTimers();
+
+    // A season campaign plays at its own season's pace.
+    f.app.setState({ match: null, settings: { ...f.app.state.settings, dataSet: 'nba-2k04', dataSeason: '2003/04' } });
+    f.app.startMatch('250', '276');
+    assert.equal(f.app.state.match.live.pace, 90.1);
+    assert.equal(f.app.state.match.live.length, 48);
   } finally { f.close(); }
 });
 

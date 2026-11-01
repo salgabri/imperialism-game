@@ -203,8 +203,8 @@ opposing defence and goalkeeper. Shared match tempo, form and Poisson scoring
 produce varied low-scoring games. Basketball uses shared possessions, positional
 offence/defence, form and shooting variance. Nations play FIBA's four ten-minute
 quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
-quarters at about 100, so club games score about 115 a side, near the league's
-own, rather than in the eighties. American football plays about 11
+quarters at their season's league pace and scoring rate, so games score like
+their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
 possessions a side, each ending in a touchdown, a field goal or nothing by its
 offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
