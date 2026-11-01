@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 
 export const THEME_KEY = 'fi-theme';
+// --surface of each theme (tokens.css): the browser's own bar and an installed app's title bar take the page's ground.
+const THEME_COLOURS = { light: '#f5f5f2', dark: '#121416' };
 const listeners = new Set();
 
 const systemQuery = () => (typeof window !== 'undefined' && window.matchMedia
@@ -21,7 +23,10 @@ export function currentTheme() {
 
 function applyTheme() {
   const theme = currentTheme();
-  if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme;
+  if (typeof document !== 'undefined') {
+    document.documentElement.dataset.theme = theme;
+    document.querySelector?.('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOURS[theme]);
+  }
   listeners.forEach(listener => listener(theme));
 }
 

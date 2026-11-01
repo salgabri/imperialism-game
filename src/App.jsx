@@ -36,6 +36,7 @@ import TacticalChoice from './components/TacticalChoice.jsx';
 import ManagerElimination from './components/ManagerElimination.jsx';
 import CampaignStorageDialog from './components/CampaignStorageDialog.jsx';
 import ExportCheckpoint from './components/ExportCheckpoint.jsx';
+import UpdatePrompt from './components/UpdatePrompt.jsx';
 import CommandBar, { SettingsPanel } from './components/CommandBar.jsx';
 import PlaybackBar from './components/PlaybackBar.jsx';
 import WorldMap from './components/WorldMap.jsx';
@@ -2070,6 +2071,7 @@ export default class App extends React.Component {
         />}
         {st.exportText && <ExportCheckpoint text={st.exportText} filename={st.exportFilename}
           onDownload={() => this.downloadProgress()} onClose={() => this.setState({ exportText: null })} />}
+        <UpdatePrompt campaign={playing} />
         {st.phase === 'loading' && <div className="loading-screen" role={st.err ? 'alert' : 'status'}>
           <span>{st.err || 'Opening the atlas…'}</span>
           {st.err && <button className="button" onClick={() => { this.setState({ err: null }); this.boot(); }}>Try again</button>}
