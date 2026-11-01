@@ -1,15 +1,15 @@
 import React from 'react';
 import { CONFIG } from './config.js';
-import { C } from './theme.js';
+import { C, V4 } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
-import { clearDomesticCache, domesticScope, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
+import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
-import { clubMapScope, domesticEntry, domesticLabel } from './data/domesticScope.js';
+import { domesticEntry, domesticLabel } from './data/domesticScope.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
-  loadFootballSetIndex, retainFootballSets, seasonMapOf, seasonSport, setSportOf, sportOf } from './engine/footballSets.js';
+  loadFootballSetIndex, retainFootballSets, seasonSport, setSportOf, sportOf } from './engine/footballSets.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
@@ -24,7 +24,13 @@ import { createMinuteStore } from './engine/liveMinute.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { countryMapPreview, theatreMapPreview } from './screens/setup/setupModel.js';
-import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf } from './app/shared.js';
+import { challengeUrl, dailyLabel, dailySetup, dayOf, fieldedTeam, isDaily, readChallenge } from './screens/setup/challenge.js';
+import { buildShareCard, shareLine } from './viewModels/shareCard.js';
+import { canDrawShareImage, deliverShareImage, drawShareCard } from './engine/shareImage.js';
+import { politicalFill } from './data/empireColours.js';
+import { flagUrl } from './data/flags.js';
+import { clubLogoUrl } from './data/clubLogos.js';
+import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf, setClubScope } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
 import * as matchM from './app/matchMethods.jsx';
@@ -69,25 +75,6 @@ const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.
 
 /** "Football · Europe"; a data set campaign names its season ("Football 2001/02 · Europe"). */
 const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}${settings.dataSeason ? ` ${settings.dataSeason}` : ''} · ${scopeName}`;
-
-/**
- * The setup's club theatre. A sport with its own map plays only there (basketball: the NBA's USA and Canada, or an
- * earlier season's map of its own era), and another sport's map falls back to every club. A football data set brings
- * its own clubs, so the theatre must be one of them: a country map (built from the built-in data) and a league the set
- * leaves out fall back to every club. Kept as it is while the set loads.
- */
-function setClubScope(setup) {
-  const sportId = getSport(setup.sport).id;
-  const era = setup.dataSet != null && setSportOf(setup.dataSet) === sportId ? seasonMapOf(setup.dataSet) : null;
-  if (era) return domesticScope(era);
-  const own = clubMapScope(sportId);
-  if (own) return own;
-  if (domesticEntry(setup.clubScope)?.sport) return 'all';
-  if (setup.dataSet == null || sportId !== 'football') return setup.clubScope;
-  if (isDomesticScope(setup.clubScope)) return 'all';
-  const sport = sportOf(setup);
-  return !sport || CLUB_SCOPES(sport).some(scope => scope.id === setup.clubScope) ? setup.clubScope : 'all';
-}
 
 /** A club map's row as one of a basketball season's clubs: the season's name, code, strength and five on the map's land. */
 const seasonClub = (row, club) => ({ ...row, name: club.name, code: club.code, league: club.league, str: club.str, squad: club.squad });
@@ -179,6 +166,8 @@ export default class App extends React.Component {
     // setup's chosen one loading (UI-only, like the country map's), and Retry this setup loading a season campaign's
     // set: { elimination, state: 'loading' | 'error', message }.
     footballSets: BUILT_IN_SETS, footballSetLoad: { id: null, state: 'idle', message: null }, retrySetup: null,
+    // The challenge link setup was filled in from (README §Sharing a campaign): its seed and the keys it could not use.
+    challenge: null,
   };
 
   engagement = new SessionEngagement();
@@ -239,9 +228,23 @@ export default class App extends React.Component {
   speedRestore = null;
   /** `?playtest` in the address: the results also show the playtest timing (docs/design/playtest.md). */
   playtest = false;
+  /** The challenge in the address (screens/setup/challenge.js), applied to setup once the map is ready. */
+  link = null;
+  /** This page's own address without its query: what a challenge link starts with. */
+  pageBase = '';
+  /** A challenge link's managed team, until its theatre's teams are known (settleChallengeTeam). */
+  challengeTeam = null;
+  /** The day the daily campaign card offers ("2026-11-01"), taken when setup opens. */
+  dailyDay = dayOf(new Date());
+  /** The results' share image: { key, file: Promise<File | null> } for the finished campaign on screen. */
+  shareImage = null;
 
   componentDidMount() {
     try { this.playtest = new URLSearchParams(window.location.search).has('playtest'); } catch { this.playtest = false; }
+    try {
+      this.link = readChallenge(window.location.search);
+      this.pageBase = `${window.location.origin}${window.location.pathname}`;
+    } catch { this.link = null; }
     window.addEventListener('storage', this.handleStorage);
     window.addEventListener('focus', this.handleFocus);
     window.addEventListener('blur', this.handleBlur);
@@ -286,6 +289,23 @@ export default class App extends React.Component {
     // The signing screen and the target panel hold focus while they show; confirming unmounts them.
     if (previous && ((previous.choice && !this.state.choice) || (previous.pendingTarget && !this.state.pendingTarget))) this.focusRescue = true;
     if (this.focusRescue) this.rescueFocus();
+    if (this.challengeTeam != null && this.state.phase === 'setup') this.settleChallengeTeam();
+  }
+
+  /**
+   * A challenge link's team stays chosen if it plays in the link's theatre. That is known once the theatre's teams
+   * are: at once on the world map, after its map or season has loaded otherwise. A team it lacks is cleared, so setup
+   * asks for one, and the link's note lists it. Choosing another team or theatre first settles it too.
+   */
+  settleChallengeTeam() {
+    const setup = this.state.setup;
+    if (setup.role !== 'manager' || setup.managedTeamId !== this.challengeTeam) { this.challengeTeam = null; return; }
+    const map = this.domesticStatus(setup).state, season = this.seasonStatus(setup).state;
+    if (!this.geo || [map, season].some(state => state === 'loading' || state === 'error')) return;
+    this.challengeTeam = null;
+    if (fieldedTeam(setup, this.setupTeams(setup))) return;
+    this.setState(state => ({ setup: { ...state.setup, managedTeamId: '' },
+      challenge: state.challenge && { ...state.challenge, ignored: [...new Set([...state.challenge.ignored, 'team'])] } }));
   }
 
   /**
@@ -382,8 +402,17 @@ export default class App extends React.Component {
           ...(inspection.state === 'recovery' ? { storageDialog: { mode: 'recovery', ...inspection } } : {}) });
       }
       this.fitMap(Object.keys(NATIONS));
-      this.setState({ phase: 'setup' });
-      this.requestSeasons();
+      // A challenge link fills in setup without launching; its country map or season starts loading here.
+      const link = this.link?.found ? this.link : null;
+      this.setState({ phase: 'setup', ...(link ? { setup: link.setup, challenge: { seed: link.setup.seed, ignored: link.ignored } } : {}) }, () => {
+        if (link) {
+          this.challengeTeam = link.setup.managedTeamId || null;
+          this.showSetupMap();
+          this.showSetupSet();
+          if (this.challengeTeam != null) this.settleChallengeTeam();
+        }
+        this.requestSeasons();
+      });
     } catch (e) {
       this.setState({ err: 'MAP DATA FAILED TO LOAD — ' + String((e && e.message) || e) });
     }
@@ -747,6 +776,26 @@ export default class App extends React.Component {
     });
   }
 
+  /**
+   * The setup's daily campaign card (README §Sharing a campaign): today's short setup and seed for the chosen sport.
+   * A team already chosen for the same field stays chosen; the setup then asks for one.
+   */
+  playDaily() {
+    const day = this.dailyDay;
+    this.challengeTeam = null;
+    this.setState(state => {
+      const setup = dailySetup(state.setup.sport, day);
+      const field = s => [s.sport, s.layer, s.layer === 'clubs' ? s.clubScope : s.scope, dataSetOf(s)].join('|');
+      const keep = state.setup.role === 'manager' && field(state.setup) === field(setup);
+      return { setup: { ...setup, managedTeamId: keep ? state.setup.managedTeamId : '' }, challenge: null };
+    }, () => {
+      if (this.state.phase !== 'setup') return;
+      this.showSetupMap();
+      this.showSetupSet();
+      this.requestSeasons();
+    });
+  }
+
   exportProgress() {
     const data = this.state.phase === 'setup' && this.saved ? this.saved
       : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState,
@@ -770,6 +819,54 @@ export default class App extends React.Component {
     anchor.remove();
     // Let the browser begin reading the blob before releasing its URL.
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  /**
+   * The finished campaign's share image (README §Sharing a campaign), drawn once per result: a Promise of a PNG File,
+   * or of null where the browser cannot draw it. The results start it as they open, so a phone's share sheet opens
+   * while the tap still counts as the player's.
+   */
+  shareImageFile() {
+    const st = this.state, champ = st.teams[st.aliveIds[0]];
+    if (!champ || !this.geo || !canDrawShareImage()) return Promise.resolve(null);
+    const key = `${st.campaignId}|${st.matches}|${champ.id}`;
+    if (this.shareImage?.key === key) return this.shareImage.file;
+    const victory = this.victoryPanel();
+    const settings = st.initialSettings || st.settings;
+    const day = st.startedAt ? dayOf(new Date(st.startedAt)) : null;
+    const shapes = this.geo.countries.map(country => {
+      const path = this.displayGeo?.paths[country.id] || this.geo.paths[country.id];
+      return path ? { id: country.id, d: path.d, bbox: path.bbox } : null;
+    }).filter(Boolean);
+    const card = buildShareCard({
+      shapes, backdrop: this.domesticMap() ? this.backdrop : [], own: st.own, championId: champ.id, championName: champ.name,
+      // The colour the final map gives the champion: clay when it is the team you manage.
+      fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill : politicalFill(champ.id),
+      frame: this.viewFocus, seed: st.seed,
+      kicker: `${day && isDaily(settings, day) ? `Daily campaign · ${dailyLabel(day)}` : 'Campaign complete'} · Round ${roman(st.round)}`,
+      line: shareLine(victory), site: typeof window !== 'undefined' ? window.location.host : '',
+      mark: champ.kind === 'club' ? { kind: 'crest', url: clubLogoUrl(champ.id), code: champ.code, color: champ.col }
+        : { kind: 'flag', url: flagUrl(champ.flagId ?? champ.id), code: champ.code, color: champ.col },
+    });
+    const file = drawShareCard(card).then(blob => (blob ? new File([blob], card.filename, { type: 'image/png' }) : null), () => null);
+    this.shareImage = { key, file };
+    return file;
+  }
+
+  /** The results' Share image: the share sheet on a phone, a download elsewhere. Resolves to the line the results show. */
+  async shareResultImage() {
+    const file = await this.shareImageFile();
+    if (!file) return 'This browser could not make the image.';
+    const st = this.state, champ = st.teams[st.aliveIds[0]];
+    const phone = typeof window !== 'undefined' && !!window.matchMedia?.('(max-width:699.98px), (pointer:coarse)').matches;
+    const link = challengeUrl(this.pageBase, st.initialSettings || st.settings, st.seed);
+    try {
+      const outcome = await deliverShareImage(file, { phone, title: 'Imperialism',
+        text: `${champ.name} ${this.victoryPanel().subtitle}. Play the same campaign: ${link}` });
+      return outcome === 'shared' ? 'Image shared.' : outcome === 'downloaded' ? `Image saved as ${file.name}.` : '';
+    } catch {
+      return 'The image could not be shared or saved here.';
+    }
   }
 
   async importProgress(file) {
@@ -1058,6 +1155,8 @@ export default class App extends React.Component {
         storageDialog: null, storageConflict: false,
         // clearTimers() above dropped the tasks that would clear a previous campaign's notice and goal toast.
         pu: null, toast: null,
+        // A challenge link's note belongs to the setup it filled in.
+        challenge: null,
         teams,
         own,
         aliveIds: included.map(t => t.id),
@@ -1211,6 +1310,8 @@ export default class App extends React.Component {
     this.cancelRestore();
     this.flowToken++;
     this.openingSeed = Date.now() >>> 0;
+    this.dailyDay = dayOf(new Date());
+    this.challengeTeam = null;
     this.setupTeamsCache = null;
     this.showSetupMap(this.state.setup, true);
     this.showSetupSet();
@@ -2024,11 +2125,16 @@ export default class App extends React.Component {
           saveStatus={st.saveStatus} onExport={() => this.exportProgress()} onImport={file => this.importProgress(file)}
           onManageSaves={() => this.openStorageDialog('slots')}
           onCancel={st.hasSave ? () => this.resume() : undefined}
+          // Sharing (README §Sharing a campaign): the link names the seed this setup launches, even with a blank field.
+          challenge={st.challenge} challengeLink={challengeUrl(this.pageBase, st.setup, this.setupSeed(st.setup))}
+          daily={{ label: dailyLabel(this.dailyDay), active: isDaily(st.setup, this.dailyDay) }} onDaily={() => this.playDaily()}
         />}
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           // "View map" (and close): the final's automatic switch to the Match view is otherwise never undone.
           onClose={() => this.setState({ phase: 'playing', view: 'map', viewSource: 'user' })}
           onNew={() => this.openSetup()}
+          challengeLink={challengeUrl(this.pageBase, st.initialSettings || st.settings, st.seed)}
+          onPrepareImage={() => { this.shareImageFile(); }} onShareImage={() => this.shareResultImage()}
         />}
         {st.tacticalChoice && st.tacticalPreview && !st.storageDialog && !st.exportText && <TacticalChoice choice={st.tacticalChoice}
           preview={this.matchPreviewModel()} onSimulate={() => this.simulateResult()}

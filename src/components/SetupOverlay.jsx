@@ -4,9 +4,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
+import ShareCampaign from './ShareCampaign.jsx';
 import TeamMark from './TeamMark.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
 import * as setupModel from '../screens/setup/setupModel.js';
+import { challengeNote, dailyField } from '../screens/setup/challenge.js';
 import { themedPaint } from '../theme.js';
 import './setup.css';
 
@@ -233,11 +235,14 @@ function theatreCaption(model, preview) {
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
  * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
  * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
+ * Sharing (README §Sharing a campaign): `challenge` is the link setup was filled in from ({ seed, ignored }) or null,
+ * `challengeLink` this setup's own link for step 3, and `daily` today's campaign card ({ label, active }, `onDaily`).
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
   domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON,
+  challenge = null, challengeLink = '', daily = null, onDaily,
 }) {
   const [step, setStep] = useState(1);
   const [confirmation, setConfirmation] = useState(null);
@@ -505,6 +510,28 @@ export default function SetupOverlay({
                       </div>
                     </>
                   )}
+                </div>
+              ) : null}
+
+              {challenge ? (
+                <div className="setup-challenge" role="note" aria-labelledby="setup-challenge-title">
+                  <strong id="setup-challenge-title">Challenge link</strong>
+                  <p>{challengeNote(challenge)}</p>
+                </div>
+              ) : null}
+
+              {/* Today's campaign for the chosen sport: setup fills it in, then step 3 asks for your team. A page opened
+                  from a challenge link is there to play that challenge, so the card waits until the note goes. */}
+              {daily && !challenge ? (
+                <div className="setup-daily" data-active={daily.active || undefined}>
+                  <div className="setup-daily__text">
+                    <strong>Daily campaign · {model.sport.name} · {daily.label}</strong>
+                    <p>{daily.active ? `Today’s campaign is set up. Choose your ${model.noun} and launch it.`
+                      : `Today’s campaign: ${dailyField(model.sport.id)} on Fast-forward, with the same seed for everyone. Pick your team and see how far it goes.`}</p>
+                  </div>
+                  <button type="button" className="btn-secondary setup-daily__play" onClick={() => { if (!daily.active) onDaily?.(); goTo(3); }}>
+                    {daily.active ? `Choose your ${model.noun}` : 'Play today’s campaign'}
+                  </button>
                 </div>
               ) : null}
 
@@ -776,6 +803,13 @@ export default function SetupOverlay({
               ) : null}
               <TeamShortlist id="setup-favourites" title="Favourites" teams={model.favourites} />
               <TeamShortlist id="setup-long-shots" title="Long shots" teams={model.longShots} />
+              {challengeLink ? (
+                <section className="setup-share" aria-labelledby="setup-share-title">
+                  <Kicker id="setup-share-title" title="Challenge a friend" />
+                  <ShareCampaign link={challengeLink}
+                    note="The link holds this setup and its seed. It opens ready to launch, and plays the same campaign." />
+                </section>
+              ) : null}
             </div>
           </div>
           {footer(3)}

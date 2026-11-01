@@ -1,9 +1,11 @@
 // Owner: WP-0 (see PLAN.md §4). Frozen constants and helpers shared by App.jsx and the method modules (§1.4, §3.8).
 import { C } from '../theme.js';
 import { DEFAULT_SPORT, getSport } from '../sports/index.js';
-import { domesticScopeId } from '../engine/domestic.js';
+import { domesticScope, domesticScopeId } from '../engine/domestic.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
-import { setSportOf } from '../engine/footballSets.js';
+import { CLUB_SCOPES } from '../data/scopes.js';
+import { clubMapScope, domesticEntry, isDomesticScope } from '../data/domesticScope.js';
+import { seasonMapOf, setSportOf, sportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -36,6 +38,25 @@ export function dataSetOf(settings) {
   const id = settings?.dataSet ?? null, sport = getSport(settings?.sport).id;
   if (id == null || setSportOf(id) !== sport) return null;
   return (sport === 'football' ? !domesticIdOf(settings) : settings.layer === 'clubs') ? id : null;
+}
+
+/**
+ * The setup's club theatre. A sport with its own map plays only there (basketball: the NBA's USA and Canada, or an
+ * earlier season's map of its own era), and another sport's map falls back to every club. A football data set brings
+ * its own clubs, so the theatre must be one of them: a country map (built from the built-in data) and a league the set
+ * leaves out fall back to every club. Kept as it is while the set loads. Shared by App's setup and challenge links.
+ */
+export function setClubScope(setup) {
+  const sportId = getSport(setup.sport).id;
+  const era = setup.dataSet != null && setSportOf(setup.dataSet) === sportId ? seasonMapOf(setup.dataSet) : null;
+  if (era) return domesticScope(era);
+  const own = clubMapScope(sportId);
+  if (own) return own;
+  if (domesticEntry(setup.clubScope)?.sport) return 'all';
+  if (setup.dataSet == null || sportId !== 'football') return setup.clubScope;
+  if (isDomesticScope(setup.clubScope)) return 'all';
+  const sport = sportOf(setup);
+  return !sport || CLUB_SCOPES(sport).some(scope => scope.id === setup.clubScope) ? setup.clubScope : 'all';
 }
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */

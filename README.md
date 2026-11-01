@@ -116,7 +116,10 @@ default suits a first campaign, so pressing Space three times starts one.
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
    football's lists its built-in 2026 season (Madden NFL 27). A
-   quick-resume card appears when a save exists.
+   quick-resume card appears when a save exists. Below it, the **Daily campaign**
+   card offers today's campaign for the chosen sport. A page opened from a
+   challenge link shows a note about the link instead
+   ([Sharing a campaign](#sharing-a-campaign)).
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
@@ -127,7 +130,8 @@ default suits a first campaign, so pressing Space three times starts one.
    its matches and one of up to three signings after its wins, and, under a
    one-match draw, **who picks your opponent**. **Spectator** leaves draws,
    results and signings to the game, and you can follow any empire once the
-   campaign starts. **Launch campaign** starts it.
+   campaign starts. **Challenge a friend** copies a link to this setup and its
+   seed. **Launch campaign** starts it.
 
 ### Rules of war
 
@@ -355,7 +359,8 @@ The optional best-of-three finale starts when two teams remain. Interim games
 award no territory or player; the second win resolves one conquest. A numeric
 seed reproduces a campaign when settings, manager choices and simulation version
 match. Updating the model can change future results for older seeds; already
-generated matches in saved campaigns retain their outcome and events.
+generated matches in saved campaigns retain their outcome and events. A
+[challenge link](#sharing-a-campaign) carries a setup and its seed to someone else.
 
 Progress autosaves at every draw, kickoff, final whistle and result, and after
 signings, preserving the seed, random state, queue, history and pending manager
@@ -385,6 +390,74 @@ the biggest haul; a manager who won sees "Managed by you". The playtest timing
 lineup) appears only with `?playtest` in the address; exports always carry it.
 The masthead trophy reopens the results after you view the map. The map has one
 keyboard tab stop, arrow navigation and a skip link.
+
+### Sharing a campaign
+
+Sharing needs no server: a campaign travels in its link.
+
+**Challenge links.** **Copy challenge link** copies a link to the game with a
+setup in its query. It is on the last setup step, under **Challenge a friend**,
+and on the final results. Opening the link fills in setup without launching it,
+and a note at the top of step 1 says so. **Launch campaign** then plays the same
+campaign, since a seed replays a campaign when the settings and the manager's
+choices match. The setup's link names the seed that setup would launch, so a blank
+seed field shares the opening seed. The results' link names the seed that was
+played. Where the browser won't copy, the link shows selected for a manual copy.
+Each key names a setup choice, and a key left at its default is left out:
+
+| Key | Setup choice | Values | Left out when |
+| --- | --- | --- | --- |
+| `sport` | Sport | `football`, `basketball`, `american-football` | football |
+| `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs `all`, `elite`, a league (`Premier+League`) or a country (`domestic:826`) | Europe for nations, all clubs for clubs, a sport's own map (NBA, NFL) |
+| `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`) | the built-in season |
+| `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
+| `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
+| `show` | Show matches | `ticker`, `instant`, `express` | Live |
+| `upsets` | Upsets | `predictable`, `balanced`, `wild` | Balanced |
+| `final` | Final | `single`, `best-of-three` | Single match |
+| `signings` | Computer signings | `highest-rated`, `best-fit` | Best-rated player |
+| `strengths` | Team strengths (basketball) | `authentic`, `competitive` | Real-world |
+| `role` | Your role | `manager`, `spectator` | Spectator |
+| `team` | A manager's team | a team id: `276` (Germany), `f-real-madrid`, `d826-679` | no team chosen |
+| `seed` | Seed | 0 to 4294967295 | never |
+
+For example, `https://imperialism-game.vercel.app/?sport=basketball&theatre=CONMEBOL&draw=round-robin&role=manager&team=076&seed=4242`
+sets up Brazil's basketball five against South America under round robin.
+
+A value this version doesn't offer stays at its default: an unknown sport, draw or
+seed, a theatre or season no longer built in, a CM 01/02 season built on another
+computer, a country map with an earlier season, team strengths outside basketball,
+a team for a spectator. A manager's team is checked once its theatre's teams are
+known, after a country map or season has loaded. If the team doesn't play there,
+setup asks for one. The note on step 1 lists what the link could not use. Other
+query keys (`?playtest`) are left alone, and the address stays as opened.
+`src/screens/setup/challenge.js` writes and reads links (`scripts/challenge-link.test.mjs`),
+and nothing in it draws from a campaign's random stream.
+
+**Daily campaign.** Step 1 offers today's campaign for the chosen sport: the Elite
+32 nations (American football: the NFL's 32 clubs) with Random draw, Fast-forward,
+the built-in season and the standard More rules, managed by you. **Play today's
+campaign** fills it in and moves on to Your role to pick a team. The seed is a
+hash of the sport and the player's calendar date (`dailySeed`, pinned by the
+tests), so everyone plays the same campaign that day and a new one from midnight.
+Your team, role, opponent choice and Show matches stay yours to change: it is
+still the daily. The card then reads "Today's campaign is set up", and its share
+image says "Daily campaign · Sunday 1 November".
+
+**Share image.** **Share image** on the final results makes a 1200×630 picture,
+drawn at twice that so it stays sharp on a phone. The final map is framed as the
+campaign's opening camera framed its theatre (Europe for the UEFA nations, a
+country's own frame), with the champion's land in the colour the map gave it (clay
+for the team you managed). A band under it holds the champion's flag or crest,
+"Campaign complete · Round IX", the champion and one line of stats: "has conquered
+Europe in 45 battles · 12 conquests · 9 players claimed". On a phone or tablet
+whose browser can share files, the share sheet opens with the image and a line
+carrying the challenge link. Elsewhere, or if sharing fails, the image downloads
+as `imperialism-<champion>-<seed>.png`. Drawing starts when the results open, so
+the share sheet opens straight from the tap. The image is drawn on a canvas from
+the map's own paths, without flag patterns or labels (`src/viewModels/shareCard.js`,
+`src/engine/shareImage.js`).
 
 ### Draw compass, flags and navigation
 
@@ -1246,7 +1319,11 @@ the neighbouring-land backdrop stays inert. The domestic resume also refuses a
 save naming missing sections and a map that cannot load, resumes from a cold
 map cache, and restores a one-section-per-club save onto the 100-section map,
 each starting group whole with its holder. `npm run test:domestic` kicks off
-every shipped country with legal duel draws.
+every shipped country with legal duel draws. A **challenge link** check opens the
+app at a link and finds setup filled in but not launched. Copy challenge link
+writes the same link back, and Launch plays its settings and seed. A country map's
+link keeps its club once the map loads, and a stale link falls back to the
+defaults and says so.
 
 The suite asserts that each match eliminates exactly one team, that no territory
 is lost or duplicated, and that one player changes shirts per match. It checks
@@ -1282,6 +1359,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |
 | `column-wiring`, `match-wiring`, `squad-wiring`, `conquest-wiring`, `ledger-wiring`, `map-wiring` | Each screen wired to the running App |
+| `challenge-link` | Challenge links written and read back, the fallback for unknown and stale values, and the daily seeds and setups |
+| `share-ui` | The share card, App's wiring of links, the daily campaign and the share image, and the setup and results controls |
 
 Domestic campaigns add `domestic-data`, `domestic-geometry`, `domestic-campaign`
 and `domestic-routing`, which `npm run test:domestic` also runs on their own.
