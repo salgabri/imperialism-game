@@ -132,11 +132,13 @@ deploys `main` on every push, so a push to `main` is a release.
 minutes. GitHub Actions is free for public repositories. On `main`, its deploy
 job then builds the tested commit with the Vercel CLI (pinned at 64.7.0) and
 deploys it to production. A newer push cancels the older run, so only the
-newest commit deploys. The job reads three repository secrets: `VERCEL_TOKEN`,
-`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`. They go under GitHub → Settings →
-Secrets and variables → Actions → **Repository secrets**, not Variables and not
-an environment's secrets. Without all three, the job leaves the notice "Not
-deploying" and skips its Vercel steps.
+newest commit deploys. The job runs in the **Production** environment and reads
+three secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`.
+Production's environment secrets (GitHub → Settings → Environments → Production)
+are the tighter choice, because no other job can read them. Repository secrets
+(Settings → Secrets and variables → Actions) work too, but Variables do not.
+Without all three, the job leaves the notice "Not deploying", names the missing
+ones and skips its Vercel steps.
 
 To make production wait for the tests, Vercel's own Git deploys of `main` have
 to be turned off with `"git": { "deploymentEnabled": { "main": false } }` in

@@ -34,6 +34,10 @@ jobs:
     name: Deploy to production
     needs: test
     if: github.ref == 'refs/heads/main'
+    # The Production environment's secrets reach only this job; repository secrets work here too.
+    environment:
+      name: Production
+      url: https://imperialism-game.vercel.app
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -53,7 +57,7 @@ jobs:
           if [ -z "$missing" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::Not deploying: this job cannot read the repository secrets$missing (README \"Deployment\")."
+            echo "::notice::Not deploying: this job cannot read$missing as Production environment or repository secrets (README \"Deployment\")."
           fi
       - if: steps.vercel.outputs.ready == 'true'
         uses: actions/checkout@v7
