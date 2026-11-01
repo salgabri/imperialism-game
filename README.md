@@ -1107,7 +1107,8 @@ coastline and date-line regressions.
 ## Advertising
 
 The game can show AdSense banner ads, and shows none until a build names a
-publisher. `src/ads.js` loads Google's script and reads the switches below;
+publisher (placeholders can be previewed sooner, below). `src/ads.js` loads
+Google's script and reads the switches below;
 `src/components/AdSlot.jsx` is the only ad unit. There are no full-screen ad
 breaks.
 
@@ -1143,9 +1144,15 @@ All three banners share the one ad unit. Create it as a display ad with
 as Google's exact-size example does, without its `data-ad-format` line.
 `npm run build` checks both ids and writes `dist/ads.txt`. AdSense reads that
 file only at the root of the domain, so a game served from a subfolder needs a
-copy there. `npm run dev` requests no ad unless `VITE_ADSENSE_TEST=on`. With a
-publisher and a slot set it shows each banner as an empty "Ad space" box
-instead. The test bundles have no Vite env, so the tests never load ads.
+copy there. The test bundles have no Vite env, so the tests never load ads.
+
+To see where the banners go before there are any ads, add `?ads=preview` to the
+game's address, for example `https://imperialism-game.vercel.app/?ads=preview`.
+Every build supports it, with or without a publisher: each banner shows as a
+dashed "Ad space" box of its exact size, and nothing is asked of Google.
+Players who open the plain address see no banners. `npm run dev` shows the
+same placeholders whenever a publisher and a slot are set, unless
+`VITE_ADSENSE_TEST=on`. An ad blocker may hide the placeholders too.
 
 In the AdSense account, keep Auto ads off for the site: they would add an anchor
 banner over the phone tab bar and drop units into the campaign column. Publish a

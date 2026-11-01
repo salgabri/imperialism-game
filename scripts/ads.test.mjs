@@ -154,7 +154,7 @@ test('the setup rail, the Ledger and the Chronicle each place one banner where t
     assert.deepEqual([...rail.children].map(child => child.tagName + (child.className ? '.' + child.className : '')),
       ['NAV', 'SECTION.ad-slot setup-rail__ad'], 'the square follows the steps, outside their navigation landmark');
     assert.equal(rail.querySelector('nav').getAttribute('aria-label'), 'Setup steps');
-    assert.equal(rail.querySelector('ins').style.width, '200px');
+    assert.equal(rail.querySelector('.ad-slot__unit').style.width, '200px');
 
     const ledger = render(React.createElement(LedgerScreen, {
       share: { total: 1, rows: [{ key: '250', teamId: '250', name: 'France', territories: 1, pct: '100%', width: 100 }] }, fallen: [],
@@ -170,16 +170,39 @@ test('the setup rail, the Ledger and the Chronicle each place one banner where t
   });
 });
 
-test('a dev server shows the reserved slot and loads or requests nothing', async () => {
+/** Placeholders, nothing from Google: no script, no queue, no ad unit. */
+async function assertPreview({ window, document, mount }, AdSlot) {
+  assert.equal(document.documentElement.dataset.ads, 'preview');
+  assert.equal(document.querySelectorAll('script').length, 0);
+  const view = await mount(AdSlot);
+  const unit = view.host.querySelector('.ad-slot .ad-slot__unit--preview');
+  assert.ok(unit, 'a placeholder shows where the banner goes');
+  assert.equal(unit.textContent, 'Ad space · 300 × 250');
+  assert.deepEqual([unit.style.width, unit.style.height], ['300px', '250px'], 'at the banner\'s own size');
+  assert.equal(view.host.querySelector('.kicker__title').textContent, 'Advertisements');
+  assert.equal(view.host.querySelectorAll('ins').length, 0, 'no ad unit');
+  assert.equal(typeof window.adsbygoogle, 'undefined', 'no queue and no request');
+}
+
+test('a dev server with a publisher shows placeholders and loads or requests nothing', async () => {
   const { ads, AdSlot } = await bundleWithEnv({ ...LIVE, DEV: true });
-  await withDom(async ({ window, document, mount }) => {
-    ads.loadAds(document);
-    assert.equal(document.documentElement.dataset.ads, 'preview');
-    assert.equal(document.querySelectorAll('script').length, 0);
-    const view = await mount(AdSlot);
-    assert.ok(view.host.querySelector('ins.adsbygoogle'), 'the reserved box shows where the ad goes');
-    assert.equal(typeof window.adsbygoogle, 'undefined', 'no queue and no request');
+  await withDom(async dom => {
+    ads.loadAds(dom.document);
+    await assertPreview(dom, AdSlot);
   });
+});
+
+test('?ads=preview shows placeholders on any build, with or without a publisher', async () => {
+  const { loadAds, AdSlot } = await bundleComponents({ loadAds: ['src/ads.js', 'loadAds'], AdSlot: 'src/components/AdSlot.jsx' });
+  await withDom(async dom => {
+    loadAds(dom.document);
+    await assertPreview(dom, AdSlot);
+  }, { url: 'http://localhost/?ads=preview' });
+  const live = await bundleWithEnv(LIVE);
+  await withDom(async dom => {
+    live.ads.loadAds(dom.document);
+    await assertPreview(dom, live.AdSlot);
+  }, { url: 'http://localhost/?seed=7&ads=preview' });
 });
 
 test('VITE_ADSENSE_TEST marks requests as tests and loads the script on a dev server too', async () => {
