@@ -7,12 +7,11 @@
 // The ratings come from one saved copy of https://2karchive.com/ in data-src/bball-2karchive/home.html, pinned by
 // SHA-256 in scripts/data/nba-seasons.json; the build stops on any other copy, so every season rebuilds byte for byte.
 // Each season names the era map it plays on; npm run build:nba-map builds those maps from the same manifest.
-import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { CLUBS } from '../src/data/clubs.basketball.js';
-import { buildNbaSeason, extractYears } from './lib/nba-seasons.mjs';
+import { buildNbaSeason, readArchive } from './lib/nba-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -32,14 +31,7 @@ async function main() {
   const check = process.argv.includes('--check');
   const unknown = process.argv.slice(2).filter(arg => arg !== '--check');
   if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
-  const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/nba-seasons.json'), 'utf8'));
-  const arenas = JSON.parse(await readFile(path.join(root, 'scripts/data/nba-arenas.json'), 'utf8')).clubs;
-  const page = await readFile(path.join(root, 'data-src/bball-2karchive', manifest.source.file));
-  const sha256 = createHash('sha256').update(page).digest('hex');
-  if (sha256 !== manifest.source.sha256) {
-    throw new Error(`data-src/bball-2karchive/${manifest.source.file} is not the pinned copy (SHA-256 ${sha256}); save ${manifest.source.url} there`);
-  }
-  const years = extractYears(page.toString('utf8'));
+  const { manifest, arenas, years } = await readArchive(root);
   const results = manifest.seasons.map(year => buildNbaSeason(years, year, manifest, { arenas, builtIn: CLUBS }))
     .sort((a, b) => b.doc.year - a.doc.year);
   for (const { doc, text, audit } of results) {

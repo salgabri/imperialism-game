@@ -48,6 +48,22 @@ export function tacticalOptions(team, opponent, drama = 6) {
   });
 }
 
+/**
+ * The approach Continue (and "simulate the result") kicks off with: the best displayed win chance, compared as the
+ * whole percentages the player reads, so the tag never sits on an option that shows the same number as Balanced.
+ * Ties keep Balanced, then the TACTICS order. Options without estimates (older saves) keep Balanced.
+ */
+export function recommendedTactic(options = []) {
+  const shown = option => Number.isFinite(option?.winProbability) ? Math.round(option.winProbability * 100) : null;
+  const balanced = options.find(option => option.id === 'balanced');
+  let best = balanced && shown(balanced) != null ? balanced : null;
+  for (const option of options) {
+    if (shown(option) == null) continue;
+    if (!best || shown(option) > shown(best)) best = option;
+  }
+  return best?.id || 'balanced';
+}
+
 /** Pure parameters used by BOTH the real outcome and the displayed odds. */
 export function tacticalMatchParameters({ attacker, defender, managedId, tactic = 'balanced', drama = 6 }) {
   const isAttacker = managedId === attacker.id, isDefender = managedId === defender.id;

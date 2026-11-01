@@ -812,9 +812,10 @@ for (const scenario of managerScenarios) {
   console.log(`\n  ${scenario.name}`);
   try {
     const mod = await import(`${new URL('file://' + entry.replace(/\\/g, '/'))}?manager=${Math.random()}`);
-    // The seed keeps Italy in charge for two cycles (target choices with one and five options, eight signings) before it
-    // falls, so every check below has something to verify, Continue as spectator included.
-    const r = await mod.runManagerCampaign({ ...scenario, seed: 20261026 + MANAGER_SCENARIOS.indexOf(scenario) });
+    // The seed keeps Italy in charge into the second cycle (target choices with two and three options, three signings)
+    // before it falls, so every check below has something to verify, Continue as spectator included. It depends on the
+    // squads and on the approach Continue plays (the recommended one): the 2026/27 rosters needed a new one.
+    const r = await mod.runManagerCampaign({ ...scenario, seed: 20261108 + MANAGER_SCENARIOS.indexOf(scenario) });
     console.log(
       `    ${r.fielded} nations · ${r.roundRobin.cycles} cycles · ${r.turns} turns · ${r.matches} matches · champion ${r.champion} · ` +
       `${r.teamName} ${r.eliminated ? `out in round ${r.eliminated.round} (placed ${r.eliminated.placement} of ${r.fielded}, by ${r.eliminated.by})` : 'won the campaign'}`,

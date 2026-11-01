@@ -7,7 +7,7 @@ import { loadFootballData, pickFootballSquad, playerTuple } from './lib/football
 import { rostersModule } from './lib/data-module.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const source = process.argv[2] || path.join(root, 'scripts/data/ea-fc26.csv');
+const source = process.argv[2] || path.join(root, 'scripts/data/ea-fc27.csv');
 const fmSource = process.argv[3] || path.join(root, 'scripts/data/fm26-players.json');
 const data = await loadFootballData(source, fmSource);
 const nameToId = Object.fromEntries(Object.entries(NATIONS).map(([id, rec]) => [rec[0], id]));

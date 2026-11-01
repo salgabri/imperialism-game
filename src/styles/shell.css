@@ -76,6 +76,16 @@ main.campaign-layout {
   flex:none; pointer-events:none;
   font:500 12px/1 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:.04em;
 }
+/* Auto and speed sit above the bar-wide primary target (the button's ::before); the label keeps the free space. */
+.phone-bar__btn { margin-right:auto; }
+.phone-bar__playback { position:relative; z-index:1; flex:none; display:flex; align-items:center; gap:6px; margin-right:-10px; }
+.phone-bar__tool {
+  display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:var(--tap, 44px); height:var(--tap, 44px);
+  padding:0 10px; border:0; background:none; color:inherit; box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.6);
+  font:700 13px/1 var(--font-narrow); letter-spacing:.08em; text-transform:uppercase; cursor:pointer;
+}
+.phone-bar__tool[aria-pressed=true] { background:#fff; color:var(--you); box-shadow:none; }
+.phone-bar__tool:focus-visible { outline:2px solid #fff; outline-offset:2px; }
 .app-shell[data-view=conquest] > .phone-bar { height:calc(56px + max(22px, var(--safe-bottom))); padding-bottom:max(22px, var(--safe-bottom)); }
 
 /* ---- Phone tab bar (RM §2.10) ---- */

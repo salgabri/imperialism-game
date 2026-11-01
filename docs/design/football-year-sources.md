@@ -260,7 +260,8 @@ From a read of the current pipeline:
   `football-roster-audit.json`.
 - **Clubs key leagues by league id**, not by name, because EA's league names
   change by edition. The football club build must also be split from basketball,
-  which needs the ignored `data-src/nba2k.json`.
+  which needed the ignored `data-src/nba2k.json` (since 2026/27 the basketball
+  clubs come from the pinned 2K Archive page instead).
 - **Domestic campaigns are per year and per FM-sized database.** Their sections
   derive from each year's club list (about 18 MB of maps per year), so they would
   stay 2026-only unless the format shares unit geometry across years.

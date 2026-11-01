@@ -1,8 +1,13 @@
 // The built-in earlier basketball seasons (docs/design/football-years.md): one NBA 2K edition's ratings, as compiled by
 // 2K Archive, become that season's NBA clubs, each with its best five, in the data set format the game loads
-// (src/engine/footballSets.js, kind 'nba2k'). Clubs only: no source rates the national teams' other players. No I/O
-// here: scripts/build-nba-seasons.mjs reads the page and writes the files, scripts/build-nba-map.mjs takes each era's
-// teams and arenas from `teamsOf`, and tests build seasons from invented players. Every rating is 2K's, unchanged.
+// (src/engine/footballSets.js, kind 'nba2k'). Clubs only: no source rates the national teams' other players. The
+// built-in season's clubs (scripts/build-clubs.mjs) and its national fives' NBA ratings (scripts/build-basketball.mjs)
+// come from the same page. Only readArchive does I/O: scripts/build-nba-seasons.mjs writes the files,
+// scripts/build-club-maps.mjs takes each era's teams and arenas from `teamsOf`, and tests build seasons from invented
+// players. Every rating is 2K's, unchanged.
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { selectLineup } from '../../src/data/teams.js';
 import { colourFor, contentHash, makeCode, serializeFootballSet } from '../../src/data/footballSetBuild.js';
 
@@ -34,6 +39,21 @@ export function extractYears(html) {
     else if (c === '}' && --depth === 0) return JSON.parse(html.slice(start, i + 1));
   }
   throw new Error('The YEARS table on the 2K Archive page never closes');
+}
+
+/**
+ * The manifest (scripts/data/nba-seasons.json), the arenas (scripts/data/nba-arenas.json) and the pinned page's whole
+ * table, read from data-src/bball-2karchive/ (ignored) after checking it is the pinned copy.
+ */
+export async function readArchive(root) {
+  const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/nba-seasons.json'), 'utf8'));
+  const arenas = JSON.parse(await readFile(path.join(root, 'scripts/data/nba-arenas.json'), 'utf8')).clubs;
+  const page = await readFile(path.join(root, 'data-src/bball-2karchive', manifest.source.file));
+  const sha256 = createHash('sha256').update(page).digest('hex');
+  if (sha256 !== manifest.source.sha256) {
+    throw new Error(`data-src/bball-2karchive/${manifest.source.file} is not the pinned copy (SHA-256 ${sha256}); save ${manifest.source.url} there`);
+  }
+  return { manifest, arenas, years: extractYears(page.toString('utf8')) };
 }
 
 /**
@@ -77,11 +97,13 @@ function startingFive(pool) {
 }
 
 /**
- * Build season `year`. `years` is the page's whole table (a player whose position is blank takes the one 2K gave him
- * in the nearest edition, earlier first); `builtIn` are the game's NBA clubs, whose codes and colours a club that
- * kept its id keeps. Returns `{ doc, text, audit, warnings }`; throws when the edition's teams are not the manifest's.
+ * The clubs of season `year`, strongest first, each with its best five as `[name, 'PG/SG', rating]`, as both the
+ * season files and the built-in clubs (scripts/build-clubs.mjs) hold them. `years` is the page's whole table (a player
+ * whose position is blank takes the one 2K gave him in the nearest edition, earlier first); `builtIn` are the game's
+ * NBA clubs, whose codes and colours a club that kept its id keeps. Returns `{ clubs, rows, filled, dropped, narrowed,
+ * warnings }`; throws when the edition's teams are not the manifest's.
  */
-export function buildNbaSeason(years, year, manifest, { arenas, builtIn = [] }) {
+export function nbaSeasonClubs(years, year, manifest, { arenas, builtIn = [] }) {
   const warnings = [];
   const players = years[String(year)];
   if (!Array.isArray(players)) throw new Error(`2K Archive has no ${editionOf(year)}`);
@@ -131,13 +153,20 @@ export function buildNbaSeason(years, year, manifest, { arenas, builtIn = [] }) 
       squad: squad.map(p => [p.name, p.positions.join('/'), p.rating]) };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
   if (dropped.length) warnings.push(`${dropped.length} players with no position in any edition were left out`);
+  return { clubs, rows: players.length, filled, dropped, narrowed, warnings };
+}
 
+/**
+ * Build season `year` (nbaSeasonClubs' clubs, in the data set format). Returns `{ doc, text, audit, warnings }`.
+ */
+export function buildNbaSeason(years, year, manifest, { arenas, builtIn = [] }) {
+  const { clubs, rows, filled, dropped, narrowed, warnings } = nbaSeasonClubs(years, year, manifest, { arenas, builtIn });
   const edition = editionOf(year);
   const doc = { format: 1, kind: 'nba2k', id: seasonIdOf(year), version: '', year, season: seasonOf(year), label: edition, local: false,
     source: { provider: '2K Sports', edition, compiler: manifest.source.name, url: manifest.source.url, rawScale: 99 },
     map: mapOf(manifest, year), clubs, coverage: { players: clubs.length * FIVE, clubs: clubs.length } };
   doc.version = `${doc.id}-${contentHash(doc)}`;
-  const audit = { id: doc.id, version: doc.version, edition, rows: players.length, map: doc.map, clubs: clubs.length,
+  const audit = { id: doc.id, version: doc.version, edition, rows, map: doc.map, clubs: clubs.length,
     filledPositions: filled, droppedNoPosition: dropped, narrowedPositions: narrowed.length, warnings };
   return { doc, text: serializeFootballSet(doc), audit, warnings };
 }
