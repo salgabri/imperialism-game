@@ -31,9 +31,11 @@ the green/red seam, for example. Field-size constraints retain Canada's two red
 panels and Slovenia's three bands; these may require a smaller emblem. Symbols
 can become small on narrow land, rather than being distorted or cut in half.
 
-SVG patterns use geographic tile origins and tile-local artwork coordinates,
-without an anisotropically scaled parent viewBox. Pattern bounds still cover
-exactly one padded region, so the banner never repeats across individual islands.
+Each banner is drawn once in map coordinates, without an anisotropically scaled
+parent viewBox, and each land part shows it through a clip of the part's outline.
+Its field covers exactly one padded region, so the banner never repeats across
+individual islands. (Banners were SVG `<pattern>` fills until the browser's cost
+of re-rendering every pattern tile on each repaint made Flags mode lag.)
 
 ## Coverage and preserved behavior
 
@@ -68,7 +70,7 @@ The derived assets include their MIT license.
 The browser measured the 14 symbol bounds before final cropping. The
 [asset comparison](flag-assets-review.html) shows originals and reassembled
 artwork. The [territory comparison](flag-symbols-review.html) uses the production
-pattern renderer on 15 real-map fixtures, including Swiss expansion across
+banner renderer on 15 real-map fixtures, including Swiss expansion across
 France/Italy, Portugal, Japan and Canada.
 
 Run `npm run test:flag-symbols` for asset integrity, fitting and renderer checks;

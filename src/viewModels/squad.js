@@ -4,6 +4,7 @@ import { selectLineup, teamSportId } from '../data/teams.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
+import { baseballProfile } from '../sports/baseball.js';
 import { getSport, SPORTS } from '../sports/index.js';
 import { historyRound, memo, ratingTier, roman, shortName, signedDelta, teamChip } from './format.js';
 
@@ -18,8 +19,18 @@ const GROUPS = {
   DL: 'Defensive line', LB: 'Linebackers', CB: 'Secondary', S: 'Secondary', K: 'Kicker',
 };
 /**
- * Formation slots in % of the pitch box (C§7.4, design V442), the basketball half court (C§17) and the American football
- * field: the offence driving up from below the line of scrimmage, the nickel defence above it, the kicker aside.
+ * A sport whose codes clash with another's has its own order and groups: baseball's catcher shares basketball's 'C'.
+ * The batting order's positions first (catcher, infield, outfield, designated hitter), then the pitchers.
+ */
+const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5, CF: 6, RF: 7, DH: 8, SP: 9, RP: 10 } };
+const SPORT_GROUPS = {
+  baseball: { C: 'Catcher', '1B': 'Infield', '2B': 'Infield', '3B': 'Infield', SS: 'Infield', LF: 'Outfield', CF: 'Outfield',
+    RF: 'Outfield', DH: 'Designated hitter', SP: 'Starting pitcher', RP: 'Bullpen' },
+};
+/**
+ * Formation slots in % of the pitch box (C§7.4, design V442), the basketball half court (C§17), the American football
+ * field (the offence driving up from below the line of scrimmage, the nickel defence above it, the kicker aside) and
+ * the baseball diamond.
  */
 const SLOTS = {
   football: {
@@ -38,12 +49,19 @@ const SLOTS = {
     CB: [[8, 40], [92, 40], [18, 30]],
     S: [[30, 13], [70, 13]],
   },
+  // Home plate at the foot of the box, the infield diamond above it, the outfield beyond; the designated hitter on
+  // deck and the bullpen beyond the right-field line.
+  baseball: {
+    C: [[50, 89]], SP: [[50, 62]], '1B': [[70, 58]], '2B': [[61, 42]], SS: [[39, 42]], '3B': [[30, 58]],
+    LF: [[22, 30]], CF: [[50, 21]], RF: [[78, 30]], DH: [[16, 86]], RP: [[91, 50], [91, 68], [91, 86]],
+  },
 };
 /** Squad-screen copy per sport: the box the lineup is drawn on and its names. */
 const LAYOUTS = {
   football: { layout: 'pitch', viewLabel: 'Pitch' },
   basketball: { layout: 'court', viewLabel: 'Court' },
   'american-football': { layout: 'field', viewLabel: 'Field' },
+  baseball: { layout: 'diamond', viewLabel: 'Diamond' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
 const DEPTH_ROWS = 5;
@@ -52,13 +70,14 @@ const SIDE_CLAIMS = 3;
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const finite = value => (Number.isFinite(Number(value)) && value !== null && value !== '' ? Number(value) : null);
 
-function byPosition(position) {
-  return player => POSITION_ORDER[position(player)] ?? 99;
+function byPosition(position, sportId) {
+  const order = SPORT_ORDER[sportId] || POSITION_ORDER;
+  return player => order[position(player)] ?? 99;
 }
 
 /** Stable sort by position order, then base rating descending (design `byPos`, C§5.7). */
-function sortByPosition(players, position) {
-  const order = byPosition(position);
+function sortByPosition(players, position, sportId) {
+  const order = byPosition(position, sportId);
   return players.slice().sort((a, b) => order(a) - order(b) || (Number(b.rating) || 0) - (Number(a.rating) || 0));
 }
 
@@ -108,16 +127,18 @@ export function profileSegments(value) {
 }
 
 /**
- * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball) or Offence / Defence / Kicking (American
- * football) from the sports engines' positional profiles of the lineup (ED§4c; no match-day offset), with the C1
- * segment count.
+ * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball), Offence / Defence / Kicking (American
+ * football) or Batting / Pitching / Fielding (baseball) from the sports engines' positional profiles of the lineup
+ * (ED§4c; no match-day offset), with the C1 segment count.
  */
 export function strengthProfile(lineup, sportId) {
   const rows = sportId === 'basketball'
     ? (({ offence, defence }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence]])(basketballProfile(lineup))
     : sportId === 'american-football'
       ? (({ offence, defence, kicking }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence], ['kicking', 'Kicking', kicking]])(americanFootballProfile(lineup))
-      : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
+      : sportId === 'baseball'
+        ? (({ batting, pitching, fielding }) => [['batting', 'Batting', batting], ['pitching', 'Pitching', pitching], ['fielding', 'Fielding', fielding]])(baseballProfile(lineup))
+        : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
   return rows.map(([key, label, value]) => {
     const raw = Number.isFinite(Number(value)) ? Number(value) : 0;
     return { key, label, value: raw.toFixed(1), raw: Math.round(raw * 10) / 10, segments: profileSegments(raw) };
@@ -264,16 +285,16 @@ function computeSquad(st, ctx, team) {
     };
   };
 
-  const starters = sortByPosition(lineup.starters, player => player.assignedPos || player.pos);
+  const starters = sortByPosition(lineup.starters, player => player.assignedPos || player.pos, sportId);
   const starterRows = starters.map((player, i) => rowOf(player, i, true));
   const groups = [];
   for (const row of starterRows) {
-    const label = GROUPS[row.pos] || row.pos;
+    const label = (SPORT_GROUPS[sportId] || GROUPS)[row.pos] || row.pos;
     const last = groups.at(-1);
     if (last && last.label === label) last.rows.push(row);
     else groups.push({ key: `g-${groups.length}-${label}`, label, rows: [row] });
   }
-  const bench = sortByPosition(lineup.bench, player => player.pos);
+  const bench = sortByPosition(lineup.bench, player => player.pos, sportId);
   const benchRows = bench.map((player, i) => rowOf(player, i, false));
   const depth = {
     rows: benchRows.slice(0, DEPTH_ROWS),

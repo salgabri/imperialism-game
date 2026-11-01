@@ -3,6 +3,7 @@ import { C } from '../theme.js';
 import TeamMark from './TeamMark.jsx';
 import Icon from './Icon.jsx';
 import { useLiveMinute } from './LiveMinute.jsx';
+import { clockLabel } from '../sports/index.js';
 import { formatOddsPair, roman } from '../viewModels/format.js';
 import { FOREIGN_TRANSIT_LABEL } from '../engine/campaign.js';
 import './match-card.css';
@@ -79,10 +80,13 @@ function MatchResult({ result, resultWinnerId, onSelectTeam, onViewConquest }) {
   );
 }
 
-/** "38' · LIVE" read from the minute store (DEC D7); never below the model's minute (last revealed event). */
-function CompactMinute({ store, fallback = 0, label }) {
+/**
+ * "38' · LIVE" (baseball "T5 · LIVE") read from the minute store (DEC D7); never below the model's minute (last revealed
+ * event). `sport` shows the sport's own clock.
+ */
+function CompactMinute({ store, fallback = 0, label, sport }) {
   const minute = useLiveMinute(store, fallback);
-  return <>{`${Math.max(Number(minute) || 0, Number(fallback) || 0)}' · ${label}`}</>;
+  return <>{`${clockLabel(sport, Math.max(Number(minute) || 0, Number(fallback) || 0))} · ${label}`}</>;
 }
 
 const STATUS_COPY = { FT: 'Full time', 'FULL TIME': 'Full time', FINAL: 'Final', PENALTIES: 'Penalties', OVERTIME: 'Overtime' };
@@ -158,7 +162,7 @@ function CompactResult({ result, resultWinnerId, onSelectTeam, onViewConquest, e
  * everything else folds into the result's details so the column keeps its fronts and latest results.
  */
 function CompactMatchCard({ round, status, statusLive, startLabel, a, b, firstTeamId, secondTeamId, resultWinnerId, kicks,
-  events, noEvents, result, eventsRef, odds, series, onViewConquest, onSelectTeam, routeLabel, minuteStore, minuteFallback }) {
+  events, noEvents, result, eventsRef, odds, series, onViewConquest, onSelectTeam, routeLabel, minuteStore, minuteFallback, clockSport }) {
   const done = !!result;
   const live = !done && !!statusLive;
   const ticking = live && /^live$/i.test(String(status || ''));
@@ -186,7 +190,7 @@ function CompactMatchCard({ round, status, statusLive, startLabel, a, b, firstTe
       </div>
       <p className={`fi-match-status${live ? ' is-live' : ''}`}>
         <i className="fi-match-status-mark" aria-hidden="true" />
-        <span>{ticking ? <CompactMinute store={minuteStore} fallback={floor} label={status} />
+        <span>{ticking ? <CompactMinute store={minuteStore} fallback={floor} label={status} sport={clockSport} />
           : done && result.tieText ? `${statusText} · ${result.tieText}` : statusText}</span>
       </p>
       {!done && oddsRow}
@@ -207,7 +211,7 @@ function CompactMatchCard({ round, status, statusLive, startLabel, a, b, firstTe
 }
 
 /** The latest match stays visible while its territory and player rewards resolve. */
-export default function MatchCard({ round, status, statusColor, statusLive, startLabel, a, b, aId, bId, dId, winnerId, kicks, events = [], noEvents, result, eventsRef, odds, series, onViewConquest, onSelectTeam, archived = false, routeLabel, variant = 'full', minuteStore = null, minuteFallback = 0 }) {
+export default function MatchCard({ round, status, statusColor, statusLive, startLabel, a, b, aId, bId, dId, winnerId, kicks, events = [], noEvents, result, eventsRef, odds, series, onViewConquest, onSelectTeam, archived = false, routeLabel, variant = 'full', minuteStore = null, minuteFallback = 0, clockSport = 'football' }) {
   // Flag IDs describe artwork; only campaign IDs can open a squad, particularly for clubs.
   const firstTeamId = a.teamId ?? a.tid ?? aId;
   const secondTeamId = b.teamId ?? b.tid ?? dId ?? bId;
@@ -216,7 +220,7 @@ export default function MatchCard({ round, status, statusColor, statusLive, star
     return <CompactMatchCard round={round} status={status} statusLive={statusLive} startLabel={startLabel} a={a} b={b}
       firstTeamId={firstTeamId} secondTeamId={secondTeamId} resultWinnerId={resultWinnerId} kicks={kicks} events={events}
       noEvents={noEvents} result={result} eventsRef={eventsRef} odds={odds} series={series} onViewConquest={onViewConquest}
-      onSelectTeam={onSelectTeam} routeLabel={routeLabel} minuteStore={minuteStore} minuteFallback={minuteFallback} />;
+      onSelectTeam={onSelectTeam} routeLabel={routeLabel} minuteStore={minuteStore} minuteFallback={minuteFallback} clockSport={clockSport} />;
   }
   const statusText = status === 'FT' || status === 'FULL TIME' ? 'Full time' : status;
   const statusTone = statusColor === C.gold ? 'warning' : statusLive ? 'positive' : 'muted';

@@ -27,8 +27,12 @@ const COASTAL_ZERO_TOLERANCE = 1e-8;
 const text = () => document.getElementById('root').textContent;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const countryPaths = () => [...document.querySelectorAll('[data-testid="world-map"] path[data-country]')];
-const countryFlagParts = id => [...document.querySelectorAll('path[data-flag-country]')]
+const countryFlagParts = id => [...document.querySelectorAll('use[data-flag-country]')]
   .filter(part => id == null || part.dataset.flagCountry === id);
+/** A shape's outline: a land path's own `d`, or for a flag part the outline its clip path draws. */
+const shapeD = node => (node.localName === 'use'
+  ? document.getElementById(node.getAttribute('clip-path')?.match(/^url\(#(.+)\)$/)?.[1])?.querySelector('path')?.getAttribute('d')
+  : node.getAttribute('d')) || '';
 const setState = (app, state) => new Promise(resolve => app.setState(state, resolve));
 const roundedGain = (after, before) => Math.round((after - before) * 10) / 10;
 const buttonNamed = label => [...document.querySelectorAll('button')].find(el => el.textContent.trim() === label);
@@ -102,43 +106,49 @@ function backdropSnapshot(app) {
   };
 }
 
-function flagPattern(path) {
-  const id = path.getAttribute('fill').match(/^url\(#(fi-flag-[^)]+)\)$/)?.[1];
+/** The banner a flag part shows (its `<use>` href), or one a land path were filled with (a regression). */
+function flagBanner(node) {
+  const id = (node.getAttribute('href') || node.getAttribute('fill') || '').match(/^(?:#|url\(#)(fi-flag-[^)]+)\)?$/)?.[1];
   return id ? document.getElementById(id) : null;
 }
 
+const numericBox = node => ['x', 'y', 'width', 'height'].map(name => Number(node.getAttribute(name)));
+
+/** A banner (FlagArt) as drawn: a plain group in map coordinates, one region rect and only its artwork layers. */
+function bannerShape(banner) {
+  if (!banner || banner.localName !== 'g' || banner.hasAttribute('viewBox') || banner.hasAttribute('transform')
+    || banner.getAttribute('pointer-events') !== 'none') return null;
+  const images = [...banner.querySelectorAll('image')];
+  const fallback = banner.querySelector('rect');
+  if (banner.children.length !== images.length + 1 || [...banner.children].some(node => !['rect', 'image'].includes(node.localName))
+    || banner.querySelectorAll('rect').length !== 1 || !fallback || fallback.hasAttribute('stroke')
+    || banner.querySelector('[transform], [style*="transform"], [tabindex], a, use, foreignObject')) return null;
+  return { images, fallback, region: numericBox(fallback) };
+}
+
 /** Exact provenance and one-banner semantics, for native and separated emblems. */
-function flagAssetsMatch(pattern, code) {
-  if (!pattern || !code || pattern.dataset.flagSource !== `/flags/${code}.svg`
-    || pattern.getAttribute('patternUnits') !== 'userSpaceOnUse'
-    || pattern.getAttribute('patternContentUnits') !== 'userSpaceOnUse'
-    || pattern.hasAttribute('viewBox') || pattern.hasAttribute('patternTransform')
-    || pattern.getAttribute('pointer-events') !== 'none') return false;
-  const images = [...pattern.querySelectorAll('image')];
-  if (pattern.children.length !== images.length + 1 || [...pattern.children].some(node => !['rect', 'image'].includes(node.localName))) return false;
-  const field = pattern.querySelector('[data-flag-field]');
-  const symbol = pattern.querySelector('[data-flag-symbol]');
-  const numericBox = node => ['x', 'y', 'width', 'height'].map(name => Number(node.getAttribute(name)));
+function flagAssetsMatch(banner, code) {
+  const shape = bannerShape(banner);
+  if (!shape || !code || banner.dataset.flagSource !== `/flags/${code}.svg`) return false;
+  const { images, region } = shape;
+  const field = banner.querySelector('[data-flag-field]');
+  const symbol = banner.querySelector('[data-flag-symbol]');
   const validBox = node => numericBox(node).every(Number.isFinite) && numericBox(node).slice(2).every(n => n > 0);
-  const localTile = [0, 0, ...numericBox(pattern).slice(2)];
-  const fallback = pattern.querySelector('rect');
-  if (pattern.querySelectorAll('rect').length !== 1 || !fallback
-    || JSON.stringify(numericBox(fallback)) !== JSON.stringify(localTile)
-    || fallback.hasAttribute('stroke') || pattern.querySelector('[transform], [style*="transform"], [tabindex], a, use, foreignObject')) return false;
-  if (!field && !symbol) return pattern.dataset.flagLayout === 'native' && images.length === 1
+  if (!validBox(shape.fallback)) return false;
+  if (!field && !symbol) return banner.dataset.flagLayout === 'native' && images.length === 1
     && images[0].getAttribute('href') === `/flags/${code}.svg`
     && images[0].getAttribute('preserveAspectRatio') === 'none'
-    && JSON.stringify(numericBox(images[0])) === JSON.stringify(localTile);
+    && JSON.stringify(numericBox(images[0])) === JSON.stringify(region);
   const profile = FLAG_SYMBOLS[code];
   if (!profile || !field || !symbol || images.length !== 2
-    || pattern.querySelectorAll('[data-flag-field]').length !== 1 || pattern.querySelectorAll('[data-flag-symbol]').length !== 1
-    || pattern.dataset.flagLayout !== 'symbol-aware'
+    || banner.querySelectorAll('[data-flag-field]').length !== 1 || banner.querySelectorAll('[data-flag-symbol]').length !== 1
+    || banner.dataset.flagLayout !== 'symbol-aware'
     || field.getAttribute('href') !== `/${profile.fieldFile}` || symbol.getAttribute('href') !== `/${profile.symbolFile}`
     || field.getAttribute('preserveAspectRatio') !== 'none' || symbol.getAttribute('preserveAspectRatio') !== 'xMidYMid meet'
     || !validBox(field) || !validBox(symbol)) return false;
   const [sx, sy, sw, sh] = numericBox(symbol);
   const [fx, fy, fw, fh] = numericBox(field);
-  const [px, py, pw, ph] = localTile;
+  const [px, py, pw, ph] = region;
   const eps = 1e-6;
   return Math.abs(sw / sh - profile.bounds.w / profile.bounds.h) < eps
     && fx <= px + eps && fy <= py + eps && fx + fw >= px + pw - eps && fy + fh >= py + ph - eps
@@ -150,37 +160,31 @@ const crestOf = team => (team?.kind === 'club' ? clubLogoUrl(team.id) : null);
 /** Whether a team's land carries a banner in Flags mode: a nation's flag or a club's crest. */
 const flies = team => !!(FLAG_CODES[team?.flagId] || crestOf(team));
 
-/** A club crest tile: the club colour across the region and at most one undistorted crest inside it. */
-function crestAssetsMatch(pattern, team) {
+/** A club crest banner: the club colour across the region and at most one undistorted crest inside it. */
+function crestAssetsMatch(banner, team) {
   const crest = crestOf(team);
-  if (!pattern || !crest || pattern.dataset.flagSource !== crest || pattern.dataset.flagLayout !== 'crest'
-    || pattern.getAttribute('patternUnits') !== 'userSpaceOnUse' || pattern.getAttribute('patternContentUnits') !== 'userSpaceOnUse'
-    || pattern.hasAttribute('viewBox') || pattern.hasAttribute('patternTransform') || pattern.getAttribute('pointer-events') !== 'none') return false;
-  const numericBox = node => ['x', 'y', 'width', 'height'].map(name => Number(node.getAttribute(name)));
-  const [, , pw, ph] = numericBox(pattern);
-  const fallback = pattern.querySelector('rect');
-  const images = [...pattern.querySelectorAll('image')];
-  if (pattern.querySelectorAll('rect').length !== 1 || JSON.stringify(numericBox(fallback)) !== JSON.stringify([0, 0, pw, ph])
-    || fallback.getAttribute('fill') !== team.col || images.length > 1
-    || pattern.children.length !== images.length + 1) return false;
-  if (!images.length) return true;
-  const [x, y, w, h] = numericBox(images[0]);
+  const shape = bannerShape(banner);
+  if (!shape || !crest || banner.dataset.flagSource !== crest || banner.dataset.flagLayout !== 'crest'
+    || shape.fallback.getAttribute('fill') !== team.col || shape.images.length > 1) return false;
+  if (!shape.images.length) return true;
+  const [px, py, pw, ph] = shape.region;
+  const [x, y, w, h] = numericBox(shape.images[0]);
   const eps = 1e-6;
-  return images[0].getAttribute('href') === crest && images[0].getAttribute('preserveAspectRatio') === 'xMidYMid meet'
-    && w > 0 && h > 0 && x >= -eps && y >= -eps && x + w <= pw + eps && y + h <= ph + eps;
+  return shape.images[0].getAttribute('href') === crest && shape.images[0].getAttribute('preserveAspectRatio') === 'xMidYMid meet'
+    && w > 0 && h > 0 && x >= px - eps && y >= py - eps && x + w <= px + pw + eps && y + h <= py + ph + eps;
 }
 
 /** The right banner for a region's owner: its crest for a club with one, else its flag. */
-const ownerAssetsMatch = (pattern, team) => (crestOf(team) ? crestAssetsMatch(pattern, team) : flagAssetsMatch(pattern, FLAG_CODES[team?.flagId]));
+const ownerAssetsMatch = (banner, team) => (crestOf(team) ? crestAssetsMatch(banner, team) : flagAssetsMatch(banner, FLAG_CODES[team?.flagId]));
 
 /** A country's flag parts exactly repaint its filled rings with its owner's banner. */
 function bannerPartsMatch(app, path, owner) {
   const parts = countryFlagParts(path.dataset.country);
   return parts.length > 0 && path.getAttribute('fill') === 'transparent'
-    && JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(parts.map(part => part.getAttribute('d')).join('')))
+    && JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(parts.map(shapeD).join('')))
     && parts.every(part => {
-      const pattern = flagPattern(part);
-      return pattern?.id === `fi-flag-${part.dataset.flagComponent}` && ownerAssetsMatch(pattern, owner);
+      const banner = flagBanner(part);
+      return banner?.id === `fi-flag-${part.dataset.flagComponent}` && ownerAssetsMatch(banner, owner);
     });
 }
 
@@ -194,11 +198,11 @@ function expectedFlagsShown(app) {
     // Setup flies nothing.
     const ids = paths.map(path => path.dataset.country);
     if (app.state.mapMode !== 'flags' || ids.length !== domestic.sectionIds.size || !ids.every(id => domestic.sectionIds.has(id))) return false;
-    if (!playing) return !countryFlagParts().length && !document.querySelector('pattern[id^="fi-flag-"]');
+    if (!playing) return !countryFlagParts().length && !document.querySelector('g[id^="fi-flag-"]');
     return paths.every(path => {
       const owner = app.state.teams[app.state.own[path.dataset.country]];
       if (owner?.kind !== 'club') return false;
-      if (!crestOf(owner)) return path.getAttribute('fill') === owner.col && !flagPattern(path);
+      if (!crestOf(owner)) return path.getAttribute('fill') === owner.col && !flagBanner(path);
       return filledRings(path.getAttribute('d')).length ? bannerPartsMatch(app, path, owner) : countryFlagParts(path.dataset.country).length === 0;
     });
   }
@@ -209,23 +213,25 @@ function expectedFlagsShown(app) {
     const owner = playing ? app.state.teams[app.state.own[id]] : null;
     const flagId = playing ? owner?.flagId : FLAG_CODES[id] ? id : DEPENDENCIES[id]?.of;
     const parts = countryFlagParts(id);
-    if (owner?.kind === 'club' && !crestOf(owner)) return parts.length === 0 && !flagPattern(path) && path.getAttribute('fill') === owner.col;
+    if (owner?.kind === 'club' && !crestOf(owner)) return parts.length === 0 && !flagBanner(path) && path.getAttribute('fill') === owner.col;
     if (owner?.kind === 'club') return filledRings(path.getAttribute('d')).length === 0 ? parts.length === 0 : bannerPartsMatch(app, path, owner);
-    if (!FLAG_CODES[flagId]) return parts.length === 0 && !flagPattern(path);
+    if (!FLAG_CODES[flagId]) return parts.length === 0 && !flagBanner(path);
     if (filledRings(path.getAttribute('d')).length === 0) return parts.length === 0;
     return parts.length > 0 && path.getAttribute('fill') === 'transparent'
-      && JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(parts.map(part => part.getAttribute('d')).join('')))
+      && JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(parts.map(shapeD).join('')))
       && parts.every(part => {
-        const pattern = flagPattern(part);
-        return pattern?.id === `fi-flag-${part.dataset.flagComponent}`
-          && flagAssetsMatch(pattern, FLAG_CODES[flagId]);
+        const banner = flagBanner(part);
+        return banner?.id === `fi-flag-${part.dataset.flagComponent}`
+          && flagAssetsMatch(banner, FLAG_CODES[flagId]);
       });
   });
 }
 
-const patternBounds = pattern => Object.fromEntries([['x', 'x'], ['y', 'y'], ['w', 'width'], ['h', 'height']]
-  .map(([key, attr]) => [key, Number(pattern.getAttribute(attr))]));
-const pathPoints = path => [...path.getAttribute('d').matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)]
+const boxOf = node => Object.fromEntries([['x', 'x'], ['y', 'y'], ['w', 'width'], ['h', 'height']]
+  .map(([key, attr]) => [key, Number(node.getAttribute(attr))]));
+/** A banner's region: its fallback rect, which spans the region's padded bounds. */
+const bannerBounds = banner => boxOf(banner.querySelector('rect'));
+const pathPoints = node => [...shapeD(node).matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)]
   .map(match => [Number(match[1]), Number(match[2])]);
 const insideBounds = ([x, y], bounds, tolerance = .000001) => x >= bounds.x - tolerance && y >= bounds.y - tolerance
   && x <= bounds.x + bounds.w + tolerance && y <= bounds.y + bounds.h + tolerance;
@@ -242,7 +248,7 @@ function filledRings(d) {
   }).sort();
 }
 
-/** Nearby owned land shares a regional tile; remote possessions stay separate. */
+/** Nearby owned land shares a regional banner; remote possessions stay separate. */
 function empireFlagsSnapshot(app) {
   const groups = new Map();
   const owners = new Set();
@@ -253,20 +259,20 @@ function empireFlagsSnapshot(app) {
     if (!groups.has(part.dataset.flagComponent)) groups.set(part.dataset.flagComponent, []);
     groups.get(part.dataset.flagComponent).push(part);
   }
-  const patterns = [...document.querySelectorAll('pattern[id^="fi-flag-"]')];
+  const patterns = [...document.querySelectorAll('g[id^="fi-flag-"]')];
   let sharedReferences = true;
   let localBounds = true;
   let coversEveryPolygon = true;
   let correctOwner = true;
   for (const [componentId, componentParts] of groups) {
-    const pattern = document.getElementById(`fi-flag-${componentId}`);
-    sharedReferences &&= !!pattern && componentParts.every(part => flagPattern(part) === pattern);
-    if (!pattern) { localBounds = false; coversEveryPolygon = false; correctOwner = false; continue; }
+    const banner = document.getElementById(`fi-flag-${componentId}`);
+    sharedReferences &&= !!banner && componentParts.every(part => flagBanner(part) === banner);
+    if (!banner) { localBounds = false; coversEveryPolygon = false; correctOwner = false; continue; }
     correctOwner &&= componentParts.every(part => {
       const ownerId = app.state.own[part.dataset.flagCountry];
-      return pattern.dataset.owner === ownerId && ownerAssetsMatch(pattern, app.state.teams[ownerId]);
+      return banner.dataset.owner === ownerId && ownerAssetsMatch(banner, app.state.teams[ownerId]);
     });
-    const bounds = patternBounds(pattern);
+    const bounds = bannerBounds(banner);
     const points = componentParts.flatMap(pathPoints);
     const minX = Math.min(...points.map(([x]) => x)), maxX = Math.max(...points.map(([x]) => x));
     const minY = Math.min(...points.map(([, y]) => y)), maxY = Math.max(...points.map(([, y]) => y));
@@ -280,7 +286,7 @@ function empireFlagsSnapshot(app) {
     const heldParts = parts.filter(part => part.dataset.flagCountry === path.dataset.country);
     const owner = app.state.teams[app.state.own[path.dataset.country]];
     if (!flies(owner)) return heldParts.length === 0;
-    return JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(heldParts.map(part => part.getAttribute('d')).join('')));
+    return JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(heldParts.map(shapeD).join('')));
   });
   const unpaintedOwners = app.state.aliveIds.filter(id => flies(app.state.teams[id]) && !owners.has(id));
   return {
@@ -293,8 +299,8 @@ function empireFlagsSnapshot(app) {
     onePatternPerComponent: patterns.length === groups.size && new Set(patterns.map(pattern => pattern.id)).size === groups.size,
     oneBannerPerPattern: patterns.every(pattern => ownerAssetsMatch(pattern, app.state.teams[pattern.dataset.owner])),
     sharedReferences, localBounds, coversEveryPolygon, correctOwner, exactCountryCoverage,
-    signature: JSON.stringify(patterns.map(pattern => ({ id: pattern.id, bounds: patternBounds(pattern), source: pattern.dataset.flagSource,
-      layers: [...pattern.querySelectorAll('image')].map(image => ({ url: image.getAttribute('href'), bounds: patternBounds(image), fit: image.getAttribute('preserveAspectRatio') }))
+    signature: JSON.stringify(patterns.map(banner => ({ id: banner.id, bounds: bannerBounds(banner), source: banner.dataset.flagSource,
+      layers: [...banner.querySelectorAll('image')].map(image => ({ url: image.getAttribute('href'), bounds: boxOf(image), fit: image.getAttribute('preserveAspectRatio') }))
     })).sort((a, b) => a.id.localeCompare(b.id))),
   };
 }
@@ -306,7 +312,7 @@ function flagPartAtCountryLocation(app, countryId, longitude, latitude) {
   const x = px * s + tx, y = py * s + ty;
   return countryFlagParts(countryId).find(part => {
     let winding = 0;
-    for (const ring of filledRings(part.getAttribute('d')).map(JSON.parse)) {
+    for (const ring of filledRings(shapeD(part)).map(JSON.parse)) {
       for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
         const a = ring[j], b = ring[i];
         const cross = (b[0] - a[0]) * (y - a[1]) - (x - a[0]) * (b[1] - a[1]);
@@ -343,13 +349,13 @@ export async function runSwissFlagRegionCheck() {
       Guiana: ['250', -53.1, 4.1],
     };
     const located = Object.fromEntries(Object.entries(locations).map(([name, args]) => [name, flagPartAtCountryLocation(app, ...args)]));
-    const mainlandPattern = located.Switzerland && flagPattern(located.Switzerland);
-    const isMainland = name => !!mainlandPattern && !!located[name] && flagPattern(located[name])?.id === mainlandPattern.id;
+    const mainlandBanner = located.Switzerland && flagBanner(located.Switzerland);
+    const isMainland = name => !!mainlandBanner && !!located[name] && flagBanner(located[name])?.id === mainlandBanner.id;
     const afterConquests = empireFlagsSnapshot(app);
     const rulesBeforeModes = ownershipSnapshot(app);
     button('Political').click();
     await until('Swiss regional political mode', () => app.state.mapMode === 'political');
-    const politicalHasNoFlags = countryFlagParts().length === 0 && !document.querySelector('pattern[id^="fi-flag-"]');
+    const politicalHasNoFlags = countryFlagParts().length === 0 && !document.querySelector('g[id^="fi-flag-"]');
     button('Flags').click();
     await until('Swiss regional flags restored', () => app.state.mapMode === 'flags');
     const restored = empireFlagsSnapshot(app);
@@ -357,9 +363,9 @@ export async function runSwissFlagRegionCheck() {
       afterConquests, restored, located: Object.fromEntries(Object.entries(located).map(([name, part]) => [name, !!part])),
       mainlandShared: ['France', 'Italy'].every(isMainland),
       corsicaShared: isMainland('Corsica'), sardiniaShared: isMainland('Sardinia'), sicilyShared: isMainland('Sicily'),
-      swissAsset: flagAssetsMatch(mainlandPattern, 'ch'),
-      guianaSeparate: !!located.Guiana && flagPattern(located.Guiana)?.id !== mainlandPattern?.id
-        && flagAssetsMatch(flagPattern(located.Guiana), 'ch'),
+      swissAsset: flagAssetsMatch(mainlandBanner, 'ch'),
+      guianaSeparate: !!located.Guiana && flagBanner(located.Guiana)?.id !== mainlandBanner?.id
+        && flagAssetsMatch(flagBanner(located.Guiana), 'ch'),
       onlyIntendedConquests: app.state.matches === 2 && app.state.aliveIds.length === fielded - 2
         && app.state.teams['756'].squad.length === squadSizeBefore + 2
         && Object.keys(app.state.own).length === Object.keys(ownershipBefore).length
@@ -384,7 +390,7 @@ function regionalFlagsSnapshot(app) {
     expectedSections: domestic.sectionIds.size,
     neutralCount: neutral.length,
     flagParts: countryFlagParts().length,
-    flagPatterns: document.querySelectorAll('pattern[id^="fi-flag-"]').length,
+    flagPatterns: document.querySelectorAll('g[id^="fi-flag-"]').length,
     empireFlags: empireFlagsSnapshot(app),
     backdrop: backdropSnapshot(app),
   };
@@ -397,7 +403,7 @@ function regionalFlagsSnapshot(app) {
     const owner = app.state.teams[app.state.own[path.dataset.country]];
     const parts = countryFlagParts(path.dataset.country);
     if (filledRings(path.getAttribute('d')).length === 0) return parts.length === 0;
-    return parts.length > 0 && parts.every(part => ownerAssetsMatch(flagPattern(part), owner));
+    return parts.length > 0 && parts.every(part => ownerAssetsMatch(flagBanner(part), owner));
   };
   const neutralMatches = path => !path.getAttribute('fill').startsWith('url(')
     && countryFlagParts(path.dataset.country).length === 0;
@@ -565,8 +571,8 @@ function empireLabelsSnapshot(app, { geography = false } = {}) {
 
 /** Flags mode: an owner whose crest is drawn on its land has no code printed over it (README "Club crests"). */
 function crestLabelsSnapshot() {
-  const drawn = new Set([...document.querySelectorAll('pattern[data-flag-layout="crest"]')]
-    .filter(pattern => pattern.querySelector('image')).map(pattern => pattern.dataset.owner));
+  const drawn = new Set([...document.querySelectorAll('g[data-flag-layout="crest"]')]
+    .filter(banner => banner.querySelector('image')).map(banner => banner.dataset.owner));
   const labelled = [...document.querySelectorAll('text[data-empire-label]')].map(label => label.dataset.empireLabel);
   return { drawn: drawn.size, labelledOverCrest: labelled.filter(id => drawn.has(id)).length };
 }
@@ -745,12 +751,12 @@ async function select(id, value) {
   if (el.value !== value) throw new Error(`select rejected ${value}: ${id}`);
 }
 
-/** Political (DEC D18): ownership fills only, with no flag pattern or flag part anywhere on the map. */
+/** Political (DEC D18): ownership fills only, with no flag banner or flag part anywhere on the map. */
 function politicalMapShown(app) {
   const paths = countryPaths();
   const playing = app.state.phase === 'playing' || app.state.phase === 'victory';
   return app.state.mapMode === 'political' && paths.length > 0
-    && countryFlagParts().length === 0 && !document.querySelector('pattern[id^="fi-flag-"]')
+    && countryFlagParts().length === 0 && !document.querySelector('g[id^="fi-flag-"]')
     && paths.every(path => !String(path.getAttribute('fill') || '').startsWith('url('))
     && (!playing || document.querySelector('.map-modes button[aria-pressed="true"]')?.textContent.trim() === 'Political');
 }
@@ -1110,8 +1116,8 @@ export async function runEmpireFlagCheck() {
       };
       return area(b) - area(a);
     })[0];
-    const mainlandPattern = () => flagPattern(largestPart('276'));
-    const germanyBefore = patternBounds(mainlandPattern());
+    const mainlandBanner = () => flagBanner(largestPart('276'));
+    const germanyBefore = bannerBounds(mainlandBanner());
     const franceAtKickoffDetached = new Set(countryFlagParts('250').map(part => part.dataset.flagComponent)).size > 1;
     async function acquire(loserId) {
       await setState(app, { round: app.state.round + 1, match: {
@@ -1125,26 +1131,26 @@ export async function runEmpireFlagCheck() {
     }
     await acquire('208'); // Danish Jutland joins Germany; Greenland must not.
     const firstConquest = empireFlagsSnapshot(app);
-    const denmarkConnected = flagPattern(largestPart('208')) === mainlandPattern();
-    const greenlandDetached = countryFlagParts('304').length > 0 && countryFlagParts('304').every(part => flagPattern(part) !== mainlandPattern());
-    const germanAssetAfterDenmark = flagAssetsMatch(mainlandPattern(), 'de');
-    const germanyAfterDenmark = patternBounds(mainlandPattern());
+    const denmarkConnected = flagBanner(largestPart('208')) === mainlandBanner();
+    const greenlandDetached = countryFlagParts('304').length > 0 && countryFlagParts('304').every(part => flagBanner(part) !== mainlandBanner());
+    const germanAssetAfterDenmark = flagAssetsMatch(mainlandBanner(), 'de');
+    const germanyAfterDenmark = bannerBounds(mainlandBanner());
     await acquire('250'); // Continental France joins Germany, not its colonies.
     const neighboring = empireFlagsSnapshot(app);
-    const franceConnected = flagPattern(largestPart('250')) === mainlandPattern();
-    const franceOffshoreDetached = countryFlagParts('250').some(part => flagPattern(part) !== mainlandPattern());
-    const mainlandAfterNeighbors = mainlandPattern().outerHTML;
+    const franceConnected = flagBanner(largestPart('250')) === mainlandBanner();
+    const franceOffshoreDetached = countryFlagParts('250').some(part => flagBanner(part) !== mainlandBanner());
+    const mainlandAfterNeighbors = mainlandBanner().outerHTML;
     await acquire('392'); // Japan is disjoint from Europe and contains many islands.
     const disjoint = empireFlagsSnapshot(app);
-    const japanDetached = countryFlagParts('392').length > 0 && countryFlagParts('392').every(part => flagPattern(part) !== mainlandPattern());
-    const mainlandUnchangedByJapan = mainlandPattern().outerHTML === mainlandAfterNeighbors;
+    const japanDetached = countryFlagParts('392').length > 0 && countryFlagParts('392').every(part => flagBanner(part) !== mainlandBanner());
+    const mainlandUnchangedByJapan = mainlandBanner().outerHTML === mainlandAfterNeighbors;
     await acquire('242'); // Fiji exercises islands on both sides of the date line.
     const archipelago = empireFlagsSnapshot(app);
     const islandPath = document.querySelector('path[data-country="242"]');
     const islandGeometry = app.displayGeo?.paths['242'] || app.geo.paths['242'];
     const islandsBeyondMainland = pathPoints(islandPath).some(point => !insideBounds(point, islandGeometry.bbox));
-    const islandDetached = countryFlagParts('242').length > 1 && countryFlagParts('242').every(part => flagPattern(part) !== mainlandPattern());
-    const mainlandUnchangedByFiji = mainlandPattern().outerHTML === mainlandAfterNeighbors;
+    const islandDetached = countryFlagParts('242').length > 1 && countryFlagParts('242').every(part => flagBanner(part) !== mainlandBanner());
+    const mainlandUnchangedByFiji = mainlandBanner().outerHTML === mainlandAfterNeighbors;
     const grewWithNeighbor = germanyAfterDenmark.w * germanyAfterDenmark.h > germanyBefore.w * germanyBefore.h;
 
     const svg = document.querySelector('[data-testid="world-map"]');
@@ -2060,7 +2066,7 @@ export async function run(scenario) {
     const politicalAtStart = app.state.mapMode === 'political'
       && initialHeld.length === Object.keys(app.state.own).length
       && initialHeld.every(path => path.dataset.owner === app.state.own[path.dataset.country] && !path.getAttribute('fill').startsWith('url('))
-      && !document.querySelector('pattern[id^="fi-flag-"]');
+      && !document.querySelector('g[id^="fi-flag-"]');
 
     // Sample actual rendered cards as the real simulation runs.
     let lastProgress = Date.now();
@@ -2149,7 +2155,7 @@ export async function run(scenario) {
     button('Flags').click();
     await until('flag map selected', () => app.state.mapMode === 'flags');
     const heldPaths = countryPaths().filter(path => path.dataset.owner);
-    const patterns = [...new Set(countryFlagParts().map(flagPattern).filter(Boolean))];
+    const patterns = [...new Set(countryFlagParts().map(flagBanner).filter(Boolean))];
     const championFlag = patterns.filter(pattern => ownerAssetsMatch(pattern, champion));
     const flagFills = heldPaths.filter(path => countryFlagParts(path.dataset.country).length > 0).length;
     const paintableTerritories = heldPaths.filter(path => filledRings(path.getAttribute('d')).length > 0).length;

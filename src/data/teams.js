@@ -327,7 +327,13 @@ export function buildTeam(id, rng, sport) {
   }
   const real = squad.length;
 
-  if (sport.id !== 'football') {
+  if (sport.id === 'baseball') {
+    // A nation's birthplace roster can be deep and still lack a catcher or a bullpen: every lineup slot its own
+    // players cannot fill naturally gets a generated player, however many real ones it has.
+    for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
+      if (!slot.player || slot.outOfPosition) squad.push(genPlayer(rng, culture, slot.position, str));
+    }
+  } else if (sport.id !== 'football') {
     const have = p => squad.filter(x => x.pos === p).length;
     for (const [pos, count] of Object.entries(formation)) {
       while (have(pos) < count && squad.length < squadSize) squad.push(genPlayer(rng, culture, pos, str));
@@ -382,24 +388,42 @@ export function squadAverage(team) {
 
 export const OUT_OF_POSITION_PENALTY = 12;
 // American football's positions are far more specialised: a tight end on the offensive line, or a receiver at
-// cornerback, is an emergency, not a rotation.
-const PENALTY_OF = { 'american-football': 25 };
+// cornerback, is an emergency, not a rotation. So are baseball's: MLB The Show lists every position a player can
+// field, and a starter in the bullpen (or a reliever starting) is out of his role.
+const PENALTY_OF = { 'american-football': 25, baseball: 20 };
 /** Rating points a starter loses outside his natural positions, in a sport ('football', 'basketball', …). */
 export const outOfPositionPenalty = sportId => PENALTY_OF[sportId] ?? OUT_OF_POSITION_PENALTY;
+// A baseball hitter on the mound, or a pitcher in the field or at the plate, is no rotation at all.
+export const CROSSOVER_PENALTY = 40;
+const PITCHING = new Set(['SP', 'RP']);
+const canPitch = player => PITCHING.has(player.pos) || !!player.positions?.some(position => PITCHING.has(position));
+const canHit = player => !PITCHING.has(player.pos) || !!player.positions?.some(position => !PITCHING.has(position));
 const LINEUP_PLANS = {
   football: ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'],
   basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
   // Eleven on offence (three receivers), eleven on defence (the nickel) and the kicker.
   'american-football': ['QB', 'RB', 'WR', 'WR', 'WR', 'TE', 'OL', 'OL', 'OL', 'OL', 'OL',
     'DL', 'DL', 'DL', 'DL', 'LB', 'LB', 'CB', 'CB', 'CB', 'S', 'S', 'K'],
+  // The batting order's nine (a designated hitter, no pitcher at the plate), the day's starter and three relievers.
+  baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP', 'RP', 'RP'],
 };
 const BASKETBALL_POSITIONS = new Set(LINEUP_PLANS.basketball);
 const GRIDIRON_POSITIONS = new Set(LINEUP_PLANS['american-football']);
-const canPlay = (player, position) => player.pos === position || player.positions?.includes(position);
+// Baseball's catcher shares basketball's 'C'; every other baseball position is its own.
+const BASEBALL_POSITIONS = new Set(LINEUP_PLANS.baseball.filter(position => position !== 'C'));
+// Baseball's designated hitter is any batter.
+const canPlay = (player, position) => player.pos === position || !!player.positions?.includes(position)
+  || (position === 'DH' && canHit(player));
+/** Rating points `player` loses at `position` outside his natural positions, in a sport. */
+function slotPenalty(sportId, player, position) {
+  if (sportId === 'baseball' && (PITCHING.has(position) ? !canPitch(player) : !canHit(player))) return CROSSOVER_PENALTY;
+  return outOfPositionPenalty(sportId);
+}
 
 /** Legacy saves can predate the sport field; their positions identify the plan. */
 export function teamSportId(team) {
   if (LINEUP_PLANS[team?.sport]) return team.sport;
+  if (team?.squad?.some(player => BASEBALL_POSITIONS.has(player.pos))) return 'baseball';
   // Basketball's centre and the offensive line never share a code: 'C' is basketball's, 'OL' American football's.
   if (team?.squad?.some(player => GRIDIRON_POSITIONS.has(player.pos) && !BASKETBALL_POSITIONS.has(player.pos))) return 'american-football';
   return team?.squad?.some(player => BASKETBALL_POSITIONS.has(player.pos)) ? 'basketball' : 'football';
@@ -407,14 +431,13 @@ export function teamSportId(team) {
 
 /**
  * Select the strongest assignment to the sport's actual playing positions.
- * A player may cover another position, but the assignment and penalty (12 points, 25 in American football)
- * are explicit. Optimising the whole assignment means an acquisition cannot
- * reduce strength by evicting a better emergency starter.
+ * A player may cover another position, but the assignment and penalty (12 points, 25 in American football, 20 in
+ * baseball and 40 for a baseball hitter pitching or a pitcher hitting) are explicit. Optimising the whole assignment
+ * means an acquisition cannot reduce strength by evicting a better emergency starter.
  */
 export function selectLineup(team) {
   const sportId = teamSportId(team);
   const plan = LINEUP_PLANS[sportId];
-  const penalty = outOfPositionPenalty(sportId);
   const squad = Array.isArray(team?.squad) ? team.squad : [];
   const rowCount = plan.length;
   const columnCount = Math.max(rowCount, squad.length);
@@ -422,7 +445,7 @@ export function selectLineup(team) {
     const player = squad[column];
     if (!player) return 40; // Unfilled shirts affect strength without inventing a player.
     const rating = Number.isFinite(player.rating) ? player.rating : 40;
-    return Math.max(1, rating - (canPlay(player, plan[row]) ? 0 : penalty));
+    return Math.max(1, rating - (canPlay(player, plan[row]) ? 0 : slotPenalty(sportId, player, plan[row])));
   };
 
   // Rectangular Hungarian assignment: rows are shirts, columns are players.
@@ -471,7 +494,7 @@ export function selectLineup(team) {
     const outOfPosition = !!source && !canPlay(source, position);
     const effectiveRating = effective(row, playerIndex);
     const player = source ? { ...source, originalIndex: playerIndex, assignedPos: position, effectiveRating, outOfPosition } : null;
-    return { position, player, effectiveRating, outOfPosition, penalty: outOfPosition ? penalty : 0 };
+    return { position, player, effectiveRating, outOfPosition, penalty: outOfPosition ? slotPenalty(sportId, source, position) : 0 };
   });
   return {
     starters: slots.filter(slot => slot.player).map(slot => slot.player),

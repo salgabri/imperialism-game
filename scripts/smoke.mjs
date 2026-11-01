@@ -27,6 +27,8 @@ const FIJI = { layer: 'clubs', clubScope: 'domestic:242' };
 const NBA = { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nba' };
 // American football: the 32 NFL franchises on their own map of the USA, clubs only.
 const NFL = { sport: 'american-football', layer: 'clubs', clubScope: 'domestic:nfl' };
+// Baseball clubs: the 30 MLB clubs on their own map of the USA and Canada.
+const MLB = { sport: 'baseball', layer: 'clubs', clubScope: 'domestic:mlb' };
 
 const SCENARIOS = [
   { name: 'South America · duel · ticker', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
@@ -40,6 +42,8 @@ const SCENARIOS = [
   { name: 'DOMESTIC · England top clubs · blitz · instant', ...ENGLAND, pacing: 'blitz', resolution: 'instant' },
   { name: 'DOMESTIC · Fiji top clubs · duel · instant', ...FIJI, pacing: 'duel', resolution: 'instant' },
   { name: 'CLUBS · NFL · duel · ticker', ...NFL, pacing: 'duel', resolution: 'ticker' },
+  { name: 'CLUBS · MLB · duel · ticker', ...MLB, pacing: 'duel', resolution: 'ticker' },
+  { name: 'BASEBALL · N. & C. America · blitz · instant', sport: 'baseball', scope: 'CONCACAF', pacing: 'blitz', resolution: 'instant' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -50,6 +54,7 @@ const RESUME_SCENARIOS = [
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', finish: true },
   { name: 'DOMESTIC · Fiji top clubs · chaos · instant', ...FIJI, pacing: 'chaos', resolution: 'instant', finish: true },
   { name: 'CLUBS · NFL · blitz · instant', ...NFL, pacing: 'blitz', resolution: 'instant' },
+  { name: 'CLUBS · MLB · chaos · instant', ...MLB, pacing: 'chaos', resolution: 'instant' },
 ];
 
 const LABEL_SCENARIOS = [
@@ -68,7 +73,8 @@ const MANAGER_SCENARIOS = [
 // Focused subsets: `--campaign-only=<i>` runs only SCENARIOS[i], `--resume-only=<i>` only RESUME_SCENARIOS[i] and
 // `--manager-only` only the manager campaign; any of them skips every other section (together they run each pick).
 // The country scenarios come next to last, so they are `--campaign-only=7` (England duel, with the setup checks), `=8`
-// (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji); the NFL's are `=10` and `=6`. `--scenarios=<text>` composes with
+// (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji); the NFL's are `=10` and `=6`, MLB's `=11` and `=7`,
+// baseball's nations `=12`. `--scenarios=<text>` composes with
 // these: it narrows whatever they leave.
 function onlyIndex(name, list) {
   const arg = process.argv.find(value => value.startsWith(`--${name}=`));
@@ -238,11 +244,16 @@ function checkMapScope(label, snapshot, options) {
 }
 
 /**
- * Football clubs offer every shipped country, grouped apart from the leagues; basketball clubs only the NBA's map, and
- * American football (clubs only) the NFL's.
+ * Football clubs offer every shipped country, grouped apart from the leagues; basketball clubs only the NBA's map,
+ * American football (clubs only) the NFL's and baseball clubs MLB's.
  */
 function checkTheatres(scenario, theatre) {
   const countries = theatre.options.filter(option => option.value.startsWith('domestic:'));
+  if (scenario.layer === 'clubs' && scenario.sport === 'baseball') {
+    check('baseball clubs play only MLB’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:mlb', text: 'MLB · 30 clubs' }]),
+      JSON.stringify(theatre.options));
+    return;
+  }
   if (scenario.sport === 'american-football') {
     check('American football plays only the NFL’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:nfl', text: 'NFL · 32 clubs' }]),
       JSON.stringify(theatre.options));
@@ -592,7 +603,8 @@ if (!filtered && fixedChecks) {
 if (!filtered && fixedChecks) {
   const { NATIONS, buildTeam, makeRng, teamEff } = await import('../src/data/teams.js');
   const { SPORT_LIST } = await import('../src/sports/index.js');
-  const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'] };
+  const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'],
+    baseball: ['United States', 'Dominican Rep.', 'Venezuela', 'Cuba'] };
 
   for (const sport of SPORT_LIST) {
     // A sport with clubs only (American football) fields no nations: its clubs are checked below.
@@ -611,7 +623,10 @@ if (!filtered && fixedChecks) {
       const ranked = teams.map(t => ({ n: t.name, e: teamEff(t) })).sort((a, b) => b.e - a.e);
       const top = ranked.slice(0, 8).map(r => r.n);
 
-      check('every nation fields a full lineup', teams.every(t => t.squad.length === size), 'short squad');
+      // Baseball's nations carry a club's depth beyond the lineup; the other sports' are exactly their lineup.
+      const { selectLineup: lineupOf } = await import('../src/data/teams.js');
+      const full = t => (t.squad.length > size ? lineupOf(t).slots.every(slot => slot.player && !slot.outOfPosition) : t.squad.length === size);
+      check('every nation fields a full lineup', teams.every(full), 'short squad');
       check('no roster for an unknown nation', strays.length === 0, strays.join(', '));
       check('every rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
       check('every position belongs to this sport', badPos.length === 0, [...new Set(badPos.map(p => p.pos))].join(', '));
@@ -639,8 +654,8 @@ if (!filtered && fixedChecks) {
       const outOfRange = clubs.flatMap(c => c.squad).filter(p => p.rating > 99 || p.rating < 1);
       const badPos = clubs.flatMap(c => c.squad).filter(p => !sport.positionColors[p.pos]);
 
-      // NFL clubs carry backups beyond their 23 starters; the other sports' clubs are exactly their lineup.
-      const full = c => (sport.clubsOnly ? c.squad.length >= sport.squadSize && selectLineup(c).slots.every(slot => slot.player && !slot.outOfPosition)
+      // NFL and MLB clubs carry backups beyond their starters; the other sports' clubs are exactly their lineup.
+      const full = c => (c.squad.length > sport.squadSize ? selectLineup(c).slots.every(slot => slot.player && !slot.outOfPosition)
         : c.squad.length === sport.squadSize);
       check('every club fields a full lineup', clubs.every(full), 'short lineup');
       check('club codes are unique', new Set(codes).size === codes.length, `${codes.length - new Set(codes).size} duplicates`);
@@ -703,7 +718,7 @@ if (!filtered && fixedChecks) {
       check('every match has a winner', results.every(r => r.winner === a.id || r.winner === b.id), 'no winner');
       check('a level score always triggers a tie-break', unresolved === 0, `${unresolved} left level`);
       check('the feed adds up to the final score', evTotals, 'event totals mismatch');
-      const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30] }[sport.id];
+      const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], baseball: [2, 10] }[sport.id];
       check('scoring is in the right range for the sport', mean > low && mean < high, `mean ${mean.toFixed(1)}`);
       console.log(`    400 matches · mean score ${mean.toFixed(1)} · ${results.filter(r => r.tie).length} needed ${sport.labels.tie.toLowerCase()}`);
     } catch (e) {

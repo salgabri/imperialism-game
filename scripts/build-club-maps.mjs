@@ -1,6 +1,7 @@
 // The maps a sport's clubs play on instead of the world (docs/design/domestic-campaigns.md,
-// "The NBA map" and "The NFL map"): the NBA's USA and Canada, and the NFL's United States,
-// each split into one territory per franchise, grown from its arena or stadium by the
+// "The NBA map", "The NFL map" and "The MLB map"): the NBA's and MLB's USA and Canada, and the
+// NFL's United States, each split into one territory per franchise, grown from its arena,
+// stadium or ballpark by the
 // domestic partition (format 1: one section per club) over whole states and provinces.
 // Only a state with two or more franchises is split, along its counties, between them
 // (and a state a league joins to it, such as New York to New Jersey's for the NFL), and
@@ -10,8 +11,8 @@
 // New Jersey where they played. Today's map is unchanged by them.
 //
 // Usage:
-//   node scripts/build-club-maps.mjs [--league=nba|nfl] [--check | --dry-run]
-//     --league   build one league's maps; the index keeps the other league's entries as they are
+//   node scripts/build-club-maps.mjs [--league=nba|nfl|mlb] [--check | --dry-run]
+//     --league   build one league's maps; the index keeps the other leagues' entries as they are
 //     --check    rebuild offline from the caches and compare every output byte for byte
 //     --dry-run  build and verify (downloading boundaries as needed) but write nothing
 //
@@ -19,11 +20,13 @@
 //          their ADM1 (states, provinces), cached under the gitignored
 //          data-src/boundaries/; the game's world map
 //          public/countries-50m.json (land it gives to other countries is cut); the
-//          arenas in scripts/data/nba-arenas.json and the stadiums in scripts/data/nfl-teams.json;
-//          the franchises in src/data/clubs.basketball.js and src/data/clubs.american-football.js;
+//          arenas in scripts/data/nba-arenas.json, the stadiums in scripts/data/nfl-teams.json and the
+//          ballparks in scripts/data/mlb-teams.json; the franchises in src/data/clubs.basketball.js,
+//          src/data/clubs.american-football.js and src/data/clubs.baseball.js;
 //          each NBA era's teams and moved arenas in scripts/data/nba-seasons.json.
-// Outputs: public/domestic/nba.json, one public/domestic/nba<year>.json per era and
-//          public/domestic/nfl.json, an ATTRIBUTION-<id>.txt beside each, and src/data/clubMaps.js
+// Outputs: public/domestic/nba.json, one public/domestic/nba<year>.json per era,
+//          public/domestic/nfl.json and public/domestic/mlb.json, an ATTRIBUTION-<id>.txt beside each,
+//          and src/data/clubMaps.js
 //          (the setup screen's entries).
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -34,6 +37,7 @@ import { topology } from 'topojson-server';
 import { feature, mergeArcs, neighbors } from 'topojson-client';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
+import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { createBoundarySource, cutForeignLand, GB_CITATION } from './lib/domestic-boundaries.mjs';
@@ -52,6 +56,7 @@ const indexFile = path.join(root, 'src/data/clubMaps.js');
 const arenasFile = path.join(root, 'scripts/data/nba-arenas.json');
 const seasonsFile = path.join(root, 'scripts/data/nba-seasons.json');
 const stadiumsFile = path.join(root, 'scripts/data/nfl-teams.json');
+const ballparksFile = path.join(root, 'scripts/data/mlb-teams.json');
 const cacheDir = path.join(root, 'data-src/boundaries');
 const worldFile = path.join(root, 'public/countries-50m.json');
 
@@ -59,7 +64,9 @@ const USA = { id: '840', iso3: 'USA' }, CAN = { id: '124', iso3: 'CAN' };
 /**
  * Each league's map: its id, sport, name and `countries` (the game's world shapes its units come from, never drawn
  * beneath it); `joins` lets a state's franchises also take the counties of the states listed (MetLife Stadium is in
- * New Jersey, but the Giants and Jets are New York's); `entry` adds fields to its index entry (the setup's words).
+ * New Jersey, but the Giants and Jets are New York's); `entry` adds fields to its index entry (the setup's words);
+ * `maxGapKm`, how far a franchise may start from its venue before the county it shares is cut between the two (the
+ * partition's own limit, about 20 km of US county, unless named: Wrigley Field and Rate Field are both Cook County's).
  */
 const LEAGUES = {
   nba: { id: 'nba', sport: 'basketball', league: 'NBA', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: {},
@@ -67,6 +74,8 @@ const LEAGUES = {
   nfl: { id: 'nfl', sport: 'american-football', league: 'NFL', name: 'USA', countries: [USA], joins: { 'US-NJ': ['US-NY'] },
     entry: { venue: 'stadium', lines: 'state' },
     venues: 'Stadium locations: scripts/data/nfl-teams.json (the four franchises that share a stadium grow from their training grounds).' },
+  mlb: { id: 'mlb', sport: 'baseball', league: 'MLB', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: { venue: 'ballpark' },
+    maxGapKm: 5, venues: 'Ballpark locations: scripts/data/mlb-teams.json.' },
 };
 // Territories take states and provinces (REGION_LEVEL) whole, built from their counties
 // and economic regions (UNIT_LEVEL) so that both share every border vertex for vertex.
@@ -264,6 +273,14 @@ async function nflSpecs() {
   return [{ id: LEAGUES.nfl.id, seasons: null, clubs }];
 }
 
+/** MLB's one map, from the game's clubs and their ballparks: `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`. */
+async function mlbSpecs() {
+  const ballparks = JSON.parse(await readFile(ballparksFile, 'utf8')).teams;
+  const clubs = rankedClubs(MLB_CLUBS, ballparks, 'ballpark')
+    .map(c => ({ id: c.id, name: c.name, city: ballparks[c.id].city, arena: ballparks[c.id].ballpark, home: ballparks[c.id].home }));
+  return [{ id: LEAGUES.mlb.id, seasons: null, clubs }];
+}
+
 /**
  * The NBA maps to build, each `{ id, seasons, clubs: [{ id, name, city, arena, home }] }` in rank order: today's from
  * the game's clubs (`seasons` null), then one per earlier era of scripts/data/nba-seasons.json, whose seasons must all
@@ -333,7 +350,7 @@ async function build({ source, log, spec, league }) {
   // A shared state's counties go only to its own (and joined) franchises; whole states to anyone.
   const allowed = (club, unit) => !shared.has(unit.region) || unit.region === regionOf[club] || joinedTo(unit.region).includes(regionOf[club]);
   const { shift, units, adjacency, topo: unitTopo, homes, homeOf, located, dropped, splits, sourceUnits, sourceAreaKm2, owner } = partitionCountry(
-    rawUnits, rawHomes, { sections: n, joinKm: JOIN_KM, allowed, spare: true, log });
+    rawUnits, rawHomes, { sections: n, joinKm: JOIN_KM, allowed, spare: true, log, ...(league.maxGapKm ? { maxGapKm: league.maxGapKm } : {}) });
   if (shift) throw new Error('The map crosses the antimeridian');
   const unlocated = clubs.filter((_, i) => !homeOf[i] || located[i].status === 'discarded').map(c => c.name);
   if (unlocated.length) throw new Error(`Arenas off the map: ${unlocated.join(', ')}`);
@@ -446,9 +463,9 @@ async function build({ source, log, spec, league }) {
 }
 
 function indexModule(entries) {
-  return `// GENERATED by scripts/build-club-maps.mjs from public/domestic/nba*.json and nfl.json; do not edit.
+  return `// GENERATED by scripts/build-club-maps.mjs from public/domestic/nba*.json, nfl.json and mlb.json; do not edit.
 // Maps a sport's clubs play on instead of the world (docs/design/domestic-campaigns.md,
-// "The NBA map", "The NFL map"): the setup offers each as its sport's club theatre ('domestic:<id>')
+// "The NBA map", "The NFL map", "The MLB map"): the setup offers each as its sport's club theatre ('domestic:<id>')
 // and the loader fetches public/domestic/<id>.json on demand. A map with \`seasons\` is an
 // earlier era's, played only with those built-in seasons' clubs, whose strongest each
 // season names itself.
@@ -487,7 +504,7 @@ function attributionText(doc, league) {
   return `${lines.join('\n')}\n`;
 }
 
-const SPECS = { nba: nbaSpecs, nfl: nflSpecs };
+const SPECS = { nba: nbaSpecs, nfl: nflSpecs, mlb: mlbSpecs };
 
 async function main() {
   const argv = process.argv.slice(2), args = new Set(argv);
@@ -522,10 +539,10 @@ async function main() {
       for (const f of differs) console.error(`differs: ${f}`);
       process.exit(1);
     }
-    log(`Verified the ${only ? LEAGUES[only].league : 'NBA and NFL'} maps, their index and attributions byte for byte.`);
+    log(`Verified the ${only ? LEAGUES[only].league : 'NBA, NFL and MLB'} maps, their index and attributions byte for byte.`);
   } else if (!dryRun) {
     for (const [file, text] of outputs) await writeFile(file, text);
-    log(`Wrote the ${only ? LEAGUES[only].league : 'NBA and NFL'} maps, their index and attributions in ${((Date.now() - started) / 1000).toFixed(1)} s.`);
+    log(`Wrote the ${only ? LEAGUES[only].league : 'NBA, NFL and MLB'} maps, their index and attributions in ${((Date.now() - started) / 1000).toFixed(1)} s.`);
   }
 }
 
