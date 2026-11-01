@@ -155,7 +155,8 @@ default suits a first campaign, so pressing Space three times starts one.
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
    football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
-   built-in 2026 (MLB The Show 26). A
+   built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
+   2025 back to 2021, with nations or with clubs on the map of their day. A
    quick-resume card appears when a save exists.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
@@ -998,6 +999,41 @@ only when chosen, with the map of its era.
 The [design notes](docs/design/football-years.md#earlier-basketball-seasons)
 give the file format, the era maps and the known limits.
 
+## Baseball seasons
+
+Baseball can be played on five earlier seasons as well as the built-in 2026:
+2021 to 2025, each from that year's MLB The Show (21 to 25) at its last roster
+update, every one read from the game's own public API. Pick one under
+**Season** in setup. A baseball season keeps both layers: **Nations** field that
+year's players by birthplace, and **Clubs** play that year's MLB on the map of
+their day. Each season is a file in `public/baseball/` (about 35 KB) that loads
+only when chosen.
+
+- **What a season holds:** every nation with MLB players born there and the 30
+  clubs, each club's lineup and active roster of 26, by the same rules as the
+  built-in season. Ratings are The Show's overalls, unchanged.
+- **Clubs of their day:** the Cleveland Indians in 2021, the Oakland Athletics
+  until 2024 (the Athletics play in West Sacramento from 2025) and the Rays at
+  Steinbrenner Field in Tampa in 2025, each on its era's map (`mlb2021`, `mlb2022`
+  for 2022–24, `mlb2025`; 2026 plays on today's `mlb`).
+- **What is missing:** anything before 2021. Older editions' APIs are gone
+  (mlb17 to mlb20), the Wayback Machine holds two pages of one of them, and no
+  dataset of every player's ratings for those years turned up.
+- **A source error:** MLB The Show 24's API gives the wrong country for players
+  born outside the United States (Juan Soto "At Sea", Ronald Acuña Jr. "Slovenia").
+  The build takes each such player's birthplace from the nearest sound edition
+  and lists every one in `docs/design/baseball-seasons-audit.json`.
+- **Source:** the snapshots `scripts/data/mlb-the-show-<nn>.json` (committed),
+  each refreshed by `npm run sync:mlb-the-show -- --edition=<nn>` (add
+  `--parallel=3` for the older hosts, which take 15–25 s a page). To rebuild:
+
+  ```bash
+  npm run build:mlb-seasons   # the season files, src/data/baseballSeasons.js and the audit (--check compares byte for byte)
+  npm run build:mlb-map       # today's map and the era maps from scripts/data/mlb-seasons.json
+  ```
+- **Saves** hold every player as played, so a season campaign resumes without
+  its season file; a club campaign still needs its era's map.
+
 ## Squad economics
 
 Beating a team claims one player. Strength (`EFF`) is the best-lineup rating, so
@@ -1244,6 +1280,7 @@ src/
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
   data/clubs.american-football.js  GENERATED NFL lineups and backups (npm run build-nfl)
   data/clubs.baseball.js      GENERATED MLB lineups and active rosters (npm run build-mlb)
+  data/baseballSeasons.js     GENERATED listing of the earlier baseball seasons (npm run build:mlb-seasons)
   data/rosters.baseball.js    GENERATED baseball nations by birthplace (npm run build-mlb)
   data/sourceTable.js  compact player rows of the generated football files: one
                        JSON line per nation or club, metadata keys and shared
@@ -1286,6 +1323,7 @@ public/
   domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …) and the NFL's (nfl.json), fetched on demand
   football/            the built-in earlier football seasons (ea-*.json), fetched when chosen
   basketball/          the built-in earlier basketball seasons (nba-2k*.json), fetched when chosen
+  baseball/            the built-in earlier baseball seasons (mlb-the-show-*.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
   flags/               173 vendored flag SVGs
@@ -1310,6 +1348,7 @@ scripts/
   build-nfl.mjs        builds the NFL clubs from that snapshot
   sync-mlb-the-show.mjs  snapshots MLB The Show's Live cards from its public API
   build-mlb.mjs        builds the MLB clubs and the baseball nations from that snapshot
+  build-mlb-seasons.mjs  builds the earlier baseball seasons from their snapshots (lib/mlb.mjs holds the shared rules)
   build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export

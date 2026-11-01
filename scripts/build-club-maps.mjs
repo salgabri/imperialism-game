@@ -43,6 +43,7 @@ import { decodeDomestic } from '../src/engine/domestic.js';
 import { createBoundarySource, cutForeignLand, GB_CITATION } from './lib/domestic-boundaries.mjs';
 import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
 import { seasonIdOf, teamsOf } from './lib/nba-seasons.mjs';
+import { seasonIdOf as mlbSeasonIdOf, teamsOf as mlbTeamsOf } from './lib/mlb.mjs';
 import {
   arcPoints, bboxOf, centroidOf, components, dissolve, EARTH_KM, facingKm, facingSections, interiorPoint, joinRealms, kmBetween, kmToPolys,
   nodeRings, partitionCountry, pointInPolys, polysAreaKm2, polysOf, prepareUnits, quantize, sectionTopology, simplifyTopology, splitOnLand,
@@ -57,6 +58,7 @@ const arenasFile = path.join(root, 'scripts/data/nba-arenas.json');
 const seasonsFile = path.join(root, 'scripts/data/nba-seasons.json');
 const stadiumsFile = path.join(root, 'scripts/data/nfl-teams.json');
 const ballparksFile = path.join(root, 'scripts/data/mlb-teams.json');
+const mlbSeasonsFile = path.join(root, 'scripts/data/mlb-seasons.json');
 const cacheDir = path.join(root, 'data-src/boundaries');
 const worldFile = path.join(root, 'public/countries-50m.json');
 
@@ -70,12 +72,14 @@ const USA = { id: '840', iso3: 'USA' }, CAN = { id: '124', iso3: 'CAN' };
  */
 const LEAGUES = {
   nba: { id: 'nba', sport: 'basketball', league: 'NBA', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: {},
-    venues: 'Arena locations: scripts/data/nba-arenas.json.' },
+    venues: 'Arena locations: scripts/data/nba-arenas.json.',
+    eraVenues: 'Arena locations: scripts/data/nba-arenas.json, and scripts/data/nba-seasons.json for teams that have moved since.' },
   nfl: { id: 'nfl', sport: 'american-football', league: 'NFL', name: 'USA', countries: [USA], joins: { 'US-NJ': ['US-NY'] },
     entry: { venue: 'stadium', lines: 'state' },
     venues: 'Stadium locations: scripts/data/nfl-teams.json (the four franchises that share a stadium grow from their training grounds).' },
   mlb: { id: 'mlb', sport: 'baseball', league: 'MLB', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: { venue: 'ballpark' },
-    maxGapKm: 5, venues: 'Ballpark locations: scripts/data/mlb-teams.json.' },
+    maxGapKm: 5, venues: 'Ballpark locations: scripts/data/mlb-teams.json.',
+    eraVenues: 'Ballpark locations: scripts/data/mlb-teams.json, and scripts/data/mlb-seasons.json for clubs that have moved, been renamed or played elsewhere since.' },
 };
 // Territories take states and provinces (REGION_LEVEL) whole, built from their counties
 // and economic regions (UNIT_LEVEL) so that both share every border vertex for vertex.
@@ -276,9 +280,23 @@ async function nflSpecs() {
 /** MLB's one map, from the game's clubs and their ballparks: `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`. */
 async function mlbSpecs() {
   const ballparks = JSON.parse(await readFile(ballparksFile, 'utf8')).teams;
+  const manifest = JSON.parse(await readFile(mlbSeasonsFile, 'utf8'));
   const clubs = rankedClubs(MLB_CLUBS, ballparks, 'ballpark')
     .map(c => ({ id: c.id, name: c.name, city: ballparks[c.id].city, arena: ballparks[c.id].ballpark, home: ballparks[c.id].home }));
-  return [{ id: LEAGUES.mlb.id, seasons: null, clubs }];
+  const specs = [{ id: LEAGUES.mlb.id, seasons: null, clubs }];
+  // Each earlier era's clubs (scripts/data/mlb-seasons.json) rank as their franchises rank today, so section ids follow
+  // the same order on every map; the seasons an era map serves must all have the same clubs in the same ballparks.
+  const rank = new Map(clubs.map((c, i) => [ballparks[c.id].show, i]));
+  const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.ballpark, t.home]));
+  for (const map of manifest.maps) {
+    const [first, ...rest] = map.seasons;
+    const teams = mlbTeamsOf(ballparks, manifest, first).sort((a, b) => rank.get(a.show) - rank.get(b.show));
+    const differs = rest.find(year => places(mlbTeamsOf(ballparks, manifest, year).sort((a, b) => rank.get(a.show) - rank.get(b.show))) !== places(teams));
+    if (differs) throw new Error(`${map.id}: the clubs or ballparks of ${differs} are not those of ${first}`);
+    specs.push({ id: map.id, seasons: map.seasons.map(mlbSeasonIdOf),
+      clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ballpark, home: t.home })) });
+  }
+  return specs;
 }
 
 /**
@@ -491,7 +509,7 @@ function attributionText(doc, league) {
     `  ${GB_CITATION}`,
     "Land the game's world map (public/countries-50m.json: world-atlas 2.0.2, ISC; Natural Earth 1:50m,",
     '  public domain) draws for another country is cut; see "Cut" lines below.',
-    doc.seasons ? 'Arena locations: scripts/data/nba-arenas.json, and scripts/data/nba-seasons.json for teams that have moved since.'
+    doc.seasons ? league.eraVenues
       : league.venues,
   ];
   for (const b of doc.boundaries.layers) {

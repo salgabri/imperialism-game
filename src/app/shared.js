@@ -3,7 +3,7 @@ import { C } from '../theme.js';
 import { DEFAULT_SPORT, getSport } from '../sports/index.js';
 import { domesticScopeId } from '../engine/domestic.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
-import { setSportOf } from '../engine/footballSets.js';
+import { setHasNations, setSportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -30,12 +30,13 @@ export function domesticIdOf(settings) {
 /**
  * The data set a setup or saved campaign is played on, or null for the built-in data. A set plays in its own sport:
  * a football season on the world (country maps use the built-in data), a basketball season with clubs only, on its
- * era's map. Pure.
+ * era's map, and a baseball season with its nations or with its clubs on its era's map. Pure.
  */
 export function dataSetOf(settings) {
   const id = settings?.dataSet ?? null, sport = getSport(settings?.sport).id;
   if (id == null || setSportOf(id) !== sport) return null;
-  return (sport === 'football' ? !domesticIdOf(settings) : settings.layer === 'clubs') ? id : null;
+  if (sport === 'football') return domesticIdOf(settings) ? null : id;
+  return setHasNations(id) || settings.layer === 'clubs' ? id : null;
 }
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */

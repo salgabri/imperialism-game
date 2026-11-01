@@ -188,7 +188,7 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
   assert.deepEqual(none.calls, ['/base/football/index.json']);
   assert.equal(await loadFootballSetIndex({ fetch: none.fetch }), BUILT_IN_SETS, 'the answer is kept');
   assert.equal(none.calls.length, 1, 'read once');
-  assert.ok(BUILT_IN_SETS.length > 0 && BUILT_IN_SETS.every(set => /^(ea-(fifa|fc)-|nba-2k)\d{2}$/.test(set.id)));
+  assert.ok(BUILT_IN_SETS.length > 0 && BUILT_IN_SETS.every(set => /^(ea-(fifa|fc)-|nba-2k|mlb-the-show-)\d{2}$/.test(set.id)));
 
   const sets = [syntheticSet({ id: 'cm0102-2001-12', year: 2002, label: 'CM 01/02 · December 2001' }), SET,
     syntheticSet({ id: 'cm0102-2026-05', year: 2026, label: 'CM 01/02 · May 2026' })];

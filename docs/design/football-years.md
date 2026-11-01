@@ -378,6 +378,19 @@ strength and five and keeps the map's land and colour. The loader accepts such a
 map only with a sport. The index entry has no `top`: the setup names the chosen
 season's own three strongest clubs once it has loaded.
 
+## Earlier baseball seasons
+
+Baseball has five earlier seasons, 2021 to 2025, one per MLB The Show edition (21
+to 25), each read from the edition's own public API; the built-in 2026 is MLB The
+Show 26's. They are data sets of `kind: 'show'` (`mlb-the-show-<nn>`), and unlike
+an NBA season they field **nations** as well as clubs: `nations` holds each nation
+with MLB players born there (`[strength, players, squad]`, the built-in shape), a
+nation it does not list being the sport's minnow, and `clubs` the MLB of that year,
+each `[name, 'SS/2B', rating]`, on its era's map (`mlb2021`, `mlb2022` for 2022–24,
+`mlb2025`). A season's `season` is its calendar year ('2024'), not football's
+'2023/24'. The built files, era maps, the Oakland Athletics and the edition whose
+birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons).
+
 ## Runtime
 
 - `src/engine/footballSets.js`:
