@@ -1,7 +1,7 @@
 // Whole league seasons played with the built-in clubs land in each real league's range (REAL in
 // simulation-realism.mjs, with its seasons and sources). Only what the models set out to match is held here. The known
-// gaps are reported by `npm run simulation:realism` and not tested: no home advantage in any sport, the NFL's key
-// margins (3 and 7) and one-score share, NBA games decided by three or fewer, MLB's worst club.
+// gaps are reported by `npm run simulation:realism` and not tested: no home advantage in any sport, NBA games decided by
+// three or fewer, MLB's worst club.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
@@ -55,6 +55,17 @@ test('NFL: points, margins, overtime, the standings and who scores the touchdown
   for (const group of ['WR', 'RB', 'TE', 'QB', 'D/ST']) {
     within(nfl.tdShares[group], real.tdShares[group], `touchdowns by ${group}`, 0.005);
   }
+});
+
+test('NFL: the key margins, one-score games, the tries and the safeties', () => {
+  const nfl = report.nfl, real = REAL.nfl;
+  within(nfl.oneScore, real.oneScore, 'one-score games');
+  within(nfl.byThree, real.byThree, 'decided by exactly 3');
+  within(nfl.bySeven, real.bySeven, 'decided by exactly 7');
+  within(nfl.xpRate, real.xpRate, 'extra points made');
+  within(nfl.twoPointShare, real.twoPointShare, 'touchdowns going for two');
+  within(nfl.twoPointRate, real.twoPointRate, 'two-point tries made');
+  within(nfl.safetiesPerSeason, real.safetiesPerSeason, 'safeties a season');
 });
 
 test('MLB: runs, close games, extra innings and the standings look like an MLB season', () => {

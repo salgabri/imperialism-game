@@ -60,7 +60,8 @@ function positionsByName(team) {
 
 /**
  * Plays `seasons` seasons of `games` rounds between `teams` under `sport` and returns every game and the
- * per-season tables. `full` builds the event feeds (scorers, minutes); otherwise only scores are drawn.
+ * per-season tables. `full` builds the event feeds (scorers, minutes); otherwise only scores are drawn, with the
+ * score-only path's own record of the game (American football's possessions, `plays`).
  */
 function playSeasons({ sport, teams, games, seasons, seed, full = true }) {
   const rng = makeRng(seed);
@@ -82,7 +83,7 @@ function playSeasons({ sport, teams, games, seasons, seed, full = true }) {
       }
       const regA = result.regA ?? result.ga, regD = result.regD ?? result.gd;
       const game = { i, j, effI: eff[i], effJ: eff[j], ga: result.ga, gd: result.gd, regA, regD, tie: result.tie,
-        winner: result.winner === a.id ? i : j, ev: result.ev };
+        winner: result.winner === a.id ? i : j, ev: result.ev, plays: result.plays };
       played.push(game);
       const ti = table[i], tj = table[j];
       ti.for += regA; ti.against += regD; tj.for += regD; tj.against += regA;
@@ -212,11 +213,22 @@ function nflSeason(seasons, seed) {
   let tds = 0;
   for (const g of played) {
     for (const e of g.ev) {
-      if (e.pts !== 7) continue;
+      if (e.pts < 6) continue; // a touchdown is 6 to 8 with its try
       const pos = positions.get(e.tid).get(e.name);
       const group = ['WR', 'RB', 'TE', 'QB'].includes(pos) ? pos : 'D/ST';
       tdBy[group] = (tdBy[group] || 0) + 1;
       tds++;
+    }
+  }
+  // Tries and safeties, from the possessions of a score-only run: the feed keeps a touchdown's points, not its try.
+  const tries = { touchdowns: 0, kicks: 0, kicked: 0, twos: 0, converted: 0, safeties: 0 };
+  for (const { plays } of playSeasons({ sport: americanFootball, teams: clubs, games: 17, seasons, seed: seed + 1, full: false }).played) {
+    for (const p of plays) {
+      if (p.pts === 2) tries.safeties++;
+      if (p.pts < 6) continue;
+      tries.touchdowns++;
+      if (p.conversion === 'kick') { tries.kicks++; if (p.pts === 7) tries.kicked++; }
+      if (p.conversion === 'two') { tries.twos++; if (p.pts === 8) tries.converted++; }
     }
   }
   const spread = seasonSpread(tables, 17);
@@ -228,10 +240,11 @@ function nflSeason(seasons, seed) {
     oneScore: share(margins, m => m <= 8), byThree: share(margins, m => m === 3), bySeven: share(margins, m => m === 7),
     byOneOrTwo: share(margins, m => m <= 2), blowouts: share(margins, m => m >= 21),
     commonScores: commonest(scores, 8, teamPoints.length),
-    impossibleScores: share(teamPoints, p => [1, 2, 4, 5, 8, 11].includes(p)),
     winPctSd: spread.sd, bestWins: spread.best * 17, worstWins: spread.worst * 17,
     favourite: favouriteRecord(played), homeWins: share(played, g => g.winner === g.j),
     tdShares: Object.fromEntries(Object.entries(tdBy).map(([k, v]) => [k, v / tds])),
+    xpRate: tries.kicked / tries.kicks, twoPointShare: tries.twos / tries.touchdowns, twoPointRate: tries.converted / tries.twos,
+    safetiesPerSeason: tries.safeties / seasons,
   };
 }
 
@@ -291,6 +304,10 @@ export const REAL = Object.freeze({
     homeWins: [0.515, 0.557],
     // Passing 57–59% of touchdowns, rushing 35.5–37%, returns and the defence 4.8–6%, split by position (2023–2025).
     tdShares: { WR: [0.35, 0.4], RB: [0.32, 0.35], TE: [0.128, 0.165], QB: [0.075, 0.09], 'D/ST': [0.048, 0.06] },
+    // Extra points made and safeties a season, 2021–2025. Two-point tries made 56.5% of the time in 2023 and 40% in
+    // 2024 (47.6% over 2020–2024), after 9.8% of touchdowns in 2024 (Laura Albert's NFL analytics recaps, UW–Madison);
+    // est.: about one touchdown in ten goes for two each season.
+    xpRate: [0.934, 0.959], twoPointShare: [0.085, 0.11], twoPointRate: [0.4, 0.565], safetiesPerSeason: [8, 17],
   },
   mlb: {
     note: 'MLB regular seasons 2022–2025',
@@ -374,6 +391,10 @@ function print(report) {
   for (const group of ['WR', 'RB', 'TE', 'QB', 'D/ST']) {
     lines.push(row(`touchdowns by ${group}`, a.tdShares[group] || 0, ra.tdShares[group], pct));
   }
+  lines.push(row('extra points made', a.xpRate, ra.xpRate, pct));
+  lines.push(row('touchdowns going for two', a.twoPointShare, ra.twoPointShare, pct));
+  lines.push(row('two-point tries made', a.twoPointRate, ra.twoPointRate, pct));
+  lines.push(row('safeties a season', a.safetiesPerSeason, ra.safetiesPerSeason, x => num(x, 1)));
   lines.push(`    team scores: ${a.commonScores.join(', ')}`);
   const m = report.mlb, rm = REAL.mlb;
   lines.push(`\nMLB — ${m.clubs} clubs, 162 games (real: ${rm.note})`);

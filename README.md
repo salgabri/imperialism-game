@@ -294,8 +294,10 @@ variance, scaled to the NBA's margins and its share of overtime games. Nations p
 quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
 quarters at their season's league pace and scoring rate, so games score like
 their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
-possessions a side, each ending in a touchdown, a field goal or nothing by its
-offence against the opposing defence, with playoff overtime. Stronger teams are favourites, while
+possessions a side, each ending in a touchdown and its try (the extra point or two points),
+a field goal, now and then a safety, or nothing by its offence against the opposing defence,
+with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime.
+Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
 Pre-match percentages estimate this model with an independent seeded sample.
 They do not consume the campaign's random stream.

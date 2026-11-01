@@ -19,7 +19,7 @@ import { createDuelDraw } from '../src/engine/duelDraw.js';
 import { exportCampaign, parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel, sportNote } from '../src/screens/setup/setupModel.js';
 import { buildSquad } from '../src/viewModels/squad.js';
-import { scorersLine } from '../src/viewModels/match.js';
+import { buildLiveMatch, scorersLine } from '../src/viewModels/match.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
@@ -80,7 +80,8 @@ test('positions are specialised: an emergency starter costs 25 points, and a leg
 test('matches always produce a winner, events add up, and scores look like the NFL\'s', () => {
   const rng = makeRng(20261031);
   let points = 0, games = 0, overtimes = 0;
-  const margins = [];
+  const margins = [], finals = [];
+  const kinds = new Map();
   for (let i = 0; i < 3000; i++) {
     const a = teams[i % 32], d = teams[(i * 7 + 3) % 32];
     if (a === d) continue;
@@ -90,7 +91,14 @@ test('matches always produce a winner, events add up, and scores look like the N
     assert.equal(result.winner === a.id, result.ga > result.gd);
     const sum = id => result.ev.filter(e => e.tid === id).reduce((s, e) => s + e.pts, 0);
     assert.deepEqual([sum(a.id), sum(d.id)], [result.ga, result.gd], 'the feed adds up to the final score');
-    assert.ok(result.ev.every(e => e.pts === 7 || e.pts === 3), 'touchdowns and field goals');
+    for (const e of result.ev) {
+      kinds.set(e.pts, (kinds.get(e.pts) || 0) + 1);
+      // A safety is the defence's: one of its pass rushers or defensive backs.
+      if (e.pts === 2) {
+        const position = selectLineup(e.tid === a.id ? a : d).slots.find(slot => slot.player?.name === e.name)?.position;
+        assert.ok(['DL', 'LB', 'CB', 'S'].includes(position), `${e.name} (${position}) is credited with a safety`);
+      }
+    }
     assert.ok(result.ev.every(e => e.m >= 1 && e.m <= 90), 'within regulation and three overtimes');
     if (result.tie) {
       overtimes++;
@@ -102,12 +110,54 @@ test('matches always produce a winner, events add up, and scores look like the N
     points += result.regA + result.regD;
     games++;
     margins.push(Math.abs(result.regA - result.regD));
+    finals.push(Math.abs(result.ga - result.gd));
   }
   const perTeam = points / games / 2;
   assert.ok(perTeam > 19 && perTeam < 26, `about 22 points a team (${perTeam.toFixed(1)})`);
   assert.ok(overtimes / games > 0.02 && overtimes / games < 0.09, `a few games go to overtime (${(overtimes / games * 100).toFixed(1)}%)`);
   margins.sort((x, y) => x - y);
   assert.ok(margins[margins.length >> 1] >= 7 && margins[margins.length >> 1] <= 14, 'a typical margin of one or two scores');
+  // Touchdowns with the extra point (7), a missed try (6) or two points (8); field goals; now and then a safety.
+  assert.deepEqual([...kinds.keys()].sort((x, y) => x - y), [2, 3, 6, 7, 8], 'touchdowns and their tries, field goals and safeties');
+  const touchdowns = kinds.get(6) + kinds.get(7) + kinds.get(8);
+  assert.ok(kinds.get(7) / touchdowns > 0.8 && kinds.get(7) / touchdowns < 0.9, 'most touchdowns are kicked and made');
+  assert.ok(kinds.get(2) / games > 0.02 && kinds.get(2) / games < 0.08, `a safety in about one game in twenty (${kinds.get(2)} in ${games})`);
+  // A field goal decides more NFL games than any other margin, about twice as many as by exactly 7.
+  const by = margin => finals.filter(m => m === margin).length;
+  assert.ok(by(3) > 1.5 * by(7), `more games decided by 3 than by 7 (${by(3)} v ${by(7)})`);
+});
+
+test('the scores follow the NFL: tries by the chart, safeties, and overtime walk-offs without a try', () => {
+  const prepared = sport.prepareMatch(teams[5], teams[6], teamEff(teams[5]), teamEff(teams[6]));
+  const rng = makeRng(31);
+  const tries = { kick: 0, made: 0, two: 0, converted: 0, none: 0, regulationNone: 0 };
+  let touchdowns = 0, safeties = 0, games = 0;
+  for (; games < 20000; games++) {
+    const { plays, ga, gd, regA, regD } = sport.sampleResult(rng, prepared, 6);
+    assert.equal(plays.reduce((s, p) => s + (p.side === 'A' ? p.pts : 0), 0), ga);
+    assert.equal(plays.reduce((s, p) => s + (p.side === 'D' ? p.pts : 0), 0), gd);
+    assert.equal(plays.filter(p => !p.period).reduce((s, p) => s + (p.side === 'A' ? p.pts : -p.pts), 0), regA - regD);
+    for (const play of plays) {
+      if (play.pts === 2) safeties++;
+      if (play.pts < 6) continue;
+      touchdowns++;
+      if (play.conversion === 'kick') { tries.kick++; if (play.pts === 7) tries.made++; }
+      else if (play.conversion === 'two') { tries.two++; if (play.pts === 8) tries.converted++; }
+      else {
+        // No try only when the touchdown has won an overtime.
+        tries.none++;
+        assert.equal(play.pts, 6);
+        if (!play.period) tries.regulationNone++;
+      }
+    }
+  }
+  assert.equal(tries.regulationNone, 0, 'every touchdown in regulation has its try');
+  assert.ok(tries.none > 0, 'overtime walk-offs');
+  const share = (n, of) => `${(n / of * 100).toFixed(1)}%`;
+  assert.ok(tries.made / tries.kick > 0.92 && tries.made / tries.kick < 0.97, `extra points made (${share(tries.made, tries.kick)})`);
+  assert.ok(tries.two / touchdowns > 0.08 && tries.two / touchdowns < 0.12, `about one touchdown in ten goes for two (${share(tries.two, touchdowns)})`);
+  assert.ok(tries.converted / tries.two > 0.42 && tries.converted / tries.two < 0.55, `two-point tries made (${share(tries.converted, tries.two)})`);
+  assert.ok(safeties / games > 0.03 && safeties / games < 0.07, `about 0.05 safeties a game (${(safeties / games).toFixed(3)})`);
 });
 
 test('stronger teams are favourites, and Upsets widens the underdog\'s chance without removing drive luck', () => {
@@ -120,17 +170,46 @@ test('stronger teams are favourites, and Upsets widens the underdog\'s chance wi
   assert.ok(Math.abs(swap - (1 - balanced)) < 0.03, 'the attacker gets no home advantage');
 });
 
-test('the drive odds and the feed copy: a touchdown is 7, a field goal 3, by quarter', () => {
+test('the drive odds and the feed copy: a touchdown is 6 to 8 with its try, a field goal 3, a safety 2, by quarter', () => {
   const even = driveMoments(driveOdds(0, 80));
   assert.ok(even.mean > 1.8 && even.mean < 2.2, 'about two points a drive between equals');
   assert.ok(driveOdds(5, 80).td > driveOdds(0, 80).td && driveOdds(0, 90).make > driveOdds(0, 80).make);
-  assert.deepEqual(sport.formatEvent({ m: 14, pts: 7, name: 'Travis Kelce' }, 'KCC'), { when: 'Q1', text: 'TD — Travis Kelce (KCC)' });
+  assert.ok(driveOdds(0, 90).xp > driveOdds(0, 80).xp && driveOdds(5, 80).two > driveOdds(0, 80).two, 'a better kicker, a better offence');
+  assert.ok(Math.abs(driveOdds(0, 80).xp - 0.95) < 1e-9 && Math.abs(driveOdds(0, 80).two - 0.48) < 1e-9);
+  for (const pts of [6, 7, 8]) {
+    assert.deepEqual(sport.formatEvent({ m: 14, pts, name: 'Travis Kelce' }, 'KCC'), { when: 'Q1', text: 'TD — Travis Kelce (KCC)' });
+    assert.equal(sport.formatToast({ pts, name: 'Travis Kelce' }), 'TOUCHDOWN — TRAVIS KELCE');
+  }
   assert.deepEqual(sport.formatEvent({ m: 47, pts: 3, name: 'Harrison Butker' }, 'KCC'), { when: 'Q4', text: 'FG — Harrison Butker (KCC)' });
   assert.equal(sport.formatEvent({ m: 64, pts: 3, name: 'Harrison Butker' }, 'KCC').when, 'OT');
-  assert.equal(sport.formatToast({ pts: 7, name: 'Travis Kelce' }), 'TOUCHDOWN — TRAVIS KELCE');
-  const shown = [{ tid: 'k', name: 'Travis Kelce', pts: 7 }, { tid: 'k', name: 'Travis Kelce', pts: 7 }, { tid: 'k', name: 'Harrison Butker', pts: 3 },
-    { tid: 'k', name: 'Harrison Butker', pts: 3 }, { tid: 'k', name: 'Harrison Butker', pts: 3 }, { tid: 'k', name: 'Rashee Rice', pts: 7 }];
+  assert.equal(sport.formatToast({ pts: 3, name: 'Harrison Butker' }), 'FIELD GOAL — HARRISON BUTKER');
+  assert.deepEqual(sport.formatEvent({ m: 22, pts: 2, name: 'Chris Jones' }, 'KCC'), { when: 'Q2', text: 'SAFETY — Chris Jones (KCC)' });
+  assert.equal(sport.formatToast({ pts: 2, name: 'Chris Jones' }), 'SAFETY — CHRIS JONES');
+  // Ranked by the scores themselves, a touchdown counting 6 whatever its try.
+  const shown = [{ tid: 'k', name: 'Travis Kelce', pts: 8 }, { tid: 'k', name: 'Travis Kelce', pts: 6 }, { tid: 'k', name: 'Harrison Butker', pts: 3 },
+    { tid: 'k', name: 'Harrison Butker', pts: 3 }, { tid: 'k', name: 'Harrison Butker', pts: 3 }, { tid: 'k', name: 'Rashee Rice', pts: 7 },
+    { tid: 'k', name: 'Chris Jones', pts: 2 }];
   assert.equal(scorersLine(shown, 'k', {}, 'american-football'), 'Kelce 2 TD · Butker 3 FG');
+  assert.equal(scorersLine([{ tid: 'k', name: 'Chris Jones', pts: 2 }, { tid: 'k', name: 'Rashee Rice', pts: 8 }], 'k', {}, 'american-football'),
+    'Rice 1 TD · Jones 1 safety');
+});
+
+test('an archived NFL final reads its scorer lines back from the feed copy, safeties included', () => {
+  const { A, D } = { A: byId['nfl-kansas-city-chiefs'], D: byId['nfl-buffalo-bills'] };
+  const entry = {
+    a: { teamId: A.id, code: A.code, score: 15 }, b: { teamId: D.id, code: D.code, score: 13 },
+    result: { winnerId: A.id }, events: [
+      { when: 'Q1', text: `TD — Travis Kelce (${A.code})` }, { when: 'Q2', text: `SAFETY — Chris Jones (${A.code})` },
+      { when: 'Q3', text: `TD — Josh Allen (${D.code})` }, { when: 'Q4', text: `FG — Harrison Butker (${A.code})` },
+      { when: 'Q4', text: `TD — James Cook (${D.code})` }, { when: 'Q4', text: `TD — Rashee Rice (${A.code})` },
+    ],
+  };
+  const model = buildLiveMatch({ teams: { [A.id]: A, [D.id]: D }, history: [entry] }, { sport });
+  assert.equal(model.source, 'history');
+  assert.equal(model.a.scorers, 'Kelce 1 TD · Rice 1 TD');
+  assert.equal(model.b.scorers, 'Allen 1 TD · Cook 1 TD');
+  const safetyFirst = { ...entry, events: [entry.events[1], entry.events[3]] };
+  assert.equal(buildLiveMatch({ teams: { [A.id]: A, [D.id]: D }, history: [safetyFirst] }, { sport }).a.scorers, 'Butker 1 FG · Jones 1 safety');
 });
 
 test('the live win probability starts at the fixture odds, follows the score and settles at the end', () => {
@@ -144,9 +223,28 @@ test('the live win probability starts at the fixture odds, follows the score and
     assert.ok(winProbabilityAt(model, 59, 10) > 0.97, 'two scores up with a minute left');
     assert.equal(winProbabilityAt(model, 90, 3), 1);
     assert.equal(winProbabilityAt(model, 60, 0), model.otChain[3], 'level at full time: the overtime chain');
-    // In overtime a touchdown's lead leaves the trailing side one answer.
+    // In overtime a touchdown's lead leaves the trailing side one answer; a missed extra point leaves it a better one.
     assert.ok(winProbabilityAt(model, 63, 7) > model.otChain[3] && winProbabilityAt(model, 63, -7) < model.otChain[3]);
+    assert.ok(winProbabilityAt(model, 63, 6) < winProbabilityAt(model, 63, 7) && winProbabilityAt(model, 63, 9) === 1);
+    // A model saved before tries had none: its extra points were always good.
+    const { xpA, twoA, xpD, twoD, ...saved } = model;
+    assert.ok([xpA, twoA, xpD, twoD].every(p => p > 0 && p < 1) && isLiveModel(saved));
+    assert.equal(winProbabilityAt(saved, 63, 7), 1 - saved.tdD * (1 - saved.otChain[3]));
+    assert.equal(isLiveModel({ ...model, xpA: 1.5 }), false);
   }
+  // The overtime chain is exact for the simulation's overtime rules, before form (Predictable).
+  const prepared = sport.prepareMatch(teams[5], teams[6], teamEff(teams[5]), teamEff(teams[6]));
+  const exact = liveModelFor(sport, teams[5], teams[6], teamEff(teams[5]), teamEff(teams[6]), 0).otChain[3];
+  const rng = makeRng(77);
+  let overtimes = 0, attackerWins = 0;
+  for (let i = 0; i < 300000; i++) {
+    const result = sport.sampleResult(rng, prepared, 0);
+    if (!result.tie) continue;
+    overtimes++;
+    if (result.ga > result.gd) attackerWins++;
+  }
+  const simulated = attackerWins / overtimes;
+  assert.ok(Math.abs(simulated - exact) < 3.5 * Math.sqrt(exact * (1 - exact) / overtimes), `overtime chain ${exact} v ${simulated} over ${overtimes}`);
   const model = liveModelFor(sport, teams[0], teams[1]);
   const series = winSeries({ model, goals: [{ m: 20, tid: 'a', pts: 7 }, { m: 70, tid: 'a', pts: 3 }], aId: 'a', dId: 'd', minute: 70,
     final: { winnerSide: 'A' } });
