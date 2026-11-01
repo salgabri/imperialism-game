@@ -17,9 +17,10 @@
 //   under 'predictable' and ≈ 12 points under 'wild'. DEC D6 ships the formula as specified.
 //
 // Basketball — engine-diff §4a.2 normal approximation of the repo's own model (src/sports/basketball.js):
-//   each period score is Normal(poss·eff, poss·(0.72 + 0.5·eff)) rounded; possessions ~ 73 ± 4.5; match-day form
-//   N(0, drama·0.0125) per side persists through overtime; shared conditions cancel in the margin; level after 40'
-//   goes to 5' overtimes (at most 4, the last ends in a decisive play won with logistic(3·(effA − effD))).
+//   each period score is Normal(poss·eff, poss·(0.72 + 0.5·eff)) rounded; possessions ~ pace ± 4.5 (73 over FIBA's
+//   40', 100 over the NBA's 48'); match-day form N(0, drama·0.0125) per side persists through overtime; shared
+//   conditions cancel in the margin; level after regulation goes to 5' overtimes (at most 4, the last ends in a
+//   decisive play won with logistic(3·(effA − effD))).
 //   The remaining margin is therefore ≈ Normal(R·(effA − effD), R·(1.44 + 0.5·(effA + effD)) + 2·(formSd·R)²
 //   + (effA − effD)²·σ_R² + 1/6) for R remaining possessions; P(A wins) = P(margin ≥ 1) + P(margin = 0)·P(A wins
 //   from level), with a ±0.5 continuity correction. Measured robust: tip-off within ≈ 1 point of the Monte Carlo
@@ -73,7 +74,8 @@ export function footballRate(log) {
 /**
  * The live model a match keeps in `match.live` (PLAN §3.1; small plain JSON, persisted with the match):
  * → { kind:'poisson', rA, rD, length:90 } (football)
- * | { kind:'normal', pace, effA, effD, formSd, length:40, ot:5, maxOt:4 } (basketball; effA/effD are efficiencies)
+ * | { kind:'normal', pace, effA, effD, formSd, length:40, ot:5, maxOt:4 } (basketball, length 48 under NBA rules;
+ *     effA/effD are efficiencies)
  * | { kind:'drives', drives, muA, muD, varA, varD, slope, formSd, driveSd, length:60, ot:10, maxOt:3, otChain,
  *     tdA, fgA, tdD, fgD } (American football; μ/σ² are a possession's points, otChain[k] A's chance from level with
  *     k overtimes left, td/fg a possession's chance of a touchdown / field goal)
@@ -305,7 +307,7 @@ function drivesAt(model, t, margin) {
 /** Models with overtime periods after regulation: basketball's and American football's. */
 const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives';
 
-/** The last minute a model can reach: 90 for football, 40 + 5·4 for basketball, 60 + 10·3 for American football. */
+/** The last minute a model can reach: 90 for football, 40 + 5·4 for basketball (48 + 5·4 in the NBA), 60 + 10·3 for American football. */
 function lastMinute(model) {
   return hasOvertime(model) ? model.length + model.ot * model.maxOt : model.length;
 }
@@ -450,8 +452,8 @@ export function winMarkers(series, goals = [], { aId, model = null, includeRuns 
 /**
  * The chart's x-domain for a model at the current minute → { length, half, ticks, guides }.
  * Football: 0'…90', ticks every 15', half-time at 45'. Basketball: 0'…40' plus each overtime period reached,
- * ticks at the quarters and overtime ends, half-time at 20', quarter guides at 10'/20'/30'. American football the
- * same over 0'…60' and its ten-minute overtimes.
+ * ticks at the quarters and overtime ends, half-time at 20', quarter guides at 10'/20'/30' (NBA rules: 0'…48', the
+ * quarters every 12'). American football the same over 0'…60' and its ten-minute overtimes.
  */
 export function chartDomain(model, minute = 0) {
   if (isLiveModel(model) && hasOvertime(model)) {

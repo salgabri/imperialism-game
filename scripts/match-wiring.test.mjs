@@ -9,6 +9,7 @@ import React, { act } from 'react';
 import { bundleApp, bundleComponents, syncAppFixture, findElement, withDom, mount } from './lib/app-harness.mjs';
 import { teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
+import { nbaBasketball } from '../src/sports/basketball.js';
 import { liveModelFor } from '../src/engine/winProbability.js';
 import { SAVE_KEY } from '../src/config.js';
 
@@ -148,6 +149,37 @@ test('basketball overtime: the chain runs to the last overtime minute', () => {
     assert.equal(f.app.state.match.shown.length, 2);
     f.time.advance(sport.clock.msPerUnit);
     assert.equal(f.app.state.match.status, sport.labels.tie);
+  } finally { f.close(); }
+});
+
+test('basketball clubs play under NBA rules: kickoff simulates 48 minutes and the chain runs to the buzzer at 48\'', () => {
+  const f = syncAppFixture({ settings: { sport: 'basketball', layer: 'clubs' } });
+  try {
+    quiet(f.app);
+    f.app.finishMatch = () => {};
+    // The App bundle holds its own copy of the sport modules: compare the rules, not the object.
+    const sport = f.app.sport();
+    assert.deepEqual([sport.id, sport.simulationVersion, sport.clock], ['basketball', nbaBasketball.simulationVersion, nbaBasketball.clock]);
+    assert.equal(f.app.viewContext().sport, sport);
+    // The last run lands at 30': the clock still runs on to the buzzer at 48', then the final whistle.
+    f.app.setState({ match: { ...liveMatch(f.app, [[12, '250'], [30, '276'], [31, '250']]), status: sport.labels.live } });
+    f.app.presentMatch();
+    f.time.advance(LEAD + 48 * sport.clock.msPerUnit);
+    assert.equal(minute(f.app), 48);
+    assert.equal(f.app.state.match.shown.length, 3);
+    assert.equal(f.app.state.match.status, sport.labels.live);
+    f.time.advance(sport.clock.msPerUnit);
+    assert.equal(f.app.state.match.status, sport.labels.end);
+    f.app.clearTimers();
+
+    // A real kickoff: NBA scoring and an NBA live model.
+    f.app.setState({ match: null });
+    f.app.startMatch('250', '276');
+    const m = f.app.state.match;
+    assert.equal(m.live.length, 48);
+    assert.equal(m.live.pace, 100);
+    assert.ok(m.allEv.some(event => event.m > 40 && event.m <= 48), 'runs land in the NBA\'s last eight minutes');
+    assert.ok(m.allEv.every(event => event.m <= (m.tie ? 48 + 5 * m.tie.periods.length : 48)));
   } finally { f.close(); }
 });
 
