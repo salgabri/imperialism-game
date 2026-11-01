@@ -133,8 +133,10 @@ must match the code that reads them.
 
 **Link previews.** `index.html` carries a description, a canonical URL, and
 Open Graph and Twitter tags, so a shared link shows a card. Crawlers need
-absolute URLs, so the canonical URL, `og:url` and `og:image` name
-`imperialism-game.vercel.app`: change them with the address.
+absolute URLs, so the canonical URL and `og:image` name
+`imperialism-game.vercel.app`: change them with the address. There is no
+`og:url`: Facebook would open every shared challenge link at the address it
+names, and without it a share keeps its own.
 `public/og-image.png` (1200×630) is a Europe campaign after 29 matches,
 captured from the game with its overlays hidden, beside the wordmark.
 `public/favicon.svg` is the draw compass's needle on the clay accent, and
