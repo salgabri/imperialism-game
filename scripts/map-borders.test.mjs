@@ -311,6 +311,13 @@ test('layers: outline(id) chains one owner exactly as ownerPaths does, and the c
   assert.equal(index.resolve({ a: 'red', b: 'blue' }).outline('red'), rivals.outline('red'), 'resolve() offers the same outline');
 });
 
+test('a missing, non-finite or sparse-hole vertex drops just its two edges', () => {
+  const coast = ring => createMapBorderIndex([{ id: 'a', rings: [ring] }]).layers({ a: 'empire' }).coastD;
+  for (const ring of [[[0, 0], [2, 0], null, [0, 2]], [[0, 0], [2, 0], [NaN, 1], [0, 2]], [[0, 0], [2, 0], , [0, 2]]]) {
+    assert.equal(coast(ring), 'M2,0L0,0L0,2');
+  }
+});
+
 test('layers: empty and degenerate geometry produces empty layers', () => {
   assert.deepEqual(createMapBorderIndex().layers(), { coastD: '', innerD: '', outerD: '', ownerPaths: [] });
   const layers = createMapBorderIndex([{ id: 'a', rings: [[], [[0, 0]], [[1, 1], [1, 1]]] }]).layers({ a: 'empire' });

@@ -77,13 +77,17 @@ export function createMapBorderIndex(geometry = []) {
     if (country === undefined) { country = countryIds.length; countryIds.push(countryId); countryIndex.set(countryId, country); }
     for (const ring of shape.rings || []) {
       if (ring.length < 2) continue;
+      // Each vertex's key is made once rather than once per edge end. A plain loop: map() would keep a sparse ring's holes.
+      const keys = new Array(ring.length);
+      for (let j = 0; j < ring.length; j++) {
+        const point = ring[j];
+        keys[j] = point && Number.isFinite(point[0]) && Number.isFinite(point[1]) ? `${point[0]},${point[1]}` : null;
+      }
       for (let i = 0, previous = ring.length - 1; i < ring.length; previous = i++) {
-        const start = ring[previous], end = ring[i];
-        if (!start || !end || ![start[0], start[1], end[0], end[1]].every(Number.isFinite)) continue;
-        const startKey = `${start[0]},${start[1]}`, endKey = `${end[0]},${end[1]}`;
-        if (startKey === endKey) continue;
-        const [low, high] = startKey < endKey ? [startKey, endKey] : [endKey, startKey];
-        const lowId = pointOf(low), highId = pointOf(high), key = lowId * POINT_SPAN + highId;
+        const startKey = keys[previous], endKey = keys[i];
+        if (startKey === null || endKey === null || startKey === endKey) continue;
+        const lowFirst = startKey < endKey;
+        const lowId = pointOf(lowFirst ? startKey : endKey), highId = pointOf(lowFirst ? endKey : startKey), key = lowId * POINT_SPAN + highId;
         let segment = segmentIds.get(key);
         if (segment === undefined) {
           segment = a.length;
