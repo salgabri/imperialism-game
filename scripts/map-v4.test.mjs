@@ -35,6 +35,7 @@ const compiled = await build({
         if (instrumented === source) throw new Error('EmpireLabels factory import changed');
         return { loader: 'jsx', contents: `${instrumented}
 function createEmpireLabelEngine(...args) {
+  globalThis.__mapV4EngineGeometry = args[0];
   const engine = realCreateEmpireLabelEngine(...args);
   return { ...engine, layout(...inputs) { globalThis.__mapV4Layouts = (globalThis.__mapV4Layouts || 0) + 1;
     globalThis.__mapV4LastLayout = inputs[0]; return engine.layout(...inputs); } };
@@ -706,7 +707,13 @@ test('chrome: four exact mode buttons, zoom group, return, phone Whole map; hidd
     }
     await view.render({ ...props, playing: false });
     assert.equal(view.q('.map-modes, .map-zoom, .map-whole, .map-skip-link'), null, 'setup shows no chrome');
+    // Behind the setup wizard a world theatre gets no border mesh and no label geometry (Launch refits it) ...
+    assert.deepEqual(view.qa('.ownership-borders path').map(path => path.getAttribute('d')), ['', '', '']);
+    assert.deepEqual(globalThis.__mapV4EngineGeometry, []);
+    // ... while a country theatre keeps its setup-time build, which Launch reuses.
+    await view.render({ ...props, playing: false, showAllHomes: true });
     assert.equal(view.q('.empire-borders').getAttribute('d').includes('400,100'), true, 'setup borders are all "between"');
+    assert.equal(globalThis.__mapV4EngineGeometry, labelGeometry);
   } finally { await view.close(); }
 });
 

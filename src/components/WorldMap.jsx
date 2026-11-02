@@ -255,7 +255,10 @@ export default function WorldMap({
 
   const hatchSet = new Set(conquestIds || EMPTY);
   const hatched = countries.filter(country => hatchSet.has(country.id));
-  const borderIndex = useMemo(() => createMapBorderIndex(labelGeometry || EMPTY), [labelGeometry]);
+  // Behind the setup wizard (opaque and inert) a world theatre is never seen and Launch refits it: no border mesh and
+  // no label engine for it. A country theatre keeps its setup-time build, which Launch reuses.
+  const drawnGeometry = playing || showAllHomes ? labelGeometry : undefined;
+  const borderIndex = useMemo(() => createMapBorderIndex(drawnGeometry || EMPTY), [drawnGeometry]);
   const mesh = useMemo(() => borderLayers(borderIndex, playing ? ownership || {} : {}), [borderIndex, playing, ownership]);
   const meshReady = !!(mesh.coastD || mesh.innerD || mesh.outerD);
   const outlineOf = id => ownerOutline(mesh, id);
@@ -433,7 +436,7 @@ export default function WorldMap({
         </g>
         {/* Labels wait for the opening camera (laying out 100 names for a stand-in view is wasted work) and keep
             their last layout while a drag is under way. */}
-        <EmpireLabels geometry={labelGeometry} ownership={ownership} labels={vp.framing ? EMPTY : shownLabels}
+        <EmpireLabels geometry={drawnGeometry} ownership={ownership} labels={vp.framing ? EMPTY : shownLabels}
           viewBox={vp.view} unitsPerPixel={k} mapMode={mapMode} meId={meId}
           maxFontPx={LABEL_MAX_PX[breakpoint]} minFontPx={LABEL_MIN_PX} holdCamera={vp.panning} />
         {attack && <AttackVector {...attack} k={k} paused={paused} />}
