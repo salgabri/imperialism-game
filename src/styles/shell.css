@@ -29,6 +29,12 @@ main.campaign-layout {
 .campaign-layout[data-view=map] > .world-map { grid-column:1; grid-row:1; }
 .campaign-layout[data-view=map] > .v4-column { grid-column:2; grid-row:1; }
 .campaign-layout[data-view=map] > .ticker { grid-column:1 / -1; grid-row:2; }
+/* Desktop: the column on its own compositing layer. A live match updates it many times a second, and on its own layer
+   those updates cost about a quarter of the GPU raster work (headless Chrome). Its text, and the settings popover's
+   above it, then draw with grayscale rather than subpixel anti-aliasing: a deliberate trade. */
+@media (min-width:1200px) {
+  .campaign-layout[data-view=map] > .v4-column { transform:translateZ(0); }
+}
 
 /* conquest (A-2, D1): full-bleed map under an absolutely positioned 650px article */
 .campaign-layout[data-view=conquest] > .world-map { grid-column:1; grid-row:1; }

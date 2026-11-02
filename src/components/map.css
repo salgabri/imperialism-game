@@ -63,10 +63,14 @@
 .map-skip-link:focus { top: var(--map-inset); }
 
 /* ---- hover tooltip (README §Interactions: title-card style white panel) ---- */
+/* On its own compositing layer, the tooltip following the pointer costs about half the GPU work while hovering in
+   Flags mode (headless Chrome). Its text then draws with grayscale rather than subpixel anti-aliasing: a deliberate
+   trade. */
 .map-tooltip {
   position: absolute; left: -999px; top: -999px; z-index: 20; pointer-events: none;
   width: 262px; max-width: calc(100% - 16px); padding: 12px 14px;
   background: var(--panel); color: var(--ink); box-shadow: var(--shadow-float);
+  transform: translateZ(0);
 }
 .map-tooltip__name { display: block; font: 700 18px/1.1 var(--font-narrow); letter-spacing: .06em; text-transform: uppercase; }
 .map-tooltip__held { display: block; margin-top: 6px; font: 400 13px/1.35 var(--font-sans); color: var(--text-2); }
