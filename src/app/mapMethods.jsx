@@ -26,6 +26,8 @@ const CREST_PROFILE = Object.freeze({ id: 'club-crest', sourceWidth: 640, source
 /** A team's crest URL when it is a club with one. */
 const crestOf = team => (team?.kind === 'club' ? clubLogoUrl(team.id) : null);
 const NO_IDENTITY = Object.freeze({ meId: null, meFill: false, opponentId: null });
+// mapFlags' empty value: one object (never written to), so the memoised country rows keep their identity.
+const NO_FLAGS = Object.freeze({ flagParts: new Map(), flagPatterns: NONE });
 const isPlaying = st => st?.phase === 'playing' || st?.phase === 'victory';
 /** The views that show the map (App.render's `mapVisible`); every other view hides it. */
 const MAP_VIEWS = new Set(['setup', 'map', 'conquest']);
@@ -113,14 +115,13 @@ export function handleMapMove(e) {
 /** One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest. */
 export function mapFlags(playing) {
   const { mapMode, teams } = this.state;
-  const empty = { flagParts: new Map(), flagPatterns: [] };
-  if (mapMode !== 'flags') return empty;
-  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return empty;
+  if (mapMode !== 'flags') return NO_FLAGS;
+  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return NO_FLAGS;
   // The region index of this fit, built on its first Flags view (fitMap keeps only its source).
   if (!this.flagComponents && this.flagRegionSource) {
     this.flagComponents = createFlagRegionIndex(this.flagRegionSource.geometry, { maxGap: this.flagRegionSource.maxGap });
   }
-  if (!this.flagComponents) return empty;
+  if (!this.flagComponents) return NO_FLAGS;
   // While signing, the projected board: the taken land already flies the winner's banner (DEC D15).
   const components = this.flagComponents.components(playing ? mapSnapshot(this).own : this.setupFlagOwnership);
   const cached = this.flagLayoutCache;
@@ -162,10 +163,12 @@ export function mapFlags(playing) {
 
 /**
  * A country's click and hover handlers, made once per country id (they only name the id), so every render hands
- * the map the same functions instead of three new closures for each of ~240 shapes.
+ * the map the same functions instead of three new closures for each of ~240 shapes. One cache per geometry, so
+ * browsing country maps in setup keeps only the drawn map's ids.
  */
 function countryHandlers(app, cid) {
-  const cache = app.countryHandlers || (app.countryHandlers = new Map());
+  if (app.countryHandlerGeo !== app.geo) { app.countryHandlers = new Map(); app.countryHandlerGeo = app.geo; }
+  const cache = app.countryHandlers;
   let handlers = cache.get(cid);
   if (!handlers) {
     handlers = {
@@ -200,45 +203,55 @@ export function mapCountries() {
   const domestic = this.domesticMap();
   const preview = domestic && !playing ? homeClubs(domestic) : null;
 
-  const countries = [];
   const { flagParts, flagPatterns } = this.mapFlags(playing);
-  for (const c of this.geo.countries) {
-    const p = this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
-    if (!p) continue;
-    const ownerId = playing ? snap.own[c.id] : null;
-    const owner = ownerId ? teams[ownerId] : null;
-    const isSelected = owner && selected === ownerId;
-    const parts = flagParts.get(c.id);
-    countries.push({
-      id: c.id,
-      ownerId,
-      ownerName: owner?.name,
-      selected: !!isSelected,
-      name: domestic?.sectionNames[c.id] || NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
-      d: p.d,
-      // The mainland's bounds: keyboard focus reveals these, never a date-line-split country's map-wide box.
-      bbox: p.bbox,
-      flagParts: parts,
-      fill: mapVM.countryFill({ countryId: c.id, ownerId, owner, mapMode, hasFlagParts: !!parts?.length,
-        setup: phase === 'setup', ...identity, strength, fronts, preview: preview?.[c.id] || null }),
-      stroke: 'none',
-      strokeWidth: 0,
-      cursor: owner ? 'pointer' : 'default',
-      animation: flash[c.id] ? 'fiFlash 0.9s ease-out' : 'none',
-      ...countryHandlers(this, c.id),
-    });
-  }
+  // Keyed on every input of the rows, by identity; fitMap refits geo and displayGeo in place, so on their path maps.
+  // The ticker, the compass and hover re-render App many times per match without changing any of them, and the same
+  // rows let WorldMap keep its country elements.
+  const countries = memo(this.vmCache, 'map:countries', [this.geo.countries, this.geo.paths, this.displayGeo?.paths,
+    domestic, preview, phase, snap.own, teams, selected, flash, mapMode, identity.meId, identity.meFill, identity.opponentId,
+    strength, fronts, flagParts], () => {
+    const rows = [];
+    for (const c of this.geo.countries) {
+      const p = this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
+      if (!p) continue;
+      const ownerId = playing ? snap.own[c.id] : null;
+      const owner = ownerId ? teams[ownerId] : null;
+      const isSelected = owner && selected === ownerId;
+      const parts = flagParts.get(c.id);
+      rows.push({
+        id: c.id,
+        ownerId,
+        ownerName: owner?.name,
+        selected: !!isSelected,
+        name: domestic?.sectionNames[c.id] || NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
+        d: p.d,
+        // The mainland's bounds: keyboard focus reveals these, never a date-line-split country's map-wide box.
+        bbox: p.bbox,
+        flagParts: parts,
+        fill: mapVM.countryFill({ countryId: c.id, ownerId, owner, mapMode, hasFlagParts: !!parts?.length,
+          setup: phase === 'setup', ...identity, strength, fronts, preview: preview?.[c.id] || null }),
+        stroke: 'none',
+        strokeWidth: 0,
+        cursor: owner ? 'pointer' : 'default',
+        animation: flash[c.id] ? 'fiFlash 0.9s ease-out' : 'none',
+        ...countryHandlers(this, c.id),
+      });
+    }
+    return rows;
+  });
   return { countries, flagPatterns };
 }
 
 /** One label per alive empire (the projected survivors while signing). Uppercase text is the smoke contract. */
 export function mapLabels(playing) {
-  if (!playing || !CONFIG.showLabels || !this.geo) return [];
+  if (!playing || !CONFIG.showLabels || !this.geo) return NONE;
   const { teams } = this.state;
-  return mapSnapshot(this).aliveIds.filter(id => teams[id]).map(id => ({
+  const { aliveIds } = mapSnapshot(this);
+  // One list per survivors and teams (both replaced, never edited), not a new one for every ticker render.
+  return memo(this.vmCache, 'map:labels', [aliveIds, teams], () => aliveIds.filter(id => teams[id]).map(id => ({
     id,
     text: (teams[id].kind === 'club' ? teams[id].code : teams[id].name).toUpperCase(),
-  }));
+  })));
 }
 
 /**

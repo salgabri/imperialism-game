@@ -178,16 +178,46 @@ test('tooltip copy comes from tooltipModel', () => {
   } finally { f.close(); }
 });
 
-test('each country keeps its click and hover handlers across renders, so the map can skip unchanged land', () => {
+test('each country keeps its row while nothing it shows changes, and its click and hover handlers across renders', () => {
   const f = fixture();
   try {
-    const first = countryOf(f.app, '250');
-    f.app.setState({ hoverCid: '276' });
-    const again = countryOf(f.app, '250');
-    assert.notEqual(again, first, 'a fresh row each render');
-    for (const key of ['onClick', 'onEnter', 'onLeave']) assert.equal(again[key], first[key], key);
-    again.onEnter();
-    assert.equal(f.app.state.hoverCid, '250');
+    const { app } = f;
+    const first = countryOf(app, '250'), list = app.mapCountries().countries;
+    app.setState({ hoverCid: '276' });
+    assert.equal(app.mapCountries().countries, list, 'a hover changes no row: the same list');
+    assert.equal(countryOf(app, '250'), first, 'and the same row');
+    app.setState({ selected: '250' });
+    const selected = countryOf(app, '250');
+    assert.notEqual(selected, first, 'a new row when an input changes');
+    assert.equal(selected.selected, true);
+    for (const key of ['onClick', 'onEnter', 'onLeave']) assert.equal(selected[key], first[key], key);
+    selected.onEnter();
+    assert.equal(app.state.hoverCid, '250');
+    // A refit replaces the geometry's path map, not the geometry: new rows with the new paths.
+    const before = countryOf(app, '250');
+    app.geo.paths = { ...app.geo.paths, 250: { ...app.geo.paths['250'], d: 'M0,0L1,0L1,1Z' } };
+    assert.notEqual(countryOf(app, '250'), before);
+    assert.equal(countryOf(app, '250').d, 'M0,0L1,0L1,1Z');
+    assert.equal(countryOf(app, '250').onClick, first.onClick, 'a refit keeps the handlers');
+    // Another geometry (a country map) starts a new handler cache: browsing maps keeps only the drawn map's ids.
+    app.geo = { ...app.geo, countries: [{ id: '250' }] };
+    assert.notEqual(countryOf(app, '250').onClick, first.onClick);
+    assert.deepEqual([...app.countryHandlers.keys()], ['250']);
+  } finally { f.close(); }
+});
+
+test('labels: one list while the survivors and teams stand, a new one when they change, one empty list outside play', () => {
+  const f = fixture();
+  try {
+    const { app } = f;
+    const labels = app.mapLabels(true);
+    assert.deepEqual(labels.map(label => [label.id, label.text]), IDS.map(id => [id, app.state.teams[id].name.toUpperCase()]));
+    app.setState({ hoverCid: '276', selected: '250' });
+    assert.equal(app.mapLabels(true), labels, 'the ticker, hover and selection keep the list');
+    app.setState({ aliveIds: ['250', '826'] });
+    assert.deepEqual(app.mapLabels(true).map(label => label.id), ['250', '826']);
+    assert.equal(app.mapLabels(false), app.mapLabels(false));
+    assert.ok(Object.isFrozen(app.mapLabels(false)));
   } finally { f.close(); }
 });
 

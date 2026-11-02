@@ -348,8 +348,28 @@ export default function WorldMap({
   const veilD = useMemo(() => veiled.map(c => c.d).join(' '), [veiledIds, labelGeometry]);
   const showWhole = playing && typeof onWholeMap === 'function' && (!!nearFocus || wholeMap);
   const targetableOf = country => !choosing || inReach.has(country.ownerId);
-  latest.current = { choosing, byId: new Map(countries.map(country => [country.id, country])), targetable: targetableOf,
-    didPan: vp.didPan, onPointerMove, navigateCountry, setKeyboardCountry };
+  const byId = useMemo(() => new Map(countries.map(country => [country.id, country])), [countries]);
+  // A new geometry (another country map in setup) drops the ref callbacks of land it no longer draws.
+  useEffect(() => {
+    for (const id of countryRefCallbacks.current.keys()) if (!byId.has(id)) countryRefCallbacks.current.delete(id);
+  }, [labelGeometry]);
+  latest.current = { choosing, byId, targetable: targetableOf, didPan: vp.didPan, onPointerMove, navigateCountry, setKeyboardCountry };
+  // The country elements, remade only when something they show changes (not for the ticker, the compass or a hover).
+  // Every value they read is a dependency; the reach by its id lists, as buildReach makes a new object each render.
+  const reachKey = choosing ? `${reachIds.join('|')}#${[...kept].join('|')}` : '';
+  const shapes = useMemo(() => countries.map(c => {
+    const reachState = reachStateOf(c);
+    const targetable = targetableOf(c);
+    const tabbable = !!c.ownerId && targetable;
+    return <CountryShape key={c.id} id={c.id} d={c.d} fill={identityFill(c.fill, c.ownerId, identity)} ownerId={c.ownerId}
+      flagParts={c.flagParts} animation={c.animation} conquered={hatchSet.has(c.id)}
+      followed={!!c.ownerId && c.ownerId === followedId} selected={!!c.selected} reachState={reachState}
+      label={c.ownerName ? `${c.name}, held by ${c.ownerName}.${actionPhrase(reachState)}` : c.name}
+      role={tabbable ? 'button' : undefined} tabIndex={tabbable ? c.id === activeCountry ? 0 : -1 : undefined}
+      cursor={targetable ? c.cursor : 'default'}
+      stroke={meshReady ? 'none' : c.stroke} strokeWidth={meshReady ? 0 : (c.strokeWidth || 0) * k}
+      pathRef={countryRef(countryRefs.current, countryRefCallbacks.current, c.id)} actions={actions.current} />;
+  }), [countries, meId, meFill, opponentId, mapMode, conquestIds, followedId, reachKey, activeCountry, meshReady, meshReady ? 0 : k]);
 
   return (
     <section ref={mapRef} className={'world-map' + (playing ? '' : ' world-map--setup')} aria-label="Campaign map" tabIndex={-1}
@@ -384,19 +404,7 @@ export default function WorldMap({
         <g className="country-shapes">
           {/* Hover: entering land shows its card; leaving it, or tabbing off it, drops that card (App's handleMapMove
               also drops it over the sea). A window blur has no relatedTarget and keeps the card. */}
-          {countries.map(c => {
-            const reachState = reachStateOf(c);
-            const targetable = targetableOf(c);
-            const tabbable = !!c.ownerId && targetable;
-            return <CountryShape key={c.id} id={c.id} d={c.d} fill={identityFill(c.fill, c.ownerId, identity)} ownerId={c.ownerId}
-              flagParts={c.flagParts} animation={c.animation} conquered={hatchSet.has(c.id)}
-              followed={!!c.ownerId && c.ownerId === followedId} selected={!!c.selected} reachState={reachState}
-              label={c.ownerName ? `${c.name}, held by ${c.ownerName}.${actionPhrase(reachState)}` : c.name}
-              role={tabbable ? 'button' : undefined} tabIndex={tabbable ? c.id === activeCountry ? 0 : -1 : undefined}
-              cursor={targetable ? c.cursor : 'default'}
-              stroke={meshReady ? 'none' : c.stroke} strokeWidth={meshReady ? 0 : (c.strokeWidth || 0) * k}
-              pathRef={countryRef(countryRefs.current, countryRefCallbacks.current, c.id)} actions={actions.current} />;
-          })}
+          {shapes}
         </g>
         {hatched.length > 0 && <g className="conquest-hatch" pointerEvents="none" aria-hidden="true">
           {hatched.map(c => <path key={c.id} data-conquest-hatch={c.id} d={c.d} fillRule="evenodd" fill={`url(#${hatchId})`} />)}
