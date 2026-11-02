@@ -16,7 +16,7 @@ import { getSport, matchSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
-  fitDomesticCampaign, CHECKPOINT_KEYS } from './engine/storage.js';
+  fitDomesticCampaign, setActiveCampaign, CHECKPOINT_KEYS } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
 import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiveBasketballTeams } from './engine/managerStrategy.js';
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
@@ -82,6 +82,16 @@ const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}
 
 /** A club map's row as one of a basketball season's clubs: the season's name, code, strength and five on the map's land. */
 const seasonClub = (row, club) => ({ ...row, name: club.name, code: club.code, league: club.league, str: club.str, squad: club.squad });
+
+/**
+ * The Elite 32: the strongest nations, the same field whatever the seed. Generated players (a baseball nation's empty
+ * slots, a short basketball five) come from the campaign's draw, so ties are ranked on each nation built with its own
+ * fixed draw: without that, a new seed could leave out the team a manager plays again. Football builds draw nothing.
+ */
+function eliteNations(all, sport) {
+  const rank = new Map(all.map(team => [team.id, teamEff(buildTeam(team.id, makeRng(hashStr(`elite ${team.id}`)), sport))]));
+  return all.slice().sort((a, b) => b.str - a.str || rank.get(b.id) - rank.get(a.id)).slice(0, 32);
+}
 
 /**
  * Live presentation of an outcome already decided and saved at kickoff: the events and kicks revealed so far, and
@@ -280,6 +290,8 @@ export default class App extends React.Component {
 
   componentDidUpdate(_props, previous) {
     this.updateEngagement();
+    // The crash screen exports the campaign this page plays (storage crashCheckpoint), not another tab's.
+    setActiveCampaign(this.state.phase === 'playing' || this.state.phase === 'victory' ? this.state.campaignId : null);
     const el = this.eventsRef.current;
     if (el) el.scrollTop = el.scrollHeight;
     // Save when the match or spin CONTENT changed. Identity alone looped: when a click's sync update (revealAll's
@@ -650,8 +662,10 @@ export default class App extends React.Component {
       if (!current()) return;
       this.setState(state => {
         const clubScope = setClubScope(state.setup);
+        // The clubs' map follows the season; only a club field changes with it, so a nations manager keeps the team.
+        const field = state.setup.layer === 'clubs' ? { managedTeamId: '' } : {};
         return { footballSetLoad: { id, state: 'ready', message: null },
-          ...(clubScope !== state.setup.clubScope ? { setup: { ...state.setup, clubScope, managedTeamId: '' } } : {}) };
+          ...(clubScope !== state.setup.clubScope ? { setup: { ...state.setup, clubScope, ...field } } : {}) };
       });
     }, error => {
       if (current()) this.setState({ footballSetLoad: { id, state: 'error', message: `The ${this.setName(id)} season could not be loaded. ${error.message || error}` } });
@@ -815,8 +829,9 @@ export default class App extends React.Component {
     const gated = !!(st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination);
     const pending = !gated && (st.autoplay || !!st.spin || (st.match && !st.match.done));
     if (pending) this.clock.pause();
+    // The export pauses as Pause does, which also ends a skip ahead at the speed it started from.
     this.setState({ exportText: exportCampaign(data), exportFilename: `imperialism-${data.seed ?? 'campaign'}-match-${data.matches}.json`,
-      ...(pending ? { autoplay: false, paused: true } : {}) });
+      ...(pending ? { autoplay: false, paused: true, ...(st.skipAhead ? { skipAhead: null, speed: st.skipAhead.speed } : {}) } : {}) });
   }
 
   downloadProgress() {
@@ -842,7 +857,10 @@ export default class App extends React.Component {
     if (this.shareImage?.key === key) return this.shareImage.file;
     const victory = this.victoryPanel();
     const settings = st.initialSettings || st.settings;
-    const day = st.startedAt ? dayOf(new Date(st.startedAt)) : null;
+    // A daily set up before midnight and launched after it is the day before's.
+    const start = st.startedAt ? new Date(st.startedAt) : null;
+    const day = start ? [0, 1].map(back => dayOf(new Date(start.getFullYear(), start.getMonth(), start.getDate() - back)))
+      .find(candidate => isDaily(settings, candidate)) : null;
     const shapes = this.geo.countries.map(country => {
       const path = this.displayGeo?.paths[country.id] || this.geo.paths[country.id];
       return path ? { id: country.id, d: path.d, bbox: path.bbox } : null;
@@ -852,7 +870,7 @@ export default class App extends React.Component {
       // The colour the final map gives the champion: clay when it is the team you manage.
       fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill : politicalFill(champ.id),
       frame: this.viewFocus, seed: st.seed,
-      kicker: `${day && isDaily(settings, day) ? `Daily campaign · ${dailyLabel(day)}` : 'Campaign complete'} · Round ${roman(st.round)}`,
+      kicker: `${day ? `Daily campaign · ${dailyLabel(day)}` : 'Campaign complete'} · Round ${roman(st.round)}`,
       line: shareLine(victory), site: typeof window !== 'undefined' ? window.location.host : '',
       mark: champ.kind === 'club' ? { kind: 'crest', url: clubLogoUrl(champ.id), code: champ.code, color: champ.col }
         : { kind: 'flag', url: flagUrl(champ.flagId ?? champ.id), code: champ.code, color: champ.col },
@@ -1056,8 +1074,7 @@ export default class App extends React.Component {
     } else {
       const all = fieldedNations(sport).map(id => buildTeam(id, rng, sport));
       const scope = SCOPES.find(x => x.id === su.scope) || SCOPES[0];
-      included = su.scope === 'world' ? all : su.scope === 'elite'
-        ? all.slice().sort((a, b) => b.str - a.str || teamEff(b) - teamEff(a)).slice(0, 32) : all.filter(scope.filter);
+      included = su.scope === 'world' ? all : su.scope === 'elite' ? eliteNations(all, sport) : all.filter(scope.filter);
       for (const team of included) own[team.id] = team.id;
       scopeName = plainScopeName(scope.name);
     }
@@ -1186,7 +1203,7 @@ export default class App extends React.Component {
         batchTotal: 0,
         autoplay: false,
         // A skip ahead never carries into another campaign; its speed does come back.
-        skipAhead: null, ...(this.state.skipAhead ? { speed: this.state.skipAhead.speed } : {}),
+        skipAhead: null, ...this.handBackSpeed(),
         selected: null,
         flash: {},
         tab: 'power',
@@ -1276,7 +1293,7 @@ export default class App extends React.Component {
       turnQueue: s.turnQueue || [], turnIndex: redraw ? Math.max(0, (s.turnIndex || 0) - 1) : s.turnIndex || 0,
       pendingTarget: s.pendingTarget || null,
       view: 'map', viewSource: 'user', tacticalPreview: false, phoneMore: false, focusLayout: null, targetHoverId: null,
-      skipAhead: null, ...(this.state.skipAhead ? { speed: this.state.skipAhead.speed } : {}),
+      skipAhead: null, ...this.handBackSpeed(),
     };
     const gated = s.choice || s.tacticalChoice || s.managerElimination || s.pendingTarget;
     // A restored unapplied match is presented again: the same auto-switch rule as a kickoff (DEC D11).
@@ -1346,7 +1363,7 @@ export default class App extends React.Component {
       phase: 'setup',
       setupStep: step,
       setupSuggest: suggest !== false,
-      skipAhead: null, ...(this.state.skipAhead ? { speed: this.state.skipAhead.speed } : {}),
+      skipAhead: null, ...this.handBackSpeed(),
       confirmNew: false,
       autoplay: false,
       match: null,
@@ -1403,7 +1420,15 @@ export default class App extends React.Component {
       this.openingSeed = fresh === Number(this.state.seed) ? (fresh + 1) >>> 0 : fresh;
     }
     this.clearTimers();
-    this.setState({ setup, managerElimination: null, retrySetup: null }, () => this.startCampaign());
+    // The same draw launches with the campaign's seed; the setup's seed field then goes back to what the player left
+    // there, or the next New campaign would replay this draw too.
+    const seedField = this.state.setup.seed;
+    const restoreSeedField = () => this.setState(state => (state.setup.seed === setup.seed ? { setup: { ...state.setup, seed: seedField } } : null));
+    this.setState({ setup, managerElimination: null, retrySetup: null }, () => {
+      // At once, or once the country map or season the launch waits for has loaded.
+      const launch = this.startCampaign();
+      if (typeof launch?.then === 'function') launch.then(restoreSeedField); else restoreSeedField();
+    });
   }
 
   /**
@@ -1792,6 +1817,26 @@ export default class App extends React.Component {
     if (speed > 0 && speed !== 1 && this.state.speed === 1) this.setState({ speed });
   }
 
+  /**
+   * Leaving a campaign (for setup, another campaign or a restore) hands back the speed set aside in it: a skip ahead's,
+   * or the one your live match slowed to 1× from. The fields for that setState; {} when nothing was set aside.
+   */
+  handBackSpeed(st = this.state) {
+    const speed = st.skipAhead ? st.skipAhead.speed : Number(this.speedRestore) || 0;
+    this.speedRestore = null;
+    return speed > 0 ? { speed } : {};
+  }
+
+  /**
+   * Open the final results: the pause after the final result, or the masthead's Results when the player gets there
+   * first. Either way that pause can no longer reopen them after View map.
+   */
+  showResults() {
+    this.clock.remove(this.resultsTask);
+    this.resultsTask = null;
+    this.setState({ phase: 'victory', autoplay: false }, () => this.persist());
+  }
+
   cycleSpeed() {
     const s = this.state.speed;
     this.setSpeed(s === 1 ? 2 : s === 2 ? 4 : 1);
@@ -1897,7 +1942,7 @@ export default class App extends React.Component {
   /** The one primary action (DEC D13) shown by the masthead and the phone bar and run by Space. Pure. */
   primaryAction(st = this.state) {
     if (st.phase !== 'playing' || st.storageDialog || st.storageConflict || st.exportText || st.managerElimination) return null;
-    if (st.aliveIds.length <= 1) return { id: 'results', label: 'Results', run: () => this.setState({ phase: 'victory' }) };
+    if (st.aliveIds.length <= 1) return { id: 'results', label: 'Results', run: () => this.showResults() };
     if (st.pendingTarget) {
       const target = st.teams[st.pendingTarget.selectedId];
       return { id: 'attack', label: `Attack ${target?.name || 'target'}`, disabled: !target, run: () => this.confirmTarget() };
@@ -2134,7 +2179,7 @@ export default class App extends React.Component {
       busy: liveMatch || !!st.spin,
       onNew: () => this.newCampaign(), onCancelNew: () => this.setState({ confirmNew: false }),
       saveStatus: st.saveStatus, onExport: () => this.exportProgress(), onImport: file => this.importProgress(file),
-      onResults: () => this.setState({ phase: 'victory' }), seed: st.seed, settings: st.settings,
+      onResults: () => this.showResults(), seed: st.seed, settings: st.settings,
       onSetting: (key, value) => this.setSetting(key, value), managementEnded: st.managementEnded,
       managedName: st.teams?.[st.managedTeamId]?.name || null,
       onManageSaves: () => this.openStorageDialog('slots') };
@@ -2221,7 +2266,7 @@ export default class App extends React.Component {
           setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()} domestic={this.domesticStatus()}
           theatreMap={this.setupMapPreview()}
           season={this.seasonStatus()}
-          savedText={st.savedMeta ? 'Round ' + st.savedMeta.round + ' · ' + this.savedProgress(st.savedMeta) + ' · ' + this.scopeName(st.savedMeta.settings)
+          savedText={st.savedMeta ? (st.savedMeta.round ? 'Round ' + st.savedMeta.round : 'Before the first match') + ' · ' + this.savedProgress(st.savedMeta) + ' · ' + this.scopeName(st.savedMeta.settings)
             + (st.savedMeta.settings?.dataSeason ? ' · ' + st.savedMeta.settings.dataSeason : '') : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
           onPick={(key, value) => this.pickSetup(key, value)}

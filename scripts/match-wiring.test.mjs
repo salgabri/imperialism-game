@@ -134,7 +134,7 @@ test('the chain stops at the last tick, the whistle settles the minute and leave
   } finally { f.close(); }
 });
 
-test('basketball overtime: the chain runs to the last overtime minute', () => {
+test('basketball overtime: the chain runs to the end of the last overtime period, past its last basket', () => {
   const f = syncAppFixture({ settings: { sport: 'basketball' } });
   try {
     quiet(f.app);
@@ -145,10 +145,32 @@ test('basketball overtime: the chain runs to the last overtime minute', () => {
     f.app.presentMatch();
     f.time.advance(LEAD + 43 * sport.clock.msPerUnit);
     assert.equal(minute(f.app), 43);
-    assert.equal(f.app.minuteToken, null);
     assert.equal(f.app.state.match.shown.length, 2);
+    // The five-minute period plays out: 40 + 5, as the feed's final row and the chart end it.
+    f.time.advance(2 * sport.clock.msPerUnit);
+    assert.equal(minute(f.app), 45);
+    assert.equal(f.app.minuteToken, null);
+    assert.equal(f.app.state.match.status, sport.labels.live);
     f.time.advance(sport.clock.msPerUnit);
     assert.equal(f.app.state.match.status, sport.labels.tie);
+  } finally { f.close(); }
+});
+
+test('baseball: a run in the top of an extra inning still plays its bottom half out on the clock', () => {
+  const f = syncAppFixture({ settings: { sport: 'baseball' } });
+  try {
+    quiet(f.app);
+    f.app.finishMatch = () => {};
+    const sport = getSport('baseball');
+    // Level after nine, the visitors (the attacker bats first) score in the top of the tenth, outs 54–57.
+    f.app.setState({ match: { ...liveMatch(f.app, [[5, '276'], [56, '250']]), status: sport.labels.live, tie: { periods: [{}] } } });
+    f.app.presentMatch();
+    f.time.advance(LEAD + 56 * sport.clock.msPerUnit);
+    assert.equal(f.app.state.match.shown.length, 2);
+    f.time.advance(4 * sport.clock.msPerUnit);
+    assert.equal(minute(f.app), 60, 'the bottom of the tenth is played: three more outs');
+    assert.equal(sport.formatClock(minute(f.app)), 'B10');
+    assert.equal(f.app.minuteToken, null);
   } finally { f.close(); }
 });
 

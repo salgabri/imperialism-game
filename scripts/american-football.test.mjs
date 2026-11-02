@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { CLUBS, SOURCE } from '../src/data/clubs.american-football.js';
 import { buildClub, makeRng, outOfPositionPenalty, selectLineup, teamEff, teamSportId } from '../src/data/teams.js';
-import { getSport, SPORT_LIST } from '../src/sports/index.js';
+import { getSport, overtimeEnd, SPORT_LIST } from '../src/sports/index.js';
 import { americanFootballProfile, driveMoments, driveOdds } from '../src/sports/americanFootball.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
 import { chartDomain, isLiveModel, liveModelFor, winProbabilityAt, winSeries } from '../src/engine/winProbability.js';
@@ -137,6 +137,11 @@ test('the scores follow the NFL: tries by the chart, safeties, and overtime walk
     assert.equal(plays.reduce((s, p) => s + (p.side === 'A' ? p.pts : 0), 0), ga);
     assert.equal(plays.reduce((s, p) => s + (p.side === 'D' ? p.pts : 0), 0), gd);
     assert.equal(plays.filter(p => !p.period).reduce((s, p) => s + (p.side === 'A' ? p.pts : -p.pts), 0), regA - regD);
+    for (let period = 1; plays.some(p => p.period === period); period++) {
+      const [first, second] = plays.filter(p => p.period === period);
+      // A touchdown down after the first possession, the answer must be a touchdown: never a field goal that loses anyway.
+      if (first.pts >= 6 && second && second.side !== first.side) assert.notEqual(second.pts, 3, 'no field goal a touchdown down');
+    }
     for (const play of plays) {
       if (play.pts === 2) safeties++;
       if (play.pts < 6) continue;
@@ -250,6 +255,12 @@ test('the live win probability starts at the fixture odds, follows the score and
     final: { winnerSide: 'A' } });
   assert.equal(series.at(-1).t, 70, 'the series runs to the end of the overtime played');
   assert.equal(series.at(-1).p, 1);
+  // Overtime ends with the score that decides it: the series stops there, at 1, as the live clock does.
+  const early = winSeries({ model, goals: [{ m: 20, tid: 'a', pts: 7 }, { m: 41, tid: 'd', pts: 7 }, { m: 63.4, tid: 'a', pts: 3 }], aId: 'a', dId: 'd',
+    minute: 64, final: { winnerSide: 'A' } });
+  assert.deepEqual([early.at(-1).t, early.at(-1).p], [64, 1]);
+  assert.equal(overtimeEnd(sport, 1), 0, 'no period end to run on to after the deciding score');
+  assert.deepEqual([overtimeEnd('basketball', 2), overtimeEnd('baseball', 1), overtimeEnd('football', 1)], [50, 60, 0]);
   assert.deepEqual(chartDomain(model, 70).ticks, [0, 15, 30, 45, 60, 70], 'quarters, then each overtime');
   assert.equal(liveModelFor(sport, teams[0], teams[1]).length, 60);
 });

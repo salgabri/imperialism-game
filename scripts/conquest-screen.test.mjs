@@ -122,6 +122,13 @@ test('standfirst names the winner first: beat when attacking, held off when defe
   assert.equal(defend.standfirst, 'Italy held off Serbia 2–1. Italy take all 3 of Serbia’s territories and one player.');
   const single = buildConquest(fixture({ loserTerritories: ['688'] }), ctx);
   assert.match(single.standfirst, /Italy take Serbia’s only territory and one player\.$/);
+  const two = buildConquest(fixture({ loserTerritories: ['688', 'KOS'] }), ctx);
+  assert.match(two.standfirst, /Italy take both of Serbia’s territories and one player\.$/);
+  // A name ending in a plural s takes the apostrophe alone: every NFL club's does.
+  const colts = fixture();
+  colts.teams['688'] = { ...colts.teams['688'], name: 'Indianapolis Colts' };
+  colts.choice = { ...colts.choice, loserName: 'Indianapolis Colts' };
+  assert.match(buildConquest(colts, ctx).standfirst, /Italy take all 3 of Indianapolis Colts’ territories and one player\.$/);
 });
 
 test('tie-breaks are sport-aware and winner-first', () => {

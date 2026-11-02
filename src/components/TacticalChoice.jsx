@@ -12,6 +12,9 @@ import { recommendedTactic } from '../engine/managerStrategy.js';
 import { formatWinChance, winTone } from '../viewModels/format.js';
 import './dialogs.css';
 
+/** "Pick an approach to kick off": each sport's start of play (its words.kickoff) as a verb. */
+const START_VERBS = { 'Kick-off': 'kick off', Kickoff: 'kick off', 'Tip-off': 'tip off', 'First pitch': 'throw the first pitch' };
+
 function Side({ team, align }) {
   return (
     <div className={`fi-tactical-side fi-tactical-side--${align}${team.you ? ' is-you' : ''}`}>
@@ -132,6 +135,9 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
   const options = choice.options || [];
   const context = options[0]?.context || '';
   const rich = !!preview?.a && !!preview?.b;
+  // The sport's start of play (the preview model's words; football's without one).
+  const kickoff = preview?.kickoff || 'Kick-off';
+  const start = START_VERBS[kickoff] || 'start the match';
   // With the board-07 preview the fixture header already names both sides and the footer says how to kick off, so the
   // standfirst keeps only the strength context (one line); the plain dialog keeps the full sentence.
   const standfirst = rich && context ? context
@@ -164,7 +170,7 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
             <div className="fi-tactical-approach">
               <div className="kicker">
                 <h1 className="kicker__title" id="tactical-title">Choose your approach</h1>
-                <span className="kicker__aside">Locks at kick-off</span>
+                <span className="kicker__aside">{`Locks at ${kickoff.toLowerCase()}`}</span>
               </div>
               <p id="tactical-description" className="fi-tactical-standfirst">{standfirst}</p>
               <div className="fi-tactical-options">
@@ -207,8 +213,8 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
         {/* Sticky footer: the "simulate the result" escape hatch stays in view however far the panel scrolls. */}
         <p className="fi-tactical-foot">
           {onSimulate
-            ? <>Pick an approach to kick off and watch it live, or <button type="button" className="btn-link" onClick={onSimulate}>simulate the result</button>.</>
-            : 'Pick an approach to kick off and watch it live.'}
+            ? <>{`Pick an approach to ${start} and watch it live, or `}<button type="button" className="btn-link" onClick={onSimulate}>simulate the result</button>.</>
+            : `Pick an approach to ${start} and watch it live.`}
         </p>
       </section>
     </div>

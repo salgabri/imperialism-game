@@ -61,7 +61,8 @@ export function buildConquestPreview(st, ctx = {}) {
 // ---------- shared copy helpers ----------
 
 const NAMES_SHOWN = 6;
-const possessive = name => `${name}’s`;
+// "Serbia’s", but "Indianapolis Colts’": every NFL name and many clubs end in a plural s.
+const possessive = name => (/s$/i.test(name) ? `${name}’` : `${name}’s`);
 const isFiniteScore = value => value !== null && value !== '' && Number.isFinite(Number(value));
 
 /**
@@ -94,9 +95,9 @@ export function resultSentence(winnerName, loserName, winnerAttacked, score) {
   return `${winnerName} ${winnerAttacked ? 'beat' : 'held off'} ${loserName}${score ? ` ${score}` : ''}.`;
 }
 
-/** "all 3 of Serbia’s territories" / "Serbia’s only territory" (D§6). */
+/** "all 3 of Serbia’s territories" / "both of Serbia’s territories" / "Serbia’s only territory" (D§6). */
 function takenPhrase(loserName, n) {
-  return n === 1 ? `${possessive(loserName)} only territory` : `all ${n} of ${possessive(loserName)} territories`;
+  return n === 1 ? `${possessive(loserName)} only territory` : `${n === 2 ? 'both' : `all ${n}`} of ${possessive(loserName)} territories`;
 }
 
 /**

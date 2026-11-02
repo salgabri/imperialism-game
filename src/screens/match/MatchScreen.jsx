@@ -65,7 +65,7 @@ export default function MatchScreen(props) {
         <div className="match-main">
           <WinChart sport={sport} model={model} goals={goals} perspective={perspective} final={final} length={length} ot={ot}
             chartNote={chartNote} aId={a.teamId} dId={b.teamId} {...minuteProps} />
-          <MatchStats preMatch={preMatch} speed={speed} paused={paused} onSpeed={onSpeed} onPause={onPause} />
+          <MatchStats sport={sport} preMatch={preMatch} speed={speed} paused={paused} onSpeed={onSpeed} onPause={onPause} />
           <div className="match-lineups">
             <XiTable {...(lineups?.a || {})} onSelectTeam={onSelectTeam} />
             <XiTable {...(lineups?.b || {})} onSelectTeam={onSelectTeam} />

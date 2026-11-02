@@ -625,6 +625,10 @@ test('basketball match preview reads "Starting five" over five rows', async cont
   assert.match(view.host.querySelector('.fi-tactical-xi .kicker__aside').textContent, /^Five \d+\.\d$/);
   assert.equal(view.host.querySelectorAll('.fi-tactical-xi__row').length, 10);
   assert.doesNotMatch(view.host.textContent, /Starting XI/);
+  // Basketball starts at tip-off, not kick-off.
+  assert.equal(view.host.querySelector('.fi-tactical-approach .kicker__aside').textContent, 'Locks at tip-off');
+  assert.equal(view.host.querySelector('.dialog.fi-tactical > .fi-tactical-foot').textContent, 'Pick an approach to tip off and watch it live.');
+  assert.doesNotMatch(view.host.textContent, /kick/i);
   assertConsoleClean();
 });
 

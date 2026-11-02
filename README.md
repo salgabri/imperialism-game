@@ -519,7 +519,9 @@ An error while rendering shows a **crash screen** instead of a blank page
 autosaves stop with it, so the stored checkpoint is the last good one.
 **Reload** returns to setup and its resume card, on the new version when one is
 waiting (a plain reload would open the cached one). **Export campaign** downloads
-that checkpoint exactly as stored, which Import campaign reads. **Report it on
+that checkpoint exactly as stored, which Import campaign reads: the campaign this
+page was playing, even when another tab has saved since (outside a campaign, the
+quick-resume save). A campaign that never saved offers no export. **Report it on
 GitHub** opens a new issue with the error filled in, and **Error details** shows
 the message and the first stack frames.
 

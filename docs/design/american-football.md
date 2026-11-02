@@ -1,7 +1,8 @@
 # American football (NFL)
 
 Status: implemented 2026-10-31; touchdown tries, safeties and the NFL's key margins
-2026-11-01 (simulation version 3). A third sport beside football and basketball: the
+2026-11-01 (simulation version 3); 2026-11-02 (version 4), an overtime side a
+touchdown down no longer settles for a field goal. A third sport beside football and basketball: the
 32 NFL franchises, rated by Madden NFL 27, fight over the USA. It is played with
 clubs only, on the NFL's own map ([domestic-campaigns.md](domestic-campaigns.md#the-nfl-map)).
 Everything outside the match (territory, the draw, targeting, conquest, signings,

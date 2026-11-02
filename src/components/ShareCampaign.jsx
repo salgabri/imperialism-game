@@ -51,7 +51,9 @@ export default function ShareCampaign({ link = '', note = '', onShareImage }) {
       </div>
       {current.manual ? (
         <input ref={field} className="share-campaign__field" type="text" readOnly value={link} aria-label="Challenge link"
-          spellCheck={false} onFocus={event => event.target.select()} />
+          spellCheck={false} onFocus={event => event.target.select()}
+          // Setup's last step holds this field inside its form: Enter here must not submit it and launch the campaign.
+          onKeyDown={event => { if (event.key === 'Enter') event.preventDefault(); }} />
       ) : null}
       <p className="share-campaign__status" role="status" aria-live="polite">{current.status}</p>
     </div>

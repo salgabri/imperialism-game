@@ -16,6 +16,15 @@ function isPlaying(st) {
   return st?.phase === 'playing' || st?.phase === 'victory';
 }
 
+// Theatres and countries that read with "the" after "has conquered": the Elite 32, the USA and Canada, the Premier League.
+const WITH_ARTICLE = /^(Elite 32|USA|United |Netherlands$|Philippines$|Solomon Islands$|Dominican Rep|Central African Rep|Gambia$|Premier League$|Bundesliga$|Eredivisie$)/;
+
+/** What a champion has conquered: "Europe", "the Elite 32", "all the leagues" (clubs' All Leagues). */
+function conqueredName(name) {
+  if (name === 'All Leagues') return 'all the leagues';
+  return WITH_ARTICLE.test(name) ? `the ${name}` : name;
+}
+
 /**
  * viewContext() plus the theatre name, so the Ledger/Chronicle kickers read "The European Campaign" exactly as the
  * masthead does. `scopeName` is optional for the builders (they derive it from settings), so a failure here is ignored.
@@ -82,7 +91,7 @@ export function victoryPanel() {
     name: champ.name.toUpperCase(),
     color: champ.col,
     subtitle:
-      'has conquered ' + (settings.layer !== 'clubs' && settings.scope === 'world' ? 'the world' : scope) +
+      'has conquered ' + (settings.layer !== 'clubs' && settings.scope === 'world' ? 'the world' : conqueredName(scope)) +
       ' in ' + matches + (matches === 1 ? ' battle' : ' battles'),
     conquests: String(s.conq || 0),
     steals: String((s.steals || []).length),

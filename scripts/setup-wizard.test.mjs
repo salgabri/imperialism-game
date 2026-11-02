@@ -11,7 +11,7 @@ import { build } from 'esbuild';
 import {
   DRAW_CARDS, buildSetupModel, campaignFacts, campaignPreview as modelPreview, countryMapPreview, domesticDescription as modelDescription,
   domesticTheatres, estimateNote, frontRelation, moreRulesSummary, rulesOf, showMatchOptions, showMatchesOf, showMatchesWrites,
-  suggestedTeamId, theatreMapPreview, theatreRow, tierOf,
+  sportNote, suggestedTeamId, theatreMapPreview, theatreRow, tierOf,
 } from '../src/screens/setup/setupModel.js';
 import { launchRules } from '../src/engine/turns.js';
 import { SCOPES } from '../src/data/teams.js';
@@ -138,11 +138,21 @@ test('frozen named exports keep their values', () => {
   assert.deepEqual(RESOLUTION_OPTIONS.map(([id]) => id), ['ticker', 'instant']);
   assert.match(PACING_HELP.duel, /neutral transit/i);
   assert.equal(typeof campaignPreview, 'function');
-  assert.deepEqual(campaignPreview(32, getSport('football'), { finale: 'best-of-three', resolution: 'ticker' }).matches, '31–33');
+  // 30 matches leave the final pair; their best-of-three takes two or three games.
+  assert.deepEqual(campaignPreview(32, getSport('football'), { finale: 'best-of-three', resolution: 'ticker' }).matches, '32–33');
+  assert.deepEqual(campaignPreview(2, getSport('football'), { finale: 'best-of-three', resolution: 'ticker' }).matches, '2–3');
   assert.deepEqual(campaignPreview(10, getSport('football'), { resolution: 'instant' }), { matches: '9', duration: 'about 1–2 min at 1× autoplay' });
   // The component re-exports the model's function (the bundle holds its own copy of the module).
   const sample = { finale: 'best-of-three', resolution: 'ticker', express: false };
   assert.deepEqual(campaignPreview(46, getSport('basketball'), sample), modelPreview(46, getSport('basketball'), sample));
+});
+
+test('a two-club country is one match, and a basketball season\'s sport card offers its clubs alone', () => {
+  const pakistan = buildSetupModel({ sport: 'football', layer: 'clubs', clubScope: 'domestic:586', role: 'manager' }, {});
+  assert.equal(pakistan.country?.clubs, 2);
+  assert.match(pakistan.status, /^2 clubs · 1 match · /);
+  assert.equal(sportNote(getSport('basketball')), 'Nations · 30 NBA clubs');
+  assert.equal(sportNote(getSport('basketball'), { clubsOnly: true }), '30 NBA clubs', 'an NBA season has no nations');
 });
 
 test('static markup keeps the whole DOM contract on every step', t => {
@@ -197,7 +207,7 @@ test('static markup keeps the whole DOM contract on every step', t => {
     assert.match(markup, /take all of the loser/);
     assert.match(markup, /some signings add bench options/);
     assert.match(markup, /up to three signings/);
-    assert.match(markup, /31–33 matches/);
+    assert.match(markup, /32–33 matches/);
     assert.doesNotMatch(markup, /neutral transit/i, 'route internals stay out of the setup copy');
     assert.doesNotMatch(markup, /rule-matrix|Spectator-ready|Match settings/, 'no duplicate rules matrix or hidden pacing');
     assert.doesNotMatch(markup, /Progress saved after every match/);

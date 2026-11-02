@@ -23,12 +23,13 @@ export const PACING_HELP = {
 
 export function campaignPreview(count, sport, setup) {
   const matches = Math.max(0, count - 1);
-  const extra = setup.finale === 'best-of-three' ? '–' + (matches + 2) : '';
+  // A best-of-three final plays two or three games where a single final plays one.
+  const range = setup.finale === 'best-of-three' && matches > 0 ? `${matches + 1}–${matches + 2}` : `${matches}`;
   // The clock of the rules the campaign will play (a season's sport object carries the built-in one's).
   const { clock } = matchSport({ sport: sport.id, layer: setup.layer });
   const seconds = setup.express ? 2.5 : setup.resolution === 'instant' ? 5 : clock.length * clock.msPerUnit / 1000 + 7;
   const minutes = Math.max(1, Math.ceil(matches * seconds / 60));
-  return { matches: `${matches}${extra}`, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
+  return { matches: range, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
 }
 
 /** Wizard steps (M§1.8, M§3.3). `pending` is the rail subtitle until the step is done. */
@@ -437,13 +438,16 @@ export function theatreMapPreview({ countries, paths = null, basePaths, own, fra
   return value;
 }
 
-/** Sport card subtitle, derived from the sport's own club data so it never overstates the leagues. */
-export function sportNote(sport) {
+/**
+ * Sport card subtitle, derived from the sport's own club data so it never overstates the leagues. `clubsOnly`: the
+ * chosen season has no nations (a basketball season's NBA clubs).
+ */
+export function sportNote(sport, { clubsOnly = false } = {}) {
   const clubs = sport.clubs || [];
   const leagues = [...new Set(clubs.map(club => club.league))];
   if (!clubs.length) return 'Nations';
   // A sport with clubs only (American football) has no nations to offer.
-  if (sport.clubsOnly) return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs` : `${clubs.length} clubs`;
+  if (sport.clubsOnly || clubsOnly) return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs` : `${clubs.length} clubs`;
   if (leagues.length === 1) return `Nations · ${clubs.length} ${leagues[0]} clubs`;
   return `Nations · ${clubs.length} clubs from ${leagues.length} leagues`;
 }
@@ -644,7 +648,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     sport: { id: sport.id, name: sport.name },
     // The chosen set's card counts its own clubs.
     sports: SPORT_LIST.map(item => ({ id: item.id, name: item.name,
-      note: item.id !== sport.id ? sportNote(item) : pending ? sportNote(NO_CLUBS) : sportNote(sport), selected: item.id === sport.id })),
+      note: item.id !== sport.id ? sportNote(item) : pending ? sportNote(NO_CLUBS)
+        : sportNote(sport, { clubsOnly: dataSet != null && !setHasNations(dataSet) }), selected: item.id === sport.id })),
     season: {
       id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTES[sportId] || '', loading: setLoading,
       message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',
@@ -670,7 +675,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
       { id: 'matches', label: 'Matches', value: preview.matches },
       { id: 'length', label: 'Length', value: preview.duration.replace(' at 1× autoplay', ''), small: true },
     ],
-    status: pending ? (seasonState === 'error' ? setFailed : setLoading) : `${count} ${nouns} · ${preview.matches} matches · ${preview.duration}`,
+    status: pending ? (seasonState === 'error' ? setFailed : setLoading)
+      : `${count} ${nouns} · ${preview.matches} ${preview.matches === '1' ? 'match' : 'matches'} · ${preview.duration}`,
     estimateNote: estimateNote(showMatches, setup.role),
     campaignSummary,
     rules,

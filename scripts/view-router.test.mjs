@@ -1162,3 +1162,14 @@ test('following another team after the managed team falls keeps it on record as 
     app.clearTimers();
   });
 });
+
+test('the champion has conquered a place: "the Elite 32", "all the leagues", "the Premier League", "Europe"', () => {
+  for (const [settings, place] of [[{ scope: 'elite' }, 'the Elite 32'], [{ layer: 'clubs', clubScope: 'all' }, 'all the leagues'],
+    [{ layer: 'clubs', clubScope: 'Premier League' }, 'the Premier League'], [{ scope: 'UEFA' }, 'Europe'], [{ scope: 'world' }, 'the world']]) {
+    const f = syncAppFixture({ settings });
+    try {
+      f.app.setState({ phase: 'victory', aliveIds: ['250'], matches: 2 });
+      assert.equal(f.app.victoryPanel().subtitle, `has conquered ${place} in 2 battles`);
+    } finally { f.close(); }
+  }
+});

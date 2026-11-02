@@ -1,12 +1,15 @@
 // Owner: WP-MATCH (see PLAN.md §4). Phone "Stats" segment (A-3): pre-match odds and strengths + speed and pause.
 import React from 'react';
 import SpeedControls from './SpeedControls.jsx';
+import { getSport } from '../../sports/index.js';
 
-export default function MatchStats({ preMatch = null, speed = 1, paused = false, onSpeed, onPause }) {
+export default function MatchStats({ sport = 'football', preMatch = null, speed = 1, paused = false, onSpeed, onPause }) {
+  // "Before kick-off", "Before tip-off", "Before first pitch".
+  const kickoff = (getSport(sport).words?.kickoff || 'Kick-off').toLowerCase();
   return (
     <section className="match-stats" aria-labelledby="match-stats-title">
       <div className="kicker match-stats__kicker">
-        <h2 className="kicker__title match-stats__title" id="match-stats-title">Before kick-off</h2>
+        <h2 className="kicker__title match-stats__title" id="match-stats-title">{`Before ${kickoff}`}</h2>
         <span className="kicker__aside match-stats__aside">Estimate</span>
       </div>
       {preMatch?.odds ? (

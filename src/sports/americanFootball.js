@@ -156,7 +156,9 @@ function overtimePeriod(rng, oddsA, oddsD, first) {
   const oddsOf = side => (side === 'A' ? oddsA : oddsD);
   play(order[0], oddsOf(order[0]), () => false);
   const behind = order[1] === 'A' ? d - a : a - d;
-  if (behind >= 0) play(order[1], lateCall(oddsOf(order[1]), -behind), () => (behind < 6 ? null : false));
+  // A touchdown down, a field goal cannot help: the second side goes for it on fourth down instead.
+  const second = lateCall(oddsOf(order[1]), -behind);
+  if (behind >= 0) play(order[1], behind > 3 ? { ...second, fgTry: 0 } : second, () => (behind < 6 ? null : false));
   for (let k = 0; k < SUDDEN_DEATH * 2 && a === d; k++) play(order[k % 2], oddsOf(order[k % 2]), () => null);
   return { a, d, drives };
 }
@@ -226,7 +228,8 @@ function playMinute(rng, index, count, offset, span) {
 
 export const americanFootball = {
   id: 'american-football',
-  simulationVersion: 3,
+  // 4: an overtime side a touchdown down no longer settles for a field goal.
+  simulationVersion: 4,
   name: 'American football',
   blurb: 'Eleven on offence, eleven on defence, sixty minutes. Touchdowns and field goals — level games go to overtime.',
   // No source rates national teams: American football is played by NFL clubs, on their own map of the USA.
@@ -245,7 +248,8 @@ export const americanFootball = {
   fallbackStrength: (rec, confMeta) => Math.max(40, confMeta[rec[2]].baseStr - 15),
   requiredPositions: ['QB'],
 
-  clock: { length: MINUTES, msPerUnit: 65, ot: OVERTIME },
+  // `sudden`: an overtime period ends with the score that decides it, not at its tenth minute.
+  clock: { length: MINUTES, msPerUnit: 65, ot: OVERTIME, sudden: true },
   tieBreak: 'overtime',
   labels: {
     score: 'POINTS',

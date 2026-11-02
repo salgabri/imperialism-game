@@ -479,6 +479,21 @@ export function inspectSave() {
 
 export function loadSave() { return inspectSave().campaign; }
 
+/**
+ * The campaign this page is playing (App keeps it current), so the crash screen offers that campaign's checkpoint:
+ * the resume pointer is shared by every tab and may hold another tab's campaign by then.
+ */
+let activeCampaignId = null;
+export function setActiveCampaign(id) { activeCampaignId = typeof id === 'string' && id ? id : null; }
+
+/**
+ * The crash screen's checkpoint, as stored: the playing campaign's own (null if it never saved), else, outside a
+ * campaign, the resume pointer's.
+ */
+export function crashCheckpoint() {
+  try { return localStorage.getItem(activeCampaignId ? campaignStorageKey(activeCampaignId) : SAVE_KEY) || null; } catch { return null; }
+}
+
 function indexData() {
   const raw = localStorage.getItem(CAMPAIGN_INDEX_KEY);
   let parsed = null;
@@ -712,7 +727,12 @@ export function renameCampaign(id, name) {
   return writeSave({ ...campaign, campaignName: cleanName(name) }, { activate: false });
 }
 
-export function exportCampaign(state) { return serializeCampaign(campaignSnapshot(state), 2); }
+export function exportCampaign(state) {
+  const data = campaignSnapshot(state);
+  // A campaign that never saved keeps its full name (a country club's can pass 80 characters); import takes 80.
+  if (typeof data.campaignName === 'string' && data.campaignName.length > 80) data.campaignName = cleanName(data.campaignName);
+  return serializeCampaign(data, 2);
+}
 
 const sectionCount = (n, noun = 'section') => `${n} of its ${noun}s ${n === 1 ? 'is' : 'are'}`;
 
@@ -774,7 +794,21 @@ export function fitDomesticCampaign(campaign, { meta, clubs, sectionNames }) {
   } };
 }
 
-/** Discard only the resume pointer; named campaigns and recovery copies stay intact. */
+/**
+ * Discard only the resume pointer; named campaigns and recovery copies stay intact. A save from before campaign slots
+ * (no campaign id) has no copy but the pointer: it moves into Saved campaigns first, as starting a new campaign moves it.
+ */
 export function clearSave() {
-  try { localStorage.removeItem(SAVE_KEY); return true; } catch { return false; }
+  try {
+    const current = tryParse(localStorage.getItem(SAVE_KEY));
+    if (current && !current.campaignId) {
+      const migrated = { ...current, campaignId: createCampaignId(), revision: 1,
+        campaignName: cleanName(current.campaignName || `${current.settings?.sport || 'Football'} legacy campaign`) };
+      writeAll([[CAMPAIGN_INDEX_KEY, JSON.stringify([...indexData(), campaignMetadata(migrated)])],
+        [campaignStorageKey(migrated.campaignId), checkpointText(migrated)], [SAVE_KEY, null]]);
+      return true;
+    }
+    localStorage.removeItem(SAVE_KEY);
+    return true;
+  } catch { return false; }
 }

@@ -42,7 +42,7 @@ test('setup presents rules, role, reproducible settings and honest session previ
   assert.match(markup, /take all of the loser/);
   assert.match(markup, /some signings add bench options/);
   assert.match(markup, /up to three signings/);
-  assert.match(markup, /31–33 matches/);
+  assert.match(markup, /32–33 matches/);
   assert.match(markup, /id="setup-seed"[^>]*value="42"/);
   assert.match(markup, /Seed 42/, 'More rules names the changed rules');
   assert.match(markup, /Who picks your opponent/);

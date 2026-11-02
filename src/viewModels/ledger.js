@@ -603,6 +603,8 @@ export function buildMatchPreview(st, ctx) {
       kicker: round ? `Round ${roman(round)} · Fixture` : 'Fixture',
       lineupLabel: copy.label,
       lineupShort: copy.short,
+      // "Kick-off", "Tip-off", "First pitch": what the approach locks at.
+      kickoff: getSport(sportId).words?.kickoff || 'Kick-off',
       a, b,
       odds: oddsRow(a, b, pA, pD),
       samples: odds?.samples ?? null,

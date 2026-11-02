@@ -1,7 +1,7 @@
 // Owner: WP-MATCH (see PLAN.md §4). Live match view-models (PLAN §3.6, B§5, DEC D6/D7/D11).
 // Pure: no window/document/timers/RNG. The live minute is NOT read here (it lives in the minute store, DEC D7);
 // components pass it to buildFeedRows and to the win-probability series.
-import { clockLabel, getSport, matchSport, overtimePeriodsOf, overtimeText } from '../sports/index.js';
+import { clockLabel, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeText } from '../sports/index.js';
 import { selectLineup } from '../data/teams.js';
 import { BENCH } from '../sports/basketball.js';
 import { liveModelFor } from '../engine/winProbability.js';
@@ -143,12 +143,11 @@ function lineups(st, ctx, aId, dId, sportId, moved = null) {
 /** The half-time minute the feed marks: half the regulation length, or none in a sport without one (baseball). */
 const halfOf = (sport, length) => (sport?.words?.half === null ? 0 : length / 2);
 
-/** Overtime tie-breaks end at the last period played (DEC D6 "the end of the last overtime played"). */
+/**
+ * Overtime tie-breaks end at the last period played (DEC D6 "the end of the last overtime played"), American football's
+ * at its deciding score (sports overtimeEnd).
+ */
 const otOf = sport => Number(sport?.clock?.ot) || (sport?.tieBreak === 'overtime' ? 5 : 0);
-function overtimeEnd(sport, length, periods) {
-  const n = Number(periods) || 0, ot = otOf(sport);
-  return sport?.tieBreak === 'overtime' && n > 0 && ot > 0 ? length + n * ot : 0;
-}
 
 /**
  * History keeps each event's formatted copy only ("GOAL — Name (ITA)", "+3 — Name (SRB)", "TD — Name (KCC)",
@@ -231,7 +230,7 @@ function fromMatch(st, ctx, sport, m) {
   const allEv = Array.isArray(m.allEv) ? m.allEv : shown;
   const lastTick = allEv.reduce((n, e) => Math.max(n, Number(e?.m) || 0), length);
   // The full-time minute: the last event, or the end of the last overtime period (same as the history fallback).
-  const finalMinute = Math.max(lastTick, overtimeEnd(sport, length, (m.tie?.periods || []).length));
+  const finalMinute = Math.max(lastTick, overtimeEnd(sport, (m.tie?.periods || []).length));
   const shootout = sport.tieBreak === 'shootout';
   const kicks = kickCounts(m.tieShown);
   const kicksPending = !!(kicks && m.tie && (kicks.kicksA.length < (m.tie.A || []).length || kicks.kicksB.length < (m.tie.D || []).length));
@@ -301,7 +300,7 @@ function fromHistory(st, ctx, sport, entry) {
   // The minute the match ended: the last timed event, or the end of the overtime the tie text records.
   const periods = overtimePeriodsOf(sport, tieDetail);
   const lastEvent = events.reduce((n, e) => Math.max(n, Number(e.m) || 0), 0);
-  const finalMinute = Math.max(length, lastEvent, overtimeEnd(sport, length, periods));
+  const finalMinute = Math.max(length, lastEvent, overtimeEnd(sport, periods));
   const aCode = entry.a?.code || A.code, dCode = entry.b?.code || D.code;
   const scorers = historyShown(entry, aId, dId, aCode, dCode);
   // The last finished match is the latest conquest: undo its player move so the XIs show who played (DEC D11).

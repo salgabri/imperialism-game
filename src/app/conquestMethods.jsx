@@ -112,7 +112,8 @@ export function finishMatch() {
       this.setState({ series: next.series, match: completed, matches: st.matches + 1,
         history: [...st.history, entry], queue: [],
         log: [...st.log, { t: 'match', r: st.round, txt: `${completed.winnerName} wins finale game ${next.series.games}; series continues.`, chip: C.gold }].slice(-LOG_CAP) },
-        () => { this.persist(); if (this.state.autoplay) this.after(this.fastPlayback(st) ? 120 : 1000, () => this.nextAction()); });
+        // Autoplay is asked again when the pause ends: Pause, Resume or Stop meanwhile leaves it off.
+        () => { this.persist(); if (this.state.autoplay) this.after(this.fastPlayback(st) ? 120 : 1000, () => { if (this.state.autoplay) this.nextAction(); }); });
       return;
     }
     recordSettlement(this, st, { series: next.series, view: seriesView, holds: state => state.series === next.series });
@@ -288,8 +289,9 @@ export function applyConquest(playerIndex) {
 
       // Fast-forward, or a skip ahead: no notices, straight on.
       if (this.fastPlayback(st)) {
-        if (aliveIds.length === 1) this.after(200, () => this.setState({ phase: 'victory', autoplay: false }, () => this.persist()));
-        else if (this.state.autoplay) this.after(m.express ? 12 : 650, () => this.nextAction());
+        if (aliveIds.length === 1) this.resultsTask = this.after(200, () => this.showResults());
+        // Autoplay is asked again when the pause ends: Pause then Resume, or Stop skipping, leaves it off.
+        else if (this.state.autoplay) this.after(m.express ? 12 : 650, () => { if (this.state.autoplay) this.nextAction(); });
         return;
       }
 
@@ -332,7 +334,7 @@ export function applyConquest(playerIndex) {
 
       const doneAt = stolen ? 3900 : 1950;
       if (aliveIds.length === 1) {
-        this.after(doneAt + 250, () => this.setState({ phase: 'victory', autoplay: false }, () => this.persist()));
+        this.resultsTask = this.after(doneAt + 250, () => this.showResults());
       } else if (this.state.autoplay) {
         // Mid-batch runs back-to-back; a fresh round gets a beat of breathing room.
         this.after(this.state.queue.length ? doneAt : doneAt + 120, () => { if (this.state.autoplay) this.nextAction(); });

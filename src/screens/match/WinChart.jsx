@@ -90,7 +90,8 @@ export default function WinChart({ sport = 'football', live = false, model = nul
           <rect width={W} height={H} className="match-chart__bg" />
           <path d={`M0 ${H * .25}H${W}M0 ${H * .75}H${W}`} className="match-chart__guide" />
           <path d={`M0 ${H / 2}H${W}`} className="match-chart__even" />
-          <path d={`M${half} 0V${H}`} className="match-chart__guide" />
+          {/* Half-time, in the sports that have one (baseball's words.half is null). */}
+          {getSport(sport).words?.half !== null && <path d={`M${half} 0V${H}`} className="match-chart__guide" />}
           {geometry.area && <path d={geometry.area} fill={`url(#${patternId})`} className="match-chart__area" />}
           {geometry.line && <path d={geometry.line} className="match-chart__line" />}
           {markers.map(marker => <circle key={marker.key} cx={marker.x} cy={marker.y} r="4.5" className="match-chart__goal" />)}

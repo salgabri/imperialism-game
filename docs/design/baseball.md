@@ -147,7 +147,10 @@ supply `formatClock`, `formatTick`, `clockLeft` ("4 innings left") and `overtime
 (baseball's "after 11 innings", "F/11"); `src/sports/index.js` reads them
 (`clockLabel`, `clockTick`, `overtimeText`, `overtimeShort`, `overtimePeriodsOf`) with
 the minute defaults for the other sports. Baseball has no half-time row, and its
-overtime row reads "Extra innings".
+overtime row reads "Extra innings". The clock always reaches the end of the last
+inning played (`overtimeEnd`): a game the visitors win in the top of the tenth still
+plays out its bottom half, as basketball plays out a five-minute overtime after its
+last basket. American football's overtime ends at its deciding score instead.
 
 ## Live win probability
 

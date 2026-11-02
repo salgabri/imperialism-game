@@ -9,7 +9,7 @@
 import React from 'react';
 import { C, pad3, tint } from '../theme.js';
 import { liveModelFor } from '../engine/winProbability.js';
-import { overtimeText } from '../sports/index.js';
+import { overtimeEnd, overtimeText } from '../sports/index.js';
 import { roman } from '../viewModels/format.js';
 import * as matchVM from '../viewModels/match.js';
 
@@ -24,9 +24,13 @@ const SHOOTOUT_FINISH_MS = 650;
 /** What each tracked clock token runs (`{ kind, fn, event? }`), so a speed change re-times only pending work (A-12). */
 const TASKS = new WeakMap();
 
-/** The last minute of play: regulation, or the last overtime event. */
+/**
+ * The last minute of play: regulation, the last event, or the end of the last overtime period played, so a game won
+ * in the top of an extra inning still plays out its bottom half on the clock (overtimeEnd).
+ */
 function lastTickOf(m, sport) {
-  return (m?.allEv || []).reduce((n, e) => Math.max(n, Number(e?.m) || 0), Number(sport?.clock?.length) || 0);
+  const last = (m?.allEv || []).reduce((n, e) => Math.max(n, Number(e?.m) || 0), Number(sport?.clock?.length) || 0);
+  return Math.max(last, overtimeEnd(sport, Array.isArray(m?.tie?.periods) ? m.tie.periods.length : 0));
 }
 
 function lastShownMinute(m) {

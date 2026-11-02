@@ -51,6 +51,17 @@ export function overtimeText(sport, periods) {
   return typeof own === 'function' ? own(n) : `after ${n} overtime period${n === 1 ? '' : 's'}`;
 }
 
+/**
+ * The clock at the end of the last overtime period played (basketball's five minutes, baseball's extra innings), or 0
+ * when there is none to reach: no overtime, a shoot-out, or American football's, which ends at its deciding score
+ * (`clock.sudden`), the last event.
+ */
+export function overtimeEnd(sport, periods) {
+  const model = sportOf(sport), n = Number(periods) || 0;
+  if (model?.tieBreak !== 'overtime' || model.clock?.sudden || n <= 0) return 0;
+  return (Number(model.clock?.length) || 0) + n * (Number(model.clock?.ot) || 5);
+}
+
 /** The short tie-break beside a level score: "OT", "2OT", or a sport's own (`overtime.short`: baseball's "F/11"). */
 export function overtimeShort(sport, periods) {
   const n = Math.max(1, Number(periods) || 1);

@@ -17,6 +17,7 @@ import { BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, seasonMapOf, seasonS
 import { parseCampaign } from '../src/engine/storage.js';
 import { BASELINE } from '../src/sports/baseball.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
+import { readChallenge } from '../src/screens/setup/challenge.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
 import { editionOf, seasonIdOf, teamsOf } from './lib/mlb.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
@@ -255,5 +256,30 @@ test('a season\'s clubs launch on their era\'s map: the Oakland Athletics in Oak
     const today = CLUB_MAPS.find(entry => entry.id === 'mlb').version;
     assert.throws(() => parseCampaign(edited(s => { s.clubScope = 'domestic:mlb'; s.domesticVersion = today; })), /Campaign data set is invalid/);
     assert.ok(CLUBS.every(club => club.id !== 'mlb-oakland-athletics'), 'today\'s Athletics are another club');
+  });
+});
+
+test('a challenge link to a season\'s nations keeps the manager\'s team once the season loads', async () => {
+  await withApp(async ({ app, time }) => {
+    const link = readChallenge('?sport=baseball&theatre=CONCACAF&season=mlb-the-show-24&role=manager&team=214&seed=1');
+    assert.deepEqual(link.ignored, []);
+    app.setState({ setup: link.setup });
+    app.showSetupSet();
+    time.advance(200);
+    await app.loadSet('mlb-the-show-24');
+    await settle();
+    assert.equal(app.seasonStatus().state, 'ready');
+    assert.equal(app.state.setup.clubScope, 'domestic:mlb2022', 'the clubs\' map follows the season');
+    assert.equal(app.state.setup.managedTeamId, '214', 'the nations field is unchanged, so the Dominican Republic stays picked');
+  });
+});
+
+test('baseball\'s Elite 32 is the same nations for every seed, so New draw keeps the team it fielded', async () => {
+  await withApp(async ({ app }) => {
+    // Most baseball nations tie on strength with generated players, which come from the campaign's draw.
+    const setup = { ...app.state.setup, sport: 'baseball', layer: 'nations', scope: 'elite', dataSet: null };
+    const fields = [1, 2, 3, 2026, 4294967295].map(seed => app.opening(setup, makeRng(seed)).included.map(team => team.id).sort().join());
+    assert.equal(fields[0].split(',').length, 32);
+    assert.equal(new Set(fields).size, 1);
   });
 });

@@ -389,3 +389,17 @@ test('baseball sets up with clubs on the MLB map or with nations, launches and s
     if (prior) Object.defineProperty(globalThis, 'fetch', prior); else delete globalThis.fetch;
   }
 });
+
+test('the win chart marks no half-time in baseball, and the feed names the ninth\'s last out before any extra inning', async () => {
+  const { WinChart } = await bundleComponents({ WinChart: 'src/screens/match/WinChart.jsx' });
+  const { renderToStaticMarkup } = await import('react-dom/server');
+  const React = (await import('react')).default;
+  const guides = (id, model) => (renderToStaticMarkup(React.createElement(WinChart, { sport: id, model, minuteFallback: 10 }))
+    .match(/class="match-chart__guide"/g) || []).length;
+  const football = getSport('football'), nations = ['250', '276'].map(id => buildTeam(id, makeRng(3), football));
+  assert.equal(guides('football', liveModelFor(football, nations[0], nations[1])), 2, 'the quarter lines and half-time');
+  assert.equal(guides('baseball', liveModelFor(sport, teams[0], teams[1])), 1, 'the quarter lines only');
+  assert.equal(sport.clockLeft(54, 54), 'final out');
+  assert.equal(sport.clockLeft(55, 54), 'extra innings');
+  assert.equal(sport.clockLeft(51, 54), '1 inning left');
+});

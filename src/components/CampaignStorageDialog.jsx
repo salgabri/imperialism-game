@@ -38,12 +38,13 @@ function CampaignPreview({ campaign }) {
   if (!campaign) return null;
   const settings = campaign.settings || {}, alive = campaign.aliveIds?.length ?? campaign.alive;
   const manager = campaign.teams?.[campaign.managedTeamId]?.name || campaign.managedTeamName;
+  const round = Number(campaign.round) || 0, matches = Number(campaign.matches) || 0;
   return <dl className="campaign-storage-preview">
     <div><dt>Sport</dt><dd>{getSport(settings.sport).name} · {settings.layer === 'clubs' ? 'Clubs' : 'Nations'}</dd></div>
     <div><dt>Theatre</dt><dd>{theatreName(settings)}</dd></div>
     {/* Only a campaign played on a football data set names its season; the built-in season is implied. */}
     {settings.dataSeason && <div><dt>Season</dt><dd>{settings.dataSeason} · {settings.dataSet}</dd></div>}
-    <div><dt>Progress</dt><dd>Round {campaign.round || 0} · {campaign.matches || 0} matches · {alive} remaining</dd></div>
+    <div><dt>Progress</dt><dd>{round ? `Round ${round} · ${matches} ${matches === 1 ? 'match' : 'matches'}` : 'Before the first match'} · {alive} remaining</dd></div>
     <div><dt>Seed</dt><dd>{campaign.seed ?? 'Legacy campaign'}</dd></div>
     {manager && <div><dt>Manager</dt><dd>{manager}</dd></div>}
   </dl>;

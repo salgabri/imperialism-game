@@ -7,7 +7,7 @@ import { getSport } from '../src/sports/index.js';
 import { CAMPAIGN_BACKUP_KEY, CAMPAIGN_DAMAGED_KEY, campaignStorageKey, createCampaignId, parseCampaign, writeSave,
   campaignSnapshot, inspectSave, inspectCampaign, loadSave, loadCampaign, listCampaigns, renameCampaign,
   forkCampaign, clearSave, detectSaveConflict, isCampaignStorageEvent, serializeCampaign, exportCampaign, deleteCampaign,
-  fitDomesticCampaign } from '../src/engine/storage.js';
+  fitDomesticCampaign, setActiveCampaign, crashCheckpoint } from '../src/engine/storage.js';
 
 function checkpoint() {
   const rng = makeRng(42), sport = getSport('football');
@@ -176,6 +176,46 @@ test('starting a new campaign archives the old singleton instead of overwriting 
   const slots = listCampaigns(); assert.equal(slots.length, 2);
   const archived = loadCampaign(slots.find(item => item.id !== next.campaignId).id);
   assert.deepEqual(archived.own, legacy.own); assert.deepEqual(archived.teams, legacy.teams);
+}));
+
+test('Clear quick resume moves an old singleton into Saved campaigns instead of deleting its only copy', () => withStorage(({ storage }) => {
+  const legacy = campaignSnapshot(checkpoint()); legacy.v = 2;
+  delete legacy.campaignId; delete legacy.revision;
+  storage.setItem(SAVE_KEY, JSON.stringify(legacy));
+  assert.equal(listCampaigns().length, 0, 'a singleton has no slot of its own');
+  assert.equal(clearSave(), true);
+  assert.equal(storage.getItem(SAVE_KEY), null, 'the quick resume is gone');
+  const slots = listCampaigns();
+  assert.equal(slots.length, 1, '"The campaign stays available in Saved campaigns"');
+  const kept = loadCampaign(slots[0].id);
+  assert.deepEqual(kept.own, legacy.own); assert.deepEqual(kept.teams, legacy.teams);
+  // A campaign with a slot only loses its pointer.
+  assert.equal(writeSave(checkpoint()).ok, true);
+  clearSave();
+  assert.equal(storage.getItem(SAVE_KEY), null); assert.equal(listCampaigns().length, 2);
+}));
+
+test('an export of a campaign whose long name never saved imports again', () => {
+  // A country club's manager name can pass the 80 characters a save keeps (writeSave trims it, a failed save does not).
+  const state = { ...checkpoint(), campaignName: `Football · Argentina · top 100 clubs · ${'Club Atlético '.repeat(5)}` };
+  assert.ok(state.campaignName.length > 80);
+  const imported = parseCampaign(exportCampaign(state));
+  assert.equal(imported.campaignName, state.campaignName.trim().slice(0, 80));
+});
+
+test('the crash screen offers the campaign this page plays, not the quick resume another tab wrote', () => withStorage(({ storage }) => {
+  const mine = checkpoint(), theirs = { ...checkpoint(), campaignName: 'Another tab' };
+  assert.equal(writeSave(mine).ok, true);
+  assert.equal(writeSave(theirs).ok, true); // the other tab saves last: the quick resume is its campaign
+  setActiveCampaign(mine.campaignId);
+  try {
+    assert.equal(parseCampaign(crashCheckpoint()).campaignId, mine.campaignId);
+    setActiveCampaign('never-saved');
+    assert.equal(crashCheckpoint(), null, 'a campaign that never saved has nothing to export');
+    setActiveCampaign(null);
+    assert.equal(parseCampaign(crashCheckpoint()).campaignId, theirs.campaignId, 'outside a campaign: the quick resume');
+  } finally { setActiveCampaign(null); }
+  assert.ok(storage.getItem(SAVE_KEY));
 }));
 
 // ---------- v3: turn order × targeting (DEC D8, PLAN §3.2) ----------

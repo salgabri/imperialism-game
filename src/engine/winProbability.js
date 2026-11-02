@@ -544,10 +544,14 @@ function revealedEvents(goals) {
   return (Array.isArray(goals) ? goals : []).filter(event => event && isNum(event.m));
 }
 
-/** Last minute the revealed events reach, rounded up to the end of its period (basketball overtime), else the regulation length. */
+/**
+ * Last minute the revealed events reach, rounded up to the end of its period (basketball overtime, baseball's extra
+ * innings), else the regulation length. American football's overtime ends at its deciding score, the last event.
+ */
 function endMinute(model, events) {
   const latest = events.reduce((max, event) => Math.max(max, num(event.m)), 0);
   if (!hasOvertime(model) || latest <= model.length) return model.length;
+  if (model.kind === 'drives') return Math.min(lastMinute(model), Math.ceil(latest));
   return Math.min(lastMinute(model), model.length + model.ot * Math.ceil((latest - model.length) / model.ot));
 }
 

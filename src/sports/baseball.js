@@ -238,10 +238,13 @@ export const baseball = {
 
   words: { kickoff: 'First pitch', end: 'Final', lineup: 'Starting lineup', lineupShort: 'Lineup', lineupNoun: 'starting lineup',
     lineupTitle: 'Lineup', overtime: 'Extra innings', half: null },
-  /** The live feed's status line after the score: the innings still to play, then the extra innings. */
+  /**
+   * The live feed's status line after the score: the innings still to play, the ninth's last out (as other sports'
+   * "final minute"; every game's clock passes it), then the extra innings.
+   */
   clockLeft: (now, length) => {
     const left = Math.ceil((length - now) / INNING);
-    return left > 0 ? `${left} inning${left === 1 ? '' : 's'} left` : 'extra innings';
+    return left > 0 ? `${left} inning${left === 1 ? '' : 's'} left` : now > length ? 'extra innings' : 'final out';
   },
 
   /** The clock as the match shows it: the half-inning, never a minute; the win chart's axis counts innings played. */

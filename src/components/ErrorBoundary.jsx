@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { SAVE_KEY } from '../config.js';
+import { crashCheckpoint } from '../engine/storage.js';
 import { applyUpdate } from '../serviceWorker.js';
 import './crash.css';
 
 const ISSUES_URL = 'https://github.com/salgabri/imperialism-game/issues/new';
 
-/** The active campaign's last checkpoint exactly as stored (Import campaign reads it as it is), or null. */
+/**
+ * The active campaign's last checkpoint exactly as stored (Import campaign reads it as it is), or null: the campaign
+ * this page was playing, not whichever another tab saved last.
+ */
 function storedCheckpoint() {
-  try { return localStorage.getItem(SAVE_KEY) || null; } catch { return null; }
+  return crashCheckpoint();
 }
 
 /** Named as Export campaign names its files: "imperialism-<seed>-match-<n>.json". */

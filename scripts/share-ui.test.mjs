@@ -190,6 +190,10 @@ test('Copy challenge link copies the link, or shows it selected where copying is
       assert.equal(field.getAttribute('aria-label'), 'Challenge link');
       assert.equal(document.activeElement, field, 'the link is focused for the browser’s own Copy');
       assert.match(view.host.querySelector('.setup-share [role="status"]').textContent, /Copy is unavailable here/);
+      // The field sits in setup's form: Enter there must not submit it and launch the campaign.
+      const enter = new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+      field.dispatchEvent(enter);
+      assert.equal(enter.defaultPrevented, true);
     });
   });
 });
