@@ -1266,11 +1266,14 @@ test('a country map keeps no world display atlas; the way back builds it again, 
     const drawn = () => JSON.stringify({ countries: app.displayGeo.countries, paths: app.displayGeo.paths, rings: app.labelGeometry });
     app.fitMap(ids);
     const world = app.displayGeo, before = drawn();
+    // A view model memoised on the world map (as nearFocus is, on the geometry), never built again on the country map.
+    app.vmCache.set('map:near', { deps: [app.state.own, app.geo, world], value: world.paths['250'].bbox });
     await app.loadCountry('826');
     app.useGeometry('826');
     app.fitMap(ids);
     assert.equal(app.displayGeo, null);
     assert.ok(Object.values(app).every(value => value !== world), 'nothing on the App holds the world display atlas');
+    assert.ok([...app.vmCache.values()].every(entry => !entry.deps.includes(world)), 'nor a view model memoised on it');
     app.useGeometry(null);
     app.fitMap(ids);
     assert.equal(app.geo, app.worldGeo, 'the rules geometry is the one kept');

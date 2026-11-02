@@ -505,6 +505,7 @@ export default class App extends React.Component {
    * redraws it on return anyway: it is built again from the atlas, as boot does.
    */
   useGeometry(id) {
+    const shown = this.geo;
     if (id) {
       const loaded = getLoadedDomestic(id);
       if (!loaded) throw new Error(`The map for country ${id} has not loaded.`);
@@ -519,6 +520,9 @@ export default class App extends React.Component {
       this.domesticId = null;
       this.backdrop = [];
     }
+    // A memoised view model keeps its inputs, the map's geometry among them, until it is next built (some never are on
+    // the new map): drop them all, so the map left behind and its display atlas can go.
+    if (this.geo !== shown) this.vmCache.clear();
     this.retainMaps();
   }
 
