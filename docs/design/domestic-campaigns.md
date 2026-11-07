@@ -2,18 +2,20 @@
 
 Status: implemented. Format 1 (one section per club, 128 countries) shipped on
 2026-10-19; since 2026-10-24 every map is format 2: 100 sections shared out in
-club groups, 163 countries. Since 2026-10-29 a country's club count follows its
-league's tier (Tiers, below) rather than 100 for every country that has them.
-This describes the system as built; the code comments in the files named below
-are the detailed reference.
+club groups, then 163 countries. Since 2026-10-29 a country's club count follows
+its league's tier (Tiers, below) rather than 100 for every country that has them.
+Since 2026-11-07 a country needs ten clubs for a map (What ships), which brings
+back format 1's 128 countries. This describes the system as built; the code
+comments in the files named below are the detailed reference.
 
 ## Goal
 
 In club mode, with football, the player can pick **one country**. Its top
 Football Manager 26 clubs fight over **that country's map**: 100 for the biggest
 leagues, fewer for smaller leagues and smaller nations (Tiers, below), and fewer
-still when the database has fewer viable clubs. The map is built from the
-country's real administrative divisions and always split into **100 sections**.
+still when the database has fewer viable clubs. A country with fewer than ten has
+no map. The map is built from the country's real administrative divisions and
+always split into **100 sections**.
 Clubs are real only: no club or player is generated. With N clubs, each club
 starts on a contiguous **group** of `floor(100/N)` or `ceil(100/N)` sections
 around its home town (one section each when N = 100). Conquest follows the
@@ -45,12 +47,13 @@ countries in that order, and the European leagues follow their countries'.
 | 5 | 16 | about one top flight | the other 65, from Luxembourg and Estonia to Fiji |
 
 A nation missing from the table would get the smallest tier; the data test
-requires every nation of `NATIONS` exactly once. Mexico (58 viable clubs) and the
-United States (81) stay below their tier; so do many smaller nations.
+requires every nation of `NATIONS` exactly once. A tier caps a map but does not
+grant one: 45 of these nations have no map (What ships). Mexico (58 viable clubs)
+and the United States (81) stay below their tier; so do many smaller nations.
 
-**What ships:** 163 countries of the game's 173 nations, **4,343 clubs**, 16,300
-sections. Maps total 22.1 MB (7.7 MB gzipped), 34–250 KB per country, fetched
-only when chosen; the generated index is 29 KB.
+**What ships:** 128 countries of the game's 173 nations, **4,184 clubs**, 12,800
+sections. Maps total 18.8 MB (6.6 MB gzipped), 46–250 KB per country, fetched
+only when chosen; the generated index is 23 KB.
 
 | Clubs N | Countries | Sections per club |
 | --- | --- | --- |
@@ -59,18 +62,38 @@ only when chosen; the generated index is 29 KB.
 | 34–50 | 32 | 2 or 3 |
 | 21–33 | 34 | 3 to 5 |
 | 10–20 | 44 | 5 to 10 |
-| 5–9 | 14 | 11 to 20 |
-| 2–4 | 21 | 25 to 50 |
 
-The median N is 21. Nine countries have two clubs (Belize, Central African Rep.,
-Eq. Guinea, Guyana, Lesotho, Madagascar, Pakistan, Suriname, Yemen). The 35
-countries with N below 10 are new in format 2. The tiers cut 71 maps to their
-tier on 2026-10-29 (6,364 clubs before, 22 countries with 100); their snapshots
-keep the same clubs in the same order, only fewer of them, and the other 92 maps
-are unchanged.
+The median N is 24. The tiers cut 71 maps to their tier on 2026-10-29 (6,364 clubs
+before, 22 countries with 100); their snapshots keep the same clubs in the same
+order, only fewer of them, and the other 92 maps of that day were unchanged.
 
-**Seven nations cannot ship**, because fewer than two clubs pass the unchanged
+**A country needs ten clubs** (`MIN_CLUBS`). A map has 100 sections whatever N, so
+two clubs can fill one, and from 2026-10-24 to 2026-11-07 every nation with two or
+more had a map. But a two-club campaign is one match and a nine-club one eight,
+too short to be worth a country of their own, so those 35 maps were retired on
+2026-11-07 with their snapshots and crests. The list is format 1's 128 countries
+again, and their maps did not change. The sync deletes the snapshot of a nation
+below the floor, and the next full build retires its map. (Sync with `--only=` the
+survey's ids: a plain sync also asks for Scotland's clubs, which are not cached, and
+stops there without EFEM's permission.)
+
+**45 nations have no map**, and all of them still play as nations. Scotland, Wales
+and Northern Ireland became nations of their own after the last sync, so they have
+no snapshot. The other 42 have fewer than ten clubs that pass the unchanged
 viability rules (`survey.json` records each reason as `why`):
+
+| N | Nations |
+| --- | --- |
+| 9 | Bhutan |
+| 8 | Gabon, Puerto Rico, Solomon Islands, Somalia, Timor-Leste, Turkmenistan |
+| 7 | Benin |
+| 6 | Guinea-Bissau, Haiti, Mauritania, Papua New Guinea |
+| 5 | Mali, Philippines |
+| 4 | Burundi, Djibouti, Liberia, Mongolia, Nepal, South Sudan, Sudan |
+| 3 | Chad, Congo, Guinea, Malawi, Niger |
+| 2 | Belize, Central African Rep., Eq. Guinea, Guyana, Lesotho, Madagascar, Pakistan, Suriname, Yemen |
+
+Seven more could not fill a map at any floor, with fewer than two viable clubs:
 
 | Nation | N | Why |
 | --- | --- | --- |
@@ -93,7 +116,7 @@ Two offline stages; nothing is fetched from these services at runtime.
 | File | Role |
 | --- | --- |
 | `scripts/sync-domestic-clubs.mjs`, `scripts/lib/domestic-sync.mjs`, `scripts/lib/domestic-locate.mjs` | Stage 1 (network, cached; EFEM only with `--efem-permission-granted`): EFEM clubs and squads, home towns → snapshots. |
-| `scripts/data/domestic/<id>.json`, `survey.json` | Committed snapshot per nation (written only when N ≥ 2, `MIN_CLUBS`); the survey records every nation's club-list estimate `estN` and the full sync's `n`, `ships` and, for a nation that does not ship, `why`. |
+| `scripts/data/domestic/<id>.json`, `survey.json` | Committed snapshot per nation (written only when N ≥ 10, `MIN_CLUBS`; a nation below it loses any earlier snapshot); the survey records every nation's club-list estimate `estN` and the full sync's `n`, `ships` and, for a nation that does not ship, `why`. |
 | `scripts/data/domestic-locations.json` | Manual home-town overrides, keyed by FM club id. |
 | `scripts/data/domestic-names.json` | Real names for FM's placeholder club names, keyed by FM club id. |
 | `scripts/build-domestic.mjs`, `scripts/lib/domestic-boundaries.mjs`, `scripts/lib/domestic-partition.mjs` | Stage 2 (cached downloads, worker threads): boundaries + snapshot → 100 sections in club groups. `--only=826,724`, `--jobs=N`, `--check`, `--dry-run`. |
@@ -174,7 +197,7 @@ including a natural goalkeeper. `EXCLUDED_CLUBS` in `domestic-sync.mjs` takes
 clubs the rules miss (currently none). A club without an FM competition stays in,
 shown as "Regional football". Viable clubs are taken in rank order up to
 **N = min(tier, viable)**, the nation's tier from `src/data/domesticTiers.js`
-(Tiers); a nation ships when N ≥ 2. Every excluded club ranked above the cut is
+(Tiers); a nation ships when N ≥ 10. Every excluded club ranked above the cut is
 listed with its reason in the snapshot.
 
 **Squads.** Up to 16 players: the strongest natural 4-4-2 in the game's own roles
@@ -200,10 +223,10 @@ a full sync (or `--only`) updates them for its own nations.
 Layered and deterministic; each location records its `source`:
 
 1. **Override** (`override`): `{ lon, lat, note }` or `{ qid }`, plus a reader's
-   `name`. 888 entries (486 in use; most of the rest belong to clubs below the
-   tiers' cuts). Points are GeoNames towns unless the note cites another source;
-   a note starting `approximate:` marks a region-level point from the club's
-   competition or a province in its name (30 in use).
+   `name`. 888 entries (446 in use; most of the rest belong to clubs below the
+   tiers' cuts, and 40 to nations below the floor). Points are GeoNames towns unless
+   the note cites another source; a note starting `approximate:` marks a region-level
+   point from the club's competition or a province in its name (28 in use).
    Overrides also correct wrong automatic points (a national or league stadium
    for a club from another town, a sponsor's town in the name, GeoNames listing
    "Puerto Rico" as an alternate name of San Juan).
@@ -227,7 +250,7 @@ Layered and deterministic; each location records its `source`:
    province named in the club name or competition limits the search to it, and a
    club with no town there stays unlocated (with a warning).
 
-Coverage: 3,342 Wikidata, 486 override, 477 GeoNames, **38 with no home** (the
+Coverage: 3,237 Wikidata, 446 override, 464 GeoNames, **37 with no home** (the
 build places them, Stage 2 step 5). The sync warns about points far from any
 town and provinces with no matching town; four warnings remain (Cobresal,
 Wolmido, Nedjm Chabab Magra, 31–44 km from a town; Espoir du Burkina,
@@ -255,12 +278,12 @@ format-1 build except for `format` and the one-entry `sections` lists.
    the 100 sections whatever N: the coarsest layer with ≥ 200 units, else the
    finest with ≥ 100, else the finest; a loaded layer's real unit count replaces
    the listed one and the rule runs again. Natural Earth 10m admin-1 is the
-   fallback, then ADM0. Shipped: ADM2 103, ADM3 48, ADM1 8, ADM4 3, Natural Earth
+   fallback, then ADM0. Shipped: ADM2 80, ADM3 36, ADM1 8, ADM4 3, Natural Earth
    1 (New Caledonia).
 2. **Fill.** Each polygon of the next coarser layer that the chosen layer mostly
    misses joins as a unit, minus the chosen units, when the missing land is at
    least 5 km² and 0.001% of the country (Moscow and Saint Petersburg in RUS
-   ADM2). 31 maps; recorded in `boundaries.filled`.
+   ADM2). 26 maps; recorded in `boundaries.filled`.
 3. **Mask.** The game's 826 is England: GBR ADM2 units whose centroid lies in the
    GB-ENG polygon of GBR ADM1.
 4. **Other associations.** China drops polygons mostly within 3 km of Natural
@@ -271,7 +294,7 @@ format-1 build except for `format` and the one-entry `sections` lists.
    holding at least 20 km² is cut (polygon minus that shape, keeping a 3 km strip
    along the host border; an almost wholly foreign polygon is dropped). Lone
    exclaves below that stay (Ceuta, Melilla, Llívia), islands missing from the
-   world map are never foreign, and Åland counts as Finland's. 105 maps have cuts,
+   world map are never foreign, and Åland counts as Finland's. 78 maps have cuts,
    recorded in `boundaries.foreign` and ATTRIBUTION (India −Pakistan 77,765 km²,
    Morocco −W. Sahara east of the berm, Ukraine −Crimea, Cyprus −N. Cyprus).
 
@@ -297,7 +320,7 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
    other, and whose nearest-land share is at most 2× (then 4×, 8×) the average;
    these conditions relax in turn. The file records the place as `home` with
    `homeSource: "placed:<geonameid>"`, an estimate. Placed clubs grow only into
-   land nearer to them than to any other start. 38 clubs are placed.
+   land nearer to them than to any other start. 37 clubs are placed.
 6. **Fans** (grouped; `fanSectors`). Clubs whose homes lie within the link
    distance `clamp(0.1·√(area/N), 3, 15)` km of each other form a cluster. A
    cluster of three or more, or of two sharing a town point (homes under 0.5 km
@@ -308,8 +331,8 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
    gap (the sea, for a port). Only its club may take a sector's pieces; beyond the
    zone clubs grow freely, so their land follows the country's shape. A club
    starts in the largest connected part of its sector: at home when that part
-   holds it, else next to the centre. 989 clubs in 227 fans (Brunei's twelve,
-   Dhaka's ten, Dili's eight, Kathmandu's four, Bangui's two). A cluster whose
+   holds it, else next to the centre. 901 clubs in 203 fans (Brunei's twelve,
+   Dhaka's ten, Tbilisi's eight, Limassol's four, Graz's two). A cluster whose
    zone would take in more than 12 clubs is not fanned, since its sectors would be
    slivers: Asunción (29 linked clubs) and Cairo (17) are not; their boxed-in
    clubs start outside instead (step 7).
@@ -359,7 +382,7 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
    nearest come first. Among those, the nearest land within reach wins, else the
    least stretched, so an archipelago does not chain to one club island by island.
 10. **Boxed-in retry** (grouped). The estimates in steps 6–7 cannot see a club
-    shut in by its neighbours' land as they grow (Bangui's two clubs). After
+    shut in by its neighbours' land as they grow (Port Vila's clubs). After
     growth, a club whose territory is under half its room
     (`BOXED = 0.5 × minSectionKm2 × group size`) is boxed in. One not yet fanned
     is fanned with its city when another club's home lies within the link
@@ -368,7 +391,7 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
     members, which start outside. The partition is then redone from the same
     units, until no club escalates; the attempt whose boxed clubs fall least short
     (sum of squared shortfalls, the earliest of equals) is kept, with only its log
-    lines, so no map ends worse than its first attempt. 25 maps retried (Canada,
+    lines, so no map ends worse than its first attempt. 23 maps retried (Canada,
     Egypt, Paraguay and Vanuatu among them); maps without a boxed club are
     unaffected.
 
@@ -377,7 +400,7 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
 11. **Sizes** (`groupTargets`): `floor(100/N)` or `ceil(100/N)`, the stronger
     clubs the larger, exactly `100 mod N` of them. A club whose territory is too
     small for the larger size (under `minSectionKm2` per section: a club hemmed
-    in by its city) hands it to the strongest smaller-sized club with room. 160
+    in by its city) hands it to the strongest smaller-sized club with room. 150
     clubs are involved in such hand-overs (donors and takers counted).
 12. **Extra seeds** (`territoryExtras`). Each territory gets `size − 1` more
     seeds, one at a time by lazy greedy: the candidate that would take the most
@@ -393,8 +416,8 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
     `cities1000`; where it has fewer than three per extra section, the GeoNames
     country file's populated places are added (feature codes `PPL`,
     `PPLA`–`PPLA4`, `PPLC`, `PPLG`, `PPLL`, `PPLR`, `PPLS`, `PPLF`); only readable
-    Latin-script names count. Of the 11,957 extra sections, 11,330 are built
-    around a place and 627 around a unit centre or land sample.
+    Latin-script names count. Of the 8,616 extra sections, 8,181 are built
+    around a place and 435 around a unit centre or land sample.
 13. **Cut and grow.** Units holding several starts are crowd-cut (`crowdAll`), and
     a territory with fewer units than starts has its largest unit halved. Each
     territory then grows its own sections from its starts with the step-9 rules,
@@ -451,8 +474,8 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
 The build is deterministic: same snapshots and caches give byte-identical files,
 whatever `--jobs`. `--check` rebuilds offline and compares every output.
 
-Across the 163 maps: groups split on land 0; a club's home lies in its own home
-section for 3,238 of 4,305 located clubs (75.2%; 679 of 800 on the 100-club
+Across the 128 maps: groups split on land 0; a club's home lies in its own home
+section for 3,135 of 4,147 located clubs (75.6%; 679 of 800 on the 100-club
 maps), the others being clubs sharing a town point, fanned or moved clubs, and
 clubs pushed off their unit by a stronger club.
 
@@ -617,6 +640,12 @@ two clubs share a home (or a home is not an `<id>-NNN` id), an `own` key lies
 outside `<id>-001` to the number of `own` keys or before the first home, a home
 has no holder, or the holdings split a starting group.
 
+A save on a country that no longer ships cannot resume either, and is kept: "The
+map of Belize is no longer in the game, so the campaign cannot resume. The save
+is kept." (Offline, a copy of the map the service worker kept still loads it.) The
+setup no longer lists the country, and a challenge link naming it falls back to
+every club.
+
 ## Acceptance checks (as tested)
 
 `npm test` runs every test file below; `npm run test:domestic` runs the four
@@ -624,9 +653,11 @@ has no holder, or the holdings split a starting group.
 
 - `scripts/domestic-data.test.mjs`: the index lists every shipped map once, in
   name order, and ATTRIBUTION.txt names every version; every nation sits in
-  exactly one tier, and the tiers shrink from 100. Every shipped map: at most
+  exactly one tier, and the tiers shrink from 100; a nation ships exactly when N
+  reaches `MIN_CLUBS`, and the survey, the snapshots and the maps agree on which
+  do. Every shipped map: at most
   250,000 bytes; `format` 2, index entry (`clubs`, `sections: 100`, `level`,
-  `top`) and content-hash version; N from 2 to its tier; ids `<id>-001` … `-100`
+  `top`) and content-hash version; N from 10 to its tier; ids `<id>-001` … `-100`
   equal to the clubs' `sections` concatenated in rank order, home first; group
   sizes `floor`/`ceil(100/N)` with exactly `100 mod N` larger ones; every club,
   squad and home equals its snapshot (placed homes marked); codes letters (a
@@ -643,7 +674,7 @@ has no holder, or the holdings split a starting group.
   and format 2 (a 9-club and a 100-club format-2 file on a test grid, 26 invalid
   cases with their exact errors).
 - `scripts/domestic-routing.test.mjs`: anchors inside all
-  16,300 shipped sections, no club with land neighbours left with only sea routes,
+  12,800 shipped sections, no club with land neighbours left with only sea routes,
   arrows leave the section they start from, obstacle blocking and precedence,
   exclave labelling, border routes, identity without obstacles, real neighbours on
   five maps, the cache bound.
@@ -656,6 +687,8 @@ has no holder, or the holdings split a starting group.
   A full England campaign on the app board crosses no neighbour.
 - `scripts/campaign-storage.test.mjs`: a made-up 3-club, 10-section map for the
   grouped remap (upgrade, reordered rebuild, refusals).
+- `scripts/campaign-lifecycle.test.mjs`: a save on a country no longer shipped is
+  refused by name, and a shipped map that fails to load still says so.
 - `npm run smoke`: England duel and blitz and a Fiji duel campaign, setup
   loading/error/Retry, grouped preview colours and tooltips, inert backdrop,
   restore races and cancellation, England and Fiji interrupt-and-resume to the
@@ -859,59 +892,56 @@ an MLB duel and an MLB resume.
 
 ## Known limitations
 
-- **Coverage.** Seven nations have fewer than two viable clubs and do not ship
-  (What ships). The unchanged rules also drop some top clubs for which FM lists
-  no natural goalkeeper: Horoya AC (Guinea's highest-reputation club), Bantu FC
+- **Coverage.** 42 nations have fewer than ten viable clubs and do not ship (What
+  ships). The unchanged rules cost some of them a top club for which FM lists no
+  natural goalkeeper: Horoya AC (Guinea's highest-reputation club), Bantu FC
   (Lesotho), Chemal (Mauritania), Aigle Noir AC (Haiti), Bumamuru (Burundi),
   Fruta Conquerors (Guyana), Khovd (Mongolia) and Sosa (Solomon Islands).
 - **Licences.** Section shapes are derived from their boundary layers and keep
-  those terms: 34 maps come from ODbL 1.0 layers and 13 from CC BY-SA (2.0, 3.0 or
-  4.0), so those maps are share-alike; most others require attribution (CC BY 3.0
+  those terms: 32 maps come from ODbL 1.0 layers and 11 from CC BY-SA (2.0 or
+  3.0), so those maps are share-alike; most others require attribution (CC BY 3.0
   IGO, CC BY 4.0, OGL, swisstopo, …). `ATTRIBUTION.txt` must ship with the maps.
   GeoNames needs attribution. FM data is used as for the existing FM supplement;
   the game is not affiliated with SI or EFEM.
 - **Loans** are not applied: EFEM's player list (views Default, ValueAndWage and
   Profile) has no loan club, so loaned-out players count for their parent club.
   Recorded in every snapshot's `source.loans`.
-- **Approximate homes.** 30 overrides in use are region-level and 38 clubs are
-  placed at populous places (`placed:`), South Druk United (Bhutan) among them.
-  Their groups hold about 2.6% of all land (2.19% approximate overrides, 0.36%
-  placed clubs), but 74% of Laos (7 of its 16 clubs are placed), about half of
-  Eq. Guinea (15 de Agosto at Bata), a quarter of Togo and of Eswatini, 21% of
-  China, 19% of Uzbekistan and 14–17% of Egypt and Mongolia. Up to five clubs
-  share one town point (in ten countries, Bangladesh, Brunei and Ethiopia among
-  them); only one can hold the point. Some overrides rest on medium-confidence
-  judgement (noted in the file).
+- **Approximate homes.** 28 overrides in use are region-level and 37 clubs are
+  placed at populous places (`placed:`), Alo Egypt at Zagazig among them. Their
+  groups hold about 2.7% of all land (2.28% approximate overrides, 0.41% placed
+  clubs), but 74% of Laos (7 of its 16 clubs are placed), a quarter of Togo and of
+  Eswatini, 21% of China, 19% of Uzbekistan, 17% of Egypt and 12% of Ecuador. Up to
+  five clubs share one town point (in eight countries, Bangladesh, Brunei and
+  Ethiopia among them); only one can hold the point. Some overrides rest on
+  medium-confidence judgement (noted in the file).
 - **Group sizes are not always by strength.** "The stronger clubs take the
   larger groups" holds only where they have room: a club hemmed in by its city
-  hands its larger size to the strongest club with room (160 clubs involved).
+  hands its larger size to the strongest club with room (150 clubs involved).
 - **Home sections away from home.** A club's home lies in its own home section
-  for 3,238 of 4,305 located clubs (75.2%). For fanned clubs (989) and moved
+  for 3,135 of 4,147 located clubs (75.6%). For fanned clubs (901) and moved
   starts (201) the home section is the one nearest their start, not the one
   holding their town, and the town may lie in a weaker club's group; `home`
-  keeps the real town. Moved starts stay within `√(area/N)` of home, so
-  archipelago capitals (Honiara, Port Vila) keep their clubs on or near the home
-  island.
+  keeps the real town. Moved starts stay within `√(area/N)` of home, so an
+  archipelago capital (Port Vila) keeps its clubs on or near the home island.
 - **Uneven sections.** Group sizes are fixed and groups contiguous, so empty
   land bordered by few clubs keeps huge sections: Canada's arctic (one section of
   2.26 million km²), China's west (1.53 million), Algeria's Sahara (392,000 km²),
   Egypt's Western Desert (174,000 km²), Paraguay's Chaco (78,000 km²). Crowded
   cities give tiny sections instead: a tenth of the sections are under 2 km² in
-  Brunei, Jamaica, Kuwait, Luxembourg and Qatar, and 16 clubs still have under
-  half the land their sections need after the retries: Solomon Islands' Henderson
-  Eels, Central Coast, Laugu and Honiara City (Honiara wedges); Egypt's
-  Al-Ittihad, Ceramica Cleopatra, National Bank and FC Masar; Vanuatu's Tafea and
-  Mauriki (Port Vila); Israel's Maccabi Tel Aviv; Iceland's Valur; New Zealand's
-  Auckland FC; Norway's Åsane; Australia's Eastern Suburbs; Senegal's Teungueth
-  FC. Per map, the 90th/10th percentile section-area ratio has a median of 23
-  and a 90th percentile of 174.
-  221 of the 16,300 sections are under 3 px across at the opening fit (area under
+  Brunei, Jamaica, Kuwait, Luxembourg and Qatar, and 12 clubs still have under
+  half the land their sections need after the retries: Egypt's Al-Ittihad,
+  Ceramica Cleopatra, National Bank and FC Masar; Vanuatu's Tafea and Mauriki
+  (Port Vila); Israel's Maccabi Tel Aviv; Iceland's Valur; New Zealand's Auckland
+  FC; Norway's Åsane; Australia's Eastern Suburbs; Senegal's Teungueth FC. Per
+  map, the 90th/10th percentile section-area ratio has a median of 29 and a 90th
+  percentile of 221.
+  183 of the 12,800 sections are under 3 px across at the opening fit (area under
   `(3·extent/900)²`).
-- **Names.** 503 of the 15,500 sections on maps with fewer than 100 clubs (3.2%)
+- **Names.** 382 of the 12,000 sections on maps with fewer than 100 clubs (3.2%)
   keep numbered compass names such as "Abu Dhabi (east 21)", from units cut many
   times.
-- **Size and time.** 22.1 MB of maps ship in `dist/`, though a session fetches
-  only the country chosen (34–250 KB). A decoded country holds several MB, hence
+- **Size and time.** 18.8 MB of maps ship in `dist/`, though a session fetches
+  only the country chosen (46–250 KB). A decoded country holds several MB, hence
   the cache bound. A full build or `--check` takes 4.5 to 6.5 minutes, nearly all
   of it Canada.
 - **Borders.** The 3 km tolerance against the coarse 1:50m world map leaves thin
@@ -921,7 +951,7 @@ an MLB duel and an MLB resume.
   it) and shows blank there. On England, Wales and Scotland are world shapes of
   their own and block routes like any neighbour. On coarse layers a fan zone spills outside its
   circle, since whole units touching it are cut into sectors (Israel ADM2).
-- 48 located homes lie outside every shipped section: 38 lie just outside the
+- 46 located homes lie outside every shipped section: 36 lie just outside the
   boundary layer and were snapped to it (N. Cyprus refugee clubs, Bishkek's six,
   seven in Portugal among them), and the other 10 fall outside after cutting or
   simplifying. Anchors never assume a home is inside.

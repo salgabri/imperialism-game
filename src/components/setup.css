@@ -304,6 +304,7 @@
   display:block; font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--you-text);
 }
 .setup-save__text p { margin:4px 0 0; font:400 14px/1.4 var(--font-sans); color:var(--ink); }
+.setup-save__text .setup-save__refused { color:var(--loss); font-weight:600; }
 .setup-save__actions { margin-left:auto; flex:none; display:flex; align-items:center; gap:16px; }
 
 /* A challenge link's note and the daily campaign card (top of step 1; README §Sharing a campaign) */

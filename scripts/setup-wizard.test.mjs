@@ -147,10 +147,16 @@ test('frozen named exports keep their values', () => {
   assert.deepEqual(campaignPreview(46, getSport('basketball'), sample), modelPreview(46, getSport('basketball'), sample));
 });
 
-test('a two-club country is one match, and a basketball season\'s sport card offers its clubs alone', () => {
+test('the smallest country is nine matches, a retired one leaves the list, and a basketball season\'s sport card offers its clubs alone', () => {
+  const cambodia = buildSetupModel({ sport: 'football', layer: 'clubs', clubScope: 'domestic:116', role: 'manager' }, {});
+  assert.equal(cambodia.country?.clubs, 10);
+  assert.match(cambodia.status, /^10 clubs · 9 matches · /);
+  assert.equal(Math.min(...cambodia.domesticScopes.map(row => row.count)), 10, 'no country below the ten-club floor is offered');
+  // Pakistan's two clubs lost their map to that floor: a setup still naming it shows the first theatre instead.
   const pakistan = buildSetupModel({ sport: 'football', layer: 'clubs', clubScope: 'domestic:586', role: 'manager' }, {});
-  assert.equal(pakistan.country?.clubs, 2);
-  assert.match(pakistan.status, /^2 clubs · 1 match · /);
+  assert.equal(pakistan.country, null);
+  assert.ok(!pakistan.domesticScopes.some(row => row.id === 'domestic:586'));
+  assert.equal(pakistan.scopeName, 'All Leagues');
   assert.equal(sportNote(getSport('basketball')), 'Nations · 30 NBA clubs');
   assert.equal(sportNote(getSport('basketball'), { clubsOnly: true }), '30 NBA clubs', 'an NBA season has no nations');
 });
@@ -504,6 +510,18 @@ test('Space advances steps, launches on step 3 and is ignored on inputs, selects
   await manager.click(manager.qa('.setup-rail__step')[2]);
   await manager.key(document.body, ' ');
   assert.equal(manager.calls.start, 0, 'no launch without a managed team');
+});
+
+test('a refused resume says why on the quick resume card; any other save status stays on the status line', async t => {
+  const message = 'The map of Belize is no longer in the game, so the campaign cannot resume. The save is kept.';
+  const view = await mount(t, { hasSave: true, savedText: 'Round 4', saveStatus: { ok: false, refused: true, message } });
+  assert.equal(view.q('.setup-save .setup-save__refused').textContent, message);
+  assert.equal(view.q('.save-status').textContent, message, 'the status line still announces it');
+  assert.equal(view.q('.setup-save [role]'), null, 'and the card does not announce it twice');
+
+  const other = await mount(t, { hasSave: true, savedText: 'Round 4', saveStatus: { ok: false, message: 'Choose the team you will manage before launching.' } });
+  assert.equal(other.q('.setup-save__refused'), null);
+  assert.match(other.q('.save-status').textContent, /Choose the team/);
 });
 
 test('quick resume card resumes or asks before clearing, and focus never falls to the body', async t => {

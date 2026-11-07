@@ -828,13 +828,14 @@ fight over that country alone. How many depends on the league's tier
 Turkey, Brazil and Argentina; 60 for strong leagues such as Portugal, the
 Netherlands and Japan; 40 for established ones such as Austria, Croatia and
 Colombia; 24 for smaller leagues; 16 for the smallest nations. A country with
-fewer viable sides plays with all of them (Mexico 58, the United States 81; a
-country ships with at least two, and every club is real). The map is always
+fewer viable sides plays with all of them (Mexico 58, the United States 81), and
+every club is real. A country with fewer than ten has no map: its campaign would
+be over in a few matches. The map is always
 split into 100 sections, built from the country's real administrative divisions.
 Each club starts on the section around its home town; with fewer than 100 clubs
 it also starts on the sections around that one, a group of 100/N rounded down or
 up (the stronger clubs take the extra ones where they have room), so Fiji's 16
-clubs start with 6 or 7 sections each and Belize's two with 50. Conquest is
+clubs start with 6 or 7 sections each and Cambodia's ten with 10. Conquest is
 unchanged: the winner annexes everything the loser holds and claims one player,
 so a starting group always changes hands whole. Every section is held from
 kick-off, so there is no neutral land and no transit treaty. Neighbouring
@@ -908,11 +909,12 @@ from these services at runtime.
 
 `public/domestic/ATTRIBUTION.txt` is generated with every build and lists each
 country's boundary source and licence, its cuts and fills, plus the GeoNames,
-Wikidata and EFEM notes. 163 of the game's 173 nations ship, with 4,343 clubs (8
-countries have 100, nine have two); the maps total 22.1 MB (34–250 KB each), and
-a session fetches only the one chosen. Sri Lanka, Cuba, Eritrea, Afghanistan,
-the Bahamas, Namibia and Sierra Leone have fewer than two viable clubs, so they
-do not ship.
+Wikidata and EFEM notes. 128 of the game's 173 nations ship, with 4,184 clubs (8
+countries have 100, four have ten); the maps total 18.8 MB (46–250 KB each), and
+a session fetches only the one chosen. 42 nations have fewer than ten viable clubs,
+from Bhutan's nine to none in Sri Lanka and Cuba, so they do not ship
+([the list](docs/design/domestic-campaigns.md#tiers)), and Scotland, Wales and
+Northern Ireland have no club data yet. All of them still play as nations.
 
 **How sections are built.** For each country the builder takes the coarsest
 boundary level with at least 200 units (twice the 100 sections), or else the

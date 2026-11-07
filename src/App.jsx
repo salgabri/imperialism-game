@@ -984,7 +984,8 @@ export default class App extends React.Component {
       return then(loaded, fitted.campaign);
     }
     const token = ++this.flowToken;
-    const name = domesticEntry(campaign.settings.clubScope)?.name || 'this country';
+    const entry = domesticEntry(campaign.settings.clubScope);
+    const name = entry?.name || NATIONS[id]?.[0] || 'this country';
     const message = `Loading the map of ${name}…`;
     this.pendingDomesticId = id;
     this.retainMaps();
@@ -1000,7 +1001,12 @@ export default class App extends React.Component {
       if (this.state.phase !== 'setup') this.retainMaps(0);
       return false;
     }, error => {
-      if (current()) this.refuseRestore(`The map of ${name} could not be loaded, so the campaign cannot resume. ${error.message || error}`);
+      // A country this build no longer ships will not come back on a retry. (Offline, a copy the service worker
+      // kept still loads, and the campaign resumes.)
+      if (current()) {
+        this.refuseRestore(entry ? `The map of ${name} could not be loaded, so the campaign cannot resume. ${error.message || error}`
+          : `The map of ${name} is no longer in the game, so the campaign cannot resume. The save is kept.`);
+      }
       return false;
     });
   }
@@ -1022,7 +1028,8 @@ export default class App extends React.Component {
   }
 
   refuseRestore(message) {
-    this.setState(state => ({ saveStatus: { ok: false, message },
+    // `refused`: the quick-resume card shows it beside Resume, since the status line sits far below on the setup screen.
+    this.setState(state => ({ saveStatus: { ok: false, refused: true, message },
       ...(state.storageDialog ? { storageDialog: { ...state.storageDialog, error: message } } : {}) }));
   }
 
