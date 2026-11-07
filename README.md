@@ -201,10 +201,8 @@ manager of the theatre's favourite, with decisions from the first match.
    football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
    2025 back to 2021, with nations or with clubs on the map of their day. A
-   quick-resume card appears when a save exists. Below it, the **Daily campaign**
-   card offers today's campaign for the chosen sport. A page opened from a
-   challenge link shows a note about the link instead
-   ([Sharing a campaign](#sharing-a-campaign)).
+   quick-resume card appears when a save exists. A page opened from a challenge
+   link shows a note about the link ([Sharing a campaign](#sharing-a-campaign)).
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
@@ -582,16 +580,6 @@ query keys (`?playtest`) are left alone, and the address stays as opened.
 `src/screens/setup/challenge.js` writes and reads links (`scripts/challenge-link.test.mjs`),
 and nothing in it draws from a campaign's random stream.
 
-**Daily campaign.** Step 1 offers today's campaign for the chosen sport: the Elite
-32 nations (American football: the NFL's 32 clubs) with Random draw, Fast-forward,
-the built-in season and the standard More rules, managed by you. **Play today's
-campaign** fills it in and moves on to Your role to pick a team. The seed is a
-hash of the sport and the player's calendar date (`dailySeed`, pinned by the
-tests), so everyone plays the same campaign that day and a new one from midnight.
-Your team, role, opponent choice and Show matches stay yours to change: it is
-still the daily. The card then reads "Today's campaign is set up", and its share
-image says "Daily campaign · Sunday 1 November".
-
 **Share image.** **Share image** on the final results makes a 1200×630 picture,
 drawn at twice that so it stays sharp on a phone. The final map is framed as the
 campaign's opening camera framed its theatre (Europe for the UEFA nations, a
@@ -829,13 +817,14 @@ fight over that country alone. How many depends on the league's tier
 Turkey, Brazil and Argentina; 60 for strong leagues such as Portugal, the
 Netherlands and Japan; 40 for established ones such as Austria, Croatia and
 Colombia; 24 for smaller leagues; 16 for the smallest nations. A country with
-fewer viable sides plays with all of them (Mexico 58, the United States 81; a
-country ships with at least two, and every club is real). The map is always
+fewer viable sides plays with all of them (Mexico 58, the United States 81), and
+every club is real. A country with fewer than ten has no map: its campaign would
+be over in a few matches. The map is always
 split into 100 sections, built from the country's real administrative divisions.
 Each club starts on the section around its home town; with fewer than 100 clubs
 it also starts on the sections around that one, a group of 100/N rounded down or
 up (the stronger clubs take the extra ones where they have room), so Fiji's 16
-clubs start with 6 or 7 sections each and Belize's two with 50. Conquest is
+clubs start with 6 or 7 sections each and Cambodia's ten with 10. Conquest is
 unchanged: the winner annexes everything the loser holds and claims one player,
 so a starting group always changes hands whole. Every section is held from
 kick-off, so there is no neutral land and no transit treaty. Neighbouring
@@ -909,11 +898,12 @@ from these services at runtime.
 
 `public/domestic/ATTRIBUTION.txt` is generated with every build and lists each
 country's boundary source and licence, its cuts and fills, plus the GeoNames,
-Wikidata and EFEM notes. 163 of the game's 173 nations ship, with 4,343 clubs (8
-countries have 100, nine have two); the maps total 22.1 MB (34–250 KB each), and
-a session fetches only the one chosen. Sri Lanka, Cuba, Eritrea, Afghanistan,
-the Bahamas, Namibia and Sierra Leone have fewer than two viable clubs, so they
-do not ship.
+Wikidata and EFEM notes. 128 of the game's 173 nations ship, with 4,184 clubs (8
+countries have 100, four have ten); the maps total 18.8 MB (46–250 KB each), and
+a session fetches only the one chosen. 42 nations have fewer than ten viable clubs,
+from Bhutan's nine to none in Sri Lanka and Cuba, so they do not ship
+([the list](docs/design/domestic-campaigns.md#tiers)), and Scotland, Wales and
+Northern Ireland have no club data yet. All of them still play as nations.
 
 **How sections are built.** For each country the builder takes the coarsest
 boundary level with at least 200 units (twice the 100 sections), or else the
@@ -1664,8 +1654,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |
 | `column-wiring`, `match-wiring`, `squad-wiring`, `conquest-wiring`, `ledger-wiring`, `map-wiring` | Each screen wired to the running App |
-| `challenge-link` | Challenge links written and read back, the fallback for unknown and stale values, and the daily seeds and setups |
-| `share-ui` | The share card, App's wiring of links, the daily campaign and the share image, and the setup and results controls |
+| `challenge-link` | Challenge links written and read back, and the fallback for unknown and stale values |
+| `share-ui` | The share card, App's wiring of links and the share image, and the setup and results controls |
 
 Domestic campaigns add `domestic-data`, `domestic-geometry`, `domestic-campaign`
 and `domestic-routing`, which `npm run test:domestic` also runs on their own.

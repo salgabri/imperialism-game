@@ -1,10 +1,9 @@
-// Challenge links and the daily campaign (README §Sharing a campaign): writing a setup into a link's query, reading it
-// back into setup, the fallback for anything this build doesn't offer, and the daily seeds.
+// Challenge links (README §Sharing a campaign): writing a setup into a link's query, reading it back into setup, and the
+// fallback for anything this build doesn't offer.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  CHALLENGE_KEYS, CHALLENGE_LABELS, challengeQuery, challengeUrl, dailyLabel, dailySeed, dailySetup, dayOf, fieldedTeam, isDaily,
-  readChallenge,
+  CHALLENGE_KEYS, CHALLENGE_LABELS, challengeQuery, challengeUrl, fieldedTeam, readChallenge,
 } from '../src/screens/setup/challenge.js';
 import { DEFAULT_SETUP } from '../src/app/shared.js';
 import { BUILT_IN_SETS } from '../src/engine/footballSets.js';
@@ -182,57 +181,4 @@ test('a link’s seed is the number the campaign launches with', () => {
   // Setup's blank seed launches App's opening seed: the link carries that number, and reading it launches it again.
   const shared = readChallenge(challengeQuery(setupOf({ seed: '' }), 2860311234)).setup;
   assert.equal(launchSeed(shared.seed), 2860311234);
-});
-
-test('the daily seed is fixed for each sport and day', () => {
-  // Pinned: changing how a daily seed is made would change everyone's daily campaign mid-day.
-  const sports = ['football', 'basketball', 'american-football', 'baseball'];
-  assert.deepEqual(sports.map(sport => dailySeed(sport, '2026-11-01')), [2163291708, 382462174, 3840094371, 293440551]);
-  assert.equal(dailySeed('football', '2026-11-02'), dailySeed('football', '2026-11-02'));
-  assert.notEqual(dailySeed('football', '2026-11-02'), dailySeed('football', '2026-11-01'));
-  const seeds = new Set();
-  for (let day = 1; day <= 30; day++) for (const sport of sports) {
-    const seed = dailySeed(sport, `2026-11-${String(day).padStart(2, '0')}`);
-    assert.ok(Number.isInteger(seed) && seed >= 1 && seed <= 0xffffffff);
-    seeds.add(seed);
-  }
-  assert.equal(seeds.size, 120, 'a month of dailies never repeats a seed');
-  assert.equal(dailySeed('hockey', '2026-11-01'), dailySeed('football', '2026-11-01'), 'an unknown sport is the default sport');
-});
-
-test('the daily campaign is a short fixed setup per sport', () => {
-  const day = '2026-11-01';
-  assert.deepEqual(dailySetup('football', day), setupOf({ scope: 'elite', express: true, role: 'manager', seed: '2163291708' }));
-  assert.deepEqual(dailySetup('basketball', day), setupOf({ sport: 'basketball', scope: 'elite', express: true, role: 'manager',
-    seed: '382462174' }));
-  assert.deepEqual(dailySetup('american-football', day), setupOf({ sport: 'american-football', layer: 'clubs', scope: 'elite',
-    clubScope: 'domestic:nfl', express: true, role: 'manager', seed: '3840094371' }));
-  assert.deepEqual(dailySetup('baseball', day), setupOf({ sport: 'baseball', scope: 'elite', express: true, role: 'manager',
-    seed: '293440551' }));
-  // It is still the daily with your own team, role, opponent choice and Show matches; not another day's or theatre.
-  const daily = dailySetup('football', day);
-  assert.ok(isDaily(daily, day));
-  assert.ok(isDaily({ ...daily, managedTeamId: '276', targeting: 'player', express: false, resolution: 'instant' }, day));
-  assert.ok(isDaily({ ...daily, role: 'spectator' }, day));
-  assert.ok(!isDaily(daily, '2026-11-02'));
-  assert.ok(!isDaily({ ...daily, scope: 'UEFA' }, day));
-  assert.ok(!isDaily({ ...daily, finale: 'best-of-three' }, day));
-  assert.ok(!isDaily(dailySetup('basketball', day), '2026-11-02'));
-  assert.ok(!isDaily(daily, 'yesterday'));
-  assert.ok(!isDaily(null, day));
-  // A launched daily's settings (the seed as launched, the stamps of a campaign) are still the daily.
-  assert.ok(isDaily({ ...daily, seed: String(2163291708), dataSet: null, managedTeamId: '250' }, day));
-  // A shared daily reads back as the daily.
-  assert.ok(isDaily(readChallenge(challengeQuery({ ...daily, managedTeamId: '250' })).setup, day));
-});
-
-test('days are the player’s own calendar days', () => {
-  assert.equal(dayOf(new Date(2026, 10, 1, 0, 0)), '2026-11-01');
-  assert.equal(dayOf(new Date(2026, 10, 1, 23, 59, 59)), '2026-11-01');
-  assert.equal(dayOf(new Date(2026, 0, 9, 12)), '2026-01-09');
-  assert.equal(dayOf(new Date(2026, 10, 1, 12).getTime()), '2026-11-01');
-  assert.equal(dailyLabel('2026-11-01'), 'Sunday 1 November');
-  assert.equal(dailyLabel('2027-02-28'), 'Sunday 28 February');
-  assert.equal(dailyLabel('2026-12-25'), 'Friday 25 December');
-  assert.equal(dailyLabel('not a day'), '');
 });

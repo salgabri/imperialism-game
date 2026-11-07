@@ -1578,7 +1578,7 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
   const minSectionKm2 = (6 * extentKm / 900) ** 2;
   const linkKm = Math.min(15, Math.max(3, 0.1 * Math.sqrt(sourceAreaKm2 / n)));
   // The land-share estimates miss a club shut in by its neighbours' land as they grow
-  // (Bangui's two clubs, Honiara's eight): one whose territory still ends up under
+  // (Port Vila's clubs): one whose territory still ends up under
   // BOXED of its sections' room is fanned with the clubs of its city, or when it already
   // is, starts outside; the partition is then redone from the same units. The attempt
   // whose boxed-in clubs fall least short (squared shortfalls, the earliest of equals) is

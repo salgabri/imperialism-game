@@ -1,9 +1,10 @@
 // How many top clubs each country map takes, and the order the setup screen lists them in
 // (docs/design/domestic-campaigns.md). Every game nation sits in one tier: the bigger leagues
 // take their top 100 clubs, smaller leagues and smaller nations fewer, and a map takes
-// N = min(tier, viable clubs) (scripts/sync-domestic-clubs.mjs). Each tier lists its nations
-// in priority order, by confederation (UEFA, CONMEBOL, CONCACAF, CAF, AFC, OFC) and then
-// standing; the country list and the European leagues follow that order.
+// N = min(tier, viable clubs) (scripts/sync-domestic-clubs.mjs); below ten clubs (MIN_CLUBS)
+// a nation has no map. Each tier lists its nations in priority order, by confederation
+// (UEFA, CONMEBOL, CONCACAF, CAF, AFC, OFC) and then standing; the country list and the
+// European leagues follow that order.
 
 export const DOMESTIC_TIERS = Object.freeze([
   // The biggest leagues, three or four professional divisions deep.

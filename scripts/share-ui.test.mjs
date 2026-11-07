@@ -1,11 +1,11 @@
-// Sharing a campaign (README §Sharing a campaign) in the app: the share card's model, App's wiring of challenge links,
-// the daily campaign and the share image, and the setup and results controls that copy a link or share the image.
+// Sharing a campaign (README §Sharing a campaign) in the app: the share card's model, App's wiring of challenge links and
+// the share image, and the setup and results controls that copy a link or share the image.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { act } from 'react';
 import { bundleApp, bundleComponents, findElement, syncAppFixture, withDom } from './lib/app-harness.mjs';
 import { SHARE_CARD, buildShareCard, shareLine } from '../src/viewModels/shareCard.js';
-import { challengeUrl, dailyLabel, dailySetup, dayOf } from '../src/screens/setup/challenge.js';
+import { challengeUrl } from '../src/screens/setup/challenge.js';
 import { V4 } from '../src/theme.js';
 
 await bundleApp();
@@ -78,7 +78,7 @@ test('the results get the campaign’s challenge link and the share image callba
   } finally { f.close(); }
 });
 
-test('setup shares the seed it would launch, and offers today’s campaign', () => {
+test('setup shares the seed it would launch', () => {
   const f = syncAppFixture({ phase: 'setup', settings: { scope: 'CONMEBOL' } });
   try {
     const setup = findElement(f.app.render(), 'SetupOverlay');
@@ -86,17 +86,6 @@ test('setup shares the seed it would launch, and offers today’s campaign', () 
     assert.equal(setup.props.challengeLink, `?theatre=CONMEBOL&role=manager&seed=${f.app.openingSeed}`, 'a blank seed shares the opening seed');
     f.app.setState({ setup: { ...f.app.state.setup, seed: '99' } });
     assert.equal(findElement(f.app.render(), 'SetupOverlay').props.challengeLink, '?theatre=CONMEBOL&role=manager&seed=99');
-    const day = dayOf(new Date());
-    assert.deepEqual(setup.props.daily, { label: dailyLabel(day), active: false });
-    f.app.setState({ challenge: { seed: '99', ignored: [] } });
-    findElement(f.app.render(), 'SetupOverlay').props.onDaily();
-    assert.deepEqual(f.app.state.setup, dailySetup('football', day));
-    assert.equal(f.app.state.challenge, null, 'the setup no longer comes from the link');
-    assert.equal(findElement(f.app.render(), 'SetupOverlay').props.daily.active, true);
-    // A team already chosen for the same field stays chosen.
-    f.app.setState({ setup: { ...f.app.state.setup, managedTeamId: '276' } });
-    f.app.playDaily();
-    assert.equal(f.app.state.setup.managedTeamId, '276');
   } finally { f.close(); }
 });
 
@@ -140,30 +129,6 @@ test('setup says a link filled it in, and what the link could not use', async ()
     assert.match(note.textContent, /The link’s theatre and season aren’t offered here, so setup keeps the defaults\./);
     await view.render({ setup: SETUP, managerTeams: TEAMS, challenge: null });
     assert.ok(!view.host.querySelector('.setup-challenge'), 'no note without a link');
-  });
-});
-
-test('the daily campaign card fills in today’s campaign and moves on to the team', async () => {
-  await withDom(async ({ mount }) => {
-    let daily = 0;
-    const props = { setup: SETUP, managerTeams: TEAMS, daily: { label: 'Sunday 1 November', active: false }, onDaily: () => { daily += 1; } };
-    const view = await mount(SetupOverlay, props);
-    const card = view.host.querySelector('.setup-daily');
-    assert.match(card.textContent, /Daily campaign · Football · Sunday 1 November/);
-    assert.match(card.textContent, /the Elite 32 nations on Fast-forward, with the same seed for everyone/);
-    await click(buttonNamed(card, 'Play today’s campaign'));
-    assert.equal(daily, 1);
-    assert.ok(!view.host.querySelector('section.setup-step[data-step="3"]').hidden, 'step 3 asks for the team');
-    await view.render({ ...props, daily: { label: 'Sunday 1 November', active: true } });
-    assert.match(view.host.querySelector('.setup-daily').textContent, /Today’s campaign is set up\. Choose your nation and launch it\./);
-    await click(buttonNamed(view.host.querySelector('.setup-daily'), 'Choose your nation'));
-    assert.equal(daily, 1, 'an active card only moves on');
-    await view.render({ ...props, setup: { ...SETUP, sport: 'american-football', layer: 'clubs', clubScope: 'domestic:nfl' } });
-    assert.match(view.host.querySelector('.setup-daily').textContent, /the NFL’s 32 clubs on Fast-forward/);
-    await view.render({ ...props, daily: null });
-    assert.ok(!view.host.querySelector('.setup-daily'));
-    await view.render({ ...props, challenge: { seed: '42', ignored: [] } });
-    assert.ok(!view.host.querySelector('.setup-daily'), 'a page opened from a challenge link shows the challenge alone');
   });
 });
 

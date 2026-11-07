@@ -15,7 +15,7 @@ import { decodeDomestic, DOMESTIC_SECTIONS } from '../src/engine/domestic.js';
 import { expandFmTuple, FM_ROLES } from '../src/data/fmPlayers.js';
 import { FOREIGN_DEPTH_KM, hostShapes, loadWorldMap } from './lib/domestic-boundaries.mjs';
 import { bboxOf, facingKm, facingSections, kmToPolys, pointInPolys, polysAreaKm2, splitOnLand } from './lib/domestic-partition.mjs';
-import { DATABASE_DATE } from './lib/domestic-sync.mjs';
+import { DATABASE_DATE, MIN_CLUBS } from './lib/domestic-sync.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const shippedDir = path.join(root, 'public/domestic');
@@ -58,6 +58,16 @@ test('every nation sits in one tier, and the tiers shrink', () => {
   assert.ok(sizes.every((k, i) => i === 0 || k < sizes[i - 1]), `tier sizes ${sizes.join('/')}`);
 });
 
+test('a country ships exactly when it has the clubs for it, and leaves nothing behind when it does not', () => {
+  const { nations } = JSON.parse(readFileSync(path.join(snapshotDir, 'survey.json'), 'utf8'));
+  for (const nation of nations) {
+    assert.equal(nation.ships, nation.n >= MIN_CLUBS, `${nation.name}: N = ${nation.n}, ships ${nation.ships}`);
+    if (!nation.ships) assert.ok(nation.why, `${nation.name} needs a reason for not shipping`);
+  }
+  assert.deepEqual(nations.filter(nation => nation.ships).map(nation => nation.id).sort(), shipped, 'the survey and public/domestic/*.json differ');
+  assert.deepEqual(readdirSync(snapshotDir).filter(f => FILE.test(f)).map(f => f.slice(0, -5)).sort(), shipped, 'snapshots and public/domestic/*.json differ');
+});
+
 const polysOf = (topo, g) => {
   const geometry = feature(topo, g).geometry;
   return geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
@@ -90,7 +100,7 @@ for (const entry of DOMESTIC) {
     // 100 sections <id>-001..100 shared out as N club groups: home first, ids in club rank
     // order, sizes floor or ceil(100 / N) with exactly 100 mod N larger groups.
     const S = DOMESTIC_SECTIONS;
-    assert.ok(n >= 2 && n <= domesticCap(id), `N = ${n}, tier ${domesticCap(id)}`);
+    assert.ok(n >= MIN_CLUBS && n <= domesticCap(id), `N = ${n}, tier ${domesticCap(id)}`);
     const geoms = doc.topology.objects.sections.geometries;
     assert.equal(geoms.length, S, 'sections');
     assert.equal(doc.clubs.length, n, 'clubs');
