@@ -1,11 +1,10 @@
-// Challenge links and the daily campaign (README §Sharing a campaign). A challenge link carries a setup in the page
-// address's query: sport, teams, theatre, season, the rules of war, your role and the seed. Opening it fills in setup
-// without launching, and the same setup and seed replay the same campaign (README §Finale, seeds and saves). The daily
-// campaign is one fixed short setup per sport with a seed taken from the date. Pure: no window or document, and
+// Challenge links (README §Sharing a campaign). A challenge link carries a setup in the page address's query: sport,
+// teams, theatre, season, the rules of war, your role and the seed. Opening it fills in setup without launching, and the
+// same setup and seed replay the same campaign (README §Finale, seeds and saves). Pure: no window or document, and
 // nothing here draws from a campaign's random stream.
-import { SCOPES, hashStr } from '../../data/teams.js';
+import { SCOPES } from '../../data/teams.js';
 import { CLUB_SCOPES } from '../../data/scopes.js';
-import { clubMapOf, domesticEntry, isDomesticScope } from '../../data/domesticScope.js';
+import { domesticEntry, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
 import { BUILT_IN_SETS, setSportOf } from '../../engine/footballSets.js';
 import { DEFAULT_SETUP, dataSetOf, setClubScope } from '../../app/shared.js';
@@ -160,60 +159,4 @@ export function challengeNote({ seed = '', ignored = [] } = {}) {
   const names = [...new Set(ignored)].map(key => CHALLENGE_LABELS[key]).filter(Boolean);
   if (!names.length) return lead;
   return `${lead} The link’s ${listed(names)} ${names.length === 1 ? 'isn’t' : 'aren’t'} offered here, so setup keeps the default${names.length === 1 ? '' : 's'}.`;
-}
-
-// ---------- the daily campaign ----------
-
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November',
-  'December'];
-const DAY = /^(\d{4})-(\d{2})-(\d{2})$/;
-const two = n => String(n).padStart(2, '0');
-
-/** A date's calendar day where the player is, as "2026-11-01": the daily campaign changes at local midnight. */
-export function dayOf(date) {
-  const d = date instanceof Date ? date : new Date(date);
-  return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`;
-}
-
-/** "Sunday 1 November" for "2026-11-01". */
-export function dailyLabel(day) {
-  const [, y, m, d] = String(day).match(DAY) || [];
-  if (!y) return '';
-  const date = new Date(Number(y), Number(m) - 1, Number(d));
-  return `${WEEKDAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]}`;
-}
-
-/** The day's seed for a sport: the same everywhere for that date, a different one for each sport and day. Never 0. */
-export function dailySeed(sportId, day) {
-  return hashStr(`imperialism daily ${getSport(sportId).id} ${day}`) || 1;
-}
-
-/**
- * The daily campaign's setup for a sport: the 32 strongest nations (a clubs-only sport: its own map, the NFL's 32
- * clubs), the built-in season, Random draw, Fast-forward and the standard rules, managed by you with the day's seed.
- * The team is yours to pick.
- */
-export function dailySetup(sportId, day) {
-  const sport = getSport(sportId);
-  const setup = { ...DEFAULT_SETUP, sport: sport.id, layer: sport.clubsOnly ? 'clubs' : 'nations', scope: 'elite', express: true,
-    role: 'manager', seed: String(dailySeed(sport.id, day)) };
-  return sport.clubsOnly ? { ...setup, clubScope: setClubScope(setup) } : setup;
-}
-
-/** The daily campaign's field in words: "the Elite 32 nations", "the NFL’s 32 clubs". */
-export function dailyField(sportId) {
-  const sport = getSport(sportId);
-  const map = sport.clubsOnly ? clubMapOf(sport.id) : null;
-  return map ? `the ${map.league}’s ${map.clubs} clubs` : 'the Elite 32 nations';
-}
-
-// What makes a daily campaign: everything but how you watch it, your role and the choices that are yours.
-const campaignOf = settings => challengeQuery({ ...settings, role: 'spectator', managedTeamId: '', express: false,
-  resolution: 'ticker', targeting: 'compass' });
-
-/** Whether a setup (or a launched campaign's settings) is that day's daily campaign of its sport. */
-export function isDaily(settings, day) {
-  if (!settings || !DAY.test(String(day))) return false;
-  return campaignOf(settings) === campaignOf(dailySetup(settings.sport, day));
 }
