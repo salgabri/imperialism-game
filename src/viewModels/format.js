@@ -97,13 +97,14 @@ export function shortName(name) {
 
 /**
  * Route line for a draw or match: land border, neutral transit treaty, foreign land (an exclave on a country map:
- * the neighbouring country is crossed, never claimed) or sea.
+ * the neighbouring country is crossed, never claimed) or sea, which is open ground on a map with empty land
+ * (`openLand`, the American leagues' maps: the land between two clubs' states is nobody's).
  */
-export function routeCopy(draw) {
+export function routeCopy(draw, { openLand = false } = {}) {
   if (!draw) return '';
   if (draw.routeKind === 'neutral-transit') return 'Through neutral land — transit treaty';
   if (draw.routeKind === 'foreign-transit') return 'Through foreign land — never claimed';
-  if (draw.routeKind === 'sea' || draw.isNeighbor === false) return 'By sea — no shared border';
+  if (draw.routeKind === 'sea' || draw.isNeighbor === false) return openLand ? 'Over open ground — no shared border' : 'By sea — no shared border';
   return 'Across a land border';
 }
 

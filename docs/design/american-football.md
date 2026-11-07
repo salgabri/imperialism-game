@@ -27,12 +27,12 @@ are not cleared, as for the built-in EA FC 27 and NBA 2K27 data.
 
 **Franchises.** `scripts/data/nfl-teams.json` names each franchise (EA shortens the
 New York teams to "NY Giants" and "NY Jets"), gives its scoreboard code, the place
-its territory is named after, its stadium and the point its territory grows from.
+its territory is named after, its stadium and the point the map places it at.
 Codes are three capitals, as the game's maps require: the NFL's own abbreviations
 where they have three letters, and GBP, KCC, LVR, NEP, NOS, SFO and TBB for the
 seven with two (GB, KC, LV, NE, NO, SF, TB). Two pairs share a stadium (the Rams
 and Chargers at SoFi Stadium, the Giants and Jets at MetLife Stadium), and the map
-cannot grow two territories from one point, so those four grow from their training
+cannot divide a state from one point, so those four are placed at their training
 grounds: Warner Center in Woodland Hills, The Bolt in El Segundo, the Quest
 Diagnostics Training Center in East Rutherford and the Atlantic Health Jets
 Training Center in Florham Park. Their stadium stays named.

@@ -361,8 +361,8 @@ clubs, so no `playerPack` is needed.
 ### Era maps
 
 A season plays on the map of its own era: the franchises of that season, each
-territory grown from the arena it played in, with the
-[NBA map](domestic-campaigns.md#the-nba-map)'s partition. A season's `map` names
+holding the state or province of the arena it played in, by the
+[NBA map](domestic-campaigns.md#the-nba-map)'s rule. A season's `map` names
 it. `npm run build:nba-map` builds today's map and one map per era of the
 manifest's `maps`: `nba2000` (1999/00 and 2000/01), `nba2002`, `nba2003`
 (2002/03, 2003/04), `nba2005`, `nba2006` (2005/06, 2006/07), `nba2008`,

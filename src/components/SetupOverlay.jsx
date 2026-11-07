@@ -175,7 +175,7 @@ function SelectedTeam({ team, noun }) {
                 </li>
               ))}
             </ol>
-          ) : <p className="setup-fronts__empty">No land borders — every war goes by sea.</p>}
+          ) : <p className="setup-fronts__empty">{team.fronts.emptyText}</p>}
         </div>
       ) : null}
     </section>

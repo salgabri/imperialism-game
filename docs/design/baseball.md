@@ -30,8 +30,8 @@ pages at once: the older editions' hosts take 15–25 s a page. The earlier seas
 (below) are built from editions 21 to 25.
 
 **Clubs.** `scripts/data/mlb-teams.json` names each club, its scoreboard code, the
-place its territory is named after, its ballpark and the point its territory grows
-from (each ballpark's Wikidata coordinates). Codes are three capitals: MLB's own,
+place its territory is named after, its ballpark and the point the map places it at
+(each ballpark's Wikidata coordinates). Codes are three capitals: MLB's own,
 ATH for the Athletics (The Show still files them as OAK), and KCR, SDP, SFG and TBR
 for the four with two letters. Chicago and New York have two clubs each, so their
 territories are named after their parts of town: the North Side and the South Side,

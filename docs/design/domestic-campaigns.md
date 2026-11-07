@@ -23,7 +23,8 @@ player, so a starting group always changes hands whole.
 The world campaigns (nations and the 132-club European layer, both sports) are
 unchanged: same geometry, seeded outcomes, saves and rendering. NBA clubs, which
 used to be dealt across the world map, now play on a map of their own: the USA
-and Canada split into one territory per franchise (see "The NBA map" below).
+and Canada, where each franchise holds its own state or province (see "The NBA
+map" below).
 
 ### Tiers
 
@@ -667,11 +668,14 @@ has no holder, or the holdings split a starting group.
 ## The NBA map
 
 Status: implemented 2026-10-29. Basketball clubs have one theatre, **NBA**, played
-on `public/domestic/nba.json`: the USA and Canada and nothing else, split into 30
-territories, one per franchise, along state and province lines, with the states
-and provinces far from every arena left empty (since 2026-10-30; the first build
-split every county of both countries). It reuses this whole runtime (loader, country
-chart, backdrop, routing, saves) as a format-1 map whose clubs are the game's own.
+on `public/domestic/nba.json`: the USA and Canada and nothing else. Since 2026-11-07
+each of the 30 franchises holds the state or province its arena stands in and nothing
+else: a state with several franchises is divided between them, and every state and
+province without one stays empty. (From 2026-10-30 a franchise also took the states
+nearest its arena, and only those over 1,000 km from every arena stayed empty; the
+first build split every county of both countries.) It reuses this whole runtime
+(loader, country chart, backdrop, routing, saves) as a format-1 map whose clubs are
+the game's own.
 
 **Build** (`npm run build:nba-map`, `scripts/build-club-maps.mjs --league=nba`, about 6 minutes with the era maps;
 `--check` rebuilds offline and compares, `--dry-run` writes nothing):
@@ -687,35 +691,35 @@ chart, backdrop, routing, saves) as a format-1 map whose clubs are the game's ow
   hosts at most one arena is merged from its units into one `whole` unit (on their
   shared arcs, so its borders keep their vertices; `explodeUnits` leaves it in one
   piece, so Michigan's two peninsulas go together). The units of California (4
-  franchises), Texas (3), Florida and New York (2 each) stay as counties, and
-  `allowed` gives them only to that state's own franchises. A territory is
-  therefore whole states and provinces, plus its share of its own state when that
-  state is shared.
-- **Empty land**: a region without an arena whose centroid lies over 1,000 km
-  (`EMPTY_KM`) from every arena is left out of the partition: Alaska, Yukon, the
-  Northwest Territories, Nunavut, British Columbia, Alberta, Saskatchewan,
-  Manitoba, Quebec, and Newfoundland and Labrador (the next nearest, Ontario at
-  813 km, is Toronto's home anyway). Those on the landmass go into the file as
-  empty land; those off it (Hawaii, with Puerto Rico and the other territories
-  already cut) are dropped.
+  franchises), Texas (3), Florida and New York (2 each) stay as counties. `allowed`
+  gives a franchise only the land of its own state, so a territory is one whole
+  state or province, or its share of a shared one.
+- **Empty land**: every region without an arena is left out of the partition:
+  28 states and 12 provinces and territories on today's map, from neighbours of a
+  franchise's state (Oregon has the Trail Blazers; Washington, next to it, is
+  nobody's) to Alaska and the North. Those on the landmass, or within a hop of it by
+  the partition's overseas rule (`dropOverseas`: Prince Edward Island stays), go
+  into the file as empty land; those farther off (Hawaii, with Puerto Rico and the
+  other territories already cut) are dropped.
 - **Homes**: each franchise's arena, `scripts/data/nba-arenas.json` (`[lon, lat]`
   to about 100 m, with the city that names the territory).
-- **Partition**: `partitionCountry` with one section per club (the format-1
-  rules: the smallest territory takes the adjacent free unit nearest its arena,
-  within reach). The two layers draw the national border up to ~3 km apart, so
-  `joinKm: 5` links units of different realms that come that close
-  (`joinRealms`). Los Angeles County is cut for the Lakers and the Clippers. With
-  `spare`, a club passes over a unit that is another club's last way out when the
-  unit lies nearer that club's arena: Brooklyn's only land neighbour is Queens, and
-  the Knicks, smaller at the start with Manhattan alone, would otherwise take it and
-  shut the Nets in. The build fails if a shared state's county goes to another
-  state's franchise.
+- **Partition**: `partitionCountry` with one section per club. A franchise alone in
+  its state starts on that whole state and has nothing left to take; in a shared
+  state the format-1 rules divide the counties (the smallest territory takes the
+  adjacent free county nearest its arena, within reach). The two layers draw the
+  national border up to ~3 km apart, so `joinKm: 5` links units of different realms
+  that come that close (`joinRealms`). Los Angeles County is cut for the Lakers and
+  the Clippers. With `spare`, a club passes over a unit that is another club's last
+  way out when the unit lies nearer that club's arena: Brooklyn's only land neighbour
+  is Queens, and the Knicks, smaller at the start with Manhattan alone, would
+  otherwise take it and shut the Nets in. The build fails if land of a state goes to
+  another state's franchise.
 - **Border fitting** (`fitBorder`): each franchise's land is dissolved per
   country, and each empty region is a piece of its own; every Canadian edge within 3 km of US land is widened into a band, then
   US land and the other Canadian pieces are cut away, and `nodeRings` gives the
   US rings the crossing points. Both sides then share the line vertex for vertex,
-  so a franchise holding land in both countries is one territory and neighbours
-  across the border are land neighbours in the game (`geo.adj`, border routes).
+  so neighbours across the border are land neighbours in the game (`geo.adj`,
+  border routes).
 - **Output** as the country maps (simplify to 14,000 points, quantize, colours
   that differ across borders and water). Empty land is simplified with the
   sections, in one topology, so the two share every border; it is then moved to
@@ -736,12 +740,14 @@ strength. The loader refuses an unknown sport or club, a repeated club, empty
 `hosts` and empty land that is not a GeometryCollection of named, uniquely
 identified polygons; the FM checks apply to country maps only.
 
-**Result** (2026-10-30 build): Portland holds Washington, Oregon and Idaho;
-Minnesota the Dakotas; Utah Montana and Wyoming; Denver Nebraska; Toronto Ontario;
-the Knicks upstate New York, New Jersey and Connecticut; Boston New England and
-the Maritimes; the Wizards Virginia, West Virginia, Maryland and Delaware. Areas
-range from the Nets' 4,000 km² (Brooklyn, Queens and Long Island) to Toronto's
-983,000 km².
+**Result** (2026-11-07 build): Portland holds Oregon; Denver Colorado; Toronto Ontario;
+Boston Massachusetts; the Knicks all of New York but Brooklyn, Queens and Long Island,
+which are the Nets'. California is divided
+between the Kings (146,000 km²), the Lakers (100,000), the Clippers (87,000) and the
+Warriors (77,000), Texas between the Spurs (292,000), the Mavericks (288,000) and
+the Rockets (110,000), and Florida between the Magic (106,000) and the Heat (45,000).
+Areas range from the Wizards' 200 km² or so (the District of Columbia is theirs alone,
+Maryland and Virginia nobody's) to Toronto's 983,000 km².
 
 **Runtime.** The scope is `domestic:nba`. `domesticIdOf` maps a scope to a map
 only for its sport (a football country for football, the NBA map for basketball),
@@ -749,12 +755,18 @@ so a world NBA campaign saved before (`clubScope` `all`, `elite` or `NBA`) still
 restores on the world. `setClubScope` (App) moves basketball clubs to
 `domestic:nba` whatever the setup held, and a football setup left on it back to
 every club. The setup lists the one row "NBA · 30 clubs", describes the split
-("… lead the 30 NBA clubs, each starting on the land nearest its arena …"),
+("… lead the 30 NBA clubs fighting over the USA and Canada, each starting with only its arena's state or province …"),
 loads and previews the map like a country, and titles read "NBA · USA and Canada".
 `decodeDomestic` returns the empty land as `empty` (a `WorldGeometry`, only ever
 drawn), and `domesticSurroundings` draws it first among the shapes beneath the
 map, in the backdrop's neutral grey. It is not an obstacle: like the host shape beneath
-England it lies inside the hosts, so a route over it reads as open ground.
+England it lies inside the hosts, so a route over it reads as open ground. A franchise
+with no land neighbour (the Wizards at kick-off; on the NFL's map the Seahawks) reaches
+any rival it has a clear line to, as an island does across the sea, and the words say
+so: such a map adds `openLand` to the board, the route line reads "Over open ground —
+no shared border" and the fronts note "reached over open ground", the setup's Fronts
+"every war crosses open ground", and a route that must bend around rival land is a
+"Route around rival land", not a coastal sea route.
 The victory names "USA and Canada". Basketball squads are not FM players, so
 checkpoints store them in full (no `playerPack`).
 
@@ -771,21 +783,25 @@ five at kick-off. Today's `nba.json` is unchanged and also serves the seasons fr
 
 **Checks**: `scripts/nba-map.test.mjs` (in `npm run test:domestic`): file, index,
 arenas and clubs agree; the USA and Canada are all the land and the hosts are not
-drawn beneath it; the empty regions are the expected ten, drawn but no obstacle, on
-the sections' arcs; towns of one state fall in one territory, towns of empty land
-in none, and New York splits between the Knicks and the Nets only; cross-border
-land neighbours and neighbour colours; seeded duel
+drawn beneath it; the empty regions are exactly the states and provinces without an
+arena, drawn but no obstacle, on the sections' arcs; towns of one state fall in one
+territory, towns of empty land in none, and New York splits between the Knicks and
+the Nets only; cross-border land neighbours and neighbour colours; a franchise with
+no land neighbour still reaches its rivals over open ground, in those words; seeded duel
 campaigns on the app board reach a champion without treaties or third-party
 crossings; loader refusals; the App sets up, launches and titles an NBA campaign
 and keeps an old world NBA save on the world. The smoke's NBA scenarios run
-through the country-map checks.
+through the country-map checks. `scripts/club-maps.test.mjs` holds every league's
+maps, today's and each era's, to the rule: a town of a state with a club lies in a
+club's section, one of a state without lies on its own empty land, and no section
+reaches into a second state.
 
 ## The NFL map
 
 Status: implemented 2026-10-31. American football ([american-football.md](american-football.md))
-has one theatre, **NFL**, played on `public/domestic/nfl.json`: the USA split into
-32 territories, one per franchise, along state lines. It is built by the same
-command and partition as the NBA's: `scripts/build-nba-map.mjs` became
+has one theatre, **NFL**, played on `public/domestic/nfl.json`: the USA, where each
+of the 32 franchises holds its own state (since 2026-11-07, as on the NBA's map). It is
+built by the same command and partition as the NBA's: `scripts/build-nba-map.mjs` became
 `scripts/build-club-maps.mjs`, with one entry per league in `LEAGUES` (`npm run
 build:club-maps` builds both; `build:nba-map` and `build:nfl-map` one each, the
 index keeping the other league's entries as they are). The NBA maps rebuild byte
@@ -793,8 +809,8 @@ for byte; only their attribution files name the new script.
 
 - **Units**: the USA's counties grouped by state, as for the NBA, with no second
   country, so no border fitting. Puerto Rico and the other territories are cut;
-  Alaska and Hawaii lie off the landmass and are dropped. No state lies over
-  1,000 km from every stadium, so there is no empty land.
+  Alaska and Hawaii lie off the landmass and are dropped. The 25 other states without
+  a stadium stay empty, from Maine to Oregon.
 - **Homes**: `scripts/data/nfl-teams.json`, each franchise's stadium, except the
   four that share one, which grow from their training grounds (see
   [american-football.md](american-football.md#data)).
@@ -803,35 +819,38 @@ for byte; only their attribution files name the new script.
   MetLife Stadium stands in New Jersey, but the Giants and Jets are New York's, so
   the league joins New York to New Jersey (`joins: { 'US-NJ': ['US-NY'] }`): New
   York's counties go to the Bills or to either New Jersey franchise. The Giants,
-  nearer the city, hold Manhattan, Long Island and Connecticut; the Bills the rest
-  of the state. Los Angeles County is cut between the Rams and the Chargers.
-- **Result** (2026-10-31 build): Denver holds Colorado, Wyoming and Montana; Las
-  Vegas Nevada and Utah; Kansas City Missouri, Kansas and Nebraska; Minnesota the
-  Dakotas; Seattle Washington, Oregon and Idaho; Tennessee Arkansas and Alabama;
-  Washington Virginia, DC and southern Maryland; Baltimore northern Maryland and
-  Delaware. Areas range from the Jets' 19,000 km² (northern New Jersey) to Denver's
-  902,000 km². The file is about 134 KB; the index entry adds `venue: "stadium"` and
-  `lines: "state"`, so the setup reads "… each starting on the land nearest its
-  stadium: USA split into 32 territories along state lines."
+  nearer the city, hold Manhattan and Long Island; the Bills western and northern New
+  York. Northwest Stadium stands in Maryland, but the Commanders are Washington's, so
+  the District of Columbia is joined to Maryland too (`'US-MD': ['US-DC']`), and goes
+  to them. Los Angeles County is cut between the Rams and the Chargers.
+- **Result** (2026-11-07 build): Denver holds Colorado; Las Vegas Nevada; Kansas City
+  Missouri; Seattle Washington; Washington DC and western and southern Maryland; Baltimore
+  its city and the Eastern Shore. Texas is divided between
+  Houston (358,000 km²) and Dallas (331,000), California between San Francisco
+  (211,000), the Chargers (100,000) and the Rams (99,000). Areas range from Washington's
+  13,000 km² to Houston's. The file is about 141 KB; the index entry adds
+  `venue: "stadium"` and `lines: "state"`, so the setup reads "… each starting with
+  only its stadium's state."
 
 **Checks**: `scripts/american-football.test.mjs`: file, index, stadiums and clubs
 agree; every stadium (or training ground) lies inside its territory; Manhattan is
 the Giants', Buffalo the Bills', Morris County the Jets', the San Fernando Valley
-the Rams' and San Diego the Chargers'; seeded duel campaigns reach a champion; the
-App launches on the map. The smoke runs an NFL duel and an NFL resume.
+the Rams', San Diego the Chargers' and DC the Commanders'; the empty states are
+exactly those without a franchise; seeded duel campaigns reach a champion; the App
+launches on the map. The smoke runs an NFL duel and an NFL resume.
+`scripts/club-maps.test.mjs` holds it to the rule, as it does the NBA's and MLB's.
 
 ## The MLB map
 
 Status: implemented 2026-11-01. Baseball clubs ([baseball.md](baseball.md)) have one
-theatre, **MLB**, played on `public/domestic/mlb.json`: the USA and Canada split into
-30 territories, one per club, along state and province lines, by the same command
-and partition (`LEAGUES.mlb` in `scripts/build-club-maps.mjs`; `npm run
-build:mlb-map`). The NBA and NFL maps rebuild byte for byte.
+theatre, **MLB**, played on `public/domestic/mlb.json`: the USA and Canada, where each
+of the 30 clubs holds its own state or province (since 2026-11-07, as on the NBA's map),
+by the same command and partition (`LEAGUES.mlb` in `scripts/build-club-maps.mjs`;
+`npm run build:mlb-map`).
 
 - **Units**: the USA's counties and Canada's economic regions grouped by state and
-  province, fitted to the US line, as for the NBA. Alaska, the Prairies, Quebec,
-  Newfoundland and Labrador and the North lie over 1,000 km from every ballpark and
-  stay empty; Hawaii, Puerto Rico and the other territories are dropped.
+  province, fitted to the US line, as for the NBA. Every state and province without a
+  ballpark stays empty; Hawaii, Puerto Rico and the other territories are dropped.
 - **Homes**: `scripts/data/mlb-teams.json`, each club's ballpark at its Wikidata
   coordinates. No two clubs share a ballpark.
 - **Shared states**: California (five clubs), New York, Illinois, Texas, Florida, Ohio,
@@ -842,14 +861,15 @@ build:mlb-map`). The NBA and NFL maps rebuild byte for byte.
   instead, and Cook County is cut between the Cubs (the North Side) and the White Sox
   (the South Side). The Yankees (the Bronx) and the Mets (Queens) have counties of
   their own.
-- **Result** (2026-11-01 build): Boston holds New England (Connecticut is the
-  Yankees') and the Maritimes; Toronto Ontario; Seattle Washington, Idaho and British Columbia; Colorado Colorado, Utah,
-  Wyoming and Montana; Minnesota the Dakotas; Arizona New Mexico; Washington Virginia,
-  DC and North Carolina; Atlanta Georgia, Alabama and South Carolina. Areas range from
-  the Mets' 4,000 km² to Seattle's 1.33 million. The file is about 155 KB; the index
-  entry adds `venue: "ballpark"`, so the setup reads "… each starting on the land
-  nearest its ballpark: USA and Canada split into 30 territories along state and
-  province lines."
+- **Result** (2026-11-07 build): Boston holds Massachusetts; Toronto Ontario; Seattle
+  Washington; Baltimore Maryland; Atlanta Georgia. Texas is divided between Houston (359,000 km²) and the
+  Rangers (331,000), Illinois between the White Sox (85,000) and the Cubs (61,000),
+  Missouri about evenly between Kansas City and St. Louis, and California between the
+  Athletics (146,000), the Dodgers (95,000), the Giants (74,000), the Angels (73,000)
+  and the Padres (23,000). Areas range from the Nationals' 200 km² or so (the District of
+  Columbia) to Toronto's 983,000 km². The file is about 162 KB; the index entry adds
+  `venue: "ballpark"`, so the setup reads "… each starting with only its ballpark's
+  state or province."
 
 **Checks**: `scripts/baseball.test.mjs`: file, index, ballparks and clubs agree; every
 ballpark lies inside its territory; Wrigley Field is the Cubs', Rate Field the White

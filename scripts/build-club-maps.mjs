@@ -1,11 +1,10 @@
 // The maps a sport's clubs play on instead of the world (docs/design/domestic-campaigns.md,
 // "The NBA map", "The NFL map" and "The MLB map"): the NBA's and MLB's USA and Canada, and the
-// NFL's United States, each split into one territory per franchise, grown from its arena,
-// stadium or ballpark by the
-// domestic partition (format 1: one section per club) over whole states and provinces.
-// Only a state with two or more franchises is split, along its counties, between them
-// (and a state a league joins to it, such as New York to New Jersey's for the NFL), and
-// states and provinces far from every venue stay empty: land, but nobody's.
+// NFL's United States. A franchise holds the state or province its arena, stadium or ballpark
+// stands in and nothing else, as one territory (the domestic partition, format 1: one section
+// per club). A state with two or more franchises is split, along its counties, between them
+// (and so is a state a league joins to it, such as New York to New Jersey's for the NFL), and
+// every other state and province stays empty: land, but nobody's.
 // The earlier basketball seasons (scripts/data/nba-seasons.json) play on maps of their
 // own era, built the same way from that era's teams and arenas: Seattle, Vancouver and
 // New Jersey where they played. Today's map is unchanged by them.
@@ -45,7 +44,7 @@ import { colourSections, contentHash, serialize } from './lib/domestic-output.mj
 import { seasonIdOf, teamsOf } from './lib/nba-seasons.mjs';
 import { seasonIdOf as mlbSeasonIdOf, teamsOf as mlbTeamsOf } from './lib/mlb.mjs';
 import {
-  arcPoints, bboxOf, centroidOf, components, dissolve, EARTH_KM, facingKm, facingSections, interiorPoint, joinRealms, kmBetween, kmToPolys,
+  arcPoints, bboxOf, dissolve, dropOverseas, EARTH_KM, facingKm, facingSections, interiorPoint, joinRealms, kmBetween, kmToPolys,
   nodeRings, partitionCountry, pointInPolys, polysAreaKm2, polysOf, prepareUnits, quantize, sectionTopology, simplifyTopology, splitOnLand,
   unitTopology,
 } from './lib/domestic-partition.mjs';
@@ -66,7 +65,8 @@ const USA = { id: '840', iso3: 'USA' }, CAN = { id: '124', iso3: 'CAN' };
 /**
  * Each league's map: its id, sport, name and `countries` (the game's world shapes its units come from, never drawn
  * beneath it); `joins` lets a state's franchises also take the counties of the states listed (MetLife Stadium is in
- * New Jersey, but the Giants and Jets are New York's); `entry` adds fields to its index entry (the setup's words);
+ * New Jersey, but the Giants and Jets are New York's; Northwest Stadium is in Maryland, but the Commanders are
+ * Washington's); `entry` adds fields to its index entry (the setup's words);
  * `maxGapKm`, how far a franchise may start from its venue before the county it shares is cut between the two (the
  * partition's own limit, about 20 km of US county, unless named: Wrigley Field and Rate Field are both Cook County's).
  */
@@ -74,20 +74,19 @@ const LEAGUES = {
   nba: { id: 'nba', sport: 'basketball', league: 'NBA', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: {},
     venues: 'Arena locations: scripts/data/nba-arenas.json.',
     eraVenues: 'Arena locations: scripts/data/nba-arenas.json, and scripts/data/nba-seasons.json for teams that have moved since.' },
-  nfl: { id: 'nfl', sport: 'american-football', league: 'NFL', name: 'USA', countries: [USA], joins: { 'US-NJ': ['US-NY'] },
+  nfl: { id: 'nfl', sport: 'american-football', league: 'NFL', name: 'USA', countries: [USA], joins: { 'US-NJ': ['US-NY'], 'US-MD': ['US-DC'] },
     entry: { venue: 'stadium', lines: 'state' },
     venues: 'Stadium locations: scripts/data/nfl-teams.json (the four franchises that share a stadium grow from their training grounds).' },
   mlb: { id: 'mlb', sport: 'baseball', league: 'MLB', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: { venue: 'ballpark' },
     maxGapKm: 5, venues: 'Ballpark locations: scripts/data/mlb-teams.json.',
     eraVenues: 'Ballpark locations: scripts/data/mlb-teams.json, and scripts/data/mlb-seasons.json for clubs that have moved, been renamed or played elsewhere since.' },
 };
-// Territories take states and provinces (REGION_LEVEL) whole, built from their counties
-// and economic regions (UNIT_LEVEL) so that both share every border vertex for vertex.
+// Territories are states and provinces (REGION_LEVEL), built from their counties and
+// economic regions (UNIT_LEVEL) so that both share every border vertex for vertex.
 const UNIT_LEVEL = 'ADM2';
 const REGION_LEVEL = 'ADM1';
-// A state or province whose centre lies farther than this from every arena stays empty
-// (Alaska, the North, the Prairies, Quebec): drawn as land beneath the map, never territory.
-const EMPTY_KM = 1000;
+// The ISO codes geoBoundaries misspells (an empty region's code is its id in the file).
+const ISO_FIXES = { 'SU-SD': 'US-SD', 'CA-QB': 'CA-QC' };
 // The two layers draw the 49th parallel and the Alaska border a little differently:
 // units of the two countries this close count as neighbours, and Canadian edges this
 // close to US land are fitted to the US line (fitBorder).
@@ -138,7 +137,7 @@ async function countryUnits(source, { id, iso3 }, log) {
   if (cut.length) log(`  ${iso3}: cut land the world map gives to others: ${cut.map(c => `${c.shape} ${c.km2} km²`).join(', ')}`);
   const regions = (await source.features(regionRow))
     .filter(f => f.geometry && (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon'))
-    .map(f => ({ id: f.properties.shapeISO || `${iso3}-${f.properties.shapeName}`, name: f.properties.shapeName, polys: polysOf(f.geometry) }))
+    .map(f => ({ id: ISO_FIXES[f.properties.shapeISO] || f.properties.shapeISO || `${iso3}-${f.properties.shapeName}`, name: f.properties.shapeName, polys: polysOf(f.geometry) }))
     .map(r => ({ ...r, bbox: bboxOf(r.polys) }));
   const inBox = ([x, y], [w, s, e, n]) => x >= w && x <= e && y >= s && y <= n;
   for (const u of kept) {
@@ -182,15 +181,14 @@ function mergeRegions(units, split) {
 }
 
 /**
- * The units `isEmpty` picks, on the same landmass as the others (adjacent through
- * shared borders or across the national border), and those off it (Hawaii).
+ * The units `isEmpty` picks that stay on the map as empty land, and those the partition's
+ * overseas rule drops: Hawaii goes, while Prince Edward Island, a strait off the mainland,
+ * stays. Land counts as connected through shared borders or across the national border.
  */
-function emptyLand(units, isEmpty) {
+function emptyLand(units, isEmpty, homes) {
   const prepared = prepareUnits(units);
-  const { comp } = components(joinRealms(prepared, unitTopology(prepared).adjacency, JOIN_KM));
-  const played = new Set(prepared.filter(u => !isEmpty(u)).map(u => comp[u.index]));
-  const all = prepared.filter(isEmpty);
-  return { empty: all.filter(u => played.has(comp[u.index])), off: all.filter(u => !played.has(comp[u.index])) };
+  const { keep, dropped } = dropOverseas(prepared, joinRealms(prepared, unitTopology(prepared).adjacency, JOIN_KM), homes);
+  return { empty: keep.filter(isEmpty), off: dropped.filter(isEmpty) };
 }
 
 /**
@@ -359,26 +357,23 @@ async function build({ source, log, spec, league }) {
     ...Object.entries(league.joins).filter(([from]) => regionOf.includes(from)).flatMap(([, to]) => to)]);
   log(`  split between their franchises: ${[...shared].map(r => `${regionName.get(r)} (${regionOf.filter(x => x === r || joinedTo(r).includes(x)).length})`).join(', ')}`);
   const merged = countryList.flatMap(list => mergeRegions(list, shared));
-  const isEmpty = u => u.whole && !regionOf.includes(u.region)
-    && Math.min(...rawHomes.map(h => kmBetween(centroidOf(u.polys), h))) > EMPTY_KM;
-  const { empty, off } = emptyLand(merged, isEmpty);
+  // A state or province without a franchise is nobody's.
+  const isEmpty = u => u.whole && !regionOf.includes(u.region);
+  const { empty, off } = emptyLand(merged, isEmpty, rawHomes);
   log(`  empty: ${empty.map(u => `${u.regionName} ${Math.round(u.area / 1000)}k km²`).join(', ')}`);
   if (off.length) log(`  dropped off the landmass: ${off.map(u => u.regionName).join(', ')}`);
   const rawUnits = merged.filter(u => !isEmpty(u));
-  // A shared state's counties go only to its own (and joined) franchises; whole states to anyone.
-  const allowed = (club, unit) => !shared.has(unit.region) || unit.region === regionOf[club] || joinedTo(unit.region).includes(regionOf[club]);
-  const { shift, units, adjacency, topo: unitTopo, homes, homeOf, located, dropped, splits, sourceUnits, sourceAreaKm2, owner } = partitionCountry(
+  // A franchise takes only its own state, and the states the league joins to it.
+  const allowed = (club, unit) => unit.region === regionOf[club] || joinedTo(unit.region).includes(regionOf[club]);
+  const { shift, units, topo: unitTopo, homes, homeOf, located, dropped, splits, sourceUnits, sourceAreaKm2, owner } = partitionCountry(
     rawUnits, rawHomes, { sections: n, joinKm: JOIN_KM, allowed, spare: true, log, ...(league.maxGapKm ? { maxGapKm: league.maxGapKm } : {}) });
   if (shift) throw new Error('The map crosses the antimeridian');
   const unlocated = clubs.filter((_, i) => !homeOf[i] || located[i].status === 'discarded').map(c => c.name);
   if (unlocated.length) throw new Error(`Arenas off the map: ${unlocated.join(', ')}`);
 
-  // Projection: circular-mean meridian, standard parallel through the main landmass.
-  const { comp, count } = components(adjacency);
-  const compArea = new Array(count).fill(0);
-  units.forEach((u, i) => { compArea[comp[i]] += u.area; });
-  const main = compArea.indexOf(Math.max(...compArea));
-  const mainBox = bboxOf(units.filter((_, i) => comp[i] === main).flatMap(u => u.polys));
+  // Projection: circular-mean meridian, standard parallel through the middle of the territories
+  // (empty states leave them no one landmass to measure).
+  const mainBox = bboxOf(units.flatMap(u => u.polys));
   const projection = { lon0: fixed(round(circularMeanLon(units.map(u => [u.centroid[0], u.area])))), lat0: fixed(round((mainBox[1] + mainBox[3]) / 2)) };
 
   const ids = clubs.map((_, i) => `${mapId}-${String(i + 1).padStart(3, '0')}`);
@@ -464,7 +459,7 @@ async function build({ source, log, spec, league }) {
   if (landSplit.length) log(`  split on land: ${landSplit.join(', ')}`);
   log(`  ${sourceUnits} units -> ${n} territories; dropped ${dropped.length} overseas units; ${splits.length} units split for shared cities`);
   const strays = units.filter((u, k) => !allowed(owner[k], u));
-  if (strays.length) throw new Error(`Counties of a shared state went to another state's franchise: ${strays.map(u => u.name).join(', ')}`);
+  if (strays.length) throw new Error(`Land of a state went to another state's franchise: ${strays.map(u => u.name).join(', ')}`);
   clubs.forEach((c, i) => {
     const km = kmToPolys(homes[i], sectionPolys[i]);
     const held = units.filter((_, k) => owner[k] === i);

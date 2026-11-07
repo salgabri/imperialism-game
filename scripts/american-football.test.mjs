@@ -305,8 +305,15 @@ test('New York City is a New York team\'s, upstate the Bills\', and the shared s
   assert.equal(sectionAt([-74.48, 40.86]), home('nfl-new-york-jets'), 'Morris County, New Jersey');
   assert.equal(sectionAt([-118.6, 34.2]), home('nfl-los-angeles-rams'), 'the San Fernando Valley');
   assert.equal(sectionAt([-117.16, 32.72]), home('nfl-los-angeles-chargers'), 'San Diego, the Chargers\' old home');
-  assert.equal(sectionAt([-104.82, 41.14]), home('nfl-denver-broncos'), 'Cheyenne');
+  assert.equal(sectionAt([-77.02, 38.91]), home('nfl-washington-commanders'), 'Washington, D.C., beside the Commanders\' stadium in Maryland');
+  assert.equal(sectionAt([-76.61, 39.4]), home('nfl-baltimore-ravens'), 'Towson, Maryland');
+  assert.equal(sectionAt([-104.82, 38.83]), home('nfl-denver-broncos'), 'Colorado Springs');
+  assert.equal(sectionAt([-104.82, 41.14]), null, 'Cheyenne: Wyoming has no club');
+  assert.equal(sectionAt([-72.68, 41.76]), null, 'Hartford: Connecticut has no club');
   assert.equal(sectionAt([-149.9, 61.22]), null, 'Alaska is nobody\'s');
+  assert.deepEqual(DOC.topology.objects.empty.geometries.map(g => g.properties.name).sort(), ['Alabama', 'Arkansas', 'Connecticut', 'Delaware', 'Idaho',
+    'Iowa', 'Kansas', 'Kentucky', 'Maine', 'Mississippi', 'Montana', 'Nebraska', 'New Hampshire', 'New Mexico', 'North Dakota', 'Oklahoma', 'Oregon',
+    'Rhode Island', 'South Carolina', 'South Dakota', 'Utah', 'Vermont', 'Virginia', 'West Virginia', 'Wyoming'], 'every state without a franchise');
 });
 
 test('seeded duel campaigns on the NFL map reach a champion', () => {
@@ -337,7 +344,7 @@ test('setup lists American football as a third sport with clubs only, on its bui
   assert.equal(model.clubsOnly, 'NFL');
   assert.deepEqual(model.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:nfl', 'NFL', 32]]);
   assert.equal(model.scopeName, 'NFL · USA');
-  assert.match(model.countryNote, /lead the 32 NFL clubs, each starting on the land nearest its stadium: USA split into 32 territories along state lines\./);
+  assert.match(model.countryNote, /lead the 32 NFL clubs fighting over the USA, each starting with only its stadium's state\. A state with several clubs is divided between them; one with none stays empty\./);
   assert.deepEqual(model.season.options.map(option => option.name), ['2026']);
   assert.equal(buildSetupModel({ sport: 'football' }, {}).clubsOnly, null);
 });

@@ -72,7 +72,7 @@ function routeLine(ctx, aId, dId, route) {
   if (isNeighbor === undefined && ctx?.board?.geo?.adj && ctx.board.own) {
     try { isNeighbor = empireNeighbors(ctx.board, aId).has(dId); } catch { isNeighbor = undefined; }
   }
-  return routeCopy({ routeKind: source.routeKind, isNeighbor }) || null;
+  return routeCopy({ routeKind: source.routeKind, isNeighbor }, { openLand: Boolean(ctx?.board?.openLand) }) || null;
 }
 
 /** Both sides of a fixture's win chance from the attacker's probability (shared: format.js formatOddsPair). */
@@ -339,7 +339,7 @@ export function buildFronts(st, ctx = {}, { limit = 5, reach = null } = {}) {
       return {
         nameHeading: clubs ? 'Club' : 'Nation',
         rows,
-        note: !land.length && rows.length ? reachNote(pool.filter(entry => rows.some(row => row.teamId === entry.tid))) : null,
+        note: !land.length && rows.length ? reachNote(pool.filter(entry => rows.some(row => row.teamId === entry.tid)), Boolean(board.openLand)) : null,
         empty: rows.length ? null : 'No rival is within reach.',
       };
     });
@@ -352,14 +352,14 @@ export function buildFronts(st, ctx = {}, { limit = 5, reach = null } = {}) {
 }
 
 /**
- * The note under a fronts table without a land tier (DEC D4): direct sea strikes, or the fallback tier's coastal
- * sea routes, neutral transit treaties and (an exclave on a country map) crossings of foreign land that is never
- * claimed — the copy names the route kinds actually present.
+ * The note under a fronts table without a land tier (DEC D4): direct sea strikes (over open ground on a map with
+ * empty land), or the fallback tier's coastal sea routes, neutral transit treaties and (an exclave on a country map)
+ * crossings of foreign land that is never claimed — the copy names the route kinds actually present.
  */
-function reachNote(entries) {
+function reachNote(entries, openLand = false) {
   const kinds = new Set(entries.map(entry => (['neutral-transit', 'foreign-transit'].includes(entry.routeKind) ? entry.routeKind : 'sea')));
   const by = [kinds.has('sea') || !kinds.size ? 'sea' : null, kinds.has('neutral-transit') ? 'transit treaty' : null].filter(Boolean);
-  const ways = [...by.map((way, i) => (i ? way : `by ${way}`)), ...(kinds.has('foreign-transit') ? ['across foreign land'] : [])];
+  const ways = [...by.map((way, i) => (way === 'sea' && openLand ? 'over open ground' : i ? way : `by ${way}`)), ...(kinds.has('foreign-transit') ? ['across foreign land'] : [])];
   const list = ways.length > 1 ? `${ways.slice(0, -1).join(', ')} or ${ways[ways.length - 1]}` : ways[0];
   return `No land border · these rivals are reached ${list}`;
 }

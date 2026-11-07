@@ -833,9 +833,9 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const note = document.getElementById('setup-theatre-description')?.textContent.trim() || '';
   const fewer = Math.floor(sections / entry.clubs), more = Math.ceil(sections / entry.clubs);
   const share = sections === entry.clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
-  // A sport's own map (the NBA's, the NFL's) names its league and splits the land around the arenas or stadiums.
+  // A sport's own map (the NBA's, the NFL's) names its league, each club holding the state of its arena or stadium.
   result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.league
-    ? `the ${entry.clubs} ${entry.league} clubs, each starting on the land nearest its ${entry.venue || 'arena'}: ${entry.name} split into ${sections} territories along ${entry.lines || 'state and province'} lines.`
+    ? `the ${entry.clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines === 'state' ? 'state' : 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
     : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
   // Step 1's country card: every section in its starting club's pastel (the card has no ids, so compare the fills

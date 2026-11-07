@@ -1,8 +1,8 @@
 // The NBA's own map (docs/design/domestic-campaigns.md, "The NBA map"): public/domestic/nba.json against
-// its index, its arenas and the game's basketball clubs; the USA and Canada are its only land, split along
-// state and province lines, with the states and provinces far from every arena left empty; neighbours across
-// their border share it; seeded campaigns on the app's board reach a champion; and the running App plays
-// basketball clubs there while a world NBA save stays on the world.
+// its index, its arenas and the game's basketball clubs; the USA and Canada are its only land, each franchise
+// holding its own state or province, with those shared divided between their franchises and every other left
+// empty; neighbours across their border share it; seeded campaigns on the app's board reach a champion; and the
+// running App plays basketball clubs there while a world NBA save stays on the world.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -13,9 +13,11 @@ import { CLUBS } from '../src/data/clubs.basketball.js';
 import { buildClub, makeRng, teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { decodeDomestic, domesticSurroundings } from '../src/engine/domestic.js';
-import { territories, validateReachability } from '../src/engine/campaign.js';
+import { empireNeighbors, territories, validateReachability } from '../src/engine/campaign.js';
 import { createDuelDraw } from '../src/engine/duelDraw.js';
 import { createAttackRouteIndex, routeLandCrossings } from '../src/engine/attackRoutes.js';
+import { reachableTargets } from '../src/engine/turns.js';
+import { buildFronts } from '../src/viewModels/campaign.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { kmToPolys, pointInPolys, polysAreaKm2, polysOf } from './lib/domestic-partition.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
@@ -71,13 +73,15 @@ const emptyAt = point => EMPTY.find(g => pointInPolys(point, polysOf(feature(DOC
 test('the USA and Canada are all its land; empty states and the rest of the world lie beneath, never territory', () => {
   const total = geo.countries.reduce((sum, section) => sum + polysAreaKm2(section.polys), 0);
   assert.ok(Math.abs(total - DOC.boundaries.areaKm2) / DOC.boundaries.areaKm2 < 0.02, 'the sections cover the source units');
-  // Nothing south of Florida's keys or north of the 49th parallel's west (British Columbia and the Prairies are empty).
+  // Nothing south of Florida's keys or west of Oregon's coast (Alaska, British Columbia and Washington are empty).
   const lats = geo.countries.flatMap(section => section.polys.flatMap(poly => poly[0].map(([, lat]) => lat)));
   const lons = geo.countries.flatMap(section => section.polys.flatMap(poly => poly[0].map(([lon]) => lon)));
   assert.ok(Math.min(...lats) > 24 && Math.max(...lons) < -50 && Math.min(...lons) > -125);
-  // States and provinces whose centre lies over 1,000 km from every arena are nobody's.
-  assert.deepEqual(EMPTY.map(g => g.properties.name).sort(), ['Alaska', 'Alberta', 'British Columbia', 'Manitoba', 'Newfoundland and Labrador',
-    'Northwest Territories', 'Nunavut', 'Quebec', 'Saskatchewan', 'Yukon']);
+  // Every state and province without an arena is nobody's.
+  assert.deepEqual(EMPTY.map(g => g.properties.name).sort(), ['Alabama', 'Alaska', 'Alberta', 'Arkansas', 'British Columbia', 'Connecticut', 'Delaware', 'Idaho',
+    'Iowa', 'Kansas', 'Kentucky', 'Maine', 'Manitoba', 'Maryland', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Brunswick', 'New Hampshire',
+    'New Jersey', 'New Mexico', 'Newfoundland and Labrador', 'North Dakota', 'Northwest Territories', 'Nova Scotia', 'Nunavut', 'Prince Edward Island', 'Quebec',
+    'Rhode Island', 'Saskatchewan', 'South Carolina', 'South Dakota', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wyoming', 'Yukon']);
   const emptyIds = new Set(EMPTY.map(g => g.id));
   const { shapes, obstacles } = domesticSurroundings(ATLAS, MAP);
   const ids = new Set(shapes.map(shape => shape.id));
@@ -92,19 +96,20 @@ test('the USA and Canada are all its land; empty states and the rest of the worl
   assert.ok(touching.includes('Quebec') && touching.includes('Manitoba'), touching.join(', '));
 });
 
-test('a state or province goes whole to one franchise, or stays empty; shared states split between their own', () => {
+test('a state or province goes whole to its one franchise, or stays empty; shared states are divided between their own', () => {
   // Inland towns, clear of the simplified coasts.
   const sameState = {
-    Washington: [[-120.51, 46.6], [-117.43, 47.66]], Michigan: [[-84.55, 42.73], [-87.67, 46.49]],
+    Oregon: [[-121.31, 44.06], [-117.83, 44.78]], Michigan: [[-84.55, 42.73], [-87.67, 46.49]],
     Pennsylvania: [[-76.88, 40.27], [-79.99, 40.44]], Ohio: [[-82.99, 39.96], [-84.19, 39.76]], Georgia: [[-84.39, 33.75], [-83.63, 32.84]],
-    Montana: [[-108.5, 45.78], [-113.99, 46.87]], Illinois: [[-89.65, 39.8], [-89.22, 37.73]], Ontario: [[-80.99, 46.49], [-89.25, 48.38]],
+    Utah: [[-111.66, 40.23], [-113.58, 37.1]], Illinois: [[-89.65, 39.8], [-89.22, 37.73]], Ontario: [[-80.99, 46.49], [-89.25, 48.38]],
   };
   for (const [state, [a, b]] of Object.entries(sameState)) {
     assert.ok(sectionAt(a), `${state} is land of the map`);
     assert.equal(sectionAt(a), sectionAt(b), `${state} belongs to one franchise`);
   }
   for (const [place, point] of Object.entries({ Anchorage: [-149.9, 61.22], Kamloops: [-120.33, 50.67], Calgary: [-114.07, 51.05],
-    Winnipeg: [-97.14, 49.9], Montreal: [-73.57, 45.5] })) {
+    Winnipeg: [-97.14, 49.9], Montreal: [-73.57, 45.5], Yakima: [-120.51, 46.6], Billings: [-108.5, 45.78], Omaha: [-96.04, 41.26],
+    'St. Louis': [-90.27, 38.65], Richmond: [-77.44, 37.54], Hartford: [-72.68, 41.76], Trenton: [-74.76, 40.22], Charlottetown: [-63.4, 46.35] })) {
     assert.equal(sectionAt(point), null, `${place} is nobody's`);
     assert.ok(emptyAt(point), `${place} lies on empty land`);
   }
@@ -112,6 +117,33 @@ test('a state or province goes whole to one franchise, or stays empty; shared st
   const home = id => MAP.clubs.find(club => club.id === id).homeSection;
   for (const point of [[-73.8, 40.73], [-72.66, 40.92]]) assert.equal(sectionAt(point), home('b-brooklyn-nets'));
   for (const point of [[-73.86, 40.85], [-76.15, 43.05]]) assert.equal(sectionAt(point), home('b-new-york-knicks'));
+  // California's four, Texas's three and Florida's two hold all of their states between them, and nothing else.
+  const heldBy = (places, ids) => Object.entries(places).forEach(([place, point]) =>
+    assert.ok(ids.map(home).includes(sectionAt(point)), `${place} belongs to one of ${ids.join(', ')}`));
+  heldBy({ Fresno: [-119.79, 36.74], Redding: [-122.39, 40.59], Bakersfield: [-119.02, 35.37], 'San Bernardino': [-117.29, 34.11] },
+    ['b-golden-state-warriors', 'b-sacramento-kings', 'b-los-angeles-lakers', 'b-los-angeles-clippers']);
+  heldBy({ Odessa: [-102.37, 31.85], Amarillo: [-101.83, 35.2], Austin: [-97.74, 30.27], Tyler: [-95.3, 32.35] },
+    ['b-dallas-mavericks', 'b-houston-rockets', 'b-san-antonio-spurs']);
+  heldBy({ Tallahassee: [-84.28, 30.44], Gainesville: [-82.33, 29.65], 'Fort Myers': [-81.87, 26.64] }, ['b-miami-heat', 'b-orlando-magic']);
+  assert.equal(sectionAt([-77.03, 38.9]), home('b-washington-wizards'), 'the District of Columbia');
+  assert.equal(sectionAt([-76.61, 39.29]), null, 'Baltimore: Maryland has no franchise');
+});
+
+test('a franchise without a land neighbour reaches its rivals over open ground, and the words say so', () => {
+  const { obstacles } = domesticSurroundings(ATLAS, MAP);
+  const own = { ...MAP.startOwners }, aliveIds = MAP.clubs.map(club => club.id);
+  const board = { geo, routingPaths: geo.paths, own, aliveIds, obstacles, borderRoutes: true, openLand: true };
+  // The Wizards hold the District of Columbia alone: Maryland and Virginia around it are nobody's.
+  const id = 'b-washington-wizards';
+  assert.equal(empireNeighbors(board, id).size, 0, 'no land neighbour');
+  const reach = reachableTargets(board, id);
+  assert.ok(reach.length >= 3 && reach.every(entry => entry.tier === 'sea' && !entry.isNeighbor), 'rivals in reach all the same');
+  const st = { teams: Object.fromEntries(MAP.clubs.map(club => [club.id, buildClub(club, sport)])), own, aliveIds, settings: { layer: 'clubs' } };
+  const fronts = buildFronts(st, { board, geo, sport, managedId: id, followedId: null, drama: 6, cache: new Map() }, { reach });
+  assert.equal(fronts.note, 'No land border · these rivals are reached over open ground');
+  const model = buildSetupModel({ sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nba', role: 'manager', managedTeamId: id },
+    { managerTeams: [{ id, name: 'Washington Wizards', rating: 70, neighbours: [] }, { id: 'b-boston-celtics', name: 'Boston Celtics', rating: 80, neighbours: [] }] });
+  assert.equal(model.managed.fronts.emptyText, 'No land borders — every war crosses open ground.');
 });
 
 test('neighbours across the national border share it, and every pair of neighbours differs in colour', () => {
@@ -119,9 +151,8 @@ test('neighbours across the national border share it, and every pair of neighbou
   const across = id => [...geo.adj[sectionIds[MAP.clubs.findIndex(club => club.id === id)]]].map(name);
   // Toronto meets Minnesota by land and the Great Lakes franchises by river; Boston's Maine and New Brunswick are one territory.
   for (const city of ['Detroit', 'New York', 'Minneapolis']) assert.ok(across('b-toronto-raptors').includes(city), city);
-  const boston = geo.countries.find(section => section.id === MAP.clubs.find(club => club.id === 'b-boston-celtics').homeSection);
-  const mainland = boston.polys.reduce((best, poly) => (polysAreaKm2([poly]) > polysAreaKm2([best]) ? poly : best));
-  assert.ok(kmToPolys([-66.06, 45.27], [mainland]) === 0 && kmToPolys([-71.06, 42.36], [mainland]) <= 1, 'Saint John and Boston on one landmass');
+  assert.equal(sectionAt([-66.64, 45.96]), null, 'Fredericton: Boston holds Massachusetts, not New Brunswick');
+  assert.equal(emptyAt([-66.64, 45.96]), 'New Brunswick');
   const shared = neighbors(DOC.topology.objects.sections.geometries);
   shared.forEach((list, i) => list.forEach(j => assert.notEqual(DOC.clubs[i].col, DOC.clubs[j].col, `${name(sectionIds[i])} / ${name(sectionIds[j])}`)));
   for (const [id, list] of Object.entries(geo.adj)) for (const other of list) assert.notEqual(colourOf[id], colourOf[other]);
@@ -213,7 +244,7 @@ test('basketball clubs set up and launch on the NBA map; football clubs keep the
     assert.equal(app.domesticStatus().state, 'ready');
     assert.equal(ready.canLaunch, true);
     assert.equal(ready.scopeName, 'NBA · USA and Canada');
-    assert.match(ready.countryNote, /lead the 30 NBA clubs, each starting on the land nearest its arena: USA and Canada split into 30 territories/);
+    assert.match(ready.countryNote, /lead the 30 NBA clubs fighting over the USA and Canada, each starting with only its arena's state or province\. A state with several clubs is divided between them; one with none stays empty\./);
 
     app.startCampaign();
     const { state } = app;

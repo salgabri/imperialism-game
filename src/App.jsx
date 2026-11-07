@@ -445,13 +445,14 @@ export default class App extends React.Component {
   /**
    * The read-only view the campaign rules operate on. A country map adds the
    * neighbouring land as obstacles (never territory) and lets routes aim across
-   * shared borders; the world board is unchanged.
+   * shared borders, and a map with empty land says so (openLand: a route between
+   * territories may cross it, not only sea); the world board is unchanged.
    */
   board(state = this.state) {
     const routingPaths = this.displayGeo ? drawnPaths(this.displayGeo.paths, this.geo.countries) : this.geo.paths;
     const board = { geo: this.geo, routingPaths, own: state.own, aliveIds: state.aliveIds };
     const domestic = this.domesticMap();
-    return domestic ? { ...board, obstacles: this.surroundings(domestic).obstacles, borderRoutes: true } : board;
+    return domestic ? { ...board, obstacles: this.surroundings(domestic).obstacles, borderRoutes: true, ...(domestic.empty ? { openLand: true } : {}) } : board;
   }
 
   /** Neighbouring land of a country map, built once per map and fit (and freed with the map). */
