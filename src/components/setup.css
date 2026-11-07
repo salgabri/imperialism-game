@@ -307,18 +307,12 @@
 .setup-save__text .setup-save__refused { color:var(--loss); font-weight:600; }
 .setup-save__actions { margin-left:auto; flex:none; display:flex; align-items:center; gap:16px; }
 
-/* A challenge link's note and the daily campaign card (top of step 1; README §Sharing a campaign) */
-.setup-challenge, .setup-daily { padding:14px 18px; background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
-.setup-challenge { border-left:4px solid var(--opponent); }
-.setup-daily { display:flex; align-items:center; gap:16px; }
-.setup-daily[data-active] { border-left:4px solid var(--you); }
-.setup-challenge strong, .setup-daily__text strong {
-  display:block; font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--text-2);
+/* A challenge link's note (top of step 1; README §Sharing a campaign) */
+.setup-challenge { padding:14px 18px; background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); border-left:4px solid var(--opponent); }
+.setup-challenge strong {
+  display:block; font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--opponent);
 }
-.setup-challenge strong { color:var(--opponent); }
-.setup-challenge p, .setup-daily__text p { margin:4px 0 0; font:400 14px/1.4 var(--font-sans); color:var(--ink); }
-.setup-daily__text { min-width:0; }
-.setup-daily__play { margin-left:auto; flex:none; }
+.setup-challenge p { margin:4px 0 0; font:400 14px/1.4 var(--font-sans); color:var(--ink); }
 
 /* ---- Step 2: Rules of war (the draw) and step 3's opponent choice ---- */
 .rule-note {
@@ -512,9 +506,8 @@
   .setup-stat--small dd { font-size:16px; }
   .setup-stat + .setup-stat { padding-left:12px; }
   .setup-settings-fields { grid-template-columns:minmax(0, 1fr); }
-  .setup-save, .setup-confirmation, .setup-daily { flex-direction:column; align-items:stretch; gap:12px; }
+  .setup-save, .setup-confirmation { flex-direction:column; align-items:stretch; gap:12px; }
   .setup-save__actions { margin-left:0; justify-content:space-between; }
-  .setup-daily__play { margin-left:0; }
   .setup-pick__head { gap:14px; padding:18px; }
   .setup-pick__name { font-size:28px; }
   .setup-pick__stats > div { padding-left:18px; }

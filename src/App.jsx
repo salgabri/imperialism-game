@@ -27,7 +27,7 @@ import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/f
 import { buildMasthead } from './viewModels/masthead.js';
 import { skipAheadModel } from './viewModels/campaign.js';
 import { countryMapPreview, suggestedTeamId, theatreMapPreview } from './screens/setup/setupModel.js';
-import { challengeUrl, dailyLabel, dailySetup, dayOf, fieldedTeam, isDaily, readChallenge } from './screens/setup/challenge.js';
+import { challengeUrl, fieldedTeam, readChallenge } from './screens/setup/challenge.js';
 import { buildShareCard, shareLine } from './viewModels/shareCard.js';
 import { canDrawShareImage, deliverShareImage, drawShareCard } from './engine/shareImage.js';
 import { politicalFill } from './data/empireColours.js';
@@ -253,8 +253,6 @@ export default class App extends React.Component {
   pageBase = '';
   /** A challenge link's managed team, until its theatre's teams are known (settleChallengeTeam). */
   challengeTeam = null;
-  /** The day the daily campaign card offers ("2026-11-01"), taken when setup opens. */
-  dailyDay = dayOf(new Date());
   /** The results' share image: { key, file: Promise<File | null> } for the finished campaign on screen. */
   shareImage = null;
 
@@ -828,26 +826,6 @@ export default class App extends React.Component {
     });
   }
 
-  /**
-   * The setup's daily campaign card (README §Sharing a campaign): today's short setup and seed for the chosen sport.
-   * A team already chosen for the same field stays chosen; the setup then asks for one.
-   */
-  playDaily() {
-    const day = this.dailyDay;
-    this.challengeTeam = null;
-    this.setState(state => {
-      const setup = dailySetup(state.setup.sport, day);
-      const field = s => [s.sport, s.layer, s.layer === 'clubs' ? s.clubScope : s.scope, dataSetOf(s)].join('|');
-      const keep = state.setup.role === 'manager' && field(state.setup) === field(setup);
-      return { setup: { ...setup, managedTeamId: keep ? state.setup.managedTeamId : '' }, challenge: null };
-    }, () => {
-      if (this.state.phase !== 'setup') return;
-      this.showSetupMap();
-      this.showSetupSet();
-      this.requestSeasons();
-    });
-  }
-
   exportProgress() {
     const data = this.state.phase === 'setup' && this.saved ? this.saved
       : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState,
@@ -885,11 +863,6 @@ export default class App extends React.Component {
     const key = `${st.campaignId}|${st.matches}|${champ.id}`;
     if (this.shareImage?.key === key) return this.shareImage.file;
     const victory = this.victoryPanel();
-    const settings = st.initialSettings || st.settings;
-    // A daily set up before midnight and launched after it is the day before's.
-    const start = st.startedAt ? new Date(st.startedAt) : null;
-    const day = start ? [0, 1].map(back => dayOf(new Date(start.getFullYear(), start.getMonth(), start.getDate() - back)))
-      .find(candidate => isDaily(settings, candidate)) : null;
     const shapes = this.geo.countries.map(country => {
       const path = this.displayGeo?.paths[country.id] || this.geo.paths[country.id];
       return path ? { id: country.id, d: path.d, bbox: path.bbox } : null;
@@ -899,7 +872,7 @@ export default class App extends React.Component {
       // The colour the final map gives the champion: clay when it is the team you manage.
       fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill : politicalFill(champ.id),
       frame: this.viewFocus, seed: st.seed,
-      kicker: `${day ? `Daily campaign · ${dailyLabel(day)}` : 'Campaign complete'} · Round ${roman(st.round)}`,
+      kicker: `Campaign complete · Round ${roman(st.round)}`,
       line: shareLine(victory), site: typeof window !== 'undefined' ? window.location.host : '',
       mark: champ.kind === 'club' ? { kind: 'crest', url: clubLogoUrl(champ.id), code: champ.code, color: champ.col }
         : { kind: 'flag', url: flagUrl(champ.flagId ?? champ.id), code: champ.code, color: champ.col },
@@ -1402,7 +1375,6 @@ export default class App extends React.Component {
     this.cancelRestore();
     this.flowToken++;
     this.openingSeed = Date.now() >>> 0;
-    this.dailyDay = dayOf(new Date());
     this.challengeTeam = null;
     this.setupTeamsCache = null;
     this.showSetupMap(this.state.setup, true);
@@ -2329,7 +2301,6 @@ export default class App extends React.Component {
           initialStep={st.setupStep} suggestTeam={st.setupSuggest !== false}
           // Sharing (README §Sharing a campaign): the link names the seed this setup launches, even with a blank field.
           challenge={st.challenge} challengeLink={challengeUrl(this.pageBase, st.setup, this.setupSeed(st.setup))}
-          daily={{ label: dailyLabel(this.dailyDay), active: isDaily(st.setup, this.dailyDay) }} onDaily={() => this.playDaily()}
         />}
         {victory && !st.storageDialog && !st.exportText && !st.managerElimination && <VictoryOverlay {...victory} positionColors={sport.positionColors}
           // "View map" (and close): the final's automatic switch to the Match view is otherwise never undone.

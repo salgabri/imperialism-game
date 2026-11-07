@@ -201,10 +201,8 @@ manager of the theatre's favourite, with decisions from the first match.
    football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
    2025 back to 2021, with nations or with clubs on the map of their day. A
-   quick-resume card appears when a save exists. Below it, the **Daily campaign**
-   card offers today's campaign for the chosen sport. A page opened from a
-   challenge link shows a note about the link instead
-   ([Sharing a campaign](#sharing-a-campaign)).
+   quick-resume card appears when a save exists. A page opened from a challenge
+   link shows a note about the link ([Sharing a campaign](#sharing-a-campaign)).
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
@@ -581,16 +579,6 @@ setup asks for one. The note on step 1 lists what the link could not use. Other
 query keys (`?playtest`) are left alone, and the address stays as opened.
 `src/screens/setup/challenge.js` writes and reads links (`scripts/challenge-link.test.mjs`),
 and nothing in it draws from a campaign's random stream.
-
-**Daily campaign.** Step 1 offers today's campaign for the chosen sport: the Elite
-32 nations (American football: the NFL's 32 clubs) with Random draw, Fast-forward,
-the built-in season and the standard More rules, managed by you. **Play today's
-campaign** fills it in and moves on to Your role to pick a team. The seed is a
-hash of the sport and the player's calendar date (`dailySeed`, pinned by the
-tests), so everyone plays the same campaign that day and a new one from midnight.
-Your team, role, opponent choice and Show matches stay yours to change: it is
-still the daily. The card then reads "Today's campaign is set up", and its share
-image says "Daily campaign · Sunday 1 November".
 
 **Share image.** **Share image** on the final results makes a 1200×630 picture,
 drawn at twice that so it stays sharp on a phone. The final map is framed as the
@@ -1668,8 +1656,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |
 | `column-wiring`, `match-wiring`, `squad-wiring`, `conquest-wiring`, `ledger-wiring`, `map-wiring` | Each screen wired to the running App |
-| `challenge-link` | Challenge links written and read back, the fallback for unknown and stale values, and the daily seeds and setups |
-| `share-ui` | The share card, App's wiring of links, the daily campaign and the share image, and the setup and results controls |
+| `challenge-link` | Challenge links written and read back, and the fallback for unknown and stale values |
+| `share-ui` | The share card, App's wiring of links and the share image, and the setup and results controls |
 
 Domestic campaigns add `domestic-data`, `domestic-geometry`, `domestic-campaign`
 and `domestic-routing`, which `npm run test:domestic` also runs on their own.
