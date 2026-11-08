@@ -112,7 +112,7 @@ test('NRL: points, tries, goals, margins, golden point, the standings and who sc
 
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
   for (const [label, share] of [['NBA', report.nba.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins],
-    ['Davis Cup', report.davisCup.homeWins], ['NRL', report.nrl.homeWins]]) {
+    ['Davis Cup', report.davisCup.homeWins], ['Billie Jean King Cup', report.billieJeanKingCup.homeWins], ['NRL', report.nrl.homeWins]]) {
     assert.ok(Math.abs(share - 0.5) < 0.015, `${label} neutral: the defender won ${share}`);
   }
   for (const league of report.football) {
@@ -128,5 +128,6 @@ test('home sides: half the decided games at a neutral venue, their league\'s sha
   within(home.mlb.homeWins, REAL.mlb.homeWins, 'MLB home wins');
   within(home.nhl.homeWins, REAL.nhl.homeWins, 'NHL home wins');
   within(home.davisCup.homeWins, REAL.davisCup.homeWins, 'Davis Cup host wins');
+  within(home.billieJeanKingCup.homeWins, REAL.billieJeanKingCup.homeWins, 'Billie Jean King Cup host wins');
   within(home.nrl.homeWins, REAL.nrl.homeWins, 'NRL home wins');
 });

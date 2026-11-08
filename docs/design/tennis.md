@@ -3,7 +3,8 @@
 Status: implemented 2026-11-08. A seventh sport, played by the rules of the Davis Cup: two
 nations' teams meet in a tie of five rubbers, first to three. Nations only, on the world map:
 tennis has no clubs. Everything outside the match (territory, the draw, targeting,
-conquest, signings, saves) is the game's own, unchanged.
+conquest, signings, saves) is the game's own, unchanged. The women's game plays the same
+rules as the Billie Jean King Cup, a sport of its own ([women's tennis](womens-tennis.md)).
 
 The player chose the format and the data: the home-and-away ties' five rubbers (rather than
 the Final 8's three, or the old best-of-five sets), and Elo ratings only, with nothing
@@ -150,16 +151,19 @@ pair once a season, 40 seasons (4,800 ties):
 | --- | --- | --- |
 | Ties won 3–0 / 3–1 / 3–2 | 26.8% / 41.0% / 32.2% | — |
 | Rubbers to a third set | 36.0% | about 35% of the ATP's best-of-three matches |
-| Sets decided in a tie-break | 18.6% | — |
-| Sets won 6–0 | 1.6% | — |
+| Sets decided in a tie-break | 18.6% | 19.1% of the ATP's sets |
+| Sets won 6–0 | 1.6% | 2.0% of the ATP's sets |
 | Favourite wins the tie | 72.1% | — |
 | Host wins, Home advantage on | 58.1% (49.7% neutral) | 60.9% where Elo expected 53.1% |
 
 The rubber odds are Elo's by construction, so who wins a rubber is as well calibrated as
 Tennis Abstract's ratings are. The tie scores, the tie-break share and the favourites' share
 have no real figure here: real Davis Cup ties often play their dead rubbers, which hides when a
-tie was decided, and tennis-data.co.uk's match files (which would give the tour's set scores)
-were not downloaded.
+tie was decided. The tour's set scores come from Jeff Sackmann's match files, counted on
+2026-11-08 for the women's game (docs/design/womens-tennis.md): the ATP's 9,454 completed
+tour-level best-of-three matches of 2022–2025 went to a third set 35.9% of the time, and their
+sets to a tie-break 19.1% and 6–0 2.0%; its servers won 64.0% of their points and held 79.9% of
+their games, the serve the model plays.
 
 ## Tests
 
@@ -180,7 +184,8 @@ campaign of Europe with the live ticker.
   doubles.
 - The built-in season is 2026, as of Tennis Abstract's update of 2 November; the earlier
   seasons have their own limits (Earlier seasons, below).
-- Men only: the Billie Jean King Cup would take Tennis Abstract's women's Elo report.
+- Men only here: the women play the Billie Jean King Cup as a sport of their own, on these rules
+  with the WTA's serve ([women's tennis](womens-tennis.md)).
 - No surfaces: a host's choice of surface is in the home edge, not played. The snapshot keeps
   each player's hard, clay and grass Elo for that.
 - Players by the country Tennis Abstract files them under, not by Davis Cup nominations.

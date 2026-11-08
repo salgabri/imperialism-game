@@ -43,6 +43,12 @@ const SEED_HELP = 'Replays the same campaign with the same rules and choices. Le
 /** The team wall's cells: flags at 4:3, small enough to seat a world of nations; under a finger, a 44px square target. */
 const WALL = { ratio: 4 / 3, gap: 6, minCell: 34, maxCell: 104, touch: { ratio: 1, minCell: 44 } };
 
+/**
+ * The sport tiles' columns: up to four share a row, up to eight split into two even rows, and more into three (nine
+ * sports: three rows of three). Five across would squeeze "Basketball" out of its tile on a desktop's setup column.
+ */
+const sportColumns = count =>(count <= 4 ? count : count <= 8 ? Math.ceil(count / 2) : Math.ceil(count / 3));
+
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });
 }
@@ -569,7 +575,8 @@ export default function SetupOverlay({
               </div>
 
               <div className="setup-sports" role="radiogroup" aria-label="Sport"
-                style={{ '--sport-cols': model.sports.length > 4 ? Math.ceil(model.sports.length / 2) : model.sports.length }}>
+                data-rows={Math.ceil(model.sports.length / sportColumns(model.sports.length))}
+                style={{ '--sport-cols': sportColumns(model.sports.length) }}>
                 {model.sports.map(item => (
                   <div className="setup-card" data-checked={item.selected} key={item.id} title={item.note}>
                     <Icon name={item.id} size={22} className="setup-card__icon" />

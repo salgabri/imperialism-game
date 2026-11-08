@@ -70,7 +70,7 @@ test('each sport fields them where it can: generated where it generates players,
   const fields = Object.fromEntries(SPORT_LIST.filter(sport => !sport.clubsOnly)
     .map(sport => [sport.id, PACIFIC_ISLANDS.filter(id => fieldedNations(sport).includes(id))]));
   assert.deepEqual(fields, { football: [], 'womens-football': [], basketball: PACIFIC_ISLANDS.slice(), baseball: PACIFIC_ISLANDS.slice(),
-    hockey: PACIFIC_ISLANDS.slice(), tennis: [], 'rugby-league': PACIFIC_ISLANDS.slice() });
+    hockey: PACIFIC_ISLANDS.slice(), tennis: [], 'womens-tennis': [], 'rugby-league': PACIFIC_ISLANDS.slice() });
   for (const sportId of ['basketball', 'baseball', 'hockey']) {
     for (const id of PACIFIC_ISLANDS) {
       const team = buildTeam(id, makeRng(7), getSport(sportId));

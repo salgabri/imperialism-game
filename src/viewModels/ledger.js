@@ -1,7 +1,7 @@
 // Owner: WP-LEDGER (see PLAN.md §4). Ledger, Chronicle and Match-preview view-models (PLAN §3.6).
 // Pure: (state, ctx) in, plain data out. No window/document/timers/RNG. Tolerates loading/setup state
 // (teams {}, aliveIds [], board null), `stats: {}`, teams without baseEff and history entries without odds.
-import { DEPENDENCIES, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
+import { DEPENDENCIES, isTennisSport, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
 import { worldClubTheatreName } from '../data/scopes.js';
 import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
@@ -509,7 +509,7 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
       const pA = hockeyProfile(lineupA), pD = hockeyProfile(lineupD);
       rows = [['attack', 'Attack', pA.attack, pD.attack], ['defence', 'Defence', pA.defence, pD.defence],
         ['goaltending', 'Goaltending', pA.goaltending, pD.goaltending]];
-    } else if (sportId === 'tennis') {
+    } else if (isTennisSport(sportId)) {
       const pA = tennisProfile(lineupA), pD = tennisProfile(lineupD);
       rows = [['singles', 'Singles', pA.singles, pD.singles], ['doubles', 'Doubles', pA.doubles, pD.doubles]];
     } else if (sportId === 'rugby-league') {

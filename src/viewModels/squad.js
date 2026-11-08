@@ -1,6 +1,6 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Squad view-models (PLAN §3.6, C§16, DEC D8/D9).
 // Pure: no window/document/timers/RNG; tolerates missing teams, history, stats and baseEff.
-import { selectLineup, teamSportId } from '../data/teams.js';
+import { isTennisSport, selectLineup, teamSportId } from '../data/teams.js';
 import { ESTIMATE_TITLE, isEstimated } from '../data/estimates.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
@@ -29,8 +29,9 @@ const GROUPS = {
 const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5, CF: 6, RF: 7, DH: 8, SP: 9, RP: 10 },
   // Ice hockey's centre shares it too: the forwards, then the defence and the goalie.
   hockey: { C: 0, LW: 1, RW: 2, D: 3, G: 4 },
-  // A Davis Cup team: the singles, then the doubles.
+  // A Davis Cup (or Billie Jean King Cup) team: the singles, then the doubles.
   tennis: { SGL: 0, DBL: 1 },
+  'womens-tennis': { SGL: 0, DBL: 1 },
   // Rugby league numbers its thirteen from the back: the fullback, the outside backs, the halves, then the pack.
   'rugby-league': { FB: 0, WG: 1, CE: 2, FE: 3, HB: 4, PR: 5, HK: 6, SR: 7, LK: 8 } };
 const SPORT_GROUPS = {
@@ -38,6 +39,7 @@ const SPORT_GROUPS = {
     RF: 'Outfield', DH: 'Designated hitter', SP: 'Starting pitcher', RP: 'Bullpen' },
   hockey: { C: 'Centres', LW: 'Wings', RW: 'Wings', D: 'Defence', G: 'Goalie' },
   tennis: { SGL: 'Singles', DBL: 'Doubles' },
+  'womens-tennis': { SGL: 'Singles', DBL: 'Doubles' },
   'rugby-league': { FB: 'Outside backs', WG: 'Outside backs', CE: 'Outside backs', FE: 'Halves', HB: 'Halves', PR: 'Front row',
     HK: 'Front row', SR: 'Back row', LK: 'Back row' },
 };
@@ -80,6 +82,7 @@ const SLOTS = {
   },
   // Tennis: the No. 1 and No. 2 at the near baseline, the doubles pair in the far half, across the net.
   tennis: { SGL: [[30, 82], [70, 82]], DBL: [[30, 22], [70, 22]] },
+  'womens-tennis': { SGL: [[30, 82], [70, 82]], DBL: [[30, 22], [70, 22]] },
   // The pack up front, attacking the try line at the top: the front row, the back row behind it, then the halves, the
   // centres and wings across the field and the fullback at the back. Each position's best starts; the rest of the 17 sit
   // on the interchange bench along the foot of the box.
@@ -97,6 +100,7 @@ const LAYOUTS = {
   baseball: { layout: 'diamond', viewLabel: 'Diamond' },
   hockey: { layout: 'rink', viewLabel: 'Rink' },
   tennis: { layout: 'tennis', viewLabel: 'Court' },
+  'womens-tennis': { layout: 'tennis', viewLabel: 'Court' },
   'rugby-league': { layout: 'rugby', viewLabel: 'Field' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
@@ -178,7 +182,7 @@ export function strengthProfile(lineup, sportId) {
         ? (({ batting, pitching, fielding }) => [['batting', 'Batting', batting], ['pitching', 'Pitching', pitching], ['fielding', 'Fielding', fielding]])(baseballProfile(lineup))
         : sportId === 'hockey'
           ? (({ attack, defence, goaltending }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goaltending', 'Goaltending', goaltending]])(hockeyProfile(lineup))
-          : sportId === 'tennis'
+          : isTennisSport(sportId)
             ? (({ singles, doubles }) => [['singles', 'Singles', singles], ['doubles', 'Doubles', doubles]])(tennisProfile(lineup))
           : sportId === 'rugby-league'
             ? (({ backs, halves, forwards }) => [['backs', 'Backs', backs], ['halves', 'Halves', halves], ['forwards', 'Forwards', forwards]])(rugbyLeagueProfile(lineup))
@@ -329,7 +333,7 @@ function computeSquad(st, ctx, team) {
   };
 
   // Tennis lists every place, a singles player who doubles in the doubles twice (a small nation's).
-  const placed = sportId === 'tennis' ? lineup.slots.filter(slot => slot.player).map(slot => slot.player) : lineup.starters;
+  const placed = isTennisSport(sportId) ? lineup.slots.filter(slot => slot.player).map(slot => slot.player) : lineup.starters;
   const starters = sortByPosition(placed, player => player.assignedPos || player.pos, sportId);
   const starterRows = starters.map((player, i) => rowOf(player, i, true));
   const groups = [];

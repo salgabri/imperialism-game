@@ -57,6 +57,7 @@ const SCENARIOS = [
   { name: "WOMEN'S FOOTBALL · Europe · duel · ticker", sport: 'womens-football', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
   { name: "WOMEN'S CLUBS · NWSL · blitz · instant", sport: 'womens-football', layer: 'clubs', clubScope: 'NWSL', pacing: 'blitz', resolution: 'instant' },
   { name: 'TENNIS · Europe · duel · ticker', sport: 'tennis', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
+  { name: "WOMEN'S TENNIS · World · blitz · instant", sport: 'womens-tennis', scope: 'world', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NRL · duel · ticker', ...NRL, pacing: 'duel', resolution: 'ticker' },
   { name: 'RUGBY LEAGUE · Asia & Oceania · blitz · instant', sport: 'rugby-league', scope: 'AFC', pacing: 'blitz', resolution: 'instant' },
 ];
@@ -629,12 +630,13 @@ if (!filtered && fixedChecks) {
 // Rosters are generated from a dataset that is not committed, so verify the
 // committed output still builds a legal XI for every nation on the map.
 if (!filtered && fixedChecks) {
-  const { NATIONS, buildTeam, makeRng, teamEff } = await import('../src/data/teams.js');
+  const { NATIONS, buildTeam, isTennisSport, makeRng, teamEff } = await import('../src/data/teams.js');
   const { SPORT_LIST } = await import('../src/sports/index.js');
   const { fieldedNations } = await import('../src/engine/footballSets.js');
   const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'],
     baseball: ['United States', 'Dominican Rep.', 'Venezuela', 'Cuba'], hockey: ['Canada', 'United States', 'Sweden', 'Russia'],
     'womens-football': ['Spain', 'England', 'France', 'Germany'], tennis: ['Spain', 'Italy', 'United States', 'Germany'],
+    'womens-tennis': ['United States', 'Russia', 'Czechia', 'Ukraine'],
     'rugby-league': ['Australia', 'New Zealand', 'England', 'Fiji'] };
 
   for (const sport of SPORT_LIST) {
@@ -664,8 +666,8 @@ if (!filtered && fixedChecks) {
       // Tennis invents nobody either: a nation needs two rated players, and a team of two or three plays its singles
       // players in the doubles too.
       const fielded = sport.id === 'womens-football' ? teams.filter(t => t.real >= size)
-        : sport.id === 'tennis' ? teams.filter(t => t.real >= 2) : teams;
-      const full = t => (sport.id === 'tennis' ? lineupOf(t).slots.every(slot => slot.player)
+        : isTennisSport(sport.id) ? teams.filter(t => t.real >= 2) : teams;
+      const full = t => (isTennisSport(sport.id) ? lineupOf(t).slots.every(slot => slot.player)
         : t.squad.length > size ? lineupOf(t).slots.every(natural) : t.squad.length === size);
       check('every nation fields a full lineup', fielded.length > 20 && fielded.every(full), 'short squad');
       check('no roster for an unknown nation', strays.length === 0, strays.join(', '));
@@ -766,7 +768,7 @@ if (!filtered && fixedChecks) {
       check('the feed adds up to the final score', evTotals, 'event totals mismatch');
       const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], baseball: [2, 10], 'womens-football': [0.6, 3.5], hockey: [1.5, 5.5],
         // Rubbers: the winner's three and the loser's none to two.
-        tennis: [1.5, 2.5], 'rugby-league': [12, 35] }[sport.id];
+        tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35] }[sport.id];
       check('scoring is in the right range for the sport', mean > low && mean < high, `mean ${mean.toFixed(1)}`);
       console.log(`    400 matches · mean score ${mean.toFixed(1)} · ${results.filter(r => r.tie).length} needed ${sport.labels.tie.toLowerCase()}`);
     } catch (e) {

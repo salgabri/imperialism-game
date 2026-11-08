@@ -120,7 +120,7 @@ players, never the bench.
 ## Statistical verification
 
 The checked-in [report](match-simulation-report.json) samples 200,000 outcomes per
-pairing, thirty-two million outcomes over the eight sports, plus 10,000 complete
+pairing, thirty-six million outcomes over the nine sports, plus 10,000 complete
 timelines a sport for timing. It covers three uncertainty settings, five rating
 gaps, equal teams and four pairings a sport built from national rosters, so its
 basketball figures are FIBA's. These equal-team results use 75-rated starters and
@@ -151,7 +151,9 @@ each of its rubbers, and 99.87% and 88.71% in rugby league. Rugby league is the 
 NRL clubs within 3.3 points of each other, while the NRL's standings spread as widely as the NFL's, so each rating point
 must count for more ([rugby-league.md](rugby-league.md#the-match-model)). Increasing uncertainty raises upset chances while retaining a
 meaningful strength advantage. Women's football plays football's model, so on the
-same 75-rated lineups its figures match football's within sampling error.
+same 75-rated lineups its figures match football's within sampling error. Women's tennis plays tennis's model at the
+WTA's serve, which moves only the games inside a set, so its figures match tennis's too (equal teams 50.02%, a
+ten-point favourite 94.36%, 94.78% Predictable and 87.85% Wild).
 
 Historical reference anchors inform broad scoring targets: Qatar 2022 recorded 172
 goals in 64 matches, or 2.69 per match, according to
@@ -169,7 +171,8 @@ seasons with the built-in clubs at Balanced: double round robins of Europe's top
 five football leagues, 82-game NBA seasons, 17-game NFL seasons, 162-game MLB
 seasons, 82-game NHL seasons and 24-game NRL seasons (17 clubs, a bye each round), the attacker and defender
 drawn as the round robin falls. Tennis has no league: the sixteen strongest nations play each other once a season,
-in Davis Cup ties ([tennis.md](tennis.md) has its table). Football's club layer keeps only Europe's 124 strongest clubs, so each league
+in Davis Cup ties, and the women's in Billie Jean King Cup ties ([tennis.md](tennis.md) and
+[womens-tennis.md](womens-tennis.md) have their tables). Football's club layer keeps only Europe's 124 strongest clubs, so each league
 plays whole: its clubs come from the same EA FC 27 snapshot, with the XIs the club
 layer gives them (`scripts/lib/first-divisions.mjs`). It sets each
 measure beside the real league's range over recent seasons; `REAL` in the script
@@ -300,6 +303,7 @@ sides win at home about as often as home sides do in the sport's league:
 | Rugby league | ±0.08 in log try rate: 3.5 points a game | 0.6 | 58% | 53.6–58.9% |
 | Women's football | Football's | 2 | 45–46% in 90 minutes over each league's pairings, 56–58% after the shoot-out | 41.7–47.7% in 90 minutes (four leagues, one season each) |
 | Tennis | 1.8 rating points (45 Elo) in a singles rubber, 0.7 in the doubles | 1.6 | 60% of ties | Davis Cup hosts won 60.9% of World Group ties where Elo expected 53.1% |
+| Women's tennis | Tennis's | 1.6 | 60% of ties | none found for the Billie Jean King Cup: the Davis Cup's |
 
 "Worth" is the rating advantage an attacker needs for an even match against a home
 defender; a manager's Attack approach adds 0.6 rating points, plus up to 1.2 for
@@ -310,7 +314,8 @@ seasons) put every league's home sides inside the real range: 44.7–46.0% home 
 in ninety minutes across the five football leagues (40.8% in the 2024/25 Premier
 League to 47.9% in the 2022/23 La Liga, from FootballRates and Statista), 55.9% in
 the NBA, 53.4% in the NFL, 53.1% in MLB, 54.6% in the NHL and 57.2% in the NRL, and Davis Cup hosts among the sixteen
-strongest tennis nations win 58.1% of their ties (49.7% at a neutral venue; [tennis.md](tennis.md)). Every other measure
+strongest tennis nations win 58.1% of their ties (49.7% at a neutral venue; [tennis.md](tennis.md)), Billie Jean King
+Cup hosts 56.3% (50.2%; [womens-tennis.md](womens-tennis.md)). Every other measure
 stays in its range, bar two of the NHL's: wins by three or more stay a little low
 (38.3%) and wins by five or more edge over the top (6.7%, real 5.5–6.5%). Football's
 draws stay at 23–25%. `scripts/simulation-realism.test.mjs` checks the
@@ -334,10 +339,13 @@ campaigns:
 | Women's football | 46.8% → 40.6% | 59% → 59% | 18% → 20% | 5.8 → 5.9 | 20 → 22 |
 | Ice hockey | 44.3% → 41.4% | 97% → 96% | 31% → 31% | 2.5 → 2.6 | 7 → 7 |
 | Tennis | 46.9% → 40.9% | 75% → 75% | 36% → 40% | 4.3 → 4.2 | 21 → 20 |
+| Women's tennis | 45.4% → 39.7% | 73% → 70% | 29% → 25% | 4.6 → 5.1 | 18 → 20 |
 
 Women's football's elite 32 are its strongest rated nations, and England, Spain and
 the United States take 9–17% of the titles each. Tennis's are its 32 strongest nations; Italy (Sinner, 96)
-and Spain (Alcaraz, 91) take about 62% of the titles between them. Ice hockey's are its 16 NHL nations
+and Spain (Alcaraz, 91) take about 62% of the titles between them. Women's tennis's are its 32 strongest of 45: the
+United States (Gauff 89, Pegula 88) take 25–29%, then Russia, Ukraine, Czechia and Poland 8–16% each (measured
+2026-11-08 with `probeCampaign`, which reproduced the men's row to the decimal the same day). Ice hockey's are its 16 NHL nations
 and 16 minnows at the baseline of 45, so its titles stay at the top: the United
 States, Canada and Russia win 23–31% each, and the champion started in the top five
 in 96–97% of campaigns. The probe has routed over the App's merged map since these
@@ -378,11 +386,12 @@ balance decision, not a realism one.
 
 ## Performance and reproduction
 
-The recorded Windows Node 26 run sampled approximately 4.7 million prepared
-football outcomes per second, 3.2 million basketball ones, 1.2 million ice hockey
-ones and 5.1 million tennis ones. Complete timelines ran at approximately 69,000 football, 57,000 basketball,
-9,600 hockey and 1,400 tennis matches per second: a tie plays every rubber game by game. A fresh 1,024-sample
-odds estimate took 1.09 ms for football, 0.38 ms for basketball, 2.69 ms for hockey and 0.76 ms for tennis. These are local timing observations, separate from live ticker
+The recorded Windows Node 26 run sampled approximately 5.0 million prepared
+football outcomes per second, 4.2 million basketball ones, 1.8 million ice hockey
+ones and 6.8 million tennis ones (6.2 million women's tennis). Complete timelines ran at approximately 71,000
+football, 74,000 basketball, 14,700 hockey and 1,900 tennis matches per second (1,700 women's tennis): a tie plays
+every rubber game by game. A fresh 1,024-sample odds estimate took 1.02 ms for football, 0.27 ms for basketball,
+1.79 ms for hockey and 0.69 ms for tennis. These are local timing observations, separate from live ticker
 presentation delays, and are not timing requirements in the tests.
 
 All randomness comes from the injected campaign generator. Identical seeds,
@@ -390,8 +399,8 @@ settings, model version and manager choices reproduce campaigns. RNG state
 resumes from saves; existing generated match outcomes remain stored. Football,
 FIBA basketball and American football have simulation version 3, NBA basketball
 version 5 and baseball version 2 (the realism pass above; American football's
-version 3 added its touchdown tries and safeties). Ice hockey, women's football and
-tennis are at version 1. Club campaigns played
+version 3 added its touchdown tries and safeties). Ice hockey, women's football,
+tennis and women's tennis are at version 1. Club campaigns played
 FIBA rules before NBA version 3, and version 3 played every season at one pace.
 New results from an older seed can differ after upgrading the model.
 

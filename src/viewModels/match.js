@@ -2,7 +2,7 @@
 // Pure: no window/document/timers/RNG. The live minute is NOT read here (it lives in the minute store, DEC D7);
 // components pass it to buildFeedRows and to the win-probability series.
 import { clockLabel, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeText } from '../sports/index.js';
-import { selectLineup } from '../data/teams.js';
+import { isTennisSport, selectLineup } from '../data/teams.js';
 import { isEstimated } from '../data/estimates.js';
 import { BENCH } from '../sports/basketball.js';
 import { PERIOD_MODEL } from '../sports/hockey.js';
@@ -18,6 +18,7 @@ const GROUPS = {
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP'],
   hockey: ['C', 'LW', 'RW', 'D', 'G'],
   tennis: ['SGL', 'DBL'],
+  'womens-tennis': ['SGL', 'DBL'],
   'rugby-league': ['FB', 'WG', 'CE', 'FE', 'HB', 'PR', 'HK', 'SR', 'LK'],
 };
 
@@ -48,7 +49,7 @@ function oddsOf(odds) {
 export function scorersLine(shown, teamId, teams, sportId = 'football') {
   const own = (Array.isArray(shown) ? shown : []).filter(e => e && e.tid === teamId && e.name);
   if (!own.length) return '';
-  if (sportId === 'tennis') return own.filter(e => Number(e.pts) > 0).map(e => shortName(e.name)).join(' · ');
+  if (isTennisSport(sportId)) return own.filter(e => Number(e.pts) > 0).map(e => shortName(e.name)).join(' · ');
   if (sportId === 'hockey') {
     const totals = new Map();
     for (const e of own) if (Number(e.m) <= PERIOD_MODEL.MINUTES + PERIOD_MODEL.OVERTIME) totals.set(e.name, (totals.get(e.name) || 0) + 1);
@@ -123,7 +124,7 @@ function xiTable(team, st, sportId) {
   const groups = GROUPS[sportId] || GROUPS.football;
   const rank = pos => { const i = groups.indexOf(pos); return i < 0 ? groups.length : i; };
   // Tennis lists every place: a small nation's singles player who plays the doubles too is there twice.
-  const tennis = sportId === 'tennis';
+  const tennis = isTennisSport(sportId);
   const placed = tennis ? (lineup.slots || []).filter(slot => slot.player).map(slot => slot.player) : (lineup.starters || []);
   const rows = placed.map((p, i) => ({ p, i, pos: p.assignedPos || p.pos || '' }))
     .sort((x, y) => rank(x.pos) - rank(y.pos) || (Number(y.p.rating) || 0) - (Number(x.p.rating) || 0) || x.i - y.i)
