@@ -16,7 +16,6 @@ function StrengthCell({ eff, effGain, delta }) {
         {positive && <span key={text} className="fi-strength-gain" data-testid="standing-strength-gain"
           aria-label={`Gained ${text} overall strength since campaign start`}>{text}</span>}
         {negative && <span className="fi-standing-delta tone-loss" aria-label={`Lost ${text.slice(1)} overall strength since campaign start`}>{text}</span>}
-        {!positive && !negative && text && <span className="fi-standing-delta tone-muted" aria-hidden="true">{text}</span>}
       </span>
     </td>
   );

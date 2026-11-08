@@ -1,6 +1,8 @@
 // Owner: WP-SETUP (see PLAN.md §4). Three-step campaign setup (PLAN A-5): Campaign → Rules → Your role, in the
 // board-12 frame and v4 tokens. Every step stays mounted (inactive ones carry `hidden`) so the DOM contract of PLAN
 // §4.7 holds on every step: theatre, the draw and match settings, managed team and the `Launch campaign` submit button.
+// Compact pass (docs/design/compact-pass.md): every step fits the window. Controls say what they are by their faces, the
+// explanations live in `title` and for screen readers, and the team list is a wall of flags that pages only if it must.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
@@ -8,6 +10,8 @@ import ShareCampaign from './ShareCampaign.jsx';
 import TeamMark from './TeamMark.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
 import AdSlot from './AdSlot.jsx';
+import Pager from './Pager.jsx';
+import { useFitWall } from '../hooks/useFit.js';
 import * as setupModel from '../screens/setup/setupModel.js';
 import { challengeNote } from '../screens/setup/challenge.js';
 import { themedPaint } from '../theme.js';
@@ -21,7 +25,7 @@ export const campaignPreview = setupModel.campaignPreview;
 export const domesticDescription = setupModel.domesticDescription;
 
 const {
-  SETUP_STEPS, DRAW_CARDS, TARGETING_CARDS, ROLE_CARDS, CONQUEST_RULES, UNCERTAINTY_OPTIONS, UNCERTAINTY_HELP, FINALE_OPTIONS,
+  SETUP_STEPS, DRAW_CARDS, TARGETING_CARDS, ROLE_CARDS, UNCERTAINTY_OPTIONS, UNCERTAINTY_HELP, FINALE_OPTIONS,
   FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, HOME_OPTIONS, HOME_HELP, SHOW_MATCH_OPTIONS,
   showMatchesWrites,
 } = setupModel;
@@ -35,14 +39,12 @@ const IDLE_DOMESTIC = Object.freeze({ state: 'idle', message: null });
 /** App's Season state with no data sets listed or chosen (`seasonStatus()` shape, without `onRetry`). */
 const IDLE_SEASON = Object.freeze({ sets: NO_TEAMS, state: 'idle', message: null, sport: null });
 
+const SEED_HELP = 'Replays the same campaign with the same rules and choices. Leave blank for a new one.';
+/** The team wall's cells: flags at 4:3, small enough to seat a world of nations; under a finger, a 44px square target. */
+const WALL = { ratio: 4 / 3, gap: 6, minCell: 34, maxCell: 104, touch: { ratio: 1, minCell: 44 } };
+
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });
-}
-
-/** Centre a list's checked row inside the list's own scroll box only (scrollIntoView would also scroll the page). */
-function centreChecked(list) {
-  const row = list?.querySelector?.('[aria-checked="true"]');
-  if (row) list.scrollTop += row.getBoundingClientRect().top - list.getBoundingClientRect().top - (list.clientHeight - row.offsetHeight) / 2;
 }
 
 function CheckMark() {
@@ -65,23 +67,6 @@ function moveRadio(event) {
   event.preventDefault();
   radios[nextIndex].focus();
   if (radios[nextIndex] !== event.currentTarget) radios[nextIndex].click();
-}
-
-/** Type-ahead for long radio lists: a letter jumps to the next name starting with it. */
-function typeAhead(event) {
-  if (event.key.length !== 1 || event.key === ' ' || event.altKey || event.ctrlKey || event.metaKey) return;
-  const radios = [...event.currentTarget.querySelectorAll('[role="radio"]')];
-  const start = radios.indexOf(event.target);
-  const letter = event.key.toLowerCase();
-  for (let offset = 1; offset <= radios.length; offset += 1) {
-    const radio = radios[(start + offset) % radios.length];
-    if ((radio.dataset.name || '').toLowerCase().startsWith(letter)) {
-      event.preventDefault();
-      radio.focus();
-      radio.click();
-      return;
-    }
-  }
 }
 
 function Kicker({ id, title, aside }) {
@@ -133,15 +118,13 @@ function SelectedTeam({ team, noun }) {
     <section className="setup-pick" aria-labelledby="setup-pick-name">
       <div className="setup-pick__head">
         <span className="setup-pick__flag" aria-hidden="true">
-          <TeamMark id={team.id} code={team.code} isClub={team.isClub} width={60} />
+          <TeamMark id={team.id} code={team.code} isClub={team.isClub} width={48} />
         </span>
         <div className="setup-pick__id">
           <p className="setup-pick__kicker">{team.suggested ? 'Suggested' : 'Selected'} {noun}</p>
-          <h3 className="setup-pick__name" id="setup-pick-name">{team.name}</h3>
-          <p className="setup-pick__meta">{team.meta}</p>
+          <h3 className="setup-pick__name" id="setup-pick-name" title={team.meta}>{team.name}</h3>
         </div>
       </div>
-      {team.suggested && <p className="setup-pick__suggested">{`The favourite, for a long first campaign. Pick any ${noun} to manage it instead.`}</p>}
       <dl className="setup-pick__stats">
         <div><dt>Strength</dt><dd className="num">{team.ratingText}</dd></div>
         <div><dt>Rank</dt><dd className="num">{team.rankText}</dd></div>
@@ -204,13 +187,13 @@ function TeamShortlist({ id, title, teams }) {
  * Step 1's map card: the theatre's opening board, each starting territory in its team's kick-off pastel over the land
  * nobody holds. A world theatre's `preview` comes from `setupModel.theatreMapPreview`, a country's from
  * `setupModel.countryMapPreview` (its sections over the neighbouring land). Static and decorative — no camera, labels or
- * territory attributes; the caption, description and stats carry the same facts in text. Memoised: App re-renders
+ * territory attributes; the title, description and stats carry the same facts in text. Memoised: App re-renders
  * setup on every state change, and `preview` keeps its identity per board.
  */
 const TheatreMap = React.memo(function TheatreMap({ preview, caption, loading = false, kind }) {
   if (!preview && !loading) return null;
   return (
-    <figure className="setup-map" aria-hidden="true" data-state={preview ? 'ready' : 'loading'} data-kind={kind}>
+    <figure className="setup-map" aria-hidden="true" data-state={preview ? 'ready' : 'loading'} data-kind={kind} title={caption}>
       {preview ? (
         <svg className="setup-map__chart" viewBox={preview.viewBox} preserveAspectRatio="xMidYMid meet" focusable="false">
           <g className="setup-map__backdrop">
@@ -221,7 +204,6 @@ const TheatreMap = React.memo(function TheatreMap({ preview, caption, loading = 
           </g>
         </svg>
       ) : <div className="setup-map__chart setup-map__placeholder" />}
-      <figcaption className="setup-map__caption">{caption}</figcaption>
     </figure>
   );
 });
@@ -252,8 +234,7 @@ export default function SetupOverlay({
   const [step, setStep] = useState(() => Math.min(3, Math.max(1, Math.round(Number(initialStep)) || 1)));
   const [confirmation, setConfirmation] = useState(null);
   const headings = useRef({});
-  const nationList = useRef(null);
-  const theatreList = useRef(null);
+  const refocusTeam = useRef(false);
   const navigated = useRef(false);
   const keepSaveButton = useRef(null);
   const clearSaveButton = useRef(null);
@@ -272,30 +253,70 @@ export default function SetupOverlay({
   }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam]);
   const { rules } = model;
   const manager = model.role === 'manager';
-  /** Football clubs also offer one country's own top clubs: a long, scrolling theatre list in two groups. */
+  /** Football clubs also offer one country's own top clubs: more than a hundred, so they are a dropdown under Europe's theatres. */
   const countries = model.domesticScopes.length > 0;
+  // Europe's theatres are maps too (`model.country` is set for them), so "a country is chosen" means one from the dropdown.
+  const countryChosen = countries && model.domesticScopes.some(scope => scope.id === model.scopeId);
+  const theatreChecked = model.scopes.some(scope => scope.id === model.scopeId);
+  // The wall reads strongest first: the favourites lead, and the long shots are where a player would look for them.
+  const wallTeams = useMemo(() => model.teams.slice().sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)), [model.teams]);
+  const wall = useFitWall(wallTeams.length, WALL);
+  const checkedTeam = wallTeams.findIndex(team => team.id === model.managedId);
+  const { setPage: setWallPage, pageFor: wallPageFor } = wall;
+  const wallShown = Number.isFinite(wall.pageSize) ? wallTeams.slice(wall.start, wall.start + wall.pageSize) : wallTeams;
 
   const pick = (key, value) => onPick?.(key, value);
   function choose(key, value, current) { if (value !== current) pick(key, value); }
-  function theatreRadio(scope) {
+  function theatreRadio(scope, index) {
     const checked = scope.id === model.scopeId;
     const describedBy = scope.note ? `setup-theatre-note-${scope.id}`
       : checked && model.country ? 'setup-theatre-description' : undefined;
     return (
-      <button type="button" role="radio" key={scope.id} aria-checked={checked} tabIndex={checked ? 0 : -1}
-        className="setup-theatre" data-name={scope.label} aria-describedby={describedBy}
+      <button type="button" role="radio" key={scope.id} aria-checked={checked}
+        // With a country chosen from the dropdown no theatre is checked: the first still takes the group's one tab stop.
+        tabIndex={checked || (!theatreChecked && index === 0) ? 0 : -1}
+        className="setup-theatre" data-name={scope.label} title={scope.note || undefined}
+        aria-describedby={describedBy}
         onClick={() => choose(model.scopeKey, scope.id, model.scopeId)} onKeyDown={moveRadio}>
-        <span className="setup-theatre__name">
-          {scope.label}{scope.note ? <span className="setup-theatre__mark" aria-hidden="true">*</span> : null}
-        </span>
+        <span className="setup-theatre__name">{scope.label}</span>
         {/* A chosen data set's counts are unknown until it loads. */}
-        <span className="setup-theatre__count num">{scope.count == null ? '' : `${scope.count} ${model.nouns}`}</span>
+        <span className="setup-theatre__count sr-only">{scope.count == null ? '' : `${scope.count} ${model.nouns}`}</span>
       </button>
     );
   }
   const theatreChoices = rows => rows.map(scope => (
     <option value={scope.id} key={scope.id}>{scope.count == null ? scope.label : `${scope.label} · ${scope.count} ${model.nouns}`}</option>
   ));
+  /** Arrow keys, Home, End and type-ahead walk the whole wall, across its pages, in the order it reads. */
+  function teamKey(event, index) {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const count = wallTeams.length;
+    const steps = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    let next = null;
+    if (steps[event.key]) next = (index + steps[event.key] + count) % count;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = count - 1;
+    else if (event.key.length === 1 && event.key !== ' ') {
+      const letter = event.key.toLowerCase();
+      for (let offset = 1; offset <= count && next == null; offset += 1) {
+        const candidate = (index + offset) % count;
+        if (String(wallTeams[candidate].name).toLowerCase().startsWith(letter)) next = candidate;
+      }
+    }
+    if (next == null) return;
+    event.preventDefault();
+    refocusTeam.current = true;
+    choose('managedTeamId', wallTeams[next].id, setup.managedTeamId);
+  }
+
+  // The wall shows the page holding the checked team, however it was picked (a click, the keyboard, a challenge link).
+  useEffect(() => { if (checkedTeam >= 0) setWallPage(wallPageFor(checkedTeam)); }, [checkedTeam, wallPageFor, setWallPage]);
+  // A keyboard pick moves focus to the new team's flag, once its page is on show.
+  useEffect(() => {
+    if (!refocusTeam.current) return;
+    const radio = wall.element?.querySelector('[aria-checked="true"]');
+    if (radio) { refocusTeam.current = false; focusQuietly(radio); }
+  });
   function goTo(next) {
     const target = Math.min(3, Math.max(1, next));
     navigated.current = true;
@@ -317,21 +338,16 @@ export default function SetupOverlay({
   useEffect(() => { startRef.current = onStart; });
 
   // On mount, move focus into the wizard (it covers the whole app) to the step it opened on, unless a modal dialog
-  // already holds it. A chosen country can sit far down the long theatre list: centre it there.
+  // already holds it.
   useEffect(() => {
-    if (countries) centreChecked(theatreList.current);
-    if (step === 3) centreChecked(nationList.current);
     if (typeof document === 'undefined' || document.querySelector('[aria-modal="true"]')) return;
     focusQuietly(headings.current[step]);
   }, []);
 
-  // After a step change, move focus to that step's heading (the scroll body is per step, so it starts at the top).
+  // After a step change, move focus to that step's heading.
   useEffect(() => {
     if (!navigated.current) return;
     headings.current[step]?.focus?.();
-    // Centre the chosen team (or a chosen country) inside its own list.
-    if (step === 3) centreChecked(nationList.current);
-    else if (step === 1 && countries) centreChecked(theatreList.current);
   }, [step]);
 
   // Quick-resume confirmation: its trigger unmounts when it opens and its buttons unmount when it closes, so focus is
@@ -399,10 +415,11 @@ export default function SetupOverlay({
 
   function footer(n) {
     const meta = SETUP_STEPS[n - 1];
-    const note = n === 3 ? model.launchNote : meta.note;
+    // Only what holds the launch back: a team to pick, a map or season still loading.
+    const note = n === 3 ? model.launchNote : '';
     return (
       <footer className="setup-foot">
-        <p className="setup-foot__note">{note}</p>
+        <p className="setup-foot__note" role={note ? 'status' : undefined}>{note}</p>
         {n > 1 ? <button type="button" className="btn-secondary setup-foot__back" onClick={() => goTo(n - 1)}>Back</button> : null}
         {n < 3 ? (
           <button type="button" className="btn-primary setup-foot__next" data-key-hint="Space" data-bar-hint={`Step ${n} of 3`}
@@ -422,44 +439,45 @@ export default function SetupOverlay({
         <span className="setup-advanced__title">More rules</span>
         <small className="setup-advanced__values" title={model.moreRules}>{model.moreRules}</small>
       </summary>
+      {/* The options name themselves; what each does is the field's title, and its description for screen readers. */}
       <div className="setup-settings-fields">
-        <label className="control-field" htmlFor="setup-uncertainty"><span>Upsets</span>
+        <label className="control-field" htmlFor="setup-uncertainty" title={UNCERTAINTY_HELP[model.uncertainty]}><span>Upsets</span>
           <select id="setup-uncertainty" value={model.uncertainty} onChange={event => pick('uncertainty', event.target.value)}>
             {UNCERTAINTY_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
           </select>
-          <small className="control-help">{UNCERTAINTY_HELP[model.uncertainty]}</small>
+          <small className="control-help sr-only">{UNCERTAINTY_HELP[model.uncertainty]}</small>
         </label>
-        <label className="control-field" htmlFor="setup-finale"><span>Final</span>
+        <label className="control-field" htmlFor="setup-finale" title={FINALE_HELP[model.finale]}><span>Final</span>
           <select id="setup-finale" value={model.finale} onChange={event => pick('finale', event.target.value)}>
             {FINALE_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
           </select>
-          <small className="control-help">{FINALE_HELP[model.finale]}</small>
+          <small className="control-help sr-only">{FINALE_HELP[model.finale]}</small>
         </label>
-        <label className="control-field" htmlFor="setup-recruitment"><span>Computer signings</span>
+        <label className="control-field" htmlFor="setup-recruitment" title={RECRUITMENT_HELP[model.acquisitionPolicy]}><span>Computer signings</span>
           <select id="setup-recruitment" value={model.acquisitionPolicy} onChange={event => pick('acquisitionPolicy', event.target.value)}>
             {RECRUITMENT_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
           </select>
-          <small className="control-help">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
+          <small className="control-help sr-only">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
         </label>
-        <label className="control-field" htmlFor="setup-home-advantage"><span>Home advantage</span>
+        <label className="control-field" htmlFor="setup-home-advantage" title={HOME_HELP[model.homeAdvantage]}><span>Home advantage</span>
           <select id="setup-home-advantage" value={model.homeAdvantage} onChange={event => pick('homeAdvantage', event.target.value)}>
             {HOME_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
           </select>
-          <small className="control-help">{HOME_HELP[model.homeAdvantage]}</small>
+          <small className="control-help sr-only">{HOME_HELP[model.homeAdvantage]}</small>
         </label>
         {model.sport.id === 'basketball' ? (
-          <label className="control-field" htmlFor="setup-roster-preset"><span>Team strengths</span>
+          <label className="control-field" htmlFor="setup-roster-preset" title={ROSTER_HELP[model.rosterPreset]}><span>Team strengths</span>
             <select id="setup-roster-preset" value={model.rosterPreset} onChange={event => pick('rosterPreset', event.target.value)}>
               {ROSTER_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
             </select>
-            <small className="control-help">{ROSTER_HELP[model.rosterPreset]}</small>
+            <small className="control-help sr-only">{ROSTER_HELP[model.rosterPreset]}</small>
           </label>
         ) : null}
-        <label className="control-field" htmlFor="setup-seed"><span>Seed (optional)</span>
+        <label className="control-field" htmlFor="setup-seed" title={SEED_HELP}><span>Seed</span>
           <input id="setup-seed" type="number" min="1" max="4294967295" step="1" inputMode="numeric" placeholder="Random"
             value={setup.seed ?? ''} onChange={event => pick('seed', event.target.value)}
             onKeyDown={event => { if (event.key === 'Enter') event.preventDefault(); }} />
-          <small className="control-help">Replays the same campaign with the same rules and choices. Leave blank for a new one.</small>
+          <small className="control-help sr-only">{SEED_HELP}</small>
         </label>
       </div>
     </details>
@@ -472,6 +490,11 @@ export default function SetupOverlay({
           <span className="setup-head__wordmark">Imperialism</span>
           <span className="setup-head__rule" aria-hidden="true" />
           <h1 className="setup-head__title">New campaign</h1>
+          <section className="setup-saves" aria-label="Saves">
+            {/* A refused resume says why on the quick resume card, beside Resume; anything else that failed has the header's strip. */}
+            <SaveControls status={saveStatus} onExport={hasSave ? onExport : undefined} onImport={onImport} onManageSaves={onManageSaves} icons
+              quiet={hasSave && !!saveStatus?.refused} />
+          </section>
           {onCancel ? <button type="button" className="setup-head__cancel" disabled={restoring} onClick={onCancel}>Cancel</button> : null}
           <ThemeToggle className="setup-head__theme" />
         </header>
@@ -488,7 +511,7 @@ export default function SetupOverlay({
                       <span className="setup-rail__badge" aria-hidden="true">{state === 'done' ? <CheckMark /> : item.n}</span>
                       <span className="setup-rail__text">
                         <span className="setup-rail__title">{state === 'done' ? <span className="sr-only">Done: </span> : null}{item.title}</span>
-                        <span className="setup-rail__sub">{state === 'done' ? <RailSummary text={model.stepSummaries[item.n]} /> : item.pending}</span>
+                        {state === 'done' ? <span className="setup-rail__sub"><RailSummary text={model.stepSummaries[item.n]} /></span> : null}
                       </span>
                     </button>
                   </li>
@@ -500,126 +523,125 @@ export default function SetupOverlay({
           <AdSlot className="setup-rail__ad" size={[200, 200]} />
         </div>
 
-        {/* Step 1 — Campaign (V1 board 02) */}
+        {/* Step 1 — Campaign: the controls beside the theatre's map */}
         <section className="setup-step" id="setup-step-campaign" data-step="1" hidden={step !== 1} aria-labelledby="setup-campaign-title">
           <div className="setup-step__body">
             <div className="setup-main">
-              {hasSave ? (
-                <div className="setup-save">
-                  {confirmation === 'discard' ? (
-                    <div className="setup-confirmation" role="alert">
-                      <div className="setup-save__text">
-                        <strong>Clear quick resume?</strong>
-                        <p>The campaign stays available in Saved campaigns.</p>
-                      </div>
-                      <div className="setup-save__actions">
-                        <button type="button" className="btn-secondary" ref={keepSaveButton} onClick={keepSave}>Keep save</button>
-                        <button type="button" className="btn-link" onClick={confirmDiscard}>Clear quick resume</button>
-                      </div>
+              {hasSave || challenge ? (
+                <div className="setup-notices">
+                  {hasSave ? (
+                    <div className="setup-save">
+                      {confirmation === 'discard' ? (
+                        <div className="setup-confirmation" role="alert">
+                          <strong className="setup-save__text">Clear quick resume?</strong>
+                          <div className="setup-save__actions">
+                            <button type="button" className="btn-secondary" ref={keepSaveButton} onClick={keepSave}>Keep save</button>
+                            <button type="button" className="btn-link" onClick={confirmDiscard}>Clear quick resume</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <button type="button" className="btn-secondary setup-save__resume" disabled={restoring} onClick={onResume}>Resume</button>
+                          <p className="setup-save__text" title={savedText}>{savedText}</p>
+                          <button type="button" className="icon-button setup-save__clear" ref={clearSaveButton} title="Clear quick resume" onClick={askDiscard}>
+                            <Icon name="close" size={16} /><span className="sr-only">Clear quick resume</span>
+                          </button>
+                          {/* Visual only: SaveControls' status line announces it. */}
+                          {saveStatus?.refused && <p className="setup-save__refused">{saveStatus.message}</p>}
+                        </>
+                      )}
                     </div>
-                  ) : (
-                    <>
-                      <div className="setup-save__text">
-                        <strong>Continue your campaign</strong><p>{savedText}</p>
-                        {/* Visual only: SaveControls' status line already announces it. */}
-                        {saveStatus?.refused && <p className="setup-save__refused">{saveStatus.message}</p>}
-                      </div>
-                      <div className="setup-save__actions">
-                        <button type="button" className="btn-secondary setup-save__resume" disabled={restoring} onClick={onResume}>Resume</button>
-                        <button type="button" className="btn-link" ref={clearSaveButton} onClick={askDiscard}>Clear quick resume</button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ) : null}
+                  ) : null}
 
-              {challenge ? (
-                <div className="setup-challenge" role="note" aria-labelledby="setup-challenge-title">
-                  <strong id="setup-challenge-title">Challenge link</strong>
-                  <p>{challengeNote(challenge)}</p>
+                  {challenge ? (
+                    <div className="setup-challenge" role="note" aria-labelledby="setup-challenge-title">
+                      <strong id="setup-challenge-title">Challenge link</strong>
+                      <p>{challengeNote(challenge)}</p>
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 
               <div className="setup-heading">
                 {stepHeading(1, 'setup-campaign-title', 'Raise a campaign')}
-                <p className="setup-lede">Every team starts with its own land. Win a match to take all of the loser’s territory — and one of its players.</p>
+                <p className="setup-lede">Win a match to take all of the loser’s land and one player. Last team standing wins.</p>
               </div>
 
-              <div className="setup-group">
-                <Kicker id="setup-sport-label" title="Sport" />
-                <div className="setup-card-grid setup-card-grid--sports" role="radiogroup" aria-labelledby="setup-sport-label">
-                  {model.sports.map(item => (
-                    <div className="setup-card" data-checked={item.selected} key={item.id}>
-                      <button type="button" role="radio" aria-checked={item.selected} tabIndex={item.selected ? 0 : -1}
-                        className="setup-card__button" aria-describedby={`setup-sport-${item.id}-note`}
-                        onClick={() => choose('sport', item.id, model.sport.id)} onKeyDown={moveRadio}>{item.name}</button>
-                      <span className="setup-card__note" id={`setup-sport-${item.id}-note`}>{item.note}</span>
-                      <span className="setup-check" aria-hidden="true"><CheckMark /></span>
-                    </div>
-                  ))}
-                </div>
+              <div className="setup-sports" role="radiogroup" aria-label="Sport"
+                style={{ '--sport-cols': model.sports.length > 4 ? Math.ceil(model.sports.length / 2) : model.sports.length }}>
+                {model.sports.map(item => (
+                  <div className="setup-card" data-checked={item.selected} key={item.id} title={item.note}>
+                    <Icon name={item.id} size={22} className="setup-card__icon" />
+                    <button type="button" role="radio" aria-checked={item.selected} tabIndex={item.selected ? 0 : -1}
+                      className="setup-card__button" aria-describedby={`setup-sport-${item.id}-note`}
+                      onClick={() => choose('sport', item.id, model.sport.id)} onKeyDown={moveRadio}>{item.name}</button>
+                    <span className="setup-card__note sr-only" id={`setup-sport-${item.id}-note`}>{item.note}</span>
+                  </div>
+                ))}
               </div>
 
-              {/* The sport's seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this
-                  computer, in a native dropdown ('' is the built-in season). */}
-              {model.season ? (
+              <div className="setup-row">
                 <div className="setup-group">
-                  <Kicker id="setup-season-label" title="Season" />
-                  <select id="setup-season" className="setup-season" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
-                    value={model.season.id ?? ''} onChange={event => pick('dataSet', event.target.value || null)}>
-                    {model.season.options.map(option => <option value={option.id ?? ''} key={option.key}>{option.name}</option>)}
-                  </select>
-                  <p className="setup-season__note" id="setup-season-note">{model.season.note}</p>
-                  {model.season.state === 'loading' ? (
-                    <p className="setup-season__status setup-season__loading" role="status">{model.season.loading}</p>
-                  ) : null}
-                  {model.season.state === 'error' ? (
-                    <div className="rule-note setup-season__error" role="alert">
-                      <Icon name="info" size={20} />
-                      <p>{model.season.message}{' '}
-                        <button type="button" className="btn-link rule-note__action" onClick={() => season?.onRetry?.()}>Retry</button>
-                      </p>
-                    </div>
-                  ) : null}
+                  <span className="sr-only" id="setup-layer-label">Teams</span>
+                  <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="setup-layer-label"
+                    aria-describedby={model.clubsOnly ? 'setup-layer-note' : undefined}>
+                    {[['nations', 'Nations'], ['clubs', 'Clubs']].map(([id, name]) => (
+                      <button type="button" role="radio" key={id} aria-checked={model.layer === id} tabIndex={model.layer === id ? 0 : -1}
+                        disabled={id === 'nations' && !!model.clubsOnly}
+                        onClick={() => choose('layer', id, model.layer)} onKeyDown={moveRadio}>{name}</button>
+                    ))}
+                  </div>
+                  {/* A sport with clubs only (American football) has no national teams to field. */}
+                  {model.clubsOnly ? <p className="sr-only" id="setup-layer-note">{model.sport.name} is played by {model.clubsOnly} clubs only.</p> : null}
+                </div>
+
+                {/* The sport's seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this
+                    computer, in a native dropdown ('' is the built-in season). */}
+                {model.season ? (
+                  <div className="setup-group setup-group--season">
+                    <span className="sr-only" id="setup-season-label">Season</span>
+                    <select id="setup-season" className="setup-season" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
+                      title={model.season.note} value={model.season.id ?? ''} onChange={event => pick('dataSet', event.target.value || null)}>
+                      {model.season.options.map(option => <option value={option.id ?? ''} key={option.key}>{option.name}</option>)}
+                    </select>
+                    <p className="setup-season__note sr-only" id="setup-season-note">{model.season.note}</p>
+                  </div>
+                ) : null}
+              </div>
+              {model.season?.state === 'loading' ? (
+                <p className="setup-season__status setup-season__loading" role="status">{model.season.loading}</p>
+              ) : null}
+              {model.season?.state === 'error' ? (
+                <div className="rule-note setup-season__error" role="alert">
+                  <Icon name="info" size={20} />
+                  <p>{model.season.message}{' '}
+                    <button type="button" className="btn-link rule-note__action" onClick={() => season?.onRetry?.()}>Retry</button>
+                  </p>
                 </div>
               ) : null}
 
-              <div className="setup-group">
-                <Kicker id="setup-layer-label" title="Teams" />
-                <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="setup-layer-label"
-                  aria-describedby={model.clubsOnly ? 'setup-layer-note' : undefined}>
-                  {[['nations', 'Nations'], ['clubs', 'Clubs']].map(([id, name]) => (
-                    <button type="button" role="radio" key={id} aria-checked={model.layer === id} tabIndex={model.layer === id ? 0 : -1}
-                      disabled={id === 'nations' && !!model.clubsOnly}
-                      onClick={() => choose('layer', id, model.layer)} onKeyDown={moveRadio}>{name}</button>
-                  ))}
-                </div>
-                {/* A sport with clubs only (American football) has no national teams to field. */}
-                {model.clubsOnly ? <p className="setup-season__note" id="setup-layer-note">{model.sport.name} is played by {model.clubsOnly} clubs only.</p> : null}
-              </div>
-
               <div className="setup-group setup-group--list">
-                <Kicker id="setup-theatre-label" title="Theatre" aside="Where the war is fought" />
-                {/* One radiogroup for Europe and countries: a single tab stop, and arrow keys walk from one into the other. */}
-                <div className="setup-theatres" role="radiogroup" aria-labelledby="setup-theatre-label" ref={theatreList}
-                  data-long={countries ? '' : undefined} onKeyDown={countries ? typeAhead : undefined}>
+                <span className="sr-only" id="setup-theatre-label">Theatre</span>
+                <div className="setup-theatres" role="radiogroup" aria-labelledby="setup-theatre-label">
                   {model.scopes.map(theatreRadio)}
-                  {countries ? (
-                    <>
-                      <p className="setup-theatres__group" aria-hidden="true">{model.domesticGroup}</p>
-                      {model.domesticScopes.map(theatreRadio)}
-                    </>
-                  ) : null}
                 </div>
-                {/* The data's "*" marker ("Asia & Oceania*") resolves to the scope's own description. */}
+                {/* The data's "*" marker ("Asia & Oceania*") resolves to the scope's own description: its row's title. */}
                 {model.theatreNotes.map(scope => (
-                  <p className="setup-theatres__note" id={`setup-theatre-note-${scope.id}`} key={scope.id}>
-                    <span aria-hidden="true">* </span>{scope.note}
-                  </p>
+                  <p className="setup-theatres__note sr-only" id={`setup-theatre-note-${scope.id}`} key={scope.id}>{scope.note}</p>
                 ))}
+                {/* One country's own top clubs: more than a hundred, so a dropdown, not rows. */}
+                {countries ? (
+                  <select id="setup-country" className="setup-season setup-country" aria-label={model.domesticGroup}
+                    aria-describedby={countryChosen ? 'setup-theatre-description' : undefined}
+                    data-checked={countryChosen ? '' : undefined} value={countryChosen ? model.scopeId : ''}
+                    onChange={event => { if (event.target.value) pick(model.scopeKey, event.target.value); }}>
+                    <option value="">{model.domesticGroup}</option>
+                    {theatreChoices(model.domesticScopes)}
+                  </select>
+                ) : null}
                 {model.country ? (
                   <>
-                    <p className="setup-theatres__note setup-domestic__note" id="setup-theatre-description">{model.countryNote}</p>
+                    <p className="sr-only" id="setup-theatre-description">{model.countryNote}</p>
                     {model.countryState === 'loading' ? (
                       <p className="setup-domestic__status" role="status">{model.mapLoading}</p>
                     ) : null}
@@ -644,6 +666,17 @@ export default function SetupOverlay({
                   ) : theatreChoices(model.scopes)}
                 </select>
               </div>
+
+              <div className="setup-estimate">
+                <dl className="setup-stats">
+                  {model.stats.map(stat => (
+                    <div className={`setup-stat${stat.small ? ' setup-stat--small' : ''}`} key={stat.id} title={stat.id === 'length' ? model.estimateNote : undefined}>
+                      <dt>{stat.label}</dt><dd className="num">{stat.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="sr-only" role="status">{model.status}</p>
+              </div>
             </div>
 
             <div className="setup-side">
@@ -653,28 +686,7 @@ export default function SetupOverlay({
                     : model.country.countries ? `${model.country.name} · ${model.country.clubs} clubs in ${model.country.countries} countries`
                       : `${model.country.name} · ${domestic.preview.sections.length} sections, `
                         + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)} />
-              ) : theatreMap ? <TheatreMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)} /> : null}
-              <section className="setup-howto" aria-labelledby="setup-howto-title">
-                <Kicker id="setup-howto-title" title="How conquest works" />
-                <ol className="setup-rules">
-                  {CONQUEST_RULES.map(rule => <li key={rule}>{rule}</li>)}
-                </ol>
-              </section>
-              <div className="setup-estimate">
-                <dl className="setup-stats">
-                  {model.stats.map(stat => (
-                    <div className={`setup-stat${stat.small ? ' setup-stat--small' : ''}`} key={stat.id}>
-                      <dt>{stat.label}</dt><dd className="num">{stat.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="setup-estimate__note">{model.estimateNote}</p>
-                <p className="sr-only" role="status">{model.status}</p>
-              </div>
-              <section className="setup-saves" aria-labelledby="setup-saves-title">
-                <Kicker id="setup-saves-title" title="Saves" />
-                <SaveControls status={saveStatus} onExport={hasSave ? onExport : undefined} onImport={onImport} onManageSaves={onManageSaves} />
-              </section>
+              ) : theatreMap ? <TheatreMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)} /> : <div className="setup-side__empty" aria-hidden="true" />}
             </div>
           </div>
           {footer(1)}
@@ -686,10 +698,9 @@ export default function SetupOverlay({
             <div className="setup-main">
               <div className="setup-heading">
                 {stepHeading(2, 'setup-rules-title', 'Rules of war')}
-                <p className="setup-lede">Choose how matches are drawn. With Random draw or Round robin, a manager can also pick their own opponents in step 3.</p>
               </div>
               <div className="rule-group">
-                <Kicker id="rule-draw-label" title="The draw" />
+                <span className="sr-only" id="rule-draw-label">The draw</span>
                 <div className="setup-card-grid" role="radiogroup" aria-labelledby="rule-draw-label">
                   {DRAW_CARDS.map(card => (
                     <OptionCard key={card.value} idBase={`rule-draw-${card.value}`} card={card}
@@ -707,12 +718,12 @@ export default function SetupOverlay({
             <div className="setup-side">
               <div className="setup-group setup-playback">
                 <Kicker id="setup-playback-label" title="Show matches" aside="Change any time" />
-                <div className="control-field">
+                <div className="control-field" title={model.showMatchesHelp}>
                   <select id="setup-resolution" aria-labelledby="setup-playback-label" aria-describedby="setup-resolution-help"
                     value={model.showMatches} onChange={event => showMatches(event.target.value)}>
                     {SHOW_MATCH_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
                   </select>
-                  <small className="control-help" id="setup-resolution-help">{model.showMatchesHelp}</small>
+                  <small className="control-help sr-only" id="setup-resolution-help">{model.showMatchesHelp}</small>
                 </div>
               </div>
               {moreRules}
@@ -721,80 +732,81 @@ export default function SetupOverlay({
           {footer(2)}
         </section>
 
-        {/* Step 3 — Your role (V1 board 03, restyled into the frame); a manager also picks who chooses their opponents */}
+        {/* Step 3 — Your role: a manager also picks who chooses their opponents, and a team from the wall of flags */}
         <section className="setup-step" id="setup-step-role" data-step="3" hidden={step !== 3} aria-labelledby="setup-role-title">
           <div className="setup-step__body">
             <div className="setup-main">
               <div className="setup-heading">
                 {stepHeading(3, 'setup-role-title', model.roleTitle)}
-                <p className="setup-lede setup-lede--meta">{model.roleMeta}</p>
               </div>
-              <div className="setup-group">
-                <Kicker id="setup-role-label" title="Your role" />
-                <div className="setup-card-grid" role="radiogroup" aria-labelledby="setup-role-label">
-                  {ROLE_CARDS.map(card => (
-                    <OptionCard key={card.value} idBase={`setup-role-${card.value}`} card={card}
-                      checked={model.role === card.value} onSelect={value => pick('role', value)} />
-                  ))}
+              <div className="setup-role-row">
+                <div className="setup-group setup-roles">
+                  <span className="sr-only" id="setup-role-label">Your role</span>
+                  <div className="setup-card-grid" role="radiogroup" aria-labelledby="setup-role-label">
+                    {ROLE_CARDS.map(card => (
+                      <OptionCard key={card.value} idBase={`setup-role-${card.value}`} card={card}
+                        checked={model.role === card.value} onSelect={value => pick('role', value)} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-              {manager ? (
-                <div className="setup-group setup-opponents">
-                  <Kicker id="rule-target-label" title="Who picks your opponent" />
-                  {rules.applies ? (
-                    <>
-                      <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="rule-target-label"
-                        aria-describedby="rule-target-help">
-                        {TARGETING_CARDS.map(card => {
-                          const checked = rules.targeting === card.value;
-                          return (
-                            <button type="button" role="radio" key={card.value} aria-checked={checked} tabIndex={checked ? 0 : -1}
-                              aria-labelledby={`rule-target-${card.value}-title`}
-                              onClick={() => choose('targeting', card.value, rules.targeting)} onKeyDown={moveRadio}>
-                              <span id={`rule-target-${card.value}-title`}>{card.title}</span>
-                            </button>
-                          );
-                        })}
+                {manager ? (
+                  <div className="setup-group setup-opponents">
+                    <span className="setup-opponents__label" id="rule-target-label">Opponent</span>
+                    {rules.applies ? (
+                      <>
+                        <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="rule-target-label"
+                          aria-describedby="rule-target-help" title={rules.targetingHelp}>
+                          {TARGETING_CARDS.map(card => {
+                            const checked = rules.targeting === card.value;
+                            return (
+                              <button type="button" role="radio" key={card.value} aria-checked={checked} tabIndex={checked ? 0 : -1}
+                                aria-labelledby={`rule-target-${card.value}-title`}
+                                onClick={() => choose('targeting', card.value, rules.targeting)} onKeyDown={moveRadio}>
+                                <span id={`rule-target-${card.value}-title`}>{card.title}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <small className="control-help sr-only" id="rule-target-help">{rules.targetingHelp}</small>
+                      </>
+                    ) : (
+                      <div className="rule-note" role="note" id="rule-target-none">
+                        <p>{rules.note} <button type="button" className="btn-link rule-note__action" onClick={() => goTo(2)}>Change the draw</button></p>
                       </div>
-                      <small className="control-help setup-opponents__help" id="rule-target-help">{rules.targetingHelp}</small>
-                    </>
-                  ) : (
-                    <div className="rule-note" role="note" id="rule-target-none">
-                      <Icon name="info" size={20} />
-                      <p>{rules.note} <button type="button" className="btn-link rule-note__action" onClick={() => goTo(2)}>Change the draw</button></p>
-                    </div>
-                  )}
-                </div>
-              ) : null}
+                    )}
+                  </div>
+                ) : null}
+              </div>
               {manager ? (
-                <div className="setup-group setup-group--list">
-                  <Kicker id="setup-team-label" title={`Your ${model.noun}`} aside={`${model.field} ${model.nouns} · A–Z`} />
+                <div className="setup-group setup-group--wall">
+                  <span className="sr-only" id="setup-team-label">{`Your ${model.noun}, strongest first`}</span>
                   {model.teams.length ? (
                     <div className="setup-teams" role="radiogroup" aria-labelledby="setup-team-label" aria-required="true"
-                      ref={nationList} onKeyDown={typeAhead}>
-                      {model.teams.map((team, index) => {
+                      ref={wall.boxRef} style={wall.style} data-measured={wall.measured || undefined}>
+                      {wallShown.map((team, position) => {
                         // The suggested team is checked until the player picks one (model.managedId).
                         const checked = team.id === model.managedId;
-                        const focusable = checked || (!model.managed && index === 0);
+                        const focusable = checked || (checkedTeam < 0 && position === 0) || (checkedTeam >= 0 && !wallShown.some(item => item.id === model.managedId) && position === 0);
                         return (
                           <button type="button" role="radio" key={team.id} aria-checked={checked} tabIndex={focusable ? 0 : -1}
-                            className="setup-team" data-name={team.name} onClick={() => choose('managedTeamId', team.id, setup.managedTeamId)}
-                            onKeyDown={moveRadio}>
+                            className="setup-team" data-name={team.name} title={`${team.name} · ${team.ratingText}`}
+                            onClick={() => choose('managedTeamId', team.id, setup.managedTeamId)}
+                            onKeyDown={event => teamKey(event, wall.start + position)}>
                             <TeamRowMark team={team} />
-                            <span className="setup-team__name">{team.name}</span>
-                            <span className="setup-team__eff num">{team.ratingText}</span>
+                            <span className="setup-team__name sr-only">{team.name}</span>
+                            <span className="setup-team__eff sr-only">{team.ratingText}</span>
                           </button>
                         );
                       })}
                     </div>
                   ) : <p className="setup-empty">{model.teamsEmpty}</p>}
+                  <Pager page={wall.page} pages={wall.pages} onPage={wall.setPage} label={`${model.nouns} pages`} className="setup-teams__pager" />
                   {/* Native mirror of the team radios (PLAN §4.7 `#setup-managed-team`, value-bound). */}
                   <select id="setup-managed-team" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={model.managedId || ''}
                     onChange={event => pick('managedTeamId', event.target.value)}>
                     <option value="" disabled>Choose your team</option>
                     {model.teams.map(team => <option key={team.id} value={team.id}>{`${team.name} · ${team.ratingText} strength`}</option>)}
                   </select>
-                  <p className="control-help setup-teams__help">{`You manage this ${model.noun} until it is knocked out, then keep watching as a spectator.`}</p>
                 </div>
               ) : null}
             </div>
@@ -803,18 +815,13 @@ export default function SetupOverlay({
               {manager ? (
                 model.managed ? <SelectedTeam team={model.managed} noun={model.noun} /> : (
                   <div className="setup-pick setup-pick--empty">
-                    <p className="setup-pick__kicker">Selected {model.noun}</p>
-                    <p className="setup-pick__placeholder">Pick a {model.noun} from the list to see its strength, rank and best players.</p>
+                    <p className="setup-pick__kicker">{`Pick a ${model.noun}`}</p>
                   </div>
                 )
-              ) : null}
-              <TeamShortlist id="setup-favourites" title="Favourites" teams={model.favourites} />
-              <TeamShortlist id="setup-long-shots" title="Long shots" teams={model.longShots} />
+              ) : <TeamShortlist id="setup-favourites" title="Favourites" teams={model.favourites} />}
               {challengeLink ? (
-                <section className="setup-share" aria-labelledby="setup-share-title">
-                  <Kicker id="setup-share-title" title="Challenge a friend" />
-                  <ShareCampaign link={challengeLink}
-                    note="The link holds this setup and its seed. It opens ready to launch, and plays the same campaign." />
+                <section className="setup-share" aria-label="Challenge a friend" title="The link holds this setup and its seed. It opens ready to launch, and plays the same campaign.">
+                  <ShareCampaign link={challengeLink} />
                 </section>
               ) : null}
             </div>

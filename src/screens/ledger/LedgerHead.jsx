@@ -1,14 +1,12 @@
-// Owner: WP-LEDGER (see PLAN.md §4). Screen header shared by Ledger and Chronicle: the v4 squad header pattern
-// (C1 §3: kicker + 54px title on the left, big stats on the right, 1px ink rule below).
+// Owner: WP-LEDGER (see PLAN.md §4). Screen header shared by Ledger and Chronicle: one line, the theatre and the figures.
+// The masthead's nav names the screen, so its title is for screen readers.
 import React from 'react';
 
 export default function LedgerHead({ titleId, kicker, title, stats = [] }) {
   return (
     <header className="ledger-head">
-      <div className="ledger-head__title">
-        {kicker && <p className="ledger-head__kicker">{kicker}</p>}
-        <h1 className="ledger-head__name" id={titleId}>{title}</h1>
-      </div>
+      <h1 className="ledger-head__name sr-only" id={titleId}>{title}</h1>
+      {kicker && <p className="ledger-head__kicker">{kicker}</p>}
       {stats.length > 0 && (
         <dl className="ledger-head__stats">
           {stats.map(stat => (

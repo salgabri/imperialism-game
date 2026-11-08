@@ -2,7 +2,7 @@
 // the left, the champion's XI on the right). Contract (smoke L1072-1077): [role=dialog][aria-labelledby=victory-title]
 // containing "Campaign complete", #victory-title textContent === the (already upper-cased) champion name, a
 // button whose text is exactly "View map", Escape → onClose, focus starts on the close button and is restored.
-import React, { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import PlayerRow from './PlayerRow.jsx';
 import ShareCampaign from './ShareCampaign.jsx';
 import TeamMark from './TeamMark.jsx';
@@ -70,6 +70,8 @@ export default function VictoryOverlay({
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
   const touch = useSyncExternalStore(subscribeTouch, touchSnapshot, noTouch);
+  // Below 1200 the result and the champion's squad take turns (dialogs.css).
+  const [panel, setPanel] = useState('result');
   const rows = useMemo(() => (touch ? squad.map(withoutSourceLink) : squad), [touch, squad]);
   const closeCallback = useRef(onClose);
   closeCallback.current = onClose;
@@ -101,8 +103,13 @@ export default function VictoryOverlay({
   const gainText = effGain?.text ?? '';
   return (
     <div className="dialog-backdrop fi-victory-backdrop">
-      <section className="dialog fi-victory" ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="victory-title" aria-describedby="victory-description">
+      <section className="dialog fi-victory" ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="victory-title" aria-describedby="victory-description" data-panel={panel}>
         <button ref={closeRef} type="button" className="icon-button fi-victory-close" onClick={onClose} aria-label="Close campaign results"><Icon name="close" size={19} /></button>
+        <div className="segmented fi-victory-panels" role="group" aria-label="Results panels">
+          {[['result', 'Result'], ['squad', 'Squad']].map(([key, label]) => (
+            <button key={key} type="button" aria-pressed={panel === key} onClick={() => setPanel(key)}>{label}</button>
+          ))}
+        </div>
         <div className="fi-victory-main">
           <div className="fi-victory-eyebrow">
             <span className="fi-victory-emblem"><TeamMark id={id} teamId={teamId} code={code || name.slice(0, 3)} color={color} isClub={isClub || !id} width={48} /></span>
@@ -121,33 +128,32 @@ export default function VictoryOverlay({
           {highlights.length > 0 && (
             <div className="fi-victory-recap" role="group" aria-label="Campaign highlights">
               {highlights.map(([key, value]) => (
-                <div key={key}><strong>{HIGHLIGHTS[key]}</strong><p>{recapText(value)}</p></div>
+                <div key={key} title={recapText(value)}><strong>{HIGHLIGHTS[key]}</strong><p>{recapText(value)}</p></div>
               ))}
             </div>
           )}
           {record.length > 0 && (
             <dl className="fi-victory-record" role="group" aria-label="Campaign record">
               {record.map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{recapText(value)}</dd></div>)}
+              {seed != null && <div className="fi-victory-seed" title="Export the campaign to keep its match archive"><dt>Seed</dt><dd>{seed}</dd></div>}
             </dl>
           )}
-          {seed != null && <p className="fi-victory-seed">Campaign seed {seed} · export the campaign to keep its match archive</p>}
           <div className="fi-victory-actions">
             <button type="button" className="btn-primary fi-victory-primary" onClick={onNew}>New campaign <Icon name="arrow" size={17} /></button>
             <button type="button" className="btn-secondary" onClick={onClose}>View map</button>
-            {onChronicle && <button type="button" className="btn-secondary" onClick={onChronicle}>Read the chronicle</button>}
+            {onChronicle && <button type="button" className="btn-secondary" onClick={onChronicle}>Chronicle</button>}
           </div>
           {challengeLink || onShareImage ? (
-            <section className="fi-victory-share" aria-labelledby="victory-share-title">
-              <div className="kicker"><h2 className="kicker__title" id="victory-share-title">Challenge a friend</h2></div>
-              <ShareCampaign link={challengeLink} onShareImage={onShareImage}
-                note="The link sets up this campaign, seed and all, for a friend to play. The image shows the final map." />
+            <section className="fi-victory-share" aria-label="Challenge a friend"
+              title="The link sets up this campaign, seed and all, for a friend to play. The image shows the final map.">
+              <ShareCampaign link={challengeLink} onShareImage={onShareImage} />
             </section>
           ) : null}
         </div>
         <aside className="fi-victory-side" aria-labelledby="victory-squad-title">
           <div className="kicker fi-victory-squad-heading">
             <h2 className="kicker__title" id="victory-squad-title">The champion's squad</h2>
-            <span className="kicker__aside">Strength {effBase} → {effNow}</span>
+            <span className="kicker__aside">{effBase} → {effNow}</span>
           </div>
           <div className="fi-victory-squad">{rows.map((player, i) => <PlayerRow key={i} player={player} positionColors={positionColors} roomy />)}</div>
         </aside>

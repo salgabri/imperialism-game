@@ -473,7 +473,7 @@ test('the match preview opens and closes the tactical dialog; Continue kicks off
     assert.equal(dialog.props.preview, app.matchPreviewModel(), 'the memoised preview model reaches the dialog');
     assert.ok(dialog.props.preview?.a && dialog.props.preview?.b, 'both XIs are in the preview');
     assert.equal(typeof dialog.props.onSimulate, 'function');
-    assert.match(previewHtml, /simulate the result/);
+    assert.match(previewHtml, /Simulate the result/);
     app.closeMatchPreview();
     assert.equal(app.state.tacticalPreview, false);
     const chosen = [];

@@ -545,8 +545,8 @@ function heldTerritories(own, team) {
 }
 
 /**
- * Board 07 stakes: "Annex 3 territories — Serbia, Kosovo, Montenegro — and claim one player" (first three names,
- * an ellipsis when there are more) / "Italy falls. Your campaign ends."; the best-of-three finale keeps its own copy.
+ * Board 07 stakes: "+3 territories, +1 player" / "Campaign over"; `winTitle` names the land (first three names, an
+ * ellipsis when there are more). The best-of-three finale keeps its own copy.
  */
 function stakesCopy(st, youTeam, themTeam, ctx) {
   // Best-of-three final: a game only decides the series for a side that already has a win (as turns.js targetStakes
@@ -560,11 +560,12 @@ function stakesCopy(st, youTeam, themTeam, ctx) {
   const held = heldTerritories(st?.own, themTeam);
   const names = held.slice(0, 3).map(cid => territoryName(cid, ctx)).join(', ') + (held.length > 3 ? '…' : '');
   return {
-    win: !winDecides ? `${youTeam.name} moves one game closer to total conquest`
+    win: !winDecides ? 'One game closer'
       : held.length
-        ? `Annex ${held.length} ${territoryWord(held.length)} — ${names} — and claim one player`
-        : `Claim one player from ${themTeam.name}`,
-    lose: loseDecides ? `${youTeam.name} falls. Your campaign ends.` : `${themTeam.name} moves one game closer to total conquest`,
+        ? `+${held.length} ${territoryWord(held.length)}, +1 player`
+        : '+1 player',
+    winTitle: winDecides && held.length ? names : undefined,
+    lose: loseDecides ? 'Campaign over' : `${themTeam.name} one game closer`,
   };
 }
 

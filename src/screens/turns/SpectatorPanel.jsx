@@ -68,7 +68,7 @@ export default function SpectatorPanel({
   // Tolerate partial models (the W1 stub sends `{ id: null, name: undefined }` when nobody is followed).
   const follow = followed?.id && followed?.name ? followed : null;
   const pause = follow ? follow.pauseOnEvents ?? pauseFollow : false;
-  const detail = follow ? follow.detail : 'Follow an empire to track its matches';
+  const detail = follow ? follow.detail : '';
   const pickerWord = follow ? 'Change' : 'Choose';
   // `managed` is set only after the manager's exit (DEC D16); `ended: false` is the W1 stub's live manager.
   const managedNote = managed?.id && managed?.name && managed.ended !== false ? managed : null;

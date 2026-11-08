@@ -4,8 +4,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './share.css';
 
-const COPIED = 'Link copied. Whoever opens it gets this setup and seed, ready to launch.';
-const NO_CLIPBOARD = 'Copy is unavailable here. The link is selected: use your usual Copy command.';
+const COPIED = 'Link copied.';
+const NO_CLIPBOARD = 'Copy the selected link.';
 
 /**
  * `link` is the challenge link, `note` an optional line above the buttons. `onShareImage` (the results only) makes,

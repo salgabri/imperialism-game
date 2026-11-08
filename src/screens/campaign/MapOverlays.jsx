@@ -1,4 +1,4 @@
-// Owner: WP-COL (see PLAN.md §4). Map caption (top-left: one line, title │ map state, instruction or route) and key
+// Owner: WP-COL (see PLAN.md §4). Map caption (top-left: one line, the theatre, or title │ instruction or route) and key
 // (bottom-left) — PLAN §3.5 MapOverlays, DEC D21, A-11, RM §1.11. Rendered as WorldMap children; both panels are
 // `pointer-events: none` so panning and hovering the map keep working underneath. Renders nothing when both models
 // are null (conquest view).
@@ -6,7 +6,7 @@ import React from 'react';
 import { themedPaint } from '../../theme.js';
 import './campaign.css';
 
-function TitleCard({ variant = 'campaign', title = '', phoneTitle = null, meta = null, sub = null, wholeMap = false }) {
+function TitleCard({ variant = 'campaign', title = '', phoneTitle = null, sub = null, wholeMap = false }) {
   const swap = !!phoneTitle && !wholeMap;
   return (
     <div className={`map-title-card map-title-card--${variant}${swap ? ' map-title-card--swap' : ''}`}>
@@ -15,7 +15,6 @@ function TitleCard({ variant = 'campaign', title = '', phoneTitle = null, meta =
         {swap ? <span className="map-title-card__title--phone">{phoneTitle}</span> : null}
       </h2>
       {sub ? <p className="map-title-card__sub">{sub}</p> : null}
-      {meta ? <p className="map-title-card__meta">{meta}</p> : null}
     </div>
   );
 }
@@ -46,11 +45,13 @@ function KeyGlyph({ item }) {
 }
 
 function MapKey({ variant = 'political', heading = 'Key', items = [] }) {
+  // A key says it is one by being one: only a mode's own heading ("Strength, weakest to strongest") is worth a line.
+  const shownHeading = heading && heading !== 'Key' ? heading : null;
   const list = Array.isArray(items) ? items.filter(Boolean) : [];
   if (!list.length) return null;
   return (
     <div className={`map-key map-key--${variant}`} role="group" aria-label={heading && heading !== 'Key' ? `Map key: ${heading}` : 'Map key'}>
-      {heading ? <p className="map-key__heading" aria-hidden="true">{heading}</p> : null}
+      {shownHeading ? <p className="map-key__heading" aria-hidden="true">{shownHeading}</p> : null}
       <ul className="map-key__items">
         {list.map(item => (
           <li key={item.key} className={`map-key__item map-key__item--${item.kind}`}>

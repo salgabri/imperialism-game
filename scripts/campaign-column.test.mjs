@@ -264,7 +264,7 @@ test('NextFixture: Skip to your next match, then its progress and Stop', async c
   await click(skip);
   await view.render({ fixture: { ...fixture, skip: { active: true, played: 1 } }, onSkip: () => calls.push('skip'), onStopSkip: () => calls.push('stop') });
   const status = view.host.querySelector('.fixture__skipping[role="status"]');
-  assert.equal(text(status.querySelector('span')), 'Skipping to your next match · 1 match played');
+  assert.equal(text(status.querySelector('span')), 'Skipping · 1 match played');
   assert.equal([...view.host.querySelectorAll('button')].some(button => button.textContent === 'Skip to your next match'), false);
   await click(status.querySelector('button'));
   assert.deepEqual(calls, ['skip', 'stop']);
@@ -765,7 +765,7 @@ test('NextFixture renders the idle placeholder and the W1 idleText fallback', as
   assert.ok(root);
   assert.equal(root.getAttribute('aria-labelledby'), 'fixture-kicker');
   assert.equal(text(root.querySelector('h2#fixture-kicker.kicker__title')), 'Next fixture', 'the section name is the heading');
-  assert.equal(text(root.querySelector('.kicker__aside')), 'Round I');
+  assert.equal(root.querySelector('.kicker__aside'), null, 'the masthead carries the round');
   assert.equal(text(root.querySelector('h3.fixture__title--idle')), fixture.idleTitle);
   assert.equal(text(root.querySelector('.fixture__route')), fixture.route);
   assert.equal(root.querySelector('.odds'), null);
@@ -800,9 +800,10 @@ test('NextFixture tactical state: headline, odds bar, Match preview and simulate
   assert.equal(view.host.querySelector('.odds__fill').style.width, `${fixture.odds.fill}%`);
   assert.equal(text(view.host.querySelector('.odds__label--a')), fixture.odds.aLabel);
   assert.equal(text(view.host.querySelector('.odds__label--b')), fixture.odds.bLabel);
-  assert.equal(text(view.host.querySelector('.fixture__meta')), fixture.meta);
+  assert.equal(view.host.querySelector('.odds').getAttribute('title'), fixture.meta, 'the strengths behind the odds are on their title');
+  assert.equal(view.host.querySelector('.fixture__route'), null, 'the map\'s arrow already shows an ordinary land border');
   const preview = [...view.host.querySelectorAll('button')].find(button => button.textContent === 'Match preview');
-  const simulate = [...view.host.querySelectorAll('button')].find(button => button.textContent === 'or simulate the result');
+  const simulate = [...view.host.querySelectorAll('button')].find(button => button.textContent === 'Simulate');
   assert.ok(preview.classList.contains('btn-secondary'));
   assert.ok(simulate.classList.contains('btn-link'));
   assert.equal(preview.type, 'button');
@@ -811,7 +812,8 @@ test('NextFixture tactical state: headline, odds bar, Match preview and simulate
   assert.deepEqual(calls, ['preview', 'simulate']);
   assert.equal(view.host.querySelector('.fixture__approach'), null, 'no estimates, no approach line');
   await view.render({ fixture: { ...fixture, approach: 'Attack' } });
-  assert.equal(text(view.host.querySelector('.fixture__approach')), 'Continue kicks off with Attack, the recommended approach.');
+  assert.equal(text(view.host.querySelector('.kicker__aside.fixture__approach')), 'Attack');
+  assert.equal(view.host.querySelector('.fixture__approach').getAttribute('title'), 'Continue kicks off with Attack, the recommended approach.');
   await view.render({ fixture });
   assert.equal(view.host.querySelector('button'), null, 'no actions without handlers');
 });
@@ -843,7 +845,7 @@ test('FrontsTable rows, squad links, tones and the empty note', async context =>
   const selected = [];
   const view = await mount(FrontsTable, { fronts, onSelectTeam: id => selected.push(id) }, context);
   assert.equal(text(view.host.querySelector('#fronts-kicker')), 'Your fronts');
-  assert.equal(text(view.host.querySelector('.fronts .kicker__aside')), 'Win chance');
+  assert.equal(view.host.querySelector('.fronts .kicker__aside'), null, 'the column head says Win');
   assert.deepEqual([...view.host.querySelectorAll('thead th')].map(text), ['Nation', 'Str', 'Terr', 'Win']);
   const rows = [...view.host.querySelectorAll('tbody tr.fronts__row')];
   assert.equal(rows.length, fronts.rows.length);
@@ -930,12 +932,12 @@ test('MapOverlays: nothing in conquest, one-line caption variants, phone swap an
   assert.equal(card.querySelector('.map-title-card__kicker'), null);
   assert.equal(text(card.querySelector('h2.map-title-card__title .map-title-card__title-full')), 'The European Campaign');
   assert.equal(text(card.querySelector('.map-title-card__title--phone')), 'Your fronts');
-  assert.equal(text(card.querySelector('.map-title-card__meta')), 'Map after Round XVIII');
-  assert.doesNotMatch(card.textContent, /seed|Round XIX/, 'the masthead carries the round, Settings the seed');
+  assert.equal(card.querySelector('.map-title-card__meta'), null, 'at rest the caption is the theatre alone');
+  assert.doesNotMatch(card.textContent, /seed|Round/, 'the masthead carries the round, Settings the seed');
   const key = view.host.querySelector('.map-key.map-key--political');
   assert.equal(key.getAttribute('role'), 'group');
   assert.equal(key.getAttribute('aria-label'), 'Map key');
-  assert.equal(text(key.querySelector('.map-key__heading')), 'Key');
+  assert.equal(key.querySelector('.map-key__heading'), null, 'a key needs no "Key"');
   assert.deepEqual([...key.querySelectorAll('.map-key__label')].map(text), ['Your empire', 'Next opponent', 'Line of attack', 'Capital']);
   const [you, opponent] = key.querySelectorAll('.map-key__swatch');
   assert.equal(you.style.background, 'var(--you-fill)');

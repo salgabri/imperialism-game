@@ -48,10 +48,9 @@
 }
 .mast__id { display:flex; align-items:center; gap:8px; min-width:0; white-space:nowrap; }
 .mast__team { font:700 13px/1 var(--font-narrow); letter-spacing:.06em; text-transform:uppercase; }
-.mast__role { font:400 12px/1 var(--font-sans); color:var(--muted); }
 .mast__stat { display:flex; align-items:baseline; gap:6px; white-space:nowrap; }
 .mast__label { font:700 11px/1 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
-.mast__label-short { display:none; }
+.mast__label-long { display:none; }
 .mast__value { font:600 13px/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--ink); }
 .mast__delta { font:600 11px/1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted); }
 .mast__delta[data-tone=gain] { color:var(--gain); }
@@ -72,7 +71,6 @@
   .mast__mark > img, .mast__mark > .fi-team-monogram { width:22px; height:16px; }
   .mast__mark > .fi-team-monogram { font-size:8px; }
   .mast__team { font-size:15px; }
-  .mast__role { font-size:14px; }
   .mast__stat { gap:7px; }
   .mast__label { font-size:12px; }
   .mast__value { font-size:15px; }
@@ -87,9 +85,6 @@
   .btn-primary.mast__cta { flex:0 1 auto; min-width:0; }
   .mast__tab { padding:0 9px; }
   .mast__row2 { gap:18px; }
-  .mast__role { display:none; }
-  .mast__label-long { display:none; }
-  .mast__label-short { display:inline; }
   .mast__round--tab { display:inline; }
 }
 
@@ -134,13 +129,17 @@
 }
 
 /* ---------- SettingsPanel (popover body and phone More sheet, A-10) ---------- */
-.settings-panel { display:flex; flex-direction:column; gap:18px; font-size:14px; }
-.settings-panel__section { display:flex; flex-direction:column; gap:10px; }
+.settings-panel { display:flex; flex-direction:column; gap:14px; font-size:14px; }
+.settings-panel__section { display:flex; flex-direction:column; gap:8px; }
 .settings-panel__kicker { margin:0; }
-.settings-panel__note { margin:0; font-size:12px; line-height:1.45; color:var(--muted); }
-/* "This campaign": the launch rules as read-only label / value rows. */
+/* "This campaign": the launch rules as read-only label / value rows, folded until asked for. */
+.settings-panel__campaign > summary { align-items:center; list-style:none; cursor:pointer; min-height:var(--tap); }
+.settings-panel__campaign > summary::-webkit-details-marker { display:none; }
+.settings-panel__chevron { flex:none; }
+.settings-panel__campaign[open] .settings-panel__chevron { transform:rotate(180deg); }
+.settings-panel__campaign[open] > .settings-panel__facts { margin-top:8px; }
 .settings-panel__facts {
-  display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 16px; margin:0; font:400 13px/1.4 var(--font-sans);
+  display:grid; grid-template-columns:auto minmax(0, 1fr); gap:3px 16px; margin:0; font:400 13px/1.35 var(--font-sans);
 }
 .settings-panel__facts > div { display:contents; }
 .settings-panel__facts dt { color:var(--muted); white-space:nowrap; }
@@ -177,12 +176,22 @@
 .playback-mast__sep { white-space:pre; }
 
 /* ---------- PlaybackBar: "sheet" variant (phone More sheet) ---------- */
-.playback-sheet { display:flex; flex-direction:column; gap:8px; }
-/* A fixed heading over the controls; the live state is a muted sub-line, never the controls' title. */
-.playback-sheet__head { display:flex; flex-direction:column; gap:4px; padding-bottom:2px; }
+.playback-sheet { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
+/* A fixed heading over the controls; the live state sits beside it, muted, never the controls' title. */
+.playback-sheet__head { grid-column:1 / -1; display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding-bottom:2px; }
 .playback-sheet__title {
   margin:0; font:700 var(--fs-kicker)/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--ink);
 }
 .playback-sheet__state { margin:0; font:400 13px/1.35 var(--font-sans); color:var(--muted); }
 .playback-sheet__state .playback-summary { font-weight:600; color:var(--ink); }
 .playback-sheet .button { width:100%; min-height:44px; justify-content:space-between; }
+
+/* The More sheet on a phone with its browser bars showing: tighter, and a healthy save says so to screen readers alone. */
+@media (max-width:699.98px) and (max-height:760px) {
+  .more-sheet .settings-panel { gap:8px; }
+  .more-sheet .settings-panel__section { gap:4px; }
+  .more-sheet .settings-panel__new { padding-top:8px; }
+  .more-sheet .playback-sheet__head { display:none; }
+  .more-sheet .settings-panel__section:has(.save-controls) > .settings-panel__kicker { display:none; }
+  .more-sheet .save-status:not(.is-unsaved) { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+}

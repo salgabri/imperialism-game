@@ -32,11 +32,11 @@ export function campaignPreview(count, sport, setup) {
   return { matches: range, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
 }
 
-/** Wizard steps (M§1.8, M§3.3). `pending` is the rail subtitle until the step is done. */
+/** Wizard steps (M§1.8, M§3.3). */
 export const SETUP_STEPS = Object.freeze([
-  { n: 1, id: 'campaign', title: 'Campaign', pending: 'Sport, teams, theatre', next: 'Next: Rules', note: 'The default rules suit a first campaign' },
-  { n: 2, id: 'rules', title: 'Rules', pending: 'How matches are drawn', next: 'Next: Your role', note: 'Rules are fixed at launch; Show matches can change any time' },
-  { n: 3, id: 'role', title: 'Your role', pending: 'Manage a team, or watch', next: 'Launch campaign', note: 'Rules are fixed at launch' },
+  { n: 1, id: 'campaign', title: 'Campaign', next: 'Next: Rules' },
+  { n: 2, id: 'rules', title: 'Rules', next: 'Next: Your role' },
+  { n: 3, id: 'role', title: 'Your role', next: 'Launch campaign' },
 ]);
 
 /** The draw's name in setup, the rail summary and the in-game settings: one-by-one turn order, else the pacing. */
@@ -51,14 +51,14 @@ export const DRAW_NAMES = Object.freeze({ random: 'Random draw', 'round-robin': 
 export const DRAW_CARDS = Object.freeze([
   { value: 'random', title: DRAW_NAMES.random, tag: 'Recommended', tone: 'you', dotStyle: 'rand', dots: ['off', 'on', 'off', 'off', 'on'],
     pacing: 'duel', turnOrder: 'random',
-    body: 'One match per turn. A random team is drawn to attack, so some teams attack often and some wait.' },
+    body: 'One match a turn. A random team attacks.' },
   { value: 'round-robin', title: DRAW_NAMES['round-robin'], dotStyle: 'rr', dots: ['on', 'on', 'current', 'off', 'off'],
     pacing: 'duel', turnOrder: 'round-robin',
-    body: 'One match per turn. Every team attacks once per round, strongest first.' },
+    body: 'One match a turn. Every team attacks in order.' },
   { value: 'blitz', title: DRAW_NAMES.blitz, dotStyle: 'all', dots: ['on', 'on', 'on', 'on', 'on'], pacing: 'blitz',
-    body: 'Teams are paired off each round, with a neighbour where possible; with an odd number, one sits out. The field roughly halves each round.' },
+    body: 'Everyone is paired. The field halves each round.' },
   { value: 'chaos', title: DRAW_NAMES.chaos, dotStyle: 'rand', dots: ['on', 'off', 'on', 'on', 'off'], pacing: 'chaos',
-    body: 'Matches are drawn, mostly between neighbours, until a team would play twice, so the number of matches each round varies.' },
+    body: 'A random batch of matches each round.' },
 ]);
 
 /** Step 3's opponent choice: a manager under a one-match draw only (DEC D2). `body` is the help under the control. */
@@ -70,17 +70,8 @@ export const TARGETING_CARDS = Object.freeze([
 ]);
 
 export const ROLE_CARDS = Object.freeze([
-  { value: 'manager', title: 'Manager',
-    body: 'Run one team. Choose its approach before each match and one of up to three signings after each win.' },
-  { value: 'spectator', title: 'Spectator',
-    body: 'Watch the war play out on its own. Nothing waits for you, and you can follow any team once it starts.' },
-]);
-
-/** The conquest rules the old setup intro listed (ui-interaction contract copy). */
-export const CONQUEST_RULES = Object.freeze([
-  "Win a match to take all of the loser's territories.",
-  'Claim a player; some signings add bench options.',
-  'Last team standing wins.',
+  { value: 'manager', title: 'Manager', body: 'Run one team.' },
+  { value: 'spectator', title: 'Spectator', body: 'Just watch.' },
 ]);
 
 /** "More rules": the launch-fixed options behind step 2's disclosure, shared with the in-game settings. */
@@ -527,7 +518,7 @@ export function rulesOf(setup = {}) {
     turnOrder: applies ? turnOrder : 'random', targeting: canPick ? targeting : 'compass',
     targetingHelp: TARGETING_CARDS.find(card => card.value === (canPick ? targeting : 'compass')).body,
     stored: { turnOrder, targeting },
-    note: applies ? '' : `${drawName} pairs every match itself, so there's no opponent to pick.`,
+    note: applies ? '' : `${drawName} pairs every match itself.`,
     summary: drawName,
   };
 }
@@ -655,9 +646,6 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     };
   }
   const favourites = ranked.slice(0, 5).map(row);
-  const favouriteIds = new Set(favourites.map(team => team.id));
-  const longShots = [...new Set([.55, .7, .85].map(share => ranked[Math.round(field * share)]).filter(Boolean))]
-    .filter(team => !favouriteIds.has(team.id)).map(row);
   const teamChosen = role !== 'manager' || !!picked;
   // A country campaign also waits for its map (and never launches twice while App prepares it), a data set for its file.
   const canLaunch = teamChosen && !countryWaits && !seasonWaits && !launching;
@@ -668,7 +656,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
       : countryState === 'error' ? mapFailed
         : seasonState === 'loading' ? setLoading
           : seasonState === 'error' ? setFailed
-            : teamChosen ? SETUP_STEPS[2].note : `Choose a ${noun} to manage`;
+            : teamChosen ? '' : `Choose a ${noun} to manage`;
 
   return {
     sport: { id: sport.id, name: sport.name },
@@ -713,10 +701,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     rosterPreset: valid(ROSTER_OPTIONS, setup.rosterPreset, 'authentic'),
     homeAdvantage: valid(HOME_OPTIONS, setup.homeAdvantage, 'off'),
     moreRules: moreRulesSummary(setup),
-    role, teams, field, managed, managedId: role === 'manager' ? picked?.id ?? null : null, favourites, longShots, canLaunch,
+    role, teams, field, managed, managedId: role === 'manager' ? picked?.id ?? null : null, favourites, canLaunch,
     // Spectators pick no team, so their step-3 heading names what they do choose.
     roleTitle: role === 'manager' ? `Choose your ${noun}` : 'Choose your role',
-    roleMeta: `${scopeName} · ${sport.name} ${nouns}${pending ? '' : ` · ${count} ${nouns}`}`,
     stepSummaries: {
       1: campaignSummary,
       2: rules.summary,

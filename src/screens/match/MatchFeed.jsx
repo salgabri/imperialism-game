@@ -12,7 +12,6 @@ export default function MatchFeed({ model, live = false, minuteStore = null, min
     <aside className="match-feed" aria-labelledby="match-feed-title">
       <div className="match-feed__head">
         <h2 className="match-feed__title" id="match-feed-title">Match feed</h2>
-        <span className="match-feed__order">Newest first</span>
       </div>
       <div className="match-feed__body" role="log" aria-live="polite" aria-label="Match feed">
         <span className="match-feed__cursor" aria-hidden="true" />

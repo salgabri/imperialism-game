@@ -158,8 +158,6 @@ const listed = names => (names.length > 1 ? `${names.slice(0, -1).join(', ')} an
 
 /** Setup's note for a setup a link filled in (App's `challenge`: the link's seed and the keys it could not use). */
 export function challengeNote({ seed = '', ignored = [] } = {}) {
-  const lead = `This setup${seed ? ` and its seed, ${seed},` : ''} came from the link you opened. Launch it as it is to play the same campaign.`;
   const names = [...new Set(ignored)].map(key => CHALLENGE_LABELS[key]).filter(Boolean);
-  if (!names.length) return lead;
-  return `${lead} The link’s ${listed(names)} ${names.length === 1 ? 'isn’t' : 'aren’t'} offered here, so setup keeps the default${names.length === 1 ? '' : 's'}.`;
+  return `${seed ? `Seed ${seed}. ` : ''}${names.length ? `Not offered here: ${listed(names)}.` : 'Launch it to play the same campaign.'}`;
 }

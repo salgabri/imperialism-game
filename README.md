@@ -199,11 +199,11 @@ manager of the theatre's favourite, with decisions from the first match.
    baseball clubs MLB on its map of the USA and Canada and ice hockey clubs the NHL on its own. Women's football's clubs
    offer its five leagues, the Rest of Europe, all of them or the strongest 32. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
-   the campaign's opening camera frames it (the continent for Europe). It also
-   shows the actual number of teams, the number of matches and the estimated
-   length; its note names the Show matches mode the estimate assumes. With
-   clubs in football, a second theatre group, **One country · top clubs**,
-   starts a [domestic campaign](#domestic-campaigns), and its map shows that
+   the campaign's opening camera frames it (the continent for Europe). Its foot
+   shows the number of teams, the number of matches and the estimated length
+   (the length's title names the Show matches mode the estimate assumes). With
+   clubs in football, the **One country · top clubs** dropdown under the
+   theatres starts a [domestic campaign](#domestic-campaigns), and its map shows that
    country. Football also has a **Season** choice: the built-in 2026/27 (the
    current season), then the [earlier seasons](#football-seasons) 2025/26 back
    to 2004/05 (EA FIFA and FC ratings of each; 2005/06 and 2004/05 have
@@ -213,10 +213,12 @@ manager of the theatre's favourite, with decisions from the first match.
    1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
    football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
-   2025 back to 2021, with nations or with clubs on the map of their day. Women's football and ice hockey
-   list their built-in 2026/27. A
-   quick-resume card appears when a save exists. A page opened from a challenge
-   link shows a note about the link ([Sharing a campaign](#sharing-a-campaign)).
+   2025 back to 2021, with nations or with clubs on the map of their day. Women's
+   football and ice hockey list their built-in 2026/27. A one-line quick-resume
+   strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
+   from a challenge link shows a one-line note about the link
+   ([Sharing a campaign](#sharing-a-campaign)). The header holds the save actions
+   as icons; a failed save or a refused file shows on a strip under it.
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
    matches** picks *Live, minute by minute*, *Final score only* or
    *Fast-forward*; it can be changed at any time during play. A collapsed
@@ -225,15 +227,17 @@ manager of the theatre's favourite, with decisions from the first match.
    or lists only the rules you changed.
 3. **Your role** — **Manager** runs one team. You choose an approach before
    its matches and one of up to three signings after its wins, and, under a
-   one-match draw, **who picks your opponent**. Manager is the default. Until
-   you pick a team, the theatre's strongest is **Suggested** ("The favourite,
-   for a long first campaign"): checked in the list and launched if you pick
-   none. **Another team** after a defeat turns the suggestion off, so Launch
-   waits for a pick. **Spectator** leaves draws, results and signings to the
-   game, and you can follow any empire once the campaign starts. **Challenge a
-   friend** copies a link to this setup and its seed. **Launch campaign**
-   starts it. Saves from before the role existed still load as spectator
-   campaigns.
+   one-match draw, the **Opponent** rule (who picks it). Manager is the default.
+   The teams are a wall of flags (crests for clubs), strongest first. A field
+   too large for the window pages (‹ 1 / 4 ›), and the arrow keys, Home, End
+   and type-ahead walk the wall across its pages. Until you pick a team, the
+   theatre's strongest is **Suggested**: checked on the wall and launched if you
+   pick none. **Another team** after a defeat turns the suggestion off, so
+   Launch waits for a pick. **Spectator** leaves draws, results and signings to
+   the game, and you can follow any empire once the campaign starts. **Copy
+   challenge link** copies a link to this setup and its seed. **Launch
+   campaign** starts it. Saves from before the role existed still load as
+   spectator campaigns.
 
 ### Rules of war
 
@@ -251,7 +255,7 @@ Blitz and chaos allow distant pairings without the directional route restriction
 used in one-by-one mode. Neither mode annexes neutral land to connect teams.
 
 A manager under Random draw or Round robin also chooses, on the Your role step,
-**who picks your opponent** (`targeting`):
+the **Opponent** rule, which decides who picks the opponent (`targeting`):
 
 | Opponent | Whom they attack |
 | --- | --- |
@@ -284,7 +288,8 @@ On your turn under *You choose*, every empire in reach gets a dashed cobalt
 outline and the land out of reach is veiled. The column's **Choose a target**
 panel lists flag, name, strength, the territories you would gain and your win
 chance. The list is sorted by win chance × territories, with the top row
-preselected. A card on the map spells out what winning and losing would mean,
+preselected. When more empires are in reach than the column holds, the list
+pages (‹ 1 / 2 ›) and the arrow keys walk it across its pages. A card on the map spells out what winning and losing would mean,
 and the primary action becomes **Attack <team>**. The campaign waits for your
 choice; no timer runs.
 
@@ -374,25 +379,28 @@ The map fills the screen next to a campaign column (500px at 1600px and wider,
 - **Next fixture.** Before the draw, round robin shows "<TEAM> to attack" with
   "Compass decides the target" or "You choose the target". A random draw shows
   "Next draw · Any of N empires can be drawn". Once the fixture is known, it
-  shows "<A> v <B>", the route ("Across a land border" / "By sea — no shared
-  border"), the odds bar and "Strength 82.1 v 78.4 · from N simulated matches".
-  When your team plays, the odds bar and strength line show the **recommended
+  shows "<A> v <B>", the route when there is no land border ("By sea — no shared
+  border") and the odds bar, whose title reads "Strength 82.1 v 78.4 · from N
+  simulated matches". When your team plays, the odds bar shows the **recommended
   approach** (the one with the best displayed win chance; Balanced on a tie), and
-  a line names it: "Continue kicks off with Attack, the recommended approach."
-  **Match preview** opens the approach choice, with that option tagged
-  Recommended and focused. **or simulate the result** reveals this match at once
-  with the recommended approach, and **Continue** kicks off with it. During and
+  the block's kicker names it ("Attack"; its title says Continue kicks off with
+  it). **Match preview** opens the approach choice, with that option tagged
+  Recommended and focused. **Simulate** reveals this match at once with the
+  recommended approach, and **Continue** kicks off with it. During and
   after the match the block holds the compact match card with the score and minute.
   Between your decisions the block offers **Skip to your next match**: every
   match without your team plays at Fast-forward pace (4×, autoplay on) until
   your next tactical gate or target choice, which hands back the speed and
-  autoplay you had. While it runs the block reads "Skipping to your next match ·
-  N matches played" with **Stop**; Pause also ends it, and a speed picked
-  meanwhile is the one handed back.
+  autoplay you had. While it runs the block reads "Skipping · N matches played"
+  with **Stop**; Pause also ends it, and a speed picked meanwhile is the one
+  handed back.
 - **Your fronts** — neighbouring empires with strength, territories and your
   win chance: green at 60% or more, amber at 45–59%, red below 45%.
 - **Latest results** — "Germany beat Austria", the score and the claimed
-  player. **Chronicle** opens the full history.
+  player. The ticker already lists them, so the column shows them only where
+  there's room: on desktops at least 860px tall, on tablets in place of the
+  fronts, and in a phone's expanded sheet unless the phone is short.
+  **Chronicle** opens the full history.
 
 A spectator's column shows **This turn** instead: attacker, "compass points
 to", defender and the odds, then the live match card. It also shows
@@ -426,8 +434,9 @@ basketball, or PENALTIES). Below it, a **win-probability chart** follows the
 match from your side: the managed team, else the followed team, else the
 attacker. It marks goals and half-time. Football uses a Poisson model of the
 goals still to come, built from the match's own lineups. Basketball uses a
-normal approximation of the remaining margin. Both lineups follow, with
-claimed players tagged and ratings coloured by tier. A dark match feed lists
+normal approximation of the remaining margin. **Chart | Lineups** switches to
+both lineups, with claimed players tagged and ratings coloured by tier. Lineups
+longer than the window (American football's 23) page together. A dark match feed lists
 events newest first and has 1× / 2× / 4× speed chips and Pause. When a live
 ticker match involving your team (or, as a spectator, the followed team) kicks
 off while you are on Map, the game switches to Match, under Fast-forward too; the
@@ -438,23 +447,26 @@ next fixture before the first one.
 
 **Squad** shows one team: the flag, "First team · N players · K claimed in
 conquest", the starting-lineup strength and its change, and the claimed count.
-Tabs switch between **List**, **Pitch** and **Acquisitions**. The list columns
-are No · Pos · Player · Natural · In role · Rtg · Acquired · Source, grouped by
-position, followed by squad depth. The side column has the formation (claimed
-players in teal), a strength profile on a 60–95 scale and the latest claims.
+Tabs switch between **List**, **Pitch** and **Acquisitions** (phones: List,
+Pitch and Bench). The list columns are Pos · Player · Rtg · Acquired, grouped by
+position. A player out of position shows the in-role rating with ↓. The natural
+positions and the data source are on the row's title, and the name links to the
+source. The side column has a strength profile on a 60–95 scale and the squad
+depth, paged to fit. The pitch marks claimed players in teal.
 Basketball uses a court, Guards / Forwards / Centres and an offence/defence
 profile. Squad opens from the navigation, from map land or from a Ledger row;
 Back returns to where you came from.
 
 The **conquest screen** appears after your managed team wins, and the campaign
 waits for your choice. The map hatches the taken land under a "+N territories
-taken" callout. Beside it, an article reads "SERBIA IS OUT", with a
-winner-first standfirst and the territory and empire effects. **Claim one
+taken" callout. Beside it, an article reads "SERBIA IS OUT", with the result
+("Italy beat Serbia 2–0.") and the territory and empire effects. **Claim one
 player** lists the candidates, with the best lineup fit preselected. Each one
 reads "FW · 86 rating · Starts ahead of <player>" or "Adds depth · the XI is
 unchanged", with the strength gain. The position lists every natural position,
-so a basketball combo guard reads "PG/SG · 88 rating". A collapsible "Lineup
-before and after" compares the lineups, and **Sign <player>** confirms. If your
+so a basketball combo guard reads "PG/SG · 88 rating". A collapsible **Lineup
+changes** lists the places the signing changes, before and after, or says the
+lineup stays the same. **Sign <player>** confirms. If your
 team is knocked out, the same article layout ("ITALY IS OUT") offers
 **Continue as spectator**, which follows the team that knocked you out (change it
 under Following), or **Try again**: **Same draw** replays the campaign's seed, so
@@ -465,15 +477,19 @@ Conquests by other teams never wait: a notice on the map, the ticker and a brief
 hatch flash report them.
 
 **Ledger** shows the standings (# · Team · Terr · Strength · Conq · Claimed),
-the share of the map and the fallen empires. **Chronicle** shows the match
-history, the archived match card, turning points and the activity feed.
+the share of the map and the fallen empires, a wall of grey flags. **Chronicle**
+shows the match history, the archived match card, turning points and the
+activity feed. The standings, the history and the feed show the rows that fit
+and page through the rest. Below 1200px a switch shows one panel at a time:
+Standings · Map share · Fallen, and Matches · Result · Story.
 
 ### Phones and tablets
 
 Below 700px the masthead shrinks to the flag, wordmark and round over four stat
 cells. The map zooms to your empire and the next opponent, with a **Whole map** /
 **Your fronts** toggle. The campaign column becomes a bottom sheet with a grab
-handle; tapping it expands the sheet to show your fronts and latest results. A
+handle; tapping it expands the sheet to show your fronts and latest results (the
+fronts alone on a short phone). A
 full-width primary bar sits above a tab bar of **Map · Squad · Match · Ledger ·
 More**. While nothing waits on a decision, the bar ends with **Auto** (a manager's
 autoplay toggle; a spectator's primary already plays and pauses) and the speed
@@ -482,9 +498,13 @@ match), in place of the round, because the sheet's own Skip button sits below
 its fold whenever a match card fills it. Under 360px these keep their 44px
 targets as icons and figures. **More** holds the Chronicle, the playback controls,
 Settings and saves.
-From 700px to 1199px the map sits on top and the column content runs in two
-columns below. Touch targets are at least 44px. Reduced motion keeps only
-opacity transitions.
+From 700px to 1199px a portrait tablet has the map on top and the column
+content in two columns below. In landscape the map and the column, the conquest
+article and the match feed sit side by side, as on a desktop. No screen scrolls
+in a normal state: lists page and team fields become flag walls. On a short
+phone (its browser bars showing) the extras give way first: the
+[compact pass record](docs/design/compact-pass.md) lists what goes where. Touch
+targets are at least 44px. Reduced motion keeps only opacity transitions.
 
 ### Finale, seeds and saves
 
@@ -845,8 +865,8 @@ five is then the lineup the game itself would field from its whole roster.
 
 ## Domestic campaigns
 
-With **Clubs** and football, the Theatre list has a second group, **One country
-· top clubs**, listed biggest leagues first. Pick a country and its top clubs
+With **Clubs** and football, a dropdown under the theatres, **One country · top
+clubs**, lists the countries biggest leagues first. Pick a country and its top clubs
 fight over that country alone. How many depends on the league's tier
 (`src/data/domesticTiers.js`): 100 for England, Spain, Germany, Italy, France,
 Turkey, Brazil and Argentina; 60 for strong leagues such as Portugal, the
@@ -872,7 +892,7 @@ and conquest results use section names, such as "Lancashire (east)", where
 Burnley starts.
 
 In the v4 interface, choosing **Clubs** in setup step 1 adds the **One country ·
-top clubs** group below the leagues (football only). Picking a country shows a
+top clubs** dropdown below Europe's two theatres (football only). Picking a country shows a
 preview card: its sections in their starting clubs' kick-off colours over the
 neighbouring land, captioned with the number of sections. The sectioned map
 uses the same flat style as the world map: pastel section fills, white borders
@@ -1513,7 +1533,8 @@ Banners sit only in space the game leaves empty, each under a muted
 
 - **Setup:** a 200×200 square at the foot of the step rail, at least 40px below
   the last step and far from the footer's buttons. It shows only where the rail
-  is a column (1200px wide and up) and the window is at least 740px tall.
+  is wide enough for it (1600px wide and up) and the window is at least 740px
+  tall.
 - **Ledger:** a 300×250 unit in the side column, after Share of the map.
 - **Chronicle:** a 300×250 unit in the side column, after Turning points and
   above the activity feed.
@@ -1581,7 +1602,7 @@ src/
   screens/             presentational v4 screens, one folder per area
     campaign/          Next fixture, Your fronts, Latest results, ticker, map overlays
     match/             score header, win-probability chart, XI tables, match feed
-    squad/             squad table, pitch/court, strength profile, claims
+    squad/             squad table, pitch/court, strength profile, acquisitions
     conquest/          conquest article and map callout
     turns/             turn strip, Choose a target panel and card, spectator panel
     ledger/            Ledger and Chronicle screens, standings, history
@@ -1628,7 +1649,7 @@ src/
   data/sha256.js       synchronous SHA-256 for the data set builder
   data/flags.js        nation id -> flag asset
   data/capitals.js     capital city coordinates
-  hooks/               map zoom and pan viewport
+  hooks/               map zoom and pan viewport; useFit (lists that page, team walls that fit)
   engine/
     geo.js             TopoJSON decode, land adjacency, projection, SVG paths
     random.js          sampling shared by every sport
@@ -1642,7 +1663,7 @@ src/
     storage.js         autosave, save slots and versions
   components/          masthead (CommandBar), playback, phone chrome, map, setup
                        wizard, match card, dialogs and overlays, crash screen
-                       (ErrorBoundary), the ad slot
+                       (ErrorBoundary), the ad slot, the pager
 public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display

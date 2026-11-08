@@ -41,11 +41,11 @@
   --mast-h:76px; --mast-row2-h:28px; --mast-pad:0 20px; --mast-gap:18px;
   --col-w:360px; --col-pad:18px 20px; --col-gap:18px; --map-inset:20px;
   --fs-wordmark:30px; --fs-dateline:11px; --fs-nav:14px; --nav-bar:3px;
-  --fs-title:54px;        /* screen title (squad name) */
-  --fs-headline:74px;     /* big result headline */
-  --fs-fixture:34px;      /* fixture headline */
+  --fs-title:32px;        /* screen title (squad name) */
+  --fs-headline:52px;     /* big result headline */
+  --fs-fixture:30px;      /* fixture headline */
   --fs-kicker:12px; --fs-body:15px; --fs-num:13px; --fs-label:11px; --fs-meta:11px;
-  --fs-score:124px;       /* live score */
+  --fs-score:88px;        /* live score */
   --btn-h:36px; --btn-fs:14px; --btn-pad:0 10px 0 16px; --btn-gap:10px; --kbd-fs:10px; --kbd-pad:2px 6px;
   --btn2-h:38px; --btn2-fs:13px;
   --ticker-h:30px; --ticker-fs:12px;
@@ -83,24 +83,26 @@
   --mast-h:92px; --mast-row2-h:34px; --mast-pad:0 28px; --mast-gap:24px;
   --col-w:500px; --col-pad:26px 30px; --col-gap:28px; --map-inset:30px;
   --fs-wordmark:40px; --fs-dateline:13px; --fs-nav:16px; --nav-bar:4px;
-  --fs-fixture:54px; --fs-kicker:13px; --fs-body:17px; --fs-num:15px; --fs-label:12px; --fs-meta:12px;
+  --fs-title:38px; --fs-headline:64px; --fs-score:104px; --fs-fixture:44px; --fs-kicker:13px; --fs-body:17px; --fs-num:15px; --fs-label:12px; --fs-meta:12px;
   --btn-h:46px; --btn-fs:17px; --btn-pad:0 14px 0 20px; --btn-gap:12px; --kbd-fs:11px; --kbd-pad:2px 6px;
   --btn2-h:44px; --btn2-fs:15px; --ticker-h:36px; --ticker-fs:14px; --row-h:38px; --flag-w:24px; --target-row-h:44px;
 } }
 @media (max-width:1199.98px) { :root {
   --mast-h:92px; --mast-row2-h:40px; --mast-pad:0 18px; --mast-gap:14px;
   --col-pad:22px 26px; --col-gap:22px 30px; --map-inset:18px;
-  --fs-wordmark:26px; --fs-nav:13px; --fs-fixture:32px;
-  --fs-title:40px; --fs-headline:56px; --fs-score:88px;   /* [derived: README gives no 820 value; A-3] */
+  --fs-wordmark:26px; --fs-nav:13px; --fs-fixture:30px;
+  --fs-title:28px; --fs-headline:44px; --fs-score:72px;   /* [derived: README gives no 820 value; A-3] */
   --btn-h:40px; --btn-pad:0 16px; --btn2-h:44px; --ticker-h:34px; --ticker-fs:13px; --row-h:34px;
 } }
 @media (max-width:699.98px) { :root {
   --mast-h:88px; --mast-row2-h:40px; --mast-pad:0 18px; --map-inset:12px;
   --col-pad:10px 18px 14px; --col-gap:0;
-  --fs-wordmark:24px; --fs-nav:12px; --fs-title:28px; --fs-headline:32px; --fs-fixture:28px;
+  --fs-wordmark:24px; --fs-nav:12px; --fs-title:24px; --fs-headline:32px; --fs-fixture:26px;
   --fs-kicker:11px; --fs-body:16px; --fs-score:58px;
   --btn-h:56px; --btn-fs:17px; --btn2-h:44px; --tap:44px;
-  --phone-map-h:330px;    /* phone map row (shell.css) and the sheet's slide-up offset (campaign.css) */
+  /* Phone map row (shell.css) and the sheet's slide-up offset (campaign.css): what the chrome (264px) and the collapsed
+     sheet (218px at its tallest) leave, so a short phone gives up map rather than scroll the sheet. */
+  --phone-map-h:clamp(150px, calc(100dvh - 482px), 330px);
 } }
 @media (pointer:coarse) { :root { --tap:44px; } }
 

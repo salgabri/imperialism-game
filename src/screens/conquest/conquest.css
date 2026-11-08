@@ -8,7 +8,7 @@
 .screen--conquest {
   z-index:28; /* above map overlays/anchors, below the masthead (z 30) and its popover */
   display:flex; flex-direction:column;
-  padding:28px 40px 0; /* the 26px bottom inset lives on the sticky footer, so it also clears the edge when stuck */
+  padding:20px 32px 0; /* the bottom inset lives on the sticky footer, so it also clears the edge when stuck */
   background:var(--surface); color:var(--ink);
   border-left:1px solid var(--rule);
 }
@@ -25,33 +25,23 @@
 .conquest-kicker__aside { flex:none; color:var(--muted); }
 
 .conquest-headline {
-  margin:16px 0 0;
+  margin:12px 0 0;
   font:700 var(--fs-headline)/.9 var(--font-narrow); letter-spacing:0;
   text-transform:uppercase; text-wrap:balance; overflow-wrap:anywhere; color:var(--ink);
 }
-.conquest-standfirst { margin:14px 0 0; font:400 20px/1.45 var(--font-sans); color:var(--text-2); text-wrap:pretty; }
+.conquest-standfirst { margin:8px 0 0; font:400 18px/1.35 var(--font-sans); color:var(--text-2); text-wrap:pretty; }
 
 /* Effects: two cells, top + bottom 1px rule, no divider; values in gain (D§2.5) */
 .conquest-effects {
-  margin:18px 0 0; display:grid; grid-template-columns:1fr 1fr;
+  margin:12px 0 0; display:grid; grid-template-columns:1fr 1fr;
   box-shadow:inset 0 1px 0 var(--rule), inset 0 -1px 0 var(--rule);
 }
-.conquest-effect { min-width:0; padding:10px 14px 10px 0; }
+.conquest-effect { min-width:0; display:flex; align-items:baseline; gap:10px; padding:8px 14px 8px 0; }
 .conquest-effect__label { font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
-.conquest-effect__value { margin:0; font:600 30px/1.1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--gain); }
-/* Names clamp to 2 lines; "+ N more" sits outside the clamp at the end of the last line (D§10 #7). */
-.conquest-effect__detail {
-  margin:0; display:flex; align-items:flex-end; column-gap:.3em;
-  font:400 13px/1.35 var(--font-sans); color:var(--muted);
-}
-.conquest-effect__text {
-  flex:0 1 auto; min-width:0;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-}
-.conquest-effect__more { flex:none; white-space:nowrap; }
+.conquest-effect__value { margin:0; font:600 26px/1.1 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--gain); }
 
 /* "Claim one player" uses the shared .kicker (README 12px, D§9 #1) */
-.conquest-claim-head { margin-top:20px; }
+.conquest-claim-head { margin-top:16px; }
 
 /* ---- Options (radio rows) ---- */
 .conquest-options { display:flex; flex-direction:column; gap:6px; margin-top:6px; }
@@ -77,7 +67,7 @@
 }
 .conquest-option__gain { font:600 22px/1 var(--font-sans); font-variant-numeric:tabular-nums; white-space:nowrap; }
 
-/* ---- "Lineup before and after" (DEC D15; collapsed by default) ---- */
+/* ---- "Lineup changes" (DEC D15; collapsed by default) ---- */
 .conquest-compare { margin-top:14px; }
 .conquest-compare__summary {
   display:flex; align-items:center; gap:12px; min-height:max(36px, var(--tap)); padding:0;
@@ -97,23 +87,19 @@
 .conquest-compare__chevron { flex:none; color:var(--muted); transition:transform .15s ease-out; }
 .conquest-compare[open] .conquest-compare__chevron { transform:rotate(180deg); }
 .conquest-compare__table { margin-top:2px; font:400 13px/1.3 var(--font-sans); }
-.conquest-compare__caption {
-  caption-side:top; padding:8px 0 2px; text-align:left;
-  font:400 12px/1.35 var(--font-sans); color:var(--muted);
-}
+.conquest-compare__none { margin:8px 0 0; font:400 13px/1.35 var(--font-sans); color:var(--muted); }
 .conquest-compare__table thead th:first-child { width:56px; }
 /* the primitive header cell has no side padding: keep "Position" clear of "Before" */
 .conquest-compare .conquest-compare__table thead th { padding-right:8px; }
+.conquest-compare__table td:last-child { font-weight:600; }
 .conquest-compare .conquest-compare__table tbody th,
 .conquest-compare .conquest-compare__table td {
-  height:27px; padding:0 8px 0 0; border-top:1px solid var(--row-rule); border-bottom:0;
+  padding:0 8px 0 0; border-top:1px solid var(--row-rule); border-bottom:0;
   vertical-align:middle; text-align:left; text-transform:none; letter-spacing:0; white-space:normal;
 }
 .conquest-compare .conquest-compare__table tbody th { font:600 12px/1.2 var(--font-sans); color:var(--text-2); }
 .conquest-compare .conquest-compare__table tbody tr:first-child > * { border-top:0; }
 .conquest-compare__rating { font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--muted); }
-.conquest-compare tr.is-changed > * { background:var(--you-soft); }
-.conquest-compare tr.is-changed td:last-child { font-weight:600; }
 .conquest-compare__support { margin:8px 0 0; font:400 12px/1.4 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted); }
 
 /* ---- Footer: primary pinned to the bottom (D§2.5; no SPACE chip here, D§9 #4) ----
@@ -122,7 +108,7 @@
 .conquest-footer {
   position:sticky; bottom:0; z-index:1;
   /* 12px top: only seen while the article scrolls; with 16px the D1 article overflowed 1366×768 by 2px */
-  margin-top:auto; padding:12px 0 26px;
+  margin-top:auto; padding:12px 0 20px;
   display:flex; align-items:center; gap:16px;
   background:var(--surface);
 }
@@ -140,7 +126,11 @@
   height:50px; padding:0 22px; gap:10px; font-size:17px;
 }
 .conquest-footer__label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.conquest-footer__note { flex:0 1 auto; min-width:0; margin:0; font:400 14px/1.35 var(--font-sans); color:var(--muted); }
+/* The comparison open: the figures above give it their room, so the article still fits. */
+.screen--conquest:has(.conquest-compare[open]) :is(.conquest-effects, .conquest-standfirst, .conquest-option__meta) { display:none; }
+.screen--conquest:has(.conquest-compare[open]) .conquest-option { padding-top:6px; padding-bottom:6px; }
+.conquest-compare .conquest-compare__table tbody th, .conquest-compare .conquest-compare__table td { height:23px; }
+.screen--conquest:has(.conquest-compare[open]) .conquest-compare { margin-top:6px; }
 
 /* ---- Callout card over the taken land (D§2.4); fades in after the hatch (A-2) ----
    WorldMap centres the anchor on the taken land; the card then sits a quarter of its width left and a little up of
@@ -164,9 +154,14 @@
 
 /* ---- Tablet 700–1199: map on top, article below (A-2, DEC D22) ---- */
 @media (max-width:1199.98px) {
-  .screen--conquest { z-index:auto; padding:22px 26px 0; border-left:0; border-top:1px solid var(--rule); }
-  .conquest-standfirst { font-size:18px; }
-  .conquest-footer { padding-bottom:calc(24px + var(--safe-bottom, 0px)); }
+  .screen--conquest { z-index:auto; padding:16px 26px 0; border-left:0; border-top:1px solid var(--rule); }
+  .conquest-standfirst { font-size:16px; }
+  .conquest-footer { padding-bottom:calc(14px + var(--safe-bottom, 0px)); }
+}
+
+/* ---- Landscape tablet: the article beside the map (shell.css), as on a desktop ---- */
+@media (min-width:700px) and (max-width:1199.98px) and (orientation:landscape) {
+  .screen--conquest { padding:14px 22px 0; border-top:0; border-left:1px solid var(--rule); }
 }
 
 /* ---- Phone <700 (D2): sheet content; the PhoneBar carries "Sign <player>" + gain ---- */
@@ -195,6 +190,11 @@
   .callout__figure { font-size:30px; }
   .callout__label { font-size:11px; }
   .callout__sub { font-size:13px; }
+}
+
+/* ---- A phone with its browser bars showing: the standfirst gives way, since the headline says most of it ---- */
+@media (max-width:699.98px) and (max-height:760px) {
+  .conquest-standfirst { display:none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
