@@ -253,7 +253,13 @@ These settle layout questions the decisions above left open:
   and with no team picked the theatre's strongest is suggested
   (`suggestedTeamId` in setupModel.js), checked, labelled Suggested and
   launched. DEFAULT_SETUP keeps Spectator, because it also fills the settings
-  of saves made before the role existed.)*
+  of saves made before the role existed.)* *(Amended 2026-11-08: the card is no
+  longer static. `SetupMap.jsx` gives it the campaign map's camera, so it zooms
+  (scroll, pinch, the −/+/reset group, hidden on phones) and pans, and a
+  **Political** / **Flags** switch (**Crests** for clubs) shows each starting
+  team's flag or crest on its land, built as the campaign's Flags mode builds
+  them (`setupMapFlags`). The switch is the card's own choice (`setupMapMode`),
+  not the campaign map's mode.)*
 - Space on a focused option in the conquest or target list still runs the
   primary action. Setup handles its own Space (next step / launch).
 - While a signing or target choice is pending, every nav entry except Map is
