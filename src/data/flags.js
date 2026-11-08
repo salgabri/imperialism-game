@@ -3,6 +3,8 @@
 // Derived from the iso_a2 column of the Natural Earth 110m attribute table, with
 // football-specific overrides: the United Kingdom's shape is England, beside
 // Scotland, Wales and Northern Ireland, and Kosovo has no ISO numeric code of its own.
+// Great Britain, the United Kingdom's team in the sports that play it as one, flies
+// the Union Jack under its own flag id ('GBR', GREAT_BRITAIN in src/data/teams.js).
 //
 // Assets are vendored from the MIT-licensed `flag-icons` package; re-sync them
 // with `npm run sync-flags` after changing this map.
@@ -154,6 +156,7 @@ export const FLAG_CODES = {
   'SCO': 'gb-sct',    // Scotland
   'WAL': 'gb-wls',    // Wales
   'NIR': 'gb-nir',    // Northern Ireland
+  'GBR': 'gb',        // Great Britain (the United Kingdom as one team)
   '834': 'tz',        // Tanzania
   '840': 'us',        // United States
   '854': 'bf',        // Burkina Faso

@@ -105,10 +105,11 @@ function RailSummary({ text }) {
   ));
 }
 
+/** A row's flag (`flagId`: Great Britain's is not its shape's id) or a club's crest, found by its id. */
 function TeamRowMark({ team, width = 24 }) {
   return (
     <span className="setup-team-mark" aria-hidden="true">
-      <TeamMark id={team.id} code={team.code} isClub={team.isClub} width={width} />
+      <TeamMark id={team.flagId ?? team.id} teamId={team.id} code={team.code} isClub={team.isClub} width={width} />
     </span>
   );
 }
@@ -118,7 +119,7 @@ function SelectedTeam({ team, noun }) {
     <section className="setup-pick" aria-labelledby="setup-pick-name">
       <div className="setup-pick__head">
         <span className="setup-pick__flag" aria-hidden="true">
-          <TeamMark id={team.id} code={team.code} isClub={team.isClub} width={48} />
+          <TeamMark id={team.flagId ?? team.id} teamId={team.id} code={team.code} isClub={team.isClub} width={48} />
         </span>
         <div className="setup-pick__id">
           <p className="setup-pick__kicker">{team.suggested ? 'Suggested' : 'Selected'} {noun}</p>

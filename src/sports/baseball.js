@@ -1,7 +1,7 @@
 import { C } from '../theme.js';
 import { ROSTERS } from '../data/rosters.baseball.js';
 import { CLUBS } from '../data/clubs.baseball.js';
-import { HOME_NATIONS, selectLineup } from '../data/teams.js';
+import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 
 // The clock counts outs: three a half-inning, six an inning, nine innings. The attacker bats first (the top of each
@@ -213,6 +213,8 @@ export const baseball = {
   // The World Baseball Classic fields Great Britain and the Kingdom of the Netherlands: the home nations' shapes start
   // in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
+  // That empire plays as Great Britain, under the Union Jack. A season's sport keeps this with the rest of baseball's.
+  playsAs: { '826': GREAT_BRITAIN },
 
   squadSize: 13,
   formation: { C: 1, '1B': 1, '2B': 1, '3B': 1, SS: 1, LF: 1, CF: 1, RF: 1, DH: 1, SP: 1, RP: 3 },

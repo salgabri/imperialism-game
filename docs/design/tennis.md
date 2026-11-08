@@ -43,9 +43,9 @@ Cup captain nominates five. Left out:
 
 That leaves 52 nations, from Spain (86.1) and Italy (86) down to Thailand (58.5). A nation
 without a team stays neutral land, as in women's football. Great Britain plays the Davis Cup
-as one, so the home nations' shapes start in the United Kingdom's empire, under England's name
-and flag as in basketball, baseball and hockey. Russia and Belarus, out of today's Davis Cup,
-play here.
+as one, so the home nations' shapes start in the United Kingdom's empire, which plays as Great
+Britain (GBR) under the Union Jack, as in basketball, baseball and hockey. Russia and Belarus,
+out of today's Davis Cup, play here.
 
 ## The team
 

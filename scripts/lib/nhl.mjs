@@ -11,8 +11,8 @@
 // A nation fields every player of its own: by EA's nationality for a player EA rates, else by the country the NHL says
 // he was born in. A place a nation cannot fill is the game's to fill with a generated player at the nation's strength,
 // as in baseball; that strength counts those places at the sport's baseline.
-import { NATIONS, selectLineup } from '../../src/data/teams.js';
-import { BASELINE } from '../../src/sports/hockey.js';
+import { NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
+import { BASELINE, hockey } from '../../src/sports/hockey.js';
 
 const SPORT = 'hockey';
 export const ROSTER_SIZE = 23;
@@ -124,6 +124,6 @@ export function nationsOf(players) {
     const { squad, lineup } = rosterOf(pool.slice().sort(byRating));
     const open = lineup.slots.filter(slot => !slot.player || slot.penalty > 4);
     const covered = lineup.slots.map(slot => (slot.player && slot.penalty <= 4 ? slot.effectiveRating : BASELINE));
-    return { id, name: NATIONS[id][0], str: Math.round(covered.reduce((s, v) => s + v, 0) / covered.length), squad, open: open.map(slot => slot.position) };
+    return { id, name: nationIdentity(id, hockey).name, str: Math.round(covered.reduce((s, v) => s + v, 0) / covered.length), squad, open: open.map(slot => slot.position) };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
 }

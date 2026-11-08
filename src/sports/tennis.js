@@ -1,6 +1,6 @@
 import { C } from '../theme.js';
 import { ROSTERS } from '../data/rosters.tennis.js';
-import { HOME_NATIONS, NATIONS, selectLineup } from '../data/teams.js';
+import { GREAT_BRITAIN, HOME_NATIONS, NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, gauss } from '../engine/random.js';
 
 // Tennis by the rules of the Davis Cup's home-and-away ties (docs/design/tennis.md). Two nations' teams play five
@@ -358,6 +358,8 @@ export const tennis = {
     merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])),
     inactive: Object.keys(NATIONS).filter(id => !HOME_NATIONS.includes(id) && !Object.hasOwn(ROSTERS, id)),
   },
+  // That empire plays as Great Britain, under the Union Jack.
+  playsAs: { '826': GREAT_BRITAIN },
 
   squadSize: 4,
   formation: { SGL: 2, DBL: 2 },

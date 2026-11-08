@@ -1037,7 +1037,7 @@ export default class App extends React.Component {
     const board = geo?.adj ? { geo, own: opening } : null;
     // Country clubs (ids like "d826-679") are unknown to the sport's club list: pass their own code and kind.
     const teams = included.map(team => ({ id: team.id, name: team.name, code: team.code, isClub: team.kind === 'club',
-      rating: teamEff(team),
+      flagId: team.flagId ?? null, rating: teamEff(team),
       ...(loaded ? { meta: [team.conf, loaded.sectionNames[team.home]].filter(Boolean).join(' · ') } : {}),
       players: selectLineup(team).starters.filter(player => Number.isFinite(player?.rating))
         .sort((a, b) => b.rating - a.rating || String(a.name).localeCompare(String(b.name))).slice(0, 5)

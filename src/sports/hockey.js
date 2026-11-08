@@ -1,7 +1,7 @@
 import { C } from '../theme.js';
 import { ROSTERS } from '../data/rosters.hockey.js';
 import { CLUBS } from '../data/clubs.hockey.js';
-import { HOME_NATIONS, selectLineup } from '../data/teams.js';
+import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, createScorerSampler, gauss, poisson } from '../engine/random.js';
 
 // Three twenty-minute periods, told in three-minute slices: the score decides how each slice is played. Level after
@@ -183,6 +183,8 @@ export const hockey = {
   clubs: CLUBS,
   // Ice hockey's Great Britain plays as one: the home nations' shapes start in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
+  // That empire plays as Great Britain, under the Union Jack.
+  playsAs: { '826': GREAT_BRITAIN },
 
   squadSize: 19,
   formation: { C: 4, LW: 4, RW: 4, D: 6, G: 1 },

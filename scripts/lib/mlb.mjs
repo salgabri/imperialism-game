@@ -13,8 +13,8 @@
 // Virgin Islands are the United States'; Curaçao and Aruba play for the Kingdom of the Netherlands, as in the World
 // Baseball Classic. A nation that cannot field a lineup slot from its own players leaves it to the game, which fields
 // a generated player there at the nation's strength; that strength counts those slots at the sport's baseline.
-import { NATIONS, selectLineup } from '../../src/data/teams.js';
-import { BASELINE } from '../../src/sports/baseball.js';
+import { NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
+import { BASELINE, baseball } from '../../src/sports/baseball.js';
 
 export const FREE_AGENTS = 'FA';
 const SPORT = 'baseball';
@@ -135,7 +135,7 @@ export function nationsOf(players) {
     // A slot the nation's own players cannot fill naturally is the game's to fill, at the sport's baseline.
     const covered = lineup.slots.map(slot => (slot.player && !slot.outOfPosition ? slot.effectiveRating : BASELINE));
     const str = Math.round(covered.reduce((s, v) => s + v, 0) / covered.length);
-    return { id, name: NATIONS[id][0], str, squad, open: lineup.slots.filter(slot => !slot.player || slot.outOfPosition).map(slot => slot.position) };
+    return { id, name: nationIdentity(id, baseball).name, str, squad, open: lineup.slots.filter(slot => !slot.player || slot.outOfPosition).map(slot => slot.position) };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
 }
 

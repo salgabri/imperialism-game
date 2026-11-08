@@ -24,7 +24,7 @@ export const ROSTERS = {
   '558': [51,4,[["Milkar Pérez",'1B/3B',55],["Freddy Zamora",'SS/2B',65],["Carlos Rodriguez",'SP',62],["Jonathan Loaisiga",'RP',76]]], // Nicaragua
   '276': [50,2,[["Brendan Donovan",'3B/2B/SS/LF',78],["Max Kepler",'LF/RF',72]]], // Germany
   '044': [49,2,[["BJ Murray Jr.",'1B/3B',67],["Jazz Chisholm Jr.",'2B/3B',74]]], // Bahamas
-  '826': [49,2,[["Matt Koperniak",'RF/LF/CF',62],["Michael Petersen",'RP',77]]], // England
+  '826': [49,2,[["Matt Koperniak",'RF/LF/CF',62],["Michael Petersen",'RP',77]]], // Great Britain
   '380': [49,2,[["Chase Burns",'SP',85],["Sam Aldegheri",'RP',57]]], // Italy
   '340': [48,1,[["Mauricio Dubón",'SS/1B/2B/3B/LF/CF/RF',82]]], // Honduras
   '710': [47,2,[["Tayler Scott",'RP',63],["Mitch Neunborn",'RP',54]]], // South Africa

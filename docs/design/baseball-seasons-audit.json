@@ -67,7 +67,7 @@
         "Brazil 49 (3; the game fills 1B 2B 3B SS LF CF RF DH SP RP)",
         "Italy 49 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "Honduras 48 (1; the game fills C 2B 3B SS LF CF RF DH SP RP RP RP)",
-        "England 47 (2; the game fills C 1B 2B 3B SS CF RF DH SP RP RP)",
+        "Great Britain 47 (2; the game fills C 1B 2B 3B SS CF RF DH SP RP RP)",
         "Slovakia 46 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "South Africa 46 (1; the game fills C 1B 2B 3B SS LF CF RF DH SP RP RP)"
       ],
@@ -135,7 +135,7 @@
         "Bahamas 48 (1; the game fills C 1B 3B SS LF CF RF DH SP RP RP RP)",
         "Brazil 48 (2; the game fills 1B 2B 3B SS LF CF RF DH SP RP RP)",
         "Chinese Taipei 48 (3; the game fills C 3B SS LF CF RF DH SP RP RP)",
-        "England 47 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
+        "Great Britain 47 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "Honduras 47 (1; the game fills C 2B 3B SS LF CF RF DH SP RP RP RP)",
         "Italy 46 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "Slovakia 46 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)"
@@ -768,7 +768,7 @@
         "Brazil 48 (2; the game fills 1B 2B 3B SS LF CF RF DH SP RP RP)",
         "Honduras 48 (1; the game fills C 1B 3B SS LF CF RF DH SP RP RP RP)",
         "Chinese Taipei 47 (1; the game fills C 2B 3B SS LF CF RF DH SP RP RP RP)",
-        "England 47 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
+        "Great Britain 47 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "China 46 (1; the game fills C 1B 2B 3B SS LF CF RF DH SP RP RP)",
         "Slovakia 46 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)"
       ],
@@ -832,7 +832,7 @@
         "Japan 60 (9; the game fills C 2B SS RF DH RP)",
         "South Korea 57 (7; the game fills C CF RF DH RP RP RP)",
         "Bahamas 50 (2; the game fills C 1B SS LF CF RF DH SP RP RP RP)",
-        "England 50 (3; the game fills C 1B 3B SS CF RF DH SP RP RP)",
+        "Great Britain 50 (3; the game fills C 1B 3B SS CF RF DH SP RP RP)",
         "Nicaragua 50 (3; the game fills C 1B 3B SS LF CF RF DH SP RP)",
         "Australia 49 (3; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "Chinese Taipei 48 (2; the game fills C 3B SS LF CF RF DH SP RP RP RP)",
@@ -903,8 +903,8 @@
         "Bahamas 49 (2; the game fills C 1B SS LF CF RF DH SP RP RP RP)",
         "Chinese Taipei 49 (3; the game fills 3B SS LF CF RF DH SP RP RP RP)",
         "China 47 (1; the game fills C 1B 2B 3B SS LF CF RF DH SP RP RP)",
-        "England 47 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "Germany 47 (1; the game fills C 2B 3B SS LF CF RF DH SP RP RP RP)",
+        "Great Britain 47 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "Honduras 47 (1; the game fills C 1B 3B SS LF CF RF DH SP RP RP RP)",
         "Czechia 46 (1; the game fills 1B 2B 3B SS LF CF RF DH SP RP RP RP)"
       ],
