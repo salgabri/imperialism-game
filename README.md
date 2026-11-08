@@ -286,7 +286,8 @@ On your turn under *You choose*, every empire in reach gets a dashed cobalt
 outline and the land out of reach is veiled. The column's **Choose a target**
 panel lists flag, name, strength, the territories you would gain and your win
 chance. The list is sorted by win chance × territories, with the top row
-preselected. A card on the map spells out what winning and losing would mean,
+preselected. When more empires are in reach than the column holds, the list
+pages (‹ 1 / 2 ›) and the arrow keys walk it across its pages. A card on the map spells out what winning and losing would mean,
 and the primary action becomes **Attack <team>**. The campaign waits for your
 choice; no timer runs.
 

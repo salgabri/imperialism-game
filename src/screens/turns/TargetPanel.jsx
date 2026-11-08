@@ -1,15 +1,26 @@
 // Owner: WP-TURN (see PLAN.md §4). "Choose a target" docked in the Map column in place of Next fixture (A-1,
 // M§5.6 type/rows/copy without the floating box). A radiogroup inside [data-space-primary] with roving tabindex:
 // arrows/Home/End move the selection, Space runs the masthead primary "Attack <team>" (App, A-8), Enter confirms
-// here. Never a dialog (A-8).
+// here. Never a dialog (A-8). Compact pass (docs/design/compact-pass.md): an empire late in a campaign borders more teams
+// than the column holds, so the list shows the rows that fit and pages the rest. The selected row's page is the one on
+// show, and the keyboard walks every row, across the pages.
 import React, { useEffect, useRef } from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
+import Pager from '../../components/Pager.jsx';
+import { usePagedList } from '../../hooks/useFit.js';
 import './turns.css';
 
 export default function TargetPanel({ count = '', rows = [], selectedId = null, onSelect, onHover, onConfirm }) {
+  // The panel, to find its radios in; the rows' own box is the paged list's to measure.
   const listRef = useRef(null);
   const titleId = 'target-panel-title';
   const selected = rows.find(row => row.teamId === selectedId) || rows.find(row => row.selected) || rows[0] || null;
+  const paged = usePagedList(rows, { row: '.target-panel__row', focusIndex: rows.indexOf(selected) });
+  // The pager may show a page without the selected row: its first row then keeps the group's one tab stop.
+  const selectedShown = paged.shown.includes(selected);
+  // A keyboard move to a row on another page: that row takes the focus once its page is on show.
+  const refocus = useRef(null);
+  const rowFor = id => [...(listRef.current?.querySelectorAll('[role="radio"]') || [])].find(element => element.dataset.teamId === String(id));
 
   // When the choice opens with focus on the page or on the primary button, move focus to the selected row so
   // arrows and Space work straight away (no scroll jump, no timers). From the page (e.g. the turn arrived under
@@ -23,9 +34,18 @@ export default function TargetPanel({ count = '', rows = [], selectedId = null, 
     const row = listRef.current?.querySelector('[role="radio"][tabindex="0"]');
     row?.focus?.(fromPage ? { preventScroll: true, focusVisible: false } : { preventScroll: true });
   }, []);
+  useEffect(() => {
+    const id = refocus.current;
+    if (id == null || selected?.teamId !== id) return;
+    const row = rowFor(id);
+    if (row) { refocus.current = null; row.focus(); }
+  });
 
   function focusRow(position) {
-    listRef.current?.querySelectorAll('[role="radio"]')[position]?.focus?.();
+    const id = rows[position]?.teamId ?? null;
+    const row = id == null ? null : rowFor(id);
+    // On this page it takes the focus now; on another, once the selection has turned the page.
+    if (row) { refocus.current = null; row.focus(); } else refocus.current = id;
   }
   function onKeyDown(event, position) {
     // Leave browser and OS shortcuts alone (Alt+←/→ history, Ctrl/Cmd+Home/End, Ctrl+Enter …).
@@ -51,18 +71,24 @@ export default function TargetPanel({ count = '', rows = [], selectedId = null, 
   }
 
   return (
-    <section className="target-panel" aria-labelledby={titleId}>
+    <section className="target-panel" aria-labelledby={titleId} ref={listRef}>
       <div className="kicker">
         <span className="kicker__title" id={titleId}>Choose a target</span>
         {count && <span className="kicker__aside">{count}</span>}
       </div>
-      <div className="target-panel__head" aria-hidden="true"><span title="Territories you would annex">Spoils</span><span>Win</span></div>
-      <div ref={listRef} className="target-panel__rows" role="radiogroup" data-space-primary aria-labelledby={titleId}
-        onPointerLeave={() => onHover?.(null)}>
-        {rows.map((row, position) => {
+      <div className="target-panel__head">
+        <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label="Target pages" className="target-panel__pager" />
+        <span className="target-panel__label target-panel__label--spoils" aria-hidden="true" title="Territories you would annex">Spoils</span>
+        <span className="target-panel__label target-panel__label--win" aria-hidden="true">Win</span>
+      </div>
+      <div ref={paged.boxRef} className="target-panel__rows" role="radiogroup"
+        data-space-primary aria-labelledby={titleId} onPointerLeave={() => onHover?.(null)}>
+        {paged.shown.map((row, index) => {
+          const position = paged.start + index;
           const checked = row === selected;
           return (
-            <div key={row.teamId} role="radio" aria-checked={checked} tabIndex={checked ? 0 : -1}
+            <div key={row.teamId} role="radio" aria-checked={checked} tabIndex={checked || (!selectedShown && index === 0) ? 0 : -1}
+              aria-posinset={position + 1} aria-setsize={rows.length}
               className={`target-panel__row${checked ? ' is-selected' : ''}`} data-team-id={row.teamId}
               aria-label={`${row.name}, strength ${row.eff}, spoils ${row.spoils.replace('+', '')} ${row.spoils === '+1' ? 'territory' : 'territories'}, win chance ${row.win}`}
               onClick={() => onSelect?.(row.teamId)} onKeyDown={event => onKeyDown(event, position)}

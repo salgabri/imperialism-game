@@ -65,9 +65,14 @@ scrolling panels, at desktop, tablet and phone sizes.
   "simulate the result" link is now just "Simulate". The result card drops "Full time" and the strengths. Latest
   results repeats the ticker, so it shows only where there's room: on desktops 860px tall or more, on tablets in
   place of the fronts, and in a phone's expanded sheet unless the phone is short. It never shows "No results yet".
+  On your turn, **Choose a target** takes the column's height and pages its rows: an empire late in a campaign
+  borders more teams than the column holds, and a phone holds about four. The pager sits in the list's head row,
+  and the arrow keys walk every row across the pages. In a phone's expanded sheet, Your fronts shows the rows that
+  fit, strongest first: a club's long name can wrap the fixture above it.
 - **Match preview.** The decision comes first: three approach cards (name, Recommended, strength, variation
   squares, reserves, win chance). Tale of the tape and Lineups share one panel below. "Simulate the result" sits
-  in the top row.
+  in the top row. On a phone, lineups longer than the sheet (ice hockey fields 19, American football 23) page
+  together, as on the Match screen.
 - **Match.** Chart | Lineups. The XIs show the rows that fit and page together (American football fields 23).
 - **Squad.** List, Pitch and Acquisitions. The table columns are Pos · Player · Rtg · Acquired: the natural
   position and the source are on the row's title, and the name links to the source. The depth list is paged in
@@ -102,7 +107,9 @@ Fast-forward). The before figures are from `0bce595`.
 After the pass, nothing scrolls at 1920×1080, 1440×900, 1366×768, 1280×720, 1024×768, 820×1180, 768×1024,
 390×844, 390×664 and 360×640 on the full manager run (setup, map, preview, match, conquest, squad, ledger,
 chronicle, elimination, results). The same holds for spectator, American football (NFL), baseball (MLB), club
-walls, dark mode and `?ads=preview`. The dark match feed drops its oldest lines at the bottom by design.
+walls, dark mode, `?ads=preview`, and a football club campaign on the Europe maps (Top 124, measured at all of
+those sizes but 1920×1080, 1366×768 and 1280×720). The dark match feed drops its oldest lines at the bottom by
+design.
 
 ## Limits
 
@@ -110,6 +117,10 @@ walls, dark mode and `?ads=preview`. The dark match feed drops its oldest lines 
   `aria-describedby`, but a sighted phone player no longer sees those explanations.
 - A phone held sideways (844×390) leaves about 250px under the masthead, too short for 44px targets: the column,
   the conquest article and the results scroll there.
+- Long club names ("Paris Saint-Germain") keep to one line, cut with an ellipsis, on phones with their browser bars
+  showing: in a result's score header and signing line and in the preview's header, and on the smallest phones
+  in a result's headline too. The crests stay beside the names, and the full names are in the screen-reader
+  labels and the match list.
 - Some content left the screen: the managers' Favourites and Long shots lists in setup, the claimed list and the
   pitch in the Squad side column, Latest results on short windows, the full XIs in the conquest comparison, and
   the preview's XIs (one switch away).
@@ -117,6 +128,8 @@ walls, dark mode and `?ads=preview`. The dark match feed drops its oldest lines 
 ## Verifying
 
 `node scripts/test.mjs` covers the arithmetic and the hooks (`scripts/fit.test.mjs`, with a stubbed
-`ResizeObserver`), the wall's keyboard walk across pages, and the DOM contracts. The fit itself is a layout
-property that jsdom can't measure. Check it in a browser at 375–390 and 768–1024 wide as well as on desktops,
-with both short (664, 640) and tall phone heights.
+`ResizeObserver`), the keyboard walks across pages (the team wall, the target list), and the DOM contracts. The
+fit itself is a layout property that jsdom can't measure. Check it in a browser at 375–390 and 768–1024 wide as
+well as on desktops, with both short (664, 640) and tall phone heights. Check lists that grow during a campaign
+at their longest, not only on the first turn: the target list fit a nations campaign's first turn and still
+overflowed a phone in a club campaign, where a club starts with six neighbours in reach.

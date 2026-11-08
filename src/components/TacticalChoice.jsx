@@ -10,9 +10,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import TeamMark from './TeamMark.jsx';
+import Pager from './Pager.jsx';
+import { usePagedList } from '../hooks/useFit.js';
 import { recommendedTactic } from '../engine/managerStrategy.js';
 import { formatWinChance, routeWorthSaying, winTone } from '../viewModels/format.js';
 import './dialogs.css';
+
+const NO_LINES = [];
 
 /** What the variation squares mean, on their title. */
 const VARIATION_NOTE = 'Variation changes matchday form for both teams. Scoring luck remains at every setting.';
@@ -95,7 +99,8 @@ function LineupRow({ row }) {
   );
 }
 
-function Lineup({ team, label = 'Starting XI', short = 'XI' }) {
+/** One side's lineup: `rows` is the page on show (the whole lineup until a phone's sheet pages it). */
+function Lineup({ team, rows = team?.lineup, label = 'Starting XI', short = 'XI' }) {
   if (!team?.lineup?.length) return null;
   return (
     <section className="fi-tactical-xi" aria-label={`${team.name} · ${label}`}>
@@ -104,7 +109,7 @@ function Lineup({ team, label = 'Starting XI', short = 'XI' }) {
         {team.xi && <span className="kicker__aside">{short} {team.xi}</span>}
       </div>
       <ol className="fi-tactical-xi__list" data-long={team.lineup.length > 13 ? '' : undefined}>
-        {team.lineup.map(row => <LineupRow key={row.key} row={row} />)}
+        {rows.map(row => <LineupRow key={row.key} row={row} />)}
       </ol>
     </section>
   );
@@ -135,6 +140,11 @@ function Tape({ rows = [], a, b }) {
 export default function TacticalChoice({ choice, preview = null, onChoose, onClose, onSimulate }) {
   const dialogRef = useRef(null);
   const [panel, setPanel] = useState('tape');
+  // Lineups longer than a phone's sheet (ice hockey fields 19, American football 23) page together, as on the Match
+  // screen; elsewhere the panel is as tall as its rows and keeps them all.
+  const linesA = preview?.a?.lineup || NO_LINES, linesB = preview?.b?.lineup || NO_LINES;
+  const xi = usePagedList(linesA.length >= linesB.length ? linesA : linesB, { row: '.fi-tactical-xi__row' });
+  const xiPage = lines => (Number.isFinite(xi.pageSize) ? lines.slice(xi.start, xi.start + xi.pageSize) : lines);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   const recommended = recommendedTactic(choice?.options || []);
@@ -220,9 +230,10 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
                 <button type="button" aria-pressed={panel === 'lineups'} onClick={() => setPanel('lineups')}>Lineups</button>
               </div>
               <div className="fi-tactical-panel" hidden={panel !== 'tape'}><Tape rows={preview.tape} a={preview.a} b={preview.b} /></div>
-              <div className="fi-tactical-panel fi-tactical-lineups" hidden={panel !== 'lineups'}>
-                <Lineup team={preview.a} label={preview.lineupLabel} short={preview.lineupShort} />
-                <Lineup team={preview.b} label={preview.lineupLabel} short={preview.lineupShort} />
+              <div className="fi-tactical-panel fi-tactical-lineups" hidden={panel !== 'lineups'} ref={xi.boxRef}>
+                <Pager page={xi.page} pages={xi.pages} onPage={xi.setPage} label="Lineup pages" className="fi-tactical-lineups__pager" />
+                <Lineup team={preview.a} rows={xiPage(linesA)} label={preview.lineupLabel} short={preview.lineupShort} />
+                <Lineup team={preview.b} rows={xiPage(linesB)} label={preview.lineupLabel} short={preview.lineupShort} />
               </div>
             </div>
           )}

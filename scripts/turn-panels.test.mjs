@@ -508,7 +508,8 @@ test('TargetPanel is a radiogroup in [data-space-primary] with roving tabindex, 
   assert.equal(panel.getAttribute('aria-labelledby'), 'target-panel-title');
   assert.equal(text(panel.querySelector('#target-panel-title')), 'Choose a target');
   assert.equal(text(panel.querySelector('.kicker__aside')), '6 neighbours in reach');
-  assert.equal(view.host.querySelector('[role="dialog"], [aria-modal]'), null);
+  // Booleans, never DOM nodes, in these asserts: a failing diff of two jsdom nodes never ends (runaway memory).
+  assert.ok(!view.host.querySelector('[role="dialog"], [aria-modal]'));
   const group = panel.querySelector('[role="radiogroup"]');
   assert.ok(group.hasAttribute('data-space-primary'));
   const radios = [...group.querySelectorAll('[role="radio"]')];
@@ -516,11 +517,12 @@ test('TargetPanel is a radiogroup in [data-space-primary] with roving tabindex, 
   const selectedAt = model.rows.findIndex(row => row.teamId === '348');
   assert.deepEqual(radios.map(radio => radio.getAttribute('aria-checked')), model.rows.map(row => String(row.teamId === '348')));
   assert.deepEqual(radios.map(radio => radio.tabIndex), model.rows.map(row => (row.teamId === '348' ? 0 : -1)));
-  assert.equal(document.activeElement, radios[selectedAt], 'opening the choice focuses the selected row');
+  assert.ok(document.activeElement === radios[selectedAt], 'opening the choice focuses the selected row');
   assert.match(radios[selectedAt].getAttribute('aria-label'), /^Hungary, strength \d+\.\d, spoils 10 territories, win chance \d+%$/);
   assert.equal(text(radios[selectedAt].querySelector('.target-panel__spoils')), '+10');
   assert.ok(radios[selectedAt].querySelector('.target-panel__win').classList.contains(`tone-${model.rows[selectedAt].tone}`));
-  assert.equal(panel.querySelector('.target-panel__foot'), null, 'no instructions: the bar says Attack Hungary');
+  assert.ok(!panel.querySelector('.target-panel__foot'), 'no instructions: the bar says Attack Hungary');
+  assert.ok(!panel.querySelector('.pager'), 'one page: no pager');
 
   // Browser/OS shortcuts pass through untouched (Alt+arrows history, Ctrl/Cmd+Home/End, Ctrl+Enter).
   for (const [keyName, modifiers] of [['ArrowRight', { altKey: true }], ['ArrowLeft', { altKey: true }],
@@ -534,7 +536,7 @@ test('TargetPanel is a radiogroup in [data-space-primary] with roving tabindex, 
   await key(radios[selectedAt], 'ArrowDown');
   const after = (selectedAt + 1) % radios.length;
   assert.equal(calls.select.at(-1), model.rows[after].teamId);
-  assert.equal(document.activeElement, radios[after]);
+  assert.ok(document.activeElement === radios[after]);
   await key(radios[selectedAt], 'End');
   assert.equal(calls.select.at(-1), model.rows.at(-1).teamId);
   await key(radios[selectedAt], 'Home');

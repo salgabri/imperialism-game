@@ -2,17 +2,24 @@
 // clubs layer heads the first column "Club" (buildFronts nameHeading).
 import React from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
+import { usePagedList } from '../../hooks/useFit.js';
+
+const NO_ROWS = [];
 
 /**
  * Rows come from buildFronts (≤ 5; CSS keeps 4 below 1600px). Clicking a nation or club opens its squad. Renders
- * nothing for spectators (no model) and an empty note when the managed empire has no rival in reach.
+ * nothing for spectators (no model) and an empty note when the managed empire has no rival in reach. The rows are a
+ * summary of the strongest rivals, not a list to page: in a short sheet (a phone's, with a club's long name in the
+ * fixture above) the table shows the rows that fit and leaves out the weakest (compact pass).
  */
 export default function FrontsTable({ fronts = null, onSelectTeam }) {
+  const rows = Array.isArray(fronts?.rows) ? fronts.rows : NO_ROWS;
+  const fit = usePagedList(rows, { row: '.fronts__row' });
   if (!fronts) return null;
-  const rows = Array.isArray(fronts.rows) ? fronts.rows : [];
+  const shown = Number.isFinite(fit.pageSize) ? rows.slice(0, fit.pageSize) : rows;
   const select = typeof onSelectTeam === 'function' ? onSelectTeam : null;
   return (
-    <section className="fronts" aria-labelledby="fronts-kicker">
+    <section className="fronts" aria-labelledby="fronts-kicker" ref={fit.boxRef}>
       <div className="kicker">
         <h2 className="kicker__title v4-column__heading" id="fronts-kicker">Your fronts</h2>
       </div>
@@ -32,7 +39,7 @@ export default function FrontsTable({ fronts = null, onSelectTeam }) {
           </tr>
         </thead>
         <tbody>
-          {rows.map(row => (
+          {shown.map(row => (
             <tr key={row.teamId} className="fronts__row" data-team-id={row.teamId}>
               <td className="fronts__cell fronts__cell--nation">
                 <span className="fronts__nation">

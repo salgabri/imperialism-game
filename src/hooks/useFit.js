@@ -14,9 +14,9 @@ function pageOf(index, size, current) {
 }
 
 /**
- * One page of `items`, as many rows as fit in the box `boxRef` is attached to. The box needs a height of its own (a flex
- * or grid track with min-height:0): its content never decides it. `row` selects a row inside the box to measure, and
- * rows are assumed to be the same height. `focusIndex`, when it changes, brings its row's page into view: the player's
+ * One page of `items`, as many rows as fit in the box `boxRef` is attached to. To page, the box needs a height of its own
+ * (a flex or grid track with min-height:0); a box its rows size never overflows, so it keeps every row. `row` selects a
+ * row inside the box to measure, and rows are assumed to be the same height. `focusIndex`, when it changes, brings its row's page into view: the player's
  * own team in the standings, the selected match in the history.
  * → { boxRef, page, pages, pageSize, shown, start, setPage }
  */
@@ -39,8 +39,11 @@ export function usePagedList(items, { row = '[data-row]', focusIndex = -1, minRo
       const height = Math.max(...[rows[0], rows[1], rows[rows.length - 1]].filter(Boolean).map(element => element.getBoundingClientRect().height));
       if (!(height > 0)) return;
       const room = box.getBoundingClientRect().bottom - firstBox.top;
+      // Nothing overflowing means every row on show is whole: the page keeps at least those. Otherwise a box its own rows
+      // size (a table in a column) would lose a row at each measure wherever one row is a rule taller than the rest.
+      const whole = box.scrollHeight - box.clientHeight <= 1 ? rows.length : 0;
       setPageSize(current => {
-        const next = Math.max(minRows, Math.floor((room + .5) / height));
+        const next = Math.max(minRows, whole, Math.floor((room + .5) / height));
         return next === current ? current : next;
       });
     };

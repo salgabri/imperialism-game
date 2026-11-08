@@ -7,11 +7,12 @@ import React, { act } from 'react';
 import { bundleComponents, withDom } from './lib/app-harness.mjs';
 import { fitWall } from '../src/hooks/useFit.js';
 
-const { Pager, usePagedList, useFitWall, SetupOverlay } = await bundleComponents({
+const { Pager, usePagedList, useFitWall, SetupOverlay, TargetPanel } = await bundleComponents({
   Pager: 'src/components/Pager.jsx',
   usePagedList: ['src/hooks/useFit.js', 'usePagedList'],
   useFitWall: ['src/hooks/useFit.js', 'useFitWall'],
   SetupOverlay: 'src/components/SetupOverlay.jsx',
+  TargetPanel: 'src/screens/turns/TargetPanel.jsx',
 });
 
 const click = async element => { await act(async () => { element.click(); }); };
@@ -128,10 +129,12 @@ function installObserver(window) {
 }
 
 /** jsdom has no layout: give an element the box a browser would. */
-function layOut(element, { width = 0, height = 0, top = 0 }) {
+function layOut(element, { width = 0, height = 0, top = 0, scrollHeight = height }) {
   Object.defineProperties(element, {
     clientWidth: { configurable: true, value: width },
     clientHeight: { configurable: true, value: height },
+    // What the content would need: more than the box when it overflows.
+    scrollHeight: { configurable: true, value: scrollHeight },
   });
   element.getBoundingClientRect = () => ({ width, height, top, bottom: top + height, left: 0, right: width });
 }
@@ -151,7 +154,7 @@ function PagedList({ items, focusIndex = -1, minRows }) {
 /** Lay the box out, with every row 30px tall and the first 10px below the box's top, then measure. */
 async function measureList(view, stub, height) {
   const box = view.host.querySelector('.box');
-  layOut(box, { width: 300, height, top: 0 });
+  layOut(box, { width: 300, height, top: 0, scrollHeight: 10 + 30 * view.host.querySelectorAll('li').length });
   view.host.querySelectorAll('li').forEach(row => layOut(row, { width: 300, height: 30, top: 10 }));
   await stub.fire();
 }
@@ -204,6 +207,21 @@ test('usePagedList: a list with no rows yet is measured when they arrive; minRow
   });
 });
 
+test('usePagedList: a box its own rows size keeps every row, even with one row a rule taller than the rest', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    const view = await mount(PagedList, { items: NAMES.slice(0, 5) });
+    // A table in a column ("Your fronts"): the first row 30px, the rest 31 with their top rule, and the box exactly as
+    // tall as they are, so nothing overflows.
+    view.host.querySelectorAll('li').forEach((row, i) => layOut(row, { width: 300, height: i ? 31 : 30, top: i ? 30 + (i - 1) * 31 : 0 }));
+    layOut(view.host.querySelector('.box'), { width: 300, height: 154, top: 0 });
+    await stub.fire();
+    await stub.fire();
+    assert.equal(view.host.querySelectorAll('li').length, 5, 'not floor(154.5 / 31) = 4, then 3, a row at each measure');
+    assert.equal(JSON.parse(view.host.querySelector('.meta').textContent).pages, 1);
+  });
+});
+
 /** A list whose pager sits inside its box, above the rows (the match lineups): it pushes the rows down. */
 function PagedWithPager({ items }) {
   const list = usePagedList(items, { row: 'li' });
@@ -222,7 +240,7 @@ test('usePagedList: a pager that appears inside the box is measured around, so t
       return { top, height: 30, bottom: top + 30, width: 300, left: 0, right: 300 };
     };
     const view = await mount(PagedWithPager, { items: NAMES });
-    layOut(view.host.querySelector('.box'), { width: 300, height: 310, top: 0 });
+    layOut(view.host.querySelector('.box'), { width: 300, height: 310, top: 0, scrollHeight: 10 + 30 * NAMES.length });
     await stub.fire();
     assert.deepEqual(JSON.parse(view.host.querySelector('.meta').textContent), { pages: 4, pageSize: 8 }, '(310 − 54) / 30, not (310 − 10) / 30');
     assert.equal(view.host.querySelector('.in-box-pager').textContent, '1 / 4');
@@ -332,5 +350,69 @@ test('the team wall pages, and the keyboard walks it across its pages', async ()
     assert.equal(picks.length, before);
     assert.equal(pos(), 'Page 2 /  of 2');
     assert.equal(flags().filter(flag => flag.tabIndex === 0).length, 1, 'the checked team is off this page, so the first flag is the tab stop');
+  });
+});
+
+// ---------- the target list ----------
+
+const TARGETS = Array.from({ length: 6 }, (_, i) => ({
+  teamId: `t${i}`, name: `Target ${i}`, eff: '70.0', spoils: '+1', win: `${90 - i}%`, tone: 'win', flagId: null, code: `T${i}`,
+  color: '#888888', isClub: false,
+}));
+
+test('the target list pages what the column cannot hold, and the keyboard walks it across its pages', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    const selects = [];
+    const props = selectedId => ({ count: '6 neighbours in reach', rows: TARGETS, selectedId, onSelect: id => selects.push(id) });
+    const view = await mount(TargetPanel, props('t0'));
+    const panel = view.host.querySelector('.target-panel');
+    const radios = () => [...panel.querySelectorAll('[role="radio"]')];
+    assert.equal(radios().length, 6, 'not measured yet: every target');
+    assert.ok(!panel.querySelector('.pager'), 'and no pager');
+    // 44px rows, the first 10px down a 150px box: three to a page.
+    layOut(panel.querySelector('.target-panel__rows'), { width: 320, height: 150, top: 0, scrollHeight: 10 + 44 * TARGETS.length });
+    radios().forEach(row => layOut(row, { width: 320, height: 44, top: 10 }));
+    await stub.fire();
+    const pos = () => panel.querySelector('.target-panel__pager .pager__pos').textContent;
+    assert.deepEqual(radios().map(row => row.dataset.teamId), ['t0', 't1', 't2']);
+    assert.equal(pos(), 'Page 1 /  of 2');
+    assert.ok(!!panel.querySelector('.target-panel__head > .target-panel__pager'), 'the pager sits in the head row');
+    assert.deepEqual(radios().map(row => [row.getAttribute('aria-posinset'), row.getAttribute('aria-setsize')]), [['1', '6'], ['2', '6'], ['3', '6']]);
+    assert.deepEqual(radios().map(row => row.tabIndex), [0, -1, -1]);
+
+    const press = key => act(async () => {
+      document.activeElement.dispatchEvent(new window.KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+    });
+    radios()[0].focus();
+    // End selects the last target; once App selects it, its page shows and it has the focus.
+    await press('End');
+    assert.deepEqual(selects, ['t5']);
+    await view.render(props('t5'));
+    assert.equal(pos(), 'Page 2 /  of 2');
+    assert.deepEqual(radios().map(row => row.dataset.teamId), ['t3', 't4', 't5']);
+    assert.equal(document.activeElement.dataset.teamId, 't5');
+    // The arrows wrap around the whole list, not the page.
+    await press('ArrowDown');
+    assert.equal(selects.at(-1), 't0');
+    await view.render(props('t0'));
+    assert.equal(pos(), 'Page 1 /  of 2');
+    assert.equal(document.activeElement.dataset.teamId, 't0');
+    await press('ArrowUp');
+    assert.equal(selects.at(-1), 't5');
+    await view.render(props('t5'));
+    assert.equal(document.activeElement.dataset.teamId, 't5');
+    // A target picked on the map brings its page into view.
+    await view.render(props('t1'));
+    assert.equal(pos(), 'Page 1 /  of 2');
+    assert.equal(radios().find(row => row.getAttribute('aria-checked') === 'true')?.dataset.teamId, 't1');
+
+    // The pager only turns the pages: the selection stays, and the first row shown keeps the group's one tab stop.
+    const before = selects.length;
+    await click(panel.querySelector('.target-panel__pager [aria-label="Next page"]'));
+    assert.equal(selects.length, before);
+    assert.equal(pos(), 'Page 2 /  of 2');
+    assert.ok(!radios().some(row => row.getAttribute('aria-checked') === 'true'), 'the selected target is on the other page');
+    assert.deepEqual(radios().map(row => row.tabIndex), [0, -1, -1]);
   });
 });
