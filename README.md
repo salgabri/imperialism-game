@@ -206,8 +206,8 @@ manager of the theatre's favourite, with decisions from the first match.
    starts a [domestic campaign](#domestic-campaigns), and its map shows that
    country. Football also has a **Season** choice: the built-in 2026/27 (the
    current season), then the [earlier seasons](#football-seasons) 2025/26 back
-   to 2004/05 (EA FIFA ratings of each; there is no 2024/25, and 2005/06 and
-   2004/05 have nations only), and any local
+   to 2004/05 (EA FIFA and FC ratings of each; 2005/06 and 2004/05 have
+   nations only), and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
@@ -1060,7 +1060,7 @@ unchanged. A world campaign saved before these maps stays on the world, and resu
 as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
 deals its clubs onto the world.
 
-Each map is `public/domestic/eu<clubs>[s<season year>].json` (40 files, 150–190 KB,
+Each map is `public/domestic/eu<clubs>[s<season year>].json` (42 files, 150–190 KB,
 fetched when chosen), with the index `src/data/europeMaps.js`. They follow the clubs, so
 rebuild them after `npm run build-clubs` or `npm run build:ea-seasons`:
 
@@ -1129,11 +1129,11 @@ npm run build:nhl-map -- --check           # offline rebuild must match the comm
 
 ## Football seasons
 
-Football can be played on twenty-one earlier seasons as well as the built-in
-2026/27: 2004/05 to 2025/26, each from EA's FIFA of that season (FIFA 05 to EA
-FC 26; no source here has EA FC 25, so there is no 2024/25). They ship with the
-game: pick one under **Season** in setup. Each is a file in `public/football/`
-(75–335 KB) that loads only when chosen.
+Football can be played on twenty-two earlier seasons as well as the built-in
+2026/27: every season from 2004/05 to 2025/26, each from EA's FIFA or EA FC of
+that season (FIFA 05 to EA FC 26). They ship with the game: pick one under
+**Season** in setup. Each is a file in `public/football/` (75–335 KB) that loads
+only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
   and the clubs of the seven biggest European leagues (132–134 clubs a season,
@@ -1146,14 +1146,21 @@ game: pick one under **Season** in setup. Each is a file in `public/football/`
   none, and their players still play for their clubs.
 - **Rosters:** EA FC 26 is update 4 of 19 September 2025, the snapshot the
   built-in season came from until 2026/27, so its clubs are the built-in clubs
-  of 2025/26; FM no longer fills its nations, so 80 field a full XI. FIFA 15 to
-  EA FC 24 are each edition's launch roster. FIFA 07 to
+  of 2025/26; FM no longer fills its nations, so 80 field a full XI. EA FC 25
+  has EA's release ratings as its website showed them on 26 September 2024.
+  FIFA 15 to EA FC 24 are each edition's launch roster. FIFA 07 to
   FIFA 11 take their ratings from the launch roster and the clubs and
   nationalities from the winter update; FIFA 12 to FIFA 14 use one roster each,
   from later in the season. FIFA 05 and FIFA 06 have the one roster their source
   lists, dated by the game's release.
 - **Sources:** EA FC 26 is the committed `scripts/data/ea-fc26.csv` (rovnez on
-  Kaggle, CC BY 4.0; its 316 generated players stay out). FIFA 15 – EA FC 24 come from one Kaggle export
+  Kaggle, CC BY 4.0; its 316 generated players stay out). EA FC 25 joins two
+  Kaggle files by EA's player id: an export of EA's ratings website
+  (`nyagami/ea-sports-fc-25-database-ratings-and-stats`, Apache-2.0 as set by its
+  compiler) for the overall, positions, nationality and club, and a SoFIFA scrape
+  of June 2025 (`aniss7/fifa-player-data-from-sofifa-2025-06-03`, MIT) for the
+  date of birth, the full name and the clubs' usual names (EA's website calls
+  Inter "Lombardia FC"). FIFA 15 – EA FC 24 come from one Kaggle export
   (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
   labelled CC0 by its compiler). FIFA 07 – FIFA 14 join two scrapes by EA's
   player id: a FIFA Index mirror on Kaggle

@@ -9,6 +9,8 @@ export const EUROPE_MAPS = [
   {"id":"eu32","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","clubs":32,"sections":32,"countries":7,"version":"eu32-2374d601","top":["Paris Saint-Germain","FC Barcelona","Real Madrid"]},
   {"id":"eu124s2026","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["ea-fc-26"],"clubs":124,"sections":124,"countries":7,"version":"eu124s2026-f0ac35c5"},
   {"id":"eu32s2026","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["ea-fc-26"],"clubs":32,"sections":32,"countries":6,"version":"eu32s2026-f5c7fac4"},
+  {"id":"eu124s2025","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["ea-fc-25"],"clubs":124,"sections":124,"countries":7,"version":"eu124s2025-51068d46"},
+  {"id":"eu32s2025","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["ea-fc-25"],"clubs":32,"sections":32,"countries":7,"version":"eu32s2025-8450aa97"},
   {"id":"eu124s2024","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["ea-fc-24"],"clubs":124,"sections":124,"countries":7,"version":"eu124s2024-b7099bb5"},
   {"id":"eu32s2024","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["ea-fc-24"],"clubs":32,"sections":32,"countries":6,"version":"eu32s2024-46e5e5da"},
   {"id":"eu124s2023","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["ea-fifa-23"],"clubs":124,"sections":124,"countries":7,"version":"eu124s2023-41404dbd"},

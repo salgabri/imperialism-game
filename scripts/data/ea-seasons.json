@@ -1,5 +1,5 @@
 {
-  "note": "The built-in earlier football seasons: one roster per EA FIFA / FC edition. EA FC 26 is the committed snapshot the built-in 2025/26 came from (snapshots); FIFA 15 – EA FC 24 are launch rosters from one export (dataset, editions); FIFA 07 – FIFA 14 join two scrapes by EA player id (legacy); FIFA 05 and FIFA 06 have the same ratings file, nations only, with nationalities from later editions and Wikidata (early). npm run build:ea-seasons reads the snapshot from scripts/data/ and every other file from data-src/ (ignored), and checks each against its sha256. See docs/design/football-years.md.",
+  "note": "The built-in earlier football seasons: one roster per EA FIFA / FC edition. EA FC 26 is the committed snapshot the built-in 2025/26 came from (snapshots); EA FC 25 joins an export of EA's ratings website to a later SoFIFA scrape by EA player id (site); FIFA 15 – EA FC 24 are launch rosters from one export (dataset, editions); FIFA 07 – FIFA 14 join two scrapes by EA player id (legacy); FIFA 05 and FIFA 06 have the same ratings file, nations only, with nationalities from later editions and Wikidata (early). npm run build:ea-seasons reads the snapshot from scripts/data/ and every other file from data-src/ (ignored), and checks each against its sha256. See docs/design/football-years.md.",
   "snapshots": [
     {
       "id": "ea-fc-26",
@@ -14,6 +14,40 @@
       "sha256": "7f6b46dd4f9abafad7ebe9206164b8669ef6cbc82a45c2b1aa999949341d316f"
     }
   ],
+  "site": {
+    "note": "EA FC 25: EA's ratings website a week after release gives the ratings, nationalities and launch clubs; a SoFIFA scrape of June 2025 gives dates of birth, full names and the clubs' SoFIFA names, joined by EA id where EA's age agrees. Players link to SoFIFA's release roster, 250002 (20 Sep 2024). See scripts/lib/ea-site-seasons.mjs.",
+    "editions": [
+      {
+        "id": "ea-fc-25",
+        "fifaVersion": 25,
+        "edition": "EA FC 25",
+        "update": 2,
+        "roster": "250002",
+        "snapshotDate": "2024-09-26",
+        "ratings": {
+          "name": "EA Sports FC 25 database, ratings and stats (nyagami), from EA's ratings website",
+          "url": "https://www.kaggle.com/datasets/nyagami/ea-sports-fc-25-database-ratings-and-stats",
+          "download": "https://www.kaggle.com/api/v1/datasets/download/nyagami/ea-sports-fc-25-database-ratings-and-stats/male_players.csv",
+          "folder": "ea-fc25",
+          "file": "male_players.csv",
+          "licence": "Apache-2.0, as set by the compiler on Kaggle; EA's own rights in the ratings are not cleared, as for the other EA seasons",
+          "rows": 16161,
+          "sha256": "689195986dffed3c2a33655c71e281d39eec03bc633c0acecae45500b9901a00",
+          "retrieved": "2026-11-08"
+        },
+        "later": {
+          "name": "FIFA player data from SoFIFA, 3 June 2025 (aniss7)",
+          "url": "https://www.kaggle.com/datasets/aniss7/fifa-player-data-from-sofifa-2025-06-03",
+          "download": "https://www.kaggle.com/api/v1/datasets/download/aniss7/fifa-player-data-from-sofifa-2025-06-03/player-data-full-2025-june.csv",
+          "folder": "ea-fc25",
+          "file": "player-data-full-2025-june.csv",
+          "licence": "MIT, as set by the compiler on Kaggle; SoFIFA states no licence",
+          "sha256": "561c9bad844e6946fedb29a73f2c6ee47d4fb0720709b80d464c0c9ab20a9c78",
+          "retrieved": "2026-11-08"
+        }
+      }
+    ]
+  },
   "dataset": {
     "name": "EA Sports FC 24 complete player dataset (stefanoleone992)",
     "url": "https://www.kaggle.com/datasets/stefanoleone992/ea-sports-fc-24-complete-player-dataset",

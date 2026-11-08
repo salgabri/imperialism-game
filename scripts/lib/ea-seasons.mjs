@@ -25,6 +25,8 @@ export const EA_NATION_ALIASES = {
   ...NATION_ALIASES,
   'Brunei Darussalam': 'Brunei', 'Czech Republic': 'Czechia', 'Guinea Bissau': 'Guinea-Bissau', 'Korea DPR': 'North Korea',
   Swaziland: 'Eswatini',
+  // EA's website (EA FC 25).
+  Holland: 'Netherlands',
 };
 
 /**
@@ -36,6 +38,8 @@ export const EA_NO_TEAM = [
   'Faroe Islands', 'Gibraltar', 'Grenada', 'Guam', 'Hong Kong', 'Liechtenstein', 'Macau', 'Malta', 'Mauritius',
   'Montserrat', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'San Marino',
   'São Tomé e Príncipe', 'Singapore', 'Turks and Caicos Islands',
+  // EA's website (EA FC 25).
+  'Curaçao', 'St. Kitts and Nevis', 'St. Lucia',
 ];
 
 /** The CSV columns the build reads. */
