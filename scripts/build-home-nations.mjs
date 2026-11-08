@@ -7,6 +7,12 @@
 // stays the upstream file's: Great Britain's coast is cut into arcs where the borders meet it, the two borders are new
 // arcs, and the islands and Northern Ireland keep their arcs whole.
 //
+// The Pacific islands the rules map leaves out. Tonga (776), Samoa (882) and the Cook Islands (184) field national teams
+// (rugby league's Tests among them), but Natural Earth's 1:110m map has none of them. The 50m map draws all three, so
+// the 110m map gains them from it: each island's ring, as the 50m map has it, put on the 110m map's grid as an arc of
+// its own (they touch no other land), appended after every upstream shape, and to the land object. The 50m map, which
+// the game draws them from, keeps them as they are.
+//
 // Usage:
 //   node scripts/build-home-nations.mjs [--check]
 //     --check  rebuild offline from the caches and compare both maps byte for byte
@@ -32,6 +38,12 @@ const ATLASES = [
     sha256: '04342cdc1e3016bcd7db1630de95684d67b79fe3c8c460321e87aef469502394', cache: 'world-atlas-2.0.2-countries-50m.json' },
 ];
 const UK = '826';
+// The shapes the 110m map takes from the 50m map, in the order it appends them.
+const ISLANDS = [
+  { id: '776', name: 'Tonga' },
+  { id: '882', name: 'Samoa' },
+  { id: '184', name: 'Cook Is.' },
+];
 // Natural Earth admin-1 geounit (gu_a3) -> the game's shape. A 50m map names its shapes; the 110m map does not.
 const NATIONS = [
   { gu: 'ENG', id: UK, name: 'England' },
@@ -427,16 +439,59 @@ function splitAtlas(upstream, { points, borders }, label, named) {
   return { topo, counts: Object.fromEntries(NATIONS.map(nation => [nation.name, out[nation.gu].length])) };
 }
 
+/**
+ * Add the ISLANDS from `source` (the upstream 50m atlas) to `topo` (the 110m map, changed in place): each ring keeps
+ * the 50m map's points and winding, rounded to `topo`'s grid. Returns each island's polygon count by name.
+ */
+function addIslands(topo, source, label) {
+  const geometries = topo.objects.countries.geometries;
+  const from = source.transform, to = topo.transform;
+  const land = topo.objects.land.geometries?.[0] || topo.objects.land;
+  if (land.type !== 'MultiPolygon') throw new Error(`${label}: the land object is not one MultiPolygon`);
+  const signedArea = ring => ring.slice(1).reduce((total, point, i) => total + cross([0, 0], ring[i], point), 0);
+  const counts = {};
+  for (const island of ISLANDS) {
+    if (geometries.some(geometry => String(geometry.id) === island.id)) throw new Error(`${label} already has ${island.name} (${island.id})`);
+    const shape = source.objects.countries.geometries.find(geometry => String(geometry.id) === island.id);
+    if (!shape || shape.properties?.name !== island.name) throw new Error(`The 50m atlas has no ${island.name} (${island.id})`);
+    const polygons = shape.type === 'Polygon' ? [shape.arcs] : shape.arcs;
+    const out = polygons.map((polygon, k) => {
+      if (polygon.length !== 1) throw new Error(`${island.name}'s polygon ${k} has holes`);
+      const ring = ringPoints(source, polygon[0]);
+      const moved = ring.map(([x, y]) => [x * from.scale[0] + from.translate[0], y * from.scale[1] + from.translate[1]])
+        .map(([lon, lat]) => [Math.round((lon - to.translate[0]) / to.scale[0]), Math.round((lat - to.translate[1]) / to.scale[1])])
+        .filter((point, i, all) => !i || point.join() !== all[i - 1].join());
+      // Still a closed ring of three or more corners, wound as the 50m map winds it.
+      if (moved.length < 4 || moved[0].join() !== moved.at(-1).join() || Math.sign(signedArea(moved)) !== Math.sign(signedArea(ring))) {
+        throw new Error(`${island.name}'s polygon ${k} does not survive the 110m grid`);
+      }
+      topo.arcs.push(encodeArc(moved));
+      return [[topo.arcs.length - 1]];
+    });
+    geometries.push({ type: out.length === 1 ? 'Polygon' : 'MultiPolygon', arcs: out.length === 1 ? out[0] : out, id: island.id });
+    land.arcs.push(...out);
+    counts[island.name] = out.length;
+  }
+  return counts;
+}
+
 const nations = await naturalEarth();
-let stale = 0;
+const upstream = [];
 for (const atlas of ATLASES) {
   const text = await download(atlas.url, path.join(root, 'data-src/world-atlas', atlas.cache));
   if (sha256(text) !== atlas.sha256) throw new Error(`${atlas.url} is not the pinned file (SHA-256 ${sha256(text)})`);
-  const { topo, counts } = splitAtlas(JSON.parse(text), nations, atlas.file, atlas.file.includes('50m'));
+  upstream.push(JSON.parse(text));
+}
+const fiftyM = upstream[ATLASES.findIndex(atlas => atlas.file.includes('50m'))];
+let stale = 0;
+for (const [i, atlas] of ATLASES.entries()) {
+  const named = atlas.file.includes('50m');
+  const { topo, counts } = splitAtlas(upstream[i], nations, atlas.file, named);
+  const islands = named ? null : addIslands(topo, fiftyM, atlas.file);
   const output = `${JSON.stringify(topo)}\n`;
   const file = path.join(root, atlas.file);
   const current = await readFile(file, 'utf8').catch(() => null);
-  const parts = Object.entries(counts).map(([name, n]) => `${name} ${n}`).join(', ');
+  const parts = [...Object.entries(counts), ...Object.entries(islands || {})].map(([name, n]) => `${name} ${n}`).join(', ');
   if (check) {
     if (current !== output) { stale++; console.log(`${atlas.file}: differs from a rebuild`); }
     else console.log(`${atlas.file}: up to date (${parts} polygons)`);

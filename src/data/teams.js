@@ -38,6 +38,11 @@ export function nationIdentity(id, sport) {
   return { name: as?.name ?? rec[0], code: as?.code ?? rec[1], flagId: as?.flagId ?? id };
 }
 
+// Tonga, Samoa and the Cook Islands: the 110m map has none of them, so scripts/build-home-nations.mjs adds the 50m
+// map's outlines. Saves from before have no owner for them (neutral land), and football seasons built before list
+// none of them: those seasons field no team of theirs.
+export const PACIFIC_ISLANDS = Object.freeze(['776', '882', '184']);
+
 // Shapes drawn on the map that never belong to anyone (club seeding never deals them).
 // Antarctica, Fr.S.Lands, Falklands, W.Sahara, N.Cyprus, Somaliland.
 export const EXCLUDED_SHAPES = new Set(['010', '260', '238', '732', 'XCYN', 'XSOL']);
@@ -260,6 +265,11 @@ export const NATIONS = {
   '090': ['Solomon Islands', 'SOL', 'OFC', 'pac', 44, '#4C9E5C', 0],
   '548': ['Vanuatu', 'VAN', 'OFC', 'pac', 42, '#E8B93C', 0],
   '540': ['New Caledonia', 'NCL', 'OFC', 'pac', 44, '#D0455A', 0],
+  // The 110m map gains these three from the 50m map (scripts/build-home-nations.mjs, PACIFIC_ISLANDS below). No
+  // football source rates their players, so their strength is the confederation's: football fields no team of theirs.
+  '776': ['Tonga', 'TGA', 'OFC', 'pac', 0, '#D9363E', 0],
+  '882': ['Samoa', 'SAM', 'OFC', 'pac', 0, '#3460C8', 0],
+  '184': ['Cook Islands', 'COK', 'OFC', 'pac', 0, '#3FA05A', 0],
 };
 
 

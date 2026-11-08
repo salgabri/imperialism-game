@@ -41,6 +41,7 @@ export const NATION_COLOURS = Object.freeze({
   '170': ['#00148e', 1], // Colombia
   '178': ['#0ec584', 0], // Congo
   '180': ['#4b8be0', 0], // DR Congo
+  '184': ['#3fa05a', 1], // Cook Islands
   '188': ['#ffffff', 1], // Costa Rica
   '191': ['#171796', 2], // Croatia
   '192': ['#d0433e', 0], // Cuba
@@ -156,6 +157,7 @@ export const NATION_COLOURS = Object.freeze({
   '762': ['#ffffff', 0], // Tajikistan
   '764': ['#4b72d0', 1], // Thailand
   '768': ['#d80100', 2], // Togo
+  '776': ['#d9363e', 1], // Tonga
   '780': ['#d84450', 0], // Trinidad & Tobago
   '784': ['#c4404e', 0], // United Arab Emirates
   '788': ['#de4048', 1], // Tunisia
@@ -172,6 +174,7 @@ export const NATION_COLOURS = Object.freeze({
   '858': ['#3c2aa6', 0], // Uruguay
   '860': ['#1eb53a', 1], // Uzbekistan
   '862': ['#8e3b46', 2], // Venezuela
+  '882': ['#3460c8', 1], // Samoa
   '887': ['#c44048', 1], // Yemen
   '894': ['#4ca86a', 1], // Zambia
   'KOS': ['#0896d5', 0], // Kosovo

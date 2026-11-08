@@ -16,6 +16,7 @@ import { domesticIdOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
 import { clearDomesticCache, decodeDomestic, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
 import { getSport } from '../src/sports/index.js';
+import { fieldedNations, sportOf } from '../src/engine/footballSets.js';
 import { EMPIRE_PASTELS } from '../src/theme.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { createEmpireLabelEngine as createLabelValidator } from '../src/engine/empireLabels.js';
@@ -381,6 +382,7 @@ export async function runSwissFlagRegionCheck() {
 function regionalFlagsSnapshot(app) {
   const paths = countryPaths();
   const neutral = paths.filter(path => !app.state.own[path.dataset.country]);
+  const fielded = new Set(fieldedNations(sportOf(app.state.settings)));
   const domestic = domesticOf(app);
   if (domestic) return {
     domestic: true,
@@ -410,6 +412,9 @@ function regionalFlagsSnapshot(app) {
     correct: expectedFlagsShown(app),
     neutralCount: neutral.length,
     inactiveNations: neutral.filter(path => NATIONS[path.dataset.country]).length,
+    // Nations the sport fields that are neutral all the same: none at a world kickoff. Football fields no team for a
+    // nation no source rates (Tonga, Samoa, the Cook Islands), so their land is neutral there.
+    neutralFielded: neutral.filter(path => fielded.has(path.dataset.country)).length,
     neutralHasNoFlags: neutral.every(neutralMatches),
     conqueredCount: conquered.length,
     conqueredKeepOwnerFlags: conquered.every(ownerFlagMatches),

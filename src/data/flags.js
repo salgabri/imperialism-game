@@ -26,6 +26,7 @@ export const FLAG_CODES = {
   '170': 'co',        // Colombia
   '178': 'cg',        // Congo
   '180': 'cd',        // DR Congo
+  '184': 'ck',        // Cook Islands
   '188': 'cr',        // Costa Rica
   '191': 'hr',        // Croatia
   '192': 'cu',        // Cuba
@@ -141,6 +142,7 @@ export const FLAG_CODES = {
   '762': 'tj',        // Tajikistan
   '764': 'th',        // Thailand
   '768': 'tg',        // Togo
+  '776': 'to',        // Tonga
   '780': 'tt',        // Trinidad & Tobago
   '784': 'ae',        // United Arab Emirates
   '788': 'tn',        // Tunisia
@@ -161,6 +163,7 @@ export const FLAG_CODES = {
   '858': 'uy',        // Uruguay
   '860': 'uz',        // Uzbekistan
   '862': 've',        // Venezuela
+  '882': 'ws',        // Samoa
   '887': 'ye',        // Yemen
   '894': 'zm',        // Zambia
   '032': 'ar',        // Argentina

@@ -20,7 +20,6 @@ import { EARLY_EXTRA_FIELDS, buildEarlyEaSeason, nationalityEntries } from './li
 import { LEGACY_POSITIONS, buildLegacyEaSeason, legacyExclusions, readRatingsRows, rosterDates } from './lib/ea-legacy-seasons.mjs';
 import { buildSiteEaSeason, readLaterRows, readSiteRows } from './lib/ea-site-seasons.mjs';
 import { pinned, readExport, readLaterEditions, readLegacyFiles } from './lib/ea-season-files.mjs';
-import { NATIONS } from '../src/data/teams.js';
 import { loadEaPlayers } from './lib/football-data.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -117,7 +116,7 @@ async function main() {
   for (const { doc, text, audit } of results) {
     const { coverage } = doc;
     console.log(`${doc.id} ${doc.season} ${doc.label} (${audit.snapshotDate}, ${audit.rows} players): `
-      + `${coverage.completeXIs}/${Object.keys(NATIONS).length} full XIs, ${coverage.nations} nations with players, ${coverage.clubs} clubs, ${Math.round(Buffer.byteLength(text) / 1024)} KB`);
+      + `${coverage.completeXIs}/${Object.keys(doc.nations).length} full XIs, ${coverage.nations} nations with players, ${coverage.clubs} clubs, ${Math.round(Buffer.byteLength(text) / 1024)} KB`);
     for (const warning of audit.warnings) console.log(`  warning: ${warning}`);
   }
   if (args.check) {
