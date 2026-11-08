@@ -789,9 +789,10 @@ rest stay neutral. See the [design notes](docs/design/tennis.md).
 **Rugby league** — `src/data/clubs.rugby-league.js` and `src/data/rosters.rugby-league.js`, from Big Ant's Rugby League 26
 ratings of every NRL player as Zero Tackle listed them on the game's release (17 July 2025), Zero Tackle's player profiles
 and NRL.com's 2025 team lists and Tests (`scripts/data/rugby-league-26.json`). Ratings are the game's overalls, unchanged;
-positions are Zero Tackle's and any other a player started in 2025. The 17 clubs field their matchday 17 and keep up to 24.
-Nations field the NRL's players, by their 2025 Test side, else birthplace; Tonga, Samoa and the Cook Islands have no land
-on the world map, so their Test players play for none. See the [design notes](docs/design/rugby-league.md).
+positions are each player's most-started place in 2025, with Zero Tackle's kept as a second. The 17 clubs field their
+matchday 17 and keep up to 24. Nations field the NRL's players, by their 2025 Test side, else birthplace: eight of them,
+Australia, New Zealand, Samoa, Tonga, England, Fiji, Papua New Guinea and the Cook Islands. See the
+[design notes](docs/design/rugby-league.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07

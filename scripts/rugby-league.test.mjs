@@ -66,18 +66,21 @@ test('every rating is Rugby League 26\'s, unchanged, and every position one the 
   assert.deepEqual([haas[3], haas[4], cleary[3], cleary[4]], [93, 'PR', 93, 'HB']);
 });
 
-test('a player plays for his 2025 Test side, else where he was born, else where he may; Tonga\'s and Samoa\'s play for none', () => {
-  assert.deepEqual(['Newcastle, NSW', 'Auckland NZ', 'Lewisham, UK', '-', 'Apia, Samoa', 'Port Moresby, PNG'].map(birthCountry),
-    ['036', '554', null, null, null, '598']);
-  assert.equal(eligibleNation(['Samoa', 'New Zealand', 'Queensland']), '554');
-  assert.equal(eligibleNation(['Tonga', 'Queensland']), null);
+test('a player plays for his 2025 Test side, else where he was born, else where he may: Tonga\'s and Samoa\'s for their own', () => {
+  assert.deepEqual(['Newcastle, NSW', 'Auckland NZ', 'Lewisham, UK', '-', 'Apia, Samoa', 'Port Moresby, PNG', 'Pago Pago, American Samoa']
+    .map(birthCountry), ['036', '554', null, null, '882', '598', null]);
+  assert.equal(eligibleNation(['Samoa', 'New Zealand', 'Queensland']), '882');
+  assert.equal(eligibleNation(['Queensland', 'Tonga']), '776');
+  assert.equal(eligibleNation(['New South Wales']), null);
   const players = SNAPSHOT.players.map(playerOf);
   const of = name => players.find(player => player.name === name);
   assert.deepEqual([of('Nathan Cleary').nation, of('Herbie Farnworth').nation, of('Eliesa Katoa').nation, of('Payne Haas').nation],
-    ['036', '826', null, null], 'Australia, England, and Tonga\'s and Samoa\'s players for no one');
-  assert.ok(players.filter(player => ['Tonga', 'Samoa', 'Cook Islands'].includes(player.test)).every(player => player.nation === null));
-  const fielded = new Set(Object.values(ROSTERS).flatMap(([, , squad]) => squad.map(([name]) => name)));
-  assert.ok(!fielded.has('Eliesa Katoa') && !fielded.has('Payne Haas'));
+    ['036', '826', '776', '882'], 'Australia, England, Tonga and Samoa, each by his 2025 Test');
+  const tests = { Tonga: '776', Samoa: '882', 'Cook Islands': '184' };
+  assert.ok(players.filter(player => tests[player.test]).every(player => player.nation === tests[player.test]));
+  // The Pacific Championships' three islands field their Test players on the map since docs/design/pacific-islands.md.
+  const fielded = id => new Set(ROSTERS[id][2].map(([name]) => name));
+  assert.ok(fielded('776').has('Eliesa Katoa') && fielded('882').has('Payne Haas') && fielded('184').has('Marata Niukore'));
 });
 
 // ---------- the clubs and the nations ----------

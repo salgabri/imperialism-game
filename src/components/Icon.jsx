@@ -36,6 +36,8 @@ const PATHS = {
   baseball: <><circle cx="12" cy="12" r="9" /><path d="M6.2 5.2a10 10 0 0 1 0 13.6M17.8 5.2a10 10 0 0 0 0 13.6" /><path d="m7.6 8.4 1.7-.8M8.5 11l1.8-.3M8.5 13.2l1.8.3M7.6 15.8l1.7.8M16.4 8.4l-1.7-.8M15.5 11l-1.8-.3M15.5 13.2l-1.8.3M16.4 15.8l-1.7.8" /></>,
   // A racket, its strings crossed, and a ball.
   tennis: <><ellipse cx="9.5" cy="9.5" rx="5.2" ry="6.4" transform="rotate(-45 9.5 9.5)" /><path d="M13.2 13.2 20 20M6.6 9.5h5.8M9.5 6.6v5.8" /><circle cx="18.5" cy="5.5" r="2" /></>,
+  // The H of the posts, and a ball going over the crossbar.
+  'rugby-league': <><path d="M7 3v18M17 3v18M7 14h10" /><ellipse cx="12" cy="8" rx="3.6" ry="2.3" transform="rotate(-30 12 8)" /></>,
   folder: <path d="M3 7a1 1 0 0 1 1-1h5l2 2.5h9a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />,
   upload: <path d="M12 16V5m-4.5 4.5L12 5l4.5 4.5M4 19h16" />,
   download: <path d="M12 5v11m-4.5-4.5L12 16l4.5-4.5M4 19h16" />,

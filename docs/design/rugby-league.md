@@ -40,14 +40,15 @@ training bases. `npm run build-rugby-league` (`scripts/build-rugby-league.mjs`, 
 fields the matchday 17 the game picks from its whole list, then its best players left, up to 24. The build runs from
 the Storm's 85.1 to the Dragons' and Cowboys' 81.8: Rugby League 26 rates the clubs close together.
 
-**Nations.** A player plays for the nation he played a Test for in 2025 (59 players); without a Test, for the country
-he was born in (423); born off the map or where Zero Tackle does not say, for the first nation on the map he is
-eligible for (14). **Tonga, Samoa and the Cook Islands have no land on the game's world map** (its 1:110m atlas leaves
-them out), so their 46 Test players play for no nation, nor do 49 others born there or with no eligibility on the map:
-95 in all. Five nations field NRL players: Australia (90), New Zealand (86), England (74), Fiji (69) and Papua New
-Guinea (58). A lineup place a nation's own players cannot fill is the game's to fill with a generated player at the
-nation's strength, as in hockey; a nation with no NRL players is a minnow at the baseline, 45. England, Scotland and
-Wales play as themselves; Ireland is the whole island, so Northern Ireland's shape starts in Ireland's empire.
+**Nations.** A player plays for the nation he played a Test for in 2025 (105 players); without a Test, for the country
+he was born in (432); born off the map or where Zero Tackle does not say, for the first nation on the map he is
+eligible for (12). The 42 left (no place of birth and no eligibility on the map, or born in Hong Kong) play for none.
+Tonga, Samoa and the Cook Islands, whose 46 Test players were the reason to put them on the world map
+([pacific-islands.md](pacific-islands.md)), field their own. Eight nations field NRL players: Australia (90), New
+Zealand (86), Samoa (85), Tonga (83), England (74), Fiji (69), Papua New Guinea (58) and the Cook Islands (55). A lineup
+place a nation's own players cannot fill is the game's to fill with a generated player at the nation's strength, as in
+hockey; a nation with no NRL players is a minnow at the baseline, 45. England, Scotland and Wales play as themselves;
+Ireland is the whole island, so Northern Ireland's shape starts in Ireland's empire.
 
 ## The lineup
 
@@ -163,12 +164,11 @@ rugby league nations blitz of Asia and Oceania.
 - **The 2025 season.** Rugby League 26 has had one ratings release, July 2025, so the clubs are 2025's: the Perth Bears
   (2027) are not in it, and players who have moved since play for their 2025 clubs.
 - **NRL players only.** Super League's players are not in the list (Zero Tackle published only each club's best), so
-  England is thin and fills three places with generated players, Fiji five and Papua New Guinea eleven.
-- **No Tonga, Samoa or Cook Islands.** Their Test players sit out the nations game; adding the islands to the world map
-  would change every sport's.
-- **Nations campaigns are a two-horse race.** Five nations field NRL players and the rest are minnows, so Australia wins
-  87% of Elite 32 campaigns and 83% of world wars, New Zealand nearly all the others (`probeCampaign` in
-  `scripts/balance.mjs`: 300 and 60 seeded campaigns); in Asia and Oceania Australia won all 300.
+  England is thin and fills three places with generated players, Fiji five, Papua New Guinea eleven and the Cook Islands
+  twelve.
+- **Nations campaigns are Australia's to lose.** Eight nations field NRL players and the rest are minnows, so Australia
+  wins 84% of Elite 32 campaigns and 78% of world wars, New Zealand, Samoa and Tonga the rest (`probeCampaign` in
+  `scripts/balance.mjs`: 200 and 40 seeded campaigns); in Asia and Oceania Australia won all 200.
 - **Tiny Sydney territories.** Ten clubs share New South Wales, eight of them in Sydney. Hemmed in by their neighbours,
   the Roosters (50 km²), the Rabbitohs (133 km²) and the Wests Tigers (145 km²) start with an inner-Sydney council area or
   two, smaller even than Washington's District of Columbia; Parramatta and Penrith take the west of the state.

@@ -53,7 +53,7 @@ They are OFC nations, culture `pac`, so the Asia & Oceania theatre includes them
 | Basketball, ice hockey, baseball | generated sides | These sports generate players for every nation they have none for, as for Fiji |
 | Tennis | no team; land neutral | Its existing rule: no Elo-rated player, no team |
 | American football | — | Clubs only |
-| Rugby league | not on main yet | It will field their 2025 Test players once it merges (below) |
+| Rugby league | their own sides | Their 2025 Test players and the NRL players born there (below) |
 
 Football had fielded every nation on the map, each with eleven source-backed players. EA FC 27 rates no Tongan,
 Samoan or Cook Islands player, and the FM 26 snapshot was taken as the top 100 players of each nation then on the
@@ -89,11 +89,10 @@ database with a Tongan player now lists the islands, and he plays for Tonga.
 
 ## Rugby league
 
-Rugby league is in worktree add-rugby-support-a44ba8 and was not on main when this landed. Once it merges,
-`NATION_OF_TEST` and `COUNTRY_OF_PLACE` in `scripts/lib/nrl.mjs` can map the 2025 Test sides of Tonga, Samoa and
-the Cook Islands to 776, 882 and 184, and `npm run build-rugby-league` will give those 46 players nations.
-`scripts/rugby-league.test.mjs` (which asserts they play for no nation) and `docs/design/rugby-league.md` need
-the same change then.
+Rugby league came to main after this, with the islands mapped: `NATION_OF_TEST`, `COUNTRY_OF_PLACE` and the eligibility
+table in `scripts/lib/nrl.mjs` give the 2025 Test sides of Tonga, Samoa and the Cook Islands, and the NRL players born
+there, their own nations (776, 882, 184). Samoa (85) and Tonga (83) field full matchday 17s behind Australia and New
+Zealand; the Cook Islands field five NRL players and the game fills the rest ([rugby-league.md](rugby-league.md)).
 
 ## In the code
 
