@@ -4,10 +4,10 @@
 // Everything here is a pure function of the setup record and the opening teams App already computes
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
 import { NATIONS, SCOPES } from '../../data/teams.js';
-import { CLUB_SCOPES } from '../../data/scopes.js';
+import { CLUB_SCOPES, TOP_CLUBS, strongestClubs as topClubs } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
-import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope } from '../../data/domesticScope.js';
+import { clubMapOf, domesticEntry, domesticLabel, europeMapsOf, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
@@ -269,12 +269,23 @@ function clubMapTheatre(map) {
   return clubMapRows.get(map.id);
 }
 
+const europeRows = new Map();
+/** Football's club theatres in a season (`dataSet`, null for the built-in one): its Europe maps, or none for a set without them. */
+function europeTheatres(dataSet = null) {
+  if (!europeRows.has(dataSet)) {
+    europeRows.set(dataSet, Object.freeze(europeMapsOf(dataSet).map(map => Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' }))));
+  }
+  return europeRows.get(dataSet);
+}
+
 /** Theatre rows for the active layer: [{ id, name, label, count, note }] (counts as in HEAD's setup). */
 export function theatreOptions(sport, clubLayer) {
   if (clubLayer) {
     // A basketball season plays on its era's map (`clubMap`).
     const map = clubMapOf(sport.id, sport.clubMap);
-    return map ? clubMapTheatre(map) : clubTheatres(sport);
+    if (map) return clubMapTheatre(map);
+    const europe = sport.id === 'football' ? europeTheatres(sport.dataSet ?? null) : [];
+    return europe.length ? europe : clubTheatres(sport);
   }
   const counts = nationCounts(sport);
   return SCOPES.map(scope => theatreRow(scope, counts[scope.id]));
@@ -283,18 +294,20 @@ export function theatreOptions(sport, clubLayer) {
 /**
  * Theatre rows while a chosen data set loads, with no counts (`count: null`): its nations and leagues are not known
  * yet. Clubs offer every club and the elite, plus a league already chosen, which the set keeps or drops once loaded.
- * A basketball season's era map is known already, clubs counted.
+ * The maps a season's clubs play on are known already, clubs counted: a basketball season's era map, a football
+ * season's Europe maps.
  */
 function pendingTheatres(builtIn, clubLayer, clubScope) {
   if (!clubLayer) return SCOPES.map(scope => theatreRow(scope, null));
   const map = domesticEntry(clubScope);
+  if (map?.theatre) return europeTheatres(map.seasons?.[0] ?? null);
   if (map?.sport === builtIn.id) return clubMapTheatre(map);
   const [all, elite, ...leagues] = CLUB_SCOPES(builtIn);
   return [all, elite, ...leagues.filter(scope => scope.id === clubScope)].map(scope => theatreRow(scope, null));
 }
 
 /** Theatre list group headings (and the `#setup-theatre` mirror's optgroup labels) when countries are offered. */
-export const LEAGUE_GROUP = 'European leagues';
+export const LEAGUE_GROUP = 'Europe';
 export const DOMESTIC_GROUP = 'One country · top clubs';
 
 let domesticRowCache = null;
@@ -316,8 +329,8 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
-  football: 'Earlier seasons use EA FIFA ratings of that season. Nations without eleven rated players '
-    + 'start short-handed.',
+  football: 'Earlier seasons use EA FIFA ratings of that season, with clubs from the seven biggest leagues. Nations without '
+    + 'eleven rated players start short-handed.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
     + 'only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
@@ -350,6 +363,10 @@ export function domesticDescription(entry) {
   const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
+  if (entry.theatre) {
+    return `${leaders} Europe's ${clubs} strongest clubs, each on land in its own country: alone it holds all of it, and clubs that `
+      + 'share a country split it along its regional borders. A country with no club stays grey.';
+  }
   if (entry.league) {
     const place = entry.lines === 'state' ? 'state' : 'state or province';
     return `${leaders} the ${clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
@@ -444,7 +461,8 @@ export function theatreMapPreview({ countries, paths = null, basePaths, own, fra
  * chosen season has no nations (a basketball season's NBA clubs).
  */
 export function sportNote(sport, { clubsOnly = false } = {}) {
-  const clubs = sport.clubs || [];
+  // Football fields only its strongest clubs, whatever a season holds.
+  const clubs = sport.id === 'football' ? topClubs(sport.clubs || [], TOP_CLUBS) : sport.clubs || [];
   const leagues = [...new Set(clubs.map(club => club.league))];
   if (!clubs.length) return 'Nations';
   // A sport with clubs only (American football) has no nations to offer.
@@ -577,7 +595,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   // A chosen country (football), or the map a sport's clubs play on (basketball: the NBA's USA and Canada).
   const chosenMap = clubLayer && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
   const country = chosenMap && (chosenMap.sport ? chosenMap.sport === sport.id : domesticOn) ? chosenMap : null;
-  // Changing sport can leave a league from the previous sport in the saved setup; same fallback as startCampaign.
+  // Changing sport can leave another sport's theatre in the saved setup; same fallback as startCampaign.
   const activeScope = scopes.find(scope => scope.id === (clubLayer ? setup.clubScope : setup.scope)) || scopes[0];
   const scopeId = country ? setup.clubScope : activeScope.id;
   const scopeName = country ? domesticLabel(setup.clubScope) : activeScope.label;
@@ -628,7 +646,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
       players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
       })),
-      fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league)),
+      fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league && !country.theatre)),
     };
   }
   const favourites = ranked.slice(0, 5).map(row);
@@ -664,7 +682,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
     theatreNotes: scopes.filter(scope => scope.note),
     domesticScopes, leagueGroup: LEAGUE_GROUP, domesticGroup: DOMESTIC_GROUP,
-    country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs } : null,
+    country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs, countries: country.countries ?? null } : null,
     // A basketball season's own strongest clubs lead its map, named once it has loaded.
     countryNote: !country ? '' : domesticDescription(dataSet == null ? country : { ...country, top: pending ? [] : strongestClubs(sport) }),
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
