@@ -8,11 +8,13 @@ import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
+import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { buildClub, hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
 import { football } from '../src/sports/football.js';
 import { BENCH, nbaBasketballIn } from '../src/sports/basketball.js';
 import { americanFootball } from '../src/sports/americanFootball.js';
 import { baseball } from '../src/sports/baseball.js';
+import { hockey, PERIOD_MODEL } from '../src/sports/hockey.js';
 
 const DRAMA = 6; // Balanced
 
@@ -272,6 +274,46 @@ function mlbSeason(seasons, seed, venue) {
   };
 }
 
+// ---- Ice hockey (NHL) -----------------------------------------------------------------------------------------
+
+function nhlSeason(seasons, seed, venue) {
+  const clubs = NHL_CLUBS.map(c => buildClub(c, hockey));
+  const { played, tables } = playSeasons({ sport: hockey, teams: clubs, games: 82, seasons, seed, venue });
+  // A shoot-out's extra goal is on the final score, not on anyone's goal count.
+  const inShootout = g => g.tie?.periods.length > 1;
+  const teamGoals = played.flatMap(g => [g.ga - (inShootout(g) && g.ga > g.gd ? 1 : 0), g.gd - (inShootout(g) && g.gd > g.ga ? 1 : 0)]);
+  const margins = played.map(g => Math.abs(g.ga - g.gd));
+  const positions = new Map(clubs.map(c => [c.id, positionsByName(c)]));
+  const perSeason = played.length / seasons;
+  const topScorers = [];
+  let goals = 0, byDefenders = 0;
+  for (let s = 0; s < seasons; s++) {
+    const tally = new Map();
+    for (const g of played.slice(s * perSeason, (s + 1) * perSeason)) {
+      for (const e of g.ev) {
+        if (e.m > PERIOD_MODEL.MINUTES + PERIOD_MODEL.OVERTIME) continue;
+        const key = `${e.tid}|${e.name}`;
+        tally.set(key, (tally.get(key) || 0) + 1);
+        goals++;
+        if (positions.get(e.tid).get(e.name) === 'D') byDefenders++;
+      }
+    }
+    topScorers.push(Math.max(...tally.values()));
+  }
+  const spread = seasonSpread(tables, 82);
+  return {
+    clubs: clubs.length,
+    goalsPerTeam: mean(teamGoals), teamGoalsSd: sd(teamGoals),
+    overtime: share(played, g => g.tie), shootout: share(played, inShootout),
+    decidedInOvertime: share(played.filter(g => g.tie), g => !inShootout(g)),
+    oneGoal: share(margins, m => m === 1), twoGoal: share(margins, m => m === 2), threePlus: share(margins, m => m >= 3), fivePlus: share(margins, m => m >= 5),
+    marginMean: mean(margins), shutoutRate: share(teamGoals, x => x === 0),
+    homeWins: share(played, g => g.winner === g.j),
+    winPctSd: spread.sd, bestWins: spread.best * 82, worstWins: spread.worst * 82,
+    favourite: favouriteRecord(played), topScorer: mean(topScorers), defenderGoals: byDefenders / goals,
+  };
+}
+
 // ---- Real leagues ---------------------------------------------------------------------------------------------
 
 /**
@@ -323,6 +365,16 @@ export const REAL = Object.freeze({
     shutoutRate: [0.06, 0.072],
     homeWins: [0.521, 0.543], winPctSd: [0.071, 0.089], bestWins: [97, 111], worstWins: [41, 55],
   },
+  nhl: {
+    note: "NHL regular seasons 2021/22–2025/26, computed 2026-11-07 from every game in the league's own API",
+    // Goals a team without a shoot-out's extra goal; the margins are the final scores', which count it.
+    goalsPerTeam: [3.01, 3.14], overtime: [0.207, 0.249], shootout: [0.059, 0.091], decidedInOvertime: [0.635, 0.716],
+    oneGoal: [0.381, 0.432], twoGoal: [0.175, 0.219], threePlus: [0.393, 0.417], fivePlus: [0.055, 0.065], marginMean: [2.2, 2.31],
+    shutoutRate: [0.043, 0.058], homeWins: [0.522, 0.563], winPctSd: [0.082, 0.127], bestWins: [55, 65], worstWins: [19, 25],
+    topScorer: [52, 69],
+    // est.: 15.2% of the 2025/26 goals of the players on today's rosters.
+    defenderGoals: [0.14, 0.17],
+  },
 });
 
 const row = (label, value, range, format = num) => {
@@ -341,6 +393,7 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     nba: nbaSeason(seasons, hashStr(`${seed}:nba`), venue),
     nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`), venue),
     mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`), venue),
+    nhl: nhlSeason(seasons, hashStr(`${seed}:nhl`), venue),
   };
 }
 
@@ -419,6 +472,26 @@ function print(report) {
   lines.push(row('best record (wins)', m.bestWins, rm.bestWins, x => num(x, 0)));
   lines.push(row('worst record (wins)', m.worstWins, rm.worstWins, x => num(x, 0)));
   lines.push(row('favourite wins', m.favourite.wins, rm.favouriteWins, pct));
+  const h = report.nhl, rh = REAL.nhl;
+  lines.push(`\nNHL — ${h.clubs} clubs, 82 games (real: ${rh.note})`);
+  lines.push(row('goals a team', h.goalsPerTeam, rh.goalsPerTeam));
+  lines.push(row('team goals SD', h.teamGoalsSd, rh.teamGoalsSd));
+  lines.push(row('overtime or shoot-out', h.overtime, rh.overtime, pct));
+  lines.push(row('shoot-outs', h.shootout, rh.shootout, pct));
+  lines.push(row('overtimes decided before a shoot-out', h.decidedInOvertime, rh.decidedInOvertime, pct));
+  lines.push(row('won by one', h.oneGoal, rh.oneGoal, pct));
+  lines.push(row('won by two', h.twoGoal, rh.twoGoal, pct));
+  lines.push(row('won by three or more', h.threePlus, rh.threePlus, pct));
+  lines.push(row('won by five or more', h.fivePlus, rh.fivePlus, pct));
+  lines.push(row('mean margin', h.marginMean, rh.marginMean));
+  lines.push(row('shutouts (per team game)', h.shutoutRate, rh.shutoutRate, pct));
+  lines.push(row('home (defending) side wins', h.homeWins, rh.homeWins, pct));
+  lines.push(row('win% SD', h.winPctSd, rh.winPctSd, x => num(x, 3)));
+  lines.push(row('best record (wins)', h.bestWins, rh.bestWins, x => num(x, 0)));
+  lines.push(row('worst record (wins)', h.worstWins, rh.worstWins, x => num(x, 0)));
+  lines.push(row('favourite wins', h.favourite.wins, rh.favouriteWins, pct));
+  lines.push(row('top scorer (goals)', h.topScorer, rh.topScorer, x => num(x, 0)));
+  lines.push(row('goals by defenders', h.defenderGoals, rh.defenderGoals, pct));
   return lines.join('\n');
 }
 

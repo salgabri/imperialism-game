@@ -49,15 +49,22 @@
 //   are counted. Match-day form, which moves both edges, is integrated over its normal spread with seven-point
 //   Gauss–Hermite quadrature.
 //
+// Ice hockey — the model's own slices (src/sports/hockey.js): the remaining three-minute slices are played out backwards
+//   from each margin with the sport's own score effects and pulled goalies (sliceMeans), the slice in progress scaled by
+//   the time it has left; level after sixty, sudden death at the overtime's rates (overtimeMeans), then the shoot-out
+//   (shootoutOdds). A lead in overtime has already won. Match-day form, which moves both rates, is integrated over its
+//   normal spread with seven-point Gauss–Hermite quadrature.
+//
 // Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE); basketball's,
-// American football's and baseball's come from their own modules (BASKETBALL_MODEL; DRIVE_MODEL, driveOdds, lateCall;
-// INNING_MODEL, inningOdds, runMasses). The tests compare this module against those models, so a change there that is
-// not mirrored here fails loudly.
+// American football's, baseball's and ice hockey's come from their own modules (BASKETBALL_MODEL; DRIVE_MODEL, driveOdds,
+// lateCall; INNING_MODEL, inningOdds, runMasses; PERIOD_MODEL, sliceMeans, overtimeMeans, shootoutOdds). The tests compare
+// this module against those models, so a change there that is not mirrored here fails loudly.
 
 import { getSport } from '../sports/index.js';
 import { BASKETBALL_MODEL } from '../sports/basketball.js';
 import { DRIVE_MODEL, driveMoments, driveOdds, lateCall } from '../sports/americanFootball.js';
 import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
+import { overtimeMeans, PERIOD_MODEL, shootoutOdds, sliceMeans } from '../sports/hockey.js';
 
 const BASE_GOALS = 1.28;
 const MAX_LOG_EDGE = 1.5;
@@ -97,6 +104,9 @@ export function footballRate(log) {
  *     touchdown's chance of its extra point / two points; a model saved before tries has no xp/two)
  * | { kind:'innings', edgeA, edgeD, formSd, length:54, ot:6, maxOt:6 } (baseball; the clock counts outs, edges are each
  *     side's batting minus the opposing defence, formSd the spread of match-day form in rating points)
+ * | { kind:'periods', rateA, rateD, shootout, formSd, length:60, ot:5, maxOt:2 } (ice hockey; rates are goals in sixty
+ *     minutes, formSd the spread of match-day form in log rate, and the two "overtime periods" the five minutes of
+ *     sudden death and the shoot-out)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
  * is the match's uncertainty (football ignores it, as the README formula does); `home`, that the defender plays at
@@ -127,6 +137,13 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
     return {
       kind: 'innings', edgeA: num(prepared.edgeA), edgeD: num(prepared.edgeD), formSd: variation * INNING_MODEL.FORM_PER_DRAMA,
       length: INNING_MODEL.LENGTH, ot: INNING_MODEL.INNING, maxOt: INNING_MODEL.MAX_EXTRA,
+    };
+  }
+  if (model.tieBreak === 'overtime' && positive(prepared.rateA) && positive(prepared.rateD)) {
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    return {
+      kind: 'periods', rateA: num(prepared.rateA), rateD: num(prepared.rateD), shootout: num(prepared.shootout) || 0,
+      formSd: PERIOD_MODEL.FORM_AT_BALANCED * (variation / 6) ** 2, length: PERIOD_MODEL.MINUTES, ot: PERIOD_MODEL.OVERTIME, maxOt: 2,
     };
   }
   if (model.tieBreak === 'overtime' && isNum(prepared.efficiencyA) && isNum(prepared.efficiencyD) && positive(prepared.pace)) {
@@ -216,6 +233,10 @@ export function isLiveModel(model) {
   if (model.kind === 'innings') {
     return ['edgeA', 'edgeD', 'formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
       && Number.isInteger(model.maxOt) && model.maxOt >= 0;
+  }
+  if (model.kind === 'periods') {
+    return ['rateA', 'rateD', 'shootout', 'formSd', 'length', 'ot'].every(finite) && model.rateA > 0 && model.rateD > 0 && model.formSd >= 0
+      && model.length > 0 && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0;
   }
   return false;
 }
@@ -458,12 +479,95 @@ function inningsAt(model, t, margin) {
   return chance;
 }
 
-/** Models with overtime periods after regulation: basketball's and American football's, and baseball's extra innings. */
-const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives' || model.kind === 'innings';
+// A margin past this many goals is as good as won, for the hockey tables.
+const MARGIN_CAP = 12;
+// Goals in one slice, the last bucket holding "this many or more".
+const SLICE_GOALS = 8;
+const periods = new WeakMap();
+
+/** Poisson(λ) masses for 0…SLICE_GOALS, the last one holding the rest. */
+function sliceMasses(lambda) {
+  const masses = new Array(SLICE_GOALS + 1).fill(0);
+  let mass = Math.exp(-lambda), total = 0;
+  for (let k = 0; k < SLICE_GOALS; k++) {
+    masses[k] = mass;
+    total += mass;
+    mass *= lambda / (k + 1);
+  }
+  masses[SLICE_GOALS] = Math.max(0, 1 - total);
+  return masses;
+}
+
+/**
+ * A hockey model's tables, built once per model: for each form node its two rates and `from[s][margin]`, A's chance at
+ * the start of slice s (`from[SLICES]` at the end of regulation, level meaning the overtime and shoot-out). Also a cache of
+ * computed values by minute and margin.
+ */
+function periodTables(model) {
+  if (periods.has(model)) return periods.get(model);
+  const { SLICES } = PERIOD_MODEL;
+  const shootout = shootoutOdds(model.shootout);
+  const nodes = HERMITE.map(([t, weight]) => {
+    const form = Math.exp(t * model.formSd);
+    const rateA = model.rateA * form, rateD = model.rateD / form;
+    const [overtimeA, overtimeD] = overtimeMeans(rateA, rateD);
+    const node = { weight, rateA, rateD, overtimeA, overtimeD, shootout, from: new Array(SLICES + 1) };
+    node.from[SLICES] = Array.from({ length: 2 * MARGIN_CAP + 1 }, (_, i) => step(i - MARGIN_CAP, suddenDeathChance(overtimeA, overtimeD, 1, shootout)));
+    for (let s = SLICES - 1; s >= 0; s--) node.from[s] = Array.from({ length: 2 * MARGIN_CAP + 1 }, (_, i) => sliceChance(node, s, i - MARGIN_CAP, 1));
+    return node;
+  });
+  const tables = { nodes, cache: new Map() };
+  periods.set(model, tables);
+  return tables;
+}
+
+/** A's chance from level with `left` (a share) of the five minutes of sudden death to go, then the shoot-out. */
+function suddenDeathChance(overtimeA, overtimeD, left, shootout) {
+  const total = overtimeA + overtimeD;
+  const none = Math.exp(-total * left);
+  return (1 - none) * overtimeA / total + none * shootout;
+}
+
+/** A's chance in `node` from `margin` with `left` (a share) of slice s to play, then the slices after it. */
+function sliceChance(node, s, margin, left) {
+  const [meanA, meanD] = sliceMeans(node.rateA, node.rateD, margin, s);
+  const a = sliceMasses(meanA * left), d = sliceMasses(meanD * left), next = node.from[s + 1];
+  let chance = 0;
+  for (let i = 0; i <= SLICE_GOALS; i++) {
+    for (let j = 0; j <= SLICE_GOALS; j++) chance += a[i] * d[j] * next[clamp(margin + i - j, -MARGIN_CAP, MARGIN_CAP) + MARGIN_CAP];
+  }
+  return chance;
+}
+
+/** Ice hockey: P(side A wins) at minute `t` with goal margin `margin`, averaged over the form nodes. */
+function periodsAt(model, t, margin) {
+  const { SLICE, SLICES } = PERIOD_MODEL;
+  const minute = clamp(t, 0, lastMinute(model));
+  const lead = clamp(Math.round(margin), -MARGIN_CAP, MARGIN_CAP);
+  const { nodes, cache } = periodTables(model);
+  const key = `${minute}|${lead}`;
+  if (cache.has(key)) return cache.get(key);
+  let chance;
+  if (minute >= model.length) {
+    // Regulation is over: a lead has won, in overtime as at the end of the third. Level, what is left of the five minutes.
+    const left = clamp((model.length + model.ot - minute) / model.ot, 0, 1);
+    chance = lead ? step(lead, 0.5) : nodes.reduce((sum, node) => sum + node.weight * suddenDeathChance(node.overtimeA, node.overtimeD, left, node.shootout), 0);
+  } else {
+    const s = Math.min(SLICES - 1, Math.floor(minute / SLICE));
+    const left = (SLICE * (s + 1) - minute) / SLICE;
+    chance = nodes.reduce((sum, node) => sum + node.weight * sliceChance(node, s, lead, left), 0);
+  }
+  chance = clamp01(chance);
+  cache.set(key, chance);
+  return chance;
+}
+
+/** Models with overtime periods after regulation: basketball's and American football's, baseball's extra innings, ice hockey's. */
+const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives' || model.kind === 'innings' || model.kind === 'periods';
 
 /**
  * The last minute a model can reach: 90 for football, 40 + 5·4 for basketball (48 + 5·4 in the NBA), 60 + 10·3 for
- * American football and 54 + 6·6 outs for baseball.
+ * American football, 54 + 6·6 outs for baseball and 60 + 5 + 5 for ice hockey (its shoot-out the second five).
  */
 function lastMinute(model) {
   return hasOvertime(model) ? model.length + model.ot * model.maxOt : model.length;
@@ -507,6 +611,7 @@ export function winProbabilityAt(model, minute, diff = 0) {
   if (model.kind === 'normal') return basketballAt(model, t, lead);
   if (model.kind === 'drives') return drivesAt(model, t, lead);
   if (model.kind === 'innings') return inningsAt(model, t, lead);
+  if (model.kind === 'periods') return periodsAt(model, t, lead);
   return footballWinProbability({ rA: model.rA, rD: model.rD, diff: lead, remaining: (model.length - clamp(t, 0, model.length)) / model.length });
 }
 
@@ -546,12 +651,13 @@ function revealedEvents(goals) {
 
 /**
  * Last minute the revealed events reach, rounded up to the end of its period (basketball overtime, baseball's extra
- * innings), else the regulation length. American football's overtime ends at its deciding score, the last event.
+ * innings), else the regulation length. American football's and ice hockey's overtime ends at its deciding score, the
+ * last event.
  */
 function endMinute(model, events) {
   const latest = events.reduce((max, event) => Math.max(max, num(event.m)), 0);
   if (!hasOvertime(model) || latest <= model.length) return model.length;
-  if (model.kind === 'drives') return Math.min(lastMinute(model), Math.ceil(latest));
+  if (model.kind === 'drives' || model.kind === 'periods') return Math.min(lastMinute(model), Math.ceil(latest));
   return Math.min(lastMinute(model), model.length + model.ot * Math.ceil((latest - model.length) / model.ot));
 }
 
@@ -590,6 +696,7 @@ export function winSeries({ model, goals = [], aId, dId, minute = 0, perspective
       ? basketballAt(model, t, diff, chains)
       : model.kind === 'drives' ? drivesAt(model, t, diff)
       : model.kind === 'innings' ? inningsAt(model, t, diff)
+      : model.kind === 'periods' ? periodsAt(model, t, diff)
       : footballWinProbability({ rA: model.rA, rD: model.rD, diff, remaining: (model.length - Math.min(t, model.length)) / model.length });
     series.push({ t, p });
   }
@@ -618,9 +725,18 @@ export function winMarkers(series, goals = [], { aId, model = null, includeRuns 
  * Football: 0'…90', ticks every 15', half-time at 45'. Basketball: 0'…40' plus each overtime period reached,
  * ticks at the quarters and overtime ends, half-time at 20', quarter guides at 10'/20'/30' (NBA rules: 0'…48', the
  * quarters every 12'). American football the same over 0'…60' and its ten-minute overtimes. Baseball: 54 outs, a tick
- * at the end of every inning, extra innings included, and a guide after the third and the sixth.
+ * at the end of every inning, extra innings included, and a guide after the third and the sixth. Ice hockey: 0'…60', a
+ * tick and a guide at the end of each period, then the overtime and the shoot-out once reached.
  */
 export function chartDomain(model, minute = 0) {
+  if (isLiveModel(model) && model.kind === 'periods') {
+    const t = isNum(minute) ? num(minute) : 0;
+    const extra = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;
+    const period = model.length / 3;
+    const ticks = [0, period, 2 * period, model.length];
+    for (let k = 1; k <= extra; k++) ticks.push(model.length + k * model.ot);
+    return { length: model.length + extra * model.ot, half: model.length / 2, ticks, guides: [period, 2 * period] };
+  }
   if (isLiveModel(model) && model.kind === 'innings') {
     const t = isNum(minute) ? num(minute) : 0;
     const extras = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;

@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { NATIONS, DEPENDENCIES, buildTeam, hashStr, makeRng, teamEff } from '../src/data/teams.js';
 import { SPORT_LIST } from '../src/sports/index.js';
-import { WorldGeometry } from '../src/engine/geo.js';
+import { WorldGeometry, drawnPaths, mergeSharedIds } from '../src/engine/geo.js';
 import { CAPITALS } from '../src/data/capitals.js';
 import { createAttackRouteIndex } from '../src/engine/attackRoutes.js';
 import { createDuelDraw } from '../src/engine/duelDraw.js';
@@ -18,7 +18,9 @@ function world() {
   if (!geography) {
     const geo = new WorldGeometry(load('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS));
     const { s, tx, ty } = geo.fit;
-    const routingPaths = new WorldGeometry(load('countries-50m.json'), CAPITALS).buildPaths(s, tx, ty);
+    // What App.board() routes over: the merged 50m shapes of the countries the map draws. Unmerged, Australia is the
+    // Ashmore and Cartier reef that shares its id, and a campaign can end with no route to it.
+    const routingPaths = drawnPaths(new WorldGeometry(mergeSharedIds(load('countries-50m.json')), CAPITALS).buildPaths(s, tx, ty), geo.countries);
     geography = { geo, routingPaths, routeIndex: createAttackRouteIndex(routingPaths) };
   }
   return geography;

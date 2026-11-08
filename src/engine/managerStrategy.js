@@ -11,8 +11,12 @@ export const TACTICS = [
 
 // Bench players provide bounded tactical support through their natural position.
 // The best useful reserve matters; hoarding dozens of players cannot stack it.
+const FOOTBALL_SUPPORT = { FW: [1, 0], MF: [.65, .65], DF: [0, 1], GK: [0, 1] };
 const SUPPORT = {
-  football: { FW: [1, 0], MF: [.65, .65], DF: [0, 1], GK: [0, 1] },
+  football: FOOTBALL_SUPPORT,
+  'womens-football': FOOTBALL_SUPPORT,
+  // Forwards help a team score, the centres win defensive draws too; defenders and the backup goalie keep goals out.
+  hockey: { C: [1, .4], LW: [1, .2], RW: [1, .2], D: [.2, 1], G: [0, 1] },
   basketball: { PG: [.75, .25], SG: [1, 0], SF: [1, .4], PF: [0, 1], C: [0, 1] },
   'american-football': { QB: [1, 0], RB: [1, 0], WR: [1, 0], TE: [.8, .2], OL: [.65, .35], DL: [0, 1], LB: [0, 1], CB: [0, 1],
     S: [0, 1], K: [.3, .3] },

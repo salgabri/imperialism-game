@@ -1,5 +1,6 @@
 import React from 'react';
 import { C, ratingColor } from '../theme.js';
+import { ESTIMATE_TITLE, isEstimated } from '../data/estimates.js';
 import './player-row.css';
 
 /** Claimed players retain their former team, keeping the campaign's story readable. */
@@ -14,7 +15,8 @@ export default function PlayerRow({ player, positionColors = {}, roomy = false, 
   const sourceName = source?.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : 'Football Manager';
   const edition = String(source?.edition || '');
   const sourceLabel = edition ? /^\d+$/.test(edition) ? `${sourceName} ${edition}` : edition : sourceName;
-  const sourceTitle = source ? [sourceLabel, cm && (source.provider || 'CM 01/02 Update Team'), source.version && `Database ${source.version}`,
+  const estimated = isEstimated(player);
+  const sourceTitle = estimated ? ESTIMATE_TITLE : source ? [sourceLabel, cm && (source.provider || 'CM 01/02 Update Team'), source.version && `Database ${source.version}`,
     source.snapshotDate && `Database snapshot ${source.snapshotDate}`,
     Number.isFinite(source.rawRating) && `Source rating ${source.rawRating}${Number.isFinite(source.rawScale) ? `/${source.rawScale}` : source.rawScale ? ` (${source.rawScale} scale)` : ''}`,
     source.conversion && `Game rating converted from ${cm ? 'CM' : 'Football Manager'} current ability: ${source.conversion}`].filter(Boolean).join(' · ') : '';
@@ -23,8 +25,8 @@ export default function PlayerRow({ player, positionColors = {}, roomy = false, 
   return (
     <div className={`fi-player-row${roomy ? ' is-roomy' : ''}${player.from ? ' is-acquired' : ''}${role ? ` is-${role}` : ''}`}>
       <span className="fi-player-position" title={player.assignedPos && player.assignedPos !== player.pos ? `Natural positions ${naturalPositions}; playing ${player.assignedPos}` : undefined} style={{ color: `var(--result-position-${player.pos}, var(--result-muted, ${posColor}))` }}>{player.assignedPos || player.pos}</span>
-      <span className={`fi-player-identity${player.gen ? ' is-generated' : ''}`} title={player.gen ? 'Generated player — roster data unavailable' : undefined}>
-        <span title={source?.fullName || undefined}>{player.name}{player.gen && <sup>*</sup>}</span>
+      <span className={`fi-player-identity${player.gen ? ' is-generated' : ''}`} title={player.gen ? 'Generated player — roster data unavailable' : estimated ? ESTIMATE_TITLE : undefined}>
+        <span title={source?.fullName || undefined}>{player.name}{(player.gen || estimated) && <sup>*</sup>}</span>
         {source && <small className="fi-player-source" title={sourceTitle}>{/^https?:\/\//.test(source.url || '')
           ? <a href={source.url} target="_blank" rel="noopener noreferrer" aria-label={`View ${source.fullName || player.name} in ${sourceLabel}`}>{sourceLabel}</a>
           : sourceLabel}</small>}

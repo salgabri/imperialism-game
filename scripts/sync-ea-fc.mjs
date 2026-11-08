@@ -45,6 +45,30 @@ export const COLUMNS = ['player_id', 'player_url', 'fifa_version', 'fifa_update'
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const data = file => path.join(root, 'scripts/data', file);
 
+/**
+ * Every page of one gender's ratings (0 men's, 1 women's), each from `cacheDir` unless `refresh` → { items, pages, date }.
+ * One pull is one snapshot: a set that changes mid-pull, or pages fetched on two days, must be fetched again.
+ */
+export async function pullPages(cacheDir, gender, refresh) {
+  await mkdir(cacheDir, { recursive: true });
+  const first = await page(cacheDir, 0, refresh, gender);
+  const pages = Math.ceil(first.totalItems / LIMIT);
+  const items = [...first.items], dates = new Set([first.fetchedAt.slice(0, 10)]);
+  for (let i = 1; i < pages; i++) {
+    const body = await page(cacheDir, i * LIMIT, refresh, gender);
+    // A different total means EA changed the set mid-pull: refetch it whole.
+    if (body.totalItems !== first.totalItems) throw new Error(`The edition changed mid-pull: ${body.totalItems} players, not ${first.totalItems}; rerun with --refresh`);
+    dates.add(body.fetchedAt.slice(0, 10));
+    items.push(...body.items);
+    if (i % 40 === 0) console.log(`  page ${i}/${pages}`);
+  }
+  const ids = new Set(items.map(item => item.id));
+  if (items.length !== first.totalItems || ids.size !== first.totalItems) throw new Error(`Expected ${first.totalItems} players; got ${items.length} rows, ${ids.size} ids`);
+  // fifa_update_date is the day of the pull: one pull, one snapshot.
+  if (dates.size !== 1) throw new Error(`The pages were fetched on ${[...dates].join(', ')}; rerun with --refresh to fetch them in one pull`);
+  return { items, pages, date: [...dates][0] };
+}
+
 // Letters NFD does not decompose. EA's slugs fold them the same way (vini-jr and kylian-mbappe resolve).
 const FOLD = { Ø: 'O', ø: 'o', Đ: 'D', đ: 'd', Ð: 'D', ð: 'd', Ł: 'L', ł: 'l', ı: 'i', ß: 'ss',
   Æ: 'AE', æ: 'ae', Œ: 'OE', œ: 'oe', Þ: 'Th', þ: 'th' };
@@ -174,12 +198,15 @@ export function checkClubIdentity(items, referenceRows, { aliases = new Map(), l
   return { aliased, added, warnings };
 }
 
-/** The API's players as CSV rows (COLUMNS), with the nations, leagues, club names and legal names resolved. */
-export function reduceItems(items, { version, date, nations, leagues, clubNames = new Map(), aliases = new Map(), referenceNames = new Map() }) {
+/**
+ * The API's players as CSV rows (COLUMNS), with the nations, leagues, club names and legal names resolved. `gender` is
+ * the API's: 0 men's football (this script), 1 women's (scripts/sync-ea-fc-women.mjs).
+ */
+export function reduceItems(items, { version, date, nations, leagues, clubNames = new Map(), aliases = new Map(), referenceNames = new Map(), gender = 0 }) {
   const unknownPositions = new Map(), labelNations = new Map();
   let carried = 0;
   const rows = items.map(item => {
-    if (item.gender?.id !== 0) throw new Error(`EA player ${item.id} is not in men's football`);
+    if (item.gender?.id !== gender) throw new Error(`EA player ${item.id} is not in ${gender === 0 ? "men's" : "women's"} football`);
     if (!Number.isInteger(item.id) || item.id <= 0) throw new Error(`Invalid EA player id ${item.id}`);
     if (!Number.isInteger(item.overallRating) || item.overallRating < 1 || item.overallRating > 99) throw new Error(`Invalid EA overall for ${item.id}`);
     const positions = [...new Set([item.position, ...(item.alternatePositions || [])].map(p => p?.shortLabel))];
@@ -208,10 +235,10 @@ const csvField = value => `"${String(value).replaceAll('"', '""')}"`;
 export const toCsv = rows => rows.map(row => row.map(csvField).join(',')).join('\n') + '\n';
 
 /** One page of the API, from the cache unless `refresh`. */
-async function page(cacheDir, offset, refresh) {
+async function page(cacheDir, offset, refresh, gender = 0) {
   const file = path.join(cacheDir, `page-${String(offset / LIMIT).padStart(4, '0')}.json`);
   if (!refresh && existsSync(file)) return JSON.parse(await readFile(file, 'utf8'));
-  const url = `${ENDPOINT}?locale=en&limit=${LIMIT}&offset=${offset}&gender=0`;
+  const url = `${ENDPOINT}?locale=en&limit=${LIMIT}&offset=${offset}&gender=${gender}`;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const response = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(30000) });
@@ -235,23 +262,7 @@ async function main() {
   if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
   const refresh = args.includes('--refresh');
   const cacheDir = path.join(root, `data-src/ea-fc${VERSION}`);
-  await mkdir(cacheDir, { recursive: true });
-  const first = await page(cacheDir, 0, refresh);
-  const pages = Math.ceil(first.totalItems / LIMIT);
-  const items = [...first.items], dates = new Set([first.fetchedAt.slice(0, 10)]);
-  for (let i = 1; i < pages; i++) {
-    const body = await page(cacheDir, i * LIMIT, refresh);
-    // A different total means EA changed the set mid-pull: refetch it whole.
-    if (body.totalItems !== first.totalItems) throw new Error(`The edition changed mid-pull: ${body.totalItems} players, not ${first.totalItems}; rerun with --refresh`);
-    dates.add(body.fetchedAt.slice(0, 10));
-    items.push(...body.items);
-    if (i % 40 === 0) console.log(`  page ${i}/${pages}`);
-  }
-  const ids = new Set(items.map(item => item.id));
-  if (items.length !== first.totalItems || ids.size !== first.totalItems) throw new Error(`Expected ${first.totalItems} players; got ${items.length} rows, ${ids.size} ids`);
-  // fifa_update_date is the day of the pull: one pull, one snapshot.
-  if (dates.size !== 1) throw new Error(`The pages were fetched on ${[...dates].join(', ')}; rerun with --refresh to fetch them in one pull`);
-  const [date] = dates;
+  const { items, pages, date } = await pullPages(cacheDir, 0, refresh);
 
   const nations = JSON.parse(await readFile(data('ea-nations.json'), 'utf8')).nationalities;
   const aliases = readClubAliases(JSON.parse(await readFile(data('ea-club-aliases.json'), 'utf8')), VERSION, REFERENCE);

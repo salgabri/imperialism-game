@@ -55,8 +55,9 @@ scrolling panels, at desktop, tablet and phone sizes.
 
 - **Setup.** The header holds the save actions as icons. A failed save or a refused file grows a strip under the
   header's row; a refused resume shows on the resume card instead. Step 1: a slim notice line (resume, challenge
-  link), sport tiles, Nations | Clubs and the season on one row, theatre chips, a country select, and the counts at
-  the foot. The theatre's map fills the side. Step 2: four short draw cards, with Show matches and More rules
+  link), sport tiles (up to four in a row; the six sports in two rows of three), Nations | Clubs and the season on
+  one row, theatre chips (Europe's Top 124 and Elite 32 for football clubs), the One country · top clubs dropdown,
+  and the counts at the foot. The theatre's map fills the side. Step 2: four short draw cards, with Show matches and More rules
   beside them. Step 3: compact role cards with the opponent choice in the same row, a flag wall strongest first
   (arrows, Home, End and type-ahead walk it across its pages), and the suggested team as a compact card. The rail's
   ad shows only at 1600px and wider and at least 740px tall.

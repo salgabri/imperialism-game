@@ -567,7 +567,8 @@ export default function SetupOverlay({
                 <p className="setup-lede">Win a match to take all of the loser’s land and one player. Last team standing wins.</p>
               </div>
 
-              <div className="setup-sports" role="radiogroup" aria-label="Sport">
+              <div className="setup-sports" role="radiogroup" aria-label="Sport"
+                style={{ '--sport-cols': model.sports.length > 4 ? Math.ceil(model.sports.length / 2) : model.sports.length }}>
                 {model.sports.map(item => (
                   <div className="setup-card" data-checked={item.selected} key={item.id} title={item.note}>
                     <Icon name={item.id} size={22} className="setup-card__icon" />

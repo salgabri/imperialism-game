@@ -26,8 +26,8 @@ function PlayerName({ row }) {
 }
 
 /**
- * Row: { pos, name, fullName, natural, inRole, outOfPosition, rating, tier, acquired, source, sourceTitle, sourceUrl, generated }.
- * A starter out of position shows his rating in role beside his own (↓).
+ * Row: { pos, name, fullName, natural, inRole, outOfPosition, rating, tier, acquired, source, sourceTitle, sourceUrl, generated, estimated }.
+ * A starter out of position shows the rating in role beside the natural one (↓).
  */
 export default function SquadRow({ row }) {
   const acquired = row.acquired;
@@ -38,6 +38,7 @@ export default function SquadRow({ row }) {
       <span className="squad-row__name" role="cell">
         <PlayerName row={row} />
         {row.generated && <span className="squad-tag">Generated</span>}
+        {row.estimated && <span className="squad-tag" title={row.sourceTitle}>Estimated</span>}
       </span>
       <span className="squad-row__rtg" role="cell">
         {row.outOfPosition && <span className="squad-row__role" title={`Out of position · natural ${row.natural}`}>

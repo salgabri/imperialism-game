@@ -13,6 +13,8 @@ import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
+import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
+import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { DOMESTIC } from '../src/data/domestic.js';
 
 const root = new URL('../', import.meta.url);
@@ -42,7 +44,7 @@ const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(na
 const sources = readFileSync(new URL('public/club-logos/SOURCES.tsv', root), 'utf8').split('\n')
   .filter(line => line && !line.startsWith('#')).slice(1).map(line => line.split('\t'));
 const domesticIds = DOMESTIC.flatMap(entry => JSON.parse(readFileSync(new URL(`public/domestic/${entry.id}.json`, root), 'utf8')).clubs.map(club => club.id));
-const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS].map(club => club.id).concat(domesticIds);
+const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...WOMENS_CLUBS].map(club => club.id).concat(domesticIds);
 const withCrest = allClubIds.filter(id => clubLogoFile(id));
 
 test('every club the list gives a crest has its file, a source row, and nothing else ships', () => {
@@ -65,6 +67,7 @@ test('the big clubs carry crests, and an all-leagues club shares its domestic tw
     'b-boston-celtics', 'b-los-angeles-lakers', 'nfl-kansas-city-chiefs', 'nfl-green-bay-packers', 'mlb-new-york-yankees', 'mlb-los-angeles-dodgers']) assert.ok(clubLogoFile(id), `${id} has a crest`);
   assert.ok(NFL_CLUBS.every(club => clubLogoFile(club.id)), 'every NFL franchise has a crest');
   assert.ok(MLB_CLUBS.every(club => clubLogoFile(club.id)), 'every MLB club has a crest');
+  assert.ok(NHL_CLUBS.every(club => clubLogoFile(club.id)), 'every NHL club has a crest');
   const madrid = clubLogoFile('f-real-madrid');
   assert.match(madrid, /^d724-\d+$/, 'Real Madrid uses its La Liga twin\'s file');
   assert.equal(clubLogoUrl('f-real-madrid'), `/club-logos/${madrid}.webp`);

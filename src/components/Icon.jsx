@@ -26,8 +26,11 @@ const PATHS = {
   settings: <><path d="m10 3-.6 2.3-2 .9-2.2-.7-2 3.5 1.7 1.7v2.5L3.2 15l2 3.5 2.3-.7 1.9 1L10 21h4l.6-2.2 1.9-1 2.3.7 2-3.5-1.7-1.8v-2.5L20.8 9l-2-3.5-2.2.7-2-.9L14 3Z" /><circle cx="12" cy="12" r="3" /></>,
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2.5V5m0 14v2.5M2.5 12H5m14 0h2.5M5.3 5.3l1.8 1.8m9.8 9.8 1.8 1.8M5.3 18.7l1.8-1.8m9.8-9.8 1.8-1.8" /></>,
   moon: <path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10Z" />,
-  // The four sports, in the setup wizard's sport tiles.
+  // The sports, in the setup wizard's sport tiles. Women's football plays with the same ball.
   football: <><circle cx="12" cy="12" r="9" /><path d="m12 7.5 4.3 3.1-1.6 5h-5.4l-1.6-5ZM12 7.5V3.2M16.3 10.6l4-1.4M14.7 15.6l2.6 3.5M9.3 15.6l-2.6 3.5M7.7 10.6l-4-1.4" /></>,
+  'womens-football': <><circle cx="12" cy="12" r="9" /><path d="m12 7.5 4.3 3.1-1.6 5h-5.4l-1.6-5ZM12 7.5V3.2M16.3 10.6l4-1.4M14.7 15.6l2.6 3.5M9.3 15.6l-2.6 3.5M7.7 10.6l-4-1.4" /></>,
+  // A stick, its blade along the ice, and a puck.
+  hockey: <><path d="M8.5 2.8l5.4 13.1a3 3 0 0 0 2.8 1.9H21" /><ellipse cx="6" cy="18.6" rx="3.2" ry="1.4" /><path d="M2.8 18.6v1.3c0 .8 1.4 1.4 3.2 1.4s3.2-.6 3.2-1.4v-1.3" /></>,
   basketball: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3v18M5.8 5.5a10 10 0 0 1 0 13M18.2 5.5a10 10 0 0 0 0 13" /></>,
   'american-football': <><path d="M19.8 4.2c1 5.4-.2 10-3 12.6s-7.2 4-12.6 3c-1-5.4.2-10 3-12.6s7.2-4 12.6-3Z" /><path d="m9 15 6-6M10.5 10.5l3 3M8.5 12.5l3 3M12.5 8.5l3 3" /></>,
   baseball: <><circle cx="12" cy="12" r="9" /><path d="M6.2 5.2a10 10 0 0 1 0 13.6M17.8 5.2a10 10 0 0 0 0 13.6" /><path d="m7.6 8.4 1.7-.8M8.5 11l1.8-.3M8.5 13.2l1.8.3M7.6 15.8l1.7.8M16.4 8.4l-1.7-.8M15.5 11l-1.8-.3M15.5 13.2l-1.8.3M16.4 15.8l-1.7.8" /></>,

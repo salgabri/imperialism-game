@@ -13,10 +13,14 @@ import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
+import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
+import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { football } from '../src/sports/football.js';
 import { basketball, nbaBasketball } from '../src/sports/basketball.js';
 import { americanFootball } from '../src/sports/americanFootball.js';
 import { baseball } from '../src/sports/baseball.js';
+import { hockey } from '../src/sports/hockey.js';
+import { womensFootball } from '../src/sports/womensFootball.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
 import { liveModelFor, winProbabilityAt } from '../src/engine/winProbability.js';
 import { tacticalMatchParameters } from '../src/engine/managerStrategy.js';
@@ -45,13 +49,18 @@ function equalSides(sport, clubs) {
   return [{ ...side, id: 'a' }, { ...side, id: 'd' }];
 }
 
-// Each sport's league range for home wins; FIBA nations share the NBA's (their per-possession edge is the same).
+// Each sport's league range for home wins; FIBA nations share the NBA's (their per-possession edge is the same). Football
+// reads in ninety minutes: about 45% home wins and 26% draws, and the shoot-out stays even, so 58% in all. Women's football
+// plays the men's model and has no real range to meet: the band only says the men's edge reads the same on its median
+// club, whose attack outrates its defence, so its mirror game is an open one (3.5 goals, fewer draws).
 const SPORTS = [
-  { label: 'football', sport: football, clubs: FOOTBALL_CLUBS },
+  { label: 'football', sport: football, clubs: FOOTBALL_CLUBS, ninety: { homeWins: [0.42, 0.48], draws: [0.24, 0.3], defender: [0.55, 0.61] } },
+  { label: "women's football", sport: womensFootball, clubs: WOMENS_CLUBS, ninety: { homeWins: [0.45, 0.51], draws: [0.19, 0.25], defender: [0.56, 0.62] } },
   { label: 'basketball (FIBA)', sport: basketball, clubs: null, range: REAL.nba.homeWins },
   { label: 'basketball (NBA)', sport: nbaBasketball, clubs: NBA_CLUBS, range: REAL.nba.homeWins },
   { label: 'American football', sport: americanFootball, clubs: NFL_CLUBS, range: REAL.nfl.homeWins },
   { label: 'baseball', sport: baseball, clubs: MLB_CLUBS, range: REAL.mlb.homeWins },
+  { label: 'ice hockey', sport: hockey, clubs: NHL_CLUBS, range: REAL.nhl.homeWins },
 ];
 const scoreFields = ({ ga, gd, tie, winner }) => ({ ga, gd, tie, winner });
 
@@ -81,7 +90,7 @@ test('a neutral venue is the default, and plays exactly as before', () => {
 
 test('at home, equal sides win about as often as home sides do in their leagues', () => {
   const samples = 60000;
-  for (const { label, sport, clubs, range } of SPORTS) {
+  for (const { label, sport, clubs, range, ninety } of SPORTS) {
     const [a, d] = equalSides(sport, clubs);
     const prepared = sport.prepareMatch(a, d, undefined, undefined, HOME);
     const rng = makeRng(20261101);
@@ -92,11 +101,9 @@ test('at home, equal sides win about as often as home sides do in their leagues'
       const regA = result.regA ?? result.ga, regD = result.regD ?? result.gd;
       if (regD > regA) homeWins++; else if (regD === regA) draws++;
     }
-    if (sport === football) {
-      // About 45% home wins and 26% draws in ninety minutes; the shoot-out stays even, so 58% in all.
-      assert.ok(homeWins / samples > 0.42 && homeWins / samples < 0.48, `${label} home wins in 90: ${homeWins / samples}`);
-      assert.ok(draws / samples > 0.24 && draws / samples < 0.3, `${label} draws: ${draws / samples}`);
-      assert.ok(defenderWins / samples > 0.55 && defenderWins / samples < 0.61, `${label} defender: ${defenderWins / samples}`);
+    if (ninety) {
+      const shares = { homeWins: homeWins / samples, draws: draws / samples, defender: defenderWins / samples };
+      for (const [key, [low, high]] of Object.entries(ninety)) assert.ok(shares[key] > low && shares[key] < high, `${label} ${key}: ${shares[key]}`);
     } else {
       const share = defenderWins / samples;
       assert.ok(share >= range[0] && share <= range[1], `${label}: the home side won ${share}, real ${range.join('–')}`);
@@ -108,8 +115,10 @@ test('the edge is the prepared match\'s: the defender gains what the visitors lo
   for (const { label, sport, clubs } of SPORTS) {
     const [a, d] = equalSides(sport, clubs);
     const neutral = sport.prepareMatch(a, d, 75, 75), home = sport.prepareMatch(a, d, 75, 75, HOME);
-    const [keyA, keyD] = 'logA' in neutral ? ['logA', 'logD'] : 'efficiencyA' in neutral ? ['efficiencyA', 'efficiencyD'] : ['edgeA', 'edgeD'];
-    const gain = home[keyD] - neutral[keyD], loss = neutral[keyA] - home[keyA];
+    // Hockey's prepared rates are goals a game, so its edge is in their logs.
+    const inRates = 'rateA' in neutral, read = inRates ? Math.log : value => value;
+    const [keyA, keyD] = inRates ? ['rateA', 'rateD'] : 'logA' in neutral ? ['logA', 'logD'] : 'efficiencyA' in neutral ? ['efficiencyA', 'efficiencyD'] : ['edgeA', 'edgeD'];
+    const gain = read(home[keyD]) - read(neutral[keyD]), loss = read(neutral[keyA]) - read(home[keyA]);
     assert.ok(gain > 0, `${label}: the defender gains`);
     assert.ok(Math.abs(gain - loss) < 1e-9, `${label}: the visitors lose as much (${gain} v ${loss})`);
     if ('kickingA' in neutral) assert.deepEqual([home.kickingA, home.kickingD], [neutral.kickingA, neutral.kickingD], 'kickers unchanged');
@@ -122,7 +131,7 @@ test('the edge is the prepared match\'s: the defender gains what the visitors lo
 
 test('the live chart starts from the home odds', () => {
   // Kick-off tolerances as the sports' own tests hold them against the fixture odds.
-  const tolerance = { football: 0.035, basketball: 0.02, 'american-football': 0.03, baseball: 0.02 };
+  const tolerance = { football: 0.035, 'womens-football': 0.035, basketball: 0.02, 'american-football': 0.03, baseball: 0.02, hockey: 0.02 };
   for (const { label, sport, clubs } of SPORTS) {
     const [a, d] = equalSides(sport, clubs);
     const neutral = liveModelFor(sport, a, d, undefined, undefined, 6);

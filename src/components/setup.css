@@ -171,8 +171,9 @@ strong.setup-save__text { font-weight:600; }
 }
 .setup-challenge p { flex:1 1 0; min-width:0; margin:0; font:400 13px/1.3 var(--font-sans); color:var(--ink); }
 
-/* ---- Sports: one row of tiles, an icon over its name; the whole tile is the radio ---- */
-.setup-sports { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; }
+/* ---- Sports: tiles, an icon over its name; the whole tile is the radio. Up to four share a row; more split into two
+   even rows (--sport-cols, set by SetupOverlay), since six across would squeeze "American football" ---- */
+.setup-sports { display:grid; grid-template-columns:repeat(var(--sport-cols, 4), minmax(0, 1fr)); gap:8px; }
 .setup-card {
   position:relative; min-width:0; min-height:70px; padding:10px 4px 8px;
   display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:6px; text-align:center;

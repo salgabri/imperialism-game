@@ -20,6 +20,8 @@ import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
+import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
+import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { clubLogoFile } from '../src/data/clubLogos.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -88,7 +90,7 @@ for (const name of files) {
 
 // ---- Corrections ----
 const { colours: overrides } = JSON.parse(await readFile(overridesFile, 'utf8'));
-const knownIds = new Set([...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS].map(club => club.id));
+const knownIds = new Set([...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...WOMENS_CLUBS].map(club => club.id));
 for (const [id, colour] of Object.entries(overrides)) {
   // A club that has left the built-in leagues keeps its crest for the earlier seasons it played, so its correction too.
   if (!knownIds.has(id) && !DOMESTIC_ID.test(id) && !clubLogoFile(id)) throw new Error(`club-colours.json: no club ${id}`);

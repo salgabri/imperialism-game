@@ -1,5 +1,5 @@
-// Club crests for every club the game ships: the all-leagues football layer, the NBA, NFL and
-// MLB franchises and every country's domestic clubs. A club with a crest shows it wherever
+// Club crests for every club the game ships: the all-leagues football layer, the women's clubs, the NBA, NFL, MLB and
+// NHL franchises and every country's domestic clubs. A club with a crest shows it wherever
 // a nation shows its flag; a club without one keeps its monogram chip.
 //
 // Usage:
@@ -10,8 +10,9 @@
 //   - Each club's Wikidata item (CC0). Domestic clubs reuse the item their home town came
 //     from (scripts/data/domestic/<nation>.json, location.source "wikidata:Q..", or location.qid); an
 //     all-leagues club takes the item of its domestic twin, the club of its country whose
-//     FM26 squad shares the most players with its EA lineup; NBA, NFL and MLB franchises
-//     are matched by English label. scripts/data/club-logos.json overrides any of these ("items"),
+//     FM26 squad shares the most players with its EA lineup; NBA, NFL, MLB and NHL franchises
+//     are matched by English label. A women's club wears its men's club's crest (scripts/data/club-logos.json "twins")
+//     or has an item of its own there ("items"). scripts/data/club-logos.json overrides any of these ("items"),
 //     or names a twin the lineups do not find ("twins"). The all-leagues clubs are the built-in
 //     ones plus those of the earlier EA seasons no older than the domestic squads (EA FC 26), so
 //     a club that has left the seven leagues keeps its crest in the seasons it played.
@@ -36,6 +37,8 @@ import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
+import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
+import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { cachedGz, createLimiter, DATABASE_DATE } from './lib/domestic-sync.mjs';
 import { norm } from './lib/domestic-locate.mjs';
@@ -53,6 +56,7 @@ const ENWIKI = 'https://en.wikipedia.org/w/api.php';
 const NBA = 'Q155223', BASKETBALL_TEAM = 'Q13393265';
 const NFL = 'Q1215884', AMERICAN_FOOTBALL_TEAM = 'Q17156793';
 const MLB = 'Q1163715', BASEBALL_TEAM = 'Q13027888';
+const NHL = 'Q1215892', HOCKEY_TEAM = 'Q4498974';
 const THUMB_WIDTH = 250; // one of Wikimedia's standard thumbnail steps
 const BOX = 128; // a crest fits this square: twice the largest mark the game draws (60px)
 // The fewest lineup players an all-leagues club must share with a domestic club to be its twin.
@@ -152,7 +156,7 @@ function twinOf(club, domestic) {
   return best && best.shared >= MIN_SHARED ? best : null;
 }
 
-/** A league's current franchises by English label: the NBA's, or (`league`, `kind`) the NFL's or MLB's. */
+/** A league's current franchises by English label: the NBA's, or (`league`, `kind`) the NFL's, MLB's or the NHL's. */
 async function leagueItems(league = NBA, kind = BASKETBALL_TEAM) {
   const rows = await sparql(`SELECT ?team ?label WHERE { ?team wdt:P118 wd:${league}; wdt:P31/wdt:P279* wd:${kind}; rdfs:label ?label .
     FILTER(lang(?label) = 'en') FILTER NOT EXISTS { ?team wdt:P576 [] } }`);
@@ -265,6 +269,7 @@ const domesticById = new Map(domestic.map(club => [club.id, club]));
 const nba = await leagueItems();
 const nfl = await leagueItems(NFL, AMERICAN_FOOTBALL_TEAM);
 const mlb = await leagueItems(MLB, BASEBALL_TEAM);
+const nhl = await leagueItems(NHL, HOCKEY_TEAM);
 const clubs = []; // { id, name, qid, twin? }
 const problems = [];
 
@@ -292,7 +297,13 @@ for (const club of footballClubs) {
   }
   clubs.push({ id: club.id, name: club.name, qid: twin?.club.qid ?? null, twin: twin?.club.id ?? null });
 }
-for (const [league, items, list] of [['NBA', nba, BASKETBALL_CLUBS], ['NFL', nfl, NFL_CLUBS], ['MLB', mlb, MLB_CLUBS]]) for (const club of list) {
+// A women's club named in neither "twins" nor "items" keeps its monogram.
+for (const club of WOMENS_CLUBS) {
+  const named = twinOverrides[club.id];
+  if (named && !domesticById.has(named)) throw new Error(`club-logos.json twins ${club.id} with unknown domestic club ${named}`);
+  if (named || itemOverrides[club.id]) clubs.push({ id: club.id, name: club.name, qid: named ? domesticById.get(named).qid : null, twin: named ?? null });
+}
+for (const [league, items, list] of [['NBA', nba, BASKETBALL_CLUBS], ['NFL', nfl, NFL_CLUBS], ['MLB', mlb, MLB_CLUBS], ['NHL', nhl, NHL_CLUBS]]) for (const club of list) {
   const qid = items.get(club.name) || null;
   if (!qid && !itemOverrides[club.id]) problems.push(`${club.id}: no ${league} item labelled "${club.name}"`);
   clubs.push({ id: club.id, name: club.name, qid });
@@ -378,7 +389,7 @@ await writeFile(moduleFile, `// GENERATED by scripts/sync-club-logos.mjs; do not
 // Clubs with a crest in public/club-logos/ (sources and licences: public/club-logos/SOURCES.tsv).
 // A club with a crest shows it wherever a nation shows its flag; the rest keep their monogram.
 
-// All-leagues football clubs that share their domestic twin's file.
+// All-leagues and women's football clubs that share their domestic twin's file.
 const SHARED = JSON.parse('${JSON.stringify(shared)}');
 // Other clubs with a file of their own.
 const OWN = new Set('${own.join(' ')}'.split(' '));
@@ -411,12 +422,13 @@ export function clubLogoUrl(id) {
 const count = list => list.filter(club => crests.has(club.id)).length;
 const worldClubs = clubs.filter(club => club.id.startsWith('f-')), nbaClubs = clubs.filter(club => club.id.startsWith('b-'));
 const nflClubs = clubs.filter(club => club.id.startsWith('nfl-')), mlbClubs = clubs.filter(club => club.id.startsWith('mlb-'));
+const nhlClubs = clubs.filter(club => club.id.startsWith('nhl-')), womensClubs = clubs.filter(club => club.id.startsWith('w-'));
 console.log(`Crests: ${crests.size} of ${clubs.length} clubs`);
-console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, MLB ${count(mlbClubs)}/${mlbClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
+console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, MLB ${count(mlbClubs)}/${mlbClubs.length}, NHL ${count(nhlClubs)}/${nhlClubs.length}, women's ${count(womensClubs)}/${womensClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
 console.log(`  domestic clubs with a Wikidata item: ${domestic.filter(club => club.qid).length}`);
 for (const [reason, list] of Object.entries(rejected)) console.log(`  rejected (${reason}): ${list.length}${list.length <= 12 ? '\n    ' + list.join('\n    ') : ''}`);
-const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs].filter(club => !crests.has(club.id));
-if (missing.length) console.log(`  all-leagues, NBA, NFL and MLB clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
+const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs, ...nhlClubs, ...womensClubs].filter(club => !crests.has(club.id));
+if (missing.length) console.log(`  all-leagues, NBA, NFL, MLB, NHL and women's clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
 for (const problem of problems) console.log(`  ${problem}`);
 const sizes = await Promise.all([...new Set([...crests.values()].map(crest => crest.file))].map(async file => (await readFile(path.join(outDir, `${file}.webp`))).length));
 console.log(`  ${sizes.length} files, ${(sizes.reduce((a, b) => a + b, 0) / 1048576).toFixed(1)} MB, module ${(Buffer.byteLength(await readFile(moduleFile, 'utf8')) / 1024).toFixed(1)} KB`);

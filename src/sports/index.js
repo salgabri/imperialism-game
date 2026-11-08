@@ -3,12 +3,14 @@
 // spinner, conquest, autosave — is sport-agnostic.
 
 import { football } from './football.js';
+import { womensFootball } from './womensFootball.js';
 import { basketball, nbaBasketballIn } from './basketball.js';
 import { americanFootball } from './americanFootball.js';
 import { baseball } from './baseball.js';
+import { hockey } from './hockey.js';
 
-export const SPORTS = { football, basketball, 'american-football': americanFootball, baseball };
-export const SPORT_LIST = [football, basketball, americanFootball, baseball];
+export const SPORTS = { football, 'womens-football': womensFootball, basketball, 'american-football': americanFootball, baseball, hockey };
+export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, baseball, hockey];
 export const DEFAULT_SPORT = 'football';
 
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];
