@@ -47,7 +47,7 @@ const WALL = { ratio: 4 / 3, gap: 6, minCell: 34, maxCell: 104, touch: { ratio: 
  * The sport tiles' columns: up to four share a row, up to eight split into two even rows, and more into three (nine
  * sports: three rows of three). Five across would squeeze "Basketball" out of its tile on a desktop's setup column.
  */
-const sportColumns = count =>(count <= 4 ? count : count <= 8 ? Math.ceil(count / 2) : Math.ceil(count / 3));
+const sportColumns = count => (count <= 4 ? count : count <= 8 ? Math.ceil(count / 2) : Math.ceil(count / 3));
 
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });
