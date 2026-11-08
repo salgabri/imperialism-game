@@ -217,6 +217,16 @@
 .pitch--rink.pitch--large .pitch__dot { width: 30px; height: 30px; font-size: 12px; }
 .pitch--rink.pitch--large .pitch__name { font-size: 12px; }
 .pitch--rink.pitch--phone .pitch__name { display: none; }
+/* Rugby league: the attacking half drawn over the box, the bench below halfway, and 17 smaller discs */
+.pitch__rugby { position: absolute; left: 10px; top: 10px; width: calc(100% - 20px); height: calc(100% - 20px); }
+.pitch__rugby rect, .pitch__rugby path { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.pitch__rugby .pitch__rugby-line { stroke-dasharray: 4 4; }
+.pitch--rugby .pitch__player { gap: 2px; }
+.pitch--rugby .pitch__dot { width: 26px; height: 26px; font-size: 11px; }
+.pitch--rugby .pitch__name { padding: 0 2px; font-size: 11px; }
+.pitch--rugby.pitch--large .pitch__dot { width: 32px; height: 32px; font-size: 12px; }
+.pitch--rugby.pitch--large .pitch__name { font-size: 12px; }
+.pitch--rugby.pitch--phone .pitch__name { display: none; }
 .pitch__player {
   position: absolute; z-index: 1; transform: translate(-50%, -50%);
   display: flex; flex-direction: column; align-items: center; gap: 3px;

@@ -43,6 +43,10 @@
     "mlb-san-diego-padres": "#2f241d",
     "nhl-chicago-blackhawks": "#cf0a2c",
     "nhl-philadelphia-flyers": "#f74902",
-    "nhl-nashville-predators": "#ffb81c"
+    "nhl-nashville-predators": "#ffb81c",
+    "nrl-melbourne-storm": "#632390",
+    "nrl-canberra-raiders": "#7cbf44",
+    "nrl-south-sydney-rabbitohs": "#00843d",
+    "nrl-canterbury-bankstown-bulldogs": "#0057a5"
   }
 }

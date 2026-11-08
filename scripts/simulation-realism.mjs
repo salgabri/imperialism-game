@@ -18,6 +18,8 @@ import { BENCH, nbaBasketballIn } from '../src/sports/basketball.js';
 import { americanFootball } from '../src/sports/americanFootball.js';
 import { baseball } from '../src/sports/baseball.js';
 import { hockey, PERIOD_MODEL } from '../src/sports/hockey.js';
+import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
+import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugbyLeague.js';
 
 const DRAMA = 6; // Balanced
 
@@ -34,15 +36,22 @@ function roundRobin(n) {
   return rounds;
 }
 
-/** `games` rounds for each team, cycling the round robin (a second cycle swaps the sides), teams shuffled per season. */
+/**
+ * `games` rounds for each team, cycling the round robin (a second cycle swaps the sides), teams shuffled per season. An
+ * odd number of teams (the NRL's 17) adds a bye: each round one team sits out, as in the NRL.
+ */
 function schedule(n, games, rng) {
-  const order = [...Array(n).keys()];
-  for (let i = n - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-  const rounds = roundRobin(n);
+  const slots = n % 2 ? n + 1 : n;
+  const order = [...Array(slots).keys()];
+  for (let i = slots - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  const rounds = roundRobin(slots);
   const fixtures = [];
   for (let g = 0; g < games; g++) {
     const flip = Math.floor(g / rounds.length) % 2 === 1;
-    for (const [a, b] of rounds[g % rounds.length]) fixtures.push(flip ? [order[b], order[a]] : [order[a], order[b]]);
+    for (const [a, b] of rounds[g % rounds.length]) {
+      if (order[a] >= n || order[b] >= n) continue;
+      fixtures.push(flip ? [order[b], order[a]] : [order[a], order[b]]);
+    }
   }
   return fixtures;
 }
@@ -326,6 +335,57 @@ function nhlSeason(seasons, seed, venue) {
   };
 }
 
+// ---- Rugby league (NRL) ---------------------------------------------------------------------------------------
+
+/** Rounds a season: the NRL's 17 clubs play 24 games each, a bye in each round, as 26 rounds of this schedule give. */
+const NRL_ROUNDS = 26;
+const NRL_GAMES = 24;
+
+export function nrlSeason(seasons, seed, venue) {
+  const clubs = NRL_CLUBS.map(c => buildClub(c, rugbyLeague));
+  const { played, tables } = playSeasons({ sport: rugbyLeague, teams: clubs, games: NRL_ROUNDS, seasons, seed, venue });
+  const teamPoints = played.flatMap(g => [g.ga, g.gd]);
+  const margins = played.map(g => Math.abs(g.ga - g.gd));
+  const regulation = played.filter(g => !g.tie);
+  // Each player's place: the thirteen by position, the interchange as the bench, as NRL.com's team lists count them.
+  const positions = new Map(clubs.map(c => {
+    const { starters, bench } = onField(selectLineup(c));
+    return [c.id, new Map([...starters.map(slot => [slot.player.name, slot.position]), ...bench.map(slot => [slot.player.name, 'BENCH'])])];
+  }));
+  const events = played.flatMap(g => g.ev);
+  const tries = events.filter(e => scoreKind(e) === 'try' && e.m <= SLICE_MODEL.MINUTES);
+  const tryShares = {};
+  for (const e of tries) {
+    const position = positions.get(e.tid).get(e.name) || 'other';
+    tryShares[position] = (tryShares[position] || 0) + 1 / tries.length;
+  }
+  const firstHalf = events.filter(e => e.m <= SLICE_MODEL.HALF).reduce((s, e) => s + e.pts, 0);
+  // Win percentages and records by games played: the byes leave each club a game or two either side of 24.
+  const spreads = [], best = [], worst = [];
+  for (const { table } of tables) {
+    const values = table.map(t => (t.w + t.d / 2) / Math.max(1, t.w + t.d + t.l));
+    spreads.push(sd(values));
+    best.push(Math.max(...values) * NRL_GAMES);
+    worst.push(Math.min(...values) * NRL_GAMES);
+  }
+  return {
+    clubs: clubs.length,
+    pointsPerTeam: mean(teamPoints), teamPointsSd: sd(teamPoints),
+    triesPerTeam: tries.length / teamPoints.length,
+    conversionRate: tries.filter(e => e.pts === 6).length / Math.max(1, tries.length),
+    penaltyGoalsPerTeam: events.filter(e => scoreKind(e) === 'penalty' && e.m <= SLICE_MODEL.MINUTES).length / teamPoints.length,
+    fieldGoalsPerGame: events.filter(e => scoreKind(e) === 'field').length / played.length,
+    goldenPoint: share(played, g => g.tie),
+    marginMean: mean(margins), withinSix: share(margins, m => m > 0 && m <= 6), withinTwelve: share(margins, m => m > 0 && m <= 12),
+    byThirteenPlus: share(margins, m => m >= 13), byTwentyFivePlus: share(margins, m => m >= 25), byOne: share(margins, m => m === 1),
+    nilRate: share(teamPoints, p => p === 0), fortyPlusRate: share(teamPoints, p => p >= 40),
+    firstHalfShare: firstHalf / Math.max(1, events.reduce((s, e) => s + e.pts, 0)),
+    homeWins: share(played, g => g.winner === g.j),
+    winPctSd: mean(spreads), bestWins: mean(best), worstWins: mean(worst),
+    favourite: favouriteRecord(played), tryShares, regulationShare: regulation.length / played.length,
+  };
+}
+
 // ---- Real leagues ---------------------------------------------------------------------------------------------
 
 /**
@@ -387,6 +447,20 @@ export const REAL = Object.freeze({
     // est.: 15.2% of the 2025/26 goals of the players on today's rosters.
     defenderGoals: [0.14, 0.17],
   },
+  nrl: {
+    note: "NRL regular seasons 2021–2025, computed 2026-11-08 from every game in NRL.com's draw and match centre "
+      + '(scripts/lib/nrl-seasons.mjs)',
+    pointsPerTeam: [21.6, 23.5], teamPointsSd: [11.6, 13.0], triesPerTeam: [3.8, 4.11], conversionRate: [0.738, 0.766],
+    penaltyGoalsPerTeam: [0.375, 0.444], fieldGoalsPerGame: [0.083, 0.198],
+    // Level after eighty minutes: 1.6% of 2021's games, 3.6% of 2022's and 4.9% of each season since.
+    goldenPoint: [0.016, 0.049],
+    marginMean: [14.6, 18.3], withinSix: [0.219, 0.338], withinTwelve: [0.391, 0.539], byThirteenPlus: [0.456, 0.609],
+    byTwentyFivePlus: [0.181, 0.302], byOne: [0.034, 0.069], nilRate: [0.01, 0.036], fortyPlusRate: [0.078, 0.128],
+    firstHalfShare: [0.481, 0.501], homeWins: [0.536, 0.589], winPctSd: [0.154, 0.223], bestWins: [18, 21], worstWins: [3, 6],
+    // 2023–2025, by the scorer's place in the team list.
+    tryShares: { WG: [0.292, 0.3], CE: [0.155, 0.184], FB: [0.086, 0.114], SR: [0.104, 0.111], FE: [0.062, 0.066],
+      HB: [0.048, 0.054], PR: [0.038, 0.04], HK: [0.029, 0.034], LK: [0.015, 0.025], BENCH: [0.111, 0.134] },
+  },
 });
 
 const row = (label, value, range, format = num) => {
@@ -406,6 +480,7 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`), venue),
     mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`), venue),
     nhl: nhlSeason(seasons, hashStr(`${seed}:nhl`), venue),
+    nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
   };
 }
 
@@ -504,6 +579,32 @@ function print(report) {
   lines.push(row('favourite wins', h.favourite.wins, rh.favouriteWins, pct));
   lines.push(row('top scorer (goals)', h.topScorer, rh.topScorer, x => num(x, 0)));
   lines.push(row('goals by defenders', h.defenderGoals, rh.defenderGoals, pct));
+  const r = report.nrl, rr = REAL.nrl;
+  lines.push(`\nNRL — ${r.clubs} clubs, ${NRL_GAMES} games (real: ${rr.note})`);
+  lines.push(row('points a team', r.pointsPerTeam, rr.pointsPerTeam, x => num(x, 1)));
+  lines.push(row('team points SD', r.teamPointsSd, rr.teamPointsSd, x => num(x, 1)));
+  lines.push(row('tries a team', r.triesPerTeam, rr.triesPerTeam));
+  lines.push(row('conversions made', r.conversionRate, rr.conversionRate, pct));
+  lines.push(row('penalty goals a team', r.penaltyGoalsPerTeam, rr.penaltyGoalsPerTeam));
+  lines.push(row('field goals a game', r.fieldGoalsPerGame, rr.fieldGoalsPerGame, x => num(x, 3)));
+  lines.push(row('golden point', r.goldenPoint, rr.goldenPoint, pct));
+  lines.push(row('mean margin', r.marginMean, rr.marginMean, x => num(x, 1)));
+  lines.push(row('won by 1', r.byOne, rr.byOne, pct));
+  lines.push(row('won by 1–6', r.withinSix, rr.withinSix, pct));
+  lines.push(row('won by 1–12', r.withinTwelve, rr.withinTwelve, pct));
+  lines.push(row('won by 13 or more', r.byThirteenPlus, rr.byThirteenPlus, pct));
+  lines.push(row('won by 25 or more', r.byTwentyFivePlus, rr.byTwentyFivePlus, pct));
+  lines.push(row('nil (per team game)', r.nilRate, rr.nilRate, pct));
+  lines.push(row('40 or more (per team game)', r.fortyPlusRate, rr.fortyPlusRate, pct));
+  lines.push(row('first-half points', r.firstHalfShare, rr.firstHalfShare, pct));
+  lines.push(row('home (defending) side wins', r.homeWins, rr.homeWins, pct));
+  lines.push(row('win% SD', r.winPctSd, rr.winPctSd, x => num(x, 3)));
+  lines.push(row(`best record (wins of ${NRL_GAMES})`, r.bestWins, rr.bestWins, x => num(x, 1)));
+  lines.push(row(`worst record (wins of ${NRL_GAMES})`, r.worstWins, rr.worstWins, x => num(x, 1)));
+  lines.push(row('favourite wins', r.favourite.wins, rr.favouriteWins, pct));
+  for (const position of ['WG', 'CE', 'FB', 'SR', 'FE', 'HB', 'PR', 'HK', 'LK', 'BENCH']) {
+    lines.push(row(`tries by ${position}`, r.tryShares[position] || 0, rr.tryShares[position], pct));
+  }
   return lines.join('\n');
 }
 

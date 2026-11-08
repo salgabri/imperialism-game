@@ -7,6 +7,7 @@ import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
 import { baseballProfile } from '../sports/baseball.js';
 import { hockeyProfile } from '../sports/hockey.js';
+import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { getSport, SPORTS } from '../sports/index.js';
 import { historyRound, memo, ratingTier, roman, shortName, signedDelta, teamChip } from './format.js';
 
@@ -26,11 +27,15 @@ const GROUPS = {
  */
 const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5, CF: 6, RF: 7, DH: 8, SP: 9, RP: 10 },
   // Ice hockey's centre shares it too: the forwards, then the defence and the goalie.
-  hockey: { C: 0, LW: 1, RW: 2, D: 3, G: 4 } };
+  hockey: { C: 0, LW: 1, RW: 2, D: 3, G: 4 },
+  // Rugby league numbers its thirteen from the back: the fullback, the outside backs, the halves, then the pack.
+  'rugby-league': { FB: 0, WG: 1, CE: 2, FE: 3, HB: 4, PR: 5, HK: 6, SR: 7, LK: 8 } };
 const SPORT_GROUPS = {
   baseball: { C: 'Catcher', '1B': 'Infield', '2B': 'Infield', '3B': 'Infield', SS: 'Infield', LF: 'Outfield', CF: 'Outfield',
     RF: 'Outfield', DH: 'Designated hitter', SP: 'Starting pitcher', RP: 'Bullpen' },
   hockey: { C: 'Centres', LW: 'Wings', RW: 'Wings', D: 'Defence', G: 'Goalie' },
+  'rugby-league': { FB: 'Outside backs', WG: 'Outside backs', CE: 'Outside backs', FE: 'Halves', HB: 'Halves', PR: 'Front row',
+    HK: 'Front row', SR: 'Back row', LK: 'Back row' },
 };
 /**
  * Formation slots in % of the pitch box (C§7.4, design V442), the basketball half court (C§17), the American football
@@ -69,6 +74,13 @@ const SLOTS = {
     LW: [[17, 9], [17, 21], [17, 33], [17, 45]],
     RW: [[83, 9], [83, 21], [83, 33], [83, 45]],
   },
+  // The pack up front, attacking the try line at the top: the front row, the back row behind it, then the halves, the
+  // centres and wings across the field and the fullback at the back. Each position's best starts; the rest of the 17 sit
+  // on the interchange bench along the foot of the box.
+  'rugby-league': {
+    PR: [[31, 15], [69, 15], [39, 92], [61, 92]], HK: [[50, 15], [17, 92]], SR: [[19, 31], [81, 31]], LK: [[50, 32], [83, 92]],
+    HB: [[38, 47]], FE: [[62, 47]], CE: [[28, 60], [72, 60]], WG: [[8, 64], [92, 64]], FB: [[50, 74]],
+  },
 };
 /** Squad-screen copy per sport: the box the lineup is drawn on and its names. */
 const LAYOUTS = {
@@ -78,6 +90,7 @@ const LAYOUTS = {
   'american-football': { layout: 'field', viewLabel: 'Field' },
   baseball: { layout: 'diamond', viewLabel: 'Diamond' },
   hockey: { layout: 'rink', viewLabel: 'Rink' },
+  'rugby-league': { layout: 'rugby', viewLabel: 'Field' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
 const DEPTH_ROWS = 5;
@@ -145,8 +158,8 @@ export function profileSegments(value) {
 
 /**
  * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball), Offence / Defence / Kicking (American
- * football), Batting / Pitching / Fielding (baseball) or Attack / Defence / Goaltending (ice hockey) from the sports
- * engines' positional profiles of the lineup (ED§4c; no match-day offset), with the C1 segment count.
+ * football), Batting / Pitching / Fielding (baseball), Attack / Defence / Goaltending (ice hockey) or Backs / Halves /
+ * Forwards (rugby league) from the sports engines' positional profiles of the lineup (ED§4c; no match-day offset), with the C1 segment count.
  */
 export function strengthProfile(lineup, sportId) {
   const rows = sportId === 'basketball'
@@ -157,6 +170,8 @@ export function strengthProfile(lineup, sportId) {
         ? (({ batting, pitching, fielding }) => [['batting', 'Batting', batting], ['pitching', 'Pitching', pitching], ['fielding', 'Fielding', fielding]])(baseballProfile(lineup))
         : sportId === 'hockey'
           ? (({ attack, defence, goaltending }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goaltending', 'Goaltending', goaltending]])(hockeyProfile(lineup))
+          : sportId === 'rugby-league'
+          ? (({ backs, halves, forwards }) => [['backs', 'Backs', backs], ['halves', 'Halves', halves], ['forwards', 'Forwards', forwards]])(rugbyLeagueProfile(lineup))
           : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
   return rows.map(([key, label, value]) => {
     const raw = Number.isFinite(Number(value)) ? Number(value) : 0;

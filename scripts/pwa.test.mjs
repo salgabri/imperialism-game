@@ -315,7 +315,7 @@ test('every crest and flag a campaign can keep is in public/, and the worker cac
   const rng = makeRng(1);
   const world = Object.fromEntries(fieldedNations(football).map(id => [id, buildTeam(id, rng, football)]));
   const urls = [teamMarkUrls(world), teamMarkUrls(clubsOf(montenegro())),
-    ...['football', 'womens-football', 'basketball', 'american-football', 'baseball', 'hockey'].map(id => teamMarkUrls(clubsOf(getSport(id).clubs, getSport(id))))].flat();
+    ...['football', 'womens-football', 'basketball', 'american-football', 'baseball', 'hockey', 'rugby-league'].map(id => teamMarkUrls(clubsOf(getSport(id).clubs, getSport(id))))].flat();
   assert.ok(urls.some(url => url.startsWith('/flags-symbols/')) && urls.length > 300, `${urls.length} files`);
   for (const url of urls) {
     assert.ok(existsSync(publicFile(url.slice(1))), url);

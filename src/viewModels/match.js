@@ -6,6 +6,7 @@ import { selectLineup } from '../data/teams.js';
 import { isEstimated } from '../data/estimates.js';
 import { BENCH } from '../sports/basketball.js';
 import { PERIOD_MODEL } from '../sports/hockey.js';
+import { scoreKind } from '../sports/rugbyLeague.js';
 import { liveModelFor } from '../engine/winProbability.js';
 import { roman, historyRound, formatOddsPair, ratingTier, shortName, memo } from './format.js';
 import { idleTurnCopy } from './turns.js';
@@ -16,6 +17,7 @@ const GROUPS = {
   'american-football': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'],
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP'],
   hockey: ['C', 'LW', 'RW', 'D', 'G'],
+  'rugby-league': ['FB', 'WG', 'CE', 'FE', 'HB', 'PR', 'HK', 'SR', 'LK'],
 };
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -35,7 +37,9 @@ function oddsOf(odds) {
  * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score, a safety the
  * 2-point one, a touchdown 6 to 8 with its try, ranked as 6 since the archived copy keeps no try) or
  * "Judge 3 RBI · Soto 1 RBI" (baseball: the two who drove in most runs) or "McDavid 2 G · Draisaitl 1 G" (ice hockey: the
- * two who scored most; a shoot-out's goal is the side's, nobody's own).
+ * two who scored most; a shoot-out's goal is the side's, nobody's own) or "Walsh 2 tries · Cleary 3 PG" (rugby league: the
+ * two who scored most, a try ranked as its four points, a penalty goal as two and a field goal as one; a conversion is
+ * the try's, nobody's own).
  */
 export function scorersLine(shown, teamId, teams, sportId = 'football') {
   const own = (Array.isArray(shown) ? shown : []).filter(e => e && e.tid === teamId && e.name);
@@ -44,6 +48,18 @@ export function scorersLine(shown, teamId, teams, sportId = 'football') {
     const totals = new Map();
     for (const e of own) if (Number(e.m) <= PERIOD_MODEL.MINUTES + PERIOD_MODEL.OVERTIME) totals.set(e.name, (totals.get(e.name) || 0) + 1);
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, goals]) => `${shortName(name)} ${goals} G`).join(' · ');
+  }
+  if (sportId === 'rugby-league') {
+    const totals = new Map();
+    for (const e of own) {
+      const row = totals.get(e.name) || { pts: 0, tries: 0, penalty: 0, field: 0 };
+      const kind = scoreKind(e);
+      if (kind === 'try') { row.tries++; row.pts += 4; } else if (kind === 'penalty') { row.penalty++; row.pts += 2; } else { row.field++; row.pts += 1; }
+      totals.set(e.name, row);
+    }
+    return [...totals.entries()].sort((x, y) => y[1].pts - x[1].pts).slice(0, 2)
+      .map(([name, { tries, penalty, field }]) => `${shortName(name)} ${[tries && `${tries} ${tries === 1 ? 'try' : 'tries'}`, penalty && `${penalty} PG`,
+        field && `${field} FG`].filter(Boolean).join(', ')}`).join(' · ');
   }
   if (sportId === 'baseball') {
     const totals = new Map();
@@ -382,7 +398,9 @@ export function buildFeedRows(model, minute) {
   if (state === 'live') {
     const left = base.length - now;
     const tail = typeof sport.clockLeft === 'function' ? sport.clockLeft(now, base.length)
-      : left > 0 ? `${plural(left, 'minute')} left` : base.overtime && now > base.length ? 'overtime' : 'final minute';
+      // Past full time, the sport's own word for it: rugby league's "golden point".
+      : left > 0 ? `${plural(left, 'minute')} left` : base.overtime && now > base.length ? (sport.words?.overtime || 'Overtime').toLowerCase()
+        : 'final minute';
     top = { key: 'status', minute: clock(now), weight: 600, live: true, text: `Live — ${scoreText(base, base.scoreA, base.scoreB)} · ${tail}` };
   } else if (state === 'penalties') {
     top = { key: 'status', minute: clock(base.finalMinute), weight: 600, live: false,

@@ -15,12 +15,14 @@ import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
+import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { football } from '../src/sports/football.js';
 import { basketball, nbaBasketball } from '../src/sports/basketball.js';
 import { americanFootball } from '../src/sports/americanFootball.js';
 import { baseball } from '../src/sports/baseball.js';
 import { hockey } from '../src/sports/hockey.js';
 import { womensFootball } from '../src/sports/womensFootball.js';
+import { rugbyLeague } from '../src/sports/rugbyLeague.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
 import { liveModelFor, winProbabilityAt } from '../src/engine/winProbability.js';
 import { tacticalMatchParameters } from '../src/engine/managerStrategy.js';
@@ -61,6 +63,7 @@ const SPORTS = [
   { label: 'American football', sport: americanFootball, clubs: NFL_CLUBS, range: REAL.nfl.homeWins },
   { label: 'baseball', sport: baseball, clubs: MLB_CLUBS, range: REAL.mlb.homeWins },
   { label: 'ice hockey', sport: hockey, clubs: NHL_CLUBS, range: REAL.nhl.homeWins },
+  { label: 'rugby league', sport: rugbyLeague, clubs: NRL_CLUBS, range: REAL.nrl.homeWins },
 ];
 const scoreFields = ({ ga, gd, tie, winner }) => ({ ga, gd, tie, winner });
 
@@ -115,9 +118,9 @@ test('the edge is the prepared match\'s: the defender gains what the visitors lo
   for (const { label, sport, clubs } of SPORTS) {
     const [a, d] = equalSides(sport, clubs);
     const neutral = sport.prepareMatch(a, d, 75, 75), home = sport.prepareMatch(a, d, 75, 75, HOME);
-    // Hockey's prepared rates are goals a game, so its edge is in their logs.
-    const inRates = 'rateA' in neutral, read = inRates ? Math.log : value => value;
-    const [keyA, keyD] = inRates ? ['rateA', 'rateD'] : 'logA' in neutral ? ['logA', 'logD'] : 'efficiencyA' in neutral ? ['efficiencyA', 'efficiencyD'] : ['edgeA', 'edgeD'];
+    // Hockey's prepared rates are goals a game and rugby league's tries a game, so their edge is in their logs.
+    const inRates = 'rateA' in neutral || 'triesA' in neutral, read = inRates ? Math.log : value => value;
+    const [keyA, keyD] = 'rateA' in neutral ? ['rateA', 'rateD'] : 'triesA' in neutral ? ['triesA', 'triesD'] : 'logA' in neutral ? ['logA', 'logD'] : 'efficiencyA' in neutral ? ['efficiencyA', 'efficiencyD'] : ['edgeA', 'edgeD'];
     const gain = read(home[keyD]) - read(neutral[keyD]), loss = read(neutral[keyA]) - read(home[keyA]);
     assert.ok(gain > 0, `${label}: the defender gains`);
     assert.ok(Math.abs(gain - loss) < 1e-9, `${label}: the visitors lose as much (${gain} v ${loss})`);
@@ -131,7 +134,8 @@ test('the edge is the prepared match\'s: the defender gains what the visitors lo
 
 test('the live chart starts from the home odds', () => {
   // Kick-off tolerances as the sports' own tests hold them against the fixture odds.
-  const tolerance = { football: 0.035, 'womens-football': 0.035, basketball: 0.02, 'american-football': 0.03, baseball: 0.02, hockey: 0.02 };
+  const tolerance = { football: 0.035, 'womens-football': 0.035, basketball: 0.02, 'american-football': 0.03, baseball: 0.02, hockey: 0.02,
+    'rugby-league': 0.02 };
   for (const { label, sport, clubs } of SPORTS) {
     const [a, d] = equalSides(sport, clubs);
     const neutral = liveModelFor(sport, a, d, undefined, undefined, 6);

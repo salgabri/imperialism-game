@@ -30,15 +30,18 @@ const SCORE_SCALES = Object.freeze({
   football: Object.freeze({ largeTotal: 7, blowout: 4, bar: 1 }),
   'womens-football': Object.freeze({ largeTotal: 7, blowout: 4, bar: 1 }),
   hockey: Object.freeze({ largeTotal: 10, blowout: 5, bar: 1 }),
+  // Rugby league in points: sixty between the sides is a high-scoring game, a 25-point margin a rout, a bar a try.
+  'rugby-league': Object.freeze({ largeTotal: 60, blowout: 25, bar: 4 }),
 });
 const POINTS_SCALE = Object.freeze({ largeTotal: 220, blowout: 20, bar: 10 });
 
-// Four national pairings a sport. Women's football's and ice hockey's are nations that field their own players: a nation
-// without any plays no women's football, and a hockey minnow's lineup is generated.
+// Four national pairings a sport. Women's football's, ice hockey's and rugby league's are nations that field their own
+// players: a nation without any plays no women's football, and a hockey or rugby league minnow's lineup is generated.
 const PAIRINGS = Object.freeze({
   football: [['250', '076'], ['032', '276'], ['724', '756'], ['076', '356']],
   'womens-football': [['724', '826'], ['840', '276'], ['076', '392'], ['724', '834']],
   hockey: [['124', '840'], ['752', '246'], ['203', '756'], ['124', '276']],
+  'rugby-league': [['036', '554'], ['826', '242'], ['036', '826'], ['554', '598']],
 });
 const OTHER_PAIRINGS = [['840', '124'], ['276', '688'], ['250', '724'], ['840', '356']];
 
@@ -48,7 +51,8 @@ export function syntheticTeam(sport, rating = 75, id = 'A') {
 }
 
 export function regulationScore(sport, result) {
-  if (sport.id === 'hockey') return [result.regA, result.regD];
+  // Ice hockey's shoot-out and rugby league's golden point add to the final score, not to regulation's.
+  if (sport.id === 'hockey' || sport.id === 'rugby-league') return [result.regA, result.regD];
   if (sport.id !== 'basketball' || !result.tie) return [result.ga, result.gd];
   return [result.ga - result.tie.periods.reduce((sum, pair) => sum + pair[0], 0),
     result.gd - result.tie.periods.reduce((sum, pair) => sum + pair[1], 0)];

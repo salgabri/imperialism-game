@@ -1,0 +1,22 @@
+{
+  "note": "The NRL's seventeen clubs of 2025, as Rugby League 26 has them: `list` is the club's heading in Zero Tackle's ratings list, `code` the NRL's own abbreviation, `city` the place its territory is named after, `ground` its main home ground, and `home` the [lon, lat] its territory grows from (English Wikipedia's coordinates; Allianz Stadium's and the Heffron Centre's read off the map). That is the ground itself, except where clubs share one: the Rabbitohs and the Bulldogs both play at Accor Stadium, and the Wests Tigers at three grounds, so those three grow from their training bases (`base`).",
+  "teams": {
+    "nrl-brisbane-broncos": { "name": "Brisbane Broncos", "list": "Brisbane Broncos", "code": "BRI", "city": "Brisbane", "ground": "Suncorp Stadium", "home": [153.0094, -27.4647] },
+    "nrl-canberra-raiders": { "name": "Canberra Raiders", "list": "Canberra Raiders", "code": "CBR", "city": "Canberra", "ground": "GIO Stadium", "home": [149.1028, -35.25] },
+    "nrl-canterbury-bankstown-bulldogs": { "name": "Canterbury-Bankstown Bulldogs", "list": "Canterbury Bulldogs", "code": "CBY", "city": "Canterbury", "ground": "Accor Stadium", "base": "Belmore Sports Ground", "home": [151.0947, -33.9167] },
+    "nrl-cronulla-sutherland-sharks": { "name": "Cronulla-Sutherland Sharks", "list": "Cronulla Sharks", "code": "CRO", "city": "Cronulla", "ground": "Ocean Protect Stadium", "home": [151.1408, -34.0386] },
+    "nrl-dolphins": { "name": "Dolphins", "list": "The Dolphins", "code": "DOL", "city": "Redcliffe", "ground": "Kayo Stadium", "home": [153.0972, -27.2189] },
+    "nrl-gold-coast-titans": { "name": "Gold Coast Titans", "list": "Gold Coast Titans", "code": "GCT", "city": "Gold Coast", "ground": "Cbus Super Stadium", "home": [153.3789, -28.0669] },
+    "nrl-manly-warringah-sea-eagles": { "name": "Manly Warringah Sea Eagles", "list": "Manly Sea Eagles", "code": "MAN", "city": "Manly", "ground": "4 Pines Park", "home": [151.2733, -33.76] },
+    "nrl-melbourne-storm": { "name": "Melbourne Storm", "list": "Melbourne Storm", "code": "MEL", "city": "Melbourne", "ground": "AAMI Park", "home": [144.9839, -37.8253] },
+    "nrl-new-zealand-warriors": { "name": "New Zealand Warriors", "list": "New Zealand Warriors", "code": "NZW", "city": "Auckland", "ground": "Go Media Stadium", "home": [174.8125, -36.9183] },
+    "nrl-newcastle-knights": { "name": "Newcastle Knights", "list": "Newcastle Knights", "code": "NEW", "city": "Newcastle", "ground": "McDonald Jones Stadium", "home": [151.7267, -32.9189] },
+    "nrl-north-queensland-cowboys": { "name": "North Queensland Cowboys", "list": "North Queensland Cowboys", "code": "NQC", "city": "Townsville", "ground": "Queensland Country Bank Stadium", "home": [146.8167, -19.2661] },
+    "nrl-parramatta-eels": { "name": "Parramatta Eels", "list": "Parramatta Eels", "code": "PAR", "city": "Parramatta", "ground": "CommBank Stadium", "home": [150.9997, -33.8081] },
+    "nrl-penrith-panthers": { "name": "Penrith Panthers", "list": "Penrith Panthers", "code": "PEN", "city": "Penrith", "ground": "Penrith Stadium", "home": [150.6878, -33.7586] },
+    "nrl-south-sydney-rabbitohs": { "name": "South Sydney Rabbitohs", "list": "South Sydney Rabbitohs", "code": "SOU", "city": "South Sydney", "ground": "Accor Stadium", "base": "Heffron Centre", "home": [151.237, -33.944] },
+    "nrl-st-george-illawarra-dragons": { "name": "St. George Illawarra Dragons", "list": "St George Illawarra Dragons", "code": "SGI", "city": "Illawarra", "ground": "WIN Stadium", "home": [150.9025, -34.4278] },
+    "nrl-sydney-roosters": { "name": "Sydney Roosters", "list": "Sydney Roosters", "code": "SYD", "city": "Sydney", "ground": "Allianz Stadium", "home": [151.2247, -33.8892] },
+    "nrl-wests-tigers": { "name": "Wests Tigers", "list": "Wests Tigers", "code": "WST", "city": "Concord", "ground": "Leichhardt Oval", "base": "Concord Oval", "home": [151.1094, -33.8683] }
+  }
+}

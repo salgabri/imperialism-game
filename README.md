@@ -15,6 +15,7 @@ Pick your sport at kick-off:
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
+| Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
 
 And pick who fights:
 
@@ -24,8 +25,8 @@ And pick who fights:
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs, all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
   franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
-  [theirs](#the-mlb-map) of the USA and Canada, or all 32 NHL clubs on
-  [theirs](#the-nhl-map). Real Madrid annexes territory
+  [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
+  [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
   exactly the way Spain does. American football is played by clubs only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
@@ -38,8 +39,9 @@ American football took one module, its club file, its lineup plan and its squad
 field ([design notes](docs/design/american-football.md)). Baseball added the sport's
 own match clock (half-innings, not minutes) and nations by birthplace
 ([design notes](docs/design/baseball.md)). Ice hockey's ratings are partly estimates, each
-marked as one ([design notes](docs/design/hockey.md)), and women's football plays
-under football's rulebook with its own players ([design notes](docs/design/womens-football.md)).
+marked as one ([design notes](docs/design/hockey.md)), women's football plays
+under football's rulebook with its own players ([design notes](docs/design/womens-football.md)), and rugby league plays
+Rugby League 26's NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -103,6 +105,9 @@ npm run build:mlb-map    # rebuild MLB's map of the USA and Canada (about 2 minu
 npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (network, cached)
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
 npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
+npm run sync:nrl         # snapshot Rugby League 26's NRL ratings, Zero Tackle's profiles and NRL.com's 2025 team lists into scripts/data/rugby-league-26.json (network, cached)
+npm run build-rugby-league # rebuild the NRL clubs and the rugby league nations from that snapshot (--check compares byte for byte)
+npm run build:nrl-map    # rebuild the NRL's map of Australia and New Zealand (seconds; --check compares byte for byte)
 npm run sync:ea-fc-women # snapshot EA FC's women's players from its public API into scripts/data/ea-fc27-women.csv (network, cached)
 npm run build-womens-football # rebuild the women's nations and clubs from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
@@ -196,7 +201,8 @@ manager of the theatre's favourite, with decisions from the first match.
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA,
-   baseball clubs MLB on its map of the USA and Canada and ice hockey clubs the NHL on its own. Women's football's clubs
+   baseball clubs MLB on its map of the USA and Canada, ice hockey clubs the NHL on its own and rugby league clubs the NRL
+   on its map of Australia and New Zealand. Women's football's clubs
    offer its five leagues, the Rest of Europe, all of them or the strongest 32. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). It also
@@ -214,7 +220,7 @@ manager of the theatre's favourite, with decisions from the first match.
    football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
    2025 back to 2021, with nations or with clubs on the map of their day. Women's football and ice hockey
-   list their built-in 2026/27. A
+   list their built-in 2026/27, rugby league its built-in 2025 (Rugby League 26). A
    quick-resume card appears when a save exists. A page opened from a challenge
    link shows a note about the link ([Sharing a campaign](#sharing-a-campaign)).
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
@@ -568,7 +574,7 @@ Each key names a setup choice, and a key left at its default is left out:
 
 | Key | Setup choice | Values | Left out when |
 | --- | --- | --- | --- |
-| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey` | football |
+| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `rugby-league` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
 | `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), or for women's football `all`, `elite` or a league (`NWSL`) | Europe for nations, the Top 124 for football clubs, all clubs for women's football, a sport's own map (NBA, NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
@@ -697,7 +703,7 @@ snapshot takes its names from. FM ratings come from Football Manager 26 database
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
-2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), the NBA, the NFL, MLB, the NHL,
+2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), the NBA, the NFL, MLB, the NHL, the NRL,
 or the clubs, leagues and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
@@ -737,6 +743,13 @@ field the lineup the game picks and keep up to 23; nations field the NHL's playe
 nationality or else birth country, and a place they cannot fill gets a generated player. See the
 [design notes](docs/design/hockey.md).
 
+**Rugby league** — `src/data/clubs.rugby-league.js` and `src/data/rosters.rugby-league.js`, from Big Ant's Rugby League 26
+ratings of every NRL player as Zero Tackle listed them on the game's release (17 July 2025), Zero Tackle's player profiles
+and NRL.com's 2025 team lists and Tests (`scripts/data/rugby-league-26.json`). Ratings are the game's overalls, unchanged;
+positions are Zero Tackle's and any other a player started in 2025. The 17 clubs field their matchday 17 and keep up to 24.
+Nations field the NRL's players, by their 2025 Test side, else birthplace; Tonga, Samoa and the Cook Islands have no land
+on the world map, so their Test players play for none. See the [design notes](docs/design/rugby-league.md).
+
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
 (`scripts/data/ea-fc27-women.csv`, 1,940 players). Ratings are EA's, unchanged, and nothing is
@@ -774,10 +787,11 @@ another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
 An assignment optimizer fills all eleven football, five basketball, 23 American
-football, 13 baseball or 19 ice hockey slots. Playing outside a natural position costs 12 rating
+football, 13 baseball, 19 ice hockey or 17 rugby league slots. Playing outside a natural position costs 12 rating
 points (25 in American football, 20 in baseball, where a hitter pitching or a pitcher
 hitting costs 40 and any hitter can be the designated hitter; in ice hockey 4 between the forward places, 15
-between forwards and defence and 40 in or out of goal). A player may have
+between forwards and defence and 40 in or out of goal; in rugby league 4 within the outside backs, the halves or the
+pack, 8 for a common move between them, such as a centre to the second row, and 15 for any other). A player may have
 more than one natural position, and each one is penalty-free: a claimed PG/SG
 can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
@@ -830,8 +844,9 @@ identical national flags would tell you nothing — and wherever a nation shows 
 flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
-Each NFL franchise holds its own state of [the USA](#the-nfl-map), and each MLB and NHL club its own of
-[the USA and Canada](#the-mlb-map) ([the NHL's](#the-nhl-map)).
+Each NFL franchise holds its own state of [the USA](#the-nfl-map), each MLB and NHL club its own of
+[the USA and Canada](#the-mlb-map) ([the NHL's](#the-nhl-map)), and each NRL club its own of
+[Australia and New Zealand](#the-nrl-map).
 
 Club lineups come from the same sources as the national squads:
 `clubs.football.js` from the EA FC 27 snapshot: the 124 strongest of its 309
@@ -1125,6 +1140,19 @@ New Jersey, stays with its own state's nearest club. The map is `public/domestic
 ```bash
 npm run build:nhl-map                      # boundaries + arenas → public/domestic/nhl.json and its index entry (about 2 minutes)
 npm run build:nhl-map -- --check           # offline rebuild must match the committed files byte for byte
+```
+
+### The NRL map
+
+Rugby league clubs have one theatre, **NRL**: the 17 clubs fight over Australia and New Zealand, each holding the state,
+territory or region its ground stands in and nothing else. New South Wales (ten clubs, eight of them in Sydney) and
+Queensland (four) are divided between their clubs; the Storm hold Victoria, the Raiders the Australian Capital Territory
+and the Warriors the Auckland Region, and every other state and region stays empty. The map is `public/domestic/nrl.json`
+(134 KB); grounds are in `scripts/data/nrl-teams.json`.
+
+```bash
+npm run build:nrl-map                      # boundaries + grounds → public/domestic/nrl.json and its index entry (seconds)
+npm run build:nrl-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
 
 ## Football seasons
@@ -1692,13 +1720,14 @@ vercel.json            cache headers for the deployed site
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **seventeen full
-campaigns** across all three pacings, both resolution modes, all six sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **twenty full
+campaigns** across all three pacings, both resolution modes, all seven sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
 sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
 clubs on theirs, also live, one baseball's nations of North and Central America, one the NHL's 32 clubs on
-their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, and one the NWSL's clubs. A **manager campaign** (Italy, Europe, round robin × *You
+their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, one the NWSL's clubs, one the
+NRL's 17 clubs on their map, live, and one rugby league's nations of Asia and Oceania. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after

@@ -931,6 +931,35 @@ without a club stays empty. Homes are `scripts/data/nhl-teams.json`, each club's
 inside its territory; the shared states are split, Staten Island stays New York's; seeded duel
 campaigns reach a champion; the App launches on the map. The smoke runs an NHL duel.
 
+## The NRL map
+
+Status: implemented 2026-11-08. Rugby league clubs ([rugby-league.md](rugby-league.md)) have one theatre, **NRL**,
+played on `public/domestic/nrl.json`: Australia and New Zealand, where each of the 17 clubs holds its own state,
+territory or region, by the same command and partition (`LEAGUES.nrl` in `scripts/build-club-maps.mjs`; `npm run
+build:nrl-map`). Grounds are `scripts/data/nrl-teams.json`; the Rabbitohs and Bulldogs (who share Accor Stadium) and the
+Wests Tigers grow from their training bases.
+
+- **Units**: geoBoundaries gbOpen AUS ADM2 (local government areas, ABS, CC BY 4.0) grouped by ADM1 (states and
+  territories), and NZL ADM2 (districts, Stats NZ, CC BY 4.0) grouped by ADM1 (regions). The builder takes the eastern
+  hemisphere's side of the antimeridian for this league (`east`), so the Chathams go; the world map's Norfolk Island and
+  Indian Ocean Territories are cut. GitHub's raw links answered 504 for three of the four layers on 2026-11-08; the
+  same files, pinned to the same commit, came from `media.githubusercontent.com` into the cache.
+- **No border to fit**: the Tasman Sea lies between the two countries (`border: null`), so no edge is fitted as the US
+  and Canadian ones are; the Warriors reach Australia across the water, as island clubs do on the country maps.
+- **Shared states**: New South Wales (ten clubs) and Queensland (four) split along council lines. Eight of New South
+  Wales's clubs are in Sydney: the Roosters (50 km²), Rabbitohs (133 km²) and Wests Tigers (145 km²) start hemmed in,
+  while Parramatta (309,000 km²) and Penrith (281,000) take the west. Queensland goes to the Cowboys (960,000 km²), the
+  Dolphins, the Titans and the Broncos. The Storm hold Victoria, the Raiders the Australian Capital Territory, the
+  Warriors the Auckland Region; Western Australia, South Australia, Tasmania, the Northern Territory, Jervis Bay and
+  every other New Zealand region stay empty.
+- The file is about 134 KB; the index entry adds `venue: "ground"` and `lines: "state or region"`, so the setup reads
+  "… fighting over Australia and New Zealand, each starting with only its ground's state or region."
+
+**Checks**: `scripts/rugby-league.test.mjs`: file, index, grounds and clubs agree; every ground lies inside its
+territory; Victoria, the ACT and Auckland are one club's, Cairns the Cowboys', Wollongong the Dragons', Hamilton nobody's;
+seeded duel campaigns reach a champion across the Tasman; the App launches on the map. `scripts/club-maps.test.mjs`
+holds it to the state rule with towns of each state and region. The smoke runs an NRL duel.
+
 ## The Europe maps
 
 Status: implemented 2026-11-07. Football clubs have two theatres, **Top 124** and

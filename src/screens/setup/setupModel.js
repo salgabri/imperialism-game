@@ -335,6 +335,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'players start short-handed, and a nation with none fields no team.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
     + 'scoring, marked as one. Rosters as of 7 November 2026. Nations field the NHL players of each country.',
+  'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
+    + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
     + 'only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
@@ -372,8 +374,11 @@ export function domesticDescription(entry) {
       + 'share a country split it along its regional borders. A country with no club stays grey.';
   }
   if (entry.league) {
-    const place = entry.lines === 'state' ? 'state' : 'state or province';
-    return `${leaders} the ${clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
+    // 'state' (the NFL's USA), 'state or region' (the NRL's Australia and New Zealand), else 'state or province'.
+    const place = entry.lines || 'state or province';
+    // "the USA and Canada", but "Australia and New Zealand".
+    const land = /^(?:USA|United)\b/.test(entry.name) ? `the ${entry.name}` : entry.name;
+    return `${leaders} the ${clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
       + 'A state with several clubs is divided between them; one with none stays empty.';
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);

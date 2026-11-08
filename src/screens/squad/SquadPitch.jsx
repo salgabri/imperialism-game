@@ -1,11 +1,11 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Formation pitch (C§7, board C1), the basketball half court (C§17, DEC misc), the
-// American football field, the baseball diamond and the hockey rink.
+// American football field, the baseball diamond, the hockey rink and the rugby league field.
 import React from 'react';
 import { ESTIMATE_TITLE } from '../../data/estimates.js';
 
 /**
  * `slots`: [{ key, x: '50%', y: '88%', name, fullName, rating, claimed, estimated }] positioned in % of the box.
- * `layout`: 'pitch' | 'court' | 'field' | 'diamond' | 'rink'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
+ * `layout`: 'pitch' | 'court' | 'field' | 'diamond' | 'rink' | 'rugby'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
  */
 export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side', label = 'Formation' }) {
   return (
@@ -30,6 +30,15 @@ export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side'
           <path d="M50 88L3 36M50 88L97 36M3 36Q50 -12 97 36" />
           <path d="M50 88L68 64L50 40L32 64Z" />
           <ellipse cx="50" cy="63" rx="2.6" ry="3.2" />
+        </svg>
+      ) : layout === 'rugby' ? (
+        // The half the side attacks: the posts and the try line at the top, the 20-metre and 40-metre lines, halfway at
+        // the foot of the field, and the interchange bench below it. The drawing stretches with the box.
+        <svg className="pitch__rugby" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <rect x="0" y="0" width="100" height="84" />
+          <path d="M0 6H100M0 84H100" />
+          <path className="pitch__rugby-line" d="M0 26H100M0 54H100" />
+          <path d="M45 6V0M55 6V0M45 2.5H55" />
         </svg>
       ) : layout === 'rink' ? (
         // One end of the rink: the goal line and crease at the foot, the blue line and the centre line and circle

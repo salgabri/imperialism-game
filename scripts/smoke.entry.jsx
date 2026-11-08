@@ -832,11 +832,12 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const fewer = Math.floor(sections / entry.clubs), more = Math.ceil(sections / entry.clubs);
   const share = sections === entry.clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
   // A Europe map tells the rules of its land; a sport's own map (the NBA's, the NFL's) names its league, each club holding
-  // the state of its arena or stadium.
+  // the state of its arena or stadium ("the USA and Canada", but "Australia and New Zealand").
+  const land = /^(?:USA|United)\b/.test(entry.name || '') ? `the ${entry.name}` : entry.name;
   result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre
     ? `Europe's ${entry.clubs} strongest clubs, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
     : entry.league
-      ? `the ${entry.clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines === 'state' ? 'state' : 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
+      ? `the ${entry.clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines || 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
       : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
   // Step 1's country card: every section in its starting club's pastel (the card has no ids, so compare the fills

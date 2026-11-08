@@ -17,6 +17,9 @@ const SUPPORT = {
   'womens-football': FOOTBALL_SUPPORT,
   // Forwards help a team score, the centres win defensive draws too; defenders and the backup goalie keep goals out.
   hockey: { C: [1, .4], LW: [1, .2], RW: [1, .2], D: [.2, 1], G: [0, 1] },
+  // The outside backs and halves make tries, the forwards and centres stop them; a hooker does both.
+  'rugby-league': { FB: [1, .4], WG: [1, .2], CE: [.65, .65], FE: [1, .3], HB: [1, .3], HK: [.5, .6], PR: [.2, 1], SR: [.4, 1],
+    LK: [.3, 1] },
   basketball: { PG: [.75, .25], SG: [1, 0], SF: [1, .4], PF: [0, 1], C: [0, 1] },
   'american-football': { QB: [1, 0], RB: [1, 0], WR: [1, 0], TE: [.8, .2], OL: [.65, .35], DL: [0, 1], LB: [0, 1], CB: [0, 1],
     S: [0, 1], K: [.3, .3] },

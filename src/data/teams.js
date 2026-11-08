@@ -333,11 +333,13 @@ export function buildTeam(id, rng, sport) {
     for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
       if (!slot.player || slot.outOfPosition) squad.push(genPlayer(rng, culture, slot.position, str));
     }
-  } else if (sport.id === 'hockey') {
-    // As in baseball, except that a forward on another forward's line is no gap: only a place left empty, or held by
-    // a defender, a forward or a goalie out of his own group, gets a generated player.
+  } else if (sport.id === 'hockey' || sport.id === 'rugby-league') {
+    // As in baseball, except that a move within a group is no gap (a forward on another forward's line; in rugby league
+    // a back to another outside place, a forward round the pack, a centre to the second row): only a place left empty,
+    // or held by a player out of his own group, gets a generated player.
+    const gap = sport.id === 'hockey' ? outOfPositionPenalty(sport.id) : RUGBY_NEAR_PENALTY;
     for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
-      if (!slot.player || slot.penalty > outOfPositionPenalty(sport.id)) squad.push(genPlayer(rng, culture, slot.position, str));
+      if (!slot.player || slot.penalty > gap) squad.push(genPlayer(rng, culture, slot.position, str));
     }
   } else if (!REAL_PLAYERS_ONLY.has(sport.id)) {
     const have = p => squad.filter(x => x.pos === p).length;
@@ -396,8 +398,9 @@ export const OUT_OF_POSITION_PENALTY = 12;
 // American football's positions are far more specialised: a tight end on the offensive line, or a receiver at
 // cornerback, is an emergency, not a rotation. So are baseball's: MLB The Show lists every position a player can
 // field, and a starter in the bullpen (or a reliever starting) is out of his role. A hockey forward moves between the
-// lines' three places with little trouble: the NHL lists one position for players who play all three.
-const PENALTY_OF = { 'american-football': 25, baseball: 20, hockey: 4 };
+// lines' three places with little trouble: the NHL lists one position for players who play all three. So does a rugby
+// league back between the outside places, or a forward round the pack (RUGBY_UNIT below).
+const PENALTY_OF = { 'american-football': 25, baseball: 20, hockey: 4, 'rugby-league': 4 };
 /** Rating points a starter loses outside his natural positions, in a sport ('football', 'basketball', …). */
 export const outOfPositionPenalty = sportId => PENALTY_OF[sportId] ?? OUT_OF_POSITION_PENALTY;
 // A baseball hitter on the mound, or a pitcher in the field or at the plate, is no rotation at all. Nor is a hockey
@@ -409,6 +412,15 @@ const PITCHING = new Set(['SP', 'RP']);
 const canPitch = player => PITCHING.has(player.pos) || !!player.positions?.some(position => PITCHING.has(position));
 const canHit = player => !PITCHING.has(player.pos) || !!player.positions?.some(position => !PITCHING.has(position));
 const FORWARDS = new Set(['C', 'LW', 'RW']);
+// Rugby league's units: the outside backs, the halves, the hooker and the pack. A move within a unit costs the sport's 4
+// points; these moves between units are common and cost 8 (a centre to the second row, a half to fullback or hooker, a
+// hooker to the halves or into the pack, a forward to hooker); any other, a winger in the front row, say, is an
+// emergency.
+const RUGBY_UNIT = { FB: 'out', WG: 'out', CE: 'out', FE: 'half', HB: 'half', HK: 'hooker', PR: 'pack', SR: 'pack', LK: 'pack' };
+const RUGBY_NEAR = new Set(['CE>SR', 'SR>CE', 'FE>FB', 'HB>FB', 'FB>FE', 'FE>HK', 'HB>HK', 'HK>HB', 'HK>FE', 'HK>PR', 'HK>SR',
+  'HK>LK', 'PR>HK', 'SR>HK', 'LK>HK']);
+export const RUGBY_NEAR_PENALTY = 8;
+export const RUGBY_CROSSING_PENALTY = 15;
 // Football's rule, in both of its games: a team fields only the players its source rates.
 const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football']);
 const FOOTBALL_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
@@ -423,8 +435,12 @@ const LINEUP_PLANS = {
     'DL', 'DL', 'DL', 'DL', 'LB', 'LB', 'CB', 'CB', 'CB', 'S', 'S', 'K'],
   // The batting order's nine (a designated hitter, no pitcher at the plate), the day's starter and three relievers.
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP', 'RP', 'RP'],
+  // The matchday 17: the thirteen (fullback, wings, centres, halves, the front row, the back row) and an interchange bench
+  // of a utility hooker, two props and a lock.
+  'rugby-league': ['FB', 'WG', 'WG', 'CE', 'CE', 'FE', 'HB', 'PR', 'HK', 'PR', 'SR', 'SR', 'LK', 'HK', 'PR', 'PR', 'LK'],
 };
 const BASKETBALL_POSITIONS = new Set(LINEUP_PLANS.basketball);
+const RUGBY_POSITIONS = new Set(Object.keys(RUGBY_UNIT));
 const GRIDIRON_POSITIONS = new Set(LINEUP_PLANS['american-football']);
 // Baseball's catcher shares basketball's 'C'; every other baseball position is its own.
 const BASEBALL_POSITIONS = new Set(LINEUP_PLANS.baseball.filter(position => position !== 'C'));
@@ -438,6 +454,13 @@ function slotPenalty(sportId, player, position) {
     if (position === 'G' || player.pos === 'G') return CROSSOVER_PENALTY;
     if (FORWARDS.has(position) !== FORWARDS.has(player.pos)) return SKATER_CROSSOVER_PENALTY;
   }
+  if (sportId === 'rugby-league') {
+    // The kindest of the player's own positions decides.
+    const own = [player.pos, ...(player.positions || [])].filter(code => RUGBY_UNIT[code]);
+    const cost = code => (RUGBY_UNIT[code] === RUGBY_UNIT[position] ? outOfPositionPenalty(sportId)
+      : RUGBY_NEAR.has(`${code}>${position}`) ? RUGBY_NEAR_PENALTY : RUGBY_CROSSING_PENALTY);
+    return own.length ? Math.min(...own.map(cost)) : RUGBY_CROSSING_PENALTY;
+  }
   return outOfPositionPenalty(sportId);
 }
 
@@ -445,6 +468,8 @@ function slotPenalty(sportId, player, position) {
 export function teamSportId(team) {
   if (LINEUP_PLANS[team?.sport]) return team.sport;
   if (team?.squad?.some(player => BASEBALL_POSITIONS.has(player.pos))) return 'baseball';
+  // Rugby league's codes are its own.
+  if (team?.squad?.some(player => RUGBY_POSITIONS.has(player.pos))) return 'rugby-league';
   // Basketball's centre and the offensive line never share a code: 'C' is basketball's, 'OL' American football's.
   if (team?.squad?.some(player => GRIDIRON_POSITIONS.has(player.pos) && !BASKETBALL_POSITIONS.has(player.pos))) return 'american-football';
   return team?.squad?.some(player => BASKETBALL_POSITIONS.has(player.pos)) ? 'basketball' : 'football';
