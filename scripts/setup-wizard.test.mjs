@@ -639,6 +639,21 @@ test('setup.css keeps the reviewed token and hit-target rules', () => {
   assert.match(narrow, /^\s*\.setup-foot \.setup-foot__back \{ padding:0 14px; \}\s*\.setup-foot \.setup-foot__next \{ padding:0 12px; \}\s*\}/);
 });
 
+test('nine sports sit in three rows of three, compact tiles that stay 44px targets, and step 1\'s heading gives way at 360×640', t => {
+  const sink = consoleSink(t);
+  t.after(() => sink.release());
+  const markup = renderToStaticMarkup(React.createElement(SetupOverlay, { setup: { ...BASE, sport: 'womens-tennis' }, managerTeams: TEAMS,
+    hasSave: true, savedText: 'Round 4 · 20 nations remaining · Europe', onResume() {}, onCancel() {} }));
+  const grid = new JSDOM(markup).window.document.querySelector('.setup-sports');
+  assert.equal(grid.children.length, 9);
+  assert.equal(grid.getAttribute('data-rows'), '3');
+  assert.match(grid.getAttribute('style'), /--sport-cols:\s*3/, 'five across would squeeze "Basketball" out of its tile');
+  assert.deepEqual([...grid.querySelectorAll('.setup-card__button')].map(button => button.textContent).slice(6, 8), ['Tennis', 'Women\'s tennis']);
+  const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(css, /\.setup-sports\[data-rows="3"\] \.setup-card \{ min-height:44px;/);
+  assert.match(css, /@media \(max-width:699\.98px\) and \(max-height:660px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="3"\]\) \.setup-heading \{ display:none; \}/);
+});
+
 test('theatre footnote: a "*"-marked scope name resolves to its description; summaries drop the marker', async t => {
   // The marker rule on synthetic scopes.
   assert.deepEqual(theatreRow({ id: 'x', name: 'East*', desc: 'A plus B.' }, 3), { id: 'x', name: 'East*', label: 'East', count: 3, note: 'A plus B.' });
@@ -1031,7 +1046,20 @@ test('a country restore in progress disables Resume and Cancel', async t => {
   assert.equal(idle.button('Cancel').disabled, false);
 });
 
-test('country card: sections in their kick-off pastels over the neighbouring land, static and decorative', async t => {
+/** The card's camera: its svg viewBox as { x, y, w, h }. */
+const cameraOf = card => {
+  const [x, y, w, h] = card.querySelector('svg').getAttribute('viewBox').split(' ').map(Number);
+  return { x, y, w, h };
+};
+/** The card's land is drawing only: hidden from assistive technology, never territory; its only controls are buttons. */
+function assertCardDrawing(card) {
+  const svg = card.querySelector('svg');
+  assert.equal(svg.getAttribute('aria-hidden'), 'true', 'the drawing stays out of the accessibility tree');
+  assert.equal(svg.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
+  assert.equal(card.getAttribute('aria-hidden'), null, 'the card itself is not hidden: it holds buttons');
+}
+
+test('country card: sections in their kick-off pastels over the neighbouring land, a map that zooms', async t => {
   const paths = {
     s1: { d: 'M0,0L10,0L10,10Z', fullBounds: { x: 0, y: 0, w: 10, h: 10 } },
     s2: { d: 'M10,0L20,0L20,10Z', fullBounds: { x: 10, y: 0, w: 10, h: 10 } },
@@ -1079,12 +1107,15 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   const view = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {}, preview } });
   const card = view.q('.setup-step[data-step="1"] .setup-side > .setup-map');
   assert.ok(card, 'the card leads the side column of step 1');
-  assert.equal(card.getAttribute('aria-hidden'), 'true');
-  assert.equal(card.querySelector('svg').getAttribute('viewBox'), preview.viewBox);
+  assertCardDrawing(card);
+  // The camera opens on the board (here at the closest zoom the 960-unit chart allows: 60 units across).
+  const camera = cameraOf(card);
+  assert.ok(camera.x <= 0 && camera.y <= 0 && camera.x + camera.w >= 20 && camera.y + camera.h >= 12, 'every section in view');
   assert.equal(card.querySelectorAll('.setup-map__backdrop path').length, 1);
   assert.deepEqual([...card.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
     preview.sections.map(section => section.fill));
-  assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
+  assert.deepEqual(view.qa('.setup-map button').map(button => button.getAttribute('aria-label') || button.textContent),
+    ['Zoom in', 'Zoom out', 'Reset view', 'Political', 'Crests'], 'a country is clubs: its banners are crests');
   assert.equal(card.getAttribute('title'), 'England · 3 sections, one per club');
   const fijiView = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:242' },
     domestic: { state: 'ready', message: null, onRetry() {}, preview: fijiCard } });
@@ -1119,21 +1150,101 @@ test('world card: a theatre opening board in kick-off pastels over unclaimed lan
   const nations = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: preview });
   const card = nations.q('.setup-step[data-step="1"] .setup-side > .setup-map[data-kind="world"]');
   assert.ok(card, 'every world theatre leads step 1 with its map');
-  assert.equal(card.getAttribute('aria-hidden'), 'true');
-  assert.equal(card.querySelector('svg').getAttribute('viewBox'), preview.viewBox);
+  assertCardDrawing(card);
+  const camera = cameraOf(card);
+  assert.ok(camera.x <= 0 && camera.y <= 0 && camera.x + camera.w >= 20 && camera.y + camera.h >= 10, 'the starting land in view');
   assert.equal(card.querySelectorAll('.setup-map__backdrop path').length, 1);
   assert.deepEqual([...card.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
     preview.sections.map(section => section.fill));
-  assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
   assert.equal(card.getAttribute('title'), 'Europe · 2 nations, each on its own land');
+  assert.equal(nations.q('.setup-map__mode[aria-pressed="false"]').textContent, 'Flags', 'nations fly flags');
   const clubs = await mount(t, { setup: { layer: 'clubs', clubScope: 'all' }, theatreMap: preview });
   assert.match(clubs.q('.setup-map').getAttribute('title'), /^Top 124 · 2 clubs dealt onto the nearest free land$/i);
+  assert.equal(clubs.q('.setup-map__mode[aria-pressed="false"]').textContent, 'Crests', 'clubs fly crests');
   const none = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: null });
   assert.equal(none.q('.setup-map'), null, 'no card before App has a board');
   // A chosen country shows its own card, never a world board App may still hold while the country loads.
   const country = await mount(t, { setup: COUNTRY, theatreMap: preview, domestic: { state: 'loading', message: null, onRetry() {} } });
   assert.deepEqual(country.qa('.setup-map').map(element => element.dataset.kind), ['country']);
   assert.deepEqual([...nations.errors, ...clubs.errors, ...none.errors, ...country.errors], []);
+});
+
+test('the map card zooms like the campaign map, and its Political / Flags switch draws each team’s flag or crest', async t => {
+  // A 400×300 board in the 960×540 chart. jsdom measures no canvas, so the camera frames it for the default 960×540.
+  const square = (x, y, size) => `M${x},${y}h${size}v${size}h-${size}Z`;
+  const preview = { viewBox: '100 50 400 300', teams: 3, backdrop: [{ id: 'n', d: square(450, 300, 40) }],
+    sections: ['a', 'b', 'c'].map((id, index) => ({ id, d: square(100 + index * 120, 50 + index * 80, 100), fill: politicalFill(id) })) };
+  const near = (actual, expected, label) => assert.ok(Math.abs(actual - expected) < 1e-6, `${label}: ${actual} ≠ ${expected}`);
+  const assertCamera = (card, [x, y, w, h], label) => {
+    const camera = cameraOf(card);
+    near(camera.x, x, `${label} x`); near(camera.y, y, `${label} y`); near(camera.w, w, `${label} w`); near(camera.h, h, `${label} h`);
+  };
+  const modes = [];
+  const view = await mount(t, { setup: { scope: 'world' }, theatreMap: preview, onMapMode: mode => { modes.push(mode); } });
+  const card = view.q('.setup-map');
+  const reset = () => view.q('.setup-map button[aria-label="Reset view"]');
+  // The board fills the canvas top to bottom, centred: 533⅓ × 300 around (300, 200), the campaign map's 1.8×.
+  const opening = [100 / 3, 50, 1600 / 3, 300];
+  assertCamera(card, opening, 'opening frame');
+  assert.equal(reset().textContent, '1.8×');
+  await view.click(view.q('.setup-map button[aria-label="Zoom in"]'));
+  assertCamera(card, [400 / 3, 106.25, 1000 / 3, 187.5], 'zoomed in about the centre');
+  assert.equal(reset().textContent, '2.9×');
+  // A double-click on a zoom button is two presses, never a reset.
+  await act(async () => view.q('.setup-map button[aria-label="Zoom out"]').dispatchEvent(new dom.window.MouseEvent('dblclick', { bubbles: true })));
+  assertCamera(card, [400 / 3, 106.25, 1000 / 3, 187.5], 'a double-click on the controls');
+  await view.click(view.q('.setup-map button[aria-label="Zoom out"]'));
+  await view.click(view.q('.setup-map button[aria-label="Zoom out"]'));
+  assertCamera(card, [0, 0, 2560 / 3, 480], 'zoomed out, held inside the chart');
+  await view.click(reset());
+  assertCamera(card, opening, 'Reset view');
+  await view.click(view.q('.setup-map button[aria-label="Zoom in"]'));
+  await act(async () => card.querySelector('svg path').dispatchEvent(new dom.window.MouseEvent('dblclick', { bubbles: true })));
+  assertCamera(card, opening, 'a double-click on the map resets it');
+
+  // Political (the default) ignores banners; the switch asks App for Flags, and a pressed mode asks nothing.
+  assert.equal(card.dataset.mapMode, 'political');
+  assert.deepEqual(view.qa('.setup-map__mode').map(button => [button.textContent, button.getAttribute('aria-pressed')]),
+    [['Political', 'true'], ['Flags', 'false']]);
+  await view.click(view.button('Political', card));
+  await view.click(view.button('Flags', card));
+  assert.deepEqual(modes, ['flags']);
+
+  // Flags: a nation's banner and a club's crest, each shown through its land's parts; a club with no crest keeps its colour.
+  const flag = { id: 'setup-a-a-0', ownerId: 'a', url: '/flags/fr.svg', crestUrl: null, color: '#fafafa', symbolLayout: null,
+    bbox: { x: 99.9, y: 49.9, w: 100.2, h: 100.2 } };
+  const crest = { id: 'setup-b-b-0', ownerId: 'b', url: '/club-logos/b.webp', crestUrl: '/club-logos/b.webp', color: '#123456',
+    symbolLayout: { symbol: { x: 250, y: 110, w: 40, h: 40 }, field: { x: 210, y: 120, w: 120, h: 90 } }, bbox: { x: 219.9, y: 129.9, w: 100.2, h: 100.2 } };
+  const mapFlags = {
+    flagPatterns: [flag, crest],
+    flagParts: new Map([['a', [{ id: flag.id, d: 'M100,50L200,50L200,150L100,150Z' }]], ['b', [{ id: crest.id, d: 'M220,130L320,130L320,230L220,230Z' }]]]),
+    fills: new Map([['b', '#123456'], ['c', '#abcdef']]),
+  };
+  const ignored = await mount(t, { setup: { scope: 'world' }, theatreMap: preview, mapFlags });
+  assert.equal(ignored.q('.setup-map use, .setup-map defs'), null, 'Political draws no banner');
+  const flags = await mount(t, { setup: { scope: 'world' }, theatreMap: preview, mapMode: 'flags', mapFlags,
+    onMapMode: mode => { modes.push(mode); } });
+  const flagged = flags.q('.setup-map');
+  assert.equal(flagged.dataset.mapMode, 'flags');
+  assert.equal(flags.q('.setup-map__mode[aria-pressed="true"]').textContent, 'Flags');
+  assert.equal(flagged.querySelector('defs #fi-flag-setup-a-a-0').dataset.flagSource, '/flags/fr.svg');
+  const crestArt = flagged.querySelector('defs #fi-flag-setup-b-b-0');
+  assert.equal(crestArt.dataset.flagLayout, 'crest');
+  assert.equal(crestArt.querySelector('image').getAttribute('href'), '/club-logos/b.webp');
+  const uses = [...flagged.querySelectorAll('.setup-map__flags use')];
+  assert.deepEqual(uses.map(use => [use.dataset.setupFlag, use.getAttribute('href')]),
+    [[flag.id, '#fi-flag-setup-a-a-0'], [crest.id, '#fi-flag-setup-b-b-0']]);
+  for (const use of uses) {
+    const clip = flagged.querySelector(`clipPath#${/^url\(#(.+)\)$/.exec(use.getAttribute('clip-path'))[1]}`);
+    assert.ok(clip?.querySelector('path'), 'each part is clipped to its own outline');
+  }
+  assert.deepEqual([...flagged.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
+    ['transparent', 'transparent', '#abcdef'], 'land under a banner shows it; a club with no crest its colour');
+  assert.equal(flagged.querySelectorAll('.setup-map__sections path').length, 3, 'one land path per section, banners apart');
+  await flags.click(flags.button('Flags', flagged));
+  await flags.click(flags.button('Political', flagged));
+  assert.deepEqual(modes, ['flags', 'political']);
+  assert.deepEqual([...view.errors, ...ignored.errors, ...flags.errors], []);
 });
 
 test('a pressed segment keeps its white label on hover (Teams toggle, history kinds, squad view)', () => {

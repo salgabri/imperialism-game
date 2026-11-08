@@ -9,11 +9,12 @@ import { americanFootball } from './americanFootball.js';
 import { baseball } from './baseball.js';
 import { hockey } from './hockey.js';
 import { tennis } from './tennis.js';
+import { womensTennis } from './womensTennis.js';
 import { rugbyLeague } from './rugbyLeague.js';
 
 export const SPORTS = { football, 'womens-football': womensFootball, basketball, 'american-football': americanFootball, baseball, hockey, tennis,
-  'rugby-league': rugbyLeague };
-export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, baseball, hockey, tennis, rugbyLeague];
+  'womens-tennis': womensTennis, 'rugby-league': rugbyLeague };
+export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, baseball, hockey, tennis, womensTennis, rugbyLeague];
 export const DEFAULT_SPORT = 'football';
 
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];

@@ -3,10 +3,13 @@ import { ROSTERS } from '../data/rosters.tennis.js';
 import { GREAT_BRITAIN, HOME_NATIONS, NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, gauss } from '../engine/random.js';
 
-// Tennis by the rules of the Davis Cup's home-and-away ties (docs/design/tennis.md). Two nations' teams play five
-// rubbers over two days, first to three. Day one: each side's No. 1 plays the other's No. 2. Day two: the doubles, then
-// No. 1 against No. 1 and No. 2 against No. 2. Every rubber is a best-of-three-sets match of tie-break sets. Once a side
-// has three, the rest are dead rubbers and are not played, so a tie ends 3–0, 3–1 or 3–2.
+// Tennis by the rules of the Davis Cup's home-and-away ties (docs/design/tennis.md), and the women's game by the
+// Billie Jean King Cup's, whose qualifiers and play-offs have played them in the same order since 2026
+// (docs/design/womens-tennis.md).
+// Two nations' teams play five rubbers over two days, first to three. Day one: each side's No. 1 plays the other's
+// No. 2. Day two: the doubles, then No. 1 against No. 1 and No. 2 against No. 2. Every rubber is a best-of-three-sets
+// match of tie-break sets. Once a side has three, the rest are dead rubbers and are not played, so a tie ends 3–0, 3–1
+// or 3–2.
 export const RUBBERS = 5;
 export const TO_WIN = 3;
 // Who plays each rubber, as lineup places [the attacker's, the defender's]: 0 the No. 1, 1 the No. 2; null, the doubles.
@@ -19,10 +22,15 @@ export const ELO_PER_POINT = 25;
 /** The favourite's chance in a best-of-three-sets match, `gap` rating points ahead. */
 export const matchOdds = gap => 1 / (1 + 10 ** (-gap * ELO_PER_POINT / 400));
 
-// The share of his service points an ATP player wins against an equal: about 64%. A rubber splits the difference
-// between the two servers so that the better player wins exactly as often as Elo says (serveEdge), and the sets are
-// then played game by game (holds and breaks) and the tie-breaks point by point.
-const SERVE = 0.64;
+// The share of their service points a tour's players win against an equal: 64% on the ATP, 56.7% on the WTA (tour-level
+// best-of-three matches 2022–2025 in Jeff Sackmann's match files: 64.0% and 56.7%, holds 79.9% and 65.7%). A rubber
+// splits the difference between the two servers so that the better player wins exactly as often as Elo says (serveEdge),
+// and the sets are then played game by game (holds and breaks) and the tie-breaks point by point. The serve shapes only
+// the games inside a set: women break more often, so fewer of their sets reach a tie-break and more end 6–0. Who wins a
+// set, a rubber or a tie is Elo's either way.
+export const ATP = Object.freeze({ id: 'atp', serve: 0.64 });
+export const WTA = Object.freeze({ id: 'wta', serve: 0.567 });
+const SERVE = ATP.serve;
 
 // Match-day form: one draw for the tie in rating points, on every rubber's gap, a hot team or a cold one. At Balanced
 // it barely moves Elo's odds; it grows with the square of the drama, as in the other sports, so Wild swings ties hard and
@@ -157,10 +165,10 @@ function playTiebreak(rng, pA, pD, aFirst) {
   }
 }
 
-/** The two servers' point and hold chances when A wins a set with `s`. */
-function servesFor(s) {
-  const edge = serveEdge(s);
-  const pA = SERVE + edge / 2, pD = SERVE - edge / 2;
+/** The two servers' point and hold chances when A wins a set with `s`, on a tour whose servers win `serve` of points. */
+function servesFor(s, serve = SERVE) {
+  const edge = serveEdge(s, serve);
+  const pA = serve + edge / 2, pD = serve - edge / 2;
   return { pA, pD, hA: holdChance(pA), hD: holdChance(pD) };
 }
 
@@ -186,9 +194,10 @@ function playSet(rng, { pA, pD, hA, hD }, aServes) {
 /**
  * A best-of-three-sets match that A wins with `odds` → [{ a, d, tb }], each set's games and, for a set decided in a
  * tie-break, its points [A's, D's]: the day's form, then the sets game by game, after a toss for the first server.
+ * `tour`: ATP (the men's serve) or WTA (the women's).
  */
-export function playMatch(rng, odds) {
-  const serves = servesFor(logistic(setLogitFor(odds) + DAY_FORM * gauss(rng)));
+export function playMatch(rng, odds, tour = ATP) {
+  const serves = servesFor(logistic(setLogitFor(odds) + DAY_FORM * gauss(rng)), tour.serve);
   let aServes = rng() < 0.5;
   const sets = [];
   while (sets.filter(set => set.a > set.d).length < 2 && sets.filter(set => set.d > set.a).length < 2) {
@@ -208,8 +217,9 @@ const mirrored = set => ({ ...set, a: set.d, d: set.a, tb: set.tb && [set.tb[1],
  * A best-of-three match that A wins with `odds`, played out given that A wins it (`aWins`) or loses it, exactly: the day's
  * form given the result (drawn from its prior, kept with the chance it gives that result), then which sets the winner
  * takes given that form (two straight, or one dropped first or second), then each set game by game given its winner.
+ * `tour`: ATP (the men's serve) or WTA (the women's).
  */
-export function playMatchWon(rng, odds, aWins) {
+export function playMatchWon(rng, odds, aWins, tour = ATP) {
   const mean = setLogitFor(odds);
   let s = null;
   for (let i = 0; i < MAX_TRIES && s === null; i++) {
@@ -222,7 +232,7 @@ export function playMatchWon(rng, odds, aWins) {
   const w = aWins ? s : 1 - s;
   const roll = rng() * (3 - 2 * w);
   const winnerTakes = roll < 1 ? [true, true] : roll < 2 - w ? [true, false, true] : [false, true, true];
-  const serves = servesFor(s);
+  const serves = servesFor(s, tour.serve);
   let aServes = rng() < 0.5;
   return winnerTakes.map(winnerWins => {
     const aTakes = winnerWins === aWins;
@@ -311,9 +321,9 @@ export function sampleResult(rng, prepared, drama = 6) {
  * The whole tie: sampleResult's own draws decide every rubber (so a seed gives the same score on both paths), then each
  * rubber's sets are played out given its winner. One event per set won, at its share of the rubber's games on the clock,
  * `pts` 1 for the set that wins the rubber (the score counts rubbers) and 0 for the others; a walkover is one event with
- * no sets.
+ * no sets. `tour`: ATP (the men's serve) or WTA (the women's).
  */
-export function simulateTie(rng, prepared, drama = 6) {
+export function simulateTie(rng, prepared, drama = 6, tour = ATP) {
   const result = sampleResult(rng, prepared, drama);
   const ev = [];
   result.rubbers.forEach((side, i) => {
@@ -325,7 +335,7 @@ export function simulateTie(rng, prepared, drama = 6) {
       ev.push({ ...common, m: start + BLOCK, side, name: aWon ? rubber.a : rubber.d, pts: 1, set: 0, score: 'w/o' });
       return;
     }
-    const sets = playMatchWon(rng, rubberOdds(rubber, result.form), aWon);
+    const sets = playMatchWon(rng, rubberOdds(rubber, result.form), aWon, tour);
     const games = sets.reduce((sum, set) => sum + set.a + set.d, 0);
     let played = 0;
     sets.forEach((set, k) => {
@@ -343,20 +353,25 @@ export function simulateTie(rng, prepared, drama = 6) {
 const rubberAt = m => clamp(Math.ceil((Number(m) || 0) / BLOCK), 1, RUBBERS);
 const kindOf = e => (e.doubles ? 'DOUBLES' : 'SINGLES');
 
-export const tennis = {
-  id: 'tennis',
+/**
+ * A sport played by these rules with one tour's players: `rosters` the nations that field a team, `tour` its serve (ATP,
+ * the men's Davis Cup; WTA, the women's Billie Jean King Cup). Everything else is the same in both cups.
+ */
+export const tennisSport = ({ id, name, blurb, rosters, tour = ATP }) => ({
+  id,
   simulationVersion: 1,
-  name: 'Tennis',
-  blurb: 'Davis Cup ties: four singles and a doubles over two days, first to three rubbers. Every match is best of three sets.',
-  rosters: ROSTERS,
+  name,
+  blurb,
+  rosters,
   clubs: [],
   // Nations only: tennis has no clubs to play.
   nationsOnly: true,
-  // Great Britain plays the Davis Cup as one: the home nations' shapes start in the United Kingdom's (826) empire. A
-  // nation with fewer than two rated players fields no team, and its land stays neutral.
+  tour,
+  // Great Britain plays either cup as one: the home nations' shapes start in the United Kingdom's (826) empire. A nation
+  // with fewer than two rated players fields no team, and its land stays neutral.
   territory: {
-    merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])),
-    inactive: Object.keys(NATIONS).filter(id => !HOME_NATIONS.includes(id) && !Object.hasOwn(ROSTERS, id)),
+    merged: Object.fromEntries(HOME_NATIONS.map(nation => [nation, '826'])),
+    inactive: Object.keys(NATIONS).filter(nation => !HOME_NATIONS.includes(nation) && !Object.hasOwn(rosters, nation)),
   },
   // That empire plays as Great Britain, under the Union Jack.
   playsAs: { '826': GREAT_BRITAIN },
@@ -399,11 +414,20 @@ export const tennis = {
 
   simulate(rng, attacker, defender, drama, effA, effD, venue) {
     const prepared = prepareMatch(attacker, defender, effA, effD, venue);
-    const { ga, gd, ev, winner } = simulateTie(rng, prepared, drama);
+    const { ga, gd, ev, winner } = simulateTie(rng, prepared, drama, tour);
     return { ga, gd, regA: ga, regD: gd, tie: null, winner,
       ev: ev.map(({ side, ...e }) => ({ ...e, tid: side === 'A' ? attacker.id : defender.id })) };
   },
-};
+});
+
+/** The men's game: the ATP's players in the Davis Cup. */
+export const tennis = tennisSport({
+  id: 'tennis',
+  name: 'Tennis',
+  blurb: 'Davis Cup ties: four singles and a doubles over two days, first to three rubbers. Every match is best of three sets.',
+  rosters: ROSTERS,
+  tour: ATP,
+});
 
 /**
  * Squad-screen strength profile: the mean of the No. 1 and No. 2, and the doubles pair's → { singles, doubles } on the

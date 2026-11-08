@@ -3,7 +3,7 @@
 // §4.7 holds on every step: theatre, the draw and match settings, managed team and the `Launch campaign` submit button.
 // Compact pass (docs/design/compact-pass.md): every step fits the window. Controls say what they are by their faces, the
 // explanations live in `title` and for screen readers, and the team list is a wall of flags that pages only if it must.
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
 import ShareCampaign from './ShareCampaign.jsx';
@@ -11,10 +11,10 @@ import TeamMark from './TeamMark.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
 import AdSlot from './AdSlot.jsx';
 import Pager from './Pager.jsx';
+import SetupMap from './SetupMap.jsx';
 import { useFitWall } from '../hooks/useFit.js';
 import * as setupModel from '../screens/setup/setupModel.js';
 import { challengeNote } from '../screens/setup/challenge.js';
-import { themedPaint } from '../theme.js';
 import './setup.css';
 
 // Frozen named exports (kept for the module contract). Definitions live in the pure model module.
@@ -42,6 +42,12 @@ const IDLE_SEASON = Object.freeze({ sets: NO_TEAMS, state: 'idle', message: null
 const SEED_HELP = 'Replays the same campaign with the same rules and choices. Leave blank for a new one.';
 /** The team wall's cells: flags at 4:3, small enough to seat a world of nations; under a finger, a 44px square target. */
 const WALL = { ratio: 4 / 3, gap: 6, minCell: 34, maxCell: 104, touch: { ratio: 1, minCell: 44 } };
+
+/**
+ * The sport tiles' columns: up to four share a row, up to eight split into two even rows, and more into three (nine
+ * sports: three rows of three). Five across would squeeze "Basketball" out of its tile on a desktop's setup column.
+ */
+const sportColumns = count => (count <= 4 ? count : count <= 8 ? Math.ceil(count / 2) : Math.ceil(count / 3));
 
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });
@@ -184,31 +190,6 @@ function TeamShortlist({ id, title, teams }) {
   );
 }
 
-/**
- * Step 1's map card: the theatre's opening board, each starting territory in its team's kick-off pastel over the land
- * nobody holds. A world theatre's `preview` comes from `setupModel.theatreMapPreview`, a country's from
- * `setupModel.countryMapPreview` (its sections over the neighbouring land). Static and decorative — no camera, labels or
- * territory attributes; the title, description and stats carry the same facts in text. Memoised: App re-renders
- * setup on every state change, and `preview` keeps its identity per board.
- */
-const TheatreMap = React.memo(function TheatreMap({ preview, caption, loading = false, kind }) {
-  if (!preview && !loading) return null;
-  return (
-    <figure className="setup-map" aria-hidden="true" data-state={preview ? 'ready' : 'loading'} data-kind={kind} title={caption}>
-      {preview ? (
-        <svg className="setup-map__chart" viewBox={preview.viewBox} preserveAspectRatio="xMidYMid meet" focusable="false">
-          <g className="setup-map__backdrop">
-            {preview.backdrop.map((shape, index) => <path key={`${shape.id}-${index}`} d={shape.d} />)}
-          </g>
-          <g className="setup-map__sections">
-            {preview.sections.map(section => <path key={section.id} d={section.d} fill={section.fill} style={{ fill: themedPaint(section.fill) }} />)}
-          </g>
-        </svg>
-      ) : <div className="setup-map__chart setup-map__placeholder" />}
-    </figure>
-  );
-});
-
 /** The world card's caption: "Europe · 46 nations, each on its own land" (a set with no Europe maps deals its clubs out, README §The club layer). */
 function theatreCaption(model, preview) {
   const teams = `${preview.teams} ${preview.teams === 1 ? model.noun : model.nouns}`;
@@ -219,7 +200,9 @@ function theatreCaption(model, preview) {
  * The setup wizard. Props are App's (HEAD) setup props plus optional `onCancel` (header Cancel, only with a save) and
  * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
- * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
+ * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card (SetupMap), or null.
+ * The card's `mapMode` ('political' | 'flags') is App's, set through `onMapMode`; `mapFlags` is App's
+ * `setupMapFlags()` for the board on show, while the card is in Flags mode.
  * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
  * `initialStep` (1–3) is the step it opens on: Your role (3) for "Another team" after a defeat. `suggestTeam` (default
  * true) lets a manager with no team picked launch the suggested one; "Another team" turns it off.
@@ -230,7 +213,7 @@ export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
   domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON, initialStep = 1,
-  suggestTeam = true, challenge = null, challengeLink = '',
+  suggestTeam = true, challenge = null, challengeLink = '', mapMode = 'political', onMapMode, mapFlags = null,
 }) {
   const [step, setStep] = useState(() => Math.min(3, Math.max(1, Math.round(Number(initialStep)) || 1)));
   const [confirmation, setConfirmation] = useState(null);
@@ -243,6 +226,10 @@ export default function SetupOverlay({
   const confirmationFocus = useRef(null);
   // App passes a fresh `onStart` arrow on every render; the Space listener reads the latest one through this ref.
   const startRef = useRef(onStart);
+  // Likewise `onMapMode`: the memoised map card gets one stable handler that calls the latest.
+  const mapModeRef = useRef(onMapMode);
+  mapModeRef.current = onMapMode;
+  const chooseMapMode = useCallback(mode => mapModeRef.current?.(mode), []);
   // App passes a fresh `domestic` object (with a fresh `onRetry`) every render: the model keys on its values only.
   const mapState = domestic?.state || 'idle';
   const mapMessage = domestic?.message || null;
@@ -569,7 +556,8 @@ export default function SetupOverlay({
               </div>
 
               <div className="setup-sports" role="radiogroup" aria-label="Sport"
-                style={{ '--sport-cols': model.sports.length > 4 ? Math.ceil(model.sports.length / 2) : model.sports.length }}>
+                data-rows={Math.ceil(model.sports.length / sportColumns(model.sports.length))}
+                style={{ '--sport-cols': sportColumns(model.sports.length) }}>
                 {model.sports.map(item => (
                   <div className="setup-card" data-checked={item.selected} key={item.id} title={item.note}>
                     <Icon name={item.id} size={22} className="setup-card__icon" />
@@ -684,12 +672,15 @@ export default function SetupOverlay({
 
             <div className="setup-side">
               {model.country ? (
-                <TheatreMap kind="country" preview={domestic?.preview || null} loading={model.countryState === 'loading'}
+                <SetupMap kind="country" preview={domestic?.preview || null} loading={model.countryState === 'loading'}
                   caption={!domestic?.preview ? `Loading the map of ${model.country.name}…`
                     : model.country.countries ? `${model.country.name} · ${model.country.clubs} clubs in ${model.country.countries} countries`
                       : `${model.country.name} · ${domestic.preview.sections.length} sections, `
-                        + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)} />
-              ) : theatreMap ? <TheatreMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)} /> : <div className="setup-side__empty" aria-hidden="true" />}
+                        + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)}
+                  mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs resetKey={model.scopeId} />
+              ) : theatreMap ? <SetupMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)}
+                mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs={model.layer === 'clubs'} resetKey={model.scopeId} />
+                : <div className="setup-side__empty" aria-hidden="true" />}
             </div>
           </div>
           {footer(1)}

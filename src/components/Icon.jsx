@@ -34,8 +34,9 @@ const PATHS = {
   basketball: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3v18M5.8 5.5a10 10 0 0 1 0 13M18.2 5.5a10 10 0 0 0 0 13" /></>,
   'american-football': <><path d="M19.8 4.2c1 5.4-.2 10-3 12.6s-7.2 4-12.6 3c-1-5.4.2-10 3-12.6s7.2-4 12.6-3Z" /><path d="m9 15 6-6M10.5 10.5l3 3M8.5 12.5l3 3M12.5 8.5l3 3" /></>,
   baseball: <><circle cx="12" cy="12" r="9" /><path d="M6.2 5.2a10 10 0 0 1 0 13.6M17.8 5.2a10 10 0 0 0 0 13.6" /><path d="m7.6 8.4 1.7-.8M8.5 11l1.8-.3M8.5 13.2l1.8.3M7.6 15.8l1.7.8M16.4 8.4l-1.7-.8M15.5 11l-1.8-.3M15.5 13.2l-1.8.3M16.4 15.8l-1.7.8" /></>,
-  // A racket, its strings crossed, and a ball.
+  // A racket, its strings crossed, and a ball. Women's tennis plays with the same racket.
   tennis: <><ellipse cx="9.5" cy="9.5" rx="5.2" ry="6.4" transform="rotate(-45 9.5 9.5)" /><path d="M13.2 13.2 20 20M6.6 9.5h5.8M9.5 6.6v5.8" /><circle cx="18.5" cy="5.5" r="2" /></>,
+  'womens-tennis': <><ellipse cx="9.5" cy="9.5" rx="5.2" ry="6.4" transform="rotate(-45 9.5 9.5)" /><path d="M13.2 13.2 20 20M6.6 9.5h5.8M9.5 6.6v5.8" /><circle cx="18.5" cy="5.5" r="2" /></>,
   // The H of the posts, and a ball going over the crossbar.
   'rugby-league': <><path d="M7 3v18M17 3v18M7 14h10" /><ellipse cx="12" cy="8" rx="3.6" ry="2.3" transform="rotate(-30 12 8)" /></>,
   folder: <path d="M3 7a1 1 0 0 1 1-1h5l2 2.5h9a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />,

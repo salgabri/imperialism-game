@@ -1,6 +1,6 @@
 {
   "purpose": "Reproducible model diagnostics. These are simulation design checks, not empirically validated match forecasts.",
-  "generatedAt": "2026-11-08T10:57:13.121Z",
+  "generatedAt": "2026-11-08T16:49:34.211Z",
   "runtime": {
     "node": "v26.13.0",
     "platform": "win32",
@@ -268,8 +268,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 54.2618,
-          "samplesPerSecond": 3685834
+          "elapsedMs": 55.2505,
+          "samplesPerSecond": 3619877
         }
       },
       "ratingGaps": [
@@ -474,8 +474,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 56.6369,
-            "samplesPerSecond": 3531267
+            "elapsedMs": 55.0511,
+            "samplesPerSecond": 3632988
           }
         },
         {
@@ -685,8 +685,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 58.3119,
-            "samplesPerSecond": 3429832
+            "elapsedMs": 57.7074,
+            "samplesPerSecond": 3465760
           }
         },
         {
@@ -896,8 +896,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 48.8347,
-            "samplesPerSecond": 4095449
+            "elapsedMs": 49.583,
+            "samplesPerSecond": 4033641
           }
         },
         {
@@ -1131,8 +1131,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 46.2371,
-            "samplesPerSecond": 4325531
+            "elapsedMs": 53.4755,
+            "samplesPerSecond": 3740030
           }
         },
         {
@@ -1384,8 +1384,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 44.955,
-            "samplesPerSecond": 4448893
+            "elapsedMs": 52.1752,
+            "samplesPerSecond": 3833239
           }
         },
         {
@@ -1589,8 +1589,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 55.8238,
-            "samplesPerSecond": 3582701
+            "elapsedMs": 56.0692,
+            "samplesPerSecond": 3567021
           }
         },
         {
@@ -1800,8 +1800,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 59.2967,
-            "samplesPerSecond": 3372869
+            "elapsedMs": 54.2589,
+            "samplesPerSecond": 3686031
           }
         },
         {
@@ -2029,8 +2029,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 57.7118,
-            "samplesPerSecond": 3465496
+            "elapsedMs": 51.2057,
+            "samplesPerSecond": 3905815
           }
         },
         {
@@ -2264,8 +2264,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 47.5247,
-            "samplesPerSecond": 4208338
+            "elapsedMs": 47.231,
+            "samplesPerSecond": 4234507
           }
         },
         {
@@ -2517,8 +2517,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 45.596,
-            "samplesPerSecond": 4386350
+            "elapsedMs": 44.7176,
+            "samplesPerSecond": 4472512
           }
         },
         {
@@ -2758,8 +2758,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 51.6299,
-            "samplesPerSecond": 3873724
+            "elapsedMs": 52.3226,
+            "samplesPerSecond": 3822440
           }
         },
         {
@@ -2999,8 +2999,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 51.0794,
-            "samplesPerSecond": 3915473
+            "elapsedMs": 53.9231,
+            "samplesPerSecond": 3708986
           }
         },
         {
@@ -3234,8 +3234,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 51.274,
-            "samplesPerSecond": 3900612
+            "elapsedMs": 51.7606,
+            "samplesPerSecond": 3863943
           }
         },
         {
@@ -3475,8 +3475,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 49.5371,
-            "samplesPerSecond": 4037378
+            "elapsedMs": 49.4637,
+            "samplesPerSecond": 4043369
           }
         },
         {
@@ -3728,8 +3728,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 45.9039,
-            "samplesPerSecond": 4356928
+            "elapsedMs": 45.9938,
+            "samplesPerSecond": 4348412
           }
         }
       ],
@@ -3949,8 +3949,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 57.6068,
-            "samplesPerSecond": 3471812
+            "elapsedMs": 57.1406,
+            "samplesPerSecond": 3500138
           }
         },
         {
@@ -4174,8 +4174,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 54.5618,
-            "samplesPerSecond": 3665568
+            "elapsedMs": 54.6089,
+            "samplesPerSecond": 3662407
           }
         },
         {
@@ -4387,8 +4387,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 54.2464,
-            "samplesPerSecond": 3686881
+            "elapsedMs": 53.6891,
+            "samplesPerSecond": 3725151
           }
         },
         {
@@ -4630,31 +4630,31 @@
             }
           ],
           "timing": {
-            "elapsedMs": 48.7617,
-            "samplesPerSecond": 4101580
+            "elapsedMs": 47.9775,
+            "samplesPerSecond": 4168621
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 4.3045,
-          "meanMs": 0.01722
+          "elapsedMs": 4.3233,
+          "meanMs": 0.01729
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 20.3442,
-          "perSecond": 4915406
+          "elapsedMs": 20.0049,
+          "perSecond": 4998775
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 144.7217,
-          "perSecond": 69098
+          "elapsedMs": 140.6924,
+          "perSecond": 71077
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 1.0337,
-          "cachedMs": 0.087,
+          "firstMs": 1.0217,
+          "cachedMs": 0.0934,
           "cacheIdentityPreserved": true
         },
         "checksum": 159504
@@ -4866,8 +4866,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 54.3176,
-          "samplesPerSecond": 3682048
+          "elapsedMs": 54.6021,
+          "samplesPerSecond": 3662863
         }
       },
       "ratingGaps": [
@@ -5072,8 +5072,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 55.4105,
-            "samplesPerSecond": 3609424
+            "elapsedMs": 55.2481,
+            "samplesPerSecond": 3620034
           }
         },
         {
@@ -5283,8 +5283,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 53.4584,
-            "samplesPerSecond": 3741227
+            "elapsedMs": 53.7146,
+            "samplesPerSecond": 3723382
           }
         },
         {
@@ -5494,8 +5494,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 56.0962,
-            "samplesPerSecond": 3565304
+            "elapsedMs": 56.5472,
+            "samplesPerSecond": 3536868
           }
         },
         {
@@ -5729,8 +5729,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 54.2037,
-            "samplesPerSecond": 3689785
+            "elapsedMs": 53.8775,
+            "samplesPerSecond": 3712125
           }
         },
         {
@@ -5988,8 +5988,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 45.1069,
-            "samplesPerSecond": 4433911
+            "elapsedMs": 43.5986,
+            "samplesPerSecond": 4587303
           }
         },
         {
@@ -6199,8 +6199,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 54.3548,
-            "samplesPerSecond": 3679528
+            "elapsedMs": 53.9115,
+            "samplesPerSecond": 3709784
           }
         },
         {
@@ -6410,8 +6410,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 53.0745,
-            "samplesPerSecond": 3768288
+            "elapsedMs": 52.5181,
+            "samplesPerSecond": 3808211
           }
         },
         {
@@ -6633,8 +6633,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 51.2286,
-            "samplesPerSecond": 3904069
+            "elapsedMs": 49.8536,
+            "samplesPerSecond": 4011746
           }
         },
         {
@@ -6868,8 +6868,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 47.8685,
-            "samplesPerSecond": 4178113
+            "elapsedMs": 46.5923,
+            "samplesPerSecond": 4292555
           }
         },
         {
@@ -7133,8 +7133,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 45.6521,
-            "samplesPerSecond": 4380959
+            "elapsedMs": 45.1961,
+            "samplesPerSecond": 4425161
           }
         },
         {
@@ -7368,8 +7368,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 51.5996,
-            "samplesPerSecond": 3875999
+            "elapsedMs": 51.8591,
+            "samplesPerSecond": 3856604
           }
         },
         {
@@ -7609,8 +7609,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 51.6231,
-            "samplesPerSecond": 3874235
+            "elapsedMs": 51.5994,
+            "samplesPerSecond": 3876014
           }
         },
         {
@@ -7850,8 +7850,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 51.8934,
-            "samplesPerSecond": 3854055
+            "elapsedMs": 50.9394,
+            "samplesPerSecond": 3926234
           }
         },
         {
@@ -8097,8 +8097,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 49.9498,
-            "samplesPerSecond": 4004020
+            "elapsedMs": 49.4722,
+            "samplesPerSecond": 4042674
           }
         },
         {
@@ -8344,8 +8344,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 46.031,
-            "samplesPerSecond": 4344898
+            "elapsedMs": 45.3305,
+            "samplesPerSecond": 4412040
           }
         }
       ],
@@ -8565,8 +8565,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 54.284,
-            "samplesPerSecond": 3684327
+            "elapsedMs": 54.3223,
+            "samplesPerSecond": 3681729
           }
         },
         {
@@ -8784,8 +8784,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 53.8017,
-            "samplesPerSecond": 3717355
+            "elapsedMs": 54.4019,
+            "samplesPerSecond": 3676342
           }
         },
         {
@@ -9003,8 +9003,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 53.8978,
-            "samplesPerSecond": 3710727
+            "elapsedMs": 54.7674,
+            "samplesPerSecond": 3651807
           }
         },
         {
@@ -9270,31 +9270,31 @@
             }
           ],
           "timing": {
-            "elapsedMs": 44.336,
-            "samplesPerSecond": 4511007
+            "elapsedMs": 44.2882,
+            "samplesPerSecond": 4515876
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 5.3881,
-          "meanMs": 0.02155
+          "elapsedMs": 5.4145,
+          "meanMs": 0.02166
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 20.6336,
-          "perSecond": 4846464
+          "elapsedMs": 20.1747,
+          "perSecond": 4956703
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 163.462,
-          "perSecond": 61176
+          "elapsedMs": 170.2986,
+          "perSecond": 58720
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 0.281,
-          "cachedMs": 0.0194,
+          "firstMs": 0.3034,
+          "cachedMs": 0.0371,
           "cacheIdentityPreserved": true
         },
         "checksum": 159504
@@ -9512,8 +9512,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 104.9478,
-          "samplesPerSecond": 1905709
+          "elapsedMs": 71.0726,
+          "samplesPerSecond": 2814024
         }
       },
       "ratingGaps": [
@@ -9730,8 +9730,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 73.1121,
-            "samplesPerSecond": 2735525
+            "elapsedMs": 72.8441,
+            "samplesPerSecond": 2745590
           }
         },
         {
@@ -9941,8 +9941,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 70.189,
-            "samplesPerSecond": 2849449
+            "elapsedMs": 69.5857,
+            "samplesPerSecond": 2874154
           }
         },
         {
@@ -10158,8 +10158,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 66.6226,
-            "samplesPerSecond": 3001984
+            "elapsedMs": 66.2284,
+            "samplesPerSecond": 3019853
           }
         },
         {
@@ -10369,8 +10369,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 66.0413,
-            "samplesPerSecond": 3028408
+            "elapsedMs": 64.9422,
+            "samplesPerSecond": 3079662
           }
         },
         {
@@ -10580,8 +10580,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 64.9665,
-            "samplesPerSecond": 3078510
+            "elapsedMs": 64.6595,
+            "samplesPerSecond": 3093126
           }
         },
         {
@@ -10791,8 +10791,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 72.42,
-            "samplesPerSecond": 2761668
+            "elapsedMs": 70.3656,
+            "samplesPerSecond": 2842298
           }
         },
         {
@@ -11002,8 +11002,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 68.9202,
-            "samplesPerSecond": 2901907
+            "elapsedMs": 65.9368,
+            "samplesPerSecond": 3033208
           }
         },
         {
@@ -11219,8 +11219,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 86.9786,
-            "samplesPerSecond": 2299416
+            "elapsedMs": 84.6194,
+            "samplesPerSecond": 2363524
           }
         },
         {
@@ -11430,8 +11430,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 118.5564,
-            "samplesPerSecond": 1686961
+            "elapsedMs": 79.5155,
+            "samplesPerSecond": 2515233
           }
         },
         {
@@ -11647,8 +11647,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 99.4213,
-            "samplesPerSecond": 2011641
+            "elapsedMs": 75.9808,
+            "samplesPerSecond": 2632244
           }
         },
         {
@@ -11876,8 +11876,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 76.224,
-            "samplesPerSecond": 2623846
+            "elapsedMs": 78.1263,
+            "samplesPerSecond": 2559957
           }
         },
         {
@@ -12111,8 +12111,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 81.578,
-            "samplesPerSecond": 2451641
+            "elapsedMs": 72.1357,
+            "samplesPerSecond": 2772552
           }
         },
         {
@@ -12340,8 +12340,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 104.3003,
-            "samplesPerSecond": 1917540
+            "elapsedMs": 70.1168,
+            "samplesPerSecond": 2852383
           }
         },
         {
@@ -12563,8 +12563,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 89.1213,
-            "samplesPerSecond": 2244132
+            "elapsedMs": 73.7255,
+            "samplesPerSecond": 2712766
           }
         },
         {
@@ -12786,8 +12786,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 110.8722,
-            "samplesPerSecond": 1803879
+            "elapsedMs": 69.598,
+            "samplesPerSecond": 2873646
           }
         }
       ],
@@ -13013,8 +13013,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 99.8557,
-            "samplesPerSecond": 2002890
+            "elapsedMs": 70.9594,
+            "samplesPerSecond": 2818513
           }
         },
         {
@@ -13232,8 +13232,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 76.8442,
-            "samplesPerSecond": 2602669
+            "elapsedMs": 73.5534,
+            "samplesPerSecond": 2719113
           }
         },
         {
@@ -13457,8 +13457,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 103.8633,
-            "samplesPerSecond": 1925608
+            "elapsedMs": 71.1684,
+            "samplesPerSecond": 2810236
           }
         },
         {
@@ -13682,31 +13682,31 @@
             }
           ],
           "timing": {
-            "elapsedMs": 85.3936,
-            "samplesPerSecond": 2342096
+            "elapsedMs": 67.1894,
+            "samplesPerSecond": 2976660
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 1.3545,
-          "meanMs": 0.00542
+          "elapsedMs": 1.3201,
+          "meanMs": 0.00528
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 25.71,
-          "perSecond": 3889537
+          "elapsedMs": 23.7038,
+          "perSecond": 4218733
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 162.9043,
-          "perSecond": 61386
+          "elapsedMs": 134.2738,
+          "perSecond": 74475
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 0.3939,
-          "cachedMs": 0.0112,
+          "firstMs": 0.265,
+          "cachedMs": 0.0063,
           "cacheIdentityPreserved": true
         },
         "checksum": 8524537
@@ -13900,8 +13900,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 253.4197,
-          "samplesPerSecond": 789205
+          "elapsedMs": 204.9146,
+          "samplesPerSecond": 976016
         }
       },
       "ratingGaps": [
@@ -14094,8 +14094,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 202.4385,
-            "samplesPerSecond": 987954
+            "elapsedMs": 188.6705,
+            "samplesPerSecond": 1060049
           }
         },
         {
@@ -14293,8 +14293,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 240.7221,
-            "samplesPerSecond": 830834
+            "elapsedMs": 189.3562,
+            "samplesPerSecond": 1056210
           }
         },
         {
@@ -14486,8 +14486,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 250.5341,
-            "samplesPerSecond": 798295
+            "elapsedMs": 166.8276,
+            "samplesPerSecond": 1198842
           }
         },
         {
@@ -14679,8 +14679,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 245.0657,
-            "samplesPerSecond": 816108
+            "elapsedMs": 163.3102,
+            "samplesPerSecond": 1224663
           }
         },
         {
@@ -14872,8 +14872,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 184.4658,
-            "samplesPerSecond": 1084212
+            "elapsedMs": 151.1961,
+            "samplesPerSecond": 1322785
           }
         },
         {
@@ -15065,8 +15065,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 181.0104,
-            "samplesPerSecond": 1104909
+            "elapsedMs": 169.4139,
+            "samplesPerSecond": 1180541
           }
         },
         {
@@ -15264,8 +15264,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 200.9233,
-            "samplesPerSecond": 995405
+            "elapsedMs": 172.5457,
+            "samplesPerSecond": 1159113
           }
         },
         {
@@ -15457,8 +15457,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 195.5674,
-            "samplesPerSecond": 1022665
+            "elapsedMs": 176.5197,
+            "samplesPerSecond": 1133018
           }
         },
         {
@@ -15656,8 +15656,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 229.8849,
-            "samplesPerSecond": 870001
+            "elapsedMs": 162.2554,
+            "samplesPerSecond": 1232625
           }
         },
         {
@@ -15843,8 +15843,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 222.2777,
-            "samplesPerSecond": 899775
+            "elapsedMs": 147.5656,
+            "samplesPerSecond": 1355329
           }
         },
         {
@@ -16030,8 +16030,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 227.7253,
-            "samplesPerSecond": 878251
+            "elapsedMs": 176.1878,
+            "samplesPerSecond": 1135152
           }
         },
         {
@@ -16223,8 +16223,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 227.048,
-            "samplesPerSecond": 880871
+            "elapsedMs": 174.0429,
+            "samplesPerSecond": 1149142
           }
         },
         {
@@ -16422,8 +16422,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 249.7569,
-            "samplesPerSecond": 800779
+            "elapsedMs": 191.8286,
+            "samplesPerSecond": 1042597
           }
         },
         {
@@ -16621,8 +16621,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 200.4002,
-            "samplesPerSecond": 998003
+            "elapsedMs": 195.9816,
+            "samplesPerSecond": 1020504
           }
         },
         {
@@ -16814,8 +16814,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 169.9419,
-            "samplesPerSecond": 1176873
+            "elapsedMs": 206.1347,
+            "samplesPerSecond": 970239
           }
         }
       ],
@@ -17017,8 +17017,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 218.6034,
-            "samplesPerSecond": 914899
+            "elapsedMs": 252.6018,
+            "samplesPerSecond": 791760
           }
         },
         {
@@ -17218,8 +17218,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 212.0202,
-            "samplesPerSecond": 943306
+            "elapsedMs": 262.9849,
+            "samplesPerSecond": 760500
           }
         },
         {
@@ -17419,8 +17419,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 223.3846,
-            "samplesPerSecond": 895317
+            "elapsedMs": 176.5864,
+            "samplesPerSecond": 1132590
           }
         },
         {
@@ -17620,31 +17620,31 @@
             }
           ],
           "timing": {
-            "elapsedMs": 244.3162,
-            "samplesPerSecond": 818611
+            "elapsedMs": 209.4381,
+            "samplesPerSecond": 954936
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 23.0908,
-          "meanMs": 0.09236
+          "elapsedMs": 14.6456,
+          "meanMs": 0.05858
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 99.1093,
-          "perSecond": 1008987
+          "elapsedMs": 70.6757,
+          "perSecond": 1414913
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 840.415,
-          "perSecond": 11899
+          "elapsedMs": 764.5064,
+          "perSecond": 13080
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 1.3512,
-          "cachedMs": 0.1038,
+          "firstMs": 1.3693,
+          "cachedMs": 0.1087,
           "cacheIdentityPreserved": true
         },
         "checksum": 2231227
@@ -17796,8 +17796,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 86.537,
-          "samplesPerSecond": 2311150
+          "elapsedMs": 137.3312,
+          "samplesPerSecond": 1456333
         }
       },
       "ratingGaps": [
@@ -17948,8 +17948,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 121.8902,
-            "samplesPerSecond": 1640821
+            "elapsedMs": 114.2384,
+            "samplesPerSecond": 1750725
           }
         },
         {
@@ -18093,8 +18093,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 141.0856,
-            "samplesPerSecond": 1417579
+            "elapsedMs": 123.6769,
+            "samplesPerSecond": 1617117
           }
         },
         {
@@ -18244,8 +18244,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 137.1355,
-            "samplesPerSecond": 1458412
+            "elapsedMs": 149.6808,
+            "samplesPerSecond": 1336177
           }
         },
         {
@@ -18395,8 +18395,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 122.1709,
-            "samplesPerSecond": 1637051
+            "elapsedMs": 148.5036,
+            "samplesPerSecond": 1346769
           }
         },
         {
@@ -18540,8 +18540,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 102.8595,
-            "samplesPerSecond": 1944400
+            "elapsedMs": 91.7136,
+            "samplesPerSecond": 2180702
           }
         },
         {
@@ -18691,8 +18691,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 123.3213,
-            "samplesPerSecond": 1621780
+            "elapsedMs": 86.2385,
+            "samplesPerSecond": 2319150
           }
         },
         {
@@ -18842,8 +18842,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 112.5161,
-            "samplesPerSecond": 1777523
+            "elapsedMs": 94.8977,
+            "samplesPerSecond": 2107533
           }
         },
         {
@@ -18993,8 +18993,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 108.1197,
-            "samplesPerSecond": 1849802
+            "elapsedMs": 118.8046,
+            "samplesPerSecond": 1683436
           }
         },
         {
@@ -19144,8 +19144,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 89.6327,
-            "samplesPerSecond": 2231329
+            "elapsedMs": 138.6233,
+            "samplesPerSecond": 1442759
           }
         },
         {
@@ -19295,8 +19295,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 86.8036,
-            "samplesPerSecond": 2304052
+            "elapsedMs": 137.189,
+            "samplesPerSecond": 1457843
           }
         },
         {
@@ -19446,8 +19446,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 90.8278,
-            "samplesPerSecond": 2201969
+            "elapsedMs": 138.5082,
+            "samplesPerSecond": 1443958
           }
         },
         {
@@ -19603,8 +19603,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 89.3557,
-            "samplesPerSecond": 2238246
+            "elapsedMs": 119.1542,
+            "samplesPerSecond": 1678497
           }
         },
         {
@@ -19754,8 +19754,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 88.0083,
-            "samplesPerSecond": 2272513
+            "elapsedMs": 113.6797,
+            "samplesPerSecond": 1759329
           }
         },
         {
@@ -19905,8 +19905,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 89.0629,
-            "samplesPerSecond": 2245604
+            "elapsedMs": 110.6005,
+            "samplesPerSecond": 1808310
           }
         },
         {
@@ -20056,8 +20056,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 88.0159,
-            "samplesPerSecond": 2272317
+            "elapsedMs": 130.3715,
+            "samplesPerSecond": 1534078
           }
         }
       ],
@@ -20211,8 +20211,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 131.6746,
-            "samplesPerSecond": 1518896
+            "elapsedMs": 115.7641,
+            "samplesPerSecond": 1727651
           }
         },
         {
@@ -20370,8 +20370,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 103.5705,
-            "samplesPerSecond": 1931052
+            "elapsedMs": 97.7337,
+            "samplesPerSecond": 2046377
           }
         },
         {
@@ -20529,8 +20529,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 116.9318,
-            "samplesPerSecond": 1710399
+            "elapsedMs": 95.0463,
+            "samplesPerSecond": 2104238
           }
         },
         {
@@ -20688,31 +20688,31 @@
             }
           ],
           "timing": {
-            "elapsedMs": 101.5541,
-            "samplesPerSecond": 1969394
+            "elapsedMs": 87.8976,
+            "samplesPerSecond": 2275375
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 10.5434,
-          "meanMs": 0.04217
+          "elapsedMs": 7.3932,
+          "meanMs": 0.02957
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 47.8259,
-          "perSecond": 2090917
+          "elapsedMs": 36.6802,
+          "perSecond": 2726266
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 316.6275,
-          "perSecond": 31583
+          "elapsedMs": 240.4935,
+          "perSecond": 41581
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 0.5917,
-          "cachedMs": 0.0426,
+          "firstMs": 0.3866,
+          "cachedMs": 0.0255,
           "cacheIdentityPreserved": true
         },
         "checksum": 557546
@@ -20960,8 +20960,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 215.8261,
-          "samplesPerSecond": 926672
+          "elapsedMs": 132.3773,
+          "samplesPerSecond": 1510833
         }
       },
       "ratingGaps": [
@@ -21208,8 +21208,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 194.2575,
-            "samplesPerSecond": 1029561
+            "elapsedMs": 157.5896,
+            "samplesPerSecond": 1269119
           }
         },
         {
@@ -21455,8 +21455,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 203.737,
-            "samplesPerSecond": 981658
+            "elapsedMs": 146.2535,
+            "samplesPerSecond": 1367489
           }
         },
         {
@@ -21702,8 +21702,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 217.6136,
-            "samplesPerSecond": 919060
+            "elapsedMs": 141.2489,
+            "samplesPerSecond": 1415940
           }
         },
         {
@@ -21961,8 +21961,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 213.9391,
-            "samplesPerSecond": 934845
+            "elapsedMs": 164.0604,
+            "samplesPerSecond": 1219063
           }
         },
         {
@@ -22238,8 +22238,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 228.3561,
-            "samplesPerSecond": 875825
+            "elapsedMs": 155.8673,
+            "samplesPerSecond": 1283143
           }
         },
         {
@@ -22485,8 +22485,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 157.4175,
-            "samplesPerSecond": 1270507
+            "elapsedMs": 155.2068,
+            "samplesPerSecond": 1288603
           }
         },
         {
@@ -22738,8 +22738,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 181.5614,
-            "samplesPerSecond": 1101556
+            "elapsedMs": 152.0723,
+            "samplesPerSecond": 1315164
           }
         },
         {
@@ -22991,8 +22991,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 207.1574,
-            "samplesPerSecond": 965449
+            "elapsedMs": 143.6894,
+            "samplesPerSecond": 1391891
           }
         },
         {
@@ -23262,8 +23262,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 216.2126,
-            "samplesPerSecond": 925015
+            "elapsedMs": 163.1719,
+            "samplesPerSecond": 1225701
           }
         },
         {
@@ -23545,8 +23545,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 175.9233,
-            "samplesPerSecond": 1136859
+            "elapsedMs": 183.0475,
+            "samplesPerSecond": 1092613
           }
         },
         {
@@ -23798,8 +23798,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 207.1487,
-            "samplesPerSecond": 965490
+            "elapsedMs": 152.8727,
+            "samplesPerSecond": 1308278
           }
         },
         {
@@ -24069,8 +24069,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 185.8347,
-            "samplesPerSecond": 1076225
+            "elapsedMs": 147.7718,
+            "samplesPerSecond": 1353438
           }
         },
         {
@@ -24388,8 +24388,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 224.4344,
-            "samplesPerSecond": 891129
+            "elapsedMs": 154.5201,
+            "samplesPerSecond": 1294330
           }
         },
         {
@@ -24749,8 +24749,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 201.8852,
-            "samplesPerSecond": 990662
+            "elapsedMs": 168.7741,
+            "samplesPerSecond": 1185016
           }
         },
         {
@@ -25182,8 +25182,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 238.6332,
-            "samplesPerSecond": 838106
+            "elapsedMs": 182.4472,
+            "samplesPerSecond": 1096208
           }
         }
       ],
@@ -25439,8 +25439,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 192.1486,
-            "samplesPerSecond": 1040861
+            "elapsedMs": 136.9392,
+            "samplesPerSecond": 1460502
           }
         },
         {
@@ -25694,8 +25694,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 166.0186,
-            "samplesPerSecond": 1204684
+            "elapsedMs": 146.3081,
+            "samplesPerSecond": 1366978
           }
         },
         {
@@ -25937,8 +25937,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 190.013,
-            "samplesPerSecond": 1052560
+            "elapsedMs": 126.4766,
+            "samplesPerSecond": 1581320
           }
         },
         {
@@ -26210,31 +26210,31 @@
             }
           ],
           "timing": {
-            "elapsedMs": 215.4041,
-            "samplesPerSecond": 928487
+            "elapsedMs": 156.6011,
+            "samplesPerSecond": 1277130
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 29.0239,
-          "meanMs": 0.1161
+          "elapsedMs": 29.501,
+          "meanMs": 0.118
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 57.0114,
-          "perSecond": 1754035
+          "elapsedMs": 55.4281,
+          "perSecond": 1804139
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 1034.3675,
-          "perSecond": 9668
+          "elapsedMs": 682.1633,
+          "perSecond": 14659
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 2.6403,
-          "cachedMs": 0.132,
+          "firstMs": 1.7928,
+          "cachedMs": 0.0786,
           "cacheIdentityPreserved": true
         },
         "checksum": 392036
@@ -26344,8 +26344,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 63.4986,
-          "samplesPerSecond": 3149676
+          "elapsedMs": 49.0102,
+          "samplesPerSecond": 4080783
         }
       },
       "ratingGaps": [
@@ -26454,8 +26454,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 63.2198,
-            "samplesPerSecond": 3163566
+            "elapsedMs": 43.6042,
+            "samplesPerSecond": 4586714
           }
         },
         {
@@ -26563,8 +26563,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 47.0608,
-            "samplesPerSecond": 4249822
+            "elapsedMs": 47.9031,
+            "samplesPerSecond": 4175095
           }
         },
         {
@@ -26672,8 +26672,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 75.6571,
-            "samplesPerSecond": 2643506
+            "elapsedMs": 47.781,
+            "samplesPerSecond": 4185764
           }
         },
         {
@@ -26781,8 +26781,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 74.5892,
-            "samplesPerSecond": 2681353
+            "elapsedMs": 44.8274,
+            "samplesPerSecond": 4461557
           }
         },
         {
@@ -26875,8 +26875,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 55.0927,
-            "samplesPerSecond": 3630245
+            "elapsedMs": 47.5463,
+            "samplesPerSecond": 4206426
           }
         },
         {
@@ -26984,8 +26984,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 74.4117,
-            "samplesPerSecond": 2687749
+            "elapsedMs": 47.264,
+            "samplesPerSecond": 4231550
           }
         },
         {
@@ -27093,8 +27093,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 67.4988,
-            "samplesPerSecond": 2963016
+            "elapsedMs": 46.0161,
+            "samplesPerSecond": 4346305
           }
         },
         {
@@ -27202,8 +27202,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 67.4548,
-            "samplesPerSecond": 2964948
+            "elapsedMs": 61.3255,
+            "samplesPerSecond": 3261286
           }
         },
         {
@@ -27311,8 +27311,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 38.3378,
-            "samplesPerSecond": 5216783
+            "elapsedMs": 56.8149,
+            "samplesPerSecond": 3520203
           }
         },
         {
@@ -27405,8 +27405,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 38.5549,
-            "samplesPerSecond": 5187408
+            "elapsedMs": 43.8257,
+            "samplesPerSecond": 4563532
           }
         },
         {
@@ -27514,8 +27514,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 72.1674,
-            "samplesPerSecond": 2771334
+            "elapsedMs": 55.278,
+            "samplesPerSecond": 3618076
           }
         },
         {
@@ -27623,8 +27623,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 64.3131,
-            "samplesPerSecond": 3109786
+            "elapsedMs": 59.704,
+            "samplesPerSecond": 3349859
           }
         },
         {
@@ -27732,8 +27732,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 41.6323,
-            "samplesPerSecond": 4803962
+            "elapsedMs": 47.9686,
+            "samplesPerSecond": 4169394
           }
         },
         {
@@ -27841,8 +27841,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 38.5771,
-            "samplesPerSecond": 5184423
+            "elapsedMs": 49.7068,
+            "samplesPerSecond": 4023594
           }
         },
         {
@@ -27940,8 +27940,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 61.8983,
-            "samplesPerSecond": 3231107
+            "elapsedMs": 36.3426,
+            "samplesPerSecond": 5503184
           }
         }
       ],
@@ -28059,8 +28059,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 78.1951,
-            "samplesPerSecond": 2557705
+            "elapsedMs": 52.8223,
+            "samplesPerSecond": 3786280
           }
         },
         {
@@ -28176,8 +28176,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 72.6376,
-            "samplesPerSecond": 2753395
+            "elapsedMs": 49.8332,
+            "samplesPerSecond": 4013389
           }
         },
         {
@@ -28293,8 +28293,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 59.726,
-            "samplesPerSecond": 3348625
+            "elapsedMs": 49.569,
+            "samplesPerSecond": 4034780
           }
         },
         {
@@ -28410,34 +28410,2234 @@
             }
           ],
           "timing": {
-            "elapsedMs": 58.8732,
-            "samplesPerSecond": 3397131
+            "elapsedMs": 52.4751,
+            "samplesPerSecond": 3811331
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 1.5089,
-          "meanMs": 0.00604
+          "elapsedMs": 1.5476,
+          "meanMs": 0.00619
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 14.8178,
-          "perSecond": 6748640
+          "elapsedMs": 14.6202,
+          "perSecond": 6839852
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 6814.7147,
-          "perSecond": 1467
+          "elapsedMs": 5215.3103,
+          "perSecond": 1917
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 0.8244,
-          "cachedMs": 0.0165,
+          "firstMs": 0.6881,
+          "cachedMs": 0.021,
           "cacheIdentityPreserved": true
         },
         "checksum": 304390
+      }
+    },
+    "womens-tennis": {
+      "equalTeams": {
+        "samples": 200000,
+        "seed": 1685235865,
+        "drama": 6,
+        "attackerWinRate": 0.50019,
+        "defenderWinRate": 0.49982,
+        "winRateMargin95": 0.00219,
+        "regulationTieRate": 0,
+        "attackerWinRateAfterTie": null,
+        "zeroZeroRate": 0,
+        "largeTotalRate": 0.36639,
+        "blowoutRate": 0.2591,
+        "regulationTotal": {
+          "mean": 4.10729,
+          "sd": 0.78357,
+          "p05": 3,
+          "median": 4,
+          "p95": 5,
+          "min": 3,
+          "max": 5
+        },
+        "regulationMargin": {
+          "mean": 0.00147,
+          "sd": 2.0485,
+          "p05": -3,
+          "median": 1,
+          "p95": 3,
+          "min": -3,
+          "max": 3
+        },
+        "attackerScore": {
+          "mean": 2.05437,
+          "sd": 1.09614,
+          "p05": 0,
+          "median": 3,
+          "p95": 3,
+          "min": 0,
+          "max": 3
+        },
+        "defenderScore": {
+          "mean": 2.05291,
+          "sd": 1.09711,
+          "p05": 0,
+          "median": 2,
+          "p95": 3,
+          "min": 0,
+          "max": 3
+        },
+        "finalTotalMean": 4.10729,
+        "regulationAbsoluteMarginMean": 1.89272,
+        "mostCommonRegulationScores": [
+          {
+            "score": "1-3",
+            "count": 37464,
+            "rate": 0.18732
+          },
+          {
+            "score": "3-1",
+            "count": 37437,
+            "rate": 0.18719
+          },
+          {
+            "score": "2-3",
+            "count": 36650,
+            "rate": 0.18325
+          },
+          {
+            "score": "3-2",
+            "count": 36628,
+            "rate": 0.18314
+          },
+          {
+            "score": "3-0",
+            "count": 25972,
+            "rate": 0.12986
+          },
+          {
+            "score": "0-3",
+            "count": 25849,
+            "rate": 0.12925
+          }
+        ],
+        "totalHistogram": [
+          {
+            "from": 3,
+            "to": 3,
+            "count": 51821,
+            "rate": 0.2591
+          },
+          {
+            "from": 4,
+            "to": 4,
+            "count": 74901,
+            "rate": 0.37451
+          },
+          {
+            "from": 5,
+            "to": 5,
+            "count": 73278,
+            "rate": 0.36639
+          }
+        ],
+        "timing": {
+          "elapsedMs": 43.5812,
+          "samplesPerSecond": 4589135
+        }
+      },
+      "ratingGaps": [
+        {
+          "preset": "predictable",
+          "ratingGap": 0,
+          "samples": 200000,
+          "seed": 936548654,
+          "drama": 0,
+          "attackerWinRate": 0.50053,
+          "defenderWinRate": 0.49948,
+          "winRateMargin95": 0.00219,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.37585,
+          "blowoutRate": 0.24925,
+          "regulationTotal": {
+            "mean": 4.1266,
+            "sd": 0.78043,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": -0.0021,
+            "sd": 2.02946,
+            "p05": -3,
+            "median": 1,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.06225,
+            "sd": 1.08906,
+            "p05": 0,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 2.06435,
+            "sd": 1.08528,
+            "p05": 0,
+            "median": 2,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 4.1266,
+          "regulationAbsoluteMarginMean": 1.8734,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-2",
+              "count": 37818,
+              "rate": 0.18909
+            },
+            {
+              "score": "3-1",
+              "count": 37549,
+              "rate": 0.18775
+            },
+            {
+              "score": "1-3",
+              "count": 37431,
+              "rate": 0.18716
+            },
+            {
+              "score": "2-3",
+              "count": 37352,
+              "rate": 0.18676
+            },
+            {
+              "score": "0-3",
+              "count": 25112,
+              "rate": 0.12556
+            },
+            {
+              "score": "3-0",
+              "count": 24738,
+              "rate": 0.12369
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 49850,
+              "rate": 0.24925
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 74980,
+              "rate": 0.3749
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 75170,
+              "rate": 0.37585
+            }
+          ],
+          "timing": {
+            "elapsedMs": 38.4005,
+            "samplesPerSecond": 5208266
+          }
+        },
+        {
+          "preset": "predictable",
+          "ratingGap": 5,
+          "samples": 200000,
+          "seed": 1020436749,
+          "drama": 0,
+          "attackerWinRate": 0.79984,
+          "defenderWinRate": 0.20016,
+          "winRateMargin95": 0.00175,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.2906,
+          "blowoutRate": 0.34233,
+          "regulationTotal": {
+            "mean": 3.94827,
+            "sd": 0.79388,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 1.37145,
+            "sd": 1.72018,
+            "p05": -2,
+            "median": 2,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.65986,
+            "sd": 0.75778,
+            "p05": 1,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 1.28841,
+            "sd": 1.10472,
+            "p05": 0,
+            "median": 1,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.94827,
+          "regulationAbsoluteMarginMean": 2.05174,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 61485,
+              "rate": 0.30743
+            },
+            {
+              "score": "3-1",
+              "count": 59380,
+              "rate": 0.2969
+            },
+            {
+              "score": "3-2",
+              "count": 39103,
+              "rate": 0.19552
+            },
+            {
+              "score": "2-3",
+              "count": 19016,
+              "rate": 0.09508
+            },
+            {
+              "score": "1-3",
+              "count": 14035,
+              "rate": 0.07018
+            },
+            {
+              "score": "0-3",
+              "count": 6981,
+              "rate": 0.03491
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 68466,
+              "rate": 0.34233
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 73415,
+              "rate": 0.36708
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 58119,
+              "rate": 0.2906
+            }
+          ],
+          "timing": {
+            "elapsedMs": 58.309,
+            "samplesPerSecond": 3430002
+          }
+        },
+        {
+          "preset": "predictable",
+          "ratingGap": 10,
+          "samples": 200000,
+          "seed": 1686759779,
+          "drama": 0,
+          "attackerWinRate": 0.94779,
+          "defenderWinRate": 0.05222,
+          "winRateMargin95": 0.00097,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.1436,
+          "blowoutRate": 0.53942,
+          "regulationTotal": {
+            "mean": 3.60418,
+            "sd": 0.72549,
+            "p05": 3,
+            "median": 3,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 2.22889,
+            "sd": 1.13947,
+            "p05": -1,
+            "median": 3,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.91653,
+            "sd": 0.3915,
+            "p05": 2,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.68765,
+            "sd": 0.87126,
+            "p05": 0,
+            "median": 0,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.60418,
+          "regulationAbsoluteMarginMean": 2.39583,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 106458,
+              "rate": 0.53229
+            },
+            {
+              "score": "3-1",
+              "count": 59998,
+              "rate": 0.29999
+            },
+            {
+              "score": "3-2",
+              "count": 23101,
+              "rate": 0.11551
+            },
+            {
+              "score": "2-3",
+              "count": 5618,
+              "rate": 0.02809
+            },
+            {
+              "score": "1-3",
+              "count": 3399,
+              "rate": 0.017
+            },
+            {
+              "score": "0-3",
+              "count": 1426,
+              "rate": 0.00713
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 107884,
+              "rate": 0.53942
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 63397,
+              "rate": 0.31699
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 28719,
+              "rate": 0.1436
+            }
+          ],
+          "timing": {
+            "elapsedMs": 40.9355,
+            "samplesPerSecond": 4885735
+          }
+        },
+        {
+          "preset": "predictable",
+          "ratingGap": 20,
+          "samples": 200000,
+          "seed": 4068637224,
+          "drama": 0,
+          "attackerWinRate": 0.99871,
+          "defenderWinRate": 0.00129,
+          "winRateMargin95": 0.00016,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.01565,
+          "blowoutRate": 0.84843,
+          "regulationTotal": {
+            "mean": 3.16723,
+            "sd": 0.41301,
+            "p05": 3,
+            "median": 3,
+            "p95": 4,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 2.82879,
+            "sd": 0.43944,
+            "p05": 2,
+            "median": 3,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.99801,
+            "sd": 0.06104,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.16922,
+            "sd": 0.42204,
+            "p05": 0,
+            "median": 0,
+            "p95": 1,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.16723,
+          "regulationAbsoluteMarginMean": 2.83277,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 169651,
+              "rate": 0.84826
+            },
+            {
+              "score": "3-1",
+              "count": 27112,
+              "rate": 0.13556
+            },
+            {
+              "score": "3-2",
+              "count": 2979,
+              "rate": 0.0149
+            },
+            {
+              "score": "2-3",
+              "count": 152,
+              "rate": 0.00076
+            },
+            {
+              "score": "1-3",
+              "count": 72,
+              "rate": 0.00036
+            },
+            {
+              "score": "0-3",
+              "count": 34,
+              "rate": 0.00017
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 169685,
+              "rate": 0.84843
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 27184,
+              "rate": 0.13592
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 3131,
+              "rate": 0.01565
+            }
+          ],
+          "timing": {
+            "elapsedMs": 34.2853,
+            "samplesPerSecond": 5833404
+          }
+        },
+        {
+          "preset": "predictable",
+          "ratingGap": 40,
+          "samples": 200000,
+          "seed": 1989198206,
+          "drama": 0,
+          "attackerWinRate": 1,
+          "defenderWinRate": 0,
+          "winRateMargin95": 0,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.00003,
+          "blowoutRate": 0.99067,
+          "regulationTotal": {
+            "mean": 3.00936,
+            "sd": 0.0966,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 2.99064,
+            "sd": 0.0966,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 1,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 3,
+            "sd": 0,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 3,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.00936,
+            "sd": 0.0966,
+            "p05": 0,
+            "median": 0,
+            "p95": 0,
+            "min": 0,
+            "max": 2
+          },
+          "finalTotalMean": 3.00936,
+          "regulationAbsoluteMarginMean": 2.99064,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 198134,
+              "rate": 0.99067
+            },
+            {
+              "score": "3-1",
+              "count": 1860,
+              "rate": 0.0093
+            },
+            {
+              "score": "3-2",
+              "count": 6,
+              "rate": 0.00003
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 198134,
+              "rate": 0.99067
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 1860,
+              "rate": 0.0093
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 6,
+              "rate": 0.00003
+            }
+          ],
+          "timing": {
+            "elapsedMs": 32.5245,
+            "samplesPerSecond": 6149211
+          }
+        },
+        {
+          "preset": "balanced",
+          "ratingGap": 0,
+          "samples": 200000,
+          "seed": 1214271181,
+          "drama": 6,
+          "attackerWinRate": 0.50096,
+          "defenderWinRate": 0.49904,
+          "winRateMargin95": 0.00219,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.36668,
+          "blowoutRate": 0.2579,
+          "regulationTotal": {
+            "mean": 4.10878,
+            "sd": 0.78278,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 0.00614,
+            "sd": 2.04681,
+            "p05": -3,
+            "median": 1,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.05746,
+            "sd": 1.09403,
+            "p05": 0,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 2.05132,
+            "sd": 1.09735,
+            "p05": 0,
+            "median": 2,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 4.10878,
+          "regulationAbsoluteMarginMean": 1.89122,
+          "mostCommonRegulationScores": [
+            {
+              "score": "1-3",
+              "count": 37550,
+              "rate": 0.18775
+            },
+            {
+              "score": "3-1",
+              "count": 37536,
+              "rate": 0.18768
+            },
+            {
+              "score": "2-3",
+              "count": 36683,
+              "rate": 0.18342
+            },
+            {
+              "score": "3-2",
+              "count": 36652,
+              "rate": 0.18326
+            },
+            {
+              "score": "3-0",
+              "count": 26004,
+              "rate": 0.13002
+            },
+            {
+              "score": "0-3",
+              "count": 25575,
+              "rate": 0.12787
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 51579,
+              "rate": 0.2579
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 75086,
+              "rate": 0.37543
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 73335,
+              "rate": 0.36668
+            }
+          ],
+          "timing": {
+            "elapsedMs": 46.1787,
+            "samplesPerSecond": 4331001
+          }
+        },
+        {
+          "preset": "balanced",
+          "ratingGap": 5,
+          "samples": 200000,
+          "seed": 1130383086,
+          "drama": 6,
+          "attackerWinRate": 0.79024,
+          "defenderWinRate": 0.20976,
+          "winRateMargin95": 0.00178,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.28941,
+          "blowoutRate": 0.34208,
+          "regulationTotal": {
+            "mean": 3.94733,
+            "sd": 0.79291,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 1.33117,
+            "sd": 1.75218,
+            "p05": -2,
+            "median": 2,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.63925,
+            "sd": 0.77979,
+            "p05": 1,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 1.30808,
+            "sd": 1.11416,
+            "p05": 0,
+            "median": 1,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.94733,
+          "regulationAbsoluteMarginMean": 2.05267,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 60867,
+              "rate": 0.30434
+            },
+            {
+              "score": "3-1",
+              "count": 58602,
+              "rate": 0.29301
+            },
+            {
+              "score": "3-2",
+              "count": 38579,
+              "rate": 0.1929
+            },
+            {
+              "score": "2-3",
+              "count": 19302,
+              "rate": 0.09651
+            },
+            {
+              "score": "1-3",
+              "count": 15102,
+              "rate": 0.07551
+            },
+            {
+              "score": "0-3",
+              "count": 7548,
+              "rate": 0.03774
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 68415,
+              "rate": 0.34208
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 73704,
+              "rate": 0.36852
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 57881,
+              "rate": 0.28941
+            }
+          ],
+          "timing": {
+            "elapsedMs": 48.4351,
+            "samplesPerSecond": 4129237
+          }
+        },
+        {
+          "preset": "balanced",
+          "ratingGap": 10,
+          "samples": 200000,
+          "seed": 1721321150,
+          "drama": 6,
+          "attackerWinRate": 0.9436,
+          "defenderWinRate": 0.05641,
+          "winRateMargin95": 0.00101,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.14707,
+          "blowoutRate": 0.53414,
+          "regulationTotal": {
+            "mean": 3.61293,
+            "sd": 0.72896,
+            "p05": 3,
+            "median": 3,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 2.20472,
+            "sd": 1.16991,
+            "p05": -1,
+            "median": 3,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.90883,
+            "sd": 0.40997,
+            "p05": 2,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.7041,
+            "sd": 0.88429,
+            "p05": 0,
+            "median": 0,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.61293,
+          "regulationAbsoluteMarginMean": 2.38707,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 105261,
+              "rate": 0.52631
+            },
+            {
+              "score": "3-1",
+              "count": 59939,
+              "rate": 0.2997
+            },
+            {
+              "score": "3-2",
+              "count": 23519,
+              "rate": 0.1176
+            },
+            {
+              "score": "2-3",
+              "count": 5894,
+              "rate": 0.02947
+            },
+            {
+              "score": "1-3",
+              "count": 3820,
+              "rate": 0.0191
+            },
+            {
+              "score": "0-3",
+              "count": 1567,
+              "rate": 0.00784
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 106828,
+              "rate": 0.53414
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 63759,
+              "rate": 0.3188
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 29413,
+              "rate": 0.14707
+            }
+          ],
+          "timing": {
+            "elapsedMs": 39.0665,
+            "samplesPerSecond": 5119476
+          }
+        },
+        {
+          "preset": "balanced",
+          "ratingGap": 20,
+          "samples": 200000,
+          "seed": 1620508341,
+          "drama": 6,
+          "attackerWinRate": 0.99812,
+          "defenderWinRate": 0.00188,
+          "winRateMargin95": 0.00019,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.01698,
+          "blowoutRate": 0.84582,
+          "regulationTotal": {
+            "mean": 3.17116,
+            "sd": 0.41931,
+            "p05": 3,
+            "median": 3,
+            "p95": 4,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 2.82327,
+            "sd": 0.45531,
+            "p05": 2,
+            "median": 3,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.99722,
+            "sd": 0.06998,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.17395,
+            "sd": 0.43205,
+            "p05": 0,
+            "median": 0,
+            "p95": 1,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.17116,
+          "regulationAbsoluteMarginMean": 2.82884,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 169133,
+              "rate": 0.84567
+            },
+            {
+              "score": "3-1",
+              "count": 27321,
+              "rate": 0.13661
+            },
+            {
+              "score": "3-2",
+              "count": 3170,
+              "rate": 0.01585
+            },
+            {
+              "score": "2-3",
+              "count": 226,
+              "rate": 0.00113
+            },
+            {
+              "score": "1-3",
+              "count": 119,
+              "rate": 0.0006
+            },
+            {
+              "score": "0-3",
+              "count": 31,
+              "rate": 0.00016
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 169164,
+              "rate": 0.84582
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 27440,
+              "rate": 0.1372
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 3396,
+              "rate": 0.01698
+            }
+          ],
+          "timing": {
+            "elapsedMs": 47.4284,
+            "samplesPerSecond": 4216883
+          }
+        },
+        {
+          "preset": "balanced",
+          "ratingGap": 40,
+          "samples": 200000,
+          "seed": 1418882723,
+          "drama": 6,
+          "attackerWinRate": 1,
+          "defenderWinRate": 0,
+          "winRateMargin95": 0,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.00006,
+          "blowoutRate": 0.99006,
+          "regulationTotal": {
+            "mean": 3.01,
+            "sd": 0.10005,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 2.99,
+            "sd": 0.10005,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 1,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 3,
+            "sd": 0,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 3,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.01,
+            "sd": 0.10005,
+            "p05": 0,
+            "median": 0,
+            "p95": 0,
+            "min": 0,
+            "max": 2
+          },
+          "finalTotalMean": 3.01,
+          "regulationAbsoluteMarginMean": 2.99,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 198011,
+              "rate": 0.99006
+            },
+            {
+              "score": "3-1",
+              "count": 1978,
+              "rate": 0.00989
+            },
+            {
+              "score": "3-2",
+              "count": 11,
+              "rate": 0.00006
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 198011,
+              "rate": 0.99006
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 1978,
+              "rate": 0.00989
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 11,
+              "rate": 0.00006
+            }
+          ],
+          "timing": {
+            "elapsedMs": 45.7336,
+            "samplesPerSecond": 4373152
+          }
+        },
+        {
+          "preset": "wild",
+          "ratingGap": 0,
+          "samples": 200000,
+          "seed": 1335640101,
+          "drama": 12,
+          "attackerWinRate": 0.4991,
+          "defenderWinRate": 0.5009,
+          "winRateMargin95": 0.00219,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.28613,
+          "blowoutRate": 0.35614,
+          "regulationTotal": {
+            "mean": 3.92999,
+            "sd": 0.79835,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": -0.00054,
+            "sd": 2.21863,
+            "p05": -3,
+            "median": -1,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 1.96472,
+            "sd": 1.178,
+            "p05": 0,
+            "median": 2,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 1.96527,
+            "sd": 1.1799,
+            "p05": 0,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.92999,
+          "regulationAbsoluteMarginMean": 2.07002,
+          "mostCommonRegulationScores": [
+            {
+              "score": "1-3",
+              "count": 35788,
+              "rate": 0.17894
+            },
+            {
+              "score": "3-1",
+              "count": 35759,
+              "rate": 0.1788
+            },
+            {
+              "score": "3-0",
+              "count": 35684,
+              "rate": 0.17842
+            },
+            {
+              "score": "0-3",
+              "count": 35544,
+              "rate": 0.17772
+            },
+            {
+              "score": "2-3",
+              "count": 28848,
+              "rate": 0.14424
+            },
+            {
+              "score": "3-2",
+              "count": 28377,
+              "rate": 0.14189
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 71228,
+              "rate": 0.35614
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 71547,
+              "rate": 0.35774
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 57225,
+              "rate": 0.28613
+            }
+          ],
+          "timing": {
+            "elapsedMs": 45.486,
+            "samplesPerSecond": 4396957
+          }
+        },
+        {
+          "preset": "wild",
+          "ratingGap": 5,
+          "samples": 200000,
+          "seed": 1251752006,
+          "drama": 12,
+          "attackerWinRate": 0.72176,
+          "defenderWinRate": 0.27824,
+          "winRateMargin95": 0.00196,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.25121,
+          "blowoutRate": 0.40892,
+          "regulationTotal": {
+            "mean": 3.84229,
+            "sd": 0.79702,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 1.09123,
+            "sd": 2.02489,
+            "p05": -3,
+            "median": 2,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.46676,
+            "sd": 0.95574,
+            "p05": 0,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 1.37553,
+            "sd": 1.20593,
+            "p05": 0,
+            "median": 1,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.84229,
+          "regulationAbsoluteMarginMean": 2.15771,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 66328,
+              "rate": 0.33164
+            },
+            {
+              "score": "3-1",
+              "count": 47886,
+              "rate": 0.23943
+            },
+            {
+              "score": "3-2",
+              "count": 30138,
+              "rate": 0.15069
+            },
+            {
+              "score": "2-3",
+              "count": 20103,
+              "rate": 0.10052
+            },
+            {
+              "score": "1-3",
+              "count": 20090,
+              "rate": 0.10045
+            },
+            {
+              "score": "0-3",
+              "count": 15455,
+              "rate": 0.07728
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 81783,
+              "rate": 0.40892
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 67976,
+              "rate": 0.33988
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 50241,
+              "rate": 0.25121
+            }
+          ],
+          "timing": {
+            "elapsedMs": 40.8186,
+            "samplesPerSecond": 4899727
+          }
+        },
+        {
+          "preset": "wild",
+          "ratingGap": 10,
+          "samples": 200000,
+          "seed": 1643550982,
+          "drama": 12,
+          "attackerWinRate": 0.87854,
+          "defenderWinRate": 0.12147,
+          "winRateMargin95": 0.00143,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.16569,
+          "blowoutRate": 0.53816,
+          "regulationTotal": {
+            "mean": 3.62753,
+            "sd": 0.75174,
+            "p05": 3,
+            "median": 3,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 1.93665,
+            "sd": 1.56306,
+            "p05": -2,
+            "median": 3,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.78209,
+            "sd": 0.64561,
+            "p05": 1,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.84544,
+            "sd": 1.04275,
+            "p05": 0,
+            "median": 0,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.62753,
+          "regulationAbsoluteMarginMean": 2.37248,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 102284,
+              "rate": 0.51142
+            },
+            {
+              "score": "3-1",
+              "count": 50637,
+              "rate": 0.25319
+            },
+            {
+              "score": "3-2",
+              "count": 22786,
+              "rate": 0.11393
+            },
+            {
+              "score": "2-3",
+              "count": 10351,
+              "rate": 0.05176
+            },
+            {
+              "score": "1-3",
+              "count": 8594,
+              "rate": 0.04297
+            },
+            {
+              "score": "0-3",
+              "count": 5348,
+              "rate": 0.02674
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 107632,
+              "rate": 0.53816
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 59231,
+              "rate": 0.29616
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 33137,
+              "rate": 0.16569
+            }
+          ],
+          "timing": {
+            "elapsedMs": 37.6981,
+            "samplesPerSecond": 5305307
+          }
+        },
+        {
+          "preset": "wild",
+          "ratingGap": 20,
+          "samples": 200000,
+          "seed": 4227054045,
+          "drama": 12,
+          "attackerWinRate": 0.98937,
+          "defenderWinRate": 0.01063,
+          "winRateMargin95": 0.00045,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.03514,
+          "blowoutRate": 0.81301,
+          "regulationTotal": {
+            "mean": 3.22213,
+            "sd": 0.49302,
+            "p05": 3,
+            "median": 3,
+            "p95": 4,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 2.74338,
+            "sd": 0.6584,
+            "p05": 2,
+            "median": 3,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.98276,
+            "sd": 0.18245,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.23938,
+            "sd": 0.55226,
+            "p05": 0,
+            "median": 0,
+            "p95": 1,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.22213,
+          "regulationAbsoluteMarginMean": 2.77787,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 162290,
+              "rate": 0.81145
+            },
+            {
+              "score": "3-1",
+              "count": 29672,
+              "rate": 0.14836
+            },
+            {
+              "score": "3-2",
+              "count": 5911,
+              "rate": 0.02956
+            },
+            {
+              "score": "2-3",
+              "count": 1117,
+              "rate": 0.00559
+            },
+            {
+              "score": "1-3",
+              "count": 698,
+              "rate": 0.00349
+            },
+            {
+              "score": "0-3",
+              "count": 312,
+              "rate": 0.00156
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 162602,
+              "rate": 0.81301
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 30370,
+              "rate": 0.15185
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 7028,
+              "rate": 0.03514
+            }
+          ],
+          "timing": {
+            "elapsedMs": 35.5083,
+            "samplesPerSecond": 5632486
+          }
+        },
+        {
+          "preset": "wild",
+          "ratingGap": 40,
+          "samples": 200000,
+          "seed": 4025428427,
+          "drama": 12,
+          "attackerWinRate": 0.99999,
+          "defenderWinRate": 0.00001,
+          "winRateMargin95": 0.00001,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.00023,
+          "blowoutRate": 0.98643,
+          "regulationTotal": {
+            "mean": 3.0138,
+            "sd": 0.11857,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 2.98616,
+            "sd": 0.11958,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": -2,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.99998,
+            "sd": 0.00632,
+            "p05": 3,
+            "median": 3,
+            "p95": 3,
+            "min": 1,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 0.01382,
+            "sd": 0.11891,
+            "p05": 0,
+            "median": 0,
+            "p95": 0,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 3.0138,
+          "regulationAbsoluteMarginMean": 2.9862,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-0",
+              "count": 197285,
+              "rate": 0.98643
+            },
+            {
+              "score": "3-1",
+              "count": 2668,
+              "rate": 0.01334
+            },
+            {
+              "score": "3-2",
+              "count": 45,
+              "rate": 0.00023
+            },
+            {
+              "score": "1-3",
+              "count": 2,
+              "rate": 0.00001
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 197285,
+              "rate": 0.98643
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 2670,
+              "rate": 0.01335
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 45,
+              "rate": 0.00023
+            }
+          ],
+          "timing": {
+            "elapsedMs": 32.879,
+            "samplesPerSecond": 6082910
+          }
+        }
+      ],
+      "realTeamPairings": [
+        {
+          "attacker": {
+            "id": "840",
+            "name": "United States",
+            "rating": 87.1
+          },
+          "defender": {
+            "id": "643",
+            "name": "Russia",
+            "rating": 84
+          },
+          "samples": 200000,
+          "seed": 1684486748,
+          "drama": 6,
+          "attackerWinRate": 0.69169,
+          "defenderWinRate": 0.30832,
+          "winRateMargin95": 0.00202,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.34032,
+          "blowoutRate": 0.28305,
+          "regulationTotal": {
+            "mean": 4.05727,
+            "sd": 0.78746,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 0.82603,
+            "sd": 1.92665,
+            "p05": -3,
+            "median": 1,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.44164,
+            "sd": 0.93768,
+            "p05": 0,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 1.61562,
+            "sd": 1.13437,
+            "p05": 0,
+            "median": 2,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 4.05727,
+          "regulationAbsoluteMarginMean": 1.94274,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-1",
+              "count": 51833,
+              "rate": 0.25916
+            },
+            {
+              "score": "3-0",
+              "count": 43353,
+              "rate": 0.21677
+            },
+            {
+              "score": "3-2",
+              "count": 43151,
+              "rate": 0.21576
+            },
+            {
+              "score": "2-3",
+              "count": 24912,
+              "rate": 0.12456
+            },
+            {
+              "score": "1-3",
+              "count": 23494,
+              "rate": 0.11747
+            },
+            {
+              "score": "0-3",
+              "count": 13257,
+              "rate": 0.06629
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 56610,
+              "rate": 0.28305
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 75327,
+              "rate": 0.37664
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 68063,
+              "rate": 0.34032
+            }
+          ],
+          "timing": {
+            "elapsedMs": 47.0451,
+            "samplesPerSecond": 4251240
+          }
+        },
+        {
+          "attacker": {
+            "id": "203",
+            "name": "Czechia",
+            "rating": 83.5
+          },
+          "defender": {
+            "id": "804",
+            "name": "Ukraine",
+            "rating": 82.9
+          },
+          "samples": 200000,
+          "seed": 4045186896,
+          "drama": 6,
+          "attackerWinRate": 0.53745,
+          "defenderWinRate": 0.46255,
+          "winRateMargin95": 0.00219,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.36981,
+          "blowoutRate": 0.24993,
+          "regulationTotal": {
+            "mean": 4.11989,
+            "sd": 0.77805,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 0.26815,
+            "sd": 2.017,
+            "p05": -3,
+            "median": 1,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.19401,
+            "sd": 1.01314,
+            "p05": 0,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 1.92587,
+            "sd": 1.14472,
+            "p05": 0,
+            "median": 2,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 4.11989,
+          "regulationAbsoluteMarginMean": 1.88012,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-1",
+              "count": 44006,
+              "rate": 0.22003
+            },
+            {
+              "score": "2-3",
+              "count": 42143,
+              "rate": 0.21072
+            },
+            {
+              "score": "1-3",
+              "count": 32047,
+              "rate": 0.16023
+            },
+            {
+              "score": "3-2",
+              "count": 31819,
+              "rate": 0.15909
+            },
+            {
+              "score": "3-0",
+              "count": 31665,
+              "rate": 0.15833
+            },
+            {
+              "score": "0-3",
+              "count": 18320,
+              "rate": 0.0916
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 49985,
+              "rate": 0.24993
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 76053,
+              "rate": 0.38027
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 73962,
+              "rate": 0.36981
+            }
+          ],
+          "timing": {
+            "elapsedMs": 46.5131,
+            "samplesPerSecond": 4299864
+          }
+        },
+        {
+          "attacker": {
+            "id": "616",
+            "name": "Poland",
+            "rating": 81.6
+          },
+          "defender": {
+            "id": "112",
+            "name": "Belarus",
+            "rating": 79.5
+          },
+          "samples": 200000,
+          "seed": 3300735462,
+          "drama": 6,
+          "attackerWinRate": 0.63717,
+          "defenderWinRate": 0.36283,
+          "winRateMargin95": 0.00211,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.44344,
+          "blowoutRate": 0.14282,
+          "regulationTotal": {
+            "mean": 4.30061,
+            "sd": 0.70419,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 0.50575,
+            "sd": 1.76862,
+            "p05": -2,
+            "median": 1,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.40318,
+            "sd": 0.88033,
+            "p05": 1,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 1.89744,
+            "sd": 1.01832,
+            "p05": 0,
+            "median": 2,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 4.30061,
+          "regulationAbsoluteMarginMean": 1.69939,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-2",
+              "count": 56282,
+              "rate": 0.28141
+            },
+            {
+              "score": "3-1",
+              "count": 49225,
+              "rate": 0.24613
+            },
+            {
+              "score": "1-3",
+              "count": 33524,
+              "rate": 0.16762
+            },
+            {
+              "score": "2-3",
+              "count": 32405,
+              "rate": 0.16203
+            },
+            {
+              "score": "3-0",
+              "count": 21927,
+              "rate": 0.10964
+            },
+            {
+              "score": "0-3",
+              "count": 6637,
+              "rate": 0.03319
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 28564,
+              "rate": 0.14282
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 82749,
+              "rate": 0.41375
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 88687,
+              "rate": 0.44344
+            }
+          ],
+          "timing": {
+            "elapsedMs": 47.6569,
+            "samplesPerSecond": 4196664
+          }
+        },
+        {
+          "attacker": {
+            "id": "826",
+            "name": "Great Britain",
+            "rating": 78.1
+          },
+          "defender": {
+            "id": "036",
+            "name": "Australia",
+            "rating": 74.2
+          },
+          "samples": 200000,
+          "seed": 3488838118,
+          "drama": 6,
+          "attackerWinRate": 0.73438,
+          "defenderWinRate": 0.26562,
+          "winRateMargin95": 0.00194,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.31883,
+          "blowoutRate": 0.28894,
+          "regulationTotal": {
+            "mean": 4.02989,
+            "sd": 0.77902,
+            "p05": 3,
+            "median": 4,
+            "p95": 5,
+            "min": 3,
+            "max": 5
+          },
+          "regulationMargin": {
+            "mean": 1.0525,
+            "sd": 1.83861,
+            "p05": -3,
+            "median": 2,
+            "p95": 3,
+            "min": -3,
+            "max": 3
+          },
+          "attackerScore": {
+            "mean": 2.54119,
+            "sd": 0.86244,
+            "p05": 0,
+            "median": 3,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "defenderScore": {
+            "mean": 1.4887,
+            "sd": 1.11798,
+            "p05": 0,
+            "median": 1,
+            "p95": 3,
+            "min": 0,
+            "max": 3
+          },
+          "finalTotalMean": 4.02989,
+          "regulationAbsoluteMarginMean": 1.97012,
+          "mostCommonRegulationScores": [
+            {
+              "score": "3-1",
+              "count": 61633,
+              "rate": 0.30817
+            },
+            {
+              "score": "3-0",
+              "count": 46876,
+              "rate": 0.23438
+            },
+            {
+              "score": "3-2",
+              "count": 38367,
+              "rate": 0.19184
+            },
+            {
+              "score": "2-3",
+              "count": 25398,
+              "rate": 0.12699
+            },
+            {
+              "score": "1-3",
+              "count": 16814,
+              "rate": 0.08407
+            },
+            {
+              "score": "0-3",
+              "count": 10912,
+              "rate": 0.05456
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 3,
+              "to": 3,
+              "count": 57788,
+              "rate": 0.28894
+            },
+            {
+              "from": 4,
+              "to": 4,
+              "count": 78447,
+              "rate": 0.39224
+            },
+            {
+              "from": 5,
+              "to": 5,
+              "count": 63765,
+              "rate": 0.31883
+            }
+          ],
+          "timing": {
+            "elapsedMs": 43.8791,
+            "samplesPerSecond": 4557979
+          }
+        }
+      ],
+      "benchmark": {
+        "prepare": {
+          "samples": 250,
+          "elapsedMs": 0.6351,
+          "meanMs": 0.00254
+        },
+        "scores": {
+          "samples": 100000,
+          "elapsedMs": 16.0859,
+          "perSecond": 6216624
+        },
+        "completeMatches": {
+          "samples": 10000,
+          "elapsedMs": 5741.3482,
+          "perSecond": 1742
+        },
+        "odds": {
+          "samples": 1024,
+          "firstMs": 0.3814,
+          "cachedMs": 0.0107,
+          "cacheIdentityPreserved": true
+        },
+        "checksum": 304369
       }
     },
     "rugby-league": {
@@ -28754,8 +30954,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 407.6559,
-          "samplesPerSecond": 490610
+          "elapsedMs": 433.75,
+          "samplesPerSecond": 461095
         }
       },
       "ratingGaps": [
@@ -29074,8 +31274,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 456.8526,
-            "samplesPerSecond": 437778
+            "elapsedMs": 433.6322,
+            "samplesPerSecond": 461220
           }
         },
         {
@@ -29405,8 +31605,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 457.8464,
-            "samplesPerSecond": 436828
+            "elapsedMs": 492.3973,
+            "samplesPerSecond": 406176
           }
         },
         {
@@ -29778,8 +31978,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 410.4931,
-            "samplesPerSecond": 487219
+            "elapsedMs": 403.023,
+            "samplesPerSecond": 496250
           }
         },
         {
@@ -30175,8 +32375,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 378.3416,
-            "samplesPerSecond": 528623
+            "elapsedMs": 475.4318,
+            "samplesPerSecond": 420670
           }
         },
         {
@@ -30584,8 +32784,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 441.9739,
-            "samplesPerSecond": 452515
+            "elapsedMs": 474.6036,
+            "samplesPerSecond": 421404
           }
         },
         {
@@ -30897,8 +33097,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 475.6948,
-            "samplesPerSecond": 420438
+            "elapsedMs": 466.2646,
+            "samplesPerSecond": 428941
           }
         },
         {
@@ -31246,8 +33446,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 381.5373,
-            "samplesPerSecond": 524195
+            "elapsedMs": 370.0596,
+            "samplesPerSecond": 540453
           }
         },
         {
@@ -31643,8 +33843,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 389.3643,
-            "samplesPerSecond": 513658
+            "elapsedMs": 444.7692,
+            "samplesPerSecond": 449671
           }
         },
         {
@@ -32106,8 +34306,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 361.2281,
-            "samplesPerSecond": 553667
+            "elapsedMs": 416.7638,
+            "samplesPerSecond": 479888
           }
         },
         {
@@ -32587,8 +34787,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 458.5734,
-            "samplesPerSecond": 436135
+            "elapsedMs": 448.8149,
+            "samplesPerSecond": 445618
           }
         },
         {
@@ -33440,8 +35640,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 376.5286,
-            "samplesPerSecond": 531168
+            "elapsedMs": 357.6922,
+            "samplesPerSecond": 559140
           }
         },
         {
@@ -34689,8 +36889,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 416.3619,
-            "samplesPerSecond": 480351
+            "elapsedMs": 399.0915,
+            "samplesPerSecond": 501138
           }
         },
         {
@@ -36328,8 +38528,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 435.4563,
-            "samplesPerSecond": 459288
+            "elapsedMs": 450.1023,
+            "samplesPerSecond": 444343
           }
         },
         {
@@ -38393,8 +40593,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 467.6456,
-            "samplesPerSecond": 427674
+            "elapsedMs": 489.881,
+            "samplesPerSecond": 408262
           }
         },
         {
@@ -40518,8 +42718,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 449.3863,
-            "samplesPerSecond": 445051
+            "elapsedMs": 474.4145,
+            "samplesPerSecond": 421572
           }
         }
       ],
@@ -40871,8 +43071,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 349.5774,
-            "samplesPerSecond": 572119
+            "elapsedMs": 415.7214,
+            "samplesPerSecond": 481091
           }
         },
         {
@@ -41204,8 +43404,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 400.0795,
-            "samplesPerSecond": 499901
+            "elapsedMs": 397.6981,
+            "samplesPerSecond": 502894
           }
         },
         {
@@ -41621,8 +43821,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 481.7768,
-            "samplesPerSecond": 415130
+            "elapsedMs": 478.7054,
+            "samplesPerSecond": 417793
           }
         },
         {
@@ -42104,31 +44304,31 @@
             }
           ],
           "timing": {
-            "elapsedMs": 491.5139,
-            "samplesPerSecond": 406906
+            "elapsedMs": 408.2951,
+            "samplesPerSecond": 489842
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 52.7154,
-          "meanMs": 0.21086
+          "elapsedMs": 36.7235,
+          "meanMs": 0.14689
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 196.5959,
-          "perSecond": 508658
+          "elapsedMs": 136.8601,
+          "perSecond": 730673
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 1995.1851,
-          "perSecond": 5012
+          "elapsedMs": 1465.5272,
+          "perSecond": 6823
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 5.0008,
-          "cachedMs": 0.2212,
+          "firstMs": 3.7103,
+          "cachedMs": 0.1373,
           "cacheIdentityPreserved": true
         },
         "checksum": 2271636

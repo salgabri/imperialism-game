@@ -23,6 +23,7 @@ import { baseball } from '../src/sports/baseball.js';
 import { hockey } from '../src/sports/hockey.js';
 import { womensFootball } from '../src/sports/womensFootball.js';
 import { HOME_EDGE, tennis } from '../src/sports/tennis.js';
+import { womensTennis } from '../src/sports/womensTennis.js';
 import { rugbyLeague } from '../src/sports/rugbyLeague.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
 import { liveModelFor, winProbabilityAt } from '../src/engine/winProbability.js';
@@ -66,6 +67,8 @@ const SPORTS = [
   { label: 'ice hockey', sport: hockey, clubs: NHL_CLUBS, range: REAL.nhl.homeWins },
   // Tennis has no clubs: four 75-rated players a side.
   { label: 'tennis', sport: tennis, clubs: null, range: REAL.davisCup.homeWins },
+  // No study of the Billie Jean King Cup's hosts was found: the women's game plays the Davis Cup's edge.
+  { label: "women's tennis", sport: womensTennis, clubs: null, range: REAL.davisCup.homeWins },
   { label: 'rugby league', sport: rugbyLeague, clubs: NRL_CLUBS, range: REAL.nrl.homeWins },
 ];
 const scoreFields = ({ ga, gd, tie, winner }) => ({ ga, gd, tie, winner });
@@ -144,7 +147,7 @@ test('the edge is the prepared match\'s: the defender gains what the visitors lo
 test('the live chart starts from the home odds', () => {
   // Kick-off tolerances as the sports' own tests hold them against the fixture odds.
   const tolerance = { football: 0.035, 'womens-football': 0.035, basketball: 0.02, 'american-football': 0.03, baseball: 0.02, hockey: 0.02,
-    tennis: 0.015, 'rugby-league': 0.02 };
+    tennis: 0.015, 'womens-tennis': 0.015, 'rugby-league': 0.02 };
   for (const { label, sport, clubs } of SPORTS) {
     const [a, d] = equalSides(sport, clubs);
     const neutral = liveModelFor(sport, a, d, undefined, undefined, 6);

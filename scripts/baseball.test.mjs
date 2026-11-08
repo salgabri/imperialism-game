@@ -313,7 +313,7 @@ test('seeded duel campaigns on the MLB map reach a champion', () => {
 
 test('setup lists baseball as a fourth sport with nations and the MLB clubs, on its built-in 2026 season', () => {
   assert.deepEqual(SPORT_LIST.map(item => item.id), ['football', 'womens-football', 'basketball', 'american-football', 'baseball', 'hockey', 'tennis',
-    'rugby-league']);
+    'womens-tennis', 'rugby-league']);
   assert.equal(sportNote(sport), 'Nations · 30 MLB clubs');
   const clubs = buildSetupModel({ sport: 'baseball', layer: 'clubs', clubScope: 'domestic:mlb' }, {});
   assert.equal(clubs.clubsOnly, null);

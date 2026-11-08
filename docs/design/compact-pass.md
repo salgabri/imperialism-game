@@ -55,7 +55,9 @@ scrolling panels, at desktop, tablet and phone sizes.
 
 - **Setup.** The header holds the save actions as icons. A failed save or a refused file grows a strip under the
   header's row; a refused resume shows on the resume card instead. Step 1: a slim notice line (resume, challenge
-  link), sport tiles (up to four in a row; the eight sports in two rows of four), Nations | Clubs and the season on
+  link), sport tiles (up to four in a row, up to eight in two rows; since women's tennis, the nine sports in three
+  rows of three, tiles trimmed to what the icon and name need but still 44px targets, and on 360×640 with a notice
+  line the step's heading gives way, as step 2's does for More rules), Nations | Clubs and the season on
   one row, theatre chips (Europe's Top 124 and Elite 32 for football clubs), the One country · top clubs dropdown,
   and the counts at the foot. The theatre's map fills the side. Step 2: four short draw cards, with Show matches and More rules
   beside them. Step 3: compact role cards with the opponent choice in the same row, a flag wall strongest first

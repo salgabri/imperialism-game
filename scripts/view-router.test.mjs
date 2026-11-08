@@ -7,7 +7,9 @@ import React, { act } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { exportCampaign, loadSave } from '../src/engine/storage.js';
 import { SAVE_KEY } from '../src/config.js';
-import { selectLineup } from '../src/data/teams.js';
+import { buildClub, selectLineup } from '../src/data/teams.js';
+import { clubLogoFile } from '../src/data/clubLogos.js';
+import { getSport } from '../src/sports/index.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { empireNeighbors } from '../src/engine/campaign.js';
@@ -20,7 +22,7 @@ import { ROOT, bundleApp, findElement, forceResult, syncAppFixture, withDom } fr
 const BundledApp = await bundleApp();
 
 const UI_ONLY = ['view', 'viewSource', 'squadReturn', 'tacticalPreview', 'phoneSheet', 'phoneMore', 'wholeMap', 'focusLayout',
-  'targetHoverId'];
+  'targetHoverId', 'setupMapMode'];
 const PENDING = { attackerId: '250', optionIds: ['276', '826'], selectedId: '276', round: 1, openedAt: 0, resumeAutoplay: false, turn: null };
 
 const fixture = options => syncAppFixture(options);
@@ -801,7 +803,47 @@ test('setupMapPreview: the step-1 map card shows the board a world theatre opens
     assert.equal(app.setupMapPreview({ ...setup, layer: 'clubs', clubScope: 'domestic:826' }), null);
   });
   await withApp({ phase: 'setup' }, ({ app }) => {
-    assert.match(renderPure(app, 'setup with its map'), /class="setup-map" aria-hidden="true" data-state="ready" data-kind="world"/);
+    assert.match(renderPure(app, 'setup with its map'), /class="setup-map" data-state="ready" data-kind="world" data-map-mode="political"/);
+  });
+});
+
+test('setupMapFlags: the step-1 card in Flags mode flies each starting nation’s flag, or each club’s crest on its colour', async () => {
+  await withApp({ ids: ['208', '276', '250'] }, ({ app }) => {
+    app.geo.fitTo = () => {};
+    BundledApp.prototype.fitMap.call(app, ['208', '276', '250']);
+    const setup = { ...app.state.setup, sport: 'football', layer: 'nations', scope: 'world', seed: '7' };
+    const flags = app.setupMapFlags(setup);
+    // One banner per nation, apart from the campaign map's ids, shown through that nation's own land.
+    assert.deepEqual(flags.flagPatterns.map(pattern => [pattern.id, pattern.ownerId, pattern.url, pattern.crestUrl]), [
+      ['setup-208-208-0', '208', '/flags/dk.svg', null], ['setup-250-250-0', '250', '/flags/fr.svg', null],
+      ['setup-276-276-0', '276', '/flags/de.svg', null]]);
+    assert.deepEqual(flags.flagParts.get('276'), [{ id: 'setup-276-276-0', d: 'M180,80L220,80L220,120L180,120Z' }]);
+    assert.equal(flags.fills.size, 0, 'nations need no fill: no flag, its pastel');
+    assert.equal(app.setupMapFlags(setup), flags, 'memoised per board');
+    assert.equal(app.setupMapFlags({ ...setup, layer: 'clubs', clubScope: 'domestic:826' }), null, 'no card on show, no banners');
+
+    // Clubs: a crest on the club's colour; every club's land takes its colour, the ground behind its crest.
+    const sport = getSport('football');
+    const club = id => buildClub(sport.clubs.find(row => row.id === id), sport);
+    const arsenal = club('f-arsenal'), chelsea = club('f-chelsea');
+    const crestOf = id => `/club-logos/${clubLogoFile(id)}.webp`;
+    app.opening = () => ({ included: [arsenal, chelsea], own: { 208: arsenal.id, 276: chelsea.id }, scopeName: 'Fixture' });
+    const clubs = app.setupMapFlags({ ...setup, layer: 'clubs', clubScope: 'all' });
+    assert.deepEqual(clubs.flagPatterns.map(pattern => [pattern.ownerId, pattern.crestUrl, pattern.color, pattern.url === pattern.crestUrl]),
+      [[arsenal.id, crestOf(arsenal.id), arsenal.col, true], [chelsea.id, crestOf(chelsea.id), chelsea.col, true]]);
+    assert.ok(clubs.flagPatterns.every(pattern => pattern.crestUrl && pattern.symbolLayout), 'each crest placed on its land');
+    assert.deepEqual([...clubs.fills], [['208', arsenal.col], ['276', chelsea.col]]);
+    assert.equal(clubs.flagParts.has('250'), false, 'unclaimed land flies nothing');
+  });
+  // App hands the card its banners only while it shows Flags; the campaign map behind the wizard keeps its own mode.
+  await withApp({ phase: 'setup' }, ({ app }) => {
+    const overlay = () => findElement(app.render(), 'SetupOverlay').props;
+    assert.deepEqual([overlay().mapMode, overlay().mapFlags], ['political', null]);
+    app.setState({ setupMapMode: 'flags' });
+    assert.equal(overlay().mapMode, 'flags');
+    assert.equal(app.state.mapMode, 'political', 'the campaign map’s mode is another choice');
+    overlay().onMapMode('political');
+    assert.equal(app.state.setupMapMode, 'political');
   });
 });
 

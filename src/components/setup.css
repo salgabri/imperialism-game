@@ -171,8 +171,8 @@ strong.setup-save__text { font-weight:600; }
 }
 .setup-challenge p { flex:1 1 0; min-width:0; margin:0; font:400 13px/1.3 var(--font-sans); color:var(--ink); }
 
-/* ---- Sports: tiles, an icon over its name; the whole tile is the radio. Up to four share a row; more split into two
-   even rows (--sport-cols, set by SetupOverlay), since six across would squeeze "American football" ---- */
+/* ---- Sports: tiles, an icon over its name; the whole tile is the radio. Up to four share a row; up to eight split into
+   two even rows and nine into three (--sport-cols, set by SetupOverlay), since five across would squeeze "Basketball" ---- */
 .setup-sports { display:grid; grid-template-columns:repeat(var(--sport-cols, 4), minmax(0, 1fr)); gap:8px; }
 .setup-card {
   position:relative; min-width:0; min-height:70px; padding:10px 4px 8px;
@@ -188,6 +188,9 @@ strong.setup-save__text { font-weight:600; }
   font:700 12px/1.1 var(--font-narrow); letter-spacing:.06em; text-transform:uppercase; text-align:center;
 }
 .setup-card__button::after { content:''; position:absolute; inset:0; }
+/* Three rows (nine sports) cost a row's height, so their tiles keep only what the icon and name need: still at least
+   a 44px target on a phone, and no step scrolls. Outranks the phone rule's tile below. */
+.setup-sports[data-rows="3"] .setup-card { min-height:44px; padding:6px 4px 5px; gap:3px; }
 .setup-card__button:focus-visible { outline:none; }
 .setup-card__button:focus-visible::after { outline:2px solid var(--you); outline-offset:2px; }
 
@@ -224,14 +227,52 @@ strong.setup-save__text { font-weight:600; }
 }
 .rule-note.setup-domestic__error > svg, .rule-note.setup-season__error > svg { color:var(--loss); }
 
-/* Step 1 map card: the theatre's opening board — each starting territory (a world theatre's nations or clubs, a country's
-   sections) in its kick-off pastel over the land nobody holds. It takes the column's free height. */
-.setup-map { position:relative; flex:1 1 0; min-height:120px; margin:0; background:var(--sea); box-shadow:inset 0 0 0 1px var(--rule); }
+/* Step 1 map card (SetupMap): the theatre's opening board — each starting territory (a world theatre's nations or clubs, a
+   country's sections) in its kick-off pastel, or under its flag or crest, over the land nobody holds. It takes the
+   column's free height. A map like the campaign's: it zooms (scroll, pinch, the −/+/reset group) and pans, and its chrome
+   is the campaign map's in miniature (map.css): the zoom group stacked over the Political / Flags switch, bottom right.
+   Size containment lets a short card drop its zoom group (it still scrolls and pinches). */
+.setup-map {
+  --setup-map-inset:12px; --setup-map-mode-h:31px; --setup-map-zoom:36px;
+  position:relative; flex:1 1 0; min-height:120px; margin:0; overflow:hidden; container-type:size;
+  background:var(--sea); box-shadow:inset 0 0 0 1px var(--rule);
+}
 .setup-map__chart { position:absolute; inset:0; display:block; width:100%; height:100%; background:var(--sea); }
+.setup-map[data-state=ready] { cursor:grab; }
+.setup-map[data-panning] { cursor:grabbing; }
+.setup-map[data-state=ready] .setup-map__chart { touch-action:none; }
 .setup-map__backdrop path {
   fill:var(--land-neutral); stroke:var(--map-coast); stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round;
 }
 .setup-map__sections path { stroke:var(--map-border); stroke-width:.6px; vector-effect:non-scaling-stroke; stroke-linejoin:round; }
+.setup-map__modes, .setup-map__zoom {
+  position:absolute; right:var(--setup-map-inset); z-index:1; display:flex; background:var(--panel); box-shadow:var(--shadow-float); cursor:default;
+}
+.setup-map__modes { bottom:var(--setup-map-inset); }
+.setup-map__zoom { bottom:calc(var(--setup-map-inset) + var(--setup-map-mode-h) + 8px); flex-direction:column; }
+.setup-map__mode {
+  display:inline-flex; align-items:center; height:var(--setup-map-mode-h); margin:0; padding:0 11px;
+  border:0; border-radius:0; background:transparent; color:var(--ink); cursor:pointer;
+  font:700 12px/1 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;
+}
+.setup-map__mode + .setup-map__mode { box-shadow:inset 1px 0 0 var(--rule); }
+.setup-map__mode:hover { background:var(--surface-2); }
+.setup-map__mode[aria-pressed=true] { background:var(--ink); color:var(--on-ink); box-shadow:none; }
+.setup-map__zoom-btn {
+  display:grid; place-items:center; width:var(--setup-map-zoom); height:var(--setup-map-zoom); margin:0; padding:0;
+  border:0; border-radius:0; background:transparent; color:var(--ink); cursor:pointer;
+}
+.setup-map__zoom-btn + .setup-map__zoom-btn { box-shadow:inset 0 1px 0 var(--rule); }
+.setup-map__zoom-btn:hover { background:var(--surface-2); }
+.setup-map__mode:focus-visible, .setup-map__zoom-btn:focus-visible { outline-offset:-2px; }
+.setup-map__reset { font:500 11px/1 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:.02em; color:var(--muted); }
+/* Under a finger every card control is a 44px target, as on the campaign map. */
+@media (pointer:coarse) {
+  .setup-map { --setup-map-mode-h:max(31px, var(--tap, 44px)); --setup-map-zoom:max(36px, var(--tap, 44px)); }
+}
+/* Phones pinch: no zoom buttons (the campaign map's A4 rule), and none on a card too short to stack them. */
+@media (max-width:699.98px) { .setup-map__zoom { display:none; } }
+@container (max-height:229.98px) { .setup-map__zoom { display:none; } }
 
 .setup-side__empty { flex:1 1 0; min-height:120px; background:var(--sea); }
 
@@ -502,6 +543,12 @@ strong.setup-save__text { font-weight:600; }
   .setup-step[data-step="1"] .setup-side { display:none; }
   .setup-step[data-step="1"] .setup-step__body { grid-template-rows:minmax(0, 1fr); }
   .setup-step[data-step="2"]:has(.setup-advanced[open]) :is(.setup-heading, .rule-card__body, .rule-dots, .rule-card__tag) { display:none; }
+}
+
+/* ---- The smallest phones (360×640): three rows of sports and a notice line (Resume, a challenge link) leave no room
+   for step 1's heading, so it gives way as step 2's does for More rules; the step bar names the step. ---- */
+@media (max-width:699.98px) and (max-height:660px) {
+  .setup-step[data-step="1"]:has(.setup-notices):has(.setup-sports[data-rows="3"]) .setup-heading { display:none; }
 }
 
 /* ---- Below the 390 phone target (e.g. 360 Android): tighten the step bar. ---- */

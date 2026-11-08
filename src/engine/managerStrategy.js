@@ -12,6 +12,7 @@ export const TACTICS = [
 // Bench players provide bounded tactical support through their natural position.
 // The best useful reserve matters; hoarding dozens of players cannot stack it.
 const FOOTBALL_SUPPORT = { FW: [1, 0], MF: [.65, .65], DF: [0, 1], GK: [0, 1] };
+const TENNIS_SUPPORT = { SGL: [.5, .5], DBL: [.5, .5] };
 const SUPPORT = {
   football: FOOTBALL_SUPPORT,
   'womens-football': FOOTBALL_SUPPORT,
@@ -27,8 +28,9 @@ const SUPPORT = {
   // pitchers keep runs off the board.
   baseball: { C: [.6, .6], '1B': [1, .3], '2B': [.8, .5], '3B': [.9, .4], SS: [.7, .6], LF: [1, .3], CF: [.8, .5], RF: [1, .3],
     DH: [1, 0], SP: [0, 1], RP: [0, 1] },
-  // A Davis Cup team's reserve can come in for any rubber, at either end of the risk.
-  tennis: { SGL: [.5, .5], DBL: [.5, .5] },
+  // A Davis Cup (or Billie Jean King Cup) team's reserve can come in for any rubber, at either end of the risk.
+  tennis: TENNIS_SUPPORT,
+  'womens-tennis': TENNIS_SUPPORT,
 };
 
 export function tacticalProfile(team) {
