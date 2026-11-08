@@ -177,6 +177,12 @@ function crestAssetsMatch(banner, team) {
 /** The right banner for a region's owner: its crest for a club with one, else its flag. */
 const ownerAssetsMatch = (banner, team) => (crestOf(team) ? crestAssetsMatch(banner, team) : flagAssetsMatch(banner, FLAG_CODES[team?.flagId]));
 
+/**
+ * Who the map paints a country for: its holder, else the team that claimed it (a world map's nation with no team,
+ * src/engine/claims.js), which flies that team's banner exactly as its territory does.
+ */
+const holderOf = (app, id) => app.state.own[id] ?? app.state.claims?.[id];
+
 /** A country's flag parts exactly repaint its filled rings with its owner's banner. */
 function bannerPartsMatch(app, path, owner) {
   const parts = countryFlagParts(path.dataset.country);
@@ -210,7 +216,7 @@ function expectedFlagsShown(app) {
   if (app.state.mapMode !== 'flags' || nationPaths.length !== Object.keys(NATIONS).length) return false;
   return paths.every(path => {
     const id = path.dataset.country;
-    const owner = playing ? app.state.teams[app.state.own[id]] : null;
+    const owner = playing ? app.state.teams[holderOf(app, id)] : null;
     const flagId = playing ? owner?.flagId : FLAG_CODES[id] ? id : DEPENDENCIES[id]?.of;
     const parts = countryFlagParts(id);
     if (owner?.kind === 'club' && !crestOf(owner)) return parts.length === 0 && !flagBanner(path) && path.getAttribute('fill') === owner.col;
@@ -254,7 +260,7 @@ function empireFlagsSnapshot(app) {
   const owners = new Set();
   const parts = countryFlagParts();
   for (const part of parts) {
-    const ownerId = app.state.own[part.dataset.flagCountry];
+    const ownerId = holderOf(app, part.dataset.flagCountry);
     owners.add(ownerId);
     if (!groups.has(part.dataset.flagComponent)) groups.set(part.dataset.flagComponent, []);
     groups.get(part.dataset.flagComponent).push(part);
@@ -269,7 +275,7 @@ function empireFlagsSnapshot(app) {
     sharedReferences &&= !!banner && componentParts.every(part => flagBanner(part) === banner);
     if (!banner) { localBounds = false; coversEveryPolygon = false; correctOwner = false; continue; }
     correctOwner &&= componentParts.every(part => {
-      const ownerId = app.state.own[part.dataset.flagCountry];
+      const ownerId = holderOf(app, part.dataset.flagCountry);
       return banner.dataset.owner === ownerId && ownerAssetsMatch(banner, app.state.teams[ownerId]);
     });
     const bounds = bannerBounds(banner);
@@ -284,7 +290,7 @@ function empireFlagsSnapshot(app) {
   }
   const exactCountryCoverage = countryPaths().every(path => {
     const heldParts = parts.filter(part => part.dataset.flagCountry === path.dataset.country);
-    const owner = app.state.teams[app.state.own[path.dataset.country]];
+    const owner = app.state.teams[holderOf(app, path.dataset.country)];
     if (!flies(owner)) return heldParts.length === 0;
     return JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(heldParts.map(shapeD).join('')));
   });
@@ -381,7 +387,8 @@ export async function runSwissFlagRegionCheck() {
 /** Flags follow campaign ownership, never geography or the surviving id list. */
 function regionalFlagsSnapshot(app) {
   const paths = countryPaths();
-  const neutral = paths.filter(path => !app.state.own[path.dataset.country]);
+  // Neutral: nobody holds it and nobody claimed it (claimed land flies its holder's banner, holderOf).
+  const neutral = paths.filter(path => !holderOf(app, path.dataset.country));
   const fielded = new Set(fieldedNations(sportOf(app.state.settings)));
   const domestic = domesticOf(app);
   if (domestic) return {
@@ -401,7 +408,7 @@ function regionalFlagsSnapshot(app) {
     return NATIONS[id] && owner?.kind !== 'club' && owner && owner.id !== id;
   });
   const ownerFlagMatches = path => {
-    const owner = app.state.teams[app.state.own[path.dataset.country]];
+    const owner = app.state.teams[holderOf(app, path.dataset.country)];
     const parts = countryFlagParts(path.dataset.country);
     if (filledRings(path.getAttribute('d')).length === 0) return parts.length === 0;
     return parts.length > 0 && parts.every(part => ownerAssetsMatch(flagBanner(part), owner));
@@ -421,7 +428,7 @@ function regionalFlagsSnapshot(app) {
     empireFlags: empireFlagsSnapshot(app),
     // A held dependency flies its owner's banner (a club's crest); land held by a club without one, or nobody, has none.
     dependenciesCorrect: paths.filter(path => DEPENDENCIES[path.dataset.country]).every(path => {
-      const owner = app.state.teams[app.state.own[path.dataset.country]];
+      const owner = app.state.teams[holderOf(app, path.dataset.country)];
       return owner && (owner.kind !== 'club' || crestOf(owner)) ? ownerFlagMatches(path) : neutralMatches(path);
     }),
   };
@@ -467,13 +474,15 @@ function labelGeographySnapshot(app, placements, unitsPerPixel) {
     return Math.hypot(x - a[0] - t * dx, y - a[1] - t * dy);
   };
   const errors = [];
+  // The land the map paints for each empire, claimed nations included: the ownership its labels are laid out on.
+  const own = app.mapOwnership();
   for (const placement of placements) {
     if (!placement) { errors.push('missing placement'); continue; }
-    const owned = cache.rings.filter(shape => app.state.own[shape.id] === placement.id);
-    const foreign = cache.rings.filter(shape => app.state.own[shape.id] !== placement.id);
+    const owned = cache.rings.filter(shape => own[shape.id] === placement.id);
+    const foreign = cache.rings.filter(shape => own[shape.id] !== placement.id);
     if (!owned.some(shape => contains(shape, [placement.tx, placement.ty]))) errors.push(`${placement.id}: anchor is not owned land`);
     const allowance = placement.coastal ? 10 * unitsPerPixel : 0;
-    if (!cache.validator.validateFootprint(app.state.own, placement.id, placement.corners, {
+    if (!cache.validator.validateFootprint(own, placement.id, placement.corners, {
       unitsPerPixel, coastalAllowancePx: placement.coastal ? 10 : 0, maxSeaFraction: .22,
     })) errors.push(`${placement.id}: curved envelope fails geographic policy`);
     const [a, b, , d] = placement.corners;

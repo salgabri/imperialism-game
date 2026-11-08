@@ -85,7 +85,9 @@ so a reload mid-match settles the same claims; an older match has none.
 
 `scripts/claimed-land.test.mjs`: the rules on a made-up map (enclosure, the open edge, capture, crossing order and
 grazing, settlement, probes), the NBA, Elite 32 and world maps as shipped, saves, the tooltip, and a match on the NBA
-map in the running App that colours Maryland for the winner without a territory changing hands.
+map in the running App that colours Maryland for the winner without a territory changing hands. The smoke run's
+Flags-mode and label checks read a country's holder as its territory's holder, else its claimant (`holderOf`,
+`app.mapOwnership()` in `scripts/smoke.entry.jsx`): a claimed nation flies its claimant's flag and may carry its label.
 
 ## Choices
 
