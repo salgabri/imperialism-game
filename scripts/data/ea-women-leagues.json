@@ -1,0 +1,34 @@
+{
+  "note": "EA SPORTS FC's women's leagues as the ratings API names them. `name` is the league's real name, `id` a number of the game's own (the API gives none), `country` the map shape its clubs start on, `main` whether it is a whole league with its own theatre; EA licenses only a club or two of the others, which play together as the `rest` theatre. `clubs` gives a club its full name where EA's label is shortened or garbled.",
+  "rest": "Rest of Europe",
+  "leagues": {
+    "Barclays WSL": { "id": 1, "name": "Women's Super League", "country": "826", "main": true },
+    "NWSL": { "id": 2, "name": "NWSL", "country": "840", "main": true },
+    "Liga F Moeve": { "id": 3, "name": "Liga F", "country": "724", "main": true },
+    "GPFBL": { "id": 4, "name": "Frauen-Bundesliga", "country": "276", "main": true },
+    "Arkema PL": { "id": 5, "name": "Première Ligue", "country": "250", "main": true },
+    "Calcio A Femminile": { "id": 6, "name": "Serie A Femminile", "country": "380" },
+    "Nederland Vrouwen Liga": { "id": 7, "name": "Vrouwen Eredivisie", "country": "528" },
+    "Sverige Liga": { "id": 8, "name": "Damallsvenskan", "country": "752" },
+    "Ceska Liga Žen": { "id": 9, "name": "Czech Women's First League", "country": "203" },
+    "Liga Portugal Feminino": { "id": 10, "name": "Liga BPI", "country": "620" },
+    "Schweizer Damen Liga": { "id": 11, "name": "Women's Super League (Switzerland)", "country": "756" },
+    "Norge Kvinner Liga": { "id": 12, "name": "Toppserien", "country": "578" },
+    "Scottish Women's League": { "id": 13, "name": "Scottish Women's Premier League", "country": "SCO" },
+    "Iceland League": { "id": 14, "name": "Besta deild kvenna", "country": "352" }
+  },
+  "clubs": {
+    "BK Hcken": "BK Häcken",
+    "C. Adeje Tenerife": "Costa Adeje Tenerife",
+    "Frankfurt": "Eintracht Frankfurt",
+    "Havre AC": "Le Havre",
+    "KC Current": "Kansas City Current",
+    "Leverkusen": "Bayer Leverkusen",
+    "Les Marseillaises": "Marseille",
+    "Manchester Utd": "Manchester United",
+    "NC Courage": "North Carolina Courage",
+    "Paris SG": "Paris Saint-Germain",
+    "Rac. Louisville": "Racing Louisville",
+    "Spurs": "Tottenham Hotspur"
+  }
+}

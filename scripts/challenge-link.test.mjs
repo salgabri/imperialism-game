@@ -105,7 +105,7 @@ test('values are written readably and read in any encoding', () => {
 
 test('unknown values fall back to the defaults and are reported', () => {
   const cases = [
-    ['sport=hockey', {}, ['sport']],
+    ['sport=curling', {}, ['sport']],
     ['sport=Football', {}, ['sport']],
     ['teams=martians', {}, ['teams']],
     ['theatre=Mars', {}, ['theatre']],
@@ -124,7 +124,7 @@ test('unknown values fall back to the defaults and are reported', () => {
     assert.deepEqual(readChallenge(search), { found: true, setup: setupOf(patch), ignored }, search);
   }
   // The rest of the link still counts.
-  assert.deepEqual(readChallenge('sport=hockey&theatre=CONMEBOL&draw=chaos&seed=5'),
+  assert.deepEqual(readChallenge('sport=curling&theatre=CONMEBOL&draw=chaos&seed=5'),
     { found: true, setup: setupOf({ scope: 'CONMEBOL', pacing: 'chaos', seed: '5' }), ignored: ['sport'] });
 });
 

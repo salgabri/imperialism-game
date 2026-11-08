@@ -4,6 +4,7 @@ import { hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
 import { football } from '../src/sports/football.js';
 import { BENCH, basketball } from '../src/sports/basketball.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from '../src/engine/odds.js';
+import { getSport } from '../src/sports/index.js';
 import { DESIGN_TARGETS, regulationScore, sampleMatchStatistics, syntheticTeam } from './match-simulation-report.mjs';
 
 const sports = [football, basketball];
@@ -16,6 +17,16 @@ function boundedConstant(value) {
   let calls = 0;
   return () => { assert.ok(++calls <= 5000, `sampler failed to terminate for constant rng=${value}`); return value; };
 }
+
+test('the report reads the goal-scoring sports in goals, and hockey\'s ties at the end of regulation', () => {
+  for (const [id, ties] of [['womens-football', [0.22, 0.34]], ['hockey', [0.18, 0.28]]]) {
+    const sport = getSport(id);
+    const stats = sampleMatchStatistics({ sport, attacker: syntheticTeam(sport, 75), defender: syntheticTeam(sport, 75, 'D'), samples: 6000 });
+    between(stats.regulationTieRate, ties[0], ties[1], `${id} level at full time`);
+    assert.ok(stats.totalHistogram.every(bar => bar.to === bar.from), `${id}: a bar a goal`);
+    assert.ok(stats.largeTotalRate > 0 && stats.blowoutRate > 0, `${id}: high-scoring games and routs both show`);
+  }
+});
 
 test('both sports expose a prepared score sampler without creating an event timeline', () => {
   for (const sport of sports) {

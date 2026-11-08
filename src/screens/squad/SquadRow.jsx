@@ -32,7 +32,7 @@ function SourceCell({ row }) {
 }
 
 /**
- * Row: { no, pos, name, fullName, natural, inRole, outOfPosition, rating, tier, acquired, source, sourceTitle, sourceUrl, generated }.
+ * Row: { no, pos, name, fullName, natural, inRole, outOfPosition, rating, tier, acquired, source, sourceTitle, sourceUrl, generated, estimated }.
  * Starters show the effective rating in role (↓ when out of position); depth rows show "—".
  */
 export default function SquadRow({ row, showSource = true }) {
@@ -44,6 +44,7 @@ export default function SquadRow({ row, showSource = true }) {
       <span className="squad-row__name" role="cell">
         <span className="squad-row__label" title={row.fullName || row.name}>{row.name}</span>
         {row.generated && <span className="squad-tag">Generated</span>}
+        {row.estimated && <span className="squad-tag" title={row.sourceTitle}>Estimated</span>}
       </span>
       <span className="squad-row__natural" role="cell">{row.natural}</span>
       <span className="squad-row__role" role="cell" title={row.outOfPosition ? `Out of position · natural ${row.natural}` : undefined}>

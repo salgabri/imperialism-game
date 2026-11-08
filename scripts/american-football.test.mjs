@@ -338,7 +338,7 @@ test('seeded duel campaigns on the NFL map reach a champion', () => {
 // ---------- setup and the squad screen ----------
 
 test('setup lists American football as a third sport with clubs only, on its built-in 2026 season', () => {
-  assert.deepEqual(SPORT_LIST.map(item => item.id).slice(0, 3), ['football', 'basketball', 'american-football']);
+  assert.deepEqual(SPORT_LIST.map(item => item.id).filter(id => id !== 'womens-football').slice(0, 3), ['football', 'basketball', 'american-football']);
   assert.equal(sportNote(sport), '32 NFL clubs');
   const model = buildSetupModel({ sport: 'american-football', layer: 'clubs', clubScope: 'domestic:nfl' }, {});
   assert.equal(model.clubsOnly, 'NFL');

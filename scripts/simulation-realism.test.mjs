@@ -82,7 +82,7 @@ test('MLB: runs, close games, extra innings and the standings look like an MLB s
 });
 
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
-  for (const [label, share] of [['NBA', report.nba.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins]]) {
+  for (const [label, share] of [['NBA', report.nba.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins]]) {
     assert.ok(Math.abs(share - 0.5) < 0.015, `${label} neutral: the defender won ${share}`);
   }
   for (const league of report.football) {
@@ -96,4 +96,5 @@ test('home sides: half the decided games at a neutral venue, their league\'s sha
   within(home.nba.homeWins, REAL.nba.homeWins, 'NBA home wins');
   within(home.nfl.homeWins, REAL.nfl.homeWins, 'NFL home wins');
   within(home.mlb.homeWins, REAL.mlb.homeWins, 'MLB home wins');
+  within(home.nhl.homeWins, REAL.nhl.homeWins, 'NHL home wins');
 });

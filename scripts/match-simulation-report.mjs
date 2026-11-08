@@ -24,12 +24,31 @@ export const EMPIRICAL_REFERENCES = Object.freeze([
     source: 'https://assets.fiba.basketball/image/upload/documents-corporate-studies-and-facts-fiba-scouting-report-fiba-basketball-world-cup-2023.pdf' },
 ]);
 
+// Each sport's yardstick in its own units: the total that counts as high-scoring, the margin that counts as a rout and
+// the width of a histogram bar. Sports not listed read on the points scale.
+const SCORE_SCALES = Object.freeze({
+  football: Object.freeze({ largeTotal: 7, blowout: 4, bar: 1 }),
+  'womens-football': Object.freeze({ largeTotal: 7, blowout: 4, bar: 1 }),
+  hockey: Object.freeze({ largeTotal: 10, blowout: 5, bar: 1 }),
+});
+const POINTS_SCALE = Object.freeze({ largeTotal: 220, blowout: 20, bar: 10 });
+
+// Four national pairings a sport. Women's football's and ice hockey's are nations that field their own players: a nation
+// without any plays no women's football, and a hockey minnow's lineup is generated.
+const PAIRINGS = Object.freeze({
+  football: [['250', '076'], ['032', '276'], ['724', '756'], ['076', '356']],
+  'womens-football': [['724', '826'], ['840', '276'], ['076', '392'], ['724', '834']],
+  hockey: [['124', '840'], ['752', '246'], ['203', '756'], ['124', '276']],
+});
+const OTHER_PAIRINGS = [['840', '124'], ['276', '688'], ['250', '724'], ['840', '356']];
+
 export function syntheticTeam(sport, rating = 75, id = 'A') {
   return { id, name: `${sport.name} rating ${rating}`, sport: sport.id, str: rating,
     squad: sport.positionPlan.map((pos, i) => ({ name: `${id}-${pos}-${i}`, pos, rating })) };
 }
 
 export function regulationScore(sport, result) {
+  if (sport.id === 'hockey') return [result.regA, result.regD];
   if (sport.id !== 'basketball' || !result.tie) return [result.ga, result.gd];
   return [result.ga - result.tie.periods.reduce((sum, pair) => sum + pair[0], 0),
     result.gd - result.tie.periods.reduce((sum, pair) => sum + pair[1], 0)];
@@ -55,6 +74,7 @@ function increment(histogram, value) { histogram.set(value, (histogram.get(value
 /** Prepare once; aggregate score samples without allocating commentary/events. */
 export function sampleMatchStatistics({ sport, attacker, defender, drama = 6, samples = 30000, seed = 20261002 }) {
   const prepared = sport.prepareMatch(attacker, defender, teamEff(attacker), teamEff(defender));
+  const scale = SCORE_SCALES[sport.id] || POINTS_SCALE;
   const rng = makeRng(seed);
   const scorelines = new Map(), totals = new Map(), margins = new Map(), aScores = new Map(), dScores = new Map();
   let wins = 0, ties = 0, tiedWins = 0, zeroZero = 0, largeTotals = 0, blowouts = 0;
@@ -67,8 +87,8 @@ export function sampleMatchStatistics({ sport, attacker, defender, drama = 6, sa
     wins += Number(win);
     if (a === d) { ties++; tiedWins += Number(win); }
     zeroZero += Number(a === 0 && d === 0);
-    largeTotals += Number(a + d >= (sport.id === 'football' ? 7 : 220));
-    blowouts += Number(Math.abs(a - d) >= (sport.id === 'football' ? 4 : 20));
+    largeTotals += Number(a + d >= scale.largeTotal);
+    blowouts += Number(Math.abs(a - d) >= scale.blowout);
     finalTotal += result.ga + result.gd;
     absoluteMargin += Math.abs(a - d);
     increment(scorelines, `${a}-${d}`);
@@ -80,7 +100,7 @@ export function sampleMatchStatistics({ sport, attacker, defender, drama = 6, sa
   const elapsedMs = performance.now() - started;
   const winRate = wins / samples;
   const groupedTotals = new Map();
-  for (const [value, frequency] of totals) incrementBy(groupedTotals, sport.id === 'football' ? value : Math.floor(value / 10) * 10, frequency);
+  for (const [value, frequency] of totals) incrementBy(groupedTotals, Math.floor(value / scale.bar) * scale.bar, frequency);
   return {
     samples, seed, drama, attackerWinRate: rounded(winRate), defenderWinRate: rounded(1 - winRate),
     winRateMargin95: rounded(1.96 * Math.sqrt(winRate * (1 - winRate) / samples)),
@@ -92,7 +112,7 @@ export function sampleMatchStatistics({ sport, attacker, defender, drama = 6, sa
     mostCommonRegulationScores: [...scorelines.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12)
       .map(([score, count]) => ({ score, count, rate: rounded(count / samples) })),
     totalHistogram: [...groupedTotals.entries()].sort((a, b) => a[0] - b[0]).map(([from, count]) =>
-      ({ from, to: sport.id === 'football' ? from : from + 9, count, rate: rounded(count / samples) })),
+      ({ from, to: from + scale.bar - 1, count, rate: rounded(count / samples) })),
     timing: { elapsedMs: rounded(elapsedMs), samplesPerSecond: Math.round(samples * 1000 / Math.max(.001, elapsedMs)) },
   };
 }
@@ -137,9 +157,7 @@ export function createSimulationReport({ samples = 30000, fullSamples = 1000, se
     }
     const equalA = syntheticTeam(sport, 75, 'A'), equalD = syntheticTeam(sport, 75, 'D');
     const equalTeams = sampleMatchStatistics({ sport, attacker: equalA, defender: equalD, samples, seed: hashStr(`${seed}:${sport.id}:equal`) });
-    const pairIds = sport.id === 'football' ? [['250', '076'], ['032', '276'], ['724', '756'], ['076', '356']]
-      : [['840', '124'], ['276', '688'], ['250', '724'], ['840', '356']];
-    const realTeamPairings = pairIds.map(([aId, dId]) => {
+    const realTeamPairings = (PAIRINGS[sport.id] || OTHER_PAIRINGS).map(([aId, dId]) => {
       const rosterRng = makeRng(hashStr(`${seed}:${sport.id}:${aId}:${dId}:rosters`));
       const attacker = buildTeam(aId, rosterRng, sport), opponent = buildTeam(dId, rosterRng, sport);
       return { attacker: { id: aId, name: attacker.name, rating: teamEff(attacker) }, defender: { id: dId, name: opponent.name, rating: teamEff(opponent) },
