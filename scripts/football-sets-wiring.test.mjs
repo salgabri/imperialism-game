@@ -130,7 +130,7 @@ async function pickSeason(document, id) {
   select.value = id;
   await act(async () => select.dispatchEvent(new document.defaultView.Event('change', { bubbles: true })));
 }
-/** The Season dropdown's names for the built-in earlier seasons: "2023/24" … "2006/07", without their source. */
+/** The Season dropdown's names for the built-in earlier seasons: "2025/26" … "2004/05", without their source. */
 const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
 
 // ---------- setup ----------
@@ -149,7 +149,7 @@ test('the Season choice offers the built-in season, then every earlier season bu
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
       assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER]);
       assert.deepEqual(EARLIER.slice(0, 2), ['2025/26', '2023/24'], 'the last built-in season, then the earlier ones (no 2024/25)');
-      assert.equal(EARLIER.at(-1), '2006/07');
+      assert.equal(EARLIER.at(-1), '2004/05');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
       assert.equal(seasonPicker(document).value, '');
       assert.match(document.getElementById('setup-season-note').textContent, /Earlier seasons use EA FIFA ratings/);
@@ -540,6 +540,102 @@ test('an earlier season loads its own file and plays that season\'s EA players; 
     app.continueSaved(saved);
     assert.equal(app.state.phase, 'playing', 'resumed at once');
     assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams));
+    assert.equal(calls.length, before, 'resuming fetched nothing');
+  });
+});
+
+// ---------- the seasons with nations only ----------
+
+const EARLY_ID = 'ea-fifa-06';
+const EARLY_URL = `/football/${EARLY_ID}.json`;
+const EARLY_SET = JSON.parse(readFileSync(new URL(`../public${EARLY_URL}`, import.meta.url), 'utf8'));
+
+test('a season with nations only takes the nations, and choosing clubs goes back to the built-in season', async () => {
+  await withSetup({ [EARLY_URL]: EARLY_SET }, async ({ app, time }) => {
+    const setup = () => app.state.setup;
+    const modelOf = () => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), season: app.seasonStatus() });
+    await app.requestSeasons();
+    assert.deepEqual(EARLIER.slice(-3), ['2006/07', '2005/06', '2004/05'], 'the earliest seasons');
+    assert.match(modelOf().season.note, /2005\/06 and 2004\/05 have nations only/);
+
+    // From clubs: the season takes the nations, and keeps the league for when clubs come back.
+    app.pickSetup('layer', 'clubs');
+    app.pickSetup('clubScope', 'Premier League');
+    app.pickSetup('role', 'manager');
+    app.pickSetup('managedTeamId', 'f-arsenal');
+    app.pickSetup('dataSet', EARLY_ID);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope, setup().managedTeamId], ['nations', EARLY_ID, 'Premier League', '']);
+    assert.equal(modelOf().canLaunch, false, 'Launch waits for the season');
+    time.advance(200);
+    await app.loadSet(EARLY_ID);
+    await settle();
+    assert.equal(app.seasonStatus().state, 'ready');
+
+    const model = modelOf();
+    assert.deepEqual([model.layer, model.season.id, model.campaignSummary], ['nations', EARLY_ID, 'Football · Nations · Europe · 2005/06']);
+    assert.equal(model.sports.find(sport => sport.id === 'football').note, 'Nations', 'its card counts no clubs');
+    assert.equal(model.canLaunch, true);
+    assert.ok(model.teams.some(team => team.id === '250'), 'France is on offer');
+    assert.ok(!model.teams.some(team => team.id === '499'), 'Montenegro joined FIFA in 2007');
+
+    // Another pick leaves the nations as they are, and the season's clubs never replace the theatre.
+    app.pickSetup('scope', 'AFC');
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['nations', EARLY_ID, 'Premier League']);
+
+    // Clubs: the built-in season, in the league it had.
+    app.pickSetup('layer', 'clubs');
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', null, 'Premier League']);
+    assert.deepEqual([modelOf().layer, modelOf().season.id], ['clubs', null]);
+
+    // Back again, and a season with clubs lets them stay.
+    app.pickSetup('dataSet', EARLY_ID);
+    assert.equal(setup().layer, 'nations');
+    app.pickSetup('dataSet', 'ea-fifa-07');
+    assert.equal(setup().layer, 'nations', 'the player chooses clubs again if they want them');
+    app.pickSetup('layer', 'clubs');
+    assert.deepEqual([setup().layer, setup().dataSet], ['clubs', 'ea-fifa-07']);
+  });
+});
+
+test('a season with nations only launches its own players, and its campaigns resume without the file', async () => {
+  const files = { [EARLY_URL]: EARLY_SET };
+  await withSetup(files, async ({ app, items, calls, time }) => {
+    await app.requestSeasons();
+    await withDom(async ({ document, mount }) => {
+      const view = await mountPart(app, mount, 'SetupOverlay');
+      assert.equal(seasonPicker(document).options[seasonNames(document).indexOf('2005/06')].value, EARLY_ID);
+      await pickSeason(document, EARLY_ID);
+      await view.refresh();
+      assert.equal(document.querySelector('.setup-season__loading[role=status]')?.textContent, 'Loading the FIFA 06 season…');
+    });
+    time.advance(200);
+    await app.loadSet(EARLY_ID);
+    await settle();
+
+    app.startCampaign();
+    const st = app.state;
+    assert.equal(st.phase, 'playing');
+    assert.deepEqual([st.settings.layer, st.settings.dataSet, st.settings.dataVersion, st.settings.dataYear, st.settings.dataSeason],
+      ['nations', EARLY_ID, EARLY_SET.version, 2006, '2005/06']);
+    assert.equal(st.campaignName, 'Football 2005/06 · Europe');
+    assert.deepEqual(st.teams['250'].squad.map(player => player.name), EARLY_SET.nations['250'][2].map(tuple => tuple[1]), 'France\'s FIFA 06 XI');
+    assert.ok(st.teams['250'].squad.some(player => player.name === 'Zinedine Zidane'), 'Zidane, who had retired by FIFA 07');
+    assert.ok(st.teams['250'].squad.every(player => player.sourceInfo.edition === 'FIFA 06' && player.sourceInfo.club === ''
+      && player.sourceInfo.url.startsWith('https://fifaindex.com/players/') && player.rating === player.sourceInfo.rawRating));
+    assert.ok(!st.teams['499'], 'Montenegro plays as part of Serbia');
+    assert.equal(st.own['499'], '688');
+    assert.ok(!st.teams.KOS);
+
+    // The checkpoint needs no file to come back.
+    const text = items.get(SAVE_KEY);
+    assert.deepEqual(JSON.parse(text).playerPack, { kind: 'ea', source: { edition: 'FIFA 06', update: 1, snapshotDate: '2005-09-30', roster: '060001' } });
+    B.clearFootballSetCache();
+    files[EARLY_URL] = new Error('the season file is gone');
+    const before = calls.length;
+    const saved = parseCampaign(text);
+    assert.equal(JSON.stringify(saved.teams), JSON.stringify(st.teams), 'squads rebuild exactly');
+    app.continueSaved(saved);
+    assert.equal(app.state.phase, 'playing');
     assert.equal(calls.length, before, 'resuming fetched nothing');
   });
 });

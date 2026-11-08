@@ -1,5 +1,5 @@
 {
-  "note": "The built-in earlier football seasons: one roster per EA FIFA / FC edition. EA FC 26 is the committed snapshot the built-in 2025/26 came from (snapshots); FIFA 15 – EA FC 24 are launch rosters from one export (dataset, editions); FIFA 07 – FIFA 14 join two scrapes by EA player id (legacy). npm run build:ea-seasons reads the snapshot from scripts/data/ and every other file from data-src/ (ignored), and checks each against its sha256. See docs/design/football-years.md.",
+  "note": "The built-in earlier football seasons: one roster per EA FIFA / FC edition. EA FC 26 is the committed snapshot the built-in 2025/26 came from (snapshots); FIFA 15 – EA FC 24 are launch rosters from one export (dataset, editions); FIFA 07 – FIFA 14 join two scrapes by EA player id (legacy); FIFA 05 and FIFA 06 have the same ratings file, nations only, with nationalities from later editions and Wikidata (early). npm run build:ea-seasons reads the snapshot from scripts/data/ and every other file from data-src/ (ignored), and checks each against its sha256. See docs/design/football-years.md.",
   "snapshots": [
     {
       "id": "ea-fc-26",
@@ -213,6 +213,34 @@
           { "edition": "FIFA 08", "eaId": 184409, "name": "Anghel Stinga" }
         ]
       }
+    ]
+  },
+  "early": {
+    "note": "FIFA 05 and FIFA 06 (scripts/lib/ea-early-seasons.mjs). EA's overall, positions and name come from the same mirror's ratings files as FIFA 07 – FIFA 14's (legacy.ratings). Nothing here has these editions' nationalities or clubs, so these seasons have nations only: a player's nationality is the one the same EA id has in the nearest later edition, where the id still names that person, else Wikidata's. A player with neither is left out, EA's stand-in names among them. SoFIFA has no roster before FIFA 07, so each edition's one roster is numbered in its pattern (060001), and each player links to FIFA Index.",
+    "nationalities": {
+      "file": "scripts/data/ea-early-nationalities.json",
+      "name": "Wikidata, for the players no later edition names",
+      "url": "https://www.wikidata.org/",
+      "licence": "CC0-1.0",
+      "sha256": "25bd1cbdea6fde5506a296cfc9c1354789f36962193f96786831890553f88638",
+      "retrieved": "2026-11-07"
+    },
+    "checked": [
+      { "eaId": 8885, "names": ["Pochettino"], "wikidata": "Q313000", "nationality": "Argentina", "why": "Mauricio Pochettino, Argentina international. His one-word name and a birth date a day off escape the rules." },
+      { "eaId": 135683, "names": ["Adrian Ilie"], "wikidata": "Q359484", "nationality": "Romania", "why": "The Romania international, born 1974. Wikidata has another Adrian Ilie, born 1981." },
+      { "eaId": 5491, "names": ["Naybet M.", "Nourredine Naybet"], "wikidata": "Q137899", "nationality": "Morocco", "why": "Noureddine Naybet, Morocco international, born the same day. The files misspell his name." },
+      { "eaId": 7520, "names": ["Mohamed Gargo"], "wikidata": "Q2259413", "nationality": "Ghana", "why": "Mohammed Gargo, Ghana international, born the same day. The files spell his name another way." },
+      { "eaId": 147696, "names": ["Alexey Bugaev"], "wikidata": "Q2527026", "nationality": "Russia", "why": "Aleksei Bugayev, Russia international, born the same day. The files spell his name another way." },
+      { "eaId": 146673, "names": ["Posse"], "wikidata": "Q2470802", "nationality": "Argentina", "why": "Martín Posse, the Argentine forward at Espanyol, born 20 August 1975. The file has a one-word name and the 2nd." },
+      { "eaId": 110137, "names": ["Djalminha"], "wikidata": "Q47489", "nationality": "Brazil", "why": "Djalminha, Brazil international, born 9 December 1970. The file has a one-word name and the wrong month." }
+    ],
+    "editions": [
+      { "id": "ea-fifa-06", "fifaVersion": 6, "edition": "FIFA 06", "released": "2005-09-30",
+        "ratings": { "file": "fifa06.csv", "sha256": "6c6ca98ad7c5cd0037573c4499ce0b6fdb5e6fc31ade217759fee8a19e264d41" },
+        "evidence": "FIFA Index lists one roster of this edition: 10,176 players with Ronaldinho, Buffon and Casillas at 95 and Zidane at 92, as in this file's 10,151. The date is the game's release in Europe, by EA's press release." },
+      { "id": "ea-fifa-05", "fifaVersion": 5, "edition": "FIFA 05", "released": "2004-10-08",
+        "ratings": { "file": "fifa05.csv", "sha256": "2472ef2b24ccbd0c2c75d45dd9105b278ce6e3b55be591915ad6b78aa7eea39e" },
+        "evidence": "FIFA Index lists one roster of this edition, about 10,994 players, with Henry at 97 and Zidane at 96, as in this file's 10,970. The date is the game's release in Europe." }
     ]
   }
 }

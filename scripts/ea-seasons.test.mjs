@@ -1,19 +1,26 @@
 // The built-in earlier football seasons (docs/design/football-years.md): EA player tuples (src/data/eaPlayers.js), the
 // season builders (scripts/lib/ea-seasons.mjs for FIFA 15 – EA FC 24, scripts/lib/ea-legacy-seasons.mjs for FIFA 07 –
-// FIFA 14) on invented rows, saves of an EA season campaign, and the committed files in public/football/ checked
-// against their listing (src/data/footballSeasons.js), their own content hash and the manifest.
+// FIFA 14, scripts/lib/ea-early-seasons.mjs for FIFA 05 and FIFA 06) on invented rows, saves of an EA season campaign, and
+// the committed files in public/football/ checked against their listing (src/data/footballSeasons.js), their own content
+// hash and the manifest.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { NATIONS } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { EA_ROLES, eaRosterOf, eaTupleOf, expandEaTuple } from '../src/data/eaPlayers.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { contentHash } from '../src/data/footballSetBuild.js';
-import { BUILT_IN_SETS, decodeFootballSet, setKindOf, setSportOf } from '../src/engine/footballSets.js';
+import { BUILT_IN_SETS, decodeFootballSet, setHasClubs, setHasNations, setKindOf, setSportOf, sportOf } from '../src/engine/footballSets.js';
+import { dataSetOf } from '../src/app/shared.js';
 import { parseCampaign, serializeCampaign } from '../src/engine/storage.js';
 import { sourceLabel, sourceTitle, sourceUrl } from '../src/viewModels/squad.js';
 import { EA_LEAGUES, EA_NATION_ALIASES, EA_NO_TEAM, buildEaSeason } from './lib/ea-seasons.mjs';
+import {
+  EARLY_EXTRA_FIELDS, WIKIDATA_COUNTRIES, buildEarlyEaSeason, eaCountryName, inLaterEdition, knownNationality, laterFromExport, laterFromScrape,
+  nameWords, namesAgree, nationalityEntries, samePerson, teamCountry, wikidataNationality,
+} from './lib/ea-early-seasons.mjs';
 import {
   LEGACY_POSITIONS, buildLegacyEaSeason, isoDate, legacyExclusions, legacyPositionKeys, readClubRows, readRatingsRows, rosterDate,
   rosterDates,
@@ -349,7 +356,252 @@ test('the old files are read as they are laid out: the ratings file\'s shifted c
   assert.throws(() => legacyExclusions([{ player: 'A', evidence: 'e', records: [{ edition: 'FIFA 09', eaId: '1', name: 'X' }] }]), /is incomplete/);
 });
 
+// ---------- the FIFA 05 and FIFA 06 builder, on invented rows ----------
+
+const EARLY_EDITION = { id: 'ea-fifa-06', fifaVersion: 6, edition: 'FIFA 06', released: '2005-09-30' };
+const EARLY_URL = 'https://example.test/ratings';
+const earlyRow = (id, name, over = {}) => ({ id: String(id), Fullname: name, current_rating: '70', birth_date: '01/01/1980', preferred_positions: 'ST', ...over });
+const later = (nationality, names, dob = '1980-01-01') => ({ nationality, names, dob });
+const EARLY_LATER = [
+  { edition: 'FIFA 07', players: new Map([
+    [1, later('England', ['A. Keeper', 'Alan Keeper'])],
+    [2, later('France', ['T. Spelled', 'Thierry Spelled'], '1977-08-17')],
+    [3, later('Egypt', ['I. Said', 'Ibrahim Said'], '1979-10-16')],
+    [4, later('Montenegro', ['M. Vucin'])],
+    [8, later('Brazil', ['Someone Else Entirely'])],
+  ]) },
+  { edition: 'FIFA 08', players: new Map([
+    [1, later('Scotland', ['Alan Keeper'])],
+    [3, later('Tunisia', ['Anis Boussaidi'], '1984-02-29')],
+    [5, later('Spain', ['Xavi'], null)],
+    [6, later('Kosovo', ['Bes Hasani'])],
+    [7, later('Malta', ['Maltese Player'])],
+  ]) },
+];
+const EARLY_ENTRIES = nationalityEntries({ players: [
+  { eaId: 20, names: ['Retired Great'], nationality: 'France', wikidata: 'Q1835', evidence: 'P1532', match: 'birth date and name' },
+  { eaId: 21, names: ['Real Name'], nationality: 'Romania', wikidata: 'Q2', evidence: 'P27', match: 'name', dob: '1979-01-08' },
+  { eaId: 22, names: ['Spelt One Way'], nationality: 'Italy', wikidata: 'Q3', evidence: 'P54', match: 'birth date and name' },
+] });
+const earlyRows = () => [
+  earlyRow(1, 'Alan Keeper', { preferred_positions: 'GK', current_rating: '80' }),
+  // A name that agrees, with a birth date a later edition corrects (this file has many wrong ones).
+  earlyRow(2, 'Thierry Spelled', { birth_date: '12/05/1984', preferred_positions: 'LWM-LF' }),
+  // EA gave this id to someone else: FIFA 07's Egyptian is another person, and FIFA 08 is not asked.
+  earlyRow(3, 'Anis Boussaidi', { birth_date: '29/02/1984' }),
+  // Montenegro's players counted for Serbia until 2006, and Kosovo had no federation.
+  earlyRow(4, 'Mirko Vucin'),
+  earlyRow(6, 'Bes Hasani'),
+  // The nearest later edition with the id, and a nationality with no team.
+  earlyRow(5, 'Xavi', { preferred_positions: 'CM-CAM' }),
+  earlyRow(7, 'Maltese Player'),
+  // The same birth date under another name is the same person ("Rocco" and "J. Sandkvist").
+  earlyRow(8, 'Nickname'),
+  // Wikidata for those no later edition has: only under the spelling it was matched to.
+  earlyRow(20, 'Retired Great', { current_rating: '92', preferred_positions: 'CAM' }),
+  earlyRow(21, 'Real Name', { birth_date: '30/06/1987' }),
+  earlyRow(22, 'Invented Standin', { current_rating: '89' }),
+  earlyRow(30, 'Nobody Knows', { current_rating: '60' }),
+];
+const buildEarly = (rows = earlyRows(), edition = EARLY_EDITION, options = {}) =>
+  buildEarlyEaSeason({ ratings: rows, later: EARLY_LATER, entries: EARLY_ENTRIES }, edition, { ratingsUrl: EARLY_URL, nationalities: 'Later editions, then Wikidata', ...options });
+
+test('names agree word by word: an initial or a shortening counts, a shared surname alone does not', () => {
+  assert.deepEqual(nameWords("Raúl M. Sørensen-O'Brien"), ['raul', 'm', 'sorensen', 'o', 'brien']);
+  for (const [a, b] of [['C. Ronaldo', 'Cristiano Ronaldo'], ['Manuel Cesar Rui Costa', 'Rui Costa'], ['Joshua Gowling', 'Josh Gowling'], ['Kim J. W.', 'Kim Jin Woo'],
+    ['Jin Woo Kim', 'Kim Jin Woo'], ['Tuncay Sanli', 'Tuncay Şanlı'], ['Alex Baptiste', 'Alex John-Baptiste'], ['Jay-Jay', 'Jay-Jay Okocha'], ['Wendell', 'Wendel']]) {
+    assert.ok(namesAgree(a, b), `${a} and ${b} agree`);
+    assert.ok(namesAgree(b, a), `${b} and ${a} agree`);
+  }
+  for (const [a, b] of [['Pierluigi Brivio', 'D. Brivio'], ['Pierluigi Brivio', 'Davide Brivio'], ['Peng Wang', 'Dong Fangzhuo'], ['Adrian Mutu', 'Petrovici Teodor'], ['', 'Someone']]) {
+    assert.ok(!namesAgree(a, b), `${a} and ${b} do not agree`);
+  }
+  const row = { id: '1', Fullname: 'Rocco', birth_date: '06/05/1981' };
+  assert.ok(samePerson(row, { names: ['J. Sandkvist'], dob: '1981-05-06' }), 'the same birth date under another name');
+  assert.ok(samePerson({ ...row, Fullname: 'Teddy Sheringham', birth_date: '14/05/1984' }, { names: ['T. Sheringham'], dob: '1966-04-02' }), 'the same name with a wrong date');
+  assert.ok(!samePerson(row, { names: ['J. Sandkvist'], dob: null }), 'nothing to go on');
+});
+
+test('the later editions read a player from either kind of source, and the nearest with the id speaks', () => {
+  const ratings = [{ id: '5', Fullname: 'Full Name', birth_date: '02/03/1980' }];
+  const clubs = [{ sofifa_id: '5', short_name: 'F. Name', nationality: 'Spain ' }, { sofifa_id: '6', short_name: 'Clubs Only', nationality: 'Peru' }];
+  const scraped = laterFromScrape('FIFA 07', clubs, ratings);
+  assert.equal(scraped.edition, 'FIFA 07');
+  assert.deepEqual(scraped.players.get(5), { nationality: 'Spain', names: ['F. Name', 'Full Name'], dob: '1980-03-02' });
+  assert.deepEqual(scraped.players.get(6), { nationality: 'Peru', names: ['Clubs Only'], dob: null });
+
+  const row = (id, version, nationality) => ({ player_id: id, fifa_version: version, nationality_name: nationality, short_name: 'S. Name', long_name: 'Some Name', dob: '1980-01-01' });
+  const exported = laterFromExport([row('9', '15.0', 'Chile'), row('9', '15.0', 'Peru'), row('9', '16.0', 'Peru'), row('8', '99.0', 'Peru')],
+    [{ fifaVersion: 16, edition: 'FIFA 16' }, { fifaVersion: 15, edition: 'FIFA 15' }]);
+  assert.deepEqual(exported.map(({ edition }) => edition), ['FIFA 16', 'FIFA 15']);
+  assert.equal(exported[1].players.get(9).nationality, 'Chile', 'a player\'s first row in the edition');
+  assert.ok(!exported.some(({ players }) => players.has(8)), 'another edition is not read');
+
+  const ask = id => inLaterEdition(earlyRows().find(candidate => candidate.id === String(id)), EARLY_LATER);
+  assert.deepEqual([ask(1).edition, ask(1).player.nationality], ['FIFA 07', 'England'], 'the nearest edition, though FIFA 08 says otherwise');
+  assert.deepEqual([ask(5).edition, ask(5).player.nationality], ['FIFA 08', 'Spain']);
+  assert.deepEqual(ask(3), { reused: { edition: 'FIFA 07', names: ['I. Said', 'Ibrahim Said'] } }, 'FIFA 08 is not asked once the id has moved on');
+  assert.equal(ask(30), null);
+});
+
+test('Wikidata settles a nationality in order of how directly it speaks of football, or not at all', () => {
+  assert.deepEqual(wikidataNationality({ senior: ["Greece men's national football team"], sport: ['Germany'], citizenship: ['Greece'] }), { nationality: 'Greece', evidence: 'P54' }, 'the team they played for');
+  assert.deepEqual(wikidataNationality({ senior: ["England men's national association football team"], citizenship: ['United Kingdom'] }), { nationality: 'England', evidence: 'P54' }, 'by the team\'s name: Wikidata files it under the United Kingdom');
+  assert.deepEqual(wikidataNationality({ senior: ['Soviet Union national football team', "Russia men's national football team"] }), { nationality: 'Russia', evidence: 'P54' }, 'a state of its time says nothing');
+  assert.equal(wikidataNationality({ senior: ["Spain men's national football team", "Argentina men's national football team"] }), null, 'two nations');
+  assert.deepEqual(wikidataNationality({ sport: ['Germany'], citizenship: ['Brazil'] }), { nationality: 'Brazil', evidence: 'P27' }, 'a country for sport no citizenship backs does not count');
+  assert.deepEqual(wikidataNationality({ sport: ['France'], citizenship: ['France', 'Algeria'] }), { nationality: 'France', evidence: 'P1532' });
+  assert.deepEqual(wikidataNationality({ sport: ['Russia', 'Germany'], citizenship: ['Russia'] }), { nationality: 'Russia', evidence: 'P1532' });
+  assert.deepEqual(wikidataNationality({ teams: ['England national under-21 association football team'], citizenship: ['United Kingdom'] }), { nationality: 'England', evidence: 'P54' }, 'a youth team, where nothing stronger speaks');
+  assert.deepEqual(wikidataNationality({ teams: ['Germany national under-21 football team', 'West Germany national under-18 football team'], citizenship: ['Germany', 'Turkey'] }), { nationality: 'Germany', evidence: 'P54' }, 'one nation, under two names');
+  assert.deepEqual(wikidataNationality({ citizenship: ['Kingdom of the Netherlands'] }), { nationality: 'Netherlands', evidence: 'P27' });
+  assert.deepEqual(wikidataNationality({ citizenship: ['South Korea'] }), { nationality: 'Korea Republic', evidence: 'P27' });
+  assert.deepEqual(wikidataNationality({ sport: ['England'], citizenship: ['United Kingdom'] }), { nationality: 'England', evidence: 'P1532' });
+  assert.equal(wikidataNationality({ citizenship: ['United Kingdom'] }), null, 'the United Kingdom is four of the game\'s nations');
+  assert.equal(wikidataNationality({ citizenship: ['Soviet Union'] }), null);
+  assert.equal(wikidataNationality({ citizenship: ['France', 'Algeria'] }), null, 'two countries, nothing to choose between them');
+  assert.equal(wikidataNationality({ sport: ['France', 'Algeria'], citizenship: ['France', 'Algeria'] }), null, 'football itself is unsure');
+  assert.equal(wikidataNationality({}), null);
+  assert.equal(teamCountry("United States men's national soccer team"), 'United States');
+  assert.equal(teamCountry('Atlantis'), 'Atlantis');
+  assert.equal(eaCountryName('Atlantis'), null);
+  for (const [label, name] of Object.entries(WIKIDATA_COUNTRIES)) {
+    if (name != null) assert.ok(knownNationality(name), `${label} → ${name} is a nationality the seasons read`);
+  }
+
+  const entry = { eaId: 1, names: ['Name'], nationality: 'France', wikidata: 'Q1', evidence: 'P1532', match: 'birth date and name' };
+  assert.equal(nationalityEntries({ players: [entry] }).get(1), entry);
+  assert.throws(() => nationalityEntries({}), /no players/);
+  assert.throws(() => nationalityEntries({ players: [entry, entry] }), /Early nationality of 1 is listed twice/);
+  assert.throws(() => nationalityEntries({ players: [{ ...entry, nationality: 'Atlantis' }] }), /"Atlantis" is not a nationality/);
+  for (const damaged of [{ names: [] }, { wikidata: 'x' }, { evidence: 'P9' }, { match: 'hunch' }, { dob: '1980' }]) {
+    assert.throws(() => nationalityEntries({ players: [{ ...entry, ...damaged }] }), /is incomplete/, JSON.stringify(damaged));
+  }
+});
+
+test('a FIFA 05 or FIFA 06 season: EA\'s ratings, a later edition\'s nationality or Wikidata\'s, and no clubs', () => {
+  const { doc, text, audit, warnings } = buildEarly();
+  assert.deepEqual([doc.format, doc.kind, doc.id, doc.year, doc.season, doc.label], [1, 'ea', 'ea-fifa-06', 2006, '2005/06', 'FIFA 06']);
+  assert.deepEqual(doc.source, { provider: 'EA Sports', edition: 'FIFA 06', update: 1, roster: '060001', snapshotDate: '2005-09-30', url: EARLY_URL,
+    nationalities: 'Later editions, then Wikidata', rawScale: 99 });
+  assert.equal(doc.version, `ea-fifa-06-${contentHash(doc)}`);
+  assert.equal(text, `${JSON.stringify(doc)}\n`);
+  assert.deepEqual(warnings, [], 'no club is no news here');
+
+  assert.deepEqual(doc.clubs, []);
+  assert.deepEqual([doc.coverage.clubs, doc.coverage.leagues], [0, 0]);
+  const tuple = (nation, id) => doc.nations[nation][2].find(player => player[0] === id);
+  assert.deepEqual(tuple('826', 1), [1, 'Alan Keeper', 0, 80, 'GK', 'England', '', '1980-01-01', 'alan-keeper'], 'the nearest later edition; no club');
+  assert.deepEqual(tuple('250', 2), [2, 'Thierry Spelled', 0, 70, 'LM,CF', 'France', '', '1977-08-17', 'thierry-spelled'], 'the later edition\'s birth date');
+  assert.deepEqual(tuple('724', 5).slice(1, 6), ['Xavi', 0, 70, 'CM,CAM', 'Spain']);
+  assert.deepEqual(tuple('076', 8).slice(1, 6), ['Nickname', 0, 70, 'ST', 'Brazil'], 'the same birth date under another name');
+  assert.deepEqual(tuple('250', 20), [20, 'Retired Great', 0, 92, 'CAM', 'France', '', '1980-01-01', 'retired-great'], 'Wikidata, for one no later edition has');
+  assert.deepEqual(tuple('642', 21), [21, 'Real Name', 0, 70, 'ST', 'Romania', '', '1979-01-08', 'real-name'], 'matched by name: Wikidata\'s birth date');
+
+  // Montenegro's player counts for Serbia that year; Montenegro is held by Serbia, Kosovo has no federation.
+  assert.deepEqual(tuple('688', 4).slice(1, 6), ['Mirko Vucin', 0, 70, 'ST', 'Serbia']);
+  assert.deepEqual(doc.nations['499'], [40, 0, []]);
+  assert.deepEqual(doc.nations.KOS, [40, 0, []]);
+  assert.deepEqual(doc.territory, { merged: { 499: '688', 728: '729' }, inactive: ['KOS'] });
+
+  // Not written: a reused id, an entry under another spelling, nobody's nationality; a nation with no team has no squad.
+  const written = Object.values(doc.nations).flatMap(([, , squad]) => squad).map(player => player[0]);
+  for (const id of [3, 22, 30, 6, 7]) assert.ok(!written.includes(id), `player ${id} is not written`);
+  assert.deepEqual(audit.noTeam, { Malta: 1 });
+  assert.deepEqual(audit.join, { ratingsRows: 12, fromLater: { 'FIFA 07': 4, 'FIFA 08': 3 }, fromWikidata: { P1532: 1, P27: 1 }, reusedIds: 1, leftOut: 3, datesCorrected: 2,
+    noFederation: { Kosovo: 1 }, heldBy: { 'Montenegro → Serbia': 1 } });
+  assert.deepEqual(audit.reused, ['3 Anis Boussaidi: FIFA 07 names I. Said / Ibrahim Said']);
+  assert.deepEqual(audit.leftOutBest, ['22 Invented Standin (89)', '3 Anis Boussaidi (70)', '30 Nobody Knows (60)'], 'best first');
+  assert.deepEqual(audit.mappedPositions, { 'LF→CF': 1, 'LWM→LM': 1 });
+  assert.deepEqual([audit.roster, audit.snapshotDate, audit.update], ['060001', '2005-09-30', 1]);
+
+  // The loader takes it, and a player links to that edition's page on FIFA Index, SoFIFA having no roster so old.
+  const set = decodeFootballSet(structuredClone(doc));
+  assert.deepEqual(set.clubs, []);
+  const zidane = set.rosters['250'][2].find(player => player[0] === 'Retired Great');
+  assert.equal(sourceUrl({ sourceInfo: zidane[3] }), 'https://fifaindex.com/players/20-retired-great/fifa06');
+  assert.equal(sourceLabel({ sourceInfo: zidane[3] }), 'FIFA 06');
+  assert.equal(zidane[3].club, '');
+  assert.equal(buildEarly().text, text, 'the same rows build the same file');
+
+  // FIFA 05 is a year earlier: Timor-Leste had no federation yet either.
+  const earlier = buildEarly(earlyRows(), { id: 'ea-fifa-05', fifaVersion: 5, edition: 'FIFA 05', released: '2004-10-08' }).doc;
+  assert.deepEqual([earlier.year, earlier.season, earlier.source.roster, earlier.source.snapshotDate], [2005, '2004/05', '050001', '2004-10-08']);
+  assert.deepEqual(earlier.territory.inactive, ['626', 'KOS']);
+});
+
+test('a FIFA 05 or FIFA 06 season stops rather than guess', () => {
+  const withRow = over => buildEarly([...earlyRows(), earlyRow(1000, 'Alan Keeper', { ...over })]);
+  assert.throws(() => withRow({ preferred_positions: 'ST-XX' }), /FIFA 06: player 1000 has positions ST-XX, a code neither EA's nor in LEGACY_POSITIONS/);
+  assert.throws(() => withRow({ birth_date: '31/02/1990' }), /FIFA 06: player 1000 has date of birth 31\/02\/1990/);
+  assert.throws(() => withRow({ Fullname: `Alan ${GARBLED}eeper` }), /FIFA 06: player 1000 has a damaged name/);
+  const rows = earlyRows();
+  assert.throws(() => buildEarly([...rows, rows[0]]), /FIFA 06: invalid or repeated player id 1/);
+  assert.throws(() => buildEarly(rows, { ...EARLY_EDITION, id: 'fifa-06' }), /not like ea-fifa-06/);
+  assert.throws(() => buildEarly(rows, { ...EARLY_EDITION, released: 'autumn' }), /FIFA 06: release date autumn is not YYYY-MM-DD/);
+  // A later edition's nationality the game cannot read stops the build, as for any other season.
+  const later2 = [{ edition: 'FIFA 07', players: new Map([[1, later('Fictionland', ['Alan Keeper'])]]) }];
+  assert.throws(() => buildEarlyEaSeason({ ratings: rows.slice(0, 1), later: later2 }, EARLY_EDITION, { ratingsUrl: EARLY_URL }), /nationalities with no game nation, and not listed as having no team: Fictionland/);
+});
+
+test('the FIFA 05 and FIFA 06 files hold one field more per row than their header names', () => {
+  const header = 'id;Fullname;current_rating;potential_rating;height;weight;preferred_foot;birth_date;preferred_positions;last';
+  const row = '3721;Nenad Dzodic;67;62;188;75;Right;04/01/1977;CB;1;extra';
+  assert.throws(() => readRatingsRows(`${header}\n${row}`), /Ratings row 2 has 11 fields/);
+  assert.deepEqual(readRatingsRows(`${header}\n${row}`, { extraFields: EARLY_EXTRA_FIELDS }),
+    [{ id: '3721', Fullname: 'Nenad Dzodic', current_rating: '67', birth_date: '04/01/1977', preferred_positions: 'CB' }]);
+  assert.throws(() => readRatingsRows(`${header}\n${row};more`, { extraFields: EARLY_EXTRA_FIELDS }), /Ratings row 2 has 12 fields/);
+});
+
+test('FIFA 05 and FIFA 06 have nations only, and a player of theirs links to FIFA Index and folds back exactly', () => {
+  for (const id of ['ea-fifa-05', 'ea-fifa-06']) {
+    assert.ok(!setHasClubs(id) && setHasNations(id), id);
+    assert.equal(setSportOf(id), 'football');
+  }
+  for (const id of ['ea-fifa-07', 'ea-fifa-18', 'ea-fc-26', 'cm0102-2005-09', 'nba-2k10', 'mlb-the-show-21']) assert.ok(setHasClubs(id), id);
+
+  // With clubs chosen, such a season does not play: the built-in season does.
+  const nations = { sport: 'football', layer: 'nations', dataSet: 'ea-fifa-06' }, clubs = { ...nations, layer: 'clubs' };
+  assert.equal(dataSetOf(nations), 'ea-fifa-06');
+  assert.equal(dataSetOf(clubs), null);
+  assert.equal(dataSetOf({ ...clubs, dataSet: 'ea-fifa-18' }), 'ea-fifa-18');
+  assert.equal(sportOf(nations), null, 'waits for the season to load');
+  assert.equal(sportOf(clubs), getSport('football'));
+
+  const source = { provider: 'EA Sports', edition: 'FIFA 06', update: 1, roster: '060001', snapshotDate: '2005-09-30', url: EARLY_URL, rawScale: 99 };
+  const tuple = [1397, 'Zinedine Zidane', 0, 92, 'CAM', 'France', '', '1972-06-23', 'zinedine-zidane'];
+  const [name, , rating, info] = expandEaTuple(tuple, source);
+  assert.deepEqual([name, rating, info.url, info.club, info.edition], ['Zinedine Zidane', 92, 'https://fifaindex.com/players/1397-zinedine-zidane/fifa06', '', 'FIFA 06']);
+  assert.deepEqual(eaTupleOf(name, info), tuple);
+  assert.equal(eaRosterOf(info.url), '060001');
+  assert.equal(sourceUrl({ name, sourceInfo: info }), info.url);
+  assert.equal(sourceTitle({ name, sourceInfo: info }), 'FIFA 06 · Database snapshot 2005-09-30 · Source rating 92/99');
+  // SoFIFA's editions keep their links; FIFA Index links name only editions before them, and the right player.
+  assert.equal(expandEaTuple([5, 'X', 0, 70, 'ST', 'Brazil', '', '', 'x'], { ...source, roster: '070002' })[3].url, 'https://sofifa.com/player/5/x/070002');
+  assert.equal(eaRosterOf('https://fifaindex.com/players/1397-zinedine-zidane/fifa18'), null);
+  assert.equal(eaTupleOf(name, { ...info, url: 'https://fifaindex.com/players/1-zinedine-zidane/fifa06' }), null);
+});
+
 // ---------- saves ----------
+
+test('a FIFA 06 campaign packs its players too; a save cannot play it with clubs', () => {
+  const doc = buildEarly().doc;
+  const set = decodeFootballSet(structuredClone(doc));
+  const squad = set.rosters['250'][2].map(([name, pos, rating, sourceInfo]) => ({ name, pos, rating, gen: false, sourceInfo, id: sourceInfo.id, positions: [...sourceInfo.positions] }));
+  const settings = { sport: 'football', layer: 'nations', scope: 'UEFA', clubScope: 'all', pacing: 'duel', resolution: 'ticker', uncertainty: 'balanced', role: 'spectator',
+    finale: 'single', express: false, managedTeamId: '', dataSet: doc.id, dataVersion: doc.version, dataYear: 2006, dataSeason: '2005/06' };
+  const campaign = { v: 4, seed: 7, rngState: 7, round: 1, matches: 0, aliveIds: ['250', '826'], own: { 250: '250', 826: '826' },
+    teams: { 250: { id: '250', name: 'France', str: 70, squad }, 826: { id: '826', name: 'England', str: 60, squad: [] } }, settings };
+  const text = serializeCampaign(campaign);
+  const packed = JSON.parse(text);
+  assert.deepEqual(packed.playerPack, { kind: 'ea', source: { edition: 'FIFA 06', update: 1, snapshotDate: '2005-09-30', roster: '060001' } });
+  assert.ok(packed.teams['250'].squad.every(player => Array.isArray(player) && player.length === 9), 'FIFA Index links pack as well as SoFIFA\'s');
+  assert.equal(JSON.stringify(parseCampaign(text).teams), JSON.stringify(campaign.teams), 'rebuilt exactly');
+
+  const copy = JSON.parse(text);
+  copy.settings.layer = 'clubs';
+  assert.throws(() => parseCampaign(JSON.stringify(copy)), /Campaign data set is invalid/);
+});
 
 test('an EA season campaign packs its players as EA tuples; a damaged pack is refused', () => {
   const doc = buildEaSeason(sampleRows(), EDITION, { dataset: DATASET }).doc;
@@ -395,16 +647,18 @@ const FLOORS = {
   default: { completeXIs: 65, nations: 125, clubs: 125 },
   'ea-fifa-14': { completeXIs: 60 }, 'ea-fifa-11': { completeXIs: 60 }, 'ea-fifa-10': { completeXIs: 60 },
   'ea-fifa-09': { completeXIs: 45, nations: 120 }, 'ea-fifa-08': { completeXIs: 50, nations: 115 }, 'ea-fifa-07': { completeXIs: 50, nations: 110 },
+  // Nations only (no source here has their clubs).
+  'ea-fifa-06': { completeXIs: 50, nations: 110, clubs: 0 }, 'ea-fifa-05': { completeXIs: 50, nations: 110, clubs: 0 },
 };
 const committed = id => JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
 const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)];
 
 test('every built-in earlier season is committed, matches its listing and its own hash, and decodes', () => {
-  const editions = [...MANIFEST.snapshots, ...MANIFEST.editions, ...MANIFEST.legacy.editions];
-  assert.equal(editions.length, 19, 'FIFA 07 to EA FC 24, and EA FC 26');
+  const editions = [...MANIFEST.snapshots, ...MANIFEST.editions, ...MANIFEST.legacy.editions, ...MANIFEST.early.editions];
+  assert.equal(editions.length, 21, 'FIFA 05 to EA FC 24, and EA FC 26');
   assert.deepEqual(BUILT_IN_SEASONS.map(set => set.id), editions.map(edition => edition.id), 'one per manifest edition, newest first');
   // EA FC 25 (2024/25) has no source here.
-  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.year), [2026, ...Array.from({ length: 18 }, (_, i) => 2024 - i)]);
+  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.year), [2026, ...Array.from({ length: 20 }, (_, i) => 2024 - i)]);
   assert.deepEqual(BUILT_IN_SETS.filter(set => setSportOf(set.id) === 'football').map(set => set.id), BUILT_IN_SEASONS.map(set => set.id));
   for (const [i, listed] of BUILT_IN_SEASONS.entries()) {
     const edition = editions[i];
@@ -413,7 +667,11 @@ test('every built-in earlier season is committed, matches its listing and its ow
     assert.deepEqual([doc.id, doc.version, doc.year, doc.season, doc.label], [listed.id, listed.version, listed.year, listed.season, listed.label]);
     assert.deepEqual([doc.year, doc.label], [2000 + edition.fifaVersion, edition.edition]);
     assert.equal(doc.version, `${doc.id}-${contentHash(doc)}`, `${doc.id} is the file its version names`);
-    if (edition.clubs) {
+    if (edition.released) {
+      // FIFA 05 and FIFA 06: one roster each, dated by the game's release.
+      assert.deepEqual([doc.source.url, doc.source.roster, doc.source.update, doc.source.snapshotDate],
+        [MANIFEST.legacy.ratings.url, `${String(edition.fifaVersion).padStart(2, '0')}0001`, 1, edition.released]);
+    } else if (edition.clubs) {
       // FIFA 07–14: the clubs file's roster dates the season; a ratings file of another roster has its own date.
       assert.deepEqual([doc.source.url, doc.source.clubsUrl, doc.source.roster, doc.source.update],
         [MANIFEST.legacy.ratings.url, MANIFEST.legacy.clubs.url, edition.clubs.roster, Number(edition.clubs.roster.slice(2))]);
@@ -429,9 +687,58 @@ test('every built-in earlier season is committed, matches its listing and its ow
     const set = decodeFootballSet(doc);
     const floor = { ...FLOORS.default, ...FLOORS[doc.id] };
     assert.ok(doc.coverage.completeXIs >= floor.completeXIs && doc.coverage.nations >= floor.nations, `${doc.id} coverage ${JSON.stringify(doc.coverage)}`);
-    assert.deepEqual([...new Set(set.clubs.map(club => club.league))].sort(), Object.values(EA_LEAGUES).map(([league]) => league).sort());
+    assert.deepEqual([...new Set(set.clubs.map(club => club.league))].sort(),
+      setHasClubs(doc.id) ? Object.values(EA_LEAGUES).map(([league]) => league).sort() : []);
     assert.ok(set.clubs.length >= floor.clubs, `${doc.id} has ${set.clubs.length} clubs`);
   }
+});
+
+test('FIFA 05 and FIFA 06 name every input by its SHA-256, field the players who retired before FIFA 07, and write no stand-in', () => {
+  const { early, legacy } = MANIFEST;
+  const hex = /^[0-9a-f]{64}$/;
+  const fileText = readFileSync(new URL(`../${early.nationalities.file}`, import.meta.url));
+  assert.equal(createHash('sha256').update(fileText).digest('hex'), early.nationalities.sha256, 'the committed nationalities are the pinned ones');
+  const entries = nationalityEntries(JSON.parse(fileText.toString('utf8')));
+  assert.ok(entries.size > 1000, `${entries.size} players from Wikidata`);
+  for (const edition of early.editions) {
+    assert.ok(hex.test(edition.ratings.sha256) && edition.evidence?.trim(), `${edition.edition} pins its file and says how its roster is known`);
+    assert.ok(!legacy.editions.some(other => other.id === edition.id));
+    assert.ok(!setHasClubs(edition.id), `${edition.edition} has nations only`);
+  }
+
+  const byId = (doc, nation, id) => doc.nations[nation][2].find(tuple => tuple[0] === id);
+  const fifa06 = committed('ea-fifa-06'), fifa05 = committed('ea-fifa-05');
+  // Top of each edition, as FIFA Index lists them: Henry at 97 in FIFA 05 (https://fifaindex.com/players/fifa05), Ronaldinho at 95 in FIFA 06.
+  const strongest = doc => Math.max(...tuplesOf(doc).map(tuple => tuple[3]));
+  assert.deepEqual([strongest(fifa05), strongest(fifa06)], [97, 95]);
+  assert.equal(tuplesOf(fifa05).find(tuple => tuple[3] === 97 && tuple[1] === 'Thierry Henry')?.[5], 'France');
+  assert.equal(tuplesOf(fifa06).find(tuple => tuple[1] === 'Ronaldinho')?.[3], 95);
+  // Zidane (EA id 1397) had retired by FIFA 07: his nationality is Wikidata's, and he leads France in both.
+  const zidane = doc => byId(doc, '250', 1397);
+  assert.deepEqual([zidane(fifa05)?.[1], zidane(fifa05)?.[3], zidane(fifa05)?.[5]], ['Zinedine Zidane', 96, 'France']);
+  assert.deepEqual([zidane(fifa06)?.[1], zidane(fifa06)?.[3], zidane(fifa06)?.[5]], ['Zinedine Zidane', 92, 'France']);
+  assert.equal(entries.get(1397)?.nationality, 'France');
+  // Each player checked by hand is one no rule could settle, and says why.
+  for (const { eaId, names, wikidata, nationality, why } of early.checked) {
+    assert.ok(why?.trim(), `${eaId} says why`);
+    assert.deepEqual([entries.get(eaId)?.wikidata, entries.get(eaId)?.nationality, entries.get(eaId)?.evidence], [wikidata, nationality, 'checked']);
+    assert.deepEqual(entries.get(eaId).names, names.slice().sort());
+  }
+
+  for (const doc of [fifa05, fifa06]) {
+    assert.deepEqual(doc.clubs, [], `${doc.id} has no clubs`);
+    const tuples = tuplesOf(doc);
+    assert.ok(tuples.every(tuple => tuple[6] === ''), 'nobody has a club');
+    assert.ok(tuples.every(tuple => tuple[8] && /^[a-z0-9-]+$/.test(tuple[8])), 'everyone has a link');
+    assert.ok(!tuples.some(tuple => tuple.some(field => String(field).includes(GARBLED))), 'no damaged text');
+    for (const held of [...Object.keys(doc.territory.merged), ...doc.territory.inactive]) assert.deepEqual(doc.nations[held], [40, 0, []], `${held} fields nobody that year`);
+    assert.ok(!tuples.some(tuple => ['Montenegro', 'Kosovo', 'South Sudan'].includes(tuple[5])));
+  }
+  // EA's stand-ins of FIFA 06 (the evidence in `legacy.exclusions`), whose real players are named in FIFA 05.
+  const standIns = ['Petrovici Teodor', 'Valerio Bernado', 'Rabret Sylvain', 'Tellot Yves', 'Marcuccilli Silvio', 'Sturdza Corneliu', 'Kurtz Kambert', 'Daddah Ankoma'];
+  const names06 = new Set(tuplesOf(fifa06).map(tuple => tuple[1]));
+  for (const name of standIns) assert.ok(!names06.has(name), `FIFA 06 leaves out ${name}`);
+  assert.ok(!standIns.some(name => [...entries.values()].some(entry => entry.names.includes(name))), 'no entry names a stand-in');
 });
 
 test('the FIFA 07–14 seasons name every input by its SHA-256, and none writes a player EA renamed with an invented name', () => {

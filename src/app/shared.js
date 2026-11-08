@@ -5,7 +5,7 @@ import { domesticScope, domesticScopeId } from '../engine/domestic.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { CLUB_SCOPES } from '../data/scopes.js';
 import { clubMapScope, domesticEntry, isDomesticScope } from '../data/domesticScope.js';
-import { seasonMapOf, setHasNations, setSportOf, sportOf } from '../engine/footballSets.js';
+import { seasonMapOf, setHasClubs, setHasNations, setSportOf, sportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -33,13 +33,14 @@ export function domesticIdOf(settings) {
 
 /**
  * The data set a setup or saved campaign is played on, or null for the built-in data. A set plays in its own sport:
- * a football season on the world (country maps use the built-in data), a basketball season with clubs only, on its
- * era's map, and a baseball season with its nations or with its clubs on its era's map. Pure.
+ * a football season on the world (country maps use the built-in data; FIFA 05 and FIFA 06 have nations only), a
+ * basketball season with clubs only, on its era's map, and a baseball season with its nations or with its clubs on its
+ * era's map. Pure.
  */
 export function dataSetOf(settings) {
   const id = settings?.dataSet ?? null, sport = getSport(settings?.sport).id;
   if (id == null || setSportOf(id) !== sport) return null;
-  if (sport === 'football') return domesticIdOf(settings) ? null : id;
+  if (sport === 'football') return domesticIdOf(settings) || (settings.layer === 'clubs' && !setHasClubs(id)) ? null : id;
   return setHasNations(id) || settings.layer === 'clubs' ? id : null;
 }
 
@@ -58,6 +59,8 @@ export function setClubScope(setup) {
   if (domesticEntry(setup.clubScope)?.sport) return 'all';
   if (setup.dataSet == null || sportId !== 'football') return setup.clubScope;
   if (isDomesticScope(setup.clubScope)) return 'all';
+  // A season with nations only has no leagues to check it against; the theatre waits for a season with clubs.
+  if (!setHasClubs(setup.dataSet)) return setup.clubScope;
   const sport = sportOf(setup);
   return !sport || CLUB_SCOPES(sport).some(scope => scope.id === setup.clubScope) ? setup.clubScope : 'all';
 }

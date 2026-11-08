@@ -52,9 +52,10 @@ export function isoDate(text) {
 /**
  * A ratings file's rows as objects of RATINGS_COLUMNS. The FIFA 11–14 files name one column more than their rows
  * hold (the attributes after `composure` shift by one) and FIFA 11's last row is cut short; the columns read here all
- * come before both, so a row needs only those.
+ * come before both, so a row needs only those. The FIFA 05 and FIFA 06 files can go the other way: `extraFields` is how
+ * many fields a row may hold beyond the header's, again after every column read here.
  */
-export function readRatingsRows(text) {
+export function readRatingsRows(text, { extraFields = 0 } = {}) {
   const lines = text.split('\n').map(line => line.replace(/\r$/, ''));
   if (lines.at(-1) === '') lines.pop();
   const header = lines[0].split(';');
@@ -66,7 +67,7 @@ export function readRatingsRows(text) {
   const needed = Math.max(...at) + 1;
   return lines.slice(1).map((line, i) => {
     const fields = line.split(';');
-    if (fields.length < needed || fields.length > header.length) throw new Error(`Ratings row ${i + 2} has ${fields.length} fields`);
+    if (fields.length < needed || fields.length > header.length + extraFields) throw new Error(`Ratings row ${i + 2} has ${fields.length} fields`);
     return Object.fromEntries(RATINGS_COLUMNS.map((name, k) => [name, fields[at[k]]]));
   });
 }

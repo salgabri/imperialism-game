@@ -10,7 +10,7 @@ import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomestic
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel } from './data/domesticScope.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
-  loadFootballSetIndex, retainFootballSets, seasonSport, setSportOf, sportOf } from './engine/footballSets.js';
+  loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport, matchSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
@@ -808,6 +808,11 @@ export default class App extends React.Component {
       if (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball') {
         if (key === 'layer' && value !== 'clubs') setup.dataSet = null;
         else setup.layer = 'clubs';
+      }
+      // A football season with nations only is the same the other way round.
+      if (setup.dataSet != null && !setHasClubs(setup.dataSet)) {
+        if (key === 'layer' && value === 'clubs') setup.dataSet = null;
+        else setup.layer = 'nations';
       }
       // A sport with clubs only (American football: the NFL's) has no nations to choose.
       if (getSport(setup.sport).clubsOnly) setup.layer = 'clubs';
