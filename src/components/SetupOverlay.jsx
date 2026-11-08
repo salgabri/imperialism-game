@@ -175,7 +175,7 @@ function SelectedTeam({ team, noun }) {
                 </li>
               ))}
             </ol>
-          ) : <p className="setup-fronts__empty">No land borders — every war goes by sea.</p>}
+          ) : <p className="setup-fronts__empty">{team.fronts.emptyText}</p>}
         </div>
       ) : null}
     </section>
@@ -519,7 +519,11 @@ export default function SetupOverlay({
                     </div>
                   ) : (
                     <>
-                      <div className="setup-save__text"><strong>Continue your campaign</strong><p>{savedText}</p></div>
+                      <div className="setup-save__text">
+                        <strong>Continue your campaign</strong><p>{savedText}</p>
+                        {/* Visual only: SaveControls' status line already announces it. */}
+                        {saveStatus?.refused && <p className="setup-save__refused">{saveStatus.message}</p>}
+                      </div>
                       <div className="setup-save__actions">
                         <button type="button" className="btn-secondary setup-save__resume" disabled={restoring} onClick={onResume}>Resume</button>
                         <button type="button" className="btn-link" ref={clearSaveButton} onClick={askDiscard}>Clear quick resume</button>

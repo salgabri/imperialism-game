@@ -25,8 +25,9 @@ export const CLUB_PAGE_SIZE = 100;
 export const TIE_PAGE_SIZE = 2000;
 export const SLICE_PAGE_SIZE = 5000;
 export const SQUAD_SIZE = 16;
-// Every map has 100 sections whatever N (format 2), so two clubs make a campaign.
-export const MIN_CLUBS = 2;
+// Every map has 100 sections whatever N (format 2), so two clubs could fill one, but their
+// whole campaign would be one match. A country needs ten to be worth a map of its own.
+export const MIN_CLUBS = 10;
 const POSITIONS = Object.keys(FM_ROLES);
 
 // ---- HTTP: concurrency-limited, paced, retried ----

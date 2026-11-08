@@ -32,7 +32,8 @@
 //
 // The sync also records each nation's N under the full rules (n, ships, why) in survey.json.
 //
-// Snapshot scripts/data/domestic/<nation id>.json (written only when N >= MIN_CLUBS, i.e. 2):
+// Snapshot scripts/data/domestic/<nation id>.json (written only when N >= MIN_CLUBS, i.e. 10;
+// a nation below it loses any earlier snapshot, and the next full build retires its map):
 // {
 //   "format": 1,
 //   "source": { provider, game, version: '26.3.0', fetchedAt (ISO, newest cached
@@ -54,7 +55,7 @@
 // fmName/fmShort keep FM's own names when domestic-names.json replaces them.
 // Squad tuples are exactly what expandFmTuple (src/data/fmPlayers.js) reads.
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
@@ -291,7 +292,11 @@ async function sync() {
     const lister = createClubLister(efem, nation);
     const { taken, excluded, rows } = await selectClubs(nation, lister, players.byClub);
     outcomes.set(id, outcome(taken.length, count(excluded, e => e.reason)));
-    if (taken.length < MIN_CLUBS) { console.log(`${id} ${nation.name}: ${outcomes.get(id).why}; no snapshot`); continue; }
+    if (taken.length < MIN_CLUBS) {
+      await rm(path.join(outDir, `${id}.json`), { force: true });
+      console.log(`${id} ${nation.name}: ${outcomes.get(id).why}; no snapshot`);
+      continue;
+    }
     const display = displayNames(nation, taken, names);
     const located = await locateClubs({
       nation, overrides, wikidata, geoFiles, region: REGIONS[id],

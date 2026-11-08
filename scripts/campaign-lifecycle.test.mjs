@@ -56,6 +56,28 @@ test('renaming a slot deleted elsewhere reports it in the dialog instead of thro
   } finally { f.close(); }
 });
 
+test('a campaign on a country no longer shipped is refused by name, while a shipped map that fails to load says so', async () => {
+  const f = syncAppFixture({ phase: 'setup' });
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  Object.defineProperty(globalThis, 'fetch', { configurable: true, writable: true,
+    value: async () => ({ ok: false, status: 404, json: async () => { throw new Error('Not found'); } }) });
+  try {
+    const { app } = f;
+    const restore = async id => {
+      let restored = false;
+      await app.withCampaignMap({ settings: { sport: 'football', layer: 'clubs', clubScope: `domestic:${id}` } }, () => { restored = true; });
+      assert.equal(restored, false);
+      return app.state.saveStatus;
+    };
+    // Belize (two viable clubs) lost its map to the ten-club floor; Fiji keeps its own.
+    assert.deepEqual(await restore('084'), { ok: false, refused: true, message: 'The map of Belize is no longer in the game, so the campaign cannot resume. The save is kept.' });
+    assert.deepEqual(await restore('242'), { ok: false, refused: true, message: 'The map of Fiji could not be loaded, so the campaign cannot resume. Domestic map 242 failed to load (HTTP 404)' });
+  } finally {
+    f.close();
+    if (prior) Object.defineProperty(globalThis, 'fetch', prior); else delete globalThis.fetch;
+  }
+});
+
 test('another tab saving the outgoing campaign never traps the setup screen in a conflict', () => {
   const f = syncAppFixture();
   try {

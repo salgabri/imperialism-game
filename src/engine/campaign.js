@@ -4,8 +4,9 @@
 //   { geo: WorldGeometry, own: {countryId -> empireId}, aliveIds: string[] }
 // plus optional routing land: routingPaths (painted geometry, else geo.paths),
 // a prepared routeIndex, obstacles (createAttackRouteIndex's never-owned land),
-// and borderRoutes (country maps: aim at a neighbour's shared border when its
-// anchor is out of sight).
+// borderRoutes (country maps: aim at a neighbour's shared border when its
+// anchor is out of sight) and openLand (a map with empty land between its
+// territories, so a route around a rival's land is no coastal sea route).
 
 import { EXCLUDED_SHAPES } from '../data/teams.js';
 import { closestPair } from './geo.js';
@@ -13,6 +14,8 @@ import { borderApproachPoints, createAttackRouteIndex, firstForeignLand, findCoa
 
 /** Route label for a transit across board.obstacles (a country map's foreign neighbours). */
 export const FOREIGN_TRANSIT_LABEL = 'Crossing foreign territory';
+/** The label of a route that bends around rival land: over water, or also over a map's empty land. */
+const aroundLabel = board => (board.openLand ? 'Route around rival land' : 'Coastal sea route');
 // Shared-border points tried per target (nearest first) when borderRoutes is on.
 const BORDER_TRIES = 12;
 
@@ -243,7 +246,7 @@ function pickFallbackTarget(board, attackerId, angle, routeIndex) {
     const a = routePoints[0], b = routePoints[routePoints.length - 1];
     return { tid: candidate.tid, cp: { ax: a[0], ay: a[1], bx: b[0], by: b[1], dist: Math.hypot(b[0] - a[0], b[1] - a[1]) },
       diff: bearingDifference(routePoints, angle), anchorDistance: candidate.cp.dist,
-      isNeighbor: false, routeKind: 'sea', routeLabel: 'Coastal sea route', routePoints, transitCountryIds: [] };
+      isNeighbor: false, routeKind: 'sea', routeLabel: aroundLabel(board), routePoints, transitCountryIds: [] };
   }
   if (!routeIndex) return null;
   const survivors = new Set(board.aliveIds);
@@ -294,7 +297,7 @@ export function fallbackRouteTo(board, attackerId, targetId, routeIndex = isolat
   if (routePoints) {
     const a = routePoints[0], b = routePoints[routePoints.length - 1];
     return { tid: targetId, cp: { ax: a[0], ay: a[1], bx: b[0], by: b[1], dist: Math.hypot(b[0] - a[0], b[1] - a[1]) },
-      anchorDistance: closest.dist, isNeighbor: false, routeKind: 'sea', routeLabel: 'Coastal sea route',
+      anchorDistance: closest.dist, isNeighbor: false, routeKind: 'sea', routeLabel: aroundLabel(board),
       routePoints, transitCountryIds: [] };
   }
   const survivors = new Set(board.aliveIds || []);

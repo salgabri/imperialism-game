@@ -36,7 +36,7 @@ export function snapshotBoard(board) {
     const neighbors = board.geo.adj?.[cid];
     adj[cid] = neighbors instanceof Set || Array.isArray(neighbors) ? new Set(neighbors) : new Set();
   }
-  return { geo: { paths, adj }, own, aliveIds, routeIndex, borderRoutes: Boolean(board.borderRoutes) };
+  return { geo: { paths, adj }, own, aliveIds, routeIndex, borderRoutes: Boolean(board.borderRoutes), openLand: Boolean(board.openLand) };
 }
 
 /**

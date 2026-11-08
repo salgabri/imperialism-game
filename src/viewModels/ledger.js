@@ -525,7 +525,7 @@ function previewRoute(ctx, aId, dId, route) {
   if (isNeighbor === undefined && ctx?.board?.geo?.adj && ctx.board.own) {
     try { isNeighbor = empireNeighbors(ctx.board, aId).has(dId); } catch { isNeighbor = undefined; }
   }
-  return routeCopy({ routeKind: source.routeKind, isNeighbor }) || '';
+  return routeCopy({ routeKind: source.routeKind, isNeighbor }, { openLand: Boolean(ctx?.board?.openLand) }) || '';
 }
 
 /** A country map's section name (ctx.sectionNames), else the nation or dependency name. */

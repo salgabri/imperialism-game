@@ -351,8 +351,9 @@ export function domesticDescription(entry) {
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
   if (entry.league) {
-    return `${leaders} the ${clubs} ${entry.league} clubs, each starting on the land nearest its ${entry.venue || 'arena'}: ${entry.name} split `
-      + `into ${sections} territories along ${entry.lines || 'state and province'} lines.`;
+    const place = entry.lines === 'state' ? 'state' : 'state or province';
+    return `${leaders} the ${clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
+      + 'A state with several clubs is divided between them; one with none stays empty.';
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
@@ -470,9 +471,10 @@ export function frontRelation(neighbourRating, ownRating) {
 /**
  * Board 03 "Fronts" (V1 L929-944). `picked.neighbours` is the optional list of team ids sharing a land border with the
  * picked team on the opening board; without it (no map geometry yet) the block is left out (`null`).
- * Rows: the four strongest neighbours, strongest first.
+ * Rows: the four strongest neighbours, strongest first. `openLand`: the map has empty land between its territories
+ * (an American league's), so a team without a land border reaches its rivals over that, not by sea.
  */
-function frontsOf(picked, managerTeams, row) {
+function frontsOf(picked, managerTeams, row, openLand = false) {
   if (!Array.isArray(picked.neighbours)) return null;
   const byId = new Map(managerTeams.map(team => [team.id, team]));
   const neighbours = [...new Set(picked.neighbours)].filter(id => id !== picked.id && byId.has(id)).map(id => byId.get(id));
@@ -481,7 +483,8 @@ function frontsOf(picked, managerTeams, row) {
     .slice(0, 4)
     .map(team => ({ ...row(team), ...frontRelation(team.rating, picked.rating) }));
   const count = neighbours.length;
-  return { count, countText: `${count} land border${count === 1 ? '' : 's'}`, rows };
+  return { count, countText: `${count} land border${count === 1 ? '' : 's'}`, rows,
+    emptyText: openLand ? 'No land borders — every war crosses open ground.' : 'No land borders — every war goes by sea.' };
 }
 
 /**
@@ -626,7 +629,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
       players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
       })),
-      fronts: frontsOf(picked, managerTeams, row),
+      fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league)),
     };
   }
   const favourites = ranked.slice(0, 5).map(row);

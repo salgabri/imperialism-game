@@ -318,7 +318,7 @@ test('setup lists baseball as a fourth sport with nations and the MLB clubs, on 
   assert.equal(clubs.clubsOnly, null);
   assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:mlb', 'MLB', 30]]);
   assert.equal(clubs.scopeName, 'MLB · USA and Canada');
-  assert.match(clubs.countryNote, /the 30 MLB clubs, each starting on the land nearest its ballpark: USA and Canada split into 30 territories along state and province lines\./);
+  assert.match(clubs.countryNote, /the 30 MLB clubs fighting over the USA and Canada, each starting with only its ballpark's state or province\. A state with several clubs is divided between them; one with none stays empty\./);
   assert.deepEqual(clubs.season.options.map(option => option.name), ['2026']);
   const nations = buildSetupModel({ sport: 'baseball', layer: 'nations', scope: 'CONCACAF' }, {});
   assert.equal(nations.layer, 'nations');

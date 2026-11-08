@@ -240,6 +240,10 @@ test('chosen target off the direct rules uses a sea route, or a treaty when encl
   const sea = noEntropy(() => createTargetedDraw(wallBoard(), 'A', 'B'));
   assert.equal(sea.routeKind, 'sea'); assert.equal(sea.routeLabel, 'Coastal sea route');
   assert.ok(sea.routePoints.length > 2); assert.equal(sea.isNeighbor, false);
+  // A map with empty land between its territories: the same route, but no sea crossing by name.
+  const around = createTargetedDraw({ ...wallBoard(), openLand: true }, 'A', 'B');
+  assert.equal(around.routeKind, 'sea'); assert.equal(around.routeLabel, 'Route around rival land');
+  assert.equal(fallbackRouteTo({ ...wallBoard(), openLand: true }, 'A', 'B').routeLabel, 'Route around rival land');
   const treaty = createTargetedDraw(wallBoard({ enclosed: true }), 'A', 'B');
   assert.equal(treaty.routeKind, 'neutral-transit'); assert.deepEqual(treaty.transitCountryIds, ['wall']);
   const board = wallBoard();

@@ -210,6 +210,13 @@ test('locked fixture shows A v B, the route, the odds bar and the sample count',
   assert.equal(sea.route, 'By sea — no shared border');
   const transit = buildFixture(state({ round: 3, spin: spinOf('locked', { isNeighbor: false, routeKind: 'neutral-transit' }) }), context(state()));
   assert.equal(transit.route, 'Through neutral land — transit treaty');
+  // An American league's map: the land between two clubs' states is nobody's, so the route is no sea crossing.
+  const overland = context(state());
+  overland.board = { ...overland.board, openLand: true };
+  assert.equal(buildFixture(state({ round: 3, spin: spinOf('locked', { isNeighbor: false, routeKind: 'straight' }) }), overland).route,
+    'Over open ground — no shared border');
+  assert.equal(buildFixture(state({ round: 3, spin: spinOf('locked', { isNeighbor: true, routeKind: 'straight' }) }), overland).route,
+    'Across a land border');
 });
 
 test('tactical gate offers Match preview and simulate with the balanced pre-match odds', () => {
@@ -458,6 +465,9 @@ test('fronts fall back to the reachable list, show an empty note, and stay off f
   const mixed = buildFronts(st, ctx, { reach: [{ tid: '276', tier: 'fallback', routeKind: 'neutral-transit' },
     { tid: '688', tier: 'fallback', routeKind: 'sea' }] });
   assert.equal(mixed.note, 'No land border · these rivals are reached by sea or transit treaty');
+  // A map with empty land between its territories.
+  const open = buildFronts(st, { ...ctx, board: { ...ctx.board, openLand: true }, cache: new Map() }, { reach: [{ tid: '276', tier: 'sea' }] });
+  assert.equal(open.note, 'No land border · these rivals are reached over open ground');
   const none = buildFronts(st, ctx, { reach: [] });
   assert.deepEqual(none.rows, []);
   assert.equal(none.empty, 'No rival is within reach.');
