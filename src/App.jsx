@@ -814,6 +814,8 @@ export default class App extends React.Component {
       }
       // A sport with clubs only (American football: the NFL's) has no nations to choose.
       if (getSport(setup.sport).clubsOnly) setup.layer = 'clubs';
+      // A sport with nations only (tennis: the Davis Cup's) has no clubs to choose.
+      if (getSport(setup.sport).nationsOnly) setup.layer = 'nations';
       const clubScope = setClubScope(setup);
       if (clubScope !== setup.clubScope) setup.clubScope = clubScope;
       // The field changes with the theatre, so the managed team goes too, but a

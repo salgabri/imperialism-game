@@ -148,7 +148,7 @@ test('the Season choice offers the built-in season, then every earlier season bu
       assert.equal(seasonPicker(document).tagName, 'SELECT', 'the seasons are a dropdown');
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
       assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER]);
-      assert.deepEqual(EARLIER.slice(0, 2), ['2025/26', '2023/24'], 'the last built-in season, then the earlier ones (no 2024/25)');
+      assert.deepEqual(EARLIER.slice(0, 3), ['2025/26', '2024/25', '2023/24'], 'the last built-in season, then the earlier ones');
       assert.equal(EARLIER.at(-1), '2004/05');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
       assert.equal(seasonPicker(document).value, '');
@@ -305,7 +305,6 @@ test('while a chosen set loads, step 1 shows none of the built-in season\'s figu
     const nations = model();
     assert.equal(nations.season.state, 'loading');
     assert.ok(nations.scopes.length > 1 && nations.scopes.every(scope => scope.count === null));
-    assert.equal(nations.roleMeta, 'Europe · Football nations');
   });
 });
 
@@ -424,7 +423,7 @@ test('Retry this setup loads the set first, and refuses clearly when it cannot',
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'ManagerElimination');
       const note = () => document.querySelector('.manager-note');
-      assert.match(note().textContent, /^Your run is saved\./);
+      assert.equal(note(), null, 'a saved run needs no note');
       const retrying = app.retryManager();
       await view.refresh();
       assert.equal(note().textContent, 'Loading the CM 01/02 · Test 2002 season…', 'the dialog says what Retry waits for');

@@ -95,12 +95,11 @@ test('buildSquad reproduces board C1: kicker, XI, groups, table cells, depth, pi
   assert.equal(model.teamId, '380');
   assert.equal(model.name, 'Italy');
   assert.equal(model.kicker, 'First team · 15 players · 4 claimed in conquest');
-  assert.equal(model.phoneMeta, '15 players · 4 claimed in conquest');
   assert.deepEqual(model.xi, { label: 'Starting XI', short: 'XI', value: selectLineup(st.teams[380]).rating.toFixed(1), delta: '+0.2', tone: 'gain' });
   assert.equal(model.claimedCount, 4);
   assert.deepEqual(model.groups.map(group => group.label), ['Goalkeeper', 'Defence', 'Midfield', 'Attack']);
   const rows = model.groups.flatMap(group => group.rows);
-  assert.deepEqual(rows.map(row => row.no), ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
+  assert.equal(rows.length, 11);
   assert.deepEqual(rows.map(row => row.name).sort(), ['A. Bastoni', 'F. Acerbi', 'F. Dimarco', 'G. Donnarumma', 'J. Gvardiol', 'M. Kean',
     'M. Locatelli', 'M. Zaccagni', 'N. Barella', 'S. Milinković-Savić', 'S. Tonali'], 'the board C1 starting XI');
   assert.deepEqual(rows.slice(5, 7).map(row => row.name), ['N. Barella', 'S. Tonali']);
@@ -122,20 +121,17 @@ test('buildSquad reproduces board C1: kicker, XI, groups, table cells, depth, pi
   assert.deepEqual(byName['J. Gvardiol'].acquired, { flagId: '191', teamId: '191', isClub: false, code: 'CRO', roman: 'R XX', label: 'CRO · R XX' });
   assert.equal(byName['S. Milinković-Savić'].acquired.label, 'SRB · R XXVII');
 
-  assert.deepEqual(model.depth.rows.map(row => [row.no, row.pos, row.name, row.inRole]),
-    [['—', 'GK', 'J. Oblak', '—'], ['—', 'DF', 'G. Di Lorenzo', '—'], ['—', 'DF', 'G. Mancini', '—'], ['—', 'DF', 'S. Savić', '—']]);
-  assert.equal(model.depth.more, null, 'no "+ N more" with four in depth');
-  assert.equal(model.depth.rows[2].source, 'EA FC 26', 'a numeric edition gets its source prefix');
-  assert.equal(model.depth.rows[3].tier, '75');
-  assert.equal(model.depth.rows[3].acquired.label, 'MNE · R XXIV');
-  assert.equal(model.showSource, true);
+  assert.deepEqual(model.depth.all.map(row => [row.pos, row.name, row.inRole]),
+    [['GK', 'J. Oblak', '—'], ['DF', 'G. Di Lorenzo', '—'], ['DF', 'G. Mancini', '—'], ['DF', 'S. Savić', '—']]);
+  assert.equal(model.depth.all[2].source, 'EA FC 26', 'a numeric edition gets its source prefix');
+  assert.equal(model.depth.all[3].tier, '75');
+  assert.equal(model.depth.all[3].acquired.label, 'MNE · R XXIV');
 
   assert.equal(model.formation, '4-4-2');
   assert.equal(model.formationAside, '4-4-2 · ● claimed');
   assert.equal(model.formationTitle, 'Formation');
   assert.equal(model.viewLabel, 'Pitch');
   assert.equal(model.pitchLabel, 'Formation 4-4-2');
-  assert.deepEqual(model.depth.rows.map(row => row.short), ['Oblak', 'Di Lorenzo', 'Mancini', 'Savić'], 'chips use surnames');
   assert.equal(model.pitch.length, 11);
   const disc = Object.fromEntries(model.pitch.map(slot => [slot.name, slot]));
   assert.deepEqual([disc.Donnarumma.x, disc.Donnarumma.y], ['50%', '88%']);
@@ -149,12 +145,12 @@ test('buildSquad reproduces board C1: kicker, XI, groups, table cells, depth, pi
   assert.deepEqual(model.profile.map(row => [row.label, row.value, row.segments]),
     [['Attack', '84.3', 7], ['Defence', '86.0', 7], ['Goalkeeping', '89.0', 8]]);
   assert.equal(model.profileScale, 'Scale 60–95');
-  assert.deepEqual(model.claimed.map(row => [row.roman, row.name, row.fromName, row.gain, row.tone]), [
+  assert.deepEqual(model.acquisitions.rows.map(row => [row.roman, row.name, row.fromName, row.gain, row.tone]), [
     ['R XXVII', 'S. Milinković-Savić', 'Serbia', '+0.1', 'gain'],
     ['R XXIV', 'S. Savić', 'Montenegro', '±0.0', 'muted'],
     ['R XX', 'J. Gvardiol', 'Croatia', '+0.1', 'gain'],
+    ['R XVII', 'J. Oblak', 'Slovenia', '±0.0', 'muted'],
   ]);
-  assert.equal(model.acquisitions.rows.length, 4);
   assert.equal(model.acquisitions.aside, '4 players · 2 of 11 starters were claimed in conquest');
   assert.deepEqual(model.acquisitions.rows.map(row => row.status), ['Starter', 'Depth', 'Starter', 'Depth']);
   assert.equal(model.status, 'alive');
@@ -181,17 +177,14 @@ test('segments follow the 60–95 mapping and the strength profile matches the s
   assert.equal(strengthProfile(lineup, 'football')[0].value, attack.toFixed(1));
 });
 
-test('depth shows the first five by position, "+ N more" only beyond five, and unfilled places get a note', () => {
+test('depth lists every reserve by position, and unfilled places get a note', () => {
   const st = campaign();
   const team = st.teams[380];
   for (let i = 0; i < 2; i++) team.squad.push({ name: `Reserve ${i}`, pos: 'FW', rating: 70 + i });
   const model = buildSquad(st, managerCtx(), '380');
   assert.equal(model.depth.count, 6);
-  assert.equal(model.depth.rows.length, 5);
-  assert.equal(model.depth.more, '+ 1 more in depth');
-  assert.deepEqual(model.depth.rows.map(row => row.pos), ['GK', 'DF', 'DF', 'DF', 'FW'], 'byPos order, not the best five');
-  assert.equal(model.depth.extra.length, 1);
-  assert.equal(model.depth.extra[0].source, '—');
+  assert.deepEqual(model.depth.all.map(row => row.pos), ['GK', 'DF', 'DF', 'DF', 'FW', 'FW'], 'byPos order');
+  assert.equal(model.depth.all[5].source, '—');
 
   const short = { id: 'x', name: 'Short', code: 'SHO', kind: 'nation', flagId: null, sport: 'football',
     squad: [{ name: 'A Keeper', pos: 'GK', rating: 70 }, { name: 'B Back', pos: 'DF', rating: 71 }] };
@@ -200,8 +193,6 @@ test('depth shows the first five by position, "+ N more" only beyond five, and u
   assert.equal(thin.kicker, 'First team · 2 players · 0 claimed in conquest');
   assert.equal(thin.xi.delta, '±0.0', 'teams without baseEff read as unchanged');
   assert.equal(thin.xi.tone, 'muted');
-  assert.equal(thin.depth.more, null);
-  assert.equal(thin.showSource, false);
 });
 
 test('provenance falls back to history for older saves, then to the team code', () => {
@@ -277,10 +268,9 @@ test('basketball: groups, court slots, Offence/Defence profile, "Starting five" 
   const lineup = selectLineup(team);
   const offence = lineup.slots.reduce((sum, slot) => sum + slot.effectiveRating * { PG: .25, SG: .25, SF: .2, PF: .15, C: .15 }[slot.position], 0);
   assert.equal(model.profile[0].value, offence.toFixed(1));
-  assert.equal(model.depth.rows[0].generated, true);
-  assert.equal(model.depth.rows[0].acquired.label, 'LAL');
-  assert.equal(model.depth.rows[0].acquired.isClub, true);
-  assert.equal(model.showSource, false, 'basketball rosters carry no source column');
+  assert.equal(model.depth.all[0].generated, true);
+  assert.equal(model.depth.all[0].acquired.label, 'LAL');
+  assert.equal(model.depth.all[0].acquired.isClub, true);
   assert.equal(model.team.isClub, true);
   assert.equal(model.canFollow, true);
   assert.equal(model.following, true);
@@ -303,7 +293,7 @@ test('buildSquad is pure, memoised and tolerant of empty states', () => {
   assert.equal(buildSquad(undefined, undefined, '380'), null);
   const loose = buildSquad({ teams: { 380: italy() } }, undefined, '380');
   assert.equal(loose.status, 'alive');
-  assert.equal(loose.claimed.length, 3);
+  assert.equal(loose.acquisitions.rows.length, 4);
   const fallen = buildSquad({ ...st, aliveIds: [], fallen: [{ id: '380', r: 12 }] }, managerCtx(), '380');
   assert.equal(fallen.status, 'fallen');
   assert.equal(fallen.statusLabel, 'Eliminated · Round XII');
@@ -324,8 +314,8 @@ test('SquadScreen renders the C1 list, header, summary column and phone list', a
   assert.equal(section.getAttribute('role'), null, 'a screen, not a dialog');
 
   const head = section.querySelector('.squad-head');
-  assert.equal(text(head.querySelector('.squad-head__kicker')), 'First team · 15 players · 4 claimed in conquest');
   assert.equal(text(head.querySelector('h1')), 'Italy');
+  assert.equal(head.querySelector('h1').getAttribute('title'), 'Italy · First team · 15 players · 4 claimed in conquest');
   assert.ok(flagUrl('380'));
   assert.equal(head.querySelector('.squad-head__flag img')?.getAttribute('src'), flagUrl('380'));
   assert.ok(head.querySelector('.squad-head__flag > img.flag-chip'), 'the header renders TeamMark\'s own chip, no squad wrapper ring');
@@ -339,55 +329,45 @@ test('SquadScreen renders the C1 list, header, summary column and phone list', a
 
   const table = section.querySelector('.squad-main .squad-table');
   assert.equal(table.getAttribute('role'), 'table');
-  assert.deepEqual(texts(table, '.squad-table__head [role=columnheader]'), ['No', 'Pos', 'Player', 'Natural', 'In role', 'Rtg', 'Acquired', 'Source']);
-  assert.deepEqual(texts(table, '.squad-group'), ['Goalkeeper', 'Defence', 'Midfield', 'Attack']);
-  assert.deepEqual([...table.querySelectorAll('.squad-group [role=rowheader]')].map(cell => cell.getAttribute('aria-colspan')), ['8', '8', '8', '8']);
+  assert.deepEqual(texts(table, '.squad-table__head [role=columnheader]'), ['Pos', 'Player', 'Rtg', 'Acquired']);
   const rows = [...table.querySelectorAll('.squad-row')];
   assert.equal(rows.length, 11);
   const first = rows[0];
-  assert.deepEqual([...first.children].map(cell => cell.textContent), ['1', 'GK', 'G. Donnarumma', 'GK', '89', '89', '', 'EA FC 26']);
+  assert.deepEqual([...first.children].map(cell => cell.textContent), ['GK', 'G. Donnarumma', '89', '']);
+  assert.equal(first.getAttribute('title'), 'Natural GK · EA FC 26');
   assert.equal(first.querySelector('.rating-box').dataset.tier, '88');
   const gvardiol = rows.find(row => row.textContent.includes('Gvardiol'));
   assert.equal(text(gvardiol.querySelector('.squad-row__acq')), 'CRO · R XX');
   assert.ok(gvardiol.querySelector('.squad-row__acq .squad-flag'));
-  const depth = section.querySelector('.squad-main .squad-depth');
+  // The bench sits beside the lineup, under the strength profile: one view of the lineup at a time.
+  const side = section.querySelector('.squad-side');
+  const depth = side.querySelector('.squad-depth');
+  assert.equal(section.querySelector('.squad-main .squad-depth'), null);
   assert.equal(text(depth.querySelector('.kicker__title')), 'Squad depth');
-  assert.equal(depth.querySelector('.squad-depth__more'), null);
-  assert.deepEqual([...depth.querySelectorAll('.squad-row')].map(row => row.children[0].textContent + row.children[2].textContent),
-    ['—J. Oblak', '—G. Di Lorenzo', '—G. Mancini', '—S. Savić']);
+  assert.deepEqual([...depth.querySelectorAll('.squad-row')].map(row => row.children[1].textContent),
+    ['J. Oblak', 'G. Di Lorenzo', 'G. Mancini', 'S. Savić']);
   const depthHead = depth.querySelector('[role=table] > .squad-table__head');
   assert.ok(depthHead?.classList.contains('sr-only'), 'the depth table names its columns for screen readers');
-  assert.equal(depthHead.querySelectorAll('[role=columnheader]').length, 8);
+  assert.equal(depthHead.querySelectorAll('[role=columnheader]').length, 4);
 
-  const side = section.querySelector('.squad-side');
-  assert.deepEqual(texts(side, '.kicker__title'), ['Formation', 'Strength profile', 'Claimed in conquest']);
-  assert.deepEqual(texts(side, '.kicker__aside'), ['4-4-2 · ● claimed', 'Scale 60–95', 'Gain']);
-  const pitch = side.querySelector('.pitch.pitch--side');
-  assert.equal(pitch.querySelectorAll('.pitch__player').length, 11);
-  assert.equal(pitch.querySelectorAll('.pitch__player.is-claimed').length, 2);
-  const donnarumma = [...pitch.querySelectorAll('.pitch__player')].find(item => item.textContent.includes('Donnarumma'));
-  assert.equal(donnarumma.style.left, '50%');
-  assert.equal(donnarumma.style.top, '88%');
-  assert.equal(text(donnarumma.querySelector('.pitch__dot')), '89');
+  assert.deepEqual(texts(side, '.kicker__title'), ['Strength profile', 'Squad depth']);
+  assert.deepEqual(texts(side, '.kicker__aside'), ['Scale 60–95', '4']);
+  assert.equal(side.querySelector('.pitch'), null, 'the pitch is a tab, not a second copy of the list');
   const profileRows = [...side.querySelectorAll('.profile__row')];
   assert.deepEqual(profileRows.map(row => [row.querySelector('.profile__label').textContent, row.querySelectorAll('.profile__seg').length,
     row.querySelectorAll('.profile__seg.is-filled').length, row.querySelector('.profile__value').textContent]),
   [['Attack', 10, 7, '84.3'], ['Defence', 10, 7, '86.0'], ['Goalkeeping', 10, 8, '89.0']]);
   assert.equal(profileRows[0].querySelector('[role=meter]').getAttribute('aria-valuetext'), '84.3');
-  const claims = [...side.querySelectorAll('.claimed-row')];
-  assert.deepEqual(claims.map(row => row.querySelector('.claimed-row__round').textContent), ['R XXVII', 'R XXIV', 'R XX']);
-  assert.equal(text(claims[0].querySelector('.claimed-row__name')), 'S. Milinković-Savić · Serbia');
-  assert.ok(claims[1].querySelector('.claimed-row__gain').classList.contains('tone-muted'));
-  assert.equal(text(claims[1].querySelector('.claimed-row__gain')), '±0.0');
 
   const phone = section.querySelector('.squad-phone');
-  assert.deepEqual(texts(section, '.squad-seg > button'), ['List', 'Pitch']);
-  assert.deepEqual(texts(phone, '.squad-plist__head'), ['Goalkeeper', 'Defence', 'Midfield', 'Attack', 'Squad depth']);
+  assert.deepEqual(texts(section, '.squad-seg > button'), ['List', 'Pitch', 'Bench']);
+  assert.equal(phone.querySelectorAll('.squad-prow').length, 11, 'the phone list is the lineup; the bench has its tab');
   const phoneGvardiol = [...phone.querySelectorAll('.squad-prow')].find(row => row.textContent.includes('Gvardiol'));
-  assert.equal(text(phoneGvardiol.querySelector('.squad-prow__meta')), 'DF / MF · from CRO R XX');
+  assert.equal(text(phoneGvardiol.querySelector('.squad-prow__meta')), 'from CRO R XX');
+  assert.equal(phoneGvardiol.getAttribute('title'), 'Natural DF / MF');
   assert.equal(phoneGvardiol.querySelector('.squad-prow__rating').dataset.tier, '84');
   assert.equal(text(section.querySelector('.squad-mhead__xi')), `XI ${model.xi.value}`);
-  assert.equal(text(section.querySelector('.squad-mhead__meta')), '15 players · 4 claimed in conquest');
+  assert.equal(section.querySelector('.squad-mhead__meta'), null, 'a team still in the war needs no meta line');
 
   assert.equal(section.querySelector(':scope > .squad-tools'), null, 'no tools row above the header (C1 height kept)');
   assert.ok(head.querySelector(':scope > .squad-tools .fi-squad-back'), 'desktop tools sit inside the header');
@@ -429,13 +409,18 @@ test('SquadScreen tabs: Pitch moves the pitch to the main column, Acquisitions l
   assert.equal(section.querySelector('#squad-tabpanel').getAttribute('aria-labelledby'), 'squad-tab-pitch');
   assert.ok(section.querySelector('.squad-main .pitch.pitch--large'));
   assert.equal(section.querySelector('.squad-side .squad-formation'), null, 'no duplicate formation block');
-  assert.deepEqual(texts(section, '.squad-side .kicker__title'), ['Strength profile', 'Claimed in conquest']);
-  assert.deepEqual(texts(section, '.squad-main .squad-chip'), ['GK · Oblak · 88', 'DF · Di Lorenzo · 83', 'DF · Mancini · 83', 'DF · Savić · 79']);
-  assert.equal(section.querySelector('.squad-main .squad-chip').getAttribute('title'), 'J. Oblak');
+  assert.deepEqual(texts(section, '.squad-side .kicker__title'), ['Strength profile', 'Squad depth']);
   const large = section.querySelector('.squad-main .squad-formation--large');
   assert.deepEqual([text(large.querySelector('.kicker__title')), text(large.querySelector('.kicker__aside'))], ['Formation', '4-4-2 · ● claimed'],
     'the large pitch keeps its legend');
   assert.equal(large.querySelector('.pitch').getAttribute('aria-label'), 'Formation 4-4-2');
+  const pitch = large.querySelector('.pitch');
+  assert.equal(pitch.querySelectorAll('.pitch__player').length, 11);
+  assert.equal(pitch.querySelectorAll('.pitch__player.is-claimed').length, 2);
+  const donnarumma = [...pitch.querySelectorAll('.pitch__player')].find(item => item.textContent.includes('Donnarumma'));
+  assert.equal(donnarumma.style.left, '50%');
+  assert.equal(donnarumma.style.top, '88%');
+  assert.equal(text(donnarumma.querySelector('.pitch__dot')), '89');
   assert.deepEqual(texts(section, '.squad-phone .squad-formation--phone .kicker > span'), ['Formation', '4-4-2 · ● claimed']);
   assert.ok(section.querySelector('.squad-phone .pitch.pitch--phone'), 'the phone Pitch segment follows the tab');
   assert.equal(section.querySelector('.squad-seg > button[aria-pressed=true]').textContent, 'Pitch');
@@ -450,36 +435,34 @@ test('SquadScreen tabs: Pitch moves the pitch to the main column, Acquisitions l
     row.querySelector('.squad-acq__name').textContent, row.querySelector('.squad-acq__from').textContent, row.querySelector('.squad-acq__status').textContent]), [
     ['R XXVII', 'S. Milinković-Savić', 'Serbia', 'Starter'], ['R XXIV', 'S. Savić', 'Montenegro', 'Depth'],
     ['R XX', 'J. Gvardiol', 'Croatia', 'Starter'], ['R XVII', 'J. Oblak', 'Slovenia', 'Depth']]);
-  assert.deepEqual(texts(section, '.squad-side .kicker__title'), ['Formation', 'Strength profile']);
+  assert.deepEqual(texts(section, '.squad-side .kicker__title'), ['Strength profile']);
   assert.equal(section.querySelector('.squad-seg > button[aria-pressed=true]').textContent, 'List', 'phone falls back to List');
 
   await key(tabs[2], 'Home');
   assert.equal(section.dataset.tab, 'list');
   await click(section.querySelectorAll('.squad-seg > button')[1]);
   assert.equal(section.dataset.tab, 'pitch');
+  // The phone's bench: one list at a time, while a wider window keeps the lineup beside it.
+  await click(section.querySelectorAll('.squad-seg > button')[2]);
+  assert.equal(section.querySelector('.squad-seg > button[aria-pressed=true]').textContent, 'Bench');
+  assert.deepEqual(texts(section, '.squad-phone .squad-prow__name'), ['J. Oblak', 'G. Di Lorenzo', 'G. Mancini', 'S. Savić']);
+  assert.equal(section.dataset.tab, 'list');
   assert.deepEqual(view.errors, []);
 });
 
-test('SquadScreen expands deep benches, marks generated players without italics and tolerates an empty model', async context => {
+test('SquadScreen lists deep benches, marks generated players without italics and tolerates an empty model', async context => {
   const st = campaign();
   for (let i = 0; i < 3; i++) st.teams[380].squad.push({ name: `Generated ${i}`, pos: 'FW', rating: 60 + i, gen: true });
   const model = buildSquad(st, managerCtx(), '380');
-  assert.equal(model.depth.more, '+ 2 more in depth');
   const view = await mount({ ...model, onBack: () => {} }, context);
-  const depth = view.host.querySelector('.squad-main .squad-depth');
-  assert.equal(depth.querySelectorAll('.squad-row').length, 5);
-  const more = depth.querySelector('.squad-depth__more');
-  assert.equal(more.textContent, '+ 2 more in depth');
-  assert.equal(more.getAttribute('aria-expanded'), 'false');
-  await click(more);
-  assert.equal(depth.querySelectorAll('.squad-row').length, 7);
-  assert.equal(more.textContent, 'Show fewer');
+  const depth = view.host.querySelector('.squad-side .squad-depth');
+  assert.equal(depth.querySelectorAll('.squad-row').length, 7, 'without layout to measure every row renders; a real window pages them');
   const generated = [...depth.querySelectorAll('.squad-row')].find(row => row.textContent.includes('Generated 2'));
   assert.equal(text(generated.querySelector('.squad-tag')), 'Generated');
-  assert.equal(text(generated.querySelector('.squad-row__src')), '—');
   assert.equal(text(generated.querySelector('.squad-row__label')), 'Generated 2', 'no asterisk suffix');
+  await click(view.host.querySelectorAll('.squad-seg > button')[2]);
   const phoneGenerated = [...view.host.querySelectorAll('.squad-prow')].find(row => row.textContent.includes('Generated 2'));
-  assert.equal(text(phoneGenerated.querySelector('.squad-prow__meta')), 'FW · Generated');
+  assert.equal(text(phoneGenerated.querySelector('.squad-prow__meta')), 'Generated');
   for (const file of ['src/screens/squad/squad.css', 'src/components/player-row.css']) {
     assert.doesNotMatch(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'), /font-style:\s*italic|monospace|(?<![-\w])serif\b|Alegreya|Consolas/i);
   }
@@ -487,7 +470,7 @@ test('SquadScreen expands deep benches, marks generated players without italics 
   await view.render({ legacySquad: null, history: [], positionColors: {}, onBack: () => {} });
   const empty = view.host.querySelector('#view-panel-squad');
   assert.equal(empty.dataset.empty, 'true');
-  assert.match(empty.textContent, /Select a team on the map or in the standings to inspect its squad\./);
+  assert.match(empty.textContent, /Select a team on the map or in the standings\./);
   const emptyBack = empty.querySelector('.fi-squad-back');
   assert.equal(emptyBack?.textContent, 'Back to map', 'the empty state keeps a way back');
   await view.render({});
@@ -510,20 +493,20 @@ test('out-of-position starters show ↓ in role on desktop and a note on phone',
   assert.equal(text(row.querySelector('.squad-row__role')), `${emergency.rating - 12} ↓ out of position`);
   assert.equal(text(row.querySelector('.squad-row__oop')), ' ↓');
   assert.equal(row.querySelector('.squad-row__oop').getAttribute('aria-hidden'), 'true');
-  assert.equal(view.host.querySelector('.squad-main .squad-table').dataset.source, 'false');
-  assert.equal(row.querySelectorAll('[role=cell]').length, 7, 'no Source cell for basketball');
-  assert.ok(view.host.querySelector('.squad-side .pitch.pitch--court .pitch__hoop'));
+  assert.equal(row.querySelectorAll('[role=cell]').length, 4);
   assert.deepEqual(texts(view.host, '.squad-head__label'), ['Starting five', 'Claimed']);
   const phoneRow = [...view.host.querySelectorAll('.squad-prow')].find(item => item.textContent.includes(emergency.name));
-  assert.equal(text(phoneRow.querySelector('.squad-prow__meta')), 'SG · out of position');
+  assert.equal(text(phoneRow.querySelector('.squad-prow__meta')), 'out of position');
+  assert.equal(phoneRow.getAttribute('title'), 'Natural SG');
   assert.equal(text(view.host.querySelector('.squad-mhead__xi')), `Five ${model.xi.value}`);
   assert.ok(view.host.querySelector('.squad-head__flag > .fi-team-monogram'), 'clubs show their monogram chip');
   assert.deepEqual(texts(view.host, '.squad-tab'), ['List', 'Court', 'Acquisitions']);
   assert.deepEqual(texts(view.host, '.squad-seg > button'), ['List', 'Court']);
-  const formation = view.host.querySelector('.squad-side .squad-formation');
+  await click(view.host.querySelectorAll('.squad-tab')[1]);
+  assert.ok(view.host.querySelector('.squad-main .pitch.pitch--court .pitch__hoop'));
+  const formation = view.host.querySelector('.squad-main .squad-formation');
   assert.deepEqual([text(formation.querySelector('.kicker__title')), text(formation.querySelector('.kicker__aside'))], ['Starting five', '● claimed']);
   assert.equal(formation.querySelector('.pitch').getAttribute('aria-label'), 'Court, starting five');
-  assert.equal(view.host.querySelector('.squad-group [role=rowheader]').getAttribute('aria-colspan'), '7');
   assert.deepEqual(view.errors, []);
 });
 
@@ -540,15 +523,16 @@ test('basketball: Natural lists both positions and a starter at his second one p
   const view = await mount(model, context);
   const row = [...view.host.querySelectorAll('.squad-main .squad-row')].find(item => item.textContent.includes('Combo Guard'));
   assert.equal(text(row.querySelector('.squad-row__pos')), 'SG');
-  assert.equal(text(row.querySelector('.squad-row__natural')), 'PG / SG');
-  assert.equal(text(row.querySelector('.squad-row__role')), '88');
+  assert.match(row.getAttribute('title'), /^Natural PG \/ SG/);
+  assert.equal(row.querySelector('.squad-row__role'), null, 'in role only when it differs: no penalty here');
   assert.equal(row.querySelector('.squad-row__oop'), null);
   const phoneRow = [...view.host.querySelectorAll('.squad-prow')].find(item => item.textContent.includes('Combo Guard'));
-  assert.equal(text(phoneRow.querySelector('.squad-prow__meta')), 'PG / SG');
+  assert.equal(phoneRow.getAttribute('title'), 'Natural PG / SG');
+  assert.equal(phoneRow.querySelector('.squad-prow__meta'), null);
   assert.deepEqual(view.errors, []);
 });
 
-test('Source cells keep the roster evidence: database title, sofifa / FM link (http only) and the full name', async context => {
+test('Rows keep the roster evidence: database title, sofifa / FM link on the name (http only) and the full name', async context => {
   const st = campaign();
   const squad = st.teams[380].squad;
   squad[0] = { ...squad[0], sourceInfo: { source: 'ea-fc', edition: 'EA FC 26', fullName: 'Gianluigi Donnarumma', snapshotDate: '2025-09-19',
@@ -570,21 +554,20 @@ test('Source cells keep the roster evidence: database title, sofifa / FM link (h
   const view = await mount(model, context);
   const row = [...view.host.querySelectorAll('.squad-main .squad-row')].find(item => item.textContent.includes('Donnarumma'));
   assert.equal(row.querySelector('.squad-row__label').getAttribute('title'), 'Gianluigi Donnarumma');
-  const cell = row.querySelector('.squad-row__src');
-  assert.equal(cell.getAttribute('title'), keeper.sourceTitle);
-  const link = cell.querySelector('a.squad-row__src-link');
+  assert.ok(row.getAttribute('title').endsWith(keeper.sourceTitle), 'the row\'s title carries the database evidence');
+  const link = row.querySelector('a.squad-row__src-link');
   assert.equal(link.getAttribute('href'), squad[0].sourceInfo.url);
   assert.equal(link.getAttribute('target'), '_blank');
   assert.equal(link.getAttribute('rel'), 'noopener noreferrer');
-  assert.equal(link.textContent, 'EA FC 26');
+  assert.equal(link.textContent, 'G. Donnarumma');
   assert.match(link.getAttribute('aria-label'), /^EA FC 26: view Gianluigi Donnarumma/);
   const kean = [...view.host.querySelectorAll('.squad-main .squad-row')].find(item => item.textContent.includes('Kean'));
-  assert.equal(kean.querySelector('.squad-row__src a'), null, 'a non-http URL is never linked');
-  assert.equal(text(kean.querySelector('.squad-row__src')), 'FM 26');
+  assert.equal(kean.querySelector('a'), null, 'a non-http URL is never linked');
+  assert.match(kean.getAttribute('title'), /FM 26/);
   assert.deepEqual(view.errors, []);
 });
 
-test('squad.css: touch targets, no WP-0 internals restyled, README pitch height kept on short viewports', () => {
+test('squad.css: touch targets, no WP-0 internals restyled, the large pitch fills its column', () => {
   const css = readFileSync(new URL('../src/screens/squad/squad.css', import.meta.url), 'utf8');
   // The first top-level rule whose selector is exactly `selector` (declarations only).
   const rule = selector => {
@@ -593,16 +576,12 @@ test('squad.css: touch targets, no WP-0 internals restyled, README pitch height 
   };
   assert.match(rule('.squad-tab'), /min-height:\s*var\(--tap\)/, 'tabs reach 44px on coarse pointers');
   assert.match(rule('.squad-tab'), /align-items:\s*flex-end/, 'the active bar stays on the header rule');
-  assert.match(rule('.screen--squad .squad-depth__more::after'), /height:\s*var\(--tap\)/);
   assert.match(rule('.squad-tools .fi-context-button::after'), /height:\s*var\(--tap\)/);
   // Phone (C2): the icon-only Back's 12px chevron still gets a full --tap-wide target (the 44px phone rule).
   const phoneBack = css.match(/\n\s+\.squad-mhead \.squad-tools \.fi-squad-back::after \{([^}]*)\}/);
   assert.ok(phoneBack, 'the phone Back has its own hit-area rule');
   assert.match(phoneBack[1], /width:\s*max\([^;]*var\(--tap\)\)/, 'phone Back target is at least --tap wide');
-  assert.doesNotMatch(css, /\.flag-chip|\.fi-team-monogram/, 'Flag / TeamMark internals belong to WP-0');
-  assert.doesNotMatch(css, /max-height:\s*820px/, 'no short-viewport pitch shrink (README 330px)');
-  assert.match(css, /--sq-pitch-h:\s*330px/);
-  assert.match(rule('.pitch--large'), /height:\s*var\(--sq-pitch-large-h\)/);
+  assert.match(rule('.pitch--large'), /flex:\s*1 1 0/);
   assert.doesNotMatch(rule('.pitch--large'), /width/, 'full column width (C§12)');
 });
 
@@ -627,34 +606,28 @@ test('ported Sidebar dossier: the legal lineup, the emergency assignment in role
   const view = await mount(buildSquad(st, { sport: { id: 'basketball' }, cache: new Map() }, bucks.id), context);
   const main = view.host.querySelector('.squad-main');
   const labels = scope => texts(scope, '.squad-row .squad-row__label');
-  assert.deepEqual(labels(main.querySelector('.squad-table:not(.squad-table--depth)')).sort(),
-    lineup.starters.map(player => player.name).sort(), 'the table groups the actual legal lineup');
-  assert.deepEqual(labels(main.querySelector('.squad-table--depth')), lineup.bench.map(player => player.name));
-  assert.deepEqual(labels(main.querySelector('.squad-table--depth')), ['Reserve Shooter'],
+  const side = view.host.querySelector('.squad-side');
+  assert.deepEqual(labels(main.querySelector('.squad-table')).sort(),
+    lineup.starters.map(player => player.name).sort(), 'the table lists the actual legal lineup');
+  assert.deepEqual(labels(side.querySelector('.squad-table--depth')), lineup.bench.map(player => player.name));
+  assert.deepEqual(labels(side.querySelector('.squad-table--depth')), ['Reserve Shooter'],
     'A high reserve rating must not replace a legal positional starter');
 
   const emergency = lineup.starters.find(player => player.assignedPos === 'PG');
-  const guards = [...main.querySelectorAll('.squad-table__group')].find(group => text(group.querySelector('.squad-group')) === 'Guards');
-  const row = [...guards.querySelectorAll('.squad-row')].find(item => text(item.querySelector('.squad-row__label')) === emergency.name);
-  assert.ok(row, 'the emergency point guard is listed with the guards');
+  const row = [...main.querySelectorAll('.squad-row')].find(item => text(item.querySelector('.squad-row__label')) === emergency.name);
+  assert.ok(row, 'the emergency point guard is listed');
   assert.ok(row.classList.contains('is-out-of-position'));
   assert.equal(text(row.querySelector('.squad-row__pos')), 'PG');
-  assert.equal(text(row.querySelector('.squad-row__natural')), 'SG');
+  assert.match(row.getAttribute('title'), /^Natural SG/);
   assert.equal(text(row.querySelector('.squad-row__role')), `${Math.round(emergency.effectiveRating)} ↓ out of position`,
     'the in-role rating is the penalty-adjusted one');
   assert.equal(row.querySelector('.squad-row__role').getAttribute('title'), 'Out of position · natural SG');
   const phoneRow = [...view.host.querySelectorAll('.squad-prow')].find(item => text(item.querySelector('.squad-prow__name')) === emergency.name);
-  assert.equal(text(phoneRow.querySelector('.squad-prow__meta')), 'SG · out of position');
+  assert.equal(text(phoneRow.querySelector('.squad-prow__meta')), 'out of position');
 
   // The former "Latest acquisition" card: player, former team, round, depth role and the zero gain.
-  const reserve = main.querySelector('.squad-table--depth .squad-row');
+  const reserve = side.querySelector('.squad-table--depth .squad-row');
   assert.equal(text(reserve.querySelector('.squad-row__acq-label')), 'LAL · R III');
-  const claims = [...view.host.querySelectorAll('.squad-side .claimed-row')];
-  assert.equal(claims.length, 1);
-  assert.equal(text(claims[0].querySelector('.claimed-row__name')), 'Reserve Shooter · Los Angeles Lakers');
-  assert.equal(text(claims[0].querySelector('.claimed-row__round')), 'R III');
-  assert.equal(text(claims[0].querySelector('.claimed-row__gain')), '±0.0');
-  assert.ok(claims[0].querySelector('.claimed-row__gain').classList.contains('tone-muted'), 'no change reads muted');
   await click(view.host.querySelectorAll('.squad-tab')[2]);
   assert.deepEqual([...view.host.querySelectorAll('.squad-acq__row')].map(item => ['round', 'name', 'from', 'gain', 'status']
     .map(cell => text(item.querySelector(`.squad-acq__${cell}`)))), [['R III', 'Reserve Shooter', 'Los Angeles Lakers', '±0.0', 'Depth']]);

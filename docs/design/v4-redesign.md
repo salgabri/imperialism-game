@@ -3,7 +3,9 @@
 Record of the v4 design import, implemented in commit `f2f0cf8` and merged with
 `main`'s domestic campaigns in `159f2ac` (19 October 2026). This record supersedes [direction.md](direction.md) and
 [ledger-restyle.md](ledger-restyle.md). Other notes in this folder describe
-earlier states of the interface and are kept as history.
+earlier states of the interface and are kept as history. The
+[compact pass](compact-pass.md) (November 2026) refines it, with less text and
+no scrolling, and wins where the two differ.
 
 ## Source
 

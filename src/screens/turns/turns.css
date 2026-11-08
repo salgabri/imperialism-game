@@ -90,7 +90,7 @@
    ========================================================================================================= */
 .target-panel {
   --tp-flag-w:20px; --tp-flag-h:15px; --tp-name:14px; --tp-eff:13px; --tp-spoils:14px; --tp-win:15px;
-  display:flex; flex-direction:column; min-width:0; color:var(--ink);
+  display:flex; flex-direction:column; flex:1 1 auto; min-width:0; min-height:0; color:var(--ink);
 }
 .target-panel__head, .target-panel__row {
   display:grid; grid-template-columns:14px var(--tp-flag-w) minmax(0,1fr) 34px 40px; column-gap:10px; align-items:center;
@@ -99,11 +99,15 @@
   margin:8px -8px 0; padding:0 8px 2px; white-space:nowrap;
   font:700 11px/1.2 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
 }
-.target-panel__head > span:first-child { grid-column:4; justify-self:end; }
-.target-panel__head > span:last-child { grid-column:5; justify-self:end; }
-.target-panel__rows { display:flex; flex-direction:column; margin:2px -8px 0; }
+.target-panel__label--spoils { grid-column:4; justify-self:end; }
+.target-panel__label--win { grid-column:5; justify-self:end; }
+/* More targets than the column holds: the pager takes the head's empty left side (compact pass), so it costs no row. */
+.target-panel__head > .target-panel__pager { grid-column:1 / 4; grid-row:1; justify-self:start; margin-left:-4px; }
+/* The rows fill what the column leaves (campaign.css lets the lead grow) and show a page of what fits (TargetPanel). */
+.target-panel__rows { display:flex; flex-direction:column; flex:1 1 0; min-height:0; overflow:hidden; margin:2px -8px 0; }
+/* flex:none: in a box shorter than the list a row keeps its height (and its 44px target), and the list pages. */
 .target-panel__row {
-  position:relative; height:max(var(--target-row-h), var(--tap)); padding:0 8px;
+  position:relative; flex:none; height:max(var(--target-row-h), var(--tap)); padding:0 8px;
   background:transparent; cursor:pointer; outline:none; -webkit-tap-highlight-color:transparent;
 }
 .target-panel__row:hover:not(.is-selected) { background:var(--panel); box-shadow:inset 0 0 0 1px var(--rule); }
@@ -124,20 +128,13 @@
   text-align:right; font:600 var(--tp-spoils)/1 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--text-2);
 }
 .target-panel__win { text-align:right; font:700 var(--tp-win)/1 var(--font-narrow); font-variant-numeric:tabular-nums; }
-.target-panel__foot {
-  margin:10px 0 0; padding-top:12px; border-top:1px solid var(--rule);
-  font:400 12px/1.5 var(--font-sans); color:var(--muted);
-}
-.target-panel__foot b { font-weight:600; color:var(--you-text); }
 
 @media (min-width:1600px) {
   .target-panel { --tp-flag-w:24px; --tp-flag-h:18px; --tp-name:16px; --tp-eff:14px; --tp-spoils:15px; --tp-win:16px; }
-  .target-panel__foot { font-size:13px; }
 }
 @media (max-width:699.98px) {
   .target-panel { --tp-name:16px; }
   .target-panel__head { margin-top:6px; }
-  .target-panel__foot { display:none; }   /* the phone bar carries "Attack <team>" right below */
 }
 
 /* =========================================================================================================

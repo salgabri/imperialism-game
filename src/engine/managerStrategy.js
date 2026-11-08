@@ -27,6 +27,8 @@ const SUPPORT = {
   // pitchers keep runs off the board.
   baseball: { C: [.6, .6], '1B': [1, .3], '2B': [.8, .5], '3B': [.9, .4], SS: [.7, .6], LF: [1, .3], CF: [.8, .5], RF: [1, .3],
     DH: [1, 0], SP: [0, 1], RP: [0, 1] },
+  // A Davis Cup team's reserve can come in for any rubber, at either end of the risk.
+  tennis: { SGL: [.5, .5], DBL: [.5, .5] },
 };
 
 export function tacticalProfile(team) {

@@ -4,6 +4,11 @@ import React from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
 import { themedPaint } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
+import Pager from '../../components/Pager.jsx';
+import { useFitWall } from '../../hooks/useFit.js';
+
+/** The fallen wall's flags: smaller than a touch target only where a fine pointer can hit them. */
+const FALLEN_WALL = { ratio: 4 / 3, gap: 6, minCell: 32, maxCell: 56, touch: { ratio: 1, minCell: 44 } };
 
 export function MapShare({ share }) {
   const rows = share?.rows || [];
@@ -47,20 +52,23 @@ export function MapShare({ share }) {
 // Memoised: the rows are memoised by the view-model and LedgerScreen's handler is stable, so the list renders when
 // an empire falls rather than on every render of a match.
 export const FallenList = React.memo(function FallenList({ fallen = [], aside = '', onSelectTeam }) {
+  const wall = useFitWall(fallen.length, FALLEN_WALL);
+  const shown = Number.isFinite(wall.pageSize) ? fallen.slice(wall.start, wall.start + wall.pageSize) : fallen;
   return (
     <section className="ledger-fallen" aria-labelledby="ledger-fallen-title">
       <div className="kicker">
         <h2 className="kicker__title" id="ledger-fallen-title">Fallen empires</h2>
+        <Pager page={wall.page} pages={wall.pages} onPage={wall.setPage} label="Fallen empires pages" />
         {aside && <span className="kicker__aside">{aside}</span>}
       </div>
       {fallen.length ? (
-        <ol className="ledger-fallen__list">
-          {fallen.map(entry => (
+        <ol className="ledger-fallen__list" ref={wall.boxRef} style={wall.style} data-measured={wall.measured || undefined}>
+          {shown.map(entry => (
             <li key={entry.key} className="ledger-fallen__row">
               <button type="button" className="ledger-fallen__team" data-team-id={entry.teamId}
-                onClick={() => onSelectTeam?.(entry.teamId)}>
+                title={entry.line ? `${entry.name} · ${entry.line}` : entry.name} onClick={() => onSelectTeam?.(entry.teamId)}>
                 <span className="ledger-fallen__mark" aria-hidden="true"><TeamMark id={entry.flagId} teamId={entry.teamId} code={entry.code} isClub={entry.isClub} width={24} /></span>
-                <span className="ledger-fallen__text">
+                <span className="ledger-fallen__text sr-only">
                   <span className="ledger-fallen__name">{entry.name}</span>
                   {entry.line && <span className="ledger-fallen__line">{entry.line}</span>}
                 </span>
@@ -68,7 +76,7 @@ export const FallenList = React.memo(function FallenList({ fallen = [], aside = 
             </li>
           ))}
         </ol>
-      ) : <p className="ledger-empty">No empire has fallen yet.</p>}
+      ) : null}
     </section>
   );
 });

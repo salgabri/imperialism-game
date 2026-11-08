@@ -192,9 +192,9 @@ names the provider and reads "Game rating converted from CM current ability".
 
 ## Built-in earlier seasons
 
-Twenty-one seasons ship with the game, 2004/05 to 2025/26, without 2024/25 (no
-source here has EA FC 25). FIFA 07 to FIFA 14 are described
-[below](#fifa-07-to-fifa-14), and so are [FIFA 05 and FIFA 06](#fifa-05-and-fifa-06),
+Twenty-two seasons ship with the game, every season from 2004/05 to 2025/26.
+[EA FC 25](#ea-fc-25) and [FIFA 07 to FIFA 14](#fifa-07-to-fifa-14) are described
+below, and so are [FIFA 05 and FIFA 06](#fifa-05-and-fifa-06),
 which have nations only. Ten, 2014/15 to 2023/24, are the launch roster
 (update 2) of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
 (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
@@ -227,7 +227,7 @@ How a season is made:
   and relative in newer ones) and one roster date, or the build stops.
 - **Nations by EA nationality.** The built-in rosters' aliases plus EA's older
   spellings (`Czech Republic`, `Guinea Bissau`, `Korea DPR`, `Swaziland`,
-  `Brunei Darussalam`) map nationalities to game nations. `EA_NO_TEAM` lists the
+  `Brunei Darussalam`) and its website's `Holland` map nationalities to game nations. `EA_NO_TEAM` lists the
   nationalities without a shape on the map (Malta, the Faroe Islands and other
   small states); their players still play for their clubs. Scotland, Wales and
   Northern Ireland have shapes and teams. Any other unmapped name stops the build. Each nation fields
@@ -253,6 +253,56 @@ overall, 'ST,LW', nationality, club, dateOfBirth, slug]`. `expandEaTuple` in
 with `source: 'ea-fc'`, the edition, update, snapshot date and the player's
 SoFIFA page for that roster, and `eaTupleOf` folds it back. The Source column
 reads "FIFA 18" and links to that page.
+
+### EA FC 25
+
+No export of SoFIFA's kind has EA FC 25, the edition between the FIFA 15 – EA FC 24
+export and the EA FC 26 snapshot, so 2024/25 joins two Kaggle files by EA's player
+id (`scripts/lib/ea-site-seasons.mjs`, manifest `site`, run by the same
+`npm run build:ea-seasons` through the same `assembleEaSeason`):
+
+- **Ratings, nationality and club** from an export of EA's own ratings website
+  (`nyagami/ea-sports-fc-25-database-ratings-and-stats`, `male_players.csv`,
+  16,161 players, Apache-2.0 as set by its compiler), dated 26 September 2024, a
+  week after the release. It has EA's overall, positions, name, nationality,
+  league and club, and EA's age, but no date of birth.
+- **Date of birth, full name and the clubs' usual names** from a SoFIFA scrape of
+  3 June 2025 (`aniss7/fifa-player-data-from-sofifa-2025-06-03`, MIT as set by its
+  compiler, no nationality). 85 of its rows are two fields short (a description
+  spills over) and are skipped; 39 ids are listed twice, identically.
+
+How they are joined:
+
+- **The same person.** A player takes the June file's date of birth and full
+  name only where EA's age agrees with it on 26 September 2024: the same age, or a
+  year less, since EA's website counts from an earlier day of the year (427
+  players). 13,451 of the 16,161 join; 2 are set aside because the ages differ by
+  more, and the other 2,708 are not in the June file. Those keep EA's name as full
+  name and have no date of birth (147 of the 2,306 players the season fields).
+- **Full names** in the June file often end in the same name in another script
+  ("Hakim Ziyechحكيم زياش"). The Latin part stands (1,359 names); a name with
+  no Latin part of its own is not used.
+- **Club names.** EA's website names some clubs its own way, among them the clubs
+  it had no licence for: Inter is "Lombardia FC", Atalanta "Bergamo Calcio", Lazio
+  "Latium", Paris Saint-Germain "Paris SG". Each club in the seven leagues takes the
+  June name most of its launch players carry, more than half of them (Rennes is
+  closest, at 15 of 25), so the club ids match the other seasons' and a winter
+  transfer moves nobody. 44 clubs are renamed (`clubNames` in the audit). The build
+  stops on a club the June file cannot name, and on two clubs that would share one
+  name. A player of a club outside the seven leagues keeps EA's club name.
+- **Spellings.** EA's website writes `Holland`, `Curaçao`, `St. Kitts and Nevis`
+  and `St. Lucia`; the first is the Netherlands, the others have no team.
+- **Roster.** Players link to SoFIFA's release roster of the edition, 250002
+  (20 September 2024; SoFIFA's version menu, as archived on 24 September and 15
+  October 2024, lists 250001 of 7 August, then 250002, 250003 of 26 September and
+  so on), like FIFA 15 – EA FC 24's update 2. The season's date is the export's.
+  EA's own website only ever shows the current edition, so its links would not.
+
+Result: 75 nations field a full XI, 139 have players, and all 132 clubs of the
+seven leagues are there, the strongest 124 and 32 on the season's two Europe maps.
+Four of its Top 124 clubs had no ground in `scripts/data/europe-clubs.json` under
+these names (UD Las Palmas, CD Leganés, Montpellier HSC, Holstein Kiel); each takes
+the row its country map gives, as the same clubs' rows under other names already do.
 
 ### FIFA 07 to FIFA 14
 

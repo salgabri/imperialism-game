@@ -7,6 +7,7 @@ import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
 import { baseballProfile } from '../sports/baseball.js';
 import { hockeyProfile } from '../sports/hockey.js';
+import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { getSport, SPORTS } from '../sports/index.js';
 import { historyRound, memo, ratingTier, roman, shortName, signedDelta, teamChip } from './format.js';
@@ -28,12 +29,15 @@ const GROUPS = {
 const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5, CF: 6, RF: 7, DH: 8, SP: 9, RP: 10 },
   // Ice hockey's centre shares it too: the forwards, then the defence and the goalie.
   hockey: { C: 0, LW: 1, RW: 2, D: 3, G: 4 },
+  // A Davis Cup team: the singles, then the doubles.
+  tennis: { SGL: 0, DBL: 1 },
   // Rugby league numbers its thirteen from the back: the fullback, the outside backs, the halves, then the pack.
   'rugby-league': { FB: 0, WG: 1, CE: 2, FE: 3, HB: 4, PR: 5, HK: 6, SR: 7, LK: 8 } };
 const SPORT_GROUPS = {
   baseball: { C: 'Catcher', '1B': 'Infield', '2B': 'Infield', '3B': 'Infield', SS: 'Infield', LF: 'Outfield', CF: 'Outfield',
     RF: 'Outfield', DH: 'Designated hitter', SP: 'Starting pitcher', RP: 'Bullpen' },
   hockey: { C: 'Centres', LW: 'Wings', RW: 'Wings', D: 'Defence', G: 'Goalie' },
+  tennis: { SGL: 'Singles', DBL: 'Doubles' },
   'rugby-league': { FB: 'Outside backs', WG: 'Outside backs', CE: 'Outside backs', FE: 'Halves', HB: 'Halves', PR: 'Front row',
     HK: 'Front row', SR: 'Back row', LK: 'Back row' },
 };
@@ -74,6 +78,8 @@ const SLOTS = {
     LW: [[17, 9], [17, 21], [17, 33], [17, 45]],
     RW: [[83, 9], [83, 21], [83, 33], [83, 45]],
   },
+  // Tennis: the No. 1 and No. 2 at the near baseline, the doubles pair in the far half, across the net.
+  tennis: { SGL: [[30, 82], [70, 82]], DBL: [[30, 22], [70, 22]] },
   // The pack up front, attacking the try line at the top: the front row, the back row behind it, then the halves, the
   // centres and wings across the field and the fullback at the back. Each position's best starts; the rest of the 17 sit
   // on the interchange bench along the foot of the box.
@@ -90,11 +96,10 @@ const LAYOUTS = {
   'american-football': { layout: 'field', viewLabel: 'Field' },
   baseball: { layout: 'diamond', viewLabel: 'Diamond' },
   hockey: { layout: 'rink', viewLabel: 'Rink' },
+  tennis: { layout: 'tennis', viewLabel: 'Court' },
   'rugby-league': { layout: 'rugby', viewLabel: 'Field' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
-const DEPTH_ROWS = 5;
-const SIDE_CLAIMS = 3;
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const finite = value => (Number.isFinite(Number(value)) && value !== null && value !== '' ? Number(value) : null);
@@ -158,8 +163,9 @@ export function profileSegments(value) {
 
 /**
  * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball), Offence / Defence / Kicking (American
- * football), Batting / Pitching / Fielding (baseball), Attack / Defence / Goaltending (ice hockey) or Backs / Halves /
- * Forwards (rugby league) from the sports engines' positional profiles of the lineup (ED§4c; no match-day offset), with the C1 segment count.
+ * football), Batting / Pitching / Fielding (baseball), Attack / Defence / Goaltending (ice hockey), Singles / Doubles
+ * (tennis) or Backs / Halves / Forwards (rugby league) from the sports engines' positional profiles of the lineup (ED§4c;
+ * no match-day offset), with the C1 segment count.
  */
 export function strengthProfile(lineup, sportId) {
   const rows = sportId === 'basketball'
@@ -170,8 +176,10 @@ export function strengthProfile(lineup, sportId) {
         ? (({ batting, pitching, fielding }) => [['batting', 'Batting', batting], ['pitching', 'Pitching', pitching], ['fielding', 'Fielding', fielding]])(baseballProfile(lineup))
         : sportId === 'hockey'
           ? (({ attack, defence, goaltending }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goaltending', 'Goaltending', goaltending]])(hockeyProfile(lineup))
+          : sportId === 'tennis'
+            ? (({ singles, doubles }) => [['singles', 'Singles', singles], ['doubles', 'Doubles', doubles]])(tennisProfile(lineup))
           : sportId === 'rugby-league'
-          ? (({ backs, halves, forwards }) => [['backs', 'Backs', backs], ['halves', 'Halves', halves], ['forwards', 'Forwards', forwards]])(rugbyLeagueProfile(lineup))
+            ? (({ backs, halves, forwards }) => [['backs', 'Backs', backs], ['halves', 'Halves', halves], ['forwards', 'Forwards', forwards]])(rugbyLeagueProfile(lineup))
           : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
   return rows.map(([key, label, value]) => {
     const raw = Number.isFinite(Number(value)) ? Number(value) : 0;
@@ -300,10 +308,8 @@ function computeSquad(st, ctx, team) {
     const rating = Math.round(Number(player.rating) || 0);
     return {
       key: `p-${indexOf(player)}-${i}`,
-      no: starter ? String(i + 1) : '—',
       pos: (starter ? player.assignedPos || player.pos : player.pos) || '',
       name: player.name || '',
-      short: shortName(player.name),
       fullName: player.sourceInfo?.fullName || player.name || '',
       natural: player.positions?.length ? player.positions.join(' / ') : player.pos || '',
       inRole: starter ? String(Math.round(Number(player.effectiveRating ?? player.rating) || 0)) : '—',
@@ -320,7 +326,9 @@ function computeSquad(st, ctx, team) {
     };
   };
 
-  const starters = sortByPosition(lineup.starters, player => player.assignedPos || player.pos, sportId);
+  // Tennis lists every place, a singles player who doubles in the doubles twice (a small nation's).
+  const placed = sportId === 'tennis' ? lineup.slots.filter(slot => slot.player).map(slot => slot.player) : lineup.starters;
+  const starters = sortByPosition(placed, player => player.assignedPos || player.pos, sportId);
   const starterRows = starters.map((player, i) => rowOf(player, i, true));
   const groups = [];
   for (const row of starterRows) {
@@ -332,11 +340,8 @@ function computeSquad(st, ctx, team) {
   const bench = sortByPosition(lineup.bench, player => player.pos, sportId);
   const benchRows = bench.map((player, i) => rowOf(player, i, false));
   const depth = {
-    rows: benchRows.slice(0, DEPTH_ROWS),
-    extra: benchRows.slice(DEPTH_ROWS),
     all: benchRows,
     count: benchRows.length,
-    more: benchRows.length > DEPTH_ROWS ? `+ ${benchRows.length - DEPTH_ROWS} more in depth` : null,
   };
 
   const slots = SLOTS[sportId] || SLOTS.football;
@@ -383,15 +388,17 @@ function computeSquad(st, ctx, team) {
   const alive = Array.isArray(st.aliveIds) ? st.aliveIds.includes(teamId) : true;
   const fell = Array.isArray(st.fallen) ? st.fallen.find(entry => entry?.id === teamId) : null;
   const notes = [];
-  if (lineup.starters.length < plan && !squad.some(player => player.gen)) {
-    notes.push(`Source data covers ${lineup.starters.length} of ${plan} starting places. Unfilled places use a 40-point team-strength baseline.`);
+  const filled = lineup.slots.filter(slot => slot.player).length;
+  if (filled < plan && !squad.some(player => player.gen)) {
+    notes.push(`Source data covers ${filled} of ${plan} starting places. Unfilled places use a 40-point team-strength baseline.`);
   }
+  const doubling = lineup.slots.filter(slot => slot.player?.doubling).map(slot => shortName(slot.player.name));
+  if (doubling.length) notes.push(`${doubling.join(' and ')} ${doubling.length === 1 ? 'plays' : 'play'} the singles and the doubles: the team has ${plural(squad.length, 'rated player')}.`);
   const estimates = lineup.starters.filter(isEstimated).length;
   if (estimates) notes.push(`${estimates} of the ${plan} starting ratings are estimates, each marked: EA publishes only NHL 27's top 300 players.`);
   // The manager's own team for the "Your squad" shortcut (spectators follow instead).
   const ownId = ctx?.managedId ?? null;
   const back = BACK_LABELS[st.squadReturn] ? { label: BACK_LABELS[st.squadReturn] } : null;
-  const showSource = [...starterRows, ...benchRows].some(row => row.source !== '—');
 
   return {
     teamId,
@@ -400,7 +407,6 @@ function computeSquad(st, ctx, team) {
     sport: sportId,
     layout: LAYOUTS[sportId].layout,
     kicker: `First team · ${plural(squad.length, 'player')} · ${claimedCount} claimed in conquest`,
-    phoneMeta: `${plural(squad.length, 'player')} · ${claimedCount} claimed in conquest`,
     playerCount: squad.length,
     xi: {
       label: words.lineup, short: words.lineupShort,
@@ -416,11 +422,9 @@ function computeSquad(st, ctx, team) {
     pitchLabel: shaped ? `Formation ${formation}` : `${LAYOUTS[sportId].viewLabel}, ${words.lineup.toLowerCase()}`,
     groups,
     depth,
-    showSource,
     pitch,
     profile: strengthProfile(lineup, sportId),
     profileScale: 'Scale 60–95',
-    claimed: claims.slice(0, SIDE_CLAIMS),
     acquisitions: {
       rows: claims,
       aside: claimedCount ? `${plural(claimedCount, 'player')} · ${claimedStarters} of ${plan} starters were claimed in conquest` : '',

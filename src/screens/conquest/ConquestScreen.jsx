@@ -19,9 +19,9 @@ export default function ConquestScreen(props) {
   // Before conquestModel() is wired to buildConquest it passes the W1 stub { choice, selectedIndex }.
   const model = Array.isArray(props.options) ? props : conquestFromChoice(props.choice, props.selectedIndex);
   const {
-    kicker = 'Conquest', kickerRight = 'Result', headline = 'Conquest', standfirst = '', effects = [],
+    kicker = 'Conquest', kickerRight = '', headline = 'Conquest', standfirst = '', effects = [],
     claimTitle = 'Claim one player', claimAside = 'Change to your XI', options = [], ctaLabel = null,
-    waitNote = 'The campaign waits for your choice.', comparison = null,
+    comparison = null,
   } = model || {};
   const listRef = useRef(null);
 
@@ -61,23 +61,17 @@ export default function ConquestScreen(props) {
     <article className="screen screen--conquest" aria-labelledby="conquest-headline" tabIndex={-1}>
       <div className="conquest-kicker">
         <span className="conquest-kicker__title">{kicker}</span>
-        <span className="conquest-kicker__aside">{kickerRight}</span>
+        {kickerRight ? <span className="conquest-kicker__aside">{kickerRight}</span> : null}
       </div>
       <h1 id="conquest-headline" className="conquest-headline">{headline}</h1>
       {standfirst && <p className="conquest-standfirst">{standfirst}</p>}
       {effects.length > 0 && (
         <dl className="conquest-effects">
           {effects.map(effect => (
-            <div key={effect.key || effect.label} className="conquest-effect">
+            <div key={effect.key || effect.label} className="conquest-effect" title={effect.title || undefined}>
               <dt className="conquest-effect__label">{effect.label}</dt>
               <dd className="conquest-effect__value">{effect.value}</dd>
-              {(effect.detail || effect.detailMore) && (
-                <dd className="conquest-effect__detail"
-                  title={effect.detailFull && effect.detailFull !== effect.detail ? effect.detailFull : undefined}>
-                  <span className="conquest-effect__text">{effect.detail}</span>
-                  {effect.detailMore && <>{' '}<span className="conquest-effect__more">{effect.detailMore}</span></>}
-                </dd>
-              )}
+              {effect.title && <dd className="sr-only">{effect.title}</dd>}
             </div>
           ))}
         </dl>
@@ -114,21 +108,23 @@ export default function ConquestScreen(props) {
               <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" />
             </svg>
           </summary>
-          <table className="v4-table conquest-compare__table">
-            <caption className="conquest-compare__caption">{comparison.caption}</caption>
-            <thead>
-              <tr><th scope="col">Position</th><th scope="col">Before</th><th scope="col">After</th></tr>
-            </thead>
-            <tbody>
-              {comparison.rows.map(row => (
-                <tr key={row.key} className={row.changed ? 'is-changed' : undefined}>
-                  <th scope="row">{row.position}</th>
-                  <td>{row.before.name} <span className="conquest-compare__rating">{row.before.rating}</span></td>
-                  <td>{row.after.name} <span className="conquest-compare__rating">{row.after.rating}{row.after.outOfPosition ? ' · out of position' : ''}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {comparison.rows.length ? (
+            <table className="v4-table conquest-compare__table">
+              <caption className="sr-only">{comparison.caption}</caption>
+              <thead>
+                <tr><th scope="col">Pos</th><th scope="col">Before</th><th scope="col">After</th></tr>
+              </thead>
+              <tbody>
+                {comparison.rows.map(row => (
+                  <tr key={row.key}>
+                    <th scope="row">{row.position}</th>
+                    <td>{row.before.name} <span className="conquest-compare__rating">{row.before.rating}</span></td>
+                    <td>{row.after.name} <span className="conquest-compare__rating">{row.after.rating}{row.after.outOfPosition ? ' · out of position' : ''}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : <p className="conquest-compare__none">{comparison.none}</p>}
           {comparison.support && <p className="conquest-compare__support">{comparison.support}</p>}
         </details>
       )}
@@ -137,7 +133,6 @@ export default function ConquestScreen(props) {
           <button type="button" className="btn-primary conquest-footer__cta" onClick={() => onConfirm?.()}>
             <span className="conquest-footer__label">{ctaLabel}</span>
           </button>
-          <p className="conquest-footer__note">{waitNote}</p>
         </div>
       )}
     </article>

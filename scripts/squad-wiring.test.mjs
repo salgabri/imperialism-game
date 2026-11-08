@@ -140,7 +140,7 @@ test('claimed provenance after a real conquest, and the history fallback for an 
     app.selectTeam('250');
     const fresh = app.squadModel();
     assert.equal(fresh.claimedCount, 1);
-    const claim = fresh.claimed[0];
+    const claim = fresh.acquisitions.rows[0];
     // History stores the rounded XI delta; applyConquest's own `claimGain` (when WP-CONQ stores it) is the same delta.
     const gain = signedDelta(entry.result.strengthGain).tone === 'gain' ? signedDelta(entry.result.strengthGain).text : '±0.0';
     assert.equal(claim.name, claimed[0].name);
@@ -162,8 +162,8 @@ test('claimed provenance after a real conquest, and the history fallback for an 
     const legacy = app.squadModel();
     assert.notEqual(legacy, fresh, 'new team identity recomputes');
     assert.deepEqual(
-      { name: legacy.claimed[0].name, code: legacy.claimed[0].code, fromName: legacy.claimed[0].fromName,
-        roman: legacy.claimed[0].roman, gain: legacy.claimed[0].gain },
+      { name: legacy.acquisitions.rows[0].name, code: legacy.acquisitions.rows[0].code, fromName: legacy.acquisitions.rows[0].fromName,
+        roman: legacy.acquisitions.rows[0].roman, gain: legacy.acquisitions.rows[0].gain },
       { name: claim.name, code: claim.code, fromName: claim.fromName, roman: 'R I', gain });
     assert.equal(legacy.claimedCount, 1);
   } finally { f.close(); }

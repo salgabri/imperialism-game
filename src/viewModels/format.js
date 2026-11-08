@@ -105,8 +105,12 @@ export function routeCopy(draw, { openLand = false } = {}) {
   if (draw.routeKind === 'neutral-transit') return 'Through neutral land — transit treaty';
   if (draw.routeKind === 'foreign-transit') return 'Through foreign land — never claimed';
   if (draw.routeKind === 'sea' || draw.isNeighbor === false) return openLand ? 'Over open ground — no shared border' : 'By sea — no shared border';
-  return 'Across a land border';
+  return LAND_ROUTE;
 }
+
+/** The ordinary route. The map's arrow already shows it, so the fixture blocks say a route only when it is not this one. */
+export const LAND_ROUTE = 'Across a land border';
+export const routeWorthSaying = route => (route && route !== LAND_ROUTE ? route : null);
 
 /**
  * 'The European Campaign' | 'The World Campaign' | `${scopeName} Campaign` (DEC misc). A country's top clubs read as

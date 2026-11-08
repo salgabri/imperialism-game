@@ -25,9 +25,12 @@ const inStrongest = count => (club, i, clubs) => strongestClubs(clubs, count).in
 
 /**
  * A sport's club theatres on the world board. Football has no league theatres: its two are Europe's strongest clubs and
- * its elite. Another sport with clubs and no map of its own has every club, the elite and each league.
+ * its elite. Another sport with clubs and no map of its own has every club, the elite and each league; one without clubs,
+ * none.
  */
 export function CLUB_SCOPES(sport) {
+  // A sport with no clubs (tennis: nations only) has no club theatre.
+  if (!sport?.clubs?.length) return [];
   if (sport?.id === 'football') {
     return [
       {

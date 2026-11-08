@@ -1,6 +1,6 @@
 # Rugby league
 
-Status: implemented 2026-11-08. A seventh sport: the 17 NRL clubs fight over Australia and New Zealand on the NRL's
+Status: implemented 2026-11-08. An eighth sport: the 17 NRL clubs fight over Australia and New Zealand on the NRL's
 own map, each holding its own state, territory or region
 ([domestic-campaigns.md](domestic-campaigns.md#the-nrl-map)), and the nations field the NRL's players of each country.
 Everything outside the match (territory, the draw, targeting, conquest, signings, saves) is the game's own, unchanged.

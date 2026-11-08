@@ -188,7 +188,7 @@ function CompactMatchCard({ round, status, statusLive, startLabel, a, b, firstTe
         <div className="fi-score-number"><span className="fi-score-value">{a.score}</span><span className="fi-score-dash">–</span><span className="fi-score-value">{b.score}</span></div>
         <ScoreTeam team={b} teamId={secondTeamId} onSelectTeam={onSelectTeam} markWidth={28} />
       </div>
-      <p className={`fi-match-status${live ? ' is-live' : ''}`}>
+      <p className={`fi-match-status${live ? ' is-live' : ''}${done && !result.tieText ? ' is-plain' : ''}`}>
         <i className="fi-match-status-mark" aria-hidden="true" />
         <span>{ticking ? <CompactMinute store={minuteStore} fallback={floor} label={status} sport={clockSport} />
           : done && result.tieText ? `${statusText} · ${result.tieText}` : statusText}</span>

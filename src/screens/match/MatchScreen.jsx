@@ -2,6 +2,8 @@
 // both XIs and the dark match feed. Model from buildLiveMatch(st, ctx) (src/viewModels/match.js) + the FROZEN
 // render props (minuteStore, speed, paused, onSpeed, onPause, onSelectTeam). The live minute is read from the
 // store by the parts that show it (DEC D7), so the tables do not re-render per minute. No timers.
+// Compact pass (docs/design/compact-pass.md): the chart fills the screen, with the lineups a switch away (above 700px;
+// the phone has its own segments). The two XIs show the rows that fit and page together: American football fields 23.
 import React from 'react';
 import MatchCard from '../../components/MatchCard.jsx';
 import ScoreHeader from './ScoreHeader.jsx';
@@ -9,14 +11,19 @@ import WinChart from './WinChart.jsx';
 import XiTable from './XiTable.jsx';
 import MatchFeed from './MatchFeed.jsx';
 import MatchStats from './MatchStats.jsx';
+import Pager from '../../components/Pager.jsx';
+import { usePagedList } from '../../hooks/useFit.js';
 import './match.css';
 
-const SEGMENTS = [['feed', 'Feed'], ['lineups', 'Lineups'], ['stats', 'Stats']];
+const NO_ROWS = [];
 
-function Shell({ children, state = 'empty', segment = 'feed' }) {
+const SEGMENTS = [['feed', 'Feed'], ['lineups', 'Lineups'], ['stats', 'Stats']];
+const MAIN_VIEWS = [['chart', 'Chart'], ['lineups', 'Lineups']];
+
+function Shell({ children, state = 'empty', segment = 'feed', mainView = 'chart' }) {
   return (
     <section id="view-panel-match" className="screen screen--match" aria-labelledby="view-tab-match" tabIndex={-1}
-      data-state={state} data-segment={segment}>
+      data-state={state} data-segment={segment} data-main={mainView}>
       {children}
     </section>
   );
@@ -30,6 +37,10 @@ export default function MatchScreen(props) {
     minuteStore = null, speed = 1, paused = false, onSpeed, onPause, onSelectTeam,
   } = props;
   const [segment, setSegment] = React.useState('feed');
+  const [mainView, setMainView] = React.useState('chart');
+  const rowsA = lineups?.a?.rows || NO_ROWS, rowsB = lineups?.b?.rows || NO_ROWS;
+  const xi = usePagedList(rowsA.length >= rowsB.length ? rowsA : rowsB, { row: '.match-xi__row' });
+  const page = rows => (Number.isFinite(xi.pageSize) ? rows.slice(xi.start, xi.start + xi.pageSize) : rows);
 
   if (!a || !b || !state) {
     // Before the App wiring pass the delegate may still hand over the legacy `card`; keep it readable.
@@ -53,7 +64,7 @@ export default function MatchScreen(props) {
 
   const minuteProps = { live, minuteStore, minuteFallback, minuteFloor };
   return (
-    <Shell state={state} segment={segment}>
+    <Shell state={state} segment={segment} mainView={mainView}>
       <ScoreHeader a={a} b={b} sport={sport} statusLabel={statusLabel} statusDetail={statusDetail} kicks={kicks} {...minuteProps} />
       <div className="segmented match-segments" role="group" aria-label="Match details">
         {SEGMENTS.map(([id, label]) => (
@@ -63,12 +74,18 @@ export default function MatchScreen(props) {
       </div>
       <div className="match-body">
         <div className="match-main">
+          <div className="segmented match-views" role="group" aria-label="Match view">
+            {MAIN_VIEWS.map(([id, label]) => (
+              <button key={id} type="button" aria-pressed={mainView === id} onClick={() => setMainView(id)}>{label}</button>
+            ))}
+          </div>
           <WinChart sport={sport} model={model} goals={goals} perspective={perspective} final={final} length={length} ot={ot}
             chartNote={chartNote} aId={a.teamId} dId={b.teamId} {...minuteProps} />
           <MatchStats sport={sport} preMatch={preMatch} speed={speed} paused={paused} onSpeed={onSpeed} onPause={onPause} />
-          <div className="match-lineups">
-            <XiTable {...(lineups?.a || {})} onSelectTeam={onSelectTeam} />
-            <XiTable {...(lineups?.b || {})} onSelectTeam={onSelectTeam} />
+          <div className="match-lineups" ref={xi.boxRef} data-long={rowsA.length > 13 ? '' : undefined}>
+            <Pager page={xi.page} pages={xi.pages} onPage={xi.setPage} label="Lineup pages" className="match-lineups__pager" />
+            <XiTable {...(lineups?.a || {})} rows={page(rowsA)} onSelectTeam={onSelectTeam} />
+            <XiTable {...(lineups?.b || {})} rows={page(rowsB)} onSelectTeam={onSelectTeam} />
           </div>
         </div>
         <MatchFeed model={props} speed={speed} paused={paused} onSpeed={onSpeed} onPause={onPause} {...minuteProps} />

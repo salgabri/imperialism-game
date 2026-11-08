@@ -1,5 +1,6 @@
 // Plays whole league seasons with the built-in clubs, each of football's five leagues whole (leagueClubs), and
 // measures what a fan of each league would look at: scores, draws and overtime, margins, standings, and who scores.
+// Tennis has no league: its nations play Davis Cup ties, the sixteen strongest each meeting every other once a season.
 // Each measure sits beside the real league's figure (REAL below, with its seasons). The defender of each fixture is
 // its home side: at a neutral venue, as campaigns play by default, or at home with `--home` (the Home advantage
 // launch rule).
@@ -12,12 +13,13 @@ import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
-import { buildClub, hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
+import { buildClub, buildTeam, hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
 import { football } from '../src/sports/football.js';
 import { BENCH, nbaBasketballIn } from '../src/sports/basketball.js';
 import { americanFootball } from '../src/sports/americanFootball.js';
 import { baseball } from '../src/sports/baseball.js';
 import { hockey, PERIOD_MODEL } from '../src/sports/hockey.js';
+import { tennis } from '../src/sports/tennis.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugbyLeague.js';
 
@@ -335,6 +337,33 @@ function nhlSeason(seasons, seed, venue) {
   };
 }
 
+// ---- Tennis (Davis Cup) ---------------------------------------------------------------------------------------
+
+/** The field: the sixteen strongest tennis nations, about a World Group's worth. */
+export function davisCupField(count = 16) {
+  const rng = makeRng(1);
+  return Object.keys(tennis.rosters).map(id => buildTeam(id, rng, tennis)).sort((a, b) => b.str - a.str).slice(0, count);
+}
+
+function davisCup(seasons, seed, venue) {
+  const nations = davisCupField();
+  const { played } = playSeasons({ sport: tennis, teams: nations, games: nations.length - 1, seasons, seed, venue });
+  // Each rubber's sets, from its deciding event's score ("6–4 3–6 7–6(5)"); a walkover has none.
+  const rubbers = played.flatMap(g => g.ev.filter(e => e.pts > 0 && e.score !== 'w/o').map(e => e.score.split(' ')));
+  const sets = rubbers.flat();
+  const score = (w, l) => share(played, g => Math.max(g.ga, g.gd) === w && Math.min(g.ga, g.gd) === l);
+  return {
+    nations: nations.length,
+    ties: played.length,
+    sweep: score(3, 0), threeOne: score(3, 1), decider: score(3, 2),
+    threeSets: share(rubbers, r => r.length === 3),
+    tiebreakSets: share(sets, set => set.includes('(')),
+    bagels: share(sets, set => /^6–0/.test(set)),
+    favourite: favouriteRecord(played),
+    homeWins: share(played, g => g.winner === g.j),
+  };
+}
+
 // ---- Rugby league (NRL) ---------------------------------------------------------------------------------------
 
 /** Rounds a season: the NRL's 17 clubs play 24 games each, a bye in each round, as 26 rounds of this schedule give. */
@@ -447,6 +476,15 @@ export const REAL = Object.freeze({
     // est.: 15.2% of the 2025/26 goals of the players on today's rosters.
     defenderGoals: [0.14, 0.17],
   },
+  davisCup: {
+    note: 'Davis Cup World Group and play-off ties 2003–2016 and the ATP tour, as Tennis Abstract (Jeff Sackmann) measured them',
+    // Hosts won 60.9% of 322 ties where Elo expected 53.1%, 7.8 points more, the field's favourites hosting about as often
+    // as not.
+    homeWins: [0.55, 0.62],
+    // About 35% of the ATP's best-of-three matches go to a third set (36% in 2014, 35% in 2023), a mix of matchups
+    // unlike a Davis Cup field's, so reported only.
+    tourThreeSets: 0.35,
+  },
   nrl: {
     note: "NRL regular seasons 2021–2025, computed 2026-11-08 from every game in NRL.com's draw and match centre "
       + '(scripts/lib/nrl-seasons.mjs)',
@@ -480,6 +518,7 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`), venue),
     mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`), venue),
     nhl: nhlSeason(seasons, hashStr(`${seed}:nhl`), venue),
+    davisCup: davisCup(seasons, hashStr(`${seed}:davis-cup`), venue),
     nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
   };
 }
@@ -579,6 +618,17 @@ function print(report) {
   lines.push(row('favourite wins', h.favourite.wins, rh.favouriteWins, pct));
   lines.push(row('top scorer (goals)', h.topScorer, rh.topScorer, x => num(x, 0)));
   lines.push(row('goals by defenders', h.defenderGoals, rh.defenderGoals, pct));
+  const t = report.davisCup, rt = REAL.davisCup;
+  lines.push(`\nDavis Cup — the ${t.nations} strongest nations, ${t.ties} ties (real: ${rt.note})`);
+  lines.push(row('ties won 3–0', t.sweep, null, pct));
+  lines.push(row('ties won 3–1', t.threeOne, null, pct));
+  lines.push(row('ties won 3–2', t.decider, null, pct));
+  lines.push(row('rubbers to a third set', t.threeSets, null, pct));
+  lines.push(`      (the ATP tour's best-of-three matches: about ${pct(rt.tourThreeSets)}, a different mix of matchups)`);
+  lines.push(row('sets decided in a tie-break', t.tiebreakSets, null, pct));
+  lines.push(row('sets won 6–0', t.bagels, null, pct));
+  lines.push(row('favourite wins', t.favourite.wins, null, pct));
+  lines.push(row('host (defending) side wins', t.homeWins, rt.homeWins, pct));
   const r = report.nrl, rr = REAL.nrl;
   lines.push(`\nNRL — ${r.clubs} clubs, ${NRL_GAMES} games (real: ${rr.note})`);
   lines.push(row('points a team', r.pointsPerTeam, rr.pointsPerTeam, x => num(x, 1)));

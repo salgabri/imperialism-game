@@ -421,8 +421,8 @@ const RUGBY_NEAR = new Set(['CE>SR', 'SR>CE', 'FE>FB', 'HB>FB', 'FB>FE', 'FE>HK'
   'HK>LK', 'PR>HK', 'SR>HK', 'LK>HK']);
 export const RUGBY_NEAR_PENALTY = 8;
 export const RUGBY_CROSSING_PENALTY = 15;
-// Football's rule, in both of its games: a team fields only the players its source rates.
-const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football']);
+// Football's rule, in both of its games, and tennis's: a team fields only the players its source rates.
+const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', 'tennis']);
 const FOOTBALL_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
 const LINEUP_PLANS = {
   football: FOOTBALL_PLAN,
@@ -435,10 +435,16 @@ const LINEUP_PLANS = {
     'DL', 'DL', 'DL', 'DL', 'LB', 'LB', 'CB', 'CB', 'CB', 'S', 'S', 'K'],
   // The batting order's nine (a designated hitter, no pitcher at the plate), the day's starter and three relievers.
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP', 'RP', 'RP'],
+  // A Davis Cup team: its No. 1 and No. 2 in the singles, and a doubles pair.
+  tennis: ['SGL', 'SGL', 'DBL', 'DBL'],
   // The matchday 17: the thirteen (fullback, wings, centres, halves, the front row, the back row) and an interchange bench
   // of a utility hooker, two props and a lock.
   'rugby-league': ['FB', 'WG', 'WG', 'CE', 'CE', 'FE', 'HB', 'PR', 'HK', 'PR', 'SR', 'SR', 'LK', 'HK', 'PR', 'PR', 'LK'],
 };
+const TENNIS_POSITIONS = new Set(LINEUP_PLANS.tennis);
+// What each lineup place weighs in a tennis team's strength: the No. 1 and the No. 2 each play two of the five rubbers,
+// the pair one between them.
+const TENNIS_WEIGHTS = [2, 2, 0.5, 0.5];
 const BASKETBALL_POSITIONS = new Set(LINEUP_PLANS.basketball);
 const RUGBY_POSITIONS = new Set(Object.keys(RUGBY_UNIT));
 const GRIDIRON_POSITIONS = new Set(LINEUP_PLANS['american-football']);
@@ -467,6 +473,7 @@ function slotPenalty(sportId, player, position) {
 /** Legacy saves can predate the sport field; their positions identify the plan. */
 export function teamSportId(team) {
   if (LINEUP_PLANS[team?.sport]) return team.sport;
+  if (team?.squad?.some(player => TENNIS_POSITIONS.has(player.pos))) return 'tennis';
   if (team?.squad?.some(player => BASEBALL_POSITIONS.has(player.pos))) return 'baseball';
   // Rugby league's codes are its own.
   if (team?.squad?.some(player => RUGBY_POSITIONS.has(player.pos))) return 'rugby-league';
@@ -486,6 +493,7 @@ export function selectLineup(team) {
   const sportId = teamSportId(team);
   const plan = LINEUP_PLANS[sportId];
   const squad = Array.isArray(team?.squad) ? team.squad : [];
+  if (sportId === 'tennis') return tennisLineup(squad);
   const rowCount = plan.length;
   const columnCount = Math.max(rowCount, squad.length);
   const effective = (row, column) => {
@@ -548,6 +556,37 @@ export function selectLineup(team) {
     bench: squad.filter((player, index) => !selected.has(index)),
     slots,
     rating: Math.round(slots.reduce((total, slot) => total + slot.effectiveRating, 0) / rowCount * 10) / 10,
+  };
+}
+
+/**
+ * A Davis Cup team from a tennis squad: the two best play the singles (the No. 1 first), the next two the doubles. Any
+ * player plays either, so nobody is out of position. A squad of two or three plays its singles players in the doubles
+ * too, as a small nation does: such a slot holds a second copy of the player, marked `doubling`, and `starters` lists
+ * each player once. The strength weighs each place by the rubbers it plays (TENNIS_WEIGHTS); an empty place counts 40.
+ */
+function tennisLineup(squad) {
+  const ratingOf = player => (Number.isFinite(player?.rating) ? player.rating : 40);
+  const order = squad.map((player, index) => ({ player, index })).filter(entry => entry.player)
+    .sort((a, b) => ratingOf(b.player) - ratingOf(a.player) || a.index - b.index);
+  const singles = order.slice(0, 2);
+  const doubles = order.slice(2, 4);
+  for (const entry of singles) if (doubles.length < 2) doubles.push({ ...entry, doubling: true });
+  const place = (position, entry) => {
+    if (!entry) return { position, player: null, effectiveRating: 40, outOfPosition: false, penalty: 0 };
+    const effectiveRating = ratingOf(entry.player);
+    return { position, effectiveRating, outOfPosition: false, penalty: 0,
+      player: { ...entry.player, originalIndex: entry.index, assignedPos: position, effectiveRating, outOfPosition: false,
+        ...(entry.doubling ? { doubling: true } : {}) } };
+  };
+  const slots = [place('SGL', singles[0]), place('SGL', singles[1]), place('DBL', doubles[0]), place('DBL', doubles[1])];
+  const selected = new Set(slots.filter(slot => slot.player).map(slot => slot.player.originalIndex));
+  const weight = TENNIS_WEIGHTS.reduce((sum, w) => sum + w, 0);
+  return {
+    starters: slots.filter(slot => slot.player && !slot.player.doubling).map(slot => slot.player),
+    bench: squad.filter((player, index) => !selected.has(index)),
+    slots,
+    rating: Math.round(slots.reduce((sum, slot, i) => sum + TENNIS_WEIGHTS[i] * slot.effectiveRating, 0) / weight * 10) / 10,
   };
 }
 

@@ -61,9 +61,6 @@ export function buildConquestPreview(st, ctx = {}) {
 
 // ---------- shared copy helpers ----------
 
-const NAMES_SHOWN = 6;
-// "Serbia’s", but "Indianapolis Colts’": every NFL name and many clubs end in a plural s.
-const possessive = name => (/s$/i.test(name) ? `${name}’` : `${name}’s`);
 const isFiniteScore = value => value !== null && value !== '' && Number.isFinite(Number(value));
 
 /**
@@ -96,19 +93,6 @@ export function resultSentence(winnerName, loserName, winnerAttacked, score) {
   return `${winnerName} ${winnerAttacked ? 'beat' : 'held off'} ${loserName}${score ? ` ${score}` : ''}.`;
 }
 
-/** "all 3 of Serbia’s territories" / "both of Serbia’s territories" / "Serbia’s only territory" (D§6). */
-function takenPhrase(loserName, n) {
-  return n === 1 ? `${possessive(loserName)} only territory` : `${n === 2 ? 'both' : `all ${n}`} of ${possessive(loserName)} territories`;
-}
-
-/**
- * "Serbia, Bosnia & Herz., Kosovo" with long lists cut to six names; the overflow count is returned separately
- * ("+ 2 more") so the screen can keep it visible outside the 2-line clamp (D§10 #7).
- */
-function namesLine(names = []) {
-  if (names.length <= NAMES_SHOWN) return { shown: names.join(', '), more: null };
-  return { shown: names.slice(0, NAMES_SHOWN).join(', '), more: `+ ${names.length - NAMES_SHOWN} more` };
-}
 
 const rating1 = value => (Number.isFinite(Number(value)) ? Number(value).toFixed(1) : '—');
 const replacedName = candidate => (typeof candidate?.replaces === 'string' ? candidate.replaces : candidate?.replaces?.name) || null;
@@ -153,23 +137,23 @@ export function conquestOptions(choice, selectedIndex = choice?.selected, sport)
   });
 }
 
-/** "Lineup before and after" comparison for the selected candidate (DEC D15; strategy-ui coverage). */
+/** "Lineup changes" for the selected candidate (DEC D15; strategy-ui coverage): the places it changes, not the ten that read the same twice. */
 export function conquestComparison(candidate) {
   const lineup = candidate?.lineupPreview;
   if (!lineup || !Array.isArray(lineup.after)) return null;
   const before = Array.isArray(lineup.before) ? lineup.before : [];
   return {
-    summary: 'Lineup before and after',
+    summary: 'Lineup changes',
     beforeRating: rating1(lineup.beforeRating),
     afterRating: rating1(lineup.afterRating),
-    caption: `Legal lineup before and after signing ${candidate.name}`,
-    rows: lineup.after.map((slot, index) => ({
+    caption: `Lineup before and after signing ${candidate.name}`,
+    rows: lineup.after.flatMap((slot, index) => (slot.name === before[index]?.name ? [] : [{
       key: `${slot.position}-${index}`,
       position: slot.position,
       before: { name: before[index]?.name || '—', rating: rating1(before[index]?.rating) },
       after: { name: slot.name, rating: rating1(slot.rating), outOfPosition: !!slot.outOfPosition },
-      changed: slot.name !== before[index]?.name,
-    })),
+    }])),
+    none: 'Your lineup stays the same.',
     support: candidate.support
       ? `Attack support ${supportChange(candidate.attackGain)} · Defensive support ${supportChange(candidate.defendGain)}`
       : null,
@@ -182,7 +166,7 @@ function articleModel({ choice, selectedIndex, kicker, standfirst, effects, spor
   const chosen = options.find(option => option.selected) || null;
   return {
     kicker: kicker || 'Conquest',
-    kickerRight: 'Result',
+    kickerRight: '',
     headline: choice?.loserName ? `${choice.loserName} is out` : 'Conquest',
     standfirst: standfirst || '',
     effects: effects || [],
@@ -193,7 +177,6 @@ function articleModel({ choice, selectedIndex, kicker, standfirst, effects, spor
     ctaLabel: chosen ? `Sign ${chosen.name}` : null,
     ctaGain: chosen ? chosen.gain : null,
     ctaTone: chosen ? chosen.tone : null,
-    waitNote: 'The campaign waits for your choice.',
     comparison: conquestComparison(selected),
   };
 }
@@ -212,11 +195,11 @@ export function conquestFromChoice(choice, selectedIndex = choice?.selected) {
 
 /**
  * The conquest article (D1/D2, D§5–§8, DEC D15) → owned shape:
- * { kicker: 'Round XIX · Conquest', kickerRight: 'Result', headline: 'Serbia is out', standfirst,
- *   effects: [{ key, label, value, detail, detailMore: '+ 2 more' | null, detailFull }], claimTitle, claimAside,
+ * { kicker: 'Round XIX · Conquest', kickerRight: '', headline: 'Serbia is out', standfirst: 'Italy beat Serbia 2–1.',
+ *   effects: [{ key, label, value, title }], claimTitle, claimAside,
  *   options: [{ key, index, name, base, note, meta, gain: '+1.2'|'±0.0', tone: 'gain'|'muted', role, selected }],
- *   selectedIndex, ctaLabel: 'Sign Federico Chiesa', ctaGain: '+1.2', ctaTone, waitNote,
- *   comparison: { summary, beforeRating, afterRating, caption, rows: [{ key, position, before, after, changed }], support } | null }
+ *   selectedIndex, ctaLabel: 'Sign Federico Chiesa', ctaGain: '+1.2', ctaTone,
+ *   comparison: { summary, beforeRating, afterRating, caption, rows: [{ key, position, before, after }], none, support } | null }
  * `preview` = buildConquestPreview(st, ctx) (computed here when omitted). Null without a pending choice.
  */
 export function buildConquest(st, ctx = {}, preview) {
@@ -228,25 +211,20 @@ export function buildConquest(st, ctx = {}, preview) {
   const loserId = projected?.loserId ?? (m && winnerId != null ? (winnerId === m.aId ? m.dId : m.aId) : null);
   const winnerName = st.teams?.[winnerId]?.name || choice.winnerName || 'Your team';
   const loserName = choice.loserName || st.teams?.[loserId]?.name || 'The loser';
-  const taken = projected ? projected.taken.length
-    : Object.values(st.own || {}).filter(owner => owner != null && owner === loserId).length;
+  const taken = projected ? projected.taken.length : 0;
   const score = m ? winnerScore(m, winnerId, ctx?.sport) : '';
   const winnerAttacked = m ? m.aId === winnerId : true;
-  const tail = taken > 0 ? ` ${winnerName} take ${takenPhrase(loserName, taken)} and one player.` : ` ${winnerName} claim one player.`;
   const round = roman(st.round);
   const effects = [];
   if (projected) {
-    const names = namesLine(projected.territoryNames);
-    effects.push({ key: 'territory', label: 'Territory', value: `+${taken}`,
-      detail: names.shown, detailMore: names.more, detailFull: projected.territoryNames.join(', ') });
+    effects.push({ key: 'territory', label: 'Territory', value: `+${taken}`, title: projected.territoryNames.join(', ') });
     effects.push({ key: 'empire', label: 'Empire', value: String(projected.empireAfter),
-      detail: `${territoryWord(projected.empireAfter)} · ${projected.aliveAfter} of ${projected.totalEmpires} empires remain`,
-      detailMore: null, detailFull: null });
+      title: `${territoryWord(projected.empireAfter)} · ${projected.aliveAfter} of ${projected.totalEmpires} empires remain` });
   }
   return articleModel({
     choice: { ...choice, loserName }, selectedIndex: choice.selected,
     kicker: round ? `Round ${round} · Conquest` : 'Conquest',
-    standfirst: resultSentence(winnerName, loserName, winnerAttacked, score) + tail,
+    standfirst: resultSentence(winnerName, loserName, winnerAttacked, score),
     effects,
     sport: ctx?.sport,
   });
@@ -280,24 +258,14 @@ function ordinal(n) {
 }
 
 /**
- * What comes next: spectating follows the team that knocked you out (App.continueAsSpectator), or, after a lost
- * final (`over`), opens the results; or a restart.
+ * The closing note speaks only when the last save failed (the masthead shows "Unsaved"): it points to the export. The
+ * buttons say what comes next. → { note, noteTone: 'unsaved' | null }
  */
-const eliminationNext = (opponentName, over) => `Continue as spectator to ${over ? 'see the results'
-  : `follow ${opponentName || 'the team that knocked you out'}`}, or try again: the same draw replays this opening, a new draw reshuffles it.`;
-
-/**
- * The closing note follows the last save (`st.saveStatus`, written by the persist that records the defeat): the
- * "saved" line only after a successful write; after a failed one (the masthead shows "Unsaved") it points to the
- * export; with no status yet it makes no claim. `over`: the defeat was the final. → { note, noteTone: 'unsaved' | null }
- */
-export function eliminationNote(saveStatus, opponentName, { over = false } = {}) {
-  if (saveStatus?.ok === true) return { note: `Your run is saved. ${eliminationNext(opponentName, over)}`, noteTone: null };
+export function eliminationNote(saveStatus) {
   if (saveStatus?.ok === false) {
-    return { note: 'Your run could not be saved. Continue as spectator and use Export campaign in Settings to keep a copy, or try again.',
-      noteTone: 'unsaved' };
+    return { note: 'Your run could not be saved. Use Export campaign in Settings to keep a copy.', noteTone: 'unsaved' };
   }
-  return { note: eliminationNext(opponentName, over), noteTone: null };
+  return { note: '', noteTone: null };
 }
 
 /**
@@ -311,24 +279,23 @@ export function eliminationFromResult(result, extra = {}) {
   const opponentName = result.opponentName || 'Your opponent';
   return {
     kicker: extra.kicker || 'Eliminated',
-    kickerRight: 'Result',
+    kickerRight: '',
     headline: `${teamName} is out`,
-    standfirst: extra.standfirst || `${opponentName} won the decisive match. Your campaign ends here.`,
+    standfirst: extra.standfirst || `${opponentName} won the decisive match.`,
     stats: [
       { key: 'placement', label: 'Placement', value: ordinal(result.placement) },
       { key: 'conquests', label: 'Conquests', value: String(result.conquests ?? 0) },
       { key: 'signings', label: 'Signings', value: String(result.signings ?? 0) },
     ],
-    ...eliminationNote(extra.saveStatus, result.opponentName, { over: !!extra.over }),
+    ...eliminationNote(extra.saveStatus),
   };
 }
 
 /**
- * Elimination article for ManagerElimination: { kicker: 'Round XIX · Eliminated', kickerRight: 'Result',
- * headline: 'Italy is out', standfirst: 'Serbia beat Italy 2–1. Serbia take all 9 of Italy’s territories. Your
- * campaign ends here.', stats: [{ key, label, value }], note, noteTone } | null. Winner-first score from the finished
- * match (or its archived history entry after a reload); with neither, a neutral sentence without a score. The note
- * follows `st.saveStatus` (eliminationNote).
+ * Elimination article for ManagerElimination: { kicker: 'Round XIX · Eliminated', headline: 'Italy is out',
+ * standfirst: 'Serbia beat Italy 2–1.', stats: [{ key, label, value }], note, noteTone } | null. Winner-first score from
+ * the finished match (or its archived history entry after a reload); with neither, a neutral sentence without a score.
+ * The note speaks only when `st.saveStatus` says the save failed (eliminationNote).
  */
 export function buildElimination(st, ctx = {}) {
   const result = st?.managerElimination;
@@ -340,12 +307,10 @@ export function buildElimination(st, ctx = {}) {
   const entry = !m && Array.isArray(st.history) ? st.history.find(item => item.id === result.matchId) : null;
   let score = '';
   let winnerAttacked = true;
-  let taken = null;
   let sentence = null;
   if (m) {
     score = winnerScore(m, result.opponentId, ctx?.sport);
     winnerAttacked = m.aId === result.opponentId;
-    taken = Number.isFinite(m.territoriesGained) ? m.territoriesGained : null;
   } else if (entry) {
     winnerAttacked = entry.aId === result.opponentId;
     const a = entry.a?.score, b = entry.b?.score;
@@ -354,18 +319,14 @@ export function buildElimination(st, ctx = {}) {
     const kicks = tieText.match(/^(\d+)–(\d+) on penalties$/);
     if (score && kicks) score += `, ${winnerAttacked ? `${kicks[1]}–${kicks[2]}` : `${kicks[2]}–${kicks[1]}`} on penalties`;
     else if (score && /^after/i.test(tieText)) score += ` ${tieText.replace(/^After/, 'after')}`;
-    taken = Number.isFinite(entry.result?.territories) ? entry.result.territories : null;
   } else {
     // Unknown side and score: result.score is attacker-first, so stay neutral rather than guess the verb.
     sentence = `${winnerName} won the decisive match.`;
   }
   const round = roman(st.round);
-  const takenLine = taken > 0 ? ` ${winnerName} take ${takenPhrase(teamName, taken)}.` : '';
   return eliminationFromResult({ ...result, teamName, opponentName: winnerName }, {
     kicker: round ? `Round ${round} · Eliminated` : 'Eliminated',
-    standfirst: `${sentence || resultSentence(winnerName, teamName, winnerAttacked, score)}${takenLine} Your campaign ends here.`,
+    standfirst: sentence || resultSentence(winnerName, teamName, winnerAttacked, score),
     saveStatus: st.saveStatus,
-    // A lost final leaves one empire: Continue as spectator opens the results, with nobody left to follow.
-    over: Array.isArray(st.aliveIds) && st.aliveIds.length === 1,
   });
 }

@@ -208,11 +208,10 @@ test('static markup keeps the whole DOM contract on every step', t => {
       assert.ok([...doc.querySelectorAll('button')].some(button => button.textContent.trim() === label), `button ${label}`);
     }
     const save = doc.querySelector('.setup-save');
-    assert.match(save.textContent, /Continue your campaign/);
+    assert.match(save.textContent, /Round 4 · 20 nations remaining · Europe/);
     assert.ok([...save.querySelectorAll('button')].some(button => button.textContent.trim() === 'Resume'));
     assert.match(markup, /take all of the loser/);
-    assert.match(markup, /some signings add bench options/);
-    assert.match(markup, /up to three signings/);
+    assert.doesNotMatch(markup, /some signings add bench options|up to three signings/, 'one line of rules, not three');
     assert.match(markup, /32–33 matches/);
     assert.doesNotMatch(markup, /neutral transit/i, 'route internals stay out of the setup copy');
     assert.doesNotMatch(markup, /rule-matrix|Spectator-ready|Match settings/, 'no duplicate rules matrix or hidden pacing');
@@ -265,7 +264,6 @@ test('a manager with no pick has the favourite suggested: checked, described and
   assert.equal(view.q('#setup-managed-team').value, '250', 'the native mirror names it too');
   const pick = view.q('.setup-pick');
   assert.match(pick.querySelector('.setup-pick__kicker').textContent, /^Suggested nation$/);
-  assert.match(pick.querySelector('.setup-pick__suggested').textContent, /The favourite, for a long first campaign\. Pick any nation to manage it instead\./);
   assert.equal(view.button('Launch campaign').disabled, false, 'Space ×3 still launches a first campaign');
   await view.click(view.button('Launch campaign'));
   assert.equal(view.calls.start, 1);
@@ -316,7 +314,7 @@ test('step 1 binds sport, teams and theatre; the theatre mirror select stays val
   await act(async () => mirror.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
   assert.deepEqual(view.calls.picks.at(-1), ['scope', 'elite']);
   assert.match(view.q('.setup-stats').textContent, /32/);
-  assert.match(view.q('[role="status"].sr-only').textContent, /32 nations · 31 matches/);
+  assert.match(view.q('.setup-estimate [role="status"]').textContent, /32 nations · 31 matches/);
 
   // Arrow keys move the radio selection (and focus) within a group.
   const first = view.qa('.setup-theatre')[0];
@@ -364,7 +362,7 @@ test('rules of war: one draw choice, Show matches and More rules', async t => {
   await act(async () => pacing.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
   assert.deepEqual(view.calls.picks.at(-1), ['pacing', 'chaos']);
   assert.equal(step.querySelector('#rule-draw-chaos-title').closest('[role="radio"]').getAttribute('aria-checked'), 'true');
-  assert.match(view.q('.setup-rail__step[aria-controls="setup-step-rules"]').textContent, /How matches are drawn/);
+  assert.equal(view.q('.setup-rail__step[aria-controls="setup-step-rules"] .setup-rail__sub'), null, 'a step says what it holds only once it is done');
 
   assert.equal(step.querySelector('.setup-advanced').open, false, 'More rules starts collapsed');
   assert.equal(step.querySelector('.setup-advanced__title').textContent, 'More rules');
@@ -388,7 +386,7 @@ test('rules of war: one draw choice, Show matches and More rules', async t => {
   show.value = 'instant';
   await act(async () => show.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
   assert.deepEqual(view.calls.picks, [['express', false], ['resolution', 'instant']]);
-  assert.match(view.q('.setup-estimate__note').textContent, /final scores only/);
+  assert.match(view.q('.setup-stat--small').getAttribute('title'), /final scores only/);
   assert.deepEqual(view.errors, []);
 });
 
@@ -418,7 +416,7 @@ test('opponent choice: a manager under a one-match draw picks on step 3; spectat
   await act(async () => pacing.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
   assert.ok(!main.querySelector('[aria-labelledby="rule-target-label"][role="radiogroup"]'));
   const note = manager.q('#rule-target-none');
-  assert.match(note.textContent, /Blitz round pairs every match itself, so there's no opponent to pick\./);
+  assert.match(note.textContent, /Blitz round pairs every match itself\./);
   await manager.click(manager.button('Change the draw', note));
   assert.deepEqual(manager.visibleStep(), ['2']);
   assert.equal(document.activeElement, manager.q('#setup-rules-title'));
@@ -517,11 +515,13 @@ test('a refused resume says why on the quick resume card; any other save status 
   const view = await mount(t, { hasSave: true, savedText: 'Round 4', saveStatus: { ok: false, refused: true, message } });
   assert.equal(view.q('.setup-save .setup-save__refused').textContent, message);
   assert.equal(view.q('.save-status').textContent, message, 'the status line still announces it');
+  assert.ok(view.q('.save-status').classList.contains('sr-only'), 'to screen readers alone: the card shows the same words');
   assert.equal(view.q('.setup-save [role]'), null, 'and the card does not announce it twice');
 
   const other = await mount(t, { hasSave: true, savedText: 'Round 4', saveStatus: { ok: false, message: 'Choose the team you will manage before launching.' } });
   assert.equal(other.q('.setup-save__refused'), null);
   assert.match(other.q('.save-status').textContent, /Choose the team/);
+  assert.ok(!other.q('.save-status').classList.contains('sr-only'), 'on the header’s strip, in plain sight');
 });
 
 test('quick resume card resumes or asks before clearing, and focus never falls to the body', async t => {
@@ -622,22 +622,6 @@ test('setup.css keeps the reviewed token and hit-target rules', () => {
   // WP-LEDGER's `.save-status.is-unsaved` weight survives the setup restyle.
   assert.doesNotMatch(rule('.setup-overlay .save-controls .save-status'), /font:/);
   assert.match(rule('.setup-overlay .save-controls .save-status.is-unsaved'), /font-weight:600/);
-  // Low std band (1200–1399) tightens the frame so option-card titles hold one line down to 1200.
-  const bandQuery = '@media (min-width:1200px) and (max-width:1399.98px) {';
-  assert.ok(css.includes(bandQuery));
-  const band = css.slice(css.indexOf(bandQuery) + bandQuery.length);   // up to the next @media: this band's rules
-  assert.match(band, /^[^@]*--setup-rail-w:224px;/);
-  assert.match(band, /^[^@]*\.rule-card__title, \.setup-card__button \{ font-size:21px;/);
-  // ...and the rail subtitles hold one line there too (W4 review: they wrapped at 1366). Measured in Chrome: 146px
-  // rail text column vs "Football · Nations · Europe" 141px at 12px.
-  assert.match(band, /^[^@]*\.setup-rail \{ padding:28px 12px; \}/);
-  assert.match(band, /^[^@]*\.setup-rail__step \{ gap:10px; padding:14px 6px 14px 10px; \}/);
-  assert.match(band, /^[^@]*\.setup-rail__sub \{ font-size:12px; \}/);
-  // Step 3: 8–12px between the nation list and the "Management stays…" note (W4 final: flush, so the list read as
-  // clipped). A bare `.setup-teams__help` loses to `.control-help { margin:0 }` (primitives.css loads later): the rule
-  // must out-rank it (measured in Chrome before: computed margin-top 0px at 1366/1440/1920/820/390).
-  assert.match(rule('.setup-group--list .setup-teams__help'), /margin-top:(8|9|10|11|12)px/);
-  assert.doesNotMatch(css, /(^|\})\s*\.setup-teams__help \{/, 'no single-class rule that .control-help overrides');
   // Done-summary parts stay whole so a long summary wraps at a separator.
   assert.match(rule('.setup-rail__part'), /white-space:nowrap/);
   // The rules matrix and the spectator note are gone (one draw choice; the opponent choice is a manager's, on step 3).
@@ -674,18 +658,18 @@ test('theatre footnote: a "*"-marked scope name resolves to its description; sum
   assert.ok(model.scopes.filter(scope => scope.id !== 'AFC').every(scope => !scope.note));
   assert.equal(model.campaignSummary, `Football · Nations · ${label}`);
   assert.equal(model.stepSummaries[1], `Football · Nations · ${label}`);
-  assert.equal(model.roleMeta, `${label} · Football nations · ${asia.count} nations`);
   assert.equal(model.scopeName, label);
   assert.deepEqual(buildSetupModel({ ...BASE, layer: 'clubs' }).theatreNotes, [], 'club theatres carry no marker');
 
   const view = await mount(t, { setup: { scope: 'AFC' } });
   const row = view.q('.setup-theatre[aria-checked="true"]');
-  assert.equal(row.querySelector('.setup-theatre__name').textContent, marked ? `${label}*` : label);
+  assert.equal(row.querySelector('.setup-theatre__name').textContent, label, 'no star: the description is the chip\'s title');
   if (marked) {
-    assert.equal(row.querySelector('.setup-theatre__mark').getAttribute('aria-hidden'), 'true');
+    assert.equal(row.getAttribute('title'), data.desc);
     const note = view.q(`#${row.getAttribute('aria-describedby')}`);
-    assert.ok(note?.classList.contains('setup-theatres__note'), 'the starred row is described by its footnote');
-    assert.equal(note.textContent, `* ${data.desc}`);
+    assert.ok(note?.classList.contains('setup-theatres__note'), 'the marked chip is described for screen readers');
+    assert.ok(note.classList.contains('sr-only'));
+    assert.equal(note.textContent, data.desc);
     assert.equal(view.qa('.setup-theatres__note').length, 1);
   } else {
     assert.equal(view.qa('.setup-theatres__note').length, 0);
@@ -708,8 +692,7 @@ test('draw cards mark their dot style for the CSS', async t => {
   assert.deepEqual(DRAW_CARDS.map(card => card.dotStyle), ['rand', 'rr', 'all', 'rand']);
   assert.deepEqual(DRAW_CARDS.map(card => [card.value, card.pacing, card.turnOrder ?? null]),
     [['random', 'duel', 'random'], ['round-robin', 'duel', 'round-robin'], ['blitz', 'blitz', null], ['chaos', 'chaos', null]]);
-  // Blitz copy keeps the odd team's bye (engine/campaign.js drawBlitzPairs).
-  assert.match(DRAW_CARDS.find(card => card.value === 'blitz').body, /one sits out/);
+  for (const card of DRAW_CARDS) assert.ok(card.body.split(' ').length <= 10, `${card.value}: a line, not a paragraph`);
   const view = await mount(t, { setup: { role: 'manager' } });
   await view.click(view.button('Next: Rules'));
   const card = value => view.q(`#rule-draw-${value}-title`).closest('[role="radio"]');
@@ -755,7 +738,7 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
   assert.equal(chaos.canPick, false);
   assert.deepEqual([chaos.draw, chaos.turnOrder, chaos.targeting], ['chaos', 'random', 'compass']);
   assert.deepEqual(chaos.stored, { turnOrder: 'round-robin', targeting: 'player' });
-  assert.equal(chaos.note, "Chaos draw pairs every match itself, so there's no opponent to pick.");
+  assert.equal(chaos.note, 'Chaos draw pairs every match itself.');
   const roundRobin = rulesOf({ pacing: 'duel', turnOrder: 'round-robin', targeting: 'player' });
   assert.equal(roundRobin.summary, 'Round robin');
   assert.equal(roundRobin.targeting, 'compass', 'a spectator always uses the compass (DEC D2)');
@@ -883,7 +866,7 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
 const ENGLAND = DOMESTIC.find(entry => entry.id === '826');
 const COUNTRY = { layer: 'clubs', clubScope: 'domestic:826' };
 
-test('football clubs list every shipped country after Europe\'s two theatres, in one radio group; the mirror groups them', async t => {
+test('football clubs offer every shipped country in a dropdown under Europe\'s two theatres; the mirror groups them', async t => {
   const sorted = DOMESTIC.slice().sort((a, b) => nationPriority(a.id) - nationPriority(b.id));
   const rows = domesticTheatres();
   assert.deepEqual(rows.map(row => row.id), sorted.map(entry => `domestic:${entry.id}`));
@@ -898,16 +881,15 @@ test('football clubs list every shipped country after Europe\'s two theatres, in
   }
 
   const view = await mount(t, { setup: { layer: 'clubs' } });
-  const list = view.q('.setup-theatres');
-  assert.ok(list.hasAttribute('data-long'), 'the long list scrolls in its own box');
   assert.equal(view.qa('[role="radiogroup"][aria-labelledby="setup-theatre-label"]').length, 1);
-  assert.equal(view.qa('.setup-theatre').length, clubs.scopes.length + rows.length);
-  const heading = view.q('.setup-theatres__group');
-  assert.equal(heading.textContent, 'One country · top clubs');
-  assert.equal(heading.getAttribute('aria-hidden'), 'true');
-  assert.equal(heading.previousElementSibling.dataset.name, clubs.scopes.at(-1).label, 'Europe first, then the countries');
-  const england = view.qa('.setup-theatre').find(row => row.dataset.name === 'England');
-  assert.equal(england.querySelector('.setup-theatre__count').textContent, `${ENGLAND.clubs} clubs`);
+  assert.deepEqual(view.qa('.setup-theatre').map(row => row.dataset.name), ['Top 124', 'Elite 32'], 'the chips are Europe\'s theatres alone');
+  const countries = view.q('#setup-country');
+  assert.equal(countries.getAttribute('aria-label'), 'One country · top clubs');
+  assert.deepEqual([...countries.options].slice(1).map(option => [option.value, option.textContent]),
+    sorted.map(entry => [`domestic:${entry.id}`, `${entry.name} · ${entry.clubs} clubs`]));
+  assert.equal(countries.options[0].textContent, 'One country · top clubs', 'its first option names it');
+  assert.equal(countries.value, '', 'nothing chosen while a Europe theatre is');
+  assert.ok(!countries.hasAttribute('data-checked'), 'and the dropdown is not marked chosen');
 
   // The mirror: "Europe" holds its theatres in order; the countries read "Name · N clubs", in priority order.
   const mirror = view.q('#setup-theatre');
@@ -920,23 +902,30 @@ test('football clubs list every shipped country after Europe\'s two theatres, in
   await act(async () => mirror.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
   assert.deepEqual(view.calls.picks.at(-1), ['clubScope', 'domestic:826']);
 
-  // Arrow keys walk from the last league into the first country; a letter jumps to the next name starting with it.
-  const leagues = view.qa('.setup-theatre').slice(0, clubs.scopes.length);
-  await view.key(leagues.at(-1), 'ArrowDown');
-  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', rows[0].id]);
-  const checked = view.q('.setup-theatre[aria-checked="true"]');
-  const names = view.qa('.setup-theatre').map(row => row.dataset.name);
-  const from = names.indexOf(checked.dataset.name);
-  const next = [...names.slice(from + 1), ...names.slice(0, from + 1)].find(name => name.toLowerCase().startsWith('s'));
-  await view.key(checked, 's');
-  assert.equal(document.activeElement.dataset.name, next);
-  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', rows.find(row => row.label === next)?.id ?? clubs.scopes.find(scope => scope.label === next).id]);
+  // Choosing a country in the dropdown leaves no theatre chip checked, and the group keeps its one tab stop.
+  assert.equal(countries.value, 'domestic:826');
+  assert.ok(countries.hasAttribute('data-checked'));
+  countries.value = rows[1].id;
+  await act(async () => countries.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', rows[1].id]);
+  assert.ok(!view.q('.setup-theatre[aria-checked="true"]'));
+  assert.deepEqual(view.qa('.setup-theatre').map(row => row.tabIndex).filter(index => index === 0), [0]);
+  // And a theatre chip takes the choice back.
+  await view.click(view.qa('.setup-theatre')[0]);
+  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', clubs.scopes[0].id]);
+  assert.equal(countries.value, '');
+  // Elite 32 is a map like a country's: its description is the chosen radio's, and it holds the group's only tab stop.
+  await view.click(view.qa('.setup-theatre')[1]);
+  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', clubs.scopes[1].id]);
+  assert.deepEqual(view.qa('.setup-theatre').filter(row => row.tabIndex === 0).map(row => row.dataset.name), ['Elite 32']);
+  assert.equal(view.qa('.setup-theatre')[1].getAttribute('aria-describedby'), 'setup-theatre-description');
+  assert.match(view.q('#setup-theatre-description').textContent, /Europe's 32 strongest clubs/);
+  assert.ok(!countries.hasAttribute('data-checked'));
   assert.deepEqual(view.errors, []);
 
-  // Nations keep v4's flat list and mirror.
+  // Nations keep v4's flat mirror, and no country dropdown.
   const nations = await mount(t);
-  assert.equal(nations.q('.setup-theatres').hasAttribute('data-long'), false);
-  assert.equal(nations.q('.setup-theatres__group'), null);
+  assert.ok(!nations.q('#setup-country'));
   assert.equal(nations.qa('#setup-theatre optgroup').length, 0);
   assert.ok(!nations.qa('#setup-theatre option').some(option => option.value.startsWith('domestic:')));
 });
@@ -961,7 +950,6 @@ test('a chosen country: description, counts, summaries, and its map load gating 
   assert.equal(model.scopeId, 'domestic:826');
   assert.equal(model.scopeName, 'England · top 100 clubs');
   assert.equal(model.campaignSummary, 'Football · Clubs · England · top 100 clubs');
-  assert.equal(model.roleMeta, 'England · top 100 clubs · Football clubs · 100 clubs');
   assert.equal(model.count, ENGLAND.clubs);
   assert.equal(model.stats[0].value, String(ENGLAND.clubs));
   assert.match(model.status, /^100 clubs · 99 matches/);
@@ -985,8 +973,8 @@ test('a chosen country: description, counts, summaries, and its map load gating 
 
   // Loading: polite status under the description, Launch disabled, step 3 explains the empty club list.
   const loading = await mount(t, { setup: { ...COUNTRY, role: 'manager' }, managerTeams: [], domestic: { state: 'loading', message: null, onRetry() {} } });
-  const row = loading.q('.setup-theatre[aria-checked="true"]');
-  assert.equal(row.dataset.name, 'England');
+  const row = loading.q('#setup-country');
+  assert.equal(row.value, 'domestic:826');
   assert.equal(row.getAttribute('aria-describedby'), 'setup-theatre-description');
   const description = loading.q('#setup-theatre-description').textContent;
   assert.ok(ENGLAND.top.every(name => description.includes(name)) && description.includes('England') && description.includes('100 sections'));
@@ -1097,10 +1085,10 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   assert.deepEqual([...card.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
     preview.sections.map(section => section.fill));
   assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
-  assert.equal(card.querySelector('figcaption').textContent, 'England · 3 sections, one per club');
+  assert.equal(card.getAttribute('title'), 'England · 3 sections, one per club');
   const fijiView = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:242' },
     domestic: { state: 'ready', message: null, onRetry() {}, preview: fijiCard } });
-  assert.equal(fijiView.q('.setup-step[data-step="1"] .setup-map figcaption').textContent, 'Fiji · 100 sections, 16 clubs');
+  assert.equal(fijiView.q('.setup-step[data-step="1"] .setup-map').getAttribute('title'), 'Fiji · 100 sections, 16 clubs');
   assert.deepEqual([...view.errors, ...fijiView.errors], []);
 });
 
@@ -1137,9 +1125,9 @@ test('world card: a theatre opening board in kick-off pastels over unclaimed lan
   assert.deepEqual([...card.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
     preview.sections.map(section => section.fill));
   assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
-  assert.equal(card.querySelector('figcaption').textContent, 'Europe · 2 nations, each on its own land');
+  assert.equal(card.getAttribute('title'), 'Europe · 2 nations, each on its own land');
   const clubs = await mount(t, { setup: { layer: 'clubs', clubScope: 'all' }, theatreMap: preview });
-  assert.match(clubs.q('.setup-map figcaption').textContent, /^Top 124 · 2 clubs dealt onto the nearest free land$/i);
+  assert.match(clubs.q('.setup-map').getAttribute('title'), /^Top 124 · 2 clubs dealt onto the nearest free land$/i);
   const none = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: null });
   assert.equal(none.q('.setup-map'), null, 'no card before App has a board');
   // A chosen country shows its own card, never a world board App may still hold while the country loads.

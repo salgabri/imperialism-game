@@ -1,6 +1,8 @@
 // Owner: WP-LEDGER (see PLAN.md §4). Chronicle right column: turning points (campaignRecap) and the activity
-// feed (former Sidebar "Activity"), grouped by round, newest first.
-import React from 'react';
+// feed (former Sidebar "Activity"), newest first, one line per entry under its round, paged to what fits.
+import React, { useMemo } from 'react';
+import Pager from '../../components/Pager.jsx';
+import { usePagedList } from '../../hooks/useFit.js';
 import { roman } from '../../viewModels/format.js';
 
 export function TurningPoints({ items = [] }) {
@@ -28,60 +30,48 @@ function countedKey(seen, id) {
 }
 
 /**
- * Consecutive entries of one round. Tolerates the W1 stub feed shape ({ round: 'R12', chip, color, text } without
- * `key`, `roman` or `kind`): the numeral is then derived from `round`.
- * React keys count from the oldest end (a group by its round, an item by its kind and text), so a new entry inserts
- * one row and a dropped one removes one instead of re-keying the whole feed: the model keys are log positions, which
- * move once the log is capped.
+ * One row per entry, with its round's numeral on the first of each run. Tolerates the W1 stub feed shape
+ * ({ round: 'R12', chip, color, text } without `key`, `roman` or `kind`): the numeral is then derived from `round`.
+ * React keys count from the oldest end (by round, kind and text), so a new entry inserts one row and a dropped one
+ * removes one instead of re-keying the whole feed: the model keys are log positions, which move once the log is capped.
  */
-function groupByRound(entries) {
-  const groups = [];
-  for (const entry of entries) {
-    const last = groups[groups.length - 1];
-    if (last && last.round === entry.round) last.items.push(entry);
-    else {
-      const numeral = entry.roman ?? roman(Number(String(entry.round ?? '').replace(/^R/, '')));
-      groups.push({ round: entry.round, roman: numeral, items: [entry] });
-    }
+function activityRows(entries) {
+  const seen = new Map();
+  const rows = entries.map((entry, index) => ({
+    entry,
+    first: index === 0 || entries[index - 1].round !== entry.round,
+    numeral: entry.roman ?? roman(Number(String(entry.round ?? '').replace(/^R/, ''))),
+  }));
+  for (let i = rows.length - 1; i >= 0; i--) {
+    rows[i].key = countedKey(seen, `${rows[i].entry.round ?? ''}|${rows[i].entry.kind ?? ''}|${rows[i].entry.text ?? ''}`);
   }
-  const rounds = new Map();
-  for (let g = groups.length - 1; g >= 0; g--) {
-    const group = groups[g], texts = new Map();
-    group.key = countedKey(rounds, group.round);
-    group.itemKeys = [];
-    for (let i = group.items.length - 1; i >= 0; i--) {
-      group.itemKeys[i] = countedKey(texts, `${group.items[i].kind ?? ''}|${group.items[i].text ?? ''}`);
-    }
-  }
-  return groups;
+  return rows;
 }
 
 // Memoised: the feed model keeps its identity until the log changes.
 export const ActivityFeed = React.memo(function ActivityFeed({ entries = [] }) {
+  const rows = useMemo(() => activityRows(entries), [entries]);
+  const paged = usePagedList(rows, { row: '.fi-activity-item' });
   return (
     <section className="fi-activity" aria-labelledby="chronicle-activity-title">
       <div className="kicker">
         <h2 className="kicker__title" id="chronicle-activity-title">Activity</h2>
-        <span className="kicker__aside">Newest first</span>
+        <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label="Activity pages" />
       </div>
-      {!entries.length
-        ? <p className="fi-activity-empty">Match results and player transfers will appear here.</p>
+      {!rows.length
+        ? <p className="fi-activity-empty">No activity yet.</p>
         : (
-          <ol className="fi-activity-list" aria-label="Campaign activity">
-            {groupByRound(entries).map(group => (
-              <li key={group.key} className="fi-activity-group">
-                <h3 className="fi-activity-round">{group.roman ? `Round ${group.roman}` : 'Before the first match'}</h3>
-                <ul>
-                  {group.items.map((item, i) => (
-                    <li key={group.itemKeys[i]} className="fi-activity-item" data-kind={item.kind || undefined}>
-                      <i className="fi-activity-mark" aria-hidden="true" />
-                      <span className="fi-activity-text">{item.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ol>
+          <div className="fi-activity-box" ref={paged.boxRef}>
+            <ol className="fi-activity-list" aria-label="Campaign activity">
+              {paged.shown.map(row => (
+                <li key={row.key} className="fi-activity-item" data-kind={row.entry.kind || undefined} title={row.entry.text}>
+                  <span className={`fi-activity-round${row.first ? '' : ' is-repeat'}`}>{row.first ? (row.numeral ? `Round ${row.numeral}` : 'Start') : ''}</span>
+                  <i className="fi-activity-mark" aria-hidden="true" />
+                  <span className="fi-activity-text">{row.entry.text}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
         )}
     </section>
   );

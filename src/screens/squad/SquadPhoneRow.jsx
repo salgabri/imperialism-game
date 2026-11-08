@@ -1,21 +1,17 @@
-// Owner: WP-SQUAD (see PLAN.md §4). One 50px phone squad row (C§10.3, board C2).
+// Owner: WP-SQUAD (see PLAN.md §4). One phone squad row (C§10.3, board C2), a single line.
 import React from 'react';
 
-/** 32px outlined position box · name over natural positions (+ " · from CRO R XX" in claimed) · tier-coloured rating. */
+/** Outlined position box · name, then what is out of the ordinary (generated, estimated, out of position, claimed) · tier-coloured rating. */
 export default function SquadPhoneRow({ row }) {
   const acquired = row.acquired;
+  const notes = [row.generated && 'Generated', row.estimated && 'Estimated', row.outOfPosition && 'out of position',
+    acquired && `from ${acquired.code}${acquired.roman ? ` ${acquired.roman}` : ''}`].filter(Boolean).join(' · ');
   return (
-    <li className={`squad-prow${acquired ? ' is-claimed' : ''}`}>
+    <li className={`squad-prow${acquired ? ' is-claimed' : ''}`} title={row.natural ? `Natural ${row.natural}` : undefined}>
       <span className="squad-prow__pos">{row.pos}</span>
       <span className="squad-prow__body">
         <span className="squad-prow__name">{row.name}</span>
-        <span className="squad-prow__meta">
-          {row.natural}
-          {row.generated && <span className="squad-prow__gen"> · Generated</span>}
-          {row.estimated && <span className="squad-prow__gen"> · Estimated</span>}
-          {row.outOfPosition && <span className="squad-prow__oop"> · out of position</span>}
-          {acquired && <span className="squad-prow__from"> · from {acquired.code}{acquired.roman ? ` ${acquired.roman}` : ''}</span>}
-        </span>
+        {notes && <span className={`squad-prow__meta${acquired ? ' squad-prow__from' : row.outOfPosition ? ' squad-prow__oop' : ''}`}>{notes}</span>}
       </span>
       <span className="squad-prow__rating squad-tier" data-tier={row.tier}>{row.rating}</span>
     </li>

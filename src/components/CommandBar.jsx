@@ -37,7 +37,7 @@ export function SettingsPanel({
       {completed && onResults && <button type="button" className="button settings-panel__results" onClick={onResults}>Campaign results</button>}
       <section className="settings-panel__section" aria-labelledby={id('settings-matches-title')}>
         <PanelKicker id={id('settings-matches-title')} title="Show matches" aside="Change any time" />
-        <div className="control-field">
+        <div className="control-field" title={busy && !completed ? SHOW_MATCH_BUSY : SHOW_MATCH_HELP[mode]}>
           <select id={id('campaign-resolution')} aria-labelledby={id('settings-matches-title')} aria-describedby={id('campaign-resolution-help')}
             value={mode} disabled={completed || !onSetting}
             onChange={event => { for (const [key, value] of showMatchesWrites(event.target.value, settings)) onSetting?.(key, value); }}>
@@ -45,12 +45,15 @@ export function SettingsPanel({
               <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>
             ))}
           </select>
-          <small className="control-help" id={id('campaign-resolution-help')}>{busy && !completed ? SHOW_MATCH_BUSY : SHOW_MATCH_HELP[mode]}</small>
+          <small className="control-help sr-only" id={id('campaign-resolution-help')}>{busy && !completed ? SHOW_MATCH_BUSY : SHOW_MATCH_HELP[mode]}</small>
         </div>
       </section>
       {facts.length > 0 && (
-        <section className="settings-panel__section" aria-labelledby={id('settings-campaign-title')}>
-          <PanelKicker id={id('settings-campaign-title')} title="This campaign" aside="Set at launch" />
+        <details className="settings-panel__section settings-panel__campaign" aria-labelledby={id('settings-campaign-title')}>
+          <summary className="kicker settings-panel__kicker">
+            <span className="kicker__title" id={id('settings-campaign-title')}>This campaign</span>
+            <Icon name="chevron" size={14} className="settings-panel__chevron" />
+          </summary>
           <dl className="settings-panel__facts">
             {facts.map(row => (
               <div key={row.id}>
@@ -61,15 +64,14 @@ export function SettingsPanel({
               </div>
             ))}
           </dl>
-          <p className="settings-panel__note">Start a new campaign to change these.</p>
-        </section>
+        </details>
       )}
       <section className="settings-panel__section" aria-labelledby={id('settings-saves-title')}>
         <PanelKicker id={id('settings-saves-title')} title="Saves" />
         <SaveControls status={saveStatus} onExport={onExport} onImport={onImport} onManageSaves={onManageSaves} compact />
       </section>
       <div className="settings-panel__new">
-        {confirmNew && <p role="alert">Start a new campaign? This one stays in Saved campaigns.</p>}
+        {confirmNew && <p role="alert">This campaign stays in Saved campaigns.</p>}
         <button type="button" className="button" onClick={onNew}>{confirmNew ? 'Confirm new campaign' : 'New campaign'}</button>
         {confirmNew && <button type="button" className="button" onClick={onCancelNew}>Cancel</button>}
       </div>
@@ -164,8 +166,7 @@ export default function CommandBar(props) {
         <div className="mast__row2">
           <span className="mast__id" aria-label={masthead.variant === 'manager' ? 'Managed team' : 'Followed team'}>
             {mark && <span className="mast__mark" aria-hidden="true">{mark}</span>}
-            <b className="mast__team">{masthead.name}</b>
-            <span className="mast__role">{masthead.role}</span>
+            <b className="mast__team" title={masthead.role}>{masthead.name}</b>
           </span>
           {(masthead.stats || []).map(stat => (
             <span className="mast__stat" key={stat.key} title={stat.tip}>

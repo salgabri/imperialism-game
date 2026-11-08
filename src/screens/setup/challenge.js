@@ -70,10 +70,11 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   take('season', value => setSportOf(value) === sport.id && sets.some(set => set.id === value), value => { setup.dataSet = value; });
   // A sport with clubs only (American football: the NFL's) and a basketball season (NBA clubs) play clubs.
   const clubsOnly = !!sport.clubsOnly || (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball');
-  // FIFA 05 and FIFA 06 have no clubs to play.
-  const nationsOnly = setup.dataSet != null && !setHasClubs(setup.dataSet);
+  // FIFA 05 and FIFA 06 have no clubs to play, nor has tennis.
+  const nationsOnly = !!sport.nationsOnly || (setup.dataSet != null && !setHasClubs(setup.dataSet));
   take('teams', value => (value === 'clubs' && !nationsOnly) || (value === 'nations' && !clubsOnly), value => { setup.layer = value; });
   if (clubsOnly) setup.layer = 'clubs';
+  if (sport.nationsOnly) setup.layer = 'nations';
   const clubLayer = setup.layer === 'clubs';
   take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : SCOPES.some(scope => scope.id === value)),
     value => { setup[clubLayer ? 'clubScope' : 'scope'] = value; });
@@ -121,7 +122,7 @@ export function challengeQuery(settings = {}, seed = settings?.seed) {
   const sport = getSport(s.sport);
   const dataSet = dataSetOf(s);
   const clubsOnly = !!sport.clubsOnly || (dataSet != null && setSportOf(dataSet) === 'basketball');
-  const clubLayer = s.layer === 'clubs' || clubsOnly;
+  const clubLayer = (s.layer === 'clubs' || clubsOnly) && !sport.nationsOnly;
   const theatre = clubLayer ? setClubScope({ ...s, layer: 'clubs' }) : s.scope;
   const rules = rulesOf(s);
   const show = showMatchesOf(s);
@@ -158,8 +159,6 @@ const listed = names => (names.length > 1 ? `${names.slice(0, -1).join(', ')} an
 
 /** Setup's note for a setup a link filled in (App's `challenge`: the link's seed and the keys it could not use). */
 export function challengeNote({ seed = '', ignored = [] } = {}) {
-  const lead = `This setup${seed ? ` and its seed, ${seed},` : ''} came from the link you opened. Launch it as it is to play the same campaign.`;
   const names = [...new Set(ignored)].map(key => CHALLENGE_LABELS[key]).filter(Boolean);
-  if (!names.length) return lead;
-  return `${lead} The link’s ${listed(names)} ${names.length === 1 ? 'isn’t' : 'aren’t'} offered here, so setup keeps the default${names.length === 1 ? '' : 's'}.`;
+  return `${seed ? `Seed ${seed}. ` : ''}${names.length ? `Not offered here: ${listed(names)}.` : 'Launch it to play the same campaign.'}`;
 }

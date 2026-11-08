@@ -984,7 +984,7 @@ FIFA 05 (2005/06, 2004/05) have nations only, so they have no maps.
 **Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 8 minutes;
 `--only=eu124,eu32`, `--check`, `--dry-run`). The maps follow the clubs, so they are rebuilt
 after `npm run build-clubs` or `npm run build:ea-seasons`; the build stops on a club with
-no row in the table below, and the test on a field that has changed. For each of the 20
+no row in the table below, and the test on a field that has changed. For each of the 21
 seasons with clubs and each of the two fields:
 
 - **Homes**: `scripts/data/europe-clubs.json`, one row per club of any season: a
@@ -1032,7 +1032,7 @@ seasons with clubs and each of the two fields:
 - **Output** as the sport maps: 16,000 arc points, quantized at 1e5, colours that differ
   across borders and water. Sections are in rank order, `eu124-001` the strongest. The
   file adds `theatre` (`all` or `elite`), `seasons` for an earlier season's map, and a
-  club row's `shape`. The 40 files hold 150–190 KB each, 6.6 MB in all, with
+  club row's `shape`. The 42 files hold 150–190 KB each, 7.0 MB in all, with
   `public/domestic/ATTRIBUTION-europe.txt` and the index `src/data/europeMaps.js`
   (`{ id, sport, league, name, theatre, seasons?, clubs, sections, countries, version, top? }`).
 

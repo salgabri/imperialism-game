@@ -36,7 +36,7 @@ test('tactical decision explains risk, commits the chosen ID and restores focus'
   const view = await mount(TacticalChoice, { choice: { managerName: 'Alfa', opponentName: 'Beta', options: tacticalOptions(squad(75), squad(85), 6) }, onChoose: value => choices.push(value) });
   assert.match(view.host.textContent, /You are the underdog/);
   assert.match(view.host.textContent, /Matchday variation 11.0/);
-  assert.match(view.host.textContent, /Scoring luck remains/);
+  assert.match(view.host.querySelector('.fi-tactical-risk').getAttribute('title'), /Scoring luck remains/);
   assert.equal(document.activeElement.dataset.tactic, 'balanced');
   await act(async () => view.host.querySelector('[data-tactic="attack"]').click());
   assert.deepEqual(choices, ['attack']);

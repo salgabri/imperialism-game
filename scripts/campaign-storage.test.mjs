@@ -44,7 +44,7 @@ test('strict import rejects invalid state before it can replace the existing che
     [s => { s.seed = -1; }, /random state/],
     [s => { s.aliveIds.push('250'); }, /territory/],
     [s => { s.own['276'] = 'missing'; }, /territory/],
-    [s => { s.settings.sport = 'tennis'; }, /setting/],
+    [s => { s.settings.sport = 'curling'; }, /setting/],
     [s => { s.match = { ...match(), winner: 'missing' }; }, /match is incomplete/],
     [s => { s.match = { ...match(), allEv: [{ m: 2, tid: 'missing' }] }; }, /match is incomplete/],
     [s => { s.spin = { targetId: '276' }; }, /draw references/],

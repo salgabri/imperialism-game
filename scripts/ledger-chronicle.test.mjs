@@ -192,9 +192,10 @@ test('buildMatchPreview frames the pending tactical gate from the manager side',
   assert.equal(preview.route, 'Across a land border');
   assert.match(preview.odds.aLabel, /^SRB \d+%$/);
   assert.match(preview.odds.bLabel, /^\d+% ITA$/);
-  // Board 07 copy: first three territory names (homeland first) and an ellipsis.
-  assert.equal(preview.stakes.win, 'Annex 4 territories — Serbia, Montenegro, N. Macedonia… — and claim one player');
-  assert.equal(preview.stakes.lose, 'Italy falls. Your campaign ends.');
+  // The figures on screen; the first three territory names (homeland first) and an ellipsis on the title.
+  assert.equal(preview.stakes.win, '+4 territories, +1 player');
+  assert.equal(preview.stakes.winTitle, 'Serbia, Montenegro, N. Macedonia…');
+  assert.equal(preview.stakes.lose, 'Campaign over');
   assert.equal(preview.lineupLabel, 'Starting XI');
   assert.equal(preview.lineupShort, 'XI');
   // Board 07 tale of the tape: positional profile + lineup rating on the fixed (v − 55) / 40 scale.
@@ -212,16 +213,16 @@ test('buildMatchPreview frames the pending tactical gate from the manager side',
   assert.equal(ledgerVM.buildMatchPreview(st, ctxFor({ managedId: '276', cache: new Map() })).stakes, null);
   // Single-territory empire: no ellipsis, singular noun.
   const small = { ...st, own: { ...st.own, '499': '380', '807': '380', '070': '380' } };
-  assert.equal(ledgerVM.buildMatchPreview(small, ctxFor()).stakes.win, 'Annex 1 territory — Serbia — and claim one player');
+  assert.equal(ledgerVM.buildMatchPreview(small, ctxFor()).stakes.win, '+1 territory, +1 player');
+  assert.equal(ledgerVM.buildMatchPreview(small, ctxFor({ cache: new Map() })).stakes.winTitle, 'Serbia');
   // Best-of-three final: a game decides the series only for a side that already has a win (as the target card does).
   const final = { ...st, aliveIds: ['380', '688'], settings: { ...st.settings, finale: 'best-of-three' } };
   const at = wins => ledgerVM.buildMatchPreview({ ...final, series: { teamIds: ['688', '380'], wins, games: 1 } }, ctxFor({ cache: new Map() })).stakes;
-  assert.deepEqual(at({ 380: 0, 688: 0 }), { win: 'Italy moves one game closer to total conquest',
-    lose: 'Serbia moves one game closer to total conquest' });
-  assert.deepEqual(at({ 380: 1, 688: 0 }), { win: 'Annex 4 territories — Serbia, Montenegro, N. Macedonia… — and claim one player',
-    lose: 'Serbia moves one game closer to total conquest' });
-  assert.deepEqual(at({ 380: 1, 688: 1 }), { win: 'Annex 4 territories — Serbia, Montenegro, N. Macedonia… — and claim one player',
-    lose: 'Italy falls. Your campaign ends.' });
+  assert.deepEqual(at({ 380: 0, 688: 0 }), { win: 'One game closer', winTitle: undefined, lose: 'Serbia one game closer' });
+  assert.deepEqual(at({ 380: 1, 688: 0 }), { win: '+4 territories, +1 player', winTitle: 'Serbia, Montenegro, N. Macedonia…',
+    lose: 'Serbia one game closer' });
+  assert.deepEqual(at({ 380: 1, 688: 1 }), { win: '+4 territories, +1 player', winTitle: 'Serbia, Montenegro, N. Macedonia…',
+    lose: 'Campaign over' });
 });
 
 test('buildMatchPreview reads "Starting five" and the basketball profile for basketball', () => {
@@ -334,7 +335,7 @@ test('ledger renders the built model and an empty fallen list', async context =>
   const rows = [{ tid: '380', rank: 1, name: 'Italy', code: 'ITA', flagId: '380', isClub: false, color: '#888', territories: '2', eff: '86.0', effGain: { text: '+1.5' } }];
   const view = await mount(LedgerScreen, { ...ledgerVM.buildLedger(st, ctxFor(), rows), selectedTeamId: null, onSelectTeam() {} }, context);
   assert.equal(view.host.querySelector('#ledger-title').textContent, 'Ledger');
-  assert.match(view.host.querySelector('.ledger-fallen').textContent, /No empire has fallen yet/);
+  assert.equal(view.host.querySelector('.ledger-fallen__list'), null, 'no wall while no empire has fallen');
   assert.match(view.host.querySelector('.ledger-share').textContent, /Share of the map/);
   assert.equal(view.host.querySelector('.fi-standing-you').textContent, 'You');
   assertConsoleClean();
@@ -377,9 +378,9 @@ test('history rows call the latest select handler and follow the perspective and
   assert.deepEqual(selected, [['new', 'm1']]);
   const row = id => screen.host.querySelector(`[data-history-id="${id}"]`);
   assert.deepEqual([row('m1').getAttribute('aria-pressed'), row('m2').getAttribute('aria-pressed')], ['true', 'false']);
-  assert.match(row('m2').textContent, /Your match/);
+  assert.equal(row('m2').querySelector('.fi-history-tag.is-you').textContent, 'You');
   await screen.render({ ...chronicle, managedId: null, followedId: '276' });
-  assert.doesNotMatch(row('m2').textContent, /Your match/);
+  assert.equal(row('m2').querySelector('.fi-history-tag.is-you'), null);
   assert.match(row('m1').textContent, /Followed/);
   assertConsoleClean();
 });
@@ -392,8 +393,7 @@ test('the activity feed keeps its rows when entries arrive, also once the capped
   await show(log);
   const item = n => [...screen.host.querySelectorAll('.fi-activity-text')].find(el => el.textContent === `ENTRY ${n}`).closest('li');
   const kept = [item(20), item(4)];
-  const group = kept[0].closest('.fi-activity-group');
-  const unchanged = () => item(20) === kept[0] && item(4) === kept[1] && item(20).closest('.fi-activity-group') === group;
+  const unchanged = () => item(20) === kept[0] && item(4) === kept[1];
   await show([...log, entry(30), entry(31)]);
   assert.equal(screen.host.querySelector('.fi-activity-round').textContent, 'Round XI', 'a new round on top');
   assert.ok(unchanged(), 'a new round inserts its rows and keeps the others');
@@ -504,20 +504,18 @@ test('chronicle shows roman rounds, tags, turning points and a grouped activity 
   assert.equal(view.host.querySelector('#chronicle-title').textContent, 'Chronicle');
   const items = [...view.host.querySelectorAll('.fi-history-list button')];
   assert.deepEqual(items.map(button => button.dataset.historyId), ['m2', 'm1'], 'newest first');
-  assert.match(items[0].textContent, /II.*Serbia beat Italy.*SRB 1–1 ITA \(4–3 on penalties\).*Your match.*Upset/);
+  assert.match(items[0].textContent, /II.*Serbia beat Italy.*SRB 1–1 ITA \(4–3 on penalties\).*You.*Upset/);
   assert.match(items[1].textContent, /Germany beat Austria.*claims AUT Player 3/);
   assert.equal(items[0].getAttribute('aria-pressed'), 'true', 'newest report shown by default');
-  assert.deepEqual([...view.host.querySelectorAll('.fi-activity-round')].map(h => h.textContent),
-    ['Round II', 'Round I', 'Before the first match']);
+  assert.deepEqual([...view.host.querySelectorAll('.fi-activity-round')].map(h => h.textContent).filter(Boolean),
+    ['Round II', 'Round I', 'Start']);
   assert.equal(view.host.querySelector('.fi-activity-item').dataset.kind, 'upset');
   assert.match(view.host.querySelector('.chronicle-turning').textContent, /Biggest upset/);
-  assert.equal(view.host.querySelector('.fi-history__report .kicker__title').textContent, 'Result',
-    'the column kicker does not repeat the MatchCard "Match report" disclosure');
   assert.equal(view.host.querySelector('.fi-history__report .fi-match-heading h2').textContent, 'Round II',
     'the archived card names its round in roman numerals, like the list and the masthead');
   const empty = await mount(ChronicleScreen, { history: [], historyTeams: [], feed: [] }, context);
-  assert.match(empty.host.querySelector('.fi-history').textContent, /Completed matches will be saved here/);
-  assert.match(empty.host.querySelector('.fi-activity').textContent, /Match results and player transfers will appear here/);
+  assert.match(empty.host.querySelector('.fi-history').textContent, /No matches yet\./);
+  assert.match(empty.host.querySelector('.fi-activity').textContent, /No activity yet\./);
   assert.equal(empty.host.querySelector('.fi-history-kinds'), null, 'no chips before the first match');
   assertConsoleClean();
 });
@@ -560,7 +558,7 @@ test('screens tolerate the W1 stub models (feed without key/roman/kind, ledger {
   const feed = st.log.slice().reverse().map(f => ({ round: 'R' + f.r, chip: f.chip || '#999', color: f.col || '#555', text: f.txt }));
   const historyTeams = Object.values(st.teams).map(team => ({ id: team.id, name: team.name, alive: st.aliveIds.includes(team.id) }));
   const view = await mount(ChronicleScreen, { history: st.history, historyTeams, feed, selectedHistory: undefined, historyFilter: '' }, context);
-  assert.deepEqual([...view.host.querySelectorAll('.fi-activity-round')].map(h => h.textContent), ['Round II', 'Round I', 'Before the first match']);
+  assert.deepEqual([...view.host.querySelectorAll('.fi-activity-round')].map(h => h.textContent).filter(Boolean), ['Round II', 'Round I', 'Start']);
   assert.equal(view.host.querySelectorAll('.fi-activity-item').length, 4);
   assert.equal(view.host.querySelector('.fi-activity-item').hasAttribute('data-kind'), false);
   assertConsoleClean();
@@ -592,10 +590,14 @@ test('match preview keeps the tactical contract, adds the board-07 preview and c
   assert.equal(dialog.getAttribute('aria-modal'), 'true');
   // Defend shows the best chance (51%), so it is the recommended approach Continue would kick off with.
   assert.equal(document.activeElement.dataset.tactic, 'defend', 'initial focus on the recommended approach');
-  assert.match(view.host.textContent, /Matchday variation 11\.0/);
-  assert.match(view.host.textContent, /Scoring luck remains/);
+  assert.match(view.host.textContent, /Matchday variation 11\.0/, 'for screen readers; the squares show it on screen');
+  assert.match(view.host.querySelector('[data-tactic="attack"] .fi-tactical-risk').getAttribute('title'), /Matchday variation 11\.0 \/ 12.*Scoring luck remains/);
+  assert.equal(view.host.querySelectorAll('[data-tactic="attack"] .fi-tactical-risk__squares > i').length, 6);
+  assert.equal(view.host.querySelectorAll('[data-tactic="attack"] .fi-tactical-risk__squares > i.is-on').length, 6, '11 of 12 fills them');
+  assert.equal(view.host.querySelector('[data-tactic="attack"]').getAttribute('title'), options[0].description);
+  assert.equal(view.host.querySelector('[data-tactic="attack"] .fi-tactical-option__desc.sr-only').textContent, options[0].description);
   assert.match(view.host.querySelector('.fi-tactical-fixture').textContent, /Attack.*Serbia.*By sea — no shared border.*Defend · You.*Italy/);
-  assert.match(view.host.querySelector('.fi-tactical-stakes').textContent, /If you win.*If you lose.*Italy falls/);
+  assert.match(view.host.querySelector('.fi-tactical-stakes').textContent, /If you win.*If you lose.*Campaign over/);
   assert.equal(view.host.querySelectorAll('.fi-tactical-xi').length, 2);
   assert.equal(view.host.querySelectorAll('.fi-tactical-xi__row').length, 22);
   assert.equal(view.host.querySelectorAll('[data-tactic]').length, 3);
@@ -606,7 +608,8 @@ test('match preview keeps the tactical contract, adds the board-07 preview and c
   // DEC D5: win chance coloured by the displayed integer.
   assert.equal(view.host.querySelector('[data-tactic="attack"] .fi-tactical-option__chance b').className, 'tone-loss');
   assert.equal(view.host.querySelector('[data-tactic="balanced"] .fi-tactical-option__chance b').className, 'tone-even');
-  assert.match(view.host.querySelector('.fi-tactical-stakes').textContent, /Annex 4 territories — Serbia, Montenegro, N\. Macedonia… — and claim one player/);
+  assert.match(view.host.querySelector('.fi-tactical-stakes').textContent, /\+4 territories, \+1 player/);
+  assert.equal(view.host.querySelector('.fi-tactical-stake--win').getAttribute('title'), 'Serbia, Montenegro, N. Macedonia…');
   const [xiA, xiB] = view.host.querySelectorAll('.fi-tactical-xi');
   assert.equal(xiA.querySelector('.kicker__title').textContent, 'SRB · Starting XI');
   assert.match(xiB.querySelector('.kicker__aside').textContent, /^XI \d+\.\d$/);
@@ -618,16 +621,23 @@ test('match preview keeps the tactical contract, adds the board-07 preview and c
   assert.match(xiB.querySelector('.fi-tactical-xi__oop').textContent, /↓/);
   assert.deepEqual([...view.host.querySelectorAll('.fi-tactical-tape__label')].map(n => n.textContent), ['Attack', 'Defence', 'Goalkeeping', 'Starting XI']);
   assert.ok(view.host.querySelector('.dialog-backdrop.fi-tactical-backdrop > .dialog.fi-tactical'), 'the dialog primitives are on the roots');
-  // Board 07 order: the tale of the tape leads the centre column (level with both XI headers), the approach follows.
-  assert.deepEqual([...view.host.querySelector('.fi-tactical-main').children].map(n => n.className), ['fi-tactical-tape', 'fi-tactical-approach']);
-  // The closing line is the panel's sticky footer (a direct child after the body), so "simulate the result" stays in view.
-  const foot = dialog.querySelector(':scope > .fi-tactical-foot');
-  assert.ok(foot?.previousElementSibling.classList.contains('fi-tactical-body'), 'the footer follows the body');
-  assert.ok([...foot.querySelectorAll('button')].some(b => b.textContent === 'simulate the result'));
-  assert.equal(view.host.querySelector('.fi-tactical-main .fi-tactical-foot'), null);
-  // The fixture header names both sides and the footer says how to kick off: the standfirst keeps the strength context.
+  // The decision comes first; the tale of the tape and both XIs share the panel below it, one at a time.
+  assert.deepEqual([...view.host.querySelector('.fi-tactical-body').children].map(n => n.className), ['fi-tactical-approach', 'fi-tactical-main']);
+  const panels = [...view.host.querySelectorAll('.fi-tactical-panels button')];
+  assert.deepEqual(panels.map(b => [b.textContent, b.getAttribute('aria-pressed')]), [['Tale of the tape', 'true'], ['Lineups', 'false']]);
+  const tape = view.host.querySelector('.fi-tactical-tape').closest('.fi-tactical-panel');
+  const lineups = view.host.querySelector('.fi-tactical-lineups');
+  assert.deepEqual([tape.hidden, lineups.hidden], [false, true]);
+  panels[1].focus();
+  await act(async () => panels[1].click());
+  assert.deepEqual([tape.hidden, lineups.hidden], [true, false]);
+  assert.ok(document.activeElement === panels[1], 'switching keeps the focus');
+  // "Simulate the result" sits in the top row, in view whatever the panel shows.
+  const simulate = view.host.querySelector('.fi-tactical-top .fi-tactical-simulate');
+  assert.equal(simulate.textContent, 'Simulate the result');
+  // Read by screen readers as the dialog's description: the strength context.
   assert.equal(view.host.querySelector('#tactical-description').textContent, options[0].context);
-  await act(async () => [...view.host.querySelectorAll('button')].find(b => b.textContent === 'simulate the result').click());
+  await act(async () => simulate.click());
   assert.deepEqual(simulated, [true]);
   await act(async () => view.host.querySelector('[data-tactic="defend"]').click());
   assert.deepEqual(chosen, ['defend']);
@@ -654,22 +664,21 @@ test('match preview without a preview model or close handler still renders the a
   assertConsoleClean();
 });
 
-test('match preview: reserve support is a tag on the option name row, never an extra line', async context => {
+test('match preview: reserve support is a tag among the figures, its meaning on the title', async context => {
   const choice = { managerName: 'Alfa', opponentName: 'Beta', options: tacticalOptions(team('a', 'Alfa', 'ALF', 75), team('b', 'Beta', 'BET', 85), 6)
     .map(option => option.id === 'balanced' ? option : { ...option, support: option.id === 'attack' ? .45 : 1.02 }) };
   const view = await mount(TacticalChoice, { choice, onChoose() {} }, context);
   // No estimates on these options: Balanced stays the recommended approach.
   assert.equal(view.host.querySelector('.fi-tactical-option.is-default').dataset.tactic, 'balanced');
-  const tag = view.host.querySelector('[data-tactic="attack"] .fi-tactical-option__name > .fi-tactical-option__support');
-  assert.equal(tag.textContent, 'Reserve support +0.45');
-  assert.equal(tag.getAttribute('title'), 'Reserve support contributes +0.45 to this approach.');
-  assert.equal(view.host.querySelector('[data-tactic="defend"] .fi-tactical-option__name > .fi-tactical-option__support').textContent, 'Reserve support +1.02');
+  const tag = view.host.querySelector('[data-tactic="attack"] .fi-tactical-option__support');
+  assert.equal(tag.textContent, 'Reserves +0.45');
+  assert.match(tag.getAttribute('title'), /^Reserve support contributes \+0\.45 to this approach\. .*reserve support changes the approach’s match strength\.$/);
+  assert.equal(view.host.querySelector('[data-tactic="defend"] .fi-tactical-option__support').textContent, 'Reserves +1.02');
   assert.equal(view.host.querySelector('[data-tactic="balanced"] .fi-tactical-option__support'), null);
-  assert.equal(view.host.querySelectorAll('.fi-tactical-option__body > .fi-tactical-option__support').length, 0);
-  // Without the preview model the standfirst keeps the full sentence, and the footer still closes the panel.
+  // Without the preview model the standfirst keeps the full sentence, for screen readers.
   assert.equal(view.host.querySelector('#tactical-description').textContent,
     'Alfa faces Beta. You are the underdog. Commit an approach to start the match.');
-  assert.equal(view.host.querySelector('.dialog.fi-tactical > .fi-tactical-foot').textContent, 'Pick an approach to kick off and watch it live.');
+  assert.equal(view.host.querySelector('.fi-tactical-simulate'), null, 'no handler, no link');
   assertConsoleClean();
 });
 
@@ -689,9 +698,6 @@ test('basketball match preview reads "Starting five" over five rows', async cont
   assert.match(view.host.querySelector('.fi-tactical-xi .kicker__aside').textContent, /^Five \d+\.\d$/);
   assert.equal(view.host.querySelectorAll('.fi-tactical-xi__row').length, 10);
   assert.doesNotMatch(view.host.textContent, /Starting XI/);
-  // Basketball starts at tip-off, not kick-off.
-  assert.equal(view.host.querySelector('.fi-tactical-approach .kicker__aside').textContent, 'Locks at tip-off');
-  assert.equal(view.host.querySelector('.dialog.fi-tactical > .fi-tactical-foot').textContent, 'Pick an approach to tip off and watch it live.');
   assert.doesNotMatch(view.host.textContent, /kick/i);
   assertConsoleClean();
 });
@@ -806,23 +812,13 @@ test('dialog and ledger CSS: the match preview fits the viewport and Fallen is n
   const dialogs = css('src/components/dialogs.css');
   const panel = dialogs.match(/\n\.fi-tactical \{([^}]*)\}/)?.[1] || '';
   assert.match(panel, /max-height:calc\(100dvh - 48px\)/, 'capped to the viewport (24px backdrop margins)');
-  assert.match(panel, /overflow:auto/, 'the tall preview scrolls inside the panel, under its sticky top');
+  assert.match(panel, /overflow:auto/, 'on a window too short for its touch targets it scrolls rather than lose anything');
   assert.match(dialogs, /\.fi-tactical, \.fi-tactical\.has-preview \{[^}]*max-height:none/, 'phone: full-screen sheet');
-  const foot = dialogs.match(/\n\.fi-tactical-foot \{([^}]*)\}/)?.[1] || '';
-  assert.match(foot, /position:sticky; bottom:0/, 'the "simulate the result" line is a sticky footer');
-  assert.match(foot, /background:var\(--panel\)/, 'the footer is opaque over the scrolled content');
-  // RC2: the whole preview fits 1440×900 and 1366×768 without scrolling — stepped rhythm by viewport height.
-  assert.match(dialogs, /@media \(min-width:700px\) and \(max-height:979\.98px\) \{[^@]*\.fi-tactical-v \{ display:none; \}/);
-  const short = dialogs.match(/@media \(min-width:700px\) and \(max-height:879\.98px\) \{([\s\S]*?)\n\}/)?.[1] || '';
-  assert.match(short, /\.fi-tactical-option__desc \{[^}]*clip:rect\(0 0 0 0\)/,
-    'short viewports hide the descriptions visually only (they stay in each option\'s accessible name)');
-  assert.doesNotMatch(short, /display:none/);
   assert.doesNotMatch(css('src/screens/ledger/ledger.css'), /data-stat=fallen\][^{]*\{[^}]*--loss/,
     'README reserves loss for negative deltas and win chances under 45%');
   // Phone: the head kicker ("THE EUROPEAN CAMPAIGN · … · SEED 2033") gets its own full-width row, not an ellipsis
   // beside the three stats.
   const phone = css('src/screens/ledger/ledger.css').match(/@media \(max-width:699\.98px\) \{([\s\S]*?)\n\}/)?.[1] || '';
   assert.match(phone, /\.ledger-head \{[^}]*flex-wrap:wrap/);
-  assert.match(phone, /\.ledger-head__title \{ display:contents; \}/);
   assert.match(phone, /\.ledger-head__kicker \{[^}]*flex:1 0 100%/);
 });

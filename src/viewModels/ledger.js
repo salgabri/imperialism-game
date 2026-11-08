@@ -10,6 +10,7 @@ import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
 import { baseballProfile } from '../sports/baseball.js';
 import { hockeyProfile } from '../sports/hockey.js';
+import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
@@ -486,8 +487,8 @@ function tapeRow(key, label, a, b) {
 /**
  * Board 07 tale of the tape: the positional profile (football Attack / Defence / Goalkeeping, basketball Offence /
  * Defence, American football Offence / Defence / Kicking, baseball Batting / Pitching / Fielding, ice hockey Attack /
- * Defence / Goaltending, rugby league Backs / Halves / Forwards) from the sports engines' frozen profile exports, then the
- * lineup rating.
+ * Defence / Goaltending, tennis Singles / Doubles, rugby league Backs / Halves / Forwards) from the sports engines' frozen
+ * profile exports, then the lineup rating.
  */
 function tapeRows(sportId, lineupA, lineupD, copy) {
   if (!lineupA || !lineupD) return [];
@@ -508,6 +509,9 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
       const pA = hockeyProfile(lineupA), pD = hockeyProfile(lineupD);
       rows = [['attack', 'Attack', pA.attack, pD.attack], ['defence', 'Defence', pA.defence, pD.defence],
         ['goaltending', 'Goaltending', pA.goaltending, pD.goaltending]];
+    } else if (sportId === 'tennis') {
+      const pA = tennisProfile(lineupA), pD = tennisProfile(lineupD);
+      rows = [['singles', 'Singles', pA.singles, pD.singles], ['doubles', 'Doubles', pA.doubles, pD.doubles]];
     } else if (sportId === 'rugby-league') {
       const pA = rugbyLeagueProfile(lineupA), pD = rugbyLeagueProfile(lineupD);
       rows = [['backs', 'Backs', pA.backs, pD.backs], ['halves', 'Halves', pA.halves, pD.halves],
@@ -551,8 +555,8 @@ function heldTerritories(own, team) {
 }
 
 /**
- * Board 07 stakes: "Annex 3 territories — Serbia, Kosovo, Montenegro — and claim one player" (first three names,
- * an ellipsis when there are more) / "Italy falls. Your campaign ends."; the best-of-three finale keeps its own copy.
+ * Board 07 stakes: "+3 territories, +1 player" / "Campaign over"; `winTitle` names the land (first three names, an
+ * ellipsis when there are more). The best-of-three finale keeps its own copy.
  */
 function stakesCopy(st, youTeam, themTeam, ctx) {
   // Best-of-three final: a game only decides the series for a side that already has a win (as turns.js targetStakes
@@ -566,11 +570,12 @@ function stakesCopy(st, youTeam, themTeam, ctx) {
   const held = heldTerritories(st?.own, themTeam);
   const names = held.slice(0, 3).map(cid => territoryName(cid, ctx)).join(', ') + (held.length > 3 ? '…' : '');
   return {
-    win: !winDecides ? `${youTeam.name} moves one game closer to total conquest`
+    win: !winDecides ? 'One game closer'
       : held.length
-        ? `Annex ${held.length} ${territoryWord(held.length)} — ${names} — and claim one player`
-        : `Claim one player from ${themTeam.name}`,
-    lose: loseDecides ? `${youTeam.name} falls. Your campaign ends.` : `${themTeam.name} moves one game closer to total conquest`,
+        ? `+${held.length} ${territoryWord(held.length)}, +1 player`
+        : '+1 player',
+    winTitle: winDecides && held.length ? names : undefined,
+    lose: loseDecides ? 'Campaign over' : `${themTeam.name} one game closer`,
   };
 }
 
