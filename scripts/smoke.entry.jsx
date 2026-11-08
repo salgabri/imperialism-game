@@ -11,7 +11,6 @@ import { clubLogoUrl } from '../src/data/clubLogos.js';
 import { DEPENDENCIES, NATIONS, buildClub, makeRng, teamEff } from '../src/data/teams.js';
 import { SAVE_KEY } from '../src/config.js';
 import { campaignStorageKey, exportCampaign, listCampaigns, writeSave } from '../src/engine/storage.js';
-import { CLUB_SCOPES } from '../src/data/scopes.js';
 import { domesticEntry, domesticLabel } from '../src/data/domesticScope.js';
 import { domesticIdOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
@@ -772,7 +771,6 @@ function theatreSnapshot(sport) {
     groups: [...theatre.querySelectorAll('optgroup')].map(group => ({ label: group.getAttribute('label'),
       options: [...group.querySelectorAll('option')].map(option) })),
     options: [...theatre.querySelectorAll('option')].map(option),
-    clubScopes: CLUB_SCOPES(getSport(sport)).map(scope => scope.id),
   };
 }
 
@@ -833,18 +831,22 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const note = document.getElementById('setup-theatre-description')?.textContent.trim() || '';
   const fewer = Math.floor(sections / entry.clubs), more = Math.ceil(sections / entry.clubs);
   const share = sections === entry.clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
-  // A sport's own map (the NBA's, the NFL's) names its league, each club holding the state of its arena or stadium.
-  result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.league
-    ? `the ${entry.clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines === 'state' ? 'state' : 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
-    : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
+  // A Europe map tells the rules of its land; a sport's own map (the NBA's, the NFL's) names its league, each club holding
+  // the state of its arena or stadium.
+  result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre
+    ? `Europe's ${entry.clubs} strongest clubs, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
+    : entry.league
+      ? `the ${entry.clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines === 'state' ? 'state' : 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
+      : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
   // Step 1's country card: every section in its starting club's pastel (the card has no ids, so compare the fills
-  // as a multiset), captioned with the sections and, unless there is one each, the clubs.
+  // as a multiset), captioned with the sections and, unless there is one each, the clubs; a Europe map with its clubs and countries.
   const cardFills = [...document.querySelectorAll('.setup-map[data-kind="country"] .setup-map__sections path')].map(path => path.getAttribute('fill')).sort();
   const startFills = Object.values(reference.startOwners).map(club => politicalFill(club)).sort();
   const caption = document.querySelector('.setup-map[data-kind="country"]')?.getAttribute('title') || '';
   result.countryCard = JSON.stringify(cardFills) === JSON.stringify(startFills)
-    && caption === `${entry.name} · ${sections} sections, ${sections === entry.clubs ? 'one per club' : `${entry.clubs} clubs`}`;
+    && caption === (entry.countries ? `${entry.name} · ${entry.clubs} clubs in ${entry.countries} countries`
+      : `${entry.name} · ${sections} sections, ${sections === entry.clubs ? 'one per club' : `${entry.clubs} clubs`}`);
   result.countryCardText = `${caption} · ${cardFills.length} sections`;
   // Hovering the preview names the section and the club starting there: "Home of X" on its home town's section,
   // "X starts here" on the rest of its group (sentence case in the DOM; CSS may uppercase it).

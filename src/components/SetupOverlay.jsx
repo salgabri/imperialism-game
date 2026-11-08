@@ -208,7 +208,7 @@ const TheatreMap = React.memo(function TheatreMap({ preview, caption, loading = 
   );
 });
 
-/** The world card's caption: "Europe · 46 nations, each on its own land" (clubs are dealt out, README §The club layer). */
+/** The world card's caption: "Europe · 46 nations, each on its own land" (a set with no Europe maps deals its clubs out, README §The club layer). */
 function theatreCaption(model, preview) {
   const teams = `${preview.teams} ${preview.teams === 1 ? model.noun : model.nouns}`;
   return `${model.scopeName} · ${teams}${model.clubLayer ? ' dealt onto the nearest free land' : ', each on its own land'}`;
@@ -253,8 +253,11 @@ export default function SetupOverlay({
   }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam]);
   const { rules } = model;
   const manager = model.role === 'manager';
-  /** Football clubs also offer one country's own top clubs: more than a hundred, so they are a dropdown under the leagues. */
+  /** Football clubs also offer one country's own top clubs: more than a hundred, so they are a dropdown under Europe's theatres. */
   const countries = model.domesticScopes.length > 0;
+  // Europe's theatres are maps too (`model.country` is set for them), so "a country is chosen" means one from the dropdown.
+  const countryChosen = countries && model.domesticScopes.some(scope => scope.id === model.scopeId);
+  const theatreChecked = model.scopes.some(scope => scope.id === model.scopeId);
   // The wall reads strongest first: the favourites lead, and the long shots are where a player would look for them.
   const wallTeams = useMemo(() => model.teams.slice().sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)), [model.teams]);
   const wall = useFitWall(wallTeams.length, WALL);
@@ -266,12 +269,14 @@ export default function SetupOverlay({
   function choose(key, value, current) { if (value !== current) pick(key, value); }
   function theatreRadio(scope, index) {
     const checked = scope.id === model.scopeId;
+    const describedBy = scope.note ? `setup-theatre-note-${scope.id}`
+      : checked && model.country ? 'setup-theatre-description' : undefined;
     return (
       <button type="button" role="radio" key={scope.id} aria-checked={checked}
-        // With a country chosen no league is checked: the first still takes the group's one tab stop.
-        tabIndex={checked || (model.country && index === 0) ? 0 : -1}
+        // With a country chosen from the dropdown no theatre is checked: the first still takes the group's one tab stop.
+        tabIndex={checked || (!theatreChecked && index === 0) ? 0 : -1}
         className="setup-theatre" data-name={scope.label} title={scope.note || undefined}
-        aria-describedby={scope.note ? `setup-theatre-note-${scope.id}` : undefined}
+        aria-describedby={describedBy}
         onClick={() => choose(model.scopeKey, scope.id, model.scopeId)} onKeyDown={moveRadio}>
         <span className="setup-theatre__name">{scope.label}</span>
         {/* A chosen data set's counts are unknown until it loads. */}
@@ -626,8 +631,8 @@ export default function SetupOverlay({
                 {/* One country's own top clubs: more than a hundred, so a dropdown, not rows. */}
                 {countries ? (
                   <select id="setup-country" className="setup-season setup-country" aria-label={model.domesticGroup}
-                    aria-describedby={model.country ? 'setup-theatre-description' : undefined}
-                    data-checked={model.country ? '' : undefined} value={model.country ? model.scopeId : ''}
+                    aria-describedby={countryChosen ? 'setup-theatre-description' : undefined}
+                    data-checked={countryChosen ? '' : undefined} value={countryChosen ? model.scopeId : ''}
                     onChange={event => { if (event.target.value) pick(model.scopeKey, event.target.value); }}>
                     <option value="">{model.domesticGroup}</option>
                     {theatreChoices(model.domesticScopes)}
@@ -676,9 +681,10 @@ export default function SetupOverlay({
             <div className="setup-side">
               {model.country ? (
                 <TheatreMap kind="country" preview={domestic?.preview || null} loading={model.countryState === 'loading'}
-                  caption={domestic?.preview ? `${model.country.name} · ${domestic.preview.sections.length} sections, `
-                    + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)
-                    : `Loading the map of ${model.country.name}…`} />
+                  caption={!domestic?.preview ? `Loading the map of ${model.country.name}…`
+                    : model.country.countries ? `${model.country.name} · ${model.country.clubs} clubs in ${model.country.countries} countries`
+                      : `${model.country.name} · ${domestic.preview.sections.length} sections, `
+                        + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)} />
               ) : theatreMap ? <TheatreMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)} /> : <div className="setup-side__empty" aria-hidden="true" />}
             </div>
           </div>

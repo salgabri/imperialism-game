@@ -146,9 +146,9 @@ test('the nation map names only game nations, and keeps every name EA spells dif
   const names = new Set(Object.values(NATIONS).map(nation => nation[0]));
   for (const [ea, game] of Object.entries(EA_NATION_ALIASES)) assert.ok(names.has(game), `${ea} → ${game} is a game nation`);
   for (const name of EA_NO_TEAM) assert.ok(!names.has(EA_NATION_ALIASES[name] || name), `${name} has no shape`);
-  // The club layer's own leagues, so a club theatre means the same in every season.
-  assert.deepEqual(Object.values(EA_LEAGUES).map(([league]) => league).sort(),
-    [...new Set(getSport('football').clubs.map(club => club.league))].sort());
+  // Built-in leagues, so a club reads the same in every season.
+  const leagues = new Set(getSport('football').clubs.map(club => club.league));
+  for (const [league] of Object.values(EA_LEAGUES)) assert.ok(leagues.has(league), league);
 });
 
 // ---------- the FIFA 07 – FIFA 14 builder, on invented rows ----------

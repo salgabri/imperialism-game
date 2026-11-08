@@ -364,6 +364,7 @@ const RUNS = {
   'football world': { sport: 'football', layer: 'nations', scope: 'world' },
   'basketball world': { sport: 'basketball', layer: 'nations', scope: 'world' },
   'England domestic': { sport: 'football', layer: 'clubs', clubScope: 'domestic:826' },
+  'Top 124 of Europe': { sport: 'football', layer: 'clubs', clubScope: 'domestic:eu124' },
 };
 const played = new Map();
 /** Each run is played once per process into its own fresh 5M storage, which later tests may keep using. */

@@ -156,7 +156,7 @@ test('the smallest country is nine matches, a retired one leaves the list, and a
   const pakistan = buildSetupModel({ sport: 'football', layer: 'clubs', clubScope: 'domestic:586', role: 'manager' }, {});
   assert.equal(pakistan.country, null);
   assert.ok(!pakistan.domesticScopes.some(row => row.id === 'domestic:586'));
-  assert.equal(pakistan.scopeName, 'All Leagues');
+  assert.equal(pakistan.scopeName, 'Top 124');
   assert.equal(sportNote(getSport('basketball')), 'Nations · 30 NBA clubs');
   assert.equal(sportNote(getSport('basketball'), { clubsOnly: true }), '30 NBA clubs', 'an NBA season has no nations');
 });
@@ -866,16 +866,15 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
 const ENGLAND = DOMESTIC.find(entry => entry.id === '826');
 const COUNTRY = { layer: 'clubs', clubScope: 'domestic:826' };
 
-test('football clubs offer every shipped country in a dropdown under the league chips; the mirror groups them', async t => {
+test('football clubs offer every shipped country in a dropdown under Europe\'s two theatres; the mirror groups them', async t => {
   const sorted = DOMESTIC.slice().sort((a, b) => nationPriority(a.id) - nationPriority(b.id));
   const rows = domesticTheatres();
   assert.deepEqual(rows.map(row => row.id), sorted.map(entry => `domestic:${entry.id}`));
   assert.deepEqual(rows.slice(0, 5).map(row => row.name), ['England', 'Spain', 'Germany', 'Italy', 'France'], 'the biggest leagues first');
   assert.deepEqual(rows[0], { id: `domestic:${sorted[0].id}`, name: sorted[0].name, label: sorted[0].name, count: sorted[0].clubs, note: '' });
   const clubs = buildSetupModel({ ...BASE, layer: 'clubs' });
-  assert.ok(clubs.scopes.length > 1 && !clubs.scopes.some(scope => scope.id.startsWith('domestic:')), 'model.scopes stays the league rows');
-  assert.deepEqual(clubs.scopes.map(scope => scope.id),
-    ['all', 'elite', 'Premier League', 'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1', 'Liga Portugal', 'Eredivisie'], 'the leagues in the same order');
+  assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]),
+    [['domestic:eu124', 'Top 124', 124], ['domestic:eu32', 'Elite 32', 32]], 'no single league: the strongest clubs in Europe, then its elite');
   assert.equal(clubs.domesticScopes, rows);
   for (const setup of [{ ...BASE }, { ...BASE, sport: 'basketball', layer: 'clubs' }, { ...BASE, sport: 'basketball' }]) {
     assert.deepEqual(buildSetupModel(setup).domesticScopes, [], `${setup.sport} ${setup.layer}: no single-country theatres`);
@@ -883,18 +882,19 @@ test('football clubs offer every shipped country in a dropdown under the league 
 
   const view = await mount(t, { setup: { layer: 'clubs' } });
   assert.equal(view.qa('[role="radiogroup"][aria-labelledby="setup-theatre-label"]').length, 1);
-  assert.equal(view.qa('.setup-theatre').length, clubs.scopes.length, 'the chips are the leagues alone');
+  assert.deepEqual(view.qa('.setup-theatre').map(row => row.dataset.name), ['Top 124', 'Elite 32'], 'the chips are Europe\'s theatres alone');
   const countries = view.q('#setup-country');
   assert.equal(countries.getAttribute('aria-label'), 'One country · top clubs');
   assert.deepEqual([...countries.options].slice(1).map(option => [option.value, option.textContent]),
     sorted.map(entry => [`domestic:${entry.id}`, `${entry.name} · ${entry.clubs} clubs`]));
   assert.equal(countries.options[0].textContent, 'One country · top clubs', 'its first option names it');
-  assert.equal(countries.value, '', 'nothing chosen while a league is');
+  assert.equal(countries.value, '', 'nothing chosen while a Europe theatre is');
+  assert.ok(!countries.hasAttribute('data-checked'), 'and the dropdown is not marked chosen');
 
-  // The mirror: "European leagues" holds the league ids in order; the countries read "Name · N clubs", in priority order.
+  // The mirror: "Europe" holds its theatres in order; the countries read "Name · N clubs", in priority order.
   const mirror = view.q('#setup-theatre');
   const groups = [...mirror.querySelectorAll('optgroup')];
-  assert.deepEqual(groups.map(group => group.getAttribute('label')), ['European leagues', 'One country · top clubs']);
+  assert.deepEqual(groups.map(group => group.getAttribute('label')), ['Europe', 'One country · top clubs']);
   assert.deepEqual([...groups[0].querySelectorAll('option')].map(option => option.value), clubs.scopes.map(scope => scope.id));
   assert.deepEqual([...groups[1].querySelectorAll('option')].map(option => [option.value, option.textContent]),
     sorted.map(entry => [`domestic:${entry.id}`, `${entry.name} · ${entry.clubs} clubs`]));
@@ -902,22 +902,30 @@ test('football clubs offer every shipped country in a dropdown under the league 
   await act(async () => mirror.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
   assert.deepEqual(view.calls.picks.at(-1), ['clubScope', 'domestic:826']);
 
-  // Choosing a country in the dropdown leaves no league chip checked, and the group keeps its one tab stop.
+  // Choosing a country in the dropdown leaves no theatre chip checked, and the group keeps its one tab stop.
   assert.equal(countries.value, 'domestic:826');
+  assert.ok(countries.hasAttribute('data-checked'));
   countries.value = rows[1].id;
   await act(async () => countries.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
   assert.deepEqual(view.calls.picks.at(-1), ['clubScope', rows[1].id]);
-  assert.equal(view.q('.setup-theatre[aria-checked="true"]'), null);
+  assert.ok(!view.q('.setup-theatre[aria-checked="true"]'));
   assert.deepEqual(view.qa('.setup-theatre').map(row => row.tabIndex).filter(index => index === 0), [0]);
-  // And a league chip takes the choice back.
+  // And a theatre chip takes the choice back.
   await view.click(view.qa('.setup-theatre')[0]);
   assert.deepEqual(view.calls.picks.at(-1), ['clubScope', clubs.scopes[0].id]);
   assert.equal(countries.value, '');
+  // Elite 32 is a map like a country's: its description is the chosen radio's, and it holds the group's only tab stop.
+  await view.click(view.qa('.setup-theatre')[1]);
+  assert.deepEqual(view.calls.picks.at(-1), ['clubScope', clubs.scopes[1].id]);
+  assert.deepEqual(view.qa('.setup-theatre').filter(row => row.tabIndex === 0).map(row => row.dataset.name), ['Elite 32']);
+  assert.equal(view.qa('.setup-theatre')[1].getAttribute('aria-describedby'), 'setup-theatre-description');
+  assert.match(view.q('#setup-theatre-description').textContent, /Europe's 32 strongest clubs/);
+  assert.ok(!countries.hasAttribute('data-checked'));
   assert.deepEqual(view.errors, []);
 
   // Nations keep v4's flat mirror, and no country dropdown.
   const nations = await mount(t);
-  assert.equal(nations.q('#setup-country'), null);
+  assert.ok(!nations.q('#setup-country'));
   assert.equal(nations.qa('#setup-theatre optgroup').length, 0);
   assert.ok(!nations.qa('#setup-theatre option').some(option => option.value.startsWith('domestic:')));
 });
@@ -1119,7 +1127,7 @@ test('world card: a theatre opening board in kick-off pastels over unclaimed lan
   assert.equal(card.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
   assert.equal(card.getAttribute('title'), 'Europe · 2 nations, each on its own land');
   const clubs = await mount(t, { setup: { layer: 'clubs', clubScope: 'all' }, theatreMap: preview });
-  assert.match(clubs.q('.setup-map').getAttribute('title'), /^All Leagues · 2 clubs dealt onto the nearest free land$/i);
+  assert.match(clubs.q('.setup-map').getAttribute('title'), /^Top 124 · 2 clubs dealt onto the nearest free land$/i);
   const none = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: null });
   assert.equal(none.q('.setup-map'), null, 'no card before App has a board');
   // A chosen country shows its own card, never a world board App may still hold while the country loads.

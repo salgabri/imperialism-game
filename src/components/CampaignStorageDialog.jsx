@@ -4,24 +4,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import { SCOPES } from '../data/teams.js';
-import { CLUB_SCOPES } from '../data/scopes.js';
+import { worldClubTheatreName } from '../data/scopes.js';
 import { plainScopeName } from '../viewModels/format.js';
 import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
 import './campaignStorage.css';
-
-/** A league's scope id is its name, so the fixed club scopes ('all', 'elite') are the only ones to look up. */
-const CLUB_FIXED_SCOPES = CLUB_SCOPES({ clubs: [] });
 
 /**
  * The theatre's display name, as App.scopeName reads it: 'UEFA' → 'Europe', a club league by name, a country's own
  * map as 'England · top 100 clubs'.
  */
 function theatreName(settings) {
-  if (settings.layer === 'clubs') {
-    const id = settings.clubScope;
-    return domesticLabel(id) || CLUB_FIXED_SCOPES.find(scope => scope.id === id)?.name || id || CLUB_FIXED_SCOPES[0].name;
-  }
+  if (settings.layer === 'clubs') return domesticLabel(settings.clubScope) || worldClubTheatreName(settings);
   return plainScopeName(SCOPES.find(scope => scope.id === settings.scope)?.name || 'World War');
 }
 
