@@ -584,15 +584,17 @@ export default function SetupOverlay({
                 <div className="setup-group">
                   <span className="sr-only" id="setup-layer-label">Teams</span>
                   <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="setup-layer-label"
-                    aria-describedby={model.clubsOnly ? 'setup-layer-note' : undefined}>
+                    aria-describedby={model.clubsOnly || model.nationsOnly ? 'setup-layer-note' : undefined}>
                     {[['nations', 'Nations'], ['clubs', 'Clubs']].map(([id, name]) => (
                       <button type="button" role="radio" key={id} aria-checked={model.layer === id} tabIndex={model.layer === id ? 0 : -1}
-                        disabled={id === 'nations' && !!model.clubsOnly}
+                        disabled={(id === 'nations' && !!model.clubsOnly) || (id === 'clubs' && !!model.nationsOnly)}
                         onClick={() => choose('layer', id, model.layer)} onKeyDown={moveRadio}>{name}</button>
                     ))}
                   </div>
                   {/* A sport with clubs only (American football) has no national teams to field. */}
                   {model.clubsOnly ? <p className="sr-only" id="setup-layer-note">{model.sport.name} is played by {model.clubsOnly} clubs only.</p> : null}
+                  {/* A sport with nations only (tennis: the Davis Cup's) has no clubs to field. */}
+                  {model.nationsOnly ? <p className="sr-only" id="setup-layer-note">{model.sport.name} is played by nations only.</p> : null}
                 </div>
 
                 {/* The sport's seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this

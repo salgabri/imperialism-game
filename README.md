@@ -15,6 +15,7 @@ Pick your sport at kick-off:
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
+| Tennis | a Davis Cup team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets | none: a tie always has a winner |
 
 And pick who fights:
 
@@ -26,7 +27,8 @@ And pick who fights:
   franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, or all 32 NHL clubs on
   [theirs](#the-nhl-map). Real Madrid annexes territory
-  exactly the way Spain does. American football is played by clubs only.
+  exactly the way Spain does. American football is played by clubs only, tennis by
+  nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
@@ -40,6 +42,8 @@ own match clock (half-innings, not minutes) and nations by birthplace
 ([design notes](docs/design/baseball.md)). Ice hockey's ratings are partly estimates, each
 marked as one ([design notes](docs/design/hockey.md)), and women's football plays
 under football's rulebook with its own players ([design notes](docs/design/womens-football.md)).
+Tennis plays Davis Cup ties between nations, its players rated by their Elo
+([design notes](docs/design/tennis.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -105,6 +109,8 @@ npm run build-hockey     # rebuild the NHL clubs and the hockey nations from tha
 npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run sync:ea-fc-women # snapshot EA FC's women's players from its public API into scripts/data/ea-fc27-women.csv (network, cached)
 npm run build-womens-football # rebuild the women's nations and clubs from that snapshot (--check compares byte for byte)
+npm run sync:tennis      # snapshot Tennis Abstract's men's Elo ratings and countries into scripts/data/tennis-elo.json (network, cached)
+npm run build-tennis     # rebuild the tennis nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 ```
@@ -196,7 +202,8 @@ manager of the theatre's favourite, with decisions from the first match.
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA,
-   baseball clubs MLB on its map of the USA and Canada and ice hockey clubs the NHL on its own. Women's football's clubs
+   baseball clubs MLB on its map of the USA and Canada and ice hockey clubs the NHL on its own. Tennis is nations only
+   (choosing it switches Teams to nations and disables Clubs). Women's football's clubs
    offer its five leagues, the Rest of Europe, all of them or the strongest 32. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). Its foot
@@ -214,7 +221,7 @@ manager of the theatre's favourite, with decisions from the first match.
    football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
    2025 back to 2021, with nations or with clubs on the map of their day. Women's
-   football and ice hockey list their built-in 2026/27. A one-line quick-resume
+   football and ice hockey list their built-in 2026/27, tennis its 2026 (Elo of 2 November). A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
    from a challenge link shows a one-line note about the link
    ([Sharing a campaign](#sharing-a-campaign)). The header holds the save actions
@@ -322,14 +329,16 @@ a field goal, now and then a safety, or nothing by its offence against the oppos
 with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime.
 Ice hockey plays three-minute slices whose rates follow the score (a level game tightens up late, a side behind
 pushes and at the end pulls its goalie), then five minutes of sudden death and a shoot-out. Women's football plays
-football's model.
+football's model. Tennis plays a Davis Cup tie: four singles and a doubles, first to three rubbers, each rubber won with
+Elo's odds for the gap between the players and played out set by set, game by game.
 Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
 **Home advantage** is off by default: every match is played on neutral ground, so
 the defending team wins half of even games. On, the defender plays at home and
 wins about as often as home teams do in its sport's league: 45% of even football
 games in ninety minutes (58% with the shoot-outs), 56% in basketball, 54% in
-American football and ice hockey and 53% in baseball. Attacks fail more often, and a failed
+American football and ice hockey and 53% in baseball. A Davis Cup host picks the surface and fills the stands:
+even ties go its way 60% of the time. Attacks fail more often, and a failed
 attack hands the defender the attacker's territory, so conquests change hands but
 campaigns run as many matches. A best-of-three final keeps its attacker, so its
 defender hosts every game.
@@ -588,8 +597,8 @@ Each key names a setup choice, and a key left at its default is left out:
 
 | Key | Setup choice | Values | Left out when |
 | --- | --- | --- | --- |
-| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey` | football |
-| `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
+| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis` | football |
+| `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season); tennis is nations only |
 | `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), or for women's football `all`, `elite` or a league (`NWSL`) | Europe for nations, the Top 124 for football clubs, all clubs for women's football, a sport's own map (NBA, NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
@@ -757,6 +766,13 @@ field the lineup the game picks and keep up to 23; nations field the NHL's playe
 nationality or else birth country, and a place they cannot fill gets a generated player. See the
 [design notes](docs/design/hockey.md).
 
+**Tennis** — `src/data/rosters.tennis.js`, from the men's Elo ratings Tennis Abstract (Jeff
+Sackmann) published on 2026-11-02, with each player's country from its ATP rankings report
+(`scripts/data/tennis-elo.json`, 547 players). There is no video-game list for tennis: a rating is
+the player's Elo / 25 + 4, rounded (Sinner's 2297 is 96), so the match model plays Elo's own odds,
+and nothing is estimated. Each nation names its five best; 52 have the two a tie needs, and the
+rest stay neutral. See the [design notes](docs/design/tennis.md).
+
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
 (`scripts/data/ea-fc27-women.csv`, 1,940 players). Ratings are EA's, unchanged, and nothing is
@@ -794,7 +810,9 @@ another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
 An assignment optimizer fills all eleven football, five basketball, 23 American
-football, 13 baseball or 19 ice hockey slots. Playing outside a natural position costs 12 rating
+football, 13 baseball or 19 ice hockey slots. Tennis picks its team instead: the two best in the singles, the next two
+in the doubles (a team of two or three plays its singles players there too), its strength weighing each place by the
+rubbers it plays. Playing outside a natural position costs 12 rating
 points (25 in American football, 20 in baseball, where a hitter pitching or a pitcher
 hitting costs 40 and any hitter can be the designated hitter; in ice hockey 4 between the forward places, 15
 between forwards and defence and 40 in or out of goal). A player may have
@@ -1720,13 +1738,14 @@ vercel.json            cache headers for the deployed site
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **seventeen full
-campaigns** across all three pacings, both resolution modes, all six sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **eighteen full
+campaigns** across all three pacings, both resolution modes, all seven sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
 sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
 clubs on theirs, also live, one baseball's nations of North and Central America, one the NHL's 32 clubs on
-their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, and one the NWSL's clubs. A **manager campaign** (Italy, Europe, round robin × *You
+their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, one the NWSL's clubs and one
+tennis's Davis Cup nations of Europe, live. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after

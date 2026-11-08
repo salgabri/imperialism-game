@@ -332,6 +332,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'of the United States.',
   baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October). Nations field the players '
     + 'born there; clubs play on the map of their day, the Athletics in Oakland until 2024.',
+  tennis: 'Elo ratings of the ATP\'s men from Tennis Abstract, as of 2 November 2026. Each nation names its five best; one '
+    + 'with fewer than two rated players fields no team.',
 });
 
 /**
@@ -581,7 +583,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);
   // Until then no figure from the built-in season stands in for the set's.
   const pending = dataSet != null && sport.dataSet !== dataSet;
-  const clubLayer = setup.layer === 'clubs';
+  const clubLayer = setup.layer === 'clubs' && !sport.nationsOnly;
   const noun = clubLayer ? 'club' : 'nation';
   const nouns = `${noun}s`;
   const scopes = pending ? pendingTheatres(sport, clubLayer, setup.clubScope) : theatreOptions(sport, clubLayer);
@@ -671,6 +673,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
     // A sport with clubs only names its league ('NFL'): the Nations choice is off.
     clubsOnly: sport.clubsOnly ? [...new Set(sport.clubs.map(club => club.league))].join(' and ') : null,
+    // A sport with nations only (tennis) has no clubs: the Clubs choice is off.
+    nationsOnly: !!sport.nationsOnly,
     // `scopes` stays the league / region rows; countries are their own group (`domesticScopes`) after them.
     scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
     theatreNotes: scopes.filter(scope => scope.note),

@@ -54,6 +54,7 @@ const SCENARIOS = [
   { name: 'ICE HOCKEY · Europe · blitz · instant', sport: 'hockey', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
   { name: "WOMEN'S FOOTBALL · Europe · duel · ticker", sport: 'womens-football', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
   { name: "WOMEN'S CLUBS · NWSL · blitz · instant", sport: 'womens-football', layer: 'clubs', clubScope: 'NWSL', pacing: 'blitz', resolution: 'instant' },
+  { name: 'TENNIS · Europe · duel · ticker', sport: 'tennis', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -84,7 +85,8 @@ const MANAGER_SCENARIOS = [
 // `--manager-only` only the manager campaign; any of them skips every other section (together they run each pick).
 // The country scenarios come next to last, so they are `--campaign-only=7` (England duel, with the setup checks), `=8`
 // (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji); the NFL's are `=10` and `=6`, MLB's `=11` and `=7`,
-// baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`. `--scenarios=<text>` composes with
+// baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`, tennis's Davis Cup nations
+// `=17`. `--scenarios=<text>` composes with
 // these: it narrows whatever they leave.
 function onlyIndex(name, list) {
   const arg = process.argv.find(value => value.startsWith(`--${name}=`));
@@ -621,7 +623,7 @@ if (!filtered && fixedChecks) {
   const { SPORT_LIST } = await import('../src/sports/index.js');
   const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'],
     baseball: ['United States', 'Dominican Rep.', 'Venezuela', 'Cuba'], hockey: ['Canada', 'United States', 'Sweden', 'Russia'],
-    'womens-football': ['Spain', 'England', 'France', 'Germany'] };
+    'womens-football': ['Spain', 'England', 'France', 'Germany'], tennis: ['Spain', 'Italy', 'United States', 'Germany'] };
 
   for (const sport of SPORT_LIST) {
     // A sport with clubs only (American football) fields no nations: its clubs are checked below.
@@ -645,8 +647,12 @@ if (!filtered && fixedChecks) {
       // A hockey forward may play another forward's place. Women's football invents nobody: a nation short of eleven, or
       // with no rated player and no team at all, stays short.
       const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : !slot.outOfPosition);
-      const fielded = sport.id === 'womens-football' ? teams.filter(t => t.real >= size) : teams;
-      const full = t => (t.squad.length > size ? lineupOf(t).slots.every(natural) : t.squad.length === size);
+      // Tennis invents nobody either: a nation needs two rated players, and a team of two or three plays its singles
+      // players in the doubles too.
+      const fielded = sport.id === 'womens-football' ? teams.filter(t => t.real >= size)
+        : sport.id === 'tennis' ? teams.filter(t => t.real >= 2) : teams;
+      const full = t => (sport.id === 'tennis' ? lineupOf(t).slots.every(slot => slot.player)
+        : t.squad.length > size ? lineupOf(t).slots.every(natural) : t.squad.length === size);
       check('every nation fields a full lineup', fielded.length > 20 && fielded.every(full), 'short squad');
       check('no roster for an unknown nation', strays.length === 0, strays.join(', '));
       check('every rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
@@ -665,6 +671,8 @@ if (!filtered && fixedChecks) {
   const { buildClub, selectLineup } = await import('../src/data/teams.js');
   const { CLUB_SCOPES } = await import('../src/data/scopes.js');
   for (const sport of SPORT_LIST) {
+    // Tennis has nations only.
+    if (!sport.clubs.length) continue;
     console.log(`\n  Club layer — ${sport.name}`);
     try {
       const clubs = sport.clubs.map(c => buildClub(c, sport));
@@ -706,6 +714,7 @@ if (!filtered && fixedChecks) {
       const topo = JSON.parse(await readFile(path.join(root, 'public', 'world-110m.v1.json'), 'utf8'));
       const geo = new WorldGeometry(topo, CAPITALS).fitTo(Object.keys(NATIONS));
       for (const sport of SPORT_LIST) {
+        if (!sport.clubs.length) continue;
         const clubs = sport.clubs.map(c => buildClub(c, sport));
         const own = seedClubs(geo, clubs);
         const seeded = new Set(Object.values(own));
@@ -740,7 +749,9 @@ if (!filtered && fixedChecks) {
       check('every match has a winner', results.every(r => r.winner === a.id || r.winner === b.id), 'no winner');
       check('a level score always triggers a tie-break', unresolved === 0, `${unresolved} left level`);
       check('the feed adds up to the final score', evTotals, 'event totals mismatch');
-      const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], baseball: [2, 10], 'womens-football': [0.6, 3.5], hockey: [1.5, 5.5] }[sport.id];
+      const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], baseball: [2, 10], 'womens-football': [0.6, 3.5], hockey: [1.5, 5.5],
+        // Rubbers: the winner's three and the loser's none to two.
+        tennis: [1.5, 2.5] }[sport.id];
       check('scoring is in the right range for the sport', mean > low && mean < high, `mean ${mean.toFixed(1)}`);
       console.log(`    400 matches · mean score ${mean.toFixed(1)} · ${results.filter(r => r.tie).length} needed ${sport.labels.tie.toLowerCase()}`);
     } catch (e) {
