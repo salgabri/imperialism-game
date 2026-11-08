@@ -13,6 +13,12 @@ const report = realismReport({ seasons: 12 });
 const within = (value, [low, high], label, slack = 0) => assert.ok(value >= low - slack && value <= high + slack,
   `${label}: ${value} outside the real ${low}–${high}${slack ? ` (± ${slack})` : ''}`);
 
+test('football: each of the five leagues plays its whole first division', () => {
+  // The club layer keeps only Europe's strongest clubs (TOP_CLUBS), which would leave a league short of its weaker clubs.
+  assert.deepEqual(Object.fromEntries(report.football.map(league => [league.league, league.clubs])),
+    { 'Premier League': 20, 'La Liga': 20, 'Serie A': 20, Bundesliga: 18, 'Ligue 1': 18 });
+});
+
 test('football: Europe\'s top five leagues score, draw and finish as they do in life', () => {
   const real = REAL.football;
   for (const league of report.football) {

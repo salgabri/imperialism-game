@@ -1,10 +1,13 @@
-// Plays whole league seasons with the built-in clubs and measures what a fan of each league would look at:
-// scores, draws and overtime, margins, standings, and who scores. Each measure sits beside the real league's
-// figure (REAL below, with its seasons). The defender of each fixture is its home side: at a neutral venue, as
-// campaigns play by default, or at home with `--home` (the Home advantage launch rule).
+// Plays whole league seasons with the built-in clubs, each of football's five leagues whole (leagueClubs), and
+// measures what a fan of each league would look at: scores, draws and overtime, margins, standings, and who scores.
+// Each measure sits beside the real league's figure (REAL below, with its seasons). The defender of each fixture is
+// its home side: at a neutral venue, as campaigns play by default, or at home with `--home` (the Home advantage
+// launch rule).
 // Run: node scripts/simulation-realism.mjs [--seasons=40] [--home] [--json]
+import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
+import { parseEaPlayers } from './lib/football-data.mjs';
+import { EA_CLUB_SNAPSHOT, firstDivisionClubs, squadTuples } from './lib/first-divisions.mjs';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
@@ -128,8 +131,17 @@ function seasonSpread(tables, games, key = 'win') {
 
 // ---- Football -------------------------------------------------------------------------------------------------
 
+// The club layer keeps only Europe's strongest clubs (TOP_CLUBS), so a league season takes its league's clubs from the
+// EA snapshot the club layer is built from, each with the XI the club layer gives it (scripts/lib/first-divisions.mjs).
+let firstDivisions;
+function leagueClubs(league) {
+  firstDivisions ??= firstDivisionClubs(parseEaPlayers(readFileSync(EA_CLUB_SNAPSHOT, 'utf8')).players);
+  return firstDivisions.filter(c => c.league === league).map(c => buildClub({ id: c.id, name: c.name, league: c.league,
+    country: c.country, str: Math.round(c.exact), squad: squadTuples(c.squad) }, football));
+}
+
 function footballLeague(league, seasons, seed, venue) {
-  const clubs = FOOTBALL_CLUBS.filter(c => c.league === league).map(c => buildClub(c, football));
+  const clubs = leagueClubs(league);
   const games = 2 * (clubs.length - 1);
   const { played, tables } = playSeasons({ sport: football, teams: clubs, games, seasons, seed, venue });
   const totals = played.map(g => g.regA + g.regD);

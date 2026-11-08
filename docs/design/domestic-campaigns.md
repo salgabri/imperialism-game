@@ -942,7 +942,8 @@ chart, backdrop, routing, saves.
 
 **The field.** `scripts/build-clubs.mjs` takes the first-division clubs of the 26
 European leagues in the EA FC 27 snapshot, plus PFC Ludogorets, which EA lists under
-no competition: 309 clubs with a natural XI. The strongest `TOP_CLUBS` (124, in
+no competition (`scripts/lib/first-divisions.mjs`, which the realism harness also plays
+whole leagues from): 309 clubs with a natural XI. The strongest `TOP_CLUBS` (124, in
 `src/data/scopes.js`) by the exact mean of that XI are `src/data/clubs.football.js`,
 strongest first: 20 clubs each from England and Spain, 19 Italy, 16 Germany, 15 France,
 6 the Netherlands, 4 each from Portugal, Turkey, Belgium and Greece, 3 Czechia, 2 each
