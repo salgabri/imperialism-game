@@ -173,6 +173,8 @@ export default class App extends React.Component {
     turnQueue: [], turnIndex: 0, pendingTarget: null,
     // UI-only state (never saved, PLAN §3.1).
     view: 'map', viewSource: 'user', squadReturn: null, tacticalPreview: false, phoneSheet: 'collapsed', setupStep: 1,
+    // Step 1's map card: Political or Flags (crests for clubs), its own choice; the campaign map keeps `mapMode`.
+    setupMapMode: 'political',
     // Setup suggests a team for a manager with none picked (off for "Another team"); skipAhead is "Skip to my next
     // match" while it runs: { speed, autoplay, from } to hand back, from = the match count it started at.
     setupSuggest: true, skipAhead: null,
@@ -1044,7 +1046,9 @@ export default class App extends React.Component {
         .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
       ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) }))
       .sort((a, b) => a.name.localeCompare(b.name));
-    this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own) };
+    // What each team flies on the step-1 card in Flags mode (setupMapFlags): a nation its flag, a club its crest.
+    const marks = Object.fromEntries(included.map(team => [team.id, { kind: team.kind, flagId: team.flagId ?? null, col: team.col }]));
+    this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own), marks };
     return teams;
   }
 
@@ -2154,6 +2158,8 @@ export default class App extends React.Component {
 
   mapFlags(...args) { return mapM.mapFlags.apply(this, args); }
 
+  setupMapFlags(...args) { return mapM.setupMapFlags.apply(this, args); }
+
   mapCountries(...args) { return mapM.mapCountries.apply(this, args); }
 
   mapLabels(...args) { return mapM.mapLabels.apply(this, args); }
@@ -2297,6 +2303,8 @@ export default class App extends React.Component {
         {st.phase === 'setup' && <SetupOverlay
           setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()} domestic={this.domesticStatus()}
           theatreMap={this.setupMapPreview()}
+          mapMode={st.setupMapMode} onMapMode={setupMapMode => this.setState({ setupMapMode })}
+          mapFlags={st.setupMapMode === 'flags' ? this.setupMapFlags() : null}
           season={this.seasonStatus()}
           savedText={st.savedMeta ? (st.savedMeta.round ? 'Round ' + st.savedMeta.round : 'Before the first match') + ' · ' + this.savedProgress(st.savedMeta) + ' · ' + this.scopeName(st.savedMeta.settings)
             + (st.savedMeta.settings?.dataSeason ? ' · ' + st.savedMeta.settings.dataSeason : '') : ''}

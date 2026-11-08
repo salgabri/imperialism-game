@@ -112,40 +112,26 @@ export function handleMapMove(e) {
   }
 }
 
-/** One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest. */
-export function mapFlags(playing) {
-  const { mapMode, teams } = this.state;
-  if (mapMode !== 'flags') return NO_FLAGS;
-  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return NO_FLAGS;
-  // The region index of this fit, built on its first Flags view (fitMap keeps only its source).
-  if (!this.flagComponents && this.flagRegionSource) {
-    this.flagComponents = createFlagRegionIndex(this.flagRegionSource.geometry, { maxGap: this.flagRegionSource.maxGap });
-  }
-  if (!this.flagComponents) return NO_FLAGS;
-  // While signing, the projected board: the taken land already flies the winner's banner (DEC D15).
-  const components = this.flagComponents.components(playing ? mapSnapshot(this).own : this.setupFlagOwnership);
-  const cached = this.flagLayoutCache;
-  if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
-  // A part's path depends only on its rings, and parts are the index's fixed objects: reuse the last layout's.
-  const previousPaths = cached?.paths, paths = new Map();
-
-  const flagParts = new Map();
-  const flagPatterns = [];
+/**
+ * Each flag region's banner (`components` from createFlagRegionIndex) and the parts every territory shows it through.
+ * `markOf(ownerId)` says what an owner flies: `{ crestUrl }` for a club with a crest, else `{ nationId }` for a flag, and
+ * the `color` behind it; an owner with neither flies nothing. `idPrefix` keeps two maps' banners apart in one document.
+ * A part's path depends only on its rings, and parts are the index's fixed objects: `previousPaths` (the last layout's)
+ * hands them back. → { result: { flagParts: Map(territory id → [{ id, d }]), flagPatterns }, paths }
+ */
+function layoutBanners(components, markOf, { previousPaths = null, idPrefix = '' } = {}) {
+  const flagParts = new Map(), flagPatterns = [], paths = new Map();
   for (const component of components) {
-    const owner = playing ? teams[component.ownerId] : null;
-    const nationId = playing ? owner?.flagId : NATIONS[component.ownerId] ? component.ownerId : DEPENDENCIES[component.ownerId]?.of;
-    const crestUrl = crestOf(owner);
+    const { crestUrl = null, nationId = null, color = V4.flagBg } = markOf(component.ownerId) || {};
     const url = crestUrl || flagUrl(nationId);
     if (!url) continue;
     // Owner + the lowest stable piece id is short and unique, including when
     // a country's mainland and overseas polygons need different flag tiles.
-    const id = component.key.split('|').slice(0, 2).join('-').replace(/[^a-zA-Z0-9_-]/g, '-');
+    const id = idPrefix + component.key.split('|').slice(0, 2).join('-').replace(/[^a-zA-Z0-9_-]/g, '-');
     const b = component.bbox;
     const symbolProfile = crestUrl ? CREST_PROFILE : FLAG_SYMBOLS[FLAG_CODES[nationId]];
     const symbolLayout = symbolProfile ? layoutFlagSymbol(component, symbolProfile) : null;
-    // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
-    flagPatterns.push({ id, ownerId: component.ownerId, url, color: owner?.col || V4.flagBg,
-      symbolProfile, symbolLayout, crestUrl,
+    flagPatterns.push({ id, ownerId: component.ownerId, url, color, symbolProfile, symbolLayout, crestUrl,
       fieldUrl: symbolProfile?.fieldFile ? `${import.meta.env.BASE_URL}${symbolProfile.fieldFile}` : null,
       symbolUrl: symbolProfile?.symbolFile ? `${import.meta.env.BASE_URL}${symbolProfile.symbolFile}` : null,
       bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
@@ -156,9 +142,68 @@ export function mapFlags(playing) {
       flagParts.get(part.countryId).push({ id, d });
     }
   }
-  const result = { flagParts, flagPatterns };
+  return { result: { flagParts, flagPatterns }, paths };
+}
+
+/** The flag region index of this fit, built on its first Flags view (fitMap keeps only its source). */
+function flagIndex(app) {
+  if (!app.flagComponents && app.flagRegionSource) {
+    app.flagComponents = createFlagRegionIndex(app.flagRegionSource.geometry, { maxGap: app.flagRegionSource.maxGap });
+  }
+  return app.flagComponents;
+}
+
+/** One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest. */
+export function mapFlags(playing) {
+  const { mapMode, teams } = this.state;
+  if (mapMode !== 'flags') return NO_FLAGS;
+  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return NO_FLAGS;
+  if (!flagIndex(this)) return NO_FLAGS;
+  // While signing, the projected board: the taken land already flies the winner's banner (DEC D15).
+  const components = this.flagComponents.components(playing ? mapSnapshot(this).own : this.setupFlagOwnership);
+  const cached = this.flagLayoutCache;
+  if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
+  const { result, paths } = layoutBanners(components, ownerId => {
+    const owner = playing ? teams[ownerId] : null;
+    // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
+    return { crestUrl: crestOf(owner), color: owner?.col || V4.flagBg,
+      nationId: playing ? owner?.flagId : NATIONS[ownerId] ? ownerId : DEPENDENCIES[ownerId]?.of };
+  }, { previousPaths: cached?.paths });
   this.flagLayoutCache = { components, teams, playing, result, paths };
   return result;
+}
+
+/** Banner ids of the setup map card: apart from the campaign map's, which stays mounted behind the wizard. */
+const SETUP_FLAG_PREFIX = 'setup-';
+/**
+ * Step 1's map card in Flags mode: every starting team's flag (a nation) or crest (a club) across the land it holds at
+ * kick-off, one banner per region exactly as the campaign's Flags mode draws it (mapFlags), on the board the card
+ * shows: a world theatre's (`setupMapPreview`) or the chosen country's once it is on screen (`domesticStatus`).
+ * `fills` gives a club's land its colour, the ground behind its crest or, with no crest, all it shows. Render-safe;
+ * memoised per board. → { flagParts, flagPatterns, fills: Map(territory id → colour) } | null
+ */
+export function setupMapFlags(setup = this.state.setup) {
+  if (!this.geo || !this.flagRegionSource) return null;
+  if (!this.setupMapPreview(setup) && !this.domesticStatus(setup).preview) return null;
+  this.setupTeams(setup);
+  const { opening, marks } = this.setupTeamsCache;
+  const index = flagIndex(this);
+  const cached = this.setupFlagCache;
+  if (cached?.index === index && cached.opening === opening && cached.marks === marks) return cached.result;
+  const { result, paths } = layoutBanners(index.components(opening), ownerId => {
+    const team = marks[ownerId];
+    if (!team) return null;
+    return team.kind === 'club' ? { crestUrl: clubLogoUrl(ownerId), color: team.col || V4.flagBg }
+      : { nationId: team.flagId, color: team.col || V4.flagBg };
+  }, { previousPaths: cached?.index === index ? cached.paths : null, idPrefix: SETUP_FLAG_PREFIX });
+  const fills = new Map();
+  for (const [territory, ownerId] of Object.entries(opening)) {
+    const team = marks[ownerId];
+    if (team?.kind === 'club' && team.col) fills.set(territory, team.col);
+  }
+  const value = { ...result, fills };
+  this.setupFlagCache = { index, opening, marks, result: value, paths };
+  return value;
 }
 
 /**

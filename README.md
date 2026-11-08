@@ -216,7 +216,11 @@ manager of the theatre's favourite, with decisions from the first match.
    (choosing it switches Teams to nations and disables Clubs). Women's football's clubs
    offer its five leagues, the Rest of Europe, all of them or the strongest 32. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
-   the campaign's opening camera frames it (the continent for Europe). Its foot
+   the campaign's opening camera frames it (the continent for Europe). The map
+   zooms and pans like the campaign's: scroll or pinch, drag, and double-click
+   or the −/+/reset buttons (phones pinch). Its **Political** / **Flags** switch
+   (**Crests** with clubs) puts each team's flag or club crest on its land, as
+   the campaign's Flags mode does. Its foot
    shows the number of teams, the number of matches and the estimated length
    (the length's title names the Show matches mode the estimate assumes). With
    clubs in football, the **One country · top clubs** dropdown under the
@@ -453,7 +457,8 @@ Map modes:
 | **Fronts** | Your fronts tinted by your win chance (green / amber / red); other land is neutral. |
 | **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours. |
 
-The map mode is not saved: a reloaded campaign opens on Political. Hovering land
+The map mode is not saved: a reloaded campaign opens on Political. The setup
+map's own Political / Flags switch does not carry into the campaign. Hovering land
 shows its owner, since when it has been held and the deciding result. Clicking
 land opens that team's squad.
 
@@ -684,7 +689,7 @@ relocate or repeat the emblem. Other flags and the small UI flag chips retain
 their original artwork.
 
 Scroll to zoom (up to 16×, anchored on the pointer), drag to pan, double-click or
-press the zoom readout to reset. The view is clamped to the world, so the map
+press the zoom readout to reset; the setup screen's map card works the same way. The view is clamped to the world, so the map
 cannot be lost off-screen. Borders, labels and markers hold a constant weight on
 screen at every zoom level. The v4 map has no scale bar or coordinate readout.
 
