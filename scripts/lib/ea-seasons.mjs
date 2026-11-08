@@ -7,7 +7,7 @@
 // buildEaSeason reads the FIFA 15 – EA FC 24 export, buildSnapshotEaSeason the committed EA FC 26 snapshot and
 // scripts/lib/ea-legacy-seasons.mjs joins the FIFA 07 – FIFA 14 sources. All hand their players to assembleEaSeason,
 // so every season is made the same way.
-import { NATIONS, selectLineup } from '../../src/data/teams.js';
+import { NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../../src/data/eaPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
 import { FOOTBALL_SET_FORMAT, contentHash, presentClubs, serializeFootballSet, territoryFor } from '../../src/data/footballSetBuild.js';
@@ -155,7 +155,12 @@ export function assembleEaSeason(records, { id, year, edition, update, source, f
   const pools = new Map();
   for (const player of players) if (player.nationId) (pools.get(player.nationId) || pools.set(player.nationId, []).get(player.nationId)).push(player);
   const nations = {}, nationAudit = [];
+  // Tonga, Samoa and the Cook Islands are listed only when the edition rates a player of theirs, and no edition does:
+  // without them a season plays as on the map it was built for, where they field no team (src/engine/footballSets.js),
+  // and every season rebuilds byte for byte.
+  const islands = PACIFIC_ISLANDS.some(nation => pools.get(nation)?.length);
   for (const [nation, rec] of Object.entries(NATIONS)) {
+    if (!islands && PACIFIC_ISLANDS.includes(nation)) continue;
     const pool = pools.get(nation) || [];
     const squad = pickFootballSquad(pool);
     const lineup = selectLineup({ sport: 'football', squad });

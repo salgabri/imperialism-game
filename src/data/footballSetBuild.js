@@ -5,7 +5,7 @@
 // folder and writes the results, and tests build sets from synthetic folders.
 // Every player written is a stored CM record that rebuilds exactly from its tuple; a
 // nation with fewer than eleven natural players keeps exactly the ones it has.
-import { NATIONS, selectLineup } from './teams.js';
+import { NATIONS, PACIFIC_ISLANDS, selectLineup } from './teams.js';
 import { CM_CONVERSION, CM_SCALE, cmNaturalPositions, cmTupleOf, expandCmTuple } from './cmPlayers.js';
 import { cmMonthDay, decodeCmDate, fileSignature, readCm0102 } from './cm0102.js';
 import { CM0102_RELEASES } from './cm0102Releases.js';
@@ -359,7 +359,11 @@ export function buildFootballSet(files, {
   const pools = new Map();
   for (const player of players) if (player.nationId) (pools.get(player.nationId) || pools.set(player.nationId, []).get(player.nationId)).push(player);
   const nations = {}, nationAudit = [];
+  // Tonga, Samoa and the Cook Islands are listed only when the database rates a player of theirs; without them they
+  // field no team (src/engine/footballSets.js), as in an EA season.
+  const islands = PACIFIC_ISLANDS.some(id => pools.get(id)?.length);
   for (const [id, rec] of Object.entries(NATIONS)) {
+    if (!islands && PACIFIC_ISLANDS.includes(id)) continue;
     const pool = pools.get(id) || [];
     const squad = pickFootballSquad(pool);
     const lineup = selectLineup({ sport: 'football', squad });
@@ -421,7 +425,7 @@ export function buildFootballSet(files, {
   };
   const summary = [
     `${doc.id}: ${database.label}, season ${database.season} (${database.known ? 'known database' : `named by flags${database.defaulted.length ? `; defaulted ${database.defaulted.join(', ')}` : ''}`})`,
-    `National squads: ${coverage.completeXIs}/${Object.keys(NATIONS).length} complete natural XIs, ${coverage.nations} nations with players, ${coverage.players} players written`,
+    `National squads: ${coverage.completeXIs}/${Object.keys(nations).length} complete natural XIs, ${coverage.nations} nations with players, ${coverage.players} players written`,
     `Clubs: ${clubs.length} (${leagueAudit.map(l => `${l.league} ${l.clubs}`).join(', ')})`,
     `Birth shift ${signed(dobShift)} from ${shiftSource}; famous players: ${oracle.matches} found, ${oracle.agreeing} agree${oracle.shift == null ? '' : ` on ${signed(oracle.shift)}`}`
       + `${oracle.duplicates ? ` (${oracle.duplicates} more stored ${oracle.duplicates > 1 ? 'copies' : 'copy'} not counted)` : ''}`,

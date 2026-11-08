@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { NATIONS } from '../src/data/teams.js';
+import { NATIONS, PACIFIC_ISLANDS } from '../src/data/teams.js';
 import { CM_ROLES, cmTupleOf, expandCmTuple } from '../src/data/cmPlayers.js';
 import { fileSignature } from '../src/data/cm0102.js';
 import { CM0102_RELEASES as databases } from '../src/data/cm0102Releases.js';
@@ -282,7 +282,8 @@ test('a famous player stored twice counts once towards a conclusive birth shift'
 test('a data set has every game nation, its source block and a content version', () => {
   const { doc, text } = build();
   assert.deepEqual(Object.keys(doc), ['format', 'id', 'version', 'year', 'season', 'label', 'local', 'source', 'nations', 'clubs', 'territory', 'coverage']);
-  assert.deepEqual(Object.keys(doc.nations).sort(), Object.keys(NATIONS).sort());
+  // Every game nation; Tonga, Samoa and the Cook Islands only when the database rates one of theirs, as this one does not.
+  assert.deepEqual(Object.keys(doc.nations).sort(), Object.keys(NATIONS).filter(id => !PACIFIC_ISLANDS.includes(id)).sort());
   assert.deepEqual(doc.nations['076'], [40, 0, []]);
   for (const [id, [strength, pool, squad]] of Object.entries(doc.nations)) {
     assert.ok(Number.isInteger(strength) && strength >= 1 && strength <= 99, id);
@@ -340,6 +341,18 @@ test('players of teamless nations stay at clubs; the dropped are counted', () =>
   assert.equal(england.pool, doc.nations['826'][1]);
   assert.equal(england.naturalLineup, true);
   assert.equal(audit.nations.filter(n => n.naturalLineup).length, doc.coverage.completeXIs);
+});
+
+test('a database that rates a player of Tonga, Samoa or the Cook Islands lists all three', () => {
+  const db = sampleDatabase({ birthYearShift: 6 });
+  db.nations.push({ name: 'Tonga', short: 'Tonga', code: 'TON', continent: 0 });
+  db.people.push({ first: 'Sione', second: 'Fixturefake', dob: { year: 0, dayOfYear: 0 }, yearOfBirth: 0, nation: db.nations.length - 1,
+    club: -1, job: 11, player: { ca: 70, ratings: { gk: 20 } } });
+  const { doc, audit } = build(db);
+  assert.deepEqual(doc.nations['776'][2].map(t => [t[1], t[5]]), [['Sione Fixturefake', 'Tonga']]);
+  assert.deepEqual([doc.nations['882'], doc.nations['184']], [[40, 0, []], [40, 0, []]]);
+  assert.deepEqual(Object.keys(doc.nations).sort(), Object.keys(NATIONS).sort());
+  assert.ok(!Object.hasOwn(audit.noTeam, 'Tonga'), 'CM\'s Tonga is the game\'s now');
 });
 
 test('a duplicated person is kept once, at a club; namesakes without a date both stay', () => {
@@ -460,7 +473,8 @@ test('every set the builder writes loads in the game (decodeFootballSet)', () =>
     assert.equal(decoded.meta.version, doc.version);
     assert.deepEqual(Object.keys(decoded.rosters).sort(), Object.keys(NATIONS).sort());
     assert.deepEqual(decoded.clubs.map(c => c.id), doc.clubs.map(c => c.id));
-    assert.deepEqual(decoded.territory, doc.territory);
+    // No fixture database rates an islander: the islands field no team.
+    assert.deepEqual(decoded.territory, { merged: doc.territory.merged, inactive: [...doc.territory.inactive, ...PACIFIC_ISLANDS] });
   }
   assert.deepEqual([sets[2].doc.label, sets[2].doc.source.version, sets[2].doc.source.provider], ['CM 01/02 · Padded', 'Padded', 'CM 01/02 Update Team']);
   assert.equal(sets[3].doc.year, 2100);

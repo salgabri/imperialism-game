@@ -19,8 +19,11 @@ Pick your sport at kick-off:
 
 And pick who fights:
 
-- **Nations** — 173 national teams, each starting on its own homeland. England,
+- **Nations** — 176 nations on the map, each team starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
+  A sport fields 173 at most: basketball, baseball and ice hockey play Great Britain as one,
+  and football leaves out Tonga, Samoa and the Cook Islands, whose players no source rates
+  ([Pacific islands](docs/design/pacific-islands.md)).
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs, all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
@@ -197,7 +200,7 @@ manager of the theatre's favourite, with decisions from the first match.
 
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
-   choices are the whole world (173 nations), another confederation, or the
+   choices are the whole world (173 nations in football), another confederation, or the
    Elite 32. Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada, American football (clubs only: choosing it
@@ -677,8 +680,11 @@ the committed EA SPORTS FC 27 snapshot (EA's ratings site as of 1 November 2026;
 the date shown as its rating date) from [EFEM.club](https://efem.club/players),
 retrieved on 2 October 2026. FM is a season behind EA until a Football Manager
 27 database is available.
-All **173 nations field eleven source-backed players** (1,257 EA and 646 FM
-shirts), with natural coverage for a 4-4-2. The builder prioritises unchanged EA
+All **173 nations football fields have eleven source-backed players** (1,257 EA and 646 FM
+shirts), with natural coverage for a 4-4-2. The map's other three, Tonga, Samoa and the
+Cook Islands, field no team, and their land stays neutral, as in women's football: EA FC 27
+rates none of their players, and the FM 26 snapshot was taken before they were on the map
+([Pacific islands](docs/design/pacific-islands.md)). The builder prioritises unchanged EA
 overall ratings and uses FM to fill coverage gaps. It retains database IDs,
 full/display names, all natural roles, source URLs, versions, dates and original
 ratings through transfers and saves. An FM player fills a gap only when he is not
@@ -971,12 +977,13 @@ from these services at runtime.
 
 `public/domestic/ATTRIBUTION.txt` is generated with every build and lists each
 country's boundary source and licence, its cuts and fills, plus the GeoNames,
-Wikidata and EFEM notes. 128 of the game's 173 nations ship, with 4,184 clubs (8
+Wikidata and EFEM notes. 128 of the game's 176 nations ship, with 4,184 clubs (8
 countries have 100, four have ten); the maps total 18.8 MB (46–250 KB each), and
 a session fetches only the one chosen. 42 nations have fewer than ten viable clubs,
 from Bhutan's nine to none in Sri Lanka and Cuba, so they do not ship
-([the list](docs/design/domestic-campaigns.md#tiers)), and Scotland, Wales and
-Northern Ireland have no club data yet. All of them still play as nations.
+([the list](docs/design/domestic-campaigns.md#tiers)), and Scotland, Wales,
+Northern Ireland, Tonga, Samoa and the Cook Islands have no club data yet. All of them
+still play as nations where a sport fields them.
 
 **How sections are built.** For each country the builder takes the coarsest
 boundary level with at least 200 units (twice the 100 sections), or else the
@@ -1250,8 +1257,10 @@ considered, back to 1872, and their terms.
     before 2002.
   - It reads the binary files with the game's own parser (`src/data/cm0102.js`,
     format in [cm0102-format.md](docs/design/cm0102-format.md)).
-  - Every one of the 173 nations gets an entry, and clubs come from the seven
-    leagues the club layer already uses.
+  - Every one of the 176 nations gets an entry, and clubs come from the seven
+    leagues the club layer already uses. Tonga, Samoa and the Cook Islands are
+    left out when the database rates none of their players: a season without them
+    fields no team of theirs, as in every built-in EA season (none rates one).
   - Ratings are CM's current ability (1–200) converted once with
     `round(ca * 99 / 200)`. Natural positions are the slots rated 20.
   - It never invents a player or a rating. It stops on an unmapped nation unless
@@ -1470,12 +1479,12 @@ for real-app integration coverage.
 
 ## Capital data and dependencies
 
-`src/data/capitals.js` holds lon/lat for all 173. Coastline generalisation at
+`src/data/capitals.js` holds lon/lat for all 176. Coastline generalisation at
 110m in the rule geometry leaves some real capitals fractionally offshore, so a
 capital that misses its own outline is walked toward the country's centre until
-it lands; 169 of 173
+it lands; 171 of 176
 anchor on the city itself and the rest fall back to the centroid rather than
-stranding a marker at sea.
+stranding a marker at sea (Apia, just off Upolu's generalised coast, is one).
 
 Overseas territory is declared in `DEPENDENCIES` in `src/data/teams.js`. It
 fields no team of its own, flies its parent's flag, and is annexed and lost with
@@ -1525,6 +1534,17 @@ SHA-256; `--check` rebuilds offline and compares. Saves from before the cut (v1�
 give the new shapes to whoever held 826, CM 01/02 data sets built before it let
 England hold them, and basketball, where Great Britain is one FIBA team, plays
 the United Kingdom as one.
+
+The 110m atlas also leaves out Tonga (776), Samoa (882) and the Cook Islands (184),
+which field national teams; the 50m atlas draws all three. The same build copies
+each of their rings from the 50m atlas onto the 110m grid, as arcs of their own
+after every other shape, so the rules map holds the outline the map draws: Tonga's
+Tongatapu, ʻEua and Vavaʻu, Samoa's Upolu and Savaiʻi, and Rarotonga, the only one
+of the Cook Islands at 1:50m and the smallest shape on the map (58 km²). They border
+nobody, so they are reached by sea. A campaign saved before them has no owner for
+them: they load as neutral land, as nations outside a theatre are, and nothing is
+migrated. See [Pacific islands](docs/design/pacific-islands.md) for which sports
+field them and what that changes.
 
 Closed coastline rings are clipped at ±180° longitude before projection, so
 date-line crossings cannot create diagonal closure wedges through Russia or
@@ -1638,7 +1658,7 @@ src/
     americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
     baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings
     index.js           the registry, and each sport's clock and tie-break copy (clockLabel, overtimeText)
-  data/teams.js        173 nations: identity, squad building
+  data/teams.js        176 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
@@ -1692,7 +1712,7 @@ public/
   baseball/            the built-in earlier baseball seasons (mlb-the-show-*.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
-  flags/               173 vendored flag SVGs
+  flags/               176 vendored flag SVGs
   club-logos/          club crests from Wikipedia, with SOURCES.tsv
   favicon.svg          site icon (npm run build:icons renders favicon.ico and apple-touch-icon.png)
   og-image.png         1200×630 link-preview card
@@ -1798,6 +1818,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `win-probability` | The live win-probability model against the football and basketball match models |
 | `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
+| `pacific-islands` | Tonga, Samoa and the Cook Islands: the rules map's rings from the 50m map, their nations, which sports field them, and world wars with them playing or neutral |
 | `error-boundary` | The crash screen: a render error shows it with focus on its heading, Export campaign downloads the stored checkpoint unchanged, and the report link carries the error |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |

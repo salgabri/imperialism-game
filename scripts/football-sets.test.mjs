@@ -9,6 +9,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { SAVE_KEY } from '../src/config.js';
 import { CAPITALS } from '../src/data/capitals.js';
+import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { CM_CONVERSION, expandCmTuple } from '../src/data/cmPlayers.js';
 import { expandFmTuple } from '../src/data/fmPlayers.js';
 import { DEPENDENCIES, NATIONS, buildClub, buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
@@ -133,6 +134,8 @@ test('anything the builder would not write is refused with a reason', () => {
     [doc => { doc.source.rawScale = 100; }, /rawScale/],
     [doc => { doc.source.conversion = 'ca'; }, /conversion/],
     [doc => { delete doc.nations['250']; }, /missing 250/],
+    // A set that lists one of the islands was built for the map that has them: it lists all three.
+    [doc => { delete doc.nations['776']; }, /missing 776/],
     [doc => { doc.nations.XYZ = [40, 0, []]; }, /unknown ids XYZ/],
     [doc => { doc.nations['250'][0] = 0; }, /strength/],
     [doc => { doc.nations['250'][0] = Number.NaN; }, /strength/],
@@ -177,6 +180,24 @@ test('anything the builder would not write is refused with a reason', () => {
   // Release variants take a suffix.
   const variant = syntheticSet({ id: 'cm0102-2012-03-odb', year: 2012 });
   assert.equal(decodeFootballSet(variant, variant.id).meta.season, '2011/12');
+});
+
+test('a set built before Tonga, Samoa and the Cook Islands were on the map lists none of them: they field no team', () => {
+  const islands = ['184', '776', '882'];
+  const older = structuredClone(SET);
+  for (const id of islands) delete older.nations[id];
+  const sport = seasonSport(decodeFootballSet(older, ID));
+  assert.deepEqual(sport.territory.inactive, ['KOS', '776', '882', '184'], 'inactive, as on the map the set was built for');
+  assert.ok(islands.every(id => !fieldedNations(sport).includes(id) && sport.rosters[id][2].length === 0));
+  // A set that lists them fields them, here with the fake database's players.
+  const current = seasonSport(decodeFootballSet(structuredClone(SET), ID));
+  assert.ok(islands.every(id => fieldedNations(current).includes(id) && current.rosters[id][2].length === 11));
+  // Every built-in earlier season predates them, and no rated player of theirs is lost: EA rated none.
+  for (const { id } of BUILT_IN_SEASONS) {
+    const doc = JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
+    assert.ok(islands.every(island => !Object.hasOwn(doc.nations, island)), id);
+    assert.ok(islands.every(island => !fieldedNations(seasonSport(decodeFootballSet(doc, id))).includes(island)), id);
+  }
 });
 
 // ---------- the index and the loader ----------
@@ -285,7 +306,8 @@ test('seasonSport binds the set to the football sport; sportOf picks it only onc
   assert.deepEqual([empty.squad.length, empty.real, empty.str], [0, 0, 40], 'nobody is invented for an empty nation');
   assert.equal(buildClub(sport.clubs[0], sport).home, '826', 'a set club seeds from its country');
 
-  assert.equal(fieldedNations(football).length, Object.keys(NATIONS).length);
+  assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(football).includes(id)), ['184', '776', '882'],
+    'the built-in season fields every nation a source rates: none rates Tonga, Samoa or the Cook Islands');
   assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(sport).includes(id)).sort(), ['499', 'KOS']);
   assert.deepEqual(heldShapes(football), Object.entries(DEPENDENCIES).map(([shape, dep]) => [shape, dep.of]));
   assert.deepEqual(heldShapes(sport).at(-1), ['499', '688'], 'Montenegro starts with Serbia, after the dependencies');

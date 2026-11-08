@@ -8,7 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { NATIONS } from '../src/data/teams.js';
+import { NATIONS, PACIFIC_ISLANDS } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { EA_ROLES, eaRosterOf, eaTupleOf, expandEaTuple } from '../src/data/eaPlayers.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
@@ -112,7 +112,9 @@ test('a season is one edition\'s roster: nations by nationality, clubs by EA\'s 
   assert.equal(doc.nations['826'][2].length, 11);
   assert.deepEqual(doc.nations['203'][2].map(tuple => tuple[5]), ['Czech Republic', 'Czech Republic', 'Czech Republic']);
   assert.deepEqual(doc.nations['442'], [40, 0, []], 'a nation with no players is empty');
-  assert.equal(Object.keys(doc.nations).length, Object.keys(NATIONS).length, 'every nation has an entry');
+  // Tonga, Samoa and the Cook Islands only when the edition rates one of theirs, as no row here (and no EA edition) does.
+  assert.deepEqual(Object.keys(doc.nations).sort(), Object.keys(NATIONS).filter(id => !PACIFIC_ISLANDS.includes(id)).sort(),
+    'every nation has an entry');
   assert.deepEqual(audit.noTeam, { Malta: 2 }, 'Malta has no shape, so no team');
   assert.ok(!Object.values(doc.nations).some(([, , squad]) => squad.some(tuple => tuple[5] === 'Malta')));
   assert.deepEqual(doc.nations.SCO[2].map(tuple => tuple[5]), ['Scotland']);
@@ -135,6 +137,17 @@ test('a season is one edition\'s roster: nations by nationality, clubs by EA\'s 
   assert.deepEqual(set.rosters['826'][2][0][3].edition, 'FIFA 18');
   assert.deepEqual(set.clubs[0].squad.map(player => player[0]), doc.clubs[0].squad.map(tuple => tuple[1]));
   assert.equal(buildEaSeason(sampleRows(), EDITION, { dataset: DATASET }).text, text, 'the same rows build the same file');
+  // Without them the islands field no team, as on the map the seasons were built for.
+  assert.deepEqual(set.territory.inactive, PACIFIC_ISLANDS);
+});
+
+test('an edition that rates a player of Tonga, Samoa or the Cook Islands lists all three, and fields what it rates', () => {
+  const { doc } = buildEaSeason([...sampleRows(), row({ nationality_name: 'Samoa', player_positions: 'ST' })], EDITION, { dataset: DATASET });
+  assert.deepEqual(doc.nations['882'][2].map(tuple => tuple[5]), ['Samoa']);
+  assert.deepEqual([doc.nations['776'], doc.nations['184']], [[40, 0, []], [40, 0, []]]);
+  assert.equal(Object.keys(doc.nations).length, Object.keys(NATIONS).length);
+  // Listed, they are no longer inactive: each plays what the edition rates, as any other nation does.
+  assert.deepEqual(decodeFootballSet(structuredClone(doc)).territory.inactive, []);
 });
 
 test('the builder stops rather than guess', () => {

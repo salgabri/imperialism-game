@@ -2,7 +2,7 @@ import { C } from '../theme.js';
 import { ROSTERS } from '../data/rosters.js';
 import { CLUBS } from '../data/clubs.football.js';
 import { clamp, createScorerSampler, gauss, poisson } from '../engine/random.js';
-import { selectLineup } from '../data/teams.js';
+import { NATIONS, selectLineup } from '../data/teams.js';
 
 const MINUTES = 90;
 /**
@@ -171,6 +171,10 @@ export const football = {
   positionPlan: ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'],
   positionColors: { GK: C.gold, DF: C.cyan, MF: C.green, FW: C.red },
 
+  // Nothing here is invented: a nation no source rates fields no team, and its land stays neutral, as in women's
+  // football. Tonga, Samoa and the Cook Islands are the three: EA FC 27 rates none of their players, and the FM 26
+  // snapshot was taken before they were on the map.
+  territory: { merged: {}, inactive: Object.keys(NATIONS).filter(id => !ROSTERS[id]?.[2]?.length) },
   /** Hand-tuned national strength for the nations with no dataset entry. */
   fallbackStrength: (rec, confMeta) => rec[4] || confMeta[rec[2]].baseStr,
   requiredPositions: ['GK'],
