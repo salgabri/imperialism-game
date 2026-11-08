@@ -220,6 +220,8 @@ function wonLine(entry, ownerId) {
  * A country map names its sections (`ctx.sectionNames`): "Home of Burnley" on a club's home section, and in setup
  * the club starting there (`ctx.homeClubs`: "Home of Burnley" on its home section, "Burnley starts here" on the rest of
  * its starting group), else "Awaiting campaign"; an unheld section reads "Unclaimed".
+ * Empty land a team has claimed (`st.claims`, named by `ctx.claimNames` where the map names it) reads "Claimed by
+ * Italy" and "Not a territory".
  * → { visible, name, held, result, link }.
  */
 export function tooltipModel(st, ctx = {}, cid) {
@@ -227,11 +229,14 @@ export function tooltipModel(st, ctx = {}, cid) {
   if (!cid) return hidden;
   const section = ctx?.sectionNames?.[cid] || null;
   const nation = NATIONS[cid], dependency = DEPENDENCIES[cid];
-  if (!section && !nation && !dependency) return hidden;
-  const name = section || nation?.[0] || dependency.name;
+  const claimName = ctx?.claimNames?.get?.(cid) || null;
+  if (!section && !nation && !dependency && !claimName) return hidden;
+  const name = section || nation?.[0] || dependency?.name || claimName;
   const playing = isPlaying(st);
   const ownerId = playing ? st.own?.[cid] : null;
   const owner = ownerId ? st.teams?.[ownerId] : null;
+  const claimant = playing && !owner ? st.teams?.[st.claims?.[cid]] : null;
+  if (claimant) return { visible: true, name, held: `Claimed by ${claimant.name}`, result: 'Not a territory', link: null };
   if (!owner) {
     const starting = section && !playing ? ctx?.homeClubs?.[cid] : null;
     const held = !starting ? (playing ? section ? 'Unclaimed' : 'Not in this theatre' : 'Awaiting campaign')

@@ -65,6 +65,22 @@ const Backdrop = memo(function Backdrop({ shapes }) {
   );
 });
 
+/**
+ * Claimed land in a country map's backdrop (app/claimMethods.js): empty land painted over the backdrop exactly as its
+ * holder's territory is, with the backdrop's own thin lines between its shapes (the fill and stroke attributes repeat
+ * map.css). Hovering it names its holder (App's tooltip); it is never a target, so it takes no clicks or focus.
+ */
+const ClaimedLand = memo(function ClaimedLand({ claims }) {
+  if (!claims?.length) return null;
+  return (
+    <g className="claimed-land" aria-hidden="true">
+      {claims.map(claim => <path key={claim.id} data-claim={claim.id} data-owner={claim.ownerId} d={claim.d}
+        fill={claim.fill} stroke={PAINT.coast} style={{ fill: themedPaint(claim.fill) }}
+        onMouseEnter={claim.onEnter} onMouseLeave={claim.onLeave} />)}
+    </g>
+  );
+});
+
 /** Five-point star, first point straight up (v4 `star(cx, cy, R, r)`). */
 export function starPath(cx, cy, outer, inner) {
   let d = '';
@@ -207,6 +223,8 @@ export default function WorldMap({
   wholeMap = false, onWholeMap, anchors = EMPTY,
   // A country map: its neighbouring land (inert backdrop) and every home town shown at any zoom.
   backdrop = EMPTY, showAllHomes = false,
+  // Empty land a team has claimed without holding it: [{ id, ownerId, d, fill, onEnter, onLeave }].
+  claims = EMPTY,
   // Accepted for the App contract but not drawn in v4 (PLAN §3.5, DEC D21): battle scars, km scale, LAT/LON, legend, title.
   battleMarks, kmPerUnit, coordRef, legend, title,
 }) {
@@ -342,7 +360,9 @@ export default function WorldMap({
     lastTip.current = { context: tipContext, visible: !!tip.visible };
     if (previous.context !== tipContext && (previous.visible || tip.visible)) onPointerLeave?.();
   });
-  const veiled = choosing ? countries.filter(c => !kept.has(c.ownerId)) : EMPTY;
+  // Claimed land is veiled with its holder's territory: a claimed nation by its painted holder, backdrop claims by theirs.
+  const veiled = choosing ? [...countries.filter(c => !kept.has(c.ownerId ?? c.claimOwnerId)),
+    ...(playing ? claims : EMPTY).filter(c => !kept.has(c.ownerId))] : EMPTY;
   const veiledIds = veiled.map(c => c.id).join(' ');
   // Every veiled shape in one path: rejoined only when the veiled land or the geometry changes, not per hover.
   const veilD = useMemo(() => veiled.map(c => c.d).join(' '), [veiledIds, labelGeometry]);
@@ -401,6 +421,8 @@ export default function WorldMap({
         <path className="map-graticule" d={graticule?.d || ''} fill="none" stroke={PAINT.white} strokeOpacity={.55}
           strokeWidth={.6 * k} pointerEvents="none" />
         <Backdrop shapes={backdrop} />
+        {/* A country map's claimed land lies in the backdrop; a world map paints its claimed nations as country shapes. */}
+        <ClaimedLand claims={playing ? claims : EMPTY} />
         <g className="country-shapes">
           {/* Hover: entering land shows its card; leaving it, or tabbing off it, drops that card (App's handleMapMove
               also drops it over the sea). A window blur has no relatedTarget and keeps the card. */}

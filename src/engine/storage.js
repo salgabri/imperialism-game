@@ -30,7 +30,7 @@ export const CHECKPOINT_KEYS = Object.freeze(['settings', 'round', 'matches', 'o
   'followedId', 'pauseFollow', 'choice', 'metrics', 'startedAt', 'completedAt', 'conquestIds',
   'campaignId', 'revision', 'campaignName', 'managedTeamId', 'managementEnded', 'managerElimination',
   'tacticalChoice', 'tactics', 'rules', 'historyFilter', 'selectedHistoryId', 'decisionLedger', 'initialSettings',
-  'turnQueue', 'turnIndex', 'pendingTarget']);
+  'turnQueue', 'turnIndex', 'pendingTarget', 'claims']);
 
 export function campaignSnapshot(state) {
   return { v: SAVE_VERSION, savedAt: Date.now(), ...Object.fromEntries(CHECKPOINT_KEYS.map(key => [key, state[key]])),
@@ -370,6 +370,9 @@ function validateCampaign(input, rebuildSources) {
       || Object.values(data.metrics.engagement).some(value => value != null && (!Number.isFinite(value) || value < 0)))) invalid('Campaign engagement metrics are invalid.');
   if (data.metrics?.leaderChanges != null && !nonnegative(data.metrics.leaderChanges)) invalid('Campaign leadership metrics are invalid.');
   if (data.fallen?.some(entry => !record(entry) || !known(entry.id) || !nonnegative(entry.r))) invalid('Campaign elimination history is incomplete.');
+  // Claimed land (engine/claims.js): land id -> a surviving team. The map's own land ids are checked when it is shown.
+  if (data.claims != null && (!record(data.claims) || Object.keys(data.claims).length > 1000
+      || Object.values(data.claims).some(id => !known(id) || !alive.has(id)))) invalid('Campaign claimed land is invalid.');
   const textValue = value => value == null || typeof value === 'string' || typeof value === 'number';
   const displayTeam = team => record(team) && typeof team.name === 'string' && textValue(team.score)
     && ['eff', 'code', 'color', 'id'].every(key => textValue(team[key]));

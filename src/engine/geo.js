@@ -104,10 +104,13 @@ export class WorldGeometry {
     this.legacy = lon0 === DEFAULT_PROJECTION.lon0 && lat0 === DEFAULT_PROJECTION.lat0;
     this.xScale = lat0 === DEFAULT_PROJECTION.lat0 ? PROJECTION_X_SCALE : Math.cos(lat0 * Math.PI / 180);
 
-    const { countries, adjacency } = decodeTopo(topo, options.object || 'countries');
+    const { countries, adjacency, borders, edges } = decodeTopo(topo, options.object || 'countries');
     this.countries = countries;
     /** country id -> Set of ids sharing a land border */
     this.adj = adjacency;
+    /** How long those borders are (country id -> Map(id -> length)), and each country's open edge (coast): see arcBorders. */
+    this.borders = borders;
+    this.edges = edges;
 
     // Lon/lat -> plane is fixed; only the fit transform changes between theatres,
     // so project every ring once and reuse it for each fitTo(). Keep this original
@@ -415,16 +418,10 @@ export class WorldGeometry {
   }
 }
 
-function decodeTopo(topo, objectName = 'countries') {
-  const objects = topo?.objects || {};
-  const collection = objects[objectName]?.type === 'GeometryCollection' ? objects[objectName]
-    : Object.values(objects).find(object => object?.type === 'GeometryCollection');
-  if (!collection || !Array.isArray(topo.arcs)) {
-    throw new Error(`Topology has no "${objectName}" GeometryCollection`);
-  }
-  // Quantized topologies delta-encode arcs; an unquantized one is absolute.
+/** A topology's arcs as absolute [lon, lat] points: quantized topologies delta-encode them, an unquantized one is absolute. */
+export function topologyArcs(topo) {
   const tr = topo.transform;
-  const arcs = topo.arcs.map(arc => {
+  return topo.arcs.map(arc => {
     if (!tr) return arc.map(p => [p[0], p[1]]);
     let x = 0;
     let y = 0;
@@ -434,6 +431,50 @@ function decodeTopo(topo, objectName = 'countries') {
       return [x * tr.scale[0] + tr.translate[0], y * tr.scale[1] + tr.translate[1]];
     });
   });
+}
+
+/** A [lon, lat] line's length in degrees of latitude (longitude scaled by the cosine of latitude): compare, never convert. */
+export function lineLength(points) {
+  let length = 0;
+  for (let i = 1; i < points.length; i++) {
+    const [lon0, lat0] = points[i - 1], [lon1, lat1] = points[i];
+    let dLon = Math.abs(lon1 - lon0);
+    if (dLon > 180) dLon = 360 - dLon;
+    length += Math.hypot(dLon * Math.cos((lat0 + lat1) / 2 * Math.PI / 180), lat1 - lat0);
+  }
+  return length;
+}
+
+/**
+ * How long each shape's borders are, from a topology's arc owners (arc index → shape ids, one entry per use): an arc
+ * two shapes share is a border between them, an arc only one shape uses is its open edge (a coast, or the edge of the
+ * topology's land). → { borders: { id: Map(other id → length) }, edges: { id: length } }, lengths as lineLength.
+ */
+export function arcBorders(arcs, arcOwners) {
+  const borders = {}, edges = {};
+  for (const ai in arcOwners) {
+    const owners = [...new Set(arcOwners[ai])];
+    const length = lineLength(arcs[ai] || []);
+    if (owners.length === 1 && arcOwners[ai].length === 1) edges[owners[0]] = (edges[owners[0]] || 0) + length;
+    for (const id of owners) {
+      for (const other of owners) {
+        if (other === id) continue;
+        const row = borders[id] || (borders[id] = new Map());
+        row.set(other, (row.get(other) || 0) + length);
+      }
+    }
+  }
+  return { borders, edges };
+}
+
+function decodeTopo(topo, objectName = 'countries') {
+  const objects = topo?.objects || {};
+  const collection = objects[objectName]?.type === 'GeometryCollection' ? objects[objectName]
+    : Object.values(objects).find(object => object?.type === 'GeometryCollection');
+  if (!collection || !Array.isArray(topo.arcs)) {
+    throw new Error(`Topology has no "${objectName}" GeometryCollection`);
+  }
+  const arcs = topologyArcs(topo);
   const ringFrom = idxs => {
     let pts = [];
     idxs.forEach((i, k) => {
@@ -481,7 +522,7 @@ function decodeTopo(topo, objectName = 'countries') {
       }
     }
   }
-  return { countries, adjacency };
+  return { countries, adjacency, ...arcBorders(arcs, arcOwners) };
 }
 
 const SEAM_EPSILON = 1e-8;

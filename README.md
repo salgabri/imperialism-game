@@ -289,7 +289,8 @@ manager of the theatre's favourite, with decisions from the first match.
 | Chaos draw | `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
 
 Blitz and chaos allow distant pairings without the directional route restrictions
-used in one-by-one mode. Neither mode annexes neutral land to connect teams.
+used in one-by-one mode. Neither mode annexes neutral land to connect teams; the
+empty land between a pair can only be [claimed](#claimed-land).
 
 A manager under Random draw or Round robin also chooses, on the Your role step,
 the **Opponent** rule, which decides who picks the opponent (`targeting`):
@@ -466,6 +467,32 @@ The map mode is not saved: a reloaded campaign opens on Political. The setup
 map's own Political / Flags switch does not carry into the campaign. Hovering land
 shows its owner, since when it has been held and the deciding result. Clicking
 land opens that team's squad.
+
+### Claimed land
+
+Land in a theatre that no team plays on (an American league's states without a
+club, a world theatre's nations that field no team, a Europe map's countries
+without a club) can be **claimed**. On the map it looks exactly like the team's
+territory, in every map mode (a claimed nation flies the team's flag and sits
+inside its borders), but it is never territory: it doesn't count in the
+standings, can't be targeted or clicked, changes no route or neighbour, and
+passes to whoever beats its holder. Land is claimed in two ways:
+
+- **Crossing.** The empty land a match's line of attack passes over goes to the
+  match's winner (a loser's land goes to the winner anyway). Blitz, chaos and the
+  final series draw no line; they use the route the attacker would take to that
+  opponent. A line that only grazes a corner claims nothing, and land another team
+  already claimed stays that team's.
+- **Landlocked.** A patch of empty land (one shape, or several neighbouring ones)
+  that borders one team only, and whose edge is mostly land rather than coast or
+  land outside the theatre, is that team's. In tennis, Lesotho (no team) is South
+  Africa's from kick-off; Ireland, which touches only Great Britain's Northern
+  Ireland but is mostly coast, stays empty. It is checked at kick-off and after every match, and
+  a patch one team claimed passes to another team that landlocks it.
+
+Hovering claimed land reads "Claimed by <team> · Not a territory". The share image
+shows the champion's claims the same way. A campaign saved before claims existed
+works them out when it resumes. Design notes: [claimed-land.md](docs/design/claimed-land.md).
 
 ### Match, squad and conquest screens
 
@@ -1869,7 +1896,8 @@ opponent, widening the cone only among unobstructed candidates. If the selected
 attacker has no legal straight-line route, a checked coastal sea polyline tries
 to connect its holdings to an enemy. If neutral enclosure prevents that route,
 an explicitly labelled **neutral transit treaty** permits crossing neutral land
-without claiming it. The displayed polyline follows the checked route. A draw
+without annexing it (the match's winner [claims](#claimed-land) it, which changes
+no rule). The displayed polyline follows the checked route. A draw
 retries an unreachable attacker without consuming extra random samples. These
 exceptions keep disconnected final opponents playable. Blitz and chaos use the
 batch pairing rules described above.

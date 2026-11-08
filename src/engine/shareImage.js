@@ -97,6 +97,11 @@ export async function drawShareCard(card, { window: win = globalThis } = {}) {
   for (const d of card.backdrop) ctx.fill(new win.Path2D(d));
   const paths = card.land.map(shape => new win.Path2D(shape.d));
   card.land.forEach((shape, i) => { ctx.fillStyle = shape.fill; ctx.fill(paths[i]); });
+  // The champion's claimed land, in its colour as on the map.
+  if (card.claimed?.length) {
+    ctx.fillStyle = card.claimFill;
+    for (const d of card.claimed) ctx.fill(new win.Path2D(d));
+  }
   ctx.strokeStyle = card.border.color;
   ctx.lineWidth = card.border.width;
   for (const path of paths) ctx.stroke(path);
