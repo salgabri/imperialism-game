@@ -3,8 +3,10 @@
 // `public/domestic/<id>.json` (format 1 or 2, see docs/design/domestic-campaigns.md),
 // validates it, and turns it into section geometry plus buildClub source rows.
 
-import { WorldGeometry } from './geo.js';
+import { WorldGeometry, arcBorders, topologyArcs } from './geo.js';
+import { createLand, touchingLand } from './claims.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
+import { NATIONS } from '../data/teams.js';
 import { SPORTS } from '../sports/index.js';
 
 export const DOMESTIC_PREFIX = 'domestic:';
@@ -164,10 +166,33 @@ export function decodeDomestic(data, id = data?.id) {
     };
   });
   const startOwners = Object.freeze(Object.fromEntries(clubs.flatMap(club => club.startSections.map(s => [s, club.id]))));
-  // Land no club starts on (topology.objects.empty), only ever drawn: see domesticSurroundings.
+  // Land no club starts on (topology.objects.empty), never territory: drawn (see domesticSurroundings) and claimed
+  // (domesticLand), with its neighbours among the sections and itself.
   const empty = topology.objects.empty?.geometries.length
     ? new WorldGeometry(topology, {}, { object: 'empty', projection: meta.projection, keepPolys: false }) : null;
-  return { meta, geo, clubs, sectionNames, focus: meta.focus, startOwners, empty };
+  return { meta, geo, clubs, sectionNames, focus: meta.focus, startOwners, empty, emptyBorders: empty ? emptyBorders(topology) : null };
+}
+
+/**
+ * Each empty-land shape's borders, with sections and other empty land alike, and its open edge: one topology holds
+ * both, so a shared border is a shared arc and an arc of its own is coast or the edge of the map's land.
+ * → { borders: { emptyId: Map(id → length) }, edges: { emptyId: length } } (geo.js arcBorders).
+ */
+function emptyBorders(topology) {
+  const owners = {};
+  for (const name of ['sections', 'empty']) {
+    for (const g of topology.objects[name]?.geometries || []) {
+      for (const polygon of g.type === 'Polygon' ? [g.arcs] : g.arcs) {
+        for (const ring of polygon) {
+          for (const i of ring) (owners[i < 0 ? ~i : i] ||= []).push(String(g.id));
+        }
+      }
+    }
+  }
+  const { borders, edges } = arcBorders(topologyArcs(topology), owners);
+  const ids = topology.objects.empty.geometries.map(g => String(g.id));
+  return { borders: Object.fromEntries(ids.map(id => [id, borders[id] || new Map()])),
+    edges: Object.fromEntries(ids.map(id => [id, edges[id] || 0])) };
 }
 
 /**
@@ -447,8 +472,48 @@ export function domesticSurroundings(atlas, domestic, margin = { x: 480, y: 800 
   const emptyShapes = empty ? shapesOf(empty.countries, id => (emptyPaths[id]?.labelRings || []).filter(near)) : [];
   const worldShapes = shapesOf(world.countries.filter(country => !hosts.has(country.id) || meta.boundaries?.mask), nearRings);
   // The masked host shape covers its own sections; overlaps elsewhere are
-  // harmless (sections take precedence over obstacles in routing).
-  const value = Object.freeze({ shapes: [...emptyShapes, ...worldShapes], obstacles: worldShapes.filter(shape => !hosts.has(shape.id)) });
+  // harmless (sections take precedence over obstacles in routing). `empty` and the
+  // atlas's land borders (`atlasNeighbours`) are what domesticLand claims from.
+  const value = Object.freeze({ shapes: [...emptyShapes, ...worldShapes], obstacles: worldShapes.filter(shape => !hosts.has(shape.id)),
+    empty: emptyShapes, atlasNeighbours: world.adj });
   surroundings.set(domestic, { atlas, key, value });
   return value;
+}
+
+// Claimable land per surroundings (one map and fit), built once.
+const lands = new WeakMap();
+
+/**
+ * The land a map's teams can claim without holding it (engine/claims.js), for `around`, its surroundings in the
+ * current fit: a sport's own map's empty land (the NBA's states without a club), or on a Europe map (`meta.theatre`)
+ * the European countries no club plays in, which lie beneath it as foreign land. A country map has none: every section
+ * is held and its neighbours are other countries. → createLand(...) or null.
+ */
+export function domesticLand(domestic, around) {
+  if (!domestic?.geo || !around) return null;
+  if (lands.has(around)) return lands.get(around);
+  let land = null;
+  const pathsOf = shapes => Object.fromEntries(shapes.map(shape => [shape.id, { labelRings: shape.rings, d: shape.d }]));
+  if (domestic.empty && domestic.emptyBorders) {
+    const names = Object.fromEntries(domestic.empty.countries.map(country => [country.id, country.name]));
+    const { borders, edges } = domestic.emptyBorders;
+    land = createLand({ ids: Object.keys(borders), neighbours: id => borders[id], edge: id => edges[id],
+      paths: pathsOf(around.empty || []), names: id => names[id] ?? null });
+  } else if (domestic.meta?.theatre) {
+    const shapes = (around.obstacles || []).filter(shape => NATIONS[shape.id]?.[2] === 'UEFA');
+    // The sections come from other boundaries than the atlas's countries, so each country's neighbours are found by
+    // looking just outside its edges: sections first, then the atlas (the two overlap along every border). The atlas's
+    // own land borders are exact: a short one the probes miss still joins its countries.
+    const sections = domestic.geo.countries.map(section => ({ id: section.id, rings: domestic.geo.paths[section.id]?.labelRings || [] }));
+    const touching = touchingLand(shapes, [...sections, ...around.obstacles]);
+    const neighbours = id => {
+      const found = new Map(touching.get(id)?.borders || []);
+      for (const other of around.atlasNeighbours?.[id] || []) if (!found.has(other)) found.set(other, 0);
+      return found;
+    };
+    land = createLand({ ids: shapes.map(shape => shape.id), neighbours, edge: id => touching.get(id)?.edge ?? 0,
+      paths: pathsOf(shapes), names: id => NATIONS[id]?.[0] ?? null });
+  }
+  lands.set(around, land);
+  return land;
 }

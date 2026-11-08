@@ -47,6 +47,14 @@
   vector-effect: non-scaling-stroke; stroke-linejoin: round;
 }
 
+/* Claimed land in a country map's backdrop: its holder's colour, exactly as its territory, with the backdrop's own
+   thin lines between its shapes. New claims fade in; a change of holder recolours. */
+.claimed-land path {
+  stroke: var(--map-coast); stroke-width: .6px; vector-effect: non-scaling-stroke; stroke-linejoin: round;
+  transition: fill .35s ease; animation: mapClaimIn 600ms ease-out both;
+}
+@keyframes mapClaimIn { from { fill-opacity: 0; } to { fill-opacity: 1; } }
+
 /* ---- your turn: out-of-reach land veiled (DEC D21, A-9) ---- */
 .reach-veil { fill: var(--map-veil); stroke: none; }
 
@@ -171,5 +179,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .conquest-hatch path { animation: none; }
-  .country-shapes path { transition: none; }
+  .country-shapes path, .claimed-land path { transition: none; }
+  .claimed-land path { animation: none; }
 }

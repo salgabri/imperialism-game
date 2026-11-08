@@ -41,6 +41,7 @@ import * as squadM from './app/squadMethods.jsx';
 import * as conqM from './app/conquestMethods.jsx';
 import * as turnM from './app/turnMethods.jsx';
 import * as ledgerM from './app/ledgerMethods.jsx';
+import * as claimM from './app/claimMethods.js';
 import TacticalChoice from './components/TacticalChoice.jsx';
 import ManagerElimination from './components/ManagerElimination.jsx';
 import CampaignStorageDialog from './components/CampaignStorageDialog.jsx';
@@ -138,6 +139,8 @@ export default class App extends React.Component {
     settings: { ...DEFAULT_SETUP },
     teams: {},
     own: {},
+    // Empty land coloured by a team without being its territory (app/claimMethods.js): land id -> team id.
+    claims: {},
     aliveIds: [],
     fallen: [],
     stats: {},
@@ -457,6 +460,15 @@ export default class App extends React.Component {
   surroundings(domestic) {
     return domesticSurroundings(this.worldAtlas(), domestic, BACKDROP_MARGIN);
   }
+
+  // Claimed land (app/claimMethods.js): empty land a team colours without holding it.
+  claimLand(...args) { return claimM.claimLand.apply(this, args); }
+
+  openingClaims(...args) { return claimM.openingClaims.apply(this, args); }
+
+  matchCrossings(...args) { return claimM.matchCrossings.apply(this, args); }
+
+  conquestClaims(...args) { return claimM.conquestClaims.apply(this, args); }
 
   /**
    * The 50m atlas with merged ids, parsed from its text the first time it is needed and then kept, never parsed
@@ -872,8 +884,12 @@ export default class App extends React.Component {
       const path = this.displayGeo?.paths[country.id] || this.geo.paths[country.id];
       return path ? { id: country.id, d: path.d, bbox: path.bbox } : null;
     }).filter(Boolean);
+    // The empty land the champion claimed, as the final map shows it.
+    const land = this.claimLand(st);
+    const claimed = land ? Object.keys(st.claims || {}).filter(id => st.claims[id] === champ.id && land.d.has(id))
+      .sort().map(id => ({ d: land.d.get(id) })) : [];
     const card = buildShareCard({
-      shapes, backdrop: this.domesticMap() ? this.backdrop : [], own: st.own, championId: champ.id, championName: champ.name,
+      shapes, backdrop: this.domesticMap() ? this.backdrop : [], own: st.own, championId: champ.id, championName: champ.name, claimed,
       // The colour the final map gives the champion: clay when it is the team you manage.
       fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill : politicalFill(champ.id),
       frame: this.viewFocus, seed: st.seed,
@@ -1198,6 +1214,8 @@ export default class App extends React.Component {
     this.useGeometry(domesticId);
     this.retainMaps(0);
     this.fitMap(Object.keys(own), su);
+    // Empty land a team already encloses at kick-off takes its colour.
+    const claims = this.openingClaims({ own, settings });
     this.setState(
       {
         phase: 'playing',
@@ -1216,6 +1234,7 @@ export default class App extends React.Component {
         challenge: null,
         teams,
         own,
+        claims,
         aliveIds: included.map(t => t.id),
         fallen: [],
         stats,
@@ -1295,6 +1314,8 @@ export default class App extends React.Component {
       pu: null, toast: null,
       teams: s.teams,
       own: s.own,
+      // A save from before claims (or from another build of the map) keeps what still fits and encloses afresh.
+      claims: this.openingClaims({ own: s.own, settings: { ...DEFAULT_SETUP, ...s.settings } }, s.claims),
       aliveIds: s.aliveIds,
       fallen: s.fallen || [],
       stats: s.stats || {},
@@ -1630,6 +1651,8 @@ export default class App extends React.Component {
         odds: { a: probabilities.attacker, b: probabilities.defender },
         series: series ? { aWins: series.wins[attackerId], bWins: series.wins[defenderId], bestOf: 3 } : null,
         routeLabel: route.routeLabel || '', routeKind: route.routeKind || 'straight',
+        // Empty land on the line of attack: its winner claims it (applyConquest).
+        crossed: this.matchCrossings(st, attackerId, defenderId, route),
         tactic: [attackerId, defenderId].includes(managedId) ? params.tactic : null,
         tacticalBonus: params.bonus, matchDrama: drama,
         express: this.fastPlayback(st) && !important,
@@ -2158,6 +2181,8 @@ export default class App extends React.Component {
 
   mapLabels(...args) { return mapM.mapLabels.apply(this, args); }
 
+  mapClaims(...args) { return mapM.mapClaims.apply(this, args); }
+
   mapHomes(...args) { return mapM.mapHomes.apply(this, args); }
 
   tooltip(...args) { return mapM.tooltip.apply(this, args); }
@@ -2240,7 +2265,7 @@ export default class App extends React.Component {
             conquestIds={this.mapConquestIds()} followedId={st.followedId} paused={st.paused} selectedId={st.selected}
             onShowDetails={() => this.showDetails()} focusBounds={st.focusBounds} focusKey={st.focusKey} focusLayout={st.focusLayout}
             tooltip={this.tooltip(playing)} kmPerUnit={0} legend={null} title={null}
-            backdrop={this.backdrop} showAllHomes={domesticMap}
+            backdrop={this.backdrop} showAllHomes={domesticMap} claims={this.mapClaims(playing)}
             viewResetKey={this.viewResetKey} initialFocus={this.mapInitialFocus()} nearFocus={this.mapNearFocus()}
             playing={playing} mapMode={st.mapMode} onMapMode={mapMode => this.setState({ mapMode })}
             meId={this.mapMeId()} opponentId={this.mapOpponentId()} reach={this.reachModel()}

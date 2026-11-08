@@ -182,6 +182,9 @@ export function applyConquest(playerIndex, decided = null) {
       taken.push(cid);
     }
   }
+  // Empty land is coloured, never taken: the loser's claims and the land this match crossed go to the winner, and
+  // land the new borders enclose to whoever encloses it (app/claimMethods.js). No territory count reads them.
+  const claims = this.conquestClaims(st, own, winnerId, loserId);
   const aliveIds = st.aliveIds.filter(t => t !== loserId);
 
   const stats = { ...st.stats };
@@ -269,6 +272,7 @@ export function applyConquest(playerIndex, decided = null) {
       ...decided,
       teams,
       own,
+      claims,
       aliveIds,
       stats,
       fallen: st.fallen.concat([{ id: loserId, r: st.round }]),
