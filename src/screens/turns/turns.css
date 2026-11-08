@@ -124,20 +124,13 @@
   text-align:right; font:600 var(--tp-spoils)/1 var(--font-narrow); font-variant-numeric:tabular-nums; color:var(--text-2);
 }
 .target-panel__win { text-align:right; font:700 var(--tp-win)/1 var(--font-narrow); font-variant-numeric:tabular-nums; }
-.target-panel__foot {
-  margin:10px 0 0; padding-top:12px; border-top:1px solid var(--rule);
-  font:400 12px/1.5 var(--font-sans); color:var(--muted);
-}
-.target-panel__foot b { font-weight:600; color:var(--you-text); }
 
 @media (min-width:1600px) {
   .target-panel { --tp-flag-w:24px; --tp-flag-h:18px; --tp-name:16px; --tp-eff:14px; --tp-spoils:15px; --tp-win:16px; }
-  .target-panel__foot { font-size:13px; }
 }
 @media (max-width:699.98px) {
   .target-panel { --tp-name:16px; }
   .target-panel__head { margin-top:6px; }
-  .target-panel__foot { display:none; }   /* the phone bar carries "Attack <team>" right below */
 }
 
 /* =========================================================================================================

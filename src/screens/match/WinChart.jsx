@@ -1,12 +1,36 @@
 // Owner: WP-MATCH (see PLAN.md §4). Live win-probability chart (B§1.5.1–1.5.2, B§2.5, DEC D6).
-// One 800×132 viewBox drawn at 100% width (956×158 at 1440, 358×59 on the phone); strokes are in viewBox units.
-import React from 'react';
+// One viewBox 800 wide at 100% width; strokes are in viewBox units. 132 tall on a phone (358×59); wherever the plot has
+// a box of its own to fill (compact pass: the Match view at ≥700) the viewBox takes that box's shape, so the chart grows
+// without stretching its lines and markers.
+import React, { useEffect, useRef, useState } from 'react';
 import { winSeries, chartGeometry } from '../../engine/winProbability.js';
 import { formatWinChance } from '../../viewModels/format.js';
 import { useMatchMinute } from './useMatchMinute.js';
 import { clockLabel, clockTick, getSport } from '../../sports/index.js';
 
-const W = 800, H = 132;
+const W = 800, BASE_H = 132, MAX_H = 480;
+
+/** The viewBox height that matches the plot's box, while CSS lays the drawing out to fill it (position:absolute). */
+function usePlotHeight() {
+  const plotRef = useRef(null);
+  const [height, setHeight] = useState(BASE_H);
+  useEffect(() => {
+    const plot = plotRef.current;
+    const view = plot?.ownerDocument?.defaultView;
+    if (!plot || typeof view?.ResizeObserver !== 'function') return undefined;
+    const measure = () => {
+      const svg = plot.querySelector('svg');
+      if (!svg || view.getComputedStyle(svg).position !== 'absolute') { setHeight(BASE_H); return; }
+      const { width, height: boxHeight } = svg.getBoundingClientRect();
+      if (width > 0 && boxHeight > 0) setHeight(Math.max(BASE_H, Math.min(MAX_H, Math.round(W * boxHeight / width))));
+    };
+    measure();
+    const observer = new view.ResizeObserver(measure);
+    observer.observe(plot);
+    return () => observer.disconnect();
+  }, []);
+  return [plotRef, height];
+}
 
 /** Axis length: regulation, extended by whole overtime periods once the clock passes it. */
 function axisLength(length, ot, minute) {
@@ -35,6 +59,7 @@ function safeSeries(args) {
 export default function WinChart({ sport = 'football', live = false, model = null, goals = [], perspective = null, final = null,
   length = 90, ot = 0, chartNote = null, aId = null, dId = null, minuteStore = null, minuteFallback = 0, minuteFloor = 0 }) {
   const minute = useMatchMinute({ live, minuteStore, minuteFallback, minuteFloor });
+  const [plotRef, H] = usePlotHeight();
   const reactId = React.useId();
   const patternId = `match-hatch-${reactId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const series = React.useMemo(() => (model
@@ -79,8 +104,8 @@ export default function WinChart({ sport = 'football', live = false, model = nul
         <h2 className="kicker__title match-chart__label" id={`${patternId}-label`}>{label}</h2>
         <span className="match-chart__value">{value}</span>
       </div>
-      <div className="match-chart__plot">
-        <svg className="match-chart__svg" viewBox={`0 0 ${W} ${H}`} role="img"
+      <div className="match-chart__plot" ref={plotRef}>
+        <svg className="match-chart__svg" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img"
           aria-label={`${label} ${value} at ${clockLabel(sport, minute)}`} focusable="false">
           <defs>
             <pattern id={patternId} patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">

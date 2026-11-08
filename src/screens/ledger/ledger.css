@@ -3,45 +3,49 @@
    Not redrawn in v4 (README Known gaps): built from the v4 patterns — C1 screen header, section kicker, v4 table,
    A-column result rows. Breakpoints: wide ≥1600 · std 1200–1599 (base) · tablet 700–1199 · phone <700. */
 
-/* ---------- Screen frame (≥1200: header + independently scrolling columns) ---------- */
-.screen--ledger, .screen--chronicle { font-variant-numeric:tabular-nums; }
+/* ---------- Screen frame (compact pass: everything fits; lists page, nothing scrolls) ---------- */
+.screen.screen--ledger, .screen.screen--chronicle { overflow:hidden; font-variant-numeric:tabular-nums; }
 .ledger, .chronicle { --ledger-pad-x:36px; --ledger-side-w:430px; --chronicle-side-w:340px; --chronicle-report-w:460px;
   display:flex; flex-direction:column; height:100%; min-height:0; }
 .ledger-body, .chronicle-body {
-  flex:1; min-height:0; display:grid; gap:0 36px; padding:16px var(--ledger-pad-x) 20px;
+  flex:1; min-height:0; display:grid; gap:0 36px; padding:14px var(--ledger-pad-x) 16px;
 }
 .ledger-body { grid-template-columns:minmax(0,1fr) var(--ledger-side-w); }
 .chronicle-body { grid-template-columns:minmax(0,1fr) var(--chronicle-side-w); }
-.ledger-main, .ledger-side, .fi-history__index, .fi-history__report, .chronicle-side {
-  min-width:0; min-height:0; overflow:auto; overscroll-behavior:contain;
-}
-.ledger-side, .chronicle-side { display:flex; flex-direction:column; gap:28px; }
+.ledger-main, .fi-history__index { min-width:0; min-height:0; overflow:hidden; }
+/* Fixed-size blocks, not lists: on a window too short for them they scroll rather than lose anything. */
+.ledger-side, .fi-history__report, .chronicle-side { min-width:0; min-height:0; overflow:auto; overscroll-behavior:contain; }
+.ledger-main, .fi-history__index { display:flex; flex-direction:column; }
+.ledger-side, .chronicle-side { display:flex; flex-direction:column; gap:20px; }
+.ledger-table, .fi-history-box, .fi-activity-box { flex:1 1 0; min-height:0; overflow:hidden; }
+/* The kicker row with a pager: the title, the pager beside it, the aside at the far end. */
+.screen--ledger .kicker, .screen--chronicle .kicker { align-items:center; justify-content:flex-start; }
+.screen--ledger .kicker > .kicker__aside, .screen--chronicle .kicker > .kicker__aside { margin-left:auto; }
+.screen--ledger .kicker > .pager, .screen--chronicle .kicker > .pager { margin:-4px 0; }
+/* The panels' switch shows only below 1200, where the columns take turns. */
+.segmented.ledger-panels { display:none; }
 
-/* ---------- Header (C1 §3 pattern) ---------- */
+/* ---------- Header: one line ---------- */
 .ledger-head {
-  flex:none; display:flex; align-items:flex-end; gap:22px; min-width:0;
-  padding:20px var(--ledger-pad-x, 36px) 0; border-bottom:1px solid var(--ink);
+  flex:none; display:flex; align-items:center; gap:22px; min-width:0;
+  padding:8px var(--ledger-pad-x, 36px); border-bottom:1px solid var(--ink);
 }
-.ledger-head__title { min-width:0; padding-bottom:12px; }
 .ledger-head__kicker {
-  margin:0; font:400 12px/1.15 var(--font-sans); letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+  flex:0 1 auto; min-width:0; margin:0; font:400 12px/1.15 var(--font-sans); letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.ledger-head__name {
-  margin:2px 0 0; font:700 var(--fs-title)/1 var(--font-sans); letter-spacing:-.02em; color:var(--ink);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.ledger-head__stats { flex:none; display:flex; gap:30px; margin:0 0 0 auto; padding-bottom:12px; }
+.ledger-head__stats { flex:none; display:flex; gap:22px; margin:0 0 0 auto; }
+.ledger-head__stat { display:flex; align-items:baseline; gap:7px; }
 .ledger-head__stat dt { font:400 11px/1.2 var(--font-sans); text-transform:uppercase; color:var(--muted); white-space:nowrap; }
-.ledger-head__stat dd { margin:2px 0 0; font:600 34px/1.05 var(--font-sans); color:var(--ink); white-space:nowrap; }
-.ledger-head__stat dd small { font-size:14px; font-weight:600; color:var(--muted); }
+.ledger-head__stat dd { margin:0; font:600 19px/1.05 var(--font-sans); color:var(--ink); white-space:nowrap; }
+.ledger-head__stat dd small { font-size:12px; font-weight:600; color:var(--muted); }
 /* Fallen stays ink: README reserves `loss` for negative deltas and win chances under 45%. */
 .ledger-head__stat[data-stat=signings] dd { color:var(--claimed); }
 
 /* Section kickers inside the columns keep the primitive (.kicker); headings inside them reset UA heading styles. */
 .screen--ledger .kicker__title, .screen--chronicle .kicker__title { margin:0; font:inherit; letter-spacing:inherit; }
 .ledger-side .kicker, .chronicle-side .kicker { margin-bottom:0; }
-.ledger-empty, .fi-history-empty, .fi-activity-empty { margin:12px 0 0; font:400 14px/1.45 var(--font-sans); color:var(--muted); }
+.ledger-empty, .fi-history-empty, .fi-activity-empty { margin:10px 0 0; font:400 13px/1.35 var(--font-sans); color:var(--muted); }
 
 /* ---------- Standings table (v4 table pattern; contract classes .fi-standings / .fi-standing-*) ---------- */
 .fi-standings {
@@ -49,7 +53,7 @@
   font:400 var(--fs-body)/1.2 var(--font-sans); color:var(--ink); font-variant-numeric:tabular-nums;
 }
 .fi-standings th {
-  position:sticky; top:0; z-index:1; padding:6px 0 4px; background:var(--surface);
+  padding:6px 0 4px; background:var(--surface);
   border-bottom:1px solid var(--ink); text-align:left; white-space:nowrap;
   font:400 11px/1.2 var(--font-sans); letter-spacing:.04em; text-transform:uppercase; color:var(--muted);
 }
@@ -117,33 +121,39 @@
 .ledger-share__count { font-size:var(--fs-num); color:var(--muted); }
 .ledger-share__pct { text-align:right; font:600 var(--fs-num)/1 var(--font-sans); }
 
-/* ---------- Fallen empires ---------- */
-.ledger-fallen__list { list-style:none; margin:0; padding:0; }
-.ledger-fallen__row + .ledger-fallen__row { border-top:1px solid var(--row-rule); }
+/* ---------- Fallen empires: a wall of grey flags ---------- */
+.ledger-fallen { flex:1 1 0; min-height:0; display:flex; flex-direction:column; }
+.ledger-fallen__list {
+  flex:1 1 0; min-height:0; list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px;
+  align-content:start; justify-content:start; grid-template-columns:repeat(auto-fill, minmax(40px, 40px));
+}
+.ledger-fallen__list[data-measured] { grid-template-columns:repeat(var(--wall-cols), var(--wall-cell)); }
+.ledger-fallen__row { min-width:0; }
 .ledger-fallen__team {
-  display:grid; grid-template-columns:24px minmax(0,1fr); align-items:center; gap:12px; width:100%;
-  min-height:max(48px, var(--tap)); padding:6px 0; border:0; border-radius:0; background:none; color:var(--ink);
-  text-align:left; cursor:pointer;
+  display:block; width:100%; aspect-ratio:var(--wall-ratio, 4 / 3); padding:0; border:0; border-radius:0; background:var(--flag-bg); cursor:pointer;
 }
-.ledger-fallen__mark { display:block; opacity:.55; filter:grayscale(1); }
-.ledger-fallen__mark .flag-chip, .ledger-fallen__mark .fi-team-monogram { width:24px; height:18px; }
-.ledger-fallen__text { min-width:0; }
-.ledger-fallen__name {
-  display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  font:600 15px/1.2 var(--font-sans); color:var(--text-2);
+.ledger-fallen__mark { display:block; width:100%; height:100%; opacity:.55; filter:grayscale(1); }
+.ledger-fallen__mark .flag-chip, .ledger-fallen__mark .fi-team-monogram { display:flex; width:100%; height:100%; }
+.ledger-fallen__team:hover .ledger-fallen__mark { opacity:1; filter:none; }
+.ledger-fallen__team:focus-visible { outline-offset:2px; }
+/* Under a finger the cell is a 44px square (useFitWall's touch options): the flag stays 4:3 in the middle of its target. */
+@media (max-width:699.98px), (pointer:coarse) {
+  .ledger-fallen__team { background:none; }
+  .ledger-fallen__mark { display:flex; align-items:center; }
+  .ledger-fallen__mark .flag-chip { height:auto; }
 }
-.ledger-fallen__line { display:block; margin-top:2px; font:400 12px/1.3 var(--font-sans); color:var(--muted); }
-.ledger-fallen__team:hover .ledger-fallen__name { color:var(--you-text); text-decoration:underline; text-underline-offset:3px; }
 
 /* ---------- Chronicle: history browser ---------- */
 .fi-history {
   min-width:0; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,var(--chronicle-report-w)); gap:0 36px;
 }
+.fi-history__report { display:flex; flex-direction:column; }
+.chronicle-side > .fi-activity { flex:1 1 0; min-height:0; display:flex; flex-direction:column; }
 /* Board 06 chips (.segmented primitive) + the team select on one wrapping row. */
-.fi-history-controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin:12px 0 8px; }
+.fi-history-controls { flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; margin:10px 0 8px; }
 .fi-history-kinds { flex:none; max-width:100%; }
-/* The four chips need ~380px on one line. In a narrower history column (tablet half-column, phone) they become a
-   2-up grid, rows divided by a rule. Doubled class: primitives.css loads after component CSS. */
+/* The four chips need ~380px on one line. In a narrower history column (phone) they become a 2-up grid, rows divided by
+   a rule. Doubled class: primitives.css loads after component CSS. */
 .fi-history__index { container-type:inline-size; }
 @container (max-width:419.98px) {
   .segmented.fi-history-kinds { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); width:100%; }
@@ -155,10 +165,7 @@
     box-shadow:inset 1px 0 0 var(--rule), inset 0 1px 0 var(--rule);
   }
 }
-.fi-history-filter { flex:1 1 240px; min-width:0; display:flex; align-items:center; gap:12px; }
-.fi-history-filter > span {
-  flex:none; font:700 12px/1.2 var(--font-narrow); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); white-space:nowrap;
-}
+.fi-history-filter { flex:1 1 160px; min-width:0; display:flex; align-items:center; gap:12px; }
 .fi-history-filter select {
   flex:1 1 auto; min-width:0; max-width:320px; height:max(36px, var(--tap)); padding:0 10px;
   border:1px solid var(--control-line); border-radius:0; background:var(--panel); color:var(--ink); font:400 14px/1 var(--font-sans);
@@ -166,18 +173,18 @@
 .fi-history-list { list-style:none; margin:0; padding:0; border-top:1px solid var(--ink); }
 .fi-history-list > li + li { border-top:1px solid var(--row-rule); }
 .fi-history-list button {
-  display:grid; grid-template-columns:52px minmax(0,1fr) auto; align-items:center; gap:12px; width:100%;
-  min-height:max(54px, var(--tap)); padding:8px 10px 8px 12px; border:0; border-radius:0; background:none;
+  display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:10px; width:100%;
+  height:max(38px, var(--tap)); padding:0 8px 0 10px; border:0; border-radius:0; background:none;
   color:var(--ink); text-align:left; cursor:pointer;
 }
 .fi-history-list button:hover { background:var(--surface-2); }
 .fi-history-list button[aria-pressed=true] { background:var(--you-soft); box-shadow:inset 3px 0 0 var(--you); }
 .fi-history-list button:focus-visible { outline-offset:-2px; }
-.fi-history-round { font:700 18px/1 var(--font-narrow); color:var(--you-text); white-space:nowrap; }
+.fi-history-round { font:700 15px/1 var(--font-narrow); color:var(--you-text); white-space:nowrap; }
 .fi-history-body { min-width:0; }
-.fi-history-title, .fi-history-meta { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.fi-history-title { font:700 15px/1.25 var(--font-sans); }
-.fi-history-meta { margin-top:2px; font:400 11px/1.3 var(--font-sans); color:var(--muted); }
+.fi-history-title { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:600 14px/1.25 var(--font-sans); }
+/* One line per match: the score and the claim are in the report, and on the title. */
+.fi-history-meta { position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
 .fi-history-tags { display:flex; gap:6px; }
 .fi-history-tags:empty { display:none; }
 .fi-history-tag {
@@ -185,27 +192,23 @@
 }
 .fi-history-tag.is-you { color:var(--you-text); box-shadow:inset 0 0 0 1px var(--you); }
 .fi-history-tag.is-upset { color:var(--even); box-shadow:inset 0 0 0 1px var(--even); }
-.fi-history__report > .kicker { margin-bottom:14px; }
-/* The aside is the whole match title here: it gives way, not the short "Result" heading. */
-.fi-history__report > .kicker > .kicker__title { flex:none; }
-.fi-history__report > .kicker > .kicker__aside { flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; }
 
 /* ---------- Chronicle: turning points + activity ---------- */
 .chronicle-turning__list { margin:0; }
-.chronicle-turning__item { padding:10px 0; }
+.chronicle-turning__item { padding:6px 0; }
 .chronicle-turning__item + .chronicle-turning__item { border-top:1px solid var(--row-rule); }
 .chronicle-turning__item dt {
   font:700 12px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--you-text);
 }
-.chronicle-turning__item dd { margin:4px 0 0; font:400 14px/1.45 var(--font-sans); color:var(--text-2); }
+.chronicle-turning__item dd { margin:2px 0 0; font:400 13px/1.3 var(--font-sans); color:var(--text-2); }
 
-.fi-activity-list, .fi-activity-group > ul { list-style:none; margin:0; padding:0; }
+.fi-activity-list { list-style:none; margin:0; padding:0; }
 .fi-activity-round {
-  margin:0; padding:10px 0 3px; font:700 12px/1.2 var(--font-narrow); letter-spacing:.16em; text-transform:uppercase; color:var(--you-text);
+  white-space:nowrap; font:700 11px/1.2 var(--font-narrow); letter-spacing:.06em; text-transform:uppercase; color:var(--you-text);
 }
 .fi-activity-item {
-  display:grid; grid-template-columns:8px minmax(0,1fr); align-items:baseline; gap:10px; padding:6px 0;
-  border-top:1px solid var(--row-rule); font:400 12px/1.4 var(--font-sans); letter-spacing:.02em; color:var(--text-2);
+  display:grid; grid-template-columns:64px 8px minmax(0,1fr); align-items:center; gap:8px; height:26px;
+  border-top:1px solid var(--row-rule); font:400 12px/1.2 var(--font-sans); letter-spacing:.02em; color:var(--text-2);
 }
 .fi-activity-mark { display:block; width:8px; height:8px; background:var(--control-line); }
 .fi-activity-item[data-kind=match] .fi-activity-mark { background:var(--ink); }
@@ -215,7 +218,7 @@
 .fi-activity-item[data-kind=champ] .fi-activity-mark { background:var(--you); }
 .fi-activity-item[data-kind=target] .fi-activity-mark { background:var(--opponent); }
 .fi-activity-item[data-kind=champ] { color:var(--ink); font-weight:600; }
-.fi-activity-text { min-width:0; overflow-wrap:anywhere; }
+.fi-activity-text { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* ---------- wide ≥1600 ---------- */
 @media (min-width:1600px) {
@@ -227,31 +230,34 @@
   .ledger-fallen__name { font-size:17px; }
 }
 
-/* ---------- tablet 700–1199: one scrolling column, side blocks two-up (A-4 pattern) ---------- */
+/* ---------- below 1200: one panel at a time, behind the segmented control ---------- */
 @media (max-width:1199.98px) {
-  .ledger, .chronicle { --ledger-pad-x:26px; height:auto; }
-  .ledger-body, .chronicle-body { display:block; padding:18px var(--ledger-pad-x) 28px; }
-  .ledger-main, .ledger-side, .fi-history__index, .fi-history__report, .chronicle-side { overflow:visible; }
-  .ledger-side, .chronicle-side { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px 30px; margin-top:28px; }
-  .fi-history { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:0 30px; }
-  /* No nested scroller below 1200: the list grows and the screen scrolls (touch never gets trapped). */
+  .ledger, .chronicle { --ledger-pad-x:26px; }
+  .segmented.ledger-panels {
+    flex:none; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); margin:10px var(--ledger-pad-x) 0; background:transparent;
+  }
+  .segmented.ledger-panels > button { min-height:max(36px, var(--tap)); }
+  .ledger-body, .chronicle-body { display:block; padding:12px var(--ledger-pad-x) 14px; }
+  .ledger-main, .ledger-side, .chronicle-side, .fi-history, .fi-history__index, .fi-history__report { height:100%; }
+  .ledger-side, .chronicle-side { gap:16px; }
+  .screen--ledger[data-panel=standings] .ledger-side, .screen--ledger:not([data-panel=standings]) .ledger-main { display:none; }
+  .screen--ledger[data-panel=share] .ledger-fallen, .screen--ledger[data-panel=fallen] .ledger-share { display:none; }
+  .screen--chronicle[data-panel=story] .fi-history, .screen--chronicle:not([data-panel=story]) .chronicle-side { display:none; }
+  .fi-history { display:block; }
+  .screen--chronicle[data-panel=matches] .fi-history__report, .screen--chronicle[data-panel=result] .fi-history__index { display:none; }
 }
 
 /* ---------- phone <700 ---------- */
 @media (max-width:699.98px) {
-  .ledger, .chronicle { --ledger-pad-x:18px; }
-  /* The kicker ("THE EUROPEAN CAMPAIGN · … · SEED 2033") takes its own full-width row; the title and the three stats
-     share the row below. The title box dissolves (display:contents) so the kicker and name join the wrapping row. */
-  .ledger-head { flex-wrap:wrap; align-items:flex-end; gap:6px 12px; padding:14px 18px 10px; }
-  .ledger-head__title { display:contents; }
-  .ledger-head__kicker { flex:1 0 100%; min-width:0; font-size:11px; }
-  .ledger-head__name { flex:0 1 auto; min-width:0; margin-top:0; }
-  .ledger-head__stats { gap:14px; padding-bottom:2px; }
+  .ledger, .chronicle { --ledger-pad-x:14px; }
+  .ledger-head { flex-wrap:wrap; gap:4px 12px; padding:8px 14px; }
+  .ledger-head__kicker { flex:1 0 100%; font-size:11px; }
+  .ledger-head__stats { flex:1 1 auto; gap:14px; justify-content:space-between; margin:0; }
+  .ledger-head__stat { gap:5px; }
   .ledger-head__stat dt { font-size:10px; }
   .ledger-head__stat dd { font-size:15px; }
   .ledger-head__stat dd small { font-size:11px; }
-  .ledger-body, .chronicle-body { padding:12px 18px 24px; }
-  .ledger-side, .chronicle-side { grid-template-columns:minmax(0,1fr); gap:24px; }
+  .ledger-body, .chronicle-body { padding:10px 14px 10px; }
   .fi-standings__conq, .fi-standings__claimed { display:none; }
   .fi-standings__rank { width:36px; }
   .fi-standings td.fi-standings__rank, .fi-standings th.fi-standings__rank { padding-left:2px; }
@@ -259,9 +265,11 @@
   .fi-standings__strength { width:104px; }
   .fi-standings .fi-standings__strength { padding-right:2px; }
   .fi-standings td { height:44px; }
-  .fi-history { grid-template-columns:minmax(0,1fr); }
   .fi-history-filter select { max-width:none; }
-  .fi-history-list button { grid-template-columns:44px minmax(0,1fr) auto; padding-left:10px; }
-  /* One column and an unbounded list: the selected report comes first so it is never thousands of px down. */
-  .fi-history__report { order:-1; margin-bottom:24px; }
+  .fi-activity-item { height:30px; }
+}
+
+/* A phone with its browser bars showing: the campaign's totals wait on the Matches panel while a result takes the room. */
+@media (max-width:699.98px) and (max-height:760px) {
+  .screen--chronicle[data-panel=result] .ledger-head { display:none; }
 }

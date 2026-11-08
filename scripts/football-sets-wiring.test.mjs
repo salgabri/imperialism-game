@@ -305,7 +305,6 @@ test('while a chosen set loads, step 1 shows none of the built-in season\'s figu
     const nations = model();
     assert.equal(nations.season.state, 'loading');
     assert.ok(nations.scopes.length > 1 && nations.scopes.every(scope => scope.count === null));
-    assert.equal(nations.roleMeta, 'Europe · Football nations');
   });
 });
 
@@ -424,7 +423,7 @@ test('Retry this setup loads the set first, and refuses clearly when it cannot',
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'ManagerElimination');
       const note = () => document.querySelector('.manager-note');
-      assert.match(note().textContent, /^Your run is saved\./);
+      assert.equal(note(), null, 'a saved run needs no note');
       const retrying = app.retryManager();
       await view.refresh();
       assert.equal(note().textContent, 'Loading the CM 01/02 · Test 2002 season…', 'the dialog says what Retry waits for');

@@ -64,8 +64,6 @@ const LAYOUTS = {
   baseball: { layout: 'diamond', viewLabel: 'Diamond' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
-const DEPTH_ROWS = 5;
-const SIDE_CLAIMS = 3;
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const finite = value => (Number.isFinite(Number(value)) && value !== null && value !== '' ? Number(value) : null);
@@ -266,10 +264,8 @@ function computeSquad(st, ctx, team) {
     const rating = Math.round(Number(player.rating) || 0);
     return {
       key: `p-${indexOf(player)}-${i}`,
-      no: starter ? String(i + 1) : '—',
       pos: (starter ? player.assignedPos || player.pos : player.pos) || '',
       name: player.name || '',
-      short: shortName(player.name),
       fullName: player.sourceInfo?.fullName || player.name || '',
       natural: player.positions?.length ? player.positions.join(' / ') : player.pos || '',
       inRole: starter ? String(Math.round(Number(player.effectiveRating ?? player.rating) || 0)) : '—',
@@ -297,11 +293,8 @@ function computeSquad(st, ctx, team) {
   const bench = sortByPosition(lineup.bench, player => player.pos, sportId);
   const benchRows = bench.map((player, i) => rowOf(player, i, false));
   const depth = {
-    rows: benchRows.slice(0, DEPTH_ROWS),
-    extra: benchRows.slice(DEPTH_ROWS),
     all: benchRows,
     count: benchRows.length,
-    more: benchRows.length > DEPTH_ROWS ? `+ ${benchRows.length - DEPTH_ROWS} more in depth` : null,
   };
 
   const slots = SLOTS[sportId] || SLOTS.football;
@@ -353,7 +346,6 @@ function computeSquad(st, ctx, team) {
   // The manager's own team for the "Your squad" shortcut (spectators follow instead).
   const ownId = ctx?.managedId ?? null;
   const back = BACK_LABELS[st.squadReturn] ? { label: BACK_LABELS[st.squadReturn] } : null;
-  const showSource = [...starterRows, ...benchRows].some(row => row.source !== '—');
 
   return {
     teamId,
@@ -362,7 +354,6 @@ function computeSquad(st, ctx, team) {
     sport: sportId,
     layout: LAYOUTS[sportId].layout,
     kicker: `First team · ${plural(squad.length, 'player')} · ${claimedCount} claimed in conquest`,
-    phoneMeta: `${plural(squad.length, 'player')} · ${claimedCount} claimed in conquest`,
     playerCount: squad.length,
     xi: {
       label: words.lineup, short: words.lineupShort,
@@ -378,11 +369,9 @@ function computeSquad(st, ctx, team) {
     pitchLabel: shaped ? `Formation ${formation}` : `${LAYOUTS[sportId].viewLabel}, ${words.lineup.toLowerCase()}`,
     groups,
     depth,
-    showSource,
     pitch,
     profile: strengthProfile(lineup, sportId),
     profileScale: 'Scale 60–95',
-    claimed: claims.slice(0, SIDE_CLAIMS),
     acquisitions: {
       rows: claims,
       aside: claimedCount ? `${plural(claimedCount, 'player')} · ${claimedStarters} of ${plan} starters were claimed in conquest` : '',

@@ -67,7 +67,7 @@ test('the conquest view renders ConquestScreen from buildConquest, the callout a
     const model = app.conquestModel();
     assert.equal(model.kicker, 'Round I · Conquest');
     assert.equal(model.headline, `${L} is out`);
-    assert.equal(model.standfirst, `${W} beat ${L} 1–0. ${W} take ${L}’s only territory and one player.`);
+    assert.equal(model.standfirst, `${W} beat ${L} 1–0.`);
     assert.deepEqual(model.effects.map(effect => [effect.label, effect.value]), [['Territory', '+1'], ['Empire', '2']]);
     assert.equal(model.options.length, 3);
     assert.equal(model.selectedIndex, first.index);
@@ -181,7 +181,7 @@ test('manager elimination: the article model is winner-first and reaches Manager
     const model = app.eliminationModel();
     assert.equal(model.kicker, 'Round I · Eliminated');
     assert.equal(model.headline, `${L} is out`);
-    assert.equal(model.standfirst, `${W} held off ${L} 1–0. ${W} take ${L}’s only territory. Your campaign ends here.`);
+    assert.equal(model.standfirst, `${W} held off ${L} 1–0.`);
     const dialog = findElement(app.render(), 'ManagerElimination');
     assert.deepEqual(dialog.props.model, model);
     assert.equal(app.state.focusLayout, null);

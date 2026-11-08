@@ -1,15 +1,18 @@
 // Owner: WP-SQUAD (see PLAN.md §4). The Squad view (boards C1/C2, A-4 breakpoints, C§12 tab proposals).
 // Presentational: the model comes from buildSquad(st, ctx, teamId) (src/viewModels/squad.js); the only local
-// state is the List / Pitch / Acquisitions tab and the expanded depth list (UI-only, never saved).
-import React, { useState } from 'react';
+// state is the List / Pitch / Acquisitions tab (UI-only, never saved).
+// Compact pass (docs/design/compact-pass.md): one view of the lineup at a time, the list or the pitch, with the strength
+// profile and the bench beside it. Every list pages to what fits; a phone's bench is a tab of its own.
+import React, { useMemo, useState } from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
 import Icon from '../../components/Icon.jsx';
 import SquadRow, { SquadTableHead } from './SquadRow.jsx';
 import SquadPhoneRow from './SquadPhoneRow.jsx';
 import SquadPitch from './SquadPitch.jsx';
 import StrengthProfile from './StrengthProfile.jsx';
-import ClaimedList from './ClaimedList.jsx';
 import SquadAcquisitions from './SquadAcquisitions.jsx';
+import Pager from '../../components/Pager.jsx';
+import { usePagedList } from '../../hooks/useFit.js';
 import './squad.css';
 
 /**
@@ -45,84 +48,74 @@ function FormationKicker({ id, title, aside }) {
   );
 }
 
-function DepthKicker({ depth, open, onToggle, id }) {
-  return (
-    <h2 className="kicker squad-kicker">
-      <span className="kicker__title" id={id}>Squad depth</span>
-      {depth?.more && <button type="button" className="kicker__aside squad-depth__more" aria-expanded={open} onClick={onToggle}>
-        {open ? 'Show fewer' : depth.more}
-      </button>}
-    </h2>
-  );
-}
-
-function SquadTable({ groups, depth, showSource, depthOpen, onToggleDepth, notes }) {
-  const depthRows = depthOpen ? depth?.all || [] : depth?.rows || [];
-  const columns = showSource ? 8 : 7;
+/** The starting lineup, in lineup order: the position column says what the group headings did. */
+function SquadTable({ groups, notes }) {
+  const rows = useMemo(() => groups.flatMap(group => group.rows), [groups]);
+  const paged = usePagedList(rows, { row: '.squad-row' });
   return (
     <div className="squad-list">
-      <div className="squad-table" role="table" aria-label="Starting lineup" data-source={showSource ? 'true' : 'false'}>
-        <SquadTableHead showSource={showSource} />
-        {groups.map(group => (
-          <div key={group.key || group.label} className="squad-table__group" role="rowgroup">
-            <div className="squad-group" role="row"><span role="rowheader" aria-colspan={columns}>{group.label}</span></div>
-            {group.rows.map(row => <SquadRow key={row.key} row={row} showSource={showSource} />)}
-          </div>
-        ))}
+      <div className="squad-list__box" ref={paged.boxRef}>
+        <div className="squad-table" role="table" aria-label="Starting lineup">
+          <SquadTableHead />
+          {paged.shown.map(row => <SquadRow key={row.key} row={row} />)}
+        </div>
       </div>
-      <section className="squad-depth" aria-labelledby="squad-depth-title">
-        <DepthKicker depth={depth} open={depthOpen} onToggle={onToggleDepth} id="squad-depth-title" />
-        {depthRows.length ? (
-          <div className="squad-table squad-table--depth" role="table" aria-labelledby="squad-depth-title" data-source={showSource ? 'true' : 'false'}>
-            <SquadTableHead showSource={showSource} hidden />
-            {depthRows.map(row => <SquadRow key={row.key} row={row} showSource={showSource} />)}
-          </div>
-        ) : <p className="squad-empty">No reserve players yet.</p>}
-      </section>
+      <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label="Lineup pages" className="squad-list__pager" />
       {notes.map(note => <p key={note} className="squad-note">{note}</p>)}
     </div>
   );
 }
 
-function PitchPanel({ pitch, layout, formationTitle, formationAside, pitchLabel, depth }) {
-  const bench = depth?.all || [];
+/** Everyone outside the lineup, as many as fit; nothing at all while there is no one. */
+function SquadDepth({ depth }) {
+  const rows = depth?.all || [];
+  const paged = usePagedList(rows, { row: '.squad-row' });
+  if (!rows.length) return null;
+  return (
+    <section className="squad-depth" aria-labelledby="squad-depth-title">
+      <h2 className="kicker squad-kicker">
+        <span className="kicker__title" id="squad-depth-title">Squad depth</span>
+        <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label="Squad depth pages" />
+        <span className="kicker__aside">{rows.length}</span>
+      </h2>
+      <div className="squad-depth__box" ref={paged.boxRef}>
+        <div className="squad-table squad-table--depth" role="table" aria-labelledby="squad-depth-title">
+          <SquadTableHead hidden />
+          {paged.shown.map(row => <SquadRow key={row.key} row={row} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PitchPanel({ pitch, layout, formationTitle, formationAside, pitchLabel }) {
   return (
     <div className="squad-pitch-panel">
       <section className="squad-formation squad-formation--large" aria-labelledby="squad-formation-title">
         <FormationKicker id="squad-formation-title" title={formationTitle} aside={formationAside} />
         <SquadPitch slots={pitch} layout={layout} size="large" label={pitchLabel} />
       </section>
-      <section className="squad-depth" aria-labelledby="squad-bench-title">
-        <h2 className="kicker squad-kicker">
-          <span className="kicker__title" id="squad-bench-title">Squad depth</span>
-          <span className="kicker__aside">{bench.length === 1 ? '1 player' : `${bench.length} players`}</span>
-        </h2>
-        {bench.length ? (
-          <ul className="squad-chips">
-            {bench.map(row => (
-              <li key={row.key} className={`squad-chip${row.acquired ? ' is-claimed' : ''}`} title={row.fullName || row.name}>
-                <span className="squad-chip__pos">{row.pos}</span> · <span className="squad-chip__name">{row.short || row.name}</span>
-                {' · '}<span className="squad-chip__rating squad-tier" data-tier={row.tier}>{row.rating}</span>
-              </li>
-            ))}
-          </ul>
-        ) : <p className="squad-empty">No reserve players yet.</p>}
-      </section>
     </div>
   );
 }
 
-function PhoneGroup({ label, rows, id }) {
+/** The phone's list: one line a player, one tab at a time, paged to what fits. */
+function PhoneList({ rows, notes, label }) {
+  const paged = usePagedList(rows, { row: '.squad-prow' });
   return (
-    <section className="squad-plist__group" aria-labelledby={id}>
-      <h3 className="squad-plist__head" id={id}>{label}</h3>
-      <ul className="squad-plist__rows">{rows.map(row => <SquadPhoneRow key={row.key} row={row} />)}</ul>
-    </section>
+    <div className="squad-phone__list">
+      <div className="squad-phone__box" ref={paged.boxRef}>
+        <ul className="squad-plist__rows" aria-label={label}>{paged.shown.map(row => <SquadPhoneRow key={row.key} row={row} />)}</ul>
+      </div>
+      <Pager page={paged.page} pages={paged.pages} onPage={paged.setPage} label={`${label} pages`} className="squad-list__pager" />
+      {notes.map(note => <p key={note} className="squad-note">{note}</p>)}
+    </div>
   );
 }
 
 function PhonePanel({ tab, groups, depth, pitch, layout, formationTitle, formationAside, pitchLabel, notes }) {
   const bench = depth?.all || [];
+  const starters = useMemo(() => groups.flatMap(group => group.rows), [groups]);
   return (
     <div className="squad-phone" id="squad-phone-panel">
       {tab === 'pitch'
@@ -130,28 +123,29 @@ function PhonePanel({ tab, groups, depth, pitch, layout, formationTitle, formati
           <FormationKicker id="squad-pformation-title" title={formationTitle} aside={formationAside} />
           <SquadPitch slots={pitch} layout={layout} size="phone" label={pitchLabel} />
         </section>
-        : groups.map((group, i) => <PhoneGroup key={group.key || group.label} id={`squad-pgroup-${i}`} label={group.label} rows={group.rows} />)}
-      {bench.length > 0 && <PhoneGroup id="squad-pgroup-depth" label="Squad depth" rows={bench} />}
-      {notes.map(note => <p key={note} className="squad-note">{note}</p>)}
+        : tab === 'bench' ? <PhoneList key="bench" rows={bench} notes={[]} label="Squad depth" />
+          : <PhoneList key="starters" rows={starters} notes={notes} label="Starting lineup" />}
     </div>
   );
 }
 
 /** Model: buildSquad() (C§16, PLAN §3.5) + FROZEN callbacks onFollow, onBack, onSelectTeam. */
 export default function SquadScreen({
-  teamId = null, team = null, name = '', layout = 'pitch', kicker = '', phoneMeta = '', xi = null, claimedCount = 0,
+  teamId = null, team = null, name = '', layout = 'pitch', kicker = '', xi = null, claimedCount = 0,
   formation = '', formationAside = '', viewLabel = 'Pitch', formationTitle = 'Formation', pitchLabel = null,
-  groups = [], depth = null, showSource = true, pitch = [], profile = [],
-  profileScale = 'Scale 60–95', claimed = [], acquisitions = null, status = 'alive', statusLabel = null,
+  groups = [], depth = null, pitch = [], profile = [],
+  profileScale = 'Scale 60–95', acquisitions = null, status = 'alive', statusLabel = null,
   canFollow = false, following = false, back = null, home = null, notes = [],
   onFollow, onBack, onSelectTeam,
 }) {
   const [tab, setTab] = useState('list');
-  const [depthOpen, setDepthOpen] = useState(false);
-  const phoneTab = tab === 'pitch' ? 'pitch' : 'list';
+  const hasBench = !!depth?.all?.length;
+  // The bench is a phone tab; beside the list, a wider window shows it anyway.
+  const phoneTab = tab === 'pitch' ? 'pitch' : tab === 'bench' && hasBench ? 'bench' : 'list';
+  const mainTab = tab === 'bench' ? 'list' : tab;
   const alive = status !== 'fallen';
   const tabs = [['list', 'List'], ['pitch', viewLabel], ['acquisitions', 'Acquisitions']];
-  const phoneTabs = tabs.slice(0, 2);
+  const phoneTabs = [['list', 'List'], ['pitch', viewLabel], ...(hasBench ? [['bench', 'Bench']] : [])];
   const shape = { pitch, layout, formationTitle, formationAside, pitchLabel: pitchLabel || `${formationTitle} ${formation}`.trim() };
 
   function onKeyDown(event) {
@@ -177,7 +171,7 @@ export default function SquadScreen({
     return (
       <section {...root} data-empty="true">
         {onBack && <Tools back={{ label: back?.label || 'Back to map' }} className="squad-tools--empty" onBack={onBack} />}
-        <p className="squad-empty squad-empty--screen">Select a team on the map or in the standings to inspect its squad.</p>
+        <p className="squad-empty squad-empty--screen">Select a team on the map or in the standings.</p>
       </section>
     );
   }
@@ -186,20 +180,17 @@ export default function SquadScreen({
   const phoneMark = team ? <TeamMark id={team.flagId} teamId={team.teamId} code={team.code} color={team.color} isClub={team.isClub} width={32} height={24} /> : null;
 
   return (
-    <section {...root} data-tab={tab} data-layout={layout}>
+    <section {...root} data-tab={mainTab} data-layout={layout}>
       <header className="squad-head">
         <span className="squad-head__flag" aria-hidden="true">{mark}</span>
         <div className="squad-head__title">
-          <p className="squad-head__kicker">
-            {kicker}
-            {statusLabel && <span className="squad-head__status"> · {statusLabel}</span>}
-          </p>
-          <h1 className="squad-head__name" title={name}>{name}</h1>
+          <h1 className="squad-head__name" title={kicker ? `${name} · ${kicker}` : name}>{name}</h1>
+          {statusLabel && <p className="squad-head__status">{statusLabel}</p>}
         </div>
         <div className="squad-tabs" role="tablist" aria-label="Squad views">
           {tabs.map(([id, label], i) => (
-            <button key={id} type="button" role="tab" id={`squad-tab-${id}`} className="squad-tab" aria-selected={tab === id}
-              aria-controls="squad-tabpanel" tabIndex={tab === id ? 0 : -1} onClick={() => setTab(id)} onKeyDown={event => onTabKey(event, i)}>
+            <button key={id} type="button" role="tab" id={`squad-tab-${id}`} className="squad-tab" aria-selected={mainTab === id}
+              aria-controls="squad-tabpanel" tabIndex={mainTab === id ? 0 : -1} onClick={() => setTab(id)} onKeyDown={event => onTabKey(event, i)}>
               {label}
             </button>
           ))}
@@ -223,10 +214,7 @@ export default function SquadScreen({
           <span className="squad-mhead__xi">{xi?.short || 'XI'} {xi?.value}</span>
         </div>
         <div className="squad-mhead__line">
-          <p className="squad-mhead__meta">
-            {phoneMeta}
-            {statusLabel && <span className="squad-head__status"> · {statusLabel}</span>}
-          </p>
+          {statusLabel && <p className="squad-mhead__meta"><span className="squad-head__status">{statusLabel}</span></p>}
           <Tools {...tools} compact />
         </div>
       </header>
@@ -236,19 +224,14 @@ export default function SquadScreen({
         ))}
       </div>
       <div className="squad-body">
-        <div className="squad-main" id="squad-tabpanel" role="tabpanel" aria-labelledby={`squad-tab-${tab}`}>
-          {tab === 'list' && <SquadTable groups={groups} depth={depth} showSource={showSource} depthOpen={depthOpen}
-            onToggleDepth={() => setDepthOpen(open => !open)} notes={notes} />}
-          {tab === 'pitch' && <PitchPanel {...shape} depth={depth} />}
-          {tab === 'acquisitions' && <SquadAcquisitions acquisitions={acquisitions} />}
+        <div className="squad-main" id="squad-tabpanel" role="tabpanel" aria-labelledby={`squad-tab-${mainTab}`}>
+          {mainTab === 'list' && <SquadTable groups={groups} notes={notes} />}
+          {mainTab === 'pitch' && <PitchPanel {...shape} />}
+          {mainTab === 'acquisitions' && <SquadAcquisitions acquisitions={acquisitions} />}
         </div>
-        <aside className="squad-side" aria-label="Squad summary" data-tab={tab}>
-          {tab !== 'pitch' && <section className="squad-formation" aria-labelledby="squad-formation-title">
-            <FormationKicker id="squad-formation-title" title={formationTitle} aside={formationAside} />
-            <SquadPitch slots={pitch} layout={layout} size="side" label={shape.pitchLabel} />
-          </section>}
+        <aside className="squad-side" aria-label="Squad summary" data-tab={mainTab}>
           <StrengthProfile rows={profile} scale={profileScale} />
-          {tab !== 'acquisitions' && <ClaimedList rows={claimed} />}
+          {mainTab !== 'acquisitions' && <SquadDepth depth={depth} />}
         </aside>
         <PhonePanel tab={phoneTab} groups={groups} depth={depth} notes={notes} {...shape} />
       </div>

@@ -125,8 +125,9 @@ test('setup says a link filled it in, and what the link could not use', async ()
     const note = view.host.querySelector('.setup-challenge');
     assert.equal(note.getAttribute('role'), 'note');
     assert.match(note.textContent, /^Challenge link/);
-    assert.match(note.textContent, /This setup and its seed, 42, came from the link you opened\. Launch it as it is/);
-    assert.match(note.textContent, /The link’s theatre and season aren’t offered here, so setup keeps the defaults\./);
+    assert.match(note.textContent, /Seed 42\. Not offered here: theatre and season\./);
+    await view.render({ setup: SETUP, managerTeams: TEAMS, challenge: { seed: '42', ignored: [] } });
+    assert.match(view.host.querySelector('.setup-challenge').textContent, /Seed 42\. Launch it to play the same campaign\./);
     await view.render({ setup: SETUP, managerTeams: TEAMS, challenge: null });
     assert.ok(!view.host.querySelector('.setup-challenge'), 'no note without a link');
   });
@@ -138,7 +139,7 @@ test('Copy challenge link copies the link, or shows it selected where copying is
     await withClipboard(window, async text => { copied.push(text); }, async () => {
       const view = await mount(SetupOverlay, { setup: SETUP, managerTeams: TEAMS, challengeLink: LINK });
       const share = view.host.querySelector('section[data-step="3"] .setup-share');
-      assert.match(share.textContent, /Challenge a friend/);
+      assert.equal(share.getAttribute('aria-label'), 'Challenge a friend');
       await click(buttonNamed(share, 'Copy challenge link'));
       assert.deepEqual(copied, [LINK]);
       assert.match(share.querySelector('[role="status"]').textContent, /^Link copied\./);
@@ -154,7 +155,7 @@ test('Copy challenge link copies the link, or shows it selected where copying is
       assert.equal(field.value, LINK);
       assert.equal(field.getAttribute('aria-label'), 'Challenge link');
       assert.equal(document.activeElement, field, 'the link is focused for the browser’s own Copy');
-      assert.match(view.host.querySelector('.setup-share [role="status"]').textContent, /Copy is unavailable here/);
+      assert.match(view.host.querySelector('.setup-share [role="status"]').textContent, /Copy the selected link/);
       // The field sits in setup's form: Enter there must not submit it and launch the campaign.
       const enter = new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
       field.dispatchEvent(enter);
@@ -177,7 +178,7 @@ test('the results share the link and the image, which starts drawing as they ope
       await view.render({ ...props, territories: '11' });
       assert.equal(prepared, 1, 'drawn once per results');
       const share = view.host.querySelector('.fi-victory-share');
-      assert.match(share.textContent, /Challenge a friend/);
+      assert.equal(share.getAttribute('aria-label'), 'Challenge a friend');
       await click(buttonNamed(share, 'Copy challenge link'));
       assert.deepEqual(copied, [LINK]);
       const image = buttonNamed(share, 'Share image');

@@ -6,7 +6,7 @@ import React, { useEffect, useRef } from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
 import './turns.css';
 
-export default function TargetPanel({ count = '', rows = [], selectedId = null, ctaLabel = '', onSelect, onHover, onConfirm }) {
+export default function TargetPanel({ count = '', rows = [], selectedId = null, onSelect, onHover, onConfirm }) {
   const listRef = useRef(null);
   const titleId = 'target-panel-title';
   const selected = rows.find(row => row.teamId === selectedId) || rows.find(row => row.selected) || rows[0] || null;
@@ -56,7 +56,7 @@ export default function TargetPanel({ count = '', rows = [], selectedId = null, 
         <span className="kicker__title" id={titleId}>Choose a target</span>
         {count && <span className="kicker__aside">{count}</span>}
       </div>
-      <div className="target-panel__head" aria-hidden="true"><span>Spoils</span><span>Win</span></div>
+      <div className="target-panel__head" aria-hidden="true"><span title="Territories you would annex">Spoils</span><span>Win</span></div>
       <div ref={listRef} className="target-panel__rows" role="radiogroup" data-space-primary aria-labelledby={titleId}
         onPointerLeave={() => onHover?.(null)}>
         {rows.map((row, position) => {
@@ -78,12 +78,6 @@ export default function TargetPanel({ count = '', rows = [], selectedId = null, 
           );
         })}
       </div>
-      {ctaLabel && (
-        <p className="target-panel__foot">
-          Spoils are the territories you would annex. Confirm with <b>{ctaLabel}</b> in the bar. Everyone else’s targets
-          come from the compass.
-        </p>
-      )}
     </section>
   );
 }

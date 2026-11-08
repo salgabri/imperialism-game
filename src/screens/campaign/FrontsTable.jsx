@@ -15,7 +15,6 @@ export default function FrontsTable({ fronts = null, onSelectTeam }) {
     <section className="fronts" aria-labelledby="fronts-kicker">
       <div className="kicker">
         <h2 className="kicker__title v4-column__heading" id="fronts-kicker">Your fronts</h2>
-        <span className="kicker__aside">Win chance</span>
       </div>
       {rows.length ? <table className="fronts__table">
         <colgroup>

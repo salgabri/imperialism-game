@@ -268,7 +268,7 @@ test('CommandBar row 2: managed team block, long/short labels, value and toned d
     const block = view.host.querySelector('[aria-label="Managed team"]');
     assert.ok(block);
     assert.equal(block.querySelector('.mast__team').textContent, props.masthead.name);
-    assert.equal(block.querySelector('.mast__role').textContent, 'Managed by you');
+    assert.equal(block.querySelector('.mast__team').getAttribute('title'), 'Managed by you');
     const stats = [...view.host.querySelectorAll('.mast__stat')];
     assert.equal(stats.length, 4);
     assert.deepEqual(stats.map(stat => [stat.querySelector('.mast__label-long').textContent, stat.querySelector('.mast__label-short').textContent]),
@@ -286,7 +286,7 @@ test('CommandBar row 2: managed team block, long/short labels, value and toned d
     assert.ok(!view.host.querySelector('[aria-label="Managed team"]'));
     const followed = view.host.querySelector('[aria-label="Followed team"]');
     assert.equal(followed.querySelector('.mast__team').textContent, 'Spectating');
-    assert.equal(followed.querySelector('.mast__role').textContent, `Following ${st.teams['688'].name}`);
+    assert.equal(followed.querySelector('.mast__team').getAttribute('title'), `Following ${st.teams['688'].name}`);
     assert.deepEqual([...view.host.querySelectorAll('.mast__label-short')].map(node => node.textContent), ['Empires', 'Matches', 'Upsets', 'Largest']);
     assert.equal(view.host.querySelectorAll('.mast__delta').length, 0);
   });
@@ -314,8 +314,8 @@ test('CommandBar settings popover: Show matches is live, the launch rules are re
     assert.ok(popover);
     assert.equal(popover.querySelectorAll('select:disabled').length, 0, 'no greyed-out controls');
     assert.match(popover.textContent, /This campaign/);
-    assert.match(popover.textContent, /Set at launch/);
-    assert.match(popover.textContent, /Start a new campaign to change these\./);
+    assert.ok(popover.querySelector('details.settings-panel__campaign:not([open])'), 'the launch rules fold away');
+    assert.doesNotMatch(popover.textContent, /Start a new campaign to change these/);
     const fact = id => popover.querySelector(`#${id}`);
     assert.equal(fact('campaign-pacing').tagName, 'DD');
     assert.equal(fact('campaign-pacing').dataset.value, 'duel');

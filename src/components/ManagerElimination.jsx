@@ -23,14 +23,14 @@ export default function ManagerElimination({ result, model = null, onSpectate, o
     return () => { document.removeEventListener('keydown', trap); if (previous?.isConnected) previous.focus(); };
   }, []);
   const view = model || eliminationFromResult(result) || {};
-  const { kicker = 'Eliminated', kickerRight = 'Result', headline = '', standfirst = '', stats = [], note = '', noteTone = null } = view;
+  const { kicker = 'Eliminated', kickerRight = '', headline = '', standfirst = '', stats = [], note = '', noteTone = null } = view;
   return (
     <div className="manager-backdrop">
       <section className="manager-ending" ref={ref} role="dialog" aria-modal="true"
         aria-labelledby="manager-ending-title" aria-describedby={standfirst ? 'manager-ending-standfirst' : undefined}>
         <div className="manager-kicker">
           <span className="manager-kicker__title">{kicker}</span>
-          <span className="manager-kicker__aside">{kickerRight}</span>
+          {kickerRight ? <span className="manager-kicker__aside">{kickerRight}</span> : null}
         </div>
         <h1 id="manager-ending-title" className="manager-headline">{headline}</h1>
         {standfirst && <p id="manager-ending-standfirst" className="manager-standfirst">{standfirst}</p>}

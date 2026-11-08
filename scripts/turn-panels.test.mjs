@@ -520,8 +520,7 @@ test('TargetPanel is a radiogroup in [data-space-primary] with roving tabindex, 
   assert.match(radios[selectedAt].getAttribute('aria-label'), /^Hungary, strength \d+\.\d, spoils 10 territories, win chance \d+%$/);
   assert.equal(text(radios[selectedAt].querySelector('.target-panel__spoils')), '+10');
   assert.ok(radios[selectedAt].querySelector('.target-panel__win').classList.contains(`tone-${model.rows[selectedAt].tone}`));
-  assert.equal(text(panel.querySelector('.target-panel__foot')),
-    'Spoils are the territories you would annex. Confirm with Attack Hungary in the bar. Everyone else’s targets come from the compass.');
+  assert.equal(panel.querySelector('.target-panel__foot'), null, 'no instructions: the bar says Attack Hungary');
 
   // Browser/OS shortcuts pass through untouched (Alt+arrows history, Ctrl/Cmd+Home/End, Ctrl+Enter).
   for (const [keyName, modifiers] of [['ArrowRight', { altKey: true }], ['ArrowLeft', { altKey: true }],

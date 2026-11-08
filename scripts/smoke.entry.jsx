@@ -842,7 +842,7 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   // as a multiset), captioned with the sections and, unless there is one each, the clubs.
   const cardFills = [...document.querySelectorAll('.setup-map[data-kind="country"] .setup-map__sections path')].map(path => path.getAttribute('fill')).sort();
   const startFills = Object.values(reference.startOwners).map(club => politicalFill(club)).sort();
-  const caption = document.querySelector('.setup-map[data-kind="country"] .setup-map__caption')?.textContent.trim() || '';
+  const caption = document.querySelector('.setup-map[data-kind="country"]')?.getAttribute('title') || '';
   result.countryCard = JSON.stringify(cardFills) === JSON.stringify(startFills)
     && caption === `${entry.name} · ${sections} sections, ${sections === entry.clubs ? 'one per club' : `${entry.clubs} clubs`}`;
   result.countryCardText = `${caption} · ${cardFills.length} sections`;
@@ -1472,7 +1472,7 @@ export async function runChallengeCheck() {
       && roleCard('manager').getAttribute('aria-checked') === 'true'
       && document.getElementById('setup-managed-team').value === '076'
       && document.getElementById('setup-seed').value === '4242'
-      && /seed, 4242, came from the link/.test(document.querySelector('.setup-challenge')?.textContent || '');
+      && /Seed 4242\./.test(document.querySelector('.setup-challenge')?.textContent || '');
     button('Copy challenge link').click();
     await until('the link is copied', () => copied != null, 5000);
     result.copied = copied;
@@ -1502,7 +1502,7 @@ export async function runChallengeCheck() {
     const stale = result.staleSetup = mounted.app.state.setup;
     result.stale = stale.sport === 'football' && stale.layer === 'nations' && stale.scope === 'UEFA' && stale.dataSet == null
       && stale.pacing === 'duel' && stale.turnOrder === 'random' && stale.seed === '' && stale.role === 'manager';
-    result.staleNote = /sport, season, theatre, draw, seed and team aren’t offered here/
+    result.staleNote = /Not offered here: sport, season, theatre, draw, seed and team\./
       .test(document.querySelector('.setup-challenge')?.textContent || '');
   } finally {
     mounted.unmount();
@@ -1627,7 +1627,7 @@ export async function runResumeCheck(scenario = {}) {
     second = mount();
     await until('setup screen again', () => text().includes('Launch campaign'));
     const savedStrip = document.querySelector('.setup-save');
-    const offeredResume = !!second.app.state.hasSave && !!savedStrip && savedStrip.textContent.includes('Continue your campaign');
+    const offeredResume = !!second.app.state.hasSave && !!savedStrip && !!savedStrip.querySelector('.setup-save__resume');
     let domesticSaved = null;
     const reference = domesticReference?.scope === scenario.clubScope ? domesticReference : null;
     if (reference) {

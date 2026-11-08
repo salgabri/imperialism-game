@@ -115,25 +115,16 @@ test('standfirst names the winner first: beat when attacking, held off when defe
   const ctx = { sport, totalTeams: 3 };
   const attack = buildConquest(fixture(), ctx);
   assert.equal(attack.kicker, 'Round XIX · Conquest');
-  assert.equal(attack.kickerRight, 'Result');
+  assert.equal(attack.kickerRight, '');
   assert.equal(attack.headline, 'Serbia is out');
-  assert.equal(attack.standfirst, 'Italy beat Serbia 2–1. Italy take all 3 of Serbia’s territories and one player.');
+  assert.equal(attack.standfirst, 'Italy beat Serbia 2–1.', 'the figures below say what is taken');
   const defend = buildConquest(fixture({ attacker: '688', ga: 1, gd: 2 }), ctx);
-  assert.equal(defend.standfirst, 'Italy held off Serbia 2–1. Italy take all 3 of Serbia’s territories and one player.');
-  const single = buildConquest(fixture({ loserTerritories: ['688'] }), ctx);
-  assert.match(single.standfirst, /Italy take Serbia’s only territory and one player\.$/);
-  const two = buildConquest(fixture({ loserTerritories: ['688', 'KOS'] }), ctx);
-  assert.match(two.standfirst, /Italy take both of Serbia’s territories and one player\.$/);
-  // A name ending in a plural s takes the apostrophe alone: every NFL club's does.
-  const colts = fixture();
-  colts.teams['688'] = { ...colts.teams['688'], name: 'Indianapolis Colts' };
-  colts.choice = { ...colts.choice, loserName: 'Indianapolis Colts' };
-  assert.match(buildConquest(colts, ctx).standfirst, /Italy take all 3 of Indianapolis Colts’ territories and one player\.$/);
+  assert.equal(defend.standfirst, 'Italy held off Serbia 2–1.');
 });
 
 test('tie-breaks are sport-aware and winner-first', () => {
   const pens = buildConquest(fixture({ attacker: '688', ga: 1, gd: 1, tie: { A: [1, 1, 1, 0], D: [1, 1, 1, 1], ga: 3, gd: 4 } }), { sport });
-  assert.match(pens.standfirst, /^Italy held off Serbia 1–1, 4–3 on penalties\. /);
+  assert.equal(pens.standfirst, 'Italy held off Serbia 1–1, 4–3 on penalties.');
   const basketball = getSport('basketball');
   const overtime = { aId: '380', dId: '688', finalGa: 98, finalGd: 95, tie: { periods: [[10, 8]], ga: 98, gd: 95 } };
   assert.equal(winnerScore(overtime, '380', basketball), '98–95 after 1 overtime period');
@@ -144,41 +135,28 @@ test('tie-breaks are sport-aware and winner-first', () => {
 
 test('effects report the taken land and the empire after the conquest', () => {
   const model = buildConquest(fixture(), { sport, totalTeams: 3 });
-  assert.deepEqual(model.effects.map(effect => [effect.label, effect.value, effect.detail]), [
+  assert.deepEqual(model.effects.map(effect => [effect.label, effect.value, effect.title]), [
     ['Territory', '+3', 'Serbia, Bosnia & Herz., Kosovo'],
     ['Empire', '6', 'territories · 2 of 3 empires remain'],
   ]);
-  assert.deepEqual(model.effects.map(effect => effect.detailMore), [null, null]);
   const many = fixture({ loserTerritories: ['688', '070', 'KOS', '191x', '192x', '193x', '194x', '195x'] });
-  const long = buildConquest(many, { sport });
-  assert.equal(long.effects[0].detail, 'Serbia, Bosnia & Herz., Kosovo, 191x, 192x, 193x');
-  assert.equal(long.effects[0].detailMore, '+ 2 more', 'the overflow count is separate from the clamped names');
-  assert.equal(long.effects[0].detailFull.split(', ').length, 8);
+  assert.equal(buildConquest(many, { sport }).effects[0].title.split(', ').length, 8, 'every name stays available');
   assert.equal(buildConquest({ ...fixture(), choice: null }, {}), null);
 });
 
-test('long territory names keep "+ N more" outside the 2-line clamp (D§10 #7)', async () => {
+test('the taken land is a figure on screen; its names are the title and for screen readers', async () => {
   const longNames = ['Central African Rep.', 'Dem. Rep. Congo', 'Republic of the Congo', 'Equatorial Guinea', 'São Tomé and Príncipe',
     'Bosnia and Herzegovina', 'Trinidad and Tobago', 'Saint Vincent and the Grenadines'];
   const ids = longNames.map((_, i) => `L${i}`);
   const st = fixture({ loserTerritories: ids });
   const ctx = { sport, geo: { countries: ids.map((id, i) => ({ id, name: longNames[i] })) } };
   const model = buildConquest(st, ctx);
-  const [territory] = model.effects;
-  assert.equal(territory.detail, longNames.slice(0, 6).join(', '));
-  assert.equal(territory.detailMore, '+ 2 more');
-  assert.equal(territory.detailFull, longNames.join(', '));
+  assert.equal(model.effects[0].title, longNames.join(', '));
   const view = await mount(React.createElement(ConquestScreen, { ...model, onSelect() {}, onConfirm() {} }));
-  const detail = view.host.querySelector('.conquest-effect__detail');
-  assert.equal(detail.textContent, `${longNames.slice(0, 6).join(', ')} + 2 more`);
-  assert.equal(detail.getAttribute('title'), longNames.join(', '), 'the full list stays available');
-  const text = detail.querySelector('.conquest-effect__text');
-  const more = detail.querySelector('.conquest-effect__more');
-  assert.equal(more.textContent, '+ 2 more');
-  assert.ok(!text.contains(more), 'the count is a sibling of the clamped text, so the clamp cannot cut it');
-  const empire = view.host.querySelectorAll('.conquest-effect__detail')[1];
-  assert.equal(empire.querySelector('.conquest-effect__more'), null);
-  assert.equal(empire.getAttribute('title'), null);
+  const effect = view.host.querySelector('.conquest-effect');
+  assert.equal(effect.getAttribute('title'), longNames.join(', '));
+  assert.equal(effect.querySelector('.conquest-effect__value').textContent, `+${ids.length}`);
+  assert.equal(effect.querySelector('dd.sr-only').textContent, longNames.join(', '));
   await view.close();
 });
 
@@ -199,7 +177,6 @@ test('options show position, rating, lineup note and toned gains; selection foll
   assert.equal(model.selectedIndex, best.index);
   assert.equal(model.ctaLabel, 'Sign S. Milinković-Savić');
   assert.equal(model.ctaGain, best.gain);
-  assert.equal(model.waitNote, 'The campaign waits for your choice.');
   const other = rest[0];
   const reselected = buildConquest(fixture({ selected: other.index }), { sport });
   assert.deepEqual(reselected.options.filter(option => option.selected).map(option => option.index), [other.index]);
@@ -261,7 +238,7 @@ test('the conquest article is a screen, not a modal, with a space-primary radiog
   assert.equal(view.host.querySelector('[role=dialog], [aria-modal]'), null);
   assert.equal(article.getAttribute('tabindex'), '-1');
   assert.equal(document.getElementById(article.getAttribute('aria-labelledby')).textContent, 'Serbia is out');
-  assert.equal(view.host.querySelector('.conquest-kicker').textContent, 'Round XIX · ConquestResult');
+  assert.equal(view.host.querySelector('.conquest-kicker').textContent, 'Round XIX · Conquest');
   assert.match(view.host.querySelector('.conquest-standfirst').textContent, /^Italy beat Serbia 2–1\./);
   assert.equal(view.host.querySelectorAll('.conquest-effect').length, 2);
   assert.equal(view.host.querySelector('.conquest-claim-head').textContent, 'Claim one playerChange to your XI');
@@ -375,14 +352,29 @@ test('ported signing comparison: the lineup table sits outside every button and 
   const summary = view.host.querySelector('summary');
   assert.ok(summary);
   assert.equal(view.host.querySelector('button summary'), null);
-  assert.match(summary.textContent, /^Lineup before and after/);
-  assert.equal(view.host.querySelectorAll('tbody tr').length, 11);
+  assert.match(summary.textContent, /^Lineup changes/);
+  const changes = [...view.host.querySelectorAll('tbody tr')];
+  assert.ok(changes.length >= 1 && changes.length < 11, 'only the places the signing changes, not the whole XI twice');
+  assert.ok(changes.some(row => /New defender/.test(row.textContent)));
+  assert.ok(view.host.querySelector('caption.sr-only'), 'the table still says what it is');
   assert.match(view.host.querySelector('caption').textContent, /before and after signing New defender/);
-  assert.ok(view.host.querySelector('.is-changed'));
   assert.ok(document.activeElement.closest('article.screen--conquest'));
   assert.equal(document.activeElement.getAttribute('role'), 'radio');
   assert.equal(document.activeElement.getAttribute('aria-checked'), 'true');
   assert.match(view.host.querySelector('.conquest-compare__support').textContent, /^Attack support [+−]\d\.\d\d · Defensive support [+−]\d\.\d\d$/);
+  await view.close();
+});
+
+test('a signing that changes nothing says so, and shows no empty table', async () => {
+  const winner = team('a', 'Alfa', 'ALF', 80), loser = { ...team('b', 'Beta', 'BET', 70), squad: [{ name: 'Spare keeper', pos: 'GK', rating: 40 }] };
+  const choice = { winnerName: 'Alfa', loserName: 'Beta', candidates: acquisitionOptions(winner, loser) };
+  const st = { round: 3, teams: { a: winner, b: loser }, own: { x: 'a', y: 'b' }, aliveIds: ['a', 'b'], choice,
+    match: { aId: 'a', dId: 'b', winner: 'a', finalGa: 1, finalGd: 0, done: true } };
+  const model = buildConquest(st, { sport });
+  assert.deepEqual(model.comparison.rows, []);
+  const view = await mount(React.createElement(ConquestScreen, { ...model, onSelect() {}, onConfirm() {} }));
+  assert.ok(!view.host.querySelector('.conquest-compare table'));
+  assert.equal(view.host.querySelector('.conquest-compare__none').textContent, 'Your lineup stays the same.');
   await view.close();
 });
 
@@ -404,7 +396,6 @@ test('callout model centres on the taken land and the card renders the D1 copy',
   const single = fixture({ loserTerritories: ['688'] });
   const one = buildConquestCallout(single, { geo: geoFor(['688']) });
   assert.deepEqual([one.figure, one.label], ['+1', 'Territory taken']);
-  assert.match(buildConquest(single, { sport, geo: geoFor(['688']) }).standfirst, /Serbia’s only territory/);
   const view = await mount(React.createElement(ConquestCallout, { figure: '+3', label: 'Territories taken', sub: 'Now part of Italy' }));
   const card = view.host.querySelector('.callout.panel-callout');
   assert.equal(card.querySelector('.callout__figure').textContent, '+3');
@@ -430,39 +421,32 @@ test('elimination model restates the defeat winner-first in the article pattern'
   const model = buildElimination(eliminationState(), { sport });
   assert.equal(model.kicker, 'Round VII · Eliminated');
   assert.equal(model.headline, 'Italy is out');
-  assert.equal(model.standfirst, 'Serbia beat Italy 2–1. Serbia take all 3 of Italy’s territories. Your campaign ends here.');
+  assert.equal(model.standfirst, 'Serbia beat Italy 2–1.');
   assert.deepEqual(model.stats.map(stat => [stat.label, stat.value]), [['Placement', '3rd'], ['Conquests', '2'], ['Signings', '1']]);
   const defended = eliminationState();
   defended.match = { ...defended.match, aId: '380', dId: '688', finalGa: 0, finalGd: 1 };
-  assert.match(buildElimination(defended, { sport }).standfirst, /^Serbia held off Italy 1–0\. /);
+  assert.equal(buildElimination(defended, { sport }).standfirst, 'Serbia held off Italy 1–0.');
   const reloaded = { ...eliminationState(), match: null, history: [{ id: 'match-9', aId: '380', a: { score: '1' }, b: { score: '1' },
     result: { tieText: '2–4 on penalties', territories: 1 } }] };
-  assert.equal(buildElimination(reloaded, {}).standfirst, 'Serbia held off Italy 1–1, 4–2 on penalties. Serbia take Italy’s only territory. Your campaign ends here.');
+  assert.equal(buildElimination(reloaded, {}).standfirst, 'Serbia held off Italy 1–1, 4–2 on penalties.');
   assert.equal(buildElimination({ ...eliminationState(), managerElimination: null }, {}), null);
   // No match and no archived entry: result.score is attacker-first ("1–2 (1–1 PENS)"), so it is never printed.
   const orphan = { ...eliminationState(), match: null, history: [] };
   orphan.managerElimination = { ...orphan.managerElimination, score: '1–2 (1–1 PENS)' };
-  assert.equal(buildElimination(orphan, {}).standfirst, 'Serbia won the decisive match. Your campaign ends here.');
-  assert.equal(eliminationFromResult(orphan.managerElimination).standfirst, 'Serbia won the decisive match. Your campaign ends here.');
+  assert.equal(buildElimination(orphan, {}).standfirst, 'Serbia won the decisive match.');
+  assert.equal(eliminationFromResult(orphan.managerElimination).standfirst, 'Serbia won the decisive match.');
 });
 
-test('the elimination note follows the last save: saved, failed (export pointer) or unknown (no claim)', async () => {
+test('the elimination note speaks only when the save failed, and points to the export', async () => {
   const saved = buildElimination({ ...eliminationState(), saveStatus: { ok: true, savedAt: 1 } }, { sport });
-  assert.equal(saved.note, 'Your run is saved. Continue as spectator to follow Serbia, or try again: the same draw replays this opening, '
-    + 'a new draw reshuffles it.');
+  assert.equal(saved.note, '', 'the buttons say what comes next');
   assert.equal(saved.noteTone, null);
   const failed = buildElimination({ ...eliminationState(),
     saveStatus: { ok: false, message: 'Progress could not be saved. Export your campaign to keep it.' } }, { sport });
-  assert.doesNotMatch(failed.note, /is saved/, 'never claims a save the masthead calls Unsaved');
   assert.match(failed.note, /could not be saved.*Export campaign/);
   assert.equal(failed.noteTone, 'unsaved');
-  const unknown = buildElimination(eliminationState(), { sport });
-  assert.equal(unknown.note, 'Continue as spectator to follow Serbia, or try again: the same draw replays this opening, a new draw reshuffles it.');
-  assert.doesNotMatch(eliminationFromResult(eliminationState().managerElimination).note, /saved/);
-  assert.match(eliminationFromResult({ ...eliminationState().managerElimination, opponentName: '' }).note,
-    /^Continue as spectator to follow the team that knocked you out, /, 'no name: no guess');
-  const final = buildElimination({ ...eliminationState(), aliveIds: ['688'], saveStatus: { ok: true, savedAt: 1 } }, { sport });
-  assert.match(final.note, /^Your run is saved\. Continue as spectator to see the results, or try again: /, 'a lost final leaves nobody to follow');
+  assert.equal(buildElimination(eliminationState(), { sport }).note, '');
+  assert.equal(eliminationFromResult(eliminationState().managerElimination).note, '');
   const view = await mount(React.createElement(ManagerElimination, { result: eliminationState().managerElimination, model: failed,
     onSpectate() {}, onRetry() {} }));
   const note = view.host.querySelector('.manager-note');
@@ -471,7 +455,7 @@ test('the elimination note follows the last save: saved, failed (export pointer)
   await view.close();
   const plain = await mount(React.createElement(ManagerElimination, { result: eliminationState().managerElimination, model: saved,
     onSpectate() {}, onRetry() {} }));
-  assert.ok(!plain.host.querySelector('.manager-note').classList.contains('manager-note--unsaved'));
+  assert.equal(plain.host.querySelector('.manager-note'), null);
   await plain.close();
 });
 
@@ -506,7 +490,7 @@ test('ManagerElimination keeps its dialog, focus trap and exact button copy', as
   assert.deepEqual([...legacy.host.querySelectorAll('button')].map(button => button.textContent), ['Continue as spectator', 'Same draw'],
     'New draw and Another team need their handlers');
   assert.equal(legacy.host.querySelector('h1').textContent, 'Italy is out');
-  assert.match(legacy.host.textContent, /Serbia won the decisive match\. Your campaign ends here\./);
+  assert.match(legacy.host.textContent, /Serbia won the decisive match\./);
   assert.doesNotMatch(legacy.host.textContent, /2–1/, 'the attacker-first legacy score is not shown');
   await legacy.close();
 });
@@ -562,7 +546,6 @@ test('layout guards: sticky signing footer, notices clear of the map chrome and 
   assert.match(footer, /position:sticky; bottom:0/, 'the CTA stays in view whenever the article scrolls');
   assert.match(footer, /margin-top:auto/);
   assert.match(footer, /background:var\(--surface\)/);
-  assert.match(rule(conquest, '.conquest-effect__more'), /flex:none; white-space:nowrap/);
   const popups = await css('src/components/popups.css');
   assert.match(popups, /\.app-shell\[data-view=conquest\] \.fi-match-toast,\s*\.app-shell\[data-view=conquest\] \.fi-map-notice \{ display:none; \}/);
   const tablet = popups.slice(popups.indexOf('@media (max-width:1199.98px)'), popups.indexOf('@media (max-width:699.98px)'));

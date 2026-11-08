@@ -55,6 +55,19 @@
 .fi-context-button:hover:not(:disabled) { color:var(--you-text); }
 .fi-context-button[aria-pressed=true] { color:var(--you-text); }
 
+/* ---- Pager (components/Pager.jsx): lists show what fits and page through the rest ---- */
+.pager {
+  display:inline-flex; align-items:center; flex:none; gap:2px;
+  font:600 12px/1 var(--font-sans); font-variant-numeric:tabular-nums; letter-spacing:0; text-transform:none; color:var(--text-2);
+}
+.pager__pos { min-width:3.2em; text-align:center; white-space:nowrap; }
+.pager__btn {
+  display:inline-grid; place-items:center; width:max(24px, var(--tap)); height:max(22px, var(--tap)); padding:0;
+  border:0; border-radius:0; background:transparent; color:var(--ink); cursor:pointer;
+}
+.pager__btn:hover:not([aria-disabled=true]) { background:var(--surface-2); }
+.pager__btn[aria-disabled=true] { color:var(--control-line); cursor:default; }
+
 /* ---- Section kicker (A§4) ---- */
 .kicker {
   display:flex; justify-content:space-between; align-items:baseline; gap:12px;

@@ -55,6 +55,11 @@
   .v4-column--no-fronts > .results-list { grid-column:2; }
 }
 
+/* Landscape tablet: one column beside the map (shell.css), as on a desktop. */
+@media (min-width:700px) and (max-width:1199.98px) and (orientation:landscape) {
+  .v4-column { display:flex; flex-direction:column; align-items:stretch; border-top:0; border-left:1px solid var(--rule); }
+}
+
 /* Phone: bottom sheet (A§9.1). Collapsed = the first block; expanded slides the sheet up over the map. */
 @media (max-width:699.98px) {
   .v4-column {
@@ -106,14 +111,14 @@
 .fixture__meta {
   margin:6px 0 0; font:400 var(--fs-meta)/1.35 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted);
 }
-.fixture__approach { margin:6px 0 0; font:400 var(--fs-meta)/1.35 var(--font-sans); color:var(--muted); }
+.fixture__approach { color:var(--you-text); }
 /* Skip to my next match: a secondary under the fixture; while it runs, its progress and Stop. */
 .fixture__skip { margin-top:var(--col-fx-mt); }
+@media (max-width:699.98px) { .fixture__skip { display:none; } }   /* the phone bar has Skip */
 .fixture__skipping {
   margin:var(--col-fx-mt) 0 0; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px;
   font:400 var(--fs-meta)/1.4 var(--font-sans); font-variant-numeric:tabular-nums; color:var(--muted);
 }
-.fixture__approach b { font-weight:700; color:var(--ink); }
 .fixture__actions { margin-top:var(--col-fx-mt); display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; }
 .fixture__simulate { white-space:nowrap; }
 .fixture__card { margin-top:var(--col-fx-mt); min-width:0; }
@@ -314,3 +319,31 @@
 @media (max-width:699.98px) { .map-key { display:none; } }
 
 /* Reduced motion: nothing here animates (static ticker, no sheet transition). */
+
+/* Before the first result there is nothing to list ("No results yet" is the ticker's too). */
+.v4-column > .results-list:has(> .results-list__empty) { display:none; }
+/* The ticker under the map and the Chronicle already list the results: the column repeats them only with room to spare.
+   Without fronts (a spectator, your turn) they cost no height, because they take the fronts' place. */
+@media (min-width:700px) and (max-width:1199.98px), (min-width:1200px) and (max-height:859.98px) {
+  .v4-column:not(.v4-column--no-fronts) > .results-list { display:none; }
+}
+/* A wide window under 1200px tall: two results, as the std column shows. */
+@media (min-width:1600px) and (max-height:1199.98px) {
+  .results-list__row:nth-child(n+3) { display:none; }
+}
+/* Phone: collapsed, the result is the score, the headline and the strength; its details wait in the expanded sheet. */
+@media (max-width:699.98px) {
+  .v4-column[data-sheet=collapsed] .fi-match-spoils { display:none; }
+}
+/* A phone with its browser bars showing: the sheet is the fixture and the fronts, collapsed the score and the headline.
+   The results are a tap away in the Chronicle (More). */
+@media (max-width:699.98px) and (max-height:760px) {
+  .v4-column { --col-sheet-peek:40px; gap:10px; }
+  .v4-column > .results-list { display:none; }
+  .v4-column[data-sheet=collapsed] .fi-strength-reward { display:none; }
+  .fronts__row:nth-child(n+4) { display:none; }
+}
+/* The smallest phones (360×640): the expanded sheet leaves a thinner strip of map above it. */
+@media (max-width:699.98px) and (max-height:660px) {
+  .v4-column { --col-sheet-peek:20px; }
+}

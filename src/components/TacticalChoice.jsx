@@ -1,19 +1,41 @@
 // Owner: WP-LEDGER (see PLAN.md §4). "Match preview" dialog (DEC D10): v1 board 07 mapped to v4 tokens.
 // Opened from the Next fixture block; no longer auto-opens. Contract (strategy-ui L36-47): [data-tactic] buttons
-// commit immediately, copy "You are the underdog" / "Matchday variation 11.0" / "Scoring luck remains", initial
-// focus on the recommended approach (the one Continue kicks off with), focus restored on close, role="dialog"
-// aria-modal="true". Escape → onClose.
+// commit immediately, initial focus on the recommended approach (the one Continue kicks off with), focus restored on
+// close, role="dialog" aria-modal="true". Escape → onClose.
+// Compact pass (docs/design/compact-pass.md): the decision first and whole on one screen. Three approaches side by side,
+// each a name, a win chance and two small figures; what they mean is each card's title and description for screen
+// readers. The tale of the tape and both XIs share one panel below, one at a time.
 // Optional `preview` (buildMatchPreview(st, ctx), src/viewModels/ledger.js) adds the fixture header, stakes,
 // tale of the tape and both XIs; optional `onSimulate` adds the "simulate the result" link.
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import TeamMark from './TeamMark.jsx';
 import { recommendedTactic } from '../engine/managerStrategy.js';
-import { formatWinChance, winTone } from '../viewModels/format.js';
+import { formatWinChance, routeWorthSaying, winTone } from '../viewModels/format.js';
 import './dialogs.css';
 
-/** "Pick an approach to kick off": each sport's start of play (its words.kickoff) as a verb. */
-const START_VERBS = { 'Kick-off': 'kick off', Kickoff: 'kick off', 'Tip-off': 'tip off', 'First pitch': 'throw the first pitch' };
+/** What the variation squares mean, on their title. */
+const VARIATION_NOTE = 'Variation changes matchday form for both teams. Scoring luck remains at every setting.';
+/** The variation squares: matchday variation runs 0–12, drawn in six squares. */
+const VARIATION_SQUARES = 6;
+
+/** Reserve support sits in the approach's strength; said once, on the title of the reserves tag. */
+const SUPPORT_NOTE = 'Your starting lineup stays the same; reserve support changes the approach’s match strength.';
+
+/** The approach's matchday variation as filled squares, the figures on the title. */
+function Variation({ drama, baseDrama }) {
+  const level = Math.round((Math.max(0, Math.min(12, Number(drama) || 0)) / 12) * VARIATION_SQUARES);
+  const text = `Matchday variation ${Number(drama).toFixed(1)} / 12. Normal: ${Number(baseDrama).toFixed(1)}.`;
+  return (
+    <span className="fi-tactical-risk" title={`${text} ${VARIATION_NOTE}`}>
+      <span className="fi-tactical-risk__label">Variation</span>
+      <span className="fi-tactical-risk__squares" aria-hidden="true">
+        {Array.from({ length: VARIATION_SQUARES }, (_, i) => <i key={i} className={i < level ? 'is-on' : undefined} />)}
+      </span>
+      <span className="sr-only">{text}</span>
+    </span>
+  );
+}
 
 function Side({ team, align }) {
   return (
@@ -22,7 +44,7 @@ function Side({ team, align }) {
       <div className="fi-tactical-side__text">
         <span className="fi-tactical-side__role">{team.role}{team.you ? ' · You' : ''}</span>
         <span className="fi-tactical-side__name">{team.name}</span>
-        <span className="fi-tactical-side__eff">Strength <b>{team.eff}</b></span>
+        <span className="fi-tactical-side__eff" title={`Strength ${team.eff}`}><span className="sr-only">Strength </span><b>{team.eff}</b></span>
       </div>
     </div>
   );
@@ -34,16 +56,15 @@ function Fixture({ preview }) {
     <div className="fi-tactical-fixture">
       <Side team={a} align="a" />
       <div className="fi-tactical-centre">
-        <span className="fi-tactical-v" aria-hidden="true">v</span>
         {odds && <>
-          <div className="fi-tactical-odds" role="img" aria-label={`Win chance: ${odds.aria}`}>
+          <div className="fi-tactical-odds" role="img" aria-label={`Win chance: ${odds.aria}`} title="Win chance">
             <i style={{ width: `${odds.fill}%` }} />
           </div>
           <div className="fi-tactical-odds-labels" aria-hidden="true">
-            <span>{odds.aLabel}</span><small>Win chance</small><span>{odds.bLabel}</span>
+            <span>{odds.aLabel}</span><span>{odds.bLabel}</span>
           </div>
         </>}
-        {route && <p className="fi-tactical-route">{route}</p>}
+        {routeWorthSaying(route) && <p className="fi-tactical-route">{route}</p>}
       </div>
       <Side team={b} align="b" />
     </div>
@@ -82,7 +103,7 @@ function Lineup({ team, label = 'Starting XI', short = 'XI' }) {
         <span className="kicker__title">{team.code || team.name} · {label}</span>
         {team.xi && <span className="kicker__aside">{short} {team.xi}</span>}
       </div>
-      <ol className="fi-tactical-xi__list">
+      <ol className="fi-tactical-xi__list" data-long={team.lineup.length > 13 ? '' : undefined}>
         {team.lineup.map(row => <LineupRow key={row.key} row={row} />)}
       </ol>
     </section>
@@ -93,7 +114,7 @@ function Tape({ rows = [], a, b }) {
   if (!rows.length) return null;
   return (
     <section className="fi-tactical-tape" aria-labelledby="tactical-tape-title">
-      <div className="kicker"><h2 className="kicker__title" id="tactical-tape-title">Tale of the tape</h2></div>
+      <h2 className="sr-only" id="tactical-tape-title">Tale of the tape</h2>
       <ul className="fi-tactical-tape__list">
         {rows.map(row => (
           <li key={row.key} className="fi-tactical-tape__row">
@@ -113,6 +134,7 @@ function Tape({ rows = [], a, b }) {
 /** Outcome generation waits until this pre-match decision is committed. */
 export default function TacticalChoice({ choice, preview = null, onChoose, onClose, onSimulate }) {
   const dialogRef = useRef(null);
+  const [panel, setPanel] = useState('tape');
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   const recommended = recommendedTactic(choice?.options || []);
@@ -135,11 +157,8 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
   const options = choice.options || [];
   const context = options[0]?.context || '';
   const rich = !!preview?.a && !!preview?.b;
-  // The sport's start of play (the preview model's words; football's without one).
-  const kickoff = preview?.kickoff || 'Kick-off';
-  const start = START_VERBS[kickoff] || 'start the match';
-  // With the board-07 preview the fixture header already names both sides and the footer says how to kick off, so the
-  // standfirst keeps only the strength context (one line); the plain dialog keeps the full sentence.
+  // With the board-07 preview the fixture header already names both sides; the plain dialog keeps the full sentence.
+  // Read by screen readers as the dialog's description: on screen the odds say the same.
   const standfirst = rich && context ? context
     : [`${choice.managerName} faces ${choice.opponentName}.`, context, 'Commit an approach to start the match.'].filter(Boolean).join(' ');
   return (
@@ -149,8 +168,8 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
         <div className="fi-tactical-top">
           <p className="fi-tactical-kicker">
             <span className="fi-tactical-kicker__main">{preview?.kicker || 'Match preview'}</span>
-            <span className="fi-tactical-kicker__aside">Manager decision · before the match</span>
           </p>
+          {onSimulate && <button type="button" className="btn-link fi-tactical-simulate" onClick={onSimulate}>Simulate the result</button>}
           {onClose && <button type="button" className="icon-button fi-tactical-close" aria-label="Close match preview" onClick={onClose}><Icon name="close" size={18} /></button>}
         </div>
         {rich ? <Fixture preview={preview} /> : (
@@ -158,64 +177,56 @@ export default function TacticalChoice({ choice, preview = null, onChoose, onClo
         )}
         {preview?.stakes && (
           <div className="fi-tactical-stakes">
-            <p className="fi-tactical-stake fi-tactical-stake--win"><span>If you win</span>{preview.stakes.win}</p>
+            <p className="fi-tactical-stake fi-tactical-stake--win" title={preview.stakes.winTitle}><span>If you win</span>{preview.stakes.win}</p>
             <p className="fi-tactical-stake fi-tactical-stake--lose"><span>If you lose</span>{preview.stakes.lose}</p>
           </div>
         )}
         <div className="fi-tactical-body">
-          {rich && <Lineup team={preview.a} label={preview.lineupLabel} short={preview.lineupShort} />}
-          <div className="fi-tactical-main">
-            {/* Board 07 order: the tale of the tape sits level with both XI headers, the approach choice below it. */}
-            {rich && <Tape rows={preview.tape} a={preview.a} b={preview.b} />}
-            <div className="fi-tactical-approach">
-              <div className="kicker">
-                <h1 className="kicker__title" id="tactical-title">Choose your approach</h1>
-                <span className="kicker__aside">{`Locks at ${kickoff.toLowerCase()}`}</span>
-              </div>
-              <p id="tactical-description" className="fi-tactical-standfirst">{standfirst}</p>
-              <div className="fi-tactical-options">
-                {options.map(option => {
-                  const isDefault = option.id === recommended;
-                  const bonus = Number(option.bonus) || 0;
-                  const support = Number(option.support) || 0;
-                  return (
-                    <button type="button" key={option.id} data-tactic={option.id} onClick={() => onChoose(option.id)}
-                      className={`fi-tactical-option${isDefault ? ' is-default' : ''}`}>
-                      <span className="radio-square" aria-hidden="true" />
-                      <span className="fi-tactical-option__body">
-                        {/* Recommended and reserve support are tags on the name row; the row may wrap when Attack or
-                            Defend carries both. */}
-                        <span className="fi-tactical-option__name"><strong>{option.label}</strong>
-                          {isDefault && <span className="fi-tactical-option__tag">Recommended</span>}
-                          {support > 0 && <span className="fi-tactical-option__support" title={`Reserve support contributes +${support.toFixed(2)} to this approach.`}>Reserve support +{support.toFixed(2)}</span>}
-                        </span>
-                        <span className="fi-tactical-option__desc">{option.description}</span>
-                        <span className="fi-tactical-option__meta">
-                          <span className="fi-tactical-rating">Match strength {Number(option.strength).toFixed(1)} <small>({bonus >= 0 ? '+' : '−'}{Math.abs(bonus).toFixed(2)})</small></span>
-                          <span className="fi-tactical-risk">Matchday variation {Number(option.drama).toFixed(1)} / 12 <small>Normal: {Number(option.baseDrama).toFixed(1)}</small></span>
-                        </span>
+          <div className="fi-tactical-approach">
+            <h1 className="sr-only" id="tactical-title">Choose your approach</h1>
+            <p id="tactical-description" className="sr-only">{standfirst}</p>
+            <div className="fi-tactical-options">
+              {options.map(option => {
+                const isDefault = option.id === recommended;
+                const bonus = Number(option.bonus) || 0;
+                const support = Number(option.support) || 0;
+                return (
+                  <button type="button" key={option.id} data-tactic={option.id} onClick={() => onChoose(option.id)}
+                    title={option.description} className={`fi-tactical-option${isDefault ? ' is-default' : ''}`}>
+                    <span className="fi-tactical-option__name"><strong>{option.label}</strong>
+                      {isDefault && <span className="fi-tactical-option__tag">Recommended</span>}
+                    </span>
+                    <span className="fi-tactical-option__desc sr-only">{option.description}</span>
+                    <span className="fi-tactical-option__meta">
+                      <span className="fi-tactical-rating" title={`Match strength ${Number(option.strength).toFixed(1)}`}>Strength <b>{bonus >= 0 ? '+' : '−'}{Math.abs(bonus).toFixed(2)}</b></span>
+                      <Variation drama={option.drama} baseDrama={option.baseDrama} />
+                      {support > 0 && <span className="fi-tactical-option__support" title={`Reserve support contributes +${support.toFixed(2)} to this approach. ${SUPPORT_NOTE}`}>Reserves +{support.toFixed(2)}</span>}
+                    </span>
+                    {Number.isFinite(option.winProbability) && (
+                      <span className="fi-tactical-option__chance" title="Estimated chance to win">
+                        <b className={`tone-${winTone(option.winProbability)}`}>{formatWinChance(option.winProbability)}</b>
+                        <span className="sr-only">estimated chance to win</span>
                       </span>
-                      {Number.isFinite(option.winProbability) && (
-                        <span className="fi-tactical-option__chance">
-                          <b className={`tone-${winTone(option.winProbability)}`}>{formatWinChance(option.winProbability)}</b>
-                          <small>estimated chance to win</small>
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="fi-tactical-note">Variation changes matchday form for both teams. Scoring luck remains at every setting. Your starting lineup stays the same; reserve support changes the approach’s match strength.</p>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
-          {rich && <Lineup team={preview.b} label={preview.lineupLabel} short={preview.lineupShort} />}
+          {rich && (
+            <div className="fi-tactical-main">
+              <div className="segmented fi-tactical-panels" role="group" aria-label="Match detail">
+                <button type="button" aria-pressed={panel === 'tape'} onClick={() => setPanel('tape')}>Tale of the tape</button>
+                <button type="button" aria-pressed={panel === 'lineups'} onClick={() => setPanel('lineups')}>Lineups</button>
+              </div>
+              <div className="fi-tactical-panel" hidden={panel !== 'tape'}><Tape rows={preview.tape} a={preview.a} b={preview.b} /></div>
+              <div className="fi-tactical-panel fi-tactical-lineups" hidden={panel !== 'lineups'}>
+                <Lineup team={preview.a} label={preview.lineupLabel} short={preview.lineupShort} />
+                <Lineup team={preview.b} label={preview.lineupLabel} short={preview.lineupShort} />
+              </div>
+            </div>
+          )}
         </div>
-        {/* Sticky footer: the "simulate the result" escape hatch stays in view however far the panel scrolls. */}
-        <p className="fi-tactical-foot">
-          {onSimulate
-            ? <>{`Pick an approach to ${start} and watch it live, or `}<button type="button" className="btn-link" onClick={onSimulate}>simulate the result</button>.</>
-            : `Pick an approach to ${start} and watch it live.`}
-        </p>
       </section>
     </div>
   );
