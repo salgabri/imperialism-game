@@ -631,6 +631,7 @@ if (!filtered && fixedChecks) {
 if (!filtered && fixedChecks) {
   const { NATIONS, buildTeam, makeRng, teamEff } = await import('../src/data/teams.js');
   const { SPORT_LIST } = await import('../src/sports/index.js');
+  const { fieldedNations } = await import('../src/engine/footballSets.js');
   const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'],
     baseball: ['United States', 'Dominican Rep.', 'Venezuela', 'Cuba'], hockey: ['Canada', 'United States', 'Sweden', 'Russia'],
     'womens-football': ['Spain', 'England', 'France', 'Germany'], tennis: ['Spain', 'Italy', 'United States', 'Germany'],
@@ -642,7 +643,8 @@ if (!filtered && fixedChecks) {
     console.log(`\n  Squad rosters — ${sport.name}`);
     try {
       const rng = makeRng(20260802);
-      const ids = Object.keys(NATIONS);
+      // The nations the sport fields: football and women's football leave out those no source rates.
+      const ids = fieldedNations(sport);
       const teams = ids.map(id => buildTeam(id, rng, sport));
       const size = sport.squadSize;
       const realPlayers = teams.reduce((s, t) => s + t.real, 0);
@@ -966,7 +968,7 @@ for (const scenario of resumeScenarios) {
     if (scenario.scope === 'world') {
       check('whole world fielded', r.fielded === scenario.expectedField, `${r.fielded}`);
       check('Greenland starts out Danish', r.greenlandStartsDanish, `owner ${r.greenlandAlwaysHeld}`);
-      check('world kickoff still flags every participating nation', r.kickoffFlagScope.inactiveNations === 0 && r.kickoffFlagScope.correct);
+      check('world kickoff still flags every participating nation', r.kickoffFlagScope.neutralFielded === 0 && r.kickoffFlagScope.correct);
     }
     const nationalCampaign = scenario.layer !== 'clubs';
     const continentalNations = nationalCampaign && scenario.scope !== 'world';

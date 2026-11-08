@@ -50,10 +50,10 @@ countries in that order, and the European leagues follow their countries'.
 
 A nation missing from the table would get the smallest tier; the data test
 requires every nation of `NATIONS` exactly once. A tier caps a map but does not
-grant one: 45 of these nations have no map (What ships). Mexico (58 viable clubs)
+grant one: 48 of these nations have no map (What ships). Mexico (58 viable clubs)
 and the United States (81) stay below their tier; so do many smaller nations.
 
-**What ships:** 128 countries of the game's 173 nations, **4,184 clubs**, 12,800
+**What ships:** 128 countries of the game's 176 nations, **4,184 clubs**, 12,800
 sections. Maps total 18.8 MB (6.6 MB gzipped), 46–250 KB per country, fetched
 only when chosen; the generated index is 23 KB.
 
@@ -79,9 +79,10 @@ below the floor, and the next full build retires its map. (Sync with `--only=` t
 survey's ids: a plain sync also asks for Scotland's clubs, which are not cached, and
 stops there without EFEM's permission.)
 
-**45 nations have no map**, and all of them still play as nations. Scotland, Wales
-and Northern Ireland became nations of their own after the last sync, so they have
-no snapshot. The other 42 have fewer than ten clubs that pass the unchanged
+**48 nations have no map**, and all of them still play as nations where their sport fields
+them. Scotland, Wales and Northern Ireland became nations of their own after the last sync,
+and Tonga, Samoa and the Cook Islands joined the map later still, so they have no snapshot.
+The other 42 have fewer than ten clubs that pass the unchanged
 viability rules (`survey.json` records each reason as `why`):
 
 | N | Nations |

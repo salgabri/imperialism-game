@@ -316,10 +316,12 @@ test('flattening the map preserves geographic capital anchors and projects them 
   // lon/lat anchors rather than obsolete Robinson-specific pixel/area hashes:
   // projection changes coordinates, never which geographic capital was chosen.
   // Re-pinned once when Jerusalem and Nicosia moved off the borders the outlines blur (see the next test), and
-  // when the home nations got shapes: that added Edinburgh, Cardiff and Belfast and moved no other anchor.
+  // when the home nations got shapes: that added Edinburgh, Cardiff and Belfast and moved no other anchor. Re-pinned
+  // when Tonga, Samoa and the Cook Islands got shapes: that added Nukuʻalofa and Avarua (Apia is just off Upolu's
+  // generalised coast, so Samoa falls back to its centroid) and moved no other anchor.
   const expected = {
-    'countries-50m.json': '6c66393c2146d6a47453a3a6a730fced3ea6590b6742aff9e1fa83cb5d2b4395',
-    'world-110m.v1.json': 'ff66d18e714aba34f1db1f3d0b40f6b45445813ac88f16f0fcdbc8da3c15eacd',
+    'countries-50m.json': '81d5b7b576850cc242f46126ebb562f4cadb3c4bcddf5498bc10d48d1d4c1707',
+    'world-110m.v1.json': '5f2f6d20bae39979a5521e7775bb0489cd204a6a289ba48d4140f7f293e8b9a9',
   };
   const fits = {
     world: new geometry.WorldGeometry(topologies('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS)).fit,

@@ -136,11 +136,16 @@ Montenegro" needs the same identity overrides as the pre-2002 seasons.
 }
 ```
 
-- `nations` has an entry for **every** one of the 173 nations, even an empty
+- `nations` has an entry for **every** one of the 176 nations, even an empty
   one, so the hand-tuned built-in `fallbackStrength` never applies to another
   season. A set built before the map had the home nations lists none of
   `SCO`, `WAL` and `NIR`: it still loads, and England holds their land. An empty entry is `[40, 0, []]`, which is what `build-rosters` writes
-  for an empty pool.
+  for an empty pool. Tonga, Samoa and the Cook Islands (`776`, `882`, `184`) are
+  all listed or none: a builder lists them only when its source rates one of their
+  players, and a set that lists none of them (every EA season, and any set built
+  before they were on the map) fields no team of theirs, so their land stays
+  neutral, as it would on the map the set was built for
+  ([Pacific islands](pacific-islands.md)).
 - A **player tuple** is `[cmId, name, fullName, ca, positionKeys, nationality,
   club, dateOfBirth]`:
   - `fullName` is `0` when it equals `name`.
@@ -614,7 +619,8 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
 - League detection uses stored competition names and CM0102Patcher's renames. A
   top division renamed some other way is reported missing, not guessed.
 - EA seasons cover the nations EA rates: 91–124 of the 173 field fewer than
-  eleven natural players each season, more in the older editions. Seasons before
+  eleven natural players each season, more in the older editions (EA never rated
+  a Tongan, Samoan or Cook Islands player, so those three field no team). Seasons before
   2004/05 have no EA source here (the FIFA Index mirror starts with FIFA 05) and
   need a local CM 01/02 database.
 - 2005/06 and 2004/05 have no clubs, and a local CM 01/02 database is the only

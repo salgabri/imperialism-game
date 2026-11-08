@@ -66,9 +66,10 @@ for (const sport of SPORT_LIST) {
       assert.equal(draw?.attackerId, id);
       assertDraw(board, draw);
     });
-    // Sparse fields' isolated islands and landlocked nations are the most
+    // Sparse fields' isolated islands (the Cook Islands are the smallest shape; Tonga's anchor is just off its painted
+    // outline at the world fit) and landlocked nations are the most
     // important final-two cases; clubs use the corresponding seeded territories.
-    const probeCountries = ['392', '524', '756', '554', '360'];
+    const probeCountries = ['392', '524', '756', '554', '360', '184', '776'];
     const probes = [...new Set(probeCountries.map(country => field.own[country]).filter(Boolean))];
     if (!probes.length) probes.push(aliveIds[0]);
     for (const isolated of probes) {

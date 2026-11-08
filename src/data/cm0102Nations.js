@@ -6,7 +6,7 @@
 // 3.9.60 and 3.9.68 (213 records each; 3.9.60 has Taiwan for Chinese Taipei), the Update Team additions BOS and
 // CM0102Patcher name (Serbia, Montenegro, Kosovo, Gibraltar, North Macedonia, Curaçao, Martinique, eSwatini) and
 // the spellings TransferTool's lookup accepts (Serbia and Montenegro, Southern Sudan, Macedonia, Netherlands).
-// With them every one of the 173 game nations has a CM name, Montenegro, Kosovo and South Sudan only in the
+// With them every one of the 176 game nations has a CM name, Montenegro, Kosovo and South Sudan only in the
 // databases that add them. Yugoslavia is FR Yugoslavia, then Serbia and Montenegro, so it plays as Serbia; Timor,
 // an SI placeholder that Update Team data keeps, is Timor-Leste. The dead records Update Team data keeps beside
 // their successors (Yugoslavia, Swaziland, Netherlands Antilles) hold 0-2 players. See
@@ -54,7 +54,6 @@ export const CM0102_NATIONS = {
     'Cape Verde Islands',
     'Cayman Islands',
     'Commonwealth of Soviet States',
-    'Cook Islands',
     'Curaçao',
     'Czechoslovakia',
     'Dominica',
@@ -74,7 +73,6 @@ export const CM0102_NATIONS = {
     'Netherlands Antilles',
     'Pays Basque',
     'Saint Lucia',
-    'Samoa',
     'San Marino',
     'Seychelles',
     'Singapore',
@@ -83,7 +81,6 @@ export const CM0102_NATIONS = {
     'St Vincent & The Grenadines',
     'São Tomé & Principe',
     'Tahiti',
-    'Tonga',
     'Turks and Caicos Islands',
     'US Virgin Islands',
     'West Germany',
