@@ -226,7 +226,7 @@ const TheatreMap = React.memo(function TheatreMap({ preview, caption, loading = 
   );
 });
 
-/** The world card's caption: "Europe · 46 nations, each on its own land" (clubs are dealt out, README §The club layer). */
+/** The world card's caption: "Europe · 46 nations, each on its own land" (a set with no Europe maps deals its clubs out, README §The club layer). */
 function theatreCaption(model, preview) {
   const teams = `${preview.teams} ${preview.teams === 1 ? model.noun : model.nouns}`;
   return `${model.scopeName} · ${teams}${model.clubLayer ? ' dealt onto the nearest free land' : ', each on its own land'}`;
@@ -600,7 +600,7 @@ export default function SetupOverlay({
 
               <div className="setup-group setup-group--list">
                 <Kicker id="setup-theatre-label" title="Theatre" aside="Where the war is fought" />
-                {/* One radiogroup for leagues and countries: a single tab stop, and arrow keys walk from one into the other. */}
+                {/* One radiogroup for Europe and countries: a single tab stop, and arrow keys walk from one into the other. */}
                 <div className="setup-theatres" role="radiogroup" aria-labelledby="setup-theatre-label" ref={theatreList}
                   data-long={countries ? '' : undefined} onKeyDown={countries ? typeAhead : undefined}>
                   {model.scopes.map(theatreRadio)}
@@ -649,9 +649,10 @@ export default function SetupOverlay({
             <div className="setup-side">
               {model.country ? (
                 <TheatreMap kind="country" preview={domestic?.preview || null} loading={model.countryState === 'loading'}
-                  caption={domestic?.preview ? `${model.country.name} · ${domestic.preview.sections.length} sections, `
-                    + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)
-                    : `Loading the map of ${model.country.name}…`} />
+                  caption={!domestic?.preview ? `Loading the map of ${model.country.name}…`
+                    : model.country.countries ? `${model.country.name} · ${model.country.clubs} clubs in ${model.country.countries} countries`
+                      : `${model.country.name} · ${domestic.preview.sections.length} sections, `
+                        + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)} />
               ) : theatreMap ? <TheatreMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)} /> : null}
               <section className="setup-howto" aria-labelledby="setup-howto-title">
                 <Kicker id="setup-howto-title" title="How conquest works" />

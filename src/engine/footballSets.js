@@ -14,6 +14,7 @@ import { BUILT_IN_SEASONS } from '../data/footballSeasons.js';
 import { BUILT_IN_BASKETBALL_SEASONS } from '../data/basketballSeasons.js';
 import { BUILT_IN_BASEBALL_SEASONS } from '../data/baseballSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
+import { EUROPE_MAPS } from '../data/europeMaps.js';
 import { basketball } from '../sports/basketball.js';
 import { baseball } from '../sports/baseball.js';
 import { football } from '../sports/football.js';
@@ -118,7 +119,10 @@ const eraMapOf = (id, map) => CLUB_MAPS.find(entry => entry.id === map && entry.
   && (entry.seasons == null || entry.seasons.includes(id))) || null;
 
 /** Whether a club map is an earlier era's, played only with its seasons' clubs. */
-export const isEraMap = id => CLUB_MAPS.some(entry => entry.id === id && entry.seasons != null);
+export const isEraMap = id => [...CLUB_MAPS, ...EUROPE_MAPS].some(entry => entry.id === id && entry.seasons != null);
+
+/** Whether a Europe map (src/data/europeMaps.js) is the one of football data set `id`. */
+export const isSeasonEuropeMap = (mapId, id) => EUROPE_MAPS.some(entry => entry.id === mapId && !!entry.seasons?.includes(id));
 
 /** The built-in earlier seasons of every sport, newest first, as the index lists them. */
 export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS]);
@@ -372,7 +376,7 @@ function validateFootballSet(data, id) {
     if (!Number.isInteger(pool) || pool < list.length) fail(`${at} poolSize must be an integer of at least its ${list.length} players`);
   }
 
-  // League ids are the built-in ones, so a club theatre means the same in every data set and saved names resolve.
+  // League names are the built-in ones, so a club reads the same in every data set.
   const leagues = new Set(football.clubs.map(club => club.league));
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (!setHasClubs(id) && data.clubs.length) fail('this season has nations only');

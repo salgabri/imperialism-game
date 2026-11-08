@@ -2,13 +2,13 @@ import React from 'react';
 import { CONFIG } from './config.js';
 import { C, V4 } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
-import { CLUB_SCOPES } from './data/scopes.js';
+import { CLUB_SCOPES, worldClubTheatreName } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { teamMarkUrls } from './data/teamMarks.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
-import { domesticEntry, domesticLabel } from './data/domesticScope.js';
+import { domesticEntry, domesticLabel, isCountryScope } from './data/domesticScope.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
@@ -727,10 +727,7 @@ export default class App extends React.Component {
   /** The theatre's display name. The data's trailing "*" footnote marker ("Asia & Oceania*") is a setup-only device. */
   scopeName(settings = this.state.settings) {
     if (domesticIdOf(settings)) return domesticLabel(settings.clubScope);
-    if (settings?.layer === 'clubs') {
-      const scopes = CLUB_SCOPES(getSport(settings.sport));
-      return plainScopeName((scopes.find(x => x.id === settings.clubScope) || scopes[0]).name);
-    }
+    if (settings?.layer === 'clubs') return plainScopeName(worldClubTheatreName(settings));
     return plainScopeName(SCOPES.find(x => x.id === settings?.scope)?.name || 'World War');
   }
 
@@ -793,14 +790,14 @@ export default class App extends React.Component {
   pickSetup(key, value) {
     this.setState(state => {
       const setup = { ...state.setup, [key]: value };
-      const domestic = isDomesticScope(setup.clubScope);
+      const domestic = isDomesticScope(setup.clubScope), country = isCountryScope(setup.clubScope);
       if (key === 'preset') {
         setup.scope = value === 'short' ? 'elite' : value === 'world' ? 'world' : 'UEFA';
-        // A chosen country is its own theatre; a session length does not replace it.
-        if (!domestic) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all'
+        // A chosen country is its own theatre; a session length does not replace it. setClubScope below finds the map.
+        if (!country) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all'
           : CLUB_SCOPES(sportOf(setup) || getSport(setup.sport))[2]?.id || 'all';
       } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
-      // Country maps come with football data only (basketball clubs take the NBA's map below, in setClubScope).
+      // Country and Europe maps come with football data only (basketball clubs take the NBA's map below, in setClubScope).
       if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
       // A data set plays in its own sport and brings its own clubs. A basketball season has clubs only: choosing it
@@ -821,7 +818,7 @@ export default class App extends React.Component {
       if (clubScope !== setup.clubScope) setup.clubScope = clubScope;
       // The field changes with the theatre, so the managed team goes too, but a
       // preset leaves a chosen country's club theatre (and its clubs) as it was.
-      const sameField = key === 'preset' && domestic && setup.layer === 'clubs';
+      const sameField = key === 'preset' && country && setup.layer === 'clubs';
       if (['sport', 'layer', 'scope', 'clubScope', 'preset', 'dataSet'].includes(key) && !sameField) setup.managedTeamId = '';
       return { setup };
     }, () => {
@@ -1076,14 +1073,15 @@ export default class App extends React.Component {
     const domesticId = domesticIdOf(su);
     if (domesticId) {
       // Each club starts on its group of sections (just its home on a 100-club
-      // map). Nobody plays until the map has loaded. A basketball season's
-      // clubs take their map's land and colours, with the season's players.
+      // map). Nobody plays until the map has loaded. A season's clubs on a map of
+      // their day take its land and colours, with the season's players.
       const loaded = getLoadedDomestic(domesticId);
-      const season = sport.clubMap ? new Map(sport.clubs.map(club => [club.id, club])) : null;
+      const season = sport.clubMap || loaded?.meta.seasons ? new Map(sport.clubs.map(club => [club.id, club])) : null;
       included = loaded ? loaded.clubs.map(row => buildClub(season ? seasonClub(row, season.get(row.id)) : row, sport)) : [];
       if (loaded) own = { ...loaded.startOwners };
       scopeName = domesticLabel(su.clubScope);
     } else if (clubLayer) {
+      // A data set with no Europe maps: its strongest clubs dealt onto the world.
       const scope = CLUB_SCOPES(sport).find(x => x.id === su.clubScope) || CLUB_SCOPES(sport)[0];
       included = sport.clubs.filter(scope.filter).map(c => buildClub(c, sport));
       scopeName = plainScopeName(scope.name);
@@ -1463,6 +1461,8 @@ export default class App extends React.Component {
    */
   chooseAnotherTeam() {
     const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings), role: 'manager', managedTeamId: '', seed: '' };
+    // A campaign saved on a theatre this build no longer offers opens on the one that replaced it.
+    if (setup.layer === 'clubs') setup.clubScope = setClubScope(setup);
     this.setState({ setup, retrySetup: null }, () => this.openSetup({ step: 3, suggest: false }));
   }
 

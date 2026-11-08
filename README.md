@@ -19,7 +19,8 @@ And pick who fights:
 
 - **Nations** — 173 national teams, each starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-- **Clubs** — 132 football clubs from seven European leagues, all 30 NBA
+- **Clubs** — Europe's 124 strongest football clubs on [their map of
+  Europe](#the-europe-maps), each on land in its own country, all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
   franchises on [theirs](#the-nfl-map) of the USA, or all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada. Real Madrid annexes territory
@@ -182,8 +183,8 @@ manager of the theatre's favourite, with decisions from the first match.
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
    choices are the whole world (173 nations), another confederation, or the
-   Elite 32. Football club campaigns offer individual leagues, all leagues, or
-   the strongest 32 available clubs; basketball clubs play the NBA on its own
+   Elite 32. Football club campaigns offer Europe's 124 strongest clubs or its
+   Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA,
    and baseball clubs MLB on its map of the USA and Canada. The step opens on a map of the chosen theatre:
@@ -555,7 +556,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | --- | --- | --- | --- |
 | `sport` | Sport | `football`, `basketball`, `american-football`, `baseball` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs `all`, `elite`, a league (`Premier+League`) or a country (`domestic:826`) | Europe for nations, all clubs for clubs, a sport's own map (NBA, NFL, MLB) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them) or a country (`domestic:826`) | Europe for nations, the Top 124 for football clubs, a sport's own map (NBA, NFL, MLB) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -783,28 +784,29 @@ fetch without `--efem-permission-granted`.
 A club is a combatant with the same shape as a nation — id, code, colour,
 strength, lineup — so every rule already in the game applies unchanged.
 
-The one problem clubs create is territory. Twenty Premier League sides share one
-homeland, and the map has no sub-national shapes to split. So clubs are **dealt**
-onto it: working down the strength order, each club claims the nearest country to
-its homeland that nobody has taken. The best club in each league gets the
-homeland itself and the rest fan outwards, which is why an all-leagues campaign
-opens with Europe carved up and the strongest sides at its centre. Countries
-nobody reaches stay neutral, exactly as non-participating nations do. The NBA is
-not dealt: each franchise holds its own state or province of
-[the USA and Canada](#the-nba-map).
+The one problem clubs create is territory: twenty Premier League sides share one
+homeland. So football clubs play on [a map of Europe of their own](#the-europe-maps),
+where a club holds land only in its own country: alone it holds all of it, clubs
+that share a country split it along its regional borders, and a country with no
+club stays grey. Each NBA franchise likewise holds its own state or province of
+[the USA and Canada](#the-nba-map). Only a CM 01/02 database built on your own
+computer (see [Football seasons](#football-seasons)), which has no such map, still
+**deals** its strongest clubs onto the world: working down the strength order, each
+club claims the nearest country to its homeland that nobody has taken.
 
 A club's territory is painted in a generated colour rather than a flag —
 identical national flags would tell you nothing — and wherever a nation shows its
 flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
-NFL franchises are not dealt either: each holds its own state of [the USA](#the-nfl-map), and
-each MLB club its own of [the USA and Canada](#the-mlb-map).
+Each NFL franchise holds its own state of [the USA](#the-nfl-map), and each MLB club its own of
+[the USA and Canada](#the-mlb-map).
 
 Club lineups come from the same sources as the national squads:
-`clubs.football.js` from the EA FC 27 snapshot filtered to the seven tier-one
-leagues (132 clubs, among them the promoted Coventry City, Hull City, Ipswich
-Town, Schalke 04, Málaga and Monza), and `clubs.basketball.js` from NBA 2K27 as
+`clubs.football.js` from the EA FC 27 snapshot: the 124 strongest of its 309
+European first-division clubs by the mean of their best XI, from Paris Saint-Germain
+to Lecce (17 leagues: 20 clubs each from England and Spain, one each from Norway,
+Croatia and Bulgaria), and `clubs.basketball.js` from NBA 2K27 as
 2K Archive compiles it. 2K Archive lists each player's positions as 2K gives
 them, primary first; a second position that is not the first's neighbour is
 dropped, and 123 of the 150 NBA starters cover two positions. Each franchise's
@@ -996,6 +998,50 @@ Arenas are in `scripts/data/nba-arenas.json`; the
 fitting and the file additions. `scripts/build-club-maps.mjs` builds every
 league's map (`--league=nba` or `nfl` for one; the index keeps the other's entries).
 
+### The Europe maps
+
+Football clubs have two theatres, **Top 124** and **Elite 32**: the 124 and the 32
+strongest clubs of the season, on a map of Europe where a club's land lies in its
+own country.
+
+- **A country's only club holds all of it**, on the outline the world map gives it:
+  Bodø/Glimt holds Norway, Dinamo Zagreb Croatia, and in the Elite 32 Paris
+  Saint-Germain holds France.
+- **Clubs that share a country split it along its regional borders.** A region with
+  one club goes whole to it, and one with two or more is split one level down,
+  between them only (Bavaria's clubs share Bavaria along its districts). A region
+  with no club goes to whichever neighbour reaches it, whole unless it is larger
+  than a club's share. A city-state is too small for its clubs and shares its largest
+  neighbour's land too (Berlin and Brandenburg, Madrid and Castile). Where clubs
+  are crowded into one city, it is cut into wedges so each has a way out, and a
+  club boxed in by the others may start next door: Beşiktaş plays out of Anatolia.
+- **A country with no club stays grey**: it is not on the map, only drawn beneath it
+  as any country map's neighbours are. It is never territory, and attacks go around
+  it, by sea if need be. The Elite 32 has no Dutch club, so the Netherlands stays grey.
+
+Welsh clubs of the Premier League (Swansea, Cardiff, in earlier seasons) hold Wales,
+not England. AS Monaco, a Ligue 1 club, holds the land around Monaco in France.
+
+The earlier [football seasons](#football-seasons) hold the seven big leagues only, so
+their maps draw on those: the strongest 124 and 32 of that season's 132–134 clubs,
+one pair of maps per season. 2005/06 and 2004/05 have nations only, so no maps. Football's "One country · top clubs" campaigns are
+unchanged. A world campaign saved before these maps stays on the world, and resumes
+as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
+deals its clubs onto the world.
+
+Each map is `public/domestic/eu<clubs>[s<season year>].json` (40 files, 150–190 KB,
+fetched when chosen), with the index `src/data/europeMaps.js`. They follow the clubs, so
+rebuild them after `npm run build-clubs` or `npm run build:ea-seasons`:
+
+```bash
+npm run build:europe-maps                  # about 8 minutes; --only=eu124,eu32 builds just those
+npm run build:europe-maps -- --check       # offline rebuild must match the committed files byte for byte
+```
+
+Where each club stands comes from `scripts/data/europe-clubs.json`. Boundary layers
+and licences are listed in `public/domestic/ATTRIBUTION-europe.txt`, and
+[the design notes](docs/design/domestic-campaigns.md#the-europe-maps) describe the build.
+
 ### The NFL map
 
 American football has one theatre, **NFL**: the 32 franchises fight over the USA,
@@ -1044,10 +1090,10 @@ game: pick one under **Season** in setup. Each is a file in `public/football/`
 (75–335 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
-  and the clubs of the seven leagues the club layer uses (132–134 clubs a
-  season; 2005/06 and 2004/05 have nations only). Ratings are EA's overalls,
-  unchanged. EA rates only part of the
-  world, so 49–82 nations field a full XI each season (fewer in the older
+  and the clubs of the seven biggest European leagues (132–134 clubs a season,
+  of which the strongest 124 play, on [the season's own maps](#the-europe-maps);
+  2005/06 and 2004/05 have nations only). Ratings are EA's overalls, unchanged.
+  EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
   editions) and the rest field the players they have, as an empty or thin
   built-in nation does. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have

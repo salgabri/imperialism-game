@@ -264,15 +264,15 @@ test('while a chosen set loads, step 1 shows none of the built-in season\'s figu
   await withSetup(files, async ({ app, time }) => {
     await app.requestSeasons();
     app.pickSetup('layer', 'clubs');
-    app.pickSetup('clubScope', 'Premier League');
+    app.pickSetup('clubScope', 'elite');
     app.pickSetup('dataSet', ID);
     time.advance(200);
     const model = () => buildSetupModel(app.state.setup, { season: app.seasonStatus() });
     const loading = model();
     assert.equal(loading.season.state, 'loading');
-    assert.deepEqual(loading.scopes.map(scope => [scope.id, scope.count]), [['all', null], ['elite', null], ['Premier League', null]],
-      'no built-in league is offered, and the chosen one stays chosen until the set answers');
-    assert.equal(loading.scopeId, 'Premier League');
+    assert.deepEqual(loading.scopes.map(scope => [scope.id, scope.count]), [['all', null], ['elite', null]],
+      'a set with no Europe maps offers the two theatres on the world, and the chosen one stays chosen');
+    assert.equal(loading.scopeId, 'elite');
     assert.equal(loading.sports.find(sport => sport.id === 'football').note, 'Nations', 'no built-in club count on the card');
     assert.deepEqual(loading.stats.map(stat => stat.value), ['–', '–', '–']);
     assert.equal(loading.status, 'Loading the CM 01/02 · Test 2002 season…');
@@ -280,19 +280,19 @@ test('while a chosen set loads, step 1 shows none of the built-in season\'s figu
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
       const rows = () => [...document.querySelectorAll('[aria-labelledby="setup-theatre-label"] [role=radio]')];
-      assert.deepEqual(rows().map(row => row.querySelector('.setup-theatre__count').textContent), ['', '', '']);
+      assert.deepEqual(rows().map(row => row.querySelector('.setup-theatre__count').textContent), ['', '']);
       assert.deepEqual([...document.querySelectorAll('#setup-theatre option')].map(option => option.textContent),
-        ['All Leagues', 'Elite 32', 'Premier League']);
+        ['Top 124', 'Elite 32']);
       gate.resolve();
       await app.loadSet(ID);
       await settle();
       await view.refresh();
       assert.deepEqual(rows().map(row => row.querySelector('.setup-theatre__count').textContent),
-        ['5 clubs', '5 clubs', '3 clubs', '2 clubs'], 'the set\'s own leagues and counts once it has loaded');
+        ['5 clubs', '5 clubs'], 'the set\'s own counts once it has loaded');
     });
     const ready = model();
-    assert.equal(ready.scopeId, 'Premier League', 'the set has the league, so it stays');
-    assert.match(ready.status, /^3 clubs · 2 matches · /);
+    assert.equal(ready.scopeId, 'elite', 'the chosen theatre stays');
+    assert.match(ready.status, /^5 clubs · 4 matches · /);
     app.pickSetup('role', 'manager');
     app.pickSetup('managedTeamId', 'f-testford-united');
     const managed = buildSetupModel(app.state.setup, { season: app.seasonStatus(), managerTeams: app.setupTeams() }).managed;
@@ -319,14 +319,14 @@ test('a set keeps the built-in season\'s country maps out of the club theatres, 
     assert.equal(app.state.setup.clubScope, 'all', 'a chosen country falls back to every club');
     const model = buildSetupModel(app.state.setup, { season: app.seasonStatus() });
     assert.deepEqual(model.domesticScopes, [], 'no "One country" group with a set');
-    assert.deepEqual(model.scopes.map(scope => [scope.id, scope.count]), [['all', 5], ['elite', 5], ['Premier League', 3], ['La Liga', 2]]);
+    assert.deepEqual(model.scopes.map(scope => [scope.id, scope.count]), [['all', 5], ['elite', 5]]);
     assert.equal(model.sports.find(sport => sport.id === 'football').note, 'Nations · 5 clubs from 2 leagues');
     app.pickSetup('clubScope', 'Serie A');
-    assert.equal(app.state.setup.clubScope, 'all', 'a league the set leaves out is not a theatre');
+    assert.equal(app.state.setup.clubScope, 'all', 'one league is not a theatre');
     app.pickSetup('clubScope', 'domestic:826');
     assert.equal(app.state.setup.clubScope, 'all', 'nor is a country map');
-    app.pickSetup('clubScope', 'La Liga');
-    assert.equal(app.state.setup.clubScope, 'La Liga');
+    app.pickSetup('clubScope', 'elite');
+    assert.equal(app.state.setup.clubScope, 'elite');
 
     app.pickSetup('sport', 'basketball');
     assert.equal(app.state.setup.dataSet, null, 'basketball resets the season');
@@ -399,7 +399,7 @@ test('clubs on a set are the set\'s clubs, with their CM squads', async () => {
     assert.deepEqual(Object.keys(st.teams).sort(), SET.clubs.map(club => club.id).sort());
     assert.deepEqual(st.teams['f-testford-united'].squad.map(player => player.name), SET.clubs[0].squad.map(tuple => tuple[1]));
     assert.equal(st.settings.dataSet, ID);
-    assert.equal(st.campaignName, 'Football 2001/02 · All Leagues');
+    assert.equal(st.campaignName, 'Football 2001/02 · Top 124');
   }, { ids: ['250', '276', '826', '724', '380', '056'] });
 });
 
@@ -558,13 +558,14 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     assert.deepEqual(EARLIER.slice(-3), ['2006/07', '2005/06', '2004/05'], 'the earliest seasons');
     assert.match(modelOf().season.note, /2005\/06 and 2004\/05 have nations only/);
 
-    // From clubs: the season takes the nations, and keeps the league for when clubs come back.
+    // From clubs: the season takes the nations. It has no maps of Europe, so the theatre is kept as the plain elite
+    // for when clubs come back.
     app.pickSetup('layer', 'clubs');
-    app.pickSetup('clubScope', 'Premier League');
+    app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('role', 'manager');
     app.pickSetup('managedTeamId', 'f-arsenal');
     app.pickSetup('dataSet', EARLY_ID);
-    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope, setup().managedTeamId], ['nations', EARLY_ID, 'Premier League', '']);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope, setup().managedTeamId], ['nations', EARLY_ID, 'elite', '']);
     assert.equal(modelOf().canLaunch, false, 'Launch waits for the season');
     time.advance(200);
     await app.loadSet(EARLY_ID);
@@ -578,22 +579,22 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     assert.ok(model.teams.some(team => team.id === '250'), 'France is on offer');
     assert.ok(!model.teams.some(team => team.id === '499'), 'Montenegro joined FIFA in 2007');
 
-    // Another pick leaves the nations as they are, and the season's clubs never replace the theatre.
+    // Another pick leaves the nations and the theatre as they are.
     app.pickSetup('scope', 'AFC');
-    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['nations', EARLY_ID, 'Premier League']);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['nations', EARLY_ID, 'elite']);
 
-    // Clubs: the built-in season, in the league it had.
+    // Clubs: the built-in season, on its map of the elite.
     app.pickSetup('layer', 'clubs');
-    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', null, 'Premier League']);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', null, 'domestic:eu32']);
     assert.deepEqual([modelOf().layer, modelOf().season.id], ['clubs', null]);
 
-    // Back again, and a season with clubs lets them stay.
+    // Back again, and a season with clubs lets them stay, on its own map.
     app.pickSetup('dataSet', EARLY_ID);
     assert.equal(setup().layer, 'nations');
     app.pickSetup('dataSet', 'ea-fifa-07');
     assert.equal(setup().layer, 'nations', 'the player chooses clubs again if they want them');
     app.pickSetup('layer', 'clubs');
-    assert.deepEqual([setup().layer, setup().dataSet], ['clubs', 'ea-fifa-07']);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32s2007']);
   });
 });
 

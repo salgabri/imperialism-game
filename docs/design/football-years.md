@@ -237,8 +237,9 @@ How a season is made:
 - **Clubs by competition id.** The export names each club's league as it is in a
   later edition (FIFA 15's Burnley is in "Championship"), but its `league_id` is
   the edition's own, so clubs are taken from ids 13, 53, 31, 19, 16, 10 and 308,
-  the club layer's seven leagues. A club needs a natural XI, as build-clubs
-  requires: 132–134 clubs a season. Ids, codes and colours come from the same
+  the seven big leagues. A club needs a natural XI, as build-clubs
+  requires: 132–134 clubs a season, of which the strongest 124 and 32 play on the
+  season's own [Europe maps](domestic-campaigns.md#the-europe-maps). Ids, codes and colours come from the same
   `presentClubs` as the CM builder.
 - **Territory** is `territoryFor(FOOTBALL_FEDERATIONS, year)`, as for CM sets:
   Kosovo has no team before 2015/16, and Sudan holds South Sudan in the older seasons.
@@ -506,9 +507,10 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
   - A season with nations only (2005/06, 2004/05) takes Nations when chosen, and
-    choosing Clubs goes back to the built-in season. The club theatre stays as
-    it was, for when clubs come back. A challenge link that asks for clubs with
-    such a season has its `teams` ignored.
+    choosing Clubs goes back to the built-in season. With no Europe maps it keeps
+    the plain theatre (`all` or `elite`), so Clubs opens on the built-in season's
+    map of it. A challenge link that asks for clubs with such a season has its
+    `teams` ignored.
   - Country maps are built from the built-in FM data, so the "One country" group
     is not offered for another set.
   - Basketball has its own Season dropdown: the built-in 2026/27, then its

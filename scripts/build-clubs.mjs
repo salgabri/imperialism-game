@@ -12,6 +12,7 @@ import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
+import { TOP_CLUBS } from '../src/data/scopes.js';
 import { loadEaPlayers, pickFootballSquad, playerTuple } from './lib/football-data.mjs';
 import { clubsModule } from './lib/data-module.mjs';
 import { nbaSeasonClubs, readArchive } from './lib/nba-seasons.mjs';
@@ -19,20 +20,39 @@ import { CLUBS as CURRENT_NBA_CLUBS } from '../src/data/clubs.basketball.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
-// The main domestic leagues, mapped to the country whose map shape seeds them.
+// Europe's first divisions (UEFA's, as the nations' Europe theatre counts them) in the EA snapshot, by EA competition
+// id, with each league's name in the game and the map shape its clubs hold land in. By id because names collide
+// internationally: Austria also has a Bundesliga, Ukraine a Premier League, Greece and Switzerland a Super League.
 const FOOTBALL_LEAGUES = {
-  'Premier League': '826',
-  'La Liga': '724',
-  'Serie A': '380',
-  Bundesliga: '276',
-  'Ligue 1': '250',
-  Eredivisie: '528',
-  'Liga Portugal': '620',
+  13: { league: 'Premier League', country: '826' },
+  53: { league: 'La Liga', country: '724' },
+  31: { league: 'Serie A', country: '380' },
+  19: { league: 'Bundesliga', country: '276' },
+  16: { league: 'Ligue 1', country: '250' },
+  10: { league: 'Eredivisie', country: '528' },
+  308: { league: 'Liga Portugal', country: '620' },
+  68: { league: 'Süper Lig', country: '792' },
+  4: { league: 'Belgian Pro League', country: '056' },
+  63: { league: 'Greek Super League', country: '300' },
+  319: { league: 'Czech First League', country: '203' },
+  50: { league: 'Scottish Premiership', country: 'SCO' },
+  1: { league: 'Danish Superliga', country: '208' },
+  41: { league: 'Eliteserien', country: '578' },
+  332: { league: 'Ukrainian Premier League', country: '804' },
+  317: { league: 'Croatian HNL', country: '191' },
+  66: { league: 'Ekstraklasa', country: '616' },
+  189: { league: 'Swiss Super League', country: '756' },
+  80: { league: 'Austrian Bundesliga', country: '040' },
+  313: { league: 'Azerbaijan Premier League', country: '031' },
+  64: { league: 'Hungarian NB I', country: '348' },
+  330: { league: 'Romanian Liga I', country: '642' },
+  318: { league: 'Cypriot First Division', country: '196' },
+  56: { league: 'Allsvenskan', country: '752' },
+  322: { league: 'Veikkausliiga', country: '246' },
+  65: { league: 'League of Ireland', country: '372' },
 };
-// Names collide internationally: Austria also has a Bundesliga, Ukraine a
-// Premier League and Ecuador a Serie A. Use the database's competition IDs.
-const FOOTBALL_LEAGUE_IDS = { 'Premier League': 13, 'La Liga': 53, 'Serie A': 31,
-  Bundesliga: 19, 'Ligue 1': 16, Eredivisie: 10, 'Liga Portugal': 308 };
+// European first-division clubs EA lists under no competition.
+const LEAGUELESS_CLUBS = { 'PFC Ludogorets': { league: 'Bulgarian First League', country: '100' } };
 
 const FOOTBALL_FORMATION = { GK: 1, DF: 4, MF: 4, FW: 2 };
 const FOOTBALL_SIZE = 11;
@@ -107,32 +127,25 @@ const eaSource = process.argv[2] || path.join(root, 'scripts/data/ea-fc27.csv');
 const { players: eaPlayers } = await loadEaPlayers(eaSource);
 const byClub = new Map();
 for (const player of eaPlayers) {
-  if (player.leagueLevel !== 1) continue;
-  const league = player.league === 'Primeira Liga' ? 'Liga Portugal' : player.league;
-  const country = FOOTBALL_LEAGUES[league];
-  if (!country) continue;
-  if (player.leagueId !== FOOTBALL_LEAGUE_IDS[league]) continue;
+  const home = LEAGUELESS_CLUBS[player.club] ?? (player.leagueLevel === 1 ? FOOTBALL_LEAGUES[player.leagueId] : null);
+  if (!home) continue;
   const key = player.club;
   if (!key) throw new Error(`Missing club for ${player.sourceInfo.id}`);
-  if (!byClub.has(key)) byClub.set(key, { league, country, players: [] });
+  if (!byClub.has(key)) byClub.set(key, { ...home, players: [] });
   byClub.get(key).players.push(player);
 }
 
+// The strongest TOP_CLUBS of them by the exact mean of the lineup: `str` rounds it, and a club theatre takes clubs from
+// the top of this list among equals.
 const footballCodes = new Set();
-const footballClubs = [...byClub.entries()]
+const fielded = [...byClub.entries()]
   .map(([name, info]) => {
     const squad = pickFootballSquad(info.players);
-    return {
-      id: `f-${slug(name)}`,
-      name,
-      league: info.league,
-      country: info.country,
-      str: Math.round(mean(squad.map(p => p.rating))),
-      squad,
-    };
+    return { id: `f-${slug(name)}`, name, league: info.league, country: info.country, exact: mean(squad.map(p => p.rating)), squad };
   })
   .filter(c => c.squad.length >= FOOTBALL_SIZE)
-  .sort((a, b) => b.str - a.str);
+  .sort((a, b) => b.exact - a.exact || a.name.localeCompare(b.name));
+const footballClubs = fielded.slice(0, TOP_CLUBS).map(({ exact, ...c }) => ({ ...c, str: Math.round(exact) }));
 for (const c of footballClubs) {
   c.code = makeCode(c.name, footballCodes);
   c.col = colourFor(c.id);
@@ -144,9 +157,9 @@ await writeFile(path.join(root, 'src', 'data', 'clubs.football.js'), clubsModule
   `// GENERATED by scripts/build-clubs.mjs from the committed ${eaPlayers[0].sourceInfo.edition} snapshot (${eaPlayers[0].sourceInfo.snapshotDate}).
 // Player tuples retain database identity, all natural roles, original overall and source URL.
 //
-// Top-division clubs from the main European leagues, each with its best XI in a
-// 4-4-2 and a strength equal to that lineup's mean rating. \`country\` is the map
-// shape the club is seeded from when a club campaign starts.
+// Europe's ${TOP_CLUBS} strongest first-division clubs, strongest first, each with its best
+// XI in a 4-4-2 and a strength equal to that lineup's mean rating. \`country\` is the map
+// shape the club holds its land in.
 // Stored compactly: each line is JSON, and source metadata is a row under a
 // shared shape (src/data/sourceTable.js).
 `,
@@ -174,13 +187,12 @@ await emit(
 `,
 );
 
-const missing = Object.keys(FOOTBALL_LEAGUES).filter(l => ![...byClub.values()].some(c => c.league === l));
-console.log(`football: ${footballClubs.length} clubs across ${new Set(footballClubs.map(c => c.league)).size} leagues`);
-for (const [league] of Object.entries(FOOTBALL_LEAGUES)) {
+console.log(`football: ${footballClubs.length} of ${fielded.length} clubs, across ${new Set(footballClubs.map(c => c.league)).size} leagues`);
+for (const { league, country } of [...Object.values(FOOTBALL_LEAGUES), ...Object.values(LEAGUELESS_CLUBS)]) {
   const n = footballClubs.filter(c => c.league === league).length;
-  if (n) console.log(`  ${String(n).padStart(2)} ${league} (${NATIONS[FOOTBALL_LEAGUES[league]][0]})`);
+  if (n) console.log(`  ${String(n).padStart(2)} ${league} (${NATIONS[country][0]})`);
 }
-if (missing.length) console.log(`  leagues not found in the export: ${missing.join(', ')}`);
+console.log(`  last in: ${fielded[TOP_CLUBS - 1].name} (${fielded[TOP_CLUBS - 1].exact.toFixed(2)}); first out: ${fielded[TOP_CLUBS]?.name} (${fielded[TOP_CLUBS]?.exact.toFixed(2)})`);
 console.log(`  strongest: ${footballClubs.slice(0, 6).map(c => `${c.name} ${c.str}`).join(', ')}`);
 console.log(`basketball: ${basketballClubs.length} franchises`);
 console.log(`  strongest: ${basketballClubs.slice(0, 6).map(c => `${c.name} ${c.str}`).join(', ')}`);

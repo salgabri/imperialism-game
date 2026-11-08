@@ -1525,8 +1525,11 @@ export const gapLimitKm = units => Math.max(3, grainKm(units) / 2);
  * Format 1 may pass `allowed(club, unit)`: land a club may take while any club allowed
  * there can reach it (growSections; `unit` is the unit itself, crowd-cut pieces included),
  * and `spare`: no club takes another's last way out to land nearer that club (growSections).
+ * Format 1 may also pass `fair: { minKm2 }`: every club one section, but with the land rules of format 2 where they keep
+ * a club from being shut in (growth caps, fans, moved starts, the boxed-in retry), each club needing `minKm2`, and no
+ * unit halved for its size, so regions the caller keeps whole stay whole.
  */
-export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], extraPlaces = places, sections = rawHomes.length, joinKm = 0, allowed = null, spare = false, log = () => {} } = {}) {
+export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], extraPlaces = places, sections = rawHomes.length, joinKm = 0, allowed = null, spare = false, fair = null, log = () => {} } = {}) {
   const n = rawHomes.length;
   const topologyOf = list => {
     const unitTopo = unitTopology(list);
@@ -1570,12 +1573,12 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
   const minKm2 = 0.01 * padKm ** 2; // a hundredth of a median unit: smaller parts are slivers
   // Format 2 where every club starts on two or more sections: territories of about
   // their fair share of land (capped growth), clubs crowded into a city fanned out.
-  const grouped = sections > n && Math.floor(sections / n) >= 2;
+  const grouped = !!fair || (sections > n && Math.floor(sections / n) >= 2);
   const share = groupTargets(sections, n);
   // Sections under about 6 px across at the country's opening fit are too small to see.
   const [bw, bs, be, bn] = bboxOf(units.flatMap(u => u.polys));
   const extentKm = Math.max(kmBetween([bw, (bs + bn) / 2], [be, (bs + bn) / 2]), kmBetween([bw, bs], [bw, bn]));
-  const minSectionKm2 = (6 * extentKm / 900) ** 2;
+  const minSectionKm2 = fair?.minKm2 ?? (6 * extentKm / 900) ** 2;
   const linkKm = Math.min(15, Math.max(3, 0.1 * Math.sqrt(sourceAreaKm2 / n)));
   // The land-share estimates miss a club shut in by its neighbours' land as they grow
   // (Port Vila's clubs): one whose territory still ends up under
@@ -1601,7 +1604,7 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
       if (movedStarts.length) note(`  moved the starts of ${movedStarts.length} boxed-in clubs: ${movedStarts.map(c => `#${c + 1}`).join(', ')}`);
     }
     const fanOf = Array.from({ length: n }, (_, c) => fans.map((f, i) => (f.members.includes(c) ? i : -1)).filter(i => i >= 0));
-    ({ units, splits } = splitUnits(units, homeOf, sections, { maxGapKm: limit, minKm2, log: note, ...(grouped ? { maxUnitKm2: sourceAreaKm2 / sections } : {}) }));
+    ({ units, splits } = splitUnits(units, homeOf, sections, { maxGapKm: limit, minKm2, log: note, ...(grouped && !fair ? { maxUnitKm2: sourceAreaKm2 / sections } : {}) }));
     ({ topo, adjacency: unitAdjacency } = topologyOf(units));
     const grownUnits = units;
     ({ owner, seedUnit, seedPoint } = growSections(units, unitAdjacency, homeOf, {
@@ -1609,7 +1612,7 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
       ...(grouped ? {
         reach: fanOf.map(list => (list.length ? Infinity : reach ?? REACH)),
         share, cap: share.map(t => 1.5 * sourceAreaKm2 * t / sections),
-        allowed: (club, u) => !grownUnits[u].fans || grownUnits[u].fans.every(m => m == null || m === club),
+        allowed: (club, u) => (!grownUnits[u].fans || grownUnits[u].fans.every(m => m == null || m === club)) && (!allowed || allowed(club, grownUnits[u])),
       } : {
         spare,
         ...(allowed ? { allowed: (club, u) => allowed(club, grownUnits[u]) } : {}),
@@ -1803,10 +1806,11 @@ export function facingSections(sectionPolys, km) {
 /**
  * Visvalingam simplification to about `target` arc points. Shared arcs are
  * simplified once, so borders stay identical on both sides; every ring keeps at
- * least four distinct vertices so small sections cannot collapse.
+ * least four distinct vertices so small sections cannot collapse. Points `keep([x, y])` picks always stay.
  */
-export function simplifyTopology(topo, target) {
+export function simplifyTopology(topo, target, keep = null) {
   const weighted = presimplify(topo);
+  if (keep) for (const arc of weighted.arcs) for (const p of arc) if (keep(p)) p[2] = Infinity;
   const interior = [];
   for (const arc of weighted.arcs) for (let i = 1; i < arc.length - 1; i++) interior.push(arc[i][2]);
   const fixed = weighted.arcs.reduce((s, a) => s + Math.min(2, a.length), 0);
