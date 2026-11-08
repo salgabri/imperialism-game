@@ -15,9 +15,28 @@ export const DEPENDENCIES = {
 
 // Football's home nations: England, Scotland, Wales and Northern Ireland each field a team, so the map cuts the
 // United Kingdom (826, which is England) into four shapes (scripts/build-home-nations.mjs). These are the three cut
-// from it. Saves and data sets from before the cut give their land to whoever holds England, and basketball, where
-// Great Britain is one FIBA team, still plays the United Kingdom as one.
+// from it. Saves and data sets from before the cut give their land to whoever holds England, and basketball, baseball
+// and ice hockey, where Great Britain is one team, still play the United Kingdom as one (GREAT_BRITAIN below).
 export const HOME_NATIONS = Object.freeze(['SCO', 'WAL', 'NIR']);
+
+/**
+ * The United Kingdom's team where its home nations play as one (FIBA, the World Baseball Classic, the IIHF): Great
+ * Britain, under the Union Jack (flag id 'GBR' in src/data/flags.js). A sport plays it so through `playsAs`
+ * (`{ '826': GREAT_BRITAIN }`), and its team keeps the id 826, so saves and the map are unchanged. Football's 826 is
+ * England, a campaign saved before keeps the name it was saved with, and the land itself keeps its own names.
+ */
+export const GREAT_BRITAIN = Object.freeze({ name: 'Great Britain', code: 'GBR', flagId: 'GBR' });
+
+/**
+ * A nation's name, code and flag id in `sport` (a sport object; none for the nation's own): what the sport plays it
+ * as (`sport.playsAs`), else its NATIONS entry and its own flag → { name, code, flagId }, or null for no nation.
+ */
+export function nationIdentity(id, sport) {
+  const rec = NATIONS[id];
+  if (!rec) return null;
+  const as = sport?.playsAs?.[id];
+  return { name: as?.name ?? rec[0], code: as?.code ?? rec[1], flagId: as?.flagId ?? id };
+}
 
 // Shapes drawn on the map that never belong to anyone (club seeding never deals them).
 // Antarctica, Fr.S.Lands, Falklands, W.Sahara, N.Cyprus, Somaliland.
@@ -309,7 +328,9 @@ function rosterPlayer([name, listed, rating, metadata]) {
 export function buildTeam(id, rng, sport) {
   const rec = NATIONS[id];
   if (!rec) return null;
-  const [name, code, conf, culture, , colRaw] = rec;
+  const [, , conf, culture, , colRaw] = rec;
+  // The name, code and flag the sport plays the nation under: the United Kingdom is Great Britain outside football.
+  const { name, code, flagId } = nationIdentity(id, sport);
   const col = colRaw || `oklch(0.72 0.14 ${Math.floor(hashStr(id) % 360)})`;
   const roster = sport.rosters[id];
   const { squadSize, formation, positionPlan } = sport;
@@ -355,8 +376,8 @@ export function buildTeam(id, rng, sport) {
     kind: 'nation',
     /** The map shape this combatant is seeded from — its homeland. */
     home: id,
-    /** Nations fly a flag; clubs do not. */
-    flagId: id,
+    /** Nations fly a flag (their own id, or the sport's: Great Britain's 'GBR'); clubs do not. */
+    flagId,
     sport: sport.id,
     origin: id,
   };

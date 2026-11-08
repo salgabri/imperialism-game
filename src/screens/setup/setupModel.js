@@ -3,7 +3,7 @@
 // The in-game settings panel reads the same option lists, Show matches helpers and `campaignFacts`.
 // Everything here is a pure function of the setup record and the opening teams App already computes
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
-import { NATIONS, SCOPES } from '../../data/teams.js';
+import { NATIONS, SCOPES, nationIdentity } from '../../data/teams.js';
 import { CLUB_SCOPES, TOP_CLUBS, strongestClubs as topClubs } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
@@ -538,10 +538,11 @@ function bestPlayers(sport, team, clubLayer, setup) {
 function teamIdentity(sport, id, clubLayer) {
   if (clubLayer) {
     const club = clubIndex(sport).get(id);
-    return { code: club?.code || String(id).slice(0, 3).toUpperCase(), group: club?.league || '', isClub: true };
+    return { code: club?.code || String(id).slice(0, 3).toUpperCase(), group: club?.league || '', isClub: true, flagId: null };
   }
-  const nation = NATIONS[id];
-  return { code: nation?.[1] || String(id), group: nation?.[2] || '', isClub: false };
+  // As the sport plays it: the United Kingdom is Great Britain (GBR, the Union Jack) outside football.
+  const nation = nationIdentity(id, sport);
+  return { code: nation?.code || String(id), group: NATIONS[id]?.[2] || '', isClub: false, flagId: nation?.flagId ?? null };
 }
 
 const NO_ROWS = Object.freeze([]);
@@ -622,6 +623,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     const rank = rankOf.get(team.id);
     return {
       id: team.id, name: team.name, code: team.code || identity.code, isClub: team.isClub ?? identity.isClub,
+      // The flag a nation flies (Great Britain's is not its shape's); none for a club.
+      flagId: team.flagId ?? identity.flagId,
       rating: team.rating, ratingText: Number.isFinite(team.rating) ? team.rating.toFixed(1) : '–', rank,
     };
   };

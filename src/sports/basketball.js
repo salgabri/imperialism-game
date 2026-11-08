@@ -2,7 +2,7 @@ import { C } from '../theme.js';
 import { ROSTERS } from '../data/rosters.basketball.js';
 import { CLUBS } from '../data/clubs.basketball.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
-import { HOME_NATIONS, selectLineup } from '../data/teams.js';
+import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../data/nbaLeagueAverages.js';
 
 // Two rulebooks, one model. Nations play FIBA's four ten-minute quarters at about 73 possessions a game. Clubs are
@@ -279,6 +279,8 @@ export const basketball = {
   clubs: CLUBS,
   // Great Britain is one FIBA team: the home nations' shapes start in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
+  // That empire plays as Great Britain, under the Union Jack.
+  playsAs: { '826': GREAT_BRITAIN },
 
   squadSize: 5,
   formation: { PG: 1, SG: 1, SF: 1, PF: 1, C: 1 },
