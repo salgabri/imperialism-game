@@ -43,9 +43,9 @@ By EA's nationality, 78 nations have at least one rated player; 27 can field a f
 each is a theatre: the Women's Super League (14), the NWSL (16), Liga F (16), the
 Frauen-Bundesliga (14) and the Première Ligue (12). Its other twelve clubs, a club or two of
 each smaller league (Juventus, Roma, Ajax, Twente, Häcken, Rosengård, Slavia Praha, Benfica,
-Brann, Zürich, Glasgow City, Breiðablik), play together as **Rest of Europe**. Clubs seed the
-world map from their home countries, as the men's do. There are no one-country maps: those hold
-the men's clubs.
+Brann, Zürich, Glasgow City, Breiðablik), play together as **Rest of Europe**. Clubs are dealt
+onto the world map from their home countries, as the men's were before their maps of Europe.
+There are no one-country maps or maps of Europe: those hold the men's clubs.
 
 ## Crests
 

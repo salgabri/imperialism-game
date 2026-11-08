@@ -15,6 +15,7 @@ import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
 import { loadEaPlayers, fmGameRating, parseCsv } from './lib/football-data.mjs';
 import { decodeFootballSet } from '../src/engine/footballSets.js';
+import { TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
 
 const evidence = {
   id: 'ea:123', fullName: 'Verified Player', positions: ['MF', 'FW'],
@@ -234,12 +235,15 @@ test('the 29-February filter drops half-generated clubs and clubless players onl
 test('competition IDs keep foreign namesakes out of the European club leagues', async () => {
   const ea = await loadEaPlayers(new URL('./data/ea-fc27.csv', import.meta.url));
   const records = new Map(ea.players.map(player => [player.sourceInfo.id, player]));
-  const expected = { 'Premier League': [13, 20], 'La Liga': [53, 20], 'Serie A': [31, 20],
-    Bundesliga: [19, 18], 'Ligue 1': [16, 18], Eredivisie: [10, 18], 'Liga Portugal': [308, 18] };
-  for (const [league, [competitionId, count]] of Object.entries(expected)) {
-    const clubs = football.clubs.filter(club => club.league === league);
-    assert.equal(clubs.length, count, league);
-    for (const club of clubs) for (const player of club.squad) assert.equal(records.get(player[3].id).leagueId, competitionId, club.name);
+  const expected = { 'Premier League': 13, 'La Liga': 53, 'Serie A': 31, Bundesliga: 19, 'Ligue 1': 16, Eredivisie: 10, 'Liga Portugal': 308,
+    'Süper Lig': 68, 'Belgian Pro League': 4, 'Greek Super League': 63, 'Czech First League': 319, 'Scottish Premiership': 50, 'Danish Superliga': 1,
+    Eliteserien: 41, 'Ukrainian Premier League': 332, 'Croatian HNL': 317, 'Bulgarian First League': 0 };
+  assert.equal(football.clubs.length, TOP_CLUBS, 'the strongest clubs in Europe, and no others');
+  assert.deepEqual(football.clubs, strongestClubs(football.clubs, TOP_CLUBS), 'strongest first, as the theatres take them');
+  for (const club of football.clubs) {
+    assert.ok(Object.hasOwn(expected, club.league), `${club.name} plays in ${club.league}`);
+    // Ludogorets is the one first-division club EA lists under no competition.
+    for (const player of club.squad) assert.equal(records.get(player[3].id).leagueId, expected[club.league], club.name);
   }
   const brazil = buildTeam('076', makeRng(1), football);
   assert.equal(brazil.squad.filter(player => /vin[ií]cius|vini jr/i.test(player.name)).length, 1, 'legal and familiar names must not duplicate Vinícius Júnior');

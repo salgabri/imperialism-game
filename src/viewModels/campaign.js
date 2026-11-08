@@ -4,7 +4,7 @@
 // `stats: {}`, teams without baseEff, and matches/history entries without odds, routeKind, live or tactic
 // (smoke injects such matches). Memo keys carry the `col:` prefix (PLAN rule 16).
 import { SCOPES, teamEff } from '../data/teams.js';
-import { CLUB_SCOPES } from '../data/scopes.js';
+import { worldClubTheatreName } from '../data/scopes.js';
 import { domesticLabel } from '../data/domesticScope.js';
 import { getSport, overtimePeriodsOf, overtimeShort } from '../sports/index.js';
 import { domesticIdOf } from '../app/shared.js';
@@ -48,10 +48,7 @@ function scopeNameOf(settings) {
   try {
     // A country theatre ("England · top 100 clubs"), as App.scopeName names it.
     if (domesticIdOf(settings)) return domesticLabel(settings.clubScope) || '';
-    if (settings.layer === 'clubs') {
-      const scopes = CLUB_SCOPES(getSport(settings.sport));
-      return plainScopeName((scopes.find(x => x.id === settings.clubScope) || scopes[0])?.name || '');
-    }
+    if (settings.layer === 'clubs') return plainScopeName(worldClubTheatreName(settings));
     return plainScopeName(SCOPES.find(x => x.id === settings.scope)?.name || 'World War');
   } catch {
     return '';

@@ -7,7 +7,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { build } from 'esbuild';
 import { CAPITALS } from '../src/data/capitals.js';
 import { NATIONS, makeRng, teamEff } from '../src/data/teams.js';
-import { getSport } from '../src/sports/index.js';
 import { WorldGeometry } from '../src/engine/geo.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
 
@@ -238,7 +237,6 @@ export function productionMatrix(name = 'coverage') {
   const baseline = { sport: 'football', layer: 'nations', scope: 'elite', clubScope: 'elite', pacing: 'blitz',
     uncertainty: 'balanced', finale: 'single', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic', managerPolicy: 'spectator' };
   if (name === 'competitive') return ['authentic', 'competitive'].map(rosterPreset => ({ ...baseline, sport: 'basketball', rosterPreset }));
-  const firstLeague = sport => getSport(sport).clubs[0]?.league || 'all';
   return [
     {},
     { scope: 'CONMEBOL', pacing: 'duel', uncertainty: 'predictable' },
@@ -247,7 +245,7 @@ export function productionMatrix(name = 'coverage') {
     { scope: 'AFC', pacing: 'chaos', finale: 'best-of-three', acquisitionPolicy: 'best-fit' },
     { scope: 'CONCACAF', pacing: 'duel' },
     { layer: 'clubs', acquisitionPolicy: 'best-fit' },
-    { layer: 'clubs', clubScope: firstLeague('football'), pacing: 'duel', uncertainty: 'wild' },
+    { layer: 'clubs', clubScope: 'all', pacing: 'duel', uncertainty: 'wild' },
     { sport: 'basketball' },
     { sport: 'basketball', rosterPreset: 'competitive' },
     { sport: 'basketball', scope: 'UEFA', pacing: 'chaos', uncertainty: 'wild', acquisitionPolicy: 'best-fit', finale: 'best-of-three' },

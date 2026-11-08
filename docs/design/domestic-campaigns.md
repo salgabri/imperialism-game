@@ -22,11 +22,12 @@ around its home town (one section each when N = 100). Conquest follows the
 existing rules: the winner annexes everything the loser holds and claims one
 player, so a starting group always changes hands whole.
 
-The world campaigns (nations and the 132-club European layer, both sports) are
-unchanged: same geometry, seeded outcomes, saves and rendering. NBA clubs, which
-used to be dealt across the world map, now play on a map of their own: the USA
-and Canada, where each franchise holds its own state or province (see "The NBA
-map" below).
+The world campaigns of nations (both sports) are unchanged: same geometry, seeded
+outcomes, saves and rendering. Clubs, which used to be dealt across the world map,
+now play on maps of their own: Europe's football clubs each in their own country
+("The Europe maps" below), and NBA clubs on the USA and Canada, where each franchise
+holds its own state or province ("The NBA map"). Women's football's clubs have no map of
+their own and are still dealt across the world ([womens-football.md](womens-football.md)).
 
 ### Tiers
 
@@ -584,9 +585,8 @@ the town where it lies on the painted section, else the anchor.
 **Setup.** With Clubs and football, the Theatre list gains the group "One
 country · top clubs" (and the `#setup-theatre` mirror its optgroup: "England ·
 100 clubs", "Fiji · 16 clubs", value `domestic:<id>`), in the tiers' priority
-order (England, Spain, Germany, Italy, France, …); the European leagues above
-it follow their countries' order (Premier League, La Liga, Bundesliga, Serie A,
-Ligue 1, Liga Portugal, Eredivisie). The description reads the
+order (England, Spain, Germany, Italy, France, …), below the group "Europe" and
+its two theatres ("The Europe maps" below). The description reads the
 index's `sections` (`clubs` for a format-1 entry): "… 16 clubs fighting over
 Fiji, split into 100 sections drawn from its administrative divisions; each club
 starts with 6 or 7 of them." An even split names one number, and a 100-club
@@ -645,7 +645,7 @@ A save on a country that no longer ships cannot resume either, and is kept: "The
 map of Belize is no longer in the game, so the campaign cannot resume. The save
 is kept." (Offline, a copy of the map the service worker kept still loads it.) The
 setup no longer lists the country, and a challenge link naming it falls back to
-every club.
+the Top 124 ("The Europe maps" below).
 
 ## Acceptance checks (as tested)
 
@@ -786,8 +786,8 @@ Maryland and Virginia nobody's) to Toronto's 983,000 km².
 only for its sport (a football country for football, the NBA map for basketball),
 so a world NBA campaign saved before (`clubScope` `all`, `elite` or `NBA`) still
 restores on the world. `setClubScope` (App) moves basketball clubs to
-`domestic:nba` whatever the setup held, and a football setup left on it back to
-every club. The setup lists the one row "NBA · 30 clubs", describes the split
+`domestic:nba` whatever the setup held, and a football setup left on it to the
+Top 124. The setup lists the one row "NBA · 30 clubs", describes the split
 ("… lead the 30 NBA clubs fighting over the USA and Canada, each starting with only its arena's state or province …"),
 loads and previews the map like a country, and titles read "NBA · USA and Canada".
 `decodeDomestic` returns the empty land as `empty` (a `WorldGeometry`, only ever
@@ -930,6 +930,117 @@ without a club stays empty. Homes are `scripts/data/nhl-teams.json`, each club's
 **Checks**: `scripts/hockey.test.mjs`: file, index, arenas and clubs agree; every arena lies
 inside its territory; the shared states are split, Staten Island stays New York's; seeded duel
 campaigns reach a champion; the App launches on the map. The smoke runs an NHL duel.
+
+## The Europe maps
+
+Status: implemented 2026-11-07. Football clubs have two theatres, **Top 124** and
+**Elite 32**: the strongest clubs of the season on a map of Europe, each club on land
+in its own country. They replace the single-league theatres and the dealing of clubs
+across the world map. The map is format 1 (one section per club), with the fields of
+"The NBA map" below that a sport's own map adds, and it reuses that runtime: loader,
+chart, backdrop, routing, saves.
+
+**The field.** `scripts/build-clubs.mjs` takes the first-division clubs of the 26
+European leagues in the EA FC 27 snapshot, plus PFC Ludogorets, which EA lists under
+no competition: 309 clubs with a natural XI. The strongest `TOP_CLUBS` (124, in
+`src/data/scopes.js`) by the exact mean of that XI are `src/data/clubs.football.js`,
+strongest first: 20 clubs each from England and Spain, 19 Italy, 16 Germany, 15 France,
+6 the Netherlands, 4 each from Portugal, Turkey, Belgium and Greece, 3 Czechia, 2 each
+from Denmark, Ukraine and Scotland, and one each from Norway, Croatia and Bulgaria.
+The strongest `ELITE_CLUBS` (32) are the elite. An earlier season's file holds the
+seven big leagues only, and its two fields are the strongest of those.
+
+**Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 8 minutes;
+`--only=eu124,eu32`, `--check`, `--dry-run`). The maps follow the clubs, so they are rebuilt
+after `npm run build-clubs` or `npm run build:ea-seasons`; the build stops on a club with
+no row in the table below, and the test on a field that has changed. For each of 20
+seasons and each of the two fields:
+
+- **Homes**: `scripts/data/europe-clubs.json`, one row per club of any season: a
+  `city` that names its land (repeats take the club: "Rome (Lazio)"), `home`, and
+  `shape` where the land is not its league's: the Welsh clubs of the Premier League
+  hold `WAL`. Coordinates come from the club's row in a country map (`source`: its
+  `d<nation>-<FM id>`, by the crest twin or by name) or by hand. AS Monaco stays in
+  France: Monaco's own world shape is a few pixels.
+- **One club in a country**: the section is the country's world shape, without land
+  beyond `OVERSEAS_KM` of its main landmass (French Guiana, the Dutch Caribbean). The
+  Azores, Canaries and Svalbard stay; the opening camera leaves them out.
+- **Several clubs**: `COUNTRIES` names the country's finest geoBoundaries layer
+  (ADM2 to ADM4) and the layers that group it into regions. All geometry comes from the
+  finest layer, merged on its shared arcs, so a coarse unit and its neighbour's fine
+  ones share every vertex; the coarser layers only group (`regionalUnits`):
+    - A region holding one club stays whole, for that club.
+    - A region holding two or more is split one level down, and only its clubs may
+      take its land (the partition's `allowed`).
+    - A region holding none stays whole unless it is larger than a club's share. A top
+      region splits above a quarter of the country's share per club (`FREE_TOP`), a
+      lower one above a whole share (`FREE_LOWER`), so one neighbour does not take
+      Castile. Its land goes to any club, or within a shared region to that region's.
+    - A top region whose clubs would hold under a quarter of the country's share per
+      club (`TINY_REGION`) joins its largest neighbouring region: Berlin and Brandenburg,
+      Bremen and Lower Saxony, Madrid and Castile. Their clubs share the joined land.
+- **Partition**: `partitionCountry` per country, one section per club, with
+  `fair: { minKm2 }`: format 1's sections, but the land rules of format 2 where they keep
+  a club from being shut in (growth caps at 1.5× a fair share, fans, moved starts, the
+  boxed-in retry), and no unit halved for its size, so regions stay whole. A club needs a
+  tenth of its country's share per club and at least 1,200 km²: about 35 km across, 6 px
+  at the opening fit. One that cannot find it around its ground starts next door. Land the
+  world outline leaves out (Porto Santo) is dropped first, or a club moved there would end
+  up with nothing. England and Scotland have no regions in the layers, so their clubs grow
+  over counties and council areas, and a unit with one neighbour goes with it (Blackpool
+  with Lancashire, Nottingham with its county), or whichever club took the larger one would
+  shut it in.
+- **World outlines** (`fitToOutline`): each territory is clipped to the country's world
+  shape, and each piece of the shape they miss joins the nearest territory. So a country
+  keeps the borders the rest of the game draws, and meets its grey neighbours exactly.
+  `polygon-clipping` can fail on near-coincident edges, so the missed land is found
+  against the union of all territories (from the topology) and joined on shared arcs,
+  not by another clip, and a failing subject is retried rounded to a centimetre or a
+  decimetre. The outline keeps its exact vertices, and `simplifyTopology`'s `keep` holds
+  them through simplification, so section and backdrop never part.
+- **Output** as the sport maps: 16,000 arc points, quantized at 1e5, colours that differ
+  across borders and water. Sections are in rank order, `eu124-001` the strongest. The
+  file adds `theatre` (`all` or `elite`), `seasons` for an earlier season's map, and a
+  club row's `shape`. The 40 files hold 150–190 KB each, 6.6 MB in all, with
+  `public/domestic/ATTRIBUTION-europe.txt` and the index `src/data/europeMaps.js`
+  (`{ id, sport, league, name, theatre, seasons?, clubs, sections, countries, version, top? }`).
+
+**Result** (built-in season). Elite 32: Paris Saint-Germain holds France; the Netherlands
+and Belgium stay grey; Bayern Munich Bavaria and RB Leipzig the east. Top 124: 17 countries
+in colour, the rest of Europe grey, Bodø/Glimt Norway, Dinamo Zagreb Croatia, Ludogorets
+Bulgaria. The smallest land is about 1,900 km² (Rayo Vallecano's, in the crowd around
+Madrid). A club's ground lies in its own land, except for clubs boxed in by their city,
+whose land starts next door: at most about 100 km away, for the Istanbul club that starts
+across the Bosphorus in Anatolia (Beşiktaş in the Top 124, Galatasaray in the Elite 32,
+which splits Turkey about evenly), since Thrace is a thirtieth of the country. Earlier
+seasons have smaller lands where a league crowds into one place: Madeira's three clubs in
+2015/16 share their island, the smallest with about 200 km².
+
+**Runtime.** Scopes are `domestic:eu124`, `domestic:eu32` and `domestic:eu124s2018`.
+`setClubScope` keeps a setup on the map of its theatre and season: `all`, `elite`, an old
+link's league and another sport's map all land there, and one country's map stays
+until a season leaves it. The setup lists the season's two rows ("Europe") above the
+countries, known even while a season loads, and describes the rules. A session length
+picks between them (Short: Elite 32), and leaves a chosen country as it is. `dataSetOf`
+keeps a season on its own maps; `parseCampaign` accepts a set only on its own map
+(`isSeasonEuropeMap`). The map's rows take the season's clubs at kick-off, as a basketball
+era's do. The victory names "Europe".
+
+**Old games.** A world campaign saved before these maps (`clubScope` `all`, `elite` or a
+league) has no `domestic:` scope, so it restores on the world with its dealt land, under
+its old name ("All Leagues"). "Another team" after a defeat there opens on the map that
+replaced it. An old link's `theatre=Premier+League` is reported as not offered.
+A CM 01/02 set built on this computer has no maps, so it plays the two theatres on the
+world, dealt by `seedClubs` as all clubs once were.
+
+**Checks**: `scripts/europe-maps.test.mjs`: index, files, fields and hashes; each club's
+land lies in its country and the land sums to the outlines; the only club holds its whole
+country; a region with one club goes whole to it; every club holds a fair piece; a
+country with no club has no section and is drawn beneath as an obstacle; neighbour
+colours; seeded duel campaigns on both built-in maps reach a champion without treaties;
+`setClubScope` and `dataSetOf`; the App sets up and launches both a built-in and a season
+map, and keeps an old campaign on the world. The smoke runs Elite 32 and Top 124
+campaigns and an Elite 32 resume.
 
 ## Known limitations
 

@@ -1,6 +1,8 @@
 {
   "items": {
     "d620-2000263090": "Q120775987",
+    "f-celtic": "Q19593",
+    "f-rangers-fc": "Q19597",
     "w-ol-lyonnes": "Q1276685",
     "w-london-city": "Q65070115",
     "w-gotham-fc": "Q1447181",
@@ -32,6 +34,7 @@
   },
   "twins": {
     "f-venezia": "d380-1179",
+    "f-trabzonspor": "d792-1879",
     "w-arsenal": "d826-602",
     "w-fc-barcelona": "d724-1708",
     "w-chelsea": "d826-630",

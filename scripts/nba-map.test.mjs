@@ -259,7 +259,7 @@ test('basketball clubs set up and launch on the NBA map; football clubs keep the
     // Back to football: the NBA's map is no football theatre.
     app.openSetup();
     app.pickSetup('sport', 'football');
-    assert.equal(app.state.setup.clubScope, 'all');
+    assert.equal(app.state.setup.clubScope, 'domestic:eu124');
   });
 });
 

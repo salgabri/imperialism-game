@@ -410,7 +410,7 @@ test('American football sets up with clubs only, launches on the NFL map and sav
 
     app.openSetup();
     app.pickSetup('sport', 'football');
-    assert.equal(app.state.setup.clubScope, 'all', "the NFL's map is no football theatre");
+    assert.equal(app.state.setup.clubScope, 'domestic:eu124', "the NFL's map is no football theatre");
   } finally {
     f.close();
     if (prior) Object.defineProperty(globalThis, 'fetch', prior); else delete globalThis.fetch;

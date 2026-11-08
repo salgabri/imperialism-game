@@ -2,7 +2,7 @@
 // Pure: (state, ctx) in, plain data out. No window/document/timers/RNG. Tolerates loading/setup state
 // (teams {}, aliveIds [], board null), `stats: {}`, teams without baseEff and history entries without odds.
 import { DEPENDENCIES, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
-import { CLUB_SCOPES } from '../data/scopes.js';
+import { worldClubTheatreName } from '../data/scopes.js';
 import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
 import { footballProfile } from '../sports/football.js';
@@ -31,10 +31,7 @@ function scopeNameOf(settings) {
   try {
     // A country theatre ("England · top 100 clubs"), as App.scopeName names it.
     if (domesticIdOf(settings)) return domesticLabel(settings.clubScope) || '';
-    if (settings.layer === 'clubs') {
-      const scopes = CLUB_SCOPES(getSport(settings.sport));
-      return plainScopeName((scopes.find(x => x.id === settings.clubScope) || scopes[0])?.name || '');
-    }
+    if (settings.layer === 'clubs') return plainScopeName(worldClubTheatreName(settings));
     return plainScopeName(SCOPES.find(x => x.id === settings.scope)?.name || 'World War');
   } catch {
     return '';

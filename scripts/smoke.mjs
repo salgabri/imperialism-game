@@ -31,6 +31,9 @@ const NFL = { sport: 'american-football', layer: 'clubs', clubScope: 'domestic:n
 const MLB = { sport: 'baseball', layer: 'clubs', clubScope: 'domestic:mlb' };
 // Ice hockey clubs: the 32 NHL clubs on their own map of the USA and Canada.
 const NHL = { sport: 'hockey', layer: 'clubs', clubScope: 'domestic:nhl' };
+// Football clubs: Europe's strongest, each on land in its own country.
+const TOP = { layer: 'clubs', clubScope: 'domestic:eu124' };
+const ELITE = { layer: 'clubs', clubScope: 'domestic:eu32' };
 
 const SCENARIOS = [
   { name: 'South America · duel · ticker', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
@@ -38,7 +41,8 @@ const SCENARIOS = [
   { name: 'N. & C. America · chaos · instant', scope: 'CONCACAF', pacing: 'chaos', resolution: 'instant' },
   { name: 'BASKETBALL · South America · duel · ticker', sport: 'basketball', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
   { name: 'BASKETBALL · Europe · blitz · instant', sport: 'basketball', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
-  { name: 'CLUBS · Premier League · blitz · instant', layer: 'clubs', clubScope: 'Premier League', pacing: 'blitz', resolution: 'instant' },
+  { name: 'CLUBS · Elite 32 · blitz · instant', ...ELITE, pacing: 'blitz', resolution: 'instant' },
+  { name: 'CLUBS · Top 124 · duel · ticker', ...TOP, pacing: 'duel', resolution: 'ticker' },
   { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', setupChecks: true },
   { name: 'DOMESTIC · England top clubs · blitz · instant', ...ENGLAND, pacing: 'blitz', resolution: 'instant' },
@@ -55,7 +59,7 @@ const SCENARIOS = [
 const RESUME_SCENARIOS = [
   { name: 'World war · blitz · instant', scope: 'world', pacing: 'blitz', resolution: 'instant', expectedField: 173 },
   { name: 'BASKETBALL · South America · blitz · instant', sport: 'basketball', scope: 'CONMEBOL', pacing: 'blitz', resolution: 'instant' },
-  { name: 'CLUBS · Premier League · blitz · instant', layer: 'clubs', clubScope: 'Premier League', pacing: 'blitz', resolution: 'instant' },
+  { name: 'CLUBS · Elite 32 · blitz · instant', ...ELITE, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', finish: true },
   { name: 'DOMESTIC · Fiji top clubs · chaos · instant', ...FIJI, pacing: 'chaos', resolution: 'instant', finish: true },
@@ -66,7 +70,7 @@ const RESUME_SCENARIOS = [
 const LABEL_SCENARIOS = [
   { name: 'World nations', scope: 'world' },
   { name: 'European nations', scope: 'UEFA' },
-  { name: 'Premier League clubs', layer: 'clubs', clubScope: 'Premier League' },
+  { name: 'Elite 32 clubs on the map of Europe', ...ELITE },
   { name: 'England top clubs on their own map', ...ENGLAND },
 ];
 
@@ -279,11 +283,12 @@ function checkTheatres(scenario, theatre) {
     check('only football clubs offer single-country theatres', countries.length === 0, countries.map(option => option.text).join(', '));
     return;
   }
-  const leagues = theatre.groups.find(group => group.label === 'European leagues');
+  const europe = theatre.groups.find(group => group.label === 'Europe');
   const domestic = theatre.groups.find(group => group.label === 'One country · top clubs');
   const expected = DOMESTIC.slice().sort((a, b) => nationPriority(a.id) - nationPriority(b.id))
     .map(entry => ({ value: `domestic:${entry.id}`, text: `${entry.name} · ${entry.clubs} clubs` }));
-  check('existing club theatres are grouped as European leagues', JSON.stringify(leagues?.options.map(option => option.value)) === JSON.stringify(theatre.clubScopes),
+  check('Europe offers its strongest clubs and its elite, and no single league', JSON.stringify(europe?.options) === JSON.stringify([
+    { value: 'domestic:eu124', text: 'Top 124 · 124 clubs' }, { value: 'domestic:eu32', text: 'Elite 32 · 32 clubs' }]),
     JSON.stringify(theatre.groups.map(group => group.label)));
   check('every shipped country is offered by name with its club count, in priority order', JSON.stringify(domestic?.options) === JSON.stringify(expected),
     JSON.stringify(domestic?.options));
@@ -665,7 +670,6 @@ if (!filtered && fixedChecks) {
       const clubs = sport.clubs.map(c => buildClub(c, sport));
       const codes = clubs.map(c => c.code);
       const leagues = [...new Set(sport.clubs.map(c => c.league))];
-      const scopes = CLUB_SCOPES(sport);
       const badHome = clubs.filter(c => !NATIONS[c.home]);
       const outOfRange = clubs.flatMap(c => c.squad).filter(p => p.rating > 99 || p.rating < 1);
       const badPos = clubs.flatMap(c => c.squad).filter(p => !sport.positionColors[p.pos]);
@@ -679,7 +683,8 @@ if (!filtered && fixedChecks) {
       check('every club has a real home country', badHome.length === 0, badHome.map(c => c.name).join(', '));
       check('every club rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
       check('every club position belongs to this sport', badPos.length === 0, [...new Set(badPos.map(p => p.pos))].join(', '));
-      check('every league is selectable as a theatre', leagues.every(l => scopes.some(s => s.id === l)), 'missing scope');
+      // Football has no league theatres: its clubs play Europe's two (the Theatre checks above).
+      if (sport.id !== 'football') check('every league is selectable as a theatre', leagues.every(l => CLUB_SCOPES(sport).some(s => s.id === l)), 'missing scope');
       check('clubs carry no flag', clubs.every(c => c.flagId === null), 'club has a flagId');
 
       const ranked = clubs.slice().sort((a, b) => b.str - a.str);
