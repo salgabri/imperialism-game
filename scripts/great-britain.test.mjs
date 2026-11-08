@@ -1,6 +1,6 @@
 // The United Kingdom as one team: Great Britain (GBR, the Union Jack) in the sports that merge the home nations into
-// its shape (basketball, baseball, ice hockey), football's and women's football's England as before. The team keeps
-// the id 826 (src/data/teams.js GREAT_BRITAIN and nationIdentity, `playsAs` in src/sports).
+// its shape (basketball, baseball, ice hockey, tennis), football's and women's football's England as before. The team
+// keeps the id 826 (src/data/teams.js GREAT_BRITAIN and nationIdentity, `playsAs` in src/sports).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -17,12 +17,12 @@ import { bundleApp, bundleComponents, forceResult, syncAppFixture, withDom } fro
 const App = await bundleApp();
 const { SetupOverlay } = await bundleComponents({ SetupOverlay: 'src/components/SetupOverlay.jsx' });
 const IDS = ['250', '276', '826'];
-const AS_ONE = ['basketball', 'baseball', 'hockey'];
+const AS_ONE = ['basketball', 'baseball', 'hockey', 'tennis'];
 const identityOf = team => [team.name, team.code, team.flagId];
 const GB = ['Great Britain', 'GBR', 'GBR'];
 const ENGLAND = ['England', 'ENG', '826'];
 
-test('basketball, baseball and ice hockey play the United Kingdom as Great Britain, football as England', () => {
+test('basketball, baseball, ice hockey and tennis play the United Kingdom as Great Britain, football as England', () => {
   for (const id of AS_ONE) {
     const team = buildTeam('826', makeRng(1), getSport(id));
     assert.deepEqual(identityOf(team), GB, id);

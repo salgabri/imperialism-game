@@ -21,8 +21,8 @@ And pick who fights:
 
 - **Nations** — 173 national teams, each starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-  Basketball, baseball and ice hockey field them as one team, Great Britain (GBR),
-  under the Union Jack.
+  Basketball, baseball, ice hockey and tennis field them as one team, Great Britain
+  (GBR), under the Union Jack.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs, all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
@@ -1526,8 +1526,8 @@ follows an estuary's middle (Solway Firth, Dee, Severn) to wherever the coarser
 coast leaves the island. Every other shape and arc stays world-atlas's, pinned by
 SHA-256; `--check` rebuilds offline and compares. Saves from before the cut (v1–v4)
 give the new shapes to whoever held 826, CM 01/02 data sets built before it let
-England hold them, and basketball, baseball and ice hockey, where Great Britain is
-one team, play the United Kingdom as one. There its team keeps the id 826 and
+England hold them, and basketball, baseball, ice hockey and tennis, where Great
+Britain is one team, play the United Kingdom as one. There its team keeps the id 826 and
 plays as Great Britain (GBR) under the Union Jack (`playsAs` in each sport,
 `GREAT_BRITAIN` in `src/data/teams.js`), while the land keeps its names: the
 shape 826 is still England in a tooltip or a list of conquered land. A campaign

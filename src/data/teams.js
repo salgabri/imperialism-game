@@ -15,15 +15,15 @@ export const DEPENDENCIES = {
 
 // Football's home nations: England, Scotland, Wales and Northern Ireland each field a team, so the map cuts the
 // United Kingdom (826, which is England) into four shapes (scripts/build-home-nations.mjs). These are the three cut
-// from it. Saves and data sets from before the cut give their land to whoever holds England, and basketball, baseball
-// and ice hockey, where Great Britain is one team, still play the United Kingdom as one (GREAT_BRITAIN below).
+// from it. Saves and data sets from before the cut give their land to whoever holds England, and basketball, baseball,
+// ice hockey and tennis, where Great Britain is one team, still play the United Kingdom as one (GREAT_BRITAIN below).
 export const HOME_NATIONS = Object.freeze(['SCO', 'WAL', 'NIR']);
 
 /**
- * The United Kingdom's team where its home nations play as one (FIBA, the World Baseball Classic, the IIHF): Great
- * Britain, under the Union Jack (flag id 'GBR' in src/data/flags.js). A sport plays it so through `playsAs`
- * (`{ '826': GREAT_BRITAIN }`), and its team keeps the id 826, so saves and the map are unchanged. Football's 826 is
- * England, a campaign saved before keeps the name it was saved with, and the land itself keeps its own names.
+ * The United Kingdom's team where its home nations play as one (FIBA, the World Baseball Classic, the IIHF, the Davis
+ * Cup): Great Britain, under the Union Jack (flag id 'GBR' in src/data/flags.js). A sport plays it so through
+ * `playsAs` (`{ '826': GREAT_BRITAIN }`), and its team keeps the id 826, so saves and the map are unchanged. Football's
+ * 826 is England, a campaign saved before keeps the name it was saved with, and the land itself keeps its own names.
  */
 export const GREAT_BRITAIN = Object.freeze({ name: 'Great Britain', code: 'GBR', flagId: 'GBR' });
 

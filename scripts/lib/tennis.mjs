@@ -9,7 +9,8 @@
 // (retired, or out of the game) is left out. A nation names its five best by Elo, the team a Davis Cup captain nominates;
 // it needs two to play a tie (both singles players then play the doubles too), so a nation with one rated player fields
 // no team and its land stays neutral.
-import { NATIONS, selectLineup } from '../../src/data/teams.js';
+import { NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
+import { tennis } from '../../src/sports/tennis.js';
 
 const SPORT = 'tennis';
 export const TEAM_SIZE = 5;
@@ -62,7 +63,7 @@ export function nationsOf(players) {
   return [...pools.entries()].filter(([, pool]) => pool.length >= MIN_PLAYERS).map(([id, pool]) => {
     const squad = pool.slice().sort(byElo).slice(0, TEAM_SIZE);
     const lineup = selectLineup({ sport: SPORT, squad: squad.map(player => ({ name: player.name, pos: 'SGL', rating: player.rating })) });
-    return { id, name: NATIONS[id][0], str: lineup.rating, squad, players: pool.length };
+    return { id, name: nationIdentity(id, tennis).name, str: lineup.rating, squad, players: pool.length };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
 }
 
