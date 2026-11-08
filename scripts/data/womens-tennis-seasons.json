@@ -1,0 +1,945 @@
+{
+ "about": "Women's tennis's earlier seasons (docs/design/womens-tennis.md, \"Earlier seasons\"): Tennis Abstract's own year-end WTA Elo reports for 2016-2025, archived by the Wayback Machine, and year-end Elo computed from Jeff Sackmann's WTA match results by Tennis Abstract's published method for 1973-2015. npm run sync:womens-tennis-seasons rebuilds scripts/data/womens-tennis-seasons/ from the pinned inputs (cached in the ignored data-src/womens-tennis-seasons/); npm run build:womens-tennis-seasons builds the season files from there.",
+ "licence": {
+  "name": "CC BY-NC-SA 4.0",
+  "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  "credit": "Jeff Sackmann / Tennis Abstract",
+  "terms": "Attribution, non-commercial use only, derived data shared alike. The match results and Tennis Abstract's Elo reports are Jeff Sackmann's; the ratings computed here from his results are derived data under the same licence."
+ },
+ "archive": {
+  "name": "Jeff Sackmann's WTA match results (tennis_wta)",
+  "author": "Jeff Sackmann / Tennis Abstract",
+  "repository": "https://github.com/Aneeshers/tennis-sackmann-archive",
+  "commit": "83733587353df8a41f2fd4f516147d5aa83f5a8d",
+  "raw": "https://raw.githubusercontent.com/Aneeshers/tennis-sackmann-archive/83733587353df8a41f2fd4f516147d5aa83f5a8d/wta/",
+  "upstream": "https://github.com/JeffSackmann/tennis_wta",
+  "note": "An archive of Jeff Sackmann's repositories, made after his own were taken down: its wta/ folder holds tennis_wta's files through 2026, with his README as UPSTREAM_README.md; the same files are mirrored at https://huggingface.co/datasets/Aneeshers/tennis-sackmann-archive (wta/). No fork of tennis_wta itself was found.",
+  "retrieved": "2026-11-08",
+  "files": {
+   "wta_matches_1968.csv": "d31bdf94a7a03d8fdb7414eb1c39b7fea520bc0e26b1130da447fec7c2d70485",
+   "wta_matches_qual_itf_1968.csv": "077ca194093f9c60c0b5f7e495de7094a1ae2a7b49b37922646d1c088b863c3b",
+   "wta_matches_1969.csv": "01937447ee6ed88e51bef46e7bc71d49a47f97d908b4fa63a9bfd272118d3b44",
+   "wta_matches_qual_itf_1969.csv": "fc06bff4fc437b7711166dd5ed7d6ebe66fef3fd989c9506b4852391397ced5f",
+   "wta_matches_1970.csv": "3ce5de44d88250955434e933accb38531929c37fbe145685b71c1ccb6f29791f",
+   "wta_matches_qual_itf_1970.csv": "eff6fff33e98d78c3c2f7bbf58fb5d8dcc28f05f5ebcc65734698fb3dd56a46e",
+   "wta_matches_1971.csv": "a8c36b26be5dea7f0d00c4f7a494e73829c27b1af98ed75bda063bb80af38e4e",
+   "wta_matches_qual_itf_1971.csv": "fcc556837b908e648d8ffe7fbd7ccc5fe768024d7d50530d2da2bd42c26b8ee3",
+   "wta_matches_1972.csv": "05674fe8d30516347f61edc0fb4a0033ed16e29f923a5b9e06e03949ae731861",
+   "wta_matches_qual_itf_1972.csv": "49b5950bf84967abd942ffdd1ac1c8f45585bb0888453a71e50b2a821eba390f",
+   "wta_matches_1973.csv": "03fa27ecc65506569b0b72903084b7059ada63ec6fde8cd57558b19563e6d232",
+   "wta_matches_qual_itf_1973.csv": "8bcdbdf202994e414bce46a8bfce0b68851e68bab03150e980af8f035ef72be8",
+   "wta_matches_1974.csv": "bb8482d429a36751ea86545432e0d5a8d7b35fc3bfc80472aebcd096dedf0b5a",
+   "wta_matches_qual_itf_1974.csv": "4152500b41dd711d7ad2f2f05692205da66a2afbb11ba7cc8030a75748142b4d",
+   "wta_matches_1975.csv": "9a9574bd695698c8bd1af30ac293ceee0ef96eea48704adcba025ce40338d1c6",
+   "wta_matches_qual_itf_1975.csv": "b007e78337c4b5419c0502827071f5468f737369beb89d3b2b9aff2a15ad7950",
+   "wta_matches_1976.csv": "147238e26da2c65645b86a13b77dbdb413a220fba687f6f28177fafb0fc97757",
+   "wta_matches_qual_itf_1976.csv": "2ee0eeeb2786bd535ab513add92763a803b31e37a3012093b6010bf695681c97",
+   "wta_matches_1977.csv": "4844219320426233e56d7f632b373909a1d27ff2b99d6891edb160135de9e576",
+   "wta_matches_qual_itf_1977.csv": "ac35b99c47b864e47380573e8b05e03225a407adf090b32c431a46d495668ea8",
+   "wta_matches_1978.csv": "433da1438d5030e80d0996aaf0f1487c408bb39ffe93f4ca442833f01b9c462c",
+   "wta_matches_qual_itf_1978.csv": "cd9149d627541acd3cbb4c2ff2bb5c414478aafab903b4d11129aac69f80118c",
+   "wta_matches_1979.csv": "d5131152f67d4a1ffc0f049ad0528f26fb7592c9ca8020ad75d0d0d635b1fd5d",
+   "wta_matches_qual_itf_1979.csv": "32403043069a928579723d1843a50eeb67acc471f5c9b36490d7ac78364c2f33",
+   "wta_matches_1980.csv": "16d300e82a2644b3aacd6d970783dffbec8ba8eac4ca1ca42444a0888f19fae9",
+   "wta_matches_qual_itf_1980.csv": "ec5f963f3f95263854e2d7ccc1223efe1723f198709cfe1cf9053829b807db10",
+   "wta_matches_1981.csv": "4197040469abcf03f353045328d56027a4852c6fb4d697b97b7f65dbc0b7173c",
+   "wta_matches_qual_itf_1981.csv": "e7e564d21aec2d66ac5a930fcf2091174ffae3015c75b30eb14a28e370966dc3",
+   "wta_matches_1982.csv": "05b638d7404970efe7eff28d0448375dbeaa9a81f3350c4a918be6d947ae217d",
+   "wta_matches_qual_itf_1982.csv": "b85de68dcf50310f4ef6c68197e715a0b7310e472fa8ac4c96ca544720fa3060",
+   "wta_matches_1983.csv": "ebca6650f36655939e3f065450e89cc4e74e8f2893097aee7b7a670155014c28",
+   "wta_matches_qual_itf_1983.csv": "3267cd9a2a1b766fb5b56795e6149985e9b705453dfab369b6ea39d7e933a64f",
+   "wta_matches_1984.csv": "66a1e791d2879bdca56cd1c25a2243dbb4a3b65159e42379614df36ebc8c33f6",
+   "wta_matches_qual_itf_1984.csv": "377bd4988f8076f9ca215164d914163971692153f13442bc8c255286d69f0c83",
+   "wta_matches_1985.csv": "a6481ed1f4502e379ddc6f126ed5be7e1c0684d0c9741d7e1edcede6bdb645fd",
+   "wta_matches_qual_itf_1985.csv": "18ab9fa171ebe7d4a7a9a90a7dcdc16fa89eedb1f378a3c3baa6712e66f9c763",
+   "wta_matches_1986.csv": "f0e05a97e7178c38fa2658aa8fffff3438da96197411e49625a3051931394d56",
+   "wta_matches_qual_itf_1986.csv": "d56b14d26ae7df46183b3977c92365232f43582e1c6dc6cc5423e179b062ea14",
+   "wta_matches_1987.csv": "051f303d8f12f296e0ca99ed31e6d0fe749e9f7bcc5b84eff50e9800b60034e1",
+   "wta_matches_qual_itf_1987.csv": "afdea8afadf582ed50d65f22bf973f6645377c58ef9c333c64b9282b01954b8d",
+   "wta_matches_1988.csv": "a6c84da89bc835bf2bd374d59f164089de419c44b66978d0b46cf84d59ce46e5",
+   "wta_matches_qual_itf_1988.csv": "20cdd6baa21416350710300ca5c99dc12d0470c88b2eda8c54b48ee30823c767",
+   "wta_matches_1989.csv": "039c47ebb2080d81596fa01f89ba4ff2fc26cb66d455c220ed63f76f46965e11",
+   "wta_matches_qual_itf_1989.csv": "b78b4442b0a345fd40bcb1ae728fb6f34c34b80c92a9bb3e75e476c1c2328a24",
+   "wta_matches_1990.csv": "f04fddcbb05a767411cf2ab17d13c88c986b2908a1958f039704c769650b1da6",
+   "wta_matches_qual_itf_1990.csv": "cf3e2faec2c88f960d9d3e161be013a7260d296019d520223bfc691e9d877424",
+   "wta_matches_1991.csv": "17737b62a219be183112244879c4dcd26536c29ccba9f95ee3fb37fa158744fc",
+   "wta_matches_qual_itf_1991.csv": "00a6c8013f4ee1e3d258915d9283d8e6198ea63a8f017f9d87c60e884bcfc293",
+   "wta_matches_1992.csv": "1ef08242244a8d3ec237f0e78968955ee88d9e233958c7e0e55c0d471ffbbf7f",
+   "wta_matches_qual_itf_1992.csv": "62cbf0d5694752aa4a82b8809722a86e0ea40d9e018bb656472ed5fbcc0cb5ae",
+   "wta_matches_1993.csv": "ad81067140c11daec9e84a22039b8e0d944eea6e66d7cf87f4cb2b5cf7bac805",
+   "wta_matches_qual_itf_1993.csv": "e1b04c9d96610a12ab3c583d74b671d93412c57785a5b314128bd6585295f81c",
+   "wta_matches_1994.csv": "d35a986f82709de6cd530ef324210f76e612c85c95a3402e755ff2814b05efba",
+   "wta_matches_qual_itf_1994.csv": "0c702af3445ad348773d4a6dce026c3cc2d69fcca35d579b3de82db531330f4b",
+   "wta_matches_1995.csv": "d774f578e071555dd47df72fdad3582435ce48a927ad2cd6ffac0c55424edea5",
+   "wta_matches_qual_itf_1995.csv": "86033007a897d346004e234de24c56e6aa795a8e5ba20e936f92b3d2e3a34193",
+   "wta_matches_1996.csv": "953308668c369b19889e2827f947993684d55e57041126e244164e3808a29372",
+   "wta_matches_qual_itf_1996.csv": "e0ba48950c17118e50e02335a7d8c33db10e7fcf54cdcda919ea6fae2fbc53fc",
+   "wta_matches_1997.csv": "db9b2b984a1d47decd8cde861322b8c87d2436be162188be2a46d9d6f97e9a30",
+   "wta_matches_qual_itf_1997.csv": "4469e666ff919a836304d56f7c99674e2639b5e65bd8402eba2abea2f83823ec",
+   "wta_matches_1998.csv": "45839b89da922adbe359b1cc3f15d369af5520e7c22440c1bdd2d635719383bb",
+   "wta_matches_qual_itf_1998.csv": "e627aca8e286b907ec70babef5abf58c95ca29c1f38f2beb55efe90f6b18c7e7",
+   "wta_matches_1999.csv": "a0478c22bc5a0ae9231865f1b3e7486c8e4da25cc308d2633dd8bbb4f94d57a6",
+   "wta_matches_qual_itf_1999.csv": "f9e3bbf7e21d862d94b73228c23081c9819ca1694c2411c5a696e84b50c56d31",
+   "wta_matches_2000.csv": "0534f3f73efa1f1009065489b0f7d60ba312aa979ccf278dbaacbe9381f968a4",
+   "wta_matches_qual_itf_2000.csv": "1c82afb25a7e826fd874aff12f0102451ea12747a9b1a71beeb966f4ec6f75a7",
+   "wta_matches_2001.csv": "9b97c12e0f5f76c7ef40103a63ceec4b4e9e0c17a243872185532abfe7126139",
+   "wta_matches_qual_itf_2001.csv": "c272293fb0b0b8e180826e240f130bb7badd386d0f3c4addfc5da9deaec1d957",
+   "wta_matches_2002.csv": "db8c40e2a781cbc58391eda7c224c405867c213ef003629ec277b9305ed87bcb",
+   "wta_matches_qual_itf_2002.csv": "d57c452096bdd00b95c9e4e1c51c2e2294d6e35f64dc62af138de2d27fba15d8",
+   "wta_matches_2003.csv": "49edc79a3042240e301256f84643fe766798e5810c9ae7d2150fa8cdf241010c",
+   "wta_matches_qual_itf_2003.csv": "8774491373f67bdac208d0c4d3b66b5b7cf1d327923cf8157c91996ffd86b73f",
+   "wta_matches_2004.csv": "aaa594fe054a78bc411c93a10a1db9c491bb0a0d793bf0749b671e768f3c99dc",
+   "wta_matches_qual_itf_2004.csv": "17984f7314e74552465925aae1dc4888ff2deeb3e65313167cd41ef9c8e6e7bd",
+   "wta_matches_2005.csv": "8547420ac6b4b6e2adf4d4a38988bf1b1e7f3afb349d4b0f52832e22675ede1a",
+   "wta_matches_qual_itf_2005.csv": "e0819718cb4129bfc9adae8eecd048860e864ce9242dc3371a8295e0fdb41efb",
+   "wta_matches_2006.csv": "12a23f743850ab7d2963702ead3d894e51a9ec47772fac5aaf4b59b8cc74aab6",
+   "wta_matches_qual_itf_2006.csv": "14a6253d85773d749fde49c558839343cd67efdca0e60b4d05d4f61a39716aa9",
+   "wta_matches_2007.csv": "bb4ad9ad0e674f0acb8ec3ed51bf51ee6400c86f952047b17767245971db0937",
+   "wta_matches_qual_itf_2007.csv": "e0024a8af75251934bfa5bf7f90a99ce8912f7566b774770392cc3cafc5a4206",
+   "wta_matches_2008.csv": "23942f4d0bc621a9d7b069a5dbe02a80098d981d6ee13402fa97fd0a9b38a020",
+   "wta_matches_qual_itf_2008.csv": "3f541f82be8c9d80ad57a7f9ee54fe61df57d8d02179c5e52d67607d31fa3239",
+   "wta_matches_2009.csv": "ca1c01aa12f674aaaf93a6eb5169aeb295a857362a174f10d4f8bdf0328a36d5",
+   "wta_matches_qual_itf_2009.csv": "ba6af4bbad22a5c81508fdc22dc879d2e7382bbc95f7a24a1a0751bef1ebf8d4",
+   "wta_matches_2010.csv": "05b980e28398ae13e6e0edae544a060b59571cf977623ad0db727d6de3527627",
+   "wta_matches_qual_itf_2010.csv": "9687e015b0ba6af53ba8083d0055503c47019fffd4652735324935a121f252a5",
+   "wta_matches_2011.csv": "ea0afb5d5e5a1fd230860f722de4f79578f7bd39949358a8b66480f2cae6e101",
+   "wta_matches_qual_itf_2011.csv": "a98d90f7a53d406061d53599c4ae0f361cefaa316d4ee27b8527469288faedeb",
+   "wta_matches_2012.csv": "a8e7f92534df31293a5574db3406e6a0d1c2d956ba63610c44c7bb6f3f09f52d",
+   "wta_matches_qual_itf_2012.csv": "3ee0f5290e213643918619cccc3698650b743335c4c6309c5996d732606c6ae2",
+   "wta_matches_2013.csv": "0d31dde39e721a683b158c30ffbe612293b06bd2386dfeec47ae28e9bad8d93c",
+   "wta_matches_qual_itf_2013.csv": "92d9e76c96dc0ba9915f7322e46752937468df329b186e7c3d4b753caeb3f19d",
+   "wta_matches_2014.csv": "4cb59debfa4cbf079c550ee7dfc0ee098237af33376701cd340e112b917f8176",
+   "wta_matches_qual_itf_2014.csv": "0fb88077e6632a33a68a1913831f96be49e343e4f6da9d762e601af58450ae04",
+   "wta_matches_2015.csv": "9332d0d470c378c8d439553ed7d81379eb3596d04babf39bee7021edae316130",
+   "wta_matches_qual_itf_2015.csv": "3b9040206e7ff85368ad9fadc1d7604d17d478e76292ef2e4eb19f1a5474733f",
+   "wta_matches_2016.csv": "17145270279d6bf5d1abec4038d51d6af3aa71a7b40421b9f175205fafa075f7",
+   "wta_matches_qual_itf_2016.csv": "f7fa6792b1711e3327fcf70ff4770905d7b8d4cb2abf163ac075b5ac64710b88",
+   "wta_matches_2017.csv": "eae2de68b2e87fcac7e2ff1f6168c78d1baba91fb0ffecda455aa329a81437c8",
+   "wta_matches_qual_itf_2017.csv": "5b3b43025a26bf465c52a278cf271891fa830ef42224dfe529fd0b2285998613",
+   "wta_matches_2018.csv": "6ccfc04baabe536e4260083c2e299c8c36668a8e8276dfc309219df23bf9ea38",
+   "wta_matches_qual_itf_2018.csv": "477169b452d90a6241a79736b6e08e77ce95b7a2ffb44213880d1d8b1b4367ff",
+   "wta_matches_2019.csv": "da251744c6ece2cab4b94df659ee38a81bb4aa50cf532d48f1a6eb0cc66726d4",
+   "wta_matches_qual_itf_2019.csv": "371e5eeee6038e3e3f2dcd7e7f9e4f2c4c5236208480c488f85f89fdc7dd6be6",
+   "wta_matches_2020.csv": "bcbb285ee8a743ce117952bbb99cfe816bfc685412aa3adc7a9913e7799cd70c",
+   "wta_matches_qual_itf_2020.csv": "a406b94be82942359015f98b2cc3dcaa6f434127e1e02931775336fdd10d7e07",
+   "wta_matches_2021.csv": "3f4b865fe9f68aedb3d51597740cf658cf805f676bae652f2bc93cbab4f6e99f",
+   "wta_matches_qual_itf_2021.csv": "7e467660b77ac8652aae53736bfd77204303ed22bac2886b8d8582f47d4165fb",
+   "wta_matches_2022.csv": "f638cf65efefb01a1a10368c1d5217d5f90981fb76193ca3a9c3773c2abc2ba7",
+   "wta_matches_qual_itf_2022.csv": "137d6eeeabac52f69b7a23f292da706bb6361c945af0dc4c9d0a1401bc57c4a5",
+   "wta_matches_2023.csv": "b73bf74928155b858cdb7045f6334246336cef604286cb361e695df26911ad18",
+   "wta_matches_qual_itf_2023.csv": "5b8802d4b48d311c786e88e0f80ee0b80ac2581c824bc6cee9aacdb07f01080d",
+   "wta_matches_2024.csv": "d9bba2a0b3793f63c737ef62a809b82b56b3ad0ee94e1f95e78cecfac7615ed2",
+   "wta_matches_qual_itf_2024.csv": "64becb45204cde4bae762adb4cefbeb7a12bbe875d70578bb33a575200fe5d11",
+   "wta_matches_2025.csv": "e4eb002bc6d828b0bd21e04ed286e68722ddc8ccbbb27ea980bf62e938377f96",
+   "wta_matches_qual_itf_2025.csv": "af1b439684a55ae0f7cb42ed5da2b11985f08dac50ac68c06da4faa3ffe19da7",
+   "wta_players.csv": "601a747a3e6e291d5ae8778b0e75f30db5536dbf9cd3d654a95d991311ad8870"
+  }
+ },
+ "wayback": "https://web.archive.org/web/{capture}id_/{original}",
+ "reports": [
+  {
+   "season": 2016,
+   "updated": "2016-11-28",
+   "capture": "20161130084259",
+   "original": "http://tennisabstract.com/reports/wta_elo_ratings.html",
+   "sha256": "d25d3f5698d8e8d677c2d014216d98f975228a850a867d82838c9badf49079c4",
+   "method": "pre-2018"
+  },
+  {
+   "season": 2017,
+   "updated": "2017-12-25",
+   "capture": "20180104202645",
+   "original": "http://tennisabstract.com:80/reports/wta_elo_ratings.html",
+   "sha256": "b7eef2052b9bc574be6de97c41cadcf6fd93d5d9394adc5f58ea2b38549dbc52",
+   "method": "pre-2018"
+  },
+  {
+   "season": 2018,
+   "updated": "2018-11-26",
+   "capture": "20181221215052",
+   "original": "http://tennisabstract.com:80/reports/wta_elo_ratings.html",
+   "sha256": "24d1873b292fc3e9f325cf3fc1d14760add04bc2d2ce026eb6ab1e4527faa19f",
+   "method": "tour-level"
+  },
+  {
+   "season": 2019,
+   "updated": "2019-12-02",
+   "capture": "20191224102108",
+   "original": "http://tennisabstract.com:80/reports/wta_elo_ratings.html",
+   "sha256": "83e668ab622ff4224498bc07ebec7c5f00f2683af8646d08bbf514f45d615341"
+  },
+  {
+   "season": 2020,
+   "updated": "2020-11-09",
+   "capture": "20201111182956",
+   "original": "https://tennisabstract.com/reports/wta_elo_ratings.html",
+   "sha256": "db7d96afeab5fbeba1c8f802b55ac00b349e3bbe096ffd9d38b68c4de75a6592",
+   "label": "Tennis Abstract Elo, 9 November 2020, before Linz",
+   "note": "No capture holds a later 2020 update: the list of 9 November misses the season's last event (Linz, 9-15 November)."
+  },
+  {
+   "season": 2021,
+   "updated": "2021-12-20",
+   "capture": "20211225024315",
+   "original": "https://tennisabstract.com/reports/wta_elo_ratings.html",
+   "sha256": "de05bd401d57d53e232394b3f756430306a9ca2be7845b503109c11e86f2f665"
+  },
+  {
+   "season": 2022,
+   "updated": "2022-12-26",
+   "capture": "20221229000003",
+   "original": "https://tennisabstract.com/reports/wta_elo_ratings.html",
+   "sha256": "37e6afeb1e3c350381486a7c792860445e3ac94cb88499547b35eda1d61e45de"
+  },
+  {
+   "season": 2023,
+   "updated": "2023-12-25",
+   "capture": "20231228000005",
+   "original": "https://tennisabstract.com/reports/wta_elo_ratings.html",
+   "sha256": "7f4a18a2fbe2c415ba39757c25e462ae0e4a0c6c1e32f02eefe7efe5c704584d"
+  },
+  {
+   "season": 2024,
+   "updated": "2024-12-23",
+   "capture": "20241229184249",
+   "original": "https://tennisabstract.com/reports/wta_elo_ratings.html",
+   "sha256": "d077a7347a023889841911ae8c3396ddada31569ff9d450b8c4f30282191da4a"
+  },
+  {
+   "season": 2025,
+   "updated": "2025-12-29",
+   "capture": "20251230063714",
+   "original": "https://tennisabstract.com/reports/wta_elo_ratings.html",
+   "sha256": "7b9f82aa65b5107776c0ae81a3037f35e095a2954e125381c53872f1cbc69d96"
+  }
+ ],
+ "rankings": [
+  {
+   "capture": "20161130023846",
+   "updated": "2016-11-28",
+   "original": "http://tennisabstract.com/reports/wtaRankings.html",
+   "sha256": "39a0b36a65256faeb22c1aca3684abcff9dd33a35cfcb99500c53e74fed7654a",
+   "garbled": {
+    "MeganMccray": "rc="
+   }
+  },
+  {
+   "capture": "20180302102150",
+   "updated": "2018-01-08",
+   "original": "http://tennisabstract.com/reports/wtaRankings.html",
+   "sha256": "9ad27498b9b2326c02ca23d4b140809fbf8cb9ffd7632886d8ebbae333863cdf",
+   "garbled": {
+    "MeganMccray": "rc="
+   }
+  },
+  {
+   "capture": "20181206212408",
+   "updated": "2018-11-26",
+   "original": "http://tennisabstract.com:80/reports/wtaRankings.html",
+   "sha256": "38e990318bc88a03847550c67a989cfe4528a4d93b2a54398b5afc966a18f255"
+  },
+  {
+   "capture": "20191218235014",
+   "updated": "2019-12-02",
+   "original": "http://tennisabstract.com:80/reports/wtaRankings.html",
+   "sha256": "c8e6e882e2cc9ab7c2c34ab81e1762d4f08bbab318d9474c73d906c944c8d2b4"
+  },
+  {
+   "capture": "20201128050548",
+   "updated": "2020-11-23",
+   "original": "http://tennisabstract.com/reports/wtaRankings.html",
+   "sha256": "7d751acfa2f65f8bae8ed5b0da0dc45d55392cf3fc9ead0628d27f1afb3cbdde"
+  },
+  {
+   "capture": "20211020091035",
+   "updated": "2021-10-18",
+   "original": "https://tennisabstract.com/reports/wtaRankings.html",
+   "sha256": "f88f82d121620435b2275bb299f4c4fe8bf474f2f67002667d862e671489a4f2"
+  },
+  {
+   "capture": "20220901091906",
+   "updated": "2022-08-29",
+   "original": "https://tennisabstract.com/reports/wtaRankings.html",
+   "sha256": "a1ea9f1c6cda1e1935c0caf2358ca15319fed78d44d1d149ec9d0d007d2a2ce5"
+  },
+  {
+   "capture": "20231123104215",
+   "updated": "2023-11-20",
+   "original": "http://tennisabstract.com/reports/wtaRankings.html",
+   "sha256": "2dbd9f9b33efd69cf3ec077a2b13f1d215df0f29fbde645315c6273f248f91a8"
+  },
+  {
+   "capture": "20250126060811",
+   "updated": "2025-01-13",
+   "original": "http://tennisabstract.com/reports/wtaRankings.html",
+   "sha256": "a7d186d6ff158c563c8f6154bf3c21ff2756c7daf63f015e2f0c00704d98cf52"
+  },
+  {
+   "capture": "20260109083814",
+   "updated": "2026-01-06",
+   "original": "https://tennisabstract.com/reports/wtaRankings.html",
+   "sha256": "80926706697b27aea5a967b15f4f47e3683e6ed9a03e1cad5a64ebfaa87f9b21"
+  }
+ ],
+ "keyAliases": {
+  "DariaGavrilova": "DariaSaville",
+  "BarboraZahlavovaStrycova": "BarboraStrycova",
+  "DaryaKasatkina": "DariaKasatkina",
+  "AlisonRiske": "AlisonRiskeAmritraj",
+  "KaterynaKozlova": "KaterynaBaindl",
+  "DanielleRoseCollins": "DanielleCollins",
+  "ViktoriaKuzmova": "ViktoriaHruncakova",
+  "JilBelenTeichmann": "JilTeichmann",
+  "CoriGauff": "CocoGauff",
+  "IrinaMariaBara": "IrinaBara",
+  "LudmillaSamsonova": "LiudmilaSamsonova",
+  "GreetjeMinnen": "GreetMinnen",
+  "NatalijaKostic": "NatalijaStevanovic",
+  "LesleyKerkhove": "LesleyPattinamaKerkhove",
+  "AlexandraCadantu": "AlexandraCadantuIgnatik",
+  "LeylahAnnieFernandez": "LeylahFernandez",
+  "AsiaMuhammed": "AsiaMuhammad",
+  "CarolinaMeligeniRodriguesAlves": "CarolinaAlves",
+  "RalucaGeorgianaSerban": "RalukaSerban",
+  "GabrielaTalaba": "GabrielaLee",
+  "StormSanders": "StormHunter",
+  "JaquelineAdinaCristian": "JaquelineCristian",
+  "MariaCamilaOsorioSerrano": "CamilaOsorio",
+  "SarahBethAskew": "SarahBethGrey",
+  "JodieAnnaBurrage": "JodieBurrage",
+  "MariaCarle": "MariaLourdesCarle"
+ },
+ "method": {
+  "sources": [
+   "https://www.tennisabstract.com/blog/2019/12/03/an-introduction-to-tennis-elo/ (expected score; starts in the low 1200s since challengers and qualifying were added, depending on the level)",
+   "https://www.tennisabstract.com/blog/2018/05/15/handling-injuries-and-absences/ (layoff penalty, K after a layoff, second layoffs, the 1900 study population, the offseason not counted)",
+   "https://www.tennisabstract.com/blog/2019/01/08/identifying-underrated-players-with-minor-league-elo/ (challengers and tour-level qualifying counted)",
+   "https://www.tennisabstract.com/blog/2021/03/16/repurposing-elo-for-streaks-seasons/ (yElo, one of the fit targets)",
+   "K = 250 / (matches + 5)^0.4 is FiveThirtyEight's formula, which Sackmann said he adapted (sleepomeno/tennis_atp examples/elo.R); his own worked example and the February 2016 report fit an offset of 6"
+  ],
+  "k": {
+   "numerator": 250,
+   "offset": 6,
+   "exponent": 0.4
+  },
+  "start": {
+   "tour": 1330,
+   "challenger": 1275,
+   "qualifying": 1275,
+   "fit": "Not published: the tour-level start fitted on Tennis Abstract's own current-method numbers for 1973-2000, the career peaks of the 17 women of its Tennis 128 profiles whose peaks fall then; the start of an ITF event, a WTA 125 or a qualifying round is the men's, which keeps the 2021-2025 lists within ten points of Tennis Abstract's. Before 1994 the files name no ITF event's prize, so a newcomer's first counted match is at tour level, and the men's 1450 there lifts the 1970s and 1980s by about 100 points."
+  },
+  "layoff": {
+   "weeks": 8,
+   "min": 100,
+   "max": 150,
+   "maxWeeks": 52,
+   "kBoost": 1.5,
+   "kMatches": 20,
+   "repeatDays": 730,
+   "threshold": 1900,
+   "offseason": [
+    1115,
+    115
+   ],
+   "note": "A layoff of eight weeks or more between counted matches, 15 November to 15 January not counted, costs 100 points rising linearly to 150 at a year; K is then 1.5 times as large, back to normal over 20 matches; a second layoff within two years of the last comeback is charged the difference between the penalty for both together and for the first. Charged on return; a list shows a player in the middle of one with the penalty he would be charged on the list's date. Only for players rated 1900 or more, as in the study that set it (applied to everyone it lowers the whole list by 100 to 200 points against every published number)."
+  },
+  "files": "all",
+  "challengerQualifying": false,
+  "counted": "Tour-level main draws with the Fed Cup and Billie Jean King Cup (wta_matches_<year>.csv: not its exhibitions, junior events or ITF circuits under $50K), tour-level qualifying, and the main draws of the WTA 125s (level C from 2012) and of ITF events of $50K or more (wta_matches_qual_itf_<year>.csv), as Tennis Abstract's report says (\"tour-level, tour-level qualifying ... or ITF $50K+\"): not the qualifying of a 125 or an ITF event, nor any ITF event before 1994, whose prize the files do not name; nor a walkover, retirement, default, abandoned or unfinished match, nor one without a score or against a placeholder opponent.",
+  "order": "By the files' season, then the event's date, the event, the round (qualifying first) and the match number: a season ends after its last event and before the next season's first, even one that starts in late December.",
+  "activity": 10,
+  "activityNote": "A season lists the women who played at least 10 counted matches in it, as Tennis Abstract's report lists those with 10 in the last 52 weeks. The published seasons keep the women of Tennis Abstract's list who pass the same test in the match files.",
+  "asOf": "A list is dated 31 December, or the start of the season's last event when that is later.",
+  "targets": {
+   "fitYears": [
+    1973,
+    2000
+   ],
+   "peaks": {
+    "source": "Tennis Abstract, The Tennis 128 (2022): each player's peak Elo by the current method, from her profile",
+    "items": [
+     [
+      "200259",
+      "Chris Evert",
+      2451,
+      1976,
+      "https://www.tennisabstract.com/blog/2022/12/03/the-tennis-128-no-9-chris-evert/"
+     ],
+     [
+      "200293",
+      "Martina Navratilova",
+      2575,
+      1984,
+      "https://www.tennisabstract.com/blog/2022/12/16/the-tennis-128-no-3-martina-navratilova/"
+     ],
+     [
+      "200414",
+      "Steffi Graf",
+      2601,
+      1990,
+      "https://www.tennisabstract.com/blog/2022/12/19/the-tennis-128-no-2-steffi-graf/"
+     ],
+     [
+      "200652",
+      "Monica Seles",
+      2563,
+      1993,
+      "https://www.tennisabstract.com/blog/2022/11/30/the-tennis-128-no-11-monica-seles/"
+     ],
+     [
+      "200397",
+      "Tracy Austin",
+      2369,
+      1980,
+      "https://www.tennisabstract.com/blog/2022/08/30/the-tennis-128-no-56-tracy-austin/"
+     ],
+     [
+      "200348",
+      "Hana Mandlikova",
+      2316,
+      1986,
+      "https://www.tennisabstract.com/blog/2022/09/07/the-tennis-128-no-51-hana-mandlikova/"
+     ],
+     [
+      "200360",
+      "Pam Shriver",
+      2266,
+      1984,
+      "https://www.tennisabstract.com/blog/2022/06/09/the-tennis-128-no-76-pam-shriver/"
+     ],
+     [
+      "200381",
+      "Andrea Jaeger",
+      2305,
+      1981,
+      "https://www.tennisabstract.com/blog/2022/03/08/the-tennis-128-no-114-andrea-jaeger/"
+     ],
+     [
+      "200150",
+      "Evonne Goolagong",
+      2259,
+      1976,
+      "https://www.tennisabstract.com/blog/2022/08/23/the-tennis-128-no-59-evonne-goolagong/"
+     ],
+     [
+      "200237",
+      "Virginia Wade",
+      2285,
+      1976,
+      "https://www.tennisabstract.com/blog/2022/06/17/the-tennis-128-no-75-virginia-wade/"
+     ],
+     [
+      "200572",
+      "Gabriela Sabatini",
+      2418,
+      1991,
+      "https://www.tennisabstract.com/blog/2022/10/18/the-tennis-128-no-31-gabriela-sabatini/"
+     ],
+     [
+      "200017",
+      "Arantxa Sanchez Vicario",
+      2419,
+      1994,
+      "https://www.tennisabstract.com/blog/2022/10/29/the-tennis-128-no-27-arantxa-sanchez-vicario/"
+     ],
+     [
+      "200077",
+      "Jennifer Capriati",
+      2317,
+      1993,
+      "https://www.tennisabstract.com/blog/2022/09/16/the-tennis-128-no-47-jennifer-capriati/"
+     ],
+     [
+      "200049",
+      "Conchita Martinez",
+      2328,
+      1995,
+      "https://www.tennisabstract.com/blog/2022/09/20/the-tennis-128-no-45-conchita-martinez/"
+     ],
+     [
+      "200096",
+      "Mary Pierce",
+      2230,
+      1995,
+      "https://www.tennisabstract.com/blog/2022/07/15/the-tennis-128-no-67-mary-pierce/"
+     ],
+     [
+      "200539",
+      "Jana Novotna",
+      2295,
+      1998,
+      "https://www.tennisabstract.com/blog/2022/09/01/the-tennis-128-no-54-jana-novotna/"
+     ],
+     [
+      "200128",
+      "Lindsay Davenport",
+      2447,
+      2000,
+      "https://www.tennisabstract.com/blog/2022/11/01/the-tennis-128-no-26-lindsay-davenport/"
+     ],
+     [
+      "200001",
+      "Martina Hingis",
+      2549,
+      2001,
+      "https://www.tennisabstract.com/blog/2022/10/19/the-tennis-128-no-30-martina-hingis/"
+     ],
+     [
+      "200748",
+      "Venus Williams",
+      2454,
+      2002,
+      "https://www.tennisabstract.com/blog/2022/11/21/the-tennis-128-no-16-venus-williams/"
+     ],
+     [
+      "200033",
+      "Serena Williams",
+      2507,
+      2003,
+      "https://www.tennisabstract.com/blog/2022/12/09/the-tennis-128-no-6-serena-williams/"
+     ],
+     [
+      "200079",
+      "Kim Clijsters",
+      2403,
+      2004,
+      "https://www.tennisabstract.com/blog/2022/10/01/the-tennis-128-no-39-kim-clijsters/"
+     ],
+     [
+      "200065",
+      "Amelie Mauresmo",
+      2307,
+      2005,
+      "https://www.tennisabstract.com/blog/2022/08/16/the-tennis-128-no-62-amelie-mauresmo/"
+     ],
+     [
+      "200003",
+      "Justine Henin",
+      2437,
+      2008,
+      "https://www.tennisabstract.com/blog/2022/10/13/the-tennis-128-no-33-justine-henin/"
+     ],
+     [
+      "201320",
+      "Svetlana Kuznetsova",
+      2192,
+      2007,
+      "https://www.tennisabstract.com/blog/2022/05/14/the-tennis-128-no-85-svetlana-kuznetsova/"
+     ],
+     [
+      "201345",
+      "Maria Sharapova",
+      2327,
+      2008,
+      "https://www.tennisabstract.com/blog/2022/10/06/the-tennis-128-no-36-maria-sharapova/"
+     ],
+     [
+      "201496",
+      "Caroline Wozniacki",
+      2251,
+      2010,
+      "https://www.tennisabstract.com/blog/2022/05/03/the-tennis-128-no-90-caroline-wozniacki/"
+     ],
+     [
+      "200108",
+      "Elena Dementieva",
+      2168,
+      2010,
+      "https://www.tennisabstract.com/blog/2022/04/19/the-tennis-128-no-96-elena-dementieva/"
+     ],
+     [
+      "201520",
+      "Petra Kvitova",
+      2175,
+      2012,
+      "https://www.tennisabstract.com/blog/2022/03/29/the-tennis-128-no-105-petra-kvitova/"
+     ],
+     [
+      "201458",
+      "Victoria Azarenka",
+      2326,
+      2013,
+      "https://www.tennisabstract.com/blog/2022/09/18/the-tennis-128-no-46-victoria-azarenka/"
+     ],
+     [
+      "201594",
+      "Simona Halep",
+      2178,
+      2015,
+      "https://www.tennisabstract.com/blog/2022/04/26/the-tennis-128-no-93-simona-halep/"
+     ],
+     [
+      "202458",
+      "Ashleigh Barty",
+      2220,
+      2021,
+      "https://www.tennisabstract.com/blog/2022/04/07/the-tennis-128-no-101-ashleigh-barty/"
+     ]
+    ]
+   }
+  },
+  "v1": {
+   "k": {
+    "numerator": 250,
+    "offset": 6,
+    "exponent": 0.4
+   },
+   "start": {
+    "tour": 1500,
+    "challenger": 1500,
+    "qualifying": 1500
+   },
+   "layoff": null,
+   "files": "tour",
+   "note": "Tennis Abstract's method before May 2018, for the check against its 2016 and 2017 reports: tour-level matches only, everyone starting at 1500, no layoff penalty."
+  }
+ },
+ "nations": {
+  "cupWindow": 6,
+  "cupHow": "fed-cup",
+  "combinedTeams": [
+   "CAR",
+   "ECA",
+   "POC"
+  ],
+  "note": "A computed season's player plays for the nation she played the Fed Cup for in the nearest season (the same season first, then earlier, then later, within six seasons), from the ties' names in the match files (\"Fed Cup WG F: USA vs AUS\"), else for her country by the player file, which gives only her latest; then as the state of that season knew it. A published season's player plays for the country Tennis Abstract's rankings report of the nearest date files her under, else for her country by the player file.",
+  "federations": [
+   {
+    "code": "TCH",
+    "name": "Czechoslovakia",
+    "through": 1992,
+    "holder": "203",
+    "members": [
+     "CZE",
+     "SVK"
+    ],
+    "successor": "CZE"
+   },
+   {
+    "code": "URS",
+    "name": "Soviet Union",
+    "through": 1991,
+    "holder": "643",
+    "members": [
+     "RUS",
+     "UKR",
+     "BLR",
+     "GEO",
+     "ARM",
+     "AZE",
+     "KAZ",
+     "UZB",
+     "TKM",
+     "TJK",
+     "KGZ",
+     "MDA",
+     "EST",
+     "LAT",
+     "LTU"
+    ],
+    "successor": "RUS"
+   },
+   {
+    "code": "CIS",
+    "aliases": [
+     "EUN"
+    ],
+    "name": "Commonwealth of Independent States",
+    "from": 1992,
+    "through": 1992,
+    "holder": "643",
+    "members": [
+     "URS",
+     "RUS",
+     "UKR",
+     "BLR",
+     "ARM",
+     "AZE",
+     "KAZ",
+     "UZB",
+     "TKM",
+     "TJK",
+     "KGZ",
+     "MDA"
+    ],
+    "successor": "RUS"
+   },
+   {
+    "code": "YUG",
+    "name": "Yugoslavia",
+    "through": 1991,
+    "holder": "688",
+    "members": [
+     "SRB",
+     "MNE",
+     "CRO",
+     "SLO",
+     "BIH",
+     "MKD",
+     "KOS"
+    ],
+    "successor": "SRB"
+   },
+   {
+    "code": "FRY",
+    "aliases": [
+     "SCG"
+    ],
+    "name": "FR Yugoslavia, then Serbia and Montenegro",
+    "from": 1992,
+    "through": 2006,
+    "holder": "688",
+    "members": [
+     "YUG",
+     "SRB",
+     "MNE",
+     "KOS"
+    ],
+    "successor": "SRB"
+   },
+   {
+    "code": "FRG",
+    "name": "West Germany",
+    "through": 1990,
+    "holder": "276",
+    "members": [
+     "GER"
+    ],
+    "successor": "GER"
+   },
+   {
+    "code": "GDR",
+    "name": "East Germany",
+    "through": 1990,
+    "holder": null,
+    "members": [],
+    "successor": "GER"
+   }
+  ],
+  "territory": [
+   {
+    "name": "Czechoslovakia",
+    "through": 1992,
+    "holder": "203",
+    "shapes": [
+     "703"
+    ]
+   },
+   {
+    "name": "Soviet Union",
+    "through": 1991,
+    "holder": "643",
+    "shapes": [
+     "804",
+     "112",
+     "268",
+     "051",
+     "031",
+     "398",
+     "860",
+     "795",
+     "762",
+     "417",
+     "498",
+     "233",
+     "428",
+     "440"
+    ]
+   },
+   {
+    "name": "Commonwealth of Independent States",
+    "from": 1992,
+    "through": 1992,
+    "holder": "643",
+    "shapes": [
+     "804",
+     "112",
+     "051",
+     "031",
+     "398",
+     "860",
+     "795",
+     "762",
+     "417",
+     "498"
+    ]
+   },
+   {
+    "name": "Yugoslavia",
+    "through": 1991,
+    "holder": "688",
+    "shapes": [
+     "191",
+     "705",
+     "070",
+     "807",
+     "499",
+     "KOS"
+    ]
+   },
+   {
+    "name": "FR Yugoslavia, then Serbia and Montenegro",
+    "from": 1992,
+    "through": 2006,
+    "holder": "688",
+    "shapes": [
+     "499",
+     "KOS"
+    ]
+   },
+   {
+    "name": "Serbia with Kosovo",
+    "from": 2007,
+    "through": 2007,
+    "holder": "688",
+    "shapes": [
+     "KOS"
+    ]
+   }
+  ],
+  "barred": [
+   {
+    "nation": "710",
+    "name": "South Africa",
+    "from": 1978,
+    "through": 1991,
+    "why": "Barred over apartheid: the match files have no South African Fed Cup tie from 1978 until 1992."
+   },
+   {
+    "nation": "688",
+    "name": "FR Yugoslavia",
+    "from": 1993,
+    "through": 1994,
+    "why": "Barred by the United Nations sanctions: the match files have no Yugoslav Fed Cup tie in 1993 or 1994; it is back in 1995."
+   }
+  ],
+  "fixes": [
+   {
+    "id": "200293",
+    "name": "Martina Navratilova",
+    "code": "USA",
+    "from": 1976,
+    "through": 1981,
+    "why": "Defected from Czechoslovakia in September 1975 and lived in the United States, an American from 1981; her Fed Cup rows are Czechoslovakia's in 1975 and the United States' from 1982, so the nearest-season rule would keep her Czechoslovak to 1978."
+   },
+   {
+    "id": "200348",
+    "name": "Hana Mandlikova",
+    "code": "AUS",
+    "from": 1988,
+    "why": "Australian from January 1988; her Fed Cup rows are Czechoslovakia's, the last in 1987, so the nearest-season rule would keep her Czechoslovak to the end."
+   },
+   {
+    "id": "200652",
+    "name": "Monica Seles",
+    "code": "YUG",
+    "through": 1993,
+    "why": "Yugoslav until she became an American in 1994; her Fed Cup rows are the United States' from 1996, and the player file lists her as American."
+   },
+   {
+    "id": "200357",
+    "name": "Rosalyn Fairbank",
+    "code": "RSA",
+    "why": "South African: her Fed Cup rows are South Africa's (1993); the player file lists her as American, her later country."
+   },
+   {
+    "id": "200468",
+    "name": "Hu Na",
+    "code": "USA",
+    "from": 1983,
+    "why": "Defected in July 1982 and was granted asylum in the United States in 1983; her Fed Cup rows are China's (1981-1982), so the nearest-season rule would keep her Chinese to 1988."
+   }
+  ],
+  "iocNations": {
+   "GBR": "826",
+   "SLO": "705",
+   "INA": "360",
+   "IRI": "364",
+   "NGR": "566",
+   "LAT": "428",
+   "LBN": "422",
+   "LEB": "422",
+   "ESA": "222",
+   "LBA": "434",
+   "SUD": "729",
+   "CHL": "152",
+   "PRY": "600",
+   "KWT": "414",
+   "GTM": "320",
+   "TTO": "780",
+   "NIC": "558",
+   "BWA": "072",
+   "AGO": "024",
+   "COG": "178",
+   "TGO": "768",
+   "MDG": "450",
+   "MRT": "478",
+   "NPL": "524",
+   "BIZ": "084",
+   "TWN": "158",
+   "ZWE": "716",
+   "RHO": "716",
+   "DEU": "276",
+   "KOS": "KOS",
+   "CEY": "144",
+   "BIR": "104",
+   "BUR": "854",
+   "CAF": "140",
+   "RTF": "643"
+  },
+  "offMap": [
+   "HKG",
+   "SGP",
+   "SIN",
+   "MON",
+   "BAR",
+   "AHO",
+   "ARU",
+   "BER",
+   "BRN",
+   "BHR",
+   "MLT",
+   "AND",
+   "MRI",
+   "GUM",
+   "SMR",
+   "CUW",
+   "LIE",
+   "ISV",
+   "VIR",
+   "GUD",
+   "CAY",
+   "GRN",
+   "NMI",
+   "ANT",
+   "VIN",
+   "LCA",
+   "REU",
+   "ASA",
+   "MHL",
+   "SEY",
+   "CPV",
+   "PLW",
+   "TKS",
+   "PYF",
+   "MAC",
+   "ITF",
+   "UNK",
+   "POC"
+  ]
+ },
+ "seasons": {
+  "computed": [
+   1973,
+   2015
+  ],
+  "rough": [
+   1973,
+   1979
+  ],
+  "published": [
+   2016,
+   2025
+  ]
+ }
+}

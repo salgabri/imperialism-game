@@ -197,7 +197,8 @@ the ATP's men at the end of a year and the Davis Cup nations of that day, nation
 (set ids `tennis-<year>`, kind `elo`, `public/tennis/tennis-<year>.json`). The user chose the
 sources: Tennis Abstract's own published lists where they exist, and earlier years computed
 from Jeff Sackmann's match results by Tennis Abstract's published method, on today's scale
-and labelled as computed.
+and labelled as computed. The women's seasons are built by the same scripts with `--tour=wta`
+([womens-tennis.md](womens-tennis.md), "Earlier seasons"); the men's rebuild byte for byte.
 
 ### Sources
 

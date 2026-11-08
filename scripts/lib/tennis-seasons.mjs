@@ -1,6 +1,6 @@
-// Tennis's earlier seasons (docs/design/tennis.md, "Earlier seasons"): the nation a player played for in a season, the
-// game's nation and territory of that season, and its Davis Cup teams. No I/O: scripts/sync-tennis-seasons.mjs and
-// scripts/build-tennis-seasons.mjs pass in scripts/data/tennis-seasons.json (`nations`) and the snapshots.
+// Tennis's earlier seasons (docs/design/tennis.md, "Earlier seasons"; the women's, docs/design/womens-tennis.md): the
+// nation a player played for in a season, the game's nation and territory of that season, and its cup teams. No I/O:
+// scripts/sync-tennis-seasons.mjs and scripts/build-tennis-seasons.mjs pass in a manifest's `nations` and the snapshots.
 //
 // A season is a list of rated men, each with the code of the nation he played for that season: a federation of its
 // day (Czechoslovakia, the Soviet Union, Yugoslavia, West Germany) where there was one. On the game's map a federation
@@ -39,17 +39,20 @@ export function codeOfDay(code, season, ioc, rules) {
 }
 
 /**
- * The nation a computed season's player played for: a hand fix of the manifest (`fixes`), else his Davis Cup nation in
- * the nearest season he played the Davis Cup (the same season first, then earlier, then later, within `window`
- * seasons), else his country by the player file; as `codeOfDay` normalises it → `{ code, how }`.
+ * The nation a computed season's player played for: a hand fix of the manifest (`fixes`), else the player's cup nation
+ * (the Davis Cup's for the men, the Fed Cup's for the women) in the nearest season of a cup tie (the same season first,
+ * then earlier, then later, within the manifest's `davisCupWindow` or `cupWindow` seasons), else the country by the
+ * player file; as `codeOfDay` normalises it → `{ code, how }`, `how` 'fix', 'davis-cup' (`cupHow`: 'fed-cup') or
+ * 'player-file'.
  */
 export function nationOfDay({ id, ioc, davisCup }, season, rules) {
   const fix = rules.fixes.find(f => f.id === id && (f.from ?? -Infinity) <= season && season <= (f.through ?? Infinity));
   if (fix) return { code: codeOfDay(fix.code, season, ioc, rules), how: 'fix' };
+  const window = rules.cupWindow ?? rules.davisCupWindow;
   let best = null;
   for (const [year, codes] of davisCup || []) {
     const distance = Math.abs(year - season) + (year > season ? 0.5 : 0);
-    if (Math.abs(year - season) > rules.davisCupWindow) continue;
+    if (Math.abs(year - season) > window) continue;
     // A team of several countries (the Caribbean's) says nothing of which one is his: the player file does.
     const own = [...codes].filter(([code]) => !rules.combinedTeams.includes(code));
     if (!own.length) continue;
@@ -58,7 +61,7 @@ export function nationOfDay({ id, ioc, davisCup }, season, rules) {
       best = { distance, code };
     }
   }
-  if (best) return { code: codeOfDay(best.code, season, ioc, rules), how: 'davis-cup' };
+  if (best) return { code: codeOfDay(best.code, season, ioc, rules), how: rules.cupHow ?? 'davis-cup' };
   return { code: ioc ? codeOfDay(ioc, season, ioc, rules) : null, how: 'player-file' };
 }
 
@@ -103,9 +106,9 @@ const byElo = (a, b) => b.elo - a.elo || (a.name < b.name ? -1 : a.name > b.name
  * nation's five best by Elo with ratings `gameRating(elo) − shift`, where `shift` brings the season's best player in
  * the game down to 99 (match odds depend only on rating gaps, so a shift of the whole season keeps every match's odds).
  * → `{ nations: [{ id, name, str, squad, players }], shift, left }`, strongest first; `left` the players of a nation
- * of one or of a barred nation, and of no nation.
+ * of one or of a barred nation, and of no nation. `sport`: the men's game (the default) or the women's.
  */
-export function teamsOf(players, season, rules) {
+export function teamsOf(players, season, rules, sport = tennis) {
   const pools = new Map(), left = { offMap: [], barred: [], alone: [] };
   for (const player of players) {
     if (player.nation == null) { left.offMap.push(player); continue; }
@@ -123,8 +126,8 @@ export function teamsOf(players, season, rules) {
   const nations = teams.map(({ id, pool }) => {
     const squad = pool.slice(0, TEAM_SIZE).map(player => ({ ...player, rating: gameRating(player.elo) - shift }));
     if (squad.some(player => player.rating < 1)) throw new Error(`${season}: a rating under 1 in ${id}`);
-    const lineup = selectLineup({ sport: 'tennis', squad: squad.map(player => ({ name: player.name, pos: 'SGL', rating: player.rating })) });
-    return { id, name: nationIdentity(id, tennis).name, str: lineup.rating, squad, players: pool.length };
+    const lineup = selectLineup({ sport: sport.id, squad: squad.map(player => ({ name: player.name, pos: 'SGL', rating: player.rating })) });
+    return { id, name: nationIdentity(id, sport).name, str: lineup.rating, squad, players: pool.length };
   }).sort((a, b) => b.str - a.str || (a.name < b.name ? -1 : 1));
   return { nations, shift, left };
 }

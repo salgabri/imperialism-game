@@ -74,7 +74,7 @@ test('the precache is the app shell only; seasons, maps, flags and crests are ca
   const bytes = shell.reduce((sum, file) => sum + statSync(publicFile(file)).size, 0);
   assert.ok(bytes < 1_500_000, `the public part of the shell is ${bytes} bytes`);
   assert.ok(shell.includes('world-110m.v1.json') && shell.includes('countries-50m.json'));
-  assert.ok(!shell.some(file => /^(football|womens-football|basketball|american-football|baseball|hockey|tennis|rugby-league|domestic|flags|flags-symbols|club-logos|textures)\//.test(file)), shell.join(', '));
+  assert.ok(!shell.some(file => /^(football|womens-football|basketball|american-football|baseball|hockey|tennis|womens-tennis|rugby-league|domestic|flags|flags-symbols|club-logos|textures)\//.test(file)), shell.join(', '));
   // Every font fonts.css loads is in it, and only those.
   const fonts = [...readFileSync(path.join(ROOT, 'src/fonts.css'), 'utf8').matchAll(/url\('\/(fonts\/[^']+)'\)/g)].map(match => match[1]);
   assert.deepEqual(shell.filter(file => file.startsWith('fonts/')), [...new Set(fonts)].sort());
@@ -84,7 +84,7 @@ test('the precache is the app shell only; seasons, maps, flags and crests are ca
   const files = folder => readdirSync(publicFile(folder)).filter(file => !/^(README\.md|LICENSE|SOURCES\.tsv|ATTRIBUTION[\w-]*\.txt)$/.test(file))
     .map(file => `${folder}/${file}`);
   // Every sport's season folder (a sport with no earlier seasons has none) and the maps.
-  const dataFolders = ['football', 'womens-football', 'basketball', 'american-football', 'baseball', 'hockey', 'tennis', 'rugby-league', 'domestic']
+  const dataFolders = ['football', 'womens-football', 'basketball', 'american-football', 'baseball', 'hockey', 'tennis', 'womens-tennis', 'rugby-league', 'domestic']
     .filter(folder => existsSync(publicFile(folder)));
   for (const folder of dataFolders) {
     for (const file of files(folder)) assert.equal(cacheOf(file), 'imperialism-data', file);

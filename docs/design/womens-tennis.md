@@ -1,7 +1,8 @@
 # Women's tennis
 
-Status: implemented 2026-11-08. The ninth sport: the women's game by the rules of the Billie Jean King Cup, with the
-WTA's players rated by their Elo. Nations only, on the world map. It is a sport card of its own beside Tennis, as women's
+Status: implemented 2026-11-08, with 53 earlier seasons back to 1973 the same day (Earlier seasons, below). The ninth
+sport: the women's game by the rules of the Billie Jean King Cup, with the WTA's players rated by their Elo. Nations
+only, on the world map. It is a sport card of its own beside Tennis, as women's
 football is beside football, and it plays [tennis](tennis.md)'s rules and match model, changed only where the women's
 tour plays differently: its serve.
 
@@ -126,7 +127,7 @@ nations win a title in each 200. The men's, by the same probe the same day, are 
 
 - **Setup.** A Women's tennis card after Tennis, with Tennis's racket, as women's football has football's ball. It is
   nations only (`nationsOnly`): the Clubs choice is off and a challenge link's `teams=clubs` is ignored. Its Season
-  choice lists the built-in 2026 alone. Nine sports no longer split into two even rows, and five across would squeeze
+  choice lists the built-in 2026, then the 53 earlier seasons back to 1973. Nine sports no longer split into two even rows, and five across would squeeze
   "Basketball" out of its tile on a desktop's setup column (a 74px word in a 62px tile), so the tiles sit in three rows
   of three (`sportColumns` in `SetupOverlay.jsx`), trimmed to what the icon and name need and still 44px targets. On a
   360×640 phone with a notice line (Resume, a challenge link) step 1's heading then gives way, as step 2's does for
@@ -145,12 +146,13 @@ cup's order, the fast path and the full tie agreeing seed for seed, and the same
 serve; the odds and the live chart; setup, the season, challenge links; the court and the doubling note; the running
 App launching the world, playing the United States against Russia and saving it. `scripts/setup-wizard.test.mjs` holds
 the three rows of tiles; `scripts/home-advantage.test.mjs` and `scripts/simulation-realism.test.mjs` the host's edge;
-`npm run smoke` adds a Billie Jean King Cup campaign of the world.
+`npm run smoke` adds a Billie Jean King Cup campaign of the world. `scripts/womens-tennis-seasons.test.mjs` holds the
+earlier seasons (below).
 
 ## Known limits
 
-- **One season**, 2026 (Tennis Abstract's update of 2 November). Earlier seasons could follow the men's: Tennis
-  Abstract's year-end WTA reports from the Wayback Machine, and Elo computed from Sackmann's WTA match files before them.
+- **The built-in season is 2026**, as of Tennis Abstract's update of 2 November; the earlier seasons have their own
+  limits (Earlier seasons, below).
 - **No doubles specialists**, as in the men's game: a pair is its players' singles mean.
 - **No surfaces**: the host's choice is in the home edge, not played. The snapshot keeps each player's hard, clay and
   grass Elo.
@@ -158,3 +160,132 @@ the three rows of tiles; `scripts/home-advantage.test.mjs` and `scripts/simulati
 - **Players by the country Tennis Abstract files them under**, not by cup nominations.
 - **Licence**: Tennis Abstract's reports and Sackmann's match files are CC BY-NC-SA 4.0 (credit "Jeff Sackmann / Tennis
   Abstract", non-commercial), as the men's ratings are; the ads question in the men's notes applies here too.
+
+## Earlier seasons
+
+Status: built 2026-11-08, when the user asked for them after the sport shipped. The Season choice lists 53 earlier
+seasons, 2025 back to 1973, each the WTA's women at the end of a year and the Fed Cup nations of that day, nations only
+(set ids `wta-<year>`, kind `wta`, `public/womens-tennis/wta-<year>.json`). They follow the men's seasons
+([tennis.md](tennis.md), "Earlier seasons") and the user's choices for them: Tennis Abstract's own published lists where
+they exist, earlier years computed from Jeff Sackmann's match results by Tennis Abstract's published method, on today's
+scale and labelled as computed. The same scripts build both tours (`--tour=wta`), and the men's files rebuild byte for
+byte.
+
+### Sources
+
+- **2016–2025: Tennis Abstract's year-end WTA reports**, as the Wayback Machine archived them, the last update of each
+  season: 28 November 2016, 25 December 2017, 26 November 2018, 2 December 2019, 9 November 2020, 20 December 2021,
+  26 December 2022, 25 December 2023, 23 December 2024 and 29 December 2025. No capture holds a later 2020 update, so that
+  list misses the season's last event, Linz, and says so ("Tennis Abstract Elo, 9 November 2020, before Linz"). 2024 takes
+  the update of 23 December, as the men's does: the next one, 30 December, may already hold the 2025 United Cup.
+- **Countries** of the published seasons come from Tennis Abstract's WTA rankings report, by player key, from the capture
+  nearest the list's date (ten, November 2016 to January 2026). Two captures the Wayback Machine redirects are pinned at
+  the capture it serves (2 March 2018, 26 January 2025). Tennis Abstract has renamed 26 keys since (married and legal
+  names: `CoriGauff` is `CocoGauff`, `DariaGavrilova` `DariaSaville`, `StormSanders` `StormHunter`, `KaterynaKozlova`
+  `KaterynaBaindl`): `keyAliases` joins each to the current one, which also finds the player in the match files and links
+  her page. Its own report gives Megan Mccray the country "rc=" in 2016–2018 (`garbled`, skipped). One woman of its 2023
+  list, Tatiana Barkova, is in no match file and plays for nobody.
+- **1973–2015: Elo computed** from Jeff Sackmann's WTA match results, 1968 to 2025: the tour-level files (with the Fed
+  Cup) and the ITF and qualifying files. The original repository is gone and no fork of it was found; the archive
+  [Aneeshers/tennis-sackmann-archive](https://github.com/Aneeshers/tennis-sackmann-archive) at commit `8373358` holds its
+  files (`wta/`), pinned, and its Hugging Face mirror the same. Labels read "Elo from match results, end of 1985"; the
+  player's source is "Elo from match results", with her Elo in its title.
+- **Pins.** `scripts/data/womens-tennis-seasons.json` holds the SHA-256 of all 117 archive files and the 20 captures.
+- **Licence.** As the men's: CC BY-NC-SA 4.0, the computed ratings derived data under the same terms;
+  `public/womens-tennis/ATTRIBUTION.txt` credits both.
+
+`npm run sync:womens-tennis-seasons` reads the pinned inputs from the ignored `data-src/womens-tennis-seasons/`
+(downloading any that are missing) and writes one snapshot a season to `scripts/data/womens-tennis-seasons/<year>.json`
+(1.3 MB in all, committed) and `validation.json`. `npm run build:womens-tennis-seasons` builds the season files,
+`src/data/womensTennisSeasons.js`, the attribution and `docs/design/womens-tennis-seasons-audit.json`. Both have `--check`
+and rebuild byte for byte.
+
+### The method
+
+The men's engine (`scripts/lib/tennis-elo.mjs`): the same expected score, K, layoff penalty, season ends and ten counted
+matches a season. Two things are the women's own:
+
+- **What counts** (`wtaLevelOf`), by Tennis Abstract's report ("tour-level, tour-level qualifying ... or ITF $50K+
+  matches"): tour-level main draws (the tour's W events, the majors, the Fed Cup and Billie Jean King Cup, the Olympics,
+  the Finals, the Tiers of 2000–2008, Premier and International), tour-level qualifying, and the main draws of the WTA
+  125s and of ITF events of $50K or more. Not the files' exhibitions, junior events or ITF circuits under $50K, nor the
+  qualifying of a 125 or an ITF event. Before 1994 the files name no ITF event's prize (they are satellites, futures and
+  "ITF" events of every size), so none of them counts.
+- **Where a newcomer starts.** 1330 at tour level, 1275 at a 125, an ITF event or in qualifying (the men's 1450 and
+  1275). Tennis Abstract publishes neither. With the men's 1450, the 1970s and 1980s came out about 100 points high:
+  before 1994 every newcomer's first counted match is at tour level, and a weak newcomer starting high gives her points to
+  the stars. 1330 was fitted on the career peaks of the 17 women of Tennis Abstract's Tennis 128 (2022) whose peaks fall
+  in 1973–2000: computed minus published, −0.4 on average, root mean square 42.7 (1970s +7.5, 1980s +29.8, 1990s −18.3);
+  the 14 later peaks −4.7. Graf comes out +5, Seles +4, Mandlikova −1, Navratilova +30, Evert +34; the 1970s are rough
+  (Austin +93, Goolagong +75, Wade −86), and Hingis, whose 2001 peak lies outside the fit, −121. The men's fit was closer
+  (15.1): Tennis Abstract's women's database reaches back to the 1920s, these files only to 1968.
+
+**Validation** (`scripts/data/womens-tennis-seasons/validation.json`; the Elo of the same women, computed minus
+published, over Tennis Abstract's top hundred):
+
+| List | Matched | Mean difference | Correlation | Slope | Top ten shared | Listed by both |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2016, pre-2018 method | 97 | −5.3 | 0.995 | 1.02 | 8 | 136 of 148 |
+| 2017, pre-2018 method | 97 | +6.7 | 0.992 | 1.01 | 8 | 135 of 173 |
+| 2018, tour level only | 96 | +27.8 | 0.911 | 1.10 | 8 | 174 of 194 |
+| 2019 | 100 | +28.2 | 0.966 | 1.07 | 8 | 296 of 302 |
+| 2020 | 100 | −9.7 | 0.905 | 0.77 | 6 | 186 of 192 |
+| 2021 | 100 | −10.2 | 0.972 | 0.93 | 9 | 312 of 317 |
+| 2022 | 100 | +0.4 | 0.977 | 1.00 | 8 | 398 of 409 |
+| 2023 | 100 | +2.2 | 0.988 | 0.98 | 9 | 429 of 441 |
+| 2024 | 100 | +4.8 | 0.987 | 0.99 | 10 | 513 of 522 |
+| 2025 | 100 | +0.9 | 0.978 | 0.99 | 7 | 477 of 519 |
+
+The 2016 and 2017 rows run the same engine with the method Tennis Abstract used before May 2018 (tour-level matches only,
+everyone starting at 1500, no layoff penalty), a check of the engine itself. From 2021 the current method agrees with
+Tennis Abstract's own lists to within ten points, closer than the men's (+21 to +44). 2018 and 2019 are as far off as the
+men's of those years; 2020's list stops a week short of the season.
+
+**Scale.** A rating is the Elo on the game's scale, `round((Elo + 100) / 25)`, as in 2026. Where a season's best player
+would be over 99 the whole season is shifted down until she is 99, which keeps every match's odds: 26 seasons, by up to
+nine points (Navratilova's 2575 in 1985 and Graf's 2600 in 1989, both 107). The shift is the season's `source.shift`;
+each player keeps her Elo as `rawRating`.
+
+### Nations of the day
+
+As the men's (`scripts/lib/tennis-seasons.mjs`), with the Fed Cup's ties for the Davis Cup's: a computed season's player
+plays for the nation she played the Fed Cup for in the nearest season (within six), read from the ties' names in the
+match files ("Fed Cup WG F: USA vs AUS"; 349 rubbers place nobody, among them the Wightman Cup's and the Billie Jean King
+Cup's of 2024–2026, whose names give no sides), else for her country by Sackmann's player file; then as that season's state knew it, with the men's
+federations (Czechoslovakia, the Soviet Union, the CIS, Yugoslavia, FR Yugoslavia, West Germany) and their land. East
+Germany never played the Fed Cup: its players play for nobody before 1991.
+
+- **Barred:** South Africa from 1978 until 1991 (the files have no South African tie from 1978 until 1992; it played the
+  1977 cup), and FR Yugoslavia in 1993 and 1994 (none in those years; back in 1995).
+- **Fixes** (`nations.fixes`), for women who changed country with no Fed Cup row to show it: Martina Navratilova American
+  from 1976 (she defected in 1975; her rows are Czechoslovakia's to 1975 and the United States' from 1982), Hana
+  Mandlikova Australian from 1988, Monica Seles Yugoslav until 1993 (the player file lists her as American), Rosalyn
+  Fairbank South African (her 1993 rows), Hu Na American from 1983 (she defected in 1982).
+- **A nation needs two.** Monica Seles plays for Yugoslavia in 1989 and 1990. In 1991 and 1992 she was its only rated
+  player, so it fields no team, and FR Yugoslavia is barred in 1993: the world's No. 1 of 1991–1992 is not in those
+  seasons, by the rule that leaves out every nation of one. The audit names her.
+
+Among the computed seasons only 13 women change country outside the federations' successions, each one as her Fed Cup
+rows say (Manuela Maleeva to Switzerland in 1991, Patricia Hy to Canada, Sesil Karatantcheva to Kazakhstan).
+
+### Tests
+
+`scripts/womens-tennis-seasons.test.mjs`: the build and (with the inputs cached) the sync rebuild byte for byte, the
+men's too; every input pinned; the counted levels; the listing, 2025 back to 1973, and its labels; every season decodes,
+two to five women a nation, each rating her Elo on the game's scale less the season's shift, the best at 99 where
+shifted; Graf and Navratilova shifted; 1985's Czechoslovakia holding Slovakia with Mandlikova, West Germany with
+Kohde-Kilsch and Graf, South Africa barred from 1978 and back in 1992; the Soviet Union, the CIS and Serbia and
+Montenegro; the fixes and Seles's seasons; Tennis Abstract's own lists and renamed keys; the validation thresholds; the
+loader refusing damaged files; a season binding the women's sport and serve; the running App listing the seasons,
+loading one, launching 1985 with Slovakia in Czechoslovakia's empire and resuming the save; and a challenge link to a
+season.
+
+### Limits
+
+- **1973–1979 are rough**, as the men's: the ratings start from nothing in 1968, while Tennis Abstract's reach back to the
+  1920s.
+- **No ITF events before 1994**, whose prize the files do not name: a player who played only those is not rated then.
+- **Names** are the player file's, the latest a woman used (Manuela Maleeva Fragniere in 1985), and the published lists'
+  as Tennis Abstract wrote them that year (Cori Gauff in 2023).
+- **No surfaces**, as the men's.
+- **Russia and Belarus** play in 2022–2025, as in 2026 by the user's choice, though barred from the cup since 2022.

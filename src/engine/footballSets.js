@@ -18,6 +18,7 @@ import { BUILT_IN_BASEBALL_SEASONS } from '../data/baseballSeasons.js';
 import { BUILT_IN_WOMENS_SEASONS } from '../data/womensFootballSeasons.js';
 import { BUILT_IN_AMERICAN_FOOTBALL_SEASONS } from '../data/americanFootballSeasons.js';
 import { BUILT_IN_TENNIS_SEASONS } from '../data/tennisSeasons.js';
+import { BUILT_IN_WOMENS_TENNIS_SEASONS } from '../data/womensTennisSeasons.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../data/hockeySeasons.js';
 import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
@@ -25,6 +26,7 @@ import { EUROPE_MAPS } from '../data/europeMaps.js';
 import { basketball } from '../sports/basketball.js';
 import { americanFootball } from '../sports/americanFootball.js';
 import { tennis } from '../sports/tennis.js';
+import { womensTennis } from '../sports/womensTennis.js';
 import { hockey } from '../sports/hockey.js';
 import { rugbyLeague } from '../sports/rugbyLeague.js';
 import { baseball } from '../sports/baseball.js';
@@ -73,6 +75,8 @@ const SET_KINDS = Object.freeze({
   tecmo: { prefix: 'tecmo-', id: /^tecmo-\d{4}$/, sport: 'american-football', nations: false, mapped: true, calendar: true },
   // `tennis-<year>`: the ATP's men at the end of a year, by Elo, the Davis Cup's nations only.
   elo: { prefix: 'tennis-', id: /^tennis-\d{4}$/, sport: 'tennis', nationsOnly: /^tennis-/, calendar: true },
+  // `wta-<year>`: the WTA's women at the end of a year, by Elo, the Fed Cup's nations only.
+  wta: { prefix: 'wta-', id: /^wta-\d{4}$/, sport: 'womens-tennis', nationsOnly: /^wta-/, calendar: true },
   // `nhl-<season end year>`: an NHL season's ratings from an EA NHL edition (NHL 94 rates 1993/94 → `nhl-1994`), its
   // nations by nationality and the NHL's clubs.
   nhl: { prefix: 'nhl-', id: /^nhl-\d{4}$/, sport: 'hockey', mapped: true },
@@ -97,7 +101,7 @@ export const setKindOf = id => Object.keys(SET_KINDS).find(kind => SET_KINDS[kin
 export const setSportOf = id => kindRecord(id).sport;
 /** Whether a set fields national teams: every one but an NBA season, which has clubs only. */
 export const setHasNations = id => kindRecord(id).nations !== false;
-/** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, SWOS 96/97, tennis). */
+/** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, SWOS 96/97, tennis's). */
 export const setHasClubs = id => !kindRecord(id).nationsOnly?.test(String(id));
 /** Whether a set's clubs play on a map of their era (src/data/clubMaps.js) rather than on the world. */
 export const setIsMapped = id => !!kindRecord(id).mapped;
@@ -187,7 +191,7 @@ export const isSeasonEuropeMap = (mapId, id) => EUROPE_MAPS.some(entry => entry.
 /** The built-in earlier seasons of every sport, newest first, as the index lists them. */
 export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_WOMENS_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS,
   ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS, ...BUILT_IN_HOCKEY_SEASONS, ...BUILT_IN_TENNIS_SEASONS,
-  ...BUILT_IN_RUGBY_LEAGUE_SEASONS]);
+  ...BUILT_IN_WOMENS_TENNIS_SEASONS, ...BUILT_IN_RUGBY_LEAGUE_SEASONS]);
 
 /** The era map a basketball or baseball season's clubs play on (null for any other set). */
 export const seasonMapOf = id => BUILT_IN_SETS.find(set => set.id === id)?.map ?? null;
@@ -292,7 +296,7 @@ export function decodeFootballSet(data, id = data?.id) {
     const { clubs, ...meta } = data;
     return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(player => [...player]) })), territory: NO_TERRITORY };
   }
-  if (setKindOf(data.id) === 'elo') {
+  if (setKindOf(data.id) === 'elo' || setKindOf(data.id) === 'wta') {
     const { nations, clubs, territory, ...meta } = data;
     return {
       meta,
@@ -393,11 +397,12 @@ KINDS.swos = { size: 9, roles: SWOS_ROLES, tupleOf: swosTupleOf,
       : src.conversion !== SWOS_CONVERSION ? `source conversion must be "${SWOS_CONVERSION}"` : '') };
 // Each football kind's player tuple, as an error names it.
 const TUPLE_NAMES = { ea: 'an EA', eaw: 'an EA', swos: 'a SWOS' };
-// Nations only, each player `[name, 'SGL', rating, source]` as the built-in tennis rosters hold them.
+// Nations only, each player `[name, 'SGL', rating, source]` as the built-in tennis rosters hold them; the women's the same.
 KINDS.elo = { size: 4,
   source: src => (!['edition', 'name', 'snapshotDate', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
     ? 'source must name the edition, its publisher, the date the ratings are of and when they were read'
     : src.rawScale !== 'Elo' ? 'source rawScale must be "Elo"' : '') };
+KINDS.wta = KINDS.elo;
 // Nations and clubs, each player `[name, position, rating]`.
 KINDS.nhl = { size: 3,
   source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
@@ -458,7 +463,7 @@ function validateFootballSet(data, id) {
     || Object.values(data.coverage).some(n => !Number.isInteger(n) || n < 0))) fail('coverage must hold counts');
   if (setKindOf(id) === 'nba2k') return validateBasketballClubs(data, id, fail);
   if (setKindOf(id) === 'show') return validateBaseballSeason(data, id, fail);
-  if (setKindOf(id) === 'elo') return validateTennisSeason(data, id, fail);
+  if (setKindOf(id) === 'elo' || setKindOf(id) === 'wta') return validateTennisSeason(data, id, fail);
   if (setKindOf(id) === 'nhl') return validateNationsAndClubsOnMap(data, id, fail, { sport: hockey, clubId: NHL_CLUB_ID,
     positions: new Set(Object.keys(hockey.formation)), clubLeast: 12, noun: 'an NHL season' });
   if (setKindOf(id) === 'nrl') return validateClubsOnMap(data, id, fail, { sport: rugbyLeague, clubId: NRL_CLUB_ID,
@@ -611,7 +616,7 @@ function validateBasketballClubs(data, id, fail) {
 }
 
 /**
- * A tennis season: the nations that field a Davis Cup team (two to five rated men each, strongest first, as
+ * A tennis season, the men's or the women's: the nations that field a cup team (two to five rated players each, strongest first, as
  * `[name, 'SGL', rating, source]`), no clubs, and its territory: the home nations held by the United Kingdom, every
  * nation it does not list inactive. Ratings are the season's Elo on the game's scale.
  */
@@ -874,6 +879,7 @@ export function seasonSport(set) {
       : setKindOf(meta.id) === 'show' ? { ...baseball, rosters, clubs, territory, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'madden' || setKindOf(meta.id) === 'tecmo' ? { ...americanFootball, clubs, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'elo' ? { ...tennis, rosters, territory, ...identity }
+      : setKindOf(meta.id) === 'wta' ? { ...womensTennis, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'nhl' ? { ...hockey, rosters, clubs, territory, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'nrl' ? { ...rugbyLeague, clubs, clubMap: meta.map, ...identity }
       // A women's season's unlisted nations are inactive, so nothing reads their strength in play.

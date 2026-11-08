@@ -1,13 +1,16 @@
-// Men's tennis Elo computed from Jeff Sackmann's ATP match results by Tennis Abstract's published method
-// (docs/design/tennis.md, "Earlier seasons"). No I/O: scripts/sync-tennis-seasons.mjs reads the pinned files and
-// passes their text in.
+// Tennis Elo computed from Jeff Sackmann's match results by Tennis Abstract's published method: the men's from his ATP
+// files (docs/design/tennis.md, "Earlier seasons"), the women's from his WTA files (docs/design/womens-tennis.md). No
+// I/O: scripts/sync-tennis-seasons.mjs reads the pinned files and passes their text in.
 //
 // The method, as Jeff Sackmann describes it (and sources in scripts/data/tennis-seasons.json `method`):
 // - a match's expected score is 1 / (1 + 10^((opponent − player) / 400));
 // - K = 250 / (n + 6)^0.4, n the counted matches the player has already played; no bonus for the majors;
 // - counted: tour-level main draws with the Davis Cup, tour-level qualifying and challengers' main draws (not their
-//   qualifying), never a walkover, a retirement, a default or an abandoned match;
-// - a new player starts by the level of his first counted match (tour level, or a challenger or qualifying round);
+//   qualifying), never a walkover, a retirement, a default or an abandoned match; the women's, tour-level main draws
+//   with the Fed Cup, tour-level qualifying and the main draws of WTA 125s and ITF events of $50K or more
+//   (`wtaLevelOf`);
+// - a new player starts by the level of her or his first counted match (tour level, or a challenger, ITF or
+//   qualifying round);
 // - a layoff of eight weeks or more (the offseason not counted) costs a player rated 1900 or more 100 points, rising to
 //   150 for a year, charged when he returns; K is then 1.5 times as large, back to 1 over twenty matches, and a second
 //   layoff within two years of the last comeback is charged the difference. A list shows a player still away with the
@@ -15,8 +18,8 @@
 // - a season ends after its last event, as the match files group them: the Masters played in January belongs to the
 //   year before, an event starting on 29 December to the year after.
 
-/** Round order within an event, qualifying first. */
-export const ROUND_ORDER = Object.freeze({ Q1: 1, Q2: 2, Q3: 3, Q4: 4, ER: 5, R128: 10, R64: 11, R32: 12, R16: 13, RR: 14, QF: 15, SF: 16, BR: 17, F: 18 });
+/** Round order within an event, qualifying first (the WTA's files have a fifth qualifying round). */
+export const ROUND_ORDER = Object.freeze({ Q1: 1, Q2: 2, Q3: 3, Q4: 4, Q5: 4.5, ER: 5, R128: 10, R64: 11, R32: 12, R16: 13, RR: 14, QF: 15, SF: 16, BR: 17, F: 18 });
 
 // A score that shows a match was not played out: a walkover, a retirement, a default, an abandoned or unfinished one.
 const NOT_PLAYED = /W\/O|walkover|\bRET\b|\bRet\b|\bRE\b|\bDEF\b|\bDef\b|default|\bABD\b|\bABN\b|abandoned|unfinished|\bUNP\b/i;
@@ -60,7 +63,8 @@ export function parseMatchFile(text, { season, file }) {
     if (!line) continue;
     const c = line.split(',');
     if (c.length !== head.length) throw new Error(`The match file of ${season}, row ${row}: ${c.length} cells, not ${head.length}`);
-    const round = ROUND_ORDER[c[I.round]];
+    // One WTA row writes its final "f".
+    const round = ROUND_ORDER[c[I.round]] ?? ROUND_ORDER[c[I.round].toUpperCase()];
     if (round == null) throw new Error(`The match file of ${season}, row ${row}: unknown round ${c[I.round]}`);
     const date = Number(c[I.date]);
     if (!Number.isInteger(date) || date < 19000101) throw new Error(`The match file of ${season}, row ${row}: bad date ${c[I.date]}`);
@@ -111,16 +115,56 @@ const expected = (rating, opponent) => 1 / (1 + Math.pow(10, (opponent - rating)
 const round1 = x => Math.round(x * 10) / 10;
 
 /**
+ * The men's rule, by Tennis Abstract's report ("tour-level, tour-level qualifying, men's challenger"): the tour-level
+ * file's matches (`file` 0) are tour level; the other file holds the challengers, whose main draws count and whose
+ * qualifying does not (unless `method.challengerQualifying`), and the tour-level qualifying.
+ * → 'tour' | 'challenger' | 'qualifying', the start a new player gets, or null for a match that is not counted.
+ */
+export function atpLevelOf(m, method) {
+  if (m.file === 0) return 'tour';
+  if (m.level === 'C') return m.round < ROUND_ORDER.ER && !method.challengerQualifying ? null : 'challenger';
+  return 'qualifying';
+}
+
+// The WTA files' tour levels: W (the tour to 1999, the Finals of 2015, the 250s of 2021), the majors, the Fed Cup and
+// the Billie Jean King Cup (D), the Olympics, the Finals, the Tiers of 2000-2008, and Premier and International.
+const WTA_TOUR = new Set(['W', 'G', 'D', 'O', 'F', 'T1', 'T2', 'T3', 'T4', 'T5', 'PM', 'P', 'I']);
+// An ITF event's prize level, which the files name from 1994 ("50", "100", the "50+H" of 2025), else null.
+const itfPrize = level => (/^\d+(\+H)?$/.test(level) ? Number(level.replace('+H', '')) : null);
+
+/**
+ * The women's rule, by Tennis Abstract's report ("tour-level, tour-level qualifying ... or ITF $50K+ matches"): the
+ * tour-level file's tour events (not its exhibitions, junior events or ITF circuits under $50K); in the other file the
+ * qualifying of tour events, and the main draws of the WTA 125s (level C from 2012) and of ITF events of $50K or more.
+ * Before 1994 the files name no ITF event's prize, so none is counted; nor is the qualifying of a 125 or an ITF event.
+ * A WTA 125 or an ITF event starts a new player as a men's challenger does. → as `atpLevelOf`.
+ */
+export function wtaLevelOf(m) {
+  const prize = itfPrize(m.level);
+  if (m.file === 0) {
+    if (m.level === 'W' && /\b125K?\b/.test(m.eventName)) return 'challenger';
+    if (WTA_TOUR.has(m.level)) return 'tour';
+    return prize != null && prize >= 50 ? 'challenger' : null;
+  }
+  const qualifying = m.round < ROUND_ORDER.ER;
+  if (WTA_TOUR.has(m.level)) return qualifying ? 'qualifying' : 'tour';
+  if (qualifying) return null;
+  if (m.level === 'C') return m.season >= 2012 ? 'challenger' : null;
+  return prize != null && prize >= 50 ? 'challenger' : null;
+}
+
+/**
  * Rate every match in order (orderMatches) by `method` (scripts/data/tennis-seasons.json `method`): `{ k: { numerator,
  * offset, exponent }, start: { tour, challenger, qualifying }, layoff: { weeks, min, max, maxWeeks, kBoost, kMatches,
  * repeatDays, threshold, offseason: [mmdd, mmdd] } | null, files: 'tour' | 'all' }`. Options: `seasons`, the seasons to snapshot at
  * their end; `asOf`, a list's date by season (yyyymmdd; default 31 December, never before the season's last event);
- * `yElo`, also each season's yElo (every player restarting at 1500 against his opponents' real Elo).
+ * `yElo`, also each season's yElo (every player restarting at 1500 against his opponents' real Elo); `levelOf`, which
+ * matches count and at what start (`atpLevelOf`, the default, or `wtaLevelOf`).
  * Returns `{ snapshots: { [season]: { last, date, players } }, peaks, yElo, counts }`, each snapshot player `{ id,
  * name, elo, n, season: counted matches that season, last, absent? }` for everyone who played a counted match that
  * season, `absent` the layoff penalty his listed Elo already shows.
  */
-export function rateMatches(matches, method, { seasons = [], yElo = false, asOf = null } = {}) {
+export function rateMatches(matches, method, { seasons = [], yElo = false, asOf = null, levelOf = atpLevelOf } = {}) {
   const wanted = new Set(seasons);
   const players = new Map();
   const counts = { counted: 0, unplayed: 0, 'no score': 0, placeholder: 0, skipped: 0 };
@@ -132,13 +176,12 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
     if (player.boost > 0) factor *= 1 + (layoff.kBoost - 1) * player.boost / layoff.kMatches;
     return factor;
   };
-  // A new player's rating by the level of his first counted match: tour level (the Davis Cup included), a challenger,
-  // or the qualifying of a tour-level event.
-  const startOf = m => (m.file === 0 ? start.tour : m.level === 'C' ? start.challenger : start.qualifying);
-  const playerOf = (id, name, m) => {
+  // A new player's rating by the level of the first counted match: tour level (the Davis Cup or Fed Cup included), a
+  // challenger (a WTA 125 or an ITF event), or the qualifying of a tour-level event.
+  const playerOf = (id, name, level) => {
     let player = players.get(id);
     if (!player) {
-      player = { id, name, r: startOf(m), n: 0, last: 0, boost: 0, comeback: 0, prior: 0, peak: -Infinity, peakDate: 0,
+      player = { id, name, r: start[level], n: 0, last: 0, boost: 0, comeback: 0, prior: 0, peak: -Infinity, peakDate: 0,
         season: 0, seasonCount: 0, yYear: 0, yR: 0, yN: 0, yW: 0, yL: 0 };
       players.set(id, player);
     }
@@ -198,12 +241,13 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
       season = m.season;
     }
     if (m.why) { counts[m.why]++; continue; }
-    if (method.files === 'tour' && m.file !== 0) { counts.skipped++; continue; }
-    // A challenger's qualifying (Tennis Abstract counts tour-level qualifying and challengers' main draws).
-    if (!method.challengerQualifying && m.file === 1 && m.level === 'C' && m.round < ROUND_ORDER.ER) { counts.skipped++; continue; }
+    // A match of no counted level (a men's challenger's qualifying, a women's exhibition or small ITF event), or of
+    // anything but tour level under a method of tour-level matches only.
+    const level = levelOf(m, method);
+    if (level == null || (method.files === 'tour' && level !== 'tour')) { counts.skipped++; continue; }
     counts.counted++;
     lastDate = Math.max(lastDate, m.date);
-    const w = playerOf(m.winner, m.winnerName, m), l = playerOf(m.loser, m.loserName, m);
+    const w = playerOf(m.winner, m.winnerName, level), l = playerOf(m.loser, m.loserName, level);
     comeback(w, m.date);
     comeback(l, m.date);
     if (yElo) {

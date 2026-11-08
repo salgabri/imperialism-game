@@ -218,8 +218,9 @@ test('setup offers women\'s tennis after tennis, with nations only, on its built
   const model = buildSetupModel({ sport: 'womens-tennis', layer: 'clubs', scope: 'UEFA' }, {});
   assert.equal(model.layer, 'nations', 'never clubs');
   assert.equal(model.nationsOnly, true);
-  assert.deepEqual(model.season.options.map(option => option.name), ['2026']);
-  assert.match(model.season.note, /WTA's women: Tennis Abstract's own as of 2 November 2026/);
+  // 2026, then the earlier seasons (scripts/womens-tennis-seasons.test.mjs).
+  assert.equal(model.season.options[0].name, '2026');
+  assert.match(model.season.note, /WTA's women: Tennis Abstract's own as of 2 November 2026 and at the end of 2016–2025/);
   const { setup, ignored } = readChallenge('?sport=womens-tennis&teams=clubs&theatre=UEFA');
   assert.deepEqual([setup.sport, setup.layer, setup.scope], ['womens-tennis', 'nations', 'UEFA']);
   assert.deepEqual(ignored, ['teams']);

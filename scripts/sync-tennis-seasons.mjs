@@ -1,33 +1,48 @@
-// Snapshot tennis's earlier seasons (docs/design/tennis.md, "Earlier seasons") from the inputs scripts/data/tennis-seasons.json
-// pins: Jeff Sackmann's ATP match results (1968-2025) and the Wayback Machine's captures of Tennis Abstract's Elo and
-// rankings reports. Each input is read from the ignored data-src/tennis-seasons/ cache, or downloaded from its pinned
-// address when missing, and must match its SHA-256.
+// Snapshot a tour's earlier seasons from the inputs its manifest pins: the men's (docs/design/tennis.md, "Earlier
+// seasons"; scripts/data/tennis-seasons.json) or, with --tour=wta, the women's (docs/design/womens-tennis.md, "Earlier
+// seasons"; scripts/data/womens-tennis-seasons.json). The inputs are Jeff Sackmann's match results (1968-2025) and the
+// Wayback Machine's captures of Tennis Abstract's Elo and rankings reports. Each input is read from the ignored cache
+// (data-src/tennis-seasons/, data-src/womens-tennis-seasons/), or downloaded from its pinned address when missing, and
+// must match its SHA-256.
 //
 //   npm run sync:tennis-seasons              writes scripts/data/tennis-seasons/<year>.json and validation.json
-//   npm run sync:tennis-seasons -- --check   rebuilds them and compares byte for byte, writes nothing
+//   npm run sync:womens-tennis-seasons       the same with --tour=wta: scripts/data/womens-tennis-seasons/
+//   --check                                  rebuilds them and compares byte for byte, writes nothing
 //   --refresh                                downloads every input again (still checked against its pin)
 //
-// A computed season (1973-2015) is the year-end Elo of every man with ten counted matches in it, by Tennis Abstract's
-// published method (scripts/lib/tennis-elo.mjs, the manifest's `method`), each with the nation he played for that
-// season (scripts/lib/tennis-seasons.mjs). A published season (2016-2025) is Tennis Abstract's own year-end report,
-// with each man's country from its rankings report of the nearest date. validation.json holds the checks of the method
+// A computed season is the year-end Elo of every player with ten counted matches in it, by Tennis Abstract's published
+// method (scripts/lib/tennis-elo.mjs, the manifest's `method`), each with the nation the player played for that
+// season (scripts/lib/tennis-seasons.mjs). A published season is Tennis Abstract's own year-end report, with each
+// player's country from its rankings report of the nearest date. validation.json holds the checks of the method
 // against every number Tennis Abstract has published by it.
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { agreement, davisCupNations, orderMatches, parseMatchFile, rateMatches } from './lib/tennis-elo.mjs';
+import { agreement, atpLevelOf, davisCupNations, orderMatches, parseMatchFile, rateMatches, wtaLevelOf } from './lib/tennis-elo.mjs';
 import { codeOfDay, nationOfDay } from './lib/tennis-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const cacheDir = path.join(root, 'data-src/tennis-seasons');
-const outDir = path.join(root, 'scripts/data/tennis-seasons');
-const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/tennis-seasons.json'), 'utf8'));
+// Each tour's manifest, cache, snapshots and match files, its rankings' rank column and its rule of counted matches.
+const TOURS = {
+  atp: { manifest: 'scripts/data/tennis-seasons.json', cache: 'data-src/tennis-seasons', out: 'scripts/data/tennis-seasons',
+    main: season => `atp_matches_${season}.csv`, other: season => `atp_matches_qual_chall_${season}.csv`, players: 'atp_players.csv',
+    rank: 'ATP Rank', levelOf: atpLevelOf, noun: 'tennis', cup: 'Davis Cup', unresolved: 'davisCupRubbersUnresolved' },
+  wta: { manifest: 'scripts/data/womens-tennis-seasons.json', cache: 'data-src/womens-tennis-seasons', out: 'scripts/data/womens-tennis-seasons',
+    main: season => `wta_matches_${season}.csv`, other: season => `wta_matches_qual_itf_${season}.csv`, players: 'wta_players.csv',
+    rank: 'WTA Rank', levelOf: wtaLevelOf, noun: "women's tennis", cup: 'Fed Cup', unresolved: 'fedCupRubbersUnresolved' },
+};
 const args = process.argv.slice(2);
-const unknown = args.filter(arg => !['--check', '--refresh'].includes(arg));
+const unknown = args.filter(arg => !['--check', '--refresh'].includes(arg) && !/^--tour=/.test(arg));
 if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
 const check = args.includes('--check'), refresh = args.includes('--refresh');
+const tourId = args.find(arg => arg.startsWith('--tour='))?.slice('--tour='.length) ?? 'atp';
+const tour = TOURS[tourId];
+if (!tour) throw new Error(`Unknown tour ${tourId}: atp or wta`);
+const cacheDir = path.join(root, tour.cache);
+const outDir = path.join(root, tour.out);
+const manifest = JSON.parse(await readFile(path.join(root, tour.manifest), 'utf8'));
 const PAUSE_MS = 1500;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sha256 = data => createHash('sha256').update(data).digest('hex');
@@ -67,8 +82,8 @@ const [firstPublished, lastPublished] = manifest.seasons.published;
 const FIRST_FILE = 1968;
 let matches = [];
 for (let season = FIRST_FILE; season <= lastPublished; season++) {
-  matches.push(...parseMatchFile(await archiveFile(`atp_matches_${season}.csv`), { season, file: 0 }));
-  const qc = `atp_matches_qual_chall_${season}.csv`;
+  matches.push(...parseMatchFile(await archiveFile(tour.main(season)), { season, file: 0 }));
+  const qc = tour.other(season);
   if (manifest.archive.files[qc]) matches.push(...parseMatchFile(await archiveFile(qc), { season, file: 1 }));
 }
 matches = orderMatches(matches);
@@ -98,7 +113,7 @@ function playerFile(text) {
   }
   return players;
 }
-const people = playerFile(await archiveFile('atp_players.csv'));
+const people = playerFile(await archiveFile(tour.players));
 
 const text = cell => cell.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 /** A Tennis Abstract report's table (`id="reportable"`): its header and rows `{ key, cells }`. */
@@ -128,8 +143,10 @@ for (const entry of manifest.rankings) {
   if (JSON.stringify(head) !== JSON.stringify(['Rank', 'Player', 'Country', 'Birthdate'])) throw new Error(`The rankings capture ${entry.capture}'s columns changed`);
   const byKey = new Map();
   for (const { key, cells: [, , country, born] } of body) {
-    // A few men stand under no flag (2024's list has four): the next capture, or the player file, says where they are from.
+    // A few players stand under no flag (2024's ATP list has four): the next capture, or the player file, says where from.
     if (country === '') continue;
+    // A cell the report itself garbled (the manifest names each one: 2016's WTA list gives Megan Mccray "rc=") says nothing.
+    if (entry.garbled?.[key] === country) continue;
     if (!/^[A-Z]{3}$/.test(country)) throw new Error(`${key}: a country ${JSON.stringify(country)} in the rankings capture ${entry.capture}`);
     byKey.set(canonical(key), { country, born: /^\d{4}-\d{2}-\d{2}$/.test(born) ? born : null });
   }
@@ -143,10 +160,11 @@ const { nations: davisCup, unresolved } = davisCupNations(matches, (ioc, season)
 const allSeasons = [];
 for (let season = firstComputed; season <= lastPublished; season++) allSeasons.push(season);
 const asOf = Object.fromEntries(manifest.reports.map(report => [report.season, Number(report.updated.replaceAll('-', ''))]));
-const main = rateMatches(matches, manifest.method, { seasons: allSeasons, yElo: true });
+const levelOf = tour.levelOf;
+const main = rateMatches(matches, manifest.method, { seasons: allSeasons, yElo: true, levelOf });
 // The same method dated as Tennis Abstract's reports, for the check against them.
-const dated = rateMatches(matches, manifest.method, { seasons: manifest.reports.map(report => report.season), asOf });
-const v1 = rateMatches(matches, manifest.method.v1, { seasons: manifest.reports.filter(report => report.method === 'pre-2018').map(report => report.season), asOf });
+const dated = rateMatches(matches, manifest.method, { seasons: manifest.reports.map(report => report.season), asOf, levelOf });
+const v1 = rateMatches(matches, manifest.method.v1, { seasons: manifest.reports.filter(report => report.method === 'pre-2018').map(report => report.season), asOf, levelOf });
 
 const isoDate = yyyymmdd => `${String(yyyymmdd).slice(0, 4)}-${String(yyyymmdd).slice(4, 6)}-${String(yyyymmdd).slice(6)}`;
 const row = cells => JSON.stringify(cells);
@@ -196,8 +214,8 @@ for (const report of manifest.reports) {
   const rows = [], left = [], linked = [];
   for (const { key, cells } of body) {
     const name = cells[1], elo = number(cells[3], name), eloRank = number(cells[0], name);
-    const atpRank = col('ATP Rank') >= 0 && cells[col('ATP Rank')] !== '' ? number(cells[col('ATP Rank')], name) : null;
-    // His record in the match files: by his key's letters (Tennis Abstract's keys are names), else by his name.
+    const tourRank = col(tour.rank) >= 0 && cells[col(tour.rank)] !== '' ? number(cells[col(tour.rank)], name) : null;
+    // The player's record in the match files: by the key's letters (Tennis Abstract's keys are names), else by name.
     const candidates = [...new Set([...(peopleByName.get(plain(canonical(key))) || []), ...(peopleByName.get(plain(name)) || [])])];
     const playing = candidates.filter(id => counts.has(id));
     const pool = playing.length ? playing : candidates;
@@ -215,10 +233,10 @@ for (const report of manifest.reports) {
     // A surface he has not played on reads "-".
     const surface = name => (cells[col(name)] === '-' ? null : number(cells[col(name)], `${cells[1]} ${name}`));
     rows.push([key, name, codeOfDay(code, season, person.ioc, nationRules), how, born, elo, surfaces.map(surface),
-      eloRank, atpRank, id, matchesPlayed]);
+      eloRank, tourRank, id, matchesPlayed]);
   }
   const headRow = { season, kind: 'published', updated: report.updated, capture: report.capture, listed: body.length, rated: rows.length,
-    surfaces, columns: ['key', 'name', 'nation of the day', 'how', 'born', 'elo', 'surface elos', 'elo rank', 'atp rank', 'match-file id', 'matches'], left };
+    surfaces, columns: ['key', 'name', 'nation of the day', 'how', 'born', 'elo', 'surface elos', 'elo rank', tour.rank.toLowerCase(), 'match-file id', 'matches'], left };
   outputs.push([path.join(outDir, `${season}.json`), documentText(headRow, rows)]);
   publishedChecks[season] = linked;
 }
@@ -258,7 +276,7 @@ const peaks = targets.peaks.items.map(([id, name, elo, year]) => {
   const peak = peakOf.get(id);
   return { name, year, published: elo, computed: peak.peak, date: isoDate(peak.date), diff: round(peak.peak - elo) };
 });
-const yElo = targets.yElo.items.map(([season, id, name, record, value]) => {
+const yElo = (targets.yElo?.items ?? []).map(([season, id, name, record, value]) => {
   const ours = main.yElo[season].find(entry => entry.id === id);
   return { season, name, record, ours: `${ours.won}-${ours.lost}`, published: value, computed: ours.yElo, diff: round(ours.yElo - value) };
 });
@@ -270,8 +288,8 @@ const rms = xs => round(Math.sqrt(xs.reduce((s, x) => s + x * x, 0) / xs.length)
 const byDecade = Object.fromEntries([1970, 1980, 1990].map(decade => [`${decade}s`, mean([...peaks.filter(t => Math.floor(Math.min(t.year, 2000) / 10) * 10 === decade && t.year <= fitTo),
   ...yElo.filter(t => Math.floor(Math.min(t.season, 2000) / 10) * 10 === decade && t.season <= fitTo)].map(t => t.diff))]));
 const validation = {
-  generatedBy: 'scripts/sync-tennis-seasons.mjs',
-  matches: main.counts, davisCupRubbersUnresolved: unresolved,
+  generatedBy: `scripts/sync-tennis-seasons.mjs${tourId === 'atp' ? '' : ` --tour=${tourId}`}`,
+  matches: main.counts, [tour.unresolved]: unresolved,
   fit: { years: targets.fitYears, n: fitDiffs.length, meanDiff: mean(fitDiffs), rms: rms(fitDiffs), byDecade, after: { n: later.length, meanDiff: mean(later) } },
   peaks, yElo, published,
 };
@@ -289,12 +307,12 @@ if (check) {
     console.error(`differs: ${differs.join(', ')}`);
     process.exit(1);
   }
-  console.log(`Verified the ${outputs.length - 1} tennis season snapshots and their validation byte for byte.`);
+  console.log(`Verified the ${outputs.length - 1} ${tour.noun} season snapshots and their validation byte for byte.`);
 } else {
   await mkdir(outDir, { recursive: true });
   for (const [file, content] of outputs) await writeFile(file, content);
   console.log(`Wrote ${outputs.length - 1} season snapshots and validation.json to ${path.relative(root, outDir)}`);
-  console.log(`  matches: ${JSON.stringify(main.counts)}; Davis Cup rubbers whose sides the names could not place: ${unresolved}`);
+  console.log(`  matches: ${JSON.stringify(main.counts)}; ${tour.cup} rubbers whose sides the names could not place: ${unresolved}`);
   console.log(`  fit ${targets.fitYears.join('-')}: ${fitDiffs.length} targets, mean ${validation.fit.meanDiff}, rms ${validation.fit.rms}, by decade ${JSON.stringify(byDecade)}; later targets mean ${validation.fit.after.meanDiff}`);
   for (const [season, check] of Object.entries(published)) {
     console.log(`  ${season} (${check.method}): current method top 100 ${JSON.stringify(check.current.top100)}, top ten shared ${check.current.topTenShared}, listed ${JSON.stringify(check.current.listed)}`

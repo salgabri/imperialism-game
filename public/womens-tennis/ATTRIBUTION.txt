@@ -1,0 +1,16 @@
+Women's tennis seasons 1973-2025 (wta-<year>.json): attribution and licence
+===========================================================================
+
+The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived from his data.
+
+- 2016-2025: Tennis Abstract's own year-end WTA Elo reports (https://tennisabstract.com/reports/wta_elo_ratings.html),
+  read from the Internet Archive's Wayback Machine captures named in each file's source; each woman's country from
+  Tennis Abstract's WTA rankings report of the nearest date.
+- 1973-2015: Elo computed by this project from Jeff Sackmann's WTA match results
+  (https://github.com/JeffSackmann/tennis_wta, as archived at https://github.com/Aneeshers/tennis-sackmann-archive, commit 83733587353df8a41f2fd4f516147d5aa83f5a8d)
+  by the method Tennis Abstract has published; see docs/design/womens-tennis.md, "Earlier seasons". These are not
+  Tennis Abstract's own numbers.
+
+Credit: Jeff Sackmann / Tennis Abstract.
+Licence: CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/). Attribution, non-commercial use only, derived data shared alike. The match results and Tennis Abstract's Elo reports are Jeff Sackmann's; the ratings computed here from his results are derived data under the same licence.
+Non-commercial: these files may not be used for commercial purposes.

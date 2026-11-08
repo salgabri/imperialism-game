@@ -249,7 +249,7 @@ manager of the theatre's favourite, with decisions from the first match.
    2021/22, 2006/07 and 1994/95 back to 1992/93 (EA's NHL ratings of each),
    nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1973, women's tennis its 2026 (Elo of
-   2 November) alone, rugby league its built-in 2025
+   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1973, rugby league its built-in 2025
    (Rugby League 26) then [2008](#rugby-league-seasons) (Rugby League 2, the
    overall ours), NRL clubs on the map of 2008. A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
@@ -1606,6 +1606,44 @@ only. Pick one under **Season** in setup. Each season is a file in `public/tenni
   npm run build:tennis-seasons   # the season files, src/data/tennisSeasons.js and the audit (--check compares byte for byte)
   ```
 
+## Women's tennis seasons
+
+Women's tennis can be played on 53 earlier seasons as well as the built-in 2026: the
+end of every year from 1973 to 2025, the WTA's women by Elo, the Fed Cup's nations
+only. Pick one under **Season** in setup. Each season is a file in
+`public/womens-tennis/` (11–53 KB) that loads only when chosen. They are built as the
+men's are, by the same scripts with `--tour=wta`
+([design notes](docs/design/womens-tennis.md#earlier-seasons)).
+
+- **2016 to 2025** are Tennis Abstract's own year-end WTA Elo reports, as the Wayback
+  Machine kept them. No capture holds the last 2020 update, so that list stops a week
+  before the season's end, and says so.
+- **1973 to 2015** are Elo computed from Jeff Sackmann's WTA match results by Tennis
+  Abstract's published method, counting what its report counts: tour-level matches with
+  the Fed Cup, tour-level qualifying, WTA 125s and ITF events of $50K or more (none
+  before 1994, when the files start naming an event's prize). A newcomer's start at
+  tour level is fitted on the career peaks of Tennis Abstract's Tennis 128 (1330, the
+  men's 1450). On 2022–2025 the computed lists agree with Tennis Abstract's to within
+  five points; 1973 to 1979 are marked rough.
+- **Ratings** are Elo / 25 + 4; a season whose best would pass 99 (Navratilova in 1985,
+  Graf in 1989) is shifted down as a whole. The raw Elo stays with each player.
+- **Nations of the day:** a player plays for the nation she played the Fed Cup for
+  that year (Mandlikova for Czechoslovakia in 1985), with the men's federations and
+  their land. South Africa (1978–1991) and FR Yugoslavia (1993–1994), barred from the
+  Fed Cup, field no team. Navratilova plays for the United States from 1976, after her
+  defection, and Mandlikova for Australia from 1988. Monica Seles, Yugoslav until 1994,
+  is Yugoslavia's only rated player in 1991 and 1992, so she sits those seasons out, as
+  every nation of one does.
+- **Licence:** as the men's: `public/womens-tennis/ATTRIBUTION.txt` credits Jeff
+  Sackmann / Tennis Abstract (CC BY-NC-SA 4.0). `scripts/data/womens-tennis-seasons.json`
+  pins the 117 archive files (Aneeshers/tennis-sackmann-archive at 8373358) and the
+  20 captures by SHA-256. To rebuild:
+
+  ```bash
+  npm run sync:womens-tennis-seasons    # the year-end lists in scripts/data/womens-tennis-seasons/ (--check)
+  npm run build:womens-tennis-seasons   # the season files, src/data/womensTennisSeasons.js and the audit (--check)
+  ```
+
 ## Women's football seasons
 
 Women's football can be played on eleven earlier seasons as well as the built-in
@@ -2046,6 +2084,7 @@ public/
   baseball/            the built-in earlier baseball seasons (mlb-the-show-*.json), fetched when chosen
   hockey/              the built-in earlier ice hockey seasons (nhl-*.json), fetched when chosen
   tennis/              the built-in earlier tennis seasons (tennis-*.json), fetched when chosen
+  womens-tennis/       the built-in earlier women's tennis seasons (wta-*.json), fetched when chosen
   rugby-league/        the built-in earlier rugby league season (nrl-2008.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
