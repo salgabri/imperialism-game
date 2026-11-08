@@ -192,11 +192,260 @@ launching on the NFL map and saving. `scripts/simulation-realism.test.mjs` holds
 whole seasons to the NFL's key margins, one-score share, tries and safeties.
 `npm run smoke` adds an NFL duel campaign with the live ticker and an NFL resume.
 
+## Earlier seasons
+
+Twenty-five more seasons ship beside the built-in 2026: 2001 to 2025, Madden NFL 2002 to
+Madden NFL 26, each edition's roster at launch (data set `madden-<season>`, kind `madden`;
+a season is a calendar year, and Madden NFL 06 rates 2005). Clubs only, as today. Two
+editions are called Madden NFL 25: the 2013 one (instead of "14") and the 2024 one. Five
+Tecmo Super Bowl seasons, 1990 and 1992 to 1995, go further back ([Tecmo seasons](#tecmo-seasons)).
+
+- **Sources.** Every launch roster comes from a copy made at the time: EA's ratings services
+  now serve rewritten launch iterations, so none is read from them. Of the 1,000 players EA's API
+  listed first for Madden NFL 22 on 1 August 2021, today's launch list lacks 63 and rates 40
+  differently; Madden NFL 26's base list, refreshed after the August cuts, has 1,866 players
+  where launch had 2,367, and rates 81 of the 1,727 both have differently.
+  - 2001–2020, 2022 and 2023: maddenratings.net's spreadsheets of each edition's original
+    roster, one per team (Madden NFL 2002 to 21, 23 and 24). `scripts/lib/madden-workbooks.mjs`
+    reads them: .xlsx with fflate, and Madden NFL 11's .xls with a small BIFF8 reader. Each file
+    is taken for its team by its file name and checked against its sheet (the sheets name teams
+    by nickname, "Bucs", or a misspelt "Jagaurs").
+  - 2021: the Madden NFL 22 launch workbook kellerdevin/Madden-22-Data-Set keeps (65 players a
+    team); maddenratings.net has only that edition's final roster.
+  - 2024 and 2025: theedgepredictor/nfl-madden-data's raw copies of EA's ratings site at launch
+    (Madden NFL 25; Madden NFL 26 as the site listed it on 2 August 2025). Its processed and
+    dataset folders are model-imputed and never read.
+- **Checks.** Every season is compared with a second source, and the agreement is in the
+  audit. EA's own copies agree player for player wherever they survive: Madden NFL 16's list
+  (2,326 players) and Madden NFL 17's sheet (2,363), EA's ratings API as the Wayback Machine
+  kept it on 1 August 2021 (Madden NFL 22's top 1,000) and in 2022 (all 2,368 of Madden NFL 23),
+  and EA's team pages at Madden NFL 25's launch (73 and 70 players). Every other season agrees
+  with theedgepredictor's raw files (mostly scraped from maddenratings.net) on 99–100% of the players
+  both list.
+- **Pinned.** `scripts/data/nfl-seasons.json` pins every source by SHA-256; the copies stay in
+  the gitignored `data-src/madden-seasons/<season>/` (a team's spreadsheet as
+  `team-<EA team id>`). `npm run sync:madden-seasons` reads them into
+  `scripts/data/madden-seasons/<season>.json` (committed: `[name, EA team id, Madden position,
+  overall]`, the checks and the notes); `--check` rebuilds them byte for byte where the copies
+  are present.
+- **Building.** `npm run build:nfl-seasons` builds each season from its snapshot by the built-in
+  season's rules, now in `scripts/lib/nfl.mjs`, which `build-nfl.mjs` also uses (its output is
+  unchanged): `public/american-football/madden-<season>.json`, the listing
+  `src/data/americanFootballSeasons.js` and `docs/design/american-football-seasons-audit.json`.
+  `--check` rebuilds every file byte for byte, offline. Older editions call the ends LE and RE
+  and the linebackers LOLB, MLB and ROLB: they are DL and LB. On a thin roster of the early
+  2000s the game sometimes starts a player out of position before a weak natural one (a
+  linebacker kicking for a 48-rated kicker); the natural players it passes over stay in the
+  squad, so every club keeps a natural player for every place.
+- **Left out, never guessed.** Madden NFL 2004 and 2005 name 45 and 36 players only by position
+  and number ("C.#25", "LG #65"): nobody can say who they were, so they are left out (only the
+  2003 Chargers' CB C.#25, 72, would have started). The 2010 Vikings' spreadsheet gives RT Phil
+  Loadholt no overall and has an empty FB row: both are left out. Two players of one name and
+  position on one team are both kept (the Panthers' two LB Jason Williamses in 2011).
+- **As the game shipped.** 2011 is Madden NFL 12's default roster, rated before the lockout
+  ended: Kevin Kolb is still an Eagle, Matt Hasselbeck a Seahawk, Nnamdi Asomugha a Raider.
+  Madden NFL 2002 has 31 teams and no Tom Brady. Madden NFL 06's spreadsheets rate SS Ed Reed and
+  P Shane Lechler 99, which the site's own 99 Club note leaves out; no other copy survives to
+  settle it.
+- **Clubs of their day.** The manifest names the eras in which a franchise played under another
+  name or elsewhere: the St. Louis Rams (to 2015), the San Diego Chargers (to 2016), the Oakland
+  Raiders (to 2019), each with its own id (so no crest), code (STL, SDC, OAK) and colour; Washington (to 2019,
+  `nfl-washington`: its name then was a slur the league has since retired) and the Washington
+  Football Team (2020–21); no Houston Texans in 2001, so that season has 31 clubs. The stadiums
+  they left: Sun Devil Stadium (Cardinals, to 2005), the Georgia Dome (to 2016), Memorial
+  Stadium in Champaign (Bears, 2002), Texas Stadium (to 2008), the Pontiac Silverdome (2001), the
+  RCA Dome (to 2007), the Metrodome (to 2013) and TCF Bank Stadium (2014–15), Foxboro Stadium
+  (2001), Veterans Stadium (to 2002), Candlestick Park (to 2013), Husky Stadium (2001), the
+  Coliseum (Rams, 2016–19), the StubHub Center (Chargers, 2017–19), and Tiger Stadium in Baton
+  Rouge, where the Saints played most of their 2005 home games after Hurricane Katrina. The
+  franchises that share a stadium grow from their training grounds, as today: the Giants from
+  Giants Stadium (to 2009), the Jets from Hofstra University (to 2007), the Rams from California
+  Lutheran University in Thousand Oaks and the Chargers from Costa Mesa (2020–23). A stadium a
+  club still plays in keeps its present name; one it has left is named as it was best known. The
+  eras agree with the franchise research of 1980–2025 on every name, code, city and stadium (to
+  a kilometre).
+- **Era maps.** `npm run build:nfl-map` also draws thirteen era maps from the manifest: `nfl2001`,
+  `nfl2002`, `nfl2003` (2003–04), `nfl2005`, `nfl2006` (2006–07), `nfl2008`, `nfl2009`, `nfl2010`
+  (2010–13), `nfl2014` (2014–15), `nfl2016`, `nfl2017` (2017–19), `nfl2020` (2020–21) and
+  `nfl2022` (2022–23). A move starts a new map, a rename does not; 2024 and 2025 have today's
+  clubs in today's stadiums and play on `nfl`. Clubs rank as their franchises rank today, so
+  section ids follow one order on every map. Missouri is divided between the Rams and the Chiefs
+  until 2015, and the Coliseum and the StubHub Center are both Los Angeles County's: the NFL's
+  `maxGapKm` of 5 km cuts the county between them (today's map is the same with or without it).
+  A season's clubs play only on its era's map; saves name the set, its version and its season
+  ('2005').
+- **Tests.** `scripts/nfl-seasons.test.mjs`: the position groups; squads on invented rosters (the
+  passed-over kicker kept, a short roster refused); eras, renames and an absent franchise; the
+  readers (repeated headers, unrated and unnamed rows, a synthetic .xlsx, CSV quoting) and the
+  checks; every snapshot, season, listing and audit byte for byte, `build-nfl.mjs` too; every
+  check's agreement and EA's exact ones; each season decoded against its era's map, its clubs
+  named and housed as that year had them; the loader's refusals; and the running App choosing a
+  season, launching its clubs on their era's map, saving and resuming.
+
+## Tecmo seasons
+
+Status: data prepared and shipped as five seasons 2026-11-08 (see **Seasons** below). The Tecmo
+Super Bowl games rate the 1990 and 1992 to 1995 NFL seasons player by player, by attributes on a
+16-step scale (6, 13 … 100), with no overall. `node scripts/sync-tecmo.mjs` reads the games'
+roster dumps and writes one committed snapshot a season, `scripts/data/tecmo/<season>.json`, which
+the seasons are built from; `--check` rebuilds them byte for byte, `--season=<year>` one of them.
+
+| Season | Game (platform) | Read from | Checked against | Clubs | Players |
+| --- | --- | --- | --- | --- | --- |
+| 1990 | Tecmo Super Bowl (NES, Dec 1991) | `TSBData.txt` | Tecmo Geek: 839 of 840 identical | 28 | 810 |
+| 1992 | Tecmo Super Bowl II: Special Edition (SNES), cartridge season 1 | `TSB2Data.txt` | a second tsbtools dump: 1,036 of 1,036 | 28 | 991 |
+| 1993 | Tecmo Super Bowl (SNES, Dec 1993) | `SNES_05_TeamDefense_input.txt` | GameFAQs roster FAQ: 879 of 896 | 28 | 868 |
+| 1994 | Tecmo Super Bowl II: Special Edition (SNES), cartridge season 3 | `TSB2Data.txt` | a second tsbtools dump: 1,036 of 1,036 | 28 | 1,002 |
+| 1995 | Tecmo Super Bowl III: Final Edition (SNES) | `TSB3Data.txt` | NFTGL's Book of Armaments: 1,101 of 1,107 | 30 | 1,079 |
+
+- **Sources.** The dumps are BAD-AL/tsbtools' (GitHub), each byte for byte the repository's
+  git blob, which the sync checks. The 1993 one is a simulation test's input: its names, numbers
+  and attributes are the stock cartridge's, only the simulation values changed. TSB II's 1993
+  season (cartridge season 2) and the Genesis cartridge are not rating sources: SNES Tecmo Super
+  Bowl is the 1993 edition its transcription confirms. TSB II's two seasons rest on one
+  extraction: its second dump comes from the same tools and no independent transcription exists,
+  which each 1992 and 1994 snapshot states. The 1980s are left out (Tecmo Bowl's 1987 set has
+  12 clubs of nine a side), and so is 1991 (no Tecmo edition rates it). Every input stays in the
+  ignored `data-src/research80s/american-football/` and `data-src/research/american-football/`,
+  pinned by SHA-256 in the sync (`PINS`), and each snapshot lists the files it read.
+- **Attributes.** Each player keeps the game's values under the screen's names: running speed
+  (RS), rushing power (RP), maximum speed (MS), hitting power (HP), body balance (BB, TSB II
+  and III), agility (AG, TSB III), passing speed, pass control and accuracy (PS, PC, PA), avoid
+  rush (AR; Tecmo Geek's avoid pass block), coolness (CO), ball control (BC), receptions (REC),
+  pass interceptions (PI), quickness (QU) and the kicking values (KP, KA, AKB). TSB II and III's
+  dumps (and the Book of Armaments) list RP before RS, as TSBM 2000 does: they are swapped back,
+  after which every edition gives every quarterback rushing power 69 and every kicker running
+  speed 56 and rushing power 81, as NES Tecmo Super Bowl does. John Taylor's receptions are 69 in
+  the NES dump and 63 at Tecmo Geek: the dump's are kept.
+- **Clubs.** Players are keyed by today's franchise (`scripts/data/nfl-teams.json`), and each
+  snapshot names the clubs as `data-src/research/eras/nfl.json` has them that season (the
+  Phoenix Cardinals to 1993, the Los Angeles Raiders to 1994, the Houston Oilers, the San Diego
+  Chargers, the St. Louis Rams in 1995) with their era id, which the sync checks against that
+  file. Washington's club is named Washington, as the Madden seasons name it before 2020 (the
+  eras file has `nfl-washington-redskins`). TSB III's free agents (Deion Sanders among them) and
+  all-time team are no club.
+- **Names.** nflverse's rosters (CC-BY 4.0) name a player when he is on his club's roster that
+  season (or the one before or after: the games were made between seasons) under the game's
+  name: last names equal, cut short or a letter apart (two in a long name), first names equal,
+  the given name nflverse keeps, an initial, a short form or a letter or two apart, never both
+  approximate. So `haywood JEFFRIES` is Haywood Jeffires and `m. MERRIWEATHE` Mike
+  Merriweather. The rest keep the game's spelling in ordinary capitals (4, 1, 8, 3 and 39 a
+  season, most of them TSB III players nflverse does not have on that club in 1995), listed in
+  each snapshot.
+- **Unlicensed stars.** The games list players outside the players' union licence by position
+  and club (`qb BILLS`, `hb BILLS`): 3 in 1990, 60 in 1992, 4 in 1993, 33 in 1994, 16 in 1995.
+  One is named only where nflverse lists him on the club that season in the position group and
+  the game names nobody else so: by his jersey number, when exactly one such player is shown
+  wearing it for the franchise within three seasons (by nflverse or another edition) and nflverse
+  gives him no other number that season; without a number (the NES and SNES ones are #0), when he
+  is the only such player, or when the other edition rating the season (TSB II's 1993) has him in
+  the same slot. Anybody else is left out. Named: 1, 43, 4, 27 and 15 a season (Thurman Thomas,
+  Bruce Smith, Derrick Thomas, Joe Montana in 1993 …); left out: QB Bills and QB Browns in 1990
+  (nflverse lists two quarterbacks the game does not name for each: Jim Kelly and Gale Gilbert,
+  Bernie Kosar and Jeff Francis), 17 in 1992, 6 in 1994 and 1 in 1995. Each decision, with its
+  candidates and evidence, is in the snapshot's `placeholders`.
+- **Positions.** Slots map onto the game's ten: QB; RB; WR; TE; C, G and T to OL; RE, NT, LE (and
+  TSB II and III's second line) to DL; the four linebackers (and LB5) to LB; RCB and LCB to CB;
+  FS and SS to S; K. Punters are left out. The nickel and dime slots play where most of their
+  players did in the NFL (nflverse's CB, FS, SS or S): SNES DB1 at corner (13 corners, 2
+  safeties) and DB2 at safety (8 safeties, 3 corners); TSB II and III DB1 and DB2 at corner (50
+  and 36 corners against 2 and 8 safeties over the three seasons) and DB3 at safety (44 safeties,
+  5 corners). Defenders play their slot, as the game has them (Cortez Kennedy at inside
+  linebacker is a linebacker). Backs, receivers and tight ends play their own position: one-back
+  clubs carry a receiver in their second back's slot and a back in their third receiver's, and
+  the run-and-shoot clubs receivers in their tight-end slots. NES takes Tecmo Geek's labels
+  (Atlanta, Detroit and Houston with six receivers and no tight end); the others nflverse's
+  position, where it names the player (12 to 18 players a season).
+- **The overall is ours.** Each edition gets one position score from the raw attributes. NES:
+  Tecmo Geek's ratings (each attribute against the best at the position, hitting power by bands,
+  weighted to 100; backs as rushers, receivers and tight ends as receivers), which the sync
+  reproduces for 811 of Tecmo Geek's 812 published ratings (John Taylor's is the other). SNES:
+  no agreed formula, and its attributes are NES's: Tecmo Geek's weights and bands, against the
+  best SNES values. TSB III: the NFTGL's weighting (The Book of Armaments, 2017 update; the
+  league has revised it over the years), each attribute times its weight, summed, as the Book's
+  point values; the weights reproduce all 1,147 of them (1,133 at the position the Book lists,
+  14 at another back's, receiver's or tight end's). They apply here by the screen's names, so
+  the Book's own sums, made in TSBM order, give its RS weight to the screen's RP. Its bonus terms
+  (+50 or +100 points over thresholds) are no part of those values and are left out. TSB II: no agreed
+  formula; TSB III is its engine with agility added, so the NFTGL weighting applies without
+  agility. Then each position's scores are ranked within the season (mid-rank percentiles, ties
+  sharing one) and read off Madden NFL 2002's overalls at that position (the 2001 season, the
+  earliest Madden season; maddenratings.net's 31 team sheets, punters out), as many of each Madden
+  team's best as the season carries per club, so that a Tecmo backup meets Madden's backups. The
+  overall is rounded and held to 1–99, never falls as the score rises, and is comparable within
+  a season, not across seasons. Each snapshot holds the formula, its maxima, weights and every
+  position's Madden overalls, so the overall can be recomputed from the snapshot alone.
+- **Lineup gaps.** NES Tecmo Super Bowl fields a 3-4 with two corners: every 1990 club is a
+  lineman and a corner short of the game's nickel lineup; SNES Tecmo Super Bowl lists three
+  linemen: every 1993 club is a lineman short. The run-and-shoot clubs have no tight end (Atlanta,
+  Detroit and Houston in 1990; Atlanta and Houston in 1992 and 1993; Atlanta in 1994), and an
+  unlicensed tackle nobody can name leaves Washington (1992) and Carolina (1995) an offensive
+  lineman short. No player is added: the game fills the place out of position. `SEASONS` in
+  `scripts/lib/tecmo.mjs` documents every gap and the sync stops on any other. The game's lineup
+  also puts a back at kicker for a few clubs whose kicker rates more than 25 below their best
+  spare back (Cincinnati in 1992, 1994 and 1995 …). The build accepts both: `squadOf` in
+  `scripts/lib/nfl.mjs` takes a club's documented gaps and stops on any other shortfall, and an
+  emergency kicker is the game's own choice, as in the Madden seasons (the kicker stays in the squad).
+- **Snapshots.** `source` (game, platform, release, season, the dump's repository path and blob,
+  every input's SHA-256, the check, the names' source, the notes and limits), `conversion` (the
+  formula, the attributes' names, the position rules and evidence, and Madden NFL 2002's
+  reference by position), `teams` (by franchise: the era id, name and code that season),
+  `lineup` (the game's needs and each club's gaps), `placeholders` and `players`, each `[name,
+  franchise, Tecmo slot, game position, overall, { rom (the game's spelling), no (jersey), the
+  attributes, id (nflverse's gsis id, where it has one) }]`, by club, position and overall.
+- **Tests.** `scripts/tecmo.test.mjs`: the rebuild (where `data-src/` has the inputs), the pins,
+  every season's clubs, eras and players club by club, the era table against the eras file, every
+  unlicensed star's decision and that no generic name survives, the attributes on the scale and
+  in the screen's order, the slot rules, every club's lineup or its documented gap (and the game
+  filling every place), the formula stated as applied, the overall recomputed from the raw
+  attributes, monotonic and within 1–99, the percentile mapping and the Madden reference, the
+  checks' agreement, Tecmo Geek's published examples and the NFTGL's, and the readers.
+- **Seasons.** `npm run build:nfl-seasons` builds `public/american-football/tecmo-<season>.json`
+  (kind `tecmo`, a calendar year) from each snapshot, listed after the Madden seasons in
+  `src/data/americanFootballSeasons.js`: "Tecmo Super Bowl (NES)" (1990), "Tecmo Super Bowl II"
+  (1992 and 1994, the cartridge's first and third seasons), "Tecmo Super Bowl (SNES)" (1993) and
+  "Tecmo Super Bowl III" (1995). Its source names the game and platform (`edition`), the dump's
+  repository (`url`), BAD-AL/tsbtools and the overall's sources (`compiler`), the day the inputs
+  were read, and the snapshot's `conversion`, the loader's proof that the overall is ours. Each
+  club fields its lineup and backups by the Madden seasons' rules, every player and overall as the
+  snapshot has them; club strengths run 69.3–82.5 (1990), 71.8–82.2 (1992), 69.5–81.8 (1993),
+  71.5–83.5 (1994) and 71.8–84.3 (1995).
+- **Out of position.** A documented gap goes to the best spare player, whatever his position (in
+  1990 the 49ers' Steve Young lines up on the defensive line). Beyond the gaps, the game starts a
+  spare player at kicker where the kicker rates more than 25 below him: 1992's 49ers (Joe
+  Montana), Bengals and Patriots, 1994's Cowboys, Browns, Rams, Buccaneers and Bengals, and 1995's
+  Chiefs, Rams, Buccaneers, Bengals and Jaguars. It also prefers a spare player to a weak natural
+  one in six places: a linebacker at corner (1992 Saints, 1994 Lions), a back at corner (1992
+  Seahawks, 1995 Cowboys) and at tight end (1992 Eagles), and a linebacker at tight end (1995
+  Seahawks). The natural players stay in the squad, and the audit lists every club's
+  out-of-position starters.
+- **Era maps.** Four more maps by the same builder and rule: `nfl1990`, `nfl1992` (1992–93),
+  `nfl1994` and `nfl1995`. From the franchise research: the Phoenix Cardinals (PHO) to 1993 and the
+  Arizona Cardinals from 1994, both at Sun Devil Stadium; the Los Angeles Raiders (RAI, LAR being
+  the Rams' code) at the Coliseum and the Los Angeles Rams at Anaheim Stadium to 1994; the Houston
+  Oilers at the Astrodome; the Cleveland Browns at Cleveland Municipal Stadium (no Ravens until
+  1996, and no Browns 1996–98); the San Diego Chargers; Washington at RFK Stadium, holding only the
+  District; Atlanta–Fulton County Stadium (1990), Riverfront Stadium, Mile High Stadium, Three
+  Rivers Stadium, the Kingdome and Tampa Stadium. 1995 adds the Carolina Panthers and the
+  Jacksonville Jaguars and has the Raiders back in Oakland and the Rams in St. Louis (the Trans
+  World Dome for the whole season, though its first four home games were at Busch Stadium). The
+  Panthers played that first season at Clemson University's Memorial Stadium, in South Carolina,
+  while their Charlotte stadium was finished: by the rule every map follows (a club plays where it
+  played its home games that season, as the 2002 Bears in Champaign and the 2005 Saints in Baton
+  Rouge), they hold South Carolina in 1995, and North Carolina is nobody's.
+- **Season tests.** `scripts/nfl-seasons.test.mjs`: the gaps `squadOf` accepts and refuses; each Tecmo
+  season's clubs and players as its snapshot has them, its gaps filled by the game and its
+  out-of-position starters in the audit; the eras on their maps (the Coliseum, Anaheim, the
+  Astrodome, RFK, Clemson); the loader's refusal of a season without its `conversion`; and a 1990
+  campaign launched on its era's map and saved.
+
 ## Known limits
 
 - No national teams: no source rates American football players by nation.
-- One season. Madden's earlier editions are not on EA's site; fan compilations
-  exist (as 2K Archive does for NBA 2K) but none is pinned here yet.
+- Seasons from 1990: the Tecmo Super Bowl games' 1990 and 1992 to 1995, whose overall is
+  ours (no Tecmo edition rates 1991), then Madden NFL's from 2001. No game rated individual NFL
+  players with an overall before Madden 2002 that any archive kept (Madden 98 to 2001 survive
+  as team overalls only).
 - Scoring is possession by possession: no defensive returns of a try, no one-point
   safeties, and the side that concedes a safety still gets the next possession
   (there is no free kick). The two-point chart is one chart for every coach.

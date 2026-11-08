@@ -36,10 +36,13 @@ const NATION_OF_EA = {
 };
 /** Where a player was born, by the NHL's country code. */
 const NATION_OF_BIRTH = {
-  AUS: '036', AUT: '040', BLR: '112', BRA: '076', CAN: '124', CHE: '756', CHN: '156', CZE: '203', DEU: '276', DNK: '208', EST: '233', FIN: '246',
-  FRA: '250', GBR: '826', HRV: '191', HUN: '348', ITA: '380', JPN: '392', KAZ: '398', KOR: '410', LTU: '440', LVA: '428', NGA: '566', NLD: '528',
-  NOR: '578', POL: '616', ROU: '642', RUS: '643', SRB: '688', SVK: '703', SVN: '705', SWE: '752', UKR: '804', USA: '840', UZB: '860',
+  AUS: '036', AUT: '040', BGR: '100', BLR: '112', BRA: '076', CAN: '124', CHE: '756', CHN: '156', CZE: '203', DEU: '276', DNK: '208', EST: '233',
+  FIN: '246', FRA: '250', GBR: '826', HRV: '191', HTI: '332', HUN: '348', ITA: '380', JPN: '392', KAZ: '398', KOR: '410', LTU: '440', LVA: '428',
+  NGA: '566', NLD: '528', NOR: '578', POL: '616', ROU: '642', RUS: '643', SRB: '688', SVK: '703', SVN: '705', SWE: '752', TWN: '158', UKR: '804',
+  USA: '840', UZB: '860', ZAF: '710',
 };
+/** The game's nation for the NHL's birth-country code (ISO 3166 alpha-3), or null for one it does not know. */
+export const nationOfBirth = code => NATION_OF_BIRTH[code] ?? null;
 
 const byRating = (a, b) => b.rating - a.rating || a.name.localeCompare(b.name);
 
@@ -121,9 +124,18 @@ export function nationsOf(players) {
     pools.get(player.nation).push(player);
   }
   return [...pools.entries()].map(([id, pool]) => {
-    const { squad, lineup } = rosterOf(pool.slice().sort(byRating));
-    const open = lineup.slots.filter(slot => !slot.player || slot.penalty > 4);
-    const covered = lineup.slots.map(slot => (slot.player && slot.penalty <= 4 ? slot.effectiveRating : BASELINE));
-    return { id, name: nationIdentity(id, hockey).name, str: Math.round(covered.reduce((s, v) => s + v, 0) / covered.length), squad, open: open.map(slot => slot.position) };
+    const { squad } = rosterOf(pool.slice().sort(byRating));
+    return { id, name: nationIdentity(id, hockey).name, ...nationStrength(squad), squad };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
+}
+
+/**
+ * A nation's strength from its squad: the mean of its lineup's places at their effective ratings, a place its own
+ * players cannot fill at the baseline → `{ str, open }` (`open` those places).
+ */
+export function nationStrength(squad) {
+  const lineup = selectLineup({ sport: SPORT, squad });
+  const covered = lineup.slots.map(slot => (slot.player && slot.penalty <= 4 ? slot.effectiveRating : BASELINE));
+  return { str: Math.round(covered.reduce((s, v) => s + v, 0) / covered.length),
+    open: lineup.slots.filter(slot => !slot.player || slot.penalty > 4).map(slot => slot.position) };
 }

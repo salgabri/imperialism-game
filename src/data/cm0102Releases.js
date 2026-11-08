@@ -203,6 +203,16 @@ export const CM0102_RELEASES = [
     signatures: [
       { club: 6664070, staff: 36019444, clubSha256: '6dffe15d59cff8c2362b23d698a39c2afb120769536281329ba054c796b5c3b6', staffSha256: 'a09402e74d1f72f51b9d48a92d782d0d80ab02adfe138ac3fcf23f03c62bee8e' },
     ] },
+  // SI's Championship Manager 3 data (1998/99; CM3 was released on 26 March 1999) in the CM 01/02 format: Cam F's
+  // "Season 98/99 for 0102 (CM3)" (forum topic of 28 November 2020; Gio converted it about 2011), as the CM0102 Starter
+  // Kit ships it (data/cm3_data.zip). Birth years are stored three years late, so the game can start in 2001. Its
+  // staff.dat carries 230 bytes after its last table (22 bytes of 0xFF, then four repeated preferences records), cut
+  // before reading (`staffTrailing`). Not Cam F's later rework of it to September 1998.
+  { id: 'cm0102-2020-11-cm3', edition: 'CM3', label: '98/99 for CM 01/02', provider: 'Sports Interactive', season: '1998/99', year: 1999,
+    released: '2020-11', snapshotDate: '1999-03', url: 'https://www.champman0102.co.uk/viewtopic.php?t=1547', shifts: { birth: -3 },
+    signatures: [
+      { club: 6148142, staff: 11798060, staffTrailing: 230, clubSha256: '3309a9f3cb68e47bcafc09c1c25615a37150f06e53d76609e0e45885bd1618f3', staffSha256: '2df1a6a0efeb439954218f35f5258817e53a144787b5402f5b8e05b948877b47' },
+    ] },
   { id: 'cm0102-2021-04', label: 'April 2021', provider: 'CM 01/02 Update Team', season: '2020/21', year: 2021, released: '2021-04',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=2863', shifts: { birth: 19, joined: 19, contract: 19 },
     signatures: [

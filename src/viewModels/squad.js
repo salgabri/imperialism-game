@@ -119,7 +119,7 @@ function sortByPosition(players, position, sportId) {
 export function sourceLabel(player) {
   const info = player?.sourceInfo;
   if (!info) return '—';
-  const short = info.source === 'ea-fc' ? 'EA FC' : info.source === 'football-manager' ? 'FM' : info.source === 'cm0102' ? 'CM 01/02' : '';
+  const short = info.source === 'ea-fc' ? 'EA FC' : info.source === 'football-manager' ? 'FM' : info.source === 'cm0102' ? 'CM 01/02' : info.source === 'swos' ? 'SWOS' : '';
   const edition = String(info.edition || '');
   if (edition) return /^\d+$/.test(edition) && short ? `${short} ${edition}` : edition;
   return short || '—';
@@ -134,16 +134,18 @@ export function sourceTitle(player) {
   const info = player?.sourceInfo;
   if (!info) return '';
   const cm = info.source === 'cm0102';
-  const name = info.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : 'Football Manager';
+  // Sensible World of Soccer rates a price step, not an ability (src/data/swosPlayers.js).
+  const swos = info.source === 'swos';
+  const name = info.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : swos ? 'SWOS' : 'Football Manager';
   const edition = String(info.edition || '');
   const label = edition ? (/^\d+$/.test(edition) ? `${name} ${edition}` : edition) : name;
   if (info.source === 'estimate') return ESTIMATE_TITLE;
   const raw = Number.isFinite(info.rawRating)
     ? `Source rating ${info.rawRating}${Number.isFinite(info.rawScale) ? `/${info.rawScale}` : info.rawScale ? ` (${info.rawScale} scale)` : ''}`
     : null;
-  return [label, cm && (info.provider || 'CM 01/02 Update Team'), info.version && `Database ${info.version}`,
-    info.snapshotDate && `Database snapshot ${info.snapshotDate}`, raw,
-    info.conversion && `Game rating converted from ${cm ? 'CM' : 'Football Manager'} current ability: ${info.conversion}`]
+  return [label, cm && (info.provider || 'CM 01/02 Update Team'), swos && (info.provider || 'Sensible Software'),
+    info.version && `Database ${info.version}`, info.snapshotDate && `Database snapshot ${info.snapshotDate}`, raw,
+    info.conversion && `Game rating converted from ${swos ? 'SWOS\'s price step' : `${cm ? 'CM' : 'Football Manager'} current ability`}: ${info.conversion}`]
     .filter(Boolean).join(' · ');
 }
 

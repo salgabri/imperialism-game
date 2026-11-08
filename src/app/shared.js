@@ -43,7 +43,8 @@ export function dataSetOf(settings) {
     return (domesticIdOf(settings) && !isEuropeScope(settings.clubScope)) || (settings.layer === 'clubs' && !setHasClubs(id))
       ? null : id;
   }
-  return setHasNations(id) || settings.layer === 'clubs' ? id : null;
+  // Any other sport's season plays the layer it has: its clubs (on its era's map, if it has one), or its nations.
+  return (settings.layer === 'clubs' ? setHasClubs(id) : setHasNations(id)) ? id : null;
 }
 
 /**

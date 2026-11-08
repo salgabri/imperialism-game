@@ -787,11 +787,14 @@ const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => 
 test('every built-in earlier season is committed, matches its listing and its own hash, and decodes', () => {
   const editions = [...MANIFEST.snapshots, ...MANIFEST.site.editions, ...MANIFEST.editions, ...MANIFEST.legacy.editions, ...MANIFEST.early.editions];
   assert.equal(editions.length, 22, 'FIFA 05 to EA FC 26');
-  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.id), editions.map(edition => edition.id), 'one per manifest edition, newest first');
+  // The listing names EA's seasons first, then the seasons before them (scripts/football-early-seasons.test.mjs).
+  const eaSeasons = BUILT_IN_SEASONS.slice(0, editions.length);
+  assert.deepEqual(eaSeasons.map(set => set.id), editions.map(edition => edition.id), 'one per manifest edition, newest first');
+  assert.ok(BUILT_IN_SEASONS.slice(editions.length).every(set => setKindOf(set.id) !== 'ea' && set.year < 2005), 'then the seasons before FIFA 05');
   // Every season from 2004/05 to 2025/26.
-  assert.deepEqual(BUILT_IN_SEASONS.map(set => set.year), Array.from({ length: 22 }, (_, i) => 2026 - i));
+  assert.deepEqual(eaSeasons.map(set => set.year), Array.from({ length: 22 }, (_, i) => 2026 - i));
   assert.deepEqual(BUILT_IN_SETS.filter(set => setSportOf(set.id) === 'football').map(set => set.id), BUILT_IN_SEASONS.map(set => set.id));
-  for (const [i, listed] of BUILT_IN_SEASONS.entries()) {
+  for (const [i, listed] of eaSeasons.entries()) {
     const edition = editions[i];
     const doc = committed(listed.id);
     assert.equal(setKindOf(listed.id), 'ea');

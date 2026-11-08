@@ -1,0 +1,611 @@
+{
+  "generatedBy": "scripts/build-rugby-league-seasons.mjs",
+  "seasons": [
+    {
+      "id": "nrl-2008",
+      "version": "nrl-2008-062aacd4",
+      "season": "2008",
+      "edition": "Rugby League 2: World Cup Edition (PlayStation 2, Sidhe, 2008)",
+      "label": "Rugby League 2: World Cup Edition",
+      "map": "nrl2008",
+      "players": {
+        "clubsKept": 414,
+        "clubsListed": 462,
+        "inSquads": 381
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 81,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 81,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "23 players, overall 72–91 (median 85), played 74–93",
+        "WG": "48 players, overall 72–90 (median 81), played 73–92",
+        "CE": "56 players, overall 68–91 (median 81), played 67–91",
+        "FE": "27 players, overall 70–90 (median 79), played 71–91",
+        "HB": "25 players, overall 74–93 (median 82), played 75–94",
+        "HK": "38 players, overall 68–91 (median 79), played 68–91",
+        "PR": "88 players, overall 70–91 (median 77), played 68–91",
+        "SR": "87 players, overall 69–91 (median 80), played 69–91",
+        "LK": "22 players, overall 82–92 (median 86), played 80–93"
+      },
+      "clubs": [
+        "Sydney Roosters 85.5 (22 kept, 22 in the squad; out of position: Lopini Paea (SR) at LK, Nate Myles (SR) at LK; 2008: 15–0–9, 511–446)",
+        "Wests Tigers 84.1 (28 kept, 24 in the squad; out of position: Dene Halatau (LK) at PR; 2008: 11–0–13, 528–560)",
+        "Manly Warringah Sea Eagles 83.9 (25 kept, 24 in the squad; out of position: Steve Matai (CE) at FB, Brett Stewart (FB) at FE, Jack Afamasaga (SR) at LK; 2008: 17–0–7, 645–355)",
+        "Brisbane Broncos 83.8 (24 kept, 24 in the squad; out of position: Dave Taylor (PR) at SR; 2008: 14–1–9, 560–452)",
+        "Melbourne Storm 83.8 (28 kept, 24 in the squad; out of position: Russell Aitken (FE) at HK, Jeremy Smith (SR) at LK; 2008: 17–0–7, 584–282)",
+        "North Queensland Cowboys 83.8 (26 kept, 24 in the squad; out of position: Ashley Graham (CE) at WG, Steve Southern (SR) at LK; 2008: 5–0–19, 474–638)",
+        "Gold Coast Titans 83.4 (27 kept, 24 in the squad; out of position: Luke O'Dwyer (SR) at LK; 2008: 10–0–14, 476–586)",
+        "New Zealand Warriors 83.2 (23 kept, 23 in the squad; out of position: Manu Vatuvei (WG) at CE, Logan Swann (SR) at PR, Ruben Wiki (SR) at LK; 2008: 13–0–11, 502–567)",
+        "St. George Illawarra Dragons 83.1 (25 kept, 24 in the squad; out of position: Ben Creagh (SR) at LK, Beau Scott (SR) at PR, Jarrod Saffy (SR) at PR, Justin Poore (SR) at LK; 2008: 13–0–11, 489–378)",
+        "Bulldogs 82.9 (27 kept, 24 in the squad; out of position: Lee Te Maari (SR) at LK, Kane Cleal (SR) at LK; 2008: 5–0–19, 433–782)",
+        "Cronulla-Sutherland Sharks 82.8 (27 kept, 24 in the squad; out of position: Dustin Cooper (WG) at CE, Luke Covell (WG) at CE, Paul Stephenson (SR) at LK; 2008: 17–0–7, 451–384)",
+        "Newcastle Knights 82.5 (24 kept, 24 in the squad; out of position: Wes Naiqama (WG) at FB, Kurt Gidley (FE) at HB, Cory Paterson (SR) at LK; 2008: 12–0–12, 516–486)",
+        "Canberra Raiders 82.3 (28 kept, 24 in the squad; out of position: Glen Turner (SR) at PR; 2008: 13–0–11, 640–527)",
+        "Penrith Panthers 82.3 (26 kept, 24 in the squad; out of position: Nathan Smith (LK) at PR; 2008: 10–1–13, 504–611)",
+        "Parramatta Eels 81.8 (24 kept, 24 in the squad; out of position: Luke Burt (CE) at FB, Chad Robinson (SR) at PR, Junior Paulo (SR) at LK; 2008: 11–0–13, 501–547)",
+        "South Sydney Rabbitohs 81.6 (30 kept, 24 in the squad; out of position: Craig Wing (HB) at FE, Ben Lowe (LK) at PR, Shannan McPherson (LK) at PR; 2008: 8–0–16, 453–666)"
+      ],
+      "clubShift": [
+        "Sydney Roosters: team rating 8 (8/9/8/8/7), target 85.08, shift +3, strength 82.5 → 85.5",
+        "Brisbane Broncos: team rating 7.8 (8/9/7/6/9), target 84.28, shift +1, strength 82.8 → 83.8",
+        "Wests Tigers: team rating 7.8 (9/8/6/8/8), target 84.28, shift 0, strength 84.1 → 84.1",
+        "Manly Warringah Sea Eagles: team rating 7.6 (7/8/9/7/7), target 83.87, shift +1, strength 82.9 → 83.9",
+        "Melbourne Storm: team rating 7.6 (8/8/9/8/5), target 83.87, shift 0, strength 83.8 → 83.8",
+        "North Queensland Cowboys: team rating 7.6 (9/7/6/8/8), target 83.87, shift 0, strength 83.8 → 83.8",
+        "Gold Coast Titans: team rating 7.2 (8/8/7/7/6), target 83.32, shift +1, strength 82.4 → 83.4",
+        "New Zealand Warriors: team rating 7 (7/5/8/7/8), target 83.2, shift +2, strength 81.2 → 83.2",
+        "Bulldogs: team rating 6.8 (7/7/6/6/8), target 83.2, shift +1, strength 81.9 → 82.9",
+        "Cronulla-Sutherland Sharks: team rating 6.6 (7/6/8/5/7), target 82.76, shift +2, strength 80.8 → 82.8",
+        "Newcastle Knights: team rating 6.6 (6/6/7/6/8), target 82.76, shift +1, strength 81.5 → 82.5",
+        "Penrith Panthers: team rating 6.6 (7/7/7/6/6), target 82.76, shift -2, strength 84.3 → 82.3",
+        "St. George Illawarra Dragons: team rating 6.6 (6/7/7/6/7), target 82.76, shift 0, strength 83.1 → 83.1",
+        "Parramatta Eels: team rating 6.4 (7/6/6/7/6), target 82.13, shift 0, strength 81.8 → 81.8",
+        "Canberra Raiders: team rating 6 (6/7/6/5/6), target 81.83, shift +1, strength 81.3 → 82.3",
+        "South Sydney Rabbitohs: team rating 5.6 (6/5/5/5/7), target 81.8, shift -1, strength 82.6 → 81.6"
+      ],
+      "strengthAndResults": {
+        "attributes": -0.158,
+        "shifted": 0.358
+      },
+      "nations": {
+        "fielded": false,
+        "why": "The World Cup squads pass the check, but they mix Super League's players, whom the database rates on a kinder scale than the NRL's (`scales`): read off the clubs' scale they make England the strongest nation; limited to NRL players, England and France have none. `all` is each nation's strength with its whole checked squad, `nrlOnly` with its NRL players alone (a place they cannot fill at the sport's baseline, 45).",
+        "squads": [
+          "England: 22 checked, 0 of them NRL players; all 89, NRL players only none",
+          "Australia: 25 checked, 25 of them NRL players; all 87, NRL players only 87",
+          "New Zealand: 24 checked, 21 of them NRL players; all 84, NRL players only 83",
+          "France: 22 checked, 0 of them NRL players; all 80, NRL players only none",
+          "Scotland: 19 checked, 3 of them NRL players; all 78, NRL players only 51",
+          "Ireland: 17 checked, 1 of them NRL players; all 77, NRL players only 47",
+          "Tonga: 17 checked, 10 of them NRL players; all 77, NRL players only 65",
+          "Samoa: 17 checked, 8 of them NRL players; all 76, NRL players only 61",
+          "Papua New Guinea: 14 checked, 3 of them NRL players; all 71, NRL players only 51",
+          "Fiji: 11 checked, 4 of them NRL players; all 67, NRL players only 53"
+        ],
+        "scales": {
+          "note": "Mean position score (`score`) and attribute (`attributes`) of the 2008 NRL clubs' kept players and of every player the database's Super League XIII clubs list, by competition; `starMean` the mean star value.",
+          "nrl": {
+            "players": 414,
+            "starMean": 64.41
+          },
+          "superLeague": {
+            "players": 337,
+            "starMean": 64.75
+          },
+          "score": {
+            "FB": [
+              7.39,
+              7.56
+            ],
+            "WG": [
+              7.01,
+              7.21
+            ],
+            "CE": [
+              6.58,
+              7.09
+            ],
+            "FE": [
+              6.98,
+              7.49
+            ],
+            "HB": [
+              7.34,
+              7.57
+            ],
+            "HK": [
+              7.06,
+              6.25
+            ],
+            "PR": [
+              6.45,
+              6.92
+            ],
+            "SR": [
+              6.47,
+              7.05
+            ],
+            "LK": [
+              6.68,
+              6.15
+            ]
+          },
+          "attributes": {
+            "FIT": [
+              7.24,
+              7.38
+            ],
+            "SPD": [
+              6.57,
+              6.91
+            ],
+            "ACC": [
+              6.79,
+              6.88
+            ],
+            "AGG": [
+              6.6,
+              6.77
+            ],
+            "AGI": [
+              6.45,
+              6.9
+            ],
+            "BRK": [
+              6.09,
+              6.83
+            ],
+            "TKL": [
+              6.69,
+              7.27
+            ],
+            "PAS": [
+              5.83,
+              6.54
+            ],
+            "OFF": [
+              5.73,
+              6.16
+            ],
+            "KCK": [
+              4.57,
+              5.8
+            ],
+            "GKA": [
+              3.58,
+              4.5
+            ],
+            "CAT": [
+              6.92,
+              6.61
+            ]
+          }
+        }
+      },
+      "carriedOver": [
+        "Great Britain (30 listed): an older edition's squad, not read",
+        "Wales (26 listed): an older edition's squad, not read",
+        "Cook Islands (21 listed): an older edition's squad, not read",
+        "Lebanon (25 listed): an older edition's squad, not read",
+        "Russia (26 listed): an older edition's squad, not read",
+        "Malta (24 listed): an older edition's squad, not read",
+        "South Africa (19 listed): an older edition's squad, not read",
+        "United States (25 listed): an older edition's squad, not read"
+      ],
+      "left": [
+        "Brisbane Broncos: Rodney Davies: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Brisbane Broncos: Craig Frawley: played for Brisbane Broncos in 2007, no 2008 game for the club (RLP)",
+        "Brisbane Broncos: Tom Hewitt: played for St. George Illawarra Dragons in 2007, no 2008 game for any NRL club (RLP)",
+        "Brisbane Broncos: Ryan Barton: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Brisbane Broncos: Palmer Wapau: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Canberra Raiders: Cy Lasscock: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Canterbury Bulldogs: Leon Bott: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Canterbury Bulldogs: Luke Thompson: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Cronulla Sharks: Eddie Su'a: played for Cronulla-Sutherland Sharks in 2007, no 2008 game for the club (RLP)",
+        "Gold Coast Titans: Joel Rapana: RLP's Jordan Rapana (7848) was born 1989-08-15, the database's Joel Rapana 1986-05-21",
+        "Gold Coast Titans: Ian Donnelly: played for Gold Coast Titans in 2007, no 2008 game for the club (RLP)",
+        "Gold Coast Titans: Kris Kahler: played for Gold Coast Titans in 2007, no 2008 game for the club (RLP)",
+        "Gold Coast Titans: Chris Walker: played for Gold Coast Titans in 2007, no 2008 game for the club (RLP)",
+        "Gold Coast Titans: Chris Afamasaga: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Manly Sea Eagles: Jason Wells: played for Manly Warringah Sea Eagles in 2007, no 2008 game for the club (RLP)",
+        "Manly Sea Eagles: George Rose: played for Manly Warringah Sea Eagles in 2007, no 2008 game for the club (RLP)",
+        "Manly Sea Eagles: Chris Trembath: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Melbourne Storm: Ben MacDougall: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "New Zealand Warriors: Toleafoa Leaupepe: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "New Zealand Warriors: Herman Retzlaff: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Newcastle Knights: Luke MacDougall: played for Newcastle Knights in 2007, no 2008 game for the club (RLP)",
+        "Newcastle Knights: Tim Natusch: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Newcastle Knights: Jacob Ling: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Newcastle Knights: Lui Toimoana: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Newcastle Knights: Luke Walsh: played for Newcastle Knights in 2007, no 2008 game for the club (RLP)",
+        "Newcastle Knights: Tanu Wulf: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Nth Queensland Cowboys: Daniel Backo: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Nth Queensland Cowboys: John Frith: played for North Queensland Cowboys in 2007, no 2008 game for the club (RLP)",
+        "Nth Queensland Cowboys: Keiron Lander: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Nth Queensland Cowboys: Anthony Perkins: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Penrith Panthers: Dean Caldwell: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Penrith Panthers: David Georgiou: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Penrith Panthers: Jason Wrigley: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Penrith Panthers: Joshua McCrone: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Penrith Panthers: Peewee Moke: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Penrith Panthers: Hutch Maiava: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "South Sydney Rabbitohs: Nathanael Barnes: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "South Sydney Rabbitohs: Luke Grant: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "South Sydney Rabbitohs: Sam Huihahau: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "St George Illawarra: Jardine Bobongie: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "St George Illawarra: Tony Caine: played for St. George Illawarra Dragons in 2007, no 2008 game for the club (RLP)",
+        "St George Illawarra: Joseph Falemaka: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "St George Illawarra: Mark Hendy: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "St George Illawarra: Alex Ranieri: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "St George Illawarra: Frank Samia: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Sydney Roosters: Albert Hopoate: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Sydney Roosters: Shaun Foley: no first-grade or youth game for any NRL club in 2007 or 2008 (RLP): not shown to be a real player of the club",
+        "Wests Tigers: Luke Harlen: played for North Queensland Cowboys in 2008, not Wests Tigers (RLP)",
+        "Australia: Matt Cooper: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Danny Buderus: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Ben Cross: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Brett Stewart: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Dallas Johnson: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Braith Anasta: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Anthony Quinn: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Jarryd Hayne: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Robbie Farah: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Michael Jennings: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Craig Wing: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Cooper Cronk: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Sam Thaiday: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "Australia: Luke O'Donnell: not in Australia's 2008 World Cup squad and no 2008 Test for Australia (RLP)",
+        "New Zealand: Epalahame Lauaki: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Ben Roberts: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Ben Te'o: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Jeff Lima: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Tame Tupou: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Luke Covell: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Fuifui Moimoi: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Taniela Tuiaki: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Sam Tagataese: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Wairangi Koopu: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Marvin Karawana: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Jesse Royal: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Sione Faumuina: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Lee Te Maari: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "New Zealand: Junior Paulo: not in New Zealand's 2008 World Cup squad and no 2008 Test for New Zealand (RLP)",
+        "England: Chev Walker: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Gareth Raynor: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Terry Newton: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Stephen Wild: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Paul Cooke: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Kirk Yeaman: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Sean O'Loughlin: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Joe Westerman: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Paul Deacon: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Chris Feather: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Matt Cook: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Wayne Godwin: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Jason Crookes: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Richard Johnson: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Anthony Thackeray: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Rikki Sheriffe: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Tom Hemingway: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "England: Mike Bennett: not in England's 2008 World Cup squad and no 2008 Test for England (RLP)",
+        "France: Jamel Fakir: RLP's Jamal Fakir (3462) was born 1982-08-30, the database's Jamel Fakir 1978-08-09",
+        "France: Frederic Vaccari: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Sylvian Houles: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: David Ferriol: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Cyril Gossard: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: David Berthezene: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Aurelien Cologni: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Constant Villegas: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Olivier Charles: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Renaud Guigue: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Frederic Zitter: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Lionel Teixido: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Florian Quintilla: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "France: Julien Touxagas: not in France's 2008 World Cup squad and no 2008 Test for France (RLP)",
+        "Papua New Guinea: Rod Griffith: RLP's Rod Griffin (7987) was born 1987-01-05, the database's Rod Griffith 1985-06-27",
+        "Papua New Guinea: Nixon Kolo: RLP's Nickson Kolo (8569) was born on a date it does not give, the database's Nixon Kolo 1983-05-31",
+        "Papua New Guinea: Nicko Slain: RLP's Nico Slain (8589) was born 1983-04-19, the database's Nicko Slain 1986-06-09",
+        "Papua New Guinea: Tu Moari: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Steve Franciscus: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Michael Mark: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Jessie Joe: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Joseph Omae: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Nigel Hukula: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Gimapau Keimelo: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Benjamin John: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Porian Bal: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Papua New Guinea: Michael Bani: not in Papua New Guinea's 2008 World Cup squad and no 2008 Test for Papua New Guinea (RLP)",
+        "Fiji: Wais Naiqama: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Peni Tagive: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Alipate Tani: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Frank Watene: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Asaeli Saravaki: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Adam Watene: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: John Sutton: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Tomujani Koroi: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Tabua Cakacaka: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Jone Waisale: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Waisale Suka: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Namila Davui: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Waisale Sovatabua: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Meli Ravai: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Taniela Tuinasau: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Sitiveni Logaivau: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Jope Tuivanuavou: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Kaliova Tani: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Fiji: Epeli Soro: not in Fiji's 2008 World Cup squad and no 2008 Test for Fiji (RLP)",
+        "Samoa: James Fuiava: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Motu Tony: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Joe Vagana: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Alfonso Fuiava: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Evarn Tuimavave: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Hutch Maiava: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Phillip Leuluai: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Malo Solomona: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Iafeta Palea'aesina: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Gray Viane: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Junior Moors: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Rota Setu: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Chris Vaefaga: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Taualagi Lepupa: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: William Leaumoana: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Frank Winterstein: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Chase Stanley: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Joe Galuvao: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Patrick Ah Van: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Sonny Fai: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: David Faiumu: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Mark Leafa: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Samoa: Reni Maitua: not in Samoa's 2008 World Cup squad and no 2008 Test for Samoa (RLP)",
+        "Tonga: Lelea Paea: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Albert Hopoate: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: David Pangai: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: John Sinisa: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Andrew Lomu: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Taufa Fukofuka: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Jeff Lima: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Joseph Falemaka: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Charlie Tonga: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Simione Foliaki: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Saia Makisi: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Makasini Richter: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Filimone Lolohea: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Sione Finefeuiaki: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Visese Mataele: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Willie Tupou: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Fraser Anderson: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Louis Anderson: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Vinnie Anderson: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Sam Huihahau: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Sinbad Kali: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: Tevita Metuisela: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Tonga: John Tamanika: not in Tonga's 2008 World Cup squad and no 2008 Test for Tonga (RLP)",
+        "Scotland: Ben MacDougall: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: James McManus: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Keith Galloway: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Richard Fletcher: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Iain Marsh: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: David Lynn: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Ritchy Hawkyard: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Jamie Benn: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Andy Todd: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Mark Slatter: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Alex Szostak: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Michael Wainwright: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Daniel Heckenberg: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Richard Horne: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Graeme Horne: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Scotland: Lee Gilmour: not in Scotland's 2008 World Cup squad and no 2008 Test for Scotland (RLP)",
+        "Ireland: Simon Grix: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Shannon McDonnell: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Paul Handforth: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Brett White: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Anthony Stewart: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Dave Buckley: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: David Allen: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Chris Bridge: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Paul Prescott: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Phil Cantillon: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: James Coyle: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: David Bates: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Gavin Dodd: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Stevie Gibbons: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Billy Treacy: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Martin Gambles: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Clive Gee: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Justin Murphy: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Dean Gaskell: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Jason Golden: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)",
+        "Ireland: Michael McLlorum: not in Ireland's 2008 World Cup squad and no 2008 Test for Ireland (RLP)"
+      ],
+      "conversion": {
+        "weights": {
+          "FB": {
+            "CAT": 20,
+            "SPD": 15,
+            "ACC": 10,
+            "AGI": 15,
+            "BRK": 15,
+            "TKL": 10,
+            "PAS": 5,
+            "FIT": 10
+          },
+          "WG": {
+            "SPD": 25,
+            "ACC": 10,
+            "AGI": 10,
+            "BRK": 15,
+            "CAT": 20,
+            "TKL": 15,
+            "FIT": 5
+          },
+          "CE": {
+            "BRK": 20,
+            "SPD": 10,
+            "ACC": 10,
+            "AGI": 10,
+            "TKL": 20,
+            "PAS": 10,
+            "OFF": 5,
+            "CAT": 10,
+            "FIT": 5
+          },
+          "FE": {
+            "PAS": 25,
+            "KCK": 15,
+            "AGI": 15,
+            "SPD": 10,
+            "ACC": 10,
+            "BRK": 5,
+            "TKL": 10,
+            "CAT": 5,
+            "FIT": 5
+          },
+          "HB": {
+            "PAS": 30,
+            "KCK": 30,
+            "AGI": 10,
+            "ACC": 10,
+            "TKL": 5,
+            "CAT": 5,
+            "FIT": 10
+          },
+          "HK": {
+            "PAS": 30,
+            "TKL": 25,
+            "ACC": 10,
+            "AGI": 10,
+            "CAT": 5,
+            "AGG": 5,
+            "FIT": 15
+          },
+          "PR": {
+            "BRK": 25,
+            "TKL": 25,
+            "OFF": 15,
+            "AGG": 15,
+            "ACC": 5,
+            "CAT": 5,
+            "FIT": 10
+          },
+          "SR": {
+            "TKL": 25,
+            "BRK": 20,
+            "SPD": 10,
+            "ACC": 5,
+            "AGI": 5,
+            "OFF": 10,
+            "AGG": 10,
+            "CAT": 5,
+            "FIT": 10
+          },
+          "LK": {
+            "TKL": 30,
+            "BRK": 15,
+            "PAS": 15,
+            "OFF": 10,
+            "AGG": 10,
+            "CAT": 5,
+            "FIT": 15
+          }
+        },
+        "defaults": {
+          "FIT": 7,
+          "KCK": 4,
+          "GKA": 3
+        },
+        "quota": {
+          "FB": 1.4375,
+          "WG": 3,
+          "CE": 3.5,
+          "FE": 1.6875,
+          "HB": 1.5625,
+          "HK": 2.375,
+          "PR": 5.5,
+          "SR": 5.4375,
+          "LK": 1.375
+        },
+        "star": {
+          "spearmanByPosition": {
+            "FB": 0.782,
+            "WG": 0.463,
+            "CE": 0.394,
+            "FE": 0.703,
+            "HB": 0.751,
+            "HK": 0.313,
+            "PR": 0.539,
+            "SR": 0.407,
+            "LK": 0.574
+          },
+          "spearman": 0.499,
+          "testPlayers": 92,
+          "testAuc": {
+            "overall": 0.616,
+            "star": 0.656
+          },
+          "elitePlayers": 76,
+          "eliteAuc": {
+            "overall": 0.734,
+            "star": 0.753
+          }
+        },
+        "clubShift": {
+          "parts": [
+            "willingness_to_attack",
+            "attack",
+            "defense",
+            "flair",
+            "support"
+          ],
+          "reference": [
+            81.8,
+            81.8,
+            82.1,
+            82.3,
+            82.6,
+            82.8,
+            82.9,
+            83.2,
+            83.2,
+            83.2,
+            83.4,
+            83.8,
+            83.9,
+            83.9,
+            84.2,
+            84.4,
+            85.1
+          ],
+          "note": "Each club's `team`: its five parts in this order, their mean (`rating`), its target, its lineup's strength unshifted (`strength`) and shifted (`shifted`), and the shift; every player's row ends with his attribute overall and his club's shift (null outside the clubs)."
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 21.529,
+        "teamPointsSd": 11.358,
+        "draws": 1,
+        "marginMean": 14.734,
+        "byOne": 0.068,
+        "withinSix": 0.297,
+        "withinTwelve": 0.474,
+        "byThirteenPlus": 0.521,
+        "byTwentyFivePlus": 0.167,
+        "nilRate": 0.018,
+        "fortyPlusRate": 0.068,
+        "homeWins": 0.592,
+        "winPctSd": 0.153,
+        "bestWins": 17,
+        "worstWins": 5
+      }
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "about": "The built-in football seasons before FIFA 05 (docs/design/football-years.md, 'Seasons before FIFA 05'), built by npm run build:retro-seasons (scripts/build-retro-seasons.mjs) into public/football/<id>.json. Every source is pinned by SHA-256 and read from the gitignored data-src/<folder>/; download names where it came from. The data's rights stay with its makers (Sports Interactive and Eidos, Sensible Software and Codemasters); the user chose to ship these seasons, credited to them.",
+  "retrieved": "2026-11-08",
+  "seasons": [
+    {
+      "id": "cm0102-2002-11",
+      "kind": "cm0102",
+      "season": "2002/03",
+      "listing": "SI's Championship Manager 01/02 3.9.68 database (the CM0102 Starter Kit's patched_data.zip)",
+      "maker": "Sports Interactive",
+      "compiler": "SI's own 3.9.68 files, byte for byte (club.dat and staff.dat as src/data/cm0102Releases.js pins them), as nckstwrt's CM0102 Starter Kit ships them",
+      "rights": "Eidos made CM 01/02 free to download in December 2008, for personal, non-commercial use; the data's rights are reserved.",
+      "file": {
+        "folder": "cm0102-starter-kit",
+        "name": "patched_data.zip",
+        "bytes": 16775586,
+        "sha256": "1ec5e59d438e026c86bc9af4e34e57fa85299ad8ea1b84a51be4f41b6ca7ec83",
+        "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/patched_data.zip"
+      }
+    },
+    {
+      "id": "cm0102-2001-09",
+      "kind": "cm0102",
+      "season": "2001/02",
+      "listing": "SI's Championship Manager 01/02 3.9.60 database (the CM0102 Starter Kit's original_data.zip)",
+      "maker": "Sports Interactive",
+      "compiler": "SI's own 3.9.60 files, byte for byte (club.dat and staff.dat as src/data/cm0102Releases.js pins them), as nckstwrt's CM0102 Starter Kit ships them",
+      "rights": "Eidos made CM 01/02 free to download in December 2008, for personal, non-commercial use; the data's rights are reserved.",
+      "file": {
+        "folder": "cm0102-starter-kit",
+        "name": "original_data.zip",
+        "bytes": 12219700,
+        "sha256": "f3a5a9097e7e8d959b75550b4775c1ce4687d004187836ce095ce25e4ff0235c",
+        "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/original_data.zip"
+      }
+    },
+    {
+      "id": "cm0102-2020-11-cm3",
+      "kind": "cm0102",
+      "season": "1998/99",
+      "listing": "SI's Championship Manager 3 data in the CM 01/02 format, Cam F's port (the CM0102 Starter Kit's cm3_data.zip)",
+      "maker": "Sports Interactive",
+      "compiler": "Cam F, \"Season 98/99 for 0102 (CM3)\" (champman0102.co.uk t=1547, 28 November 2020), converted by Gio about 2011; as nckstwrt's CM0102 Starter Kit ships it (data/cm3_data.zip, first commit 9 June 2021). Not Cam F's later rework to September 1998.",
+      "rights": "Championship Manager 3 is Sports Interactive's and Eidos's; the port names no licence and the data's rights are reserved.",
+      "file": {
+        "folder": "cm0102-starter-kit",
+        "name": "cm3_data.zip",
+        "bytes": 9877063,
+        "sha256": "702c85d69c1b806f3980c9dd8a864800e51ad8058421311edf2fe9eeb04e0c26",
+        "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm3_data.zip"
+      }
+    },
+    {
+      "id": "cm-9798",
+      "kind": "cm",
+      "season": "1997/98",
+      "listing": "SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)",
+      "maker": "Sports Interactive",
+      "edition": "CM 97/98",
+      "version": "baskeyx/cm9798 06bdd2b",
+      "snapshotDate": "1997-10",
+      "url": "https://github.com/baskeyx/cm9798",
+      "compiler": "baskeyx (Dan Baskey): the cm9798 package, extracted to JSON (commit 06bdd2b, 5 October 2026)",
+      "provenance": "The extraction names neither the tool that read the game's files nor the game's version (2.81 or 2.93), and it holds Scandinavian, Japanese, Turkish and MLS divisions the UK release did not play, so it may come from another release or an edited database. No second copy of its values exists. Its transfers stop in September 1997: Ravanelli is at Marseille and Yeboah at Hamburg, Karembeu still at Sampdoria, Klinsmann at Sampdoria and Davids at Milan. For the same players its abilities run about 9 points above the next season's on the 1-200 scale (110.9 against 101.4 in the CM3 port for 7,435 players matched by name and nation, correlation 0.69, 27% identical; 9.5 above SI's 3.9.60), so its ratings sit about 4.7 higher across the board; the conversion is CM 01/02's, unchanged.",
+      "rights": "The package's code is MIT; its player and team data, extracted from the game, is not, and its rights stay with Sports Interactive and Eidos.",
+      "files": [
+        {
+          "folder": "cm9798",
+          "name": "players.json",
+          "bytes": 15803687,
+          "sha256": "ededc12454339df770ba43b5079845c3ba5f0cf98103886b0cf0b71a79e2d8eb",
+          "download": "https://raw.githubusercontent.com/baskeyx/cm9798/06bdd2b0cb2f0ca9a4e74a1bdd1ffd1f783155d8/src/players.json"
+        },
+        {
+          "folder": "cm9798",
+          "name": "teams.json",
+          "bytes": 1261687,
+          "sha256": "4a2a900d020039c07dfbe02716e4c78ad7f48a11b1bfc3db2838c770a29a5122",
+          "download": "https://raw.githubusercontent.com/baskeyx/cm9798/06bdd2b0cb2f0ca9a4e74a1bdd1ffd1f783155d8/src/teams.json"
+        }
+      ]
+    },
+    {
+      "id": "swos-9697",
+      "kind": "swos",
+      "season": "1996/97",
+      "listing": "Sensible Software's Sensible World of Soccer 96/97 national squads (Whiteulver's database, as keyser1884's SWOS-MCP holds it)",
+      "maker": "Sensible Software",
+      "edition": "SWOS 96/97",
+      "version": "Whiteulver's database, xflea's spreadsheet v1.1",
+      "snapshotDate": "1996",
+      "url": "https://github.com/keyser1884/SWOS-MCP",
+      "compiler": "Whiteulver's database of the game's teams, xflea's spreadsheet of it (v1.1, December 2018), as keyser1884's SWOS-MCP holds it (swos_database.db, commit ac15d74, 9 July 2025)",
+      "provenance": "Row for row the spreadsheet; its Swedish club records equal the game's own team file (304 of 304 players), and its national squads gazchap's database (64 of 64 checked). A SWOS United thread (2021) says some minor nations' squads and nationalities in the game predate 1996.",
+      "rights": "Sensible World of Soccer is Sensible Software's, published by Renegade and GT Interactive and now Codemasters'; the database's code is MIT, the game's data is not.",
+      "files": [
+        {
+          "folder": "swos-9697",
+          "name": "swos_database.db",
+          "bytes": 2392064,
+          "sha256": "7104eaa893a138b2fb7344d67f1bbe61f5f9a2514fbfe12d51e2214071d6807f",
+          "download": "https://raw.githubusercontent.com/keyser1884/SWOS-MCP/ac15d74d4a47a6dc0325398bb6c2781ea3f7d322/swos_database.db"
+        }
+      ]
+    }
+  ]
+}

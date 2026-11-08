@@ -12,6 +12,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { snapshotText } from './lib/mlb.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const args = process.argv.slice(2);
@@ -108,11 +109,5 @@ const snapshot = {
     .sort((a, b) => a.team.localeCompare(b.team) || b.overall - a.overall || a.name.localeCompare(b.name) || a.uuid.localeCompare(b.uuid))
     .map(p => [p.uuid, p.name, p.team, p.position, p.secondary.join(','), p.overall, p.born]),
 };
-const body = `{\n${[
-  `  "note": ${JSON.stringify(snapshot.note)}`,
-  `  "source": ${JSON.stringify(snapshot.source)}`,
-  `  "teams": ${JSON.stringify(snapshot.teams)}`,
-  `  "players": [\n${snapshot.players.map(row => `    ${JSON.stringify(row)}`).join(',\n')}\n  ]`,
-].join(',\n')}\n}\n`;
-await writeFile(output, body);
+await writeFile(output, snapshotText(snapshot));
 console.log(`Wrote ${cards.size} Live cards of ${teams.size} teams (roster update ${latest.id}, ${latest.name}) to ${path.relative(root, output)}`);

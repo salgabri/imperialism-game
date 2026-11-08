@@ -6,7 +6,7 @@ import { SCOPES } from '../../data/teams.js';
 import { CLUB_SCOPES } from '../../data/scopes.js';
 import { domesticEntry, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
-import { BUILT_IN_SETS, setHasClubs, setSportOf } from '../../engine/footballSets.js';
+import { BUILT_IN_SETS, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { DEFAULT_SETUP, dataSetOf, setClubScope } from '../../app/shared.js';
 import {
   DRAW_CARDS, FINALE_OPTIONS, HOME_OPTIONS, RECRUITMENT_OPTIONS, ROSTER_OPTIONS, SHOW_MATCH_OPTIONS, TARGETING_CARDS,
@@ -68,8 +68,8 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   take('sport', value => SPORT_LIST.some(sport => sport.id === value), value => { setup.sport = value; });
   const sport = getSport(setup.sport);
   take('season', value => setSportOf(value) === sport.id && sets.some(set => set.id === value), value => { setup.dataSet = value; });
-  // A sport with clubs only (American football: the NFL's) and a basketball season (NBA clubs) play clubs.
-  const clubsOnly = !!sport.clubsOnly || (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball');
+  // A sport with clubs only (American football: the NFL's) and a season with clubs only (an NBA season) play clubs.
+  const clubsOnly = !!sport.clubsOnly || (setup.dataSet != null && !setHasNations(setup.dataSet));
   // FIFA 05 and FIFA 06 have no clubs to play, nor has tennis.
   const nationsOnly = !!sport.nationsOnly || (setup.dataSet != null && !setHasClubs(setup.dataSet));
   take('teams', value => (value === 'clubs' && !nationsOnly) || (value === 'nations' && !clubsOnly), value => { setup.layer = value; });
@@ -121,7 +121,7 @@ export function challengeQuery(settings = {}, seed = settings?.seed) {
   const s = { ...DEFAULT_SETUP, ...settings };
   const sport = getSport(s.sport);
   const dataSet = dataSetOf(s);
-  const clubsOnly = !!sport.clubsOnly || (dataSet != null && setSportOf(dataSet) === 'basketball');
+  const clubsOnly = !!sport.clubsOnly || (dataSet != null && !setHasNations(dataSet));
   const clubLayer = (s.layer === 'clubs' || clubsOnly) && !sport.nationsOnly;
   const theatre = clubLayer ? setClubScope({ ...s, layer: 'clubs' }) : s.scope;
   const rules = rulesOf(s);

@@ -1,9 +1,12 @@
 // NBA league averages per regular season, from Basketball-Reference's league averages table
-// (https://www.basketball-reference.com/leagues/NBA_stats_per_game.html, read 2026-11-01): `pace` is possessions
-// per 48 minutes, `rating` points per 100 possessions (ORtg) and `points` points a game. Club basketball plays each
-// season at its own pace and scoring rate (src/sports/basketball.js); `points` is what the tests hold it to.
-// 2026/27 is left out until it has a full season behind it.
+// (https://www.basketball-reference.com/leagues/NBA_stats_per_game.html, read 2026-11-01; 1983/84, 1991/92 and
+// 1998/99 read 2026-11-08): `pace` is possessions per 48 minutes, `rating` points per 100 possessions (ORtg) and
+// `points` points a game. Club basketball plays each season at its own pace and scoring rate (src/sports/basketball.js);
+// `points` is what the tests hold it to. 2026/27 is left out until it has a full season behind it.
 export const NBA_LEAGUE_AVERAGES = Object.freeze({
+  '1983/84': Object.freeze({ pace: 101.4, rating: 107.6, points: 110.1 }),
+  '1991/92': Object.freeze({ pace: 96.6, rating: 108.2, points: 105.3 }),
+  '1998/99': Object.freeze({ pace: 88.9, rating: 102.2, points: 91.6 }),
   '1999/00': Object.freeze({ pace: 93.1, rating: 104.1, points: 97.5 }),
   '2000/01': Object.freeze({ pace: 91.3, rating: 103.0, points: 94.8 }),
   '2001/02': Object.freeze({ pace: 90.7, rating: 104.5, points: 95.5 }),

@@ -979,13 +979,14 @@ strongest first: 20 clubs each from England and Spain, 19 Italy, 16 Germany, 15 
 6 the Netherlands, 4 each from Portugal, Turkey, Belgium and Greece, 3 Czechia, 2 each
 from Denmark, Ukraine and Scotland, and one each from Norway, Croatia and Bulgaria.
 The strongest `ELITE_CLUBS` (32) are the elite. An earlier season's file holds the
-seven big leagues only, and its two fields are the strongest of those. FIFA 06 and
-FIFA 05 (2005/06, 2004/05) have nations only, so they have no maps.
+seven big leagues only, and its two fields are the strongest of those. FIFA 06, FIFA 05
+and SWOS 96/97 (2005/06, 2004/05, 1996/97) have nations only, so they have no maps.
 
 **Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 8 minutes;
-`--only=eu124,eu32`, `--check`, `--dry-run`). The maps follow the clubs, so they are rebuilt
-after `npm run build-clubs` or `npm run build:ea-seasons`; the build stops on a club with
-no row in the table below, and the test on a field that has changed. For each of the 21
+`--only=eu124,eu32`, `--check`, `--dry-run`, `--boundaries=<dir>` for another boundary cache).
+The maps follow the clubs, so they are rebuilt after `npm run build-clubs`,
+`npm run build:ea-seasons` or `npm run build:retro-seasons`; the build stops on a club with
+no row in the table below, and the test on a field that has changed. For each of the 25
 seasons with clubs and each of the two fields:
 
 - **Homes**: `scripts/data/europe-clubs.json`, one row per club of any season: a
@@ -1033,7 +1034,7 @@ seasons with clubs and each of the two fields:
 - **Output** as the sport maps: 16,000 arc points, quantized at 1e5, colours that differ
   across borders and water. Sections are in rank order, `eu124-001` the strongest. The
   file adds `theatre` (`all` or `elite`), `seasons` for an earlier season's map, and a
-  club row's `shape`. The 42 files hold 150–190 KB each, 7.0 MB in all, with
+  club row's `shape`. The 50 files hold 150–192 KB each, 8.3 MB in all, with
   `public/domestic/ATTRIBUTION-europe.txt` and the index `src/data/europeMaps.js`
   (`{ id, sport, league, name, theatre, seasons?, clubs, sections, countries, version, top? }`).
 

@@ -1,0 +1,135 @@
+// Build the built-in football seasons before FIFA 05 (docs/design/football-years.md, "Seasons before FIFA 05"):
+//
+//   npm run build:retro-seasons                  writes public/football/<id>.json for each season of
+//                                                scripts/data/retro-seasons.json, src/data/footballSeasons.js and
+//                                                docs/design/football-retro-seasons-audit.json
+//   npm run build:retro-seasons -- --check       builds and compares every output byte for byte, writes nothing
+//   npm run build:retro-seasons -- --data=<dir>  the downloaded sources elsewhere (default data-src/)
+//
+// 2002/03 and 2001/02 are SI's own Championship Manager 01/02 databases (3.9.68 and 3.9.60) and 1998/99 SI's
+// Championship Manager 3 data in the CM 01/02 format, all three read by the CM 01/02 builder (src/data/footballSetBuild.js)
+// from the CM0102 Starter Kit's zips; 1997/98 is SI's Championship Manager 97/98 database as extracted to JSON
+// (scripts/lib/cm9798.mjs); 1996/97 is Sensible World of Soccer 96/97's national squads (scripts/lib/swos.mjs), nations
+// only. Every source is pinned by SHA-256 in the manifest and the build stops on any other file, so every season
+// rebuilds byte for byte. Their Europe maps come from npm run build:europe-maps, as the EA seasons' do.
+import { existsSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { DatabaseSync } from 'node:sqlite';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { unzipSync } from 'fflate';
+import { CM_CONVERSION, CM_SCALE } from '../src/data/cmPlayers.js';
+import { SWOS_CONVERSION, SWOS_PRICES, SWOS_SCALE } from '../src/data/swosPlayers.js';
+import { buildFootballSet, seasonYear } from '../src/data/footballSetBuild.js';
+import { buildCm9798Season } from './lib/cm9798.mjs';
+import { buildSwosSeason } from './lib/swos.mjs';
+import { committedSeasons, eaSeasonIds, footballSeasonsModule } from './lib/football-seasons-listing.mjs';
+
+const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+
+function parseArgs(argv) {
+  const args = {};
+  for (const arg of argv) {
+    const [, key, value] = /^--([a-z]+)(?:=(.*))?$/s.exec(arg) || [];
+    if (key === 'check' && value === undefined) args.check = true;
+    else if (key === 'data' && value) args.data = value;
+    else throw new Error(`Unknown option ${arg}`);
+  }
+  return args;
+}
+
+/** A source file's bytes, after checking it is the pinned one. */
+async function pinned(dataDir, file) {
+  const at = path.join(dataDir, file.folder, file.name);
+  if (!existsSync(at)) throw new Error(`${at} is missing: download ${file.download} into data-src/${file.folder}/`);
+  const bytes = await readFile(at);
+  const digest = createHash('sha256').update(bytes).digest('hex');
+  if (digest !== file.sha256 || bytes.length !== file.bytes) {
+    throw new Error(`${at} is not the pinned ${file.name} (SHA-256 ${digest}, ${bytes.length} bytes); see scripts/data/retro-seasons.json`);
+  }
+  return bytes;
+}
+
+/** The fields every season's source block adds to its maker's: who compiled it, from where, and when it was read. */
+const credits = (season, retrieved) => ({ compiler: season.compiler, ...(season.provenance ? { provenance: season.provenance } : {}), retrieved });
+
+/** A CM 01/02-format database: the zip's .dat files, read by the CM 01/02 builder as a known release. */
+async function buildCmZip(season, dataDir, retrieved) {
+  const zip = await pinned(dataDir, season.file);
+  // Only the Data folder's tables: the language and picture files are not read.
+  const files = unzipSync(zip, { filter: entry => /^[^/]+\.dat$/i.test(entry.name) });
+  return buildFootballSet(files, { local: false, sourceExtra: credits(season, retrieved) });
+}
+
+async function buildCm9798(season, dataDir, retrieved) {
+  const [players, teams] = await Promise.all(season.files.map(async file => JSON.parse((await pinned(dataDir, file)).toString('utf8'))));
+  const source = { provider: season.maker, edition: season.edition, version: season.version, snapshotDate: season.snapshotDate, url: season.url,
+    rawScale: CM_SCALE, conversion: CM_CONVERSION, ...credits(season, retrieved) };
+  return buildCm9798Season({ players, teams }, { source, year: seasonYear(season.season) });
+}
+
+async function buildSwos(season, dataDir, retrieved) {
+  const [file] = season.files;
+  await pinned(dataDir, file);
+  const db = new DatabaseSync(path.join(dataDir, file.folder, file.name), { readOnly: true });
+  try {
+    const rows = db.prepare("SELECT * FROM players WHERE type = 'NATIONAL' ORDER BY id").all().map(row => ({ ...row }));
+    const source = { provider: season.maker, edition: season.edition, version: season.version, snapshotDate: season.snapshotDate, url: season.url,
+      rawScale: SWOS_SCALE, conversion: SWOS_CONVERSION, ...credits(season, retrieved) };
+    return buildSwosSeason(rows, { source, year: seasonYear(season.season), prices: SWOS_PRICES });
+  } finally {
+    db.close();
+  }
+}
+
+const BUILDERS = { cm0102: buildCmZip, cm: buildCm9798, swos: buildSwos };
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/retro-seasons.json'), 'utf8'));
+  const ea = JSON.parse(await readFile(path.join(root, 'scripts/data/ea-seasons.json'), 'utf8'));
+  const dataDir = path.resolve(args.data ?? path.join(root, 'data-src'));
+  const results = [];
+  for (const season of manifest.seasons) {
+    const build = BUILDERS[season.kind];
+    if (!build) throw new Error(`${season.id} has kind ${season.kind}, which no builder makes`);
+    const result = await build(season, dataDir, manifest.retrieved);
+    const { doc } = result;
+    if (doc.id !== season.id || doc.season !== season.season || doc.local !== false) {
+      throw new Error(`${season.id} built as ${doc.id} ${doc.season}${doc.local === false ? '' : ', local'}: the manifest and the source disagree`);
+    }
+    results.push(result);
+    const { coverage } = doc;
+    console.log(`${doc.id} ${doc.season} ${doc.label}: ${coverage.completeXIs}/${Object.keys(doc.nations).length} full XIs, `
+      + `${coverage.nations} nations with players, ${coverage.clubs} clubs, ${coverage.players} players, ${Math.round(Buffer.byteLength(result.text) / 1024)} KB`);
+    for (const warning of result.warnings) console.log(`  warning: ${warning}`);
+  }
+  const listed = [...await committedSeasons(path.join(root, 'public/football'), eaSeasonIds(ea)), ...results.map(result => result.doc)];
+  const audit = {
+    generatedBy: 'scripts/build-retro-seasons.mjs', retrieved: manifest.retrieved,
+    seasons: results.map(({ doc, audit: own }, i) => ({ ...manifest.seasons[i], version: doc.version, coverage: doc.coverage, audit: own })),
+  };
+  const outputs = new Map([
+    ...results.map(({ doc, text }) => [path.join(root, 'public/football', `${doc.id}.json`), text]),
+    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea, retro: manifest })],
+    [path.join(root, 'docs/design/football-retro-seasons-audit.json'), `${JSON.stringify(audit, null, 2)}\n`],
+  ]);
+  if (args.check) {
+    const differs = [];
+    for (const [file, text] of outputs) {
+      const current = existsSync(file) ? (await readFile(file, 'utf8')).replace(/\r\n/g, '\n') : null;
+      if (current !== text) differs.push(path.relative(root, file));
+    }
+    if (differs.length) throw new Error(`Check failed, these differ from what the build writes: ${differs.join(', ')}`);
+    console.log(`Check only, nothing written: ${outputs.size} files rebuild byte for byte`);
+    return;
+  }
+  for (const [file, text] of outputs) await writeFile(file, text);
+  console.log(`Wrote ${results.length} seasons to public/football/, src/data/footballSeasons.js and docs/design/football-retro-seasons-audit.json`);
+}
+
+main().catch(error => {
+  console.error(`build-retro-seasons: ${error.message}`);
+  process.exitCode = 1;
+});

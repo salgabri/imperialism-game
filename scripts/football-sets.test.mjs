@@ -12,6 +12,7 @@ import { CAPITALS } from '../src/data/capitals.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { CM_CONVERSION, expandCmTuple } from '../src/data/cmPlayers.js';
 import { expandFmTuple } from '../src/data/fmPlayers.js';
+import { expandSwosTuple } from '../src/data/swosPlayers.js';
 import { DEPENDENCIES, NATIONS, buildClub, buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
 import { WorldGeometry } from '../src/engine/geo.js';
 import { getSport } from '../src/sports/index.js';
@@ -192,12 +193,20 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
   // A set that lists them fields them, here with the fake database's players.
   const current = seasonSport(decodeFootballSet(structuredClone(SET), ID));
   assert.ok(islands.every(id => fieldedNations(current).includes(id) && current.rosters[id][2].length === 11));
-  // Every built-in earlier season predates them, and no rated player of theirs is lost: EA rated none.
+  // EA rated none of their players, so no EA season lists them. SI's CM 01/02 databases, built on today's map, list all
+  // three as they list every nation, and rate a few (3.9.68 Tongans, Samoans and Cook Islanders, 3.9.60 one Cook
+  // Islander); a listed nation nobody rated fields empty shirts, as in any CM set.
+  const ratedIn = {};
   for (const { id } of BUILT_IN_SEASONS) {
     const doc = JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
-    assert.ok(islands.every(island => !Object.hasOwn(doc.nations, island)), id);
-    assert.ok(islands.every(island => !fieldedNations(seasonSport(decodeFootballSet(doc, id))).includes(island)), id);
+    const listed = islands.filter(island => Object.hasOwn(doc.nations, island));
+    assert.ok(listed.length === 0 || (listed.length === 3 && id.startsWith('cm0102-')), id);
+    const rated = listed.filter(island => doc.nations[island][2].length > 0);
+    if (rated.length) ratedIn[id] = rated;
+    const fielded = fieldedNations(seasonSport(decodeFootballSet(doc, id)));
+    assert.deepEqual(islands.filter(island => fielded.includes(island)), listed, id);
   }
+  assert.deepEqual(ratedIn, { 'cm0102-2002-11': ['184', '776', '882'], 'cm0102-2001-09': ['184'] });
 });
 
 // ---------- the index and the loader ----------
@@ -209,7 +218,10 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
   assert.deepEqual(none.calls, ['/base/football/index.json']);
   assert.equal(await loadFootballSetIndex({ fetch: none.fetch }), BUILT_IN_SETS, 'the answer is kept');
   assert.equal(none.calls.length, 1, 'read once');
-  assert.ok(BUILT_IN_SETS.length > 0 && BUILT_IN_SETS.every(set => /^(ea-(fifa|fc)-|nba-2k|mlb-the-show-)\d{2}$/.test(set.id)));
+  const builtInId = new RegExp('^(?:(?:eaw?-(?:fifa|fc)-|nba-2k|nba-live-|mlb-the-show-)\\d{2}'
+    + '|(?:madden|tecmo|tennis|nhl|nrl|nba-eras|nba-classic|cm|swos)-\\d{4}|cm0102-\\d{4}-\\d{2}(?:-[a-z0-9]+)?)$');
+  assert.ok(BUILT_IN_SETS.length > 0, 'seasons are built in');
+  assert.deepEqual(BUILT_IN_SETS.map(set => set.id).filter(id => !builtInId.test(id)), [], 'every built-in id has a known shape');
 
   const sets = [syntheticSet({ id: 'cm0102-2001-12', year: 2002, label: 'CM 01/02 · December 2001' }), SET,
     syntheticSet({ id: 'cm0102-2026-05', year: 2026, label: 'CM 01/02 · May 2026' })];
@@ -219,7 +231,8 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
     { ...entryOf(SET), id: earlier[0].id, year: earlier[0].year, season: earlier[0].season, version: null }] };
   clearFootballSetIndex();
   const index = await loadFootballSetIndex({ fetch: fakeFetch({ '/football/index.json': listed }).fetch });
-  const local = index.filter(set => set.id.startsWith('cm0102-'));
+  // SI's own CM 01/02 databases are built in as well.
+  const local = index.filter(set => set.id.startsWith('cm0102-') && !BUILT_IN_SETS.some(builtIn => builtIn.id === set.id));
   assert.deepEqual(local.map(set => set.id), ['cm0102-2026-05', ID, 'cm0102-2001-12'], 'newest season, then latest release');
   assert.deepEqual(local[1], { id: ID, version: SET.version, year: 2002, season: '2001/02', label: 'CM 01/02 · Test 2002' });
   assert.deepEqual(index.filter(set => set.id.startsWith('ea-')), earlier, 'a local file never stands in for a built-in season');
@@ -470,6 +483,12 @@ test('CM players are labelled "CM 01/02" and credit the Update Team; FM and EA l
   assert.equal(sourceTitle({ sourceInfo: fmInfo }), 'FM 26 · Database 26.3.0 · Database snapshot 2026-10-02 · Source rating 80/100'
     + ' · Game rating converted from Football Manager current ability: round(currentAbility * 99 / 100)');
   assert.equal(sourceLabel({ sourceInfo: { source: 'ea-fc', edition: '26' } }), 'EA FC 26');
+  // Sensible World of Soccer rates a price step, and its makers are credited.
+  const [, , , swosInfo] = expandSwosTuple([7, 'Zinedine Zidane', 0, 35, 'm', 'France', '', '', '7556545'],
+    { edition: 'SWOS 96/97', version: 'Test', snapshotDate: '1996', url: 'https://example.test/swos' });
+  assert.equal(sourceLabel({ sourceInfo: swosInfo }), 'SWOS 96/97');
+  assert.equal(sourceTitle({ sourceInfo: swosInfo }), 'SWOS 96/97 · Sensible Software · Database Test · Database snapshot 1996'
+    + ' · Source rating 35/49 · Game rating converted from SWOS\'s price step: round(40 + value * 59 / 49)');
 
   const { PlayerRow } = await bundleComponents({ PlayerRow: 'src/components/PlayerRow.jsx' });
   const html = renderToStaticMarkup(React.createElement(PlayerRow, { player: { ...cm, positions: sourceInfo.positions } }));

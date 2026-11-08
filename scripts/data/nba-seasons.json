@@ -1,5 +1,5 @@
 {
-  "note": "The built-in earlier basketball seasons: each NBA 2K edition's ratings, team and position per player, as compiled by 2K Archive, for NBA clubs only. npm run build:nba-seasons reads the page from data-src/bball-2karchive/ (ignored) and checks it against sha256; npm run build:nba-map builds each era's map from these teams and arenas. The built-in season (builtIn) comes from the same page: npm run build-clubs writes its NBA clubs and npm run build-basketball rates its national fives' NBA players. See docs/design/football-years.md, 'Built-in earlier basketball seasons'.",
+  "note": "The built-in earlier basketball seasons: each NBA 2K edition's ratings, team and position per player, as compiled by 2K Archive, for NBA clubs only. npm run build:nba-seasons reads the page from data-src/bball-2karchive/ (ignored) and checks it against sha256; npm run build:nba-map builds each era's map from these teams and arenas. The built-in season (builtIn) comes from the same page: npm run build-clubs writes its NBA clubs and npm run build-basketball rates its national fives' NBA players. A season of `extra` comes from its own pinned source instead: NBA 2K12 from The Real 2K Insider's list, and, with a `format`, the seasons before NBA 2K: NBA 2K27's MyNBA Eras leagues as 2kratings.com lists them (1983/84, 1991/92) and NBA Live 99's own roster files (1998/99), each player checked against Basketball-Reference's seasons (`check`). `teams` lists each franchise's eras from 1980/81, before 1999/00 each with the arena it played in. See docs/design/football-years.md, 'Earlier basketball seasons'.",
   "source": {
     "name": "2K Archive",
     "url": "https://2karchive.com/",
@@ -8,64 +8,291 @@
     "sha256": "86f0936ff0d51d671d8abaa4ed1ab8b000b438217d9b172e82932068129b695c",
     "retrieved": "2026-10-30"
   },
-  "builtIn": { "year": 2027, "season": "2026/27", "edition": "NBA 2K27" },
-  "seasons": [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
-  "skipped": {
-    "2012": "2K Archive's NBA 2K12 lists 1 Philadelphia and 2 San Antonio players (it shipped with 2010/11 rosters), so two teams cannot field a five"
+  "extra": {
+    "2012": {
+      "edition": "NBA 2K12",
+      "name": "The Real 2K Insider",
+      "url": "https://thereal2kinsider.blogspot.com/2011/09/official-nba-2k12-ratings-released.html",
+      "folder": "bball-2k12",
+      "file": "wayback-20111014-official-nba-2k12-ratings-released.html",
+      "capture": "https://web.archive.org/web/20111014062642id_/http://thereal2kinsider.blogspot.com/2011/09/official-nba-2k12-ratings-released.html",
+      "sha256": "082418bd93a541a1c725abc60ece3fd5507c2a1b74eb03774ff383aef058fcc7",
+      "published": "2011-09-27",
+      "retrieved": "2026-11-08",
+      "terms": "The pinned copy is the Wayback Machine's capture of 14 October 2011 (the live page's markup changes from one fetch to the next; its list does not). A fan blog with no licence; its ratings are 2K's launch ratings, transcribed from 2K's ratings video, on the lockout's launch rosters (the 2010/11 teams), as 2K Archive's are. 2K Archive lists only 3 Philadelphia and San Antonio players for NBA 2K12, so the season comes from this list whole; the audit counts how many of 2K Archive's players it rates the same.",
+      "nicknames": { "76ERS": "PHI", "BOBCATS": "CHA", "BUCKS": "MIL", "BULLS": "CHI", "CAVALIERS": "CLE", "CELTICS": "BOS", "CLIPPERS": "LAC",
+        "GRIZZLIES": "MEM", "HAWKS": "ATL", "HEAT": "MIA", "HORNETS": "NOH", "JAZZ": "UTA", "KINGS": "SAC", "KNICKS": "NYK", "LAKERS": "LAL",
+        "MAGIC": "ORL", "MAVERICKS": "DAL", "NETS": "NJN", "NUGGETS": "DEN", "PACERS": "IND", "PISTONS": "DET", "RAPTORS": "TOR",
+        "ROCKETS": "HOU", "SPURS": "SAS", "SUNS": "PHX", "THUNDER": "OKC", "TIMBERWOLVES": "MIN", "TRAILBLAZERS": "POR", "WARRIORS": "GSW",
+        "WIZARDS": "WAS" }
+    },
+    "1984": {
+      "format": "mynba-eras",
+      "id": "nba-eras-1984",
+      "label": "NBA 2K27 (Magic vs Bird era)",
+      "edition": "NBA 2K27",
+      "provider": "2K Sports",
+      "name": "2kratings.com",
+      "url": "https://www.2kratings.com/mynba-eras/magic-vs-bird-era",
+      "era": "Magic vs Bird Era (1983)",
+      "folder": "research80s/basketball/2kratings-mynba-eras",
+      "file": "magic-vs-bird-era.html",
+      "sha256": "15f6cf0427b9b1301796c1c2c1dffb566bb88592fe1db6655500a340f28759e0",
+      "retrieved": "2026-11-08",
+      "terms": "2kratings.com's page of NBA 2K27's MyNBA Eras league that starts in 1983/84, as of 8 November 2026: each club's opening-night roster with 2K's own overall (1-99) and position. A fan site with no licence; the ratings are 2K's. 2K fills each roster up with made-up bench players (an initial and a surname) and lists no player it has no licence for; Basketball-Reference's 1983/84 season (check) keeps only the players who played for their club then.",
+      "rule": "club",
+      "teams": { "Atlanta Hawks": "ATL", "Boston Celtics": "BOS", "Chicago Bulls": "CHI", "Cleveland Cavaliers": "CLE", "Dallas Mavericks": "DAL",
+        "Denver Nuggets": "DEN", "Detroit Pistons": "DET", "Golden State Warriors": "GSW", "Houston Rockets": "HOU", "Indiana Pacers": "IND",
+        "Kansas City Kings": "KCK", "Los Angeles Lakers": "LAL", "Milwaukee Bucks": "MIL", "New Jersey Nets": "NJN", "New York Knicks": "NYK",
+        "Philadelphia 76ers": "PHI", "Phoenix Suns": "PHX", "Portland Trail Blazers": "POR", "San Antonio Spurs": "SAS", "San Diego Clippers": "SDC",
+        "Seattle SuperSonics": "SEA", "Utah Jazz": "UTA", "Washington Bullets": "WSB" },
+      "aliases": { "Micheal Ray Richardson": "Michael Ray Richardson" }
+    },
+    "1992": {
+      "format": "mynba-eras",
+      "id": "nba-eras-1992",
+      "label": "NBA 2K27 (Jordan era)",
+      "edition": "NBA 2K27",
+      "provider": "2K Sports",
+      "name": "2kratings.com",
+      "url": "https://www.2kratings.com/mynba-eras/jordan-era",
+      "era": "Jordan Era (1991)",
+      "folder": "research80s/basketball/2kratings-mynba-eras",
+      "file": "jordan-era.html",
+      "sha256": "c7e8f0b1116c96aa1f9980028295e61f32edcd697c131c40bd37a0fd0ec3b444",
+      "retrieved": "2026-11-08",
+      "terms": "2kratings.com's page of NBA 2K27's MyNBA Eras league that starts in 1991/92, as of 8 November 2026: each club's opening-night roster with 2K's own overall (1-99) and position. A fan site with no licence; the ratings are 2K's. 2K fills each roster up with made-up bench players and lists a few real ones by an initial and a surname; `roster` names those who were on that club's roster in 1991/92, the others are left out, as is every player Basketball-Reference's 1991/92 season (check) does not have playing for his club. Players 2K has no licence for are not listed at all.",
+      "rule": "club",
+      "teams": { "Atlanta Hawks": "ATL", "Boston Celtics": "BOS", "Charlotte Hornets": "CHH", "Chicago Bulls": "CHI", "Cleveland Cavaliers": "CLE",
+        "Dallas Mavericks": "DAL", "Denver Nuggets": "DEN", "Detroit Pistons": "DET", "Golden State Warriors": "GSW", "Houston Rockets": "HOU",
+        "Indiana Pacers": "IND", "Los Angeles Clippers": "LAC", "Los Angeles Lakers": "LAL", "Miami Heat": "MIA", "Milwaukee Bucks": "MIL",
+        "Minnesota Timberwolves": "MIN", "New Jersey Nets": "NJN", "New York Knicks": "NYK", "Orlando Magic": "ORL", "Philadelphia 76ers": "PHI",
+        "Phoenix Suns": "PHX", "Portland Trail Blazers": "POR", "Sacramento Kings": "SAC", "San Antonio Spurs": "SAS", "Seattle SuperSonics": "SEA",
+        "Utah Jazz": "UTA", "Washington Bullets": "WSB" },
+      "roster": {
+        "LAL M. Johnson": { "name": "Magic Johnson", "note": "on the Lakers' opening-night roster: he missed the first three games ill and retired on 7 November 1991 (Wikipedia, 1991–92 Los Angeles Lakers season, revision 1377384155)" },
+        "WSB B. King": { "name": "Bernard King", "note": "on the Bullets' injured reserve list all season after knee surgery (Wikipedia, 1991–92 Washington Bullets season, revision 1377290818)" },
+        "WSB J. Williams": { "name": "John Williams", "note": "on the Bullets' roster, suspended indefinitely for his weight (Wikipedia, 1991–92 Washington Bullets season, revision 1377290818)" },
+        "WSB M. Alarie": { "name": "Mark Alarie", "note": "on the Bullets' injured reserve list all season (Wikipedia, 1991–92 Washington Bullets season, revision 1377290818)" },
+        "NJN R. Hinson": { "name": "Roy Hinson", "note": "on the Nets' injured reserve list all season (Wikipedia, 1991–92 New Jersey Nets season, revision 1377280547)" },
+        "PHX R. Dumas": { "name": "Richard Dumas", "note": "on the Suns' roster, suspended under the NBA's substance abuse policy (Wikipedia, 1991–92 Phoenix Suns season, revision 1377347433)" },
+        "PHX T. Tucker": { "name": "Trent Tucker", "note": "the Suns' from 1 October 1991, when they traded for him, to 15 November 1991, when they waived him without his playing (Wikipedia, 1991–92 Phoenix Suns season, revision 1377347433)" },
+        "DEN C. Jackson": { "name": "Chris Jackson", "bref": "Mahmoud Abdul-Rauf", "note": "Denver's point guard, Mahmoud Abdul-Rauf from 1993 (Wikipedia, 1991–92 Denver Nuggets season, revision 1377387749)" }
+      }
+    },
+    "1999": {
+      "format": "nba-live-dbf",
+      "id": "nba-live-99",
+      "label": "NBA Live 99",
+      "edition": "NBA Live 99",
+      "provider": "EA Sports",
+      "name": "The NLSC",
+      "url": "https://forums.nba-live.com/downloads.php",
+      "folder": "research80s/basketball/nlsc-live99-original-1998",
+      "archive": { "live99-original-1998.7z": "6386550cf3faf2589b4ab7585a7a8c99056be4d0bd0df15563107507f2fd3d99" },
+      "files": {
+        "players": { "file": "extracted/999/PLAYERS.DBF", "sha256": "b42c3b92f255b096dad5df795dc1eb025f0e70737788492d70d903795309e46e" },
+        "teams": { "file": "extracted/999/TEAMS.DBF", "sha256": "4ede4ea62bac413a7f3dc75a97dcb90ef5f963d643e0c25cbbe6ecff93457450" }
+      },
+      "retrieved": "2026-11-08",
+      "terms": "'NBA Live 99 Original 1998 Rosters' 1.0 (8 March 2017, uploaded by Andrew) from the NLSC's Downloads database: EA's own roster files from the NBA Live 99 PC CD-ROM (© EA Sports 1998), no licence given. The .7z (MD5 6280cd1d87748d80689c053037c028e0) is pinned as downloaded, and its PLAYERS.DBF and TEAMS.DBF as extracted; only those two dBase tables are read, as data. Because of the 1998 lockout the game shipped with the final 1997/98 rosters plus the trades of May and June 1998 and none of the 1998 draft; the season is 1998/99, the edition's, as NBA 2K12 carries 2011/12 on the lockout's 2010/11 rosters. Free agents and the All-Star teams are left out, and so is every player Basketball-Reference (check) does not have playing in the NBA: the made-up 'Roster Player' and a draft pick who never played. Each player keeps EA's computed overall (OVERALLRTG) as `raw`, put on NBA 2K's scale by `scale`.",
+      "rule": "league",
+      "teams": { "Atl": "ATL", "Bos": "BOS", "Cha": "CHH", "Chi": "CHI", "Cle": "CLE", "Dal": "DAL", "Den": "DEN", "Det": "DET", "GS": "GSW",
+        "Hou": "HOU", "Ind": "IND", "LAC": "LAC", "LAL": "LAL", "Mia": "MIA", "Mil": "MIL", "Min": "MIN", "NJ": "NJN", "NY": "NYK", "Orl": "ORL",
+        "Phi": "PHI", "Pho": "PHX", "Por": "POR", "Sac": "SAC", "SA": "SAS", "Sea": "SEA", "Tor": "TOR", "Utah": "UTA", "Van": "VAN", "Was": "WAS" },
+      "others": ["FA", "ASE", "ASW"],
+      "aliases": { "Armon Gilliam": "Armen Gilliam", "Brian Williams": "Bison Dele", "Charles Outlaw": "Bo Outlaw", "Jerome Richardson": "Pooh Richardson",
+        "John Williams": "Hot Rod Williams", "Predrag Stojakovic": "Peja Stojaković", "Ronald Jones": "Popeye Jones", "Theodore Edwards": "Blue Edwards",
+        "Tyrone Bogues": "Muggsy Bogues", "Vernell Coles": "Bimbo Coles" },
+      "scale": {
+        "edition": "NBA 2K",
+        "year": 2000,
+        "intercept": 20.22,
+        "slope": 1.089,
+        "note": "NBA Live 99's overall is the rounded mean of 17 of its ratings, so it runs low (28-71 here) and undervalues specialists. One straight line puts it on NBA 2K's scale: the least-squares line of NBA 2K's overall (2K Archive's NBA 2K, 1999/00) on NBA Live 99's, through the players both editions rate, matched by name or alias. rating = round(20.22 + 1.089 × raw); its slope is positive, so no player passes another. The build fits the line again and stops if it is not this one. The audit gives every raw overall's rating and how the line does on those players."
+      }
+    }
   },
+  "check": {
+    "name": "Basketball-Reference's player seasons (Sumitro Datta, NBA Stats (1947-present), version 57)",
+    "url": "https://www.kaggle.com/datasets/sumitrodatta/nba-aba-baa-stats",
+    "folder": "research80s/basketball/kaggle-sumitrodatta-nba-aba-baa-stats",
+    "file": "Player Totals.csv",
+    "sha256": "2954bc4acb2651f6989304ab1a6d79f3ec710195b828c922510bc1250928b316",
+    "retrieved": "2026-11-08",
+    "terms": "CC0: Public Domain, compiled from Basketball-Reference's regular seasons (dataset updated 1 November 2026). Read only to check facts: who played for which club in which season, and for how long. `codes` maps the manifest's team codes to Basketball-Reference's where they differ; `rotation` is the minutes a season's real player must have played for his club for the audit to name him if a source does not list him.",
+    "codes": { "PHX": "PHO" },
+    "rotation": 1000
+  },
+  "builtIn": { "year": 2027, "season": "2026/27", "edition": "NBA 2K27" },
+  "seasons": [1984, 1992, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
   "teams": {
-    "ATL": [{ "id": "b-atlanta-hawks", "name": "Atlanta Hawks" }],
-    "BOS": [{ "id": "b-boston-celtics", "name": "Boston Celtics" }],
+    "ATL": [
+      { "from": 1981, "to": 1997, "id": "b-atlanta-hawks", "name": "Atlanta Hawks", "city": "Atlanta", "arena": "Omni Coliseum", "home": [-84.3967, 33.7575] },
+      { "from": 1998, "to": 1999, "id": "b-atlanta-hawks", "name": "Atlanta Hawks", "city": "Atlanta", "arena": "Georgia Dome", "home": [-84.4008, 33.7575] },
+      { "from": 2000, "id": "b-atlanta-hawks", "name": "Atlanta Hawks" }
+    ],
+    "BOS": [
+      { "from": 1981, "to": 1995, "id": "b-boston-celtics", "name": "Boston Celtics", "city": "Boston", "arena": "Boston Garden", "home": [-71.0617, 42.3657] },
+      { "from": 1996, "to": 1999, "id": "b-boston-celtics", "name": "Boston Celtics", "city": "Boston", "arena": "FleetCenter", "home": [-71.0622, 42.3664] },
+      { "from": 2000, "id": "b-boston-celtics", "name": "Boston Celtics" }
+    ],
     "BKN": [{ "from": 2013, "id": "b-brooklyn-nets", "name": "Brooklyn Nets" }],
-    "NJN": [{ "to": 2012, "id": "b-new-jersey-nets", "name": "New Jersey Nets", "city": "New Jersey", "arena": "Continental Airlines Arena", "home": [-74.0675, 40.8117] }],
-    "CHH": [{ "to": 2002, "id": "b-charlotte-hornets", "name": "Charlotte Hornets", "city": "Charlotte", "arena": "Charlotte Coliseum", "home": [-80.9128, 35.1864] }],
+    "NJN": [
+      { "from": 1981, "to": 1981, "id": "b-new-jersey-nets", "name": "New Jersey Nets", "city": "New Jersey", "arena": "Rutgers Athletic Center", "home": [-74.4411, 40.5253] },
+      { "from": 1982, "to": 1995, "id": "b-new-jersey-nets", "name": "New Jersey Nets", "city": "New Jersey", "arena": "Brendan Byrne Arena", "home": [-74.0675, 40.8117] },
+      { "from": 1996, "to": 2012, "id": "b-new-jersey-nets", "name": "New Jersey Nets", "city": "New Jersey", "arena": "Continental Airlines Arena", "home": [-74.0675, 40.8117] }
+    ],
+    "CHH": [{ "from": 1989, "to": 2002, "id": "b-charlotte-hornets", "name": "Charlotte Hornets", "city": "Charlotte", "arena": "Charlotte Coliseum", "home": [-80.9128, 35.1864] }],
     "CHA": [
       { "from": 2005, "to": 2005, "id": "b-charlotte-bobcats", "name": "Charlotte Bobcats", "city": "Charlotte", "arena": "Charlotte Coliseum", "home": [-80.9128, 35.1864] },
       { "from": 2006, "to": 2014, "id": "b-charlotte-bobcats", "name": "Charlotte Bobcats", "city": "Charlotte", "arena": "Charlotte Bobcats Arena", "home": [-80.8392, 35.2251] },
       { "from": 2015, "id": "b-charlotte-hornets", "name": "Charlotte Hornets" }
     ],
-    "CHI": [{ "id": "b-chicago-bulls", "name": "Chicago Bulls" }],
-    "CLE": [{ "id": "b-cleveland-cavaliers", "name": "Cleveland Cavaliers" }],
-    "DAL": [{ "id": "b-dallas-mavericks", "name": "Dallas Mavericks" }],
-    "DEN": [{ "id": "b-denver-nuggets", "name": "Denver Nuggets" }],
-    "DET": [{ "id": "b-detroit-pistons", "name": "Detroit Pistons" }],
-    "GSW": [{ "id": "b-golden-state-warriors", "name": "Golden State Warriors" }],
-    "HOU": [{ "id": "b-houston-rockets", "name": "Houston Rockets" }],
-    "IND": [{ "id": "b-indiana-pacers", "name": "Indiana Pacers" }],
-    "LAC": [{ "id": "b-los-angeles-clippers", "name": "Los Angeles Clippers" }],
-    "LAL": [{ "id": "b-los-angeles-lakers", "name": "Los Angeles Lakers" }],
-    "VAN": [{ "to": 2001, "id": "b-vancouver-grizzlies", "name": "Vancouver Grizzlies", "city": "Vancouver", "arena": "General Motors Place", "home": [-123.1089, 49.2778] }],
+    "CHI": [
+      { "from": 1981, "to": 1994, "id": "b-chicago-bulls", "name": "Chicago Bulls", "city": "Chicago", "arena": "Chicago Stadium", "home": [-87.6728, 41.8817] },
+      { "from": 1995, "to": 1999, "id": "b-chicago-bulls", "name": "Chicago Bulls", "city": "Chicago", "arena": "United Center", "home": [-87.6742, 41.8806] },
+      { "from": 2000, "id": "b-chicago-bulls", "name": "Chicago Bulls" }
+    ],
+    "CLE": [
+      { "from": 1981, "to": 1994, "id": "b-cleveland-cavaliers", "name": "Cleveland Cavaliers", "city": "Richfield", "arena": "Richfield Coliseum", "home": [-81.5939, 41.2453] },
+      { "from": 1995, "to": 1999, "id": "b-cleveland-cavaliers", "name": "Cleveland Cavaliers", "city": "Cleveland", "arena": "Gund Arena", "home": [-81.6881, 41.4964] },
+      { "from": 2000, "id": "b-cleveland-cavaliers", "name": "Cleveland Cavaliers" }
+    ],
+    "DAL": [
+      { "from": 1981, "to": 1999, "id": "b-dallas-mavericks", "name": "Dallas Mavericks", "city": "Dallas", "arena": "Reunion Arena", "home": [-96.8081, 32.7728] },
+      { "from": 2000, "id": "b-dallas-mavericks", "name": "Dallas Mavericks" }
+    ],
+    "DEN": [
+      { "from": 1981, "to": 1999, "id": "b-denver-nuggets", "name": "Denver Nuggets", "city": "Denver", "arena": "McNichols Sports Arena", "home": [-105.0225, 39.7428] },
+      { "from": 2000, "id": "b-denver-nuggets", "name": "Denver Nuggets" }
+    ],
+    "DET": [
+      { "from": 1981, "to": 1988, "id": "b-detroit-pistons", "name": "Detroit Pistons", "city": "Pontiac", "arena": "Pontiac Silverdome", "home": [-83.255, 42.6458] },
+      { "from": 1989, "to": 1999, "id": "b-detroit-pistons", "name": "Detroit Pistons", "city": "Auburn Hills", "arena": "The Palace of Auburn Hills", "home": [-83.2456, 42.6969] },
+      { "from": 2000, "id": "b-detroit-pistons", "name": "Detroit Pistons" }
+    ],
+    "GSW": [
+      { "from": 1981, "to": 1996, "id": "b-golden-state-warriors", "name": "Golden State Warriors", "city": "Oakland", "arena": "Oakland–Alameda County Coliseum Arena", "home": [-122.2031, 37.7503] },
+      { "from": 1997, "to": 1997, "id": "b-golden-state-warriors", "name": "Golden State Warriors", "city": "San Jose", "arena": "San Jose Arena", "home": [-121.9011, 37.3328] },
+      { "from": 1998, "to": 1999, "id": "b-golden-state-warriors", "name": "Golden State Warriors", "city": "Oakland", "arena": "The Arena in Oakland", "home": [-122.2031, 37.7503] },
+      { "from": 2000, "id": "b-golden-state-warriors", "name": "Golden State Warriors" }
+    ],
+    "HOU": [
+      { "from": 1981, "to": 1998, "id": "b-houston-rockets", "name": "Houston Rockets", "city": "Houston", "arena": "The Summit", "home": [-95.435, 29.7303] },
+      { "from": 1999, "to": 1999, "id": "b-houston-rockets", "name": "Houston Rockets", "city": "Houston", "arena": "Compaq Center", "home": [-95.435, 29.7303] },
+      { "from": 2000, "id": "b-houston-rockets", "name": "Houston Rockets" }
+    ],
+    "IND": [
+      { "from": 1981, "to": 1999, "id": "b-indiana-pacers", "name": "Indiana Pacers", "city": "Indianapolis", "arena": "Market Square Arena", "home": [-86.1519, 39.7683] },
+      { "from": 2000, "id": "b-indiana-pacers", "name": "Indiana Pacers" }
+    ],
+    "SDC": [{ "from": 1981, "to": 1984, "id": "b-san-diego-clippers", "name": "San Diego Clippers", "city": "San Diego", "arena": "San Diego Sports Arena", "home": [-117.2122, 32.7553] }],
+    "LAC": [
+      { "from": 1985, "to": 1999, "id": "b-los-angeles-clippers", "name": "Los Angeles Clippers", "city": "Los Angeles", "arena": "Los Angeles Memorial Sports Arena", "home": [-118.2844, 34.0131] },
+      { "from": 2000, "id": "b-los-angeles-clippers", "name": "Los Angeles Clippers" }
+    ],
+    "LAL": [
+      { "from": 1981, "to": 1988, "id": "b-los-angeles-lakers", "name": "Los Angeles Lakers", "city": "Inglewood", "arena": "The Forum", "home": [-118.342, 33.9582] },
+      { "from": 1989, "to": 1999, "id": "b-los-angeles-lakers", "name": "Los Angeles Lakers", "city": "Inglewood", "arena": "Great Western Forum", "home": [-118.342, 33.9582] },
+      { "from": 2000, "id": "b-los-angeles-lakers", "name": "Los Angeles Lakers" }
+    ],
+    "VAN": [{ "from": 1996, "to": 2001, "id": "b-vancouver-grizzlies", "name": "Vancouver Grizzlies", "city": "Vancouver", "arena": "General Motors Place", "home": [-123.1089, 49.2778] }],
     "MEM": [{ "from": 2002, "id": "b-memphis-grizzlies", "name": "Memphis Grizzlies" }],
-    "MIA": [{ "id": "b-miami-heat", "name": "Miami Heat" }],
-    "MIL": [{ "id": "b-milwaukee-bucks", "name": "Milwaukee Bucks" }],
-    "MIN": [{ "id": "b-minnesota-timberwolves", "name": "Minnesota Timberwolves" }],
+    "MIA": [
+      { "from": 1989, "to": 1999, "id": "b-miami-heat", "name": "Miami Heat", "city": "Miami", "arena": "Miami Arena", "home": [-80.1956, 25.7808] },
+      { "from": 2000, "id": "b-miami-heat", "name": "Miami Heat" }
+    ],
+    "MIL": [
+      { "from": 1981, "to": 1988, "id": "b-milwaukee-bucks", "name": "Milwaukee Bucks", "city": "Milwaukee", "arena": "MECCA Arena", "home": [-87.9169, 43.0422] },
+      { "from": 1989, "to": 1999, "id": "b-milwaukee-bucks", "name": "Milwaukee Bucks", "city": "Milwaukee", "arena": "Bradley Center", "home": [-87.9169, 43.0436] },
+      { "from": 2000, "id": "b-milwaukee-bucks", "name": "Milwaukee Bucks" }
+    ],
+    "MIN": [
+      { "from": 1990, "to": 1990, "id": "b-minnesota-timberwolves", "name": "Minnesota Timberwolves", "city": "Minneapolis", "arena": "Hubert H. Humphrey Metrodome", "home": [-93.2581, 44.9739] },
+      { "from": 1991, "to": 1999, "id": "b-minnesota-timberwolves", "name": "Minnesota Timberwolves", "city": "Minneapolis", "arena": "Target Center", "home": [-93.2761, 44.9794] },
+      { "from": 2000, "id": "b-minnesota-timberwolves", "name": "Minnesota Timberwolves" }
+    ],
     "NOH": [
       { "from": 2003, "to": 2005, "id": "b-new-orleans-hornets", "name": "New Orleans Hornets", "city": "New Orleans", "arena": "New Orleans Arena", "home": [-90.0819, 29.9489] },
       { "from": 2006, "to": 2007, "id": "b-new-orleans-oklahoma-city-hornets", "name": "New Orleans/Oklahoma City Hornets", "city": "Oklahoma City", "arena": "Ford Center", "home": [-97.5151, 35.4634] },
       { "from": 2008, "to": 2013, "id": "b-new-orleans-hornets", "name": "New Orleans Hornets", "city": "New Orleans", "arena": "New Orleans Arena", "home": [-90.0819, 29.9489] }
     ],
     "NOP": [{ "from": 2014, "id": "b-new-orleans-pelicans", "name": "New Orleans Pelicans" }],
-    "NYK": [{ "id": "b-new-york-knicks", "name": "New York Knicks" }],
-    "SEA": [{ "to": 2008, "id": "b-seattle-supersonics", "name": "Seattle SuperSonics", "city": "Seattle", "arena": "KeyArena", "home": [-122.354, 47.622] }],
+    "NYK": [
+      { "from": 1981, "to": 1999, "id": "b-new-york-knicks", "name": "New York Knicks", "city": "New York", "arena": "Madison Square Garden", "home": [-73.9935, 40.7505] },
+      { "from": 2000, "id": "b-new-york-knicks", "name": "New York Knicks" }
+    ],
+    "SEA": [
+      { "from": 1981, "to": 1985, "id": "b-seattle-supersonics", "name": "Seattle SuperSonics", "city": "Seattle", "arena": "Kingdome", "home": [-122.3331, 47.5956] },
+      { "from": 1986, "to": 1994, "id": "b-seattle-supersonics", "name": "Seattle SuperSonics", "city": "Seattle", "arena": "Seattle Center Coliseum", "home": [-122.3542, 47.6222] },
+      { "from": 1995, "to": 1995, "id": "b-seattle-supersonics", "name": "Seattle SuperSonics", "city": "Tacoma", "arena": "Tacoma Dome", "home": [-122.4267, 47.2367] },
+      { "from": 1996, "to": 2008, "id": "b-seattle-supersonics", "name": "Seattle SuperSonics", "city": "Seattle", "arena": "KeyArena", "home": [-122.354, 47.622] }
+    ],
     "OKC": [{ "from": 2009, "id": "b-oklahoma-city-thunder", "name": "Oklahoma City Thunder" }],
-    "ORL": [{ "id": "b-orlando-magic", "name": "Orlando Magic" }],
-    "PHI": [{ "id": "b-philadelphia-76ers", "name": "Philadelphia 76ers" }],
-    "PHX": [{ "id": "b-phoenix-suns", "name": "Phoenix Suns" }],
-    "POR": [{ "id": "b-portland-trail-blazers", "name": "Portland Trail Blazers" }],
-    "SAC": [{ "id": "b-sacramento-kings", "name": "Sacramento Kings" }],
-    "SAS": [{ "id": "b-san-antonio-spurs", "name": "San Antonio Spurs" }],
-    "TOR": [{ "id": "b-toronto-raptors", "name": "Toronto Raptors" }],
-    "UTA": [{ "id": "b-utah-jazz", "name": "Utah Jazz" }],
-    "WAS": [{ "id": "b-washington-wizards", "name": "Washington Wizards" }]
+    "ORL": [
+      { "from": 1990, "to": 1999, "id": "b-orlando-magic", "name": "Orlando Magic", "city": "Orlando", "arena": "Orlando Arena", "home": [-81.3867, 28.5489] },
+      { "from": 2000, "id": "b-orlando-magic", "name": "Orlando Magic" }
+    ],
+    "PHI": [
+      { "from": 1981, "to": 1994, "id": "b-philadelphia-76ers", "name": "Philadelphia 76ers", "city": "Philadelphia", "arena": "The Spectrum", "home": [-75.1711, 39.9042] },
+      { "from": 1995, "to": 1996, "id": "b-philadelphia-76ers", "name": "Philadelphia 76ers", "city": "Philadelphia", "arena": "CoreStates Spectrum", "home": [-75.1711, 39.9042] },
+      { "from": 1997, "to": 1998, "id": "b-philadelphia-76ers", "name": "Philadelphia 76ers", "city": "Philadelphia", "arena": "CoreStates Center", "home": [-75.172, 39.9012] },
+      { "from": 1999, "to": 1999, "id": "b-philadelphia-76ers", "name": "Philadelphia 76ers", "city": "Philadelphia", "arena": "First Union Center", "home": [-75.172, 39.9012] },
+      { "from": 2000, "id": "b-philadelphia-76ers", "name": "Philadelphia 76ers" }
+    ],
+    "PHX": [
+      { "from": 1981, "to": 1992, "id": "b-phoenix-suns", "name": "Phoenix Suns", "city": "Phoenix", "arena": "Arizona Veterans Memorial Coliseum", "home": [-112.0967, 33.4694] },
+      { "from": 1993, "to": 1999, "id": "b-phoenix-suns", "name": "Phoenix Suns", "city": "Phoenix", "arena": "America West Arena", "home": [-112.0714, 33.4458] },
+      { "from": 2000, "id": "b-phoenix-suns", "name": "Phoenix Suns" }
+    ],
+    "POR": [
+      { "from": 1981, "to": 1995, "id": "b-portland-trail-blazers", "name": "Portland Trail Blazers", "city": "Portland", "arena": "Memorial Coliseum", "home": [-122.6694, 45.5322] },
+      { "from": 1996, "to": 1999, "id": "b-portland-trail-blazers", "name": "Portland Trail Blazers", "city": "Portland", "arena": "Rose Garden", "home": [-122.6667, 45.5317] },
+      { "from": 2000, "id": "b-portland-trail-blazers", "name": "Portland Trail Blazers" }
+    ],
+    "KCK": [{ "from": 1981, "to": 1985, "id": "b-kansas-city-kings", "name": "Kansas City Kings", "city": "Kansas City", "arena": "Kemper Arena", "home": [-94.6058, 39.0919] }],
+    "SAC": [
+      { "from": 1986, "to": 1988, "id": "b-sacramento-kings", "name": "Sacramento Kings", "city": "Sacramento", "arena": "ARCO Arena (I)", "home": [-121.4985, 38.6473] },
+      { "from": 1989, "to": 1999, "id": "b-sacramento-kings", "name": "Sacramento Kings", "city": "Sacramento", "arena": "ARCO Arena (II)", "home": [-121.5181, 38.6492] },
+      { "from": 2000, "id": "b-sacramento-kings", "name": "Sacramento Kings" }
+    ],
+    "SAS": [
+      { "from": 1981, "to": 1993, "id": "b-san-antonio-spurs", "name": "San Antonio Spurs", "city": "San Antonio", "arena": "HemisFair Arena", "home": [-98.4833, 29.4201] },
+      { "from": 1994, "to": 1999, "id": "b-san-antonio-spurs", "name": "San Antonio Spurs", "city": "San Antonio", "arena": "Alamodome", "home": [-98.4789, 29.4169] },
+      { "from": 2000, "id": "b-san-antonio-spurs", "name": "San Antonio Spurs" }
+    ],
+    "TOR": [
+      { "from": 1996, "to": 1998, "id": "b-toronto-raptors", "name": "Toronto Raptors", "city": "Toronto", "arena": "SkyDome", "home": [-79.3892, 43.6414] },
+      { "from": 1999, "to": 1999, "id": "b-toronto-raptors", "name": "Toronto Raptors", "city": "Toronto", "arena": "Air Canada Centre", "home": [-79.3792, 43.6433] },
+      { "from": 2000, "id": "b-toronto-raptors", "name": "Toronto Raptors" }
+    ],
+    "UTA": [
+      { "from": 1981, "to": 1991, "id": "b-utah-jazz", "name": "Utah Jazz", "city": "Salt Lake City", "arena": "Salt Palace", "home": [-111.895, 40.766] },
+      { "from": 1992, "to": 1999, "id": "b-utah-jazz", "name": "Utah Jazz", "city": "Salt Lake City", "arena": "Delta Center", "home": [-111.9011, 40.7683] },
+      { "from": 2000, "id": "b-utah-jazz", "name": "Utah Jazz" }
+    ],
+    "WSB": [
+      { "from": 1981, "to": 1993, "id": "b-washington-bullets", "name": "Washington Bullets", "city": "Landover", "arena": "Capital Centre", "home": [-76.8469, 38.9025] },
+      { "from": 1994, "to": 1996, "id": "b-washington-bullets", "name": "Washington Bullets", "city": "Landover", "arena": "USAir Arena", "home": [-76.8469, 38.9025] },
+      { "from": 1997, "to": 1997, "id": "b-washington-bullets", "name": "Washington Bullets", "city": "Landover", "arena": "US Airways Arena", "home": [-76.8469, 38.9025] }
+    ],
+    "WAS": [
+      { "from": 1998, "to": 1999, "id": "b-washington-wizards", "name": "Washington Wizards", "city": "Washington", "arena": "MCI Center", "home": [-77.0208, 38.8981] },
+      { "from": 2000, "id": "b-washington-wizards", "name": "Washington Wizards" }
+    ]
   },
   "maps": [
+    { "id": "nba1984", "seasons": [1984] },
+    { "id": "nba1992", "seasons": [1992] },
+    { "id": "nba1999", "seasons": [1999] },
     { "id": "nba2000", "seasons": [2000, 2001] },
     { "id": "nba2002", "seasons": [2002] },
     { "id": "nba2003", "seasons": [2003, 2004] },
     { "id": "nba2005", "seasons": [2005] },
     { "id": "nba2006", "seasons": [2006, 2007] },
     { "id": "nba2008", "seasons": [2008] },
-    { "id": "nba2009", "seasons": [2009, 2010, 2011] },
+    { "id": "nba2009", "seasons": [2009, 2010, 2011, 2012] },
     { "id": "nba2013", "seasons": [2013] },
     { "id": "nba2014", "seasons": [2014] },
     { "id": "nba", "seasons": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026] }

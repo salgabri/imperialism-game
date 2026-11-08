@@ -75,10 +75,11 @@ most of the 170 nations. EA counts are nations able to field a natural
 | 2006 | CM0102 Sep 2005 (Helvete) | **Shipping, nations only:** FIFA 06: `daguizer`, no nationality or club; nationalities from later editions and Wikidata ([football-years.md](football-years.md#fifa-05-and-fifa-06)). 54 nations | PES 5 (52 nations) | results/Elo, Wikidata |
 | 2005 | CM0102 Oct 2004 (Sawczuk): listed in an offline archive, file not found | **Shipping, nations only:** FIFA 05: as FIFA 06. 54 nations | — | results/Elo, Wikidata |
 | 2004 | CM0102 Oct 2003 (Sawczuk) | — | — | results/Elo, Wikidata |
-| 2003 | SI's own CM 01/02 3.9.68 database (2002/03) | — | — | results/Elo, Wikidata |
-| 2002 | SI's own CM 01/02 3.9.60 / 3.9.65 database (2001/02) | — | — | results/Elo, Wikidata |
-| 1999–2001 | CM0102 retro: 98/99 (ported from SI's CM3), 99/00, 00/01; World Cup 1998 pack (32 nations) | Road to World Cup 98 had 172 national teams, but only inside the game files | — | results/Elo, Wikidata, World Cup squads |
-| 1997 | **SWOS 96/97**: 143 national squads of 16, 129 of our nations, all can field a natural 4-4-2 | — | — | as above |
+| 2003 | **Shipping:** SI's own CM 01/02 3.9.68 database (2002/03), from the CM0102 Starter Kit ([football-years.md](football-years.md#seasons-before-fifa-05)) | — | — | results/Elo, Wikidata |
+| 2002 | **Shipping:** SI's own CM 01/02 3.9.60 database (2001/02; 3.9.65 too) | — | — | results/Elo, Wikidata |
+| 1999–2001 | **Shipping 1999:** SI's CM3 data ported to CM 01/02 (Cam F; Starter Kit). CM0102 retro 99/00, 00/01 need their own executables; World Cup 1998 pack (32 nations) | Road to World Cup 98 had 172 national teams, but only inside the game files | — | results/Elo, Wikidata, World Cup squads |
+| 1998 | **Shipping:** SI's CM 97/98 database as baskeyx extracted it to JSON (2026; tool and game version unstated) | — | Winning Eleven 4 (53 nations, spring 1999: a cross-check only) | as above |
+| 1997 | **Shipping, nations only:** SWOS 96/97: 143 national squads of 16, 133 of our nations, all field a natural 4-4-2 | — | — | as above |
 | 1994–1996 | CM0102 retro: 93/94 (from SI's CM3, 16 nations' leagues), 94/95, 95/96 (from SI's CM2) | — | SWOS 94/95, 95/96 only as game disk images (not usable) | as above |
 | 1985–1993 | **CM0102 1984/85 Retro Update**: 72,015 players, 186 nationalities, 137 of our nations with 11+ players (after USSR/Yugoslavia/Czechoslovakia merges). Also 89/90, 91/92 | — | — | as above |
 | 1966–1984 | CM0102 65/66 (work in progress, ~10% of 21k players rated), 77/78 (creates new players), 81/82; FM throwbacks (2–15 nations) | — | — | results/Elo (118 nations active by 1970); Wikidata XIs for ~33 nations in 1970 |

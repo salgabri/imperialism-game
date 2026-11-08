@@ -4,11 +4,12 @@
 //                                         docs/design/baseball-seasons-audit.json
 //   npm run build:mlb-seasons -- --check  builds every file and compares it byte for byte, writes nothing
 //
-// Each season is one edition's committed snapshot (scripts/data/mlb-the-show-<nn>.json, npm run sync:mlb-the-show --
-// --edition=<nn>), the edition's last roster update: its MLB clubs and its nations by birthplace, built by the same
-// rules as the built-in season (scripts/lib/mlb.mjs). The teams are today's (scripts/data/mlb-teams.json) but for the
-// eras scripts/data/mlb-seasons.json names; each season names the era map its clubs play on, which npm run
-// build:mlb-map builds from the same manifest. Every rating is The Show's, unchanged.
+// Each season is one edition's committed snapshot (scripts/data/mlb-the-show-<nn>.json: npm run sync:mlb-the-show --
+// --edition=<nn> from Sony's API, or npm run import:mlb-showzone for the editions only ShowZone keeps), the edition's
+// last roster update: its MLB clubs and its nations by birthplace, built by the same rules as the built-in season
+// (scripts/lib/mlb.mjs). The teams are today's (scripts/data/mlb-teams.json) but for the eras
+// scripts/data/mlb-seasons.json names; each season names the era map its clubs play on, which npm run build:mlb-map
+// builds from the same manifest. Every rating is The Show's, unchanged.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -16,60 +17,65 @@ import path from 'node:path';
 import { HOME_NATIONS } from '../src/data/teams.js';
 import { CLUBS } from '../src/data/clubs.baseball.js';
 import { contentHash, serializeFootballSet } from '../src/data/footballSetBuild.js';
-import { checkTeams, clubsOf, colourFor, editionOf, mapOf, nationOfBirthplace, nationsOf, playerOf, seasonIdOf, teamsOf, tupleOf } from './lib/mlb.mjs';
+import {
+  checkTeams, clubsOf, colourFor, editionOf, mapOf, nationOfBirthplace, nationsOf, nearestBirthplace, playerOf, seasonIdOf, teamsOf,
+  trustsBirthplace, tupleOf,
+} from './lib/mlb.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outDir = path.join(root, 'public/baseball');
 const listingFile = path.join(root, 'src/data/baseballSeasons.js');
 const auditFile = path.join(root, 'docs/design/baseball-seasons-audit.json');
-
-
-/** A name as editions may spell it differently: no accents, case or punctuation ("Germán Márquez", "German Marquez"). */
-const plain = name => name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z ]/g, '').replace(/s+/g, ' ').trim();
+const birthplacesFile = 'scripts/data/mlb-birthplaces.json';
 
 /**
- * A birthplace for `name` from the edition nearest `year` that gives one the game knows, earlier first, or null. Only
- * editions whose birthplaces are sound are asked (scripts/data/mlb-seasons.json `unreliableBirthplaces`).
+ * Season `year`: its data set document and its audit row. `birthplaces` holds MLB's own answers for the cards of the
+ * seasons scripts/data/mlb-seasons.json `statsApi.for` names (scripts/data/mlb-birthplaces.json).
  */
-function nearestBirthplace(snapshots, year, name, unreliable) {
-  const key = plain(name);
-  for (let d = 1; d <= 10; d++) {
-    for (const other of [year - d, year + d]) {
-      if (unreliable[other]) continue;
-      const row = snapshots.get(other)?.players.find(p => plain(p[1]) === key && nationOfBirthplace(p[6]));
-      if (row) return { born: row[6], from: other };
-    }
-  }
-  return null;
-}
-
-/** Season `year`: its data set document and its audit row. */
-function buildSeason(snapshot, year, manifest, franchises, snapshots) {
+function buildSeason(snapshot, year, manifest, franchises, snapshots, birthplaces) {
   const { source } = snapshot;
   if (Number(source.season) !== year) throw new Error(`scripts/data/mlb-the-show-${editionOf(year)}.json is the ${source.season} season`);
   // A club that kept its id keeps its colour; one of another era takes its own.
   const colours = new Map(CLUBS.map(club => [club.id, club.col]));
   const teams = teamsOf(franchises, manifest, year).map(team => ({ ...team, col: colours.get(team.id) ?? colourFor(team.id) }));
   checkTeams(snapshot, teams);
-  // A card names a place the game does not know, or (in an edition whose foreign birthplaces are wrong) any place
-  // outside the United States: the player takes his birthplace from the nearest sound edition, else plays for no nation.
+  // A card names no place the game knows, or (in an edition whose foreign birthplaces are wrong) a place outside the
+  // United States: the player takes his birthplace from the nearest sound edition, else (in a season MLB's own records
+  // were asked for) from those, else plays for no nation.
   const unreliable = manifest.unreliableBirthplaces || {};
-  const filled = [], unplaced = [];
+  const asked = manifest.statsApi?.for.includes(year) ? birthplaces.seasons[year] ?? {} : null;
+  const filled = [], fromMlb = [], unplaced = [];
+  let answered = 0;
   const players = snapshot.players.map(row => {
-    const [, name, , , , , born] = row;
-    const nation = nationOfBirthplace(born);
-    if (nation && (nation === '840' || !unreliable[year])) return playerOf(row);
-    const near = nearestBirthplace(snapshots, year, name, unreliable);
-    if (near) filled.push(`${name}: ${JSON.stringify(born)} → ${near.born} (MLB The Show ${editionOf(near.from)})`);
-    else unplaced.push(`${name}: ${JSON.stringify(born)}`);
-    return playerOf([...row.slice(0, 6), near?.born ?? ''], () => null);
+    const [uuid, name, , , , , born] = row;
+    if (trustsBirthplace(born, year, unreliable)) return playerOf(row);
+    const near = nearestBirthplace(snapshots, year, row, unreliable);
+    if (near) {
+      filled.push(`${name}: ${JSON.stringify(born)} → ${near.born} (MLB The Show ${editionOf(near.from)})`);
+      return playerOf([...row.slice(0, 6), near.born]);
+    }
+    const answer = asked?.[uuid];
+    if (asked && !answer) throw new Error(`${source.edition}: ${birthplacesFile} has no answer for ${name} (${uuid}): run npm run sync:mlb-birthplaces`);
+    if (answer) answered++;
+    const [, place, id, reason] = answer ?? [];
+    if (place && nationOfBirthplace(place)) {
+      fromMlb.push(`${name}: ${JSON.stringify(born)} → ${place} (MLB player ${id}, ${reason})`);
+      return playerOf([...row.slice(0, 6), place]);
+    }
+    unplaced.push(`${name}: ${JSON.stringify(born)}${answer ? ` (MLB's records: ${place ?? reason})` : ''}`);
+    return playerOf([...row.slice(0, 6), ''], () => null);
   });
+  if (asked && answered !== Object.keys(asked).length) {
+    throw new Error(`${source.edition}: ${birthplacesFile} answers for cards the build places otherwise: run npm run sync:mlb-birthplaces`);
+  }
   const clubs = clubsOf(players, teams);
   const nations = nationsOf(players);
   const update = `Roster update ${source.rosterUpdate.id} (${source.rosterUpdate.name})`;
   const doc = {
     format: 1, kind: 'show', id: seasonIdOf(year), version: '', year, season: String(year), label: source.edition, local: false,
-    source: { provider: manifest.source.provider, edition: source.edition, update, retrieved: source.retrieved, url: source.url, rawScale: 99 },
+    source: { provider: manifest.source.provider, edition: source.edition, update, retrieved: source.retrieved, url: source.url, rawScale: 99,
+      // An edition whose own API is gone names the site that keeps its cards.
+      ...(source.compiler ? { compiler: source.compiler } : {}) },
     map: mapOf(manifest, year),
     nations: Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]])),
     clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'MLB', country: '840', col: c.col, str: c.str, squad: c.squad.map(tupleOf) })),
@@ -82,7 +88,7 @@ function buildSeason(snapshot, year, manifest, franchises, snapshots) {
     id: doc.id, version: doc.version, edition: source.edition, update, retrieved: source.retrieved, cards: snapshot.players.length, map: doc.map,
     clubs: clubs.map(c => `${c.name} ${c.str}`),
     nations: nations.map(n => `${n.name} ${n.str} (${n.squad.length}${n.open.length ? `; the game fills ${n.open.join(' ')}` : ''})`),
-    birthplacesFromOtherEditions: filled, noNation: unplaced,
+    birthplacesFromOtherEditions: filled, ...(asked ? { birthplacesFromMlb: fromMlb } : {}), noNation: unplaced,
   };
   return { doc, text: serializeFootballSet(doc), audit };
 }
@@ -112,7 +118,8 @@ async function main() {
     if (!existsSync(file)) throw new Error(`No snapshot for ${year}: run npm run sync:mlb-the-show -- --edition=${editionOf(year)}`);
     snapshots.set(year, JSON.parse(await readFile(file, 'utf8')));
   }
-  const results = manifest.seasons.map(year => buildSeason(snapshots.get(year), year, manifest, franchises, snapshots));
+  const birthplaces = JSON.parse(await readFile(path.join(root, birthplacesFile), 'utf8'));
+  const results = manifest.seasons.map(year => buildSeason(snapshots.get(year), year, manifest, franchises, snapshots, birthplaces));
   results.sort((a, b) => b.doc.year - a.doc.year);
   for (const { doc, text, audit } of results) {
     console.log(`${doc.id} ${doc.season} on ${doc.map}: ${doc.clubs.length} clubs, ${audit.nations.length} nations from ${audit.cards} cards, `

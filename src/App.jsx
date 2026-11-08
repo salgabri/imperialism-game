@@ -10,7 +10,7 @@ import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomestic
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel, isCountryScope } from './data/domesticScope.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
-  loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setSportOf, sportOf } from './engine/footballSets.js';
+  loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setHasNations, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport, matchSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
@@ -800,10 +800,10 @@ export default class App extends React.Component {
       // Country and Europe maps come with football data only (basketball clubs take the NBA's map below, in setClubScope).
       if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
-      // A data set plays in its own sport and brings its own clubs. A basketball season has clubs only: choosing it
-      // takes the clubs, and choosing nations goes back to the built-in season.
+      // A data set plays in its own sport and brings its own clubs. A season with clubs only (an NBA season) takes the
+      // clubs, and choosing nations goes back to the built-in season.
       if (setup.dataSet != null && setSportOf(setup.dataSet) !== getSport(setup.sport).id) setup.dataSet = null;
-      if (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball') {
+      if (setup.dataSet != null && !setHasNations(setup.dataSet)) {
         if (key === 'layer' && value !== 'clubs') setup.dataSet = null;
         else setup.layer = 'clubs';
       }

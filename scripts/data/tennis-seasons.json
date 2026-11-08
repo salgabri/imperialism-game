@@ -1,0 +1,1071 @@
+{
+  "about": "Tennis's earlier seasons (docs/design/tennis.md, \"Earlier seasons\"): Tennis Abstract's own year-end Elo reports for 2016-2025, archived by the Wayback Machine, and year-end Elo computed from Jeff Sackmann's ATP match results by Tennis Abstract's published method for 1973-2015. npm run sync:tennis-seasons rebuilds scripts/data/tennis-seasons/ from the pinned inputs (cached in the ignored data-src/tennis-seasons/); npm run build:tennis-seasons builds the season files from there.",
+  "licence": {
+    "name": "CC BY-NC-SA 4.0",
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "credit": "Jeff Sackmann / Tennis Abstract",
+    "terms": "Attribution, non-commercial use only, derived data shared alike. The match results and Tennis Abstract's Elo reports are Jeff Sackmann's; the ratings computed here from his results are derived data under the same licence."
+  },
+  "archive": {
+    "name": "Jeff Sackmann's ATP match results (tennis_atp)",
+    "author": "Jeff Sackmann / Tennis Abstract",
+    "repository": "https://github.com/Kadantte/tennis_atp",
+    "commit": "712be0c5ade693cdab9e69c23a71a0edf5a23c44",
+    "raw": "https://raw.githubusercontent.com/Kadantte/tennis_atp/712be0c5ade693cdab9e69c23a71a0edf5a23c44/",
+    "upstream": "https://github.com/JeffSackmann/tennis_atp",
+    "note": "A fork of Jeff Sackmann's repository, last committed by him on 2026-06-08 (\"thru 8 jun 2026\"); the same files are mirrored byte for byte at https://huggingface.co/datasets/Aneeshers/tennis-sackmann-archive (revision 8ac86f7c62889b5d5c4cfec4c6403edcb8c5d993, atp/).",
+    "retrieved": "2026-11-08",
+    "files": {
+      "atp_matches_1968.csv": "5c2b13de739adc7f8d5c17df583fc90f81584da97897d6da189ca73820cca3aa",
+      "atp_matches_1969.csv": "3f67c7c5c1e35479c1030cf03839613133948bb16f11d21e3ec6eaa7d9f00345",
+      "atp_matches_1970.csv": "4de43ab8539a6de62622ddfc13f74ad547cd059be81873b18c329791b91bb1ea",
+      "atp_matches_1971.csv": "a51ce273fb3c4d50f71d41fd4274fe76208989e5cbe0f4828c47e5ac2c2d8571",
+      "atp_matches_1972.csv": "90c052854e14d3c5bd13a29a18e684be643cab5e2545e58e5527c8661878a39b",
+      "atp_matches_1973.csv": "b621123fadb7c3c2f7a44e83e0c6f9bcf30d77664dd8155933cf38f6bfb56ac1",
+      "atp_matches_1974.csv": "a38920e4bc2c68705c2708213c46d655f4f2b2aae7c512bdd056882d7d36cf41",
+      "atp_matches_1975.csv": "a97cb95b0b37c985cba88c4a128a4d4fa2ceb0857786b4e9bebf326931d3d3ec",
+      "atp_matches_1976.csv": "f608384b2f7021f41b7d8908dfbb1cfcac96ef0ee95b7e053210dc2bd04e5d2a",
+      "atp_matches_1977.csv": "b54f4e514b0eb365fdafe5a4827d9fe146e5ef8b0e13cf14574e48ad0c21bfed",
+      "atp_matches_1978.csv": "6b42b2859965c4a13172d17d7763c797311d75d9f98eb6c2b94ae18d2e8864e7",
+      "atp_matches_1979.csv": "43a17fe1a399135a0f3227f88fedc8b61e0f9157400d559c218dd2fb918b168b",
+      "atp_matches_1980.csv": "1affa2bd0d0606622968258269580ddefcf8c8831c5e168c37e8e92426bac297",
+      "atp_matches_1981.csv": "30daad41e573c1c48d59fa4164e25768f9d1f9b1e07f598e5c064e7d685fd9b7",
+      "atp_matches_1982.csv": "5542264542e6e0f088ad8e40f7d2e9a92c2a4ee56e8afba46c368d46628f0ebf",
+      "atp_matches_1983.csv": "2e717cf01f6e24d1628a878f67a1d0bf5351dd0e2872517a7e73c69d5dc80c19",
+      "atp_matches_1984.csv": "f96b0d5cbefb55f96a87abd835e5af0fe5dce4fdd8491639d205b89eed3a2b05",
+      "atp_matches_1985.csv": "6932e7ff50c2dd6a3898fa3f3ca7af0f76e4e45dc0522a6868319e235cb7e989",
+      "atp_matches_1986.csv": "0344ad27eb92de134ec59ede2a9ab436aabcaddc11daa49887e23f0e7b11ce44",
+      "atp_matches_1987.csv": "4f8c2947b0ae305d9afbedad7ae44b82ce426cd5d5b8b2835778073fd721febb",
+      "atp_matches_1988.csv": "7da1eb2691c5a992648529f89d6564a685baf7150d37a0143d5599a9f3f48fd7",
+      "atp_matches_1989.csv": "f059a3423e2bb986215311a2ec9cac3f4bab9a76bd1167be711de37470d977e9",
+      "atp_matches_1990.csv": "4c65abf16c98f1a96634bdc464961f058555677539203cd23b50031155fa037c",
+      "atp_matches_1991.csv": "8366632e1d874fcfb700017d8ff8bf59fe05e25e44ca86dfcfb314a198d303a0",
+      "atp_matches_1992.csv": "b2ede0ff352a34e59b9cdc0e2a7c9af764a6fe6ac7326a09c4c923f5736b7922",
+      "atp_matches_1993.csv": "4620a9807ae69e2e04bad72a1c26c2994f8d20cbbe7a2933d4e533cf2d9fc43b",
+      "atp_matches_1994.csv": "e8c577594c4495945d337d95b44ca5a8441c952eb693f7e6c9bcb61bb762580e",
+      "atp_matches_1995.csv": "d480e93dc75e4631d4811edc1f98c168f9e80f8eab8ab2eb6040a22bda7b3b21",
+      "atp_matches_1996.csv": "0e8fd6303e8a2f400a4a6f3ebc5aa04200e4d31bffd18593c815688d01e6052b",
+      "atp_matches_1997.csv": "74f69b97695a85e97a1e905244ca2e0f872c9ecc56862f5e595c612a3c656796",
+      "atp_matches_1998.csv": "396ad4be1a5843badd0c6a5ffee976cabbf43be865ce859a295b82ae403f9164",
+      "atp_matches_1999.csv": "bf864d0c188947369fa8f2e280ab571fc43b9db2e9e657d29e03683b4dbd26a4",
+      "atp_matches_2000.csv": "a2176b0d9e70f238536d0a2d0957bc54dc1bfbfb47c368d8f3cbe28457b5ebe4",
+      "atp_matches_2001.csv": "b07bcb7e7239fb451eae6b4e99ef9a0c892083a21185405c8627d5edc9a113be",
+      "atp_matches_2002.csv": "d161c2ef78158d167372ebc38b7eea2038c5b9e42bbb4b2804d8c19540c33adf",
+      "atp_matches_2003.csv": "387a1dec62d014fdf5c7dc83329b87c3a4041fc4ebf8a25b19352c82d1f67c31",
+      "atp_matches_2004.csv": "79251fec7d9751ea2eebb005a962f69fea466f827172d53f47b381aac53634af",
+      "atp_matches_2005.csv": "7ab77584b319b65830d4b5c988cf8349d14a7a4e867633e9717801f8d9b97b27",
+      "atp_matches_2006.csv": "c7f28866e127c665072ed6e4a8fc5812cd82f804660fbdd37e8b00063d1b8f53",
+      "atp_matches_2007.csv": "d392402109561d6d3e19fd41dc8cc3a3f72ccb52d3988edbe7c18cc47b603db0",
+      "atp_matches_2008.csv": "6725bd6e56d32538282e5a77bd30a2502014917138df180dce9259c535a93310",
+      "atp_matches_2009.csv": "bab7523386fddcaeb684b2b354016075d035516e65c2f54d3e1d23c3a8fe22f9",
+      "atp_matches_2010.csv": "135a4a1e2ab69c33318b6e5ad59efc67cc5358629b15bf28fb2f905d48f7aeb0",
+      "atp_matches_2011.csv": "8e91e4b680f0b4e9605a3c71b4c676b55e2a102de8544a7d3b2fbaca5977575a",
+      "atp_matches_2012.csv": "03f03612691af370c9c47939dde4202d9858e05ea044367388115e627d4d13f3",
+      "atp_matches_2013.csv": "9e1e3b124ac22c1b840118f78475a910cb2ea68684289581f70b54a022f2832c",
+      "atp_matches_2014.csv": "7c102ee3b0da1fee59edc6a5f280eb0784ac0bad69988583f65791dcb7084177",
+      "atp_matches_2015.csv": "20c1f723df86b367f3ec205bbda3d8a7163fa6d4e46dcfda15095e24965bc5ed",
+      "atp_matches_2016.csv": "86dda3871cb79d3226a047774c8fc97b86267cfe96709dea832a347dfbf81684",
+      "atp_matches_2017.csv": "4bb295788c37487b120cd39171d413cef0ebc6f4c2d9fa40b7261f5143f3719f",
+      "atp_matches_2018.csv": "0363dc6012190f337fcf34b4ca443634f192c4670cc6c14c94342a54b9adf7eb",
+      "atp_matches_2019.csv": "7f1a21451ff622bb0c6a09690898db46d51e59dcdf08086d369753822e1d5478",
+      "atp_matches_2020.csv": "985a917b72d5efb7dd5ef9df8ecc58c637ed6b88561ccad364653af71ac12da0",
+      "atp_matches_2021.csv": "b9b1d31a4b0b9273b8f338cbb1347c5a847ad2361334ec760a286f5990fba347",
+      "atp_matches_2022.csv": "7190042565ab8400e74f44fda60700acb36ddf3c82d393f331a07589e05b5f52",
+      "atp_matches_2023.csv": "9b9671aa7c8156e74c2e4466675b7ed4e762bb8a58b7237a30daefd84ffceff5",
+      "atp_matches_2024.csv": "73aec32247a0db68d8aa8fd8003eefea132905177f1cb145502d9215b53311be",
+      "atp_matches_2025.csv": "78c356ef9328b89ae58a17564d61c02cdad2a3a007f6b8af5cfc17992b11bb2d",
+      "atp_matches_qual_chall_1978.csv": "94847ef917074aba7233689c976edcaed94e976ebec962d21e4d5de8c6ee5aaf",
+      "atp_matches_qual_chall_1979.csv": "1af18d1b769752a318e15c71551d4080a749ccaa5e4823fa66dde3f5edee211a",
+      "atp_matches_qual_chall_1980.csv": "4b61e21127f8f4d635fa5e8b8fb00029cf7632d15ea374c09ed983b46f21602c",
+      "atp_matches_qual_chall_1981.csv": "99ab0e59c50084b7f74abfa6aed21d6f22ead7310ab19089cd6336d96a567212",
+      "atp_matches_qual_chall_1982.csv": "32951fed4f7c700ff24425dce492a7a3821f402c430502473a97308e2d371f39",
+      "atp_matches_qual_chall_1983.csv": "31691d349dfeb8a199490aacaf2ee01c2119ed186561cda3f27dc9adacbcbe2e",
+      "atp_matches_qual_chall_1984.csv": "7a92f259babbdf9e21019ad56f7c78e2db528ffc6cb1de18a7ec65f24e041a21",
+      "atp_matches_qual_chall_1985.csv": "3f138c6b733caae2d2d6ee917ed7b3eea9870dc7f8aabdbce9da3f335b6588c4",
+      "atp_matches_qual_chall_1986.csv": "e57e4a81431095897d647595892caa00d6a47f3e810db00419b0d3e9614d067a",
+      "atp_matches_qual_chall_1987.csv": "0653b8beb4333161acf04fdb014bb1b6e32947af4e064213e58c95eefbfbfd83",
+      "atp_matches_qual_chall_1988.csv": "3837fc7b56db790481cf4dc057b879558e1876f3492298ed8c169f8de73e7c25",
+      "atp_matches_qual_chall_1989.csv": "5dc9078dd039992046848ef19d96dacee715461857d3133f4992028547fa7a80",
+      "atp_matches_qual_chall_1990.csv": "0fc76651741a6f068e148bded788ca27f538ab160ff11f4dae646ab2a11ad2e6",
+      "atp_matches_qual_chall_1991.csv": "e33abab0a8a597f77616ec6b7afb37583f6d87fd8ecf5b0a2b6a90e04c62bd4b",
+      "atp_matches_qual_chall_1992.csv": "71b7da9f9d4687f6176a682b202f52c51d37a14fa0c576f6239e7ed6b7b1b60e",
+      "atp_matches_qual_chall_1993.csv": "8bbb6f99097636d4908a3592b0216866d85ce2f6814ede1075d08beed63aebb1",
+      "atp_matches_qual_chall_1994.csv": "63c8376c2b8854e3bdf1c31c4a37668577117116ac8e1dadf9274c3cedac190f",
+      "atp_matches_qual_chall_1995.csv": "31bedb8e14f4848823342d8333e1ebc6fd980f02526573f5abe7dc75d8710775",
+      "atp_matches_qual_chall_1996.csv": "720e15e0bc13839c2fca7c542723bd758c1439364011083b81aacb67b8c91060",
+      "atp_matches_qual_chall_1997.csv": "b39bf71c8f10327e81f3b2b8dd36f9ad84a18c1b11728c31b0f00db4d5bc97f1",
+      "atp_matches_qual_chall_1998.csv": "c8a553b190005aca4b10a84483651ca9b3b62b92087d6223d57ca8f41caef56d",
+      "atp_matches_qual_chall_1999.csv": "8b9c0f0173cd001a3bc2bf15d1ddbda48dd1e4119968bc33f6774abd909a56b5",
+      "atp_matches_qual_chall_2000.csv": "751b423294f230c0a5b908bb2a832d2032a30fe02e743eaf2cb71069fbd4197e",
+      "atp_matches_qual_chall_2001.csv": "0a2b4dd1fda9c7735ff295b1b49324cd48852c7ed4c749f767dfc1d3c924db27",
+      "atp_matches_qual_chall_2002.csv": "76fd1722bf35461b8d530a8ed51a3b739ac27ae9e395fa31833a4cdaa7f1aed0",
+      "atp_matches_qual_chall_2003.csv": "94d0d862ec04ee99152dab108223ab145da8a1216465078d016523d3b780ffb3",
+      "atp_matches_qual_chall_2004.csv": "a736687c46d40856c33c16a0810ab3f948ffbf870c440d1e8b7896d7040fa2af",
+      "atp_matches_qual_chall_2005.csv": "2c8dabeec8d49f60946f248c2deee26e90801c9b6a6b5dfb180b7186cdf92707",
+      "atp_matches_qual_chall_2006.csv": "9c904151837cf669851f8983b03e24c4838db84eadec55afaf3328e7f4a2eb33",
+      "atp_matches_qual_chall_2007.csv": "749e84ee364509ef0180c6353528ed91fe635dae71814d6b6fd8cf3fbbc728b2",
+      "atp_matches_qual_chall_2008.csv": "9b483662031686e178f19e6bc2b7dd3ed9ab13d08506f79244e1868d70ff8ec8",
+      "atp_matches_qual_chall_2009.csv": "5d19ee835d2ac89e44fe07e0e1901c9631064f1484fc34c43350adbf24b3d6db",
+      "atp_matches_qual_chall_2010.csv": "6e4fb19e4c804a1738b53e96c977d1433c2bca658892a6e097251a2501354e46",
+      "atp_matches_qual_chall_2011.csv": "0ebc07816e4a89a2f1ae22dd1f8de8eda77f77f3a19acc9d4813a56d7675e8cb",
+      "atp_matches_qual_chall_2012.csv": "0335062ddbf017df85287020a3fa2664915c24117ff2dba1abad1bbc4c65551c",
+      "atp_matches_qual_chall_2013.csv": "e7ab30100308ee6fc4c0e83e52932fe80e3e1637cb390c31b2069bb7038e33fa",
+      "atp_matches_qual_chall_2014.csv": "0df174f37440a0107e40fbffe7b4d3d3e08bdbf45bd62060d4557fc886f7ec3d",
+      "atp_matches_qual_chall_2015.csv": "204d012ef7ea277ea8ee105f0587b173094061de05e97b0a258eb81845b16303",
+      "atp_matches_qual_chall_2016.csv": "22f94c05c14cd3b0381bd52a7508145285d4d5c0e97f43da38ab14aa7cfeaa23",
+      "atp_matches_qual_chall_2017.csv": "260b1f714739a703d9e5e310d9f37cb6d599cc6d618146e144b86f9e2b79141a",
+      "atp_matches_qual_chall_2018.csv": "15a98896a98e22cde181123cb4aaec5c54c10274e4299642c67d3b1e85954986",
+      "atp_matches_qual_chall_2019.csv": "78cc93918d21c6f03657930b5a748a007c60de8c31761f5b193c236cc338f44d",
+      "atp_matches_qual_chall_2020.csv": "b80d0e4a2765402a8d14799a3433994d7d8ba10d394e28f7d2bddb85a47010df",
+      "atp_matches_qual_chall_2021.csv": "ac62e3a031aab95ee4724082c2d7a224d6d9662aad0554c8c57712004877ac0a",
+      "atp_matches_qual_chall_2022.csv": "455dd77775e3f5a5b7ece184af780ba97b548c19d9e49b2073191581443346fb",
+      "atp_matches_qual_chall_2023.csv": "cce51f50a75adc60aefdf131c7285d440605fcb0abf7d4c507f01fba689fe882",
+      "atp_matches_qual_chall_2024.csv": "714347e68ce3436e9009be1f999d0130e09eb74d5cded4ebd97974fce3e0ba6f",
+      "atp_matches_qual_chall_2025.csv": "7690c576689d9cafc28d1b9f3293173e87220573db5fd2c47e3097f2ab505ec0",
+      "atp_players.csv": "89e81bb3a02561dee29afe53dbcdabe4ae22f725fb5d0303617366a57e3b7a83"
+    }
+  },
+  "wayback": "https://web.archive.org/web/{capture}id_/{original}",
+  "reports": [
+    {
+      "season": 2016,
+      "updated": "2016-12-12",
+      "capture": "20161221012308",
+      "original": "http://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "0cbab07547fc1cedddba1427426d8d135c07f309296ed47831f9172454c2c24f",
+      "method": "pre-2018"
+    },
+    {
+      "season": 2017,
+      "updated": "2017-11-20",
+      "capture": "20171222024044",
+      "original": "http://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "5541251336b318da92daaac0a2eb5928e8e696e76db030c9dbbf453d837fec5f",
+      "method": "pre-2018",
+      "label": "Tennis Abstract Elo, through the ATP Finals",
+      "note": "Tennis Abstract did not update the report again in 2017 (the capture of 28 November is the same file): the list stops at the ATP Finals and never took in the Davis Cup final."
+    },
+    {
+      "season": 2018,
+      "updated": "2018-12-24",
+      "capture": "20181229123056",
+      "original": "http://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "b640ceb951110c4e4527baa8bcec65d9bcf9197047d11b73e9b71a79a43b55b9",
+      "method": "tour-level"
+    },
+    {
+      "season": 2019,
+      "updated": "2019-12-02",
+      "capture": "20191204231628",
+      "original": "http://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "f25c31d3d85d39db154c6edebc4c761d5729ff831798388575c6d185e7551720"
+    },
+    {
+      "season": 2020,
+      "updated": "2020-12-28",
+      "capture": "20201229101839",
+      "original": "http://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "c6ef68daf781bed69226f46976374f547f23d8ebf28cf71cceaa245652ccf733"
+    },
+    {
+      "season": 2021,
+      "updated": "2021-12-27",
+      "capture": "20211228135111",
+      "original": "http://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "c3ea5b65e0f3ea806d40d9767f7fca38cbdfe643d27b10e606b69c32ab303c46"
+    },
+    {
+      "season": 2022,
+      "updated": "2022-12-26",
+      "capture": "20221227080108",
+      "original": "http://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "b5b6ec0ef922eb14e8c8ab5c1bae60f559f3df06a6afa7738c9a48c851273aa0"
+    },
+    {
+      "season": 2023,
+      "updated": "2023-12-25",
+      "capture": "20231228000011",
+      "original": "https://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "f39c24733e69e3ebac403f2e5f0dc3805f31a474890bef1905054c4e8a569407"
+    },
+    {
+      "season": 2024,
+      "updated": "2024-12-23",
+      "capture": "20241224222727",
+      "original": "https://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "7e8cfdd2e570c48d39f0dddb863ea6582be40fa0e37fd10f8a351be73fb7a776"
+    },
+    {
+      "season": 2025,
+      "updated": "2025-12-29",
+      "capture": "20251230063716",
+      "original": "https://tennisabstract.com/reports/atp_elo_ratings.html",
+      "sha256": "24b3912fd35462954b4cba1d39f4e78106b396d78dd51bdf0157b30cf59fd6ff"
+    }
+  ],
+  "rankings": [
+    {
+      "capture": "20161215100259",
+      "updated": "2016-12-12",
+      "original": "http://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "5bf2854873caea1a43bda28860047a2a77b7168e6507bca615403ff9c66b0ef4"
+    },
+    {
+      "capture": "20181223151457",
+      "updated": "2018-11-19",
+      "original": "http://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "cec5f741f6b65abd8ea18799cfa7172a6fa77b2d6faae5c105c728f1b9a97ac4"
+    },
+    {
+      "capture": "20191227135637",
+      "updated": "2019-12-02",
+      "original": "http://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "948b51f7525afa476cdcda81b179f30d3b189aa2fc93d1b4f532f399a285ba86"
+    },
+    {
+      "capture": "20201128054135",
+      "updated": "2020-11-23",
+      "original": "http://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "a993c2a4f60e5bab97900113cbf4bbe073bd57ba9e648102729cc89b4152cc3e"
+    },
+    {
+      "capture": "20211020082423",
+      "updated": "2021-10-18",
+      "original": "https://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "50b3a10f3c86911ca3c84ad773820db262751864dae701bbff07fcdce23c3c5b"
+    },
+    {
+      "capture": "20221111143946",
+      "updated": "2022-11-07",
+      "original": "http://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "a3286a33ab77ea31e752f4dbccb703f56364e52df3fb79360631322806f05547"
+    },
+    {
+      "capture": "20240112190639",
+      "updated": "2024-01-08",
+      "original": "https://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "791c258635170158bc85b14b92b651bbba9c590663248832668bfd7a2929c0d1"
+    },
+    {
+      "capture": "20241222142344",
+      "updated": "2024-12-16",
+      "original": "http://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "262783ad38d7e27bf0e7de9997401e417f2015ae72e870e51e4e03a37d81af3f"
+    },
+    {
+      "capture": "20260106232950",
+      "updated": "2026-01-05",
+      "original": "https://tennisabstract.com/reports/atpRankings.html",
+      "sha256": "7660f3dce784a12c6f9fae6ebe3a35b4ef3b76e419109165b2a69ebb279e2558"
+    }
+  ],
+  "keyAliases": {
+    "StanislasWawrinka": "StanWawrinka",
+    "TaylorHarryFritz": "TaylorFritz",
+    "CarlosAlcarazGarfia": "CarlosAlcaraz",
+    "DiegoSebastianSchwartzman": "DiegoSchwartzman",
+    "FrancisTiafoe": "FrancesTiafoe",
+    "SamuelGroth": "SamGroth",
+    "ChakLamColemanWong": "ColemanWong",
+    "ChristianGarin": "CristianGarin",
+    "LloydGeorgeMuirheadHarris": "LloydHarris",
+    "AntonieHoang": "AntoineHoang",
+    "JeffreyJohnWolf": "JJWolf",
+    "JuanPabloVarillasPatinoSamudio": "JuanPabloVarillas",
+    "DanielElahiGalanRiveros": "DanielElahiGalan",
+    "JoaoLucasMagalhaesHuebDeMenezes": "JoaoMenezes",
+    "PedroMartinezPortero": "PedroMartinez",
+    "MarceloTomasBarriosVera": "TomasBarriosVera",
+    "FelipeMeligeniRodriguesAlves": "FelipeMeligeniAlves"
+  },
+  "method": {
+    "sources": [
+      "https://www.tennisabstract.com/blog/2019/12/03/an-introduction-to-tennis-elo/ (expected score; starts in the low 1200s since challengers and qualifying were added, depending on the level)",
+      "https://www.tennisabstract.com/blog/2018/05/15/handling-injuries-and-absences/ (layoff penalty, K after a layoff, second layoffs, the 1900 study population, the offseason not counted)",
+      "https://www.tennisabstract.com/blog/2019/01/08/identifying-underrated-players-with-minor-league-elo/ (challengers and tour-level qualifying counted)",
+      "https://www.tennisabstract.com/blog/2021/03/16/repurposing-elo-for-streaks-seasons/ (yElo, one of the fit targets)",
+      "K = 250 / (matches + 5)^0.4 is FiveThirtyEight's formula, which Sackmann said he adapted (sleepomeno/tennis_atp examples/elo.R); his own worked example and the February 2016 report fit an offset of 6"
+    ],
+    "k": {
+      "numerator": 250,
+      "offset": 6,
+      "exponent": 0.4
+    },
+    "start": {
+      "tour": 1450,
+      "challenger": 1275,
+      "qualifying": 1275,
+      "fit": "Not published: fitted on Tennis Abstract's own current-method numbers for 1974-2000, the 23 career peaks of its Tennis 128 profiles and the 18 yElo seasons of its season tables (counted by the match files' seasons): mean difference -2.0 Elo, root mean square 15.1 (1970s -1.2, 1980s -1.6, 1990s -4.7)."
+    },
+    "layoff": {
+      "weeks": 8,
+      "min": 100,
+      "max": 150,
+      "maxWeeks": 52,
+      "kBoost": 1.5,
+      "kMatches": 20,
+      "repeatDays": 730,
+      "threshold": 1900,
+      "offseason": [
+        1115,
+        115
+      ],
+      "note": "A layoff of eight weeks or more between counted matches, 15 November to 15 January not counted, costs 100 points rising linearly to 150 at a year; K is then 1.5 times as large, back to normal over 20 matches; a second layoff within two years of the last comeback is charged the difference between the penalty for both together and for the first. Charged on return; a list shows a player in the middle of one with the penalty he would be charged on the list's date. Only for players rated 1900 or more, as in the study that set it (applied to everyone it lowers the whole list by 100 to 200 points against every published number)."
+    },
+    "files": "all",
+    "challengerQualifying": false,
+    "counted": "Tour-level main draws with the Davis Cup (atp_matches_<year>.csv), tour-level qualifying and challengers' main draws (atp_matches_qual_chall_<year>.csv), as Tennis Abstract's report says (\"tour-level, tour-level qualifying, men's challenger\"): not a challenger's qualifying (the files hold whole qualifying draws in 2018 and from 2022; counting them lists some 180 men a season Tennis Abstract does not and lifts the modern lists by 20 to 40 points), nor a walkover, retirement, default, abandoned or unfinished match, nor one without a score or against a placeholder opponent (\"U Unknown\").",
+    "order": "By the files' season, then the event's date, the event, the round (qualifying first) and the match number: a season ends after its last event (the Masters played in January 1978-1986 belongs to the year before) and before the next season's first, even one that starts on 29 December.",
+    "activity": 10,
+    "activityNote": "A season lists the men who played at least 10 counted matches in it, as Tennis Abstract's report has listed those with 10 in the last 52 weeks since 2020. The published seasons keep the men of Tennis Abstract's list who pass the same test in the match files.",
+    "asOf": "A list is dated 31 December, or the start of the season's last event when that is later.",
+    "targets": {
+      "fitYears": [
+        1973,
+        2000
+      ],
+      "peaks": {
+        "source": "Tennis Abstract, The Tennis 128 (2022): each player's peak Elo by the current method, from his profile",
+        "items": [
+          [
+            "100437",
+            "Bjorn Borg",
+            2473,
+            1980,
+            "https://www.tennisabstract.com/blog/2022/11/28/the-tennis-128-no-12-bjorn-borg/"
+          ],
+          [
+            "104925",
+            "Novak Djokovic",
+            2470,
+            2016,
+            "https://www.tennisabstract.com/blog/2022/12/14/the-tennis-128-no-4-novak-djokovic/"
+          ],
+          [
+            "100581",
+            "John McEnroe",
+            2442,
+            1985,
+            "https://www.tennisabstract.com/blog/2022/11/26/the-tennis-128-no-13-john-mcenroe/"
+          ],
+          [
+            "100656",
+            "Ivan Lendl",
+            2402,
+            1986,
+            "https://www.tennisabstract.com/blog/2022/11/14/the-tennis-128-no-20-ivan-lendl/"
+          ],
+          [
+            "103819",
+            "Roger Federer",
+            2383,
+            2007,
+            "https://www.tennisabstract.com/blog/2022/12/12/the-tennis-128-no-5-roger-federer/"
+          ],
+          [
+            "104745",
+            "Rafael Nadal",
+            2370,
+            2009,
+            "https://www.tennisabstract.com/blog/2022/12/06/the-tennis-128-no-8-rafael-nadal/"
+          ],
+          [
+            "100284",
+            "Jimmy Connors",
+            2364,
+            1979,
+            "https://www.tennisabstract.com/blog/2022/11/04/the-tennis-128-no-24-jimmy-connors/"
+          ],
+          [
+            "101414",
+            "Boris Becker",
+            2320,
+            1989,
+            "https://www.tennisabstract.com/blog/2022/10/15/the-tennis-128-no-32-boris-becker/"
+          ],
+          [
+            "101948",
+            "Pete Sampras",
+            2319,
+            1994,
+            "https://www.tennisabstract.com/blog/2022/11/12/the-tennis-128-no-21-pete-sampras/"
+          ],
+          [
+            "101062",
+            "Mats Wilander",
+            2309,
+            1983,
+            "https://www.tennisabstract.com/blog/2022/09/08/the-tennis-128-no-50-mats-wilander/"
+          ],
+          [
+            "100282",
+            "Guillermo Vilas",
+            2298,
+            1977,
+            "https://www.tennisabstract.com/blog/2022/09/24/the-tennis-128-no-43-guillermo-vilas/"
+          ],
+          [
+            "101736",
+            "Andre Agassi",
+            2282,
+            1995,
+            "https://www.tennisabstract.com/blog/2022/10/04/the-tennis-128-no-38-andre-agassi/"
+          ],
+          [
+            "101793",
+            "Jim Courier",
+            2256,
+            1992,
+            "https://www.tennisabstract.com/blog/2022/03/24/the-tennis-128-no-107-jim-courier/"
+          ],
+          [
+            "100119",
+            "Ilie Nastase",
+            2256,
+            1973,
+            "https://www.tennisabstract.com/blog/2022/08/18/the-tennis-128-no-61-ilie-nastase/"
+          ],
+          [
+            "100126",
+            "Stan Smith",
+            2248,
+            1973,
+            "https://www.tennisabstract.com/blog/2022/06/28/the-tennis-128-no-72-stan-smith/"
+          ],
+          [
+            "101222",
+            "Stefan Edberg",
+            2239,
+            1990,
+            "https://www.tennisabstract.com/blog/2022/09/29/the-tennis-128-no-40-stefan-edberg/"
+          ],
+          [
+            "100087",
+            "John Newcombe",
+            2209,
+            1974,
+            "https://www.tennisabstract.com/blog/2022/09/06/the-tennis-128-no-52-john-newcombe/"
+          ],
+          [
+            "100074",
+            "Arthur Ashe",
+            2206,
+            1976,
+            "https://www.tennisabstract.com/blog/2022/09/14/the-tennis-128-no-48-arthur-ashe/"
+          ],
+          [
+            "101529",
+            "Michael Stich",
+            2203,
+            1993,
+            "https://www.tennisabstract.com/blog/2022/02/15/the-tennis-128-no-123-michael-stich/"
+          ],
+          [
+            "100342",
+            "Vitas Gerulaitis",
+            2201,
+            1978,
+            "https://www.tennisabstract.com/blog/2022/04/21/the-tennis-128-no-95-vitas-gerulaitis/"
+          ],
+          [
+            "100084",
+            "Tom Okker",
+            2190,
+            1974,
+            "https://www.tennisabstract.com/blog/2022/04/12/the-tennis-128-no-99-tom-okker/"
+          ],
+          [
+            "102021",
+            "Michael Chang",
+            2186,
+            1994,
+            "https://www.tennisabstract.com/blog/2022/05/05/the-tennis-128-no-89-michael-chang/"
+          ],
+          [
+            "101964",
+            "Goran Ivanisevic",
+            2185,
+            1993,
+            "https://www.tennisabstract.com/blog/2022/03/15/the-tennis-128-no-111-goran-ivanisevic/"
+          ]
+        ]
+      },
+      "yElo": {
+        "source": "https://www.tennisabstract.com/blog/2024/11/28/how-does-jannik-sinners-season-stack-up/ (the best seasons by yElo, Tennis Abstract's current method)",
+        "items": [
+          [
+            1979,
+            "100437",
+            "Bjorn Borg",
+            "84-5",
+            2499
+          ],
+          [
+            1984,
+            "100581",
+            "John McEnroe",
+            "82-3",
+            2476
+          ],
+          [
+            2015,
+            "104925",
+            "Novak Djokovic",
+            "82-6",
+            2458
+          ],
+          [
+            1985,
+            "100656",
+            "Ivan Lendl",
+            "82-7",
+            2440
+          ],
+          [
+            2016,
+            "104918",
+            "Andy Murray",
+            "78-9",
+            2416
+          ],
+          [
+            2013,
+            "104925",
+            "Novak Djokovic",
+            "74-9",
+            2408
+          ],
+          [
+            1976,
+            "100284",
+            "Jimmy Connors",
+            "97-7",
+            2406
+          ],
+          [
+            1977,
+            "100437",
+            "Bjorn Borg",
+            "78-6",
+            2403
+          ],
+          [
+            1977,
+            "100282",
+            "Guillermo Vilas",
+            "133-13",
+            2401
+          ],
+          [
+            2006,
+            "103819",
+            "Roger Federer",
+            "91-5",
+            2399
+          ],
+          [
+            1980,
+            "100437",
+            "Bjorn Borg",
+            "70-5",
+            2395
+          ],
+          [
+            1981,
+            "100656",
+            "Ivan Lendl",
+            "96-12",
+            2383
+          ],
+          [
+            1987,
+            "100656",
+            "Ivan Lendl",
+            "73-7",
+            2381
+          ],
+          [
+            1982,
+            "100656",
+            "Ivan Lendl",
+            "105-9",
+            2380
+          ],
+          [
+            1978,
+            "100284",
+            "Jimmy Connors",
+            "66-5",
+            2379
+          ],
+          [
+            2013,
+            "104745",
+            "Rafael Nadal",
+            "74-7",
+            2373
+          ],
+          [
+            1986,
+            "100656",
+            "Ivan Lendl",
+            "74-6",
+            2369
+          ],
+          [
+            2011,
+            "104925",
+            "Novak Djokovic",
+            "63-4",
+            2367
+          ],
+          [
+            2005,
+            "103819",
+            "Roger Federer",
+            "80-4",
+            2364
+          ],
+          [
+            2014,
+            "104925",
+            "Novak Djokovic",
+            "61-8",
+            2363
+          ],
+          [
+            2012,
+            "104925",
+            "Novak Djokovic",
+            "73-12",
+            2360
+          ],
+          [
+            1978,
+            "100437",
+            "Bjorn Borg",
+            "79-6",
+            2359
+          ],
+          [
+            2008,
+            "104745",
+            "Rafael Nadal",
+            "81-10",
+            2352
+          ],
+          [
+            1986,
+            "101414",
+            "Boris Becker",
+            "69-13",
+            2347
+          ],
+          [
+            1982,
+            "100581",
+            "John McEnroe",
+            "71-9",
+            2341
+          ],
+          [
+            2024,
+            "206173",
+            "Jannik Sinner",
+            "72-6",
+            2339
+          ],
+          [
+            1983,
+            "101062",
+            "Mats Wilander",
+            "80-11",
+            2338
+          ],
+          [
+            1974,
+            "100284",
+            "Jimmy Connors",
+            "94-5",
+            2332
+          ],
+          [
+            1989,
+            "101414",
+            "Boris Becker",
+            "64-8",
+            2329
+          ],
+          [
+            2015,
+            "103819",
+            "Roger Federer",
+            "62-11",
+            2329
+          ]
+        ]
+      }
+    },
+    "v1": {
+      "k": {
+        "numerator": 250,
+        "offset": 6,
+        "exponent": 0.4
+      },
+      "start": {
+        "tour": 1500,
+        "challenger": 1500,
+        "qualifying": 1500
+      },
+      "layoff": null,
+      "files": "tour",
+      "note": "Tennis Abstract's method before May 2018, for the check against its 2016 and 2017 reports: tour-level matches only, everyone starting at 1500, no layoff penalty."
+    }
+  },
+  "nations": {
+    "davisCupWindow": 6,
+    "combinedTeams": [
+      "CAR",
+      "ECA",
+      "POC"
+    ],
+    "note": "A computed season's player plays for the nation he played the Davis Cup for in the nearest season (the same season first, then earlier, then later, within six seasons), from the ties' names in the match files (\"Davis Cup WG F: USA vs AUS\"), else for his country by the player file, which gives only his latest; then as the state of that season knew it. A published season's player plays for the country Tennis Abstract's rankings report of the nearest date files him under, else for his country by the player file.",
+    "federations": [
+      {
+        "code": "TCH",
+        "name": "Czechoslovakia",
+        "through": 1992,
+        "holder": "203",
+        "members": [
+          "CZE",
+          "SVK"
+        ],
+        "successor": "CZE"
+      },
+      {
+        "code": "URS",
+        "name": "Soviet Union",
+        "through": 1991,
+        "holder": "643",
+        "members": [
+          "RUS",
+          "UKR",
+          "BLR",
+          "GEO",
+          "ARM",
+          "AZE",
+          "KAZ",
+          "UZB",
+          "TKM",
+          "TJK",
+          "KGZ",
+          "MDA",
+          "EST",
+          "LAT",
+          "LTU"
+        ],
+        "successor": "RUS"
+      },
+      {
+        "code": "CIS",
+        "aliases": [
+          "EUN"
+        ],
+        "name": "Commonwealth of Independent States",
+        "from": 1992,
+        "through": 1992,
+        "holder": "643",
+        "members": [
+          "URS",
+          "RUS",
+          "UKR",
+          "BLR",
+          "ARM",
+          "AZE",
+          "KAZ",
+          "UZB",
+          "TKM",
+          "TJK",
+          "KGZ",
+          "MDA"
+        ],
+        "successor": "RUS"
+      },
+      {
+        "code": "YUG",
+        "name": "Yugoslavia",
+        "through": 1991,
+        "holder": "688",
+        "members": [
+          "SRB",
+          "MNE",
+          "CRO",
+          "SLO",
+          "BIH",
+          "MKD",
+          "KOS"
+        ],
+        "successor": "SRB"
+      },
+      {
+        "code": "FRY",
+        "aliases": [
+          "SCG"
+        ],
+        "name": "FR Yugoslavia, then Serbia and Montenegro",
+        "from": 1992,
+        "through": 2006,
+        "holder": "688",
+        "members": [
+          "YUG",
+          "SRB",
+          "MNE",
+          "KOS"
+        ],
+        "successor": "SRB"
+      },
+      {
+        "code": "FRG",
+        "name": "West Germany",
+        "through": 1990,
+        "holder": "276",
+        "members": [
+          "GER"
+        ],
+        "successor": "GER"
+      },
+      {
+        "code": "GDR",
+        "name": "East Germany",
+        "through": 1990,
+        "holder": null,
+        "members": [],
+        "successor": "GER"
+      }
+    ],
+    "territory": [
+      {
+        "name": "Czechoslovakia",
+        "through": 1992,
+        "holder": "203",
+        "shapes": [
+          "703"
+        ]
+      },
+      {
+        "name": "Soviet Union",
+        "through": 1991,
+        "holder": "643",
+        "shapes": [
+          "804",
+          "112",
+          "268",
+          "051",
+          "031",
+          "398",
+          "860",
+          "795",
+          "762",
+          "417",
+          "498",
+          "233",
+          "428",
+          "440"
+        ]
+      },
+      {
+        "name": "Commonwealth of Independent States",
+        "from": 1992,
+        "through": 1992,
+        "holder": "643",
+        "shapes": [
+          "804",
+          "112",
+          "051",
+          "031",
+          "398",
+          "860",
+          "795",
+          "762",
+          "417",
+          "498"
+        ]
+      },
+      {
+        "name": "Yugoslavia",
+        "through": 1991,
+        "holder": "688",
+        "shapes": [
+          "191",
+          "705",
+          "070",
+          "807",
+          "499",
+          "KOS"
+        ]
+      },
+      {
+        "name": "FR Yugoslavia, then Serbia and Montenegro",
+        "from": 1992,
+        "through": 2006,
+        "holder": "688",
+        "shapes": [
+          "499",
+          "KOS"
+        ]
+      },
+      {
+        "name": "Serbia with Kosovo",
+        "from": 2007,
+        "through": 2007,
+        "holder": "688",
+        "shapes": [
+          "KOS"
+        ]
+      }
+    ],
+    "barred": [
+      {
+        "nation": "710",
+        "name": "South Africa",
+        "from": 1979,
+        "through": 1992,
+        "why": "Barred over apartheid: the match files have no South African Davis Cup tie from 1979 until Group II in 1993 (they hold the World Group, Group I and Group II only)."
+      },
+      {
+        "nation": "688",
+        "name": "FR Yugoslavia",
+        "from": 1993,
+        "through": 1995,
+        "why": "Barred by the United Nations sanctions: the match files have no Yugoslav tie from February 1992 until Group II in 1996."
+      }
+    ],
+    "fixes": [
+      {
+        "id": "100532",
+        "name": "Johan Kriek",
+        "code": "RSA",
+        "through": 1981,
+        "why": "South African until he became an American in 1982; the player file lists him as American and he played no Davis Cup."
+      },
+      {
+        "id": "100529",
+        "name": "Kevin Curren",
+        "code": "RSA",
+        "through": 1984,
+        "why": "South African until he became an American in 1985; the player file lists him as American and he played no Davis Cup before."
+      },
+      {
+        "id": "102257",
+        "name": "Greg Rusedski",
+        "code": "CAN",
+        "through": 1994,
+        "why": "Canadian until he chose Great Britain in 1995; the player file lists him as British and his Davis Cup rows start with Great Britain in 1995."
+      },
+      {
+        "id": "105062",
+        "name": "Mikhail Kukushkin",
+        "code": "RUS",
+        "through": 2007,
+        "why": "Russian until he chose Kazakhstan in 2008, the year his Kazakh Davis Cup rows start."
+      },
+      {
+        "id": "104979",
+        "name": "Andrey Golubev",
+        "code": "RUS",
+        "through": 2007,
+        "why": "Russian until he chose Kazakhstan in 2008, the year his Kazakh Davis Cup rows start."
+      }
+    ],
+    "iocNations": {
+      "GBR": "826",
+      "SLO": "705",
+      "INA": "360",
+      "IRI": "364",
+      "NGR": "566",
+      "LAT": "428",
+      "LBN": "422",
+      "LEB": "422",
+      "ESA": "222",
+      "LBA": "434",
+      "SUD": "729",
+      "CHL": "152",
+      "PRY": "600",
+      "KWT": "414",
+      "GTM": "320",
+      "TTO": "780",
+      "NIC": "558",
+      "BWA": "072",
+      "AGO": "024",
+      "COG": "178",
+      "TGO": "768",
+      "MDG": "450",
+      "MRT": "478",
+      "NPL": "524",
+      "BIZ": "084",
+      "TWN": "158",
+      "ZWE": "716",
+      "RHO": "716",
+      "DEU": "276",
+      "KOS": "KOS",
+      "CEY": "144",
+      "BIR": "104",
+      "BUR": "854",
+      "CAF": "140",
+      "RTF": "643"
+    },
+    "offMap": [
+      "HKG",
+      "SGP",
+      "SIN",
+      "MON",
+      "BAR",
+      "AHO",
+      "ARU",
+      "BER",
+      "BRN",
+      "BHR",
+      "MLT",
+      "AND",
+      "MRI",
+      "GUM",
+      "SMR",
+      "CUW",
+      "LIE",
+      "ISV",
+      "VIR",
+      "GUD",
+      "CAY",
+      "GRN",
+      "NMI",
+      "ANT",
+      "VIN",
+      "LCA",
+      "REU",
+      "ASA",
+      "MHL",
+      "SEY",
+      "CPV",
+      "PLW",
+      "TKS",
+      "PYF",
+      "MAC",
+      "ITF",
+      "UNK"
+    ]
+  },
+  "seasons": {
+    "computed": [
+      1973,
+      2015
+    ],
+    "rough": [
+      1973,
+      1979
+    ],
+    "published": [
+      2016,
+      2025
+    ]
+  }
+}

@@ -1,10 +1,11 @@
 import { SAVE_KEY, SAVE_VERSION } from '../config.js';
 import { DOMESTIC_PREFIX, domesticScopeId, isDomesticScope } from './domestic.js';
-import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, isSeasonEuropeMap, seasonLabelOf, seasonMapOf, setHasClubs, setHasNations,
+import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, isSeasonEuropeMap, seasonLabelOf, seasonMapOf, setHasClubs, setHasNations, setIsMapped,
   setKindOf, setSportOf } from './footballSets.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 import { CM_ROLES, CM_SOURCE, cmTupleOf } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SOURCE, eaRosterOf, eaTupleOf } from '../data/eaPlayers.js';
+import { SWOS_ROLES, SWOS_SOURCE, swosTupleOf } from '../data/swosPlayers.js';
 import { getSport, SPORT_LIST } from '../sports/index.js';
 import { HOME_NATIONS } from '../data/teams.js';
 import { keepSaves } from './persistence.js';
@@ -147,7 +148,19 @@ const SET_PACKS = {
       ? { edition: info.edition, update: info.update, snapshotDate: info.snapshotDate, roster: eaRosterOf(info.url) } : null),
     valid: source => text(source.edition) && Number.isInteger(source.update) && text(source.snapshotDate) && /^\d{6}$/.test(source.roster),
   },
+  // SWOS 96/97's national squads (src/data/swosPlayers.js), credited like a CM database.
+  swos: {
+    source: SWOS_SOURCE, size: 9, roles: SWOS_ROLES, tupleOf: swosTupleOf,
+    sourceOf: info => (['edition', 'version', 'snapshotDate', 'url'].every(key => text(info[key])) && optionalText(info.provider)
+      ? Object.fromEntries(['provider', 'edition', 'version', 'snapshotDate', 'url'].filter(key => info[key] !== undefined).map(key => [key, info[key]]))
+      : null),
+    valid: source => ['edition', 'version', 'snapshotDate', 'url'].every(key => text(source[key])) && optionalText(source.provider),
+  },
 };
+// A women's EA season's players are the same records as the men's.
+SET_PACKS.eaw = SET_PACKS.ea;
+// CM 97/98's players are CM 01/02 records (src/data/cmPlayers.js).
+SET_PACKS.cm = SET_PACKS.cm0102;
 
 /** Whether `player` is a record of this kind's database, from `source` when one is given. */
 function setPlayer(player, kind, source) {
@@ -321,8 +334,9 @@ function validateCampaign(input, rebuildSources) {
         || (domestic && !domesticVersion.startsWith(`${domesticScopeId(clubScope)}-`)))) invalid('Campaign map version is invalid.');
     // A data set campaign names the set, the build it was played on and its season, or none of them. A set plays in its
     // own sport: a football one on its own Europe maps or the world, never on a country map (those use the built-in
-    // data) and never with clubs if it has none, a basketball one with clubs on its era's map, which no other campaign
-    // plays on, and a baseball one with its nations or its clubs on its era's map.
+    // data) and never with clubs if it has none. Any other sport's set plays the layers it has: its nations, or its clubs,
+    // on its era's map when its clubs have one (an NBA or MLB season's, which no other campaign plays on), else on the
+    // world (the women's game's).
     const { dataSet, dataVersion, dataYear, dataSeason } = configuration;
     const sport = getSport(configuration.sport).id;
     if (dataSet == null ? [dataVersion, dataYear, dataSeason].some(value => value != null) || (domestic && isEraMap(domesticScopeId(clubScope)))
@@ -330,7 +344,7 @@ function validateCampaign(input, rebuildSources) {
         || (sport === 'football' ? (domestic && !isSeasonEuropeMap(domesticScopeId(clubScope), dataSet))
             || (configuration.layer === 'clubs' && !setHasClubs(dataSet))
           : configuration.layer !== 'clubs' ? !setHasNations(dataSet)
-          : !domestic || domesticScopeId(clubScope) !== seasonMapOf(dataSet))
+          : !setHasClubs(dataSet) || (setIsMapped(dataSet) ? !domestic || domesticScopeId(clubScope) !== seasonMapOf(dataSet) : domestic))
         || typeof dataVersion !== 'string' || !new RegExp(`^${dataSet}-[0-9a-f]{8}$`).test(dataVersion)
         || !isDataYear(dataYear) || dataSeason !== seasonLabelOf(dataSet, dataYear)) invalid('Campaign data set is invalid.');
   }

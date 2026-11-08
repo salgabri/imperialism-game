@@ -15,6 +15,14 @@ ignored `data-src/cm0102/`, and its output stays out of git.
 When an answer arrives, record its date, who gave it, a link to it and its exact
 scope here before any derived data is committed.
 
+These requests cover the community's databases. On 2026-11-08 the user chose to
+ship five seasons whose data no one has licensed, credited to their makers
+([football-years.md](football-years.md#seasons-before-fifa-05)): SI's own CM 01/02
+3.9.68 and 3.9.60 databases (free from Eidos since 2008 for personal,
+non-commercial use, data rights reserved), SI's CM3 data as Cam F ported it, SI's
+CM 97/98 database as baskeyx extracted it, and Sensible World of Soccer 96/97's
+national squads. No Update Team or retro-team database is among them.
+
 ## 1. To the CM 01/02 Update Team
 
 **Subject:** Permission to use the official databases in a free open-source game

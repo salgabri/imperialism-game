@@ -132,7 +132,7 @@ tie's simulated odds.
 
 - **Setup.** A Tennis card with a racket icon. Tennis is nations only (`nationsOnly` on the
   sport): the Clubs choice is off, a challenge link's `teams=clubs` is ignored, and the
-  season reads 2026.
+  Season choice lists 2026 and the 53 earlier seasons back to 1973 (see Earlier seasons).
 - **Squad.** A court from above: the No. 1 and No. 2 at the near baseline, the doubles pair
   across the net. The list groups Singles and Doubles, a player who doubles up appears in
   both, and a note says so. The profile reads Singles and Doubles, as does the tale of the
@@ -178,10 +178,200 @@ campaign of Europe with the live ticker.
 - No doubles ratings: a pair is its players' singles mean, so doubles specialists (Bolelli and
   Vavassori, Granollers, Pavić) are not in the game, and a nation's No. 3 and No. 4 play its
   doubles.
-- One season, 2026, as of Tennis Abstract's update of 2 November. Its Elo report lists only the
-  current ratings, and Jeff Sackmann's match archive, which would rebuild earlier seasons, is
-  no longer public.
+- The built-in season is 2026, as of Tennis Abstract's update of 2 November; the earlier
+  seasons have their own limits (Earlier seasons, below).
 - Men only: the Billie Jean King Cup would take Tennis Abstract's women's Elo report.
 - No surfaces: a host's choice of surface is in the home edge, not played. The snapshot keeps
   each player's hard, clay and grass Elo for that.
 - Players by the country Tennis Abstract files them under, not by Davis Cup nominations.
+
+## Earlier seasons
+
+Status: built 2026-11-08. The Season choice lists 53 earlier seasons, 2025 back to 1973, each
+the ATP's men at the end of a year and the Davis Cup nations of that day, nations only
+(set ids `tennis-<year>`, kind `elo`, `public/tennis/tennis-<year>.json`). The user chose the
+sources: Tennis Abstract's own published lists where they exist, and earlier years computed
+from Jeff Sackmann's match results by Tennis Abstract's published method, on today's scale
+and labelled as computed.
+
+### Sources
+
+- **2016–2025: Tennis Abstract's year-end reports**, as the Wayback Machine archived them (the
+  last capture of each before the next update): 12 December 2016, 20 November 2017 (the report
+  was not updated again that year, so the list stops at the ATP Finals and never took in the
+  Davis Cup final: "Tennis Abstract Elo, through the ATP Finals"), 24 December 2018,
+  2 December 2019, then 28, 27, 26, 25, 23 and 29 December 2020–2025. Labels read "Tennis
+  Abstract Elo, December 2023". Every Elo is Tennis Abstract's, unchanged.
+- **Countries** of the published seasons come from Tennis Abstract's ATP rankings report, by
+  player key, from the capture nearest the list's date (nine captures, December 2016 to
+  January 2026: Alejandro Tabilo is Canadian in 2019 and Chilean from 2020), else from
+  Sackmann's player file. Tennis Abstract renamed some keys (`StanislasWawrinka` /
+  `StanWawrinka`, `TaylorHarryFritz`, `CarlosAlcarazGarfia`, `DiegoSebastianSchwartzman`,
+  `FrancisTiafoe`, `SamuelGroth`, `ChakLamColemanWong`, and ten full names of its 2019–2020
+  lists such as `MarceloTomasBarriosVera`): `keyAliases` joins each to its current key, which
+  also finds the man in the match files (a key is his name) and links his page.
+- **1973–2015: Elo computed** from Jeff Sackmann's ATP match results, 1968 to 2025: the
+  tour-level files (with the Davis Cup) and the challenger and qualifying files from 1978. The
+  original repository is gone; its fork
+  [Kadantte/tennis_atp](https://github.com/Kadantte/tennis_atp) at commit `712be0c` (Sackmann's
+  own last commit, 8 June 2026) is pinned, and the Hugging Face mirror
+  `Aneeshers/tennis-sackmann-archive` holds the same bytes. Labels read "Elo from match results,
+  end of 1985"; the player's source is "Elo from match results", with his Elo in its title.
+- **Pins.** `scripts/data/tennis-seasons.json` holds the SHA-256 of all 107 archive files and
+  19 captures. The captures are the Wayback Machine's raw pages (`id_`): the 2016–2019 reports
+  match the archive's own SHA-1 digests, the 2020 one's gzipped page matches its digest and
+  decodes to the pinned bytes, and fresh downloads of 2021–2024 and of five rankings captures
+  match their pins (the 2025 report could not be fetched again: the archive was throttling).
+- **Licence.** Sackmann's data and Tennis Abstract's reports are CC BY-NC-SA 4.0 (credit "Jeff
+  Sackmann / Tennis Abstract", non-commercial, share alike), as the 2026 season already is; the
+  computed ratings are derived data under the same terms. Each season's `source.licence` says
+  so, and `public/tennis/ATTRIBUTION.txt` credits both. The non-commercial clause binds the game:
+  serving these seasons on pages that carry advertising is a question for the owner.
+
+`npm run sync:tennis-seasons` (`scripts/sync-tennis-seasons.mjs`) reads the pinned inputs from
+the ignored `data-src/tennis-seasons/` (downloading any that are missing, checked against their
+pins) and writes one snapshot a season to `scripts/data/tennis-seasons/<year>.json` (1.6 MB in
+all, committed: every rated man with his key or match-file id, name, nation of the day and how
+it was found, birth date, Elo and matches, the published ones with their surface Elos too) and
+`validation.json`. `npm run build:tennis-seasons` (`scripts/build-tennis-seasons.mjs`) builds the
+season files, `src/data/tennisSeasons.js`, the attribution and
+`docs/design/tennis-seasons-audit.json` from them. Both have `--check` and rebuild byte for byte.
+
+### The method
+
+`scripts/lib/tennis-elo.mjs`, from Sackmann's own descriptions (Tennis Abstract posts of
+2015–2024; the parameters and their sources are in the manifest's `method`):
+
+- the expected score is `1 / (1 + 10^((opponent − player) / 400))`, and K is
+  `250 / (n + 6)^0.4`, n the matches the player has already played, with no bonus for the
+  majors (an offset of 6 fits Sackmann's worked example and his February 2016 report);
+- counted: tour-level main draws with the Davis Cup, tour-level qualifying and challengers'
+  main draws, as his report says ("tour-level, tour-level qualifying, men's challenger"); never
+  a walkover, retirement, default or abandoned match, nor a challenger's qualifying (the files
+  hold whole qualifying draws in 2018 and from 2022: counting them lists some 180 men a season
+  his report does not, and lifts the modern lists by 20 to 40 points);
+- a new player starts at 1450 if his first counted match is at tour level, 1275 if it is a
+  challenger or a tour-level qualifying round. Sackmann gives no figure ("the low 1200s,
+  depending on the level") and the public files lack the history before 1968, so these are
+  fitted: on Tennis Abstract's own current-method numbers for 1973–2000, the 20 career peaks of
+  its Tennis 128 profiles that fall then and the 18 yElo seasons of its best-seasons table, the
+  computed values are 2.0 Elo low on average, root mean square 15.1 (1970s −1.2, 1980s −1.6,
+  1990s −4.7). A start of 1300 fits 1973–2000 about as well (+1.3) but puts the 2000s and
+  2010s 44 points high; 1250 leaves the 1990s 15 low;
+- a layoff of eight weeks or more (15 November to 15 January not counted) costs 100 points,
+  rising linearly to 150 at a year, when the player returns; K is then 1.5 times as large, back
+  to normal over 20 matches; a second layoff within two years of the last comeback is charged
+  the difference. A list shows a player in the middle of a layoff with the penalty he would be
+  charged on its date, as Tennis Abstract's does: Hubert Hurkacz, away since June 2025, is
+  listed 117 points under his rating at the end of 2025 (1869; Tennis Abstract's list has 1821,
+  the usual offset apart, where without the penalty he would be 128 points out of line). Only
+  players rated 1900 or more are charged, the population Sackmann studied: charging everyone
+  lowers every list by 100 to 200 points against everything Tennis Abstract has published;
+- a season ends after its last event as the files group them: the Masters played in January
+  1978–1986 belongs to the year before, and an event starting on 29 December to the next;
+- a season lists the men with ten counted matches in it, as Tennis Abstract's report has listed
+  those with ten in the last 52 weeks since 2020. The published seasons keep the men of its list
+  who pass the same test (the 2026 build's ATP-rank rule cannot be applied: the rankings
+  captures are too sparse for 2021–2023).
+
+**Validation** (`scripts/data/tennis-seasons/validation.json`; the Elo of the same men,
+computed minus published, over Tennis Abstract's top hundred):
+
+| List | Matched | Mean difference | Correlation | Slope | Top ten shared | Listed by both |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2016, pre-2018 method | 99 | −2.8 | 0.999 | 1.00 | 9 | 143 of 147 |
+| 2017, pre-2018 method | 99 | +4.9 | 0.997 | 1.01 | 9 | 162 of 171 |
+| 2018, tour level only | 95 | +41.5 | 0.942 | 1.14 | 9 | 166 of 183 |
+| 2019 | 100 | +43.7 | 0.989 | 1.07 | 8 | 403 of 404 |
+| 2020 | 100 | +20.9 | 0.956 | 0.86 | 8 | 296 of 296 |
+| 2021 | 100 | +28.3 | 0.987 | 1.00 | 9 | 384 of 384 |
+| 2022 | 100 | +33.3 | 0.973 | 1.07 | 9 | 444 of 444 |
+| 2023 | 100 | +35.1 | 0.996 | 1.04 | 9 | 455 of 456 |
+| 2024 | 100 | +38.8 | 0.977 | 1.02 | 9 | 481 of 482 |
+| 2025 | 100 | +31.1 | 0.982 | 1.01 | 10 | 491 of 498 |
+
+The 2016 and 2017 rows run the same engine with the method Tennis Abstract used before May 2018
+(tour-level matches only, everyone starting at 1500, no layoff penalty): it reproduces those
+lists to 6.6 and 8.1 points on average, a check of the engine itself (the research's own
+reconstruction, `data-src/research/tennis/computed-elo-from-sackmann`, matched them to 1.5–7
+points after a constant 12). The current method's rows compare its own numbers with Tennis
+Abstract's: over every man of the 2019–2025 lists the correlation is 0.994–0.999 and the slope
+0.95–1.02. The seasons' records come out as Tennis Abstract's (Borg 84–5 in 1979, Lendl 105–9
+in 1982) in 27 of its 30 best seasons.
+
+**Scale.** The computed ratings agree with Tennis Abstract's for 1973–2000 (−2 Elo), but sit
+about 30 points above its numbers from 2005 on: its yElo seasons and Federer's, Nadal's and
+Djokovic's peaks (+29 on average), and its 2019–2025 lists (+21 to +44 over the top hundred).
+The offset is uniform (slopes near 1): it moves a season's ratings by about a point together
+and no match's odds, which depend on rating gaps alone. A rating is the Elo on the game's
+scale, `round((Elo + 100) / 25)`, as in 2026. Where a season's best player would be over 99
+(Borg's 2466 in 1980 is 103) the whole season is shifted down until he is 99, which keeps every
+gap and so every match's odds where a cap would not: 1979 (3), 1980 (4), 1981 (2), 1984 (3),
+1986 (1), 1987 (1), 2013 (1), 2014 (1), 2015 (4), and the pre-2018 lists 2016 (5: Djokovic
+2508) and 2017 (2). The shift is the season's `source.shift`; each player keeps his Elo as
+`rawRating`.
+
+### Nations of the day
+
+`scripts/lib/tennis-seasons.mjs`. A computed season's player plays for the nation he played the
+Davis Cup for in the nearest season (the same, then earlier, then later, within six), read from
+the ties' names in the match files ("Davis Cup WG F: USA vs AUS"; 16 rubbers place neither
+player), else for his country by Sackmann's player file, which gives only his latest: Ivan
+Lendl is American there, Czechoslovak here until 1991. Combined teams (the Caribbean, the
+Eastern Caribbean, Pacific Oceania) say nothing of a player's own country: his file does. The
+code is then that season's state's:
+
+| Federation | Years | Plays on the map as | Holds |
+| --- | --- | --- | --- |
+| Czechoslovakia | to 1992 | Czechia | Slovakia |
+| Soviet Union | to 1991 | Russia | the other fourteen republics |
+| CIS | 1992 | Russia | ten republics (not the Baltic states, not Georgia) |
+| Yugoslavia | to 1991 | Serbia | Croatia, Slovenia, Bosnia, North Macedonia, Montenegro, Kosovo |
+| FR Yugoslavia, Serbia and Montenegro | 1992–2006 | Serbia | Montenegro, Kosovo |
+| Serbia | 2007 | Serbia | Kosovo |
+| West Germany | to 1990 | Germany | — |
+
+A federation's other shapes start in its holder's empire when it fields a team that season.
+After a federation a player passes to his own successor nation (Ivanisevic is Croatian from
+1992), an emigrant to his own country. East Germany fielded no Davis Cup team: its men play for
+nobody before 1991. A nation barred from the Davis Cup fields no team and its land is neutral:
+South Africa 1979–1992 (the files' ties stop in 1978 and resume in Group II in 1993) and FR
+Yugoslavia 1993–1995 (United Nations sanctions; back in Group II in 1996). Hand fixes for men
+who changed country with no Davis Cup row to show it (`nations.fixes`): Johan Kriek South
+African to 1981, Kevin Curren to 1984, Greg Rusedski Canadian to 1994, Mikhail Kukushkin and
+Andrey Golubev Russian to 2007. Great Britain plays as one, as in 2026. A nation needs two rated
+men; countries the map does not draw (Monaco, Hong Kong, Barbados…) field nobody.
+
+The game shows a federation by its holder's name and flag (Czechia, Russia, Serbia, Germany):
+a season file has no way to rename a nation. The audit names both ("Czechoslovakia (Czechia)
+87.4" in 1985).
+
+### Tests
+
+`scripts/tennis-seasons.test.mjs`: the build and (with the inputs cached) the sync rebuild byte
+for byte; every input pinned; the listing, 2025 back to 1973, and its labels; every season
+decodes, two to five men a nation, each rating his Elo on the game's scale less the season's
+shift, the best at 99 where shifted; Borg and Djokovic shifted; 1985's Czechoslovakia holding
+Slovakia with Lendl, West Germany with Becker, South Africa barred with Kriek and Curren out of
+the game in 1980; the Soviet Union, the CIS and Croatia in 1990–1992; FR Yugoslavia barred and
+Kosovo's years; the nation-of-the-day rules and fixes; Tennis Abstract's own lists and
+countries (Tabilo); the validation thresholds; the loader refusing damaged files; the running
+App listing the seasons, loading one, launching 1985 with Slovakia in Czechoslovakia's empire
+and resuming the save; and a challenge link to a season.
+
+### Limits
+
+- **1973–1979 are rough**, and their labels say so: the ratings start from nothing in 1968 (the
+  archive's amateur file, majors and Davis Cup only before the open era, is not used), and
+  starting them in 1970 instead moves the 1975 list by about 48 points and reorders it more than
+  later seasons.
+- **No surfaces for the computed seasons.** The published ones keep Tennis Abstract's surface
+  Elos (2017–2018 single-surface, 2019–2025 blended); the game plays none of them.
+- **Nation changes.** A man who changed country with no Davis Cup row before the change plays
+  for his later country from his first season, unless he is among the fixes. The 1980 Davis
+  Cup is only half in the files.
+- **Russia and Belarus** play in 2022–2025, as in 2026 by the user's choice, though barred from
+  the Davis Cup since 2022, unlike South Africa and FR Yugoslavia in their years.
+- **The scale offset** of the computed method after 2000 (about +30 Elo, above).
+- **2018** is Tennis Abstract's list of that year, computed from tour-level matches only (its
+  challengers came in in January 2019): 183 men, 166 of them with ten counted matches.

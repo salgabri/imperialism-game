@@ -43,8 +43,8 @@ export const PRECACHE = Object.freeze(['index.html', 'assets/**/*', 'fonts/archi
  * URL; the caps hold every file in public/ with room to spare.
  */
 export const RUNTIME_CACHES = Object.freeze([
-  Object.freeze({ cacheName: 'imperialism-data', handler: 'NetworkFirst', maxEntries: 400,
-    pattern: /\/(?:football|basketball|baseball|domestic)\/[^/?#]+\.json$/ }),
+  Object.freeze({ cacheName: 'imperialism-data', handler: 'NetworkFirst', maxEntries: 1000,
+    pattern: /\/(?:football|womens-football|basketball|american-football|baseball|hockey|tennis|rugby-league|domestic)\/[^/?#]+\.json$/ }),
   Object.freeze({ cacheName: 'imperialism-images', handler: 'StaleWhileRevalidate', maxEntries: 5000,
     pattern: /\/(?:flags|flags-symbols|club-logos|textures)\/[^/?#]+\.(?:svg|webp|png)$/ }),
 ]);

@@ -8,4 +8,7 @@ export const BUILT_IN_BASEBALL_SEASONS = Object.freeze([
   Object.freeze({ id: 'mlb-the-show-23', version: 'mlb-the-show-23-dd24b433', year: 2023, season: '2023', label: 'MLB The Show 23', map: 'mlb2022' }),
   Object.freeze({ id: 'mlb-the-show-22', version: 'mlb-the-show-22-df2519c4', year: 2022, season: '2022', label: 'MLB The Show 22', map: 'mlb2022' }),
   Object.freeze({ id: 'mlb-the-show-21', version: 'mlb-the-show-21-f1ff1ff6', year: 2021, season: '2021', label: 'MLB The Show 21', map: 'mlb2021' }),
+  Object.freeze({ id: 'mlb-the-show-20', version: 'mlb-the-show-20-89a3a3d5', year: 2020, season: '2020', label: 'MLB The Show 20', map: 'mlb2020' }),
+  Object.freeze({ id: 'mlb-the-show-19', version: 'mlb-the-show-19-fb2e2c95', year: 2019, season: '2019', label: 'MLB The Show 19', map: 'mlb2019' }),
+  Object.freeze({ id: 'mlb-the-show-18', version: 'mlb-the-show-18-73b8c030', year: 2018, season: '2018', label: 'MLB The Show 18', map: 'mlb2018' }),
 ]);

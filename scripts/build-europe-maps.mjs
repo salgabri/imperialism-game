@@ -1,16 +1,17 @@
 // The maps Europe's football clubs play on (docs/design/domestic-campaigns.md, "The Europe maps"): one for the strongest
-// TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier EA season. A club holds
+// TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier season with clubs. A club holds
 // land only in its own country. A country's only club holds all of it; several clubs share it along its regional
 // borders, a region going whole to one club unless it holds two or more (then its next level down is split between
 // them); a country with no club is not on the map at all, so it stays grey beneath it, like any neighbour of a country map.
 //
 // Usage:
-//   node scripts/build-europe-maps.mjs [--only=eu124,eu32] [--check | --dry-run]
-//     --only     build these maps; the index keeps the others' entries as they are
-//     --check    rebuild offline from the caches and compare every output byte for byte
-//     --dry-run  build and verify (downloading boundaries as needed) but write nothing
+//   node scripts/build-europe-maps.mjs [--only=eu124,eu32] [--check | --dry-run] [--boundaries=<dir>]
+//     --only        build these maps; the index keeps the others' entries as they are
+//     --check       rebuild offline from the caches and compare every output byte for byte
+//     --dry-run     build and verify (downloading boundaries as needed) but write nothing
+//     --boundaries  the boundary cache (default data-src/boundaries), e.g. another worktree's that holds Europe's layers
 //
-// Inputs:  the clubs in src/data/clubs.football.js and public/football/ea-*.json; where they stand, in
+// Inputs:  the clubs in src/data/clubs.football.js and the earlier seasons' public/football/<id>.json; where they stand, in
 //          scripts/data/europe-clubs.json; geoBoundaries gbOpen layers, cached under the gitignored data-src/boundaries/;
 //          the game's world map public/countries-50m.json, whose outlines every country keeps, so territories meet
 //          each other and the grey neighbours on the very borders the rest of the game draws.
@@ -492,8 +493,8 @@ function attributionText(entries, docs) {
 }
 
 /**
- * The maps to build: for the built-in season and each earlier EA season with clubs, its strongest TOP_CLUBS and
- * ELITE_CLUBS clubs. FIFA 05 and FIFA 06 have nations only, so no maps.
+ * The maps to build: for the built-in season and each earlier season with clubs (src/data/footballSeasons.js), its
+ * strongest TOP_CLUBS and ELITE_CLUBS clubs. FIFA 05, FIFA 06 and SWOS 96/97 have nations only, so no maps.
  */
 async function mapSpecs() {
   const { clubs: places } = JSON.parse(await readFile(clubsFile, 'utf8'));
@@ -517,9 +518,10 @@ async function main() {
   const argv = process.argv.slice(2), args = new Set(argv);
   const check = args.has('--check'), dryRun = args.has('--dry-run');
   const only = argv.find(a => a.startsWith('--only='))?.slice('--only='.length).split(',') ?? null;
+  const boundaries = argv.find(a => a.startsWith('--boundaries='))?.slice('--boundaries='.length);
   const log = line => console.log(line);
   const started = Date.now();
-  const source = createBoundarySource({ cacheDir, worldFile, offline: check, log });
+  const source = createBoundarySource({ cacheDir: boundaries ? path.resolve(boundaries) : cacheDir, worldFile, offline: check, log });
   const specs = await mapSpecs();
   const unknown = only?.filter(id => !specs.some(spec => spec.id === id));
   if (unknown?.length) throw new Error(`Unknown maps: ${unknown.join(', ')}`);

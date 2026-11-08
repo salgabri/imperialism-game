@@ -27,7 +27,7 @@ them. Sony's rights are not cleared, as for the built-in EA and 2K data.
 
 `--edition=<NN>` reads another edition and `--parallel=<n>` (at most 4) asks for several
 pages at once: the older editions' hosts take 15–25 s a page. The earlier seasons
-(below) are built from editions 21 to 25.
+(below) are built from editions 21 to 25, and from ShowZone's copies of 18 to 20.
 
 **Clubs.** `scripts/data/mlb-teams.json` names each club, its scoreboard code, the
 place its territory is named after, its ballpark and the point the map places it at
@@ -206,48 +206,103 @@ the live ticker, a baseball nations campaign and an MLB resume.
 
 ## Earlier seasons
 
-Five more seasons ship beside the built-in 2026: 2021 to 2025, each MLB The Show
-edition's Live series at its last roster update (5 November 2021, 11 November 2022,
-10 November 2023, 8 November 2024 and the 2025 edition's last), read from that
-edition's own API host (mlb21 to mlb25.theshow.com). Nothing older exists to read:
-the mlb17–mlb20 hosts are gone, the Wayback Machine holds two pages of the MLB 19
-API, and no dataset of every player's ratings for those years turned up. The only
-lead, a fan project that computes Show-like ratings from real statistics back to
-1897, estimates ratings rather than reading them, so it is not used.
+Eight more seasons ship beside the built-in 2026: 2018 to 2025, each MLB The Show
+edition's Live series at its last roster update (1 November 2018, 27 September 2019,
+30 October 2020, 5 November 2021, 11 November 2022, 10 November 2023, 8 November 2024
+and the 2025 edition's last). 2021 to 2025 are read from each edition's own API host
+(mlb21 to mlb25.theshow.com). Sony's mlb18–mlb20 hosts are gone, so 2018 to 2020 are
+ShowZone's copies of the same cards (below). Nothing older can be read: ShowZone keeps
+no edition before MLB The Show 18, the Wayback Machine holds two pages of the MLB 19
+API, and no other dataset of every player's ratings for those years turned up. A fan
+project that computes Show-like ratings from real statistics back to 1897 estimates
+ratings rather than reading them, so it is not used. The 2020 season was 60 games;
+here it is a season like any other.
 
 - **Building.** `npm run build:mlb-seasons` (`scripts/build-mlb-seasons.mjs`) builds
   each season from its committed snapshot by the built-in season's rules, now in
   `scripts/lib/mlb.mjs`: `public/baseball/mlb-the-show-<nn>.json` (kind `show`), their
   listing `src/data/baseballSeasons.js` and `docs/design/baseball-seasons-audit.json`.
   `--check` rebuilds every file byte for byte, offline.
+- **ShowZone.** showzone.gg, a fan-run card database that is not the publisher, keeps
+  the Live series of MLB The Show 18 to 26 at each edition's last roster update and
+  serves it from a public data API (data.showzone.gg). Its pages for 18 to 21 were read
+  once, on 8 November 2026 (74 pages of 100 cards), cached in the ignored
+  `data-src/showzone/` and pinned by SHA-256 in `scripts/data/mlb-seasons.json`
+  (`showzone`). showzone.gg's robots.txt disallows /api on its own host; the data host
+  serves none. ShowZone states "All Rights Reserved" and publishes no terms: as with
+  Sony's own data, the rights are not cleared. `npm run import:mlb-showzone`
+  (`scripts/import-mlb-showzone.mjs`) checks the pins and writes
+  `scripts/data/mlb-the-show-18.json` to `-20.json` in the Sony snapshots' shape, with
+  the source and these checks in each; it never fetches, and `--check` rebuilds the
+  three byte for byte.
+- **Checks.** ShowZone's MLB The Show 21 must equal Sony's own snapshot card for card
+  (all 2,092: uuid, name, team, position, overall and birthplace) or the import stops;
+  its team ids take their codes and names from that edition, which the clubs kept from
+  2018 to 2021. Against Sony's own pages, ShowZone holds the new rating and the team of
+  all 37 changes of MLB 18's last roster update, 142 of 143 of MLB 19's and 113 of 114
+  of MLB 20's (the Wayback Machine); every overall of the 60 MLB 18, 10 MLB 19 and 95
+  MLB 20 card pages the Wayback Machine and Common Crawl hold agrees, and so do the
+  secondary positions and birthplaces of 19 and 20. Two Live cards are missing, and
+  so are their players: Giovanny Gallegos (MLB 19) and Paolo Espino (MLB 20).
+- **MLB The Show 18** lists no secondary positions (nor do Sony's own MLB 18 card
+  pages), so its players field their primary position only; every club still fields
+  every place naturally. It names no birthplace either. A card takes one from the
+  nearest edition within three that names it (MLB 19 to 21: 1,369 cards, and all 54
+  that Sony's own MLB 18 pages name agree), else from MLB's own records:
+  `npm run sync:mlb-birthplaces` (`scripts/sync-mlb-birthplaces.mjs`) matches each of
+  the other 202 cards to one player of the 2016–2019 seasons in MLB's Stats API
+  (statsapi.mlb.com, which serves no robots.txt; one request a season, pinned in the
+  manifest's `statsApi`), by name, then surname and a shortened first name ("Matt" for
+  Matthew), then surname and club, always in the card's role and with its hands (a
+  pitcher's batting hand aside), and writes the answers to
+  `scripts/data/mlb-birthplaces.json`. 201 match, the six that Sony's MLB 18 pages
+  name among them, and agree; Chris Smith, a free agent two players could be, plays
+  for no nation. The audit lists every birthplace found and where.
 - **Clubs of their day.** `scripts/data/mlb-seasons.json` names the eras in which a
-  franchise played under another name or elsewhere: the Cleveland Indians (2021),
-  the Oakland Athletics at the Oakland Coliseum (to 2024), the Rays at George M.
-  Steinbrenner Field in Tampa (2025, Tropicana Field being repaired after Hurricane
-  Milton), and the old names of Guaranteed Rate Field and Minute Maid Park (to 2024).
-  A club of another era has its own id (`mlb-cleveland-indians`,
-  `mlb-oakland-athletics`), as the NBA's moved franchises do, so it has no crest.
-- **Era maps.** `npm run build:mlb-map` also draws `mlb2021`, `mlb2022` (2022–24) and
-  `mlb2025` from the manifest; each lists the seasons it serves, and a season's clubs
-  play only there. Their clubs rank as their franchises rank today, so section ids
+  franchise played under another name or elsewhere (from the franchise history of
+  1980–2020 researched for the maps): the Cleveland Indians (to 2021), the Oakland
+  Athletics (to 2024) at the Oakland–Alameda County Coliseum, the RingCentral Coliseum
+  (2019) and the Oakland Coliseum (2021–24), the Blue Jays at Sahlen Field in Buffalo
+  (2020, Canada closing its border to visiting teams), the Rangers at Globe Life Park
+  in Arlington (to 2019), the Rays at George M. Steinbrenner Field in Tampa (2025,
+  Tropicana Field being repaired after Hurricane Milton), and the old names of
+  SunTrust Park (to 2019), Marlins Park and Miller Park (to 2020), Safeco Field and
+  AT&T Park (2018), Guaranteed Rate Field and Minute Maid Park (to 2024). A club of
+  another era has its own id (`mlb-cleveland-indians`, `mlb-oakland-athletics`), as
+  the NBA's moved franchises do, so it has no crest.
+- **Era maps.** `npm run build:mlb-map` also draws `mlb2018`, `mlb2019`, `mlb2020`,
+  `mlb2021`, `mlb2022` (2022–24) and `mlb2025` from the manifest; each lists the
+  seasons it serves, and a season's clubs play only there. A map serves the seasons
+  with the same clubs in the same ballparks under the same names, so 2018, 2019 and
+  2020 have one each. Their clubs rank as their franchises rank today, so section ids
   follow one order on every map. Cook County is cut between the Chicago clubs on
-  every map.
+  every map. In 2020 the Blue Jays hold their part of New York State, which they
+  share with the Yankees and the Mets, and Ontario is nobody's.
 - **Nations.** A season keeps both layers, unlike an NBA season: its nations
   replace the built-in ones (a nation it does not list is the sport's minnow, 45),
   and its clubs the built-in clubs, on its era's map. The loader (`seasonSport` in
   `src/engine/footballSets.js`) binds baseball to both; saves name the set, its
-  version and its season ('2024', a calendar year).
+  version and its season ('2024', a calendar year). MLB The Show 19 and 20 name three
+  places the later editions do not: Northern Ireland (the United Kingdom, as Great
+  Britain is), Lithuania and Saudi Arabia, each one pitcher's.
 - **A source error.** MLB The Show 24's API gives the wrong country for players born
   outside the United States (Juan Soto and Ketel Marte "At Sea", Ronald Acuña Jr.
   "Slovenia", Shohei Ohtani "Honduras"); its US states are right. The manifest marks
   that edition (`unreliableBirthplaces`), and the build takes each foreign-born
-  player's birthplace from the nearest sound edition, earlier first. The audit lists
-  every one, and any player no other edition names, who then plays for his club only.
-  The other editions agree with 2026 on all but a handful of players.
+  player's birthplace from the nearest sound edition within three, earlier first.
+  Where that edition has two players of the name born in different places, the one in
+  the card's role (pitcher or not) decides, then the one on its club, then the one at
+  its position; failing all three, the edition is passed over. The audit lists every
+  one, and any player no edition names, who then plays for his club only. The other
+  editions agree with 2026 on all but a handful of players.
 
 ## Known limits
 
-- Six seasons, 2021 to 2026: nothing older can be read.
+- Nine seasons, 2018 to 2026: ShowZone keeps nothing older. 2018 to 2020 are a fan
+  site's copy of Sony's cards, checked against Sony's own pages but not Sony's API,
+  read from a data host whose site disallows /api in its robots.txt; MLB The Show 18's
+  players field their primary position only, and its birthplaces come from the next
+  editions and MLB's records.
 - Nations by birthplace, not eligibility; no NPB, KBO or CPBL players.
 - The ace starts every game, and a run scores as runs batted in only: no errors, wild
   pitches or unearned runs, no home runs as such.

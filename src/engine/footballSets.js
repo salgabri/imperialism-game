@@ -1,6 +1,7 @@
 // Data sets: one dated database's nations and clubs, played instead of a sport's built-in season. A football set is
-// one of the built-in earlier seasons (an EA FIFA / FC roster, src/data/footballSeasons.js; FIFA 05 and FIFA 06 have
-// nations only) or a CM 01/02 database built on this computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition,
+// one of the built-in earlier seasons (src/data/footballSeasons.js: an EA FIFA / FC roster, FIFA 05 and FIFA 06 with
+// nations only; before them SI's CM 01/02 3.9.68 and 3.9.60, CM3 and CM 97/98 databases, and SWOS 96/97's national
+// squads, nations only) or a CM 01/02 database built on this computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition,
 // src/data/basketballSeasons.js), clubs only, on its era's map; a baseball set a built-in earlier MLB season (an MLB
 // The Show edition, src/data/baseballSeasons.js), its nations by birthplace and its clubs on its era's map. Each is a
 // `public/<sport>/<id>.json` (format 1, see docs/design/football-years.md), validated strictly and exposed as that sport
@@ -10,14 +11,25 @@
 import { DEPENDENCIES, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS } from '../data/teams.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
+import { SWOS_CONVERSION, SWOS_ROLES, SWOS_SCALE, expandSwosTuple, swosTupleOf } from '../data/swosPlayers.js';
 import { BUILT_IN_SEASONS } from '../data/footballSeasons.js';
 import { BUILT_IN_BASKETBALL_SEASONS } from '../data/basketballSeasons.js';
 import { BUILT_IN_BASEBALL_SEASONS } from '../data/baseballSeasons.js';
+import { BUILT_IN_WOMENS_SEASONS } from '../data/womensFootballSeasons.js';
+import { BUILT_IN_AMERICAN_FOOTBALL_SEASONS } from '../data/americanFootballSeasons.js';
+import { BUILT_IN_TENNIS_SEASONS } from '../data/tennisSeasons.js';
+import { BUILT_IN_HOCKEY_SEASONS } from '../data/hockeySeasons.js';
+import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
 import { basketball } from '../sports/basketball.js';
+import { americanFootball } from '../sports/americanFootball.js';
+import { tennis } from '../sports/tennis.js';
+import { hockey } from '../sports/hockey.js';
+import { rugbyLeague } from '../sports/rugbyLeague.js';
 import { baseball } from '../sports/baseball.js';
 import { football } from '../sports/football.js';
+import { womensFootball } from '../sports/womensFootball.js';
 import { getSport } from '../sports/index.js';
 
 export const FOOTBALL_SET_FORMAT = 1;
@@ -36,33 +48,72 @@ const BUILT_IN_SEASONS_OF = Object.freeze({ football: BUILT_IN_SEASON, 'womens-f
 /** The season a sport's built-in data plays. */
 export const builtInSeasonOf = sportId => BUILT_IN_SEASONS_OF[getSport(sportId).id];
 
-// `cm0102-<release month>[-variant]` for a CM 01/02 database, `ea-fifa-<nn>` / `ea-fc-<nn>` for an EA edition,
-// `nba-2k<nn>` for an NBA 2K edition, `mlb-the-show-<nn>` for an MLB The Show edition.
-const SET_ID = /^(?:cm0102-\d{4}-\d{2}(-[a-z0-9]+)?|ea-(?:fifa|fc)-\d{2}|nba-2k\d{2}|mlb-the-show-\d{2})$/;
-export const isFootballSetId = id => typeof id === 'string' && SET_ID.test(id);
-/** Whose players a set holds, by its id: 'ea', 'nba2k', 'show' or 'cm0102'. */
-export const setKindOf = id => (String(id).startsWith('ea-') ? 'ea' : String(id).startsWith('nba-') ? 'nba2k'
-  : String(id).startsWith('mlb-') ? 'show' : 'cm0102');
-const SPORT_OF_KIND = { nba2k: 'basketball', show: 'baseball' };
+// The kinds of data set, told apart by their ids' prefixes: the sport each plays in, the shape of its ids, whether it
+// fields national teams (`nations: false`: clubs only), which of its ids have nations only (`nationsOnly`), whether its
+// clubs play on a map of their era (`mapped`, src/data/clubMaps.js) rather than on the world, and whether its season is
+// a calendar year (`calendar`: '2025') rather than a winter's ('2025/26'). A CM 01/02 database is the kind of any id
+// no other prefix claims: `cm0102-<release month>[-variant]`.
+const SET_KINDS = Object.freeze({
+  // `ea-fifa-<nn>` / `ea-fc-<nn>`: an EA edition. SoFIFA, this game's only source of EA's clubs before FIFA 15, starts
+  // with FIFA 07, so the editions before it have nations only.
+  ea: { prefix: 'ea-', id: /^ea-(?:fifa|fc)-\d{2}$/, sport: 'football', nationsOnly: /^ea-fifa-0[0-6]$/ },
+  // `eaw-fifa-<nn>` / `eaw-fc-<nn>`: an EA edition's women. EA rated national teams alone until FIFA 22, and the women's
+  // clubs from FIFA 23 on.
+  eaw: { prefix: 'eaw-', id: /^eaw-(?:fifa|fc)-\d{2}$/, sport: 'womens-football', nationsOnly: /^eaw-fifa-(?:1\d|2[0-2])$/ },
+  // `nba-2k<nn>`: an NBA 2K edition, the NBA's clubs only.
+  // Also, by the season they rate: NBA 2K's MyNBA Eras leagues (`nba-eras-<season end year>`), NBA 2K's classic teams
+  // of one season (`nba-classic-<season end year>`) and EA's NBA Live editions (`nba-live-<nn>`).
+  nba2k: { prefix: 'nba-', id: /^nba-(?:2k\d{2}|eras-\d{4}|classic-\d{4}|live-\d{2})$/, sport: 'basketball', nations: false, mapped: true },
+  // `mlb-the-show-<nn>`: an MLB The Show edition, its nations by birthplace and the MLB's clubs.
+  show: { prefix: 'mlb-', id: /^mlb-the-show-\d{2}$/, sport: 'baseball', mapped: true, calendar: true },
+  // `madden-<season>`: a Madden NFL edition, by the NFL season it rates (Madden NFL 06 rates 2005), the NFL's clubs only.
+  madden: { prefix: 'madden-', id: /^madden-\d{4}$/, sport: 'american-football', nations: false, mapped: true, calendar: true },
+  // `tecmo-<season>`: a Tecmo Super Bowl edition, by the NFL season it rates (the NES game rates 1990), the NFL's clubs
+  // only. Tecmo rates attributes, not players: each overall is converted (source.conversion).
+  tecmo: { prefix: 'tecmo-', id: /^tecmo-\d{4}$/, sport: 'american-football', nations: false, mapped: true, calendar: true },
+  // `tennis-<year>`: the ATP's men at the end of a year, by Elo, the Davis Cup's nations only.
+  elo: { prefix: 'tennis-', id: /^tennis-\d{4}$/, sport: 'tennis', nationsOnly: /^tennis-/, calendar: true },
+  // `nhl-<season end year>`: an NHL season's ratings from an EA NHL edition (NHL 94 rates 1993/94 → `nhl-1994`), its
+  // nations by nationality and the NHL's clubs.
+  nhl: { prefix: 'nhl-', id: /^nhl-\d{4}$/, sport: 'hockey', mapped: true },
+  // `nrl-<season>`: an NRL season from a rugby league game's database (Rugby League 2: World Cup Edition rates 2008), the
+  // NRL's clubs only. The game rates attributes, not players: each overall is converted (source.conversion).
+  nrl: { prefix: 'nrl-', id: /^nrl-\d{4}$/, sport: 'rugby-league', nations: false, mapped: true, calendar: true },
+  // `cm-<season>`: a Championship Manager edition's database before CM 01/02 (CM 97/98 → `cm-9798`), its players CM
+  // 01/02's tuples.
+  cm: { prefix: 'cm-', id: /^cm-\d{4}$/, sport: 'football' },
+  // `swos-<season>`: a Sensible World of Soccer edition's national squads (SWOS 96/97 → `swos-9697`), nations only.
+  swos: { prefix: 'swos-', id: /^swos-\d{4}$/, sport: 'football', nationsOnly: /^swos-/ },
+  cm0102: { prefix: '', id: /^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$/, sport: 'football' },
+});
+const kindRecord = id => {
+  const text = String(id);
+  return Object.values(SET_KINDS).find(kind => kind.prefix && text.startsWith(kind.prefix)) || SET_KINDS.cm0102;
+};
+export const isFootballSetId = id => typeof id === 'string' && kindRecord(id).id.test(id);
+/** Whose players a set holds, by its id: 'ea', 'eaw', 'nba2k', 'show', 'cm', 'swos' or 'cm0102' (and the other sports' kinds). */
+export const setKindOf = id => Object.keys(SET_KINDS).find(kind => SET_KINDS[kind] === kindRecord(id));
 /** The sport a set is played in, by its id. */
-export const setSportOf = id => SPORT_OF_KIND[setKindOf(id)] || 'football';
+export const setSportOf = id => kindRecord(id).sport;
 /** Whether a set fields national teams: every one but an NBA season, which has clubs only. */
-export const setHasNations = id => setKindOf(id) !== 'nba2k';
-// SoFIFA, this game's only source of EA's clubs before FIFA 15, starts with FIFA 07.
-const NATIONS_ONLY = /^ea-fifa-0[0-6]$/;
-/** Whether a set has clubs: every one but the EA editions before FIFA 07, which have nations only. */
-export const setHasClubs = id => !NATIONS_ONLY.test(String(id));
-// Sets whose clubs play on a map of their era (src/data/clubMaps.js) rather than on the world.
-const MAPPED = new Set(['nba2k', 'show']);
+export const setHasNations = id => kindRecord(id).nations !== false;
+/** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, SWOS 96/97, tennis). */
+export const setHasClubs = id => !kindRecord(id).nationsOnly?.test(String(id));
+/** Whether a set's clubs play on a map of their era (src/data/clubMaps.js) rather than on the world. */
+export const setIsMapped = id => !!kindRecord(id).mapped;
 export const isDataYear = year => Number.isInteger(year) && year >= 1872 && year <= 2100;
 /** '2025/26' for 2026. */
 export const seasonOf = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
 /** A set's season as it names it: football's and basketball's '2025/26', baseball's calendar year, '2025'. */
-export const seasonLabelOf = (id, year) => (setSportOf(id) === 'baseball' ? String(year) : seasonOf(year));
+export const seasonLabelOf = (id, year) => (kindRecord(id).calendar ? String(year) : seasonOf(year));
 const versionPattern = id => new RegExp(`^${id}-[0-9a-f]{8}$`);
 // The builder's `f-<slug>` ids. The fixed prefix also keeps a club clear of Object.prototype names such as
 // `__proto__`, which the campaign's team maps would swallow.
 const CLUB_ID = /^f-[a-z0-9-]{0,62}$/;
+// The women's game's clubs, `w-<slug>` as its built-in clubs' (scripts/build-womens-football.mjs).
+const WOMENS_CLUB_ID = /^w-[a-z0-9-]{1,62}$/;
+// Kinds whose players are EA's tuples (src/data/eaPlayers.js).
+const EA_KINDS = new Set(['ea', 'eaw']);
 
 // What build-rosters writes for a nation with no players.
 const EMPTY_STRENGTH = 40;
@@ -117,9 +168,9 @@ function listing(data) {
   const valid = entries.filter(entry => entry && isFootballSetId(entry.id) && !seen.has(entry.id) && seen.add(entry.id)
     && isDataYear(entry.year) && entry.season === seasonLabelOf(entry.id, entry.year) && typeof entry.label === 'string' && entry.label.trim()
     && (entry.version == null || (typeof entry.version === 'string' && versionPattern(entry.id).test(entry.version)))
-    && (!MAPPED.has(setKindOf(entry.id)) || eraMapOf(entry.id, entry.map) != null));
+    && (!setIsMapped(entry.id) || eraMapOf(entry.id, entry.map) != null));
   return Object.freeze(valid.sort(newestFirst).map(({ id, version = null, year, season, label, map }) => Object.freeze({
-    id, version, year, season, label: label.trim(), ...(MAPPED.has(setKindOf(id)) ? { map } : {}) })));
+    id, version, year, season, label: label.trim(), ...(setIsMapped(id) ? { map } : {}) })));
 }
 
 // A basketball or baseball season's map (src/data/clubMaps.js), or null: an earlier era's that lists the season, or
@@ -134,7 +185,9 @@ export const isEraMap = id => [...CLUB_MAPS, ...EUROPE_MAPS].some(entry => entry
 export const isSeasonEuropeMap = (mapId, id) => EUROPE_MAPS.some(entry => entry.id === mapId && !!entry.seasons?.includes(id));
 
 /** The built-in earlier seasons of every sport, newest first, as the index lists them. */
-export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS]);
+export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_WOMENS_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS,
+  ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS, ...BUILT_IN_HOCKEY_SEASONS, ...BUILT_IN_TENNIS_SEASONS,
+  ...BUILT_IN_RUGBY_LEAGUE_SEASONS]);
 
 /** The era map a basketball or baseball season's clubs play on (null for any other set). */
 export const seasonMapOf = id => BUILT_IN_SETS.find(set => set.id === id)?.map ?? null;
@@ -235,11 +288,20 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
  */
 export function decodeFootballSet(data, id = data?.id) {
   validateFootballSet(data, String(id));
-  if (setKindOf(data.id) === 'nba2k') {
+  if (['nba2k', 'madden', 'tecmo', 'nrl'].includes(setKindOf(data.id))) {
     const { clubs, ...meta } = data;
     return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(player => [...player]) })), territory: NO_TERRITORY };
   }
-  if (setKindOf(data.id) === 'show') {
+  if (setKindOf(data.id) === 'elo') {
+    const { nations, clubs, territory, ...meta } = data;
+    return {
+      meta,
+      rosters: Object.fromEntries(Object.entries(nations).map(([nation, [str, real, players]]) => [nation, [str, real, players.map(player => [player[0], player[1], player[2], { ...player[3] }])]])),
+      clubs: [],
+      territory: { merged: { ...territory.merged }, inactive: [...territory.inactive] },
+    };
+  }
+  if (setKindOf(data.id) === 'show' || setKindOf(data.id) === 'nhl') {
     const { nations, clubs, territory, ...meta } = data;
     return {
       meta,
@@ -250,6 +312,15 @@ export function decodeFootballSet(data, id = data?.id) {
   }
   const { nations, clubs, territory, ...meta } = data;
   const expand = tuple => expandSetPlayer(tuple, meta.source, setKindOf(meta.id));
+  // A women's season lists only the nations with a rated player; every other one fields no team (`territory.inactive`).
+  if (setKindOf(meta.id) === 'eaw') {
+    return {
+      meta,
+      rosters: Object.fromEntries(Object.entries(nations).map(([nation, [str, pool, players]]) => [nation, [str, pool, players.map(expand)]])),
+      clubs: clubs.map(club => ({ ...club, squad: club.squad.map(expand) })),
+      territory: { merged: { ...territory.merged }, inactive: [...territory.inactive] },
+    };
+  }
   const englandHolds = beforeHomeNations(nations);
   return {
     meta,
@@ -270,7 +341,12 @@ export function decodeFootballSet(data, id = data?.id) {
  * this too.
  */
 export function expandSetPlayer(tuple, source, kind = 'cm0102') {
-  if (kind === 'ea') return expandEaTuple(tuple, source);
+  if (EA_KINDS.has(kind)) return expandEaTuple(tuple, source);
+  if (kind === 'swos') {
+    const player = expandSwosTuple(tuple, source);
+    if (source.provider != null) player[3].provider = source.provider;
+    return player;
+  }
   const player = expandCmTuple(tuple, source);
   if (source.provider != null && player[3].provider === undefined) player[3].provider = source.provider;
   return player;
@@ -290,11 +366,14 @@ const KINDS = {
       : src.rawScale !== EA_SCALE ? `source rawScale must be ${EA_SCALE}`
         : src.conversion !== undefined ? 'EA ratings are not converted' : '') },
   // Clubs only, each player `[name, positions, rating]` as the built-in basketball clubs hold them.
+  // NBA 2K's overalls are used as they are; NBA Live's are put on NBA 2K's scale by a line its source states.
   nba2k: { size: 3,
-    source: src => (!['edition', 'compiler'].every(key => typeof src[key] === 'string' && src[key].trim())
+    source: (src, id) => (!['edition', 'compiler'].every(key => typeof src[key] === 'string' && src[key].trim())
       ? 'source must name the edition and who compiled its ratings'
       : src.rawScale !== NBA_SCALE ? `source rawScale must be ${NBA_SCALE}`
-        : src.conversion !== undefined ? 'NBA 2K ratings are not converted' : '') },
+        : /^nba-live-/.test(id) ? (typeof src.conversion === 'string' && src.conversion.trim() ? ''
+          : 'source conversion must say how NBA Live\'s overalls were put on NBA 2K\'s scale')
+          : src.conversion !== undefined ? 'NBA 2K ratings are not converted' : '') },
   // Nations and clubs, each player `[name, positions, rating]` as the built-in baseball teams hold them.
   show: { size: 3,
     source: src => (!['edition', 'update', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
@@ -302,6 +381,46 @@ const KINDS = {
       : src.rawScale !== SHOW_SCALE ? `source rawScale must be ${SHOW_SCALE}`
         : src.conversion !== undefined ? 'MLB The Show ratings are not converted' : '') },
 };
+// The women's EA seasons hold the same tuples and source block as the men's.
+KINDS.eaw = KINDS.ea;
+// A Championship Manager database before CM 01/02 (CM 97/98) holds CM 01/02's tuples and source block.
+KINDS.cm = KINDS.cm0102;
+// SWOS's national squads: CM's tuple layout plus the seven skill digits (src/data/swosPlayers.js), its price step converted.
+KINDS.swos = { size: 9, roles: SWOS_ROLES, tupleOf: swosTupleOf,
+  source: src => (!['edition', 'version', 'snapshotDate'].every(key => typeof src[key] === 'string' && src[key].trim())
+    ? 'source must name the edition, database version and snapshotDate'
+    : src.rawScale !== SWOS_SCALE ? `source rawScale must be ${SWOS_SCALE}`
+      : src.conversion !== SWOS_CONVERSION ? `source conversion must be "${SWOS_CONVERSION}"` : '') };
+// Each football kind's player tuple, as an error names it.
+const TUPLE_NAMES = { ea: 'an EA', eaw: 'an EA', swos: 'a SWOS' };
+// Nations only, each player `[name, 'SGL', rating, source]` as the built-in tennis rosters hold them.
+KINDS.elo = { size: 4,
+  source: src => (!['edition', 'name', 'snapshotDate', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
+    ? 'source must name the edition, its publisher, the date the ratings are of and when they were read'
+    : src.rawScale !== 'Elo' ? 'source rawScale must be "Elo"' : '') };
+// Nations and clubs, each player `[name, position, rating]`.
+KINDS.nhl = { size: 3,
+  source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
+    ? 'source must name the edition, who compiled its ratings and when they were read'
+    : !Number.isInteger(src.rawScale) ? 'source rawScale must be a number' : '') };
+// Clubs only, each player `[name, position, rating]` as the built-in NFL clubs hold them.
+KINDS.madden = { size: 3,
+  source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
+    ? 'source must name the edition, who compiled its ratings and when they were read'
+    : src.rawScale !== 99 ? 'source rawScale must be 99'
+      : src.conversion !== undefined ? 'Madden ratings are not converted' : '') };
+// The same clubs, their overalls converted from Tecmo's attributes by a documented rule.
+KINDS.tecmo = { size: 3,
+  source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
+    ? 'source must name the edition, who compiled its ratings and when they were read'
+    : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the overalls were derived' : '') };
+// Clubs only, each player `[name, position, rating]` as the built-in rugby league clubs hold them, their overalls
+// converted from the game's 1–10 attributes by a documented rule (source.conversion), as Tecmo's are.
+KINDS.nrl = { size: 3,
+  source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
+    ? 'source must name the edition, who compiled its ratings and when they were read'
+    : !Number.isInteger(src.rawScale) ? 'source rawScale must be a number'
+      : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the overalls were derived' : '') };
 const NBA_SCALE = 99;
 const SHOW_SCALE = 99;
 const BASKETBALL_POSITIONS = ['PG', 'SG', 'SF', 'PF', 'C'];
@@ -315,7 +434,7 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "ea-fifa-<nn>" or "nba-2k<nn>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "nba-2k<nn>" or "mlb-the-show-<nn>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
@@ -331,7 +450,7 @@ function validateFootballSet(data, id) {
   if (data.local != null && typeof data.local !== 'boolean') fail('local must be true or false');
   const src = data.source;
   if (!isObject(src)) fail('source is missing');
-  const sourceProblem = kind.source(src);
+  const sourceProblem = kind.source(src, id);
   if (sourceProblem) fail(sourceProblem);
   if (src.provider != null && !text(src.provider)) fail('source provider is empty');
   if (typeof src.url !== 'string' || !/^https?:\/\/\S+$/i.test(src.url)) fail('source url must be an http(s) link');
@@ -339,6 +458,13 @@ function validateFootballSet(data, id) {
     || Object.values(data.coverage).some(n => !Number.isInteger(n) || n < 0))) fail('coverage must hold counts');
   if (setKindOf(id) === 'nba2k') return validateBasketballClubs(data, id, fail);
   if (setKindOf(id) === 'show') return validateBaseballSeason(data, id, fail);
+  if (setKindOf(id) === 'elo') return validateTennisSeason(data, id, fail);
+  if (setKindOf(id) === 'nhl') return validateNationsAndClubsOnMap(data, id, fail, { sport: hockey, clubId: NHL_CLUB_ID,
+    positions: new Set(Object.keys(hockey.formation)), clubLeast: 12, noun: 'an NHL season' });
+  if (setKindOf(id) === 'nrl') return validateClubsOnMap(data, id, fail, { sport: rugbyLeague, clubId: NRL_CLUB_ID,
+    positions: new Set(Object.keys(rugbyLeague.formation)), least: rugbyLeague.squadSize, noun: 'an NRL season' });
+  if (setKindOf(id) === 'madden' || setKindOf(id) === 'tecmo') return validateClubsOnMap(data, id, fail, { sport: americanFootball, clubId: NFL_CLUB_ID,
+    positions: new Set(Object.keys(americanFootball.formation)), least: americanFootball.squadSize, noun: 'an NFL season' });
 
   // The builder writes only tuples that rebuild exactly, so anything else (an unknown or repeated position key, a
   // full name equal to the name, a malformed date) is a file it did not write.
@@ -347,7 +473,7 @@ function validateFootballSet(data, id) {
     const ids = new Set();
     tuples.forEach((tuple, j) => {
       const where = `${at}[${j}]`;
-      if (!Array.isArray(tuple) || tuple.length !== kind.size) fail(`${where} is not ${setKindOf(id) === 'ea' ? 'an EA' : 'a CM'} player tuple`);
+      if (!Array.isArray(tuple) || tuple.length !== kind.size) fail(`${where} is not ${TUPLE_NAMES[setKindOf(id)] ?? 'a CM'} player tuple`);
       const [playerId, , , , positions, , , dateOfBirth] = tuple;
       if (ids.has(playerId)) fail(`${where} repeats player ${playerId}`);
       ids.add(playerId);
@@ -368,13 +494,15 @@ function validateFootballSet(data, id) {
     });
   };
 
-  // Every nation has an entry, even an empty one, so no season falls back to the built-in hand-tuned strength.
+  // Every nation has an entry, even an empty one, so no season falls back to the built-in hand-tuned strength. A women's
+  // season lists only the nations with a rated player instead: every other one fields no team and is inactive.
+  const women = setKindOf(id) === 'eaw';
   const nations = data.nations;
   if (!isObject(nations)) fail('nations is missing');
   const unknown = Object.keys(nations).filter(key => !nation(key));
   if (unknown.length) fail(`nations has unknown ids ${unknown.slice(0, 5).join(', ')}`);
   const older = beforeHomeNations(nations), islandless = beforePacificIslands(nations);
-  const missing = Object.keys(NATIONS).filter(key => !Object.hasOwn(nations, key) && !(older && HOME_NATIONS.includes(key))
+  const missing = women ? [] : Object.keys(NATIONS).filter(key => !Object.hasOwn(nations, key) && !(older && HOME_NATIONS.includes(key))
     && !(islandless && PACIFIC_ISLANDS.includes(key)));
   if (missing.length) fail(`nations must list all ${Object.keys(NATIONS).length} nations; missing ${missing.slice(0, 5).join(', ')}`);
   for (const [key, entry] of Object.entries(nations)) {
@@ -384,17 +512,18 @@ function validateFootballSet(data, id) {
     if (!rating(str)) fail(`${at} strength must be a rating 1-99`);
     players(at, list);
     if (!Number.isInteger(pool) || pool < list.length) fail(`${at} poolSize must be an integer of at least its ${list.length} players`);
+    if (women && !list.length) fail(`${at} has no players: a nation with none is inactive, not listed`);
   }
 
   // League names are the built-in ones, so a club reads the same in every data set.
-  const leagues = new Set(football.clubs.map(club => club.league));
+  const leagues = new Set((women ? womensFootball : football).clubs.map(club => club.league));
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (!setHasClubs(id) && data.clubs.length) fail('this season has nations only');
   const clubIds = new Set();
   data.clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
     if (!isObject(club)) fail(`${at} is not an object`);
-    if (typeof club.id !== 'string' || !CLUB_ID.test(club.id)) fail(`${at} id ${JSON.stringify(club.id)} must look like "f-<name>"`);
+    if (typeof club.id !== 'string' || !(women ? WOMENS_CLUB_ID : CLUB_ID).test(club.id)) fail(`${at} id ${JSON.stringify(club.id)} must look like "${women ? 'w' : 'f'}-<name>"`);
     if (clubIds.has(club.id)) fail(`${at} id is duplicated`);
     clubIds.add(club.id);
     if (!text(club.name)) fail(`${at} has no name`);
@@ -421,6 +550,13 @@ function validateFootballSet(data, id) {
     if (!nation(holder) || holder === shape) fail(`territory.merged ${shape} names no other nation as its holder`);
     if (inactive.has(shape)) fail(`territory ${shape} is both merged and inactive`);
     if (inactive.has(holder) || Object.hasOwn(territory.merged, holder)) fail(`territory.merged ${shape}: holder ${holder} fields no team that year`);
+  }
+  // In a women's season a nation fields a team exactly when it is listed: the others' land stays neutral.
+  if (women) {
+    const fielded = Object.keys(NATIONS).filter(key => !inactive.has(key) && !Object.hasOwn(territory.merged, key));
+    const unlisted = fielded.filter(key => !Object.hasOwn(nations, key)), idle = Object.keys(nations).filter(key => !fielded.includes(key));
+    if (unlisted.length) fail(`territory leaves ${unlisted.slice(0, 5).join(', ')} active with no players`);
+    if (idle.length) fail(`territory makes listed nations ${idle.slice(0, 5).join(', ')} inactive or merged`);
   }
 }
 
@@ -469,6 +605,173 @@ function validateBasketballClubs(data, id, fail) {
       if (typeof positions !== 'string' || at1 < 0 || rest.length || (second !== undefined && (at2 < 0 || Math.abs(at1 - at2) !== 1))) {
         fail(`${where} positions ${JSON.stringify(positions)} must be one position or two neighbouring ones`);
       }
+      if (!rating(value)) fail(`${where} rating must be a whole number 1-99`);
+    });
+  });
+}
+
+/**
+ * A tennis season: the nations that field a Davis Cup team (two to five rated men each, strongest first, as
+ * `[name, 'SGL', rating, source]`), no clubs, and its territory: the home nations held by the United Kingdom, every
+ * nation it does not list inactive. Ratings are the season's Elo on the game's scale.
+ */
+function validateTennisSeason(data, id, fail) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
+  const text = v => typeof v === 'string' && v.trim().length > 0;
+  const nations = data.nations;
+  if (!isObject(nations)) fail('nations is missing');
+  if (!Array.isArray(data.clubs) || data.clubs.length) fail('a tennis season has nations only');
+  for (const [key, entry] of Object.entries(nations)) {
+    const at = `nations[${key}]`;
+    if (!Object.hasOwn(NATIONS, key)) fail(`${at} is not a nation id`);
+    if (!Array.isArray(entry) || entry.length !== 3) fail(`${at} must be [strength, players, squad]`);
+    const [str, real, squad] = entry;
+    if (typeof str !== 'number' || !(str >= 1 && str <= 99)) fail(`${at} strength must be a rating 1-99`);
+    if (!Array.isArray(squad) || squad.length < 2 || squad.length > 5) fail(`${at} must name two to five players`);
+    if (!Number.isInteger(real) || real < squad.length) fail(`${at} counts ${real} players but names ${squad.length}`);
+    const names = new Set();
+    squad.forEach((player, j) => {
+      const where = `${at}[${j}]`;
+      if (!Array.isArray(player) || player.length !== 4) fail(`${where} is not [name, 'SGL', rating, source]`);
+      const [name, pos, rating, source] = player;
+      if (!text(name) || name !== name.trim() || names.has(name)) fail(`${where} has no name, or repeats one`);
+      names.add(name);
+      if (pos !== 'SGL') fail(`${where} position must be SGL`);
+      if (!Number.isInteger(rating) || rating < 1 || rating > 99) fail(`${where} rating must be a whole number 1-99`);
+      if (!isObject(source) || !text(source.id) || !text(source.source) || typeof source.rawRating !== 'number') {
+        fail(`${where} source must name the player and his Elo`);
+      }
+    });
+    if (squad.some((player, j) => j && player[3].rawRating > squad[j - 1][3].rawRating)) fail(`${at} squad must run strongest first`);
+  }
+  const territory = data.territory;
+  if (!isObject(territory) || !isObject(territory.merged) || !Array.isArray(territory.inactive)) {
+    fail('territory must be { merged: { shape: holder }, inactive: [shape] }');
+  }
+  // The home nations play as Great Britain, as in the Davis Cup; a season of another era may also merge the shapes of a
+  // federation of its day into the nation that played for it (the Soviet Union's republics into Russia's).
+  if (HOME_NATIONS.some(home => territory.merged[home] !== '826')) fail('territory.merged must put the home nations in the United Kingdom, as the Davis Cup does');
+  for (const [shape, holder] of Object.entries(territory.merged)) {
+    if (!Object.hasOwn(NATIONS, shape) || shape === holder || !Object.hasOwn(nations, holder) && holder !== '826') {
+      fail(`territory.merged ${shape} names no nation of this season as its holder`);
+    }
+    if (Object.hasOwn(nations, shape)) fail(`territory.merged ${shape} fields a team of its own`);
+  }
+  const inactive = Object.keys(NATIONS).filter(key => !Object.hasOwn(territory.merged, key) && !Object.hasOwn(nations, key));
+  if (JSON.stringify(territory.inactive) !== JSON.stringify(inactive)) fail('territory.inactive must be every nation the season neither lists nor merges');
+}
+
+// The built-in NHL clubs' `nhl-<slug>` ids, with the same guard against Object.prototype names.
+const NHL_CLUB_ID = /^nhl-[a-z0-9-]{1,62}$/;
+
+/**
+ * A season of nations and clubs, its clubs on its era's map (`map`), each player `[name, position, rating]`: an NHL
+ * season. Its nations are those with players (a nation it does not list fields its generated minnows, as the built-in
+ * season's would); its clubs one per section of the map, at least `clubLeast` players each (a place a club cannot fill
+ * is the sport's baseline, as in the built-in season). Ids, codes and leagues follow the built-in clubs' rules.
+ */
+function validateNationsAndClubsOnMap(data, id, fail, { sport, clubId, positions, clubLeast, noun }) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
+  const text = v => typeof v === 'string' && v.trim().length > 0;
+  const squad = (at, list, least) => {
+    if (!Array.isArray(list) || list.length < least) fail(`${at} needs at least ${least} players`);
+    const names = new Set();
+    list.forEach((player, j) => {
+      const where = `${at}[${j}]`;
+      if (!Array.isArray(player) || player.length !== 3) fail(`${where} is not [name, position, rating]`);
+      const [name, position, value] = player;
+      if (!text(name) || name !== name.trim()) fail(`${where} has no name`);
+      if (names.has(name)) fail(`${where} repeats ${name}`);
+      names.add(name);
+      if (!positions.has(position)) fail(`${where} position ${JSON.stringify(position)} is not one of the sport's`);
+      if (!Number.isInteger(value) || value < 1 || value > 99) fail(`${where} rating must be a whole number 1-99`);
+    });
+  };
+  const map = eraMapOf(id, data.map);
+  if (!map) fail(`map ${JSON.stringify(data.map)} is not one of ${sport.name}'s maps listing this season`);
+  const nations = data.nations;
+  if (!isObject(nations)) fail('nations is missing');
+  for (const [key, entry] of Object.entries(nations)) {
+    const at = `nations[${key}]`;
+    if (!Object.hasOwn(NATIONS, key)) fail(`${at} is not a nation id`);
+    if (!Array.isArray(entry) || entry.length !== 3) fail(`${at} must be [strength, players, squad]`);
+    const [str, real, list] = entry;
+    if (typeof str !== 'number' || !(str >= 1 && str <= 99)) fail(`${at} strength must be a rating 1-99`);
+    squad(`${at} squad`, list, 1);
+    if (!Number.isInteger(real) || real < list.length) fail(`${at} counts ${real} players but lists ${list.length}`);
+  }
+  if (!Array.isArray(data.clubs)) fail('clubs must be a list');
+  if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
+  const leagues = new Set(sport.clubs.map(club => club.league));
+  const ids = new Set(), codes = new Set();
+  data.clubs.forEach((club, i) => {
+    const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
+    if (!isObject(club)) fail(`${at} is not an object`);
+    if (typeof club.id !== 'string' || !clubId.test(club.id)) fail(`${at} id ${JSON.stringify(club.id)} must look like the built-in clubs'`);
+    if (ids.has(club.id)) fail(`${at} id is duplicated`);
+    ids.add(club.id);
+    if (!text(club.name)) fail(`${at} has no name`);
+    if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
+    if (codes.has(club.code)) fail(`${at} code ${club.code} is duplicated`);
+    codes.add(club.code);
+    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
+    if (typeof club.country !== 'string' || !Object.hasOwn(NATIONS, club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
+    if (!text(club.col)) fail(`${at} has no colour`);
+    if (typeof club.str !== 'number' || !(club.str >= 1 && club.str <= 99)) fail(`${at} str must be a rating 1-99`);
+    squad(`${at} squad`, club.squad, clubLeast);
+  });
+  const territory = data.territory;
+  if (!isObject(territory) || !isObject(territory.merged) || !Array.isArray(territory.inactive)) {
+    fail('territory must be { merged: { shape: holder }, inactive: [shape] }');
+  }
+  for (const [shape, holder] of Object.entries(territory.merged)) {
+    if (!Object.hasOwn(NATIONS, shape) || !Object.hasOwn(NATIONS, holder) || holder === shape) fail(`territory.merged ${shape} names no other nation as its holder`);
+  }
+  if (!territory.inactive.every(shape => Object.hasOwn(NATIONS, shape))) fail('territory.inactive lists a shape that is not a nation');
+}
+
+// The built-in NFL clubs' `nfl-<slug>` ids, with the same guard against Object.prototype names.
+const NFL_CLUB_ID = /^nfl-[a-z0-9-]{1,62}$/;
+// The built-in rugby league clubs' `nrl-<slug>` ids, likewise.
+const NRL_CLUB_ID = /^nrl-[a-z0-9-]{1,62}$/;
+
+/**
+ * A season of clubs only on its era's map (`map`), each player `[name, position, rating]` as the sport's built-in clubs
+ * hold them: an NFL season. One club per section of the map; ids, codes and leagues follow the built-in clubs' rules,
+ * so saved names resolve against them. `least` is the lineup a club must be able to name.
+ */
+function validateClubsOnMap(data, id, fail, { sport, clubId, positions, least, noun }) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
+  const text = v => typeof v === 'string' && v.trim().length > 0;
+  const rating = v => Number.isInteger(v) && v >= 1 && v <= 99;
+  if (data.nations !== undefined || data.territory !== undefined) fail(`${noun} has clubs only`);
+  const map = eraMapOf(id, data.map);
+  if (!map) fail(`map ${JSON.stringify(data.map)} is not one of ${sport.name}'s maps listing this season`);
+  if (!Array.isArray(data.clubs)) fail('clubs must be a list');
+  if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
+  const leagues = new Set(sport.clubs.map(club => club.league));
+  const ids = new Set(), codes = new Set();
+  data.clubs.forEach((club, i) => {
+    const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
+    if (!isObject(club)) fail(`${at} is not an object`);
+    if (typeof club.id !== 'string' || !clubId.test(club.id)) fail(`${at} id ${JSON.stringify(club.id)} must look like the built-in clubs'`);
+    if (ids.has(club.id)) fail(`${at} id is duplicated`);
+    ids.add(club.id);
+    if (!text(club.name)) fail(`${at} has no name`);
+    if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
+    if (codes.has(club.code)) fail(`${at} code ${club.code} is duplicated`);
+    codes.add(club.code);
+    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
+    if (typeof club.country !== 'string' || !Object.hasOwn(NATIONS, club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
+    if (!text(club.col)) fail(`${at} has no colour`);
+    if (typeof club.str !== 'number' || !(club.str >= 1 && club.str <= 99)) fail(`${at} str must be a rating 1-99`);
+    if (!Array.isArray(club.squad) || club.squad.length < least) fail(`${at} squad needs at least ${least} players`);
+    club.squad.forEach((player, j) => {
+      const where = `${at} squad[${j}]`;
+      if (!Array.isArray(player) || player.length !== 3) fail(`${where} is not [name, position, rating]`);
+      const [name, position, value] = player;
+      if (!text(name) || name !== name.trim()) fail(`${where} has no name`);
+      if (!positions.has(position)) fail(`${where} position ${JSON.stringify(position)} is not one of the sport's`);
       if (!rating(value)) fail(`${where} rating must be a whole number 1-99`);
     });
   });
@@ -569,6 +872,12 @@ export function seasonSport(set) {
     const identity = { dataSet: meta.id, dataVersion: meta.version, dataYear: meta.year, dataSeason: meta.season, dataLabel: meta.label };
     sport = setKindOf(meta.id) === 'nba2k' ? { ...basketball, clubs, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'show' ? { ...baseball, rosters, clubs, territory, clubMap: meta.map, ...identity }
+      : setKindOf(meta.id) === 'madden' || setKindOf(meta.id) === 'tecmo' ? { ...americanFootball, clubs, clubMap: meta.map, ...identity }
+      : setKindOf(meta.id) === 'elo' ? { ...tennis, rosters, territory, ...identity }
+      : setKindOf(meta.id) === 'nhl' ? { ...hockey, rosters, clubs, territory, clubMap: meta.map, ...identity }
+      : setKindOf(meta.id) === 'nrl' ? { ...rugbyLeague, clubs, clubMap: meta.map, ...identity }
+      // A women's season's unlisted nations are inactive, so nothing reads their strength in play.
+      : setKindOf(meta.id) === 'eaw' ? { ...womensFootball, rosters, clubs, territory, fallbackStrength: () => EMPTY_STRENGTH, ...identity }
       : { ...football, rosters, clubs, territory,
         // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
         fallbackStrength: () => EMPTY_STRENGTH, ...identity };
@@ -585,7 +894,7 @@ export function seasonSport(set) {
 export function sportOf(config) {
   const sport = getSport(config?.sport);
   const id = config?.dataSet;
-  if (id == null || setSportOf(id) !== sport.id || (sport.id === 'basketball' && config.layer !== 'clubs')
+  if (id == null || setSportOf(id) !== sport.id || (!setHasNations(id) && config.layer !== 'clubs')
     || (config.layer === 'clubs' && !setHasClubs(id))) return sport;
   const loaded = getLoadedFootballSet(id);
   return loaded ? seasonSport(loaded) : null;

@@ -46,8 +46,11 @@ import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { createBoundarySource, cutForeignLand, GB_CITATION } from './lib/domestic-boundaries.mjs';
 import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
-import { seasonIdOf, teamsOf } from './lib/nba-seasons.mjs';
+import { setIdOf, teamsOf } from './lib/nba-seasons.mjs';
 import { seasonIdOf as mlbSeasonIdOf, teamsOf as mlbTeamsOf } from './lib/mlb.mjs';
+import { setIdOf as nflSetIdOf, teamsOf as nflTeamsOf } from './lib/nfl.mjs';
+import { seasonIdOf as nhlSeasonIdOf, teamsOf as nhlTeamsOf } from './lib/nhl-seasons.mjs';
+import { seasonIdOf as nrlSeasonIdOf, teamsOf as nrlTeamsOf } from './lib/rugby-league-seasons.mjs';
 import {
   arcPoints, bboxOf, dissolve, dropOverseas, EARTH_KM, facingKm, facingSections, interiorPoint, joinRealms, kmBetween, kmToPolys,
   nodeRings, partitionCountry, pointInPolys, polysAreaKm2, polysOf, prepareUnits, quantize, sectionTopology, simplifyTopology, splitOnLand,
@@ -65,6 +68,9 @@ const ballparksFile = path.join(root, 'scripts/data/mlb-teams.json');
 const nhlArenasFile = path.join(root, 'scripts/data/nhl-teams.json');
 const nrlGroundsFile = path.join(root, 'scripts/data/nrl-teams.json');
 const mlbSeasonsFile = path.join(root, 'scripts/data/mlb-seasons.json');
+const nflSeasonsFile = path.join(root, 'scripts/data/nfl-seasons.json');
+const nhlSeasonsFile = path.join(root, 'scripts/data/nhl-seasons.json');
+const nrlSeasonsFile = path.join(root, 'scripts/data/rugby-league-seasons.json');
 const cacheDir = path.join(root, 'data-src/boundaries');
 const worldFile = path.join(root, 'public/countries-50m.json');
 
@@ -85,18 +91,26 @@ const LEAGUES = {
   nba: { id: 'nba', sport: 'basketball', league: 'NBA', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: {},
     venues: 'Arena locations: scripts/data/nba-arenas.json.',
     eraVenues: 'Arena locations: scripts/data/nba-arenas.json, and scripts/data/nba-seasons.json for teams that have moved since.' },
+  // The Rams' Coliseum and the Chargers' StubHub Center of 2017–2019 are both Los Angeles County's (5 km cuts it between
+  // them; today's map is the same with or without it).
   nfl: { id: 'nfl', sport: 'american-football', league: 'NFL', name: 'USA', countries: [USA], joins: { 'US-NJ': ['US-NY'], 'US-MD': ['US-DC'] },
-    entry: { venue: 'stadium', lines: 'state' },
-    venues: 'Stadium locations: scripts/data/nfl-teams.json (the four franchises that share a stadium grow from their training grounds).' },
+    entry: { venue: 'stadium', lines: 'state' }, maxGapKm: 5,
+    venues: 'Stadium locations: scripts/data/nfl-teams.json (the four franchises that share a stadium grow from their training grounds).',
+    eraVenues: 'Stadium locations: scripts/data/nfl-teams.json, and scripts/data/nfl-seasons.json for clubs that have moved, been renamed or played elsewhere since (franchises that share a stadium grow from their training grounds).' },
   mlb: { id: 'mlb', sport: 'baseball', league: 'MLB', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: { venue: 'ballpark' },
     maxGapKm: 5, venues: 'Ballpark locations: scripts/data/mlb-teams.json.',
     eraVenues: 'Ballpark locations: scripts/data/mlb-teams.json, and scripts/data/mlb-seasons.json for clubs that have moved, been renamed or played elsewhere since.' },
   nhl: { id: 'nhl', sport: 'hockey', league: 'NHL', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: {},
-    venues: 'Arena locations: scripts/data/nhl-teams.json.' },
-  // Australia's states and territories and New Zealand's regions. The Tasman Sea is between them: no border to fit.
+    venues: 'Arena locations: scripts/data/nhl-teams.json.',
+    eraVenues: 'Arena locations: scripts/data/nhl-seasons.json, every club of each season in the arena it played in.' },
+  // Australia's states and territories and New Zealand's regions. The Tasman Sea is between them: no border to fit. In
+  // 2008 the Bulldogs at Sydney Olympic Park and the Eels share the City of Parramatta, and the Rabbitohs at Redfern and
+  // the Roosters the City of Sydney: half a kilometre cuts each council between its two (today's map is the same with or
+  // without it).
   nrl: { id: 'nrl', sport: 'rugby-league', league: 'NRL', name: 'Australia and New Zealand', countries: [AUS, NZL], joins: {},
-    entry: { venue: 'ground', lines: 'state or region' }, east: true, border: null, grouping: 'state, territory or region',
-    venues: 'Ground locations: scripts/data/nrl-teams.json (the Rabbitohs and the Bulldogs, who share Accor Stadium, and the Wests Tigers, who play at three grounds, grow from their training bases).' },
+    entry: { venue: 'ground', lines: 'state or region' }, east: true, border: null, grouping: 'state, territory or region', maxGapKm: 0.5,
+    venues: 'Ground locations: scripts/data/nrl-teams.json (the Rabbitohs and the Bulldogs, who share Accor Stadium, and the Wests Tigers, who play at three grounds, grow from their training bases).',
+    eraVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played at (a club that shared its ground, or played at several, grows from where it trained).' },
 };
 // Territories are states and provinces (REGION_LEVEL), built from their counties and
 // economic regions (UNIT_LEVEL) so that both share every border vertex for vertex.
@@ -271,8 +285,9 @@ function fitBorder(pieces, line, log) {
 }
 
 // Each era's team that has moved or been renamed since, by its 2K code, and the code of the franchise it is today: an
-// era map ranks its teams as their franchises rank today.
-const LINEAGE = { VAN: 'MEM', SEA: 'OKC', NJN: 'BKN', CHH: 'CHA', NOH: 'NOP' };
+// era map ranks its teams as their franchises rank today. The Kansas City Kings, San Diego Clippers and Washington
+// Bullets are the 1980s' (scripts/data/nba-seasons.json).
+const LINEAGE = { VAN: 'MEM', SEA: 'OKC', NJN: 'BKN', CHH: 'CHA', NOH: 'NOP', KCK: 'SAC', SDC: 'LAC', WSB: 'WAS' };
 
 /** A league's clubs strongest first, as the partition ranks them (section ids follow this order), each with its venue. */
 function rankedClubs(clubs, venues, noun) {
@@ -284,12 +299,35 @@ function rankedClubs(clubs, venues, noun) {
   return ranked;
 }
 
-/** The NFL's one map, from the game's clubs and their stadiums: `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`. */
+/**
+ * The NFL's maps, each `{ id, seasons, clubs: [{ id, name, city, arena, home }] }` in rank order: today's from the game's
+ * clubs and their stadiums (`seasons` null), then one per earlier era of scripts/data/nfl-seasons.json, whose seasons
+ * must all have the same clubs in the same stadiums (a franchise that shares its stadium grows from its training base).
+ */
 async function nflSpecs() {
   const stadiums = JSON.parse(await readFile(stadiumsFile, 'utf8')).teams;
+  const manifest = JSON.parse(await readFile(nflSeasonsFile, 'utf8'));
   const clubs = rankedClubs(NFL_CLUBS, stadiums, 'stadium')
     .map(c => ({ id: c.id, name: c.name, city: stadiums[c.id].city, arena: stadiums[c.id].stadium, home: stadiums[c.id].home }));
-  return [{ id: LEAGUES.nfl.id, seasons: null, clubs }];
+  const specs = [{ id: LEAGUES.nfl.id, seasons: null, clubs }];
+  // Each era's clubs rank as their franchises rank today, so section ids follow the same order on every map.
+  const rank = new Map(clubs.map((c, i) => [c.id, i]));
+  const teamsAt = year => nflTeamsOf(stadiums, manifest, year).sort((a, b) => rank.get(a.franchise) - rank.get(b.franchise));
+  const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.stadium, t.base ?? null, t.home]));
+  const today = places(clubs.map(c => ({ ...c, stadium: c.arena, base: stadiums[c.id].base })));
+  for (const map of manifest.maps) {
+    const [first, ...rest] = map.seasons;
+    const teams = teamsAt(first);
+    const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
+    if (differs) throw new Error(`${map.id}: the clubs or stadiums of ${differs} are not those of ${first}`);
+    if (map.id === LEAGUES.nfl.id) {
+      if (places(teams) !== today) throw new Error(`${map.id}: the seasons ${map.seasons.join(', ')} are not today's clubs and stadiums`);
+      continue;
+    }
+    specs.push({ id: map.id, seasons: map.seasons.map(year => nflSetIdOf(manifest, year)),
+      clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.stadium, home: t.home })) });
+  }
+  return specs;
 }
 
 /** MLB's one map, from the game's clubs and their ballparks: `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`. */
@@ -314,20 +352,56 @@ async function mlbSpecs() {
   return specs;
 }
 
-/** The NRL's one map, from the game's clubs and their grounds: `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`. */
+/**
+ * The NRL's maps, `{ id, seasons, clubs: [{ id, name, city, arena, home }] }`: today's from the game's clubs and their
+ * grounds (`seasons` null), then one per earlier era of scripts/data/rugby-league-seasons.json, whose seasons must all
+ * have the same clubs at the same grounds. An era's clubs rank as their franchises rank today, so section ids follow the
+ * same order on every map.
+ */
 async function nrlSpecs() {
   const grounds = JSON.parse(await readFile(nrlGroundsFile, 'utf8')).teams;
+  const manifest = JSON.parse(await readFile(nrlSeasonsFile, 'utf8'));
   const clubs = rankedClubs(NRL_CLUBS, grounds, 'ground')
     .map(c => ({ id: c.id, name: c.name, city: grounds[c.id].city, arena: grounds[c.id].ground, home: grounds[c.id].home }));
-  return [{ id: LEAGUES.nrl.id, seasons: null, clubs }];
+  const specs = [{ id: LEAGUES.nrl.id, seasons: null, clubs }];
+  const rank = new Map(clubs.map((c, i) => [c.id, i]));
+  const teamsAt = year => nrlTeamsOf(manifest, year).sort((a, b) => rank.get(a.franchise) - rank.get(b.franchise));
+  const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.ground, t.base ?? null, t.home]));
+  for (const map of manifest.maps) {
+    const [first, ...rest] = map.seasons;
+    const teams = teamsAt(first);
+    if (teams.some(t => !rank.has(t.franchise))) throw new Error(`${map.id}: a club of ${first} is no franchise of today's`);
+    const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
+    if (differs) throw new Error(`${map.id}: the clubs or grounds of ${differs} are not those of ${first}`);
+    specs.push({ id: map.id, seasons: map.seasons.map(nrlSeasonIdOf), clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ground, home: t.home })) });
+  }
+  return specs;
 }
 
-/** The NHL's one map, from the game's clubs and their arenas: `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`. */
+/**
+ * The NHL's maps, `{ id, seasons, clubs: [{ id, name, city, arena, home }] }`: today's from the game's clubs and their
+ * arenas (`seasons` null), then one per earlier era of scripts/data/nhl-seasons.json, whose seasons must all have the
+ * same clubs in the same arenas. An era's clubs rank as their franchises rank today, so section ids follow the same order
+ * on every map.
+ */
 async function nhlSpecs() {
   const arenas = JSON.parse(await readFile(nhlArenasFile, 'utf8')).teams;
+  const manifest = JSON.parse(await readFile(nhlSeasonsFile, 'utf8'));
   const clubs = rankedClubs(NHL_CLUBS, arenas, 'arena')
     .map(c => ({ id: c.id, name: c.name, city: arenas[c.id].city, arena: arenas[c.id].arena, home: arenas[c.id].home }));
-  return [{ id: LEAGUES.nhl.id, seasons: null, clubs }];
+  const specs = [{ id: LEAGUES.nhl.id, seasons: null, clubs }];
+  const rank = new Map(clubs.map((c, i) => [c.id, i]));
+  const teamsAt = year => nhlTeamsOf(manifest, year).sort((a, b) => rank.get(a.franchise) - rank.get(b.franchise));
+  const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.arena, t.home]));
+  for (const map of manifest.maps) {
+    const [first, ...rest] = map.seasons;
+    const teams = teamsAt(first);
+    if (teams.some(t => !rank.has(t.franchise))) throw new Error(`${map.id}: a club of ${first} is no franchise of today's`);
+    const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
+    if (differs) throw new Error(`${map.id}: the clubs or arenas of ${differs} are not those of ${first}`);
+    specs.push({ id: map.id, seasons: map.seasons.map(nhlSeasonIdOf), clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.arena, home: t.home })) });
+  }
+  return specs;
 }
 
 /**
@@ -357,7 +431,9 @@ async function nbaSpecs() {
       continue;
     }
     const rankOf = team => rank.get(todayOf.get(LINEAGE[team.code] || team.code));
-    specs.push({ id: map.id, seasons: map.seasons.map(seasonIdOf), clubs: teams.slice().sort((a, b) => rankOf(a) - rankOf(b)) });
+    const unranked = teams.filter(team => rankOf(team) === undefined);
+    if (unranked.length) throw new Error(`${map.id}: ${unranked.map(team => team.name).join(', ')} is no franchise of today's (LINEAGE)`);
+    specs.push({ id: map.id, seasons: map.seasons.map(year => setIdOf(manifest, year)), clubs: teams.slice().sort((a, b) => rankOf(a) - rankOf(b)) });
   }
   return specs;
 }

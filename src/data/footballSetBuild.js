@@ -16,8 +16,12 @@ import { sha256 } from './sha256.js';
 
 export const FOOTBALL_SET_FORMAT = 1;
 export const SET_ID = /^cm0102-\d{4}-\d{2}(?:-[a-z0-9]+)?$/;
-/** Seasons ending earlier use the Soviet Union, Yugoslavia and both Germanys: they need identity overrides first. */
-export const FIRST_YEAR = 2002;
+/**
+ * The earliest season-end year a set is built for: 1996/97, the earliest season the game ships (SWOS 96/97).
+ * footballFederations.js gives every year from then on its federations. Seasons ending earlier would need the Soviet
+ * Union, Czechoslovakia, Yugoslavia and both Germanys, as identity overrides as well as territory.
+ */
+export const FIRST_YEAR = 1997;
 /** The last season-end year the game loads (isDataYear in src/engine/footballSets.js). */
 export const LAST_YEAR = 2100;
 export const NO_TEAM = 'noTeam';
@@ -148,6 +152,7 @@ export function resolveDatabase(signature, databases, identity = {}) {
     return {
       known: true, id: database.id, label: database.label, provider: database.provider, season: database.season,
       year: database.year, released: database.released, url: database.url, dobShift: database.shifts.birth, match,
+      ...(database.edition ? { edition: database.edition } : {}), ...(database.snapshotDate ? { snapshotDate: database.snapshotDate } : {}),
       ignored: given.map(key => FLAGS[key]), defaulted: [],
     };
   }
@@ -200,14 +205,19 @@ export function nationResolver({ aliases = {}, noTeam = [] } = {}) {
 
 /**
  * Shapes merged into another nation's empire, and shapes with no federation, in season-end year `year`: an
- * association takes part once it was a FIFA member by the cutoff (30 June) of that year.
+ * association takes part once it was a FIFA member by the cutoff (30 June) of that year. Before then its shape is
+ * held by `heldBy`, until `heldUntil` if the holder lost it earlier (by the same cutoff), and neutral otherwise.
  */
 export function territoryFor({ cutoff = '06-30', shapes = {} } = {}, year) {
   const merged = {}, inactive = [];
+  const end = `${year}-${cutoff}`;
   for (const [shape, federation] of Object.entries(shapes).sort(([a], [b]) => byText(a, b))) {
     if (!NATIONS[shape] || (federation.heldBy && !NATIONS[federation.heldBy])) throw new Error(`footballFederations.js names ${shape} held by ${federation.heldBy}, not both game nations`);
-    if (federation.member <= `${year}-${cutoff}`) continue;
-    if (federation.heldBy) merged[shape] = federation.heldBy;
+    if (federation.heldUntil && (!federation.heldBy || federation.heldUntil > federation.member)) {
+      throw new Error(`footballFederations.js gives ${shape} a holder until ${federation.heldUntil}, which needs a holder and a date before its membership`);
+    }
+    if (federation.member <= end) continue;
+    if (federation.heldBy && !(federation.heldUntil && federation.heldUntil <= end)) merged[shape] = federation.heldBy;
     else inactive.push(shape);
   }
   return { merged, inactive };
@@ -260,15 +270,27 @@ export function contentHash(doc) {
 export const serializeFootballSet = doc => `${JSON.stringify(doc)}\n`;
 
 /**
+ * The folder with the bytes a known database's staff.dat carries past its last table cut off (`staffTrailing` in
+ * its signature), so the strict reader reads it. Only a file with exactly the recorded size gets here (the signature
+ * matched it), and its SHA-256, when checked, matched the recorded one, so exactly the recorded bytes go.
+ */
+function withoutTrailingBytes(files, trailing) {
+  const key = Object.keys(files).find(name => name.toLowerCase() === 'staff.dat');
+  return { ...files, [key]: files[key].subarray(0, files[key].length - trailing) };
+}
+
+/**
  * Build one data set from a Data folder `{ fileName: Uint8Array }`. Options: `databases` (default CM0102_RELEASES),
  * `nationMap` (default CM0102_NATIONS), `federations` (default FOOTBALL_FEDERATIONS), `identity` (the flags for an
- * unknown folder), `allowUnmapped`, `famous` (birthdays for the shift check) and `verifyFiles` (false skips the
- * SHA-256 of a known database's club.dat and staff.dat, tens of MB). Returns `{ doc, text, audit, summary,
- * warnings }`; throws on an unknown layout, an unmapped nation (unless allowed) or an unnamed database.
+ * unknown folder), `allowUnmapped`, `famous` (birthdays for the shift check), `verifyFiles` (false skips the
+ * SHA-256 of a known database's club.dat and staff.dat, tens of MB), and for a season the game ships
+ * (scripts/build-retro-seasons.mjs) `local: false` and `sourceExtra`, fields added to its source block (who
+ * compiled it, when it was read). Returns `{ doc, text, audit, summary, warnings }`; throws on an unknown layout, an
+ * unmapped nation (unless allowed) or an unnamed database.
  */
 export function buildFootballSet(files, {
   databases = CM0102_RELEASES, nationMap = CM0102_NATIONS, federations = FOOTBALL_FEDERATIONS, identity = {}, allowUnmapped = false,
-  famous = FAMOUS_BIRTHDAYS, verifyFiles = true,
+  famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {},
 } = {}) {
   const warnings = [];
   const warn = message => warnings.push(message);
@@ -287,6 +309,12 @@ export function buildFootballSet(files, {
         : sha256(fileNamed(files, `${key}.dat`)) === expected ? 'match' : 'mismatch';
       if (digests[key] === 'mismatch') warn(`${key}.dat has the size of ${database.label} but not its SHA-256: the folder may have been edited`);
     }
+  }
+  const trailing = database.match?.staffTrailing ?? 0;
+  if (trailing) {
+    if (digests.staff === 'mismatch') throw new Error(`staff.dat is not the ${database.label} file whose ${trailing} trailing bytes are known, so they are not cut`);
+    files = withoutTrailingBytes(files, trailing);
+    warn(`staff.dat: cut the ${trailing} bytes ${database.label} carries after its last table, as src/data/cm0102Releases.js records`);
   }
 
   const parsed = readCm0102(files);
@@ -310,9 +338,11 @@ export function buildFootballSet(files, {
     return { name: n.name, id: id === NO_TEAM ? null : id, key: id && id !== NO_TEAM ? id : `cm:${fold(n.name)}`, noTeam: id === NO_TEAM, unmapped: id == null };
   });
   const clubByRow = new Map(parsed.clubs.map(c => [c.row, c]));
+  // A database of another edition's data in the CM 01/02 format (SI's CM3, ported) names that edition.
+  const edition = database.edition ?? 'CM 01/02';
   const source = {
-    provider: database.provider, edition: 'CM 01/02', version: database.label, snapshotDate: database.released,
-    url: database.url, rawScale: CM_SCALE, conversion: CM_CONVERSION, dobShift,
+    provider: database.provider, edition, version: database.label, snapshotDate: database.snapshotDate ?? database.released,
+    url: database.url, rawScale: CM_SCALE, conversion: CM_CONVERSION, dobShift, ...sourceExtra,
   };
 
   // Eligible players: a CA on the 1-200 scale, natural positions, and a nation that is mapped or deliberately teamless.
@@ -407,7 +437,7 @@ export function buildFootballSet(files, {
   };
   const doc = {
     format: FOOTBALL_SET_FORMAT, id: database.id, version: '', year: database.year, season: database.season,
-    label: `CM 01/02 · ${database.label}`, local: true, source, nations, clubs, territory, coverage,
+    label: `${edition} · ${database.label}`, local, source, nations, clubs, territory, coverage,
   };
   doc.version = `${doc.id}-${contentHash(doc)}`;
 

@@ -148,6 +148,167 @@ is within half a point of the fixture's simulated odds; a match's tables build i
   in `scripts/data/club-logos.json`, as Wikidata labels them "The Dolphins" and "Manly-Warringah"). Four colours are
   corrected: the Storm's purple, the Raiders' lime, the Rabbitohs' green and the Bulldogs' blue.
 
+## Earlier seasons
+
+Status: built 2026-11-08, one season: **2008**, the NRL's sixteen clubs as Rugby League 2: World Cup Edition (Sidhe,
+PlayStation 2, 2008) rates them, on a map of their own day (`nrl2008`). Clubs only: its nations are checked but not fielded
+(**Nations**, below). The game rates attributes, not players: the overall is ours, a documented conversion, as the Tecmo
+seasons' is ([american-football.md](american-football.md#tecmo-seasons)), then shifted club by club by the game's own team
+ratings. The user chose this on 2026-11-08 ("Build 2008", then "Adjust by team ratings").
+
+- **The database.** `RLDatabase.xml`, the game's own database, extracted from its data pak by Wouldubeinta and posted on
+  rugbyleaguemods.net (thread "Data pak File", post 570, 30 March 2012, attachment 56), read from the Wayback Machine's raw
+  copy. The zip is pinned by SHA-256 in `scripts/data/rugby-league-seasons-sources.json` and the XML inside it in
+  `scripts/data/rugby-league-seasons.json`; both stay in the ignored `data-src/rugby-league-seasons/`. It holds 1,180
+  players and 69 teams; the sixteen NRL clubs list 24 to 33 players each, 462 in all. A team's list names a player by his
+  place in the file: six entries an editor copied keep the copied entry's `db_index` (Chaz I'Anson's is Braith Anasta's),
+  so only the place tells them apart. A `\x20` joins a first name's words ("Jeremy\x20J Smith"); one name has an encoding
+  slip ("Taufa垒ao", mended to Taufa'ao by `nameFixes`).
+- **Positions** are the game's `primary_position`, in its own order, read off the 2008 clubs: 0 fullback (Slater,
+  Minichiello), 1 halfback (Cronk, Kimmorley), 2–3 wing, 4–5 centre, 6 five-eighth (Lockyer, Marshall, Thurston), 7 and 9
+  prop, 8 hooker (Cameron Smith, Buderus), 10–11 second row, 12 lock. One position each: the file's
+  `position_categories` are not positions (Cameron Smith's first is a five-eighth's), so they are not read.
+- **Who is kept.** A club's player is kept when the Rugby League Project (rugbyleagueproject.org; its robots.txt allows the
+  season, competition and player pages read, one request every three seconds) lists him at that club in 2008: its
+  first-grade page (premiership, finals and the World Club Challenge) or its National Youth Competition one. Names fold
+  case, accents, spaces, hyphens and apostrophes (Nu'uausala, Seu Seu); a name RLP spells otherwise is his only by the same
+  surname and initial, or the same first name and a surname a letter off, when one listed player fits, and with RLP's date
+  of birth on his player page like the database's (the same, or one field off in the same year). Ten are named so, each
+  page pinned, and play under RLP's spelling, as the Tecmo seasons take nflverse's (Danny Williams for the database's Dan,
+  Daryl Millard for Darryl, Micheal Luck, David Fa'alogo, Aidan Guerra for Adrian …; the snapshot's `spelled` keeps the
+  database's).
+  **414 of the 462 are kept**, 22 to 30 a club. The 48 left out, each with its reason in
+  `docs/design/rugby-league-seasons-audit.json`: 1 on the wrong club (Luke Harlen, a Cowboy in 2008, listed at the Wests
+  Tigers), 1 a near name with another birth date (Joel Rapana, RLP's Jordan Rapana born 1989), 12 who played first grade
+  in 2007 but not in 2008 (11 for the same club: Craig Frawley, George Rose …), and 34 with no first-grade or youth game for
+  any NRL club in 2007 or 2008 (Hutch Maiava, Ben MacDougall …), not shown to be real players of the club.
+  No duplicates: no RLP player is named twice.
+- **The overall is ours.** Twelve attributes, 1 to 10: fitness, speed, acceleration, aggressiveness, agility, break
+  tackle, tackle, pass, offload, general kick, goal kick and catch. A player's score at his position is the weighted mean
+  of the attributes its job asks for (`WEIGHTS`, per cent; a reason for each weight in `REASONS`, both in
+  `scripts/lib/rugby-league-seasons.mjs` and the snapshot). Three values are the database's defaults, not ratings —
+  fitness 7 (336 of the 462), general kick 4 (303) and goal kick 3 (350) — and a default (or an omitted 0) never counts:
+  its weight goes to the player's other attributes. Goal-kicking counts nowhere (the match model converts every try at
+  the NRL's rate, and kicking goals is no position's job); general kicking only for the halves.
+
+  | | Weights (per cent) | Why |
+  | --- | --- | --- |
+  | FB | catch 20, speed 15, agility 15, break tackle 15, acceleration 10, tackle 10, fitness 10, pass 5 | fields the kicks, returns them into contact, the last line |
+  | WG | speed 25, catch 20, break tackle 15, tackle 15, acceleration 10, agility 10, fitness 5 | finishes on the edge, takes the bombs, defends the corner |
+  | CE | break tackle 20, tackle 20, speed 10, acceleration 10, agility 10, pass 10, catch 10, offload 5, fitness 5 | strike runner and edge defender, the winger's provider |
+  | FE | pass 25, kick 15, agility 15, speed 10, acceleration 10, tackle 10, break tackle 5, catch 5, fitness 5 | second receiver, second kicker, a running game |
+  | HB | pass 30, kick 30, agility 10, acceleration 10, fitness 10, tackle 5, catch 5 | runs the attack and kicks in general play |
+  | HK | pass 30, tackle 25, fitness 15, acceleration 10, agility 10, catch 5, aggressiveness 5 | passes from every ruck, tackles most |
+  | PR | break tackle 25, tackle 25, offload 15, aggressiveness 15, fitness 10, acceleration 5, catch 5 | the hit-up and the middle defence |
+  | SR | tackle 25, break tackle 20, speed 10, offload 10, aggressiveness 10, fitness 10, acceleration 5, agility 5, catch 5 | edge runner and edge defender |
+  | LK | tackle 30, break tackle 15, pass 15, fitness 15, offload 10, aggressiveness 10, catch 5 | leads the middle defence, links forwards and backs |
+
+  Then each position's scores among the 2008 clubs' kept players are ranked (mid-rank percentiles, ties sharing one) and
+  read off Rugby League 26's overalls at that position (the built-in snapshot, `scripts/data/rugby-league-26.json`, by each
+  player's first position), as many of each 2025 club's best there as the 2008 clubs carry per club (fullbacks 1.44 a
+  club, props 5.5 …), so a 2008 backup meets 2025's backups; by linear interpolation, rounded and held to 1–99: the
+  player's **attribute overall**. The rule is monotonic and keeps the built-in season's spread at each position, the
+  match model's tuning: the 2008 players run 68–93 (median 81). The locks run 82–92 because Rugby League 26 lists only its
+  best middle forwards as locks. The snapshot holds the weights, the defaults, every position's 2025 reference and 2008
+  scores, so every overall is recomputed from it alone (the test does).
+- **The club shift** (the user's choice, 2026-11-08: "Adjust by team ratings"). The attribute overalls leave the clubs
+  80.8–84.3 in an order unlike 2008's (**The real 2008**, below), while the database rates each side too, by five parts
+  from 1 to 10 — willingness to attack, attack, defence, flair and support — with no overall. Its all-star sides (the NRL
+  and Super League dream teams, and Sidhe's own) have 10 in all five, so all five measure a side, and a club's **team
+  rating** is their equal-weight mean, a rule fixed before any result was read: no part is chosen or weighted by how it
+  tracks 2008 (the parts had been compared with the 2008 ladder before, which is why none is). The sixteen team ratings
+  are ranked (mid-rank percentiles, ties sharing one) and read off the built-in 2025 NRL clubs' strengths (81.8–85.1,
+  what the match model was tuned on) by linear interpolation: each club's **target**. Every player of the club then moves
+  by the one whole number (the **shift**) that brings its lineup's strength closest to the target (of two as close, the
+  smaller move), held to 1–99, so a club's players keep their order. Real results only check it.
+
+  | Club | Team rating (W/A/D/F/S) | Target | Shift | Strength |
+  | --- | --- | --- | --- | --- |
+  | Sydney Roosters | 8.0 (8/9/8/8/7) | 85.08 | +3 | 82.5 → 85.5 |
+  | Brisbane Broncos | 7.8 (8/9/7/6/9) | 84.28 | +1 | 82.8 → 83.8 |
+  | Wests Tigers | 7.8 (9/8/6/8/8) | 84.28 | 0 | 84.1 |
+  | Manly Warringah Sea Eagles | 7.6 (7/8/9/7/7) | 83.87 | +1 | 82.9 → 83.9 |
+  | Melbourne Storm | 7.6 (8/8/9/8/5) | 83.87 | 0 | 83.8 |
+  | North Queensland Cowboys | 7.6 (9/7/6/8/8) | 83.87 | 0 | 83.8 |
+  | Gold Coast Titans | 7.2 (8/8/7/7/6) | 83.32 | +1 | 82.4 → 83.4 |
+  | New Zealand Warriors | 7.0 (7/5/8/7/8) | 83.20 | +2 | 81.2 → 83.2 |
+  | Bulldogs | 6.8 (7/7/6/6/8) | 83.20 | +1 | 81.9 → 82.9 |
+  | Cronulla-Sutherland Sharks | 6.6 (7/6/8/5/7) | 82.76 | +2 | 80.8 → 82.8 |
+  | Newcastle Knights | 6.6 (6/6/7/6/8) | 82.76 | +1 | 81.5 → 82.5 |
+  | Penrith Panthers | 6.6 (7/7/7/6/6) | 82.76 | −2 | 84.3 → 82.3 |
+  | St. George Illawarra Dragons | 6.6 (6/7/7/6/7) | 82.76 | 0 | 83.1 |
+  | Parramatta Eels | 6.4 (7/6/6/7/6) | 82.13 | 0 | 81.8 |
+  | Canberra Raiders | 6.0 (6/7/6/5/6) | 81.83 | +1 | 81.3 → 82.3 |
+  | South Sydney Rabbitohs | 5.6 (6/5/5/5/7) | 81.80 | −1 | 82.6 → 81.6 |
+
+  The clubs now run 81.6–85.5 and the players 67–94 (median 81). Each player's row in the snapshot ends with his
+  attribute overall and his club's shift; the season file holds the sum. `source.conversion` states both steps.
+- **The star value.** Each player also has a "star" value, 0 to 100 (Lockyer 100, Benji Marshall 98), which the game
+  does not explain. It is a cross-check only: it ranks with the overall (Spearman 0.50; 0.31 for hookers to 0.78 for
+  fullbacks), and picks out the clubs' 76 players of 2008's Origin and Australia and New Zealand Tests a little better
+  (area under the curve 0.753 against the overall's 0.734; any 2008 Test, 0.656 against 0.616). Nothing reads it.
+- **Clubs of their day.** The sixteen of 2008, no Dolphins. Each keeps today's id, code, colour and crest except the
+  **Bulldogs**, as the club was named from 2000 to 2009 (`nrl-bulldogs`, code BUL, the game's own; no crest). Grounds are
+  RLP's 2008 home venues: Olympic Park Stadium (the Storm, until 2010), Dairy Farmers Stadium (the Cowboys, until 2020),
+  Parramatta Stadium and the Sydney Football Stadium of 1988 (both rebuilt since, on their sites); a ground still played at
+  keeps its present name. Clubs that shared a ground grow from where they trained: the Bulldogs moved theirs to Sydney
+  Olympic Park, beside their ground, early in 2008 (the territory "Homebush"); the Rabbitohs from Redfern Oval, their
+  training ground from 1988 to 2023 (it was rebuilt during 2008; where they trained meanwhile is not recorded); the Wests
+  Tigers from Concord Oval, as today (they played at Accor Stadium, Campbelltown and Leichhardt).
+- **The map** `nrl2008` (`node scripts/build-club-maps.mjs --league=nrl`, from the manifest's `teams` and `maps`) follows
+  today's rule: a club holds its own state, territory or region, New South Wales (ten clubs) and Queensland (three) are
+  split between theirs, every other state and region stays empty. With no Dolphins the Broncos hold Redcliffe. The
+  Bulldogs at Olympic Park share the City of Parramatta with the Eels, and the Rabbitohs at Redfern the City of Sydney with
+  the Roosters: `maxGapKm` 0.5 cuts each council between its two (today's map is byte for byte the same with it).
+- **Nations: not fielded.** The database's ten 2008 World Cup squads (Australia, New Zealand, England, France, Papua New
+  Guinea, Fiji, Samoa, Tonga, Scotland and Ireland) pass the same check against RLP's World Cup squads and 2008 Tests:
+  188 players kept, 11 (Fiji) to 25 (Australia) a nation. But they mix the NRL's players with Super League's, and the
+  database rates Super League's on a kinder scale: its players score higher at seven positions of nine (centres 7.09
+  against the NRL's 6.58, props 6.92 against 6.45; tackling 7.27 against 6.69, break tackle 6.83 against 6.09, the
+  snapshot's `scales`), though the NRL was the stronger league. Read off the clubs' scale, England (all Super League)
+  would be the strongest nation, 89 to Australia's 87 (Australia beat England 52–4 at the World Cup); limited to NRL
+  players, as the built-in nations are, England and France would have none: minnows at the baseline, below Scotland
+  (three NRL players, 51) and Ireland (one, 47). Neither is 2008, so the season has clubs only (`nations: false`), and a
+  nations game plays the built-in 2025 nations. The squads stay in the snapshot; the audit shows both readings. The
+  database's Great Britain, Wales, Cook Islands, Lebanon, Russia, Malta, South Africa and United States squads look
+  carried over from the 2005 edition and are not read.
+- **The real 2008**, from RLP's results (192 regular-season games): Melbourne the minor premiers on points difference
+  (17–7, +302) from Manly and Cronulla (17–7); the Cowboys and Bulldogs 5–19; one draw (Brisbane and Penrith). 40 seeded
+  seasons of the 2008 clubs, 24 games each at a neutral venue (`node scripts/build-rugby-league-seasons.mjs --realism`),
+  at their attribute overalls and with the club shift:
+
+  | Measure | Attribute overalls | Shifted (played) | NRL 2008 |
+  | --- | --- | --- | --- |
+  | Points a team (SD) | 22.8 (12.8) | 22.9 (12.8) | 21.5 (11.4) |
+  | Mean margin | 15.9 | 15.9 | 14.7 |
+  | Won by 1 / 1–6 / 1–12 | 3.9 / 27.0 / 48.9% | 3.8 / 26.9 / 48.6% | 6.8 / 29.7 / 47.4% |
+  | Won by 13+ / 25+ | 51.1 / 20.8% | 51.4 / 20.5% | 52.1 / 16.7% |
+  | Held scoreless / 40 or more | 2.4 / 11.3% | 2.2 / 11.1% | 1.8 / 6.8% |
+  | Win% spread | 0.171 | 0.162 | 0.153 |
+  | Best and worst records (wins of 24) | 18.7, 4.4 | 19.1, 5.1 | 17, 5 |
+  | Rank correlation of the model's wins with 2008's | −0.12 | 0.33 | |
+
+  The scoring is the built-in season's, a little above 2008's, and the spread is 2008's, before the shift and after it.
+  The order is what the shift changes. At the attribute overalls the model's strongest clubs were the Wests Tigers,
+  Melbourne and the Cowboys (16.8–17.3 wins) and its weakest Cronulla (6.2), whose real record was 17–7: the player
+  attributes do not order the 2008 clubs, nor does the star value, which suggests the 2008 edition rerated its teams and
+  kept older editions' player attributes. Shifted, the Roosters lead (18.6 wins; real 15), Melbourne and Manly are second
+  and fourth (15.6 and 15.0; real 17 each) and the Rabbitohs last (6.7; real 8); the clubs' strengths rank with the real
+  wins at 0.36 (−0.16 before). The team rating is the database's view of each side, not 2008's: the Cowboys (14.4 wins;
+  real 5) and the Bulldogs (12.8; real 5) still play above their record, and Cronulla (11.0; real 17) below it.
+- **Files.** `scripts/sync-rugby-league-seasons.mjs` (`--fetch`, `--pin`, `--check`) writes
+  `scripts/data/rugby-league-seasons/nrl-2008.json` (the kept players with their attributes, score, attribute overall and
+  club shift, each club's team rating, target and shift, each club's and nation's RLP evidence, the left-out with their
+  reasons, the conversion and the real season);
+  `scripts/build-rugby-league-seasons.mjs` (`--check`, `--realism`) writes `public/rugby-league/nrl-2008.json` (kind
+  `nrl`, `source.conversion` required, as Tecmo's), `src/data/rugbyLeagueSeasons.js` and the audit; rules in
+  `scripts/lib/rugby-league-seasons.mjs`. Tests: `scripts/rugby-league-seasons.test.mjs`.
+- **Limits.** Every kicker converts at the NRL's rate, and with no goal tally a 2008 side's goals go to its halfback (the
+  database's own `goal_kicker` is not read). A club the database leaves short of a position plays someone out of it
+  (Manly has no five-eighth: Brett Stewart plays there, Steve Matai at fullback). Squad players show no source line.
+  Rugby League 2's first edition (2006) and the Rugby League Live games keep their ratings inside the games: 2008 is the
+  only earlier season.
+
 ## Tests
 
 `scripts/rugby-league.test.mjs`: the data rebuilds byte for byte; every rating and position is the snapshot's; the

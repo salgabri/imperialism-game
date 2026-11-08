@@ -149,7 +149,7 @@ test('the Season choice offers the built-in season, then every earlier season bu
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
       assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER]);
       assert.deepEqual(EARLIER.slice(0, 3), ['2025/26', '2024/25', '2023/24'], 'the last built-in season, then the earlier ones');
-      assert.equal(EARLIER.at(-1), '2004/05');
+      assert.equal(EARLIER.at(-1), '1996/97', 'back to Sensible World of Soccer 96/97');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
       assert.equal(seasonPicker(document).value, '');
       assert.match(document.getElementById('setup-season-note').textContent, /Earlier seasons use EA FIFA ratings/);
@@ -167,10 +167,15 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
   const files = { '/football/index.json': INDEX, [SET_URL]: gate.promise.then(() => SET) };
   await withSetup(files, async ({ app, calls, time }) => {
     await app.requestSeasons();
-    assert.deepEqual(footballSetIds(app), [...BUILT_IN_SEASONS.map(set => set.id), ID], 'the local set after the built-in ones');
+    // The local 2001/02 set sits among the seasons, before SI's 3.9.60 of the same season: the later release first.
+    const builtInIds = BUILT_IN_SEASONS.map(set => set.id);
+    const at = builtInIds.indexOf('cm0102-2001-09');
+    assert.deepEqual(footballSetIds(app), [...builtInIds.slice(0, at), ID, ...builtInIds.slice(at)], 'the local set among its season\'s');
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
-      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER, '2001/02']);
+      // Two sets of one season keep their source.
+      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER.slice(0, at), `2001/02 · ${SET.label}`,
+        `2001/02 · ${BUILT_IN_SEASONS[at].label}`, ...EARLIER.slice(at + 1)]);
       assert.equal(seasonPicker(document).value, '', 'the built-in season is chosen');
 
       await pickSeason(document, ID);
@@ -244,9 +249,12 @@ test('stepping through the seasons fetches only the set the player stays on', as
   const files = { '/football/index.json': index, [SET_URL]: SET, '/football/cm0102-2001-12.json': december };
   await withSetup(files, async ({ app, calls, time }) => {
     await app.requestSeasons();
-    assert.deepEqual(app.state.footballSets.filter(set => set.id.startsWith('cm0102-')).map(set => set.id), [ID, december.id], 'the later release first');
-    assert.deepEqual(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).season.options.slice(-2).map(option => option.name),
-      ['2001/02 · CM 01/02 · Test 2002', '2001/02 · CM 01/02 · December 2001'], 'two sets of one season keep their source');
+    // Among SI's built-in 3.9.60 of the same season.
+    assert.deepEqual(app.state.footballSets.filter(set => setSportOf(set.id) === 'football' && set.season === '2001/02').map(set => set.id), [ID, december.id, 'cm0102-2001-09'],
+      'the later release first');
+    assert.deepEqual(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).season.options.filter(option => option.season === '2001/02')
+      .map(option => option.name), ['2001/02 · CM 01/02 · Test 2002', '2001/02 · CM 01/02 · December 2001', '2001/02 · CM 01/02 · 3.9.60'],
+    'sets of one season keep their source');
     app.pickSetup('dataSet', december.id);
     time.advance(50);
     app.pickSetup('dataSet', ID);
@@ -554,8 +562,9 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     const setup = () => app.state.setup;
     const modelOf = () => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), season: app.seasonStatus() });
     await app.requestSeasons();
-    assert.deepEqual(EARLIER.slice(-3), ['2006/07', '2005/06', '2004/05'], 'the earliest seasons');
-    assert.match(modelOf().season.note, /2005\/06 and 2004\/05 have nations only/);
+    assert.deepEqual(EARLIER.slice(-8), ['2006/07', '2005/06', '2004/05', '2002/03', '2001/02', '1998/99', '1997/98', '1996/97'],
+      'the earliest seasons');
+    assert.match(modelOf().season.note, /2005\/06, 2004\/05 and 1996\/97 have nations only/);
 
     // From clubs: the season takes the nations. It has no maps of Europe, so the theatre is kept as the plain elite
     // for when clubs come back.

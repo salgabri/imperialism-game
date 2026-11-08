@@ -69,18 +69,20 @@ function expectedTuple(db, row, shift) {
 // ---- Manifests ----
 
 test('the database manifest names every known release once, by a unique signature', () => {
-  assert.equal(databases.length, 48);
+  // 48 CM 01/02 releases, and SI's CM3 data ported to the format (1998/99).
+  assert.equal(databases.length, 49);
   const pairs = databases.flatMap(d => d.signatures.map(s => `${s.club}/${s.staff}`));
   assert.equal(new Set(pairs).size, pairs.length);
   assert.equal(new Set(databases.map(d => d.id)).size, databases.length);
   for (const d of databases) {
-    assert.match(d.id, /^cm0102-\d{4}-\d{2}(-(odb|sim))?$/, d.id);
+    assert.match(d.id, /^cm0102-\d{4}-\d{2}(-(odb|sim|cm3))?$/, d.id);
     assert.ok(d.id.startsWith(`cm0102-${d.released}`), d.id);
     assert.ok(d.label.trim() && d.provider.trim(), d.id);
     assert.equal(d.year, seasonYear(d.season), d.id);
     assert.ok(d.year <= LAST_YEAR, d.id);
     assert.match(d.url, /^https:\/\/www\.champman0102\.co\.uk\/viewtopic\.php\?t=\d+$/);
-    assert.ok(['birth', 'joined', 'contract'].every(key => Number.isInteger(d.shifts[key])), d.id);
+    // The CM3 port's joined and contract shifts were not measured: the builder reads only the birth shift.
+    assert.ok(Number.isInteger(d.shifts.birth) && ['joined', 'contract'].every(key => Number.isInteger(d.shifts[key]) || (d.edition === 'CM3' && d.shifts[key] === undefined)), d.id);
     assert.ok(d.signatures.every(s => Number.isInteger(s.club) && Number.isInteger(s.staff) && s.club % 581 === 0), d.id);
     for (const s of d.signatures) for (const key of ['clubSha256', 'staffSha256']) if (key in s) assert.match(s[key], /^[0-9a-f]{64}$/);
   }
@@ -122,6 +124,12 @@ test('federations: a shape plays once its association was a FIFA member by 30 Ju
     assert.match(entry.source, /^https:\/\/inside\.fifa\.com\/associations\/[A-Z]{3}$/);
   }
   const at = year => territoryFor(federations, year);
+  // FR Yugoslavia holds Montenegro and, until the United Nations took it over in June 1999, Kosovo; Bosnia joined FIFA
+  // in July 1996, Eritrea and Palestine in 1998, Mongolia in July 1998 and Bhutan in 2000.
+  assert.deepEqual(at(1997), { merged: { 499: '688', 540: '250', 728: '729', KOS: '688' }, inactive: ['064', '232', '275', '496', '626'] });
+  assert.deepEqual(at(1998), { merged: { 499: '688', 540: '250', 728: '729', KOS: '688' }, inactive: ['064', '496', '626'] });
+  assert.deepEqual(at(1999), { merged: { 499: '688', 540: '250', 728: '729' }, inactive: ['064', '626', 'KOS'] });
+  assert.deepEqual(at(2001), { merged: { 499: '688', 540: '250', 728: '729' }, inactive: ['626', 'KOS'] });
   assert.deepEqual(at(2003), { merged: { 499: '688', 540: '250', 728: '729' }, inactive: ['626', 'KOS'] });
   assert.deepEqual(at(2005), { merged: { 499: '688', 728: '729' }, inactive: ['626', 'KOS'] });
   assert.deepEqual(at(2006), { merged: { 499: '688', 728: '729' }, inactive: ['KOS'] });
@@ -130,6 +138,12 @@ test('federations: a shape plays once its association was a FIFA member by 30 Ju
   assert.deepEqual(at(2012), { merged: {}, inactive: ['KOS'] });
   assert.deepEqual(at(2016), { merged: {}, inactive: [] });
   assert.throws(() => territoryFor({ shapes: { 999: { member: '2010-01-01' } } }, 2005), /not both game nations/);
+  // A holder lost by the cutoff leaves the shape neutral; a date after the membership, or without a holder, is refused.
+  const held = { shapes: { 499: { member: '2007-05-31', heldBy: '688', heldUntil: '2003-02-04' } } };
+  assert.deepEqual([2002, 2003, 2007].map(year => territoryFor(held, year)), [{ merged: { 499: '688' }, inactive: [] }, { merged: {}, inactive: ['499'] },
+    { merged: {}, inactive: [] }]);
+  assert.throws(() => territoryFor({ shapes: { 499: { member: '2007-05-31', heldBy: '688', heldUntil: '2008-01-01' } } }, 2005), /before its membership/);
+  assert.throws(() => territoryFor({ shapes: { 499: { member: '2007-05-31', heldUntil: '2003-01-01' } } }, 2005), /needs a holder/);
 });
 
 // ---- Identification ----
@@ -203,15 +217,42 @@ test('the builder defaults to the src manifests, so the CLI and the browser buil
     /Fictionland \(2 players\)\. Add them to src\/data\/cm0102Nations\.js/);
 });
 
-test('seasons ending before 2002 are refused', () => {
-  assert.throws(() => build(undefined, { identity: { ...identity, released: '2001-05', season: '2000/01' } }), /ends in 2001: seasons ending before 2002 are refused .*football-years\.md/);
+test('seasons ending before 1997 are refused', () => {
+  assert.throws(() => build(undefined, { identity: { ...identity, released: '1995-05', season: '1995/96' } }), /ends in 1996: seasons ending before 1997 are refused .*football-years\.md/);
   const files = writeCm0102Files(sampleDatabase());
   const { clubSize, staffSize } = fileSignature(files);
-  const old = { id: 'cm0102-2000-10', label: 'Old', provider: 'Fixture makers', season: '2000/01', year: 2001, released: '2000-10',
+  const old = { id: 'cm0102-1995-10', label: 'Old', provider: 'Fixture makers', season: '1995/96', year: 1996, released: '1995-10',
     url: 'https://example.test/old', shifts: { birth: 0 }, signatures: [{ club: clubSize, staff: staffSize }] };
-  assert.throws(() => buildFootballSet(files, { databases: [old], nationMap, federations }), /before 2002/);
-  // SI's own 2001/02 database is the first accepted.
+  assert.throws(() => buildFootballSet(files, { databases: [old], nationMap, federations }), /before 1997/);
+  // 1996/97, the earliest season the game ships (SWOS 96/97), is the first accepted, with the federations of its day.
+  const first = build(undefined, { identity: { ...identity, released: '1996-09', id: 'cm0102-1996-09-custom', dobShift: 0 } }).doc;
+  assert.deepEqual([first.year, first.season, first.territory], [1997, '1996/97', territoryFor(federations, 1997)]);
   assert.equal(build(undefined, { identity: { ...identity, released: '2001-09', id: 'cm0102-2001-09-custom', dobShift: 0 } }).doc.year, 2002);
+});
+
+test('a known database whose staff.dat carries bytes after its last table has exactly those cut, and only when it is the file', () => {
+  const db = sampleDatabase();
+  const clean = writeCm0102Files(db);
+  // Bytes past the last table, as SI's CM3 port carries 230 (22 of 0xFF, then four stray preferences records).
+  const tail = new Uint8Array(230).fill(0xff);
+  const files = { ...clean, 'staff.dat': new Uint8Array([...clean['staff.dat'], ...tail]) };
+  assert.throws(() => buildFootballSet(files, { identity, nationMap, federations }), /staff\.dat/, 'the strict reader stops on them');
+  const { clubSize, staffSize } = fileSignature(files);
+  const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+  const entry = { id: 'cm0102-2020-11-test', edition: 'CM3', label: 'Ported', provider: 'Fixture makers', season: '1998/99', year: 1999,
+    released: '2020-11', snapshotDate: '1999-03', url: 'https://example.test/ported', shifts: { birth: 0 },
+    signatures: [{ club: clubSize, staff: staffSize, staffTrailing: tail.length, clubSha256: sha(files['club.dat']), staffSha256: sha(files['staff.dat']) }] };
+  const { doc, warnings } = buildFootballSet(files, { databases: [entry], nationMap, federations, local: false, sourceExtra: { compiler: 'Fixture porter', retrieved: '2026-11-08' } });
+  const without = { ...entry, signatures: [{ club: clubSize, staff: clean['staff.dat'].length }] };
+  const plain = buildFootballSet(clean, { databases: [without], nationMap, federations }).doc;
+  assert.deepEqual([doc.nations, doc.clubs, doc.coverage], [plain.nations, plain.clubs, plain.coverage], 'the same players as the folder without them');
+  assert.deepEqual([doc.label, doc.local, doc.source.edition, doc.source.snapshotDate, doc.source.compiler, doc.source.retrieved],
+    ['CM3 · Ported', false, 'CM3', '1999-03', 'Fixture porter', '2026-11-08']);
+  assert.ok(warnings.some(w => /cut the 230 bytes Ported carries after its last table/.test(w)));
+  // Another file of the same size keeps them, and stops.
+  const edited = { ...files, 'staff.dat': files['staff.dat'].slice() };
+  edited['staff.dat'][edited['staff.dat'].length - 1] = 0;
+  assert.throws(() => buildFootballSet(edited, { databases: [entry], nationMap, federations }), /not the Ported file whose 230 trailing bytes are known/);
 });
 
 // ---- Birth-shift check ----
@@ -530,9 +571,9 @@ test('the CLI writes nothing with --check, and stops on what it cannot build', (
     const unknown = run(`--cm0102=${game}`, `--out=${out}`);
     assert.equal(unknown.status, 1);
     assert.match(unknown.stderr, /Unknown CM 01\/02 database .* --label=\.\.\./);
-    const early = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--season=2000/01');
+    const early = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--season=1995/96');
     assert.equal(early.status, 1);
-    assert.match(early.stderr, /seasons ending before 2002 are refused/);
+    assert.match(early.stderr, /seasons ending before 1997 are refused/);
     const blank = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--label=  ');
     assert.equal(blank.status, 1);
     assert.match(blank.stderr, /Name it with --label=\.\.\. \(/);

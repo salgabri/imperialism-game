@@ -51,7 +51,9 @@ const OFF_THE_MAP = { 'US-HI': [[-157.86, 21.31]] };
 const ALASKA = [[-149.9, 61.22]];
 // A league may join a state to another's clubs (LEAGUES in scripts/build-club-maps.mjs): those clubs hold both.
 const JOINED = { NFL: { 'nfl-new-york-giants': ['US-NJ', 'US-NY'], 'nfl-new-york-jets': ['US-NJ', 'US-NY'],
-  'nfl-baltimore-ravens': ['US-DC', 'US-MD'], 'nfl-washington-commanders': ['US-DC', 'US-MD'] } };
+  'nfl-baltimore-ravens': ['US-DC', 'US-MD'], 'nfl-washington-commanders': ['US-DC', 'US-MD'],
+  // Washington's earlier names, on the earlier seasons' maps (scripts/data/nfl-seasons.json).
+  'nfl-washington': ['US-DC', 'US-MD'], 'nfl-washington-football-team': ['US-DC', 'US-MD'] } };
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 
 for (const entry of CLUB_MAPS) {

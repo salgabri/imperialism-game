@@ -320,22 +320,35 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
-  football: 'Earlier seasons use EA FIFA ratings of that season, with clubs from the seven biggest leagues. Nations without '
-    + 'eleven rated players start short-handed. 2005/06 and 2004/05 have nations only.',
-  'womens-football': 'EA SPORTS FC 27 ratings of the women\'s game, as of 7 November 2026. Nations without eleven rated '
-    + 'players start short-handed, and a nation with none fields no team.',
+  football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1996/97: '
+    + 'Sensible World of Soccer\'s), with clubs from the seven biggest leagues. Nations without eleven rated players start '
+    + 'short-handed. 2005/06, 2004/05 and 1996/97 have nations only.',
+  'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
+    + 'EA rated national teams only until 2021/22. Nations without eleven rated players start short-handed, and a nation '
+    + 'with none fields no team.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
-    + 'scoring, marked as one. Rosters as of 7 November 2026. Nations field the NHL players of each country.',
+    + 'scoring, marked as one. Rosters as of 7 November 2026. Earlier seasons use EA\'s ratings of that season, nothing '
+    + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
+    + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings, clubs on '
+    + 'the map of their day. Nations field the NHL '
+    + 'players of each country.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
-    + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace.',
-  basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
-    + 'only: the franchises of that season, on the map of their day.',
-  'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
-    + 'of the United States.',
-  baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October). Nations field the players '
-    + 'born there; clubs play on the map of their day, the Athletics in Oakland until 2024.',
-  tennis: 'Elo ratings of the ATP\'s men from Tennis Abstract, as of 2 November 2026. Each nation names its five best; one '
-    + 'with fewer than two rated players fields no team.',
+    + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace. 2008 '
+    + 'comes from Rugby League 2: World Cup Edition\'s database, every player checked against the Rugby League Project. '
+    + 'The game rates attributes, not players, so the overall is ours, each club then moved by the game\'s own team '
+    + 'rating. It has NRL clubs only, on the map of 2008.',
+  basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive (2011/12 by The '
+    + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
+    + 'They have NBA clubs only: the franchises of that season, on the map of their day.',
+  'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
+    + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
+    + 'overall ours. NFL clubs only: the franchises of that season, on the map of their day.',
+  baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October; 2018–2020 as the fan site '
+    + 'ShowZone keeps them). Nations field the players born there; clubs play on the map of their day, the Athletics in '
+    + 'Oakland until 2024.',
+  tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
+    + '2016 computed from Jeff Sackmann\'s match results by its method (1973–1979 rough). Each nation names its five best; '
+    + 'one with fewer than two rated players fields no team.',
 });
 
 /**

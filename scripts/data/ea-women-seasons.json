@@ -1,0 +1,268 @@
+{
+  "note": "The built-in earlier women's football seasons (docs/design/womens-football.md, 'Earlier seasons'): one EA FIFA / FC edition's women each, newest first. npm run sync:womens-seasons reduces the pinned downloads in data-src/ to the committed snapshots below; npm run build:womens-seasons builds each season from them. EA rated women's national teams alone from FIFA 16 to FIFA 22 and its women's clubs from FIFA 23 on. `leagues` maps EA's league ids (the export's) and labels (EA's ratings website's) to the game's leagues: a `main` league plays as itself, any other as `rest`. `clubs` names a club, by EA team id, where EA's label is shortened. Ratings are EA's, unchanged; EA's own rights in them are not cleared, as for the men's earlier seasons.",
+  "rest": "Rest of Europe",
+  "site": [
+    {
+      "id": "eaw-fc-26",
+      "fifaVersion": 26,
+      "edition": "EA FC 26",
+      "update": 4,
+      "roster": "260004",
+      "name": "EA SPORTS FC 26's women from EA's ratings API, which serves the previous edition to a request without the ratings site's referrer",
+      "url": "https://www.ea.com/games/ea-sports-fc/ratings",
+      "api": "https://drop-api.ea.com/rating/ea-sports-fc?locale=en&limit=100&offset=<n>&gender=1",
+      "cache": "ea-fc26-women",
+      "players": 1645,
+      "clubs": {
+        "note": "Club names and leagues for every player come from this copy of EA FC 26 taken during its season: the API now names no club for the 126 players of the seven clubs EA has dropped since, and gives other clubs FC 27's names. It must rate all 1,645 players as the API does. v1shalsb/eafc26-player-database is a byte-identical re-upload of its first version.",
+        "name": "EAFC26 Player Database (flynn28), EAFC26-Women.csv",
+        "url": "https://www.kaggle.com/datasets/flynn28/eafc26-player-database",
+        "download": "https://www.kaggle.com/api/v1/datasets/download/flynn28/eafc26-player-database/EAFC26-Women.csv",
+        "folder": "ea-fc26-women-kaggle",
+        "file": "EAFC26-Women.flynn28.csv",
+        "licence": "GPL-3.0, as set by the compiler on Kaggle; EA's own rights in the ratings are not cleared",
+        "rows": 1645,
+        "sha256": "5b66a3bb0f5d61ce0470140f8d11bf506d86c5f10b9ed5647c417dedc0e2fc7b",
+        "retrieved": "2026-11-08"
+      },
+      "check": "EA's site never changed EA FC 26's ratings in season (in-game updates did), so the API's FC 26 women are EA's launch-window ratings: players link to SoFIFA's launch roster, 260004, as the men's EA FC 26 does. On 2026-11-08 the API's 1,645 women matched the clubs file below overall for overall, all 1,645, and FC 27's 1,940 not.",
+      "snapshot": "scripts/data/ea-fc26-women.csv"
+    },
+    {
+      "id": "eaw-fc-25",
+      "fifaVersion": 25,
+      "edition": "EA FC 25",
+      "update": 2,
+      "roster": "250002",
+      "snapshotDate": "2024-09-26",
+      "name": "EA Sports FC 25 database, ratings and stats (nyagami), female_players.csv, from EA's ratings website",
+      "url": "https://www.kaggle.com/datasets/nyagami/ea-sports-fc-25-database-ratings-and-stats",
+      "download": "https://www.kaggle.com/api/v1/datasets/download/nyagami/ea-sports-fc-25-database-ratings-and-stats/female_players.csv",
+      "folder": "ea-fc25-women",
+      "file": "female_players.csv",
+      "licence": "Apache-2.0, as set by the compiler on Kaggle; EA's own rights in the ratings are not cleared",
+      "rows": 1576,
+      "sha256": "09ce5416c1117b7c6fb9ba19cc309ebccbee987bb2aac7a1ce3a3e271cba6d39",
+      "retrieved": "2026-11-08",
+      "roster_note": "EA's website a week after release, as the men's EA FC 25: players link to SoFIFA's release roster, 250002 (20 Sep 2024).",
+      "snapshot": "scripts/data/ea-fc25-women.csv"
+    }
+  ],
+  "siteLeagues": {
+    "Liga F": "Liga F Moeve"
+  },
+  "siteClubs": {
+    "note": "EA FC 25's club labels that EA FC 26 and EA FC 27 do not share, as the export names them: the club's EA team id (from the FIFA 16 – EA FC 24 export's club of that name), and its name where the label is shortened. Carl Zeiss Jena and Turbine Potsdam appear in no other edition and keep their labels as names.",
+    "OL": {
+      "team": 116033,
+      "name": "Olympique Lyonnais"
+    },
+    "Chicago Red Stars": {
+      "team": 116305
+    },
+    "NJ/NY Gotham": {
+      "team": 116310,
+      "name": "NJ/NY Gotham FC"
+    },
+    "Real Madrid CF": {
+      "team": 116326,
+      "name": "Real Madrid"
+    },
+    "Levante UD": {
+      "team": 116333
+    },
+    "Levante Badalona": {
+      "team": 131125
+    },
+    "Montpellier": {
+      "team": 116037
+    },
+    "Stade de Reims": {
+      "team": 116040
+    },
+    "Leicester City": {
+      "team": 116020
+    },
+    "UD Tenerife": {
+      "team": 116332
+    },
+    "Real Betis": {
+      "team": 116330
+    },
+    "SGS Essen": {
+      "team": 116001
+    },
+    "Dijon FCO": {
+      "team": 116039
+    },
+    "En Avant Guingamp": {
+      "team": 116042
+    },
+    "AS Saint Étienne": {
+      "team": 116044
+    }
+  },
+  "exports": {
+    "fc24": {
+      "name": "EA Sports FC 24 complete player dataset (stefanoleone992), female_players.csv",
+      "url": "https://www.kaggle.com/datasets/stefanoleone992/ea-sports-fc-24-complete-player-dataset",
+      "download": "https://www.kaggle.com/api/v1/datasets/download/stefanoleone992/ea-sports-fc-24-complete-player-dataset/female_players.csv",
+      "folder": "ea-leone-women",
+      "file": "female_players.csv",
+      "licence": "CC0-1.0, as set by the compiler on Kaggle; EA's own rights in the ratings are not cleared",
+      "rows": 5035,
+      "sha256": "cec084ecebbf18e6154ca2e63cb1a661d223d0b0781beeb4e0295e8edb8d71ec",
+      "retrieved": "2026-11-08"
+    },
+    "fifa23": {
+      "name": "FIFA 23 complete player dataset (stefanoleone992), female_players.csv: every roster update of FIFA 16 to FIFA 23",
+      "url": "https://www.kaggle.com/datasets/stefanoleone992/fifa-23-complete-player-dataset",
+      "download": "https://www.kaggle.com/api/v1/datasets/download/stefanoleone992/fifa-23-complete-player-dataset/female_players.csv",
+      "folder": "ea-leone-women-all",
+      "file": "female_players.csv",
+      "dateColumn": "fifa_update_date",
+      "licence": "CC0-1.0, as set by the compiler on Kaggle; EA's own rights in the ratings are not cleared",
+      "rows": 181361,
+      "sha256": "f5f63c6790ff46c9a8adc672002dab4887eb9d55bb0e2074b222b9774e39c328",
+      "retrieved": "2026-11-08"
+    }
+  },
+  "snapshot": "scripts/data/ea-women-16-24.csv",
+  "editions": [
+    {
+      "id": "eaw-fc-24",
+      "fifaVersion": 24,
+      "edition": "EA FC 24",
+      "update": 2,
+      "export": "fc24"
+    },
+    {
+      "id": "eaw-fifa-23",
+      "fifaVersion": 23,
+      "edition": "FIFA 23",
+      "update": 2,
+      "export": "fc24"
+    },
+    {
+      "id": "eaw-fifa-22",
+      "fifaVersion": 22,
+      "edition": "FIFA 22",
+      "update": 2,
+      "export": "fc24"
+    },
+    {
+      "id": "eaw-fifa-21",
+      "fifaVersion": 21,
+      "edition": "FIFA 21",
+      "update": 2,
+      "export": "fc24"
+    },
+    {
+      "id": "eaw-fifa-20",
+      "fifaVersion": 20,
+      "edition": "FIFA 20",
+      "update": 2,
+      "export": "fc24"
+    },
+    {
+      "id": "eaw-fifa-19",
+      "fifaVersion": 19,
+      "edition": "FIFA 19",
+      "update": 3,
+      "export": "fifa23",
+      "note": "Update 2 (2018-08-21) is a pre-release roster still carrying FIFA 18's ratings (23 of 304 overalls match the released game); update 3 (2018-09-20) is the first after release."
+    },
+    {
+      "id": "eaw-fifa-18",
+      "fifaVersion": 18,
+      "edition": "FIFA 18",
+      "update": 2,
+      "export": "fc24"
+    },
+    {
+      "id": "eaw-fifa-17",
+      "fifaVersion": 17,
+      "edition": "FIFA 17",
+      "update": 2,
+      "export": "fc24"
+    },
+    {
+      "id": "eaw-fifa-16",
+      "fifaVersion": 16,
+      "edition": "FIFA 16",
+      "update": 3,
+      "export": "fifa23",
+      "note": "Update 3 (2015-09-25) holds the same ratings as update 2 with full 23-woman squads (276 players)."
+    }
+  ],
+  "leagues": {
+    "603": {
+      "name": "Serie A Femminile",
+      "country": "380"
+    },
+    "607": {
+      "name": "Scottish Women's Premier League",
+      "country": "SCO"
+    },
+    "609": {
+      "name": "Czech Women's First League",
+      "country": "203"
+    },
+    "610": {
+      "name": "Vrouwen Eredivisie",
+      "country": "528"
+    },
+    "611": {
+      "name": "Women's Super League (Switzerland)",
+      "country": "756"
+    },
+    "814": {
+      "name": "Damallsvenskan",
+      "country": "752"
+    },
+    "2215": {
+      "name": "Frauen-Bundesliga",
+      "country": "276",
+      "main": true
+    },
+    "2216": {
+      "name": "Women's Super League",
+      "country": "826",
+      "main": true
+    },
+    "2218": {
+      "name": "Première Ligue",
+      "country": "250",
+      "main": true
+    },
+    "2221": {
+      "name": "NWSL",
+      "country": "840",
+      "main": true
+    },
+    "2222": {
+      "name": "Liga F",
+      "country": "724",
+      "main": true
+    },
+    "10003": {
+      "name": "Liga BPI",
+      "country": "620"
+    }
+  },
+  "clubs": {
+    "116034": "Paris Saint-Germain",
+    "116035": "Paris FC",
+    "116309": "Kansas City Current",
+    "116310": "NJ/NY Gotham FC",
+    "116311": "Angel City FC",
+    "116327": "Atlético de Madrid",
+    "116328": "Athletic Club",
+    "116332": "UDG Tenerife",
+    "131125": "Levante Las Planas",
+    "131358": "SL Benfica",
+    "131360": "Slavia Praha",
+    "131361": "FC Zürich",
+    "131362": "FC Rosengård"
+  }
+}
