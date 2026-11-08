@@ -7,6 +7,7 @@ import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
 import { baseballProfile } from '../sports/baseball.js';
 import { hockeyProfile } from '../sports/hockey.js';
+import { tennisProfile } from '../sports/tennis.js';
 import { getSport, SPORTS } from '../sports/index.js';
 import { historyRound, memo, ratingTier, roman, shortName, signedDelta, teamChip } from './format.js';
 
@@ -26,11 +27,14 @@ const GROUPS = {
  */
 const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5, CF: 6, RF: 7, DH: 8, SP: 9, RP: 10 },
   // Ice hockey's centre shares it too: the forwards, then the defence and the goalie.
-  hockey: { C: 0, LW: 1, RW: 2, D: 3, G: 4 } };
+  hockey: { C: 0, LW: 1, RW: 2, D: 3, G: 4 },
+  // A Davis Cup team: the singles, then the doubles.
+  tennis: { SGL: 0, DBL: 1 } };
 const SPORT_GROUPS = {
   baseball: { C: 'Catcher', '1B': 'Infield', '2B': 'Infield', '3B': 'Infield', SS: 'Infield', LF: 'Outfield', CF: 'Outfield',
     RF: 'Outfield', DH: 'Designated hitter', SP: 'Starting pitcher', RP: 'Bullpen' },
   hockey: { C: 'Centres', LW: 'Wings', RW: 'Wings', D: 'Defence', G: 'Goalie' },
+  tennis: { SGL: 'Singles', DBL: 'Doubles' },
 };
 /**
  * Formation slots in % of the pitch box (C§7.4, design V442), the basketball half court (C§17), the American football
@@ -69,6 +73,8 @@ const SLOTS = {
     LW: [[17, 9], [17, 21], [17, 33], [17, 45]],
     RW: [[83, 9], [83, 21], [83, 33], [83, 45]],
   },
+  // Tennis: the No. 1 and No. 2 at the near baseline, the doubles pair in the far half, across the net.
+  tennis: { SGL: [[30, 82], [70, 82]], DBL: [[30, 22], [70, 22]] },
 };
 /** Squad-screen copy per sport: the box the lineup is drawn on and its names. */
 const LAYOUTS = {
@@ -78,6 +84,7 @@ const LAYOUTS = {
   'american-football': { layout: 'field', viewLabel: 'Field' },
   baseball: { layout: 'diamond', viewLabel: 'Diamond' },
   hockey: { layout: 'rink', viewLabel: 'Rink' },
+  tennis: { layout: 'tennis', viewLabel: 'Court' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
 
@@ -143,8 +150,9 @@ export function profileSegments(value) {
 
 /**
  * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball), Offence / Defence / Kicking (American
- * football), Batting / Pitching / Fielding (baseball) or Attack / Defence / Goaltending (ice hockey) from the sports
- * engines' positional profiles of the lineup (ED§4c; no match-day offset), with the C1 segment count.
+ * football), Batting / Pitching / Fielding (baseball), Attack / Defence / Goaltending (ice hockey) or Singles / Doubles
+ * (tennis) from the sports engines' positional profiles of the lineup (ED§4c; no match-day offset), with the C1 segment
+ * count.
  */
 export function strengthProfile(lineup, sportId) {
   const rows = sportId === 'basketball'
@@ -155,6 +163,8 @@ export function strengthProfile(lineup, sportId) {
         ? (({ batting, pitching, fielding }) => [['batting', 'Batting', batting], ['pitching', 'Pitching', pitching], ['fielding', 'Fielding', fielding]])(baseballProfile(lineup))
         : sportId === 'hockey'
           ? (({ attack, defence, goaltending }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goaltending', 'Goaltending', goaltending]])(hockeyProfile(lineup))
+          : sportId === 'tennis'
+            ? (({ singles, doubles }) => [['singles', 'Singles', singles], ['doubles', 'Doubles', doubles]])(tennisProfile(lineup))
           : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
   return rows.map(([key, label, value]) => {
     const raw = Number.isFinite(Number(value)) ? Number(value) : 0;
@@ -301,7 +311,9 @@ function computeSquad(st, ctx, team) {
     };
   };
 
-  const starters = sortByPosition(lineup.starters, player => player.assignedPos || player.pos, sportId);
+  // Tennis lists every place, a singles player who doubles in the doubles twice (a small nation's).
+  const placed = sportId === 'tennis' ? lineup.slots.filter(slot => slot.player).map(slot => slot.player) : lineup.starters;
+  const starters = sortByPosition(placed, player => player.assignedPos || player.pos, sportId);
   const starterRows = starters.map((player, i) => rowOf(player, i, true));
   const groups = [];
   for (const row of starterRows) {
@@ -361,9 +373,12 @@ function computeSquad(st, ctx, team) {
   const alive = Array.isArray(st.aliveIds) ? st.aliveIds.includes(teamId) : true;
   const fell = Array.isArray(st.fallen) ? st.fallen.find(entry => entry?.id === teamId) : null;
   const notes = [];
-  if (lineup.starters.length < plan && !squad.some(player => player.gen)) {
-    notes.push(`Source data covers ${lineup.starters.length} of ${plan} starting places. Unfilled places use a 40-point team-strength baseline.`);
+  const filled = lineup.slots.filter(slot => slot.player).length;
+  if (filled < plan && !squad.some(player => player.gen)) {
+    notes.push(`Source data covers ${filled} of ${plan} starting places. Unfilled places use a 40-point team-strength baseline.`);
   }
+  const doubling = lineup.slots.filter(slot => slot.player?.doubling).map(slot => shortName(slot.player.name));
+  if (doubling.length) notes.push(`${doubling.join(' and ')} ${doubling.length === 1 ? 'plays' : 'play'} the singles and the doubles: the team has ${plural(squad.length, 'rated player')}.`);
   const estimates = lineup.starters.filter(isEstimated).length;
   if (estimates) notes.push(`${estimates} of the ${plan} starting ratings are estimates, each marked: EA publishes only NHL 27's top 300 players.`);
   // The manager's own team for the "Your squad" shortcut (spectators follow instead).

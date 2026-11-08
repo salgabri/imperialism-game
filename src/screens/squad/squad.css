@@ -189,6 +189,10 @@
 .pitch--diamond.pitch--large .pitch__dot { width: 32px; height: 32px; font-size: 12px; }
 .pitch--diamond.pitch--large .pitch__name { font-size: 12px; }
 .pitch--diamond.pitch--phone .pitch__name { display: none; }
+/* Tennis: the court drawn over the box, the singles in the near half and the doubles pair across the net */
+.pitch__tennis { position: absolute; left: 10px; top: 10px; width: calc(100% - 20px); height: calc(100% - 20px); }
+.pitch__tennis rect, .pitch__tennis path { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.pitch__tennis .pitch__net { stroke-width: 2px; }
 /* Ice hockey: the rink drawn over the box, and 19 smaller discs, as the NFL field's 23 */
 .pitch__rink { position: absolute; left: 10px; top: 10px; width: calc(100% - 20px); height: calc(100% - 20px); }
 .pitch__rink rect, .pitch__rink path { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
