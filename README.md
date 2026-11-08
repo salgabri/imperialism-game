@@ -10,19 +10,21 @@ Pick your sport at kick-off:
 
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
-| Football | XI in a 4-4-2 | 90 minutes | penalty shootout |
+| Football, and women's football | XI in a 4-4-2 | 90 minutes | penalty shootout |
 | Basketball | starting five | 40 minutes for nations (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
+| Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
 
 And pick who fights:
 
 - **Nations** — 173 national teams, each starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-- **Clubs** — 132 football clubs from seven European leagues, all 30 NBA
+- **Clubs** — 132 football clubs from seven European leagues, 84 women's clubs, all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
-  franchises on [theirs](#the-nfl-map) of the USA, or all 30 MLB clubs on
-  [theirs](#the-mlb-map) of the USA and Canada. Real Madrid annexes territory
+  franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
+  [theirs](#the-mlb-map) of the USA and Canada, or all 32 NHL clubs on
+  [theirs](#the-nhl-map). Real Madrid annexes territory
   exactly the way Spain does. American football is played by clubs only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
@@ -34,7 +36,9 @@ data, lineup shape, match model and vocabulary (`words`) from `src/sports/`; add
 American football took one module, its club file, its lineup plan and its squad
 field ([design notes](docs/design/american-football.md)). Baseball added the sport's
 own match clock (half-innings, not minutes) and nations by birthplace
-([design notes](docs/design/baseball.md)).
+([design notes](docs/design/baseball.md)). Ice hockey's ratings are partly estimates, each
+marked as one ([design notes](docs/design/hockey.md)), and women's football plays
+under football's rulebook with its own players ([design notes](docs/design/womens-football.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -94,6 +98,11 @@ npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check com
 npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
 npm run build:mlb-map    # rebuild MLB's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
+npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (network, cached)
+npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
+npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
+npm run sync:ea-fc-women # snapshot EA FC's women's players from its public API into scripts/data/ea-fc27-women.csv (network, cached)
+npm run build-womens-football # rebuild the women's nations and clubs from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 ```
@@ -185,7 +194,8 @@ manager of the theatre's favourite, with decisions from the first match.
    the strongest 32 available clubs; basketball clubs play the NBA on its own
    map of the USA and Canada, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA,
-   and baseball clubs MLB on its map of the USA and Canada. The step opens on a map of the chosen theatre:
+   baseball clubs MLB on its map of the USA and Canada and ice hockey clubs the NHL on its own. Women's football's clubs
+   offer its five leagues, the Rest of Europe, all of them or the strongest 32. The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). It also
    shows the actual number of teams, the number of matches and the estimated
@@ -200,7 +210,8 @@ manager of the theatre's favourite, with decisions from the first match.
    1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
    football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
-   2025 back to 2021, with nations or with clubs on the map of their day. A
+   2025 back to 2021, with nations or with clubs on the map of their day. Women's football and ice hockey
+   list their built-in 2026/27. A
    quick-resume card appears when a save exists. A page opened from a challenge
    link shows a note about the link ([Sharing a campaign](#sharing-a-campaign)).
 2. **Rules of war** — one choice, **The draw** (below). Beside it, **Show
@@ -301,13 +312,16 @@ their season did: about 93 a side in 2003/04, 116 today. American football plays
 possessions a side, each ending in a touchdown and its try (the extra point or two points),
 a field goal, now and then a safety, or nothing by its offence against the opposing defence,
 with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime.
+Ice hockey plays three-minute slices whose rates follow the score (a level game tightens up late, a side behind
+pushes and at the end pulls its goalie), then five minutes of sudden death and a shoot-out. Women's football plays
+football's model.
 Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
 **Home advantage** is off by default: every match is played on neutral ground, so
 the defending team wins half of even games. On, the defender plays at home and
 wins about as often as home teams do in its sport's league: 45% of even football
 games in ninety minutes (58% with the shoot-outs), 56% in basketball, 54% in
-American football and 53% in baseball. Attacks fail more often, and a failed
+American football and ice hockey and 53% in baseball. Attacks fail more often, and a failed
 attack hands the defender the attacker's territory, so conquests change hands but
 campaigns run as many matches. A best-of-three final keeps its attacker, so its
 defender hosts every game.
@@ -551,9 +565,9 @@ Each key names a setup choice, and a key left at its default is left out:
 
 | Key | Setup choice | Values | Left out when |
 | --- | --- | --- | --- |
-| `sport` | Sport | `football`, `basketball`, `american-football`, `baseball` | football |
+| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs `all`, `elite`, a league (`Premier+League`) or a country (`domestic:826`) | Europe for nations, all clubs for clubs, a sport's own map (NBA, NFL, MLB) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs `all`, `elite`, a league (`Premier+League`) or a country (`domestic:826`) | Europe for nations, all clubs for clubs, a sport's own map (NBA, NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -679,8 +693,8 @@ snapshot takes its names from. FM ratings come from Football Manager 26 database
 26.3.0 as displayed by EFEM.club.
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
-(EA SPORTS FC, FIFA, Madden NFL), Sports Interactive and SEGA (Football Manager),
-2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), the NBA, the NFL, MLB,
+(EA SPORTS FC, FIFA, Madden NFL, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
+2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), the NBA, the NFL, MLB, the NHL,
 or the clubs, leagues and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
@@ -710,6 +724,21 @@ Classic. 23 nations field players, from the United States (88) and the Dominican
 Republic (85) down; a lineup place a nation's own players cannot fill gets a generated
 player, and a nation with no MLB players is a minnow (45). Ratings are The Show's
 overalls, unchanged. See the [design notes](docs/design/baseball.md).
+
+**Ice hockey** — `src/data/clubs.hockey.js` and `src/data/rosters.hockey.js`, from
+EA SPORTS NHL 27's ratings and the NHL's rosters and statistics, retrieved 2026-11-07
+(`scripts/data/nhl-27.json`). **EA publishes its top 300 players only, so every other rating
+is an estimate**, marked as one wherever it is shown: the players EA leaves out are ranked by
+ice time and scoring and spread from 83 down to 72 (goalies 70). EA's own ratings are unchanged. The 32 clubs
+field the lineup the game picks and keep up to 23; nations field the NHL's players, by EA's
+nationality or else birth country, and a place they cannot fill gets a generated player. See the
+[design notes](docs/design/hockey.md).
+
+**Women's football** — `src/data/clubs.womens-football.js` and
+`src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
+(`scripts/data/ea-fc27-women.csv`, 1,940 players). Ratings are EA's, unchanged, and nothing is
+invented: 27 of the 78 nations with a rated player field a full XI, the rest start short-handed, and a
+nation with none fields no team. See the [design notes](docs/design/womens-football.md).
 
 **Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
@@ -742,9 +771,10 @@ another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
 An assignment optimizer fills all eleven football, five basketball, 23 American
-football or 13 baseball slots. Playing outside a natural position costs 12 rating
+football, 13 baseball or 19 ice hockey slots. Playing outside a natural position costs 12 rating
 points (25 in American football, 20 in baseball, where a hitter pitching or a pitcher
-hitting costs 40 and any hitter can be the designated hitter). A player may have
+hitting costs 40 and any hitter can be the designated hitter; in ice hockey 4 between the forward places, 15
+between forwards and defence and 40 in or out of goal). A player may have
 more than one natural position, and each one is penalty-free: a claimed PG/SG
 can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
@@ -797,7 +827,7 @@ flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
 NFL franchises are not dealt either: each holds its own state of [the USA](#the-nfl-map), and
-each MLB club its own of [the USA and Canada](#the-mlb-map).
+each MLB and NHL club its own of [the USA and Canada](#the-mlb-map) ([the NHL's](#the-nhl-map)).
 
 Club lineups come from the same sources as the national squads:
 `clubs.football.js` from the EA FC 27 snapshot filtered to the seven tier-one
@@ -1031,6 +1061,21 @@ empty. The map is `public/domestic/mlb.json` (162 KB); ballparks are in
 ```bash
 npm run build:mlb-map                      # boundaries + ballparks → public/domestic/mlb.json and its index entry (about 2 minutes)
 npm run build:mlb-map -- --check           # offline rebuild must match the committed files byte for byte
+```
+
+### The NHL map
+
+Ice hockey clubs have one theatre, **NHL**: the 32 clubs fight over the USA and Canada, each
+holding the state or province its arena stands in and nothing else, as on the NBA's map.
+California and New York (three clubs each), Florida, Pennsylvania, Ontario and Alberta (two
+each) are divided between their clubs, and every state and province without a club stays empty.
+A scrap of a divided state that only another state's land touches, such as Staten Island beside
+New Jersey, stays with its own state's nearest club. The map is `public/domestic/nhl.json`
+(157 KB); arenas are in `scripts/data/nhl-teams.json`.
+
+```bash
+npm run build:nhl-map                      # boundaries + arenas → public/domestic/nhl.json and its index entry (about 2 minutes)
+npm run build:nhl-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
 
 ## Football seasons
@@ -1527,7 +1572,7 @@ src/
     campaign.js        territory ownership, targeting, round draws
     duelDraw.js        one-by-one draw: attacker, compass bearing, route
     turns.js           round-robin queue, "in reach" targets, launch rules
-    winProbability.js  live win-probability model (football, basketball and American football)
+    winProbability.js  live win-probability model (each sport's)
     liveMinute.js      live match minute store (outside saved state)
     domestic.js        loads and validates a country map: sections and club rows
     footballSets.js    lists, loads and validates earlier seasons of both sports; season-bound sport
@@ -1591,12 +1636,13 @@ vercel.json            cache headers for the deployed site
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **thirteen full
-campaigns** across all three pacings, both resolution modes, all four sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **seventeen full
+campaigns** across all three pacings, both resolution modes, all six sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
 sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
-clubs on theirs, also live, and one baseball's nations of North and Central America. A **manager campaign** (Italy, Europe, round robin × *You
+clubs on theirs, also live, one baseball's nations of North and Central America, one the NHL's 32 clubs on
+their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, and one the NWSL's clubs. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after

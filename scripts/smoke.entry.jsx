@@ -1497,7 +1497,7 @@ export async function runChallengeCheck() {
     mounted.unmount();
 
     // A stale link: a sport, season, theatre, draw and seed this build doesn't offer, and a team the theatre lacks.
-    mounted = await mountAt('/?sport=hockey&theatre=Mars&season=ea-fifa-99&draw=sometimes&role=manager&team=XYZ&seed=abc');
+    mounted = await mountAt('/?sport=curling&theatre=Mars&season=ea-fifa-99&draw=sometimes&role=manager&team=XYZ&seed=abc');
     await until('the unknown team is cleared', () => mounted.app.state.setup.managedTeamId === '', 5000);
     const stale = result.staleSetup = mounted.app.state.setup;
     result.stale = stale.sport === 'football' && stale.layer === 'nations' && stale.scope === 'UEFA' && stale.dataSet == null

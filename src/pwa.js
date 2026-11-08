@@ -8,7 +8,7 @@ export const APP_MANIFEST = Object.freeze({
   short_name: 'Imperialism',
   // index.html's description: what an install dialog shows.
   description: 'Sport decides the borders. Win a match to take all of the loser’s territory and one of its players. '
-    + 'Football, basketball, American football and baseball in your browser.',
+    + 'Football, women’s football, basketball, American football, baseball and ice hockey in your browser.',
   lang: 'en',
   start_url: './',
   scope: './',

@@ -3,7 +3,9 @@
 // components pass it to buildFeedRows and to the win-probability series.
 import { clockLabel, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeText } from '../sports/index.js';
 import { selectLineup } from '../data/teams.js';
+import { isEstimated } from '../data/estimates.js';
 import { BENCH } from '../sports/basketball.js';
+import { PERIOD_MODEL } from '../sports/hockey.js';
 import { liveModelFor } from '../engine/winProbability.js';
 import { roman, historyRound, formatOddsPair, ratingTier, shortName, memo } from './format.js';
 import { idleTurnCopy } from './turns.js';
@@ -13,6 +15,7 @@ const GROUPS = {
   basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
   'american-football': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'],
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP'],
+  hockey: ['C', 'LW', 'RW', 'D', 'G'],
 };
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -31,11 +34,17 @@ function oddsOf(odds) {
  * "Chiesa 23' · Raspadori 61'" (football), "Jokić 14 pts · Murray 9 pts" (basketball: top two scorers, never the bench),
  * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score, a safety the
  * 2-point one, a touchdown 6 to 8 with its try, ranked as 6 since the archived copy keeps no try) or
- * "Judge 3 RBI · Soto 1 RBI" (baseball: the two who drove in most runs).
+ * "Judge 3 RBI · Soto 1 RBI" (baseball: the two who drove in most runs) or "McDavid 2 G · Draisaitl 1 G" (ice hockey: the
+ * two who scored most; a shoot-out's goal is the side's, nobody's own).
  */
 export function scorersLine(shown, teamId, teams, sportId = 'football') {
   const own = (Array.isArray(shown) ? shown : []).filter(e => e && e.tid === teamId && e.name);
   if (!own.length) return '';
+  if (sportId === 'hockey') {
+    const totals = new Map();
+    for (const e of own) if (Number(e.m) <= PERIOD_MODEL.MINUTES + PERIOD_MODEL.OVERTIME) totals.set(e.name, (totals.get(e.name) || 0) + 1);
+    return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, goals]) => `${shortName(name)} ${goals} G`).join(' · ');
+  }
   if (sportId === 'baseball') {
     const totals = new Map();
     for (const e of own) totals.set(e.name, (totals.get(e.name) || 0) + (Number(e.pts) || 0));
@@ -97,7 +106,7 @@ function xiTable(team, st, sportId) {
     .map(({ p, pos }) => {
       const rating = Math.round(Number(p.effectiveRating ?? p.rating) || 0);
       return { key: `${team.id}-${p.originalIndex ?? p.name}`, pos, name: p.name || '', natural: p.pos || pos,
-        rating, tier: ratingTier(rating), outOfPosition: !!p.outOfPosition, claimed: claimedTag(p, team, st) };
+        rating, tier: ratingTier(rating), outOfPosition: !!p.outOfPosition, claimed: claimedTag(p, team, st), estimated: isEstimated(p) };
     });
   // DECISIONS (Misc): basketball lineups read "Starting five", American football's "Starters".
   const title = `${team.name} · ${getSport(sportId).words.lineupTitle}`;

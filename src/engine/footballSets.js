@@ -22,9 +22,11 @@ import { getSport } from '../sports/index.js';
 export const FOOTBALL_SET_FORMAT = 1;
 /** The built-in data's season (EA FC 27 + FM 26). Year N is the season ending in N. */
 export const BUILT_IN_SEASON = Object.freeze({ year: 2027, season: '2026/27' });
-// Basketball's built-in clubs and national fives' NBA ratings are NBA 2K27's (2026/27).
+// Basketball's built-in clubs and national fives' NBA ratings are NBA 2K27's (2026/27), the women's game's EA FC 27's and
+// ice hockey's NHL 27's.
 // The NFL's season is one calendar year: Madden NFL 27 rates the 2026 season. So is MLB's: MLB The Show 26 rates 2026.
-const BUILT_IN_SEASONS_OF = Object.freeze({ football: BUILT_IN_SEASON, basketball: Object.freeze({ year: 2027, season: '2026/27' }),
+const BUILT_IN_SEASONS_OF = Object.freeze({ football: BUILT_IN_SEASON, 'womens-football': BUILT_IN_SEASON,
+  basketball: Object.freeze({ year: 2027, season: '2026/27' }), hockey: Object.freeze({ year: 2027, season: '2026/27' }),
   'american-football': Object.freeze({ year: 2026, season: '2026' }), baseball: Object.freeze({ year: 2026, season: '2026' }) });
 /** The season a sport's built-in data plays. */
 export const builtInSeasonOf = sportId => BUILT_IN_SEASONS_OF[getSport(sportId).id];

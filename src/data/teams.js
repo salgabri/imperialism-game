@@ -302,7 +302,7 @@ function rosterPlayer([name, listed, rating, metadata]) {
 /**
  * Build a nation's squad for a campaign in the given sport.
  *
- * Football only fields players in its source data; an incomplete export remains
+ * Football, women's and men's, only fields players in its source data; an incomplete export remains
  * visibly incomplete. Other sports retain their generated baseline fillers.
  * `real` reports how much of the squad came from actual data.
  */
@@ -333,7 +333,13 @@ export function buildTeam(id, rng, sport) {
     for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
       if (!slot.player || slot.outOfPosition) squad.push(genPlayer(rng, culture, slot.position, str));
     }
-  } else if (sport.id !== 'football') {
+  } else if (sport.id === 'hockey') {
+    // As in baseball, except that a forward on another forward's line is no gap: only a place left empty, or held by
+    // a defender, a forward or a goalie out of his own group, gets a generated player.
+    for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
+      if (!slot.player || slot.penalty > outOfPositionPenalty(sport.id)) squad.push(genPlayer(rng, culture, slot.position, str));
+    }
+  } else if (!REAL_PLAYERS_ONLY.has(sport.id)) {
     const have = p => squad.filter(x => x.pos === p).length;
     for (const [pos, count] of Object.entries(formation)) {
       while (have(pos) < count && squad.length < squadSize) squad.push(genPlayer(rng, culture, pos, str));
@@ -389,17 +395,28 @@ export function squadAverage(team) {
 export const OUT_OF_POSITION_PENALTY = 12;
 // American football's positions are far more specialised: a tight end on the offensive line, or a receiver at
 // cornerback, is an emergency, not a rotation. So are baseball's: MLB The Show lists every position a player can
-// field, and a starter in the bullpen (or a reliever starting) is out of his role.
-const PENALTY_OF = { 'american-football': 25, baseball: 20 };
+// field, and a starter in the bullpen (or a reliever starting) is out of his role. A hockey forward moves between the
+// lines' three places with little trouble: the NHL lists one position for players who play all three.
+const PENALTY_OF = { 'american-football': 25, baseball: 20, hockey: 4 };
 /** Rating points a starter loses outside his natural positions, in a sport ('football', 'basketball', …). */
 export const outOfPositionPenalty = sportId => PENALTY_OF[sportId] ?? OUT_OF_POSITION_PENALTY;
-// A baseball hitter on the mound, or a pitcher in the field or at the plate, is no rotation at all.
+// A baseball hitter on the mound, or a pitcher in the field or at the plate, is no rotation at all. Nor is a hockey
+// skater in goal, or a goalie skating.
 export const CROSSOVER_PENALTY = 40;
+// A hockey forward on the blue line, or a defender up front.
+export const SKATER_CROSSOVER_PENALTY = 15;
 const PITCHING = new Set(['SP', 'RP']);
 const canPitch = player => PITCHING.has(player.pos) || !!player.positions?.some(position => PITCHING.has(position));
 const canHit = player => !PITCHING.has(player.pos) || !!player.positions?.some(position => !PITCHING.has(position));
+const FORWARDS = new Set(['C', 'LW', 'RW']);
+// Football's rule, in both of its games: a team fields only the players its source rates.
+const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football']);
+const FOOTBALL_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
 const LINEUP_PLANS = {
-  football: ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'],
+  football: FOOTBALL_PLAN,
+  'womens-football': FOOTBALL_PLAN,
+  // Four forward lines, three defence pairs and the goalie.
+  hockey: ['C', 'C', 'C', 'C', 'LW', 'LW', 'LW', 'LW', 'RW', 'RW', 'RW', 'RW', 'D', 'D', 'D', 'D', 'D', 'D', 'G'],
   basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
   // Eleven on offence (three receivers), eleven on defence (the nickel) and the kicker.
   'american-football': ['QB', 'RB', 'WR', 'WR', 'WR', 'TE', 'OL', 'OL', 'OL', 'OL', 'OL',
@@ -417,6 +434,10 @@ const canPlay = (player, position) => player.pos === position || !!player.positi
 /** Rating points `player` loses at `position` outside his natural positions, in a sport. */
 function slotPenalty(sportId, player, position) {
   if (sportId === 'baseball' && (PITCHING.has(position) ? !canPitch(player) : !canHit(player))) return CROSSOVER_PENALTY;
+  if (sportId === 'hockey') {
+    if (position === 'G' || player.pos === 'G') return CROSSOVER_PENALTY;
+    if (FORWARDS.has(position) !== FORWARDS.has(player.pos)) return SKATER_CROSSOVER_PENALTY;
+  }
   return outOfPositionPenalty(sportId);
 }
 
@@ -432,7 +453,8 @@ export function teamSportId(team) {
 /**
  * Select the strongest assignment to the sport's actual playing positions.
  * A player may cover another position, but the assignment and penalty (12 points, 25 in American football, 20 in
- * baseball and 40 for a baseball hitter pitching or a pitcher hitting) are explicit. Optimising the whole assignment
+ * baseball and 40 for a baseball hitter pitching or a pitcher hitting; in hockey 4 between the forward places, 15
+ * between forwards and defence and 40 in or out of goal) are explicit. Optimising the whole assignment
  * means an acquisition cannot reduce strength by evicting a better emergency starter.
  */
 export function selectLineup(team) {

@@ -2,6 +2,7 @@
 // The claimed tag sits in the player cell so it hugs the rating on every row (B1's per-row `auto` track).
 import React from 'react';
 import TeamMark from '../../components/TeamMark.jsx';
+import { ESTIMATE_TITLE } from '../../data/estimates.js';
 
 export default function XiTable({ title = '', teamId = null, rows = [], onSelectTeam }) {
   const titleId = `match-xi-${String(teamId ?? title).replace(/[^a-zA-Z0-9_-]/g, '')}`;
@@ -33,7 +34,9 @@ export default function XiTable({ title = '', teamId = null, rows = [], onSelect
               <td className="match-xi__pos">{row.pos}</td>
               <td className="match-xi__name">
                 <span className="match-xi__player">
-                  <span className="match-xi__player-name" title={row.name}>{row.name}</span>
+                  <span className="match-xi__player-name" title={row.estimated ? `${row.name}. ${ESTIMATE_TITLE}` : row.name}>
+                    {row.name}{row.estimated && <><sup aria-hidden="true">*</sup><span className="sr-only"> (estimated rating)</span></>}
+                  </span>
                   <span className="match-xi__claimed">
                     {row.claimed && (
                       <span className="match-xi__tag" title={row.claimed.label}>

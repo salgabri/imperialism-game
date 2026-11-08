@@ -1,10 +1,12 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Squad view-models (PLAN §3.6, C§16, DEC D8/D9).
 // Pure: no window/document/timers/RNG; tolerates missing teams, history, stats and baseEff.
 import { selectLineup, teamSportId } from '../data/teams.js';
+import { ESTIMATE_TITLE, isEstimated } from '../data/estimates.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
 import { baseballProfile } from '../sports/baseball.js';
+import { hockeyProfile } from '../sports/hockey.js';
 import { getSport, SPORTS } from '../sports/index.js';
 import { historyRound, memo, ratingTier, roman, shortName, signedDelta, teamChip } from './format.js';
 
@@ -22,10 +24,13 @@ const GROUPS = {
  * A sport whose codes clash with another's has its own order and groups: baseball's catcher shares basketball's 'C'.
  * The batting order's positions first (catcher, infield, outfield, designated hitter), then the pitchers.
  */
-const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5, CF: 6, RF: 7, DH: 8, SP: 9, RP: 10 } };
+const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5, CF: 6, RF: 7, DH: 8, SP: 9, RP: 10 },
+  // Ice hockey's centre shares it too: the forwards, then the defence and the goalie.
+  hockey: { C: 0, LW: 1, RW: 2, D: 3, G: 4 } };
 const SPORT_GROUPS = {
   baseball: { C: 'Catcher', '1B': 'Infield', '2B': 'Infield', '3B': 'Infield', SS: 'Infield', LF: 'Outfield', CF: 'Outfield',
     RF: 'Outfield', DH: 'Designated hitter', SP: 'Starting pitcher', RP: 'Bullpen' },
+  hockey: { C: 'Centres', LW: 'Wings', RW: 'Wings', D: 'Defence', G: 'Goalie' },
 };
 /**
  * Formation slots in % of the pitch box (C§7.4, design V442), the basketball half court (C§17), the American football
@@ -55,13 +60,24 @@ const SLOTS = {
     C: [[50, 89]], SP: [[50, 62]], '1B': [[70, 58]], '2B': [[61, 42]], SS: [[39, 42]], '3B': [[30, 58]],
     LF: [[22, 30]], CF: [[50, 21]], RF: [[78, 30]], DH: [[16, 86]], RP: [[91, 50], [91, 68], [91, 86]],
   },
+  // The goalie in his crease at the foot of the box, the three defence pairs below the blue line, the first furthest
+  // forward, and the four forward lines above it, the first line at the top.
+  hockey: {
+    G: [[50, 91]],
+    D: [[32, 63], [68, 63], [32, 73], [68, 73], [32, 83], [68, 83]],
+    C: [[50, 9], [50, 21], [50, 33], [50, 45]],
+    LW: [[17, 9], [17, 21], [17, 33], [17, 45]],
+    RW: [[83, 9], [83, 21], [83, 33], [83, 45]],
+  },
 };
 /** Squad-screen copy per sport: the box the lineup is drawn on and its names. */
 const LAYOUTS = {
   football: { layout: 'pitch', viewLabel: 'Pitch' },
+  'womens-football': { layout: 'pitch', viewLabel: 'Pitch' },
   basketball: { layout: 'court', viewLabel: 'Court' },
   'american-football': { layout: 'field', viewLabel: 'Field' },
   baseball: { layout: 'diamond', viewLabel: 'Diamond' },
+  hockey: { layout: 'rink', viewLabel: 'Rink' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
 const DEPTH_ROWS = 5;
@@ -103,6 +119,7 @@ export function sourceTitle(player) {
   const name = info.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : 'Football Manager';
   const edition = String(info.edition || '');
   const label = edition ? (/^\d+$/.test(edition) ? `${name} ${edition}` : edition) : name;
+  if (info.source === 'estimate') return ESTIMATE_TITLE;
   const raw = Number.isFinite(info.rawRating)
     ? `Source rating ${info.rawRating}${Number.isFinite(info.rawScale) ? `/${info.rawScale}` : info.rawScale ? ` (${info.rawScale} scale)` : ''}`
     : null;
@@ -128,8 +145,8 @@ export function profileSegments(value) {
 
 /**
  * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball), Offence / Defence / Kicking (American
- * football) or Batting / Pitching / Fielding (baseball) from the sports engines' positional profiles of the lineup
- * (ED§4c; no match-day offset), with the C1 segment count.
+ * football), Batting / Pitching / Fielding (baseball) or Attack / Defence / Goaltending (ice hockey) from the sports
+ * engines' positional profiles of the lineup (ED§4c; no match-day offset), with the C1 segment count.
  */
 export function strengthProfile(lineup, sportId) {
   const rows = sportId === 'basketball'
@@ -138,7 +155,9 @@ export function strengthProfile(lineup, sportId) {
       ? (({ offence, defence, kicking }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence], ['kicking', 'Kicking', kicking]])(americanFootballProfile(lineup))
       : sportId === 'baseball'
         ? (({ batting, pitching, fielding }) => [['batting', 'Batting', batting], ['pitching', 'Pitching', pitching], ['fielding', 'Fielding', fielding]])(baseballProfile(lineup))
-        : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
+        : sportId === 'hockey'
+          ? (({ attack, defence, goaltending }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goaltending', 'Goaltending', goaltending]])(hockeyProfile(lineup))
+          : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
   return rows.map(([key, label, value]) => {
     const raw = Number.isFinite(Number(value)) ? Number(value) : 0;
     return { key, label, value: raw.toFixed(1), raw: Math.round(raw * 10) / 10, segments: profileSegments(raw) };
@@ -230,7 +249,7 @@ function gainOf(prov) {
 /**
  * The Squad screen model for `teamId` (C§16, PLAN §3.5) or null when the team is unknown.
  * Rows: { key, no, pos, name, short, fullName, natural, inRole, outOfPosition, rating, tier, acquired, source, sourceTitle,
- * sourceUrl, generated, player }.
+ * sourceUrl, generated, estimated, player }.
  */
 export function buildSquad(st, ctx, teamId) {
   const teams = st?.teams || {};
@@ -246,7 +265,7 @@ function computeSquad(st, ctx, team) {
   const sportId = Object.hasOwn(SPORTS, ctx?.sport?.id ?? '') ? ctx.sport.id : teamSportId(team);
   const words = getSport(sportId).words;
   // Football's lineup has a shape ("4-4-2"); a five and an NFL lineup are named instead.
-  const shaped = sportId === 'football';
+  const shaped = sportId === 'football' || sportId === 'womens-football';
   const squad = Array.isArray(team.squad) ? team.squad : [];
   const lineup = selectLineup(team);
   const plan = lineup.slots.length;
@@ -281,6 +300,7 @@ function computeSquad(st, ctx, team) {
       sourceTitle: sourceTitle(player),
       sourceUrl: sourceUrl(player),
       generated: !!player.gen,
+      estimated: isEstimated(player),
       player,
     };
   };
@@ -316,6 +336,7 @@ function computeSquad(st, ctx, team) {
       name: shortName(player.name), fullName: player.name || '',
       rating: Math.round(Number(player.effectiveRating ?? player.rating) || 0),
       claimed: !!provOf(player),
+      estimated: isEstimated(player),
     };
   });
 
@@ -350,6 +371,8 @@ function computeSquad(st, ctx, team) {
   if (lineup.starters.length < plan && !squad.some(player => player.gen)) {
     notes.push(`Source data covers ${lineup.starters.length} of ${plan} starting places. Unfilled places use a 40-point team-strength baseline.`);
   }
+  const estimates = lineup.starters.filter(isEstimated).length;
+  if (estimates) notes.push(`${estimates} of the ${plan} starting ratings are estimates, each marked: EA publishes only NHL 27's top 300 players.`);
   // The manager's own team for the "Your squad" shortcut (spectators follow instead).
   const ownId = ctx?.managedId ?? null;
   const back = BACK_LABELS[st.squadReturn] ? { label: BACK_LABELS[st.squadReturn] } : null;

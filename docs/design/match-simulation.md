@@ -120,33 +120,35 @@ players, never the bench.
 ## Statistical verification
 
 The checked-in [report](match-simulation-report.json) samples 200,000 outcomes per
-pairing, sixteen million outcomes over the four sports, plus 10,000 complete
+pairing, twenty-four million outcomes over the six sports, plus 10,000 complete
 timelines a sport for timing. It covers three uncertainty settings, five rating
 gaps, equal teams and four pairings a sport built from national rosters, so its
 basketball figures are FIBA's. These equal-team results use 75-rated starters and
 Balanced uncertainty. The NBA rules are checked in
 `scripts/basketball-simulation.test.mjs` and `scripts/win-probability.test.mjs`.
 
-| Measure | Football | Basketball |
-| --- | --- | --- |
-| Combined regulation score | 2.65 goals | 162.76 points |
-| Regulation tie rate | 27.42% | 7.05% |
-| Attacking side wins | 50.17% | 50.04% |
-| Attacking side wins after a tie | 49.97% | 49.67% |
+| Measure | Football | Basketball | Ice hockey |
+| --- | --- | --- | --- |
+| Combined regulation score | 2.65 goals | 162.76 points | 6.30 goals |
+| Regulation tie rate | 27.42% | 7.05% | 23.43% |
+| Attacking side wins | 50.17% | 50.04% | 50.07% |
+| Attacking side wins after a tie | 49.97% | 49.67% | 50.21% |
 
 Synthetic stronger-team win rates against a 55-rated lineup with Balanced
 uncertainty were:
 
-| Rating advantage | Football | Basketball |
-| --- | --- | --- |
-| 5 | 70.65% | 74.40% |
-| 10 | 85.63% | 90.48% |
-| 20 | 97.11% | 99.57% |
-| 40 | 99.61% | 100.00% |
+| Rating advantage | Football | Basketball | Ice hockey |
+| --- | --- | --- | --- |
+| 5 | 70.65% | 74.40% | 76.30% |
+| 10 | 85.63% | 90.48% | 91.48% |
+| 20 | 97.11% | 99.57% | 98.97% |
+| 40 | 99.61% | 100.00% | 99.89% |
 
 At a ten-point advantage, Predictable and Wild produced 87.39% and 72.61%
-football win rates, and 93.94% and 83.15% basketball win rates. Increasing
-uncertainty raises upset chances while retaining a meaningful strength advantage.
+football win rates, 93.94% and 83.15% basketball win rates, and 92.05% and 83.82%
+in ice hockey. Increasing uncertainty raises upset chances while retaining a
+meaningful strength advantage. Women's football plays football's model, so on the
+same 75-rated lineups its figures match football's within sampling error.
 
 Historical reference anchors inform broad scoring targets: Qatar 2022 recorded 172
 goals in 64 matches, or 2.69 per match, according to
@@ -161,8 +163,9 @@ The model is not a forecast of real fixtures.
 
 `npm run simulation:realism` (`scripts/simulation-realism.mjs`) plays whole
 seasons with the built-in clubs at Balanced: double round robins of Europe's top
-five football leagues, 82-game NBA seasons, 17-game NFL seasons and 162-game MLB
-seasons, the attacker and defender drawn as the round robin falls. It sets each
+five football leagues, 82-game NBA seasons, 17-game NFL seasons, 162-game MLB
+seasons and 82-game NHL seasons, the attacker and defender drawn as the round robin
+falls. It sets each
 measure beside the real league's range over recent seasons; `REAL` in the script
 names the seasons and sources, and `scripts/simulation-realism.test.mjs` holds the
 sourced measures the models set out to match. The real figures were gathered on
@@ -220,12 +223,25 @@ after the pass.
 | Spread of winning percentages | 0.095 | 0.076 | 0.071–0.089 |
 | Best and worst records | 112–51 | 106–56 | 97–111 wins, 41–55 wins |
 
+Ice hockey arrived after this pass, calibrated from the start, so it has no "before".
+Its real ranges were computed on 2026-11-07 from every game of the five seasons in
+the NHL's own API; [hockey.md](hockey.md) has the whole table.
+
+| NHL | Now | Real (2021/22–2025/26) |
+| --- | --- | --- |
+| Goals a team | 3.05 | 3.01–3.14 |
+| Overtime or shoot-out / shoot-outs | 23.2% / 7.5% | 20.7–24.9% / 5.9–9.1% |
+| Won by one / by two | 42.8% / 19.2% | 38.1–43.2% / 17.5–21.9% |
+| Won by three or more / five or more | 38.0% / 6.4% | 39.3–41.7% / 5.5–6.5% |
+| Spread of winning percentages | 0.097 | 0.082–0.127 |
+| Best and worst records | 57 wins, 24 wins | 55–65 wins, 19–25 wins |
+
 Known gaps, reported but not tested:
 
 - **No home advantage by default.** Every sport plays at a neutral venue unless a
   campaign turns on Home advantage (below), so the defending side wins half its
   games. Real home sides win 41–48% of football games in ninety minutes, 54–58% in
-  the NBA, 52–56% in the NFL and 52–54% in MLB.
+  the NBA, 52–56% in the NFL, 52–54% in MLB and 52–56% in the NHL.
 - **Football leagues' styles.** Every league scores at one base rate, so La Liga
   (2.5–2.6 goals a game in life) scores like the Bundesliga (3.1–3.2). Top-32
   nations score about 2.9 a game against about 2.5 in World Cup group stages.
@@ -234,6 +250,12 @@ Known gaps, reported but not tested:
   strong nations, against about 20% of World Cup knockout games after extra time.
 - **MLB's worst clubs** win about 56 games, where the real worst won 41–55: The
   Show's lowest-rated lineups sit closer to the middle than the worst real clubs.
+- **The NHL's wins by three or more** run at 38.0%, under the real 39.3–41.7%.
+  Closing the gap pushes the five-goal wins out of their range.
+- **Women's football is not calibrated.** It plays the men's model and is not in the
+  harness. Its leagues draw more often than the four real ones measured (22.7–25.6%
+  of games against 13.6–21.7%) and score more alike:
+  [womens-football.md](womens-football.md#known-limits) has the figures.
 
 ## Home advantage (optional)
 
@@ -253,6 +275,8 @@ sides win at home about as often as home sides do in the sport's league:
 | Basketball | ±0.012 points a possession: 2.4 points a game (NBA), 1.8 (FIBA) | 1.2 | 57% (NBA), 56% (FIBA) | 54.3–58.0% (NBA) |
 | American football | ±0.65 rating points of drive edge: 1.2 points a game | 0.65 | 54% | 51.5–55.7% |
 | Baseball | ±1.4 rating points of half-inning edge for the side batting last: 0.34 runs a game | 1.4 | 53% | 52.1–54.3% |
+| Ice hockey | ±0.05 in log scoring rate: 0.30 goals a game | 0.9 | 55% | 52.2–56.3% |
+| Women's football | Football's | 2 | 45–46% in 90 minutes over each league's pairings, 56–58% after the shoot-out | 41.7–47.7% in 90 minutes (four leagues, one season each) |
 
 "Worth" is the rating advantage an attacker needs for an even match against a home
 defender; a manager's Attack approach adds 0.6 rating points, plus up to 1.2 for
@@ -262,8 +286,10 @@ Whole league seasons with the rule on (`npm run simulation:realism -- --home`, 4
 seasons) put every league's home sides inside the real range: 44.5–45.4% home wins
 in ninety minutes across the five football leagues (40.8% in the 2024/25 Premier
 League to 47.9% in the 2022/23 La Liga, from FootballRates and Statista), 55.9% in
-the NBA, 53.4% in the NFL and 53.1% in MLB. Every other measure stays in its range;
-football's draws stay at 23–25%. `scripts/simulation-realism.test.mjs` checks the
+the NBA, 53.4% in the NFL, 53.1% in MLB and 54.6% in the NHL. Every other measure
+stays in its range, bar two of the NHL's: wins by three or more stay a little low
+(38.3%) and wins by five or more edge over the top (6.7%, real 5.5–6.5%). Football's
+draws stay at 23–25%. `scripts/simulation-realism.test.mjs` checks the
 home sides with the rule on, and half the decided games without it;
 `scripts/home-advantage.test.mjs` covers the setting from setup to saves.
 
@@ -281,6 +307,18 @@ campaigns:
 | Basketball | 47.2% → 42.6% | 84% → 85% | 65% → 63% | 3.1 → 3.1 | 17 → 17 |
 | American football | 49.9% → 46.1% | 34% → 38% | 9% → 9% | 11.6 → 10.8 | 48 → 47 |
 | Baseball | 47.4% → 45.0% | 76% → 75% | 33% → 33% | 3.6 → 3.6 | 14 → 15 |
+| Women's football | 46.8% → 40.6% | 59% → 59% | 18% → 20% | 5.8 → 5.9 | 20 → 22 |
+| Ice hockey | 44.3% → 41.4% | 97% → 96% | 31% → 31% | 2.5 → 2.6 | 7 → 7 |
+
+Women's football's elite 32 are its strongest rated nations, and England, Spain and
+the United States take 9–17% of the titles each. Ice hockey's are its 16 NHL nations
+and 16 minnows at the baseline of 45, so its titles stay at the top: the United
+States, Canada and Russia win 23–31% each, and the champion started in the top five
+in 96–97% of campaigns. The probe has routed over the App's merged map since these
+two rows (`mergeSharedIds`, `drawnPaths`): unmerged, Australia was the Ashmore and
+Cartier reef that shares its id, and one hockey campaign in 200 under the
+one-by-one draw ended with no route between its last two. The four rows above were
+measured before that fix; none of their campaigns stalled.
 
 The App's own campaigns (`node scripts/production-balance.mjs --home=off,on`, 80
 for each setup: elite nations with a manager, elite European clubs, and the NBA,
@@ -314,11 +352,11 @@ balance decision, not a realism one.
 
 ## Performance and reproduction
 
-The recorded Windows Node 26 run sampled approximately 5.0 million prepared
-football outcomes per second and 4.7 million basketball ones. Complete timelines
-ran at approximately 73,000 football and 93,000 basketball matches per second. A
-fresh 1,024-sample odds estimate took 1.08 ms for football and 0.37 ms for
-basketball. These are local timing observations, separate from live ticker
+The recorded Windows Node 26 run sampled approximately 3.8 million prepared
+football outcomes per second, 3.7 million basketball ones and 1.5 million ice hockey
+ones. Complete timelines ran at approximately 51,000 football, 60,000 basketball and
+12,500 hockey matches per second. A fresh 1,024-sample odds estimate took 1.46 ms
+for football, 0.39 ms for basketball and 2.15 ms for hockey. These are local timing observations, separate from live ticker
 presentation delays, and are not timing requirements in the tests.
 
 All randomness comes from the injected campaign generator. Identical seeds,
@@ -326,7 +364,8 @@ settings, model version and manager choices reproduce campaigns. RNG state
 resumes from saves; existing generated match outcomes remain stored. Football,
 FIBA basketball and American football have simulation version 3, NBA basketball
 version 5 and baseball version 2 (the realism pass above; American football's
-version 3 added its touchdown tries and safeties). Club campaigns played
+version 3 added its touchdown tries and safeties). Ice hockey and women's football
+are at version 1. Club campaigns played
 FIBA rules before NBA version 3, and version 3 played every season at one pace.
 New results from an older seed can differ after upgrading the model.
 

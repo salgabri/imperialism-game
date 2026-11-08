@@ -192,7 +192,7 @@ test('the loader takes a sport map\'s clubs from the game, and refuses a club or
   const broken = edit => { const doc = JSON.parse(TEXT); edit(doc); return () => decodeDomestic(doc, 'nba'); };
   assert.throws(broken(doc => { doc.clubs[0].id = 'b-seattle-supersonics'; }), /clubs\[0\] \("b-seattle-supersonics"\) is not one of the game's basketball clubs/);
   assert.throws(broken(doc => { doc.clubs[1].id = doc.clubs[0].id; }), /clubs\[1\] .* id is duplicated/);
-  assert.throws(broken(doc => { doc.sport = 'hockey'; }), /unknown sport "hockey"/);
+  assert.throws(broken(doc => { doc.sport = 'curling'; }), /unknown sport "curling"/);
   assert.throws(broken(doc => { doc.hosts = []; }), /hosts must list world shape ids/);
   assert.throws(broken(doc => { delete doc.clubs[2].col; }), /has no colour/);
   assert.throws(broken(doc => { doc.topology.objects.empty.geometries[0].id = 'nba-001'; }), /empty land 0 .* needs an id of its own/);

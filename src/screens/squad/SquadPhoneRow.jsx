@@ -12,6 +12,7 @@ export default function SquadPhoneRow({ row }) {
         <span className="squad-prow__meta">
           {row.natural}
           {row.generated && <span className="squad-prow__gen"> · Generated</span>}
+          {row.estimated && <span className="squad-prow__gen"> · Estimated</span>}
           {row.outOfPosition && <span className="squad-prow__oop"> · out of position</span>}
           {acquired && <span className="squad-prow__from"> · from {acquired.code}{acquired.roman ? ` ${acquired.roman}` : ''}</span>}
         </span>

@@ -318,6 +318,10 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 export const SEASON_NOTES = Object.freeze({
   football: 'Earlier seasons use EA FIFA ratings of that season. Nations without eleven rated players '
     + 'start short-handed.',
+  'womens-football': 'EA SPORTS FC 27 ratings of the women\'s game, as of 7 November 2026. Nations without eleven rated '
+    + 'players start short-handed, and a nation with none fields no team.',
+  hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
+    + 'scoring, marked as one. Rosters as of 7 November 2026. Nations field the NHL players of each country.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
     + 'only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '

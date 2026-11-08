@@ -910,6 +910,27 @@ Sox's, Yankee Stadium the Yankees', Citi Field the Mets' and Ottawa the Blue Jay
 seeded duel campaigns reach a champion; the App launches on the map. The smoke runs
 an MLB duel and an MLB resume.
 
+## The NHL map
+
+Status: implemented 2026-11-07. Ice hockey clubs ([hockey.md](hockey.md)) have one theatre,
+**NHL**, played on `public/domestic/nhl.json`: the USA and Canada, where each of the 32 clubs
+holds its own state or province, as on the NBA's map, by the same command and partition
+(`LEAGUES.nhl` in `scripts/build-club-maps.mjs`; `npm run build:nhl-map`). Every state and province
+without a club stays empty. Homes are `scripts/data/nhl-teams.json`, each club's arena.
+
+- **Shared states**: California and New York (three clubs each), Florida, Pennsylvania, Ontario
+  and Alberta (two each) split along county and economic-region lines. The Capitals hold the
+  District of Columbia alone, the league's smallest territory by far.
+- **Scraps**: the NHL is the first league to split Ontario and to have a New Jersey club beside
+  New York's. A scrap of a shared state that only another state's land touches (Staten Island,
+  the islands of Lake of the Woods) would go to that state's club, which the map refuses, so
+  it stays with its own state's nearest club, across the water. The other leagues' maps have
+  no such scraps and rebuild byte for byte.
+
+**Checks**: `scripts/hockey.test.mjs`: file, index, arenas and clubs agree; every arena lies
+inside its territory; the shared states are split, Staten Island stays New York's; seeded duel
+campaigns reach a champion; the App launches on the map. The smoke runs an NHL duel.
+
 ## Known limitations
 
 - **Coverage.** 42 nations have fewer than ten viable clubs and do not ship (What

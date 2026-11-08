@@ -40,6 +40,9 @@
     "mlb-philadelphia-phillies": "#e81828",
     "mlb-san-francisco-giants": "#fd5a1e",
     "mlb-athletics": "#003831",
-    "mlb-san-diego-padres": "#2f241d"
+    "mlb-san-diego-padres": "#2f241d",
+    "nhl-chicago-blackhawks": "#cf0a2c",
+    "nhl-philadelphia-flyers": "#f74902",
+    "nhl-nashville-predators": "#ffb81c"
   }
 }
