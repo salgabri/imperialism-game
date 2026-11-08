@@ -92,6 +92,7 @@ npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
+npm run sync:early-nationalities # ask Wikidata for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page in data-src/bball-2karchive/
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
@@ -205,7 +206,8 @@ manager of the theatre's favourite, with decisions from the first match.
    theatres starts a [domestic campaign](#domestic-campaigns), and its map shows that
    country. Football also has a **Season** choice: the built-in 2026/27 (the
    current season), then the [earlier seasons](#football-seasons) 2025/26 back
-   to 2006/07 (EA FIFA ratings of each; there is no 2024/25), and any local
+   to 2004/05 (EA FIFA ratings of each; there is no 2024/25, and 2005/06 and
+   2004/05 have nations only), and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
@@ -1073,7 +1075,7 @@ not England. AS Monaco, a Ligue 1 club, holds the land around Monaco in France.
 
 The earlier [football seasons](#football-seasons) hold the seven big leagues only, so
 their maps draw on those: the strongest 124 and 32 of that season's 132–134 clubs,
-one pair of maps per season. Football's "One country · top clubs" campaigns are
+one pair of maps per season. 2005/06 and 2004/05 have nations only, so no maps. Football's "One country · top clubs" campaigns are
 unchanged. A world campaign saved before these maps stays on the world, and resumes
 as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
 deals its clubs onto the world.
@@ -1147,16 +1149,17 @@ npm run build:nhl-map -- --check           # offline rebuild must match the comm
 
 ## Football seasons
 
-Football can be played on nineteen earlier seasons as well as the built-in
-2026/27: 2006/07 to 2025/26, each from EA's FIFA of that season (FIFA 07 to EA
+Football can be played on twenty-one earlier seasons as well as the built-in
+2026/27: 2004/05 to 2025/26, each from EA's FIFA of that season (FIFA 05 to EA
 FC 26; no source here has EA FC 25, so there is no 2024/25). They ship with the
 game: pick one under **Season** in setup. Each is a file in `public/football/`
-(250–335 KB) that loads only when chosen.
+(75–335 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
   and the clubs of the seven biggest European leagues (132–134 clubs a season,
-  of which the strongest 124 play, on [the season's own maps](#the-europe-maps)). Ratings are EA's overalls, unchanged. EA rates only part of the
-  world, so 49–82 nations field a full XI each season (fewer in the older
+  of which the strongest 124 play, on [the season's own maps](#the-europe-maps);
+  2005/06 and 2004/05 have nations only). Ratings are EA's overalls, unchanged.
+  EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
   editions) and the rest field the players they have, as an empty or thin
   built-in nation does. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
@@ -1167,7 +1170,8 @@ game: pick one under **Season** in setup. Each is a file in `public/football/`
   EA FC 24 are each edition's launch roster. FIFA 07 to
   FIFA 11 take their ratings from the launch roster and the clubs and
   nationalities from the winter update; FIFA 12 to FIFA 14 use one roster each,
-  from later in the season.
+  from later in the season. FIFA 05 and FIFA 06 have the one roster their source
+  lists, dated by the game's release.
 - **Sources:** EA FC 26 is the committed `scripts/data/ea-fc26.csv` (rovnez on
   Kaggle, CC BY 4.0; its 316 generated players stay out). FIFA 15 – EA FC 24 come from one Kaggle export
   (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
@@ -1177,7 +1181,12 @@ game: pick one under **Season** in setup. Each is a file in `public/football/`
   FIFA Index's terms forbid scraping) for the overall, positions, full name and
   date of birth, and a SoFIFA scrape on GitHub (`Big-Data-FC/datasets`, no
   licence stated) for the nationality and club. SoFIFA's own rating is never
-  read, and a player missing from either file is left out. EA's own rights are
+  read, and a player missing from either file is left out. FIFA 05 and FIFA 06
+  come from the same FIFA Index mirror; SoFIFA has neither, so they have no
+  clubs, and a player's nationality is the one the same EA id has in the nearest
+  later edition, else Wikidata's (`scripts/data/ea-early-nationalities.json`, CC0,
+  refreshed by `npm run sync:early-nationalities`). A player with neither is
+  left out. EA's own rights are
   not cleared, as for the built-in EA FC 27 data. `scripts/data/ea-seasons.json`
   pins every file by SHA-256. To rebuild, download them into the ignored
   `data-src/` (the manifest names each folder) and run:
@@ -1190,8 +1199,8 @@ game: pick one under **Season** in setup. Each is a file in `public/football/`
   `docs/design/football-seasons-audit.json`, and every file rebuilds byte for
   byte.
 
-Seasons before 2006/07 have no EA source here: the SoFIFA scrape, the only
-source of nationality and club, starts with FIFA 07. They can come from a Championship
+Seasons before 2004/05 have no EA source here: the FIFA Index mirror starts with
+FIFA 05. They can come from a Championship
 Manager 01/02 database, which covers 2001/02 to 2025/26 but whose authors have
 not allowed redistribution, so those seasons stay **local**. Download a database
 from [champman0102.co.uk](https://www.champman0102.co.uk) (a free forum account

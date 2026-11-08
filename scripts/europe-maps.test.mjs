@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { feature, neighbors } from 'topojson-client';
 import { CLUBS } from '../src/data/clubs.football.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
+import { setHasClubs } from '../src/engine/footballSets.js';
 import { EUROPE_MAPS } from '../src/data/europeMaps.js';
 import { ELITE_CLUBS, TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
 import { europeMapOf, europeMapsOf, isCountryScope, isEuropeScope } from '../src/data/domesticScope.js';
@@ -27,6 +28,8 @@ import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const docOf = id => JSON.parse(read(`public/domestic/${id}.json`));
 const setOf = id => JSON.parse(read(`public/football/${id}.json`));
+// The earlier seasons with clubs. FIFA 05 and FIFA 06 have nations only, so nothing to put on a map.
+const CLUB_SEASONS = BUILT_IN_SEASONS.filter(season => setHasClubs(season.id));
 const ATLAS = JSON.parse(read('public/countries-50m.json'));
 const WORLD = new Map();
 for (const g of ATLAS.objects.countries.geometries) {
@@ -54,12 +57,18 @@ const TOWNS = {
   bern: [7.45, 46.95], budapest: [19.04, 47.5], belgrade: [20.46, 44.82], dublin: [-6.26, 53.35], moscow: [37.62, 55.75], bucharest: [26.1, 44.43],
 };
 
-test('the index lists a built-in and an earlier-season pair of maps, each file as its entry says', () => {
-  const seasons = [null, ...BUILT_IN_SEASONS.map(season => season.id)];
+test('the index lists a built-in pair of maps and one for each earlier season with clubs, each file as its entry says', () => {
+  const seasons = [null, ...CLUB_SEASONS.map(season => season.id)];
   assert.equal(EUROPE_MAPS.length, seasons.length * 2);
   for (const season of seasons) {
     assert.deepEqual(europeMapsOf(season).map(map => [map.league, map.clubs, map.theatre]),
       [[`Top ${TOP_CLUBS}`, TOP_CLUBS, 'all'], [`Elite ${ELITE_CLUBS}`, ELITE_CLUBS, 'elite']], String(season));
+  }
+  const nationsOnly = BUILT_IN_SEASONS.filter(season => !setHasClubs(season.id)).map(season => season.id);
+  assert.deepEqual(nationsOnly, ['ea-fifa-06', 'ea-fifa-05']);
+  for (const season of nationsOnly) {
+    assert.deepEqual(europeMapsOf(season), [], season);
+    assert.deepEqual(setOf(season).clubs, [], `${season} has no clubs`);
   }
   for (const entry of EUROPE_MAPS) {
     const text = read(`public/domestic/${entry.id}.json`);
@@ -81,7 +90,7 @@ test('the field is the strongest clubs of the season: Europe\'s for the built-in
   assert.deepEqual(ids(TOP), strongestClubs(CLUBS, TOP_CLUBS).map(club => club.id), 'the whole built-in club list');
   assert.deepEqual(ids(ELITE), strongestClubs(CLUBS, ELITE_CLUBS).map(club => club.id));
   assert.ok(new Set(CLUBS.map(club => club.country)).size > 7, 'more than the seven big leagues');
-  for (const season of BUILT_IN_SEASONS) {
+  for (const season of CLUB_SEASONS) {
     const { clubs } = setOf(season.id);
     assert.deepEqual(ids(docOf(`eu124s${season.year}`)), strongestClubs(clubs, TOP_CLUBS).map(club => club.id), season.id);
     assert.deepEqual(ids(docOf(`eu32s${season.year}`)), strongestClubs(clubs, ELITE_CLUBS).map(club => club.id), season.id);

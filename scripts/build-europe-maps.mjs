@@ -491,7 +491,10 @@ function attributionText(entries, docs) {
   return `${lines.join('\n')}\n`;
 }
 
-/** The maps to build: for the built-in season and each earlier EA season, its strongest TOP_CLUBS and ELITE_CLUBS clubs. */
+/**
+ * The maps to build: for the built-in season and each earlier EA season with clubs, its strongest TOP_CLUBS and
+ * ELITE_CLUBS clubs. FIFA 05 and FIFA 06 have nations only, so no maps.
+ */
 async function mapSpecs() {
   const { clubs: places } = JSON.parse(await readFile(clubsFile, 'utf8'));
   const field = (list, count) => strongestClubs(list, count).map(club => {
@@ -502,7 +505,7 @@ async function mapSpecs() {
   const seasons = [{ tag: '', set: null, clubs: CLUBS }];
   for (const season of BUILT_IN_SEASONS) {
     const set = JSON.parse(await readFile(setFile(season.id), 'utf8'));
-    seasons.push({ tag: `s${season.year}`, set: season.id, clubs: set.clubs });
+    if (set.clubs.length) seasons.push({ tag: `s${season.year}`, set: season.id, clubs: set.clubs });
   }
   return seasons.flatMap(({ tag, set, clubs }) => [
     { id: `eu${TOP_CLUBS}${tag}`, league: `Top ${TOP_CLUBS}`, theatre: 'all', seasons: set ? [set] : null, clubs: field(clubs, TOP_CLUBS) },

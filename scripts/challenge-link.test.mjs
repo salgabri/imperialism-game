@@ -143,6 +143,10 @@ test('stale values fall back: seasons, theatres and teams this build no longer o
     ['sport=basketball&teams=clubs&theatre=Premier+League', { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nba' }, ['theatre']],
     // Country maps are built from the built-in clubs: with an earlier season its clubs play on its own Europe map.
     ['teams=clubs&theatre=domestic:826&season=ea-fifa-18', { layer: 'clubs', clubScope: 'domestic:eu124s2018', dataSet: 'ea-fifa-18' }, ['theatre']],
+    // FIFA 05 and FIFA 06 have nations only; there is no earlier season than FIFA 05.
+    ['teams=clubs&season=ea-fifa-06', { dataSet: 'ea-fifa-06' }, ['teams']],
+    ['teams=nations&theatre=AFC&season=ea-fifa-05', { scope: 'AFC', dataSet: 'ea-fifa-05' }, []],
+    ['season=ea-fifa-04', {}, ['season']],
     // American football has clubs only; its NFL map is its one theatre.
     ['sport=american-football&teams=nations&theatre=UEFA', { sport: 'american-football', layer: 'clubs', clubScope: 'domestic:nfl' },
       ['teams', 'theatre']],

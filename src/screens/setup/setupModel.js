@@ -9,7 +9,7 @@ import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, europeMapsOf, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
-import { builtInSeasonOf, fieldedNations, setHasNations, setSportOf } from '../../engine/footballSets.js';
+import { builtInSeasonOf, fieldedNations, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
 
@@ -321,7 +321,7 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
   football: 'Earlier seasons use EA FIFA ratings of that season, with clubs from the seven biggest leagues. Nations without '
-    + 'eleven rated players start short-handed.',
+    + 'eleven rated players start short-handed. 2005/06 and 2004/05 have nations only.',
   'womens-football': 'EA SPORTS FC 27 ratings of the women\'s game, as of 7 November 2026. Nations without eleven rated '
     + 'players start short-handed, and a nation with none fields no team.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
@@ -573,9 +573,10 @@ export function suggestedTeamId(managerTeams = []) {
 export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
   const sportId = getSport(setup.sport).id;
-  // A chosen data set plays with its own nations and clubs once it has loaded; a basketball season with clubs only.
+  // A chosen data set plays with its own nations and clubs once it has loaded; a basketball season with clubs only, and
+  // FIFA 05 and FIFA 06 with nations only.
   const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId && (setHasNations(setup.dataSet) || setup.layer === 'clubs')
-    ? setup.dataSet : null;
+    && (setHasClubs(setup.dataSet) || setup.layer !== 'clubs') ? setup.dataSet : null;
   const seasonCtx = ctx.season || {};
   const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);
   // Until then no figure from the built-in season stands in for the set's.

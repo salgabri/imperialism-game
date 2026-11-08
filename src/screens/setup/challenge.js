@@ -6,7 +6,7 @@ import { SCOPES } from '../../data/teams.js';
 import { CLUB_SCOPES } from '../../data/scopes.js';
 import { domesticEntry, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
-import { BUILT_IN_SETS, setSportOf } from '../../engine/footballSets.js';
+import { BUILT_IN_SETS, setHasClubs, setSportOf } from '../../engine/footballSets.js';
 import { DEFAULT_SETUP, dataSetOf, setClubScope } from '../../app/shared.js';
 import {
   DRAW_CARDS, FINALE_OPTIONS, HOME_OPTIONS, RECRUITMENT_OPTIONS, ROSTER_OPTIONS, SHOW_MATCH_OPTIONS, TARGETING_CARDS,
@@ -70,7 +70,9 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   take('season', value => setSportOf(value) === sport.id && sets.some(set => set.id === value), value => { setup.dataSet = value; });
   // A sport with clubs only (American football: the NFL's) and a basketball season (NBA clubs) play clubs.
   const clubsOnly = !!sport.clubsOnly || (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball');
-  take('teams', value => value === 'clubs' || (value === 'nations' && !clubsOnly), value => { setup.layer = value; });
+  // FIFA 05 and FIFA 06 have no clubs to play.
+  const nationsOnly = setup.dataSet != null && !setHasClubs(setup.dataSet);
+  take('teams', value => (value === 'clubs' && !nationsOnly) || (value === 'nations' && !clubsOnly), value => { setup.layer = value; });
   if (clubsOnly) setup.layer = 'clubs';
   const clubLayer = setup.layer === 'clubs';
   take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : SCOPES.some(scope => scope.id === value)),

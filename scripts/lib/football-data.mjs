@@ -40,7 +40,12 @@ export function parseCsv(text) {
 }
 
 export async function loadEaPlayers(filename) {
-  const [header, ...rows] = parseCsv(await readFile(filename, 'utf8'));
+  return parseEaPlayers(await readFile(filename, 'utf8'));
+}
+
+/** loadEaPlayers from the CSV's text, for a caller that reads the file itself. */
+export function parseEaPlayers(text) {
+  const [header, ...rows] = parseCsv(text);
   const required = ['player_id', 'player_url', 'fifa_version', 'fifa_update', 'fifa_update_date',
     'short_name', 'long_name', 'player_positions', 'overall', 'nationality_name',
     'club_name', 'club_team_id', 'league_id', 'league_name', 'league_level', 'dob'];

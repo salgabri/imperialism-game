@@ -72,8 +72,8 @@ most of the 170 nations. EA counts are nations able to field a natural
 | 2015–2020 | FM only from an owned game (Kaggle uploads of FM17/19/20 have no SI permission); CM0102 each season | Leone (CC0), one file for FIFA 15–FC 24. 65–75 nations | PES 2015–2020 (up to 93 nations); 2018: Wyscout PlayeRank (CC BY 4.0, 47 nations) | results/Elo, Wikidata |
 | 2008–2014 | CM0102 each season (Update Team from Nov 2007) | No clean bulk file: FIFA Index scrape mirror `daguizer` (raw rating, positions, **no nationality**) joined by EA id to `Big-Data-FC` (nationality; its own ratings are SoFIFA's derived "best overall", not usable). ~53–67 nations | PES 2008–2014 (54–77 nations; fake names in 2008–2012) | results/Elo, Wikidata |
 | 2007 | CM0102 April 2007 (author unknown) | FIFA 07 as above | No PES 6 | results/Elo, Wikidata |
-| 2006 | CM0102 Sep 2005 (Helvete) | FIFA 06: `daguizer` only, no nationality | PES 5 (52 nations) | results/Elo, Wikidata |
-| 2005 | CM0102 Oct 2004 (Sawczuk): listed in an offline archive, file not found | FIFA 05: `daguizer` only, no nationality | — | results/Elo, Wikidata |
+| 2006 | CM0102 Sep 2005 (Helvete) | **Shipping, nations only:** FIFA 06: `daguizer`, no nationality or club; nationalities from later editions and Wikidata ([football-years.md](football-years.md#fifa-05-and-fifa-06)). 54 nations | PES 5 (52 nations) | results/Elo, Wikidata |
+| 2005 | CM0102 Oct 2004 (Sawczuk): listed in an offline archive, file not found | **Shipping, nations only:** FIFA 05: as FIFA 06. 54 nations | — | results/Elo, Wikidata |
 | 2004 | CM0102 Oct 2003 (Sawczuk) | — | — | results/Elo, Wikidata |
 | 2003 | SI's own CM 01/02 3.9.68 database (2002/03) | — | — | results/Elo, Wikidata |
 | 2002 | SI's own CM 01/02 3.9.60 / 3.9.65 database (2001/02) | — | — | results/Elo, Wikidata |

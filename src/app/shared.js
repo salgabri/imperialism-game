@@ -3,7 +3,7 @@ import { C } from '../theme.js';
 import { DEFAULT_SPORT, getSport } from '../sports/index.js';
 import { domesticScope, domesticScopeId } from '../engine/domestic.js';
 import { clubMapScope, domesticEntry, europeMapOf, isCountryScope, isEuropeScope } from '../data/domesticScope.js';
-import { seasonMapOf, setHasNations, setSportOf } from '../engine/footballSets.js';
+import { seasonMapOf, setHasClubs, setHasNations, setSportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -31,14 +31,18 @@ export function domesticIdOf(settings) {
 
 /**
  * The data set a setup or saved campaign is played on, or null for the built-in data. A set plays in its own sport: a
- * football season on its Europe maps, or the world for a set without them (country maps use the built-in data), a
+ * football season on its Europe maps, or the world for a set without them (country maps use the built-in data, and so
+ * do clubs with a season of nations only: FIFA 05 and FIFA 06), a
  * basketball season with clubs only, on its era's map, and a baseball season with its nations or with its clubs on its
  * era's map. Pure.
  */
 export function dataSetOf(settings) {
   const id = settings?.dataSet ?? null, sport = getSport(settings?.sport).id;
   if (id == null || setSportOf(id) !== sport) return null;
-  if (sport === 'football') return domesticIdOf(settings) && !isEuropeScope(settings.clubScope) ? null : id;
+  if (sport === 'football') {
+    return (domesticIdOf(settings) && !isEuropeScope(settings.clubScope)) || (settings.layer === 'clubs' && !setHasClubs(id))
+      ? null : id;
+  }
   return setHasNations(id) || settings.layer === 'clubs' ? id : null;
 }
 

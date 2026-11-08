@@ -4,7 +4,8 @@ Status: implemented for local CM 01/02 data sets, 2026-10-24; the built-in
 earlier seasons from EA's FIFA 15 – EA FC 24 launch rosters and an
 always-visible Season choice, 2026-10-30; FIFA 07 – FIFA 14 from two scrapes of
 EA's rosters, and the earlier basketball seasons from 2K Archive's NBA 2K
-ratings, on maps of their eras, 2026-10-30. The CM 01/02 path has not yet run on a
+ratings, on maps of their eras, 2026-10-30; FIFA 05 and FIFA 06, nations only,
+2026-11-07. The CM 01/02 path has not yet run on a
 real database (the files need a forum login). Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
 [football-year-permissions.md](football-year-permissions.md).
@@ -15,7 +16,7 @@ A football campaign can be played on a **data set** other than the built-in one.
 A data set is one dated database turned into nations and clubs. There are two
 kinds:
 
-- **The built-in earlier seasons** (2006/07 to 2023/24): one EA FIFA / FC
+- **The built-in earlier seasons** (2004/05 to 2025/26): one EA FIFA / FC
   roster each, committed under `public/football/ea-*.json` and offered in every
   setup. See [Built-in earlier seasons](#built-in-earlier-seasons).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
@@ -191,9 +192,10 @@ names the provider and reads "Game rating converted from CM current ability".
 
 ## Built-in earlier seasons
 
-Nineteen seasons ship with the game, 2006/07 to 2025/26, without 2024/25 (no
+Twenty-one seasons ship with the game, 2004/05 to 2025/26, without 2024/25 (no
 source here has EA FC 25). FIFA 07 to FIFA 14 are described
-[below](#fifa-07-to-fifa-14). Ten, 2014/15 to 2023/24, are the launch roster
+[below](#fifa-07-to-fifa-14), and so are [FIFA 05 and FIFA 06](#fifa-05-and-fifa-06),
+which have nations only. Ten, 2014/15 to 2023/24, are the launch roster
 (update 2) of each EA edition from FIFA 15 to EA FC 24, from one Kaggle export
 (`stefanoleone992/ea-sports-fc-24-complete-player-dataset`, `male_players.csv`,
 180,021 rows, labelled CC0 by its compiler; EA's own rights are not cleared, as
@@ -304,6 +306,87 @@ seven every year, such as `Portuguese Liga ZON SAGRES`): 132 clubs a season.
 A legacy season's `source` adds `clubsUrl` (the SoFIFA scrape) to `url` (the
 ratings mirror), and `ratingsDate` where the two rosters differ. Full XIs run
 from 49 (FIFA 09) to 69 (FIFA 12) of 173 nations.
+
+### FIFA 05 and FIFA 06
+
+SoFIFA starts with FIFA 07, so the scrape above has nothing for 2004/05 and
+2005/06. The FIFA Index mirror does: EA's overall, positions, name and date of
+birth. These two seasons are built from it
+(`scripts/lib/ea-early-seasons.mjs`, run by the same `npm run build:ea-seasons`
+through the same `assembleEaSeason`), and they differ from every other season in
+two ways: they have no clubs, and a player's nationality comes from elsewhere.
+
+- **Nations only.** Nothing here says which club anyone played for that season, so
+  `clubs` is empty. `setHasClubs` knows these seasons by their ids, so the setup
+  needs no file to tell. Choosing one takes Nations, and choosing Clubs goes back
+  to the built-in season, as an NBA season does the other way round.
+- **Nationality from the nearest later edition.** This is the one place a season
+  takes a field from another edition, and FIFA 07 to FIFA 14 still take nothing.
+  The same EA id in FIFA 07 or later gives the nationality. Nationality rarely
+  changes: tried on FIFA 07, where the real one is known, it is wrong for 82 of
+  8,872 players (0.92%), and for 2 of the 1,262 rated 75 or more.
+- **The id must still name that person.** EA reused ids: FIFA 06's Anis Boussaidi,
+  a Tunisian, has the id of FIFA 07's Ibrahim Said, an Egyptian. So the two records
+  must have the same birth date, or names that agree word by word, an initial or a
+  shortening counting as agreement ("C. Ronaldo", "Josh" for "Joshua"). A shared
+  surname is not enough (`D. Brivio` and `Pierluigi Brivio`). 8 FIFA 06 and
+  27 FIFA 05 rows fail this and are treated as having no later edition.
+- **Wikidata for the rest.** Players who had retired by FIFA 07, among them Zidane,
+  Bergkamp and Shearer, have no later edition. `npm run sync:early-nationalities`
+  asks Wikidata (CC0), and `scripts/data/ea-early-nationalities.json` commits the
+  answers (2,520 players), pinned by SHA-256 like every other input, so the seasons
+  build offline. A player is matched to a footballer born the same day whose name
+  agrees. 1 January is left out of that: it is usually a placeholder in the files,
+  and it is where Wikidata keeps a date known only to the year. A player rated 70
+  or more who is still unmatched, and whose name has at least two words, is looked
+  up by name, and needs exactly one footballer of that name aged 17 to 42 that
+  season. The nationality is the senior national team (P54), else the country for
+  sport (P1532) where citizenship backs it, else a youth or B national team, else
+  citizenship (P27). Country for sport comes after the team because it can be
+  wrong: Wikidata has Demis Nikolaidis, a Greece international, and Robson Ponte, a
+  Brazilian, as Germany's. The answer must settle on one nation, so a citizen of the
+  United Kingdom with no team stays unmatched, and so does anyone with two countries
+  and nothing to choose between them. An entry names the spelling it was matched to,
+  so it never reaches another person under the same id in the other edition. Tried
+  on 447 FIFA 06 players whose FIFA 07 nationality is known, this agrees for 427
+  (95.5%). Most of the others are young players who chose another federation after
+  2006 (Assou-Ekotto, Folly, Ndjeng), which a player retired by then cannot do.
+- **Checked by hand.** Seven real players these rules cannot settle (`early.checked`
+  in the manifest, each with its reason), such as Pochettino, whose birth date is a
+  day off under a one-word name, and Naybet, whose name the files misspell. The sync
+  writes them as `evidence: "checked"`. A real player can still be left out when
+  nothing settles them: Arie van Lent has two citizenships and no national team.
+- **Left out.** A player with neither is left out, 745 of FIFA 06's 10,151 and
+  1,290 of FIFA 05's 10,970. EA's stand-ins are among them: FIFA 06 renames
+  Mutu "Petrovici Teodor" and Materazzi "Valerio Bernado" (see the FIFA 07
+  exclusions in the manifest), and those names match nothing. Their real players are
+  in FIFA 05 under their own names.
+- **Birth dates.** Both files have many wrong ones, for the English leagues
+  especially (Teddy Sheringham, born in 1966, is born in 1984). Where a later
+  edition or a name-only Wikidata match has another date for the same person, that
+  one stands (`datesCorrected` in the audit: 242 and 385).
+- **Federations of that year.** A nationality from a later edition can be one that
+  had no federation yet. Montenegro's players count for Serbia, which held its
+  shape until 2006, and so for any nation `territoryFor` merges. Where no nation
+  held the shape (Kosovo) they have no team, and with no club are left out.
+- **One roster each.** FIFA Index lists one roster per edition, and SoFIFA has
+  none so old. The roster id follows SoFIFA's pattern (`060001`), so saves and the
+  loader treat these seasons like any other, and `snapshotDate` is the game's
+  release in Europe (2005-09-30, 2004-10-08).
+- **Links.** A player links to their page for that edition on FIFA Index
+  (`https://fifaindex.com/players/1397-zinedine-zidane/fifa06`), where a later
+  edition's player links to SoFIFA. FIFA Index's terms forbid scraping, and nothing
+  here reads the site.
+- **Names** are the mirror's full name, the only one it has, so a season can read
+  "Manuel Cesar Rui Costa" beside "Ronaldinho".
+
+The file's rows hold one field more than its header names, after every column
+read (`readRatingsRows`' `extraFields`). A season's `source` adds `nationalities`, a
+line naming where they come from. The audit counts each source of nationality,
+lists the reused ids and names the best players left out. Full XIs: 54 in each of
+FIFA 06 and FIFA 05 of 173, against 49–52 for FIFA 07–09; 119 and 116 nations have
+at least one player. FIFA 06 takes 8,131 nationalities from later editions and
+1,275 from Wikidata, FIFA 05 7,569 and 2,111. Each file is about 75 KB.
 
 ## Earlier basketball seasons
 
@@ -423,6 +506,11 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
     nations without eleven rated players start short-handed.
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
+  - A season with nations only (2005/06, 2004/05) takes Nations when chosen, and
+    choosing Clubs goes back to the built-in season. With no Europe maps it keeps
+    the plain theatre (`all` or `elite`), so Clubs opens on the built-in season's
+    map of it. A challenge link that asks for clubs with such a season has its
+    `teams` ignored.
   - Country maps are built from the built-in FM data, so the "One country" group
     is not offered for another set.
   - Basketball has its own Season dropdown: the built-in 2026/27, then its
@@ -461,8 +549,9 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   `^ea-(fifa|fc)-\d{2}$` or `^nba-2k\d{2}$`),
   `dataVersion` (`<dataSet>-<8 hex>`), `dataYear` (an integer from 1872 to 2100)
   and `dataSeason` (the season of `dataYear`), all four or none. It also rejects
-  a set of another sport, a football set on a country map, a basketball set
-  with nations or on any map but its own, and an era map without its season.
+  a set of another sport, a football set on a country map, a season with nations
+  only played with clubs, a basketball set with nations or on any map but its
+  own, and an era map without its season.
 
 ## Known limits
 
@@ -476,8 +565,13 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   top division renamed some other way is reported missing, not guessed.
 - EA seasons cover the nations EA rates: 91–124 of the 173 field fewer than
   eleven natural players each season, more in the older editions. Seasons before
-  2006/07 have no EA source here (the SoFIFA scrape, the only source of
-  nationality and club, starts with FIFA 07) and need a local CM 01/02 database.
+  2004/05 have no EA source here (the FIFA Index mirror starts with FIFA 05) and
+  need a local CM 01/02 database.
+- 2005/06 and 2004/05 have no clubs, and a local CM 01/02 database is the only
+  way to clubs in those years.
+- A nationality from a later edition can differ from the one EA gave that year,
+  as it does for 0.92% of FIFA 07's players. A player who changed federation later
+  plays for the later one.
 - An EA season's XI is the best by EA nationality, like the built-in data, not
   the squad a national coach picked.
 - In FIFA 07 to FIFA 10 wingers play as midfielders: FIFA Index has no `LW` /

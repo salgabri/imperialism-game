@@ -1,6 +1,6 @@
 // Data sets: one dated database's nations and clubs, played instead of a sport's built-in season. A football set is
-// one of the built-in earlier seasons (an EA FIFA / FC roster, src/data/footballSeasons.js) or a CM 01/02
-// database built on this computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition,
+// one of the built-in earlier seasons (an EA FIFA / FC roster, src/data/footballSeasons.js; FIFA 05 and FIFA 06 have
+// nations only) or a CM 01/02 database built on this computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition,
 // src/data/basketballSeasons.js), clubs only, on its era's map; a baseball set a built-in earlier MLB season (an MLB
 // The Show edition, src/data/baseballSeasons.js), its nations by birthplace and its clubs on its era's map. Each is a
 // `public/<sport>/<id>.json` (format 1, see docs/design/football-years.md), validated strictly and exposed as that sport
@@ -44,6 +44,10 @@ const SPORT_OF_KIND = { nba2k: 'basketball', show: 'baseball' };
 export const setSportOf = id => SPORT_OF_KIND[setKindOf(id)] || 'football';
 /** Whether a set fields national teams: every one but an NBA season, which has clubs only. */
 export const setHasNations = id => setKindOf(id) !== 'nba2k';
+// SoFIFA, this game's only source of EA's clubs before FIFA 15, starts with FIFA 07.
+const NATIONS_ONLY = /^ea-fifa-0[0-6]$/;
+/** Whether a set has clubs: every one but the EA editions before FIFA 07, which have nations only. */
+export const setHasClubs = id => !NATIONS_ONLY.test(String(id));
 // Sets whose clubs play on a map of their era (src/data/clubMaps.js) rather than on the world.
 const MAPPED = new Set(['nba2k', 'show']);
 export const isDataYear = year => Number.isInteger(year) && year >= 1872 && year <= 2100;
@@ -377,6 +381,7 @@ function validateFootballSet(data, id) {
   // League names are the built-in ones, so a club reads the same in every data set.
   const leagues = new Set(football.clubs.map(club => club.league));
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
+  if (!setHasClubs(id) && data.clubs.length) fail('this season has nations only');
   const clubIds = new Set();
   data.clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
@@ -566,12 +571,14 @@ export function seasonSport(set) {
 
 /**
  * The sport a setup or saved campaign's settings play with: the data set's once it has loaded (null until then),
- * else the built-in sport. A set plays only in its own sport, and a basketball season only with clubs.
+ * else the built-in sport. A set plays only in its own sport, a basketball season only with clubs, and a season with
+ * nations only never with clubs.
  */
 export function sportOf(config) {
   const sport = getSport(config?.sport);
   const id = config?.dataSet;
-  if (id == null || setSportOf(id) !== sport.id || (sport.id === 'basketball' && config.layer !== 'clubs')) return sport;
+  if (id == null || setSportOf(id) !== sport.id || (sport.id === 'basketball' && config.layer !== 'clubs')
+    || (config.layer === 'clubs' && !setHasClubs(id))) return sport;
   const loaded = getLoadedFootballSet(id);
   return loaded ? seasonSport(loaded) : null;
 }

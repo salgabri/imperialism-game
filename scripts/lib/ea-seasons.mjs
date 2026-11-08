@@ -113,10 +113,10 @@ export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, updat
  * are EA position codes, `positions` the source's own text of them (for messages), `dob` is YYYY-MM-DD or empty,
  * `clubKey` groups a club's players and `league` is an EA_LEAGUES entry `[game league, map shape]` or null (not one of
  * the seven). The season is `{ id, year, edition, update, source, federations }`, plus `auditExtra` (fields the audit
- * adds after the snapshot date) and `everyLeague` (stop, not warn, on a league left with no club). Returns
- * `{ doc, text, audit, warnings }`.
+ * adds after the snapshot date), `everyLeague` (stop, not warn, on a league left with no club) and `noClubs` (a season
+ * with nations only, so a league with no club is no news). Returns `{ doc, text, audit, warnings }`.
  */
-export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false }) {
+export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false, noClubs = false }) {
   const warnings = [];
   const warn = message => warnings.push(message);
 
@@ -180,7 +180,7 @@ export function assembleEaSeason(records, { id, year, edition, update, source, f
     built.push({ name: club.name, league: club.league, country: club.country, str: Math.round(mean(squad.map(p => p.rating))), squad });
   }
   for (const [league, { clubs }] of Object.entries(leagueAudit)) {
-    if (clubs) continue;
+    if (clubs || noClubs) continue;
     if (everyLeague) throw new Error(`${edition}: no ${league} club has eleven players`);
     warn(`No ${league} clubs in ${edition}`);
   }

@@ -942,19 +942,21 @@ chart, backdrop, routing, saves.
 
 **The field.** `scripts/build-clubs.mjs` takes the first-division clubs of the 26
 European leagues in the EA FC 27 snapshot, plus PFC Ludogorets, which EA lists under
-no competition: 309 clubs with a natural XI. The strongest `TOP_CLUBS` (124, in
+no competition (`scripts/lib/first-divisions.mjs`, which the realism harness also plays
+whole leagues from): 309 clubs with a natural XI. The strongest `TOP_CLUBS` (124, in
 `src/data/scopes.js`) by the exact mean of that XI are `src/data/clubs.football.js`,
 strongest first: 20 clubs each from England and Spain, 19 Italy, 16 Germany, 15 France,
 6 the Netherlands, 4 each from Portugal, Turkey, Belgium and Greece, 3 Czechia, 2 each
 from Denmark, Ukraine and Scotland, and one each from Norway, Croatia and Bulgaria.
 The strongest `ELITE_CLUBS` (32) are the elite. An earlier season's file holds the
-seven big leagues only, and its two fields are the strongest of those.
+seven big leagues only, and its two fields are the strongest of those. FIFA 06 and
+FIFA 05 (2005/06, 2004/05) have nations only, so they have no maps.
 
 **Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 8 minutes;
 `--only=eu124,eu32`, `--check`, `--dry-run`). The maps follow the clubs, so they are rebuilt
 after `npm run build-clubs` or `npm run build:ea-seasons`; the build stops on a club with
-no row in the table below, and the test on a field that has changed. For each of 20
-seasons and each of the two fields:
+no row in the table below, and the test on a field that has changed. For each of the 20
+seasons with clubs and each of the two fields:
 
 - **Homes**: `scripts/data/europe-clubs.json`, one row per club of any season: a
   `city` that names its land (repeats take the club: "Rome (Lazio)"), `home`, and
@@ -1031,7 +1033,9 @@ league) has no `domestic:` scope, so it restores on the world with its dealt lan
 its old name ("All Leagues"). "Another team" after a defeat there opens on the map that
 replaced it. An old link's `theatre=Premier+League` is reported as not offered.
 A CM 01/02 set built on this computer has no maps, so it plays the two theatres on the
-world, dealt by `seedClubs` as all clubs once were.
+world, dealt by `seedClubs` as all clubs once were. A season with nations only (FIFA 05,
+FIFA 06) has no clubs to play: it keeps the plain theatre, `all` or `elite`, and
+choosing clubs goes back to the built-in season and its map.
 
 **Checks**: `scripts/europe-maps.test.mjs`: index, files, fields and hashes; each club's
 land lies in its country and the land sums to the outlines; the only club holds its whole

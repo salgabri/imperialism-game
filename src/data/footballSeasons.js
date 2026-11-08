@@ -2,6 +2,7 @@
 // EA FC 26: FC 26 (FIFA 26) Player Data (rovnez), reduced to the columns the builds read, SHA-256 7f6b46dd4f9a…
 // FIFA 15 – EA FC 24: EA Sports FC 24 complete player dataset (stefanoleone992), SHA-256 fd788f7809a6…
 // FIFA 07 – FIFA 14: FIFA 21 to FIFA 05 complete player attributes (daguizer, a FIFA Index mirror), joined to Big-Data-FC datasets (a SoFIFA scrape)
+// FIFA 05, FIFA 06: the same ratings, nations only, with nationalities from the later editions and Wikidata
 // The built-in earlier seasons, newest first. Each is public/football/<id>.json, loaded when a setup chooses it
 // (src/engine/footballSets.js); docs/design/football-years.md describes them.
 export const BUILT_IN_SEASONS = Object.freeze([
@@ -24,4 +25,6 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'ea-fifa-09', version: 'ea-fifa-09-2cff6600', year: 2009, season: '2008/09', label: 'FIFA 09' }),
   Object.freeze({ id: 'ea-fifa-08', version: 'ea-fifa-08-e7c7f73e', year: 2008, season: '2007/08', label: 'FIFA 08' }),
   Object.freeze({ id: 'ea-fifa-07', version: 'ea-fifa-07-ac742262', year: 2007, season: '2006/07', label: 'FIFA 07' }),
+  Object.freeze({ id: 'ea-fifa-06', version: 'ea-fifa-06-35251773', year: 2006, season: '2005/06', label: 'FIFA 06' }),
+  Object.freeze({ id: 'ea-fifa-05', version: 'ea-fifa-05-f16bdf47', year: 2005, season: '2004/05', label: 'FIFA 05' }),
 ]);

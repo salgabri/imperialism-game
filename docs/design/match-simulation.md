@@ -165,7 +165,9 @@ The model is not a forecast of real fixtures.
 seasons with the built-in clubs at Balanced: double round robins of Europe's top
 five football leagues, 82-game NBA seasons, 17-game NFL seasons, 162-game MLB
 seasons and 82-game NHL seasons, the attacker and defender drawn as the round robin
-falls. It sets each
+falls. Football's club layer keeps only Europe's 124 strongest clubs, so each league
+plays whole: its clubs come from the same EA FC 27 snapshot, with the XIs the club
+layer gives them (`scripts/lib/first-divisions.mjs`). It sets each
 measure beside the real league's range over recent seasons; `REAL` in the script
 names the seasons and sources, and `scripts/simulation-realism.test.mjs` holds the
 sourced measures the models set out to match. The real figures were gathered on
@@ -175,17 +177,20 @@ NFL margin data for 1999–2025 and Laura Albert's NFL analytics recaps
 (UW–Madison) for two-point tries.
 
 The first run, before this pass, measured the models as they shipped; "now" is 40
-seasons of each league after it (football: the five leagues' mean).
+seasons of each league after it (football: the five leagues' mean). Football's "now"
+was measured again on 2026-11-08 with the same clubs, listed strongest first, which
+reshuffles the seeded draws: in the old order it gives the figures first published
+(2.87 goals, 23.9% draws, 7.9% goalless, 45.3% before half-time, champions 84–97).
 
 | Football | Before | Now | Real (2021/22–2024/25) |
 | --- | --- | --- | --- |
-| Goals a game | 3.01 | 2.87 | 2.50–3.28 |
-| Draws | 19.6% | 23.9% | 20.3–29.5% |
-| 0-0 | 6.1% | 7.9% | 2.9–9.6% |
+| Goals a game | 3.01 | 2.88 | 2.50–3.28 |
+| Draws | 19.6% | 24.0% | 20.3–29.5% |
+| 0-0 | 6.1% | 7.8% | 2.9–9.6% |
 | Goals by forwards / midfielders / defenders | 45 / 43 / 12% | 53 / 35 / 12% | about 45–50 / 30–35 / 10–13%, own goals 3% (est.) |
-| Goals before half-time | 44.0% | 45.3% | about 45–47% |
+| Goals before half-time | 44.0% | 45.5% | about 45–47% |
 | Shoot-out kicks scored | 76% | 74% | 73.1% at the major tournaments |
-| Champion's points (per 38 games) | 83–96 | 84–97 | 79–101 |
+| Champion's points (per 38 games) | 83–96 | 84–98 | 79–101 |
 
 | NBA | Before | Now | Real (2021/22–2024/25) |
 | --- | --- | --- | --- |
@@ -283,7 +288,7 @@ defender; a manager's Attack approach adds 0.6 rating points, plus up to 1.2 for
 bench support.
 
 Whole league seasons with the rule on (`npm run simulation:realism -- --home`, 40
-seasons) put every league's home sides inside the real range: 44.5–45.4% home wins
+seasons) put every league's home sides inside the real range: 44.7–46.0% home wins
 in ninety minutes across the five football leagues (40.8% in the 2024/25 Premier
 League to 47.9% in the 2022/23 La Liga, from FootballRates and Statista), 55.9% in
 the NBA, 53.4% in the NFL, 53.1% in MLB and 54.6% in the NHL. Every other measure
