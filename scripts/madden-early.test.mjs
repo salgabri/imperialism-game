@@ -154,6 +154,18 @@ test('the checks hold as recorded: team overalls, the 99 and 100 overall clubs, 
   }
 });
 
+test('a player the site names on two clubs plays for the one nflverse gives him; the other club\'s row is left out', () => {
+  // [season, name, the club whose row is left out, the club he plays for]: nflverse's club and number, and for Marcus
+  // Nash, whom nflverse has on both, the club he left during 1999 (the launch roster's).
+  for (const [year, name, out, kept] of [[1999, 'Marcus Nash', 'nfl-baltimore-ravens', 'nfl-denver-broncos'],
+    [2000, 'Donta Jones', 'nfl-carolina-panthers', 'nfl-new-orleans-saints'], [2000, 'Myron Bell', 'nfl-cincinnati-bengals', 'nfl-pittsburgh-steelers'],
+    [2000, 'Nate Wayne', 'nfl-denver-broncos', 'nfl-green-bay-packers']]) {
+    const snapshot = snapshotOf(year);
+    assert.deepEqual(snapshot.players.filter(p => p[0] === name).map(p => p[1]), [kept], `${year} ${name} plays for one club`);
+    assert.ok(snapshot.source.left.some(line => line.startsWith(`${name} (${out} `)), `${year}: ${name}'s row on ${out} is left out`);
+  }
+});
+
 test('Madden NFL 2001 keeps EA\'s overall: the season\'s squads rate every player as the snapshot does', () => {
   const snapshot = snapshotOf(2000), doc = seasonFile('madden-2000');
   assert.equal(snapshot.conversion, undefined);

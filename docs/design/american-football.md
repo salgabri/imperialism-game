@@ -452,8 +452,8 @@ kind `madden`, clubs only, each on an era map of its own:
 
 | Season | Data set | Edition | Overall | Clubs | Players | Strengths | Team overalls (Spearman) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2000 | `madden-2000` | Madden NFL 2001 | EA's | 31 | 1,507 | 80.9–86.3 | 0.831 |
-| 1999 | `madden-1999` | Madden NFL 2000 | ours (converted) | 31 | 1,216 | 68.1–84.6 | 0.903 |
+| 2000 | `madden-2000` | Madden NFL 2001 | EA's | 31 | 1,504 | 80.9–86.3 | 0.832 |
+| 1999 | `madden-1999` | Madden NFL 2000 | ours (converted) | 31 | 1,215 | 68.1–84.6 | 0.903 |
 | 1998 | `madden-1998` | Madden NFL 99 | ours (converted) | 30 | 1,180 | 71.7–82.9 | 0.875 |
 
 - **Source.** NFL Draft Buzz's Madden Ratings Database (`https://www.nfldraftbuzz.com/madden`, live since June
@@ -479,11 +479,15 @@ kind `madden`, clubs only, each on an era map of its own:
   1,342 of 1,345 players.
 - **Positions.** The site's labels map onto the game's ten: two-position labels by their first (LT/RT a lineman), LLB
   and RLB linebackers, NT a lineman. A generic defensive back (DB) plays safety where nflverse lists him at safety that
-  season (2, 5 and 34 of 79, 80 and 108), else corner. Punters and long snappers are left out.
+  season (2, 5 and 34 of 79, 80 and 107), else corner. Punters and long snappers are left out.
 - **Left out, never guessed.** Two rows of one club under one of the site's players, their values apart, are one game
   row the matcher named twice: the row in the jersey nflverse gives him that season stays (else the first, as the site
   lists a club by depth), the other is left out (Rob Moore's second row, #20, on the 1998 Cardinals; Kevin Mitchell's,
-  Marty Moore's and Marquis Walker's; Todd McClure's and Mark Campbell's, both in their own number). A player whose
+  Marty Moore's and Marquis Walker's; Todd McClure's and Mark Campbell's, both in their own number). One of the site's
+  players on two clubs of an edition, the rows' values apart, is another club's game row named after him too: the row on
+  the club and in the jersey nflverse gives him that season stays (where nflverse has him on both, as it has Marcus
+  Nash on the 1999 Broncos and Ravens, the club he left, on which the launch roster had him), the other is left out (the
+  1999 Ravens' Nash; the 2000 Panthers' Donta Jones, Bengals' Myron Bell and Broncos' Nate Wayne). A player whose
   edition did not track a value his overall needs is left out (Marcus Spriggs, 1999). Each snapshot names them.
 - **Lineup gaps.** The site's copy lacks some players: the 1998 Dolphins have one receiver (O.J. McDuffie, Lamar
   Thomas and Oronde Gadsden are missing), the 1998 Colts and 49ers and the 1999 Eagles and Washington no kicker, the
@@ -504,11 +508,11 @@ kind `madden`, clubs only, each on an era map of its own:
 - **Madden NFL 2001 keeps EA's overall**, unchanged (rawScale 99, no conversion). EA rated that edition high: its
   clubs run 80.9–86.3, every one stronger than Madden NFL 2002's weakest, and closer together.
 - **Checks.** Club strengths order maddenratings.net's team overalls at Spearman 0.875 (Madden NFL 99), 0.903
-  (2000) and 0.831 (2001, EA's own). Of Madden NFL 99's 99 and 100 overall clubs, Jerry Rice, Tony Boselli, Ben Coates
+  (2000) and 0.832 (2001, EA's own). Of Madden NFL 99's 99 and 100 overall clubs, Jerry Rice, Tony Boselli, Ben Coates
   and Bruce Smith rank first at their positions, Mark Schlereth and Neil Smith second, Barry Sanders fourth, Deion
   Sanders twentieth of 146 corners; Jason Sehorn is not in the site's copy. In Madden NFL 2000 Deion Sanders and
   Dermontti Dawson rank first, Mike Alstott tenth of 137 backs; Barry Sanders, who retired days before its release, is
-  not in the site's copy. 98.7%, 98.7% and 89.4% of the players are on nflverse's roster of their club that season.
+  not in the site's copy. 98.7%, 98.7% and 89.6% of the players are on nflverse's roster of their club that season.
 - **Era maps.** `nfl1998` (the Oilers at Vanderbilt Stadium in Nashville, the Ravens at Camden Yards, the Buccaneers
   at Raymond James Stadium, no Browns), `nfl1999` (the Browns back, the Titans at Adelphia Coliseum) and `nfl2000`
   (the Bengals at Paul Brown Stadium, the Seahawks at Husky Stadium), by the rule every map follows.

@@ -1542,7 +1542,7 @@
     },
     {
       "id": "madden-2000",
-      "version": "madden-2000-9bf3a0d5",
+      "version": "madden-2000-35381aad",
       "season": "2000",
       "label": "Madden NFL 2001",
       "edition": "Madden NFL 2001",
@@ -1550,7 +1550,7 @@
       "url": "https://www.nfldraftbuzz.com/madden/year/2001",
       "retrieved": "2026-11-09",
       "overall": "EA",
-      "players": 1507,
+      "players": 1504,
       "map": "nfl2000",
       "clubs": [
         "Tampa Bay Buccaneers 86.3",
@@ -1576,8 +1576,8 @@
         "New York Giants 83.1",
         "Seattle Seahawks 83.1",
         "Arizona Cardinals 83",
-        "Cincinnati Bengals 83",
         "Philadelphia Eagles 83",
+        "Cincinnati Bengals 82.9",
         "New Orleans Saints 82.7",
         "San Francisco 49ers 82.5",
         "Atlanta Falcons 82.4",
@@ -1591,7 +1591,7 @@
         {
           "name": "maddenratings.net's Madden NFL 2001 team overalls",
           "clubs": 31,
-          "spearman": 0.831
+          "spearman": 0.832
         },
         {
           "name": "maddenratings.net's Madden NFL 2001 99 and 100 overall clubs",
@@ -1599,7 +1599,7 @@
         },
         {
           "name": "nflverse's 2000 rosters",
-          "players": 1507,
+          "players": 1504,
           "sameClub": 1347
         },
         {
@@ -1612,12 +1612,15 @@
         "Todd McClure (nfl-atlanta-falcons C #62): a second game row under the name of Todd McClure #62 (the first listed); who he was is unknown",
         "Mark Campbell (nfl-cleveland-browns TE #83): a second game row under the name of Mark Campbell #83 (the first listed); who he was is unknown",
         "Marty Moore (nfl-cleveland-browns RLB #53): a second game row under the name of Marty Moore #55 (nflverse's number); who he was is unknown",
-        "Marquis Walker (nfl-detroit-lions DB #43): a second game row under the name of Marquis Walker #38 (nflverse's number); who he was is unknown"
+        "Marquis Walker (nfl-detroit-lions DB #43): a second game row under the name of Marquis Walker #38 (nflverse's number); who he was is unknown",
+        "Donta Jones (nfl-carolina-panthers LB #54): another club's game row under the name of Donta Jones of nfl-new-orleans-saints #53 (nflverse's club and number); who he was is unknown",
+        "Myron Bell (nfl-cincinnati-bengals DB #40): another club's game row under the name of Myron Bell of nfl-pittsburgh-steelers #42 (nflverse's club and number); who he was is unknown",
+        "Nate Wayne (nfl-denver-broncos RLB #54): another club's game row under the name of Nate Wayne of nfl-green-bay-packers #54 (nflverse's club and number); who he was is unknown"
       ]
     },
     {
       "id": "madden-1999",
-      "version": "madden-1999-c274f767",
+      "version": "madden-1999-c1e9c79d",
       "season": "1999",
       "label": "Madden NFL 2000 (converted)",
       "edition": "Madden NFL 2000",
@@ -1625,7 +1628,7 @@
       "url": "https://www.nfldraftbuzz.com/madden/year/2000",
       "retrieved": "2026-11-09",
       "overall": "converted",
-      "players": 1216,
+      "players": 1215,
       "map": "nfl1999",
       "clubs": [
         "Denver Broncos 84.6",
@@ -1717,8 +1720,8 @@
         },
         {
           "name": "nflverse's 1999 rosters",
-          "players": 1216,
-          "sameClub": 1200
+          "players": 1215,
+          "sameClub": 1199
         },
         {
           "name": "the position lists against the team pages",
@@ -1779,6 +1782,7 @@
       "left": [
         "Kyle Richardson (nfl-baltimore-ravens P #14): a second game row under the name of Kyle Richardson #5 (nflverse's number); who he was is unknown",
         "Kevin Mitchell (nfl-new-orleans-saints LB #59): a second game row under the name of Kevin Mitchell #50 (nflverse's number); who he was is unknown",
+        "Marcus Nash (nfl-baltimore-ravens WR #11): another club's game row under the name of Marcus Nash of nfl-denver-broncos #82 (nflverse's club he left that season); who he was is unknown",
         "Marcus Spriggs (nfl-buffalo-bills DT): the edition did not track his TAK"
       ]
     },

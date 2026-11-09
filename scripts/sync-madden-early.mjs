@@ -95,7 +95,7 @@ const NFLVERSE_CODE = {
 };
 const SAFETY = new Set(['FS', 'SS', 'S', 'SAF']);
 
-/** nflverse's roster of season `season`: by franchise, its rows `{ name, plain, position, depth }`. */
+/** nflverse's roster of season `season`: by franchise, its rows `{ name, plain, position, depth, no, status }`. */
 async function nflverseOf(season) {
   const [header, ...rows] = parseCsv(await pinned(`${NFLVERSE}/roster_${season}.csv`));
   const col = name => header.indexOf(name);
@@ -105,10 +105,12 @@ async function nflverseOf(season) {
     if (!franchise) throw new Error(`nflverse ${season}: unknown team ${cells[col('team')]}`);
     if (!out.has(franchise)) out.set(franchise, []);
     out.get(franchise).push({ name: cells[col('full_name')], plain: plain(cells[col('full_name')]), position: cells[col('position')],
-      depth: cells[col('depth_chart_position')], no: Number(cells[col('jersey_number')]) || null });
+      depth: cells[col('depth_chart_position')], no: Number(cells[col('jersey_number')]) || null, status: cells[col('status')] });
   }
   return out;
 }
+// nflverse's statuses of a player who left a club during the season (traded, cut).
+const LEFT_CLUB = new Set(['TRD', 'CUT']);
 
 // ---------- the pages ----------
 
@@ -249,6 +251,27 @@ async function snapshotOf(year, manifest, franchises, fit) {
     kept.add(keep);
     for (const row of rows.filter(r => r !== keep)) {
       left.push(`${row.name} (${row.franchise} ${row.listed}${row.no ? ` #${row.no}` : ''}): a second game row under the name of ${keep.name} #${keep.no ?? '?'}${matching.length === 1 ? ' (nflverse\'s number)' : ' (the first listed)'}; who he was is unknown`);
+    }
+  }
+  // One player of the site's on two clubs of an edition, the rows' values apart: its matcher named another club's game row
+  // after him too, and a player plays for one club. The row on the club, in the jersey, nflverse gives him that season
+  // stays; where nflverse has him on both (he moved during the season), the row of the club he left, as the launch roster
+  // had him. The other is left out; anything nflverse does not settle stops the sync.
+  const clubsOf = new Map();
+  for (const row of raw.filter(r => kept.has(r) && r.href)) {
+    if (!clubsOf.has(row.href)) clubsOf.set(row.href, []);
+    clubsOf.get(row.href).push(row);
+  }
+  for (const rows of clubsOf.values()) {
+    if (new Set(rows.map(row => row.franchise)).size < 2) continue;
+    const listing = row => (nflverse.get(row.franchise) ?? []).find(r => r.plain === plain(row.name) && (!r.no || !row.no || r.no === row.no));
+    const listed = rows.filter(listing);
+    const moved = listed.filter(row => LEFT_CLUB.has(listing(row).status));
+    const keep = listed.length === 1 ? listed[0] : moved.length === 1 ? moved[0] : null;
+    if (!keep) throw new Error(`${year}: ${rows[0].name} is on ${rows.map(row => row.franchise).join(' and ')}, and nflverse does not settle which`);
+    for (const row of rows.filter(r => r !== keep)) {
+      kept.delete(row);
+      left.push(`${row.name} (${row.franchise} ${row.listed}${row.no ? ` #${row.no}` : ''}): another club's game row under the name of ${keep.name} of ${keep.franchise} #${keep.no ?? '?'} (nflverse's ${listed.length === 1 ? 'club and number' : 'club he left that season'}); who he was is unknown`);
     }
   }
   for (const player of raw.filter(row => kept.has(row))) {
