@@ -55,6 +55,7 @@
     "build-mlb": "node scripts/build-mlb.mjs",
     "build:mlb-seasons": "node scripts/build-mlb-seasons.mjs",
     "import:mlb-showzone": "node scripts/import-mlb-showzone.mjs",
+    "import:mlb-war": "node scripts/import-mlb-war.mjs",
     "sync:mlb-birthplaces": "node scripts/sync-mlb-birthplaces.mjs",
     "sync:nhl": "node scripts/sync-nhl.mjs",
     "build-hockey": "node scripts/build-hockey.mjs",
