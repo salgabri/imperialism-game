@@ -1085,8 +1085,8 @@ the nine computed World Cups (1961/62 to 1993/94) have nations only, so they hav
 `--only=eu124,eu32`, `--check`, `--dry-run`, `--boundaries=<dir>` for another boundary cache).
 The maps follow the clubs, so they are rebuilt after `npm run build-clubs`,
 `npm run build:ea-seasons` or `npm run build:retro-seasons`; the build stops on a club with
-no row in the table below, and the test on a field that has changed. For each of the 30
-seasons with clubs (the built-in one and 29 earlier) and each of the two fields:
+no row in the table below, and the test on a field that has changed. For each of the 31
+seasons with clubs (the built-in one and 30 earlier) and each of the two fields:
 
 - **Homes**: `scripts/data/europe-clubs.json`, one row per club of any season: a
   `city` that names its land (repeats take the club: "Rome (Lazio)"), `home`, and

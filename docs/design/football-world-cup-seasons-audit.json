@@ -1,7 +1,7 @@
 {
   "generatedBy": "scripts/build-world-cup-seasons.mjs",
   "retrieved": "2026-11-09",
-  "decided": "2026-11-09: the user approved computed ratings for football's 1960s to 1980s, from national-team Elo adjusted per player and labelled as computed. Claude chose the rest under that request, not yet confirmed by the user: World Cup squads only (no Wikidata pools), the nation's strength from its Elo the day after the final by a line (not by rank), each XI ordered by the players' records, the federations of the day under their own names and flags. East Germany, with no map shape, fields no team.",
+  "decided": "2026-11-09: the user approved computed ratings for football's 1960s to 1980s, from national-team Elo adjusted per player and labelled as computed. Claude chose the rest under that request, approved by the user with the release of 2026-11-10: World Cup squads only (no Wikidata pools), the nation's strength from its Elo the day after the final by a line (not by rank), each XI ordered by the players' records, the federations of the day under their own names and flags. East Germany, with no map shape, fields no team.",
   "elo": {
     "formula": "R' = R + K × G × (W − We), We = 1 / (1 + 10^(−dr / 400)), dr = R_home − R_away + home (none at a neutral venue); W is 1, ½ or 0, a match level after extra time a draw",
     "home": 100,

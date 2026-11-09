@@ -38,16 +38,17 @@ const read = file => readFileSync(path.join(root, file), 'utf8');
 const MANIFEST = JSON.parse(read('scripts/data/retro-seasons.json'));
 const committed = id => JSON.parse(read(`public/football/${id}.json`));
 const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)];
-const IDS = ['cm0102-2002-11', 'cm0102-2001-09', 'cm-0001', 'cm-9900', 'cm0102-2020-11-cm3', 'cm-9798', 'swos-9697'];
+const IDS = ['cm0102-2003-10', 'cm0102-2002-11', 'cm0102-2001-09', 'cm-0001', 'cm-9900', 'cm0102-2020-11-cm3', 'cm-9798', 'swos-9697'];
 
 // ---------- the committed seasons ----------
 
 test('the seasons before FIFA 05 are built in, after EA\'s, each its committed file and credited to its makers', () => {
-  // The manifest lists these seven in this order, among the others (scripts/football-swos-fan-seasons.test.mjs has
+  // The manifest lists these eight in this order, among the others (scripts/football-swos-fan-seasons.test.mjs has
   // SWOS 94/95 and 95/96 and the two fan-made databases; the computed World Cup seasons, 1961/62 to 1993/94, follow).
   assert.deepEqual(MANIFEST.seasons.map(season => season.id).filter(id => IDS.includes(id)), IDS);
   const listed = IDS.map(id => BUILT_IN_SEASONS.find(set => set.id === id));
-  assert.deepEqual(listed.map(set => [set.id, set.year, set.season]), [['cm0102-2002-11', 2003, '2002/03'], ['cm0102-2001-09', 2002, '2001/02'],
+  assert.deepEqual(listed.map(set => [set.id, set.year, set.season]), [['cm0102-2003-10', 2004, '2003/04'], ['cm0102-2002-11', 2003, '2002/03'],
+    ['cm0102-2001-09', 2002, '2001/02'],
     ['cm-0001', 2001, '2000/01'], ['cm-9900', 2000, '1999/00'], ['cm0102-2020-11-cm3', 1999, '1998/99'], ['cm-9798', 1998, '1997/98'],
     ['swos-9697', 1997, '1996/97']]);
   // A season may have two sets (a game's database and a fan's or a computed one).
@@ -62,7 +63,7 @@ test('the seasons before FIFA 05 are built in, after EA\'s, each its committed f
     assert.equal(doc.local, false, 'built in, not a local build');
     // Who made the data, who compiled or ported it, from where and when it was read.
     assert.equal(doc.source.provider, season.maker);
-    assert.ok(['Sports Interactive', 'Sensible Software'].includes(doc.source.provider));
+    assert.ok(['Sports Interactive', 'Sensible Software', 'Sawczuk'].includes(doc.source.provider));
     assert.equal(doc.source.compiler, season.compiler);
     assert.equal(doc.source.retrieved, season.retrieved ?? MANIFEST.retrieved);
     assert.match(doc.source.url, /^https:\/\//);
@@ -77,8 +78,10 @@ test('the seasons before FIFA 05 are built in, after EA\'s, each its committed f
     if (season.cd) {
       const { cd } = season;
       // The archive.org item's image by size and digests, its sector layout and volume, and where the tables are on it.
+      // An SI edition links the item; a CM 01/02 release keeps its forum topic, and its compiler names the item.
       assert.match(cd.item, /^[a-z0-9-]+$/);
-      assert.equal(doc.source.url, `https://archive.org/details/${cd.item}`);
+      assert.ok(doc.source.compiler.includes(`archive.org ${cd.item}`), doc.id);
+      if (season.kind === 'cm') assert.equal(doc.source.url, `https://archive.org/details/${cd.item}`);
       assert.ok(Number.isInteger(cd.imageBytes) && cd.imageBytes % cd.sector === 0, cd.image);
       assert.match(cd.imageMd5, /^[0-9a-f]{32}$/);
       assert.match(cd.imageSha1, /^[0-9a-f]{40}$/);
@@ -111,6 +114,7 @@ test('every season rebuilds byte for byte from its pinned sources (when they are
 
 // Each season's coverage: what its source rates, written exactly.
 const COVERAGE = {
+  'cm0102-2003-10': { players: 2614, nations: 162, completeXIs: 109, clubs: 129, leagues: 7 },
   'cm0102-2002-11': { players: 2599, nations: 162, completeXIs: 108, clubs: 129, leagues: 7 },
   'cm0102-2001-09': { players: 2458, nations: 143, completeXIs: 96, clubs: 130, leagues: 7 },
   'cm-0001': { players: 2284, nations: 134, completeXIs: 82, clubs: 130, leagues: 7 },
@@ -191,6 +195,9 @@ test('the federations of the seasons\' own years: FR Yugoslavia holds Montenegro
   for (const id of ['cm-0001', 'cm0102-2001-09', 'cm0102-2002-11']) {
     assert.deepEqual(committed(id).territory, { merged: { 499: '688', 540: '250', 728: '729' }, inactive: ['626', 'KOS'] }, id);
   }
+  // 2003/04: New Caledonia joined FIFA in 2004, so France no longer holds it; with four rated players it fields no team.
+  assert.deepEqual(committed('cm0102-2003-10').territory, { merged: { 499: '688', 728: '729' }, inactive: ['626', 'KOS'] });
+  assert.ok(!fieldedNations(of('cm0102-2003-10')).includes('540'), 'New Caledonia\'s land stays neutral');
   for (const entry of Object.values(FOOTBALL_FEDERATIONS.shapes)) assert.match(entry.source, /^https:\/\/inside\.fifa\.com\/associations\/[A-Z]{3}$/);
 });
 
@@ -222,7 +229,7 @@ test('conversions to the game\'s 1-99 are documented, pinned and applied to ever
 });
 
 test('the CM 01/02 seasons are SI\'s own databases, the CM3 port with its birth years moved back three years', () => {
-  for (const id of ['cm0102-2002-11', 'cm0102-2001-09', 'cm-0001', 'cm-9900', 'cm0102-2020-11-cm3']) {
+  for (const id of ['cm0102-2003-10', 'cm0102-2002-11', 'cm0102-2001-09', 'cm-0001', 'cm-9900', 'cm0102-2020-11-cm3']) {
     const release = CM0102_RELEASES.find(entry => entry.id === id);
     const { source } = committed(id);
     assert.deepEqual([source.provider, source.version, source.url, source.dobShift, source.edition],
@@ -241,6 +248,19 @@ test('the CM 01/02 seasons are SI\'s own databases, the CM3 port with its birth 
   assert.deepEqual(committed('cm-0001').nations['620'][2].find(tuple => tuple[1] === 'Figo').slice(2),
     ['Luis Filipe Madeira', 185, 'rw', 'Portugal', 'Real Madrid C.F.', '1972-11-04']);
   assert.deepEqual(committed('cm-0001').nations['032'][2].find(tuple => tuple[1] === 'Hernan Jorge Crespo').slice(6), ['Lazio', '1975-07-05']);
+  // Sawczuk's fan update of 3.9.68 (2003/04), its own files as the community's signature pins them, which the user
+  // chose to ship: October 2003's squads, some of its players re-rated by hand (Duff 129 in 3.9.68), 17 Dutch clubs.
+  const sawczuk = committed('cm0102-2003-10');
+  assert.deepEqual([sawczuk.label, sawczuk.source.provider], ['CM 01/02 · October 2003 by Alex Sawczuk, fan-made', 'Sawczuk']);
+  assert.match(MANIFEST.seasons[0].rights, /The user chose to ship it on 2026-11-10/);
+  assert.deepEqual(sawczuk.nations['826'][2].find(tuple => tuple[1] === 'David Beckham').slice(3), [187, 'rm', 'England', 'Real Madrid C.F.', '1975-05-02']);
+  assert.deepEqual(sawczuk.nations['372'][2].find(tuple => tuple[1] === 'Damien Duff').slice(3, 7), [179, 'lm,lw', 'Republic of Ireland', 'Chelsea']);
+  assert.equal(sawczuk.clubs.filter(club => club.league === 'Eredivisie').length, 17);
+  // Its La Liga lists Real Oviedo, relegated in 2001, rather than Málaga, and its Ligue 1 keeps CM 01/02's 18 clubs.
+  const laLiga = sawczuk.clubs.filter(club => club.league === 'La Liga').map(club => club.name);
+  assert.ok(laLiga.includes('Real Oviedo C.F.') && !laLiga.includes('Málaga C.F.'), 'as the update stores them');
+  assert.equal(sawczuk.clubs.filter(club => club.league === 'Ligue 1').length, 18);
+  assert.match(MANIFEST.seasons[0].provenance, /Real Oviedo.*Málaga.*18 clubs/);
   // CM 99/00 names the Eredivisie after its sponsor and misspells Burkina Faso; both are read.
   const cm9900 = committed('cm-9900');
   assert.equal(cm9900.clubs.filter(club => club.league === 'Eredivisie').length, 18);

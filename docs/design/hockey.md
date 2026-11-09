@@ -629,7 +629,7 @@ duel campaign with the live ticker and a hockey nations campaign.
   1982/83 are in the open sources; the NHL's API has both, but turns this project's agents away.
 - Terms. MoneyPuck.com's data, behind the 15 seasons from 2010/11, is free for non-commercial use only, as the NHL's own
   statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. Using it was Claude's decision
-  of 2026-11-09, under the user's request to cover every missing season, and is open for the user. The Hockey
+  of 2026-11-09, under the user's request to cover every missing season, and the user accepted it with the release of 2026-11-10. The Hockey
   Databank's statement and MoneyPuck's credit show in full under the Season choice ("Credits"), in setup only: no screen
   in play names a season's source beyond a passing loading line.
 - Names: the Hockey Databank and MoneyPuck spell names without accents ("Borje Salming", "Tim Stutzle"), and the

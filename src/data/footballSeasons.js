@@ -5,6 +5,7 @@
 // FIFA 07 – FIFA 14: FIFA 21 to FIFA 05 complete player attributes (daguizer, a FIFA Index mirror), joined to Big-Data-FC datasets (a SoFIFA scrape)
 // FIFA 05, FIFA 06: the same ratings, nations only, with nationalities from the later editions and Wikidata
 // and by npm run build:retro-seasons from the databases before them (scripts/data/retro-seasons.json):
+// 2003/04: Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 database, fan-made (the Official Championship Manager Magazine's issue 5 cover CD, archive.org cmmag-05)
 // 2002/03: SI's Championship Manager 01/02 3.9.68 database (the CM0102 Starter Kit's patched_data.zip)
 // 2001/02: SI's Championship Manager 01/02 3.9.60 database (the CM0102 Starter Kit's original_data.zip)
 // 2000/01: SI's Championship Manager 00/01 database, original release 3.81 (the UK retail CD's data files, archive.org cm-0001-rel)
@@ -43,6 +44,7 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'ea-fifa-07', version: 'ea-fifa-07-ac742262', year: 2007, season: '2006/07', label: 'FIFA 07' }),
   Object.freeze({ id: 'ea-fifa-06', version: 'ea-fifa-06-35251773', year: 2006, season: '2005/06', label: 'FIFA 06' }),
   Object.freeze({ id: 'ea-fifa-05', version: 'ea-fifa-05-f16bdf47', year: 2005, season: '2004/05', label: 'FIFA 05' }),
+  Object.freeze({ id: 'cm0102-2003-10', version: 'cm0102-2003-10-df2c38bf', year: 2004, season: '2003/04', label: 'CM 01/02 · October 2003 by Alex Sawczuk, fan-made' }),
   Object.freeze({ id: 'cm0102-2002-11', version: 'cm0102-2002-11-12b13a69', year: 2003, season: '2002/03', label: 'CM 01/02 · 3.9.68' }),
   Object.freeze({ id: 'cm0102-2001-09', version: 'cm0102-2001-09-58d3ed4f', year: 2002, season: '2001/02', label: 'CM 01/02 · 3.9.60' }),
   Object.freeze({ id: 'cm-0001', version: 'cm-0001-e6e6a2f0', year: 2001, season: '2000/01', label: 'CM 00/01 · 3.81' }),

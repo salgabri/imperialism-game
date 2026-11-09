@@ -335,11 +335,12 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
-  football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1994/95 to '
-    + '1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, Cam F\'s and Simon Treanor\'s), with clubs from '
-    + 'the seven biggest leagues. A nation with fewer than six rated players fields no team, and one without eleven starts '
-    + 'short-handed. 2005/06, 2004/05, 1996/97 and 1989/90 have nations only. The World Cups of 1961/62 to 1993/94 are '
-    + 'computed and have nations only: each finalist rated from its Elo and its players\' records.',
+  football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (2003/04: '
+    + 'Alex Sawczuk\'s fan update of them; 1994/95 to 1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, '
+    + 'Cam F\'s and Simon Treanor\'s), with clubs from the seven biggest leagues. A nation with fewer than six rated players '
+    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05, 1996/97 and 1989/90 have nations only. '
+    + 'The World Cups of 1961/62 to 1993/94 are computed and have nations only: each finalist rated from its Elo and its '
+    + 'players\' records.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
     + 'without eleven starts short-handed.',
