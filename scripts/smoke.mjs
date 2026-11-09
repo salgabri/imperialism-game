@@ -722,8 +722,14 @@ if (!filtered && fixedChecks) {
       check('every club has a real home country', badHome.length === 0, badHome.map(c => c.name).join(', '));
       check('every club rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
       check('every club position belongs to this sport', badPos.length === 0, [...new Set(badPos.map(p => p.pos))].join(', '));
-      // Football has no league theatres: its clubs play Europe's two (the Theatre checks above).
-      if (sport.id !== 'football') check('every league is selectable as a theatre', leagues.every(l => CLUB_SCOPES(sport).some(s => s.id === l)), 'missing scope');
+      // Football has no league theatres: its clubs play Europe's two (the Theatre checks above). Nor has women's football
+      // for its European leagues: every club plays Europe's, or the NWSL's.
+      if (sport.id === 'womens-football') {
+        const scopes = CLUB_SCOPES(sport);
+        const homeless = sport.clubs.filter(club => !scopes.some(scope => sport.clubs.filter(scope.filter).includes(club)));
+        check('every women\'s club plays a theatre: Europe\'s or the NWSL\'s', JSON.stringify(scopes.map(scope => scope.id)) === '["all","elite","NWSL"]'
+          && homeless.length === 0, homeless.map(club => club.name).join(', ') || scopes.map(scope => scope.id).join(', '));
+      } else if (sport.id !== 'football') check('every league is selectable as a theatre', leagues.every(l => CLUB_SCOPES(sport).some(s => s.id === l)), 'missing scope');
       check('clubs carry no flag', clubs.every(c => c.flagId === null), 'club has a flagId');
 
       const ranked = clubs.slice().sort((a, b) => b.str - a.str);

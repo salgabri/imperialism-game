@@ -1117,7 +1117,9 @@ league and over a transatlantic map that kept all 84 together.
   the club's Wikidata home venue, else Wikipedia's ground, else the men's club's ground when
   the women play in the same town (`as f-…`), else the town by hand. Wikidata was wrong for
   Granada (a ground in Jerez) and old for Aston Villa (Villa Park since 2024). So Manchester
-  United's land is Leigh's, Chelsea's Kingston's, Arsenal's Holloway's (the Emirates).
+  United's land is Leigh's, Chelsea's Kingston's, Arsenal's Holloway's (the Emirates). A club has
+  one row for every season, as the men's do, so an earlier season's map puts it at today's ground:
+  Arsenal at the Emirates in 2022/23, when it still played at Meadow Park.
 - **Sweden** joins `COUNTRIES` (ADM2 municipalities in ADM1 counties) for Häcken and Rosengård.
 - **Crowding**: England's 14 include seven London clubs, so as in the men's maps some start
   hemmed in or next door: Arsenal holds about 1,200 km², Tottenham, West Ham and Charlton start
