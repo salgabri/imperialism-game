@@ -342,9 +342,10 @@ export function teamsOf(manifest, year) {
 
 /**
  * The clubs of a season `teams` does not list, from each franchise's era that holds it (scripts/data/nhl-seasons.json
- * `eras`), by code; null for a season no franchise played (2004/05).
+ * `eras`), by code; null for a season not played (`cancelled`: 2004/05, which an era running across it does not hold).
  */
 function erasOf(manifest, year) {
+  if (manifest.eras?.cancelled?.includes(year)) return null;
   const defunct = new Set(manifest.eras?.defunct ?? []);
   const list = Object.entries(manifest.eras?.franchises ?? {}).flatMap(([franchise, eras]) => {
     const era = eras.find(e => e.from <= year && year <= e.to);
