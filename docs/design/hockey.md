@@ -473,7 +473,8 @@ brackets):
 The early seasons are allowed outside today's ranges (fewer clubs spread wider; the 1970s' blowouts), and are documented
 rather than forced. So are the closest-packed modern seasons, just under the range's floor when re-measured 2026-11-10
 (the harness's seed 20261101): 2005/06 at 0.079 and 2012/13 at 0.075 (best 55, worst 29 wins), while 1974/75 runs over
-its ceiling at 0.161 (worst 14 wins; the Capitals won 8 of 80). NHL 08 plays on NHL 07's scale, like NHL 07 (2.73 goals a team, top scorer 80).
+its ceiling at 0.161 (worst 14 wins; the Capitals won 8 of 80). NHL 08 plays on NHL 07's scale, like NHL 07 (2.73
+goals a team, top scorer 80).
 
 **Nations before 1977/78.** A season fields nations only where at least three play a real side (`fieldedNations`: their
 own players hold at least half the lineup). By the databank's birth countries, Canada alone does until 1970/71, the
