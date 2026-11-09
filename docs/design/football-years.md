@@ -845,7 +845,7 @@ season's own three strongest clubs once it has loaded.
 
 ## Earlier baseball seasons
 
-Baseball has eight earlier seasons, 2018 to 2025, one per MLB The Show edition (18
+Baseball has eight earlier seasons from MLB The Show, 2018 to 2025, one per edition (18
 to 25): 2021 to 2025 read from each edition's own public API, 2018 to 2020 from the
 fan site ShowZone's copies of Sony's cards (docs/design/baseball.md); the built-in
 2026 is MLB The Show 26's. Each plays on its era's map (`mlb2018`, `mlb2019`,

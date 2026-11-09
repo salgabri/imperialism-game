@@ -254,7 +254,8 @@ manager of the theatre's favourite, with decisions from the first match.
    of each launch), then 1995 to 1992 and 1990 (Tecmo Super Bowl, the overall
    ours), NFL clubs on the map of their day, and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
-   2025 back to 2018, with nations or with clubs on the map of their day. Women's football lists its
+   2025 back to 2018 (MLB The Show of each), then 2017 back to 1960 (computed from
+   WAR), with nations or with clubs on the map of their day. Women's football lists its
    built-in 2026/27, then its [earlier seasons](#womens-football-seasons) 2025/26
    back to 2015/16 (EA ratings of each; national teams only before 2022/23), ice
    hockey its built-in 2026/27, then its [earlier seasons](#ice-hockey-seasons)
@@ -1527,18 +1528,21 @@ file in `public/american-football/` (about 30 KB) that loads only when chosen.
 
 ## Baseball seasons
 
-Baseball can be played on eight earlier seasons as well as the built-in 2026:
+Baseball can be played on 66 earlier seasons as well as the built-in 2026:
 2018 to 2025, each from that year's MLB The Show (18 to 25) at its last roster
 update: 2021 to 2025 read from the game's own public API, 2018 to 2020 from the
-fan site ShowZone's copies of Sony's cards. Pick one under
+fan site ShowZone's copies of Sony's cards; and 1960 to 2017, which no game rated,
+computed from the players' WAR (below). Pick one under
 **Season** in setup. A baseball season keeps both layers: **Nations** field that
 year's players by birthplace, and **Clubs** play that year's MLB on the map of
-their day. Each season is a file in `public/baseball/` (about 35 KB) that loads
+their day. Each season is a file in `public/baseball/` (17–35 KB) that loads
 only when chosen.
 
-- **What a season holds:** every nation with MLB players born there and the 30
-  clubs, each club's lineup and active roster of 26, by the same rules as the
-  built-in season. Ratings are The Show's overalls, unchanged.
+- **What a season holds:** every nation with MLB players born there and the
+  season's clubs (30 since 1998, 16 in 1960), each club's lineup and active roster of
+  26, by the same rules as the built-in season (a club of the computed seasons that
+  used fewer than 13 pitchers all season keeps every one it used, so 23 to 25). The
+  MLB The Show seasons' ratings are The Show's overalls, unchanged.
 - **Clubs of their day:** the Cleveland Indians until 2021, the Oakland Athletics
   until 2024 (the Athletics play in West Sacramento from 2025), the Blue Jays in
   Buffalo in 2020, the Rangers at Globe Life Park until 2019 and the Rays at
@@ -1552,8 +1556,21 @@ only when chosen.
   Rights Reserved" and gives no terms; its site's robots.txt disallows `/api`, its
   data host has no rules. MLB The Show 18 has no secondary positions and no
   birthplaces: birthplaces come from MLB 19–21 by name, else MLB's Stats API.
-- **What is missing:** anything before 2018: ShowZone keeps nothing older, and no
-  dataset of every player's ratings for those years turned up.
+- **1960 to 2017 are computed** (listed "Computed from WAR, end of <year>"): ShowZone
+  keeps no game's ratings before 2018, and no dataset of every player's ratings for
+  those years turned up. Each player's WAR (Neil Paine's JEFFBAGWELL file, the average
+  of Baseball-Reference's and FanGraphs' WAR) per playing time over the season and the
+  two before it is put rank for rank, within hitters, starters and relievers, on MLB
+  The Show 18 to 24's scale; tested on 2018–2024, it misses the Show by about 4.4
+  points a player. Names, birthplaces and each club's main ballpark are the Lahman
+  Baseball Database's. The clubs of their day (the Milwaukee Braves, the Senators,
+  the Expos…) play on 37 era maps, `mlb1960` to `mlb2017`
+  ([design notes](docs/design/baseball.md#seasons-before-2018-computed-from-war)).
+  Nothing before 1960.
+- **Licence of the computed seasons:** JEFFBAGWELL is MIT; the Lahman database is
+  CC BY-SA 3.0 (share-alike), so the season files and their snapshots are shared
+  under it. `public/baseball/ATTRIBUTION.txt` credits both, repeats the MIT notice and
+  names Baseball-Reference and FanGraphs as the WAR's origin.
 - **A source error:** MLB The Show 24's API gives the wrong country for players
   born outside the United States (Juan Soto "At Sea", Ronald Acuña Jr. "Slovenia").
   The build takes each such player's birthplace from the nearest sound edition
@@ -1565,8 +1582,9 @@ only when chosen.
   ```bash
   npm run import:mlb-showzone   # 2018–2020's snapshots, from the pinned ShowZone cache in data-src/showzone/ (--check)
   npm run sync:mlb-birthplaces  # MLB 18's missing birthplaces from MLB's Stats API, pinned in scripts/data/mlb-birthplaces.json
-  npm run build:mlb-seasons   # the season files, src/data/baseballSeasons.js and the audit (--check compares byte for byte)
-  npm run build:mlb-map       # today's map and the era maps from scripts/data/mlb-seasons.json
+  npm run import:mlb-war      # 1960–2017's snapshots, from the pinned WAR and Lahman files in data-src/mlb-war/ (--check)
+  npm run build:mlb-seasons   # the season files, src/data/baseballSeasons.js and the audits (--check compares byte for byte)
+  npm run build:mlb-map       # today's map and the era maps from scripts/data/mlb-seasons.json and mlb-war-seasons.json
   ```
 - **Saves** hold every player as played, so a season campaign resumes without
   its season file; a club campaign still needs its era's map.

@@ -209,7 +209,7 @@ the live ticker, a baseball nations campaign and an MLB resume.
 
 ## Earlier seasons
 
-Eight more seasons ship beside the built-in 2026: 2018 to 2025, each MLB The Show
+Eight more seasons from MLB The Show ship beside the built-in 2026: 2018 to 2025, each
 edition's Live series at its last roster update (1 November 2018, 27 September 2019,
 30 October 2020, 5 November 2021, 11 November 2022, 10 November 2023, 8 November 2024
 and the 2025 edition's last). 2021 to 2025 are read from each edition's own API host
@@ -548,7 +548,8 @@ research pass's Wikidata answers.
 
 ## Known limits
 
-- Nine seasons, 2018 to 2026: ShowZone keeps nothing older. 2018 to 2020 are a fan
+- MLB The Show's nine seasons, 2018 to 2026: ShowZone keeps nothing older, so 1960 to
+  2017 are computed (below). 2018 to 2020 are a fan
   site's copy of Sony's cards, checked against Sony's own pages but not Sony's API,
   read from a data host whose site disallows /api in its robots.txt; MLB The Show 18's
   players field their primary position only, and its birthplaces come from the next
