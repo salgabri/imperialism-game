@@ -351,6 +351,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'rating. It has NRL clubs only, on the map of 2008.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive (2011/12 by The '
     + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
+    + 'The seasons no game rated, back to 1960/61, are computed from Basketball-Reference\'s statistics, fitted to '
+    + 'NBA 2K and put on NBA 2K27\'s scale. '
     + 'They have NBA clubs only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
