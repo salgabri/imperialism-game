@@ -1,8 +1,48 @@
 // Theatre choices for a club campaign on the world board. Football's clubs play Europe's strongest clubs or its elite on a
 // map of Europe where a club's land lies in its own country (src/data/europeMaps.js, docs/design/domestic-campaigns.md); the
 // world board plays those two only for a set with no such map (a CM 01/02 database built on this computer). Nation
-// theatres live in SCOPES in teams.js.
+// theatres live in SCOPES in teams.js; which of them a sport offers is decided here (`nationTheatres`).
 import { nationPriority } from './domesticTiers.js';
+import { NATIONS, SCOPES, fieldsRealSide } from './teams.js';
+import { fieldedNations } from '../engine/footballSets.js';
+
+/** How many of a continent's nations must field a real side (teams.js `fieldsRealSide`) for a sport to offer it. */
+export const MIN_REAL_SIDES = 4;
+/** The Elite theatre's size: a sport offers it once that many nations field a real side. */
+export const ELITE_NATIONS = 32;
+
+const nationTheatreCache = new WeakMap();
+/**
+ * A sport's nation theatres (a sport object: a season's once it has loaded). A sport is offered where it is played.
+ * The world is always offered, whole. A continent needs MIN_REAL_SIDES of its nations to field a real side, so none is
+ * empty, one team's walkover or a field of generated players (rugby league in Africa); the Elite 32 needs 32 real sides.
+ * `fallback` stands in for a theatre the sport lacks: its heartland, the offered continent with the most real sides
+ * (the first in SCOPES's order of equals), else the world. Campaigns already launched keep theirs: SCOPES names them all.
+ */
+function theatresOf(sport) {
+  if (!nationTheatreCache.has(sport)) {
+    const real = fieldedNations(sport).filter(id => fieldsRealSide(id, sport));
+    const sides = scope => real.filter(id => scope.filter({ conf: NATIONS[id][2] })).length;
+    const offered = Object.freeze(SCOPES.filter(scope => scope.id === 'world'
+      || (scope.id === 'elite' ? real.length >= ELITE_NATIONS : sides(scope) >= MIN_REAL_SIDES)));
+    const heartland = offered.filter(scope => scope.id !== 'world' && scope.id !== 'elite')
+      .reduce((best, scope) => (!best || sides(scope) > sides(best) ? scope : best), null);
+    nationTheatreCache.set(sport, { offered, fallback: heartland || offered[0] });
+  }
+  return nationTheatreCache.get(sport);
+}
+
+/** The nation theatres `sport` offers, as SCOPES entries in their order (`theatresOf`). */
+export const nationTheatres = sport => theatresOf(sport).offered;
+
+/**
+ * The nation theatre a setup's choice (`id`) plays in `sport`: that theatre if the sport offers it, else the sport's
+ * heartland (`theatresOf`). The choice itself stays in the setup, so it comes back with a sport that offers it.
+ */
+export function nationTheatre(sport, id) {
+  const { offered, fallback } = theatresOf(sport);
+  return offered.find(scope => scope.id === id) || fallback;
+}
 
 /** How many clubs the two theatres field: the built-in season's clubs are exactly the first (scripts/build-clubs.mjs). */
 export const TOP_CLUBS = 124;

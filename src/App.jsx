@@ -2,7 +2,7 @@ import React from 'react';
 import { CONFIG } from './config.js';
 import { C, V4 } from './theme.js';
 import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
-import { CLUB_SCOPES, worldClubTheatreName } from './data/scopes.js';
+import { CLUB_SCOPES, nationTheatre, worldClubTheatreName } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { teamMarkUrls } from './data/teamMarks.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
@@ -1077,7 +1077,10 @@ export default class App extends React.Component {
     if (!this.geo || this.domesticId || domesticIdOf(setup)) return null;
     this.setupTeams(setup);
     const { opening, homes } = this.setupTeamsCache;
-    const focus = setup.layer !== 'clubs' && setup.scope === 'UEFA' ? this.europeFocus() : null;
+    // The theatre the sport plays (a season still loading: the choice as it stands).
+    const sport = sportOf(setup);
+    const scope = setup.layer === 'clubs' ? null : sport ? nationTheatre(sport, setup.scope).id : setup.scope;
+    const focus = scope === 'UEFA' ? this.europeFocus() : null;
     return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
       own: opening, frameIds: homes, focus });
   }
@@ -1115,8 +1118,9 @@ export default class App extends React.Component {
       }
     } else {
       const all = fieldedNations(sport).map(id => buildTeam(id, rng, sport));
-      const scope = SCOPES.find(x => x.id === su.scope) || SCOPES[0];
-      included = su.scope === 'world' ? all : su.scope === 'elite' ? eliteNations(all, sport) : all.filter(scope.filter);
+      // Where the sport is played: a theatre it does not offer gives way to its heartland, as setup shows.
+      const scope = nationTheatre(sport, su.scope);
+      included = scope.id === 'world' ? all : scope.id === 'elite' ? eliteNations(all, sport) : all.filter(scope.filter);
       for (const team of included) own[team.id] = team.id;
       scopeName = plainScopeName(scope.name);
     }
@@ -1179,6 +1183,8 @@ export default class App extends React.Component {
     this.rng = makeRng(seed);
     const clubLayer = su.layer === 'clubs';
     const sport = sportOf(su);
+    // The campaign keeps the nation theatre it plays, not a choice its sport does not offer.
+    if (!clubLayer && sport) su = { ...su, scope: nationTheatre(sport, su.scope).id };
     const { included, own, scopeName } = this.opening(su, this.rng);
     // No team picked: launch the one the wizard suggested (the same seed builds the same opening, ranked the same
     // way), unless setup was opened to pick another team.

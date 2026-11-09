@@ -41,7 +41,8 @@ const SCENARIOS = [
   { name: 'South America · duel · ticker', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
   { name: 'South America · blitz · instant', scope: 'CONMEBOL', pacing: 'blitz', resolution: 'instant' },
   { name: 'N. & C. America · chaos · instant', scope: 'CONCACAF', pacing: 'chaos', resolution: 'instant' },
-  { name: 'BASKETBALL · South America · duel · ticker', sport: 'basketball', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
+  // Basketball's smallest continent: South America, with two real sides, is not offered (src/data/scopes.js).
+  { name: 'BASKETBALL · N. & C. America · duel · ticker', sport: 'basketball', scope: 'CONCACAF', pacing: 'duel', resolution: 'ticker' },
   { name: 'BASKETBALL · Europe · blitz · instant', sport: 'basketball', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Elite 32 · blitz · instant', ...ELITE, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Top 124 · duel · ticker', ...TOP, pacing: 'duel', resolution: 'ticker' },
@@ -64,7 +65,7 @@ const SCENARIOS = [
 
 const RESUME_SCENARIOS = [
   { name: 'World war · blitz · instant', scope: 'world', pacing: 'blitz', resolution: 'instant', expectedField: 173 },
-  { name: 'BASKETBALL · South America · blitz · instant', sport: 'basketball', scope: 'CONMEBOL', pacing: 'blitz', resolution: 'instant' },
+  { name: 'BASKETBALL · N. & C. America · blitz · instant', sport: 'basketball', scope: 'CONCACAF', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Elite 32 · blitz · instant', ...ELITE, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', finish: true },
@@ -294,6 +295,11 @@ function checkTheatres(scenario, theatre) {
   }
   if (scenario.layer !== 'clubs' || (scenario.sport || 'football') !== 'football') {
     check('only football clubs offer single-country theatres', countries.length === 0, countries.map(option => option.text).join(', '));
+    // Nations play only where their sport is: rugby league's real sides are all in Asia & Oceania but England's.
+    if (scenario.layer !== 'clubs' && scenario.sport === 'rugby-league') {
+      check('rugby league nations offer only the world and Asia & Oceania', JSON.stringify(theatre.options.map(option => option.value))
+        === JSON.stringify(['world', 'AFC']), JSON.stringify(theatre.options));
+    }
     return;
   }
   const europe = theatre.groups.find(group => group.label === 'Europe');

@@ -210,7 +210,14 @@ manager of the theatre's favourite, with decisions from the first match.
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
    choices are the whole world (173 nations in football), another confederation, or the
-   Elite 32. Football club campaigns offer Europe's 124 strongest clubs or its
+   Elite 32. A sport offers a confederation only where it is played: once at least four
+   of its nations field a real side, their own rated players holding at least half the
+   lineup, and the Elite 32 once 32 nations do. Rugby league offers the world and Asia &
+   Oceania, baseball the world and N. & C. America, ice hockey the world and Europe;
+   neither tennis game nor women's football has Africa, and an earlier season can offer
+   fewer still. A choice the sport doesn't offer plays its heartland, the confederation
+   with the most real sides (rugby league's Asia & Oceania), and comes back with a sport
+   that offers it. Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA,
@@ -658,7 +665,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | --- | --- | --- | --- |
 | `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-league` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season); tennis and women's tennis are nations only |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), or for women's football `all`, `elite` or a league (`NWSL`) | Europe for nations, the Top 124 for football clubs, all clubs for women's football, a sport's own map (NBA, NFL, MLB, NHL) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), or for women's football `all`, `elite` or a league (`NWSL`) | Europe for nations, the Top 124 for football clubs, all clubs for women's football, a sport's own map (NBA, NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -672,11 +679,12 @@ Each key names a setup choice, and a key left at its default is left out:
 | `team` | A manager's team | a team id: `276` (Germany), `f-real-madrid`, `d826-679` | no team chosen |
 | `seed` | Seed | 0 to 4294967295 | never |
 
-For example, `https://imperialism-game.vercel.app/?sport=basketball&theatre=CONMEBOL&draw=round-robin&role=manager&team=076&seed=4242`
-sets up Brazil's basketball five against South America under round robin.
+For example, `https://imperialism-game.vercel.app/?sport=basketball&theatre=CAF&draw=round-robin&role=manager&team=566&seed=4242`
+sets up Nigeria's basketball five against Africa under round robin.
 
 A value this version doesn't offer stays at its default: an unknown sport, draw or
-seed, a theatre or season no longer built in, a CM 01/02 season built on another
+seed, a theatre or season no longer built in, a theatre the sport doesn't offer
+(rugby league in Africa; with a season, setup falls back once it has loaded), a CM 01/02 season built on another
 computer, a country map with an earlier season, team strengths outside basketball,
 a team for a spectator. A manager's team is checked once its theatre's teams are
 known, after a country map or season has loaded. If the team doesn't play there,
@@ -2068,7 +2076,8 @@ src/
   data/sourceTable.js  compact player rows of the generated football files: one
                        JSON line per nation or club, metadata keys and shared
                        values written once (scripts/lib/data-module.mjs writes them)
-  data/scopes.js       club theatre choices (per league, all, elite)
+  data/scopes.js       theatre choices: the nation theatres a sport offers (only where it
+                       is played) and the club ones (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
   data/clubMaps.js     GENERATED index of a sport's own club maps: the NBA's, today's and its eras', and the NFL's (npm run build:club-maps)
   data/domesticScope.js  labels for 'domestic:<id>' theatres, and a sport's own map

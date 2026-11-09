@@ -633,6 +633,21 @@ export function teamEff(team) {
   return selectLineup(team).rating;
 }
 
+/**
+ * Whether a nation fields a real side in `sport` (a sport object, a season's included): its own rated players hold at
+ * least half the places of the lineup it fields, as buildTeam builds it, with generated players wherever the sport fills
+ * gaps with them (a pitcher would bat, a goalie skate). A tennis player doubling in the doubles counts once. Its own
+ * draw (by the nation's id) builds the team, so the answer never depends on a campaign's. The nation theatres a sport
+ * offers count these (data/scopes.js `nationTheatres`).
+ */
+export function fieldsRealSide(id, sport) {
+  const players = sport?.rosters?.[id]?.[2];
+  const places = LINEUP_PLANS[sport?.id]?.length;
+  if (!places || !players?.length || players.length * 2 < places) return false;
+  const { slots } = selectLineup(buildTeam(id, makeRng(hashStr(`real side ${id}`)), sport));
+  return slots.filter(slot => slot.player && !slot.player.gen && !slot.player.doubling).length * 2 >= places;
+}
+
 export const SCOPES = [
   { id: 'world', name: 'World War', desc: 'Every nation on the map. Last empire standing.', filter: () => true },
   { id: 'UEFA', name: 'Europe', desc: 'UEFA members battle for the continent.', filter: t => t.conf === 'UEFA' },

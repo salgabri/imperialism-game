@@ -4,7 +4,7 @@
 // Everything here is a pure function of the setup record and the opening teams App already computes
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
 import { NATIONS, SCOPES, nationIdentity } from '../../data/teams.js';
-import { CLUB_SCOPES, TOP_CLUBS, strongestClubs as topClubs } from '../../data/scopes.js';
+import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, domesticEntry, domesticLabel, europeMapsOf, isDomesticScope } from '../../data/domesticScope.js';
@@ -278,8 +278,9 @@ export function theatreOptions(sport, clubLayer) {
     const europe = sport.id === 'football' ? europeTheatres(sport.dataSet ?? null) : [];
     return europe.length ? europe : clubTheatres(sport);
   }
+  // Only where the sport is played (data/scopes.js `nationTheatres`).
   const counts = nationCounts(sport);
-  return SCOPES.map(scope => theatreRow(scope, counts[scope.id]));
+  return nationTheatres(sport).map(scope => theatreRow(scope, counts[scope.id]));
 }
 
 /**
@@ -615,8 +616,11 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   // A chosen country (football), or the map a sport's clubs play on (basketball: the NBA's USA and Canada).
   const chosenMap = clubLayer && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
   const country = chosenMap && (chosenMap.sport ? chosenMap.sport === sport.id : domesticOn) ? chosenMap : null;
-  // Changing sport can leave another sport's theatre in the saved setup; same fallback as startCampaign.
-  const activeScope = scopes.find(scope => scope.id === (clubLayer ? setup.clubScope : setup.scope)) || scopes[0];
+  // Changing sport can leave another sport's theatre in the saved setup; same fallback as startCampaign. A nation
+  // theatre the sport does not offer gives way to its heartland (`nationTheatre`); while a season loads, every theatre
+  // is listed, the choice with it.
+  const chosenScope = clubLayer ? setup.clubScope : pending ? setup.scope : nationTheatre(sport, setup.scope).id;
+  const activeScope = scopes.find(scope => scope.id === chosenScope) || scopes[0];
   const scopeId = country ? setup.clubScope : activeScope.id;
   const scopeName = country ? domesticLabel(setup.clubScope) : activeScope.label;
   const count = country ? country.clubs : activeScope.count;

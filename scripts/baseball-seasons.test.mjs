@@ -12,11 +12,12 @@ import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_BASEBALL_SEASONS } from '../src/data/baseballSeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { CLUBS } from '../src/data/clubs.baseball.js';
-import { buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
+import { NATIONS, buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
+import { nationTheatres } from '../src/data/scopes.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, seasonMapOf, seasonSport, setHasNations, setSportOf, sportOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
-import { BASELINE } from '../src/sports/baseball.js';
+import { BASELINE, baseball } from '../src/sports/baseball.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
@@ -476,12 +477,16 @@ test('a challenge link to a season\'s nations keeps the manager\'s team once the
   assert.deepEqual(readChallenge('?sport=baseball&season=mlb-the-show-17').ignored, ['season']);
 });
 
-test('baseball\'s Elite 32 is the same nations for every seed, so New draw keeps the team it fielded', async () => {
+test('baseball offers no Elite 32, so an elite setup plays N. & C. America, the same nations for every seed', async () => {
+  // Fewer than 32 nations field a real baseball side (data/scopes.js): the rest of an Elite 32 would be generated
+  // players, tied on strength.
+  assert.ok(!nationTheatres(baseball).some(scope => scope.id === 'elite'));
   await withApp(async ({ app }) => {
-    // Most baseball nations tie on strength with generated players, which come from the campaign's draw.
     const setup = { ...app.state.setup, sport: 'baseball', layer: 'nations', scope: 'elite', dataSet: null };
-    const fields = [1, 2, 3, 2026, 4294967295].map(seed => app.opening(setup, makeRng(seed)).included.map(team => team.id).sort().join());
-    assert.equal(fields[0].split(',').length, 32);
+    const openings = [1, 2, 3, 2026, 4294967295].map(seed => app.opening(setup, makeRng(seed)));
+    const fields = openings.map(({ included }) => included.map(team => team.id).sort().join());
     assert.equal(new Set(fields).size, 1);
+    assert.ok(fields[0].split(',').every(id => NATIONS[id][2] === 'CONCACAF'), 'baseball\'s heartland');
+    assert.equal(openings[0].scopeName, 'N. & C. America');
   });
 });

@@ -1467,7 +1467,7 @@ async function mountAt(address) {
  * map has loaded; a stale link falls back to the defaults and says which choices it could not use.
  */
 export async function runChallengeCheck() {
-  const link = '/?sport=basketball&theatre=CONMEBOL&draw=round-robin&upsets=wild&role=manager&team=076&seed=4242';
+  const link = '/?sport=basketball&theatre=CAF&draw=round-robin&upsets=wild&role=manager&team=566&seed=4242';
   let copied = null;
   Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText: async value => { copied = value; } } });
   const result = {};
@@ -1477,17 +1477,17 @@ export async function runChallengeCheck() {
     // Past the team check: on the world map it settles at once.
     await sleep(200);
     const setup = result.setup = app.state.setup;
-    result.prefilled = setup.sport === 'basketball' && setup.layer === 'nations' && setup.scope === 'CONMEBOL' && setup.pacing === 'duel'
-      && setup.turnOrder === 'round-robin' && setup.uncertainty === 'wild' && setup.role === 'manager' && setup.managedTeamId === '076'
+    result.prefilled = setup.sport === 'basketball' && setup.layer === 'nations' && setup.scope === 'CAF' && setup.pacing === 'duel'
+      && setup.turnOrder === 'round-robin' && setup.uncertainty === 'wild' && setup.role === 'manager' && setup.managedTeamId === '566'
       && setup.seed === '4242' && setup.dataSet == null;
     result.notLaunched = app.state.phase === 'setup' && Object.keys(app.state.teams).length === 0;
     const radio = id => document.getElementById(id)?.closest('[role="radio"]');
     result.rendered = button('Basketball').getAttribute('aria-checked') === 'true'
-      && document.getElementById('setup-theatre').value === 'CONMEBOL'
+      && document.getElementById('setup-theatre').value === 'CAF'
       && radio('rule-draw-round-robin-title')?.getAttribute('aria-checked') === 'true'
       && document.getElementById('setup-uncertainty').value === 'wild'
       && roleCard('manager').getAttribute('aria-checked') === 'true'
-      && document.getElementById('setup-managed-team').value === '076'
+      && document.getElementById('setup-managed-team').value === '566'
       && document.getElementById('setup-seed').value === '4242'
       && /Seed 4242\./.test(document.querySelector('.setup-challenge')?.textContent || '');
     button('Copy challenge link').click();
@@ -1497,8 +1497,8 @@ export async function runChallengeCheck() {
     button('Launch campaign').click();
     await until('the challenge launches', () => app.state.phase === 'playing');
     const settings = result.settings = app.state.settings;
-    result.launched = settings.sport === 'basketball' && settings.scope === 'CONMEBOL' && settings.turnOrder === 'round-robin'
-      && settings.uncertainty === 'wild' && settings.seed === '4242' && app.state.seed === 4242 && app.state.managedTeamId === '076'
+    result.launched = settings.sport === 'basketball' && settings.scope === 'CAF' && settings.turnOrder === 'round-robin'
+      && settings.uncertainty === 'wild' && settings.seed === '4242' && app.state.seed === 4242 && app.state.managedTeamId === '566'
       && !document.querySelector('.setup-challenge');
     mounted.unmount();
 

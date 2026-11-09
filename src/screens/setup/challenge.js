@@ -3,10 +3,10 @@
 // same setup and seed replay the same campaign (README §Finale, seeds and saves). Pure: no window or document, and
 // nothing here draws from a campaign's random stream.
 import { SCOPES } from '../../data/teams.js';
-import { CLUB_SCOPES } from '../../data/scopes.js';
+import { CLUB_SCOPES, nationTheatre, nationTheatres } from '../../data/scopes.js';
 import { domesticEntry, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
-import { BUILT_IN_SETS, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
+import { BUILT_IN_SETS, setHasClubs, setHasNations, setSportOf, sportOf } from '../../engine/footballSets.js';
 import { DEFAULT_SETUP, dataSetOf, setClubScope } from '../../app/shared.js';
 import {
   DRAW_CARDS, FINALE_OPTIONS, HOME_OPTIONS, RECRUITMENT_OPTIONS, ROSTER_OPTIONS, SHOW_MATCH_OPTIONS, TARGETING_CARDS,
@@ -46,6 +46,15 @@ function offeredClubTheatre(sport, dataSet, value) {
 }
 
 /**
+ * Whether `value` is a nation theatre the sport offers (data/scopes.js `nationTheatres`: only where it is played). A
+ * season's nations are known only once it has loaded, so with one (`dataSet`) any theatre stands, and setup gives
+ * one the season lacks to the sport's heartland, as it does when the sport changes.
+ */
+function offeredNationTheatre(sport, dataSet, value) {
+  return (dataSet == null ? nationTheatres(sport) : SCOPES).some(scope => scope.id === value);
+}
+
+/**
  * The challenge in a page address's query (`search`, with or without its "?"): `{ found, setup, ignored }`. `setup` is a
  * whole setup record, a new setup's defaults (DEFAULT_SETUP) with every value the link names that this build offers. A
  * value it doesn't offer — an unknown sport, a theatre or season it no longer has, a malformed seed — stays at its
@@ -76,7 +85,7 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   if (clubsOnly) setup.layer = 'clubs';
   if (sport.nationsOnly) setup.layer = 'nations';
   const clubLayer = setup.layer === 'clubs';
-  take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : SCOPES.some(scope => scope.id === value)),
+  take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : offeredNationTheatre(sport, setup.dataSet, value)),
     value => { setup[clubLayer ? 'clubScope' : 'scope'] = value; });
   if (clubLayer) setup.clubScope = setClubScope(setup);
 
@@ -123,7 +132,10 @@ export function challengeQuery(settings = {}, seed = settings?.seed) {
   const dataSet = dataSetOf(s);
   const clubsOnly = !!sport.clubsOnly || (dataSet != null && !setHasNations(dataSet));
   const clubLayer = (s.layer === 'clubs' || clubsOnly) && !sport.nationsOnly;
-  const theatre = clubLayer ? setClubScope({ ...s, layer: 'clubs' }) : s.scope;
+  // The nation theatre the campaign plays: a theatre its sport does not offer gives way as at launch (a season still
+  // loading: the choice as it stands).
+  const nationSport = clubLayer ? null : sportOf({ ...s, layer: 'nations' });
+  const theatre = clubLayer ? setClubScope({ ...s, layer: 'clubs' }) : nationSport ? nationTheatre(nationSport, s.scope).id : s.scope;
   const rules = rulesOf(s);
   const show = showMatchesOf(s);
   const manager = s.role === 'manager';
