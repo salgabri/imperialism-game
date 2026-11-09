@@ -598,8 +598,9 @@ boundary cache.
   Saint-Germain; Charlton, Manchester City and Ipswich are up, so are Köln,
   Bochum and Cottbus, and Lille, Guingamp and Toulouse.
 - **Territory**: in 1999/00 Kosovo is under the United Nations and Bhutan not yet
-  a FIFA member (both neutral), and FR Yugoslavia holds Montenegro; from 2000/01
-  Bhutan plays.
+  a FIFA member (both neutral), and FR Yugoslavia holds Montenegro. Bhutan is a
+  member from 2000/01, but CM 00/01 rates none of its players, so it fields no
+  team and its land stays neutral then too.
 - **Rights**: both games are SI's and Eidos's (now SEGA's and Square Enix's). The
   archive.org items are users' uploads of the retail CDs (the 99/00 item's Public
   Domain Mark and the 00/01 item's "open source software" collection do not apply

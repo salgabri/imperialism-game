@@ -1274,9 +1274,9 @@ npm run build:nrl-map -- --check           # offline rebuild must match the comm
 
 ## Football seasons
 
-Football can be played on twenty-seven earlier seasons as well as the built-in
+Football can be played on twenty-nine earlier seasons as well as the built-in
 2026/27: every season from 2004/05 to 2025/26, each from EA's FIFA or EA FC of
-that season (FIFA 05 to EA FC 26), and five before them, from 2002/03 back to
+that season (FIFA 05 to EA FC 26), and seven before them, from 2002/03 back to
 1996/97, from the games of their day ([below](#before-200405)). They ship with
 the game: pick one under **Season** in setup. Each is a file in
 `public/football/` (75–340 KB) that loads only when chosen.
@@ -1335,13 +1335,15 @@ the game: pick one under **Season** in setup. Each is a file in
 ### Before 2004/05
 
 EA has no source here before FIFA 05 (the FIFA Index mirror starts there), so
-five earlier seasons come from Sports Interactive's Championship Manager and
+seven earlier seasons come from Sports Interactive's Championship Manager and
 from Sensible World of Soccer, one source each:
 
 | Season | Source | Nations with a full XI | Clubs |
 | --- | --- | --- | --- |
 | 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 129 |
 | 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 130 |
+| 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 130 |
+| 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 130 |
 | 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 130 |
 | 1997/98 | SI's Championship Manager 97/98 | 52 | 124 |
 | 1996/97 | Sensible World of Soccer 96/97, its national squads | 133 | nations only |
@@ -1357,7 +1359,9 @@ from Sensible World of Soccer, one source each:
 - **Credits and rights:** Championship Manager is Sports Interactive's; Eidos
   made CM 01/02 free to download in December 2008 for personal, non-commercial
   use, the data's rights reserved. 3.9.60 and 3.9.68 are SI's own files as
-  nckstwrt's CM0102 Starter Kit ships them; CM3's data was ported to CM 01/02 by
+  nckstwrt's CM0102 Starter Kit ships them; CM 00/01 (3.81) and CM 99/00 (3.70),
+  never made free, are SI's own files too, read from users' uploads of the retail
+  CDs to archive.org; CM3's data was ported to CM 01/02 by
   Gio and released by Cam F on champman0102.co.uk; CM 97/98's database is as
   baskeyx extracted it. SWOS 96/97 is Sensible Software's (now Codemasters'),
   from Whiteulver's database and xflea's spreadsheet as keyser1884's SWOS-MCP
@@ -1366,10 +1370,11 @@ from Sensible World of Soccer, one source each:
   `scripts/data/retro-seasons.json` pins every file by SHA-256. To rebuild:
 
   ```bash
-  npm run build:retro-seasons   # the five season files, the listing and the audit (--check compares byte for byte)
+  npm run sync:retro-cds        # CM 00/01's and CM 99/00's tables, read by byte range from their CD images
+  npm run build:retro-seasons   # the seven season files, the listing and the audit (--check compares byte for byte)
   ```
-- **Missing:** 2003/04, 2000/01 and 1999/00, whose CM databases are fan edits
-  or come only inside game packages.
+- **Missing:** 2003/04: SI's own CM 03/04 database is in a format no one has
+  documented, and that season's CM 01/02 database is a fan's update.
 
 Other Championship Manager 01/02 databases, the CM 01/02 Update Team's for
 2001/02 to 2025/26, can be built on your own computer: their authors have not
