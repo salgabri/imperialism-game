@@ -1,6 +1,6 @@
 // Women's tennis's earlier seasons (docs/design/womens-tennis.md, "Earlier seasons"): Tennis Abstract's own year-end WTA
 // Elo reports for 2016-2025 and Elo computed from Jeff Sackmann's WTA match results by Tennis Abstract's method for
-// 1973-2015, built from committed snapshots; the Fed Cup's nations of each season (Czechoslovakia, the Soviet Union,
+// 1968-2015 (1968-1972 against the published top tens), built from committed snapshots; the Fed Cup's nations of each season (Czechoslovakia, the Soviet Union,
 // Yugoslavia, West Germany on today's map, South Africa barred) and the documented fixes; the per-season shift that
 // keeps the best at 99; the method's checks against every list Tennis Abstract published and its Tennis 128 peaks; the
 // loader and the running App choosing, launching and resuming a season.
@@ -32,23 +32,23 @@ const seasonFile = year => JSON.parse(read(`public/womens-tennis/wta-${year}.jso
 const snapshot = year => JSON.parse(read(`scripts/data/womens-tennis-seasons/${year}.json`));
 const squadNames = (doc, nation) => doc.nations[nation][2].map(([name]) => name);
 const everyone = year => Object.values(seasonFile(year).nations).flatMap(([, , squad]) => squad.map(([name]) => name));
-const YEARS = Array.from({ length: 2025 - 1973 + 1 }, (_, i) => 2025 - i);
+const YEARS = Array.from({ length: 2025 - 1968 + 1 }, (_, i) => 2025 - i);
 
 // ---------- building ----------
 
 test('every season rebuilds byte for byte from its committed snapshot, and the snapshots from the pinned inputs', () => {
   assert.match(execFileSync(process.execPath, ['scripts/build-tennis-seasons.mjs', '--tour=wta', '--check'], { cwd: root, encoding: 'utf8' }),
-    /Verified the 53 women's tennis seasons, their listing, attribution and audit byte for byte/);
+    /Verified the 58 women's tennis seasons, their listing, attribution and audit byte for byte/);
   // The men's seasons still rebuild as they were before the women's tour joined.
   assert.match(execFileSync(process.execPath, ['scripts/build-tennis-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
-    /Verified the 53 tennis seasons/);
+    /Verified the 66 tennis seasons/);
   // The snapshots rebuild from the archive and the captures, cached in the ignored data-src/ (not on a fresh checkout).
   const cached = Object.keys(MANIFEST.archive.files).every(file => existsSync(`${root}/data-src/womens-tennis-seasons/sackmann/${file}`))
     && MANIFEST.reports.every(report => existsSync(`${root}/data-src/womens-tennis-seasons/wayback/elo_${report.capture}.html`))
     && MANIFEST.rankings.every(capture => existsSync(`${root}/data-src/womens-tennis-seasons/wayback/rank_${capture.capture}.html`));
   if (cached) {
     assert.match(execFileSync(process.execPath, ['scripts/sync-tennis-seasons.mjs', '--tour=wta', '--check'], { cwd: root, encoding: 'utf8' }),
-      /Verified the 53 women's tennis season snapshots and their validation byte for byte/);
+      /Verified the 58 women's tennis season snapshots and their validation byte for byte/);
   }
   for (const year of YEARS) {
     const data = snapshot(year);
@@ -81,7 +81,7 @@ test('the counted matches are Tennis Abstract\'s: tour level, its qualifying, WT
   assert.deepEqual(MANIFEST.method.start, { ...MANIFEST.method.start, tour: 1330, challenger: 1275, qualifying: 1275 });
 });
 
-test('the built-in seasons run from 2025 back to 1973: Tennis Abstract\'s own lists, then Elo computed by its method', () => {
+test('the built-in seasons run from 2025 back to 1968: Tennis Abstract\'s own lists, then Elo computed by its method', () => {
   assert.deepEqual(BUILT_IN_WOMENS_TENNIS_SEASONS.map(set => set.id), YEARS.map(year => `wta-${year}`));
   assert.equal(builtInSeasonOf('womens-tennis').season, '2026', 'the built-in season stays November 2026\'s');
   const label = year => BUILT_IN_WOMENS_TENNIS_SEASONS.find(set => set.year === year).label;
@@ -90,6 +90,7 @@ test('the built-in seasons run from 2025 back to 1973: Tennis Abstract\'s own li
   assert.equal(label(2016), 'Tennis Abstract Elo, November 2016');
   assert.equal(label(1985), 'Elo from match results, end of 1985');
   assert.equal(label(1975), 'Elo from match results, end of 1975 (rough)', 'the 1970s are rougher, and say so');
+  assert.equal(label(1968), 'Elo from match results, end of 1968 (rough)', 'the files\' first year, roughest of all');
   for (const listed of BUILT_IN_WOMENS_TENNIS_SEASONS) {
     assert.ok(listed.label.length <= 50, `${listed.id}'s label is short`);
     const set = BUILT_IN_SETS.find(entry => entry.id === listed.id);
@@ -238,6 +239,25 @@ test('the method reproduces Tennis Abstract: its own lists and the Tennis 128\'s
   for (const name of ['Steffi Graf', 'Monica Seles']) assert.ok(Math.abs(VALIDATION.peaks.find(peak => peak.name === name).diff) < 10, name);
 });
 
+test('1968-1972, the files\' first seasons: Court and King lead Australia and the United States, South Africa plays', () => {
+  const doc = seasonFile(1970);
+  assert.equal(squadNames(doc, '036')[0], 'Margaret Court');
+  assert.equal(squadNames(doc, '840')[0], 'Billie Jean King');
+  assert.equal(snapshot(1971).players[0][1], 'Billie Jean King');
+  // South Africa played the Federation Cup until 1977 (it won the 1972 cup at home); it is barred only from 1978.
+  for (const year of [1968, 1969, 1970, 1971, 1972]) assert.ok(seasonFile(year).nations['710'], `South Africa plays in ${year}`);
+  // The 1971 cup is all but missing from the files (five rubbers, no tie names): nations come from the cups around it.
+  assert.ok(snapshot(1971).players.filter(row => row[3] === 'fed-cup').length > 50);
+  // Against Tingay's ten (married names joined by hand: Kerry Melville is Kerry Reid), about eight shared a season.
+  const { topTens, statements } = VALIDATION.checks;
+  assert.deepEqual(Object.keys(topTens.seasons), ['1968', '1969', '1970', '1971', '1972']);
+  assert.ok(topTens.periods.all.shared >= 7 && topTens.periods.all.rho > 0.5, JSON.stringify(topTens.periods));
+  assert.ok(Object.values(topTens.seasons).every(season => season.listed === 10), 'every one of Tingay\'s women is rated');
+  // Court's peak: Tennis Abstract's 2,389 of 1971; here 2,262 at the end of 1971, her peak in 1973.
+  const court = statements.peaks.find(peak => peak.name === 'Margaret Court');
+  assert.ok(Math.abs(court.computed - court.published) < 50 && court.endOfYear < court.published, JSON.stringify(court));
+});
+
 test('the loader refuses a women\'s season that is not the builder\'s', () => {
   const doc = seasonFile(1985);
   const broken = edit => { const copy = JSON.parse(JSON.stringify(doc)); edit(copy); return () => decodeFootballSet(copy, copy.id); };
@@ -299,13 +319,14 @@ async function withApp(fn) {
 }
 const modelOf = app => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), domestic: app.domesticStatus(), season: app.seasonStatus() });
 
-test('women\'s tennis\'s Season choice lists 2026 and the 53 earlier seasons, newest first', async () => {
+test('women\'s tennis\'s Season choice lists 2026 and the 58 earlier seasons, newest first', async () => {
   await withApp(async ({ app, time }) => {
     app.pickSetup('sport', 'womens-tennis');
     const model = modelOf(app);
     assert.deepEqual(model.season.options.map(option => option.name), ['2026', ...YEARS.map(String)]);
     assert.equal(model.season.options[1].label, '2025 · Tennis Abstract Elo, December 2025');
-    assert.equal(model.season.options.at(-1).label, '1973 · Elo from match results, end of 1973 (rough)');
+    assert.equal(model.season.options.at(-1).label, '1968 · Elo from match results, end of 1968 (rough)');
+    assert.match(model.season.note, /\(1968–1979 rough\)/);
     app.pickSetup('dataSet', 'wta-1985');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'wta-1985']);
     time.advance(200);

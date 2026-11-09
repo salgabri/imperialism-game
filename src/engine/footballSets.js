@@ -64,30 +64,44 @@ const SET_KINDS = Object.freeze({
   eaw: { prefix: 'eaw-', id: /^eaw-(?:fifa|fc)-\d{2}$/, sport: 'womens-football', nationsOnly: /^eaw-fifa-(?:1\d|2[0-2])$/ },
   // `nba-2k<nn>`: an NBA 2K edition, the NBA's clubs only.
   // Also, by the season they rate: NBA 2K's MyNBA Eras leagues (`nba-eras-<season end year>`), NBA 2K's classic teams
-  // of one season (`nba-classic-<season end year>`) and EA's NBA Live editions (`nba-live-<nn>`).
-  nba2k: { prefix: 'nba-', id: /^nba-(?:2k\d{2}|eras-\d{4}|classic-\d{4}|live-\d{2})$/, sport: 'basketball', nations: false, mapped: true },
-  // `mlb-the-show-<nn>`: an MLB The Show edition, its nations by birthplace and the MLB's clubs.
-  show: { prefix: 'mlb-', id: /^mlb-the-show-\d{2}$/, sport: 'baseball', mapped: true, calendar: true },
+  // of one season (`nba-classic-<season end year>`), EA's NBA Live editions (`nba-live-<nn>`) and the seasons no game
+  // rated, computed from the players' season statistics (`nba-stats-<season end year>`, source.conversion says how).
+  nba2k: { prefix: 'nba-', id: /^nba-(?:2k\d{2}|eras-\d{4}|classic-\d{4}|live-\d{2}|stats-\d{4})$/, sport: 'basketball', nations: false, mapped: true },
+  // `mlb-the-show-<nn>`: an MLB The Show edition, its nations by birthplace and the MLB's clubs. `mlb-war-<year>`: a
+  // season no game rated, computed from the players' WAR (source.computed, source.conversion), the same shape.
+  show: { prefix: 'mlb-', id: /^mlb-(?:the-show-\d{2}|war-\d{4})$/, sport: 'baseball', mapped: true, calendar: true },
   // `madden-<season>`: a Madden NFL edition, by the NFL season it rates (Madden NFL 06 rates 2005), the NFL's clubs only.
+  // An edition that kept its players' attributes but no overall has its overalls converted (source.overall 'converted',
+  // source.conversion).
   madden: { prefix: 'madden-', id: /^madden-\d{4}$/, sport: 'american-football', nations: false, mapped: true, calendar: true },
   // `tecmo-<season>`: a Tecmo Super Bowl edition, by the NFL season it rates (the NES game rates 1990), the NFL's clubs
   // only. Tecmo rates attributes, not players: each overall is converted (source.conversion).
   tecmo: { prefix: 'tecmo-', id: /^tecmo-\d{4}$/, sport: 'american-football', nations: false, mapped: true, calendar: true },
+  // `pfa-<season>` / `pfa-afl-<season>`: an NFL (or, before the 1970 merger, AFL) season no game rated, computed from the
+  // players' season facts (starts, positions, box scores; source.method 'computed', source.conversion), clubs only.
+  pfa: { prefix: 'pfa-', id: /^pfa-(?:afl-)?\d{4}$/, sport: 'american-football', nations: false, mapped: true, calendar: true },
   // `tennis-<year>`: the ATP's men at the end of a year, by Elo, the Davis Cup's nations only.
   elo: { prefix: 'tennis-', id: /^tennis-\d{4}$/, sport: 'tennis', nationsOnly: /^tennis-/, calendar: true },
   // `wta-<year>`: the WTA's women at the end of a year, by Elo, the Fed Cup's nations only.
   wta: { prefix: 'wta-', id: /^wta-\d{4}$/, sport: 'womens-tennis', nationsOnly: /^wta-/, calendar: true },
   // `nhl-<season end year>`: an NHL season's ratings from an EA NHL edition (NHL 94 rates 1993/94 → `nhl-1994`), its
-  // nations by nationality and the NHL's clubs.
-  nhl: { prefix: 'nhl-', id: /^nhl-\d{4}$/, sport: 'hockey', mapped: true },
+  // nations by nationality and the NHL's clubs. A season no edition rated is computed from the NHL's statistics, or
+  // converted from an edition's attributes (source.method, source.conversion). Before 1979/80 only Canada fields a real
+  // side, so those seasons have clubs only (`clubsOnly`).
+  nhl: { prefix: 'nhl-', id: /^nhl-\d{4}$/, sport: 'hockey', mapped: true, clubsOnly: /^nhl-19[67]\d$/ },
   // `nrl-<season>`: an NRL season from a rugby league game's database (Rugby League 2: World Cup Edition rates 2008), the
-  // NRL's clubs only. The game rates attributes, not players: each overall is converted (source.conversion).
+  // NRL's clubs only. The game rates attributes, not players: each overall is converted (source.conversion). A season
+  // no game rated is computed from the players' match statistics (source.method 'computed', source.metric).
   nrl: { prefix: 'nrl-', id: /^nrl-\d{4}$/, sport: 'rugby-league', nations: false, mapped: true, calendar: true },
   // `cm-<season>`: a Championship Manager edition's database before CM 01/02 (CM 97/98 → `cm-9798`), its players CM
   // 01/02's tuples.
   cm: { prefix: 'cm-', id: /^cm-\d{4}$/, sport: 'football' },
-  // `swos-<season>`: a Sensible World of Soccer edition's national squads (SWOS 96/97 → `swos-9697`), nations only.
-  swos: { prefix: 'swos-', id: /^swos-\d{4}$/, sport: 'football', nationsOnly: /^swos-/ },
+  // `wc-<season end year>`: a World Cup season no game rated, its finalists' squads computed from the nations' Elo and
+  // the players' records (source.conversion), nations only.
+  wc: { prefix: 'wc-', id: /^wc-\d{4}$/, sport: 'football', nationsOnly: /^wc-/ },
+  // `swos-<season>`: a Sensible World of Soccer edition (SWOS 96/97 → `swos-9697`): its national squads, and its clubs
+  // where the edition's own team files give them (SWOS 96/97 is nations only).
+  swos: { prefix: 'swos-', id: /^swos-\d{4}$/, sport: 'football', nationsOnly: /^swos-9697$/ },
   cm0102: { prefix: '', id: /^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$/, sport: 'football' },
 });
 const kindRecord = id => {
@@ -99,8 +113,9 @@ export const isFootballSetId = id => typeof id === 'string' && kindRecord(id).id
 export const setKindOf = id => Object.keys(SET_KINDS).find(kind => SET_KINDS[kind] === kindRecord(id));
 /** The sport a set is played in, by its id. */
 export const setSportOf = id => kindRecord(id).sport;
-/** Whether a set fields national teams: every one but an NBA season, which has clubs only. */
-export const setHasNations = id => kindRecord(id).nations !== false;
+/** Whether a set fields national teams: every one but the clubs-only kinds' (the NBA's, the NFL's, the NRL's) and the
+ * early NHL seasons, when only Canada fielded a real side. */
+export const setHasNations = id => kindRecord(id).nations !== false && !kindRecord(id).clubsOnly?.test(String(id));
 /** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, SWOS 96/97, tennis's). */
 export const setHasClubs = id => !kindRecord(id).nationsOnly?.test(String(id));
 /** Whether a set's clubs play on a map of their era (src/data/clubMaps.js) rather than on the world. */
@@ -296,7 +311,7 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
  */
 export function decodeFootballSet(data, id = data?.id) {
   validateFootballSet(data, String(id));
-  if (['nba2k', 'madden', 'tecmo', 'nrl'].includes(setKindOf(data.id))) {
+  if (['nba2k', 'madden', 'tecmo', 'pfa', 'nrl'].includes(setKindOf(data.id))) {
     const { clubs, ...meta } = data;
     return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(player => [...player]) })), territory: NO_TERRITORY };
   }
@@ -374,20 +389,29 @@ const KINDS = {
       : src.rawScale !== EA_SCALE ? `source rawScale must be ${EA_SCALE}`
         : src.conversion !== undefined ? 'EA ratings are not converted' : '') },
   // Clubs only, each player `[name, positions, rating]` as the built-in basketball clubs hold them.
-  // NBA 2K's overalls are used as they are; NBA Live's are put on NBA 2K's scale by a line its source states.
+  // NBA 2K's overalls are used as they are; NBA Live's are put on NBA 2K's scale by a line its source states, and a
+  // computed season's are derived from the players' statistics by a rule its source states.
   nba2k: { size: 3,
     source: (src, id) => (!['edition', 'compiler'].every(key => typeof src[key] === 'string' && src[key].trim())
       ? 'source must name the edition and who compiled its ratings'
       : src.rawScale !== NBA_SCALE ? `source rawScale must be ${NBA_SCALE}`
         : /^nba-live-/.test(id) ? (typeof src.conversion === 'string' && src.conversion.trim() ? ''
           : 'source conversion must say how NBA Live\'s overalls were put on NBA 2K\'s scale')
-          : src.conversion !== undefined ? 'NBA 2K ratings are not converted' : '') },
-  // Nations and clubs, each player `[name, positions, rating]` as the built-in baseball teams hold them.
+          : /^nba-stats-/.test(id) ? (typeof src.conversion === 'string' && src.conversion.trim() ? ''
+            : 'source conversion must say how the overalls were computed from the statistics')
+            : src.conversion !== undefined ? 'NBA 2K ratings are not converted' : '') },
+  // Nations and clubs, each player `[name, positions, rating]` as the built-in baseball teams hold them. A season no
+  // game rated is computed from the players' WAR: its source says so (computed, method) and how (conversion).
   show: { size: 3,
-    source: src => (!['edition', 'update', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
-      ? 'source must name the edition, its roster update and when it was read'
-      : src.rawScale !== SHOW_SCALE ? `source rawScale must be ${SHOW_SCALE}`
-        : src.conversion !== undefined ? 'MLB The Show ratings are not converted' : '') },
+    source: (src, id) => (/^mlb-war-/.test(id)
+      ? (!['edition', 'retrieved', 'method', 'conversion'].every(key => typeof src[key] === 'string' && src[key].trim())
+        ? 'source must name the edition, when it was read, the method and how the ratings were derived'
+        : src.computed !== true ? 'source must say the ratings are computed'
+          : src.rawScale !== 'WAR' ? 'source rawScale must be "WAR"' : '')
+      : !['edition', 'update', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
+        ? 'source must name the edition, its roster update and when it was read'
+        : src.rawScale !== SHOW_SCALE ? `source rawScale must be ${SHOW_SCALE}`
+          : src.conversion !== undefined ? 'MLB The Show ratings are not converted' : '') },
 };
 // The women's EA seasons hold the same tuples and source block as the men's.
 KINDS.eaw = KINDS.ea;
@@ -407,29 +431,48 @@ KINDS.elo = { size: 4,
     ? 'source must name the edition, its publisher, the date the ratings are of and when they were read'
     : src.rawScale !== 'Elo' ? 'source rawScale must be "Elo"' : '') };
 KINDS.wta = KINDS.elo;
-// Nations and clubs, each player `[name, position, rating]`.
+// Nations and clubs, each player `[name, position, rating]`. A season no edition rated says how its ratings were made
+// (source.method 'computed' from the NHL's statistics, or 'converted' from an edition's attributes) and the rule
+// (source.conversion).
 KINDS.nhl = { size: 3,
   source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
     ? 'source must name the edition, who compiled its ratings and when they were read'
-    : !Number.isInteger(src.rawScale) ? 'source rawScale must be a number' : '') };
-// Clubs only, each player `[name, position, rating]` as the built-in NFL clubs hold them.
+    : src.method !== undefined ? (!['computed', 'converted'].includes(src.method) ? 'source method must be "computed" or "converted"'
+      : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the ratings were derived'
+        : !(Number.isInteger(src.rawScale) || (typeof src.rawScale === 'string' && src.rawScale.trim())) ? 'source rawScale must be a number or name the measure' : '')
+      : !Number.isInteger(src.rawScale) ? 'source rawScale must be a number' : '') };
+// Clubs only, each player `[name, position, rating]` as the built-in NFL clubs hold them. An edition that kept its
+// players' attributes but no overall says so (source.overall 'converted') and how its overalls were derived.
 KINDS.madden = { size: 3,
   source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
     ? 'source must name the edition, who compiled its ratings and when they were read'
-    : src.rawScale !== 99 ? 'source rawScale must be 99'
-      : src.conversion !== undefined ? 'Madden ratings are not converted' : '') };
+    : src.overall === 'converted' ? (!Number.isInteger(src.rawScale) || src.rawScale < 1 ? 'source rawScale must be the attributes\' scale'
+      : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the overalls were derived' : '')
+      : src.overall !== undefined ? 'source overall must be "converted" or absent'
+        : src.rawScale !== 99 ? 'source rawScale must be 99'
+          : src.conversion !== undefined ? 'Madden ratings are not converted' : '') };
+// The same clubs in a season no game rated: their overalls computed from the season's facts by a documented rule.
+KINDS.pfa = { size: 3,
+  source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
+    ? 'source must name the edition, who compiled its facts and when they were read'
+    : src.method !== 'computed' ? 'source method must be "computed"'
+      : src.rawScale !== 'value' ? 'source rawScale must be "value"'
+        : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the overalls were derived' : '') };
 // The same clubs, their overalls converted from Tecmo's attributes by a documented rule.
 KINDS.tecmo = { size: 3,
   source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
     ? 'source must name the edition, who compiled its ratings and when they were read'
     : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the overalls were derived' : '') };
 // Clubs only, each player `[name, position, rating]` as the built-in rugby league clubs hold them, their overalls
-// converted from the game's 1–10 attributes by a documented rule (source.conversion), as Tecmo's are.
+// converted from the game's 1–10 attributes by a documented rule (source.conversion), as Tecmo's are. A season no game
+// rated is computed from the players' match statistics (source.method 'computed', the measure in source.metric).
 KINDS.nrl = { size: 3,
   source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
     ? 'source must name the edition, who compiled its ratings and when they were read'
-    : !Number.isInteger(src.rawScale) ? 'source rawScale must be a number'
-      : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the overalls were derived' : '') };
+    : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the overalls were derived'
+      : src.method === 'computed' ? (!(typeof src.metric === 'string' && src.metric.trim()) ? 'source metric must name the measure the ratings rank' : '')
+        : src.method !== undefined ? 'source method must be "computed" or absent'
+          : !Number.isInteger(src.rawScale) ? 'source rawScale must be a number' : '') };
 const NBA_SCALE = 99;
 const SHOW_SCALE = 99;
 const BASKETBALL_POSITIONS = ['PG', 'SG', 'SF', 'PF', 'C'];
@@ -443,12 +486,13 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "nba-2k<nn>" or "mlb-the-show-<nn>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "tennis-<yyyy>" or "wta-<yyyy>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
   // A set without `kind` is a CM 01/02 one, as every set was before the EA seasons.
   const kind = KINDS[setKindOf(id)];
+  if (!kind) fail(`this build cannot read ${setKindOf(id)} sets`);
   if ((data.kind ?? 'cm0102') !== setKindOf(id)) fail(`kind ${JSON.stringify(data.kind)} is not the kind its id names`);
   if (typeof data.version !== 'string' || !versionPattern(id).test(data.version)) {
     fail(`version ${JSON.stringify(data.version)} must look like "${id}-<8 hex>"`);
@@ -472,7 +516,7 @@ function validateFootballSet(data, id) {
     positions: new Set(Object.keys(hockey.formation)), clubLeast: 12, noun: 'an NHL season' });
   if (setKindOf(id) === 'nrl') return validateClubsOnMap(data, id, fail, { sport: rugbyLeague, clubId: NRL_CLUB_ID,
     positions: new Set(Object.keys(rugbyLeague.formation)), least: rugbyLeague.squadSize, noun: 'an NRL season' });
-  if (setKindOf(id) === 'madden' || setKindOf(id) === 'tecmo') return validateClubsOnMap(data, id, fail, { sport: americanFootball, clubId: NFL_CLUB_ID,
+  if (['madden', 'tecmo', 'pfa'].includes(setKindOf(id))) return validateClubsOnMap(data, id, fail, { sport: americanFootball, clubId: NFL_CLUB_ID,
     positions: new Set(Object.keys(americanFootball.formation)), least: americanFootball.squadSize, noun: 'an NFL season' });
 
   // The builder writes only tuples that rebuild exactly, so anything else (an unknown or repeated position key, a
@@ -747,7 +791,8 @@ const NRL_CLUB_ID = /^nrl-[a-z0-9-]{1,62}$/;
 /**
  * A season of clubs only on its era's map (`map`), each player `[name, position, rating]` as the sport's built-in clubs
  * hold them: an NFL season. One club per section of the map; ids, codes and leagues follow the built-in clubs' rules,
- * so saved names resolve against them. `least` is the lineup a club must be able to name.
+ * so saved names resolve against them, except that a map of another league of its day (the AFL's, before the 1970
+ * merger) names its clubs' league. `least` is the lineup a club must be able to name.
  */
 function validateClubsOnMap(data, id, fail, { sport, clubId, positions, least, noun }) {
   const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
@@ -758,7 +803,9 @@ function validateClubsOnMap(data, id, fail, { sport, clubId, positions, least, n
   if (!map) fail(`map ${JSON.stringify(data.map)} is not one of ${sport.name}'s maps listing this season`);
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
-  const leagues = new Set(sport.clubs.map(club => club.league));
+  const builtInLeagues = new Set(sport.clubs.map(club => club.league));
+  const leagues = map.seasons != null && typeof map.league === 'string' && !builtInLeagues.has(map.league)
+    ? new Set([map.league]) : builtInLeagues;
   const ids = new Set(), codes = new Set();
   data.clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
@@ -881,7 +928,7 @@ export function seasonSport(set) {
     const identity = { dataSet: meta.id, dataVersion: meta.version, dataYear: meta.year, dataSeason: meta.season, dataLabel: meta.label };
     sport = setKindOf(meta.id) === 'nba2k' ? { ...basketball, clubs, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'show' ? { ...baseball, rosters, clubs, territory, clubMap: meta.map, ...identity }
-      : setKindOf(meta.id) === 'madden' || setKindOf(meta.id) === 'tecmo' ? { ...americanFootball, clubs, clubMap: meta.map, ...identity }
+      : ['madden', 'tecmo', 'pfa'].includes(setKindOf(meta.id)) ? { ...americanFootball, clubs, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'elo' ? { ...tennis, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'wta' ? { ...womensTennis, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'nhl' ? { ...hockey, rosters, clubs, territory, clubMap: meta.map, ...identity }

@@ -15,12 +15,18 @@
 // season (scripts/lib/tennis-seasons.mjs). A published season is Tennis Abstract's own year-end report, with each
 // player's country from its rankings report of the nearest date. validation.json holds the checks of the method
 // against every number Tennis Abstract has published by it.
+//
+// The men's seasons before 1973 (`seasons.early`, docs/design/tennis.md, "Before 1973") come from a second run,
+// `method.early`: the amateur file (the majors and the Davis Cup, 1877-1967) read before the open era's files, with
+// its duplicate ids merged. It is kept apart from the first, so the seasons from 1973 are as they were.
+// validation.json's `early` holds its fit and its seam with the first run, and `checks` the agreement of the seasons
+// before 1973 with the published top tens and Tennis Abstract's statements (the manifest's `checks`).
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { agreement, atpLevelOf, davisCupNations, orderMatches, parseMatchFile, rateMatches, wtaLevelOf } from './lib/tennis-elo.mjs';
+import { agreement, applyAliases, atpLevelOf, davisCupNations, earlyLevelOf, orderMatches, parseMatchFile, rateMatches, wtaLevelOf } from './lib/tennis-elo.mjs';
 import { codeOfDay, nationOfDay } from './lib/tennis-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -170,20 +176,85 @@ const isoDate = yyyymmdd => `${String(yyyymmdd).slice(0, 4)}-${String(yyyymmdd).
 const row = cells => JSON.stringify(cells);
 const documentText = (head, rows) => `{\n${Object.entries(head).map(([key, value]) => `${JSON.stringify(key)}: ${JSON.stringify(value)}`).join(',\n')},\n"players": [\n${rows.map(row).join(',\n')}\n]\n}\n`;
 
-const outputs = [];
-for (let season = firstComputed; season <= lastComputed; season++) {
-  const { last, date, players } = main.snapshots[season];
-  const rated = players.filter(player => player.season >= manifest.method.activity);
-  const rows = rated.map(player => {
+/** A computed season's rows, strongest first: every player of `players` with `activity` counted matches in it. */
+function computedRows(players, season, activity, cup) {
+  return players.filter(player => player.season >= activity).map(player => {
     const person = people.get(player.id);
     if (!person) throw new Error(`${season}: ${player.name} (${player.id}) is not in the player file`);
-    const { code, how } = nationOfDay({ id: player.id, ioc: person.ioc, davisCup: davisCup.get(player.id) }, season, nationRules);
+    const { code, how } = nationOfDay({ id: player.id, ioc: person.ioc, davisCup: cup.get(player.id) }, season, nationRules);
     return [player.id, person.name, code, how, person.born, player.elo, player.season];
   });
-  const head = { season, kind: 'computed', lastEvent: isoDate(last), date: isoDate(date), rated: rows.length,
-    columns: ['id', 'name', 'nation of the day', 'how', 'born', 'elo', 'matches'] };
-  outputs.push([path.join(outDir, `${season}.json`), documentText(head, rows)]);
 }
+const COLUMNS = ['id', 'name', 'nation of the day', 'how', 'born', 'elo', 'matches'];
+
+const outputs = [];
+// Each computed season's rows and its run's whole list (everyone with a counted match), for the checks.
+const seasonLists = {};
+for (let season = firstComputed; season <= lastComputed; season++) {
+  const { last, date, players } = main.snapshots[season];
+  const rows = computedRows(players, season, manifest.method.activity, davisCup);
+  const head = { season, kind: 'computed', lastEvent: isoDate(last), date: isoDate(date), rated: rows.length, columns: COLUMNS };
+  outputs.push([path.join(outDir, `${season}.json`), documentText(head, rows)]);
+  seasonLists[season] = { rows, players, run: main };
+}
+
+// ---------- the men's seasons before 1973 ----------
+
+/**
+ * The second run (`method.early`): the amateur file before the open era's files, every match with the amateur file's
+ * duplicate ids merged (each pair checked: both in the player file, no chain, a country in common, never in one
+ * event), its newcomers at `start.amateur`, its layoffs charged only from `layoff.amateurWeeks`. Its seasons list
+ * `activity.amateur` counted matches before 1968 and `activity.open` after, and take their nations from its own Davis
+ * Cup rows, aliases applied.
+ */
+async function earlyRun() {
+  const E = manifest.method.early;
+  const amateur = parseMatchFile(await archiveFile(E.file), { file: 2, pad: true });
+  const all = [...amateur, ...matches];
+  const aliasOf = new Map();
+  for (const [from, to, name] of E.aliases.items) {
+    if (aliasOf.has(from) || !people.has(from) || !people.has(to)) throw new Error(`The alias of ${name} (${from} → ${to}) is repeated or not in the player file`);
+    aliasOf.set(from, to);
+  }
+  const paired = new Set([...aliasOf.keys(), ...aliasOf.values()]);
+  const countries = new Map(), events = new Map();
+  for (const m of all) {
+    for (const [id, ioc] of [[m.winner, m.winnerIoc], [m.loser, m.loserIoc]]) {
+      if (!paired.has(id)) continue;
+      if (!countries.has(id)) { countries.set(id, new Set([people.get(id).ioc])); events.set(id, new Set()); }
+      countries.get(id).add(ioc);
+      events.get(id).add(`${m.file === 2 ? 'amateur' : m.season}:${m.event}`);
+    }
+  }
+  for (const [from, to, name] of E.aliases.items) {
+    if (!countries.has(from) || !countries.has(to)) throw new Error(`The alias of ${name} (${from} → ${to}) names an id with no match`);
+    if (aliasOf.has(to)) throw new Error(`The alias of ${name} joins ${to}, itself merged`);
+    if (![...countries.get(from)].some(code => countries.get(to).has(code))) throw new Error(`The alias of ${name} (${from} → ${to}) shares no country`);
+    if ([...events.get(from)].some(event => events.get(to).has(event))) throw new Error(`The alias of ${name} (${from} → ${to}) joins two men of one event`);
+  }
+  const merged = applyAliases(all, aliasOf);
+  const moved = merged.filter((m, i) => m !== all[i]).length;
+  const earlyMatches = orderMatches(merged);
+  const method = { ...manifest.method, start: { ...manifest.method.start, amateur: E.start.amateur },
+    layoff: { ...manifest.method.layoff, from: E.layoff.from, amateurWeeks: E.layoff.amateurWeeks } };
+  const [from, to] = manifest.seasons.early;
+  const [, lastAmateur] = manifest.seasons.amateur;
+  const seam = { from: firstComputed, to: 1980 };
+  const seasons = [];
+  for (let season = from; season <= seam.to; season++) seasons.push(season);
+  const run = rateMatches(earlyMatches, method, { seasons, yElo: true, levelOf: earlyLevelOf });
+  const { nations: cup, unresolved: cupUnresolved } = davisCupNations(earlyMatches, (ioc, season) => (ioc ? codeOfDay(ioc, season, ioc, nationRules) : null));
+  for (let season = from; season <= to; season++) {
+    const activity = season <= lastAmateur ? E.activity.amateur : E.activity.open;
+    const { last, date, players } = run.snapshots[season];
+    const rows = computedRows(players, season, activity, cup);
+    const head = { season, kind: 'computed', run: 'early', activity, lastEvent: isoDate(last), date: isoDate(date), rated: rows.length, columns: COLUMNS };
+    outputs.push([path.join(outDir, `${season}.json`), documentText(head, rows)]);
+    seasonLists[season] = { rows, players, run };
+  }
+  return { run, cupUnresolved, aliases: E.aliases.items, moved, seam };
+}
+const early = manifest.seasons.early ? await earlyRun() : null;
 
 // ---------- the published seasons ----------
 
@@ -270,29 +341,107 @@ for (const report of manifest.reports) {
     ...(v1.snapshots[report.season] ? { v1: against(v1.snapshots[report.season].players, list) } : {}),
   };
 }
-const peakOf = new Map(main.peaks.map(peak => [peak.id, peak]));
 const targets = manifest.method.targets;
-const peaks = targets.peaks.items.map(([id, name, elo, year]) => {
-  const peak = peakOf.get(id);
-  return { name, year, published: elo, computed: peak.peak, date: isoDate(peak.date), diff: round(peak.peak - elo) };
-});
-const yElo = (targets.yElo?.items ?? []).map(([season, id, name, record, value]) => {
-  const ours = main.yElo[season].find(entry => entry.id === id);
-  return { season, name, record, ours: `${ours.won}-${ours.lost}`, published: value, computed: ours.yElo, diff: round(ours.yElo - value) };
-});
 const [fitFrom, fitTo] = targets.fitYears;
-const fitDiffs = [...peaks.filter(t => t.year >= fitFrom && t.year <= fitTo), ...yElo.filter(t => t.season >= fitFrom && t.season <= fitTo)].map(t => t.diff);
-const later = [...peaks.filter(t => t.year > fitTo), ...yElo.filter(t => t.season > fitTo)].map(t => t.diff);
 const mean = xs => round(xs.reduce((s, x) => s + x, 0) / xs.length);
 const rms = xs => round(Math.sqrt(xs.reduce((s, x) => s + x * x, 0) / xs.length));
-const byDecade = Object.fromEntries([1970, 1980, 1990].map(decade => [`${decade}s`, mean([...peaks.filter(t => Math.floor(Math.min(t.year, 2000) / 10) * 10 === decade && t.year <= fitTo),
-  ...yElo.filter(t => Math.floor(Math.min(t.season, 2000) / 10) * 10 === decade && t.season <= fitTo)].map(t => t.diff))]));
+/** A run against Tennis Abstract's targets: each career peak and yElo season, and the fit over `fitYears`. */
+function fitOf(run) {
+  const peakOf = new Map(run.peaks.map(peak => [peak.id, peak]));
+  const peaks = targets.peaks.items.map(([id, name, elo, year]) => {
+    const peak = peakOf.get(id);
+    return { name, year, published: elo, computed: peak.peak, date: isoDate(peak.date), diff: round(peak.peak - elo) };
+  });
+  const yElo = (targets.yElo?.items ?? []).map(([season, id, name, record, value]) => {
+    const ours = run.yElo[season].find(entry => entry.id === id);
+    return { season, name, record, ours: `${ours.won}-${ours.lost}`, published: value, computed: ours.yElo, diff: round(ours.yElo - value) };
+  });
+  const fitDiffs = [...peaks.filter(t => t.year >= fitFrom && t.year <= fitTo), ...yElo.filter(t => t.season >= fitFrom && t.season <= fitTo)].map(t => t.diff);
+  const later = [...peaks.filter(t => t.year > fitTo), ...yElo.filter(t => t.season > fitTo)].map(t => t.diff);
+  const byDecade = Object.fromEntries([1970, 1980, 1990].map(decade => [`${decade}s`, mean([...peaks.filter(t => Math.floor(Math.min(t.year, 2000) / 10) * 10 === decade && t.year <= fitTo),
+    ...yElo.filter(t => Math.floor(Math.min(t.season, 2000) / 10) * 10 === decade && t.season <= fitTo)].map(t => t.diff))]));
+  return { peaks, yElo, fit: { years: targets.fitYears, n: fitDiffs.length, meanDiff: mean(fitDiffs), rms: rms(fitDiffs), byDecade, after: { n: later.length, meanDiff: mean(later) } } };
+}
+const { peaks, yElo, fit } = fitOf(main);
 const validation = {
   generatedBy: `scripts/sync-tennis-seasons.mjs${tourId === 'atp' ? '' : ` --tour=${tourId}`}`,
   matches: main.counts, [tour.unresolved]: unresolved,
-  fit: { years: targets.fitYears, n: fitDiffs.length, meanDiff: mean(fitDiffs), rms: rms(fitDiffs), byDecade, after: { n: later.length, meanDiff: mean(later) } },
-  peaks, yElo, published,
+  fit, peaks, yElo, published,
 };
+
+// The second run against the targets, and its seam with the first: over the first run's top 50 of each season from 1973
+// (ten counted matches), the second run's Elo of the same men less the first's.
+if (early) {
+  const seam = {};
+  for (let season = early.seam.from; season <= early.seam.to; season++) {
+    const ours = new Map(early.run.snapshots[season].players.map(player => [player.id, player.elo]));
+    const top = main.snapshots[season].players.filter(player => player.season >= manifest.method.activity).slice(0, 50).filter(player => ours.has(player.id));
+    const diffs = top.map(player => ours.get(player.id) - player.elo);
+    seam[season] = { n: diffs.length, meanDiff: mean(diffs), meanAbsDiff: mean(diffs.map(Math.abs)), maxAbsDiff: round(Math.max(...diffs.map(Math.abs))) };
+  }
+  const kinds = {};
+  for (const [, , , rule, kind] of early.aliases) kinds[kind] = (kinds[kind] || 0) + 1;
+  validation.early = {
+    seasons: manifest.seasons.early, matches: early.run.counts, [tour.unresolved]: early.cupUnresolved,
+    aliases: { pairs: early.aliases.length, kinds, matchesMoved: early.moved },
+    fit: fitOf(early.run).fit, seam,
+  };
+}
+
+/** Spearman's rank correlation of two lists of distinct values, each ranked 1..n among themselves; null under three. */
+function spearman(xs, ys) {
+  const n = xs.length;
+  if (n < 3) return null;
+  const ranks = values => {
+    const r = [];
+    values.map((value, i) => [value, i]).sort((a, b) => a[0] - b[0]).forEach(([, i], k) => { r[i] = k + 1; });
+    return r;
+  };
+  const rx = ranks(xs), ry = ranks(ys);
+  return 1 - 6 * rx.reduce((s, r, i) => s + (r - ry[i]) ** 2, 0) / (n * (n * n - 1));
+}
+// The seasons before 1973 against the published top tens (each season's listed players, strongest first: how many of
+// the ten are in our ten, how many we list at all, and the rank correlation of the ten we list) and Tennis Abstract's
+// statements (where we rank its men at the end of a season; our Elo against its peak).
+if (manifest.checks) {
+  const { topTens, statements } = manifest.checks;
+  const nameOf = id => people.get(id)?.name ?? id;
+  const why = (season, id) => {
+    const entry = seasonLists[season].players.find(player => player.id === id);
+    return `${nameOf(id)}: ${entry ? `${entry.season} counted matches` : 'no counted match'}`;
+  };
+  const seasonsOfTen = {};
+  for (const [season, ten] of Object.entries(topTens.years)) {
+    const { rows } = seasonLists[season];
+    const rankOf = new Map(rows.map((row, i) => [row[0], i + 1]));
+    const ours = new Set(rows.slice(0, 10).map(row => row[0]));
+    const found = ten.map(([, id], i) => [i + 1, rankOf.get(id)]).filter(([, rank]) => rank != null);
+    const rho = spearman(found.map(([position]) => position), found.map(([, rank]) => rank));
+    seasonsOfTen[season] = { shared: ten.filter(([, id]) => ours.has(id)).length, listed: found.length, rho: rho == null ? null : round(rho, 2),
+      ranks: ten.map(([, id]) => rankOf.get(id) ?? null), notListed: ten.filter(([, id]) => !rankOf.has(id)).map(([, id]) => why(season, id)) };
+  }
+  const period = (from, to) => {
+    const rows = Object.entries(seasonsOfTen).filter(([season]) => season >= from && season <= to).map(([, row]) => row);
+    return rows.length ? { seasons: rows.length, shared: round(rows.reduce((s, row) => s + row.shared, 0) / rows.length), rho: round(rows.reduce((s, row) => s + row.rho, 0) / rows.length, 2) } : null;
+  };
+  const tenYears = Object.keys(topTens.years).map(Number);
+  const periods = manifest.seasons.amateur
+    ? { amateur: period(manifest.seasons.amateur[0], manifest.seasons.amateur[1]), open: period(manifest.seasons.amateur[1] + 1, Math.max(...tenYears)) }
+    : { all: period(Math.min(...tenYears), Math.max(...tenYears)) };
+  validation.checks = {
+    topTens: { authority: topTens.authority, periods, seasons: seasonsOfTen },
+    statements: {
+      yearEnd: statements.yearEnd.map(([season, ids, text]) => ({ season, text,
+        ours: ids.map(id => `${nameOf(id)} ${seasonLists[season].rows.findIndex(row => row[0] === id) + 1 || 'unlisted'}`) })),
+      peaks: statements.peaks.map(([id, name, elo, year]) => {
+        const { run } = seasonLists[year];
+        const peak = run.peaks.find(entry => entry.id === id);
+        const atEnd = run.snapshots[year].players.find(player => player.id === id);
+        return { name, year, published: elo, computed: peak.peak, date: isoDate(peak.date), endOfYear: atEnd?.elo ?? null };
+      }),
+    },
+  };
+}
 outputs.push([path.join(outDir, 'validation.json'), `${JSON.stringify(validation, null, 1)}\n`]);
 
 // ---------- write or check ----------
@@ -313,9 +462,19 @@ if (check) {
   for (const [file, content] of outputs) await writeFile(file, content);
   console.log(`Wrote ${outputs.length - 1} season snapshots and validation.json to ${path.relative(root, outDir)}`);
   console.log(`  matches: ${JSON.stringify(main.counts)}; ${tour.cup} rubbers whose sides the names could not place: ${unresolved}`);
-  console.log(`  fit ${targets.fitYears.join('-')}: ${fitDiffs.length} targets, mean ${validation.fit.meanDiff}, rms ${validation.fit.rms}, by decade ${JSON.stringify(byDecade)}; later targets mean ${validation.fit.after.meanDiff}`);
+  console.log(`  fit ${targets.fitYears.join('-')}: ${fit.n} targets, mean ${fit.meanDiff}, rms ${fit.rms}, by decade ${JSON.stringify(fit.byDecade)}; later targets mean ${fit.after.meanDiff}`);
   for (const [season, check] of Object.entries(published)) {
     console.log(`  ${season} (${check.method}): current method top 100 ${JSON.stringify(check.current.top100)}, top ten shared ${check.current.topTenShared}, listed ${JSON.stringify(check.current.listed)}`
       + (check.v1 ? `; pre-2018 method ${JSON.stringify(check.v1.top100)}, top ten ${check.v1.topTenShared}` : ''));
+  }
+  if (validation.early) {
+    const { early: e } = validation;
+    console.log(`  before 1973: ${JSON.stringify(e.matches)}; aliases ${JSON.stringify(e.aliases)}; fit mean ${e.fit.meanDiff}, rms ${e.fit.rms}; seam ${Object.entries(e.seam).map(([season, s]) => `${season} ${s.meanDiff}/${s.meanAbsDiff}`).join(', ')}`);
+  }
+  if (validation.checks) {
+    const { topTens, statements } = validation.checks;
+    console.log(`  top tens: ${JSON.stringify(topTens.periods)}; ${Object.entries(topTens.seasons).map(([season, s]) => `${season} ${s.shared}/10 ρ ${s.rho}`).join(', ')}`);
+    for (const statement of statements.yearEnd) console.log(`  ${statement.season}: ${statement.text}; ours ${statement.ours.join(', ')}`);
+    for (const peak of statements.peaks) console.log(`  ${peak.name}: published peak ${peak.published} (${peak.year}); ours ${peak.computed} on ${peak.date}, ${peak.endOfYear} at the end of ${peak.year}`);
   }
 }

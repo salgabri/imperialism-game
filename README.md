@@ -261,8 +261,8 @@ manager of the theatre's favourite, with decisions from the first match.
    hockey its built-in 2026/27, then its [earlier seasons](#ice-hockey-seasons)
    2021/22, 2006/07 and 1994/95 back to 1992/93 (EA's NHL ratings of each),
    nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
-   [earlier seasons](#tennis-seasons) 2025 back to 1973, women's tennis its 2026 (Elo of
-   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1973, rugby league its built-in 2025
+   [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
+   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1968, rugby league its built-in 2025
    (Rugby League 26) then [2008](#rugby-league-seasons) (Rugby League 2, the
    overall ours), NRL clubs on the map of 2008. A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
@@ -1650,10 +1650,10 @@ file in `public/hockey/` that loads only when chosen.
 
 ## Tennis seasons
 
-Tennis can be played on 53 earlier seasons as well as the built-in 2026: the end
-of every year from 1973 to 2025, the ATP's men by Elo, the Davis Cup's nations
-only. Pick one under **Season** in setup. Each season is a file in `public/tennis/`
-(17–56 KB) that loads only when chosen.
+Tennis can be played on 66 earlier seasons as well as the built-in 2026: the end
+of every year from 1960 to 2025, the ATP's men by Elo (before 1968 the amateurs),
+the Davis Cup's nations only. Pick one under **Season** in setup. Each season is a
+file in `public/tennis/` (13–56 KB) that loads only when chosen.
 
 - **2016 to 2025** are Tennis Abstract's own year-end Elo reports, as the Wayback
   Machine kept them. 2016 and 2017 are on its older, higher scale.
@@ -1663,6 +1663,13 @@ only. Pick one under **Season** in setup. Each season is a file in `public/tenni
   and 2017 with the method of that time, the same engine reproduces Tennis
   Abstract's lists (r 0.999 and 0.997); on 2019–2025 it runs about 30 Elo higher
   throughout, which moves no match's odds.
+- **1960 to 1972** are a second run of the same method, warmed up on Sackmann's
+  file of the amateur era (the majors and the Davis Cup, 1877–1967), with its
+  duplicate player ids merged: 1960 to 1967 are the amateurs alone ("Amateur Elo"),
+  the professionals back from 1968, all marked rough. They share about seven of
+  Lance Tingay's year-end ten each season, Laver is first in 1968–1970 as in Tennis
+  Abstract's own Elo, and the run meets the shipped seasons from 1973 within a few
+  points ([design notes](docs/design/tennis.md#before-1973)).
 - **Ratings** are Elo / 25 + 4 as in the built-in season; a season whose best would
   pass 99 (Borg in 1980) is shifted down as a whole, which keeps every match's
   odds. The raw Elo stays with each player.
@@ -1670,13 +1677,13 @@ only. Pick one under **Season** in setup. Each season is a file in `public/tenni
   that year (Lendl for Czechoslovakia in 1985). Czechoslovakia holds Slovakia's land
   through 1992, the Soviet Union the republics' through 1991 (Russia shown), and
   Yugoslavia its six through 1991; West Germany plays as Germany. South Africa
-  (1979–1992) and FR Yugoslavia (1993–1995), barred from the Davis Cup, field no
-  team.
+  (1970–1972 and 1979–1992) and FR Yugoslavia (1993–1995), barred from the Davis
+  Cup, field no team; the Soviet Union plays from 1962, its first cup.
 - **Licence:** Tennis Abstract's ratings and Jeff Sackmann's match data are
   CC BY-NC-SA 4.0 (attribution, non-commercial, share-alike), as for the built-in
   season: `public/tennis/ATTRIBUTION.txt` credits them. `scripts/data/tennis-seasons.json`
-  pins the 107 archive files (the GitHub fork Kadantte/tennis_atp at 712be0c) and the
-  19 captures by SHA-256. To rebuild:
+  pins the 108 archive files (the GitHub fork Kadantte/tennis_atp at 712be0c, the
+  amateur file among them) and the 19 captures by SHA-256. To rebuild:
 
   ```bash
   npm run sync:tennis-seasons    # the year-end lists in scripts/data/tennis-seasons/, from the pinned archive (--check)
@@ -1685,8 +1692,8 @@ only. Pick one under **Season** in setup. Each season is a file in `public/tenni
 
 ## Women's tennis seasons
 
-Women's tennis can be played on 53 earlier seasons as well as the built-in 2026: the
-end of every year from 1973 to 2025, the WTA's women by Elo, the Fed Cup's nations
+Women's tennis can be played on 58 earlier seasons as well as the built-in 2026: the
+end of every year from 1968 to 2025, the WTA's women by Elo, the Fed Cup's nations
 only. Pick one under **Season** in setup. Each season is a file in
 `public/womens-tennis/` (11–53 KB) that loads only when chosen. They are built as the
 men's are, by the same scripts with `--tour=wta`
@@ -1695,13 +1702,14 @@ men's are, by the same scripts with `--tour=wta`
 - **2016 to 2025** are Tennis Abstract's own year-end WTA Elo reports, as the Wayback
   Machine kept them. No capture holds the last 2020 update, so that list stops a week
   before the season's end, and says so.
-- **1973 to 2015** are Elo computed from Jeff Sackmann's WTA match results by Tennis
+- **1968 to 2015** are Elo computed from Jeff Sackmann's WTA match results by Tennis
   Abstract's published method, counting what its report counts: tour-level matches with
   the Fed Cup, tour-level qualifying, WTA 125s and ITF events of $50K or more (none
   before 1994, when the files start naming an event's prize). A newcomer's start at
   tour level is fitted on the career peaks of Tennis Abstract's Tennis 128 (1330, the
   men's 1450). On 2022–2025 the computed lists agree with Tennis Abstract's to within
-  five points; 1973 to 1979 are marked rough.
+  five points; 1968 to 1979 are marked rough (the files start in 1968, so 1968 and
+  1969 are the roughest; 1968–1972 share about eight of Lance Tingay's year-end ten).
 - **Ratings** are Elo / 25 + 4; a season whose best would pass 99 (Navratilova in 1985,
   Graf in 1989) is shifted down as a whole. The raw Elo stays with each player.
 - **Nations of the day:** a player plays for the nation she played the Fed Cup for

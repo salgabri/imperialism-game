@@ -1,8 +1,10 @@
 // Tennis's earlier seasons (docs/design/tennis.md, "Earlier seasons"): Tennis Abstract's own year-end Elo reports for
-// 2016-2025 and Elo computed from Jeff Sackmann's match results by Tennis Abstract's method for 1973-2015, built from
-// committed snapshots; the Davis Cup's nations of each season (Czechoslovakia, the Soviet Union, Yugoslavia, West
-// Germany on today's map, South Africa barred); the per-season shift that keeps the best at 99; the method's checks
-// against every list Tennis Abstract published; the loader and the running App choosing, launching and resuming a season.
+// 2016-2025 and Elo computed from Jeff Sackmann's match results by Tennis Abstract's method for 1973-2015, and for
+// 1960-1972 by a second run warmed up on his amateur file ("Before 1973"), built from committed snapshots; the Davis
+// Cup's nations of each season (Czechoslovakia, the Soviet Union, Yugoslavia, West Germany on today's map, South Africa
+// barred); the per-season shift that keeps the best at 99; the method's checks against every list Tennis Abstract
+// published and the seasons before 1973 against the published top tens; the loader and the running App choosing,
+// launching and resuming a season.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -26,20 +28,21 @@ const VALIDATION = JSON.parse(read('scripts/data/tennis-seasons/validation.json'
 const seasonFile = year => JSON.parse(read(`public/tennis/tennis-${year}.json`));
 const snapshot = year => JSON.parse(read(`scripts/data/tennis-seasons/${year}.json`));
 const squadNames = (doc, nation) => doc.nations[nation][2].map(([name]) => name);
-const YEARS = Array.from({ length: 2025 - 1973 + 1 }, (_, i) => 2025 - i);
+const YEARS = Array.from({ length: 2025 - 1960 + 1 }, (_, i) => 2025 - i);
+const EARLY = MANIFEST.method.early;
 
 // ---------- building ----------
 
 test('every season rebuilds byte for byte from its committed snapshot, and the snapshots from the pinned inputs', () => {
   assert.match(execFileSync(process.execPath, ['scripts/build-tennis-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
-    /Verified the 53 tennis seasons, their listing, attribution and audit byte for byte/);
+    /Verified the 66 tennis seasons, their listing, attribution and audit byte for byte/);
   // The snapshots rebuild from the archive and the captures, cached in the ignored data-src/ (not on a fresh checkout).
   const cached = Object.keys(MANIFEST.archive.files).every(file => existsSync(`${root}/data-src/tennis-seasons/sackmann/${file}`))
     && MANIFEST.reports.every(report => existsSync(`${root}/data-src/tennis-seasons/wayback/elo_${report.capture}.html`))
     && MANIFEST.rankings.every(capture => existsSync(`${root}/data-src/tennis-seasons/wayback/rank_${capture.capture}.html`));
   if (cached) {
     assert.match(execFileSync(process.execPath, ['scripts/sync-tennis-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
-      /Verified the 53 tennis season snapshots and their validation byte for byte/);
+      /Verified the 66 tennis season snapshots and their validation byte for byte/);
   }
   for (const year of YEARS) {
     const data = snapshot(year);
@@ -47,15 +50,20 @@ test('every season rebuilds byte for byte from its committed snapshot, and the s
     assert.equal(data.kind, year >= 2016 ? 'published' : 'computed');
     assert.equal(data.rated, data.players.length);
     assert.ok(data.players.every((row, i) => i === 0 || row[5] <= data.players[i - 1][5]), `${year} runs strongest first`);
-    if (data.kind === 'computed') assert.ok(data.players.every(row => row[6] >= MANIFEST.method.activity), `${year}: ten counted matches each`);
+    // The seasons before 1973 are the second run's: three counted matches each to 1967, ten from 1968, as from 1973.
+    const floor = year >= 1973 ? MANIFEST.method.activity : year >= 1968 ? EARLY.activity.open : EARLY.activity.amateur;
+    if (data.kind === 'computed') assert.ok(data.players.every(row => row[6] >= floor), `${year}: ${floor} counted matches each`);
+    assert.deepEqual([data.run, data.activity], year < 1973 ? ['early', floor] : [undefined, undefined]);
+    assert.equal(new Set(data.players.map(row => row[0])).size, data.players.length, `${year}: no man listed twice`);
   }
-  // Every input is pinned: the 107 files of Sackmann's archive and the 19 captures.
-  assert.equal(Object.keys(MANIFEST.archive.files).length, 107);
+  // Every input is pinned: the 108 files of Sackmann's archive (the amateur file among them) and the 19 captures.
+  assert.equal(Object.keys(MANIFEST.archive.files).length, 108);
+  assert.equal(MANIFEST.archive.files[EARLY.file], '2edfa7ab1a1d14fff924dd824ed261d6bb845d954f13b56699157c0262859912');
   assert.ok(Object.values(MANIFEST.archive.files).every(hash => /^[0-9a-f]{64}$/.test(hash)));
   assert.ok([...MANIFEST.reports, ...MANIFEST.rankings].every(entry => /^[0-9a-f]{64}$/.test(entry.sha256) && /^\d{14}$/.test(entry.capture)));
 });
 
-test('the built-in seasons run from 2025 back to 1973: Tennis Abstract\'s own lists, then Elo computed by its method', () => {
+test('the built-in seasons run from 2025 back to 1960: Tennis Abstract\'s own lists, then Elo computed by its method', () => {
   assert.deepEqual(BUILT_IN_TENNIS_SEASONS.map(set => set.id), YEARS.map(year => `tennis-${year}`));
   assert.equal(builtInSeasonOf('tennis').season, '2026', 'the built-in season stays November 2026\'s');
   const label = year => BUILT_IN_TENNIS_SEASONS.find(set => set.year === year).label;
@@ -64,6 +72,8 @@ test('the built-in seasons run from 2025 back to 1973: Tennis Abstract\'s own li
   assert.equal(label(2017), 'Tennis Abstract Elo, through the ATP Finals', 'the 2017 list never took in the Davis Cup final');
   assert.equal(label(1985), 'Elo from match results, end of 1985');
   assert.equal(label(1975), 'Elo from match results, end of 1975 (rough)', 'the 1970s are rougher, and say so');
+  assert.equal(label(1970), 'Elo from match results, end of 1970 (rough)');
+  assert.equal(label(1962), 'Amateur Elo, end of 1962 (rough)', 'before 1968 the amateurs alone, and rough');
   for (const listed of BUILT_IN_TENNIS_SEASONS) {
     assert.ok(listed.label.length <= 44, `${listed.id}'s label is short`);
     const set = BUILT_IN_SETS.find(entry => entry.id === listed.id);
@@ -103,6 +113,8 @@ test('every season decodes: two to five men a nation, each his source\'s Elo on 
     } else {
       assert.deepEqual([doc.source.edition, doc.source.computed], ['Elo from match results', true]);
       assert.equal(!!doc.source.rough, year <= 1979);
+      assert.equal(!!doc.source.amateurs, year <= 1967);
+      assert.match(doc.source.method, year < 1973 ? /warmed up on Jeff Sackmann's majors and Davis Cup results of 1877-1967/ : /^Tennis Abstract's published Elo method \(/);
     }
   }
 });
@@ -208,6 +220,81 @@ test('the method reproduces Tennis Abstract: its own lists, its season and caree
   }
 });
 
+// ---------- before 1973 ----------
+
+test('before 1973 the amateurs alone: the professionals are missing until 1968, then back, Laver first in 1968-1970', () => {
+  const ids = year => new Set(snapshot(year).players.map(row => row[0]));
+  // Rosewall (100016) turned professional in 1957, Laver (100029) in 1963: the amateur file has no match of theirs.
+  for (let year = 1960; year <= 1967; year++) assert.ok(!ids(year).has('100016'), `Rosewall is not an amateur in ${year}`);
+  for (let year = 1963; year <= 1967; year++) assert.ok(!ids(year).has('100029'), `Laver is not an amateur in ${year}`);
+  assert.equal(snapshot(1962).players[0][1], 'Rod Laver', 'the amateur Grand Slam year');
+  assert.equal(snapshot(1965).players[0][1], 'Roy Emerson');
+  // Open tennis: the professionals come back with their last amateur ratings, uncharged for the years away.
+  for (const id of ['100029', '100016', '100005']) assert.ok(ids(1968).has(id), `${id} plays in 1968`);
+  for (const year of [1968, 1969, 1970]) assert.equal(snapshot(year).players[0][1], 'Rod Laver', `Laver first at the end of ${year}, as Tennis Abstract has him`);
+  assert.equal(snapshot(1972).players[0][1], 'Ilie Nastase');
+  // Ratings on today's scale, no season over 99.
+  for (let year = 1960; year <= 1972; year++) assert.equal(seasonFile(year).source.shift, undefined, `${year} needs no shift`);
+});
+
+test('before 1973 each man once: the amateur file\'s duplicate ids are merged, each pair checked', () => {
+  const { items } = EARLY.aliases;
+  assert.ok(items.length >= 200);
+  const from = new Set(items.map(([id]) => id));
+  assert.equal(from.size, items.length, 'no id merged twice');
+  for (const [merged, kept, name, rule, kind] of items) {
+    assert.notEqual(merged, kept);
+    assert.ok(!from.has(kept), `${name}: no chain`);
+    assert.match(rule, /^(name|initial|born|hand: .+)$/);
+    assert.ok(['davis-cup', 'open-era'].includes(kind));
+  }
+  // Edison Mandarino's Davis Cup id joins Jose Edison Mandarino's: Brazil names him once.
+  for (let year = 1960; year <= 1972; year++) assert.ok(!snapshot(year).players.some(row => row[0] === '109856'), `${year}`);
+  assert.equal(squadNames(seasonFile(1967), '076').filter(name => /Mandarino/.test(name)).length, 1);
+  // Brothers stay two men.
+  assert.ok(squadNames(seasonFile(1968), '208').includes('Torben Ulrich') && squadNames(seasonFile(1968), '208').includes('Jorgen Ulrich'));
+});
+
+test('before 1973 the Davis Cup nations of the day: South Africa barred 1970-1972, the Soviet Union from 1962, the fixes', () => {
+  // South Africa was expelled from the 1970 cup and readmitted in 1973.
+  for (const year of [1968, 1969]) assert.ok(seasonFile(year).nations['710'], `South Africa plays in ${year}`);
+  const audit = JSON.parse(read('docs/design/tennis-seasons-audit.json')).seasons;
+  for (const year of [1970, 1971, 1972]) {
+    assert.ok(!seasonFile(year).nations['710'] && seasonFile(year).territory.inactive.includes('710'), `barred in ${year}`);
+    const barred = audit.find(row => row.id === `tennis-${year}`).leftOut.barred;
+    assert.ok(barred.includes('Cliff Drysdale (RSA)') && barred.includes('Bob Hewitt (RSA)'), `${year}: ${barred}`);
+  }
+  // The Soviet Union's first cup was 1962: Russia holds the other republics from then.
+  assert.ok(!seasonFile(1960).nations['643'] && !seasonFile(1961).nations['643']);
+  assert.ok(seasonFile(1962).nations['643'] && seasonFile(1962).territory.merged['804'] === '643');
+  // Drobny played for Egypt, then Britain; Mulligan was Australian until Italy's team of 1968, Hewitt until 1967.
+  const row = (year, id) => snapshot(year).players.find(entry => entry[0] === id);
+  assert.deepEqual(row(1960, '112517').slice(2, 4), ['GBR', 'fix']);
+  assert.ok(squadNames(seasonFile(1960), '826').includes('Jaroslav Drobny'));
+  assert.deepEqual(row(1962, '100050').slice(2, 4), ['AUS', 'fix']);
+  assert.deepEqual(row(1968, '100050').slice(2, 4), ['ITA', 'davis-cup']);
+  assert.deepEqual(row(1962, '100040').slice(2, 4), ['AUS', 'fix']);
+  assert.deepEqual(row(1967, '100040').slice(2, 4), ['RSA', 'davis-cup']);
+  assert.deepEqual(squadNames(seasonFile(1962), '036'), ['Rod Laver', 'Neale Fraser', 'Roy Emerson', 'Martin Mulligan', 'Bob Hewitt']);
+  // Czechoslovakia and Yugoslavia hold their land while they field a team, as from 1973.
+  assert.equal(seasonFile(1968).territory.merged['703'], '203');
+  assert.equal(seasonFile(1968).territory.merged['191'], '688');
+});
+
+test('before 1973 the second run carries on as the first and agrees with the published top tens', () => {
+  const { early, checks } = VALIDATION;
+  assert.ok(Math.abs(early.fit.meanDiff) < 5 && early.fit.rms < 20, `1973-2000 targets: ${JSON.stringify(early.fit)}`);
+  for (const [season, seam] of Object.entries(early.seam)) assert.ok(seam.meanAbsDiff < 5 && seam.n === 50, `${season}: ${JSON.stringify(seam)}`);
+  // Tingay's ten: about seven shared a season, before and after 1968.
+  assert.ok(checks.topTens.periods.amateur.shared >= 6 && checks.topTens.periods.open.shared >= 6, JSON.stringify(checks.topTens.periods));
+  assert.ok(checks.topTens.periods.amateur.rho > 0.5, JSON.stringify(checks.topTens.periods));
+  assert.deepEqual(Object.keys(checks.topTens.seasons), Array.from({ length: 13 }, (_, i) => String(1960 + i)));
+  // Tennis Abstract's own year ends: Laver first in each.
+  for (const statement of checks.statements.yearEnd) assert.equal(statement.ours[0], 'Rod Laver 1', `${statement.season}`);
+  // Nothing from the published lists is in a season file.
+  assert.ok(!read('public/tennis/tennis-1962.json').includes('Tingay'));
+});
+
 test('the loader refuses a tennis season that is not the builder\'s', () => {
   const doc = seasonFile(1985);
   const broken = edit => { const copy = JSON.parse(JSON.stringify(doc)); edit(copy); return () => decodeFootballSet(copy, copy.id); };
@@ -242,7 +329,8 @@ const B = await bundleComponents({
 }, { jsx: 'automatic' });
 const settle = () => new Promise(resolve => setImmediate(resolve));
 
-async function withApp(fn) {
+// Czechia, Slovakia, the United States, Sweden, Germany and South Africa, unless a test names its own map.
+async function withApp(fn, ids = ['203', '703', '840', '752', '276', '710']) {
   const calls = [];
   const fetch = async url => {
     calls.push(String(url));
@@ -256,8 +344,7 @@ async function withApp(fn) {
   Object.defineProperty(globalThis, 'fetch', { configurable: true, writable: true, value: fetch });
   B.clearFootballSetCache();
   B.clearFootballSetIndex();
-  // Czechia, Slovakia, the United States, Sweden, Germany and South Africa.
-  const f = syncAppFixture({ App: B.App, phase: 'setup', ids: ['203', '703', '840', '752', '276', '710'],
+  const f = syncAppFixture({ App: B.App, phase: 'setup', ids,
     settings: { sport: 'tennis', layer: 'nations', scope: 'world', role: 'spectator', seed: '11' } });
   f.app.opening = B.App.prototype.opening;
   try { return await fn({ ...f, calls }); } finally {
@@ -267,13 +354,15 @@ async function withApp(fn) {
 }
 const modelOf = app => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), domestic: app.domesticStatus(), season: app.seasonStatus() });
 
-test('tennis\'s Season choice lists 2026 and the 53 earlier seasons, newest first', async () => {
+test('tennis\'s Season choice lists 2026 and the 66 earlier seasons, newest first', async () => {
   await withApp(async ({ app, time }) => {
     app.pickSetup('sport', 'tennis');
     const model = modelOf(app);
     assert.deepEqual(model.season.options.map(option => option.name), ['2026', ...YEARS.map(String)]);
     assert.equal(model.season.options[1].label, '2025 · Tennis Abstract Elo, December 2025');
-    assert.equal(model.season.options.at(-1).label, '1973 · Elo from match results, end of 1973 (rough)');
+    assert.equal(model.season.options.find(option => option.name === '1973').label, '1973 · Elo from match results, end of 1973 (rough)');
+    assert.equal(model.season.options.at(-1).label, '1960 · Amateur Elo, end of 1960 (rough)');
+    assert.match(model.season.note, /1960–1979 rough; before 1968 the amateurs' majors and Davis Cup only/);
     app.pickSetup('dataSet', 'tennis-1985');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'tennis-1985']);
     time.advance(200);
@@ -316,6 +405,32 @@ test('a season launches with that year\'s nations, Slovakia in Czechoslovakia\'s
     assert.throws(() => parseCampaign(edited(s => { s.dataSeason = '1984/85'; })), /Campaign data set is invalid/);
     assert.throws(() => parseCampaign(edited(s => { s.layer = 'clubs'; })), /Campaign data set is invalid|layer/i);
   });
+});
+
+test('an amateur season launches with its Davis Cup nations, the Soviet Union holding its republics, and resumes', async () => {
+  await withApp(async ({ app, time, items, calls }) => {
+    app.pickSetup('sport', 'tennis');
+    app.pickSetup('scope', 'world');
+    app.pickSetup('dataSet', 'tennis-1962');
+    time.advance(200);
+    await app.loadSet('tennis-1962');
+    await settle();
+    assert.equal(app.seasonStatus().state, 'ready');
+    const doc = seasonFile(1962);
+    app.startCampaign();
+    const st = app.state;
+    assert.equal(st.phase, 'playing');
+    assert.deepEqual([st.settings.dataSet, st.settings.dataVersion, st.settings.dataYear, st.settings.dataSeason], ['tennis-1962', doc.version, 1962, '1962']);
+    assert.ok(calls.includes('/tennis/tennis-1962.json'));
+    assert.deepEqual(st.teams['036'].squad.map(player => player.name), squadNames(doc, '036'), 'Laver\'s Australia');
+    assert.ok(st.teams['036'].squad.every(player => player.sourceInfo.edition === 'Elo from match results' && !player.gen));
+    assert.equal(st.own['804'], '643', 'Ukraine starts in the Soviet Union\'s empire');
+    assert.deepEqual(st.aliveIds.slice().sort(), Object.keys(doc.nations).sort(), 'the 28 nations of 1962');
+    const saved = parseCampaign(items.get(SAVE_KEY));
+    app.continueSaved(saved);
+    assert.equal(app.state.phase, 'playing');
+    assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams), 'the squads come back exactly');
+  }, ['036', '643', '804', '840', '826', '380']); // Australia, Russia, Ukraine, the United States, Britain and Italy
 });
 
 test('a challenge link to a tennis season loads it', async () => {
