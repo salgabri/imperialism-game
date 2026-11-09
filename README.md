@@ -249,7 +249,8 @@ manager of the theatre's favourite, with decisions from the first match.
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), then 1998/99 (NBA Live 99), 1991/92 and
-   1983/84 (NBA 2K27's MyNBA Eras), which play NBA clubs on the map of their era. American
+   1983/84 (NBA 2K27's MyNBA Eras) and every other season back to 1960/61
+   (computed from Basketball-Reference's statistics), which play NBA clubs on the map of their era. American
    football's lists its built-in 2026 season (Madden NFL 27), then its
    [earlier seasons](#american-football-seasons) 2025 back to 2001 (Madden ratings
    of each launch), then 1995 to 1992 and 1990 (Tecmo Super Bowl, the overall
@@ -1149,12 +1150,13 @@ country-map runtime; NBA campaigns saved before it still resume on the world map
 Each [earlier season](#basketball-seasons) plays on a map of its own era, drawn
 the same way from the arenas of that season: the Grizzlies hold British Columbia
 until 2000/01, the SuperSonics Washington until 2007/08 and the Nets New Jersey
-until 2010/11. Nine era maps
-(`public/domestic/nba2000.json` to `nba2014.json`) cover 1999/00 to 2013/14;
+until 2010/11; in 1960/61 the Warriors hold Pennsylvania and the Syracuse
+Nationals share New York with the Knicks. 42 era maps
+(`public/domestic/nba1961.json` to `nba2014.json`) cover 1960/61 to 2013/14;
 later seasons have today's franchises and play on this map.
 
 ```bash
-npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 6 minutes)
+npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 45 minutes)
 npm run build:nba-map -- --check           # offline rebuild must match the committed files byte for byte
 npm run build:club-maps                    # the NBA's and the NFL's maps together
 ```
@@ -1454,12 +1456,14 @@ runtime, the saves and the known limits.
 
 ## Basketball seasons
 
-Basketball can be played on 30 earlier seasons as well as the built-in 2026/27:
+Basketball can be played on 66 earlier seasons as well as the built-in 2026/27:
 every season from 1999/00 to 2025/26, each from that season's NBA 2K (NBA 2K to
-NBA 2K26), and three before them (below): 1998/99 from NBA Live 99, 1991/92 and
-1983/84 from NBA 2K27's MyNBA Eras. Pick
+NBA 2K26), three before them from other games (below: 1998/99 from NBA Live 99,
+1991/92 and 1983/84 from NBA 2K27's MyNBA Eras), and the 36 others back to
+1960/61, which no game rated, computed from Basketball-Reference's statistics
+(below). Pick
 one under **Season** in setup; it plays NBA clubs only, so it switches Teams to
-clubs. Each season is a file in `public/basketball/` (about 12 KB) that loads
+clubs. Each season is a file in `public/basketball/` (3 to 12 KB) that loads
 only when chosen, with the map of its era.
 
 - **What a season holds:** the franchises of that season, each with the best
@@ -1481,9 +1485,20 @@ only when chosen, with the map of its era.
   May and June 1998. Its overalls run low (28–71), so one line puts them on NBA
   2K's scale, `round(20.22 + 1.089 * raw)`, fitted on the 296 players NBA 2K
   rates in 1999/00 (3.95 points out on average).
-- **What is missing:** any national team (NBA 2K rates NBA players only), the
-  seasons from 1984/85 to 1990/91 and from 1992/93 to 1997/98, and any before
-  1983/84.
+- **Computed seasons:** 1960/61 to 1982/83, 1984/85 to 1990/91 and 1992/93 to
+  1997/98, labelled 'Basketball-Reference (computed)'. One score per player
+  season from Basketball-Reference's statistics in Sumitro Datta's CC0 copy on
+  Kaggle (PER and WS/48 shrunk by minutes, minutes, points, rebounds and
+  assists a game, All-Star and All-NBA picks, defensive win shares), fitted by
+  least squares to NBA 2K's overalls of 1999/00 to 2025/26; each club's 13
+  players with the most minutes are ranked by it and given NBA 2K27's ratings
+  rank for rank. A player traded during a season plays for the club he played
+  the most minutes for. Rated this way, 1983/84 and 1991/92 match NBA 2K27's own
+  ratings of them at a rank correlation of 0.95 and 0.94 (about 2 points out).
+  Specialists rate low (Dennis Rodman does not start for the 1995/96 Bulls),
+  and the engine plays every season with today's rules at that season's pace.
+- **What is missing:** any national team (NBA 2K rates NBA players only), and
+  any season before 1960/61 (no BAA or ABA).
 - **Source:** [2K Archive](https://2karchive.com/), a fan compilation of every
   edition's ratings that names no licence (2K's own rights are not cleared).
   2011/12 comes from [The Real 2K Insider](https://thereal2kinsider.blogspot.com/2011/09/official-nba-2k12-ratings-released.html)'s
@@ -1500,7 +1515,9 @@ only when chosen, with the map of its era.
 
   It writes the season files, their listing `src/data/basketballSeasons.js` and
   `docs/design/basketball-seasons-audit.json`; `npm run build:nba-map` then
-  draws the era maps.
+  draws the era maps. The computed seasons need the CC0 copy's tables in
+  `data-src/research-gaps/basketball/kaggle-sumitrodatta-v57/` (ignored, pinned
+  by SHA-256 in the manifest's `computed`).
 - **Saves** hold every player as played, so a season campaign resumes without
   its season file. It still needs its era's map, as any NBA campaign does.
 

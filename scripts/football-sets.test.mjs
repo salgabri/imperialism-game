@@ -223,7 +223,7 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
   assert.equal(await loadFootballSetIndex({ fetch: none.fetch }), BUILT_IN_SETS, 'the answer is kept');
   assert.equal(none.calls.length, 1, 'read once');
   const builtInId = new RegExp('^(?:(?:eaw?-(?:fifa|fc)-|nba-2k|nba-live-|mlb-the-show-)\\d{2}'
-    + '|(?:madden|tecmo|tennis|wta|nhl|nrl|nba-eras|nba-classic|cm|swos)-\\d{4}|cm0102-\\d{4}-\\d{2}(?:-[a-z0-9]+)?)$');
+    + '|(?:madden|tecmo|tennis|wta|nhl|nrl|nba-eras|nba-classic|nba-stats|cm|swos)-\\d{4}|cm0102-\\d{4}-\\d{2}(?:-[a-z0-9]+)?)$');
   assert.ok(BUILT_IN_SETS.length > 0, 'seasons are built in');
   assert.deepEqual(BUILT_IN_SETS.map(set => set.id).filter(id => !builtInId.test(id)), [], 'every built-in id has a known shape');
 

@@ -1,8 +1,9 @@
 // The NBA's own map (docs/design/domestic-campaigns.md, "The NBA map"): public/domestic/nba.json against
 // its index, its arenas and the game's basketball clubs; the USA and Canada are its only land, each franchise
 // holding its own state or province, with those shared divided between their franchises and every other left
-// empty; neighbours across their border share it; seeded campaigns on the app's board reach a champion; and the
-// running App plays basketball clubs there while a world NBA save stays on the world.
+// empty; neighbours across their border share it; the 1960s and 1970s era maps divide their shared states between the
+// franchises of the day; seeded campaigns on the app's board reach a champion; and the running App plays basketball
+// clubs there while a world NBA save stays on the world.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -127,6 +128,47 @@ test('a state or province goes whole to its one franchise, or stays empty; share
   heldBy({ Tallahassee: [-84.28, 30.44], Gainesville: [-82.33, 29.65], 'Fort Myers': [-81.87, 26.64] }, ['b-miami-heat', 'b-orlando-magic']);
   assert.equal(sectionAt([-77.03, 38.9]), home('b-washington-wizards'), 'the District of Columbia');
   assert.equal(sectionAt([-76.61, 39.29]), null, 'Baltimore: Maryland has no franchise');
+});
+
+test('the 1960s and 1970s maps give each franchise of its day its arena\'s state, shared states divided as they were', () => {
+  const era = id => {
+    const doc = JSON.parse(read(`public/domestic/${id}.json`));
+    const map = decodeDomestic(doc, id);
+    const at = point => map.geo.countries.find(section => pointInPolys(point, section.polys))?.id ?? null;
+    const home = clubId => map.clubs.find(club => club.id === clubId).homeSection;
+    const empty = point => doc.topology.objects.empty.geometries.find(g => pointInPolys(point, polysOf(feature(doc.topology, g).geometry)))?.properties.name ?? null;
+    return { at, home, empty, oneOf: (point, ids) => ids.map(home).includes(at(point)) };
+  };
+  // 1960/61: the Knicks and the Syracuse Nationals divide New York; California is the Lakers', Missouri the Hawks'.
+  const m61 = era('nba1961');
+  assert.equal(m61.at([-76.15, 43.05]), m61.home('b-syracuse-nationals'), 'Syracuse');
+  assert.equal(m61.at([-73.86, 40.85]), m61.home('b-new-york-knicks'), 'the Bronx');
+  assert.ok(m61.oneOf([-73.76, 42.65], ['b-syracuse-nationals', 'b-new-york-knicks']), 'Albany');
+  for (const point of [[-119.79, 36.74], [-122.39, 40.59], [-117.29, 34.11]]) assert.equal(m61.at(point), m61.home('b-los-angeles-lakers'));
+  assert.equal(m61.at([-92.33, 38.95]), m61.home('b-st-louis-hawks'), 'Columbia, Missouri');
+  assert.equal(m61.at([-76.88, 40.27]), m61.home('b-philadelphia-warriors'), 'Harrisburg');
+  assert.deepEqual([m61.at([-89.65, 39.8]), m61.empty([-89.65, 39.8])], [null, 'Illinois'], 'no franchise in Illinois yet');
+  // 1967/68: California's three, the Lakers, the Warriors at the Cow Palace and the San Diego Rockets.
+  const m68 = era('nba1968');
+  for (const point of [[-119.79, 36.74], [-122.39, 40.59], [-117.29, 34.11], [-119.02, 35.37]]) {
+    assert.ok(m68.oneOf(point, ['b-los-angeles-lakers', 'b-san-francisco-warriors', 'b-san-diego-rockets']), String(point));
+  }
+  // 1970/71: Ohio's two, the Royals and the Cavaliers.
+  const m71 = era('nba1971');
+  for (const point of [[-82.99, 39.96], [-84.19, 39.76], [-83.55, 41.65]]) assert.ok(m71.oneOf(point, ['b-cincinnati-royals', 'b-cleveland-cavaliers']));
+  assert.ok(m71.oneOf([-78.88, 42.89], ['b-buffalo-braves']), 'Buffalo');
+  // 1972/73: the Kansas City-Omaha Kings hold Missouri alone; Omaha's Nebraska is nobody's.
+  const m73 = era('nba1973');
+  assert.equal(m73.at([-92.33, 38.95]), m73.home('b-kansas-city-omaha-kings'));
+  assert.deepEqual([m73.at([-96.7, 40.81]), m73.empty([-96.7, 40.81])], [null, 'Nebraska']);
+  // 1976/77: New York's three, the Knicks, the Braves and the New York Nets at Uniondale; New Jersey is nobody's.
+  const m77 = era('nba1977');
+  assert.equal(m77.at([-78.88, 42.89]), m77.home('b-buffalo-braves'), 'Buffalo');
+  assert.equal(m77.at([-73.86, 40.85]), m77.home('b-new-york-knicks'), 'the Bronx');
+  assert.equal(m77.at([-72.66, 40.92]), m77.home('b-new-york-nets'), 'Suffolk County');
+  assert.deepEqual([m77.at([-74.76, 40.22]), m77.empty([-74.76, 40.22])], [null, 'New Jersey']);
+  assert.equal(m77.at([-92.45, 31.31]), m77.home('b-new-orleans-jazz'), 'Louisiana');
+  assert.ok(m77.oneOf([-97.74, 30.27], ['b-houston-rockets', 'b-san-antonio-spurs']), 'Austin');
 });
 
 test('a franchise without a land neighbour reaches its rivals over open ground, and the words say so', () => {
