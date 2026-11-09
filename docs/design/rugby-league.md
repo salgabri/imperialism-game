@@ -47,7 +47,9 @@ Tonga, Samoa and the Cook Islands, whose 46 Test players were the reason to put 
 ([pacific-islands.md](pacific-islands.md)), field their own. Eight nations field NRL players: Australia (90), New
 Zealand (86), Samoa (85), Tonga (83), England (74), Fiji (69), Papua New Guinea (58) and the Cook Islands (55). A lineup
 place a nation's own players cannot fill is the game's to fill with a generated player at the nation's strength, as in
-hockey; a nation with no NRL players is a minnow at the baseline, 45. England, Scotland and Wales play as themselves;
+hockey; a nation with no NRL players is a minnow at the baseline, 45. Since 2026-11-09 a nation whose NRL players hold
+less than half the matchday 17 fields no team (`fieldedNations`): the first six play, while Papua New Guinea, the Cook
+Islands and every nation with no NRL player stay neutral. England, Scotland and Wales play as themselves;
 Ireland is the whole island, so Northern Ireland's shape starts in Ireland's empire.
 
 ## The lineup
@@ -329,7 +331,8 @@ rugby league nations blitz of Asia and Oceania.
   twelve.
 - **Nations campaigns are Australia's to lose.** Eight nations field NRL players and the rest are minnows, so Australia
   wins 84% of Elite 32 campaigns and 78% of world wars, New Zealand, Samoa and Tonga the rest (`probeCampaign` in
-  `scripts/balance.mjs`: 200 and 40 seeded campaigns); in Asia and Oceania Australia won all 200.
+  `scripts/balance.mjs`: 200 and 40 seeded campaigns); in Asia and Oceania Australia won all 200. Since 2026-11-09
+  only the six real sides play, on the world and in Asia & Oceania; rugby league offers no Elite 32.
 - **Tiny Sydney territories.** Ten clubs share New South Wales, eight of them in Sydney. Hemmed in by their neighbours,
   the Roosters (50 km²), the Rabbitohs (133 km²) and the Wests Tigers (145 km²) start with an inner-Sydney council area or
   two, smaller even than Washington's District of Columbia; Parramatta and Penrith take the west of the state.

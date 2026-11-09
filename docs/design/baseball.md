@@ -66,7 +66,9 @@ Netherlands seven to nine of its thirteen places; eleven more one to seven playe
   generated player there at the nation's strength, shown dimmed and asterisked, as
   basketball does. The strength counts those places at the baseline (45).
 - A nation with no MLB players is a minnow at the baseline, 45, whatever its football
-  confederation: baseball is a few nations' sport.
+  confederation: baseball is a few nations' sport. Since 2026-11-09 it fields no team, nor
+  does a nation whose MLB players hold less than half the lineup (`fieldedNations` in
+  `src/engine/footballSets.js`): 12 nations play, and the rest of the land stays neutral.
 - This is birthplace, not World Baseball Classic eligibility: Italy and Israel, whose
   classic teams are heritage players born in the USA, are almost empty, and Japan has
   only its MLB players (no NPB). The game's football nations are likewise dated XIs by
@@ -279,7 +281,7 @@ here it is a season like any other.
   every map. In 2020 the Blue Jays hold their part of New York State, which they
   share with the Yankees and the Mets, and Ontario is nobody's.
 - **Nations.** A season keeps both layers, unlike an NBA season: its nations
-  replace the built-in ones (a nation it does not list is the sport's minnow, 45),
+  replace the built-in ones (a nation it does not list fields no team, nor does one whose players hold less than half the lineup),
   and its clubs the built-in clubs, on its era's map. The loader (`seasonSport` in
   `src/engine/footballSets.js`) binds baseball to both; saves name the set, its
   version and its season ('2024', a calendar year). MLB The Show 19 and 20 name three

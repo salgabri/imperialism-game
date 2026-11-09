@@ -332,7 +332,8 @@ function rosterPlayer([name, listed, rating, metadata]) {
  * Build a nation's squad for a campaign in the given sport.
  *
  * Football, women's and men's, only fields players in its source data; an incomplete export remains
- * visibly incomplete. Other sports retain their generated baseline fillers.
+ * visibly incomplete. Other sports fill a lineup's gaps with generated players. Only a nation with a real side
+ * (fieldsRealSide) fields a team at all.
  * `real` reports how much of the squad came from actual data.
  */
 export function buildTeam(id, rng, sport) {
@@ -637,8 +638,8 @@ export function teamEff(team) {
  * Whether a nation fields a real side in `sport` (a sport object, a season's included): its own rated players hold at
  * least half the places of the lineup it fields, as buildTeam builds it, with generated players wherever the sport fills
  * gaps with them (a pitcher would bat, a goalie skate). A tennis player doubling in the doubles counts once. Its own
- * draw (by the nation's id) builds the team, so the answer never depends on a campaign's. The nation theatres a sport
- * offers count these (data/scopes.js `nationTheatres`).
+ * draw (by the nation's id) builds the team, so the answer never depends on a campaign's. Only these nations field a
+ * team (engine/footballSets.js `fieldedNations`).
  */
 export function fieldsRealSide(id, sport) {
   const players = sport?.rosters?.[id]?.[2];

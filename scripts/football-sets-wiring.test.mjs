@@ -66,7 +66,10 @@ const SET = syntheticSet();
 const INDEX = { format: 1, sets: [{ id: ID, version: SET.version, year: 2002, season: '2001/02', label: SET.label,
   provider: SOURCE.provider, local: true, coverage: SET.coverage }] };
 const SET_URL = `/football/${ID}.json`;
-const UEFA_FIELD = Object.values(NATIONS).filter(nation => nation[2] === 'UEFA').length - 2; // without Montenegro and Kosovo
+const UEFA_NATIONS = Object.values(NATIONS).filter(nation => nation[2] === 'UEFA').length;
+// The set's European teams: without Montenegro and Kosovo, which have no federation, and Luxembourg, whom nobody plays
+// for (a nation fields a team only with a real side).
+const UEFA_FIELD = UEFA_NATIONS - 3;
 
 // ---------- harness ----------
 
@@ -198,9 +201,9 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
       assert.equal(document.querySelector('.setup-launch').disabled, false);
     });
     const teams = app.setupTeams(), byId = new Map(teams.map(team => [team.id, team]));
-    assert.equal(teams.length, UEFA_FIELD, 'the set fields every UEFA nation it has a federation for');
+    assert.equal(teams.length, UEFA_FIELD, 'the set fields every UEFA nation it has a federation and a side for');
     assert.ok(!byId.has('499') && !byId.has('KOS'), 'Montenegro plays for Serbia and Kosovo has no team');
-    assert.deepEqual(byId.get(EMPTY).players, [], 'an empty nation lists nobody');
+    assert.ok(!byId.has(EMPTY), 'an empty nation fields no team');
     assert.ok(byId.get('250').players.every(player => setNames('250').includes(player.name)), 'France fields the set\'s players');
     assert.deepEqual(calls, ['/football/index.json', SET_URL], 'one request for the set');
     const model = buildSetupModel(app.state.setup, { managerTeams: teams, season: app.seasonStatus() });
@@ -346,7 +349,7 @@ test('a set keeps the built-in season\'s country maps out of the club theatres, 
 
 // ---------- launch, saves and names ----------
 
-test('launch builds the nations from the set: Montenegro held by Serbia, Kosovo neutral, an empty nation kept empty', async () => {
+test('launch builds the nations from the set: Montenegro held by Serbia, Kosovo neutral, an empty nation without a team', async () => {
   const files = { '/football/index.json': INDEX, [SET_URL]: SET };
   await withSetup(files, async ({ app, items, calls, time }) => {
     await app.requestSeasons();
@@ -358,7 +361,7 @@ test('launch builds the nations from the set: Montenegro held by Serbia, Kosovo 
     assert.deepEqual(st.teams['250'].squad.map(player => player.name), setNames('250'));
     assert.ok(st.teams['250'].squad.every(player => player.sourceInfo.source === 'cm0102' && player.gen === false));
     assert.equal(st.teams['250'].str, SET.nations['250'][0]);
-    assert.deepEqual([st.teams[EMPTY].squad.length, st.teams[EMPTY].real, st.teams[EMPTY].str], [0, 0, 40], 'nobody is invented');
+    assert.ok(!st.teams[EMPTY] && !(EMPTY in st.own), 'nobody is invented: an empty nation fields no team, its land neutral');
     assert.ok(!st.teams['499'] && st.own['499'] === '688', 'Montenegro starts in Serbia\'s empire');
     assert.ok(!st.teams.KOS && !('KOS' in st.own), 'Kosovo is neutral land');
     for (const settings of [st.settings, st.initialSettings]) {
@@ -492,7 +495,7 @@ test('the built-in season launches exactly as before, beside a listed set', asyn
     assert.ok(!['dataVersion', 'dataYear', 'dataSeason'].some(key => key in st.settings), 'no season stamps');
     assert.equal(st.campaignName, 'Football · Europe');
     assert.equal(app.mapOverlaysModel().titleCard.title, 'The European Campaign');
-    assert.equal(st.aliveIds.length, UEFA_FIELD + 2, 'Montenegro and Kosovo field their own teams');
+    assert.equal(st.aliveIds.length, UEFA_NATIONS, 'every European nation, Montenegro and Kosovo with their own teams');
     assert.deepEqual(st.teams['499'].squad.map(player => player.name), football.rosters['499'][2].map(row => row[0]));
     assert.equal(st.own['499'], '499');
     assert.equal(calls.filter(url => url === SET_URL).length, 1);

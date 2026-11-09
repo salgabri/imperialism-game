@@ -62,7 +62,8 @@ best skaters left, up to 23. The 2026/27 build runs from Carolina's 84.5 to Vanc
 country. 16 nations field players, from Canada (92) and the United States (91) down. A
 lineup place a nation's own players cannot fill is the game's to fill with a generated
 player at the nation's strength, as in baseball; a nation with no NHL players is a minnow
-at the baseline, 45. Great Britain plays as one, so the home nations' shapes start in the
+at the baseline, 45. Since 2026-11-09 a nation whose NHL players hold less than half the lineup, or
+none, fields no team (`fieldedNations`), so seven play and the rest of the land stays neutral. Great Britain plays as one, so the home nations' shapes start in the
 United Kingdom's empire. This is the NHL's players only: no KHL, SHL or Liiga, so Czechia,
 Slovakia and Switzerland are thinner than their real teams.
 
@@ -319,5 +320,6 @@ duel campaign with the live ticker and a hockey nations campaign.
 - NHL players only, by nationality or birth country.
 - Nations campaigns are top-heavy. Half the elite 32 are minnows at the baseline, so the
   United States, Canada and Russia win about four titles in five (`npm run balance`, 1,200
-  campaigns).
+  campaigns). Since 2026-11-09 no minnow plays: the seven real sides play the world and Europe,
+  and hockey offers no Elite 32.
 - No power plays, penalties or fights: a goal is a goal.

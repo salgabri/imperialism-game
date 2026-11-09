@@ -66,18 +66,15 @@ test('they are OFC nations with a capital, a flag and a colour, drawn from the 5
   assert.equal(world.capitals['882'], undefined);
 });
 
-test('each sport fields them where it can: generated where it generates players, nowhere where nobody rates theirs', () => {
+test('each sport fields them only with a real side: rugby league Tonga and Samoa, nobody else', () => {
+  // A nation fields a team only when its own rated players hold half the lineup (fieldedNations): nobody rates the
+  // islanders in football, basketball, baseball, hockey or tennis.
   const fields = Object.fromEntries(SPORT_LIST.filter(sport => !sport.clubsOnly)
     .map(sport => [sport.id, PACIFIC_ISLANDS.filter(id => fieldedNations(sport).includes(id))]));
-  assert.deepEqual(fields, { football: [], 'womens-football': [], basketball: PACIFIC_ISLANDS.slice(), baseball: PACIFIC_ISLANDS.slice(),
-    hockey: PACIFIC_ISLANDS.slice(), tennis: [], 'womens-tennis': [], 'rugby-league': PACIFIC_ISLANDS.slice() });
-  for (const sportId of ['basketball', 'baseball', 'hockey']) {
-    for (const id of PACIFIC_ISLANDS) {
-      const team = buildTeam(id, makeRng(7), getSport(sportId));
-      assert.ok(team.squad.length && team.squad.every(player => player.gen), `${sportId}: ${team.name} is generated, as Fiji is`);
-    }
-  }
-  // Rugby league fields their own: the NRL players of their 2025 Test sides (docs/design/rugby-league.md).
+  assert.deepEqual(fields, { football: [], 'womens-football': [], basketball: [], baseball: [], hockey: [], tennis: [],
+    'womens-tennis': [], 'rugby-league': ['776', '882'] });
+  // Rugby league's are the NRL players of their 2025 Test sides (docs/design/rugby-league.md). The Cook Islands' five
+  // fall short of half a matchday 17.
   for (const [id, real] of [['776', 17], ['882', 17], ['184', 5]]) {
     const team = buildTeam(id, makeRng(7), getSport('rugby-league'));
     assert.ok(team.squad.filter(player => !player.gen).length >= real, `rugby league: ${team.name} fields ${real} NRL players or more`);
@@ -85,11 +82,12 @@ test('each sport fields them where it can: generated where it generates players,
 });
 
 test('a world war plays to a champion whether the islands play or stay neutral, as in a campaign saved before them', () => {
-  // Basketball fields them; football leaves their land neutral, which is how a campaign saved before them resumes.
-  const played = runProductionCampaign({ seed: 20261108, sport: 'basketball', scope: 'world', pacing: 'blitz', resolution: 'instant' });
-  assert.equal(played.startingTeams, 173);
+  // Rugby league fields Tonga and Samoa; football leaves their land neutral, which is how a campaign saved before them
+  // resumes.
+  const played = runProductionCampaign({ seed: 20261108, sport: 'rugby-league', scope: 'world', pacing: 'blitz', resolution: 'instant' });
+  assert.equal(played.startingTeams, 6);
   assert.ok(played.completed);
-  assert.ok(PACIFIC_ISLANDS.every(id => played.outcomes.some(outcome => outcome.split(':').slice(0, 2).includes(id))), 'each island plays');
+  assert.ok(['776', '882'].every(id => played.outcomes.some(outcome => outcome.split(':').slice(0, 2).includes(id))), 'Tonga and Samoa play');
   const neutral = runProductionCampaign({ seed: 20261108, sport: 'football', scope: 'world', pacing: 'blitz', resolution: 'instant' });
   assert.equal(neutral.startingTeams, 173);
   assert.ok(neutral.completed);

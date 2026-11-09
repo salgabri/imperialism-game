@@ -14,11 +14,11 @@ import {
   serveEdge, setChance, setLogitFor, surname, tennisProfile, tiebreakChance,
 } from '../src/sports/tennis.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
-import { acquisitionCandidates } from '../src/engine/campaignExperience.js';
+import { acquisitionCandidates, automaticAcquisition } from '../src/engine/campaignExperience.js';
 import { chartDomain, isLiveModel, liveModelFor, winProbabilityAt, winSeries } from '../src/engine/winProbability.js';
 import { exportCampaign, parseCampaign } from '../src/engine/storage.js';
 import { CLUB_SCOPES } from '../src/data/scopes.js';
-import { buildSetupModel, sportNote } from '../src/screens/setup/setupModel.js';
+import { buildSetupModel, campaignFacts, moreRulesSummary, signingsOffered, sportNote } from '../src/screens/setup/setupModel.js';
 import { challengeQuery, readChallenge } from '../src/screens/setup/challenge.js';
 import { buildSquad } from '../src/viewModels/squad.js';
 import { buildFeedRows, buildLiveMatch, scorersLine } from '../src/viewModels/match.js';
@@ -321,6 +321,30 @@ test('setup offers tennis with nations only, on its built-in 2026 season', () =>
   assert.deepEqual([setup.sport, setup.layer, setup.scope], ['tennis', 'nations', 'UEFA']);
   assert.deepEqual(ignored, ['teams']);
   assert.doesNotMatch(challengeQuery({ sport: 'tennis', layer: 'clubs', scope: 'UEFA' }, 7), /teams=/);
+});
+
+test('Computer signings is no choice in tennis: the best-rated player is always the best fit', () => {
+  // Any player plays any place, so both settings sign the same player for every winner and loser.
+  for (const game of [sport, getSport('womens-tennis')]) {
+    const teams = Object.keys(game.rosters).map(id => buildTeam(id, makeRng(1), game));
+    for (const winner of teams) {
+      for (const loser of teams) {
+        if (winner === loser) continue;
+        assert.equal(automaticAcquisition(winner, loser, 'best-fit')?.index, automaticAcquisition(winner, loser, 'highest-rated')?.index,
+          `${game.id}: ${winner.name} signing from ${loser.name}`);
+      }
+    }
+    assert.equal(signingsOffered(game.id), false, game.id);
+  }
+  assert.ok(signingsOffered('football') && signingsOffered('basketball'));
+  // So setup, the campaign's rules and challenge links leave it out.
+  const settings = { sport: 'tennis', layer: 'nations', scope: 'UEFA', acquisitionPolicy: 'best-fit' };
+  assert.ok(!campaignFacts(settings).some(row => row.id === 'recruitment'));
+  assert.ok(campaignFacts({ ...settings, sport: 'football' }).some(row => row.id === 'recruitment'));
+  assert.equal(moreRulesSummary(settings), 'Standard');
+  assert.deepEqual(readChallenge('?sport=tennis&signings=best-fit').ignored, ['signings']);
+  assert.doesNotMatch(challengeQuery(settings, 7), /signings=/);
+  assert.match(challengeQuery({ ...settings, sport: 'football' }, 7), /signings=best-fit/);
 });
 
 test('the squad screen draws a court with the singles and the doubles, and says who doubles up', () => {

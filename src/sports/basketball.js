@@ -287,8 +287,8 @@ export const basketball = {
   positionPlan: ['PG', 'SG', 'SF', 'PF', 'C'],
   positionColors: { PG: C.gold, SG: C.cyan, SF: C.green, PF: C.red, C: '#B07CD8' },
 
-  // Nations outside the curated list are basketball minnows, well below the
-  // forty federations that field real players.
+  // Only the forty curated federations field a team (fieldedNations: a real side). Built anyway, a nation outside the
+  // list would be all generated at this strength.
   fallbackStrength: (rec, confMeta) => Math.max(40, confMeta[rec[2]].baseStr - 8),
   requiredPositions: [],
 

@@ -191,7 +191,8 @@ export const hockey = {
   positionPlan: ['C', 'C', 'C', 'C', 'LW', 'LW', 'LW', 'LW', 'RW', 'RW', 'RW', 'RW', 'D', 'D', 'D', 'D', 'D', 'D', 'G'],
   positionColors: { C: C.red, LW: C.green, RW: C.green, D: C.cyan, G: C.gold },
 
-  // Nations with no NHL players are hockey's minnows, all alike: the game is a few nations' sport.
+  // A nation whose NHL players hold less than half the lineup fields no team (fieldedNations). Built anyway, one with
+  // none would be all generated at this strength.
   fallbackStrength: () => BASELINE,
   requiredPositions: ['G'],
 

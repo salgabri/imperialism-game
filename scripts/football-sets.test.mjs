@@ -194,9 +194,10 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
   const current = seasonSport(decodeFootballSet(structuredClone(SET), ID));
   assert.ok(islands.every(id => fieldedNations(current).includes(id) && current.rosters[id][2].length === 11));
   // EA rated none of their players, so no EA season lists them. SI's CM 01/02 databases, built on today's map, list all
-  // three as they list every nation, and rate a few (3.9.68 Tongans, Samoans and Cook Islanders, 3.9.60 one Cook
-  // Islander); a listed nation nobody rated fields empty shirts, as in any CM set.
-  const ratedIn = {};
+  // three as they list every nation, and rate a few (3.9.68 nine Cook Islanders, two Tongans and five Samoans, 3.9.60
+  // one Cook Islander). A listed nation fields a team only with half an XI of rated players (fieldedNations): the
+  // Cook Islands in 3.9.68, nobody else.
+  const ratedIn = {}, fieldedIn = {};
   for (const { id } of BUILT_IN_SEASONS) {
     const doc = JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
     const listed = islands.filter(island => Object.hasOwn(doc.nations, island));
@@ -204,9 +205,12 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
     const rated = listed.filter(island => doc.nations[island][2].length > 0);
     if (rated.length) ratedIn[id] = rated;
     const fielded = fieldedNations(seasonSport(decodeFootballSet(doc, id)));
-    assert.deepEqual(islands.filter(island => fielded.includes(island)), listed, id);
+    const playing = islands.filter(island => fielded.includes(island));
+    assert.ok(playing.every(island => listed.includes(island) && doc.nations[island][2].length >= 6), id);
+    if (playing.length) fieldedIn[id] = playing;
   }
   assert.deepEqual(ratedIn, { 'cm0102-2002-11': ['184', '776', '882'], 'cm0102-2001-09': ['184'] });
+  assert.deepEqual(fieldedIn, { 'cm0102-2002-11': ['184'] });
 });
 
 // ---------- the index and the loader ----------
@@ -321,7 +325,8 @@ test('seasonSport binds the set to the football sport; sportOf picks it only onc
 
   assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(football).includes(id)), ['184', '776', '882'],
     'the built-in season fields every nation a source rates: none rates Tonga, Samoa or the Cook Islands');
-  assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(sport).includes(id)).sort(), ['499', 'KOS']);
+  assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(sport).includes(id)).sort(), [EMPTY, '499', 'KOS'],
+    'Montenegro plays for Serbia, Kosovo has no federation and the empty nation no side');
   assert.deepEqual(heldShapes(football), Object.entries(DEPENDENCIES).map(([shape, dep]) => [shape, dep.of]));
   assert.deepEqual(heldShapes(sport).at(-1), ['499', '688'], 'Montenegro starts with Serbia, after the dependencies');
 });
@@ -601,7 +606,7 @@ test('a 170-nation data set world campaign stays inside the save budgets from ki
     await app.startCampaign();
     assert.equal(app.state.phase, 'playing', app.state.saveStatus?.message);
     assert.deepEqual(calls, [`/football/${ID}.json`], 'launch loads the chosen set once');
-    assert.equal(app.state.aliveIds.length, Object.keys(NATIONS).length - 2, 'Montenegro and Kosovo field no team');
+    assert.equal(app.state.aliveIds.length, Object.keys(NATIONS).length - 3, 'Montenegro, Kosovo and the empty nation field no team');
     for (let steps = 0; app.state.aliveIds.length > 1 && steps < 5000; steps++) {
       const st = app.state;
       if (st.match && !st.match.applied) app.finishMatch();
