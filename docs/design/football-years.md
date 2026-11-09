@@ -852,7 +852,7 @@ fan site ShowZone's copies of Sony's cards (docs/design/baseball.md); the built-
 `mlb2020`, `mlb2021`, `mlb2022`, `mlb2025`). They are data sets of `kind: 'show'` (`mlb-the-show-<nn>`), and unlike
 an NBA season they field **nations** as well as clubs: `nations` holds each nation
 with MLB players born there (`[strength, players, squad]`, the built-in shape), a
-nation it does not list being the sport's minnow, and `clubs` the MLB of that year,
+nation it does not list fielding no team (a minnow before 2026-11-09), and `clubs` the MLB of that year,
 each `[name, 'SS/2B', rating]`, on its era's map (`mlb2021`, `mlb2022` for 2022–24,
 `mlb2025`). A season's `season` is its calendar year ('2024'), not football's
 '2023/24'. The built files, era maps, the Oakland Athletics and the edition whose

@@ -9,8 +9,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { GREAT_BRITAIN, HOME_NATIONS, NATIONS, buildTeam, makeRng, nationIdentity } from '../src/data/teams.js';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { SPORT_LIST, getSport } from '../src/sports/index.js';
-import { nationTheatres } from '../src/data/scopes.js';
-import { decodeFootballSet, seasonSport } from '../src/engine/footballSets.js';
+import { decodeFootballSet, fieldedNations, seasonSport } from '../src/engine/footballSets.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { exportCampaign, parseCampaign } from '../src/engine/storage.js';
 import { bundleApp, bundleComponents, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
@@ -62,13 +61,15 @@ test('Great Britain flies the vendored Union Jack; England keeps the cross of St
 });
 
 test('the setup wall lists Great Britain under the Union Jack where the sport plays it, England in football', async () => {
-  for (const sport of [...AS_ONE, 'football']) {
+  // Great Britain fields a team where its own rated players hold half the lineup (fieldedNations): in both tennis games.
+  // Its basketball, baseball and hockey players are too few, and its land stays neutral there.
+  const playing = AS_ONE.filter(sport => fieldedNations(getSport(sport)).includes('826'));
+  assert.deepEqual(playing, ['tennis', 'womens-tennis']);
+  for (const sport of [...playing, 'football']) {
     const [name, code, flagId] = sport === 'football' ? ENGLAND : GB;
     const flag = sport === 'football' ? '/flags/gb-eng.svg' : '/flags/gb.svg';
-    // Europe where the sport offers it; baseball, with too few European sides of its own, plays the world (data/scopes.js).
-    const scope = nationTheatres(getSport(sport)).some(theatre => theatre.id === 'UEFA') ? 'UEFA' : 'world';
     const f = syncAppFixture({ App, ids: IDS, phase: 'setup',
-      settings: { sport, layer: 'nations', scope, role: 'manager', managedTeamId: '826', seed: '7' } });
+      settings: { sport, layer: 'nations', scope: 'UEFA', role: 'manager', managedTeamId: '826', seed: '7' } });
     try {
       f.app.opening = App.prototype.opening; // every nation of the theatre, built for the sport (the fixture's are football's)
       const setup = f.app.state.setup;

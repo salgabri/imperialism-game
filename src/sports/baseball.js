@@ -222,7 +222,8 @@ export const baseball = {
   positionColors: { C: C.gold, '1B': C.cyan, '2B': C.cyan, '3B': C.cyan, SS: C.cyan, LF: C.green, CF: C.green, RF: C.green,
     DH: C.red, SP: '#B07CD8', RP: '#7FA7E8' },
 
-  // Nations with no MLB players are baseball's minnows, all alike: the game is a few nations' sport.
+  // A nation whose MLB players hold less than half the lineup fields no team (fieldedNations). Built anyway, one with
+  // none would be all generated at this strength.
   fallbackStrength: () => BASELINE,
   requiredPositions: ['SP'],
 

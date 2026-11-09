@@ -50,10 +50,10 @@ They are OFC nations, culture `pac`, so the Asia & Oceania theatre includes them
 | --- | --- | --- |
 | Football | no team; land neutral | No source rates their players (below) |
 | Women's football | no team; land neutral | Its existing rule: a nation with no rated player fields no team |
-| Basketball, ice hockey, baseball | generated sides | These sports generate players for every nation they have none for, as for Fiji |
+| Basketball, ice hockey, baseball | no team; land neutral | Generated sides until 2026-11-09; since then a nation fields a team only with a real side (`fieldedNations`) |
 | Tennis | no team; land neutral | Its existing rule: no Elo-rated player, no team |
 | American football | — | Clubs only |
-| Rugby league | their own sides | Their 2025 Test players and the NRL players born there (below) |
+| Rugby league | Tonga and Samoa; the Cook Islands no team | Their 2025 Test players and the NRL players born there (below); since 2026-11-09 the Cook Islands' five fall short of half a matchday 17 |
 
 Football had fielded every nation on the map, each with eleven source-backed players. EA FC 27 rates no Tongan,
 Samoan or Cook Islands player, and the FM 26 snapshot was taken as the top 100 players of each nation then on the
@@ -85,7 +85,8 @@ database with a Tongan player now lists the islands, and he plays for Tonga.
 - **Clubs.** Dealing clubs onto the world (women's clubs, earlier football seasons) never reaches the islands:
   every club list is dealt exactly as before.
 - **Counts.** The map has 176 nations. A sport fields 173 at most: football leaves out the islands, and
-  basketball, ice hockey and baseball play Great Britain as one.
+  basketball, ice hockey and baseball play Great Britain as one. Since 2026-11-09 a nation fields a team only with
+  a real side, so most sports field far fewer (README, "Nations").
 
 ## Rugby league
 
@@ -99,5 +100,5 @@ Zealand; the Cook Islands field five NRL players and the game fills the rest ([r
 - `PACIFIC_ISLANDS` in `src/data/teams.js` lists the three ids. The builders, the loader and the tests read it.
 - Football's `territory` (`src/sports/football.js`) is computed from its rosters, as women's football's is.
 - `scripts/pacific-islands.test.mjs` checks the rings, the nations, which sports field them, and a world war with
-  them playing (basketball) and neutral (football, which is also how a campaign saved before them resumes).
+  them playing (rugby league: Tonga and Samoa) and neutral (football, which is also how a campaign saved before them resumes).
   `campaign-reachability.test.mjs` probes Tonga and the Cook Islands alone against everyone else in the final two.

@@ -280,7 +280,8 @@ export const rugbyLeague = {
   positionColors: { FB: C.gold, WG: C.red, CE: '#E0904A', FE: C.green, HB: C.green, HK: '#7FA7E8', PR: C.cyan, SR: '#B07CD8',
     LK: '#8FCFA0' },
 
-  // Nations with no NRL players are rugby league's minnows, all alike.
+  // A nation whose NRL players hold less than half the matchday 17 fields no team (fieldedNations). Built anyway, one
+  // with none would be all generated at this strength.
   fallbackStrength: () => BASELINE,
   requiredPositions: ['HB'],
 

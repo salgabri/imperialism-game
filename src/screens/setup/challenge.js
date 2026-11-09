@@ -10,7 +10,7 @@ import { BUILT_IN_SETS, setHasClubs, setHasNations, setSportOf, sportOf } from '
 import { DEFAULT_SETUP, dataSetOf, setClubScope } from '../../app/shared.js';
 import {
   DRAW_CARDS, FINALE_OPTIONS, HOME_OPTIONS, RECRUITMENT_OPTIONS, ROSTER_OPTIONS, SHOW_MATCH_OPTIONS, TARGETING_CARDS,
-  UNCERTAINTY_OPTIONS, rulesOf, showMatchesOf,
+  UNCERTAINTY_OPTIONS, rulesOf, showMatchesOf, signingsOffered,
 } from './setupModel.js';
 
 /** A link's query keys, in the order it writes them. */
@@ -101,7 +101,8 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   });
   take('upsets', value => offers(UNCERTAINTY_OPTIONS, value), value => { setup.uncertainty = value; });
   take('final', value => offers(FINALE_OPTIONS, value), value => { setup.finale = value; });
-  take('signings', value => offers(RECRUITMENT_OPTIONS, value), value => { setup.acquisitionPolicy = value; });
+  // Computer signings is no choice in tennis (setupModel.js `signingsOffered`).
+  take('signings', value => signingsOffered(sport.id) && offers(RECRUITMENT_OPTIONS, value), value => { setup.acquisitionPolicy = value; });
   take('home', value => offers(HOME_OPTIONS, value), value => { setup.homeAdvantage = value; });
   // Team strengths is a basketball rule.
   take('strengths', value => sport.id === 'basketball' && offers(ROSTER_OPTIONS, value), value => { setup.rosterPreset = value; });
@@ -151,7 +152,7 @@ export function challengeQuery(settings = {}, seed = settings?.seed) {
     show: show !== 'ticker' ? show : null,
     upsets: s.uncertainty !== 'balanced' && offers(UNCERTAINTY_OPTIONS, s.uncertainty) ? s.uncertainty : null,
     final: s.finale === 'best-of-three' ? s.finale : null,
-    signings: s.acquisitionPolicy === 'best-fit' ? s.acquisitionPolicy : null,
+    signings: signingsOffered(sport.id) && s.acquisitionPolicy === 'best-fit' ? s.acquisitionPolicy : null,
     home: s.homeAdvantage === 'on' ? s.homeAdvantage : null,
     strengths: sport.id === 'basketball' && s.rosterPreset === 'competitive' ? s.rosterPreset : null,
     role: manager ? 'manager' : null,

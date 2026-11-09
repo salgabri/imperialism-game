@@ -121,7 +121,7 @@ test('a back moves between the outside places, a forward round the pack; a winge
   assert.equal(penaltyAt([...rest('SR'), player('Swap', 'CE', ['CE', 'SR'])], 'SR'), 0, 'a second position is his own');
 });
 
-test('nations field their NRL players, the game fills what they lack, and a nation with none is a minnow', () => {
+test('nations field their NRL players and the game fills what they lack; a nation without half a side fields no team', () => {
   const strongest = Object.entries(ROSTERS).sort((a, b) => b[1][0] - a[1][0]).map(([id]) => id);
   assert.deepEqual(strongest.slice(0, 2), ['036', '554'], 'Australia, then New Zealand');
   assert.ok(strongest.includes('826') && strongest.includes('242') && strongest.includes('598'), 'England, Fiji and Papua New Guinea');
@@ -138,12 +138,17 @@ test('nations field their NRL players, the game fills what they lack, and a nati
   assert.ok(lineup.starters.some(player => player.gen) && lineup.starters.some(player => player.name === 'Xavier Coates'));
   const brazil = buildTeam('076', rng, sport);
   assert.equal(brazil.real, 0);
-  assert.equal(brazil.str, BASELINE, 'a nation with no NRL players is a minnow');
+  assert.equal(brazil.str, BASELINE, 'built anyway, a nation with no NRL players would be all generated');
   assert.equal(brazil.squad.length, 17);
   assert.ok(teamEff(australia) > teamEff(png) && teamEff(png) > teamEff(brazil));
+  // Only a nation whose NRL players hold half its matchday 17 fields a team (fieldedNations): Papua New Guinea's six and
+  // the Cook Islands' five fall short.
+  assert.deepEqual(fieldedNations(sport).slice().sort(), ['036', '242', '554', '776', '826', '882'],
+    'Australia, Fiji, New Zealand, Tonga, England and Samoa');
   assert.ok(!fieldedNations(sport).includes('NIR') && heldShapes(sport).some(([shape, holder]) => shape === 'NIR' && holder === '372'),
     'Ireland is the whole island');
-  assert.ok(fieldedNations(sport).includes('SCO') && fieldedNations(sport).includes('WAL'), 'Scotland and Wales play as themselves');
+  assert.ok(!Object.hasOwn(sport.territory.merged, 'SCO') && !Object.hasOwn(sport.territory.merged, 'WAL'),
+    'Scotland and Wales are nations of their own, with no NRL side to field');
 });
 
 // ---------- the match model ----------

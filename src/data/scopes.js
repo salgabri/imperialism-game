@@ -4,12 +4,12 @@
 // football's play every European club or the elite on maps of Europe, or the NWSL on its own USA (src/data/clubMaps.js).
 // Nation theatres live in SCOPES in teams.js; which of them a sport offers is decided here (`nationTheatres`).
 import { nationPriority } from './domesticTiers.js';
-import { NATIONS, SCOPES, fieldsRealSide } from './teams.js';
+import { NATIONS, SCOPES } from './teams.js';
 import { fieldedNations } from '../engine/footballSets.js';
 
-/** How many of a continent's nations must field a real side (teams.js `fieldsRealSide`) for a sport to offer it. */
+/** How many of a continent's nations must field a team, each a real side (footballSets.js `fieldedNations`), for a sport to offer it. */
 export const MIN_REAL_SIDES = 4;
-/** The Elite theatre's size: a sport offers it once that many nations field a real side. */
+/** The Elite theatre's size: a sport offers it once that many nations field a team. */
 export const ELITE_NATIONS = 32;
 
 const nationTheatreCache = new WeakMap();
@@ -22,7 +22,8 @@ const nationTheatreCache = new WeakMap();
  */
 function theatresOf(sport) {
   if (!nationTheatreCache.has(sport)) {
-    const real = fieldedNations(sport).filter(id => fieldsRealSide(id, sport));
+    // Only nations with a real side field a team.
+    const real = fieldedNations(sport);
     const sides = scope => real.filter(id => scope.filter({ conf: NATIONS[id][2] })).length;
     const offered = Object.freeze(SCOPES.filter(scope => scope.id === 'world'
       || (scope.id === 'elite' ? real.length >= ELITE_NATIONS : sides(scope) >= MIN_REAL_SIDES)));

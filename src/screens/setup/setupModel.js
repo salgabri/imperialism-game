@@ -3,7 +3,7 @@
 // The in-game settings panel reads the same option lists, Show matches helpers and `campaignFacts`.
 // Everything here is a pure function of the setup record and the opening teams App already computes
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
-import { NATIONS, SCOPES, nationIdentity } from '../../data/teams.js';
+import { NATIONS, SCOPES, isTennisSport, nationIdentity } from '../../data/teams.js';
 import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
@@ -87,6 +87,11 @@ export const FINALE_HELP = {
   'best-of-three': 'The last two teams play until one has won twice.',
 };
 export const RECRUITMENT_OPTIONS = Object.freeze([['highest-rated', 'Best-rated player'], ['best-fit', 'Best lineup fit']]);
+/**
+ * Whether Computer signings is a choice in a sport (an id). In tennis any player plays any place, so the best-rated
+ * player is always the best fit and the two settings sign the same player: the choice is left out there.
+ */
+export const signingsOffered = sportId => !isTennisSport(sportId);
 export const RECRUITMENT_HELP = {
   'highest-rated': "After a win, a team you don't manage signs the loser's highest-rated player.",
   'best-fit': "After a win, a team you don't manage signs the loser's player who most improves its starting lineup.",
@@ -148,7 +153,9 @@ export function moreRulesSummary(setup = {}) {
   const uncertainty = valid(UNCERTAINTY_OPTIONS, setup.uncertainty, 'balanced');
   if (uncertainty !== 'balanced') parts.push(`Upsets: ${nameOf(UNCERTAINTY_OPTIONS, uncertainty)}`);
   if (setup.finale === 'best-of-three') parts.push(`Final: ${nameOf(FINALE_OPTIONS, 'best-of-three')}`);
-  if (setup.acquisitionPolicy === 'best-fit') parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
+  if (setup.acquisitionPolicy === 'best-fit' && signingsOffered(getSport(setup.sport).id)) {
+    parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
+  }
   if (setup.homeAdvantage === 'on') parts.push(`Home advantage: ${nameOf(HOME_OPTIONS, 'on')}`);
   if (setup.rosterPreset === 'competitive' && getSport(setup.sport).id === 'basketball') {
     parts.push(`Team strengths: ${nameOf(ROSTER_OPTIONS, 'competitive')}`);
@@ -161,7 +168,8 @@ export function moreRulesSummary(setup = {}) {
 /**
  * The in-game settings' read-only "This campaign" rows, from the launched settings. Missing or unknown values read as
  * their defaults, so old saves and partial fixtures never show `undefined`. `stored` is the value behind the text.
- * Home advantage has a row only when it is on, as team strengths has one only in basketball.
+ * Home advantage has a row only when it is on, as team strengths has one only in basketball and computer signings
+ * none in tennis.
  * → [{ id, label, value, stored, inner?: { id, stored }, num? }]
  */
 export function campaignFacts(settings = {}, { seed = null, managementEnded = false, managedName = null } = {}) {
@@ -190,8 +198,10 @@ export function campaignFacts(settings = {}, { seed = null, managementEnded = fa
   rows.push(
     { id: 'uncertainty', label: 'Upsets', value: nameOf(UNCERTAINTY_OPTIONS, uncertainty), stored: uncertainty },
     { id: 'finale', label: 'Final', value: nameOf(FINALE_OPTIONS, finale), stored: finale },
-    { id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment },
   );
+  if (signingsOffered(getSport(s.sport).id)) {
+    rows.push({ id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment });
+  }
   if (s.homeAdvantage === 'on') rows.push({ id: 'home-advantage', label: 'Home advantage', value: nameOf(HOME_OPTIONS, 'on'), stored: 'on' });
   if (s.sport === 'basketball') rows.push({ id: 'roster-preset', label: 'Team strengths', value: nameOf(ROSTER_OPTIONS, roster), stored: roster });
   if (seed != null && String(seed) !== '') rows.push({ id: 'seed', label: 'Seed', value: String(seed), stored: String(seed), num: true });
@@ -326,19 +336,20 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
   football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1996/97: '
-    + 'Sensible World of Soccer\'s), with clubs from the seven biggest leagues. Nations without eleven rated players start '
-    + 'short-handed. 2005/06, 2004/05 and 1996/97 have nations only.',
+    + 'Sensible World of Soccer\'s), with clubs from the seven biggest leagues. A nation with fewer than six rated players '
+    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1996/97 have nations only.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
-    + 'EA rated national teams only until 2021/22. Nations without eleven rated players start short-handed, and a nation '
-    + 'with none fields no team.',
+    + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
+    + 'without eleven starts short-handed.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
     + 'scoring, marked as one. Rosters as of 7 November 2026. Earlier seasons use EA\'s ratings of that season, nothing '
     + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
     + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings, clubs on '
     + 'the map of their day. Nations field the NHL '
-    + 'players of each country.',
+    + 'players of each country, and only where they hold at least half the lineup.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
-    + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace. 2008 '
+    + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
+    + 'least half a matchday 17. 2008 '
     + 'comes from Rugby League 2: World Cup Edition\'s database, every player checked against the Rugby League Project. '
     + 'The game rates attributes, not players, so the overall is ours, each club then moved by the game\'s own team '
     + 'rating. It has NRL clubs only, on the map of 2008.',
@@ -349,7 +360,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
     + 'overall ours. NFL clubs only: the franchises of that season, on the map of their day.',
   baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October; 2018–2020 as the fan site '
-    + 'ShowZone keeps them). Nations field the players born there; clubs play on the map of their day, the Athletics in '
+    + 'ShowZone keeps them). Nations field the players born there, where they hold at least half the lineup; clubs play on '
+    + 'the map of their day, the Athletics in '
     + 'Oakland until 2024.',
   'womens-tennis': 'Elo ratings of the WTA\'s women: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; '
     + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1973–1979 rough). Each nation names its five '

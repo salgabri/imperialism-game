@@ -71,20 +71,24 @@ test('a nation short of eleven starts short-handed, and nothing is invented', ()
     assert.equal(team.squad.length, ROSTERS[id][2].length, `${team.name} fields only its rated players`);
     assert.ok(team.squad.length <= 11);
   }
-  const zambia = buildTeam('894', makeRng(7), sport);
-  assert.ok(zambia.squad.length < 11 && zambia.squad.some(player => /Banda/.test(player.name)), 'Zambia has Barbra Banda and few others');
-  const lineup = selectLineup(zambia);
+  const morocco = buildTeam('504', makeRng(7), sport);
+  assert.ok(fieldedNations(sport).includes('504'), 'seven rated players: half an XI and more, so Morocco plays');
+  assert.ok(morocco.squad.length === 7 && morocco.squad.some(player => /Saoud/.test(player.name)), 'Morocco has Saoud and six others');
+  const lineup = selectLineup(morocco);
   assert.ok(lineup.slots.some(slot => !slot.player && slot.effectiveRating === 40), 'an empty shirt counts 40');
-  assert.ok(teamEff(zambia) < teamEff(buildTeam('724', makeRng(7), sport)), 'short-handed, however good her star');
-  const squad = buildSquad({ teams: { [zambia.id]: zambia }, aliveIds: [zambia.id], history: [] }, { sport }, zambia.id);
+  assert.ok(teamEff(morocco) < teamEff(buildTeam('724', makeRng(7), sport)), 'short-handed');
+  const squad = buildSquad({ teams: { [morocco.id]: morocco }, aliveIds: [morocco.id], history: [] }, { sport }, morocco.id);
   assert.ok(squad.notes.some(note => /Source data covers/.test(note)), 'the squad screen says so');
 });
 
-test('a nation with no rated player fields no team and her land stays neutral', () => {
+test('a nation without half an XI of rated players fields no team and her land stays neutral', () => {
   const fielded = fieldedNations(sport);
-  assert.deepEqual(fielded.slice().sort(), Object.keys(ROSTERS).sort());
-  assert.ok(fielded.length < Object.keys(NATIONS).length);
-  for (const id of ['826', 'SCO', 'WAL', 'NIR']) assert.ok(fielded.includes(id), `${NATIONS[id][0]} plays on her own`);
+  assert.deepEqual(fielded.slice().sort(), Object.keys(ROSTERS).filter(id => ROSTERS[id][2].length >= 6).sort());
+  assert.ok(fielded.length < Object.keys(ROSTERS).length);
+  for (const id of ['826', 'SCO', 'WAL']) assert.ok(fielded.includes(id), `${NATIONS[id][0]} plays on her own`);
+  assert.ok(Object.hasOwn(ROSTERS, 'NIR') && !fielded.includes('NIR'), 'Northern Ireland\'s four rated players field no team');
+  assert.ok(ROSTERS['894'][2].some(player => /Banda/.test(player[0])) && !fielded.includes('894'),
+    'nor do Zambia\'s three, Barbra Banda among them');
   assert.ok(!Object.hasOwn(ROSTERS, '004') && !fielded.includes('004'), 'Afghanistan has no team');
   assert.deepEqual(['724', '826', '250', '276', '840'].filter(id => ROSTERS[id][0] >= 84).length, 5, 'the big five lead');
   const best = Object.entries(ROSTERS).sort((a, b) => b[1][0] - a[1][0])[0];
@@ -156,7 +160,7 @@ test('setup lists women\'s football after football, with nations and clubs on th
   assert.deepEqual(nations.season.options.map(option => option.name), ['2026/27']);
   assert.match(nations.season.note, /short-handed/);
   assert.ok(nations.scopes.every(scope => scope.count >= 1), JSON.stringify(nations.scopes.map(scope => [scope.id, scope.count])));
-  assert.equal(nations.scopes.find(scope => scope.id === 'world').count, Object.keys(ROSTERS).length);
+  assert.equal(nations.scopes.find(scope => scope.id === 'world').count, Object.values(ROSTERS).filter(([, , players]) => players.length >= 6).length);
   const clubs = buildSetupModel({ sport: 'womens-football', layer: 'clubs', clubScope: 'domestic:nwsl' }, {});
   assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]),
     [['domestic:weu', 'Europe', 68], ['domestic:weu32', 'Elite 32', 32], ['domestic:nwsl', 'NWSL', 16]]);

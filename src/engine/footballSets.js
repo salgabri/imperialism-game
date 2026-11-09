@@ -8,7 +8,7 @@
 // bound to the season. The built-in data (src/data/rosters.js, clubs.football.js, the basketball and baseball modules)
 // never changes.
 
-import { DEPENDENCIES, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS } from '../data/teams.js';
+import { DEPENDENCIES, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS, fieldsRealSide } from '../data/teams.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
 import { SWOS_CONVERSION, SWOS_ROLES, SWOS_SCALE, expandSwosTuple, swosTupleOf } from '../data/swosPlayers.js';
@@ -910,10 +910,21 @@ export function sportOf(config) {
   return loaded ? seasonSport(loaded) : null;
 }
 
-/** Nations fielding a team in the sport's season: a data set leaves out shapes merged into another federation or with none. */
+const fieldedCache = new WeakMap();
+/**
+ * Nations fielding a team in the sport's season (a sport object): a data set leaves out shapes merged into another
+ * federation or with none, and only a nation with a real side plays (teams.js `fieldsRealSide`: its own rated players
+ * hold at least half its lineup), so no team is made up or nearly empty. Every other nation's land stays neutral.
+ * Frozen and cached per sport object.
+ */
 export function fieldedNations(sport) {
+  const cacheable = !!sport && typeof sport === 'object';
+  if (cacheable && fieldedCache.has(sport)) return fieldedCache.get(sport);
   const { merged, inactive } = sport?.territory || NO_TERRITORY;
-  return Object.keys(NATIONS).filter(id => !Object.hasOwn(merged, id) && !inactive.includes(id));
+  const fielded = Object.freeze(Object.keys(NATIONS)
+    .filter(id => !Object.hasOwn(merged, id) && !inactive.includes(id) && fieldsRealSide(id, sport)));
+  if (cacheable) fieldedCache.set(sport, fielded);
+  return fielded;
 }
 
 /** Shapes that start in another nation's empire, as [shape, holder]: overseas dependencies, then a set's merged federations. */

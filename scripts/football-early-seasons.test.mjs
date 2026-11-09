@@ -136,20 +136,25 @@ test('the federations of the seasons\' own years: FR Yugoslavia holds Montenegro
   const year = id => committed(id).year;
   for (const id of IDS) assert.deepEqual(committed(id).territory, territoryFor(FOOTBALL_FEDERATIONS, year(id)), id);
   const of = id => seasonSport(decodeFootballSet(committed(id)));
-  // 1996/97: Bosnia (FIFA, July 1996) plays; Eritrea, Palestine (1998), Mongolia (July 1998) and Bhutan (2000) do not.
+  // A FIFA member of the season's year: neither merged into another federation nor inactive. It fields a team only with
+  // a real side (fieldedNations).
+  const member = (sport, shape) => !Object.hasOwn(sport.territory.merged, shape) && !sport.territory.inactive.includes(shape);
+  // 1996/97: Bosnia (FIFA, July 1996) is a member; Eritrea, Palestine (1998), Mongolia (July 1998) and Bhutan (2000) are not.
   const swos = of('swos-9697');
   assert.deepEqual(swos.territory.merged, { 499: '688', 540: '250', 728: '729', KOS: '688' });
   assert.ok(['064', '232', '275', '496', '626'].every(shape => swos.territory.inactive.includes(shape)));
-  assert.ok(fieldedNations(swos).includes('070') && !fieldedNations(swos).includes('KOS'));
+  assert.ok(member(swos, '070') && !member(swos, 'KOS') && !fieldedNations(swos).includes('KOS'));
+  assert.ok(!fieldedNations(swos).includes('070'), 'Bosnia, with no SWOS player, fields no team');
   assert.ok(heldShapes(swos).some(([shape, holder]) => shape === 'KOS' && holder === '688'));
-  // 1997/98: Eritrea and Palestine play; Mongolia joined after the season.
+  // 1997/98: Eritrea and Palestine are members; Mongolia joined after the season.
   const cm97 = of('cm-9798');
   assert.equal(cm97.territory.merged.KOS, '688');
-  assert.ok(fieldedNations(cm97).includes('232') && fieldedNations(cm97).includes('275') && !fieldedNations(cm97).includes('496'));
-  // 1998/99: the United Nations took Kosovo over on 10 June 1999, before the season's end; Mongolia plays, Bhutan not yet.
+  assert.ok(member(cm97, '232') && member(cm97, '275') && !member(cm97, '496'));
+  // 1998/99: the United Nations took Kosovo over on 10 June 1999, before the season's end; Mongolia is a member, Bhutan
+  // not yet.
   const cm3 = of('cm0102-2020-11-cm3');
   assert.ok(cm3.territory.inactive.includes('KOS') && !Object.hasOwn(cm3.territory.merged, 'KOS'));
-  assert.ok(fieldedNations(cm3).includes('496') && !fieldedNations(cm3).includes('064'));
+  assert.ok(member(cm3, '496') && !member(cm3, '064'));
   // From 2001/02 every one of them plays but Montenegro, Kosovo, Timor-Leste, New Caledonia and South Sudan.
   for (const id of ['cm0102-2001-09', 'cm0102-2002-11']) {
     assert.deepEqual(committed(id).territory, { merged: { 499: '688', 540: '250', 728: '729' }, inactive: ['626', 'KOS'] }, id);
@@ -415,7 +420,7 @@ test('the running App launches a 1996/97 nations campaign on SWOS\'s squads, and
       && player.rating === swosGameRating(player.sourceInfo.rawRating)));
     // FR Yugoslavia holds Montenegro and Kosovo; Bosnia had joined FIFA.
     assert.ok(!st.teams['499'] && !st.teams.KOS && st.own['499'] === '688' && st.own.KOS === '688');
-    assert.ok(st.teams['070'], 'Bosnia fields its (empty) team');
+    assert.ok(!st.teams['070'] && !('070' in st.own), 'Bosnia, a member with no SWOS player, fields no team: its land is neutral');
     resumes(fixture, '/football/swos-9697.json', { kind: 'swos', source: { provider: 'Sensible Software', edition: 'SWOS 96/97',
       version: doc.source.version, snapshotDate: '1996', url: doc.source.url } });
   });

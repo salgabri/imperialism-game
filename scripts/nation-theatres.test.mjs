@@ -16,6 +16,14 @@ const ids = sport => nationTheatres(sport).map(scope => scope.id);
 const NATION_SPORTS = SPORT_LIST.filter(sport => !sport.clubsOnly);
 const inScope = (scope, id) => scope.filter({ conf: NATIONS[id][2] });
 
+test('only a nation with a real side fields a team, so no team is made up or nearly empty', () => {
+  const fielded = Object.fromEntries(NATION_SPORTS.map(sport => [sport.id, fieldedNations(sport).length]));
+  assert.deepEqual(fielded, { football: 173, 'womens-football': 36, basketball: 40, baseball: 12, hockey: 7, tennis: 52,
+    'womens-tennis': 45, 'rugby-league': 6 });
+  for (const sport of NATION_SPORTS) assert.ok(fieldedNations(sport).every(id => fieldsRealSide(id, sport)), sport.id);
+  assert.ok(!fieldedNations(getSport('rugby-league')).some(id => NATIONS[id][2] === 'CAF'), 'no rugby league team in Africa');
+});
+
 test('a real side is one whose own rated players hold at least half the lineup it fields', () => {
   const rugby = getSport('rugby-league'), hockey = getSport('hockey'), tennis = getSport('tennis');
   assert.equal(fieldsRealSide('036', rugby), true, 'Australia in rugby league');

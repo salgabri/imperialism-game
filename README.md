@@ -25,7 +25,11 @@ And pick who fights:
   Basketball, baseball, ice hockey and both tennis games field them as one team, Great Britain
   (GBR), under the Union Jack. A sport fields 173 at most: those four play Great Britain
   as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
-  source rates ([Pacific islands](docs/design/pacific-islands.md)).
+  source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
+  only with a **real side**, its own rated players holding at least half the lineup, and
+  every other nation's land stays neutral: 173 nations play football, 52 tennis, 45
+  women's tennis, 40 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
+  rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
   on [their maps of Europe](#womens-football-on-the-europe-maps), the NWSL's 16 on [theirs](#the-nwsl-map) of the USA), all 30 NBA
@@ -674,7 +678,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | `show` | Show matches | `ticker`, `instant`, `express` | Live |
 | `upsets` | Upsets | `predictable`, `balanced`, `wild` | Balanced |
 | `final` | Final | `single`, `best-of-three` | Single match |
-| `signings` | Computer signings | `highest-rated`, `best-fit` | Best-rated player |
+| `signings` | Computer signings (not in tennis, where both sign the same player) | `highest-rated`, `best-fit` | Best-rated player |
 | `home` | Home advantage | `off`, `on` | Off |
 | `strengths` | Team strengths (basketball) | `authentic`, `competitive` | Real-world |
 | `role` | Your role | `manager`, `spectator` | Spectator |
@@ -824,10 +828,10 @@ then the others it lists; any hitter can be the designated hitter. A position ou
 player's list costs 20 points, a hitter pitching or a pitcher hitting 40. The **nations**
 are every Live card (free agents included) by **birthplace**: a US state is the United
 States', Curaçao and Aruba are the Kingdom of the Netherlands', as in the World Baseball
-Classic. 23 nations field players, from the United States (88) and the Dominican
-Republic (85) down; a lineup place a nation's own players cannot fill gets a generated
-player, and a nation with no MLB players is a minnow (45). Ratings are The Show's
-overalls, unchanged. See the [design notes](docs/design/baseball.md).
+Classic. 23 nations have MLB players, from the United States (88) and the Dominican
+Republic (85) down. The 12 whose players hold at least half the lineup field a team, a
+place their own players cannot fill getting a generated player; every other nation's land
+stays neutral. Ratings are The Show's overalls, unchanged. See the [design notes](docs/design/baseball.md).
 
 **Ice hockey** — `src/data/clubs.hockey.js` and `src/data/rosters.hockey.js`, from
 EA SPORTS NHL 27's ratings and the NHL's rosters and statistics, retrieved 2026-11-07
@@ -835,7 +839,8 @@ EA SPORTS NHL 27's ratings and the NHL's rosters and statistics, retrieved 2026-
 is an estimate**, marked as one wherever it is shown: the players EA leaves out are ranked by
 ice time and scoring and spread from 83 down to 72 (goalies 70). EA's own ratings are unchanged. The 32 clubs
 field the lineup the game picks and keep up to 23; nations field the NHL's players, by EA's
-nationality or else birth country, and a place they cannot fill gets a generated player. See the
+nationality or else birth country, and a place they cannot fill gets a generated player. The seven
+whose players hold at least half the lineup field a team; every other nation's land stays neutral. See the
 [design notes](docs/design/hockey.md).
 
 **Tennis** — `src/data/rosters.tennis.js`, from the men's Elo ratings Tennis Abstract (Jeff
@@ -855,15 +860,17 @@ player each, stay neutral. See the [design notes](docs/design/womens-tennis.md).
 ratings of every NRL player as Zero Tackle listed them on the game's release (17 July 2025), Zero Tackle's player profiles
 and NRL.com's 2025 team lists and Tests (`scripts/data/rugby-league-26.json`). Ratings are the game's overalls, unchanged;
 positions are each player's most-started place in 2025, with Zero Tackle's kept as a second. The 17 clubs field their
-matchday 17 and keep up to 24. Nations field the NRL's players, by their 2025 Test side, else birthplace: eight of them,
-Australia, New Zealand, Samoa, Tonga, England, Fiji, Papua New Guinea and the Cook Islands. See the
+matchday 17 and keep up to 24. Nations field the NRL's players, by their 2025 Test side, else birthplace. Eight have them,
+Australia, New Zealand, Samoa, Tonga, England, Fiji, Papua New Guinea and the Cook Islands; the first six hold at least half
+a matchday 17 and field a team, while Papua New Guinea's six and the Cook Islands' five fall short and their land stays
+neutral. See the
 [design notes](docs/design/rugby-league.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
 (`scripts/data/ea-fc27-women.csv`, 1,940 players). Ratings are EA's, unchanged, and nothing is
-invented: 27 of the 78 nations with a rated player field a full XI, the rest start short-handed, and a
-nation with none fields no team. See the [design notes](docs/design/womens-football.md).
+invented: 27 of the 78 nations with a rated player field a full XI. The 36 with at least six, half an
+XI, field a team, short-handed below eleven; the rest, and a nation with none, field no team. See the [design notes](docs/design/womens-football.md).
 
 **Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
@@ -1314,8 +1321,8 @@ the game: pick one under **Season** in setup. Each is a file in
   of which the strongest 124 play, on [the season's own maps](#the-europe-maps);
   2005/06 and 2004/05 have nations only). Ratings are EA's overalls, unchanged.
   EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
-  editions) and the rest field the players they have, as an empty or thin
-  built-in nation does. Scotland, Wales and Northern Ireland field their own
+  editions). A nation with at least six rated players, half an XI, fields the players it has, short-handed
+  below eleven; one with fewer fields no team, and its land stays neutral. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
   none, and their players still play for their clubs.
 - **Rosters:** EA FC 26 is update 4 of 19 September 2025, the snapshot the
@@ -1723,8 +1730,8 @@ under **Season** in setup. Each season is a file in `public/womens-football/`
 (15–150 KB) that loads only when chosen.
 
 - **What a season holds:** every nation with a rated player, each with its best
-  XI (one short of eleven starts short-handed, one with none fields no team and
-  its land stays neutral), and from 2022/23 every club EA rates, the European ones
+  XI (one with at least six rated players plays, short-handed below eleven; one with
+  fewer fields no team and its land stays neutral), and from 2022/23 every club EA rates, the European ones
   on that season's [maps of Europe](#womens-football-on-the-europe-maps), the NWSL's on
   [its own](#the-nwsl-map). Ratings are EA's
   overalls, unchanged. A club keeps its id, crest and colour from season to

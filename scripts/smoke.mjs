@@ -647,6 +647,7 @@ if (!filtered && fixedChecks) {
   const { NATIONS, buildTeam, isTennisSport, makeRng, teamEff } = await import('../src/data/teams.js');
   const { SPORT_LIST } = await import('../src/sports/index.js');
   const { fieldedNations } = await import('../src/engine/footballSets.js');
+  const { MIN_REAL_SIDES } = await import('../src/data/scopes.js');
   const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'],
     baseball: ['United States', 'Dominican Rep.', 'Venezuela', 'Cuba'], hockey: ['Canada', 'United States', 'Sweden', 'Russia'],
     'womens-football': ['Spain', 'England', 'France', 'Germany'], tennis: ['Spain', 'Italy', 'United States', 'Germany'],
@@ -659,7 +660,7 @@ if (!filtered && fixedChecks) {
     console.log(`\n  Squad rosters — ${sport.name}`);
     try {
       const rng = makeRng(20260802);
-      // The nations the sport fields: football and women's football leave out those no source rates.
+      // The nations the sport fields: only those with a real side, their own rated players holding half the lineup.
       const ids = fieldedNations(sport);
       const teams = ids.map(id => buildTeam(id, rng, sport));
       const size = sport.squadSize;
@@ -683,7 +684,9 @@ if (!filtered && fixedChecks) {
         : isTennisSport(sport.id) ? teams.filter(t => t.real >= 2) : teams;
       const full = t => (isTennisSport(sport.id) ? lineupOf(t).slots.every(slot => slot.player)
         : t.squad.length > size ? lineupOf(t).slots.every(natural) : t.squad.length === size);
-      check('every nation fields a full lineup', fielded.length > 20 && fielded.every(full), 'short squad');
+      // A sport fields at least a continent's worth of real sides (src/data/scopes.js): rugby league fields six.
+      check('every nation fields a full lineup', fielded.length >= MIN_REAL_SIDES && fielded.every(full),
+        `${fielded.filter(t => !full(t)).map(t => t.name).join(', ') || `${fielded.length} nations`}: short squad`);
       check('no roster for an unknown nation', strays.length === 0, strays.join(', '));
       check('every rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
       check('every position belongs to this sport', badPos.length === 0, [...new Set(badPos.map(p => p.pos))].join(', '));

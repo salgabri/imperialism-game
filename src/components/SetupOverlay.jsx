@@ -27,7 +27,7 @@ export const domesticDescription = setupModel.domesticDescription;
 const {
   SETUP_STEPS, DRAW_CARDS, TARGETING_CARDS, ROLE_CARDS, UNCERTAINTY_OPTIONS, UNCERTAINTY_HELP, FINALE_OPTIONS,
   FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, HOME_OPTIONS, HOME_HELP, SHOW_MATCH_OPTIONS,
-  showMatchesWrites,
+  showMatchesWrites, signingsOffered,
 } = setupModel;
 
 /** Focus inside one of these keeps Space for itself (A-8). */
@@ -441,12 +441,14 @@ export default function SetupOverlay({
           </select>
           <small className="control-help sr-only">{FINALE_HELP[model.finale]}</small>
         </label>
-        <label className="control-field" htmlFor="setup-recruitment" title={RECRUITMENT_HELP[model.acquisitionPolicy]}><span>Computer signings</span>
-          <select id="setup-recruitment" value={model.acquisitionPolicy} onChange={event => pick('acquisitionPolicy', event.target.value)}>
-            {RECRUITMENT_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-          </select>
-          <small className="control-help sr-only">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
-        </label>
+        {signingsOffered(model.sport.id) ? (
+          <label className="control-field" htmlFor="setup-recruitment" title={RECRUITMENT_HELP[model.acquisitionPolicy]}><span>Computer signings</span>
+            <select id="setup-recruitment" value={model.acquisitionPolicy} onChange={event => pick('acquisitionPolicy', event.target.value)}>
+              {RECRUITMENT_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+            </select>
+            <small className="control-help sr-only">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
+          </label>
+        ) : null}
         <label className="control-field" htmlFor="setup-home-advantage" title={HOME_HELP[model.homeAdvantage]}><span>Home advantage</span>
           <select id="setup-home-advantage" value={model.homeAdvantage} onChange={event => pick('homeAdvantage', event.target.value)}>
             {HOME_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
