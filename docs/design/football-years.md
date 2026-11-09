@@ -1162,6 +1162,12 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
     San Francisco Warriors, not the 76ers he finished it with; Clyde Drexler
     1994/95 for Portland, not the champion Rockets; Bob McAdoo 1976/77 for the
     Knicks.
+  - A club's 13 by minutes can hold a player who missed most of the season, and
+    he is rated on the games he played (PER and WS/48 are shrunk by minutes, his
+    points, rebounds and assists a game are not), so he starts all season: 56 of
+    the 3,515 starters played under 40% of the season's games, among them Bob
+    Rule (4 games in 1970/71, rated 85), Larry Bird (6 in 1988/89, 83) and David
+    Robinson (6 in 1996/97, 82).
   - Club strengths spread less than the games' seasons (standard deviation 1.37
     to 2.37 against 1.80 to 3.70), and follow real results least in 1964/65,
     1975/76, 1976/77 and 1977/78 (0.51 to 0.61 against SRS).
