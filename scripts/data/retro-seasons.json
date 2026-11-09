@@ -1,5 +1,5 @@
 {
-  "about": "The built-in football seasons before FIFA 05 (docs/design/football-years.md, 'Seasons before FIFA 05'), built by npm run build:retro-seasons (scripts/build-retro-seasons.mjs) into public/football/<id>.json. Every source is pinned by SHA-256 and read from the gitignored data-src/<folder>/; download names where it came from. The data's rights stay with its makers (Sports Interactive and Eidos, Sensible Software and Codemasters); the user chose to ship these seasons, credited to them.",
+  "about": "The built-in football seasons before FIFA 05 (docs/design/football-years.md, 'Seasons before FIFA 05'), built by npm run build:retro-seasons (scripts/build-retro-seasons.mjs) into public/football/<id>.json. Every source is pinned by SHA-256 and read from the gitignored data-src/<folder>/; download names where it came from, and a cd block the CD image npm run sync:retro-cds reads it from (scripts/sync-retro-cds.mjs). The data's rights stay with its makers (Sports Interactive and Eidos, Sensible Software and Codemasters); the user chose to ship these seasons, credited to them.",
   "retrieved": "2026-11-08",
   "seasons": [
     {
