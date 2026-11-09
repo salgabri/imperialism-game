@@ -887,9 +887,12 @@ keep their games' ratings (the user's decision). No BAA, no ABA, no 1959/60.
   quantile of its ratings of each club's 13 best (2K Archive's 2026/27 table: 390
   ratings from 69 to 97; 72 at 5%, 74 at 25%, 78 at the median, 81 at 75%, 90 at
   95%). No player passes another, and every season has NBA 2K27's spread, as the
-  1990s hockey seasons have NHL 27's. Nothing uses a team's results (the user's
-  decision of 2026-11-09: a team-results term ordered clubs a little better,
-  0.75 to 0.87 against SRS, but would choose ratings by real results).
+  1990s hockey seasons have NHL 27's. No input is a team's result: no SRS,
+  record or point margin (the user's decision of 2026-11-09: a team-results term
+  ordered clubs a little better, 0.75 to 0.87 against SRS, but would choose
+  ratings by real results). Basketball-Reference's defensive win shares, and so
+  WS/48, do start from each club's points allowed, so some of a club's defence
+  reaches its players' scores.
 - **Positions and fives.** A player's first position is the season's
   (Basketball-Reference lists PG, SG, SF, PF or C), else the first his career
   position implies (G is PG/SG, F SF/PF, C C, G-F SG/SF, F-G SF/SG, F-C PF/C,
@@ -904,8 +907,9 @@ keep their games' ratings (the user's decision). No BAA, no ABA, no 1959/60.
 - **Checks.** Each season's teams must be Basketball-Reference's, by name, and
   its league averages (pace, offensive rating and points a game) those of
   `src/data/nbaLeagueAverages.js`; the build stops otherwise. The audit gives
-  each season's 13s by minutes (8,884 player seasons in all), every traded
-  player and his club, each five with each player's score, the season's league
+  how many players each season rates (its clubs' 13s by minutes, 8,884 player
+  seasons in all), every traded player and his club, each five with each
+  player's score, the season's league
   averages, and how its clubs' strengths follow its real SRS. Run end to end on
   the two seasons NBA 2K27's MyNBA Eras rate, the rule rates them as 2K does:
   1983/84's 233 players whom both rate at Spearman 0.95, 1.94 points mean error
@@ -1151,7 +1155,8 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
     see them: in 1995/96 Dennis Rodman is not in the Bulls' five (Toni Kukoč
     starts), so the 72–10 Bulls are only the fourth-strongest club (86, behind
     Orlando's 89); in 1996/97 (69–13) four clubs match their 86, behind Houston
-    and Seattle.
+    and Seattle; and nine clubs rate above the 63–19 champion Pistons of
+    1988/89 (84).
   - A player traded during a season counts only for the club he played the most
     minutes for, 5.6% of all starters: Wilt Chamberlain plays 1964/65 for the
     San Francisco Warriors, not the 76ers he finished it with; Clyde Drexler
@@ -1161,8 +1166,11 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
     to 2.37 against 1.80 to 3.70), and follow real results least in 1964/65,
     1975/76, 1976/77 and 1977/78 (0.51 to 0.61 against SRS).
   - Positions are Basketball-Reference's modern labels given retroactively, and
-    the second position is derived; ratings use NBA 2K27's spread, so a 1960s
-    league plays with today's distribution of talent.
+    the second position is derived. Names are Basketball-Reference's too, each
+    player's latest: Kareem Abdul-Jabbar in 1969/70 and 1970/71, when he played
+    as Lew Alcindor, and Hakeem Olajuwon before 1991, when he was Akeem. Ratings
+    use NBA 2K27's spread, so a 1960s league plays with today's distribution of
+    talent.
   - Neighbouring seasons mix sources: 1983/84 and 1991/92 (MyNBA Eras) lack the
     players 2K has no licence for (Andrew Toney; Charles Barkley and Reggie
     Miller), while the computed 1982/83, 1984/85, 1990/91 and 1992/93 have them.
