@@ -306,7 +306,16 @@ of 1969/70 (the Soviet Union holding Ukraine and the Baltic states), 1973/74
 suspensions; every year 1961/62 to 1995/96 consistent and none from 1996/97 with
 an identity; the CM 01/02 builder's pooling and names; the loader's refusals; and
 a 1969/70 campaign launched, drawn, flagged, saved and resumed as the Soviet
-Union.
+Union. `scripts/flag-symbol-layout.test.mjs` fits each historic emblem on its
+federation's real land.
+
+Spot check against history (2026-11-09): every one of the 176 men's World Cup
+finalists of 1962 to 1994 (the Fjelstul World Cup Database's qualified teams)
+takes part in its season, none neutral or held, but East Germany in 1974, which
+has no shape. They play as the Soviet Union in 1962, 1966, 1970, 1982, 1986 and
+1990, Yugoslavia in 1962, 1974, 1982 and 1990, Czechoslovakia in 1962, 1970,
+1982 and 1990, West Germany in every one from 1962 to 1990, and Zaire in 1974;
+the 1994 finalists, Russia and Germany among them, all under their own names.
 
 ## Data set file (format 1)
 
