@@ -64,6 +64,35 @@ function namesApart(players, birthOf) {
 }
 const isoDate = (year, month, day) => (year && month && day ? `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}` : null);
 
+/** Whether `short` is `long` with letters taken out (and nothing else changed). */
+function lettersTakenOut(short, long) {
+  let i = 0;
+  for (const ch of long) {
+    if (ch === short[i]) i++;
+    else if (!/\p{L}/u.test(ch)) return false;
+  }
+  return i === short.length;
+}
+
+/**
+ * A MoneyPuck player's name. MoneyPuck's files from its 2022/23 season on drop every letter of a name that is not plain
+ * ASCII ('Tim Sttzle', 'Matj  Blmel'): a player scripts/data/nhl-seasons.json `computed.moneypuckNames` lists takes the
+ * name it gives him, which must be MoneyPuck's with only letters put back. Any other name with a run of spaces is a
+ * dropped letter the list does not know yet.
+ */
+function moneypuckName(key, raw, listed) {
+  const name = raw.replace(/\s+/g, ' ');
+  const fixed = listed[key];
+  if (fixed == null) {
+    if (name !== raw) throw new Error(`MoneyPuck names ${key} ${JSON.stringify(raw)}: a dropped letter? List him in computed.moneypuckNames`);
+    return raw;
+  }
+  if (!lettersTakenOut(name, fixed)) {
+    throw new Error(`computed.moneypuckNames names ${key} ${JSON.stringify(fixed)}, not MoneyPuck's ${JSON.stringify(raw)} with its letters put back`);
+  }
+  return fixed;
+}
+
 /**
  * A computed season's snapshot parts: `{ form, leagues, players, left, notes }` from the Hockey Databank (`source.kind`
  * 'hdb': no time on ice; goalies by save percentage once every season of the window kept shots against, else by goals
@@ -99,7 +128,10 @@ export async function assembleComputed(season, io, manifest) {
     for (const y of windowOf(year)) seasons.set(y, await moneypuck(io, y));
     const clubs = await moneypuckClubs(io, year);
     const people = await lookup(io);
-    const fromSummary = [], fromDatabank = [];
+    const fromSummary = [], fromDatabank = [], restored = [];
+    // A name MoneyPuck dropped letters from, put back (moneypuckName).
+    const listed = manifest.computed.moneypuckNames?.players ?? {};
+    const nameOf = (key, e) => moneypuckName(key, e.name, listed);
     // A player MoneyPuck's lookup gives no nationality: the Hockey Databank's birth country, where exactly one of its
     // players of 2008/09 to 2017/18 has his name.
     const db = await databank(io);
@@ -115,24 +147,30 @@ export async function assembleComputed(season, io, manifest) {
     const bornOf = (key, e) => {
       const nationality = people.get(key)?.nationality;
       if (nationality) return nationality;
-      const ids = namesake.get(norm(e.name)) ?? [];
+      const ids = namesake.get(norm(nameOf(key, e))) ?? [];
       if (ids.length !== 1) return null;
       const born = hdbBirthCountry(db.master.get(ids[0]));
-      if (born) fromDatabank.push(`${e.name}: ${born}`);
+      if (born) fromDatabank.push(`${nameOf(key, e)}: ${born}`);
       return born;
     };
     parts = seasonPlayers(year, seasons, {
-      nameOf: (key, e) => e.name, bornOf,
+      nameOf: (key, e) => {
+        const name = nameOf(key, e);
+        if (name !== e.name) restored.push(`${e.name} as ${name}`);
+        return name;
+      },
+      bornOf,
       clubOf: (key, e) => {
         const stints = clubs.get(key);
         if (stints) return clubOfStints(stints);
-        fromSummary.push(`${e.name} (${e.team})`);
+        fromSummary.push(`${nameOf(key, e)} (${e.team})`);
         return e.team;
       },
       timeOnIce: true,
     });
     parts.notes = { renamed: namesApart(parts.players, key => people.get(key)?.birthDate || null),
-      clubFromSummary: fromSummary, birthFromDatabank: fromDatabank, noNationality: parts.players.filter(p => p[4] == null).map(p => `${p[1]} (${p[2]})`) };
+      clubFromSummary: fromSummary, birthFromDatabank: fromDatabank, noNationality: parts.players.filter(p => p[4] == null).map(p => `${p[1]} (${p[2]})`),
+      ...(restored.length ? { lettersPutBack: restored } : {}) };
     parts.form = { skaters: 'minutes', goalies: 'saves' };
   } else throw new Error(`${season.id}: no statistics source ${season.source.kind}`);
   const codes = new Set(teamsOf(manifest, year).map(team => team.code));

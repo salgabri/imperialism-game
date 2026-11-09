@@ -301,7 +301,7 @@
   "seasons": [
     {
       "id": "nhl-2026",
-      "version": "nhl-2026-43379e1a",
+      "version": "nhl-2026-6eccbedd",
       "season": "2025/26",
       "label": "Computed from statistics",
       "method": "computed",
@@ -411,8 +411,8 @@
         "Sacha Boisvert (CHI)",
         "Wyatt Kaiser (CHI)",
         "Nathan Bastian (DAL)",
-        "Oskar Bck (DAL)",
-        "Michael Brandsegg-Nygrd (DET)",
+        "Oskar Back (DAL)",
+        "Michael Brandsegg-Nygard (DET)",
         "Ludvig Jansson (FLA)",
         "Marek Alscher (FLA)",
         "Wilmer Skoog (FLA)",
@@ -467,7 +467,7 @@
           "Nathan Bastian (DAL)",
           "Oliver Bonk (PHI)",
           "David Reinbacher (MTL)",
-          "Oskar Bck (DAL)",
+          "Oskar Back (DAL)",
           "Wilmer Skoog (FLA)",
           "Wyatt Kaiser (CHI)",
           "Alex Vlasic (CHI)",
@@ -479,16 +479,31 @@
           "Topias Vilen (NJD)",
           "Tyson Hinds (ANA)",
           "Felix Unger Sorum (CAR)",
-          "Michael Brandsegg-Nygrd (DET)",
+          "Michael Brandsegg-Nygard (DET)",
           "Jake Livanavage (PIT)",
           "Brayden Yager (WPG)",
           "Arsenii Sergeev (CGY)"
+        ],
+        "lettersPutBack": [
+          "Martin Fehrvry as Martin Fehervary",
+          "Matj  Blmel as Matej Blumel",
+          "Isac Lundestrm as Isac Lundestrom",
+          "Alexis Lafrenire as Alexis Lafreniere",
+          "Alex Barr-Boulet as Alex Barre-Boulet",
+          "Juraj Slafkovsk as Juraj Slafkovsky",
+          "Jonathan Lekkerimki as Jonathan Lekkerimaki",
+          "Tim Sttzle as Tim Stutzle",
+          "Oskar Bck as Oskar Back",
+          "Aatu Rty as Aatu Raty",
+          "Olli Mtt as Olli Maatta",
+          "Michael Brandsegg-Nygrd as Michael Brandsegg-Nygard",
+          "Leevi Merilinen as Leevi Merilainen"
         ]
       }
     },
     {
       "id": "nhl-2025",
-      "version": "nhl-2025-9c55b6a6",
+      "version": "nhl-2025-ee01e9af",
       "season": "2024/25",
       "label": "Computed from statistics",
       "method": "computed",
@@ -589,7 +604,7 @@
         "Alex Vlasic (CHI)",
         "Wyatt Kaiser (CHI)",
         "Mason Marchment (DAL)",
-        "Oskar Bck (DAL)",
+        "Oskar Back (DAL)",
         "Jeff Malott (LAK)",
         "Nathan Bastian (NJD)",
         "Adam Ginning (PHI)",
@@ -609,7 +624,7 @@
         ],
         "noNationality": [
           "Mason Marchment (DAL)",
-          "Oskar Bck (DAL)",
+          "Oskar Back (DAL)",
           "Alex Vlasic (CHI)",
           "Blake Lizotte (PIT)",
           "Olle Lycksell (PHI)",
@@ -618,12 +633,26 @@
           "Adam Ginning (PHI)",
           "Matt Roy (WSH)",
           "Nathan Bastian (NJD)"
+        ],
+        "lettersPutBack": [
+          "Oskar Bck as Oskar Back",
+          "Tim Sttzle as Tim Stutzle",
+          "Martin Fehrvry as Martin Fehervary",
+          "Jonathan Lekkerimki as Jonathan Lekkerimaki",
+          "Juraj Slafkovsk as Juraj Slafkovsky",
+          "Alex Barr-Boulet as Alex Barre-Boulet",
+          "Olli Mtt as Olli Maatta",
+          "Matj  Blmel as Matej Blumel",
+          "Juuso Vlimki as Juuso Valimaki",
+          "Jani Hakanp as Jani Hakanpaa",
+          "Alexis Lafrenire as Alexis Lafreniere",
+          "Leevi Merilinen as Leevi Merilainen"
         ]
       }
     },
     {
       "id": "nhl-2024",
-      "version": "nhl-2024-1d9e0b5d",
+      "version": "nhl-2024-95c23985",
       "season": "2023/24",
       "label": "Computed from statistics",
       "method": "computed",
@@ -761,12 +790,20 @@
           "Oskar Steen (BOS)",
           "Filip Roos (CHI)",
           "Matt Roy (LAK)"
+        ],
+        "lettersPutBack": [
+          "Tim Sttzle as Tim Stutzle",
+          "Alex Barr-Boulet as Alex Barre-Boulet",
+          "Jani Hakanp as Jani Hakanpaa",
+          "Jesse Ylnen as Jesse Ylonen",
+          "Alexis Lafrenire as Alexis Lafreniere",
+          "Marin Studenic as Marian Studenic"
         ]
       }
     },
     {
       "id": "nhl-2023",
-      "version": "nhl-2023-b5f3a0b3",
+      "version": "nhl-2023-d71e7ba5",
       "season": "2022/23",
       "label": "Computed from statistics",
       "method": "computed",
@@ -915,6 +952,12 @@
           "Matthew Berlin (EDM)",
           "Pavel Francouz (COL)",
           "Jett Alexander (TOR)"
+        ],
+        "lettersPutBack": [
+          "Jani Hakanp as Jani Hakanpaa",
+          "Alex Barr-Boulet as Alex Barre-Boulet",
+          "Alexis Lafrenire as Alexis Lafreniere",
+          "Tim Sttzle as Tim Stutzle"
         ]
       }
     },

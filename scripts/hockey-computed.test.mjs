@@ -207,6 +207,22 @@ test('birth countries: the Hockey Databank\'s, a birth city in another country t
   assert.deepEqual(nationOf('Peter Stastny'), ['703'], 'Peter Stastny for Slovakia, born in Bratislava');
 });
 
+test('a name MoneyPuck dropped letters from is put back: Tim Stutzle, not Tim Sttzle', () => {
+  const listed = MANIFEST.computed.moneypuckNames.players;
+  const seen = new Set();
+  for (const entry of COMPUTED.filter(season => season.source.kind === 'moneypuck')) {
+    for (const [key, name] of snapshotOf(entry.id).players) {
+      assert.ok(!/\s{2}/.test(name), `${entry.id}: ${JSON.stringify(name)}`);
+      if (!listed[key]) continue;
+      assert.equal(name.replace(/ \((?:\d{4}|\d{4}-\d\d-\d\d)\)$/, ''), listed[key], `${entry.id}: ${key}`);
+      seen.add(String(key));
+    }
+  }
+  assert.deepEqual([...seen].sort(), Object.keys(listed).sort(), 'every listed player plays a MoneyPuck season');
+  assert.deepEqual(playerOf('nhl-2026', 'Tim Stutzle')?.slice(0, 2), ['OTT', 'C']);
+  assert.ok(!JSON.stringify(seasonFile('nhl-2026')).includes('Sttzle'));
+});
+
 // ---------- NHL 08 and NHL 09 ----------
 
 test('NHL 08 and NHL 09: EA\'s attributes, the mean ranked onto NHL 07\'s overalls, 255 left out', () => {

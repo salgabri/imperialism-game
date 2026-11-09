@@ -3,10 +3,10 @@
 // or ratings computed from the season's statistics (docs/design/hockey.md). Each is public/hockey/<id>.json, loaded when a
 // setup chooses it (src/engine/footballSets.js), and its clubs play on their era's map (`map`, public/domestic/<map>.json).
 export const BUILT_IN_HOCKEY_SEASONS = Object.freeze([
-  Object.freeze({ id: 'nhl-2026', version: 'nhl-2026-43379e1a', year: 2026, season: '2025/26', label: 'Computed from statistics', map: 'nhl' }),
-  Object.freeze({ id: 'nhl-2025', version: 'nhl-2025-9c55b6a6', year: 2025, season: '2024/25', label: 'Computed from statistics', map: 'nhl2025' }),
-  Object.freeze({ id: 'nhl-2024', version: 'nhl-2024-1d9e0b5d', year: 2024, season: '2023/24', label: 'Computed from statistics', map: 'nhl2023' }),
-  Object.freeze({ id: 'nhl-2023', version: 'nhl-2023-b5f3a0b3', year: 2023, season: '2022/23', label: 'Computed from statistics', map: 'nhl2023' }),
+  Object.freeze({ id: 'nhl-2026', version: 'nhl-2026-6eccbedd', year: 2026, season: '2025/26', label: 'Computed from statistics', map: 'nhl' }),
+  Object.freeze({ id: 'nhl-2025', version: 'nhl-2025-ee01e9af', year: 2025, season: '2024/25', label: 'Computed from statistics', map: 'nhl2025' }),
+  Object.freeze({ id: 'nhl-2024', version: 'nhl-2024-95c23985', year: 2024, season: '2023/24', label: 'Computed from statistics', map: 'nhl2023' }),
+  Object.freeze({ id: 'nhl-2023', version: 'nhl-2023-d71e7ba5', year: 2023, season: '2022/23', label: 'Computed from statistics', map: 'nhl2023' }),
   Object.freeze({ id: 'nhl-2022', version: 'nhl-2022-c91e9cb4', year: 2022, season: '2021/22', label: 'NHL 22', map: 'nhl2022' }),
   Object.freeze({ id: 'nhl-2021', version: 'nhl-2021-c342f469', year: 2021, season: '2020/21', label: 'Computed from statistics', map: 'nhl2019' }),
   Object.freeze({ id: 'nhl-2020', version: 'nhl-2020-84230dea', year: 2020, season: '2019/20', label: 'Computed from statistics', map: 'nhl2019' }),

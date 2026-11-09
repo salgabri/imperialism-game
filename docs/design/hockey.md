@@ -398,6 +398,12 @@ the lookup and 30 game-by-game archives of 329 MB in all) is pinned by SHA-256 i
   season to 2017/18 is left without a nation, 5 to 37 after (2025/26's mostly rookies); they play for no nation.
 - *Namesakes.* Two players of one season who share a name carry their birth year ("Sebastian Aho (1997)"), or their
   birth date where that is shared too ("Steve Smith (1963-04-04)").
+- *Dropped letters.* MoneyPuck's files from its 2022/23 season on drop every letter of a name that is not plain ASCII
+  ("Tim Sttzle", "Alexis Lafrenire", "Matj  Blmel"). The 17 players this hits in 2022/23 to 2025/26 take back their
+  names (`computed.moneypuckNames`, by NHL id): as MoneyPuck spelled them in its earlier files, else as the built-in NHL
+  27 season does, in plain letters like every other MoneyPuck name ("Tim Stutzle"). The sync checks each is MoneyPuck's
+  name with only letters put back, and stops on any other name with a run of spaces. One more, "Nathan Lgar", in no
+  squad, has no such spelling and stays as MoneyPuck gives it.
 
 **Calibration**, measured 2026-11-09 against the five full EA editions (`scripts/data/nhl-seasons/calibration.json`
 holds their players with their lines from these sources; `docs/design/hockey-seasons-audit.json` `calibration` records
@@ -559,8 +565,8 @@ duel campaign with the live ticker and a hockey nations campaign.
   statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. The Hockey Databank asks for
   its statement to be displayed prominently on the product: it is in `public/hockey/ATTRIBUTION.txt`, each season's
   source and the Season note, which the setup shows as the Season list's tooltip, not on a credits screen.
-- Names: the Hockey Databank and MoneyPuck spell names without accents ("Borje Salming"), and the databank in its own
-  way (Raymond Bourque); NHL 08 and NHL 09 keep IGN's spellings.
+- Names: the Hockey Databank and MoneyPuck spell names without accents ("Borje Salming", "Tim Stutzle"), and the
+  databank in its own way (Raymond Bourque); NHL 08 and NHL 09 keep IGN's spellings.
 - NHL 09's attributes are EA's before release; neither NHL 08's nor NHL 09's overall is EA's.
 - Nations campaigns are top-heavy. Half the elite 32 are minnows at the baseline, so the
   United States, Canada and Russia win about four titles in five (`npm run balance`, 1,200
