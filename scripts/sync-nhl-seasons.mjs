@@ -3,14 +3,20 @@
 // give every player his position and his birth country. The downloads stay in the ignored data-src/nhl-seasons/, each
 // pinned by SHA-256 in scripts/data/nhl-seasons-sources.json; only the snapshots are committed.
 //
-// Usage: node scripts/sync-nhl-seasons.mjs [--season=nhl-1994] [--fetch] [--pin] [--check]
+// Usage: node scripts/sync-nhl-seasons.mjs [--season=nhl-1994|calibration] [--fetch] [--pin] [--check]
 //   --fetch   download the sources missing from data-src/nhl-seasons/ (about one request a second)
 //   --pin     record the SHA-256 of every source read (after a deliberate new download)
 //   --check   rebuild the snapshots and compare them byte for byte; writes nothing
-// Output: scripts/data/nhl-seasons/nhl-<season end year>.json, read by scripts/build-nhl-seasons.mjs.
+// Output: scripts/data/nhl-seasons/nhl-<season end year>.json, read by scripts/build-nhl-seasons.mjs, and
+// scripts/data/nhl-seasons/calibration.json (the computed rule against the full editions).
 //
-// A snapshot row is [name, NHL club code, position (C/LW/RW/D/G), overall, birth country (ISO 3166 alpha-3) or null,
-// NHL id or null]; `left` lists the source's players the season leaves out, and why.
+// An edition's snapshot row is [name, NHL club code, position (C/LW/RW/D/G), overall, birth country (ISO 3166 alpha-3)
+// or null, NHL id or null]; `left` lists the source's players the season leaves out, and why. A computed season's row is
+// [source key, name, club, position, birth country or nationality, lines] (scripts/lib/nhl-history.mjs), a converted
+// season's [name, club, position, country, skill attributes].
+//
+// The computed seasons read the Hockey Databank (1964/65–2009/10 here) and MoneyPuck.com (2008/09 on), never the NHL's
+// own API, whose robots.txt turns away this project's agents (docs/design/hockey.md, "Computed seasons").
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -22,6 +28,9 @@ import {
   parseNhl95Sheet, parseNhlpa93, parseSegathon, segathonTable, teamsOf,
 } from './lib/nhl-seasons.mjs';
 import { assembleNhlRatings } from './lib/nhlratings-net.mjs';
+import {
+  assembleCalibration, assembleComputed, assembleConverted, calibrationText, computedSnapshotText, convertedSnapshotText,
+} from './lib/nhl-history.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cacheDir = path.join(root, 'data-src/nhl-seasons');
@@ -31,7 +40,7 @@ const snapshotDir = path.join(root, 'scripts/data/nhl-seasons');
 const PAUSE_MS = 1100;
 
 const args = process.argv.slice(2);
-const unknown = args.filter(arg => !/^--(fetch|pin|check|season=nhl-\d{4})$/.test(arg));
+const unknown = args.filter(arg => !/^--(fetch|pin|check|season=(?:nhl-\d{4}|calibration))$/.test(arg));
 if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
 const fetchMissing = args.includes('--fetch'), pin = args.includes('--pin'), check = args.includes('--check');
 const only = args.find(arg => arg.startsWith('--season='))?.slice('--season='.length);
@@ -88,6 +97,7 @@ async function download({ url, warc }, at) {
 // IGN's pages of 2006 are ISO-8859-1; everything else is UTF-8.
 const text = async (file, encoding = 'utf8') => (await source(file)).toString(encoding);
 const json = async file => JSON.parse(await text(file));
+const io = { text, buffer: source };
 
 /** The clubs whose rosters of `season` (20062007) are sources. */
 const rosterCodes = season => Object.keys(sourceList.sources)
@@ -271,22 +281,46 @@ function snapshotText(season, { players, left, notes }) {
 }
 
 const differs = [];
-for (const season of manifest.seasons) {
-  if (only && season.id !== only) continue;
-  const edition = EDITIONS[season.source.kind];
-  if (!edition) throw new Error(`${season.id}: no assembler for ${season.source.kind}`);
-  const result = await edition(season);
-  const out = path.join(snapshotDir, `${season.id}.json`);
-  const snapshot = snapshotText(season, result);
-  const clubs = new Set(result.players.map(p => p[1])).size;
-  console.log(`${season.id} ${season.edition}: ${result.players.length} players of ${clubs} clubs, ${result.left.length} left out`);
+/** Writes `text` to `out`, or with --check compares it. */
+async function output(out, snapshot) {
   if (check) {
     const current = existsSync(out) ? (await readFile(out, 'utf8')).replace(/\r\n/g, '\n') : null;
     if (current !== snapshot) differs.push(path.relative(root, out));
+    return;
+  }
+  await mkdir(path.dirname(out), { recursive: true });
+  await writeFile(out, snapshot);
+}
+
+for (const season of manifest.seasons) {
+  if (only && season.id !== only) continue;
+  const out = path.join(snapshotDir, `${season.id}.json`);
+  if (season.method === 'computed') {
+    const parts = await assembleComputed(season, io, manifest);
+    console.log(`${season.id} computed (${season.source.kind}, ${parts.form.skaters}, ${parts.form.goalies}): ${parts.players.length} players of `
+      + `${new Set(parts.players.map(p => p[2])).size} clubs, ${parts.left.length} left out`);
+    await output(out, computedSnapshotText(season, manifest, parts));
     continue;
   }
-  await mkdir(snapshotDir, { recursive: true });
-  await writeFile(out, snapshot);
+  if (season.method === 'converted') {
+    const parts = await assembleConverted(season, io);
+    console.log(`${season.id} ${season.edition} converted: ${parts.players.length} players of ${new Set(parts.players.map(p => p[1])).size} clubs, ${parts.left.length} left out`);
+    await output(out, convertedSnapshotText(season, manifest, parts));
+    continue;
+  }
+  const edition = EDITIONS[season.source.kind];
+  if (!edition) throw new Error(`${season.id}: no assembler for ${season.source.kind}`);
+  const result = await edition(season);
+  const clubs = new Set(result.players.map(p => p[1])).size;
+  console.log(`${season.id} ${season.edition}: ${result.players.length} players of ${clubs} clubs, ${result.left.length} left out`);
+  await output(out, snapshotText(season, result));
+}
+// The calibration fixture: the full editions' players with their lines from the permitted sources.
+if (!only || only === 'calibration') {
+  const editions = await assembleCalibration(manifest.computed.calibration,
+    io, async id => JSON.parse(await readFile(path.join(snapshotDir, `${id}.json`), 'utf8')));
+  for (const e of editions) console.log(`calibration ${e.id}: ${e.players.length - e.unmatched.length} of ${e.players.length} players with lines`);
+  await output(path.join(snapshotDir, 'calibration.json'), calibrationText(editions));
 }
 if (pin) {
   for (const [file, hash] of pinned) sourceList.sources[file] = { ...sourceList.sources[file], sha256: hash };

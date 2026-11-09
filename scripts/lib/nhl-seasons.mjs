@@ -218,10 +218,43 @@ export function parseIgnCountries(html) {
   return rows.slice(at + 1).filter(row => row.length > C.country && row[C.last]).map(row => ({ name: `${row[C.first]} ${row[C.last]}`.trim(), country: row[C.country] }));
 }
 
+/**
+ * One of IGN's NHL 08 or NHL 09 team pages (EA's attributes, no overall): `{ name, table: 'skater'|'goalie', fields }` per
+ * player, `fields` every column the page gives by its header (NHL 08: Country, Position, Birth Date and 24 or 20
+ * attributes; NHL 09: 23 or 19 attribute codes). The goalies' table is the one whose header names a goalie's attribute.
+ */
+export function parseIgnAttributes(page) {
+  // The Canadiens' NHL 08 page closes each row's last cell as "</td</tr>".
+  const html = page.replace(/<\/td<\/tr>/g, '</td></tr>');
+  const out = [];
+  let from = 0;
+  for (;;) {
+    const headAt = html.indexOf('<th>First Name</th>', from);
+    if (headAt < 0) break;
+    const start = html.lastIndexOf('<table', headAt), end = html.indexOf('</table>', headAt);
+    if (start < 0 || end < 0) throw new Error("IGN's page has a header outside a table");
+    const rows = tableRows(html.slice(start, end + '</table>'.length));
+    const at = rows.findIndex(row => row.includes('First Name'));
+    const head = rows[at];
+    const goalies = head.some(h => ['Glove Side High', 'GLVHI', '5 Hole', '5HOLE'].includes(h));
+    for (const row of rows.slice(at + 1)) {
+      if (row.length !== head.length || !row[head.indexOf('Last Name')]) continue;
+      const fields = Object.fromEntries(head.map((h, i) => [h, row[i]]));
+      out.push({ name: `${fields['First Name']} ${fields['Last Name']}`.trim(), table: goalies ? 'goalie' : 'skater', fields });
+    }
+    from = end;
+  }
+  if (!out.length) throw new Error("IGN's page has no player table");
+  return out;
+}
+
+/** IGN's NHL 08 positions. */
+export const IGN08_POSITION = Object.freeze({ Center: 'C', 'Left Wing': 'LW', 'Right Wing': 'RW', Defense: 'D', Defenseman: 'D', Goalie: 'G' });
+
 /** EA's country names (IGN's NHL 08 pages) as the NHL's codes (ISO 3166 alpha-3). */
 export const COUNTRY_CODE = Object.freeze({ Austria: 'AUT', Belarus: 'BLR', Brazil: 'BRA', Canada: 'CAN', 'Czech Republic': 'CZE', Denmark: 'DNK', Finland: 'FIN',
   France: 'FRA', Germany: 'DEU', Italy: 'ITA', Kazakhstan: 'KAZ', Kazakstan: 'KAZ', Latvia: 'LVA', Lithuania: 'LTU', 'Northern Ireland': 'GBR', Norway: 'NOR',
-  Poland: 'POL', Russia: 'RUS', Slovakia: 'SVK', 'South Korea': 'KOR',
+  Poland: 'POL', Russia: 'RUS', Slovakia: 'SVK', 'South Africa': 'ZAF', 'South Korea': 'KOR',
   Slovenia: 'SVN', Sweden: 'SWE', Switzerland: 'CHE', Ukraine: 'UKR', USA: 'USA' });
 
 const NHL_POSITION = { C: 'C', L: 'LW', R: 'RW', D: 'D', G: 'G' };
@@ -292,11 +325,12 @@ export function mapOf(manifest, year) {
 
 /**
  * The clubs of the season ending in `year`, by the NHL's code that season: `{ code, id, franchise, name, city, arena,
- * home, country }` (scripts/data/nhl-seasons.json `teams`). A franchise that has moved or been renamed since has an id
- * of its own for its era (`id`); one that has not keeps today's (`franchise`).
+ * home, country }` (scripts/data/nhl-seasons.json `teams` where it lists the season, else `eras`). A franchise that has
+ * moved or been renamed since has an id of its own for its era (`id`); one that has not keeps today's (`franchise`); a
+ * defunct one (the Seals and Barons) has no franchise of today's (`franchise` null).
  */
 export function teamsOf(manifest, year) {
-  const list = manifest.teams[String(year)];
+  const list = manifest.teams[String(year)] ?? erasOf(manifest, year);
   if (!list) throw new Error(`No NHL clubs listed for the season ending in ${year}`);
   const teams = list.map(team => ({ ...team, id: team.id ?? team.franchise }));
   for (const key of ['code', 'id', 'city']) {
@@ -304,6 +338,23 @@ export function teamsOf(manifest, year) {
     if (new Set(values).size !== values.length) throw new Error(`Two NHL clubs of ${year} share a ${key}`);
   }
   return teams;
+}
+
+/**
+ * The clubs of a season `teams` does not list, from each franchise's era that holds it (scripts/data/nhl-seasons.json
+ * `eras`), by code; null for a season no franchise played (2004/05).
+ */
+function erasOf(manifest, year) {
+  const defunct = new Set(manifest.eras?.defunct ?? []);
+  const list = Object.entries(manifest.eras?.franchises ?? {}).flatMap(([franchise, eras]) => {
+    const era = eras.find(e => e.from <= year && year <= e.to);
+    if (!era) return [];
+    const { from, to, ...team } = era;
+    if (defunct.has(franchise) && !team.id) throw new Error(`${franchise} (${from}–${to}): a defunct franchise's eras need their own ids`);
+    return [{ code: team.code, ...(team.id ? { id: team.id } : {}), franchise: defunct.has(franchise) ? null : franchise, name: team.name, city: team.city,
+      arena: team.arena, home: team.home, country: team.country }];
+  });
+  return list.length ? list.sort((a, b) => a.code.localeCompare(b.code)) : null;
 }
 
 const byRating = (a, b) => b.rating - a.rating || a.name.localeCompare(b.name);
