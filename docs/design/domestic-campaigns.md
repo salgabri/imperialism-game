@@ -874,6 +874,13 @@ exactly those without a franchise; seeded duel campaigns reach a champion; the A
 launches on the map. The smoke runs an NFL duel and an NFL resume.
 `scripts/club-maps.test.mjs` holds it to the rule, as it does the NBA's and MLB's.
 
+**Era maps from 1960** (2026-11-09): the earlier seasons ([american-football.md](american-football.md#computed-seasons))
+reach back to 1960 on 20 more NFL maps by the same rule, and the American Football League's ten seasons before the
+1970 merger play on ten maps of their own, `afl1960` to `afl1969`, an `afl` entry in `LEAGUES` (league `AFL`, its
+clubs only, the NFL's joins; `--league=afl`). A map of another league of its day names its clubs' league, which the
+loader accepts (`validateClubsOnMap`). A club whose stadium lies outside its league's joined states holds its own
+state alone: the Giants at the Yale Bowl hold Connecticut in 1973–74, which `scripts/club-maps.test.mjs` allows.
+
 ## The MLB map
 
 Status: implemented 2026-11-01. Baseball clubs ([baseball.md](baseball.md)) have one

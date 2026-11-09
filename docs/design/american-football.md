@@ -198,7 +198,11 @@ Twenty-five more seasons ship beside the built-in 2026: 2001 to 2025, Madden NFL
 Madden NFL 26, each edition's roster at launch (data set `madden-<season>`, kind `madden`;
 a season is a calendar year, and Madden NFL 06 rates 2005). Clubs only, as today. Two
 editions are called Madden NFL 25: the 2013 one (instead of "14") and the 2024 one. Five
-Tecmo Super Bowl seasons, 1990 and 1992 to 1995, go further back ([Tecmo seasons](#tecmo-seasons)).
+Tecmo Super Bowl seasons, 1990 and 1992 to 1995, go further back ([Tecmo seasons](#tecmo-seasons)),
+three more from Madden NFL 99, 2000 and 2001 fill 1998 to 2000 ([Madden NFL 99 to 2001](#madden-nfl-99-to-2001)),
+and the seasons no game rated, 1960 to 1989, 1991, 1996 and 1997, are computed from Pro Football
+Archives' facts, with the AFL's ten seasons before the merger beside them ([Computed seasons](#computed-seasons)).
+Every NFL season from 1960 to 2026 is now there.
 
 - **Sources.** Every launch roster comes from a copy made at the time: EA's ratings services
   now serve rewritten launch iterations, so none is read from them. Of the 1,000 players EA's API
@@ -439,13 +443,220 @@ the seasons are built from; `--check` rebuilds them byte for byte, `--season=<ye
   Astrodome, RFK, Clemson); the loader's refusal of a season without its `conversion`; and a 1990
   campaign launched on its era's map and saved.
 
+## Madden NFL 99 to 2001
+
+Status: built 2026-11-09, on the user's request that day to cover every season it can ("can you do all you
+can to cover gaps in every sports year"); the coordinator chose this source for 1998 to 2000. Three seasons,
+kind `madden`, clubs only, each on an era map of its own:
+
+| Season | Data set | Edition | Overall | Clubs | Players | Strengths | Team overalls (Spearman) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2000 | `madden-2000` | Madden NFL 2001 | EA's | 31 | 1,507 | 80.9–86.3 | 0.831 |
+| 1999 | `madden-1999` | Madden NFL 2000 | ours (converted) | 31 | 1,216 | 68.1–84.6 | 0.903 |
+| 1998 | `madden-1998` | Madden NFL 99 | ours (converted) | 30 | 1,180 | 71.7–82.9 | 0.875 |
+
+- **Source.** NFL Draft Buzz's Madden Ratings Database (`https://www.nfldraftbuzz.com/madden`, live since June
+  2026) carries EA's per-player data of every edition back to Madden NFL 92, which no archive checked before had
+  kept. The ratings are EA SPORTS'; the compilation, and the players' names, are NFL Draft Buzz's: its matcher
+  bridges each game row to a Pro-Football-Reference id by name, team, position and jersey. Where it can be checked
+  it agrees (its Madden NFL 2002 Bills equal maddenratings.net's workbook). The site states no terms of use and its
+  robots.txt carries only a Sitemap line. Its pages were saved with curl, one request every 8 s, on 2026-11-09 (the
+  research pass's and this build's alike; Node's fetch is answered with a Cloudflare 403, is not used, and no
+  challenge was ever solved): 86 team pages, 27 position lists and 15 player pages, in the ignored
+  `data-src/ndb-madden/`, each pinned by SHA-256 in `scripts/data/ndb-pages.json` with the checks' sources (nflverse's
+  1998–2000 rosters, CC-BY 4.0, and maddenratings.net's three edition pages). Where an edition recorded no overall the
+  site shows its own, marked OVR* (its two best attributes averaged): it is never read. `npm run sync:madden-early`
+  (`scripts/sync-madden-early.mjs`, the readers in `scripts/lib/ndb-madden.mjs`) writes one committed snapshot a
+  season, `scripts/data/madden-early/<season>.json`; `--check` rebuilds them byte for byte, `--pin` rewrites the pins.
+- **Players.** Each club's team page (`/madden/team/<nickname>/<edition>`) lists every player with his position,
+  jersey and attributes. The Raiders', Rams' and Chargers' pages are empty for these editions (the site files them
+  under today's cities): their players come from the position lists (`/madden/year/<edition>/<group>`), which show
+  fewer attributes and leave out a few position labels (LLB, RLB, LT/RT: the 1998 Cowboys' Randall Godfrey and Dexter
+  Coakley), and their kickers' power and accuracy from their player pages. A player a team page lists under two
+  positions sits in its "Other" table, which shows no blocking or catching: his player page gives the edition's values
+  (11 players). The lists agree with the team pages on every value both show for 1,042 of 1,043, 1,073 of 1,075 and
+  1,342 of 1,345 players.
+- **Positions.** The site's labels map onto the game's ten: two-position labels by their first (LT/RT a lineman), LLB
+  and RLB linebackers, NT a lineman. A generic defensive back (DB) plays safety where nflverse lists him at safety that
+  season (2, 5 and 34 of 79, 80 and 108), else corner. Punters and long snappers are left out.
+- **Left out, never guessed.** Two rows of one club under one of the site's players, their values apart, are one game
+  row the matcher named twice: the row in the jersey nflverse gives him that season stays (else the first, as the site
+  lists a club by depth), the other is left out (Rob Moore's second row, #20, on the 1998 Cardinals; Kevin Mitchell's,
+  Marty Moore's and Marquis Walker's; Todd McClure's and Mark Campbell's, both in their own number). A player whose
+  edition did not track a value his overall needs is left out (Marcus Spriggs, 1999). Each snapshot names them.
+- **Lineup gaps.** The site's copy lacks some players: the 1998 Dolphins have one receiver (O.J. McDuffie, Lamar
+  Thomas and Oronde Gadsden are missing), the 1998 Colts and 49ers and the 1999 Eagles and Washington no kicker, the
+  1998 Panthers four linemen, the 1999 Colts two receivers and the 1999 Eagles no tight end, and the 1998 Cardinals'
+  third receiver is Rob Moore's second row. No player is added: the game fills each place out of position, as for the
+  Tecmo seasons (`GAPS` in the sync documents them and stops on any other shortfall).
+- **The overall of Madden NFL 99 and 2000 is ours.** Each player's attributes are weighted as Madden NFL 2001's
+  overall weights them: a least-squares fit of its EA overall on the attributes both the team pages and the lists show
+  for a group (QB: THP THA AWR SPD AGI ACC; RB: SPD ACC AGI AWR STR CAR; WR: SPD ACC AGI AWR CTH; TE: SPD ACC AGI AWR
+  STR CTH; tackles, guards and centres apart: AWR STR AGI PBK RBK; DL: STR SPD ACC AGI AWR TAK; LB: SPD ACC AGI AWR STR
+  TAK; CB and S apart: SPD ACC AGI AWR TAK CTH; K: AWR KPW KAC), over Madden NFL 2001's 28 team pages (1,274
+  players; in-sample Spearman 0.73 for kickers, 0.95–0.99 for every other group). The scores are then ranked within the
+  season at each game position and read off Madden NFL 2002 exactly as the Tecmo seasons' (`scripts/lib/nfl-reference.mjs`,
+  moved there from the Tecmo library; the Tecmo snapshots rebuild byte for byte). Each snapshot stores the weights,
+  every player's attributes and score, and the reference, so the overall can be recomputed from it alone. The label
+  says so: "Madden NFL 99 (converted)", "Madden NFL 2000 (converted)", and the source block has overall 'converted',
+  rawScale 99 and the conversion.
+- **Madden NFL 2001 keeps EA's overall**, unchanged (rawScale 99, no conversion). EA rated that edition high: its
+  clubs run 80.9–86.3, every one stronger than Madden NFL 2002's weakest, and closer together.
+- **Checks.** Club strengths order maddenratings.net's team overalls at Spearman 0.875 (Madden NFL 99), 0.903
+  (2000) and 0.831 (2001, EA's own). Of Madden NFL 99's 99 and 100 overall clubs, Jerry Rice, Tony Boselli, Ben Coates
+  and Bruce Smith rank first at their positions, Mark Schlereth and Neil Smith second, Barry Sanders fourth, Deion
+  Sanders twentieth of 146 corners; Jason Sehorn is not in the site's copy. In Madden NFL 2000 Deion Sanders and
+  Dermontti Dawson rank first, Mike Alstott tenth of 137 backs; Barry Sanders, who retired days before its release, is
+  not in the site's copy. 98.7%, 98.7% and 89.4% of the players are on nflverse's roster of their club that season.
+- **Era maps.** `nfl1998` (the Oilers at Vanderbilt Stadium in Nashville, the Ravens at Camden Yards, the Buccaneers
+  at Raymond James Stadium, no Browns), `nfl1999` (the Browns back, the Titans at Adelphia Coliseum) and `nfl2000`
+  (the Bengals at Paul Brown Stadium, the Seahawks at Husky Stadium), by the rule every map follows.
+- **Tests.** `scripts/madden-early.test.mjs`: the readers on pages laid out as the site's (OVR* never read, an empty
+  page, a value not tracked), the positions, the fit, the conversion recomputed from each snapshot, the checks as
+  recorded, Madden NFL 2001's overalls unchanged, and the snapshots rebuilt byte for byte where `data-src/` has the
+  pages.
+
+## Computed seasons
+
+Status: built 2026-11-09. On the user's request that day (computed seasons from per-player records may go back to
+1960, not further) the coordinator chose Pro Football Archives' facts for the seasons no game rated: the NFL's 1960
+to 1989, 1991, 1996 and 1997 (data sets `pfa-<season>`) and the AFL's ten seasons before the 1970 merger
+(`pfa-afl-<season>`), kind `pfa`, clubs only, labelled "NFL (computed)" and "AFL (computed)" so the Season list
+tells the two leagues of a 1960s year apart. The user asked for an Approximate Value: Pro-Football-Reference's own is
+off limits (its pages challenge automated clients, and Sports Reference's data-use terms forbid building on scraped
+data), so the value here is ours, AV-like.
+
+- **Source.** Pro Football Archives (`https://www.profootballarchives.com`, (c) 2006–2026, a privacy policy and no
+  terms of use; robots.txt is HTTP 404) has every NFL and AFL team-season with complete starting lineups (games started
+  sum to 22 a game), positions with sides (LOT, RDE, LLB, LCB, and LS and RS for the safeties) and every box-score
+  table. Only facts are taken: who played, at which position, in how many games and starts, and the season's totals.
+  `npm run fetch:pfa` (`scripts/fetch-pfa.mjs`) saved each season's league index and club pages (the regular season's)
+  into the ignored `data-src/pfa/<year>/`, one request every 5 s, on 2026-11-09, and pins every page by SHA-256 in
+  `scripts/data/pfa-pages.json`; an answer other than 200 or 404 stops it. The site's owner was not contacted.
+  `npm run sync:pfa` (`scripts/sync-pfa.mjs`, the reader and value in `scripts/lib/pfa.mjs`) writes one committed
+  snapshot a season, `scripts/data/pfa-seasons/<season>.json` and `afl-<season>.json`, and
+  `scripts/data/pfa-seasons/calibration.json`; `--check` rebuilds them byte for byte, `--tune` reruns the weights' search.
+
+- **Positions.** The site's codes map onto the game's ten by a player's first listed position: QB; HB, FB, RB
+  backs; FL, SE, OE and WR receivers; TE (and H-back) tight ends; the tackles, guards and centres the line; ends,
+  tackles, nose guards and middle guards the defensive line; every linebacker; LCB, RCB, CB, DB and the nickel corners
+  CB; LS and RS (before the 1980s the site's left and right safeties; its long snapper is LONG), FS, SS and S
+  safeties; K. Punters, long snappers and kick returners have no place in the lineup and are left out. The site's slips
+  are read as meant (`SLIPS`: ROG0LOT, RDTLDE, LLLB …), and a code the sync does not know stops it.
+- **Kickers.** A player who tried a field goal is a kicker too, and a punter who did is one (P-K). One who also played
+  a position (George Blanda at quarterback, Paul Hornung at halfback, Gino Cappelletti at flanker) is listed once, at
+  his larger share: where his value stands higher among the league-season's players at that place (the plan's rule).
+  Hornung and Blanda stay at their positions in their great seasons, and their clubs' kicking falls to the game, out
+  of position.
+- **The value.** Each club's credit is its points per game against the league-season's (scored for the offence,
+  conceded for the defence), to the power 0.25; each league-season's mean is its own (the AFL's apart from the NFL's).
+  It is shared out: the offensive line by starts (each lineman's games started over five a game); quarterbacks, backs,
+  receivers and tight ends by their share of the club's production (rushing and receiving yards, 0.2 a passing yard,
+  40 a touchdown run, caught or thrown, less 60 an interception thrown, never below nought) plus 0.15 of a game started
+  (a tight end 0.3); defenders two thirds by starts (over eleven a game) and one third by their share of the
+  defence's plays (2 a sack where the site records them, 1.5 an interception, 1 an opponent's fumble recovered, 1 a
+  return touchdown); kickers by field goals made, 0.3 an extra point and 3 a field goal beyond the league's rate.
+  Tackles (only from 2001) and Pro-Football-Reference's AV are not used. A player of two clubs that season has his
+  values summed and plays for the one he started most for (then played most for); his other clubs are noted.
+- **Tuning.** The weights were tuned once on 2001 to 2005, each player's value against his overall in the next
+  season's Madden launch roster (Madden NFL 2003 to 07, the committed snapshots; players matched by name), by the mean
+  of the ten positions' Spearman correlations: a grid around the plan's draft (pass yard 0.5, touchdown 20,
+  interception 45, tight-end blocking 0.5 of the starts …) and a second around the first's best, the club's credit
+  linear. Then its power: 1 gave a dominant club's every starter a top place at his position, spreading the computed
+  2001 season's clubs over 71.3–88.3 where Madden NFL 2002's 2001 runs 72.7–83.9; 0.25 spreads them 73.5–85.0, the
+  nearest in width of 1 to 0.1. Then frozen (`VALUE_WEIGHTS` in `scripts/lib/pfa.mjs`; `npm run sync:pfa -- --tune`
+  reruns the search). Against the next season's Madden ratings they order quarterbacks at 0.82, receivers
+  0.86, linebackers 0.79, corners 0.78, backs 0.78, safeties 0.76, the defensive line 0.74,
+  tight ends 0.71, the offensive line 0.68 and kickers 0.64 (mean 0.757; `calibration.json` has every
+  season's).
+- **The overall.** Each league-season's players are ranked at their game position by value, then games started, then
+  games played, and read off Madden NFL 2002's overalls at that position exactly as the Tecmo seasons' and Madden NFL 99
+  and 2000's are. The label says so ("NFL (computed)", "AFL (computed)"), and the source block has method 'computed',
+  rawScale 'value' and the conversion. Each snapshot keeps every player's starts, games and value, and the reference,
+  so the overall can be recomputed from it alone.
+- **The strikes.** 1982's strike cancelled seven weeks: the season is ranked as played, nine games (the site lists a
+  cancelled game without a score, and no such game is read). 1987's cancelled one week and was played by replacement
+  players for three (4 to 19 October): that season ranks the clubs' own players only. A replacement player is one the
+  strike games' box scores (their starters and every player with a statistic; `npm run fetch:pfa` saves the 42 of
+  them) name as often as he played, or one who played no more than three games and for no club in 1986 or 1988 (a box
+  score names no substitute without a statistic): 1,221 left out, 1,537 kept. The clubs' credit is still their whole
+  season's, strike games and all.
+- **Lineup gaps.** No player is added: a place a club has too few natural players for is the game's to fill out of
+  position, and the snapshot documents it (63 club-seasons of the 43): a third corner for 36 two-corner defences,
+  mostly before 1975 (the game's lineup is the nickel); a kicker for 21 clubs whose kicker played a position for his
+  larger share (Hornung's Packers, Blanda's Oilers, Cappelletti's Patriots); a third receiver for 9 clubs of the 1960s
+  and 1970s; a tight end for the run-and-shoot Lions of 1989 and Oilers of 1991, as in the Tecmo seasons.
+- **Results.** Club strengths run 70.8–86.7 over the 43 seasons (the Madden seasons' 69–85) and follow each season's
+  results: Spearman 0.58–0.97 against the clubs' winning shares, 0.83 on average, where Madden's launch ratings of
+  2001 to 2005 reach 0.15–0.55 (0.36) against theirs: a hindsight rating. The champions or the best records lead: the
+  1962 Packers (13–1, 85.2), the 1968 Colts (13–1, 86.5), the 1969 Vikings, the 1972 Dolphins (14–0, 83.8), the 1985
+  Bears (15–1, 85.0), the 1989 49ers, the 1991 Washington club (14–2, 85.5), the 1996 Packers, the 1997 Broncos; in
+  the AFL the 1960 Oilers, the 1964 Bills, the 1967 Raiders and the 1969 Chiefs. Where they do not: the 1960 Eagles,
+  champions at 10–2, sixth of 13 (their receivers and corners thin); the 1965 Packers third behind the 49ers, who
+  scored the most and finished 7–6–1; the 1976 Raiders (13–1) eighth; the 1987 49ers (13–2) twelfth of 28, their line
+  and tight ends sharing starts. Every season is in the audit with each club's record and points, its gaps and its
+  out-of-position starters.
+- **The AFL.** Its ten seasons are computed as the NFL's are, each ranked among its own players, so its clubs read as
+  strong as the NFL's of the same year though they were not: the two leagues never meet in the game, and each 1960s
+  year has both seasons, labelled "NFL (computed)" and "AFL (computed)". Its clubs are 8 to 1965, 9 in 1966–67 and
+  10 in 1968–69; they join the NFL's seasons from 1970.
+- **Era maps from 1960.** The franchise eras now run from 1960 (`teams` in `scripts/data/nfl-seasons.json`), every
+  existing era unchanged in effect: every season and map before rebuilds byte for byte but `nfl1990`, whose seasons
+  are now 1988 to 1991 (no club moved: its shapes are unchanged, its version is new, and a save on it resumes on the
+  updated map club by club). A club plays where it played most of its home games that season, which the sync checks
+  against Pro Football Archives' scores of every season (a club splitting them evenly keeps its own: the Packers, four
+  in Green Bay and four in Milwaukee from 1978). Stadium points come from the franchise research of 1980–2025 or the
+  manifest where it has them, else from each stadium's Wikipedia article (read 2026-11-09 from `/wiki/` pages, which
+  robots.txt allows; its APIs it does not), to four decimals. A move starts a map, a rename does not: 20 new NFL maps,
+  `nfl1960`, `nfl1961` (1961–63), `nfl1964` (1964–65), `nfl1966`, `nfl1967` (1967–69), `nfl1970`, `nfl1971`, `nfl1972`,
+  `nfl1973` (1973–74), `nfl1975`, `nfl1976` (1976–79), `nfl1980` (1980–81), `nfl1982` (1982–83), `nfl1984` (1984–86),
+  `nfl1987`, `nfl1996`, `nfl1997`, `nfl1998`, `nfl1999` and `nfl2000`, and ten AFL maps, `afl1960` to `afl1969` (a
+  venue moved every year). The clubs of their day: the St. Louis Cardinals at Busch Stadium (Sportsman's Park) to 1965
+  and Busch Memorial Stadium to 1987; the Baltimore Colts at Memorial Stadium to 1983; Washington at Griffith Stadium in
+  1960, then RFK Stadium; the Steelers at Forbes Field to 1963 (most home games: 5–1, 6–1, 5–2, 4–3 against Pitt
+  Stadium), at Pitt Stadium to 1969; the Bears at Wrigley Field, the Eagles at Franklin Field, the 49ers at Kezar and
+  the Cowboys at the Cotton Bowl to 1970 (Texas Stadium from 1971: five of seven home games); the Lions at Tiger
+  Stadium to 1974; the Giants at Yankee Stadium to 1972, at the Yale Bowl in 1973 (five of seven) and 1974, so they
+  hold Connecticut, and at Shea in 1975 with the Jets, who grow from their Hofstra base (the Giants' own base that
+  season is not established; they grow from Shea); the Rams at the Coliseum to 1979; the Saints at Tulane Stadium to
+  1974; the Vikings from 1961 at Metropolitan Stadium; the Falcons from 1966, the Saints from 1967, the Seahawks and
+  Buccaneers from 1976. 1996 and 1997 add the Ravens at Memorial Stadium (no Browns 1996–98), the Panthers in
+  Charlotte, and in 1997 the Tennessee Oilers at the Liberty Bowl in Memphis and Washington at its Maryland stadium.
+- **The AFL's clubs.** Eras with `league: 'AFL'` (teamsOf takes the season's league; the NFL's seasons never field
+  them): the Boston Patriots at Nickerson Field, Fenway Park (1963–68), Alumni Stadium (1969) and, in the merged NFL,
+  Harvard Stadium (1970); the New York Titans and then the Jets (1963) at the Polo Grounds, at Shea from 1964; the
+  Dallas Texans at the Cotton Bowl to 1962, then the Kansas City Chiefs at Municipal Stadium; the Oakland Raiders at
+  Kezar (1960) and Candlestick Park (1961), both in San Francisco, Frank Youell Field (1962–65) and the Coliseum; the
+  Los Angeles Chargers at the Coliseum (1960), then San Diego at Balboa Stadium and San Diego Stadium (1967); the
+  Houston Oilers at Jeppesen Stadium, Rice Stadium (1965–67) and the Astrodome; the Bills at War Memorial Stadium; the
+  Broncos at Bears (Mile High) Stadium; the Dolphins from 1966 at the Orange Bowl; the Bengals from 1968 at Nippert
+  Stadium. Each AFL map's index entry names its league, `AFL`, which the setup shows as the theatre ("AFL · USA").
+- **Tests.** `scripts/pfa-seasons.test.mjs`: the reader on pages laid out as the site's (exhibition, playoff and
+  cancelled games left out, a slip in a count read past, the draft list not the roster), the positions and the site's
+  slips, the kickers' rule, the value on invented clubs (the line by starts, each league its own mean), the 1987 rule,
+  ties by starts then games, every season recomputed from its snapshot, every club's lineup or its documented gaps, the
+  calibration as recorded, and the snapshots rebuilt byte for byte where `data-src/pfa/` has the pages.
+  `scripts/nfl-seasons.test.mjs` adds the seasons from 1960 on their maps (the Texans at the Cotton Bowl, the
+  Patriots' four Boston grounds, the Giants holding Connecticut, the Jets growing from Hofstra in 1975, the Oilers in
+  Memphis and Nashville, no AFL club in an NFL season nor the reverse, the expansion clubs and the Browns), the loader's
+  refusals (a computed season without its conversion, a converted Madden edition without one, an AFL club on an NFL map
+  and the reverse) and the running App launching and saving 1965's NFL and AFL seasons. `scripts/club-maps.test.mjs`
+  holds the 30 new maps to the state rule.
+
 ## Known limits
 
 - No national teams: no source rates American football players by nation.
-- Seasons from 1990: the Tecmo Super Bowl games' 1990 and 1992 to 1995, whose overall is
-  ours (no Tecmo edition rates 1991), then Madden NFL's from 2001. No game rated individual NFL
-  players with an overall before Madden 2002 that any archive kept (Madden 98 to 2001 survive
-  as team overalls only).
+- Seasons from 1960, not earlier (the user's floor for computed seasons). Only Madden NFL 2001 and
+  2002 on carry EA's overall; Madden NFL 99 and 2000 and the Tecmo games' overall is ours, from their
+  attributes, and every season before 1998 but the Tecmo ones is computed from what the players did:
+  a hindsight rating, which follows that season's results more closely than a game's pre-season
+  ratings do. Madden NFL 97 and 98 (1996, 1997) are not used, on the coordinator's choice: the
+  research found Madden 98's 1–15 attributes order its team overalls at only 0.58, and Madden 97's
+  recorded overall on an odd scale, with nothing to check it against and rows repeated.
+- NFL Draft Buzz's copy of Madden NFL 99 to 2001 lacks a few players (documented lineup gaps), and its
+  player names are its own matcher's. EA's rights in it are not cleared, as for the other Madden seasons.
+- The AFL's seasons are ranked within the AFL: its clubs and the NFL's of the same year cannot be compared,
+  and never meet.
 - Scoring is possession by possession: no defensive returns of a try, no one-point
   safeties, and the side that concedes a safety still gets the next possession
   (there is no free kick). The two-point chart is one chart for every coach.
