@@ -356,8 +356,9 @@ NRL.com's match centre, the same endpoints the built-in season reads (`scripts/s
   starting (below): his club's season page (`seasons/nrl-<year>/<club>/players.html`) for his RLP id, then his player
   page for its "Position(s)". 370 requests, every one answered: 354 pages, of which the sync now reads and pins 352 by
   the part read (the other two, Parramatta's 2012 list and Pat O'Hanlon's page, served his 2012 id before it was
-  aliased, below), and each season's summary page, whose club links gave the manifest's `rlp` slugs. A player page's pin (shared with 2008's) now
-  covers his name, date of birth and positions, so 2008's 20 player pins changed; its snapshot did not.
+  aliased, below), and each season's summary page, whose club links gave the manifest's `rlp` slugs. A player page's
+  pin (shared with 2008's) now covers his name, date of birth and positions, so 2008's 20 player pins changed; its
+  snapshot did not.
 - **One player, two ids.** NRL.com lists the Titans' Ben Nakubuwai under two ids in 2017 (503511 in round 24, 100007912
   in round 26); the Rugby League Project's 2017 Titans list has him once. It also gives two players a new id for one
   season: Parramatta's Pat O'Hanlon is 500987 in 2011 and 2013 but 500233 in 2012, South Sydney's Matt King 501172 in
