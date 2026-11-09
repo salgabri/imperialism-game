@@ -749,10 +749,23 @@ test('a Tecmo season launches its clubs on their era\'s map: the Raiders in Los 
     assert.deepEqual(raiders.squad.map(p => [p.name, p.pos, p.rating]), doc.clubs.find(club => club.id === 'nfl-los-angeles-raiders').squad);
     const saved = parseCampaign(items.get(SAVE_KEY));
     assert.equal(JSON.stringify(saved.teams), JSON.stringify(st.teams), 'saved as played');
+
+    // nfl1990 now also serves 1988, 1989 and 1991, which changed its version but not its shapes: a 1990 save made on the
+    // map's earlier build (nfl1990-359ec65c) resumes on this one, club by club, as it was played.
+    const map = CLUB_MAPS.find(entry => entry.id === 'nfl1990');
+    assert.notEqual(map.version, 'nfl1990-359ec65c');
+    const before = JSON.parse(items.get(SAVE_KEY));
+    for (const settings of [before.settings, before.initialSettings].filter(Boolean)) settings.domesticVersion = 'nfl1990-359ec65c';
+    B.clearFootballSetCache();
+    app.continueSaved(parseCampaign(JSON.stringify(before)));
+    assert.equal(app.state.phase, 'playing');
+    assert.equal(app.state.settings.domesticVersion, map.version, 'moved onto the updated map');
+    assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams), 'every club as played');
+    assert.deepEqual(app.state.own, st.own, 'every club on its own land');
   });
 });
 
-test('a computed season launches on its era\'s map and saves: the NFL\'s 1965, and the AFL\'s on a map of its own', async () => {
+test('a computed season launches on its era\'s map, saves and resumes: the NFL\'s 1965, and the AFL\'s on a map of its own', async () => {
   for (const [id, map, count, scope] of [['pfa-1965', 'nfl1964', 14, 'NFL'], ['pfa-afl-1965', 'afl1965', 8, 'AFL']]) {
     await withApp(async ({ app, time, items }) => {
       app.pickSetup('sport', 'american-football');
@@ -770,6 +783,14 @@ test('a computed season launches on its era\'s map and saves: the NFL\'s 1965, a
       for (const club of doc.clubs) assert.deepEqual(st.teams[club.id].squad.map(p => [p.name, p.pos, p.rating]), club.squad);
       const saved = parseCampaign(items.get(SAVE_KEY));
       assert.equal(JSON.stringify(saved.teams), JSON.stringify(st.teams), 'saved as played');
+      // The save holds every player as played, so it resumes without the season file, on the same map.
+      B.clearFootballSetCache();
+      app.continueSaved(saved);
+      assert.equal(app.state.phase, 'playing');
+      assert.deepEqual([app.state.settings.dataSet, app.state.settings.clubScope, app.state.settings.domesticVersion],
+        [id, `domestic:${map}`, CLUB_MAPS.find(entry => entry.id === map).version]);
+      assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams), 'resumed as played');
+      assert.deepEqual(app.state.own, st.own);
     });
   }
 });
