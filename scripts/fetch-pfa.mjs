@@ -109,6 +109,9 @@ async function main() {
   if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
   await mkdir(cacheDir, { recursive: true });
   if (argv.includes('--pin')) return writePins();
+  // A run started right after another keeps the gap too: the first request waits for the log's last answer.
+  const logFile = path.join(cacheDir, 'fetch-log.tsv');
+  if (existsSync(logFile)) last = Date.parse((await readFile(logFile, 'utf8')).trim().split('\n').at(-1)?.split('\t')[0]) || 0;
   const leagues = option('league') ? [option('league')] : Object.keys(SEASONS);
   if (leagues.some(league => !SEASONS[league])) throw new Error(`Unknown league ${option('league')}`);
   const years = option('years')?.split(',').flatMap(part => {
