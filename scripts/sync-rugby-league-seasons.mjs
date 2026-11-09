@@ -518,12 +518,20 @@ async function computedSnapshotOf(season) {
     placed.push({ player, club, pos: positions[0], how: 'RLP' });
   }
 
-  // One player, one id: two of one name at one club are NRL.com's duplicate, to be named in nrlcom.aliases.
+  // One player, one id: two of one name at one club are NRL.com's duplicate, to be named in nrlcom.aliases. So is one
+  // name at one club in the season either side under another id, when neither id plays in the other's season (Pat
+  // O'Hanlon's 2012 id, Matt King's 2013 one): his season before and the seasons around him would be lost.
   const named = new Map();
   for (const entry of placed) {
     const key = `${entry.club}|${entry.player.name}`;
     if (named.has(key)) throw new Error(`${year}: NRL.com lists ${entry.player.name} at ${entry.club} under ${named.get(key)} and ${entry.player.id}: if one player, add the second to nrlcom.aliases`);
     named.set(key, entry.player.id);
+    const franchise = clubOf(entry.player);
+    for (const at of [year - 1, year + 1]) {
+      const other = [...records.get(at).values()].find(p => p.id !== entry.player.id && fold(p.name) === fold(entry.player.name)
+        && Object.hasOwn(p.clubs, franchise) && !records.get(at).has(entry.player.id) && !records.get(year).has(p.id));
+      if (other) throw new Error(`NRL.com lists ${entry.player.name} at ${franchise} under ${entry.player.id} in ${year} and ${other.id} in ${at}: if one player, add the later id to nrlcom.aliases`);
+    }
   }
 
   // Values: core points a club game, the season before at half weight.

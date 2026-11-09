@@ -528,7 +528,12 @@ test('each computed season places its players by the season, then a season eithe
     assert.equal(audit.left.length, snapshot.left.length, `${id}: the audit lists every one left out`);
     assert.deepEqual([audit.players.bySeason, audit.players.bySeasonEitherSide, audit.players.byTwoEitherSide, audit.players.byRlp],
       ['S', 'S±1', 'S±2', 'RLP'].map(how => rows.filter(row => row.how === how).length));
+    assert.ok(rows.every(row => !Object.hasOwn(MANIFEST.nrlcom.aliases, String(row.nrlId))), `${id}: a second id plays under the first`);
   }
+  // NRL.com gave Pat O'Hanlon (2012) and Matt King (2013) a new id for a season: aliased, each keeps his season before.
+  const in2013 = nrlId => rowOf(SNAPSHOTS.get('nrl-2013').players.find(row => row[0] === nrlId));
+  assert.deepEqual([in2013(500987).name, in2013(500987).previous[0]], ["Pat O'Hanlon", 2]);
+  assert.deepEqual([in2013(501172).name, in2013(501172).previous[0]], ['Matt King', 20]);
 });
 
 test('every computed overall recomputes from its snapshot: value, percentile at the position, Rugby League 26\'s reference by the quota', () => {

@@ -15,7 +15,7 @@ export const BUILT_IN_RUGBY_LEAGUE_SEASONS = Object.freeze([
   Object.freeze({ id: 'nrl-2016', version: 'nrl-2016-e997deea', year: 2016, season: '2016', label: 'Computed from NRL.com match stats', map: 'nrl2012' }),
   Object.freeze({ id: 'nrl-2015', version: 'nrl-2015-8c869b3f', year: 2015, season: '2015', label: 'Computed from NRL.com match stats', map: 'nrl2012' }),
   Object.freeze({ id: 'nrl-2014', version: 'nrl-2014-9b759241', year: 2014, season: '2014', label: 'Computed from NRL.com match stats', map: 'nrl2012' }),
-  Object.freeze({ id: 'nrl-2013', version: 'nrl-2013-1e8e050e', year: 2013, season: '2013', label: 'Computed from NRL.com match stats', map: 'nrl2012' }),
+  Object.freeze({ id: 'nrl-2013', version: 'nrl-2013-b16ade03', year: 2013, season: '2013', label: 'Computed from NRL.com match stats', map: 'nrl2012' }),
   Object.freeze({ id: 'nrl-2012', version: 'nrl-2012-cc13a125', year: 2012, season: '2012', label: 'Computed from NRL.com match stats', map: 'nrl2012' }),
   Object.freeze({ id: 'nrl-2011', version: 'nrl-2011-239382b6', year: 2011, season: '2011', label: 'Computed from NRL.com match stats', map: 'nrl2010' }),
   Object.freeze({ id: 'nrl-2010', version: 'nrl-2010-50fa255d', year: 2010, season: '2010', label: 'Computed from NRL.com match stats', map: 'nrl2010' }),

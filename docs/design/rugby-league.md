@@ -354,12 +354,17 @@ NRL.com's match centre, the same endpoints the built-in season reads (`scripts/s
 - **The Rugby League Project** (rugbyleagueproject.org, robots.txt read 2026-11-09: no query strings, no
   `/matches/Custom` or `/matches/s|m|p|r/`), one request every three seconds, only for the players NRL.com never shows
   starting (below): his club's season page (`seasons/nrl-<year>/<club>/players.html`) for his RLP id, then his player
-  page for its "Position(s)". 370 requests, every one answered: 354 pages read and pinned by the part read, and each
-  season's summary page, whose club links gave the manifest's `rlp` slugs. A player page's pin (shared with 2008's) now
+  page for its "Position(s)". 370 requests, every one answered: 354 pages, of which the sync now reads and pins 352 by
+  the part read (the other two, Parramatta's 2012 list and Pat O'Hanlon's page, served his 2012 id before it was
+  aliased, below), and each season's summary page, whose club links gave the manifest's `rlp` slugs. A player page's pin (shared with 2008's) now
   covers his name, date of birth and positions, so 2008's 20 player pins changed; its snapshot did not.
 - **One player, two ids.** NRL.com lists the Titans' Ben Nakubuwai under two ids in 2017 (503511 in round 24, 100007912
-  in round 26); the Rugby League Project's 2017 Titans list has him once. `nrlcom.aliases` in the
-  manifest plays the second as the first, and the sync stops on any other name a club lists under two ids.
+  in round 26); the Rugby League Project's 2017 Titans list has him once. It also gives two players a new id for one
+  season: Parramatta's Pat O'Hanlon is 500987 in 2011 and 2013 but 500233 in 2012, South Sydney's Matt King 501172 in
+  2012 but 501830 in 2013 (RLP's lists have each under one id), which lost each his season before and Pat O'Hanlon his
+  seasons either side. `nrlcom.aliases` in the manifest plays each later id as the first, and the sync stops on any
+  other name a club lists under two ids in a season, or under another id in the season either side when neither id
+  plays in the other's season.
 
 ### The method
 
@@ -431,7 +436,7 @@ results, so the test recomputes every overall and every shift from it alone.
 | 2009 | 201 | 449 | 398 / 30 / 11 / 10 | 4 | 81.7–85.2 | −2 to +2 | 3.8 | 0.48 → 0.72 |
 | 2010 | 201 | 448 | 395 / 31 / 6 / 16 | 5 | 81.5–85.1 | −2 to +2 | 4.3 | 0.06 → 0.82 |
 | 2011 | 201 | 465 | 417 / 32 / 9 / 7 | 3 | 81.4–84.9 | −1 to +2 | 3.2 | 0.55 → 0.92 |
-| 2012 | 201 | 436 | 388 / 31 / 6 / 11 | 2 | 81.5–84.9 | −1 to +1 | 1.8 | 0.45 → 0.91 |
+| 2012 | 201 | 436 | 388 / 32 / 6 / 10 | 2 | 81.5–84.9 | −1 to +1 | 1.8 | 0.45 → 0.91 |
 | 2013 | 201 | 457 | 400 / 32 / 11 / 14 | 4 | 81.4–85.5 | −1 to +2 | 4.1 | 0.59 → 0.93 |
 | 2014 | 201 | 461 | 404 / 30 / 7 / 20 | 2 | 81.4–84.7 | −1 to +1 | 4.4 | 0.54 → 0.86 |
 | 2015 | 201 | 445 | 381 / 29 / 19 / 16 | 2 | 81.4–85.2 | −1 to +1 | 3.5 | 0.78 → 0.88 |

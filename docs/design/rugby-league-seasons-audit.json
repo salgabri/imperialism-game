@@ -1849,7 +1849,7 @@
     },
     {
       "id": "nrl-2013",
-      "version": "nrl-2013-1e8e050e",
+      "version": "nrl-2013-b16ade03",
       "season": "2013",
       "edition": "NRL.com match centre, the 2013 NRL premiership",
       "label": "Computed from NRL.com match stats",
@@ -2031,9 +2031,9 @@
       "players": {
         "placed": 436,
         "bySeason": 388,
-        "bySeasonEitherSide": 31,
+        "bySeasonEitherSide": 32,
         "byTwoEitherSide": 6,
-        "byRlp": 11,
+        "byRlp": 10,
         "left": 2,
         "inSquads": 384
       },
@@ -2123,7 +2123,6 @@
         "nrl-new-zealand-warriors: Sam Lousi: SR (RLP 19973)",
         "nrl-newcastle-knights: Chris Adams: HK (RLP 19768)",
         "nrl-north-queensland-cowboys: Blake Leary: SR (RLP 20010)",
-        "nrl-parramatta-eels: Pat O'Hanlon: SR (RLP 17217)",
         "nrl-penrith-panthers: Mitchell Achurch: SR (RLP 19581)",
         "nrl-south-sydney-rabbitohs: Neccrom Areaiiti: PR (RLP 19418)",
         "nrl-wests-tigers: Ray Cashmere: PR (RLP 1721)"
