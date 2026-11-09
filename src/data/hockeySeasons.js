@@ -21,7 +21,7 @@ export const BUILT_IN_HOCKEY_SEASONS = Object.freeze([
   Object.freeze({ id: 'nhl-2011', version: 'nhl-2011-0e1e6f08', year: 2011, season: '2010/11', label: 'Computed from statistics', map: 'nhl2007' }),
   Object.freeze({ id: 'nhl-2010', version: 'nhl-2010-c083eb58', year: 2010, season: '2009/10', label: 'Computed from statistics', map: 'nhl2007' }),
   Object.freeze({ id: 'nhl-2009', version: 'nhl-2009-35f9e501', year: 2009, season: '2008/09', label: 'NHL 09, converted', map: 'nhl2007' }),
-  Object.freeze({ id: 'nhl-2008', version: 'nhl-2008-3d12a46d', year: 2008, season: '2007/08', label: 'NHL 08, converted', map: 'nhl2007' }),
+  Object.freeze({ id: 'nhl-2008', version: 'nhl-2008-62615e5d', year: 2008, season: '2007/08', label: 'NHL 08, converted', map: 'nhl2007' }),
   Object.freeze({ id: 'nhl-2007', version: 'nhl-2007-7fbf9804', year: 2007, season: '2006/07', label: 'NHL 07', map: 'nhl2007' }),
   Object.freeze({ id: 'nhl-2006', version: 'nhl-2006-94d5917d', year: 2006, season: '2005/06', label: 'Computed from statistics', map: 'nhl2004' }),
   Object.freeze({ id: 'nhl-2004', version: 'nhl-2004-9d8f11d0', year: 2004, season: '2003/04', label: 'Computed from statistics', map: 'nhl2004' }),

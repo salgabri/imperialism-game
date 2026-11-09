@@ -234,6 +234,11 @@ test('NHL 08 and NHL 09: EA\'s attributes, the mean ranked onto NHL 07\'s overal
   assert.equal(n09.attributes.skater.length, 19);
   assert.ok(!n09.attributes.skater.some(a => ['DIS', 'TGH', 'AGG', 'DUR'].includes(a)) && !n09.attributes.goalie.some(a => ['AGGR', 'DUR', 'PUCK'].includes(a)));
   assert.deepEqual(n08.left.map(([name]) => name).sort(), ['Alexei Zhamnov', 'Jiri Fischer', 'Mike Rathje', 'Rob DiMaio'], 'EA\'s unset 255');
+  // The rows two pages break: the Devils' last goalie, and the Stars' two centres run together.
+  for (const [name, team, pos] of [['Kevin Weekes', 'NJD', 'G'], ['Stu Barnes', 'DAL', 'C'], ['Jeff Halpern', 'DAL', 'C']]) {
+    assert.ok(n08.players.some(p => p[0] === name && p[1] === team && p[2] === pos), `${name} (${team}) in NHL 08`);
+  }
+  assert.equal(n08.players.length, 662);
   assert.equal(attributeMean([80, 255]), null);
   assert.equal(attributeMean([80, 90]), 85);
   const reference = Object.fromEntries(['F', 'D', 'G'].map(g => [g, new Set(ratingsOfHistogram(MANIFEST.converted.histograms[g]))]));

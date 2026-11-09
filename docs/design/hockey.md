@@ -315,8 +315,10 @@ every club's place.
 converted, as Tecmo's is for the NFL. Neither edition's overall was ever published in full.
 
 - *NHL 08*: IGN's 30 team pages of September and October 2007 (the Wayback Machine's captures, already pinned for NHL
-  07's countries): 24 skater attributes or 20 goalie attributes, EA's position and EA's Country. The Canadiens' page
-  closes each row's last cell as `</td</tr>`, which the parser repairs. 659 players.
+  07's countries): 24 skater attributes or 20 goalie attributes, EA's position and EA's Country. Three pages break
+  their rows, and the parser repairs them: the Canadiens' closes each row's last cell as `</td</tr>`, the Devils' leaves
+  its last goalie's row (Kevin Weekes) without its `</tr>`, and the Stars' starts Jeff Halpern's row inside Stu Barnes's
+  last cell. 662 players.
 - *NHL 09*: IGN's 30 team pages as the Wayback Machine captured them on 16 to 18 August 2008, a month before the game came
   out (fetched again 2026-11-09 from web.archive.org, the same bytes as the research's copies): 23 skater or 19 goalie
   attributes and nothing else. IGN's article of the same week (xbox360.ign.com/articles/898/898201p1.html, captured
@@ -339,7 +341,7 @@ does. Ties stay ties and nobody passes anybody in a group.
 Why it holds: within NHL 07 the same plain mean of the skill attributes (all but Injury, Potential, Fighting, Penalty,
 Aggression, Toughness and Intensity) ranks the players like EA's overall, Spearman 0.95 for forwards and 0.94 for
 defenders (`scripts/hockey-computed.test.mjs` measures it from the pinned pages). Results: Brodeur 96, Luongo 95, Iginla
-95, Crosby 94; Anaheim, the 2007 champions, the strongest club of NHL 08 (80.3) and Phoenix the weakest (72.4); Detroit,
+95, Crosby 94; Anaheim, the 2007 champions, the strongest club of NHL 08 (80.4) and Phoenix the weakest (72.4); Detroit,
 the 2008 champions, the strongest of NHL 09 (78.6).
 
 ## Computed seasons

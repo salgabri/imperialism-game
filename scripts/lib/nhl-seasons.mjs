@@ -233,7 +233,12 @@ export function parseIgnAttributes(page) {
     if (headAt < 0) break;
     const start = html.lastIndexOf('<table', headAt), end = html.indexOf('</table>', headAt);
     if (start < 0 || end < 0) throw new Error("IGN's page has a header outside a table");
-    const rows = tableRows(html.slice(start, end + '</table>'.length));
+    // Two NHL 08 pages leave a row open: the Devils' goalies' last row (Kevin Weekes) ends at the table's end without its
+    // </tr>, and on the Stars' page Jeff Halpern's row starts inside Stu Barnes's last cell, on a line of its own.
+    const table = html.slice(start, end + '</table>'.length)
+      .replace(/<\/td>(\s*)<\/table>$/, '</td></tr>$1</table>')
+      .replace(/(<td>[^<\r\n]*)\r?\n(?=[^<\s])/g, '$1</td></tr><tr><td>');
+    const rows = tableRows(table);
     const at = rows.findIndex(row => row.includes('First Name'));
     const head = rows[at];
     const goalies = head.some(h => ['Glove Side High', 'GLVHI', '5 Hole', '5HOLE'].includes(h));
