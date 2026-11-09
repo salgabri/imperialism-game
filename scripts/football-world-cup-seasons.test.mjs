@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SAVE_KEY } from '../src/config.js';
-import { NATIONS, buildTeam, makeRng, nationIdentity, selectLineup } from '../src/data/teams.js';
+import { NATIONS, nationIdentity, selectLineup } from '../src/data/teams.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { FOOTBALL_FEDERATIONS } from '../src/data/footballFederations.js';
 import { contentHash, identitiesFor, territoryFor } from '../src/data/footballSetBuild.js';
