@@ -289,8 +289,10 @@ earlier.
 
 **Validation** (`validation.json`'s `checks`, inputs in the manifest's `checks`; nothing from them is in a season file):
 Lance Tingay's year-end tens from Wikipedia's "Top ten ranked female tennis players (1921–1974)", revision 1376153875
-(22 September 2026, CC BY-SA 4.0), read once from the research pass's copy of the raw wikitext (SHA-256 `cc0c6df4…`;
-Wikipedia's robots.txt disallows `/w/`, so nothing re-fetches it). Each name is kept with its match-file id, married
+(22 September 2026, CC BY-SA 4.0). They match Tingay's columns on the article page of that revision, fetched once under
+`/wiki/`, which Wikipedia's robots.txt allows (SHA-256 `c9d49c88…`); the research pass had first read them from the raw
+wikitext through `/w/index.php`, a path robots.txt disallows, and nothing here uses that copy or fetches `/w/`. Each
+name is kept with its match-file id, married
 names joined by hand: Kerry Melville is Kerry Reid in the player file, Nancy Richey Gunter Nancy Richey, Lesley Turner
 Bowrey Lesley Turner, Annette Van Zyl duPlooy Annette Van Zyl. Every one of the fifty is rated in her season; the
 seasons share 8.2 of the ten on average, rank correlation 0.68. 1968 is the weakest: King, Tingay's first, is seventh,
@@ -314,7 +316,7 @@ Montenegro; the fixes and Seles's seasons; Tennis Abstract's own lists and renam
 1968–1972 with Court and King leading Australia and the United States, South Africa playing, the 1971 nations from the
 cups around it, Tingay's tens and Court's peak; the loader refusing damaged files; a season binding the women's sport
 and serve; the running App listing the seasons, loading one, launching 1985 with Slovakia in Czechoslovakia's empire and
-resuming the save; and a challenge link to a season.
+1968 with South Africa playing, and resuming the saves; and a challenge link to a season.
 
 ### Limits
 

@@ -728,7 +728,7 @@
       "fileNote": "25,001 rows of two levels, the majors (G, 20,201) and the Davis Cup rubbers (D, 4,800); each row stops after 40 of the header's 49 cells (the empty statistics and rank cells left off, padded when read), and two rounds appear that the open era's files lack: PR, a preliminary round before the first full one, and CR, the challenge round of Wimbledon to 1921 and of the US Championships to 1911. A row's season is the year of its date. Every row is counted but walkovers, retirements, defaults and placeholder opponents.",
       "start": {
         "amateur": 1360,
-        "fit": "Not published: a newcomer whose first counted match is in the amateur file starts at 1360, fitted to five points so that the run carries on as the shipped one. On Tennis Abstract's 38 targets for 1973-2000 (targets above) it comes out 2.0 Elo low on average, root mean square 15.3 (the shipped run: 2.0 and 15.1), and over the shipped run's top 50 of each season 1973-1980 its Elo of the same men differs from the shipped run's by 0.4 to 3.0 points on average (absolute), by -1.2 to +2.6 in all. A start of 1350 leaves those seasons 0.1 to 4.8 points under the shipped run, 1370 2.9 to 5.9 over it, 1450 (the open era's tour start) 18 to 30 over it."
+        "fit": "Not published: a newcomer whose first counted match is in the amateur file starts at 1360, fitted to five points so that the run carries on as the shipped one. On Tennis Abstract's 38 targets for 1973-2000 (targets above) it comes out 2.0 Elo low on average, root mean square 15.3 (the shipped run: 2.0 and 15.1), and over the shipped run's top 50 of each season 1973-1980 its Elo of the same men differs from the shipped run's by 0.3 to 3.0 points on average (absolute), by -1.2 to +2.6 in all. A start of 1350 leaves those seasons 0.1 to 4.8 points under the shipped run, 1370 2.9 to 5.9 over it, 1450 (the open era's tour start) 18 to 30 over it."
       },
       "layoff": {
         "from": 19680101,
@@ -741,7 +741,7 @@
         "note": "1960-1967 (seasons.amateur) list the men with three counted matches in the season, 1968-1972 ten, as from 1973. The amateur file holds only the majors and the Davis Cup, about a third of a leading amateur's matches: a floor of ten would leave six to eight nations a season (and share 7.6 of Tingay's ten, rank correlation 0.78), five 15 to 20 (7.4, 0.74), three 23 to 30 (7.1, 0.70)."
       },
       "aliases": {
-        "note": "Duplicate ids, each merged into the id of the same man before rating (and so for his Davis Cup nations too), reviewed by hand on 2026-11-09. Two kinds: 'davis-cup', an id of the amateur file with Davis Cup rows only, joined to his id with majors or open-era rows; and 'open-era', an amateur id of a man who carries on in the open era under another one. Both share a country, and careers no more than two seasons apart unless the birth dates agree. Rules: 'name', the same full name; 'initial', the same surname and first initial; 'born', the same surname and birth date; 'hand', the same surname with a variant of the first name, accepted by hand. Of the two, the id the open era's files use is kept (the one with more open-era rows when both have some), else the majors id. No merged pair played the same event. Not merged: men of one surname told apart by their first names or birth dates (Constantin and Ilie Nastase, the Ulrichs, the Frasers, Vo Van Bay and Vo Van Thanh, whose surname is Vo), two ids in one event (always two men), and pairs with no evidence beyond the surname (Aragon, Mohan, Kirby, Reyes, Tapia, Cameron, Guimaraes, Badreldin and El Sayed, Sturdza). The player file's birth dates differ within 39 merged pairs by a day, a month, a year or a placeholder (1 January); their names, country and years agree.",
+        "note": "Duplicate ids, each merged into the id of the same man before rating (and so for his Davis Cup nations too), reviewed by hand on 2026-11-09. Two kinds: 'davis-cup', an id of the amateur file with Davis Cup rows only, joined to his id with majors or open-era rows; and 'open-era', an amateur id of a man who carries on in the open era under another one. Both share a country, and careers no more than two seasons apart unless the birth dates agree. Rules: 'name', the same full name; 'initial', the same surname and first initial; 'born', the same surname and birth date; 'hand', the same surname with a variant of the first name, accepted by hand, or (two pairs, found by a second search for surnames spelt two ways) a variant of the surname: Julie Mayer, 'Julius Mayer' in the Davis Cup and 'Julian Mayers' at the majors (Wikipedia, 'Julie Mayer (tennis)', revision 1370199196, names the two), and Andras Szikszay, 'Szikszai' at the majors. Of the two, the id the open era's files use is kept (the one with more open-era rows when both have some), else the majors id. No merged pair played the same event. Not merged: men of one surname told apart by their first names or birth dates (Constantin and Ilie Nastase, the Ulrichs, the Frasers, Vo Van Bay and Vo Van Thanh, whose surname is Vo), two ids in one event (always two men), and pairs with no evidence beyond the surname (Aragon, Mohan, Kirby, Reyes, Tapia, Cameron, Guimaraes, Badreldin and El Sayed, Sturdza). The player file's birth dates differ within 39 merged pairs by a day, a month, a year or a placeholder (1 January); their names, country and years agree.",
         "columns": ["merged id", "kept id", "name", "rule", "kind"],
         "items": [
           ["112391", "100027", "Gene Scott", "hand: Gene/Eugene L", "davis-cup"],
@@ -782,6 +782,7 @@
           ["117126", "112653", "Valentino Taroni", "name", "davis-cup"],
           ["117119", "112668", "Pierre Henri Landry", "initial", "davis-cup"],
           ["117162", "112698", "Boris Maneff", "name", "davis-cup"],
+          ["117325", "112708", "Julian Mayers", "hand: surname and first name, Julius Mayer/Julian Mayers, born 1937 (Wikipedia, 'Julie Mayer (tennis)', revision 1370199196)", "davis-cup"],
           ["117332", "112711", "Voldo Presecki", "initial", "davis-cup"],
           ["117123", "112719", "Jean Couiteas De Faucamberge", "name", "davis-cup"],
           ["117026", "112728", "Pierre Hirsch", "name", "davis-cup"],
@@ -955,6 +956,7 @@
           ["112714", "117302", "Albert Gaertner", "born", "davis-cup"],
           ["109763", "117308", "Eduardo Zuleta", "name", "davis-cup"],
           ["112497", "117309", "Omar Pabst", "name", "davis-cup"],
+          ["110269", "117312", "Andras Szikszay", "hand: surname Szikszai/Szikszay, Andras both", "open-era"],
           ["112965", "117315", "Stepan Koudelka", "name", "davis-cup"],
           ["112388", "117339", "Hoang Duc Luu", "name", "davis-cup"],
           ["115135", "201293", "Paul Sullivan", "name", "open-era"],
@@ -1219,6 +1221,13 @@
         "why": "Australian until he became a South African citizen in 1967, after marrying a South African (Wikipedia, 'Bob Hewitt', revision 1383230922); his Davis Cup rows are South Africa's from 1967 and the player file lists him as South African, so he would be South African in every season before."
       },
       {
+        "id": "100265",
+        "name": "Cliff Letcher",
+        "code": "AUS",
+        "through": 1972,
+        "why": "Australian: he accepted Austria's Davis Cup offer in November 1974 and played its ties of 1977 (Wikipedia, 'Cliff Letcher', revision 1373412341, citing The Canberra Times of 18 November 1974), so the six-season window would make him Austria's best man in 1971. The fix stops at 1972: the shipped seasons from 1973 stay byte for byte as they were, which leaves him Austrian in 1973 and 1974 by the same window."
+      },
+      {
         "id": "100532",
         "name": "Johan Kriek",
         "code": "RSA",
@@ -1356,9 +1365,10 @@
   "checks": {
     "about": "Published judgments of the seasons before 1973, kept as validation inputs only: validation.json's checks compare the computed lists with them, and nothing from them is in a season file.",
     "topTens": {
-      "source": "Wikipedia, 'Top ten ranked male tennis players (1912–1972)', revision 1379999545 of 13 October 2026 (https://en.wikipedia.org/w/index.php?oldid=1379999545), read from the raw wikitext of that revision fetched on 2026-11-09, SHA-256 3c2b6fc1df7755e2208be3b304a722a4d86ef15b8ab4f188de59c7742a287980",
+      "source": "Wikipedia, 'Top ten ranked male tennis players (1912–1972)', revision 1379999545 of 13 October 2026 (https://en.wikipedia.org/w/index.php?oldid=1379999545): its article page (https://en.wikipedia.org/wiki/Top_ten_ranked_male_tennis_players_(1912%E2%80%931972)), fetched once under /wiki/, which Wikipedia's robots.txt allows, on 2026-11-09 at that revision, SHA-256 c6e6c9b0be5e7197f612570f049282c4d1c507c2e61b9d96c10535a9d259acc8; Tingay's columns read from it match the lists below. The research pass first read them from the revision's raw wikitext (SHA-256 3c2b6fc1df7755e2208be3b304a722a4d86ef15b8ab4f188de59c7742a287980) through /w/index.php, a path robots.txt disallows; nothing here uses that copy or fetches /w/.",
       "licence": "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/): the page's text by Wikipedia's contributors; the rankings are Lance Tingay's, as the page cites them",
       "authority": "Lance Tingay (The Daily Telegraph): his amateur ten for 1960-1967, everyone's from 1968",
+      "ties": "Tingay ranked some men equal at the foot of his list: in 1967 Leschly, Bungert and Drysdale share tenth place and only Leschly, the first the page names, is kept; in 1970 Gimeno and Pilic share ninth and are kept as ninth and tenth.",
       "columns": ["name as the page writes it", "match-file id"],
       "years": {
         "1960": [["N. Fraser", "100013"], ["R. Laver", "100029"], ["N. Pietrangeli", "100012"], ["B. MacKay", "100018"], ["B. Buchholz", "100048"], ["R. Emerson", "100022"], ["L. Ayala", "100010"], ["R. Krishnan", "100023"], ["J.-E. Lundqvist", "100024"], ["D. Ralston", "100069"]],

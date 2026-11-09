@@ -68,7 +68,7 @@
       "fileNote": "25,001 rows of two levels, the majors (G, 20,201) and the Davis Cup rubbers (D, 4,800); each row stops after 40 of the header's 49 cells (the empty statistics and rank cells left off, padded when read), and two rounds appear that the open era's files lack: PR, a preliminary round before the first full one, and CR, the challenge round of Wimbledon to 1921 and of the US Championships to 1911. A row's season is the year of its date. Every row is counted but walkovers, retirements, defaults and placeholder opponents.",
       "start": {
         "amateur": 1360,
-        "fit": "Not published: a newcomer whose first counted match is in the amateur file starts at 1360, fitted to five points so that the run carries on as the shipped one. On Tennis Abstract's 38 targets for 1973-2000 (targets above) it comes out 2.0 Elo low on average, root mean square 15.3 (the shipped run: 2.0 and 15.1), and over the shipped run's top 50 of each season 1973-1980 its Elo of the same men differs from the shipped run's by 0.4 to 3.0 points on average (absolute), by -1.2 to +2.6 in all. A start of 1350 leaves those seasons 0.1 to 4.8 points under the shipped run, 1370 2.9 to 5.9 over it, 1450 (the open era's tour start) 18 to 30 over it."
+        "fit": "Not published: a newcomer whose first counted match is in the amateur file starts at 1360, fitted to five points so that the run carries on as the shipped one. On Tennis Abstract's 38 targets for 1973-2000 (targets above) it comes out 2.0 Elo low on average, root mean square 15.3 (the shipped run: 2.0 and 15.1), and over the shipped run's top 50 of each season 1973-1980 its Elo of the same men differs from the shipped run's by 0.3 to 3.0 points on average (absolute), by -1.2 to +2.6 in all. A start of 1350 leaves those seasons 0.1 to 4.8 points under the shipped run, 1370 2.9 to 5.9 over it, 1450 (the open era's tour start) 18 to 30 over it."
       },
       "layoff": {
         "from": 19680101,
@@ -81,8 +81,8 @@
         "note": "1960-1967 (seasons.amateur) list the men with three counted matches in the season, 1968-1972 ten, as from 1973. The amateur file holds only the majors and the Davis Cup, about a third of a leading amateur's matches: a floor of ten would leave six to eight nations a season (and share 7.6 of Tingay's ten, rank correlation 0.78), five 15 to 20 (7.4, 0.74), three 23 to 30 (7.1, 0.70)."
       },
       "aliases": {
-        "note": "Duplicate ids, each merged into the id of the same man before rating (and so for his Davis Cup nations too), reviewed by hand on 2026-11-09. Two kinds: 'davis-cup', an id of the amateur file with Davis Cup rows only, joined to his id with majors or open-era rows; and 'open-era', an amateur id of a man who carries on in the open era under another one. Both share a country, and careers no more than two seasons apart unless the birth dates agree. Rules: 'name', the same full name; 'initial', the same surname and first initial; 'born', the same surname and birth date; 'hand', the same surname with a variant of the first name, accepted by hand. Of the two, the id the open era's files use is kept (the one with more open-era rows when both have some), else the majors id. No merged pair played the same event. Not merged: men of one surname told apart by their first names or birth dates (Constantin and Ilie Nastase, the Ulrichs, the Frasers, Vo Van Bay and Vo Van Thanh, whose surname is Vo), two ids in one event (always two men), and pairs with no evidence beyond the surname (Aragon, Mohan, Kirby, Reyes, Tapia, Cameron, Guimaraes, Badreldin and El Sayed, Sturdza). The player file's birth dates differ within 39 merged pairs by a day, a month, a year or a placeholder (1 January); their names, country and years agree.",
-        "pairs": 223
+        "note": "Duplicate ids, each merged into the id of the same man before rating (and so for his Davis Cup nations too), reviewed by hand on 2026-11-09. Two kinds: 'davis-cup', an id of the amateur file with Davis Cup rows only, joined to his id with majors or open-era rows; and 'open-era', an amateur id of a man who carries on in the open era under another one. Both share a country, and careers no more than two seasons apart unless the birth dates agree. Rules: 'name', the same full name; 'initial', the same surname and first initial; 'born', the same surname and birth date; 'hand', the same surname with a variant of the first name, accepted by hand, or (two pairs, found by a second search for surnames spelt two ways) a variant of the surname: Julie Mayer, 'Julius Mayer' in the Davis Cup and 'Julian Mayers' at the majors (Wikipedia, 'Julie Mayer (tennis)', revision 1370199196, names the two), and Andras Szikszay, 'Szikszai' at the majors. Of the two, the id the open era's files use is kept (the one with more open-era rows when both have some), else the majors id. No merged pair played the same event. Not merged: men of one surname told apart by their first names or birth dates (Constantin and Ilie Nastase, the Ulrichs, the Frasers, Vo Van Bay and Vo Van Thanh, whose surname is Vo), two ids in one event (always two men), and pairs with no evidence beyond the surname (Aragon, Mohan, Kirby, Reyes, Tapia, Cameron, Guimaraes, Badreldin and El Sayed, Sturdza). The player file's birth dates differ within 39 merged pairs by a day, a month, a year or a placeholder (1 January); their names, country and years agree.",
+        "pairs": 225
       }
     }
   },
@@ -892,12 +892,12 @@
       },
       "davisCupRubbersUnresolved": 31,
       "aliases": {
-        "pairs": 223,
+        "pairs": 225,
         "kinds": {
-          "davis-cup": 199,
-          "open-era": 24
+          "davis-cup": 200,
+          "open-era": 25
         },
-        "matchesMoved": 1485
+        "matchesMoved": 1498
       },
       "fit": {
         "years": [
@@ -920,7 +920,7 @@
       "seam": {
         "1973": {
           "n": 50,
-          "meanDiff": 0.2,
+          "meanDiff": 0.1,
           "meanAbsDiff": 2.3,
           "maxAbsDiff": 18.5
         },
@@ -938,7 +938,7 @@
         },
         "1976": {
           "n": 50,
-          "meanDiff": 1,
+          "meanDiff": 0.9,
           "meanAbsDiff": 1.8,
           "maxAbsDiff": 45.3
         },
@@ -963,7 +963,7 @@
         "1980": {
           "n": 50,
           "meanDiff": 0.3,
-          "meanAbsDiff": 0.4,
+          "meanAbsDiff": 0.3,
           "maxAbsDiff": 1.6
         }
       }
@@ -1031,7 +1031,7 @@
               2,
               10,
               5,
-              14,
+              13,
               17,
               6,
               36
@@ -1088,21 +1088,21 @@
               12,
               21,
               5,
-              8
+              7
             ],
             "notListed": []
           },
           "1966": {
             "shared": 8,
             "listed": 10,
-            "rho": 0.85,
+            "rho": 0.83,
             "ranks": [
               3,
               2,
               1,
-              7,
-              4,
               8,
+              4,
+              7,
               5,
               22,
               10,
@@ -6185,7 +6185,7 @@
     },
     {
       "id": "tennis-1972",
-      "version": "tennis-1972-699f9b84",
+      "version": "tennis-1972-822cbbe7",
       "label": "Elo from match results, end of 1972 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6197,7 +6197,7 @@
       "top": [
         "Ilie Nastase ROU 2190.1 → 92",
         "Stan Smith USA 2179.3 → 91",
-        "John Newcombe AUS 2132.2 → 89",
+        "John Newcombe AUS 2132.1 → 89",
         "Arthur Ashe USA 2119.7 → 89",
         "Rod Laver AUS 2109.6 → 88"
       ],
@@ -6280,7 +6280,7 @@
     },
     {
       "id": "tennis-1971",
-      "version": "tennis-1971-5270e67d",
+      "version": "tennis-1971-ccf22b44",
       "label": "Elo from match results, end of 1971 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6297,7 +6297,7 @@
         "Stan Smith USA 2112.8 → 89"
       ],
       "nations": [
-        "Australia 90.4 (Rod Laver 92, Ken Rosewall 91, John Newcombe 89, Roy Emerson 83, Tony Roche 82; +28)",
+        "Australia 90.4 (Rod Laver 92, Ken Rosewall 91, John Newcombe 89, Roy Emerson 83, Tony Roche 82; +29)",
         "United States 87.9 (Stan Smith 89, Arthur Ashe 88, Marty Riessen 86, Bob Lutz 85, Richard Gonzalez 84; +28)",
         "Spain 83.6 (Manuel Santana 85, Manuel Orantes 84, Andres Gimeno 83, Juan Gisbert 77, Antonio Munoz 64)",
         "Romania 83 (Ilie Nastase 90, Ion Tiriac 76)",
@@ -6315,7 +6315,7 @@
         "Mexico 70.5 (Joaquin Loyo Mayo 72, Marcello Lara 69)",
         "India 69 (Premjit Lall 71, Jaidip Mukerjea 67)",
         "Japan 66.4 (Jun Kamiwazumi 67, Jun Kuki 66, Toshiro Sakai 65)",
-        "Austria 63.9 (Cliff Letcher 65, Peter Pokorny 63, Hans Kary 62)",
+        "Austria 62.5 (Peter Pokorny 63, Hans Kary 62)",
         "Belgium 62.5 (Patrick Hombergen 66, Eric Drossart 59)"
       ],
       "merged": [
@@ -6328,8 +6328,9 @@
         "Kosovo → Yugoslavia (Serbia)"
       ],
       "nationFrom": {
-        "davis-cup": 113,
-        "player-file": 43
+        "davis-cup": 112,
+        "player-file": 43,
+        "fix": 1
       },
       "leftOut": {
         "barred": [
@@ -6360,7 +6361,7 @@
     },
     {
       "id": "tennis-1970",
-      "version": "tennis-1970-f523a186",
+      "version": "tennis-1970-e1cd61d9",
       "label": "Elo from match results, end of 1970 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6374,7 +6375,7 @@
         "Ken Rosewall AUS 2143.5 → 90",
         "Arthur Ashe USA 2114.1 → 89",
         "Cliff Richey USA 2109.1 → 88",
-        "Stan Smith USA 2095.4 → 88"
+        "Stan Smith USA 2095.3 → 88"
       ],
       "nations": [
         "Australia 91.5 (Rod Laver 95, Ken Rosewall 90, Tony Roche 88, John Newcombe 87, Roy Emerson 84; +25)",
@@ -6454,7 +6455,7 @@
     },
     {
       "id": "tennis-1969",
-      "version": "tennis-1969-be759294",
+      "version": "tennis-1969-94ecce39",
       "label": "Elo from match results, end of 1969 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6464,10 +6465,10 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Rod Laver AUS 2250.4 → 94",
+        "Rod Laver AUS 2250.3 → 94",
         "Tom Okker NED 2119.4 → 89",
         "Richard Gonzalez USA 2084.7 → 87",
-        "Ken Rosewall AUS 2067.1 → 87",
+        "Ken Rosewall AUS 2067 → 87",
         "Tony Roche AUS 2061.2 → 86"
       ],
       "nations": [
@@ -6541,7 +6542,7 @@
     },
     {
       "id": "tennis-1968",
-      "version": "tennis-1968-a9292fba",
+      "version": "tennis-1968-1e49a981",
       "label": "Elo from match results, end of 1968 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6631,21 +6632,21 @@
     },
     {
       "id": "tennis-1967",
-      "version": "tennis-1967-e0d1b76e",
+      "version": "tennis-1967-53feb263",
       "label": "Amateur Elo, end of 1967 (rough)",
       "kind": "computed",
       "run": "early",
       "activity": 3,
       "date": "1967-12-31",
-      "rated": 142,
+      "rated": 141,
       "shift": 0,
       "over99": [],
       "top": [
         "Roy Emerson AUS 2069 → 87",
         "John Newcombe AUS 1941.8 → 82",
         "Manuel Santana ESP 1935.5 → 81",
-        "Bob Hewitt RSA 1866.7 → 79",
-        "Tony Roche AUS 1856 → 78"
+        "Bob Hewitt RSA 1866.6 → 79",
+        "Tony Roche AUS 1855.8 → 78"
       ],
       "nations": [
         "Australia 83 (Roy Emerson 87, John Newcombe 82, Tony Roche 78, Ken Fletcher 76, Owen Davidson 74; +13)",
@@ -6662,9 +6663,9 @@
         "Italy 68.4 (Nicola Pietrangeli 73, Giordano Majoli 65, Gaetano Di Maso 59)",
         "Yugoslavia (Serbia) 68.1 (Nikola Pilic 74, Nicola Spear 66, Boro Jovanovic 63, Zeljko Franulovic 58)",
         "Soviet Union (Russia) 66.1 (Alex Metreveli 68, Thomas Lejus 65, Vyacheslav Egorov 65, Sergei Likhachev 64, Vladimir Ivanov 63)",
+        "Hungary 65.7 (Istvan Gulyas 73, Andras Szikszay 59, Peter Szoke 56)",
         "Netherlands 65 (Tom Okker 70, Jan Hajer 60)",
         "Philippines 64.5 (Felicisimo Ampon 66, Eddie Cruz 64, Samuel Ang 59)",
-        "Hungary 64.2 (Istvan Gulyas 73, Andras Szikszay 59, Andras Szikszai 58, Peter Szoke 56)",
         "Romania 64 (Ion Tiriac 67, Ilie Nastase 61)",
         "Japan 63 (Koji Watanabe 65, Ichizo Konishi 63, Keishiro Yanagi 60, Ryoichi Mori 58)",
         "Czechoslovakia (Czechia) 62.9 (Jan Kodes 65, Milan Holecek 61, Jan Kukal 60)",
@@ -6704,7 +6705,7 @@
       ],
       "nationFrom": {
         "davis-cup": 105,
-        "player-file": 36,
+        "player-file": 35,
         "fix": 1
       },
       "leftOut": {
@@ -6724,7 +6725,7 @@
     },
     {
       "id": "tennis-1966",
-      "version": "tennis-1966-b79d27a6",
+      "version": "tennis-1966-203c4a73",
       "label": "Amateur Elo, end of 1966 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6734,14 +6735,14 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Roy Emerson AUS 2064.9 → 87",
+        "Roy Emerson AUS 2065 → 87",
         "Fred Stolle AUS 2018.3 → 85",
-        "Manuel Santana ESP 2016 → 85",
-        "Dennis Ralston USA 1894.9 → 80",
-        "Arthur Ashe USA 1877.4 → 79"
+        "Manuel Santana ESP 2016.1 → 85",
+        "Dennis Ralston USA 1895 → 80",
+        "Arthur Ashe USA 1877.6 → 79"
       ],
       "nations": [
-        "Australia 84.2 (Roy Emerson 87, Fred Stolle 85, Tony Roche 77, John Newcombe 77, Bob Hewitt 77; +9)",
+        "Australia 84.2 (Roy Emerson 87, Fred Stolle 85, John Newcombe 77, Tony Roche 77, Bob Hewitt 77; +9)",
         "United States 78.4 (Dennis Ralston 80, Arthur Ashe 79, Chuck Mckinley 75, Marty Riessen 73, Clark Graebner 72; +16)",
         "Spain 74.7 (Manuel Santana 85, Juan Manuel Couder 68, Juan Gisbert 68, Jose Luis Arillla 67, Jose Maria Gisbert 57)",
         "India 73.2 (Ramanathan Krishnan 78, Jaidip Mukerjea 73, Premjit Lall 65, Shiv Prakash Misra 63, Ravi Venkatesan 61)",
@@ -6803,7 +6804,7 @@
     },
     {
       "id": "tennis-1965",
-      "version": "tennis-1965-301bfa0f",
+      "version": "tennis-1965-77af6b5c",
       "label": "Amateur Elo, end of 1965 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6813,11 +6814,11 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Roy Emerson AUS 2092.7 → 88",
-        "Manuel Santana ESP 2022.8 → 85",
-        "Fred Stolle AUS 1995.9 → 84",
+        "Roy Emerson AUS 2092.8 → 88",
+        "Manuel Santana ESP 2022.9 → 85",
+        "Fred Stolle AUS 1996 → 84",
         "Cliff Drysdale RSA 1906 → 80",
-        "Dennis Ralston USA 1848.9 → 78"
+        "Dennis Ralston USA 1849.1 → 78"
       ],
       "nations": [
         "Australia 84.1 (Roy Emerson 88, Fred Stolle 84, Neale Fraser 77, Tony Roche 76, Bob Hewitt 76; +13)",
@@ -6892,19 +6893,19 @@
     },
     {
       "id": "tennis-1964",
-      "version": "tennis-1964-2f38759e",
+      "version": "tennis-1964-9e8df0d3",
       "label": "Amateur Elo, end of 1964 (rough)",
       "kind": "computed",
       "run": "early",
       "activity": 3,
       "date": "1964-12-31",
-      "rated": 118,
+      "rated": 119,
       "shift": 0,
       "over99": [],
       "top": [
         "Roy Emerson AUS 2113.8 → 89",
         "Chuck Mckinley USA 1942.4 → 82",
-        "Fred Stolle AUS 1922.2 → 81",
+        "Fred Stolle AUS 1922.3 → 81",
         "Manuel Santana ESP 1896.1 → 80",
         "Jan Erik Lundquist SWE 1865.4 → 79"
       ],
@@ -6926,6 +6927,7 @@
         "Yugoslavia (Serbia) 67 (Nikola Pilic 71, Boro Jovanovic 63)",
         "Soviet Union (Russia) 64 (Thomas Lejus 66, Alex Metreveli 62)",
         "Zimbabwe 63 (Adrian Bey 67, Frank Saloman 59)",
+        "Hungary 62 (Istvan Gulyas 68, Andras Szikszay 56)",
         "New Zealand 59.5 (Lew Gerrard 60, Ian Crookenden 59)",
         "Chile 58.5 (Patricio Rodriguez Chi 63, Ernesto Aguirre 54)",
         "Argentina 58 (Eduardo Soriano 59, Roberto Aubone 57)",
@@ -6960,7 +6962,7 @@
         "Kosovo → Yugoslavia (Serbia)"
       ],
       "nationFrom": {
-        "davis-cup": 90,
+        "davis-cup": 91,
         "player-file": 25,
         "fix": 3
       },
@@ -6968,7 +6970,6 @@
         "barred": [],
         "aloneInTheirNation": [
           "Iyo Pimentel (VEN)",
-          "Istvan Gulyas (HUN)",
           "Nicholas Kalogeropoulos (GRE)",
           "Eduardo Zuleta (ECU)",
           "Mustapha Belkhodja (TUN)",
@@ -6984,7 +6985,7 @@
     },
     {
       "id": "tennis-1963",
-      "version": "tennis-1963-fef38b5b",
+      "version": "tennis-1963-234b91f9",
       "label": "Amateur Elo, end of 1963 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6994,11 +6995,11 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Roy Emerson AUS 2013.1 → 85",
+        "Roy Emerson AUS 2013.2 → 85",
         "Chuck Mckinley USA 1917.5 → 81",
-        "Rafael Osuna MEX 1911.5 → 80",
-        "Frank Froehling USA 1861.8 → 78",
-        "Manuel Santana ESP 1856.6 → 78"
+        "Rafael Osuna MEX 1911.6 → 80",
+        "Frank Froehling USA 1861.7 → 78",
+        "Manuel Santana ESP 1856.5 → 78"
       ],
       "nations": [
         "United States 78.8 (Chuck Mckinley 81, Frank Froehling 78, Hamilton Richardson 76, Dennis Ralston 76, Vic Seixas 76; +21)",
@@ -7011,7 +7012,7 @@
         "Spain 70.4 (Manuel Santana 78, Juan Manuel Couder 69, Jose Luis Arillla 62, Alberto Arilla 54)",
         "West Germany (Germany) 69.6 (Christian Kuhnke 73, Wilhelm Bungert 70, Wolfgang Stuck 64, Adolf Kreinberg 60, Dieter Ecklebe 55)",
         "Brazil 67.9 (Ronnie Barnes 70, Thomaz Koch 67, Jose Edison Mandarino 61)",
-        "France 67.9 (Pierre Darmon 75, Jacques Renavand 64, Jean Claude Barclay 63, Francois Jauffret 60, Pierre Barthes 60; +4)",
+        "France 67.9 (Pierre Darmon 75, Jacques Renavand 64, Jean Claude Barclay 63, Pierre Barthes 60, Francois Jauffret 60; +4)",
         "South Africa 66 (Gordon Forbes 68, Abe Segal 66, Cliff Drysdale 64, David Phillips 60, Frew Mcmillan 59; +1)",
         "Zimbabwe 66 (Adrian Bey 69, Frank Saloman 63)",
         "Denmark 65.6 (Jorgen Ulrich 68, Jan Leschly 66, Carl Edvard Hedelund 52)",
@@ -7078,7 +7079,7 @@
     },
     {
       "id": "tennis-1962",
-      "version": "tennis-1962-5d7f92d5",
+      "version": "tennis-1962-abeea604",
       "label": "Amateur Elo, end of 1962 (rough)",
       "kind": "computed",
       "run": "early",
@@ -7090,8 +7091,8 @@
       "top": [
         "Rod Laver AUS 2131 → 89",
         "Neale Fraser AUS 2017.9 → 85",
-        "Roy Emerson AUS 1978.3 → 83",
-        "Jan Erik Lundquist SWE 1861.3 → 78",
+        "Roy Emerson AUS 1978.4 → 83",
+        "Jan Erik Lundquist SWE 1861.1 → 78",
         "Rafael Osuna MEX 1859.3 → 78"
       ],
       "nations": [
@@ -7160,29 +7161,29 @@
           "Thorvald Moe (NOR)",
           "Eleazar Davidman (ISR)",
           "Evert Schneider (NED)",
-          "Karim Fawaz (LIB)",
-          "Peter Jackson (IRL)"
+          "Peter Jackson (IRL)",
+          "Karim Fawaz (LIB)"
         ],
         "noNationOnTheMap": []
       }
     },
     {
       "id": "tennis-1961",
-      "version": "tennis-1961-f6c610a2",
+      "version": "tennis-1961-cc90d757",
       "label": "Amateur Elo, end of 1961 (rough)",
       "kind": "computed",
       "run": "early",
       "activity": 3,
       "date": "1961-12-31",
-      "rated": 120,
+      "rated": 119,
       "shift": 0,
       "over99": [],
       "top": [
         "Neale Fraser AUS 2010.1 → 84",
         "Rod Laver AUS 1982 → 83",
-        "Roy Emerson AUS 1906.4 → 80",
+        "Roy Emerson AUS 1906.5 → 80",
         "Luis Ayala CHI 1888.8 → 80",
-        "Ramanathan Krishnan IND 1868.4 → 79"
+        "Ramanathan Krishnan IND 1868.7 → 79"
       ],
       "nations": [
         "Australia 81.9 (Neale Fraser 84, Rod Laver 83, Roy Emerson 80, Bob Hewitt 71, Bob Mark 68; +14)",
@@ -7194,9 +7195,9 @@
         "India 68.1 (Ramanathan Krishnan 79, Akhtar Ali 62, Premjit Lall 60, Jaidip Mukerjea 57)",
         "Chile 68 (Luis Ayala 80, Patricio Rodriguez Chi 56)",
         "Mexico 67.3 (Rafael Osuna 71, Tony Palafox 67, Mario Llamas 65, Gabino Palafox 56)",
+        "South Africa 66 (Abe Segal 70, Albert Gaertner 63, Julian Mayers 58)",
         "Brazil 65.5 (Carlos Fernandes 69, Ronnie Barnes 63, Jose Edison Mandarino 58)",
         "Spain 65.3 (Manuel Santana 77, Alberto Arilla 54, Emilio Martinez Del Rey 52)",
-        "South Africa 64.7 (Abe Segal 70, Albert Gaertner 63, Julius Mayer 60, Julian Mayers 55)",
         "Japan 64 (Atsushi Miyagi 64, Osamu Ishiguro 64)",
         "Ecuador 63 (Eduardo Zuleta 64, Miguel Olvera 62)",
         "New Zealand 63 (Lew Gerrard 64, Mark Otway 62)",
@@ -7221,7 +7222,7 @@
       ],
       "nationFrom": {
         "davis-cup": 92,
-        "player-file": 26,
+        "player-file": 25,
         "fix": 2
       },
       "leftOut": {

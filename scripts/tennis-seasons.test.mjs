@@ -251,6 +251,26 @@ test('before 1973 each man once: the amateur file\'s duplicate ids are merged, e
   // Edison Mandarino's Davis Cup id joins Jose Edison Mandarino's: Brazil names him once.
   for (let year = 1960; year <= 1972; year++) assert.ok(!snapshot(year).players.some(row => row[0] === '109856'), `${year}`);
   assert.equal(squadNames(seasonFile(1967), '076').filter(name => /Mandarino/.test(name)).length, 1);
+  // A surname spelt two ways is one man too: Julie Mayer ("Julius Mayer" in the 1961 ties, "Julian Mayers" at the majors)
+  // and Andras Szikszay ("Szikszai" at the majors).
+  assert.deepEqual(squadNames(seasonFile(1961), '710').filter(name => /Mayer/.test(name)), ['Julian Mayers']);
+  assert.deepEqual(squadNames(seasonFile(1967), '348').filter(name => /Sziksza/.test(name)), ['Andras Szikszay']);
+  // No nation lists two men of one first initial whose surnames are two letters or less apart: one man's two spellings.
+  const plain = name => name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z ]/g, ' ').trim().split(/\s+/);
+  const apart = (a, b) => {
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return d[a.length][b.length];
+  };
+  for (let year = 1960; year <= 1972; year++) {
+    const rows = snapshot(year).players;
+    for (const [i, a] of rows.entries()) for (const b of rows.slice(i + 1)) {
+      const [na, nb] = [plain(a[1]), plain(b[1])];
+      if (a[2] !== b[2] || na[0][0] !== nb[0][0] || na.at(-1) === nb.at(-1) || Math.min(na.at(-1).length, nb.at(-1).length) < 4) continue;
+      assert.ok(apart(na.at(-1), nb.at(-1)) > 2, `${year}: ${a[1]} and ${b[1]} may be one man`);
+    }
+  }
   // Brothers stay two men.
   assert.ok(squadNames(seasonFile(1968), '208').includes('Torben Ulrich') && squadNames(seasonFile(1968), '208').includes('Jorgen Ulrich'));
 });
@@ -276,6 +296,11 @@ test('before 1973 the Davis Cup nations of the day: South Africa barred 1970-197
   assert.deepEqual(row(1962, '100040').slice(2, 4), ['AUS', 'fix']);
   assert.deepEqual(row(1967, '100040').slice(2, 4), ['RSA', 'davis-cup']);
   assert.deepEqual(squadNames(seasonFile(1962), '036'), ['Rod Laver', 'Neale Fraser', 'Roy Emerson', 'Martin Mulligan', 'Bob Hewitt']);
+  // Cliff Letcher took up Austria's Davis Cup offer in November 1974: Australian in 1971, Austrian by the window from the
+  // shipped 1973 on.
+  assert.deepEqual(row(1971, '100265').slice(2, 4), ['AUS', 'fix']);
+  assert.ok(!squadNames(seasonFile(1971), '040').includes('Cliff Letcher'));
+  assert.deepEqual(row(1973, '100265').slice(2, 4), ['AUT', 'davis-cup']);
   // Czechoslovakia and Yugoslavia hold their land while they field a team, as from 1973.
   assert.equal(seasonFile(1968).territory.merged['703'], '203');
   assert.equal(seasonFile(1968).territory.merged['191'], '688');

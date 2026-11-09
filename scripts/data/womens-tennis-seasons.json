@@ -945,7 +945,7 @@
  "checks": {
   "about": "Published judgments of the seasons before 1973, kept as validation inputs only: validation.json's checks compare the computed lists with them, and nothing from them is in a season file.",
   "topTens": {
-   "source": "Wikipedia, 'Top ten ranked female tennis players (1921–1974)', revision 1376153875 of 22 September 2026 (https://en.wikipedia.org/w/index.php?oldid=1376153875), read from the raw wikitext of that revision fetched on 2026-11-09, SHA-256 cc0c6df44337abb52c278d66a950a3bd45b50fe439cc4c56eca6ca9b4ecdaf97",
+   "source": "Wikipedia, 'Top ten ranked female tennis players (1921–1974)', revision 1376153875 of 22 September 2026 (https://en.wikipedia.org/w/index.php?oldid=1376153875): its article page (https://en.wikipedia.org/wiki/Top_ten_ranked_female_tennis_players_(1921%E2%80%931974)), fetched once under /wiki/, which Wikipedia's robots.txt allows, on 2026-11-09 at that revision, SHA-256 c9d49c88f50594741549435414a4edc07998d6ee5061d86b715bd3c7268d1ca1; Tingay's columns read from it match the lists below. The research pass first read them from the revision's raw wikitext (SHA-256 cc0c6df44337abb52c278d66a950a3bd45b50fe439cc4c56eca6ca9b4ecdaf97) through /w/index.php, a path robots.txt disallows; nothing here uses that copy or fetches /w/.",
    "licence": "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/): the page's text by Wikipedia's contributors; the rankings are Lance Tingay's, as the page cites them",
    "authority": "Lance Tingay (The Daily Telegraph), every year",
    "columns": ["name as the page writes it", "match-file id"],

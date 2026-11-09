@@ -371,6 +371,32 @@ test('a season launches with that year\'s nations, Slovakia in Czechoslovakia\'s
   });
 });
 
+test('the first season, 1968, launches with its Fed Cup nations, South Africa among them, and resumes', async () => {
+  await withApp(async ({ app, time, items, calls }) => {
+    app.pickSetup('sport', 'womens-tennis');
+    app.pickSetup('scope', 'world');
+    app.pickSetup('dataSet', 'wta-1968');
+    time.advance(200);
+    await app.loadSet('wta-1968');
+    await settle();
+    assert.equal(app.seasonStatus().state, 'ready');
+    const doc = seasonFile(1968);
+    app.startCampaign();
+    const st = app.state;
+    assert.equal(st.phase, 'playing');
+    assert.deepEqual([st.settings.dataSet, st.settings.dataVersion, st.settings.dataYear, st.settings.dataSeason], ['wta-1968', doc.version, 1968, '1968']);
+    assert.ok(calls.includes('/womens-tennis/wta-1968.json'));
+    assert.deepEqual(st.teams['036'].squad.map(player => player.name), squadNames(doc, '036'), 'Court\'s Australia');
+    assert.ok(st.teams['710'] && st.teams['840'], 'South Africa plays the 1968 cup, as do the United States');
+    assert.ok(st.own['703'] === '203', 'Slovakia starts in Czechoslovakia\'s empire');
+    assert.deepEqual(st.aliveIds.slice().sort(), Object.keys(doc.nations).sort());
+    const saved = parseCampaign(items.get(SAVE_KEY));
+    app.continueSaved(saved);
+    assert.equal(app.state.phase, 'playing');
+    assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams), 'the squads come back exactly');
+  });
+});
+
 test('a challenge link to a women\'s season loads it', async () => {
   await withApp(async ({ app, time }) => {
     const link = readChallenge('?sport=womens-tennis&theatre=world&season=wta-2023&seed=1');

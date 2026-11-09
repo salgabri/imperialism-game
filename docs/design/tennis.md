@@ -384,15 +384,20 @@ South Africa barred 1970–1972; Drobny's fix; the duplicate ids reviewed and co
   2026, CC BY-SA 4.0), whose lists for 1960–1972 are Lance Tingay's (The Daily Telegraph: the
   amateurs' ten to 1967, everyone's from 1968); each name is kept with its match-file id, joined
   by hand (Pancho Gonzales is "Richard Gonzalez" in the player file, Jan-Erik Lundqvist "Jan Erik
-  Lundquist"). The raw wikitext was read once, from the research pass's copy (SHA-256
-  `3c2b6fc1…`): Wikipedia's robots.txt disallows `/w/` for crawlers, so nothing re-fetches it.
-  And Tennis Abstract's own words in The Tennis 128: Newcombe fourth at the end of 1968, behind
+  Lundquist"). They match Tingay's columns on the article page of that revision, fetched once
+  under `/wiki/`, which Wikipedia's robots.txt allows (SHA-256 `c6e6c9b0…`). The research pass
+  had first read them from the raw wikitext through `/w/index.php`, a path robots.txt disallows;
+  nothing here uses that copy or fetches `/w/`. Where Tingay ranked men equal at the foot of his
+  list the page's first is kept (1967's tenth place is Leschly's, shared with Bungert and
+  Drysdale). And Tennis Abstract's own words in The Tennis 128: Newcombe fourth at the end of 1968, behind
   Laver, Rosewall and Ashe, and again in 1969, behind Laver, Roche and Okker; Rosewall behind
   Laver at the end of 1970; Laver's peak of 2,571 in 1970.
 - **Facts for the nations rules**, from Wikipedia (the revisions are in the manifest's `why`):
-  the article pages of Drobný, Mulligan and Hewitt, fetched once each under `/wiki/`, which
-  robots.txt allows, and the research pass's copy of "Sporting boycott of South Africa during
-  the apartheid era" for South Africa's ejection from the 1970 Davis Cup.
+  the article pages of Drobný, Mulligan, Hewitt and Letcher, fetched once each under `/wiki/`,
+  which robots.txt allows, and the article page of "Sporting boycott of South Africa during the
+  apartheid era" at the revision the manifest cites, fetched the same way, for South Africa's
+  ejection from the 1970 Davis Cup (the research pass had read it through `/w/api.php`, which
+  robots.txt disallows).
 
 **The method.** `method.early`: a second run of the same engine, kept apart from the first. It
 reads the amateur file before the open era's files and changes four things:
@@ -400,7 +405,7 @@ reads the amateur file before the open era's files and changes four things:
 - **Newcomers of the amateur file start at 1360**, fitted to five points so that the run carries
   on as the shipped one: on Tennis Abstract's 38 targets for 1973–2000 it comes out −2.0 Elo,
   root mean square 15.3 (the shipped run −2.0 and 15.1), and over the shipped run's top 50 of
-  each season 1973–1980 its Elo of the same men is within 0.4 to 3.0 points on average (in all
+  each season 1973–1980 its Elo of the same men is within 0.3 to 3.0 points on average (in all
   −1.2 to +2.6). 1350 leaves those seasons up to 4.8 points under the shipped run, 1450 (the
   open era's start) 18 to 30 over it. The research pass had fitted 1350 before the 24 open-era
   aliases below; with them 1360 fits.
@@ -413,17 +418,21 @@ reads the amateur file before the open era's files and changes four things:
 - **Activity.** 1960–1967 list the men with three counted matches in the season (a floor of
   ten leaves six to eight nations a season, five 15 to 20, three 23 to 30); 1968–1972 ten, as
   from 1973.
-- **Duplicate ids.** 223 pairs, reviewed by hand and committed (`method.early.aliases`), each
-  merged into the id of the same man before rating: 199 ids of the amateur file with Davis Cup
+- **Duplicate ids.** 225 pairs, reviewed by hand and committed (`method.early.aliases`), each
+  merged into the id of the same man before rating: 200 ids of the amateur file with Davis Cup
   rows only (Edison Mandarino's joins Jose Edison Mandarino's, Alfred Huber's Freddie Huber's)
-  and 24 amateur ids of men who carry on under another id in the open era (John McDonald, Paul
+  and 25 amateur ids of men who carry on under another id in the open era (John McDonald, Paul
   Sullivan). Each pair shares a country and careers no more than two seasons apart unless the
   birth dates agree, by the same full name, surname and initial, surname and birth date, or
-  (twelve) a variant of the first name accepted by hand. The open era's id is kept. Never
+  (fourteen, by hand) a variant of the first name or, for two, of the surname. Those two had
+  each put one man in a squad twice until a second search, for surnames spelt two ways, found
+  them: Julie Mayer, "Julius Mayer" in South Africa's ties of 1961 and "Julian Mayers" at the
+  majors (Wikipedia's article on him names both), and András Szikszay, "Szikszai" at the
+  majors, twice in Hungary's squad of 1967. The open era's id is kept. Never
   merged: two ids in one event, and men told apart by first name or birth date (the Ulrichs,
   the Frasers, the Amritraj and Dell brothers, Vo Van Bay and Vo Van Thanh). The sync checks
   every pair again (both in the player file, no chain, a shared country, no shared event), and
-  1,485 rows move.
+  1,498 rows move.
 
 Each season lists its men strongest first; the nations of the day come from the same run's
 Davis Cup rows, aliases applied (31 rubbers place nobody). Nothing needs a shift: the best is
@@ -434,13 +443,13 @@ Laver's 2,269 at the end of 1970, rating 95.
 | Season | Rated | Nations | Best (rating) | Strongest three | Tingay's ten shared | Rank correlation |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1960 | 111 | 23 | Neale Fraser (85) | Australia, United States, Italy | 7 | 0.87 |
-| 1961 | 120 | 25 | Neale Fraser (84) | Australia, United States, Italy | 8 | 0.33 |
+| 1961 | 119 | 25 | Neale Fraser (84) | Australia, United States, Italy | 8 | 0.33 |
 | 1962 | 129 | 28 | Rod Laver (89) | Australia, United States, Italy | 6 | 0.73 |
 | 1963 | 134 | 28 | Roy Emerson (85) | United States, Australia, Mexico | 6 | 0.81 |
-| 1964 | 118 | 26 | Roy Emerson (89) | Australia, United States, Sweden | 8 | 0.67 |
+| 1964 | 119 | 27 | Roy Emerson (89) | Australia, United States, Sweden | 8 | 0.67 |
 | 1965 | 125 | 24 | Roy Emerson (88) | Australia, United States, Spain | 7 | 0.68 |
-| 1966 | 131 | 29 | Roy Emerson (87) | Australia, United States, Spain | 8 | 0.85 |
-| 1967 | 142 | 30 | Roy Emerson (87) | Australia, United States, South Africa | 7 | 0.68 |
+| 1966 | 131 | 29 | Roy Emerson (87) | Australia, United States, Spain | 8 | 0.83 |
+| 1967 | 141 | 30 | Roy Emerson (87) | Australia, United States, South Africa | 7 | 0.68 |
 | 1968 | 184 | 23 | Rod Laver (89) | Australia, United States, Spain | 6 | 0.76 |
 | 1969 | 136 | 17 | Rod Laver (94) | Australia, United States, Spain | 8 | 0.49 |
 | 1970 | 137 | 19 | Rod Laver (95) | Australia, United States, Spain | 7 | 0.48 |
@@ -457,7 +466,7 @@ Laver's peak is 2,329 (20 September 1969) against Tennis Abstract's 2,571, which
 tours these files lack. The Davis Cup bears the nations out: Italy, third in 1960, lost that
 year's Challenge Round to Australia; Mexico (Osuna) is third in 1963 and fifth in 1962, the year
 it reached the Challenge Round; the United States and Australia lead every season; Romania,
-the finalist of 1969, 1971 and 1972, is fifth, fourth and third. In 1973–1980 one man
+the finalist of 1969, 1971 and 1972, is fourth, fourth and third. In 1973–1980 one man
 sits far from the shipped run, Tony Roche (up to 100 points in 1977): a layoff the 1900
 threshold charges in one run and not the other.
 
@@ -474,7 +483,9 @@ men to their own countries. Monaco and Hong Kong are off the map. Additions:
   1950–1959, British after; his file says Czechoslovak and his ties end in 1949); Martin
   Mulligan for Australia to 1967 (his only ties are Italy's of 1968, which the six-season window
   would reach back to 1962); Bob Hewitt for Australia to 1966 (South African from 1967, the year
-  his ties start).
+  his ties start); Cliff Letcher for Australia to 1972 (he accepted Austria's Davis Cup offer in
+  November 1974 and played its ties of 1977, which made him Austria's best man of 1971). The
+  fix stops at 1972, so the shipped 1973 and 1974 still make him Austrian by the window.
 
 **Limits.**
 
@@ -486,8 +497,9 @@ men to their own countries. Monaco and Hong Kong are off the map. Additions:
   in every season though the cup barred contract professionals until 1973.
 - **Two tuned parameters**, the start of 1360 and the 26-week layoff, documented, not
   published; the seasons' level cannot be checked against Tennis Abstract's.
-- **The nearest-season rule** still makes a man his later nation's up to six seasons early where
-  no fix says otherwise (Cliff Letcher Austrian in 1971 by his tie of 1977).
+- **The nearest-season rule** can still make a man his later nation's up to six seasons early
+  where no fix says otherwise; the cases a review of 1960–1972 found are fixed (Mulligan, Hewitt,
+  Letcher).
 - **The second run is not the first**: its 1973 differs from the shipped 1973 by about two
   points on average, so a 1972 player and his 1973 self come from two runs.
 
@@ -502,9 +514,10 @@ Kriek and Curren out of the game in 1980; the Soviet Union, the CIS and Croatia 
 FR Yugoslavia barred and Kosovo's years; the nation-of-the-day rules and fixes; Tennis
 Abstract's own lists and countries (Tabilo); the validation thresholds; before 1973, the
 second run's snapshots (three or ten counted matches, no man twice), the professionals absent
-until 1968 and Laver first in 1968–1970, the alias list, Mandarino merged and the Ulrichs not,
-South Africa barred 1970–1972 with Drysdale and Hewitt out, the Soviet Union from 1962, the
-Drobný, Mulligan and Hewitt fixes, and the fit, seam and top-ten thresholds; the loader
+until 1968 and Laver first in 1968–1970, the alias list, Mandarino, Mayers and Szikszay merged
+and the Ulrichs not, no nation naming one man under two spellings of his surname, South Africa
+barred 1970–1972 with Drysdale and Hewitt out, the Soviet Union from 1962, the Drobný,
+Mulligan, Hewitt and Letcher fixes, and the fit, seam and top-ten thresholds; the loader
 refusing damaged files; the running App listing the seasons, loading one, launching 1985 with
 Slovakia in Czechoslovakia's empire and 1962 with Ukraine in the Soviet Union's, and resuming
 the saves; and a challenge link to a season.

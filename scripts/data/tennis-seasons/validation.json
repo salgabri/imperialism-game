@@ -804,12 +804,12 @@
   },
   "davisCupRubbersUnresolved": 31,
   "aliases": {
-   "pairs": 223,
+   "pairs": 225,
    "kinds": {
-    "davis-cup": 199,
-    "open-era": 24
+    "davis-cup": 200,
+    "open-era": 25
    },
-   "matchesMoved": 1485
+   "matchesMoved": 1498
   },
   "fit": {
    "years": [
@@ -832,7 +832,7 @@
   "seam": {
    "1973": {
     "n": 50,
-    "meanDiff": 0.2,
+    "meanDiff": 0.1,
     "meanAbsDiff": 2.3,
     "maxAbsDiff": 18.5
    },
@@ -850,7 +850,7 @@
    },
    "1976": {
     "n": 50,
-    "meanDiff": 1,
+    "meanDiff": 0.9,
     "meanAbsDiff": 1.8,
     "maxAbsDiff": 45.3
    },
@@ -875,7 +875,7 @@
    "1980": {
     "n": 50,
     "meanDiff": 0.3,
-    "meanAbsDiff": 0.4,
+    "meanAbsDiff": 0.3,
     "maxAbsDiff": 1.6
    }
   }
@@ -943,7 +943,7 @@
       2,
       10,
       5,
-      14,
+      13,
       17,
       6,
       36
@@ -1000,21 +1000,21 @@
       12,
       21,
       5,
-      8
+      7
      ],
      "notListed": []
     },
     "1966": {
      "shared": 8,
      "listed": 10,
-     "rho": 0.85,
+     "rho": 0.83,
      "ranks": [
       3,
       2,
       1,
-      7,
-      4,
       8,
+      4,
+      7,
       5,
       22,
       10,
