@@ -111,12 +111,14 @@ const VENUE = ['stadium', 'base', 'home'];
  * played under another name or elsewhere (`teams`). An era keeps today's identity (id, name, code, city) unless it
  * names its own; one that names a stadium or a point replaces today's venue whole (its stadium, training base and
  * point); one that is `absent` (before an expansion franchise's first season, or while one was suspended) leaves the
- * franchise out of the season.
+ * franchise out of the season. `league` is the league whose season it is: an era names its own (`league: 'AFL'`, the
+ * American Football League's clubs before the 1970 merger), else it is the NFL's, and a franchise plays only in its
+ * league's seasons.
  */
-export function teamsOf(franchises, manifest, year) {
+export function teamsOf(franchises, manifest, year, league = 'NFL') {
   return Object.entries(franchises).flatMap(([franchise, team]) => {
     const era = manifest?.teams?.[franchise]?.find(e => (e.from ?? -Infinity) <= year && year <= (e.to ?? Infinity));
-    if (era?.absent) return [];
+    if (era?.absent || (era?.league ?? 'NFL') !== league) return [];
     const venue = era && VENUE.some(key => key in era) ? { stadium: era.stadium, base: era.base, home: era.home }
       : { stadium: team.stadium, base: team.base, home: team.home };
     const here = { ...team, id: franchise, ...(era || {}), ...venue };

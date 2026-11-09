@@ -1,0 +1,552 @@
+{
+ "note": "How well the computed seasons' value orders each position as the next season's Madden launch ratings do (Spearman's rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season's club strengths by the credit's power, beside Madden NFL 2002's spread of 2001's.",
+ "weights": {
+  "pass": 0.2,
+  "td": 40,
+  "int": 60,
+  "start": 0.15,
+  "teStart": 0.15,
+  "sack": 2,
+  "pick": 1.5,
+  "recovery": 1,
+  "returnTd": 1,
+  "starts": 0.6666666666666666,
+  "extraPoint": 0.3,
+  "accuracy": 3,
+  "team": 0.25
+ },
+ "grid": {
+  "pass": [
+   0.15,
+   0.2,
+   0.3
+  ],
+  "td": [
+   40,
+   60,
+   80
+  ],
+  "int": [
+   30,
+   45,
+   60
+  ],
+  "teStart": [
+   0.15,
+   0.25
+  ],
+  "start": [
+   0.05,
+   0.1,
+   0.15
+  ],
+  "sack": [
+   2,
+   3
+  ],
+  "pick": [
+   1,
+   1.5
+  ],
+  "accuracy": [
+   3,
+   5,
+   8
+  ]
+ },
+ "mean": 0.7567,
+ "positions": {
+  "QB": 0.825,
+  "RB": 0.778,
+  "WR": 0.86,
+  "TE": 0.714,
+  "OL": 0.679,
+  "DL": 0.74,
+  "LB": 0.792,
+  "CB": 0.782,
+  "S": 0.761,
+  "K": 0.636
+ },
+ "seasons": {
+  "QB": [
+   {
+    "season": 2001,
+    "players": 68,
+    "spearman": 0.829
+   },
+   {
+    "season": 2002,
+    "players": 69,
+    "spearman": 0.894
+   },
+   {
+    "season": 2003,
+    "players": 70,
+    "spearman": 0.815
+   },
+   {
+    "season": 2004,
+    "players": 66,
+    "spearman": 0.843
+   },
+   {
+    "season": 2005,
+    "players": 69,
+    "spearman": 0.744
+   }
+  ],
+  "RB": [
+   {
+    "season": 2001,
+    "players": 124,
+    "spearman": 0.763
+   },
+   {
+    "season": 2002,
+    "players": 136,
+    "spearman": 0.82
+   },
+   {
+    "season": 2003,
+    "players": 132,
+    "spearman": 0.791
+   },
+   {
+    "season": 2004,
+    "players": 133,
+    "spearman": 0.791
+   },
+   {
+    "season": 2005,
+    "players": 130,
+    "spearman": 0.727
+   }
+  ],
+  "WR": [
+   {
+    "season": 2001,
+    "players": 145,
+    "spearman": 0.852
+   },
+   {
+    "season": 2002,
+    "players": 155,
+    "spearman": 0.904
+   },
+   {
+    "season": 2003,
+    "players": 156,
+    "spearman": 0.892
+   },
+   {
+    "season": 2004,
+    "players": 153,
+    "spearman": 0.841
+   },
+   {
+    "season": 2005,
+    "players": 156,
+    "spearman": 0.81
+   }
+  ],
+  "TE": [
+   {
+    "season": 2001,
+    "players": 68,
+    "spearman": 0.702
+   },
+   {
+    "season": 2002,
+    "players": 86,
+    "spearman": 0.788
+   },
+   {
+    "season": 2003,
+    "players": 79,
+    "spearman": 0.68
+   },
+   {
+    "season": 2004,
+    "players": 83,
+    "spearman": 0.657
+   },
+   {
+    "season": 2005,
+    "players": 74,
+    "spearman": 0.742
+   }
+  ],
+  "OL": [
+   {
+    "season": 2001,
+    "players": 218,
+    "spearman": 0.601
+   },
+   {
+    "season": 2002,
+    "players": 251,
+    "spearman": 0.657
+   },
+   {
+    "season": 2003,
+    "players": 240,
+    "spearman": 0.73
+   },
+   {
+    "season": 2004,
+    "players": 250,
+    "spearman": 0.711
+   },
+   {
+    "season": 2005,
+    "players": 252,
+    "spearman": 0.696
+   }
+  ],
+  "DL": [
+   {
+    "season": 2001,
+    "players": 222,
+    "spearman": 0.693
+   },
+   {
+    "season": 2002,
+    "players": 221,
+    "spearman": 0.75
+   },
+   {
+    "season": 2003,
+    "players": 228,
+    "spearman": 0.754
+   },
+   {
+    "season": 2004,
+    "players": 232,
+    "spearman": 0.744
+   },
+   {
+    "season": 2005,
+    "players": 224,
+    "spearman": 0.759
+   }
+  ],
+  "LB": [
+   {
+    "season": 2001,
+    "players": 165,
+    "spearman": 0.805
+   },
+   {
+    "season": 2002,
+    "players": 177,
+    "spearman": 0.813
+   },
+   {
+    "season": 2003,
+    "players": 190,
+    "spearman": 0.82
+   },
+   {
+    "season": 2004,
+    "players": 191,
+    "spearman": 0.757
+   },
+   {
+    "season": 2005,
+    "players": 197,
+    "spearman": 0.764
+   }
+  ],
+  "CB": [
+   {
+    "season": 2001,
+    "players": 136,
+    "spearman": 0.766
+   },
+   {
+    "season": 2002,
+    "players": 146,
+    "spearman": 0.776
+   },
+   {
+    "season": 2003,
+    "players": 139,
+    "spearman": 0.802
+   },
+   {
+    "season": 2004,
+    "players": 135,
+    "spearman": 0.781
+   },
+   {
+    "season": 2005,
+    "players": 140,
+    "spearman": 0.784
+   }
+  ],
+  "S": [
+   {
+    "season": 2001,
+    "players": 97,
+    "spearman": 0.724
+   },
+   {
+    "season": 2002,
+    "players": 103,
+    "spearman": 0.8
+   },
+   {
+    "season": 2003,
+    "players": 115,
+    "spearman": 0.788
+   },
+   {
+    "season": 2004,
+    "players": 113,
+    "spearman": 0.741
+   },
+   {
+    "season": 2005,
+    "players": 118,
+    "spearman": 0.753
+   }
+  ],
+  "K": [
+   {
+    "season": 2001,
+    "players": 33,
+    "spearman": 0.763
+   },
+   {
+    "season": 2002,
+    "players": 31,
+    "spearman": 0.78
+   },
+   {
+    "season": 2003,
+    "players": 36,
+    "spearman": 0.569
+   },
+   {
+    "season": 2004,
+    "players": 35,
+    "spearman": 0.584
+   },
+   {
+    "season": 2005,
+    "players": 31,
+    "spearman": 0.483
+   }
+  ]
+ },
+ "team": {
+  "madden2002": [
+   72.7,
+   83.9
+  ],
+  "computed2001": {
+   "1": [
+    71.3,
+    88.3
+   ],
+   "0.75": [
+    71.8,
+    87.8
+   ],
+   "0.5": [
+    72.3,
+    86.3
+   ],
+   "0.35": [
+    73.1,
+    85.5
+   ],
+   "0.3": [
+    73.3,
+    85.2
+   ],
+   "0.25": [
+    73.5,
+    85
+   ],
+   "0.2": [
+    74,
+    84.7
+   ],
+   "0.15": [
+    74.1,
+    84.4
+   ],
+   "0.1": [
+    74.3,
+    84.2
+   ]
+  }
+ },
+ "files": {
+  "2001/2001nfl.html": "ab6249221522d560b4d782d7c262f26493eee81f92aa7452264ee3edd6714364",
+  "2001/2001nflne.html": "f111b8dbe4665ba3305e70f5bce7b80ee18f1e761e207d4d896c2f7bee9c15db",
+  "2001/2001nflmia.html": "3fc6e321b759feba0957e4a795358636ddf04bdaf88a85e6d7d8fefd89b3977b",
+  "2001/2001nflnyj.html": "76941fd7bcf7784dd52c2fe24f6491bbddd1079c3196023c72d0e8752d9ef825",
+  "2001/2001nflind.html": "6cdcde102c18d8f0671d8eaaa72fcc411a26420750edf2b052ab3cc56aa6019b",
+  "2001/2001nflbuf.html": "6b29c78e31df7132621481692fa0d56a3af3faf29c7066876f32b5fe9e5ee38d",
+  "2001/2001nflpit.html": "70c3c139a088d460158509bee9a3253d199fdfe14c1ec5109abc2c4e527935a5",
+  "2001/2001nflbal.html": "7b28b435f142fb8235f815a4d463639612511903e306b29649b4eef843883be3",
+  "2001/2001nflcle.html": "d69d85b91ea54337bf22ce5d889149f454c264db4ed5a9902daa4bff6f397623",
+  "2001/2001nflten.html": "86c39f267b3dd9299fc267c04a4d33e5bced9242495d6d5ee096fe8b5fc98ab7",
+  "2001/2001nfljac.html": "c0c074f877c7679fece67d7c1bd92d0db5153c39ca5842e1e57d908da01aecc5",
+  "2001/2001nflcin.html": "23aa970cfc943d2168e5f0c142427c2f85d69ee1b0c64d4b1d2d3a6c895e9d21",
+  "2001/2001nfloak.html": "ec89f92270870c65b53e938ed063c022c3a6e15b2cbc926abedd0d8d5367990c",
+  "2001/2001nflsea.html": "41203a46f63439f57a5cc2cc0bc2b524960c12084097d5db8874e8b1c18a22c6",
+  "2001/2001nflden.html": "0f5e9cd20da6407de6d75e8011ae34a99ea655d7e730c6ccc8d3ed31b5577a6f",
+  "2001/2001nflkc.html": "abf3eedaeb639e67738b4114163ea49beeae37e8d23c4fba51f37d170c954eb7",
+  "2001/2001nflsd.html": "99230e03ced672c77afb1f03a7609175c5ed1d2043812e97312a38d7d6449152",
+  "2001/2001nflphi.html": "b4ef2eba5e38c31d374447178cf709d2996da45c32ba054c995156f603552949",
+  "2001/2001nflwas.html": "fc01263cf41d76b5d7379f88a6b6c478f11d4115dd0494dbae790580bb1f5c38",
+  "2001/2001nflnyg.html": "0e9d56b31557c8bd402f7af33c5b1394922a24cc7e3c879e7f82471201714b89",
+  "2001/2001nflari.html": "82e0e0c81a0d61348812da3a247ba2965c5cc2b0c3f6d39289c8a969255433a7",
+  "2001/2001nfldal.html": "dc76f1ee0740b2d121a5f87c13d2d4cd410545901d2e711d46e82e1dc00e8ad0",
+  "2001/2001nflchib.html": "f510a46d6b834ab79b54a2ea1e1b219f606caf970bf9018278fc09c6abd9e644",
+  "2001/2001nflgb.html": "9957d1a13e0f04c01fa18aa0e91e5e754bd5567f9b6b7879d2470b0e8f6865b5",
+  "2001/2001nfltb.html": "f622b23ce1441fc89951829cd2278e0c7918d6eacfd75797e7b8a37e9565ea07",
+  "2001/2001nflmin.html": "95a467d19e2eb0e2b36adc8164c6302218620a7d024a29414fddbaf8504166e1",
+  "2001/2001nfldet.html": "ed77e033cf893dc1bee379740dd538658dd5753f1fbcd7c25242dda096fb2a4e",
+  "2001/2001nflstl.html": "bb4df1bace3bba7869b3384d145932b9c5182e67943ff05fa690620c6d5feaf0",
+  "2001/2001nflsf.html": "2845b3ff885e7788372971867a73287a23a35b8e8069371136936881b3da9bd2",
+  "2001/2001nflno.html": "53da1d1dc9a1ccde652cecae3a3fcbfbb8de66ce13df499a490d923744624196",
+  "2001/2001nflatl.html": "9d750863abd733badc8e7d0b964f9b691fbc2654c2cb040f7560d4c75092d459",
+  "2001/2001nflcar.html": "4bae445a337b221cac6ca91882d4d8974763d68f36378bc8a93faa75f98b351d",
+  "2002/2002nfl.html": "0d1d7d2fecafa9ef97275c6f815828f5805449a605d6c860953910f97e6eef8d",
+  "2002/2002nfltb.html": "b85749eb0c4b712478b29dc8c6bdeccff0fd8aedec5137def7c178c9a70bada1",
+  "2002/2002nflnyj.html": "288a6dfae62646b820b0ea7b46d3467676ed3c92778f81a5ee04460277e3b178",
+  "2002/2002nflne.html": "fed6a197b1a237f2e534d398eb6932c259063f1f697739ef5b51264cf3a0d452",
+  "2002/2002nflmia.html": "7267e5f6e057d056ae0cc5d7478b2decc58362f9b2669c625dfde21908aea264",
+  "2002/2002nflbuf.html": "ed6a5c2ea3a83ae6ac9f2842c0c8f3bfbcb97c04ec4baa3e959473b5de3bf915",
+  "2002/2002nflpit.html": "e20dbc71a13b646706a756a8522d5ec12e8e5339bfe8d444dfd3a1c91f47f511",
+  "2002/2002nflcle.html": "9757133c90b6ecfece876cf1bdd6c80c60f4e5f46de0c4c1ead55e85f72479cf",
+  "2002/2002nflbal.html": "808a109d7b750195dc0672e29c37a557f9d35b8f0309315239c7a279d639109d",
+  "2002/2002nflcin.html": "9b27c2b000ea0cf170eb951af8495cf4ba7432faf06291f4b146a31dd09de82d",
+  "2002/2002nflten.html": "1d5de77243233aa8d9f4e722ffb1db754a28018870a966e70c55fb850418214b",
+  "2002/2002nflind.html": "8399a7af687fc1df8cea5256c6edbfa89a4fe6271447dc0cda12baba1fb45feb",
+  "2002/2002nfljac.html": "7a8289942ac7dcd5459754f62712d6def3c840ba70d864c468345f5d93a9403a",
+  "2002/2002nflhou.html": "a75501d995b281075181a5248a7c426f7ccae9035c80a20d144167fea26422c9",
+  "2002/2002nfloak.html": "c24e82eb48d235ed2565977692cc60edc1b5dfc9807855f620abc64f9ac89faf",
+  "2002/2002nflden.html": "e0ed1391c83d78cd7f4987ad30ee352702c12a1dd299c93bc91ad98b6b6e8c1d",
+  "2002/2002nflsd.html": "90119b19ccf71ca9375484d95320651b639a32dd7dbc58fe8e8fadda33013967",
+  "2002/2002nflkc.html": "601a2de9157c0ef52db0ce846af44d4a0ea931d9324fc8ee4e70608c973841f7",
+  "2002/2002nflphi.html": "d8bc42cca4b92acc4a80e49a433989becca7a8dba3b4a70a633646229e0fea66",
+  "2002/2002nflnyg.html": "35a202306a9c610a269b819f2bf395530f6f3033890f62901dd4cf751ea2f45d",
+  "2002/2002nflwas.html": "bc5c0de4c52bf214c63443baffd321065cf105dcff41803129a6d81fe3dc71d7",
+  "2002/2002nfldal.html": "84e605c6a73461fa96d0977b17e718bb8b6315f21558338427dab8a202464fbf",
+  "2002/2002nflgb.html": "6569dd251796e766fd9bf01c2bf360ab73bd08fceea73982683d7222f297e743",
+  "2002/2002nflmin.html": "3a5412cfd19bcab65ed41a5d37a904d3bad5cf5e28e1b6c32e0e2e30c202d6b2",
+  "2002/2002nflchib.html": "38e0a20ff2652d5e8c251c58503f0e90dc736dd526c3aa66a50107dd9aafad9e",
+  "2002/2002nfldet.html": "bdf1dd0c0ca489a70c4b4a7468cf4bf62f22c3d184d2dce6c746c90b8aa480c1",
+  "2002/2002nflatl.html": "d6b8418bef344c73ad0876f44b26b6d3d2b5f658a8d8e07b17e091a842dceaa0",
+  "2002/2002nflno.html": "4edde8800fa50a6ab5ef56da22c980121d462e39a38e18a397a2ff60adee2808",
+  "2002/2002nflcar.html": "05bb37c51f01b487ab3dbb07f6c80677664047a277c0155217adc61f87d4cf97",
+  "2002/2002nflsf.html": "9c83c01069cc7c9205546bdf8b2bbc719e775722e66f6b3aaecd39e8ef81947e",
+  "2002/2002nflstl.html": "9bfbaf9669b9671d92c510b607b50467e78cf52247cb8c1aad8623e8bfb3ea71",
+  "2002/2002nflsea.html": "4a8294f1a714ca1a1f407561db7025adbc213adf5a30c389d2b6a0bd0f2e9b90",
+  "2002/2002nflari.html": "b8b91590e232c5806ce7792e13a0e005b45a8131cc96275709b78036e0f30925",
+  "2003/2003nfl.html": "0465f2f78f8fe5b639d01077b07f5a4d679c93224c6a8a3421f1bcf25ed2ada0",
+  "2003/2003nflne.html": "c7d761919704375cb8b0f9f6c1ecd1c357b9beaecf63cc7848466a75676032bf",
+  "2003/2003nflmia.html": "0802baaed21f2a800a84e295321fef17974dcce6b1b5d7a2c75ca85a3b2ff79b",
+  "2003/2003nflbuf.html": "4c8b9779917512a8fa633666e36085e640ecf843946bc7a5f8e29fea7af3c201",
+  "2003/2003nflnyj.html": "a8367182c42b301eded289013e795e07e30a8f962583d1e5e936f50408d3d06b",
+  "2003/2003nflbal.html": "901597cb1f5c070a797133a137c959655059e018fd76001e8ccd28cf05ba90b4",
+  "2003/2003nflcin.html": "0e2e7e92ff9af39df000e1a447f4c944659e5b0a5b5f6ed396b3a786dc82c694",
+  "2003/2003nflpit.html": "ca3ba1196c30d213c4d48aa7af6788f5fe004e0b0ce81318a2330acda2ab1756",
+  "2003/2003nflcle.html": "f847471e7d065c30a850dfa5e7fbfe3e0291bc13abc80190c464771a0268e900",
+  "2003/2003nflind.html": "6a34b028af1994e5da5ad339a899aeeb6ed11ee5c0c30bfe24b9b6f6d164621b",
+  "2003/2003nflten.html": "2b17064d8885e3af7dcc805ed677413008abed114ceb993f8c3919a2daef8682",
+  "2003/2003nfljac.html": "6c5cc80482825875236f1cf26851247fa73590051af9c836cd1d9dcced6e0e47",
+  "2003/2003nflhou.html": "482ec8944e82bf83a003ccf018f208a73a939c8f10b033da491645e9e4174e9f",
+  "2003/2003nflkc.html": "33b1e9631be0491b9f74fed382dbd5b9e25e503cc2c56fabbcaa1260f54a2443",
+  "2003/2003nflden.html": "99f266bca6e6bdec80e91e3eb5dbb58f26f0d79e47b64241d31dbaeccaa33f0c",
+  "2003/2003nfloak.html": "0499e3f056b20d4fd2eeb48a152281e5710121e9dfb922073b92f47767cbe2e8",
+  "2003/2003nflsd.html": "9926ebfd9b2919df586b449980c22b7043c5022fd04f82b050dc9f8887dc54ef",
+  "2003/2003nflphi.html": "09d06f1013f21184861fbb12b97d412e5e3bd0c0ef3d2dbcc5ab1a962b6e4252",
+  "2003/2003nfldal.html": "e551e0928f12a0f96deb8c9a8e6f0e9ec473166b8428b3a10d2ac3e20f831399",
+  "2003/2003nflwas.html": "9a332f6536faba0ce8efe2fce0d4509fd74c03febf77fae1e4aa069f1ff0cd48",
+  "2003/2003nflnyg.html": "d898efe1f8e4d7eb1c0f93a058d72b94477ec160220c770bc2ae1d9b57db6c99",
+  "2003/2003nflgb.html": "37f87c579a16be357f1b6fe092c36c220a29a0a0a181b6f0846ffc32b86cbdc4",
+  "2003/2003nflmin.html": "1bfd2a0e9882da0a4e89d4331ae0a7cab9fdd81d3e1a3b6335edac70b7589201",
+  "2003/2003nflchib.html": "1da2e68280e3f60992aa4494f7e71afacb65a96b0c508b4e536952d9873c3833",
+  "2003/2003nfldet.html": "85657b605b4a29f041aea6a5b1b8a5759e1133100c2472427af199b5e692053f",
+  "2003/2003nflcar.html": "ea1421f4392338d8b34bd790748bbb50775865a04d3ef3fafe96ee073f124454",
+  "2003/2003nflno.html": "ea92a36c8ddfdc8257eae1521339beaaa95588798a454a03108178c7348800e4",
+  "2003/2003nfltb.html": "b44d01652932590906e05ae36c885599910170ef056fb33f66030d13d8253a0d",
+  "2003/2003nflatl.html": "69511b47bf2d09fe14c47679e74d1c843bb41a7565cc5369740b93d8654f2f20",
+  "2003/2003nflstl.html": "e179810c7a29cb5deff7894bdd3c605f6c806cf9339a059cb1ad9301a4f3f5b7",
+  "2003/2003nflsea.html": "5a294a9c7e46a1c5e61b267d8d2a0eb79c7b10bb5aafd4a1a667abe993c004ba",
+  "2003/2003nflsf.html": "369ba657670f8a2b3535731890af0d13805a338b5e81b4df96f4e466388fc67c",
+  "2003/2003nflari.html": "242d1f7ab6c4c8f128df48e30c4e9133b3e6fcf7ff58f9b0a1670965d2bda548",
+  "2004/2004nfl.html": "97ccc88ffa90508e8813cc6ceae1ff52921437a04ae1c0d16b2de77f3040283b",
+  "2004/2004nflne.html": "f86032c747f5f2ea77ea21305a3d804c5b1afcff0955b50f201f8b3d96290522",
+  "2004/2004nflnyj.html": "60abe87c70863320013486fd253b141db1f64d77f4c7a5bfc865a7867abeaa01",
+  "2004/2004nflbuf.html": "b626ba0cc2188d9d175a56014a4e989fefe832bfc1e9be8001526e1ed7bcd684",
+  "2004/2004nflmia.html": "8f3895d4865321d2b317483c7599746366bc2d33b025e4721ae0cd2056eff216",
+  "2004/2004nflpit.html": "23259f64d116d7b9ba477fc1c49349b28d70f0d5443766be3ea7f7d7d3f9fb17",
+  "2004/2004nflbal.html": "0c1e0a9df7e6aa7b53b1046c422f447a623742fd7695c6d0c5f1175cf6fb8533",
+  "2004/2004nflcin.html": "48e10458f3c64e36c6e6a67a24133f1961fbd4f38c6680f98090405a5f11f561",
+  "2004/2004nflcle.html": "5b88d077e5b32cfae6bed5e2b088292d7176805f73452033206f82c33ee79845",
+  "2004/2004nflind.html": "08dc110b0adbd2e7fb146410d2544615cd8b00e75ff1a30034860fdfeb6376fa",
+  "2004/2004nfljac.html": "245a738e8300e2b6014633b2199dafaedb85407d5cb31327aee12d1297f23684",
+  "2004/2004nflhou.html": "8cd908630af144b1140ca4c5c182b5138c3ea6b7a99d30fc003941eabbabbac0",
+  "2004/2004nflten.html": "2bf3d4369ffa894e9e07af89476d25bfcb152c1ef75cd58fedadd51858998bdf",
+  "2004/2004nflsd.html": "cda83a6e58dd44f43f64948d528e14bdb6bfa67c1ac385102269b4a06e05d1f6",
+  "2004/2004nflden.html": "62830faa1de906c114c53f2b97ee8f2a5b9e48c917594054ebad748d90495a21",
+  "2004/2004nflkc.html": "5eead4812c28b5ce062f9621524918ead8fc97d579ff997d9d3a52ae896098b4",
+  "2004/2004nfloak.html": "1cabb919238437d77fc30b4040ecf149e52fd23c2e0df7e7333d21e155dddf9b",
+  "2004/2004nflphi.html": "7233c31429d206c282ed6049fb93112d793e67a35d1fca2dcf7b75369a520352",
+  "2004/2004nflnyg.html": "12e0cf8a599a6cb389ded44b9f2729d3bfc36f4eeda93f24bf17b8eafa67c934",
+  "2004/2004nfldal.html": "3f96a5d104787e9a006b41713b8d018f3423485f451fc7ba5cb443d9c5cc687c",
+  "2004/2004nflwas.html": "a83edec2164c270c52e8e0da8c9967a17a11371ad0feb6da0f80061d85c27728",
+  "2004/2004nflgb.html": "cb39aa28dbcd20e941181160fb27c3de55c27d5230fce72cedf1c29917a15795",
+  "2004/2004nflmin.html": "ea1f04cef583172f7a1be1b96ef1a0d1e202408f84d8b6e1ef15dec9f3a7523a",
+  "2004/2004nfldet.html": "7f805b752633f8e3a927baa481a979075a8d6a7e42cb109590bf41fba175981c",
+  "2004/2004nflchib.html": "96bf8ccfd0e7d98697158408349e5fd6621b850de788b9e4540dd62c5f3efe60",
+  "2004/2004nflatl.html": "ecf31320619c626293e698c139260ce4c5444f45dc23bfabc3499144bcf2b368",
+  "2004/2004nflno.html": "7c9ebeb9ec9de30faa89572f5d79a619861488b648469a1cfe04ecd37d56e9a4",
+  "2004/2004nflcar.html": "bb2f163b853c98dff54696dacba76ff8b8d1b7079db66239680e3f9f77e3e52e",
+  "2004/2004nfltb.html": "2c9a5930c0da5a0ce4c6855865120b44fd245b54ddf410abce6de0e398212042",
+  "2004/2004nflsea.html": "2b4749eb503a592252170822b49676357ae8a422f527f5a4d77b21ab3e06c473",
+  "2004/2004nflstl.html": "9cf65e31372da3b5907de46688071fc05b67b5196f23e8a57ed821ccb4c621c7",
+  "2004/2004nflari.html": "cd62f7b02185ce6f03c2303b7be9b0e65f755805f9e45e6507772858a5f3354c",
+  "2004/2004nflsf.html": "920c215985c75ba320058cd637ef60cf86cfb81bb2d6469d4643e8ca7b9405c0",
+  "2005/2005nfl.html": "a41d090c680cc785e260a7e85ee48c82890fd0857d59a42b731dea1927c3fc1a",
+  "2005/2005nflpit.html": "23dced23d53e0508b47bc6857fae8c9d8ceaf51c12f2103e915ac3f0a8a13856",
+  "2005/2005nflne.html": "70826bc32ea7a48794e72bd505b08bca14cc6d440bd8f272251cf75ae9950cc7",
+  "2005/2005nflmia.html": "edf10a5cde452f8a5f04ee8ee562ecf7f0ab3b57e502b90a0b59874c18962b75",
+  "2005/2005nflbuf.html": "4cc5fe9514df549e10c6eb1bd4bab6b2e2b383a336d3e59f88b5cea1c7a8f251",
+  "2005/2005nflnyj.html": "147f9bb1756476dd73453aee2871ef9224cdcb7bb28b0051e4585bfa5c5bfaaa",
+  "2005/2005nflcin.html": "acb76ccfe2997dd1ab23be1268b7550f3ee25cf017796554a29c3dba06bb55a9",
+  "2005/2005nflbal.html": "3a8701ad5d79b71b0795c89281818878401b0a64bd58a13de13f58ce8ffd5b61",
+  "2005/2005nflcle.html": "a495b3a3543992eb1415eda6dd82252e81fed074adb8d4c2b6690b9a424d261e",
+  "2005/2005nflind.html": "1c984d35635689f2fb51401e87659f6a8e73d61c0410d51d9b7628576005b98c",
+  "2005/2005nfljac.html": "ddb497ebaf755022995d8f1afb19a0dd4d5f9cad205943e98c2185c603712c44",
+  "2005/2005nflten.html": "681ac880cc7173ed826321113004c2ae4ac74d4741dd4bbe4dd36cdc05a370f0",
+  "2005/2005nflhou.html": "c739de1538aef8600a3ca20325183daf688b9da592a4c33bc64ecc142d1196de",
+  "2005/2005nflden.html": "04001645da4a0c0ee63ff5ba98f0f622871ed8857e04d9ea03a1de0f09bb03a5",
+  "2005/2005nflkc.html": "03865e275fd03ba9dc77ff1ca472162de5d56a98a0078cf2ef359af69db6e491",
+  "2005/2005nflsd.html": "55223cdb1cf22d78d40b13b95ae98da7bab5b32f3f2ca169e88c891bd1f6381c",
+  "2005/2005nfloak.html": "5326498752d6347a0b86b79f04f773d3b97bf4333c1dcb367eb766518d7f5211",
+  "2005/2005nflnyg.html": "def556901d49e5d7bc7823dee5a74e59a5bc5b30ddd0d136a9c431599d350df1",
+  "2005/2005nflwas.html": "a1c55b3e30a5daa9947d1e3e93cc4a3242bd69d70935f0bb631915b622b497f4",
+  "2005/2005nfldal.html": "5d9e33089e4a94cb91af2e32044da63c715834aa764636785f84f1a8bb281bdc",
+  "2005/2005nflphi.html": "97a3394d258d368c8d49e87dd9e7a71b6206f441d828d6560e3c09a878f4a18d",
+  "2005/2005nflchib.html": "9b0b2fffdf953c6de6bea89ed5880d9b7b6b0f7620f5a60a4df4e2161cdda767",
+  "2005/2005nflmin.html": "f3eb4c2fa9eb32e45d24516b65f6bc5307d8705824ccb58e34c3b9064c0ffb32",
+  "2005/2005nfldet.html": "8db1baa6abd1b4650271b81cd941a27a48977f0b104808c4d4ce7b2487286292",
+  "2005/2005nflgb.html": "be7f8047290bbce1fa24b5630edc7973612fa7250b1f4c01ff671dae73e601f6",
+  "2005/2005nfltb.html": "56a846797c2d38a1db069dc45fbf2a312265627fc87f7c88f49ab4aa0870cd42",
+  "2005/2005nflcar.html": "3767f6a7356d637263394cabfe166d68b9db0bbd90211fa69bfa6056741335a3",
+  "2005/2005nflatl.html": "6f88096e63998c6b4a88e500cb81ecb89c49d1f1833e659178582bf0de20ca1a",
+  "2005/2005nflno.html": "cc0f6d271f128791bd60dc799345a77ad32b614ee16c0c4e12b681433daadc0c",
+  "2005/2005nflsea.html": "e5a8064691e4f10a1f08912bf0a8c5650da18e363a2782bcc274679687fc8092",
+  "2005/2005nflstl.html": "37f2c662b4dc240cb2bb816396b72c521170ee3beda621c15c351bec6b311b98",
+  "2005/2005nflari.html": "d6c3082166bce04fc6f7ba6ceb999e27bd19292825237cbd302aee2450e72e84",
+  "2005/2005nflsf.html": "33ec8f5d5d64256582c1c3ba4be600a4717c4622ba2ebe514a97c1fea211c52c"
+ }
+}

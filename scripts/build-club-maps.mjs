@@ -10,7 +10,7 @@
 // New Jersey where they played. Today's map is unchanged by them.
 //
 // Usage:
-//   node scripts/build-club-maps.mjs [--league=nba|nfl|mlb|nhl|nrl] [--check | --dry-run]
+//   node scripts/build-club-maps.mjs [--league=nba|nfl|afl|mlb|nhl|nrl] [--check | --dry-run]
 //     --league   build one league's maps; the index keeps the other leagues' entries as they are
 //     --check    rebuild offline from the caches and compare every output byte for byte
 //     --dry-run  build and verify (downloading boundaries as needed) but write nothing
@@ -97,6 +97,12 @@ const LEAGUES = {
     entry: { venue: 'stadium', lines: 'state' }, maxGapKm: 5,
     venues: 'Stadium locations: scripts/data/nfl-teams.json (the four franchises that share a stadium grow from their training grounds).',
     eraVenues: 'Stadium locations: scripts/data/nfl-teams.json, and scripts/data/nfl-seasons.json for clubs that have moved, been renamed or played elsewhere since (franchises that share a stadium grow from their training grounds).' },
+  // The American Football League's seasons before the 1970 merger (scripts/data/nfl-seasons.json, `afl`): era maps only,
+  // its clubs alone on them, by the NFL's rules.
+  afl: { id: 'afl', sport: 'american-football', league: 'AFL', name: 'USA', countries: [USA], joins: { 'US-NJ': ['US-NY'], 'US-MD': ['US-DC'] },
+    entry: { venue: 'stadium', lines: 'state' }, maxGapKm: 5,
+    venues: 'Stadium locations: scripts/data/nfl-seasons.json.',
+    eraVenues: 'Stadium locations: scripts/data/nfl-teams.json, and scripts/data/nfl-seasons.json for clubs that have moved, been renamed or played elsewhere since.' },
   mlb: { id: 'mlb', sport: 'baseball', league: 'MLB', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: { venue: 'ballpark' },
     maxGapKm: 5, venues: 'Ballpark locations: scripts/data/mlb-teams.json.',
     eraVenues: 'Ballpark locations: scripts/data/mlb-teams.json, and scripts/data/mlb-seasons.json for clubs that have moved, been renamed or played elsewhere since.' },
@@ -328,6 +334,28 @@ async function nflSpecs() {
       clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.stadium, home: t.home })) });
   }
   return specs;
+}
+
+/**
+ * The AFL's maps, one per era of scripts/data/nfl-seasons.json's `afl` (1960–1969), each `{ id, seasons, clubs }` in the
+ * order the AFL's franchises rank today among the NFL's, its seasons all with the same clubs in the same stadiums.
+ */
+async function aflSpecs() {
+  const stadiums = JSON.parse(await readFile(stadiumsFile, 'utf8')).teams;
+  const manifest = JSON.parse(await readFile(nflSeasonsFile, 'utf8'));
+  const rank = new Map(rankedClubs(NFL_CLUBS, stadiums, 'stadium').map((c, i) => [c.id, i]));
+  const teamsAt = year => nflTeamsOf(stadiums, manifest, year, 'AFL').sort((a, b) => rank.get(a.franchise) - rank.get(b.franchise));
+  const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.stadium, t.base ?? null, t.home]));
+  const afl = { ...manifest, ...manifest.afl };
+  return manifest.afl.maps.map(map => {
+    const [first, ...rest] = map.seasons;
+    const teams = teamsAt(first);
+    if (!teams.length) throw new Error(`${map.id}: no AFL club in ${first}`);
+    const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
+    if (differs) throw new Error(`${map.id}: the clubs or stadiums of ${differs} are not those of ${first}`);
+    return { id: map.id, seasons: map.seasons.map(year => nflSetIdOf(afl, year)),
+      clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.stadium, home: t.home })) };
+  });
 }
 
 /** MLB's one map, from the game's clubs and their ballparks: `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`. */
@@ -639,7 +667,7 @@ function attributionText(doc, league) {
   return `${lines.join('\n')}\n`;
 }
 
-const SPECS = { nba: nbaSpecs, nfl: nflSpecs, mlb: mlbSpecs, nhl: nhlSpecs, nrl: nrlSpecs };
+const SPECS = { nba: nbaSpecs, nfl: nflSpecs, afl: aflSpecs, mlb: mlbSpecs, nhl: nhlSpecs, nrl: nrlSpecs };
 
 async function main() {
   const argv = process.argv.slice(2), args = new Set(argv);
@@ -674,10 +702,10 @@ async function main() {
       for (const f of differs) console.error(`differs: ${f}`);
       process.exit(1);
     }
-    log(`Verified the ${only ? LEAGUES[only].league : 'NBA, NFL, MLB, NHL and NRL'} maps, their index and attributions byte for byte.`);
+    log(`Verified the ${only ? LEAGUES[only].league : 'NBA, NFL, AFL, MLB, NHL and NRL'} maps, their index and attributions byte for byte.`);
   } else if (!dryRun) {
     for (const [file, text] of outputs) await writeFile(file, text);
-    log(`Wrote the ${only ? LEAGUES[only].league : 'NBA, NFL, MLB, NHL and NRL'} maps, their index and attributions in ${((Date.now() - started) / 1000).toFixed(1)} s.`);
+    log(`Wrote the ${only ? LEAGUES[only].league : 'NBA, NFL, AFL, MLB, NHL and NRL'} maps, their index and attributions in ${((Date.now() - started) / 1000).toFixed(1)} s.`);
   }
 }
 
