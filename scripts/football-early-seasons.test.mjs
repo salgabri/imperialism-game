@@ -20,7 +20,7 @@ import { CM_CONVERSION, CM_SCALE, cmGameRating } from '../src/data/cmPlayers.js'
 import { SWOS_CONVERSION, SWOS_PRICES, SWOS_SCALE, SWOS_SKILLS, expandSwosTuple, swosGameRating, swosTupleOf } from '../src/data/swosPlayers.js';
 import { CM0102_RELEASES } from '../src/data/cm0102Releases.js';
 import { FOOTBALL_FEDERATIONS } from '../src/data/footballFederations.js';
-import { FIRST_YEAR, contentHash, territoryFor } from '../src/data/footballSetBuild.js';
+import { FIRST_YEAR, contentHash, identitiesFor, territoryFor } from '../src/data/footballSetBuild.js';
 import {
   BUILT_IN_SETS, decodeFootballSet, fieldedNations, heldShapes, isFootballSetId, seasonSport, setHasClubs, setKindOf, setSportOf,
 } from '../src/engine/footballSets.js';
@@ -132,9 +132,11 @@ test('each season with clubs plays on its own two Europe maps: its strongest 124
 // ---------- federations ----------
 
 test('the federations of the seasons\' own years: FR Yugoslavia holds Montenegro, and Kosovo until 1999', () => {
-  assert.equal(FIRST_YEAR, 1997, 'the earliest season the game ships');
+  assert.equal(FIRST_YEAR, 1962, 'the first World Cup season the federations table covers');
   const year = id => committed(id).year;
   for (const id of IDS) assert.deepEqual(committed(id).territory, territoryFor(FOOTBALL_FEDERATIONS, year(id)), id);
+  // These seasons were built before identities: none carries one, and none of their years has a federation of the day.
+  for (const id of IDS) assert.ok(!('identities' in committed(id)) && !Object.keys(identitiesFor(FOOTBALL_FEDERATIONS, year(id))).length, id);
   const of = id => seasonSport(decodeFootballSet(committed(id)));
   // A FIFA member of the season's year: neither merged into another federation nor inactive. It fields a team only with
   // a real side (fieldedNations).
