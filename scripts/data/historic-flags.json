@@ -1,0 +1,95 @@
+{
+  "about": "Flags of football federations of another day that flag-icons does not have (docs/design/football-years.md, 'Federations of the day'). Each is a public-domain SVG from Wikimedia Commons, read 2026-11-09 from the file page named (robots.txt allows /wiki/ pages and upload.wikimedia.org), committed under scripts/data/historic-flags/ and redrawn on flag-icons' 4:3 canvas (640 x 480) by npm run build:historic-flags, which writes public/flags/<file>.svg; --check rebuilds them byte for byte. The redrawing keeps every path of the original: the flag is scaled by its height to 480 and cut to 640 wide, at the fly for a flag whose emblem sits in the canton, evenly on both sides for a centred one; a plain field is redrawn as rectangles in the new coordinates. sha256 is the original as served by upload.wikimedia.org, lfSha256 the committed snapshot (git keeps text with LF line endings).",
+  "flags": [
+    {
+      "file": "su",
+      "flagId": "URS",
+      "name": "Soviet Union",
+      "flies": "1955-1991",
+      "source": "scripts/data/historic-flags/Flag_of_the_Soviet_Union.svg",
+      "commons": {
+        "title": "File:Flag of the Soviet Union.svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Soviet_Union.svg",
+        "revision": 1291936455,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Flag_of_the_Soviet_Union.svg"
+      },
+      "licence": "Public domain: not an object of copyright under article 1259 of Book IV of the Civil Code of the Russian Federation (Commons: PD-RU-exempt), as the file page states",
+      "sha256": "f6741b67fcf8934c47f2482a54440ab406ae82763c9c7676b9972f476232127f",
+      "lfSha256": "f6741b67fcf8934c47f2482a54440ab406ae82763c9c7676b9972f476232127f",
+      "bytes": 3441,
+      "layout": "canton"
+    },
+    {
+      "file": "yu",
+      "flagId": "YUG",
+      "name": "Yugoslavia (SFR Yugoslavia)",
+      "flies": "1946-1992",
+      "source": "scripts/data/historic-flags/Flag_of_Yugoslavia_(1946-1992).svg",
+      "commons": {
+        "title": "File:Flag of Yugoslavia (1946-1992).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Yugoslavia_(1946-1992).svg",
+        "revision": 1294570127,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/6/61/Flag_of_Yugoslavia_%281946-1992%29.svg"
+      },
+      "licence": "Public domain: ineligible for copyright (simple geometry, official insignia) and expired under Yugoslav copyright law (Commons: PD-ineligible, PD-shape, PD-Yugoslavia), as the file page states",
+      "sha256": "688185bc4e5b46debda7d6ecaa3bc3f410b1c1ba62d759d5a876def06e6bc887",
+      "lfSha256": "688185bc4e5b46debda7d6ecaa3bc3f410b1c1ba62d759d5a876def06e6bc887",
+      "bytes": 422,
+      "layout": "centred"
+    },
+    {
+      "file": "yu-1992",
+      "flagId": "FRY",
+      "name": "FR Yugoslavia, then Serbia and Montenegro",
+      "flies": "1992-2006",
+      "source": "scripts/data/historic-flags/Flag_of_Serbia_and_Montenegro_(1992-2006).svg",
+      "commons": {
+        "title": "File:Flag of Serbia and Montenegro (1992–2006).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Serbia_and_Montenegro_(1992–2006).svg",
+        "revision": 1272722742,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Flag_of_Serbia_and_Montenegro_%281992%E2%80%932006%29.svg"
+      },
+      "licence": "Public domain: an official act of state authorities under the copyright law of Serbia and Montenegro, and ineligible for copyright (Commons: PD-SerbiaGov, PD-ineligible), as the file page states",
+      "sha256": "d766043a5ccac18b7ab3be1def2439d626e7ed2a03a79ae278b0eadd3bdfa5df",
+      "lfSha256": "97077c297356efe748b1a947a19e22c99cd5e52990d83b1dd784f4bd119efc64",
+      "bytes": 194,
+      "layout": "stripes"
+    },
+    {
+      "file": "zr",
+      "flagId": "ZAI",
+      "name": "Zaire",
+      "flies": "1971-1997",
+      "source": "scripts/data/historic-flags/Flag_of_Zaire_(1971-1997).svg",
+      "commons": {
+        "title": "File:Flag of Zaire (1971–1997).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Zaire_(1971–1997).svg",
+        "revision": 1250427596,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Flag_of_Zaire_%281971%E2%80%931997%29.svg"
+      },
+      "licence": "Public domain: an official act, and expired under Ordinance-Law No. 86-033 of 5 April 1986 of the Democratic Republic of the Congo (Commons: PD-Congo), as the file page states",
+      "sha256": "4d9d167735254b34ee9d84e588a90767c5017f796a23315c33b5f7521218e7bd",
+      "lfSha256": "4d9d167735254b34ee9d84e588a90767c5017f796a23315c33b5f7521218e7bd",
+      "bytes": 9349,
+      "layout": "centred"
+    },
+    {
+      "file": "cis-1992",
+      "flagId": "CIS",
+      "name": "CIS (the flag of its team at Euro 1992)",
+      "flies": "1992",
+      "source": "scripts/data/historic-flags/Flag_of_the_CIS_(UEFA_Euro_1992).svg",
+      "commons": {
+        "title": "File:Flag of the CIS (UEFA Euro 1992).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_CIS_(UEFA_Euro_1992).svg",
+        "revision": 1254228551,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/3/33/Flag_of_the_CIS_%28UEFA_Euro_1992%29.svg"
+      },
+      "licence": "Public domain: simple geometric shapes and text, below the threshold of originality (Commons: PD-textlogo), as the file page states",
+      "sha256": "20904257182ac9481320fe17ab5870958cebd7a1c336cbc849be0da45420b9b8",
+      "lfSha256": "20904257182ac9481320fe17ab5870958cebd7a1c336cbc849be0da45420b9b8",
+      "bytes": 5068,
+      "layout": "centred"
+    }
+  ]
+}
