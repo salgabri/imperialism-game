@@ -396,6 +396,60 @@ test('a 1985/86 nations campaign launches with the season\'s computed Swedes', a
   });
 });
 
+test('a 2025/26 clubs campaign plays on today\'s NHL map, saves and resumes on it', async () => {
+  await withApp(async ({ app, time, items }) => {
+    app.pickSetup('sport', 'hockey');
+    app.pickSetup('layer', 'clubs');
+    app.pickSetup('dataSet', 'nhl-2026');
+    assert.equal(app.state.setup.clubScope, 'domestic:nhl', 'the season of today\'s clubs plays on today\'s map');
+    time.advance(200);
+    await Promise.all([app.loadCountry('nhl'), app.loadSet('nhl-2026')]);
+    await settle();
+    app.startCampaign();
+    const before = app.state;
+    assert.equal(before.phase, 'playing');
+    assert.deepEqual([before.settings.dataSet, before.settings.dataSeason, before.settings.clubScope, before.settings.domesticVersion],
+      ['nhl-2026', '2025/26', 'domestic:nhl', CLUB_MAPS.find(entry => entry.id === 'nhl').version]);
+    const doc = seasonFile('nhl-2026');
+    assert.deepEqual(Object.keys(before.teams).sort(), doc.clubs.map(club => club.id).sort());
+    assert.equal(before.teams['nhl-ottawa-senators'].squad.some(p => p.name === 'Tim Stutzle'), true);
+    const saved = parseCampaign(items.get(SAVE_KEY));
+    assert.equal(JSON.stringify(saved.teams), JSON.stringify(before.teams));
+    let resumed = null;
+    assert.notEqual(app.withCampaignMap(saved, (loaded, fitted) => { resumed = { loaded, fitted }; return true; }), false);
+    app.restoreCampaign(resumed.fitted, resumed.loaded);
+    assert.equal(app.state.phase, 'playing');
+    assert.deepEqual(app.state.own, before.own, 'every club keeps its land');
+    assert.equal(app.state.settings.dataSet, 'nhl-2026');
+  });
+});
+
+test('a 2007/08 nations campaign plays NHL 08\'s converted players, saves and resumes', async () => {
+  await withApp(async ({ app, time, items }) => {
+    app.pickSetup('sport', 'hockey');
+    app.pickSetup('scope', 'UEFA');
+    app.pickSetup('dataSet', 'nhl-2008');
+    assert.equal(app.state.setup.layer, 'nations');
+    time.advance(200);
+    await app.loadSet('nhl-2008');
+    await settle();
+    app.startCampaign();
+    const before = app.state;
+    assert.equal(before.phase, 'playing');
+    const doc = seasonFile('nhl-2008');
+    assert.deepEqual(before.teams['752'].squad.filter(p => !p.gen).map(p => [p.name, p.rating]), doc.nations['752'][2].map(([name, , rating]) => [name, rating]),
+      'the Swedes of NHL 08');
+    const saved = parseCampaign(items.get(SAVE_KEY));
+    assert.equal(JSON.stringify(saved.teams), JSON.stringify(before.teams));
+    let resumed = null;
+    assert.notEqual(app.withCampaignMap(saved, (loaded, fitted) => { resumed = { loaded, fitted }; return true; }), false);
+    app.restoreCampaign(resumed.fitted, resumed.loaded);
+    assert.equal(app.state.phase, 'playing');
+    assert.deepEqual([app.state.settings.dataSet, app.state.settings.dataVersion], ['nhl-2008', doc.version]);
+    assert.deepEqual(app.state.own, before.own);
+  });
+});
+
 test('a 2006/07 campaign saved on the map before it served 2007/08 to 2010/11 resumes on it', async () => {
   // The version nhl2007 had when it served 2006/07 alone (src/data/clubMaps.js at 06db6f6).
   const OLD = 'nhl2007-784f3771';
