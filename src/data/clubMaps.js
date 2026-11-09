@@ -53,5 +53,8 @@ export const CLUB_MAPS = [
   {"id":"nhl2007","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-2007"],"clubs":30,"sections":30,"version":"nhl2007-784f3771"},
   {"id":"nhl2022","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-2022"],"clubs":32,"sections":32,"version":"nhl2022-93344215"},
   {"id":"nrl","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","clubs":17,"sections":17,"venue":"ground","lines":"state or region","version":"nrl-3c3fee15","top":["Melbourne Storm","Penrith Panthers","Canterbury-Bankstown Bulldogs"]},
-  {"id":"nrl2008","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-2008"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl2008-0e22f7e6"},
+  {"id":"nrl2008","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-2008","nrl-2009"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl2008-6fdb9513"},
+  {"id":"nrl2010","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-2010","nrl-2011"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl2010-86b96ec5"},
+  {"id":"nrl2012","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-2012","nrl-2013","nrl-2014","nrl-2015","nrl-2016","nrl-2017","nrl-2018","nrl-2019"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl2012-29320771"},
+  {"id":"nrl2020","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-2020","nrl-2021","nrl-2022"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl2020-9f1085b0"},
 ];

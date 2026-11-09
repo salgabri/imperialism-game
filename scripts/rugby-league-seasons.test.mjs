@@ -82,7 +82,7 @@ test('the built-in season list has 2008: clubs only, a calendar year, on the map
   assert.equal(listed.version, DOC.version);
   assert.equal(listed.id, seasonIdOf(listed.year));
   const era = CLUB_MAPS.find(entry => entry.id === 'nrl2008');
-  assert.deepEqual([era.sport, era.league, era.seasons, era.clubs, era.sections, era.venue, era.lines], ['rugby-league', 'NRL', ['nrl-2008'], 16, 16, 'ground', 'state or region']);
+  assert.deepEqual([era.sport, era.league, era.seasons, era.clubs, era.sections, era.venue, era.lines], ['rugby-league', 'NRL', ['nrl-2008', 'nrl-2009'], 16, 16, 'ground', 'state or region']);
   assert.ok(isEraMap('nrl2008') && !isEraMap('nrl'));
   assert.equal(CLUB_MAPS.find(entry => entry.id === 'nrl').seasons, undefined, 'today\'s map serves the built-in clubs');
 });

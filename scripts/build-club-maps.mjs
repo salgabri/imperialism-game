@@ -356,7 +356,8 @@ async function mlbSpecs() {
  * The NRL's maps, `{ id, seasons, clubs: [{ id, name, city, arena, home }] }`: today's from the game's clubs and their
  * grounds (`seasons` null), then one per earlier era of scripts/data/rugby-league-seasons.json, whose seasons must all
  * have the same clubs at the same grounds. An era's clubs rank as their franchises rank today, so section ids follow the
- * same order on every map.
+ * same order on every map. Seasons with today's clubs at today's grounds (2023 on) play on today's map, which is
+ * built once.
  */
 async function nrlSpecs() {
   const grounds = JSON.parse(await readFile(nrlGroundsFile, 'utf8')).teams;
@@ -367,12 +368,17 @@ async function nrlSpecs() {
   const rank = new Map(clubs.map((c, i) => [c.id, i]));
   const teamsAt = year => nrlTeamsOf(manifest, year).sort((a, b) => rank.get(a.franchise) - rank.get(b.franchise));
   const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.ground, t.base ?? null, t.home]));
+  const today = places(clubs.map(c => ({ ...c, ground: c.arena, base: grounds[c.id].base })));
   for (const map of manifest.maps) {
     const [first, ...rest] = map.seasons;
     const teams = teamsAt(first);
     if (teams.some(t => !rank.has(t.franchise))) throw new Error(`${map.id}: a club of ${first} is no franchise of today's`);
     const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
     if (differs) throw new Error(`${map.id}: the clubs or grounds of ${differs} are not those of ${first}`);
+    if (map.id === LEAGUES.nrl.id) {
+      if (places(teams) !== today) throw new Error(`${map.id}: the seasons ${map.seasons.join(', ')} are not today's clubs and grounds`);
+      continue;
+    }
     specs.push({ id: map.id, seasons: map.seasons.map(nrlSeasonIdOf), clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ground, home: t.home })) });
   }
   return specs;
