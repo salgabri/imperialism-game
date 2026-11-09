@@ -6,7 +6,9 @@ always-visible Season choice, 2026-10-30; FIFA 07 – FIFA 14 from two scrapes o
 EA's rosters, and the earlier basketball seasons from 2K Archive's NBA 2K
 ratings, on maps of their eras, 2026-10-30; FIFA 05 and FIFA 06, nations only,
 2026-11-07; five seasons before them, 2002/03 to 1996/97, from SI's CM 01/02, CM3
-and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08. The CM 01/02
+and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08; the basketball
+seasons no game rated, 1960/61 to 1997/98, computed from Basketball-Reference's
+statistics, 2026-11-09. The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -670,9 +672,13 @@ world's minnows meet its giants.
 
 ## Earlier basketball seasons
 
-Basketball has 30 earlier seasons: 1983/84, 1991/92 and 1998/99 from NBA 2K27's
-MyNBA Eras and NBA Live 99 ([below](#before-nba-2k-198384-199192-and-199899)),
-then every one from 1999/00 to 2025/26: the NBA
+Basketball has 66 earlier seasons, every one from 1960/61 to 2025/26. The 36
+that no game rated, 1960/61 to 1997/98 but 1983/84 and 1991/92, are computed
+from Basketball-Reference's statistics
+([below](#computed-seasons-196061-to-199798)); 1983/84, 1991/92 and 1998/99
+come from NBA 2K27's MyNBA Eras and NBA Live 99
+([below](#before-nba-2k-198384-199192-and-199899)); then every one from 1999/00
+to 2025/26: the NBA
 clubs of each NBA 2K edition from NBA 2K to NBA 2K26, as compiled by
 [2K Archive](https://2karchive.com/) (NBA 2K12 by The Real 2K Insider, below). The built-in basketball clubs are NBA
 2K27's (2026/27), from the same page (`builtIn` in the manifest, built by
@@ -688,8 +694,9 @@ literal out by matching braces and parsing it as JSON, so nothing on the page
 runs. It stops on any other copy of the page and writes:
 
 - `public/basketball/nba-2k<nn>.json`, one data set per edition (about 12 KB),
-  with `kind: 'nba2k'` (below), and `nba-eras-1984.json`, `nba-eras-1992.json`
-  and `nba-live-99.json`;
+  with `kind: 'nba2k'` (below), `nba-eras-1984.json`, `nba-eras-1992.json`
+  and `nba-live-99.json`, and `nba-stats-<season end year>.json` for the
+  computed seasons (3 to 9 KB);
 - `src/data/basketballSeasons.js`, the listing, each entry naming its map;
 - `docs/design/basketball-seasons-audit.json`, per season: rows, the positions
   filled from another edition, the players left out and any five's player
@@ -811,30 +818,183 @@ read only for who played for which club and for how long.
   1983/84, 96.6 and 105.3 in 1991/92, 88.9 and 91.6 in 1998/99), and its clubs
   score within half a point of them.
 
+### Computed seasons: 1960/61 to 1997/98
+
+No game rates the NBA's seasons before 1983/84 or those between the three
+above: NBA Live 95 to 97 kept their ratings inside the game executables and the
+NLSC offers only fan rosters and patches for them (it answered this client with
+a 403 on 2026-11-09); MyNBA Eras starts in 1983/84; NBA 2K27's classic teams
+give one to four teams a season. So, by the user's decision of 2026-11-09
+(computed NBA seasons back to 1960, not further: the floor is 1960/61), the 36
+seasons 1960/61 to 1982/83, 1984/85 to 1990/91 and 1992/93 to 1997/98 are
+computed from Basketball-Reference's player seasons, `nba-stats-<season end
+year>`, labelled 'Basketball-Reference (computed)'. 1983/84, 1991/92 and 1998/99
+keep their games' ratings (the user's decision). No BAA, no ABA, no 1959/60.
+
+- **Source.** Sumitro Datta's 'NBA Stats (1947-present)' on Kaggle, version 57
+  (updated 1 November 2026): a CC0 copy of Basketball-Reference's regular
+  seasons, downloaded anonymously from Kaggle's API on 2026-11-09. The
+  manifest's `computed.files` pins seven of its tables by SHA-256 in
+  `data-src/research-gaps/basketball/kaggle-sumitrodatta-v57/` (ignored):
+  Advanced (position, games, minutes, PER, WS/48, DWS), Player Totals (points,
+  rebounds, assists; the file `check` pins too), All-Star Selections, End of
+  Season Teams (All-NBA), Player Career Info (career position), Team Summaries
+  (team names, SRS, the league's pace and offensive rating) and Team Stats Per
+  Game (the league's points a game). Nothing was fetched from
+  basketball-reference.com. PER, WS/48 and DWS are Basketball-Reference's own
+  calculations, and Sports-Reference's data-use terms forbid scraping that harms
+  its sites, building a competing database and AI training with its data, and
+  say facts are not copyrightable; the user chose on 2026-11-09 to use them,
+  computed and labelled, with the CC0 copy and Basketball-Reference credited.
+  Each season's `source` is `{ provider: 'Basketball-Reference', edition:
+  '1975/76 NBA regular season', compiler: 'Sumitro Datta, NBA Stats
+  (1947-present), Kaggle, CC0, version 57', url, rawScale: 99, method:
+  'computed', conversion }`, `conversion` stating the whole rule; the loader
+  requires `conversion` of an `nba-stats` season.
+- **The score.** One formula for every season, on inputs that exist from
+  1951/52: score = −1.91373 + 0.0541565 × PER′ + 0.342456 × WS/48′ +
+  0.00592352 × MPG + 0.00000972204 × MPG² + 0.0683889 × PPG + 0.0254284 × RPG +
+  0.0709854 × APG + 0.264524 × All-Star + 0.0486592 × All-NBA + 0.111944 × DWS.
+  PER′ and WS/48′ are shrunk toward a bench player's 11 and 0.050 by 400
+  minutes ((value × minutes + prior × 400) / (minutes + 400)), so a few good
+  minutes count for little; All-Star is 1 if picked, All-NBA 3, 2 or 1 for the
+  first, second or third team; every input is the player's whole season. Every
+  coefficient is positive.
+- **Its fit.** The coefficients are the least-squares fit of NBA 2K's overall,
+  as a z-score within each edition, on those inputs from each player's season
+  before (2K rates a season's players from the season before): 2K Archive's NBA
+  2K (1999/00) to NBA 2K26 (2025/26), its own NBA 2K12 included, players matched
+  by name and, where two share one, by club: 9,970 pairs. In sample the score
+  correlates 0.904 with the z-scores (Spearman 0.876). The manifest fixes the
+  coefficients, the training editions (2000 to 2026), the spread's edition
+  (2027) and its 390 ratings (`spread.counts`); the build fits the score again
+  and stops if a coefficient differs at six significant figures or the spread
+  has moved, so a later copy of 2K Archive's page cannot move a season unseen.
+  The research pass measured it leaving each edition out in turn (its scratch
+  scripts, in `data-src/research-gaps/basketball/_scratch/`, reproduce every
+  figure): Spearman 0.882, Pearson 0.906, 2.51 points mean error (2.26 for each
+  club's top five), weakest on 2004/05 (0.81). Against the same season's launch
+  ratings it does worse (0.78, 3.38 points): launch ratings come before the
+  season they rate. A score on BPM gained nothing and cannot go before 1973/74;
+  age terms gained nothing and learn 2K's ageing; box-score facts alone (no PER,
+  WS or DWS) reach 0.871 but order clubs worse (0.53 to 0.66 against SRS).
+- **The ratings.** Each season, each club's 13 players with the most minutes
+  are rated. A player traded during the season counts once, for the club he
+  played the most minutes for (then the most games, then the earlier club): the
+  user's decision of 2026-11-09. The league is ranked by score, lowest first
+  (scores in millionths, ties by Basketball-Reference's player id), and the
+  player at rank quantile (rank − 0.5) / N takes NBA 2K27's rating at that
+  quantile of its ratings of each club's 13 best (2K Archive's 2026/27 table: 390
+  ratings from 69 to 97; 72 at 5%, 74 at 25%, 78 at the median, 81 at 75%, 90 at
+  95%). No player passes another, and every season has NBA 2K27's spread, as the
+  1990s hockey seasons have NHL 27's. Nothing uses a team's results (the user's
+  decision of 2026-11-09: a team-results term ordered clubs a little better,
+  0.75 to 0.87 against SRS, but would choose ratings by real results).
+- **Positions and fives.** A player's first position is the season's
+  (Basketball-Reference lists PG, SG, SF, PF or C), else the first his career
+  position implies (G is PG/SG, F SF/PF, C C, G-F SG/SF, F-G SF/SG, F-C PF/C,
+  C-F C/PF). His second is the neighbouring position he was listed at in his
+  other seasons, the one with the most minutes there (then the latest), else the
+  neighbour his career position implies. A player with no position would be left
+  out; none is. Of two teammates with one name the one with fewer minutes is
+  left out, since a five names its players by name alone: 1988/89's Bullets had
+  two Charles Joneses, and the one with 516 minutes is out. Each club fields the
+  strongest five its players' positions allow (`selectLineup`); no five plays
+  anyone out of position.
+- **Checks.** Each season's teams must be Basketball-Reference's, by name, and
+  its league averages (pace, offensive rating and points a game) those of
+  `src/data/nbaLeagueAverages.js`; the build stops otherwise. The audit gives
+  each season's 13s by minutes (8,884 player seasons in all), every traded
+  player and his club, each five with each player's score, the season's league
+  averages, and how its clubs' strengths follow its real SRS. Run end to end on
+  the two seasons NBA 2K27's MyNBA Eras rate, the rule rates them as 2K does:
+  1983/84's 233 players whom both rate at Spearman 0.95, 1.94 points mean error
+  and 1.40 points too high on average; 1991/92's 297 at 0.94, 2.10 and 1.85. The
+  research pass found the same on 378 players of 2K27's 34 classic teams from
+  1964/65 to 1999/2000 (0.91 and 2.82 points; before 1980, 0.93 and 2.42): Jerry
+  West 93 against 2K's 93 in 1964/65, Kareem Abdul-Jabbar 97 against 97 in
+  1970/71. The bias is mostly bench players: 2K27's spread starts at 69, and the
+  eras' benches reach the low 70s.
+- **Clubs.** A club's strength follows its season's SRS at 0.79 on average,
+  from 0.51 in 1964/65 (Wilt Chamberlain counts for the Warriors, who traded him
+  in January) and 0.56 in 1975/76 and 1976/77 to 0.93 in 1963/64 and 1966/67.
+  Strengths spread less than the games' seasons do (a standard deviation of 1.37
+  to 2.37 a season, against 1.80 to 3.70), so computed seasons play a little
+  more evenly. Spot checks, each the season's best record: the strongest clubs
+  are the 1961/62 Celtics (86, Bill Russell 93), the 1967/68 76ers (87, Wilt
+  Chamberlain 97), the 1971/72 Lakers (88: Jerry West 96, Chamberlain 91, Gail
+  Goodrich 90), the 1972/73 Celtics (89: Dave Cowens 96, John Havlicek 95) and
+  the 1982/83 76ers (88: Moses Malone 97, Julius Erving 94); Oscar Robertson is
+  92 as a rookie in 1960/61, and Kareem Abdul-Jabbar 97 in 1971/72.
+- They play at their own league averages (127.7 possessions and 118.1 points a
+  game in 1960/61, 115.1 and 112.4 in 1970/71, 90.3 and 95.6 in 1997/98), from
+  the same CC0 copy (Team Summaries' League Average pace and ORtg, Team Stats Per
+  Game's points), which the build checks against `src/data/nbaLeagueAverages.js`.
+  Played every pairing four times, their clubs score from 1.3 points a game
+  under the league (1960/61) to 1.6 over (1987/88), 0.7 over on average; the
+  games' seasons run from 2.1 under to 1.9 over. The match engine is unchanged
+  (the user's decision): see [Known limits](#known-limits).
+
 ### Era maps
 
 A season plays on the map of its own era: the franchises of that season, each
 holding the state or province of the arena it played in, by the
 [NBA map](domestic-campaigns.md#the-nba-map)'s rule. A season's `map` names
 it. `npm run build:nba-map` builds today's map and one map per era of the
-manifest's `maps`: `nba1984`, `nba1992` and `nba1999`, one for each season
-before NBA 2K, `nba2000` (1999/00 and 2000/01), `nba2002`, `nba2003`
-(2002/03, 2003/04), `nba2005`, `nba2006` (2005/06, 2006/07), `nba2008`,
-`nba2009` (2008/09 to 2010/11), `nba2013` and `nba2014`. Every season of an era
-must have the same franchises in the same arenas, or the build stops. From
-2014/15 the franchises are today's, so those seasons play on today's map
-(`nba`), whose file is unchanged.
+manifest's `maps`. Before 1999/00 an arena moved almost every season, so most
+seasons have a map of their own: `nba1961` to `nba1981`, but `nba1965`
+(1964/65, 1965/66) and `nba1969` (1968/69, 1969/70); `nba1984` (1981/82 to
+1983/84, the same franchises in the same arenas); `nba1985`, `nba1986` (1985/86
+to 1987/88), `nba1989`, `nba1990`, `nba1991`, `nba1992` and `nba1993` to
+`nba1999`; then `nba2000` (1999/00 and 2000/01), `nba2002`, `nba2003` (2002/03,
+2003/04), `nba2005`, `nba2006` (2005/06, 2006/07), `nba2008`, `nba2009`
+(2008/09 to 2010/11), `nba2013` and `nba2014`: 42 era maps, 30 of them new on
+2026-11-09. Every season of an era must have the same
+franchises in the same cities and arenas, or the build stops (the user kept
+this rule on 2026-11-09 rather than share a map when a club alone in its state
+moves within its city, which would save three maps). From 2014/15 the
+franchises are today's, so those seasons play on today's map (`nba`), whose file
+is unchanged. `nba1984`'s file gained 1981/82 and 1982/83 and so a new version;
+its land is the same, and a 1983/84 campaign saved on the old version resumes on
+the new one club by club (`fitDomesticCampaign`).
 
-Before 1999/00 the manifest's `teams` give every franchise, from 1980/81, the
-arena it played in that season (from Basketball-Reference's league pages and
-Wikipedia's arena articles): in 1983/84 the Kansas City Kings, the San Diego
-Clippers, the Washington Bullets at Landover (Maryland, so the Bullets hold
-Maryland), the Pistons at Pontiac and the Cavaliers at Richfield; in 1998/99
-the Lakers at the Great Western Forum, the Hawks at the Georgia Dome and the
-Raptors at the Air Canada Centre. From 1999/00 a franchise that kept its name
-and city takes today's arena, as before. An era map ranks its teams as their
-franchises rank today: the Kings, Clippers and Bullets as Sacramento, Los
-Angeles and Washington.
+Before 1999/00 the manifest's `teams` give every franchise, from 1960/61, the
+arena it played in that season: before 1980/81 the arena Basketball-Reference's
+team summaries name (in the CC0 copy), its point from the manifest or from
+English Wikipedia's coordinates (each such era's `source` names the article and
+the revision read, 20 arenas: the Cincinnati Gardens, the Detroit Olympia, Cobo
+Arena, the 1925 Madison Square Garden, Philadelphia's Convention Hall, the Kiel
+Auditorium, the Onondaga War Memorial, the International Amphitheatre, the
+Chicago Coliseum, the Cow Palace, the San Francisco Civic Auditorium, the
+Baltimore Civic Center, the Alexander Memorial Coliseum, the Buffalo Memorial
+Auditorium, the Cleveland Arena, Hofheinz Pavilion, the Municipal Auditoriums of
+Kansas City and New Orleans, the Superdome and the Nassau Coliseum); from
+1980/81 Basketball-Reference's league pages and Wikipedia's arena articles, as
+before. So 1960/61 has the Warriors in Philadelphia, the Nationals in Syracuse,
+the Royals in Cincinnati and the Hawks in St. Louis; the Warriors play at the
+Cow Palace (Daly City) in 1962/63, 1963/64 and 1967/68, in San Francisco between,
+and in Oakland from 1968/69; the Bullets in Chicago (Packers, Zephyrs), Baltimore
+and Landover; the Kansas City-Omaha Kings hold Missouri alone (one arena a
+season: Basketball-Reference's main one, as for Buffalo's games in Toronto and
+Cincinnati's in Omaha); the New York Nets of 1976/77 play at Uniondale, and the
+New Jersey Nets at Rutgers from 1977/78. Seattle's arena is missing from
+Basketball-Reference for 1978/79 to 1984/85 and is the Kingdome, as the manifest
+had it. The Milwaukee Arena and MECCA are one building, named MECCA Arena
+throughout; the Forum, Oakland's arena and the Richfield Coliseum keep the
+manifest's names. In 1983/84 the Kansas City Kings, the San Diego Clippers, the
+Washington Bullets at Landover (Maryland, so the Bullets hold Maryland), the
+Pistons at Pontiac and the Cavaliers at Richfield; in 1998/99 the Lakers at the
+Great Western Forum, the Hawks at the Georgia Dome and the Raptors at the Air
+Canada Centre. From 1999/00 a franchise that kept its name and city takes
+today's arena, as before. An era map ranks its teams as their franchises rank
+today: the Kings, Clippers and Bullets as Sacramento, Los Angeles and Washington,
+and the 1960s' and 1970s' by Basketball-Reference's codes (`LINEAGE` in
+`scripts/build-club-maps.mjs`): the Philadelphia and San Francisco Warriors as
+Golden State, the Syracuse Nationals as Philadelphia, the Cincinnati Royals and
+Kansas City-Omaha Kings as Sacramento, the St. Louis Hawks as Atlanta, the
+Packers, Zephyrs, Baltimore and Capital Bullets as Washington, the San Diego
+Rockets as Houston, the Buffalo Braves as the Clippers, the New Orleans Jazz as
+Utah and the New York Nets as Brooklyn.
 
 An era map's file and index entry have `seasons` (the set ids it serves). Its
 club rows name their franchise and carry no code, strength or squad: those come
@@ -898,7 +1058,9 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
     is not offered for another set.
   - Basketball has its own Season dropdown: the built-in 2026/27, then its
     earlier seasons ("2007/08"), with a note that they use 2K Archive's NBA 2K
-    ratings and have NBA clubs only. Picking one switches Teams
+    ratings, that those no game rated, back to 1960/61, are computed from
+    Basketball-Reference's statistics, fitted to NBA 2K and put on NBA 2K27's
+    scale, and that they have NBA clubs only. Picking one switches Teams
     to clubs and the theatre to its map (`domestic:nba2008`); picking nations
     goes back to the built-in season. The map and the set load side by side, and
     Launch waits for both.
@@ -981,8 +1143,37 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
 - FIFA Index's FIFA 07 and FIFA 08 overalls are one point lower than a second
   database's (the European Soccer Database on Kaggle) for about 35–40% of
   players; the build uses FIFA Index's.
-- Basketball seasons have no national teams, and none before 1999/00: NBA 2K
-  begins with the 1999/00 season.
+- Basketball seasons have no national teams, and none before 1960/61 (the
+  user's floor; no BAA or ABA). 36 of them are computed, not a game's ratings
+  ([Computed seasons](#computed-seasons-196061-to-199798)), and their limits are
+  the score's:
+  - Specialists rate low and scorers on weak clubs high, as PER and win shares
+    see them: in 1995/96 Dennis Rodman is not in the Bulls' five (Toni Kukoč
+    starts), so the 72–10 Bulls are only the fourth-strongest club (86, behind
+    Orlando's 89); in 1996/97 (69–13) four clubs match their 86, behind Houston
+    and Seattle.
+  - A player traded during a season counts only for the club he played the most
+    minutes for, 5.6% of all starters: Wilt Chamberlain plays 1964/65 for the
+    San Francisco Warriors, not the 76ers he finished it with; Clyde Drexler
+    1994/95 for Portland, not the champion Rockets; Bob McAdoo 1976/77 for the
+    Knicks.
+  - Club strengths spread less than the games' seasons (standard deviation 1.37
+    to 2.37 against 1.80 to 3.70), and follow real results least in 1964/65,
+    1975/76, 1976/77 and 1977/78 (0.51 to 0.61 against SRS).
+  - Positions are Basketball-Reference's modern labels given retroactively, and
+    the second position is derived; ratings use NBA 2K27's spread, so a 1960s
+    league plays with today's distribution of talent.
+  - Neighbouring seasons mix sources: 1983/84 and 1991/92 (MyNBA Eras) lack the
+    players 2K has no licence for (Andrew Toney; Charles Barkley and Reggie
+    Miller), while the computed 1982/83, 1984/85, 1990/91 and 1992/93 have them.
+  - The match engine is today's NBA one at each season's pace and scoring rate:
+    a fourth overtime's deciding basket can be a three before the NBA had the
+    three-point line (1979/80), the bench takes the modern 32% of a side's points
+    though 1960s starters played more, and 1960s games run near 127 possessions,
+    inside the engine's range but far from the seasons it was tuned on.
+  - One arena per franchise and season: a split home schedule (the Kansas
+    City-Omaha Kings, the Braves' games in Toronto, the Royals' in Omaha) plays
+    at Basketball-Reference's main arena, so a franchise holds one state.
 - Era maps follow franchises that changed city, not moves within one area:
   seasons from 2014/15 use today's arenas, so the Warriors' territory is named
   San Francisco though they played in Oakland until 2019, and the Clippers'
