@@ -333,8 +333,8 @@ Toughness (19 left), its goalies Aggressiveness, Durability, Potential and Puck 
 DIS, TGH, AGG and DUR (19), its goalies AGGR, DUR and PUCK (16). A value outside 0–99, EA's unset 255, leaves the player
 out: Alexei Zhamnov, Mike Rathje, Rob DiMaio and Jiri Fischer, none of whom played that season. The score's mid-rank in
 its group (forwards, defenders, goalies) over the edition's club players is read off NHL 07's EA overalls in that group
-(515 forwards, 259 defenders, 84 goalies, frozen as histograms), so the two seasons play on NHL 07's scale, as NHL 07 does.
-Ties stay ties and nobody passes anybody in a group.
+(515 forwards, 259 defenders, 84 goalies, frozen as histograms), so the two seasons play on NHL 07's scale, as NHL 07
+does. Ties stay ties and nobody passes anybody in a group.
 
 Why it holds: within NHL 07 the same plain mean of the skill attributes (all but Injury, Potential, Fighting, Penalty,
 Aggression, Toughness and Intensity) ranks the players like EA's overall, Spearman 0.95 for forwards and 0.94 for
@@ -432,15 +432,15 @@ G 0.22 (10 goalies); NHL 24's (120) against 2023/24, F 0.76, D 0.61, G 0.74; NHL
   defender from 1983/84 to 1990/91.
 - 2019/20: Connor McDavid, Leon Draisaitl, Nathan MacKinnon.
 - Nations: Canada the strongest every season (the USA level with it from 2022/23); the USA second through the 1980s
-  and 1990s (Sweden level in 1979/80); Czechia second in 2000/01, 2001/02, 2003/04 and 2005/06 (the Jagr and Hasek
-  years), Russia in 2002/03 and 2009/10, Sweden in 2010/11 and 2011/12.
+  and 1990s (Sweden level in 1979/80); Czechia, Russia and the USA within a point of one another behind Canada from
+  2000/01 to 2005/06 (the Jagr and Hasek years); Sweden second in 2010/11 and 2011/12.
 
 **Club spread.** The rule regresses: its clubs sit closer together than an edition's, at about 0.6 to 0.8 of their
 spread (club strengths' standard deviation 0.99 against 1.26 for NHL 22's players, 0.65 against 0.87 for NHL 07's).
 The MoneyPuck seasons, where every club's top line logs the same minutes, run 0.6 to 0.9 points of standard deviation,
-the databank's 0.7 to 2.3, widest in the 1970s (NHL 27 itself: 1.09). A season's surprise club is underrated (the weights lean on the seasons
-before, as the games' ratings do), and the order at the top is loose: the 2019/20 Coyotes, with Darcy Kuemper in goal,
-come out first by 0.1.
+the databank's 0.7 to 2.3, widest in the 1970s (NHL 27 itself: 1.09). A season's surprise club is underrated (the
+weights lean on the seasons before, as the games' ratings do), and the order at the top is loose: the 2019/20 Coyotes,
+with Darcy Kuemper in goal, come out first by 0.1.
 
 Over 20 seeded seasons of 82 games (the measures of `npm run simulation:realism` on each season's clubs; NHL range in
 brackets):
