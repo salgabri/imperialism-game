@@ -56,7 +56,9 @@ test('the four seasons are built in, newest first, each its committed file, cred
     assert.equal(doc.local, false);
     assert.equal(doc.source.provider, season.maker);
     assert.equal(doc.source.compiler, season.compiler);
-    assert.equal(doc.source.retrieved, MANIFEST.retrieved);
+    // SWOS's files were read on 2026-11-09; the Starter Kit's zips with the other seasons, on the manifest's day.
+    assert.equal(doc.source.retrieved, SWOS.includes(id) ? '2026-11-09' : MANIFEST.retrieved);
+    assert.equal(doc.source.retrieved, season.retrieved ?? MANIFEST.retrieved);
     assert.ok(season.rights.trim() && season.provenance.trim(), id);
     for (const file of season.files || [season.file]) {
       assert.match(file.sha256, /^[0-9a-f]{64}$/);

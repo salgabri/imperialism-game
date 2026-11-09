@@ -55,8 +55,12 @@ async function pinned(dataDir, file) {
   return bytes;
 }
 
-/** The fields every season's source block adds to its maker's: who compiled it, from where, and when it was read. */
-const credits = (season, retrieved) => ({ compiler: season.compiler, ...(season.provenance ? { provenance: season.provenance } : {}), retrieved });
+/**
+ * The fields every season's source block adds to its maker's: who compiled it, from where, and when it was read (the
+ * manifest's date, or the season's own where its sources were read another day).
+ */
+const credits = (season, retrieved) => ({ compiler: season.compiler, ...(season.provenance ? { provenance: season.provenance } : {}),
+  retrieved: season.retrieved ?? retrieved });
 
 /**
  * A CM 01/02-format database: the zip's .dat files, read by the CM 01/02 builder as a known release. A season may name

@@ -44,8 +44,8 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-5b8d03bc', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
   Object.freeze({ id: 'cm-9798', version: 'cm-9798-cb9596fd', year: 1998, season: '1997/98', label: 'CM 97/98' }),
   Object.freeze({ id: 'swos-9697', version: 'swos-9697-189aa2ca', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
-  Object.freeze({ id: 'swos-9596', version: 'swos-9596-761fe99a', year: 1996, season: '1995/96', label: 'SWOS 95/96' }),
-  Object.freeze({ id: 'swos-9495', version: 'swos-9495-1a13b4c3', year: 1995, season: '1994/95', label: 'SWOS 94/95' }),
+  Object.freeze({ id: 'swos-9596', version: 'swos-9596-ef95edc8', year: 1996, season: '1995/96', label: 'SWOS 95/96' }),
+  Object.freeze({ id: 'swos-9495', version: 'swos-9495-3d369a28', year: 1995, season: '1994/95', label: 'SWOS 94/95' }),
   Object.freeze({ id: 'cm0102-2020-11-cm93', version: 'cm0102-2020-11-cm93-1c31e5ae', year: 1994, season: '1993/94', label: 'CM 01/02 · 93/94 by Cam F, fan-made' }),
   Object.freeze({ id: 'cm0102-2017-04-cm89', version: 'cm0102-2017-04-cm89-51f49124', year: 1990, season: '1989/90', label: 'CM 01/02 · 89/90 by Simon Treanor, fan-made' }),
 ]);
