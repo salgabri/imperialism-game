@@ -483,11 +483,12 @@ kind `madden`, clubs only, each on an era map of its own:
 - **Left out, never guessed.** Two rows of one club under one of the site's players, their values apart, are one game
   row the matcher named twice: the row in the jersey nflverse gives him that season stays (else the first, as the site
   lists a club by depth), the other is left out (Rob Moore's second row, #20, on the 1998 Cardinals; Kevin Mitchell's,
-  Marty Moore's and Marquis Walker's; Todd McClure's and Mark Campbell's, both in their own number). One of the site's
-  players on two clubs of an edition, the rows' values apart, is another club's game row named after him too: the row on
-  the club and in the jersey nflverse gives him that season stays (where nflverse has him on both, as it has Marcus
-  Nash on the 1999 Broncos and Ravens, the club he left, on which the launch roster had him), the other is left out (the
-  1999 Ravens' Nash; the 2000 Panthers' Donta Jones, Bengals' Myron Bell and Broncos' Nate Wayne). A player whose
+  Marty Moore's and Marquis Walker's; Todd McClure's and Mark Campbell's, both in their own number). Where the site
+  puts one of its players on two clubs of an edition, their values apart, the matcher has named a second club's game
+  row after him; which row is his own the site cannot say, so the same rule decides: the row on the club and in the
+  jersey nflverse gives him that season stays (where nflverse has him on both, as Marcus Nash on the 1999 Broncos and
+  Ravens, the club he left during the season, where the launch roster had him), the other is left out (the 1999
+  Ravens' Nash; the 2000 Panthers' Donta Jones, Bengals' Myron Bell and Broncos' Nate Wayne). A player whose
   edition did not track a value his overall needs is left out (Marcus Spriggs, 1999). Each snapshot names them.
 - **Lineup gaps.** The site's copy lacks some players: the 1998 Dolphins have one receiver (O.J. McDuffie, Lamar
   Thomas and Oronde Gadsden are missing), the 1998 Colts and 49ers and the 1999 Eagles and Washington no kicker, the
