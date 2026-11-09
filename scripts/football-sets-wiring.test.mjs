@@ -152,7 +152,7 @@ test('the Season choice offers the built-in season, then every earlier season bu
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
       assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER]);
       assert.deepEqual(EARLIER.slice(0, 3), ['2025/26', '2024/25', '2023/24'], 'the last built-in season, then the earlier ones');
-      assert.equal(EARLIER.at(-1), '1996/97', 'back to Sensible World of Soccer 96/97');
+      assert.equal(EARLIER.at(-1), '1989/90', 'back to Simon Treanor\'s fan-made 1989/90');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
       assert.equal(seasonPicker(document).value, '');
       assert.match(document.getElementById('setup-season-note').textContent, /Earlier seasons use EA FIFA ratings/);
@@ -565,9 +565,9 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     const setup = () => app.state.setup;
     const modelOf = () => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), season: app.seasonStatus() });
     await app.requestSeasons();
-    assert.deepEqual(EARLIER.slice(-8), ['2006/07', '2005/06', '2004/05', '2002/03', '2001/02', '1998/99', '1997/98', '1996/97'],
-      'the earliest seasons');
-    assert.match(modelOf().season.note, /2005\/06, 2004\/05 and 1996\/97 have nations only/);
+    assert.deepEqual(EARLIER.slice(-12), ['2006/07', '2005/06', '2004/05', '2002/03', '2001/02', '1998/99', '1997/98', '1996/97',
+      '1995/96', '1994/95', '1993/94', '1989/90'], 'the earliest seasons');
+    assert.match(modelOf().season.note, /2005\/06, 2004\/05, 1996\/97 and 1989\/90 have nations only/);
 
     // From clubs: the season takes the nations. It has no maps of Europe, so the theatre is kept as the plain elite
     // for when clubs come back.

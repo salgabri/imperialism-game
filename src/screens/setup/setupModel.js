@@ -331,9 +331,10 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
-  football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1996/97: '
-    + 'Sensible World of Soccer\'s), with clubs from the seven biggest leagues. A nation with fewer than six rated players '
-    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1996/97 have nations only.',
+  football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1994/95 to '
+    + '1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, Cam F\'s and Simon Treanor\'s), with clubs from '
+    + 'the seven biggest leagues. A nation with fewer than six rated players fields no team, and one without eleven starts '
+    + 'short-handed. 2005/06, 2004/05, 1996/97 and 1989/90 have nations only.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
     + 'without eleven starts short-handed.',

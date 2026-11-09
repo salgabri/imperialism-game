@@ -55,4 +55,10 @@ export const EUROPE_MAPS = [
   {"id":"eu32s1999","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["cm0102-2020-11-cm3"],"clubs":32,"sections":32,"countries":6,"version":"eu32s1999-501510ce"},
   {"id":"eu124s1998","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["cm-9798"],"clubs":124,"sections":124,"countries":7,"version":"eu124s1998-63cf9a4c"},
   {"id":"eu32s1998","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["cm-9798"],"clubs":32,"sections":32,"countries":6,"version":"eu32s1998-376868fd"},
+  {"id":"eu124s1996","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["swos-9596"],"clubs":124,"sections":124,"countries":7,"version":"eu124s1996-04bc64d1"},
+  {"id":"eu32s1996","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["swos-9596"],"clubs":32,"sections":32,"countries":7,"version":"eu32s1996-32701aa5"},
+  {"id":"eu124s1995","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["swos-9495"],"clubs":124,"sections":124,"countries":7,"version":"eu124s1995-78a965cc"},
+  {"id":"eu32s1995","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["swos-9495"],"clubs":32,"sections":32,"countries":7,"version":"eu32s1995-5e41ee02"},
+  {"id":"eu124s1994","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["cm0102-2020-11-cm93"],"clubs":124,"sections":124,"countries":7,"version":"eu124s1994-f2434a15"},
+  {"id":"eu32s1994","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["cm0102-2020-11-cm93"],"clubs":32,"sections":32,"countries":7,"version":"eu32s1994-e10b4b38"},
 ];

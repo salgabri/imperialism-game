@@ -10,6 +10,10 @@
 // 1998/99: SI's Championship Manager 3 data in the CM 01/02 format, Cam F's port (the CM0102 Starter Kit's cm3_data.zip)
 // 1997/98: SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)
 // 1996/97: Sensible Software's Sensible World of Soccer 96/97 national squads (Whiteulver's database, as keyser1884's SWOS-MCP holds it)
+// 1995/96: Sensible Software's Sensible World of Soccer 95/96, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
+// 1994/95: Sensible Software's original Sensible World of Soccer (1994), its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
+// 1993/94: Cam F's fan-made 1993/94 database for CM 01/02, its ratings Cam F's (the CM0102 Starter Kit's cm93_data.zip)
+// 1989/90: Simon Treanor's fan-made 1989/90 database for CM 01/02, Beta 5, its ratings his, nations only (the CM0102 Starter Kit's cm89_data.zip)
 // The built-in earlier seasons, newest first. Each is public/football/<id>.json, loaded when a setup chooses it
 // (src/engine/footballSets.js); docs/design/football-years.md describes them.
 export const BUILT_IN_SEASONS = Object.freeze([
@@ -40,4 +44,8 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-5b8d03bc', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
   Object.freeze({ id: 'cm-9798', version: 'cm-9798-cb9596fd', year: 1998, season: '1997/98', label: 'CM 97/98' }),
   Object.freeze({ id: 'swos-9697', version: 'swos-9697-189aa2ca', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
+  Object.freeze({ id: 'swos-9596', version: 'swos-9596-761fe99a', year: 1996, season: '1995/96', label: 'SWOS 95/96' }),
+  Object.freeze({ id: 'swos-9495', version: 'swos-9495-1a13b4c3', year: 1995, season: '1994/95', label: 'SWOS 94/95' }),
+  Object.freeze({ id: 'cm0102-2020-11-cm93', version: 'cm0102-2020-11-cm93-1c31e5ae', year: 1994, season: '1993/94', label: 'CM 01/02 · 93/94 by Cam F, fan-made' }),
+  Object.freeze({ id: 'cm0102-2017-04-cm89', version: 'cm0102-2017-04-cm89-51f49124', year: 1990, season: '1989/90', label: 'CM 01/02 · 89/90 by Simon Treanor, fan-made' }),
 ]);

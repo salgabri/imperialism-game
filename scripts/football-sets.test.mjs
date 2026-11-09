@@ -209,7 +209,8 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
     assert.ok(playing.every(island => listed.includes(island) && doc.nations[island][2].length >= 6), id);
     if (playing.length) fieldedIn[id] = playing;
   }
-  assert.deepEqual(ratedIn, { 'cm0102-2002-11': ['184', '776', '882'], 'cm0102-2001-09': ['184'] });
+  // Simon Treanor's 1989/90 rates a Cook Islander too, of an association FIFA admitted in 1994.
+  assert.deepEqual(ratedIn, { 'cm0102-2002-11': ['184', '776', '882'], 'cm0102-2001-09': ['184'], 'cm0102-2017-04-cm89': ['184'] });
   assert.deepEqual(fieldedIn, { 'cm0102-2002-11': ['184'] });
 });
 

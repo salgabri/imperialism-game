@@ -41,12 +41,15 @@ const IDS = ['cm0102-2002-11', 'cm0102-2001-09', 'cm0102-2020-11-cm3', 'cm-9798'
 // ---------- the committed seasons ----------
 
 test('the seasons before FIFA 05 are built in, after EA\'s, each its committed file and credited to its makers', () => {
-  assert.deepEqual(MANIFEST.seasons.map(season => season.id), IDS);
-  const listed = BUILT_IN_SEASONS.slice(-IDS.length);
+  // The manifest lists these five in this order, among the others (scripts/football-swos-fan-seasons.test.mjs has
+  // SWOS 94/95 and 95/96 and the two fan-made databases).
+  assert.deepEqual(MANIFEST.seasons.map(season => season.id).filter(id => IDS.includes(id)), IDS);
+  const listed = IDS.map(id => BUILT_IN_SEASONS.find(set => set.id === id));
   assert.deepEqual(listed.map(set => [set.id, set.year, set.season]), [['cm0102-2002-11', 2003, '2002/03'], ['cm0102-2001-09', 2002, '2001/02'],
     ['cm0102-2020-11-cm3', 1999, '1998/99'], ['cm-9798', 1998, '1997/98'], ['swos-9697', 1997, '1996/97']]);
-  assert.ok(BUILT_IN_SEASONS.every((set, i) => !i || set.year < BUILT_IN_SEASONS[i - 1].year), 'one listing, newest first');
-  for (const [i, season] of MANIFEST.seasons.entries()) {
+  // A season may have two sets (a game's database and a fan's or a computed one).
+  assert.ok(BUILT_IN_SEASONS.every((set, i) => !i || set.year <= BUILT_IN_SEASONS[i - 1].year), 'one listing, newest first');
+  for (const [i, season] of IDS.map(id => MANIFEST.seasons.find(entry => entry.id === id)).entries()) {
     const doc = committed(season.id);
     assert.deepEqual([doc.id, doc.version, doc.year, doc.season, doc.label], [listed[i].id, listed[i].version, listed[i].year, listed[i].season, listed[i].label]);
     assert.equal(doc.version, `${doc.id}-${contentHash(doc)}`, `${doc.id} is the file its version names`);
@@ -80,7 +83,8 @@ test('every season rebuilds byte for byte from its pinned sources (when they are
   }
   const run = spawnSync(process.execPath, [path.join(root, 'scripts/build-retro-seasons.mjs'), '--check'], { cwd: root, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
-  assert.match(run.stdout, /7 files rebuild byte for byte/);
+  // Every season's file, the listing and the audit.
+  assert.match(run.stdout, new RegExp(`${MANIFEST.seasons.length + 2} files rebuild byte for byte`));
 });
 
 // Each season's coverage: what its source rates, written exactly.
@@ -319,7 +323,8 @@ test('SWOS 96/97: each nation\'s own sixteen, its best eleven by SWOS\'s positio
     assert.equal(info.nationality, 'England');
     assert.deepEqual(swosTupleOf(name, info), doc.nations['826'][2].find(tuple => tuple[1] === name));
   }
-  assert.deepEqual(doc.territory, territoryFor(FOOTBALL_FEDERATIONS, 1997));
+  // A shape held by a federation SWOS has no squad for stays neutral: here France, FR Yugoslavia and Sudan field none.
+  assert.deepEqual(doc.territory, territoryFor(FOOTBALL_FEDERATIONS, 1997, { fields: id => ['826', '528'].includes(id) }));
   assert.throws(() => expandSwosTuple([1, 'X', 0, 20, 'g', 'England', '', '', '1234567'], SOURCE_SWOS), /Invalid SWOS tuple/, 'a keeper has no skills');
 });
 
