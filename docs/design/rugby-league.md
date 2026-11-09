@@ -336,7 +336,8 @@ NRL.com's match centre, the same endpoints the built-in season reads (`scripts/s
 
 - **Terms.** robots.txt (read 2026-11-09): `User-agent: *` with no Disallow. The terms of use redirect to an account
   sign-in, which was not followed, so they were not read; the replies state no licence. The data are the NRL's: each
-  season names NRL.com as its `source.provider` and the setup note says where the ratings come from.
+  season names NRL.com as its `source.provider` and the setup note says where the ratings come from. The manifest
+  records both sources' terms (`nrlcom.terms`, `rlpTerms`).
 - **Download.** Every premiership game of 2007 to 2026 (each computed season and the two either side): 4,036 games and
   613 draw pages, into the ignored `data-src/rugby-league-seasons/nrlcom/` (`draw/111-<season>[-<round>].json`,
   `match/nrl-premiership_<season>_<round>_<game>.json`), each reply kept as received. 2,606 requests on 2026-11-09, one
