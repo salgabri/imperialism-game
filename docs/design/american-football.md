@@ -309,7 +309,8 @@ the seasons are built from; `--check` rebuilds them byte for byte, `--season=<ye
   Bowl is the 1993 edition its transcription confirms. TSB II's two seasons rest on one
   extraction: its second dump comes from the same tools and no independent transcription exists,
   which each 1992 and 1994 snapshot states. The 1980s are left out (Tecmo Bowl's 1987 set has
-  12 clubs of nine a side), and so is 1991 (no Tecmo edition rates it). Every input stays in the
+  12 clubs of nine a side), and so is 1991 (no Tecmo edition rates it): both are computed instead
+  ([Computed seasons](#computed-seasons)). Every input stays in the
   ignored `data-src/research80s/american-football/` and `data-src/research/american-football/`,
   pinned by SHA-256 in the sync (`PINS`), and each snapshot lists the files it read.
 - **Attributes.** Each player keeps the game's values under the screen's names: running speed
@@ -591,11 +592,14 @@ data), so the value here is ours, AV-like.
   2001 to 2005 reach 0.15–0.55 (0.36) against theirs: a hindsight rating. The champions or the best records lead: the
   1962 Packers (13–1, 85.2), the 1968 Colts (13–1, 86.5), the 1969 Vikings, the 1972 Dolphins (14–0, 83.8), the 1985
   Bears (15–1, 85.0), the 1989 49ers, the 1991 Washington club (14–2, 85.5), the 1996 Packers, the 1997 Broncos; in
-  the AFL the 1960 Oilers, the 1964 Bills, the 1967 Raiders and the 1969 Chiefs. Where they do not: the 1960 Eagles,
-  champions at 10–2, sixth of 13 (their receivers and corners thin); the 1965 Packers third behind the 49ers, who
-  scored the most and finished 7–6–1; the 1976 Raiders (13–1) eighth; the 1987 49ers (13–2) twelfth of 28, their line
-  and tight ends sharing starts. Every season is in the audit with each club's record and points, its gaps and its
-  out-of-position starters.
+  the AFL the 1960 Oilers, the 1964 Bills, the 1967 Raiders and the 1969 Chiefs. Of the 43 seasons' champions (the
+  NFL's and AFL's title winners, the Super Bowl's from 1970), 16 rate first and 29 in the top three. Where they do
+  not: the 1979 Steelers, Super Bowl champions at 12–4, fifteenth of 28 (the most points, yet a line and a secondary
+  that shared their starts, and a starting line rates mostly by its starts); the 1970 Colts tenth of 26, the 1980
+  Raiders ninth and the 1971 Cowboys seventh; the 1960 Eagles, champions at 10–2, sixth of 13 (their receivers and
+  corners thin); the 1965 Packers third behind the 49ers, who scored the most and finished 7–6–1; the 1976 Raiders
+  (13–1) eighth; and, though not champions, the 1987 49ers (13–2) twelfth of 28, their line and tight ends sharing
+  starts. Every season is in the audit with each club's record and points, its gaps and its out-of-position starters.
 - **The AFL.** Its ten seasons are computed as the NFL's are, each ranked among its own players, so its clubs read as
   strong as the NFL's of the same year though they were not: the two leagues never meet in the game, and each 1960s
   year has both seasons, labelled "NFL (computed)" and "AFL (computed)". Its clubs are 8 to 1965, 9 in 1966–67 and
@@ -604,10 +608,14 @@ data), so the value here is ours, AV-like.
   existing era unchanged in effect: every season and map before rebuilds byte for byte but `nfl1990`, whose seasons
   are now 1988 to 1991 (no club moved: its shapes are unchanged, its version is new, and a save on it resumes on the
   updated map club by club). A club plays where it played most of its home games that season, which the sync checks
-  against Pro Football Archives' scores of every season (a club splitting them evenly keeps its own: the Packers, four
-  in Green Bay and four in Milwaukee from 1978). Stadium points come from the franchise research of 1980–2025 or the
-  manifest where it has them, else from each stadium's Wikipedia article (read 2026-11-09 from `/wiki/` pages, which
-  robots.txt allows; its APIs it does not), to four decimals. A move starts a map, a rename does not: 20 new NFL maps,
+  against Pro Football Archives' scores of every season (where two venues shared them evenly, the eras may name
+  either). One second home is not counted, as the franchise research of 1980–2025 has it (`SECOND_HOME` in the sync):
+  the Packers' games at Milwaukee's County Stadium, two or three a season to 1977 and three or four from 1978, so they
+  stay in Green Bay in 1978 and 1980 (four and four) and in the strike season of 1982, when three of their four home
+  games were in Milwaukee (Wisconsin is theirs either way). Stadium points come from the franchise research of
+  1980–2025 or the manifest where it has them, else from each stadium's Wikipedia article (read 2026-11-09 from
+  `/wiki/` pages, which robots.txt allows; its APIs it does not), to four decimals. A move starts a map, a rename does
+  not: 20 new NFL maps,
   `nfl1960`, `nfl1961` (1961–63), `nfl1964` (1964–65), `nfl1966`, `nfl1967` (1967–69), `nfl1970`, `nfl1971`, `nfl1972`,
   `nfl1973` (1973–74), `nfl1975`, `nfl1976` (1976–79), `nfl1980` (1980–81), `nfl1982` (1982–83), `nfl1984` (1984–86),
   `nfl1987`, `nfl1996`, `nfl1997`, `nfl1998`, `nfl1999` and `nfl2000`, and ten AFL maps, `afl1960` to `afl1969` (a

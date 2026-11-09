@@ -1474,16 +1474,22 @@ give the file format, the era maps and the known limits.
 
 ## American football seasons
 
-American football can be played on 30 earlier seasons as well as the built-in
-2026: every NFL season from 2001 to 2025, each from that season's Madden (Madden
-NFL 2002 to Madden NFL 26) as it launched, and 1990 and 1992 to 1995 from Tecmo
-Super Bowl (below). Pick one under **Season** in setup; it
-plays the NFL's clubs of that season on the map of their day. Each season is a
+American football can be played on 76 earlier seasons as well as the built-in
+2026: every NFL season from 1960 to 2025, and the AFL's ten seasons before the
+1970 merger. 2001 to 2025 come from that season's Madden (Madden NFL 2002 to
+Madden NFL 26) as it launched, 1998 to 2000 from Madden NFL 99, 2000 and 2001,
+1990 and 1992 to 1995 from Tecmo Super Bowl, and the seasons no game rated
+(1960 to 1989, 1991, 1996 and 1997, and the AFL's) are computed from what the
+players did (below). Pick one under **Season** in setup; it
+plays the clubs of that season on the map of their day. Each season is a
 file in `public/american-football/` (about 30 KB) that loads only when chosen.
 
-- **What a season holds:** every club of that season (31 in 2001, 32 since 2002),
-  each with the lineup the game picks from its whole roster and its best backups,
-  by the built-in season's rules. Ratings are Madden's overalls, unchanged.
+- **What a season holds:** every club of that season (from 13 in 1960 to 32
+  since 2002; the AFL's 8 to 10), each with the lineup the game picks from its
+  whole roster and its best backups, by the built-in season's rules. Madden's
+  overalls are used unchanged where the edition recorded one (Madden NFL 2001
+  on); every other overall is ours, as each season's source block and its label
+  say ("converted", "computed").
 - **Clubs of their day:** the St. Louis Rams until 2015, the San Diego Chargers
   until 2016, the Oakland Raiders until 2019, Washington (named by its city until
   2019) and the Washington Football Team in 2020 and 2021, no Texans in 2001, the
@@ -1520,9 +1526,34 @@ file in `public/american-football/` (about 30 KB) that loads only when chosen.
   the Phoenix Cardinals, Los Angeles Raiders and Rams, Houston Oilers and the
   first Cleveland Browns, and in 1995 the Panthers at Clemson (holding South
   Carolina) and the St. Louis Rams, on the maps `nfl1990` … `nfl1995`.
-- **What is missing:** 1991 (no Tecmo edition rates it), 1996 to 2000 (Madden
-  98 to 2001 survive as team overalls only) and anything before 1990 (Tecmo
-  Bowl's 1987 set has 12 clubs of nine a side).
+- **Madden NFL 99, 2000 and 2001 (1998 to 2000):** EA SPORTS' ratings as NFL
+  Draft Buzz's Madden Ratings Database compiled them (its pages saved and
+  pinned; the players' names are its matcher's). Madden NFL 2001 keeps EA's
+  overall; Madden NFL 99 and 2000 kept attributes only, so **their overall is
+  ours**: the attributes weighted as Madden NFL 2001 weights them, ranked within
+  the season and read off Madden NFL 2002 (labelled "converted"). The site's
+  copy lacks a few players, and the game fills those places out of position;
+  nflverse's rosters (CC BY 4.0) check the names and place its generic
+  defensive backs (`npm run sync:madden-early`, `--check`).
+- **Computed seasons (1960 to 1989, 1991, 1996, 1997, and the AFL 1960 to
+  1969):** no game rated them, so **the overall is ours**, from Pro Football
+  Archives' facts (profootballarchives.com: who played where, games and starts,
+  the season's box-score totals): each club's points against the league's
+  shared out by starts and production, ranked at each position and read off
+  Madden NFL 2002 (labelled "computed"). It is a hindsight rating: it follows
+  each season's results more closely than a game's pre-season ratings do. 1987
+  counts the clubs' own players, not the strike games' replacements. Each AFL
+  season is ranked within the AFL and plays on a map of its own (`afl1960` …
+  `afl1969`); the NFL's seasons before 2001 play on era maps from `nfl1960`,
+  with the clubs of their day (the St. Louis Cardinals, Baltimore Colts, Boston
+  Patriots, Dallas Texans and New York Titans, the Giants at the Yale Bowl
+  holding Connecticut in 1973–74). To rebuild:
+  `npm run fetch:pfa` (polite, resumable), `npm run sync:pfa`, then
+  `npm run build:nfl-seasons`, `npm run build:nfl-map` and
+  `node scripts/build-club-maps.mjs --league=afl`.
+- **What is missing:** anything before 1960. Madden NFL 97 and 98 are not used
+  (their ratings check poorly, so 1996 and 1997 are computed), nor are the
+  fan-made Tecmo Super Bowl ROM hacks.
 
 ## Baseball seasons
 
