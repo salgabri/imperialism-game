@@ -949,7 +949,7 @@ to 1987/88), `nba1989`, `nba1990`, `nba1991`, `nba1992` and `nba1993` to
 `nba1999`; then `nba2000` (1999/00 and 2000/01), `nba2002`, `nba2003` (2002/03,
 2003/04), `nba2005`, `nba2006` (2005/06, 2006/07), `nba2008`, `nba2009`
 (2008/09 to 2010/11), `nba2013` and `nba2014`: 42 era maps, 30 of them new on
-2026-11-09. Every season of an era must have the same
+2026-11-09 (158 to 162 KB each, 4.8 MB in all). Every season of an era must have the same
 franchises in the same cities and arenas, or the build stops (the user kept
 this rule on 2026-11-09 rather than share a map when a club alone in its state
 moves within its city, which would save three maps). From 2014/15 the
