@@ -256,7 +256,10 @@ export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot
 
   // Ballon d'Or points: by the player's article, else by his name and nation, else by a name the manifest pins to him.
   const squadIds = new Set(squadRows.map(r => r.player_id));
-  const nameOf = r => `${r.given_name === 'not applicable' ? '' : `${r.given_name} `}${r.family_name}`;
+  // A given name that already ends with the family name is the whole name: the database's 1994 Moroccan "El Arbi
+  // Hababi" (given) "Hababi" (family) is El Arbi Hababi, not El Arbi Hababi Hababi.
+  const nameOf = r => (r.given_name === 'not applicable' ? r.family_name
+    : r.given_name.endsWith(` ${r.family_name}`) ? r.given_name : `${r.given_name} ${r.family_name}`);
   const byTitle = new Map(), byName = new Map();
   for (const r of squadRows) {
     const title = wikiTitle(people.get(r.player_id)?.player_wikipedia_link);

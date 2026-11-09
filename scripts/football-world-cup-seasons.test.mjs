@@ -287,6 +287,11 @@ test('spot checks: each season\'s strongest nations and players are history\'s',
   assert.ok(!brazil.includes('Tostão'));
   const pele = eleven(committed('wc-1970'), '076').find(([name]) => name === 'Pelé')[3];
   assert.deepEqual([pele.goals, pele.minutes, pele.starts, pele.url], [4, 540, 6, 'https://en.wikipedia.org/wiki/Pel%C3%A9']);
+  // A name is written once: the database's given name "El Arbi Hababi" already ends with his family name, "Hababi".
+  for (const id of IDS) {
+    for (const nation of facts(id).nations) for (const { name } of nation.squad) assert.ok(!/(?:^|\s)(\S+) \1$/u.test(name), `${id}: ${name}`);
+  }
+  assert.ok(names(committed('wc-1994'), '504').includes('El Arbi Hababi'));
 });
 
 test('the federations of the day: the finalists play under their own names, and hold only their own members', () => {

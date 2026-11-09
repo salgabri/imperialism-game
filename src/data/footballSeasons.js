@@ -42,7 +42,7 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-5b8d03bc', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
   Object.freeze({ id: 'cm-9798', version: 'cm-9798-cb9596fd', year: 1998, season: '1997/98', label: 'CM 97/98' }),
   Object.freeze({ id: 'swos-9697', version: 'swos-9697-189aa2ca', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
-  Object.freeze({ id: 'wc-1994', version: 'wc-1994-ae4aefa8', year: 1994, season: '1993/94', label: 'Computed · 1994 World Cup' }),
+  Object.freeze({ id: 'wc-1994', version: 'wc-1994-7f151aae', year: 1994, season: '1993/94', label: 'Computed · 1994 World Cup' }),
   Object.freeze({ id: 'wc-1990', version: 'wc-1990-246f9a35', year: 1990, season: '1989/90', label: 'Computed · 1990 World Cup' }),
   Object.freeze({ id: 'wc-1986', version: 'wc-1986-cb089884', year: 1986, season: '1985/86', label: 'Computed · 1986 World Cup' }),
   Object.freeze({ id: 'wc-1982', version: 'wc-1982-1fa88a41', year: 1982, season: '1981/82', label: 'Computed · 1982 World Cup' }),
