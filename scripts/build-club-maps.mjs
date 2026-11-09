@@ -48,6 +48,7 @@ import { createBoundarySource, cutForeignLand, GB_CITATION } from './lib/domesti
 import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
 import { setIdOf, teamsOf } from './lib/nba-seasons.mjs';
 import { seasonIdOf as mlbSeasonIdOf, teamsOf as mlbTeamsOf } from './lib/mlb.mjs';
+import { teamsOfWar, warSeasonIdOf } from './lib/mlb-war.mjs';
 import { setIdOf as nflSetIdOf, teamsOf as nflTeamsOf } from './lib/nfl.mjs';
 import { seasonIdOf as nhlSeasonIdOf, teamsOf as nhlTeamsOf } from './lib/nhl-seasons.mjs';
 import { seasonIdOf as nrlSeasonIdOf, teamsOf as nrlTeamsOf } from './lib/rugby-league-seasons.mjs';
@@ -68,6 +69,7 @@ const ballparksFile = path.join(root, 'scripts/data/mlb-teams.json');
 const nhlArenasFile = path.join(root, 'scripts/data/nhl-teams.json');
 const nrlGroundsFile = path.join(root, 'scripts/data/nrl-teams.json');
 const mlbSeasonsFile = path.join(root, 'scripts/data/mlb-seasons.json');
+const mlbWarSeasonsFile = path.join(root, 'scripts/data/mlb-war-seasons.json');
 const nflSeasonsFile = path.join(root, 'scripts/data/nfl-seasons.json');
 const nhlSeasonsFile = path.join(root, 'scripts/data/nhl-seasons.json');
 const nrlSeasonsFile = path.join(root, 'scripts/data/rugby-league-seasons.json');
@@ -99,7 +101,10 @@ const LEAGUES = {
     eraVenues: 'Stadium locations: scripts/data/nfl-teams.json, and scripts/data/nfl-seasons.json for clubs that have moved, been renamed or played elsewhere since (franchises that share a stadium grow from their training grounds).' },
   mlb: { id: 'mlb', sport: 'baseball', league: 'MLB', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: { venue: 'ballpark' },
     maxGapKm: 5, venues: 'Ballpark locations: scripts/data/mlb-teams.json.',
-    eraVenues: 'Ballpark locations: scripts/data/mlb-teams.json, and scripts/data/mlb-seasons.json for clubs that have moved, been renamed or played elsewhere since.' },
+    eraVenues: 'Ballpark locations: scripts/data/mlb-teams.json, and scripts/data/mlb-seasons.json for clubs that have moved, been renamed or played elsewhere since.',
+    // The seasons computed from WAR, 1960 to 2017. The Angels of 1962–1965, at Dodger Stadium, and the Yankees of
+    // 1974–1975, at Shea Stadium, grow from their own previous ballparks.
+    warVenues: 'Ballpark locations: scripts/data/mlb-war-seasons.json, every club of each season at the ballpark it played most of its home games in (the Lahman Baseball Database\'s HomeGames: SABR, CC BY-SA 3.0), named as the map\'s first season knew it (a ballpark renamed in place keeps the map); the names of the day and the coordinates of the ballparks of the 1960s and 1970s from English Wikipedia (CC BY-SA 4.0). Clubs that played in another club\'s ballpark grow from their own previous one: the Angels of 1962–1965 (Dodger Stadium) from Wrigley Field, Los Angeles, and the Yankees of 1974–1975 (Shea Stadium) from Yankee Stadium.' },
   nhl: { id: 'nhl', sport: 'hockey', league: 'NHL', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: {},
     venues: 'Arena locations: scripts/data/nhl-teams.json.',
     eraVenues: 'Arena locations: scripts/data/nhl-seasons.json, every club of each season in the arena it played in.' },
@@ -330,25 +335,36 @@ async function nflSpecs() {
   return specs;
 }
 
-/** MLB's one map, from the game's clubs and their ballparks: `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`. */
+/**
+ * MLB's maps, `{ id, seasons, clubs: [{ id, name, city, arena, home }] }`: today's from the game's clubs and their
+ * ballparks (`seasons` null), then one per earlier era: the MLB The Show seasons' (scripts/data/mlb-seasons.json) and
+ * those computed from WAR (scripts/data/mlb-war-seasons.json, 1960 to 2017, `venues` their attribution's words).
+ */
 async function mlbSpecs() {
   const ballparks = JSON.parse(await readFile(ballparksFile, 'utf8')).teams;
   const manifest = JSON.parse(await readFile(mlbSeasonsFile, 'utf8'));
+  const warManifest = JSON.parse(await readFile(mlbWarSeasonsFile, 'utf8'));
   const clubs = rankedClubs(MLB_CLUBS, ballparks, 'ballpark')
     .map(c => ({ id: c.id, name: c.name, city: ballparks[c.id].city, arena: ballparks[c.id].ballpark, home: ballparks[c.id].home }));
   const specs = [{ id: LEAGUES.mlb.id, seasons: null, clubs }];
-  // Each earlier era's clubs (scripts/data/mlb-seasons.json) rank as their franchises rank today, so section ids follow
-  // the same order on every map; the seasons an era map serves must all have the same clubs in the same ballparks.
+  // Each earlier era's clubs rank as their franchises rank today, so section ids follow the same order on every map.
+  // The seasons an era map serves must all have the same clubs, named and placed alike: a ballpark renamed in place
+  // keeps its map, which names it as its first season did. A club that played in another club's ballpark grows from
+  // its own (`base`).
   const rank = new Map(clubs.map((c, i) => [ballparks[c.id].show, i]));
-  const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.ballpark, t.home]));
-  for (const map of manifest.maps) {
+  const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.base ?? null, t.home]));
+  const eraSpecs = (maps, teamsAt, seasonId, venues) => maps.map(map => {
     const [first, ...rest] = map.seasons;
-    const teams = mlbTeamsOf(ballparks, manifest, first).sort((a, b) => rank.get(a.show) - rank.get(b.show));
-    const differs = rest.find(year => places(mlbTeamsOf(ballparks, manifest, year).sort((a, b) => rank.get(a.show) - rank.get(b.show))) !== places(teams));
+    const teams = teamsAt(first);
+    const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
     if (differs) throw new Error(`${map.id}: the clubs or ballparks of ${differs} are not those of ${first}`);
-    specs.push({ id: map.id, seasons: map.seasons.map(mlbSeasonIdOf),
-      clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ballpark, home: t.home })) });
-  }
+    return { id: map.id, seasons: map.seasons.map(seasonId), ...(venues ? { venues } : {}),
+      clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ballpark, home: t.home })) };
+  });
+  specs.push(...eraSpecs(manifest.maps, year => mlbTeamsOf(ballparks, manifest, year).sort((a, b) => rank.get(a.show) - rank.get(b.show)), mlbSeasonIdOf));
+  const franchiseRank = new Map(clubs.map((c, i) => [c.id, i]));
+  specs.push(...eraSpecs(warManifest.maps, year => teamsOfWar(ballparks, warManifest, year).sort((a, b) => franchiseRank.get(a.franchise) - franchiseRank.get(b.franchise)),
+    warSeasonIdOf, LEAGUES.mlb.warVenues));
   return specs;
 }
 
@@ -593,7 +609,7 @@ async function build({ source, log, spec, league }) {
   const top = rows.slice(0, 3).map(row => clubs.find(c => c.id === row.id).name);
   const entry = { id: mapId, sport: league.sport, league: league.league, name: league.name, ...(seasons ? { seasons } : {}), clubs: n,
     sections: n, ...league.entry, version: doc.version, ...(seasons ? {} : { top }) };
-  return { entry, outputs: [[outFile(mapId), text], [attributionFile(mapId), attributionText(doc, league)]] };
+  return { entry, outputs: [[outFile(mapId), text], [attributionFile(mapId), attributionText(doc, league, spec.venues)]] };
 }
 
 function indexModule(entries) {
@@ -612,7 +628,8 @@ ${entries.map(entry => `  ${JSON.stringify(entry)},`).join('\n')}
 `;
 }
 
-function attributionText(doc, league) {
+/** A map's attribution; `venues`, a map's own words for where its venues come from (else its league's). */
+function attributionText(doc, league, venues = null) {
   const lines = [
     doc.seasons ? `${league.league} map of the seasons ${doc.seasons.join(', ')} (public/domestic/${doc.id}.json), ${doc.version}`
       : `${league.league} map (public/domestic/${doc.id}.json), ${doc.version}`,
@@ -625,8 +642,8 @@ function attributionText(doc, league) {
     `  ${GB_CITATION}`,
     "Land the game's world map (public/countries-50m.json: world-atlas 2.0.2, ISC; Natural Earth 1:50m,",
     '  public domain) draws for another country is cut; see "Cut" lines below.',
-    doc.seasons ? league.eraVenues
-      : league.venues,
+    venues ?? (doc.seasons ? league.eraVenues
+      : league.venues),
   ];
   for (const b of doc.boundaries.layers) {
     const grouping = league.grouping || (league.countries.length > 1 ? 'state or province' : 'state');
