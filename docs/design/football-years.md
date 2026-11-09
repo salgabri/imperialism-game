@@ -287,8 +287,8 @@ test:flag-symbols` runs it.
 | URS | `su` | Flag of the Soviet Union.svg | PD-RU-exempt | hammer, sickle and star |
 | CIS | `cis-1992` | Flag of the CIS (UEFA Euro 1992).svg | PD-textlogo | the letters C.I.S. |
 | YUG | `yu` | Flag of Yugoslavia (1946-1992).svg | PD-ineligible, PD-shape, PD-Yugoslavia | the star, its gold edge included |
-| FRY | `yu-1992` | Flag of Serbia and Montenegro (1992–2006).svg | PD-SerbiaGov, PD-ineligible | none: three bands |
-| ZAI | `zr` | Flag of Zaire (1971–1997).svg | PD-Congo | the disc with arm and torch |
+| FRY | `yu-1992` | Flag of Serbia and Montenegro (1992–2006).svg | PD-SCGGov, PD-ineligible, PD-shape | none: three bands |
+| ZAI | `zr` | Flag of Zaire (1971–1997).svg | PD-Democratic Republic of the Congo, PD-ineligible | the disc with arm and torch |
 
 The four emblems have symbol profiles (`src/data/flagSymbols.js`; split by
 `scripts/build-flag-symbols.mjs`, whose files for them name their public-domain
