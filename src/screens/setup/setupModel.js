@@ -342,11 +342,13 @@ export const SEASON_NOTES = Object.freeze({
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
     + 'without eleven starts short-handed.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
-    + 'scoring, marked as one. Rosters as of 7 November 2026. Earlier seasons use EA\'s ratings of that season, nothing '
+    + 'scoring, marked as one. Rosters as of 7 November 2026. Five earlier seasons use EA\'s ratings of that season, nothing '
     + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
-    + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings, clubs on '
-    + 'the map of their day. Nations field the NHL '
-    + 'players of each country, and only where they hold at least half the lineup.',
+    + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings. NHL 08 and '
+    + 'NHL 09 are EA\'s attributes, the overall converted by us. Every other season back to 1966/67 is computed from the '
+    + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank (obtained free of charge from and '
+    + 'copyrighted by the Hockey Databank project), after from MoneyPuck.com. Clubs play on the map of their day. Nations '
+    + 'field the NHL players of each country, only where they hold at least half the lineup, and none before 1977/78.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
     + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
     + 'least half a matchday 17. 2008 '

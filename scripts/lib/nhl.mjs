@@ -34,12 +34,13 @@ const NATION_OF_EA = {
   Russia: '643', 'Russian Federation': '643', Slovakia: '703', Slovenia: '705', Sweden: '752', Switzerland: '756', Ukraine: '804', USA: '840',
   'United States': '840',
 };
-/** Where a player was born, by the NHL's country code. */
+/** Where a player was born, by the NHL's country code (ISO 3166 alpha-3; the earlier seasons' sources add a few more). */
 const NATION_OF_BIRTH = {
-  AUS: '036', AUT: '040', BGR: '100', BLR: '112', BRA: '076', CAN: '124', CHE: '756', CHN: '156', CZE: '203', DEU: '276', DNK: '208', EST: '233',
-  FIN: '246', FRA: '250', GBR: '826', HRV: '191', HTI: '332', HUN: '348', ITA: '380', JPN: '392', KAZ: '398', KOR: '410', LTU: '440', LVA: '428',
-  NGA: '566', NLD: '528', NOR: '578', POL: '616', ROU: '642', RUS: '643', SRB: '688', SVK: '703', SVN: '705', SWE: '752', TWN: '158', UKR: '804',
-  USA: '840', UZB: '860', ZAF: '710',
+  AUS: '036', AUT: '040', BEL: '056', BGR: '100', BHS: '044', BLR: '112', BRA: '076', BRN: '096', CAN: '124', CHE: '756', CHN: '156', CZE: '203',
+  DEU: '276', DNK: '208', EST: '233', FIN: '246', FRA: '250', GBR: '826', HRV: '191', HTI: '332', HUN: '348', IDN: '360', IRL: '372', ITA: '380',
+  JAM: '388', JPN: '392', KAZ: '398', KOR: '410', LBN: '422', LTU: '440', LVA: '428', NGA: '566', NLD: '528', NOR: '578', POL: '616', PRY: '600',
+  ROU: '642', RUS: '643', SRB: '688', SVK: '703', SVN: '705', SWE: '752', TWN: '158', TZA: '834', UKR: '804', USA: '840', UZB: '860', VEN: '862',
+  ZAF: '710',
 };
 /** The game's nation for the NHL's birth-country code (ISO 3166 alpha-3), or null for one it does not know. */
 export const nationOfBirth = code => NATION_OF_BIRTH[code] ?? null;

@@ -392,30 +392,79 @@ async function nrlSpecs() {
   return specs;
 }
 
+/** How far an NHL club's arena may move, within its county (or its state, if no other club shares it), and keep its map. */
+const NHL_MOVE_KM = 15;
+
 /**
  * The NHL's maps, `{ id, seasons, clubs: [{ id, name, city, arena, home }] }`: today's from the game's clubs and their
- * arenas (`seasons` null), then one per earlier era of scripts/data/nhl-seasons.json, whose seasons must all have the
- * same clubs in the same arenas. An era's clubs rank as their franchises rank today, so section ids follow the same order
- * on every map.
+ * arenas (`seasons` null), then one per earlier era of scripts/data/nhl-seasons.json. An era map serves seasons with the
+ * same clubs under the same names, each arena within NHL_MOVE_KM of the first season's and in the same county (or, in a
+ * state or province no other club shares, the same state); it keeps the first season's arenas and places. The seasons
+ * the manifest gives today's map (`nhl`) must have today's clubs in today's arenas. An era's clubs rank as their
+ * franchises rank today (a defunct franchise, the Seals and Barons, after them), so section ids follow the same order on
+ * every map.
  */
-async function nhlSpecs() {
+async function nhlSpecs({ source, log }) {
   const arenas = JSON.parse(await readFile(nhlArenasFile, 'utf8')).teams;
   const manifest = JSON.parse(await readFile(nhlSeasonsFile, 'utf8'));
   const clubs = rankedClubs(NHL_CLUBS, arenas, 'arena')
     .map(c => ({ id: c.id, name: c.name, city: arenas[c.id].city, arena: arenas[c.id].arena, home: arenas[c.id].home }));
   const specs = [{ id: LEAGUES.nhl.id, seasons: null, clubs }];
   const rank = new Map(clubs.map((c, i) => [c.id, i]));
-  const teamsAt = year => nhlTeamsOf(manifest, year).sort((a, b) => rank.get(a.franchise) - rank.get(b.franchise));
+  const defunct = manifest.eras?.defunct ?? [];
+  const defunctOf = t => defunct.indexOf(Object.entries(manifest.eras?.franchises ?? {}).find(([, eras]) => eras.some(e => e.id === t.id))?.[0]);
+  const rankOf = t => (t.franchise == null ? (defunctOf(t) >= 0 ? clubs.length + defunctOf(t) : undefined) : rank.get(t.franchise));
+  const teamsAt = year => nhlTeamsOf(manifest, year).sort((a, b) => rankOf(a) - rankOf(b));
   const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.arena, t.home]));
+  const where = await arenaPlaces(source);
   for (const map of manifest.maps) {
     const [first, ...rest] = map.seasons;
     const teams = teamsAt(first);
-    if (teams.some(t => !rank.has(t.franchise))) throw new Error(`${map.id}: a club of ${first} is no franchise of today's`);
-    const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
-    if (differs) throw new Error(`${map.id}: the clubs or arenas of ${differs} are not those of ${first}`);
+    if (teams.some(t => rankOf(t) === undefined)) throw new Error(`${map.id}: a club of ${first} is no franchise of today's or a defunct one`);
+    if (map.id === LEAGUES.nhl.id) {
+      const today = places(clubs);
+      const differs = map.seasons.find(year => places(teamsAt(year)) !== today);
+      if (differs) throw new Error(`${map.id}: the season ending in ${differs} is not today's clubs and arenas`);
+      continue;
+    }
+    for (const year of rest) {
+      const later = teamsAt(year);
+      const names = list => JSON.stringify(list.map(t => [t.id, t.name]));
+      if (names(later) !== names(teams)) throw new Error(`${map.id}: the clubs of ${year} are not those of ${first}, or not under the same names`);
+      const shared = list => {
+        const regions = list.map(t => where(t.home).region);
+        return t => regions.filter(r => r === where(t.home).region).length > 1;
+      };
+      const sharedThen = shared(teams), sharedLater = shared(later);
+      for (const [i, t] of later.entries()) {
+        const was = teams[i];
+        const km = kmBetween(was.home, t.home);
+        const a = where(was.home), b = where(t.home);
+        const inPlace = sharedThen(was) || sharedLater(t) ? a.unit === b.unit : a.region === b.region;
+        if (km >= NHL_MOVE_KM || !inPlace) {
+          throw new Error(`${map.id}: ${t.name} moved from ${was.arena} (${first}) to ${t.arena} (${year}), ${fixed(km)} km${inPlace ? '' : ', into another county or state'}`);
+        }
+      }
+    }
     specs.push({ id: map.id, seasons: map.seasons.map(nhlSeasonIdOf), clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.arena, home: t.home })) });
   }
   return specs;
+}
+
+/** A point's county (ADM2 unit) and state or province (ADM1) in the USA or Canada: the unit it stands in, else the nearest. */
+async function arenaPlaces(source) {
+  const units = [];
+  for (const country of LEAGUES.nhl.countries) units.push(...(await countryUnits(source, country, () => {}, false)).units);
+  const memo = new Map();
+  return point => {
+    const key = point.join(',');
+    if (!memo.has(key)) {
+      const unit = units.find(u => pointInPolys(point, u.polys))
+        ?? units.reduce((best, u) => { const km = kmToPolys(point, u.polys); return !best || km < best.km ? { km, u } : best; }, null).u;
+      memo.set(key, { unit: unit.id, region: unit.region });
+    }
+    return memo.get(key);
+  };
 }
 
 /**
@@ -694,7 +743,7 @@ async function main() {
   const outputs = new Map(), built = new Map();
   for (const key of only ? [only] : Object.keys(LEAGUES)) {
     const league = LEAGUES[key], entries = [];
-    for (const spec of await SPECS[key]()) {
+    for (const spec of await SPECS[key]({ source, log })) {
       log(`${spec.id}: ${spec.clubs.length} franchises${spec.seasons ? ` for ${spec.seasons.join(', ')}` : ''}`);
       const { entry, outputs: files } = await build({ source, log, spec, league });
       entries.push(entry);

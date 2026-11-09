@@ -35,7 +35,10 @@ const snapshotOf = id => JSON.parse(read(`scripts/data/nhl-seasons/${id}.json`))
 const seasonFile = id => JSON.parse(read(`public/hockey/${id}.json`));
 const mapFile = id => JSON.parse(read(`public/domestic/${id}.json`));
 const ERA_MAPS = CLUB_MAPS.filter(entry => entry.sport === 'hockey' && entry.seasons);
+// The five EA editions; the computed and converted seasons have their own tests (scripts/hockey-computed.test.mjs).
 const IDS = ['nhl-2022', 'nhl-2007', 'nhl-1995', 'nhl-1994', 'nhl-1993'];
+const EDITIONS = MANIFEST.seasons.filter(season => !season.method);
+const ALL_IDS = MANIFEST.seasons.map(season => season.id).sort((a, b) => b.localeCompare(a));
 const sectionAt = (map, point) => map.geo.countries.find(section => pointInPolys(point, section.polys))?.id ?? null;
 const home = (map, id) => map.clubs.find(club => club.id === id).homeSection;
 const playerOf = (id, name) => {
@@ -53,9 +56,10 @@ const rescaledOf = id => AUDIT.seasons.find(season => season.id === id).rescaled
 // ---------- building ----------
 
 test('every season rebuilds byte for byte from its committed snapshot, and the built-in season is unchanged', () => {
-  assert.match(execFileSync(process.execPath, ['scripts/build-nhl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 5 hockey seasons/);
+  assert.match(execFileSync(process.execPath, ['scripts/build-nhl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 59 hockey seasons/);
   assert.match(execFileSync(process.execPath, ['scripts/build-hockey.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the NHL clubs and the hockey nations/);
-  for (const season of MANIFEST.seasons) {
+  assert.deepEqual(EDITIONS.map(season => season.id).sort(), IDS.slice().sort());
+  for (const season of EDITIONS) {
     const snapshot = snapshotOf(season.id);
     assert.deepEqual(snapshot.source, { id: season.id, edition: season.edition, label: season.label, retrieved: season.retrieved });
     assert.ok(snapshot.players.every(([name, team, pos, rating]) => name && team && ['C', 'LW', 'RW', 'D', 'G'].includes(pos)
@@ -73,21 +77,24 @@ test('the snapshots rebuild from their pinned downloads', { skip: !cached && 'th
 });
 
 test('the built-in seasons are the manifest\'s, newest first, each on its era\'s map', () => {
-  assert.deepEqual(BUILT_IN_HOCKEY_SEASONS.map(set => set.id), IDS);
-  assert.deepEqual(BUILT_IN_HOCKEY_SEASONS.map(set => [set.season, set.label, set.map]), [
+  assert.deepEqual(BUILT_IN_HOCKEY_SEASONS.map(set => set.id), ALL_IDS);
+  assert.deepEqual(BUILT_IN_HOCKEY_SEASONS.filter(set => IDS.includes(set.id)).map(set => [set.season, set.label, set.map]), [
     ['2021/22', 'NHL 22', 'nhl2022'], ['2006/07', 'NHL 07', 'nhl2007'], ['1994/95', 'NHL 95', 'nhl1995'], ['1993/94', 'NHL 94', 'nhl1994'],
     ['1992/93', 'NHLPA 93', 'nhl1993']]);
   assert.equal(builtInSeasonOf('hockey').season, '2026/27', 'the built-in season stays the current one');
   for (const listed of BUILT_IN_HOCKEY_SEASONS) {
     assert.deepEqual(BUILT_IN_SETS.find(entry => entry.id === listed.id), listed, `${listed.id} is listed as built`);
     assert.equal(setSportOf(listed.id), 'hockey');
-    assert.ok(setHasNations(listed.id) && setHasClubs(listed.id), 'a hockey season fields nations and clubs');
+    assert.ok(setHasClubs(listed.id), 'a hockey season fields clubs');
+    assert.equal(setHasNations(listed.id), listed.year >= 1978, 'and nations from 1977/78');
     assert.equal(seasonMapOf(listed.id), listed.map);
     assert.equal(seasonFile(listed.id).version, listed.version);
     assert.equal(listed.id, seasonIdOf(listed.year));
   }
-  assert.deepEqual(ERA_MAPS.map(entry => [entry.id, entry.seasons, entry.clubs]), [
-    ['nhl1993', ['nhl-1993'], 24], ['nhl1994', ['nhl-1994'], 26], ['nhl1995', ['nhl-1995'], 26], ['nhl2007', ['nhl-2007'], 30], ['nhl2022', ['nhl-2022'], 32]]);
+  const shipped = ['nhl1993', 'nhl1994', 'nhl1995', 'nhl2007', 'nhl2022'];
+  assert.deepEqual(ERA_MAPS.filter(entry => shipped.includes(entry.id)).map(entry => [entry.id, entry.seasons, entry.clubs]), [
+    ['nhl1993', ['nhl-1993'], 24], ['nhl1994', ['nhl-1994'], 26], ['nhl1995', ['nhl-1995'], 26],
+    ['nhl2007', ['nhl-2007', 'nhl-2008', 'nhl-2009', 'nhl-2010', 'nhl-2011'], 30], ['nhl2022', ['nhl-2022'], 32]]);
 });
 
 // ---------- the seasons ----------
@@ -95,17 +102,22 @@ test('the built-in seasons are the manifest\'s, newest first, each on its era\'s
 test('every season loads and fits its era\'s map: its clubs named, coded and housed as that season had them', () => {
   for (const listed of BUILT_IN_HOCKEY_SEASONS) {
     const doc = seasonFile(listed.id);
+    const entry = MANIFEST.seasons.find(season => season.id === listed.id);
     const set = decodeFootballSet(doc, listed.id);
-    assert.deepEqual([set.meta.year, set.meta.season, set.meta.map, set.meta.source.provider], [listed.year, listed.season, listed.map, 'EA Sports']);
+    assert.deepEqual([set.meta.year, set.meta.season, set.meta.map], [listed.year, listed.season, listed.map]);
+    if (entry.method !== 'computed') assert.equal(set.meta.source.provider, 'EA Sports');
     const map = decodeDomestic(mapFile(listed.map), listed.map);
     assert.deepEqual(map.clubs.map(club => club.id).sort(), doc.clubs.map(club => club.id).sort(), `${listed.id}'s clubs are its map's`);
     const teams = teamsOf(MANIFEST, listed.year);
+    // An era map keeps the arenas of the first season it serves (a later season's may have moved, within its county).
+    const mapEntry = MANIFEST.maps.find(m => m.seasons.includes(listed.year));
+    const firstTeams = teamsOf(MANIFEST, mapEntry.seasons[0]);
     const arenas = new Map(mapFile(listed.map).clubs.map(club => [club.id, club.arena]));
     for (const club of doc.clubs) {
       const team = teams.find(t => t.id === club.id);
       assert.ok(team, `${club.name} is a club of ${listed.season}`);
       assert.deepEqual([club.name, club.code, club.league, club.country], [team.name, team.code, 'NHL', team.country]);
-      assert.equal(arenas.get(club.id), team.arena, `${listed.season} ${club.name} plays at ${team.arena}`);
+      if (listed.map !== 'nhl') assert.equal(arenas.get(club.id), firstTeams.find(t => t.id === club.id).arena, `${listed.season} ${club.name}'s map arena`);
       assert.ok(club.squad.length >= 12 && club.squad.length <= 23, `${listed.season} ${club.name} keeps ${club.squad.length}`);
       const lineup = selectLineup({ sport: 'hockey', squad: club.squad.map(([name, pos, rating]) => ({ name, pos, rating })) });
       assert.equal(lineup.rating, club.str, `${listed.season} ${club.name}'s strength is its lineup's`);
@@ -116,7 +128,7 @@ test('every season loads and fits its era\'s map: its clubs named, coded and hou
     assert.equal(doc.coverage.players, snapshot.players.length);
     assert.equal(doc.coverage.left, snapshot.left.length);
     assert.deepEqual(doc.territory, { merged: { SCO: '826', WAL: '826', NIR: '826' }, inactive: [] }, 'Great Britain plays as one');
-    assert.ok(doc.nations['124'][0] >= doc.nations['840'][0], `${listed.season}: Canada first`);
+    if (setHasNations(listed.id)) assert.ok(doc.nations['124'][0] >= doc.nations['840'][0], `${listed.season}: Canada first`);
   }
 });
 
@@ -228,7 +240,7 @@ test('the 1990s seasons are rescaled onto NHL 27\'s ratings rank for rank; NHL 0
     const game = new Map(snapshotOf(id).players.map(([name, team, , overall]) => [`${name}|${team}`, overall]));
     assert.ok(doc.clubs.every(club => club.squad.every(([name, , rating]) => game.get(`${name}|${club.code}`) === rating)), id);
   }
-  assert.deepEqual(BUILT_IN_HOCKEY_SEASONS.filter(set => !CLASSIC.includes(set.id)).map(set => set.version), ['nhl-2022-c91e9cb4', 'nhl-2007-7fbf9804']);
+  assert.deepEqual(BUILT_IN_HOCKEY_SEASONS.filter(set => ['nhl-2022', 'nhl-2007'].includes(set.id)).map(set => set.version), ['nhl-2022-c91e9cb4', 'nhl-2007-7fbf9804']);
 });
 
 test('a rank-preserving rescale keeps ties and lets nobody pass', () => {
@@ -381,8 +393,9 @@ test('hockey\'s Season choice lists its seasons; a season keeps Nations, and Clu
   await withApp(async ({ app }) => {
     app.pickSetup('sport', 'hockey');
     const model = modelOf(app);
-    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27', '2021/22', '2006/07', '1994/95', '1993/94', '1992/93']);
+    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27', ...BUILT_IN_HOCKEY_SEASONS.map(set => set.season)]);
     assert.deepEqual(model.season.options.slice(1).map(option => option.label), BUILT_IN_HOCKEY_SEASONS.map(set => `${set.season} · ${set.label}`));
+    assert.equal(model.season.options.length, 60, 'the built-in season and every season from 1966/67 but 2004/05');
     app.pickSetup('dataSet', 'nhl-1994');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'nhl-1994'], 'a hockey season keeps its nations');
     app.pickSetup('layer', 'clubs');
