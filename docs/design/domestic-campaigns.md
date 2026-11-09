@@ -925,8 +925,8 @@ tenant grows from its own previous ballpark (`base`, as the NFL's shared stadium
 from training grounds): Wrigley Field, Los Angeles, and Yankee Stadium. Los Angeles
 County is cut between the Dodgers and the Angels in 1961–65, the Polo Grounds Mets' part
 of New York State is "Manhattan" in 1962–63, beside the Yankees' Bronx, and before the
-Expos of 1969 Canada's provinces are all empty. `scripts/club-maps.test.mjs` holds every one to the rule; 2017 has its own
-map (2018's clubs and places), so mlb2018 is unchanged.
+Expos of 1969 Canada's provinces are all empty. `scripts/club-maps.test.mjs` holds every
+one to the rule; 2017 has its own map (2018's clubs and places), so mlb2018 is unchanged.
 
 ## The NHL map
 

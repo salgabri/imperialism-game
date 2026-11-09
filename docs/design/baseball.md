@@ -316,14 +316,18 @@ ignored `data-src/mlb-war/`:
   1901 (github.com/Neil-Paine-1/MLB-WAR-data-historical, `jeffbagwell_war_historical_2025.csv`,
   added in a9087e3, read at commit 1c8c308; git blob 48d384a4, SHA-256 0572a897…). MIT
   licence. Its WAR averages Baseball-Reference's and FanGraphs' (pitching: FIP-based,
-  runs-allowed modified for defence, and RA9). Neither site was read for these seasons;
+  runs-allowed modified for defence, and RA9). Neither site was read for these seasons:
   their terms pages answered HTTP 403 to the research pass and were not read, and no
-  Sports Reference or FanGraphs page was fetched. 2025 is in the file only partly (it was
-  made in April 2025) and is not used.
+  other Sports Reference or FanGraphs page was requested. 2025 is in the file only partly
+  (it was made in April 2025) and is not used.
 - **Lahman Baseball Database 2025** (SABR, CC BY-SA 3.0): People (names, given names,
   birth year and birth country, joined by `bbrefID`), Teams (each club's
   Baseball-Reference code, name and record) and HomeGames (the ballpark each club played
   most of its home games in). Every one of the 10,401 players of 1960 to 2017 is found.
+  The research pass downloaded the files from SABR's public Box share through its
+  download endpoint (`sabr.box.com/index.php?rm=box_download_shared_file…`), a path
+  box.com's robots.txt disallows to every agent (it allows the share's own pages, `/s/`);
+  the pinned SHA-256s let the same files be re-read from a copy that allows it.
 - **English Wikipedia** (CC BY-SA 4.0; facts only): the names of the day and the
   coordinates of the ballparks of 1960 to 1979, from 39 articles' infoboxes, and Elmer
   Valo's birthplace; each article's revision and SHA-256 is pinned. en.wikipedia.org's
@@ -339,11 +343,11 @@ snapshots under CC BY-SA 3.0, as Lahman's share-alike licence asks of derived da
 
 **Building.** `npm run import:mlb-war` (`scripts/import-mlb-war.mjs`) checks every pin,
 never fetches, and writes one snapshot a season, `scripts/data/mlb-war-seasons/<year>.json`
-(6.6 MB in all, 58,902 player-seasons): every player who played in the season with his
+(6.7 MB in all, 58,902 player-seasons): every player who played in the season with his
 club, role, positions, score, the inputs it was computed from and his birth country, and
 each club's name, record and main ballpark. It also writes
 `scripts/data/mlb-war-reference.json` (below). `npm run build:mlb-seasons` rates and teams
-each season from its snapshot (`public/baseball/mlb-war-<year>.json`, 17–33 KB, 1.8 MB in
+each season from its snapshot (`public/baseball/mlb-war-<year>.json`, 17–33 KB, 1.6 MB in
 all), with the listing, `docs/design/baseball-war-seasons-audit.json` and the attribution;
 `npm run build:mlb-map` draws the era maps. All three take `--check` and rebuild byte for
 byte offline: the importer from its cache, the seasons from committed files alone, the
