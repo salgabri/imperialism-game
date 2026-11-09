@@ -989,11 +989,13 @@ rollover of the built-in season changes nothing.
   the same leader every year. The computed scale is narrower than theirs (slope
   0.58), and the 3.2 is measured on it.
 - **Against SWOS 94/95** (the original SWOS, December 1994, its national squads,
-  cross-check only): for 1993/94's 24 finalists, Pearson 0.76 and Spearman 0.77
-  between the nations' strengths, and 0.63 for the 178 XI players found in SWOS's
-  squads by surname. The computed strengths run 5.5 points higher on average:
-  SWOS rates Mexico, Saudi Arabia and South Korea at 60–65 where their results
-  make them 77–81.
+  cross-check only, measured once on 2026-11-10 outside the build: no script or
+  audit file keeps these figures): for 1993/94's 24 finalists, Pearson 0.76 and
+  Spearman 0.77 between the nations' strengths, and 0.63 for the 178 XI players
+  found in SWOS's squads by surname (a re-check that kept only surnames one SWOS
+  player of the nation has found 147, at 0.65). The computed strengths run 5.5
+  points higher on average: SWOS rates Mexico, Saudi Arabia and South Korea at
+  60–65 where their results make them 77–81.
 - **How they play.** Each season's finalists, all against all (twenty rounds,
   neutral venue, Balanced, measured 2026-11-10): 2.89–3.16 goals a game,
   20.3–23.2% draws and 6.2–7.8% goalless, within the realism harness's real range

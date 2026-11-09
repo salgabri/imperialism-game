@@ -1318,7 +1318,7 @@ that season (FIFA 05 to EA FC 26), five before them, from 2002/03 back to
 1996/97, from the games of their day ([below](#before-200405)), and the nine World
 Cups from 1962 to 1994, computed ([below](#the-world-cups-1962-to-1994-computed)). They ship with
 the game: pick one under **Season** in setup. Each is a file in
-`public/football/` (75–340 KB) that loads only when chosen.
+`public/football/` (52–340 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
   and the clubs of the seven biggest European leagues (132–134 clubs a season,
