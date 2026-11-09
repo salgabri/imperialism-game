@@ -961,6 +961,24 @@ territory; Victoria, the ACT and Auckland are one club's, Cairns the Cowboys', W
 seeded duel campaigns reach a champion across the Tasman; the App launches on the map. `scripts/club-maps.test.mjs`
 holds it to the state rule with towns of each state and region. The smoke runs an NRL duel.
 
+**Era maps** (2026-11-08 and 2026-11-09): the earlier seasons ([rugby-league.md](rugby-league.md#earlier-seasons))
+play on maps of their day, built by the same command from `teams` and `maps` in `scripts/data/rugby-league-seasons.json`,
+16 clubs each, about 134 KB. Rules R1–R3 decide when a ground change makes a new map: a club keeps its own ground while
+it is rebuilt (R1), COVID-19 relocations are ignored (R2), and a rename on the same site does not split a map (R3).
+
+| Map | Seasons | Grounds and bases that set it apart |
+| --- | --- | --- |
+| `nrl2008` | 2008, 2009 | the Bulldogs (as "Bulldogs") train at Sydney Olympic Park and share the City of Parramatta with the Eels; the Storm at Olympic Park Stadium |
+| `nrl2010` | 2010, 2011 | Canterbury-Bankstown again, still at Sydney Olympic Park until October 2011; the Storm at AAMI Park |
+| `nrl2012` | 2012–2019 | the Bulldogs back at Belmore; the Cowboys still at Dairy Farmers (1300SMILES) Stadium |
+| `nrl2020` | 2020–2022 | the Cowboys at the North Queensland Stadium; the Roosters' new stadium; the Rabbitohs still at Redfern Oval; no Dolphins |
+
+2023 and 2024 have today's clubs at today's grounds and play on `nrl.json` itself: `nrlSpecs` checks that they equal
+`scripts/data/nrl-teams.json` and builds no copy. Each era's clubs rank as their franchises do today, so section ids
+follow the same order on every map. `scripts/rugby-league-seasons.test.mjs` checks the City of Parramatta (cut between
+the Bulldogs and the Eels only while the Bulldogs were at Olympic Park), Redcliffe (the Broncos' until the Dolphins
+came) and each era's Rabbitohs.
+
 ## The Europe maps
 
 Status: implemented 2026-11-07. Football clubs have two theatres, **Top 124** and

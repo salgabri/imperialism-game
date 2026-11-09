@@ -152,11 +152,13 @@ is within half a point of the fixture's simulated odds; a match's tables build i
 
 ## Earlier seasons
 
-Status: built 2026-11-08, one season: **2008**, the NRL's sixteen clubs as Rugby League 2: World Cup Edition (Sidhe,
+Status: built 2026-11-08: **2008**, the NRL's sixteen clubs as Rugby League 2: World Cup Edition (Sidhe,
 PlayStation 2, 2008) rates them, on a map of their own day (`nrl2008`). Clubs only: its nations are checked but not fielded
 (**Nations**, below). The game rates attributes, not players: the overall is ours, a documented conversion, as the Tecmo
 seasons' is ([american-football.md](american-football.md#tecmo-seasons)), then shifted club by club by the game's own team
-ratings. The user chose this on 2026-11-08 ("Build 2008", then "Adjust by team ratings").
+ratings. The user chose this on 2026-11-08 ("Build 2008", then "Adjust by team ratings"). The seasons from 2009 to 2024,
+which no game rated, are computed from NRL.com's match stats ([Computed seasons](#computed-seasons-20092024), built
+2026-11-09).
 
 - **The database.** `RLDatabase.xml`, the game's own database, extracted from its data pak by Wouldubeinta and posted on
   rugbyleaguemods.net (thread "Data pak File", post 570, 30 March 2012, attachment 56), read from the Wayback Machine's raw
@@ -261,7 +263,8 @@ ratings. The user chose this on 2026-11-08 ("Build 2008", then "Adjust by team r
   today's rule: a club holds its own state, territory or region, New South Wales (ten clubs) and Queensland (three) are
   split between theirs, every other state and region stays empty. With no Dolphins the Broncos hold Redcliffe. The
   Bulldogs at Olympic Park share the City of Parramatta with the Eels, and the Rabbitohs at Redfern the City of Sydney with
-  the Roosters: `maxGapKm` 0.5 cuts each council between its two (today's map is byte for byte the same with it).
+  the Roosters: `maxGapKm` 0.5 cuts each council between its two (today's map is byte for byte the same with it). Since
+  2026-11-09 it serves 2009 too, whose clubs and grounds are 2008's: its `seasons` and version changed, not its shapes.
 - **Nations: not fielded.** The database's ten 2008 World Cup squads (Australia, New Zealand, England, France, Papua New
   Guinea, Fiji, Samoa, Tonga, Scotland and Ireland) pass the same check against RLP's World Cup squads and 2008 Tests:
   188 players kept, 11 (Fiji) to 25 (Australia) a nation. But they mix the NRL's players with Super League's, and the
@@ -309,7 +312,242 @@ ratings. The user chose this on 2026-11-08 ("Build 2008", then "Adjust by team r
   database's own `goal_kicker` is not read). A club the database leaves short of a position plays someone out of it
   (Manly has no five-eighth: Brett Stewart plays there, Steve Matai at fullback). Squad players show no source line.
   Rugby League 2's first edition (2006) and the Rugby League Live games keep their ratings inside the games: 2008 is the
-  only earlier season.
+  only earlier season a game rates (Rugby League Live 3 and 4's databases, for 2015 and 2017, survive only as a
+  cross-check of the computed seasons, below).
+
+## Computed seasons, 2009–2024
+
+Status: built 2026-11-09. Sixteen NRL seasons that no game rated, **2009 to 2024**, computed from what NRL.com's match
+centre recorded of them, each labelled "Computed from NRL.com match stats" and each on a map of its day. Clubs only, as
+2008. The user asked on 2026-11-09 to cover every sport's missing years ("In some sports there are individual rankings
+you can use to make ratings"); the research pass planned the method, and these decisions were taken that day:
+
+- one method for all sixteen seasons; Rugby League Live 3 (2015) and Live 4 (2017) only as a cross-check;
+- each club moved by its season's Simple Rating System (real margins, adjusted for the opponents), read off the built-in
+  clubs' strengths: the season's results set each club's level, while its players keep their order;
+- the venue rules R1–R3 (three new maps, below); clubs only; nrl-2008 kept as shipped; nothing before 2008.
+
+### The source
+
+NRL.com's match centre, the same endpoints the built-in season reads (`scripts/sync-nrl.mjs`): the draw of every round
+(`https://www.nrl.com/draw/data?competition=111&season=<year>&round=<n>`) and each finished game's reply (its
+`matchCentreUrl` + `data`): team lists (each player's place and jersey) and every player's stats. NRL.com keeps them from
+1998, with the eleven stats counted here from 2003 and NRL Fantasy's own points from 2013.
+
+- **Terms.** robots.txt (read 2026-11-09): `User-agent: *` with no Disallow. The terms of use redirect to an account
+  sign-in, which was not followed, so they were not read; the replies state no licence. The data are the NRL's: each
+  season names NRL.com as its `source.provider` and the setup note says where the ratings come from.
+- **Download.** Every premiership game of 2007 to 2026 (each computed season and the two either side): 4,036 games and
+  613 draw pages, into the ignored `data-src/rugby-league-seasons/nrlcom/` (`draw/111-<season>[-<round>].json`,
+  `match/nrl-premiership_<season>_<round>_<game>.json`), each reply kept as received. 2,606 requests on 2026-11-09, one
+  at a time and at least 1.2 seconds apart, fetched the games of 2009–2013, 2018–2023 and 2026, most of 2007, and the
+  draws of 2007 and 2026 (every reply 200; `FETCH-LOG.tsv` beside them). The rest the research pass had downloaded the
+  same day by the same endpoints (the games of 2008, 2014–2017, 2024 and 2025, the draws of 2008–2025), copied after
+  checking each against its SHA-256 list (`SOURCE.txt`). `node scripts/sync-rugby-league-seasons.mjs --fetch` downloads
+  whatever is missing.
+- **Pins.** A reply carries stamps and image links that change between requests, and old replies name grounds by
+  today's names (the 2009 Cowboys at "1300SMILES Stadium"), so a pin covers what is read, as JSON: a season's rounds
+  (`nrlcom/<season>`) and each round's finished games in its draw with their team lists and stats
+  (`nrlcom/<season>/<round>`), 613 pins in `scripts/data/rugby-league-seasons-sources.json`, one input a line. Grounds
+  come from the manifest, never from the replies.
+- **The Rugby League Project** (rugbyleagueproject.org, robots.txt read 2026-11-09: no query strings, no
+  `/matches/Custom` or `/matches/s|m|p|r/`), one request every three seconds, only for the players NRL.com never shows
+  starting (below): his club's season page (`seasons/nrl-<year>/<club>/players.html`) for his RLP id, then his player
+  page for its "Position(s)". 370 requests, every one answered: 354 pages read and pinned by the part read, and each
+  season's summary page, whose club links gave the manifest's `rlp` slugs. A player page's pin (shared with 2008's) now
+  covers his name, date of birth and positions, so 2008's 20 player pins changed; its snapshot did not.
+- **One player, two ids.** NRL.com lists the Titans' Ben Nakubuwai under two ids in 2017 (503511 in round 24, 100007912
+  in round 26); the Rugby League Project's 2017 Titans list has him once. `nrlcom.aliases` in the
+  manifest plays the second as the first, and the sync stops on any other name a club lists under two ids.
+
+### The method
+
+`scripts/lib/rugby-league-seasons.mjs` ("the computed seasons"), step by step, as each season's `source.conversion`
+states it.
+
+1. **Players.** Everyone NRL.com lists taking the field in a premiership game of the season, regular season and finals.
+   A player listed at a position started there (`tookField`); one named off the field at kick-off (`Interchange`, the
+   18th man's `Replacement`, the 19th's `Reserve`) played only if NRL.com gives him minutes or any counted stat: an
+   unused 18th man has neither. Minutes are missing for some bench players (344 in 2013, 334 of them with stats) and for
+   both sides of one 2017 game, so the stats decide there. His club is the one he played most games for; of two as many,
+   the one he played for last.
+2. **Position.** The position he started at most that season, by the team lists, whatever his jersey: the lists give
+   the place at kick-off (a starting prop may wear 15; in the 2022 qualifying final the Panthers' number 9, Apisai
+   Koroisau, is listed on the interchange and their 14, Mitch Kenny, at hooker). Of two as often, the one he started at
+   last. A player who never started takes his most-started position in the seasons either side, then two
+   either side (NRL.com's player ids hold across seasons), then the first of his career positions on the Rugby League
+   Project, matched by name at his club that season (the whole name, or the surname and initial when one player fits;
+   "Utility Forward" names no position); else he is left out, and the audit says why.
+3. **Value: core points a club game.** NRL Fantasy's points for the eleven stats NRL.com has kept since 2003 (`CORE`;
+   least squares on NRL.com's own fantasy totals, 7,344 player-games of 2025, recovers each weight). Goals and field
+   goals count nowhere, as in 2008's overall: the match model converts every try at the NRL's rate, whoever kicks.
+
+   | Stat | Points | Why |
+   | --- | --- | --- |
+   | Try | 8 | what the game is played for |
+   | Try assist | 5 | the last pass or kick before a try |
+   | Line break | 4 | a run through the defensive line |
+   | Line-break assist | 2 | the pass that puts a runner through |
+   | Tackle | 1 | defence, most of the middle forwards' work |
+   | Missed tackle | −2 | lets the attack through |
+   | Tackle break | 2 | beating a tackler in contact |
+   | Offload | 4 | keeps the ball alive through the tackle |
+   | Error | −2 | hands the ball over |
+   | Run metres | 1 every 10 | the forwards' and outside backs' work |
+   | Kick metres | 1 every 30 | territory, the halves' and fullbacks' work |
+
+   A player's value is his season's core points over his club's games that season (the mean of his clubs' where he
+   played for two), with the season before at half weight when he played in it: (P + ½·P₋₁) / (G + ½·G₋₁). Counting club
+   games, not his own, rewards the player who was there every week; the season before softens an injury year. Points are
+   added in thirtieths, so they are exact; the value keeps six decimals.
+4. **Overall.** The value's mid-rank percentile among the season's players at his position (ties share one), read off
+   Rugby League 26's overalls at that position by linear interpolation, as many of each 2025 club's best there as the
+   season's clubs carry per club (the quota, 2008's rule: a 2016 backup meets 2025's backups), rounded and held to 1–99.
+5. **Club shift.** The season's results set each club's level, while its players keep their order. Each club's Simple
+   Rating System is fitted to its regular season by least squares (margin = home rating − away rating + one home edge,
+   the ratings summing to zero, solved exactly; `srsOf`), so a club that lost to strong sides by little rates above one
+   that beat weak sides by little. The sixteen (or seventeen) ratings are ranked (mid-rank percentiles) and read off the
+   built-in 2025 clubs' strengths (81.8–85.1): each club's target. Every player of the club then moves by the one whole
+   number that brings its matchday 17's strength closest to the target (of two as close, the smaller move), held to
+   1–99: 2008's shift, with the season's own margins where 2008 used the game's team rating. Margins, not ladder points:
+   the 2010 Storm, stripped of their points for salary-cap breaches, rate by their play, as do the 2016 Eels, docked 12.
+
+The snapshot `scripts/data/rugby-league-seasons/nrl-<year>.json` holds the weights with their reasons, every player's
+summed stats for the season and the season before, his clubs and games, value, overall and shift, each club's games,
+SRS, target and shift, the quota and reference at each position, the players left out, and the regular season's
+results, so the test recomputes every overall and every shift from it alone.
+
+### The seasons
+
+| Season | Games | Players | Placed by: season / ±1 / ±2 / RLP | Left out | Clubs, shifted | Shifts | Home edge | Clubs against wins: stats → shifted |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2009 | 201 | 449 | 398 / 30 / 11 / 10 | 4 | 81.7–85.2 | −2 to +2 | 3.8 | 0.48 → 0.72 |
+| 2010 | 201 | 448 | 395 / 31 / 6 / 16 | 5 | 81.5–85.1 | −2 to +2 | 4.3 | 0.06 → 0.82 |
+| 2011 | 201 | 465 | 417 / 32 / 9 / 7 | 3 | 81.4–84.9 | −1 to +2 | 3.2 | 0.55 → 0.92 |
+| 2012 | 201 | 436 | 388 / 31 / 6 / 11 | 2 | 81.5–84.9 | −1 to +1 | 1.8 | 0.45 → 0.91 |
+| 2013 | 201 | 457 | 400 / 32 / 11 / 14 | 4 | 81.3–84.6 | −1 to +1 | 4.1 | 0.72 → 0.94 |
+| 2014 | 201 | 461 | 404 / 30 / 7 / 20 | 2 | 81.7–84.8 | −1 to +1 | 4.4 | 0.54 → 0.87 |
+| 2015 | 201 | 445 | 381 / 29 / 19 / 16 | 2 | 81.4–85.2 | −1 to +1 | 3.5 | 0.80 → 0.85 |
+| 2016 | 201 | 448 | 397 / 28 / 4 / 19 | 1 | 81.6–84.8 | −2 to +2 | 1.7 | 0.62 → 0.90 |
+| 2017 | 201 | 440 | 379 / 33 / 11 / 17 | 3 | 81.5–84.8 | −1 to +1 | 0.3 | 0.57 → 0.86 |
+| 2018 | 201 | 437 | 383 / 35 / 13 / 6 | 3 | 81.4–84.9 | −1 to +1 | 2.4 | 0.54 → 0.84 |
+| 2019 | 201 | 451 | 398 / 36 / 9 / 8 | 1 | 81.9–84.7 | −2 to +1 | 3.3 | 0.44 → 0.87 |
+| 2020 | 169 | 466 | 419 / 26 / 6 / 15 | 1 | 81.5–84.9 | −1 to +1 | 2.4 | 0.83 → 0.87 |
+| 2021 | 201 | 494 | 437 / 27 / 11 / 19 | 0 | 82.2–84.7 | −1 to +1 | 1.1 | 0.89 → 0.93 |
+| 2022 | 201 | 476 | 412 / 37 / 11 / 16 | 0 | 81.6–85.1 | −2 to +1 | 2.7 | 0.75 → 0.87 |
+| 2023 | 213 | 500 | 445 / 30 / 6 / 19 | 2 | 81.8–84.8 | −1 to +1 | 2.0 | 0.67 → 0.88 |
+| 2024 | 213 | 507 | 445 / 34 / 5 / 23 | 1 | 81.4–85.5 | −1 to +2 | 2.4 | 0.40 → 0.85 |
+
+Home edge in points a game; the last column is the rank correlation of the clubs' strengths with their regular-season
+wins, from the players' stats alone and after the shift (a check: the shift is fitted to margins, not wins). Every club
+had 22 to 36 players and fields its matchday 17 from its own, each place from the place's own unit but one: the 2009
+Wests Tigers had one hooker, Robbie Farah, so a centre, Dene Halatau, is their bench hooker. The players rate 66–95 as
+played (overalls 67–93, median 79–80). The 34 left out are bench players of one to ten games: 22 whose Rugby League Project page gives no
+position (some say only "Utility Forward"), 12 whom it lists under another name (Sione Kite is its John Kite). The
+audit (`docs/design/rugby-league-seasons-audit.json`) names every one, every player RLP placed, each club's SRS and
+shift, and the best-rated dozen.
+
+**Calibration** (cross-checks only; nothing here sets a rating):
+
+- **Against Rugby League 26.** The same method run on 2025 (its seasons either side, 2023–2026; the 30 players NRL.com
+  never shows starting not looked up) against the game's ratings of the 2025 players: 449 players, Spearman 0.761 within
+  position (Rugby League 26's positions), mean error 2.72 points; the value alone 0.765.
+- **Against the games of 2015 and 2017.** Rugby League Live 3 and 4 rate players inside the games; their databases
+  survive in Blobset-Tools' save editor on GitHub (Big Ant's data, no licence, so only read for this check), with the
+  editor's own overall formulas. Matched once by name: 2015, 415 of 445 players, Spearman 0.70 within position (0.69 by
+  the game's positions); 2017, 421 of 440, 0.74 (0.71). The two games agree with each other at 0.53 (the research
+  pass's figure, 227 players): the computed ratings track each game better than the games track each other.
+- **Year to year.** The same player at the same position in consecutive seasons: Spearman 0.69–0.82 (276–339 players a
+  pair), a mean change of 2.4–2.9 points.
+- **Realism.** 40 seeded seasons of each (`--realism`, 24 games at a neutral venue): the model's wins rank against the
+  real season's at 0.73–0.93 (2008's: 0.32). Points a team 22.9–23.4 (real 19.6–23.4: the model is tuned on 2021–2025,
+  and the 2010s scored less), mean margin 15.7–16.9 (real 12.8–18.3), win% spread 0.156–0.179 (real 0.124–0.226), best
+  and worst records 18.9–19.8 and 4.0–5.7 wins of 24 (real 16–21.6 and 1–8).
+
+**Spot checks against the record** (NRL.com's results; the grand finals from its finals games). The strongest club of
+each computed season is its best by margin. That is the premier in 2010 (the Dragons), 2011 (Manly), 2012 (Melbourne),
+2013 (the Roosters), 2014 (the Rabbitohs), 2017 (Melbourne), 2018 (the Roosters), 2022 and 2023 (Penrith); in 2009,
+2015, 2016, 2019, 2020 and 2021 it is the minor premier (the Dragons, the Roosters, Melbourne three times, Penrith),
+the premiers second (2009, 2019–2021) or fourth (2015, 2016); in 2024 the Roosters, ahead of Melbourne (minor
+premiers), Cronulla and Penrith (premiers). The 2009 Bulldogs, 18 wins but docked two points (the Rugby League
+Project's ladder), rate third, as do the 2010 Storm, 14 wins and stripped of every point. The best-rated dozen of each
+season (the audit's `best`) are the
+period's stars, with the box score's leanings: Cooper Cronk (2009–2012), Billy Slater (2009–2013) and Cameron Smith
+(2011–2019) of Melbourne; Daly Cherry-Evans in every season from his first, 2011 (top three in ten of them); Andrew
+Fifita (2013, 2016–2019); Greg Inglis (2013–2014) and Sam Burgess (2014); Jarryd Hayne (2011, 2014); James Tedesco
+(2017–2024); Payne Haas (2020–2023); Nathan Cleary (2020, 2021, 2023); Isaah Yeo (2018, 2021, 2023, 2024). Johnathan
+Thurston, the halfback of North Queensland's 2015 title, rates 90 that year, outside the dozen: the box score sees his
+kicking as metres and his goals not at all.
+
+### Clubs and maps
+
+The sixteen clubs of 2008 play every season to 2022, the Dolphins join in 2023 (seventeen). Every club keeps today's id,
+name, code, colour and crest, except the Bulldogs in 2009, still "Bulldogs" (`nrl-bulldogs`, BUL, no crest) as in 2008;
+from 2010 they are Canterbury-Bankstown again. `teams` in `scripts/data/rugby-league-seasons.json` lists each season's
+clubs with its NRL.com nickname (`list`), its Rugby League Project slug that season (`rlp`) and its ground; `nrlcom`
+names each NRL.com team id's club, the same in every season. A club grows from its own ground, or from its training base
+when it shares one (the Bulldogs and Rabbitohs at Accor Stadium, the Wests Tigers at three grounds), as today. Three
+rules keep the maps few (decided 2026-11-09, as the research proposed):
+
+- **R1, a ground being rebuilt stays the club's.** The built-in season does the same for the 2025 Panthers. The Eels
+  played at ANZ Stadium in 2017 and 2018 while Parramatta Stadium was rebuilt, and the Roosters at the SCG from 2019
+  until the new Allianz Stadium opened in August 2022: both keep their own sites.
+- **R2, COVID-19 relocations are ignored:** the Warriors at Gosford in 2020 and 2021 and at Redcliffe in 2022, the Storm on
+  the Sunshine Coast in 2020. Otherwise New Zealand and Victoria would be empty and the Storm a Queensland club.
+- **R3, a rename on the same site does not split a map:** Dairy Farmers Stadium became 1300SMILES Stadium in 2013, the
+  Sydney Football Stadium became Allianz Stadium in 2012, and the new Western Sydney Stadium (2019) stands on Parramatta
+  Stadium's site. A ground no longer played at keeps its name of the era's first season; one still played at, its
+  present name (NRL.com's replies use today's names for old grounds, so names come from the manifest).
+
+| Map | Seasons | Grounds and bases that set it apart |
+| --- | --- | --- |
+| `nrl2008` | 2008, 2009 | the Bulldogs ("Bulldogs") train at Sydney Olympic Park, the "Homebush" territory; the Storm at Olympic Park Stadium |
+| `nrl2010` (new) | 2010, 2011 | Canterbury-Bankstown, still at Sydney Olympic Park until October 2011; the Storm at AAMI Park from its opening |
+| `nrl2012` (new) | 2012–2019 | the Bulldogs back at Belmore Sports Ground ("Canterbury"); the Cowboys at Dairy Farmers Stadium; the Roosters at the old stadium (Allianz Stadium) |
+| `nrl2020` (new) | 2020–2022 | the Cowboys at the North Queensland Stadium (Queensland Country Bank Stadium); the Roosters' new stadium; the Eels at CommBank Stadium; the Rabbitohs still at Redfern Oval |
+| `nrl` (today's) | 2023, 2024 | the Dolphins at Kayo Stadium, the Rabbitohs at the Heffron Centre (from April 2023): today's clubs and grounds |
+
+`node scripts/build-club-maps.mjs --league=nrl` builds them (about 134 KB each). Its `nrlSpecs` checks that every season
+of a map has the same clubs at the same grounds, and that the seasons of `nrl` are today's (`scripts/data/nrl-teams.json`),
+which it builds once, as `nflSpecs` does for the NFL. Adding 2009 to `nrl2008` changed that map's `seasons` and version,
+not its shapes; a saved 2008 campaign is moved club by club onto the new version, as any rebuilt map's is.
+
+### Season quirks
+
+- **2010.** The Storm were stripped of every competition point for salary-cap breaches: their ladder says 0, their play
+  14 wins. The SRS reads margins, so they rate by their play.
+- **2016.** The Eels were docked twelve points for the same: again the margins decide.
+- **2020.** Twenty rounds (169 games, the COVID-19 season). A value is points a club game, so the short season rates on
+  the same scale as the others; the season before still weighs half its games.
+- **2021.** Played largely in Queensland hubs, the most lopsided season of the period (mean margin 18.3); the SRS takes it
+  as it was.
+- **2023–2024.** Seventeen clubs and a bye each round.
+
+### Files
+
+`scripts/sync-rugby-league-seasons.mjs` (`--fetch`, `--pin`, `--check`) writes `scripts/data/rugby-league-seasons/
+nrl-2009.json` … `nrl-2024.json`; `scripts/build-rugby-league-seasons.mjs` (`--check`, `--realism`) writes
+`public/rugby-league/nrl-<year>.json` (kind `nrl`, `source.method` "computed" with `metric` and `conversion`, which the
+loader requires), the listing `src/data/rugbyLeagueSeasons.js` and the audit; rules in
+`scripts/lib/rugby-league-seasons.mjs`. The audit, `docs/design/rugby-league-seasons-audit.json`, gives each season's
+players by how they were placed, the players left out and why, each club's SRS, target and shift, the best-rated players,
+and the real season's figures.
+
+### Limits
+
+- **A computed rating is a box-score rating.** It sees what the match centre counts: a forward's tackles and metres
+  more than a half's organising, a fullback's kick returns more than his positioning, and nothing of a kicker's goals.
+  It agrees with Rugby League 26 at 0.76 within position on 2025, not exactly.
+- **Injured stars rate low** in a season they missed much of: the value counts club games, and only the season before
+  softens it.
+- **The club order comes from the results** (decided 2026-11-09): unlike 2008's, a computed season's club strengths are
+  fitted to the season they play, so a campaign's strongest clubs are the season's best by margin.
+- **Positions are one each,** the most-started; a utility plays where he started most. A player NRL.com never shows
+  starting in five seasons takes the Rugby League Project's first career position.
+- **Every kicker converts at the NRL's rate:** the season file has no goal tally (the snapshot keeps each player's goals
+  and field goals, which nothing reads yet), so a computed side's penalty goals go to its halfback, as 2008's do.
+- **No nations.** A nations game plays the built-in 2025 nations; the season's Tests (NRL.com competitions 133, 131 and
+  195) could field them later.
 
 ## Tests
 
@@ -321,6 +559,16 @@ kicker; the running App launching on the map and saving. `scripts/simulation-rea
 and its home sides, `scripts/home-advantage.test.mjs` the edge and the live chart at home, `scripts/club-maps.test.mjs`
 the map's state rule with Australian and New Zealand towns. `npm run smoke` adds an NRL duel with the live ticker and a
 rugby league nations blitz of Asia and Oceania.
+
+`scripts/rugby-league-seasons.test.mjs` covers the earlier seasons: all seventeen rebuild byte for byte, and their
+snapshots from the pinned inputs when `data-src/rugby-league-seasons/` is present. For 2008, the reader, the naming
+check, the weights and every overall, the club shift and the map. For the computed seasons: NRL Fantasy's eleven
+weights with a reason each and the season before at half weight; who took the field (a prop in 15 started, an unused
+18th man has no game) and the order positions come from; every value, overall, SRS, target and shift recomputed from
+each snapshot; sixteen clubs to 2022 and the Dolphins from 2023, the 2009 Bulldogs, each era's grounds and map; the City
+of Parramatta cut only while the Bulldogs trained at Olympic Park; four seasons played 40 times with the model's wins
+ranking against the real ones at 0.6 or better; the loader's rules; and the App launching a 2015 campaign on `nrl2012`,
+saving and resuming it, and a 2023 one on today's map.
 
 ## Known limits
 
@@ -338,3 +586,7 @@ rugby league nations blitz of Asia and Oceania.
   two, smaller even than Washington's District of Columbia; Parramatta and Penrith take the west of the state.
 - **One conversion rate.** Every kicker converts 75.5%: the game's overall says nothing of goal-kicking.
 - **No two-point field goals, sin bins or penalty counts:** a try, a goal and a field goal are all there is.
+- **Nothing before 2008.** NRL.com keeps team lists and stats back to 1998 and the same method would rate them, but
+  those seasons have clubs that are gone (the Adelaide Rams, the Gold Coast Chargers, Illawarra and St George to 1998,
+  Balmain, Western Suburbs and North Sydney to 1999, the Northern Eagles to 2002), whose maps the builder does not draw.
+  NRL.com's replies before 1998 carry scores only; 1997 had two competitions.
