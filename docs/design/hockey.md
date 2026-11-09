@@ -545,11 +545,13 @@ weights, 2004/05 skipped, the club by most games); the mid-rank ratings, ties an
 computed rating NHL 27's and every group's order kept; the stars and clubs of known seasons; the
 calibration against the five editions (F ≥ 0.84, D ≥ 0.75, G ≥ 0.59, players ≤ 2.8 and clubs ≤ 1.7
 apart; minutes a game better for NHL 22; goals against within 0.03 of save percentage); nations from
-1977/78; the birth-city rule; NHL 08 and NHL 09 (the attribute lists, the 255 rows, NHL 07's
-self-check from the pinned pages); the eras (club counts, the Seals and Barons, the 1979/80 Whalers
-at Springfield, the editions' lists reproduced); every map serving its seasons; the loader's
-refusals; and the running App playing a 1967/68 clubs campaign, a 1985/86 nations campaign and
-resuming a 2006/07 campaign saved on `nhl2007` before it served more seasons.
+1977/78; the birth-city rule; the names MoneyPuck dropped letters from put back; NHL 08 and NHL 09
+(the attribute lists, the 255 rows, the three rows broken pages hide, NHL 07's self-check from the
+pinned pages); the eras (club counts, the Seals and Barons, the 1979/80 Whalers at Springfield, the
+editions' lists reproduced); every map serving its seasons; the loader's refusals; and the running
+App playing a 1967/68 clubs campaign, a 1985/86 nations campaign, a 2025/26 clubs campaign on today's
+map and a 2007/08 nations campaign (each saved and the last two resumed), and resuming a 2006/07
+campaign saved on `nhl2007` before it served more seasons.
 
 `scripts/hockey.test.mjs`: the data rebuilds byte for byte; EA's ratings unchanged, every
 other rating marked and under the cut-off; namesakes apart; lineups, depth and the position
