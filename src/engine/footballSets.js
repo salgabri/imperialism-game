@@ -23,6 +23,7 @@ import { BUILT_IN_HOCKEY_SEASONS } from '../data/hockeySeasons.js';
 import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
+import { FLAG_CODES } from '../data/flags.js';
 import { basketball } from '../sports/basketball.js';
 import { americanFootball } from '../sports/americanFootball.js';
 import { tennis } from '../sports/tennis.js';
@@ -307,6 +308,8 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
  */
 export function decodeFootballSet(data, id = data?.id) {
   validateFootballSet(data, String(id));
+  // The federations of the day it plays (`meta.identities`, men's football only): seasonSport plays them as playsAs.
+  if (data.identities !== undefined) data = { ...data, identities: frozenIdentities(data.identities) };
   if (['nba2k', 'madden', 'tecmo', 'pfa', 'nrl'].includes(setKindOf(data.id))) {
     const { clubs, ...meta } = data;
     return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(player => [...player]) })), territory: NO_TERRITORY };
@@ -505,6 +508,7 @@ function validateFootballSet(data, id) {
   if (typeof src.url !== 'string' || !/^https?:\/\/\S+$/i.test(src.url)) fail('source url must be an http(s) link');
   if (data.coverage != null && (!isObject(data.coverage)
     || Object.values(data.coverage).some(n => !Number.isInteger(n) || n < 0))) fail('coverage must hold counts');
+  if (data.identities !== undefined) validateIdentities(data, id, fail);
   if (setKindOf(id) === 'nba2k') return validateBasketballClubs(data, id, fail);
   if (setKindOf(id) === 'show') return validateBaseballSeason(data, id, fail);
   if (setKindOf(id) === 'elo' || setKindOf(id) === 'wta') return validateTennisSeason(data, id, fail);
@@ -608,6 +612,51 @@ function validateFootballSet(data, id) {
     if (idle.length) fail(`territory makes listed nations ${idle.slice(0, 5).join(', ')} inactive or merged`);
   }
 }
+
+const foldName = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+/**
+ * A men's football season of another era names the federations of its day it plays (`identities`, from
+ * src/data/footballSetBuild.js identitiesFor: `{ '643': { name: 'Soviet Union', code: 'URS', flagId: 'URS' } }`), any
+ * football kind. Each names a nation the season fields (listed with players, neither merged nor inactive), a name and a
+ * three-capital code no other nation of the season plays under, and a flag the game has (src/data/flags.js). Checked
+ * before the kind's own rules, so it reads nations and territory warily.
+ */
+function validateIdentities(data, id, fail) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
+  if (setSportOf(id) !== 'football') fail('only a men\'s football season plays nations under identities of their day');
+  const identities = data.identities;
+  if (!isObject(identities) || !Object.keys(identities).length) fail('identities must name at least one nation');
+  const nations = isObject(data.nations) ? data.nations : {};
+  const merged = isObject(data.territory?.merged) ? data.territory.merged : {};
+  const inactive = Array.isArray(data.territory?.inactive) ? data.territory.inactive : [];
+  const fielded = shape => Object.hasOwn(NATIONS, shape) && Object.hasOwn(nations, shape) && Array.isArray(nations[shape]?.[2])
+    && nations[shape][2].length > 0 && !Object.hasOwn(merged, shape) && !inactive.includes(shape);
+  // The names and codes the season's other nations play under.
+  const codes = new Map(), names = new Map();
+  for (const shape of Object.keys(nations)) {
+    if (!fielded(shape) || Object.hasOwn(identities, shape)) continue;
+    codes.set(NATIONS[shape][1], shape);
+    names.set(foldName(NATIONS[shape][0]), shape);
+  }
+  for (const [shape, identity] of Object.entries(identities)) {
+    const at = `identities[${shape}]`;
+    if (!fielded(shape)) fail(`${at} names no nation the season fields`);
+    if (!isObject(identity) || Object.keys(identity).sort().join() !== 'code,flagId,name') fail(`${at} must be { name, code, flagId }`);
+    const { name, code, flagId } = identity;
+    if (typeof name !== 'string' || !name.trim() || name !== name.trim()) fail(`${at} has no name`);
+    if (typeof code !== 'string' || !/^[A-Z]{3}$/.test(code)) fail(`${at} code ${JSON.stringify(code)} must be three capitals`);
+    if (typeof flagId !== 'string' || !Object.hasOwn(FLAG_CODES, flagId)) fail(`${at} flag ${JSON.stringify(flagId)} is not one the game has`);
+    if (codes.has(code)) fail(`${at} code ${code} is ${codes.get(code)}'s too`);
+    if (names.has(foldName(name))) fail(`${at} name ${JSON.stringify(name)} is ${names.get(foldName(name))}'s too`);
+    codes.set(code, shape);
+    names.set(foldName(name), shape);
+  }
+}
+
+/** A set's identities, copied and frozen, so a decoded set's sport cannot change the file it came from. */
+const frozenIdentities = identities => Object.freeze(Object.fromEntries(Object.entries(identities)
+  .map(([shape, { name, code, flagId }]) => [shape, Object.freeze({ name, code, flagId })])));
 
 /**
  * A basketball season's clubs: the NBA's of that season, one per section of its era's map (`map`), each with its best
@@ -934,6 +983,9 @@ export function seasonSport(set) {
       : { ...football, rosters, clubs, territory,
         // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
         fallbackStrength: () => EMPTY_STRENGTH, ...identity };
+    // A season of another era plays the federations of its day under their own names, codes and flags (the Soviet
+    // Union on Russia's shape), as Great Britain plays on England's: teams.js nationIdentity reads `playsAs`.
+    if (meta.identities && sport.id === 'football') sport = { ...sport, playsAs: { ...sport.playsAs, ...meta.identities } };
     sports.set(set, sport);
   }
   return sport;
