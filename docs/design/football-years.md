@@ -352,7 +352,8 @@ the 1994 finalists, Russia and Germany among them, all under their own names.
 
 - `nations` has an entry for **every** one of the 176 nations, even an empty
   one, so the hand-tuned built-in `fallbackStrength` never applies to another
-  season. A set built before the map had the home nations lists none of
+  season (a computed World Cup season lists its finalists only, each with its
+  eleven: [below](#computed-world-cup-seasons)). A set built before the map had the home nations lists none of
   `SCO`, `WAL` and `NIR`: it still loads, and England holds their land. An empty entry is `[40, 0, []]`, which is what `build-rosters` writes
   for an empty pool. Tonga, Samoa and the Cook Islands (`776`, `882`, `184`) are
   all listed or none: a builder lists them only when its source rates one of their
