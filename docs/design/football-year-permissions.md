@@ -23,6 +23,14 @@ non-commercial use, data rights reserved), SI's CM3 data as Cam F ported it, SI'
 CM 97/98 database as baskeyx extracted it, and Sensible World of Soccer 96/97's
 national squads. No Update Team or retro-team database is among them.
 
+On 2026-11-09 the user chose to fill 2000/01 and 1999/00 the same way: SI's own
+Championship Manager 00/01 (original release 3.81, the UK release-day database
+rather than SI's later European pressing) and CM 99/00 (original release 3.70),
+read data-only from users' uploads of the retail CDs to archive.org, credited to
+Sports Interactive with the archive.org item as each season's source link
+([football-years.md](football-years.md#sis-cm-0001-and-cm-9900-read-from-their-cds-200001-and-199900)).
+Neither game was ever made free, and no one has licensed their data.
+
 ## 1. To the CM 01/02 Update Team
 
 **Subject:** Permission to use the official databases in a free open-source game

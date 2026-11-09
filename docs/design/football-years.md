@@ -6,7 +6,9 @@ always-visible Season choice, 2026-10-30; FIFA 07 – FIFA 14 from two scrapes o
 EA's rosters, and the earlier basketball seasons from 2K Archive's NBA 2K
 ratings, on maps of their eras, 2026-10-30; FIFA 05 and FIFA 06, nations only,
 2026-11-07; five seasons before them, 2002/03 to 1996/97, from SI's CM 01/02, CM3
-and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08. The CM 01/02
+and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08; 2000/01 and
+1999/00 from SI's own CM 00/01 and CM 99/00 databases, read from their retail CDs,
+2026-11-09. The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -21,9 +23,9 @@ kinds:
 - **The built-in earlier seasons** (2004/05 to 2025/26): one EA FIFA / FC
   roster each, committed under `public/football/ea-*.json` and offered in every
   setup. See [Built-in earlier seasons](#built-in-earlier-seasons). Before them,
-  five more from 2002/03 back to 1996/97: SI's own CM 01/02 databases, its CM3
-  and CM 97/98 data, and SWOS 96/97's national squads. See
-  [Seasons before FIFA 05](#seasons-before-fifa-05).
+  seven more from 2002/03 back to 1996/97: SI's own CM 01/02, CM 00/01 and CM
+  99/00 databases, its CM3 and CM 97/98 data, and SWOS 96/97's national squads.
+  See [Seasons before FIFA 05](#seasons-before-fifa-05).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
   downloaded, built on their computer. Until the database authors allow
   redistribution these stay local: the user puts the database in the ignored
@@ -85,7 +87,8 @@ The format is in [cm0102-format.md](cm0102-format.md). A database is identified
 by the sizes of its `club.dat` and `staff.dat`, a pair that is unique across the
 48 releases in `cm0102Releases.js`. The manifest gives each release's season,
 release month, forum topic, author and per-field date shifts, and SI's own 3.9.x
-databases are recognised the same way. The builder also estimates the birth-year
+databases are recognised the same way, as are SI's CM 99/00 and CM 00/01 files
+([below](#sis-cm-0001-and-cm-9900-read-from-their-cds-200001-and-199900)). The builder also estimates the birth-year
 shift from famous players' known birthdays, counting each person once. For an
 unknown folder, a conclusive estimate that disagrees with `--dob-shift` stops
 the build. For a known release, it raises a loud warning and the manifest's shift
@@ -216,7 +219,7 @@ names the provider and reads "Game rating converted from CM current ability".
 ## Built-in earlier seasons
 
 Twenty-two seasons ship with the game, every season from 2004/05 to 2025/26
-(and five before them, [below](#seasons-before-fifa-05)).
+(and seven before them, [below](#seasons-before-fifa-05)).
 [EA FC 25](#ea-fc-25) and [FIFA 07 to FIFA 14](#fifa-07-to-fifa-14) are described
 below, and so are [FIFA 05 and FIFA 06](#fifa-05-and-fifa-06),
 which have nations only. Ten, 2014/15 to 2023/24, are the launch roster
@@ -464,31 +467,38 @@ at least one player. FIFA 06 takes 8,131 nationalities from later editions and
 
 ## Seasons before FIFA 05
 
-Five more seasons ship with the game, from 2002/03 back to 1996/97, one source
+Seven more seasons ship with the game, from 2002/03 back to 1996/97, one source
 each. `npm run build:retro-seasons` (`scripts/build-retro-seasons.mjs`, manifest
 `scripts/data/retro-seasons.json`, audit `docs/design/football-retro-seasons-audit.json`)
 reads every source from the gitignored `data-src/`, pinned by SHA-256 and by the
-commit it was downloaded from, and `--check` rebuilds the five files, the listing
+commit it was downloaded from (or, for the two read from CDs, by the CD image it
+was read from), and `--check` rebuilds the seven files, the listing
 `src/data/footballSeasons.js` (which `npm run build:ea-seasons` writes alike) and
 the audit byte for byte. None of these sources grants redistribution; the user
 chose to ship them, credited to their makers, and each season's source block names
 its maker (`provider`), who compiled or ported it (`compiler`), where it comes from
-(`url`) and when it was read (`retrieved`).
+(`url`) and when it was read (`retrieved`; a season read later than the others
+names its own day in the manifest).
 
 | Season | Id | Source | Nations with players (full XIs) | Clubs |
 | --- | --- | --- | --- | --- |
 | 2002/03 | `cm0102-2002-11` | SI's CM 01/02 3.9.68 | 162 (108) | 129 |
 | 2001/02 | `cm0102-2001-09` | SI's CM 01/02 3.9.60 | 143 (96) | 130 |
+| 2000/01 | `cm-0001` | SI's CM 00/01 3.81, from its UK retail CD | 134 (82) | 130 |
+| 1999/00 | `cm-9900` | SI's CM 99/00 3.70, from its UK retail CD | 123 (74) | 130 |
 | 1998/99 | `cm0102-2020-11-cm3` | SI's CM3 data, ported to CM 01/02 | 113 (64) | 130 |
 | 1997/98 | `cm-9798` | SI's CM 97/98, extracted to JSON | 102 (52) | 124 |
 | 1996/97 | `swos-9697` | Sensible World of Soccer 96/97's national squads | 133 (133) | nations only |
 
-The four seasons with clubs play on their own Europe maps (`eu124s2003`,
+The six seasons with clubs play on their own Europe maps (`eu124s2003`,
 `eu32s2003` … `eu124s1998`, `eu32s1998`), built by `npm run build:europe-maps`
-like the EA seasons'. Their clubs' grounds are 107 new rows of
+like the EA seasons'. Their clubs' grounds are 114 new rows of
 `scripts/data/europe-clubs.json`: a club the table already placed under another
-name takes that row (`Real Madrid C.F.`, `F.C. Barcelona`), 14 take a country
-map's row, and 11 are placed by hand from their grounds' Wikidata or Wikipedia
+name takes that row (`Real Madrid C.F.`, `F.C. Barcelona`; for 2000/01 and
+1999/00 `C.D. Numancia`, `As.Troyes Aube Champagne`, `Sporting Clube Farense`
+and `Futebol Clube Paços de Ferreira`), 17 take a country map's row (2000/01 and
+1999/00 add Bradford City at Valley Parade, SpVgg Unterhaching and SSV Ulm 1846),
+and 11 are placed by hand from their grounds' Wikidata or Wikipedia
 coordinates (Varzim, Salgueiros, Leça, Mérida, Extremadura, Compostela,
 Salamanca, RBC Roosendaal, and Wimbledon at Selhurst Park, which it shared with
 Crystal Palace from 1991 to 2003). `--boundaries=<dir>` reads another worktree's
@@ -511,6 +521,89 @@ boundary cache.
   listed and field what the database rates.
 - **Rights**: Eidos made CM 01/02 free to download in December 2008, for
   personal, non-commercial use; the data's rights are reserved.
+
+### SI's CM 00/01 and CM 99/00, read from their CDs: 2000/01 and 1999/00
+
+- **Source**: SI's own databases of Championship Manager: Season 00/01
+  (original release 3.81; the UK CD was mastered on 6 October 2000 and the game
+  released on 27 October) and Season 99/00 (original release 3.70; CD mastered on
+  16 November 1999, released on 3 December 1999), from users' uploads of the
+  retail CDs to archive.org: [cm-0001-rel](https://archive.org/details/cm-0001-rel)
+  (`CM0001_rel.iso`, 702,269,440 bytes, 2048-byte sectors) and
+  [championship-manager-season-9900](https://archive.org/details/championship-manager-season-9900)
+  (`CM9900_REL.bin`, 806,512,560 bytes, raw MODE1/2352 sectors). Neither game was
+  made free, unlike CM 01/02. On 2026-11-09 the user chose to ship both, credited
+  to SI with the archive.org item as the source link, as for the CM3 port and
+  CM 97/98.
+- **The same tables**: both CDs' untouched Data files are CM 01/02's tables, with
+  SI's format-1 staff (157-byte people) as in 3.9.60 and 3.9.68, so the CM 01/02
+  reader and builder read them unchanged, as known releases of
+  `cm0102Releases.js`: ids `cm-0001` and `cm-9900`, editions `CM 00/01` and
+  `CM 99/00`, labels `3.81` and `3.70`. A `cm-<season>` id is kind `cm`, as CM
+  97/98's is, and the builder writes `kind: 'cm'` into such a set (the retro
+  build passes the manifest's kind, which must agree).
+- **Read from the CDs, data only**: `npm run sync:retro-cds`
+  (`scripts/sync-retro-cds.mjs`) fetches each season's eleven tables into
+  `data-src/cm0001-cd/` and `data-src/cm9900-cd/`. A CD installs its data from an
+  InstallShield 5 cabinet (`DATA1.CAB` and its header `DATA1.HDR`). The sync reads,
+  by HTTP range requests at least a second apart, only the volume descriptors and
+  the root directory (`scripts/lib/cd-image.mjs`), the header whole, and the
+  compressed bytes of the eleven tables (`scripts/lib/installshield5.mjs`): 15
+  requests and 4.9 MB for CM 00/01, 3.8 MB for CM 99/00. It checks the image's
+  size (the `Content-Range` total), its sector layout, volume name and creation
+  time, where the header and cabinet start, the header's SHA-256, each inflated
+  table's MD5 against the header, and each table's size and SHA-256 against the
+  manifest before writing it. No executable and no whole image is downloaded, and
+  nothing is run. `--image=<file>` reads a local copy of the same CD instead.
+  archive.org's robots.txt (read 2026-11-09) disallows only `/control/` and
+  `/report/`.
+- **Second copies**: the Dutch CM 99/00 CD (archive.org `cm-9900-nl`) has a
+  byte-identical cabinet header, so the same MD5 for every data file. CM 00/01
+  exists in two SI pressings: the UK one of 6 October 2000, read here, and a later
+  European one (archive.org `cm-0001`), which agrees on 96.3% of current abilities
+  (39,382 players matched by name and date of birth) and rates 1,866 more players,
+  with a few later transfers (Weah at Marseille rather than Manchester City). The
+  user chose the UK release-day database, as the EA seasons take the launch roster.
+- **One scale** with the seasons around them, so the conversion is CM 01/02's,
+  `round(ca * 99 / 200)`, with no offset (unlike CM 97/98's). For players matched
+  by name and real date of birth:
+
+  | From | To | Matched | Same CA | Mean change | Correlation |
+  | --- | --- | --- | --- | --- | --- |
+  | CM3 port (1998/99) | CM 99/00 | 15,637 | 70.5% | +2.0 | 0.947 |
+  | CM 99/00 | CM 00/01 | 22,544 | 61.8% | +2.6 | 0.931 |
+  | CM 00/01 | SI 3.9.60 (2001/02) | 35,810 | 50.3% | +0.7 | 0.924 |
+
+- **Dates of birth** are stored as real: the famous-player check finds 7 of 7
+  agreeing on a shift of 0 in both. CM 99/00 has 46,460 players, 28,020 rated;
+  CM 00/01 71,641, 48,617 rated, and four with a current ability below 0, unrated
+  and left out.
+- **Its own names**: CM 99/00 names the Eredivisie after its sponsor of the season,
+  `Dutch KPN-Telecompetition` (one more stored name in the builder's `LEAGUES`),
+  and spells Burkina Faso `Burkino Faso` (an alias in `cm0102Nations.js`). Its
+  `Zaire` placeholder (two players) fields no team, as in SI's later databases.
+- **Clubs**: the seven leagues whole, 130 clubs in each season (Premier League
+  and La Liga 20, the others 18). CM 00/01 rates one player of the Cook Islands,
+  so Tonga, Samoa and the Cook Islands are listed (176 nations); CM 99/00 rates
+  none of theirs (173).
+- **Checked against history**: 1999/00's strongest clubs are Juventus (86), Lazio
+  and Parma (85), Internazionale (84), Barcelona and Bayern (83); Monaco lead
+  Ligue 1; Vieri is at Inter, Anelka at Real Madrid, Shevchenko at Milan;
+  Sunderland, Bradford City and Watford are up in the Premier League, Bielefeld,
+  Unterhaching and Ulm in the Bundesliga, Saint-Étienne, Troyes and Sedan in
+  Ligue 1. Its strongest nations are Italy (89), France (88), Brazil (87) and
+  Argentina (85). 2000/01's strongest clubs are Lazio (87), Roma and Juventus
+  (86), Internazionale (85), Milan and Manchester United (84); Figo is at Real
+  Madrid, Crespo at Lazio, Batistuta at Roma and Anelka back at Paris
+  Saint-Germain; Charlton, Manchester City and Ipswich are up, so are Köln,
+  Bochum and Cottbus, and Lille, Guingamp and Toulouse.
+- **Territory**: in 1999/00 Kosovo is under the United Nations and Bhutan not yet
+  a FIFA member (both neutral), and FR Yugoslavia holds Montenegro; from 2000/01
+  Bhutan plays.
+- **Rights**: both games are SI's and Eidos's (now SEGA's and Square Enix's). The
+  archive.org items are users' uploads of the retail CDs (the 99/00 item's Public
+  Domain Mark and the 00/01 item's "open source software" collection do not apply
+  to the games), and the data's rights are reserved.
 
 ### SI's CM3 data, ported: 1998/99
 
@@ -655,16 +748,21 @@ harness's real range of 2.50–3.28 goals a game and 20.3–29.5% draws):
 | --- | --- | --- | --- |
 | 2002/03 (3.9.68) | 3.40 | 19.5% | 5.6% |
 | 2001/02 (3.9.60) | 3.41 | 19.8% | 5.7% |
+| 2000/01 (CM 00/01) | 3.52 | 19.2% | 5.2% |
+| 1999/00 (CM 99/00) | 3.56 | 18.5% | 5.1% |
 | 1998/99 (CM3) | 3.56 | 18.8% | 5.2% |
 | 1997/98 (CM 97/98) | 3.36 | 19.6% | 5.9% |
 | 2006/07, 2011/12, 2017/18, 2023/24 (EA) | 2.82–3.13 | 22.8–24.6% | 6.6–8.6% |
 
+(2000/01 and 1999/00 measured 2026-11-09 the same way, 45,800 games each; the
+same run gives 3.9.60 3.41 goals, 19.7% draws and 5.7% goalless.)
+
 1997/98 plays like the other CM seasons, its higher scale notwithstanding. All
-four score more and draw less than EA's seasons and than real leagues, because
+six score more and draw less than EA's seasons and than real leagues, because
 CM's current ability spreads a league's clubs wider: their strengths' standard
-deviation within a league is 5.4–5.9 rating points, against 3.4–3.8 in EA's
-seasons. That is the CM conversion's, as in any local CM 01/02 set, and nothing
-corrects it. SWOS 96/97's 133 nations, all against all, score 4.15 a game with
+deviation within a league is 5.4–5.9 rating points on average (6.2 in 1999/00),
+against 3.4–3.8 in EA's seasons. That is the CM conversion's, as in any local
+CM 01/02 set, and nothing corrects it. SWOS 96/97's 133 nations, all against all, score 4.15 a game with
 11.9% draws, as CM 01/02's 107 to 119 nations do (4.17–4.23, 12.3–12.7%): the
 world's minnows meet its giants.
 
@@ -954,12 +1052,16 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   a Tongan, Samoan or Cook Islands player, so those three field no team). Seasons before
   2004/05 have no EA source here (the FIFA Index mirror starts with FIFA 05);
   2002/03 to 1996/97 come from SI's and Sensible Software's databases instead,
-  and 2003/04, 2000/01 and 1999/00 from none the game ships (the community's CM
-  packages for them need their own executables).
+  and 2003/04 from none the game ships (SI's CM 03/04 database is in a format no
+  one has documented).
+- CM 00/01 and CM 99/00 are read from users' uploads of the retail CDs to
+  archive.org, which can go dark; the pinned SHA-256 and MD5 digests let any copy
+  of the same CD feed the build (`--image`). CM 00/01 is the UK release-day
+  database, a few transfers short of SI's later European pressing.
 - 2005/06, 2004/05 and 1996/97 have no clubs, and a local CM 01/02 database is
   the only way to clubs in 2005/06 and 2004/05.
 - The CM seasons' clubs score more and draw less than EA's and than real
-  leagues (3.4–3.6 goals a game and 19–20% draws), CM's current ability spreading
+  leagues (3.4–3.6 goals a game and 18–20% draws), CM's current ability spreading
   a league wider ([How they play](#how-they-play)); CM 97/98's scale also runs
   about 4.7 rating points above CM3's for the same players.
 - SWOS 96/97 rates by price alone: its keepers have no other rating, and every
@@ -1000,7 +1102,7 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   built-in season to 2026/27 regenerated those files, and the golden with them.)
 - No CM 01/02 data set file, database file or derived player list is committed,
   but for the three built-in ones the user chose to ship (SI's 3.9.68 and 3.9.60,
-  the CM3 port), with CM 97/98's and SWOS 96/97's: the seasons, not the database
-  files. The EA seasons are committed on the same terms as the built-in EA FC 27
+  the CM3 port), with CM 00/01's, CM 99/00's, CM 97/98's and SWOS 96/97's: the
+  seasons, not the database files. The EA seasons are committed on the same terms as the built-in EA FC 27
   data.
 - The domestic pack format is unchanged. A pack without `kind` is FM.

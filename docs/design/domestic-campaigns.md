@@ -986,7 +986,7 @@ and SWOS 96/97 (2005/06, 2004/05, 1996/97) have nations only, so they have no ma
 `--only=eu124,eu32`, `--check`, `--dry-run`, `--boundaries=<dir>` for another boundary cache).
 The maps follow the clubs, so they are rebuilt after `npm run build-clubs`,
 `npm run build:ea-seasons` or `npm run build:retro-seasons`; the build stops on a club with
-no row in the table below, and the test on a field that has changed. For each of the 25
+no row in the table below, and the test on a field that has changed. For each of the 27
 seasons with clubs and each of the two fields:
 
 - **Homes**: `scripts/data/europe-clubs.json`, one row per club of any season: a
