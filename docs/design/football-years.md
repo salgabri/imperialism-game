@@ -6,7 +6,10 @@ always-visible Season choice, 2026-10-30; FIFA 07 – FIFA 14 from two scrapes o
 EA's rosters, and the earlier basketball seasons from 2K Archive's NBA 2K
 ratings, on maps of their eras, 2026-10-30; FIFA 05 and FIFA 06, nations only,
 2026-11-07; five seasons before them, 2002/03 to 1996/97, from SI's CM 01/02, CM3
-and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08. The CM 01/02
+and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08; the federations
+of every season from 1961/62, with those of their day (the Soviet Union, the CIS,
+Yugoslavia, FR Yugoslavia, Czechoslovakia, West Germany and Zaire) under their own
+names and flags, 2026-11-09 ([Federations of the day](#federations-of-the-day-196162-to-199596)). The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -91,13 +94,12 @@ unknown folder, a conclusive estimate that disagrees with `--dob-shift` stops
 the build. For a known release, it raises a loud warning and the manifest's shift
 is kept.
 
-**Seasons ending before 1997 are refused** (`FIRST_YEAR`). 1996/97, the
-earliest season the game ships (SWOS 96/97, [below](#seasons-before-fifa-05)),
-is the first one accepted, and the federations table covers every year from
-then on. Earlier seasons come from retro databases (1984/85 and others) that
-use the Soviet Union, Yugoslavia, Czechoslovakia and East and West Germany.
-Those need identity overrides (name, code, flag) as well as territory, which
-comes next.
+**Seasons ending before 1962 are refused** (`FIRST_YEAR`). 1961/62, the first
+World Cup season the game covers, is the first one accepted, and the federations
+table covers every year from then on, with the federations of the day a season
+of 1961/62 to 1995/96 plays under their own names and flags
+([below](#federations-of-the-day-196162-to-199596)). Until 2026-11-09 the first
+year was 1997.
 
 ### Federations by year
 
@@ -122,9 +124,189 @@ association, read 2026-11-08):
 | Kosovo (KOS) | 2015 | held by Serbia (688), FR Yugoslavia, until the United Nations took over its administration on 10 June 1999 (Security Council resolution 1244), so in 1996/97 and 1997/98; neutral from 1998/99, whose cutoff falls after that day. FIFA member 13 May 2016 |
 
 Every other game nation's association was a FIFA member before 1996: the Soviet,
-Yugoslav and Czechoslovak successor states by 1994. Serbia keeps its modern name
-and flag in its FR Yugoslavia and Serbia and Montenegro years. Showing those
-names needs the same identity overrides as the seasons before 1997.
+Yugoslav and Czechoslovak successor states by 1994. In the seasons from 1996/97,
+built before identities, Serbia keeps its modern name and flag in its FR
+Yugoslavia and Serbia and Montenegro years. The seasons before 1996/97 are below.
+
+### Federations of the day (1961/62 to 1995/96)
+
+Decided 2026-11-09, for the seasons before 1996/97 that the computed World Cup
+seasons, SWOS 94/95 and 95/96 and the fan-made CM databases will add (none ships
+yet). `FIRST_YEAR` is 1962, and `src/data/footballFederations.js` gives every
+season from 1961/62 its federations, as the state on its cutoff (30 June of the
+season-end year), in three parts. Every year from 1996/97 keeps exactly the
+territory it had, and has no identity, so every season the game ships rebuilds
+byte for byte.
+
+**Admissions** (`shapes`). Every game nation whose association joined FIFA after
+30 June 1962 has its date, 79 shapes from Australia (1963) and Algeria (1964) to
+Kosovo (2016), each from FIFA's page for the association ("FIFA member since",
+read 2026-11-09; `scripts/data/fifa-member-associations.json` keeps all 176 game
+nations', and a test checks the table against it). FIFA gives 1 January where
+it knows only the year, and that day is used, so such a nation counts from the
+season ending in that year. Slovenia alone has a day from elsewhere: FIFA gives
+1992, its association's article (Wikipedia, revision 1372391120) 3 July 1992,
+the day Croatia and Ukraine were admitted. Before its admission a shape is
+neutral, colonies included (the map has no colonial empires), unless it was part
+of another game nation, which holds it, as Sudan holds South Sudan: Eritrea is
+Ethiopia's until it became independent in fact on 24 May 1991, Bangladesh
+Pakistan's until the surrender of 16 December 1971.
+
+**Federations of the day** (`federations`). Each plays on its holder's shape
+under its own name, FIFA code of the day (List of FIFA country codes, Wikipedia,
+revision 1383938499) and flag, and holds its members' shapes, whatever their own
+dates:
+
+| Federation | Code | Flag | Holder | Holds | Seasons |
+| --- | --- | --- | --- | --- | --- |
+| Soviet Union | URS | `su` (new) | Russia (643) | the other 14 republics | to 1990/91 |
+| CIS | CIS | `cis-1992` (new) | Russia (643) | Ukraine, Belarus, Georgia, Armenia, Azerbaijan, Kazakhstan, Uzbekistan, Turkmenistan, Tajikistan, Kyrgyzstan, Moldova | 1991/92 |
+| Yugoslavia | YUG | `yu` (new) | Serbia (688) | Croatia, Slovenia, Bosnia, North Macedonia, Montenegro, Kosovo | to 1990/91 |
+| FR Yugoslavia | YUG | `yu-1992` (new) | Serbia (688) | Montenegro, Kosovo (their own entries) | 1991/92 to 1995/96; barred to 1993/94 |
+| Czechoslovakia | TCH | Czech (`cz`) | Czechia (203) | Slovakia | to 1992/93 |
+| West Germany | FRG | German (`de`) | Germany (276) | nothing | to 1989/90 |
+| Zaire | ZAI | `zr` (new) | DR Congo (180) | nothing | 1971/72 to 1995/96 |
+
+- **The Soviet Union and the CIS** (Soviet Union and CIS national football team,
+  Wikipedia, revisions 1384615907 and 1384484443). The Soviet team's last match
+  was on 13 November 1991, and the Soviet Union ceased to exist on 26 December
+  1991. The team played on as the CIS, approved by FIFA on 13 January 1992, until
+  Euro 1992 (18 June 1992): twelve former republics, the eleven CIS members and
+  Georgia, then outside the CIS, but not the Baltic states. Their associations
+  take part from 1991/92 under FIFA's dates (1923); Estonia's first FIFA match
+  after the Soviet years was on 3 June 1992. Ukraine joined FIFA on 3 July 1992,
+  Belarus, Georgia and Armenia in 1992, the other seven in 1994, so 1992/93 has
+  those seven neutral.
+- **Yugoslavia** (revision 1378612036). The dates the work was asked to check
+  decide 1991/92: by its cutoff FR Yugoslavia had adopted its constitution (27
+  April 1992; Serbia and Montenegro, Wikipedia, revision 1384622516) and its
+  association had been barred under the United Nations sanctions (31 May 1992),
+  and Croatia and Slovenia joined FIFA only on 3 July 1992. So SFR Yugoslavia's
+  last season is 1990/91 (its last match was on 25 March 1992), and in 1991/92 no
+  shape of the old Yugoslavia fields a team. Croatia and Slovenia play from
+  1992/93, North Macedonia from 1993/94 (16 June 1994), Bosnia from 1996/97.
+- **FR Yugoslavia** (revision 1366001746) is barred to 1993/94 and plays from
+  1994/95, its first match after the sanctions on 23 December 1994, under its
+  name and its blue, white and red flag. Its identity stops with 1995/96: the
+  seasons from 1996/97 were built before identities and play it as Serbia.
+- **Czechoslovakia** (revision 1375198257) ended on 31 December 1992, but its team
+  played the rest of the 1994 World Cup qualifiers as the Representation of Czechs
+  and Slovaks until 17 November 1993, after 1992/93's cutoff. The Czech Republic
+  and Slovakia played from February 1994, and FIFA dates Slovakia's association
+  from 1994 (the Czech one from 1907), so 1993/94 has them apart. It flies the
+  Czech flag.
+- **West Germany** (Germany FR, FRG, revision 1384613198) until reunification on 3
+  October 1990 (German reunification, revision 1383934904), after 1989/90's
+  cutoff: its name and code only, under Germany's flag. **East Germany** has no
+  shape on the map, so it fields no team (decided 2026-11-09: no new shape), and
+  1973/74 has one World Cup finalist fewer.
+- **Zaire** (revision 1383080856): the DR Congo was renamed on 27 October 1971 and
+  renamed back in May 1997, before 1996/97's cutoff.
+
+A nation in a database named after a federation of its year plays for the
+holder (`dayNationResolver`): SI's 'Soviet Union', 'Czechoslovakia', 'West
+Germany', 'Zaire' and 'Commonwealth of Soviet States' (the CIS's `aliases`),
+which `cm0102Nations.js` lists as having no team, as they have in any other year.
+
+**Suspensions** (`suspensions`). A suspended association's shapes are neutral, and
+so is every shape it holds:
+
+| Association | From | To | No team |
+| --- | --- | --- | --- |
+| South Africa | 26 Sep 1961, suspended | January 1963, lifted | 1961/62 |
+| South Africa | October 1964, suspended; expelled in 1976 | 3 Jul 1992, readmitted | 1964/65 to 1991/92 |
+| FR Yugoslavia | 31 May 1992, the United Nations sanctions | December 1994 | 1991/92 to 1993/94, Montenegro and Kosovo too |
+| China PR | 8 Jul 1958, left over Taiwan | 7 Jul 1980, readmitted by the 42nd Congress | to 1979/80 |
+
+South Africa's dates come from its national team's article (revision 1384091000),
+its expulsion at the Montreal Congress on 16 July 1976 from the South African
+Football Association's (revision 1370236747), and its readmission from South
+African History Online (`sahistory.org.za`, whose robots.txt allows ClaudeBot);
+FIFA gives only the year of the new association, 1992. China's are from the
+Chinese Football Association's article (revision 1375920796); the national team's
+gives only the year 1979 for its return. A date known only to the month is kept
+so ('1963-01'); none falls in a cutoff's June, so no day would change a season.
+Suspensions from 1996/97 on are not listed: they would change the seasons already
+shipped.
+
+**Territory** (`territoryFor(table, year, { fields })`): a suspended shape is
+neutral; a federation's member is merged into its holder in its years; any other
+shape is held or neutral until its admission, as before; and a merged shape
+whose holder is neutral, held itself, or, given `fields` (a nation id → whether
+the season fields its team), fields no side, is neutral. A builder whose source
+has no team for a holder passes `fields`: SWOS 94/95 has no FR Yugoslavia squad,
+so Serbia, Montenegro and Kosovo are all neutral there.
+
+**Identities** (`identitiesFor(table, year, { fields })`): `{ shape: { name,
+code, flagId } }` for each federation of the year whose holder takes part and,
+given `fields`, fields a side:
+
+| Seasons | Identities |
+| --- | --- |
+| 1961/62 to 1970/71 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany |
+| 1971/72 to 1989/90 | the same and Zaire |
+| 1990/91 | Soviet Union, Yugoslavia, Czechoslovakia, Zaire |
+| 1991/92 | CIS, Czechoslovakia, Zaire |
+| 1992/93 | Czechoslovakia, Zaire |
+| 1993/94 | Zaire |
+| 1994/95, 1995/96 | FR Yugoslavia, Zaire |
+| from 1996/97 | none |
+
+A season file carries them as `identities` (below). The loader checks them for
+every men's football kind (`validateIdentities`): each names a nation the season
+fields (listed with players, neither merged nor inactive), a name and a code of
+three capitals that no other nation of the season plays under, and a flag in
+`src/data/flags.js`; another sport's season may not have them. `decodeFootballSet`
+keeps a frozen copy as `meta.identities`, and `seasonSport` plays it as
+`playsAs`, as Great Britain plays on England's shape (`src/data/teams.js`
+`nationIdentity`). So `buildTeam` names and flags the
+holder's team, and the setup wall, the campaign, its map labels, Flags mode, the
+chronicle and the saves show the Soviet Union with its flag; the land keeps its
+name ("Ukraine, held by Soviet Union"). A saved team keeps its name, code and
+flag, so a campaign resumes without the season file.
+
+The CM 01/02 builder writes a season's identities (its holders with players),
+fields a federation's members' players for it (`federationTeamOf`: a Ukrainian of
+a 1989/90 database plays for the Soviet Union, a Slovak for Czechoslovakia), and
+records both in its audit (`federations: { identities, pooled }`). A shape merged
+into a nation without an identity (New Caledonia into France) keeps its players
+apart, as before.
+
+**Flags.** flag-icons has none of these, so five public-domain SVGs from
+Wikimedia Commons are pinned in `scripts/data/historic-flags.json` (file page
+revision, the original's SHA-256, licence) and committed under
+`scripts/data/historic-flags/`. `npm run build:historic-flags` redraws each on
+flag-icons' 640 × 480 canvas into `public/flags/`, keeping every original path:
+the flag is scaled by its height to 480 and cut to 640 wide, at the fly for the
+Soviet flag (its emblem is in the canton), evenly for the others; a plain field
+becomes rectangles. `--check` rebuilds them byte for byte, and `npm run
+test:flag-symbols` runs it.
+
+| Flag id | File | Commons file | Licence (as the file page states) | Emblem kept upright on the map |
+| --- | --- | --- | --- | --- |
+| URS | `su` | Flag of the Soviet Union.svg | PD-RU-exempt | hammer, sickle and star |
+| CIS | `cis-1992` | Flag of the CIS (UEFA Euro 1992).svg | PD-textlogo | the letters C.I.S. |
+| YUG | `yu` | Flag of Yugoslavia (1946-1992).svg | PD-ineligible, PD-shape, PD-Yugoslavia | the star, its gold edge included |
+| FRY | `yu-1992` | Flag of Serbia and Montenegro (1992–2006).svg | PD-SerbiaGov, PD-ineligible | none: three bands |
+| ZAI | `zr` | Flag of Zaire (1971–1997).svg | PD-Congo | the disc with arm and torch |
+
+The four emblems have symbol profiles (`src/data/flagSymbols.js`; split by
+`scripts/build-flag-symbols.mjs`, whose files for them name their public-domain
+source). Their bounds are measured by `build-historic-flags.mjs` (the drawn
+extent, the Yugoslav star's mitred gold tips included, rounded outward with a
+one-unit margin), which checks the profiles against them. `npm run sync-flags`
+leaves the five alone. `docs/design/flag-symbols-review.html` shows them on the
+Soviet Union's, the CIS's, Yugoslavia's and Zaire's land.
+
+**Checks.** `scripts/football-federations.test.mjs` (in `npm run
+test:football-sets`): the table against FIFA's dates; territory and identities
+of 1969/70 (the Soviet Union holding Ukraine and the Baltic states), 1973/74
+(Zaire, no East Germany), 1981/82 (Yugoslavia holding Croatia), 1989/90
+(Czechoslovakia holding Slovakia), 1991/92 and 1992/93 to 1995/96; the
+suspensions; every year 1961/62 to 1995/96 consistent and none from 1996/97 with
+an identity; the CM 01/02 builder's pooling and names; the loader's refusals; and
+a 1969/70 campaign launched, drawn, flagged, saved and resumed as the Soviet
+Union.
 
 ## Data set file (format 1)
 
@@ -150,6 +332,7 @@ names needs the same identity overrides as the seasons before 1997.
   "nations": { "<nation id>": [strength, poolSize, [tuple, ...]] },
   "clubs": [ { "id", "name", "code", "league", "country", "col", "str", "squad": [tuple, ...] } ],
   "territory": { "merged": { "<shape id>": "<holder nation id>" }, "inactive": ["<shape id>"] },
+  "identities": { "<holder nation id>": { "name": "Soviet Union", "code": "URS", "flagId": "URS" } },
   "coverage": { "players": 0, "nations": 0, "completeXIs": 0, "clubs": 0, "leagues": 0 }
 }
 ```
@@ -184,6 +367,10 @@ names needs the same identity overrides as the seasons before 1997.
   Timor-Leste before 2006). They stay neutral land, as non-participants do in a
   continental theatre. Both come from `footballFederations.js`, keyed by
   year.
+- `identities` (optional, men's football seasons of 1961/62 to 1995/96 only) names
+  the federations of the day the season plays: its holder's team takes that name,
+  code and flag ([Federations of the day](#federations-of-the-day-196162-to-199596)).
+  A season without it plays every nation under its own.
 
 ### Ratings and positions
 
@@ -876,7 +1063,8 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   - `seasonSport(set)` returns `{ ...football, rosters, clubs, dataSet, dataVersion, dataYear, dataSeason, territory }`,
     or for a basketball season `{ ...basketball, clubs, clubMap, dataSet, … }`.
     It is memoised per decoded set, not per version, so an evicted set does not
-    stay in memory.
+    stay in memory. A men's football season with `identities` also gets
+    `playsAs` from them (the Soviet Union on Russia's shape).
   - `sportOf(settingsOrSetup)` returns that sport, or the built-in sport for no
     set. A set plays only in its own sport, and a basketball one only with
     clubs.
@@ -944,9 +1132,24 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   merged federations are held by their holder, and inactive shapes are
   unclaimed.
 - Serbia keeps its modern name and flag in its FR Yugoslavia and Serbia and
-  Montenegro years.
-- Seasons ending before 1997 need the Soviet Union, Czechoslovakia, Yugoslavia
-  and both Germanys, and are refused.
+  Montenegro years from 1996/97, which were built before identities; 1994/95 and
+  1995/96 show FR Yugoslavia.
+- Seasons ending before 1962 are refused.
+- East Germany has no shape on the map, so it never fields a team, and its
+  players, where a database lists them as Germany's, play for West Germany.
+- Only the seven federations of the day play under names of their own. Other
+  nations of 1961/62 to 1995/96 play under today's names and flags (Swaziland as
+  Eswatini, Burma as Myanmar, Upper Volta as Burkina Faso), and so does the DR
+  Congo before Zaire.
+- FIFA dates many admissions by the year alone (1 January). A nation admitted
+  after 30 June of that year counts one season early.
+- Colonies stay neutral until their association joined FIFA; the map draws no
+  colonial empires. Rhodesia's standing with FIFA from 1970 to 1980 has no dated
+  source here and is not encoded: Zimbabwe counts from 1964/65, FIFA's date.
+- Suspensions from 1996/97 on are not encoded: they would change the seasons
+  already shipped.
+- The CIS's flag is the one Wikipedia shows for its team at Euro 1992 (Commons:
+  Flag of the CIS (UEFA Euro 1992).svg), drawn by the Commons user B1mbo.
 - League detection uses stored competition names and CM0102Patcher's renames. A
   top division renamed some other way is reported missing, not guessed.
 - EA seasons cover the nations EA rates: 91–124 of the 173 field fewer than

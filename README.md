@@ -98,6 +98,7 @@ npm run test:targeting # intervening borders, islands, neutral land and real Eur
 npm run test:flag-symbols # symbol proportions, land fitting and generated asset integrity
 npm run build:flag-symbols # regenerate reviewed field/emblem assets after source review
 npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
+npm run build:historic-flags # redraw the federations of the day's public-domain flags (--check to verify)
 npm run sync:ea-fc       # snapshot EA FC 27 from EA's ratings API into scripts/data/ea-fc27.csv (network, cached)
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
 npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
@@ -1410,7 +1411,12 @@ considered, back to 1872, and their terms.
   Serbia's until June 1999 (1996/97 and 1997/98), then stays neutral until 2015,
   as Timor-Leste does until 2005. Bosnia and Herzegovina plays from 1996/97,
   Eritrea and Palestine from 1997/98, Mongolia from 1998/99 and Bhutan from
-  2000/01.
+  2000/01. The table goes back to 1961/62: a season of then plays the federations
+  of its day under their own names and flags (the Soviet Union on Russia's shape,
+  holding the other republics, to 1990/91; the CIS in 1991/92; Yugoslavia to
+  1990/91; FR Yugoslavia in 1994/95 and 1995/96; Czechoslovakia to 1992/93; West
+  Germany to 1989/90; Zaire from 1971/72), leaves suspended associations out (South
+  Africa, FR Yugoslavia, China PR) and fields no East Germany, which has no shape.
 - **Saves are self-contained:** players are packed as compact EA or CM tuples,
   so a season campaign resumes or imports without its season file.
 
@@ -1812,7 +1818,10 @@ England (`gb-eng`, on the United Kingdom's id), Scotland (`gb-sct`), Wales
 numeric code. Great Britain, the United Kingdom's team in the sports that play it
 as one, flies the Union Jack (`gb`) under a flag id of its own, `GBR`. The SVGs are vendored into `public/flags/` from the MIT-licensed
 [`flag-icons`](https://github.com/lipis/flag-icons) package, so the built app has
-no runtime dependency on it.
+no runtime dependency on it. Football's federations of the day fly flags flag-icons
+does not have, under flag ids of their own (`URS`, `CIS`, `YUG`, `FRY`, `ZAI`):
+public-domain Wikimedia Commons SVGs, pinned in `scripts/data/historic-flags.json`
+and redrawn on the same 4:3 canvas by `npm run build:historic-flags`.
 
 ### Club crests
 
@@ -2144,6 +2153,7 @@ scripts/
   data/seed-replay.golden.json  determinism golden for seeded campaigns
   smoke.mjs            headless campaign test (jsdom)
   sync-flags.mjs       vendors flag SVGs from flag-icons
+  build-historic-flags.mjs  redraws the federations of the day's public-domain flags
   build-rosters.mjs    builds football squads from an EA FC export
   build-basketball.mjs builds FIBA fives from NBA 2K + fiba-squads.json
   build-clubs.mjs      builds the club layer for both sports
