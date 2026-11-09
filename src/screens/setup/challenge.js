@@ -32,10 +32,10 @@ const TEAM_ID = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$/;
 const offers = (options, value) => options.some(([id]) => id === value);
 
 /**
- * Whether `value` is a club theatre this build offers the sport: the strongest clubs or the elite, a country of its own
- * (football's built-in clubs only: country maps are built from them) or a map its clubs play on. The map of the sport and
- * season then takes over in `setClubScope`, as in setup. A link to one league's theatre, which this build no longer has,
- * keeps the default.
+ * Whether `value` is a club theatre this build offers the sport: the strongest clubs or the elite (and women's
+ * football's NWSL), a country of its own (football's built-in clubs only: country maps are built from them) or a map its
+ * clubs play on. The map of the sport and season then takes over in `setClubScope`, as in setup. A link to one European
+ * league's theatre, which this build no longer has, keeps the default.
  */
 function offeredClubTheatre(sport, dataSet, value) {
   if (isDomesticScope(value)) {

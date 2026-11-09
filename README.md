@@ -27,7 +27,8 @@ And pick who fights:
   as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
   source rates ([Pacific islands](docs/design/pacific-islands.md)).
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
-  Europe](#the-europe-maps), each on land in its own country, 84 women's clubs, all 30 NBA
+  Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
+  on [their maps of Europe](#womens-football-on-the-europe-maps), the NWSL's 16 on [theirs](#the-nwsl-map) of the USA), all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
   franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
@@ -224,7 +225,8 @@ manager of the theatre's favourite, with decisions from the first match.
    baseball clubs MLB on its map of the USA and Canada, ice hockey clubs the NHL on its own and rugby league clubs the NRL
    on its map of Australia and New Zealand. Tennis and women's tennis are nations only
    (choosing either switches Teams to nations and disables Clubs). Women's football's clubs
-   offer its five leagues, the Rest of Europe, all of them or the strongest 32. The step opens on a map of the chosen theatre:
+   offer every European club or its Elite 32 on [maps of Europe](#womens-football-on-the-europe-maps), or the NWSL
+   on [its map of the USA](#the-nwsl-map). The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
    the campaign's opening camera frames it (the continent for Europe). The map
    zooms and pans like the campaign's: scroll or pinch, drag, and double-click
@@ -665,7 +667,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | --- | --- | --- | --- |
 | `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-league` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season); tennis and women's tennis are nations only |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), or for women's football `all`, `elite` or a league (`NWSL`) | Europe for nations, the Top 124 for football clubs, all clubs for women's football, a sport's own map (NBA, NFL, MLB, NHL) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), or women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, a sport's own map (NBA, NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -941,12 +943,13 @@ The one problem clubs create is territory: twenty Premier League sides share one
 homeland. So football clubs play on [a map of Europe of their own](#the-europe-maps),
 where a club holds land only in its own country: alone it holds all of it, clubs
 that share a country split it along its regional borders, and a country with no
-club stays grey. Each NBA franchise likewise holds its own state or province of
-[the USA and Canada](#the-nba-map). Two kinds of clubs have no such map and are still
-**dealt** onto the world: women's football's, and the strongest clubs of a CM 01/02
-database built on your own computer (see [Football seasons](#football-seasons)). Working
-down the strength order, each club claims the nearest country to its homeland that
-nobody has taken.
+club stays grey. Women's football's European clubs play [maps of Europe](#womens-football-on-the-europe-maps) of
+their own on the same rule, and each NBA franchise holds its own state or province of
+[the USA and Canada](#the-nba-map). Only the strongest clubs of a CM 01/02 database built on your own
+computer (see [Football seasons](#football-seasons)) have no map and are still **dealt** onto the world:
+working down the strength order, each club claims the nearest country to its homeland that nobody has
+taken. So were women's football's until 9 November 2026; a campaign saved on the world then still
+plays there.
 
 A club's territory is painted in a generated colour rather than a flag —
 identical national flags would tell you nothing — and wherever a nation shows its
@@ -954,8 +957,8 @@ flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
 Each NFL franchise holds its own state of [the USA](#the-nfl-map), each MLB and NHL club its own of
-[the USA and Canada](#the-mlb-map) ([the NHL's](#the-nhl-map)), and each NRL club its own of
-[Australia and New Zealand](#the-nrl-map).
+[the USA and Canada](#the-mlb-map) ([the NHL's](#the-nhl-map)), each NRL club its own of
+[Australia and New Zealand](#the-nrl-map), and each NWSL club its own of [the USA](#the-nwsl-map).
 
 Club lineups come from the same sources as the national squads:
 `clubs.football.js` from the EA FC 27 snapshot: the 124 strongest of its 309
@@ -1187,7 +1190,8 @@ deals its clubs onto the world.
 
 Each map is `public/domestic/eu<clubs>[s<season year>].json` (42 files, 150–190 KB,
 fetched when chosen), with the index `src/data/europeMaps.js`. They follow the clubs, so
-rebuild them after `npm run build-clubs` or `npm run build:ea-seasons`:
+rebuild them after `npm run build-clubs`, `npm run build:ea-seasons`, `npm run build-womens-football`
+or `npm run build:womens-seasons`:
 
 ```bash
 npm run build:europe-maps                  # about 8 minutes; --only=eu124,eu32 builds just those
@@ -1197,6 +1201,20 @@ npm run build:europe-maps -- --check       # offline rebuild must match the comm
 Where each club stands comes from `scripts/data/europe-clubs.json`. Boundary layers
 and licences are listed in `public/domestic/ATTRIBUTION-europe.txt`, and
 [the design notes](docs/design/domestic-campaigns.md#the-europe-maps) describe the build.
+
+#### Women's football on the Europe maps
+
+Women's football's clubs play the same way: **Europe**, every European club EA rates (68 in
+2026/27, in thirteen countries), and **Elite 32**, the 32 strongest of them (in six), each on
+a map of Europe where a club holds land only in its own country, by the rules above. The NWSL's
+clubs play [their own map](#the-nwsl-map) instead, so European and American clubs never meet. Glasgow
+City holds Scotland, Benfica Portugal, Brann Norway, Breiðablik Iceland; England's fourteen clubs share
+England, seven of them London's. A club stands at the women's own ground, not the men's: Manchester
+United's land is Leigh's, Chelsea's Kingston's. The earlier seasons with clubs, 2025/26 back to
+2023/24, have their own pair; 2022/23 rated only the WSL and D1 Arkema, so one map of its 24 clubs.
+The maps are `public/domestic/weu[32][s<season year>].json` (9 files, 140–170 KB). There are no
+single-league theatres any more: a world campaign saved on one before still plays on the world
+under its name, and a new setup or challenge link that names one plays Europe.
 
 ### The NFL map
 
@@ -1263,6 +1281,23 @@ and the Warriors the Auckland Region, and every other state and region stays emp
 ```bash
 npm run build:nrl-map                      # boundaries + grounds → public/domestic/nrl.json and its index entry (seconds)
 npm run build:nrl-map -- --check           # offline rebuild must match the committed files byte for byte
+```
+
+### The NWSL map
+
+Women's football's NWSL clubs have one theatre of their own, **NWSL**, beside [Europe's two](#womens-football-on-the-europe-maps):
+the 16 clubs fight over the USA, each holding the state its stadium stands in and nothing else. California's three
+(Bay FC, Angel City and the San Diego Wave) divide it along its counties; the Washington Spirit holds only DC, as
+the NBA's Wizards do. Boston Legacy FC plays at Centreville Bank Stadium in Pawtucket, Rhode Island, until White
+Stadium opens in 2028, so it holds Rhode Island and, as Boston's club, Massachusetts. Gotham FC holds New Jersey,
+its stadium's. Every other state stays empty. Each earlier season with NWSL clubs (2025, 2024 and 2023, from EA FC
+26, 25 and 24) has its own map, its clubs where they played then: in 2023 the Current played in Kansas City,
+Kansas, so they hold Kansas. The maps are `public/domestic/nwsl[s<season year>].json` (about 135 KB each);
+stadiums are in `scripts/data/nwsl-teams.json`.
+
+```bash
+npm run build:nwsl-map                     # boundaries + stadiums → public/domestic/nwsl*.json and their index entries (seconds)
+npm run build:nwsl-map -- --check          # offline rebuild must match the committed files byte for byte
 ```
 
 ## Football seasons
@@ -1689,8 +1724,9 @@ under **Season** in setup. Each season is a file in `public/womens-football/`
 
 - **What a season holds:** every nation with a rated player, each with its best
   XI (one short of eleven starts short-handed, one with none fields no team and
-  its land stays neutral), and from 2022/23 every club EA rates, in the five
-  whole leagues EA licenses or together as the Rest of Europe. Ratings are EA's
+  its land stays neutral), and from 2022/23 every club EA rates, the European ones
+  on that season's [maps of Europe](#womens-football-on-the-europe-maps), the NWSL's on
+  [its own](#the-nwsl-map). Ratings are EA's
   overalls, unchanged. A club keeps its id, crest and colour from season to
   season under the name EA gave it that year (Olympique Lyonnais in 2024/25).
 - **National teams only before 2022/23:** EA rated 12 to 17 women's national

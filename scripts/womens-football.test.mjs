@@ -106,9 +106,14 @@ test('the clubs: five leagues of their own, and EA\'s other clubs together', () 
   assert.ok(CLUBS.filter(club => club.league === TABLE.rest).some(club => club.name === 'Juventus'));
   assert.ok(CLUBS.some(club => club.name === 'BK Häcken'), 'a garbled EA name, put right');
   assert.ok(CLUBS.some(club => club.name === 'Tottenham Hotspur') && !CLUBS.some(club => club.name === 'Spurs'));
+  // Europe's clubs play together, every one or the elite, and the NWSL's apart (scripts/womens-club-maps.test.mjs).
   const scopes = CLUB_SCOPES(sport);
-  assert.deepEqual(scopes.slice(0, 2).map(scope => scope.id), ['all', 'elite']);
-  for (const league of MAIN_LEAGUES) assert.ok(scopes.some(scope => scope.id === league), league);
+  assert.deepEqual(scopes.map(scope => [scope.id, scope.name]), [['all', 'Europe'], ['elite', 'Elite 32'], ['NWSL', 'NWSL']]);
+  const field = scope => CLUBS.filter(scopes.find(s => s.id === scope).filter);
+  assert.deepEqual(field('all').map(club => club.id), CLUBS.filter(club => club.league !== 'NWSL').map(club => club.id));
+  assert.equal(field('elite').length, 32);
+  assert.ok(field('elite').every(club => club.league !== 'NWSL'));
+  assert.equal(field('NWSL').length, 16);
 });
 
 test('a club wears its men\'s club\'s crest, or its own', () => {
@@ -152,8 +157,10 @@ test('setup lists women\'s football after football, with nations and clubs on th
   assert.match(nations.season.note, /short-handed/);
   assert.ok(nations.scopes.every(scope => scope.count >= 1), JSON.stringify(nations.scopes.map(scope => [scope.id, scope.count])));
   assert.equal(nations.scopes.find(scope => scope.id === 'world').count, Object.keys(ROSTERS).length);
-  const clubs = buildSetupModel({ sport: 'womens-football', layer: 'clubs', clubScope: 'NWSL' }, {});
-  assert.equal(clubs.scopes.find(scope => scope.id === 'NWSL').count, 16);
+  const clubs = buildSetupModel({ sport: 'womens-football', layer: 'clubs', clubScope: 'domestic:nwsl' }, {});
+  assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]),
+    [['domestic:weu', 'Europe', 68], ['domestic:weu32', 'Elite 32', 32], ['domestic:nwsl', 'NWSL', 16]]);
+  assert.equal(clubs.scopeName, 'NWSL · USA');
   assert.equal(clubs.domesticScopes.length, 0, 'no country maps: those hold the men\'s clubs');
 });
 

@@ -1,0 +1,32 @@
+{
+  "note": "The NWSL's clubs of women's football (src/data/clubs.womens-football.js, the 2026 season) and of its earlier seasons with clubs (public/womens-football/<id>.json): the place each territory is named after, the stadium its home matches are played at and the point its territory grows from (the stadium's location, [lon, lat], from Wikidata; `source` names the item). scripts/build-club-maps.mjs grows each club's territory from `home`, in the stadium's state only, except that Boston Legacy FC, at its interim ground in Rhode Island until White Stadium opens in 2028 (Wikipedia), holds Massachusetts too. `seasons` lists, per earlier season, the clubs that played somewhere else then, or at a stadium under another name: the 2023 NWSL is EA FC 24's, 2024's EA FC 25's and 2025's EA FC 26's.",
+  "teams": {
+    "w-angel-city-fc": { "city": "Los Angeles", "stadium": "BMO Stadium", "home": [-118.285, 34.013], "source": "Wikidata Q97609993" },
+    "w-bay-fc": { "city": "Bay Area", "stadium": "PayPal Park", "home": [-121.925, 37.3514], "source": "Wikidata Q3046470" },
+    "w-boston-legacy-fc": { "city": "Boston", "stadium": "Centreville Bank Stadium", "home": [-71.3826, 41.8688], "source": "Wikidata Q130214018" },
+    "w-chicago-stars-fc": { "city": "Chicago", "stadium": "Martin Stadium", "home": [-87.6709, 42.0582], "source": "Wikidata Q134722468" },
+    "w-denver-summit-fc": { "city": "Denver", "stadium": "Centennial Stadium", "home": [-104.829, 39.584], "source": "Wikidata Q132067920" },
+    "w-gotham-fc": { "city": "New Jersey", "stadium": "Sports Illustrated Stadium", "home": [-74.1503, 40.7367], "source": "Wikidata Q1447181" },
+    "w-houston-dash": { "city": "Houston", "stadium": "Shell Energy Stadium", "home": [-95.3524, 29.7522], "source": "Wikidata Q15303416" },
+    "w-kansas-city-current": { "city": "Kansas City", "stadium": "CPKC Stadium", "home": [-94.5662, 39.1203], "source": "Wikidata Q120069200" },
+    "w-north-carolina-courage": { "city": "North Carolina", "stadium": "WakeMed Soccer Park", "home": [-78.7551, 35.7862], "source": "Wikidata Q28169542" },
+    "w-orlando-pride": { "city": "Orlando", "stadium": "Inter&Co Stadium", "home": [-81.389, 28.5411], "source": "Wikidata Q21066986" },
+    "w-portland-thorns": { "city": "Portland", "stadium": "Providence Park", "home": [-122.6917, 45.5214], "source": "Wikidata Q1446672" },
+    "w-racing-louisville": { "city": "Louisville", "stadium": "Lynn Family Stadium", "home": [-85.7333, 38.2596], "source": "Wikidata Q97079547" },
+    "w-san-diego-wave": { "city": "San Diego", "stadium": "Snapdragon Stadium", "home": [-117.1228, 32.7844], "source": "Wikidata Q107324446" },
+    "w-seattle-reign": { "city": "Seattle", "stadium": "Lumen Field", "home": [-122.3317, 47.5953], "source": "Wikidata Q1357111" },
+    "w-utah-royals-fc": { "city": "Utah", "stadium": "America First Field", "home": [-111.893, 40.5829], "source": "Wikidata Q47005781" },
+    "w-washington-spirit": { "city": "Washington", "stadium": "Audi Field", "home": [-77.0129, 38.8685], "source": "Wikidata Q1446108" }
+  },
+  "seasons": {
+    "eaw-fc-25": {
+      "w-chicago-stars-fc": { "stadium": "SeatGeek Stadium", "home": [-87.8061, 41.7647], "source": "Wikidata Q1071986" },
+      "w-gotham-fc": { "stadium": "Red Bull Arena", "home": [-74.1503, 40.7367], "source": "Wikidata Q1447181" }
+    },
+    "eaw-fc-24": {
+      "w-chicago-stars-fc": { "stadium": "SeatGeek Stadium", "home": [-87.8061, 41.7647], "source": "Wikidata Q1071986" },
+      "w-gotham-fc": { "stadium": "Red Bull Arena", "home": [-74.1503, 40.7367], "source": "Wikidata Q1447181" },
+      "w-kansas-city-current": { "stadium": "Children's Mercy Park", "home": [-94.8237, 39.1218], "source": "Wikidata Q1787141" }
+    }
+  }
+}

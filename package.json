@@ -45,6 +45,7 @@
     "build:mlb-map": "node scripts/build-club-maps.mjs --league=mlb",
     "build:nhl-map": "node scripts/build-club-maps.mjs --league=nhl",
     "build:nrl-map": "node scripts/build-club-maps.mjs --league=nrl",
+    "build:nwsl-map": "node scripts/build-club-maps.mjs --league=nwsl",
     "build:europe-maps": "node scripts/build-europe-maps.mjs",
     "sync:madden": "node scripts/sync-madden.mjs",
     "build-nfl": "node scripts/build-nfl.mjs",

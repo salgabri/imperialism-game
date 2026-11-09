@@ -56,7 +56,8 @@ const SCENARIOS = [
   { name: 'CLUBS · NHL · duel · ticker', ...NHL, pacing: 'duel', resolution: 'ticker' },
   { name: 'ICE HOCKEY · Europe · blitz · instant', sport: 'hockey', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
   { name: "WOMEN'S FOOTBALL · Europe · duel · ticker", sport: 'womens-football', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
-  { name: "WOMEN'S CLUBS · NWSL · blitz · instant", sport: 'womens-football', layer: 'clubs', clubScope: 'NWSL', pacing: 'blitz', resolution: 'instant' },
+  { name: "WOMEN'S CLUBS · NWSL · blitz · instant", sport: 'womens-football', layer: 'clubs', clubScope: 'domestic:nwsl', pacing: 'blitz', resolution: 'instant' },
+  { name: "WOMEN'S CLUBS · Elite 32 · duel · instant", sport: 'womens-football', layer: 'clubs', clubScope: 'domestic:weu32', pacing: 'duel', resolution: 'instant' },
   { name: 'TENNIS · Europe · duel · ticker', sport: 'tennis', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
   { name: "WOMEN'S TENNIS · World · blitz · instant", sport: 'womens-tennis', scope: 'world', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NRL · duel · ticker', ...NRL, pacing: 'duel', resolution: 'ticker' },
@@ -263,11 +264,18 @@ function checkMapScope(label, snapshot, options) {
 }
 
 /**
- * Football clubs offer every shipped country, grouped apart from the leagues; basketball clubs only the NBA's map,
- * American football (clubs only) the NFL's, baseball clubs MLB's, hockey clubs the NHL's and rugby league clubs the NRL's.
+ * Football clubs offer every shipped country, grouped apart from the leagues; women's football clubs Europe's two maps
+ * and the NWSL's; basketball clubs only the NBA's map, American football (clubs only) the NFL's, baseball clubs MLB's,
+ * hockey clubs the NHL's and rugby league clubs the NRL's.
  */
 function checkTheatres(scenario, theatre) {
   const countries = theatre.options.filter(option => option.value.startsWith('domestic:'));
+  if (scenario.layer === 'clubs' && scenario.sport === 'womens-football') {
+    check('women\'s clubs play Europe\'s every club, its elite or the NWSL, each on a map of its own', JSON.stringify(theatre.options) === JSON.stringify([
+      { value: 'domestic:weu', text: 'Europe · 68 clubs' }, { value: 'domestic:weu32', text: 'Elite 32 · 32 clubs' },
+      { value: 'domestic:nwsl', text: 'NWSL · 16 clubs' }]), JSON.stringify(theatre.options));
+    return;
+  }
   if (scenario.layer === 'clubs' && scenario.sport === 'baseball') {
     check('baseball clubs play only MLB’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:mlb', text: 'MLB · 30 clubs' }]),
       JSON.stringify(theatre.options));

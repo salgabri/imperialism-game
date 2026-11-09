@@ -1,7 +1,8 @@
 // Theatre choices for a club campaign on the world board. Football's clubs play Europe's strongest clubs or its elite on a
 // map of Europe where a club's land lies in its own country (src/data/europeMaps.js, docs/design/domestic-campaigns.md); the
-// world board plays those two only for a set with no such map (a CM 01/02 database built on this computer). Nation
-// theatres live in SCOPES in teams.js; which of them a sport offers is decided here (`nationTheatres`).
+// world board plays those two only for a set with no such map (a CM 01/02 database built on this computer). Women's
+// football's play every European club or the elite on maps of Europe, or the NWSL on its own USA (src/data/clubMaps.js).
+// Nation theatres live in SCOPES in teams.js; which of them a sport offers is decided here (`nationTheatres`).
 import { nationPriority } from './domesticTiers.js';
 import { NATIONS, SCOPES, fieldsRealSide } from './teams.js';
 import { fieldedNations } from '../engine/footballSets.js';
@@ -51,26 +52,54 @@ export const ELITE_CLUBS = 32;
 /** A club list's `count` strongest. Equal strengths keep the list's order, so a list always gives the same clubs. */
 export const strongestClubs = (clubs, count) => clubs.slice().sort((a, b) => b.str - a.str).slice(0, count);
 
+/** Whether a club is European, by the confederation of its country: women's football's play Europe's maps, the NWSL's its own. */
+export const isEuropeanClub = club => NATIONS[club.country]?.[2] === 'UEFA';
+
 /**
- * A world campaign's club theatre by name: a set with no Europe maps plays these two theatres, and a campaign saved
- * before there were any played all the game's clubs ('all') or one league, whose id is its name.
+ * A world campaign's club theatre by name: a football set with no Europe maps plays these two theatres, and a campaign
+ * saved before there were any (women's football's before 9 November 2026, of any season) played all the game's clubs
+ * ('all') or one league, whose id is its name.
  */
-export function worldClubTheatreName({ clubScope, dataSet = null } = {}) {
+export function worldClubTheatreName({ clubScope, dataSet = null, sport = 'football' } = {}) {
   if (clubScope === 'elite') return `Elite ${ELITE_CLUBS}`;
   if (clubScope && clubScope !== 'all' && !clubScope.startsWith('domestic:')) return clubScope;
-  return dataSet == null ? 'All Leagues' : `Top ${TOP_CLUBS}`;
+  return dataSet == null || sport !== 'football' ? 'All Leagues' : `Top ${TOP_CLUBS}`;
 }
 
 const inStrongest = count => (club, i, clubs) => strongestClubs(clubs, count).includes(club);
 
 /**
  * A sport's club theatres on the world board. Football has no league theatres: its two are Europe's strongest clubs and
- * its elite. Another sport with clubs and no map of its own has every club, the elite and each league; one without clubs,
- * none.
+ * its elite. Women's football's clubs play the same two among Europe's clubs, and the NWSL's apart: in setup each is a
+ * map of its own (src/data/europeMaps.js, clubMaps.js), and these ids name them. Another sport with clubs and no map of
+ * its own has every club, the elite and each league; one without clubs, none.
  */
 export function CLUB_SCOPES(sport) {
   // A sport with no clubs (tennis: nations only) has no club theatre.
   if (!sport?.clubs?.length) return [];
+  if (sport?.id === 'womens-football') {
+    const leagues = [...new Set(sport.clubs.filter(club => !isEuropeanClub(club)).map(club => club.league))];
+    return [
+      {
+        id: 'all',
+        name: 'Europe',
+        desc: 'Every European club, each on land in its own country.',
+        filter: isEuropeanClub,
+      },
+      {
+        id: 'elite',
+        name: `Elite ${ELITE_CLUBS}`,
+        desc: `The ${ELITE_CLUBS} strongest clubs in Europe, each on land in its own country.`,
+        filter: (club, i, clubs) => strongestClubs(clubs.filter(isEuropeanClub), ELITE_CLUBS).includes(club),
+      },
+      ...leagues.map(league => ({
+        id: league,
+        name: league,
+        desc: `The ${league}'s ${sport.clubs.filter(c => c.league === league).length} clubs, each in its own state.`,
+        filter: c => c.league === league,
+      })),
+    ];
+  }
   if (sport?.id === 'football') {
     return [
       {
