@@ -69,20 +69,26 @@ function expectedTuple(db, row, shift) {
 // ---- Manifests ----
 
 test('the database manifest names every known release once, by a unique signature', () => {
-  // 48 CM 01/02 releases, and SI's CM3 data ported to the format (1998/99).
-  assert.equal(databases.length, 49);
+  // 48 CM 01/02 releases, SI's CM3 data ported to the format (1998/99) and two fan-made databases (1993/94, 1989/90).
+  assert.equal(databases.length, 51);
   const pairs = databases.flatMap(d => d.signatures.map(s => `${s.club}/${s.staff}`));
   assert.equal(new Set(pairs).size, pairs.length);
   assert.equal(new Set(databases.map(d => d.id)).size, databases.length);
+  // The fan-made databases name their makers, and Simon Treanor's 1989/90 its own site.
+  const FAN = { 'cm0102-2020-11-cm93': 'Cam F', 'cm0102-2017-04-cm89': 'Simon Treanor' };
   for (const d of databases) {
-    assert.match(d.id, /^cm0102-\d{4}-\d{2}(-(odb|sim|cm3))?$/, d.id);
+    assert.match(d.id, /^cm0102-\d{4}-\d{2}(-(odb|sim|cm3|cm93|cm89))?$/, d.id);
     assert.ok(d.id.startsWith(`cm0102-${d.released}`), d.id);
     assert.ok(d.label.trim() && d.provider.trim(), d.id);
     assert.equal(d.year, seasonYear(d.season), d.id);
     assert.ok(d.year <= LAST_YEAR, d.id);
-    assert.match(d.url, /^https:\/\/www\.champman0102\.co\.uk\/viewtopic\.php\?t=\d+$/);
-    // The CM3 port's joined and contract shifts were not measured: the builder reads only the birth shift.
-    assert.ok(Number.isInteger(d.shifts.birth) && ['joined', 'contract'].every(key => Number.isInteger(d.shifts[key]) || (d.edition === 'CM3' && d.shifts[key] === undefined)), d.id);
+    if (FAN[d.id]) assert.deepEqual([d.provider, /fan-made/.test(d.label)], [FAN[d.id], true], d.id);
+    if (d.id === 'cm0102-2017-04-cm89') assert.equal(d.url, 'https://cm8990.wordpress.com/');
+    else assert.match(d.url, /^https:\/\/www\.champman0102\.co\.uk\/viewtopic\.php\?t=\d+$/);
+    // The CM3 port's and the fan-made databases' joined and contract shifts were not measured: the builder reads only the
+    // birth shift.
+    assert.ok(Number.isInteger(d.shifts.birth) && ['joined', 'contract'].every(key => Number.isInteger(d.shifts[key])
+      || ((d.edition === 'CM3' || FAN[d.id]) && d.shifts[key] === undefined)), d.id);
     assert.ok(d.signatures.every(s => Number.isInteger(s.club) && Number.isInteger(s.staff) && s.club % 581 === 0), d.id);
     for (const s of d.signatures) for (const key of ['clubSha256', 'staffSha256']) if (key in s) assert.match(s[key], /^[0-9a-f]{64}$/);
   }

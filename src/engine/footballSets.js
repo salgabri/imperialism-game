@@ -103,7 +103,8 @@ const SET_KINDS = Object.freeze({
   // `swos-<season>`: a Sensible World of Soccer edition (SWOS 96/97 → `swos-9697`): its national squads, and its clubs
   // where the edition's own team files give them (SWOS 96/97 is nations only).
   swos: { prefix: 'swos-', id: /^swos-\d{4}$/, sport: 'football', nationsOnly: /^swos-9697$/ },
-  cm0102: { prefix: '', id: /^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$/, sport: 'football' },
+  // Simon Treanor's fan-made 1989/90 database has nations only: its clubs cannot field 1989/90's top divisions.
+  cm0102: { prefix: '', id: /^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$/, sport: 'football', nationsOnly: /^cm0102-2017-04-cm89$/ },
 });
 const kindRecord = id => {
   const text = String(id);

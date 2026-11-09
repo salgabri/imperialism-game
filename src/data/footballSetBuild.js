@@ -387,12 +387,15 @@ function withoutTrailingBytes(files, trailing) {
  * unknown folder), `allowUnmapped`, `famous` (birthdays for the shift check), `verifyFiles` (false skips the
  * SHA-256 of a known database's club.dat and staff.dat, tens of MB), and for a season the game ships
  * (scripts/build-retro-seasons.mjs) `local: false` and `sourceExtra`, fields added to its source block (who
- * compiled it, when it was read). Returns `{ doc, text, audit, summary, warnings }`; throws on an unknown layout, an
- * unmapped nation (unless allowed) or an unnamed database.
+ * compiled it, when it was read). `noNationAt` (`{ nationality, clubs, label }`) makes the players of that stored
+ * nationality at those clubs (by name) play for no nation, though still for their clubs: a 1989/90 database that files
+ * East Germans as 'Germany' names its East German clubs. `clubs: false` builds the nations alone (a season whose clubs
+ * are not its year's). Returns `{ doc, text, audit, summary, warnings }`; throws on an unknown layout, an unmapped
+ * nation (unless allowed) or an unnamed database.
  */
 export function buildFootballSet(files, {
   databases = CM0102_RELEASES, nationMap = CM0102_NATIONS, federations = FOOTBALL_FEDERATIONS, identity = {}, allowUnmapped = false,
-  famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {},
+  famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {}, noNationAt = null, clubs: withClubs = true,
 } = {}) {
   const warnings = [];
   const warn = message => warnings.push(message);
@@ -440,6 +443,17 @@ export function buildFootballSet(files, {
     return { name: n.name, id: id === NO_TEAM ? null : id, key: id && id !== NO_TEAM ? id : `cm:${fold(n.name)}`, noTeam: id === NO_TEAM, unmapped: id == null };
   });
   const clubByRow = new Map(parsed.clubs.map(c => [c.row, c]));
+  // The clubs whose players of `noNationAt.nationality` play for no nation, each name one live club of that nation.
+  let noNationClubs = null;
+  if (noNationAt) {
+    noNationClubs = new Set();
+    for (const name of noNationAt.clubs) {
+      const rows = parsed.clubs.filter(club => club.name === name && club.nation != null && parsed.nations[club.nation].name === noNationAt.nationality);
+      if (rows.length !== 1) throw new Error(`noNationAt names ${name}, which is ${rows.length ? 'more than one club' : 'no club'} of ${noNationAt.nationality} in this database`);
+      noNationClubs.add(rows[0].row);
+    }
+    if (!nationRows.some(row => row.name === noNationAt.nationality)) throw new Error(`noNationAt names ${noNationAt.nationality}, which is no nationality of this database`);
+  }
   // A database of another edition's data in the CM 01/02 format (SI's CM3, ported) names that edition.
   const edition = database.edition ?? 'CM 01/02';
   const source = {
@@ -460,7 +474,8 @@ export function buildFootballSet(files, {
     const nation = nationRows[player.nation];
     if (nation.unmapped) { dropped.unmapped++; unmapped[nation.name] = (unmapped[nation.name] || 0) + 1; continue; }
     const dateOfBirth = decodeCmDate(player.dob, dobShift) || '';
-    const candidate = { player, keys, nation, dateOfBirth };
+    const stateless = !!noNationClubs && nation.name === noNationAt.nationality && noNationClubs.has(player.club);
+    const candidate = { player, keys, nation, dateOfBirth, stateless };
     // The same person can be stored twice, with or without diacritics, or once at a club and once unattached. Without
     // a date of birth two namesakes cannot be told from one person, so both stay.
     const key = dateOfBirth ? `${fold(player.fullName || player.name)}|${dateOfBirth}|${nation.key}` : `row:${row}`;
@@ -476,16 +491,17 @@ export function buildFootballSet(files, {
   if (unmappedNames.length) warn(`Left out the players of unmapped nations: ${unmappedNames.map(name => `${name} (${unmapped[name]})`).join(', ')}`);
 
   const seen = new Set();
-  const players = [...kept.values()].sort((a, b) => a.player.id - b.player.id).map(({ player, keys, nation, dateOfBirth }) => {
+  const players = [...kept.values()].sort((a, b) => a.player.id - b.player.id).map(({ player, keys, nation, dateOfBirth, stateless }) => {
     if (seen.has(player.id)) throw new Error(`Two eligible players share CM staff id ${player.id}`);
     seen.add(player.id);
     // Players of nations without a team still play for their clubs.
     if (nation.noTeam) noTeam[nation.name] = (noTeam[nation.name] || 0) + 1;
+    else if (stateless) noTeam[`${nation.name} at ${noNationAt.label}`] = (noTeam[`${nation.name} at ${noNationAt.label}`] || 0) + 1;
     const tuple = [player.id, player.name, player.fullName && player.fullName !== player.name ? player.fullName : 0, player.ca,
       keys.join(','), nation.name, player.club == null ? '' : clubByRow.get(player.club).name, dateOfBirth];
     const [name, pos, rating, sourceInfo] = expandCmTuple(tuple, source);
     if (JSON.stringify(cmTupleOf(name, sourceInfo)) !== JSON.stringify(tuple)) throw new Error(`CM player ${player.id} (${player.name}) does not rebuild from its tuple`);
-    return { name, pos, positions: sourceInfo.positions, rating, sourceInfo, tuple, club: player.club, nationId: nation.id };
+    return { name, pos, positions: sourceInfo.positions, rating, sourceInfo, tuple, club: player.club, nationId: stateless ? null : nation.id };
   });
 
   // A federation of the day fields its members' players: a Ukrainian of a 1989/90 database plays for the Soviet Union.
@@ -537,7 +553,8 @@ export function buildFootballSet(files, {
     }
     leagueAudit.push({ league, country, competition: comp.name, members: members.length, clubs: members.length - short.length, short });
   }
-  const clubs = presentClubs(built, warn);
+  // A season with nations only keeps its leagues in the audit, as the reason it has no clubs.
+  const clubs = withClubs ? presentClubs(built, warn) : [];
 
   // The names, codes and flags of the federations of the day that field players (none from 1996/97 on).
   const identities = identitiesFor(federations, database.year, { fields: id => nations[id]?.[2].length > 0 });
@@ -563,7 +580,8 @@ export function buildFootballSet(files, {
     parser: { format: parsed.format, counts: parsed.counts, index: parsed.index, warnings: parsed.warnings },
     birthShift: { used: dobShift, from: shiftSource, oracle },
     players: { read: parsed.players.length, eligible: players.length, written: coverage.players, dropped },
-    unmapped, noTeam, leagues: leagueAudit, territory,
+    unmapped, noTeam, ...(noNationAt ? { noNationAt: { nationality: noNationAt.nationality, label: noNationAt.label, clubs: noNationClubs.size } } : {}),
+    ...(withClubs ? {} : { nationsOnly: true }), leagues: leagueAudit, territory,
     // A season of federations of the day records them and whose players they field (by shape, how many).
     ...(Object.keys(identities).length || Object.keys(pooled).length ? { federations: { identities, pooled } } : {}),
     nations: nationAudit, warnings,
