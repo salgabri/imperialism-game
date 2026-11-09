@@ -9,7 +9,9 @@ ratings, on maps of their eras, 2026-10-30; FIFA 05 and FIFA 06, nations only,
 and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08; the federations
 of every season from 1961/62, with those of their day (the Soviet Union, the CIS,
 Yugoslavia, FR Yugoslavia, Czechoslovakia, West Germany and Zaire) under their own
-names and flags, 2026-11-09 ([Federations of the day](#federations-of-the-day-196162-to-199596)). The CM 01/02
+names and flags, 2026-11-09 ([Federations of the day](#federations-of-the-day-196162-to-199596)); the nine World
+Cups from 1961/62 to 1993/94 as computed seasons, 2026-11-10
+([Computed World Cup seasons](#computed-world-cup-seasons)). The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -26,7 +28,9 @@ kinds:
   setup. See [Built-in earlier seasons](#built-in-earlier-seasons). Before them,
   five more from 2002/03 back to 1996/97: SI's own CM 01/02 databases, its CM3
   and CM 97/98 data, and SWOS 96/97's national squads. See
-  [Seasons before FIFA 05](#seasons-before-fifa-05).
+  [Seasons before FIFA 05](#seasons-before-fifa-05). Before those, the World Cups
+  of 1962 to 1994, nations only, their ratings computed from the nations' Elo and
+  the players' records. See [Computed World Cup seasons](#computed-world-cup-seasons).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
   downloaded, built on their computer. Until the database authors allow
   redistribution these stay local: the user puts the database in the ignored
@@ -131,8 +135,8 @@ Yugoslavia and Serbia and Montenegro years. The seasons before 1996/97 are below
 ### Federations of the day (1961/62 to 1995/96)
 
 Decided 2026-11-09, for the seasons before 1996/97 that the computed World Cup
-seasons, SWOS 94/95 and 95/96 and the fan-made CM databases will add (none ships
-yet). `FIRST_YEAR` is 1962, and `src/data/footballFederations.js` gives every
+seasons, SWOS 94/95 and 95/96 and the fan-made CM databases will add (the computed
+World Cup seasons ship from 2026-11-10, [below](#computed-world-cup-seasons)). `FIRST_YEAR` is 1962, and `src/data/footballFederations.js` gives every
 season from 1961/62 its federations, as the state on its cutoff (30 June of the
 season-end year), in three parts. Every year from 1996/97 keeps exactly the
 territory it had, and has no identity, so every season the game ships rebuilds
@@ -864,6 +868,181 @@ corrects it. SWOS 96/97's 133 nations, all against all, score 4.15 a game with
 11.9% draws, as CM 01/02's 107 to 119 nations do (4.17–4.23, 12.3–12.7%): the
 world's minnows meet its giants.
 
+## Computed World Cup seasons
+
+Decided 2026-11-09, shipped 2026-11-10. No game rates the players of most nations
+before 1994 in a form the game can read, so the nine World Cups from 1962 to 1994
+are **computed**: each finalist's strength from its Elo the day after the final,
+its eleven the players of its World Cup squad with the most minutes, ordered by
+their records. The user approved computed football ratings for the 1960s to
+1980s on 2026-11-09, labelled as computed, with World Cup squads only (no
+Wikidata pools), the strength from Elo by the line below (not by rank), the Elo
+of the day after the final, and the federations of the day under their own names
+and flags. Each season is a data set of `kind: 'wc'`, nations only, labelled
+"Computed · 1970 World Cup", and the setup's Season note says those seasons are
+computed.
+
+| Season | Id | Finalists fielded | Identities | Theatres | Strongest (T) | Team share |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1961/62 | `wc-1962` | 16 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | Brazil 87, Soviet Union 81.2, Czechoslovakia 80.4 | 76% |
+| 1965/66 | `wc-1966` | 16 | Soviet Union, West Germany | World, Europe, South America | England 87, West Germany 85.4, Soviet Union 84.8 | 70% |
+| 1969/70 | `wc-1970` | 16 | Soviet Union, Czechoslovakia, West Germany | World, Europe | Brazil 87, West Germany 83.0, England 82.3 | 78% |
+| 1973/74 | `wc-1974` | 15 (no East Germany) | Yugoslavia, West Germany, Zaire | World, Europe, South America | West Germany 87, Netherlands 84.6, Poland 84.1 | 74% |
+| 1977/78 | `wc-1978` | 16 | West Germany | World, Europe | Brazil 87, Netherlands 84.3, Argentina 83.7 | 66% |
+| 1981/82 | `wc-1982` | 24 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | Brazil 87, Italy 85.4, West Germany 84.4 | 70% |
+| 1985/86 | `wc-1986` | 24 | Soviet Union, West Germany | World, Europe, South America | Argentina 87, France 86.2, Brazil 86.2 | 66% |
+| 1989/90 | `wc-1990` | 24 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | West Germany 87, Italy 85.7, Brazil 84.7 | 70% |
+| 1993/94 | `wc-1994` | 24 | none | World, Europe, South America | Brazil 87, Italy 85.9, Germany 84.5 | 68% |
+
+"Team share" is the nation's part of the variance of the season's XI ratings:
+the ratings are mostly about the team.
+
+### Sources
+
+| Source | Pinned | Use | Licence |
+| --- | --- | --- | --- |
+| The Fjelstul World Cup Database ([jfjelstul/worldcup](https://github.com/jfjelstul/worldcup)), `data-csv/` | commit `35a8667` (2026-06-11); nine files by SHA-256 | Squads (position GK/DF/MF/FW, shirt number), appearances, substitutions and sendings-off from 1970, goals, awards, players' dates of birth and Wikipedia links | CC BY-SA 4.0: credit "Joshua C. Fjelstul, Ph.D.", "© 2023 Joshua C. Fjelstul, Ph.D.", links to the licence and the repository, changes indicated |
+| [martj42/international_results](https://github.com/martj42/international_results), `results.csv` | commit `b0948cb` (2026-10-31), SHA-256 | Every men's full international to 1994, for the Elo | CC0-1.0 |
+| English Wikipedia, "<year> Ballon d'Or" | 18 revisions, 1961–1994 (the two years of each season) | The voting tables: points per player | CC BY-SA 4.0 (the votes are France Football's) |
+| English Wikipedia, "1962 / 1966 FIFA World Cup Group 1–4" and "… knockout stage" | 10 revisions | The starting line-ups, before the database's appearances begin | CC BY-SA 4.0 |
+| eloratings.net year-end tables 1962–1994 | 9 tables and `en.teams.tsv` by SHA-256 | A cross-check of the computed Elo only, never an input; no rating of theirs is kept | none stated |
+
+The Wikipedia pages were saved from their article paths (`/wiki/<title>`), one
+every 2 seconds on 2026-11-09: robots.txt disallows `/w/` and `/api/` to every
+user agent, the parse API included, and has no rule for ClaudeBot. A page saved
+again shows its pinned revision but not always the same bytes, so `--check`
+needs the saved copies. The research pass's copies of eloratings.net's tables
+(fetched 3 s apart; the site has no robots.txt) and of the two repositories are
+reused, each checked against its SHA-256. `scripts/data/world-cup-seasons.json`
+pins all of it, and `public/football/ATTRIBUTION-world-cup.txt` gives the credits
+CC BY-SA asks for and licenses the season files under it.
+
+### How a season is made
+
+- **Elo** (`scripts/lib/football-elo.mjs`), by the formula eloratings.net
+  publishes: R' = R + K × G × (W − We), We = 1 / (1 + 10^(−dr / 400)), dr the
+  rating gap plus 100 for a home side (none at a neutral venue). K is 60 at the
+  World Cup finals; 50 at the Euro, the Copa América, the African Cup of Nations,
+  the Asian Cup, the Gold Cup, the CONCACAF Championship, the Oceania Nations
+  Cup, the Confederations Cup and the Finalissima; 40 in any qualification and
+  the Nations Leagues; 20 in friendlies; 30 elsewhere. G is 1 for a margin of 0
+  or 1, 1.5 for 2, 1.75 for 3 and 1.75 + (N − 3) / 8 from 4. A match level after
+  extra time is a draw, whatever its shoot-out. A team starts at 1500, or 1300
+  when its first match is in a year after 1930. The Soviet Union and the CIS are
+  `Russia` in the results, West Germany `Germany`, Zaire `DR Congo`.
+- **Strength.** The Elo is read the day after the final (every match up to the
+  final's day). T = 87 − 3.2 × (E_best − E) / 100: E is the nation's Elo, E_best
+  the best of the teams that played in the four years before (each season's best
+  is a finalist), and 87 today's strongest built-in nation.
+- **The XI.** From the squad of 22: one GK, four DF, four MF and two FW by the
+  database's positions, the most minutes first, then the most starts, then the
+  lower shirt number. A role the squad cannot fill takes the most-used players
+  left, whatever their position (1962's Czechoslovakia lists two midfielders,
+  Chile three, 1982's Hungary three). From 1970, minutes come from the
+  appearances, substitutions, sendings-off and extra time. For 1962 and 1966
+  every starter of Wikipedia's line-ups plays the whole match (no substitutes
+  were allowed), 120 minutes with extra time: the line-up is matched to the squad
+  by team and shirt number, and the eleven names spelt otherwise on the page
+  (Li Chan-myung for Chang-myung Lee) are checked and listed in the manifest.
+- **Order.** By Ballon d'Or points of the season's two calendar years (1969 and
+  1970 for 1969/70), then World Cup awards (Golden Ball 3, Silver 2, Bronze 1,
+  Golden Boot 2, Silver and Bronze Boot 1, Golden Glove 1, Best Young Player 1),
+  then goals a minute, then minutes. A vote is the player's by his article, else
+  by name and nation, else by one of seven names the manifest pins after a check
+  by hand (Wikipedia's "Igor Belanov" is the database's "Ihor Belanov").
+- **Ratings.** The k-th player of the order is T + D_k, D = +5.3, +3.3, +2.1,
+  +1.0, 0.0, −0.4, −1.0, −1.7, −2.1, −2.7, −3.9: the mean sorted deviation from
+  the XI's mean of the 32 strongest built-in XIs of 2026/27, to one decimal. The
+  eleven are rounded together so they sum to round(11 × T) (each rounded down,
+  the largest fractions up), so the XI's mean is T within 1/22 and rounds as T
+  does. The nation's strength in the file is its lineup's, as for every football
+  set: T, less 12 a place for a player out of position.
+- **Nations and federations.** A finalist plays as the game nation its name
+  resolves to in its year (`dayNationResolver`: the Soviet Union 643, West
+  Germany 276, Yugoslavia 688, Czechoslovakia 203, Zaire 180, the Republic of
+  Ireland 372 by the manifest's alias); the build stops on a finalist whose shape
+  the year merges or leaves out, and none does. East Germany (1974) has no shape
+  and fields no team. Territory and identities are `territoryFor` and
+  `identitiesFor` of the season-end year with only the finalists fielding
+  (`fields`): a federation of the day holds its members' land only where it is a
+  finalist (the Soviet Union in 1969/70 holds Ukraine and the Baltic states;
+  Yugoslavia, not a finalist, holds nothing, and its republics are neutral), and
+  plays under its name and flag. A nation that is not a finalist fields no team.
+- **Theatres** follow the existing rule: the world, and a continent with four
+  finalists of its own (South America in all but 1969/70 and 1977/78, which have
+  three). Never the Elite 32.
+
+All constants are the manifest's, not read from the built-in data, so a later
+rollover of the built-in season changes nothing.
+
+### Calibration and checks
+
+- **3.2 points per 100 Elo** gives the game's football model (rate
+  1.28·e^(1.5·tanh(0.075Δ / 1.5)), Poisson goals) Elo's expected score within
+  0.0015 for gaps of 50 to 300 Elo; the research pass found the same slope, 3.20,
+  regressing today's 173 built-in strengths on their 2026 Elo from the same
+  results (r 0.895).
+- **Against eloratings.net** (year-end tables, cross-check only,
+  `scripts/data/world-cup-seasons/elo-crosscheck.json`): Pearson 0.872–0.917 and
+  top-48 Spearman 0.858–0.957, 0.898 and 0.915 on average over the nine years,
+  the same leader every year. The computed scale is narrower than theirs (slope
+  0.58), and the 3.2 is measured on it.
+- **Against SWOS 94/95** (the original SWOS, December 1994, its national squads,
+  cross-check only): for 1993/94's 24 finalists, Pearson 0.76 and Spearman 0.77
+  between the nations' strengths, and 0.63 for the 178 XI players found in SWOS's
+  squads by surname. The computed strengths run 5.5 points higher on average:
+  SWOS rates Mexico, Saudi Arabia and South Korea at 60–65 where their results
+  make them 77–81.
+- **How they play.** Each season's finalists, all against all (twenty rounds,
+  neutral venue, Balanced, measured 2026-11-10): 2.89–3.16 goals a game,
+  20.3–23.2% draws and 6.2–7.8% goalless, within the realism harness's real range
+  and as EA's seasons play; the stronger side wins 72–77% of decided games.
+- **Saves.** A computed player is a plain record (no `playerPack` kind), its
+  source inline: 24 squads take about 105,000 characters, and a whole 1989/90
+  world campaign stays within the checkpoint budget (`scripts/save-size.test.mjs`).
+
+### Files and commands
+
+```bash
+npm run sync:world-cup-seasons            # data-src/ → scripts/data/world-cup-seasons/<id>.json (--check compares)
+npm run build:world-cup-seasons           # facts → public/football/wc-<year>.json, the listing, the audit (--check)
+```
+
+- `scripts/data/world-cup-seasons.json`: the manifest (sources, constants, the
+  reviewed spellings and Ballon d'Or names, the seasons).
+- `scripts/data/world-cup-seasons/wc-<year>.json`: the committed facts of each
+  World Cup (the finalists' Elo and rank, every squad player's minutes, starts,
+  goals, awards, Ballon d'Or points, date of birth and article, and the votes for
+  players in no squad), CC BY-SA 4.0. The sync needs `data-src/`; the build reads
+  only these and the manifest, so it rebuilds offline.
+- `public/football/wc-<year>.json`: `nations` lists the finalists only, each
+  `[strength, squad size, eleven]`, a player `[name, 'GK' | 'DF' | 'MF' | 'FW',
+  rating, source]` strongest first; `clubs` is empty; `territory` and
+  `identities` as above. A player's source is `{ id: 'wc:P-38906', source:
+  'world-cup', edition: '1970 World Cup, computed', snapshotDate, url, team,
+  shirt, teamElo, xiRank, minutes, starts, goals, awards?, ballonDor?,
+  dateOfBirth? }`: the Source column reads "1970 World Cup, computed" and links
+  to his Wikipedia article. The season's source block says `method: 'computed'`,
+  `computed: true`, `rawScale: 'Elo'`, the Elo's day, the rule (`conversion`),
+  the licence and the commits and revisions read.
+- `docs/design/football-world-cup-seasons-audit.json`: per season each nation's
+  Elo, rank, T, strength, XI and fill-ins, the team share, and the votes matched
+  to no squad player.
+- The loader (`KINDS.wc` in `src/engine/footballSets.js`) refuses a season whose
+  source does not say it is computed, a nation without eleven players or out of
+  order, a player whose source does not name him, his team's Elo, his place and
+  his record, any club, and a holder that fields no team.
+
+### Spot checks (2026-11-10)
+
+The strongest nation by Elo the day after each final is the winner, but in
+1977/78 and 1981/82 Brazil (unbeaten and third in 1978). Each XI's first is its
+star of the day: Garrincha for Brazil and Masopust (1962's Ballon d'Or) for
+Czechoslovakia in 1961/62, Eusébio in 1965/66, Jairzinho (93) and Pelé (90) for
+Brazil and Gerd Müller for West Germany in 1969/70, Cruyff in 1973/74, Kempes in
+1977/78, Paolo Rossi in 1981/82, Maradona in 1985/86, Matthäus (93) in 1989/90
+and Roberto Baggio in 1993/94.
+
 ## Earlier basketball seasons
 
 Basketball has 30 earlier seasons: 1983/84, 1991/92 and 1998/99 from NBA 2K27's
@@ -1126,7 +1305,7 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   that dialog is still open. It plays the version of the set loaded now, which
   can differ from the saved `dataVersion`, as country maps can.
 - `parseCampaign` accepts `dataSet` (`^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$`,
-  `^cm-\d{4}$`, `^swos-\d{4}$`, `^ea-(fifa|fc)-\d{2}$` or `^nba-2k\d{2}$`, among
+  `^cm-\d{4}$`, `^swos-\d{4}$`, `^wc-\d{4}$`, `^ea-(fifa|fc)-\d{2}$` or `^nba-2k\d{2}$`, among
   the other sports' kinds),
   `dataVersion` (`<dataSet>-<8 hex>`), `dataYear` (an integer from 1872 to 2100)
   and `dataSeason` (the season of `dataYear`), all four or none. It also rejects
@@ -1203,6 +1382,23 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   Pistons at Detroit for their Auburn Hills years (until 2016/17).
 - A franchise's code and colour are the game's when it kept its id; a moved one
   gets a code and colour of its own, not its historic ones.
+- The computed World Cup seasons (1961/62 to 1993/94) rate the team more than the
+  player: the nation's Elo explains 66–78% of a season's rating variance, and the
+  gaps inside an XI are today's average shape (D), not a measurement of the day.
+  Before 1995 the Ballon d'Or voted on Europeans only, so a non-European XI is
+  ordered by World Cup awards, goals a minute and minutes (Pelé, 90, follows
+  Jairzinho, 93, in 1969/70), and goals a minute lifts a substitute who scored.
+- Their XI is a 4-4-2 by the database's positions. A 4-2-4 or 4-3-3 side loses
+  its third forward (Tostão in 1969/70), a WM side short of midfielders plays a
+  forward out of position, and a role is filled from its own position first, even
+  by a squad player who never played: 25 of the 1,925 XI places, 18 of them in
+  1961/62 and 1965/66 (Brazil's 1962 XI has Zequinha and Mengálvio, unused, where
+  Zagallo and Amarildo played).
+- They field only the World Cup's 15–24 finalists, so no Elite 32, and Africa,
+  Asia and North America never reach four sides. The Elo is computed from results
+  alone: Asian and North American sides rate higher than SWOS's ratings of autumn
+  1994 put them, and the scale is narrower than eloratings.net's.
+- East Germany, with no shape, fields no team, so 1973/74 has 15 finalists.
 
 ## Invariants kept
 

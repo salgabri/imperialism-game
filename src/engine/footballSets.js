@@ -1072,6 +1072,7 @@ export function seasonSport(set) {
       : setKindOf(meta.id) === 'nrl' ? { ...rugbyLeague, clubs, clubMap: meta.map, ...identity }
       // A women's season's unlisted nations are inactive, so nothing reads their strength in play.
       : setKindOf(meta.id) === 'eaw' ? { ...womensFootball, rosters, clubs, territory, fallbackStrength: () => EMPTY_STRENGTH, ...identity }
+      // Every other football season, a computed World Cup one ('wc') too, whose unlisted nations field no team.
       : { ...football, rosters, clubs, territory,
         // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
         fallbackStrength: () => EMPTY_STRENGTH, ...identity };

@@ -109,6 +109,8 @@ npm run build:domestic   # rebuild country maps from snapshots and boundaries (a
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
 npm run sync:early-nationalities # ask Wikidata for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
+npm run sync:world-cup-seasons # read the pinned World Cup, results and Wikipedia sources in data-src/ into scripts/data/world-cup-seasons/
+npm run build:world-cup-seasons # rebuild the computed World Cup seasons 1961/62 to 1993/94 from those facts (offline; --check to verify)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page and sources in data-src/
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
@@ -1275,10 +1277,11 @@ npm run build:nrl-map -- --check           # offline rebuild must match the comm
 
 ## Football seasons
 
-Football can be played on twenty-seven earlier seasons as well as the built-in
+Football can be played on thirty-six earlier seasons as well as the built-in
 2026/27: every season from 2004/05 to 2025/26, each from EA's FIFA or EA FC of
-that season (FIFA 05 to EA FC 26), and five before them, from 2002/03 back to
-1996/97, from the games of their day ([below](#before-200405)). They ship with
+that season (FIFA 05 to EA FC 26), five before them, from 2002/03 back to
+1996/97, from the games of their day ([below](#before-200405)), and the nine World
+Cups from 1962 to 1994, computed ([below](#the-world-cups-1962-to-1994-computed)). They ship with
 the game: pick one under **Season** in setup. Each is a file in
 `public/football/` (75–340 KB) that loads only when chosen.
 
@@ -1419,6 +1422,32 @@ considered, back to 1872, and their terms.
   Africa, FR Yugoslavia, China PR) and fields no East Germany, which has no shape.
 - **Saves are self-contained:** players are packed as compact EA or CM tuples,
   so a season campaign resumes or imports without its season file.
+
+### The World Cups, 1962 to 1994 (computed)
+
+No game rates the players of most nations before 1994 in a form the game can
+read, so nine seasons, 1961/62 to 1993/94, are **computed** and say so ("Computed
+· 1970 World Cup"): each World Cup's finalists, nations only, 15 to 24 of them.
+
+- **Ratings:** a nation's strength comes from its Elo the day after the final,
+  `T = 87 − 3.2 × (best Elo − its Elo) / 100`, with the Elo computed from every
+  international result to that day (martj42's results, CC0) by eloratings.net's
+  formula. Its eleven are the players of its World Cup squad with the most
+  minutes (1 GK, 4 DF, 4 MF, 2 FW), ordered by Ballon d'Or votes, World Cup
+  awards, goals a minute and minutes, and rated T plus today's spread of an XI,
+  so the team's Elo sets most of each rating. Squads, minutes, goals and awards
+  come from the Fjelstul World Cup Database, the 1962 and 1966 line-ups and the
+  Ballon d'Or votes from Wikipedia (all CC BY-SA 4.0, credited in
+  `public/football/ATTRIBUTION-world-cup.txt`, which licenses the season files
+  the same way).
+- **Federations of the day:** the Soviet Union, Yugoslavia, Czechoslovakia, West
+  Germany and Zaire play under their own names and flags, holding their members'
+  land where they are finalists. East Germany has no shape and fields no team.
+- **Theatres:** the world, Europe, and South America where it had four
+  finalists; never the Elite 32.
+- **Rebuild:** `npm run sync:world-cup-seasons` reads the pinned sources in
+  `data-src/` into the committed facts; `npm run build:world-cup-seasons` turns
+  them into the season files, offline, and `--check` compares byte for byte.
 
 The [design notes](docs/design/football-years.md) give the file format, the
 runtime, the saves and the known limits.
@@ -2154,6 +2183,7 @@ scripts/
   smoke.mjs            headless campaign test (jsdom)
   sync-flags.mjs       vendors flag SVGs from flag-icons
   build-historic-flags.mjs  redraws the federations of the day's public-domain flags
+  sync-world-cup-seasons.mjs, build-world-cup-seasons.mjs  the computed World Cup seasons: sources → facts → seasons
   build-rosters.mjs    builds football squads from an EA FC export
   build-basketball.mjs builds FIBA fives from NBA 2K + fiba-squads.json
   build-clubs.mjs      builds the club layer for both sports
