@@ -173,7 +173,8 @@ setting.
 - **Setup.** A fourth sport card, "Nations · 30 MLB clubs". Clubs have one theatre,
   **MLB · USA and Canada**; nations the usual theatres (North and Central America,
   where the baseball nations are, or the world). The Season list holds the built-in
-  2026.
+  2026, then MLB The Show's 2025 to 2018 and the computed 2017 to 1960 (below); a
+  season's clubs take the map of their day.
 - **Squad.** A diamond: the catcher at home plate, the infield and the starter on the
   mound, the outfield inside the fence, the designated hitter on deck and the bullpen
   beyond the right-field line. Groups read Catcher, Infield, Outfield, Designated
