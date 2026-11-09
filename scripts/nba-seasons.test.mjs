@@ -18,7 +18,7 @@ import { BUILT_IN_SETS, builtInSeasonOf, clearFootballSetIndex, decodeFootballSe
   setSportOf, sportOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
-import { brefPlayerSeasons, brefPositions, buildNbaSeason, checkScore, computedConversion, computedSeasonPlayers, editionOf, extractYears,
+import { brefPlayerSeasons, brefPositions, buildNbaSeason, checkScore, checkSpread, computedConversion, computedSeasonPlayers, editionOf, extractYears,
   fitLine, isComputed, labelOf, leastSquares, leftOutNotes, listedPositions, liveScale, mapOf, nameKey, notListed, onLine, parseCsv,
   parseErasPage, parseLive99, positionsOf, rateComputedSeason, ratingSpread, readDbf, readPlayerSeasons, readTable, realPlayers,
   SCORE_INPUTS, scoreInputs, scoreOf, seasonIdOf, setIdOf, teamsOf, trainingPairs } from './lib/nba-seasons.mjs';
@@ -370,6 +370,9 @@ test('a computed season ranks the league by score onto the spread: no player pas
     .sort((a, b) => a.score - b.score).map(entry => entry.rating);
   assert.deepEqual([ratings[0], ratings.at(-1)], [60, 79]);
   assert.ok(ratings.every((rating, i) => i === 0 || rating >= ratings[i - 1]), 'no player passes another');
+  // The manifest fixes the spread too: a page whose ratings moved stops the build.
+  assert.equal(checkSpread([70, 70, 75], { 70: 2, 75: 1 }).length, 3);
+  assert.throws(() => checkSpread([70, 71, 75], { 70: 2, 75: 1 }), /spread's ratings are not the manifest's: 1 rated 70, not 2; 1 rated 71, not 0/);
 });
 
 test('a computed player\'s positions: the season\'s, a neighbour he played elsewhere, else his career position\'s', () => {
@@ -573,6 +576,8 @@ test('the computed seasons are computed by the manifest\'s rule, and say so', ()
   }
   assert.deepEqual([computed.spreadRatings.edition, computed.spreadRatings.ratings, computed.spreadRatings.quantiles['0'], computed.spreadRatings.quantiles['1']],
     ['NBA 2K27', 390, 69, 97]);
+  const counts = Object.entries(MANIFEST.computed.spread.counts).map(([rating, count]) => [Number(rating), count]);
+  assert.deepEqual([counts.reduce((sum, [, count]) => sum + count, 0), counts[0][0], counts.at(-1)[0]], [390, 69, 97], 'the manifest pins all 390');
   const conversion = computedConversion(MANIFEST.computed);
   for (const listed of BUILT_IN_BASKETBALL_SEASONS.filter(set => isComputed(MANIFEST, set.year))) {
     const doc = seasonFile(listed.id);

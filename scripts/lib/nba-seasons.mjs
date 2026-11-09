@@ -816,6 +816,21 @@ export function ratingSpread(players, perClub) {
   return spread;
 }
 
+/**
+ * Check a spread against the manifest's `counts` (how many of its ratings are each rating), as the score is checked:
+ * a later copy of the page whose ratings moved stops the build rather than moving every computed season.
+ */
+export function checkSpread(spread, counts) {
+  const found = {};
+  for (const rating of spread) found[rating] = (found[rating] ?? 0) + 1;
+  const ratings = [...new Set([...Object.keys(found), ...Object.keys(counts ?? {})])].sort((a, b) => a - b);
+  const differ = ratings.filter(rating => (found[rating] ?? 0) !== (counts?.[rating] ?? 0));
+  if (differ.length) {
+    throw new Error(`The spread's ratings are not the manifest's: ${differ.map(rating => `${found[rating] ?? 0} rated ${rating}, not ${counts?.[rating] ?? 0}`).join('; ')}`);
+  }
+  return spread;
+}
+
 /** A spread's ratings at quantiles 0, 5%, 25%, 50%, 75%, 95% and 1. */
 export const spreadQuantiles = spread => Object.fromEntries([0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
   .map(q => [q, spread[Math.min(spread.length - 1, Math.floor(q * spread.length))]]));
@@ -928,8 +943,8 @@ export function computedConversion({ score, roster, spread }) {
 /**
  * The seasons of the manifest's `computed`, read from its pinned copy of Basketball-Reference's tables in
  * data-src/<folder>/: the score is fitted again on 2K Archive's whole table (`years`, NBA 2K12 its own) and checked
- * against the manifest's (checkScore); each season is rated onto the spread (rateComputedSeason) and its players put in
- * the table's shape (computedSeasonPlayers). Each season's franchises must have Basketball-Reference's names for its
+ * against the manifest's (checkScore), and so is the spread (checkSpread); each season is rated onto the spread
+ * (rateComputedSeason) and its players put in the table's shape (computedSeasonPlayers). Each season's franchises must have Basketball-Reference's names for its
  * teams, and src/data/nbaLeagueAverages.js (`leagueAverages`) its league averages. The audit's checks rate the MyNBA
  * Eras seasons the same way and compare with 2K's own ratings (`sources`, readSeasonSources'). Returns
  * `{ seasons: { [year]: source }, summary }`, or null without a `computed`.
@@ -947,7 +962,7 @@ export async function readComputedSources(root, manifest, years, { arenas = {}, 
   const inputsOf = record => scoreInputs(record, computed.score);
   const scoreFor = scoreOf(computed.score);
   const fit = checkScore(trainingPairs(years, records, computed.score.training, inputsOf), computed.score);
-  const spread = ratingSpread(years[String(computed.spread.edition)] || [], computed.spread.perClub);
+  const spread = checkSpread(ratingSpread(years[String(computed.spread.edition)] || [], computed.spread.perClub), computed.spread.counts);
   const listed = listedPositions(records);
   const options = { roster: computed.roster, inputsOf, scoreFor, spread };
   const codes = manifest.check?.codes ?? {};

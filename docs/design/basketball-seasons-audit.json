@@ -384,7 +384,38 @@
     "roster": 13,
     "spread": {
       "edition": 2027,
-      "perClub": 13
+      "perClub": 13,
+      "counts": {
+        "69": 1,
+        "70": 1,
+        "71": 15,
+        "72": 17,
+        "73": 33,
+        "74": 44,
+        "75": 33,
+        "76": 37,
+        "77": 14,
+        "78": 25,
+        "79": 47,
+        "80": 20,
+        "81": 13,
+        "82": 13,
+        "83": 8,
+        "84": 12,
+        "85": 14,
+        "86": 6,
+        "87": 11,
+        "88": 4,
+        "89": 1,
+        "90": 2,
+        "91": 4,
+        "92": 1,
+        "93": 6,
+        "94": 1,
+        "95": 1,
+        "96": 3,
+        "97": 3
+      }
     },
     "positions": {
       "G": [
@@ -415,7 +446,7 @@
         "PF"
       ]
     },
-    "rule": "Each season, each club's 13 players with the most minutes are rated (a traded player counts once, for the club he played the most minutes for). The league is ranked by score, and the player at rank quantile (rank - 0.5) / N takes NBA 2K27's rating at that quantile of its ratings of each club's 13 best (2K Archive, 390 ratings from 69 to 97): no player passes another. A player's positions are the season's, else the first his career position implies (`positions`); the second is the neighbouring one he was listed at in other seasons with the most minutes, else the one his career position implies. A player with no position is left out. Nothing uses a team's results.",
+    "rule": "Each season, each club's 13 players with the most minutes are rated (a traded player counts once, for the club he played the most minutes for). The league is ranked by score, and the player at rank quantile (rank - 0.5) / N takes NBA 2K27's rating at that quantile of its ratings of each club's 13 best (2K Archive, 390 ratings from 69 to 97, `spread.counts`; the build stops if the page's differ): no player passes another. A player's positions are the season's, else the first his career position implies (`positions`); the second is the neighbouring one he was listed at in other seasons with the most minutes, else the one his career position implies. A player with no position is left out. Nothing uses a team's results.",
     "fit": {
       "pairs": 9970,
       "editions": 27,
