@@ -1,0 +1,21 @@
+Ice hockey seasons (public/hockey/nhl-<year>.json): sources, terms and attribution
+=========================================================================
+
+EA's own ratings of a season (1992/93, 1993/94, 1994/95, 2006/07, 2021/22): each file's source names the edition and who compiled it (docs/design/hockey.md, "Earlier seasons").
+
+Converted from EA's attributes (2007/08, 2008/09): EA's NHL 08 and NHL 09 attributes as IGN's team pages published them
+(the Wayback Machine's captures, pinned in scripts/data/nhl-seasons-sources.json); the overall is this project's conversion, not EA's
+(docs/design/hockey.md, "NHL 08 and NHL 09").
+
+Computed from the players' season statistics by this project's rule (docs/design/hockey.md, "Computed seasons"). These are not any game's ratings.
+
+- 1966/67, 1967/68, 1968/69, 1969/70, 1970/71, 1971/72, 1972/73, 1973/74, 1974/75, 1975/76, 1976/77, 1977/78, 1978/79, 1979/80, 1980/81, 1981/82, 1982/83, 1983/84, 1984/85, 1985/86, 1986/87, 1987/88, 1988/89, 1989/90, 1990/91, 1991/92, 1995/96, 1996/97, 1997/98, 1998/99, 1999/00, 2000/01, 2001/02, 2002/03, 2003/04, 2005/06, 2009/10: the Hockey Databank, version 13.0 of 10 July 2018 (maintained through the hockey-databank Yahoo group), as published at github.com/rippinrobr/hockey-databank.
+  Terms: free use of the data, a commercial product included, with the Hockey Databank's attribution statement displayed in its entirety (its readme). The statement it asks for:
+
+  "The information used herein was obtained free of charge from and is copyrighted by the Hockey Databank project.  For more information about the Hockey Databank project please visit http://sports.groups.yahoo.com/group/hockey-databank"
+
+- 2010/11, 2011/12, 2012/13, 2013/14, 2014/15, 2015/16, 2016/17, 2017/18, 2018/19, 2019/20, 2020/21, 2022/23, 2023/24, 2024/25, 2025/26: MoneyPuck.com's season summaries and game-by-game player data (moneypuck.com/data.htm).
+  Terms: free to use for non-commercial purposes, crediting MoneyPuck.com (moneypuck.com/data.htm). Credit: MoneyPuck.com (https://moneypuck.com).
+  Non-commercial: these files may not be used for commercial purposes without MoneyPuck.com's leave.
+  Where MoneyPuck's player lookup gives no nationality, these seasons take the Hockey Databank's birth country, under
+  its terms and statement above.
