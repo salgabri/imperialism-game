@@ -42,7 +42,8 @@ const IDS = ['cm0102-2002-11', 'cm0102-2001-09', 'cm0102-2020-11-cm3', 'cm-9798'
 
 test('the seasons before FIFA 05 are built in, after EA\'s, each its committed file and credited to its makers', () => {
   assert.deepEqual(MANIFEST.seasons.map(season => season.id), IDS);
-  const listed = BUILT_IN_SEASONS.slice(-IDS.length);
+  // The computed World Cup seasons (1961/62 to 1993/94) follow them.
+  const listed = BUILT_IN_SEASONS.filter(set => IDS.includes(set.id));
   assert.deepEqual(listed.map(set => [set.id, set.year, set.season]), [['cm0102-2002-11', 2003, '2002/03'], ['cm0102-2001-09', 2002, '2001/02'],
     ['cm0102-2020-11-cm3', 1999, '1998/99'], ['cm-9798', 1998, '1997/98'], ['swos-9697', 1997, '1996/97']]);
   assert.ok(BUILT_IN_SEASONS.every((set, i) => !i || set.year < BUILT_IN_SEASONS[i - 1].year), 'one listing, newest first');

@@ -10,6 +10,8 @@
 // 1998/99: SI's Championship Manager 3 data in the CM 01/02 format, Cam F's port (the CM0102 Starter Kit's cm3_data.zip)
 // 1997/98: SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)
 // 1996/97: Sensible Software's Sensible World of Soccer 96/97 national squads (Whiteulver's database, as keyser1884's SWOS-MCP holds it)
+// and by npm run build:world-cup-seasons, computed (scripts/data/world-cup-seasons.json):
+// 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994: each World Cup's finalists, rated from their Elo and their players' records
 // The built-in earlier seasons, newest first. Each is public/football/<id>.json, loaded when a setup chooses it
 // (src/engine/footballSets.js); docs/design/football-years.md describes them.
 export const BUILT_IN_SEASONS = Object.freeze([
@@ -40,4 +42,13 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-5b8d03bc', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
   Object.freeze({ id: 'cm-9798', version: 'cm-9798-cb9596fd', year: 1998, season: '1997/98', label: 'CM 97/98' }),
   Object.freeze({ id: 'swos-9697', version: 'swos-9697-189aa2ca', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
+  Object.freeze({ id: 'wc-1994', version: 'wc-1994-ae4aefa8', year: 1994, season: '1993/94', label: 'Computed · 1994 World Cup' }),
+  Object.freeze({ id: 'wc-1990', version: 'wc-1990-246f9a35', year: 1990, season: '1989/90', label: 'Computed · 1990 World Cup' }),
+  Object.freeze({ id: 'wc-1986', version: 'wc-1986-cb089884', year: 1986, season: '1985/86', label: 'Computed · 1986 World Cup' }),
+  Object.freeze({ id: 'wc-1982', version: 'wc-1982-1fa88a41', year: 1982, season: '1981/82', label: 'Computed · 1982 World Cup' }),
+  Object.freeze({ id: 'wc-1978', version: 'wc-1978-0c26e9e2', year: 1978, season: '1977/78', label: 'Computed · 1978 World Cup' }),
+  Object.freeze({ id: 'wc-1974', version: 'wc-1974-73aec340', year: 1974, season: '1973/74', label: 'Computed · 1974 World Cup' }),
+  Object.freeze({ id: 'wc-1970', version: 'wc-1970-a986f212', year: 1970, season: '1969/70', label: 'Computed · 1970 World Cup' }),
+  Object.freeze({ id: 'wc-1966', version: 'wc-1966-02c57501', year: 1966, season: '1965/66', label: 'Computed · 1966 World Cup' }),
+  Object.freeze({ id: 'wc-1962', version: 'wc-1962-033fca51', year: 1962, season: '1961/62', label: 'Computed · 1962 World Cup' }),
 ]);

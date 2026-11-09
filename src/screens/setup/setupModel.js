@@ -333,7 +333,8 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 export const SEASON_NOTES = Object.freeze({
   football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1996/97: '
     + 'Sensible World of Soccer\'s), with clubs from the seven biggest leagues. A nation with fewer than six rated players '
-    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1996/97 have nations only.',
+    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1996/97 have nations only.'
+    + ' 1961/62 to 1993/94 are computed: each World Cup\'s finalists, rated from their Elo and records.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
     + 'without eleven starts short-handed.',
