@@ -1,4 +1,4 @@
-Tennis seasons 1973-2025 (tennis-<year>.json): attribution and licence
+Tennis seasons 1960-2025 (tennis-<year>.json): attribution and licence
 =====================================================================
 
 The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived from his data.
@@ -10,6 +10,9 @@ The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived
   (https://github.com/JeffSackmann/tennis_atp, as mirrored at https://github.com/Kadantte/tennis_atp, commit 712be0c5ade693cdab9e69c23a71a0edf5a23c44)
   by the method Tennis Abstract has published; see docs/design/tennis.md, "Earlier seasons". These are not Tennis
   Abstract's own numbers.
+- 1960-1972: Elo computed the same way from the same repository's match results, warmed up on its file of
+  the amateur era's majors and Davis Cup ties (atp_matches_amateur.csv, 1877-1967); 1960-1967 list the
+  amateurs of that file alone. See docs/design/tennis.md, "Before 1973".
 
 Credit: Jeff Sackmann / Tennis Abstract.
 Licence: CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/). Attribution, non-commercial use only, derived data shared alike. The match results and Tennis Abstract's Elo reports are Jeff Sackmann's; the ratings computed here from his results are derived data under the same licence.
