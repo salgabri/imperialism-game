@@ -447,13 +447,19 @@ Russia, South Vietnam (Danny Graves, Saigon) Vietnam, British Honduras (Chito Ma
 Belize, and Czechoslovakia (Elmer Valo) Slovakia, for his birthplace Rybník in Levice
 District (Wikipedia, citing his SABR biography; Lahman's birth state reads "Plzenský").
 Hong Kong's Austin Brice is China's, as Lahman files him. The game has no Singapore, so
-Robin Jennings plays for his club only, and so does Bob Johnson of 1969–1977
-(`johnsbo03`), whom Lahman gives no birthplace. Each nation keeps its lineup and up to a
-club's depth; 4 to 10 nations a season field a team by the game's rule (their own players
-hold half the lineup): in 1960 the United States, Cuba, Puerto Rico and the Dominican
-Republic; Canada, Panama, Venezuela and Mexico in some seasons from 1962, 1967 and 1972;
-the Netherlands from 1998, Japan from 2001, Colombia in 2015 and South Korea in 2016;
-ten in 2012. The North and Central America theatre is offered in every season.
+Robin Jennings plays for his club only; every other player of the 58 seasons has a
+nation. Lahman files four of these players' Baseball-Reference ids twice, each beside a
+man with no major-league debut: the player is the one with a debut (Bob Johnson of
+1969–1977, `johnsbo03`, born in Aurora, Illinois, not the `johnsbo05` filed under his id
+with no birthplace; Bob McClure, Eddie Miller and Billy Parker likewise). Each nation
+keeps its lineup and up to a club's depth; 4 to 10 nations a season field a team by the
+game's rule (their own players hold half the lineup): in 1960 the United States, Cuba,
+Puerto Rico and the Dominican Republic; Canada, Panama, Venezuela and Mexico in some
+seasons from 1962, 1967 and 1972; the Netherlands from 1998, Japan from 2001, Colombia in
+2015 and South Korea in 2016; ten in 2012. The North and Central America theatre, which
+needs four of its nations' real sides, is offered in every season but 1985–87 and
+1989–90: then only the United States, the Dominican Republic and Puerto Rico field one
+(Venezuela, the fourth, is South America's), and those seasons' nations play the world.
 
 **Clubs of their day.** `scripts/data/mlb-war-seasons.json` `eras` names each franchise's
 clubs of 1960 to 2017 by today's franchise: its Baseball-Reference code (`war`, the code

@@ -67,6 +67,28 @@ async function pinned(source, file) {
 
 const number = value => (value === '' || value === 'NA' || value == null ? 0 : Number(value));
 
+/**
+ * Lahman's People by Baseball-Reference id. Lahman files a few ids twice, a major leaguer beside another man with no
+ * major-league debut: Bob Johnson of 1969–77 (johnsbo03, born in Aurora, Illinois) beside johnsbo05, who has no
+ * birthplace, and likewise Bob McClure, Eddie Miller and Billy Parker. The player is the one with a debut, else the one
+ * whose own Lahman id is the Baseball-Reference id; an id neither tells apart throws once a season asks for it.
+ */
+function peopleByBbref(rows) {
+  const filed = new Map();
+  for (const person of rows) {
+    if (!person.bbrefID) continue;
+    if (!filed.has(person.bbrefID)) filed.set(person.bbrefID, []);
+    filed.get(person.bbrefID).push(person);
+  }
+  const people = new Map();
+  for (const [id, list] of filed) {
+    const found = list.length === 1 ? list : [p => Boolean(p.debut), p => p.playerID === id]
+      .map(test => list.filter(test)).find(picked => picked.length === 1) ?? list;
+    people.set(id, found.length === 1 ? found[0] : { ambiguous: list.map(p => p.playerID) });
+  }
+  return people;
+}
+
 // ---------- player-seasons ----------
 
 const GAMES = { C: 'gms_C', '1B': 'gms_1B', '2B': 'gms_2B', '3B': 'gms_3B', SS: 'gms_SS', LF: 'gms_LF', CF: 'gms_CF', RF: 'gms_RF' };
@@ -294,7 +316,7 @@ async function main() {
   // The licence the season files' attribution repeats is the file's own.
   if ((await pinned(sources.war, 'LICENSE.txt')) !== sources.war.licenceText) throw new Error('sources.war.licenceText is not the WAR file\'s LICENSE.txt');
   const war = csvRows(await pinned(sources.war, sources.war.file));
-  const people = new Map(csvObjects(await pinned(sources.lahman, 'People.csv')).map(p => [p.bbrefID, p]));
+  const people = peopleByBbref(csvObjects(await pinned(sources.lahman, 'People.csv')));
   const lahmanTeams = csvObjects(await pinned(sources.lahman, 'Teams.csv'));
   const homeGames = csvObjects(await pinned(sources.lahman, 'HomeGames.csv'));
   await pinned(sources.lahman, 'readme2025.txt');
@@ -339,6 +361,8 @@ async function main() {
     const pool = seasonPool(seasons, year, get, method);
     const unknownPeople = pool.filter(p => !people.has(p.id));
     if (unknownPeople.length) throw new Error(`${year}: no Lahman person for ${unknownPeople.map(p => p.id).join(', ')}`);
+    const ambiguous = pool.filter(p => people.get(p.id).ambiguous);
+    if (ambiguous.length) throw new Error(`${year}: Lahman files more than one person under ${ambiguous.map(p => `${p.id} (${people.get(p.id).ambiguous.join(', ')})`).join(', ')}`);
     const players = pool.map(p => {
       const person = people.get(p.id);
       const suffix = p.name.match(SUFFIX)?.[1] ?? null;

@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_BASEBALL_SEASONS } from '../src/data/baseballSeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
+import { nationTheatres } from '../src/data/scopes.js';
 import { selectLineup } from '../src/data/teams.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import {
@@ -180,16 +181,25 @@ test('nations by birthplace: four in 1960, the countries of the day placed in to
     const count = fielded(year).length;
     assert.ok(count >= 4 && count <= 10, `${year}: ${count} nations field a team`);
   }
+  // North and Central America needs four of its nations' real sides: every season has them but 1985–87 and 1989–90,
+  // whose fourth is Venezuela, South America's. Those seasons' nations play the world.
+  const offersNca = year => nationTheatres(seasonSport(decodeFootballSet(seasonFile(year), warSeasonIdOf(year)))).some(scope => scope.id === 'CONCACAF');
+  assert.deepEqual(YEARS.filter(year => !offersNca(year)), [1985, 1986, 1987, 1989, 1990]);
   const { nations } = MANIFEST;
   assert.deepEqual(['West Germany', 'England', 'Scotland', 'Soviet Union', 'Czechoslovakia', 'South Vietnam', 'British Honduras', 'Curaçao', 'U.S. Virgin Islands']
     .map(country => nationOfBirthCountry(country, nations)), ['276', '826', '826', '643', '703', '704', '084', '528', '840']);
   assert.equal(nationOfBirthCountry('', nations), null);
   assert.equal(nationOfBirthCountry('Singapore', nations), null);
   assert.throws(() => nationOfBirthCountry('Atlantis', nations), /No nation for the birth country/);
-  // Bob Johnson of the 1969 Mets has no birthplace in Lahman: he plays for his club only.
-  assert.equal(rows(1969).find(row => row.id === 'johnsbo03').born, '');
-  assert.ok(AUDIT.seasons.find(season => season.id === 'mlb-war-1969').noNation.includes('Bob Johnson (johnsbo03): no birthplace'));
+  // Lahman files Bob Johnson of the 1969 Mets (johnsbo03, born in Aurora, Illinois) twice, beside a namesake with no
+  // major-league debut and no birthplace: the major leaguer is American. Every player of the 58 seasons has a
+  // birthplace, and only Robin Jennings, born in Singapore, has none of the game's nations.
+  assert.equal(rows(1969).find(row => row.id === 'johnsbo03').born, 'USA');
   assert.ok(seasonFile(1969).clubs.find(club => club.code === 'NYM').squad.some(([name]) => name === 'Bob Johnson'));
+  assert.ok(YEARS.every(year => rows(year).every(row => row.born !== '')), 'every player has a birthplace');
+  assert.deepEqual([...new Set(AUDIT.seasons.flatMap(season => season.noNation))], ['Robin Jennings (jenniro01): born in Singapore, no nation of the game']);
+  // His namesake of the same seasons, Bob W. Johnson, is told apart by the middle initials Lahman's given names hold.
+  assert.deepEqual(rows(1970).filter(row => row.name === 'Bob Johnson').map(row => row.alias).sort(), ['Bob D. Johnson', 'Bob W. Johnson']);
   // Victor Cole, born in Leningrad, plays for Russia in 1992.
   assert.ok(seasonFile(1992).nations['643']?.[2].some(([name]) => name === 'Victor Cole'));
 });
@@ -353,7 +363,19 @@ test('the Season choice lists 1960 to 2017 after MLB The Show\'s seasons, and a 
     assert.ok(yankees.squad.some(p => p.name === 'Roger Maris') && yankees.squad.some(p => p.name === 'Mickey Mantle'));
     assert.equal(app.territoryName(st.teams['mlb-los-angeles-angels'].home), 'Los Angeles (Angels)');
     assert.equal(app.territoryName(st.teams['mlb-washington-senators-1961'].home), 'Washington');
-    assert.equal(JSON.stringify(parseCampaign(items.get(SAVE_KEY)).teams), JSON.stringify(st.teams));
+    // The save holds every player as played, so it resumes without the season file, on the map of 1961 and no other.
+    const text = items.get(SAVE_KEY);
+    const saved = parseCampaign(text);
+    assert.equal(JSON.stringify(saved.teams), JSON.stringify(st.teams));
+    B.clearFootballSetCache();
+    app.continueSaved(saved);
+    assert.equal(app.state.phase, 'playing');
+    assert.deepEqual([app.state.settings.clubScope, app.state.settings.dataSet], ['domestic:mlb1961', 'mlb-war-1961']);
+    assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams));
+    const edited = edit => { const data = JSON.parse(text); edit(data.settings); if (data.initialSettings) edit(data.initialSettings); return JSON.stringify(data); };
+    const map1962 = CLUB_MAPS.find(entry => entry.id === 'mlb1962').version;
+    assert.throws(() => parseCampaign(edited(s => { s.clubScope = 'domestic:mlb1962'; s.domesticVersion = map1962; })), /Campaign data set is invalid/);
+    assert.throws(() => parseCampaign(edited(s => { s.dataSeason = '1962'; })), /Campaign data set is invalid/);
   });
   // A challenge link reaches back to 1960, and no further.
   assert.deepEqual(readChallenge('?sport=baseball&season=mlb-war-1960').ignored, []);
