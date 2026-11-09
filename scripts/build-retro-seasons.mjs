@@ -22,8 +22,10 @@ import { unzipSync } from 'fflate';
 import { CM_CONVERSION, CM_SCALE } from '../src/data/cmPlayers.js';
 import { SWOS_CONVERSION, SWOS_PRICES, SWOS_SCALE } from '../src/data/swosPlayers.js';
 import { buildFootballSet, seasonYear } from '../src/data/footballSetBuild.js';
+import { setHasClubs } from '../src/engine/footballSets.js';
 import { buildCm9798Season } from './lib/cm9798.mjs';
-import { buildSwosSeason } from './lib/swos.mjs';
+import { SWOS_LEAGUES, buildSwosSeason } from './lib/swos.mjs';
+import { SWOS_NATIONAL_FILES, readTeamFile, swosRows } from './lib/swos-files.mjs';
 import { committedSeasons, eaSeasonIds, footballSeasonsModule } from './lib/football-seasons-listing.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -54,12 +56,17 @@ async function pinned(dataDir, file) {
 /** The fields every season's source block adds to its maker's: who compiled it, from where, and when it was read. */
 const credits = (season, retrieved) => ({ compiler: season.compiler, ...(season.provenance ? { provenance: season.provenance } : {}), retrieved });
 
-/** A CM 01/02-format database: the zip's .dat files, read by the CM 01/02 builder as a known release. */
+/**
+ * A CM 01/02-format database: the zip's .dat files, read by the CM 01/02 builder as a known release. A season may name
+ * players of its own day to check the stored birth years against (`birthdays`), the clubs whose players of a nationality
+ * play for no nation (`noNationAt`), and its nations alone (src/engine/footballSets.js setHasClubs).
+ */
 async function buildCmZip(season, dataDir, retrieved) {
   const zip = await pinned(dataDir, season.file);
   // Only the Data folder's tables: the language and picture files are not read.
   const files = unzipSync(zip, { filter: entry => /^[^/]+\.dat$/i.test(entry.name) });
-  return buildFootballSet(files, { local: false, sourceExtra: credits(season, retrieved) });
+  return buildFootballSet(files, { local: false, sourceExtra: credits(season, retrieved), ...(season.birthdays ? { famous: season.birthdays } : {}),
+    ...(season.noNationAt ? { noNationAt: season.noNationAt } : {}), ...(setHasClubs(season.id) ? {} : { clubs: false }) });
 }
 
 async function buildCm9798(season, dataDir, retrieved) {
@@ -83,7 +90,29 @@ async function buildSwos(season, dataDir, retrieved) {
   }
 }
 
-const BUILDERS = { cm0102: buildCmZip, cm: buildCm9798, swos: buildSwos };
+/**
+ * A SWOS edition read from the game's own team files (scripts/lib/swos-files.mjs): its national squads, and its seven
+ * leagues' top-division clubs.
+ */
+async function buildSwosFiles(season, dataDir, retrieved) {
+  const read = await Promise.all(season.files.map(async file => readTeamFile(await pinned(dataDir, file), file.name.replace(/^TEAM\./, ''))));
+  const numbers = read.map(file => file.number).sort();
+  if (JSON.stringify(numbers) !== JSON.stringify([...SWOS_NATIONAL_FILES, ...Object.keys(SWOS_LEAGUES)].sort())) {
+    throw new Error(`${season.id} must list the six national and seven league files, not ${numbers.join(', ')}`);
+  }
+  // Price steps as the SWOS 96/97 database stores them (0 as 1, 49 as 48), each one moved listed in the audit.
+  const clamped = [];
+  const rows = read.filter(file => SWOS_NATIONAL_FILES.includes(file.number)).flatMap(file => swosRows(file, 'NATIONAL', clamped));
+  // The leagues' top divisions (division 0).
+  const clubRows = read.filter(file => Object.hasOwn(SWOS_LEAGUES, file.number))
+    .flatMap(file => swosRows({ ...file, teams: file.teams.filter(team => team.division === 0) }, 'CLUB', clamped));
+  const source = { provider: season.maker, edition: season.edition, version: season.version, snapshotDate: season.snapshotDate, url: season.url,
+    rawScale: SWOS_SCALE, conversion: SWOS_CONVERSION, ...credits(season, retrieved) };
+  const result = buildSwosSeason(rows, { source, year: seasonYear(season.season), prices: SWOS_PRICES, id: season.id, clubRows });
+  return { ...result, audit: { ...result.audit, clamped } };
+}
+
+const BUILDERS = { cm0102: buildCmZip, cm: buildCm9798, swos: buildSwos, 'swos-files': buildSwosFiles };
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -92,8 +121,9 @@ async function main() {
   const dataDir = path.resolve(args.data ?? path.join(root, 'data-src'));
   const results = [];
   for (const season of manifest.seasons) {
-    const build = BUILDERS[season.kind];
-    if (!build) throw new Error(`${season.id} has kind ${season.kind}, which no builder makes`);
+    // A season's reader, where its kind is read from more than one kind of source (SWOS: a database, or team files).
+    const build = BUILDERS[season.reader ?? season.kind];
+    if (!build) throw new Error(`${season.id} has kind ${season.kind}${season.reader ? ` and reader ${season.reader}` : ''}, which no builder makes`);
     const result = await build(season, dataDir, manifest.retrieved);
     const { doc } = result;
     if (doc.id !== season.id || doc.season !== season.season || doc.local !== false) {
