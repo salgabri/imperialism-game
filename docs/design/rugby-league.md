@@ -397,6 +397,12 @@ states it.
    | Run metres | 1 every 10 | the forwards' and outside backs' work |
    | Kick metres | 1 every 30 | territory, the halves' and fullbacks' work |
 
+   NRL.com's replies of 2013–2015 record no errors at all (`errors` is 0 for every player of every game), only handling
+   errors (`handlingErrors`, about 17 a game against some 20 errors a game in the seasons around them): in a game whose
+   reply gives no player an error, a player's handling errors count as his errors (`matchRecord`), so all eleven stats
+   count in every season. The replies' `goals` is empty in every season; a player's goals are his conversions and
+   penalty goals, as `scripts/sync-nrl.mjs` counts them.
+
    A player's value is his season's core points over his club's games that season (the mean of his clubs' where he
    played for two), with the season before at half weight when he played in it: (P + ½·P₋₁) / (G + ½·G₋₁). Counting club
    games, not his own, rewards the player who was there every week; the season before softens an injury year. Points are
@@ -426,10 +432,10 @@ results, so the test recomputes every overall and every shift from it alone.
 | 2010 | 201 | 448 | 395 / 31 / 6 / 16 | 5 | 81.5–85.1 | −2 to +2 | 4.3 | 0.06 → 0.82 |
 | 2011 | 201 | 465 | 417 / 32 / 9 / 7 | 3 | 81.4–84.9 | −1 to +2 | 3.2 | 0.55 → 0.92 |
 | 2012 | 201 | 436 | 388 / 31 / 6 / 11 | 2 | 81.5–84.9 | −1 to +1 | 1.8 | 0.45 → 0.91 |
-| 2013 | 201 | 457 | 400 / 32 / 11 / 14 | 4 | 81.3–84.6 | −1 to +1 | 4.1 | 0.72 → 0.94 |
-| 2014 | 201 | 461 | 404 / 30 / 7 / 20 | 2 | 81.7–84.8 | −1 to +1 | 4.4 | 0.54 → 0.87 |
-| 2015 | 201 | 445 | 381 / 29 / 19 / 16 | 2 | 81.4–85.2 | −1 to +1 | 3.5 | 0.80 → 0.85 |
-| 2016 | 201 | 448 | 397 / 28 / 4 / 19 | 1 | 81.6–84.8 | −2 to +2 | 1.7 | 0.62 → 0.90 |
+| 2013 | 201 | 457 | 400 / 32 / 11 / 14 | 4 | 81.4–85.5 | −1 to +2 | 4.1 | 0.59 → 0.93 |
+| 2014 | 201 | 461 | 404 / 30 / 7 / 20 | 2 | 81.4–84.7 | −1 to +1 | 4.4 | 0.54 → 0.86 |
+| 2015 | 201 | 445 | 381 / 29 / 19 / 16 | 2 | 81.4–85.2 | −1 to +1 | 3.5 | 0.78 → 0.88 |
+| 2016 | 201 | 448 | 397 / 28 / 4 / 19 | 1 | 81.7–84.8 | −2 to +2 | 1.7 | 0.64 → 0.92 |
 | 2017 | 201 | 440 | 379 / 33 / 11 / 17 | 3 | 81.5–84.8 | −1 to +1 | 0.3 | 0.57 → 0.86 |
 | 2018 | 201 | 437 | 383 / 35 / 13 / 6 | 3 | 81.4–84.9 | −1 to +1 | 2.4 | 0.54 → 0.84 |
 | 2019 | 201 | 451 | 398 / 36 / 9 / 8 | 1 | 81.9–84.7 | −2 to +1 | 3.3 | 0.44 → 0.87 |
@@ -458,27 +464,29 @@ shift, and the best-rated dozen.
   editor's own overall formulas. Matched once by name: 2015, 415 of 445 players, Spearman 0.70 within position (0.69 by
   the game's positions); 2017, 421 of 440, 0.74 (0.71). The two games agree with each other at 0.53 (the research
   pass's figure, 227 players): the computed ratings track each game better than the games track each other.
-- **Year to year.** The same player at the same position in consecutive seasons: Spearman 0.69–0.82 (276–339 players a
-  pair), a mean change of 2.4–2.9 points.
+- **Year to year.** The same player at the same position in consecutive seasons: Spearman 0.68–0.82 within position
+  (276–339 players a pair), a mean change of 2.4–2.9 points.
 - **Realism.** 40 seeded seasons of each (`--realism`, 24 games at a neutral venue): the model's wins rank against the
-  real season's at 0.73–0.93 (2008's: 0.32). Points a team 22.9–23.4 (real 19.6–23.4: the model is tuned on 2021–2025,
-  and the 2010s scored less), mean margin 15.7–16.9 (real 12.8–18.3), win% spread 0.156–0.179 (real 0.124–0.226), best
-  and worst records 18.9–19.8 and 4.0–5.7 wins of 24 (real 16–21.6 and 1–8).
+  real season's at 0.73–0.94 (2008's: 0.32). Points a team 22.9–23.4 (real 19.6–23.4: the model is tuned on 2021–2025,
+  and the 2010s scored less), mean margin 15.7–17.0 (real 12.8–18.3), win% spread 0.156–0.187 (real 0.124–0.226), best
+  and worst records 18.9–20.1 and 4.0–5.7 wins of 24 (real 16–21.6 and 1–8).
 
 **Spot checks against the record** (NRL.com's results; the grand finals from its finals games). The strongest club of
-each computed season is its best by margin. That is the premier in 2010 (the Dragons), 2011 (Manly), 2012 (Melbourne),
-2013 (the Roosters), 2014 (the Rabbitohs), 2017 (Melbourne), 2018 (the Roosters), 2022 and 2023 (Penrith); in 2009,
-2015, 2016, 2019, 2020 and 2021 it is the minor premier (the Dragons, the Roosters, Melbourne three times, Penrith),
-the premiers second (2009, 2019–2021) or fourth (2015, 2016); in 2024 the Roosters, ahead of Melbourne (minor
-premiers), Cronulla and Penrith (premiers). The 2009 Bulldogs, 18 wins but docked two points (the Rugby League
-Project's ladder), rate third, as do the 2010 Storm, 14 wins and stripped of every point. The best-rated dozen of each
-season (the audit's `best`) are the
-period's stars, with the box score's leanings: Cooper Cronk (2009–2012), Billy Slater (2009–2013) and Cameron Smith
-(2011–2019) of Melbourne; Daly Cherry-Evans in every season from his first, 2011 (top three in ten of them); Andrew
-Fifita (2013, 2016–2019); Greg Inglis (2013–2014) and Sam Burgess (2014); Jarryd Hayne (2011, 2014); James Tedesco
-(2017–2024); Payne Haas (2020–2023); Nathan Cleary (2020, 2021, 2023); Isaah Yeo (2018, 2021, 2023, 2024). Johnathan
-Thurston, the halfback of North Queensland's 2015 title, rates 90 that year, outside the dozen: the box score sees his
-kicking as metres and his goals not at all.
+each computed season is its best by margin, its SRS (in 2016 level with North Queensland). That is the premier in 2010
+(the Dragons), 2011 (Manly), 2012 (Melbourne), 2013 (the Roosters), 2014 (the Rabbitohs), 2017 (Melbourne), 2018 (the
+Roosters), 2022 and 2023 (Penrith); in 2009, 2015, 2016, 2019, 2020 and 2021 it is the minor premier (the Dragons, the
+Roosters, Melbourne three times, Penrith), the premiers second by margin (2009, 2019–2021) or fourth (2015, 2016); in
+2024 the Roosters, ahead of Melbourne (minor premiers), Cronulla and Penrith (premiers) by margin. The 2009 Bulldogs, 18
+wins but docked two points (the Rugby League Project's ladder), are third by margin, as are the 2010 Storm, 14 wins and
+stripped of every point. The shift moves a club by whole points, about a point of strength, while neighbouring targets
+lie a fifth of a point apart, so the strengths keep the margins' order only roughly: the 2009 Bulldogs play fifth
+(83.8), the 2010 Storm fourth, the premiers of 2019 and 2020 third, North Queensland in 2015 fifth. The best-rated dozen
+of each season (the audit's `best`) are the period's stars, with the box score's leanings: Cooper Cronk and Billy Slater
+(2009–2012) and Cameron Smith (2011–2019) of Melbourne; Daly Cherry-Evans in every season from his first, 2011 (top
+three in ten of them); Andrew Fifita (2013, 2016–2019); Greg Inglis and Sam Burgess (2013–2014); Jarryd Hayne (2011,
+2014); James Tedesco (2017–2024); Payne Haas (2020–2023); Nathan Cleary (2020, 2021, 2023); Isaah Yeo (2018, 2021, 2023,
+2024). Johnathan Thurston, the halfback of North Queensland's 2015 title, rates 90 that year, only twelfth: the box score
+sees his kicking as metres and his goals not at all.
 
 ### Clubs and maps
 
@@ -545,8 +553,12 @@ and the real season's figures.
   fitted to the season they play, so a campaign's strongest clubs are the season's best by margin.
 - **Positions are one each,** the most-started; a utility plays where he started most. A player NRL.com never shows
   starting in five seasons takes the Rugby League Project's first career position.
-- **Every kicker converts at the NRL's rate:** the season file has no goal tally (the snapshot keeps each player's goals
-  and field goals, which nothing reads yet), so a computed side's penalty goals go to its halfback, as 2008's do.
+- **Every kicker converts at the NRL's rate:** the season file has no goal tally (the snapshot keeps each player's goals,
+  his conversions and penalty goals, and his field goals, which nothing reads yet), so a computed side's penalty goals go
+  to its halfback, as 2008's do.
+- **Errors in 2013–2015 are handling errors:** NRL.com kept no other count of errors for those seasons (about 17 a game,
+  against some 20 errors a game in the seasons around them). A season's players are ranked against each other, so what
+  counts is who made them; 2014–2016 also read them in their season before.
 - **No nations.** A nations game plays the built-in 2025 nations; the season's Tests (NRL.com competitions 133, 131 and
   195) could field them later.
 
@@ -565,11 +577,12 @@ rugby league nations blitz of Asia and Oceania.
 snapshots from the pinned inputs when `data-src/rugby-league-seasons/` is present. For 2008, the reader, the naming
 check, the weights and every overall, the club shift and the map. For the computed seasons: NRL Fantasy's eleven
 weights with a reason each and the season before at half weight; who took the field (a prop in 15 started, an unused
-18th man has no game) and the order positions come from; every value, overall, SRS, target and shift recomputed from
-each snapshot; sixteen clubs to 2022 and the Dolphins from 2023, the 2009 Bulldogs, each era's grounds and map; the City
-of Parramatta cut only while the Bulldogs trained at Olympic Park; four seasons played 40 times with the model's wins
-ranking against the real ones at 0.6 or better; the loader's rules; and the App launching a 2015 campaign on `nrl2012`,
-saving and resuming it, and a 2023 one on today's map.
+18th man has no game) and the order positions come from; errors read as handling errors where a game records none, and
+goals as conversions and penalty goals, every season keeping both; every value, overall, SRS, target and shift
+recomputed from each snapshot; sixteen clubs to 2022 and the Dolphins from 2023, the 2009 Bulldogs, each era's grounds
+and map; the City of Parramatta cut only while the Bulldogs trained at Olympic Park; four seasons played 40 times with
+the model's wins ranking against the real ones at 0.6 or better; the loader's rules; and the App launching a 2015
+campaign on `nrl2012`, saving and resuming it, and a 2023 one on today's map.
 
 ## Known limits
 

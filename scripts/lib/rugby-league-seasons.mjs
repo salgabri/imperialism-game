@@ -721,7 +721,10 @@ export const CORE_REASONS = Object.freeze({
   allRunMetres: 'a point every ten metres carried: the forwards\' and outside backs\' work',
   kickMetres: 'a point every thirty metres kicked: territory, the halves\' and fullbacks\' work',
 });
-/** The stats a snapshot keeps of a player's season, in this order: the counted ones, then his minutes, goals and field goals. */
+/**
+ * The stats a snapshot keeps of a player's season, in this order: the counted ones, then his minutes, goals and field
+ * goals (matchRecord says where it reads errors and goals from).
+ */
 export const KEPT = Object.freeze([...Object.keys(CORE), 'minutesPlayed', 'goals', 'fieldGoals']);
 /** The season before counts at this weight beside the season itself, when he played in it. */
 export const PREVIOUS_WEIGHT = 0.5;
@@ -780,17 +783,25 @@ export function drawGames(body) {
 /**
  * A game's team lists, from its match centre reply, as a snapshot reads them: `{ id, title, home, away }`, each side
  * `{ team, score, players }`, a row a player, `[playerId, name, position, jersey, ...KEPT]` (a stat the reply does not
- * give him 0); null when the reply has no team lists.
+ * give him 0); null when the reply has no team lists. Two of KEPT are not read by their own names. NRL.com's `goals`
+ * is empty in every season, so a player's goals are his `conversions` and `penaltyGoals` (the goals scripts/sync-nrl.mjs
+ * counts from the timeline). And its replies of 2013–2015 record no `errors` at all, only `handlingErrors`: in a game
+ * whose reply gives no player an error, a player's errors are his handling errors.
  */
 export function matchRecord(body) {
   if (!body?.homeTeam?.players?.length || !body?.awayTeam?.players?.length) return null;
+  const count = value => (Number.isFinite(value) ? value : 0);
+  const rowsOf = key => body.stats?.players?.[key] || [];
+  const noErrors = [...rowsOf('homeTeam'), ...rowsOf('awayTeam')].every(row => !count(row.errors));
+  const statOf = (row, stat) => (stat === 'goals' ? count(row.conversions) + count(row.penaltyGoals)
+    : stat === 'errors' && noErrors ? count(row.handlingErrors) : count(row[stat]));
   const side = key => {
     const team = body[key];
-    const stats = new Map((body.stats?.players?.[key] || []).map(row => [row.playerId, row]));
+    const stats = new Map(rowsOf(key).map(row => [row.playerId, row]));
     return { team: team.teamId, score: team.score, players: team.players.map(p => {
       const row = stats.get(p.playerId) || {};
       return [p.playerId, `${p.firstName ?? ''} ${p.lastName ?? ''}`.replace(/\s+/g, ' ').trim(), p.position, p.number,
-        ...KEPT.map(stat => (Number.isFinite(row[stat]) ? row[stat] : 0))];
+        ...KEPT.map(stat => statOf(row, stat))];
     }) };
   };
   return { id: body.matchId, title: body.roundTitle, home: side('homeTeam'), away: side('awayTeam') };

@@ -496,6 +496,21 @@ test('who took the field and where: a start is the team list\'s position whateve
   assert.deepEqual(record.home.players[0], [10, 'Jo Bloggs', 'Hooker', 9, ...KEPT.map(stat => ({ tacklesMade: 40, minutesPlayed: 80 })[stat] ?? 0)]);
   assert.deepEqual(record.away.players[0].slice(4), KEPT.map(() => 0), 'no stats row: zeros');
   assert.equal(matchRecord({ homeTeam: { players: [] }, awayTeam: { players: [] } }), null, 'a reply without team lists');
+  // NRL.com's `goals` is always empty: goals are conversions and penalty goals. Its replies of 2013–2015 record no
+  // `errors`, only `handlingErrors`, which count in their place there, and only there.
+  const kicks = (home, away) => matchRecord({ matchId: 'k', roundTitle: 'Round 2', homeTeam: reply(1), awayTeam: reply(2),
+    stats: { players: { homeTeam: [{ playerId: 10, ...home }], awayTeam: [{ playerId: 20, ...away }] } } });
+  // A stat of both sides' first player.
+  const stat = (rec, name) => [rec.home, rec.away].map(side => side.players[0][4 + KEPT.indexOf(name)]);
+  const old = kicks({ goals: 0, conversions: 4, penaltyGoals: 1, fieldGoals: 1, errors: 0, handlingErrors: 2 }, { errors: 0, handlingErrors: 1 });
+  assert.deepEqual([stat(old, 'goals'), stat(old, 'fieldGoals'), stat(old, 'errors')], [[5, 0], [1, 0], [2, 1]]);
+  const kept = kicks({ conversions: 2, errors: 1, handlingErrors: 3 }, { errors: 0, handlingErrors: 2 });
+  assert.deepEqual(stat(kept, 'errors'), [1, 0], 'a game that records errors counts its errors alone');
+  for (const snapshot of SNAPSHOTS.values()) {
+    const sums = KEPT.map((_, i) => snapshot.players.reduce((total, row) => total + row[7][i], 0));
+    assert.ok(sums[KEPT.indexOf('goals')] > 5 * snapshot.source.games && sums[KEPT.indexOf('errors')] > 15 * snapshot.source.games,
+      `${snapshot.source.id}: every season keeps its goals and counts its errors`);
+  }
 });
 
 test('each computed season places its players by the season, then a season either side, then two, then the Rugby League Project', () => {

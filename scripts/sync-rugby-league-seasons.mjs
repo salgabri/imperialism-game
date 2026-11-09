@@ -450,8 +450,9 @@ function computedFormula(year) {
     + 'Position: the one he started at most in the season by its team lists, whatever his jersey; else most in the seasons '
     + 'either side, then two either side; else the first of his positions on the Rugby League Project; else he is left out. '
     + 'Value: his core points a club game, NRL Fantasy\'s points for eleven stats (`core`: 8 a try, 5 a try assist, 4 a line '
-    + 'break, 2 a line-break assist, 1 a tackle, -2 a missed tackle, 2 a tackle break, 4 an offload, -2 an error, 1 every 10 '
-    + 'metres run and 1 every 30 kicked; goals and field goals not counted), the season\'s in full and the season before\'s '
+    + 'break, 2 a line-break assist, 1 a tackle, -2 a missed tackle, 2 a tackle break, 4 an offload, -2 an error (where '
+    + 'NRL.com records no errors for a game, as for every game of 2013-2015, a handling error), 1 every 10 metres run and 1 '
+    + 'every 30 kicked; goals and field goals not counted), the season\'s in full and the season before\'s '
     + `at half weight when he played in it, over his club's games in each. Overall: the value's mid-rank percentile among the `
     + 'season\'s players at his position (ties sharing one), read off `reference`, Rugby League 26\'s overalls at that '
     + 'position (scripts/data/rugby-league-26.json), as many of each 2025 club\'s best as the season\'s clubs carry per club '
