@@ -875,8 +875,9 @@ Championship Edition; SWOS 96/97 stays as it is, nations only.
   `/9596/`; no robots.txt, no licence or terms stated): the six national team
   files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013
   France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), 26 files
-  fetched one at a time on 2026-11-10, pinned by bytes and SHA-256, and equal to
-  the research pass's copies of the day before. The v1.1 update of early 1995 has
+  fetched one at a time late on 2026-11-09 (UTC; the season's `retrieved`), pinned
+  by bytes and SHA-256, and equal to the research pass's copies of the same day.
+  The v1.1 update of early 1995 has
   v1.0's national teams and later club squads. **Rights**: Sensible Software's,
   now Codemasters'; the data's rights are reserved.
 - **Reader** (`scripts/lib/swos-files.mjs`, the layout codemeyer's SwosPlayerFinder,
