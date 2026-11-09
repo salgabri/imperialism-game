@@ -9,6 +9,8 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { SAVE_KEY } from '../src/config.js';
 import { NATIONS, nationIdentity, selectLineup } from '../src/data/teams.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
@@ -22,7 +24,7 @@ import { footballRate, footballWinProbability } from '../src/engine/winProbabili
 import { parseCampaign } from '../src/engine/storage.js';
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import { SEASON_NOTES, buildSetupModel } from '../src/screens/setup/setupModel.js';
-import { sourceLabel, sourceUrl } from '../src/viewModels/squad.js';
+import { sourceLabel, sourceTitle, sourceUrl } from '../src/viewModels/squad.js';
 import { dayAfter, eloOn, expectedScore, goalFactor, kFactor, resultRows, yearsBefore } from './lib/football-elo.mjs';
 import { ballonDorVotes, factsText, worldCupLineups } from './lib/world-cup-facts.mjs';
 import {
@@ -389,6 +391,7 @@ test('the loader refuses a damaged World Cup season', () => {
 
 const B = await bundleComponents({
   App: 'src/App.jsx',
+  PlayerRow: 'src/components/PlayerRow.jsx',
   clearFootballSetCache: ['src/engine/footballSets.js', 'clearFootballSetCache'],
   clearFootballSetIndex: ['src/engine/footballSets.js', 'clearFootballSetIndex'],
 }, { jsx: 'automatic' });
@@ -447,6 +450,11 @@ test('a 1969/70 campaign plays the Soviet Union\'s computed eleven, saves its pl
     const player = st.teams['643'].squad[0];
     assert.equal(sourceLabel(player), '1970 World Cup, computed');
     assert.equal(sourceUrl(player), player.sourceInfo.url);
+    // Its tooltip names the team's Elo the rating was computed from, on the squad screen and the match's player rows
+    // alike, never a database snapshot.
+    const title = `1970 World Cup, computed · Team Elo ${doc.nations['643'][2][0][3].teamElo} on 1970-06-22`;
+    assert.equal(sourceTitle(player), title);
+    assert.ok(renderToStaticMarkup(React.createElement(B.PlayerRow, { player })).includes(`title="${title}"`));
 
     // The checkpoint keeps the players whole (no pack: a computed player is a plain record) and resumes with no file.
     const text = items.get(SAVE_KEY);

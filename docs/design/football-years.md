@@ -1023,9 +1023,11 @@ npm run build:world-cup-seasons           # facts → public/football/wc-<year>.
   'world-cup', edition: '1970 World Cup, computed', snapshotDate, url, team,
   shirt, teamElo, xiRank, minutes, starts, goals, awards?, ballonDor?,
   dateOfBirth? }`: the Source column reads "1970 World Cup, computed" and links
-  to his Wikipedia article. The season's source block says `method: 'computed'`,
-  `computed: true`, `rawScale: 'Elo'`, the Elo's day, the rule (`conversion`),
-  the licence and the commits and revisions read.
+  to his Wikipedia article, and its tooltip names the Elo the rating comes from
+  ("Team Elo 1995.3 on 1970-06-22"), not a database snapshot. The season's
+  source block says `method: 'computed'`, `computed: true`, `rawScale: 'Elo'`,
+  the Elo's day, the rule (`conversion`), the licence and the commits and
+  revisions read.
 - `docs/design/football-world-cup-seasons-audit.json`: per season each nation's
   Elo, rank, T, strength, XI and fill-ins, the team share, and the votes matched
   to no squad player.
