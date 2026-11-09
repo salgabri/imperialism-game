@@ -104,7 +104,9 @@ function buildSeason(snapshot, year, manifest, franchises, snapshots, birthplace
   return { doc, text: serializeFootballSet(doc), audit };
 }
 
-// A computed season's players: rating first, then score, then id, so a name never decides who plays.
+// A computed season's players: rating first, then score, then id, so a name never decides who makes a squad. (Within a
+// squad, rosterOf orders equal ratings by name, so the lineup may start one of two equally rated players by name: the
+// same strength either way.)
 const byRatingThenScore = (a, b) => b.rating - a.rating || b.score - a.score || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 const pearson = (xs, ys) => {
   const mean = list => list.reduce((s, v) => s + v, 0) / list.length;
