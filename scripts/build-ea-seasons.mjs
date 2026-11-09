@@ -12,12 +12,13 @@
 // (scripts/lib/ea-legacy-seasons.mjs), and FIFA 05 and FIFA 06 from that mirror with nationalities from the later
 // editions and Wikidata (scripts/lib/ea-early-seasons.mjs). scripts/data/ea-seasons.json names every file with its
 // SHA-256, and the build stops on any other file, so every season rebuilds byte for byte. The listing also names the
-// seasons before FIFA 05 (npm run build:retro-seasons), read from their committed files.
+// seasons before FIFA 05 (npm run build:retro-seasons) and the computed World Cup seasons (npm run
+// build:world-cup-seasons), read from their committed files.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { committedSeasons, footballSeasonsModule, retroSeasonIds } from './lib/football-seasons-listing.mjs';
+import { committedSeasons, footballSeasonsModule, retroSeasonIds, worldCupSeasonIds } from './lib/football-seasons-listing.mjs';
 import { buildEaSeason, buildSnapshotEaSeason } from './lib/ea-seasons.mjs';
 import { EARLY_EXTRA_FIELDS, buildEarlyEaSeason, nationalityEntries } from './lib/ea-early-seasons.mjs';
 import { LEGACY_POSITIONS, buildLegacyEaSeason, legacyExclusions, readRatingsRows, rosterDates } from './lib/ea-legacy-seasons.mjs';
@@ -108,13 +109,15 @@ async function main() {
     for (const warning of audit.warnings) console.log(`  warning: ${warning}`);
   }
   const retro = JSON.parse(await readFile(path.join(root, 'scripts/data/retro-seasons.json'), 'utf8'));
-  const listed = [...results.map(result => result.doc), ...await committedSeasons(path.join(root, 'public/football'), retroSeasonIds(retro))];
+  const worldCup = JSON.parse(await readFile(path.join(root, 'scripts/data/world-cup-seasons.json'), 'utf8'));
+  const listed = [...results.map(result => result.doc), ...await committedSeasons(path.join(root, 'public/football'), retroSeasonIds(retro)),
+    ...await committedSeasons(path.join(root, 'public/football'), worldCupSeasonIds(worldCup))];
   const { editions, exclusions, ...legacySources } = manifest.legacy;
   const audit = { generatedBy: 'scripts/build-ea-seasons.mjs', snapshots: manifest.snapshots, site: manifest.site, dataset: manifest.dataset,
     legacy: { ...legacySources, positions: LEGACY_POSITIONS, exclusions }, early: manifest.early, seasons: results.map(result => result.audit) };
   const outputs = new Map([
     ...results.map(({ doc, text }) => [path.join(root, 'public/football', `${doc.id}.json`), text]),
-    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea: manifest, retro })],
+    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea: manifest, retro, worldCup })],
     [path.join(root, 'docs/design/football-seasons-audit.json'), `${JSON.stringify(audit, null, 2)}\n`],
   ]);
   if (args.check) {

@@ -67,7 +67,8 @@ test('the index lists a built-in pair of maps and one for each earlier season wi
       [[`Top ${TOP_CLUBS}`, TOP_CLUBS, 'all'], [`Elite ${ELITE_CLUBS}`, ELITE_CLUBS, 'elite']], String(season));
   }
   const nationsOnly = BUILT_IN_SEASONS.filter(season => !setHasClubs(season.id)).map(season => season.id);
-  assert.deepEqual(nationsOnly, ['ea-fifa-06', 'ea-fifa-05', 'swos-9697']);
+  // The computed World Cup seasons (`wc-<year>`) have nations only too.
+  assert.deepEqual(nationsOnly.filter(id => !id.startsWith('wc-')), ['ea-fifa-06', 'ea-fifa-05', 'swos-9697']);
   for (const season of nationsOnly) {
     assert.deepEqual(europeMapsOf(season), [], season);
     assert.deepEqual(setOf(season).clubs, [], `${season} has no clubs`);

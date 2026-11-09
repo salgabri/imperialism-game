@@ -1,0 +1,1411 @@
+{
+ "about": "FIFA's own \"FIFA member since\" date for the association of every game nation, as each one's page on inside.fifa.com gave it on 2026-11-09 (robots.txt allows /associations/; one request every 1.2 s). FIFA gives 1 January where it knows only the year. scripts/football-federations.test.mjs checks src/data/footballFederations.js against it. sha256 is the page as fetched (gzip), a record of what was read: the pages change with every visit.",
+ "read": "2026-11-09",
+ "associations": {
+  "100": {
+   "fifa": "BUL",
+   "association": "Bulgarian Football Union",
+   "memberSince": "01 January 1924",
+   "member": "1924-01-01",
+   "url": "https://inside.fifa.com/associations/BUL",
+   "sha256": "befc570dbbfe3689adb25275dfe6f82b9504f726d41b29f1cb101de11e672cce"
+  },
+  "104": {
+   "fifa": "MYA",
+   "association": "Myanmar Football Federation",
+   "memberSince": "27 May 1948",
+   "member": "1948-05-27",
+   "url": "https://inside.fifa.com/associations/MYA",
+   "sha256": "40e0939b647ce62cf83b4cc11bb3d514f556fdf33f5f8962701b9ffb62acd0fd"
+  },
+  "108": {
+   "fifa": "BDI",
+   "association": "Burundian Football Association",
+   "memberSince": "01 January 1972",
+   "member": "1972-01-01",
+   "url": "https://inside.fifa.com/associations/BDI",
+   "sha256": "fbf94803084836c67f65d3146690c0df0186d081c00c00648d3a838514823611"
+  },
+  "112": {
+   "fifa": "BLR",
+   "association": "Belarus Football Federation",
+   "memberSince": "01 January 1992",
+   "member": "1992-01-01",
+   "url": "https://inside.fifa.com/associations/BLR",
+   "sha256": "9e050d30e87d26269abb709aabb78ff84dd1e497fee6d67b228d436d5bcf6072"
+  },
+  "116": {
+   "fifa": "CAM",
+   "association": "Football Federation of Cambodia",
+   "memberSince": "01 January 1954",
+   "member": "1954-01-01",
+   "url": "https://inside.fifa.com/associations/CAM",
+   "sha256": "3953d02e407a3773781687885bd5ba1d7629c052387bce39430e1c8e6f6c9c12"
+  },
+  "120": {
+   "fifa": "CMR",
+   "association": "Cameroonian Football Association",
+   "memberSince": "01 January 1962",
+   "member": "1962-01-01",
+   "url": "https://inside.fifa.com/associations/CMR",
+   "sha256": "44ae465b922039e23a74c2d0bc3553c2ffd644459efa67d2a68f6fd1dc96f4d9"
+  },
+  "124": {
+   "fifa": "CAN",
+   "association": "The Canadian Soccer Association",
+   "memberSince": "01 January 1913",
+   "member": "1913-01-01",
+   "url": "https://inside.fifa.com/associations/CAN",
+   "sha256": "071e82926b087587e592baad46a977b955988dba8fa9c98a081af5e896cc1998"
+  },
+  "140": {
+   "fifa": "CTA",
+   "association": "Central African Republic Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/CTA",
+   "sha256": "e30f008faa14cec980629fa408a47ac229703c93119d1d7e036d3c09eab2a241"
+  },
+  "144": {
+   "fifa": "SRI",
+   "association": "Football Federation of Sri Lanka",
+   "memberSince": "24 July 1952",
+   "member": "1952-07-24",
+   "url": "https://inside.fifa.com/associations/SRI",
+   "sha256": "3dbd116f24cbff5e54c4d66e2037a3bf111c83c66944ec61853a6ba307d99e16"
+  },
+  "148": {
+   "fifa": "CHA",
+   "association": "Chadian Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/CHA",
+   "sha256": "47eede56ee6236353f29061a69cf0c63e298dc0ffe8fc535d7ec67e02b811734"
+  },
+  "152": {
+   "fifa": "CHI",
+   "association": "Chilean Football Association",
+   "memberSince": "01 January 1913",
+   "member": "1913-01-01",
+   "url": "https://inside.fifa.com/associations/CHI",
+   "sha256": "fcf3c4aeb2fcac0282292640a30c610845ce091ed489f708618a937be1d16e4e"
+  },
+  "156": {
+   "fifa": "CHN",
+   "association": "Chinese Football Association",
+   "memberSince": "01 January 1931",
+   "member": "1931-01-01",
+   "url": "https://inside.fifa.com/associations/CHN",
+   "sha256": "1d742f13ec083cd81931db153b63f0d3d2215b925fcb752e6ff245dfa3bce28a"
+  },
+  "158": {
+   "fifa": "TPE",
+   "association": "Chinese Taipei Football Association",
+   "memberSince": "01 January 1954",
+   "member": "1954-01-01",
+   "url": "https://inside.fifa.com/associations/TPE",
+   "sha256": "f26e03ab806705f0c021add7bea271fb42ccd9097969036c1139f8225553edf4"
+  },
+  "170": {
+   "fifa": "COL",
+   "association": "Colombian Football Association",
+   "memberSince": "14 August 1936",
+   "member": "1936-08-14",
+   "url": "https://inside.fifa.com/associations/COL",
+   "sha256": "2a773ea6712392c6e87ae00ec8ab2e947a760e5e7ddad97299dbf1550e124484"
+  },
+  "178": {
+   "fifa": "CGO",
+   "association": "Congolese Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/CGO",
+   "sha256": "27e1a7c9abbb7b3dd973b02fae80145443bc5a626654c1aa794768a61269658f"
+  },
+  "180": {
+   "fifa": "COD",
+   "association": "Congo DR Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/COD",
+   "sha256": "c3deaed1480293f6b3d6325409bd2b1dbb95da9447ca9b3e46a249bb697a0c9d"
+  },
+  "184": {
+   "fifa": "COK",
+   "association": "Cook Islands Football Association",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/COK",
+   "sha256": "5b6cb3fdf9cf62fc686beab16c436205aa050da19e428886596df664a1bdc59d"
+  },
+  "188": {
+   "fifa": "CRC",
+   "association": "Costa Rican Football Association",
+   "memberSince": "01 January 1927",
+   "member": "1927-01-01",
+   "url": "https://inside.fifa.com/associations/CRC",
+   "sha256": "6dc30bde8ecc45afac39474c087f8a3d6efd143125cf1419e2659564d0abc9f4"
+  },
+  "191": {
+   "fifa": "CRO",
+   "association": "Croatian Football Federation",
+   "memberSince": "03 July 1992",
+   "member": "1992-07-03",
+   "url": "https://inside.fifa.com/associations/CRO",
+   "sha256": "932b2a783c4255d376d233b4bb9a5a0644c13c4f59d9a9f8da4888d279938f96"
+  },
+  "192": {
+   "fifa": "CUB",
+   "association": "Cuban Football Association",
+   "memberSince": "17 May 1929",
+   "member": "1929-05-17",
+   "url": "https://inside.fifa.com/associations/CUB",
+   "sha256": "e6e23ecb4014ad767dd9f0d88c07e57b0cc8309f0b4cf0199998b083c9d0b60e"
+  },
+  "196": {
+   "fifa": "CYP",
+   "association": "Cyprus Football Association",
+   "memberSince": "01 January 1948",
+   "member": "1948-01-01",
+   "url": "https://inside.fifa.com/associations/CYP",
+   "sha256": "d94593c70af4411a11490d4603ae7cf0446fcd4e7ec2860fdf256f895e8cb684"
+  },
+  "203": {
+   "fifa": "CZE",
+   "association": "Czech Football Association",
+   "memberSince": "01 January 1907",
+   "member": "1907-01-01",
+   "url": "https://inside.fifa.com/associations/CZE",
+   "sha256": "324510d88bbc94bca0be46cf24313fa881c596226ba0974a20d544b4352dc4bc"
+  },
+  "204": {
+   "fifa": "BEN",
+   "association": "Beninese Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/BEN",
+   "sha256": "594cbd5a577eb8e80d1ff8e96d1f0273fcd655b6e95e3b832e367fb549a9fef3"
+  },
+  "208": {
+   "fifa": "DEN",
+   "association": "Danish Football Association",
+   "memberSince": "01 January 1904",
+   "member": "1904-01-01",
+   "url": "https://inside.fifa.com/associations/DEN",
+   "sha256": "d3bb45bd10a16923c055f634cef2cd78a13c601326d9004b1ffb8757137c1a98"
+  },
+  "214": {
+   "fifa": "DOM",
+   "association": "Dominican Republic Football Association",
+   "memberSince": "01 January 1958",
+   "member": "1958-01-01",
+   "url": "https://inside.fifa.com/associations/DOM",
+   "sha256": "105f47e27869df6616e571cc012a734e5436cfedd7c3b274bf9eacc4e23545c2"
+  },
+  "218": {
+   "fifa": "ECU",
+   "association": "Ecuadorian Football Association",
+   "memberSince": "01 January 1926",
+   "member": "1926-01-01",
+   "url": "https://inside.fifa.com/associations/ECU",
+   "sha256": "a51d38506764842787c0f26b32b112ae94736de42499eade7eed9833478d3f22"
+  },
+  "222": {
+   "fifa": "SLV",
+   "association": "Salvadoran Football Association",
+   "memberSince": "01 January 1938",
+   "member": "1938-01-01",
+   "url": "https://inside.fifa.com/associations/SLV",
+   "sha256": "a19d99ca030a5f59fb4a41d51c3723ca6627eb5247c6d4ec2c41b632f094cea7"
+  },
+  "226": {
+   "fifa": "EQG",
+   "association": "Equatorial Guinean Football Association",
+   "memberSince": "01 January 1986",
+   "member": "1986-01-01",
+   "url": "https://inside.fifa.com/associations/EQG",
+   "sha256": "fab876f05950af2838ee38219e7a5b0d5e2fd6f16e6f3a538e77ad12c5bc1b3a"
+  },
+  "231": {
+   "fifa": "ETH",
+   "association": "Ethiopian Football Federation",
+   "memberSince": "20 July 1952",
+   "member": "1952-07-20",
+   "url": "https://inside.fifa.com/associations/ETH",
+   "sha256": "411bb00022044dd41a9e24a34bf150a09d7d21d9fddbecf3e7370c39f72dfff5"
+  },
+  "232": {
+   "fifa": "ERI",
+   "association": "Eritrean National Football Federation",
+   "memberSince": "01 January 1998",
+   "member": "1998-01-01",
+   "url": "https://inside.fifa.com/associations/ERI",
+   "sha256": "10946a8a325f57d53ac02759e251daa402a51d05d0bb52d591ab2e0d20702635"
+  },
+  "233": {
+   "fifa": "EST",
+   "association": "Estonian Football Association",
+   "memberSince": "01 January 1923",
+   "member": "1923-01-01",
+   "url": "https://inside.fifa.com/associations/EST",
+   "sha256": "129b2a749039c446506c7c2cd1514f0acd4faaeddd95ef056798a25b45b99986"
+  },
+  "242": {
+   "fifa": "FIJ",
+   "association": "Fiji Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/FIJ",
+   "sha256": "5684a32bb384c640ae2d2ff068ae35b71d009b87ef70a67e78e43e716947e563"
+  },
+  "246": {
+   "fifa": "FIN",
+   "association": "Finnish Football Association",
+   "memberSince": "01 January 1908",
+   "member": "1908-01-01",
+   "url": "https://inside.fifa.com/associations/FIN",
+   "sha256": "714c7e73b3506a17e227d38a462b87900e90d62f074dacd36c5489e9909e5139"
+  },
+  "250": {
+   "fifa": "FRA",
+   "association": "French Football Association",
+   "memberSince": "01 January 1904",
+   "member": "1904-01-01",
+   "url": "https://inside.fifa.com/associations/FRA",
+   "sha256": "9fa4dfb4c0f5c1ccdf93b30b3437a47a0d923d10c201b947292f626ef0a5afff"
+  },
+  "262": {
+   "fifa": "DJI",
+   "association": "Djiboutian Football Association",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/DJI",
+   "sha256": "3bae69e1b41821239559428c692f43acdb30fa99016c6c26d0a7fac780436912"
+  },
+  "266": {
+   "fifa": "GAB",
+   "association": "Gabonese Football Federation",
+   "memberSince": "01 January 1966",
+   "member": "1966-01-01",
+   "url": "https://inside.fifa.com/associations/GAB",
+   "sha256": "5ffa1aae3dce153c80fc991207b2c7c0ca4009e9d062faeeba682739c4ddfa0c"
+  },
+  "268": {
+   "fifa": "GEO",
+   "association": "Georgian Football Federation",
+   "memberSince": "01 January 1992",
+   "member": "1992-01-01",
+   "url": "https://inside.fifa.com/associations/GEO",
+   "sha256": "ce14e8e26f813633b0d95d42bea25cccee7bce36785e3aa89d9824a450ad91bc"
+  },
+  "270": {
+   "fifa": "GAM",
+   "association": "Gambia Football Federation",
+   "memberSince": "01 January 1968",
+   "member": "1968-01-01",
+   "url": "https://inside.fifa.com/associations/GAM",
+   "sha256": "23aab9255767c29c174988d959536b90e8627e94c8ecf9035934255f9ae997ff"
+  },
+  "275": {
+   "fifa": "PLE",
+   "association": "Palestine Football Association",
+   "memberSince": "01 January 1998",
+   "member": "1998-01-01",
+   "url": "https://inside.fifa.com/associations/PLE",
+   "sha256": "7e01545a31c6356bbe123c6bc06edfcb02523ffa4cd767794e89ef726973f0cd"
+  },
+  "276": {
+   "fifa": "GER",
+   "association": "German Football Association",
+   "memberSince": "01 January 1904",
+   "member": "1904-01-01",
+   "url": "https://inside.fifa.com/associations/GER",
+   "sha256": "1e723411531d91c57e0d4c40278333568cd16b0a0bc0ddbd9de8127c4d47821f"
+  },
+  "288": {
+   "fifa": "GHA",
+   "association": "Ghana Football Association",
+   "memberSince": "01 January 1958",
+   "member": "1958-01-01",
+   "url": "https://inside.fifa.com/associations/GHA",
+   "sha256": "a5304ab4aadae64ce28b45e36e43c117b0e20de3ca6a3bc7c764fb0cec458ef6"
+  },
+  "300": {
+   "fifa": "GRE",
+   "association": "Hellenic Football Federation",
+   "memberSince": "01 January 1927",
+   "member": "1927-01-01",
+   "url": "https://inside.fifa.com/associations/GRE",
+   "sha256": "d2fa5b38c6545fa32174136b5c8b88710305f2beacbf3ec58976f6ee1b79ba62"
+  },
+  "320": {
+   "fifa": "GUA",
+   "association": "Guatemalan Football Association",
+   "memberSince": "01 January 1946",
+   "member": "1946-01-01",
+   "url": "https://inside.fifa.com/associations/GUA",
+   "sha256": "ccb422aee8c7d29f6115693ad01aede5d090a29c1337ae1db05e74e93f150fbb"
+  },
+  "324": {
+   "fifa": "GUI",
+   "association": "Guinean Football Association",
+   "memberSince": "01 January 1962",
+   "member": "1962-01-01",
+   "url": "https://inside.fifa.com/associations/GUI",
+   "sha256": "35e20a92620ea88753b221844da50881c53f32744b7a04feb83f26a2f40187b2"
+  },
+  "328": {
+   "fifa": "GUY",
+   "association": "Guyana Football Federation",
+   "memberSince": "01 January 1970",
+   "member": "1970-01-01",
+   "url": "https://inside.fifa.com/associations/GUY",
+   "sha256": "4703c3dc037991915d5452e508b16cb91723d7640c390cc76b27f9e43922bc96"
+  },
+  "332": {
+   "fifa": "HAI",
+   "association": "Haitian Football Federation",
+   "memberSince": "25 May 1934",
+   "member": "1934-05-25",
+   "url": "https://inside.fifa.com/associations/HAI",
+   "sha256": "dffb731e7c8eb4eb3ccc06bf1f3983e13db6d6d2015d575f6e093b68de58c3f1"
+  },
+  "340": {
+   "fifa": "HON",
+   "association": "Honduran Football Association",
+   "memberSince": "01 January 1946",
+   "member": "1946-01-01",
+   "url": "https://inside.fifa.com/associations/HON",
+   "sha256": "6e3499c2c0fb2266fbaf9234f98a4c6dff03b1067f0d931e7d9ec9b22699abbd"
+  },
+  "348": {
+   "fifa": "HUN",
+   "association": "Hungarian Football Federation",
+   "memberSince": "01 January 1907",
+   "member": "1907-01-01",
+   "url": "https://inside.fifa.com/associations/HUN",
+   "sha256": "bc23879d5f35f4d8c5085fe4d09ac74028b23824d3bb452e8027a439779e0b21"
+  },
+  "352": {
+   "fifa": "ISL",
+   "association": "Icelandic Football Association",
+   "memberSince": "26 March 1947",
+   "member": "1947-03-26",
+   "url": "https://inside.fifa.com/associations/ISL",
+   "sha256": "5a85f927125e61626b4900ae73a71e605d8a1a8b5c4983b8b7e28cda97157dc2"
+  },
+  "356": {
+   "fifa": "IND",
+   "association": "All India Football Federation",
+   "memberSince": "01 January 1948",
+   "member": "1948-01-01",
+   "url": "https://inside.fifa.com/associations/IND",
+   "sha256": "03a0484c7e699b8a0b4a9158c624806beeafc55d581254927c804ffea4027671"
+  },
+  "360": {
+   "fifa": "IDN",
+   "association": "Football Association of Indonesia",
+   "memberSince": "01 January 1952",
+   "member": "1952-01-01",
+   "url": "https://inside.fifa.com/associations/IDN",
+   "sha256": "ce1dbbc8545f27483d98530dfa124ce0ac616f2b39dde030ccdc1a5a5fbcd36f"
+  },
+  "364": {
+   "fifa": "IRN",
+   "association": "Islamic Republic of Iran Football Federation",
+   "memberSince": "30 January 1948",
+   "member": "1948-01-30",
+   "url": "https://inside.fifa.com/associations/IRN",
+   "sha256": "c8e87f276ae04bf717c44e96b52e0119e825e8a4a4458d0e20c5fd86b2bdd9f1"
+  },
+  "368": {
+   "fifa": "IRQ",
+   "association": "Iraqi Football Association",
+   "memberSince": "01 January 1950",
+   "member": "1950-01-01",
+   "url": "https://inside.fifa.com/associations/IRQ",
+   "sha256": "c2bb143e83bcb1130d1247dbfd4e9acc56a5548c64dba10c06f054b4afcb4a4c"
+  },
+  "372": {
+   "fifa": "IRL",
+   "association": "The Football Association of Ireland",
+   "memberSince": "01 January 1923",
+   "member": "1923-01-01",
+   "url": "https://inside.fifa.com/associations/IRL",
+   "sha256": "d397c9e7702e17fabb8fdf09bf914617a268ade583887aa1d692426d4d3cbeea"
+  },
+  "376": {
+   "fifa": "ISR",
+   "association": "The Israel Football Association",
+   "memberSince": "01 January 1929",
+   "member": "1929-01-01",
+   "url": "https://inside.fifa.com/associations/ISR",
+   "sha256": "adbc82e302ab16e12136e5551e61d53f71edf34539e4f40c1da07e85826ffe79"
+  },
+  "380": {
+   "fifa": "ITA",
+   "association": "Italian Football Federation",
+   "memberSince": "01 January 1905",
+   "member": "1905-01-01",
+   "url": "https://inside.fifa.com/associations/ITA",
+   "sha256": "5fc64cf9c960ddf6b67bc937074060769465c9e75f8f26fde56050d6ca0b229e"
+  },
+  "384": {
+   "fifa": "CIV",
+   "association": "Ivorian Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/CIV",
+   "sha256": "d0d8d47792be38b729d64b285f851c01c4a9c2f9eadc8cfd7e53de3a45ff3b20"
+  },
+  "388": {
+   "fifa": "JAM",
+   "association": "Jamaica Football Federation",
+   "memberSince": "01 January 1962",
+   "member": "1962-01-01",
+   "url": "https://inside.fifa.com/associations/JAM",
+   "sha256": "e06a7c5cdc9ef0b0e0c9b28698613360f709d372b653ac289e7dc714775255a6"
+  },
+  "392": {
+   "fifa": "JPN",
+   "association": "Japan Football Association",
+   "memberSince": "10 September 1921",
+   "member": "1921-09-10",
+   "url": "https://inside.fifa.com/associations/JPN",
+   "sha256": "840071ab5a529759820bb5a38b71928541c0bf8e3e2fe269b1bff99e787f815f"
+  },
+  "398": {
+   "fifa": "KAZ",
+   "association": "Kazakhstan Football Federation",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/KAZ",
+   "sha256": "72ecc9555a7b595a3571cebd31926c054e665cad485848c003ab1ff15d7d402c"
+  },
+  "400": {
+   "fifa": "JOR",
+   "association": "Jordan Football Association",
+   "memberSince": "01 January 1956",
+   "member": "1956-01-01",
+   "url": "https://inside.fifa.com/associations/JOR",
+   "sha256": "43445aaffa6073ee074e141a0c07ad30167853fc31eedee70abf6390d75b8157"
+  },
+  "404": {
+   "fifa": "KEN",
+   "association": "Football Kenya Federation",
+   "memberSince": "01 January 1960",
+   "member": "1960-01-01",
+   "url": "https://inside.fifa.com/associations/KEN",
+   "sha256": "66b1cda7b35db4118b073c8b1dd2ac3844695247abb1cee19f40b38c75596c9f"
+  },
+  "408": {
+   "fifa": "PRK",
+   "association": "DPR Korea Football Association",
+   "memberSince": "01 January 1958",
+   "member": "1958-01-01",
+   "url": "https://inside.fifa.com/associations/PRK",
+   "sha256": "41f9cdcdc5e1a057b1cfdbafde7be82764b64c765e3dc11b9c120c906feb9c62"
+  },
+  "410": {
+   "fifa": "KOR",
+   "association": "Korea Football Association",
+   "memberSince": "21 May 1948",
+   "member": "1948-05-21",
+   "url": "https://inside.fifa.com/associations/KOR",
+   "sha256": "398cab35bdafefa515b7af54986b4ccbb5fb13ac7f9bd2d5ce3a474151315a7f"
+  },
+  "414": {
+   "fifa": "KUW",
+   "association": "Kuwait Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/KUW",
+   "sha256": "9b354a0169bd5b269993078434798625d347bb42b32850d8a3106ccb2763d4fa"
+  },
+  "417": {
+   "fifa": "KGZ",
+   "association": "The Kyrgyz Football Union",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/KGZ",
+   "sha256": "42460586a98c98f183b89e6f74c9138799412ca068e8bdad583a79621df28bbd"
+  },
+  "418": {
+   "fifa": "LAO",
+   "association": "Lao Football Federation",
+   "memberSince": "01 January 1952",
+   "member": "1952-01-01",
+   "url": "https://inside.fifa.com/associations/LAO",
+   "sha256": "97a6e02c5cd4dd7b8b55497860c1c28763f3c0f2f4b4dd28ba4ca0bf17ce2003"
+  },
+  "422": {
+   "fifa": "LBN",
+   "association": "Lebanese Football Association",
+   "memberSince": "13 August 1936",
+   "member": "1936-08-13",
+   "url": "https://inside.fifa.com/associations/LBN",
+   "sha256": "6366cd02b54654374f9bb697ad18c9baecd7ca297c488041d7008ec61844644a"
+  },
+  "426": {
+   "fifa": "LES",
+   "association": "Lesotho Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/LES",
+   "sha256": "d81a1c3d306e935ec8958794b4257b09999f96d4ef16d27ee22bb327c2b0a2a5"
+  },
+  "428": {
+   "fifa": "LVA",
+   "association": "Latvian Football Federation",
+   "memberSince": "01 January 1923",
+   "member": "1923-01-01",
+   "url": "https://inside.fifa.com/associations/LVA",
+   "sha256": "b33e361ca4c458c284a8848273468413f779ecc06750bcceb7a80b7b6282935f"
+  },
+  "430": {
+   "fifa": "LBR",
+   "association": "Liberia Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/LBR",
+   "sha256": "9c428c6793181dc4112f01596abc3c1ba75e79114fddfa86880326e60f7fc1fc"
+  },
+  "434": {
+   "fifa": "LBY",
+   "association": "Libyan Football Federation",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/LBY",
+   "sha256": "2bd230f3fd1ec5332313304a0f76c6f9999a248472c21edfde359840d54f3cb1"
+  },
+  "440": {
+   "fifa": "LTU",
+   "association": "Lithuanian Football Federation",
+   "memberSince": "21 May 1923",
+   "member": "1923-05-21",
+   "url": "https://inside.fifa.com/associations/LTU",
+   "sha256": "fa64a531e74f55584d5cc68bd4725feb9db1c615ba23f7defb3be93d5e896bc0"
+  },
+  "442": {
+   "fifa": "LUX",
+   "association": "Luxembourgish Football Association",
+   "memberSince": "01 January 1910",
+   "member": "1910-01-01",
+   "url": "https://inside.fifa.com/associations/LUX",
+   "sha256": "73041a46c5dc46ed0c685647cb6f7f059bd8b0be5884c9288b161b0febd222f9"
+  },
+  "450": {
+   "fifa": "MAD",
+   "association": "Malagasy Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/MAD",
+   "sha256": "9d09041fa49b187d70a76879d5eb31251967605b272860c02a9f2ff8df27d6d6"
+  },
+  "454": {
+   "fifa": "MWI",
+   "association": "Football Association of Malawi",
+   "memberSince": "01 January 1968",
+   "member": "1968-01-01",
+   "url": "https://inside.fifa.com/associations/MWI",
+   "sha256": "535a17e26cb085cfeccfd16af2e853e71850272e83dc718ac636970b8df92316"
+  },
+  "458": {
+   "fifa": "MAS",
+   "association": "Football Association of Malaysia",
+   "memberSince": "01 January 1954",
+   "member": "1954-01-01",
+   "url": "https://inside.fifa.com/associations/MAS",
+   "sha256": "a3727ffe231c751d4df5b27cff6b91001450d87eba4c8f367604bd606f96f50c"
+  },
+  "466": {
+   "fifa": "MLI",
+   "association": "Malian Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/MLI",
+   "sha256": "b4045497523f74c9eeed8ce01f2c1fb5bf42022a2993e51d48c54b59c6ff9d5d"
+  },
+  "478": {
+   "fifa": "MTN",
+   "association": "Mauritanian Football Association",
+   "memberSince": "01 January 1970",
+   "member": "1970-01-01",
+   "url": "https://inside.fifa.com/associations/MTN",
+   "sha256": "f28de97cf71f694fa7531f1094d08248a6ab05631696638de625b69c315511a1"
+  },
+  "484": {
+   "fifa": "MEX",
+   "association": "Mexican Football Association",
+   "memberSince": "01 January 1929",
+   "member": "1929-01-01",
+   "url": "https://inside.fifa.com/associations/MEX",
+   "sha256": "83519f11249c7299bbe8346563579c46a0424e57c296c46cfdc6270da6fb6449"
+  },
+  "496": {
+   "fifa": "MNG",
+   "association": "Mongolian Football Federation",
+   "memberSince": "29 July 1998",
+   "member": "1998-07-29",
+   "url": "https://inside.fifa.com/associations/MNG",
+   "sha256": "b13aacd2316f4640687a1f043950155e5ab51bdd25575cfa186637a64106f77c"
+  },
+  "498": {
+   "fifa": "MDA",
+   "association": "Football Association of Moldova",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/MDA",
+   "sha256": "ac7bdad3ecc8d76935173090461d837330ad374af64889a2adae3ca9bc5a50b9"
+  },
+  "499": {
+   "fifa": "MNE",
+   "association": "Football Association of Montenegro",
+   "memberSince": "31 May 2007",
+   "member": "2007-05-31",
+   "url": "https://inside.fifa.com/associations/MNE",
+   "sha256": "29a2b5b863626e2009e7f1ff122d545af7efdc9d6b32a5bfe1f76dfc278db34f"
+  },
+  "504": {
+   "fifa": "MAR",
+   "association": "Moroccan Football Association",
+   "memberSince": "01 January 1960",
+   "member": "1960-01-01",
+   "url": "https://inside.fifa.com/associations/MAR",
+   "sha256": "a4607b95b713827a854a418450b3fd4a0bdb02b80154b0cab48bf8b8665c4048"
+  },
+  "508": {
+   "fifa": "MOZ",
+   "association": "Mozambican Football Association",
+   "memberSince": "01 January 1980",
+   "member": "1980-01-01",
+   "url": "https://inside.fifa.com/associations/MOZ",
+   "sha256": "9260c82255711792af7db27ad73c9ea6ea9aecd962ec5ba467fdf9a26ace0f95"
+  },
+  "512": {
+   "fifa": "OMA",
+   "association": "Oman Football Association",
+   "memberSince": "01 January 1980",
+   "member": "1980-01-01",
+   "url": "https://inside.fifa.com/associations/OMA",
+   "sha256": "ef3a5197852ce9f6d3b9d1ddb7ac8841833c6862294e990089679f6bc67c8069"
+  },
+  "516": {
+   "fifa": "NAM",
+   "association": "Namibia Football Association",
+   "memberSince": "01 January 1992",
+   "member": "1992-01-01",
+   "url": "https://inside.fifa.com/associations/NAM",
+   "sha256": "e2b6fb77a8a43b4bf95b7840917bb6666faeaf534bad4be434dd512d237eaf06"
+  },
+  "524": {
+   "fifa": "NEP",
+   "association": "All Nepal Football Association",
+   "memberSince": "01 January 1972",
+   "member": "1972-01-01",
+   "url": "https://inside.fifa.com/associations/NEP",
+   "sha256": "0fd6004eba7fdb2e16b47af2a7c532c8ff2bb01b575b3214d6092bb40b75be53"
+  },
+  "528": {
+   "fifa": "NED",
+   "association": "Royal Netherlands Football Association",
+   "memberSince": "01 January 1904",
+   "member": "1904-01-01",
+   "url": "https://inside.fifa.com/associations/NED",
+   "sha256": "e35db97ab70dedc9be9bdc29b263131454578f037cb3ceba774d39655fa1af13"
+  },
+  "540": {
+   "fifa": "NCL",
+   "association": "New Caledonian Football Association",
+   "memberSince": "21 May 2004",
+   "member": "2004-05-21",
+   "url": "https://inside.fifa.com/associations/NCL",
+   "sha256": "9a69889442c0c992b060a9202a3cbe43972fd9f43692b72102ef16b0b7998969"
+  },
+  "548": {
+   "fifa": "VAN",
+   "association": "Vanuatu Football Federation",
+   "memberSince": "01 January 1988",
+   "member": "1988-01-01",
+   "url": "https://inside.fifa.com/associations/VAN",
+   "sha256": "9836462f3457d8fcda109d30f543ccd692e1d923cee20eb8114170b66c0f6661"
+  },
+  "554": {
+   "fifa": "NZL",
+   "association": "New Zealand Football",
+   "memberSince": "01 January 1948",
+   "member": "1948-01-01",
+   "url": "https://inside.fifa.com/associations/NZL",
+   "sha256": "4d11fe873fce616dd7c7b185b78c19f4aebe676a686bdd707b4a762991b8c6ef"
+  },
+  "558": {
+   "fifa": "NCA",
+   "association": "Nicaraguan Football Association",
+   "memberSince": "01 January 1950",
+   "member": "1950-01-01",
+   "url": "https://inside.fifa.com/associations/NCA",
+   "sha256": "12944157bae56fac9a2a8c19e65f8f901746f39c9de5475328ea9c30c07551a4"
+  },
+  "562": {
+   "fifa": "NIG",
+   "association": "Nigerien Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/NIG",
+   "sha256": "2affdb48685f21031faebf3f9eac768801b3339ad60791a712538266ebcc6c6f"
+  },
+  "566": {
+   "fifa": "NGA",
+   "association": "Nigeria Football Federation",
+   "memberSince": "01 January 1960",
+   "member": "1960-01-01",
+   "url": "https://inside.fifa.com/associations/NGA",
+   "sha256": "86ed4374454984b8c26e4c05592dbff304af01f5bd7c31b6f0071799170eeb5b"
+  },
+  "578": {
+   "fifa": "NOR",
+   "association": "Norwegian Football Association",
+   "memberSince": "01 January 1908",
+   "member": "1908-01-01",
+   "url": "https://inside.fifa.com/associations/NOR",
+   "sha256": "09a72bfa6cf77446c46266dd8eae0ddd2863b574e9f2bc8e54c92c8a285ce51e"
+  },
+  "586": {
+   "fifa": "PAK",
+   "association": "Pakistan Football Federation",
+   "memberSince": "01 January 1948",
+   "member": "1948-01-01",
+   "url": "https://inside.fifa.com/associations/PAK",
+   "sha256": "fd5ae01c4b6766495660050ffc8d63a7a86718eb92cd08014626e7111c541398"
+  },
+  "591": {
+   "fifa": "PAN",
+   "association": "Panamanian Football Association",
+   "memberSince": "01 January 1938",
+   "member": "1938-01-01",
+   "url": "https://inside.fifa.com/associations/PAN",
+   "sha256": "e984cadc2aeba97194e22b68acd6d63a1d468b4ad45a2ce7a5a13f6ed3366dff"
+  },
+  "598": {
+   "fifa": "PNG",
+   "association": "Papua New Guinea Football Association",
+   "memberSince": "01 January 1966",
+   "member": "1966-01-01",
+   "url": "https://inside.fifa.com/associations/PNG",
+   "sha256": "621206fb74033c671058e34b8a949757a5eb185e87d050e084d5b503700b9d54"
+  },
+  "600": {
+   "fifa": "PAR",
+   "association": "Paraguayan Football Association",
+   "memberSince": "01 January 1925",
+   "member": "1925-01-01",
+   "url": "https://inside.fifa.com/associations/PAR",
+   "sha256": "86e6ea193dbba8d0b9f43f39f18d65bf086e260f4f00e12bad577c5de54045e5"
+  },
+  "604": {
+   "fifa": "PER",
+   "association": "Peruvian Football Association",
+   "memberSince": "01 January 1924",
+   "member": "1924-01-01",
+   "url": "https://inside.fifa.com/associations/PER",
+   "sha256": "5054172850b199c1e11ec10ce920fde4946bac9eee907b5223b98cec5a23e95f"
+  },
+  "608": {
+   "fifa": "PHI",
+   "association": "Philippine Football Federation",
+   "memberSince": "06 June 1930",
+   "member": "1930-06-06",
+   "url": "https://inside.fifa.com/associations/PHI",
+   "sha256": "0b799edd429e6219435d30a469976b0863096f4cade3f8a0f40c3543e5f14088"
+  },
+  "616": {
+   "fifa": "POL",
+   "association": "Polish Football Association",
+   "memberSince": "01 January 1923",
+   "member": "1923-01-01",
+   "url": "https://inside.fifa.com/associations/POL",
+   "sha256": "64f759926e5b428e0bd798cf571926a48f92418f57938746fd237548c807ee6a"
+  },
+  "620": {
+   "fifa": "POR",
+   "association": "Portuguese Football Federation",
+   "memberSince": "01 September 1923",
+   "member": "1923-09-01",
+   "url": "https://inside.fifa.com/associations/POR",
+   "sha256": "57cdc362a85894e8b46e607afed10a1c1956bda87760b12b56c1b3eb51ec9649"
+  },
+  "624": {
+   "fifa": "GNB",
+   "association": "Bissau-Guinean Football Association",
+   "memberSince": "01 January 1986",
+   "member": "1986-01-01",
+   "url": "https://inside.fifa.com/associations/GNB",
+   "sha256": "c888ea3aa617f2ea8bb3518a1572cb544070e395301d94bed362d386a27300a4"
+  },
+  "626": {
+   "fifa": "TLS",
+   "association": "Football Federation of Timor-Leste",
+   "memberSince": "12 September 2005",
+   "member": "2005-09-12",
+   "url": "https://inside.fifa.com/associations/TLS",
+   "sha256": "d45d4e460dedd0772f996ee6672cbc1b36ded1a0de4d6616847e653bd385e8c8"
+  },
+  "630": {
+   "fifa": "PUR",
+   "association": "Puerto Rican Football Association",
+   "memberSince": "01 January 1960",
+   "member": "1960-01-01",
+   "url": "https://inside.fifa.com/associations/PUR",
+   "sha256": "4c34cc33e5dce37b8fdf05a99475c47a63042798fed92ad2f395f0297c1da52a"
+  },
+  "634": {
+   "fifa": "QAT",
+   "association": "Qatar Football Association",
+   "memberSince": "01 January 1972",
+   "member": "1972-01-01",
+   "url": "https://inside.fifa.com/associations/QAT",
+   "sha256": "9f9f6469d016873f55d468c14a286c5c754ca1852eea4e6136a65c0f1a12f178"
+  },
+  "642": {
+   "fifa": "ROU",
+   "association": "Romanian Football Federation",
+   "memberSince": "20 May 1923",
+   "member": "1923-05-20",
+   "url": "https://inside.fifa.com/associations/ROU",
+   "sha256": "b8896189f5f232c0904ac2739f1a8959ad4c3a3e8836af9a16cca6dd02023273"
+  },
+  "643": {
+   "fifa": "RUS",
+   "association": "Russian Football Union",
+   "memberSince": "01 January 1912",
+   "member": "1912-01-01",
+   "url": "https://inside.fifa.com/associations/RUS",
+   "sha256": "0eb0fe4132848f8536b59df157980fd4499a6164f825e9bfe90b882ee3aaef8a"
+  },
+  "646": {
+   "fifa": "RWA",
+   "association": "Rwandan Football Association",
+   "memberSince": "01 January 1978",
+   "member": "1978-01-01",
+   "url": "https://inside.fifa.com/associations/RWA",
+   "sha256": "8bc8ed5fafbd8dd378c16d3d14810c171c6bcd1dbe4ed0abbe310dad021b6cf8"
+  },
+  "682": {
+   "fifa": "KSA",
+   "association": "Saudi Arabian Football Federation",
+   "memberSince": "01 January 1956",
+   "member": "1956-01-01",
+   "url": "https://inside.fifa.com/associations/KSA",
+   "sha256": "d1dca929466e1b48accc6ade75477b0d4154f85101035760bea9648d948cd683"
+  },
+  "686": {
+   "fifa": "SEN",
+   "association": "Senegalese Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/SEN",
+   "sha256": "b1f394c4f1b24a23b0177c08815ea7744008ff9e5b869a5bee1e05b23230ce45"
+  },
+  "688": {
+   "fifa": "SRB",
+   "association": "Football Association of Serbia",
+   "memberSince": "01 January 1923",
+   "member": "1923-01-01",
+   "url": "https://inside.fifa.com/associations/SRB",
+   "sha256": "bcdf130b1f00d497b6173517985f0cfe37a2f6afabc308205c21daa66e13d0a7"
+  },
+  "694": {
+   "fifa": "SLE",
+   "association": "Sierra Leone Football Association",
+   "memberSince": "01 January 1960",
+   "member": "1960-01-01",
+   "url": "https://inside.fifa.com/associations/SLE",
+   "sha256": "691fce50f61bd6ea534907254ab1ac16977b66d40e2fab2407b1ebba867dc6aa"
+  },
+  "703": {
+   "fifa": "SVK",
+   "association": "Slovakian Football Association",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/SVK",
+   "sha256": "1b3c49ee3ba2cdf8d654da38c677fbd55282cb2c46218d2bdfe25288646ad6b4"
+  },
+  "704": {
+   "fifa": "VIE",
+   "association": "Vietnam Football Federation",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/VIE",
+   "sha256": "c7e6abff8ac063b3e51a4a8210ff96626a311315c6c7cefc7c387851dc6db217"
+  },
+  "705": {
+   "fifa": "SVN",
+   "association": "Football Association of Slovenia",
+   "memberSince": "01 January 1992",
+   "member": "1992-01-01",
+   "url": "https://inside.fifa.com/associations/SVN",
+   "sha256": "5db01e9f92527a9b37fa3cb60ee8418cd1d107324b073a2c1e046cfa935d6748"
+  },
+  "706": {
+   "fifa": "SOM",
+   "association": "Somali Football Federation",
+   "memberSince": "01 January 1962",
+   "member": "1962-01-01",
+   "url": "https://inside.fifa.com/associations/SOM",
+   "sha256": "c55e1667ab792a68ace1a67323b541128a3a0d18644c46631571abf33ea96977"
+  },
+  "710": {
+   "fifa": "RSA",
+   "association": "South African Football Association",
+   "memberSince": "01 January 1992",
+   "member": "1992-01-01",
+   "url": "https://inside.fifa.com/associations/RSA",
+   "sha256": "2b8606c6559374274efd6d53a4951e86ec70c411b450133170fbb475bfe89000"
+  },
+  "716": {
+   "fifa": "ZIM",
+   "association": "Zimbabwe Football Association",
+   "memberSince": "01 January 1965",
+   "member": "1965-01-01",
+   "url": "https://inside.fifa.com/associations/ZIM",
+   "sha256": "e90d050ffca8859779e30763ce35e33edcde8d33235e2cd2a8deafd363e9a1e2"
+  },
+  "724": {
+   "fifa": "ESP",
+   "association": "Spanish Football Association",
+   "memberSince": "01 January 1904",
+   "member": "1904-01-01",
+   "url": "https://inside.fifa.com/associations/ESP",
+   "sha256": "5e6d0bf78e2b58dd27cad9c33925ec594a27821366f3d854aaf4b45f9154d6c3"
+  },
+  "728": {
+   "fifa": "SSD",
+   "association": "South Sudan Football Federation",
+   "memberSince": "25 May 2012",
+   "member": "2012-05-25",
+   "url": "https://inside.fifa.com/associations/SSD",
+   "sha256": "2ced9792c3c7c4605dd87ff8c9213596d1b40bcf4ad50313757a9130c5a93320"
+  },
+  "729": {
+   "fifa": "SDN",
+   "association": "Sudan Football Association",
+   "memberSince": "01 January 1948",
+   "member": "1948-01-01",
+   "url": "https://inside.fifa.com/associations/SDN",
+   "sha256": "171ebe42db455fad43222fb4306543c7194ad4962b32d7bd469765b48625776d"
+  },
+  "740": {
+   "fifa": "SUR",
+   "association": "Surinamese Football Association",
+   "memberSince": "01 January 1929",
+   "member": "1929-01-01",
+   "url": "https://inside.fifa.com/associations/SUR",
+   "sha256": "1da6279666a993e665d081e30dbf047836fefdba76c418503b02242bc01b831c"
+  },
+  "748": {
+   "fifa": "SWZ",
+   "association": "Eswatini Football Association",
+   "memberSince": "01 January 1978",
+   "member": "1978-01-01",
+   "url": "https://inside.fifa.com/associations/SWZ",
+   "sha256": "b7a64e6aa2268d3362518e4b37d63b3d51e9a1585f3ce9903060bb4ff4880213"
+  },
+  "752": {
+   "fifa": "SWE",
+   "association": "Swedish Football Association",
+   "memberSince": "21 May 1904",
+   "member": "1904-05-21",
+   "url": "https://inside.fifa.com/associations/SWE",
+   "sha256": "1974b51a0ae932a880e0cdb61b81bfb92868294829ccb91edf9caed4b69ded3c"
+  },
+  "756": {
+   "fifa": "SUI",
+   "association": "Swiss Football Association",
+   "memberSince": "01 January 1904",
+   "member": "1904-01-01",
+   "url": "https://inside.fifa.com/associations/SUI",
+   "sha256": "224e448d7bb91b61f1f64be687e1e7979d299b2270685c41ee319bcbddeff73b"
+  },
+  "760": {
+   "fifa": "SYR",
+   "association": "Syrian Football Association",
+   "memberSince": "01 January 1937",
+   "member": "1937-01-01",
+   "url": "https://inside.fifa.com/associations/SYR",
+   "sha256": "09cf5e335bd11b8944e23520db26a41288d4618d3d77b02ad3fb06b8f4908714"
+  },
+  "762": {
+   "fifa": "TJK",
+   "association": "Tajikistan Football Federation",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/TJK",
+   "sha256": "83ad52755dc846dcedc1d54f611aacb83c1ac49b94bf777534cbf335c8e328f8"
+  },
+  "764": {
+   "fifa": "THA",
+   "association": "The Football Association of Thailand",
+   "memberSince": "01 January 1925",
+   "member": "1925-01-01",
+   "url": "https://inside.fifa.com/associations/THA",
+   "sha256": "227c78930dcdb5afb0133ecc09b376b58c650483f6bc9f0ae40e84b8cbd86cf7"
+  },
+  "768": {
+   "fifa": "TOG",
+   "association": "Togolese Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/TOG",
+   "sha256": "dad6375d465d658c4cbd975cb39984c5dfd4eb92aef35a667e90f3b7768a8d59"
+  },
+  "776": {
+   "fifa": "TGA",
+   "association": "Tonga Football Association",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/TGA",
+   "sha256": "19c516660944adf66488bc31b24d837a7e8f9d77a5446b01b97cb62a8f61641e"
+  },
+  "780": {
+   "fifa": "TRI",
+   "association": "Trinidad and Tobago Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/TRI",
+   "sha256": "321ba0fc0b56fcece7cfd76dd2320ac1b1644318572db5f14d8a233400015381"
+  },
+  "784": {
+   "fifa": "UAE",
+   "association": "United Arab Emirates Football Association",
+   "memberSince": "01 January 1974",
+   "member": "1974-01-01",
+   "url": "https://inside.fifa.com/associations/UAE",
+   "sha256": "e85ebbe161663b19004430c6a6b995124f5eb9bf84ff4c297ae2a3afd7fcec34"
+  },
+  "788": {
+   "fifa": "TUN",
+   "association": "Tunisian Football Association",
+   "memberSince": "01 January 1960",
+   "member": "1960-01-01",
+   "url": "https://inside.fifa.com/associations/TUN",
+   "sha256": "5562067e913a7d5aea00cd6a2fd57159d8e6aabe633c2b974b9516e4bf8df9da"
+  },
+  "792": {
+   "fifa": "TUR",
+   "association": "Turkish Football Federation",
+   "memberSince": "21 May 1923",
+   "member": "1923-05-21",
+   "url": "https://inside.fifa.com/associations/TUR",
+   "sha256": "ea87240ae89e7bfc192ded3009219c7c9103784aca7a87360c00b6811a9c6ba6"
+  },
+  "795": {
+   "fifa": "TKM",
+   "association": "Football Federation of Turkmenistan",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/TKM",
+   "sha256": "bbb66dfb130a8cb7c00db0797472c97f0a7d5c84b5a1dac4efe9ec0919c46eeb"
+  },
+  "800": {
+   "fifa": "UGA",
+   "association": "Federation of Uganda Football Associations",
+   "memberSince": "22 August 1960",
+   "member": "1960-08-22",
+   "url": "https://inside.fifa.com/associations/UGA",
+   "sha256": "556feafb3578162c5a1fe201075509780251d10cc1ce1296270959a35356aa5c"
+  },
+  "804": {
+   "fifa": "UKR",
+   "association": "Ukrainian Association of Football",
+   "memberSince": "03 July 1992",
+   "member": "1992-07-03",
+   "url": "https://inside.fifa.com/associations/UKR",
+   "sha256": "28985fab23cc854dbee5a0c4b6c5161686adec88c6ba8289551d46cb31fa1e53"
+  },
+  "807": {
+   "fifa": "MKD",
+   "association": "Football Federation of North Macedonia",
+   "memberSince": "16 June 1994",
+   "member": "1994-06-16",
+   "url": "https://inside.fifa.com/associations/MKD",
+   "sha256": "72f3c0ff2e904ea99d098989a25afc05c20d2233e8c1246b53dd604900a004fa"
+  },
+  "818": {
+   "fifa": "EGY",
+   "association": "Egyptian Football Association",
+   "memberSince": "01 January 1923",
+   "member": "1923-01-01",
+   "url": "https://inside.fifa.com/associations/EGY",
+   "sha256": "cf57340d18c3c672e0506793d1aac154c67f41b2500abe16e161379bb984ec69"
+  },
+  "826": {
+   "fifa": "ENG",
+   "association": "The Football Association",
+   "memberSince": "01 January 1905",
+   "member": "1905-01-01",
+   "url": "https://inside.fifa.com/associations/ENG",
+   "sha256": "2517925af43f983c46628b929d327dd88ba2a95bf2c6003a63bfc65e8daec883"
+  },
+  "834": {
+   "fifa": "TAN",
+   "association": "Tanzania Football Federation",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/TAN",
+   "sha256": "8d4bcfaf17beed5b74511e36bd4789fcc82da1e2300ac95d3df6bfb881a97af3"
+  },
+  "840": {
+   "fifa": "USA",
+   "association": "U.S. Soccer Federation",
+   "memberSince": "01 January 1914",
+   "member": "1914-01-01",
+   "url": "https://inside.fifa.com/associations/USA",
+   "sha256": "2f6cda49d139ee7de0699b2e8035b1573eb26f389dda8ae59337a4e449d7af2e"
+  },
+  "854": {
+   "fifa": "BFA",
+   "association": "Burkinabe Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/BFA",
+   "sha256": "83b53fa09dff5098baeba36a8aec3d0f241362f4856a9056547d78ee18cf5733"
+  },
+  "858": {
+   "fifa": "URU",
+   "association": "Uruguayan Football Association",
+   "memberSince": "01 January 1923",
+   "member": "1923-01-01",
+   "url": "https://inside.fifa.com/associations/URU",
+   "sha256": "d61c64c6ad819d654e2169efd5dca7380e916e5b7a211d6d9dcaa296409c9551"
+  },
+  "860": {
+   "fifa": "UZB",
+   "association": "Uzbekistan Football Association",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/UZB",
+   "sha256": "877251665404c473fa50b4bb56f1052480c8bb24ad7c7e969b8833a3c0e839c9"
+  },
+  "862": {
+   "fifa": "VEN",
+   "association": "Venezuelan Football Association",
+   "memberSince": "01 January 1952",
+   "member": "1952-01-01",
+   "url": "https://inside.fifa.com/associations/VEN",
+   "sha256": "d230ebb92394edf01fcb11129e2835b2419eeb7edea6d21eb98b7dc83dab9053"
+  },
+  "882": {
+   "fifa": "SAM",
+   "association": "Samoa Football",
+   "memberSince": "01 January 1986",
+   "member": "1986-01-01",
+   "url": "https://inside.fifa.com/associations/SAM",
+   "sha256": "a78fe1be6da5630b0469a0bbb30d41588403c6842e786e54d7cdec095941b157"
+  },
+  "887": {
+   "fifa": "YEM",
+   "association": "Yemen Football Association",
+   "memberSince": "01 January 1980",
+   "member": "1980-01-01",
+   "url": "https://inside.fifa.com/associations/YEM",
+   "sha256": "f52e00f9e028a52f33af1b55e36aee3264666938e6f1d3e71dcb0aa64733ef04"
+  },
+  "894": {
+   "fifa": "ZAM",
+   "association": "Football Association of Zambia",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/ZAM",
+   "sha256": "22306eb9641c8f1f65769151177c46c735ed8be93bcc55716b29665ebd9989cd"
+  },
+  "004": {
+   "fifa": "AFG",
+   "association": "Afghanistan Football Federation",
+   "memberSince": "01 January 1948",
+   "member": "1948-01-01",
+   "url": "https://inside.fifa.com/associations/AFG",
+   "sha256": "4e693982cdfd9dd3b3138a2721cc1c405ddc6c6d5cd8e5882dcae4ea556f1ee5"
+  },
+  "008": {
+   "fifa": "ALB",
+   "association": "The Football Association of Albania",
+   "memberSince": "01 January 1932",
+   "member": "1932-01-01",
+   "url": "https://inside.fifa.com/associations/ALB",
+   "sha256": "5bc33d7962b96a1614bdb6df20ca2a9285bf8ea0315c608ab344b796edbb9141"
+  },
+  "012": {
+   "fifa": "ALG",
+   "association": "Algerian Football Association",
+   "memberSince": "01 January 1964",
+   "member": "1964-01-01",
+   "url": "https://inside.fifa.com/associations/ALG",
+   "sha256": "d36a06ce84b3810c5cb09c469706581191a9a5fce99d9f37eed5c10b114faca1"
+  },
+  "024": {
+   "fifa": "ANG",
+   "association": "Angolan Football Association",
+   "memberSince": "01 January 1980",
+   "member": "1980-01-01",
+   "url": "https://inside.fifa.com/associations/ANG",
+   "sha256": "d4b5904a15e74d4778932d7b7cd18e6bba265f5fa2879b6ec73e233ddb444c83"
+  },
+  "031": {
+   "fifa": "AZE",
+   "association": "Association of Football Federations of Azerbaijan",
+   "memberSince": "01 January 1994",
+   "member": "1994-01-01",
+   "url": "https://inside.fifa.com/associations/AZE",
+   "sha256": "855076db655006abb734e5a8f9e2ee3a524853c272149410aed13ce3fee2adc8"
+  },
+  "032": {
+   "fifa": "ARG",
+   "association": "Argentinian Football Association",
+   "memberSince": "01 January 1912",
+   "member": "1912-01-01",
+   "url": "https://inside.fifa.com/associations/ARG",
+   "sha256": "abb7d9278503db01e6afca23328a198f5ed36ca9918c4426431028c025dc3220"
+  },
+  "036": {
+   "fifa": "AUS",
+   "association": "Football Australia",
+   "memberSince": "01 January 1963",
+   "member": "1963-01-01",
+   "url": "https://inside.fifa.com/associations/AUS",
+   "sha256": "d573a73439bf9e068d8d47c456b17421c5f8b7a45bad864b50885c4d1e3ce337"
+  },
+  "040": {
+   "fifa": "AUT",
+   "association": "Austrian Football Association",
+   "memberSince": "01 January 1905",
+   "member": "1905-01-01",
+   "url": "https://inside.fifa.com/associations/AUT",
+   "sha256": "8e14c3b35c16525d397374be8e906e456c7faf1158e9ee183ee223df7dc45c7f"
+  },
+  "044": {
+   "fifa": "BAH",
+   "association": "Bahamas Football Association",
+   "memberSince": "01 January 1968",
+   "member": "1968-01-01",
+   "url": "https://inside.fifa.com/associations/BAH",
+   "sha256": "2ea3b4e67ab1049cd58d4b9755873b2ffe66e85f07b2ec0f2f252931cf37bff2"
+  },
+  "050": {
+   "fifa": "BAN",
+   "association": "Bangladesh Football Federation",
+   "memberSince": "01 January 1976",
+   "member": "1976-01-01",
+   "url": "https://inside.fifa.com/associations/BAN",
+   "sha256": "2abe8629bf96c8a996228e69114d1b1aa9d7e2982496df6f7dd9bdba51ec98ac"
+  },
+  "051": {
+   "fifa": "ARM",
+   "association": "Football Federation of Armenia",
+   "memberSince": "01 January 1992",
+   "member": "1992-01-01",
+   "url": "https://inside.fifa.com/associations/ARM",
+   "sha256": "3016474ab9e92ce7749e6bcbd75ffcd3eef65171332b1f2799ac357754337b75"
+  },
+  "056": {
+   "fifa": "BEL",
+   "association": "Royal Belgian Football Association",
+   "memberSince": "01 January 1904",
+   "member": "1904-01-01",
+   "url": "https://inside.fifa.com/associations/BEL",
+   "sha256": "b498f16cffb4c6122ef957896fcb0ed9b7ebd6fd1a968c03335e378b2fd25431"
+  },
+  "064": {
+   "fifa": "BHU",
+   "association": "Bhutan Football Federation",
+   "memberSince": "01 August 2000",
+   "member": "2000-08-01",
+   "url": "https://inside.fifa.com/associations/BHU",
+   "sha256": "21ac21ae63868c18aeb9c3d55ff2f96c5396942dbe8c799ed633129a20a21a38"
+  },
+  "068": {
+   "fifa": "BOL",
+   "association": "Bolivian Football Association",
+   "memberSince": "12 September 1926",
+   "member": "1926-09-12",
+   "url": "https://inside.fifa.com/associations/BOL",
+   "sha256": "5808714d96def2d71c3d2acce84cf07f34d3857ff40822b8019f6511ce3106e6"
+  },
+  "070": {
+   "fifa": "BIH",
+   "association": "Bosnia and Herzegovina Football Federation",
+   "memberSince": "03 July 1996",
+   "member": "1996-07-03",
+   "url": "https://inside.fifa.com/associations/BIH",
+   "sha256": "e4ec6ef068a88f716ec55fd79a322d272f4ba6fb8002f1a858886121f8b417f0"
+  },
+  "072": {
+   "fifa": "BOT",
+   "association": "Botswana Football Association",
+   "memberSince": "01 January 1978",
+   "member": "1978-01-01",
+   "url": "https://inside.fifa.com/associations/BOT",
+   "sha256": "4ea7020688eccaadc05d1d80e89e7f38c26fb6962ed68e15fba74ac835e85c39"
+  },
+  "076": {
+   "fifa": "BRA",
+   "association": "Brazilian Football Association",
+   "memberSince": "01 January 1923",
+   "member": "1923-01-01",
+   "url": "https://inside.fifa.com/associations/BRA",
+   "sha256": "d1c54182768025efa68e971233ebbcf2ba18cf270c6ef50533ad382e7b9833a4"
+  },
+  "084": {
+   "fifa": "BLZ",
+   "association": "Football Federation of Belize",
+   "memberSince": "03 April 1986",
+   "member": "1986-04-03",
+   "url": "https://inside.fifa.com/associations/BLZ",
+   "sha256": "32b1aa2229292adcfe4927f70415dcd97010f641790839fe4e2ef9d577bacc71"
+  },
+  "090": {
+   "fifa": "SOL",
+   "association": "Solomon Islands Football Federation",
+   "memberSince": "01 January 1988",
+   "member": "1988-01-01",
+   "url": "https://inside.fifa.com/associations/SOL",
+   "sha256": "17c589c9c5296b2e4840500434ac05769729dd422a3765d29434aa10bb454438"
+  },
+  "096": {
+   "fifa": "BRU",
+   "association": "Football Association of Brunei Darussalam",
+   "memberSince": "01 January 1972",
+   "member": "1972-01-01",
+   "url": "https://inside.fifa.com/associations/BRU",
+   "sha256": "f2dc22485c99ddaa4d39757cf7a51301706c7d46a90462a6e4546e8c7d2e144d"
+  },
+  "KOS": {
+   "fifa": "KVX",
+   "url": "https://inside.fifa.com/associations/KVX",
+   "unread": "The page served on 2026-11-09 held no association record (a 14 KB shell); src/data/footballFederations.js keeps the date read on 2026-11-08."
+  },
+  "NIR": {
+   "fifa": "NIR",
+   "association": "Irish Football Association",
+   "memberSince": "01 January 1911",
+   "member": "1911-01-01",
+   "url": "https://inside.fifa.com/associations/NIR",
+   "sha256": "d8a1e5d30c37421c16696c86fb078f9ce6d8d17dcc2eaf5bb3b6b7c47143e64d"
+  },
+  "SCO": {
+   "fifa": "SCO",
+   "association": "The Scottish Football Association",
+   "memberSince": "01 January 1910",
+   "member": "1910-01-01",
+   "url": "https://inside.fifa.com/associations/SCO",
+   "sha256": "f9dce0a96e61f38a89e195de3911a2050fcd9c674187c1e5f96126e9e24617ef"
+  },
+  "WAL": {
+   "fifa": "WAL",
+   "association": "The Football Association of Wales",
+   "memberSince": "01 January 1910",
+   "member": "1910-01-01",
+   "url": "https://inside.fifa.com/associations/WAL",
+   "sha256": "db6439337c9c28b6a6b1bd7b59864bc8bdce441d3fc7c9f9f22ec47b17a72e2f"
+  }
+ }
+}
