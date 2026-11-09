@@ -142,6 +142,64 @@ export function buildTecmoSeason(snapshot, year, manifest, franchises) {
   return { doc, text: serializeFootballSet(doc), audit };
 }
 
+/**
+ * Madden NFL 99, 2000 or 2001 season `year`: its data set document, the document as the file holds it, and its audit
+ * row, from its committed snapshot (scripts/data/madden-early/<season>.json, npm run sync:madden-early: NFL Draft Buzz's
+ * copy of EA's data). Madden NFL 2001 kept EA's overall, used unchanged; Madden NFL 99 and 2000 kept attributes only, so
+ * their overall is ours (the snapshot's `conversion`, which the source block carries: overall 'converted'). Its clubs must
+ * be the season's franchises as the manifest's eras name them, each fielding its squad by the Madden seasons' rules; a
+ * place the snapshot documents as short (`lineup.gaps`: a player the site's copy lacks) is left to the game.
+ */
+export function buildEarlyMaddenSeason(snapshot, year, manifest, franchises) {
+  const source = manifest.sources?.[year];
+  if (source?.kind !== 'ndb') throw new Error(`${year} is no NFL Draft Buzz season of the manifest`);
+  if (snapshot.source?.season !== year || snapshot.source.edition !== source.edition) throw new Error(`The ${year} snapshot is ${snapshot.source?.edition} of ${snapshot.source?.season}`);
+  const id = setIdOf(manifest, year);
+  if (id !== seasonIdOf(year)) throw new Error(`${id} is no Madden season`);
+  if (JSON.stringify(snapshot.lineup?.needs) !== JSON.stringify(FORMATION)) throw new Error(`${year}: the snapshot's lineup is not the game's`);
+  const converted = !!snapshot.conversion;
+  const teams = teamsOf(franchises, manifest, year);
+  const listed = Object.entries(snapshot.teams);
+  const stray = listed.filter(([franchise, club]) => !teams.some(team => team.franchise === franchise && team.id === club.era
+    && team.name === club.name && team.code === club.code));
+  if (stray.length || listed.length !== teams.length) {
+    throw new Error(`${year}: the snapshot's clubs ${stray.map(([, club]) => club.name).join(', ') || '(missing some)'} are not the season's ${teams.length}`);
+  }
+  const pools = new Map(teams.map(team => [team.franchise, []]));
+  for (const [name, franchise, label, pos, overall] of snapshot.players) {
+    if (!pools.has(franchise)) throw new Error(`${year}: ${name} plays for ${franchise}, no club of the season`);
+    if (!FORMATION[pos]) throw new Error(`${year}: ${name} (${label}) plays ${pos}, no position of the game's`);
+    if (!Number.isInteger(overall) || overall < 1 || overall > 99) throw new Error(`${year}: ${name} has a rating outside 1-99`);
+    pools.get(franchise).push({ name, pos, rating: overall });
+  }
+  const clubs = teams.map(team => {
+    const { squad, str } = squadOf(pools.get(team.franchise), `${year} ${team.name}`, { gaps: snapshot.lineup.gaps[team.franchise] || {} });
+    return { id: team.id, name: team.name, code: team.code, league: 'NFL', country: '840', col: colourFor(team.id), str,
+      squad: squad.map(p => [p.name, p.pos, p.rating]) };
+  }).sort(strongestFirst);
+  const doc = {
+    format: 1, kind: 'madden', id, version: '', year, season: String(year), label: source.label, local: false,
+    source: { provider: manifest.source.provider, edition: source.edition, compiler: source.compiler, url: source.url, retrieved: source.retrieved,
+      ...(converted ? { overall: 'converted', rawScale: 99, conversion: snapshot.conversion.overall } : { rawScale: 99 }) },
+    map: mapOf(manifest, year),
+    clubs,
+    coverage: { players: snapshot.players.length, clubs: clubs.length },
+  };
+  doc.version = `${doc.id}-${contentHash(doc)}`;
+  const audit = {
+    id: doc.id, version: doc.version, season: doc.season, label: doc.label, edition: source.edition, compiler: source.compiler, url: source.url,
+    retrieved: source.retrieved, overall: converted ? 'converted' : 'EA', players: snapshot.players.length, map: doc.map,
+    clubs: clubs.map(c => `${c.name} ${c.str}`),
+    outOfPosition: Object.fromEntries(clubs.map(c => [c.name, outOfPosition(c.squad)]).filter(([, places]) => places.length)),
+    gaps: Object.fromEntries(Object.entries(snapshot.lineup.gaps).map(([franchise, gaps]) => [teams.find(t => t.franchise === franchise).name, gaps])),
+    checks: snapshot.checks.map(({ name, spearman, clubs: count, players, sameClub, compared, identical }) => ({ name,
+      ...(spearman !== undefined ? { clubs: count, spearman } : sameClub !== undefined ? { players, sameClub } : compared !== undefined ? { compared, identical } : { players }) })),
+    ...(converted ? { fit: snapshot.conversion.fit.groups } : {}),
+    left: snapshot.source.left,
+  };
+  return { doc, text: serializeFootballSet(doc), audit };
+}
+
 function listingModule(docs) {
   const rows = docs.map(doc => `  Object.freeze({ id: '${doc.id}', version: '${doc.version}', year: ${doc.year}, season: '${doc.season}', label: '${doc.label}', map: '${doc.map}' }),`);
   return `// GENERATED by npm run build:nfl-seasons; do not edit.
@@ -160,12 +218,14 @@ async function main() {
   const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/nfl-seasons.json'), 'utf8'));
   const franchises = JSON.parse(await readFile(path.join(root, 'scripts/data/nfl-teams.json'), 'utf8')).teams;
   const results = [];
+  // Each kind of season, its builder and the sync that makes its snapshot.
+  const KIND = { tecmo: [buildTecmoSeason, 'sync:tecmo'], ndb: [buildEarlyMaddenSeason, 'sync:madden-early'] };
   for (const year of manifest.seasons) {
-    const tecmo = manifest.sources[year]?.kind === 'tecmo';
-    const file = tecmo ? path.join(root, manifest.sources[year].snapshot) : path.join(snapshotDir, `${year}.json`);
-    if (!existsSync(file)) throw new Error(`No snapshot for ${year}: run npm run ${tecmo ? 'sync:tecmo' : 'sync:madden-seasons'} -- --season=${year}`);
+    const [builder, sync] = KIND[manifest.sources[year]?.kind] ?? [buildNflSeason, 'sync:madden-seasons'];
+    const file = manifest.sources[year]?.snapshot ? path.join(root, manifest.sources[year].snapshot) : path.join(snapshotDir, `${year}.json`);
+    if (!existsSync(file)) throw new Error(`No snapshot for ${year}: run npm run ${sync} -- --season=${year}`);
     const snapshot = JSON.parse(await readFile(file, 'utf8'));
-    results.push(tecmo ? buildTecmoSeason(snapshot, year, manifest, franchises) : buildNflSeason(snapshot, year, manifest, franchises));
+    results.push(builder(snapshot, year, manifest, franchises));
   }
   results.sort((a, b) => b.doc.year - a.doc.year);
   for (const { doc, text, audit } of results) {

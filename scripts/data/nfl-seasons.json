@@ -2,13 +2,16 @@
   "note": "The built-in earlier American football seasons: 1990 and 1992 to 1995 (the Tecmo Super Bowl games) and 2001 (Madden NFL 2002) to 2025 (Madden NFL 26). A Madden season is its edition's NFL rosters at launch, from copies made at the time (EA's ratings services today serve rewritten launch iterations): npm run sync:madden-seasons reads the pinned sources (`sources`: copies kept in the gitignored data-src/madden-seasons/<season>/, each file by its SHA-256; `checks` are second sources it compares with) into scripts/data/madden-seasons/<season>.json. A Tecmo season (`kind` tecmo) is built from scripts/data/tecmo/<season>.json, which npm run sync:tecmo makes and pins (its overall is ours: docs/design/american-football.md). npm run build:nfl-seasons builds each season's clubs from those snapshots (a source's `id` names its data set, else madden-<season>), and npm run build:nfl-map each era's map from `teams` and `maps`. `teams` lists, by today's club (scripts/data/nfl-teams.json), the seasons in which a franchise played under another name or elsewhere: such an era keeps today's id, name, code and city unless it names its own; one that names a stadium replaces today's venue whole (a franchise that shares its stadium grows from its training base, `base`, as on today's map); one that is `absent` leaves the franchise out (before an expansion franchise's first season, and the Browns' three seasons without a club). A club plays where it played its home games that season (most of them, when it moved during one). A stadium the club still plays in keeps its present name; one it has left is named as it was best known in those seasons. Washington's club before 2020 is named Washington: its name then was a slur the league has since retired.",
   "source": {"name":"Madden NFL","provider":"EA Sports","rawScale":99},
   "builtIn": {"year":2026,"edition":"Madden NFL 27"},
-  "seasons": [1990,1992,1993,1994,1995,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
+  "seasons": [1990,1992,1993,1994,1995,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
   "sources": {
     "1990": {"id":"tecmo-1990","kind":"tecmo","label":"Tecmo Super Bowl (NES)","snapshot":"scripts/data/tecmo/1990.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from Tecmo Geek's ratings and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
     "1992": {"id":"tecmo-1992","kind":"tecmo","label":"Tecmo Super Bowl II","snapshot":"scripts/data/tecmo/1992.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from the NFTGL's TSB III weighting without agility and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
     "1993": {"id":"tecmo-1993","kind":"tecmo","label":"Tecmo Super Bowl (SNES)","snapshot":"scripts/data/tecmo/1993.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from Tecmo Geek's NES weights and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
     "1994": {"id":"tecmo-1994","kind":"tecmo","label":"Tecmo Super Bowl II","snapshot":"scripts/data/tecmo/1994.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from the NFTGL's TSB III weighting without agility and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
     "1995": {"id":"tecmo-1995","kind":"tecmo","label":"Tecmo Super Bowl III","snapshot":"scripts/data/tecmo/1995.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from the NFTGL's weighting (The Book of Armaments) and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
+    "1998": {"id":"madden-1998","kind":"ndb","label":"Madden NFL 99 (converted)","edition":"Madden NFL 99","ndbEdition":1999,"snapshot":"scripts/data/madden-early/1998.json","compiler":"NFL Draft Buzz's Madden Ratings Database (EA SPORTS' attributes); the overall ours, from Madden NFL 2001's weights and Madden NFL 2002 (maddenratings.net)","url":"https://www.nfldraftbuzz.com/madden/year/1999","retrieved":"2026-11-09","pins":"scripts/data/ndb-pages.json"},
+    "1999": {"id":"madden-1999","kind":"ndb","label":"Madden NFL 2000 (converted)","edition":"Madden NFL 2000","ndbEdition":2000,"snapshot":"scripts/data/madden-early/1999.json","compiler":"NFL Draft Buzz's Madden Ratings Database (EA SPORTS' attributes); the overall ours, from Madden NFL 2001's weights and Madden NFL 2002 (maddenratings.net)","url":"https://www.nfldraftbuzz.com/madden/year/2000","retrieved":"2026-11-09","pins":"scripts/data/ndb-pages.json"},
+    "2000": {"id":"madden-2000","kind":"ndb","label":"Madden NFL 2001","edition":"Madden NFL 2001","ndbEdition":2001,"snapshot":"scripts/data/madden-early/2000.json","compiler":"NFL Draft Buzz's Madden Ratings Database (EA SPORTS' ratings)","url":"https://www.nfldraftbuzz.com/madden/year/2001","retrieved":"2026-11-09","pins":"scripts/data/ndb-pages.json"},
     "2001": {
       "edition": "Madden NFL 2002",
       "kind": "maddenratings",
@@ -1066,7 +1069,8 @@
       {"from":1992,"to":2016,"stadium":"Georgia Dome","home":[-84.4008,33.7575]}
     ],
     "nfl-baltimore-ravens": [
-      {"to":1995,"absent":true}
+      {"to":1995,"absent":true},
+      {"from":1996,"to":1997,"stadium":"Memorial Stadium, Baltimore","home":[-76.6014,39.3294]}
     ],
     "nfl-carolina-panthers": [
       {"to":1994,"absent":true},
@@ -1149,7 +1153,9 @@
       {"to":1997,"stadium":"Tampa Stadium","home":[-82.5036,27.9789]}
     ],
     "nfl-tennessee-titans": [
-      {"to":1996,"id":"nfl-houston-oilers","name":"Houston Oilers","code":"HOU","city":"Houston","stadium":"Houston Astrodome","home":[-95.4078,29.685]}
+      {"to":1996,"id":"nfl-houston-oilers","name":"Houston Oilers","code":"HOU","city":"Houston","stadium":"Houston Astrodome","home":[-95.4078,29.685]},
+      {"from":1997,"to":1997,"id":"nfl-tennessee-oilers","name":"Tennessee Oilers","code":"TEN","city":"Tennessee","stadium":"Liberty Bowl Memorial Stadium","home":[-89.9775,35.1211]},
+      {"from":1998,"to":1998,"id":"nfl-tennessee-oilers","name":"Tennessee Oilers","code":"TEN","city":"Tennessee","stadium":"Vanderbilt Stadium","home":[-86.8089,36.1442]}
     ],
     "nfl-washington-commanders": [
       {"to":1996,"id":"nfl-washington","name":"Washington","stadium":"RFK Stadium","home":[-76.9719,38.89]},
@@ -1162,6 +1168,9 @@
     {"id":"nfl1992","seasons":[1992,1993]},
     {"id":"nfl1994","seasons":[1994]},
     {"id":"nfl1995","seasons":[1995]},
+    {"id":"nfl1998","seasons":[1998]},
+    {"id":"nfl1999","seasons":[1999]},
+    {"id":"nfl2000","seasons":[2000]},
     {"id":"nfl2001","seasons":[2001]},
     {"id":"nfl2002","seasons":[2002]},
     {"id":"nfl2003","seasons":[2003,2004]},

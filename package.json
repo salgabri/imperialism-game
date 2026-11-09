@@ -50,6 +50,7 @@
     "build-nfl": "node scripts/build-nfl.mjs",
     "sync:madden-seasons": "node scripts/sync-madden-seasons.mjs",
     "sync:tecmo": "node scripts/sync-tecmo.mjs",
+    "sync:madden-early": "node scripts/sync-madden-early.mjs",
     "build:nfl-seasons": "node scripts/build-nfl-seasons.mjs",
     "sync:mlb-the-show": "node scripts/sync-mlb-the-show.mjs",
     "build-mlb": "node scripts/build-mlb.mjs",

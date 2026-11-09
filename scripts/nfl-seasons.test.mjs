@@ -34,10 +34,16 @@ const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'
 const MANIFEST = JSON.parse(read('scripts/data/nfl-seasons.json'));
 const FRANCHISES = JSON.parse(read('scripts/data/nfl-teams.json')).teams;
 const isTecmo = year => MANIFEST.sources[year].kind === 'tecmo';
-const MADDEN = MANIFEST.seasons.filter(year => !isTecmo(year));
+// Madden NFL 99 to 2001, from NFL Draft Buzz's copy (scripts/data/madden-early/<season>.json).
+const isEarly = year => MANIFEST.sources[year].kind === 'ndb';
+const MADDEN = MANIFEST.seasons.filter(year => !isTecmo(year) && !isEarly(year));
 const TECMO = MANIFEST.seasons.filter(isTecmo);
+const EARLY = MANIFEST.seasons.filter(isEarly);
 const snapshotOf = year => JSON.parse(read(`scripts/data/madden-seasons/${year}.json`));
 const tecmoSnapshotOf = year => JSON.parse(read(`scripts/data/tecmo/${year}.json`));
+const earlySnapshotOf = year => JSON.parse(read(`scripts/data/madden-early/${year}.json`));
+/** The places of a season's club its snapshot documents as short, which the game fills out of position. */
+const gapsOf = (year, franchise) => (isTecmo(year) ? tecmoSnapshotOf(year) : isEarly(year) ? earlySnapshotOf(year) : null)?.lineup.gaps[franchise] || {};
 const seasonFile = id => JSON.parse(read(`public/american-football/${id}.json`));
 const mapFile = id => JSON.parse(read(`public/domestic/${id}.json`));
 const ERA_MAPS = CLUB_MAPS.filter(entry => entry.sport === 'american-football' && entry.seasons);
@@ -220,7 +226,7 @@ test('a second source is compared player by player, by name, team and position',
 
 test('every season, its listing and audit rebuild byte for byte from the committed snapshots; so does the 2026 season', () => {
   const root = fileURLToPath(new URL('..', import.meta.url));
-  assert.match(execFileSync(process.execPath, ['scripts/build-nfl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 30 American football seasons/);
+  assert.match(execFileSync(process.execPath, ['scripts/build-nfl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), new RegExp(`Verified the ${MANIFEST.seasons.length} American football seasons`));
   assert.match(execFileSync(process.execPath, ['scripts/build-nfl.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the NFL clubs byte for byte/);
   for (const year of MADDEN) {
     const snapshot = snapshotOf(year);
@@ -264,7 +270,11 @@ test('the built-in seasons are the manifest\'s, newest first, from Madden NFL 26
   assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => set.id), [...MANIFEST.seasons].reverse().map(year => setIdOf(MANIFEST, year)));
   assert.deepEqual(MADDEN, Array.from({ length: 25 }, (_, i) => 2001 + i), 'no Madden season is missing');
   assert.deepEqual(TECMO, [1990, 1992, 1993, 1994, 1995], 'every Tecmo Super Bowl season: no edition rates 1991');
-  assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.slice(25).map(set => [set.id, set.season, set.label, set.map]), [
+  assert.deepEqual(EARLY, [1998, 1999, 2000], 'Madden NFL 99, 2000 and 2001');
+  assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.filter(set => /^madden-(?:1998|1999|2000)$/.test(set.id)).map(set => [set.id, set.label, set.map]), [
+    ['madden-2000', 'Madden NFL 2001', 'nfl2000'], ['madden-1999', 'Madden NFL 2000 (converted)', 'nfl1999'],
+    ['madden-1998', 'Madden NFL 99 (converted)', 'nfl1998']], 'Madden NFL 2001 keeps EA\'s overall; 99 and 2000 say theirs is converted');
+  assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.filter(set => set.id.startsWith('tecmo-')).map(set => [set.id, set.season, set.label, set.map]), [
     ['tecmo-1995', '1995', 'Tecmo Super Bowl III', 'nfl1995'], ['tecmo-1994', '1994', 'Tecmo Super Bowl II', 'nfl1994'],
     ['tecmo-1993', '1993', 'Tecmo Super Bowl (SNES)', 'nfl1992'], ['tecmo-1992', '1992', 'Tecmo Super Bowl II', 'nfl1992'],
     ['tecmo-1990', '1990', 'Tecmo Super Bowl (NES)', 'nfl1990']], 'after the Madden seasons, each game by its name');
@@ -308,7 +318,7 @@ test('every season loads and fits its era\'s map: the same clubs, named and hous
       if (entry.seasons) assert.equal(row.name, club.name, 'an era map names its season\'s clubs');
       assert.ok(club.squad.length >= americanFootball.squadSize);
       // A Tecmo club keeps every natural player of a place it is short of; the game fills the rest out of position.
-      const gaps = isTecmo(listed.year) ? tecmoSnapshotOf(listed.year).lineup.gaps[team.franchise] || {} : {};
+      const gaps = gapsOf(listed.year, team.franchise);
       for (const [pos, count] of Object.entries(FORMATION)) {
         assert.ok(naturalCount(club.squad, pos) >= count - (gaps[pos] ?? 0), `${listed.year} ${club.name} has its ${pos}`);
       }
