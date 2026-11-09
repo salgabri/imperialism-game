@@ -195,13 +195,13 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
   assert.ok(islands.every(id => fieldedNations(current).includes(id) && current.rosters[id][2].length === 11));
   // EA rated none of their players, so no EA season lists them. SI's CM 01/02 databases, built on today's map, list all
   // three as they list every nation, and rate a few (3.9.68 nine Cook Islanders, two Tongans and five Samoans, 3.9.60
-  // one Cook Islander). A listed nation fields a team only with half an XI of rated players (fieldedNations): the
-  // Cook Islands in 3.9.68, nobody else.
+  // one Cook Islander), as SI's CM 00/01 does (one Cook Islander). A listed nation fields a team only with half an XI of
+  // rated players (fieldedNations): the Cook Islands in 3.9.68, nobody else.
   const ratedIn = {}, fieldedIn = {};
   for (const { id } of BUILT_IN_SEASONS) {
     const doc = JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
     const listed = islands.filter(island => Object.hasOwn(doc.nations, island));
-    assert.ok(listed.length === 0 || (listed.length === 3 && id.startsWith('cm0102-')), id);
+    assert.ok(listed.length === 0 || (listed.length === 3 && /^cm(?:0102)?-/.test(id)), id);
     const rated = listed.filter(island => doc.nations[island][2].length > 0);
     if (rated.length) ratedIn[id] = rated;
     const fielded = fieldedNations(seasonSport(decodeFootballSet(doc, id)));
@@ -209,7 +209,7 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
     assert.ok(playing.every(island => listed.includes(island) && doc.nations[island][2].length >= 6), id);
     if (playing.length) fieldedIn[id] = playing;
   }
-  assert.deepEqual(ratedIn, { 'cm0102-2002-11': ['184', '776', '882'], 'cm0102-2001-09': ['184'] });
+  assert.deepEqual(ratedIn, { 'cm0102-2002-11': ['184', '776', '882'], 'cm0102-2001-09': ['184'], 'cm-0001': ['184'] });
   assert.deepEqual(fieldedIn, { 'cm0102-2002-11': ['184'] });
 });
 

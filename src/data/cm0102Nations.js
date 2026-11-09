@@ -5,7 +5,8 @@
 // still play for their clubs. A name in neither list stops the build. Only stored spellings are listed: SI
 // 3.9.60 and 3.9.68 (213 records each; 3.9.60 has Taiwan for Chinese Taipei), the Update Team additions BOS and
 // CM0102Patcher name (Serbia, Montenegro, Kosovo, Gibraltar, North Macedonia, Curaçao, Martinique, eSwatini) and
-// the spellings TransferTool's lookup accepts (Serbia and Montenegro, Southern Sudan, Macedonia, Netherlands).
+// the spellings TransferTool's lookup accepts (Serbia and Montenegro, Southern Sudan, Macedonia, Netherlands), and SI's
+// CM 99/00 misspelling of Burkina Faso.
 // With them every one of the 176 game nations has a CM name, Montenegro, Kosovo and South Sudan only in the
 // databases that add them. Yugoslavia is FR Yugoslavia, then Serbia and Montenegro, so it plays as Serbia; Timor,
 // an SI placeholder that Update Team data keeps, is Timor-Leste. The dead records Update Team data keeps beside
@@ -16,6 +17,7 @@ export const CM0102_NATIONS = {
   aliases: {
     'Bosnia-Herzegovina': '070',
     'Brunei Darussalam': '096',
+    'Burkino Faso': '854',
     'Central African Republic': '140',
     'China PR': '156',
     Taiwan: '158',

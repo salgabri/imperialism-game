@@ -16,6 +16,9 @@ import { sha256 } from './sha256.js';
 
 export const FOOTBALL_SET_FORMAT = 1;
 export const SET_ID = /^cm0102-\d{4}-\d{2}(?:-[a-z0-9]+)?$/;
+// A Championship Manager edition before CM 01/02 whose own files are CM 01/02's tables (SI's CM 99/00 and CM 00/01):
+// `cm-<season>`, the loader's kind 'cm' (src/engine/footballSets.js), which its set names.
+const CM_EDITION_ID = /^cm-\d{4}$/;
 /**
  * The earliest season-end year a set is built for: 1996/97, the earliest season the game ships (SWOS 96/97).
  * footballFederations.js gives every year from then on its federations. Seasons ending earlier would need the Soviet
@@ -29,14 +32,15 @@ const DEFAULT_PROVIDER = 'CM 01/02 Update Team';
 const CLUB_SIZE = 11;
 
 // The built-in league ids and map shapes (scripts/build-clubs.mjs FOOTBALL_LEAGUES), so a club theatre means the same
-// in every set. Each is found by its stored CM name or CM0102Patcher's rename, in a competition of that nation.
+// in every set. Each is found by its stored CM name or CM0102Patcher's rename, in a competition of that nation. SI's
+// CM 99/00 stores the Eredivisie under its sponsor's name of 1999/00, 'Dutch KPN-Telecompetition'.
 export const LEAGUES = {
   'Premier League': { country: '826', names: ['English Premier Division', 'English Premier League'] },
   'La Liga': { country: '724', names: ['Spanish First Division', 'Spanish La Liga'] },
   'Serie A': { country: '380', names: ['Italian Serie A'] },
   Bundesliga: { country: '276', names: ['German First Division', 'German Bundesliga'] },
   'Ligue 1': { country: '250', names: ['French First Division', 'French Ligue 1'] },
-  Eredivisie: { country: '528', names: ['Dutch Premier Division', 'Dutch Eredivisie'] },
+  Eredivisie: { country: '528', names: ['Dutch Premier Division', 'Dutch Eredivisie', 'Dutch KPN-Telecompetition'] },
   'Liga Portugal': { country: '620', names: ['Portuguese Premier League', 'Liga Portugal 1'] },
 };
 
@@ -284,18 +288,21 @@ function withoutTrailingBytes(files, trailing) {
  * `nationMap` (default CM0102_NATIONS), `federations` (default FOOTBALL_FEDERATIONS), `identity` (the flags for an
  * unknown folder), `allowUnmapped`, `famous` (birthdays for the shift check), `verifyFiles` (false skips the
  * SHA-256 of a known database's club.dat and staff.dat, tens of MB), and for a season the game ships
- * (scripts/build-retro-seasons.mjs) `local: false` and `sourceExtra`, fields added to its source block (who
- * compiled it, when it was read). Returns `{ doc, text, audit, summary, warnings }`; throws on an unknown layout, an
- * unmapped nation (unless allowed) or an unnamed database.
+ * (scripts/build-retro-seasons.mjs) `local: false`, `sourceExtra`, fields added to its source block (who
+ * compiled it, when it was read), and `kind`, the set kind its manifest names, checked against the one its id makes.
+ * Returns `{ doc, text, audit, summary, warnings }`; throws on an unknown layout, an unmapped nation (unless allowed)
+ * or an unnamed database.
  */
 export function buildFootballSet(files, {
   databases = CM0102_RELEASES, nationMap = CM0102_NATIONS, federations = FOOTBALL_FEDERATIONS, identity = {}, allowUnmapped = false,
-  famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {},
+  famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {}, kind,
 } = {}) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const signature = fileSignature(files);
   const database = resolveDatabase(signature, databases, identity);
+  const setKind = CM_EDITION_ID.test(database.id) ? 'cm' : 'cm0102';
+  if (kind !== undefined && kind !== setKind) throw new Error(`${database.id} makes a set of kind ${setKind}, not ${kind}`);
   if (database.ignored.length) warn(`${database.label} is a known database, so ${database.ignored.join(', ')} ${database.ignored.length > 1 ? 'are' : 'is'} ignored`);
   if (database.year < FIRST_YEAR) {
     throw new Error(`Season ${database.season} ends in ${database.year}: seasons ending before ${FIRST_YEAR} are refused for now, because `
@@ -435,9 +442,10 @@ export function buildFootballSet(files, {
     players: written.size, nations: nationAudit.filter(n => n.players).length,
     completeXIs: nationAudit.filter(n => n.naturalLineup).length, clubs: clubs.length, leagues: new Set(clubs.map(c => c.league)).size,
   };
+  // A CM 01/02 set names no kind, as every set did before the EA seasons.
   const doc = {
-    format: FOOTBALL_SET_FORMAT, id: database.id, version: '', year: database.year, season: database.season,
-    label: `${edition} · ${database.label}`, local, source, nations, clubs, territory, coverage,
+    format: FOOTBALL_SET_FORMAT, ...(setKind === 'cm' ? { kind: setKind } : {}), id: database.id, version: '', year: database.year,
+    season: database.season, label: `${edition} · ${database.label}`, local, source, nations, clubs, territory, coverage,
   };
   doc.version = `${doc.id}-${contentHash(doc)}`;
 

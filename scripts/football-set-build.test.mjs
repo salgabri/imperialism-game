@@ -69,12 +69,23 @@ function expectedTuple(db, row, shift) {
 // ---- Manifests ----
 
 test('the database manifest names every known release once, by a unique signature', () => {
-  // 48 CM 01/02 releases, and SI's CM3 data ported to the format (1998/99).
-  assert.equal(databases.length, 49);
   const pairs = databases.flatMap(d => d.signatures.map(s => `${s.club}/${s.staff}`));
   assert.equal(new Set(pairs).size, pairs.length);
   assert.equal(new Set(databases.map(d => d.id)).size, databases.length);
-  for (const d of databases) {
+  // SI's own CM 99/00 and CM 00/01, whose files are the same tables: their editions' ids and the archive.org CDs they
+  // are read from (scripts/sync-retro-cds.mjs).
+  const editions = databases.filter(d => /^cm-\d{4}$/.test(d.id));
+  assert.deepEqual(editions.map(d => [d.id, d.edition, d.label, d.season, d.provider]),
+    [['cm-9900', 'CM 99/00', '3.70', '1999/00', 'Sports Interactive'], ['cm-0001', 'CM 00/01', '3.81', '2000/01', 'Sports Interactive']]);
+  for (const d of editions) {
+    assert.match(d.url, /^https:\/\/archive\.org\/details\/[a-z0-9-]+$/);
+    assert.deepEqual([d.year, d.shifts], [seasonYear(d.season), { birth: 0 }]);
+    assert.ok(d.signatures.every(s => s.club % 581 === 0 && /^[0-9a-f]{64}$/.test(s.clubSha256) && /^[0-9a-f]{64}$/.test(s.staffSha256)), d.id);
+  }
+  const releases = databases.filter(d => !editions.includes(d));
+  // 48 CM 01/02 releases, and SI's CM3 data ported to the format (1998/99).
+  assert.equal(releases.length, 49);
+  for (const d of releases) {
     assert.match(d.id, /^cm0102-\d{4}-\d{2}(-(odb|sim|cm3))?$/, d.id);
     assert.ok(d.id.startsWith(`cm0102-${d.released}`), d.id);
     assert.ok(d.label.trim() && d.provider.trim(), d.id);

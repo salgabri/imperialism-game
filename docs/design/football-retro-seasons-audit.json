@@ -3750,6 +3750,3877 @@
       }
     },
     {
+      "id": "cm-0001",
+      "kind": "cm",
+      "reader": "tables",
+      "season": "2000/01",
+      "listing": "SI's Championship Manager 00/01 database, original release 3.81 (the UK retail CD's data files, archive.org cm-0001-rel)",
+      "maker": "Sports Interactive",
+      "compiler": "SI's own data files from the retail CD's InstallShield cabinet (DATA1.CAB), read by HTTP range from archive.org cm-0001-rel (CM0001_rel.iso), each file's MD5 as the cabinet header records it",
+      "provenance": "The CD's volume CM0001_rel was mastered on 6 October 2000, three weeks before the game's release on 27 October: the release-day database. A later European pressing (archive.org cm-0001) agrees on 96.3% of current abilities (39,382 players matched by name and date of birth) and rates 1,866 more players, with a few later transfers (Weah at Marseille rather than Manchester City); it is not the one read. The squads are of the summer of 2000: Figo at Real Madrid, Crespo at Lazio, Batistuta at Roma; Charlton, Manchester City and Ipswich promoted. Four players with a current ability below 0 are unrated and left out. For players matched by name and date of birth, 61.8% of current abilities equal CM 99/00's, which sit 2.6 lower on average (22,544 players, correlation 0.931), and 50.3% equal SI's CM 01/02 3.9.60's, which sit 0.7 higher (35,810 players, correlation 0.924): one scale, so the conversion is CM 01/02's, unchanged.",
+      "rights": "Championship Manager: Season 00/01 is Sports Interactive's and Eidos's (now SEGA's and Square Enix's) and was never made free, unlike CM 01/02; the archive.org item is a user's upload of the retail CD, and the data's rights are reserved. Only the eleven tables below are read from it.",
+      "retrieved": "2026-11-09",
+      "cd": {
+        "item": "cm-0001-rel",
+        "image": "CM0001_rel.iso",
+        "imageBytes": 702269440,
+        "imageMd5": "ffae6fe106638f7f4b2d10faedba92b1",
+        "imageSha1": "aa8ca571f898405322df5a5f76d4927a9e8c7590",
+        "sector": 2048,
+        "dataOffset": 0,
+        "volume": "CM0001_rel",
+        "created": "2000100616501300",
+        "cabinet": {
+          "header": "DATA1.HDR",
+          "headerLba": 178424,
+          "headerSha256": "77100b0b8bfa74db1d8b7074758458945b811e9a3a58ec4e026abadae9605ce9",
+          "cabinet": "DATA1.CAB",
+          "cabinetLba": 3241
+        }
+      },
+      "files": [
+        {
+          "folder": "cm0001-cd",
+          "name": "club.dat",
+          "bytes": 3691093,
+          "sha256": "c8b238c19a94d18442099f0294e056ce989d31d3c62679f6b58b72e8d6975305",
+          "md5": "55e07e33230478988b8696aa02a627dd"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "club_comp.dat",
+          "bytes": 30281,
+          "sha256": "ccfeec37026c0b7366adaa1e104f214a2b71255d36a31bccfb6e9ad044a821d2",
+          "md5": "da955279e3c9461d15fa05f881f32ca1"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "common_names.dat",
+          "bytes": 367440,
+          "sha256": "339cf0faf160969e0be4704b1ea37a4f8c3b01c6b2114499a6f9a78a2acf2b08",
+          "md5": "00ed428875c94612bef142c6079ecee4"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "77dbbd6054140f2cb1baf3c3443307c603ea2f089b7f9d056d3933e02aa3cc01",
+          "md5": "404a2142303f10b0adebb8d0eb29b9ae"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "first_names.dat",
+          "bytes": 1271940,
+          "sha256": "1f652fc9f7e8f6266b1026f271d210769e1856b66b96e7c6dc6acfb5303f01cf",
+          "md5": "47a9d9ffb0a1b4e491201e2ae281daf3"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "a6ea56d9d158db4744b4b78f506e8f37c845c4a21a0f42603bc91b3198a1ef1e",
+          "md5": "c6a709adc48b84276be6b224e89b8b92"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "nat_club.dat",
+          "bytes": 248668,
+          "sha256": "7f93520b1d3eefdd041e565eb686a422b8493a3bd78808e0127f5f022d047c4b",
+          "md5": "a452361f002fb51a4975291c5a866442"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "nation.dat",
+          "bytes": 62060,
+          "sha256": "a84ae88311cdf1bec3bca935533f8d6435314b92b0c22dbefae0ad44a09112d7",
+          "md5": "f104f521b90168326e8419de8a7cce2e"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "2b21326033cbcc8fa8f0d4653f16b791c03b5c80176c33df302164318bf701ed",
+          "md5": "6e026150b175ee4a9918d34a4ac7ea0f"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "second_names.dat",
+          "bytes": 3316380,
+          "sha256": "db251eaedc618c01fef4b5c5e3aa4e9285eb7fb099e1465f0fec421884b2a582",
+          "md5": "5a6b5cc666e95894533d4e877081134e"
+        },
+        {
+          "folder": "cm0001-cd",
+          "name": "staff.dat",
+          "bytes": 19498141,
+          "sha256": "6a6b3eead90f246317e7c58a36654bef981d2f1fa61503fc08abc2c2ef7f0926",
+          "md5": "a79d766a3869490bc2ec4e60b1e01b58"
+        }
+      ],
+      "version": "cm-0001-e6e6a2f0",
+      "coverage": {
+        "players": 2284,
+        "nations": 134,
+        "completeXIs": 82,
+        "clubs": 130,
+        "leagues": 7
+      },
+      "audit": {
+        "generatedBy": "scripts/build-football-set.mjs",
+        "id": "cm-0001",
+        "version": "cm-0001-e6e6a2f0",
+        "database": {
+          "known": true,
+          "label": "3.81",
+          "provider": "Sports Interactive",
+          "season": "2000/01",
+          "released": "2000-10",
+          "url": "https://archive.org/details/cm-0001-rel",
+          "signature": {
+            "clubSize": 3691093,
+            "staffSize": 19498141,
+            "staffFormat": 1
+          },
+          "digests": {
+            "club": "match",
+            "staff": "match"
+          },
+          "defaulted": []
+        },
+        "parser": {
+          "format": 1,
+          "counts": {
+            "staff": 85859,
+            "players": 71641,
+            "nations": 214,
+            "clubs": 6353,
+            "nationalSides": 428,
+            "clubCompetitions": 283,
+            "nationCompetitions": 19,
+            "continents": 6
+          },
+          "index": {
+            "order": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              7,
+              5,
+              6,
+              8,
+              9,
+              10,
+              11,
+              21,
+              12,
+              16,
+              13,
+              14,
+              15,
+              17,
+              18,
+              19,
+              20
+            ],
+            "formats": {
+              "0": 2,
+              "1": 2,
+              "2": 1,
+              "3": 1,
+              "4": 2,
+              "5": 1,
+              "6": 1,
+              "7": 1,
+              "8": 1,
+              "9": 2,
+              "10": 2,
+              "11": 2,
+              "12": 2,
+              "13": 1,
+              "14": 1,
+              "15": 1,
+              "16": 2,
+              "17": 1,
+              "18": 1,
+              "19": 1,
+              "20": 1,
+              "21": 1
+            },
+            "strayBytes": 0
+          },
+          "warnings": [
+            "staff.dat: 4 players have a current ability outside 0-200"
+          ]
+        },
+        "birthShift": {
+          "used": 0,
+          "from": "the manifest",
+          "oracle": {
+            "matches": 7,
+            "shift": 0,
+            "agreeing": 7,
+            "conclusive": true,
+            "duplicates": 0,
+            "samples": [
+              {
+                "name": "John Terry",
+                "cmId": 15697,
+                "stored": 1980,
+                "shift": 0
+              },
+              {
+                "name": "Thierry Henry",
+                "cmId": 18114,
+                "stored": 1977,
+                "shift": 0
+              },
+              {
+                "name": "Steven Gerrard",
+                "cmId": 28082,
+                "stored": 1980,
+                "shift": 0
+              },
+              {
+                "name": "Frank Lampard",
+                "cmId": 29333,
+                "stored": 1978,
+                "shift": 0
+              },
+              {
+                "name": "Gianluigi Buffon",
+                "cmId": 45349,
+                "stored": 1978,
+                "shift": 0
+              },
+              {
+                "name": "Iker Casillas",
+                "cmId": 68062,
+                "stored": 1981,
+                "shift": 0
+              },
+              {
+                "name": "Ryan Giggs",
+                "cmId": 78747,
+                "stored": 1973,
+                "shift": 0
+              }
+            ]
+          }
+        },
+        "players": {
+          "read": 71641,
+          "eligible": 40728,
+          "written": 2284,
+          "dropped": {
+            "nameless": 0,
+            "noAbility": 23024,
+            "noPositions": 7867,
+            "noNationality": 14,
+            "unmapped": 0,
+            "duplicates": 8
+          }
+        },
+        "unmapped": {},
+        "noTeam": {
+          "Bermuda": 3,
+          "Cape Verde Islands": 20,
+          "Hong Kong": 94,
+          "Malta": 63,
+          "Mauritius": 4,
+          "São Tomé & Principe": 2,
+          "Faroe Islands": 23,
+          "Bahrain": 1,
+          "Singapore": 4,
+          "Barbados": 6,
+          "Cayman Islands": 9,
+          "Andorra": 16,
+          "Saint Lucia": 2,
+          "St Kitts & Nevis": 2,
+          "St Vincent & The Grenadines": 4,
+          "Liechtenstein": 14
+        },
+        "leagues": [
+          {
+            "league": "Premier League",
+            "country": "826",
+            "competition": "English Premier Division",
+            "members": 20,
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "La Liga",
+            "country": "724",
+            "competition": "Spanish First Division",
+            "members": 20,
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "Serie A",
+            "country": "380",
+            "competition": "Italian Serie A",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Bundesliga",
+            "country": "276",
+            "competition": "German First Division",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Ligue 1",
+            "country": "250",
+            "competition": "French First Division",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Eredivisie",
+            "country": "528",
+            "competition": "Dutch Premier Division",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Liga Portugal",
+            "country": "620",
+            "competition": "Portuguese Premier League",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          }
+        ],
+        "territory": {
+          "merged": {
+            "499": "688",
+            "540": "250",
+            "728": "729"
+          },
+          "inactive": [
+            "626",
+            "KOS"
+          ]
+        },
+        "nations": [
+          {
+            "id": "100",
+            "name": "Bulgaria",
+            "pool": 105,
+            "players": 11,
+            "strength": 72,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "104",
+            "name": "Myanmar",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "108",
+            "name": "Burundi",
+            "pool": 5,
+            "players": 5,
+            "strength": 42,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "112",
+            "name": "Belarus",
+            "pool": 64,
+            "players": 11,
+            "strength": 70,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "116",
+            "name": "Cambodia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "120",
+            "name": "Cameroon",
+            "pool": 109,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "124",
+            "name": "Canada",
+            "pool": 32,
+            "players": 11,
+            "strength": 59,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "140",
+            "name": "Central African Rep.",
+            "pool": 3,
+            "players": 3,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "144",
+            "name": "Sri Lanka",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "148",
+            "name": "Chad",
+            "pool": 1,
+            "players": 1,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "152",
+            "name": "Chile",
+            "pool": 56,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "156",
+            "name": "China",
+            "pool": 357,
+            "players": 11,
+            "strength": 59,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "158",
+            "name": "Chinese Taipei",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "170",
+            "name": "Colombia",
+            "pool": 69,
+            "players": 11,
+            "strength": 75,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "178",
+            "name": "Congo",
+            "pool": 10,
+            "players": 10,
+            "strength": 36,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "180",
+            "name": "DR Congo",
+            "pool": 84,
+            "players": 11,
+            "strength": 55,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "184",
+            "name": "Cook Islands",
+            "pool": 1,
+            "players": 1,
+            "strength": 37,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "188",
+            "name": "Costa Rica",
+            "pool": 11,
+            "players": 11,
+            "strength": 51,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "191",
+            "name": "Croatia",
+            "pool": 339,
+            "players": 11,
+            "strength": 78,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "192",
+            "name": "Cuba",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "196",
+            "name": "Cyprus",
+            "pool": 20,
+            "players": 11,
+            "strength": 44,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "203",
+            "name": "Czechia",
+            "pool": 263,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "204",
+            "name": "Benin",
+            "pool": 6,
+            "players": 6,
+            "strength": 36,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "208",
+            "name": "Denmark",
+            "pool": 447,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "214",
+            "name": "Dominican Rep.",
+            "pool": 2,
+            "players": 2,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "218",
+            "name": "Ecuador",
+            "pool": 19,
+            "players": 11,
+            "strength": 59,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "222",
+            "name": "El Salvador",
+            "pool": 5,
+            "players": 5,
+            "strength": 49,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "226",
+            "name": "Eq. Guinea",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "231",
+            "name": "Ethiopia",
+            "pool": 1,
+            "players": 1,
+            "strength": 39,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "232",
+            "name": "Eritrea",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "233",
+            "name": "Estonia",
+            "pool": 77,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "242",
+            "name": "Fiji",
+            "pool": 20,
+            "players": 11,
+            "strength": 14,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "246",
+            "name": "Finland",
+            "pool": 935,
+            "players": 11,
+            "strength": 66,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "250",
+            "name": "France",
+            "pool": 1716,
+            "players": 11,
+            "strength": 87,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "262",
+            "name": "Djibouti",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "266",
+            "name": "Gabon",
+            "pool": 8,
+            "players": 8,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "268",
+            "name": "Georgia",
+            "pool": 42,
+            "players": 11,
+            "strength": 65,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "270",
+            "name": "Gambia",
+            "pool": 12,
+            "players": 11,
+            "strength": 45,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "275",
+            "name": "Palestine",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "276",
+            "name": "Germany",
+            "pool": 1928,
+            "players": 11,
+            "strength": 83,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "288",
+            "name": "Ghana",
+            "pool": 99,
+            "players": 11,
+            "strength": 69,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "300",
+            "name": "Greece",
+            "pool": 987,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "320",
+            "name": "Guatemala",
+            "pool": 1,
+            "players": 1,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "324",
+            "name": "Guinea",
+            "pool": 35,
+            "players": 11,
+            "strength": 61,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "328",
+            "name": "Guyana",
+            "pool": 2,
+            "players": 2,
+            "strength": 39,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "332",
+            "name": "Haiti",
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "340",
+            "name": "Honduras",
+            "pool": 6,
+            "players": 6,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "348",
+            "name": "Hungary",
+            "pool": 333,
+            "players": 11,
+            "strength": 65,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "352",
+            "name": "Iceland",
+            "pool": 104,
+            "players": 11,
+            "strength": 68,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "356",
+            "name": "India",
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "360",
+            "name": "Indonesia",
+            "pool": 4,
+            "players": 4,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "364",
+            "name": "Iran",
+            "pool": 32,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "368",
+            "name": "Iraq",
+            "pool": 3,
+            "players": 3,
+            "strength": 38,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "372",
+            "name": "Ireland",
+            "pool": 738,
+            "players": 11,
+            "strength": 75,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "376",
+            "name": "Israel",
+            "pool": 132,
+            "players": 11,
+            "strength": 70,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "380",
+            "name": "Italy",
+            "pool": 2199,
+            "players": 11,
+            "strength": 90,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "384",
+            "name": "Côte d'Ivoire",
+            "pool": 53,
+            "players": 11,
+            "strength": 65,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "388",
+            "name": "Jamaica",
+            "pool": 30,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "392",
+            "name": "Japan",
+            "pool": 603,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "398",
+            "name": "Kazakhstan",
+            "pool": 4,
+            "players": 4,
+            "strength": 44,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "400",
+            "name": "Jordan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "404",
+            "name": "Kenya",
+            "pool": 4,
+            "players": 4,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "408",
+            "name": "North Korea",
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "410",
+            "name": "South Korea",
+            "pool": 47,
+            "players": 11,
+            "strength": 61,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "414",
+            "name": "Kuwait",
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "417",
+            "name": "Kyrgyzstan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "418",
+            "name": "Laos",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "422",
+            "name": "Lebanon",
+            "pool": 5,
+            "players": 5,
+            "strength": 44,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "426",
+            "name": "Lesotho",
+            "pool": 2,
+            "players": 2,
+            "strength": 39,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "428",
+            "name": "Latvia",
+            "pool": 32,
+            "players": 11,
+            "strength": 61,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "430",
+            "name": "Liberia",
+            "pool": 22,
+            "players": 11,
+            "strength": 54,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "434",
+            "name": "Libya",
+            "pool": 1,
+            "players": 1,
+            "strength": 39,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "440",
+            "name": "Lithuania",
+            "pool": 71,
+            "players": 11,
+            "strength": 62,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "442",
+            "name": "Luxembourg",
+            "pool": 16,
+            "players": 11,
+            "strength": 45,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "450",
+            "name": "Madagascar",
+            "pool": 2,
+            "players": 2,
+            "strength": 38,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "454",
+            "name": "Malawi",
+            "pool": 4,
+            "players": 4,
+            "strength": 40,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "458",
+            "name": "Malaysia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "466",
+            "name": "Mali",
+            "pool": 16,
+            "players": 11,
+            "strength": 54,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "478",
+            "name": "Mauritania",
+            "pool": 1,
+            "players": 1,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "484",
+            "name": "Mexico",
+            "pool": 71,
+            "players": 11,
+            "strength": 72,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "496",
+            "name": "Mongolia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "498",
+            "name": "Moldova",
+            "pool": 26,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "499",
+            "name": "Montenegro",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "504",
+            "name": "Morocco",
+            "pool": 100,
+            "players": 11,
+            "strength": 70,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "508",
+            "name": "Mozambique",
+            "pool": 10,
+            "players": 10,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "512",
+            "name": "Oman",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "516",
+            "name": "Namibia",
+            "pool": 6,
+            "players": 6,
+            "strength": 43,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "524",
+            "name": "Nepal",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "528",
+            "name": "Netherlands",
+            "pool": 890,
+            "players": 11,
+            "strength": 85,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "540",
+            "name": "New Caledonia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "548",
+            "name": "Vanuatu",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "554",
+            "name": "New Zealand",
+            "pool": 30,
+            "players": 11,
+            "strength": 45,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "558",
+            "name": "Nicaragua",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "562",
+            "name": "Niger",
+            "pool": 8,
+            "players": 8,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "566",
+            "name": "Nigeria",
+            "pool": 144,
+            "players": 11,
+            "strength": 73,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "578",
+            "name": "Norway",
+            "pool": 810,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "586",
+            "name": "Pakistan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "591",
+            "name": "Panama",
+            "pool": 2,
+            "players": 2,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "598",
+            "name": "Papua New Guinea",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "600",
+            "name": "Paraguay",
+            "pool": 65,
+            "players": 11,
+            "strength": 74,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "604",
+            "name": "Peru",
+            "pool": 44,
+            "players": 11,
+            "strength": 70,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "608",
+            "name": "Philippines",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "616",
+            "name": "Poland",
+            "pool": 1033,
+            "players": 11,
+            "strength": 73,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "620",
+            "name": "Portugal",
+            "pool": 981,
+            "players": 11,
+            "strength": 80,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "624",
+            "name": "Guinea-Bissau",
+            "pool": 17,
+            "players": 11,
+            "strength": 48,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "626",
+            "name": "Timor-Leste",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "630",
+            "name": "Puerto Rico",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "634",
+            "name": "Qatar",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "642",
+            "name": "Romania",
+            "pool": 292,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "643",
+            "name": "Russia",
+            "pool": 658,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "646",
+            "name": "Rwanda",
+            "pool": 4,
+            "players": 4,
+            "strength": 37,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "682",
+            "name": "Saudi Arabia",
+            "pool": 25,
+            "players": 11,
+            "strength": 57,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "686",
+            "name": "Senegal",
+            "pool": 55,
+            "players": 11,
+            "strength": 62,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "688",
+            "name": "Serbia",
+            "pool": 866,
+            "players": 11,
+            "strength": 78,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "694",
+            "name": "Sierra Leone",
+            "pool": 18,
+            "players": 11,
+            "strength": 48,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "703",
+            "name": "Slovakia",
+            "pool": 86,
+            "players": 11,
+            "strength": 69,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "704",
+            "name": "Vietnam",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "705",
+            "name": "Slovenia",
+            "pool": 49,
+            "players": 11,
+            "strength": 67,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "706",
+            "name": "Somalia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "710",
+            "name": "South Africa",
+            "pool": 313,
+            "players": 11,
+            "strength": 67,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "716",
+            "name": "Zimbabwe",
+            "pool": 23,
+            "players": 11,
+            "strength": 51,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "724",
+            "name": "Spain",
+            "pool": 1747,
+            "players": 11,
+            "strength": 83,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "728",
+            "name": "South Sudan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "729",
+            "name": "Sudan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "740",
+            "name": "Suriname",
+            "pool": 4,
+            "players": 4,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "748",
+            "name": "Eswatini",
+            "pool": 2,
+            "players": 2,
+            "strength": 38,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "752",
+            "name": "Sweden",
+            "pool": 3895,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "756",
+            "name": "Switzerland",
+            "pool": 45,
+            "players": 11,
+            "strength": 73,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "760",
+            "name": "Syria",
+            "pool": 5,
+            "players": 5,
+            "strength": 48,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "762",
+            "name": "Tajikistan",
+            "pool": 3,
+            "players": 3,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "764",
+            "name": "Thailand",
+            "pool": 1,
+            "players": 1,
+            "strength": 43,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "768",
+            "name": "Togo",
+            "pool": 12,
+            "players": 11,
+            "strength": 44,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "776",
+            "name": "Tonga",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "780",
+            "name": "Trinidad & Tobago",
+            "pool": 20,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "784",
+            "name": "United Arab Emirates",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "788",
+            "name": "Tunisia",
+            "pool": 39,
+            "players": 11,
+            "strength": 59,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "792",
+            "name": "Turkey",
+            "pool": 809,
+            "players": 11,
+            "strength": 75,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "795",
+            "name": "Turkmenistan",
+            "pool": 3,
+            "players": 3,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "800",
+            "name": "Uganda",
+            "pool": 1,
+            "players": 1,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "804",
+            "name": "Ukraine",
+            "pool": 143,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "807",
+            "name": "N. Macedonia",
+            "pool": 55,
+            "players": 11,
+            "strength": 64,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "818",
+            "name": "Egypt",
+            "pool": 24,
+            "players": 11,
+            "strength": 64,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "826",
+            "name": "England",
+            "pool": 3344,
+            "players": 11,
+            "strength": 82,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "834",
+            "name": "Tanzania",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "840",
+            "name": "United States",
+            "pool": 195,
+            "players": 11,
+            "strength": 66,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "854",
+            "name": "Burkina Faso",
+            "pool": 9,
+            "players": 9,
+            "strength": 48,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "858",
+            "name": "Uruguay",
+            "pool": 118,
+            "players": 11,
+            "strength": 80,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "860",
+            "name": "Uzbekistan",
+            "pool": 10,
+            "players": 10,
+            "strength": 46,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "862",
+            "name": "Venezuela",
+            "pool": 23,
+            "players": 11,
+            "strength": 57,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "882",
+            "name": "Samoa",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "887",
+            "name": "Yemen",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "894",
+            "name": "Zambia",
+            "pool": 19,
+            "players": 11,
+            "strength": 51,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "032",
+            "name": "Argentina",
+            "pool": 1440,
+            "players": 11,
+            "strength": 87,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "076",
+            "name": "Brazil",
+            "pool": 4965,
+            "players": 11,
+            "strength": 86,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "068",
+            "name": "Bolivia",
+            "pool": 27,
+            "players": 11,
+            "strength": 69,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "SCO",
+            "name": "Scotland",
+            "pool": 1304,
+            "players": 11,
+            "strength": 74,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "WAL",
+            "name": "Wales",
+            "pool": 311,
+            "players": 11,
+            "strength": 69,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "NIR",
+            "name": "Northern Ireland",
+            "pool": 802,
+            "players": 11,
+            "strength": 68,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "056",
+            "name": "Belgium",
+            "pool": 1384,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "040",
+            "name": "Austria",
+            "pool": 65,
+            "players": 11,
+            "strength": 69,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "070",
+            "name": "Bosnia & Herz.",
+            "pool": 95,
+            "players": 11,
+            "strength": 67,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "008",
+            "name": "Albania",
+            "pool": 55,
+            "players": 11,
+            "strength": 59,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "KOS",
+            "name": "Kosovo",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "051",
+            "name": "Armenia",
+            "pool": 22,
+            "players": 11,
+            "strength": 54,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "031",
+            "name": "Azerbaijan",
+            "pool": 20,
+            "players": 11,
+            "strength": 51,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "012",
+            "name": "Algeria",
+            "pool": 26,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "024",
+            "name": "Angola",
+            "pool": 60,
+            "players": 11,
+            "strength": 59,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "072",
+            "name": "Botswana",
+            "pool": 1,
+            "players": 1,
+            "strength": 39,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "084",
+            "name": "Belize",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "044",
+            "name": "Bahamas",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "036",
+            "name": "Australia",
+            "pool": 391,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "096",
+            "name": "Brunei",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "050",
+            "name": "Bangladesh",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "064",
+            "name": "Bhutan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "004",
+            "name": "Afghanistan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "090",
+            "name": "Solomon Islands",
+            "pool": 2,
+            "players": 2,
+            "strength": 37,
+            "goalkeeper": false,
+            "naturalLineup": false
+          }
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "id": "cm-9900",
+      "kind": "cm",
+      "reader": "tables",
+      "season": "1999/00",
+      "listing": "SI's Championship Manager 99/00 database, original release 3.70 (the UK retail CD's data files, archive.org championship-manager-season-9900)",
+      "maker": "Sports Interactive",
+      "compiler": "SI's own data files from the retail CD's InstallShield cabinet (DATA1.CAB), read by HTTP range from archive.org championship-manager-season-9900 (CM9900_REL.bin), each file's MD5 as the cabinet header records it",
+      "provenance": "The CD's volume CM9900_REL was mastered on 16 November 1999; the game was released on 3 December 1999. A second copy, the Dutch CD (archive.org cm-9900-nl), carries a byte-identical cabinet header, so every data file's MD5 agrees. The squads are of the autumn of 1999: Vieri at Inter, Anelka at Real Madrid, Shevchenko at Milan; Bradford City, Watford and Sunderland promoted. It names the Eredivisie after its sponsor (Dutch KPN-Telecompetition) and spells Burkina Faso 'Burkino Faso'; both are read as such. For players matched by name and date of birth, 70.5% of current abilities equal the CM3 port's (1998/99), which sit 2.0 lower on average (15,637 players, correlation 0.947): the scale of the seasons around it, so the conversion is CM 01/02's, unchanged.",
+      "rights": "Championship Manager: Season 99/00 is Sports Interactive's and Eidos's (now SEGA's and Square Enix's) and was never made free, unlike CM 01/02; the archive.org item is a user's upload of the retail CD (its Public Domain Mark does not apply to the game), and the data's rights are reserved. Only the eleven tables below are read from it.",
+      "retrieved": "2026-11-09",
+      "cd": {
+        "item": "championship-manager-season-9900",
+        "image": "CM9900_REL.bin",
+        "imageBytes": 806512560,
+        "imageMd5": "814eca7ef4e636e4ff15621f4039354b",
+        "imageSha1": "7c665b20be7cd8c1fc6963fd2bbc491974fd1ac7",
+        "sector": 2352,
+        "dataOffset": 16,
+        "volume": "CM9900_REL",
+        "created": "1999111615412400",
+        "cabinet": {
+          "header": "DATA1.HDR",
+          "headerLba": 181185,
+          "headerSha256": "c68afde0c9665b165194dfca504f00422875a92b3a2afa6918b8698f02044c3b",
+          "cabinet": "DATA1.CAB",
+          "cabinetLba": 2649
+        }
+      },
+      "files": [
+        {
+          "folder": "cm9900-cd",
+          "name": "club.dat",
+          "bytes": 2540132,
+          "sha256": "8fabfd345a999abedcd3714f6cd8a9373a33782f2d5570c023a4b4098989bf25",
+          "md5": "5dd5ce64785f6706ccd1623a657799bc"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "club_comp.dat",
+          "bytes": 18725,
+          "sha256": "9aa099b9358659ece6d77975131fd8e666981841afe27e146f68a4e28b77462f",
+          "md5": "54350e3f20ddf6f7ec239b34a89ce78c"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "common_names.dat",
+          "bytes": 233520,
+          "sha256": "8b323ee306d9d77f39f1758acb368a0603547efd8fb74736ffb31f6b1ebb1f25",
+          "md5": "52e9d542614b83e62fb2f1641c25911a"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "77dbbd6054140f2cb1baf3c3443307c603ea2f089b7f9d056d3933e02aa3cc01",
+          "md5": "404a2142303f10b0adebb8d0eb29b9ae"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "first_names.dat",
+          "bytes": 804360,
+          "sha256": "9620bee4fe443a4885f558a0e4f04fe0d8b4225e0ba961c1f5c1924545f85241",
+          "md5": "34e311e4d3fde5c518df078fb0474c93"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "5cc5059ad95b62fb372b9f457f948204e8aaad6ff8ad834aeec3da13d195b030",
+          "md5": "9210f9df1931d390a3545710e481d58f"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "nat_club.dat",
+          "bytes": 235886,
+          "sha256": "232426142493ad436486f8d3caf242a18bbf20ed8df04d570a2d847cf090f47f",
+          "md5": "8f64712037e2b1fc9a4e158ae95918cb"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "nation.dat",
+          "bytes": 58870,
+          "sha256": "f50cf972b8742d860f7fbd8bdb4d56c0acca01027e35a53d72bf0dba6fe82bb6",
+          "md5": "da9ee447858876682bcc51c4e1fd7f92"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "nation_comp.dat",
+          "bytes": 1819,
+          "sha256": "f5875ad1f945f8919e11df09123dc295d1e48d30fca721458f38e0f82840287e",
+          "md5": "168a65193f523a215d1ee70f76a386e0"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "second_names.dat",
+          "bytes": 2260080,
+          "sha256": "97d208f6eefddec67fb6bd0a14c1f9f3b6de6c68b048ffdf19c4bc941a2aa841",
+          "md5": "8d12d9fa056b8a1cc6110c649f7cf8c3"
+        },
+        {
+          "folder": "cm9900-cd",
+          "name": "staff.dat",
+          "bytes": 12318294,
+          "sha256": "1efd3432d9ea3c54ff88aab39e8b43e7ef7ea064032f38918d5ba58cfc2b8455",
+          "md5": "a59c383419664cbd4e236936a7532979"
+        }
+      ],
+      "version": "cm-9900-e4639df6",
+      "coverage": {
+        "players": 2178,
+        "nations": 123,
+        "completeXIs": 74,
+        "clubs": 130,
+        "leagues": 7
+      },
+      "audit": {
+        "generatedBy": "scripts/build-football-set.mjs",
+        "id": "cm-9900",
+        "version": "cm-9900-e4639df6",
+        "database": {
+          "known": true,
+          "label": "3.70",
+          "provider": "Sports Interactive",
+          "season": "1999/00",
+          "released": "1999-11",
+          "url": "https://archive.org/details/championship-manager-season-9900",
+          "signature": {
+            "clubSize": 2540132,
+            "staffSize": 12318294,
+            "staffFormat": 1
+          },
+          "digests": {
+            "club": "match",
+            "staff": "match"
+          },
+          "defaulted": []
+        },
+        "parser": {
+          "format": 1,
+          "counts": {
+            "staff": 54254,
+            "players": 46460,
+            "nations": 203,
+            "clubs": 4372,
+            "nationalSides": 406,
+            "clubCompetitions": 175,
+            "nationCompetitions": 17,
+            "continents": 6
+          },
+          "index": {
+            "order": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              7,
+              5,
+              6,
+              8,
+              9,
+              10,
+              11,
+              21,
+              12,
+              16,
+              13,
+              14,
+              15,
+              17,
+              18,
+              19,
+              20
+            ],
+            "formats": {
+              "0": 2,
+              "1": 2,
+              "2": 1,
+              "3": 1,
+              "4": 2,
+              "5": 1,
+              "6": 1,
+              "7": 1,
+              "8": 1,
+              "9": 2,
+              "10": 2,
+              "11": 2,
+              "12": 2,
+              "13": 1,
+              "14": 1,
+              "15": 1,
+              "16": 2,
+              "17": 1,
+              "18": 1,
+              "19": 1,
+              "20": 1,
+              "21": 1
+            },
+            "strayBytes": 0
+          },
+          "warnings": []
+        },
+        "birthShift": {
+          "used": 0,
+          "from": "the manifest",
+          "oracle": {
+            "matches": 7,
+            "shift": 0,
+            "agreeing": 7,
+            "conclusive": true,
+            "duplicates": 0,
+            "samples": [
+              {
+                "name": "John Terry",
+                "cmId": 9938,
+                "stored": 1980,
+                "shift": 0
+              },
+              {
+                "name": "Steven Gerrard",
+                "cmId": 19189,
+                "stored": 1980,
+                "shift": 0
+              },
+              {
+                "name": "Thierry Henry",
+                "cmId": 19610,
+                "stored": 1977,
+                "shift": 0
+              },
+              {
+                "name": "Frank Lampard",
+                "cmId": 20188,
+                "stored": 1978,
+                "shift": 0
+              },
+              {
+                "name": "Gianluigi Buffon",
+                "cmId": 30935,
+                "stored": 1978,
+                "shift": 0
+              },
+              {
+                "name": "Iker Casillas",
+                "cmId": 44974,
+                "stored": 1981,
+                "shift": 0
+              },
+              {
+                "name": "Ryan Giggs",
+                "cmId": 51224,
+                "stored": 1973,
+                "shift": 0
+              }
+            ]
+          }
+        },
+        "players": {
+          "read": 46460,
+          "eligible": 22939,
+          "written": 2178,
+          "dropped": {
+            "nameless": 0,
+            "noAbility": 18440,
+            "noPositions": 5076,
+            "noNationality": 1,
+            "unmapped": 0,
+            "duplicates": 4
+          }
+        },
+        "unmapped": {},
+        "noTeam": {
+          "Cape Verde Islands": 17,
+          "Bermuda": 3,
+          "Mauritius": 2,
+          "Sao Tome & Principe": 1,
+          "Bahrain": 1,
+          "Singapore": 3,
+          "Barbados": 3,
+          "Andorra": 16,
+          "Saint Lucia": 2,
+          "St Kitts & Nevis": 1,
+          "St Vincent & The Grenadines": 1,
+          "Faroe Islands": 23,
+          "Malta": 22,
+          "Liechtenstein": 14,
+          "Zaire": 2
+        },
+        "leagues": [
+          {
+            "league": "Premier League",
+            "country": "826",
+            "competition": "English Premier Division",
+            "members": 20,
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "La Liga",
+            "country": "724",
+            "competition": "Spanish First Division",
+            "members": 20,
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "Serie A",
+            "country": "380",
+            "competition": "Italian Serie A",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Bundesliga",
+            "country": "276",
+            "competition": "German First Division",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Ligue 1",
+            "country": "250",
+            "competition": "French First Division",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Eredivisie",
+            "country": "528",
+            "competition": "Dutch KPN-Telecompetition",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Liga Portugal",
+            "country": "620",
+            "competition": "Portuguese Premier League",
+            "members": 18,
+            "clubs": 18,
+            "short": []
+          }
+        ],
+        "territory": {
+          "merged": {
+            "499": "688",
+            "540": "250",
+            "728": "729"
+          },
+          "inactive": [
+            "064",
+            "626",
+            "KOS"
+          ]
+        },
+        "nations": [
+          {
+            "id": "100",
+            "name": "Bulgaria",
+            "pool": 92,
+            "players": 11,
+            "strength": 73,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "104",
+            "name": "Myanmar",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "108",
+            "name": "Burundi",
+            "pool": 2,
+            "players": 2,
+            "strength": 44,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "112",
+            "name": "Belarus",
+            "pool": 29,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "116",
+            "name": "Cambodia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "120",
+            "name": "Cameroon",
+            "pool": 76,
+            "players": 11,
+            "strength": 70,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "124",
+            "name": "Canada",
+            "pool": 26,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "140",
+            "name": "Central African Rep.",
+            "pool": 2,
+            "players": 2,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "144",
+            "name": "Sri Lanka",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "148",
+            "name": "Chad",
+            "pool": 1,
+            "players": 1,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "152",
+            "name": "Chile",
+            "pool": 40,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "156",
+            "name": "China",
+            "pool": 14,
+            "players": 11,
+            "strength": 55,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "158",
+            "name": "Chinese Taipei",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "170",
+            "name": "Colombia",
+            "pool": 57,
+            "players": 11,
+            "strength": 75,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "178",
+            "name": "Congo",
+            "pool": 10,
+            "players": 10,
+            "strength": 31,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "180",
+            "name": "DR Congo",
+            "pool": 63,
+            "players": 11,
+            "strength": 53,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "188",
+            "name": "Costa Rica",
+            "pool": 7,
+            "players": 7,
+            "strength": 48,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "191",
+            "name": "Croatia",
+            "pool": 299,
+            "players": 11,
+            "strength": 79,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "192",
+            "name": "Cuba",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "196",
+            "name": "Cyprus",
+            "pool": 1,
+            "players": 1,
+            "strength": 43,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "203",
+            "name": "Czechia",
+            "pool": 97,
+            "players": 11,
+            "strength": 75,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "204",
+            "name": "Benin",
+            "pool": 6,
+            "players": 6,
+            "strength": 36,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "208",
+            "name": "Denmark",
+            "pool": 419,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "214",
+            "name": "Dominican Rep.",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "218",
+            "name": "Ecuador",
+            "pool": 18,
+            "players": 11,
+            "strength": 58,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "222",
+            "name": "El Salvador",
+            "pool": 4,
+            "players": 4,
+            "strength": 48,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "226",
+            "name": "Eq. Guinea",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "231",
+            "name": "Ethiopia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "232",
+            "name": "Eritrea",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "233",
+            "name": "Estonia",
+            "pool": 28,
+            "players": 11,
+            "strength": 57,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "242",
+            "name": "Fiji",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "246",
+            "name": "Finland",
+            "pool": 155,
+            "players": 11,
+            "strength": 65,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "250",
+            "name": "France",
+            "pool": 1579,
+            "players": 11,
+            "strength": 88,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "262",
+            "name": "Djibouti",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "266",
+            "name": "Gabon",
+            "pool": 4,
+            "players": 4,
+            "strength": 38,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "268",
+            "name": "Georgia",
+            "pool": 21,
+            "players": 11,
+            "strength": 64,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "270",
+            "name": "Gambia",
+            "pool": 9,
+            "players": 9,
+            "strength": 39,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "275",
+            "name": "Palestine",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "276",
+            "name": "Germany",
+            "pool": 1867,
+            "players": 11,
+            "strength": 84,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "288",
+            "name": "Ghana",
+            "pool": 79,
+            "players": 11,
+            "strength": 68,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "300",
+            "name": "Greece",
+            "pool": 58,
+            "players": 11,
+            "strength": 72,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "320",
+            "name": "Guatemala",
+            "pool": 1,
+            "players": 1,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "324",
+            "name": "Guinea",
+            "pool": 25,
+            "players": 11,
+            "strength": 57,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "328",
+            "name": "Guyana",
+            "pool": 1,
+            "players": 1,
+            "strength": 37,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "332",
+            "name": "Haiti",
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "340",
+            "name": "Honduras",
+            "pool": 4,
+            "players": 4,
+            "strength": 43,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "348",
+            "name": "Hungary",
+            "pool": 75,
+            "players": 11,
+            "strength": 68,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "352",
+            "name": "Iceland",
+            "pool": 97,
+            "players": 11,
+            "strength": 67,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "356",
+            "name": "India",
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "360",
+            "name": "Indonesia",
+            "pool": 3,
+            "players": 3,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "364",
+            "name": "Iran",
+            "pool": 30,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "368",
+            "name": "Iraq",
+            "pool": 3,
+            "players": 3,
+            "strength": 37,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "372",
+            "name": "Ireland",
+            "pool": 221,
+            "players": 11,
+            "strength": 72,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "376",
+            "name": "Israel",
+            "pool": 63,
+            "players": 11,
+            "strength": 74,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "380",
+            "name": "Italy",
+            "pool": 1816,
+            "players": 11,
+            "strength": 89,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "384",
+            "name": "Côte d'Ivoire",
+            "pool": 42,
+            "players": 11,
+            "strength": 65,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "388",
+            "name": "Jamaica",
+            "pool": 30,
+            "players": 11,
+            "strength": 59,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "392",
+            "name": "Japan",
+            "pool": 453,
+            "players": 11,
+            "strength": 63,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "398",
+            "name": "Kazakhstan",
+            "pool": 1,
+            "players": 1,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "400",
+            "name": "Jordan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "404",
+            "name": "Kenya",
+            "pool": 2,
+            "players": 2,
+            "strength": 43,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "408",
+            "name": "North Korea",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "410",
+            "name": "South Korea",
+            "pool": 32,
+            "players": 11,
+            "strength": 53,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "414",
+            "name": "Kuwait",
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "417",
+            "name": "Kyrgyzstan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "418",
+            "name": "Laos",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "422",
+            "name": "Lebanon",
+            "pool": 3,
+            "players": 3,
+            "strength": 42,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "426",
+            "name": "Lesotho",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "428",
+            "name": "Latvia",
+            "pool": 25,
+            "players": 11,
+            "strength": 59,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "430",
+            "name": "Liberia",
+            "pool": 12,
+            "players": 11,
+            "strength": 50,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "434",
+            "name": "Libya",
+            "pool": 1,
+            "players": 1,
+            "strength": 39,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "440",
+            "name": "Lithuania",
+            "pool": 42,
+            "players": 11,
+            "strength": 63,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "442",
+            "name": "Luxembourg",
+            "pool": 12,
+            "players": 11,
+            "strength": 44,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "450",
+            "name": "Madagascar",
+            "pool": 1,
+            "players": 1,
+            "strength": 37,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "454",
+            "name": "Malawi",
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "458",
+            "name": "Malaysia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "466",
+            "name": "Mali",
+            "pool": 9,
+            "players": 9,
+            "strength": 49,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "478",
+            "name": "Mauritania",
+            "pool": 1,
+            "players": 1,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "484",
+            "name": "Mexico",
+            "pool": 70,
+            "players": 11,
+            "strength": 72,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "496",
+            "name": "Mongolia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "498",
+            "name": "Moldova",
+            "pool": 16,
+            "players": 11,
+            "strength": 46,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "499",
+            "name": "Montenegro",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "504",
+            "name": "Morocco",
+            "pool": 75,
+            "players": 11,
+            "strength": 69,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "508",
+            "name": "Mozambique",
+            "pool": 6,
+            "players": 6,
+            "strength": 48,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "512",
+            "name": "Oman",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "516",
+            "name": "Namibia",
+            "pool": 2,
+            "players": 2,
+            "strength": 43,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "524",
+            "name": "Nepal",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "528",
+            "name": "Netherlands",
+            "pool": 733,
+            "players": 11,
+            "strength": 84,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "540",
+            "name": "New Caledonia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "548",
+            "name": "Vanuatu",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "554",
+            "name": "New Zealand",
+            "pool": 6,
+            "players": 6,
+            "strength": 41,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "558",
+            "name": "Nicaragua",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "562",
+            "name": "Niger",
+            "pool": 7,
+            "players": 7,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "566",
+            "name": "Nigeria",
+            "pool": 103,
+            "players": 11,
+            "strength": 74,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "578",
+            "name": "Norway",
+            "pool": 588,
+            "players": 11,
+            "strength": 74,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "586",
+            "name": "Pakistan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "591",
+            "name": "Panama",
+            "pool": 2,
+            "players": 2,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "598",
+            "name": "Papua New Guinea",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "600",
+            "name": "Paraguay",
+            "pool": 47,
+            "players": 11,
+            "strength": 73,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "604",
+            "name": "Peru",
+            "pool": 30,
+            "players": 11,
+            "strength": 70,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "608",
+            "name": "Philippines",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "616",
+            "name": "Poland",
+            "pool": 178,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "620",
+            "name": "Portugal",
+            "pool": 583,
+            "players": 11,
+            "strength": 81,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "624",
+            "name": "Guinea-Bissau",
+            "pool": 13,
+            "players": 11,
+            "strength": 45,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "626",
+            "name": "Timor-Leste",
+            "pool": 1,
+            "players": 1,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "630",
+            "name": "Puerto Rico",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "634",
+            "name": "Qatar",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "642",
+            "name": "Romania",
+            "pool": 275,
+            "players": 11,
+            "strength": 75,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "643",
+            "name": "Russia",
+            "pool": 123,
+            "players": 11,
+            "strength": 79,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "646",
+            "name": "Rwanda",
+            "pool": 2,
+            "players": 2,
+            "strength": 38,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "682",
+            "name": "Saudi Arabia",
+            "pool": 25,
+            "players": 11,
+            "strength": 57,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "686",
+            "name": "Senegal",
+            "pool": 43,
+            "players": 11,
+            "strength": 60,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "688",
+            "name": "Serbia",
+            "pool": 295,
+            "players": 11,
+            "strength": 79,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "694",
+            "name": "Sierra Leone",
+            "pool": 16,
+            "players": 11,
+            "strength": 47,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "703",
+            "name": "Slovakia",
+            "pool": 52,
+            "players": 11,
+            "strength": 67,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "704",
+            "name": "Vietnam",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "705",
+            "name": "Slovenia",
+            "pool": 39,
+            "players": 11,
+            "strength": 69,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "706",
+            "name": "Somalia",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "710",
+            "name": "South Africa",
+            "pool": 33,
+            "players": 11,
+            "strength": 68,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "716",
+            "name": "Zimbabwe",
+            "pool": 7,
+            "players": 7,
+            "strength": 46,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "724",
+            "name": "Spain",
+            "pool": 1545,
+            "players": 11,
+            "strength": 84,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "728",
+            "name": "South Sudan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "729",
+            "name": "Sudan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "740",
+            "name": "Suriname",
+            "pool": 4,
+            "players": 4,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "748",
+            "name": "Eswatini",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "752",
+            "name": "Sweden",
+            "pool": 2633,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "756",
+            "name": "Switzerland",
+            "pool": 44,
+            "players": 11,
+            "strength": 72,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "760",
+            "name": "Syria",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "762",
+            "name": "Tajikistan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "764",
+            "name": "Thailand",
+            "pool": 1,
+            "players": 1,
+            "strength": 43,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "768",
+            "name": "Togo",
+            "pool": 10,
+            "players": 10,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "780",
+            "name": "Trinidad & Tobago",
+            "pool": 15,
+            "players": 11,
+            "strength": 51,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "784",
+            "name": "United Arab Emirates",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "788",
+            "name": "Tunisia",
+            "pool": 36,
+            "players": 11,
+            "strength": 55,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "792",
+            "name": "Turkey",
+            "pool": 155,
+            "players": 11,
+            "strength": 71,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "795",
+            "name": "Turkmenistan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "800",
+            "name": "Uganda",
+            "pool": 1,
+            "players": 1,
+            "strength": 42,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "804",
+            "name": "Ukraine",
+            "pool": 72,
+            "players": 11,
+            "strength": 76,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "807",
+            "name": "N. Macedonia",
+            "pool": 42,
+            "players": 11,
+            "strength": 62,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "818",
+            "name": "Egypt",
+            "pool": 20,
+            "players": 11,
+            "strength": 62,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "826",
+            "name": "England",
+            "pool": 2751,
+            "players": 11,
+            "strength": 82,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "834",
+            "name": "Tanzania",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "840",
+            "name": "United States",
+            "pool": 184,
+            "players": 11,
+            "strength": 66,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "854",
+            "name": "Burkina Faso",
+            "pool": 6,
+            "players": 6,
+            "strength": 45,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "858",
+            "name": "Uruguay",
+            "pool": 92,
+            "players": 11,
+            "strength": 78,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "860",
+            "name": "Uzbekistan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "862",
+            "name": "Venezuela",
+            "pool": 20,
+            "players": 11,
+            "strength": 56,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "887",
+            "name": "Yemen",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "894",
+            "name": "Zambia",
+            "pool": 8,
+            "players": 8,
+            "strength": 44,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "032",
+            "name": "Argentina",
+            "pool": 835,
+            "players": 11,
+            "strength": 85,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "076",
+            "name": "Brazil",
+            "pool": 660,
+            "players": 11,
+            "strength": 87,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "068",
+            "name": "Bolivia",
+            "pool": 26,
+            "players": 11,
+            "strength": 69,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "SCO",
+            "name": "Scotland",
+            "pool": 798,
+            "players": 11,
+            "strength": 72,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "WAL",
+            "name": "Wales",
+            "pool": 190,
+            "players": 11,
+            "strength": 68,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "NIR",
+            "name": "Northern Ireland",
+            "pool": 115,
+            "players": 11,
+            "strength": 67,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "056",
+            "name": "Belgium",
+            "pool": 831,
+            "players": 11,
+            "strength": 73,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "040",
+            "name": "Austria",
+            "pool": 57,
+            "players": 11,
+            "strength": 70,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "070",
+            "name": "Bosnia & Herz.",
+            "pool": 64,
+            "players": 11,
+            "strength": 65,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "008",
+            "name": "Albania",
+            "pool": 31,
+            "players": 11,
+            "strength": 54,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "KOS",
+            "name": "Kosovo",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "051",
+            "name": "Armenia",
+            "pool": 6,
+            "players": 6,
+            "strength": 35,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "031",
+            "name": "Azerbaijan",
+            "pool": 4,
+            "players": 4,
+            "strength": 36,
+            "goalkeeper": true,
+            "naturalLineup": false
+          },
+          {
+            "id": "012",
+            "name": "Algeria",
+            "pool": 22,
+            "players": 11,
+            "strength": 50,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "024",
+            "name": "Angola",
+            "pool": 45,
+            "players": 11,
+            "strength": 58,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "072",
+            "name": "Botswana",
+            "pool": 1,
+            "players": 1,
+            "strength": 39,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "084",
+            "name": "Belize",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "044",
+            "name": "Bahamas",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "036",
+            "name": "Australia",
+            "pool": 62,
+            "players": 11,
+            "strength": 68,
+            "goalkeeper": true,
+            "naturalLineup": true
+          },
+          {
+            "id": "096",
+            "name": "Brunei",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "050",
+            "name": "Bangladesh",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "064",
+            "name": "Bhutan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "004",
+            "name": "Afghanistan",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          },
+          {
+            "id": "090",
+            "name": "Solomon Islands",
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
+            "goalkeeper": false,
+            "naturalLineup": false
+          }
+        ],
+        "warnings": []
+      }
+    },
+    {
       "id": "cm0102-2020-11-cm3",
       "kind": "cm0102",
       "season": "1998/99",

@@ -565,7 +565,7 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     const setup = () => app.state.setup;
     const modelOf = () => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), season: app.seasonStatus() });
     await app.requestSeasons();
-    assert.deepEqual(EARLIER.slice(-8), ['2006/07', '2005/06', '2004/05', '2002/03', '2001/02', '1998/99', '1997/98', '1996/97'],
+    assert.deepEqual(EARLIER.slice(-10), ['2006/07', '2005/06', '2004/05', '2002/03', '2001/02', '2000/01', '1999/00', '1998/99', '1997/98', '1996/97'],
       'the earliest seasons');
     assert.match(modelOf().season.note, /2005\/06, 2004\/05 and 1996\/97 have nations only/);
 

@@ -11,6 +11,20 @@
 // The data set builder (src/data/footballSetBuild.js) reads this list in the CLI and in the browser.
 
 export const CM0102_RELEASES = [
+  // SI's own Championship Manager: Season 99/00 (original release 3.70, CD mastered 16 November 1999) and Season 00/01
+  // (original release 3.81, the UK CD of 6 October 2000): their untouched Data files are already the CM 01/02 tables
+  // (format 1, 157-byte staff), read from the retail CDs' InstallShield cabinets (scripts/sync-retro-cds.mjs). Ids are
+  // `cm-<season>`, the kind of a CM edition before CM 01/02, and the url is the archive.org item the files are read from.
+  { id: 'cm-9900', edition: 'CM 99/00', label: '3.70', provider: 'Sports Interactive', season: '1999/00', year: 2000, released: '1999-11',
+    snapshotDate: '1999-11', url: 'https://archive.org/details/championship-manager-season-9900', shifts: { birth: 0 },
+    signatures: [
+      { club: 2540132, staff: 12318294, clubSha256: '8fabfd345a999abedcd3714f6cd8a9373a33782f2d5570c023a4b4098989bf25', staffSha256: '1efd3432d9ea3c54ff88aab39e8b43e7ef7ea064032f38918d5ba58cfc2b8455' },
+    ] },
+  { id: 'cm-0001', edition: 'CM 00/01', label: '3.81', provider: 'Sports Interactive', season: '2000/01', year: 2001, released: '2000-10',
+    snapshotDate: '2000-10', url: 'https://archive.org/details/cm-0001-rel', shifts: { birth: 0 },
+    signatures: [
+      { club: 3691093, staff: 19498141, clubSha256: 'c8b238c19a94d18442099f0294e056ce989d31d3c62679f6b58b72e8d6975305', staffSha256: '6a6b3eead90f246317e7c58a36654bef981d2f1fa61503fc08abc2c2ef7f0926' },
+    ] },
   { id: 'cm0102-2001-09', label: '3.9.60', provider: 'Sports Interactive', season: '2001/02', year: 2002, released: '2001-09',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=65', shifts: { birth: 0, joined: 0, contract: 0 },
     signatures: [
