@@ -858,6 +858,14 @@ each `[name, 'SS/2B', rating]`, on its era's map (`mlb2021`, `mlb2022` for 2022â
 '2023/24'. The built files, era maps, the Oakland Athletics and the edition whose
 birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons).
 
+Before them come 58 seasons, 1960 to 2017 (`mlb-war-<year>`, the same `kind: 'show'`,
+since 2026-11-09), which no game rated: each player's rating is computed from his WAR
+and put on MLB The Show 18 to 24's scale rank for rank within his role. Their source
+block says so (`computed: true`, `method`, `conversion`, `rawScale: 'WAR'`, which the
+loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
+<year>", and they play on 37 era maps of their own (`mlb1960` to `mlb2017`). See
+[baseball.md](baseball.md#seasons-before-2018-computed-from-war).
+
 ## Runtime
 
 - `src/engine/footballSets.js`:

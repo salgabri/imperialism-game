@@ -153,25 +153,33 @@ export const tupleOf = p => [p.name, p.positions.join('/'), p.rating];
 
 /**
  * The clubs of one edition, strongest first: each team `{ show, id, name, code, col }` fields its lineup and active
- * roster from the cards The Show files under its code. Throws when a team cannot field every position naturally.
+ * roster from the cards The Show files under its code. Throws when a team cannot field every position naturally, or
+ * keeps fewer than the 26 of an active roster, unless `fewerPitchers` allows a club that used fewer than its roster's
+ * thirteen pitchers all season to keep every one it used (the seasons computed from WAR). `order` ranks a pool before
+ * the lineup is picked (by rating, then name, unless a season gives its own).
  */
-export function clubsOf(players, teams) {
+export function clubsOf(players, teams, { order = byRating, fewerPitchers = false } = {}) {
   return teams.map(team => {
-    const pool = players.filter(player => player.team === team.show).sort(byRating);
+    const pool = players.filter(player => player.team === team.show).sort(order);
     const { squad, lineup } = rosterOf(pool);
     if (lineup.slots.some(slot => slot.outOfPosition || !slot.player)) {
       throw new Error(`${team.name} cannot field every position: ${lineup.slots.filter(slot => slot.outOfPosition || !slot.player).map(slot => slot.position).join(', ')}`);
     }
-    if (squad.length !== ROSTER_SIZE) throw new Error(`${team.name} keeps ${squad.length} players, not an active roster of ${ROSTER_SIZE}`);
+    // Short of pitchers only: every one the club has is kept, beside its thirteen hitters.
+    const shortOfPitchers = pool.filter(pitches).every(player => squad.includes(player)) && squad.filter(player => !pitches(player)).length === 13;
+    if (squad.length !== ROSTER_SIZE && !(fewerPitchers && squad.length < ROSTER_SIZE && shortOfPitchers)) {
+      throw new Error(`${team.name} keeps ${squad.length} players, not an active roster of ${ROSTER_SIZE}`);
+    }
     return { id: team.id, name: team.name, code: team.code, col: team.col, str: lineup.rating, squad };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
 }
 
 /**
  * The nations of one edition, strongest first, each `{ id, name, str, squad, open }`: every card under its birthplace's
- * nation, `open` the lineup slots its own players cannot fill (counted at the baseline in `str`).
+ * nation, `open` the lineup slots its own players cannot fill (counted at the baseline in `str`). `order` ranks a
+ * nation's pool as clubsOf's does.
  */
-export function nationsOf(players) {
+export function nationsOf(players, order = byRating) {
   const pools = new Map();
   for (const player of players) {
     if (player.nation == null) continue;
@@ -180,7 +188,7 @@ export function nationsOf(players) {
     pools.get(player.nation).push(player);
   }
   return [...pools.entries()].map(([id, pool]) => {
-    const { squad, lineup } = rosterOf(pool.slice().sort(byRating));
+    const { squad, lineup } = rosterOf(pool.slice().sort(order));
     // A slot the nation's own players cannot fill naturally is the game's to fill, at the sport's baseline.
     const covered = lineup.slots.map(slot => (slot.player && !slot.outOfPosition ? slot.effectiveRating : BASELINE));
     const str = Math.round(covered.reduce((s, v) => s + v, 0) / covered.length);
