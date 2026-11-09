@@ -425,7 +425,9 @@ against rank goalies within 0.02 of save percentage on average (0.70 against 0.7
 them. EA's own published players, cross-checks only, within their narrow tops: NHL 27's top 300 against 2025/26 and
 2024/25 weighted 2:1, F 0.84, D 0.73, G 0.67; NHL 23's launch lists (66) against the computed 2022/23, F 0.84, D 0.55,
 G 0.22 (10 goalies); NHL 24's (120) against 2023/24, F 0.76, D 0.61, G 0.74; NHL 25's 20 against 2024/25, F 0.91; NHL
-26's first 50 against 2025/26, F 0.77, D 0.73, G 0.99 (6).
+26's first 50 against 2025/26, F 0.77, D 0.73, G 0.99 (6). These cross-checks are not in the audit: NHL 27's top 300 are
+in `scripts/data/nhl-27.json`, but the NHL 23 to 26 lists are the research's unpinned copies of EA's pages (rank
+correlations of the computed scores, re-measured 2026-11-10 for NHL 23, 24 and 27).
 
 **Results**, from the audit (`best`, `clubs`):
 
@@ -446,7 +448,11 @@ spread (club strengths' standard deviation 0.99 against 1.26 for NHL 22's player
 The MoneyPuck seasons, where every club's top line logs the same minutes, run 0.6 to 0.9 points of standard deviation,
 the databank's 0.7 to 2.3, widest in the 1970s (NHL 27 itself: 1.09). A season's surprise club is underrated (the
 weights lean on the seasons before, as the games' ratings do), and the order at the top is loose: the 2019/20 Coyotes,
-with Darcy Kuemper in goal, come out first by 0.1.
+with Darcy Kuemper in goal, come out first by 0.1. A club's squad is picked from everyone who played most of his games
+for it that season, so a club that went through many players fields stars it never had at once: the 2005/06 Penguins,
+29th of 30, come out strongest by 1.4 with Mario Lemieux and Ziggy Palffy, who retired in January, and Mark Recchi,
+traded in March. Skaters ranked by points alone (before 2010/11) undervalue a defensive club: the 1987/88 Canadiens,
+second in the league, come out last of 21.
 
 Over 20 seeded seasons of 82 games (the measures of `npm run simulation:realism` on each season's clubs; NHL range in
 brackets):
@@ -463,7 +469,9 @@ brackets):
 | 2025/26 | 32 | 0.088 | 56, 25 | 3.04 | 6.3% | 58 |
 
 The early seasons are allowed outside today's ranges (fewer clubs spread wider; the 1970s' blowouts), and are documented
-rather than forced. NHL 08 plays on NHL 07's scale, like NHL 07 (2.73 goals a team, top scorer 80).
+rather than forced. So are the closest-packed modern seasons, just under the range's floor when re-measured 2026-11-10
+(the harness's seed 20261101): 2005/06 at 0.079 and 2012/13 at 0.075 (best 55, worst 29 wins), while 1974/75 runs over
+its ceiling at 0.161 (worst 14 wins; the Capitals won 8 of 80). NHL 08 plays on NHL 07's scale, like NHL 07 (2.73 goals a team, top scorer 80).
 
 **Nations before 1977/78.** A season fields nations only where at least three play a real side (`fieldedNations`: their
 own players hold at least half the lineup). By the databank's birth countries, Canada alone does until 1970/71, the
@@ -563,8 +571,10 @@ duel campaign with the live ticker and a hockey nations campaign.
   1982/83 are in the open sources; the NHL's API has both, but turns this project's agents away.
 - Terms. MoneyPuck.com's data, behind the 15 seasons from 2010/11, is free for non-commercial use only, as the NHL's own
   statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. The Hockey Databank asks for
-  its statement to be displayed prominently on the product: it is in `public/hockey/ATTRIBUTION.txt`, each season's
-  source and the Season note, which the setup shows as the Season list's tooltip, not on a credits screen.
+  its statement to be displayed prominently and in its entirety on the product: it is whole in
+  `public/hockey/ATTRIBUTION.txt` and each season's source, but the game shows neither; the Season note, which the setup
+  shows only as the Season list's tooltip, credits the databank in short. No screen shows it in full yet: the player's
+  call before these seasons ship.
 - Names: the Hockey Databank and MoneyPuck spell names without accents ("Borje Salming", "Tim Stutzle"), and the
   databank in its own way (Raymond Bourque); NHL 08 and NHL 09 keep IGN's spellings.
 - NHL 09's attributes are EA's before release; neither NHL 08's nor NHL 09's overall is EA's.
