@@ -10,8 +10,10 @@
 // Championship Manager 3 data in the CM 01/02 format, all three read by the CM 01/02 builder (src/data/footballSetBuild.js)
 // from the CM0102 Starter Kit's zips; 1997/98 is SI's Championship Manager 97/98 database as extracted to JSON
 // (scripts/lib/cm9798.mjs); 1996/97 is Sensible World of Soccer 96/97's national squads (scripts/lib/swos.mjs), nations
-// only. Every source is pinned by SHA-256 in the manifest and the build stops on any other file, so every season
-// rebuilds byte for byte. Their Europe maps come from npm run build:europe-maps, as the EA seasons' do.
+// only; 1995/96 and 1994/95 are SWOS's own team files with their clubs (scripts/lib/swos-files.mjs); 1993/94 and 1989/90
+// are the Starter Kit's two fan-made databases (Cam F's; Simon Treanor's, nations only). Every source is pinned by
+// SHA-256 in the manifest and the build stops on any other file, so every season rebuilds byte for byte. Their Europe
+// maps come from npm run build:europe-maps, as the EA seasons' do.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
