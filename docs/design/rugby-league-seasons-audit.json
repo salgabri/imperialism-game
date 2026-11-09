@@ -2,6 +2,2678 @@
   "generatedBy": "scripts/build-rugby-league-seasons.mjs",
   "seasons": [
     {
+      "id": "nrl-2024",
+      "version": "nrl-2024-a2ed378c",
+      "season": "2024",
+      "edition": "NRL.com match centre, the 2024 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl",
+      "method": "computed",
+      "games": {
+        "played": 213,
+        "regular": 204,
+        "withTeamLists": 213
+      },
+      "players": {
+        "placed": 507,
+        "bySeason": 445,
+        "bySeasonEitherSide": 34,
+        "byTwoEitherSide": 5,
+        "byRlp": 23,
+        "left": 1,
+        "inSquads": 408
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "30 players (1.7647 a club), overall 70–91 (median 84), played 69–93",
+        "WG": "71 players (4.1765 a club), overall 68–90 (median 79), played 67–91",
+        "CE": "67 players (3.9412 a club), overall 68–91 (median 79), played 67–91",
+        "FE": "32 players (1.8824 a club), overall 70–90 (median 79), played 70–89",
+        "HB": "33 players (1.9412 a club), overall 71–93 (median 78), played 70–94",
+        "HK": "42 players (2.4706 a club), overall 68–91 (median 78), played 68–91",
+        "PR": "99 players (5.8235 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "87 players (5.1176 a club), overall 69–91 (median 81), played 68–90",
+        "LK": "46 players (2.7059 a club), overall 70–92 (median 82), played 70–92"
+      },
+      "best": [
+        "Daly Cherry-Evans (MAN HB) 94",
+        "Addin Fonua-Blake (NZW PR) 93",
+        "James Tedesco (SYD FB) 93",
+        "Isaah Yeo (PEN LK) 92",
+        "Jahrome Hughes (MEL HB) 92",
+        "Damien Cook (SOU HK) 91",
+        "Reed Mahoney (CBY HK) 91",
+        "Herbie Farnworth (DOL CE) 91",
+        "Scott Drinkwater (NQC FB) 91",
+        "Jacob Kiraz (CBY WG) 91",
+        "Tom Trbojevic (MAN FB) 91",
+        "Joseph Tapine (CBR PR) 90"
+      ],
+      "clubs": [
+        "Sydney Roosters 85.5 (28 players, 24 in the squad; out of position: Angus Crichton (SR) at PR; 2024: 16–0–8, 738–463)",
+        "Melbourne Storm 84.2 (33 players, 24 in the squad; 2024: 19–0–5, 692–449)",
+        "Penrith Panthers 84.1 (31 players, 24 in the squad; out of position: Liam Henry (SR) at PR, Luke Garner (SR) at LK; 2024: 17–0–7, 580–394)",
+        "Manly Warringah Sea Eagles 83.9 (30 players, 24 in the squad; out of position: Corey Waddell (SR) at PR; 2024: 13–1–10, 634–521)",
+        "Cronulla-Sutherland Sharks 83.8 (27 players, 24 in the squad; 2024: 16–0–8, 653–431)",
+        "Newcastle Knights 83.7 (29 players, 24 in the squad; out of position: Dylan Lucas (SR) at PR; 2024: 12–0–12, 470–510)",
+        "Canterbury-Bankstown Bulldogs 83.6 (30 players, 24 in the squad; out of position: Toby Sexton (HB) at HK, Jaeman Salmon (SR) at PR; 2024: 14–0–10, 529–433)",
+        "New Zealand Warriors 83.6 (30 players, 24 in the squad; out of position: Marata Niukore (SR) at PR; 2024: 9–1–14, 512–574)",
+        "Dolphins 83.3 (28 players, 24 in the squad; out of position: Kenneath Bromwich (LK) at PR; 2024: 11–0–13, 577–578)",
+        "St. George Illawarra Dragons 83.2 (30 players, 24 in the squad; out of position: Raymond Faitala-Mariner (SR) at PR; 2024: 11–0–13, 508–634)",
+        "North Queensland Cowboys 82.9 (26 players, 24 in the squad; 2024: 15–0–9, 657–568)",
+        "Brisbane Broncos 82.8 (27 players, 24 in the squad; 2024: 10–0–14, 537–607)",
+        "Canberra Raiders 82.4 (29 players, 24 in the squad; out of position: Ata Mariota (SR) at LK; 2024: 12–0–12, 474–601)",
+        "Gold Coast Titans 82.3 (30 players, 24 in the squad; out of position: Klese Haas (SR) at PR; 2024: 8–0–16, 488–656)",
+        "Parramatta Eels 82.2 (31 players, 24 in the squad; out of position: Shaun Lane (SR) at PR; 2024: 7–0–17, 561–716)",
+        "Wests Tigers 81.5 (36 players, 24 in the squad; out of position: Samuela Fainu (SR) at PR, Alex Seyfarth (SR) at PR; 2024: 6–0–18, 463–750)",
+        "South Sydney Rabbitohs 81.4 (32 players, 24 in the squad; out of position: Jack Wighton (FE) at HB, Tallis Duncan (SR) at PR; 2024: 7–0–17, 494–682)"
+      ],
+      "clubShift": [
+        "Sydney Roosters: SRS +10.761, target 85.1, shift +2, strength 83.5 → 85.5",
+        "Melbourne Storm: SRS +9.674, target 84.4, shift +1, strength 83.2 → 84.2",
+        "Cronulla-Sutherland Sharks: SRS +7.718, target 84.2, shift 0, strength 83.8 → 83.8",
+        "Penrith Panthers: SRS +7.282, target 83.9, shift 0, strength 84.1 → 84.1",
+        "Manly Warringah Sea Eagles: SRS +4.045, target 83.9, shift +1, strength 82.9 → 83.9",
+        "Canterbury-Bankstown Bulldogs: SRS +3.974, target 83.8, shift +1, strength 82.6 → 83.6",
+        "North Queensland Cowboys: SRS +3.274, target 83.4, shift 0, strength 82.9 → 82.9",
+        "Dolphins: SRS -0.689, target 83.2, shift 0, strength 83.3 → 83.3",
+        "Newcastle Knights: SRS -1.794, target 83.2, shift 0, strength 83.7 → 83.7",
+        "New Zealand Warriors: SRS -2.006, target 83.2, shift 0, strength 83.6 → 83.6",
+        "Brisbane Broncos: SRS -2.345, target 82.9, shift 0, strength 82.8 → 82.8",
+        "St. George Illawarra Dragons: SRS -4.459, target 82.8, shift 0, strength 83.2 → 83.2",
+        "Canberra Raiders: SRS -4.521, target 82.6, shift 0, strength 82.4 → 82.4",
+        "Parramatta Eels: SRS -5.614, target 82.3, shift -1, strength 83.2 → 82.2",
+        "Gold Coast Titans: SRS -6.57, target 82.1, shift -1, strength 83.3 → 82.3",
+        "South Sydney Rabbitohs: SRS -6.739, target 81.8, shift 0, strength 81.4 → 81.4",
+        "Wests Tigers: SRS -11.993, target 81.8, shift -1, strength 82.5 → 81.5"
+      ],
+      "homeEdge": 2.387,
+      "strengthAndResults": {
+        "stats": 0.399,
+        "shifted": 0.852
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Blake Mozer: HK (RLP 35406)",
+        "nrl-brisbane-broncos: Benjamin Te Kura: PR (RLP 35426)",
+        "nrl-canberra-raiders: Peter Hola: PR (RLP 28812)",
+        "nrl-canberra-raiders: Jordan Martin: SR (RLP 35481)",
+        "nrl-cronulla-sutherland-sharks: Jayden Berrell: HK (RLP 35472)",
+        "nrl-cronulla-sutherland-sharks: Tuku Hau Tapuha: PR (RLP 30866)",
+        "nrl-manly-warringah-sea-eagles: Gordon Chan Kum Tong: HK (RLP 37246)",
+        "nrl-manly-warringah-sea-eagles: Aitasi James: PR (RLP 35512)",
+        "nrl-manly-warringah-sea-eagles: Ben Condon: SR (RLP 30068)",
+        "nrl-manly-warringah-sea-eagles: Caleb Navale: LK (RLP 45449)",
+        "nrl-melbourne-storm: Tristan Powell: PR (RLP 35166)",
+        "nrl-new-zealand-warriors: Zyon Maiu'u: PR (RLP 37277)",
+        "nrl-newcastle-knights: Sebastian Su'a: PR (RLP 37242)",
+        "nrl-north-queensland-cowboys: Jamal Shibasaki: SR (RLP 38577)",
+        "nrl-parramatta-eels: Matthew Arthur: HK (RLP 44829)",
+        "nrl-parramatta-eels: Dan Keir: SR (RLP 35467)",
+        "nrl-south-sydney-rabbitohs: Liam Le Blanc: LK (RLP 49036)",
+        "nrl-south-sydney-rabbitohs: Matt French: LK (RLP 35525)",
+        "nrl-st-george-illawarra-dragons: Viliami Fifita: PR (RLP 35645)",
+        "nrl-sydney-roosters: De La Salle Va'a: PR (RLP 49114)",
+        "nrl-wests-tigers: Jordan Miller: PR (RLP 47752)",
+        "nrl-wests-tigers: Tim Johannssen: PR (RLP 35602)",
+        "nrl-wests-tigers: Kit Laulilii: PR (RLP 44785)"
+      ],
+      "left": [
+        "nrl-new-zealand-warriors: Demitric Vaimauga (4 games): started at no position on NRL.com from 2022 to 2026, and the Rugby League Project gives no position for him (37238)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.7647,
+          "WG": 4.1765,
+          "CE": 3.9412,
+          "FE": 1.8824,
+          "HB": 1.9412,
+          "HK": 2.4706,
+          "PR": 5.8235,
+          "SR": 5.1176,
+          "LK": 2.7059
+        }
+      },
+      "real": {
+        "games": 204,
+        "pointsPerTeam": 23.449,
+        "teamPointsSd": 11.774,
+        "draws": 1,
+        "marginMean": 14.672,
+        "byOne": 0.044,
+        "withinSix": 0.314,
+        "withinTwelve": 0.534,
+        "byThirteenPlus": 0.461,
+        "byTwentyFivePlus": 0.196,
+        "nilRate": 0.017,
+        "fortyPlusRate": 0.113,
+        "homeWins": 0.576,
+        "winPctSd": 0.155,
+        "bestWins": 19,
+        "worstWins": 6
+      }
+    },
+    {
+      "id": "nrl-2023",
+      "version": "nrl-2023-a281ea37",
+      "season": "2023",
+      "edition": "NRL.com match centre, the 2023 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl",
+      "method": "computed",
+      "games": {
+        "played": 213,
+        "regular": 204,
+        "withTeamLists": 213
+      },
+      "players": {
+        "placed": 500,
+        "bySeason": 445,
+        "bySeasonEitherSide": 30,
+        "byTwoEitherSide": 6,
+        "byRlp": 19,
+        "left": 2,
+        "inSquads": 408
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "31 players (1.8235 a club), overall 70–91 (median 84), played 71–92",
+        "WG": "69 players (4.0588 a club), overall 68–90 (median 79), played 68–90",
+        "CE": "61 players (3.5882 a club), overall 68–91 (median 80), played 67–91",
+        "FE": "43 players (2.5294 a club), overall 70–90 (median 78), played 70–91",
+        "HB": "26 players (1.5294 a club), overall 75–93 (median 84), played 74–93",
+        "HK": "46 players (2.7059 a club), overall 67–91 (median 78), played 68–91",
+        "PR": "96 players (5.6471 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "83 players (4.8824 a club), overall 69–91 (median 81), played 68–90",
+        "LK": "45 players (2.6471 a club), overall 70–92 (median 82), played 69–93"
+      },
+      "best": [
+        "Nicholas Hynes (CRO HB) 93",
+        "Payne Haas (BRI PR) 93",
+        "Isaah Yeo (PEN LK) 93",
+        "Daly Cherry-Evans (MAN HB) 92",
+        "Dylan Edwards (PEN FB) 92",
+        "Damien Cook (SOU HK) 91",
+        "Harry Grant (MEL HK) 91",
+        "Cameron Munster (MEL FE) 91",
+        "Nathan Cleary (PEN HB) 91",
+        "James Tedesco (SYD FB) 91",
+        "Will Penisini (PAR CE) 91",
+        "Isaiah Papali'i (WST SR) 90"
+      ],
+      "clubs": [
+        "Penrith Panthers 84.8 (26 players, 24 in the squad; out of position: Zac Hosking (SR) at LK; 2023: 18–0–6, 645–312)",
+        "Melbourne Storm 84.4 (34 players, 24 in the squad; 2023: 16–0–8, 627–459)",
+        "Brisbane Broncos 84.3 (29 players, 24 in the squad; 2023: 18–0–6, 639–425)",
+        "Newcastle Knights 84.3 (28 players, 24 in the squad; out of position: Mat Croker (LK) at PR; 2023: 14–1–9, 626–451)",
+        "Cronulla-Sutherland Sharks 83.8 (24 players, 24 in the squad; out of position: Jack Williams (LK) at HK; 2023: 14–0–10, 619–497)",
+        "New Zealand Warriors 83.7 (29 players, 24 in the squad; out of position: Marata Niukore (SR) at LK; 2023: 16–0–8, 572–448)",
+        "Parramatta Eels 83.7 (30 players, 24 in the squad; out of position: Andrew Davey (SR) at PR, Shaun Lane (SR) at PR; 2023: 12–0–12, 587–574)",
+        "North Queensland Cowboys 83.4 (31 players, 24 in the squad; out of position: Griffin Neame (SR) at HK, Heilum Luki (SR) at PR; 2023: 12–0–12, 546–542)",
+        "South Sydney Rabbitohs 83.4 (29 players, 24 in the squad; out of position: Michael Chee Kam (SR) at LK; 2023: 12–0–12, 564–505)",
+        "Manly Warringah Sea Eagles 83.3 (29 players, 24 in the squad; out of position: Kelma Tuilagi (SR) at PR; 2023: 11–1–12, 545–539)",
+        "Sydney Roosters 82.6 (30 players, 24 in the squad; out of position: Angus Crichton (SR) at PR; 2023: 13–0–11, 472–496)",
+        "Dolphins 82.4 (31 players, 24 in the squad; out of position: Felise Kaufusi (SR) at LK; 2023: 9–0–15, 520–631)",
+        "Gold Coast Titans 82.4 (26 players, 24 in the squad; out of position: Jayden Campbell (FB) at CE; 2023: 9–0–15, 527–653)",
+        "Canberra Raiders 82.2 (30 players, 24 in the squad; 2023: 13–0–11, 486–623)",
+        "Canterbury-Bankstown Bulldogs 81.9 (35 players, 24 in the squad; out of position: Viliame Kikau (SR) at PR; 2023: 7–0–17, 438–769)",
+        "St. George Illawarra Dragons 81.9 (29 players, 24 in the squad; out of position: Ben Murdoch-Masila (SR) at LK; 2023: 5–0–19, 474–673)",
+        "Wests Tigers 81.8 (30 players, 24 in the squad; out of position: Shawn Blore (SR) at PR, Alex Seyfarth (SR) at LK; 2023: 4–0–20, 385–675)"
+      ],
+      "clubShift": [
+        "Penrith Panthers: SRS +14.394, target 85.1, shift +1, strength 83.8 → 84.8",
+        "Brisbane Broncos: SRS +8.926, target 84.4, shift 0, strength 84.3 → 84.3",
+        "Melbourne Storm: SRS +7.097, target 84.2, shift +1, strength 83.4 → 84.4",
+        "Newcastle Knights: SRS +6.53, target 83.9, shift 0, strength 84.3 → 84.3",
+        "Cronulla-Sutherland Sharks: SRS +4.343, target 83.9, shift 0, strength 83.8 → 83.8",
+        "New Zealand Warriors: SRS +4.122, target 83.8, shift +1, strength 82.7 → 83.7",
+        "South Sydney Rabbitohs: SRS +2.404, target 83.4, shift 0, strength 83.4 → 83.4",
+        "Parramatta Eels: SRS +1.019, target 83.2, shift 0, strength 83.7 → 83.7",
+        "North Queensland Cowboys: SRS +0.59, target 83.2, shift 0, strength 83.4 → 83.4",
+        "Manly Warringah Sea Eagles: SRS +0.576, target 83.2, shift +1, strength 82.3 → 83.3",
+        "Sydney Roosters: SRS -0.301, target 82.9, shift 0, strength 82.6 → 82.6",
+        "Dolphins: SRS -4.467, target 82.8, shift 0, strength 82.4 → 82.4",
+        "Gold Coast Titans: SRS -5.847, target 82.6, shift -1, strength 83.4 → 82.4",
+        "Canberra Raiders: SRS -6.036, target 82.3, shift -1, strength 83.2 → 82.2",
+        "St. George Illawarra Dragons: SRS -8.661, target 82.1, shift 0, strength 81.9 → 81.9",
+        "Wests Tigers: SRS -11.734, target 81.8, shift -1, strength 82.8 → 81.8",
+        "Canterbury-Bankstown Bulldogs: SRS -12.956, target 81.8, shift 0, strength 81.9 → 81.9"
+      ],
+      "homeEdge": 1.961,
+      "strengthAndResults": {
+        "stats": 0.667,
+        "shifted": 0.881
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Blake Mozer: HK (RLP 35406)",
+        "nrl-canberra-raiders: Adrian Trevilyan: HK (RLP 31645)",
+        "nrl-canberra-raiders: Peter Hola: PR (RLP 28812)",
+        "nrl-canterbury-bankstown-bulldogs: Franklin Pele: PR (RLP 30988)",
+        "nrl-canterbury-bankstown-bulldogs: Jayden Tanner: PR (RLP 33450)",
+        "nrl-dolphins: JJ Collins: PR (RLP 22718)",
+        "nrl-gold-coast-titans: Joe Vuna: SR (RLP 26154)",
+        "nrl-manly-warringah-sea-eagles: Dean Matterson: FE (RLP 35520)",
+        "nrl-manly-warringah-sea-eagles: Gordon Chan Kum Tong: HK (RLP 37246)",
+        "nrl-melbourne-storm: Jordan Grant: PR (RLP 23134)",
+        "nrl-new-zealand-warriors: Kalani Going: SR (RLP 36135)",
+        "nrl-newcastle-knights: Ryan Rivett: FE (RLP 35688)",
+        "nrl-north-queensland-cowboys: Riley Price: PR (RLP 35296)",
+        "nrl-parramatta-eels: Jirah Momoisea: PR (RLP 31365)",
+        "nrl-penrith-panthers: Soni Luke: HK (RLP 32691)",
+        "nrl-sydney-roosters: Ben Thomas: PR (RLP 31171)",
+        "nrl-wests-tigers: Aitasi James: PR (RLP 35512)",
+        "nrl-wests-tigers: Kit Laulilii: PR (RLP 44785)",
+        "nrl-wests-tigers: Brandon Tumeth: SR (RLP 35670)"
+      ],
+      "left": [
+        "nrl-new-zealand-warriors: Demitric Sifakula (3 games): started at no position on NRL.com from 2021 to 2025, and the Rugby League Project lists nobody of his name at New Zealand Warriors in 2023",
+        "nrl-newcastle-knights: Riley Jones (1 game): started at no position on NRL.com from 2021 to 2025, and the Rugby League Project gives no position for him (36840)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.8235,
+          "WG": 4.0588,
+          "CE": 3.5882,
+          "FE": 2.5294,
+          "HB": 1.5294,
+          "HK": 2.7059,
+          "PR": 5.6471,
+          "SR": 4.8824,
+          "LK": 2.6471
+        }
+      },
+      "real": {
+        "games": 204,
+        "pointsPerTeam": 22.725,
+        "teamPointsSd": 11.643,
+        "draws": 1,
+        "marginMean": 14.843,
+        "byOne": 0.069,
+        "withinSix": 0.299,
+        "withinTwelve": 0.539,
+        "byThirteenPlus": 0.456,
+        "byTwentyFivePlus": 0.191,
+        "nilRate": 0.012,
+        "fortyPlusRate": 0.088,
+        "homeWins": 0.552,
+        "winPctSd": 0.167,
+        "bestWins": 18,
+        "worstWins": 4
+      }
+    },
+    {
+      "id": "nrl-2022",
+      "version": "nrl-2022-1bf76798",
+      "season": "2022",
+      "edition": "NRL.com match centre, the 2022 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2020",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 476,
+        "bySeason": 412,
+        "bySeasonEitherSide": 37,
+        "byTwoEitherSide": 11,
+        "byRlp": 16,
+        "left": 0,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "32 players (2 a club), overall 70–91 (median 84), played 71–91",
+        "WG": "67 players (4.1875 a club), overall 68–90 (median 79), played 69–90",
+        "CE": "58 players (3.625 a club), overall 68–91 (median 80), played 67–91",
+        "FE": "34 players (2.125 a club), overall 70–90 (median 79), played 71–91",
+        "HB": "27 players (1.6875 a club), overall 74–93 (median 79), played 74–93",
+        "HK": "37 players (2.3125 a club), overall 68–91 (median 79), played 68–91",
+        "PR": "98 players (6.125 a club), overall 69–93 (median 77), played 68–92",
+        "SR": "81 players (5.0625 a club), overall 69–91 (median 81), played 68–90",
+        "LK": "42 players (2.625 a club), overall 70–92 (median 83), played 70–92"
+      },
+      "best": [
+        "Daly Cherry-Evans (MAN HB) 93",
+        "Cameron Murray (SOU LK) 92",
+        "Joseph Tapine (CBR PR) 92",
+        "Damien Cook (SOU HK) 91",
+        "Reece Robson (NQC HK) 91",
+        "Nicholas Hynes (CRO HB) 91",
+        "Payne Haas (BRI PR) 91",
+        "Cameron Munster (MEL FE) 91",
+        "James Tedesco (SYD FB) 91",
+        "Joseph Manu (SYD CE) 91",
+        "Jahrome Hughes (MEL HB) 91",
+        "Scott Drinkwater (NQC FB) 91"
+      ],
+      "clubs": [
+        "Penrith Panthers 85.1 (32 players, 24 in the squad; out of position: Scott Sorensen (SR) at LK; 2022: 20–0–4, 636–330)",
+        "Melbourne Storm 84.1 (30 players, 24 in the squad; out of position: Ryan Papenhuyzen (FB) at WG, Chris Lewis (SR) at HK; 2022: 15–0–9, 657–410)",
+        "North Queensland Cowboys 84.1 (24 players, 24 in the squad; out of position: Griffin Neame (SR) at HK, Heilum Luki (SR) at PR; 2022: 17–0–7, 633–361)",
+        "South Sydney Rabbitohs 84 (31 players, 24 in the squad; out of position: Jacob Host (SR) at LK; 2022: 14–0–10, 604–474)",
+        "Sydney Roosters 83.9 (26 players, 24 in the squad; out of position: Sitili Tupouniua (SR) at LK; 2022: 15–0–9, 635–434)",
+        "Cronulla-Sutherland Sharks 83.7 (29 players, 24 in the squad; out of position: Wade Graham (SR) at HK; 2022: 18–0–6, 573–364)",
+        "Brisbane Broncos 83.2 (32 players, 24 in the squad; 2022: 13–0–11, 514–550)",
+        "Canberra Raiders 82.9 (30 players, 24 in the squad; out of position: Corey Harawira-Naera (SR) at PR; 2022: 14–0–10, 524–461)",
+        "Canterbury-Bankstown Bulldogs 82.9 (31 players, 24 in the squad; out of position: Raymond Faitala-Mariner (SR) at PR; 2022: 7–0–17, 383–575)",
+        "Parramatta Eels 82.9 (27 players, 24 in the squad; out of position: Nathan Brown (LK) at PR; 2022: 16–0–8, 608–489)",
+        "St. George Illawarra Dragons 82.9 (29 players, 24 in the squad; out of position: Tariq Sims (SR) at PR, Josh McGuire (SR) at LK; 2022: 12–0–12, 469–569)",
+        "Manly Warringah Sea Eagles 82.6 (33 players, 24 in the squad; out of position: Tom Trbojevic (FB) at WG, Joshua Schuster (FE) at HK; 2022: 9–0–15, 490–595)",
+        "Gold Coast Titans 82.2 (28 players, 24 in the squad; out of position: Kevin Proctor (SR) at LK; 2022: 6–0–18, 455–660)",
+        "Newcastle Knights 82.2 (31 players, 24 in the squad; out of position: Lachlan Fitzgibbon (SR) at PR; 2022: 6–0–18, 372–662)",
+        "New Zealand Warriors 81.9 (30 players, 24 in the squad; out of position: Eliesa Katoa (SR) at PR, Bayley Sironen (SR) at PR; 2022: 6–0–18, 408–700)",
+        "Wests Tigers 81.6 (33 players, 24 in the squad; out of position: Kelma Tuilagi (SR) at PR, Alex Seyfarth (SR) at PR; 2022: 4–0–20, 352–679)"
+      ],
+      "clubShift": [
+        "Penrith Panthers: SRS +12.741, target 85.08, shift +1, strength 84.1 → 85.1",
+        "Melbourne Storm: SRS +10.854, target 84.38, shift +1, strength 83.1 → 84.1",
+        "North Queensland Cowboys: SRS +10.033, target 84.15, shift +1, strength 83.1 → 84.1",
+        "Sydney Roosters: SRS +8.932, target 83.9, shift 0, strength 83.9 → 83.9",
+        "Cronulla-Sutherland Sharks: SRS +6.474, target 83.87, shift 0, strength 83.7 → 83.7",
+        "South Sydney Rabbitohs: SRS +5.222, target 83.66, shift 0, strength 84 → 84",
+        "Parramatta Eels: SRS +4.868, target 83.32, shift -2, strength 84.9 → 82.9",
+        "Canberra Raiders: SRS +2.538, target 83.2, shift -1, strength 83.9 → 82.9",
+        "Brisbane Broncos: SRS -1.111, target 83.2, shift +1, strength 82.2 → 83.2",
+        "St. George Illawarra Dragons: SRS -4.032, target 83.02, shift +1, strength 81.9 → 82.9",
+        "Manly Warringah Sea Eagles: SRS -4.502, target 82.83, shift 0, strength 82.6 → 82.6",
+        "Canterbury-Bankstown Bulldogs: SRS -7.344, target 82.66, shift 0, strength 82.9 → 82.9",
+        "Gold Coast Titans: SRS -8.533, target 82.37, shift 0, strength 82.2 → 82.2",
+        "New Zealand Warriors: SRS -10.81, target 82.13, shift 0, strength 81.9 → 81.9",
+        "Newcastle Knights: SRS -11.774, target 81.83, shift 0, strength 82.2 → 82.2",
+        "Wests Tigers: SRS -13.555, target 81.8, shift -1, strength 82.6 → 81.6"
+      ],
+      "homeEdge": 2.693,
+      "strengthAndResults": {
+        "stats": 0.747,
+        "shifted": 0.873
+      },
+      "placedByRlp": [
+        "nrl-canberra-raiders: Adrian Trevilyan: HK (RLP 31645)",
+        "nrl-canberra-raiders: Trey Mooney: PR (RLP 33403)",
+        "nrl-canberra-raiders: Harry Rushton: SR (RLP 32692)",
+        "nrl-canterbury-bankstown-bulldogs: Billy Tsikrikas: PR (RLP 22204)",
+        "nrl-canterbury-bankstown-bulldogs: Joshua Stuckey: SR (RLP 34004)",
+        "nrl-manly-warringah-sea-eagles: James Segeyaro: HK (RLP 16662)",
+        "nrl-manly-warringah-sea-eagles: James Roumanos: PR (RLP 28662)",
+        "nrl-manly-warringah-sea-eagles: Zac Fulton: SR (RLP 33756)",
+        "nrl-melbourne-storm: Jordan Grant: PR (RLP 23134)",
+        "nrl-newcastle-knights: Jirah Momoisea: PR (RLP 31365)",
+        "nrl-parramatta-eels: Ky Rodwell: PR (RLP 31371)",
+        "nrl-penrith-panthers: Soni Luke: HK (RLP 32691)",
+        "nrl-penrith-panthers: Eddie Blacker: PR (RLP 30077)",
+        "nrl-sydney-roosters: Ben Thomas: PR (RLP 31171)",
+        "nrl-wests-tigers: Austin Dias: PR (RLP 33714)",
+        "nrl-wests-tigers: Kitione Kautoga: SR (RLP 34005)"
+      ],
+      "left": [],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 2,
+          "WG": 4.1875,
+          "CE": 3.625,
+          "FE": 2.125,
+          "HB": 1.6875,
+          "HK": 2.3125,
+          "PR": 6.125,
+          "SR": 5.0625,
+          "LK": 2.625
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 21.648,
+        "teamPointsSd": 12.074,
+        "draws": 0,
+        "marginMean": 16.234,
+        "byOne": 0.052,
+        "withinSix": 0.255,
+        "withinTwelve": 0.464,
+        "byThirteenPlus": 0.536,
+        "byTwentyFivePlus": 0.208,
+        "nilRate": 0.018,
+        "fortyPlusRate": 0.078,
+        "homeWins": 0.589,
+        "winPctSd": 0.201,
+        "bestWins": 20,
+        "worstWins": 4
+      }
+    },
+    {
+      "id": "nrl-2021",
+      "version": "nrl-2021-3f5cf624",
+      "season": "2021",
+      "edition": "NRL.com match centre, the 2021 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2020",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 494,
+        "bySeason": 437,
+        "bySeasonEitherSide": 27,
+        "byTwoEitherSide": 11,
+        "byRlp": 19,
+        "left": 0,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "29 players (1.8125 a club), overall 70–91 (median 84), played 69–91",
+        "WG": "68 players (4.25 a club), overall 68–90 (median 79), played 69–90",
+        "CE": "69 players (4.3125 a club), overall 68–91 (median 79), played 67–91",
+        "FE": "36 players (2.25 a club), overall 70–90 (median 78), played 70–90",
+        "HB": "34 players (2.125 a club), overall 71–93 (median 78), played 70–94",
+        "HK": "39 players (2.4375 a club), overall 68–91 (median 78), played 67–91",
+        "PR": "94 players (5.875 a club), overall 69–93 (median 77), played 69–94",
+        "SR": "79 players (4.9375 a club), overall 69–91 (median 81), played 68–91",
+        "LK": "46 players (2.875 a club), overall 70–92 (median 82), played 69–92"
+      },
+      "best": [
+        "Daly Cherry-Evans (MAN HB) 94",
+        "Payne Haas (BRI PR) 94",
+        "Isaah Yeo (PEN LK) 92",
+        "Luciano Leilua (WST SR) 91",
+        "Martin Taupau (MAN PR) 91",
+        "Nathan Cleary (PEN HB) 91",
+        "James Tedesco (SYD FB) 91",
+        "Reece Robson (NQC HK) 91",
+        "Joseph Manu (SYD CE) 91",
+        "Tom Trbojevic (MAN FB) 91",
+        "Roger Tuivasa-Sheck (NZW FB) 91",
+        "Damien Cook (SOU HK) 90"
+      ],
+      "clubs": [
+        "Melbourne Storm 84.7 (32 players, 24 in the squad; out of position: Nicholas Hynes (FB) at CE, Tom Eisenhuth (SR) at PR; 2021: 21–0–3, 815–316)",
+        "Penrith Panthers 84.5 (27 players, 24 in the squad; out of position: Kurt Capewell (SR) at PR, Scott Sorensen (SR) at LK; 2021: 21–0–3, 676–286)",
+        "Manly Warringah Sea Eagles 84.2 (29 players, 24 in the squad; out of position: Sean Keppie (SR) at HK, Karl Lawton (SR) at LK; 2021: 16–0–8, 744–492)",
+        "South Sydney Rabbitohs 84.2 (31 players, 24 in the squad; out of position: Keaon Koloamatangi (SR) at PR; 2021: 20–0–4, 775–453)",
+        "Sydney Roosters 83.9 (33 players, 24 in the squad; out of position: Nat Butcher (SR) at PR; 2021: 16–0–8, 630–489)",
+        "Cronulla-Sutherland Sharks 83.5 (27 players, 24 in the squad; out of position: Teig Wilton (SR) at HK, Siosifa Talakai (SR) at PR; 2021: 10–0–14, 520–556)",
+        "Parramatta Eels 83.5 (32 players, 24 in the squad; out of position: Ryan Matterson (SR) at PR, Bryce Cartwright (SR) at LK; 2021: 15–0–9, 566–457)",
+        "Gold Coast Titans 83.4 (30 players, 24 in the squad; 2021: 10–0–14, 580–583)",
+        "Canberra Raiders 83.3 (31 players, 24 in the squad; out of position: Corey Harawira-Naera (SR) at PR; 2021: 10–0–14, 481–578)",
+        "New Zealand Warriors 83.1 (32 players, 24 in the squad; out of position: Reece Walsh (FB) at CE; 2021: 8–0–16, 453–624)",
+        "Newcastle Knights 82.8 (31 players, 24 in the squad; out of position: Lachlan Fitzgibbon (SR) at PR; 2021: 12–0–12, 428–571)",
+        "St. George Illawarra Dragons 82.8 (31 players, 24 in the squad; out of position: Billy Burns (SR) at PR; 2021: 8–0–16, 474–616)",
+        "Brisbane Broncos 82.4 (35 players, 24 in the squad; out of position: Jordan Riki (SR) at PR; 2021: 7–0–17, 446–695)",
+        "Canterbury-Bankstown Bulldogs 82.2 (32 players, 24 in the squad; out of position: Jake Averillo (HB) at FE; 2021: 3–0–21, 340–710)",
+        "North Queensland Cowboys 82.2 (31 players, 24 in the squad; out of position: Heilum Luki (SR) at HK; 2021: 7–0–17, 460–748)",
+        "Wests Tigers 82.2 (30 players, 24 in the squad; 2021: 8–0–16, 500–714)"
+      ],
+      "clubShift": [
+        "Melbourne Storm: SRS +20.759, target 85.08, shift +1, strength 83.7 → 84.7",
+        "Penrith Panthers: SRS +16.455, target 84.38, shift 0, strength 84.5 → 84.5",
+        "South Sydney Rabbitohs: SRS +13.32, target 84.15, shift -1, strength 85.2 → 84.2",
+        "Manly Warringah Sea Eagles: SRS +8.848, target 83.9, shift +1, strength 83.2 → 84.2",
+        "Sydney Roosters: SRS +6.351, target 83.87, shift 0, strength 83.9 → 83.9",
+        "Parramatta Eels: SRS +5.615, target 83.66, shift -1, strength 84.5 → 83.5",
+        "Gold Coast Titans: SRS -0.534, target 83.32, shift 0, strength 83.4 → 83.4",
+        "Cronulla-Sutherland Sharks: SRS -2.342, target 83.2, shift +1, strength 82.5 → 83.5",
+        "Canberra Raiders: SRS -3.194, target 83.2, shift +1, strength 82.3 → 83.3",
+        "St. George Illawarra Dragons: SRS -6.468, target 83.02, shift 0, strength 82.8 → 82.8",
+        "New Zealand Warriors: SRS -7.319, target 82.83, shift +1, strength 82.1 → 83.1",
+        "Newcastle Knights: SRS -7.751, target 82.66, shift -1, strength 83.8 → 82.8",
+        "Brisbane Broncos: SRS -8.388, target 82.37, shift +1, strength 81.4 → 82.4",
+        "Wests Tigers: SRS -8.717, target 82.13, shift 0, strength 82.2 → 82.2",
+        "North Queensland Cowboys: SRS -12.573, target 81.83, shift +1, strength 81.2 → 82.2",
+        "Canterbury-Bankstown Bulldogs: SRS -14.063, target 81.8, shift +1, strength 81.2 → 82.2"
+      ],
+      "homeEdge": 1.073,
+      "strengthAndResults": {
+        "stats": 0.889,
+        "shifted": 0.931
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Xavier Willison: PR (RLP 31347)",
+        "nrl-canberra-raiders: Elijah Anderson: WG (RLP 31351)",
+        "nrl-cronulla-sutherland-sharks: Franklin Pele: PR (RLP 30988)",
+        "nrl-cronulla-sutherland-sharks: Billy Magoulias: LK (RLP 27281)",
+        "nrl-gold-coast-titans: Joseph Vuna: SR (RLP 26154)",
+        "nrl-manly-warringah-sea-eagles: Zac Saddler: PR (RLP 29756)",
+        "nrl-melbourne-storm: Daniel Atkinson: FE (RLP 31369)",
+        "nrl-melbourne-storm: Darryn Schonig: PR (RLP 29911)",
+        "nrl-melbourne-storm: Jordan Grant: PR (RLP 23134)",
+        "nrl-newcastle-knights: Jirah Momoisea: PR (RLP 31365)",
+        "nrl-north-queensland-cowboys: Peter Hola: PR (RLP 28812)",
+        "nrl-parramatta-eels: Samuel Loizou: CE (RLP 31370)",
+        "nrl-parramatta-eels: Ky Rodwell: PR (RLP 31371)",
+        "nrl-south-sydney-rabbitohs: Patrick Mago: SR (RLP 23914)",
+        "nrl-sydney-roosters: Moala Graham-Taufa: CE (RLP 31367)",
+        "nrl-sydney-roosters: Tuku Hau Tapuha: PR (RLP 30866)",
+        "nrl-sydney-roosters: Ben Thomas: PR (RLP 31171)",
+        "nrl-wests-tigers: Tukimihia Simpkins: PR (RLP 31338)",
+        "nrl-wests-tigers: Tom Amone: PR (RLP 28634)"
+      ],
+      "left": [],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.8125,
+          "WG": 4.25,
+          "CE": 4.3125,
+          "FE": 2.25,
+          "HB": 2.125,
+          "HK": 2.4375,
+          "PR": 5.875,
+          "SR": 4.9375,
+          "LK": 2.875
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 23.146,
+        "teamPointsSd": 13.007,
+        "draws": 0,
+        "marginMean": 18.292,
+        "byOne": 0.057,
+        "withinSix": 0.219,
+        "withinTwelve": 0.391,
+        "byThirteenPlus": 0.609,
+        "byTwentyFivePlus": 0.302,
+        "nilRate": 0.036,
+        "fortyPlusRate": 0.128,
+        "homeWins": 0.536,
+        "winPctSd": 0.223,
+        "bestWins": 21,
+        "worstWins": 3
+      }
+    },
+    {
+      "id": "nrl-2020",
+      "version": "nrl-2020-eba9c42a",
+      "season": "2020",
+      "edition": "NRL.com match centre, the 2020 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2020",
+      "method": "computed",
+      "games": {
+        "played": 169,
+        "regular": 160,
+        "withTeamLists": 169
+      },
+      "players": {
+        "placed": 466,
+        "bySeason": 419,
+        "bySeasonEitherSide": 26,
+        "byTwoEitherSide": 6,
+        "byRlp": 15,
+        "left": 1,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "24 players (1.5 a club), overall 71–91 (median 84), played 71–91",
+        "WG": "67 players (4.1875 a club), overall 68–90 (median 79), played 68–91",
+        "CE": "64 players (4 a club), overall 68–91 (median 79), played 68–91",
+        "FE": "37 players (2.3125 a club), overall 70–90 (median 78), played 70–90",
+        "HB": "28 players (1.75 a club), overall 73–93 (median 79), played 73–93",
+        "HK": "37 players (2.3125 a club), overall 68–91 (median 79), played 68–91",
+        "PR": "94 players (5.875 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "76 players (4.75 a club), overall 69–91 (median 81), played 69–90",
+        "LK": "39 players (2.4375 a club), overall 70–92 (median 83), played 70–92"
+      },
+      "best": [
+        "Payne Haas (BRI PR) 93",
+        "Daly Cherry-Evans (MAN HB) 93",
+        "Cameron Murray (SOU LK) 92",
+        "Nathan Cleary (PEN HB) 92",
+        "Damien Cook (SOU HK) 91",
+        "James Tedesco (SYD FB) 91",
+        "Roger Tuivasa-Sheck (NZW FB) 91",
+        "David Nofoaluma (WST WG) 91",
+        "Joseph Manu (SYD CE) 91",
+        "Cameron McInnes (SGI HK) 90",
+        "Jake Trbojevic (MAN LK) 90",
+        "David Klemmer (NEW PR) 90"
+      ],
+      "clubs": [
+        "Penrith Panthers 84.9 (26 players, 24 in the squad; out of position: Kurt Capewell (SR) at LK; 2020: 18–1–1, 537–238)",
+        "Sydney Roosters 84.4 (29 players, 24 in the squad; out of position: Boyd Cordner (SR) at PR, Mitchell Aubusson (SR) at PR; 2020: 14–0–6, 552–322)",
+        "Melbourne Storm 84.2 (32 players, 24 in the squad; out of position: Tino Fa'asuamaleaui (LK) at PR; 2020: 16–0–4, 534–276)",
+        "South Sydney Rabbitohs 83.8 (28 players, 24 in the squad; out of position: Corey Allan (FB) at CE, Keaon Koloamatangi (SR) at HK, Bayley Sironen (SR) at PR; 2020: 12–0–8, 521–352)",
+        "Canberra Raiders 83.6 (31 players, 24 in the squad; out of position: Hudson Young (SR) at PR; 2020: 14–0–6, 445–317)",
+        "Parramatta Eels 83.6 (25 players, 24 in the squad; 2020: 15–0–5, 392–288)",
+        "Wests Tigers 83.5 (30 players, 24 in the squad; out of position: Luke Brooks (HB) at HK, Alex Twal (LK) at PR, Sam McIntyre (SR) at PR; 2020: 7–0–13, 440–505)",
+        "St. George Illawarra Dragons 83.2 (29 players, 24 in the squad; 2020: 7–0–13, 378–452)",
+        "Newcastle Knights 83.1 (29 players, 24 in the squad; out of position: Sione Mata'utia (SR) at PR; 2020: 11–1–8, 421–374)",
+        "Cronulla-Sutherland Sharks 82.9 (28 players, 24 in the squad; out of position: Wade Graham (SR) at HK; 2020: 10–0–10, 480–480)",
+        "New Zealand Warriors 82.8 (31 players, 24 in the squad; out of position: Patrick Herbert (WG) at CE, Tohu Harris (SR) at LK; 2020: 8–0–12, 343–458)",
+        "Manly Warringah Sea Eagles 82.6 (27 players, 24 in the squad; out of position: Dylan Walker (FE) at HK, Corey Waddell (SR) at LK; 2020: 7–0–13, 375–509)",
+        "Gold Coast Titans 82.2 (30 players, 24 in the squad; 2020: 9–0–11, 346–463)",
+        "Canterbury-Bankstown Bulldogs 82.1 (30 players, 24 in the squad; 2020: 3–0–17, 282–504)",
+        "North Queensland Cowboys 81.9 (30 players, 24 in the squad; out of position: Mitchell Dunn (SR) at LK; 2020: 5–0–15, 368–520)",
+        "Brisbane Broncos 81.5 (31 players, 24 in the squad; out of position: Alex Glenn (SR) at LK; 2020: 3–0–17, 268–624)"
+      ],
+      "clubShift": [
+        "Penrith Panthers: SRS +13.707, target 85.08, shift +1, strength 83.9 → 84.9",
+        "Melbourne Storm: SRS +13.303, target 84.38, shift 0, strength 84.2 → 84.2",
+        "Sydney Roosters: SRS +11.316, target 84.15, shift 0, strength 84.4 → 84.4",
+        "South Sydney Rabbitohs: SRS +7.819, target 83.9, shift 0, strength 83.8 → 83.8",
+        "Canberra Raiders: SRS +6.561, target 83.87, shift 0, strength 83.6 → 83.6",
+        "Parramatta Eels: SRS +3.909, target 83.66, shift -1, strength 84.6 → 83.6",
+        "Newcastle Knights: SRS +1.879, target 83.32, shift 0, strength 83.1 → 83.1",
+        "Cronulla-Sutherland Sharks: SRS -0.417, target 83.2, shift +1, strength 81.9 → 82.9",
+        "Wests Tigers: SRS -2.299, target 83.2, shift +1, strength 82.5 → 83.5",
+        "St. George Illawarra Dragons: SRS -3.511, target 83.02, shift 0, strength 83.2 → 83.2",
+        "New Zealand Warriors: SRS -4.737, target 82.83, shift 0, strength 82.8 → 82.8",
+        "Manly Warringah Sea Eagles: SRS -6.201, target 82.66, shift 0, strength 82.6 → 82.6",
+        "Gold Coast Titans: SRS -6.596, target 82.37, shift 0, strength 82.2 → 82.2",
+        "North Queensland Cowboys: SRS -7.617, target 82.13, shift 0, strength 81.9 → 81.9",
+        "Canterbury-Bankstown Bulldogs: SRS -10.585, target 81.83, shift 0, strength 82.1 → 82.1",
+        "Brisbane Broncos: SRS -16.532, target 81.8, shift 0, strength 81.5 → 81.5"
+      ],
+      "homeEdge": 2.363,
+      "strengthAndResults": {
+        "stats": 0.832,
+        "shifted": 0.87
+      },
+      "placedByRlp": [
+        "nrl-canberra-raiders: Darby Medlyn: LK (RLP 30074)",
+        "nrl-cronulla-sutherland-sharks: Daniel Vasquez: PR (RLP 30072)",
+        "nrl-cronulla-sutherland-sharks: Billy Magoulias: LK (RLP 27281)",
+        "nrl-melbourne-storm: Darryn Schonig: PR (RLP 29911)",
+        "nrl-melbourne-storm: Albert Vete: PR (RLP 21464)",
+        "nrl-new-zealand-warriors: King Vuniyayawa: PR (RLP 26194)",
+        "nrl-new-zealand-warriors: Tom Ale: PR (RLP 30069)",
+        "nrl-newcastle-knights: Pasami Saulo: PR (RLP 26513)",
+        "nrl-north-queensland-cowboys: Peter Hola: PR (RLP 28812)",
+        "nrl-north-queensland-cowboys: Emry Pere: PR (RLP 29972)",
+        "nrl-south-sydney-rabbitohs: Tom Amone: PR (RLP 28634)",
+        "nrl-south-sydney-rabbitohs: Kurt Dillon: PR (RLP 25747)",
+        "nrl-st-george-illawarra-dragons: Eddie Blacker: PR (RLP 30077)",
+        "nrl-sydney-roosters: Max Bailey: PR (RLP 29968)",
+        "nrl-sydney-roosters: Sonny Bill Williams: SR (RLP 148)"
+      ],
+      "left": [
+        "nrl-canberra-raiders: Jarrett Subloo (1 game): started at no position on NRL.com from 2018 to 2022, and the Rugby League Project gives no position for him (30075)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.5,
+          "WG": 4.1875,
+          "CE": 4,
+          "FE": 2.3125,
+          "HB": 1.75,
+          "HK": 2.3125,
+          "PR": 5.875,
+          "SR": 4.75,
+          "LK": 2.4375
+        }
+      },
+      "real": {
+        "games": 160,
+        "pointsPerTeam": 20.881,
+        "teamPointsSd": 11.846,
+        "draws": 1,
+        "marginMean": 15.35,
+        "byOne": 0.031,
+        "withinSix": 0.294,
+        "withinTwelve": 0.513,
+        "byThirteenPlus": 0.481,
+        "byTwentyFivePlus": 0.219,
+        "nilRate": 0.028,
+        "fortyPlusRate": 0.084,
+        "homeWins": 0.528,
+        "winPctSd": 0.226,
+        "bestWins": 18,
+        "worstWins": 3
+      }
+    },
+    {
+      "id": "nrl-2019",
+      "version": "nrl-2019-977a153c",
+      "season": "2019",
+      "edition": "NRL.com match centre, the 2019 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2012",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 451,
+        "bySeason": 398,
+        "bySeasonEitherSide": 36,
+        "byTwoEitherSide": 9,
+        "byRlp": 8,
+        "left": 1,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 66,
+          "median": 80,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "27 players (1.6875 a club), overall 70–91 (median 84), played 71–91",
+        "WG": "62 players (3.875 a club), overall 68–90 (median 79), played 68–90",
+        "CE": "62 players (3.875 a club), overall 68–91 (median 80), played 66–91",
+        "FE": "38 players (2.375 a club), overall 70–90 (median 78), played 70–90",
+        "HB": "25 players (1.5625 a club), overall 74–93 (median 82), played 74–92",
+        "HK": "36 players (2.25 a club), overall 68–91 (median 79), played 69–91",
+        "PR": "90 players (5.625 a club), overall 69–93 (median 77), played 69–94",
+        "SR": "73 players (4.5625 a club), overall 69–91 (median 81), played 70–91",
+        "LK": "38 players (2.375 a club), overall 70–92 (median 83), played 70–93"
+      },
+      "best": [
+        "Martin Taupau (MAN PR) 94",
+        "Jake Trbojevic (MAN LK) 93",
+        "Luke Brooks (WST HB) 92",
+        "Damien Cook (SOU HK) 91",
+        "John Bateman (CBR SR) 91",
+        "Cameron Murray (SOU LK) 91",
+        "James Tedesco (SYD FB) 91",
+        "Will Hopoate (CBY CE) 91",
+        "Daly Cherry-Evans (MAN HB) 91",
+        "Cameron McInnes (SGI HK) 90",
+        "Andrew Fifita (CRO PR) 90",
+        "Cameron Smith (MEL HK) 90"
+      ],
+      "clubs": [
+        "Melbourne Storm 84.7 (27 players, 24 in the squad; out of position: Jahrome Hughes (FB) at CE, Joe Stimson (SR) at HK; 2019: 20–0–4, 631–300)",
+        "Manly Warringah Sea Eagles 84.1 (29 players, 24 in the squad; out of position: Jack Gosiewski (SR) at PR, Corey Waddell (SR) at LK; 2019: 14–0–10, 496–446)",
+        "Sydney Roosters 84 (27 players, 24 in the squad; out of position: Mitchell Aubusson (SR) at PR, Isaac Liu (LK) at PR; 2019: 17–0–7, 627–363)",
+        "Canberra Raiders 83.7 (26 players, 24 in the squad; out of position: Hudson Young (SR) at PR; 2019: 15–0–9, 524–374)",
+        "Cronulla-Sutherland Sharks 83.6 (26 players, 24 in the squad; out of position: Matt Moylan (FB) at WG; 2019: 12–0–12, 514–464)",
+        "Parramatta Eels 83.6 (26 players, 24 in the squad; out of position: Marata Niukore (SR) at PR; 2019: 14–0–10, 533–473)",
+        "South Sydney Rabbitohs 83.5 (29 players, 24 in the squad; out of position: Ethan Lowe (SR) at LK; 2019: 16–0–8, 521–417)",
+        "Newcastle Knights 83 (27 players, 24 in the squad; out of position: Sione Mata'utia (SR) at PR; 2019: 10–0–14, 485–522)",
+        "Brisbane Broncos 82.9 (28 players, 24 in the squad; out of position: Matt Gillett (SR) at PR; 2019: 11–1–12, 432–489)",
+        "Wests Tigers 82.9 (26 players, 24 in the squad; out of position: Moses Mbye (FB) at CE; 2019: 11–0–13, 475–486)",
+        "North Queensland Cowboys 82.6 (30 players, 24 in the squad; out of position: Nene Macdonald (WG) at FB, Shane Wright (SR) at LK; 2019: 9–0–15, 378–500)",
+        "Penrith Panthers 82.5 (32 players, 24 in the squad; out of position: Liam Martin (SR) at PR; 2019: 11–0–13, 413–474)",
+        "Gold Coast Titans 82.1 (30 players, 24 in the squad; out of position: Ryan James (SR) at PR; 2019: 4–0–20, 370–651)",
+        "New Zealand Warriors 82.1 (30 players, 24 in the squad; out of position: Tohu Harris (SR) at PR; 2019: 9–1–14, 433–574)",
+        "St. George Illawarra Dragons 82.1 (30 players, 24 in the squad; out of position: Luciano Leilua (SR) at LK; 2019: 8–0–16, 427–575)",
+        "Canterbury-Bankstown Bulldogs 81.9 (28 players, 24 in the squad; 2019: 10–0–14, 326–477)"
+      ],
+      "clubShift": [
+        "Melbourne Storm: SRS +12.911, target 85.08, shift +1, strength 83.7 → 84.7",
+        "Sydney Roosters: SRS +10.768, target 84.38, shift 0, strength 84 → 84",
+        "Canberra Raiders: SRS +6.678, target 84.15, shift 0, strength 83.7 → 83.7",
+        "South Sydney Rabbitohs: SRS +3.628, target 83.9, shift +1, strength 82.5 → 83.5",
+        "Parramatta Eels: SRS +2.091, target 83.87, shift 0, strength 83.6 → 83.6",
+        "Manly Warringah Sea Eagles: SRS +2.013, target 83.66, shift +1, strength 83.1 → 84.1",
+        "Cronulla-Sutherland Sharks: SRS +1.584, target 83.32, shift 0, strength 83.6 → 83.6",
+        "Wests Tigers: SRS -0.02, target 83.2, shift -1, strength 83.9 → 82.9",
+        "Newcastle Knights: SRS -2.107, target 83.2, shift 0, strength 83 → 83",
+        "Brisbane Broncos: SRS -2.126, target 83.02, shift 0, strength 82.9 → 82.9",
+        "Penrith Panthers: SRS -2.206, target 82.83, shift 0, strength 82.5 → 82.5",
+        "North Queensland Cowboys: SRS -4.895, target 82.66, shift +1, strength 81.6 → 82.6",
+        "New Zealand Warriors: SRS -5.284, target 82.37, shift -2, strength 84.1 → 82.1",
+        "Canterbury-Bankstown Bulldogs: SRS -5.473, target 82.13, shift 0, strength 81.9 → 81.9",
+        "St. George Illawarra Dragons: SRS -6.075, target 81.83, shift -1, strength 83.1 → 82.1",
+        "Gold Coast Titans: SRS -11.487, target 81.8, shift 0, strength 82.1 → 82.1"
+      ],
+      "homeEdge": 3.266,
+      "strengthAndResults": {
+        "stats": 0.435,
+        "shifted": 0.87
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Izaia Perese: CE (RLP 28823)",
+        "nrl-canberra-raiders: JJ Collins: PR (RLP 22718)",
+        "nrl-cronulla-sutherland-sharks: Billy Magoulias: LK (RLP 27281)",
+        "nrl-manly-warringah-sea-eagles: Kelepi Tanginoa: SR (RLP 20290)",
+        "nrl-newcastle-knights: Pasami Saulo: PR (RLP 26513)",
+        "nrl-north-queensland-cowboys: Peter Hola: PR (RLP 28812)",
+        "nrl-south-sydney-rabbitohs: Tom Amone: PR (RLP 28634)",
+        "nrl-st-george-illawarra-dragons: Mitchell Allgood: PR (RLP 16580)"
+      ],
+      "left": [
+        "nrl-new-zealand-warriors: Chris Satae (2 games): started at no position on NRL.com from 2017 to 2021, and the Rugby League Project lists nobody of his name at New Zealand Warriors in 2019"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.6875,
+          "WG": 3.875,
+          "CE": 3.875,
+          "FE": 2.375,
+          "HB": 1.5625,
+          "HK": 2.25,
+          "PR": 5.625,
+          "SR": 4.5625,
+          "LK": 2.375
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 19.753,
+        "teamPointsSd": 10.485,
+        "draws": 1,
+        "marginMean": 13.547,
+        "byOne": 0.073,
+        "withinSix": 0.344,
+        "withinTwelve": 0.563,
+        "byThirteenPlus": 0.432,
+        "byTwentyFivePlus": 0.156,
+        "nilRate": 0.008,
+        "fortyPlusRate": 0.057,
+        "homeWins": 0.545,
+        "winPctSd": 0.157,
+        "bestWins": 20,
+        "worstWins": 4
+      }
+    },
+    {
+      "id": "nrl-2018",
+      "version": "nrl-2018-64e50d88",
+      "season": "2018",
+      "edition": "NRL.com match centre, the 2018 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2012",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 437,
+        "bySeason": 383,
+        "bySeasonEitherSide": 35,
+        "byTwoEitherSide": 13,
+        "byRlp": 6,
+        "left": 3,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "23 players (1.4375 a club), overall 72–91 (median 85), played 73–92",
+        "WG": "49 players (3.0625 a club), overall 70–90 (median 81), played 71–90",
+        "CE": "62 players (3.875 a club), overall 68–91 (median 80), played 69–91",
+        "FE": "36 players (2.25 a club), overall 70–90 (median 78), played 69–91",
+        "HB": "26 players (1.625 a club), overall 74–93 (median 82), played 73–92",
+        "HK": "38 players (2.375 a club), overall 68–91 (median 79), played 67–91",
+        "PR": "96 players (6 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "74 players (4.625 a club), overall 69–91 (median 81), played 70–92",
+        "LK": "33 players (2.0625 a club), overall 70–92 (median 84), played 70–91"
+      },
+      "best": [
+        "Andrew Fifita (CRO PR) 93",
+        "Angus Crichton (SOU SR) 92",
+        "Daly Cherry-Evans (MAN HB) 92",
+        "James Tedesco (SYD FB) 92",
+        "Jake Trbojevic (MAN LK) 91",
+        "Jason Taumalolo (NQC LK) 91",
+        "Damien Cook (SOU HK) 91",
+        "Anthony Milford (BRI FE) 91",
+        "Will Hopoate (CBY CE) 91",
+        "Cameron McInnes (SGI HK) 90",
+        "Cameron Smith (MEL HK) 90",
+        "Isaah Yeo (PEN SR) 90"
+      ],
+      "clubs": [
+        "Sydney Roosters 84.9 (28 players, 24 in the squad; 2018: 16–0–8, 542–361)",
+        "Melbourne Storm 84.4 (28 players, 24 in the squad; 2018: 16–0–8, 536–363)",
+        "South Sydney Rabbitohs 84.3 (25 players, 24 in the squad; out of position: Cameron Murray (LK) at HK; 2018: 16–0–8, 582–437)",
+        "Brisbane Broncos 84.1 (28 players, 24 in the squad; out of position: Tevita Pangai Junior (SR) at HK, David Fifita (SR) at PR, Matt Gillett (SR) at PR; 2018: 15–0–9, 556–500)",
+        "St. George Illawarra Dragons 84.1 (25 players, 24 in the squad; out of position: Kurt Mann (FE) at HK; 2018: 15–0–9, 519–472)",
+        "Penrith Panthers 83.6 (27 players, 24 in the squad; out of position: Viliame Kikau (SR) at PR; 2018: 15–0–9, 517–461)",
+        "Canterbury-Bankstown Bulldogs 83.4 (28 players, 24 in the squad; out of position: Raymond Faitala-Mariner (SR) at LK; 2018: 8–0–16, 428–474)",
+        "Cronulla-Sutherland Sharks 83.4 (26 players, 24 in the squad; out of position: Luke Lewis (SR) at PR, Kurt Capewell (SR) at PR; 2018: 16–0–8, 519–423)",
+        "New Zealand Warriors 83 (25 players, 24 in the squad; 2018: 15–0–9, 472–447)",
+        "Canberra Raiders 82.9 (25 players, 24 in the squad; 2018: 10–0–14, 563–540)",
+        "North Queensland Cowboys 82.8 (28 players, 24 in the squad; out of position: Te Maire Martin (FE) at HK, Ethan Lowe (SR) at LK; 2018: 8–0–16, 449–521)",
+        "Wests Tigers 82.4 (28 players, 24 in the squad; 2018: 12–0–12, 377–460)",
+        "Gold Coast Titans 82.1 (27 players, 24 in the squad; 2018: 8–0–16, 472–582)",
+        "Manly Warringah Sea Eagles 82.1 (29 players, 24 in the squad; out of position: Frank Winterstein (SR) at PR, Curtis Sironen (SR) at LK; 2018: 7–0–17, 500–622)",
+        "Newcastle Knights 81.6 (29 players, 24 in the squad; out of position: Mitchell Barnett (SR) at LK, Jamie Buhrer (SR) at LK; 2018: 9–0–15, 414–607)",
+        "Parramatta Eels 81.4 (31 players, 24 in the squad; out of position: Marata Niukore (SR) at PR; 2018: 6–0–18, 374–550)"
+      ],
+      "clubShift": [
+        "Sydney Roosters: SRS +6.869, target 85.08, shift +1, strength 83.9 → 84.9",
+        "Melbourne Storm: SRS +6.418, target 84.38, shift +1, strength 83.4 → 84.4",
+        "South Sydney Rabbitohs: SRS +5.791, target 84.15, shift +1, strength 83.3 → 84.3",
+        "Cronulla-Sutherland Sharks: SRS +3.621, target 83.9, shift 0, strength 83.4 → 83.4",
+        "Brisbane Broncos: SRS +2.697, target 83.87, shift +1, strength 83.1 → 84.1",
+        "St. George Illawarra Dragons: SRS +2.073, target 83.66, shift -1, strength 85.1 → 84.1",
+        "New Zealand Warriors: SRS +1.773, target 83.32, shift 0, strength 83 → 83",
+        "Penrith Panthers: SRS +1.364, target 83.2, shift +1, strength 82.6 → 83.6",
+        "Canberra Raiders: SRS +0.768, target 83.2, shift -1, strength 83.9 → 82.9",
+        "Canterbury-Bankstown Bulldogs: SRS -1.338, target 83.02, shift 0, strength 83.4 → 83.4",
+        "North Queensland Cowboys: SRS -2.444, target 82.83, shift +1, strength 81.8 → 82.8",
+        "Wests Tigers: SRS -3.3, target 82.66, shift 0, strength 82.4 → 82.4",
+        "Gold Coast Titans: SRS -4.213, target 82.37, shift 0, strength 82.1 → 82.1",
+        "Manly Warringah Sea Eagles: SRS -5.057, target 82.13, shift -1, strength 83.1 → 82.1",
+        "Parramatta Eels: SRS -7.32, target 81.83, shift -1, strength 82.4 → 81.4",
+        "Newcastle Knights: SRS -7.702, target 81.8, shift -1, strength 82.6 → 81.6"
+      ],
+      "homeEdge": 2.375,
+      "strengthAndResults": {
+        "stats": 0.538,
+        "shifted": 0.844
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: George Fai: PR (RLP 23419)",
+        "nrl-cronulla-sutherland-sharks: Kurt Dillon: PR (RLP 25747)",
+        "nrl-manly-warringah-sea-eagles: Kelepi Tanginoa: SR (RLP 20290)",
+        "nrl-newcastle-knights: Jj Collins: PR (RLP 22718)",
+        "nrl-newcastle-knights: Pasami Saulo: PR (RLP 26513)",
+        "nrl-parramatta-eels: Oregon Kaufusi: PR (RLP 26516)"
+      ],
+      "left": [
+        "nrl-canterbury-bankstown-bulldogs: Francis Kalisolaite-Tualau (2 games): started at no position on NRL.com from 2016 to 2020, and the Rugby League Project lists nobody of his name at Canterbury-Bankstown Bulldogs in 2018",
+        "nrl-new-zealand-warriors: Chris Satae (10 games): started at no position on NRL.com from 2016 to 2020, and the Rugby League Project lists nobody of his name at New Zealand Warriors in 2018",
+        "nrl-new-zealand-warriors: Sam Cook (2 games): started at no position on NRL.com from 2016 to 2020, and the Rugby League Project gives no position for him (24762)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.4375,
+          "WG": 3.0625,
+          "CE": 3.875,
+          "FE": 2.25,
+          "HB": 1.625,
+          "HK": 2.375,
+          "PR": 6,
+          "SR": 4.625,
+          "LK": 2.0625
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 20.365,
+        "teamPointsSd": 10.635,
+        "draws": 0,
+        "marginMean": 12.781,
+        "byOne": 0.073,
+        "withinSix": 0.38,
+        "withinTwelve": 0.594,
+        "byThirteenPlus": 0.406,
+        "byTwentyFivePlus": 0.141,
+        "nilRate": 0.013,
+        "fortyPlusRate": 0.055,
+        "homeWins": 0.563,
+        "winPctSd": 0.155,
+        "bestWins": 16,
+        "worstWins": 6
+      }
+    },
+    {
+      "id": "nrl-2017",
+      "version": "nrl-2017-736f57b2",
+      "season": "2017",
+      "edition": "NRL.com match centre, the 2017 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2012",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 440,
+        "bySeason": 379,
+        "bySeasonEitherSide": 33,
+        "byTwoEitherSide": 11,
+        "byRlp": 17,
+        "left": 3,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "30 players (1.875 a club), overall 70–91 (median 84), played 71–92",
+        "WG": "53 players (3.3125 a club), overall 70–90 (median 81), played 71–89",
+        "CE": "51 players (3.1875 a club), overall 68–91 (median 81), played 69–92",
+        "FE": "28 players (1.75 a club), overall 70–90 (median 79), played 69–91",
+        "HB": "27 players (1.6875 a club), overall 74–93 (median 79), played 75–94",
+        "HK": "42 players (2.625 a club), overall 67–91 (median 78), played 67–91",
+        "PR": "92 players (5.75 a club), overall 69–93 (median 77), played 68–94",
+        "SR": "79 players (4.9375 a club), overall 69–91 (median 81), played 69–91",
+        "LK": "38 players (2.375 a club), overall 70–92 (median 83), played 69–91"
+      },
+      "best": [
+        "Andrew Fifita (CRO PR) 94",
+        "Daly Cherry-Evans (MAN HB) 94",
+        "James Roberts (BRI CE) 92",
+        "Tom Trbojevic (MAN FB) 92",
+        "Simon Mannering (NZW LK) 91",
+        "Cameron Smith (MEL HK) 91",
+        "Matt Gillett (BRI SR) 91",
+        "Mitchell Pearce (SYD HB) 91",
+        "Michael Morgan (NQC HB) 91",
+        "Cody Walker (SOU FE) 91",
+        "James Tedesco (WST FB) 91",
+        "Valentine Holmes (CRO FB) 91"
+      ],
+      "clubs": [
+        "Melbourne Storm 84.8 (28 players, 24 in the squad; out of position: Tohu Harris (SR) at LK; 2017: 20–0–4, 633–336)",
+        "Brisbane Broncos 84.6 (26 players, 24 in the squad; out of position: Sam Thaiday (SR) at PR; 2017: 16–0–8, 597–433)",
+        "Cronulla-Sutherland Sharks 84.5 (25 players, 24 in the squad; out of position: Jayson Bukuya (SR) at PR; 2017: 15–0–9, 476–407)",
+        "St. George Illawarra Dragons 84 (25 players, 24 in the squad; 2017: 12–0–12, 533–450)",
+        "Sydney Roosters 84 (26 players, 24 in the squad; out of position: Connor Watson (FB) at CE, Boyd Cordner (SR) at PR; 2017: 17–0–7, 500–428)",
+        "Canberra Raiders 83.8 (25 players, 24 in the squad; out of position: Joseph Tapine (SR) at PR, Iosia Soliola (SR) at PR; 2017: 11–0–13, 558–497)",
+        "North Queensland Cowboys 83.4 (32 players, 24 in the squad; out of position: Coen Hess (SR) at LK; 2017: 13–0–11, 467–443)",
+        "Parramatta Eels 83.3 (27 players, 24 in the squad; out of position: Tepai Moeroa (SR) at PR; 2017: 16–0–8, 496–457)",
+        "Manly Warringah Sea Eagles 83.2 (26 players, 24 in the squad; out of position: Lewis Brown (SR) at LK; 2017: 14–0–10, 552–512)",
+        "South Sydney Rabbitohs 83.1 (30 players, 24 in the squad; out of position: Kyle Turner (SR) at PR; 2017: 9–0–15, 464–564)",
+        "Penrith Panthers 82.9 (25 players, 24 in the squad; 2017: 13–0–11, 504–459)",
+        "Canterbury-Bankstown Bulldogs 82.5 (24 players, 24 in the squad; out of position: Greg Eastwood (SR) at PR; 2017: 10–0–14, 360–455)",
+        "New Zealand Warriors 82.3 (28 players, 24 in the squad; 2017: 7–0–17, 444–575)",
+        "Wests Tigers 82.1 (29 players, 24 in the squad; out of position: Josh Aloiai (SR) at PR; 2017: 7–0–17, 413–571)",
+        "Gold Coast Titans 81.7 (34 players, 24 in the squad; out of position: Chris McQueen (SR) at PR; 2017: 7–0–17, 448–638)",
+        "Newcastle Knights 81.5 (30 players, 24 in the squad; out of position: Lachlan Fitzgibbon (SR) at LK; 2017: 5–0–19, 428–648)"
+      ],
+      "clubShift": [
+        "Melbourne Storm: SRS +11.938, target 85.08, shift +1, strength 83.8 → 84.8",
+        "Brisbane Broncos: SRS +6.88, target 84.38, shift +1, strength 83.6 → 84.6",
+        "Cronulla-Sutherland Sharks: SRS +2.985, target 84.15, shift +1, strength 83.5 → 84.5",
+        "Canberra Raiders: SRS +2.969, target 83.9, shift -1, strength 84.8 → 83.8",
+        "Sydney Roosters: SRS +2.633, target 83.87, shift 0, strength 84 → 84",
+        "St. George Illawarra Dragons: SRS +2.33, target 83.66, shift -1, strength 85 → 84",
+        "Manly Warringah Sea Eagles: SRS +1.691, target 83.32, shift +1, strength 82.2 → 83.2",
+        "North Queensland Cowboys: SRS +1.343, target 83.2, shift +1, strength 82.4 → 83.4",
+        "Parramatta Eels: SRS +1.047, target 83.18, shift 0, strength 83.3 → 83.3",
+        "Penrith Panthers: SRS +1.047, target 83.18, shift -1, strength 83.9 → 82.9",
+        "South Sydney Rabbitohs: SRS -3.341, target 82.83, shift +1, strength 82.1 → 83.1",
+        "Canterbury-Bankstown Bulldogs: SRS -3.857, target 82.66, shift -1, strength 83.5 → 82.5",
+        "New Zealand Warriors: SRS -5.202, target 82.37, shift -1, strength 83.3 → 82.3",
+        "Wests Tigers: SRS -6.239, target 82.13, shift 0, strength 82.1 → 82.1",
+        "Gold Coast Titans: SRS -7.709, target 81.83, shift 0, strength 81.7 → 81.7",
+        "Newcastle Knights: SRS -8.515, target 81.8, shift +1, strength 80.5 → 81.5"
+      ],
+      "homeEdge": 0.349,
+      "strengthAndResults": {
+        "stats": 0.571,
+        "shifted": 0.856
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: George Fai: PR (RLP 23419)",
+        "nrl-canberra-raiders: Jeff Lima: PR (RLP 3440)",
+        "nrl-canberra-raiders: Royce Hunt: PR (RLP 23749)",
+        "nrl-canterbury-bankstown-bulldogs: Andy Saunders: PR (RLP 23763)",
+        "nrl-gold-coast-titans: Ben Nakubuwai: PR (RLP 22759)",
+        "nrl-manly-warringah-sea-eagles: Joey Lussick: HK (RLP 23901)",
+        "nrl-manly-warringah-sea-eagles: Kelepi Tanginoa: SR (RLP 20290)",
+        "nrl-melbourne-storm: Tui Kamikamica: PR (RLP 22760)",
+        "nrl-melbourne-storm: Vincent Leuluai: SR (RLP 22611)",
+        "nrl-new-zealand-warriors: James Bell: LK (RLP 23911)",
+        "nrl-new-zealand-warriors: Erin Clark: LK (RLP 22763)",
+        "nrl-newcastle-knights: Tyrone Amey: PR (RLP 23992)",
+        "nrl-north-queensland-cowboys: Ben Spina: PR (RLP 20848)",
+        "nrl-north-queensland-cowboys: Braden Hamlin-Uele: PR (RLP 23912)",
+        "nrl-south-sydney-rabbitohs: Anthony Cherrington: SR (RLP 7730)",
+        "nrl-wests-tigers: JJ Collins: PR (RLP 22718)",
+        "nrl-wests-tigers: Bayley Sironen: SR (RLP 23921)"
+      ],
+      "left": [
+        "nrl-canterbury-bankstown-bulldogs: Francis Kalisolaite-Tualau (8 games): started at no position on NRL.com from 2015 to 2019, and the Rugby League Project lists nobody of his name at Canterbury-Bankstown Bulldogs in 2017",
+        "nrl-manly-warringah-sea-eagles: Bill Bainbridge (1 game): started at no position on NRL.com from 2015 to 2019, and the Rugby League Project lists nobody of his name at Manly Warringah Sea Eagles in 2017",
+        "nrl-new-zealand-warriors: Chris Satae (3 games): started at no position on NRL.com from 2015 to 2019, and the Rugby League Project lists nobody of his name at New Zealand Warriors in 2017"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.875,
+          "WG": 3.3125,
+          "CE": 3.1875,
+          "FE": 1.75,
+          "HB": 1.6875,
+          "HK": 2.625,
+          "PR": 5.75,
+          "SR": 4.9375,
+          "LK": 2.375
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 20.503,
+        "teamPointsSd": 10.263,
+        "draws": 0,
+        "marginMean": 13.13,
+        "byOne": 0.073,
+        "withinSix": 0.354,
+        "withinTwelve": 0.568,
+        "byThirteenPlus": 0.432,
+        "byTwentyFivePlus": 0.141,
+        "nilRate": 0.013,
+        "fortyPlusRate": 0.055,
+        "homeWins": 0.536,
+        "winPctSd": 0.172,
+        "bestWins": 20,
+        "worstWins": 5
+      }
+    },
+    {
+      "id": "nrl-2016",
+      "version": "nrl-2016-72b38dc7",
+      "season": "2016",
+      "edition": "NRL.com match centre, the 2016 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2012",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 448,
+        "bySeason": 397,
+        "bySeasonEitherSide": 28,
+        "byTwoEitherSide": 4,
+        "byRlp": 19,
+        "left": 1,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 66,
+          "median": 80,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "30 players (1.875 a club), overall 70–91 (median 84), played 69–92",
+        "WG": "54 players (3.375 a club), overall 70–90 (median 81), played 71–90",
+        "CE": "63 players (3.9375 a club), overall 68–91 (median 79), played 68–92",
+        "FE": "29 players (1.8125 a club), overall 70–90 (median 79), played 69–91",
+        "HB": "27 players (1.6875 a club), overall 74–93 (median 79), played 72–93",
+        "HK": "45 players (2.8125 a club), overall 67–91 (median 78), played 66–92",
+        "PR": "94 players (5.875 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "76 players (4.75 a club), overall 69–91 (median 81), played 68–91",
+        "LK": "30 players (1.875 a club), overall 70–92 (median 84), played 71–93"
+      },
+      "best": [
+        "Simon Mannering (NZW LK) 93",
+        "Andrew Fifita (CRO PR) 93",
+        "Ben Hunt (BRI HB) 93",
+        "Cameron Smith (MEL HK) 92",
+        "Daly Cherry-Evans (MAN HB) 92",
+        "Tyrone Peachey (PEN CE) 92",
+        "Cameron Munster (MEL FB) 92",
+        "Jesse Bromwich (MEL PR) 91",
+        "Tohu Harris (MEL SR) 91",
+        "Bryce Cartwright (PEN FE) 91",
+        "Shaun Johnson (NZW HB) 91",
+        "Dane Gagai (NEW FB) 91"
+      ],
+      "clubs": [
+        "Melbourne Storm 84.8 (27 players, 24 in the squad; out of position: Kenneath Bromwich (SR) at HK, Felise Kaufusi (SR) at LK; 2016: 19–0–5, 563–302)",
+        "North Queensland Cowboys 84.8 (26 players, 24 in the squad; out of position: Coen Hess (SR) at LK; 2016: 15–0–9, 584–355)",
+        "Brisbane Broncos 83.9 (26 players, 24 in the squad; out of position: Sam Thaiday (SR) at LK; 2016: 15–0–9, 554–434)",
+        "Cronulla-Sutherland Sharks 83.9 (24 players, 24 in the squad; out of position: Chris Heighington (LK) at PR; 2016: 17–1–6, 580–404)",
+        "Canberra Raiders 83.7 (26 players, 24 in the squad; out of position: Joseph Tapine (SR) at PR; 2016: 17–1–6, 688–456)",
+        "Parramatta Eels 83.6 (26 players, 24 in the squad; out of position: Beau Scott (SR) at LK; 2016: 13–0–11, 462–443)",
+        "Penrith Panthers 83.6 (27 players, 24 in the squad; out of position: James Fisher-Harris (SR) at LK; 2016: 14–0–10, 563–463)",
+        "Canterbury-Bankstown Bulldogs 83.5 (26 players, 24 in the squad; out of position: Tony Williams (SR) at PR, Tim Browne (LK) at PR; 2016: 14–0–10, 506–448)",
+        "New Zealand Warriors 83.4 (31 players, 24 in the squad; out of position: Roger Tuivasa-Sheck (FB) at WG, Bunty Afoa (SR) at LK; 2016: 10–0–14, 513–601)",
+        "Gold Coast Titans 83 (29 players, 24 in the squad; out of position: Leivaha Pulu (SR) at PR; 2016: 11–1–12, 508–497)",
+        "Manly Warringah Sea Eagles 82.6 (30 players, 24 in the squad; out of position: Feleti Mateo (SR) at LK; 2016: 8–0–16, 454–563)",
+        "South Sydney Rabbitohs 82.6 (30 players, 24 in the squad; 2016: 9–0–15, 473–549)",
+        "Sydney Roosters 82.5 (29 players, 24 in the squad; out of position: Boyd Cordner (SR) at HK; 2016: 6–0–18, 443–576)",
+        "Wests Tigers 82.4 (29 players, 24 in the squad; out of position: Josh Aloiai (SR) at LK; 2016: 11–0–13, 499–607)",
+        "St. George Illawarra Dragons 82.2 (28 players, 24 in the squad; out of position: Tariq Sims (SR) at PR; 2016: 10–0–14, 341–538)",
+        "Newcastle Knights 81.6 (34 players, 24 in the squad; 2016: 1–1–22, 305–800)"
+      ],
+      "clubShift": [
+        "Melbourne Storm: SRS +9.709, target 85.08, shift +1, strength 83.8 → 84.8",
+        "North Queensland Cowboys: SRS +9.373, target 84.38, shift +1, strength 83.8 → 84.8",
+        "Canberra Raiders: SRS +8.609, target 84.15, shift -1, strength 84.7 → 83.7",
+        "Cronulla-Sutherland Sharks: SRS +6.889, target 83.9, shift 0, strength 83.9 → 83.9",
+        "Brisbane Broncos: SRS +5.095, target 83.87, shift 0, strength 83.9 → 83.9",
+        "Penrith Panthers: SRS +4.227, target 83.66, shift +1, strength 82.6 → 83.6",
+        "Canterbury-Bankstown Bulldogs: SRS +2.322, target 83.32, shift 0, strength 83.5 → 83.5",
+        "Parramatta Eels: SRS +1.459, target 83.2, shift +2, strength 81.6 → 83.6",
+        "Gold Coast Titans: SRS +0.258, target 83.2, shift +1, strength 82 → 83",
+        "New Zealand Warriors: SRS -3.71, target 83.02, shift +1, strength 82.4 → 83.4",
+        "South Sydney Rabbitohs: SRS -3.922, target 82.83, shift 0, strength 82.6 → 82.6",
+        "Manly Warringah Sea Eagles: SRS -4.139, target 82.66, shift +1, strength 81.6 → 82.6",
+        "Wests Tigers: SRS -4.351, target 82.37, shift -1, strength 83.4 → 82.4",
+        "Sydney Roosters: SRS -4.427, target 82.13, shift -1, strength 83.5 → 82.5",
+        "St. George Illawarra Dragons: SRS -7.657, target 81.83, shift -2, strength 84.2 → 82.2",
+        "Newcastle Knights: SRS -19.733, target 81.8, shift +1, strength 80.6 → 81.6"
+      ],
+      "homeEdge": 1.74,
+      "strengthAndResults": {
+        "stats": 0.623,
+        "shifted": 0.896
+      },
+      "placedByRlp": [
+        "nrl-canberra-raiders: Jeff Lima: PR (RLP 3440)",
+        "nrl-cronulla-sutherland-sharks: David Fifita: PR (RLP 20722)",
+        "nrl-cronulla-sutherland-sharks: Jesse Sene-Lefao: SR (RLP 20288)",
+        "nrl-manly-warringah-sea-eagles: Liam Knight: PR (RLP 22781)",
+        "nrl-new-zealand-warriors: Toafofoa Sipley: PR (RLP 22731)",
+        "nrl-north-queensland-cowboys: Josh Chudleigh: HK (RLP 22837)",
+        "nrl-north-queensland-cowboys: Ben Spina: PR (RLP 20848)",
+        "nrl-south-sydney-rabbitohs: Tautalatasi Tasi: WG (RLP 22783)",
+        "nrl-south-sydney-rabbitohs: Patrice Siolo: SR (RLP 20912)",
+        "nrl-sydney-roosters: Ian Henderson: HK (RLP 1759)",
+        "nrl-sydney-roosters: Grant Garvey: HK (RLP 22842)",
+        "nrl-sydney-roosters: Eloni Vunakece: PR (RLP 20542)",
+        "nrl-sydney-roosters: Abraham Papalii: PR (RLP 22625)",
+        "nrl-sydney-roosters: Mitch Frei: SR (RLP 20236)",
+        "nrl-sydney-roosters: Vincent Leuluai: SR (RLP 22611)",
+        "nrl-sydney-roosters: Chris Smith: SR (RLP 22780)",
+        "nrl-wests-tigers: Manaia Cherrington: HK (RLP 21705)",
+        "nrl-wests-tigers: JJ Collins: PR (RLP 22718)",
+        "nrl-wests-tigers: Jack Buchanan: PR (RLP 20265)"
+      ],
+      "left": [
+        "nrl-manly-warringah-sea-eagles: Bill Bainbridge (1 game): started at no position on NRL.com from 2014 to 2018, and the Rugby League Project lists nobody of his name at Manly Warringah Sea Eagles in 2016"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.875,
+          "WG": 3.375,
+          "CE": 3.9375,
+          "FE": 1.8125,
+          "HB": 1.6875,
+          "HK": 2.8125,
+          "PR": 5.875,
+          "SR": 4.75,
+          "LK": 1.875
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 20.927,
+        "teamPointsSd": 10.969,
+        "draws": 2,
+        "marginMean": 14.125,
+        "byOne": 0.083,
+        "withinSix": 0.313,
+        "withinTwelve": 0.547,
+        "byThirteenPlus": 0.443,
+        "byTwentyFivePlus": 0.172,
+        "nilRate": 0.031,
+        "fortyPlusRate": 0.063,
+        "homeWins": 0.579,
+        "winPctSd": 0.185,
+        "bestWins": 19,
+        "worstWins": 1
+      }
+    },
+    {
+      "id": "nrl-2015",
+      "version": "nrl-2015-e35c3492",
+      "season": "2015",
+      "edition": "NRL.com match centre, the 2015 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2012",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 445,
+        "bySeason": 381,
+        "bySeasonEitherSide": 29,
+        "byTwoEitherSide": 19,
+        "byRlp": 16,
+        "left": 2,
+        "inSquads": 382
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "21 players (1.3125 a club), overall 76–91 (median 85), played 75–91",
+        "WG": "68 players (4.25 a club), overall 68–90 (median 79), played 67–91",
+        "CE": "57 players (3.5625 a club), overall 68–91 (median 80), played 68–91",
+        "FE": "25 players (1.5625 a club), overall 70–90 (median 80), played 69–90",
+        "HB": "25 players (1.5625 a club), overall 74–93 (median 82), played 74–93",
+        "HK": "43 players (2.6875 a club), overall 67–91 (median 78), played 68–92",
+        "PR": "102 players (6.375 a club), overall 69–93 (median 77), played 68–94",
+        "SR": "71 players (4.4375 a club), overall 69–91 (median 82), played 68–91",
+        "LK": "33 players (2.0625 a club), overall 70–92 (median 84), played 70–91"
+      },
+      "best": [
+        "Jesse Bromwich (MEL PR) 94",
+        "Ben Hunt (BRI HB) 93",
+        "Cameron Smith (MEL HK) 92",
+        "Daly Cherry-Evans (MAN HB) 92",
+        "Simon Mannering (NZW LK) 91",
+        "Wade Graham (CRO SR) 91",
+        "Roger Tuivasa-Sheck (SYD FB) 91",
+        "Will Chambers (MEL CE) 91",
+        "Semi Radradra (PAR WG) 91",
+        "Andrew McCullough (BRI HK) 90",
+        "Shaun Fensom (CBR LK) 90",
+        "Matt Gillett (BRI SR) 90"
+      ],
+      "clubs": [
+        "Sydney Roosters 85.2 (22 players, 22 in the squad; out of position: Mitchell Aubusson (SR) at PR; 2015: 18–0–6, 591–300)",
+        "Melbourne Storm 84.6 (27 players, 24 in the squad; out of position: Kenneath Bromwich (SR) at HK; 2015: 14–0–10, 467–348)",
+        "Brisbane Broncos 84.1 (29 players, 24 in the squad; 2015: 17–0–7, 574–379)",
+        "Canterbury-Bankstown Bulldogs 83.9 (27 players, 24 in the squad; 2015: 14–0–10, 522–480)",
+        "Canberra Raiders 83.6 (27 players, 24 in the squad; out of position: Jarrad Kennedy (SR) at LK; 2015: 10–0–14, 577–569)",
+        "North Queensland Cowboys 83.6 (28 players, 24 in the squad; out of position: Rory Kostjasyn (FE) at HK, John Asiata (LK) at PR; 2015: 17–0–7, 587–454)",
+        "Manly Warringah Sea Eagles 83.5 (29 players, 24 in the squad; out of position: Justin Horo (SR) at PR; 2015: 11–0–13, 458–492)",
+        "St. George Illawarra Dragons 83.5 (29 players, 24 in the squad; out of position: Jake Marketo (SR) at PR; 2015: 12–0–12, 435–408)",
+        "Cronulla-Sutherland Sharks 83.3 (25 players, 24 in the squad; out of position: Jayson Bukuya (SR) at PR; 2015: 14–0–10, 469–476)",
+        "Penrith Panthers 83.2 (32 players, 24 in the squad; out of position: Sika Manu (SR) at LK; 2015: 9–0–15, 399–477)",
+        "South Sydney Rabbitohs 82.9 (26 players, 24 in the squad; out of position: Chris McQueen (SR) at PR; 2015: 13–0–11, 465–467)",
+        "Parramatta Eels 82.4 (29 players, 24 in the squad; out of position: Tepai Moeroa (SR) at LK; 2015: 9–0–15, 448–573)",
+        "Wests Tigers 82.4 (24 players, 24 in the squad; out of position: David Nofoaluma (WG) at CE, Curtis Sironen (SR) at LK; 2015: 8–0–16, 487–562)",
+        "New Zealand Warriors 81.8 (30 players, 24 in the squad; out of position: Raymond Faitala-Mariner (SR) at LK; 2015: 9–0–15, 445–588)",
+        "Gold Coast Titans 81.4 (32 players, 24 in the squad; 2015: 9–0–15, 439–636)",
+        "Newcastle Knights 81.4 (29 players, 24 in the squad; out of position: Beau Scott (SR) at PR; 2015: 8–0–16, 458–612)"
+      ],
+      "clubShift": [
+        "Sydney Roosters: SRS +11.831, target 85.08, shift 0, strength 85.2 → 85.2",
+        "Brisbane Broncos: SRS +8.215, target 84.38, shift 0, strength 84.1 → 84.1",
+        "Melbourne Storm: SRS +5.216, target 84.15, shift +1, strength 83.6 → 84.6",
+        "North Queensland Cowboys: SRS +5.109, target 83.9, shift 0, strength 83.6 → 83.6",
+        "St. George Illawarra Dragons: SRS +1.757, target 83.87, shift -1, strength 84.5 → 83.5",
+        "Canterbury-Bankstown Bulldogs: SRS +1.718, target 83.66, shift +1, strength 82.9 → 83.9",
+        "South Sydney Rabbitohs: SRS +0.548, target 83.32, shift 0, strength 82.9 → 82.9",
+        "Cronulla-Sutherland Sharks: SRS -0.21, target 83.2, shift 0, strength 83.3 → 83.3",
+        "Canberra Raiders: SRS -0.545, target 83.2, shift 0, strength 83.6 → 83.6",
+        "Manly Warringah Sea Eagles: SRS -0.901, target 83.02, shift +1, strength 82.5 → 83.5",
+        "Penrith Panthers: SRS -3.216, target 82.83, shift +1, strength 82.2 → 83.2",
+        "Wests Tigers: SRS -3.431, target 82.66, shift 0, strength 82.4 → 82.4",
+        "Parramatta Eels: SRS -5.37, target 82.37, shift +1, strength 81.4 → 82.4",
+        "New Zealand Warriors: SRS -5.812, target 82.13, shift -1, strength 82.8 → 81.8",
+        "Newcastle Knights: SRS -6.425, target 81.83, shift -1, strength 82.4 → 81.4",
+        "Gold Coast Titans: SRS -8.483, target 81.8, shift 0, strength 81.4 → 81.4"
+      ],
+      "homeEdge": 3.464,
+      "strengthAndResults": {
+        "stats": 0.799,
+        "shifted": 0.85
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Mitch Garbutt: PR (RLP 20256)",
+        "nrl-brisbane-broncos: Francis Molo: PR (RLP 20827)",
+        "nrl-brisbane-broncos: Joe Boyce: LK (RLP 21547)",
+        "nrl-canberra-raiders: Mark Nicholls: PR (RLP 19963)",
+        "nrl-cronulla-sutherland-sharks: David Fifita: PR (RLP 20722)",
+        "nrl-gold-coast-titans: Mark Ioane: PR (RLP 20276)",
+        "nrl-manly-warringah-sea-eagles: Jesse Sene-Lefao: SR (RLP 20288)",
+        "nrl-melbourne-storm: Dayne Weston: PR (RLP 5577)",
+        "nrl-north-queensland-cowboys: Ben Spina: PR (RLP 20848)",
+        "nrl-parramatta-eels: Richie Fa'aoso: PR (RLP 847)",
+        "nrl-penrith-panthers: Sam Anderson: PR (RLP 20468)",
+        "nrl-penrith-panthers: Chris Smith: SR (RLP 22780)",
+        "nrl-st-george-illawarra-dragons: Luke Page: PR (RLP 20278)",
+        "nrl-sydney-roosters: Willie Manu: SR (RLP 814)",
+        "nrl-wests-tigers: Manaia Cherrington: HK (RLP 21705)",
+        "nrl-wests-tigers: Brenden Santi: PR (RLP 20636)"
+      ],
+      "left": [
+        "nrl-sydney-roosters: Lagi Setu (2 games): started at no position on NRL.com from 2013 to 2017, and the Rugby League Project gives no position for him (5562)",
+        "nrl-wests-tigers: Lamar Manuel-Liolevave (1 game): started at no position on NRL.com from 2013 to 2017, and the Rugby League Project lists nobody of his name at Wests Tigers in 2015"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.3125,
+          "WG": 4.25,
+          "CE": 3.5625,
+          "FE": 1.5625,
+          "HB": 1.5625,
+          "HK": 2.6875,
+          "PR": 6.375,
+          "SR": 4.4375,
+          "LK": 2.0625
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 20.367,
+        "teamPointsSd": 10.775,
+        "draws": 0,
+        "marginMean": 13.557,
+        "byOne": 0.047,
+        "withinSix": 0.323,
+        "withinTwelve": 0.547,
+        "byThirteenPlus": 0.453,
+        "byTwentyFivePlus": 0.156,
+        "nilRate": 0.021,
+        "fortyPlusRate": 0.055,
+        "homeWins": 0.531,
+        "winPctSd": 0.137,
+        "bestWins": 18,
+        "worstWins": 8
+      }
+    },
+    {
+      "id": "nrl-2014",
+      "version": "nrl-2014-7bdc66dd",
+      "season": "2014",
+      "edition": "NRL.com match centre, the 2014 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2012",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 461,
+        "bySeason": 404,
+        "bySeasonEitherSide": 30,
+        "byTwoEitherSide": 7,
+        "byRlp": 20,
+        "left": 2,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "26 players (1.625 a club), overall 70–91 (median 84), played 71–92",
+        "WG": "67 players (4.1875 a club), overall 68–90 (median 79), played 67–90",
+        "CE": "57 players (3.5625 a club), overall 68–91 (median 80), played 68–91",
+        "FE": "29 players (1.8125 a club), overall 70–90 (median 79), played 70–91",
+        "HB": "27 players (1.6875 a club), overall 74–93 (median 79), played 74–94",
+        "HK": "40 players (2.5 a club), overall 68–91 (median 78), played 69–91",
+        "PR": "92 players (5.75 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "81 players (5.0625 a club), overall 69–91 (median 81), played 69–91",
+        "LK": "42 players (2.625 a club), overall 70–92 (median 83), played 69–93"
+      },
+      "best": [
+        "Daly Cherry-Evans (MAN HB) 94",
+        "Sam Burgess (SOU LK) 93",
+        "Corey Parker (BRI PR) 93",
+        "Jarryd Hayne (PAR FB) 92",
+        "Greg Inglis (SOU FB) 92",
+        "Cameron Smith (MEL HK) 91",
+        "Simon Mannering (NZW SR) 91",
+        "Mitchell Pearce (SYD HB) 91",
+        "Adam Reynolds (SOU HB) 91",
+        "Johnathan Thurston (NQC FE) 91",
+        "Shaun Kenny-Dowall (SYD CE) 91",
+        "Jesse Bromwich (MEL PR) 90"
+      ],
+      "clubs": [
+        "Sydney Roosters 84.8 (24 players, 24 in the squad; 2014: 16–0–8, 615–385)",
+        "South Sydney Rabbitohs 84.6 (27 players, 24 in the squad; out of position: Chris McQueen (SR) at PR; 2014: 15–0–9, 585–361)",
+        "North Queensland Cowboys 84.5 (29 players, 24 in the squad; out of position: Robert Lui (FE) at HK, Jason Taumalolo (SR) at PR; 2014: 14–0–10, 596–406)",
+        "Brisbane Broncos 84.2 (24 players, 24 in the squad; 2014: 12–0–12, 549–456)",
+        "Manly Warringah Sea Eagles 83.9 (28 players, 24 in the squad; out of position: Tom Symonds (SR) at PR; 2014: 16–0–8, 502–399)",
+        "Melbourne Storm 83.8 (27 players, 24 in the squad; out of position: Tohu Harris (SR) at HK; 2014: 14–0–10, 536–460)",
+        "Canterbury-Bankstown Bulldogs 83.4 (26 players, 24 in the squad; out of position: Reni Maitua (SR) at HK; 2014: 13–0–11, 446–439)",
+        "Penrith Panthers 83.4 (29 players, 24 in the squad; out of position: Sika Manu (SR) at LK; 2014: 15–0–9, 506–426)",
+        "St. George Illawarra Dragons 83.2 (28 players, 24 in the squad; out of position: Bronson Harrison (SR) at PR; 2014: 11–0–13, 469–528)",
+        "New Zealand Warriors 83.1 (31 players, 24 in the squad; out of position: Ben Henry (SR) at LK; 2014: 12–0–12, 571–491)",
+        "Parramatta Eels 82.7 (31 players, 24 in the squad; out of position: Pauli Pauli (SR) at LK; 2014: 12–0–12, 477–580)",
+        "Canberra Raiders 82.6 (27 players, 24 in the squad; out of position: Joel Edwards (SR) at LK; 2014: 8–0–16, 466–623)",
+        "Gold Coast Titans 82.4 (31 players, 24 in the squad; out of position: William Zillman (FB) at CE; 2014: 9–0–15, 372–538)",
+        "Wests Tigers 82.3 (31 players, 24 in the squad; 2014: 10–0–14, 420–631)",
+        "Newcastle Knights 82.2 (32 players, 24 in the squad; out of position: Beau Scott (SR) at PR; 2014: 10–0–14, 463–571)",
+        "Cronulla-Sutherland Sharks 81.7 (36 players, 24 in the squad; out of position: Luke Lewis (SR) at PR; 2014: 5–0–19, 334–613)"
+      ],
+      "clubShift": [
+        "South Sydney Rabbitohs: SRS +9.06, target 85.08, shift +1, strength 83.6 → 84.6",
+        "Sydney Roosters: SRS +8.737, target 84.38, shift 0, strength 84.8 → 84.8",
+        "North Queensland Cowboys: SRS +6.727, target 84.15, shift +1, strength 83.5 → 84.5",
+        "Manly Warringah Sea Eagles: SRS +4.518, target 83.9, shift +1, strength 82.9 → 83.9",
+        "Brisbane Broncos: SRS +4.29, target 83.87, shift 0, strength 84.2 → 84.2",
+        "Melbourne Storm: SRS +3.123, target 83.66, shift 0, strength 83.8 → 83.8",
+        "New Zealand Warriors: SRS +2.157, target 83.32, shift 0, strength 83.1 → 83.1",
+        "Penrith Panthers: SRS +2.112, target 83.2, shift +1, strength 82.4 → 83.4",
+        "Canterbury-Bankstown Bulldogs: SRS +1.152, target 83.2, shift 0, strength 83.4 → 83.4",
+        "St. George Illawarra Dragons: SRS -2.197, target 83.02, shift 0, strength 83.2 → 83.2",
+        "Parramatta Eels: SRS -3.954, target 82.83, shift +1, strength 81.7 → 82.7",
+        "Newcastle Knights: SRS -4.08, target 82.66, shift -1, strength 83.2 → 82.2",
+        "Gold Coast Titans: SRS -6.209, target 82.37, shift 0, strength 82.4 → 82.4",
+        "Canberra Raiders: SRS -6.253, target 82.13, shift 0, strength 82.6 → 82.6",
+        "Wests Tigers: SRS -8.256, target 81.83, shift +1, strength 81.3 → 82.3",
+        "Cronulla-Sutherland Sharks: SRS -10.929, target 81.8, shift 0, strength 81.7 → 81.7"
+      ],
+      "homeEdge": 4.38,
+      "strengthAndResults": {
+        "stats": 0.54,
+        "shifted": 0.867
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Francis Molo: PR (RLP 20827)",
+        "nrl-canterbury-bankstown-bulldogs: Lloyd Perrett: PR (RLP 20839)",
+        "nrl-cronulla-sutherland-sharks: David Fifita: PR (RLP 20722)",
+        "nrl-cronulla-sutherland-sharks: Sione Masima: SR (RLP 20892)",
+        "nrl-cronulla-sutherland-sharks: Scott Sorensen: SR (RLP 20893)",
+        "nrl-cronulla-sutherland-sharks: Patrice Siolo: SR (RLP 20912)",
+        "nrl-gold-coast-titans: Mark Ioane: PR (RLP 20276)",
+        "nrl-gold-coast-titans: Caleb Binge: PR (RLP 20837)",
+        "nrl-manly-warringah-sea-eagles: Tyson Andrews: PR (RLP 20863)",
+        "nrl-manly-warringah-sea-eagles: Jesse Sene-Lefao: SR (RLP 20288)",
+        "nrl-melbourne-storm: Mitch Garbutt: PR (RLP 20256)",
+        "nrl-new-zealand-warriors: Sam Lousi: SR (RLP 19973)",
+        "nrl-north-queensland-cowboys: Ben Spina: PR (RLP 20848)",
+        "nrl-parramatta-eels: Kaysa Pritchard: HK (RLP 20403)",
+        "nrl-parramatta-eels: Lee Mossop: PR (RLP 8041)",
+        "nrl-penrith-panthers: Sam Anderson: PR (RLP 20468)",
+        "nrl-south-sydney-rabbitohs: Nathaniel Neale: PR (RLP 20738)",
+        "nrl-st-george-illawarra-dragons: Shane Pumipi: HK (RLP 20828)",
+        "nrl-sydney-roosters: Remi Casty: PR (RLP 3505)",
+        "nrl-wests-tigers: Brenden Santi: PR (RLP 20636)"
+      ],
+      "left": [
+        "nrl-canberra-raiders: Kyle O'Donnell (5 games): started at no position on NRL.com from 2012 to 2016, and the Rugby League Project gives no position for him (19967)",
+        "nrl-sydney-roosters: Willis Meehan (1 game): started at no position on NRL.com from 2012 to 2016, and the Rugby League Project gives no position for him (20836)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.625,
+          "WG": 4.1875,
+          "CE": 3.5625,
+          "FE": 1.8125,
+          "HB": 1.6875,
+          "HK": 2.5,
+          "PR": 5.75,
+          "SR": 5.0625,
+          "LK": 2.625
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 20.591,
+        "teamPointsSd": 11.174,
+        "draws": 0,
+        "marginMean": 14.505,
+        "byOne": 0.073,
+        "withinSix": 0.344,
+        "withinTwelve": 0.51,
+        "byThirteenPlus": 0.49,
+        "byTwentyFivePlus": 0.188,
+        "nilRate": 0.023,
+        "fortyPlusRate": 0.076,
+        "homeWins": 0.583,
+        "winPctSd": 0.124,
+        "bestWins": 16,
+        "worstWins": 5
+      }
+    },
+    {
+      "id": "nrl-2013",
+      "version": "nrl-2013-62c6396e",
+      "season": "2013",
+      "edition": "NRL.com match centre, the 2013 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2012",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 457,
+        "bySeason": 400,
+        "bySeasonEitherSide": 32,
+        "byTwoEitherSide": 11,
+        "byRlp": 14,
+        "left": 4,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "29 players (1.8125 a club), overall 70–91 (median 84), played 70–92",
+        "WG": "63 players (3.9375 a club), overall 68–90 (median 79), played 68–89",
+        "CE": "62 players (3.875 a club), overall 68–91 (median 80), played 68–91",
+        "FE": "25 players (1.5625 a club), overall 70–90 (median 80), played 70–91",
+        "HB": "30 players (1.875 a club), overall 71–93 (median 79), played 70–93",
+        "HK": "37 players (2.3125 a club), overall 68–91 (median 79), played 67–91",
+        "PR": "90 players (5.625 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "72 players (4.5 a club), overall 69–91 (median 82), played 69–91",
+        "LK": "49 players (3.0625 a club), overall 69–92 (median 80), played 69–91"
+      },
+      "best": [
+        "Andrew Fifita (CRO PR) 93",
+        "Daly Cherry-Evans (MAN HB) 93",
+        "Greg Inglis (SOU FB) 92",
+        "Cameron Smith (MEL HK) 91",
+        "Corey Parker (BRI LK) 91",
+        "Sonny Bill Williams (SYD SR) 91",
+        "John Sutton (SOU FE) 91",
+        "Aiden Tolman (CBY PR) 91",
+        "Mitchell Pearce (SYD HB) 91",
+        "Billy Slater (MEL FB) 91",
+        "Jamie Lyon (MAN CE) 91",
+        "Ben Barba (CBY FB) 91"
+      ],
+      "clubs": [
+        "Sydney Roosters 84.6 (24 players, 24 in the squad; out of position: Aidan Guerra (SR) at HK; 2013: 18–0–6, 640–325)",
+        "South Sydney Rabbitohs 84.1 (27 players, 24 in the squad; out of position: Nathan Peats (SR) at HK; 2013: 18–0–6, 588–384)",
+        "Canterbury-Bankstown Bulldogs 84 (27 players, 24 in the squad; out of position: Frank Pritchard (SR) at HK, Dene Halatau (SR) at PR; 2013: 13–0–11, 529–463)",
+        "Melbourne Storm 83.9 (27 players, 24 in the squad; out of position: Kevin Proctor (SR) at PR; 2013: 16–1–7, 589–373)",
+        "North Queensland Cowboys 83.7 (30 players, 24 in the squad; out of position: Tariq Sims (SR) at LK; 2013: 12–0–12, 507–431)",
+        "Cronulla-Sutherland Sharks 83.5 (29 players, 24 in the squad; out of position: Anthony Tupou (SR) at PR, Luke Lewis (SR) at PR; 2013: 14–0–10, 468–460)",
+        "Manly Warringah Sea Eagles 83.4 (28 players, 24 in the squad; out of position: Richie Fa'aoso (PR) at HK; 2013: 15–1–8, 588–366)",
+        "Newcastle Knights 83.4 (29 players, 24 in the squad; out of position: Alex McKinnon (SR) at PR; 2013: 12–1–11, 528–422)",
+        "Gold Coast Titans 83.2 (28 players, 24 in the squad; out of position: Mark Minichiello (SR) at LK; 2013: 11–0–13, 500–518)",
+        "New Zealand Warriors 82.8 (28 players, 24 in the squad; out of position: Pita Godinet (HB) at HK; 2013: 11–0–13, 495–554)",
+        "Brisbane Broncos 82.4 (28 players, 24 in the squad; out of position: Ben Hunt (HB) at HK, Lama Tasi (PR) at LK; 2013: 10–1–13, 434–477)",
+        "Penrith Panthers 82.4 (30 players, 24 in the squad; 2013: 11–0–13, 495–532)",
+        "Canberra Raiders 81.9 (28 players, 24 in the squad; out of position: Reece Robinson (FB) at WG, Joel Thompson (SR) at PR; 2013: 10–0–14, 434–624)",
+        "St. George Illawarra Dragons 81.9 (30 players, 24 in the squad; out of position: Bronson Harrison (SR) at PR; 2013: 7–0–17, 379–530)",
+        "Wests Tigers 81.8 (33 players, 24 in the squad; out of position: Eddy Pettybourne (SR) at LK; 2013: 7–0–17, 386–687)",
+        "Parramatta Eels 81.3 (31 players, 24 in the squad; out of position: Kelepi Tanginoa (SR) at PR; 2013: 5–0–19, 326–740)"
+      ],
+      "clubShift": [
+        "Sydney Roosters: SRS +12.084, target 85.08, shift 0, strength 84.6 → 84.6",
+        "South Sydney Rabbitohs: SRS +9.033, target 84.38, shift +1, strength 83.1 → 84.1",
+        "Melbourne Storm: SRS +8.745, target 84.15, shift 0, strength 83.9 → 83.9",
+        "Manly Warringah Sea Eagles: SRS +8.741, target 83.9, shift 0, strength 83.4 → 83.4",
+        "Newcastle Knights: SRS +4.078, target 83.87, shift 0, strength 83.4 → 83.4",
+        "Canterbury-Bankstown Bulldogs: SRS +3.422, target 83.66, shift +1, strength 83 → 84",
+        "North Queensland Cowboys: SRS +2.737, target 83.32, shift +1, strength 82.7 → 83.7",
+        "Cronulla-Sutherland Sharks: SRS -0.296, target 83.2, shift 0, strength 83.5 → 83.5",
+        "Gold Coast Titans: SRS -0.298, target 83.2, shift 0, strength 83.2 → 83.2",
+        "New Zealand Warriors: SRS -1.299, target 83.02, shift 0, strength 82.8 → 82.8",
+        "Brisbane Broncos: SRS -2.443, target 82.83, shift -1, strength 83.4 → 82.4",
+        "Penrith Panthers: SRS -2.469, target 82.66, shift 0, strength 82.4 → 82.4",
+        "Canberra Raiders: SRS -6.582, target 82.37, shift -1, strength 82.9 → 81.9",
+        "St. George Illawarra Dragons: SRS -6.872, target 82.13, shift -1, strength 82.9 → 81.9",
+        "Wests Tigers: SRS -12.016, target 81.83, shift 0, strength 81.8 → 81.8",
+        "Parramatta Eels: SRS -16.566, target 81.8, shift 0, strength 81.3 → 81.3"
+      ],
+      "homeEdge": 4.125,
+      "strengthAndResults": {
+        "stats": 0.723,
+        "shifted": 0.944
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Nick Slyney: PR (RLP 7815)",
+        "nrl-canberra-raiders: Mark Nicholls: PR (RLP 19963)",
+        "nrl-canterbury-bankstown-bulldogs: Harlan Alaalatoa: SR (RLP 20329)",
+        "nrl-cronulla-sutherland-sharks: Jon Green: PR (RLP 3518)",
+        "nrl-gold-coast-titans: Mark Ioane: PR (RLP 20276)",
+        "nrl-manly-warringah-sea-eagles: Nick Skinner: PR (RLP 19582)",
+        "nrl-manly-warringah-sea-eagles: Jesse Sene-Lefao: SR (RLP 20288)",
+        "nrl-melbourne-storm: Slade Griffin: HK (RLP 20258)",
+        "nrl-melbourne-storm: Mitch Garbutt: PR (RLP 20256)",
+        "nrl-new-zealand-warriors: Charlie Gubb: PR (RLP 20573)",
+        "nrl-newcastle-knights: Craig Gower: HB (RLP 329)",
+        "nrl-parramatta-eels: Kaysa Pritchard: HK (RLP 20403)",
+        "nrl-parramatta-eels: Joseph Ualesi: SR (RLP 20588)",
+        "nrl-penrith-panthers: Sam Anderson: PR (RLP 20468)"
+      ],
+      "left": [
+        "nrl-gold-coast-titans: Sam Irwin (10 games): started at no position on NRL.com from 2011 to 2015, and the Rugby League Project gives no position for him (20354)",
+        "nrl-gold-coast-titans: Shane Gray (1 game): started at no position on NRL.com from 2011 to 2015, and the Rugby League Project gives no position for him (20274)",
+        "nrl-melbourne-storm: Lagi Setu (7 games): started at no position on NRL.com from 2011 to 2015, and the Rugby League Project gives no position for him (5562)",
+        "nrl-wests-tigers: Jarrod Farlow (1 game): started at no position on NRL.com from 2011 to 2015, and the Rugby League Project gives no position for him (20560)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.8125,
+          "WG": 3.9375,
+          "CE": 3.875,
+          "FE": 1.5625,
+          "HB": 1.875,
+          "HK": 2.3125,
+          "PR": 5.625,
+          "SR": 4.5,
+          "LK": 3.0625
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 20.536,
+        "teamPointsSd": 11.712,
+        "draws": 2,
+        "marginMean": 15.375,
+        "byOne": 0.036,
+        "withinSix": 0.302,
+        "withinTwelve": 0.495,
+        "byThirteenPlus": 0.495,
+        "byTwentyFivePlus": 0.203,
+        "nilRate": 0.034,
+        "fortyPlusRate": 0.065,
+        "homeWins": 0.579,
+        "winPctSd": 0.154,
+        "bestWins": 18,
+        "worstWins": 5
+      }
+    },
+    {
+      "id": "nrl-2012",
+      "version": "nrl-2012-33bd7367",
+      "season": "2012",
+      "edition": "NRL.com match centre, the 2012 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2012",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 436,
+        "bySeason": 388,
+        "bySeasonEitherSide": 31,
+        "byTwoEitherSide": 6,
+        "byRlp": 11,
+        "left": 2,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "27 players (1.6875 a club), overall 70–91 (median 84), played 70–92",
+        "WG": "61 players (3.8125 a club), overall 70–90 (median 79), played 71–90",
+        "CE": "54 players (3.375 a club), overall 68–91 (median 81), played 67–92",
+        "FE": "31 players (1.9375 a club), overall 70–90 (median 79), played 69–90",
+        "HB": "23 players (1.4375 a club), overall 76–93 (median 84), played 76–94",
+        "HK": "33 players (2.0625 a club), overall 68–91 (median 79), played 68–92",
+        "PR": "88 players (5.5 a club), overall 70–93 (median 78), played 70–93",
+        "SR": "81 players (5.0625 a club), overall 69–91 (median 81), played 68–90",
+        "LK": "38 players (2.375 a club), overall 70–92 (median 83), played 69–93"
+      },
+      "best": [
+        "Daly Cherry-Evans (MAN HB) 94",
+        "Shaun Fensom (CBR LK) 93",
+        "Trent Merrin (SGI PR) 93",
+        "Cameron Smith (MEL HK) 92",
+        "Cooper Cronk (MEL HB) 92",
+        "Ben Barba (CBY FB) 92",
+        "Matthew Bowen (NQC FB) 92",
+        "Jamie Lyon (MAN CE) 92",
+        "James Tamou (NQC PR) 91",
+        "Billy Slater (MEL FB) 91",
+        "Nathan Hindmarsh (PAR SR) 90",
+        "Jake Friend (SYD HK) 90"
+      ],
+      "clubs": [
+        "Melbourne Storm 84.9 (24 players, 24 in the squad; out of position: Sika Manu (SR) at HK; 2012: 17–0–7, 579–361)",
+        "North Queensland Cowboys 84.6 (27 players, 24 in the squad; 2012: 15–0–9, 597–445)",
+        "Canterbury-Bankstown Bulldogs 84.1 (26 players, 24 in the squad; out of position: Josh Jackson (SR) at HK, Corey Payne (LK) at PR; 2012: 18–0–6, 568–369)",
+        "Manly Warringah Sea Eagles 84.1 (24 players, 24 in the squad; out of position: Tony Williams (SR) at HK; 2012: 16–0–8, 497–403)",
+        "Brisbane Broncos 83.5 (29 players, 24 in the squad; out of position: Matt Gillett (SR) at PR, Ben Te'o (SR) at LK; 2012: 12–0–12, 481–447)",
+        "South Sydney Rabbitohs 83.4 (26 players, 24 in the squad; out of position: Chris McQueen (SR) at PR; 2012: 16–0–8, 559–438)",
+        "Canberra Raiders 83.3 (28 players, 24 in the squad; out of position: Bronson Harrison (SR) at LK; 2012: 13–0–11, 545–536)",
+        "St. George Illawarra Dragons 83.2 (29 players, 24 in the squad; out of position: Beau Scott (SR) at PR; 2012: 11–0–13, 405–438)",
+        "Newcastle Knights 83.1 (27 players, 24 in the squad; out of position: Joel Edwards (SR) at PR; 2012: 10–0–14, 448–488)",
+        "Cronulla-Sutherland Sharks 82.9 (26 players, 24 in the squad; out of position: Anthony Tupou (SR) at PR, Jayson Bukuya (SR) at PR; 2012: 12–1–11, 445–441)",
+        "Gold Coast Titans 82.9 (28 players, 24 in the squad; out of position: Luke O'Dwyer (SR) at LK; 2012: 10–0–14, 449–477)",
+        "Wests Tigers 82.8 (29 players, 24 in the squad; out of position: Tom Humble (HB) at FE, Matthew Bell (SR) at PR, Gareth Ellis (SR) at PR; 2012: 11–0–13, 506–551)",
+        "Sydney Roosters 82.6 (27 players, 24 in the squad; out of position: Mitchell Aubusson (SR) at PR; 2012: 8–1–15, 462–626)",
+        "New Zealand Warriors 82.5 (28 players, 24 in the squad; 2012: 8–0–16, 497–609)",
+        "Penrith Panthers 81.6 (31 players, 24 in the squad; out of position: Matt Robinson (SR) at HK, Nigel Plum (LK) at PR; 2012: 8–0–16, 409–575)",
+        "Parramatta Eels 81.5 (27 players, 24 in the squad; 2012: 6–0–18, 431–674)"
+      ],
+      "clubShift": [
+        "Melbourne Storm: SRS +8.82, target 85.08, shift +1, strength 83.9 → 84.9",
+        "Canterbury-Bankstown Bulldogs: SRS +7.765, target 84.38, shift +1, strength 83.1 → 84.1",
+        "North Queensland Cowboys: SRS +6.158, target 84.15, shift +1, strength 83.6 → 84.6",
+        "South Sydney Rabbitohs: SRS +4.139, target 83.9, shift 0, strength 83.4 → 83.4",
+        "Manly Warringah Sea Eagles: SRS +2.926, target 83.87, shift +1, strength 83.1 → 84.1",
+        "Brisbane Broncos: SRS +1.637, target 83.66, shift 0, strength 83.5 → 83.5",
+        "Canberra Raiders: SRS +0.454, target 83.32, shift +1, strength 82.3 → 83.3",
+        "Cronulla-Sutherland Sharks: SRS +0.023, target 83.2, shift 0, strength 82.9 → 82.9",
+        "Gold Coast Titans: SRS -0.717, target 83.2, shift 0, strength 82.9 → 82.9",
+        "Newcastle Knights: SRS -1.105, target 83.02, shift 0, strength 83.1 → 83.1",
+        "St. George Illawarra Dragons: SRS -1.232, target 82.83, shift 0, strength 83.2 → 83.2",
+        "Wests Tigers: SRS -1.674, target 82.66, shift 0, strength 82.8 → 82.8",
+        "New Zealand Warriors: SRS -4.246, target 82.37, shift -1, strength 83.5 → 82.5",
+        "Sydney Roosters: SRS -6.54, target 82.13, shift 0, strength 82.6 → 82.6",
+        "Penrith Panthers: SRS -6.911, target 81.83, shift -1, strength 82.6 → 81.6",
+        "Parramatta Eels: SRS -9.497, target 81.8, shift -1, strength 82.5 → 81.5"
+      ],
+      "homeEdge": 1.781,
+      "strengthAndResults": {
+        "stats": 0.453,
+        "shifted": 0.91
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Nick Slyney: PR (RLP 7815)",
+        "nrl-canberra-raiders: Mark Nicholls: PR (RLP 19963)",
+        "nrl-canterbury-bankstown-bulldogs: James Gavet: PR (RLP 19980)",
+        "nrl-manly-warringah-sea-eagles: Nick Skinner: PR (RLP 19582)",
+        "nrl-new-zealand-warriors: Sam Lousi: SR (RLP 19973)",
+        "nrl-newcastle-knights: Chris Adams: HK (RLP 19768)",
+        "nrl-north-queensland-cowboys: Blake Leary: SR (RLP 20010)",
+        "nrl-parramatta-eels: Pat O'Hanlon: SR (RLP 17217)",
+        "nrl-penrith-panthers: Mitchell Achurch: SR (RLP 19581)",
+        "nrl-south-sydney-rabbitohs: Neccrom Areaiiti: PR (RLP 19418)",
+        "nrl-wests-tigers: Ray Cashmere: PR (RLP 1721)"
+      ],
+      "left": [
+        "nrl-newcastle-knights: Kyle O'Donnell (1 game): started at no position on NRL.com from 2010 to 2014, and the Rugby League Project gives no position for him (19967)",
+        "nrl-newcastle-knights: Marvin Filipo (2 games): started at no position on NRL.com from 2010 to 2014, and the Rugby League Project gives no position for him (17165)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.6875,
+          "WG": 3.8125,
+          "CE": 3.375,
+          "FE": 1.9375,
+          "HB": 1.4375,
+          "HK": 2.0625,
+          "PR": 5.5,
+          "SR": 5.0625,
+          "LK": 2.375
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 20.516,
+        "teamPointsSd": 10.807,
+        "draws": 1,
+        "marginMean": 13.781,
+        "byOne": 0.068,
+        "withinSix": 0.281,
+        "withinTwelve": 0.516,
+        "byThirteenPlus": 0.479,
+        "byTwentyFivePlus": 0.135,
+        "nilRate": 0.018,
+        "fortyPlusRate": 0.07,
+        "homeWins": 0.555,
+        "winPctSd": 0.145,
+        "bestWins": 18,
+        "worstWins": 6
+      }
+    },
+    {
+      "id": "nrl-2011",
+      "version": "nrl-2011-6a905fbb",
+      "season": "2011",
+      "edition": "NRL.com match centre, the 2011 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2010",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 465,
+        "bySeason": 417,
+        "bySeasonEitherSide": 32,
+        "byTwoEitherSide": 9,
+        "byRlp": 7,
+        "left": 3,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 95
+        }
+      },
+      "byPosition": {
+        "FB": "29 players (1.8125 a club), overall 70–91 (median 84), played 70–92",
+        "WG": "69 players (4.3125 a club), overall 68–90 (median 79), played 68–91",
+        "CE": "61 players (3.8125 a club), overall 68–91 (median 80), played 67–91",
+        "FE": "29 players (1.8125 a club), overall 70–90 (median 79), played 70–90",
+        "HB": "26 players (1.625 a club), overall 74–93 (median 82), played 74–95",
+        "HK": "38 players (2.375 a club), overall 68–91 (median 79), played 68–91",
+        "PR": "89 players (5.5625 a club), overall 70–93 (median 77), played 69–92",
+        "SR": "87 players (5.4375 a club), overall 69–91 (median 80), played 68–91",
+        "LK": "37 players (2.3125 a club), overall 70–92 (median 83), played 70–93"
+      },
+      "best": [
+        "Daly Cherry-Evans (MAN HB) 95",
+        "Corey Parker (BRI LK) 93",
+        "Luke Douglas (CRO PR) 92",
+        "Cooper Cronk (MEL HB) 92",
+        "Billy Slater (MEL FB) 92",
+        "Nathan Hindmarsh (PAR SR) 91",
+        "Robbie Farah (WST HK) 91",
+        "Cameron Smith (MEL HK) 91",
+        "Jarryd Hayne (PAR FB) 91",
+        "Anthony Watmough (MAN SR) 91",
+        "Akuila Uate (NEW WG) 91",
+        "Shaun Kenny-Dowall (SYD CE) 91"
+      ],
+      "clubs": [
+        "Manly Warringah Sea Eagles 84.9 (25 players, 24 in the squad; out of position: Tony Williams (SR) at PR, Jamie Buhrer (SR) at LK; 2011: 18–0–6, 539–331)",
+        "Melbourne Storm 84.5 (27 players, 24 in the squad; out of position: Sika Manu (SR) at PR; 2011: 19–0–5, 521–308)",
+        "Brisbane Broncos 83.8 (28 players, 24 in the squad; out of position: Gerard Beale (FB) at WG, Matt Gillett (SR) at LK; 2011: 18–0–6, 511–372)",
+        "St. George Illawarra Dragons 83.8 (28 players, 24 in the squad; out of position: Beau Scott (SR) at PR, Adam Cuthbertson (SR) at LK; 2011: 14–1–9, 483–341)",
+        "Newcastle Knights 83.7 (31 players, 24 in the squad; 2011: 12–0–12, 478–443)",
+        "New Zealand Warriors 83.6 (29 players, 24 in the squad; out of position: Lance Hohaia (FB) at CE, Elijah Taylor (SR) at LK; 2011: 14–0–10, 504–393)",
+        "Wests Tigers 83.6 (30 players, 24 in the squad; out of position: Simon Dwyer (SR) at HK; 2011: 15–0–9, 519–430)",
+        "North Queensland Cowboys 83.2 (28 players, 24 in the squad; out of position: Tariq Sims (SR) at PR, Scott Bolton (SR) at LK; 2011: 14–0–10, 532–480)",
+        "Sydney Roosters 83.2 (33 players, 24 in the squad; out of position: Aidan Guerra (SR) at PR; 2011: 10–0–14, 417–500)",
+        "Penrith Panthers 83.1 (28 players, 24 in the squad; out of position: Nigel Plum (SR) at PR; 2011: 9–0–15, 430–517)",
+        "South Sydney Rabbitohs 82.9 (26 players, 24 in the squad; 2011: 11–0–13, 531–562)",
+        "Canterbury-Bankstown Bulldogs 82.6 (30 players, 24 in the squad; out of position: Corey Payne (LK) at PR; 2011: 12–0–12, 449–489)",
+        "Parramatta Eels 82.5 (31 players, 24 in the squad; out of position: Jeff Robson (HB) at HK; 2011: 6–1–17, 385–538)",
+        "Cronulla-Sutherland Sharks 82.1 (31 players, 24 in the squad; out of position: Jayson Bukuya (SR) at PR; 2011: 7–0–17, 428–557)",
+        "Gold Coast Titans 82 (31 players, 24 in the squad; out of position: Anthony Laffranchi (SR) at PR; 2011: 6–0–18, 363–629)",
+        "Canberra Raiders 81.4 (29 players, 24 in the squad; 2011: 6–0–18, 423–623)"
+      ],
+      "clubShift": [
+        "Manly Warringah Sea Eagles: SRS +8.451, target 85.08, shift +2, strength 82.9 → 84.9",
+        "Melbourne Storm: SRS +8.018, target 84.38, shift +1, strength 83.5 → 84.5",
+        "Brisbane Broncos: SRS +5.249, target 84.15, shift +1, strength 82.8 → 83.8",
+        "St. George Illawarra Dragons: SRS +4.98, target 83.9, shift 0, strength 83.8 → 83.8",
+        "New Zealand Warriors: SRS +4.544, target 83.87, shift 0, strength 83.6 → 83.6",
+        "Wests Tigers: SRS +2.677, target 83.66, shift 0, strength 83.6 → 83.6",
+        "Newcastle Knights: SRS +1.642, target 83.32, shift +1, strength 82.7 → 83.7",
+        "North Queensland Cowboys: SRS +1.581, target 83.2, shift 0, strength 83.2 → 83.2",
+        "South Sydney Rabbitohs: SRS -0.813, target 83.2, shift 0, strength 82.9 → 82.9",
+        "Canterbury-Bankstown Bulldogs: SRS -1.536, target 83.02, shift -1, strength 83.6 → 82.6",
+        "Sydney Roosters: SRS -2.423, target 82.83, shift 0, strength 83.2 → 83.2",
+        "Penrith Panthers: SRS -2.743, target 82.66, shift 0, strength 83.1 → 83.1",
+        "Cronulla-Sutherland Sharks: SRS -5.548, target 82.37, shift -1, strength 83.1 → 82.1",
+        "Parramatta Eels: SRS -5.709, target 82.13, shift 0, strength 82.5 → 82.5",
+        "Canberra Raiders: SRS -8.04, target 81.83, shift -1, strength 82.4 → 81.4",
+        "Gold Coast Titans: SRS -10.33, target 81.8, shift 0, strength 82 → 82"
+      ],
+      "homeEdge": 3.224,
+      "strengthAndResults": {
+        "stats": 0.55,
+        "shifted": 0.919
+      },
+      "placedByRlp": [
+        "nrl-canterbury-bankstown-bulldogs: Trent Cutler: WG (RLP 1767)",
+        "nrl-manly-warringah-sea-eagles: Terence Seu Seu: HK (RLP 5560)",
+        "nrl-manly-warringah-sea-eagles: Tim Robinson: PR (RLP 16596)",
+        "nrl-north-queensland-cowboys: Isaak Ah Mau: PR (RLP 7733)",
+        "nrl-parramatta-eels: Billy Rogers: LK (RLP 16600)",
+        "nrl-parramatta-eels: Rory Brien: LK (RLP 17304)",
+        "nrl-wests-tigers: Jason Schirnack: LK (RLP 14511)"
+      ],
+      "left": [
+        "nrl-melbourne-storm: Sione Kite (1 game): started at no position on NRL.com from 2009 to 2013, and the Rugby League Project lists nobody of his name at Melbourne Storm in 2011",
+        "nrl-newcastle-knights: Marvin Filipo (2 games): started at no position on NRL.com from 2009 to 2013, and the Rugby League Project gives no position for him (17165)",
+        "nrl-south-sydney-rabbitohs: Deon Apps (2 games): started at no position on NRL.com from 2009 to 2013, and the Rugby League Project gives no position for him (17198)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.8125,
+          "WG": 4.3125,
+          "CE": 3.8125,
+          "FE": 1.8125,
+          "HB": 1.625,
+          "HK": 2.375,
+          "PR": 5.5625,
+          "SR": 5.4375,
+          "LK": 2.3125
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 19.565,
+        "teamPointsSd": 10.168,
+        "draws": 1,
+        "marginMean": 13.245,
+        "byOne": 0.047,
+        "withinSix": 0.255,
+        "withinTwelve": 0.542,
+        "byThirteenPlus": 0.453,
+        "byTwentyFivePlus": 0.125,
+        "nilRate": 0.016,
+        "fortyPlusRate": 0.049,
+        "homeWins": 0.613,
+        "winPctSd": 0.176,
+        "bestWins": 19,
+        "worstWins": 6
+      }
+    },
+    {
+      "id": "nrl-2010",
+      "version": "nrl-2010-3bbceb75",
+      "season": "2010",
+      "edition": "NRL.com match centre, the 2010 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2010",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 448,
+        "bySeason": 395,
+        "bySeasonEitherSide": 31,
+        "byTwoEitherSide": 6,
+        "byRlp": 16,
+        "left": 5,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 92
+        }
+      },
+      "byPosition": {
+        "FB": "29 players (1.8125 a club), overall 70–91 (median 84), played 70–92",
+        "WG": "62 players (3.875 a club), overall 68–90 (median 79), played 67–92",
+        "CE": "62 players (3.875 a club), overall 68–91 (median 80), played 67–92",
+        "FE": "24 players (1.5 a club), overall 70–90 (median 80), played 71–91",
+        "HB": "24 players (1.5 a club), overall 75–93 (median 84), played 75–92",
+        "HK": "42 players (2.625 a club), overall 67–91 (median 78), played 68–91",
+        "PR": "94 players (5.875 a club), overall 69–93 (median 77), played 68–92",
+        "SR": "75 players (4.6875 a club), overall 69–91 (median 81), played 70–90",
+        "LK": "36 players (2.25 a club), overall 70–92 (median 83), played 72–91"
+      },
+      "best": [
+        "Luke Douglas (CRO PR) 92",
+        "Trent Hodkinson (MAN HB) 92",
+        "Shaun Kenny-Dowall (SYD CE) 92",
+        "Cooper Cronk (MEL HB) 92",
+        "Brett Morris (SGI WG) 92",
+        "Billy Slater (MEL FB) 92",
+        "Mitchell Pearce (SYD HB) 92",
+        "Darius Boyd (SGI FB) 92",
+        "Robbie Farah (WST HK) 91",
+        "David Stagg (CBY LK) 91",
+        "Todd Carney (SYD FE) 91",
+        "Matt Gillett (BRI CE) 91"
+      ],
+      "clubs": [
+        "St. George Illawarra Dragons 85.1 (28 players, 24 in the squad; out of position: Nathan Fien (HB) at HK; 2010: 17–0–7, 518–299)",
+        "Penrith Panthers 84.4 (26 players, 24 in the squad; out of position: Nathan Smith (SR) at PR, Frank Pritchard (SR) at PR; 2010: 15–0–9, 645–489)",
+        "Sydney Roosters 84.1 (29 players, 24 in the squad; out of position: Joseph Leilua (WG) at CE, Aidan Guerra (SR) at LK, Tom Symonds (SR) at LK; 2010: 14–0–10, 559–510)",
+        "Melbourne Storm 84 (28 players, 24 in the squad; out of position: Kevin Proctor (SR) at PR, Sika Manu (SR) at PR; 2010: 14–0–10, 489–363)",
+        "New Zealand Warriors 83.8 (26 players, 24 in the squad; 2010: 14–0–10, 539–486)",
+        "Gold Coast Titans 83.6 (30 players, 24 in the squad; out of position: William Zillman (FB) at CE; 2010: 15–0–9, 520–498)",
+        "Manly Warringah Sea Eagles 83.3 (24 players, 24 in the squad; out of position: Joe Galuvao (SR) at PR; 2010: 12–0–12, 545–510)",
+        "South Sydney Rabbitohs 83.3 (28 players, 24 in the squad; out of position: Eddy Pettybourne (SR) at PR; 2010: 11–0–13, 584–567)",
+        "Brisbane Broncos 83.1 (26 players, 24 in the squad; out of position: Josh McGuire (SR) at LK; 2010: 11–0–13, 508–535)",
+        "Canberra Raiders 82.9 (29 players, 24 in the squad; out of position: Shaun Fensom (LK) at PR; 2010: 13–0–11, 499–493)",
+        "Canterbury-Bankstown Bulldogs 82.9 (32 players, 24 in the squad; 2010: 9–0–15, 494–539)",
+        "Wests Tigers 82.9 (30 players, 24 in the squad; out of position: Andrew Fifita (SR) at HK, Mark Flanagan (SR) at PR, Simon Dwyer (SR) at LK; 2010: 15–0–9, 537–503)",
+        "Newcastle Knights 82.8 (27 players, 24 in the squad; out of position: Steve Simpson (SR) at PR; 2010: 10–0–14, 499–569)",
+        "Parramatta Eels 82.2 (26 players, 24 in the squad; out of position: Justin Horo (SR) at LK; 2010: 10–0–14, 413–491)",
+        "Cronulla-Sutherland Sharks 81.8 (27 players, 24 in the squad; out of position: Broderick Wright (SR) at LK; 2010: 7–0–17, 354–609)",
+        "North Queensland Cowboys 81.5 (32 players, 24 in the squad; 2010: 5–0–19, 425–667)"
+      ],
+      "clubShift": [
+        "St. George Illawarra Dragons: SRS +8.382, target 85.08, shift +2, strength 83.1 → 85.1",
+        "Penrith Panthers: SRS +5.713, target 84.38, shift +2, strength 82.4 → 84.4",
+        "Melbourne Storm: SRS +4.567, target 84.15, shift +1, strength 83 → 84",
+        "New Zealand Warriors: SRS +1.985, target 83.9, shift +1, strength 82.8 → 83.8",
+        "Sydney Roosters: SRS +1.604, target 83.87, shift +2, strength 82.1 → 84.1",
+        "Manly Warringah Sea Eagles: SRS +1.504, target 83.66, shift -1, strength 84.3 → 83.3",
+        "South Sydney Rabbitohs: SRS +1.501, target 83.32, shift 0, strength 83.3 → 83.3",
+        "Wests Tigers: SRS +1.28, target 83.2, shift 0, strength 82.9 → 82.9",
+        "Gold Coast Titans: SRS +0.935, target 83.2, shift 0, strength 83.6 → 83.6",
+        "Canberra Raiders: SRS +0.656, target 83.02, shift 0, strength 82.9 → 82.9",
+        "Canterbury-Bankstown Bulldogs: SRS -1.111, target 82.83, shift -1, strength 83.9 → 82.9",
+        "Brisbane Broncos: SRS -1.556, target 82.66, shift 0, strength 83.1 → 83.1",
+        "Newcastle Knights: SRS -3.078, target 82.37, shift +1, strength 81.8 → 82.8",
+        "Parramatta Eels: SRS -3.4, target 82.13, shift -2, strength 84.2 → 82.2",
+        "North Queensland Cowboys: SRS -9.411, target 81.83, shift 0, strength 81.5 → 81.5",
+        "Cronulla-Sutherland Sharks: SRS -9.571, target 81.8, shift -1, strength 82.8 → 81.8"
+      ],
+      "homeEdge": 4.344,
+      "strengthAndResults": {
+        "stats": 0.059,
+        "shifted": 0.819
+      },
+      "placedByRlp": [
+        "nrl-canterbury-bankstown-bulldogs: Tim Browne: PR (RLP 14526)",
+        "nrl-cronulla-sutherland-sharks: Lancen Joudo: HK (RLP 13971)",
+        "nrl-cronulla-sutherland-sharks: Siosaia Vave: PR (RLP 14514)",
+        "nrl-gold-coast-titans: Shannon Walker: FB (RLP 7728)",
+        "nrl-manly-warringah-sea-eagles: Terence Seu Seu: HK (RLP 5560)",
+        "nrl-north-queensland-cowboys: Nick Slyney: PR (RLP 7815)",
+        "nrl-north-queensland-cowboys: Isaak Ah Mau: PR (RLP 7733)",
+        "nrl-north-queensland-cowboys: Jason Taumalolo: LK (RLP 15034)",
+        "nrl-parramatta-eels: Pele Peletelese: PR (RLP 15024)",
+        "nrl-south-sydney-rabbitohs: Garret Crossman: PR (RLP 1358)",
+        "nrl-south-sydney-rabbitohs: Craig Stapleton: PR (RLP 2309)",
+        "nrl-st-george-illawarra-dragons: Cameron King: HK (RLP 15039)",
+        "nrl-sydney-roosters: Daniel Fepuleai: HK (RLP 14528)",
+        "nrl-sydney-roosters: Jason Baitieri: LK (RLP 14540)",
+        "nrl-wests-tigers: Jason Cayless: PR (RLP 841)",
+        "nrl-wests-tigers: Jason Schirnack: LK (RLP 14511)"
+      ],
+      "left": [
+        "nrl-brisbane-broncos: Michael Spence (1 game): started at no position on NRL.com from 2008 to 2012, and the Rugby League Project gives no position for him (14541)",
+        "nrl-canterbury-bankstown-bulldogs: Danny Williams (1 game): started at no position on NRL.com from 2008 to 2012, and the Rugby League Project gives no position for him (5691)",
+        "nrl-cronulla-sutherland-sharks: Luke Harlen (3 games): started at no position on NRL.com from 2008 to 2012, and the Rugby League Project gives no position for him (3529)",
+        "nrl-melbourne-storm: Sione Kite (2 games): started at no position on NRL.com from 2008 to 2012, and the Rugby League Project lists nobody of his name at Melbourne Storm in 2010",
+        "nrl-wests-tigers: Nathan Waters (1 game): started at no position on NRL.com from 2008 to 2012, and the Rugby League Project gives no position for him (14539)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.8125,
+          "WG": 3.875,
+          "CE": 3.875,
+          "FE": 1.5,
+          "HB": 1.5,
+          "HK": 2.625,
+          "PR": 5.875,
+          "SR": 4.6875,
+          "LK": 2.25
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 21.167,
+        "teamPointsSd": 10.982,
+        "draws": 0,
+        "marginMean": 13.938,
+        "byOne": 0.031,
+        "withinSix": 0.297,
+        "withinTwelve": 0.521,
+        "byThirteenPlus": 0.479,
+        "byTwentyFivePlus": 0.156,
+        "nilRate": 0.008,
+        "fortyPlusRate": 0.057,
+        "homeWins": 0.557,
+        "winPctSd": 0.131,
+        "bestWins": 17,
+        "worstWins": 5
+      }
+    },
+    {
+      "id": "nrl-2009",
+      "version": "nrl-2009-7c7ff14e",
+      "season": "2009",
+      "edition": "NRL.com match centre, the 2009 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2008",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 449,
+        "bySeason": 398,
+        "bySeasonEitherSide": 30,
+        "byTwoEitherSide": 11,
+        "byRlp": 10,
+        "left": 4,
+        "inSquads": 384
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 66,
+          "median": 80,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "28 players (1.75 a club), overall 70–91 (median 84), played 71–91",
+        "WG": "64 players (4 a club), overall 68–90 (median 79), played 67–91",
+        "CE": "61 players (3.8125 a club), overall 68–91 (median 80), played 66–92",
+        "FE": "26 players (1.625 a club), overall 70–90 (median 80), played 68–90",
+        "HB": "27 players (1.6875 a club), overall 74–93 (median 79), played 75–93",
+        "HK": "40 players (2.5 a club), overall 68–91 (median 78), played 70–92",
+        "PR": "92 players (5.75 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "78 players (4.875 a club), overall 69–91 (median 81), played 67–91",
+        "LK": "33 players (2.0625 a club), overall 70–92 (median 84), played 70–92"
+      },
+      "best": [
+        "Cooper Cronk (MEL HB) 93",
+        "Luke Douglas (CRO PR) 93",
+        "Robbie Farah (WST HK) 92",
+        "David Stagg (BUL LK) 92",
+        "Shane Tronc (NQC PR) 92",
+        "Jarrod Mullen (NEW HB) 92",
+        "Beau Scott (SGI CE) 92",
+        "Anthony Laffranchi (GCT SR) 91",
+        "Nathan Friend (GCT HK) 91",
+        "Billy Slater (MEL FB) 91",
+        "Johnathan Thurston (NQC HB) 91",
+        "Kurt Gidley (NEW FB) 91"
+      ],
+      "clubs": [
+        "St. George Illawarra Dragons 85.2 (27 players, 24 in the squad; out of position: Matt Prior (SR) at PR; 2009: 17–0–7, 548–329)",
+        "Melbourne Storm 84.2 (28 players, 24 in the squad; out of position: Matthew Cross (SR) at LK; 2009: 14–1–9, 505–348)",
+        "Wests Tigers 84 (28 players, 24 in the squad; no player of the unit for HK; out of position: Dene Halatau (CE) at HK, Danny Galea (SR) at LK; 2009: 12–0–12, 558–483)",
+        "North Queensland Cowboys 83.9 (27 players, 24 in the squad; out of position: Luke O'Donnell (LK) at PR; 2009: 11–0–13, 558–474)",
+        "Bulldogs 83.8 (26 players, 24 in the squad; out of position: Gary Warburton (SR) at PR; 2009: 18–0–6, 575–428)",
+        "Gold Coast Titans 83.8 (26 players, 24 in the squad; out of position: Brad Meyers (LK) at PR, Preston Campbell (FE) at HK; 2009: 16–0–8, 514–467)",
+        "Newcastle Knights 83.6 (29 players, 24 in the squad; out of position: Cory Paterson (SR) at LK; 2009: 13–0–11, 508–491)",
+        "Manly Warringah Sea Eagles 83.4 (25 players, 24 in the squad; out of position: Shane Rodney (SR) at LK; 2009: 14–0–10, 549–459)",
+        "South Sydney Rabbitohs 83.4 (28 players, 24 in the squad; out of position: Craig Wing (LK) at PR, Shannan McPherson (SR) at PR; 2009: 11–1–12, 566–549)",
+        "Brisbane Broncos 83 (30 players, 24 in the squad; out of position: Ashton Sims (SR) at PR, Lagi Setu (SR) at LK; 2009: 14–0–10, 511–566)",
+        "Canberra Raiders 82.8 (29 players, 24 in the squad; out of position: Tom Learoyd-Lahrs (SR) at PR; 2009: 9–0–15, 489–520)",
+        "Parramatta Eels 82.7 (27 players, 24 in the squad; out of position: Ben Smith (SR) at PR; 2009: 12–1–11, 476–473)",
+        "Penrith Panthers 81.9 (28 players, 24 in the squad; out of position: Gavin Cooper (SR) at PR; 2009: 11–1–12, 515–589)",
+        "New Zealand Warriors 81.8 (28 players, 24 in the squad; out of position: Lewis Brown (SR) at LK; 2009: 7–2–15, 377–565)",
+        "Sydney Roosters 81.8 (31 players, 24 in the squad; out of position: Shane Shackleton (PR) at LK; 2009: 5–0–19, 382–681)",
+        "Cronulla-Sutherland Sharks 81.7 (32 players, 24 in the squad; out of position: Reece Williams (SR) at LK; 2009: 5–0–19, 359–568)"
+      ],
+      "clubShift": [
+        "St. George Illawarra Dragons: SRS +7.958, target 85.08, shift +1, strength 84.2 → 85.2",
+        "Melbourne Storm: SRS +6.13, target 84.38, shift 0, strength 84.2 → 84.2",
+        "Bulldogs: SRS +5.947, target 84.15, shift 0, strength 83.8 → 83.8",
+        "North Queensland Cowboys: SRS +3.512, target 83.9, shift +2, strength 81.9 → 83.9",
+        "Manly Warringah Sea Eagles: SRS +3.432, target 83.87, shift 0, strength 83.4 → 83.4",
+        "Wests Tigers: SRS +3.156, target 83.66, shift +1, strength 83 → 84",
+        "Gold Coast Titans: SRS +2.321, target 83.32, shift +2, strength 81.8 → 83.8",
+        "Newcastle Knights: SRS +0.507, target 83.2, shift +1, strength 82.6 → 83.6",
+        "South Sydney Rabbitohs: SRS +0.39, target 83.2, shift 0, strength 83.4 → 83.4",
+        "Parramatta Eels: SRS +0.02, target 83.02, shift -1, strength 83.7 → 82.7",
+        "Canberra Raiders: SRS -1.336, target 82.83, shift 0, strength 82.8 → 82.8",
+        "Brisbane Broncos: SRS -2.187, target 82.66, shift +1, strength 82 → 83",
+        "Penrith Panthers: SRS -2.603, target 82.37, shift -1, strength 82.9 → 81.9",
+        "New Zealand Warriors: SRS -7.209, target 82.13, shift -2, strength 83.8 → 81.8",
+        "Cronulla-Sutherland Sharks: SRS -8.456, target 81.83, shift 0, strength 81.7 → 81.7",
+        "Sydney Roosters: SRS -11.583, target 81.8, shift 0, strength 81.8 → 81.8"
+      ],
+      "homeEdge": 3.823,
+      "strengthAndResults": {
+        "stats": 0.477,
+        "shifted": 0.716
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Michael De Vere: CE (RLP 1271)",
+        "nrl-brisbane-broncos: David Hala: PR (RLP 13948)",
+        "nrl-cronulla-sutherland-sharks: Lancen Joudo: HK (RLP 13971)",
+        "nrl-gold-coast-titans: Kayne Lawton: HK (RLP 13946)",
+        "nrl-new-zealand-warriors: Daniel O'Regan: FE (RLP 13734)",
+        "nrl-newcastle-knights: Tim Natusch: PR (RLP 13587)",
+        "nrl-newcastle-knights: Sione Tovo: PR (RLP 13974)",
+        "nrl-sydney-roosters: Stanley Waqa: PR (RLP 13899)",
+        "nrl-sydney-roosters: Ray Moujalli: PR (RLP 8431)",
+        "nrl-sydney-roosters: Khaild Deeb: PR (RLP 14025)"
+      ],
+      "left": [
+        "nrl-bulldogs: Sione Kite (5 games): started at no position on NRL.com from 2007 to 2011, and the Rugby League Project lists nobody of his name at Bulldogs in 2009",
+        "nrl-cronulla-sutherland-sharks: Tim Weyman (1 game): started at no position on NRL.com from 2007 to 2011, and the Rugby League Project gives no position for him (13970)",
+        "nrl-gold-coast-titans: Selasi Berdie (1 game): started at no position on NRL.com from 2007 to 2011, and the Rugby League Project gives no position for him (7861)",
+        "nrl-sydney-roosters: Rohan Ahern (4 games): started at no position on NRL.com from 2007 to 2011, and the Rugby League Project gives no position for him (13733)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.75,
+          "WG": 4,
+          "CE": 3.8125,
+          "FE": 1.625,
+          "HB": 1.6875,
+          "HK": 2.5,
+          "PR": 5.75,
+          "SR": 4.875,
+          "LK": 2.0625
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 20.807,
+        "teamPointsSd": 11.015,
+        "draws": 3,
+        "marginMean": 14.323,
+        "byOne": 0.036,
+        "withinSix": 0.297,
+        "withinTwelve": 0.5,
+        "byThirteenPlus": 0.484,
+        "byTwentyFivePlus": 0.172,
+        "nilRate": 0.021,
+        "fortyPlusRate": 0.07,
+        "homeWins": 0.619,
+        "winPctSd": 0.153,
+        "bestWins": 18,
+        "worstWins": 5
+      }
+    },
+    {
       "id": "nrl-2008",
       "version": "nrl-2008-062aacd4",
       "season": "2008",

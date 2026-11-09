@@ -345,10 +345,11 @@ export const SEASON_NOTES = Object.freeze({
     + 'players of each country, and only where they hold at least half the lineup.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
     + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
-    + 'least half a matchday 17. 2008 '
+    + 'least half a matchday 17. No game rated 2009–2024: they are computed, each player\'s NRL.com match stats ranked at his '
+    + 'position onto Rugby League 26\'s ratings, each club then moved by its results that season. 2008 '
     + 'comes from Rugby League 2: World Cup Edition\'s database, every player checked against the Rugby League Project. '
     + 'The game rates attributes, not players, so the overall is ours, each club then moved by the game\'s own team '
-    + 'rating. It has NRL clubs only, on the map of 2008.',
+    + 'rating. Earlier seasons have NRL clubs only, on the map of their day.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive (2011/12 by The '
     + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
     + 'They have NBA clubs only: the franchises of that season, on the map of their day.',

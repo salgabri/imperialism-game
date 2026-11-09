@@ -1,8 +1,9 @@
 // Rugby league's earlier seasons (docs/design/rugby-league.md, "Earlier seasons"): the 2008 NRL season from Rugby League
 // 2: World Cup Edition's database. The database's reader, the Rugby League Project pages it is checked against, the rule
 // that names a database player as a real one, and the overall, which is ours: the game rates twelve attributes from 1 to
-// 10 and gives no overall. No I/O here: scripts/sync-rugby-league-seasons.mjs reads the pinned inputs and writes the
-// snapshot, scripts/build-rugby-league-seasons.mjs builds the season from it.
+// 10 and gives no overall. Then the seasons no game rated, 2009–2024, computed from NRL.com's match centre ("the
+// computed seasons", below). No I/O here: scripts/sync-rugby-league-seasons.mjs reads the pinned inputs and writes the
+// snapshots, scripts/build-rugby-league-seasons.mjs builds the seasons from them.
 import { NATIONS, RUGBY_NEAR_PENALTY, buildClub, makeRng, teamEff } from '../../src/data/teams.js';
 import { BASELINE, rugbyLeague } from '../../src/sports/rugbyLeague.js';
 import { rosterOf } from './nrl.mjs';
@@ -154,11 +155,12 @@ export function squadsPart(html) {
 export const testsPart = html => between(html, '<table class="list x">', '</table>', 'players table');
 /** A season's results page: its results table. */
 export const resultsPart = html => between(html, '<table class="list is"', '</table>', 'results table');
-/** A player page: his name and date of birth. */
+/** A player page: his name, date of birth and career positions (which the computed seasons read). */
 export function playerPart(html) {
   const name = between(html, '<h1>', '</h1>', 'name');
   const born = html.match(/<dt>Born<\/dt><dd>[^<]*<\/dd>/)?.[0] ?? '';
-  return `${name}\n${born}`;
+  const positions = html.match(/<dt>Position\(s\)<\/dt><dd>[^<]*<\/dd>/)?.[0] ?? '';
+  return `${name}\n${born}\n${positions}`;
 }
 
 /**
@@ -587,25 +589,28 @@ function roundRobin(n) {
 /**
  * Plays `seasons` seeded seasons of `clubs` (a season file's), 24 games each, every game at a neutral venue at Balanced,
  * as scripts/simulation-realism.mjs plays the built-in clubs, and measures what it measures of the NRL: points, margins and
- * the standings, and each club's mean record (`clubs`, strongest first).
+ * the standings, and each club's mean record (`clubs`, strongest first). An odd number of clubs (the seventeen of 2023
+ * on) adds a bye, as the NRL's draw has one: each round one club sits out, over enough rounds that each plays 24 or 25,
+ * and records count by games played.
  */
 export function playSeasons(clubs, { seasons = 40, seed = 20261108, games = 24 } = {}) {
   const teams = clubs.map(club => buildClub(club, rugbyLeague));
   const eff = teams.map(teamEff);
   const rng = makeRng(seed);
-  const n = teams.length;
-  if (n % 2) throw new Error('playSeasons takes an even number of clubs');
+  const n = teams.length, slots = n % 2 ? n + 1 : n;
+  const roundsPlayed = slots === n ? games : Math.ceil(games * slots / n);
   const points = [], margins = [], spreads = [], best = [], worst = [];
   const totals = teams.map(() => ({ wins: 0, for: 0, against: 0, played: 0 }));
   for (let s = 0; s < seasons; s++) {
-    const order = [...Array(n).keys()];
-    for (let i = n - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-    const rounds = roundRobin(n);
+    const order = [...Array(slots).keys()];
+    for (let i = slots - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    const rounds = roundRobin(slots);
     const table = teams.map(() => ({ won: 0, played: 0 }));
-    for (let g = 0; g < games; g++) {
+    for (let g = 0; g < roundsPlayed; g++) {
       const flip = Math.floor(g / rounds.length) % 2 === 1;
       for (const [x, y] of rounds[g % rounds.length]) {
         const [i, j] = flip ? [order[y], order[x]] : [order[x], order[y]];
+        if (i >= n || j >= n) continue;
         const result = rugbyLeague.simulate(rng, teams[i], teams[j], 6, eff[i], eff[j]);
         points.push(result.ga, result.gd);
         margins.push(Math.abs(result.ga - result.gd));
@@ -675,4 +680,235 @@ export function seasonFigures(games) {
     bestWins: Math.max(...Object.values(records).map(r => r.won)), worstWins: Math.min(...Object.values(records).map(r => r.won)),
     records,
   };
+}
+
+// ---------- the computed seasons: NRL.com's match centre ----------
+//
+// No game rated the NRL's seasons from 2009 to 2024. Each is computed from what NRL.com's match centre recorded of it
+// (its team lists and player stats): a player's season is scored at NRL Fantasy's points for the stats NRL.com has kept
+// since 2003, ranked within his position and read off Rugby League 26's overalls there, as 2008's attribute overall is
+// read; then each club moves by its results that season (its Simple Rating System), as 2008's moves by the game's own
+// team rating.
+
+/** NRL.com's team-list positions, as the game's. A player listed at one started there, whatever his jersey number. */
+export const NRLCOM_POSITION = Object.freeze({ Fullback: 'FB', Winger: 'WG', Centre: 'CE', 'Five-Eighth': 'FE', Halfback: 'HB',
+  Prop: 'PR', Hooker: 'HK', '2nd Row': 'SR', Lock: 'LK' });
+/** NRL.com's names for a place off the field at kick-off: the interchange, the 18th and 19th men, and one it did not record. */
+export const NRLCOM_BENCH = Object.freeze(['Interchange', 'Replacement', 'Reserve', 'Unknown']);
+/** The Rugby League Project's career positions (a player page's "Position(s)"), as the game's. */
+export const RLP_POSITION = Object.freeze({ Fullback: 'FB', Wing: 'WG', Centre: 'CE', 'Five-eighth': 'FE', Halfback: 'HB',
+  'Front row': 'PR', Hooker: 'HK', 'Second row': 'SR', Lock: 'LK' });
+
+/**
+ * The stats a player's game counts, by NRL.com's names, at NRL Fantasy's points: the eleven NRL.com has kept since 2003.
+ * Least squares on NRL.com's own fantasy totals (7,344 player-games of 2025) recovers them: 8.03, 5.13, 3.98, 2.16, 1.02,
+ * −1.95, 2.06, 3.66, −1.97, 0.1008 a metre run and 0.0328 a metre kicked. Goals and field goals count nowhere, as in
+ * 2008's overall: the match model converts every try at the NRL's rate, whoever kicks. CORE_REASONS gives each its reason.
+ */
+export const CORE = Object.freeze({ tries: 8, tryAssists: 5, lineBreaks: 4, lineBreakAssists: 2, tacklesMade: 1, missedTackles: -2,
+  tackleBreaks: 2, offloads: 4, errors: -2, allRunMetres: 1 / 10, kickMetres: 1 / 30 });
+/** Why each stat counts, and at its weight. */
+export const CORE_REASONS = Object.freeze({
+  tries: 'the try is what the game is played for: NRL Fantasy\'s biggest award',
+  tryAssists: 'the last pass or kick before a try',
+  lineBreaks: 'a run through the defensive line, the best gain short of a try',
+  lineBreakAssists: 'the pass that puts a runner through the line',
+  tacklesMade: 'a point a tackle: defence is half the game, and most of the middle forwards\' work',
+  missedTackles: 'a missed tackle lets the attack through: twice a tackle\'s worth taken away',
+  tackleBreaks: 'beating a tackler in contact',
+  offloads: 'keeping the ball alive through the tackle',
+  errors: 'a knock-on or other error hands the ball over',
+  allRunMetres: 'a point every ten metres carried: the forwards\' and outside backs\' work',
+  kickMetres: 'a point every thirty metres kicked: territory, the halves\' and fullbacks\' work',
+});
+/** The stats a snapshot keeps of a player's season, in this order: the counted ones, then his minutes, goals and field goals. */
+export const KEPT = Object.freeze([...Object.keys(CORE), 'minutesPlayed', 'goals', 'fieldGoals']);
+/** The season before counts at this weight beside the season itself, when he played in it. */
+export const PREVIOUS_WEIGHT = 0.5;
+// CORE in thirtieths of a point, whole numbers, so that a season's points add up exactly.
+const CORE_30 = Object.values(CORE).map(points => Math.round(points * 30));
+
+/** A season's core points from its stats' sums (`sums`, CORE's order first): exact, four decimals. */
+export function corePoints(sums) {
+  if (!Array.isArray(sums) || sums.length < CORE_30.length) throw new Error('No stats to count');
+  let thirtieths = 0;
+  CORE_30.forEach((points, i) => {
+    if (!Number.isInteger(sums[i])) throw new Error(`${Object.keys(CORE)[i]} ${sums[i]} is not a whole number`);
+    thirtieths += points * sums[i];
+  });
+  return Math.round(thirtieths / 30 * 1e4) / 1e4 + 0;
+}
+
+/**
+ * A player's value, his core points a club game: the season's in full, and the season before's at PREVIOUS_WEIGHT when
+ * he played in it, over his club's games in each (the mean of his clubs' where he played for two). `season` and
+ * `previous` are `{ points, clubGames }`; six decimals.
+ */
+export function seasonValue(season, previous = null) {
+  const points = season.points + (previous ? PREVIOUS_WEIGHT * previous.points : 0);
+  const games = season.clubGames + (previous ? PREVIOUS_WEIGHT * previous.clubGames : 0);
+  if (!(games > 0)) throw new Error('A value needs club games');
+  return Math.round(points / games * 1e6) / 1e6 + 0;
+}
+
+/** The mean of the clubs' game counts: `clubs` a player's `[[club, his games there], …]`, `counts` each club's games. */
+export function clubGamesOf(clubs, counts) {
+  const values = clubs.map(([club]) => {
+    if (!Number.isInteger(counts[club])) throw new Error(`No game count for ${club}`);
+    return counts[club];
+  });
+  return values.reduce((s, v) => s + v, 0) / values.length;
+}
+
+/** A season's rounds, from its draw reply: `[[value, name]]` in order. */
+export function drawRounds(body) {
+  const rounds = (body?.filterRounds || []).map(round => [round.value, String(round.name)]);
+  if (!rounds.length || rounds.some(([value]) => !Number.isInteger(value))) throw new Error('The draw offers no rounds');
+  return rounds.sort((a, b) => a[0] - b[0]);
+}
+
+/**
+ * A round's finished games, from its draw reply, in the draw's order: `[{ url, title, kickOff, venue, city, home: [teamId,
+ * nickname, score], away: […] }]`. The draw's score is the result.
+ */
+export function drawGames(body) {
+  return (body?.fixtures || []).filter(f => f.type === 'Match' && f.matchState === 'FullTime' && f.matchCentreUrl).map(f => ({
+    url: f.matchCentreUrl, title: f.roundTitle, kickOff: f.clock?.kickOffTimeLong ?? null, venue: f.venue ?? null, city: f.venueCity ?? null,
+    home: [f.homeTeam.teamId, f.homeTeam.nickName, f.homeTeam.score], away: [f.awayTeam.teamId, f.awayTeam.nickName, f.awayTeam.score] }));
+}
+
+/**
+ * A game's team lists, from its match centre reply, as a snapshot reads them: `{ id, title, home, away }`, each side
+ * `{ team, score, players }`, a row a player, `[playerId, name, position, jersey, ...KEPT]` (a stat the reply does not
+ * give him 0); null when the reply has no team lists.
+ */
+export function matchRecord(body) {
+  if (!body?.homeTeam?.players?.length || !body?.awayTeam?.players?.length) return null;
+  const side = key => {
+    const team = body[key];
+    const stats = new Map((body.stats?.players?.[key] || []).map(row => [row.playerId, row]));
+    return { team: team.teamId, score: team.score, players: team.players.map(p => {
+      const row = stats.get(p.playerId) || {};
+      return [p.playerId, `${p.firstName ?? ''} ${p.lastName ?? ''}`.replace(/\s+/g, ' ').trim(), p.position, p.number,
+        ...KEPT.map(stat => (Number.isFinite(row[stat]) ? row[stat] : 0))];
+    }) };
+  };
+  return { id: body.matchId, title: body.roundTitle, home: side('homeTeam'), away: side('awayTeam') };
+}
+
+/**
+ * Whether a team-list row (matchRecord's) took the field: a player listed at a position started there; one named off
+ * the field (NRLCOM_BENCH) played only if NRL.com gives him minutes or any counted stat. An unused interchange or 18th man
+ * has neither; where NRL.com kept no minutes for a game, the bench count by their stats alone.
+ */
+export function tookField(row) {
+  const [, name, position] = row;
+  if (Object.hasOwn(NRLCOM_POSITION, position)) return true;
+  if (!NRLCOM_BENCH.includes(position)) throw new Error(`${name}: the team-list place ${JSON.stringify(position)} is no position NRL.com uses`);
+  return KEPT.some((stat, i) => row[4 + i] !== 0 && (stat === 'minutesPlayed' || Object.hasOwn(CORE, stat)));
+}
+
+/**
+ * A season's players from its games (`[{ order, home: { club, players }, away: { club, players } }]`, `order` rising with
+ * the games' kick-offs across seasons, `players` the side's team-list rows or null where NRL.com has none), by NRL.com's
+ * player id: `{ id, name, games, clubs, lastAt, starts, lastStart, sums }`, the games he took the field in (tookField) by
+ * club and the order of his last for each, his starts by position and the order of his last at each, and his KEPT
+ * stats summed. His name is the one of his last game.
+ */
+export function seasonPlayers(games) {
+  const players = new Map();
+  for (const game of games) {
+    for (const side of [game.home, game.away]) {
+      for (const row of side.players || []) {
+        if (!tookField(row)) continue;
+        const [id, name, position] = row;
+        let player = players.get(id);
+        if (!player) players.set(id, player = { id, name, games: 0, clubs: {}, lastAt: {}, starts: {}, lastStart: {}, sums: KEPT.map(() => 0) });
+        player.name = name;
+        player.games++;
+        player.clubs[side.club] = (player.clubs[side.club] || 0) + 1;
+        player.lastAt[side.club] = game.order;
+        const pos = NRLCOM_POSITION[position];
+        if (pos) {
+          player.starts[pos] = (player.starts[pos] || 0) + 1;
+          player.lastStart[pos] = game.order;
+        }
+        KEPT.forEach((stat, i) => { player.sums[i] += row[4 + i]; });
+      }
+    }
+  }
+  return players;
+}
+
+/** The club a player played most games for; of two as many, the one he played for last. */
+export function clubOf(player) {
+  return Object.keys(player.clubs).sort((a, b) => player.clubs[b] - player.clubs[a] || player.lastAt[b] - player.lastAt[a])[0];
+}
+
+/**
+ * The position a player started at most over `records` (his records of one season or more, seasonPlayers'); of two as
+ * often, the one he started at last. Null if he started at none.
+ */
+export function mostStarted(records) {
+  const starts = {}, last = {};
+  for (const record of records) {
+    for (const [pos, count] of Object.entries(record?.starts || {})) {
+      starts[pos] = (starts[pos] || 0) + count;
+      last[pos] = Math.max(last[pos] ?? -Infinity, record.lastStart[pos]);
+    }
+  }
+  return Object.keys(starts).sort((a, b) => starts[b] - starts[a] || last[b] - last[a])[0] ?? null;
+}
+
+/**
+ * A Rugby League Project player page's career positions (its "Position(s)"), as the game's, in its order. "Utility
+ * Forward" (a bench forward's) names no position and is passed over; a page may list no position at all.
+ */
+export function rlpPositions(html) {
+  const listed = String(html).match(/<dt>Position\(s\)<\/dt><dd>([^<]*)<\/dd>/);
+  if (!listed) return [];
+  return decode(listed[1]).split('/').map(name => name.trim()).filter(name => name && !/^Utility\b/.test(name)).map(name => {
+    if (!Object.hasOwn(RLP_POSITION, name)) throw new Error(`RLP's position ${JSON.stringify(name)} is no position of the game's`);
+    return RLP_POSITION[name];
+  });
+}
+
+/**
+ * The Simple Rating System of a season's games (`[{ home, away, homeScore, awayScore }]`): each club's rating and one home
+ * edge that fit every margin as the home club's rating less the away club's, plus the edge, by least squares, the
+ * ratings summing to zero. Solved exactly: the normal equations with that constraint, by Gaussian elimination. →
+ * `{ ratings: { club: rating }, homeEdge }`, in points a game, three decimals.
+ */
+export function srsOf(games) {
+  const clubs = [...new Set(games.flatMap(game => [game.home, game.away]))].sort();
+  const n = clubs.length, at = new Map(clubs.map((club, i) => [club, i]));
+  // Unknowns: the n ratings, the home edge and the constraint's multiplier; the last column is the right-hand side.
+  const size = n + 2;
+  const m = Array.from({ length: size }, () => new Array(size + 1).fill(0));
+  for (const game of games) {
+    const row = new Array(n + 1).fill(0);
+    row[at.get(game.home)] += 1;
+    row[at.get(game.away)] -= 1;
+    row[n] = 1;
+    const margin = game.homeScore - game.awayScore;
+    for (let i = 0; i <= n; i++) {
+      if (!row[i]) continue;
+      for (let j = 0; j <= n; j++) m[i][j] += row[i] * row[j];
+      m[i][size] += row[i] * margin;
+    }
+  }
+  for (let i = 0; i < n; i++) { m[i][n + 1] = 1; m[n + 1][i] = 1; }
+  for (let col = 0; col < size; col++) {
+    let pivot = col;
+    for (let r = col + 1; r < size; r++) if (Math.abs(m[r][col]) > Math.abs(m[pivot][col])) pivot = r;
+    if (Math.abs(m[pivot][col]) < 1e-12) throw new Error('The games do not rate every club');
+    [m[col], m[pivot]] = [m[pivot], m[col]];
+    for (let r = 0; r < size; r++) {
+      if (r === col || !m[r][col]) continue;
+      const factor = m[r][col] / m[col][col];
+      for (let c = col; c <= size; c++) m[r][c] -= factor * m[col][c];
+    }
+  }
+  const round = value => Math.round(value * 1000) / 1000 + 0;
+  return { ratings: Object.fromEntries(clubs.map((club, i) => [club, round(m[i][size] / m[i][i])])), homeEdge: round(m[n][size] / m[n][n]) };
 }
