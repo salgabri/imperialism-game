@@ -1,0 +1,34 @@
+{
+  "note": "The seasons the football squad gate scores (npm run validate:football, scripts/football-validate.mjs; docs/design/football-squad-gate.md), newest first. squads names where a season's national XIs come from: built-in (src/data/rosters.js) or a season file id (public/football/<id>.json). ratingsDate is D_Y, the EA snapshot the ratings date from; informationDate is R_Y, the release of the newest input (the FM database when it is later than EA's snapshot). The validator checks both against the data. A season's forecast window runs from its informationDate to the next newer season's, so the newest season's window is open. nationStatus marks a nation suspended or non-member that season: such nations stay out of the gate's statistics. results pins martj42's results.csv, the same file the computed World Cup seasons read (scripts/data/world-cup-seasons.json); it lives in the ignored data-src/martj42-results/.",
+  "seasons": [
+    {
+      "id": "2026-27",
+      "label": "2026/27",
+      "squads": "built-in",
+      "sources": "EA FC 27 + FM 26",
+      "ratingsDate": "2026-11-01",
+      "informationDate": "2026-11-01",
+      "nationStatus": { "643": "suspended" }
+    },
+    {
+      "id": "2025-26",
+      "label": "2025/26",
+      "squads": "ea-fc-26",
+      "sources": "EA FC 26",
+      "ratingsDate": "2025-09-19",
+      "informationDate": "2025-09-19",
+      "nationStatus": { "643": "suspended" }
+    }
+  ],
+  "results": {
+    "source": "martj42 international_results",
+    "url": "https://github.com/martj42/international_results",
+    "license": "CC0-1.0",
+    "commit": "b0948cb558c927c357db4067eac5b37b96d0e4bb",
+    "committed": "2026-10-31",
+    "folder": "martj42-results",
+    "file": "results.csv",
+    "sha256": "09aac809e317f3004c69720a38addb656c49ebb19f1937deab96f96e3362257a",
+    "bytes": 3764347
+  }
+}

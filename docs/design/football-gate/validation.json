@@ -1,0 +1,1432 @@
+{
+  "note": "Football squad gate (docs/design/football-squad-gate.md). Provisional gate (verdict, verdicts): build checks from the shipped data, Spearman of XI strength against World Football Elo at the season's ratingsDate on the gate set, and the EA−FM linking mean from the built-in's audit. Full ship gate (shipVerdict, shipVerdicts): the provisional gate plus the linking check on Reep-linked pairs, the forecast gate on martj42 results in (R_Y, R_next] against Elo frozen at R_Y, the engine-scale gate from engine-scale.json (the built-in) and the audit listing incomplete XIs. Every season ships by choice, so the verdicts are a report. Elo values stay offline; only aggregates, ranks and model scores are recorded. Regenerate with npm run validate:football.",
+  "gate": {
+    "spearmanMin": 0.9,
+    "linkingMaxAbsMean": 1,
+    "nations": "The nations that field a side in the season (footballSets.js fieldedNations): a nation with no squad of its own plays no part.",
+    "gateSet": "Every fielded nation except nations whose nationStatus is suspended or non-member; OFC stays in and is also reported alone.",
+    "truth": "World Football Elo at ratingsDate (after matches dated on or before it), from a snapshot taken on ratingsDate or later",
+    "eloDates": "Replay of {Y}_results.tsv over {Y-1}.tsv when the results file has a match dated on or after ratingsDate or a trusted fetch date on or after it, checked against {Y}.tsv from the same snapshot; otherwise World.tsv with a trusted fetch date 0 to 7 days after ratingsDate. A date is trusted when dateFrom is fetch or ends \"vouched by --trust-seed-dates\". Elo frozen at R_Y (the forecast baseline) takes the same replay, but World.tsv only when fetched 0 days after R_Y, on R_Y itself: a later World.tsv has seen results of the matches the forecast scores (leakage), so the forecast is incomplete instead.",
+    "verdicts": "fail if any check fails; pass if build, cross-sectional and linking all pass (not applicable counts for neither); otherwise incomplete",
+    "bootstrap": {
+      "resamples": 2000,
+      "seed": 20250919
+    },
+    "ship": {
+      "checks": [
+        "provisional gate",
+        "linking on Reep-linked pairs: |audit linking.reep.meanEaMinusFm| ≤ 1",
+        "forecast gate",
+        "engine-scale gate (docs/design/football-gate/engine-scale.json, the built-in at its content hash)",
+        "incomplete XIs listed in the audit"
+      ],
+      "forecast": {
+        "window": "(R_Y, R_next]: martj42 full internationals after the season's informationDate, up to the next newer season's; the newest season's window is open and not scored",
+        "matches": "Both teams field a side in the season (scripts/lib/results-names.mjs maps the names); matches with a suspended or non-member nation are scored apart; friendlies stay in the gate and are also reported apart",
+        "model": "Ordered logit z = β·(Z_home − Z_away) + h·[not neutral], P(home) = σ(z − c), P(away) = σ(−z − c), draw the remainder; Z standardised within the season over every fielded nation; roster T_n is the unrounded best-4-4-2 mean, the baseline Elo frozen at R_Y",
+        "matchWindows": "A match window is a FIFA window or a tournament: each finals tournament (every competition but friendlies, qualifiers and Nations Leagues) is one window, named by tournament and the year of its first match (same-name matches over 60 days apart are separate tournaments); friendlies, qualifiers and Nations Leagues group into date windows split at gaps over 10 days",
+        "fitting": "k-fold cross-validation grouped by match window, k = min(5, windows): each window whole in one fold, largest first to the fold with the fewest matches, so unequal windows still give balanced folds.",
+        "errors": "Paired per-match log-loss difference clustered by match window and, separately, by team pair; the larger SE is used. Each SE is a block bootstrap, 2000 resamples (seed 20261006), or a delete-one-cluster jackknife with fewer than 8 clusters",
+        "gate": "roster log loss ≤ Elo-at-R_Y log loss + 2·SE, or + t(G − 1)·SE (two-sided 95% Student t, G the fewer of windows and team pairs) when G < 8; at least 100 matches in 2 or more windows; roster β > 0",
+        "coverage": "The window is covered when the pinned results.csv commit is dated after R_next or a match is dated on or after R_next; otherwise forecast.partial and shipPartial are true: the verdict stands on the covered part and is re-scored when a later results.csv is pinned"
+      },
+      "verdicts": "shipVerdict: fail if any check fails; not scored while the forecast window is open; pass if all that apply pass (not applicable counts for neither); otherwise incomplete"
+    }
+  },
+  "elo": {
+    "source": "World Football Elo Ratings (eloratings.net)",
+    "url": "https://www.eloratings.net/",
+    "files": [
+      {
+        "file": "2024.tsv",
+        "url": "https://www.eloratings.net/2024.tsv",
+        "fetchedAt": "2026-11-10",
+        "dateFrom": "fetch",
+        "sha256": "be7e60d05a618add7889b8ac55f9034b755055f8c793b44ced76286bdc8a0a86"
+      },
+      {
+        "file": "2025.tsv",
+        "url": "https://www.eloratings.net/2025.tsv",
+        "fetchedAt": "2026-11-10",
+        "dateFrom": "fetch",
+        "sha256": "20a0c2d0450778aeb4573e3c020424f520662737b1d53bca257922a0d8fdc7ea"
+      },
+      {
+        "file": "2025_results.tsv",
+        "url": "https://www.eloratings.net/2025_results.tsv",
+        "fetchedAt": "2026-11-10",
+        "dateFrom": "fetch",
+        "sha256": "ff39fe06bb9d43d9b2c0eb73a127f9308678e51de6735fc86c0163224a224c3a"
+      },
+      {
+        "file": "2026.tsv",
+        "url": "https://www.eloratings.net/2026.tsv",
+        "fetchedAt": "2026-11-10",
+        "dateFrom": "fetch",
+        "sha256": "18b61db533202ce72431009fb2548ccb018f017a6ea34dbcf0a7bc956334457b"
+      },
+      {
+        "file": "2026_results.tsv",
+        "url": "https://www.eloratings.net/2026_results.tsv",
+        "fetchedAt": "2026-11-10",
+        "dateFrom": "fetch",
+        "sha256": "cf3fce737d8c216ea9b411ca14b7bccfab74812bad8665cadb3271e513be966a"
+      }
+    ]
+  },
+  "results": {
+    "source": "martj42 international_results",
+    "url": "https://github.com/martj42/international_results",
+    "license": "CC0-1.0",
+    "file": "results.csv",
+    "commit": {
+      "sha": "b0948cb558c927c357db4067eac5b37b96d0e4bb",
+      "date": "2026-10-31"
+    },
+    "sha256": "09aac809e317f3004c69720a38addb656c49ebb19f1937deab96f96e3362257a",
+    "rows": 49940,
+    "lastMatchDate": "2026-10-06"
+  },
+  "engineScale": {
+    "file": "docs/design/football-gate/engine-scale.json",
+    "reference": {
+      "contentHash": "e411dece2451",
+      "label": "EA FC 27 of 2026-11-01 + FM 26 26.3.0"
+    }
+  },
+  "seasons": [
+    {
+      "id": "2026-27",
+      "label": "2026/27",
+      "squads": "built-in",
+      "sources": "EA FC 27 + FM 26",
+      "ratingsDate": "2026-11-01",
+      "informationDate": "2026-11-01",
+      "contentHash": "1ffd9fd55538",
+      "gate": "provisional",
+      "verdict": "pass",
+      "verdicts": {
+        "build": "pass",
+        "crossSectional": "pass",
+        "linking": "pass"
+      },
+      "provisionalVerdict": "pass",
+      "shipVerdict": "not scored",
+      "shipPartial": false,
+      "shipVerdicts": {
+        "provisional": "pass",
+        "reepLinking": "pass",
+        "forecast": "not scored",
+        "engineScale": "pass",
+        "auditXIs": "pass"
+      },
+      "implication": "The built-in squads pass the provisional gate; the full gate waits for the season's forecast window, scored once a newer built-in season replaces this one.",
+      "elo": {
+        "method": "replay",
+        "date": "2026-11-01",
+        "files": [
+          "2025.tsv",
+          "2026_results.tsv",
+          "2026.tsv"
+        ],
+        "completeBy": "match dated 2026-11-08",
+        "matchesReplayed": 818,
+        "lastMatchOnOrBefore": "2026-10-06",
+        "check": {
+          "file": "2026.tsv",
+          "teams": 244,
+          "exact": 244,
+          "mismatched": []
+        },
+        "reasons": []
+      },
+      "build": {
+        "verdict": "pass",
+        "nations": 173,
+        "fielded": 173,
+        "noTeam": [
+          "184",
+          "776",
+          "882"
+        ],
+        "missing": [],
+        "unknownIds": [],
+        "wrongShirtCount": [],
+        "shortXIs": 0,
+        "badRatings": [],
+        "badStrength": [],
+        "badNationStatus": [],
+        "contentHash": "1ffd9fd55538",
+        "failures": []
+      },
+      "crossSectional": {
+        "verdict": "pass",
+        "gateSet": {
+          "n": 172,
+          "spearman": 0.9291,
+          "pearson": 0.9356,
+          "spearmanCi95": [
+            0.8961,
+            0.9504
+          ]
+        },
+        "gateSetWithoutOfc": {
+          "n": 166,
+          "spearman": 0.9247,
+          "pearson": 0.9407
+        },
+        "ofc": {
+          "n": 6,
+          "spearman": 0.8117,
+          "pearson": 0.9924
+        },
+        "allNations": {
+          "n": 173,
+          "spearman": 0.9272,
+          "pearson": 0.9342
+        },
+        "withinConfederation": {
+          "weightedSpearman": 0.9111,
+          "weighting": "n-weighted mean of the per-confederation Spearman values over the gate set",
+          "byConfederation": {
+            "UEFA": {
+              "n": 48,
+              "spearman": 0.9505,
+              "pearson": 0.9352
+            },
+            "CONMEBOL": {
+              "n": 10,
+              "spearman": 0.9636,
+              "pearson": 0.9116
+            },
+            "CAF": {
+              "n": 49,
+              "spearman": 0.8997,
+              "pearson": 0.9153
+            },
+            "AFC": {
+              "n": 40,
+              "spearman": 0.8714,
+              "pearson": 0.9115
+            },
+            "CONCACAF": {
+              "n": 19,
+              "spearman": 0.9281,
+              "pearson": 0.9528
+            },
+            "OFC": {
+              "n": 6,
+              "spearman": 0.8117,
+              "pearson": 0.9924
+            }
+          }
+        },
+        "top50ByElo": {
+          "n": 50,
+          "spearman": 0.7523,
+          "pearson": 0.7838
+        },
+        "eaOnlyXIs": {
+          "n": 83,
+          "spearman": 0.8954,
+          "pearson": 0.8946,
+          "note": "Gate nations whose 11 shirts are all EA FC players"
+        },
+        "excludedNations": [
+          {
+            "id": "643",
+            "name": "Russia",
+            "confederation": "UEFA",
+            "strength": 71,
+            "strengthRank": 72.5,
+            "eloRank": 27,
+            "rankGap": -45.5,
+            "status": "suspended"
+          }
+        ],
+        "missingStrength": [],
+        "missingElo": [],
+        "rankGaps": {
+          "note": "Ranks among all scored nations (1 = strongest); rankGap = eloRank − strengthRank, so positive means the XI ranks above its Elo.",
+          "squadAboveElo": [
+            {
+              "id": "608",
+              "name": "Philippines",
+              "confederation": "AFC",
+              "strength": 67,
+              "strengthRank": 100,
+              "eloRank": 152,
+              "rankGap": 52
+            },
+            {
+              "id": "356",
+              "name": "India",
+              "confederation": "AFC",
+              "strength": 67,
+              "strengthRank": 100,
+              "eloRank": 151,
+              "rankGap": 51
+            },
+            {
+              "id": "178",
+              "name": "Congo",
+              "confederation": "CAF",
+              "strength": 67,
+              "strengthRank": 100,
+              "eloRank": 143,
+              "rankGap": 43
+            },
+            {
+              "id": "140",
+              "name": "Central African Rep.",
+              "confederation": "CAF",
+              "strength": 67,
+              "strengthRank": 100,
+              "eloRank": 141.5,
+              "rankGap": 41.5
+            },
+            {
+              "id": "288",
+              "name": "Ghana",
+              "confederation": "CAF",
+              "strength": 77,
+              "strengthRank": 39.5,
+              "eloRank": 81,
+              "rankGap": 41.5
+            }
+          ],
+          "squadBelowElo": [
+            {
+              "id": "112",
+              "name": "Belarus",
+              "confederation": "UEFA",
+              "strength": 64,
+              "strengthRank": 130.5,
+              "eloRank": 74,
+              "rankGap": -56.5
+            },
+            {
+              "id": "704",
+              "name": "Vietnam",
+              "confederation": "AFC",
+              "strength": 60,
+              "strengthRank": 143.5,
+              "eloRank": 95,
+              "rankGap": -48.5
+            },
+            {
+              "id": "364",
+              "name": "Iran",
+              "confederation": "AFC",
+              "strength": 70,
+              "strengthRank": 80,
+              "eloRank": 32,
+              "rankGap": -48
+            },
+            {
+              "id": "512",
+              "name": "Oman",
+              "confederation": "AFC",
+              "strength": 64,
+              "strengthRank": 130.5,
+              "eloRank": 86,
+              "rankGap": -44.5
+            },
+            {
+              "id": "784",
+              "name": "United Arab Emirates",
+              "confederation": "AFC",
+              "strength": 66,
+              "strengthRank": 112,
+              "eloRank": 69,
+              "rankGap": -43
+            }
+          ]
+        },
+        "reasons": []
+      },
+      "linking": {
+        "verdict": "pass",
+        "source": "docs/design/football-roster-audit.json",
+        "pairs": 4569,
+        "meanEaMinusFm": 0.1,
+        "ci95": [
+          0.02,
+          0.19
+        ],
+        "reasons": []
+      },
+      "reepLinking": {
+        "verdict": "pass",
+        "source": "docs/design/football-roster-audit.json",
+        "pairs": 4234,
+        "meanEaMinusFm": 0.13,
+        "ci95": [
+          0.04,
+          0.21
+        ],
+        "reasons": []
+      },
+      "forecast": {
+        "verdict": "not scored",
+        "window": {
+          "from": "2026-11-01",
+          "to": null,
+          "rule": "(R_Y, R_next]: after this season's informationDate, up to and including the next newer season's"
+        },
+        "mappedMatchesSoFar": 0,
+        "lastMatchDate": "2026-10-06",
+        "reasons": [
+          "The window after 2026-11-01 is open until a newer season records its informationDate, so this season is not scored yet"
+        ]
+      },
+      "engineScale": {
+        "verdict": "pass",
+        "source": "docs/design/football-gate/engine-scale.json",
+        "reference": {
+          "contentHash": "e411dece2451",
+          "label": "EA FC 27 of 2026-11-01 + FM 26 26.3.0"
+        },
+        "starters": {
+          "sd": 10.2794,
+          "quantiles": {
+            "q10": 54,
+            "q50": 69,
+            "q90": 81
+          }
+        },
+        "strengthSd": 9.566,
+        "probe": {
+          "favouriteWinRate": 0.7633,
+          "upsetRate": 0.078,
+          "pairs": 3603
+        },
+        "production": {
+          "runs": 440,
+          "completed": 440,
+          "completion": 1,
+          "completion95": [
+            0.9913,
+            1
+          ],
+          "topFiveChampionShare": 0.5591,
+          "topFiveChampionShare95": [
+            0.5124,
+            0.6048
+          ]
+        },
+        "failed": [],
+        "reasons": []
+      },
+      "auditXIs": {
+        "verdict": "pass",
+        "source": "docs/design/football-roster-audit.json",
+        "nations": 176,
+        "incompleteXIs": [
+          "184",
+          "776",
+          "882"
+        ],
+        "unlisted": [],
+        "mismatched": [],
+        "reasons": []
+      }
+    },
+    {
+      "id": "2025-26",
+      "label": "2025/26",
+      "squads": "ea-fc-26",
+      "sources": "EA FC 26",
+      "ratingsDate": "2025-09-19",
+      "informationDate": "2025-09-19",
+      "contentHash": "ea-fc-26-8ccd45ee",
+      "gate": "provisional",
+      "verdict": "fail",
+      "verdicts": {
+        "build": "pass",
+        "crossSectional": "fail",
+        "linking": "not applicable"
+      },
+      "provisionalVerdict": "fail",
+      "shipVerdict": "fail",
+      "shipPartial": true,
+      "shipVerdicts": {
+        "provisional": "fail",
+        "reepLinking": "not applicable",
+        "forecast": "pass",
+        "engineScale": "not applicable",
+        "auditXIs": "pass"
+      },
+      "implication": "Fails the full gate (provisional fail). The season ships regardless, as every season does: the verdict is a report. The forecast rests on a partial window: results.csv covers (2025-09-19, 2026-10-06] of (2025-09-19, 2026-11-01], so it is re-scored when a results.csv that covers 2026-11-01 is pinned.",
+      "elo": {
+        "method": "replay",
+        "date": "2025-09-19",
+        "files": [
+          "2024.tsv",
+          "2025_results.tsv",
+          "2025.tsv"
+        ],
+        "completeBy": "match dated 2025-12-31",
+        "matchesReplayed": 611,
+        "lastMatchOnOrBefore": "2025-09-09",
+        "check": {
+          "file": "2025.tsv",
+          "teams": 244,
+          "exact": 244,
+          "mismatched": []
+        },
+        "reasons": []
+      },
+      "build": {
+        "verdict": "pass",
+        "nations": 112,
+        "fielded": 112,
+        "noTeam": [
+          "004",
+          "044",
+          "050",
+          "064",
+          "072",
+          "084",
+          "090",
+          "096",
+          "104",
+          "108",
+          "112",
+          "116",
+          "140",
+          "144",
+          "148",
+          "158",
+          "184",
+          "192",
+          "222",
+          "231",
+          "232",
+          "242",
+          "262",
+          "275",
+          "320",
+          "398",
+          "400",
+          "408",
+          "414",
+          "417",
+          "418",
+          "422",
+          "426",
+          "434",
+          "454",
+          "458",
+          "496",
+          "508",
+          "512",
+          "516",
+          "524",
+          "540",
+          "548",
+          "558",
+          "562",
+          "586",
+          "598",
+          "608",
+          "626",
+          "630",
+          "646",
+          "704",
+          "706",
+          "728",
+          "729",
+          "748",
+          "762",
+          "764",
+          "776",
+          "795",
+          "834",
+          "860",
+          "882",
+          "887"
+        ],
+        "missing": [],
+        "unknownIds": [],
+        "wrongShirtCount": [],
+        "shortXIs": 17,
+        "badRatings": [],
+        "badStrength": [],
+        "badNationStatus": [],
+        "contentHash": "ea-fc-26-8ccd45ee",
+        "failures": []
+      },
+      "crossSectional": {
+        "verdict": "fail",
+        "gateSet": {
+          "n": 111,
+          "spearman": 0.8457,
+          "pearson": 0.8154,
+          "spearmanCi95": [
+            0.7643,
+            0.8976
+          ]
+        },
+        "gateSetWithoutOfc": {
+          "n": 110,
+          "spearman": 0.8465,
+          "pearson": 0.8153
+        },
+        "ofc": {
+          "n": 1,
+          "spearman": null,
+          "pearson": null
+        },
+        "allNations": {
+          "n": 112,
+          "spearman": 0.8413,
+          "pearson": 0.8127
+        },
+        "withinConfederation": {
+          "weightedSpearman": 0.8131,
+          "weighting": "n-weighted mean of the per-confederation Spearman values over the gate set",
+          "byConfederation": {
+            "UEFA": {
+              "n": 46,
+              "spearman": 0.9568,
+              "pearson": 0.9169
+            },
+            "CONMEBOL": {
+              "n": 10,
+              "spearman": 0.8632,
+              "pearson": 0.8842
+            },
+            "CAF": {
+              "n": 30,
+              "spearman": 0.7651,
+              "pearson": 0.7152
+            },
+            "AFC": {
+              "n": 12,
+              "spearman": 0.4366,
+              "pearson": 0.2937
+            },
+            "CONCACAF": {
+              "n": 12,
+              "spearman": 0.7171,
+              "pearson": 0.803
+            },
+            "OFC": {
+              "n": 1,
+              "spearman": null,
+              "pearson": null
+            }
+          }
+        },
+        "top50ByElo": {
+          "n": 50,
+          "spearman": 0.7833,
+          "pearson": 0.6818
+        },
+        "eaOnlyXIs": {
+          "n": 94,
+          "spearman": 0.8316,
+          "pearson": 0.8295,
+          "note": "Gate nations whose 11 shirts are all EA FC players"
+        },
+        "excludedNations": [
+          {
+            "id": "643",
+            "name": "Russia",
+            "confederation": "UEFA",
+            "strength": 72,
+            "strengthRank": 64.5,
+            "eloRank": 28,
+            "rankGap": -36.5,
+            "status": "suspended"
+          }
+        ],
+        "missingStrength": [],
+        "missingElo": [],
+        "rankGaps": {
+          "note": "Ranks among all scored nations (1 = strongest); rankGap = eloRank − strengthRank, so positive means the XI ranks above its Elo.",
+          "squadAboveElo": [
+            {
+              "id": "566",
+              "name": "Nigeria",
+              "confederation": "CAF",
+              "strength": 80,
+              "strengthRank": 18,
+              "eloRank": 63.5,
+              "rankGap": 45.5
+            },
+            {
+              "id": "288",
+              "name": "Ghana",
+              "confederation": "CAF",
+              "strength": 78,
+              "strengthRank": 32.5,
+              "eloRank": 77,
+              "rankGap": 44.5
+            },
+            {
+              "id": "624",
+              "name": "Guinea-Bissau",
+              "confederation": "CAF",
+              "strength": 70,
+              "strengthRank": 73.5,
+              "eloRank": 108,
+              "rankGap": 34.5
+            },
+            {
+              "id": "384",
+              "name": "Côte d'Ivoire",
+              "confederation": "CAF",
+              "strength": 79,
+              "strengthRank": 25.5,
+              "eloRank": 59,
+              "rankGap": 33.5
+            },
+            {
+              "id": "120",
+              "name": "Cameroon",
+              "confederation": "CAF",
+              "strength": 78,
+              "strengthRank": 32.5,
+              "eloRank": 65,
+              "rankGap": 32.5
+            }
+          ],
+          "squadBelowElo": [
+            {
+              "id": "364",
+              "name": "Iran",
+              "confederation": "AFC",
+              "strength": 57,
+              "strengthRank": 103.5,
+              "eloRank": 32,
+              "rankGap": -71.5
+            },
+            {
+              "id": "591",
+              "name": "Panama",
+              "confederation": "CONCACAF",
+              "strength": 68,
+              "strengthRank": 81.5,
+              "eloRank": 35,
+              "rankGap": -46.5
+            },
+            {
+              "id": "818",
+              "name": "Egypt",
+              "confederation": "CAF",
+              "strength": 67,
+              "strengthRank": 87,
+              "eloRank": 50,
+              "rankGap": -37
+            },
+            {
+              "id": "068",
+              "name": "Bolivia",
+              "confederation": "CONMEBOL",
+              "strength": 68,
+              "strengthRank": 81.5,
+              "eloRank": 48,
+              "rankGap": -33.5
+            },
+            {
+              "id": "188",
+              "name": "Costa Rica",
+              "confederation": "CONCACAF",
+              "strength": 68,
+              "strengthRank": 81.5,
+              "eloRank": 49,
+              "rankGap": -32.5
+            }
+          ]
+        },
+        "reasons": [
+          "Gate-set Spearman 0.8457 is below 0.9"
+        ]
+      },
+      "linking": {
+        "verdict": "not applicable",
+        "reasons": [],
+        "note": "One source only: no EA and FM records of one person to compare"
+      },
+      "reepLinking": {
+        "verdict": "not applicable",
+        "reasons": [],
+        "note": "One source only: no EA and FM records of one person to compare"
+      },
+      "forecast": {
+        "verdict": "pass",
+        "window": {
+          "from": "2025-09-19",
+          "to": "2026-11-01",
+          "rule": "(R_Y, R_next]: after this season's informationDate, up to and including the next newer season's"
+        },
+        "partial": true,
+        "coverage": {
+          "lastMatchDate": "2026-10-06",
+          "commit": {
+            "sha": "b0948cb558c927c357db4067eac5b37b96d0e4bb",
+            "date": "2026-10-31"
+          },
+          "rule": "covered when the results commit is dated after R_next or a match is dated on or after R_next",
+          "complete": false,
+          "partial": true,
+          "covered": {
+            "from": "2025-09-19",
+            "to": "2026-10-06"
+          },
+          "note": "results.csv (commit b0948cb of 2026-10-31) ends 2026-10-06, so matches from 2026-10-07 to 2026-11-01 are not scored yet: the verdict rests on the partial window (2025-09-19, 2026-10-06] and must be re-scored when results.csv covers 2026-11-01"
+        },
+        "counts": {
+          "inWindow": 1215,
+          "offMap": 605,
+          "unknownNames": 0,
+          "excludedStatus": 10,
+          "gate": 600
+        },
+        "matchWindows": [
+          {
+            "index": 0,
+            "kind": "window",
+            "from": "2025-10-08",
+            "to": "2025-10-14",
+            "matches": 71,
+            "fold": 4
+          },
+          {
+            "index": 1,
+            "kind": "tournament",
+            "label": "Kirin Cup 2025",
+            "from": "2025-10-10",
+            "to": "2025-11-18",
+            "matches": 4,
+            "fold": 1
+          },
+          {
+            "index": 2,
+            "kind": "window",
+            "from": "2025-11-12",
+            "to": "2025-11-18",
+            "matches": 75,
+            "fold": 2
+          },
+          {
+            "index": 3,
+            "kind": "tournament",
+            "label": "Arab Cup 2025",
+            "from": "2025-12-01",
+            "to": "2025-12-15",
+            "matches": 9,
+            "fold": 2
+          },
+          {
+            "index": 4,
+            "kind": "tournament",
+            "label": "African Cup of Nations 2025",
+            "from": "2025-12-22",
+            "to": "2026-01-18",
+            "matches": 34,
+            "fold": 3
+          },
+          {
+            "index": 5,
+            "kind": "window",
+            "from": "2026-01-18",
+            "to": "2026-01-25",
+            "matches": 3,
+            "fold": 1
+          },
+          {
+            "index": 6,
+            "kind": "window",
+            "from": "2026-02-25",
+            "to": "2026-02-25",
+            "matches": 1,
+            "fold": 2
+          },
+          {
+            "index": 7,
+            "kind": "window",
+            "from": "2026-03-15",
+            "to": "2026-03-15",
+            "matches": 1,
+            "fold": 2
+          },
+          {
+            "index": 8,
+            "kind": "window",
+            "from": "2026-03-26",
+            "to": "2026-03-31",
+            "matches": 68,
+            "fold": 4
+          },
+          {
+            "index": 9,
+            "kind": "tournament",
+            "label": "FIFA Series 2026",
+            "from": "2026-03-27",
+            "to": "2026-03-31",
+            "matches": 9,
+            "fold": 2
+          },
+          {
+            "index": 10,
+            "kind": "tournament",
+            "label": "Jordan International Tournament 2026",
+            "from": "2026-03-27",
+            "to": "2026-03-31",
+            "matches": 2,
+            "fold": 1
+          },
+          {
+            "index": 11,
+            "kind": "tournament",
+            "label": "Morocco, Capital of African Football 2026",
+            "from": "2026-03-27",
+            "to": "2026-03-31",
+            "matches": 3,
+            "fold": 2
+          },
+          {
+            "index": 12,
+            "kind": "window",
+            "from": "2026-05-22",
+            "to": "2026-06-10",
+            "matches": 72,
+            "fold": 3
+          },
+          {
+            "index": 13,
+            "kind": "tournament",
+            "label": "Unity Cup 2026",
+            "from": "2026-05-26",
+            "to": "2026-05-30",
+            "matches": 4,
+            "fold": 2
+          },
+          {
+            "index": 14,
+            "kind": "tournament",
+            "label": "Baltic Cup 2026",
+            "from": "2026-06-06",
+            "to": "2026-06-09",
+            "matches": 2,
+            "fold": 1
+          },
+          {
+            "index": 15,
+            "kind": "tournament",
+            "label": "FIFA World Cup 2026",
+            "from": "2026-06-11",
+            "to": "2026-07-19",
+            "matches": 91,
+            "fold": 1
+          },
+          {
+            "index": 16,
+            "kind": "window",
+            "from": "2026-09-24",
+            "to": "2026-10-06",
+            "matches": 143,
+            "fold": 0
+          },
+          {
+            "index": 17,
+            "kind": "tournament",
+            "label": "Gulf Cup 2026",
+            "from": "2026-09-29",
+            "to": "2026-10-06",
+            "matches": 4,
+            "fold": 1
+          },
+          {
+            "index": 18,
+            "kind": "tournament",
+            "label": "Kirin Cup 2026",
+            "from": "2026-10-01",
+            "to": "2026-10-05",
+            "matches": 4,
+            "fold": 2
+          }
+        ],
+        "method": "5-fold cross-validation grouped by match window (k = min(5, 19 windows); each finals tournament is a window, friendlies, qualifiers and Nations Leagues split at date gaps over 10 days; windows go whole, largest first, to the fold with the fewest matches), every match scored out of fold.",
+        "outcomeShares": {
+          "home": 0.4683,
+          "draw": 0.2483,
+          "away": 0.2833,
+          "neutral": 0.37,
+          "friendlies": 0.345
+        },
+        "strengthScale": {
+          "roster": {
+            "mean": 72.3166,
+            "sd": 8.1241
+          },
+          "note": "Z = (value − mean) / population SD over every nation fielding a side; Elo scale stays offline"
+        },
+        "models": {
+          "baseRates": {
+            "label": "Home advantage and draw rate only (β = 0)",
+            "features": [],
+            "n": 600,
+            "logLoss": 1.0698,
+            "rps": 0.2297,
+            "brier": 0.6466,
+            "competitive": {
+              "n": 393,
+              "logLoss": 1.0702,
+              "rps": 0.2318,
+              "brier": 0.6471
+            },
+            "friendlies": {
+              "n": 207,
+              "logLoss": 1.0692,
+              "rps": 0.2258,
+              "brier": 0.6456
+            },
+            "fitAllMatches": {
+              "beta": [],
+              "h": 0.4156,
+              "c": 0.5208,
+              "converged": true
+            },
+            "folds": [
+              {
+                "fold": 0,
+                "trainMatches": 457,
+                "testMatches": 143,
+                "beta": [],
+                "h": 0.5268,
+                "c": 0.5436,
+                "converged": true
+              },
+              {
+                "fold": 1,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [],
+                "h": 0.3965,
+                "c": 0.5272,
+                "converged": true
+              },
+              {
+                "fold": 2,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [],
+                "h": 0.43,
+                "c": 0.5276,
+                "converged": true
+              },
+              {
+                "fold": 3,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [],
+                "h": 0.3615,
+                "c": 0.5195,
+                "converged": true
+              },
+              {
+                "fold": 4,
+                "trainMatches": 461,
+                "testMatches": 139,
+                "beta": [],
+                "h": 0.386,
+                "c": 0.4875,
+                "converged": true
+              }
+            ]
+          },
+          "roster": {
+            "label": "Roster strength T_n of this season",
+            "features": [
+              "roster"
+            ],
+            "n": 600,
+            "logLoss": 0.9169,
+            "rps": 0.1783,
+            "brier": 0.543,
+            "competitive": {
+              "n": 393,
+              "logLoss": 0.9011,
+              "rps": 0.1755,
+              "brier": 0.5343
+            },
+            "friendlies": {
+              "n": 207,
+              "logLoss": 0.9469,
+              "rps": 0.1835,
+              "brier": 0.5594
+            },
+            "fitAllMatches": {
+              "beta": [
+                1.0564
+              ],
+              "h": 0.2698,
+              "c": 0.671,
+              "converged": true
+            },
+            "folds": [
+              {
+                "fold": 0,
+                "trainMatches": 457,
+                "testMatches": 143,
+                "beta": [
+                  1.1074
+                ],
+                "h": 0.294,
+                "c": 0.714,
+                "converged": true
+              },
+              {
+                "fold": 1,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  1.0363
+                ],
+                "h": 0.2436,
+                "c": 0.677,
+                "converged": true
+              },
+              {
+                "fold": 2,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  1.0776
+                ],
+                "h": 0.2504,
+                "c": 0.677,
+                "converged": true
+              },
+              {
+                "fold": 3,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  1.0876
+                ],
+                "h": 0.2527,
+                "c": 0.6737,
+                "converged": true
+              },
+              {
+                "fold": 4,
+                "trainMatches": 461,
+                "testMatches": 139,
+                "beta": [
+                  0.9806
+                ],
+                "h": 0.3197,
+                "c": 0.6166,
+                "converged": true
+              }
+            ],
+            "excludedStatusMatches": {
+              "n": 10,
+              "logLoss": 0.793,
+              "rps": 0.1391,
+              "brier": 0.4614
+            }
+          },
+          "eloAtR": {
+            "label": "World Football Elo frozen at R_Y",
+            "features": [
+              "elo"
+            ],
+            "n": 600,
+            "logLoss": 0.8935,
+            "rps": 0.1718,
+            "brier": 0.5289,
+            "competitive": {
+              "n": 393,
+              "logLoss": 0.8733,
+              "rps": 0.1674,
+              "brier": 0.5149
+            },
+            "friendlies": {
+              "n": 207,
+              "logLoss": 0.9319,
+              "rps": 0.18,
+              "brier": 0.5555
+            },
+            "fitAllMatches": {
+              "beta": [
+                1.2106
+              ],
+              "h": 0.2714,
+              "c": 0.6968,
+              "converged": true
+            },
+            "folds": [
+              {
+                "fold": 0,
+                "trainMatches": 457,
+                "testMatches": 143,
+                "beta": [
+                  1.2399
+                ],
+                "h": 0.2983,
+                "c": 0.7507,
+                "converged": true
+              },
+              {
+                "fold": 1,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  1.1709
+                ],
+                "h": 0.2481,
+                "c": 0.6937,
+                "converged": true
+              },
+              {
+                "fold": 2,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  1.2303
+                ],
+                "h": 0.2346,
+                "c": 0.7021,
+                "converged": true
+              },
+              {
+                "fold": 3,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  1.2169
+                ],
+                "h": 0.3004,
+                "c": 0.6956,
+                "converged": true
+              },
+              {
+                "fold": 4,
+                "trainMatches": 461,
+                "testMatches": 139,
+                "beta": [
+                  1.2022
+                ],
+                "h": 0.2864,
+                "c": 0.6468,
+                "converged": true
+              }
+            ],
+            "excludedStatusMatches": {
+              "n": 10,
+              "logLoss": 1.0112,
+              "rps": 0.2024,
+              "brier": 0.6265
+            }
+          },
+          "eloPlusRoster": {
+            "label": "Elo at R_Y plus roster strength",
+            "features": [
+              "elo",
+              "roster"
+            ],
+            "n": 600,
+            "logLoss": 0.8781,
+            "rps": 0.1678,
+            "brier": 0.5211,
+            "competitive": {
+              "n": 393,
+              "logLoss": 0.8556,
+              "rps": 0.1631,
+              "brier": 0.5069
+            },
+            "friendlies": {
+              "n": 207,
+              "logLoss": 0.9209,
+              "rps": 0.1766,
+              "brier": 0.5479
+            },
+            "fitAllMatches": {
+              "beta": [
+                0.8369,
+                0.5089
+              ],
+              "h": 0.247,
+              "c": 0.7166,
+              "converged": true
+            },
+            "folds": [
+              {
+                "fold": 0,
+                "trainMatches": 457,
+                "testMatches": 143,
+                "beta": [
+                  0.8744,
+                  0.5294
+                ],
+                "h": 0.2525,
+                "c": 0.7733,
+                "converged": true
+              },
+              {
+                "fold": 1,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  0.7722,
+                  0.5129
+                ],
+                "h": 0.2236,
+                "c": 0.712,
+                "converged": true
+              },
+              {
+                "fold": 2,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  0.8483,
+                  0.5484
+                ],
+                "h": 0.2059,
+                "c": 0.7261,
+                "converged": true
+              },
+              {
+                "fold": 3,
+                "trainMatches": 494,
+                "testMatches": 106,
+                "beta": [
+                  0.8268,
+                  0.5195
+                ],
+                "h": 0.269,
+                "c": 0.7149,
+                "converged": true
+              },
+              {
+                "fold": 4,
+                "trainMatches": 461,
+                "testMatches": 139,
+                "beta": [
+                  0.8655,
+                  0.4465
+                ],
+                "h": 0.2886,
+                "c": 0.6628,
+                "converged": true
+              }
+            ],
+            "excludedStatusMatches": {
+              "n": 10,
+              "logLoss": 0.8501,
+              "rps": 0.1552,
+              "brier": 0.4986
+            }
+          }
+        },
+        "rosterVsElo": {
+          "meanDifference": 0.0234,
+          "seByMatchWindow": 0.0126,
+          "seMethodByMatchWindow": "cluster bootstrap",
+          "matchWindows": 19,
+          "seByTeamPair": 0.0181,
+          "seMethodByTeamPair": "cluster bootstrap",
+          "teamPairs": 534,
+          "sePerMatch": 0.018,
+          "se": 0.0181,
+          "seUsed": "team pair",
+          "critical": 2,
+          "criticalRule": "2·SE: 19 clusters, at least 8",
+          "gate": "roster log loss ≤ Elo-at-R_Y log loss + 2·SE, and roster β > 0",
+          "margin": 0.0362,
+          "rosterBeta": 1.0564,
+          "pass": true
+        },
+        "eloPlusRosterVsElo": {
+          "meanDifference": -0.0154,
+          "seByMatchWindow": 0.0048,
+          "seMethodByMatchWindow": "cluster bootstrap",
+          "matchWindows": 19,
+          "seByTeamPair": 0.0078,
+          "seMethodByTeamPair": "cluster bootstrap",
+          "teamPairs": 534,
+          "sePerMatch": 0.0076,
+          "se": 0.0078,
+          "seUsed": "team pair",
+          "critical": 2,
+          "criticalRule": "2·SE: 19 clusters, at least 8"
+        },
+        "excludedStatusMatches": {
+          "n": 10,
+          "nations": [
+            "643"
+          ],
+          "note": "Matches with a suspended or non-member nation: out of the gate, scored with the all-matches fit"
+        },
+        "matchesLost": {
+          "comparedWith": [
+            "2025-09-19",
+            "2026-09-19"
+          ],
+          "ratingsYearMatches": 457,
+          "lost": 0,
+          "gained": 153,
+          "note": "Matches between nations fielding a side (excluded-status nations included) in (D_Y, D_Y + 365] against those in (R_Y, R_next], as far as results.csv reaches"
+        },
+        "reasons": [],
+        "elo": {
+          "method": "replay",
+          "date": "2025-09-19",
+          "files": [
+            "2024.tsv",
+            "2025_results.tsv",
+            "2025.tsv"
+          ],
+          "completeBy": "match dated 2025-12-31",
+          "matchesReplayed": 611,
+          "lastMatchOnOrBefore": "2025-09-09",
+          "check": {
+            "file": "2025.tsv",
+            "teams": 244,
+            "exact": 244,
+            "mismatched": []
+          },
+          "reasons": []
+        }
+      },
+      "engineScale": {
+        "verdict": "not applicable",
+        "reasons": [],
+        "note": "The engine-scale gate compares built-in squads; a season file is checked when it is built"
+      },
+      "auditXIs": {
+        "verdict": "pass",
+        "source": "public/football/ea-fc-26.json",
+        "nationsWithPlayers": 144,
+        "completeNaturalXIs": 80,
+        "incompleteFieldedXIs": [
+          "051",
+          "204",
+          "214",
+          "233",
+          "266",
+          "328",
+          "364",
+          "428",
+          "430",
+          "440",
+          "450",
+          "478",
+          "498",
+          "780",
+          "800",
+          "818",
+          "894"
+        ],
+        "reasons": []
+      }
+    }
+  ]
+}

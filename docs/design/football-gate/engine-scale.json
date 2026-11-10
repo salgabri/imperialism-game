@@ -1,0 +1,858 @@
+{
+  "note": "Engine-scale gate (docs/design/football-squad-gate.md): the built-in squads against the reference, the built-in they replaced, on starter-rating scale, a seeded match-model probe over real nation pairs and production-balance campaigns with matched seeds. Keyed by the content hash of src/data/rosters.js; scripts/football-validate.mjs checks it. Regenerate with npm run engine-scale:football.",
+  "configuration": {
+    "quantiles": [
+      0.1,
+      0.5,
+      0.9
+    ],
+    "probe": {
+      "seed": 20261002,
+      "scopes": [
+        "UEFA",
+        "CONMEBOL",
+        "CAF",
+        "AFC",
+        "CONCACAF"
+      ],
+      "pairs": "every pair of nations fielding a side inside one confederation scope, one match each, attacker = lower NATIONS id",
+      "ratings": "teamEff (src/data/teams.js)",
+      "drama": "Balanced preset"
+    },
+    "production": {
+      "runs": 40,
+      "seedStart": 20261002,
+      "matrix": "coverage",
+      "campaigns": "the coverage matrix's football entries (scripts/production-balance.mjs productionMatrix)"
+    }
+  },
+  "tolerances": {
+    "sdRelative": 0.1,
+    "quantilePoints": 1,
+    "meanMatchesRelative": 0.1,
+    "shares": "inside the reference Wilson 95% interval",
+    "sharesPooled": "completion and topFiveChampionShare are gated pooled over all football campaigns; per-campaign intervals are diagnostics only",
+    "notGated": [
+      "effectiveChampionCount (no tolerance)",
+      "club starters"
+    ]
+  },
+  "reference": {
+    "contentHash": "e411dece2451",
+    "label": "EA FC 27 of 2026-11-01 + FM 26 26.3.0",
+    "nations": 173,
+    "starters": {
+      "n": 1903,
+      "mean": 68.6642,
+      "sd": 10.2764,
+      "min": 35,
+      "max": 91,
+      "quantiles": {
+        "q10": 54,
+        "q50": 69,
+        "q90": 81
+      }
+    },
+    "strength": {
+      "n": 173,
+      "mean": 68.6642,
+      "sd": 9.5628,
+      "min": 38,
+      "max": 87.18181818181819,
+      "quantiles": {
+        "q10": 55.5091,
+        "q50": 68.8182,
+        "q90": 79.7091
+      }
+    },
+    "clubStarters": {
+      "n": 1364,
+      "mean": 77.5139,
+      "sd": 4.1073,
+      "min": 69,
+      "max": 91,
+      "quantiles": {
+        "q10": 73,
+        "q50": 77,
+        "q90": 83
+      }
+    },
+    "probe": {
+      "pairs": 3603,
+      "drama": 6,
+      "upsetThreshold": 6,
+      "equalPairs": 16,
+      "favouriteWinRate": 0.7619,
+      "favouriteWinRate95": [
+        0.7477,
+        0.7756
+      ],
+      "favouriteMatches": 3587,
+      "upsetRate": 0.0777,
+      "upsetRate95": [
+        0.0694,
+        0.0869
+      ],
+      "underdogWinRateAtThreshold": 0.1334,
+      "pairsAtThreshold": 2092
+    },
+    "production": {
+      "campaigns": [
+        {
+          "campaign": "nations/elite/blitz/balanced/single/highest-rated/spectator",
+          "firstSeedFingerprint": "9d47fa8e7b5f",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 31,
+          "topFiveChampionShare": 0.4,
+          "topFiveChampionShare95": [
+            0.2635,
+            0.554
+          ],
+          "effectiveChampionCount": 13.02,
+          "distinctChampions": 16
+        },
+        {
+          "campaign": "nations/CONMEBOL/duel/predictable/single/highest-rated/spectator",
+          "firstSeedFingerprint": "1bb2a258909c",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 9,
+          "topFiveChampionShare": 0.975,
+          "topFiveChampionShare95": [
+            0.8712,
+            0.9956
+          ],
+          "effectiveChampionCount": 4.26,
+          "distinctChampions": 6
+        },
+        {
+          "campaign": "nations/world/chaos/wild/best-of-three/best-fit/spectator",
+          "firstSeedFingerprint": "4587cfed3a28",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 173.5,
+          "topFiveChampionShare": 0.15,
+          "topFiveChampionShare95": [
+            0.0706,
+            0.2907
+          ],
+          "effectiveChampionCount": 25.37,
+          "distinctChampions": 28
+        },
+        {
+          "campaign": "nations/CAF/blitz/predictable/single/highest-rated/spectator",
+          "firstSeedFingerprint": "93e946a9a989",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 48,
+          "topFiveChampionShare": 0.6,
+          "topFiveChampionShare95": [
+            0.446,
+            0.7365
+          ],
+          "effectiveChampionCount": 11.02,
+          "distinctChampions": 15
+        },
+        {
+          "campaign": "nations/AFC/chaos/balanced/best-of-three/best-fit/spectator",
+          "firstSeedFingerprint": "422e8617a996",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 46.43,
+          "topFiveChampionShare": 0.725,
+          "topFiveChampionShare95": [
+            0.5717,
+            0.8389
+          ],
+          "effectiveChampionCount": 9.77,
+          "distinctChampions": 14
+        },
+        {
+          "campaign": "nations/CONCACAF/duel/balanced/single/highest-rated/spectator",
+          "firstSeedFingerprint": "2349418d949e",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 18,
+          "topFiveChampionShare": 0.7,
+          "topFiveChampionShare95": [
+            0.5457,
+            0.8193
+          ],
+          "effectiveChampionCount": 7.05,
+          "distinctChampions": 9
+        },
+        {
+          "campaign": "clubs/elite/blitz/balanced/single/best-fit/spectator",
+          "firstSeedFingerprint": "4c9777952e81",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 31,
+          "topFiveChampionShare": 0.55,
+          "topFiveChampionShare95": [
+            0.3983,
+            0.6929
+          ],
+          "effectiveChampionCount": 12.47,
+          "distinctChampions": 18
+        },
+        {
+          "campaign": "clubs/all/duel/wild/single/highest-rated/spectator",
+          "firstSeedFingerprint": "f99d004a8f61",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 123,
+          "topFiveChampionShare": 0.175,
+          "topFiveChampionShare95": [
+            0.0875,
+            0.3195
+          ],
+          "effectiveChampionCount": 25.04,
+          "distinctChampions": 28
+        },
+        {
+          "campaign": "nations/CONMEBOL/duel/predictable/single/highest-rated/balanced",
+          "firstSeedFingerprint": "1bb2a258909c",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 9,
+          "topFiveChampionShare": 0.975,
+          "topFiveChampionShare95": [
+            0.8712,
+            0.9956
+          ],
+          "effectiveChampionCount": 4.26,
+          "distinctChampions": 6
+        },
+        {
+          "campaign": "nations/UEFA/blitz/balanced/single/best-fit/adaptive",
+          "firstSeedFingerprint": "957d097deaa4",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 48,
+          "topFiveChampionShare": 0.475,
+          "topFiveChampionShare95": [
+            0.3294,
+            0.625
+          ],
+          "effectiveChampionCount": 14.46,
+          "distinctChampions": 17
+        },
+        {
+          "campaign": "nations/UEFA/chaos/wild/single/highest-rated/attack",
+          "firstSeedFingerprint": "446547958f54",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 48,
+          "topFiveChampionShare": 0.225,
+          "topFiveChampionShare95": [
+            0.1232,
+            0.375
+          ],
+          "effectiveChampionCount": 20.52,
+          "distinctChampions": 23
+        }
+      ],
+      "pooled": {
+        "runs": 440,
+        "completed": 440,
+        "completion": 1,
+        "completion95": [
+          0.9913,
+          1
+        ],
+        "topFiveChampionShare": 0.5409,
+        "topFiveChampionShare95": [
+          0.4942,
+          0.5869
+        ]
+      }
+    }
+  },
+  "builtIn": {
+    "contentHash": "1ffd9fd55538",
+    "label": "EA FC 27 of 2026-11-01 + FM 26 26.3.0, Reep person keys 2026-10-18.1",
+    "verdict": "pass",
+    "failed": [],
+    "nations": 173,
+    "starters": {
+      "n": 1903,
+      "mean": 68.6458,
+      "sd": 10.2794,
+      "min": 35,
+      "max": 91,
+      "quantiles": {
+        "q10": 54,
+        "q50": 69,
+        "q90": 81
+      }
+    },
+    "strength": {
+      "n": 173,
+      "mean": 68.6458,
+      "sd": 9.566,
+      "min": 38,
+      "max": 87.18181818181819,
+      "quantiles": {
+        "q10": 55.5091,
+        "q50": 68.8182,
+        "q90": 79.7091
+      }
+    },
+    "clubStarters": {
+      "n": 1364,
+      "mean": 77.5139,
+      "sd": 4.1073,
+      "min": 69,
+      "max": 91,
+      "quantiles": {
+        "q10": 73,
+        "q50": 77,
+        "q90": 83
+      }
+    },
+    "probe": {
+      "pairs": 3603,
+      "drama": 6,
+      "upsetThreshold": 6,
+      "equalPairs": 16,
+      "favouriteWinRate": 0.7633,
+      "favouriteWinRate95": [
+        0.7491,
+        0.7769
+      ],
+      "favouriteMatches": 3587,
+      "upsetRate": 0.078,
+      "upsetRate95": [
+        0.0697,
+        0.0872
+      ],
+      "underdogWinRateAtThreshold": 0.1335,
+      "pairsAtThreshold": 2098
+    },
+    "production": {
+      "campaigns": [
+        {
+          "campaign": "nations/elite/blitz/balanced/single/highest-rated/spectator",
+          "firstSeedFingerprint": "9d47fa8e7b5f",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 31,
+          "topFiveChampionShare": 0.4,
+          "topFiveChampionShare95": [
+            0.2635,
+            0.554
+          ],
+          "effectiveChampionCount": 13.02,
+          "distinctChampions": 16
+        },
+        {
+          "campaign": "nations/CONMEBOL/duel/predictable/single/highest-rated/spectator",
+          "firstSeedFingerprint": "1bb2a258909c",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 9,
+          "topFiveChampionShare": 0.975,
+          "topFiveChampionShare95": [
+            0.8712,
+            0.9956
+          ],
+          "effectiveChampionCount": 4.26,
+          "distinctChampions": 6
+        },
+        {
+          "campaign": "nations/world/chaos/wild/best-of-three/best-fit/spectator",
+          "firstSeedFingerprint": "f2b89a7e5145",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 173.4,
+          "topFiveChampionShare": 0.225,
+          "topFiveChampionShare95": [
+            0.1232,
+            0.375
+          ],
+          "effectiveChampionCount": 25.04,
+          "distinctChampions": 28
+        },
+        {
+          "campaign": "nations/CAF/blitz/predictable/single/highest-rated/spectator",
+          "firstSeedFingerprint": "93e946a9a989",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 48,
+          "topFiveChampionShare": 0.65,
+          "topFiveChampionShare95": [
+            0.4951,
+            0.7787
+          ],
+          "effectiveChampionCount": 9.89,
+          "distinctChampions": 13
+        },
+        {
+          "campaign": "nations/AFC/chaos/balanced/best-of-three/best-fit/spectator",
+          "firstSeedFingerprint": "422e8617a996",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 46.43,
+          "topFiveChampionShare": 0.775,
+          "topFiveChampionShare95": [
+            0.625,
+            0.8768
+          ],
+          "effectiveChampionCount": 8.59,
+          "distinctChampions": 13
+        },
+        {
+          "campaign": "nations/CONCACAF/duel/balanced/single/highest-rated/spectator",
+          "firstSeedFingerprint": "2349418d949e",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 18,
+          "topFiveChampionShare": 0.7,
+          "topFiveChampionShare95": [
+            0.5457,
+            0.8193
+          ],
+          "effectiveChampionCount": 7.05,
+          "distinctChampions": 9
+        },
+        {
+          "campaign": "clubs/elite/blitz/balanced/single/best-fit/spectator",
+          "firstSeedFingerprint": "4c9777952e81",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 31,
+          "topFiveChampionShare": 0.55,
+          "topFiveChampionShare95": [
+            0.3983,
+            0.6929
+          ],
+          "effectiveChampionCount": 12.47,
+          "distinctChampions": 18
+        },
+        {
+          "campaign": "clubs/all/duel/wild/single/highest-rated/spectator",
+          "firstSeedFingerprint": "f99d004a8f61",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 123,
+          "topFiveChampionShare": 0.175,
+          "topFiveChampionShare95": [
+            0.0875,
+            0.3195
+          ],
+          "effectiveChampionCount": 25.04,
+          "distinctChampions": 28
+        },
+        {
+          "campaign": "nations/CONMEBOL/duel/predictable/single/highest-rated/balanced",
+          "firstSeedFingerprint": "1bb2a258909c",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 9,
+          "topFiveChampionShare": 0.975,
+          "topFiveChampionShare95": [
+            0.8712,
+            0.9956
+          ],
+          "effectiveChampionCount": 4.26,
+          "distinctChampions": 6
+        },
+        {
+          "campaign": "nations/UEFA/blitz/balanced/single/best-fit/adaptive",
+          "firstSeedFingerprint": "0e98e76a449e",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 48,
+          "topFiveChampionShare": 0.45,
+          "topFiveChampionShare95": [
+            0.3071,
+            0.6017
+          ],
+          "effectiveChampionCount": 14.48,
+          "distinctChampions": 17
+        },
+        {
+          "campaign": "nations/UEFA/chaos/wild/single/highest-rated/attack",
+          "firstSeedFingerprint": "5661be86b361",
+          "runs": 40,
+          "completed": 40,
+          "completion": 1,
+          "completion95": [
+            0.9124,
+            1
+          ],
+          "meanMatches": 48,
+          "topFiveChampionShare": 0.275,
+          "topFiveChampionShare95": [
+            0.1611,
+            0.4283
+          ],
+          "effectiveChampionCount": 17.22,
+          "distinctChampions": 20
+        }
+      ],
+      "pooled": {
+        "runs": 440,
+        "completed": 440,
+        "completion": 1,
+        "completion95": [
+          0.9913,
+          1
+        ],
+        "topFiveChampionShare": 0.5591,
+        "topFiveChampionShare95": [
+          0.5124,
+          0.6048
+        ]
+      }
+    },
+    "campaignDiagnostics": [
+      {
+        "campaign": "nations/elite/blitz/balanced/single/highest-rated/spectator",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 1
+      },
+      {
+        "campaign": "nations/CONMEBOL/duel/predictable/single/highest-rated/spectator",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 1
+      },
+      {
+        "campaign": "nations/world/chaos/wild/best-of-three/best-fit/spectator",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 0.987
+      },
+      {
+        "campaign": "nations/CAF/blitz/predictable/single/highest-rated/spectator",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 0.8975
+      },
+      {
+        "campaign": "nations/AFC/chaos/balanced/best-of-three/best-fit/spectator",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 0.8792
+      },
+      {
+        "campaign": "nations/CONCACAF/duel/balanced/single/highest-rated/spectator",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 1
+      },
+      {
+        "campaign": "clubs/elite/blitz/balanced/single/best-fit/spectator",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 1
+      },
+      {
+        "campaign": "clubs/all/duel/wild/single/highest-rated/spectator",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 1
+      },
+      {
+        "campaign": "nations/CONMEBOL/duel/predictable/single/highest-rated/balanced",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 1
+      },
+      {
+        "campaign": "nations/UEFA/blitz/balanced/single/best-fit/adaptive",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 1.0014
+      },
+      {
+        "campaign": "nations/UEFA/chaos/wild/single/highest-rated/attack",
+        "completionInside": true,
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 0.8392
+      }
+    ],
+    "checks": [
+      {
+        "check": "starter rating SD",
+        "value": 10.2794,
+        "reference": 10.2764,
+        "tolerance": "±10%",
+        "ratio": 1.0003,
+        "pass": true
+      },
+      {
+        "check": "starter rating 10% quantile",
+        "value": 54,
+        "reference": 54,
+        "tolerance": "±1 point",
+        "difference": 0,
+        "pass": true
+      },
+      {
+        "check": "starter rating 50% quantile",
+        "value": 69,
+        "reference": 69,
+        "tolerance": "±1 point",
+        "difference": 0,
+        "pass": true
+      },
+      {
+        "check": "starter rating 90% quantile",
+        "value": 81,
+        "reference": 81,
+        "tolerance": "±1 point",
+        "difference": 0,
+        "pass": true
+      },
+      {
+        "check": "T_n SD",
+        "value": 9.566,
+        "reference": 9.5628,
+        "tolerance": "±10%",
+        "ratio": 1.0003,
+        "pass": true
+      },
+      {
+        "check": "probe favouriteWinRate",
+        "value": 0.7633,
+        "reference": 0.7619,
+        "tolerance": "reference Wilson 95%",
+        "interval": [
+          0.7477,
+          0.7756
+        ],
+        "pass": true
+      },
+      {
+        "check": "probe upsetRate",
+        "value": 0.078,
+        "reference": 0.0777,
+        "tolerance": "reference Wilson 95%",
+        "interval": [
+          0.0694,
+          0.0869
+        ],
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/elite/blitz/balanced/single/highest-rated/spectator",
+        "value": 31,
+        "reference": 31,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/CONMEBOL/duel/predictable/single/highest-rated/spectator",
+        "value": 9,
+        "reference": 9,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/world/chaos/wild/best-of-three/best-fit/spectator",
+        "value": 173.4,
+        "reference": 173.5,
+        "tolerance": "±10%",
+        "ratio": 0.9994,
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/CAF/blitz/predictable/single/highest-rated/spectator",
+        "value": 48,
+        "reference": 48,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/AFC/chaos/balanced/best-of-three/best-fit/spectator",
+        "value": 46.43,
+        "reference": 46.43,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/CONCACAF/duel/balanced/single/highest-rated/spectator",
+        "value": 18,
+        "reference": 18,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches clubs/elite/blitz/balanced/single/best-fit/spectator",
+        "value": 31,
+        "reference": 31,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches clubs/all/duel/wild/single/highest-rated/spectator",
+        "value": 123,
+        "reference": 123,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/CONMEBOL/duel/predictable/single/highest-rated/balanced",
+        "value": 9,
+        "reference": 9,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/UEFA/blitz/balanced/single/best-fit/adaptive",
+        "value": 48,
+        "reference": 48,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "meanMatches nations/UEFA/chaos/wild/single/highest-rated/attack",
+        "value": 48,
+        "reference": 48,
+        "tolerance": "±10%",
+        "ratio": 1,
+        "pass": true
+      },
+      {
+        "check": "pooled completion",
+        "value": 1,
+        "reference": 1,
+        "tolerance": "reference Wilson 95%",
+        "interval": [
+          0.9913,
+          1
+        ],
+        "pass": true
+      },
+      {
+        "check": "pooled topFiveChampionShare",
+        "value": 0.5591,
+        "reference": 0.5409,
+        "tolerance": "reference Wilson 95%",
+        "interval": [
+          0.4942,
+          0.5869
+        ],
+        "pass": true
+      }
+    ]
+  }
+}
