@@ -25,10 +25,11 @@
     "test:map-viewport": "node --test scripts/map-viewport.test.mjs",
     "test:territories": "node --test scripts/territory-components.test.mjs",
     "test:flag-regions": "node --test scripts/flag-regions.test.mjs",
-    "test:flag-symbols": "node scripts/build-flag-symbols.mjs --check && node --test scripts/flag-symbol-layout.test.mjs scripts/flag-art.test.mjs scripts/flag-bitmaps.test.mjs",
+    "test:flag-symbols": "node scripts/build-historic-flags.mjs --check && node scripts/build-flag-symbols.mjs --check && node --test scripts/flag-symbol-layout.test.mjs scripts/flag-art.test.mjs scripts/flag-bitmaps.test.mjs",
     "test:geography": "node --test scripts/geography.test.mjs scripts/projection.test.mjs",
     "sync-flags": "node scripts/sync-flags.mjs",
     "build:flag-symbols": "node scripts/build-flag-symbols.mjs",
+    "build:historic-flags": "node scripts/build-historic-flags.mjs",
     "build:icons": "node scripts/build-icons.mjs",
     "preview:flag-symbols": "node scripts/preview-flag-symbols.mjs",
     "build-rosters": "node scripts/build-rosters.mjs",
@@ -94,7 +95,7 @@
     "build:retro-seasons": "node scripts/build-retro-seasons.mjs",
     "sync:early-nationalities": "node scripts/sync-early-nationalities.mjs",
     "build:nba-seasons": "node scripts/build-nba-seasons.mjs",
-    "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-core.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs scripts/ea-seasons.test.mjs scripts/football-early-seasons.test.mjs scripts/nba-seasons.test.mjs"
+    "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-core.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs scripts/ea-seasons.test.mjs scripts/football-early-seasons.test.mjs scripts/nba-seasons.test.mjs scripts/football-federations.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

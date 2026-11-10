@@ -217,16 +217,23 @@ test('the builder defaults to the src manifests, so the CLI and the browser buil
     /Fictionland \(2 players\)\. Add them to src\/data\/cm0102Nations\.js/);
 });
 
-test('seasons ending before 1997 are refused', () => {
-  assert.throws(() => build(undefined, { identity: { ...identity, released: '1995-05', season: '1995/96' } }), /ends in 1996: seasons ending before 1997 are refused .*football-years\.md/);
+test('seasons ending before 1962 are refused; from 1961/62 each has the federations of its day', () => {
+  assert.throws(() => build(undefined, { identity: { ...identity, released: '1960-05', season: '1960/61' } }), /ends in 1961: seasons ending before 1962 are refused.*football-years\.md/);
   const files = writeCm0102Files(sampleDatabase());
   const { clubSize, staffSize } = fileSignature(files);
-  const old = { id: 'cm0102-1995-10', label: 'Old', provider: 'Fixture makers', season: '1995/96', year: 1996, released: '1995-10',
+  const old = { id: 'cm0102-1960-10', label: 'Old', provider: 'Fixture makers', season: '1960/61', year: 1961, released: '1960-10',
     url: 'https://example.test/old', shifts: { birth: 0 }, signatures: [{ club: clubSize, staff: staffSize }] };
-  assert.throws(() => buildFootballSet(files, { databases: [old], nationMap, federations }), /before 1997/);
-  // 1996/97, the earliest season the game ships (SWOS 96/97), is the first accepted, with the federations of its day.
-  const first = build(undefined, { identity: { ...identity, released: '1996-09', id: 'cm0102-1996-09-custom', dobShift: 0 } }).doc;
-  assert.deepEqual([first.year, first.season, first.territory], [1997, '1996/97', territoryFor(federations, 1997)]);
+  assert.throws(() => buildFootballSet(files, { databases: [old], nationMap, federations }), /before 1962/);
+  // 1961/62, the first World Cup season, is the first accepted, with the federations of its day: the fixture's
+  // Germans play as West Germany and its Yugoslav as Yugoslavia, on Serbia's shape; the Soviet Union and
+  // Czechoslovakia, with no players, have no identity.
+  const first = build(undefined, { identity: { ...identity, released: '1961-09', id: 'cm0102-1961-09-custom', dobShift: 0 } }).doc;
+  assert.deepEqual([first.year, first.season, first.territory], [1962, '1961/62', territoryFor(federations, 1962)]);
+  assert.deepEqual(first.identities, { 276: { name: 'West Germany', code: 'FRG', flagId: '276' }, 688: { name: 'Yugoslavia', code: 'YUG', flagId: 'YUG' } });
+  assert.equal(decodeFootballSet(first).meta.identities[688].name, 'Yugoslavia', 'the loader takes it');
+  // 1996/97, the earliest season the game shipped before, and every later one, carry no identities.
+  const shipped = build(undefined, { identity: { ...identity, released: '1996-09', id: 'cm0102-1996-09-custom', dobShift: 0 } }).doc;
+  assert.deepEqual([shipped.year, shipped.season, shipped.territory, 'identities' in shipped], [1997, '1996/97', territoryFor(federations, 1997), false]);
   assert.equal(build(undefined, { identity: { ...identity, released: '2001-09', id: 'cm0102-2001-09-custom', dobShift: 0 } }).doc.year, 2002);
 });
 
@@ -571,9 +578,9 @@ test('the CLI writes nothing with --check, and stops on what it cannot build', (
     const unknown = run(`--cm0102=${game}`, `--out=${out}`);
     assert.equal(unknown.status, 1);
     assert.match(unknown.stderr, /Unknown CM 01\/02 database .* --label=\.\.\./);
-    const early = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--season=1995/96');
+    const early = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--season=1960/61');
     assert.equal(early.status, 1);
-    assert.match(early.stderr, /seasons ending before 1997 are refused/);
+    assert.match(early.stderr, /seasons ending before 1962 are refused/);
     const blank = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--label=  ');
     assert.equal(blank.status, 1);
     assert.match(blank.stderr, /Name it with --label=\.\.\. \(/);

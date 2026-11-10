@@ -237,3 +237,21 @@ test('world-scale geometry has bounded search work and cached repeat cost', () =
   }
   assert.ok(performance.now() - conqueredStart < 12000, 'a conquered world retains a bounded search');
 });
+
+test('the historic emblems keep their shape on their federations\' land: the Soviet Union, the CIS, Yugoslavia, Zaire', () => {
+  const load = name => JSON.parse(readFileSync(new URL(`../public/${name}`, import.meta.url), 'utf8'));
+  const rules = new WorldGeometry(load('world-110m.v1.json')).fitTo(Object.keys(NATIONS));
+  const display = new WorldGeometry(load('countries-50m.json'));
+  const { s, tx, ty } = rules.fit, paths = display.buildPaths(s, tx, ty);
+  const shapes = rules.countries.map(c => ({ id: c.id, rings: (paths[c.id] || rules.paths[c.id]).labelRings }));
+  const index = createFlagRegionIndex(shapes, { maxGap: FLAG_REGION_GAP_KM / rules.kmPerUnit });
+  // The holder and the shapes it holds at kick-off (src/data/footballFederations.js).
+  const soviet = ['643', '804', '112', '268', '051', '031', '398', '860', '795', '762', '417', '498', '233', '428', '440'];
+  for (const [code, holder, held] of [['su', '643', soviet], ['cis-1992', '643', soviet.filter(id => !['233', '428', '440'].includes(id))],
+    ['yu', '688', ['688', '191', '705', '070', '807', '499', 'KOS']], ['zr', '180', ['180']]]) {
+    const regions = index.components(Object.fromEntries(shapes.map(shape => [shape.id, held.includes(shape.id) ? holder : shape.id])))
+      .filter(region => region.ownerId === holder);
+    const r = regions.sort((a, b) => b.bbox.w * b.bbox.h - a.bbox.w * a.bbox.h)[0];
+    validate(r, FLAG_SYMBOLS[code], layoutFlagSymbol(r, FLAG_SYMBOLS[code]));
+  }
+});

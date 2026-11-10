@@ -17,11 +17,12 @@ import { sha256 } from './sha256.js';
 export const FOOTBALL_SET_FORMAT = 1;
 export const SET_ID = /^cm0102-\d{4}-\d{2}(?:-[a-z0-9]+)?$/;
 /**
- * The earliest season-end year a set is built for: 1996/97, the earliest season the game ships (SWOS 96/97).
- * footballFederations.js gives every year from then on its federations. Seasons ending earlier would need the Soviet
- * Union, Czechoslovakia, Yugoslavia and both Germanys, as identity overrides as well as territory.
+ * The earliest season-end year a set is built for: 1961/62, the first World Cup season the game covers.
+ * footballFederations.js gives every year from then on its federations: the shapes held by another, those with no team,
+ * and the federations of the day (the Soviet Union, Yugoslavia, Czechoslovakia, West Germany, Zaire) with the names,
+ * codes and flags their holders play under (identitiesFor).
  */
-export const FIRST_YEAR = 1997;
+export const FIRST_YEAR = 1962;
 /** The last season-end year the game loads (isDataYear in src/engine/footballSets.js). */
 export const LAST_YEAR = 2100;
 export const NO_TEAM = 'noTeam';
@@ -204,24 +205,125 @@ export function nationResolver({ aliases = {}, noTeam = [] } = {}) {
 }
 
 /**
- * Shapes merged into another nation's empire, and shapes with no federation, in season-end year `year`: an
- * association takes part once it was a FIFA member by the cutoff (30 June) of that year. Before then its shape is
- * held by `heldBy`, until `heldUntil` if the holder lost it earlier (by the same cutoff), and neutral otherwise.
+ * `resolve` (nationResolver's) for season-end year `year`: a nation named after a federation of that year (its name or
+ * one of its `aliases` in src/data/footballFederations.js: 'Soviet Union' to 1991, 'Czechoslovakia' to 1993, 'West
+ * Germany' to 1990, 'Zaire' from 1972 to 1996) plays for the federation's holder, though cm0102Nations.js lists SI's
+ * placeholders of those names as having no team. In any other year, and from 1996/97 on, `resolve` alone.
  */
-export function territoryFor({ cutoff = '06-30', shapes = {} } = {}, year) {
-  const merged = {}, inactive = [];
-  const end = `${year}-${cutoff}`;
-  for (const [shape, federation] of Object.entries(shapes).sort(([a], [b]) => byText(a, b))) {
-    if (!NATIONS[shape] || (federation.heldBy && !NATIONS[federation.heldBy])) throw new Error(`footballFederations.js names ${shape} held by ${federation.heldBy}, not both game nations`);
+export function dayNationResolver(resolve, { federations = [] } = {}, year) {
+  const ofTheDay = new Map();
+  for (const federation of federations) {
+    if (!inYears(federation, year)) continue;
+    for (const name of [federation.name, ...(federation.aliases || [])]) ofTheDay.set(fold(name), federation.holder);
+  }
+  return name => ofTheDay.get(fold(name)) ?? resolve(name);
+}
+
+// A day, or a month where the source gives no day ('1963-01'), compared as text with a cutoff day.
+const FEDERATION_DATE = /^\d{4}-(0[1-9]|1[0-2])(?:-(0[1-9]|[12]\d|3[01]))?$/;
+const inYears = (federation, year) => (federation.from ?? -Infinity) <= year && year <= (federation.through ?? Infinity);
+
+/** Refuse a federations table that names a shape the map does not have, or dates that cannot be compared. */
+function checkFederations({ cutoff, shapes, federations, suspensions }) {
+  const game = id => typeof id === 'string' && Object.hasOwn(NATIONS, id);
+  for (const [shape, federation] of Object.entries(shapes)) {
+    if (!game(shape) || (federation.heldBy && !game(federation.heldBy))) throw new Error(`footballFederations.js names ${shape} held by ${federation.heldBy}, not both game nations`);
     if (federation.heldUntil && (!federation.heldBy || federation.heldUntil > federation.member)) {
       throw new Error(`footballFederations.js gives ${shape} a holder until ${federation.heldUntil}, which needs a holder and a date before its membership`);
     }
-    if (federation.member <= end) continue;
-    if (federation.heldBy && !(federation.heldUntil && federation.heldUntil <= end)) merged[shape] = federation.heldBy;
+  }
+  const overlap = (a, b) => Math.max(a.from ?? -Infinity, b.from ?? -Infinity) <= Math.min(a.through ?? Infinity, b.through ?? Infinity);
+  for (const federation of federations) {
+    const at = `footballFederations.js federation ${federation.id}`;
+    if (!game(federation.holder) || !federation.members.every(game) || federation.members.includes(federation.holder)) {
+      throw new Error(`${at} must hold game nations other than its holder ${federation.holder}`);
+    }
+    if ([federation.from, federation.through].some(year => year != null && !Number.isInteger(year)) || (federation.from ?? -Infinity) > (federation.through ?? Infinity)) {
+      throw new Error(`${at} has no years from ${federation.from} through ${federation.through}`);
+    }
+    if (!federation.name?.trim() || !/^[A-Z]{3}$/.test(federation.code ?? '') || !federation.flagId) throw new Error(`${at} needs a name, a three-capital code and a flag`);
+    for (const other of federations) {
+      if (other === federation || !overlap(federation, other)) continue;
+      if (other.holder === federation.holder) throw new Error(`${at} and ${other.id} both play on ${federation.holder} in the same years`);
+      const twice = federation.members.find(member => other.members.includes(member) || other.holder === member);
+      if (twice) throw new Error(`${at} holds ${twice}, which ${other.id} holds or plays on in the same years`);
+    }
+  }
+  for (const suspension of suspensions) {
+    const at = `footballFederations.js suspension of ${suspension.shape}`;
+    if (!game(suspension.shape)) throw new Error(`${at}: not a game nation`);
+    for (const date of [suspension.from, suspension.until].filter(Boolean)) {
+      if (!FEDERATION_DATE.test(date)) throw new Error(`${at}: ${date} is not a date like 1992-05-31 or 1963-01`);
+      // A month alone cannot be told from a cutoff of the same month.
+      if (date.length === 7 && date.slice(5) === cutoff.slice(0, 2)) throw new Error(`${at}: ${date} falls in the cutoff's month; give the day`);
+    }
+    if (!suspension.from || (suspension.until && suspension.until <= suspension.from)) throw new Error(`${at} must start before it ends`);
+  }
+}
+
+/**
+ * Shapes merged into another nation's empire, and shapes with no team, in season-end year `year`, from the state on
+ * the cutoff (30 June) of that year (src/data/footballFederations.js):
+ * - a member of a federation of the day (`federations`) is merged into its holder in the federation's years;
+ * - otherwise an association takes part once it was a FIFA member by the cutoff; before then its shape is held by
+ *   `heldBy`, until `heldUntil` if the holder lost it earlier (by the same cutoff), and neutral otherwise;
+ * - a suspended association's shape (`suspensions`) is neutral;
+ * - a shape whose holder fields no team that year is neutral: a holder that is neutral or held itself, or, given
+ *   `fields` (a nation id → whether the season fields its team), one that does not field a side.
+ * Every season from 1996/97 on keeps the territory it was built with: no federation of the day or suspension reaches it.
+ */
+export function territoryFor({ cutoff = '06-30', shapes = {}, federations = [], suspensions = [] } = {}, year, { fields } = {}) {
+  checkFederations({ cutoff, shapes, federations, suspensions });
+  const end = `${year}-${cutoff}`;
+  const suspended = new Set(suspensions.filter(s => s.from <= end && !(s.until && s.until <= end)).map(s => s.shape));
+  const ofTheDay = new Map();
+  for (const federation of federations) if (inYears(federation, year)) for (const member of federation.members) ofTheDay.set(member, federation.holder);
+  // Each shape's holder that year, null when it takes part itself, or false when it has no team.
+  const holderOf = shape => {
+    if (suspended.has(shape)) return false;
+    if (ofTheDay.has(shape)) return ofTheDay.get(shape);
+    const federation = shapes[shape];
+    if (!federation || federation.member <= end) return null;
+    return federation.heldBy && !(federation.heldUntil && federation.heldUntil <= end) ? federation.heldBy : false;
+  };
+  const merged = {}, inactive = [];
+  for (const shape of [...new Set([...Object.keys(shapes), ...ofTheDay.keys(), ...suspended])].sort(byText)) {
+    const holder = holderOf(shape);
+    if (holder === null) continue;
+    if (holder !== false && holderOf(holder) === null && !(fields && !fields(holder))) merged[shape] = holder;
     else inactive.push(shape);
   }
   return { merged, inactive };
 }
+
+/**
+ * The name, code and flag the federations of the day play under in season-end year `year`, by holder shape:
+ * `{ '643': { name: 'Soviet Union', code: 'URS', flagId: 'URS' } }` for each federation of that year whose holder takes
+ * part (neither neutral nor held: FR Yugoslavia's suspended years have none) and, given `fields` (a nation id →
+ * whether the season fields its team), fields a side. A season file carries it as `identities`; the game shows the
+ * holder's team under it (src/engine/footballSets.js `seasonSport` playsAs). Empty for every season from 1996/97 on.
+ */
+export function identitiesFor(table = {}, year, { fields } = {}) {
+  const { merged, inactive } = territoryFor(table, year);
+  const identities = {};
+  for (const federation of [...(table.federations || [])].sort((a, b) => byText(a.holder, b.holder))) {
+    const { holder } = federation;
+    if (!inYears(federation, year) || inactive.includes(holder) || Object.hasOwn(merged, holder) || (fields && !fields(holder))) continue;
+    identities[holder] = { name: federation.name, code: federation.code, flagId: federation.flagId };
+  }
+  return identities;
+}
+
+/**
+ * Whose team a nation's players play for in a season with these `identities` and `territory`: a shape merged into a
+ * federation of the day plays for it (a Ukrainian in 1990 for the Soviet Union, a Croat for Yugoslavia, a Slovak for
+ * Czechoslovakia), every other shape for itself. A shape merged into a nation without an identity (New Caledonia into
+ * France, South Sudan into Sudan) keeps its own players apart, as the seasons from 1996/97 were built.
+ */
+export const federationTeamOf = (identities, territory) => id => {
+  const holder = territory.merged[id];
+  return holder && Object.hasOwn(identities, holder) ? holder : id;
+};
 
 const MONTH_START = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 const dayIndex = (month, day) => MONTH_START[month - 1] + day;
@@ -298,8 +400,8 @@ export function buildFootballSet(files, {
   const database = resolveDatabase(signature, databases, identity);
   if (database.ignored.length) warn(`${database.label} is a known database, so ${database.ignored.join(', ')} ${database.ignored.length > 1 ? 'are' : 'is'} ignored`);
   if (database.year < FIRST_YEAR) {
-    throw new Error(`Season ${database.season} ends in ${database.year}: seasons ending before ${FIRST_YEAR} are refused for now, because `
-      + 'they need historic nation identities as well as territory (docs/design/football-years.md)');
+    throw new Error(`Season ${database.season} ends in ${database.year}: seasons ending before ${FIRST_YEAR} are refused, because `
+      + 'src/data/footballFederations.js gives no federations before then (docs/design/football-years.md)');
   }
   const digests = {};
   if (database.match) {
@@ -332,7 +434,7 @@ export function buildFootballSet(files, {
     warn(`Birth shift check inconclusive (${oracle.matches} famous players found, ${oracle.agreeing} agreeing); using ${signed(dobShift)} from ${shiftSource}`);
   }
 
-  const resolve = nationResolver(nationMap);
+  const resolve = dayNationResolver(nationResolver(nationMap), federations, database.year);
   const nationRows = parsed.nations.map(n => {
     const id = resolve(n.name);
     return { name: n.name, id: id === NO_TEAM ? null : id, key: id && id !== NO_TEAM ? id : `cm:${fold(n.name)}`, noTeam: id === NO_TEAM, unmapped: id == null };
@@ -386,8 +488,16 @@ export function buildFootballSet(files, {
     return { name, pos, positions: sourceInfo.positions, rating, sourceInfo, tuple, club: player.club, nationId: nation.id };
   });
 
-  const pools = new Map();
-  for (const player of players) if (player.nationId) (pools.get(player.nationId) || pools.set(player.nationId, []).get(player.nationId)).push(player);
+  // A federation of the day fields its members' players: a Ukrainian of a 1989/90 database plays for the Soviet Union.
+  const territory = territoryFor(federations, database.year);
+  const teamOf = federationTeamOf(identitiesFor(federations, database.year), territory);
+  const pools = new Map(), pooled = {};
+  for (const player of players) {
+    if (!player.nationId) continue;
+    const team = teamOf(player.nationId);
+    if (team !== player.nationId) pooled[team] = { ...pooled[team], [player.nationId]: (pooled[team]?.[player.nationId] || 0) + 1 };
+    (pools.get(team) || pools.set(team, []).get(team)).push(player);
+  }
   const nations = {}, nationAudit = [];
   // Tonga, Samoa and the Cook Islands are listed only when the database rates a player of theirs; without them they
   // field no team (src/engine/footballSets.js), as in an EA season.
@@ -429,7 +539,8 @@ export function buildFootballSet(files, {
   }
   const clubs = presentClubs(built, warn);
 
-  const territory = territoryFor(federations, database.year);
+  // The names, codes and flags of the federations of the day that field players (none from 1996/97 on).
+  const identities = identitiesFor(federations, database.year, { fields: id => nations[id]?.[2].length > 0 });
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
   const coverage = {
     players: written.size, nations: nationAudit.filter(n => n.players).length,
@@ -437,7 +548,8 @@ export function buildFootballSet(files, {
   };
   const doc = {
     format: FOOTBALL_SET_FORMAT, id: database.id, version: '', year: database.year, season: database.season,
-    label: `${edition} · ${database.label}`, local, source, nations, clubs, territory, coverage,
+    label: `${edition} · ${database.label}`, local, source, nations, clubs, territory,
+    ...(Object.keys(identities).length ? { identities } : {}), coverage,
   };
   doc.version = `${doc.id}-${contentHash(doc)}`;
 
@@ -451,7 +563,10 @@ export function buildFootballSet(files, {
     parser: { format: parsed.format, counts: parsed.counts, index: parsed.index, warnings: parsed.warnings },
     birthShift: { used: dobShift, from: shiftSource, oracle },
     players: { read: parsed.players.length, eligible: players.length, written: coverage.players, dropped },
-    unmapped, noTeam, leagues: leagueAudit, territory, nations: nationAudit, warnings,
+    unmapped, noTeam, leagues: leagueAudit, territory,
+    // A season of federations of the day records them and whose players they field (by shape, how many).
+    ...(Object.keys(identities).length || Object.keys(pooled).length ? { federations: { identities, pooled } } : {}),
+    nations: nationAudit, warnings,
   };
   const summary = [
     `${doc.id}: ${database.label}, season ${database.season} (${database.known ? 'known database' : `named by flags${database.defaulted.length ? `; defaulted ${database.defaulted.join(', ')}` : ''}`})`,
