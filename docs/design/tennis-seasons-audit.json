@@ -61,6 +61,29 @@
       "layoff": null,
       "files": "tour",
       "note": "Tennis Abstract's method before May 2018, for the check against its 2016 and 2017 reports: tour-level matches only, everyone starting at 1500, no layoff penalty."
+    },
+    "early": {
+      "about": "The men's seasons before 1973 (docs/design/tennis.md, \"Before 1973\"): a second run of this method, kept apart from the first so that 1973-2025 rebuild byte for byte. It reads Sackmann's file of the amateur era (the majors and the Davis Cup, 1877-1967) before the open era's files, with the amateur file's duplicate ids merged, its newcomers starting at their own level and its layoffs charged only from 26 weeks, and snapshots 1960-1972 (seasons.early). The rest is the method above.",
+      "file": "atp_matches_amateur.csv",
+      "fileNote": "25,001 rows of two levels, the majors (G, 20,201) and the Davis Cup rubbers (D, 4,800); each row stops after 40 of the header's 49 cells (the empty statistics and rank cells left off, padded when read), and two rounds appear that the open era's files lack: PR, a preliminary round before the first full one, and CR, the challenge round of Wimbledon to 1921 and of the US Championships to 1911. A row's season is the year of its date. Every row is counted but walkovers, retirements, defaults and placeholder opponents.",
+      "start": {
+        "amateur": 1360,
+        "fit": "Not published: a newcomer whose first counted match is in the amateur file starts at 1360, fitted to five points so that the run carries on as the shipped one. On Tennis Abstract's 38 targets for 1973-2000 (targets above) it comes out 2.0 Elo low on average, root mean square 15.3 (the shipped run: 2.0 and 15.1), and over the shipped run's top 50 of each season 1973-1980 its Elo of the same men differs from the shipped run's by 0.3 to 3.0 points on average (absolute), by -1.2 to +2.6 in all. A start of 1350 leaves those seasons 0.1 to 4.8 points under the shipped run, 1370 2.9 to 5.9 over it, 1450 (the open era's tour start) 18 to 30 over it."
+      },
+      "layoff": {
+        "from": 19680101,
+        "amateurWeeks": 26,
+        "note": "The open era's rule (layoff above) for every gap that begins on or after 1 January 1968. A gap that begins and ends before it is charged on the same scale only when it lasts 26 weeks or more: the file holds about a third of a leading amateur's matches, so the eight-week rule charges nearly every amateur (against Tingay's top tens of 1960-1967, checks below, the mean rank correlation is 0.66 with eight weeks, 0.64 with 13, 0.70 with 26, 0.67 with 39 and 0.67 with no charge at all). A gap across the start, a professional coming back to the open events of 1968, is never charged."
+      },
+      "activity": {
+        "amateur": 3,
+        "open": 10,
+        "note": "1960-1967 (seasons.amateur) list the men with three counted matches in the season, 1968-1972 ten, as from 1973. The amateur file holds only the majors and the Davis Cup, about a third of a leading amateur's matches: a floor of ten would leave six to eight nations a season (and share 7.6 of Tingay's ten, rank correlation 0.77), five 15 to 20 (7.4, 0.73), three 23 to 30 (7.1, 0.70)."
+      },
+      "aliases": {
+        "note": "Duplicate ids, each merged into the id of the same man before rating (and so for his Davis Cup nations too), reviewed by hand on 2026-11-09. Two kinds: 'davis-cup', an id of the amateur file with Davis Cup rows only, joined to his id with majors or open-era rows; and 'open-era', an amateur id of a man who carries on in the open era under another one. Both share a country, and careers no more than two seasons apart unless the birth dates agree. Rules: 'name', the same full name; 'initial', the same surname and first initial; 'born', the same surname and birth date; 'hand', the same surname with a variant of the first name, accepted by hand, or (two pairs, found by a second search for surnames spelt two ways) a variant of the surname: Julie Mayer, 'Julius Mayer' in the Davis Cup and 'Julian Mayers' at the majors (Wikipedia, 'Julie Mayer (tennis)', revision 1370199196, names the two), and Andras Szikszay, 'Szikszai' at the majors. Of the two, the id the open era's files use is kept (the one with more open-era rows when both have some), else the majors id. No merged pair played the same event. Not merged: men of one surname told apart by their first names or birth dates (Constantin and Ilie Nastase, the Ulrichs, the Frasers, Vo Van Bay and Vo Van Thanh, whose surname is Vo), two ids in one event (always two men), and pairs with no evidence beyond the surname (Aragon, Mohan, Kirby, Reyes, Tapia, Cameron, Guimaraes, Badreldin and El Sayed, Sturdza). The player file's birth dates differ within 39 merged pairs by a day, a month, a year or a placeholder (1 January); their names, country and years agree.",
+        "pairs": 225
+      }
     }
   },
   "validation": {
@@ -853,6 +876,391 @@
             "both": 491
           }
         }
+      }
+    },
+    "early": {
+      "seasons": [
+        1960,
+        1972
+      ],
+      "matches": {
+        "counted": 417318,
+        "unplayed": 15238,
+        "no score": 177,
+        "placeholder": 110,
+        "skipped": 24824
+      },
+      "davisCupRubbersUnresolved": 31,
+      "aliases": {
+        "pairs": 225,
+        "kinds": {
+          "davis-cup": 200,
+          "open-era": 25
+        },
+        "matchesMoved": 1498
+      },
+      "fit": {
+        "years": [
+          1973,
+          2000
+        ],
+        "n": 38,
+        "meanDiff": -2,
+        "rms": 15.3,
+        "byDecade": {
+          "1970s": -1.2,
+          "1980s": -1.5,
+          "1990s": -4.7
+        },
+        "after": {
+          "n": 15,
+          "meanDiff": 29.1
+        }
+      },
+      "seam": {
+        "1973": {
+          "n": 50,
+          "meanDiff": 0.1,
+          "meanAbsDiff": 2.3,
+          "maxAbsDiff": 18.5
+        },
+        "1974": {
+          "n": 50,
+          "meanDiff": -1.2,
+          "meanAbsDiff": 1.5,
+          "maxAbsDiff": 5
+        },
+        "1975": {
+          "n": 50,
+          "meanDiff": 0.7,
+          "meanAbsDiff": 2.4,
+          "maxAbsDiff": 48.3
+        },
+        "1976": {
+          "n": 50,
+          "meanDiff": 0.9,
+          "meanAbsDiff": 1.8,
+          "maxAbsDiff": 45.3
+        },
+        "1977": {
+          "n": 50,
+          "meanDiff": 2.6,
+          "meanAbsDiff": 3,
+          "maxAbsDiff": 100
+        },
+        "1978": {
+          "n": 50,
+          "meanDiff": 2.2,
+          "meanAbsDiff": 2.3,
+          "maxAbsDiff": 68.4
+        },
+        "1979": {
+          "n": 50,
+          "meanDiff": 0.5,
+          "meanAbsDiff": 0.5,
+          "maxAbsDiff": 1.6
+        },
+        "1980": {
+          "n": 50,
+          "meanDiff": 0.3,
+          "meanAbsDiff": 0.3,
+          "maxAbsDiff": 1.6
+        }
+      }
+    },
+    "checks": {
+      "topTens": {
+        "authority": "Lance Tingay (The Daily Telegraph): his amateur ten for 1960-1967, everyone's from 1968",
+        "periods": {
+          "amateur": {
+            "seasons": 8,
+            "shared": 7.1,
+            "rho": 0.7
+          },
+          "open": {
+            "seasons": 5,
+            "shared": 7.4,
+            "rho": 0.59
+          }
+        },
+        "seasons": {
+          "1960": {
+            "shared": 7,
+            "listed": 10,
+            "rho": 0.87,
+            "ranks": [
+              1,
+              2,
+              3,
+              7,
+              9,
+              11,
+              4,
+              8,
+              12,
+              26
+            ],
+            "notListed": []
+          },
+          "1961": {
+            "shared": 8,
+            "listed": 10,
+            "rho": 0.33,
+            "ranks": [
+              2,
+              3,
+              8,
+              6,
+              15,
+              5,
+              4,
+              1,
+              7,
+              26
+            ],
+            "notListed": []
+          },
+          "1962": {
+            "shared": 6,
+            "listed": 10,
+            "rho": 0.73,
+            "ranks": [
+              1,
+              3,
+              12,
+              2,
+              10,
+              5,
+              13,
+              17,
+              6,
+              36
+            ],
+            "notListed": []
+          },
+          "1963": {
+            "shared": 6,
+            "listed": 10,
+            "rho": 0.81,
+            "ranks": [
+              3,
+              2,
+              1,
+              5,
+              14,
+              4,
+              9,
+              71,
+              12,
+              20
+            ],
+            "notListed": []
+          },
+          "1964": {
+            "shared": 8,
+            "listed": 10,
+            "rho": 0.67,
+            "ranks": [
+              1,
+              3,
+              5,
+              10,
+              2,
+              4,
+              7,
+              13,
+              12,
+              6
+            ],
+            "notListed": []
+          },
+          "1965": {
+            "shared": 7,
+            "listed": 10,
+            "rho": 0.68,
+            "ranks": [
+              1,
+              2,
+              3,
+              4,
+              27,
+              6,
+              12,
+              21,
+              5,
+              7
+            ],
+            "notListed": []
+          },
+          "1966": {
+            "shared": 8,
+            "listed": 10,
+            "rho": 0.83,
+            "ranks": [
+              3,
+              2,
+              1,
+              8,
+              4,
+              7,
+              5,
+              22,
+              10,
+              11
+            ],
+            "notListed": []
+          },
+          "1967": {
+            "shared": 7,
+            "listed": 10,
+            "rho": 0.68,
+            "ranks": [
+              2,
+              1,
+              3,
+              39,
+              5,
+              4,
+              13,
+              6,
+              7,
+              16
+            ],
+            "notListed": []
+          },
+          "1968": {
+            "shared": 6,
+            "listed": 10,
+            "rho": 0.76,
+            "ranks": [
+              1,
+              4,
+              2,
+              11,
+              3,
+              6,
+              16,
+              25,
+              17,
+              9
+            ],
+            "notListed": []
+          },
+          "1969": {
+            "shared": 8,
+            "listed": 10,
+            "rho": 0.49,
+            "ranks": [
+              1,
+              5,
+              8,
+              2,
+              4,
+              7,
+              23,
+              3,
+              6,
+              18
+            ],
+            "notListed": []
+          },
+          "1970": {
+            "shared": 7,
+            "listed": 10,
+            "rho": 0.48,
+            "ranks": [
+              7,
+              2,
+              1,
+              6,
+              9,
+              21,
+              4,
+              3,
+              13,
+              20
+            ],
+            "notListed": []
+          },
+          "1971": {
+            "shared": 9,
+            "listed": 10,
+            "rho": 0.39,
+            "ranks": [
+              4,
+              5,
+              1,
+              2,
+              15,
+              6,
+              7,
+              8,
+              9,
+              3
+            ],
+            "notListed": []
+          },
+          "1972": {
+            "shared": 7,
+            "listed": 10,
+            "rho": 0.81,
+            "ranks": [
+              2,
+              1,
+              6,
+              5,
+              4,
+              3,
+              17,
+              9,
+              18,
+              16
+            ],
+            "notListed": []
+          }
+        }
+      },
+      "statements": {
+        "yearEnd": [
+          {
+            "season": 1968,
+            "text": "Newcombe fourth at the end of 1968, behind Laver, Rosewall and Ashe",
+            "ours": [
+              "Rod Laver 1",
+              "Ken Rosewall 2",
+              "Arthur Ashe 4",
+              "John Newcombe 6"
+            ]
+          },
+          {
+            "season": 1969,
+            "text": "Newcombe fourth again at the end of 1969, now behind Laver, Roche and Okker",
+            "ours": [
+              "Rod Laver 1",
+              "Tony Roche 5",
+              "Tom Okker 2",
+              "John Newcombe 8"
+            ]
+          },
+          {
+            "season": 1970,
+            "text": "Rosewall behind Laver at the end of 1970",
+            "ours": [
+              "Rod Laver 1",
+              "Ken Rosewall 2"
+            ]
+          }
+        ],
+        "peaks": [
+          {
+            "name": "Rod Laver",
+            "year": 1970,
+            "published": 2571,
+            "computed": 2329.2,
+            "date": "1969-09-20",
+            "endOfYear": 2269
+          }
+        ]
       }
     }
   },
@@ -5773,6 +6181,1133 @@
           "Humphrey Hose (VEN)"
         ],
         "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1972",
+      "version": "tennis-1972-822cbbe7",
+      "label": "Elo from match results, end of 1972 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 10,
+      "date": "1973-01-16",
+      "rated": 168,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Ilie Nastase ROU 2190.1 → 92",
+        "Stan Smith USA 2179.3 → 91",
+        "John Newcombe AUS 2132.1 → 89",
+        "Arthur Ashe USA 2119.7 → 89",
+        "Rod Laver AUS 2109.6 → 88"
+      ],
+      "nations": [
+        "United States 89 (Stan Smith 91, Arthur Ashe 89, Jimmy Connors 85, Marty Riessen 85, Roscoe Tanner 84; +33)",
+        "Australia 87.7 (John Newcombe 89, Rod Laver 88, Ken Rosewall 87, Tony Roche 82, Roy Emerson 81; +28)",
+        "Romania 82.5 (Ilie Nastase 92, Ion Tiriac 73)",
+        "Spain 81.1 (Manuel Orantes 85, Andres Gimeno 82, Juan Gisbert 76, Antonio Munoz 67)",
+        "Soviet Union (Russia) 79.1 (Alex Metreveli 87, Teimuraz Kakulia 72, Vladimir Korotkov 68)",
+        "Great Britain 78.2 (Roger Taylor 80, Mark Cox 80, Gerald Battrick 72, John Paish 70, Graham Stilwell 68; +4)",
+        "Czechoslovakia (Czechia) 76.9 (Jan Kodes 83, Jiri Hrebec 74, Vladimir Zednik 72, Frantisek Pala 69, Milan Holecek 68; +1)",
+        "France 76.7 (Pierre Barthes 77, Patrice Dominguez 77, Francois Jauffret 76, Patrick Proisy 75, Georges Goven 72; +5)",
+        "Yugoslavia (Serbia) 76.5 (Nikola Pilic 80, Zeljko Franulovic 77, Boro Jovanovic 73, Nicola Spear 64)",
+        "West Germany (Germany) 74.9 (Karl Meiler 76, Harald Elschenbroich 75, Wilhelm Bungert 74, Jurgen Fassbender 71)",
+        "Italy 74.7 (Adriano Panatta 78, Martin Mulligan 74, Nicola Pietrangeli 71, Antonio Zugarelli 68, Paolo Bertolucci 66; +2)",
+        "Brazil 74 (Thomaz Koch 76, Jose Edison Mandarino 72)",
+        "Chile 73.3 (Jaime Fillol 76, Jaime Pinto Bravo 71, Patricio Cornejo 69)",
+        "New Zealand 72.4 (Brian Fairlie 74, Onny Parun 73, Jeff Simpson 62)",
+        "Sweden 72 (Ove Bengtson 73, Bjorn Borg 71)",
+        "Belgium 71.5 (Bernard Mignot 72, Patrick Hombergen 71)",
+        "Hungary 71.1 (Szabolcz Baranyi 72, Istvan Gulyas 72, Geza Varga 68, Peter Szoke 67)",
+        "Mexico 70.5 (Joaquin Loyo Mayo 71, Raul Ramirez 70)",
+        "Colombia 69 (Ivan Molina 70, Jairo Velasco 68)",
+        "Canada 67.5 (Mike Belkin 74, Don Mccormick 61)",
+        "Japan 66.9 (Toshiro Sakai 68, Jun Kamiwazumi 67, Kiyoshi Tanabe 65, Jun Kuki 64)",
+        "India 66.6 (Premjit Lall 69, Sashi Menon 65, Vijay Amritraj 65, Anand Amritraj 65)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 119,
+        "player-file": 49
+      },
+      "leftOut": {
+        "barred": [
+          "Cliff Drysdale (RSA)",
+          "Bob Hewitt (RSA)",
+          "Frew Mcmillan (RSA)",
+          "Raymond Moore (RSA)",
+          "Robert Maud (RSA)",
+          "Pat Cramer (RSA)",
+          "Terry Ryan (RSA)"
+        ],
+        "aloneInTheirNation": [
+          "Tom Okker (NED)",
+          "Ismail El Shafei (EGY)",
+          "Haroon Rahim (PAK)",
+          "Guillermo Vilas (ARG)",
+          "Alejandro Olmedo (PER)",
+          "Nicholas Kalogeropoulos (GRE)",
+          "Wieslaw Gasiorek (POL)",
+          "Hans Kary (AUT)",
+          "Richard Russell (JAM)",
+          "Humphrey Hose (VEN)",
+          "Torben Ulrich (DEN)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1971",
+      "version": "tennis-1971-ccf22b44",
+      "label": "Elo from match results, end of 1971 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 10,
+      "date": "1971-12-31",
+      "rated": 156,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Rod Laver AUS 2206.3 → 92",
+        "Ken Rosewall AUS 2165.2 → 91",
+        "Ilie Nastase ROU 2153.8 → 90",
+        "John Newcombe AUS 2129.2 → 89",
+        "Stan Smith USA 2112.8 → 89"
+      ],
+      "nations": [
+        "Australia 90.4 (Rod Laver 92, Ken Rosewall 91, John Newcombe 89, Roy Emerson 83, Tony Roche 82; +29)",
+        "United States 87.9 (Stan Smith 89, Arthur Ashe 88, Marty Riessen 86, Bob Lutz 85, Richard Gonzalez 84; +28)",
+        "Spain 83.6 (Manuel Santana 85, Manuel Orantes 84, Andres Gimeno 83, Juan Gisbert 77, Antonio Munoz 64)",
+        "Romania 83 (Ilie Nastase 90, Ion Tiriac 76)",
+        "Yugoslavia (Serbia) 78.5 (Nikola Pilic 81, Zeljko Franulovic 81, Boro Jovanovic 72, Nicola Spear 65)",
+        "France 78.4 (Georges Goven 80, Pierre Barthes 79, Patrick Proisy 74, Patrice Dominguez 74, Francois Jauffret 73; +4)",
+        "Great Britain 78.1 (Roger Taylor 81, Mark Cox 78, Gerald Battrick 78, Graham Stilwell 67, John Paish 65; +2)",
+        "Czechoslovakia (Czechia) 76.6 (Jan Kodes 84, Milan Holecek 73, Frantisek Pala 69, Jiri Hrebec 69, Vladimir Zednik 68; +2)",
+        "Italy 74.6 (Martin Mulligan 76, Adriano Panatta 75, Nicola Pietrangeli 72, Ezio Di Matteo 70, Massimo Di Domenico 65; +2)",
+        "Brazil 74.5 (Thomaz Koch 78, Jose Edison Mandarino 71)",
+        "West Germany (Germany) 74 (Christian Kuhnke 75, Wilhelm Bungert 75, Harald Elschenbroich 73, Hans Jurgen Pohmann 67, Ingo Buding 66)",
+        "New Zealand 73 (Onny Parun 73, Brian Fairlie 73)",
+        "Hungary 72.5 (Istvan Gulyas 73, Peter Szoke 73, Szabolcz Baranyi 68)",
+        "Chile 72.4 (Jaime Fillol 77, Patricio Cornejo 68, Jaime Pinto Bravo 67)",
+        "Denmark 72.4 (Jan Leschly 78, Torben Ulrich 67, Jorgen Ulrich 66)",
+        "Mexico 70.5 (Joaquin Loyo Mayo 72, Marcello Lara 69)",
+        "India 69 (Premjit Lall 71, Jaidip Mukerjea 67)",
+        "Japan 66.4 (Jun Kamiwazumi 67, Jun Kuki 66, Toshiro Sakai 65)",
+        "Austria 62.5 (Peter Pokorny 63, Hans Kary 62)",
+        "Belgium 62.5 (Patrick Hombergen 66, Eric Drossart 59)"
+      ],
+      "merged": [
+        "Croatia → Yugoslavia (Serbia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 112,
+        "player-file": 43,
+        "fix": 1
+      },
+      "leftOut": {
+        "barred": [
+          "Cliff Drysdale (RSA)",
+          "Bob Hewitt (RSA)",
+          "Raymond Moore (RSA)",
+          "Robert Maud (RSA)",
+          "Frew Mcmillan (RSA)",
+          "Byron Bertram (RSA)",
+          "Terry Ryan (RSA)",
+          "Pat Cramer (RSA)",
+          "Derek Schroder (RSA)"
+        ],
+        "aloneInTheirNation": [
+          "Tom Okker (NED)",
+          "Alex Metreveli (URS)",
+          "Mike Belkin (CAN)",
+          "Alejandro Olmedo (PER)",
+          "Ismail El Shafei (EGY)",
+          "Haroon Rahim (PAK)",
+          "Nicholas Kalogeropoulos (GRE)",
+          "Ove Bengtson (SWE)",
+          "Richard Russell (JAM)",
+          "Hank Irvine (RHO)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1970",
+      "version": "tennis-1970-e1cd61d9",
+      "label": "Elo from match results, end of 1970 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 10,
+      "date": "1970-12-31",
+      "rated": 137,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Rod Laver AUS 2269 → 95",
+        "Ken Rosewall AUS 2143.5 → 90",
+        "Arthur Ashe USA 2114.1 → 89",
+        "Cliff Richey USA 2109.1 → 88",
+        "Stan Smith USA 2095.3 → 88"
+      ],
+      "nations": [
+        "Australia 91.5 (Rod Laver 95, Ken Rosewall 90, Tony Roche 88, John Newcombe 87, Roy Emerson 84; +25)",
+        "United States 88 (Arthur Ashe 89, Cliff Richey 88, Stan Smith 88, Richard Gonzalez 84, Marty Riessen 84; +23)",
+        "Spain 83.4 (Manuel Santana 86, Andres Gimeno 83, Manuel Orantes 81, Juan Gisbert 77)",
+        "Yugoslavia (Serbia) 81.1 (Zeljko Franulovic 83, Nikola Pilic 81, Nicola Spear 72)",
+        "Romania 79 (Ilie Nastase 80, Ion Tiriac 78)",
+        "Great Britain 78.9 (Roger Taylor 83, Mark Cox 78, Gerald Battrick 73, Graham Stilwell 72, Peter Curtis 71; +3)",
+        "France 77.3 (Georges Goven 79, Pierre Barthes 77, Francois Jauffret 75, Jean Loup Rouyer 74, Daniel Contet 67; +2)",
+        "West Germany (Germany) 75.7 (Wilhelm Bungert 78, Christian Kuhnke 76, Harald Elschenbroich 72, Ingo Buding 69, Hans Joachim Ploetz 68; +1)",
+        "New Zealand 74.5 (Brian Fairlie 78, Onny Parun 71)",
+        "Soviet Union (Russia) 74.5 (Alex Metreveli 82, Vladimir Korotkov 67)",
+        "Chile 73.6 (Jaime Fillol 76, Luis Ayala 73, Patricio Rodriguez Chi 71, Patricio Cornejo 69)",
+        "Czechoslovakia (Czechia) 73.6 (Jan Kodes 79, Jan Kukal 71, Vladimir Zednik 71, Stepan Koudelka 65)",
+        "Brazil 73.5 (Thomaz Koch 78, Jose Edison Mandarino 69)",
+        "Italy 70.6 (Martin Mulligan 75, Adriano Panatta 70, Ezio Di Matteo 63, Massimo Di Domenico 63)",
+        "Hungary 69.5 (Istvan Gulyas 73, Peter Szoke 66, Szabolcz Baranyi 66)",
+        "India 69.5 (Premjit Lall 70, Jaidip Mukerjea 69)",
+        "Colombia 65 (Jairo Velasco 67, William Alvarez 63)",
+        "Austria 62 (Hans Kary 63, Peter Pokorny 61)",
+        "Belgium 61 (Patrick Hombergen 62, Eric Drossart 60)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 99,
+        "player-file": 38
+      },
+      "leftOut": {
+        "barred": [
+          "Cliff Drysdale (RSA)",
+          "Bob Hewitt (RSA)",
+          "Robert Maud (RSA)",
+          "Frew Mcmillan (RSA)",
+          "Raymond Moore (RSA)",
+          "Byron Bertram (RSA)",
+          "Terry Ryan (RSA)",
+          "Keith Diepraam (RSA)",
+          "Rauty Krog (RSA)"
+        ],
+        "aloneInTheirNation": [
+          "Tom Okker (NED)",
+          "Mike Belkin (CAN)",
+          "Nicholas Kalogeropoulos (GRE)",
+          "Ismail El Shafei (EGY)",
+          "Joaquin Loyo Mayo (MEX)",
+          "Torben Ulrich (DEN)",
+          "Haroon Rahim (PAK)",
+          "Hank Irvine (RHO)",
+          "Richard Russell (JAM)",
+          "Pancho Guzman (ECU)",
+          "Jun Kuki (JPN)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1969",
+      "version": "tennis-1969-94ecce39",
+      "label": "Elo from match results, end of 1969 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 10,
+      "date": "1969-12-31",
+      "rated": 136,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Rod Laver AUS 2250.3 → 94",
+        "Tom Okker NED 2119.4 → 89",
+        "Richard Gonzalez USA 2084.7 → 87",
+        "Ken Rosewall AUS 2067 → 87",
+        "Tony Roche AUS 2061.2 → 86"
+      ],
+      "nations": [
+        "Australia 89.5 (Rod Laver 94, Ken Rosewall 87, Tony Roche 86, John Newcombe 85, Roy Emerson 83; +20)",
+        "United States 85.8 (Richard Gonzalez 87, Arthur Ashe 85, Stan Smith 85, Cliff Richey 85, Earl Butch Buchholz 83; +28)",
+        "Spain 83.8 (Andres Gimeno 86, Manuel Santana 83, Manuel Orantes 76)",
+        "Romania 79 (Ilie Nastase 80, Ion Tiriac 78)",
+        "Great Britain 78.9 (Mark Cox 81, Roger Taylor 79, Graham Stilwell 78, Robert Wilson 71, David Lloyd 69; +2)",
+        "South Africa 78 (Bob Hewitt 79, Cliff Drysdale 79, Raymond Moore 74, Robert Maud 74, Julian Krinsky 69; +3)",
+        "Yugoslavia (Serbia) 77.6 (Zeljko Franulovic 79, Nikola Pilic 78, Nicola Spear 69)",
+        "West Germany (Germany) 76.4 (Wilhelm Bungert 78, Christian Kuhnke 77, Harald Elschenbroich 74, Hans Joachim Ploetz 70, Ingo Buding 68)",
+        "France 74.9 (Francois Jauffret 78, Pierre Barthes 74, Georges Goven 71, Jean Loup Rouyer 70, Michele Leclercq 69; +6)",
+        "Italy 73.9 (Martin Mulligan 78, Nicola Pietrangeli 72, Vittorio Crotta 61)",
+        "Brazil 73.5 (Thomaz Koch 79, Jose Edison Mandarino 68)",
+        "Chile 73.1 (Luis Ayala 75, Jaime Fillol 73, Patricio Cornejo 70, Patricio Rodriguez Chi 69, Jaime Pinto Bravo 66; +1)",
+        "Czechoslovakia (Czechia) 72.7 (Jan Kodes 78, Milan Holecek 71, Jan Kukal 71, Stepan Koudelka 60)",
+        "Soviet Union (Russia) 72 (Alex Metreveli 73, Thomas Lejus 71)",
+        "New Zealand 70.5 (Brian Fairlie 72, Onny Parun 69)",
+        "Ecuador 70 (Pancho Segura 72, Pancho Guzman 68)",
+        "Colombia 61 (Jairo Velasco 64, William Alvarez 58)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 90,
+        "player-file": 46
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Tom Okker (NED)",
+          "Mike Belkin (CAN)",
+          "Ove Bengtson (SWE)",
+          "Ismail El Shafei (EGY)",
+          "Istvan Gulyas (HUN)",
+          "Premjit Lall (IND)",
+          "Torben Ulrich (DEN)",
+          "Nicholas Kalogeropoulos (GRE)",
+          "Joaquin Loyo Mayo (MEX)",
+          "Wieslaw Gasiorek (POL)",
+          "Richard Russell (JAM)",
+          "Koji Watanabe (JPN)",
+          "Hank Irvine (RHO)",
+          "Peter Pokorny (AUT)",
+          "Humphrey Hose (VEN)",
+          "Michael Hickey (IRL)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1968",
+      "version": "tennis-1968-1e49a981",
+      "label": "Elo from match results, end of 1968 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 10,
+      "date": "1969-01-01",
+      "rated": 184,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Rod Laver AUS 2126.5 → 89",
+        "Ken Rosewall AUS 2071.1 → 87",
+        "Tony Roche AUS 2043.4 → 86",
+        "Arthur Ashe USA 2015.7 → 85",
+        "Roy Emerson AUS 2014.4 → 85"
+      ],
+      "nations": [
+        "Australia 87.5 (Rod Laver 89, Ken Rosewall 87, Tony Roche 86, Roy Emerson 85, John Newcombe 84; +20)",
+        "United States 82.9 (Arthur Ashe 85, Richard Gonzalez 82, Stan Smith 82, Clark Graebner 79, Cliff Richey 77; +43)",
+        "Spain 81.1 (Andres Gimeno 84, Manuel Santana 82, Juan Gisbert 74, Manuel Orantes 73, Juan Manuel Couder 70; +2)",
+        "South Africa 78.1 (Bob Hewitt 80, Cliff Drysdale 78, Robert Maud 76, Raymond Moore 73, Jackie Saul 67; +5)",
+        "Romania 76 (Ilie Nastase 78, Ion Tiriac 77, Sever Dron 62)",
+        "Denmark 75 (Jan Leschly 77, Torben Ulrich 74, Jorgen Ulrich 69)",
+        "Italy 74.6 (Martin Mulligan 78, Nicola Pietrangeli 74, Eugenio Castigliano 70, Ezio Di Matteo 68, Gaetano Di Maso 67; +5)",
+        "Brazil 74.5 (Jose Edison Mandarino 75, Thomaz Koch 74)",
+        "Great Britain 74.5 (Mark Cox 77, Roger Taylor 74, Gerald Battrick 72, Graham Stilwell 69, Robert Wilson 69; +9)",
+        "West Germany (Germany) 73.5 (Wilhelm Bungert 80, Harald Elschenbroich 70, Hans Joachim Ploetz 68, Ingo Buding 67, Jurgen Fassbender 64; +2)",
+        "Chile 73 (Luis Ayala 76, Jaime Fillol 72, Patricio Cornejo 69, Jaime Pinto Bravo 69, Patricio Rodriguez Chi 67)",
+        "France 72.7 (Pierre Barthes 75, Francois Jauffret 74, Georges Goven 67, Daniel Contet 64, Jean Pierre Courcol 62)",
+        "Yugoslavia (Serbia) 72.7 (Nikola Pilic 77, Boro Jovanovic 71, Zeljko Franulovic 70, Nicola Spear 65)",
+        "India 72 (Ramanathan Krishnan 75, Jaidip Mukerjea 69, Premjit Lall 69)",
+        "Mexico 72 (Rafael Osuna 73, Joaquin Loyo Mayo 72, Marcello Lara 67)",
+        "Soviet Union (Russia) 71.7 (Alex Metreveli 76, Thomas Lejus 70, Vladimir Korotkov 68, Sergei Likhachev 65)",
+        "Sweden 71.5 (Jan Erik Lundquist 76, Ove Bengtson 67)",
+        "Czechoslovakia (Czechia) 70.2 (Milan Holecek 71, Jan Kodes 70, Jan Kukal 67)",
+        "Canada 67 (Mike Belkin 72, Keith Carpenter 62)",
+        "Ecuador 66.8 (Pancho Segura 72, Miguel Olvera 64, Pancho Guzman 64, Eduardo Zuleta 60)",
+        "New Zealand 65.2 (Onny Parun 67, Brian Fairlie 65, John McDonald 57)",
+        "Jamaica 60 (Richard Russell 65, Lance Lumsden 55)",
+        "Belgium 58.5 (Patrick Hombergen 59, Eric Drossart 58)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 114,
+        "player-file": 70
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Tom Okker (NED)",
+          "Alejandro Olmedo (PER)",
+          "Istvan Gulyas (HUN)",
+          "Ismail El Shafei (EGY)",
+          "Koji Watanabe (JPN)",
+          "Nicholas Kalogeropoulos (GRE)",
+          "Wieslaw Gasiorek (POL)",
+          "Tito Vazquez (ARG)",
+          "Mathias Werren (SUI)",
+          "Humphrey Hose (VEN)",
+          "Haroon Rahim (PAK)",
+          "Tico Carrero (PUR)",
+          "Michael Hickey (IRL)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1967",
+      "version": "tennis-1967-53feb263",
+      "label": "Amateur Elo, end of 1967 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1967-12-31",
+      "rated": 141,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Roy Emerson AUS 2069 → 87",
+        "John Newcombe AUS 1941.8 → 82",
+        "Manuel Santana ESP 1935.5 → 81",
+        "Bob Hewitt RSA 1866.6 → 79",
+        "Tony Roche AUS 1855.8 → 78"
+      ],
+      "nations": [
+        "Australia 83 (Roy Emerson 87, John Newcombe 82, Tony Roche 78, Ken Fletcher 76, Owen Davidson 74; +13)",
+        "United States 76.6 (Clark Graebner 78, Arthur Ashe 77, Vic Seixas 73, Charlie Pasarell 73, Marty Riessen 72; +16)",
+        "South Africa 75.7 (Bob Hewitt 79, Cliff Drysdale 77, Abe Segal 68, Robert Maud 65, Raymond Moore 62; +3)",
+        "Spain 73.1 (Manuel Santana 81, Juan Gisbert 71, Jose Luis Arillla 65, Manuel Orantes 58, Jose Maria Gisbert 57)",
+        "Brazil 71.9 (Jose Edison Mandarino 74, Thomaz Koch 70, Ronnie Barnes 69)",
+        "India 71.2 (Ramanathan Krishnan 74, Jaidip Mukerjea 69, Premjit Lall 66)",
+        "Great Britain 70.8 (Robert Wilson 71, Roger Taylor 71, Mark Cox 70, Michael Sangster 70, Graham Stilwell 62; +4)",
+        "France 70.5 (Pierre Darmon 75, Francois Jauffret 70, Georges Goven 64, Daniel Contet 61, Jean Baptiste Chanfreau 57; +2)",
+        "Denmark 70.3 (Jan Leschly 74, Jorgen Ulrich 67, Torben Ulrich 65)",
+        "West Germany (Germany) 70 (Wilhelm Bungert 75, Ingo Buding 69, Hans Joachim Ploetz 65, Harald Elschenbroich 59)",
+        "Mexico 69.5 (Rafael Osuna 73, Marcello Lara 66)",
+        "Italy 68.4 (Nicola Pietrangeli 73, Giordano Majoli 65, Gaetano Di Maso 59)",
+        "Yugoslavia (Serbia) 68.1 (Nikola Pilic 74, Nicola Spear 66, Boro Jovanovic 63, Zeljko Franulovic 58)",
+        "Soviet Union (Russia) 66.1 (Alex Metreveli 68, Thomas Lejus 65, Vyacheslav Egorov 65, Sergei Likhachev 64, Vladimir Ivanov 63)",
+        "Hungary 65.7 (Istvan Gulyas 73, Andras Szikszay 59, Peter Szoke 56)",
+        "Netherlands 65 (Tom Okker 70, Jan Hajer 60)",
+        "Philippines 64.5 (Felicisimo Ampon 66, Eddie Cruz 64, Samuel Ang 59)",
+        "Romania 64 (Ion Tiriac 67, Ilie Nastase 61)",
+        "Japan 63 (Koji Watanabe 65, Ichizo Konishi 63, Keishiro Yanagi 60, Ryoichi Mori 58)",
+        "Czechoslovakia (Czechia) 62.9 (Jan Kodes 65, Milan Holecek 61, Jan Kukal 60)",
+        "Chile 61.6 (Patricio Rodriguez Chi 64, Patricio Cornejo 60, Jaime Pinto Bravo 56)",
+        "Ecuador 61 (Miguel Olvera 65, Pancho Guzman 57)",
+        "Bulgaria 59.5 (Kiril Yashmakov 60, Rangel Rangelov 59)",
+        "Greece 59 (Nicholas Kalogeropoulos 66, Periclis Gavrilidis 52)",
+        "Argentina 58.5 (Julian Ganzabal 62, Roberto Aubone 55)",
+        "New Zealand 58.5 (Brian Fairlie 61, Onny Parun 56)",
+        "Poland 58.5 (Wieslaw Gasiorek 63, Tadeusz Nowicki 54)",
+        "Belgium 57.2 (Eric Drossart 59, Claude De Gronckel 56, Patrick Hombergen 53)",
+        "Jamaica 55 (Richard Russell 55, Lance Lumsden 55)",
+        "Luxembourg 54.5 (Frank Baden 58, Thierry Brasseur 51)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 105,
+        "player-file": 35,
+        "fix": 1
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Ove Bengtson (SWE)",
+          "Keith Carpenter (CAN)",
+          "Pekka Saila (FIN)",
+          "Humphrey Hose (VEN)",
+          "Josef Stabholz (ISR)"
+        ],
+        "noNationOnTheMap": [
+          "Patrick Landau (MON)",
+          "Adrien Viviani (MON)"
+        ]
+      }
+    },
+    {
+      "id": "tennis-1966",
+      "version": "tennis-1966-203c4a73",
+      "label": "Amateur Elo, end of 1966 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1966-12-31",
+      "rated": 131,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Roy Emerson AUS 2065 → 87",
+        "Fred Stolle AUS 2018.3 → 85",
+        "Manuel Santana ESP 2016.1 → 85",
+        "Dennis Ralston USA 1895 → 80",
+        "Arthur Ashe USA 1877.6 → 79"
+      ],
+      "nations": [
+        "Australia 84.2 (Roy Emerson 87, Fred Stolle 85, John Newcombe 77, Tony Roche 77, Bob Hewitt 77; +9)",
+        "United States 78.4 (Dennis Ralston 80, Arthur Ashe 79, Chuck Mckinley 75, Marty Riessen 73, Clark Graebner 72; +16)",
+        "Spain 74.7 (Manuel Santana 85, Juan Manuel Couder 68, Juan Gisbert 68, Jose Luis Arillla 67, Jose Maria Gisbert 57)",
+        "India 73.2 (Ramanathan Krishnan 78, Jaidip Mukerjea 73, Premjit Lall 65, Shiv Prakash Misra 63, Ravi Venkatesan 61)",
+        "Brazil 72.3 (Jose Edison Mandarino 74, Thomaz Koch 71, Ronnie Barnes 69)",
+        "West Germany (Germany) 72 (Wilhelm Bungert 73, Ingo Buding 71)",
+        "France 70.8 (Pierre Darmon 74, Francois Jauffret 71, Georges Goven 65, Daniel Contet 63, Patrice Beust 60)",
+        "South Africa 70.2 (Cliff Drysdale 76, Abe Segal 67, Keith Diepraam 66, Terry Ryan 64, Frew Mcmillan 61; +3)",
+        "Great Britain 69.2 (Robert Wilson 71, Michael Sangster 69, Mark Cox 66, Roger Taylor 66, Peter Curtis 62; +2)",
+        "Mexico 68.4 (Rafael Osuna 76, Luis Augusto Garcia 65, Joaquin Loyo Mayo 60, Jaime Subirats 60)",
+        "Denmark 67.8 (Jorgen Ulrich 68, Torben Ulrich 68, Jan Leschly 66)",
+        "Italy 66.2 (Nicola Pietrangeli 75, Giordano Majoli 61, Gaetano Di Maso 59, Sergio Tacchini 59)",
+        "Yugoslavia (Serbia) 66 (Nikola Pilic 67, Nicola Spear 65)",
+        "Philippines 65.5 (Felicisimo Ampon 68, Raymundo Deyro 63)",
+        "Czechoslovakia (Czechia) 63.4 (Jiri Javorsky 65, Jan Kodes 62, Frantisek Pala 61)",
+        "Romania 63 (Ion Tiriac 66, Ilie Nastase 60)",
+        "Japan 62.1 (Koji Watanabe 63, Ichizo Konishi 62, Osamu Ishiguro 58)",
+        "New Zealand 62 (Lew Gerrard 63, Ian Crookenden 61)",
+        "Netherlands 61.5 (Tom Okker 67, Jan Hajer 56)",
+        "Ecuador 61.1 (Miguel Olvera 62, Eduardo Zuleta 61, Pancho Guzman 57)",
+        "Switzerland 60.5 (Dimitri Sturdza 62, Thedy Stalder 59)",
+        "Chile 59.5 (Patricio Rodriguez Chi 62, Jaime Pinto Bravo 57)",
+        "Poland 59.5 (Wieslaw Gasiorek 61, Piotr Jamroz 58)",
+        "Canada 58.3 (Keith Carpenter 60, Mike Belkin 59, Harry Fauquier 54, Bob Puddicombe 53)",
+        "Egypt 56.7 (Moataz El Sonbol 57, Fathi Mohammed Aly 57, Ismail El Shafei 54)",
+        "Argentina 56.5 (Eduardo Soriano 57, Roberto Aubone 56)",
+        "Belgium 56.5 (Eric Drossart 58, Claude De Gronckel 55, Patrick Hombergen 55)",
+        "Israel 56 (Eleazar Davidman 60, Yehoshua Shalem 52)",
+        "Jamaica 55 (Richard Russell 56, Lance Lumsden 54)"
+      ],
+      "merged": [
+        "Croatia → Yugoslavia (Serbia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 103,
+        "fix": 2,
+        "player-file": 26
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Istvan Gulyas (HUN)",
+          "Alex Metreveli (URS)",
+          "Tico Carrero (PUR)",
+          "Ove Bengtson (SWE)",
+          "Haibibi Bouchaib (MAR)",
+          "Senaka Kumara (SRI)",
+          "William Alvarez (COL)",
+          "Peter Pokorny (AUT)",
+          "Pekka Saila (FIN)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1965",
+      "version": "tennis-1965-77af6b5c",
+      "label": "Amateur Elo, end of 1965 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1965-12-31",
+      "rated": 125,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Roy Emerson AUS 2092.8 → 88",
+        "Manuel Santana ESP 2022.9 → 85",
+        "Fred Stolle AUS 1996 → 84",
+        "Cliff Drysdale RSA 1906 → 80",
+        "Dennis Ralston USA 1849.1 → 78"
+      ],
+      "nations": [
+        "Australia 84.1 (Roy Emerson 88, Fred Stolle 84, Neale Fraser 77, Tony Roche 76, Bob Hewitt 76; +13)",
+        "United States 77 (Dennis Ralston 78, Arthur Ashe 77, Vic Seixas 75, Chuck Mckinley 75, Ron Holmberg 74; +20)",
+        "Spain 74.1 (Manuel Santana 85, Juan Manuel Couder 67, Juan Gisbert 67, Jose Luis Arillla 66, Alberto Arilla 62)",
+        "India 72.8 (Ramanathan Krishnan 76, Jaidip Mukerjea 74, Premjit Lall 66, Shiv Prakash Misra 62)",
+        "West Germany (Germany) 72.3 (Wilhelm Bungert 73, Christian Kuhnke 72, Ingo Buding 70)",
+        "France 70.9 (Pierre Darmon 74, Pierre Barthes 71, Francois Jauffret 65, Jean Noel Grinda 64, Jean Claude Barclay 64; +3)",
+        "Mexico 70.4 (Rafael Osuna 77, Tony Palafox 70, Joaquin Loyo Mayo 62, Vicente Zarazua 54)",
+        "South Africa 70.4 (Cliff Drysdale 80, Keith Diepraam 67, Frew Mcmillan 59, Robin Sanders 57, Robert Maud 57; +2)",
+        "Great Britain 70.3 (Billy Knight 72, Michael Sangster 72, Roger Taylor 69, Keith Wooldridge 58, Graham Stilwell 57)",
+        "Italy 69.5 (Nicola Pietrangeli 76, Giuseppe Merlo 65, Sergio Tacchini 55)",
+        "Brazil 68.8 (Thomaz Koch 70, Ronnie Barnes 69, Jose Edison Mandarino 62)",
+        "Sweden 68.6 (Jan Erik Lundquist 78, Christer Holm 60, Lars Olander 56)",
+        "Soviet Union (Russia) 66.5 (Thomas Lejus 69, Alex Metreveli 64)",
+        "Yugoslavia (Serbia) 66 (Nikola Pilic 68, Boro Jovanovic 64)",
+        "Czechoslovakia (Czechia) 63.5 (Jiri Javorsky 67, Milan Holecek 60)",
+        "Japan 62.7 (Ichizo Konishi 64, Osamu Ishiguro 62, Koji Watanabe 59)",
+        "Vietnam 60 (Hoang Duc Luu 60, Van Bay Vo 60)",
+        "Austria 59 (Norbert Klatil 61, Georg Pazderka 57)",
+        "New Zealand 59 (Lew Gerrard 60, Ian Crookenden 58)",
+        "Ecuador 58 (Eduardo Zuleta 60, Pancho Guzman 56)",
+        "Chile 56.7 (Patricio Cornejo 59, Jaime Pinto Bravo 56, Ernesto Aguirre 54, Omar Pabst 53)",
+        "Belgium 56.5 (Eric Drossart 58, Claude De Gronckel 55)",
+        "Luxembourg 56 (Frank Baden 57, Thierry Brasseur 55)",
+        "Netherlands 54.5 (Tom Okker 55, Jan Hajer 54)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 96,
+        "fix": 2,
+        "player-file": 27
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Torben Ulrich (DEN)",
+          "Istvan Gulyas (HUN)",
+          "Ion Tiriac (ROU)",
+          "Nicholas Kalogeropoulos (GRE)",
+          "Keith Carpenter (CAN)",
+          "Wieslaw Gasiorek (POL)",
+          "Roger Dowdeswell (RHO)",
+          "Tim Sturdza (SUI)",
+          "William Alvarez (COL)",
+          "Richard Russell (JAM)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1964",
+      "version": "tennis-1964-9e8df0d3",
+      "label": "Amateur Elo, end of 1964 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1964-12-31",
+      "rated": 119,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Roy Emerson AUS 2113.8 → 89",
+        "Chuck Mckinley USA 1942.4 → 82",
+        "Fred Stolle AUS 1922.3 → 81",
+        "Manuel Santana ESP 1896.1 → 80",
+        "Jan Erik Lundquist SWE 1865.4 → 79"
+      ],
+      "nations": [
+        "Australia 82.6 (Roy Emerson 89, Fred Stolle 81, Bob Hewitt 75, Martin Mulligan 71, Ken Fletcher 71; +8)",
+        "United States 77.9 (Chuck Mckinley 82, Vic Seixas 76, Dennis Ralston 74, Ron Holmberg 73, Hugh Stewart 71; +15)",
+        "Sweden 76 (Jan Erik Lundquist 79, Ulf Schmidt 73)",
+        "Great Britain 73.1 (Michael Sangster 74, Jaroslav Drobny 73, Billy Knight 72, Roger Taylor 71, Robert Wilson 71; +3)",
+        "Mexico 73 (Rafael Osuna 78, Tony Palafox 68)",
+        "West Germany (Germany) 72.7 (Wilhelm Bungert 75, Christian Kuhnke 74, Wolfgang Stuck 66, Ingo Buding 65)",
+        "Spain 72.5 (Manuel Santana 80, Jose Luis Arillla 65, Juan Manuel Couder 65)",
+        "France 70.4 (Pierre Darmon 75, Pierre Barthes 69, Jean Claude Barclay 64, Jean Noel Grinda 64, Francois Jauffret 62; +1)",
+        "Italy 69.4 (Nicola Pietrangeli 77, Giuseppe Merlo 69, Giordano Majoli 56, Sergio Tacchini 54)",
+        "Denmark 69 (Torben Ulrich 70, Jorgen Ulrich 69, Jan Leschly 64)",
+        "Brazil 67.8 (Ronnie Barnes 69, Thomaz Koch 68, Jose Edison Mandarino 61)",
+        "India 67.4 (Jaidip Mukerjea 71, Shiv Prakash Misra 64, Premjit Lall 63)",
+        "South Africa 67.3 (Abe Segal 69, Cliff Drysdale 68, Clive Brebnor 63, Keith Diepraam 62, David Phillips 61; +3)",
+        "Philippines 67.2 (Felicisimo Ampon 68, Raymundo Deyro 67, Johnny Jose 64)",
+        "Yugoslavia (Serbia) 67 (Nikola Pilic 71, Boro Jovanovic 63)",
+        "Soviet Union (Russia) 64 (Thomas Lejus 66, Alex Metreveli 62)",
+        "Zimbabwe 63 (Adrian Bey 67, Frank Saloman 59)",
+        "Hungary 62 (Istvan Gulyas 68, Andras Szikszay 56)",
+        "New Zealand 59.5 (Lew Gerrard 60, Ian Crookenden 59)",
+        "Chile 58.5 (Patricio Rodriguez Chi 63, Ernesto Aguirre 54)",
+        "Argentina 58 (Eduardo Soriano 59, Roberto Aubone 57)",
+        "Czechoslovakia (Czechia) 58 (Milan Holecek 60, Stepan Koudelka 56)",
+        "Canada 57.7 (Mike Belkin 58, Keith Carpenter 58, Francois Godbout 55)",
+        "Vietnam 57.5 (Van Bay Vo 58, Hoang Duc Luu 57)",
+        "Ireland 57 (Derek Arthurs 61, Peter Jackson 53)",
+        "Netherlands 57 (Jan Hajer 58, Tom Okker 56)",
+        "Belgium 54.5 (Eric Drossart 59, Claude De Gronckel 50)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 91,
+        "player-file": 25,
+        "fix": 3
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Iyo Pimentel (VEN)",
+          "Nicholas Kalogeropoulos (GRE)",
+          "Eduardo Zuleta (ECU)",
+          "Mustapha Belkhodja (TUN)",
+          "Reino Nyyssonen (FIN)",
+          "Osamu Ishiguro (JPN)",
+          "Tim Sturdza (SUI)",
+          "Andrzej Licis (POL)",
+          "Eleazar Davidman (ISR)",
+          "Richard Russell (JAM)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1963",
+      "version": "tennis-1963-234b91f9",
+      "label": "Amateur Elo, end of 1963 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1963-12-31",
+      "rated": 134,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Roy Emerson AUS 2013.2 → 85",
+        "Chuck Mckinley USA 1917.5 → 81",
+        "Rafael Osuna MEX 1911.6 → 80",
+        "Frank Froehling USA 1861.7 → 78",
+        "Manuel Santana ESP 1856.5 → 78"
+      ],
+      "nations": [
+        "United States 78.8 (Chuck Mckinley 81, Frank Froehling 78, Hamilton Richardson 76, Dennis Ralston 76, Vic Seixas 76; +21)",
+        "Australia 78 (Roy Emerson 85, Fred Stolle 74, Bob Hewitt 73, Martin Mulligan 71, Ken Fletcher 70; +9)",
+        "Mexico 74.5 (Rafael Osuna 80, Tony Palafox 69)",
+        "Sweden 74.5 (Jan Erik Lundquist 76, Ulf Schmidt 73)",
+        "Great Britain 73.6 (Michael Sangster 76, Billy Knight 73, Robert Wilson 72, Roger Taylor 68, Alan Mills 65; +5)",
+        "India 71.8 (Ramanathan Krishnan 77, Jaidip Mukerjea 68, Premjit Lall 61)",
+        "Italy 71.4 (Nicola Pietrangeli 76, Giuseppe Merlo 69, Antonio Maggi 58)",
+        "Spain 70.4 (Manuel Santana 78, Juan Manuel Couder 69, Jose Luis Arillla 62, Alberto Arilla 54)",
+        "West Germany (Germany) 69.6 (Christian Kuhnke 73, Wilhelm Bungert 70, Wolfgang Stuck 64, Adolf Kreinberg 60, Dieter Ecklebe 55)",
+        "Brazil 67.9 (Ronnie Barnes 70, Thomaz Koch 67, Jose Edison Mandarino 61)",
+        "France 67.9 (Pierre Darmon 75, Jacques Renavand 64, Jean Claude Barclay 63, Pierre Barthes 60, Francois Jauffret 60; +4)",
+        "South Africa 66 (Gordon Forbes 68, Abe Segal 66, Cliff Drysdale 64, David Phillips 60, Frew Mcmillan 59; +1)",
+        "Zimbabwe 66 (Adrian Bey 69, Frank Saloman 63)",
+        "Denmark 65.6 (Jorgen Ulrich 68, Jan Leschly 66, Carl Edvard Hedelund 52)",
+        "Japan 65.5 (Atsushi Miyagi 68, Osamu Ishiguro 63)",
+        "Belgium 64.5 (Jackie Brichant 69, Eric Drossart 60)",
+        "Philippines 64.5 (Felicisimo Ampon 67, Johnny Jose 62)",
+        "Soviet Union (Russia) 63.9 (Thomas Lejus 67, Mikhail Mozer 62, Sergei Likhachev 62, Alex Metreveli 61)",
+        "Yugoslavia (Serbia) 63 (Nikola Pilic 64, Boro Jovanovic 62)",
+        "Romania 61 (Ion Tiriac 63, Alexandru Bardan 59)",
+        "Ecuador 59.5 (Eduardo Zuleta 63, Pancho Guzman 56)",
+        "New Zealand 58.5 (Ian Crookenden 59, Ronald Mckenzie 58)",
+        "Greece 58 (Nicholas Kalogeropoulos 58, Nick Kalyvas 58)",
+        "Chile 57.5 (Patricio Rodriguez Chi 61, Ernesto Aguirre 54)",
+        "Canada 56 (Francois Godbout 57, Keith Carpenter 55)",
+        "Austria 53.5 (Detler Herdy 54, Franz Hainka 53)",
+        "Portugal 53 (Alfredo Vaz Pinto 55, David Cohen 51)",
+        "Israel 50.5 (Eleazar Davidman 53, Gabriel Dubitzky 48)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 99,
+        "fix": 2,
+        "player-file": 33
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Iyo Pimentel (VEN)",
+          "Istvan Gulyas (HUN)",
+          "Jiri Javorsky (TCH)",
+          "Reino Nyyssonen (FIN)",
+          "Mustapha Belkhodja (TUN)",
+          "Sheikh Qutubuddin (PAK)",
+          "Sultan Aman Azman (MAS)",
+          "Gunnar Sjowall (NOR)",
+          "Tim Sturdza (SUI)",
+          "Fathi Mohammed Aly (EGY)",
+          "Willem Maris (NED)",
+          "Nazmi Bari (TUR)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1962",
+      "version": "tennis-1962-abeea604",
+      "label": "Amateur Elo, end of 1962 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1962-12-31",
+      "rated": 129,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Rod Laver AUS 2131 → 89",
+        "Neale Fraser AUS 2017.9 → 85",
+        "Roy Emerson AUS 1978.4 → 83",
+        "Jan Erik Lundquist SWE 1861.1 → 78",
+        "Rafael Osuna MEX 1859.3 → 78"
+      ],
+      "nations": [
+        "Australia 85.2 (Rod Laver 89, Neale Fraser 85, Roy Emerson 83, Martin Mulligan 73, Bob Hewitt 73; +17)",
+        "United States 76.8 (Hamilton Richardson 78, Vic Seixas 77, Chuck Mckinley 76, Ron Holmberg 72, Frank Froehling 72; +15)",
+        "Italy 75.2 (Fausto Gardini 77, Nicola Pietrangeli 76, Giuseppe Merlo 71, Orlando Sirola 69, Sergio Jacobini 64; +1)",
+        "Sweden 75 (Jan Erik Lundquist 78, Ulf Schmidt 72)",
+        "Mexico 72.9 (Rafael Osuna 78, Tony Palafox 71, Mario Llamas 67, Pancho Contreras 66)",
+        "Great Britain 72.1 (Robert Wilson 73, Billy Knight 73, Michael Sangster 71, Alan Mills 66, Roger Taylor 64; +2)",
+        "Spain 69.8 (Manuel Santana 76, Juan Manuel Couder 65, Jose Luis Arillla 58)",
+        "India 69.7 (Ramanathan Krishnan 78, Jaidip Mukerjea 66, Premjit Lall 62, Akhtar Ali 59)",
+        "France 69.2 (Pierre Darmon 73, Gerard Pilet 68, Jean Noel Grinda 66, Jacques Renavand 62)",
+        "South Africa 68.2 (Gordon Forbes 70, Abe Segal 69, Cliff Drysdale 65, A Rodney Mandelstam 61, Keith Diepraam 59; +1)",
+        "West Germany (Germany) 67 (Christian Kuhnke 68, Wilhelm Bungert 68, Ingo Buding 64, Bodo Nitsche 62, Dieter Ecklebe 56)",
+        "Denmark 64.4 (Jorgen Ulrich 67, Jan Leschly 64, Carl Edvard Hedelund 53)",
+        "Belgium 64 (Jackie Brichant 71, Eric Drossart 57)",
+        "Brazil 63.6 (Carlos Fernandes 67, Thomaz Koch 61, Jose Edison Mandarino 57)",
+        "Ecuador 63 (Miguel Olvera 64, Eduardo Zuleta 62)",
+        "Philippines 63 (Raymundo Deyro 67, Johnny Jose 59)",
+        "Poland 62.8 (Wladyslaw Skonecki 67, Andrzej Licis 59, Wieslaw Gasiorek 57)",
+        "Soviet Union (Russia) 62.6 (Thomas Lejus 63, Alex Metreveli 63, Sergei Likhachev 59)",
+        "Austria 62.5 (Franz Saiko 66, Laci Legenstein 59)",
+        "Yugoslavia (Serbia) 62.5 (Nikola Pilic 65, Boro Jovanovic 60)",
+        "Czechoslovakia (Czechia) 61.7 (Jiri Javorsky 62, Pavel Korda 62, Petr Strobl 59)",
+        "Hungary 61.5 (Istvan Gulyas 64, Zoltan Katona 59)",
+        "Japan 61.5 (Michio Fujii 62, Osamu Ishiguro 61)",
+        "Canada 58 (Donald Fontana 60, Francois Godbout 56)",
+        "Chile 58 (Patricio Apey 59, Patricio Rodriguez Chi 57)",
+        "Iran 56.5 (Taghi Akbari 60, Reza Akbari 53)",
+        "New Zealand 56.5 (Ian Crookenden 59, John McDonald 54)",
+        "Romania 53 (Ion Tiriac 55, Constantin Nastase 51)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Croatia → Yugoslavia (Serbia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 97,
+        "fix": 2,
+        "player-file": 30
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Reino Nyyssonen (FIN)",
+          "Mustapha Belkhodja (TUN)",
+          "Thorvald Moe (NOR)",
+          "Eleazar Davidman (ISR)",
+          "Evert Schneider (NED)",
+          "Peter Jackson (IRL)",
+          "Karim Fawaz (LIB)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "tennis-1961",
+      "version": "tennis-1961-cc90d757",
+      "label": "Amateur Elo, end of 1961 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1961-12-31",
+      "rated": 119,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Neale Fraser AUS 2010.1 → 84",
+        "Rod Laver AUS 1982 → 83",
+        "Roy Emerson AUS 1906.5 → 80",
+        "Luis Ayala CHI 1888.8 → 80",
+        "Ramanathan Krishnan IND 1868.7 → 79"
+      ],
+      "nations": [
+        "Australia 81.9 (Neale Fraser 84, Rod Laver 83, Roy Emerson 80, Bob Hewitt 71, Bob Mark 68; +14)",
+        "United States 74.9 (Vic Seixas 76, Tut Bartzen 75, Chuck Mckinley 73, Ron Holmberg 72, Chris Crawford 72; +16)",
+        "Italy 74 (Nicola Pietrangeli 78, Fausto Gardini 76, Orlando Sirola 68, Sergio Tacchini 56)",
+        "Sweden 73.5 (Jan Erik Lundquist 77, Ulf Schmidt 70)",
+        "Great Britain 72.4 (Michael Sangster 74, Robert Wilson 73, Billy Knight 72, Alan Mills 64, Roger Taylor 62; +3)",
+        "France 68.9 (Gerard Pilet 71, Pierre Darmon 71, Jean Claude Barclay 61, Francois Jauffret 60, Daniel Contet 59; +1)",
+        "India 68.1 (Ramanathan Krishnan 79, Akhtar Ali 62, Premjit Lall 60, Jaidip Mukerjea 57)",
+        "Chile 68 (Luis Ayala 80, Patricio Rodriguez Chi 56)",
+        "Mexico 67.3 (Rafael Osuna 71, Tony Palafox 67, Mario Llamas 65, Gabino Palafox 56)",
+        "South Africa 66 (Abe Segal 70, Albert Gaertner 63, Julian Mayers 58)",
+        "Brazil 65.5 (Carlos Fernandes 69, Ronnie Barnes 63, Jose Edison Mandarino 58)",
+        "Spain 65.3 (Manuel Santana 77, Alberto Arilla 54, Emilio Martinez Del Rey 52)",
+        "Japan 64 (Atsushi Miyagi 64, Osamu Ishiguro 64)",
+        "Ecuador 63 (Eduardo Zuleta 64, Miguel Olvera 62)",
+        "New Zealand 63 (Lew Gerrard 64, Mark Otway 62)",
+        "West Germany (Germany) 62.4 (Wilhelm Bungert 64, Christian Kuhnke 63, Ingo Buding 62, Dieter Ecklebe 54)",
+        "Austria 61.8 (Franz Saiko 65, Laci Legenstein 60, Franz Hainka 53)",
+        "Poland 61.8 (Wladyslaw Skonecki 67, Wieslaw Gasiorek 57, Jozef Orlikowski 55)",
+        "Canada 61.5 (Robert Bedard 65, Francois Godbout 58)",
+        "Yugoslavia (Serbia) 61.2 (Nikola Pilic 63, Boro Jovanovic 60, Voldo Presecki 57)",
+        "Hungary 59.5 (Istvan Gulyas 62, Zoltan Katona 57)",
+        "Finland 56 (Reino Nyyssonen 58, Sakari Salo 54)",
+        "Thailand 53.5 (Sutiraphan Karalak 54, Seri Charuchinda 53)",
+        "Netherlands 53 (Willem Maris 56, Piet Van Eijsden 50)",
+        "Norway 51.5 (Thorvald Moe 53, Finn Dag Jagge 50)"
+      ],
+      "merged": [
+        "Croatia → Yugoslavia (Serbia)",
+        "Montenegro → Yugoslavia (Serbia)",
+        "Slovenia → Yugoslavia (Serbia)",
+        "N. Macedonia → Yugoslavia (Serbia)",
+        "Bosnia & Herz. → Yugoslavia (Serbia)",
+        "Kosovo → Yugoslavia (Serbia)"
+      ],
+      "nationFrom": {
+        "davis-cup": 92,
+        "player-file": 25,
+        "fix": 2
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Jackie Brichant (BEL)",
+          "Iyo Pimentel (VEN)",
+          "Jorgen Ulrich (DEN)",
+          "Adrian Bey (RHO)",
+          "Jiri Javorsky (TCH)",
+          "Eduardo Soriano (ARG)",
+          "William Alvarez (COL)",
+          "Mustapha Belkhodja (TUN)"
+        ],
+        "noNationOnTheMap": [
+          "Roland Borghini (MON)"
+        ]
+      }
+    },
+    {
+      "id": "tennis-1960",
+      "version": "tennis-1960-bb100191",
+      "label": "Amateur Elo, end of 1960 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1960-12-31",
+      "rated": 111,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Neale Fraser AUS 2031.7 → 85",
+        "Rod Laver AUS 1932 → 81",
+        "Nicola Pietrangeli ITA 1921.2 → 81",
+        "Luis Ayala CHI 1887.7 → 80",
+        "Hamilton Richardson USA 1864.9 → 79"
+      ],
+      "nations": [
+        "Australia 81 (Neale Fraser 85, Rod Laver 81, Roy Emerson 75, Don Candy 71, Bob Mark 69; +10)",
+        "United States 77.5 (Hamilton Richardson 79, Vic Seixas 77, Barry Mackay 76, Earl Butch Buchholz 75, Tut Bartzen 74; +18)",
+        "Italy 74.4 (Nicola Pietrangeli 81, Giuseppe Merlo 73, Orlando Sirola 72, Sergio Tacchini 56)",
+        "Great Britain 73.6 (Jaroslav Drobny 75, Robert Wilson 74, Billy Knight 71, Roger Becker 69, Michael Davies 68; +1)",
+        "Sweden 72 (Jan Erik Lundquist 75, Ulf Schmidt 69)",
+        "France 71.2 (Robert Haillet 73, Pierre Darmon 71, Gerard Pilet 68, Jean Noel Grinda 68, Jean Claude Molinari 66)",
+        "Spain 70 (Andres Gimeno 72, Manuel Santana 68)",
+        "India 68.8 (Ramanathan Krishnan 76, Naresh Kumar 62, Jaidip Mukerjea 60)",
+        "Chile 68 (Luis Ayala 80, Patricio Rodriguez Chi 56)",
+        "Denmark 68 (Jorgen Ulrich 69, Kurt Nielsen 67)",
+        "Mexico 66.6 (Rafael Osuna 67, Mario Llamas 67, Pancho Contreras 66, Joaquin Reyes 64, Tony Palafox 60)",
+        "Hungary 64.5 (Andras Adam Stolpa 65, Istvan Gulyas 64)",
+        "Brazil 64.4 (Carlos Fernandes 67, Ronnie Barnes 63, Jose Edison Mandarino 57)",
+        "New Zealand 64 (Lew Gerrard 66, Mark Otway 62)",
+        "South Africa 63.9 (Ian Vermaak 67, Albert Gaertner 64, A Rodney Mandelstam 59, Gaetan Koenig 56)",
+        "Philippines 63.5 (Raymundo Deyro 68, Johnny Jose 59)",
+        "Poland 62.8 (Wladyslaw Skonecki 67, Andrzej Licis 60, Wieslaw Gasiorek 53)",
+        "West Germany (Germany) 62.6 (Wolfgang Stuck 66, Ingo Buding 61, Christian Kuhnke 61, Wilhelm Bungert 57, Dieter Ecklebe 56)",
+        "Austria 61.5 (Laci Legenstein 62, Franz Saiko 61)",
+        "Canada 60.5 (Robert Bedard 63, Francois Godbout 58)",
+        "Argentina 60 (Eduardo Soriano 62, Roberto Aubone 58)",
+        "Venezuela 59.5 (Iyo Pimentel 65, Marcus Gambus 54)",
+        "Netherlands 55 (Willem Maris 59, Piet Van Eijsden 51)"
+      ],
+      "merged": [],
+      "nationFrom": {
+        "davis-cup": 85,
+        "fix": 3,
+        "player-file": 23
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Jackie Brichant (BEL)",
+          "Osamu Ishiguro (JPN)",
+          "Jiri Javorsky (TCH)",
+          "Eduardo Zuleta (ECU)",
+          "Boro Jovanovic (YUG)",
+          "Thomas Lejus (URS)",
+          "Thorvald Moe (NOR)",
+          "Reino Nyyssonen (FIN)",
+          "Guy Jackson (IRL)"
+        ],
+        "noNationOnTheMap": [
+          "Roland Borghini (MON)",
+          "Georges Pasquier (MON)"
+        ]
       }
     }
   ]
