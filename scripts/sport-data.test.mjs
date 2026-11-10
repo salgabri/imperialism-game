@@ -126,6 +126,19 @@ async function savedHockey() {
   return { items, id: campaign.campaignId, text: items.get(SAVE_KEY) };
 }
 
+/** A football campaign's checkpoint text, as the page writes it. */
+async function savedFootball() {
+  const items = new Map();
+  await withStorage(items, () => assert.equal(writeSave(campaignOf('football', ['250', '276'], 'Football campaign')).ok, true));
+  return items.get(SAVE_KEY);
+}
+
+/** A checkpoint from before campaign slots: the same campaign with no id, revision or name. */
+function legacyOf(text) {
+  const { campaignId: _id, revision: _revision, campaignName: _name, ...legacy } = JSON.parse(text);
+  return JSON.stringify(legacy);
+}
+
 test('on the page a sport\'s players are read only once loaded; they load once, and a failed load is tried again', async () => {
   const { sportData, getSport: sportOf, control } = page();
   const hockey = sportOf('hockey');
@@ -197,6 +210,39 @@ test('saves of a sport whose players have not loaded list and stay put, and read
     assert.equal(ready.state, 'ready');
     assert.deepEqual(ready.campaign, expected);
   });
+});
+
+test('a legacy save of a sport whose players will not load moves into a slot as stored, so saves and discards still work', async () => {
+  const { text } = await savedHockey();
+  const legacy = legacyOf(text);
+  const expected = await withStorage(new Map(), () => parseCampaign(legacy));
+  for (const how of ['save', 'discard']) {
+    const items = new Map([[SAVE_KEY, legacy]]);
+    const { storage, control, sportData } = page();
+    await withStorage(items, async () => {
+      if (how === 'save') {
+        const saved = storage.writeSave(campaignOf('football', ['250', '276'], 'Football campaign'));
+        assert.equal(saved.ok, true, saved.message);
+      } else {
+        assert.equal(storage.clearSave(), true);
+        assert.equal(items.has(SAVE_KEY), false);
+      }
+      assert.equal(items.has(CAMPAIGN_DAMAGED_KEY), false);
+      const moved = storage.listCampaigns().find(item => item.settings.sport === 'hockey');
+      assert.ok(moved, `${how}: the legacy campaign is listed`);
+      assert.equal(moved.name, 'hockey legacy campaign');
+      assert.equal(control.requested().length, 0);
+      const load = sportData.loadSportData('hockey');
+      control.release('hockey');
+      await load;
+      const slot = storage.inspectCampaign(moved.id);
+      assert.equal(slot.state, 'ready', `${how}: the slot reads whole once the players are here`);
+      for (const key of ['settings', 'teams', 'own', 'aliveIds', 'history', 'seed', 'rngState']) {
+        assert.deepEqual(slot.campaign[key], expected[key], `${how}: ${key}`);
+      }
+      assert.deepEqual([slot.campaign.campaignId, slot.campaign.revision], [moved.id, 1]);
+    });
+  }
 });
 
 // ---------- the real App on the page's path ----------
@@ -467,5 +513,22 @@ test('importing a campaign of another sport reads it once its players are here',
       'the import dialog opens');
     assert.equal(view.app.state.storageDialog?.mode, 'import', view.app.state.saveStatus?.message);
     assert.equal(view.app.state.storageDialog.campaign.settings.sport, 'hockey');
+  } finally { await view.close(); }
+});
+
+test('an import still waiting for its sport\'s players gives way to a later import', async () => {
+  const [{ text: hockey }, football] = [await savedHockey(), await savedFootball()];
+  const view = await openPage();
+  try {
+    await setUp(view);
+    const first = view.app.importProgress({ size: hockey.length, text: async () => hockey });
+    await until(() => view.control.requested().length === 1, 'hockey is asked for');
+    await view.app.importProgress({ size: football.length, text: async () => football });
+    await until(() => view.app.state.storageDialog?.mode === 'import', 'the later import opens');
+    view.control.release('hockey');
+    await first;
+    await pause(30);
+    assert.equal(view.app.state.storageDialog.campaign.settings.sport, 'football', 'the earlier import does not replace it');
+    assert.notEqual(view.app.state.saveStatus?.ok, false);
   } finally { await view.close(); }
 });

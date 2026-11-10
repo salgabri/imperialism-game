@@ -714,6 +714,25 @@ function continuesLegacy(legacy, data) {
 let lastWritten = null;
 const writtenSummary = text => (text != null && text === lastWritten?.text ? lastWritten : null);
 
+/**
+ * The resume pointer's campaign as a save or a discard reads it: `{ campaign, stored }`. Another campaign is read for
+ * what it is (tryParseSummary), whatever its sport. A legacy singleton (no campaign id) moves into a slot of its own, so
+ * it is read whole; when its sport's players are not here (they failed to load), it is kept as `stored`, its text, and
+ * moves as stored instead (legacySlotText): never mistaken for damaged bytes, and never in the way of a save.
+ */
+function readPointer(text) {
+  const summary = tryParseSummary(text);
+  if (!summary || summary.campaignId) return { campaign: summary, stored: null };
+  try { return { campaign: parseCampaign(text), stored: null }; } catch { return { campaign: summary, stored: text }; }
+}
+
+/** A legacy singleton's slot: written anew when it was read whole, else its stored checkpoint given the slot's identity. */
+function legacySlotText(migrated, stored) {
+  if (stored == null) return checkpointText(migrated);
+  const { campaignId, revision, campaignName } = migrated;
+  return JSON.stringify({ ...JSON.parse(stored), campaignId, revision, campaignName });
+}
+
 /** Compare-and-save prevents a stale tab from replacing a newer checkpoint. */
 export function writeSave(state, { activate = true } = {}) {
   try {
@@ -733,11 +752,9 @@ export function writeSave(state, { activate = true } = {}) {
     index.unshift(campaignMetadata(data));
     const current = localStorage.getItem(SAVE_KEY);
     // A pointer holding this tab's last checkpoint is that campaign (never a legacy singleton: it has an id). Any other
-    // campaign is read for what it is, whatever its sport, and only a legacy singleton whole, to move it into a slot: that
-    // needs its sport's players (App loads them with the pointer), and without them this save fails rather than take a
-    // readable pointer for a damaged one.
-    const summary = writtenSummary(current) || tryParseSummary(current);
-    const currentCampaign = summary && !summary.campaignId ? parseCampaign(current) : summary;
+    // is read for what it is, whatever its sport (readPointer).
+    const pointer = writtenSummary(current) ? { campaign: writtenSummary(current), stored: null } : readPointer(current);
+    const currentCampaign = pointer.campaign;
     const updatePointer = activate || currentCampaign?.campaignId === data.campaignId;
     const kept = [];
     if (updatePointer && currentCampaign && !currentCampaign.campaignId && !continuesLegacy(currentCampaign, data)) {
@@ -745,7 +762,7 @@ export function writeSave(state, { activate = true } = {}) {
       // saved: resuming it gave it a fresh id, and this checkpoint replaces it).
       const migrated = { ...currentCampaign, campaignId: createCampaignId(), revision: 1,
         campaignName: cleanName(currentCampaign.campaignName || `${currentCampaign.settings.sport || 'Football'} legacy campaign`) };
-      kept.push([campaignStorageKey(migrated.campaignId), checkpointText(migrated)]);
+      kept.push([campaignStorageKey(migrated.campaignId), legacySlotText(migrated, pointer.stored)]);
       index.push(campaignMetadata(migrated));
     } else if (updatePointer && current && !currentCampaign) {
       // Retain damaged bytes even when the player chooses to start a fresh run.
@@ -910,18 +927,17 @@ export function fitDomesticCampaign(campaign, { meta, clubs, sectionNames }) {
 
 /**
  * Discard only the resume pointer; named campaigns and recovery copies stay intact. A save from before campaign slots
- * (no campaign id) has no copy but the pointer: it moves into Saved campaigns first, as starting a new campaign moves it.
- * Moving it reads it whole, which needs its sport's players: without them nothing changes and this returns false.
+ * (no campaign id) has no copy but the pointer: it moves into Saved campaigns first, as starting a new campaign moves it
+ * (as stored when its sport's players are not here: readPointer).
  */
 export function clearSave() {
   try {
-    const text = localStorage.getItem(SAVE_KEY), summary = tryParseSummary(text);
-    const current = summary && !summary.campaignId ? parseCampaign(text) : summary;
+    const { campaign: current, stored } = readPointer(localStorage.getItem(SAVE_KEY));
     if (current && !current.campaignId) {
       const migrated = { ...current, campaignId: createCampaignId(), revision: 1,
         campaignName: cleanName(current.campaignName || `${current.settings?.sport || 'Football'} legacy campaign`) };
       writeAll([[CAMPAIGN_INDEX_KEY, JSON.stringify([...indexData(), campaignMetadata(migrated)])],
-        [campaignStorageKey(migrated.campaignId), checkpointText(migrated)], [SAVE_KEY, null]]);
+        [campaignStorageKey(migrated.campaignId), legacySlotText(migrated, stored)], [SAVE_KEY, null]]);
       return true;
     }
     localStorage.removeItem(SAVE_KEY);

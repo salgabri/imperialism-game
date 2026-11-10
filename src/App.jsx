@@ -289,6 +289,8 @@ export default class App extends React.Component {
   link = null;
   /** The sport whose players a restore waits for before it reads its campaign whole (withCampaignSport). */
   pendingSport = null;
+  /** Bumped by each import: only the latest opens its dialog (importProgress). */
+  importToken = 0;
   /** This page's own address without its query: what a challenge link starts with. */
   pageBase = '';
   /** A challenge link's managed team, until its theatre's teams are known (settleChallengeTeam). */
@@ -1107,6 +1109,9 @@ export default class App extends React.Component {
 
   async importProgress(file) {
     if (!file) return;
+    // A later import, a launch, a restore or a conflict while this one waits for its file or its sport's players wins.
+    const token = ++this.importToken, flow = this.flowToken;
+    const current = () => token === this.importToken && flow === this.flowToken && !this.state.storageConflict;
     try {
       if (file.size > 5_000_000) throw new Error('Choose a campaign file smaller than 5 MB.');
       const text = await file.text(), sport = sportOfText(text);
@@ -1118,10 +1123,11 @@ export default class App extends React.Component {
           throw new Error(`${getSport(sport).name} could not be loaded, so this campaign cannot be imported: reload the page to try again. ${error?.message || error}`);
         }
       }
+      if (!current()) return;
       const saved = parseCampaign(text);
       this.openStorageDialog('import', { campaign: saved });
     } catch (error) {
-      this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
+      if (current()) this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
     }
   }
 
