@@ -22,27 +22,59 @@ function boundsDistanceSquared(a, b) {
   return dx * dx + dy * dy;
 }
 
-function edgesOf(parts) {
-  const edges = [];
+// A coast tree's leaf holds at most this many consecutive edges of one ring.
+const LEAF_EDGES = 8;
+
+const boxOf = node => ({ x: node.x0, y: node.y0, w: node.x1 - node.x0, h: node.y1 - node.y0 });
+
+/**
+ * One native component's coastline as a tree of boxes over its ring edges, for coastsWithinGap, built in linear time.
+ * Each ring is cut into leaves of up to LEAF_EDGES consecutive edges (a leaf never spans two rings), then neighbouring
+ * nodes are paired level by level; an odd node out moves up a level as it is, so every inner node has two children.
+ * Consecutive edges of a coast lie next to each other, so the boxes stay tight without sorting: the median splits this
+ * replaced sorted the edges again at every level, a third or more of the time to build the flag index.
+ *
+ * Any such tree finds the same links. coastsWithinGap skips a pair of nodes only when their boxes are farther apart
+ * than the gap, and a node's box holds every edge below it, so it never skips a pair of edges within the gap; those
+ * edges then meet the same test at the leaves, whichever leaves they sit in. A node's corners are the min/max of its
+ * children's, which is exact: its box is the one combineBounds makes straight from its edges, with no rounding piling
+ * up level by level (as re-adding x + w at every level would) against the inclusive gap.
+ * Exported for the tests. → the root, or null with no edges
+ */
+export function makeCoastTree(parts) {
+  let level = [];
   for (const part of parts) for (const ring of part.rings) {
+    let leaf = null;
     for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
       const a = ring[j], b = ring[i];
       if (a[0] === b[0] && a[1] === b[1]) continue;
-      edges.push({ a, b, bbox: { x: Math.min(a[0], b[0]), y: Math.min(a[1], b[1]), w: Math.abs(a[0] - b[0]), h: Math.abs(a[1] - b[1]) } });
+      const bbox = { x: Math.min(a[0], b[0]), y: Math.min(a[1], b[1]), w: Math.abs(a[0] - b[0]), h: Math.abs(a[1] - b[1]) };
+      if (!leaf || leaf.edges.length === LEAF_EDGES) {
+        leaf = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity, count: 0, edges: [] };
+        level.push(leaf);
+      }
+      leaf.edges.push({ a, b, bbox });
+      leaf.count++;
+      // The corners combineBounds takes from these edges' boxes.
+      leaf.x0 = Math.min(leaf.x0, bbox.x); leaf.y0 = Math.min(leaf.y0, bbox.y);
+      leaf.x1 = Math.max(leaf.x1, bbox.x + bbox.w); leaf.y1 = Math.max(leaf.y1, bbox.y + bbox.h);
     }
   }
-  return edges;
-}
-
-function makeEdgeTree(edges) {
-  if (!edges.length) return null;
-  const bbox = combineBounds(edges.map(edge => edge.bbox));
-  if (edges.length <= 8) return { bbox, count: edges.length, edges };
-  const axis = bbox.w >= bbox.h ? 'x' : 'y';
-  const span = axis === 'x' ? 'w' : 'h';
-  edges.sort((a, b) => a.bbox[axis] + a.bbox[span] / 2 - b.bbox[axis] - b.bbox[span] / 2);
-  const middle = Math.floor(edges.length / 2);
-  return { bbox, count: edges.length, left: makeEdgeTree(edges.slice(0, middle)), right: makeEdgeTree(edges.slice(middle)) };
+  if (!level.length) return null;
+  for (const leaf of level) leaf.bbox = boxOf(leaf);
+  while (level.length > 1) {
+    const next = [];
+    for (let i = 0; i < level.length; i += 2) {
+      const left = level[i], right = level[i + 1];
+      if (!right) { next.push(left); continue; }
+      const node = { x0: Math.min(left.x0, right.x0), y0: Math.min(left.y0, right.y0),
+        x1: Math.max(left.x1, right.x1), y1: Math.max(left.y1, right.y1), count: left.count + right.count, left, right };
+      node.bbox = boxOf(node);
+      next.push(node);
+    }
+    level = next;
+  }
+  return level[0];
 }
 
 function pointSegmentDistanceSquared(point, a, b) {
@@ -87,13 +119,13 @@ function coastsWithinGap(first, second, gapSquared) {
   return false;
 }
 
-function makeProximityGraph(nodes, maxGap) {
+function makeProximityGraph(nodes, maxGap, coastTree) {
   const neighbors = Array.from({ length: nodes.length }, () => []);
   if (!nodes.length) return neighbors;
   const bounds = combineBounds(nodes.map(node => node.bbox));
   const cellSize = Math.max(maxGap * 4, Math.max(bounds.w, bounds.h) / 128, 0.001);
   const grid = new Map();
-  const trees = nodes.map(node => makeEdgeTree(edgesOf(node.parts)));
+  const trees = nodes.map(node => coastTree(node.parts));
   const gapSquared = maxGap * maxGap;
   const gridRange = (bbox, padding = 0) => ({
     x0: Math.floor((bbox.x - padding) / cellSize), x1: Math.floor((bbox.x + bbox.w + padding) / cellSize),
@@ -139,12 +171,16 @@ function makeProximityGraph(nodes, maxGap) {
  * Create once per fitted geometry. Ownership regrouping has a current-result
  * cache; results are read-only and stable when ownership key order changes.
  * A region that survives a regrouping unchanged keeps its object identity.
+ *
+ * coastTree: a seam for the tests, which build the index on other trees of the
+ * same coasts (the median-split tree it replaced, one all-pairs leaf) and
+ * expect the same regions; the app always uses makeCoastTree.
  */
-export function createFlagRegionIndex(countryShapes = [], { maxGap = 0 } = {}) {
+export function createFlagRegionIndex(countryShapes = [], { maxGap = 0, coastTree = makeCoastTree } = {}) {
   const gap = Number.isFinite(maxGap) ? Math.max(0, maxGap) : 0;
   const nativeOwnership = Object.fromEntries(countryShapes.map(shape => [String(shape.id), String(shape.id)]));
   const nodes = createTerritoryComponentIndex(countryShapes).components(nativeOwnership);
-  const neighbors = makeProximityGraph(nodes, gap);
+  const neighbors = makeProximityGraph(nodes, gap, coastTree);
   let lastKey = null, lastComponents = [];
   return {
     components(ownership = {}) {

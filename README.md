@@ -1837,6 +1837,16 @@ zoom. Drawn as SVG `<pattern>` fills, every flag's shapes were re-rendered on
 each repaint, and panning, zooming, hovering and the draw compass lagged in
 Flags mode.
 
+Drawing an SVG holds the page's own thread, so the rasteriser keeps out of the
+way. It draws only flags a banner on the map still shows, the largest first,
+and stops when you leave Flags mode; unfinished flags resume when Flags is
+shown again. No flag is parsed or drawn within 200 ms of a click, key press,
+wheel turn or drag, and only at background priority. Finished bitmaps reach the
+map in batches, one re-render for many flags. Bitmaps are lossless WebP in
+Chrome and Firefox (Chrome encodes WebP on a worker thread, but PNG on the
+page's own thread) and PNG in Safari, which has no WebP encoder: the same pixels
+either way.
+
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
 overseas, winding, date-line and geometry-cache regressions.

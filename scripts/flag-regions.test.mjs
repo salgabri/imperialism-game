@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
-import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from '../src/engine/flagRegions.js';
+import { createFlagRegionIndex, FLAG_REGION_GAP_KM, makeCoastTree } from '../src/engine/flagRegions.js';
 import { WorldGeometry, projPt } from '../src/engine/geo.js';
 import { NATIONS } from '../src/data/teams.js';
 
@@ -226,4 +226,159 @@ test('world regional graph construction is bounded and cached frames are inexpen
   const warmMs = performance.now() - warmAt;
   assert.ok(warmMs < 500, `100 cached frames took ${warmMs.toFixed(0)} ms`);
   t.diagnostic(`cold world region graph ${coldMs.toFixed(0)} ms; 100 cached frames ${warmMs.toFixed(0)} ms`);
+});
+
+// ---- The coast tree (makeCoastTree) against other trees of the same coasts ----
+// The median-split tree it replaced, frozen here as the reference, and one leaf holding every edge, with which the
+// index compares all pairs of edges. Any tree of boxes over the same edges must give the same links, so the same regions.
+function edgeBounds(bounds) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const b of bounds) {
+    x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y);
+    x1 = Math.max(x1, b.x + b.w); y1 = Math.max(y1, b.y + b.h);
+  }
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+}
+function edgesOf(parts) {
+  const edges = [];
+  for (const part of parts) for (const ring of part.rings) {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const a = ring[j], b = ring[i];
+      if (a[0] === b[0] && a[1] === b[1]) continue;
+      edges.push({ a, b, bbox: { x: Math.min(a[0], b[0]), y: Math.min(a[1], b[1]), w: Math.abs(a[0] - b[0]), h: Math.abs(a[1] - b[1]) } });
+    }
+  }
+  return edges;
+}
+function makeEdgeTree(edges) {
+  if (!edges.length) return null;
+  const bbox = edgeBounds(edges.map(edge => edge.bbox));
+  if (edges.length <= 8) return { bbox, count: edges.length, edges };
+  const axis = bbox.w >= bbox.h ? 'x' : 'y';
+  const span = axis === 'x' ? 'w' : 'h';
+  edges.sort((a, b) => a.bbox[axis] + a.bbox[span] / 2 - b.bbox[axis] - b.bbox[span] / 2);
+  const middle = Math.floor(edges.length / 2);
+  return { bbox, count: edges.length, left: makeEdgeTree(edges.slice(0, middle)), right: makeEdgeTree(edges.slice(middle)) };
+}
+const medianSplitTree = parts => makeEdgeTree(edgesOf(parts));
+function allPairsTree(parts) {
+  const edges = edgesOf(parts);
+  return edges.length ? { bbox: edgeBounds(edges.map(edge => edge.bbox)), count: edges.length, edges } : null;
+}
+
+// An island with `n` edges along each side and a lake, so its coast tree has several levels and leaves of two rings.
+function island(x, y, w, h, n = 12, round = v => v) {
+  const outer = [];
+  for (let i = 0; i < n; i++) outer.push([x + w * i / n, y]);
+  for (let i = 0; i < n; i++) outer.push([x + w, y + h * i / n]);
+  for (let i = 0; i < n; i++) outer.push([x + w - w * i / n, y + h]);
+  for (let i = 0; i < n; i++) outer.push([x, y + h - h * i / n]);
+  outer.push(outer[0]);
+  return [outer, rect(x + w / 4, y + h / 4, w / 2, h / 2).reverse()].map(ring => ring.map(([px, py]) => [round(px), round(py)]));
+}
+
+test('the coast tree cuts each ring into leaves of up to eight edges and pairs them up, every box exact', () => {
+  assert.equal(makeCoastTree([]), null, 'no edges, no tree');
+  assert.equal(makeCoastTree([{ countryId: 'a', rings: [[[1, 1], [1, 1], [1, 1]]] }]), null, 'zero-length edges are skipped');
+  const { shapes } = atlas();
+  const fixtures = [[{ countryId: 'a', rings: island(0, 0, 40, 30, 16) }], [{ countryId: 'b', rings: [rect(0, 0, 1, 1)] }],
+    ...['360', '643'].map(id => [{ countryId: id, rings: shapes.find(s => s.id === id).rings }])];
+  for (const parts of fixtures) {
+    const ringOf = new Map();
+    parts.forEach(part => part.rings.forEach((ring, r) => ring.forEach(point => ringOf.set(point, `${part.countryId}#${r}`))));
+    const walk = node => {
+      let edges;
+      if (node.edges) {
+        assert.ok(node.edges.length >= 1 && node.edges.length <= 8 && !node.left && !node.right, 'a leaf holds one to eight edges');
+        assert.equal(new Set(node.edges.flatMap(edge => [ringOf.get(edge.a), ringOf.get(edge.b)])).size, 1, 'a leaf never spans two rings');
+        edges = node.edges;
+      } else {
+        assert.ok(node.left && node.right, 'every inner node has two children');
+        edges = [...walk(node.left), ...walk(node.right)];
+      }
+      assert.equal(node.count, edges.length);
+      assert.deepEqual(node.bbox, edgeBounds(edges.map(edge => edge.bbox)), 'a box is exactly its own edges’ box, at every level');
+      return edges;
+    };
+    const edges = walk(makeCoastTree(parts)), expected = edgesOf(parts);
+    assert.equal(edges.length, expected.length);
+    assert.ok(edges.every((edge, i) => edge.a === expected[i].a && edge.b === expected[i].b), 'every coast edge once, in ring order');
+  }
+});
+
+test('islands at, just inside and just beyond the gap link exactly as an all-pairs search and the old tree say', () => {
+  const tenth = v => Number(v.toFixed(1)); // the label rings' rounding
+  const scenarios = [];
+  // Whole map units, gap 5: the big island's east coast is at x = 40, its north coast at y = 30.
+  const big = island(0, 0, 40, 30, 16);
+  for (const [dx, dy, linked] of [[4, null, true], [5, null, true], [6, null, false],
+    [3, 4, true], [4, 3, true], [3, 3, true], [4, 4, false], [0, 5, true], [0, 6, false]]) {
+    // A side by side island across a strait of dx, or one off the north-east corner, dx east and dy north of it.
+    const small = dy === null ? island(40 + dx, 5, 20, 20, 8) : island(40 + dx, 30 + dy, 20, 20, 8);
+    scenarios.push([`whole units, ${dy === null ? `strait ${dx}` : `corner ${dx},${dy}`}`, big, small, 5, linked]);
+  }
+  // A cape whose point faces the middle of an edge of the big island's east coast (its vertices are 1.875 apart).
+  for (const [x, linked] of [[44, true], [45, true], [46, false]]) {
+    scenarios.push([`whole units, cape at ${x}`, big, [[[x, 16], [x + 15, 6], [x + 15, 26], [x, 16]]], 5, linked]);
+  }
+  // Tenths, as the map's label rings are rounded, gap 0.5: the east coast is at x = 14.4, the north coast at y = 24.
+  const tenths = island(10.3, 20.7, 4.1, 3.3, 16, tenth);
+  for (const [dx, dy, linked] of [[0.4, null, true], [0.5, null, true], [0.6, null, false],
+    [0.3, 0.4, true], [0.3, 0.3, true], [0.4, 0.4, false]]) {
+    const small = dy === null ? island(tenth(14.4 + dx), 21.2, 2.3, 1.9, 8, tenth) : island(tenth(14.4 + dx), tenth(24 + dy), 2.3, 1.9, 8, tenth);
+    scenarios.push([`tenths, ${dy === null ? `strait ${dx}` : `corner ${dx},${dy}`}`, tenths, small, 0.5, linked]);
+  }
+  // An islet inside a bay: their boxes overlap, so only the coasts deep in each tree can tell 45 units from 44.
+  const subdivided = (ring, n, round) => ring.slice(1).flatMap((b, i) => Array.from({ length: n }, (_, k) => {
+    const a = ring[i];
+    return [round(a[0] + (b[0] - a[0]) * k / n), round(a[1] + (b[1] - a[1]) * k / n)];
+  })).concat([ring[0].map(round)]);
+  for (const [scale, shift, round] of [[1, 0, v => v], [0.1, 0.3, tenth]]) {
+    const at = ([x, y]) => [x * scale + shift, y * scale + shift];
+    const bay = subdivided([[0, 0], [200, 0], [200, 200], [160, 200], [160, 40], [40, 40], [40, 200], [0, 200], [0, 0]].map(at), 6, round);
+    const islet = subdivided(rect(85, 90, 30, 30).map(at), 4, round);
+    for (const [gap, linked] of [[44, false], [45, true], [46, true]]) {
+      scenarios.push([`${scale === 1 ? 'whole units' : 'tenths'}, islet in a bay, gap ${gap * scale}`, [bay], [islet], gap * scale, linked]);
+    }
+  }
+  for (const [label, first, second, gap, linked] of scenarios) {
+    const shapes = [shape('a', ...first), shape('b', ...second)], ownership = { a: 'A', b: 'A' };
+    const links = coastTree => createFlagRegionIndex(shapes, { maxGap: gap, coastTree }).components(ownership).length === 1;
+    assert.equal(links(allPairsTree), linked, `${label}: all pairs of edges`);
+    assert.equal(links(undefined), linked, `${label}: the coast tree`);
+    assert.equal(links(medianSplitTree), linked, `${label}: the median-split tree`);
+  }
+});
+
+test('the coast tree gives the regions of the median-split tree it replaced, on the world and a country map', async () => {
+  const { decodeDomestic } = await import('../src/engine/domestic.js');
+  const indonesia = decodeDomestic(load('domestic/360.json'), '360');
+  const { shapes: world, maxGap } = atlas();
+  const fits = [['world', world, maxGap, Object.fromEntries(world.filter(s => NATIONS[s.id]).map(s => [s.id, s.id]))],
+    ['Indonesia', indonesia.geo.countries.map(c => ({ id: c.id, rings: indonesia.geo.paths[c.id].labelRings })),
+      FLAG_REGION_GAP_KM / indonesia.geo.kmPerUnit, indonesia.startOwners]];
+  for (const [name, shapes, gap, start] of fits) {
+    // Native, kick-off, one owner, then a seeded run of whole empires falling to each other.
+    const boards = [['native', Object.fromEntries(shapes.map(s => [s.id, s.id]))], ['kick-off', start],
+      ['one owner', Object.fromEntries(shapes.map(s => [s.id, 'winner']))]];
+    const board = { ...start };
+    let seed = 7;
+    const random = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32;
+    for (let match = 1; match <= 60; match++) {
+      const owners = [...new Set(Object.values(board))];
+      const winner = owners[Math.floor(random() * owners.length)], loser = owners[Math.floor(random() * owners.length)];
+      for (const [id, owner] of Object.entries(board)) if (owner === loser) board[id] = winner;
+      if (match % 12 === 0) boards.push([`after ${match} matches`, { ...board }]);
+    }
+    // Rings by their index: both indexes hand back the input rings themselves, so equal regions name the same rings.
+    const ringIds = new Map(shapes.flatMap(s => s.rings).map((ring, i) => [ring, i]));
+    const signature = regions => JSON.stringify(regions, (key, value) => key === 'rings' ? value.map(ring => ringIds.get(ring) ?? ring) : value);
+    const current = createFlagRegionIndex(shapes, { maxGap: gap });
+    const legacy = createFlagRegionIndex(shapes, { maxGap: gap, coastTree: medianSplitTree });
+    for (const [label, ownership] of boards) {
+      const regions = current.components(ownership);
+      assert.ok(regions.length > 0);
+      assert.ok(signature(regions) === signature(legacy.components(ownership)), `${name}, ${label}: the same regions, keys, bounds and parts`);
+    }
+  }
 });

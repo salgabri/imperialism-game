@@ -45,20 +45,58 @@ function prepare(component) {
     duplicates.get(key).push(edge);
   }
   const epsilon = Math.max(component.bbox.w, component.bbox.h) * 1e-9;
+  // Each duplicate is tested from both sides against the countries that share it. Scanning every edge of a country
+  // for each test grew with the square of a big empire's internal borders, so a country's edges are filed in bands
+  // on its first test and each test reads one band (countryBands): the same answers.
+  const banded = new Map();
+  const inCountry = (country, x, y) => {
+    let bands = banded.get(country);
+    if (!bands) banded.set(country, bands = countryBands(country));
+    return bands.contains(x, y);
+  };
   const edges = [];
   for (const matching of duplicates.values()) {
     let internal = false;
     if (matching.length > 1) {
       const edge = matching[0], dx = edge.b[0] - edge.a[0], dy = edge.b[1] - edge.a[1], length = Math.hypot(dx, dy);
       const x = (edge.a[0] + edge.b[0]) / 2, y = (edge.a[1] + edge.b[1]) / 2;
-      internal = [-1, 1].every(side => matching.some(candidate => containsCountry(candidate.country, x - side * dy / length * epsilon, y + side * dx / length * epsilon)));
+      internal = [-1, 1].every(side => matching.some(candidate => inCountry(candidate.country, x - side * dy / length * epsilon, y + side * dx / length * epsilon)));
     }
     if (!internal) edges.push(matching[0]);
   }
   return { countries, edges, bbox: component.bbox };
 }
 
-function containsCountry(edges, x, y) {
+/**
+ * A country's edges (prepare's, with their y0/y1 ranges) filed in horizontal bands, about six edges a band (at most
+ * 512 bands), each edge in every band its padded y range touches. contains(x, y) runs containsCountry on y's band
+ * alone, and gives exactly the answer of a scan of every edge:
+ * - an edge changes the winding at y only when y lies in its own y range (containsCountry's two crossing tests);
+ * - such an edge is in y's band: rounded, edge.y0 - pad is still at most y and edge.y1 + pad at least y, and rounding
+ *   never reverses two values through a subtraction, a division by the positive step or Math.floor, so y's band lies
+ *   between the edge's first and last (the pad is only a margin on top);
+ * - a point above or below every edge crosses none, so it is outside either way;
+ * - the winding is a sum of whole numbers, the same in any order.
+ * Exported for the tests, which hold it to the full scan. → { y0, y1, step, bands, contains(x, y) }
+ */
+export function countryBands(edges) {
+  let y0 = Infinity, y1 = -Infinity;
+  for (const edge of edges) { y0 = Math.min(y0, edge.y0); y1 = Math.max(y1, edge.y1); }
+  const pad = Math.max(1e-9, (y1 - y0) * 1e-9);
+  y0 -= pad; y1 += pad;
+  const count = clamp(Math.ceil(edges.length / 6), 1, 512);
+  const step = (y1 - y0) / count;
+  // A flat or empty country has no height to divide: one band then holds every edge, which is the full scan.
+  const bandOf = step > 0 ? y => clamp(Math.floor((y - y0) / step), 0, count - 1) : () => 0;
+  const bands = Array.from({ length: count }, () => []);
+  for (const edge of edges) {
+    for (let band = bandOf(edge.y0 - pad), last = bandOf(edge.y1 + pad); band <= last; band++) bands[band].push(edge);
+  }
+  return { y0, y1, step, bands, contains: (x, y) => y >= y0 && y <= y1 && containsCountry(bands[bandOf(y)], x, y) };
+}
+
+/** Whether (x, y) is in a country: the nonzero winding of all its edges. Exported for the tests. */
+export function containsCountry(edges, x, y) {
   let winding = 0;
   for (const { a, b } of edges) {
     const cross = (b[0] - a[0]) * (y - a[1]) - (x - a[0]) * (b[1] - a[1]);

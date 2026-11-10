@@ -33,7 +33,8 @@ function FlagArt({ flag: f, scale = 0 }) {
 
 /** An artwork layer's href: its bitmap while that covers the layer's drawn size in device px, else the SVG. */
 function useArtwork(url, box, scale) {
-  const bitmap = useFlagBitmap(url);
+  // The size it is drawn at puts the biggest flags first in the rasteriser's queue.
+  const bitmap = useFlagBitmap(url, url && box ? Math.max(box.w, box.h) * scale : 0);
   if (!url) return null;
   return bitmap && box.w * scale <= bitmap.width && box.h * scale <= bitmap.height ? bitmap.href : url;
 }
