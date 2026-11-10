@@ -723,7 +723,8 @@ function validateBasketballClubs(data, id, fail) {
   if (!map) fail(`map ${JSON.stringify(data.map)} is not a basketball map listing this season`);
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
-  const leagues = new Set(basketball.clubs.map(club => club.league));
+  // An NBA season's clubs are NBA franchises ('b-' ids): the EuroLeague's clubs are the built-in season's only.
+  const leagues = new Set(basketball.clubs.filter(club => BASKETBALL_CLUB_ID.test(club.id)).map(club => club.league));
   const ids = new Set(), codes = new Set();
   data.clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;

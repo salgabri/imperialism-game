@@ -51,7 +51,9 @@ function offeredClubTheatre(sport, dataSet, value) {
  * one the season lacks to the sport's heartland, as it does when the sport changes.
  */
 function offeredNationTheatre(sport, dataSet, value) {
-  return (dataSet == null ? nationTheatres(sport) : SCOPES).some(scope => scope.id === value);
+  // A competition of another sport (basketball's EuroBasket) is never offered.
+  return (dataSet == null ? nationTheatres(sport) : SCOPES.filter(scope => !scope.sports || scope.sports.includes(sport.id)))
+    .some(scope => scope.id === value);
 }
 
 /**

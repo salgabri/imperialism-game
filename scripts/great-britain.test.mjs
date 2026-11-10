@@ -61,10 +61,10 @@ test('Great Britain flies the vendored Union Jack; England keeps the cross of St
 });
 
 test('the setup wall lists Great Britain under the Union Jack where the sport plays it, England in football', async () => {
-  // Great Britain fields a team where its own rated players hold half the lineup (fieldedNations): in both tennis games.
-  // Its basketball, baseball and hockey players are too few, and its land stays neutral there.
+  // Great Britain fields a team where its own rated players hold half the lineup (fieldedNations): in basketball (its
+  // EuroBasket 2025 five) and both tennis games. Its baseball and hockey players are too few, and its land stays neutral there.
   const playing = AS_ONE.filter(sport => fieldedNations(getSport(sport)).includes('826'));
-  assert.deepEqual(playing, ['tennis', 'womens-tennis']);
+  assert.deepEqual(playing, ['basketball', 'tennis', 'womens-tennis']);
   for (const sport of [...playing, 'football']) {
     const [name, code, flagId] = sport === 'football' ? ENGLAND : GB;
     const flag = sport === 'football' ? '/flags/gb-eng.svg' : '/flags/gb.svg';

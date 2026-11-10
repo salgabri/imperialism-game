@@ -34,7 +34,7 @@ export default function XiTable({ title = '', teamId = null, rows = [], onSelect
               <td className="match-xi__pos">{row.pos}</td>
               <td className="match-xi__name">
                 <span className="match-xi__player">
-                  <span className="match-xi__player-name" title={row.estimated ? `${row.name}. ${ESTIMATE_TITLE}` : row.name}>
+                  <span className="match-xi__player-name" title={row.estimated ? `${row.name}. ${row.estimateTitle || ESTIMATE_TITLE}` : row.name}>
                     {row.name}{row.estimated && <><sup aria-hidden="true">*</sup><span className="sr-only"> (estimated rating)</span></>}
                   </span>
                   <span className="match-xi__claimed">

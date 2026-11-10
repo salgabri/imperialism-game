@@ -1,0 +1,3421 @@
+{
+ "note": "Every player on a EuroLeague roster as the game rates him (scripts/build-euroleague.mjs): his PIR a game over the seasons, as weighted and shrunk, the rating that gives, the positions the box score and height give, and whether he starts for his club. Regenerated with the clubs; the rule is in docs/design/euroleague.md.",
+ "source": {
+  "label": "EuroLeague 2026-27",
+  "retrieved": "2026-11-08",
+  "seasons": [
+   "E2024",
+   "E2025",
+   "E2026"
+  ]
+ },
+ "rule": {
+  "levelPir": 9,
+  "ratingAtLevel": 73,
+  "ratingPerPir": 1.3,
+  "range": [
+   60,
+   88
+  ],
+  "seasonWeights": [
+   0.5,
+   1,
+   1.5
+  ],
+  "priorPir": 4,
+  "priorGames": 4
+ },
+ "league": {
+  "season": "E2025",
+  "pace": 74.2,
+  "rating": 115.9,
+  "games": 380,
+  "points": 86.2,
+  "overtime": 0.039,
+  "margin": 10.2,
+  "close": 0.15,
+  "blowouts": 0.105,
+  "homeWins": 0.637,
+  "clubs": 20,
+  "bestWins": 26,
+  "worstWins": 8
+ },
+ "clubs": [
+  {
+   "id": "el-olympiacos",
+   "name": "Olympiacos",
+   "str": 81,
+   "five": [
+    "Sasha Vezenkov PF/SF 88",
+    "Jean Montero PG/SG 84",
+    "Nikola Milutinov C 82",
+    "Tyler Dorsey SG 78",
+    "Mbaye Ndiaye PF/SF 74"
+   ]
+  },
+  {
+   "id": "el-panathinaikos",
+   "name": "Panathinaikos",
+   "str": 81,
+   "five": [
+    "Mathias Lessort C 84",
+    "Sylvain Francisco PG 83",
+    "Kendrick Nunn SG/PG 82",
+    "Nigel Hayes-Davis SF/PF 79",
+    "Juancho Hernangómez PF/C 77"
+   ]
+  },
+  {
+   "id": "el-dubai-basketball",
+   "name": "Dubai Basketball",
+   "str": 80,
+   "five": [
+    "Mfiondu Kabengele C/PF 83",
+    "Dwayne Bacon SF/PF 80",
+    "Filip Petrušev C 79",
+    "McKinley Wright IV PG/SG 79",
+    "Elie Okobo PG/SG 77"
+   ]
+  },
+  {
+   "id": "el-hapoel-tel-aviv",
+   "name": "Hapoel Tel Aviv",
+   "str": 78,
+   "five": [
+    "Elijah Bryant SG/PG 85",
+    "Zach LeDay SF/PF 81",
+    "Dan Oturu C 80",
+    "Vasilije Micić PG/SG 76",
+    "Amir Coffey SG/SF 69"
+   ]
+  },
+  {
+   "id": "el-real-madrid",
+   "name": "Real Madrid",
+   "str": 78,
+   "five": [
+    "Walter Tavares C 81",
+    "Facundo Campazzo PG 80",
+    "Théo Maledon PG/SG 80",
+    "Timothé Luwawu-Cabarrot SF/PF 75",
+    "Chuma Okeke C/PF 72"
+   ]
+  },
+  {
+   "id": "el-anadolu-efes",
+   "name": "Anadolu Efes",
+   "str": 77,
+   "five": [
+    "Mike James PG/SG 84",
+    "Dario Šarić PF/C 78",
+    "Cameron Payne PG/SG 76",
+    "Bruno Fernando C 74",
+    "Collin Malcolm SF/PF 73"
+   ]
+  },
+  {
+   "id": "el-crvena-zvezda",
+   "name": "Crvena Zvezda",
+   "str": 77,
+   "five": [
+    "Chima Moneke SF/PF 83",
+    "Jordan Nwora PF/SF 78",
+    "Chris Jones PG 76",
+    "Nick Weiler-Babb PG/SG 74",
+    "Ebuka Izundu C 72"
+   ]
+  },
+  {
+   "id": "el-fenerbahce",
+   "name": "Fenerbahçe",
+   "str": 77,
+   "five": [
+    "Wade Baldwin IV PG/SG 80",
+    "Shavon Shields SF/PF 78",
+    "Talen Horton-Tucker SG 78",
+    "Will Clyburn SF/PF 78",
+    "Marcus Bingham C/PF 69"
+   ]
+  },
+  {
+   "id": "el-maccabi-tel-aviv",
+   "name": "Maccabi Tel Aviv",
+   "str": 77,
+   "five": [
+    "Jaylen Hoard PF/SF 80",
+    "Roman Sorkin PF/C 77",
+    "Yam Madar PG/SG 77",
+    "Daniel Theis C/PF 76",
+    "Jimmy Clark III PG/SG 73"
+   ]
+  },
+  {
+   "id": "el-valencia-basket",
+   "name": "Valencia Basket",
+   "str": 77,
+   "five": [
+    "Nikola Mirotić PF/C 81",
+    "T.J. Shorts PG 79",
+    "Kameron Taylor SF/PF 78",
+    "Armoni Brooks SG 74",
+    "Nathan Reuvers PF/C 74"
+   ]
+  },
+  {
+   "id": "el-zalgiris",
+   "name": "Žalgiris Kaunas",
+   "str": 77,
+   "five": [
+    "Jonas Valančiūnas C 83",
+    "Ažuolas Tubelis PF/C 78",
+    "Carsen Edwards SG 77",
+    "Sterling Brown SG/SF 75",
+    "Nigel Williams-Goss PG/SG 74"
+   ]
+  },
+  {
+   "id": "el-fc-barcelona",
+   "name": "FC Barcelona",
+   "str": 75,
+   "five": [
+    "Justin Robinson PG 79",
+    "Kevin Punter SG 79",
+    "Josh Nebo C 78",
+    "Tyrese Martin SF/PF 71",
+    "Joel Parra SF/PF 70"
+   ]
+  },
+  {
+   "id": "el-olimpia-milano",
+   "name": "Olimpia Milano",
+   "str": 75,
+   "five": [
+    "Moses Wright C 82",
+    "Devin Booker C/PF 74",
+    "Marko Gudurić SG/PG 74",
+    "Alec Peters PF/SF 73",
+    "Darius Thompson PG/SG 73"
+   ]
+  },
+  {
+   "id": "el-partizan",
+   "name": "Partizan",
+   "str": 75,
+   "five": [
+    "Carlik Jones PG/SG 81",
+    "Tonye Jekiri C 75",
+    "Lamar Stevens SF/PF 74",
+    "Luca Vildoza PG/SG 72",
+    "Nikola Tanasković C/PF 72"
+   ]
+  },
+  {
+   "id": "el-asvel",
+   "name": "ASVEL",
+   "str": 74,
+   "five": [
+    "Patty Mills SG 77",
+    "Hugo Besson SG/PG 75",
+    "Jae Crowder SF/PF 74",
+    "Both Gach SF/PF 72",
+    "Joel Bolomboy C/PF 71"
+   ]
+  },
+  {
+   "id": "el-bayern-munich",
+   "name": "Bayern Munich",
+   "str": 74,
+   "five": [
+    "Rokas Jokubaitis PG/SG 76",
+    "Johannes Thiemann C/PF 74",
+    "Vladimir Lučić SF/PF 74",
+    "Andreas Obst SG 73",
+    "Austin Wiley C 72"
+   ]
+  },
+  {
+   "id": "el-besiktas",
+   "name": "Beşiktaş",
+   "str": 74,
+   "five": [
+    "Lonnie Walker IV SG 76",
+    "Devon Dotson PG/SG 75",
+    "Ante Žižić C 74",
+    "Anthony Brown SF/PF 72",
+    "Eugene Omoruyi C/PF 71"
+   ]
+  },
+  {
+   "id": "el-paris-basketball",
+   "name": "Paris Basketball",
+   "str": 74,
+   "five": [
+    "Nadir Hifi PG/SG 81",
+    "Allan Dokossi C/PF 73",
+    "Jared Rhoden SG/SF 73",
+    "T.J. Warren SF/PF 73",
+    "Tyson Etienne PG/SG 72"
+   ]
+  },
+  {
+   "id": "el-baskonia",
+   "name": "Baskonia",
+   "str": 73,
+   "five": [
+    "Tadas Sedekerskis PF/SF 76",
+    "A.J. Lawson SF 73",
+    "Kenneth Faried C/PF 73",
+    "Kobi Simmons SG/PG 72",
+    "D.J. Stewart SF/SG 71"
+   ]
+  },
+  {
+   "id": "el-virtus-bologna",
+   "name": "Virtus Bologna",
+   "str": 73,
+   "five": [
+    "Aliou Diarra C 75",
+    "Wendell Moore SG 75",
+    "Marcus Carr PG 73",
+    "Derrick Alston Jr. PF/C 72",
+    "Kessler Edwards PF/SF 70"
+   ]
+  }
+ ],
+ "players": [
+  {
+   "code": "003469",
+   "club": "Olympiacos",
+   "name": "Sasha Vezenkov",
+   "positions": "PF/SF",
+   "rating": 88,
+   "pir": 21.71,
+   "games": 87,
+   "starts": true
+  },
+  {
+   "code": "009846",
+   "club": "Hapoel Tel Aviv",
+   "name": "Elijah Bryant",
+   "positions": "SG/PG",
+   "rating": 85,
+   "pir": 17.97,
+   "games": 86,
+   "starts": true
+  },
+  {
+   "code": "005985",
+   "club": "Anadolu Efes",
+   "name": "Mike James",
+   "positions": "PG/SG",
+   "rating": 84,
+   "pir": 17.6,
+   "games": 80,
+   "starts": true
+  },
+  {
+   "code": "003842",
+   "club": "Panathinaikos",
+   "name": "Mathias Lessort",
+   "positions": "C",
+   "rating": 84,
+   "pir": 17.26,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "010042",
+   "club": "Olympiacos",
+   "name": "Jean Montero",
+   "positions": "PG/SG",
+   "rating": 84,
+   "pir": 17.23,
+   "games": 44,
+   "starts": true
+  },
+  {
+   "code": "007975",
+   "club": "Panathinaikos",
+   "name": "Sylvain Francisco",
+   "positions": "PG",
+   "rating": 83,
+   "pir": 16.62,
+   "games": 86,
+   "starts": true
+  },
+  {
+   "code": "012201",
+   "club": "Crvena Zvezda",
+   "name": "Chima Moneke",
+   "positions": "SF/PF",
+   "rating": 83,
+   "pir": 16.55,
+   "games": 78,
+   "starts": true
+  },
+  {
+   "code": "012796",
+   "club": "Dubai Basketball",
+   "name": "Mfiondu Kabengele",
+   "positions": "C/PF",
+   "rating": 83,
+   "pir": 16.53,
+   "games": 46,
+   "starts": true
+  },
+  {
+   "code": "000898",
+   "club": "Žalgiris Kaunas",
+   "name": "Jonas Valančiūnas",
+   "positions": "C",
+   "rating": 83,
+   "pir": 16.39,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "003941",
+   "club": "Olympiacos",
+   "name": "Nikola Milutinov",
+   "positions": "C",
+   "rating": 82,
+   "pir": 16,
+   "games": 75,
+   "starts": true
+  },
+  {
+   "code": "012774",
+   "club": "Panathinaikos",
+   "name": "Kendrick Nunn",
+   "positions": "SG/PG",
+   "rating": 82,
+   "pir": 15.86,
+   "games": 77,
+   "starts": true
+  },
+  {
+   "code": "012878",
+   "club": "Olimpia Milano",
+   "name": "Moses Wright",
+   "positions": "C",
+   "rating": 82,
+   "pir": 15.63,
+   "games": 52,
+   "starts": true
+  },
+  {
+   "code": "012640",
+   "club": "Paris Basketball",
+   "name": "Nadir Hifi",
+   "positions": "PG/SG",
+   "rating": 81,
+   "pir": 15.39,
+   "games": 82,
+   "starts": true
+  },
+  {
+   "code": "008987",
+   "club": "Hapoel Tel Aviv",
+   "name": "Zach LeDay",
+   "positions": "SF/PF",
+   "rating": 81,
+   "pir": 15.17,
+   "games": 74,
+   "starts": true
+  },
+  {
+   "code": "005791",
+   "club": "Real Madrid",
+   "name": "Walter Tavares",
+   "positions": "C",
+   "rating": 81,
+   "pir": 14.96,
+   "games": 89,
+   "starts": true
+  },
+  {
+   "code": "013369",
+   "club": "Partizan",
+   "name": "Carlik Jones",
+   "positions": "PG/SG",
+   "rating": 81,
+   "pir": 14.86,
+   "games": 44,
+   "starts": true
+  },
+  {
+   "code": "000796",
+   "club": "Valencia Basket",
+   "name": "Nikola Mirotić",
+   "positions": "PF/C",
+   "rating": 81,
+   "pir": 14.83,
+   "games": 69,
+   "starts": true
+  },
+  {
+   "code": "007027",
+   "club": "Real Madrid",
+   "name": "Théo Maledon",
+   "positions": "PG/SG",
+   "rating": 80,
+   "pir": 14.68,
+   "games": 80,
+   "starts": true
+  },
+  {
+   "code": "011286",
+   "club": "Dubai Basketball",
+   "name": "Dwayne Bacon",
+   "positions": "SF/PF",
+   "rating": 80,
+   "pir": 14.51,
+   "games": 39,
+   "starts": true
+  },
+  {
+   "code": "005928",
+   "club": "Real Madrid",
+   "name": "Facundo Campazzo",
+   "positions": "PG",
+   "rating": 80,
+   "pir": 14.5,
+   "games": 92,
+   "starts": true
+  },
+  {
+   "code": "012788",
+   "club": "Hapoel Tel Aviv",
+   "name": "Dan Oturu",
+   "positions": "C",
+   "rating": 80,
+   "pir": 14.34,
+   "games": 90,
+   "starts": true
+  },
+  {
+   "code": "006835",
+   "club": "Maccabi Tel Aviv",
+   "name": "Jaylen Hoard",
+   "positions": "PF/SF",
+   "rating": 80,
+   "pir": 14.23,
+   "games": 69,
+   "starts": true
+  },
+  {
+   "code": "009863",
+   "club": "Fenerbahçe",
+   "name": "Wade Baldwin IV",
+   "positions": "PG/SG",
+   "rating": 80,
+   "pir": 14.03,
+   "games": 79,
+   "starts": true
+  },
+  {
+   "code": "008962",
+   "club": "Panathinaikos",
+   "name": "Nigel Hayes-Davis",
+   "positions": "SF/PF",
+   "rating": 79,
+   "pir": 13.92,
+   "games": 47,
+   "starts": true
+  },
+  {
+   "code": "009862",
+   "club": "FC Barcelona",
+   "name": "Kevin Punter",
+   "positions": "SG",
+   "rating": 79,
+   "pir": 13.88,
+   "games": 86,
+   "starts": true
+  },
+  {
+   "code": "012606",
+   "club": "Dubai Basketball",
+   "name": "McKinley Wright IV",
+   "positions": "PG/SG",
+   "rating": 79,
+   "pir": 13.77,
+   "games": 48,
+   "starts": true
+  },
+  {
+   "code": "011194",
+   "club": "Dubai Basketball",
+   "name": "Filip Petrušev",
+   "positions": "C",
+   "rating": 79,
+   "pir": 13.62,
+   "games": 79,
+   "starts": true
+  },
+  {
+   "code": "012608",
+   "club": "Valencia Basket",
+   "name": "T.J. Shorts",
+   "positions": "PG",
+   "rating": 79,
+   "pir": 13.46,
+   "games": 90,
+   "starts": true
+  },
+  {
+   "code": "014008",
+   "club": "FC Barcelona",
+   "name": "Justin Robinson",
+   "positions": "PG",
+   "rating": 79,
+   "pir": 13.45,
+   "games": 46,
+   "starts": true
+  },
+  {
+   "code": "014124",
+   "club": "Fenerbahçe",
+   "name": "Talen Horton-Tucker",
+   "positions": "SG",
+   "rating": 78,
+   "pir": 13.22,
+   "games": 51,
+   "starts": true
+  },
+  {
+   "code": "001133",
+   "club": "Dubai Basketball",
+   "name": "Tornike Shengelia",
+   "positions": "PF/C",
+   "rating": 78,
+   "pir": 13.22,
+   "games": 71
+  },
+  {
+   "code": "004888",
+   "club": "Fenerbahçe",
+   "name": "Will Clyburn",
+   "positions": "SF/PF",
+   "rating": 78,
+   "pir": 13.06,
+   "games": 67,
+   "starts": true
+  },
+  {
+   "code": "008192",
+   "club": "Žalgiris Kaunas",
+   "name": "Ažuolas Tubelis",
+   "positions": "PF/C",
+   "rating": 78,
+   "pir": 12.92,
+   "games": 52,
+   "starts": true
+  },
+  {
+   "code": "009849",
+   "club": "Olympiacos",
+   "name": "Tyler Dorsey",
+   "positions": "SG",
+   "rating": 78,
+   "pir": 12.87,
+   "games": 43,
+   "starts": true
+  },
+  {
+   "code": "011199",
+   "club": "FC Barcelona",
+   "name": "Josh Nebo",
+   "positions": "C",
+   "rating": 78,
+   "pir": 12.72,
+   "games": 33,
+   "starts": true
+  },
+  {
+   "code": "013363",
+   "club": "Crvena Zvezda",
+   "name": "Jordan Nwora",
+   "positions": "PF/SF",
+   "rating": 78,
+   "pir": 12.71,
+   "games": 81,
+   "starts": true
+  },
+  {
+   "code": "003112",
+   "club": "Anadolu Efes",
+   "name": "Dario Šarić",
+   "positions": "PF/C",
+   "rating": 78,
+   "pir": 12.61,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "007831",
+   "club": "Fenerbahçe",
+   "name": "Shavon Shields",
+   "positions": "SF/PF",
+   "rating": 78,
+   "pir": 12.56,
+   "games": 73,
+   "starts": true
+  },
+  {
+   "code": "011217",
+   "club": "Valencia Basket",
+   "name": "Kameron Taylor",
+   "positions": "SF/PF",
+   "rating": 78,
+   "pir": 12.54,
+   "games": 50,
+   "starts": true
+  },
+  {
+   "code": "011052",
+   "club": "Maccabi Tel Aviv",
+   "name": "Yam Madar",
+   "positions": "PG/SG",
+   "rating": 77,
+   "pir": 12.21,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "011219",
+   "club": "Maccabi Tel Aviv",
+   "name": "Roman Sorkin",
+   "positions": "PF/C",
+   "rating": 77,
+   "pir": 12.16,
+   "games": 81,
+   "starts": true
+  },
+  {
+   "code": "011987",
+   "club": "Žalgiris Kaunas",
+   "name": "Carsen Edwards",
+   "positions": "SG",
+   "rating": 77,
+   "pir": 12.11,
+   "games": 81,
+   "starts": true
+  },
+  {
+   "code": "012712",
+   "club": "Panathinaikos",
+   "name": "Juancho Hernangómez",
+   "positions": "PF/C",
+   "rating": 77,
+   "pir": 12.08,
+   "games": 91,
+   "starts": true
+  },
+  {
+   "code": "011212",
+   "club": "Dubai Basketball",
+   "name": "Elie Okobo",
+   "positions": "PG/SG",
+   "rating": 77,
+   "pir": 12.03,
+   "games": 87,
+   "starts": true
+  },
+  {
+   "code": "009048",
+   "club": "Olympiacos",
+   "name": "Codi Miller-McIntyre",
+   "positions": "PG",
+   "rating": 77,
+   "pir": 12.01,
+   "games": 84
+  },
+  {
+   "code": "001926",
+   "club": "Panathinaikos",
+   "name": "Kostas Sloukas",
+   "positions": "PG",
+   "rating": 77,
+   "pir": 11.91,
+   "games": 77
+  },
+  {
+   "code": "011981",
+   "club": "Olympiacos",
+   "name": "Tyrique Jones",
+   "positions": "C",
+   "rating": 77,
+   "pir": 11.88,
+   "games": 75
+  },
+  {
+   "code": "015163",
+   "club": "ASVEL",
+   "name": "Patty Mills",
+   "positions": "SG",
+   "rating": 77,
+   "pir": 11.71,
+   "games": 9,
+   "starts": true
+  },
+  {
+   "code": "010568",
+   "club": "Crvena Zvezda",
+   "name": "Chris Jones",
+   "positions": "PG",
+   "rating": 76,
+   "pir": 11.68,
+   "games": 52,
+   "starts": true
+  },
+  {
+   "code": "013403",
+   "club": "Beşiktaş",
+   "name": "Lonnie Walker IV",
+   "positions": "SG",
+   "rating": 76,
+   "pir": 11.53,
+   "games": 28,
+   "starts": true
+  },
+  {
+   "code": "004132",
+   "club": "Maccabi Tel Aviv",
+   "name": "Daniel Theis",
+   "positions": "C/PF",
+   "rating": 76,
+   "pir": 11.3,
+   "games": 46,
+   "starts": true
+  },
+  {
+   "code": "007519",
+   "club": "Bayern Munich",
+   "name": "Rokas Jokubaitis",
+   "positions": "PG/SG",
+   "rating": 76,
+   "pir": 11.3,
+   "games": 37,
+   "starts": true
+  },
+  {
+   "code": "011196",
+   "club": "Olympiacos",
+   "name": "Donta Hall",
+   "positions": "C",
+   "rating": 76,
+   "pir": 11.11,
+   "games": 81
+  },
+  {
+   "code": "014213",
+   "club": "Anadolu Efes",
+   "name": "Cameron Payne",
+   "positions": "PG/SG",
+   "rating": 76,
+   "pir": 11.02,
+   "games": 7,
+   "starts": true
+  },
+  {
+   "code": "007230",
+   "club": "Baskonia",
+   "name": "Tadas Sedekerskis",
+   "positions": "PF/SF",
+   "rating": 76,
+   "pir": 10.97,
+   "games": 32,
+   "starts": true
+  },
+  {
+   "code": "002580",
+   "club": "Hapoel Tel Aviv",
+   "name": "Vasilije Micić",
+   "positions": "PG/SG",
+   "rating": 76,
+   "pir": 10.96,
+   "games": 49,
+   "starts": true
+  },
+  {
+   "code": "006540",
+   "club": "Dubai Basketball",
+   "name": "Dzanan Musa",
+   "positions": "SG/SF",
+   "rating": 75,
+   "pir": 10.92,
+   "games": 35
+  },
+  {
+   "code": "006760",
+   "club": "Panathinaikos",
+   "name": "Isaac Bonga",
+   "positions": "PF/SF",
+   "rating": 75,
+   "pir": 10.92,
+   "games": 76
+  },
+  {
+   "code": "012080",
+   "club": "Real Madrid",
+   "name": "Timothé Luwawu-Cabarrot",
+   "positions": "SF/PF",
+   "rating": 75,
+   "pir": 10.86,
+   "games": 72,
+   "starts": true
+  },
+  {
+   "code": "013285",
+   "club": "Beşiktaş",
+   "name": "Devon Dotson",
+   "positions": "PG/SG",
+   "rating": 75,
+   "pir": 10.75,
+   "games": 8,
+   "starts": true
+  },
+  {
+   "code": "013855",
+   "club": "FC Barcelona",
+   "name": "Umoja Gibson",
+   "positions": "PG/SG",
+   "rating": 75,
+   "pir": 10.75,
+   "games": 8
+  },
+  {
+   "code": "009733",
+   "club": "Partizan",
+   "name": "Tonye Jekiri",
+   "positions": "C",
+   "rating": 75,
+   "pir": 10.72,
+   "games": 6,
+   "starts": true
+  },
+  {
+   "code": "015164",
+   "club": "ASVEL",
+   "name": "Hugo Besson",
+   "positions": "SG/PG",
+   "rating": 75,
+   "pir": 10.71,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "007200",
+   "club": "Fenerbahçe",
+   "name": "Shane Larkin",
+   "positions": "PG/SG",
+   "rating": 75,
+   "pir": 10.7,
+   "games": 34
+  },
+  {
+   "code": "012720",
+   "club": "Žalgiris Kaunas",
+   "name": "Sterling Brown",
+   "positions": "SG/SF",
+   "rating": 75,
+   "pir": 10.63,
+   "games": 81,
+   "starts": true
+  },
+  {
+   "code": "013367",
+   "club": "Fenerbahçe",
+   "name": "Trent Forrest",
+   "positions": "PG/SG",
+   "rating": 75,
+   "pir": 10.5,
+   "games": 71
+  },
+  {
+   "code": "014127",
+   "club": "Maccabi Tel Aviv",
+   "name": "O'Shae J Brissett",
+   "positions": "SF/PF",
+   "rating": 75,
+   "pir": 10.29,
+   "games": 46
+  },
+  {
+   "code": "014108",
+   "club": "Virtus Bologna",
+   "name": "Aliou Diarra",
+   "positions": "C",
+   "rating": 75,
+   "pir": 10.28,
+   "games": 38,
+   "starts": true
+  },
+  {
+   "code": "013402",
+   "club": "Hapoel Tel Aviv",
+   "name": "Antonio Blakeney",
+   "positions": "SG",
+   "rating": 75,
+   "pir": 10.17,
+   "games": 51
+  },
+  {
+   "code": "014737",
+   "club": "Virtus Bologna",
+   "name": "Wendell Moore",
+   "positions": "SG",
+   "rating": 75,
+   "pir": 10.16,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "003958",
+   "club": "Bayern Munich",
+   "name": "Johannes Thiemann",
+   "positions": "C/PF",
+   "rating": 74,
+   "pir": 10.08,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "014009",
+   "club": "Partizan",
+   "name": "Lamar Stevens",
+   "positions": "SF/PF",
+   "rating": 74,
+   "pir": 10.07,
+   "games": 8,
+   "starts": true
+  },
+  {
+   "code": "001288",
+   "club": "Bayern Munich",
+   "name": "Vladimir Lučić",
+   "positions": "SF/PF",
+   "rating": 74,
+   "pir": 10.04,
+   "games": 43,
+   "starts": true
+  },
+  {
+   "code": "012738",
+   "club": "Valencia Basket",
+   "name": "Nathan Reuvers",
+   "positions": "PF/C",
+   "rating": 74,
+   "pir": 10,
+   "games": 51,
+   "starts": true
+  },
+  {
+   "code": "007056",
+   "club": "Olimpia Milano",
+   "name": "Devin Booker",
+   "positions": "C/PF",
+   "rating": 74,
+   "pir": 10,
+   "games": 73,
+   "starts": true
+  },
+  {
+   "code": "009549",
+   "club": "Anadolu Efes",
+   "name": "Isaia Cordinier",
+   "positions": "SG/PG",
+   "rating": 74,
+   "pir": 9.96,
+   "games": 64
+  },
+  {
+   "code": "008099",
+   "club": "Anadolu Efes",
+   "name": "Matthew Strazel",
+   "positions": "PG/SG",
+   "rating": 74,
+   "pir": 9.92,
+   "games": 94
+  },
+  {
+   "code": "004554",
+   "club": "Beşiktaş",
+   "name": "Ante Žižić",
+   "positions": "C",
+   "rating": 74,
+   "pir": 9.8,
+   "games": 34,
+   "starts": true
+  },
+  {
+   "code": "013384",
+   "club": "Valencia Basket",
+   "name": "Armoni Brooks",
+   "positions": "SG",
+   "rating": 74,
+   "pir": 9.8,
+   "games": 80,
+   "starts": true
+  },
+  {
+   "code": "004004",
+   "club": "Olimpia Milano",
+   "name": "Marko Gudurić",
+   "positions": "SG/PG",
+   "rating": 74,
+   "pir": 9.77,
+   "games": 80,
+   "starts": true
+  },
+  {
+   "code": "015162",
+   "club": "ASVEL",
+   "name": "TyTy Washington Jr.",
+   "positions": "PG/SG",
+   "rating": 74,
+   "pir": 9.75,
+   "games": 6
+  },
+  {
+   "code": "010391",
+   "club": "Crvena Zvezda",
+   "name": "Nick Weiler-Babb",
+   "positions": "PG/SG",
+   "rating": 74,
+   "pir": 9.74,
+   "games": 81,
+   "starts": true
+  },
+  {
+   "code": "012731",
+   "club": "Olympiacos",
+   "name": "Mbaye Ndiaye",
+   "positions": "PF/SF",
+   "rating": 74,
+   "pir": 9.71,
+   "games": 42,
+   "starts": true
+  },
+  {
+   "code": "007982",
+   "club": "Žalgiris Kaunas",
+   "name": "Nigel Williams-Goss",
+   "positions": "PG/SG",
+   "rating": 74,
+   "pir": 9.67,
+   "games": 66,
+   "starts": true
+  },
+  {
+   "code": "002939",
+   "club": "Hapoel Tel Aviv",
+   "name": "Tomas Satoransky",
+   "positions": "PG/SG",
+   "rating": 74,
+   "pir": 9.63,
+   "games": 85
+  },
+  {
+   "code": "013667",
+   "club": "Anadolu Efes",
+   "name": "Bruno Fernando",
+   "positions": "C",
+   "rating": 74,
+   "pir": 9.49,
+   "games": 47,
+   "starts": true
+  },
+  {
+   "code": "006661",
+   "club": "Beşiktaş",
+   "name": "Scottie Wilbekin",
+   "positions": "PG/SG",
+   "rating": 74,
+   "pir": 9.45,
+   "games": 10
+  },
+  {
+   "code": "009754",
+   "club": "Anadolu Efes",
+   "name": "Jordan Loyd",
+   "positions": "SG",
+   "rating": 74,
+   "pir": 9.44,
+   "games": 79
+  },
+  {
+   "code": "015166",
+   "club": "ASVEL",
+   "name": "Jae Crowder",
+   "positions": "SF/PF",
+   "rating": 74,
+   "pir": 9.4,
+   "games": 9,
+   "starts": true
+  },
+  {
+   "code": "004508",
+   "club": "Bayern Munich",
+   "name": "Andreas Obst",
+   "positions": "SG",
+   "rating": 73,
+   "pir": 9.33,
+   "games": 81,
+   "starts": true
+  },
+  {
+   "code": "013380",
+   "club": "Olympiacos",
+   "name": "Evan Fournier",
+   "positions": "SF/PF",
+   "rating": 73,
+   "pir": 9.3,
+   "games": 83
+  },
+  {
+   "code": "011231",
+   "club": "Dubai Basketball",
+   "name": "Jaron Blossomgame",
+   "positions": "SF/PF",
+   "rating": 73,
+   "pir": 9.22,
+   "games": 93
+  },
+  {
+   "code": "011193",
+   "club": "Hapoel Tel Aviv",
+   "name": "Tamir Blatt",
+   "positions": "PG",
+   "rating": 73,
+   "pir": 9.14,
+   "games": 64
+  },
+  {
+   "code": "012707",
+   "club": "Virtus Bologna",
+   "name": "Marcus Carr",
+   "positions": "PG",
+   "rating": 73,
+   "pir": 9.13,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "014163",
+   "club": "Crvena Zvezda",
+   "name": "Jared Butler",
+   "positions": "PG/SG",
+   "rating": 73,
+   "pir": 9.12,
+   "games": 42
+  },
+  {
+   "code": "013370",
+   "club": "Bayern Munich",
+   "name": "Duane Washington",
+   "positions": "SG/PG",
+   "rating": 73,
+   "pir": 9.1,
+   "games": 8
+  },
+  {
+   "code": "008985",
+   "club": "Olimpia Milano",
+   "name": "Leandro Bolmaro",
+   "positions": "SG/PG",
+   "rating": 73,
+   "pir": 9.1,
+   "games": 64
+  },
+  {
+   "code": "011078",
+   "club": "Olimpia Milano",
+   "name": "Darius Thompson",
+   "positions": "PG/SG",
+   "rating": 73,
+   "pir": 9.06,
+   "games": 93,
+   "starts": true
+  },
+  {
+   "code": "015168",
+   "club": "Paris Basketball",
+   "name": "T.J. Warren",
+   "positions": "SF/PF",
+   "rating": 73,
+   "pir": 9.05,
+   "games": 6,
+   "starts": true
+  },
+  {
+   "code": "011284",
+   "club": "Baskonia",
+   "name": "Kenneth Faried",
+   "positions": "C/PF",
+   "rating": 73,
+   "pir": 8.99,
+   "games": 45,
+   "starts": true
+  },
+  {
+   "code": "012609",
+   "club": "Anadolu Efes",
+   "name": "Collin Malcolm",
+   "positions": "SF/PF",
+   "rating": 73,
+   "pir": 8.87,
+   "games": 83,
+   "starts": true
+  },
+  {
+   "code": "014012",
+   "club": "Maccabi Tel Aviv",
+   "name": "T.J. Leaf",
+   "positions": "PF/C",
+   "rating": 73,
+   "pir": 8.77,
+   "games": 32
+  },
+  {
+   "code": "012610",
+   "club": "Olympiacos",
+   "name": "Tyson Ward",
+   "positions": "SF/PF",
+   "rating": 73,
+   "pir": 8.75,
+   "games": 83
+  },
+  {
+   "code": "014734",
+   "club": "Baskonia",
+   "name": "A.J. Lawson",
+   "positions": "SF",
+   "rating": 73,
+   "pir": 8.74,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "011205",
+   "club": "Olimpia Milano",
+   "name": "Devon Hall",
+   "positions": "SG/PG",
+   "rating": 73,
+   "pir": 8.71,
+   "games": 77
+  },
+  {
+   "code": "014010",
+   "club": "Paris Basketball",
+   "name": "Allan Dokossi",
+   "positions": "C/PF",
+   "rating": 73,
+   "pir": 8.68,
+   "games": 44,
+   "starts": true
+  },
+  {
+   "code": "008829",
+   "club": "Olimpia Milano",
+   "name": "Alec Peters",
+   "positions": "PF/SF",
+   "rating": 73,
+   "pir": 8.67,
+   "games": 92,
+   "starts": true
+  },
+  {
+   "code": "013699",
+   "club": "Maccabi Tel Aviv",
+   "name": "Jimmy Clark III",
+   "positions": "PG/SG",
+   "rating": 73,
+   "pir": 8.62,
+   "games": 47,
+   "starts": true
+  },
+  {
+   "code": "014178",
+   "club": "Paris Basketball",
+   "name": "Jared Rhoden",
+   "positions": "SG/SF",
+   "rating": 73,
+   "pir": 8.62,
+   "games": 34,
+   "starts": true
+  },
+  {
+   "code": "013278",
+   "club": "Bayern Munich",
+   "name": "Austin Wiley",
+   "positions": "C",
+   "rating": 72,
+   "pir": 8.58,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "014152",
+   "club": "Baskonia",
+   "name": "Kobi Simmons",
+   "positions": "SG/PG",
+   "rating": 72,
+   "pir": 8.57,
+   "games": 40,
+   "starts": true
+  },
+  {
+   "code": "011204",
+   "club": "Panathinaikos",
+   "name": "Jerian Grant",
+   "positions": "SG/PG",
+   "rating": 72,
+   "pir": 8.52,
+   "games": 92
+  },
+  {
+   "code": "009783",
+   "club": "Maccabi Tel Aviv",
+   "name": "Bonzie Colson",
+   "positions": "SF/PF",
+   "rating": 72,
+   "pir": 8.5,
+   "games": 89
+  },
+  {
+   "code": "010357",
+   "club": "Panathinaikos",
+   "name": "Guerschon Yabusele",
+   "positions": "SF/PF",
+   "rating": 72,
+   "pir": 8.5,
+   "games": 10
+  },
+  {
+   "code": "014027",
+   "club": "Dubai Basketball",
+   "name": "Mamadi Diakite",
+   "positions": "C/PF",
+   "rating": 72,
+   "pir": 8.46,
+   "games": 47
+  },
+  {
+   "code": "014005",
+   "club": "Virtus Bologna",
+   "name": "Derrick Alston Jr.",
+   "positions": "PF/C",
+   "rating": 72,
+   "pir": 8.44,
+   "games": 47,
+   "starts": true
+  },
+  {
+   "code": "013929",
+   "club": "Olimpia Milano",
+   "name": "R.J. Cole",
+   "positions": "PG/SG",
+   "rating": 72,
+   "pir": 8.42,
+   "games": 10
+  },
+  {
+   "code": "009005",
+   "club": "Real Madrid",
+   "name": "Gabriel Deck",
+   "positions": "SF",
+   "rating": 72,
+   "pir": 8.36,
+   "games": 69
+  },
+  {
+   "code": "013374",
+   "club": "Virtus Bologna",
+   "name": "Mouhamet Diouf",
+   "positions": "C",
+   "rating": 72,
+   "pir": 8.34,
+   "games": 74
+  },
+  {
+   "code": "002849",
+   "club": "Fenerbahçe",
+   "name": "Nicolo Melli",
+   "positions": "PF/SF",
+   "rating": 72,
+   "pir": 8.33,
+   "games": 83
+  },
+  {
+   "code": "015165",
+   "club": "ASVEL",
+   "name": "Tremont Waters",
+   "positions": "PG/SG",
+   "rating": 72,
+   "pir": 8.32,
+   "games": 9
+  },
+  {
+   "code": "015143",
+   "club": "Paris Basketball",
+   "name": "Tyson Etienne",
+   "positions": "PG/SG",
+   "rating": 72,
+   "pir": 8.32,
+   "games": 9,
+   "starts": true
+  },
+  {
+   "code": "014029",
+   "club": "Crvena Zvezda",
+   "name": "Ebuka Izundu",
+   "positions": "C",
+   "rating": 72,
+   "pir": 8.24,
+   "games": 40,
+   "starts": true
+  },
+  {
+   "code": "007947",
+   "club": "Partizan",
+   "name": "Luca Vildoza",
+   "positions": "PG/SG",
+   "rating": 72,
+   "pir": 8.2,
+   "games": 74,
+   "starts": true
+  },
+  {
+   "code": "010393",
+   "club": "Real Madrid",
+   "name": "Jaime Pradilla",
+   "positions": "PF/SF",
+   "rating": 72,
+   "pir": 8.18,
+   "games": 54
+  },
+  {
+   "code": "011982",
+   "club": "Crvena Zvezda",
+   "name": "Semi Ojeleye",
+   "positions": "SF",
+   "rating": 72,
+   "pir": 8.16,
+   "games": 49
+  },
+  {
+   "code": "007527",
+   "club": "Panathinaikos",
+   "name": "Brancou Badio",
+   "positions": "SG",
+   "rating": 72,
+   "pir": 8.13,
+   "games": 50
+  },
+  {
+   "code": "013900",
+   "club": "ASVEL",
+   "name": "Both Gach",
+   "positions": "SF/PF",
+   "rating": 72,
+   "pir": 8.11,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "005637",
+   "club": "Partizan",
+   "name": "Nikola Tanasković",
+   "positions": "C/PF",
+   "rating": 72,
+   "pir": 8.11,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "010545",
+   "club": "Valencia Basket",
+   "name": "Neal Sako",
+   "positions": "C",
+   "rating": 72,
+   "pir": 8.1,
+   "games": 85
+  },
+  {
+   "code": "010390",
+   "club": "Partizan",
+   "name": "Kevarrius Hayes",
+   "positions": "C",
+   "rating": 72,
+   "pir": 8.1,
+   "games": 87
+  },
+  {
+   "code": "014735",
+   "club": "Baskonia",
+   "name": "Chris Duarte",
+   "positions": "SF/PF",
+   "rating": 72,
+   "pir": 8.06,
+   "games": 7
+  },
+  {
+   "code": "009025",
+   "club": "Beşiktaş",
+   "name": "Anthony Brown",
+   "positions": "SF/PF",
+   "rating": 72,
+   "pir": 8.03,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "012710",
+   "club": "Anadolu Efes",
+   "name": "Ercan Osmani",
+   "positions": "PF/C",
+   "rating": 72,
+   "pir": 8.01,
+   "games": 85
+  },
+  {
+   "code": "014006",
+   "club": "Real Madrid",
+   "name": "Chuma Okeke",
+   "positions": "C/PF",
+   "rating": 72,
+   "pir": 8,
+   "games": 52,
+   "starts": true
+  },
+  {
+   "code": "005844",
+   "club": "Anadolu Efes",
+   "name": "Georgios Papagiannis",
+   "positions": "C",
+   "rating": 71,
+   "pir": 7.76,
+   "games": 29
+  },
+  {
+   "code": "002328",
+   "club": "Žalgiris Kaunas",
+   "name": "Marius Grigonis",
+   "positions": "SG/SF",
+   "rating": 71,
+   "pir": 7.71,
+   "games": 10
+  },
+  {
+   "code": "011247",
+   "club": "Real Madrid",
+   "name": "Andres Feliz",
+   "positions": "PG/SG",
+   "rating": 71,
+   "pir": 7.68,
+   "games": 82
+  },
+  {
+   "code": "011157",
+   "club": "Crvena Zvezda",
+   "name": "Johnathan Motley",
+   "positions": "C/PF",
+   "rating": 71,
+   "pir": 7.68,
+   "games": 35
+  },
+  {
+   "code": "014207",
+   "club": "Beşiktaş",
+   "name": "Eugene Omoruyi",
+   "positions": "C/PF",
+   "rating": 71,
+   "pir": 7.63,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "009035",
+   "club": "ASVEL",
+   "name": "Joel Bolomboy",
+   "positions": "C/PF",
+   "rating": 71,
+   "pir": 7.63,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "008855",
+   "club": "Dubai Basketball",
+   "name": "Thomas Walkup",
+   "positions": "PG",
+   "rating": 71,
+   "pir": 7.56,
+   "games": 69
+  },
+  {
+   "code": "013389",
+   "club": "Žalgiris Kaunas",
+   "name": "Saben Lee",
+   "positions": "PG/SG",
+   "rating": 71,
+   "pir": 7.51,
+   "games": 34
+  },
+  {
+   "code": "007201",
+   "club": "Bayern Munich",
+   "name": "Johannes Voigtmann",
+   "positions": "C/PF",
+   "rating": 71,
+   "pir": 7.51,
+   "games": 45
+  },
+  {
+   "code": "012403",
+   "club": "Paris Basketball",
+   "name": "Mouhamed Faye",
+   "positions": "C",
+   "rating": 71,
+   "pir": 7.44,
+   "games": 48
+  },
+  {
+   "code": "013290",
+   "club": "Bayern Munich",
+   "name": "Justinian Jessup",
+   "positions": "SG/SF",
+   "rating": 71,
+   "pir": 7.42,
+   "games": 46
+  },
+  {
+   "code": "012700",
+   "club": "Baskonia",
+   "name": "D.J. Stewart",
+   "positions": "SF/SG",
+   "rating": 71,
+   "pir": 7.39,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "011305",
+   "club": "Crvena Zvezda",
+   "name": "Tyson Carter",
+   "positions": "SG",
+   "rating": 71,
+   "pir": 7.39,
+   "games": 10
+  },
+  {
+   "code": "011244",
+   "club": "Bayern Munich",
+   "name": "Oscar Da Silva",
+   "positions": "PF/SF",
+   "rating": 71,
+   "pir": 7.34,
+   "games": 68
+  },
+  {
+   "code": "014102",
+   "club": "Anadolu Efes",
+   "name": "Kai Jones",
+   "positions": "C",
+   "rating": 71,
+   "pir": 7.23,
+   "games": 46
+  },
+  {
+   "code": "015138",
+   "club": "FC Barcelona",
+   "name": "Tyrese Martin",
+   "positions": "SF/PF",
+   "rating": 71,
+   "pir": 7.08,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "014786",
+   "club": "Beşiktaş",
+   "name": "Jaylen Nowell",
+   "positions": "SG",
+   "rating": 70,
+   "pir": 7,
+   "games": 10
+  },
+  {
+   "code": "014168",
+   "club": "Fenerbahçe",
+   "name": "Braxton Key",
+   "positions": "PF/SF",
+   "rating": 70,
+   "pir": 6.91,
+   "games": 44
+  },
+  {
+   "code": "002676",
+   "club": "Žalgiris Kaunas",
+   "name": "Arnas Butkevičius",
+   "positions": "SF",
+   "rating": 70,
+   "pir": 6.91,
+   "games": 81
+  },
+  {
+   "code": "012795",
+   "club": "Dubai Basketball",
+   "name": "Justin Anderson",
+   "positions": "SF",
+   "rating": 70,
+   "pir": 6.87,
+   "games": 70
+  },
+  {
+   "code": "014736",
+   "club": "Baskonia",
+   "name": "Damion Baugh",
+   "positions": "PG",
+   "rating": 70,
+   "pir": 6.84,
+   "games": 10
+  },
+  {
+   "code": "010781",
+   "club": "Maccabi Tel Aviv",
+   "name": "Iffe Lundberg",
+   "positions": "SG/PG",
+   "rating": 70,
+   "pir": 6.79,
+   "games": 32
+  },
+  {
+   "code": "009680",
+   "club": "Beşiktaş",
+   "name": "Conor Morgan",
+   "positions": "C/PF",
+   "rating": 70,
+   "pir": 6.76,
+   "games": 10
+  },
+  {
+   "code": "015103",
+   "club": "Real Madrid",
+   "name": "Damian Jones",
+   "positions": "C/PF",
+   "rating": 70,
+   "pir": 6.76,
+   "games": 10
+  },
+  {
+   "code": "014115",
+   "club": "Valencia Basket",
+   "name": "Omari Moore",
+   "positions": "PG/SG",
+   "rating": 70,
+   "pir": 6.75,
+   "games": 52
+  },
+  {
+   "code": "015029",
+   "club": "Virtus Bologna",
+   "name": "Trent Frazier",
+   "positions": "PG/SG",
+   "rating": 70,
+   "pir": 6.68,
+   "games": 10
+  },
+  {
+   "code": "010581",
+   "club": "Valencia Basket",
+   "name": "Dylan Osetkowski",
+   "positions": "PF/SF",
+   "rating": 70,
+   "pir": 6.67,
+   "games": 45
+  },
+  {
+   "code": "002329",
+   "club": "Žalgiris Kaunas",
+   "name": "Edgaras Ulanovas",
+   "positions": "SF",
+   "rating": 70,
+   "pir": 6.66,
+   "games": 86
+  },
+  {
+   "code": "006739",
+   "club": "Partizan",
+   "name": "Alessandro Pajola",
+   "positions": "PG/SG",
+   "rating": 70,
+   "pir": 6.62,
+   "games": 64
+  },
+  {
+   "code": "014742",
+   "club": "Partizan",
+   "name": "Ethan Thompson",
+   "positions": "SF/SG",
+   "rating": 70,
+   "pir": 6.61,
+   "games": 10
+  },
+  {
+   "code": "009664",
+   "club": "Partizan",
+   "name": "Derek Willis",
+   "positions": "C/PF",
+   "rating": 70,
+   "pir": 6.58,
+   "games": 55
+  },
+  {
+   "code": "013289",
+   "club": "Baskonia",
+   "name": "Marcio Santos",
+   "positions": "C/PF",
+   "rating": 70,
+   "pir": 6.58,
+   "games": 44
+  },
+  {
+   "code": "010106",
+   "club": "FC Barcelona",
+   "name": "Juan Nunez",
+   "positions": "PG",
+   "rating": 70,
+   "pir": 6.58,
+   "games": 25
+  },
+  {
+   "code": "014416",
+   "club": "Virtus Bologna",
+   "name": "Kessler Edwards",
+   "positions": "PF/SF",
+   "rating": 70,
+   "pir": 6.53,
+   "games": 10,
+   "starts": true
+  },
+  {
+   "code": "008811",
+   "club": "Panathinaikos",
+   "name": "Moustapha Fall",
+   "positions": "C",
+   "rating": 70,
+   "pir": 6.53,
+   "games": 41
+  },
+  {
+   "code": "012613",
+   "club": "Real Madrid",
+   "name": "Mikael Jantunen",
+   "positions": "PF/SF",
+   "rating": 70,
+   "pir": 6.52,
+   "games": 83
+  },
+  {
+   "code": "005713",
+   "club": "Baskonia",
+   "name": "Rodions Kurucs",
+   "positions": "PF/SF",
+   "rating": 70,
+   "pir": 6.51,
+   "games": 33
+  },
+  {
+   "code": "007464",
+   "club": "FC Barcelona",
+   "name": "Joel Parra",
+   "positions": "SF/PF",
+   "rating": 70,
+   "pir": 6.44,
+   "games": 80,
+   "starts": true
+  },
+  {
+   "code": "012742",
+   "club": "Anadolu Efes",
+   "name": "P.J. Dozier",
+   "positions": "SG/PG",
+   "rating": 70,
+   "pir": 6.41,
+   "games": 32
+  },
+  {
+   "code": "015160",
+   "club": "Paris Basketball",
+   "name": "Alize Johnson",
+   "positions": "PF/C",
+   "rating": 70,
+   "pir": 6.4,
+   "games": 8
+  },
+  {
+   "code": "009992",
+   "club": "FC Barcelona",
+   "name": "Dario Brizuela",
+   "positions": "SG",
+   "rating": 70,
+   "pir": 6.39,
+   "games": 83
+  },
+  {
+   "code": "014782",
+   "club": "Olimpia Milano",
+   "name": "Jason Burnell",
+   "positions": "SF/PF",
+   "rating": 70,
+   "pir": 6.37,
+   "games": 10
+  },
+  {
+   "code": "011214",
+   "club": "Valencia Basket",
+   "name": "Jasiel Rivero",
+   "positions": "PF/SF",
+   "rating": 69,
+   "pir": 6.29,
+   "games": 10
+  },
+  {
+   "code": "007032",
+   "club": "Žalgiris Kaunas",
+   "name": "Maodo Lo",
+   "positions": "SG/PG",
+   "rating": 69,
+   "pir": 6.27,
+   "games": 77
+  },
+  {
+   "code": "008384",
+   "club": "Real Madrid",
+   "name": "Gabriele Procida",
+   "positions": "SF/PF",
+   "rating": 69,
+   "pir": 6.27,
+   "games": 32
+  },
+  {
+   "code": "013506",
+   "club": "Fenerbahçe",
+   "name": "Marcus Bingham",
+   "positions": "C/PF",
+   "rating": 69,
+   "pir": 6.24,
+   "games": 9,
+   "starts": true
+  },
+  {
+   "code": "007553",
+   "club": "FC Barcelona",
+   "name": "Olek Balcerowski",
+   "positions": "C",
+   "rating": 69,
+   "pir": 6.21,
+   "games": 10
+  },
+  {
+   "code": "011085",
+   "club": "Panathinaikos",
+   "name": "Nikolaos Rogkavopoulos",
+   "positions": "SF/PF",
+   "rating": 69,
+   "pir": 6.07,
+   "games": 67
+  },
+  {
+   "code": "008173",
+   "club": "Baskonia",
+   "name": "Matteo Spagnolo",
+   "positions": "SG/PG",
+   "rating": 69,
+   "pir": 6,
+   "games": 74
+  },
+  {
+   "code": "013383",
+   "club": "Beşiktaş",
+   "name": "Wenyen Gabriel",
+   "positions": "C",
+   "rating": 69,
+   "pir": 5.92,
+   "games": 78
+  },
+  {
+   "code": "007866",
+   "club": "Panathinaikos",
+   "name": "Konstantinos Mitoglou",
+   "positions": "PF/C",
+   "rating": 69,
+   "pir": 5.91,
+   "games": 79
+  },
+  {
+   "code": "015153",
+   "club": "Hapoel Tel Aviv",
+   "name": "Amir Coffey",
+   "positions": "SG/SF",
+   "rating": 69,
+   "pir": 5.87,
+   "games": 6,
+   "starts": true
+  },
+  {
+   "code": "012597",
+   "club": "Bayern Munich",
+   "name": "Kamar Baldwin",
+   "positions": "PG/SG",
+   "rating": 69,
+   "pir": 5.82,
+   "games": 25
+  },
+  {
+   "code": "011927",
+   "club": "Žalgiris Kaunas",
+   "name": "Dustin Sleva",
+   "positions": "PF/SF",
+   "rating": 69,
+   "pir": 5.75,
+   "games": 52
+  },
+  {
+   "code": "008084",
+   "club": "Panathinaikos",
+   "name": "Eleftherios Mantzoukas",
+   "positions": "PF/C",
+   "rating": 69,
+   "pir": 5.73,
+   "games": 6
+  },
+  {
+   "code": "007630",
+   "club": "Real Madrid",
+   "name": "Usman Garuba",
+   "positions": "C/PF",
+   "rating": 69,
+   "pir": 5.62,
+   "games": 67
+  },
+  {
+   "code": "012611",
+   "club": "Paris Basketball",
+   "name": "Sebastian Herrera",
+   "positions": "SG",
+   "rating": 69,
+   "pir": 5.58,
+   "games": 46
+  },
+  {
+   "code": "015141",
+   "club": "FC Barcelona",
+   "name": "Tosan Evbuomwan",
+   "positions": "PF/C",
+   "rating": 68,
+   "pir": 5.52,
+   "games": 7
+  },
+  {
+   "code": "014738",
+   "club": "Virtus Bologna",
+   "name": "Bo Klintman",
+   "positions": "PF/SF",
+   "rating": 68,
+   "pir": 5.5,
+   "games": 10
+  },
+  {
+   "code": "003733",
+   "club": "Real Madrid",
+   "name": "Alberto Abalde",
+   "positions": "SF/PF",
+   "rating": 68,
+   "pir": 5.33,
+   "games": 91
+  },
+  {
+   "code": "003048",
+   "club": "Olympiacos",
+   "name": "Bryant Dunston",
+   "positions": "C/PF",
+   "rating": 68,
+   "pir": 5.13,
+   "games": 34
+  },
+  {
+   "code": "014026",
+   "club": "Baskonia",
+   "name": "Clement Frisch",
+   "positions": "SF/PF",
+   "rating": 68,
+   "pir": 5.13,
+   "games": 44
+  },
+  {
+   "code": "014134",
+   "club": "Bayern Munich",
+   "name": "Miles Norris",
+   "positions": "PF/SF",
+   "rating": 68,
+   "pir": 5.06,
+   "games": 44
+  },
+  {
+   "code": "006643",
+   "club": "Valencia Basket",
+   "name": "Josep Puerto",
+   "positions": "SG/SF",
+   "rating": 68,
+   "pir": 5.01,
+   "games": 48
+  },
+  {
+   "code": "007960",
+   "club": "Crvena Zvezda",
+   "name": "Dejan Davidovac",
+   "positions": "PF/SF",
+   "rating": 68,
+   "pir": 4.97,
+   "games": 35
+  },
+  {
+   "code": "014732",
+   "club": "Bayern Munich",
+   "name": "MarJon Beauchamp",
+   "positions": "SF/PF",
+   "rating": 68,
+   "pir": 4.9,
+   "games": 8
+  },
+  {
+   "code": "015140",
+   "club": "FC Barcelona",
+   "name": "Olivier Nkamhoua",
+   "positions": "PF/SF",
+   "rating": 68,
+   "pir": 4.87,
+   "games": 10
+  },
+  {
+   "code": "007029",
+   "club": "Žalgiris Kaunas",
+   "name": "Deividas Sirvydis",
+   "positions": "SG/SF",
+   "rating": 68,
+   "pir": 4.78,
+   "games": 61
+  },
+  {
+   "code": "013250",
+   "club": "Beşiktaş",
+   "name": "David Dejulius",
+   "positions": "PG/SG",
+   "rating": 67,
+   "pir": 4.72,
+   "games": 7
+  },
+  {
+   "code": "007990",
+   "club": "Maccabi Tel Aviv",
+   "name": "John DiBartolomeo",
+   "positions": "SG",
+   "rating": 67,
+   "pir": 4.7,
+   "games": 60
+  },
+  {
+   "code": "014783",
+   "club": "Olimpia Milano",
+   "name": "Garrison Mathews",
+   "positions": "SG",
+   "rating": 67,
+   "pir": 4.69,
+   "games": 9
+  },
+  {
+   "code": "011823",
+   "club": "Hapoel Tel Aviv",
+   "name": "Tai Odiase",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4.49,
+   "games": 38
+  },
+  {
+   "code": "003458",
+   "club": "Dubai Basketball",
+   "name": "Davis Bertans",
+   "positions": "PF/C",
+   "rating": 67,
+   "pir": 4.46,
+   "games": 37
+  },
+  {
+   "code": "007513",
+   "club": "Žalgiris Kaunas",
+   "name": "Dovydas Giedraitis",
+   "positions": "SG",
+   "rating": 67,
+   "pir": 4.39,
+   "games": 30
+  },
+  {
+   "code": "006509",
+   "club": "Olimpia Milano",
+   "name": "Stefano Tonut",
+   "positions": "SG",
+   "rating": 67,
+   "pir": 4.39,
+   "games": 27
+  },
+  {
+   "code": "010431",
+   "club": "Paris Basketball",
+   "name": "Jeremy Morgan",
+   "positions": "SF",
+   "rating": 67,
+   "pir": 4.36,
+   "games": 42
+  },
+  {
+   "code": "011980",
+   "club": "ASVEL",
+   "name": "Nathan Sestina",
+   "positions": "SF/PF",
+   "rating": 67,
+   "pir": 4.32,
+   "games": 10
+  },
+  {
+   "code": "013284",
+   "club": "Hapoel Tel Aviv",
+   "name": "Ish Wainright",
+   "positions": "SF/SG",
+   "rating": 67,
+   "pir": 4.26,
+   "games": 52
+  },
+  {
+   "code": "005368",
+   "club": "Anadolu Efes",
+   "name": "Santi Yusta",
+   "positions": "SF/PF",
+   "rating": 67,
+   "pir": 4.23,
+   "games": 9
+  },
+  {
+   "code": "006896",
+   "club": "Fenerbahçe",
+   "name": "Ignas Sargiunas",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4.22,
+   "games": 7
+  },
+  {
+   "code": "011837",
+   "club": "Virtus Bologna",
+   "name": "Kevin Kokila",
+   "positions": "C/PF",
+   "rating": 67,
+   "pir": 4.22,
+   "games": 7
+  },
+  {
+   "code": "013373",
+   "club": "Paris Basketball",
+   "name": "Leopold Cavaliere",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4.2,
+   "games": 82
+  },
+  {
+   "code": "015139",
+   "club": "FC Barcelona",
+   "name": "Stanley Umude",
+   "positions": "SF",
+   "rating": 67,
+   "pir": 4.16,
+   "games": 10
+  },
+  {
+   "code": "015161",
+   "club": "ASVEL",
+   "name": "Marc-Owen Fodzo Dada",
+   "positions": "PG/SG",
+   "rating": 67,
+   "pir": 4.15,
+   "games": 9
+  },
+  {
+   "code": "006904",
+   "club": "Paris Basketball",
+   "name": "Joel Ayayi",
+   "positions": "PG/SG",
+   "rating": 67,
+   "pir": 4.15,
+   "games": 8
+  },
+  {
+   "code": "001557",
+   "club": "Bayern Munich",
+   "name": "Niels Giffey",
+   "positions": "SF/PF",
+   "rating": 67,
+   "pir": 4.14,
+   "games": 57
+  },
+  {
+   "code": "012618",
+   "club": "ASVEL",
+   "name": "Bodian Massa",
+   "positions": "PF/C",
+   "rating": 67,
+   "pir": 4.06,
+   "games": 44
+  },
+  {
+   "code": "012879",
+   "club": "FC Barcelona",
+   "name": "Abdu Kone",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "010062",
+   "club": "FC Barcelona",
+   "name": "Agustin Ubal",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "012948",
+   "club": "Crvena Zvezda",
+   "name": "Aleksej Nedeljkovic",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014741",
+   "club": "Valencia Basket",
+   "name": "Álvaro Cárdenas",
+   "positions": "PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 8
+  },
+  {
+   "code": "006020",
+   "club": "Maccabi Tel Aviv",
+   "name": "Amit Ebo",
+   "positions": "PG/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "012806",
+   "club": "Crvena Zvezda",
+   "name": "Andrej Bjelic",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "012838",
+   "club": "Bayern Munich",
+   "name": "Andrija Susic",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015397",
+   "club": "Partizan",
+   "name": "Antonio Reeves",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015126",
+   "club": "Olympiacos",
+   "name": "Antonis Karagiannidis",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "004846",
+   "club": "Hapoel Tel Aviv",
+   "name": "Bar Timor",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "012096",
+   "club": "Hapoel Tel Aviv",
+   "name": "Bruno Caboclo",
+   "positions": "C/PF",
+   "rating": 67,
+   "pir": 4,
+   "games": 8
+  },
+  {
+   "code": "013541",
+   "club": "Bayern Munich",
+   "name": "Caspar Vossenberg",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014220",
+   "club": "Fenerbahçe",
+   "name": "Chris Silva",
+   "positions": "C/PF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015396",
+   "club": "Crvena Zvezda",
+   "name": "Christian Koloko",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014785",
+   "club": "Beşiktaş",
+   "name": "DaQuan Jeffries",
+   "positions": "SF/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "013431",
+   "club": "Anadolu Efes",
+   "name": "Darius Karutasu",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "008176",
+   "club": "Anadolu Efes",
+   "name": "David Mutaf",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "009400",
+   "club": "Virtus Bologna",
+   "name": "Davide Casarin",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "005670",
+   "club": "Olimpia Milano",
+   "name": "Diego Flaccadori",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "006544",
+   "club": "Panathinaikos",
+   "name": "Dimitris Moraitis",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015405",
+   "club": "Fenerbahçe",
+   "name": "Dwight Powell",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "006372",
+   "club": "Anadolu Efes",
+   "name": "Erkan Yilmaz",
+   "positions": "SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "013553",
+   "club": "Real Madrid",
+   "name": "Fabian Kayser",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "005763",
+   "club": "Beşiktaş",
+   "name": "Furkan Korkmaz",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "013141",
+   "club": "Olympiacos",
+   "name": "Georgios Bourneles",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014120",
+   "club": "Maccabi Tel Aviv",
+   "name": "Gur Lavi",
+   "positions": "SF/PF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015159",
+   "club": "Panathinaikos",
+   "name": "Iason Varvaritis",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015151",
+   "club": "Hapoel Tel Aviv",
+   "name": "Jacob Toppin",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014422",
+   "club": "FC Barcelona",
+   "name": "Jakob Siftar",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015402",
+   "club": "Olympiacos",
+   "name": "John Konchar",
+   "positions": "SF/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014733",
+   "club": "Fenerbahçe",
+   "name": "Johnny Juzang",
+   "positions": "SF/PF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "008161",
+   "club": "ASVEL",
+   "name": "Juhann Begarin",
+   "positions": "SF/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "013845",
+   "club": "Žalgiris Kaunas",
+   "name": "Kaodirichi Akobundu-Ehiogu",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "011218",
+   "club": "Žalgiris Kaunas",
+   "name": "Keenan Evans",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "008912",
+   "club": "Hapoel Tel Aviv",
+   "name": "Khadeen Carrington",
+   "positions": "PG/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "013579",
+   "club": "Bayern Munich",
+   "name": "Kilian Fischer",
+   "positions": "C/PF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014597",
+   "club": "ASVEL",
+   "name": "Lorenz Sanz",
+   "positions": "PG/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "010754",
+   "club": "Valencia Basket",
+   "name": "Lucas Mari",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015102",
+   "club": "Real Madrid",
+   "name": "Maksym Shulga",
+   "positions": "SF/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014801",
+   "club": "Paris Basketball",
+   "name": "Maozinha Pereira",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "007632",
+   "club": "Partizan",
+   "name": "Mario Nakic",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "007483",
+   "club": "ASVEL",
+   "name": "Mathis Dossou-Yovo",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "013028",
+   "club": "Virtus Bologna",
+   "name": "Matteo Baiocchi",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "002969",
+   "club": "Fenerbahçe",
+   "name": "Melih Mahmutoglu",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014739",
+   "club": "Valencia Basket",
+   "name": "Mouhamadou Gueye",
+   "positions": "PF/C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "005942",
+   "club": "Dubai Basketball",
+   "name": "Nemanja Dangubic",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "012158",
+   "club": "Bayern Munich",
+   "name": "Niko Jerkic",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "010262",
+   "club": "Crvena Zvezda",
+   "name": "Nikola Djurisic",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "010091",
+   "club": "Olympiacos",
+   "name": "Nikolaos Plotas",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014196",
+   "club": "Crvena Zvezda",
+   "name": "Ognjen Simjanovski",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "006833",
+   "club": "Real Madrid",
+   "name": "Olivier Sarr",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014380",
+   "club": "Real Madrid",
+   "name": "Ömer Kutluay",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014122",
+   "club": "Olympiacos",
+   "name": "Omiros Netzipoglou",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "013385",
+   "club": "Olimpia Milano",
+   "name": "Ousmane Diop",
+   "positions": "C/PF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014384",
+   "club": "Real Madrid",
+   "name": "Pablo Mera",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014728",
+   "club": "Crvena Zvezda",
+   "name": "Patrick Baldwin",
+   "positions": "PF/C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014103",
+   "club": "Baskonia",
+   "name": "Pedro Souza",
+   "positions": "SF/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014379",
+   "club": "Real Madrid",
+   "name": "Rhys Robinson",
+   "positions": "SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015400",
+   "club": "Partizan",
+   "name": "Robert Franks",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "013422",
+   "club": "Anadolu Efes",
+   "name": "Ruzgar Fenemen",
+   "positions": "PG/SG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014635",
+   "club": "Real Madrid",
+   "name": "Serigne Sarr",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014244",
+   "club": "Real Madrid",
+   "name": "Seydou Dolo",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "015398",
+   "club": "Maccabi Tel Aviv",
+   "name": "Shane Hunter",
+   "positions": "PF/C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014094",
+   "club": "Crvena Zvezda",
+   "name": "Stefan Miljenovic",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014506",
+   "club": "Baskonia",
+   "name": "Thierry Henry Alves de Souza",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "010726",
+   "club": "Bayern Munich",
+   "name": "Tobias Jensen",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "010550",
+   "club": "Hapoel Tel Aviv",
+   "name": "Tomer Ginat",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "006707",
+   "club": "Virtus Bologna",
+   "name": "Tommaso Baldasso",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "012453",
+   "club": "Partizan",
+   "name": "Uros Danilovic",
+   "positions": "PF/SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "004761",
+   "club": "Partizan",
+   "name": "Vanja Marinkovic",
+   "positions": "SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "012233",
+   "club": "Beşiktaş",
+   "name": "Yagiz Aksu",
+   "positions": "SG/PG",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "005596",
+   "club": "Valencia Basket",
+   "name": "Yankuba Sima",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "011935",
+   "club": "FC Barcelona",
+   "name": "Yoan Makoundou",
+   "positions": "C",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "014277",
+   "club": "ASVEL",
+   "name": "Yohan Bassoumba",
+   "positions": "SF",
+   "rating": 67,
+   "pir": 4,
+   "games": 0
+  },
+  {
+   "code": "012515",
+   "club": "Paris Basketball",
+   "name": "Terry Tarpey",
+   "positions": "SG",
+   "rating": 66,
+   "pir": 3.96,
+   "games": 67
+  },
+  {
+   "code": "001844",
+   "club": "Virtus Bologna",
+   "name": "Daniel Hackett",
+   "positions": "SG",
+   "rating": 66,
+   "pir": 3.96,
+   "games": 74
+  },
+  {
+   "code": "015244",
+   "club": "Real Madrid",
+   "name": "Nick Smith Jr.",
+   "positions": "SF/SG",
+   "rating": 66,
+   "pir": 3.93,
+   "games": 7
+  },
+  {
+   "code": "003526",
+   "club": "ASVEL",
+   "name": "David Lighty",
+   "positions": "SF",
+   "rating": 66,
+   "pir": 3.89,
+   "games": 75
+  },
+  {
+   "code": "004007",
+   "club": "Crvena Zvezda",
+   "name": "Ognjen Dobric",
+   "positions": "SF/PF",
+   "rating": 66,
+   "pir": 3.86,
+   "games": 61
+  },
+  {
+   "code": "006482",
+   "club": "Crvena Zvezda",
+   "name": "David Kramer",
+   "positions": "SG/SF",
+   "rating": 66,
+   "pir": 3.85,
+   "games": 9
+  },
+  {
+   "code": "002968",
+   "club": "Fenerbahçe",
+   "name": "Sertac Sanli",
+   "positions": "C/PF",
+   "rating": 66,
+   "pir": 3.8,
+   "games": 42
+  },
+  {
+   "code": "006832",
+   "club": "ASVEL",
+   "name": "Yves Pons",
+   "positions": "SF",
+   "rating": 66,
+   "pir": 3.77,
+   "games": 9
+  },
+  {
+   "code": "001518",
+   "club": "Olimpia Milano",
+   "name": "Giampaolo Ricci",
+   "positions": "SF/PF",
+   "rating": 66,
+   "pir": 3.77,
+   "games": 76
+  },
+  {
+   "code": "001255",
+   "club": "Olympiacos",
+   "name": "Kostas Papanikolaou",
+   "positions": "SF/PF",
+   "rating": 66,
+   "pir": 3.76,
+   "games": 84
+  },
+  {
+   "code": "009513",
+   "club": "Bayern Munich",
+   "name": "Justus Hollatz",
+   "positions": "PG/SG",
+   "rating": 66,
+   "pir": 3.66,
+   "games": 32
+  },
+  {
+   "code": "014740",
+   "club": "Valencia Basket",
+   "name": "Gonzalo Corbalan",
+   "positions": "SF/SG",
+   "rating": 66,
+   "pir": 3.63,
+   "games": 8
+  },
+  {
+   "code": "014802",
+   "club": "Virtus Bologna",
+   "name": "Rasheed Bello",
+   "positions": "PG/SG",
+   "rating": 66,
+   "pir": 3.61,
+   "games": 10
+  },
+  {
+   "code": "011949",
+   "club": "Paris Basketball",
+   "name": "Daulton Hommes",
+   "positions": "PF/SF",
+   "rating": 66,
+   "pir": 3.55,
+   "games": 8
+  },
+  {
+   "code": "005793",
+   "club": "Partizan",
+   "name": "Bandja Sy",
+   "positions": "PF/SF",
+   "rating": 66,
+   "pir": 3.51,
+   "games": 35
+  },
+  {
+   "code": "014107",
+   "club": "Baskonia",
+   "name": "Stefan Joksimovic",
+   "positions": "SF/SG",
+   "rating": 66,
+   "pir": 3.46,
+   "games": 9
+  },
+  {
+   "code": "011924",
+   "club": "Partizan",
+   "name": "Kyle Allman",
+   "positions": "SG",
+   "rating": 66,
+   "pir": 3.4,
+   "games": 8
+  },
+  {
+   "code": "002661",
+   "club": "Dubai Basketball",
+   "name": "Klemen Prepelic",
+   "positions": "SG/PG",
+   "rating": 66,
+   "pir": 3.39,
+   "games": 27
+  },
+  {
+   "code": "015152",
+   "club": "Hapoel Tel Aviv",
+   "name": "Eugene German",
+   "positions": "SG",
+   "rating": 66,
+   "pir": 3.33,
+   "games": 8
+  },
+  {
+   "code": "011816",
+   "club": "Olimpia Milano",
+   "name": "Nicola Akele",
+   "positions": "PF/SF",
+   "rating": 66,
+   "pir": 3.3,
+   "games": 27
+  },
+  {
+   "code": "013269",
+   "club": "ASVEL",
+   "name": "Myles Cale",
+   "positions": "SF",
+   "rating": 66,
+   "pir": 3.28,
+   "games": 34
+  },
+  {
+   "code": "013943",
+   "club": "Anadolu Efes",
+   "name": "Daron Russell",
+   "positions": "PG",
+   "rating": 65,
+   "pir": 3.17,
+   "games": 6
+  },
+  {
+   "code": "014731",
+   "club": "Dubai Basketball",
+   "name": "Davion Mintz",
+   "positions": "SG",
+   "rating": 65,
+   "pir": 3.1,
+   "games": 8
+  },
+  {
+   "code": "003091",
+   "club": "Beşiktaş",
+   "name": "Metecan Birsen",
+   "positions": "C/PF",
+   "rating": 65,
+   "pir": 3.04,
+   "games": 32
+  },
+  {
+   "code": "TGB",
+   "club": "Real Madrid",
+   "name": "Sergio Llull",
+   "positions": "SG/PG",
+   "rating": 65,
+   "pir": 3.03,
+   "games": 80
+  },
+  {
+   "code": "014316",
+   "club": "Olympiacos",
+   "name": "Cory Joseph",
+   "positions": "SG",
+   "rating": 65,
+   "pir": 3,
+   "games": 9
+  },
+  {
+   "code": "006591",
+   "club": "Paris Basketball",
+   "name": "Frank Ntilikina",
+   "positions": "SG",
+   "rating": 65,
+   "pir": 2.8,
+   "games": 24
+  },
+  {
+   "code": "015142",
+   "club": "FC Barcelona",
+   "name": "Justin Minaya",
+   "positions": "SG",
+   "rating": 65,
+   "pir": 2.77,
+   "games": 7
+  },
+  {
+   "code": "014031",
+   "club": "Dubai Basketball",
+   "name": "Kosta Kondic",
+   "positions": "SG",
+   "rating": 65,
+   "pir": 2.75,
+   "games": 6
+  },
+  {
+   "code": "013381",
+   "club": "Maccabi Tel Aviv",
+   "name": "William Rayman",
+   "positions": "PF/SF",
+   "rating": 65,
+   "pir": 2.64,
+   "games": 80
+  },
+  {
+   "code": "014015",
+   "club": "Maccabi Tel Aviv",
+   "name": "Armando Bacot Jr.",
+   "positions": "C",
+   "rating": 65,
+   "pir": 2.64,
+   "games": 34
+  },
+  {
+   "code": "007929",
+   "club": "Fenerbahçe",
+   "name": "Onuralp Bitim",
+   "positions": "SF/SG",
+   "rating": 65,
+   "pir": 2.59,
+   "games": 29
+  },
+  {
+   "code": "015085",
+   "club": "Maccabi Tel Aviv",
+   "name": "Keaton Wallace",
+   "positions": "SG/PG",
+   "rating": 65,
+   "pir": 2.5,
+   "games": 10
+  },
+  {
+   "code": "011706",
+   "club": "Valencia Basket",
+   "name": "Mario Saint-Supery",
+   "positions": "SG/PG",
+   "rating": 65,
+   "pir": 2.48,
+   "games": 7
+  },
+  {
+   "code": "000229",
+   "club": "ASVEL",
+   "name": "Edwin Jackson",
+   "positions": "SF/SG",
+   "rating": 64,
+   "pir": 2.39,
+   "games": 22
+  },
+  {
+   "code": "003783",
+   "club": "Beşiktaş",
+   "name": "Berk Ugurlu",
+   "positions": "SG/PG",
+   "rating": 64,
+   "pir": 2.35,
+   "games": 8
+  },
+  {
+   "code": "007736",
+   "club": "Partizan",
+   "name": "Arijan Lakic",
+   "positions": "SF",
+   "rating": 64,
+   "pir": 2.31,
+   "games": 34
+  },
+  {
+   "code": "008186",
+   "club": "Žalgiris Kaunas",
+   "name": "Marek Blaževič",
+   "positions": "C",
+   "rating": 64,
+   "pir": 2.27,
+   "games": 6
+  },
+  {
+   "code": "014219",
+   "club": "Virtus Bologna",
+   "name": "Francesco Ferrari",
+   "positions": "PF/SF",
+   "rating": 64,
+   "pir": 1.72,
+   "games": 6
+  },
+  {
+   "code": "011209",
+   "club": "Panathinaikos",
+   "name": "Panagiotis Kalaitzakis",
+   "positions": "SG/SF",
+   "rating": 63,
+   "pir": 1.48,
+   "games": 66
+  },
+  {
+   "code": "004194",
+   "club": "Partizan",
+   "name": "Joffrey Lauvergne",
+   "positions": "C",
+   "rating": 63,
+   "pir": 1.3,
+   "games": 8
+  }
+ ],
+ "warnings": []
+}

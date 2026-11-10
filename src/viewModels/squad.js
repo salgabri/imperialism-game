@@ -1,7 +1,7 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Squad view-models (PLAN §3.6, C§16, DEC D8/D9).
 // Pure: no window/document/timers/RNG; tolerates missing teams, history, stats and baseEff.
 import { isTennisSport, selectLineup, teamSportId } from '../data/teams.js';
-import { ESTIMATE_TITLE, isEstimated } from '../data/estimates.js';
+import { estimateReason, estimateTitle, isEstimated } from '../data/estimates.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
@@ -146,7 +146,7 @@ export function sourceTitle(player) {
   const name = info.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : swos ? 'SWOS' : 'Football Manager';
   const edition = String(info.edition || '');
   const label = edition ? (/^\d+$/.test(edition) ? `${name} ${edition}` : edition) : name;
-  if (info.source === 'estimate') return ESTIMATE_TITLE;
+  if (info.source === 'estimate') return estimateTitle(player);
   const raw = Number.isFinite(info.rawRating)
     ? `Source rating ${info.rawRating}${Number.isFinite(info.rawScale) ? `/${info.rawScale}` : info.rawScale ? ` (${info.rawScale} scale)` : ''}`
     : null;
@@ -367,6 +367,7 @@ function computeSquad(st, ctx, team) {
       rating: Math.round(Number(player.effectiveRating ?? player.rating) || 0),
       claimed: !!provOf(player),
       estimated: isEstimated(player),
+      ...(isEstimated(player) ? { estimateTitle: estimateTitle(player) } : {}),
     };
   });
 
@@ -404,8 +405,8 @@ function computeSquad(st, ctx, team) {
   }
   const doubling = lineup.slots.filter(slot => slot.player?.doubling).map(slot => shortName(slot.player.name));
   if (doubling.length) notes.push(`${doubling.join(' and ')} ${doubling.length === 1 ? 'plays' : 'play'} the singles and the doubles: the team has ${plural(squad.length, 'rated player')}.`);
-  const estimates = lineup.starters.filter(isEstimated).length;
-  if (estimates) notes.push(`${estimates} of the ${plan} starting ratings are estimates, each marked: EA publishes only NHL 27's top 300 players.`);
+  const estimated = lineup.starters.filter(isEstimated);
+  if (estimated.length) notes.push(`${estimated.length} of the ${plan} starting ratings are estimates, each marked: ${estimateReason(estimated[0])}.`);
   // The manager's own team for the "Your squad" shortcut (spectators follow instead).
   const ownId = ctx?.managedId ?? null;
   const back = BACK_LABELS[st.squadReturn] ? { label: BACK_LABELS[st.squadReturn] } : null;

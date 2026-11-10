@@ -47,6 +47,13 @@
     "nrl-melbourne-storm": "#632390",
     "nrl-canberra-raiders": "#7cbf44",
     "nrl-south-sydney-rabbitohs": "#00843d",
-    "nrl-canterbury-bankstown-bulldogs": "#0057a5"
+    "nrl-canterbury-bankstown-bulldogs": "#0057a5",
+    "el-real-madrid": "#ffffff",
+    "el-fc-barcelona": "#a50044",
+    "el-panathinaikos": "#007a3d",
+    "el-maccabi-tel-aviv": "#f8d000",
+    "el-fenerbahce": "#fde100",
+    "el-besiktas": "#000000",
+    "el-partizan": "#000000"
   }
 }

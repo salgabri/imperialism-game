@@ -15,6 +15,15 @@ const FIBA = Object.freeze({ minutes: 40, quarter: 10, pace: 73, paceRange: [55,
 const NBA_RATE = 114;
 const nbaRules = ({ pace, rating }) => Object.freeze({ minutes: 48, quarter: 12, pace, paceRange: [pace - 18, pace + 21],
   scoring: rating / NBA_RATE });
+// The EuroLeague plays FIBA's rules at its own pace and scoring rate: 74.2 possessions a game and 86.2 points a team in
+// 2025/26, its last full season (the EuroLeague's API: scripts/data/euroleague-2026-27.json, `league`). Its clubs' fives
+// are the game's estimates (src/data/clubs.euroleague.js), and `scoring` brings them to that, as an NBA season's league
+// rate does its franchises. EuroLeague home sides win more often than the NBA's, 63.7% of the regular season's games
+// (61–66% in each season since 2021/22), so its home edge (`home`, as HOME_EFFICIENCY) is larger. Fewer of its games go
+// to overtime, 3.3–5.2% a season, so fewer one- and two-point deficits are levelled at the buzzer (`buzzer`, as
+// BUZZER_LEVEL): about 4% of its games then go to overtime.
+const EUROLEAGUE = Object.freeze({ minutes: 40, quarter: 10, pace: 74.2, paceRange: [56, 95], scoring: 1.03, home: 0.06,
+  buzzer: Object.freeze([0.1, 0.05]) });
 const PACE_SD = 4.5;
 const OVERTIME_PACE_SD = 0.7;
 const OVERTIME = 5;
@@ -62,7 +71,7 @@ function weightedRating(lineup, weights) {
 export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}, rules = FIBA) {
   const lineupA = selectLineup(attacker);
   const lineupD = selectLineup(defender);
-  const edge = home ? HOME_EFFICIENCY / 2 : 0;
+  const edge = home ? (rules.home ?? HOME_EFFICIENCY) / 2 : 0;
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
   const adjustmentD = (Number.isFinite(effD) ? effD : lineupD.rating) - lineupD.rating;
   const offenceA = weightedRating(lineupA, OFFENCE_WEIGHTS) + adjustmentA;
@@ -108,8 +117,9 @@ export function sampleResult(rng, prepared, drama = 6) {
   let regA = scorePeriod(rng, possessions, efficiencyA);
   let regD = scorePeriod(rng, possessions, efficiencyD);
   const behind = Math.abs(regA - regD);
+  const levels = rules.buzzer ?? BUZZER_LEVEL;
   let buzzer = null;
-  if (behind >= 1 && behind <= BUZZER_LEVEL.length && rng() < BUZZER_LEVEL[behind - 1]) {
+  if (behind >= 1 && behind <= levels.length && rng() < levels[behind - 1]) {
     buzzer = { side: regA < regD ? 'A' : 'D', pts: behind };
     if (regA < regD) regA += behind; else regD += behind;
   }
@@ -274,8 +284,9 @@ const basketballRules = {
   id: 'basketball',
   simulationVersion: 3,
   name: 'Basketball',
-  blurb: 'Starting fives: forty minutes between nations, forty-eight in the NBA. Level games go to overtime.',
-  // Read from the sport's players (sportData.js), once they have loaded.
+  blurb: 'Starting fives: forty minutes between nations and in the EuroLeague, forty-eight in the NBA. Level games go to overtime.',
+  // Read from the sport's players (sportData.js), once they have loaded: the NBA's franchises and the EuroLeague's clubs,
+  // each league on its own map, so they never meet.
   rosters: undefined,
   clubs: undefined,
   // Great Britain is one FIBA team: the home nations' shapes start in the United Kingdom's (826) empire.
@@ -351,6 +362,27 @@ export function nbaBasketballIn(season) {
 
 /** Basketball between NBA franchises in the built-in season. */
 export const nbaBasketball = nbaBasketballIn();
+
+/** The map the EuroLeague's clubs play on (public/domestic/euroleague.json), and its club theatre. */
+export const EUROLEAGUE_MAP = 'euroleague';
+// engine/domestic.js's 'domestic:' prefix, spelled out: that module reads the sports, so this one cannot import it.
+export const EUROLEAGUE_SCOPE = `domestic:${EUROLEAGUE_MAP}`;
+
+/**
+ * Basketball between EuroLeague clubs: FIBA's forty minutes, at the EuroLeague's pace and scoring rate and with its
+ * home edge. Club campaigns on the EuroLeague's map play it (`matchSport` in src/sports/index.js). Version 6.
+ */
+export const euroleagueBasketball = defineSportData({
+  ...basketballRules,
+  simulationVersion: 6,
+  clock: { length: EUROLEAGUE.minutes, msPerUnit: basketballRules.clock.msPerUnit },
+  formatEvent: eventFormat(EUROLEAGUE),
+  prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, EUROLEAGUE),
+
+  simulate(rng, attacker, defender, drama, effA, effD, venue) {
+    return playMatch(rng, prepareMatch(attacker, defender, effA, effD, venue, EUROLEAGUE), attacker, defender, drama);
+  },
+}, { id: 'basketball' });
 
 /** The constants the live win-probability model mirrors (src/engine/winProbability.js). */
 export const BASKETBALL_MODEL = Object.freeze({ PACE_SD, OVERTIME_PACE_SD, OVERTIME, MAX_OVERTIMES, SHOT_BASE,
