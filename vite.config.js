@@ -1,7 +1,80 @@
-import { defineConfig, loadEnv } from 'vite';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { defineConfig, loadEnv, normalizePath } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import { APP_MANIFEST, FILE_NAVIGATION, PAGE_ICONS, PRECACHE, RUNTIME_CACHES } from './src/pwa.js';
+import { APP_MANIFEST, FILE_NAVIGATION, PRECACHE, RUNTIME_CACHES } from './src/pwa.js';
+
+/** A config's public/ folder: Vite's default unless the config names another. */
+const publicDirOf = config => path.resolve(config.root ?? process.cwd(), config.publicDir || 'public');
+
+/**
+ * Whether a build asks for public/football/index.json, the list of CM 01/02 sets built on this computer
+ * (src/engine/footballSets.js): only when there was one to copy into dist/. Git ignores it, so a deployed build has
+ * none, and asking cost every page load a request that could only fail. The dev server and the tests always ask.
+ */
+export function localSeasonIndex() {
+  return {
+    name: 'local-season-index',
+    apply: 'build',
+    config: config => ({
+      define: { __LOCAL_SEASON_INDEX__: JSON.stringify(existsSync(path.join(publicDirOf(config), 'football', 'index.json'))) },
+    }),
+  };
+}
+
+/**
+ * A build's world maps and fonts under content-hashed names in assets/ (README "Running it"). Workbox fetches a
+ * precached file whose name has no hash past the browser's cache, so a first visit downloaded both maps and the fonts
+ * twice: once for the page, then again for the worker. A hashed file it takes from the copy the page just loaded, and
+ * vercel.json lets browsers keep assets/ for a year. The maps (src/mapRequests.js) learn their names from
+ * __HASHED_MAPS__; the fonts go through fontsAsAssets. Build only: the dev server and the tests read public/ under the
+ * plain names. Its inline PostCSS config means a build reads no postcss.config.js; the project has none, so a
+ * PostCSS plugin the project ever needs goes beside fontsAsAssets.
+ */
+export function hashedShell({ maps = ['world-110m.v1.json', 'countries-50m.json'] } = {}) {
+  let files = []; // [public file, its bytes, its name in dist/]
+  return {
+    name: 'hashed-shell',
+    apply: 'build',
+    config(config) {
+      const publicDir = publicDirOf(config);
+      files = maps.map(file => {
+        const source = readFileSync(path.join(publicDir, file));
+        const { name, ext } = path.parse(file);
+        return [file, source, `assets/${name}-${createHash('sha256').update(source).digest('hex').slice(0, 8)}${ext}`];
+      });
+      return {
+        define: { __HASHED_MAPS__: JSON.stringify(Object.fromEntries(files.map(([file, , name]) => [file, name]))) },
+        css: { postcss: { plugins: [fontsAsAssets(publicDir)] } },
+      };
+    },
+    generateBundle() {
+      for (const [, source, fileName] of files) this.emitFile({ type: 'asset', fileName, source });
+    },
+  };
+}
+
+/**
+ * A PostCSS step for hashedShell: src/fonts.css names its fonts by their public URLs (url('/fonts/…')), which Vite
+ * leaves as they are. Each becomes a path from the stylesheet that names it to the file in public/, which Vite hashes
+ * into assets/ like any asset. PostCSS, not a transform, because index.css @imports fonts.css: it runs after the import
+ * is inlined and before Vite rewrites the URLs.
+ */
+export function fontsAsAssets(publicDir) {
+  return {
+    postcssPlugin: 'fonts-as-assets',
+    Once(root) {
+      root.walkDecls(declaration => {
+        const from = declaration.source?.input.file;
+        if (!from || !declaration.value.includes('/fonts/')) return;
+        const toPublic = normalizePath(path.relative(path.dirname(from), publicDir));
+        declaration.value = declaration.value.replace(/url\((['"]?)\/fonts\//g, `url($1${toPublic}/fonts/`);
+      });
+    },
+  };
+}
 
 /**
  * AdSense (src/ads.js, README "Advertising"): a mistyped publisher or slot id stops the build instead of quietly serving
@@ -26,13 +99,18 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     adsense(loadEnv(mode, process.cwd(), 'VITE_ADSENSE_')),
+    localSeasonIndex(),
+    hashedShell(),
     // Installable and offline (src/pwa.js). The page registers the worker itself (src/serviceWorker.js) and runs the
     // update prompt, so a new version waits for the player instead of reloading a campaign.
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,
       manifest: APP_MANIFEST,
-      includeAssets: PAGE_ICONS,
+      // The icons stay out of the precache: the browser fetches the ones it shows itself, and an installed app keeps
+      // its own copy. Precaching them cost every first visit six more requests; vercel.json lets browsers keep them a
+      // day, so a return visit asks for none.
+      includeManifestIcons: false,
       workbox: {
         globPatterns: PRECACHE,
         // The first chunk (the game and football's players) is about 1.8 MB; past this the build fails rather than ship a

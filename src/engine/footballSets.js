@@ -153,6 +153,11 @@ const beforePacificIslands = nations => PACIFIC_ISLANDS.every(id => !Object.hasO
 
 let index = null;
 
+// Whether to ask for `football/index.json` at all. Git ignores it, so only a computer that built CM 01/02 sets has one:
+// a build made without it (vite.config.js localSeasonIndex) never asks, so a deployed page load makes no request that
+// can only fail. The dev server, the tests and the scripts always ask.
+const LOCAL_INDEX = typeof __LOCAL_SEASON_INDEX__ === 'undefined' || __LOCAL_SEASON_INDEX__;
+
 /** Forget the data set index (tests, or after a rebuild). */
 export function clearFootballSetIndex() {
   index = null;
@@ -166,14 +171,17 @@ const newestFirst = (a, b) => b.year - a.year || (a.id < b.id ? 1 : -1);
  * basketball season's era map; `credit`: the plain text a season's sources ask to be shown with it, which setup shows
  * under the Season choice), every sport's together (`setSportOf` tells them apart). The built-in earlier seasons are always
  * there; CM 01/02 sets built on this computer are read once from `football/index.json`, where a missing or unreadable
- * index means none. A listing that fails the checks is skipped (each set is validated in full when it loads).
+ * index means none, and a build made without one does not ask (LOCAL_INDEX). A listing that fails the checks is skipped
+ * (each set is validated in full when it loads).
  */
 export function loadFootballSetIndex({ baseUrl = '/', fetch: fetchImpl = globalThis.fetch } = {}) {
   index ||= (async () => {
     let files = [];
     try {
-      const res = await fetchImpl(`${baseUrl}football/index.json`);
-      if (res?.ok) files = listing(await res.json());
+      if (LOCAL_INDEX) {
+        const res = await fetchImpl(`${baseUrl}football/index.json`);
+        if (res?.ok) files = listing(await res.json());
+      }
     } catch {
       files = [];
     }

@@ -1,8 +1,11 @@
 // The two world maps App.boot reads: the 110m rules map and the 50m atlas it draws. Nothing here may import another
 // module: startMapRequests.js runs this file first of all, before React and the game's own code (see there).
 
-const MAP_URL = `${import.meta.env.BASE_URL}world-110m.v1.json`;
-const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
+// A build serves both maps from assets/ under content-hashed names (vite.config.js hashedShell), which the offline
+// worker takes from the page's own download; the dev server and the tests use public/'s plain names.
+const HASHED = typeof __HASHED_MAPS__ === 'undefined' ? {} : __HASHED_MAPS__;
+const MAP_URL = `${import.meta.env.BASE_URL}${HASHED['world-110m.v1.json'] ?? 'world-110m.v1.json'}`;
+const ATLAS_URL = `${import.meta.env.BASE_URL}${HASHED['countries-50m.json'] ?? 'countries-50m.json'}`;
 
 /**
  * Ask for both maps at once → { map: Promise<Response>, atlas: Promise<string | null> }. The atlas is only ever read as

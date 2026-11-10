@@ -24,7 +24,7 @@ import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiv
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
-import { applyUpdate, cacheForOffline, settleFirstBoot } from './serviceWorker.js';
+import { applyUpdate, keepCampaignMarks, settleFirstBoot } from './serviceWorker.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { skipAheadModel } from './viewModels/campaign.js';
@@ -1563,8 +1563,8 @@ export default class App extends React.Component {
       },
       () => {
         this.persist();
-        // Every team's crest or flag, so the campaign looks the same offline (README §Running it).
-        cacheForOffline(teamMarkUrls(teams));
+        // In the installed app, every team's crest or flag, so the campaign looks the same offline (README §Running it).
+        keepCampaignMarks(teamMarkUrls(teams));
       },
     );
   }
@@ -1650,7 +1650,7 @@ export default class App extends React.Component {
       if (!gated && s.match && !s.match.applied) this.presentMatch();
       else if (!gated && s.spin && !remapped) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
       this.persist();
-      cacheForOffline(teamMarkUrls(s.teams));
+      keepCampaignMarks(teamMarkUrls(s.teams));
       // The checkpoint re-stamps the map version; keep telling the player why the draw restarts.
       if (remapped) this.setState(state => state.saveStatus?.ok && !state.storageConflict ? { saveStatus: { ...state.saveStatus, message } } : null);
     });

@@ -1,4 +1,5 @@
-// The image files a campaign's teams are drawn with, for keeping them offline (src/serviceWorker.js cacheForOffline).
+// The image files a campaign's teams are drawn with, which the installed app keeps offline (src/serviceWorker.js
+// keepCampaignMarks).
 // They are the files TeamMark, Flag and the map's Flags mode (src/app/mapMethods.jsx) show.
 import { clubLogoUrl } from './clubLogos.js';
 import { FLAG_CODES, flagUrl } from './flags.js';
