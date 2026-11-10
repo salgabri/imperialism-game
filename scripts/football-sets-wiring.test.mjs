@@ -565,8 +565,8 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     const setup = () => app.state.setup;
     const modelOf = () => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), season: app.seasonStatus() });
     await app.requestSeasons();
-    assert.deepEqual(EARLIER.slice(-12), ['2006/07', '2005/06', '2004/05', '2002/03', '2001/02', '1998/99', '1997/98', '1996/97',
-      '1995/96', '1994/95', '1993/94', '1989/90'], 'the earliest seasons');
+    assert.deepEqual(EARLIER.slice(-14), ['2006/07', '2005/06', '2004/05', '2002/03', '2001/02', '2000/01', '1999/00', '1998/99', '1997/98',
+      '1996/97', '1995/96', '1994/95', '1993/94', '1989/90'], 'the earliest seasons');
     assert.match(modelOf().season.note, /2005\/06, 2004\/05, 1996\/97 and 1989\/90 have nations only/);
 
     // From clubs: the season takes the nations. It has no maps of Europe, so the theatre is kept as the plain elite

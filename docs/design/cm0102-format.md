@@ -87,7 +87,9 @@ that is unique across them (the club size alone collides once), with SHA-256
 digests where known, the season, release month, forum topic and shifts. SI's
 3.9.60 and 3.9.65 are listed twice: SI's format-1 files and the forum's
 format-2 re-saves, which are 5 bytes per person larger. 3.9.68 starts in 2001
-but carries 2002/03 squads, so it is season 2002/03.
+but carries 2002/03 squads, so it is season 2002/03. Beside them it lists SI's
+CM 99/00 and CM 00/01 files ([below](#sis-cd-databases-cm-9900-and-cm-0001)),
+whose ids are their editions' (`cm-9900`, `cm-0001`), not a release month's.
 
 - A known size pair names the database. A digest that differs is a warning: the
   folder may have been edited.
@@ -122,6 +124,45 @@ First Division, French First Division, Dutch Premier Division (nation
 "Holland") and Portuguese Premier League. Members are the clubs whose division
 is that competition, not the clubs of that nation, because cross-border clubs
 exist.
+
+## SI's CD databases (CM 99/00 and CM 00/01)
+
+SI's Championship Manager: Season 99/00 (3.70) and 00/01 (3.81) keep their data
+in the same tables as CM 01/02, with format-1 staff (157-byte people) as in SI's
+3.9.x files: the reader reads them unchanged. CM 99/00 stores the Eredivisie as
+`Dutch KPN-Telecompetition` and Burkina Faso as `Burkino Faso`. Their retail CDs
+install the Data folder from an InstallShield 5 cabinet, and
+`npm run sync:retro-cds` takes the eleven tables the reader needs from a CD
+image by byte range (`scripts/lib/cd-image.mjs`, `scripts/lib/installshield5.mjs`):
+
+- **The image**: ISO 9660, in 2048-byte sectors (an `.iso`) or raw 2352-byte
+  MODE1 sectors (a `.bin`: 12 sync bytes, a 4-byte header with mode 1, then the
+  2048 bytes of user data, then error correction). The volume descriptors start
+  at sector 16; the primary one gives the volume name, creation time and root
+  directory, and a Joliet one (escape `%/@`, `%/C` or `%/E`) the same tree with
+  UCS-2 long names. Directory records do not cross a sector. Both CDs list
+  copy-protection dummies whose extents lie past the volume's end (`CONFIG.AFP`,
+  40 MB at sector 332,600), so extents are not checked against it.
+- **DATA1.HDR**: a 20-byte header (`ISc(`, 0x28635349; a version word whose top
+  byte 1 puts the format in bits 12–15: 5; the cabinet descriptor's offset at
+  byte 12). The descriptor gives the file table's offset (+0x0c, from the
+  descriptor), the directory count (+0x1c) and the file count (+0x28). The table
+  holds 32-bit offsets, from its start, of each directory name and then of each
+  file's 0x3a-byte descriptor: name offset (0), directory (4), flags (8, 16 bits:
+  1 split across volumes, 2 obfuscated, 4 compressed, 8 invalid), expanded size
+  (10), compressed size (14), offset of the data in `DATA1.CAB` (0x26) and the
+  MD5 of the expanded file (0x2a). Both CDs hold one directory: 1,292 files (99/00)
+  and 1,088 (00/01).
+- **DATA1.CAB**: a compressed file's data is a run of chunks, each a 16-bit
+  little-endian length and a raw deflate stream (RFC 1951) of at most 64 KB once
+  inflated. The reader inflates them in turn and stops on a chunk that runs past
+  the data, bytes left after the last chunk, a size or an MD5 other than the
+  header's, and a split or obfuscated file, which these CDs do not have.
+
+The layout is as the unshield project (MIT) documents it for version 5, read for
+facts only; no code was copied. The tests in `scripts/retro-cds.test.mjs` run on
+synthetic images and cabinets that `scripts/lib/retro-cd-fixture.mjs` writes byte
+by byte, with invented files.
 
 ## Self-checks
 

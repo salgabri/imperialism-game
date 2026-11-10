@@ -7,6 +7,8 @@
 // and by npm run build:retro-seasons from the databases before them (scripts/data/retro-seasons.json):
 // 2002/03: SI's Championship Manager 01/02 3.9.68 database (the CM0102 Starter Kit's patched_data.zip)
 // 2001/02: SI's Championship Manager 01/02 3.9.60 database (the CM0102 Starter Kit's original_data.zip)
+// 2000/01: SI's Championship Manager 00/01 database, original release 3.81 (the UK retail CD's data files, archive.org cm-0001-rel)
+// 1999/00: SI's Championship Manager 99/00 database, original release 3.70 (the UK retail CD's data files, archive.org championship-manager-season-9900)
 // 1998/99: SI's Championship Manager 3 data in the CM 01/02 format, Cam F's port (the CM0102 Starter Kit's cm3_data.zip)
 // 1997/98: SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)
 // 1996/97: Sensible Software's Sensible World of Soccer 96/97 national squads (Whiteulver's database, as keyser1884's SWOS-MCP holds it)
@@ -41,6 +43,8 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'ea-fifa-05', version: 'ea-fifa-05-f16bdf47', year: 2005, season: '2004/05', label: 'FIFA 05' }),
   Object.freeze({ id: 'cm0102-2002-11', version: 'cm0102-2002-11-12b13a69', year: 2003, season: '2002/03', label: 'CM 01/02 · 3.9.68' }),
   Object.freeze({ id: 'cm0102-2001-09', version: 'cm0102-2001-09-58d3ed4f', year: 2002, season: '2001/02', label: 'CM 01/02 · 3.9.60' }),
+  Object.freeze({ id: 'cm-0001', version: 'cm-0001-e6e6a2f0', year: 2001, season: '2000/01', label: 'CM 00/01 · 3.81' }),
+  Object.freeze({ id: 'cm-9900', version: 'cm-9900-e4639df6', year: 2000, season: '1999/00', label: 'CM 99/00 · 3.70' }),
   Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-5b8d03bc', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
   Object.freeze({ id: 'cm-9798', version: 'cm-9798-cb9596fd', year: 1998, season: '1997/98', label: 'CM 97/98' }),
   Object.freeze({ id: 'swos-9697', version: 'swos-9697-189aa2ca', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),

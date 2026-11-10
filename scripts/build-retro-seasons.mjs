@@ -8,7 +8,9 @@
 //
 // 2002/03 and 2001/02 are SI's own Championship Manager 01/02 databases (3.9.68 and 3.9.60) and 1998/99 SI's
 // Championship Manager 3 data in the CM 01/02 format, all three read by the CM 01/02 builder (src/data/footballSetBuild.js)
-// from the CM0102 Starter Kit's zips; 1997/98 is SI's Championship Manager 97/98 database as extracted to JSON
+// from the CM0102 Starter Kit's zips; 2000/01 and 1999/00 are SI's own CM 00/01 and CM 99/00 databases, whose files are
+// the same tables, read by it from the files npm run sync:retro-cds takes from their retail CDs (reader 'tables');
+// 1997/98 is SI's Championship Manager 97/98 database as extracted to JSON
 // (scripts/lib/cm9798.mjs); 1996/97 is Sensible World of Soccer 96/97's national squads (scripts/lib/swos.mjs), nations
 // only; 1995/96 and 1994/95 are SWOS's own team files with their clubs (scripts/lib/swos-files.mjs); 1993/94 and 1989/90
 // are the Starter Kit's two fan-made databases (Cam F's; Simon Treanor's, nations only). Every source is pinned by
@@ -46,7 +48,9 @@ function parseArgs(argv) {
 /** A source file's bytes, after checking it is the pinned one. */
 async function pinned(dataDir, file) {
   const at = path.join(dataDir, file.folder, file.name);
-  if (!existsSync(at)) throw new Error(`${at} is missing: download ${file.download} into data-src/${file.folder}/`);
+  if (!existsSync(at)) {
+    throw new Error(`${at} is missing: ${file.download ? `download ${file.download} into data-src/${file.folder}/` : 'npm run sync:retro-cds reads it from its CD image'}`);
+  }
   const bytes = await readFile(at);
   const digest = createHash('sha256').update(bytes).digest('hex');
   if (digest !== file.sha256 || bytes.length !== file.bytes) {
@@ -73,6 +77,13 @@ async function buildCmZip(season, dataDir, retrieved) {
   const files = unzipSync(zip, { filter: entry => /^[^/]+\.dat$/i.test(entry.name) });
   return buildFootballSet(files, { local: false, sourceExtra: credits(season, retrieved), ...(season.birthdays ? { famous: season.birthdays } : {}),
     ...(season.noNationAt ? { noNationAt: season.noNationAt } : {}), ...(setHasClubs(season.id) ? {} : { clubs: false }) });
+}
+
+/** A Data folder's tables, each pinned on its own (taken from a CD, scripts/sync-retro-cds.mjs), read by the CM 01/02 builder as a known release. */
+async function buildCmTables(season, dataDir, retrieved) {
+  const files = {};
+  for (const file of season.files) files[file.name] = new Uint8Array(await pinned(dataDir, file));
+  return buildFootballSet(files, { local: false, kind: season.kind, sourceExtra: credits(season, retrieved) });
 }
 
 async function buildCm9798(season, dataDir, retrieved) {
@@ -118,7 +129,8 @@ async function buildSwosFiles(season, dataDir, retrieved) {
   return { ...result, audit: { ...result.audit, clamped } };
 }
 
-const BUILDERS = { cm0102: buildCmZip, cm: buildCm9798, swos: buildSwos, 'swos-files': buildSwosFiles };
+// By the season's `reader` where it names one, else by its kind.
+const BUILDERS = { cm0102: buildCmZip, cm: buildCm9798, swos: buildSwos, 'swos-files': buildSwosFiles, tables: buildCmTables };
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -127,10 +139,12 @@ async function main() {
   const dataDir = path.resolve(args.data ?? path.join(root, 'data-src'));
   const results = [];
   for (const season of manifest.seasons) {
-    // A season's reader, where its kind is read from more than one kind of source (SWOS: a database, or team files).
+    // A season's reader, where its kind is read from more than one kind of source (SWOS: a database, or team files;
+    // CM: a zip, or a CD's tables).
     const build = BUILDERS[season.reader ?? season.kind];
     if (!build) throw new Error(`${season.id} has kind ${season.kind}${season.reader ? ` and reader ${season.reader}` : ''}, which no builder makes`);
-    const result = await build(season, dataDir, manifest.retrieved);
+    // A season read later than the others names its own day.
+    const result = await build(season, dataDir, season.retrieved ?? manifest.retrieved);
     const { doc } = result;
     if (doc.id !== season.id || doc.season !== season.season || doc.local !== false) {
       throw new Error(`${season.id} built as ${doc.id} ${doc.season}${doc.local === false ? '' : ', local'}: the manifest and the source disagree`);
