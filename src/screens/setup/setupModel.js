@@ -382,6 +382,16 @@ export const SEASON_NOTES = Object.freeze({
     + 'one with fewer than two rated players fields no team.',
 });
 
+// What a season's listing label can say of its ratings, the strongest first: whole words, in any case.
+const SEASON_TAGS = Object.freeze([['fan-made', /\bfan-made\b/i], ['converted', /\bconverted\b/i], ['computed', /\bcomputed\b/i]]);
+
+/**
+ * How a data set's ratings were made when its listing label says they are no game's own: 'fan-made' ("CM 01/02 · 93/94
+ * by Cam F, fan-made"), else 'converted' ("NHL 09, converted"), else 'computed' ("Computed from WAR, end of 1961",
+ * "Basketball-Reference (computed)"), each as a whole word in any case; null for any other label.
+ */
+export const seasonTagOf = label => SEASON_TAGS.find(([, words]) => words.test(String(label ?? '')))?.[0] ?? null;
+
 /**
  * The Season choice (docs/design/football-years.md): the sport's built-in season, then each of its listed data sets
  * newest first, as `{ id, key, season, source, label, name, credit, checked }`. `credit` is the plain text the set's
@@ -392,9 +402,15 @@ function seasonOptions(sets, dataSet, sport) {
     label: [season, source].filter(Boolean).join(' · '), credit, checked: id === dataSet });
   const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label, set.credit || ''))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
-  // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
+  // The dropdown names a season by its years, and says so on screen when its label calls its ratings computed, converted
+  // or fan-made ("1969/70 · computed", seasonTagOf). A set sharing its season with another (or with none) keeps its source.
   const shared = season => !season || rows.filter(other => other.season === season).length > 1;
-  return rows.map(option => ({ ...option, name: shared(option.season) ? option.label : option.season }));
+  const optionName = option => {
+    if (shared(option.season)) return option.label;
+    const tag = seasonTagOf(option.source);
+    return tag ? `${option.season} · ${tag}` : option.season;
+  };
+  return rows.map(option => ({ ...option, name: optionName(option) }));
 }
 
 /** A sport's three strongest clubs' names, as a club map's index lists them. */

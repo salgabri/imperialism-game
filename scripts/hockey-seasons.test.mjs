@@ -394,7 +394,12 @@ test('hockey\'s Season choice lists its seasons; a season keeps Nations, and Clu
   await withApp(async ({ app }) => {
     app.pickSetup('sport', 'hockey');
     const model = modelOf(app);
-    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27', ...BUILT_IN_HOCKEY_SEASONS.map(set => set.season)]);
+    // A computed or converted season says so on screen; an EA edition's is named by its years.
+    const methodOf = id => MANIFEST.seasons.find(season => season.id === id).method;
+    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27',
+      ...BUILT_IN_HOCKEY_SEASONS.map(set => (methodOf(set.id) ? `${set.season} · ${methodOf(set.id)}` : set.season))]);
+    assert.deepEqual(['nhl-2009', 'nhl-1994', 'nhl-1968'].map(id => model.season.options.find(option => option.id === id).name),
+      ['2008/09 · converted', '1993/94', '1967/68 · computed']);
     assert.deepEqual(model.season.options.slice(1).map(option => option.label), BUILT_IN_HOCKEY_SEASONS.map(set => `${set.season} · ${set.label}`));
     assert.equal(model.season.options.length, 60, 'the built-in season and every season from 1966/67 but 2004/05');
     app.pickSetup('dataSet', 'nhl-1994');

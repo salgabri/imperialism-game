@@ -657,13 +657,16 @@ test('American football\'s Season choice lists its seasons; one takes the clubs 
     const model = modelOf(app);
     assert.deepEqual(model.season.options.map(option => option.label),
       ['2026 · built in', ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
-    // A season the NFL and the AFL share (the 1960s) is named by its label, every other by its year alone.
+    // A season the NFL and the AFL share (the 1960s) is named by its label, every other by its year, a computed one
+    // saying so.
     const shared = season => BUILT_IN_AMERICAN_FOOTBALL_SEASONS.filter(set => set.season === season).length > 1;
     assert.deepEqual(model.season.options.map(option => option.name),
-      ['2026', ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => (shared(set.season) ? `${set.season} · ${set.label}` : set.season))]);
+      ['2026', ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => (shared(set.season) ? `${set.season} · ${set.label}`
+        : set.id.startsWith('pfa-') ? `${set.season} · computed` : set.season))]);
     assert.deepEqual(model.season.options.slice(-2).map(option => option.name), ['1960 · AFL (computed)', '1960 · NFL (computed)']);
     assert.ok(model.season.options.some(option => option.label === '1990 · Tecmo Super Bowl (NES)'));
-    assert.ok(model.season.options.some(option => option.name === '1975'), 'a season of the NFL alone is named by its year');
+    assert.ok(model.season.options.some(option => option.name === '1975 · computed'), 'a computed season of the NFL alone is named by its year and says so');
+    assert.ok(model.season.options.some(option => option.name === '2005'), 'a Madden season by its year alone');
 
     app.pickSetup('dataSet', 'madden-2001');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet, app.state.setup.clubScope], ['clubs', 'madden-2001', 'domestic:nfl2001']);

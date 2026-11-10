@@ -317,8 +317,9 @@ test('baseball\'s Season choice lists its own seasons; a season keeps Nations, a
   await withApp(async ({ app, time }) => {
     app.pickSetup('sport', 'baseball');
     const model = modelOf(app);
+    // A season computed from WAR says so on screen.
     assert.deepEqual(model.season.options.map(option => option.name), ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018',
-      ...Array.from({ length: 58 }, (_, i) => String(2017 - i))]);
+      ...Array.from({ length: 58 }, (_, i) => `${2017 - i} · computed`)]);
     assert.deepEqual(model.season.options.map(option => option.label),
       ['2026 · built in', ...BUILT_IN_BASEBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
     assert.match(model.season.note, /MLB The Show ratings of each season/);

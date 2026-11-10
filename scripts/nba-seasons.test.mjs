@@ -786,8 +786,9 @@ test('basketball\'s Season choice lists its own seasons; one takes the clubs ont
       ['2026/27 · built in', ...BUILT_IN_BASKETBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
     assert.equal(model.season.options.at(-1).label, '1960/61 · Basketball-Reference (computed)');
     assert.ok(model.season.options.some(option => option.label === '1983/84 · NBA 2K27 (Magic vs Bird era)'));
-    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27', ...BUILT_IN_BASKETBALL_SEASONS.map(set => set.season)],
-      'the dropdown names each by its season alone');
+    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27', ...BUILT_IN_BASKETBALL_SEASONS.map(set => (set.id.startsWith('nba-stats-')
+      ? `${set.season} · computed` : set.season))], 'the dropdown names each by its season, a computed one saying so');
+    assert.equal(model.season.options.at(-1).name, '1960/61 · computed');
     assert.match(model.season.note, /NBA 2K ratings of that season, as compiled by 2K Archive/);
     assert.match(model.season.note, /seasons no game rated, back to 1960\/61, are computed from Basketball-Reference's statistics/);
     assert.match(model.season.note, /NBA clubs only/);

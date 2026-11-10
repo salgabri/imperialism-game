@@ -13,8 +13,8 @@ import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { NATIONS, selectLineup } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { parseCampaign } from '../src/engine/storage.js';
-import { setSportOf } from '../src/engine/footballSets.js';
-import { buildSetupModel } from '../src/screens/setup/setupModel.js';
+import { BUILT_IN_SETS, setSportOf } from '../src/engine/footballSets.js';
+import { buildSetupModel, seasonTagOf } from '../src/screens/setup/setupModel.js';
 import { bundleComponents, findElement, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 // One bundle, so the test clears the very data set caches the App reads.
@@ -136,9 +136,9 @@ async function pickSeason(document, id) {
 /** The built-in earlier seasons' names: "2025/26" … "1961/62", without their source. */
 const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
 /** The Season dropdown's names for them: a season with two sets (1993/94 and 1989/90: a fan's database and a computed
- * World Cup) names each one's source. */
+ * World Cup) names each one's source, and a computed World Cup of a season of its own says so ("1969/70 · computed"). */
 const EARLIER_NAMES = BUILT_IN_SEASONS.map(set => (BUILT_IN_SEASONS.filter(other => other.season === set.season).length > 1
-  ? `${set.season} · ${set.label}` : set.season));
+  ? `${set.season} · ${set.label}` : set.id.startsWith('wc-') ? `${set.season} · computed` : set.season));
 
 // ---------- setup ----------
 
@@ -155,6 +155,8 @@ test('the Season choice offers the built-in season, then every earlier season bu
       assert.equal(seasonPicker(document).tagName, 'SELECT', 'the seasons are a dropdown');
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
       assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER_NAMES]);
+      assert.deepEqual(seasonNames(document).slice(-3), ['1969/70 · computed', '1965/66 · computed', '1961/62 · computed'],
+        'a computed season says so on screen, not only in the note');
       assert.deepEqual(EARLIER.slice(0, 3), ['2025/26', '2024/25', '2023/24'], 'the last built-in season, then the earlier ones');
       assert.equal(EARLIER.at(-1), '1961/62', 'back to the 1962 World Cup, computed');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
@@ -271,6 +273,60 @@ test('stepping through the seasons fetches only the set the player stays on', as
     assert.equal(app.seasonStatus().state, 'ready');
     assert.deepEqual(calls, ['/football/index.json', SET_URL]);
   });
+});
+
+test('the Season choice names a season by its years, and says on screen when its label calls the ratings computed, converted or fan-made', () => {
+  // The tag: a whole word of the label, in any case; fan-made wins over converted, converted over computed.
+  assert.equal(seasonTagOf('Computed · 1970 World Cup'), 'computed');
+  assert.equal(seasonTagOf('Basketball-Reference (computed)'), 'computed');
+  assert.equal(seasonTagOf('NHL 09, converted'), 'converted');
+  assert.equal(seasonTagOf('CM 01/02 · 93/94 by Cam F, fan-made'), 'fan-made');
+  assert.equal(seasonTagOf('COMPUTED, then Converted'), 'converted', 'converted wins over computed');
+  assert.equal(seasonTagOf('Fan-Made, converted and computed'), 'fan-made', 'fan-made wins over both');
+  for (const label of ['FIFA 22', 'Elo from match results, end of 1968 (rough)', 'Precomputed, unconverted, by fan-makers', '', null, undefined]) {
+    assert.equal(seasonTagOf(label), null, `${JSON.stringify(label)} says nothing of how its ratings were made`);
+  }
+
+  // A set of a season of its own is named by its years, with the tag its label gives; two sets of one season keep their
+  // whole labels, tag or not; the built-in season and any other set are named by their years alone. Labels never change.
+  const listed = (id, season, label) => ({ id, version: `${id}-0123abcd`, year: 2000, season, label });
+  const sets = [
+    listed('cm0102-2003-05', '2002/03', 'CM 01/02 · Test 2003'),
+    listed('cm0102-1999-05', '1998/99', 'CM 01/02 · 98/99, Converted from CM3'),
+    listed('cm0102-1994-05-fan', '1993/94', 'CM 01/02 · 93/94 by a fan, fan-made'),
+    listed('wc-1994', '1993/94', 'Computed · 1994 World Cup'),
+    listed('cm0102-1989-05', '1988/89', 'CM 01/02 · 88/89 by a fan, FAN-MADE, its ratings computed'),
+    listed('wc-1970', '1969/70', 'Computed · 1970 World Cup'),
+  ];
+  const setup = { sport: 'football', layer: 'nations', scope: 'UEFA', clubScope: 'all', role: 'spectator' };
+  const options = buildSetupModel(setup, { season: { sets, state: 'idle' } }).season.options;
+  assert.deepEqual(options.map(option => [option.key, option.name]), [
+    ['built-in', '2026/27'],
+    ['cm0102-2003-05', '2002/03'],
+    ['cm0102-1999-05', '1998/99 · converted'],
+    ['cm0102-1994-05-fan', '1993/94 · CM 01/02 · 93/94 by a fan, fan-made'],
+    ['wc-1994', '1993/94 · Computed · 1994 World Cup'],
+    ['cm0102-1989-05', '1988/89 · fan-made'],
+    ['wc-1970', '1969/70 · computed'],
+  ]);
+  assert.deepEqual(options.map(option => option.label), ['2026/27 · built in', ...sets.map(set => `${set.season} · ${set.label}`)]);
+
+  // Every sport's built-in seasons: exactly the ones no game rated say so, as their labels do (the computed World Cups;
+  // the NBA's, NFL's, AFL's, MLB's, NHL's and NRL's computed seasons; NHL 08 and NHL 09, converted; the two fans'
+  // databases). Tecmo's and Rugby League 2's overalls are ours and tennis's Elo before 2016 computed, but their labels
+  // do not say so, so they are named by their years.
+  const NHL_EDITIONS = ['nhl-2022', 'nhl-2007', 'nhl-1995', 'nhl-1994', 'nhl-1993'], NHL_CONVERTED = ['nhl-2008', 'nhl-2009'];
+  const FAN_MADE = ['cm0102-2020-11-cm93', 'cm0102-2017-04-cm89'];
+  const tagOf = id => (FAN_MADE.includes(id) ? 'fan-made' : NHL_CONVERTED.includes(id) ? 'converted'
+    : /^(?:wc|nba-stats|pfa|mlb-war)-/.test(id) || (/^nrl-/.test(id) && id !== 'nrl-2008') || (/^nhl-/.test(id) && !NHL_EDITIONS.includes(id))
+      ? 'computed' : null);
+  for (const sport of new Set(BUILT_IN_SETS.map(set => setSportOf(set.id)))) {
+    const own = BUILT_IN_SETS.filter(set => setSportOf(set.id) === sport);
+    const shared = season => own.filter(set => set.season === season).length > 1;
+    const model = buildSetupModel({ ...setup, sport, scope: 'world' }, { season: { sets: BUILT_IN_SETS, state: 'idle' } });
+    assert.deepEqual(model.season.options.slice(1).map(option => option.name), own.map(set => (shared(set.season) ? `${set.season} · ${set.label}`
+      : tagOf(set.id) ? `${set.season} · ${tagOf(set.id)}` : set.season)), `${sport}'s seasons`);
+  }
 });
 
 test('while a chosen set loads, step 1 shows none of the built-in season\'s figures or leagues', async () => {
