@@ -1,6 +1,6 @@
 // Nation theatres only where a sport is played (src/data/scopes.js `nationTheatres`): the world always, a continent once
 // four of its nations field a real side, the Elite 32 once 32 do. Rugby league in Africa, all generated players, and
-// women's tennis in Africa, no nation at all, are not offered.
+// women's tennis in Africa, no nation at all, are not offered. Basketball's EuroBasket is basketball's alone.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,11 +14,13 @@ import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const ids = sport => nationTheatres(sport).map(scope => scope.id);
 const NATION_SPORTS = SPORT_LIST.filter(sport => !sport.clubsOnly);
-const inScope = (scope, id) => scope.filter({ conf: NATIONS[id][2] });
+const inScope = (scope, id) => scope.filter({ id, conf: NATIONS[id][2] });
+// A competition of one sport (basketball's EuroBasket) is a theatre of that sport alone.
+const playedIn = (scope, sport) => !scope.sports || scope.sports.includes(sport.id);
 
 test('only a nation with a real side fields a team, so no team is made up or nearly empty', () => {
   const fielded = Object.fromEntries(NATION_SPORTS.map(sport => [sport.id, fieldedNations(sport).length]));
-  assert.deepEqual(fielded, { football: 173, 'womens-football': 36, basketball: 40, baseball: 12, hockey: 7, tennis: 52,
+  assert.deepEqual(fielded, { football: 173, 'womens-football': 36, basketball: 47, baseball: 12, hockey: 7, tennis: 52,
     'womens-tennis': 45, 'rugby-league': 6 });
   for (const sport of NATION_SPORTS) assert.ok(fieldedNations(sport).every(id => fieldsRealSide(id, sport)), sport.id);
   assert.ok(!fieldedNations(getSport('rugby-league')).some(id => NATIONS[id][2] === 'CAF'), 'no rugby league team in Africa');
@@ -47,7 +49,7 @@ test('every sport offers the world, a continent only with four real sides and th
     assert.equal(offered.includes('elite'), real.length >= ELITE_NATIONS, `${sport.id}: Elite 32`);
     for (const scope of SCOPES.filter(item => item.id !== 'world' && item.id !== 'elite')) {
       const sides = real.filter(id => inScope(scope, id)).length;
-      assert.equal(offered.includes(scope.id), sides >= MIN_REAL_SIDES, `${sport.id} in ${scope.name}: ${sides} real sides`);
+      assert.equal(offered.includes(scope.id), playedIn(scope, sport) && sides >= MIN_REAL_SIDES, `${sport.id} in ${scope.name}: ${sides} real sides`);
     }
     // So no offered theatre is empty, or one team's.
     for (const scope of nationTheatres(sport).filter(item => item.filter)) {
@@ -59,7 +61,7 @@ test('every sport offers the world, a continent only with four real sides and th
 test('rugby league plays the world and Asia & Oceania, women\'s tennis no Africa, football everywhere', () => {
   assert.deepEqual(ids(getSport('rugby-league')), ['world', 'AFC'], 'no Africa, the Americas or Europe (England alone)');
   assert.ok(!ids(getSport('womens-tennis')).includes('CAF'), 'no African nation fields a Billie Jean King Cup team');
-  assert.deepEqual(ids(getSport('football')), SCOPES.map(scope => scope.id));
+  assert.deepEqual(ids(getSport('football')), SCOPES.filter(scope => !scope.sports).map(scope => scope.id), 'every theatre but basketball\'s EuroBasket');
 });
 
 test('a theatre the sport lacks gives way to its heartland, the continent with the most real sides', () => {

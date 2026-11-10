@@ -1,7 +1,7 @@
 import React from 'react';
 import { CONFIG } from './config.js';
 import { C, V4 } from './theme.js';
-import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
+import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, isEuropeanScope, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES, nationTheatre, worldClubTheatreName } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { teamMarkUrls } from './data/teamMarks.js';
@@ -703,7 +703,7 @@ export default class App extends React.Component {
       .map(country => [country.id, country.id]));
     // Russia and overseas islands remain playable, but the European opening
     // camera should show the continent. Zooming out always restores all land.
-    if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
+    if (isEuropeanScope(settings?.scope) && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
     this.viewResetKey = (this.viewResetKey || 0) + 1;
   }
 
@@ -1362,7 +1362,7 @@ export default class App extends React.Component {
     // The theatre the sport plays (a season still loading: the choice as it stands).
     const sport = sportOf(setup);
     const scope = setup.layer === 'clubs' ? null : sport ? nationTheatre(sport, setup.scope).id : setup.scope;
-    const focus = scope === 'UEFA' ? this.europeFocus() : null;
+    const focus = isEuropeanScope(scope) ? this.europeFocus() : null;
     return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
       own: opening, frameIds: homes, focus });
   }

@@ -26,7 +26,7 @@ export function campaignPreview(count, sport, setup) {
   // A best-of-three final plays two or three games where a single final plays one.
   const range = setup.finale === 'best-of-three' && matches > 0 ? `${matches + 1}–${matches + 2}` : `${matches}`;
   // The clock of the rules the campaign will play (a season's sport object carries the built-in one's).
-  const { clock } = matchSport({ sport: sport.id, layer: setup.layer });
+  const { clock } = matchSport({ sport: sport.id, layer: setup.layer, clubScope: setup.clubScope });
   const seconds = setup.express ? 2.5 : setup.resolution === 'instant' ? 5 : clock.length * clock.msPerUnit / 1000 + 7;
   const minutes = Math.max(1, Math.ceil(matches * seconds / 60));
   return { matches: range, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
@@ -225,10 +225,10 @@ function nationCounts(sport) {
   const key = sportKey(sport);
   if (!nationCountCache.has(key)) {
     // A data set's season can leave out shapes merged into another federation or with none.
-    const nations = fieldedNations(sport).map(id => NATIONS[id]);
+    const nations = fieldedNations(sport);
     nationCountCache.set(key, Object.fromEntries(SCOPES.map(scope => [scope.id, scope.id === 'world'
       ? nations.length
-      : scope.id === 'elite' ? Math.min(32, nations.length) : nations.filter(nation => scope.filter({ conf: nation[2] })).length])));
+      : scope.id === 'elite' ? Math.min(32, nations.length) : nations.filter(id => scope.filter({ id, conf: NATIONS[id][2] })).length])));
   }
   return nationCountCache.get(key);
 }
@@ -262,7 +262,7 @@ function clubIndex(sport) {
 }
 
 const clubMapRows = new Map();
-/** The one theatre of a sport whose clubs have their own map: 'NBA', on the USA and Canada. */
+/** The one theatre of a sport whose clubs have their own map: 'NFL', on the USA. */
 function clubMapTheatre(map) {
   if (!clubMapRows.has(map.id)) {
     clubMapRows.set(map.id, Object.freeze([Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' })]));
@@ -304,7 +304,7 @@ export function theatreOptions(sport, clubLayer) {
  * season's Europe maps, a women's football season's Europe and NWSL maps.
  */
 function pendingTheatres(builtIn, clubLayer, clubScope) {
-  if (!clubLayer) return SCOPES.map(scope => theatreRow(scope, null));
+  if (!clubLayer) return SCOPES.filter(scope => !scope.sports || scope.sports.includes(builtIn.id)).map(scope => theatreRow(scope, null));
   const map = domesticEntry(clubScope);
   if (isTheatreMap(map)) return mapTheatres(map.sport, map.seasons?.[0] ?? null);
   if (map?.sport === builtIn.id) return clubMapTheatre(map);
@@ -363,7 +363,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
     + 'The seasons no game rated, back to 1960/61, are computed from Basketball-Reference\'s statistics, fitted to '
     + 'NBA 2K and put on NBA 2K27\'s scale. '
-    + 'They have NBA clubs only: the franchises of that season, on the map of their day.',
+    + 'They have NBA clubs only: the franchises of that season, on the map of their day. No game rates EuroLeague '
+    + 'players, so the EuroLeague\'s ratings are estimates from its box scores, marked as such.',
   'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
     + 'overall ours. 2000 back to 1996, 1991 and 1989 back to 1960 are computed from Pro Football Archives\' records of '
@@ -423,9 +424,11 @@ export function domesticDescription(entry) {
   const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
-  if (entry.theatre) {
-    // Women's football's every European club: as many as EA rates that season.
-    const field = entry.theatre === 'all' && entry.sport !== 'football' ? `the ${clubs} European clubs EA rates` : `Europe's ${clubs} strongest clubs`;
+  // A map of Europe: football's strongest clubs, women's football's every European club, or a league's (basketball's
+  // EuroLeague, whose Dubai holds the Emirates).
+  if (entry.theatre || entry.countries) {
+    const field = !entry.theatre ? `the ${clubs} ${entry.league} clubs`
+      : entry.theatre === 'all' && entry.sport !== 'football' ? `the ${clubs} European clubs EA rates` : `Europe's ${clubs} strongest clubs`;
     return `${leaders} ${field}, each on land in its own country: alone it holds all of it, and clubs that `
       + 'share a country split it along its regional borders. A country with no club stays grey.';
   }
@@ -533,6 +536,8 @@ export function sportNote(sport, { clubsOnly = false } = {}) {
   // A sport with clubs only (American football) has no nations to offer.
   if (sport.clubsOnly || clubsOnly) return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs` : `${clubs.length} clubs`;
   if (leagues.length === 1) return `Nations · ${clubs.length} ${leagues[0]} clubs`;
+  // Basketball names its two leagues, each on its own map: the NBA and the EuroLeague.
+  if (sport.id === 'basketball' && leagues.length === 2) return `Nations · ${leagues[0]} and ${leagues[1]} clubs`;
   return `Nations · ${clubs.length} clubs from ${leagues.length} leagues`;
 }
 
@@ -544,7 +549,7 @@ export function sportNote(sport, { clubsOnly = false } = {}) {
 export const SPORT_NOTES = Object.freeze({
   football: 'Nations · 124 clubs from 17 leagues',
   'womens-football': 'Nations · 84 clubs from 6 leagues',
-  basketball: 'Nations · 30 NBA clubs',
+  basketball: 'Nations · NBA and EuroLeague clubs',
   'american-football': '32 NFL clubs',
   baseball: 'Nations · 30 MLB clubs',
   hockey: 'Nations · 32 NHL clubs',
@@ -741,7 +746,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
       players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
       })),
-      fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league && !country.theatre)),
+      // The American leagues' maps have empty land between clubs; a map of Europe (football's, the EuroLeague's) has none.
+      fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league && !country.theatre && !country.countries)),
     };
   }
   const favourites = ranked.slice(0, 5).map(row);

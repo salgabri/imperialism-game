@@ -157,8 +157,10 @@ test('the smallest country is nine matches, a retired one leaves the list, and a
   assert.equal(pakistan.country, null);
   assert.ok(!pakistan.domesticScopes.some(row => row.id === 'domestic:586'));
   assert.equal(pakistan.scopeName, 'Top 124');
-  assert.equal(sportNote(getSport('basketball')), 'Nations · 30 NBA clubs');
-  assert.equal(sportNote(getSport('basketball'), { clubsOnly: true }), '30 NBA clubs', 'an NBA season has no nations');
+  assert.equal(sportNote(getSport('basketball')), 'Nations · NBA and EuroLeague clubs');
+  // An NBA season (clubs only) holds that season's NBA franchises.
+  const nbaSeason = { ...getSport('basketball'), clubs: getSport('basketball').clubs.filter(club => club.league === 'NBA') };
+  assert.equal(sportNote(nbaSeason, { clubsOnly: true }), '30 NBA clubs', 'an NBA season has no nations');
 });
 
 test('static markup keeps the whole DOM contract on every step', t => {
@@ -299,8 +301,8 @@ test('step 1 binds sport, teams and theatre; the theatre mirror select stays val
   assert.equal(view.calls.picks.length, 1, 're-selecting the current sport does not reset the setup');
   await view.click(view.button('Clubs'));
   assert.deepEqual(view.calls.picks.at(-1), ['layer', 'clubs']);
-  // Basketball clubs have one theatre: the NBA, on its own map of the USA and Canada.
-  assert.deepEqual(view.qa('.setup-theatre').map(row => row.dataset.name), ['NBA']);
+  // Basketball clubs have two theatres: the NBA on its own map of the USA and Canada, the EuroLeague on its map of Europe.
+  assert.deepEqual(view.qa('.setup-theatre').map(row => row.dataset.name), ['NBA', 'EuroLeague']);
   await view.click(view.button('Nations'));
 
   const africa = view.qa('.setup-theatre').find(row => /Africa/.test(row.textContent));
@@ -636,7 +638,9 @@ test('setup.css keeps the reviewed token and hit-target rules', () => {
   // the hint stays whole (measured in Chrome at 360: 41px free for the 59px hint before, 64.5px after; 390 unchanged).
   assert.match(phone, /^[^@]*\.setup-foot \.setup-foot__next \{ flex:1 1 auto; min-width:0;/);
   assert.match(rule('.setup-foot .btn-primary[data-bar-hint]::after'), /min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;/);
-  assert.match(narrow, /^\s*\.setup-foot \.setup-foot__back \{ padding:0 14px; \}\s*\.setup-foot \.setup-foot__next \{ padding:0 12px; \}\s*\}/);
+  // And the theatre chips' padding narrows, so basketball's eight nation theatres (EuroBasket beside Europe) keep to two
+  // rows at 360 (measured in Chrome: 636px of chips took three rows at 10px a side, 604px take two at 8px).
+  assert.match(narrow, /^\s*\.setup-foot \.setup-foot__back \{ padding:0 14px; \}\s*\.setup-foot \.setup-foot__next \{ padding:0 12px; \}\s*\.setup-theatre \{ padding:0 8px; \}\s*\}/);
 });
 
 test('nine sports sit in three rows of three, compact tiles that stay 44px targets, and step 1\'s heading gives way at 360×640', t => {
@@ -919,7 +923,7 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
   assert.equal(empty.teams.length, 0);
   assert.equal(empty.canLaunch, true);
   const stale = buildSetupModel({ ...BASE, sport: 'basketball', layer: 'clubs', clubScope: 'Serie A' });
-  assert.equal(stale.scopeId, 'domestic:nba', "basketball clubs' only theatre");
+  assert.equal(stale.scopeId, 'domestic:nba', "basketball clubs' first theatre");
   assert.equal(stale.country, null, 'no map until App settles the theatre (setClubScope)');
   assert.match(stale.sports.find(sport => sport.id === 'basketball').note, /NBA/);
 });

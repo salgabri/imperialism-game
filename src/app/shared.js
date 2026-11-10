@@ -50,13 +50,14 @@ export function dataSetOf(settings) {
 }
 
 /**
- * The setup's club theatre. A sport with its own map plays only there (basketball: the NBA's USA and Canada, or an
- * earlier season's map of its own era). Football's clubs play on Europe's maps, the season's own: its strongest clubs,
- * or its elite; women's football's on Europe's (every club, or the elite) or on the NWSL's USA. The theatre carries
- * over between seasons and sports that have it; a league's theatre of before, or a map with no counterpart, falls back
- * to Europe's strongest clubs. One country's map stays chosen, with the built-in football data it is built from; a data
- * set brings its own clubs, so it leaves that map for the set's. A set with no maps (a CM 01/02 database built on this
- * computer) plays football's two theatres on the world. Shared by App's setup and challenge links.
+ * The setup's club theatre. A sport with its own map plays only there (American football: the NFL's USA). An earlier
+ * season with a map of its era plays there (basketball's NBA seasons). Football's clubs play on Europe's maps, the
+ * season's own: its strongest clubs, or its elite; women's football's on Europe's (every club, or the elite) or on the
+ * NWSL's USA; basketball's on the NBA's USA and Canada or the EuroLeague's Europe. The theatre carries over between
+ * seasons and sports that have it; a league's theatre of before, or a map with no counterpart, falls back to Europe's
+ * strongest clubs, or a sport's first map (the NBA's). One country's map stays chosen, with the built-in football data it
+ * is built from; a data set brings its own clubs, so it leaves that map for the set's. A set with no maps (a CM 01/02
+ * database built on this computer) plays football's two theatres on the world. Shared by App's setup and challenge links.
  */
 export function setClubScope(setup) {
   const sportId = getSport(setup.sport).id;
@@ -70,7 +71,7 @@ export function setClubScope(setup) {
   const chosen = domesticEntry(setup.clubScope);
   const theatre = chosen ? theatreOf(chosen) : setup.clubScope;
   const maps = theatreMapsOf(sportId, dataSet);
-  const map = maps.find(entry => theatreOf(entry) === theatre) || maps.find(entry => theatreOf(entry) === 'all');
+  const map = maps.find(entry => theatreOf(entry) === theatre) || maps.find(entry => theatreOf(entry) === 'all') || maps[0];
   return map ? domesticScope(map.id) : theatre === 'elite' ? 'elite' : 'all';
 }
 
