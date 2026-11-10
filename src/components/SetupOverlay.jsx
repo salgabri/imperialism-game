@@ -208,12 +208,14 @@ function theatreCaption(model, preview) {
  * true) lets a manager with no team picked launch the suggested one; "Another team" turns it off.
  * Sharing (README §Sharing a campaign): `challenge` is the link setup was filled in from ({ seed, ignored }) or null,
  * and `challengeLink` this setup's own link for step 3.
+ * `sportLoad` is App's `sportStatus()`: a sport picked before its players loaded ({ id, state, message, onRetry,
+ * onReload }), or null. Its card shows as picked, and the steps after the first and Launch wait for it.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
   domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON, initialStep = 1,
-  suggestTeam = true, challenge = null, challengeLink = '', mapMode = 'political', onMapMode, mapFlags = null,
+  suggestTeam = true, challenge = null, challengeLink = '', mapMode = 'political', onMapMode, mapFlags = null, sportLoad = null,
 }) {
   const [step, setStep] = useState(() => Math.min(3, Math.max(1, Math.round(Number(initialStep)) || 1)));
   const [confirmation, setConfirmation] = useState(null);
@@ -235,10 +237,14 @@ export default function SetupOverlay({
   const mapMessage = domestic?.message || null;
   // Likewise `season`: its list and sport keep their identity until they change.
   const { sets: seasonSets = NO_TEAMS, state: seasonState = 'idle', message: seasonMessage = null, sport: seasonSport = null } = season || IDLE_SEASON;
+  // Likewise `sportLoad`.
+  const { id: sportLoadId = null, state: sportLoadState = 'idle', message: sportLoadMessage = null } = sportLoad || {};
   const model = useMemo(() => setupModel.buildSetupModel(setup, {
     managerTeams, domestic: { state: mapState, message: mapMessage }, launching,
     season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport }, suggest: suggestTeam,
-  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam]);
+    sportLoad: { id: sportLoadId, state: sportLoadState, message: sportLoadMessage },
+  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam,
+    sportLoadId, sportLoadState, sportLoadMessage]);
   const { rules } = model;
   const manager = model.role === 'manager';
   /** Football clubs also offer one country's own top clubs: more than a hundred, so they are a dropdown under Europe's theatres. */
@@ -307,6 +313,8 @@ export default function SetupOverlay({
   });
   function goTo(next) {
     const target = Math.min(3, Math.max(1, next));
+    // A sport still loading is not set up yet: the steps after this one would show the sport it replaces.
+    if (model.sportLoad && target !== step) return;
     navigated.current = true;
     // The discard confirmation belongs to step 1's quick-resume card; leaving the step dismisses it.
     if (target !== 1) setConfirmation(null);
@@ -370,7 +378,7 @@ export default function SetupOverlay({
     }
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [step, model.canLaunch, confirmation]);
+  }, [step, model.canLaunch, model.sportLoad, confirmation]);
 
   function launch(event) {
     event.preventDefault();
@@ -403,14 +411,16 @@ export default function SetupOverlay({
 
   function footer(n) {
     const meta = SETUP_STEPS[n - 1];
-    // Only what holds the launch back: a team to pick, a map or season still loading.
-    const note = n === 3 ? model.launchNote : '';
+    // Only what holds the launch back: a team to pick, a map or season still loading; on the first step, a sport loading
+    // (one that failed says so under the sports).
+    const note = n === 3 ? model.launchNote : n === 1 && model.sportLoad?.state === 'loading' ? model.sportLoad.note : '';
     return (
       <footer className="setup-foot">
         <p className="setup-foot__note" role={note ? 'status' : undefined}>{note}</p>
         {n > 1 ? <button type="button" className="btn-secondary setup-foot__back" onClick={() => goTo(n - 1)}>Back</button> : null}
         {n < 3 ? (
           <button type="button" className="btn-primary setup-foot__next" data-key-hint="Space" data-bar-hint={`Step ${n} of 3`}
+            disabled={!!model.sportLoad} aria-busy={model.sportLoad?.state === 'loading' || undefined}
             onClick={() => goTo(n + 1)}>{meta.next}</button>
         ) : (
           <button type="submit" className="btn-primary setup-foot__next setup-launch" data-key-hint="Space" data-bar-hint="Step 3 of 3"
@@ -561,15 +571,26 @@ export default function SetupOverlay({
                 data-rows={Math.ceil(model.sports.length / sportColumns(model.sports.length))}
                 style={{ '--sport-cols': sportColumns(model.sports.length) }}>
                 {model.sports.map(item => (
-                  <div className="setup-card" data-checked={item.selected} key={item.id} title={item.note}>
+                  <div className="setup-card" data-checked={item.selected} data-busy={item.busy || undefined} key={item.id} title={item.note}>
                     <Icon name={item.id} size={22} className="setup-card__icon" />
                     <button type="button" role="radio" aria-checked={item.selected} tabIndex={item.selected ? 0 : -1}
-                      className="setup-card__button" aria-describedby={`setup-sport-${item.id}-note`}
-                      onClick={() => choose('sport', item.id, model.sport.id)} onKeyDown={moveRadio}>{item.name}</button>
+                      className="setup-card__button" aria-describedby={`setup-sport-${item.id}-note`} aria-busy={item.busy || undefined}
+                      onClick={() => choose('sport', item.id, model.sportPick)} onKeyDown={moveRadio}>{item.name}</button>
                     <span className="setup-card__note sr-only" id={`setup-sport-${item.id}-note`}>{item.note}</span>
                   </div>
                 ))}
               </div>
+
+              {/* A sport whose players would not load: Retry, or Reload, as after a deploy that renamed their files. */}
+              {model.sportLoad?.state === 'error' ? (
+                <div className="rule-note setup-sport__error" role="alert">
+                  <Icon name="info" size={20} />
+                  <p>{model.sportLoad.note}{' '}
+                    <button type="button" className="btn-link rule-note__action" onClick={() => sportLoad?.onRetry?.()}>Retry</button>{' '}
+                    <button type="button" className="btn-link rule-note__action" onClick={() => sportLoad?.onReload?.()}>Reload</button>
+                  </p>
+                </div>
+              ) : null}
 
               <div className="setup-row">
                 <div className="setup-group">

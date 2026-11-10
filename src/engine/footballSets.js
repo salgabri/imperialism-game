@@ -35,6 +35,7 @@ import { baseball } from '../sports/baseball.js';
 import { football } from '../sports/football.js';
 import { womensFootball } from '../sports/womensFootball.js';
 import { getSport } from '../sports/index.js';
+import { loadSportData, sportDataLoaded } from '../sports/sportData.js';
 
 export const FOOTBALL_SET_FORMAT = 1;
 /** The built-in data's season (EA FC 27 + FM 26). Year N is the season ending in N. */
@@ -284,9 +285,13 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
   entry.promise = (async () => {
     if (!isFootballSetId(key)) throw new Error(`Unknown football data set "${key}"`);
     if (typeof fetchImpl !== 'function') throw new Error('No fetch available to load football data sets');
+    // A set is checked against its sport's own clubs and plays its rules, so their players load beside it. Only a
+    // loaded sport's seasons are asked for (src/sports/sportData.js): in play this waits for nothing.
+    const sport = setSportOf(key), players = sportDataLoaded(sport) ? null : loadSportData(sport);
+    players?.catch(() => { /* reported once the set itself has arrived */ });
     let res;
     try {
-      res = await fetchImpl(`${baseUrl}${setSportOf(key)}/${key}.json`);
+      res = await fetchImpl(`${baseUrl}${sport}/${key}.json`);
     } catch (e) {
       throw new Error(`Football data set ${key} failed to load: ${(e && e.message) || e}`);
     }
@@ -296,6 +301,11 @@ export function loadFootballSet(id, { baseUrl = '/', fetch: fetchImpl = globalTh
       data = await res.json();
     } catch (e) {
       throw new Error(`Football data set ${key} is not valid JSON: ${(e && e.message) || e}`);
+    }
+    try {
+      await players;
+    } catch (e) {
+      throw new Error(`Football data set ${key} could not be checked: the ${getSport(sport).name} players failed to load (${(e && e.message) || e})`);
     }
     entry.value = decodeFootballSet(data, key);
     if (cache.get(key) === entry) {

@@ -193,6 +193,15 @@ strong.setup-save__text { font-weight:600; }
 .setup-sports[data-rows="3"] .setup-card { min-height:44px; padding:6px 4px 5px; gap:3px; }
 .setup-card__button:focus-visible { outline:none; }
 .setup-card__button:focus-visible::after { outline:2px solid var(--you); outline-offset:2px; }
+/* A sport picked before its players have loaded (App's sportLoad): a bar along the tile's foot, shown only after 150 ms,
+   so a pick the offline worker answers at once never flickers. */
+.setup-card[data-busy]::after {
+  content:''; position:absolute; left:0; right:0; bottom:0; height:2px; background:var(--you); opacity:0;
+  animation:setup-card-busy .8s ease-in-out 150ms infinite alternate;
+}
+@keyframes setup-card-busy { from { opacity:.3; } to { opacity:1; } }
+@keyframes setup-card-busy-still { to { opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .setup-card[data-busy]::after { animation:setup-card-busy-still 0s 150ms forwards; } }
 
 /* Teams segmented (v4 segmented primitive) */
 .segmented.setup-segmented { display:inline-flex; width:max-content; max-width:100%; }
@@ -226,10 +235,10 @@ strong.setup-save__text { font-weight:600; }
 .setup-theatre__name { white-space:nowrap; font:600 15px/1.2 var(--font-narrow); color:var(--text-2); }
 .setup-theatre[aria-checked=true] .setup-theatre__name { color:var(--ink); }
 .setup-domestic__status { margin:6px 0 0; font:400 12px/1.35 var(--font-sans); color:var(--text-2); }
-.rule-note.setup-domestic__error, .rule-note.setup-season__error {
+.rule-note.setup-domestic__error, .rule-note.setup-season__error, .rule-note.setup-sport__error {
   margin-top:8px; background:var(--panel); box-shadow:inset 3px 0 0 var(--loss), inset 0 0 0 1px var(--rule);
 }
-.rule-note.setup-domestic__error > svg, .rule-note.setup-season__error > svg { color:var(--loss); }
+.rule-note.setup-domestic__error > svg, .rule-note.setup-season__error > svg, .rule-note.setup-sport__error > svg { color:var(--loss); }
 
 /* Step 1 map card (SetupMap): the theatre's opening board — each starting territory (a world theatre's nations or clubs, a
    country's sections) in its kick-off pastel, or under its flag or crest, over the land nobody holds. It takes the

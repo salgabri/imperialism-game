@@ -536,6 +536,23 @@ export function sportNote(sport, { clubsOnly = false } = {}) {
 }
 
 /**
+ * Each sport card's note for its built-in season: `sportNote` of each sport, written out so the cards need no sport's
+ * players but the chosen one's (every other sport's load only when it is played, sportData.js). A roster rebuild that
+ * changes a club count fails npm test (scripts/sport-data.test.mjs) until this follows; the build scripts do not write it.
+ */
+export const SPORT_NOTES = Object.freeze({
+  football: 'Nations · 124 clubs from 17 leagues',
+  'womens-football': 'Nations · 84 clubs from 6 leagues',
+  basketball: 'Nations · 30 NBA clubs',
+  'american-football': '32 NFL clubs',
+  baseball: 'Nations · 30 MLB clubs',
+  hockey: 'Nations · 32 NHL clubs',
+  tennis: 'Nations',
+  'womens-tennis': 'Nations',
+  'rugby-league': 'Nations · 17 NRL clubs',
+});
+
+/**
  * Board 03 tier (V1 L1969). The cut-offs (4 / 12 / 30) suit a field of Europe's 46 or more; a smaller field scales them
  * down, so the last of ten clubs reads "Long shot" rather than "Contender".
  */
@@ -686,6 +703,12 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const setName = chosenSeason?.source || dataSet;
   const setLoading = dataSet != null ? `Loading the ${setName} season…` : '';
   const setFailed = dataSet != null ? `The ${setName} season could not be loaded.` : '';
+  // A sport picked before its players have loaded (App's `sportLoad`, src/sports/sportData.js): its card shows as picked
+  // while setup keeps the sport it had, and the steps after this one and Launch wait for it.
+  const sportLoad = ctx.sportLoad?.id != null && ctx.sportLoad.id !== sportId ? ctx.sportLoad : null;
+  const sportPick = sportLoad ? getSport(sportLoad.id) : sport;
+  const sportFailed = sportLoad?.state === 'error';
+  const sportWait = !sportLoad ? '' : sportFailed ? sportLoad.message || `${sportPick.name} could not be loaded.` : `Loading ${sportPick.name}…`;
 
   const ranked = managerTeams.slice().sort(byRating);
   const rankOf = new Map(ranked.map((team, index) => [team.id, index + 1]));
@@ -723,10 +746,11 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const favourites = ranked.slice(0, 5).map(row);
   const teamChosen = role !== 'manager' || !!picked;
   // A country campaign also waits for its map (and never launches twice while App prepares it), a data set for its file.
-  const canLaunch = teamChosen && !countryWaits && !seasonWaits && !launching;
+  const canLaunch = teamChosen && !countryWaits && !seasonWaits && !launching && !sportLoad;
   const mapLoading = country ? `Loading the map of ${country.name}…` : '';
   const mapFailed = country ? `The map of ${country.name} could not be loaded.` : '';
-  const launchNote = launching ? `Preparing the map of ${country?.name || 'the country'}…`
+  const launchNote = sportLoad ? sportWait
+    : launching ? `Preparing the map of ${country?.name || 'the country'}…`
     : countryState === 'loading' ? mapLoading
       : countryState === 'error' ? mapFailed
         : seasonState === 'loading' ? setLoading
@@ -737,8 +761,12 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     sport: { id: sport.id, name: sport.name },
     // The chosen set's card counts its own clubs.
     sports: SPORT_LIST.map(item => ({ id: item.id, name: item.name,
-      note: item.id !== sport.id ? sportNote(item) : pending ? sportNote(NO_CLUBS)
-        : sportNote(sport, { clubsOnly: dataSet != null && !setHasNations(dataSet) }), selected: item.id === sport.id })),
+      note: item.id !== sport.id ? SPORT_NOTES[item.id] : pending ? sportNote(NO_CLUBS)
+        : sportNote(sport, { clubsOnly: dataSet != null && !setHasNations(dataSet) }),
+      selected: item.id === sportPick.id, busy: !!sportLoad && !sportFailed && item.id === sportPick.id })),
+    // The sport the cards show as picked, and the wait for one picked before its players loaded (null for none).
+    sportPick: sportPick.id,
+    sportLoad: sportLoad ? { id: sportPick.id, name: sportPick.name, state: sportFailed ? 'error' : 'loading', note: sportWait } : null,
     season: {
       id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTES[sportId] || '', loading: setLoading,
       message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',

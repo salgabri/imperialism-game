@@ -1,6 +1,5 @@
 import { C } from '../theme.js';
-import { ROSTERS } from '../data/rosters.hockey.js';
-import { CLUBS } from '../data/clubs.hockey.js';
+import { defineSportData } from './sportData.js';
 import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, createScorerSampler, gauss, poisson } from '../engine/random.js';
 
@@ -174,13 +173,14 @@ export function sampleResult(rng, prepared, drama = 6) {
 const SCORER_WEIGHTS = { C: 1, LW: 1, RW: 1, D: 0.3, G: 0.0001 };
 const SCORER_FLOOR = 74;
 
-export const hockey = {
+export const hockey = defineSportData({
   id: 'hockey',
   simulationVersion: 1,
   name: 'Ice hockey',
   blurb: 'Four lines, three pairs and a goalie, three periods. Fast and low-scoring — level games go to overtime, then a shoot-out.',
-  rosters: ROSTERS,
-  clubs: CLUBS,
+  // Read from the sport's players (sportData.js), once they have loaded.
+  rosters: undefined,
+  clubs: undefined,
   // Ice hockey's Great Britain plays as one: the home nations' shapes start in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
   // That empire plays as Great Britain, under the Union Jack.
@@ -244,7 +244,7 @@ export const hockey = {
     ev.sort((x, y) => x.m - y.m);
     return { ga, gd, regA, regD, ev, tie, winner };
   },
-};
+});
 
 /**
  * Squad-screen strength profile: the attack, the defence and the goalie the match model weighs → { attack, defence,

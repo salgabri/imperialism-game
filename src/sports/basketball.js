@@ -1,6 +1,5 @@
 import { C } from '../theme.js';
-import { ROSTERS } from '../data/rosters.basketball.js';
-import { CLUBS } from '../data/clubs.basketball.js';
+import { defineSportData } from './sportData.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../data/nbaLeagueAverages.js';
@@ -270,13 +269,15 @@ const eventFormat = rules => (e, code) => ({
   text: `+${e.pts} — ${e.name} (${code})`,
 });
 
-export const basketball = {
+/** Basketball without its players: every NBA season plays these rules (`nbaBasketballIn`), read at import. */
+const basketballRules = {
   id: 'basketball',
   simulationVersion: 3,
   name: 'Basketball',
   blurb: 'Starting fives: forty minutes between nations, forty-eight in the NBA. Level games go to overtime.',
-  rosters: ROSTERS,
-  clubs: CLUBS,
+  // Read from the sport's players (sportData.js), once they have loaded.
+  rosters: undefined,
+  clubs: undefined,
   // Great Britain is one FIBA team: the home nations' shapes start in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
   // That empire plays as Great Britain, under the Union Jack.
@@ -318,6 +319,8 @@ export const basketball = {
   },
 };
 
+export const basketball = defineSportData({ ...basketballRules });
+
 const nbaSeasons = new Map();
 
 /**
@@ -331,8 +334,8 @@ export function nbaBasketballIn(season) {
   const key = Object.hasOwn(NBA_LEAGUE_AVERAGES, season) ? season : LATEST_NBA_SEASON;
   if (!nbaSeasons.has(key)) {
     const rules = nbaRules(NBA_LEAGUE_AVERAGES[key]);
-    nbaSeasons.set(key, {
-      ...basketball,
+    nbaSeasons.set(key, defineSportData({
+      ...basketballRules,
       simulationVersion: 5,
       clock: { length: rules.minutes, msPerUnit: 79 },
       formatEvent: eventFormat(rules),
@@ -341,7 +344,7 @@ export function nbaBasketballIn(season) {
       simulate(rng, attacker, defender, drama, effA, effD, venue) {
         return playMatch(rng, prepareMatch(attacker, defender, effA, effD, venue, rules), attacker, defender, drama);
       },
-    });
+    }, { id: 'basketball' }));
   }
   return nbaSeasons.get(key);
 }

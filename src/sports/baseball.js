@@ -1,6 +1,5 @@
 import { C } from '../theme.js';
-import { ROSTERS } from '../data/rosters.baseball.js';
-import { CLUBS } from '../data/clubs.baseball.js';
+import { defineSportData } from './sportData.js';
 import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 
@@ -203,13 +202,14 @@ function rbiChunks(rng, runs) {
   return chunks;
 }
 
-export const baseball = {
+export const baseball = defineSportData({
   id: 'baseball',
   simulationVersion: 2,
   name: 'Baseball',
   blurb: 'Nine innings, nine in the order and a pitching staff. The home side bats last — level games go to extra innings.',
-  rosters: ROSTERS,
-  clubs: CLUBS,
+  // Read from the sport's players (sportData.js), once they have loaded.
+  rosters: undefined,
+  clubs: undefined,
   // The World Baseball Classic fields Great Britain and the Kingdom of the Netherlands: the home nations' shapes start
   // in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
@@ -287,7 +287,7 @@ export const baseball = {
     ev.sort((x, y) => x.m - y.m);
     return { ga, gd, regA, regD, ev, tie, winner };
   },
-};
+});
 
 /**
  * Squad-screen strength profile: the batting, pitching and fielding the match model weighs → { batting, pitching,

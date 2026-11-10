@@ -112,6 +112,15 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   return { found: given.size > 0, setup, ignored };
 }
 
+/**
+ * The sport a challenge link in `search` plays, else a new setup's (DEFAULT_SETUP). Reading the rest of the link
+ * (`readChallenge`) reads that sport's theatres, so its players load first (src/sports/sportData.js).
+ */
+export function challengeSport(search = '') {
+  const value = new URLSearchParams(String(search ?? '')).get('sport')?.trim();
+  return SPORT_LIST.some(sport => sport.id === value) ? value : DEFAULT_SETUP.sport;
+}
+
 /** The setup's managed team if it plays in the theatre (`teams`: App's `setupTeams()`), else none (''). */
 export function fieldedTeam(setup, teams) {
   const id = setup?.managedTeamId ? String(setup.managedTeamId) : '';
