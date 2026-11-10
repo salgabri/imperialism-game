@@ -24,4 +24,6 @@ public/football/cm0102-*
 # The two fan-made retro databases the user chose to ship (1993/94 by Cam F, 1989/90 by Simon Treanor).
 !public/football/cm0102-2020-11-cm93.json
 !public/football/cm0102-2017-04-cm89.json
+# Alex Sawczuk's fan-made October 2003 update (2003/04), which the user chose to ship on 2026-11-10.
+!public/football/cm0102-2003-10.json
 public/football/index.json

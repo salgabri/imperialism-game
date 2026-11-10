@@ -1,7 +1,45 @@
 {
-  "about": "The built-in football seasons before FIFA 05 (docs/design/football-years.md, 'Seasons before FIFA 05'), built by npm run build:retro-seasons (scripts/build-retro-seasons.mjs) into public/football/<id>.json. Every source is pinned by SHA-256 and read from the gitignored data-src/<folder>/; download names where it came from, and a cd block the CD image npm run sync:retro-cds reads it from (scripts/sync-retro-cds.mjs). The data's rights stay with its makers (Sports Interactive and Eidos, Sensible Software and Codemasters, and two fan databases' makers, Cam F and Simon Treanor), and every season is credited to them. The user chose to ship 2002/03, 2001/02, 1998/99, 1997/98 and 1996/97 (2026-11-08) and the two fan databases (2026-11-09); Claude added 2000/01, 1999/00, 1995/96 and 1994/95 on 2026-11-09 under the user's request to cover every missing season, not yet confirmed by the user, and shipping CM 00/01's and CM 99/00's data, from games never made free, is open for the user. A season's own `retrieved` overrides the manifest's where its sources were read another day.",
+  "about": "The built-in football seasons before FIFA 05 (docs/design/football-years.md, 'Seasons before FIFA 05'), built by npm run build:retro-seasons (scripts/build-retro-seasons.mjs) into public/football/<id>.json. Every source is pinned by SHA-256 and read from the gitignored data-src/<folder>/; download names where it came from, and a cd block the CD image npm run sync:retro-cds reads it from (scripts/sync-retro-cds.mjs). The data's rights stay with its makers (Sports Interactive and Eidos, Sensible Software and Codemasters, and three fans: Cam F, Simon Treanor and Alex Sawczuk), and every season is credited to them. The user chose to ship 2002/03, 2001/02, 1998/99, 1997/98 and 1996/97 (2026-11-08) and the two fan databases (2026-11-09), and Sawczuk's 2003/04 update on 2026-11-10; Claude added 2000/01, 1999/00, 1995/96 and 1994/95 on 2026-11-09 under the user's request to cover every missing season, and the user approved shipping them on 2026-11-10 after being told CM 00/01's and CM 99/00's data come from games never made free. A season's own `retrieved` overrides the manifest's where its sources were read another day.",
   "retrieved": "2026-11-08",
   "seasons": [
+    {
+      "id": "cm0102-2003-10",
+      "kind": "cm0102",
+      "reader": "tables",
+      "season": "2003/04",
+      "listing": "Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 database, fan-made (the Official Championship Manager Magazine's issue 5 cover CD, archive.org cmmag-05)",
+      "maker": "Sawczuk",
+      "compiler": "Alex Sawczuk's 'Sawczuk Update' (7th version, transfers to 26 October 2003, with German, Croatian, US and other data he credits to contributors), as the Official Championship Manager Magazine's issue 5 cover CD (Future Publishing, November 2003) carries it: its Data tables read by HTTP range from archive.org cmmag-05 (CMMag05.iso); club.dat and staff.dat are the files src/data/cm0102Releases.js pins for it",
+      "provenance": "A fan's update of SI's CM 01/02 3.9.68 database (November 2002). For players kept under the same staff id and name, 98.6% of current abilities are still SI's 3.9.68 values (103,459 rated in both), so most ratings are a season old; the rest were changed by hand, above all in the Premier League, where 57% of players were re-rated, 8.2 points higher on average on the 1-200 scale, against 10-14% and +1.6 to +1.9 in Serie A, La Liga and the Bundesliga and 0.9% outside the seven leagues. English clubs so take 15 places of the Elite 32, where 3.9.68 gives them 7. 375 rated players are new. The squads are of October 2003: Beckham at Real Madrid, Ronaldinho at Barcelona, Cristiano Ronaldo at Manchester United, Duff, Crespo, Makelele and Verón at Chelsea. Its Eredivisie lists Excelsior (eight rated players) instead of FC Volendam, so it fields 17 clubs; its La Liga lists Real Oviedo, relegated in 2001, and puts Málaga in the second division; its Ligue 1 keeps CM 01/02's 18 clubs, so Ajaccio and Montpellier, in 2003/04's 20-club Ligue 1, play in its second division. Players who retired before the season keep their records with a current ability of 1 (Schmeichel, Bierhoff, Blanc); none of them is among the players written.",
+      "rights": "A fan's update of SI's CM 01/02 3.9.68 data: SI's and Eidos's rights in the data it starts from, and the author's in his edits; it names no licence, and the official magazine distributed it on its cover disc. The archive.org item is a user's upload of that disc. The user chose to ship it on 2026-11-10 (docs/design/football-year-permissions.md). Only the eleven tables below are read from it.",
+      "retrieved": "2026-11-09",
+      "cd": {
+        "item": "cmmag-05",
+        "image": "CMMag05.iso",
+        "imageBytes": 707598336,
+        "imageMd5": "17145be8e9298b98b1abb146e1cff256",
+        "imageSha1": "16b58556e29b96ab888dd558680b8e0f18107d7c",
+        "sector": 2048,
+        "dataOffset": 0,
+        "volume": "XPUNLOCKED",
+        "created": "1970010100000000",
+        "joliet": true,
+        "folder": "Software/CM4 Extras/Sawczuk Update 01-02/Data/Sawczuk Update"
+      },
+      "files": [
+        {"folder": "cm0102-2003-10-sawczuk", "name": "club.dat", "bytes": 7678496, "sha256": "44d237b423f1c63ea8a3d63e53ff24b0c865c3ff1fa9cf17f8a7af247adfaa5f"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "club_comp.dat", "bytes": 46331, "sha256": "7a3419cd8a68ccf900ce712cfede73bcafce0d201429d073d2402d79d83cd01d"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "common_names.dat", "bytes": 796560, "sha256": "6776535c976756a54b5ba56a77074af02d90bab359d74d040368666e8a880831"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "continent.dat", "bytes": 1188, "sha256": "3f77bd10c3df91d0233306e3102bfa6e94d21a9b544dd8b3dd28b7b98e7524ce"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "first_names.dat", "bytes": 2684940, "sha256": "343e087ea4adfde80e6a5124b9b0553e1ab24a837f9fd3231152c57aab22899b"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "index.dat", "bytes": 1482, "sha256": "019695ed1e1e1f05517304831788433f501d24d54b9a65295d7127c7077b4512"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "nat_club.dat", "bytes": 247506, "sha256": "40f5891ba4e4d22c05e13227732c6aa00a65e3475ca187c24751ad7fa327f010"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "nation.dat", "bytes": 61770, "sha256": "00d4aefc04c1b099023f44efa2d3b7a9093e37d8b068d51d40e356d18fa98fca"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "nation_comp.dat", "bytes": 2033, "sha256": "67708b187e42fd52e498a66df374c6834528e0078c29bcf510ff0559145a239f"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "second_names.dat", "bytes": 6317220, "sha256": "72093bff3ada44ebbd0cc700e5809a1de10050c05b6ab9b2d6602f36cb82ebeb"},
+        {"folder": "cm0102-2003-10-sawczuk", "name": "staff.dat", "bytes": 39458260, "sha256": "b705168377f9e9ae0014b7976093fc358b1d83da639bd5130f88644730154216"}
+      ]
+    },
     {
       "id": "cm0102-2002-11",
       "kind": "cm0102",

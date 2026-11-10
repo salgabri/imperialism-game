@@ -136,9 +136,10 @@ async function pickSeason(document, id) {
 /** The built-in earlier seasons' names: "2025/26" … "1961/62", without their source. */
 const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
 /** The Season dropdown's names for them: a season with two sets (1993/94 and 1989/90: a fan's database and a computed
- * World Cup) names each one's source, and a computed World Cup of a season of its own says so ("1969/70 · computed"). */
+ * World Cup) names each one's source, and a computed or fan-made season of its own says so ("1969/70 · computed",
+ * "2003/04 · fan-made"). */
 const EARLIER_NAMES = BUILT_IN_SEASONS.map(set => (BUILT_IN_SEASONS.filter(other => other.season === set.season).length > 1
-  ? `${set.season} · ${set.label}` : set.id.startsWith('wc-') ? `${set.season} · computed` : set.season));
+  ? `${set.season} · ${set.label}` : seasonTagOf(set.label) ? `${set.season} · ${seasonTagOf(set.label)}` : set.season));
 
 // ---------- setup ----------
 
@@ -312,11 +313,11 @@ test('the Season choice names a season by its years, and says on screen when its
   assert.deepEqual(options.map(option => option.label), ['2026/27 · built in', ...sets.map(set => `${set.season} · ${set.label}`)]);
 
   // Every sport's built-in seasons: exactly the ones no game rated say so, as their labels do (the computed World Cups;
-  // the NBA's, NFL's, AFL's, MLB's, NHL's and NRL's computed seasons; NHL 08 and NHL 09, converted; the two fans'
+  // the NBA's, NFL's, AFL's, MLB's, NHL's and NRL's computed seasons; NHL 08 and NHL 09, converted; the three fans'
   // databases). Tecmo's and Rugby League 2's overalls are ours and tennis's Elo before 2016 computed, but their labels
   // do not say so, so they are named by their years.
   const NHL_EDITIONS = ['nhl-2022', 'nhl-2007', 'nhl-1995', 'nhl-1994', 'nhl-1993'], NHL_CONVERTED = ['nhl-2008', 'nhl-2009'];
-  const FAN_MADE = ['cm0102-2020-11-cm93', 'cm0102-2017-04-cm89'];
+  const FAN_MADE = ['cm0102-2003-10', 'cm0102-2020-11-cm93', 'cm0102-2017-04-cm89'];
   const tagOf = id => (FAN_MADE.includes(id) ? 'fan-made' : NHL_CONVERTED.includes(id) ? 'converted'
     : /^(?:wc|nba-stats|pfa|mlb-war)-/.test(id) || (/^nrl-/.test(id) && id !== 'nrl-2008') || (/^nhl-/.test(id) && !NHL_EDITIONS.includes(id))
       ? 'computed' : null);
@@ -625,7 +626,7 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     const setup = () => app.state.setup;
     const modelOf = () => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), season: app.seasonStatus() });
     await app.requestSeasons();
-    assert.deepEqual(EARLIER.filter(season => season >= '1989/90').slice(-16), ['2006/07', '2005/06', '2004/05', '2002/03', '2001/02',
+    assert.deepEqual(EARLIER.filter(season => season >= '1989/90').slice(-17), ['2006/07', '2005/06', '2004/05', '2003/04', '2002/03', '2001/02',
       '2000/01', '1999/00', '1998/99', '1997/98', '1996/97', '1995/96', '1994/95', '1993/94', '1993/94', '1989/90', '1989/90'],
       'the earliest seasons, two of 1993/94 and of 1989/90 (a fan\'s database and a computed World Cup)');
     assert.deepEqual(EARLIER.filter(season => season < '1989/90'), ['1985/86', '1981/82', '1977/78', '1973/74', '1969/70', '1965/66', '1961/62'],

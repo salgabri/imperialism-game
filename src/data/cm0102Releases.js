@@ -42,7 +42,7 @@ export const CM0102_RELEASES = [
     signatures: [
       { club: 7677334, staff: 38469344, clubSha256: '32da1bc33450a1c73d9e3f4ffcd11fde2866ba7ff0f228f4effb2052856ecd87', staffSha256: '297d674bdb512546f2c12c174600ea2ba91768dfe4f97bcb6767e39eb99db8b4' },
     ] },
-  { id: 'cm0102-2003-10', label: 'October 2003', provider: 'Sawczuk', season: '2003/04', year: 2004, released: '2003-10',
+  { id: 'cm0102-2003-10', label: 'October 2003 by Alex Sawczuk, fan-made', provider: 'Sawczuk', season: '2003/04', year: 2004, released: '2003-10',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=266', shifts: { birth: 0, joined: 0, contract: 2 },
     signatures: [
       { club: 7678496, staff: 39458260, clubSha256: '44d237b423f1c63ea8a3d63e53ff24b0c865c3ff1fa9cf17f8a7af247adfaa5f', staffSha256: 'b705168377f9e9ae0014b7976093fc358b1d83da639bd5130f88644730154216' },

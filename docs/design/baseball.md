@@ -556,13 +556,13 @@ clubs campaign on `mlb1961` and resuming it. `scripts/club-maps.test.mjs` holds 
 maps to the state rule, as every other.
 
 **Decisions** (2026-11-09). The user's: seasons back to 1960 and no further. Claude's, as
-coordinator, under the user's request to cover every missing season and not yet confirmed
-by the user: JEFFBAGWELL WAR with the Lahman database for names and birthplaces, by this
+coordinator, under the user's request to cover every missing season, approved by the user with
+the release of 2026-11-10: JEFFBAGWELL WAR with the Lahman database for names and birthplaces, by this
 rule and mapping (a Lahman-only metric, nearly as good overall but 5–12 points lower for
 glove-first players, stays a documented fallback, not built); a ballpark renamed in place
 keeps its map, 2017 gets its own; shared ballparks' tenants grow from their own previous
 home; the full per-player snapshot is committed. The WAR averages Baseball-Reference's and
-FanGraphs', whose terms could not be read, so using it is open for the user. The builder's
+FanGraphs', whose terms could not be read, a caveat the user accepted with the release of 2026-11-10. The builder's
 own (2026-11-09): "Los Angeles (Dodgers)" and "Los Angeles (Angels)" for 1961–65 and
 "Manhattan" for the Polo Grounds Mets; the Senators' ids by founding year
 (`mlb-washington-senators-1901`, `-1961`); a club short of thirteen pitchers keeps the ones

@@ -362,8 +362,8 @@ Thirteen seasons, `tennis-1960` to `tennis-1972`: 1960–1967 the amateurs alone
 "Amateur Elo, end of 1962 (rough)", 1968–1972 the open era, "Elo from match results, end of
 1970 (rough)". Their source says `computed`, `rough`, `amateurs` before 1968, and the method
 "Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup
-results of 1877-1967". Claude's choices (2026-11-09), under that request and not yet confirmed
-by the user: back to 1960, the floor the user set for the NBA's, MLB's, NFL's and NHL's
+results of 1877-1967". Claude's choices (2026-11-09), under that request, approved by the user with
+the release of 2026-11-10: back to 1960, the floor the user set for the NBA's, MLB's, NFL's and NHL's
 computed seasons (the file would allow 1950); a run of their own, so that 1973–2025 stay byte
 for byte as shipped; every rated man in 1968–1972, contract professionals too, as from 1973;
 three counted matches a season before 1968; Wikipedia's published top tens pinned as validation

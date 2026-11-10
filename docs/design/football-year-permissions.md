@@ -33,8 +33,19 @@ SI's own Championship Manager 00/01 (original release 3.81, the UK release-day d
 European pressing) and CM 99/00 (original release 3.70), read data-only from users' uploads of the retail CDs to
 archive.org, with the archive.org item as each season's source link
 ([football-years.md](football-years.md#sis-cm-0001-and-cm-9900-read-from-their-cds-200001-and-199900)). Neither CM
-game was ever made free, and no one has licensed their data. The user has not confirmed these four, so whether they
-ship, the two CM seasons above all, is open for the user.
+game was ever made free, and no one has licensed their data. The user approved shipping these four on 2026-11-10
+("Ship without 2003/04"), after being told the two CM seasons come from games never made free.
+
+**Shipped by the user's choice of 2026-11-10** ("Yes, ship 2003/04", after the
+release of the other seasons without it that day): 2003/04 is built from Alex Sawczuk's fan-made
+October 2003 update of SI's CM 01/02 3.9.68 database, as the Official
+Championship Manager Magazine's issue 5 cover CD (November 2003) carried it,
+credited to Sawczuk
+([football-years.md](football-years.md#sawczuks-october-2003-update-200304)).
+It names no licence, and about 1.4% of its ratings (57% of the Premier League's
+players) were changed by hand. The user chose it as published over the
+alternatives: SI's 3.9.68 ratings restored to its squads, SI's own CM 03/04
+database (undocumented format) or leaving 2003/04 empty.
 
 ## 1. To the CM 01/02 Update Team
 

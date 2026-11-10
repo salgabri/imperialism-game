@@ -15,7 +15,8 @@ retail CDs, SWOS 94/95 and 95/96 with their clubs, read from the game's own team
 files, and the two fan-made CM databases of 1993/94 and 1989/90, 2026-11-09; the basketball
 seasons no game rated, 1960/61 to 1997/98, computed from Basketball-Reference's
 statistics, 2026-11-09; the nine World Cups from 1961/62 to 1993/94 as computed
-seasons, 2026-11-10 ([Computed World Cup seasons](#computed-world-cup-seasons)). The CM 01/02
+seasons, 2026-11-10 ([Computed World Cup seasons](#computed-world-cup-seasons)); 2003/04 from Alex Sawczuk's fan-made
+October 2003 update of SI's CM 01/02, built 2026-11-09 and shipped by the user's choice of 2026-11-10. The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -30,16 +31,17 @@ kinds:
 - **The built-in earlier seasons** (2004/05 to 2025/26): one EA FIFA / FC
   roster each, committed under `public/football/ea-*.json` and offered in every
   setup. See [Built-in earlier seasons](#built-in-earlier-seasons). Before them,
-  eleven more from 2002/03 back to 1989/90: SI's own CM 01/02, CM 00/01 and CM
-  99/00 databases, its CM3 and CM 97/98 data, three editions of Sensible World of
-  Soccer, and two fan-made CM databases. See [Seasons before FIFA 05](#seasons-before-fifa-05).
-  Before those, the World Cups of 1962 to 1994, nations only, their ratings computed
-  from the nations' Elo and the players' records. See [Computed World Cup seasons](#computed-world-cup-seasons).
+  twelve more from 2003/04 back to 1989/90: Alex Sawczuk's fan update of SI's CM
+  01/02, SI's own CM 01/02, CM 00/01 and CM 99/00 databases, its CM3 and CM 97/98
+  data, three editions of Sensible World of Soccer, and two fan-made CM databases.
+  See [Seasons before FIFA 05](#seasons-before-fifa-05). Before those, the World Cups of
+  1962 to 1994, nations only, their ratings computed from the nations' Elo and the
+  players' records. See [Computed World Cup seasons](#computed-world-cup-seasons).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
   downloaded, built on their computer. Until the database authors allow
   redistribution these stay local: the user puts the database in the ignored
   `data-src/cm0102/`, and the command-line builder writes the data set to
-  `public/football/cm0102-*.json`, which git ignores (all but the five built-in
+  `public/football/cm0102-*.json`, which git ignores (all but the six built-in
   ones, which the builder neither writes nor lists). When permission arrives,
   those files can be committed by removing one `.gitignore` line, and its scope
   should be recorded in the permissions note first.
@@ -424,7 +426,7 @@ names the provider and reads "Game rating converted from CM current ability".
 ## Built-in earlier seasons
 
 Twenty-two seasons ship with the game, every season from 2004/05 to 2025/26
-(and eleven before them, [below](#seasons-before-fifa-05)).
+(and twelve before them, [below](#seasons-before-fifa-05)).
 [EA FC 25](#ea-fc-25) and [FIFA 07 to FIFA 14](#fifa-07-to-fifa-14) are described
 below, and so are [FIFA 05 and FIFA 06](#fifa-05-and-fifa-06),
 which have nations only. Ten, 2014/15 to 2023/24, are the launch roster
@@ -683,20 +685,21 @@ at least one player. FIFA 06 takes 8,131 nationalities from later editions and
 
 ## Seasons before FIFA 05
 
-Eleven more seasons ship with the game, from 2002/03 back to 1989/90, one source
+Twelve more seasons ship with the game, from 2003/04 back to 1989/90, one source
 each. `npm run build:retro-seasons` (`scripts/build-retro-seasons.mjs`, manifest
 `scripts/data/retro-seasons.json`, audit `docs/design/football-retro-seasons-audit.json`)
 reads every source from the gitignored `data-src/`, pinned by SHA-256 and by the
 commit it was downloaded from (SWOS's files, from a server without commits, by
-SHA-256 alone; the two read from CDs, by the CD image they were read from), and
-`--check` rebuilds the eleven files, the listing
+SHA-256 alone; the three read from CDs, by the CD image they were read from), and
+`--check` rebuilds the twelve files, the listing
 `src/data/footballSeasons.js` (which `npm run build:ea-seasons` writes alike) and
 the audit byte for byte. None of these sources grants redistribution. The user
 chose to ship 2002/03, 2001/02, 1998/99, 1997/98 and 1996/97 on 2026-11-08, and
-the two fan-made databases on 2026-11-09; Claude added 2000/01, 1999/00, 1995/96
+the two fan-made databases on 2026-11-09, and Alex Sawczuk's 2003/04 update on
+2026-11-10 ("Yes, ship 2003/04"); Claude added 2000/01, 1999/00, 1995/96
 and 1994/95 on 2026-11-09, under the user's request to cover every missing
-season, and the user has not confirmed them: shipping CM 00/01's and CM 99/00's
-data, from games never made free, is open for the user. All eleven are credited
+season, and the user approved shipping them on 2026-11-10 ("Ship without 2003/04"),
+after being told CM 00/01's and CM 99/00's data come from games never made free. All twelve are credited
 to their makers: each season's source block names
 its maker (`provider`), who compiled or ported it (`compiler`), where it comes from
 (`url`) and when it was read (`retrieved`; a season read later than the others
@@ -706,6 +709,7 @@ team files; CM: a zip, or a CD's tables).
 
 | Season | Id | Source | Nations with players (full XIs) | Clubs |
 | --- | --- | --- | --- | --- |
+| 2003/04 | `cm0102-2003-10` | Alex Sawczuk's October 2003 update of SI's CM 01/02, from a magazine cover CD (fan-made) | 162 (109) | 129 |
 | 2002/03 | `cm0102-2002-11` | SI's CM 01/02 3.9.68 | 162 (108) | 129 |
 | 2001/02 | `cm0102-2001-09` | SI's CM 01/02 3.9.60 | 143 (96) | 130 |
 | 2000/01 | `cm-0001` | SI's CM 00/01 3.81, from its UK retail CD | 134 (82) | 130 |
@@ -718,8 +722,8 @@ team files; CM: a zip, or a CD's tables).
 | 1993/94 | `cm0102-2020-11-cm93` | Cam F's fan-made 93/94 for CM 01/02 | 124 (77) | 130 |
 | 1989/90 | `cm0102-2017-04-cm89` | Simon Treanor's fan-made 89/90 for CM 01/02 | 137 (88) | nations only |
 
-The nine seasons with clubs play on their own Europe maps (`eu124s2003`,
-`eu32s2003` … `eu124s1994`, `eu32s1994`), built by `npm run build:europe-maps`
+The ten seasons with clubs play on their own Europe maps (`eu124s2004`,
+`eu32s2004` … `eu124s1994`, `eu32s1994`), built by `npm run build:europe-maps`
 like the EA seasons'. Of 1995/96's, 1994/95's and 1993/94's (built 2026-11-09),
 21 club names needed a ground row: 11 take a country map's row (Albacete, Foggia,
 Padova, Reggiana, Dynamo Dresden under two names, Uerdingen under two, Tirsense,
@@ -730,17 +734,21 @@ Wikidata coordinates (P625): Martigues (Stade Francis-Turcan, Q118955), Gueugnon
 (Stade Jean-Laville, Q1569474), Wattenscheid (Lohrheidestadion, Q880075), and
 Logroñés at Las Gaunas (Q1369314, the stadium of 2002, built beside the old one)
 under both its names. The
-earlier seasons' clubs' grounds are 114 new rows of
+earlier seasons' clubs' grounds are 119 new rows of
 `scripts/data/europe-clubs.json`: a club the table already placed under another
 name takes that row (`Real Madrid C.F.`, `F.C. Barcelona`; for 2000/01 and
 1999/00 `C.D. Numancia`, `As.Troyes Aube Champagne`, `Sporting Clube Farense`
-and `Futebol Clube Paços de Ferreira`), 17 take a country map's row (2000/01 and
-1999/00 add Bradford City at Valley Parade, SpVgg Unterhaching and SSV Ulm 1846),
-and 11 are placed by hand from their grounds' Wikidata or Wikipedia
+and `Futebol Clube Paços de Ferreira`, for 2003/04 `Clube Desportivo Nacional`),
+19 take a country map's row (2000/01 and 1999/00 add Bradford City at Valley
+Parade, SpVgg Unterhaching and SSV Ulm 1846, 2003/04 Ancona and Albacete), and 13
+are placed by hand from their grounds' Wikidata or Wikipedia
 coordinates (Varzim, Salgueiros, Leça, Mérida, Extremadura, Compostela,
 Salamanca, RBC Roosendaal, and Wimbledon at Selhurst Park, which it shared with
-Crystal Palace from 1991 to 2003). `--boundaries=<dir>` reads another worktree's
-boundary cache.
+Crystal Palace from 1991 to 2003; for 2003/04 Real Murcia at La Condomina and Le
+Mans at the Stade Léon-Bollée, the grounds of the day, where the country maps
+have the later Nueva Condomina and MMArena: English Wikipedia's coordinates,
+revisions 1372149629 and 1381750282). `--boundaries=<dir>` reads another
+worktree's boundary cache.
 
 ### SI's CM 01/02 databases: 2002/03 and 2001/02
 
@@ -773,8 +781,8 @@ boundary cache.
   made free, unlike CM 01/02. On 2026-11-09 Claude decided to ship both, under
   the user's request to cover every missing season, credited to SI with the
   archive.org item as the source link, as for the CM3 port and CM 97/98. The user
-  has not confirmed it: whether data from these never-free CDs ships is open for
-  the user.
+  approved shipping them with the release of 2026-11-10, after being told the CDs' games were never
+  made free.
 - **The same tables**: both CDs' untouched Data files are CM 01/02's tables, with
   SI's format-1 staff (157-byte people) as in 3.9.60 and 3.9.68, so the CM 01/02
   reader and builder read them unchanged, as known releases of
@@ -845,6 +853,64 @@ boundary cache.
   archive.org items are users' uploads of the retail CDs (the 99/00 item's Public
   Domain Mark and the 00/01 item's "open source software" collection do not apply
   to the games), and the data's rights are reserved.
+
+### Sawczuk's October 2003 update: 2003/04
+
+Built 2026-11-09 in a commit of its own. It is fan-made, and the user chose to
+ship it on 2026-11-10 ("Yes, ship 2003/04"), after the other seasons had shipped
+without it ([football-year-permissions.md](football-year-permissions.md)).
+
+- **Source**: Alex Sawczuk's "Sawczuk Update" for CM 01/02, its 7th version
+  (transfers to 26 October 2003, with German, Croatian, US and other data he
+  credits to contributors), as the Official Championship Manager Magazine's
+  issue 5 cover CD (Future Publishing, November 2003) carries it:
+  `Software/CM4 Extras/Sawczuk Update 01-02/Data/Sawczuk Update/` on
+  [cmmag-05](https://archive.org/details/cmmag-05) (`CMMag05.iso`, 707,598,336
+  bytes, a user's upload of the disc). The update itself names no licence; the
+  official magazine distributed it.
+- **Read from the CD** by the same `npm run sync:retro-cds`, here from a folder
+  of the CD by its Joliet long names rather than from a cabinet: 22 range
+  requests, the eleven tables' 54.7 MB. Its `club.dat` and `staff.dat` are byte
+  for byte the files `cm0102Releases.js` already pins for `cm0102-2003-10`
+  (October 2003, provider Sawczuk, from the CM 01/02 community's signature
+  list), so it is built as that known release: `CM 01/02 · October 2003`, the
+  source link its forum topic, its compiler naming the archive.org item. Dates
+  of birth are real (9 of 9 famous players agree).
+- **Ratings**: a season-old SI database, partly re-rated by hand. For players kept
+  under the same staff id and name, 98.6% of current abilities are still SI's
+  3.9.68 values (103,459 rated in both; 3.9.68 is of November 2002). The rest were
+  changed by hand, above all in the Premier League: 57% of its players re-rated,
+  8.2 points higher on average on the 1–200 scale (74% of those rated 130 or more,
+  +9.0), against 10–14% and +1.6 to +1.9 in Serie A, La Liga and the Bundesliga,
+  2.1–3.3% in the other three leagues and 0.9% outside the seven. Duff goes from 129
+  to 179, Friedel from 130 to 185. So English clubs take 15 places of the Elite
+  32, where 3.9.68 gives them 7 (Blackburn 70 → 81, Manchester City 70 → 80,
+  Birmingham 64 → 77). 375 rated players are new. The conversion is CM 01/02's;
+  nothing corrects the lift.
+- **Squads** are of October 2003: Beckham at Real Madrid, Ronaldinho at
+  Barcelona, Cristiano Ronaldo at Manchester United, Duff, Crespo, Makelele and
+  Verón at Chelsea. The strongest clubs are Milan and Real Madrid (89), Arsenal
+  and Internazionale (88), Juventus and Manchester United (87); the strongest
+  nations France and Italy (90), England and Brazil (88).
+- **Its own quirks**: its Eredivisie lists Excelsior, with eight rated players,
+  instead of FC Volendam, so it fields 17 clubs. Its La Liga lists Real Oviedo,
+  relegated in 2001, and puts Málaga in the second division. Its Ligue 1 keeps
+  CM 01/02's 18 clubs, so Ajaccio and Montpellier, two of 2003/04's twenty, play
+  in its second division. The clubs are read as stored, as in every CM season.
+  Players who retired before the season keep their records with a current
+  ability of 1 (Schmeichel, Bierhoff, Blanc); none of them is among the players
+  written. Its `club.dat` has one record's bytes after its indexed records, which
+  the reader leaves unread.
+- **Coverage**: 109 of 176 full XIs, 162 nations with players, 129 clubs, 2,614
+  players; Tonga, Samoa and the Cook Islands are listed, and the Cook Islands
+  field a team, as in 3.9.68. **Territory**: New Caledonia, a FIFA member from
+  2004, is no longer France's, but with four rated players it fields no team, so
+  its land stays neutral.
+- **The alternatives** are not built: SI's own CM 03/04 database (archive.org
+  `cm-0304`) is in CM 4's undocumented format inside an LZX cabinet, and EA's
+  FIFA Football 2004 database (`FIFA.DB`) is undecoded; either would need reverse
+  engineering. Restoring SI's 3.9.68 ratings to Sawczuk's squads was another
+  option the user may choose instead.
 
 ### SI's CM3 data, ported: 1998/99
 
@@ -982,7 +1048,7 @@ boundary cache.
 ### Sensible World of Soccer 94/95 and 95/96: nations and clubs
 
 Decided 2026-11-09 by Claude, under the user's request to cover every missing
-season, and not yet confirmed by the user: both seasons ship, with their nations
+season, and approved by the user with the release of 2026-11-10: both seasons ship, with their nations
 and their clubs on four Europe maps; 1995/96 is SWOS 95/96's launch edition, not
 its European Championship Edition; SWOS 96/97 stays as it is, nations only.
 
@@ -1160,6 +1226,7 @@ harness's real range of 2.50–3.28 goals a game and 20.3–29.5% draws):
 
 | Season | Goals a game | Draws | Goalless |
 | --- | --- | --- | --- |
+| 2003/04 (October 2003) | 3.46 | 18.7% | 5.6% |
 | 2002/03 (3.9.68) | 3.40 | 19.5% | 5.6% |
 | 2001/02 (3.9.60) | 3.41 | 19.8% | 5.7% |
 | 2000/01 (CM 00/01) | 3.52 | 19.2% | 5.2% |
@@ -1171,14 +1238,14 @@ harness's real range of 2.50–3.28 goals a game and 20.3–29.5% draws):
 | 1993/94 (Cam F's, fan-made) | 3.55 | 18.9% | 5.3% |
 | 2006/07, 2011/12, 2017/18, 2023/24 (EA) | 2.82–3.13 | 22.8–24.6% | 6.6–8.6% |
 
-(2000/01 and 1999/00 measured 2026-11-09 the same way, 45,800 games each; the
-same run gives 3.9.60 3.41 goals, 19.7% draws and 5.7% goalless.)
+(2003/04, 2000/01 and 1999/00 measured 2026-11-09 the same way, 44,800 to 45,800
+games each; the same run gives 3.9.60 3.41 goals, 19.7% draws and 5.7% goalless.)
 
 1997/98 plays like the other CM seasons, its higher scale notwithstanding. All
-six score more and draw less than EA's seasons and than real leagues, because
+seven score more and draw less than EA's seasons and than real leagues, because
 CM's current ability spreads a league's clubs wider: their strengths' standard
-deviation within a league is 5.4–5.9 rating points on average (6.2 in 1999/00),
-against 3.4–3.8 in EA's seasons. That is the CM conversion's, as in any local
+deviation within a league is 5.4–5.9 rating points on average (6.2 in 1999/00,
+6.4 in 2003/04), against 3.4–3.8 in EA's seasons. That is the CM conversion's, as in any local
 CM 01/02 set, and nothing corrects it. SWOS 96/97's 133 nations, all against all, score 4.15 a game with
 11.9% draws, as CM 01/02's 107 to 119 nations do (4.17–4.23, 12.3–12.7%): the
 world's minnows meet its giants.
@@ -1541,7 +1608,7 @@ computed from Basketball-Reference's player seasons, `nba-stats-<season end
 year>`, labelled 'Basketball-Reference (computed)'. 1983/84, 1991/92 and 1998/99
 keep their games' ratings (Claude's decision). No BAA, no ABA, no 1959/60.
 Claude's decisions here and below were taken that day under the user's request
-to cover every missing season, and the user has not confirmed them.
+to cover every missing season; the user approved them with the release of 2026-11-10.
 
 - **Source.** Sumitro Datta's 'NBA Stats (1947-present)' on Kaggle, version 57
   (updated 1 November 2026): a CC0 copy of Basketball-Reference's regular
@@ -1558,8 +1625,8 @@ to cover every missing season, and the user has not confirmed them.
   its sites, building a competing database and AI training with its data, and
   say facts are not copyrightable; Claude chose on 2026-11-09 to use them,
   computed and labelled, with the CC0 copy and Basketball-Reference credited.
-  The CC0 label is the copy's compiler's, not Sports-Reference's, so whether
-  these seasons ship under Sports-Reference's terms is open for the user.
+  The CC0 label is the copy's compiler's, not Sports-Reference's; the user
+  accepted shipping these seasons under that caveat with the release of 2026-11-10.
   Each season's `source` is `{ provider: 'Basketball-Reference', edition:
   '1975/76 NBA regular season', compiler: 'Sumitro Datta, NBA Stats
   (1947-present), Kaggle, CC0, version 57', url, rawScale: 99, method:
@@ -1869,8 +1936,12 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   a Tongan, Samoan or Cook Islands player, so those three field no team). Seasons before
   2004/05 have no EA source here (the FIFA Index mirror starts with FIFA 05);
   2002/03 to 1994/95 come from SI's and Sensible Software's databases instead,
-  1993/94 and 1989/90 from fans', and 2003/04 from none the game ships (SI's CM
-  03/04 database is in a format no one has documented).
+  1993/94 and 1989/90 from fans', and 2003/04 from Alex Sawczuk's fan update of
+  SI's CM 01/02 (SI's CM 03/04 database is in a format no one has documented).
+- 2003/04's ratings are mostly SI's of November 2002, a season old, and its
+  Premier League was re-rated by hand about 8 points (of 200) higher, so English
+  clubs fill 15 of its Elite 32; its Eredivisie has 17 clubs, its La Liga Real
+  Oviedo instead of Málaga, and its Ligue 1 18 clubs rather than 20.
 - CM 00/01 and CM 99/00 are read from users' uploads of the retail CDs to
   archive.org, which can go dark; the pinned SHA-256 and MD5 digests let any copy
   of the same CD feed the build (`--image`). CM 00/01 is the UK release-day
@@ -1988,8 +2059,9 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   golden, save-size budgets and roster tests pass unchanged. (Moving the
   built-in season to 2026/27 regenerated those files, and the golden with them.)
 - No CM 01/02 data set file, database file or derived player list is committed,
-  but for the five built-in ones the user chose to ship (SI's 3.9.68 and 3.9.60,
-  the CM3 port, and Cam F's and Simon Treanor's fan-made databases), with CM
-  00/01's, CM 99/00's, CM 97/98's and the three SWOS editions': the seasons, not the database files. The EA seasons are committed on the same terms as the built-in EA FC 27
+  but for the six built-in ones the user chose to ship (SI's 3.9.68 and 3.9.60,
+  the CM3 port, Cam F's and Simon Treanor's fan-made databases, and Alex Sawczuk's
+  October 2003 update), with CM 00/01's, CM 99/00's, CM 97/98's and the three SWOS
+  editions': the seasons, not the database files. The EA seasons are committed on the same terms as the built-in EA FC 27
   data.
 - The domestic pack format is unchanged. A pack without `kind` is FM.

@@ -322,9 +322,10 @@ manager of the theatre's favourite, with decisions from the first match.
    country. Football also has a **Season** choice: the built-in 2026/27 (the
    current season), then the [earlier seasons](#football-seasons) 2025/26 back
    to 1989/90 (EA FIFA and FC ratings of each to 2004/05, then SI's
-   Championship Manager, Sensible World of Soccer for 1996/97 to 1994/95, and
-   fans' databases for 1993/94 and 1989/90; 2005/06, 2004/05, 1996/97 and 1989/90
-   have nations only), the World Cups of 1961/62 to 1993/94 (computed from each
+   Championship Manager, for 2003/04 as Alex Sawczuk's fan update of it,
+   Sensible World of Soccer for 1996/97 to 1994/95, and fans' databases for
+   1993/94 and 1989/90; 2005/06, 2004/05, 1996/97 and 1989/90 have nations
+   only), the World Cups of 1961/62 to 1993/94 (computed from each
    finalist's Elo and its players' records, nations only), and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
@@ -1444,10 +1445,10 @@ npm run build:nwsl-map -- --check          # offline rebuild must match the comm
 
 ## Football seasons
 
-Football can be played on forty-two earlier seasons as well as the built-in
+Football can be played on forty-three earlier seasons as well as the built-in
 2026/27: every season from 2004/05 to 2025/26, each from EA's FIFA or EA FC of
-that season (FIFA 05 to EA FC 26), eleven before them, from 2002/03 back to
-1989/90, from the games of their day and two fans' databases ([below](#before-200405)),
+that season (FIFA 05 to EA FC 26), twelve before them, from 2003/04 back to
+1989/90, from the games of their day and three fans' databases ([below](#before-200405)),
 and the nine World Cups from 1962 to 1994, computed
 ([below](#the-world-cups-1962-to-1994-computed)). They ship with
 the game: pick one under **Season** in setup. Each is a file in
@@ -1507,12 +1508,13 @@ the game: pick one under **Season** in setup. Each is a file in
 ### Before 2004/05
 
 EA has no source here before FIFA 05 (the FIFA Index mirror starts there), so
-eleven earlier seasons come from Sports Interactive's Championship Manager, from
-Sensible World of Soccer and from two fans' Championship Manager databases, one
-source each:
+twelve earlier seasons come from Sports Interactive's Championship Manager, a
+fan's update of it, Sensible World of Soccer and two fans' Championship Manager
+databases, one source each:
 
 | Season | Source | Nations with a full XI | Clubs |
 | --- | --- | --- | --- |
+| 2003/04 | Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 (fan-made) | 109 | 129 |
 | 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 129 |
 | 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 130 |
 | 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 130 |
@@ -1543,7 +1545,10 @@ as West Germany, and a German at an East German club plays for no nation.
   use, the data's rights reserved. 3.9.60 and 3.9.68 are SI's own files as
   nckstwrt's CM0102 Starter Kit ships them; CM 00/01 (3.81) and CM 99/00 (3.70),
   never made free, are SI's own files too, read from users' uploads of the retail
-  CDs to archive.org; CM3's data was ported to CM 01/02 by
+  CDs to archive.org; 2003/04 is Alex Sawczuk's fan-made October 2003 update of
+  3.9.68, its Premier League re-rated by hand, as the Official Championship
+  Manager Magazine's issue 5 cover CD carries it (archive.org), shipped only if
+  the user chooses; CM3's data was ported to CM 01/02 by
   Gio and released by Cam F on champman0102.co.uk; CM 97/98's database is as
   baskeyx extracted it. SWOS 96/97 is Sensible Software's (now Codemasters'),
   from Whiteulver's database and xflea's spreadsheet as keyser1884's SWOS-MCP
@@ -1556,11 +1561,9 @@ as West Germany, and a German at an East German club plays for no nation.
   `scripts/data/retro-seasons.json` pins every file by SHA-256. To rebuild:
 
   ```bash
-  npm run sync:retro-cds        # CM 00/01's and CM 99/00's tables, read by byte range from their CD images
-  npm run build:retro-seasons   # the eleven season files, the listing and the audit (--check compares byte for byte)
+  npm run sync:retro-cds        # the CD seasons' tables, read by byte range from their CD images
+  npm run build:retro-seasons   # the twelve season files, the listing and the audit (--check compares byte for byte)
   ```
-- **Missing:** 2003/04: SI's own CM 03/04 database is in a format no one has
-  documented, and that season's CM 01/02 database is a fan's update.
 
 Other Championship Manager 01/02 databases, the CM 01/02 Update Team's for
 2001/02 to 2025/26, can be built on your own computer: their authors have not

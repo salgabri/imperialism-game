@@ -48,6 +48,8 @@ export const EUROPE_MAPS = [
   {"id":"eu32s2008","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["ea-fifa-08"],"clubs":32,"sections":32,"countries":6,"version":"eu32s2008-26c23549"},
   {"id":"eu124s2007","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["ea-fifa-07"],"clubs":124,"sections":124,"countries":7,"version":"eu124s2007-8e21c6ac"},
   {"id":"eu32s2007","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["ea-fifa-07"],"clubs":32,"sections":32,"countries":6,"version":"eu32s2007-8a894ef9"},
+  {"id":"eu124s2004","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["cm0102-2003-10"],"clubs":124,"sections":124,"countries":7,"version":"eu124s2004-7cbd3178"},
+  {"id":"eu32s2004","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["cm0102-2003-10"],"clubs":32,"sections":32,"countries":5,"version":"eu32s2004-aa321e3a"},
   {"id":"eu124s2003","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["cm0102-2002-11"],"clubs":124,"sections":124,"countries":7,"version":"eu124s2003-a56fbfa1"},
   {"id":"eu32s2003","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["cm0102-2002-11"],"clubs":32,"sections":32,"countries":5,"version":"eu32s2003-f1a9eb17"},
   {"id":"eu124s2002","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["cm0102-2001-09"],"clubs":124,"sections":124,"countries":7,"version":"eu124s2002-e64c276b"},
