@@ -295,8 +295,8 @@ async function main() {
   if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
   const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
   const franchises = JSON.parse(await readFile(teamsFile, 'utf8')).teams;
-  // The Tecmo seasons' snapshots are npm run sync:tecmo's.
-  const madden = manifest.seasons.filter(year => manifest.sources[year]?.kind !== 'tecmo');
+  // The Tecmo seasons' snapshots are npm run sync:tecmo's and the computed seasons' (pfa) npm run sync:pfa's.
+  const madden = manifest.seasons.filter(year => !['tecmo', 'pfa'].includes(manifest.sources[year]?.kind));
   const years = only ? [Number(only)] : madden;
   if (years.some(year => !madden.includes(year))) throw new Error(`No Madden season ${only} in the manifest`);
   const differs = [];

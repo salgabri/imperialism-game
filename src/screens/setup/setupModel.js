@@ -364,7 +364,9 @@ export const SEASON_NOTES = Object.freeze({
     + 'They have NBA clubs only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
-    + 'overall ours. NFL clubs only: the franchises of that season, on the map of their day.',
+    + 'overall ours. 2000 back to 1996, 1991 and 1989 back to 1960 are computed from Pro Football Archives\' records of '
+    + 'each player\'s starts and season, and so are the AFL\'s 1960s, on maps of their own. Clubs only: the franchises of '
+    + 'that season, on the map of their day.',
   baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October; 2018–2020 as the fan site '
     + 'ShowZone keeps them). 1960–2017 are computed: each player\'s WAR (Baseball-Reference\'s and FanGraphs\', averaged) '
     + 'put on The Show\'s scale. Nations field the players born there, where they hold at least half the lineup; clubs play on '

@@ -84,9 +84,13 @@ for (const entry of CLUB_MAPS) {
     }
     for (const club of map.clubs) {
       const held = [...(regionsOf.get(club.homeSection) || [])].sort();
+      // A club holds one state, or the states its league joins.
       const allowed = JOINED[entry.league]?.[club.id];
-      if (allowed) assert.ok(held.every(region => allowed.includes(region)), `${club.name} holds ${held}`);
-      else assert.ok(held.length <= 1, `${club.name} holds ${held}`);
+      if (allowed && held.every(region => allowed.includes(region))) continue;
+      assert.ok(held.length <= 1, `${club.name} holds ${held}`);
+      // One of those clubs away from the joined states that season (the Giants at the Yale Bowl in 1973–74) holds the
+      // state its stadium stands in, alone.
+      if (allowed) assert.equal(sectionAt(club.homePoint), club.homeSection, `${club.name} holds ${held}, where it plays`);
     }
     // Empty land covers whatever no club holds: the states and provinces without a town in a section.
     const played = new Set([...regionsOf.values()].flatMap(regions => [...regions]));
