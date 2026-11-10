@@ -300,8 +300,11 @@ function fitBorder(pieces, line, log) {
 
 // Each era's team that has moved or been renamed since, by its 2K code, and the code of the franchise it is today: an
 // era map ranks its teams as their franchises rank today. The Kansas City Kings, San Diego Clippers and Washington
-// Bullets are the 1980s' (scripts/data/nba-seasons.json).
-const LINEAGE = { VAN: 'MEM', SEA: 'OKC', NJN: 'BKN', CHH: 'CHA', NOH: 'NOP', KCK: 'SAC', SDC: 'LAC', WSB: 'WAS' };
+// Bullets are the 1980s' (scripts/data/nba-seasons.json); the 1960s' and 1970s' teams have Basketball-Reference's
+// codes, from the Syracuse Nationals (the 76ers) and the Chicago Packers (the Wizards) to the New York Nets.
+const LINEAGE = { VAN: 'MEM', SEA: 'OKC', NJN: 'BKN', CHH: 'CHA', NOH: 'NOP', KCK: 'SAC', SDC: 'LAC', WSB: 'WAS',
+  PHW: 'GSW', SFW: 'GSW', SYR: 'PHI', CIN: 'SAC', KCO: 'SAC', STL: 'ATL', CHP: 'WAS', CHZ: 'WAS', BAL: 'WAS', CAP: 'WAS',
+  SDR: 'HOU', BUF: 'LAC', NOJ: 'UTA', NYN: 'BKN' };
 
 /** A league's clubs strongest first, as the partition ranks them (section ids follow this order), each with its venue. */
 function rankedClubs(clubs, venues, noun) {

@@ -3,6 +3,8 @@
 // 1983/84: NBA 2K27 (Magic vs Bird era), from 2kratings.com, SHA-256 15f6cf0427b9…
 // 1991/92: NBA 2K27 (Jordan era), from 2kratings.com, SHA-256 c7e8f0b1116c…
 // 1998/99: NBA Live 99, from The NLSC, SHA-256 b42c3b92f255…
+// 36 seasons from 1960/61 to 1997/98: Basketball-Reference (computed), from Sumitro Datta, NBA Stats (1947-present), Kaggle, CC0, version 57,
+// Advanced.csv SHA-256 bae5d0763931…
 // The built-in earlier basketball seasons, newest first: NBA clubs only. Each is public/basketball/<id>.json, loaded
 // when a setup chooses it (src/engine/footballSets.js), and plays on its era's map (`map`, public/domestic/<map>.json).
 export const BUILT_IN_BASKETBALL_SEASONS = Object.freeze([
@@ -34,6 +36,42 @@ export const BUILT_IN_BASKETBALL_SEASONS = Object.freeze([
   Object.freeze({ id: 'nba-2k01', version: 'nba-2k01-02fc4ad1', year: 2001, season: '2000/01', label: 'NBA 2K1', map: 'nba2000' }),
   Object.freeze({ id: 'nba-2k00', version: 'nba-2k00-9515de6e', year: 2000, season: '1999/00', label: 'NBA 2K', map: 'nba2000' }),
   Object.freeze({ id: 'nba-live-99', version: 'nba-live-99-1c9e1372', year: 1999, season: '1998/99', label: 'NBA Live 99', map: 'nba1999' }),
+  Object.freeze({ id: 'nba-stats-1998', version: 'nba-stats-1998-9f7b7a47', year: 1998, season: '1997/98', label: 'Basketball-Reference (computed)', map: 'nba1998' }),
+  Object.freeze({ id: 'nba-stats-1997', version: 'nba-stats-1997-41c95fd4', year: 1997, season: '1996/97', label: 'Basketball-Reference (computed)', map: 'nba1997' }),
+  Object.freeze({ id: 'nba-stats-1996', version: 'nba-stats-1996-d4ed3a24', year: 1996, season: '1995/96', label: 'Basketball-Reference (computed)', map: 'nba1996' }),
+  Object.freeze({ id: 'nba-stats-1995', version: 'nba-stats-1995-cb870c6e', year: 1995, season: '1994/95', label: 'Basketball-Reference (computed)', map: 'nba1995' }),
+  Object.freeze({ id: 'nba-stats-1994', version: 'nba-stats-1994-051cfb61', year: 1994, season: '1993/94', label: 'Basketball-Reference (computed)', map: 'nba1994' }),
+  Object.freeze({ id: 'nba-stats-1993', version: 'nba-stats-1993-45a49a2d', year: 1993, season: '1992/93', label: 'Basketball-Reference (computed)', map: 'nba1993' }),
   Object.freeze({ id: 'nba-eras-1992', version: 'nba-eras-1992-c77363f5', year: 1992, season: '1991/92', label: 'NBA 2K27 (Jordan era)', map: 'nba1992' }),
+  Object.freeze({ id: 'nba-stats-1991', version: 'nba-stats-1991-c8fc37f5', year: 1991, season: '1990/91', label: 'Basketball-Reference (computed)', map: 'nba1991' }),
+  Object.freeze({ id: 'nba-stats-1990', version: 'nba-stats-1990-90d8596a', year: 1990, season: '1989/90', label: 'Basketball-Reference (computed)', map: 'nba1990' }),
+  Object.freeze({ id: 'nba-stats-1989', version: 'nba-stats-1989-2d33927e', year: 1989, season: '1988/89', label: 'Basketball-Reference (computed)', map: 'nba1989' }),
+  Object.freeze({ id: 'nba-stats-1988', version: 'nba-stats-1988-6c201f2e', year: 1988, season: '1987/88', label: 'Basketball-Reference (computed)', map: 'nba1986' }),
+  Object.freeze({ id: 'nba-stats-1987', version: 'nba-stats-1987-b727ad65', year: 1987, season: '1986/87', label: 'Basketball-Reference (computed)', map: 'nba1986' }),
+  Object.freeze({ id: 'nba-stats-1986', version: 'nba-stats-1986-7cada161', year: 1986, season: '1985/86', label: 'Basketball-Reference (computed)', map: 'nba1986' }),
+  Object.freeze({ id: 'nba-stats-1985', version: 'nba-stats-1985-c65882ff', year: 1985, season: '1984/85', label: 'Basketball-Reference (computed)', map: 'nba1985' }),
   Object.freeze({ id: 'nba-eras-1984', version: 'nba-eras-1984-5907a76a', year: 1984, season: '1983/84', label: 'NBA 2K27 (Magic vs Bird era)', map: 'nba1984' }),
+  Object.freeze({ id: 'nba-stats-1983', version: 'nba-stats-1983-53e2f249', year: 1983, season: '1982/83', label: 'Basketball-Reference (computed)', map: 'nba1984' }),
+  Object.freeze({ id: 'nba-stats-1982', version: 'nba-stats-1982-b1be0fa4', year: 1982, season: '1981/82', label: 'Basketball-Reference (computed)', map: 'nba1984' }),
+  Object.freeze({ id: 'nba-stats-1981', version: 'nba-stats-1981-2f033dcf', year: 1981, season: '1980/81', label: 'Basketball-Reference (computed)', map: 'nba1981' }),
+  Object.freeze({ id: 'nba-stats-1980', version: 'nba-stats-1980-2da9eb5a', year: 1980, season: '1979/80', label: 'Basketball-Reference (computed)', map: 'nba1980' }),
+  Object.freeze({ id: 'nba-stats-1979', version: 'nba-stats-1979-8bef214c', year: 1979, season: '1978/79', label: 'Basketball-Reference (computed)', map: 'nba1979' }),
+  Object.freeze({ id: 'nba-stats-1978', version: 'nba-stats-1978-fbe4c931', year: 1978, season: '1977/78', label: 'Basketball-Reference (computed)', map: 'nba1978' }),
+  Object.freeze({ id: 'nba-stats-1977', version: 'nba-stats-1977-454687ea', year: 1977, season: '1976/77', label: 'Basketball-Reference (computed)', map: 'nba1977' }),
+  Object.freeze({ id: 'nba-stats-1976', version: 'nba-stats-1976-cd9631c4', year: 1976, season: '1975/76', label: 'Basketball-Reference (computed)', map: 'nba1976' }),
+  Object.freeze({ id: 'nba-stats-1975', version: 'nba-stats-1975-5c4e4393', year: 1975, season: '1974/75', label: 'Basketball-Reference (computed)', map: 'nba1975' }),
+  Object.freeze({ id: 'nba-stats-1974', version: 'nba-stats-1974-0661a83d', year: 1974, season: '1973/74', label: 'Basketball-Reference (computed)', map: 'nba1974' }),
+  Object.freeze({ id: 'nba-stats-1973', version: 'nba-stats-1973-f344993f', year: 1973, season: '1972/73', label: 'Basketball-Reference (computed)', map: 'nba1973' }),
+  Object.freeze({ id: 'nba-stats-1972', version: 'nba-stats-1972-c1d07208', year: 1972, season: '1971/72', label: 'Basketball-Reference (computed)', map: 'nba1972' }),
+  Object.freeze({ id: 'nba-stats-1971', version: 'nba-stats-1971-266066da', year: 1971, season: '1970/71', label: 'Basketball-Reference (computed)', map: 'nba1971' }),
+  Object.freeze({ id: 'nba-stats-1970', version: 'nba-stats-1970-b390f9c8', year: 1970, season: '1969/70', label: 'Basketball-Reference (computed)', map: 'nba1969' }),
+  Object.freeze({ id: 'nba-stats-1969', version: 'nba-stats-1969-d1bc9e4b', year: 1969, season: '1968/69', label: 'Basketball-Reference (computed)', map: 'nba1969' }),
+  Object.freeze({ id: 'nba-stats-1968', version: 'nba-stats-1968-46d6c67b', year: 1968, season: '1967/68', label: 'Basketball-Reference (computed)', map: 'nba1968' }),
+  Object.freeze({ id: 'nba-stats-1967', version: 'nba-stats-1967-7fd517ff', year: 1967, season: '1966/67', label: 'Basketball-Reference (computed)', map: 'nba1967' }),
+  Object.freeze({ id: 'nba-stats-1966', version: 'nba-stats-1966-fb3dc815', year: 1966, season: '1965/66', label: 'Basketball-Reference (computed)', map: 'nba1965' }),
+  Object.freeze({ id: 'nba-stats-1965', version: 'nba-stats-1965-0dc83c43', year: 1965, season: '1964/65', label: 'Basketball-Reference (computed)', map: 'nba1965' }),
+  Object.freeze({ id: 'nba-stats-1964', version: 'nba-stats-1964-9415aa55', year: 1964, season: '1963/64', label: 'Basketball-Reference (computed)', map: 'nba1964' }),
+  Object.freeze({ id: 'nba-stats-1963', version: 'nba-stats-1963-2247da5f', year: 1963, season: '1962/63', label: 'Basketball-Reference (computed)', map: 'nba1963' }),
+  Object.freeze({ id: 'nba-stats-1962', version: 'nba-stats-1962-ec25665b', year: 1962, season: '1961/62', label: 'Basketball-Reference (computed)', map: 'nba1962' }),
+  Object.freeze({ id: 'nba-stats-1961', version: 'nba-stats-1961-ed304580', year: 1961, season: '1960/61', label: 'Basketball-Reference (computed)', map: 'nba1961' }),
 ]);

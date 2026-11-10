@@ -4,10 +4,13 @@
 // built-in season's clubs (scripts/build-clubs.mjs) and its national fives' NBA ratings (scripts/build-basketball.mjs)
 // come from the same page. The seasons before NBA 2K come from other sources, each a season of the manifest's `extra`
 // with a `format`: NBA 2K27's MyNBA Eras leagues as 2kratings.com lists them, and NBA Live 99's own roster files, each
-// player checked against Basketball-Reference's seasons (realPlayers). Only readArchive and readSeasonSources do I/O:
-// scripts/build-nba-seasons.mjs writes the files, scripts/build-club-maps.mjs takes each era's teams and arenas from
-// `teamsOf`, and tests build seasons from invented players. Every rating is 2K's, unchanged, but NBA Live 99's, which
-// one documented straight line puts on NBA 2K's scale (liveScale).
+// player checked against Basketball-Reference's seasons (realPlayers). The seasons no game rated (the manifest's
+// `computed`, 1960/61 to 1997/98 but 1983/84 and 1991/92) are computed from Basketball-Reference's player seasons: one
+// score fitted to NBA 2K's overalls, then each season ranked onto NBA 2K27's ratings (readComputedSources). Only
+// readArchive, readSeasonSources and readComputedSources do I/O: scripts/build-nba-seasons.mjs writes the files,
+// scripts/build-club-maps.mjs takes each era's teams and arenas from `teamsOf`, and tests build seasons from invented
+// players. Every rating is 2K's, unchanged, but NBA Live 99's, which one documented straight line puts on NBA 2K's
+// scale (liveScale), and the computed seasons', which say how they were computed.
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -22,10 +25,17 @@ const seasonOf = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
 /** 2000 → 'NBA 2K', 2008 → 'NBA 2K8': the edition named for the season ending that year. */
 export const editionOf = year => `NBA 2K${year === 2000 ? '' : year - 2000}`;
 export const seasonIdOf = year => `nba-2k${String(year - 2000).padStart(2, '0')}`;
-/** The id of the season ending `year`: its `extra` source's (`nba-eras-1984`), else its NBA 2K edition's (`nba-2k08`). */
-export const setIdOf = (manifest, year) => manifest?.extra?.[String(year)]?.id ?? seasonIdOf(year);
-/** The name the season ending `year` goes by: its `extra` source's label, else its NBA 2K edition. */
-export const labelOf = (manifest, year) => manifest?.extra?.[String(year)]?.label ?? editionOf(year);
+/** Whether the season ending `year` is one no game rated, computed from the players' statistics (`nba-stats-1975`). */
+export const isComputed = (manifest, year) => !!manifest?.computed?.seasons?.includes(Number(year));
+/**
+ * The id of the season ending `year`: its `extra` source's (`nba-eras-1984`), a computed season's (`nba-stats-1975`),
+ * else its NBA 2K edition's (`nba-2k08`).
+ */
+export const setIdOf = (manifest, year) => manifest?.extra?.[String(year)]?.id
+  ?? (isComputed(manifest, year) ? `nba-stats-${year}` : seasonIdOf(year));
+/** The name the season ending `year` goes by: its `extra` source's label, a computed season's, else its NBA 2K edition. */
+export const labelOf = (manifest, year) => manifest?.extra?.[String(year)]?.label
+  ?? (isComputed(manifest, year) ? manifest.computed.label : editionOf(year));
 
 /**
  * The page's ratings: `const YEARS = { "2000": [{ n, o, p, t, ... }], ... }`, read as data. The object literal is cut
@@ -554,22 +564,27 @@ export function nbaSeasonClubs(years, year, manifest, { arenas, builtIn = [] }) 
 export function buildNbaSeason(years, year, manifest, { arenas, builtIn = [], archived = {}, source = null }) {
   const { clubs, rows, filled, dropped, narrowed, outOfPosition, warnings } = nbaSeasonClubs(years, year, manifest, { arenas, builtIn });
   // A season of the manifest's `extra` credits its own compiler (NBA 2K12: The Real 2K Insider), and one from another
-  // game names its own id, label, edition and maker.
+  // game names its own id, label, edition and maker. A computed season credits Basketball-Reference and the copy of its
+  // tables it was computed from.
   const extra = manifest.extra?.[String(year)];
-  const compiled = extra ?? manifest.source;
-  const edition = extra?.edition ?? editionOf(year);
-  // Another game's overalls put on NBA 2K's scale (NBA Live 99's) say so, with the line.
+  const computed = !extra && isComputed(manifest, year) ? manifest.computed : null;
+  const compiled = extra ?? computed ?? manifest.source;
+  const edition = extra?.edition ?? (computed ? `${seasonOf(year)} NBA regular season` : editionOf(year));
+  // Another game's overalls put on NBA 2K's scale (NBA Live 99's) say so, with the line; a computed season says how.
   const scale = extra?.scale;
   const conversion = scale ? { conversion: `round(${scale.intercept} + ${scale.slope} * raw): the least-squares line of ${scale.edition}'s overall `
-    + `(${seasonOf(scale.year)}) on ${edition}'s, through the players both rate` } : {};
+    + `(${seasonOf(scale.year)}) on ${edition}'s, through the players both rate` }
+    : computed ? { method: 'computed', conversion: computedConversion(computed) } : {};
   const doc = { format: 1, kind: 'nba2k', id: setIdOf(manifest, year), version: '', year, season: seasonOf(year), label: labelOf(manifest, year), local: false,
-    source: { provider: extra?.provider ?? '2K Sports', edition, compiler: compiled.name, url: compiled.url, rawScale: 99, ...conversion },
+    source: { provider: extra?.provider ?? computed?.provider ?? '2K Sports', edition, compiler: compiled.name, url: compiled.url, rawScale: 99, ...conversion },
     map: mapOf(manifest, year), clubs, coverage: { players: clubs.length * FIVE, clubs: clubs.length } };
   doc.version = `${doc.id}-${contentHash(doc)}`;
   const checked = archived[String(year)] ? { checkedAgainst2KArchive: agreement(years[String(year)], archived[String(year)]) } : {};
+  const teams = teamsOf(manifest, year, arenas);
+  const told = !source ? {} : source.computed ? computedAudit(source, clubs, doc, teams) : sourceAudit(source, clubs, doc, teams);
   const audit = { id: doc.id, version: doc.version, edition, rows, map: doc.map, clubs: clubs.length,
     filledPositions: filled, droppedNoPosition: dropped, narrowedPositions: narrowed.length, ...checked,
-    ...(outOfPosition.length ? { outOfPosition } : {}), ...(source ? sourceAudit(source, clubs, doc, teamsOf(manifest, year, arenas)) : {}), warnings };
+    ...(outOfPosition.length ? { outOfPosition } : {}), ...told, warnings };
   return { doc, text: serializeFootballSet(doc), audit, warnings };
 }
 
@@ -596,5 +611,443 @@ function sourceAudit(source, clubs, doc, teams) {
       scale: { table: source.scale.table, check: source.scale.check,
         fives: clubs.map(club => `${club.name}: ${club.squad.map(([name, , rating]) => `${name} ${rawOf(club, name)}→${rating}`).join(', ')}`) },
     } : {}),
+  };
+}
+
+// ---------- the seasons no game rated: computed from Basketball-Reference's player seasons ----------
+
+/** The score's inputs, in the order of the manifest's coefficients. */
+export const SCORE_INPUTS = Object.freeze(['per', 'ws48', 'mpg', 'mpg2', 'ppg', 'rpg', 'apg', 'allStar', 'allNba', 'dws']);
+const INPUT_NAMES = { per: 'PER', ws48: 'WS/48', mpg: 'MPG', mpg2: 'MPG^2', ppg: 'PPG', rpg: 'RPG', apg: 'APG', allStar: 'All-Star',
+  allNba: 'All-NBA', dws: 'DWS' };
+const number = value => (value === '' || value === 'NA' || value == null ? null : Number(value));
+const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+const average = values => values.reduce((sum, v) => sum + v, 0) / values.length;
+
+/** A CSV table's rows as objects by its header (parseCsv), after checking it has every column of `required`. */
+export function readTable(text, required = [], name = 'The table') {
+  const [head = [], ...rows] = parseCsv(text);
+  const missing = required.filter(column => !head.includes(column));
+  if (missing.length) throw new Error(`${name} has no ${missing.join(', ')} column`);
+  return rows.filter(row => row.length === head.length).map(row => Object.fromEntries(head.map((column, i) => [column, row[i]])));
+}
+
+/**
+ * Basketball-Reference's NBA player seasons, read as data from Sumitro Datta's tables (`advanced`: Advanced.csv,
+ * `totals`: Player Totals.csv, `allStar`: All-Star Selections.csv, `endOfSeason`: End of Season Teams.csv): one record
+ * per player and season, in the tables' order (newest season first). A player who played for several clubs has a row
+ * per club and a total row ('2TM', '3TM'...): his record is the total, `stints` each club in the order he played for
+ * it, and `team` the club he played the most minutes for (then the most games, then the earlier). `allStar` is 1 if
+ * he was picked for the All-Star Game, `allNba` the points `allNbaPoints` gives his All-NBA team ({ '1st': 3, ... }).
+ */
+export function brefPlayerSeasons({ advanced, totals, allStar, endOfSeason }, allNbaPoints) {
+  const rows = readTable(advanced, ['season', 'lg', 'player', 'player_id', 'team', 'pos', 'g', 'mp', 'per', 'dws', 'ws_48'], 'Advanced.csv')
+    .filter(row => row.lg === 'NBA');
+  const lines = new Map(readTable(totals, ['season', 'lg', 'player_id', 'team', 'pts', 'trb', 'ast'], 'Player Totals.csv')
+    .filter(row => row.lg === 'NBA').map(row => [`${row.season}|${row.player_id}|${row.team}`, row]));
+  const stars = new Set(readTable(allStar, ['season', 'lg', 'player_id'], 'All-Star Selections.csv')
+    .filter(row => row.lg === 'NBA').map(row => `${row.season}|${row.player_id}`));
+  const allNba = new Map();
+  for (const row of readTable(endOfSeason, ['season', 'lg', 'type', 'number_tm', 'player_id'], 'End of Season Teams.csv')) {
+    if (row.lg !== 'NBA' || row.type !== 'All-NBA') continue;
+    if (!Object.hasOwn(allNbaPoints, row.number_tm)) throw new Error(`End of Season Teams.csv: an All-NBA team "${row.number_tm}"`);
+    const key = `${row.season}|${row.player_id}`;
+    allNba.set(key, Math.max(allNba.get(key) ?? 0, allNbaPoints[row.number_tm]));
+  }
+  const groups = new Map();
+  for (const row of rows) {
+    const key = `${row.season}|${row.player_id}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  }
+  return [...groups].map(([key, list]) => {
+    const totalRows = list.filter(row => isTotal(row.team));
+    if (totalRows.length > 1 || (list.length > 1 && totalRows.length !== 1)) throw new Error(`Advanced.csv: ${key} has ${totalRows.length} total rows`);
+    const whole = totalRows[0] ?? list[0];
+    const stints = list.filter(row => !isTotal(row.team)).map(row => ({ team: row.team, minutes: number(row.mp) ?? 0, games: number(row.g) ?? 0 }));
+    const main = stints.reduce((best, s) => (!best || s.minutes > best.minutes || (s.minutes === best.minutes && s.games > best.games) ? s : best), null);
+    const line = lines.get(`${whole.season}|${whole.player_id}|${whole.team}`);
+    return { season: Number(whole.season), id: whole.player_id, name: whole.player.trim(), pos: POSITIONS.includes(whole.pos) ? whole.pos : null,
+      team: main.team, stints, games: number(whole.g), minutes: number(whole.mp), per: number(whole.per), ws48: number(whole.ws_48),
+      dws: number(whole.dws), points: line ? number(line.pts) : null, rebounds: line ? number(line.trb) : null, assists: line ? number(line.ast) : null,
+      allStar: stars.has(key) ? 1 : 0, allNba: allNba.get(key) ?? 0 };
+  });
+}
+
+/**
+ * The score's inputs for one player season (a brefPlayerSeasons record), by the manifest's `score.shrink`: PER and
+ * WS/48 shrunk toward a bench player's by `minutes` minutes of his (a few good minutes count for little), minutes a
+ * game and its square, points, rebounds and assists a game, All-Star, All-NBA and defensive win shares. Null when the
+ * season lacks one of them.
+ */
+export function scoreInputs(record, { shrink }) {
+  const { games, minutes } = record;
+  const facts = [record.per, record.ws48, record.dws, record.points, record.rebounds, record.assists];
+  if (!(games > 0) || !(minutes >= 0) || facts.some(value => value == null || !Number.isFinite(value))) return null;
+  const k = shrink.minutes, mpg = minutes / games;
+  return { per: (record.per * minutes + shrink.per * k) / (minutes + k), ws48: (record.ws48 * minutes + shrink.ws48 * k) / (minutes + k),
+    mpg, mpg2: mpg * mpg, ppg: record.points / games, rpg: record.rebounds / games, apg: record.assists / games,
+    allStar: record.allStar, allNba: record.allNba, dws: record.dws };
+}
+
+/** The manifest's score (`{ intercept, coefficients }`) of a player's inputs, summed in SCORE_INPUTS' order. */
+export const scoreOf = ({ intercept, coefficients }) => inputs => SCORE_INPUTS.reduce((sum, name) => sum + coefficients[name] * inputs[name], intercept);
+
+/**
+ * The least-squares coefficients of `targets` on `rows` (each row starting with 1 for the intercept): the normal
+ * equations, solved by Gauss-Jordan elimination with partial pivoting, every sum in the rows' order.
+ */
+export function leastSquares(rows, targets) {
+  if (!rows.length || rows.length !== targets.length) throw new Error('Least squares needs one target per row');
+  const p = rows[0].length;
+  const A = Array.from({ length: p }, () => new Array(p).fill(0)), b = new Array(p).fill(0);
+  for (let i = 0; i < rows.length; i++) {
+    for (let j = 0; j < p; j++) {
+      b[j] += rows[i][j] * targets[i];
+      for (let k = 0; k < p; k++) A[j][k] += rows[i][j] * rows[i][k];
+    }
+  }
+  for (let c = 0; c < p; c++) {
+    let pivot = c;
+    for (let r = c + 1; r < p; r++) if (Math.abs(A[r][c]) > Math.abs(A[pivot][c])) pivot = r;
+    [A[c], A[pivot]] = [A[pivot], A[c]];
+    [b[c], b[pivot]] = [b[pivot], b[c]];
+    if (!(Math.abs(A[c][c]) > 0)) throw new Error('Least squares: the inputs are not independent');
+    for (let r = 0; r < p; r++) {
+      if (r === c) continue;
+      const f = A[r][c] / A[c][c];
+      for (let k = c; k < p; k++) A[r][k] -= f * A[c][k];
+      b[r] -= f * b[c];
+    }
+  }
+  return b.map((v, j) => v / A[j][j]);
+}
+
+/**
+ * The pairs the score is fitted on: every player an NBA 2K edition of `editions` ([first, last], from 2K Archive's
+ * whole table `years`) rates, his overall as a z-score within the edition (the sample's mean and standard deviation),
+ * beside his Basketball-Reference season `lag` seasons before: 2K rates a season's players from the season before. He
+ * is matched by name in that season, and by club too where two players share his name; one who is not matched, or
+ * whose season lacks an input (`inputsOf` null), is left out. Pairs run edition by edition, in the table's order.
+ */
+export function trainingPairs(years, records, { editions: [first, last], lag }, inputsOf) {
+  const bySeason = new Map();
+  for (const record of records) {
+    if (!bySeason.has(record.season)) bySeason.set(record.season, new Map());
+    const names = bySeason.get(record.season), key = nameKey(record.name);
+    if (!names.has(key)) names.set(key, []);
+    names.get(key).push(record);
+  }
+  const pairs = [];
+  for (let edition = first; edition <= last; edition++) {
+    const list = (years[String(edition)] || []).filter(p => Number.isInteger(p.o));
+    if (list.length < 2) throw new Error(`2K Archive has no ${editionOf(edition)} to fit the score on`);
+    const mean = average(list.map(p => p.o));
+    const sd = Math.sqrt(list.reduce((sum, p) => sum + (p.o - mean) ** 2, 0) / (list.length - 1));
+    const names = bySeason.get(edition - lag) ?? new Map();
+    for (const p of list) {
+      const candidates = names.get(nameKey(p.n)) ?? [];
+      const record = candidates.length === 1 ? candidates[0] : candidates.find(r => r.stints.some(s => s.team === p.t));
+      const inputs = record && inputsOf(record);
+      if (inputs) pairs.push({ edition, rating: p.o, z: (p.o - mean) / sd, inputs, record });
+    }
+  }
+  return pairs;
+}
+
+/** Ranks from 1, lowest first, tied values sharing their mean rank. */
+function meanRanks(values) {
+  const order = values.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const ranks = new Array(values.length);
+  for (let i = 0; i < order.length;) {
+    let j = i;
+    while (j + 1 < order.length && order[j + 1][0] === order[i][0]) j++;
+    for (let k = i; k <= j; k++) ranks[order[k][1]] = (i + j) / 2 + 1;
+    i = j + 1;
+  }
+  return ranks;
+}
+/** Pearson's correlation of two lists. */
+export function correlation(xs, ys) {
+  const mx = average(xs), my = average(ys);
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < xs.length; i++) {
+    sxy += (xs[i] - mx) * (ys[i] - my);
+    sxx += (xs[i] - mx) ** 2;
+    syy += (ys[i] - my) ** 2;
+  }
+  return sxy / Math.sqrt(sxx * syy);
+}
+/** Spearman's rank correlation of two lists. */
+export const rankCorrelation = (xs, ys) => correlation(meanRanks(xs), meanRanks(ys));
+const two = v => Math.round(v * 100) / 100;
+const three = v => Math.round(v * 1000) / 1000;
+
+/**
+ * Fit the score again on the training pairs and check it is the manifest's `score`, every coefficient to six
+ * significant figures, as NBA Live 99's line is checked (liveScale): the ratings use the manifest's coefficients, so a
+ * later copy of a source cannot move them unseen. Returns how the fit does on its pairs.
+ */
+export function checkScore(pairs, score) {
+  const names = Object.keys(score.coefficients);
+  if (names.join() !== SCORE_INPUTS.join()) throw new Error(`The score's inputs must be ${SCORE_INPUTS.join(', ')}, in that order`);
+  const beta = leastSquares(pairs.map(pair => [1, ...SCORE_INPUTS.map(name => pair.inputs[name])]), pairs.map(pair => pair.z));
+  const fitted = [['intercept', beta[0], score.intercept], ...SCORE_INPUTS.map((name, i) => [name, beta[i + 1], score.coefficients[name]])];
+  const differ = fitted.filter(([, value, fixed]) => Number(value.toPrecision(6)) !== fixed);
+  if (differ.length) {
+    throw new Error(`The score fitted on the ${pairs.length} pairs is not the manifest's: ${differ.map(([name, value, fixed]) => `${name} ${Number(value.toPrecision(6))}, not ${fixed}`).join('; ')}`);
+  }
+  const predicted = pairs.map(pair => scoreOf(score)(pair.inputs)), z = pairs.map(pair => pair.z);
+  return { pairs: pairs.length, editions: new Set(pairs.map(pair => pair.edition)).size,
+    coefficients: Object.fromEntries(fitted.map(([name, value]) => [name, Number(value.toPrecision(6))])),
+    correlation: three(correlation(predicted, z)), rankCorrelation: three(rankCorrelation(predicted, z)) };
+}
+
+/** The ratings a computed season goes onto: an edition's ratings of each club's `perClub` best (free agents aside), lowest first. */
+export function ratingSpread(players, perClub) {
+  const byTeam = new Map();
+  for (const p of players) {
+    if (p.t === 'FA' || !Number.isInteger(p.o)) continue;
+    if (!byTeam.has(p.t)) byTeam.set(p.t, []);
+    byTeam.get(p.t).push(p.o);
+  }
+  const spread = [...byTeam.keys()].sort().flatMap(team => byTeam.get(team).sort((a, b) => b - a).slice(0, perClub)).sort((a, b) => a - b);
+  if (!spread.length) throw new Error('The spread has no ratings');
+  return spread;
+}
+
+/**
+ * Check a spread against the manifest's `counts` (how many of its ratings are each rating), as the score is checked:
+ * a later copy of the page whose ratings moved stops the build rather than moving every computed season.
+ */
+export function checkSpread(spread, counts) {
+  const found = {};
+  for (const rating of spread) found[rating] = (found[rating] ?? 0) + 1;
+  const ratings = [...new Set([...Object.keys(found), ...Object.keys(counts ?? {})])].sort((a, b) => a - b);
+  const differ = ratings.filter(rating => (found[rating] ?? 0) !== (counts?.[rating] ?? 0));
+  if (differ.length) {
+    throw new Error(`The spread's ratings are not the manifest's: ${differ.map(rating => `${found[rating] ?? 0} rated ${rating}, not ${counts?.[rating] ?? 0}`).join('; ')}`);
+  }
+  return spread;
+}
+
+/** A spread's ratings at quantiles 0, 5%, 25%, 50%, 75%, 95% and 1. */
+export const spreadQuantiles = spread => Object.fromEntries([0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
+  .map(q => [q, spread[Math.min(spread.length - 1, Math.floor(q * spread.length))]]));
+
+/**
+ * A computed season's ratings. Each club's `roster` players with the most minutes are its own (a traded player counts
+ * once, for his `team`; equal minutes go by player id), each is scored (`inputsOf`, `scoreFor`), and the league is
+ * ranked by score, lowest first, scores worked in millionths and ties going by player id. The player at rank quantile
+ * q = (rank - 0.5) / N takes the `spread`'s rating at q (spread[floor(q × length)]): no player passes another, and the
+ * season has the spread's shape. A player whose season lacks an input is left out (`unscored`). Returns
+ * `{ rated: [{ record, inputs, score, rating }], unscored }`, rated in club and minutes order.
+ */
+export function rateComputedSeason(records, season, { roster, inputsOf, scoreFor, spread }) {
+  const clubs = new Map();
+  for (const record of records) {
+    if (record.season !== season) continue;
+    if (!clubs.has(record.team)) clubs.set(record.team, []);
+    clubs.get(record.team).push(record);
+  }
+  const population = [...clubs.keys()].sort().flatMap(team => clubs.get(team).slice()
+    .sort((a, b) => b.minutes - a.minutes || byText(a.id, b.id)).slice(0, roster));
+  const rated = [], unscored = [];
+  for (const record of population) {
+    const inputs = inputsOf(record);
+    if (inputs) rated.push({ record, inputs, score: scoreFor(inputs), rating: null });
+    else unscored.push(record);
+  }
+  const micro = entry => Math.round(entry.score * 1e6);
+  rated.slice().sort((a, b) => micro(a) - micro(b) || byText(a.record.id, b.record.id)).forEach((entry, i, order) => {
+    entry.rating = spread[Math.floor(((2 * i + 1) * spread.length) / (2 * order.length))];
+  });
+  return { rated, unscored };
+}
+
+/** Every player's listed positions over his NBA seasons: id → Map of position → { minutes, latest season }. */
+export function listedPositions(records) {
+  const listed = new Map();
+  for (const record of records) {
+    if (!record.pos) continue;
+    if (!listed.has(record.id)) listed.set(record.id, new Map());
+    const at = listed.get(record.id).get(record.pos) ?? { minutes: 0, latest: record.season };
+    listed.get(record.id).set(record.pos, { minutes: at.minutes + (record.minutes ?? 0), latest: Math.max(at.latest, record.season) });
+  }
+  return listed;
+}
+
+/**
+ * A computed player's positions: the season's (Basketball-Reference lists PG, SG, SF, PF or C), else the first his
+ * career position implies (`careerPositions`: G is PG/SG, F-C is PF/C...). The second is the neighbouring position he
+ * was listed at in other seasons, the one with the most minutes there (then the latest), else the neighbour his career
+ * position implies. Null when he has none: he is left out, as a 2K player with no position is.
+ */
+export function brefPositions(record, listed, careerPosition, careerPositions) {
+  const implied = careerPositions[careerPosition] ?? [];
+  const first = record.pos ?? implied[0];
+  if (!POSITIONS.includes(first)) return null;
+  const neighbours = POSITIONS.filter(p => Math.abs(POSITIONS.indexOf(p) - POSITIONS.indexOf(first)) === 1);
+  const seen = [...(listed.get(record.id) ?? new Map())].filter(([p]) => neighbours.includes(p))
+    .sort(([a, x], [b, y]) => y.minutes - x.minutes || y.latest - x.latest || POSITIONS.indexOf(a) - POSITIONS.indexOf(b));
+  const second = seen[0]?.[0] ?? neighbours.find(p => implied.includes(p));
+  return second ? [first, second] : [first];
+}
+
+/**
+ * A computed season's players in the shape of 2K Archive's table, `[{ n, o, p, t }]` with `t` the manifest's code
+ * (`codes` maps the manifest's codes to Basketball-Reference's where they differ), so nbaSeasonClubs fields each club's
+ * five as it does an edition's. `rated` runs club by club, most minutes first. A five names its players by name alone,
+ * so of two teammates with one name the one with fewer minutes is left out (`namesakes`). Returns `{ players,
+ * noPosition, namesakes, traded, scores }`: the players left out, every traded player with the club he plays for, and
+ * each player's score by '<code>|<name>'.
+ */
+export function computedSeasonPlayers(rated, { listed, career, careerPositions, codes = {} }) {
+  const back = Object.fromEntries(Object.entries(codes).map(([ours, theirs]) => [theirs, ours]));
+  const codeOf = team => back[team] ?? team;
+  const players = [], noPosition = [], namesakes = [], traded = [], scores = new Map();
+  for (const { record, score, rating } of rated) {
+    const t = codeOf(record.team);
+    if (record.stints.length > 1) {
+      traded.push(`${record.name} (${record.stints.map(s => `${codeOf(s.team)} ${s.minutes} min`).join(', ')}): ${t}`);
+    }
+    const positions = brefPositions(record, listed, career.get(record.id), careerPositions);
+    if (!positions) {
+      noPosition.push(`${record.name} (${t}, ${rating})`);
+      continue;
+    }
+    if (scores.has(`${t}|${record.name}`)) {
+      namesakes.push(`${record.name} (${t}, ${rating}, ${record.minutes} min; Basketball-Reference's ${record.id})`);
+      continue;
+    }
+    scores.set(`${t}|${record.name}`, score);
+    players.push({ n: record.name, o: rating, p: positions.join('/'), t });
+  }
+  return { players, noPosition, namesakes, traded, scores };
+}
+
+/**
+ * What a computed season's source says of how its ratings were made: the score, how it was fitted, and the rule that
+ * puts it on NBA 2K's scale.
+ */
+export function computedConversion({ score, roster, spread }) {
+  const c = score.coefficients, s = score.shrink, points = Object.entries(score.allNba);
+  const terms = SCORE_INPUTS.map(name => `${c[name] < 0 ? '-' : '+'} ${Math.abs(c[name])} * ${INPUT_NAMES[name]}`).join(' ');
+  return `computed: score = ${score.intercept} ${terms}, PER and WS/48 shrunk toward ${s.per} and ${s.ws48} by ${s.minutes} minutes, `
+    + `All-NBA ${points.map(([, value]) => value).join(', ')} for the ${points.map(([team]) => team).join(', ')} team; fitted by least squares on `
+    + `NBA 2K's overall (a z-score within each edition, ${editionOf(score.training.editions[0])} to ${editionOf(score.training.editions[1])}, 2K Archive) `
+    + `against each player's season before; each club's ${roster} players with the most minutes ranked by score and given `
+    + `${editionOf(spread.edition)}'s ratings of each club's ${spread.perClub} best, rank for rank`;
+}
+
+/**
+ * The seasons of the manifest's `computed`, read from its pinned copy of Basketball-Reference's tables in
+ * data-src/<folder>/: the score is fitted again on 2K Archive's whole table (`years`, NBA 2K12 its own) and checked
+ * against the manifest's (checkScore), and so is the spread (checkSpread); each season is rated onto the spread
+ * (rateComputedSeason) and its players put in the table's shape (computedSeasonPlayers). Each season's franchises must have Basketball-Reference's names for its
+ * teams, and src/data/nbaLeagueAverages.js (`leagueAverages`) its league averages. The audit's checks rate the MyNBA
+ * Eras seasons the same way and compare with 2K's own ratings (`sources`, readSeasonSources'). Returns
+ * `{ seasons: { [year]: source }, summary }`, or null without a `computed`.
+ */
+export async function readComputedSources(root, manifest, years, { arenas = {}, sources = {}, leagueAverages = {} } = {}) {
+  const computed = manifest.computed;
+  if (!computed) return null;
+  const text = async name => (await pinnedFile(root, computed.folder, computed, computed.files[name].file, computed.files[name].sha256)).toString('utf8');
+  const records = brefPlayerSeasons({ advanced: await text('advanced'), totals: await text('totals'), allStar: await text('allStar'),
+    endOfSeason: await text('endOfSeason') }, computed.score.allNba);
+  const career = new Map(readTable(await text('career'), ['player_id', 'pos'], 'Player Career Info.csv').map(row => [row.player_id, row.pos]));
+  const summaries = readTable(await text('summaries'), ['season', 'lg', 'team', 'abbreviation', 'srs', 'pace', 'o_rtg'], 'Team Summaries.csv')
+    .filter(row => row.lg === 'NBA');
+  const perGame = readTable(await text('perGame'), ['season', 'lg', 'team', 'pts_per_game'], 'Team Stats Per Game.csv').filter(row => row.lg === 'NBA');
+  const inputsOf = record => scoreInputs(record, computed.score);
+  const scoreFor = scoreOf(computed.score);
+  const fit = checkScore(trainingPairs(years, records, computed.score.training, inputsOf), computed.score);
+  const spread = checkSpread(ratingSpread(years[String(computed.spread.edition)] || [], computed.spread.perClub), computed.spread.counts);
+  const listed = listedPositions(records);
+  const options = { roster: computed.roster, inputsOf, scoreFor, spread };
+  const codes = manifest.check?.codes ?? {};
+  const back = Object.fromEntries(Object.entries(codes).map(([ours, theirs]) => [theirs, ours]));
+
+  const seasons = {};
+  for (const year of computed.seasons) {
+    const label = seasonOf(year);
+    // The franchises of the season are Basketball-Reference's teams, by name.
+    const teams = summaries.filter(row => Number(row.season) === year && row.team !== 'League Average');
+    const ours = new Map(teamsOf(manifest, year, arenas).map(team => [team.code, team.name]));
+    const named = teams.map(row => [back[row.abbreviation] ?? row.abbreviation, row.team]);
+    const differ = named.filter(([code, name]) => ours.get(code) !== name);
+    if (differ.length || named.length !== ours.size) {
+      throw new Error(`${label}: Basketball-Reference's teams (${named.map(([code, name]) => `${code} ${name}`).join(', ')}) are not the manifest's`);
+    }
+    // Its league averages are the game's.
+    const league = summaries.find(row => Number(row.season) === year && row.team === 'League Average');
+    const points = perGame.find(row => Number(row.season) === year && row.team === 'League Average');
+    const averages = league && points && { pace: Number(league.pace), rating: Number(league.o_rtg), points: Number(points.pts_per_game) };
+    const game = leagueAverages[label];
+    if (!averages || !game || ['pace', 'rating', 'points'].some(key => game[key] !== averages[key])) {
+      throw new Error(`${label}: src/data/nbaLeagueAverages.js has ${JSON.stringify(game ?? null)}, Basketball-Reference ${JSON.stringify(averages ?? null)}`);
+    }
+    const { rated, unscored } = rateComputedSeason(records, year, options);
+    const { players, noPosition, namesakes, traded, scores } = computedSeasonPlayers(rated, { listed, career, careerPositions: computed.positions, codes });
+    seasons[year] = { computed: true, players, rows: rated.length + unscored.length, rated: rated.length,
+      unscored: unscored.map(record => `${record.name} (${back[record.team] ?? record.team})`), noPosition, namesakes, traded, scores,
+      srs: new Map(teams.map(row => [back[row.abbreviation] ?? row.abbreviation, Number(row.srs)])), averages };
+  }
+
+  // The same rule on the seasons NBA 2K27's MyNBA Eras rate, against 2K's own ratings of them.
+  const checks = {};
+  for (const [year, source] of Object.entries(manifest.extra || {})) {
+    if (source.format !== 'mynba-eras' || !sources[year]) continue;
+    const { rated } = rateComputedSeason(records, Number(year), options);
+    const byName = new Map();
+    for (const entry of rated) {
+      const key = nameKey(entry.record.name);
+      if (!byName.has(key)) byName.set(key, []);
+      byName.get(key).push(entry);
+    }
+    const brefName = p => {
+      const entry = Object.entries(source.roster ?? {}).find(([key, value]) => key.startsWith(`${p.t} `) && value.name === p.n)?.[1];
+      return entry ? entry.bref ?? entry.name : source.aliases?.[p.n] ?? p.n;
+    };
+    const hits = [];
+    for (const p of sources[year].players) {
+      const candidates = byName.get(nameKey(brefName(p))) ?? [];
+      const hit = candidates.length === 1 ? candidates[0] : candidates.find(entry => entry.record.stints.some(s => s.team === (codes[p.t] ?? p.t)));
+      if (hit) hits.push([hit, p.o]);
+    }
+    const errors = hits.map(([hit, theirs]) => hit.rating - theirs);
+    checks[source.id] = { label: source.label, players: sources[year].players.length, matched: hits.length,
+      rankCorrelation: two(rankCorrelation(hits.map(([hit]) => hit.score), hits.map(([, theirs]) => theirs))),
+      meanError: two(average(errors.map(Math.abs))), bias: two(average(errors)) };
+  }
+  return {
+    seasons,
+    summary: { fit, spreadRatings: { edition: editionOf(computed.spread.edition), ratings: spread.length, quantiles: spreadQuantiles(spread) }, checks },
+  };
+}
+
+/**
+ * What the audit says of a computed season: its population and who was left out, every traded player and the club he
+ * plays for, each five with each player's score, and how the clubs' strengths follow the season's real results
+ * (Basketball-Reference's SRS), which the ratings never use.
+ */
+function computedAudit(source, clubs, doc, teams) {
+  const codeOf = new Map(teams.map(team => [team.id, team.code]));
+  const scoreText = (club, name) => {
+    const value = source.scores.get(`${codeOf.get(club.id)}|${name}`);
+    if (value == null) throw new Error(`${club.name}: no score for ${name}`);
+    return value.toFixed(3);
+  };
+  return {
+    label: doc.label,
+    population: source.rows,
+    rated: source.rated,
+    unscored: source.unscored,
+    noPosition: source.noPosition,
+    ...(source.namesakes.length ? { namesakes: source.namesakes } : {}),
+    traded: source.traded,
+    leagueAverages: source.averages,
+    clubsAgainstSRS: two(correlation(clubs.map(club => club.str), clubs.map(club => source.srs.get(codeOf.get(club.id))))),
+    fives: clubs.map(club => `${club.name} ${club.str}: ${club.squad.map(([name, positions, rating]) => `${name} ${positions} ${rating} (${scoreText(club, name)})`).join(', ')}`),
   };
 }

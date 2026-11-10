@@ -711,7 +711,7 @@ first build split every county of both countries.) It reuses this whole runtime
 (loader, country chart, backdrop, routing, saves) as a format-1 map whose clubs are
 the game's own.
 
-**Build** (`npm run build:nba-map`, `scripts/build-club-maps.mjs --league=nba`, about 6 minutes with the era maps;
+**Build** (`npm run build:nba-map`, `scripts/build-club-maps.mjs --league=nba`, 43 minutes with the 42 era maps on 2026-11-09;
 `--check` rebuilds offline and compares, `--dry-run` writes nothing):
 
 - **Units**: geoBoundaries gbOpen USA ADM2 (counties, public domain) and CAN ADM2
@@ -804,23 +804,39 @@ no shared border" and the fronts note "reached over open ground", the setup's Fr
 The victory names "USA and Canada". Basketball squads are not FM players, so
 checkpoints store them in full (no `playerPack`).
 
-**Era maps** (2026-10-30). The earlier basketball seasons
+**Era maps** (2026-10-30; back to 1960/61 since 2026-11-09). The earlier basketball seasons
 ([football-years.md](football-years.md#era-maps)) play on maps of their own eras,
 built by the same command from `scripts/data/nba-seasons.json`: one map per era of
-franchises and arenas (`nba2000` … `nba2014`, nine in all), each from that era's
+franchises, cities and arena points (`nba1961` … `nba2014`, 42 in all, 30 of them
+added with the computed seasons of 1960/61 to 1997/98), each from that era's
 arenas and with section ids in today's strength order (a moved franchise ranks as
-its successor). Such a map adds `seasons` (the set ids it serves) to its file and
-index entry, its rows add the franchise's `name`, and the loader then takes no
-club from the game's data: the season gives each row its name, code, strength and
-five at kick-off. Today's `nba.json` is unchanged and also serves the seasons from
-2014/15, whose franchises are today's.
+its successor: the Syracuse Nationals as the 76ers, the Cincinnati Royals as the
+Kings, the Chicago Packers as the Wizards). Such a map adds `seasons` (the set ids
+it serves) to its file and index entry, its rows add the franchise's `name`, and
+the loader then takes no club from the game's data: the season gives each row its
+name, code, strength and five at kick-off. Today's `nba.json` is unchanged and
+also serves the seasons from 2014/15, whose franchises are today's. The 1960s and
+1970s maps divide the states shared then by county as today's does: New York
+between the Knicks and the Syracuse Nationals (1960/61 to 1962/63), the Knicks
+and the Buffalo Braves (1970/71 to 1977/78) and, in 1976/77, the New York Nets at
+Uniondale too; California between the Lakers and the Warriors from 1962/63, with
+the San Diego Rockets (1967/68 to 1970/71) or Clippers (from 1978/79); Ohio
+between the Royals and the Cavaliers (1970/71, 1971/72); Texas between the
+Rockets and the Spurs from 1976/77. The Kansas City-Omaha Kings hold Missouri
+alone.
+`nba1984` serves 1981/82 to 1983/84 (one build later than 1983/84's alone: a
+campaign saved on the earlier build resumes club by club).
 
 **Checks**: `scripts/nba-map.test.mjs` (in `npm run test:domestic`): file, index,
 arenas and clubs agree; the USA and Canada are all the land and the hosts are not
 drawn beneath it; the empty regions are exactly the states and provinces without an
 arena, drawn but no obstacle, on the sections' arcs; towns of one state fall in one
 territory, towns of empty land in none, and New York splits between the Knicks and
-the Nets only; cross-border land neighbours and neighbour colours; a franchise with
+the Nets only; on the 1960s and 1970s maps, New York splits between the Knicks and the
+Syracuse Nationals (1960/61) and among the Knicks, the Braves and the New York Nets
+(1976/77), California among its three franchises of 1967/68, Ohio between the Royals
+and the Cavaliers, and the Kansas City-Omaha Kings hold Missouri alone, Nebraska
+nobody's; cross-border land neighbours and neighbour colours; a franchise with
 no land neighbour still reaches its rivals over open ground, in those words; seeded duel
 campaigns on the app board reach a champion without treaties or third-party
 crossings; loader refusals; the App sets up, launches and titles an NBA campaign
