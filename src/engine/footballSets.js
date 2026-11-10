@@ -1,9 +1,10 @@
 // Data sets: one dated database's nations and clubs, played instead of a sport's built-in season. A football set is
 // one of the built-in earlier seasons (src/data/footballSeasons.js: an EA FIFA / FC roster, FIFA 05 and FIFA 06 with
-// nations only; before them SI's CM 01/02 3.9.68 and 3.9.60, CM3 and CM 97/98 databases, and SWOS 96/97's national
-// squads, nations only) or a CM 01/02 database built on this computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition,
-// src/data/basketballSeasons.js), clubs only, on its era's map; a baseball set a built-in earlier MLB season (an MLB
-// The Show edition, src/data/baseballSeasons.js), its nations by birthplace and its clubs on its era's map. Each is a
+// nations only; before them SI's Championship Manager databases, Sensible World of Soccer's, two fans' and, for the
+// World Cups of 1962 to 1994, nations computed from their Elo and squads) or a CM 01/02 database built on this
+// computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition, or computed from the season's
+// statistics), clubs only, on its era's map; a baseball set a built-in earlier MLB season (an MLB The Show edition,
+// or computed from WAR), its nations by birthplace and its clubs on its era's map; the other sports' alike. Each is a
 // `public/<sport>/<id>.json` (format 1, see docs/design/football-years.md), validated strictly and exposed as that sport
 // bound to the season. The built-in data (src/data/rosters.js, clubs.football.js, the basketball and baseball modules)
 // never changes.
@@ -94,8 +95,8 @@ const SET_KINDS = Object.freeze({
   // NRL's clubs only. The game rates attributes, not players: each overall is converted (source.conversion). A season
   // no game rated is computed from the players' match statistics (source.method 'computed', source.metric).
   nrl: { prefix: 'nrl-', id: /^nrl-\d{4}$/, sport: 'rugby-league', nations: false, mapped: true, calendar: true },
-  // `cm-<season>`: a Championship Manager edition's database before CM 01/02 (CM 97/98 → `cm-9798`), its players CM
-  // 01/02's tuples.
+  // `cm-<season>`: a Championship Manager edition's database before CM 01/02 (CM 97/98 → `cm-9798`, CM 99/00 →
+  // `cm-9900`, CM 00/01 → `cm-0001`), its players CM 01/02's tuples.
   cm: { prefix: 'cm-', id: /^cm-\d{4}$/, sport: 'football' },
   // `wc-<season end year>`: a World Cup season no game rated, its finalists' squads computed from the nations' Elo and
   // the players' records (source.conversion), nations only.

@@ -101,8 +101,8 @@ whose ids are their editions' (`cm-9900`, `cm-0001`), not a release month's.
   agreeing players making up 80 %. A person stored twice counts once, as the
   copy de-duplication keeps. For a known database a disagreement is a loud
   warning and the manifest wins. For an unknown one it stops the build.
-- Seasons ending before 2002 are refused (see football-years.md), and so are
-  seasons ending after 2100, which the game does not load.
+- Seasons ending before 1962 are refused (FIRST_YEAR; the federations table starts with
+  1961/62, see football-years.md), and so are seasons ending after 2100, which the game does not load.
 
 ## Positions
 
