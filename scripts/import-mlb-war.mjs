@@ -6,12 +6,13 @@
 //
 // It never fetches. Its sources (scripts/data/mlb-war-seasons.json `sources`) are cached in the ignored data-src/mlb-war/
 // and pinned by SHA-256: JEFFBAGWELL's WAR by player, season and stint (Neil Paine, MIT; the average of Baseball-Reference's
-// and FanGraphs' WAR) and the Lahman Baseball Database 2025 (SABR, CC BY-SA 3.0) for each player's name and birthplace,
-// each club's code, record and ballpark. Each season's snapshot holds every player who played in it: his club (that of
-// his last stint), his role and positions, his score and the inputs it was computed from, and his birth country. The
-// reference holds MLB The Show 18 to 24's overalls of the players matched to that season's WAR, by derived role,
-// strongest first: the scale the scores are mapped onto (scripts/lib/mlb-war.mjs `rateByRank`), with the calibration
-// that left one season out at a time.
+// and FanGraphs' WAR) and the Chadwick Baseball Bureau's Baseball Databank at its last commit (CC BY-SA 3.0; seasons to
+// 2022) for each player's name and birthplace, each club's code, record and ballpark. Each season's snapshot holds every
+// player who played in it: his club (that of his last stint), his role and positions, his score and the inputs it was
+// computed from, and his birth country (the Databank's, but where the manifest's `birthCountries` corrects it from a
+// pinned source). The reference holds MLB The Show 18 to 24's overalls of the players matched to that season's WAR, by
+// derived role, strongest first: the scale the scores are mapped onto (scripts/lib/mlb-war.mjs `rateByRank`), with the
+// calibration that left one season out at a time.
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -68,10 +69,9 @@ async function pinned(source, file) {
 const number = value => (value === '' || value === 'NA' || value == null ? 0 : Number(value));
 
 /**
- * Lahman's People by Baseball-Reference id. Lahman files a few ids twice, a major leaguer beside another man with no
- * major-league debut: Bob Johnson of 1969–77 (johnsbo03, born in Aurora, Illinois) beside johnsbo05, who has no
- * birthplace, and likewise Bob McClure, Eddie Miller and Billy Parker. The player is the one with a debut, else the one
- * whose own Lahman id is the Baseball-Reference id; an id neither tells apart throws once a season asks for it.
+ * The Databank's People by Baseball-Reference id. It files each player of the 58 seasons once; should an id be filed
+ * twice, a major leaguer beside another man with no major-league debut, the player is the one with a debut, else the one
+ * whose own Databank id is the Baseball-Reference id; an id neither tells apart throws once a season asks for it.
  */
 function peopleByBbref(rows) {
   const filed = new Map();
@@ -241,7 +241,8 @@ function clubStrengths(pool, ratings) {
 
 /**
  * Leave one season out: each calibration season rated against the other six's reference, against MLB The Show's own
- * overalls (players) and its own clubs (public/baseball/mlb-the-show-<nn>.json), and both against the real records.
+ * overalls (players) and its own clubs (public/baseball/mlb-the-show-<nn>.json), and both against the real records
+ * where the Databank has them (to 2022; a later season's `winShare` is null).
  */
 function leaveOneOut(calibration, records) {
   const errors = [], byRole = Object.fromEntries(WAR_ROLES.map(role => [role, { e: [], p: [], a: [] }]));
@@ -264,13 +265,15 @@ function leaveOneOut(calibration, records) {
       if (!strengths.has(club)) throw new Error(`${year}: no computed club ${club}`);
       ours.push(strengths.get(club)); theirs.push(str);
       const record = records.get(`${year}|${club}`);
-      wins.push(record.w / (record.w + record.l));
+      if (record) wins.push(record.w / (record.w + record.l));
       clubPairs.push([strengths.get(club), str]);
     }
+    // A season has every club's record or none (the Databank ends with 2022).
+    if (wins.length && wins.length !== ours.length) throw new Error(`${year}: the Databank has the records of ${wins.length} of ${ours.length} clubs`);
     seasonsOut.push({ year, cards: matches.length,
       players: { mae: r3(mean(predicted.map((p, i) => Math.abs(p - actual[i])))), pearson: r3(pearson(predicted, actual)), spearman: r3(spearman(predicted, actual)) },
       clubs: { pearson: r3(pearson(ours, theirs)), mae: r3(mean(ours.map((o, i) => Math.abs(o - theirs[i])))) },
-      winShare: { computed: r3(pearson(ours, wins)), show: r3(pearson(theirs, wins)) } });
+      winShare: wins.length ? { computed: r3(pearson(ours, wins)), show: r3(pearson(theirs, wins)) } : null });
   }
   const within = (list, d) => r3(list.filter(e => e <= d).length / list.length);
   return {
@@ -316,14 +319,27 @@ async function main() {
   // The licence the season files' attribution repeats is the file's own.
   if ((await pinned(sources.war, 'LICENSE.txt')) !== sources.war.licenceText) throw new Error('sources.war.licenceText is not the WAR file\'s LICENSE.txt');
   const war = csvRows(await pinned(sources.war, sources.war.file));
-  const people = peopleByBbref(csvObjects(await pinned(sources.lahman, 'People.csv')));
-  const lahmanTeams = csvObjects(await pinned(sources.lahman, 'Teams.csv'));
-  const homeGames = csvObjects(await pinned(sources.lahman, 'HomeGames.csv'));
-  await pinned(sources.lahman, 'readme2025.txt');
+  const { databank } = sources;
+  // The licence and the Retrosheet notice the attribution repeats are the Databank's README's own words.
+  const readme = await pinned(databank, 'README.md');
+  for (const key of ['licenceText', 'retrosheetText']) if (!readme.includes(databank[key])) throw new Error(`sources.databank.${key} is not in the Databank's README.md`);
+  const people = peopleByBbref(csvObjects(await pinned(databank, 'People.csv')));
+  const databankTeams = csvObjects(await pinned(databank, 'Teams.csv'));
+  // HomeGames names its columns year.key, team.key, park.key, games, ... (Retrosheet's game logs, by club and ballpark).
+  const homeGames = csvObjects(await pinned(databank, 'HomeGames.csv'))
+    .map(h => ({ year: h['year.key'], team: h['team.key'], park: h['park.key'], games: Number(h.games) }));
+  // A birth country the Databank gets wrong takes the one its pinned source gives (manifest `birthCountries`).
+  const corrections = manifest.birthCountries || {};
+  for (const [id, fix] of Object.entries(corrections)) {
+    if (fix.source !== 'wikipedia' || !sources.wikipedia.articles[fix.article]) throw new Error(`birthCountries.${id}: its source is no pinned Wikipedia article`);
+    const person = people.get(id);
+    if (!person || person.birthCountry !== fix.databank) throw new Error(`birthCountries.${id}: the Databank files ${JSON.stringify(person?.birthCountry)}, not ${JSON.stringify(fix.databank)}`);
+  }
+  const birthCountryOf = (id, person) => (Object.hasOwn(corrections, id) ? corrections[id].country : person.birthCountry);
 
   const seasons = playerSeasons(war);
   const get = (id, year) => seasons.get(`${id}|${year}`);
-  const records = new Map(lahmanTeams.map(t => [`${t.yearID}|${t.teamIDBR}`, { w: Number(t.W), l: Number(t.L) }]));
+  const records = new Map(databankTeams.map(t => [`${t.yearID}|${t.teamIDBR}`, { w: Number(t.W), l: Number(t.L) }]));
 
   // Calibration: MLB The Show 18 to 24 matched to their seasons' WAR.
   const byName = new Map();
@@ -347,7 +363,7 @@ async function main() {
   const teamSeasons = method.calibration.clubs * calibration.length;
   const loso = leaveOneOut(calibration, records);
   const referenceDoc = {
-    note: 'The scale the computed seasons\' scores are mapped onto (npm run import:mlb-war; docs/design/baseball.md, "Seasons before 2018: computed from WAR"): the overalls of MLB The Show 18 to 24\'s Live cards matched to their season\'s WAR (by name, then role, then club), grouped by the role the WAR file gives the player, strongest first. `teamSeasons` is the club-seasons they come from. `leaveOneOut` rates each calibration season against the other six seasons\' reference and compares it with MLB The Show\'s own overalls, its own clubs (lineups built by the game\'s rule) and the real records.',
+    note: 'The scale the computed seasons\' scores are mapped onto (npm run import:mlb-war; docs/design/baseball.md, "Seasons before 2018: computed from WAR"): the overalls of MLB The Show 18 to 24\'s Live cards matched to their season\'s WAR (by name, then role, then club), grouped by the role the WAR file gives the player, strongest first. `teamSeasons` is the club-seasons they come from. `leaveOneOut` rates each calibration season against the other six seasons\' reference and compares it with MLB The Show\'s own overalls, its own clubs (lineups built by the game\'s rule) and the real records (`winShare`, from the Baseball Databank, whose seasons end with 2022: null for 2023 and 2024).',
     years: method.calibration.years, teamSeasons,
     cards: Object.fromEntries(calibration.map(c => [c.year, c.matches.length])),
     byRole: Object.fromEntries(WAR_ROLES.map(role => [role, { cards: reference[role].length, top: reference[role][0], floor: reference[role].at(-1) }])),
@@ -360,15 +376,15 @@ async function main() {
   for (let year = from; year <= to; year++) {
     const pool = seasonPool(seasons, year, get, method);
     const unknownPeople = pool.filter(p => !people.has(p.id));
-    if (unknownPeople.length) throw new Error(`${year}: no Lahman person for ${unknownPeople.map(p => p.id).join(', ')}`);
+    if (unknownPeople.length) throw new Error(`${year}: the Databank has no person for ${unknownPeople.map(p => p.id).join(', ')}`);
     const ambiguous = pool.filter(p => people.get(p.id).ambiguous);
-    if (ambiguous.length) throw new Error(`${year}: Lahman files more than one person under ${ambiguous.map(p => `${p.id} (${people.get(p.id).ambiguous.join(', ')})`).join(', ')}`);
+    if (ambiguous.length) throw new Error(`${year}: the Databank files more than one person under ${ambiguous.map(p => `${p.id} (${people.get(p.id).ambiguous.join(', ')})`).join(', ')}`);
     const players = pool.map(p => {
       const person = people.get(p.id);
       const suffix = p.name.match(SUFFIX)?.[1] ?? null;
-      // Lahman spells initials "A. J."; the seasons write "A.J.", as MLB The Show does.
+      // The Databank spells initials "A. J."; the seasons write "A.J.", as MLB The Show does.
       const first = person.nameFirst.replace(/\b([A-Z])\. (?=[A-Z]\.)/g, '$1.');
-      return { ...p, first, last: person.nameLast, suffix, given: person.nameGiven, born: person.birthYear, country: person.birthCountry,
+      return { ...p, first, last: person.nameLast, suffix, given: person.nameGiven, born: person.birthYear, country: birthCountryOf(p.id, person),
         display: displayNameOf({ first, last: person.nameLast, suffix }) };
     });
     // Namesakes of one season get a name each that tells them apart; the season builder uses it where they share a squad.
@@ -380,17 +396,19 @@ async function main() {
     const alias = new Map();
     for (const group of byDisplay.values()) if (group.length > 1) for (const [id, name] of aliasesOf(group)) alias.set(id, name);
     const teams = {};
-    for (const t of lahmanTeams.filter(t => Number(t.yearID) === year && (t.lgID === 'AL' || t.lgID === 'NL'))
+    for (const t of databankTeams.filter(t => Number(t.yearID) === year && (t.lgID === 'AL' || t.lgID === 'NL'))
       .sort((a, b) => (a.teamIDBR < b.teamIDBR ? -1 : 1))) {
-      const games = homeGames.filter(h => h.yearkey === t.yearID && h.teamkey === t.teamID).sort((a, b) => Number(b.games) - Number(a.games));
-      teams[t.teamIDBR] = { name: t.name, league: t.lgID, w: Number(t.W), l: Number(t.L), park: games[0].parkkey, homeGames: Number(games[0].games) };
+      const games = homeGames.filter(h => h.year === t.yearID && h.team === t.teamID).sort((a, b) => b.games - a.games);
+      if (!games.length) throw new Error(`${year}: the Databank has no home games of ${t.teamIDBR}`);
+      if (games.length > 1 && games[1].games === games[0].games) throw new Error(`${year}: ${t.teamIDBR} played as many home games at ${games[0].park} as at ${games[1].park}`);
+      teams[t.teamIDBR] = { name: t.name, league: t.lgID, w: Number(t.W), l: Number(t.L), park: games[0].park, homeGames: games[0].games };
     }
     const strays = players.filter(p => !teams[p.club]);
-    if (strays.length) throw new Error(`${year}: clubs ${[...new Set(strays.map(p => p.club))].join(', ')} are not Lahman's`);
+    if (strays.length) throw new Error(`${year}: clubs ${[...new Set(strays.map(p => p.club))].join(', ')} are not the Databank's`);
     const roleOrder = role => WAR_ROLES.indexOf(role);
     players.sort((a, b) => (a.club < b.club ? -1 : a.club > b.club ? 1 : 0) || roleOrder(a.role) - roleOrder(b.role) || b.score - a.score || (a.id < b.id ? -1 : 1));
     const doc = {
-      note: `Every player of the ${year} MLB season with his score's inputs (npm run import:mlb-war; docs/design/baseball.md, "Seasons before 2018: computed from WAR"). Each player: [Baseball-Reference id, name, the name that tells him apart from a namesake of the season (else null), club (his last stint's), role (H, SP or RP), positions (the primary first), score, WAR of the season and the two before it (batting for a hitter, pitching for a pitcher; null where he did not play), plate appearances or innings of those seasons, average leverage index (relievers), Lahman birth country]. WAR: JEFFBAGWELL (Neil Paine, MIT), the average of Baseball-Reference's and FanGraphs' WAR. Names, birthplaces, clubs' records and ballparks: the Lahman Baseball Database 2025 (SABR, CC BY-SA 3.0). Each club: its name, league, won-lost record and the Lahman key of the ballpark it played most of its home games in.`,
+      note: `Every player of the ${year} MLB season with his score's inputs (npm run import:mlb-war; docs/design/baseball.md, "Seasons before 2018: computed from WAR"). Each player: [Baseball-Reference id, name, the name that tells him apart from a namesake of the season (else null), club (his last stint's), role (H, SP or RP), positions (the primary first), score, WAR of the season and the two before it (batting for a hitter, pitching for a pitcher; null where he did not play), plate appearances or innings of those seasons, average leverage index (relievers), birth country (the Databank's, or the one scripts/data/mlb-war-seasons.json \`birthCountries\` gives where it corrects the Databank)]. WAR: JEFFBAGWELL (Neil Paine, MIT), the average of Baseball-Reference's and FanGraphs' WAR. Names, birthplaces, clubs' records and ballparks: the Baseball Databank (Chadwick Baseball Bureau, CC BY-SA 3.0; its home games from Retrosheet). Each club: its name, league, won-lost record and the Databank's key (Retrosheet's park code) of the ballpark it played most of its home games in, with the number of home games it played there.`,
       season: year,
       clubs: Object.keys(teams).length,
       teams,

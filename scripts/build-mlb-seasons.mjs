@@ -16,7 +16,7 @@
 // Each season from 1960 to 2017 is its committed snapshot (scripts/data/mlb-war-seasons/<year>.json, npm run
 // import:mlb-war): every player's score, mapped rank for rank within his role onto MLB The Show 18 to 24's overalls
 // (scripts/data/mlb-war-reference.json, scripts/lib/mlb-war.mjs), then teamed by the same rules, its clubs those of the
-// franchise eras of scripts/data/mlb-war-seasons.json and its nations by Lahman's birth country.
+// franchise eras of scripts/data/mlb-war-seasons.json and its nations by the Baseball Databank's birth country.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -124,16 +124,17 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
   if (snapshot.season !== year) throw new Error(`scripts/data/mlb-war-seasons/${year}.json is the ${snapshot.season} season`);
   const colours = new Map(CLUBS.map(club => [club.id, club.col]));
   const teams = teamsOfWar(franchises, manifest, year).map(team => ({ ...team, show: team.war, col: colours.get(team.id) ?? colourFor(team.id) }));
-  // The eras are the season's clubs: Lahman's codes and names, each at the ballpark Lahman has it play most at home.
+  // The eras are the season's clubs: the Databank's codes and names, each at the ballpark the Databank has it play most at
+  // home.
   const codes = Object.keys(snapshot.teams);
   const missing = codes.filter(code => !teams.some(team => team.war === code)), extra = teams.filter(team => !snapshot.teams[team.war]);
   if (missing.length || extra.length || codes.length !== snapshot.clubs) {
     throw new Error(`${year}: the eras' clubs are not the season's (missing ${missing.join(', ') || 'none'}; extra ${extra.map(t => t.war).join(', ') || 'none'})`);
   }
   for (const team of teams) {
-    const lahman = snapshot.teams[team.war];
-    if ((team.lahmanName ?? team.name) !== lahman.name) throw new Error(`${year}: ${team.war} is Lahman's ${lahman.name}, not the ${team.name}`);
-    if (team.park !== lahman.park) throw new Error(`${year}: the ${team.name} played most at home at ${lahman.park}, not ${team.park}`);
+    const databank = snapshot.teams[team.war];
+    if ((team.databankName ?? team.name) !== databank.name) throw new Error(`${year}: ${team.war} is the Databank's ${databank.name}, not the ${team.name}`);
+    if (team.park !== databank.park) throw new Error(`${year}: the ${team.name} played most at home at ${databank.park}, not ${team.park}`);
   }
   const rows = snapshot.players.map(([id, name, alias, club, role, positions, score, war, use, li, born]) => ({ id, name, alias, club, role, positions: positions.split('/'), score, war, use, li, born }));
   for (const row of rows) {
@@ -171,9 +172,9 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
     if (still.size) throw new Error(`${year}: squads still repeat ${[...still].join(', ')}`);
   }
   const source = {
-    provider: 'Neil Paine (JEFFBAGWELL WAR) and SABR (Lahman Baseball Database)',
+    provider: 'Neil Paine (JEFFBAGWELL WAR) and the Chadwick Baseball Bureau (Baseball Databank)',
     edition: 'Computed from WAR',
-    name: 'JEFFBAGWELL WAR (Neil Paine) and the Lahman Baseball Database (SABR)',
+    name: 'JEFFBAGWELL WAR (Neil Paine) and the Baseball Databank (Chadwick Baseball Bureau)',
     computed: true,
     method: manifest.seasonSource.method,
     conversion: manifest.seasonSource.conversion,
@@ -195,14 +196,14 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
   doc.version = `${doc.id}-${contentHash(doc)}`;
   // Which nations field a team, by the game's own rule (fieldedNations): those whose own players hold half the lineup.
   const fielded = fieldedNations({ ...baseball, rosters: doc.nations, clubs: doc.clubs, territory: doc.territory });
-  const lahmanOf = id => snapshot.teams[teams.find(t => t.id === id).war];
+  const databankOf = id => snapshot.teams[teams.find(t => t.id === id).war];
   const record = code => snapshot.teams[code].w / (snapshot.teams[code].w + snapshot.teams[code].l);
   const strength = new Map(clubs.map(c => [c.id, c.str]));
   const best = rows.filter(row => row.role === 'H').sort((a, b) => ratings.get(b.id) - ratings.get(a.id) || b.score - a.score).slice(0, 5)
     .concat(rows.filter(row => row.role !== 'H').sort((a, b) => ratings.get(b.id) - ratings.get(a.id) || b.score - a.score).slice(0, 3));
   const audit = {
     id: doc.id, version: doc.version, map: doc.map, players: rows.length,
-    clubs: clubs.map(c => `${c.name} ${c.str} (${lahmanOf(c.id).w}-${lahmanOf(c.id).l})`),
+    clubs: clubs.map(c => `${c.name} ${c.str} (${databankOf(c.id).w}-${databankOf(c.id).l})`),
     strengthVsRecord: Math.round(pearson(teams.map(t => strength.get(t.id)), teams.map(t => record(t.war))) * 1000) / 1000,
     best: best.map(row => `${players.find(p => p.id === row.id).name} ${row.positions[0]} ${ratings.get(row.id)}`),
     nations: nations.map(n => `${n.name} ${n.str} (${n.squad.length}${n.open.length ? `; the game fills ${n.open.join(' ')}` : ''})`),
@@ -213,9 +214,16 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
   return { doc, text: serializeFootballSet(doc), audit };
 }
 
-/** public/baseball/ATTRIBUTION.txt: the computed seasons' sources, their licences and the MIT notice they require. */
+/**
+ * public/baseball/ATTRIBUTION.txt: the computed seasons' sources, their licences, and the notices they require (the WAR
+ * file's MIT licence, the Baseball Databank's CC BY-SA 3.0 statement and Retrosheet's notice, in their own words).
+ */
 function attributionText(manifest, docs) {
-  const { war, lahman, wikipedia } = manifest.sources;
+  const { war, databank, wikipedia } = manifest.sources;
+  const indent = text => text.split('\n').map(line => (line ? `  ${line}` : '')).join('\n');
+  const corrected = Object.values(manifest.birthCountries || {});
+  const correctedNames = corrected.map(fix => fix.name).join(', ');
+  const correctedPlaces = corrected.map(fix => `${fix.name}'s, ${fix.birthplace}, ${fix.country}`).join('; ');
   const years = docs.map(doc => doc.year);
   return `Baseball seasons ${Math.min(...years)}-${Math.max(...years)} (mlb-war-<year>.json): attribution and licence
 ${'='.repeat(78)}
@@ -231,18 +239,28 @@ WAR: ${war.name} by ${war.author} (${war.repository}),
   theirs. Neither site was read for these seasons.
   Licence: ${war.licence}.
 
-${war.licenceText.split('\n').map(line => (line ? `  ${line}` : '')).join('\n')}
+${indent(war.licenceText)}
 
 Names, given names and birth countries of the players, and the clubs' codes, names, records and ballparks:
-  the ${lahman.name}, ${lahman.release} (${lahman.url}),
-  Copyright 1996-2025 SABR, via generous donation from Sean Lahman. Licensed under Creative Commons
-  Attribution-ShareAlike 3.0 Unported (https://creativecommons.org/licenses/by-sa/3.0/). These season files,
-  derived from it, are shared under the same licence, CC BY-SA 3.0, as are the snapshots they are built from
-  (scripts/data/mlb-war-seasons/).
+  the ${databank.name} by the ${databank.publisher} (${databank.repository}),
+  at its last commit ${databank.commit}, read from ${databank.copy}
+  (the Bureau's own repository is no longer on GitHub). Changes: only each player's name, given names, birth
+  year and birth country and each club's name, record and main ballpark are taken, joined to the WAR as
+  described above; ${corrected.length === 1 ? 'one birth country is' : `${corrected.length} birth countries are`} corrected (${correctedNames}, below). The Databank is historically based in
+  part on the Lahman Baseball Database, version 2015-01-24, Copyright (C) 1996-2015 by Sean Lahman (CC BY-SA 3.0).
+  Licence: ${databank.licence}.
+  These season files, derived from it, are shared under the same licence, CC BY-SA 3.0, as are the
+  snapshots they are built from (scripts/data/mlb-war-seasons/). In the Databank's words:
 
-Ballpark names of the day, and the locations of the ballparks of the 1960s and 1970s on the maps of those
-  seasons (public/domestic/mlb<year>.json): ${wikipedia.name} (CC BY-SA 4.0), only facts taken from each
-  article's infobox; each article's revision is pinned in scripts/data/mlb-war-seasons.json.
+${indent(databank.licenceText)}
+
+${indent(databank.retrosheetText)}
+
+Ballpark names of the day, the locations of the ballparks of the 1960s and 1970s on the maps of those
+  seasons (public/domestic/mlb<year>.json), and the birthplace of each player whose birth country the Databank
+  gets wrong (${correctedPlaces}):
+  ${wikipedia.name} (CC BY-SA 4.0), only facts taken from each article's infobox; each article's revision is
+  pinned in scripts/data/mlb-war-seasons.json.
 `;
 }
 

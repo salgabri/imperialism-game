@@ -50,8 +50,8 @@ const pearson = (xs, ys) => {
 
 // ---------- building ----------
 
-const cached = ['data-src/mlb-war/jeffbagwell-war', 'data-src/mlb-war/lahman-2025'].every(dir => existsSync(new URL(`../${dir}`, import.meta.url)));
-test('the snapshots and the reference rebuild byte for byte from the pinned WAR and Lahman files', { skip: !cached && 'the WAR and Lahman caches (data-src/mlb-war/) are not on this computer' }, () => {
+const cached = [MANIFEST.sources.war.cache, MANIFEST.sources.databank.cache].every(dir => existsSync(new URL(`../${dir}`, import.meta.url)));
+test('the snapshots and the reference rebuild byte for byte from the pinned WAR and Baseball Databank files', { skip: !cached && 'the WAR and Databank caches (data-src/mlb-war/) are not on this computer' }, () => {
   assert.match(execFileSync(process.execPath, ['scripts/import-mlb-war.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
     /Verified the 58 snapshots and the reference byte for byte/);
 });
@@ -82,10 +82,13 @@ test('the reference is MLB The Show 18 to 24\'s 9,674 matched cards, and leaving
     const ref = REFERENCE.reference[role];
     assert.ok(ref.every((v, i) => Number.isInteger(v) && (!i || v <= ref[i - 1])), `${role} runs strongest first`);
   }
-  const { players, roles, clubs } = REFERENCE.leaveOneOut;
+  const { players, roles, clubs, seasons } = REFERENCE.leaveOneOut;
   assert.ok(players.mae <= 4.5, `players MAE ${players.mae}`);
   assert.ok(clubs.pearson >= 0.88, `clubs r ${clubs.pearson}`);
   assert.ok(roles.H.spearman >= 0.84 && roles.SP.spearman >= 0.8 && roles.RP.spearman >= 0.7);
+  // The real records are the Baseball Databank's, whose seasons end with 2022.
+  assert.deepEqual(seasons.map(season => [season.year, season.winShare === null]),
+    [[2018, false], [2019, false], [2020, false], [2021, false], [2022, false], [2023, true], [2024, true]]);
 });
 
 test('ratings keep each role\'s order: nobody passes anybody, and equal scores rate alike', () => {
@@ -171,7 +174,7 @@ test('the computed seasons look like their years: Mantle and Mays in 1961, the O
   assert.deepEqual(AUDIT.seasons.map(season => season.id), [...YEARS].reverse().map(warSeasonIdOf));
 });
 
-test('nations by birthplace: four in 1960, the countries of the day placed in today\'s, nobody without a birthplace', () => {
+test('nations by birthplace: four in 1960, the Databank\'s countries placed, one corrected, nobody without a birthplace', () => {
   const fielded = year => {
     const set = decodeFootballSet(seasonFile(year), warSeasonIdOf(year));
     return fieldedNations(seasonSport(set));
@@ -185,22 +188,36 @@ test('nations by birthplace: four in 1960, the countries of the day placed in to
   // whose fourth is Venezuela, South America's. Those seasons' nations play the world.
   const offersNca = year => nationTheatres(seasonSport(decodeFootballSet(seasonFile(year), warSeasonIdOf(year)))).some(scope => scope.id === 'CONCACAF');
   assert.deepEqual(YEARS.filter(year => !offersNca(year)), [1985, 1986, 1987, 1989, 1990]);
+  // The Baseball Databank's birth countries: its own spellings (V.I., Curacao), today's countries for those of their day,
+  // the home nations as the United Kingdom, and Hong Kong (Austin Brice) as China, as MLB The Show files him.
   const { nations } = MANIFEST;
-  assert.deepEqual(['West Germany', 'England', 'Scotland', 'Soviet Union', 'Czechoslovakia', 'South Vietnam', 'British Honduras', 'Curaçao', 'U.S. Virgin Islands']
-    .map(country => nationOfBirthCountry(country, nations)), ['276', '826', '826', '643', '703', '704', '084', '528', '840']);
+  assert.deepEqual(['Germany', 'United Kingdom', 'Russia', 'Slovakia', 'Viet Nam', 'Belize', 'Curacao', 'V.I.', 'Hong Kong', 'Panama']
+    .map(country => nationOfBirthCountry(country, nations)), ['276', '826', '643', '703', '704', '084', '528', '840', '156', '591']);
   assert.equal(nationOfBirthCountry('', nations), null);
   assert.equal(nationOfBirthCountry('Singapore', nations), null);
   assert.throws(() => nationOfBirthCountry('Atlantis', nations), /No nation for the birth country/);
-  // Lahman files Bob Johnson of the 1969 Mets (johnsbo03, born in Aurora, Illinois) twice, beside a namesake with no
-  // major-league debut and no birthplace: the major leaguer is American. Every player of the 58 seasons has a
+  assert.throws(() => nationOfBirthCountry('Czech Republic', nations), /No nation for the birth country/);
+  // The one birth country the Databank gets wrong: Elmer Valo, born in Rybník, Levice District (Slovakia), whom it files
+  // under the Czech Republic. The correction names its pinned Wikipedia article, and the snapshots hold it.
+  assert.deepEqual(Object.keys(MANIFEST.birthCountries), ['valoel01']);
+  const valo = MANIFEST.birthCountries.valoel01;
+  assert.deepEqual([valo.databank, valo.country], ['Czech Republic', 'Slovakia']);
+  assert.ok(MANIFEST.sources.wikipedia.articles[valo.article], 'the correction\'s article is pinned');
+  assert.deepEqual([1960, 1961].map(year => rows(year).find(row => row.id === 'valoel01').born), ['Slovakia', 'Slovakia']);
+  // Rod Carew, born in Gatun in the Panama Canal Zone, is Panama's, as the Databank files him: in 1978, with Mike Eden
+  // (Fort Clayton), Panama fields a team.
+  assert.deepEqual([1967, 1985].map(year => rows(year).find(row => row.id === 'carewro01').born), ['Panama', 'Panama']);
+  assert.ok(seasonFile(1977).nations['591'][2].some(([name]) => name === 'Rod Carew'));
+  assert.ok(fielded(1978).includes('591'));
+  // Bob Johnson of the 1969 Mets (johnsbo03, born in Aurora, Illinois) is American. Every player of the 58 seasons has a
   // birthplace, and only Robin Jennings, born in Singapore, has none of the game's nations.
   assert.equal(rows(1969).find(row => row.id === 'johnsbo03').born, 'USA');
   assert.ok(seasonFile(1969).clubs.find(club => club.code === 'NYM').squad.some(([name]) => name === 'Bob Johnson'));
   assert.ok(YEARS.every(year => rows(year).every(row => row.born !== '')), 'every player has a birthplace');
   assert.deepEqual([...new Set(AUDIT.seasons.flatMap(season => season.noNation))], ['Robin Jennings (jenniro01): born in Singapore, no nation of the game']);
-  // His namesake of the same seasons, Bob W. Johnson, is told apart by the middle initials Lahman's given names hold.
+  // His namesake of the same seasons, Bob W. Johnson, is told apart by the middle initials the Databank's given names hold.
   assert.deepEqual(rows(1970).filter(row => row.name === 'Bob Johnson').map(row => row.alias).sort(), ['Bob D. Johnson', 'Bob W. Johnson']);
-  // Victor Cole, born in Leningrad, plays for Russia in 1992.
+  // Victor Cole, born in Leningrad (the Databank's St. Petersburg, Russia), plays for Russia in 1992.
   assert.ok(seasonFile(1992).nations['643']?.[2].some(([name]) => name === 'Victor Cole'));
 });
 
@@ -210,10 +227,10 @@ test('namesakes who share a squad are told apart, the best keeping the name', ()
     'mlb-war-1993: Pedro Martinez (martipe03) → Pedro Martinez (1968)']);
   const dominicans = seasonFile(1994).nations['214'][2].map(([name]) => name);
   assert.ok(dominicans.includes('Pedro Martinez') && dominicans.includes('Pedro Martinez (1968)'));
-  // Lahman's names, with the WAR file's generational suffixes and initials written as MLB The Show writes them.
+  // The Databank's names, with the WAR file's generational suffixes and initials written as MLB The Show writes them.
   const names = seasonFile(1990).clubs.find(club => club.code === 'SEA').squad.map(([name]) => name);
   assert.ok(names.includes('Ken Griffey Jr.') && names.includes('Ken Griffey'), 'the Griffeys of the 1990 Mariners');
-  assert.ok(seasonFile(1965).clubs.flatMap(club => club.squad).some(([name]) => name === 'Hank Aaron'), 'Lahman\'s Hank, not the WAR file\'s Henry');
+  assert.ok(seasonFile(1965).clubs.flatMap(club => club.squad).some(([name]) => name === 'Hank Aaron'), 'the Databank\'s Hank, not the WAR file\'s Henry');
 });
 
 // ---------- the clubs of their day and their maps ----------

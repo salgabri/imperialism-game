@@ -35,12 +35,28 @@ WAR: JEFFBAGWELL historical WAR by Neil Paine (https://github.com/Neil-Paine-1/M
   SOFTWARE.
 
 Names, given names and birth countries of the players, and the clubs' codes, names, records and ballparks:
-  the Lahman Baseball Database, 2025 release (seasons 1871-2025) (https://sabr.org/lahman-database/),
-  Copyright 1996-2025 SABR, via generous donation from Sean Lahman. Licensed under Creative Commons
-  Attribution-ShareAlike 3.0 Unported (https://creativecommons.org/licenses/by-sa/3.0/). These season files,
-  derived from it, are shared under the same licence, CC BY-SA 3.0, as are the snapshots they are built from
-  (scripts/data/mlb-war-seasons/).
+  the Baseball Databank by the Chadwick Baseball Bureau (https://github.com/chadwickbureau/baseballdatabank),
+  at its last commit e9f247e0445bb6fee7ace30b46ffb3f83b5431b3, read from https://github.com/infonuum/baseballdatabank
+  (the Bureau's own repository is no longer on GitHub). Changes: only each player's name, given names, birth
+  year and birth country and each club's name, record and main ballpark are taken, joined to the WAR as
+  described above; one birth country is corrected (Elmer Valo, below). The Databank is historically based in
+  part on the Lahman Baseball Database, version 2015-01-24, Copyright (C) 1996-2015 by Sean Lahman (CC BY-SA 3.0).
+  Licence: CC BY-SA 3.0 Unported (https://creativecommons.org/licenses/by-sa/3.0/): Chadwick Baseball Bureau.
+  These season files, derived from it, are shared under the same licence, CC BY-SA 3.0, as are the
+  snapshots they are built from (scripts/data/mlb-war-seasons/). In the Databank's words:
 
-Ballpark names of the day, and the locations of the ballparks of the 1960s and 1970s on the maps of those
-  seasons (public/domestic/mlb<year>.json): English Wikipedia (CC BY-SA 4.0), only facts taken from each
-  article's infobox; each article's revision is pinned in scripts/data/mlb-war-seasons.json.
+  This work is licensed by [Chadwick Baseball Bureau](www.chadwick-bureau.com)
+  under the Creative Commons Attribution-ShareAlike 3.0 Unported License.  For details see
+  http://creativecommons.org/licenses/by-sa/3.0/
+
+  The tables `Parks.csv` and `HomeGames.csv` are based on the game logs
+  and park code table published by Retrosheet.
+  This information is available free of charge from and is copyrighted
+  by Retrosheet.  Interested parties may contact Retrosheet at 
+  http://www.retrosheet.org.
+
+Ballpark names of the day, the locations of the ballparks of the 1960s and 1970s on the maps of those
+  seasons (public/domestic/mlb<year>.json), and the birthplace of each player whose birth country the Databank
+  gets wrong (Elmer Valo's, Rybník, Levice District, Slovakia):
+  English Wikipedia (CC BY-SA 4.0), only facts taken from each article's infobox; each article's revision is
+  pinned in scripts/data/mlb-war-seasons.json.

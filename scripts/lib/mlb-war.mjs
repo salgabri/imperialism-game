@@ -75,9 +75,10 @@ export function rateByRank(players, reference, clubCount, teamSeasons) {
  * The clubs of season `year`, `{ franchise, war, id, name, code, city, ballpark, base?, home, park }` in today's
  * franchise order (scripts/data/mlb-teams.json): each franchise with an era of scripts/data/mlb-war-seasons.json
  * (`eras`) covering the year, under its own id, name, code and territory (`city`) where the era names them and today's
- * otherwise. `war` is the Baseball-Reference code the WAR file and Lahman file the club under, `park` Lahman's key of the
- * ballpark it played most of its home games in, `base` the ballpark it grows from when that ballpark was another
- * club's (`home` is then the base's), and `lahmanName` the name Lahman gives the club where it is not the era's.
+ * otherwise. `war` is the Baseball-Reference code the WAR file and the Baseball Databank file the club under, `park` the
+ * Databank's key (Retrosheet's park code) of the ballpark it played most of its home games in, `base` the ballpark it
+ * grows from when that ballpark was another club's (`home` is then the base's), and `databankName` the name the Databank
+ * gives the club where it is not the era's.
  */
 export function teamsOfWar(franchises, manifest, year) {
   return Object.entries(franchises).flatMap(([franchise, team]) => {
@@ -85,7 +86,7 @@ export function teamsOfWar(franchises, manifest, year) {
     if (!era) return [];
     return [{ franchise, war: era.war, id: era.id ?? franchise, name: era.name ?? team.name, code: era.code ?? team.code,
       city: era.city ?? team.city, ballpark: era.ballpark, ...(era.base ? { base: era.base } : {}), home: era.home, park: era.park,
-      ...(era.lahmanName ? { lahmanName: era.lahmanName } : {}) }];
+      ...(era.databankName ? { databankName: era.databankName } : {}) }];
   });
 }
 
@@ -97,7 +98,8 @@ export function warMapOf(manifest, year) {
 }
 
 /**
- * The game's nation of a Lahman birth country (scripts/data/mlb-war-seasons.json `nations`): a nation id, or null for a
+ * The game's nation of a birth country of the snapshots (the Baseball Databank's, or a correction's; scripts/data/
+ * mlb-war-seasons.json `nations`): a nation id, or null for a
  * country the game has no nation for (and for a player with no birthplace). Throws for a country the manifest does not
  * list, so a new one is never placed silently.
  */
@@ -107,11 +109,11 @@ export function nationOfBirthCountry(country, nations) {
   return nations[country];
 }
 
-/** A player's name as the seasons show it: Lahman's first name and surname, then the WAR file's generational suffix. */
+/** A player's name as the seasons show it: the Databank's first name and surname, then the WAR file's generational suffix. */
 export const displayNameOf = ({ first, last, suffix }) => `${first} ${last}${suffix ? ` ${suffix}` : ''}`;
 
 /**
- * Names that tell apart players who share one (`group`: `{ id, first, last, suffix, given, born }`, `given` Lahman's
+ * Names that tell apart players who share one (`group`: `{ id, first, last, suffix, given, born }`, `given` the Databank's
  * given names, `born` the birth year): the middle initial of each one's given names ("Bob L. Miller") when every one
  * has a second given name and their initials differ, else the birth year ("Pedro Martinez (1971)") when those differ;
  * nothing when neither tells them apart. → Map id → alias.

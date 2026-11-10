@@ -1,15 +1,15 @@
 {
   "generatedBy": "scripts/build-mlb-seasons.mjs",
   "source": {
-    "provider": "Neil Paine (JEFFBAGWELL WAR) and SABR (Lahman Baseball Database)",
+    "provider": "Neil Paine (JEFFBAGWELL WAR) and the Chadwick Baseball Bureau (Baseball Databank)",
     "edition": "Computed from WAR",
-    "name": "JEFFBAGWELL WAR (Neil Paine) and the Lahman Baseball Database (SABR)",
+    "name": "JEFFBAGWELL WAR (Neil Paine) and the Baseball Databank (Chadwick Baseball Bureau)",
     "computed": true,
     "method": "Each player's WAR (JEFFBAGWELL: the average of Baseball-Reference's and FanGraphs' WAR) per playing time over the season and the two before it, weighted 5, 3 and 2 (relievers 1, 1 and 1) and regressed toward a level below replacement: hitters 600 × (Σ weight·WAR − 9) / (Σ weight·PA + 600); starters 180 × (Σ weight·WAR − 4.5) / (Σ weight·IP + 150); relievers 65 × (Σ WAR − 1.5) / (Σ IP + 30) + 0.8 × the season's average leverage index. Roles and positions from his games, starts and innings, his club his last. docs/design/baseball.md, \"Seasons before 2018: computed from WAR\".",
     "conversion": "Rank for rank within each role (hitters, starters, relievers) onto MLB The Show 18 to 24's overalls at the same depth per club: the k-th best score of a season of T clubs takes the overall at index (k − 0.5) / T × 210 − 0.5 of that role's 9,674-card reference, strongest first (scripts/data/mlb-war-reference.json), interpolated and rounded; equal scores share their mean rank.",
-    "licence": "WAR: JEFFBAGWELL (Neil Paine), MIT. Names, birthplaces, clubs and ballparks: the Lahman Baseball Database 2025 (SABR), CC BY-SA 3.0. See public/baseball/ATTRIBUTION.txt.",
+    "licence": "WAR: JEFFBAGWELL (Neil Paine), MIT. Names, birthplaces, clubs and ballparks: the Baseball Databank (Chadwick Baseball Bureau), CC BY-SA 3.0; its home games from Retrosheet. See public/baseball/ATTRIBUTION.txt.",
     "url": "https://raw.githubusercontent.com/Neil-Paine-1/MLB-WAR-data-historical/1c8c3084d62112efdaa7054125af3cd01003e38d/jeffbagwell_war_historical_2025.csv",
-    "retrieved": "2026-11-09",
+    "retrieved": "2026-11-10",
     "rawScale": "WAR"
   },
   "reference": {
@@ -87,7 +87,7 @@
   "seasons": [
     {
       "id": "mlb-war-2017",
-      "version": "mlb-war-2017-ee855061",
+      "version": "mlb-war-2017-a420190e",
       "map": "mlb2017",
       "players": 1358,
       "clubs": [
@@ -172,7 +172,7 @@
     },
     {
       "id": "mlb-war-2016",
-      "version": "mlb-war-2016-48b25d1c",
+      "version": "mlb-war-2016-c5f3acb8",
       "map": "mlb2016",
       "players": 1353,
       "clubs": [
@@ -254,7 +254,7 @@
     },
     {
       "id": "mlb-war-2015",
-      "version": "mlb-war-2015-2ade78b4",
+      "version": "mlb-war-2015-88a83c26",
       "map": "mlb2012",
       "players": 1348,
       "clubs": [
@@ -337,7 +337,7 @@
     },
     {
       "id": "mlb-war-2014",
-      "version": "mlb-war-2014-36f628ff",
+      "version": "mlb-war-2014-1a54a00d",
       "map": "mlb2012",
       "players": 1320,
       "clubs": [
@@ -420,7 +420,7 @@
     },
     {
       "id": "mlb-war-2013",
-      "version": "mlb-war-2013-82a3602e",
+      "version": "mlb-war-2013-261f08bb",
       "map": "mlb2012",
       "players": 1304,
       "clubs": [
@@ -503,7 +503,7 @@
     },
     {
       "id": "mlb-war-2012",
-      "version": "mlb-war-2012-3dce77be",
+      "version": "mlb-war-2012-c84e074e",
       "map": "mlb2012",
       "players": 1284,
       "clubs": [
@@ -587,7 +587,7 @@
     },
     {
       "id": "mlb-war-2011",
-      "version": "mlb-war-2011-0b8f0913",
+      "version": "mlb-war-2011-ace354f1",
       "map": "mlb2010",
       "players": 1295,
       "clubs": [
@@ -670,7 +670,7 @@
     },
     {
       "id": "mlb-war-2010",
-      "version": "mlb-war-2010-61bad9c8",
+      "version": "mlb-war-2010-9575dcfc",
       "map": "mlb2010",
       "players": 1249,
       "clubs": [
@@ -751,7 +751,7 @@
     },
     {
       "id": "mlb-war-2009",
-      "version": "mlb-war-2009-9fe4a2a1",
+      "version": "mlb-war-2009-532bb2c1",
       "map": "mlb2009",
       "players": 1266,
       "clubs": [
@@ -833,7 +833,7 @@
     },
     {
       "id": "mlb-war-2008",
-      "version": "mlb-war-2008-7b7a37cc",
+      "version": "mlb-war-2008-2fb2f8d0",
       "map": "mlb2008",
       "players": 1291,
       "clubs": [
@@ -916,7 +916,7 @@
     },
     {
       "id": "mlb-war-2007",
-      "version": "mlb-war-2007-234de849",
+      "version": "mlb-war-2007-f5c20337",
       "map": "mlb2006",
       "players": 1278,
       "clubs": [
@@ -997,7 +997,7 @@
     },
     {
       "id": "mlb-war-2006",
-      "version": "mlb-war-2006-bfc4785e",
+      "version": "mlb-war-2006-510393fb",
       "map": "mlb2006",
       "players": 1242,
       "clubs": [
@@ -1080,7 +1080,7 @@
     },
     {
       "id": "mlb-war-2005",
-      "version": "mlb-war-2005-48cee81b",
+      "version": "mlb-war-2005-65873184",
       "map": "mlb2005",
       "players": 1237,
       "clubs": [
@@ -1161,7 +1161,7 @@
     },
     {
       "id": "mlb-war-2004",
-      "version": "mlb-war-2004-4c9d21c2",
+      "version": "mlb-war-2004-55c44656",
       "map": "mlb2004",
       "players": 1247,
       "clubs": [
@@ -1242,7 +1242,7 @@
     },
     {
       "id": "mlb-war-2003",
-      "version": "mlb-war-2003-1b283e67",
+      "version": "mlb-war-2003-b6d41f7f",
       "map": "mlb2003",
       "players": 1230,
       "clubs": [
@@ -1324,7 +1324,7 @@
     },
     {
       "id": "mlb-war-2002",
-      "version": "mlb-war-2002-2fe2284f",
+      "version": "mlb-war-2002-07287199",
       "map": "mlb2001",
       "players": 1218,
       "clubs": [
@@ -1406,7 +1406,7 @@
     },
     {
       "id": "mlb-war-2001",
-      "version": "mlb-war-2001-725b92f3",
+      "version": "mlb-war-2001-0d440067",
       "map": "mlb2001",
       "players": 1220,
       "clubs": [
@@ -1491,7 +1491,7 @@
     },
     {
       "id": "mlb-war-2000",
-      "version": "mlb-war-2000-6bf90384",
+      "version": "mlb-war-2000-08ee55d4",
       "map": "mlb2000",
       "players": 1230,
       "clubs": [
@@ -1545,7 +1545,7 @@
         "Panama 70 (11; the game fills SS RP)",
         "Canada 67 (17; the game fills C RF DH)",
         "Mexico 65 (22; the game fills C CF)",
-        "Cuba 60 (12; the game fills 2B 3B CF RF RP RP)",
+        "Cuba 60 (11; the game fills 2B 3B CF RF RP RP)",
         "Japan 56 (11; the game fills 1B 2B 3B SS CF RF DH)",
         "Netherlands 55 (5; the game fills C 1B 2B SS LF RF RP RP)",
         "Australia 51 (4; the game fills C 1B 3B SS LF CF RF DH RP)",
@@ -1574,7 +1574,7 @@
     },
     {
       "id": "mlb-war-1999",
-      "version": "mlb-war-1999-653e7267",
+      "version": "mlb-war-1999-3652dc8a",
       "map": "mlb1999",
       "players": 1209,
       "clubs": [
@@ -1628,7 +1628,7 @@
         "Canada 69 (18; the game fills C SS)",
         "Panama 68 (11; the game fills SS DH)",
         "Mexico 64 (18; the game fills C SS CF DH)",
-        "Cuba 63 (12; the game fills 2B 3B CF RF)",
+        "Cuba 63 (11; the game fills 2B 3B CF RF)",
         "Australia 55 (5; the game fills 1B 3B SS LF CF RF DH RP)",
         "Japan 54 (9; the game fills C 1B 2B 3B SS LF RF DH)",
         "Netherlands 54 (4; the game fills C 2B 3B SS LF DH RP RP RP)",
@@ -1658,7 +1658,7 @@
     },
     {
       "id": "mlb-war-1998",
-      "version": "mlb-war-1998-0d1825f5",
+      "version": "mlb-war-1998-77efbc9a",
       "map": "mlb1998",
       "players": 1186,
       "clubs": [
@@ -1712,7 +1712,7 @@
         "Canada 69 (15; the game fills SS)",
         "Mexico 64 (16; the game fills C 1B SS CF RF)",
         "Panama 62 (9; the game fills 2B 3B SS RF DH)",
-        "Cuba 60 (11; the game fills 2B 3B CF RF DH RP)",
+        "Cuba 60 (10; the game fills 2B 3B CF RF DH RP)",
         "Netherlands 57 (7; the game fills C 3B SS DH RP RP)",
         "Australia 55 (5; the game fills 2B 3B SS LF CF RF DH SP)",
         "Japan 52 (6; the game fills C 1B 2B 3B SS LF CF RF DH RP)",
@@ -1743,7 +1743,7 @@
     },
     {
       "id": "mlb-war-1997",
-      "version": "mlb-war-1997-07234f3d",
+      "version": "mlb-war-1997-29bc861c",
       "map": "mlb1997",
       "players": 1123,
       "clubs": [
@@ -1795,7 +1795,7 @@
         "Canada 66 (12; the game fills 2B 3B SS)",
         "Mexico 64 (17; the game fills C CF RF DH)",
         "Panama 62 (9; the game fills 2B 3B SS RP)",
-        "Cuba 60 (10; the game fills 2B 3B CF RF DH RP)",
+        "Cuba 60 (9; the game fills 2B 3B CF RF DH RP)",
         "Australia 55 (5; the game fills 2B 3B SS LF CF RF DH SP)",
         "Netherlands 55 (6; the game fills C SS RF DH RP RP RP)",
         "Japan 53 (5; the game fills C 1B 2B 3B SS LF CF RF DH)",
@@ -1826,7 +1826,7 @@
     },
     {
       "id": "mlb-war-1996",
-      "version": "mlb-war-1996-bc5b8b9b",
+      "version": "mlb-war-1996-f4edbfee",
       "map": "mlb1995",
       "players": 1141,
       "clubs": [
@@ -1876,7 +1876,7 @@
         "Puerto Rico 80 (23)",
         "Venezuela 74 (23)",
         "Canada 59 (11; the game fills 2B 3B SS CF DH)",
-        "Cuba 59 (8; the game fills C 2B 3B CF RF DH RP)",
+        "Cuba 59 (7; the game fills C 2B 3B CF RF DH RP)",
         "Mexico 59 (14; the game fills C 1B LF CF DH)",
         "Panama 59 (8; the game fills 1B 3B SS RP RP)",
         "Australia 54 (4; the game fills 1B 3B SS LF CF RF DH RP RP)",
@@ -1908,7 +1908,7 @@
     },
     {
       "id": "mlb-war-1995",
-      "version": "mlb-war-1995-2232cfa3",
+      "version": "mlb-war-1995-7de3052f",
       "map": "mlb1995",
       "players": 1133,
       "clubs": [
@@ -1959,7 +1959,7 @@
         "Venezuela 72 (22)",
         "Mexico 62 (17; the game fills 1B LF CF)",
         "Canada 60 (9; the game fills 2B 3B SS CF DH)",
-        "Cuba 58 (6; the game fills C 2B 3B SS LF CF DH RP)",
+        "Cuba 58 (5; the game fills C 2B 3B SS LF CF DH RP)",
         "Panama 55 (6; the game fills C 1B 3B SS DH RP RP)",
         "Australia 52 (3; the game fills 1B 3B SS LF CF RF DH SP RP RP)",
         "Jamaica 51 (2; the game fills C 1B 2B 3B SS RF DH SP RP RP RP)",
@@ -1986,7 +1986,7 @@
     },
     {
       "id": "mlb-war-1994",
-      "version": "mlb-war-1994-675cee79",
+      "version": "mlb-war-1994-1505fde3",
       "map": "mlb1994",
       "players": 991,
       "clubs": [
@@ -2036,7 +2036,7 @@
         "Dominican Rep. 79 (26)",
         "Venezuela 69 (15; the game fills CF RP)",
         "Canada 62 (11; the game fills 2B 3B SS RF DH)",
-        "Cuba 59 (7; the game fills C 2B 3B SS LF CF RP)",
+        "Cuba 59 (6; the game fills C 2B 3B SS LF CF RP)",
         "Mexico 54 (9; the game fills C 1B SS CF RF DH RP RP)",
         "Australia 53 (4; the game fills 1B 3B SS LF CF RF DH RP RP)",
         "Jamaica 51 (2; the game fills C 1B 2B 3B SS RF DH SP RP RP RP)",
@@ -2065,7 +2065,7 @@
     },
     {
       "id": "mlb-war-1993",
-      "version": "mlb-war-1993-e8de3a42",
+      "version": "mlb-war-1993-fe41370b",
       "map": "mlb1993",
       "players": 1104,
       "clubs": [
@@ -2115,7 +2115,7 @@
         "Dominican Rep. 78 (26)",
         "Venezuela 70 (17; the game fills CF)",
         "Canada 61 (15; the game fills 2B 3B SS RF)",
-        "Cuba 61 (9; the game fills 2B 3B SS CF RP)",
+        "Cuba 61 (8; the game fills 2B 3B SS CF RP)",
         "Mexico 55 (8; the game fills C 2B CF RF DH RP RP)",
         "Australia 54 (5; the game fills 1B 3B SS LF CF RF DH RP)",
         "Panama 52 (4; the game fills C 1B 2B 3B SS CF DH SP RP)",
@@ -2144,7 +2144,7 @@
     },
     {
       "id": "mlb-war-1992",
-      "version": "mlb-war-1992-ad0df25b",
+      "version": "mlb-war-1992-10d3a871",
       "map": "mlb1992",
       "players": 1007,
       "clubs": [
@@ -2191,8 +2191,8 @@
         "Puerto Rico 79 (25)",
         "Dominican Rep. 77 (26)",
         "Venezuela 64 (12; the game fills CF RP RP)",
-        "Cuba 59 (7; the game fills 2B 3B SS CF DH RP)",
         "Canada 58 (12; the game fills C 2B 3B SS RF DH)",
+        "Cuba 58 (6; the game fills 2B 3B SS CF DH SP RP)",
         "Mexico 52 (5; the game fills C SS LF CF RF DH RP RP)",
         "Jamaica 51 (2; the game fills C 1B 2B 3B SS RF DH SP RP RP RP)",
         "Panama 50 (3; the game fills C 1B 2B 3B SS RF DH SP RP RP)",
@@ -2210,7 +2210,6 @@
         "Puerto Rico",
         "Dominican Rep.",
         "Venezuela",
-        "Cuba",
         "Canada"
       ],
       "noNation": [],
@@ -2218,7 +2217,7 @@
     },
     {
       "id": "mlb-war-1991",
-      "version": "mlb-war-1991-2e92878b",
+      "version": "mlb-war-1991-a0430d0b",
       "map": "mlb1991",
       "players": 1034,
       "clubs": [
@@ -2266,8 +2265,8 @@
         "Puerto Rico 78 (25)",
         "Venezuela 69 (18; the game fills CF)",
         "Canada 59 (10; the game fills C 2B 3B SS RF DH)",
-        "Cuba 57 (5; the game fills 2B 3B SS LF CF DH SP RP)",
         "Mexico 56 (12; the game fills C CF RF RP)",
+        "Cuba 55 (4; the game fills 2B 3B SS LF CF DH SP RP RP)",
         "Panama 52 (3; the game fills C 1B 2B 3B SS CF RF DH SP RP)",
         "Germany 51 (3; the game fills C 1B 2B SS LF CF RF DH SP RP)",
         "Jamaica 51 (2; the game fills C 1B 2B 3B SS RF DH SP RP RP RP)",
@@ -2292,7 +2291,7 @@
     },
     {
       "id": "mlb-war-1990",
-      "version": "mlb-war-1990-b993a463",
+      "version": "mlb-war-1990-ae875426",
       "map": "mlb1989",
       "players": 1030,
       "clubs": [
@@ -2363,7 +2362,7 @@
     },
     {
       "id": "mlb-war-1989",
-      "version": "mlb-war-1989-12ceaf51",
+      "version": "mlb-war-1989-82ed4df8",
       "map": "mlb1989",
       "players": 988,
       "clubs": [
@@ -2434,7 +2433,7 @@
     },
     {
       "id": "mlb-war-1988",
-      "version": "mlb-war-1988-1b7698d1",
+      "version": "mlb-war-1988-26f5925c",
       "map": "mlb1982",
       "players": 973,
       "clubs": [
@@ -2508,7 +2507,7 @@
     },
     {
       "id": "mlb-war-1987",
-      "version": "mlb-war-1987-3bfc5b63",
+      "version": "mlb-war-1987-39dcc4e7",
       "map": "mlb1982",
       "players": 975,
       "clubs": [
@@ -2580,7 +2579,7 @@
     },
     {
       "id": "mlb-war-1986",
-      "version": "mlb-war-1986-2ef32422",
+      "version": "mlb-war-1986-ddbeee18",
       "map": "mlb1982",
       "players": 953,
       "clubs": [
@@ -2652,7 +2651,7 @@
     },
     {
       "id": "mlb-war-1985",
-      "version": "mlb-war-1985-702d7e44",
+      "version": "mlb-war-1985-880b157a",
       "map": "mlb1982",
       "players": 943,
       "clubs": [
@@ -2701,9 +2700,9 @@
         "Venezuela 65 (14; the game fills RF RP RP)",
         "Mexico 57 (6; the game fills 1B 2B 3B SS CF RF DH RP)",
         "Germany 54 (4; the game fills C 1B SS LF CF RF DH SP RP)",
+        "Panama 54 (4; the game fills C 2B 3B SS RF DH RP RP RP)",
         "Canada 53 (4; the game fills C 1B 2B 3B SS RF DH RP RP)",
         "Cuba 51 (3; the game fills C 3B SS CF RF DH SP RP RP RP)",
-        "Panama 51 (3; the game fills C 1B 2B 3B SS RF DH RP RP RP)",
         "Great Britain 50 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "France 49 (2; the game fills 1B 3B SS LF CF RF DH SP RP RP RP)",
         "Jamaica 49 (2; the game fills C 1B 2B 3B SS RF DH SP RP RP RP)",
@@ -2723,7 +2722,7 @@
     },
     {
       "id": "mlb-war-1984",
-      "version": "mlb-war-1984-e479f4f0",
+      "version": "mlb-war-1984-895173b3",
       "map": "mlb1982",
       "players": 935,
       "clubs": [
@@ -2771,8 +2770,8 @@
         "Puerto Rico 77 (18)",
         "Venezuela 68 (12; the game fills RF RP)",
         "Mexico 61 (8; the game fills 1B 2B 3B CF RF DH)",
+        "Panama 54 (4; the game fills C 2B 3B SS RF DH RP RP RP)",
         "Germany 52 (3; the game fills C 1B SS LF CF RF DH SP RP RP)",
-        "Panama 52 (3; the game fills C 1B 2B 3B SS RF DH RP RP RP)",
         "Cuba 51 (3; the game fills 3B SS LF CF RF DH SP RP RP RP)",
         "France 51 (3; the game fills 1B 3B SS LF CF RF DH RP RP RP)",
         "Nicaragua 51 (4; the game fills C 2B 3B SS LF CF RF DH RP RP)",
@@ -2794,7 +2793,7 @@
     },
     {
       "id": "mlb-war-1983",
-      "version": "mlb-war-1983-cdd460e4",
+      "version": "mlb-war-1983-81b09c12",
       "map": "mlb1982",
       "players": 953,
       "clubs": [
@@ -2842,10 +2841,10 @@
         "Puerto Rico 75 (18)",
         "Venezuela 71 (11; the game fills 1B LF)",
         "Mexico 63 (9; the game fills 1B 3B CF RF DH)",
+        "Panama 55 (4; the game fills C 2B 3B SS RF DH RP RP RP)",
         "Canada 52 (3; the game fills C 1B 2B 3B SS RF DH RP RP RP)",
         "Germany 52 (3; the game fills C 1B 3B LF CF RF DH SP RP RP)",
         "Nicaragua 52 (4; the game fills C 1B 2B 3B SS CF RF DH RP RP)",
-        "Panama 52 (3; the game fills C 1B 2B 3B SS RF DH RP RP RP)",
         "Cuba 51 (3; the game fills 3B SS LF CF RF DH SP RP RP RP)",
         "France 51 (3; the game fills 1B 3B SS LF CF RF DH RP RP RP)",
         "Netherlands 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
@@ -2867,7 +2866,7 @@
     },
     {
       "id": "mlb-war-1982",
-      "version": "mlb-war-1982-d4d7ca8b",
+      "version": "mlb-war-1982-469d00a9",
       "map": "mlb1982",
       "players": 932,
       "clubs": [
@@ -2916,10 +2915,10 @@
         "Venezuela 67 (10; the game fills 1B LF RF RP)",
         "Mexico 65 (13; the game fills 1B LF RF DH)",
         "Canada 55 (5; the game fills C 1B 3B SS CF DH RP RP)",
+        "Panama 54 (4; the game fills C 2B 3B SS RF DH RP RP RP)",
         "Cuba 51 (3; the game fills 2B 3B SS LF CF RF DH RP RP RP)",
         "Germany 51 (3; the game fills C 1B 3B LF CF RF DH RP RP RP)",
         "Nicaragua 51 (4; the game fills C 1B 2B 3B SS CF RF DH RP RP)",
-        "Panama 51 (3; the game fills C 1B 2B 3B SS RF DH RP RP RP)",
         "France 49 (2; the game fills 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "Netherlands 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "Jamaica 47 (1; the game fills C 1B 2B 3B SS CF RF DH SP RP RP RP)"
@@ -2936,7 +2935,7 @@
     },
     {
       "id": "mlb-war-1981",
-      "version": "mlb-war-1981-f74a3822",
+      "version": "mlb-war-1981-c5f37d78",
       "map": "mlb1977",
       "players": 907,
       "clubs": [
@@ -2984,9 +2983,9 @@
         "Puerto Rico 73 (17)",
         "Mexico 68 (12; the game fills 1B LF RF)",
         "Venezuela 66 (9; the game fills 1B CF RF RP)",
+        "Panama 57 (5; the game fills C 3B SS RF DH RP RP RP)",
         "Canada 56 (6; the game fills C 1B 3B SS CF DH RP RP)",
         "Cuba 55 (5; the game fills 3B SS CF RF DH RP RP RP)",
-        "Panama 54 (4; the game fills C 3B SS LF RF DH RP RP RP)",
         "Germany 49 (2; the game fills C 1B 3B LF CF RF DH SP RP RP RP)",
         "Nicaragua 49 (3; the game fills C 1B 2B 3B SS LF RF DH RP RP RP)",
         "Netherlands 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
@@ -3005,7 +3004,7 @@
     },
     {
       "id": "mlb-war-1980",
-      "version": "mlb-war-1980-c16557ed",
+      "version": "mlb-war-1980-2a630eac",
       "map": "mlb1977",
       "players": 916,
       "clubs": [
@@ -3055,7 +3054,7 @@
         "Venezuela 64 (9; the game fills CF RF DH RP)",
         "Canada 61 (7; the game fills C 1B 3B SS RF DH)",
         "Cuba 59 (8; the game fills 2B 3B RP RP RP)",
-        "Panama 56 (5; the game fills 3B SS LF RF DH RP RP RP)",
+        "Panama 59 (6; the game fills SS LF RF DH RP RP RP)",
         "Netherlands 50 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "France 49 (2; the game fills 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "Germany 47 (1; the game fills C 1B 3B SS LF CF RF DH SP RP RP RP)",
@@ -3075,7 +3074,7 @@
     },
     {
       "id": "mlb-war-1979",
-      "version": "mlb-war-1979-d1110a88",
+      "version": "mlb-war-1979-e631c242",
       "map": "mlb1977",
       "players": 899,
       "clubs": [
@@ -3124,7 +3123,7 @@
         "Mexico 65 (10; the game fills 1B LF CF RF)",
         "Venezuela 60 (7; the game fills 1B 3B RF DH SP RP)",
         "Canada 59 (7; the game fills C 1B 3B SS CF RF DH)",
-        "Panama 56 (5; the game fills 3B SS LF RF DH RP RP RP)",
+        "Panama 59 (6; the game fills SS LF RF DH RP RP RP)",
         "Cuba 54 (4; the game fills C 2B 3B CF RF DH RP RP RP)",
         "Netherlands 50 (2; the game fills C 1B 2B 3B SS LF CF RF DH RP RP)",
         "Nicaragua 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
@@ -3144,7 +3143,7 @@
     },
     {
       "id": "mlb-war-1978",
-      "version": "mlb-war-1978-1c09c6da",
+      "version": "mlb-war-1978-8a99b24e",
       "map": "mlb1977",
       "players": 904,
       "clubs": [
@@ -3193,8 +3192,8 @@
         "Mexico 67 (13; the game fills 1B DH)",
         "Cuba 62 (8; the game fills 3B RF DH RP RP)",
         "Venezuela 62 (8; the game fills 1B 3B RF SP RP)",
+        "Panama 61 (7; the game fills LF RF DH RP RP RP)",
         "Canada 60 (6; the game fills C 1B 3B SS CF RF DH)",
-        "Panama 56 (5; the game fills 3B SS LF RF DH RP RP RP)",
         "Germany 48 (2; the game fills C 1B SS LF CF RF DH SP RP RP RP)",
         "Netherlands 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "France 47 (1; the game fills 1B 2B 3B SS LF CF RF DH SP RP RP RP)",
@@ -3206,14 +3205,15 @@
         "Puerto Rico",
         "Mexico",
         "Cuba",
-        "Venezuela"
+        "Venezuela",
+        "Panama"
       ],
       "noNation": [],
       "renamed": []
     },
     {
       "id": "mlb-war-1977",
-      "version": "mlb-war-1977-ba3b4c33",
+      "version": "mlb-war-1977-8796e417",
       "map": "mlb1977",
       "players": 900,
       "clubs": [
@@ -3263,7 +3263,7 @@
         "Cuba 62 (8; the game fills C CF RF DH RP RP)",
         "Venezuela 61 (8; the game fills 1B RF DH SP RP)",
         "Canada 59 (9; the game fills C 1B 3B SS CF RF DH)",
-        "Panama 55 (4; the game fills 3B SS LF RF DH SP RP RP RP)",
+        "Panama 59 (5; the game fills 3B LF RF DH SP RP RP RP)",
         "Nicaragua 49 (2; the game fills C 1B 2B 3B SS LF CF RF DH SP RP)",
         "Germany 48 (2; the game fills C 1B 3B SS LF CF RF DH SP RP RP)",
         "Netherlands 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
@@ -3283,7 +3283,7 @@
     },
     {
       "id": "mlb-war-1976",
-      "version": "mlb-war-1976-71e3e21d",
+      "version": "mlb-war-1976-fd19c2bd",
       "map": "mlb1976",
       "players": 818,
       "clubs": [
@@ -3324,14 +3324,14 @@
         "Frank Tanana SP 90"
       ],
       "nations": [
-        "United States 91 (26)",
+        "United States 90 (26)",
         "Puerto Rico 75 (17; the game fills RP)",
         "Dominican Rep. 71 (20; the game fills C)",
         "Cuba 66 (12; the game fills C CF RP RP)",
         "Mexico 62 (11; the game fills 1B CF RP RP)",
+        "Panama 60 (6; the game fills 3B RF DH SP RP RP RP)",
         "Venezuela 60 (7; the game fills C 1B RF DH SP RP)",
         "Canada 57 (8; the game fills C 1B 2B SS LF CF RF DH)",
-        "Panama 55 (4; the game fills 3B SS LF RF DH SP RP RP RP)",
         "Germany 48 (2; the game fills C 1B 3B SS LF CF RF DH SP RP RP)",
         "Netherlands 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "Bahamas 47 (1; the game fills C 1B 2B 3B SS CF RF DH SP RP RP RP)",
@@ -3351,7 +3351,7 @@
     },
     {
       "id": "mlb-war-1975",
-      "version": "mlb-war-1975-78ac6c59",
+      "version": "mlb-war-1975-c5476196",
       "map": "mlb1974",
       "players": 844,
       "clubs": [
@@ -3398,8 +3398,8 @@
         "Dominican Rep. 70 (19; the game fills C)",
         "Mexico 60 (8; the game fills C 1B LF CF RF RP)",
         "Canada 58 (7; the game fills C 1B 2B SS CF RF DH)",
+        "Panama 57 (5; the game fills 3B CF RF DH SP RP RP RP)",
         "Venezuela 56 (5; the game fills C 1B CF RF DH SP RP RP)",
-        "Panama 54 (4; the game fills 3B SS CF RF DH SP RP RP RP)",
         "Germany 49 (2; the game fills C 1B 2B 3B LF CF RF DH SP RP RP)",
         "Netherlands 49 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "Colombia 47 (1; the game fills C 1B 2B 3B LF CF RF DH SP RP RP RP)",
@@ -3417,7 +3417,7 @@
     },
     {
       "id": "mlb-war-1974",
-      "version": "mlb-war-1974-22d8ded9",
+      "version": "mlb-war-1974-3393de83",
       "map": "mlb1974",
       "players": 861,
       "clubs": [
@@ -3464,8 +3464,8 @@
         "Dominican Rep. 71 (20; the game fills C)",
         "Venezuela 60 (9; the game fills C SP RP RP RP)",
         "Mexico 59 (10; the game fills C 1B LF CF RF SP)",
+        "Panama 58 (5; the game fills 3B CF RF DH SP RP RP RP)",
         "Canada 55 (5; the game fills C 1B 2B 3B SS CF RF DH RP)",
-        "Panama 54 (4; the game fills 3B SS CF RF DH SP RP RP RP)",
         "Netherlands 49 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "Bahamas 46 (1; the game fills C 1B 2B 3B SS CF RF DH SP RP RP RP)",
         "Colombia 46 (1; the game fills C 1B 2B 3B LF CF RF DH SP RP RP RP)"
@@ -3483,7 +3483,7 @@
     },
     {
       "id": "mlb-war-1973",
-      "version": "mlb-war-1973-81d826f3",
+      "version": "mlb-war-1973-80520781",
       "map": "mlb1973",
       "players": 821,
       "clubs": [
@@ -3530,8 +3530,8 @@
         "Dominican Rep. 72 (16; the game fills RP)",
         "Mexico 61 (9; the game fills 1B LF CF RF SP)",
         "Venezuela 61 (8; the game fills C SP RP RP RP)",
+        "Panama 58 (6; the game fills 3B CF DH SP RP RP RP)",
         "Canada 56 (6; the game fills C 1B 2B 3B LF CF RF DH)",
-        "Panama 55 (5; the game fills 3B SS CF DH SP RP RP RP)",
         "Netherlands 49 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
         "Bahamas 48 (2; the game fills C 1B 2B 3B SS CF RF DH RP RP RP)",
         "Germany 47 (1; the game fills C 1B 2B 3B SS LF CF RF DH SP RP RP)",
@@ -3550,7 +3550,7 @@
     },
     {
       "id": "mlb-war-1972",
-      "version": "mlb-war-1972-f793ff54",
+      "version": "mlb-war-1972-a105c393",
       "map": "mlb1972",
       "players": 824,
       "clubs": [
@@ -3595,7 +3595,7 @@
         "Cuba 76 (16; the game fills RP)",
         "Puerto Rico 72 (17; the game fills RP RP)",
         "Dominican Rep. 71 (17; the game fills C)",
-        "Panama 63 (9; the game fills SS SP RP RP)",
+        "Panama 66 (10; the game fills SP RP RP)",
         "Mexico 61 (10; the game fills 1B LF CF RF SP)",
         "Venezuela 60 (7; the game fills C RF SP RP RP RP)",
         "Canada 55 (5; the game fills C 1B 2B 3B SS LF CF RF DH)",
@@ -3618,7 +3618,7 @@
     },
     {
       "id": "mlb-war-1971",
-      "version": "mlb-war-1971-4e8873d1",
+      "version": "mlb-war-1971-2966ec29",
       "map": "mlb1971",
       "players": 828,
       "clubs": [
@@ -3663,8 +3663,8 @@
         "Cuba 77 (19)",
         "Puerto Rico 74 (17; the game fills RP)",
         "Dominican Rep. 66 (14; the game fills C RP RP)",
+        "Panama 64 (9; the game fills RF RP RP RP)",
         "Venezuela 62 (8; the game fills C SP RP RP RP)",
-        "Panama 61 (8; the game fills RF DH RP RP RP)",
         "Mexico 57 (6; the game fills 1B SS LF CF RF DH SP)",
         "Canada 53 (5; the game fills C 1B 2B 3B SS LF CF RF DH RP)",
         "Netherlands 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
@@ -3675,15 +3675,15 @@
         "Cuba",
         "Puerto Rico",
         "Dominican Rep.",
-        "Venezuela",
-        "Panama"
+        "Panama",
+        "Venezuela"
       ],
       "noNation": [],
       "renamed": []
     },
     {
       "id": "mlb-war-1970",
-      "version": "mlb-war-1970-70f87e93",
+      "version": "mlb-war-1970-df5c4669",
       "map": "mlb1970",
       "players": 849,
       "clubs": [
@@ -3728,8 +3728,8 @@
         "Cuba 78 (22)",
         "Puerto Rico 72 (17; the game fills SP)",
         "Dominican Rep. 68 (16; the game fills C RP RP)",
+        "Panama 64 (9; the game fills DH SP RP RP)",
         "Venezuela 64 (11; the game fills C SP RP RP)",
-        "Panama 61 (8; the game fills SS DH SP RP RP)",
         "Mexico 58 (6; the game fills C 1B SS LF CF RF DH)",
         "Canada 57 (8; the game fills C 2B 3B SS LF CF RF DH)",
         "Netherlands 48 (1; the game fills C 1B 2B 3B SS LF CF RF DH RP RP RP)",
@@ -3741,15 +3741,15 @@
         "Cuba",
         "Puerto Rico",
         "Dominican Rep.",
-        "Venezuela",
-        "Panama"
+        "Panama",
+        "Venezuela"
       ],
       "noNation": [],
       "renamed": []
     },
     {
       "id": "mlb-war-1969",
-      "version": "mlb-war-1969-157f6a48",
+      "version": "mlb-war-1969-f235b9fc",
       "map": "mlb1969",
       "players": 849,
       "clubs": [
@@ -3794,8 +3794,8 @@
         "Cuba 79 (20)",
         "Puerto Rico 73 (17; the game fills RP)",
         "Dominican Rep. 71 (17; the game fills RP RP)",
+        "Panama 63 (8; the game fills DH SP RP RP RP)",
         "Venezuela 62 (8; the game fills C SP RP RP RP)",
-        "Panama 60 (7; the game fills 3B DH SP RP RP RP)",
         "Canada 58 (8; the game fills C 2B 3B SS LF CF RF DH)",
         "Mexico 57 (6; the game fills C 2B LF CF RF DH SP)",
         "Great Britain 48 (2; the game fills C 1B 2B 3B SS LF CF DH SP RP RP)",
@@ -3806,15 +3806,15 @@
         "Cuba",
         "Puerto Rico",
         "Dominican Rep.",
-        "Venezuela",
-        "Panama"
+        "Panama",
+        "Venezuela"
       ],
       "noNation": [],
       "renamed": []
     },
     {
       "id": "mlb-war-1968",
-      "version": "mlb-war-1968-afa65f84",
+      "version": "mlb-war-1968-3c70e91a",
       "map": "mlb1968",
       "players": 676,
       "clubs": [
@@ -3855,7 +3855,7 @@
         "Cuba 77 (19; the game fills RP)",
         "Puerto Rico 69 (12; the game fills RF RP)",
         "Dominican Rep. 66 (11; the game fills C RP RP RP)",
-        "Panama 59 (7; the game fills C 3B DH SP RP RP)",
+        "Panama 61 (8; the game fills C DH SP RP RP)",
         "Canada 58 (6; the game fills C 2B 3B SS LF CF RF DH)",
         "Mexico 57 (6; the game fills C 2B LF RF DH SP RP)",
         "Venezuela 55 (4; the game fills C 1B CF RF DH SP RP RP RP)",
@@ -3874,7 +3874,7 @@
     },
     {
       "id": "mlb-war-1967",
-      "version": "mlb-war-1967-f8788aa0",
+      "version": "mlb-war-1967-77523011",
       "map": "mlb1966",
       "players": 718,
       "clubs": [
@@ -3915,7 +3915,7 @@
         "Cuba 78 (23)",
         "Dominican Rep. 69 (11; the game fills RP RP RP)",
         "Puerto Rico 69 (11; the game fills C RF)",
-        "Panama 59 (7; the game fills SS RF SP RP RP RP)",
+        "Panama 62 (8; the game fills RF SP RP RP RP)",
         "Venezuela 59 (9; the game fills C 1B LF RF SP RP)",
         "Canada 56 (8; the game fills C 2B 3B SS LF CF RF DH)",
         "Mexico 51 (3; the game fills C 2B SS LF CF RF DH RP RP RP)",
@@ -3936,7 +3936,7 @@
     },
     {
       "id": "mlb-war-1966",
-      "version": "mlb-war-1966-674c1d23",
+      "version": "mlb-war-1966-11334225",
       "map": "mlb1966",
       "players": 714,
       "clubs": [
@@ -3995,7 +3995,7 @@
     },
     {
       "id": "mlb-war-1965",
-      "version": "mlb-war-1965-290d7a7c",
+      "version": "mlb-war-1965-082a3223",
       "map": "mlb1965",
       "players": 702,
       "clubs": [
@@ -4055,7 +4055,7 @@
     },
     {
       "id": "mlb-war-1964",
-      "version": "mlb-war-1964-9930cbb8",
+      "version": "mlb-war-1964-8c324347",
       "map": "mlb1964",
       "players": 700,
       "clubs": [
@@ -4115,7 +4115,7 @@
     },
     {
       "id": "mlb-war-1963",
-      "version": "mlb-war-1963-6971fd2a",
+      "version": "mlb-war-1963-a46a24b5",
       "map": "mlb1962",
       "players": 695,
       "clubs": [
@@ -4175,7 +4175,7 @@
     },
     {
       "id": "mlb-war-1962",
-      "version": "mlb-war-1962-e8416cb6",
+      "version": "mlb-war-1962-91b2743e",
       "map": "mlb1962",
       "players": 702,
       "clubs": [
@@ -4236,7 +4236,7 @@
     },
     {
       "id": "mlb-war-1961",
-      "version": "mlb-war-1961-97ef8f80",
+      "version": "mlb-war-1961-bae55ef5",
       "map": "mlb1961",
       "players": 620,
       "clubs": [
@@ -4295,7 +4295,7 @@
     },
     {
       "id": "mlb-war-1960",
-      "version": "mlb-war-1960-840c5f1b",
+      "version": "mlb-war-1960-756eea5d",
       "map": "mlb1960",
       "players": 575,
       "clubs": [
