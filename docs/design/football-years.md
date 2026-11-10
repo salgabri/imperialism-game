@@ -9,7 +9,9 @@ ratings, on maps of their eras, 2026-10-30; FIFA 05 and FIFA 06, nations only,
 and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08; the federations
 of every season from 1961/62, with those of their day (the Soviet Union, the CIS,
 Yugoslavia, FR Yugoslavia, Czechoslovakia, West Germany and Zaire) under their own
-names and flags, 2026-11-09 ([Federations of the day](#federations-of-the-day-196162-to-199596)). The CM 01/02
+names and flags, 2026-11-09 ([Federations of the day](#federations-of-the-day-196162-to-199596));
+SWOS 94/95 and 95/96 with their clubs, read from the game's own team files, and
+the two fan-made CM databases of 1993/94 and 1989/90, 2026-11-09. The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -24,9 +26,9 @@ kinds:
 - **The built-in earlier seasons** (2004/05 to 2025/26): one EA FIFA / FC
   roster each, committed under `public/football/ea-*.json` and offered in every
   setup. See [Built-in earlier seasons](#built-in-earlier-seasons). Before them,
-  five more from 2002/03 back to 1996/97: SI's own CM 01/02 databases, its CM3
-  and CM 97/98 data, and SWOS 96/97's national squads. See
-  [Seasons before FIFA 05](#seasons-before-fifa-05).
+  nine more from 2002/03 back to 1989/90: SI's own CM 01/02 databases, its CM3
+  and CM 97/98 data, three editions of Sensible World of Soccer, and two fan-made
+  CM databases. See [Seasons before FIFA 05](#seasons-before-fifa-05).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
   downloaded, built on their computer. Until the database authors allow
   redistribution these stay local: the user puts the database in the ignored
@@ -131,8 +133,9 @@ Yugoslavia and Serbia and Montenegro years. The seasons before 1996/97 are below
 ### Federations of the day (1961/62 to 1995/96)
 
 Decided 2026-11-09, for the seasons before 1996/97 that the computed World Cup
-seasons, SWOS 94/95 and 95/96 and the fan-made CM databases will add (none ships
-yet). `FIRST_YEAR` is 1962, and `src/data/footballFederations.js` gives every
+seasons, SWOS 94/95 and 95/96 and the fan-made CM databases add (SWOS's and the
+fan-made ones ship: [Seasons before FIFA 05](#seasons-before-fifa-05)).
+`FIRST_YEAR` is 1962, and `src/data/footballFederations.js` gives every
 season from 1961/62 its federations, as the state on its cutoff (30 June of the
 season-end year), in three parts. Every year from 1996/97 keeps exactly the
 territory it had, and has no identity, so every season the game ships rebuilds
@@ -412,7 +415,7 @@ names the provider and reads "Game rating converted from CM current ability".
 ## Built-in earlier seasons
 
 Twenty-two seasons ship with the game, every season from 2004/05 to 2025/26
-(and five before them, [below](#seasons-before-fifa-05)).
+(and nine before them, [below](#seasons-before-fifa-05)).
 [EA FC 25](#ea-fc-25) and [FIFA 07 to FIFA 14](#fifa-07-to-fifa-14) are described
 below, and so are [FIFA 05 and FIFA 06](#fifa-05-and-fifa-06),
 which have nations only. Ten, 2014/15 to 2023/24, are the launch roster
@@ -660,16 +663,19 @@ at least one player. FIFA 06 takes 8,131 nationalities from later editions and
 
 ## Seasons before FIFA 05
 
-Five more seasons ship with the game, from 2002/03 back to 1996/97, one source
+Nine more seasons ship with the game, from 2002/03 back to 1989/90, one source
 each. `npm run build:retro-seasons` (`scripts/build-retro-seasons.mjs`, manifest
 `scripts/data/retro-seasons.json`, audit `docs/design/football-retro-seasons-audit.json`)
 reads every source from the gitignored `data-src/`, pinned by SHA-256 and by the
-commit it was downloaded from, and `--check` rebuilds the five files, the listing
+commit it was downloaded from (SWOS's files, from a server without commits, by
+SHA-256 alone), and `--check` rebuilds the nine files, the listing
 `src/data/footballSeasons.js` (which `npm run build:ea-seasons` writes alike) and
 the audit byte for byte. None of these sources grants redistribution; the user
 chose to ship them, credited to their makers, and each season's source block names
 its maker (`provider`), who compiled or ported it (`compiler`), where it comes from
-(`url`) and when it was read (`retrieved`).
+(`url`) and when it was read (`retrieved`). The manifest's `reader` names the
+builder where a kind is read from two kinds of source (SWOS: a database, or the
+game's team files).
 
 | Season | Id | Source | Nations with players (full XIs) | Clubs |
 | --- | --- | --- | --- | --- |
@@ -678,10 +684,24 @@ its maker (`provider`), who compiled or ported it (`compiler`), where it comes f
 | 1998/99 | `cm0102-2020-11-cm3` | SI's CM3 data, ported to CM 01/02 | 113 (64) | 130 |
 | 1997/98 | `cm-9798` | SI's CM 97/98, extracted to JSON | 102 (52) | 124 |
 | 1996/97 | `swos-9697` | Sensible World of Soccer 96/97's national squads | 133 (133) | nations only |
+| 1995/96 | `swos-9596` | Sensible World of Soccer 95/96's team files | 132 (132) | 134 |
+| 1994/95 | `swos-9495` | Sensible World of Soccer's team files (the original, v1.0) | 131 (131) | 134 |
+| 1993/94 | `cm0102-2020-11-cm93` | Cam F's fan-made 93/94 for CM 01/02 | 124 (77) | 130 |
+| 1989/90 | `cm0102-2017-04-cm89` | Simon Treanor's fan-made 89/90 for CM 01/02 | 137 (88) | nations only |
 
-The four seasons with clubs play on their own Europe maps (`eu124s2003`,
-`eu32s2003` … `eu124s1998`, `eu32s1998`), built by `npm run build:europe-maps`
-like the EA seasons'. Their clubs' grounds are 107 new rows of
+The seven seasons with clubs play on their own Europe maps (`eu124s2003`,
+`eu32s2003` … `eu124s1994`, `eu32s1994`), built by `npm run build:europe-maps`
+like the EA seasons'. Of 1995/96's, 1994/95's and 1993/94's (built 2026-11-09),
+21 club names needed a ground row: 11 take a country map's row (Albacete, Foggia,
+Padova, Reggiana, Dynamo Dresden under two names, Uerdingen under two, Tirsense,
+Felgueiras, and 1993/94's VfB Leipzig at its successor Lokomotive's
+Bruno-Plache-Stadion), 5 repeat the row of another name of the club (Caen,
+Farense, Gil Vicente, Cambuur, VVV), and 5 are placed by hand from their grounds'
+Wikidata coordinates (P625): Martigues (Stade Francis-Turcan, Q118955), Gueugnon
+(Stade Jean-Laville, Q1569474), Wattenscheid (Lohrheidestadion, Q880075), and
+Logroñés at Las Gaunas (Q1369314, the stadium of 2002, built beside the old one)
+under both its names. The
+earlier seasons' clubs' grounds are 107 new rows of
 `scripts/data/europe-clubs.json`: a club the table already placed under another
 name takes that row (`Real Madrid C.F.`, `F.C. Barcelona`), 14 take a country
 map's row, and 11 are placed by hand from their grounds' Wikidata or Wikipedia
@@ -841,6 +861,178 @@ boundary cache.
   and field no team; the 43 game nations SWOS has no team for (Bosnia,
   Kazakhstan, DR Congo and others) play with an empty squad, at 40.
 
+### Sensible World of Soccer 94/95 and 95/96: nations and clubs
+
+Decided 2026-11-09: both seasons ship, with their nations and their clubs on four
+Europe maps; 1995/96 is SWOS 95/96's launch edition, not its European
+Championship Edition; SWOS 96/97 stays as it is, nations only.
+
+- **Source**: Sensible Software's Sensible World of Soccer, the original game
+  (`swos-9495`, v1.0, whose READ.ME is Sensible Software's note of Christmas 1994;
+  labelled SWOS 94/95 after its season) and SWOS 95/96 (`swos-9596`, the launch
+  edition; its European Championship Edition of spring 1996 differs in 585 of
+  2,272 national players). Each is the game's own team files, as the SWOS United
+  community server keeps them for its tools (`cern.swos.eu/data/amiga/v1.0/` and
+  `/9596/`; no robots.txt, no licence or terms stated): the six national team
+  files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013
+  France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), 26 files
+  fetched one at a time late on 2026-11-09 (UTC; the season's `retrieved`), pinned
+  by bytes and SHA-256, and equal to the research pass's copies of the same day.
+  The v1.1 update of early 1995 has
+  v1.0's national teams and later club squads. **Rights**: Sensible Software's,
+  now Codemasters'; the data's rights are reserved.
+- **Reader** (`scripts/lib/swos-files.mjs`, the layout codemeyer's SwosPlayerFinder,
+  MIT, reads): two header bytes (0, then the number of teams), then 684 bytes a
+  team: 76 header bytes (the file's number, the team's place in it, its name in
+  bytes 5–23, its division in byte 25, 0 for the top one) and sixteen players of
+  38 bytes (nationality, shirt number, name, the position in the top three bits
+  of byte 26, the seven skills three bits each in bytes 28–31, the price step in
+  byte 32). It stops on any byte the layout does not explain. A player's id is
+  the file's number, the team's place and his slot (`swosFileId`: 80,001 is the
+  first player of TEAM.008's first team).
+- **Read as 96/97 is**: SWOS 96/97's own files, read the same way, agree with the
+  shipped 96/97 database for 1,441 of its 1,463 national players; the other 22 are
+  that database's price step 0 stored as 25K, Maldini's and Shearer's step 49
+  stored as 15M, and namesakes. So steps are read as that database stores them, 0
+  as 1 and 49 as 48: 63 players in 1994/95 (Roberto Baggio and Romário at 49,
+  national and club records alike) and 51 in 1995/96, each listed in the audit
+  (`clamped`). The rating, positions and names are 96/97's (above), the names now
+  also set after an apostrophe that follows a word's first letter or an Italian
+  "Dall'" or "Dell'" ("N'Doram", "L'Ami", "Dall'Oglio"; "Preud'homme" keeps his
+  small h).
+- **Nations**: 141 national teams in 1994/95 and 142 in 1995/96 (Yugoslavia's
+  returns), the same ten with no shape on the map leaving 131 and 132, every one a
+  natural 4-4-2. The federations of the day as far as SWOS fields them
+  (`territoryFor` and `identitiesFor` with `fields`, the nations SWOS has a squad
+  for): 1994/95 has no Yugoslavia squad (FR Yugoslavia was barred until December
+  1994), so Serbia, Montenegro and Kosovo are all neutral; in 1995/96 FR
+  Yugoslavia plays under its own name and flag, holding Montenegro and Kosovo.
+  SWOS has no Zaire squad, and Bosnia joined FIFA on 3 July 1996: both neutral.
+- **Clubs**: each league file's top division (division 0), 134 clubs a season,
+  the leagues' real top divisions: 1994/95 Premier League 22, La Liga 20, Serie A
+  18, Bundesliga 18, Ligue 1 20, Eredivisie 18, Liga Portugal 18; 1995/96 20, 22,
+  18, 18, 20, 18, 18. Each plays its own sixteen, its best natural XI by SWOS's
+  positions, its strength their mean. SWOS files 18 names (1994/95) and 20
+  (1995/96) at two top-division clubs, mostly namesakes (João Pinto at Benfica and
+  Porto) and a few a record left at an old club (Martin Kree at Leverkusen and
+  Dortmund in 1994/95); 1995/96 lists Jean-Luc Dogon twice at Bordeaux, with
+  different skills. Each club keeps its own sixteen, so both play; the audit lists
+  them (`collisions`). A club player's nationality is SWOS's three-letter code for
+  his nationality byte (`SWOS_NATIONALITIES`: the code SWOS 96/97's database
+  records for the 7,650 players of 96/97's own team files matched by team and
+  name, two of them disagreeing; Chad and Iran, which no 96/97 player carries,
+  as SwosPlayerFinder names them); a national squad's is its team's name, as in
+  96/97.
+- **Club names and ids** (`SWOS_CLUBS`): SWOS writes 17 capitals (`MANCHESTER UTD`,
+  `BOR. DORTMUND`, `DEP. LA CORUNA`). Each club takes the name of a club the
+  ground table already places, its id that name's slug (`presentClubs`), so it
+  keeps its id, colour and crest from season to season: where several rows are one
+  club, the one whose crest the game shows, unless that row has a name the club
+  took later (RC Strasbourg Alsace, Estrela da Amadora's refounded club); else CM
+  97/98's name for it, else the CM3 port's, else CM 01/02's or EA's. Thirteen
+  clubs no season had take new names: Albacete Balompié, CD Logroñés, Foggia,
+  Padova, Reggiana, Dynamo Dresden, Bayer 05 Uerdingen and, renamed in 1995, KFC
+  Uerdingen 05, FC Martigues, FC Gueugnon, FC Tirsense, FC Felgueiras and Sporting
+  Clube Campomaiorense (which needs no ground row: it is never among a season's
+  strongest 124).
+- **Kind `swos`**: `nationsOnly` names `swos-9697` alone, and the manifest's
+  `reader: 'swos-files'` builds these two (`scripts/build-retro-seasons.mjs`).
+- **Spot check against history** (2026-11-09): 1994/95 has Klinsmann at Tottenham,
+  Cantona at Manchester United, Romário at Barcelona, Baggio at Juventus, Weah at
+  Paris Saint-Germain and Gullit at Sampdoria; 1995/96 Klinsmann at Bayern, Baggio
+  at Milan, Gullit at Chelsea and Bergkamp at Arsenal. The strongest clubs are
+  Milan (87), Barcelona (87), Parma, Juventus, Lazio, Manchester United and Real
+  Madrid (83) in 1994/95, and Milan (86), Barcelona, Liverpool (85) and Real Madrid
+  in 1995/96; that season's champions rank lower, SWOS pricing their players
+  below Italy's and Spain's stars: Blackburn 78 (fifteenth) and Ajax 77
+  (seventeenth) in 1994/95. Italy (87) and Brazil (87, then 86) are the strongest
+  nations, Germany and the Netherlands next.
+
+### The fan-made databases: 1993/94 and 1989/90
+
+Decided 2026-11-09 by the user ("Yes, ship both"): the CM0102 Starter Kit's two
+fan-made retro databases ship, credited to their makers, their labels saying they
+are fan-made and their source blocks (`provenance`) that the ratings are the
+makers', fans', not Sports Interactive's. Both are CM 01/02-format databases,
+nckstwrt's Starter Kit's `data/cm93_data.zip` and `data/cm89_data.zip` (commit
+`e658af1`, pinned by SHA-256), each read by the CM 01/02 builder as a known
+release (`cm0102Releases.js`, by its files' sizes and SHA-256): CM 01/02's
+conversion, `round(ca * 99 / 200)`, natural positions, edition `CM 01/02`, the
+maker as `provider`. Their birth years are stored as they were (the Starter Kit's
+loader starts the game in 1993 or 1989): shift 0. **Rights**: fan-made databases
+for Eidos's freeware CM 01/02 (free since December 2008 for personal,
+non-commercial use) that name no licence; the data's rights are reserved.
+
+- **1993/94** (`cm0102-2020-11-cm93`, "CM 01/02 · 93/94 by Cam F, fan-made"): Cam
+  F's "Season 93/94 For 0102" ([forum topic](https://www.champman0102.co.uk/viewtopic.php?t=1546),
+  28 November 2020). Its abilities are Cam F's: against SI's own CM 93/94 data
+  for 1,452 English-league players matched by name (ben-clarke's
+  championship-manager-93-tools export) they correlate 0.72, 74 are equal, and
+  Cam F's run 19 lower on average. One rating is wild: Olympiakos's defender
+  Vassilis Ioannidis has the database's highest ability, 200 (rated 99, above
+  Roberto Baggio's 198), so he leads Greece's XI; it ships as Cam F set it. 124
+  nations with players (77 full XIs) and 130 clubs (Premier League 20, La Liga 20,
+  Serie A 18, Bundesliga 18, Ligue 1 18, Eredivisie 18, Liga Portugal 18), on
+  `eu124s1994` and `eu32s1994`. It keeps CM 01/02's league sizes, not 1993/94's,
+  and the builder takes a database's own top divisions: its Premier Division has
+  20 clubs (Oldham Athletic and Swindon Town, of the real 22, are in its First
+  Division) and its French First Division 18 (Angers and Martigues are in its
+  Second; 1993–94 FA Premier League and French Division 1 on Wikipedia, revisions
+  1371793527 and 1366136574). The famous-player
+  check agrees at +0 (5 of 6). Federations: Zaire alone plays under a name of its
+  day; FR Yugoslavia is barred (Montenegro and Kosovo neutral with it), the Czech
+  Republic and Slovakia play apart, and North Macedonia (16 June 1994) and the
+  seven joiners of 1994 play.
+- **1989/90** (`cm0102-2017-04-cm89`, "CM 01/02 · 89/90 by Simon Treanor,
+  fan-made"): Simon Treanor's "Championship Manager 1989/90 update for CM 01/02",
+  Beta 5 of 8 April 2017 (its readme; [cm8990.wordpress.com](https://cm8990.wordpress.com/)).
+  Its readme calls it a beta in which many teams keep squads of the early 2000s,
+  and names the English, Scottish, German and Italian leagues complete. Its birth
+  years are 1989/90's: ten players of the day (Maradona, Baresi, Lineker,
+  Matthäus, Gullit, van Basten, Klinsmann, Romário, Roberto Baggio, Maldini; the
+  manifest's `birthdays`) agree at +0, where the builder's own famous players find
+  only Ryan Giggs.
+  - **Nationalities are today's** (Ukraine, Croatia, Slovakia; East Germans as
+    'Germany'), so the season plays 1989/90's federations (`territoryFor` and
+    `identitiesFor` of 1990, the builder's `federationTeamOf`): the Soviet Union
+    fields 1,806 players of the other fourteen republics, Yugoslavia 1,182 (Croats,
+    Slovenes, Macedonians and Bosnians), Czechoslovakia 191 Slovaks, and West
+    Germany and Zaire play under their own names.
+  - **East Germans**: a 'Germany' player at an East German club is East German, of
+    a federation with no shape on the map, and plays for no nation (the manifest's
+    `noNationAt`; `buildFootballSet` keeps him for his club): 1,431 players. A
+    club is East German when its stadium's city, by the database's own stadium and
+    city records, is one GeoNames' `cities1000` (CC BY 4.0; a copy of 18 October
+    2026 pinned by SHA-256) places only in the five eastern states, or
+    `scripts/lib/east-german-clubs.mjs` lists it by hand: East Berlin's Dynamo,
+    Union, KWO, Rotation and Bergmann-Borsig, and Halle, Mühlhausen, Neustadt
+    (Dosse) and Markkleeberg, which the gazetteer names twice or not at all. That
+    is 67 clubs, committed in the manifest; a test rebuilds the list from its
+    sources when they are in `data-src/`. A club neither places in the east counts
+    as West German. So Sammer (Dynamo Dresden), Thom (Dynamo Berlin) and Kirsten
+    play for no nation, and West Germany's XI is Matthäus, Klinsmann, Brehme and
+    the rest of the Bundesliga's and Serie A's West Germans.
+  - **Nations only** (`SET_KINDS.cm0102.nationsOnly`; the builder's `clubs:
+    false`, its leagues kept in the audit). The rule set on 2026-11-09: clubs only
+    if every one of the seven leagues' top divisions could be 1989/90's from the
+    database's own players and clubs. Spain's and Portugal's cannot: their first
+    divisions in it are 1989/90's (1989–90 La Liga and Primeira Divisão on
+    Wikipedia, revisions 1337764526 and 1374234667), but Logroñés (7 rated
+    players), Castellón and Tenerife (10 each) and eight of Portugal's eighteen
+    (Chaves, Feirense, Marítimo, Nacional, Penafiel, Portimonense, Tirsense, União
+    da Madeira) cannot field eleven. (Its German First Division also holds Dynamo
+    Berlin, Chemnitz, Dynamo Dresden and Hansa Rostock where 1989–90's Bundesliga
+    had St. Pauli, Bochum, Waldhof Mannheim and Homburg, revision 1363459514; those
+    four it rates fully.) 137 nations have players, 88 full XIs.
+  - **Spot check** (2026-11-09): Italy (86) and West Germany (85) are the
+    strongest nations, then the Netherlands, Brazil and England; Yugoslavia is Red
+    Star's Stojković, Pančev, Savićević and Prosinečki, the Soviet Union Belanov,
+    Dasayev and Zavarov, Czechoslovakia Kubík, Chovanec and Skuhravý. One rating
+    is wild: Helsingborg's 36-year-old goalkeeper Jan Möller has the database's
+    highest ability, 198 against a potential of 140 (rated 98, above Maradona's
+    193), so he keeps Sweden's goal ahead of Thomas Ravelli (160, rated 79); it
+    ships as Simon Treanor set it.
+
 ### How they play
 
 Each season's clubs, league by league, played as double round-robins (twenty
@@ -853,6 +1045,9 @@ harness's real range of 2.50–3.28 goals a game and 20.3–29.5% draws):
 | 2001/02 (3.9.60) | 3.41 | 19.8% | 5.7% |
 | 1998/99 (CM3) | 3.56 | 18.8% | 5.2% |
 | 1997/98 (CM 97/98) | 3.36 | 19.6% | 5.9% |
+| 1995/96 (SWOS 95/96) | 3.90 | 17.3% | 3.8% |
+| 1994/95 (SWOS 94/95) | 3.95 | 17.7% | 3.7% |
+| 1993/94 (Cam F's, fan-made) | 3.55 | 18.9% | 5.3% |
 | 2006/07, 2011/12, 2017/18, 2023/24 (EA) | 2.82–3.13 | 22.8–24.6% | 6.6–8.6% |
 
 1997/98 plays like the other CM seasons, its higher scale notwithstanding. All
@@ -863,6 +1058,16 @@ seasons. That is the CM conversion's, as in any local CM 01/02 set, and nothing
 corrects it. SWOS 96/97's 133 nations, all against all, score 4.15 a game with
 11.9% draws, as CM 01/02's 107 to 119 nations do (4.17–4.23, 12.3–12.7%): the
 world's minnows meet its giants.
+
+The seasons of 2026-11-09, measured the same way the same day (the same harness
+gives CM 97/98 3.35 and 19.8%, and SWOS 96/97's nations 4.13 and 12.3%): SWOS's
+clubs score most and draw least of all, nearly four goals a game, its price
+steps spreading a league's clubs as wide as CM's ability does and wider at the
+top (Milan and Barcelona at 86–87 against a league's last at 54–58). Cam F's
+1993/94 plays like the SI databases. Their nations, all against all: SWOS 95/96's
+132 score 4.10 a game with 12.6% draws and 94/95's 131 4.03 and 13.0%; Cam F's
+91 that take part 4.44 and 11.3%, and Simon Treanor's 104 of 1989/90 4.38 and
+10.3%.
 
 ## Earlier basketball seasons
 
@@ -1141,11 +1346,18 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   merged federations are held by their holder, and inactive shapes are
   unclaimed.
 - Serbia keeps its modern name and flag in its FR Yugoslavia and Serbia and
-  Montenegro years from 1996/97, which were built before identities; 1994/95 and
-  1995/96 show FR Yugoslavia.
+  Montenegro years from 1996/97, which were built before identities; 1995/96
+  shows FR Yugoslavia, and 1994/95, whose SWOS has no Yugoslavia squad, leaves
+  Serbia neutral.
 - Seasons ending before 1962 are refused.
 - East Germany has no shape on the map, so it never fields a team, and its
-  players, where a database lists them as Germany's, play for West Germany.
+  players, where a database lists them as Germany's, play for West Germany, but
+  in Simon Treanor's 1989/90, where a 'Germany' player at an East German club
+  plays for no nation. That rule places a club by its stadium's city: an East
+  German playing in the West (Andreas Thom joined Leverkusen in December 1989; the
+  database still has him at Dynamo Berlin) would count as West German, and
+  Berlin's clubs are placed by hand (the database gives Hertha's reserves the
+  Jahn-Sportpark, in the east; they count as West German).
 - Only the seven federations of the day play under names of their own. Other
   nations of 1961/62 to 1995/96 play under today's names and flags (Swaziland as
   Eswatini, Burma as Myanmar, Upper Volta as Burkina Faso), and so does the DR
@@ -1165,11 +1377,21 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   eleven natural players each season, more in the older editions (EA never rated
   a Tongan, Samoan or Cook Islands player, so those three field no team). Seasons before
   2004/05 have no EA source here (the FIFA Index mirror starts with FIFA 05);
-  2002/03 to 1996/97 come from SI's and Sensible Software's databases instead,
-  and 2003/04, 2000/01 and 1999/00 from none the game ships (the community's CM
-  packages for them need their own executables).
-- 2005/06, 2004/05 and 1996/97 have no clubs, and a local CM 01/02 database is
-  the only way to clubs in 2005/06 and 2004/05.
+  2002/03 to 1994/95 come from SI's and Sensible Software's databases instead,
+  1993/94 and 1989/90 from fans', and 2003/04, 2000/01 and 1999/00 from none the
+  game ships (the community's CM packages for them need their own executables).
+- 2005/06, 2004/05, 1996/97 and 1989/90 have no clubs, and a local CM 01/02
+  database is the only way to clubs in 2005/06 and 2004/05.
+- 1993/94 and 1989/90 rate as their makers rated, fans, not as any game's maker
+  did, and 1993/94 keeps CM 01/02's league sizes (a 20-club Premier League, an
+  18-club French First Division). Simon Treanor's 1989/90 is a beta whose readme
+  says many teams keep squads of the early 2000s. Each has one wild rating at its
+  top, shipped as its maker set it: 1993/94's Vassilis Ioannidis (99, Greece) and
+  1989/90's Jan Möller (98, Sweden's goalkeeper).
+- SWOS 94/95 and 95/96 keep each club's own sixteen, so a player SWOS files at two
+  top-division clubs plays for both (18 and 20 names, mostly namesakes), and
+  1995/96's Bordeaux fields Jean-Luc Dogon's two records. Their clubs score nearly
+  four goals a game ([How they play](#how-they-play)).
 - The CM seasons' clubs score more and draw less than EA's and than real
   leagues (3.4–3.6 goals a game and 19–20% draws), CM's current ability spreading
   a league wider ([How they play](#how-they-play)); CM 97/98's scale also runs
@@ -1211,8 +1433,8 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   golden, save-size budgets and roster tests pass unchanged. (Moving the
   built-in season to 2026/27 regenerated those files, and the golden with them.)
 - No CM 01/02 data set file, database file or derived player list is committed,
-  but for the three built-in ones the user chose to ship (SI's 3.9.68 and 3.9.60,
-  the CM3 port), with CM 97/98's and SWOS 96/97's: the seasons, not the database
-  files. The EA seasons are committed on the same terms as the built-in EA FC 27
+  but for the five built-in ones the user chose to ship (SI's 3.9.68 and 3.9.60,
+  the CM3 port, and Cam F's and Simon Treanor's fan-made databases), with CM
+  97/98's and the three SWOS editions': the seasons, not the database files. The EA seasons are committed on the same terms as the built-in EA FC 27
   data.
 - The domestic pack format is unchanged. A pack without `kind` is FM.

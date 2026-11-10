@@ -21,4 +21,7 @@ public/football/cm0102-*
 !public/football/cm0102-2002-11.json
 !public/football/cm0102-2001-09.json
 !public/football/cm0102-2020-11-cm3.json
+# The two fan-made retro databases the user chose to ship (1993/94 by Cam F, 1989/90 by Simon Treanor).
+!public/football/cm0102-2020-11-cm93.json
+!public/football/cm0102-2017-04-cm89.json
 public/football/index.json

@@ -23,6 +23,14 @@ non-commercial use, data rights reserved), SI's CM3 data as Cam F ported it, SI'
 CM 97/98 database as baskeyx extracted it, and Sensible World of Soccer 96/97's
 national squads. No Update Team or retro-team database is among them.
 
+On 2026-11-09 the user chose to ship four more on the same terms: Sensible World
+of Soccer's own team files of 1994/95 (the original, v1.0) and 1995/96, with
+their clubs, as the SWOS United server keeps them; and, in their words "Yes, ship
+both", the CM0102 Starter Kit's two fan-made retro databases, Cam F's 1993/94 and
+Simon Treanor's 1989/90 (Beta 5), credited to their makers, their labels saying
+the ratings are fans'. Neither fan-made database names a licence, and neither
+maker was asked; request 2 does not cover them.
+
 ## 1. To the CM 01/02 Update Team
 
 **Subject:** Permission to use the official databases in a free open-source game

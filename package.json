@@ -95,7 +95,7 @@
     "build:retro-seasons": "node scripts/build-retro-seasons.mjs",
     "sync:early-nationalities": "node scripts/sync-early-nationalities.mjs",
     "build:nba-seasons": "node scripts/build-nba-seasons.mjs",
-    "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-core.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs scripts/ea-seasons.test.mjs scripts/football-early-seasons.test.mjs scripts/nba-seasons.test.mjs scripts/football-federations.test.mjs"
+    "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-core.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs scripts/ea-seasons.test.mjs scripts/football-early-seasons.test.mjs scripts/nba-seasons.test.mjs scripts/football-federations.test.mjs scripts/football-swos-fan-seasons.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

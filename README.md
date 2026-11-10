@@ -244,9 +244,10 @@ manager of the theatre's favourite, with decisions from the first match.
    theatres starts a [domestic campaign](#domestic-campaigns), and its map shows that
    country. Football also has a **Season** choice: the built-in 2026/27 (the
    current season), then the [earlier seasons](#football-seasons) 2025/26 back
-   to 1996/97 (EA FIFA and FC ratings of each to 2004/05, then SI's
-   Championship Manager and, for 1996/97, Sensible World of Soccer; 2005/06,
-   2004/05 and 1996/97 have nations only), and any local
+   to 1989/90 (EA FIFA and FC ratings of each to 2004/05, then SI's
+   Championship Manager, Sensible World of Soccer for 1996/97 to 1994/95, and
+   fans' databases for 1993/94 and 1989/90; 2005/06, 2004/05, 1996/97 and 1989/90
+   have nations only), and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), then 1998/99 (NBA Live 99), 1991/92 and
@@ -1310,10 +1311,11 @@ npm run build:nwsl-map -- --check          # offline rebuild must match the comm
 
 ## Football seasons
 
-Football can be played on twenty-seven earlier seasons as well as the built-in
+Football can be played on thirty-one earlier seasons as well as the built-in
 2026/27: every season from 2004/05 to 2025/26, each from EA's FIFA or EA FC of
-that season (FIFA 05 to EA FC 26), and five before them, from 2002/03 back to
-1996/97, from the games of their day ([below](#before-200405)). They ship with
+that season (FIFA 05 to EA FC 26), and nine before them, from 2002/03 back to
+1989/90, from the games of their day and two fans' databases
+([below](#before-200405)). They ship with
 the game: pick one under **Season** in setup. Each is a file in
 `public/football/` (75–340 KB) that loads only when chosen.
 
@@ -1371,8 +1373,9 @@ the game: pick one under **Season** in setup. Each is a file in
 ### Before 2004/05
 
 EA has no source here before FIFA 05 (the FIFA Index mirror starts there), so
-five earlier seasons come from Sports Interactive's Championship Manager and
-from Sensible World of Soccer, one source each:
+nine earlier seasons come from Sports Interactive's Championship Manager, from
+Sensible World of Soccer and from two fans' Championship Manager databases, one
+source each:
 
 | Season | Source | Nations with a full XI | Clubs |
 | --- | --- | --- | --- |
@@ -1381,6 +1384,15 @@ from Sensible World of Soccer, one source each:
 | 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 130 |
 | 1997/98 | SI's Championship Manager 97/98 | 52 | 124 |
 | 1996/97 | Sensible World of Soccer 96/97, its national squads | 133 | nations only |
+| 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 |
+| 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 |
+| 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 130 |
+| 1989/90 | Simon Treanor's 89/90 for CM 01/02, fan-made (Beta 5) | 88 | nations only |
+
+1993/94 and 1989/90 are rated by fans, not by a game's makers, and say so in the
+Season choice. 1989/90 plays the federations of its day: the Soviet Union,
+Yugoslavia and Czechoslovakia field their republics' players, West Germany plays
+as West Germany, and a German at an East German club plays for no nation.
 
 - **Ratings:** CM's current ability (1–200) becomes `round(ca * 99 / 200)`, as
   for a local CM database (below); CM 97/98 rates the same players about five
@@ -1397,8 +1409,12 @@ from Sensible World of Soccer, one source each:
   Gio and released by Cam F on champman0102.co.uk; CM 97/98's database is as
   baskeyx extracted it. SWOS 96/97 is Sensible Software's (now Codemasters'),
   from Whiteulver's database and xflea's spreadsheet as keyser1884's SWOS-MCP
-  holds them. None of them grants redistribution: each season's source block
-  names its maker, who compiled it, where it comes from and when it was read.
+  holds them; SWOS 94/95 and 95/96 are the game's own team files as the SWOS
+  United server keeps them. The fan-made 1993/94 is Cam F's ("Season 93/94 For
+  0102") and 1989/90 Simon Treanor's ("Championship Manager 1989/90 update for CM
+  01/02", cm8990.wordpress.com), both as the CM0102 Starter Kit ships them. None
+  of them grants redistribution: each season's source block names its maker, who
+  compiled it, where it comes from and when it was read.
   `scripts/data/retro-seasons.json` pins every file by SHA-256. To rebuild:
 
   ```bash

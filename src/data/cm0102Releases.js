@@ -213,6 +213,24 @@ export const CM0102_RELEASES = [
     signatures: [
       { club: 6148142, staff: 11798060, staffTrailing: 230, clubSha256: '3309a9f3cb68e47bcafc09c1c25615a37150f06e53d76609e0e45885bd1618f3', staffSha256: '2df1a6a0efeb439954218f35f5258817e53a144787b5402f5b8e05b948877b47' },
     ] },
+  // Two fan-made databases of earlier seasons in the CM 01/02 format, as the CM0102 Starter Kit ships them: their players
+  // and abilities are their makers' (fans'), not SI's, and the user chose to ship both, credited to them. Birth years are
+  // stored as they were (the Starter Kit's loader starts the game in 1993 or 1989).
+  // Cam F's "Season 93/94 For 0102" (forum topic of 28 November 2020; data/cm93_data.zip): against SI's own CM 93/94 data
+  // for 1,452 English-league players its abilities correlate 0.72, and 74 are equal.
+  { id: 'cm0102-2020-11-cm93', label: '93/94 by Cam F, fan-made', provider: 'Cam F', season: '1993/94', year: 1994, released: '2020-11',
+    url: 'https://www.champman0102.co.uk/viewtopic.php?t=1546', shifts: { birth: 0 },
+    signatures: [
+      { club: 6150466, staff: 14364438, clubSha256: '770bbb7d8682a7786de46c4b7959fc64d6fe811bcb495b7691f1721a8732e9ba', staffSha256: 'ea6538893383dab023129429ca1ea2697b1d35bbea4d293f2615b0e9bfd32b0c' },
+    ] },
+  // Simon Treanor's "Championship Manager 1989/90 update for CM 01/02", Beta 5 of 8 April 2017 (its readme;
+  // data/cm89_data.zip): today's nationalities (Ukraine, Croatia, Slovakia; East Germans as 'Germany'), which a season
+  // plays as the federations of their day (src/data/footballSetBuild.js).
+  { id: 'cm0102-2017-04-cm89', label: '89/90 by Simon Treanor, fan-made', provider: 'Simon Treanor', season: '1989/90', year: 1990, released: '2017-04',
+    url: 'https://cm8990.wordpress.com/', shifts: { birth: 0 },
+    signatures: [
+      { club: 7704060, staff: 30177072, clubSha256: 'f2b1b96ed109b590715627ee79933239fce85f32fabee70c719363363196bfd9', staffSha256: 'dc28f8a5b3c190fc326f156ac69bca9d0088cb9f758290bf7bd1ca96cba81844' },
+    ] },
   { id: 'cm0102-2021-04', label: 'April 2021', provider: 'CM 01/02 Update Team', season: '2020/21', year: 2021, released: '2021-04',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=2863', shifts: { birth: 19, joined: 19, contract: 19 },
     signatures: [
