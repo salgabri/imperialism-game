@@ -1,7 +1,8 @@
 # Basketball's European competitions: the EuroLeague and EuroBasket
 
-Status: implemented 2026-11-08. Asked for as "in basketball can you add euroleague and european
-championship (the main ones)": Europe's main club competition and its national championship.
+Status: implemented 2026-11-08, merged with main's code split and nation-theatre rule
+2026-11-10. Asked for as "in basketball can you add euroleague and european championship (the
+main ones)": Europe's main club competition and its national championship.
 
 - **The EuroLeague**: a second club theatre for basketball, beside the NBA. Its 20 clubs of
   2026/27 fight over a map of Europe, each on land in its own country (Dubai holds the Emirates),

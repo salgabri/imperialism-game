@@ -28,7 +28,7 @@ And pick who fights:
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
   every other nation's land stays neutral: 173 nations play football, 52 tennis, 45
-  women's tennis, 40 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
+  women's tennis, 47 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
   rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
