@@ -140,22 +140,27 @@ The production build installs as an app (Chrome's install button, or Share › A
 to Home Screen on an iPhone) and plays offline. `npm run build` writes
 `manifest.webmanifest` and a service worker, `sw.js`, which
 [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) builds from `src/pwa.js`.
-The worker precaches only the app shell, about 3.5 MB: `index.html`, the hashed
-bundle in `assets/` (every sport's players among it), the Archivo fonts and the
-two world maps. Everything else in `public/` (about 100 MB) is cached the first
-time the game uses it. Seasons and
+The worker precaches only the app shell, about 3.5 MB: `index.html` and
+`assets/`, which holds the hashed bundle (every sport's players among it), the
+Archivo fonts and the two world maps. The build copies the fonts and maps there
+under content-hashed names (`hashedShell` in `vite.config.js`), so the worker
+takes the copies a first visit's page has just downloaded instead of fetching
+them again. Everything else in `public/` (about 100 MB), the icons included, is
+cached the first time the game uses it. Seasons and
 country maps come from the network while online, so they always match the
 deployed build, and from the cache offline. Flags and crests show from the cache
-at once and refresh in the background. Starting or resuming a campaign online
-also fetches every one of its teams' crests and flags that is not cached yet, a
-few at a time, so teams the game never showed online still show offline. A
+at once and refresh in the background. In the installed app, starting or
+resuming a campaign online also fetches every one of its teams' crests and flags
+that is not cached yet, a few at a time, so teams the game never showed online
+still show offline. A browser tab skips that: a world campaign has about 200 of
+them, each a request against the host's allowance (see **Caching** below). A
 first visit installs the worker only once the setup screen is up and the page
 is idle, or about 10 seconds after the game starts if setup takes longer, so its
 downloads leave the game's own alone. After one online visit that got that far,
 the game opens offline and plays nations and club campaigns,
 plus every country whose map was opened online. A country never opened online
 fails to load, with **Retry**, and a flag or crest the game has neither shown
-nor kept for a campaign online stays blank.
+online nor, in the installed app, kept for a campaign stays blank.
 
 The first download holds the game and football's players, the default setup's.
 Every other sport's players are a file of their own (4 to 43 KB compressed),
@@ -197,13 +202,27 @@ real gates. This needs no tokens or secrets. A first attempt that deployed from
 CI with the Vercel CLI was dropped on 1 November 2026, because the CLI rejected
 the Hobby account's access tokens ("User not found. (404)").
 
-**Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
-immutable for a year. Fonts, flags and club crests are cached for a day and
-revalidated in the background for a week; a stale image is harmless.
-Everything else revalidates on every load: `index.html`, the maps and the
-season and country files keep their names from one release to the next and
-must match the code that reads them. That includes `sw.js`, which must never be
-cached for long, or players would only see a release once the cache expired.
+**Caching.** [`vercel.json`](vercel.json) marks `/assets/` immutable for a
+year: the hashed bundle, and the fonts and world maps the build copies there
+under hashed names. The worker's runtime, `workbox-<hash>.js`, is named by its
+content too and kept as long, so checking for a new version fetches `sw.js`
+alone. `public/fonts/`, flags, flag symbols, club crests and the icons are
+cached for a day and revalidated in the background for a week; a stale image is
+harmless.
+Everything else revalidates on every load: `index.html` and the season and
+country files keep their names from one release to the next and must match the
+code that reads them. That includes `sw.js`, which must never be cached for
+long, or players would only see a release once the cache expired.
+
+**Requests are the scarce allowance.** Vercel's free Hobby plan includes
+1,000,000 requests and 100 GB of transfer a month. A static site uses nothing
+else, and going over either can pause the site for up to 30 days. A request costs as
+much of the allowance as 100 KB, and most files here are far smaller (a flag is
+about 2.5 KB, a crest about 7 KB), so every one counts, a 304 or a 404 too. A
+deployed build never asks for `football/index.json` unless it was built with
+one (`localSeasonIndex` in `vite.config.js`), the worker leaves the icons out of
+its precache, and only the installed app fetches a campaign's crests and flags
+ahead of time.
 
 **Link previews.** `index.html` carries a description, a canonical URL, and
 Open Graph and Twitter tags, so a shared link shows a card. Crawlers need

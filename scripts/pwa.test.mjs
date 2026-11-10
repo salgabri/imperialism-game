@@ -3,11 +3,13 @@
 // reloads a campaign on its own, and the persist() request that keeps saves through storage eviction.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, globSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, globSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import React, { act } from 'react';
 import sharp from 'sharp';
 import { APP_MANIFEST, FILE_NAVIGATION, PAGE_ICONS, PRECACHE, RUNTIME_CACHES, isRuntimeCached } from '../src/pwa.js';
+import { hashedShell } from '../vite.config.js';
 import { keepSaves, resetKeepSaves } from '../src/engine/persistence.js';
 import { loadSave, writeSave } from '../src/engine/storage.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
@@ -68,16 +70,11 @@ test('index.html links a favicon, the SVG icon, the Apple touch icon and the the
   assert.ok(html.includes(`<meta name="description" content="${APP_MANIFEST.description}">`), 'the manifest describes the game as the page does');
 });
 
-test('the precache is the app shell only; seasons, maps, flags and crests are cached the first time they are used', () => {
-  // The public/ files the precache globs take (index.html and assets/ come from the build).
-  const shell = globSync([...PRECACHE], { cwd: PUBLIC }).map(slash).sort();
-  const bytes = shell.reduce((sum, file) => sum + statSync(publicFile(file)).size, 0);
-  assert.ok(bytes < 1_500_000, `the public part of the shell is ${bytes} bytes`);
-  assert.ok(shell.includes('world-110m.v1.json') && shell.includes('countries-50m.json'));
-  assert.ok(!shell.some(file => /^(football|womens-football|basketball|american-football|baseball|hockey|tennis|womens-tennis|rugby-league|domestic|flags|flags-symbols|club-logos|textures)\//.test(file)), shell.join(', '));
-  // Every font fonts.css loads is in it, and only those.
-  const fonts = [...readFileSync(path.join(ROOT, 'src/fonts.css'), 'utf8').matchAll(/url\('\/(fonts\/[^']+)'\)/g)].map(match => match[1]);
-  assert.deepEqual(shell.filter(file => file.startsWith('fonts/')), [...new Set(fonts)].sort());
+test('the precache is the app shell only; seasons, country maps, flags and crests are cached the first time they are used', () => {
+  // The build's index.html and assets/: the bundle, and the world maps and fonts under hashed names (hashedShell).
+  // Nothing in public/ under its own name: the worker would download it past the cache the page had just filled.
+  assert.deepEqual([...PRECACHE], ['index.html', 'assets/**/*']);
+  assert.deepEqual(globSync([...PRECACHE], { cwd: PUBLIC }), []);
 
   const cacheOf = file => RUNTIME_CACHES.find(cache => cache.pattern.test(`https://imperialism.test/${file}`))?.cacheName ?? null;
   // Every file but the licences and source lists beside the data, which the game never loads.
@@ -103,6 +100,40 @@ test('the precache is the app shell only; seasons, maps, flags and crests are ca
   assert.equal(isRuntimeCached('https://imperialism.test/sub/domestic/826.json'), true, 'served from a subpath');
 });
 
+test('a build serves the world maps and the fonts hashed in assets/, so a first visit downloads each once', () => {
+  const plugin = hashedShell();
+  assert.equal(plugin.apply, 'build', 'the dev server and the tests keep public/\'s names');
+  // The maps: copies named by their content, which src/mapRequests.js learns from __HASHED_MAPS__.
+  const names = JSON.parse(plugin.config({ root: ROOT }).define.__HASHED_MAPS__);
+  assert.deepEqual(Object.keys(names), ['world-110m.v1.json', 'countries-50m.json']);
+  const emitted = [];
+  plugin.generateBundle.call({ emitFile: asset => emitted.push(asset) });
+  for (const [file, name] of Object.entries(names)) {
+    const bytes = readFileSync(publicFile(file));
+    assert.equal(name, `assets/${file.replace(/\.json$/, '')}-${createHash('sha256').update(bytes).digest('hex').slice(0, 8)}.json`);
+    const asset = emitted.find(entry => entry.fileName === name);
+    assert.ok(asset && asset.type === 'asset' && Buffer.compare(asset.source, bytes) === 0, name);
+  }
+  assert.equal(emitted.length, 2);
+  // The fonts: fonts.css names public/ files, which the build reaches by a path from the stylesheet so Vite hashes them.
+  const [fonts] = plugin.config({ root: ROOT }).css.postcss.plugins;
+  const cssFile = path.join(ROOT, 'src', 'fonts.css');
+  const css = readFileSync(cssFile, 'utf8');
+  const declaration = value => ({ value, source: { input: { file: cssFile } } });
+  const declarations = [...css.matchAll(/src: ([^;]+);/g)].map(match => declaration(match[1]));
+  const elsewhere = { ...declaration("url('/fonts/archivo-latin-variable.woff2')"), source: { input: { file: path.join(ROOT, 'src', 'styles', 'x.css') } } };
+  const other = declaration("url('/flags/fr.svg')");
+  fonts.Once({ walkDecls: visit => [...declarations, elsewhere, other].forEach(visit) });
+  assert.ok(declarations.length >= 6, `${declarations.length} fonts`);
+  for (const { value } of declarations) {
+    const url = value.match(/^url\('([^']+)'\) format\('woff2'\)$/)?.[1];
+    assert.match(url ?? value, /^\.\.\/public\/fonts\/archivo-[\w-]+\.woff2$/);
+    assert.ok(existsSync(path.resolve(ROOT, 'src', url)), url);
+  }
+  assert.equal(elsewhere.value, "url('../../public/fonts/archivo-latin-variable.woff2')", 'from the stylesheet that names it');
+  assert.equal(other.value, "url('/flags/fr.svg')", 'only fonts');
+});
+
 test('offline, every navigation in scope gets the game, but opening a data file directly does not', () => {
   for (const url of ['/', '/index.html', '/?playtest', '/sub/', '/sub/index.html?playtest']) assert.equal(FILE_NAVIGATION.test(url), false, url);
   for (const url of ['/football/ea-fc-26.json', '/club-logos/b-boston-celtics.webp', '/flags-symbols/README.md', '/sub/domestic/826.json']) {
@@ -113,13 +144,15 @@ test('offline, every navigation in scope gets the game, but opening a data file 
 // ---------- updates ----------
 
 const { ErrorBoundary, UpdatePrompt, registerServiceWorker, applyUpdate, resetServiceWorker, cacheForOffline,
-  teamMarkUrls } = await bundleComponents({
+  keepCampaignMarks, runsInstalled, teamMarkUrls } = await bundleComponents({
   ErrorBoundary: 'src/components/ErrorBoundary.jsx',
   UpdatePrompt: 'src/components/UpdatePrompt.jsx',
   registerServiceWorker: ['src/serviceWorker.js', 'registerServiceWorker'],
   applyUpdate: ['src/serviceWorker.js', 'applyUpdate'],
   resetServiceWorker: ['src/serviceWorker.js', 'resetServiceWorker'],
   cacheForOffline: ['src/serviceWorker.js', 'cacheForOffline'],
+  keepCampaignMarks: ['src/serviceWorker.js', 'keepCampaignMarks'],
+  runsInstalled: ['src/serviceWorker.js', 'runsInstalled'],
   teamMarkUrls: ['src/data/teamMarks.js', 'teamMarkUrls'],
 });
 
@@ -488,30 +521,64 @@ test('cacheForOffline does nothing without a worker or offline; before the first
   assert.deepEqual(env.fetched.sort(), [loaded, ...urls].sort(), 'with what the page loaded before it took over');
 });
 
-test('launching or resuming a campaign online keeps all of its crests and flags', async () => {
+/** matchMedia as a browser answers it, in the installed app's window or in a tab. */
+const mediaOf = installed => query => ({ matches: installed && query === '(display-mode: standalone)', media: query,
+  addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
+
+test('the installed app is the page in a window of its own: display-mode standalone, or an iPhone Home Screen app', () => {
+  assert.equal(runsInstalled({ matchMedia: mediaOf(true), navigator: {} }), true);
+  assert.equal(runsInstalled({ matchMedia: mediaOf(false), navigator: { standalone: true } }), true, 'iOS');
+  assert.equal(runsInstalled({ matchMedia: mediaOf(false), navigator: { standalone: false } }), false, 'a tab');
+  assert.equal(runsInstalled({ navigator: {} }), false, 'no matchMedia');
+  assert.equal(runsInstalled({ matchMedia() { throw new TypeError('blocked'); }, navigator: {} }), false, 'never throws');
+});
+
+test('only the installed app keeps a campaign\'s crests and flags ahead of time; a tab fetches each when the game shows it', async () => {
+  const urls = ['http://imperialism.test/club-logos/d826-602.webp', 'http://imperialism.test/flags/pt.svg'];
+  for (const installed of [false, true]) {
+    resetServiceWorker();
+    const { env } = browser({ controller: new Worker('activated') });
+    Object.assign(env, { matchMedia: mediaOf(installed), caches: { match: async () => undefined } });
+    env.navigator.onLine = true;
+    assert.equal(await keepCampaignMarks(urls, env), undefined);
+    assert.deepEqual(env.fetched.sort(), installed ? urls : [], installed ? 'installed' : 'tab');
+  }
+});
+
+test('launching or resuming a campaign online keeps all of its crests and flags in the installed app, none in a tab', async () => {
   await bundleApp();
   const fetched = [];
   const priorFetch = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  const priorMedia = Object.getOwnPropertyDescriptor(globalThis, 'matchMedia');
   Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: { controller: {} } });
   Object.defineProperty(globalThis, 'fetch', { configurable: true, writable: true,
     value: async url => { fetched.push(url); return { ok: true }; } });
   // The fixture runs the page's timers on a manual clock.
   const settle = () => new Promise(resolve => setImmediate(resolve));
-  const f = syncAppFixture({ ids: ['250', '620', '826'] });
+  const marks = ['/flags/fr.svg', '/flags/pt.svg', '/flags-symbols/pt-field.svg', '/flags-symbols/pt-symbol.svg', '/flags/gb-eng.svg'];
   try {
-    const marks = ['/flags/fr.svg', '/flags/pt.svg', '/flags-symbols/pt-field.svg', '/flags-symbols/pt-symbol.svg', '/flags/gb-eng.svg'];
-    f.app.startCampaign();
-    await settle();
-    assert.deepEqual(fetched.sort(), marks.slice().sort());
-    fetched.length = 0;
-    f.app.saved = loadSave();
-    f.app.resume();
-    await settle();
-    assert.deepEqual(fetched.sort(), marks.slice().sort());
+    for (const installed of [false, true]) {
+      Object.defineProperty(globalThis, 'matchMedia', { configurable: true, writable: true, value: mediaOf(installed) });
+      const expected = installed ? marks.slice().sort() : [];
+      const f = syncAppFixture({ ids: ['250', '620', '826'] });
+      try {
+        f.app.startCampaign();
+        await settle();
+        assert.deepEqual(fetched.sort(), expected, installed ? 'launched in the installed app' : 'launched in a tab');
+        fetched.length = 0;
+        f.app.saved = loadSave();
+        f.app.resume();
+        await settle();
+        assert.deepEqual(fetched.sort(), expected, installed ? 'resumed in the installed app' : 'resumed in a tab');
+        fetched.length = 0;
+      } finally {
+        f.close();
+      }
+    }
   } finally {
-    f.close();
     delete navigator.serviceWorker;
     Object.defineProperty(globalThis, 'fetch', priorFetch);
+    if (priorMedia) Object.defineProperty(globalThis, 'matchMedia', priorMedia); else delete globalThis.matchMedia;
   }
 });
 

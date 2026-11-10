@@ -26,15 +26,16 @@ export const APP_MANIFEST = Object.freeze({
   ],
 });
 
-/** Other icons in public/ the page links to (index.html), precached with the manifest's. */
+/** Other icons in public/ the page links to (index.html). Like the manifest's, they are not precached (vite.config.js). */
 export const PAGE_ICONS = Object.freeze(['favicon.ico', 'favicon.svg', 'apple-touch-icon.png']);
 
 /**
- * The app shell, precached when the worker installs (globs in dist/): under 3 MB of a build near 60 MB. Each new
- * version downloads it whole before the update prompt shows. Only the Archivo faces: fonts.css loads no others.
+ * The app shell, precached when the worker installs (globs in dist/): about 3.5 MB of a build over 100 MB. A new
+ * version downloads the files it changed before the update prompt shows. assets/ holds the bundle and, under
+ * content-hashed names, the two world maps and the Archivo fonts (vite.config.js hashedShell), so the worker takes the
+ * copies a first visit's page has just loaded instead of downloading them again.
  */
-export const PRECACHE = Object.freeze(['index.html', 'assets/**/*', 'fonts/archivo-*.woff2', 'world-110m.v1.json',
-  'countries-50m.json']);
+export const PRECACHE = Object.freeze(['index.html', 'assets/**/*']);
 
 /**
  * Everything else in public/ is cached the first time the game uses it. Seasons and country maps come from the

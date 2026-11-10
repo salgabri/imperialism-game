@@ -4,7 +4,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { build } from 'esbuild';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { SAVE_KEY } from '../src/config.js';
@@ -24,7 +28,8 @@ import {
 import { campaignSnapshot, createCampaignId, exportCampaign, loadCampaign, parseCampaign, serializeCampaign, writeSave }
   from '../src/engine/storage.js';
 import { sourceLabel, sourceTitle } from '../src/viewModels/squad.js';
-import { bundleApp, bundleComponents } from './lib/app-harness.mjs';
+import { localSeasonIndex } from '../vite.config.js';
+import { ROOT, bundleApp, bundleComponents } from './lib/app-harness.mjs';
 
 // ---------- a synthetic data set ----------
 
@@ -247,6 +252,31 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
     async () => ({ ok: true, status: 200, json: async () => { throw new SyntaxError('Unexpected token'); } })]) {
     clearFootballSetIndex();
     assert.equal(await loadFootballSetIndex({ fetch }), BUILT_IN_SETS);
+  }
+});
+
+test('a build made without a local index never asks for one, so a deployed page load makes no request that can only fail', async () => {
+  // footballSets.js as such a build compiles it (vite.config.js localSeasonIndex defines __LOCAL_SEASON_INDEX__).
+  const result = await build({ entryPoints: [path.join(ROOT, 'src/engine/footballSets.js')], bundle: true, write: false,
+    platform: 'node', format: 'cjs', define: { __LOCAL_SEASON_INDEX__: 'false', 'import.meta.env.BASE_URL': '"/"' }, logLevel: 'silent' });
+  const built = { exports: {} };
+  new Function('require', 'module', 'exports', result.outputFiles[0].text)(createRequire(import.meta.url), built, built.exports);
+  const listed = fakeFetch({ '/football/index.json': { format: 1, sets: [entryOf(SET)] } });
+  const sets = await built.exports.loadFootballSetIndex({ fetch: listed.fetch });
+  assert.deepEqual(listed.calls, []);
+  assert.deepEqual(sets.map(set => set.id), BUILT_IN_SETS.map(set => set.id), 'the built-in seasons stand alone');
+
+  // The build asks only when its public/ has an index to copy into dist/: a computer that built CM 01/02 sets.
+  const plugin = localSeasonIndex();
+  assert.equal(plugin.apply, 'build', 'the dev server always asks');
+  const root = mkdtempSync(path.join(tmpdir(), 'season-index-'));
+  try {
+    assert.deepEqual(plugin.config({ root }).define, { __LOCAL_SEASON_INDEX__: 'false' });
+    mkdirSync(path.join(root, 'public', 'football'), { recursive: true });
+    writeFileSync(path.join(root, 'public', 'football', 'index.json'), '{"format":1,"sets":[]}');
+    assert.deepEqual(plugin.config({ root }).define, { __LOCAL_SEASON_INDEX__: 'true' });
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });
 

@@ -1740,8 +1740,10 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
     (`BUILT_IN_SETS`, from `src/data/footballSeasons.js` and
     `src/data/basketballSeasons.js`; `setSportOf(id)` tells them apart) and the
     CM 01/02 sets built on this computer (`football/index.json`, read once;
-    missing means none). A local file never stands in for a built-in season,
-    and never adds a basketball one.
+    missing means none). A production build made without that file never asks
+    for it (`localSeasonIndex` in `vite.config.js`), so the deployed site makes
+    no request that can only fail. A local file never stands in for a built-in
+    season, and never adds a basketball one.
   - `loadFootballSet(id)` and `getLoadedFootballSet(id)` follow
     `src/engine/domestic.js`: one shared promise per id, failed loads not cached,
     a small LRU, and strict validation of format, id, version and tuples. A set
