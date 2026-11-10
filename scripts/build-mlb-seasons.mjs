@@ -244,11 +244,12 @@ ${indent(war.licenceText)}
 
 Names, given names and birth countries of the players, and the clubs' codes, names, records and ballparks:
   the ${databank.name} by the ${databank.publisher} (${databank.repository}),
-  at its last commit ${databank.commit}, read from ${databank.copy}
-  (the Bureau's own repository is no longer on GitHub). Changes: only each player's name, given names, birth
-  year and birth country and each club's name, record and main ballpark are taken, joined to the WAR as
-  described above; ${corrected.length === 1 ? 'one birth country is' : `${corrected.length} birth countries are`} corrected (${correctedNames}, below). The Databank is historically based in
-  part on the Lahman Baseball Database, version 2015-01-24, Copyright (C) 1996-2015 by Sean Lahman (CC BY-SA 3.0).
+  at commit ${databank.commit}, read from ${databank.copy}
+  (the Bureau's own repository is no longer on GitHub; this is the latest commit its surviving forks hold).
+  Changes: only each player's name, given names, birth year and birth country and each club's name, record
+  and main ballpark are taken, joined to the WAR as described above; ${corrected.length === 1 ? 'one birth country is' : `${corrected.length} birth countries are`}
+  corrected (${correctedNames}, below). The Databank is historically based in part on the Lahman Baseball
+  Database, version 2015-01-24, Copyright (C) 1996-2015 by Sean Lahman (CC BY-SA 3.0).
   Licence: ${databank.licence}.
   These season files, derived from it, are shared under the same licence, CC BY-SA 3.0, as are the
   snapshots they are built from (scripts/data/mlb-war-seasons/). In the Databank's words:

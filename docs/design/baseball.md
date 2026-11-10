@@ -326,13 +326,14 @@ ignored `data-src/mlb-war/`:
   Baseball-Reference code, name and record) and HomeGames (the ballpark each club played
   most of its home games in, from Retrosheet's game logs). The Databank keeps the Lahman
   database's tables and format, generated from the Bureau's own data. The Bureau's
-  repository (github.com/chadwickbureau/baseballdatabank) is no longer on GitHub, so its
-  last commit, `e9f247e` (Ted Turocy, 6 November 2023; seasons 1871 to 2022), is read from
+  repository (github.com/chadwickbureau/baseballdatabank) is no longer on GitHub, so
+  whether it had later commits cannot be seen; the latest commit any of its 159 surviving
+  forks holds, `e9f247e` (Ted Turocy, 6 November 2023; seasons 1871 to 2022), is read from
   raw.githubusercontent.com through a fork whose master is that commit
-  (github.com/infonuum/baseballdatabank); each file's git blob is checked against that
-  commit's tree (GitHub's API) and its SHA-256 pinned. raw.githubusercontent.com and
-  api.github.com serve no robots.txt; github.com's own pages were not requested.
-  Retrieved 10 November 2026, one request every 1.5 s, User-Agent
+  (github.com/infonuum/baseballdatabank, forked two days later); each file's git blob is
+  checked against that commit's tree (GitHub's API) and its SHA-256 pinned.
+  raw.githubusercontent.com and api.github.com serve no robots.txt; github.com's own pages
+  were not requested. Retrieved 10 November 2026, one request every 1.5 s, User-Agent
   `imperialism-game-data/1.0`. Every one of the 10,401 players of 1960 to 2017 is found,
   each filed once. The research pass's copy of the Lahman 2025 files, from sabr.box.com,
   was replaced because box.com's robots.txt disallows the download path it came through.
@@ -565,10 +566,11 @@ Senators' ids by founding year (`mlb-washington-senators-1901`, `-1961`); a club
 thirteen pitchers keeps the ones it used; namesakes in one squad keep the better player's
 name; the ballparks' names and coordinates of 1960–79 from Wikipedia rather than the
 research pass's Wikidata answers. The re-sourcing's (2026-11-10): the Lahman tables from
-the Chadwick Bureau's Baseball Databank, the first choice asked for, read at its last commit
-through a fork; its names and birth countries as it gives them (the Peñas become Pena, Rod
-Carew and Mike Eden Panama's), Elmer Valo's alone corrected; the calibration's record check
-limited to the Databank's seasons (2018–2022) rather than a second source for 2023–24.
+the Chadwick Bureau's Baseball Databank, the first choice asked for, read at the latest
+commit its forks hold, through one of them; its names and birth countries as it gives them
+(the Peñas become Pena, Rod Carew and Mike Eden Panama's), Elmer Valo's alone corrected;
+the calibration's record check limited to the Databank's seasons (2018–2022) rather than a
+second source for 2023–24.
 
 ## Known limits
 

@@ -6,13 +6,13 @@
 //
 // It never fetches. Its sources (scripts/data/mlb-war-seasons.json `sources`) are cached in the ignored data-src/mlb-war/
 // and pinned by SHA-256: JEFFBAGWELL's WAR by player, season and stint (Neil Paine, MIT; the average of Baseball-Reference's
-// and FanGraphs' WAR) and the Chadwick Baseball Bureau's Baseball Databank at its last commit (CC BY-SA 3.0; seasons to
-// 2022) for each player's name and birthplace, each club's code, record and ballpark. Each season's snapshot holds every
-// player who played in it: his club (that of his last stint), his role and positions, his score and the inputs it was
-// computed from, and his birth country (the Databank's, but where the manifest's `birthCountries` corrects it from a
-// pinned source). The reference holds MLB The Show 18 to 24's overalls of the players matched to that season's WAR, by
-// derived role, strongest first: the scale the scores are mapped onto (scripts/lib/mlb-war.mjs `rateByRank`), with the
-// calibration that left one season out at a time.
+// and FanGraphs' WAR) and the Chadwick Baseball Bureau's Baseball Databank at the latest commit its surviving forks hold
+// (CC BY-SA 3.0; seasons to 2022) for each player's name and birthplace, each club's code, record and ballpark. Each
+// season's snapshot holds every player who played in it: his club (that of his last stint), his role and positions, his
+// score and the inputs it was computed from, and his birth country (the Databank's, but where the manifest's
+// `birthCountries` corrects it from a pinned source). The reference holds MLB The Show 18 to 24's overalls of the players
+// matched to that season's WAR, by derived role, strongest first: the scale the scores are mapped onto
+// (scripts/lib/mlb-war.mjs `rateByRank`), with the calibration that left one season out at a time.
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
