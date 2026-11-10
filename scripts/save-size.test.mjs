@@ -365,6 +365,8 @@ const RUNS = {
   'basketball world': { sport: 'basketball', layer: 'nations', scope: 'world' },
   'England domestic': { sport: 'football', layer: 'clubs', clubScope: 'domestic:826' },
   'Top 124 of Europe': { sport: 'football', layer: 'clubs', clubScope: 'domestic:eu124' },
+  // A computed World Cup season's players are plain records, their sources inline (docs/design/football-years.md).
+  'World Cup 1989/90': { sport: 'football', layer: 'nations', scope: 'world', dataSet: 'wc-1990' },
 };
 const played = new Map();
 /** Each run is played once per process into its own fresh 5M storage, which later tests may keep using. */
@@ -403,7 +405,7 @@ for (const name of Object.keys(RUNS)) {
     }
     // The UI reads the rebuilt checkpoint: squads with their sources, and the whole history.
     const text = storage.items.get(SAVE_KEY);
-    if (st.settings.sport === 'football') assert.equal((text.match(/"sourceInfo":\{/g) || []).length, 0, 'no source is stored inline');
+    if (st.settings.sport === 'football' && st.settings.dataSet == null) assert.equal((text.match(/"sourceInfo":\{/g) || []).length, 0, 'no source is stored inline');
     withStorage(storage, () => {
       const loaded = loadSave();
       assert.equal(loaded.revision, saves.length);

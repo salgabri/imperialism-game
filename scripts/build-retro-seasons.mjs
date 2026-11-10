@@ -30,7 +30,7 @@ import { setHasClubs } from '../src/engine/footballSets.js';
 import { buildCm9798Season } from './lib/cm9798.mjs';
 import { SWOS_LEAGUES, buildSwosSeason } from './lib/swos.mjs';
 import { SWOS_NATIONAL_FILES, readTeamFile, swosRows } from './lib/swos-files.mjs';
-import { committedSeasons, eaSeasonIds, footballSeasonsModule } from './lib/football-seasons-listing.mjs';
+import { committedSeasons, eaSeasonIds, footballSeasonsModule, worldCupSeasonIds } from './lib/football-seasons-listing.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -155,14 +155,16 @@ async function main() {
       + `${coverage.nations} nations with players, ${coverage.clubs} clubs, ${coverage.players} players, ${Math.round(Buffer.byteLength(result.text) / 1024)} KB`);
     for (const warning of result.warnings) console.log(`  warning: ${warning}`);
   }
-  const listed = [...await committedSeasons(path.join(root, 'public/football'), eaSeasonIds(ea)), ...results.map(result => result.doc)];
+  const worldCup = JSON.parse(await readFile(path.join(root, 'scripts/data/world-cup-seasons.json'), 'utf8'));
+  const listed = [...await committedSeasons(path.join(root, 'public/football'), eaSeasonIds(ea)), ...results.map(result => result.doc),
+    ...await committedSeasons(path.join(root, 'public/football'), worldCupSeasonIds(worldCup))];
   const audit = {
     generatedBy: 'scripts/build-retro-seasons.mjs', retrieved: manifest.retrieved,
     seasons: results.map(({ doc, audit: own }, i) => ({ ...manifest.seasons[i], version: doc.version, coverage: doc.coverage, audit: own })),
   };
   const outputs = new Map([
     ...results.map(({ doc, text }) => [path.join(root, 'public/football', `${doc.id}.json`), text]),
-    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea, retro: manifest })],
+    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea, retro: manifest, worldCup })],
     [path.join(root, 'docs/design/football-retro-seasons-audit.json'), `${JSON.stringify(audit, null, 2)}\n`],
   ]);
   if (args.check) {

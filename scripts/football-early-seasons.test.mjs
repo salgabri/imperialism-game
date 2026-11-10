@@ -44,7 +44,7 @@ const IDS = ['cm0102-2002-11', 'cm0102-2001-09', 'cm-0001', 'cm-9900', 'cm0102-2
 
 test('the seasons before FIFA 05 are built in, after EA\'s, each its committed file and credited to its makers', () => {
   // The manifest lists these seven in this order, among the others (scripts/football-swos-fan-seasons.test.mjs has
-  // SWOS 94/95 and 95/96 and the two fan-made databases).
+  // SWOS 94/95 and 95/96 and the two fan-made databases; the computed World Cup seasons, 1961/62 to 1993/94, follow).
   assert.deepEqual(MANIFEST.seasons.map(season => season.id).filter(id => IDS.includes(id)), IDS);
   const listed = IDS.map(id => BUILT_IN_SEASONS.find(set => set.id === id));
   assert.deepEqual(listed.map(set => [set.id, set.year, set.season]), [['cm0102-2002-11', 2003, '2002/03'], ['cm0102-2001-09', 2002, '2001/02'],

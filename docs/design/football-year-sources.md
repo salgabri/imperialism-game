@@ -144,6 +144,15 @@ Rangliste (20–100 players a year).
 Club history has no openly licensed structured source before about 2010 outside
 England (openfootball, engsoccerdata under GPL).
 
+**Shipping, computed (2026-11-10):** the World Cups of 1962 to 1994 as nine
+nations-only seasons whose ratings are computed, not a game's: the Fjelstul
+World Cup Database's squads and records (commit `35a8667`, CC BY-SA 4.0),
+martj42's results through our own Elo (commit `b0948cb`, CC0; each team starts at
+1500, or 1300 when its first match is after 1930), and Wikipedia's Ballon d'Or
+votes and 1962/1966 line-ups at pinned revisions (CC BY-SA 4.0), with
+eloratings.net's tables as a cross-check only
+([football-years.md](football-years.md#computed-world-cup-seasons)).
+
 ## Rights and terms
 
 These findings affect the data that **already ships**, not only new years. This

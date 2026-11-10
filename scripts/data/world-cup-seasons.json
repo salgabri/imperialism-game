@@ -1,0 +1,700 @@
+{
+  "about": "The computed World Cup seasons, 1961/62 to 1993/94 (docs/design/football-years.md, \"Computed World Cup seasons\"): every source pinned and every constant of the method, so a later change of the built-in data changes nothing. npm run sync:world-cup-seasons reads the sources from data-src/ into the committed facts (scripts/data/world-cup-seasons/), and npm run build:world-cup-seasons turns the facts into public/football/wc-<year>.json.",
+  "decided": "2026-11-09: the user approved computed ratings for football's 1960s to 1980s, labelled as computed: World Cup squads only (no Wikidata pools), the nation's strength from its Elo the day after the final, each XI ordered by the players' records. East Germany, with no map shape, fields no team.",
+  "retrieved": "2026-11-09",
+  "licence": "CC BY-SA 4.0",
+  "sources": {
+    "worldCup": {
+      "name": "The Fjelstul World Cup Database",
+      "author": "Joshua C. Fjelstul, Ph.D.",
+      "notice": "© 2023 Joshua C. Fjelstul, Ph.D.",
+      "url": "https://github.com/jfjelstul/worldcup",
+      "commit": "35a8667f518b07469182ae16d35574dd0e7a00fb",
+      "committed": "2026-06-11",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
+      "terms": "Attribution to Joshua C. Fjelstul, Ph.D., with the copyright notice and links to the licence and the repository; derived works carry CC BY-SA 4.0 and indicate their changes. Commercial use allowed (the repository's README).",
+      "folder": "fjelstul-worldcup",
+      "download": "https://raw.githubusercontent.com/jfjelstul/worldcup/35a8667f518b07469182ae16d35574dd0e7a00fb/data-csv/",
+      "files": [
+        {
+          "name": "tournaments.csv",
+          "sha256": "906b122d80aae5302486bafa9dfd925378503a2a11de6f5db39d6c4879040ce0",
+          "bytes": 3287
+        },
+        {
+          "name": "players.csv",
+          "sha256": "97d61d04b522c9b6471753e92eb3100978d8159ca8c7a7bfd1b2f1921e92e884",
+          "bytes": 1111882
+        },
+        {
+          "name": "squads.csv",
+          "sha256": "dafd483504fe26a63ae211e2539462fbbd86c53d5e079fc0a8cf48e8273659bb",
+          "bytes": 1331815
+        },
+        {
+          "name": "matches.csv",
+          "sha256": "037f718764758e7dda3a2918276f85fa8389af1d50999d2a480c8a6a49408875",
+          "bytes": 298930
+        },
+        {
+          "name": "player_appearances.csv",
+          "sha256": "edab41b99556cf7494387a5c7d74824c4c69a4474c32d1d4fbf8bab4e61ad483",
+          "bytes": 4676840
+        },
+        {
+          "name": "substitutions.csv",
+          "sha256": "dd98a991dceaeb966771db3e6f7b28413a76f16be3a1f0c2a99b8c258a3a8e56",
+          "bytes": 1878063
+        },
+        {
+          "name": "bookings.csv",
+          "sha256": "e1c010ce790fc7729392dc51ceafcb75775b4cc2e3ba39b186efbe6ab19f8969",
+          "bytes": 598373
+        },
+        {
+          "name": "goals.csv",
+          "sha256": "4fbe990b7f42bb8af00d1587af09359ecfdb4ee4101bb44fda0eb336fc1e5be3",
+          "bytes": 734494
+        },
+        {
+          "name": "award_winners.csv",
+          "sha256": "84deded971dabc8bc30dab6dbcdabc7f08c646f6e5db22b85d2a71cdad437955",
+          "bytes": 19791
+        }
+      ]
+    },
+    "results": {
+      "name": "International football results from 1872 (martj42/international_results)",
+      "author": "martj42",
+      "url": "https://github.com/martj42/international_results",
+      "commit": "b0948cb558c927c357db4067eac5b37b96d0e4bb",
+      "committed": "2026-10-31",
+      "licence": "CC0-1.0",
+      "folder": "martj42-results",
+      "download": "https://raw.githubusercontent.com/martj42/international_results/b0948cb558c927c357db4067eac5b37b96d0e4bb/",
+      "files": [
+        {
+          "name": "results.csv",
+          "sha256": "09aac809e317f3004c69720a38addb656c49ebb19f1937deab96f96e3362257a",
+          "bytes": 3764347
+        }
+      ]
+    },
+    "ballonDor": {
+      "name": "English Wikipedia, \"<year> Ballon d'Or\": the voting tables (the votes are France Football's)",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
+      "fetched": "The article pages (https://en.wikipedia.org/wiki/<title>), one every 2 s on 2026-11-09: robots.txt disallows /w/ and /api/ to every user agent and allows /wiki/. A page saved again shows the same revision, not always the same bytes.",
+      "folder": "wikipedia-ballon-dor-1961-1994",
+      "pages": [
+        {
+          "title": "1961 Ballon d'Or",
+          "revision": 1354465261,
+          "file": "1961.html",
+          "sha256": "eec4c13cc20895da403c4fcc850643d61fced056379059c87a37b8317034ebb3",
+          "bytes": 294599
+        },
+        {
+          "title": "1962 Ballon d'Or",
+          "revision": 1354465181,
+          "file": "1962.html",
+          "sha256": "32fc2c5223af1167253751a38ab9f39a626c69c499c315178fab6f9b4530d3e4",
+          "bytes": 246399
+        },
+        {
+          "title": "1965 Ballon d'Or",
+          "revision": 1354464917,
+          "file": "1965.html",
+          "sha256": "8a8189abc36aba3be9943ae614381cc5b462b2c8a9c09aa9bdba1c3d90804333",
+          "bytes": 249884
+        },
+        {
+          "title": "1966 Ballon d'Or",
+          "revision": 1354464796,
+          "file": "1966.html",
+          "sha256": "6e3799cef499ad26aa7753d4e220f4f8648ff3b40d2b55606e7caacef6555f80",
+          "bytes": 229574
+        },
+        {
+          "title": "1969 Ballon d'Or",
+          "revision": 1354464144,
+          "file": "1969.html",
+          "sha256": "7d024814a82e2fa06644a7763faa69145992b1a2347b77189ef22b53a3664fe0",
+          "bytes": 253921
+        },
+        {
+          "title": "1970 Ballon d'Or",
+          "revision": 1354464059,
+          "file": "1970.html",
+          "sha256": "0262bbace67f911fc7d4c5dfb03fb52858747b19a3243123d5cd2e7cac775c33",
+          "bytes": 248761
+        },
+        {
+          "title": "1973 Ballon d'Or",
+          "revision": 1377860229,
+          "file": "1973.html",
+          "sha256": "cd419f6c1eb976b06ed77138f1d551887507843507347c7cd0189b41b597f7bb",
+          "bytes": 244194
+        },
+        {
+          "title": "1974 Ballon d'Or",
+          "revision": 1355778955,
+          "file": "1974.html",
+          "sha256": "c2396068cb4498b5d541e3ad5d9498b538afbc06a81c58786e2b4ae48f3c1267",
+          "bytes": 233519
+        },
+        {
+          "title": "1977 Ballon d'Or",
+          "revision": 1354463443,
+          "file": "1977.html",
+          "sha256": "2c1e6e7aa549c57e30249268d8b1556f9a021d60b9e61946def406fc314f0440",
+          "bytes": 249984
+        },
+        {
+          "title": "1978 Ballon d'Or",
+          "revision": 1376163010,
+          "file": "1978.html",
+          "sha256": "3a059612d022b93c983aa3726f4be3a72eaa80c21d63a5aaa9969ef46b9954c8",
+          "bytes": 245412
+        },
+        {
+          "title": "1981 Ballon d'Or",
+          "revision": 1379538471,
+          "file": "1981.html",
+          "sha256": "b1e819f00f97f608cc8e681c15601b272548e58746dd8785f842e48ab8a679e8",
+          "bytes": 255315
+        },
+        {
+          "title": "1982 Ballon d'Or",
+          "revision": 1354462862,
+          "file": "1982.html",
+          "sha256": "76013fce37b00a5b4f3080156740949187d28c03ba2f326510fe39c8837b3f42",
+          "bytes": 222804
+        },
+        {
+          "title": "1985 Ballon d'Or",
+          "revision": 1354462634,
+          "file": "1985.html",
+          "sha256": "827e34009bfd3ad42e8e3bcbcff6d0a160a33455d8f1e888e05b67fefbd29989",
+          "bytes": 262429
+        },
+        {
+          "title": "1986 Ballon d'Or",
+          "revision": 1354462481,
+          "file": "1986.html",
+          "sha256": "7db4b587a0b3eb03396b7527b08d70e492d734074a0858facec82a127fd9b235",
+          "bytes": 246503
+        },
+        {
+          "title": "1989 Ballon d'Or",
+          "revision": 1354462265,
+          "file": "1989.html",
+          "sha256": "7983da4d3df7e6b01953b5dd37e5b13d6e279124467e539bac1ac5e1524758c7",
+          "bytes": 243761
+        },
+        {
+          "title": "1990 Ballon d'Or",
+          "revision": 1354462195,
+          "file": "1990.html",
+          "sha256": "71fc883551b7e1b031bd5f069863cd6d7617e7ddfaf69038f036082d62c25ef7",
+          "bytes": 229351
+        },
+        {
+          "title": "1993 Ballon d'Or",
+          "revision": 1354461844,
+          "file": "1993.html",
+          "sha256": "dd5d39c3429fbbbc21aa1770a09394f3e33798c7d51cb98a8c621014cb46456f",
+          "bytes": 246002
+        },
+        {
+          "title": "1994 Ballon d'Or",
+          "revision": 1363542180,
+          "file": "1994.html",
+          "sha256": "ebd2421cb0dbb244dfbf292550c072ae6fc000654df2227a607c369075306f71",
+          "bytes": 260798
+        }
+      ]
+    },
+    "lineups": {
+      "name": "English Wikipedia, \"<year> FIFA World Cup Group <n>\" and \"<year> FIFA World Cup knockout stage\": the starting line-ups",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
+      "fetched": "As the Ballon d'Or pages, on 2026-11-09.",
+      "folder": "wikipedia-world-cup-lineups-1962-1966",
+      "pages": [
+        {
+          "title": "1962 FIFA World Cup Group 1",
+          "revision": 1383581527,
+          "file": "1962-group-1.html",
+          "sha256": "ce30e0a191cc02a1561d0099a088c9bf505cc7b834f790c227a69863684ebcfc",
+          "bytes": 335832
+        },
+        {
+          "title": "1962 FIFA World Cup Group 2",
+          "revision": 1383573226,
+          "file": "1962-group-2.html",
+          "sha256": "b749fc7c22914bb135c96aa0c2aa117fc9cba5ee33dbee1d6e3ad8d6bc2f0e7f",
+          "bytes": 321644
+        },
+        {
+          "title": "1962 FIFA World Cup Group 3",
+          "revision": 1381200832,
+          "file": "1962-group-3.html",
+          "sha256": "5366b6132ca2f9d032465e0beb41ab028fcbda1c86ba95f618a7b7c5a2aa3fae",
+          "bytes": 338195
+        },
+        {
+          "title": "1962 FIFA World Cup Group 4",
+          "revision": 1383593614,
+          "file": "1962-group-4.html",
+          "sha256": "b8d80cb64dd5aead3ccf052cce2877cdf752f1248de63c2a91e30bf105caeb5c",
+          "bytes": 325882
+        },
+        {
+          "title": "1962 FIFA World Cup knockout stage",
+          "revision": 1375839558,
+          "file": "1962-knockout-stage.html",
+          "sha256": "fb638fd37be2e9d7e40b1aa83c4e5b2832d6688b41df34a7d1395ce8dd1af209",
+          "bytes": 431470
+        },
+        {
+          "title": "1966 FIFA World Cup Group 1",
+          "revision": 1379880707,
+          "file": "1966-group-1.html",
+          "sha256": "b8b5f623452afe02f25b398402eb14332a3bfab6ae451321805ba55bb8b35745",
+          "bytes": 280165
+        },
+        {
+          "title": "1966 FIFA World Cup Group 2",
+          "revision": 1370476946,
+          "file": "1966-group-2.html",
+          "sha256": "b396b3642dc755fae414af854b1cdaf5d9f02c97aa3c5fc654251d02b7c170a4",
+          "bytes": 314576
+        },
+        {
+          "title": "1966 FIFA World Cup Group 3",
+          "revision": 1380425700,
+          "file": "1966-group-3.html",
+          "sha256": "106643da2a92376d4edae8ac4386d5ed7ebbb49a9df14856ea466bca22fd88c8",
+          "bytes": 322428
+        },
+        {
+          "title": "1966 FIFA World Cup Group 4",
+          "revision": 1370476950,
+          "file": "1966-group-4.html",
+          "sha256": "083f4b5c9282a21a9c8ff43199561c09c3f414aebf982c138c795def8e2c922e",
+          "bytes": 296428
+        },
+        {
+          "title": "1966 FIFA World Cup knockout stage",
+          "revision": 1377432584,
+          "file": "1966-knockout-stage.html",
+          "sha256": "d9289455a77a6759ab2552f730d2935fd6febcd4a7e352c22aae64cd949ce7a7",
+          "bytes": 428300
+        }
+      ]
+    },
+    "crossCheck": {
+      "name": "World Football Elo Ratings (eloratings.net), year-end tables",
+      "url": "https://www.eloratings.net/",
+      "use": "Cross-check only: compared with the computed Elo, never an input and never shipped (no licence stated). Fetched by the research pass on 2026-11-09, 3 s apart; the site has no robots.txt.",
+      "folder": "eloratings-net-crosscheck",
+      "aliases": {
+        "West Germany": "Germany",
+        "Soviet Union": "Russia",
+        "East Germany": "German DR",
+        "Zaire": "DR Congo",
+        "Ireland": "Republic of Ireland",
+        "Czechia": "Czech Republic",
+        "South Vietnam": "Vietnam Republic",
+        "North Yemen": "Yemen",
+        "South Yemen": "Yemen DPR",
+        "Burma": "Myanmar",
+        "Dahomey": "Benin",
+        "Upper Volta": "Burkina Faso",
+        "Ceylon": "Sri Lanka",
+        "United Arab Republic": "Egypt",
+        "Congo-Kinshasa": "DR Congo",
+        "Swaziland": "Eswatini",
+        "Macedonia": "North Macedonia",
+        "FR Yugoslavia": "Serbia",
+        "CIS": "Russia"
+      },
+      "files": [
+        {
+          "name": "en.teams.tsv",
+          "sha256": "ff4b8c9c7bcdad56e81a007726c1a655c6dabdf77bca151b1d619f24125dbc90",
+          "bytes": 7277
+        },
+        {
+          "name": "1962.tsv",
+          "sha256": "2b0bdcb9d5334d21514e2a1c1124ee9344df22ec630573faf0e3166245c3dd9b",
+          "bytes": 18940
+        },
+        {
+          "name": "1966.tsv",
+          "sha256": "45bb31fdec288c95664e45e106f9d2ad2121c431b940d9a5e49b530e90730ec6",
+          "bytes": 21273
+        },
+        {
+          "name": "1970.tsv",
+          "sha256": "73760a7976c0a1e6e67c2fe94589f0c532bfa0587828e7471207873c60f8741f",
+          "bytes": 21475
+        },
+        {
+          "name": "1974.tsv",
+          "sha256": "dd1709c6f1427854a72d8dae2597afa4470e6de4b85f082d98f8bbf4612413c3",
+          "bytes": 22821
+        },
+        {
+          "name": "1978.tsv",
+          "sha256": "a1fbf5dfc7128e8a699ffba363803f7ed3d9804ae7cf503aae52edcf058f114b",
+          "bytes": 22672
+        },
+        {
+          "name": "1982.tsv",
+          "sha256": "6eb3ace94983f7624e3c790ecd29266488d8e3b7541678fb3d1a51ab47cddd00",
+          "bytes": 23935
+        },
+        {
+          "name": "1986.tsv",
+          "sha256": "9f2edd236db5fed3188b21e29a7f66a76cdf3c5a81dd9f601a943cb4ac4c016d",
+          "bytes": 24385
+        },
+        {
+          "name": "1990.tsv",
+          "sha256": "684c8a195984539ed8f1839428f2235dc31a44929ef4e6ead54a91eba6af9bf9",
+          "bytes": 25602
+        },
+        {
+          "name": "1994.tsv",
+          "sha256": "725bb139c7c4b6a26015d4abc16993998d9da8456ad2dd0477a54ea78a5c5295",
+          "bytes": 28632
+        }
+      ]
+    }
+  },
+  "elo": {
+    "formula": "R' = R + K × G × (W − We), We = 1 / (1 + 10^(−dr / 400)), dr = R_home − R_away + home (none at a neutral venue); W is 1, ½ or 0, a match level after extra time a draw",
+    "home": 100,
+    "start": {
+      "early": 1500,
+      "late": 1300,
+      "lateAfter": 1930,
+      "rule": "A team starts at 1500, or at 1300 when its first match in the results is in a year after 1930."
+    },
+    "k": {
+      "worldCup": [
+        "FIFA World Cup"
+      ],
+      "worldCupK": 60,
+      "continental": [
+        "UEFA Euro",
+        "Copa América",
+        "African Cup of Nations",
+        "AFC Asian Cup",
+        "Gold Cup",
+        "CONCACAF Championship",
+        "Oceania Nations Cup",
+        "Confederations Cup",
+        "CONMEBOL–UEFA Cup of Champions"
+      ],
+      "continentalK": 50,
+      "qualifierSuffix": " qualification",
+      "qualifier": [
+        "UEFA Nations League",
+        "CONCACAF Nations League"
+      ],
+      "qualifierK": 40,
+      "friendly": [
+        "Friendly"
+      ],
+      "friendlyK": 20,
+      "otherK": 30
+    },
+    "goals": "G is 1 for a margin of 0 or 1, 1.5 for 2, 1.75 for 3 and 1.75 + (N − 3) / 8 for N of 4 or more",
+    "date": "The ratings the day after the final: every match up to and including the final's day",
+    "activeYears": 4
+  },
+  "strength": {
+    "best": 87,
+    "perHundredElo": 3.2,
+    "rule": "T = best − perHundredElo × (E_best − E) / 100: E is the nation's Elo, E_best the best Elo among the teams that played in the four years before.",
+    "calibration": "best is the strongest built-in nation's strength (EA FC 27 + FM 26, 2026/27). 3.2 points per 100 Elo gives the game's football model (rate 1.28·e^(1.5·tanh(0.075Δ / 1.5)), Poisson goals) Elo's expected score within 0.0015 for gaps of 50 to 300 Elo, and the 173 built-in strengths regress on their 2026 Elo from the same results with a slope of 3.20 (r 0.895)."
+  },
+  "xi": {
+    "GK": 1,
+    "DF": 4,
+    "MF": 4,
+    "FW": 2
+  },
+  "profile": [
+    5.3,
+    3.3,
+    2.1,
+    1,
+    0,
+    -0.4,
+    -1,
+    -1.7,
+    -2.1,
+    -2.7,
+    -3.9
+  ],
+  "profileSource": "The mean sorted deviation from the XI's mean of the 32 strongest built-in XIs (2026/27), to one decimal.",
+  "awards": {
+    "Golden Ball": 3,
+    "Silver Ball": 2,
+    "Bronze Ball": 1,
+    "Golden Boot": 2,
+    "Silver Boot": 1,
+    "Bronze Boot": 1,
+    "Golden Glove": 1,
+    "Best Young Player": 1
+  },
+  "names": {
+    "results": {
+      "Soviet Union": "Russia",
+      "West Germany": "Germany",
+      "Zaire": "DR Congo",
+      "East Germany": "German DR"
+    },
+    "nations": {
+      "aliases": {
+        "Republic of Ireland": "372"
+      },
+      "noTeam": [
+        "East Germany"
+      ]
+    },
+    "ballonDorNationalities": {
+      "USSR": "Soviet Union",
+      "Ireland": "Republic of Ireland"
+    },
+    "ballonDorPlayersNote": "Votes whose article and name differ from the database's for the same man (another title or spelling of his name), each in his nation's World Cup squad of that season, checked by hand on 2026-11-10.",
+    "ballonDorPlayers": [
+      {
+        "name": "Paco Gento",
+        "player": "P-09022",
+        "database": "Francisco Gento"
+      },
+      {
+        "name": "Mikheil Meskhi",
+        "player": "P-45798",
+        "database": "Mikhail Meskhi"
+      },
+      {
+        "name": "Oleg Blokhin",
+        "player": "P-03282",
+        "database": "Oleh Blokhin"
+      },
+      {
+        "name": "Alexsandr Chivadze",
+        "player": "P-66593",
+        "database": "Aleksandr Chivadze"
+      },
+      {
+        "name": "Igor Belanov",
+        "player": "P-10855",
+        "database": "Ihor Belanov"
+      },
+      {
+        "name": "Pavlo Yakovenko",
+        "player": "P-33328",
+        "database": "Pavel Yakovenko"
+      },
+      {
+        "name": "Packie Bonner",
+        "player": "P-67839",
+        "database": "Pat Bonner"
+      }
+    ],
+    "lineupSpellingsNote": "The line-up pages and the database spell these men otherwise (another romanisation, a nickname, a second surname): each is the same man, by his team and shirt number, checked by hand on 2026-11-10.",
+    "lineupSpellings": [
+      {
+        "year": 1962,
+        "team": "Colombia",
+        "shirt": 8,
+        "wikipedia": "Hector Echeverri",
+        "database": "Héctor Echeverry"
+      },
+      {
+        "year": 1962,
+        "team": "Soviet Union",
+        "shirt": 6,
+        "wikipedia": "Leonīds Ostrovskis",
+        "database": "Leonid Ostrovskiy"
+      },
+      {
+        "year": 1962,
+        "team": "Soviet Union",
+        "shirt": 15,
+        "wikipedia": "Viktor Kanevskyi",
+        "database": "Viktor Kanevski"
+      },
+      {
+        "year": 1966,
+        "team": "Brazil",
+        "shirt": 19,
+        "wikipedia": "Silva Batuta",
+        "database": "Silva"
+      },
+      {
+        "year": 1966,
+        "team": "Soviet Union",
+        "shirt": 3,
+        "wikipedia": "Leonīds Ostrovskis",
+        "database": "Leonid Ostrovskiy"
+      },
+      {
+        "year": 1966,
+        "team": "North Korea",
+        "shirt": 1,
+        "wikipedia": "Li Chan-myung",
+        "database": "Chang-myung Lee"
+      },
+      {
+        "year": 1966,
+        "team": "North Korea",
+        "shirt": 4,
+        "wikipedia": "Kang Bong-chil",
+        "database": "Bong-chil Kang"
+      },
+      {
+        "year": 1966,
+        "team": "North Korea",
+        "shirt": 6,
+        "wikipedia": "Im Shung-hwi",
+        "database": "Seung-hwi Im"
+      },
+      {
+        "year": 1966,
+        "team": "Chile",
+        "shirt": 1,
+        "wikipedia": "Pedro Araya Toro",
+        "database": "Pedro Araya"
+      },
+      {
+        "year": 1966,
+        "team": "North Korea",
+        "shirt": 15,
+        "wikipedia": "Yang Song-guk",
+        "database": "Seung-kook Yang"
+      },
+      {
+        "year": 1966,
+        "team": "Soviet Union",
+        "shirt": 17,
+        "wikipedia": "Valeriy Porkuyan",
+        "database": "Valeriy Porkujan"
+      }
+    ]
+  },
+  "seasons": [
+    {
+      "id": "wc-1962",
+      "year": 1962,
+      "tournament": "WC-1962",
+      "minutes": "lineups",
+      "ballonDor": [
+        1961,
+        1962
+      ],
+      "lineupPages": [
+        "1962 FIFA World Cup Group 1",
+        "1962 FIFA World Cup Group 2",
+        "1962 FIFA World Cup Group 3",
+        "1962 FIFA World Cup Group 4",
+        "1962 FIFA World Cup knockout stage"
+      ]
+    },
+    {
+      "id": "wc-1966",
+      "year": 1966,
+      "tournament": "WC-1966",
+      "minutes": "lineups",
+      "ballonDor": [
+        1965,
+        1966
+      ],
+      "lineupPages": [
+        "1966 FIFA World Cup Group 1",
+        "1966 FIFA World Cup Group 2",
+        "1966 FIFA World Cup Group 3",
+        "1966 FIFA World Cup Group 4",
+        "1966 FIFA World Cup knockout stage"
+      ]
+    },
+    {
+      "id": "wc-1970",
+      "year": 1970,
+      "tournament": "WC-1970",
+      "minutes": "appearances",
+      "ballonDor": [
+        1969,
+        1970
+      ]
+    },
+    {
+      "id": "wc-1974",
+      "year": 1974,
+      "tournament": "WC-1974",
+      "minutes": "appearances",
+      "ballonDor": [
+        1973,
+        1974
+      ]
+    },
+    {
+      "id": "wc-1978",
+      "year": 1978,
+      "tournament": "WC-1978",
+      "minutes": "appearances",
+      "ballonDor": [
+        1977,
+        1978
+      ]
+    },
+    {
+      "id": "wc-1982",
+      "year": 1982,
+      "tournament": "WC-1982",
+      "minutes": "appearances",
+      "ballonDor": [
+        1981,
+        1982
+      ]
+    },
+    {
+      "id": "wc-1986",
+      "year": 1986,
+      "tournament": "WC-1986",
+      "minutes": "appearances",
+      "ballonDor": [
+        1985,
+        1986
+      ]
+    },
+    {
+      "id": "wc-1990",
+      "year": 1990,
+      "tournament": "WC-1990",
+      "minutes": "appearances",
+      "ballonDor": [
+        1989,
+        1990
+      ]
+    },
+    {
+      "id": "wc-1994",
+      "year": 1994,
+      "tournament": "WC-1994",
+      "minutes": "appearances",
+      "ballonDor": [
+        1993,
+        1994
+      ]
+    }
+  ]
+}
