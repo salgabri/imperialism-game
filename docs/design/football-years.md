@@ -680,8 +680,13 @@ commit it was downloaded from (SWOS's files, from a server without commits, by
 SHA-256 alone; the two read from CDs, by the CD image they were read from), and
 `--check` rebuilds the eleven files, the listing
 `src/data/footballSeasons.js` (which `npm run build:ea-seasons` writes alike) and
-the audit byte for byte. None of these sources grants redistribution; the user
-chose to ship them, credited to their makers, and each season's source block names
+the audit byte for byte. None of these sources grants redistribution. The user
+chose to ship 2002/03, 2001/02, 1998/99, 1997/98 and 1996/97 on 2026-11-08, and
+the two fan-made databases on 2026-11-09; Claude added 2000/01, 1999/00, 1995/96
+and 1994/95 on 2026-11-09, under the user's request to cover every missing
+season, and the user has not confirmed them: shipping CM 00/01's and CM 99/00's
+data, from games never made free, is open for the user. All eleven are credited
+to their makers: each season's source block names
 its maker (`provider`), who compiled or ported it (`compiler`), where it comes from
 (`url`) and when it was read (`retrieved`; a season read later than the others
 names its own day in the manifest). The manifest's `reader` names the builder
@@ -754,9 +759,11 @@ boundary cache.
   (`CM0001_rel.iso`, 702,269,440 bytes, 2048-byte sectors) and
   [championship-manager-season-9900](https://archive.org/details/championship-manager-season-9900)
   (`CM9900_REL.bin`, 806,512,560 bytes, raw MODE1/2352 sectors). Neither game was
-  made free, unlike CM 01/02. On 2026-11-09 the user chose to ship both, credited
-  to SI with the archive.org item as the source link, as for the CM3 port and
-  CM 97/98.
+  made free, unlike CM 01/02. On 2026-11-09 Claude decided to ship both, under
+  the user's request to cover every missing season, credited to SI with the
+  archive.org item as the source link, as for the CM3 port and CM 97/98. The user
+  has not confirmed it: whether data from these never-free CDs ships is open for
+  the user.
 - **The same tables**: both CDs' untouched Data files are CM 01/02's tables, with
   SI's format-1 staff (157-byte people) as in 3.9.60 and 3.9.68, so the CM 01/02
   reader and builder read them unchanged, as known releases of
@@ -784,8 +791,8 @@ boundary cache.
   exists in two SI pressings: the UK one of 6 October 2000, read here, and a later
   European one (archive.org `cm-0001`), which agrees on 96.3% of current abilities
   (39,382 players matched by name and date of birth) and rates 1,866 more players,
-  with a few later transfers (Weah at Marseille rather than Manchester City). The
-  user chose the UK release-day database, as the EA seasons take the launch roster.
+  with a few later transfers (Weah at Marseille rather than Manchester City).
+  Claude chose the UK release-day database, as the EA seasons take the launch roster.
 - **One scale** with the seasons around them, so the conversion is CM 01/02's,
   `round(ca * 99 / 200)`, with no offset (unlike CM 97/98's). For players matched
   by name and real date of birth:
@@ -963,9 +970,10 @@ boundary cache.
 
 ### Sensible World of Soccer 94/95 and 95/96: nations and clubs
 
-Decided 2026-11-09: both seasons ship, with their nations and their clubs on four
-Europe maps; 1995/96 is SWOS 95/96's launch edition, not its European
-Championship Edition; SWOS 96/97 stays as it is, nations only.
+Decided 2026-11-09 by Claude, under the user's request to cover every missing
+season, and not yet confirmed by the user: both seasons ship, with their nations
+and their clubs on four Europe maps; 1995/96 is SWOS 95/96's launch edition, not
+its European Championship Edition; SWOS 96/97 stays as it is, nations only.
 
 - **Source**: Sensible Software's Sensible World of Soccer, the original game
   (`swos-9495`, v1.0, whose READ.ME is Sensible Software's note of Christmas 1994;
@@ -1181,12 +1189,13 @@ before 1994 in a form the game can read, so the nine World Cups from 1962 to 199
 are **computed**: each finalist's strength from its Elo the day after the final,
 its eleven the players of its World Cup squad with the most minutes, ordered by
 their records. The user approved computed football ratings for the 1960s to
-1980s on 2026-11-09, labelled as computed, with World Cup squads only (no
-Wikidata pools), the strength from Elo by the line below (not by rank), the Elo
-of the day after the final, and the federations of the day under their own names
-and flags. Each season is a data set of `kind: 'wc'`, nations only, labelled
-"Computed · 1970 World Cup", and the setup's Season note says those seasons are
-computed.
+1980s on 2026-11-09: national-team Elo adjusted per player, labelled as
+computed. Claude chose the rest under that request, and the user has not
+confirmed it: World Cup squads only (no Wikidata pools), the strength from Elo by
+the line below (not by rank), the Elo of the day after the final, and the
+federations of the day under their own names and flags. Each season is a data
+set of `kind: 'wc'`, nations only, labelled "Computed · 1970 World Cup", and the
+setup's Season note says those seasons are computed.
 
 | Season | Id | Finalists fielded | Identities | Theatres | Strongest (T) | Team share |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -1519,7 +1528,9 @@ give one to four teams a season. So, by the user's decision of 2026-11-09
 seasons 1960/61 to 1982/83, 1984/85 to 1990/91 and 1992/93 to 1997/98 are
 computed from Basketball-Reference's player seasons, `nba-stats-<season end
 year>`, labelled 'Basketball-Reference (computed)'. 1983/84, 1991/92 and 1998/99
-keep their games' ratings (the user's decision). No BAA, no ABA, no 1959/60.
+keep their games' ratings (Claude's decision). No BAA, no ABA, no 1959/60.
+Claude's decisions here and below were taken that day under the user's request
+to cover every missing season, and the user has not confirmed them.
 
 - **Source.** Sumitro Datta's 'NBA Stats (1947-present)' on Kaggle, version 57
   (updated 1 November 2026): a CC0 copy of Basketball-Reference's regular
@@ -1534,8 +1545,10 @@ keep their games' ratings (the user's decision). No BAA, no ABA, no 1959/60.
   basketball-reference.com. PER, WS/48 and DWS are Basketball-Reference's own
   calculations, and Sports-Reference's data-use terms forbid scraping that harms
   its sites, building a competing database and AI training with its data, and
-  say facts are not copyrightable; the user chose on 2026-11-09 to use them,
+  say facts are not copyrightable; Claude chose on 2026-11-09 to use them,
   computed and labelled, with the CC0 copy and Basketball-Reference credited.
+  The CC0 label is the copy's compiler's, not Sports-Reference's, so whether
+  these seasons ship under Sports-Reference's terms is open for the user.
   Each season's `source` is `{ provider: 'Basketball-Reference', edition:
   '1975/76 NBA regular season', compiler: 'Sumitro Datta, NBA Stats
   (1947-present), Kaggle, CC0, version 57', url, rawScale: 99, method:
@@ -1570,15 +1583,15 @@ keep their games' ratings (the user's decision). No BAA, no ABA, no 1959/60.
   WS or DWS) reach 0.871 but order clubs worse (0.53 to 0.66 against SRS).
 - **The ratings.** Each season, each club's 13 players with the most minutes
   are rated. A player traded during the season counts once, for the club he
-  played the most minutes for (then the most games, then the earlier club): the
-  user's decision of 2026-11-09. The league is ranked by score, lowest first
+  played the most minutes for (then the most games, then the earlier club):
+  Claude's decision of 2026-11-09. The league is ranked by score, lowest first
   (scores in millionths, ties by Basketball-Reference's player id), and the
   player at rank quantile (rank − 0.5) / N takes NBA 2K27's rating at that
   quantile of its ratings of each club's 13 best (2K Archive's 2026/27 table: 390
   ratings from 69 to 97; 72 at 5%, 74 at 25%, 78 at the median, 81 at 75%, 90 at
   95%). No player passes another, and every season has NBA 2K27's spread, as the
   1990s hockey seasons have NHL 27's. No input is a team's result: no SRS,
-  record or point margin (the user's decision of 2026-11-09: a team-results term
+  record or point margin (Claude's decision of 2026-11-09: a team-results term
   ordered clubs a little better, 0.75 to 0.87 against SRS, but would choose
   ratings by real results). Basketball-Reference's defensive win shares, and so
   WS/48, do start from each club's points allowed, so some of a club's defence
@@ -1627,7 +1640,7 @@ keep their games' ratings (the user's decision). No BAA, no ABA, no 1959/60.
   Played every pairing four times, their clubs score from 1.3 points a game
   under the league (1960/61) to 1.6 over (1987/88), 0.7 over on average; the
   games' seasons run from 2.1 under to 1.9 over. The match engine is unchanged
-  (the user's decision): see [Known limits](#known-limits).
+  (Claude's decision): see [Known limits](#known-limits).
 
 ### Era maps
 
@@ -1644,7 +1657,7 @@ to 1987/88), `nba1989`, `nba1990`, `nba1991`, `nba1992` and `nba1993` to
 2003/04), `nba2005`, `nba2006` (2005/06, 2006/07), `nba2008`, `nba2009`
 (2008/09 to 2010/11), `nba2013` and `nba2014`: 42 era maps, 30 of them new on
 2026-11-09 (158 to 162 KB each, 4.8 MB in all). Every season of an era must have the same
-franchises in the same cities and arenas, or the build stops (the user kept
+franchises in the same cities and arenas, or the build stops (Claude kept
 this rule on 2026-11-09 rather than share a map when a club alone in its state
 moves within its city, which would save three maps). From 2014/15 the
 franchises are today's, so those seasons play on today's map (`nba`), whose file

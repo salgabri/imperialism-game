@@ -449,10 +449,10 @@ Status: built 2026-11-09. On the user's request that day (computed seasons from 
 1960, not further) the coordinator chose Pro Football Archives' facts for the seasons no game rated: the NFL's 1960
 to 1989, 1991, 1996 and 1997 (data sets `pfa-<season>`) and the AFL's ten seasons before the 1970 merger
 (`pfa-afl-<season>`), kind `pfa`, clubs only, labelled "NFL (computed)" and "AFL (computed)" so the Season list
-tells the two leagues of a 1960s year apart. The user asked for an Approximate Value: Pro-Football-Reference's own is
-off limits (its pages challenge automated clients, and Sports Reference's data-use terms forbid building on scraped
-data), so the value here is ours, AV-like. 1998, 1999 and 2000 were computed the same way on 2026-11-10
-([1998 to 2000](#1998-to-2000) below).
+tells the two leagues of a 1960s year apart. The question the user answered named an Approximate Value as the measure:
+Pro-Football-Reference's own is off limits (its pages challenge automated clients, and Sports Reference's data-use terms
+forbid building on scraped data), so the value here is ours, AV-like. 1998, 1999 and 2000 were computed the same way
+on 2026-11-10 ([1998 to 2000](#1998-to-2000) below).
 
 - **Source.** Pro Football Archives (`https://www.profootballarchives.com`, (c) 2006–2026, a privacy policy and no
   terms of use; robots.txt is HTTP 404) has every NFL and AFL team-season with complete starting lineups (games started

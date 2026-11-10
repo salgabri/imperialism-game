@@ -628,9 +628,10 @@ duel campaign with the live ticker and a hockey nations campaign.
   points alone, so a shutdown defender rates low. No time on ice before 2008/09 and no goalies' shots against before
   1982/83 are in the open sources; the NHL's API has both, but turns this project's agents away.
 - Terms. MoneyPuck.com's data, behind the 15 seasons from 2010/11, is free for non-commercial use only, as the NHL's own
-  statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. The Hockey Databank's statement
-  and MoneyPuck's credit show in full under the Season choice ("Credits"), in setup only: no screen in play names a
-  season's source beyond a passing loading line.
+  statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. Using it was Claude's decision
+  of 2026-11-09, under the user's request to cover every missing season, and is open for the user. The Hockey
+  Databank's statement and MoneyPuck's credit show in full under the Season choice ("Credits"), in setup only: no screen
+  in play names a season's source beyond a passing loading line.
 - Names: the Hockey Databank and MoneyPuck spell names without accents ("Borje Salming", "Tim Stutzle"), and the
   databank in its own way (Raymond Bourque); NHL 08 and NHL 09 keep IGN's spellings.
 - NHL 09's attributes are EA's before release; neither NHL 08's nor NHL 09's overall is EA's.

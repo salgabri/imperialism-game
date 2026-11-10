@@ -111,7 +111,7 @@ most of the 170 nations. EA counts are nations able to field a natural
 | FIFA Index | FIFA 05–24 | FIFA 05: ~10,994 players, 208 nations listed | Cloudflare-blocked; Kaggle mirror `daguizer/fifa-2021-to-2005-complete-player-attributes` (no nationality, no club, no dates) | Terms ban any robot or scraper |
 | CM 01/02 Update Team databases (champman0102.co.uk, forum f=73) | 2004, 2006, 2008–2026; 2027 due 25 Oct 2026 | 100k+ players, ~231 nation records, CA/PA 1–200, position ratings 1–20, nationality, club, DOB | Forum attachments need a free account; fixed-record `.dat` files (`staff.dat`, `nation.dat`, `club.dat`, `index.dat`) | No licence. On 20 Jul 2026 the Update Team Director allowed a free browser fan project to *convert* the May 2026 database ("Yes work away"). A request about GitHub (18 Oct 2026) is unanswered |
 | SI's original CM 01/02 database (3.9.60 / 3.9.65 / 3.9.68) | 2002, 2003 | ~169k staff, 139,769 players, 213 nation records; covers 165 of our 170 by name (Serbia is "Yugoslavia"; no Montenegro, Kosovo, South Sudan, Timor-Leste) | Same forum, same format | Free download since Dec 2008 (Eidos), for personal, non-commercial use; data rights reserved |
-| SI's CM 99/00 (3.70) and CM 00/01 (3.81) databases, on users' uploads of the retail CDs to archive.org (`championship-manager-season-9900`, its Dutch twin `cm-9900-nl`, `cm-0001-rel`, and the later European pressing `cm-0001`) | 2000, 2001 | CM 99/00: 46,460 players (28,020 rated), 203 nation records; CM 00/01: 71,641 players (48,617 rated), 214. The CM 01/02 tables, staff format 1 | HTTP range requests on the item's CD image: only the InstallShield cabinet header and eleven tables' compressed bytes (`npm run sync:retro-cds`, about 4 MB a CD). Checked 2026-11-09 | Never made free; SI/Eidos rights reserved. archive.org terms of use; robots.txt allows `/download/`. Shipped by the user's choice of 2026-11-09 |
+| SI's CM 99/00 (3.70) and CM 00/01 (3.81) databases, on users' uploads of the retail CDs to archive.org (`championship-manager-season-9900`, its Dutch twin `cm-9900-nl`, `cm-0001-rel`, and the later European pressing `cm-0001`) | 2000, 2001 | CM 99/00: 46,460 players (28,020 rated), 203 nation records; CM 00/01: 71,641 players (48,617 rated), 214. The CM 01/02 tables, staff format 1 | HTTP range requests on the item's CD image: only the InstallShield cabinet header and eleven tables' compressed bytes (`npm run sync:retro-cds`, about 4 MB a CD). Checked 2026-11-09 | Never made free; SI/Eidos rights reserved. archive.org terms of use; robots.txt allows `/download/`. Shipped on Claude's decision of 2026-11-09, under the user's request to cover every missing season; not confirmed by the user, so open for the user |
 | CM0102 community retro databases | 1951–2001 (patchy) | 84/85: 72,015 players, 186 nationalities. 93/94, 95/96, 98/99 ported from SI's CM2/CM3 | MediaFire/sendspace links in forum threads (many sendspace links expired) | No licence; per-author permission (Cam F and the 84/85 team, bruebous, Simon Treanor, PLM9293) |
 | FM throwback databases (tHe MadSCienTiSt and others: fmscout, sortitoutsi, Steam Workshop) | 1952/53–2013/14 | 2–15 playable nations; one 2003/04 database has 62 leagues | `.fmf` / `.fm` files that open only inside a licensed FM | No licence; most attributes copied by hand from SI games. An SI developer called an official retro database "not possible due to licensing" |
 | EFEM.club | FM24 24.3.0, FM26 26.0.0 / 26.2.0 (partial) / 26.3.0 | Full FM database per version | Undocumented JSON API | robots.txt `Disallow: /api/` (since mid-2025); Terms 1.1 personal use only, 1.2 no automated access |
@@ -173,9 +173,11 @@ is a record of terms as published, not legal advice.
    or materials" to personal use and forbids derivative works. SI shares its
    database only with professional partners. Permission has been given case by
    case, for example to FM Scout in 2012. SI's CM 99/00 and CM 00/01 were never
-   made free (only CM 01/02 was); the seasons built from them ship by the user's
-   choice of 2026-11-09, credited to SI
-   ([football-year-permissions.md](football-year-permissions.md)).
+   made free (only CM 01/02 was); the seasons built from them ship on Claude's
+   decision of 2026-11-09, under the user's request to cover every missing
+   season, credited to SI
+   ([football-year-permissions.md](football-year-permissions.md)). The user has
+   not confirmed it, so whether they ship is open for the user.
 4. **CM 01/02 community data** is the only rated, global, per-season source with
    a precedent of permission for a fan project. That permission covered
    converting the data, not redistributing it. Committing derived snapshots here

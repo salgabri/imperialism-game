@@ -196,10 +196,11 @@ Status: built 2026-11-08; 1960–1972 added 2026-11-09 (Before 1973, below). The
 lists 66 earlier seasons, 2025 back to 1960, each the ATP's men at the end of a year (before
 1968 the amateurs') and the Davis Cup nations of that day, nations only (set ids
 `tennis-<year>`, kind `elo`, `public/tennis/tennis-<year>.json`). The user chose the
-sources: Tennis Abstract's own published lists where they exist, and earlier years computed
-from Jeff Sackmann's match results by Tennis Abstract's published method, on today's scale
-and labelled as computed. The women's seasons are built by the same scripts with `--tour=wta`
-([womens-tennis.md](womens-tennis.md), "Earlier seasons"); the men's rebuild byte for byte.
+sources (2026-11-08): Tennis Abstract's own published lists where they exist, and earlier
+years computed from Jeff Sackmann's match results by Tennis Abstract's published method, on
+today's scale and labelled as computed. The women's seasons are built by the same scripts
+with `--tour=wta` ([womens-tennis.md](womens-tennis.md), "Earlier seasons"); the men's
+rebuild byte for byte.
 
 ### Sources
 
@@ -360,11 +361,13 @@ Thirteen seasons, `tennis-1960` to `tennis-1972`: 1960–1967 the amateurs alone
 "Amateur Elo, end of 1962 (rough)", 1968–1972 the open era, "Elo from match results, end of
 1970 (rough)". Their source says `computed`, `rough`, `amateurs` before 1968, and the method
 "Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup
-results of 1877-1967". The user's choices (2026-11-09): back to 1960, the floor of the other
-sports (the file would allow 1950); a run of their own, so that 1973–2025 stay byte for byte as
-shipped; every rated man in 1968–1972, contract professionals too, as from 1973; three counted
-matches a season before 1968; Wikipedia's published top tens pinned as validation inputs only;
-South Africa barred 1970–1972; Drobny's fix; the duplicate ids reviewed and committed.
+results of 1877-1967". Claude's choices (2026-11-09), under that request and not yet confirmed
+by the user: back to 1960, the floor the user set for the NBA's, MLB's, NFL's and NHL's
+computed seasons (the file would allow 1950); a run of their own, so that 1973–2025 stay byte
+for byte as shipped; every rated man in 1968–1972, contract professionals too, as from 1973;
+three counted matches a season before 1968; Wikipedia's published top tens pinned as validation
+inputs only; South Africa barred 1970–1972; Drobny's fix; the duplicate ids reviewed and
+committed.
 
 **Sources.**
 

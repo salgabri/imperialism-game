@@ -555,22 +555,24 @@ Polo Grounds and the tenants; the loader's refusals; and the running App launchi
 clubs campaign on `mlb1961` and resuming it. `scripts/club-maps.test.mjs` holds the 37
 maps to the state rule, as every other.
 
-**Decisions** (the user's, 2026-11-09): seasons back to 1960 and no further; JEFFBAGWELL
-WAR with the Lahman database for names and birthplaces, by this rule and mapping (a
-Lahman-only metric, nearly as good overall but 5–12 points lower for glove-first players,
-stays a documented fallback, not built); a ballpark renamed in place keeps its map, 2017
-gets its own; shared ballparks' tenants grow from their own previous home; the full
-per-player snapshot is committed. The builder's own (2026-11-09): "Los Angeles (Dodgers)"
-and "Los Angeles (Angels)" for 1961–65 and "Manhattan" for the Polo Grounds Mets; the
-Senators' ids by founding year (`mlb-washington-senators-1901`, `-1961`); a club short of
-thirteen pitchers keeps the ones it used; namesakes in one squad keep the better player's
-name; the ballparks' names and coordinates of 1960–79 from Wikipedia rather than the
-research pass's Wikidata answers. The re-sourcing's (2026-11-10): the Lahman tables from
-the Chadwick Bureau's Baseball Databank, the first choice asked for, read at the latest
-commit its forks hold, through one of them; its names and birth countries as it gives them
-(the Peñas become Pena, Rod Carew and Mike Eden Panama's), Elmer Valo's alone corrected;
-the calibration's record check limited to the Databank's seasons (2018–2022) rather than a
-second source for 2023–24.
+**Decisions** (2026-11-09). The user's: seasons back to 1960 and no further. Claude's, as
+coordinator, under the user's request to cover every missing season and not yet confirmed
+by the user: JEFFBAGWELL WAR with the Lahman database for names and birthplaces, by this
+rule and mapping (a Lahman-only metric, nearly as good overall but 5–12 points lower for
+glove-first players, stays a documented fallback, not built); a ballpark renamed in place
+keeps its map, 2017 gets its own; shared ballparks' tenants grow from their own previous
+home; the full per-player snapshot is committed. The WAR averages Baseball-Reference's and
+FanGraphs', whose terms could not be read, so using it is open for the user. The builder's
+own (2026-11-09): "Los Angeles (Dodgers)" and "Los Angeles (Angels)" for 1961–65 and
+"Manhattan" for the Polo Grounds Mets; the Senators' ids by founding year
+(`mlb-washington-senators-1901`, `-1961`); a club short of thirteen pitchers keeps the ones
+it used; namesakes in one squad keep the better player's name; the ballparks' names and
+coordinates of 1960–79 from Wikipedia rather than the research pass's Wikidata answers. The
+re-sourcing's (2026-11-10): the Lahman tables from the Chadwick Bureau's Baseball Databank,
+the first choice asked for, read at the latest commit its forks hold, through one of them;
+its names and birth countries as it gives them (the Peñas become Pena, Rod Carew and Mike
+Eden Panama's), Elmer Valo's alone corrected; the calibration's record check limited to the
+Databank's seasons (2018–2022) rather than a second source for 2023–24.
 
 ## Known limits
 

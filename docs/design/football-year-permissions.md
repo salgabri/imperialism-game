@@ -33,7 +33,8 @@ SI's own Championship Manager 00/01 (original release 3.81, the UK release-day d
 European pressing) and CM 99/00 (original release 3.70), read data-only from users' uploads of the retail CDs to
 archive.org, with the archive.org item as each season's source link
 ([football-years.md](football-years.md#sis-cm-0001-and-cm-9900-read-from-their-cds-200001-and-199900)). Neither CM
-game was ever made free, and no one has licensed their data.
+game was ever made free, and no one has licensed their data. The user has not confirmed these four, so whether they
+ship, the two CM seasons above all, is open for the user.
 
 ## 1. To the CM 01/02 Update Team
 
