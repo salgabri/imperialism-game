@@ -187,6 +187,25 @@ is a record of terms as published, not legal advice.
 5. **Open data**: martj42 (CC0), Wikidata (CC0) and openfootball (public domain)
    can be committed. Fjelstul and Wikipedia squads can be committed as separate
    files under CC BY-SA 4.0.
+6. **MoneyPuck.com** (ice hockey's 15 seasons computed from its data, 2010/11 to
+   2025/26 but 2021/22) allows non-commercial use only, with a credit, which
+   setup shows; the NHL's own statistics behind the built-in hockey season are
+   for non-commercial personal use too. Using MoneyPuck's data was Claude's
+   decision of 2026-11-09, under the user's request to cover every missing
+   season, and is open for the user ([hockey.md](hockey.md#computed-seasons)).
+7. **Jeff Sackmann / Tennis Abstract** (both tennis sports, every season: Tennis
+   Abstract's Elo reports and the Elo computed from Sackmann's match results)
+   are CC BY-NC-SA 4.0: credit, non-commercial use only, derived data shared
+   alike ([tennis.md](tennis.md#earlier-seasons)).
+8. **Sports-Reference** (the 36 computed basketball seasons): their inputs are
+   Basketball-Reference's statistics, from a Kaggle copy whose CC0 label is its
+   compiler's, not Sports-Reference's. PER, WS/48 and DWS are
+   Basketball-Reference's own figures, and Sports-Reference's data-use terms
+   forbid scraping that harms its sites, building a competing database and AI
+   training with its data; nothing was fetched from basketball-reference.com.
+   Using them was Claude's decision of 2026-11-09, under the same request, and is
+   open for the user
+   ([football-years.md](football-years.md#computed-seasons-196061-to-199798)).
 
 If permission cannot be had, the clean pattern is **bring your own database**
 (the approach `Skallerup/cm0102-reborn` takes): the user downloads a database,

@@ -39,7 +39,7 @@ kinds:
   downloaded, built on their computer. Until the database authors allow
   redistribution these stay local: the user puts the database in the ignored
   `data-src/cm0102/`, and the command-line builder writes the data set to
-  `public/football/cm0102-*.json`, which git ignores (all but the three built-in
+  `public/football/cm0102-*.json`, which git ignores (all but the five built-in
   ones, which the builder neither writes nor lists). When permission arrives,
   those files can be committed by removing one `.gitignore` line, and its scope
   should be recorded in the permissions note first.
@@ -1759,17 +1759,19 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
 - **Setup**:
   - Step 1 always has a **Season** dropdown for football (`#setup-season`, a
     native select): the built-in season, then each data set newest first,
-    listed before any fetch. Options name the season alone ("2017/18"); a set
-    that shares its season with another keeps its source ("2001/02 · CM 01/02
-    · Test 2002"). A note says the earlier seasons use EA ratings and that
-    nations without eleven rated players start short-handed.
+    listed before any fetch. Options name the season alone ("2017/18"), with
+    "· computed", "· converted" or "· fan-made" where the set's label calls its
+    ratings so (`seasonTagOf`: "1969/70 · computed"); a set that shares its
+    season with another keeps its source ("2001/02 · CM 01/02 · Test 2002"). A
+    note says the earlier seasons use EA ratings and that nations without
+    eleven rated players start short-handed.
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
-  - A season with nations only (2005/06, 2004/05) takes Nations when chosen, and
-    choosing Clubs goes back to the built-in season. With no Europe maps it keeps
-    the plain theatre (`all` or `elite`), so Clubs opens on the built-in season's
-    map of it. A challenge link that asks for clubs with such a season has its
-    `teams` ignored.
+  - A season with nations only (2005/06, 2004/05, 1996/97, 1989/90 and the World
+    Cups) takes Nations when chosen, and choosing Clubs goes back to the built-in
+    season. With no Europe maps it keeps the plain theatre (`all` or `elite`), so
+    Clubs opens on the built-in season's map of it. A challenge link that asks
+    for clubs with such a season has its `teams` ignored.
   - Country maps are built from the built-in FM data, so the "One country" group
     is not offered for another set.
   - Basketball has its own Season dropdown: the built-in 2026/27, then its

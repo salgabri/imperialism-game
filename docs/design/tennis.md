@@ -350,9 +350,10 @@ African to 1981, Kevin Curren to 1984, Greg Rusedski Canadian to 1994, Mikhail K
 Andrey Golubev Russian to 2007. Great Britain plays as one, as in 2026. A nation needs two rated
 men; countries the map does not draw (Monaco, Hong Kong, Barbados…) field nobody.
 
-The game shows a federation by its holder's name and flag (Czechia, Russia, Serbia, Germany):
-a season file has no way to rename a nation. The audit names both ("Czechoslovakia (Czechia)
-87.4" in 1985).
+The game shows a federation by its holder's name and flag (Czechia, Russia, Serbia, Germany).
+Football's seasons can now carry the federations of their day under their own names
+(`identities`), but tennis keeps today's names, so that its seasons match those shipped from
+1973 on. The audit names both ("Czechoslovakia (Czechia) 87.4" in 1985).
 
 ### Before 1973
 
