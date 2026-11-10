@@ -335,6 +335,23 @@ test('the loader refuses a hockey season that is not the builder\'s', () => {
   assert.throws(broken(d => { d.nations.XXX = [50, 1, [['A', 'C', 50]]]; }), /is not a nation id/);
 });
 
+test('a season before 1977/78 has clubs only: the loader refuses one that lists a nation', () => {
+  // A well-formed nation, so only the season decides.
+  const withCanada = id => () => {
+    const doc = seasonFile(id);
+    doc.nations['124'] = [50, 1, [['A Skater', 'C', 50]]];
+    return decodeFootballSet(doc, id);
+  };
+  for (const id of ['nhl-1967', 'nhl-1977']) {
+    assert.equal(setHasNations(id), false, `${id} has clubs only`);
+    assert.deepEqual(seasonFile(id).nations, {}, `${id} lists no nation`);
+    assert.doesNotThrow(() => decodeFootballSet(seasonFile(id), id));
+    assert.throws(withCanada(id), new RegExp(`^Error: Football data set ${id}: an NHL season before 1977/78 has clubs only$`));
+  }
+  assert.equal(setHasNations('nhl-1978'), true);
+  assert.doesNotThrow(withCanada('nhl-1978'), '1977/78 lists its nations');
+});
+
 test('a season binds hockey to its nations and clubs; a nation it does not list is a minnow', () => {
   const set = decodeFootballSet(seasonFile('nhl-1994'), 'nhl-1994');
   const sport = seasonSport(set);

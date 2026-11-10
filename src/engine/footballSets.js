@@ -546,7 +546,7 @@ function validateFootballSet(data, id) {
   if (setKindOf(id) === 'elo' || setKindOf(id) === 'wta') return validateTennisSeason(data, id, fail);
   if (setKindOf(id) === 'wc') return validateWorldCupSeason(data, id, fail);
   if (setKindOf(id) === 'nhl') return validateNationsAndClubsOnMap(data, id, fail, { sport: hockey, clubId: NHL_CLUB_ID,
-    positions: new Set(Object.keys(hockey.formation)), clubLeast: 12, noun: 'an NHL season' });
+    positions: new Set(Object.keys(hockey.formation)), clubLeast: 12, noun: 'an NHL season', clubsOnlyNoun: 'an NHL season before 1977/78' });
   if (setKindOf(id) === 'nrl') return validateClubsOnMap(data, id, fail, { sport: rugbyLeague, clubId: NRL_CLUB_ID,
     positions: new Set(Object.keys(rugbyLeague.formation)), least: rugbyLeague.squadSize, noun: 'an NRL season' });
   if (['madden', 'tecmo', 'pfa'].includes(setKindOf(id))) return validateClubsOnMap(data, id, fail, { sport: americanFootball, clubId: NFL_CLUB_ID,
@@ -866,9 +866,11 @@ const NHL_CLUB_ID = /^nhl-[a-z0-9-]{1,62}$/;
  * A season of nations and clubs, its clubs on its era's map (`map`), each player `[name, position, rating]`: an NHL
  * season. Its nations are those with players (a nation it does not list fields its generated minnows, as the built-in
  * season's would); its clubs one per section of the map, at least `clubLeast` players each (a place a club cannot fill
- * is the sport's baseline, as in the built-in season). Ids, codes and leagues follow the built-in clubs' rules.
+ * is the sport's baseline, as in the built-in season). Ids, codes and leagues follow the built-in clubs' rules. A season
+ * its id makes clubs only (`setHasNations`: the NHL's before 1977/78, `clubsOnlyNoun`) lists no nation, as a clubs-only
+ * kind's file has none (validateClubsOnMap).
  */
-function validateNationsAndClubsOnMap(data, id, fail, { sport, clubId, positions, clubLeast, noun }) {
+function validateNationsAndClubsOnMap(data, id, fail, { sport, clubId, positions, clubLeast, noun, clubsOnlyNoun = noun }) {
   const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
   const text = v => typeof v === 'string' && v.trim().length > 0;
   const squad = (at, list, least) => {
@@ -889,6 +891,7 @@ function validateNationsAndClubsOnMap(data, id, fail, { sport, clubId, positions
   if (!map) fail(`map ${JSON.stringify(data.map)} is not one of ${sport.name}'s maps listing this season`);
   const nations = data.nations;
   if (!isObject(nations)) fail('nations is missing');
+  if (!setHasNations(id) && Object.keys(nations).length) fail(`${clubsOnlyNoun} has clubs only`);
   for (const [key, entry] of Object.entries(nations)) {
     const at = `nations[${key}]`;
     if (!Object.hasOwn(NATIONS, key)) fail(`${at} is not a nation id`);
