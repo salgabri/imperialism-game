@@ -600,7 +600,10 @@ Progress autosaves at every draw, kickoff, final whistle and result, and after
 signings, preserving the seed, random state, queue, history and pending manager
 choice. A match's outcome is fixed at kickoff, so the goals and kicks revealed since
 are written with the next checkpoint, on pause, or when the page is hidden or
-closed; a save with nothing new to write is skipped. Save status reports
+closed; a save with nothing new to write is skipped. A fast-forwarded match is
+usually written once, with its result: its final score waits like the goals do,
+and so does its kickoff when it follows straight on from the last saved result,
+since resuming that save draws and plays the same match again. Save status reports
 storage errors. Each checkpoint is kept with a recovery copy. A save is all or
 nothing: when browser storage is full, a campaign may drop its own recovery copy to
 fit, but never another campaign's; otherwise nothing is written and save status

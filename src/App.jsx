@@ -109,6 +109,11 @@ function eliteNations(all, sport) {
  */
 const MATCH_PROGRESS = new Set(['shown', 'ga', 'gd', 'tieShown']);
 const SPIN_PROGRESS = new Set(['stage', 'ang']);
+/**
+ * A fast-forwarded (express) match has no ticker and no whistle: it shows its final score 18 ms (at 1×) after its
+ * kickoff and its result 18 ms after that. Its reveal, `status` included, is presentation written with the result.
+ */
+const EXPRESS_PROGRESS = new Set([...MATCH_PROGRESS, 'status']);
 
 /**
  * How `b` differs from `a`: null when they are the same value or objects with the same keys holding identical
@@ -314,7 +319,7 @@ export default class App extends React.Component {
     // next checkpoint, or when the page is hidden or closed (a whole save per goal, kick and compass stage was
     // most of the campaign's work).
     if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading') {
-      const match = contentChange(previous.match, this.state.match, MATCH_PROGRESS);
+      const match = this.matchChange(previous.match, this.state.match);
       const spin = contentChange(previous.spin, this.state.spin, SPIN_PROGRESS);
       if (match === 'checkpoint' || spin === 'checkpoint') this.persist();
       else if (match || spin) this.unsavedProgress = true;
@@ -833,6 +838,33 @@ export default class App extends React.Component {
   flushProgress() {
     if (!this.unsavedProgress || (this.state.phase !== 'playing' && this.state.phase !== 'victory')) return;
     this.persist();
+  }
+
+  /**
+   * How a commit changed the match, for the autosave (componentDidUpdate): 'checkpoint', 'progress' or null. A
+   * fast-forwarded (express) match's reveal is presentation, and so is its kickoff when the last checkpoint already
+   * decides it (expressKickoffReplays): such a match is written once, with its result.
+   */
+  matchChange(previous, match) {
+    if (!match?.express || match.applied) return contentChange(previous, match, MATCH_PROGRESS);
+    if (previous?.allEv === match.allEv) return contentChange(previous, match, EXPRESS_PROGRESS);
+    return this.expressKickoffReplays(previous) ? 'progress' : 'checkpoint';
+  }
+
+  /**
+   * Whether resuming the last checkpoint would draw and simulate this fast-forwarded kickoff again, so that writing it
+   * can wait for its result. The draw and the simulation take the same samples from the same random state, and
+   * presentation takes none (DEC D1), so that checkpoint must be this campaign's, hold the settled match this kickoff
+   * follows, and hold the random state this turn started from (nextAction's turnFrom), the kickoff's samples taken
+   * since. Kickoffs that fail this stay checkpoints: a batch's first match (startBatch saved its draw without the
+   * match), the draw a resume kicks off (restoreCampaign saves after it), one whose samples a write between its timer
+   * task and React's commit has already stored, and one whose turn started from a later state than that checkpoint:
+   * a Next match click between a turn's timer task and React's commit still reads the settled match and draws again.
+   */
+  expressKickoffReplays(previous) {
+    const last = this.lastCheckpoint;
+    return !!previous?.applied && !!last && last.match === previous && last.campaignId === this.state.campaignId
+      && last.rngState === this.turnFrom && last.rngState !== (this.rng?.getState?.() ?? this.state.rngState);
   }
 
   pickSetup(key, value) {
@@ -1565,8 +1597,12 @@ export default class App extends React.Component {
     if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.pendingTarget) return;
     if (st.match && !st.match.applied) return;
     if (st.spin) return;
+    // The random state this turn starts from: its fast-forwarded kickoff waits for its result only when the last
+    // checkpoint holds this state (expressKickoffReplays).
+    this.turnFrom = this.rng?.getState?.();
     // A view switched automatically for the last match returns to the map at the next turn (DEC D11). No timers.
-    if (st.viewSource === 'auto') this.setState({ view: 'map', viewSource: 'user' });
+    const back = st.viewSource === 'auto' ? { view: 'map', viewSource: 'user' } : {};
+    if (st.viewSource === 'auto') this.setState(back);
     if (st.series && st.aliveIds.length === 2) {
       const [a, b] = st.series.teamIds;
       this.setState({ round: st.round + 1, queue: [], turnQueue: [], turnIndex: 0 }, () => this.startMatch(a, b));
@@ -1576,7 +1612,9 @@ export default class App extends React.Component {
     if (st.queue.length) {
       const queue = st.queue.slice();
       const next = queue.shift();
-      this.setState({ queue }, () => this.startMatch(next[0], next[1]));
+      // The queue commits with the kickoff, as startMatch's `decided`: a commit of its own was never painted. The
+      // view's return goes in too, because startMatch reads the view before React has committed it (autoMatchView).
+      this.startMatch(next[0], next[1], {}, undefined, {}, { ...back, queue });
       return;
     }
     if (st.settings.pacing === 'duel') this.beginTurn();
@@ -1633,7 +1671,13 @@ export default class App extends React.Component {
     );
   }
 
-  /** `decided` is the kickoff decision's state fields (chooseTactic): read as committed and committed with the match. */
+  /**
+   * `decided` is the fields of the decision or turn that leads to this kickoff: chooseTactic's tactic, a fast-forwarded
+   * turn's round and turn order (beginDuel), a queued pair's queue (nextAction). They are read as committed and
+   * committed in one update with the match, with the tactical gate, or alone when no match starts. `decided` must
+   * hold every field queued in the same tick that this reads, such as nextAction's return to the map (view and
+   * viewSource, read by autoMatchView): React has not committed them yet, so this.state still has the old values.
+   */
   startMatch(attackerId, defenderId, route = {}, tactic, options = {}, decided = null) {
     const st = decided ? { ...this.state, ...decided } : this.state;
     const a = st.teams[attackerId];
@@ -1647,7 +1691,9 @@ export default class App extends React.Component {
     // Home advantage (a launch rule, off by default): the defender plays at home.
     const home = st.settings.homeAdvantage === 'on';
     if ([attackerId, defenderId].includes(managedId) && !tactic) {
-      if (st.tacticalChoice) return;
+      // Fast-forward's shortcut reaches the gate for a manager who follows another team, with the turn in `decided`:
+      // it commits with the gate, or alone when a gate is already open.
+      if (st.tacticalChoice) { if (decided) this.setState(decided); return; }
       this.clearTimers();
       const manager = st.teams[managedId], opponent = managedId === attackerId ? d : a;
       const options = tacticalOptions(manager, opponent, baseDrama).map(option => {
@@ -1658,7 +1704,7 @@ export default class App extends React.Component {
       // A skip ahead stops here, your next decision: it hands back its speed, and the autoplay it started from is what
       // resumes after the kick-off.
       const skip = st.skipAhead;
-      this.setState({ managedTeamId: managedId, tacticalChoice: { aId: attackerId, dId: defenderId, route,
+      this.setState({ ...decided, managedTeamId: managedId, tacticalChoice: { aId: attackerId, dId: defenderId, route,
         managerName: manager.name, opponentName: opponent.name, options, resumeAutoplay: skip ? skip.autoplay : st.autoplay, openedAt: Date.now() },
         ...(skip ? { skipAhead: null, speed: skip.speed } : {}),
         // clearTimers() above also dropped applyConquest's hatch reset: clear the flash with the notice and toast.
