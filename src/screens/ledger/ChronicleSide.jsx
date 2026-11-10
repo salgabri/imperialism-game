@@ -48,10 +48,11 @@ function activityRows(entries) {
   return rows;
 }
 
-// Memoised: the feed model keeps its identity until the log changes.
-export const ActivityFeed = React.memo(function ActivityFeed({ entries = [] }) {
+// Memoised: the feed model keeps its identity until the log changes. `measureKey` (the Chronicle's panel) measures the
+// feed again in the commit that shows it.
+export const ActivityFeed = React.memo(function ActivityFeed({ entries = [], measureKey = null }) {
   const rows = useMemo(() => activityRows(entries), [entries]);
-  const paged = usePagedList(rows, { row: '.fi-activity-item' });
+  const paged = usePagedList(rows, { row: '.fi-activity-item', measureKey });
   return (
     <section className="fi-activity" aria-labelledby="chronicle-activity-title">
       <div className="kicker">

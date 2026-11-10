@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
-import { layoutFlagSymbol } from '../src/engine/flagSymbolLayout.js';
+import { layoutFlagSymbol, countryBands, containsCountry } from '../src/engine/flagSymbolLayout.js';
 import { createFlagRegionIndex, FLAG_REGION_GAP_KM } from '../src/engine/flagRegions.js';
 import { WorldGeometry } from '../src/engine/geo.js';
 import { NATIONS } from '../src/data/teams.js';
@@ -236,4 +236,91 @@ test('world-scale geometry has bounded search work and cached repeat cost', () =
     }
   }
   assert.ok(performance.now() - conqueredStart < 12000, 'a conquered world retains a bounded search');
+});
+
+test('the banded point-in-country test answers exactly as a scan of every edge, on band edges and vertex rows too', () => {
+  // Edges as prepare files them: zero-length ones skipped, each with its x and y range.
+  const edgesOf = rings => rings.flatMap(ring => ring.map((b, i) => {
+    const a = ring[(i + ring.length - 1) % ring.length];
+    return { a, b, x0: Math.min(a[0], b[0]), x1: Math.max(a[0], b[0]), y0: Math.min(a[1], b[1]), y1: Math.max(a[1], b[1]) };
+  }).filter(({ a, b }) => a[0] !== b[0] || a[1] !== b[1]));
+  // The neighbouring double of y, above or below it.
+  const bits = new DataView(new ArrayBuffer(8));
+  const nudge = (y, up) => {
+    if (y === 0) return up ? Number.MIN_VALUE : -Number.MIN_VALUE;
+    bits.setFloat64(0, y);
+    bits.setBigUint64(0, bits.getBigUint64(0) + ((y > 0) === up ? 1n : -1n));
+    return bits.getFloat64(0);
+  };
+  let seed = 3;
+  const random = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32;
+  const tenth = v => Number(v.toFixed(1));
+  const star = (cx, cy, n, r0, r1, turn = 1) => {
+    const ring = Array.from({ length: n }, (_, i) => {
+      const angle = turn * 2 * Math.PI * i / n, r = i % 2 ? r0 : r1;
+      return [tenth(cx + r * Math.cos(angle)), tenth(cy + r * Math.sin(angle))];
+    });
+    return [...ring, ring[0]];
+  };
+  // Steps of horizontal and vertical edges: whole rows of vertices, and edges that end exactly on another's row.
+  const stairs = [[700, 100]];
+  for (let i = 0; i < 150; i++) stairs.push([700 + i, 101 + i], [701 + i, 101 + i]);
+  stairs.push([851, 100], [700, 100]);
+  const load = name => JSON.parse(readFileSync(new URL(`../public/${name}`, import.meta.url), 'utf8'));
+  const rules = new WorldGeometry(load('world-110m.v1.json')).fitTo(Object.keys(NATIONS));
+  const { s, tx, ty } = rules.fit, paths = new WorldGeometry(load('countries-50m.json')).buildPaths(s, tx, ty);
+  const countries = [
+    // A star with a reversed star for a lake and a nested star of the same turn (land counted twice), and stairs.
+    ['stars and stairs', [star(400, 300, 900, 100, 40), star(400, 300, 300, 25, 15, -1), star(400, 300, 60, 8, 4), stairs]],
+    ['Indonesia, 50m', (paths['360'] || rules.paths['360']).labelRings],
+  ];
+  for (const [name, rings] of countries) {
+    const edges = edgesOf(rings), bands = countryBands(edges);
+    assert.ok(bands.bands.length >= 100, `${name}: many bands`);
+    assert.ok(bands.bands.reduce((sum, band) => sum + band.length, 0) > edges.length, `${name}: long edges sit in several bands`);
+    const xs = edges.flatMap(edge => [edge.x0, edge.x1]), left = Math.min(...xs), right = Math.max(...xs);
+    const anyX = () => left - 5 + random() * (right - left + 10);
+    const points = [];
+    for (let k = 0; k <= bands.bands.length; k++) {
+      const y = bands.y0 + k * bands.step;
+      for (const row of [y, nudge(y, false), nudge(y, true)]) points.push([anyX(), row], [anyX(), row]);
+    }
+    for (let i = 0; i < edges.length; i += Math.ceil(edges.length / 700)) {
+      const [x, y] = edges[i].a;
+      points.push([x, y], [nudge(x, true), y], [anyX(), y], [anyX(), nudge(y, false)]);
+    }
+    for (let i = 0; i < 1000; i++) points.push([anyX(), bands.y0 - 2 + random() * (bands.y1 - bands.y0 + 4)]);
+    for (const y of [bands.y0, bands.y1, nudge(bands.y0, false), nudge(bands.y1, true)]) points.push([anyX(), y]);
+    const wrong = [];
+    let inside = 0;
+    for (const [x, y] of points) {
+      const full = containsCountry(edges, x, y);
+      if (bands.contains(x, y) !== full) wrong.push([x, y]);
+      if (full) inside++;
+    }
+    assert.deepEqual(wrong.slice(0, 5), [], `${name}: ${wrong.length} of ${points.length} points answered differently`);
+    assert.ok(inside > points.length / 20 && inside < points.length - points.length / 20, `${name}: points inside (${inside}) and outside`);
+  }
+  // Nothing to divide: no edges, or a flat country too far out for the pad to register. One band, never a crash.
+  assert.equal(countryBands([]).contains(0, 0), false);
+  const flat = edgesOf([[[0, 1e12], [10, 1e12], [20, 1e12], [0, 1e12]]]);
+  assert.equal(countryBands(flat).contains(5, 1e12), containsCountry(flat, 5, 1e12));
+});
+
+test('the historic emblems keep their shape on their federations\' land: the Soviet Union, the CIS, Yugoslavia, Zaire', () => {
+  const load = name => JSON.parse(readFileSync(new URL(`../public/${name}`, import.meta.url), 'utf8'));
+  const rules = new WorldGeometry(load('world-110m.v1.json')).fitTo(Object.keys(NATIONS));
+  const display = new WorldGeometry(load('countries-50m.json'));
+  const { s, tx, ty } = rules.fit, paths = display.buildPaths(s, tx, ty);
+  const shapes = rules.countries.map(c => ({ id: c.id, rings: (paths[c.id] || rules.paths[c.id]).labelRings }));
+  const index = createFlagRegionIndex(shapes, { maxGap: FLAG_REGION_GAP_KM / rules.kmPerUnit });
+  // The holder and the shapes it holds at kick-off (src/data/footballFederations.js).
+  const soviet = ['643', '804', '112', '268', '051', '031', '398', '860', '795', '762', '417', '498', '233', '428', '440'];
+  for (const [code, holder, held] of [['su', '643', soviet], ['cis-1992', '643', soviet.filter(id => !['233', '428', '440'].includes(id))],
+    ['yu', '688', ['688', '191', '705', '070', '807', '499', 'KOS']], ['zr', '180', ['180']]]) {
+    const regions = index.components(Object.fromEntries(shapes.map(shape => [shape.id, held.includes(shape.id) ? holder : shape.id])))
+      .filter(region => region.ownerId === holder);
+    const r = regions.sort((a, b) => b.bbox.w * b.bbox.h - a.bbox.w * a.bbox.h)[0];
+    validate(r, FLAG_SYMBOLS[code], layoutFlagSymbol(r, FLAG_SYMBOLS[code]));
+  }
 });

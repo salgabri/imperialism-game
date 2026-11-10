@@ -253,3 +253,21 @@ test('rings of plain numbers are used as they are, other points are converted (l
   assert.deepEqual(ringOf('loose'), [[0, 100], [60, 100], [60, 160], [0, 160]], 'string coordinates become numbers');
   assert.deepEqual(plain, rect(0, 0, 100, 80), 'the input ring is never changed');
 });
+
+// Pieces join where they share a vertex, matched by point id. Without ids the index falls back to "x,y" strings and
+// gives the same components more slowly, so only the counts show the ids missing.
+test('every piece gets point ids up front, and pieces meeting at -0 and 0 join as their printed points do', () => {
+  const { shapes } = atlas(), index = createTerritoryComponentIndex(shapes), stats = index.pointStats();
+  assert.ok(stats.pieces > 1000, `the atlas has its land pieces (${stats.pieces})`);
+  assert.equal(stats.withIds, stats.pieces, 'every piece has point ids');
+  const printed = new Set(shapes.flatMap(s => s.rings.filter(r => r.length >= 3 && Math.abs(area(r)) > 1e-7).flat().map(p => `${p[0]},${p[1]}`)));
+  assert.equal(stats.points, printed.size, 'one id per distinct point');
+  // One country's two squares touch only at a corner, written -0 in one and 0 in the other; a far one (x beyond
+  // 1638.4, where the wide Americas theatres reach) touches the second at a corner too, off the 0.1 grid.
+  const corner = [shape('a', [[-10, -10], [-0, -10], [-0, -0], [-10, -0]], [[0, 0], [2050.3, 0], [2050.3, 10.25], [0, 10.25]],
+    [[2050.3, 10.25], [2100.3, 10.25], [2100.3, 40], [2050.3, 40]])];
+  const joined = createTerritoryComponentIndex(corner).components({ a: 'A' });
+  assert.equal(joined.length, 1, 'the three squares are one landmass');
+  assert.equal(joined[0].parts.length, 3);
+  assert.equal(createTerritoryComponentIndex(corner).pointStats().points, 10, 'ten distinct points: -0 is 0, as it prints');
+});

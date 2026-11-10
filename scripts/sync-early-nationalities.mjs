@@ -27,7 +27,8 @@ const OUTPUT = path.join(root, 'scripts/data/ea-early-nationalities.json');
 const CACHE = path.join(root, 'data-src/wikidata-early');
 const SPARQL = 'https://query.wikidata.org/sparql';
 const SEARCH = 'https://www.wikidata.org/w/api.php';
-const USER_AGENT = 'imperialism-game-build/1.0 (https://github.com/salgabri/imperialism-game)';
+// A generic agent: no address, account or other personal data goes out with a request.
+const USER_AGENT = 'imperialism-game-data/1.0';
 const LANGUAGES = '"en","mul","de","es","fr","it","pt","nl"';
 const FOOTBALLER = 'wd:Q937857';
 const SENIOR_TEAM = 'wd:Q135408445';

@@ -1,7 +1,6 @@
 import { C } from '../theme.js';
-import { ROSTERS } from '../data/rosters.baseball.js';
-import { CLUBS } from '../data/clubs.baseball.js';
-import { HOME_NATIONS, selectLineup } from '../data/teams.js';
+import { defineSportData } from './sportData.js';
+import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 
 // The clock counts outs: three a half-inning, six an inning, nine innings. The attacker bats first (the top of each
@@ -203,16 +202,19 @@ function rbiChunks(rng, runs) {
   return chunks;
 }
 
-export const baseball = {
+export const baseball = defineSportData({
   id: 'baseball',
   simulationVersion: 2,
   name: 'Baseball',
   blurb: 'Nine innings, nine in the order and a pitching staff. The home side bats last — level games go to extra innings.',
-  rosters: ROSTERS,
-  clubs: CLUBS,
+  // Read from the sport's players (sportData.js), once they have loaded.
+  rosters: undefined,
+  clubs: undefined,
   // The World Baseball Classic fields Great Britain and the Kingdom of the Netherlands: the home nations' shapes start
   // in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
+  // That empire plays as Great Britain, under the Union Jack. A season's sport keeps this with the rest of baseball's.
+  playsAs: { '826': GREAT_BRITAIN },
 
   squadSize: 13,
   formation: { C: 1, '1B': 1, '2B': 1, '3B': 1, SS: 1, LF: 1, CF: 1, RF: 1, DH: 1, SP: 1, RP: 3 },
@@ -220,7 +222,8 @@ export const baseball = {
   positionColors: { C: C.gold, '1B': C.cyan, '2B': C.cyan, '3B': C.cyan, SS: C.cyan, LF: C.green, CF: C.green, RF: C.green,
     DH: C.red, SP: '#B07CD8', RP: '#7FA7E8' },
 
-  // Nations with no MLB players are baseball's minnows, all alike: the game is a few nations' sport.
+  // A nation whose MLB players hold less than half the lineup fields no team (fieldedNations). Built anyway, one with
+  // none would be all generated at this strength.
   fallbackStrength: () => BASELINE,
   requiredPositions: ['SP'],
 
@@ -284,7 +287,7 @@ export const baseball = {
     ev.sort((x, y) => x.m - y.m);
     return { ga, gd, regA, regD, ev, tie, winner };
   },
-};
+});
 
 /**
  * Squad-screen strength profile: the batting, pitching and fielding the match model weighs → { batting, pitching,

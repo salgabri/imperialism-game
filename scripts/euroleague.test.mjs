@@ -10,8 +10,9 @@ import { CLUBS } from '../src/data/clubs.euroleague.js';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { ROSTERS } from '../src/data/rosters.basketball.js';
 import { EUROPE_MAPS } from '../src/data/europeMaps.js';
-import { EUROBASKET_2025, NATIONS, SCOPES, buildClub, buildTeam, makeRng, nationScopes, selectLineup, teamEff } from '../src/data/teams.js';
-import { clubMapsOf, domesticLabel } from '../src/data/domesticScope.js';
+import { EUROBASKET_2025, NATIONS, SCOPES, buildClub, buildTeam, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
+import { nationTheatres } from '../src/data/scopes.js';
+import { clubMapOf, domesticLabel, theatreMapsOf } from '../src/data/domesticScope.js';
 import { estimateReason, estimateTitle, isEstimated } from '../src/data/estimates.js';
 import { EUROLEAGUE_SCOPE, basketball, euroleagueBasketball, nbaBasketball } from '../src/sports/basketball.js';
 import { getSport, matchSport } from '../src/sports/index.js';
@@ -314,9 +315,9 @@ test('the setup and a challenge link keep the EuroLeague; another sport has none
   assert.equal(setClubScope(clubs({ clubScope: 'all' })), 'domestic:nba');
   assert.equal(setClubScope(clubs({ clubScope: EUROLEAGUE_SCOPE, dataSet: 'nba-2k20' })), 'domestic:nba', 'an earlier season is NBA clubs only');
   assert.equal(setClubScope({ sport: 'hockey', layer: 'clubs', clubScope: EUROLEAGUE_SCOPE }), 'domestic:nhl');
-  assert.deepEqual(clubMapsOf('basketball').map(map => map.id), ['nba', 'euroleague']);
-  assert.deepEqual(clubMapsOf('basketball', 'nba2008').map(map => map.id), ['nba2008']);
-  assert.deepEqual(clubMapsOf('hockey').map(map => map.id), ['nhl']);
+  assert.deepEqual(theatreMapsOf('basketball').map(map => map.id), ['nba', 'euroleague']);
+  assert.deepEqual(theatreMapsOf('basketball', 'nba-2k08').map(map => map.id), ['nba2008'], 'an earlier season: its era\'s NBA map only');
+  assert.deepEqual([clubMapOf('hockey')?.id, theatreMapsOf('hockey')], ['nhl', []]);
   const query = challengeQuery(clubs({ clubScope: EUROLEAGUE_SCOPE, seed: '9' }), 9);
   assert.match(query, /theatre=domestic:euroleague/);
   const back = readChallenge(`?${query}`);
@@ -339,8 +340,8 @@ test('EuroBasket is a basketball nation theatre of the 24 nations of EuroBasket 
     assert.ok(team.squad.every(player => !player.gen), `${NATIONS[id][0]}: nobody generated`);
     assert.ok(selectLineup(team).slots.every(slot => !slot.outOfPosition), `${NATIONS[id][0]}: nobody out of position`);
   }
-  const ids = sport => nationScopes(sport).map(scope => scope.id);
-  assert.deepEqual(ids('basketball'), ['world', 'UEFA', 'eurobasket', 'CONMEBOL', 'CAF', 'AFC', 'CONCACAF', 'elite']);
+  const ids = sport => nationTheatres(getSport(sport)).map(scope => scope.id);
+  assert.deepEqual(ids('basketball'), ['world', 'UEFA', 'eurobasket', 'CAF', 'AFC', 'CONCACAF', 'elite'], 'South America: too few real fives');
   for (const sport of ['football', 'womens-football', 'baseball', 'hockey']) assert.ok(!ids(sport).includes('eurobasket'), sport);
   assert.equal(SCOPES.find(scope => scope.id === 'eurobasket').name, 'EuroBasket');
   const model = buildSetupModel({ sport: 'basketball', layer: 'nations', scope: 'eurobasket', role: 'spectator' }, {});
@@ -348,11 +349,11 @@ test('EuroBasket is a basketball nation theatre of the 24 nations of EuroBasket 
   assert.equal(model.scopes.find(scope => scope.id === 'eurobasket').count, 24);
   assert.equal(model.scopeName, 'EuroBasket');
   assert.match(model.status, /^24 nations · 23 matches · /);
-  // Football offers no EuroBasket: a setup still naming it shows the first theatre.
-  assert.equal(buildSetupModel({ sport: 'football', layer: 'nations', scope: 'eurobasket' }, {}).scopeName, 'World War');
+  // Football offers no EuroBasket: a setup still naming it shows football's heartland.
+  assert.equal(buildSetupModel({ sport: 'football', layer: 'nations', scope: 'eurobasket' }, {}).scopeName, 'Europe');
 });
 
-test('a EuroBasket campaign launches its 24 nations on their homelands; another sport goes back to Europe', async () => {
+test('a EuroBasket campaign launches its 24 nations on their homelands; another sport plays its own Europe', async () => {
   await withApp(async ({ app }) => {
     app.pickSetup('sport', 'basketball');
     app.pickSetup('scope', 'eurobasket');
@@ -364,10 +365,14 @@ test('a EuroBasket campaign launches its 24 nations on their homelands; another 
     // A football link to it is not a football theatre.
     assert.deepEqual(readChallenge('?theatre=eurobasket').ignored, ['theatre']);
     assert.equal(readChallenge('?sport=basketball&theatre=eurobasket').setup.scope, 'eurobasket');
+    // Football keeps the choice but plays its heartland, Europe; basketball finds EuroBasket again.
     app.pickSetup('sport', 'football');
-    assert.equal(app.state.setup.scope, 'UEFA', "football's Europe instead");
-    const football = app.opening({ ...app.state.setup, scope: 'eurobasket' }, makeRng(5));
-    assert.ok(football.included.length > 100, 'a stale EuroBasket plays the world, not basketball\'s field');
+    assert.equal(app.state.setup.scope, 'eurobasket');
+    const football = app.opening(app.state.setup, makeRng(5));
+    assert.equal(football.scopeName, 'Europe');
+    assert.ok(football.included.length > 24 && football.included.every(team => NATIONS[team.id][2] === 'UEFA'), 'Europe\'s football nations');
+    app.pickSetup('sport', 'basketball');
+    assert.equal(app.opening(app.state.setup, makeRng(5)).scopeName, 'EuroBasket');
   });
 });
 

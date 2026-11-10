@@ -1,9 +1,9 @@
 // Display-only border mesh. Country paths remain the map's interactive geometry.
 // The source rings use the same rounded coordinates as the painted SVG paths.
 
+import { createPairTable } from './pairTable.js';
+
 const ownerOf = value => value == null || value === '' ? null : String(value);
-// Segment keys pack two point ids into one number (exact below 2^53 for up to 2^26 points).
-const POINT_SPAN = 0x4000000;
 
 /**
  * Join segments that share endpoints into polylines, one `M` per run (`Z` when a run closes on itself), in a
@@ -61,59 +61,98 @@ function chainSegments(list, mesh) {
  * re-sorts the few thousand groups; the world-sized coastline never changes.
  */
 export function createMapBorderIndex(geometry = []) {
-  const pointIds = new Map(), points = [];
-  const pointOf = key => {
-    let id = pointIds.get(key);
-    if (id === undefined) { id = points.length; points.push(key); pointIds.set(key, id); }
+  // The shapes are read twice, so an iterator is made a list first.
+  const shapes = Array.isArray(geometry) ? geometry : [...geometry];
+  // Every vertex of the rings drawn below. There are no more points or segments than that, so the tables are made
+  // that size once and never grow.
+  let vertices = 0;
+  for (const shape of shapes) {
+    if (shape?.id == null) continue;
+    for (const ring of shape.rings || []) if (ring.length >= 2) vertices += ring.length;
+  }
+  // Point ids, equal exactly when the points' "x,y" texts are. A point on the 0.1 grid (every painted ring is rounded
+  // so) is found by its tenths, a pair of integers, in a typed hash table; any other point by its text. The tenths
+  // give the number back exactly (gx / 10 === x), so equal tenths mean equal texts, -0 printing as 0; and equal
+  // points always take the same path. A point's text, which is also what a path prints, is made once, when it is new.
+  const points = [], strings = new Map();
+  let grid = createPairTable(vertices);
+  const pointOf = (x, y) => {
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return -1;
+    const gx = Math.round(x * 10), gy = Math.round(y * 10);
+    if (gx / 10 === x && gy / 10 === y && (gx | 0) === gx && (gy | 0) === gy) {
+      const id = grid.id(gx, gy, points.length);
+      if (id === points.length) points.push(`${x},${y}`);
+      return id;
+    }
+    const text = `${x},${y}`;
+    let id = strings.get(text);
+    if (id === undefined) { id = points.length; points.push(text); strings.set(text, id); }
     return id;
   };
-  const segmentIds = new Map(), segmentCountries = [], a = [], b = [];
+  // Segments by their two end point ids, in first-seen order, and the countries drawing each, in first-seen order:
+  // the first two here, any further ones (overlapping shapes) aside.
+  const segmentIds = createPairTable(vertices), a = new Int32Array(vertices), b = new Int32Array(vertices);
+  const firstCountry = new Int32Array(vertices), secondCountry = new Int32Array(vertices).fill(-1), moreCountries = new Map();
+  let segmentCount = 0;
   const countryIndex = new Map(), countryIds = [];
 
-  for (const shape of geometry) {
+  for (const shape of shapes) {
     if (shape?.id == null) continue;
     const countryId = String(shape.id);
     let country = countryIndex.get(countryId);
     if (country === undefined) { country = countryIds.length; countryIds.push(countryId); countryIndex.set(countryId, country); }
     for (const ring of shape.rings || []) {
       if (ring.length < 2) continue;
-      // Each vertex's key is made once rather than once per edge end. A plain loop: map() would keep a sparse ring's holes.
-      const keys = new Array(ring.length);
+      // Each vertex's id is found once rather than once per edge end. A plain loop: map() would keep a sparse ring's
+      // holes. A missing or non-finite point is -1 and draws no segment.
+      const ringIds = new Int32Array(ring.length);
       for (let j = 0; j < ring.length; j++) {
         const point = ring[j];
-        keys[j] = point && Number.isFinite(point[0]) && Number.isFinite(point[1]) ? `${point[0]},${point[1]}` : null;
+        ringIds[j] = point ? pointOf(point[0], point[1]) : -1;
       }
       for (let i = 0, previous = ring.length - 1; i < ring.length; previous = i++) {
-        const startKey = keys[previous], endKey = keys[i];
-        if (startKey === null || endKey === null || startKey === endKey) continue;
-        const lowFirst = startKey < endKey;
-        const lowId = pointOf(lowFirst ? startKey : endKey), highId = pointOf(lowFirst ? endKey : startKey), key = lowId * POINT_SPAN + highId;
-        let segment = segmentIds.get(key);
-        if (segment === undefined) {
-          segment = a.length;
-          a.push(lowId); b.push(highId); segmentCountries.push([]);
-          segmentIds.set(key, segment);
+        const start = ringIds[previous], end = ringIds[i];
+        if (start === -1 || end === -1 || start === end) continue;
+        // A segment runs from the lower point text to the higher, whichever way its ring goes.
+        const lowFirst = points[start] < points[end];
+        const lowId = lowFirst ? start : end, highId = lowFirst ? end : start;
+        const segment = segmentIds.id(lowId, highId, segmentCount);
+        if (segment === segmentCount) {
+          a[segment] = lowId; b[segment] = highId; firstCountry[segment] = country;
+          segmentCount++;
+        } else if (firstCountry[segment] !== country && secondCountry[segment] !== country) {
+          if (secondCountry[segment] === -1) secondCountry[segment] = country;
+          else {
+            const more = moreCountries.get(segment);
+            if (!more) moreCountries.set(segment, [country]);
+            else if (!more.includes(country)) more.push(country);
+          }
         }
-        if (!segmentCountries[segment].includes(country)) segmentCountries[segment].push(country);
       }
     }
   }
+  // The build tables are done with. pointOf shares its scope with the methods returned below, so whatever it holds
+  // would otherwise live as long as the index.
+  grid = null;
+  strings.clear();
 
-  // Segments by the set of countries drawing them, in first-seen order.
-  const groupIds = new Map(), groups = [];
-  segmentCountries.forEach((countries, segment) => {
-    const key = countries.length === 1 ? countries[0] : countries.slice().sort((x, y) => x - y).join(',');
+  // Segments by the set of countries drawing them, in first-seen order. One country is keyed by its index, two by a
+  // number past every index, three or more by their sorted list: no two sets share a key.
+  const groupIds = new Map(), groups = [], n = countryIds.length;
+  for (let segment = 0; segment < segmentCount; segment++) {
+    const one = firstCountry[segment], two = secondCountry[segment], more = two === -1 ? undefined : moreCountries.get(segment);
+    const key = two === -1 ? one : more ? [one, two, ...more].sort((x, y) => x - y).join(',') : n + Math.min(one, two) * n + Math.max(one, two);
     let group = groupIds.get(key);
     if (group === undefined) {
       group = groups.length;
       groupIds.set(key, group);
+      const countries = two === -1 ? [one] : more ? [one, two, ...more] : [one, two];
       groups.push({ countries: countries.map(index => countryIds[index]), segments: [], d: null });
     }
     groups[group].segments.push(segment);
-  });
-  pointIds.clear();
+  }
   groupIds.clear();
-  const mesh = { a: Int32Array.from(a), b: Int32Array.from(b), points };
+  const mesh = { a: a.slice(0, segmentCount), b: b.slice(0, segmentCount), points };
   for (const group of groups) group.segments = Int32Array.from(group.segments);
   const pathOf = group => group.d ??= chainSegments(group.segments, mesh);
   let coastD = null;

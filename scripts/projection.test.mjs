@@ -164,12 +164,16 @@ test('kilometres-per-unit is the exact equatorial horizontal reference for this 
 test('display rings share the projected points they repeat, and an atlas built only to draw can drop its polygons', () => {
   const detailed = load('countries-50m.json');
   const full = new geometry.WorldGeometry(detailed, CAPITALS);
-  let shared = 0, total = 0;
+  let shared = 0, total = 0, sameRing = 0, rings = 0;
   for (const country of full.countries) {
     const projected = new Set(full.projected[country.id].flat(2));
     for (const point of full.displayProjected[country.id].flat(3)) { total++; if (projected.has(point)) shared++; }
+    const projectedRings = new Set(full.projected[country.id].flat());
+    for (const parts of full.displayProjected[country.id].flat()) { rings++; if (parts.length === 1 && projectedRings.has(parts[0])) sameRing++; }
   }
-  assert.ok(shared / total > .9, `${shared} of ${total} display points reuse their projected arrays`);
+  // A ring clear of the date line is its own display part, the very array projected (about 99.95% of the points).
+  assert.ok(shared / total > .99, `${shared} of ${total} display points reuse their projected arrays`);
+  assert.ok(sameRing / rings > .99, `${sameRing} of ${rings} display rings are their projected ring`);
   // A seam-split ring (Russia, Fiji) still gets its own points where the cut adds them.
   assert.ok(shared < total);
   const lean = new geometry.WorldGeometry(detailed, CAPITALS, { keepPolys: false });
@@ -177,4 +181,101 @@ test('display rings share the projected points they repeat, and an atlas built o
   assert.ok(full.countries.every(country => Array.isArray(country.polys)), 'by default they stay');
   assert.deepEqual(lean.capitals, full.capitals);
   assert.equal(JSON.stringify(lean.buildPaths(1.3, 10, 5)), JSON.stringify(full.buildPaths(1.3, 10, 5)), 'drawn paths are unchanged');
+  // Without border lengths (the display atlas and a country map's surroundings) nothing is measured, and the land
+  // borders stay: a Europe map's claimable land is joined across them (domestic.js atlasNeighbours).
+  const drawn = new geometry.WorldGeometry(detailed, CAPITALS, { keepPolys: false, borderLengths: false });
+  const adjacency = geo => JSON.stringify(Object.entries(geo.adj).map(([id, set]) => [id, [...set]]));
+  assert.equal(adjacency(drawn), adjacency(full));
+  assert.ok(drawn.adj['040'].has('276'), 'Austria borders Germany');
+  assert.equal(JSON.stringify([drawn.borders, drawn.edges]), '[{},{}]');
+  assert.ok(full.borders['040'].get('276') > 0, 'the default still measures them');
+  assert.equal(JSON.stringify(drawn.buildPaths(1.3, 10, 5)), JSON.stringify(full.buildPaths(1.3, 10, 5)), 'and draws the same');
+});
+
+test('fitTo on the frame it already holds keeps its paths; another frame builds them again, the same as a first fit', () => {
+  const geo = fitted(europeIds);
+  const { paths, graticule, fit, kmPerUnit } = geo;
+  assert.equal(geo.fitTo([...europeIds].reverse()), geo);
+  assert.ok(geo.paths === paths && geo.graticule === graticule && geo.fit === fit, 'the same frame keeps every object');
+  assert.equal(geo.kmPerUnit, kmPerUnit);
+  geo.fitTo(worldIds);
+  assert.notEqual(geo.paths, paths);
+  const fresh = fitted(worldIds);
+  assert.equal(JSON.stringify([geo.paths, geo.graticule, geo.fit]), JSON.stringify([fresh.paths, fresh.graticule, fresh.fit]),
+    'the same as a first fit');
+  geo.fitTo(europeIds);
+  assert.notEqual(geo.paths, paths, 'only the frame last built is kept');
+  assert.equal(JSON.stringify([geo.paths, geo.graticule, geo.fit, geo.kmPerUnit]), JSON.stringify([paths, graticule, fit, kmPerUnit]));
+});
+
+
+// Lon/lat rings, each a one-arc polygon of its own in an unquantized topology.
+const ringTopology = rings => ({ type: 'Topology', arcs: Object.values(rings), objects: { countries: { type: 'GeometryCollection',
+  geometries: Object.keys(rings).map((id, index) => ({ type: 'Polygon', id, arcs: [[index]] })) } } });
+
+test('a ring the date-line cut would change still takes the cut; any other ring is its own display part', () => {
+  // The shipped atlases have no ring on these edges, so the display rings (geo.js seamFreeRing) are pinned here against
+  // splitAtAntimeridian itself: on the seam or within its epsilon (1e-8), a repeated point, no area, a latitude past the
+  // pole, a closing -0 for a first 0, an edge over 180° of longitude, an open, empty or one-point ring.
+  const near = 180 - 5e-9;
+  const rings = {
+    plain: [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]],
+    clearOfSeam: [[179.99, 0], [179.99, 10], [170, 10], [170, 0], [179.99, 0]],
+    farSide: [[-80, 0], [-70, 0], [-70, 10], [-80, 10], [-80, 0]],
+    crossing: [[170, 0], [-170, 0], [-170, 10], [170, 10], [170, 0]],
+    onSeam: [[180, 0], [170, 0], [170, 10], [180, 10], [180, 0]],
+    withinEpsilon: [[near, 0], [170, 0], [170, 10], [near, 10], [near, 0]],
+    westWithinEpsilon: [[-near, 0], [-near, 10], [-170, 10], [-170, 0], [-near, 0]],
+    repeated: [[0, 0], [10, 0], [10, 0], [10, 10], [0, 10], [0, 0]],
+    nearlyRepeated: [[0, 0], [10, 0], [10 + 5e-9, 5e-9], [10, 10], [0, 10], [0, 0]],
+    flat: [[0, 0], [5, 0], [10, 0], [0, 0]],
+    speck: [[0, 0], [1e-7, 0], [1e-7, 1e-7], [0, 0]],
+    pastPole: [[0, 80], [10, 80], [10, 91], [0, 91], [0, 80]],
+    negativeZero: [[-0, 0], [10, 0], [10, 10], [0, 10], [0, 0]],
+    longEdge: [[-90, 0], [90.000001, 0], [90.000001, 10], [-90, 10], [-90, 0]],
+    open: [[0, 0], [10, 0], [10, 10], [0, 10]],
+    point: [[5, 5]],
+    empty: [],
+  };
+  const wrap = lon => (lon < -180 || lon > 180 ? ((lon + 180) % 360 + 360) % 360 - 180 : lon);
+  // The world chart, and a chart whose seam runs through -80° (farSide is on it there).
+  for (const projection of [undefined, { lon0: 100, lat0: 45 }]) {
+    const geo = new geometry.WorldGeometry(ringTopology(rings), {}, { projection });
+    const rotate = projection ? ([lon, lat]) => [wrap(lon - projection.lon0), lat] : point => point;
+    const plane = projection ? ([lon, lat]) => [(lon * Math.PI / 180) * geo.xScale, -lat * Math.PI / 180]
+      : ([lon, lat]) => geometry.projPt(lon, lat);
+    for (const [id, ring] of Object.entries(rings)) {
+      // deepEqual is strict: Object.is on every number, so -0 and 0 differ.
+      assert.deepEqual(geo.displayProjected[id][0][0], geometry.splitAtAntimeridian(ring.map(rotate)).map(part => part.map(plane)),
+        `${id}${projection ? ' at 100°E' : ''}`);
+    }
+    assert.equal(geo.displayProjected.plain[0][0][0], geo.projected.plain[0][0], 'a plain ring is its own display part');
+  }
+});
+
+test('buildPaths writes each fitted coordinate as toFixed(1) does, and its label rings read that text back', () => {
+  const square = new geometry.WorldGeometry(ringTopology({ square: [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]] }));
+  const world = new geometry.WorldGeometry(atlas, CAPITALS);
+  // With s = 0 every point is (tx, ty): halves, small negatives ("-0.0"), -0, decimals just above a half whose product
+  // with 10 is one (0.45, 2.45), and values toFixed must format itself (from 1e5 up, and exponent text from 1e21).
+  const frames = [0, -0, 0.04, -0.04, 0.05, -0.05, 0.15, 0.25, -0.25, 0.45, -0.45, 2.45, -2.45, 99999.95, -99999.95,
+    123456.75, 1e15 + 0.25, 1e21, -1e21].map(t => [0, t, -t]);
+  frames.push([153.7, 480.05, 270.15], [2.5, -2e5, 3e5], [1e-3, 0.05, -0.05]);
+  for (const geo of [square, world]) {
+    for (const [s, tx, ty] of frames) {
+      const paths = geo.buildPaths(s, tx, ty);
+      for (const { id } of geo.countries) {
+        let d = '';
+        const rings = [];
+        for (const poly of geo.displayProjected[id]) for (const parts of poly) for (const part of parts) {
+          if (part.length < 3) continue;
+          const text = part.map(q => [(q[0] * s + tx).toFixed(1), (q[1] * s + ty).toFixed(1)]);
+          d += 'M' + text.map(point => point.join(',')).join('L') + 'Z';
+          rings.push(text.map(([x, y]) => [Number(x), Number(y)]));
+        }
+        assert.equal(paths[id].d, d, `${id} at ${[s, tx, ty]}`);
+        assert.deepEqual(paths[id].labelRings, rings, `${id} at ${[s, tx, ty]}`);
+      }
+    }
+  }
 });

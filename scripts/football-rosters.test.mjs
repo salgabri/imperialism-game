@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { NATIONS } from '../src/data/teams.js';
 import { loadEaPlayers, fmGameRating, parseCsv } from './lib/football-data.mjs';
-import { decodeFootballSet } from '../src/engine/footballSets.js';
+import { decodeFootballSet, fieldedNations } from '../src/engine/footballSets.js';
 import { TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
 
 const evidence = {
@@ -122,10 +122,14 @@ test('player rows expose database evidence and distinguish secondary roles from 
   } finally { fm.window.close(); }
 });
 
-test('all 173 football nations field a complete natural XI of source-backed players', () => {
-  assert.equal(Object.keys(NATIONS).length, 173);
+test('every nation football fields has a complete natural XI of source-backed players', () => {
+  assert.equal(Object.keys(NATIONS).length, 176);
+  // No source rates a Tongan, Samoan or Cook Islands player: those three field no team, and nobody else is left out.
+  assert.deepEqual(football.territory, { merged: {}, inactive: ['184', '776', '882'] });
+  for (const id of football.territory.inactive) assert.deepEqual(football.rosters[id], [40, 0, []], NATIONS[id][0]);
+  assert.equal(fieldedNations(football).length, 173);
   const ids = new Set();
-  for (const id of Object.keys(NATIONS)) {
+  for (const id of fieldedNations(football)) {
     const team = buildTeam(id, makeRng(1), football);
     assert.equal(team.squad.length, 11, team.name);
     assert.equal(team.real, 11, team.name);
@@ -152,7 +156,7 @@ test('every shipped rating and identity resolves to its exact committed database
   // EA's ratings site lists no generated squads, so the 29-February rule finds none in EA FC 27.
   assert.equal(ea.fictional, 0);
   assert.equal(ea.fictionalFilter.keptRealClubLeapDayBirths, 18);
-  const teams = [...Object.keys(NATIONS).map(id => buildTeam(id, makeRng(1), football)),
+  const teams = [...fieldedNations(football).map(id => buildTeam(id, makeRng(1), football)),
     ...football.clubs.map(club => buildClub(club, football))];
   for (const team of teams) {
     assert.equal(new Set(team.squad.map(player => player.id)).size, 11, team.name);

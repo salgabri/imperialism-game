@@ -1,5 +1,5 @@
 import { C } from '../theme.js';
-import { CLUBS } from '../data/clubs.american-football.js';
+import { defineSportData } from './sportData.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 import { selectLineup } from '../data/teams.js';
 
@@ -226,7 +226,7 @@ function playMinute(rng, index, count, offset, span) {
   return offset + clamp(Math.round(at), 1, span);
 }
 
-export const americanFootball = {
+export const americanFootball = defineSportData({
   id: 'american-football',
   // 4: an overtime side a touchdown down no longer settles for a field goal.
   simulationVersion: 4,
@@ -234,7 +234,8 @@ export const americanFootball = {
   blurb: 'Eleven on offence, eleven on defence, sixty minutes. Touchdowns and field goals — level games go to overtime.',
   // No source rates national teams: American football is played by NFL clubs, on their own map of the USA.
   rosters: {},
-  clubs: CLUBS,
+  // Read from the sport's players (sportData.js), once they have loaded.
+  clubs: undefined,
   clubsOnly: true,
   territory: { merged: {}, inactive: [] },
 
@@ -304,7 +305,7 @@ export const americanFootball = {
     ev.sort((x, y) => x.m - y.m);
     return { ga, gd, regA, regD, ev, tie, winner };
   },
-};
+}, { rosters: false });
 
 /**
  * Squad-screen strength profile: the offence and defence the match model weighs, and the kicker → { offence, defence,

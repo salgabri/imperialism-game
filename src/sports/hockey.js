@@ -1,7 +1,6 @@
 import { C } from '../theme.js';
-import { ROSTERS } from '../data/rosters.hockey.js';
-import { CLUBS } from '../data/clubs.hockey.js';
-import { HOME_NATIONS, selectLineup } from '../data/teams.js';
+import { defineSportData } from './sportData.js';
+import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, createScorerSampler, gauss, poisson } from '../engine/random.js';
 
 // Three twenty-minute periods, told in three-minute slices: the score decides how each slice is played. Level after
@@ -174,22 +173,26 @@ export function sampleResult(rng, prepared, drama = 6) {
 const SCORER_WEIGHTS = { C: 1, LW: 1, RW: 1, D: 0.3, G: 0.0001 };
 const SCORER_FLOOR = 74;
 
-export const hockey = {
+export const hockey = defineSportData({
   id: 'hockey',
   simulationVersion: 1,
   name: 'Ice hockey',
   blurb: 'Four lines, three pairs and a goalie, three periods. Fast and low-scoring — level games go to overtime, then a shoot-out.',
-  rosters: ROSTERS,
-  clubs: CLUBS,
+  // Read from the sport's players (sportData.js), once they have loaded.
+  rosters: undefined,
+  clubs: undefined,
   // Ice hockey's Great Britain plays as one: the home nations' shapes start in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
+  // That empire plays as Great Britain, under the Union Jack.
+  playsAs: { '826': GREAT_BRITAIN },
 
   squadSize: 19,
   formation: { C: 4, LW: 4, RW: 4, D: 6, G: 1 },
   positionPlan: ['C', 'C', 'C', 'C', 'LW', 'LW', 'LW', 'LW', 'RW', 'RW', 'RW', 'RW', 'D', 'D', 'D', 'D', 'D', 'D', 'G'],
   positionColors: { C: C.red, LW: C.green, RW: C.green, D: C.cyan, G: C.gold },
 
-  // Nations with no NHL players are hockey's minnows, all alike: the game is a few nations' sport.
+  // A nation whose NHL players hold less than half the lineup fields no team (fieldedNations). Built anyway, one with
+  // none would be all generated at this strength.
   fallbackStrength: () => BASELINE,
   requiredPositions: ['G'],
 
@@ -241,7 +244,7 @@ export const hockey = {
     ev.sort((x, y) => x.m - y.m);
     return { ga, gd, regA, regD, ev, tie, winner };
   },
-};
+});
 
 /**
  * Squad-screen strength profile: the attack, the defence and the goalie the match model weighs → { attack, defence,

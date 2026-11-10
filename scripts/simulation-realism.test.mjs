@@ -98,8 +98,32 @@ test('MLB: runs, close games, extra innings and the standings look like an MLB s
   within(mlb.oneRun, real.oneRun, 'one-run games', 0.01);
 });
 
+test('NRL: points, tries, goals, margins, golden point, the standings and who scores the tries', () => {
+  const nrl = report.nrl, real = REAL.nrl;
+  within(nrl.pointsPerTeam, real.pointsPerTeam, 'points a team');
+  within(nrl.teamPointsSd, real.teamPointsSd, 'team points SD');
+  within(nrl.triesPerTeam, real.triesPerTeam, 'tries a team');
+  within(nrl.conversionRate, real.conversionRate, 'conversions made');
+  within(nrl.penaltyGoalsPerTeam, real.penaltyGoalsPerTeam, 'penalty goals a team');
+  within(nrl.fieldGoalsPerGame, real.fieldGoalsPerGame, 'field goals a game');
+  within(nrl.goldenPoint, real.goldenPoint, 'golden point');
+  within(nrl.marginMean, real.marginMean, 'mean margin');
+  within(nrl.withinSix, real.withinSix, 'won by six or fewer');
+  within(nrl.byThirteenPlus, real.byThirteenPlus, 'won by 13 or more');
+  within(nrl.byTwentyFivePlus, real.byTwentyFivePlus, 'won by 25 or more');
+  within(nrl.nilRate, real.nilRate, 'held scoreless');
+  within(nrl.fortyPlusRate, real.fortyPlusRate, '40 points or more');
+  within(nrl.firstHalfShare, real.firstHalfShare, 'first-half points');
+  within(nrl.winPctSd, real.winPctSd, 'spread of the standings');
+  within(nrl.bestWins, real.bestWins, 'best record');
+  within(nrl.worstWins, real.worstWins, 'worst record');
+  // Twelve seasons hold about 9,000 tries: a share can sit half a point outside a narrow real range by chance.
+  for (const position of Object.keys(real.tryShares)) within(nrl.tryShares[position] || 0, real.tryShares[position], `tries by ${position}`, 0.006);
+});
+
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
-  for (const [label, share] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins]]) {
+  for (const [label, share] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins],
+    ['Davis Cup', report.davisCup.homeWins], ['Billie Jean King Cup', report.billieJeanKingCup.homeWins], ['NRL', report.nrl.homeWins]]) {
     assert.ok(Math.abs(share - 0.5) < 0.015, `${label} neutral: the defender won ${share}`);
   }
   for (const league of report.football) {
@@ -115,4 +139,7 @@ test('home sides: half the decided games at a neutral venue, their league\'s sha
   within(home.nfl.homeWins, REAL.nfl.homeWins, 'NFL home wins');
   within(home.mlb.homeWins, REAL.mlb.homeWins, 'MLB home wins');
   within(home.nhl.homeWins, REAL.nhl.homeWins, 'NHL home wins');
+  within(home.davisCup.homeWins, REAL.davisCup.homeWins, 'Davis Cup host wins');
+  within(home.billieJeanKingCup.homeWins, REAL.billieJeanKingCup.homeWins, 'Billie Jean King Cup host wins');
+  within(home.nrl.homeWins, REAL.nrl.homeWins, 'NRL home wins');
 });

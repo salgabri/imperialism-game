@@ -26,6 +26,7 @@ const CREST_PROFILE = Object.freeze({ id: 'club-crest', sourceWidth: 640, source
 /** A team's crest URL when it is a club with one. */
 const crestOf = team => (team?.kind === 'club' ? clubLogoUrl(team.id) : null);
 const NO_IDENTITY = Object.freeze({ meId: null, meFill: false, opponentId: null });
+const NO_CLAIMS = Object.freeze({});
 // mapFlags' empty value: one object (never written to), so the memoised country rows keep their identity.
 const NO_FLAGS = Object.freeze({ flagParts: new Map(), flagPatterns: NONE });
 const isPlaying = st => st?.phase === 'playing' || st?.phase === 'victory';
@@ -51,20 +52,38 @@ export function homeClubs(domestic) {
 /**
  * The campaign as the map draws it. While the manager signs a player (`st.choice`) the map shows the projected
  * post-conquest board (DEC D15, D§2.3 / D§10): every loser cid belongs to the winner and the loser is no longer drawn,
- * so fills, flags, borders, capitals, labels and the tooltip agree with the hatch. The projection comes from
- * `this.conquestPreview()` (WP-CONQ) and is memoised on state identities, so `ownership` keeps one identity across
- * renders (label engine, border mesh and flag-region caches). → { state, own, aliveIds, taken|null }
+ * so fills, flags, borders, capitals, labels and the tooltip agree with the hatch, and so does the claimed land
+ * (the claims the conquest will settle). The projection comes from `this.conquestPreview()` (WP-CONQ) and is memoised
+ * on state identities, so `ownership` keeps one identity across renders (label engine, border mesh and flag-region
+ * caches). → { state, own, aliveIds, taken|null, claims }
  */
 function mapSnapshot(app) {
   const st = app.state;
-  const plain = { state: st, own: st.own || {}, aliveIds: st.aliveIds || NONE, taken: null };
+  const plain = { state: st, own: st.own || {}, aliveIds: st.aliveIds || NONE, taken: null, claims: st.claims || NO_CLAIMS };
   if (!st.choice || !isPlaying(st)) return plain;
-  const projected = memo(app.vmCache, 'map:projection', [st.choice, st.match, st.own, st.teams, st.aliveIds], () => {
+  const projected = memo(app.vmCache, 'map:projection', [st.choice, st.match, st.own, st.teams, st.aliveIds, st.claims], () => {
     const preview = app.conquestPreview();
     if (!preview?.own) return null;
-    return { own: preview.own, aliveIds: (st.aliveIds || NONE).filter(id => id !== preview.loserId), taken: preview.taken || NONE };
+    return { own: preview.own, aliveIds: (st.aliveIds || NONE).filter(id => id !== preview.loserId), taken: preview.taken || NONE,
+      claims: app.conquestClaims(st, preview.own, preview.winnerId, preview.loserId) };
   });
-  return projected ? { state: { ...st, own: projected.own, aliveIds: projected.aliveIds }, ...projected } : plain;
+  return projected ? { state: { ...st, own: projected.own, aliveIds: projected.aliveIds, claims: projected.claims }, ...projected } : plain;
+}
+
+/**
+ * Ownership as the map paints it: the territory, plus the claimed land that is one of the map's own shapes (a world
+ * map's nations without a team) in its holder's name, so its fill, flag, borders, outline and label are the holder's
+ * as if it were territory. A country map's claimed land lies in the backdrop (mapClaims), so there it is the territory
+ * alone, the same object. Clicks, tab stops, targets and the tooltip keep reading the real holdings.
+ */
+function paintedOwnership(app, snap) {
+  const paths = app.geo?.paths;
+  if (!paths || !Object.keys(snap.claims).some(id => paths[id])) return snap.own;
+  return memo(app.vmCache, 'map:painted-ownership', [snap.own, snap.claims, paths], () => {
+    const painted = { ...snap.own };
+    for (const [id, holder] of Object.entries(snap.claims)) if (paths[id] && painted[id] == null) painted[id] = holder;
+    return painted;
+  });
 }
 
 /**
@@ -104,48 +123,36 @@ export function handleMapMove(e) {
     tip.style.left = Math.max(8, Math.min(e.clientX - b.left + 14, b.width - width - 8)) + 'px';
     tip.style.top = Math.max(8, Math.min(e.clientY - b.top + 12, b.height - height - 8)) + 'px';
   }
-  // Only a real change sets state, so moving over the sea with no hover renders nothing.
-  if (st.hoverCid != null && !e?.target?.closest?.('path[data-country]')) this.setState({ hoverCid: null });
+  // Only a real change sets state, so moving over the sea with no hover renders nothing. Claimed land has a card too.
+  if (st.hoverCid != null && !e?.target?.closest?.('path[data-country]') && !e?.target?.closest?.('path[data-claim]')) {
+    this.setState({ hoverCid: null });
+  }
   if (st.pendingTarget) {
     const owner = e?.target?.closest?.('[data-reach="in"]')?.dataset?.owner || null;
     if (owner !== (st.targetHoverId ?? null)) this.hoverTarget(owner);
   }
 }
 
-/** One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest. */
-export function mapFlags(playing) {
-  const { mapMode, teams } = this.state;
-  if (mapMode !== 'flags') return NO_FLAGS;
-  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return NO_FLAGS;
-  // The region index of this fit, built on its first Flags view (fitMap keeps only its source).
-  if (!this.flagComponents && this.flagRegionSource) {
-    this.flagComponents = createFlagRegionIndex(this.flagRegionSource.geometry, { maxGap: this.flagRegionSource.maxGap });
-  }
-  if (!this.flagComponents) return NO_FLAGS;
-  // While signing, the projected board: the taken land already flies the winner's banner (DEC D15).
-  const components = this.flagComponents.components(playing ? mapSnapshot(this).own : this.setupFlagOwnership);
-  const cached = this.flagLayoutCache;
-  if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
-  // A part's path depends only on its rings, and parts are the index's fixed objects: reuse the last layout's.
-  const previousPaths = cached?.paths, paths = new Map();
-
-  const flagParts = new Map();
-  const flagPatterns = [];
+/**
+ * Each flag region's banner (`components` from createFlagRegionIndex) and the parts every territory shows it through.
+ * `markOf(ownerId)` says what an owner flies: `{ crestUrl }` for a club with a crest, else `{ nationId }` for a flag, and
+ * the `color` behind it; an owner with neither flies nothing. `idPrefix` keeps two maps' banners apart in one document.
+ * A part's path depends only on its rings, and parts are the index's fixed objects: `previousPaths` (the last layout's)
+ * hands them back. → { result: { flagParts: Map(territory id → [{ id, d }]), flagPatterns }, paths }
+ */
+function layoutBanners(components, markOf, { previousPaths = null, idPrefix = '' } = {}) {
+  const flagParts = new Map(), flagPatterns = [], paths = new Map();
   for (const component of components) {
-    const owner = playing ? teams[component.ownerId] : null;
-    const nationId = playing ? owner?.flagId : NATIONS[component.ownerId] ? component.ownerId : DEPENDENCIES[component.ownerId]?.of;
-    const crestUrl = crestOf(owner);
+    const { crestUrl = null, nationId = null, color = V4.flagBg } = markOf(component.ownerId) || {};
     const url = crestUrl || flagUrl(nationId);
     if (!url) continue;
     // Owner + the lowest stable piece id is short and unique, including when
     // a country's mainland and overseas polygons need different flag tiles.
-    const id = component.key.split('|').slice(0, 2).join('-').replace(/[^a-zA-Z0-9_-]/g, '-');
+    const id = idPrefix + component.key.split('|').slice(0, 2).join('-').replace(/[^a-zA-Z0-9_-]/g, '-');
     const b = component.bbox;
     const symbolProfile = crestUrl ? CREST_PROFILE : FLAG_SYMBOLS[FLAG_CODES[nationId]];
     const symbolLayout = symbolProfile ? layoutFlagSymbol(component, symbolProfile) : null;
-    // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
-    flagPatterns.push({ id, ownerId: component.ownerId, url, color: owner?.col || V4.flagBg,
-      symbolProfile, symbolLayout, crestUrl,
+    flagPatterns.push({ id, ownerId: component.ownerId, url, color, symbolProfile, symbolLayout, crestUrl,
       fieldUrl: symbolProfile?.fieldFile ? `${import.meta.env.BASE_URL}${symbolProfile.fieldFile}` : null,
       symbolUrl: symbolProfile?.symbolFile ? `${import.meta.env.BASE_URL}${symbolProfile.symbolFile}` : null,
       bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
@@ -156,9 +163,69 @@ export function mapFlags(playing) {
       flagParts.get(part.countryId).push({ id, d });
     }
   }
-  const result = { flagParts, flagPatterns };
+  return { result: { flagParts, flagPatterns }, paths };
+}
+
+/** The flag region index of this fit, built on its first Flags view (fitMap keeps only its source). */
+function flagIndex(app) {
+  if (!app.flagComponents && app.flagRegionSource) {
+    app.flagComponents = createFlagRegionIndex(app.flagRegionSource.geometry, { maxGap: app.flagRegionSource.maxGap });
+  }
+  return app.flagComponents;
+}
+
+/** One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest. */
+export function mapFlags(playing) {
+  const { mapMode, teams } = this.state;
+  if (mapMode !== 'flags') return NO_FLAGS;
+  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return NO_FLAGS;
+  if (!flagIndex(this)) return NO_FLAGS;
+  // While signing, the projected board: the taken land already flies the winner's banner (DEC D15). Claimed nations fly
+  // their holder's banner too (paintedOwnership).
+  const components = this.flagComponents.components(playing ? paintedOwnership(this, mapSnapshot(this)) : this.setupFlagOwnership);
+  const cached = this.flagLayoutCache;
+  if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
+  const { result, paths } = layoutBanners(components, ownerId => {
+    const owner = playing ? teams[ownerId] : null;
+    // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
+    return { crestUrl: crestOf(owner), color: owner?.col || V4.flagBg,
+      nationId: playing ? owner?.flagId : NATIONS[ownerId] ? ownerId : DEPENDENCIES[ownerId]?.of };
+  }, { previousPaths: cached?.paths });
   this.flagLayoutCache = { components, teams, playing, result, paths };
   return result;
+}
+
+/** Banner ids of the setup map card: apart from the campaign map's, which stays mounted behind the wizard. */
+const SETUP_FLAG_PREFIX = 'setup-';
+/**
+ * Step 1's map card in Flags mode: every starting team's flag (a nation) or crest (a club) across the land it holds at
+ * kick-off, one banner per region exactly as the campaign's Flags mode draws it (mapFlags), on the board the card
+ * shows: a world theatre's (`setupMapPreview`) or the chosen country's once it is on screen (`domesticStatus`).
+ * `fills` gives a club's land its colour, the ground behind its crest or, with no crest, all it shows. Render-safe;
+ * memoised per board. → { flagParts, flagPatterns, fills: Map(territory id → colour) } | null
+ */
+export function setupMapFlags(setup = this.state.setup) {
+  if (!this.geo || !this.flagRegionSource) return null;
+  if (!this.setupMapPreview(setup) && !this.domesticStatus(setup).preview) return null;
+  this.setupTeams(setup);
+  const { opening, marks } = this.setupTeamsCache;
+  const index = flagIndex(this);
+  const cached = this.setupFlagCache;
+  if (cached?.index === index && cached.opening === opening && cached.marks === marks) return cached.result;
+  const { result, paths } = layoutBanners(index.components(opening), ownerId => {
+    const team = marks[ownerId];
+    if (!team) return null;
+    return team.kind === 'club' ? { crestUrl: clubLogoUrl(ownerId), color: team.col || V4.flagBg }
+      : { nationId: team.flagId, color: team.col || V4.flagBg };
+  }, { previousPaths: cached?.index === index ? cached.paths : null, idPrefix: SETUP_FLAG_PREFIX });
+  const fills = new Map();
+  for (const [territory, ownerId] of Object.entries(opening)) {
+    const team = marks[ownerId];
+    if (team?.kind === 'club' && team.col) fills.set(territory, team.col);
+  }
+  const value = { ...result, fills };
+  this.setupFlagCache = { index, opening, marks, result: value, paths };
+  return value;
 }
 
 /**
@@ -189,6 +256,8 @@ function countryHandlers(app, cid) {
  * then you-fill (managed only, A-7) and opponent-fill once the fixture is known. Borders come from WorldMap's mesh,
  * so the shapes carry no stroke. Setup shows the nations' pastels (or their flags) on neutral land; a previewed
  * country map paints each section in the colour its starting club takes at kick-off (`countryFill` `preview`).
+ * A claimed nation (app/claimMethods.js) is painted as its holder's land (`claimOwnerId`, paintedOwnership) while
+ * `ownerId` stays its real holder, nobody: it takes no clicks, tab stop or target.
  */
 export function mapCountries() {
   const st = this.state;
@@ -196,6 +265,7 @@ export function mapCountries() {
   const { teams = {}, selected, flash = {}, phase, mapMode } = st;
   const playing = isPlaying(st);
   const snap = mapSnapshot(this);
+  const painted = playing ? paintedOwnership(this, snap) : snap.own;
   const ctx = playing ? this.viewContext(snap.state) : null;
   const identity = playing ? mapVM.mapIdentity(snap.state, ctx) : NO_IDENTITY;
   const strength = playing && mapMode === 'strength' ? mapVM.strengthFills(snap.state, ctx) : null;
@@ -208,19 +278,21 @@ export function mapCountries() {
   // The ticker, the compass and hover re-render App many times per match without changing any of them, and the same
   // rows let WorldMap keep its country elements.
   const countries = memo(this.vmCache, 'map:countries', [this.geo.countries, this.geo.paths, this.displayGeo?.paths,
-    domestic, preview, phase, snap.own, teams, selected, flash, mapMode, identity.meId, identity.meFill, identity.opponentId,
-    strength, fronts, flagParts], () => {
+    domestic, preview, phase, snap.own, painted, teams, selected, flash, mapMode, identity.meId, identity.meFill,
+    identity.opponentId, strength, fronts, flagParts], () => {
     const rows = [];
     for (const c of this.geo.countries) {
       const p = this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
       if (!p) continue;
       const ownerId = playing ? snap.own[c.id] : null;
       const owner = ownerId ? teams[ownerId] : null;
+      const claimOwnerId = playing && !ownerId && teams[painted[c.id]] ? painted[c.id] : null;
       const isSelected = owner && selected === ownerId;
       const parts = flagParts.get(c.id);
       rows.push({
         id: c.id,
         ownerId,
+        ...(claimOwnerId ? { claimOwnerId } : {}),
         ownerName: owner?.name,
         selected: !!isSelected,
         name: domestic?.sectionNames[c.id] || NATIONS[c.id]?.[0] || DEPENDENCIES[c.id]?.name || c.name || c.id,
@@ -228,8 +300,9 @@ export function mapCountries() {
         // The mainland's bounds: keyboard focus reveals these, never a date-line-split country's map-wide box.
         bbox: p.bbox,
         flagParts: parts,
-        fill: mapVM.countryFill({ countryId: c.id, ownerId, owner, mapMode, hasFlagParts: !!parts?.length,
-          setup: phase === 'setup', ...identity, strength, fronts, preview: preview?.[c.id] || null }),
+        fill: mapVM.countryFill({ countryId: c.id, ownerId: ownerId || claimOwnerId, owner: owner || teams[claimOwnerId] || null,
+          mapMode, hasFlagParts: !!parts?.length, setup: phase === 'setup', ...identity, strength, fronts,
+          preview: preview?.[c.id] || null }),
         stroke: 'none',
         strokeWidth: 0,
         cursor: owner ? 'pointer' : 'default',
@@ -240,6 +313,34 @@ export function mapCountries() {
     return rows;
   });
   return { countries, flagPatterns };
+}
+
+/**
+ * Claimed land that lies in a country map's backdrop (app/claimMethods.js; a world map paints its claimed nations as
+ * country shapes instead, see mapCountries): `[{ id, ownerId, d, fill, onEnter, onLeave }]`, one row per claimed shape,
+ * filled exactly as its holder's territory is in this map mode (identity fills included), so nothing tells them apart
+ * but the tooltip. Projected while signing, like every other fill; empty outside a campaign.
+ */
+export function mapClaims(playing) {
+  const st = this.state;
+  if (!playing || !isPlaying(st) || !this.geo) return NONE;
+  const snap = mapSnapshot(this);
+  if (!Object.keys(snap.claims).length) return NONE;
+  const land = this.claimLand(snap.state);
+  if (!land) return NONE;
+  const { teams = {}, mapMode } = st;
+  const ctx = this.viewContext(snap.state);
+  const identity = mapVM.mapIdentity(snap.state, ctx);
+  const strength = mapMode === 'strength' ? mapVM.strengthFills(snap.state, ctx) : null;
+  const fronts = mapMode === 'fronts' ? mapVM.frontsFills(snap.state, ctx) : null;
+  return memo(this.vmCache, 'map:claims', [snap.claims, land, teams, mapMode, identity.meId, identity.meFill, identity.opponentId,
+    strength, fronts, this.geo.paths], () => Object.keys(snap.claims).sort().flatMap(id => {
+    const ownerId = snap.claims[id], owner = teams[ownerId], d = land.d.get(id);
+    if (!owner || !d || this.geo.paths[id]) return [];
+    const { onEnter, onLeave } = countryHandlers(this, id);
+    return [{ id, ownerId, d, onEnter, onLeave,
+      fill: mapVM.countryFill({ countryId: id, ownerId, owner, mapMode, ...identity, strength, fronts }) }];
+  }));
 }
 
 /** One label per alive empire (the projected survivors while signing). Uppercase text is the smoke contract. */
@@ -288,11 +389,13 @@ export function tooltip() {
   const st = this.state;
   if (!st.hoverCid || !MAP_VIEWS.has(this.currentView())) return { visible: false, name: '', held: null, result: null, link: null };
   const snap = mapSnapshot(this);
-  const ctx = isPlaying(st) ? this.viewContext(snap.state) : {};
+  const playing = isPlaying(st);
+  // Claimed land is named by its map (a country map's empty states, the atlas's countries beneath a Europe map).
+  const ctx = playing ? { ...this.viewContext(snap.state), claimNames: this.claimLand(snap.state)?.names || null } : {};
   const domestic = this.domesticMap();
   if (!domestic) return mapVM.tooltipModel(snap.state, ctx, st.hoverCid);
   return mapVM.tooltipModel(snap.state, { ...ctx, sectionNames: domestic.sectionNames,
-    homeClubs: isPlaying(st) ? null : homeClubs(domestic) }, st.hoverCid);
+    homeClubs: playing ? null : homeClubs(domestic) }, st.hoverCid);
 }
 
 // ---------- v4 WorldMap props (PLAN §3.3 delegates; render-called, pure) ----------
@@ -317,9 +420,13 @@ export function mapOpponentId() {
   return mapVM.mapOpponentId(st, this.viewContext());
 }
 
-/** Ownership the map draws: the projected post-conquest board while signing (DEC D15), else `st.own` (same identity). */
+/**
+ * Ownership the map draws: the projected post-conquest board while signing (DEC D15), else `st.own` (same identity),
+ * with claimed nations in their holder's name so borders, outlines and labels treat them as its land (paintedOwnership).
+ */
 export function mapOwnership() {
-  return mapSnapshot(this).own;
+  const st = this.state;
+  return isPlaying(st) ? paintedOwnership(this, mapSnapshot(this)) : mapSnapshot(this).own;
 }
 
 /**

@@ -47,15 +47,16 @@ const data = file => path.join(root, 'scripts/data', file);
 
 /**
  * Every page of one gender's ratings (0 men's, 1 women's), each from `cacheDir` unless `refresh` → { items, pages, date }.
+ * `headers` are the request's: without the referrer (`{}`) the CDN serves the previous edition.
  * One pull is one snapshot: a set that changes mid-pull, or pages fetched on two days, must be fetched again.
  */
-export async function pullPages(cacheDir, gender, refresh) {
+export async function pullPages(cacheDir, gender, refresh, { headers = HEADERS } = {}) {
   await mkdir(cacheDir, { recursive: true });
-  const first = await page(cacheDir, 0, refresh, gender);
+  const first = await page(cacheDir, 0, refresh, gender, headers);
   const pages = Math.ceil(first.totalItems / LIMIT);
   const items = [...first.items], dates = new Set([first.fetchedAt.slice(0, 10)]);
   for (let i = 1; i < pages; i++) {
-    const body = await page(cacheDir, i * LIMIT, refresh, gender);
+    const body = await page(cacheDir, i * LIMIT, refresh, gender, headers);
     // A different total means EA changed the set mid-pull: refetch it whole.
     if (body.totalItems !== first.totalItems) throw new Error(`The edition changed mid-pull: ${body.totalItems} players, not ${first.totalItems}; rerun with --refresh`);
     dates.add(body.fetchedAt.slice(0, 10));
@@ -76,9 +77,9 @@ export const slugify = name => name.normalize('NFD').replace(/[̀-ͯ]/g, '')
   .replace(/[ØøĐđÐðŁłıßÆæŒœÞþ]/g, c => FOLD[c]).toLowerCase()
   .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-/** 'M/D/YYYY h:mm' (the time is always 0:00) → 'YYYY-MM-DD'. */
+/** 'M/D/YYYY h:mm' (the time is always 0:00), or EA FC 26's 'M/D/YYYY h:mm:ss AM' → 'YYYY-MM-DD'. */
 export function isoBirthdate(value) {
-  const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) \d{1,2}:\d{2}$/.exec(value || '');
+  const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) \d{1,2}:\d{2}(?::\d{2} [AP]M)?$/.exec(value || '');
   if (!match) throw new Error(`Unexpected EA birthdate "${value}"`);
   const [, month, day, year] = match.map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
@@ -235,13 +236,13 @@ const csvField = value => `"${String(value).replaceAll('"', '""')}"`;
 export const toCsv = rows => rows.map(row => row.map(csvField).join(',')).join('\n') + '\n';
 
 /** One page of the API, from the cache unless `refresh`. */
-async function page(cacheDir, offset, refresh, gender = 0) {
+async function page(cacheDir, offset, refresh, gender = 0, headers = HEADERS) {
   const file = path.join(cacheDir, `page-${String(offset / LIMIT).padStart(4, '0')}.json`);
   if (!refresh && existsSync(file)) return JSON.parse(await readFile(file, 'utf8'));
   const url = `${ENDPOINT}?locale=en&limit=${LIMIT}&offset=${offset}&gender=${gender}`;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(30000) });
+      const response = await fetch(url, { headers, signal: AbortSignal.timeout(30000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const body = await response.json();
       if (!Array.isArray(body.items) || !Number.isInteger(body.totalItems)) throw new Error('Unexpected response');

@@ -1,33 +1,35 @@
 import React from 'react';
 import { CONFIG } from './config.js';
 import { C, V4 } from './theme.js';
-import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, isEuropeanScope, makeRng, hashStr, nationScopes, selectLineup, squadAverage, teamEff } from './data/teams.js';
-import { CLUB_SCOPES, worldClubTheatreName } from './data/scopes.js';
+import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, isEuropeanScope, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
+import { CLUB_SCOPES, nationTheatre, worldClubTheatreName } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { teamMarkUrls } from './data/teamMarks.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
+import { requestMaps, takeMapRequests } from './mapRequests.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
-import { domesticEntry, domesticLabel, isCountryScope } from './data/domesticScope.js';
+import { domesticEntry, domesticLabel, hasTheatreMaps, isCountryScope } from './data/domesticScope.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
-  loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setSportOf, sportOf } from './engine/footballSets.js';
+  loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setHasNations, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport, matchSport } from './sports/index.js';
+import { loadSportData, sportDataLoaded } from './sports/sportData.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
-import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
+import { clearSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
-  fitDomesticCampaign, setActiveCampaign, CHECKPOINT_KEYS } from './engine/storage.js';
+  fitDomesticCampaign, setActiveCampaign, campaignSport, sportOfText, CHECKPOINT_KEYS } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
 import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiveBasketballTeams } from './engine/managerStrategy.js';
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
-import { cacheForOffline } from './serviceWorker.js';
+import { applyUpdate, cacheForOffline, settleFirstBoot } from './serviceWorker.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { skipAheadModel } from './viewModels/campaign.js';
 import { countryMapPreview, suggestedTeamId, theatreMapPreview } from './screens/setup/setupModel.js';
-import { challengeUrl, fieldedTeam, readChallenge } from './screens/setup/challenge.js';
+import { challengeSport, challengeUrl, fieldedTeam, readChallenge } from './screens/setup/challenge.js';
 import { buildShareCard, shareLine } from './viewModels/shareCard.js';
 import { canDrawShareImage, deliverShareImage, drawShareCard } from './engine/shareImage.js';
 import { politicalFill } from './data/empireColours.js';
@@ -41,6 +43,7 @@ import * as squadM from './app/squadMethods.jsx';
 import * as conqM from './app/conquestMethods.jsx';
 import * as turnM from './app/turnMethods.jsx';
 import * as ledgerM from './app/ledgerMethods.jsx';
+import * as claimM from './app/claimMethods.js';
 import TacticalChoice from './components/TacticalChoice.jsx';
 import ManagerElimination from './components/ManagerElimination.jsx';
 import CampaignStorageDialog from './components/CampaignStorageDialog.jsx';
@@ -66,13 +69,20 @@ import MatchScreen from './screens/match/MatchScreen.jsx';
 import LedgerScreen from './screens/ledger/LedgerScreen.jsx';
 import ChronicleScreen from './screens/ledger/ChronicleScreen.jsx';
 
-const MAP_URL = `${import.meta.env.BASE_URL}world-110m.v1.json`;
-const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
 // Neighbouring land is drawn this far (SVG units) beyond the 960×540 frame: a
 // fully zoomed-out camera shows up to ~420 units beside it on ultra-wide screens
 // and ~770 above and below on a phone.
 const BACKDROP_MARGIN = { x: 480, y: 800 };
 const SETUP_LOAD_DELAY_MS = 120;
+
+/** No sport's players loading (state.sportLoad, UI-only). */
+const IDLE_SPORT_LOAD = Object.freeze({ id: null, state: 'idle', message: null });
+
+/**
+ * Reload the page, into a new version when one waits (as the crash screen does): a sport's players that will not load
+ * after a deploy are under the new version's file names. Leaving the page writes an open campaign's checkpoint.
+ */
+const reloadPage = () => { if (!applyUpdate()) window.location.reload(); };
 
 /** The page's fetch; tests and Node have only the global one. */
 const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : globalThis.fetch);
@@ -83,13 +93,23 @@ const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}
 /** A club map's row as one of a basketball season's clubs: the season's name, code, strength and five on the map's land. */
 const seasonClub = (row, club) => ({ ...row, name: club.name, code: club.code, league: club.league, str: club.str, squad: club.squad });
 
+// Sport object → Map(nation id → its fixed-draw strength), for eliteNations. A data set's sport is a new object per
+// decoded set, so its ranks go with the set.
+const eliteRanks = new WeakMap();
+
 /**
  * The Elite 32: the strongest nations, the same field whatever the seed. Generated players (a baseball nation's empty
  * slots, a short basketball five) come from the campaign's draw, so ties are ranked on each nation built with its own
  * fixed draw: without that, a new seed could leave out the team a manager plays again. Football builds draw nothing.
+ * That rank depends only on the sport and the nation, so it is kept per sport object (eliteRanks): each Elite pick
+ * and launch after the first sorts without building the field again.
  */
 function eliteNations(all, sport) {
-  const rank = new Map(all.map(team => [team.id, teamEff(buildTeam(team.id, makeRng(hashStr(`elite ${team.id}`)), sport))]));
+  let rank = eliteRanks.get(sport);
+  if (!rank) eliteRanks.set(sport, rank = new Map());
+  for (const team of all) {
+    if (!rank.has(team.id)) rank.set(team.id, teamEff(buildTeam(team.id, makeRng(hashStr(`elite ${team.id}`)), sport)));
+  }
   return all.slice().sort((a, b) => b.str - a.str || rank.get(b.id) - rank.get(a.id)).slice(0, 32);
 }
 
@@ -99,6 +119,11 @@ function eliteNations(all, sport) {
  */
 const MATCH_PROGRESS = new Set(['shown', 'ga', 'gd', 'tieShown']);
 const SPIN_PROGRESS = new Set(['stage', 'ang']);
+/**
+ * A fast-forwarded (express) match has no ticker and no whistle: it shows its final score 18 ms (at 1×) after its
+ * kickoff and its result 18 ms after that. Its reveal, `status` included, is presentation written with the result.
+ */
+const EXPRESS_PROGRESS = new Set([...MATCH_PROGRESS, 'status']);
 
 /**
  * How `b` differs from `a`: null when they are the same value or objects with the same keys holding identical
@@ -132,12 +157,16 @@ export default class App extends React.Component {
   state = {
     phase: 'loading',
     err: null,
+    // Boot failed for a sport's players (a challenge link's): the loading screen also offers Reload.
+    errReload: false,
     // A new campaign manages a team (the suggested one until the player picks), so a first campaign has decisions to
     // make. DEFAULT_SETUP keeps Spectator: it also fills settings that saves from before the role existed lack.
     setup: { ...DEFAULT_SETUP, role: 'manager' },
     settings: { ...DEFAULT_SETUP },
     teams: {},
     own: {},
+    // Empty land coloured by a team without being its territory (app/claimMethods.js): land id -> team id.
+    claims: {},
     aliveIds: [],
     fallen: [],
     stats: {},
@@ -173,6 +202,8 @@ export default class App extends React.Component {
     turnQueue: [], turnIndex: 0, pendingTarget: null,
     // UI-only state (never saved, PLAN §3.1).
     view: 'map', viewSource: 'user', squadReturn: null, tacticalPreview: false, phoneSheet: 'collapsed', setupStep: 1,
+    // Step 1's map card: Political or Flags (crests for clubs), its own choice; the campaign map keeps `mapMode`.
+    setupMapMode: 'political',
     // Setup suggests a team for a manager with none picked (off for "Another team"); skipAhead is "Skip to my next
     // match" while it runs: { speed, autoplay, from } to hand back, from = the match count it started at.
     setupSuggest: true, skipAhead: null,
@@ -180,6 +211,9 @@ export default class App extends React.Component {
     // The setup's chosen country map, a restore waiting for its country map ({ message, status }) and a country
     // launch being prepared (UI-only: campaignSnapshot whitelists its keys, so none of these reach a save).
     domesticLoad: { id: null, state: 'idle', message: null },
+    // A sport the setup picked whose players are still loading, or failed to (src/sports/sportData.js): the setup keeps
+    // the sport it had until they are here, and the latest pick wins. UI-only, like the country map's.
+    sportLoad: IDLE_SPORT_LOAD,
     restoring: null, launching: false,
     // The football seasons on offer (the built-in earlier ones, then any CM 01/02 sets built on this computer) and the
     // setup's chosen one loading (UI-only, like the country map's), and Retry this setup loading a season campaign's
@@ -198,6 +232,8 @@ export default class App extends React.Component {
   // Async map loads compare these so a result the player has moved on from is dropped.
   setupMapToken = 0;
   setupSetToken = 0;
+  // Likewise a sport picked before its players have loaded: only the latest pick applies.
+  sportToken = 0;
   flowToken = 0;
   openingSeed = Date.now() >>> 0;
   away = false;
@@ -247,8 +283,14 @@ export default class App extends React.Component {
   speedRestore = null;
   /** `?playtest` in the address: the results also show the playtest timing (docs/design/playtest.md). */
   playtest = false;
+  /** The page address's query, read for a challenge once boot has the players of the sport it names. */
+  search = '';
   /** The challenge in the address (screens/setup/challenge.js), applied to setup once the map is ready. */
   link = null;
+  /** The sport whose players a restore waits for before it reads its campaign whole (withCampaignSport). */
+  pendingSport = null;
+  /** Bumped by each import: only the latest opens its dialog (importProgress). */
+  importToken = 0;
   /** This page's own address without its query: what a challenge link starts with. */
   pageBase = '';
   /** A challenge link's managed team, until its theatre's teams are known (settleChallengeTeam). */
@@ -259,9 +301,9 @@ export default class App extends React.Component {
   componentDidMount() {
     try { this.playtest = new URLSearchParams(window.location.search).has('playtest'); } catch { this.playtest = false; }
     try {
-      this.link = readChallenge(window.location.search);
+      this.search = window.location.search;
       this.pageBase = `${window.location.origin}${window.location.pathname}`;
-    } catch { this.link = null; }
+    } catch { this.search = ''; }
     window.addEventListener('storage', this.handleStorage);
     window.addEventListener('focus', this.handleFocus);
     window.addEventListener('blur', this.handleBlur);
@@ -276,6 +318,7 @@ export default class App extends React.Component {
     clearTimeout(this.confirmTimer);
     clearTimeout(this.setupLoadTimer);
     clearTimeout(this.setupSetTimer);
+    clearTimeout(this.sportLoadTimer);
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', this.handleStorage);
       window.removeEventListener('focus', this.handleFocus);
@@ -287,11 +330,25 @@ export default class App extends React.Component {
   }
 
   componentDidUpdate(_props, previous) {
+    // The random state this commit's campaign state was drawn with: nextAction starts no turn while the generator has
+    // moved past it (a turn drawn in a timer task that React has not committed yet), and persist writes it. A commit
+    // that holds every draw so far (markDraw) has it in the generator. A click's sync update that React commits before
+    // such a turn, on the settled match, holds an older mark and keeps the random state of the last commit that did.
+    if (this.state.drawMark === this.drawMark) this.committedRng = this.rng?.getState?.();
     this.updateEngagement();
     // The crash screen exports the campaign this page plays (storage crashCheckpoint), not another tab's.
     setActiveCampaign(this.state.phase === 'playing' || this.state.phase === 'victory' ? this.state.campaignId : null);
+    // The live match log shows its newest line: pinned when it is drawn anew or gains a line, not after every commit.
+    // Reading its scrollHeight forced a layout on each hover and ticker update; counting its lines needs none. Instance
+    // fields, never state: they describe the DOM, not the campaign. A log that has gone (the match decided, another
+    // view) is let go rather than kept alive until the next match's.
     const el = this.eventsRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) this.pinnedLog = null;
+    else if (el !== this.pinnedLog || el.childElementCount !== this.pinnedLines) {
+      this.pinnedLog = el;
+      this.pinnedLines = el.childElementCount;
+      el.scrollTop = el.scrollHeight;
+    }
     // Save when the match or spin CONTENT changed. Identity alone looped: when a click's sync update (revealAll's
     // patchMatch) is queued behind a timer's not-yet-rendered default-priority update, every sync re-render rebases
     // and re-runs the updater, minting an equal-but-new match; persist's own setState is such a re-render, so an
@@ -300,7 +357,7 @@ export default class App extends React.Component {
     // next checkpoint, or when the page is hidden or closed (a whole save per goal, kick and compass stage was
     // most of the campaign's work).
     if (previous && this.state.phase !== 'setup' && this.state.phase !== 'loading') {
-      const match = contentChange(previous.match, this.state.match, MATCH_PROGRESS);
+      const match = this.matchChange(previous.match, this.state.match);
       const spin = contentChange(previous.spin, this.state.spin, SPIN_PROGRESS);
       if (match === 'checkpoint' || spin === 'checkpoint') this.persist();
       else if (match || spin) this.unsavedProgress = true;
@@ -392,12 +449,42 @@ export default class App extends React.Component {
 
   async boot() {
     try {
-      const [res, atlasText] = await Promise.all([
-        fetch(MAP_URL),
-        fetch(ATLAS_URL).then(r => r.ok ? r.text() : null).catch(() => null),
-      ]);
+      // Both maps are requested together: as the page's script started (mapRequests.js), or anew on Try again. The
+      // 110m rules map is small and lands well before the 50m atlas (about 2 s on a slow link), so the work that needs
+      // only the rules map runs while the atlas downloads: the rules geometry and its frame, the saved campaign and
+      // the setup's team list are ready when it lands. Every state change still waits for the atlas, so the loading
+      // screen gives way to setup in one render, as before.
+      const { map, atlas: atlasRequest } = takeMapRequests() || requestMaps();
+      // A challenge link's sport is set up at once, so its players load beside the maps (a new setup's, football's, come
+      // with the page: src/sports/sportData.js).
+      const linkSport = challengeSport(this.search), linkPlayers = sportDataLoaded(linkSport) ? null : loadSportData(linkSport);
+      linkPlayers?.catch(() => { /* reported below, once the map is in */ });
+      const res = await map;
       if (!res.ok) throw new Error('map fetch ' + res.status);
       this.geo = new WorldGeometry(await res.json(), CAPITALS);
+      // fitMap frames the same nations below and keeps this frame. Club seeding reads its paths.
+      this.geo.fitTo(Object.keys(NATIONS));
+      this.rng = makeRng((Date.now() % 1000000007) >>> 0);
+      // A retry's team list is built again, on this geometry.
+      this.setupTeamsCache = null;
+      if (linkPlayers) {
+        try {
+          await linkPlayers;
+        } catch (error) {
+          throw Object.assign(new Error(`${getSport(linkSport).name} could not be loaded. ${error?.message || error}`), { sportData: true });
+        }
+      }
+      try { this.link = readChallenge(this.search); } catch { this.link = null; }
+      let inspection = inspectSave();
+      // A quick-resume campaign of another sport, or a damaged one's recovery copy, is read once its players are here:
+      // they load while the atlas downloads.
+      const savedSport = inspection.state === 'unloaded' ? inspection.sport : inspection.backupSport || null;
+      const savedPlayers = savedSport ? loadSportData(savedSport) : null;
+      savedPlayers?.catch(() => { /* savedInspection reports it */ });
+      // The first render's team list (setupTeams is cached per setup key, and nothing changes that key before it).
+      // Any failure is left for that render to meet, as before, not reported as a map that failed to load.
+      try { this.setupTeams(this.link?.found ? this.link.setup : this.state.setup); } catch { /* built at render */ }
+      const atlasText = await atlasRequest;
       // Display-only detail keeps targeting, club seeding and existing saves
       // on the original topology. A missing or unreadable visual atlas falls back gracefully.
       let atlas = null;
@@ -405,12 +492,12 @@ export default class App extends React.Component {
       // The atlas also draws a country map's neighbours: until one needs it, it waits as text (worldAtlas).
       this.atlas = null;
       this.atlasText = atlas ? atlasText : null;
-      // Only the display atlas's fitted paths are ever read, so its lon/lat polygons go once projected.
-      this.displayGeo = atlas ? new WorldGeometry(mergeSharedIds(atlas), CAPITALS, { keepPolys: false }) : null;
-      this.rng = makeRng((Date.now() % 1000000007) >>> 0);
+      // Only the display atlas's fitted paths are ever read, so its lon/lat polygons go once projected, and it
+      // measures no borders (the rules geometry's are the ones claims read).
+      this.displayGeo = atlas ? new WorldGeometry(mergeSharedIds(atlas), CAPITALS, { keepPolys: false, borderLengths: false }) : null;
 
-      const inspection = inspectSave();
-      const saved = inspection.campaign || loadSave();
+      if (savedPlayers) inspection = await this.savedInspection(inspection, savedPlayers);
+      const saved = inspection.campaign;
       if (saved) {
         this.saved = saved;
         this.setState({
@@ -433,11 +520,32 @@ export default class App extends React.Component {
           this.showSetupSet();
           if (this.challengeTeam != null) this.settleChallengeTeam();
         }
+        // Setup is up: a first visit's offline worker may register now (serviceWorker.js registerAfterBoot).
+        settleFirstBoot();
         this.requestSeasons();
       });
     } catch (e) {
-      this.setState({ err: 'MAP DATA FAILED TO LOAD — ' + String((e && e.message) || e) });
+      settleFirstBoot();
+      // A sport's players that will not load may be under a newer deploy's file names: Reload fetches the page again.
+      this.setState({ err: `${e?.sportData ? 'GAME DATA' : 'MAP DATA'} FAILED TO LOAD — ${String((e && e.message) || e)}`, errReload: !!e?.sportData });
     }
+  }
+
+  /**
+   * Boot's quick-resume inspection (storage inspectSave) once the players it waits for (`players`, a promise) are here:
+   * the pointer read whole, or a damaged pointer's recovery copy that can now be read. Players that will not load leave
+   * nothing to resume here; a campaign keeps its slot in Saved campaigns.
+   */
+  async savedInspection(inspection, players) {
+    const unloaded = inspection.state === 'unloaded', sport = unloaded ? inspection.sport : inspection.backupSport;
+    try {
+      await players;
+    } catch (error) {
+      const failed = `The ${getSport(sport).name} players could not be loaded: reload the page to try again. ${error?.message || error}`;
+      return unloaded ? { state: 'unavailable', campaign: null, message: `Your saved campaign could not be opened. ${failed}` }
+        : { ...inspection, backupSport: null, message: `${inspection.message} ${failed}` };
+    }
+    return unloaded ? inspection.read() : inspectSave();
   }
 
   /**
@@ -457,6 +565,15 @@ export default class App extends React.Component {
   surroundings(domestic) {
     return domesticSurroundings(this.worldAtlas(), domestic, BACKDROP_MARGIN);
   }
+
+  // Claimed land (app/claimMethods.js): empty land a team colours without holding it.
+  claimLand(...args) { return claimM.claimLand.apply(this, args); }
+
+  openingClaims(...args) { return claimM.openingClaims.apply(this, args); }
+
+  matchCrossings(...args) { return claimM.matchCrossings.apply(this, args); }
+
+  conquestClaims(...args) { return claimM.conquestClaims.apply(this, args); }
 
   /**
    * The 50m atlas with merged ids, parsed from its text the first time it is needed and then kept, never parsed
@@ -515,7 +632,7 @@ export default class App extends React.Component {
     } else if (this.domesticId) {
       const atlas = this.worldAtlas();
       this.geo = this.worldGeo;
-      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS, { keepPolys: false }) : null;
+      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS, { keepPolys: false, borderLengths: false }) : null;
       this.domesticId = null;
       this.backdrop = [];
     }
@@ -541,24 +658,37 @@ export default class App extends React.Component {
       return;
     }
     this.fittedDomestic = domestic;
-    // decodeDomestic fits a country on all its sections, the only frame a country map takes: keep its paths.
+    // decodeDomestic fits a country on all its sections, the only frame a country map takes: keep its paths. A world
+    // frame fitTo already holds keeps its paths too.
     if (!domestic || !this.geo.fit) this.geo.fitTo(domestic ? Object.keys(domestic.sectionNames) : ids);
-    if (this.displayGeo) {
-      const { s, tx, ty } = this.geo.fit;
-      this.displayGeo.paths = this.displayGeo.buildPaths(s, tx, ty);
+    const display = this.displayGeo;
+    if (display) {
+      // Drawn again only in a new fit (pathsFit: the fit its paths were drawn in, written only here).
+      const { s, tx, ty } = this.geo.fit, drawnIn = display.pathsFit;
+      if (!drawnIn || drawnIn.s !== s || drawnIn.tx !== tx || drawnIn.ty !== ty) {
+        display.paths = display.buildPaths(s, tx, ty);
+        display.pathsFit = { s, tx, ty };
+      }
     }
     // Stable display-only geometry lets the label engine cache shape work
-    // through ticker updates, hover, selection and camera movements.
-    this.labelGeometry = this.geo.countries.map(country => ({
-      id: country.id,
-      rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
-    }));
-    this.flagLayoutCache = null;
+    // through ticker updates, hover, selection and camera movements. The same
+    // drawn paths on the same map (a refit on the frame it holds) keep it, and the
+    // flag index and banners built on it.
+    const drawnFrom = { base: this.geo.paths, display: display?.paths ?? null, domestic };
+    const last = this.drawnFrom;
+    if (!last || last.base !== drawnFrom.base || last.display !== drawnFrom.display || last.domestic !== drawnFrom.domestic) {
+      this.drawnFrom = drawnFrom;
+      this.labelGeometry = this.geo.countries.map(country => ({
+        id: country.id,
+        rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
+      }));
+      this.flagLayoutCache = null;
+      // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. mapFlags builds
+      // that index from its source on the first Flags view: most games never show one.
+      this.flagComponents = null;
+      this.flagRegionSource = { geometry: this.labelGeometry, maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit };
+    }
     this.viewFocus = null;
-    // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. mapFlags builds
-    // that index from its source on the first Flags view: most games never show one.
-    this.flagComponents = null;
-    this.flagRegionSource = { geometry: this.labelGeometry, maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit };
     if (domestic) {
       // Setup shows no flags on a country map (its clubs carry crests, not flags). The opening camera leaves out far outliers.
       this.setupFlagOwnership = {};
@@ -751,9 +881,29 @@ export default class App extends React.Component {
       ...Object.fromEntries(Object.entries(metrics).map(([key, value]) => [`metrics.${key}`, value])), phase: st.phase === 'victory' };
   }
 
+  /**
+   * Called once a draw or a match has taken samples from the campaign's generator (this.rng), in the task that queues
+   * the state they decide. React commits this mark in the same render as that state (one task, one lane), so
+   * componentDidUpdate can tell a commit that holds the draw from a click's commit React rebased before it.
+   */
+  markDraw() {
+    this.drawMark = (this.drawMark || 0) + 1;
+    this.setState({ drawMark: this.drawMark });
+  }
+
+  /**
+   * The random state the committed campaign state was drawn with: what a checkpoint or an export of this.state holds.
+   * Between a timer task that draws (a turn, a locked compass's kickoff) and React's commit of what it drew, the
+   * generator has moved past this.state. A write then (a page hidden or closed, a click that saves) holding the spent
+   * state would resume to another turn or match than the seed played.
+   */
+  committedRngState() {
+    return this.committedRng ?? this.rng?.getState?.() ?? this.state.rngState;
+  }
+
   persist() {
     if (!Object.keys(this.state.teams).length || this.saving || this.state.storageConflict) return;
-    const rngState = this.rng?.getState?.() ?? this.state.rngState;
+    const rngState = this.committedRngState();
     // Unchanged since the last checkpoint (a decision both changes the match and saves in its callback): no write.
     const source = this.checkpointSource(rngState), last = this.lastCheckpoint;
     if (last && this.saved?.campaignId === this.state.campaignId && Object.keys(source).length === Object.keys(last).length
@@ -787,7 +937,35 @@ export default class App extends React.Component {
     this.persist();
   }
 
+  /**
+   * How a commit changed the match, for the autosave (componentDidUpdate): 'checkpoint', 'progress' or null. A
+   * fast-forwarded (express) match's reveal is presentation, and so is its kickoff when the last checkpoint already
+   * decides it (expressKickoffReplays): such a match is written once, with its result.
+   */
+  matchChange(previous, match) {
+    if (!match?.express || match.applied) return contentChange(previous, match, MATCH_PROGRESS);
+    if (previous?.allEv === match.allEv) return contentChange(previous, match, EXPRESS_PROGRESS);
+    return this.expressKickoffReplays(previous) ? 'progress' : 'checkpoint';
+  }
+
+  /**
+   * Whether resuming the last checkpoint would draw and simulate this fast-forwarded kickoff again, so that writing it
+   * can wait for its result. The draw and the simulation take the same samples from the same random state, and
+   * presentation takes none (DEC D1), so that checkpoint must be this campaign's, hold the settled match this kickoff
+   * follows, and hold the random state this turn started from (nextAction's turnFrom), the kickoff's samples taken
+   * since. Kickoffs that fail this stay checkpoints: a batch's first match (startBatch saved its draw without the
+   * match), the draw a resume kicks off (restoreCampaign saves after it), and one whose turn started from another
+   * random state than that checkpoint. A write between a turn's timer task and React's commit (a Chronicle pick)
+   * holds the settled match with the random state the turn started from (committedRngState): that kickoff can wait.
+   */
+  expressKickoffReplays(previous) {
+    const last = this.lastCheckpoint;
+    return !!previous?.applied && !!last && last.match === previous && last.campaignId === this.state.campaignId
+      && last.rngState === this.turnFrom && last.rngState !== (this.rng?.getState?.() ?? this.state.rngState);
+  }
+
   pickSetup(key, value) {
+    if (key === 'sport' && !this.pickSport(getSport(value).id)) return;
     this.setState(state => {
       const setup = { ...state.setup, [key]: value };
       const domestic = isDomesticScope(setup.clubScope), country = isCountryScope(setup.clubScope);
@@ -797,15 +975,15 @@ export default class App extends React.Component {
         if (!country) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all'
           : CLUB_SCOPES(sportOf(setup) || getSport(setup.sport))[2]?.id || 'all';
       } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
-      // Country and Europe maps come with football data only (basketball clubs take the NBA's map below, in setClubScope).
-      if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
+      // A map is its own sport's (a country's is football's). A sport whose clubs choose between maps finds its own for
+      // the theatre in setClubScope below (football's Elite 32 becomes women's football's); another sport's clubs start
+      // from every club (basketball's then take the NBA's map, also in setClubScope).
+      if (key === 'sport' && (domestic ? !hasTheatreMaps(getSport(value).id) && (domesticEntry(setup.clubScope)?.sport ?? 'football') !== getSport(value).id
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
-      // A nation theatre of one sport only (basketball's EuroBasket) goes back to Europe in another.
-      if (key === 'sport' && !nationScopes(getSport(value)).some(s => s.id === setup.scope)) setup.scope = DEFAULT_SETUP.scope;
-      // A data set plays in its own sport and brings its own clubs. A basketball season has clubs only: choosing it
-      // takes the clubs, and choosing nations goes back to the built-in season.
+      // A data set plays in its own sport and brings its own clubs. A season with clubs only (an NBA season) takes the
+      // clubs, and choosing nations goes back to the built-in season.
       if (setup.dataSet != null && setSportOf(setup.dataSet) !== getSport(setup.sport).id) setup.dataSet = null;
-      if (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball') {
+      if (setup.dataSet != null && !setHasNations(setup.dataSet)) {
         if (key === 'layer' && value !== 'clubs') setup.dataSet = null;
         else setup.layer = 'clubs';
       }
@@ -816,6 +994,8 @@ export default class App extends React.Component {
       }
       // A sport with clubs only (American football: the NFL's) has no nations to choose.
       if (getSport(setup.sport).clubsOnly) setup.layer = 'clubs';
+      // A sport with nations only (tennis: the Davis Cup's) has no clubs to choose.
+      if (getSport(setup.sport).nationsOnly) setup.layer = 'nations';
       const clubScope = setClubScope(setup);
       if (clubScope !== setup.clubScope) setup.clubScope = clubScope;
       // The field changes with the theatre, so the managed team goes too, but a
@@ -831,9 +1011,51 @@ export default class App extends React.Component {
     });
   }
 
+  /**
+   * A sport pick (src/sports/sportData.js): whether it applies now. The latest pick wins: any pick drops one still
+   * loading, and a pick of the sport set up changes nothing more (its team stays picked). A sport whose players have not
+   * loaded shows as picked while they load (sportLoad), and setup keeps the sport it had until they are here, holding
+   * its steps and Launch. A pick made while another loads waits SETUP_LOAD_DELAY_MS first, so arrow keys stepping
+   * through the cards load only the sport the player stays on.
+   */
+  pickSport(id) {
+    const token = ++this.sportToken, waiting = this.state.sportLoad.id != null;
+    clearTimeout(this.sportLoadTimer);
+    if (sportDataLoaded(id)) {
+      if (waiting) this.setState({ sportLoad: IDLE_SPORT_LOAD });
+      return id !== getSport(this.state.setup.sport).id;
+    }
+    this.setState({ sportLoad: { id, state: 'loading', message: null } });
+    const current = () => token === this.sportToken && this.state.phase === 'setup';
+    // Here, the pick applies as any pick of a loaded sport does, which also ends the wait.
+    const load = () => loadSportData(id).then(() => { if (current()) this.pickSetup('sport', id); }, error => {
+      if (current()) this.setState({ sportLoad: { id, state: 'error', message: `${getSport(id).name} could not be loaded. ${error?.message || error}` } });
+    });
+    if (waiting) this.sportLoadTimer = setTimeout(() => { if (current()) load(); }, SETUP_LOAD_DELAY_MS);
+    else load();
+    return false;
+  }
+
+  /** Leaving setup (a launch or a restore) drops a sport pick still loading: it must not change the next setup. */
+  dropSportPick() {
+    this.sportToken++;
+    clearTimeout(this.sportLoadTimer);
+    if (this.state.sportLoad.id != null) this.setState({ sportLoad: IDLE_SPORT_LOAD });
+  }
+
+  /**
+   * What the setup's Sport cards show of a pick still loading (null for none): its id, 'loading' or 'error' with the
+   * message, Retry (that pick again) and Reload (the page, as after a deploy that renamed the players' files).
+   */
+  sportStatus() {
+    const load = this.state.sportLoad;
+    if (load.id == null) return null;
+    return { ...load, onRetry: () => this.pickSetup('sport', load.id), onReload: reloadPage };
+  }
+
   exportProgress() {
     const data = this.state.phase === 'setup' && this.saved ? this.saved
-      : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState,
+      : { ...this.state, rngState: this.committedRngState(),
         metrics: { ...this.state.metrics, engagement: this.engagement.snapshot() } };
     const st = this.state;
     // A decision gate (signing, approach, target, elimination) already holds the campaign with no timers armed, and
@@ -872,8 +1094,12 @@ export default class App extends React.Component {
       const path = this.displayGeo?.paths[country.id] || this.geo.paths[country.id];
       return path ? { id: country.id, d: path.d, bbox: path.bbox } : null;
     }).filter(Boolean);
+    // The empty land the champion claimed, as the final map shows it.
+    const land = this.claimLand(st);
+    const claimed = land ? Object.keys(st.claims || {}).filter(id => st.claims[id] === champ.id && land.d.has(id))
+      .sort().map(id => ({ d: land.d.get(id) })) : [];
     const card = buildShareCard({
-      shapes, backdrop: this.domesticMap() ? this.backdrop : [], own: st.own, championId: champ.id, championName: champ.name,
+      shapes, backdrop: this.domesticMap() ? this.backdrop : [], own: st.own, championId: champ.id, championName: champ.name, claimed,
       // The colour the final map gives the champion: clay when it is the team you manage.
       fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill : politicalFill(champ.id),
       frame: this.viewFocus, seed: st.seed,
@@ -905,12 +1131,25 @@ export default class App extends React.Component {
 
   async importProgress(file) {
     if (!file) return;
+    // A later import, a launch, a restore or a conflict while this one waits for its file or its sport's players wins.
+    const token = ++this.importToken, flow = this.flowToken;
+    const current = () => token === this.importToken && flow === this.flowToken && !this.state.storageConflict;
     try {
       if (file.size > 5_000_000) throw new Error('Choose a campaign file smaller than 5 MB.');
-      const saved = parseCampaign(await file.text());
+      const text = await file.text(), sport = sportOfText(text);
+      // A campaign of another sport is read whole once that sport's players are here (src/sports/sportData.js).
+      if (sport && !sportDataLoaded(sport)) {
+        try {
+          await loadSportData(sport);
+        } catch (error) {
+          throw new Error(`${getSport(sport).name} could not be loaded, so this campaign cannot be imported: reload the page to try again. ${error?.message || error}`);
+        }
+      }
+      if (!current()) return;
+      const saved = parseCampaign(text);
       this.openStorageDialog('import', { campaign: saved });
     } catch (error) {
-      this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
+      if (current()) this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
     }
   }
 
@@ -933,7 +1172,7 @@ export default class App extends React.Component {
   }
 
   continueSaved(campaign, fork = false, name) {
-    if (!campaign || this.pendingDomesticId != null) return;
+    if (!campaign || this.pendingDomesticId != null || this.pendingSport != null) return;
     // A country campaign is checked against its map before it replaces anything.
     return this.withCampaignMap(campaign, (_loaded, fitted) => {
       this.saved = fork ? forkCampaign(fitted, name) : fitted;
@@ -989,18 +1228,75 @@ export default class App extends React.Component {
     });
   }
 
+  /**
+   * Reading a saved campaign of another sport whole needs that sport's players (src/sports/sportData.js): runs `then()`
+   * once they are here, at once when they already are. Meanwhile Saved campaigns shows the wait as it shows a country
+   * map's, and closing it cancels. Players that will not load refuse with a message.
+   */
+  withCampaignSport(sport, then) {
+    if (!sport || sportDataLoaded(sport)) return then();
+    if (this.pendingDomesticId != null || this.pendingSport != null) return false;
+    const token = ++this.flowToken, name = getSport(sport).name, message = `Loading ${name}…`;
+    this.pendingSport = sport;
+    this.setState(state => ({ restoring: { message, status: state.restoring?.status ?? state.saveStatus }, saveStatus: { ok: true, message } }));
+    const current = () => {
+      if (token !== this.flowToken) return false;
+      this.pendingSport = null;
+      this.setState(state => (state.restoring ? { restoring: null, saveStatus: state.restoring.status ?? null } : null));
+      return true;
+    };
+    return loadSportData(sport).then(() => (current() ? then() : false), error => {
+      if (current()) this.refuseRestore(`${name} could not be loaded, so this campaign cannot be opened: reload the page to try again. ${error?.message || error}`);
+      return false;
+    });
+  }
+
+  /** Saved campaigns' Resume (or Recover) of slot `id`, read whole once its sport's players are here. */
+  openSavedCampaign(id, sport = campaignSport(id)) {
+    return this.withCampaignSport(sport, () => {
+      try {
+        const inspection = inspectCampaign(id);
+        if (inspection.state === 'ready') return this.continueSaved(inspection.campaign);
+        // Its list entry named another sport than its checkpoint plays: that sport's players, then.
+        if (inspection.state === 'unloaded' && inspection.sport !== sport) return this.openSavedCampaign(id, inspection.sport);
+        this.setState({ storageDialog: { mode: 'recovery', ...inspection } });
+      } catch (error) {
+        this.setState(state => ({ storageDialog: state.storageDialog && { ...state.storageDialog, error: error.message } }));
+      }
+      return false;
+    });
+  }
+
+  /** Saved campaigns' Rename of slot `id` (its checkpoint is written again, so it is read whole first). */
+  renameSavedCampaign(id, name) {
+    return this.withCampaignSport(campaignSport(id), () => {
+      let result;
+      // A slot deleted in another tab while the dialog was open cannot be renamed: say so rather than throw.
+      try { result = renameCampaign(id, name); } catch (error) { result = { ok: false, message: error.message }; }
+      // The quick-resume copy (no campaign open yet after a reload) takes the new revision too, or resuming
+      // it reads as a change made in another tab.
+      if (result.ok && this.saved?.campaignId === id) {
+        this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
+      }
+      if (result.ok && id === this.state.campaignId) this.setState({ revision: result.revision, campaignName: result.campaignName });
+      this.setState(state => ({ storageDialog: state.storageDialog && { ...state.storageDialog, error: result.ok ? null : result.message, notice: null } }));
+    });
+  }
+
   /** The pending restore is over (it ran, failed or was replaced). */
   endRestore() {
     this.pendingDomesticId = null;
+    this.pendingSport = null;
     this.retainMaps();
     this.setState(state => state.restoring ? { restoring: null } : null);
   }
 
   /** Drop a restore still waiting for its map: its campaign must not replace anything later. */
   cancelRestore() {
-    if (this.pendingDomesticId == null) return;
+    if (this.pendingDomesticId == null && this.pendingSport == null) return;
     this.flowToken++;
     this.pendingDomesticId = null;
+    this.pendingSport = null;
     this.retainMaps();
     this.setState(state => state.restoring ? { restoring: null, saveStatus: state.restoring.status ?? null } : null);
   }
@@ -1035,16 +1331,22 @@ export default class App extends React.Component {
     // which this.geo may still show between a theatre pick and its showSetupMap callback).
     const geo = domesticId ? loaded?.geo : this.domesticId ? this.worldGeo : this.geo;
     const board = geo?.adj ? { geo, own: opening } : null;
-    // Country clubs (ids like "d826-679") are unknown to the sport's club list: pass their own code and kind.
-    const teams = included.map(team => ({ id: team.id, name: team.name, code: team.code, isClub: team.kind === 'club',
-      rating: teamEff(team),
-      ...(loaded ? { meta: [team.conf, loaded.sectionNames[team.home]].filter(Boolean).join(' · ') } : {}),
-      players: selectLineup(team).starters.filter(player => Number.isFinite(player?.rating))
-        .sort((a, b) => b.rating - a.rating || String(a.name).localeCompare(String(b.name))).slice(0, 5)
-        .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
-      ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-    this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own) };
+    // Country clubs (ids like "d826-679") are unknown to the sport's club list: pass their own code and kind. One lineup
+    // per team gives both its rating (teamEff's) and its best starters: selectLineup is pure, and filter copies before
+    // the sort.
+    const teams = included.map(team => {
+      const lineup = selectLineup(team);
+      return { id: team.id, name: team.name, code: team.code, isClub: team.kind === 'club',
+        flagId: team.flagId ?? null, rating: lineup.rating,
+        ...(loaded ? { meta: [team.conf, loaded.sectionNames[team.home]].filter(Boolean).join(' · ') } : {}),
+        players: lineup.starters.filter(player => Number.isFinite(player?.rating))
+          .sort((a, b) => b.rating - a.rating || String(a.name).localeCompare(String(b.name))).slice(0, 5)
+          .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
+        ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) };
+    }).sort((a, b) => a.name.localeCompare(b.name));
+    // What each team flies on the step-1 card in Flags mode (setupMapFlags): a nation its flag, a club its crest.
+    const marks = Object.fromEntries(included.map(team => [team.id, { kind: team.kind, flagId: team.flagId ?? null, col: team.col }]));
+    this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own), marks };
     return teams;
   }
 
@@ -1057,7 +1359,10 @@ export default class App extends React.Component {
     if (!this.geo || this.domesticId || domesticIdOf(setup)) return null;
     this.setupTeams(setup);
     const { opening, homes } = this.setupTeamsCache;
-    const focus = setup.layer !== 'clubs' && isEuropeanScope(setup.scope) ? this.europeFocus() : null;
+    // The theatre the sport plays (a season still loading: the choice as it stands).
+    const sport = sportOf(setup);
+    const scope = setup.layer === 'clubs' ? null : sport ? nationTheatre(sport, setup.scope).id : setup.scope;
+    const focus = isEuropeanScope(scope) ? this.europeFocus() : null;
     return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
       own: opening, frameIds: homes, focus });
   }
@@ -1095,8 +1400,8 @@ export default class App extends React.Component {
       }
     } else {
       const all = fieldedNations(sport).map(id => buildTeam(id, rng, sport));
-      // A theatre another sport offers (basketball's EuroBasket) is the world's in this one.
-      const scope = nationScopes(sport).find(x => x.id === su.scope) || SCOPES[0];
+      // Where the sport is played: a theatre it does not offer gives way to its heartland, as setup shows.
+      const scope = nationTheatre(sport, su.scope);
       included = scope.id === 'world' ? all : scope.id === 'elite' ? eliteNations(all, sport) : all.filter(scope.filter);
       for (const team of included) own[team.id] = team.id;
       scopeName = plainScopeName(scope.name);
@@ -1135,6 +1440,9 @@ export default class App extends React.Component {
   }
 
   startCampaign() {
+    // A sport picked before its players loaded is not set up yet: Launch waits for it (setup holds the button).
+    if (this.state.phase === 'setup' && this.state.sportLoad.id != null) return;
+    this.dropSportPick();
     this.cancelRestore();
     // No setup-screen map or data set load outlives the setup screen.
     clearTimeout(this.setupLoadTimer);
@@ -1160,6 +1468,8 @@ export default class App extends React.Component {
     this.rng = makeRng(seed);
     const clubLayer = su.layer === 'clubs';
     const sport = sportOf(su);
+    // The campaign keeps the nation theatre it plays, not a choice its sport does not offer.
+    if (!clubLayer && sport) su = { ...su, scope: nationTheatre(sport, su.scope).id };
     const { included, own, scopeName } = this.opening(su, this.rng);
     // No team picked: launch the one the wizard suggested (the same seed builds the same opening, ranked the same
     // way), unless setup was opened to pick another team.
@@ -1199,6 +1509,8 @@ export default class App extends React.Component {
     this.useGeometry(domesticId);
     this.retainMaps(0);
     this.fitMap(Object.keys(own), su);
+    // Empty land a team already encloses at kick-off takes its colour.
+    const claims = this.openingClaims({ own, settings });
     this.setState(
       {
         phase: 'playing',
@@ -1217,6 +1529,7 @@ export default class App extends React.Component {
         challenge: null,
         teams,
         own,
+        claims,
         aliveIds: included.map(t => t.id),
         fallen: [],
         stats,
@@ -1265,6 +1578,7 @@ export default class App extends React.Component {
 
   restoreCampaign(s, loaded) {
     this.flowToken++;
+    this.dropSportPick();
     this.endRestore();
     this.clearTimers();
     this.setupTeamsCache = null;
@@ -1296,6 +1610,8 @@ export default class App extends React.Component {
       pu: null, toast: null,
       teams: s.teams,
       own: s.own,
+      // A save from before claims (or from another build of the map) keeps what still fits and encloses afresh.
+      claims: this.openingClaims({ own: s.own, settings: { ...DEFAULT_SETUP, ...s.settings } }, s.claims),
       aliveIds: s.aliveIds,
       fallen: s.fallen || [],
       stats: s.stats || {},
@@ -1495,8 +1811,19 @@ export default class App extends React.Component {
     if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.pendingTarget) return;
     if (st.match && !st.match.applied) return;
     if (st.spin) return;
+    // A turn is already under way. React 18 commits a timer task's updates in a later task, so until then this.state
+    // still shows the settled match while the next turn has drawn and simulated. A second start in that gap would draw
+    // again and play a different campaign from the same seed: two turn timers due together (Play re-arms the turn timer
+    // a pause held, and schedules its own), or a Next match click. Only a draw and its match move the campaign's random
+    // state (markDraw), and componentDidUpdate records it at every commit that holds them, so a state past the last
+    // such commit is a turn in flight.
+    if (this.committedRng !== undefined && this.rng?.getState?.() !== this.committedRng) return;
+    // The random state this turn starts from: its fast-forwarded kickoff waits for its result only when the last
+    // checkpoint holds this state (expressKickoffReplays).
+    this.turnFrom = this.rng?.getState?.();
     // A view switched automatically for the last match returns to the map at the next turn (DEC D11). No timers.
-    if (st.viewSource === 'auto') this.setState({ view: 'map', viewSource: 'user' });
+    const back = st.viewSource === 'auto' ? { view: 'map', viewSource: 'user' } : {};
+    if (st.viewSource === 'auto') this.setState(back);
     if (st.series && st.aliveIds.length === 2) {
       const [a, b] = st.series.teamIds;
       this.setState({ round: st.round + 1, queue: [], turnQueue: [], turnIndex: 0 }, () => this.startMatch(a, b));
@@ -1506,7 +1833,9 @@ export default class App extends React.Component {
     if (st.queue.length) {
       const queue = st.queue.slice();
       const next = queue.shift();
-      this.setState({ queue }, () => this.startMatch(next[0], next[1]));
+      // The queue commits with the kickoff, as startMatch's `decided`: a commit of its own was never painted. The
+      // view's return goes in too, because startMatch reads the view before React has committed it (autoMatchView).
+      this.startMatch(next[0], next[1], {}, undefined, {}, { ...back, queue });
       return;
     }
     if (st.settings.pacing === 'duel') this.beginTurn();
@@ -1523,6 +1852,7 @@ export default class App extends React.Component {
   beginBlitz() {
     const st = this.state;
     const { pairs, bye } = drawBlitzPairs(this.rng, this.board());
+    this.markDraw();
     if (!pairs.length) return;
 
     const log = st.log.slice();
@@ -1535,6 +1865,7 @@ export default class App extends React.Component {
   beginChaos() {
     const st = this.state;
     const pairs = drawChaosPairs(this.rng, this.board());
+    this.markDraw();
     const log = st.log.slice();
     log.push({
       t: 'sys',
@@ -1563,7 +1894,13 @@ export default class App extends React.Component {
     );
   }
 
-  /** `decided` is the kickoff decision's state fields (chooseTactic): read as committed and committed with the match. */
+  /**
+   * `decided` is the fields of the decision or turn that leads to this kickoff: chooseTactic's tactic, a fast-forwarded
+   * turn's round and turn order (beginDuel), a queued pair's queue (nextAction). They are read as committed and
+   * committed in one update with the match, with the tactical gate, or alone when no match starts. `decided` must
+   * hold every field queued in the same tick that this reads, such as nextAction's return to the map (view and
+   * viewSource, read by autoMatchView): React has not committed them yet, so this.state still has the old values.
+   */
   startMatch(attackerId, defenderId, route = {}, tactic, options = {}, decided = null) {
     const st = decided ? { ...this.state, ...decided } : this.state;
     const a = st.teams[attackerId];
@@ -1577,7 +1914,9 @@ export default class App extends React.Component {
     // Home advantage (a launch rule, off by default): the defender plays at home.
     const home = st.settings.homeAdvantage === 'on';
     if ([attackerId, defenderId].includes(managedId) && !tactic) {
-      if (st.tacticalChoice) return;
+      // Fast-forward's shortcut reaches the gate for a manager who follows another team, with the turn in `decided`:
+      // it commits with the gate, or alone when a gate is already open.
+      if (st.tacticalChoice) { if (decided) this.setState(decided); return; }
       this.clearTimers();
       const manager = st.teams[managedId], opponent = managedId === attackerId ? d : a;
       const options = tacticalOptions(manager, opponent, baseDrama).map(option => {
@@ -1588,7 +1927,7 @@ export default class App extends React.Component {
       // A skip ahead stops here, your next decision: it hands back its speed, and the autoplay it started from is what
       // resumes after the kick-off.
       const skip = st.skipAhead;
-      this.setState({ managedTeamId: managedId, tacticalChoice: { aId: attackerId, dId: defenderId, route,
+      this.setState({ ...decided, managedTeamId: managedId, tacticalChoice: { aId: attackerId, dId: defenderId, route,
         managerName: manager.name, opponentName: opponent.name, options, resumeAutoplay: skip ? skip.autoplay : st.autoplay, openedAt: Date.now() },
         ...(skip ? { skipAhead: null, speed: skip.speed } : {}),
         // clearTimers() above also dropped applyConquest's hatch reset: clear the flash with the notice and toast.
@@ -1631,6 +1970,8 @@ export default class App extends React.Component {
         odds: { a: probabilities.attacker, b: probabilities.defender },
         series: series ? { aWins: series.wins[attackerId], bWins: series.wins[defenderId], bestOf: 3 } : null,
         routeLabel: route.routeLabel || '', routeKind: route.routeKind || 'straight',
+        // Empty land on the line of attack: its winner claims it (applyConquest).
+        crossed: this.matchCrossings(st, attackerId, defenderId, route),
         tactic: [attackerId, defenderId].includes(managedId) ? params.tactic : null,
         tacticalBonus: params.bonus, matchDrama: drama,
         express: this.fastPlayback(st) && !important,
@@ -1643,6 +1984,8 @@ export default class App extends React.Component {
       this.presentMatch();
       if (this.state.autoplay && this.state.pauseFollow && [attackerId, defenderId].includes(this.state.followedId)) this.pausePlayback();
     });
+    // The match's samples, committed with its kickoff.
+    this.markDraw();
   }
 
   chooseTactic(id, options = {}) {
@@ -2155,9 +2498,13 @@ export default class App extends React.Component {
 
   mapFlags(...args) { return mapM.mapFlags.apply(this, args); }
 
+  setupMapFlags(...args) { return mapM.setupMapFlags.apply(this, args); }
+
   mapCountries(...args) { return mapM.mapCountries.apply(this, args); }
 
   mapLabels(...args) { return mapM.mapLabels.apply(this, args); }
+
+  mapClaims(...args) { return mapM.mapClaims.apply(this, args); }
 
   mapHomes(...args) { return mapM.mapHomes.apply(this, args); }
 
@@ -2241,7 +2588,7 @@ export default class App extends React.Component {
             conquestIds={this.mapConquestIds()} followedId={st.followedId} paused={st.paused} selectedId={st.selected}
             onShowDetails={() => this.showDetails()} focusBounds={st.focusBounds} focusKey={st.focusKey} focusLayout={st.focusLayout}
             tooltip={this.tooltip(playing)} kmPerUnit={0} legend={null} title={null}
-            backdrop={this.backdrop} showAllHomes={domesticMap}
+            backdrop={this.backdrop} showAllHomes={domesticMap} claims={this.mapClaims(playing)}
             viewResetKey={this.viewResetKey} initialFocus={this.mapInitialFocus()} nearFocus={this.mapNearFocus()}
             playing={playing} mapMode={st.mapMode} onMapMode={mapMode => this.setState({ mapMode })}
             meId={this.mapMeId()} opponentId={this.mapOpponentId()} reach={this.reachModel()}
@@ -2298,7 +2645,9 @@ export default class App extends React.Component {
         {st.phase === 'setup' && <SetupOverlay
           setup={st.setup} hasSave={st.hasSave} managerTeams={this.setupTeams()} domestic={this.domesticStatus()}
           theatreMap={this.setupMapPreview()}
-          season={this.seasonStatus()}
+          mapMode={st.setupMapMode} onMapMode={setupMapMode => this.setState({ setupMapMode })}
+          mapFlags={st.setupMapMode === 'flags' ? this.setupMapFlags() : null}
+          season={this.seasonStatus()} sportLoad={this.sportStatus()}
           savedText={st.savedMeta ? (st.savedMeta.round ? 'Round ' + st.savedMeta.round : 'Before the first match') + ' · ' + this.savedProgress(st.savedMeta) + ' · ' + this.scopeName(st.savedMeta.settings)
             + (st.savedMeta.settings?.dataSeason ? ' · ' + st.savedMeta.settings.dataSeason : '') : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
@@ -2330,29 +2679,11 @@ export default class App extends React.Component {
           onDelete={id => this.deleteSavedCampaign(id)}
           onConfirmImport={name => this.continueSaved(st.storageDialog.campaign, true, name)}
           onExportCurrent={st.hasSave ? () => this.exportProgress() : undefined}
-          onLoad={id => {
-            try {
-              const inspection = inspectCampaign(id);
-              if (inspection.state === 'ready') this.continueSaved(inspection.campaign);
-              else this.setState({ storageDialog: { mode: 'recovery', ...inspection } });
-            }
-            catch (error) { this.setState({ storageDialog: { ...st.storageDialog, error: error.message } }); }
-          }}
-          onRename={(id, name) => {
-            let result;
-            // A slot deleted in another tab while the dialog was open cannot be renamed: say so rather than throw.
-            try { result = renameCampaign(id, name); } catch (error) { result = { ok: false, message: error.message }; }
-            // The quick-resume copy (no campaign open yet after a reload) takes the new revision too, or resuming
-            // it reads as a change made in another tab.
-            if (result.ok && this.saved?.campaignId === id) {
-              this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
-            }
-            if (result.ok && id === st.campaignId) this.setState({ revision: result.revision, campaignName: result.campaignName });
-            this.setState({ storageDialog: { ...st.storageDialog, error: result.ok ? null : result.message, notice: null } });
-          }}
+          onLoad={id => this.openSavedCampaign(id)}
+          onRename={(id, name) => this.renameSavedCampaign(id, name)}
           // In setup the fork copies the quick-resume save; the outgoing campaign's teams may outlive a cleared one.
           onFork={(st.phase === 'setup' ? this.saved : Object.keys(st.teams).length) ? name => this.continueSaved(st.phase === 'setup' ? this.saved
-            : { ...st, rngState: this.rng.getState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
+            : { ...st, rngState: this.committedRngState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
           onReload={() => this.continueSaved(st.storageDialog.campaign)}
           onRestoreBackup={() => this.continueSaved(st.storageDialog.backup, true, `${st.storageDialog.backup.campaignName || 'Campaign'} recovered`)}
           onExportRaw={st.storageDialog.raw ? () => this.setState({ exportText: st.storageDialog.raw, exportFilename: 'imperialism-damaged-save.json' }) : undefined}
@@ -2362,7 +2693,8 @@ export default class App extends React.Component {
         <UpdatePrompt campaign={playing} />
         {st.phase === 'loading' && <div className="loading-screen" role={st.err ? 'alert' : 'status'}>
           <span>{st.err || 'Opening the atlas…'}</span>
-          {st.err && <button className="button" onClick={() => { this.setState({ err: null }); this.boot(); }}>Try again</button>}
+          {st.err && <button className="button" onClick={() => { this.setState({ err: null, errReload: false }); this.boot(); }}>Try again</button>}
+          {st.err && st.errReload && <button className="button" onClick={reloadPage}>Reload</button>}
         </div>}
       </div>
     );

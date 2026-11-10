@@ -622,6 +622,60 @@ test('full MatchCard (default variant) keeps the frozen DOM: no compact classes,
   assert.equal(view.host.querySelector('.fi-match-heading h2').textContent, 'Round 27');
 });
 
+test('the chart and the lineups are measured as they are drawn, and again by the switch that shows them', async () => {
+  // The Match view at 700px and wider: the svg fills the plot (position:absolute), 800 × 300 on screen. A ResizeObserver
+  // that never reports: every measure here comes from a callback ref, in the commit that draws or shows the box.
+  const { flushSync } = await import('react-dom');
+  const win = dom.window;
+  const svgProto = win.SVGElement.prototype, htmlProto = win.HTMLElement.prototype;
+  const computed = win.getComputedStyle;
+  const acting = globalThis.IS_REACT_ACT_ENVIRONMENT;
+  let svgBox = { width: 800, height: 300 };
+  win.ResizeObserver = class { observe() {} disconnect() {} };
+  win.getComputedStyle = element => (element.tagName === 'svg' ? { position: 'absolute' } : computed.call(win, element));
+  svgProto.getBoundingClientRect = () => ({ ...svgBox, top: 0, left: 0, right: svgBox.width, bottom: svgBox.height });
+  const host = document.createElement('div');
+  document.body.append(host);
+  const root = createRoot(host);
+  try {
+    globalThis.IS_REACT_ACT_ENVIRONMENT = false;
+    flushSync(() => root.render(React.createElement(MatchScreen, screenProps(liveState(), { minuteStore: createMinuteStore(38) }))));
+    const viewBox = () => host.querySelector('.match-chart svg').getAttribute('viewBox');
+    assert.equal(viewBox(), '0 0 800 300', 'the first frame already has the plot’s shape, not the 132-unit base stretched');
+    globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+
+    // The lineups were hidden behind the chart when they mounted: nothing measured them, every row is there.
+    assert.equal(host.querySelectorAll('.match-xi__row').length, 22);
+    // Lineups shows them: 200px, rows 20px from 40px down, so eight a page, measured in the commit that switches.
+    Object.defineProperties(host.querySelector('.match-lineups'), {
+      clientHeight: { configurable: true, value: 200 }, scrollHeight: { configurable: true, value: 40 + 20 * 11 },
+    });
+    host.querySelector('.match-lineups').getBoundingClientRect = () => ({ top: 0, bottom: 200, height: 200, left: 0, right: 600, width: 600 });
+    htmlProto.getBoundingClientRect = function () {
+      return this.matches('.match-xi__row') ? { top: 40, bottom: 60, height: 20, left: 0, right: 300, width: 300 }
+        : { top: 0, bottom: 0, height: 0, left: 0, right: 0, width: 0 };
+    };
+    const views = () => [...host.querySelectorAll('.match-views button')];
+    await act(async () => views().find(button => button.textContent === 'Lineups').click());
+    assert.equal(host.querySelectorAll('.match-xi__row').length, 16, 'both XIs paged to 8 of 11 by the switch itself');
+    assert.equal(host.querySelector('.match-lineups__pager .pager__pos').textContent, 'Page 1 /  of 2');
+
+    // Back to the chart, now 800 × 400: the switch measures it again.
+    svgBox = { width: 800, height: 400 };
+    await act(async () => views().find(button => button.textContent === 'Chart').click());
+    assert.equal(viewBox(), '0 0 800 400');
+  } finally {
+    globalThis.IS_REACT_ACT_ENVIRONMENT = false;
+    flushSync(() => root.unmount());
+    host.remove();
+    globalThis.IS_REACT_ACT_ENVIRONMENT = acting;
+    delete win.ResizeObserver;
+    win.getComputedStyle = computed;
+    delete svgProto.getBoundingClientRect;
+    delete htmlProto.getBoundingClientRect;
+  }
+});
+
 test('no React warnings or errors were logged while rendering', () => {
   assert.deepEqual(consoleErrors, []);
 });

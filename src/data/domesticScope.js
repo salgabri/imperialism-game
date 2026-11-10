@@ -14,12 +14,21 @@ export function domesticEntry(scope) {
     || EUROPE_MAPS.find(entry => entry.id === id) || null : null;
 }
 
+// The sports whose clubs choose between maps: Europe's strongest clubs and its elite (football), and for women's
+// football the NWSL's USA too (its entry in CLUB_MAPS); basketball's NBA (USA and Canada) and its EuroLeague (Europe).
+const THEATRE_SPORTS = new Set(EUROPE_MAPS.map(entry => entry.sport));
+/** Whether a sport's clubs choose between maps (`theatreMapsOf`) rather than always playing one (`clubMapOf`). */
+export const hasTheatreMaps = sportId => THEATRE_SPORTS.has(sportId);
+
+/** Whether a map is a season's (`dataSet`: an earlier season's id, or null for the built-in one). */
+const servesSeason = (entry, dataSet) => (dataSet == null ? entry.seasons == null : !!entry.seasons?.includes(dataSet));
+
 /**
  * The map a sport's clubs always play on (basketball: the NBA's USA and Canada), or null. An earlier season names its
- * own era's map (`mapId`, a basketball season's `clubMap`).
+ * own era's map (`mapId`, a basketball season's `clubMap`). A sport whose clubs choose between maps has none.
  */
-export const clubMapOf = (sportId, mapId = null) => CLUB_MAPS.find(entry => entry.sport === sportId
-  && (mapId == null ? entry.seasons == null : entry.id === mapId)) || null;
+export const clubMapOf = (sportId, mapId = null) => (hasTheatreMaps(sportId) ? null : CLUB_MAPS.find(entry => entry.sport === sportId
+  && (mapId == null ? entry.seasons == null : entry.id === mapId)) || null);
 
 /** That map's club theatre ('domestic:nba'), or null. */
 export function clubMapScope(sportId) {
@@ -28,33 +37,31 @@ export function clubMapScope(sportId) {
 }
 
 /**
- * Every map a sport's clubs play on in a season, as its club theatres list them: its own (`clubMapOf`), then, in the
- * built-in season, its other leagues' maps of Europe (basketball's EuroLeague: a Europe map with no football `theatre`).
+ * The Europe map of a theatre ('all' or 'elite') in a sport (football unless named) and season (`dataSet`: an earlier
+ * season's id, or null for the built-in one), or null: a CM 01/02 set built on this computer has none.
  */
-export function clubMapsOf(sportId, mapId = null) {
-  const own = clubMapOf(sportId, mapId);
-  const more = mapId == null ? EUROPE_MAPS.filter(entry => entry.sport === sportId && !entry.theatre && entry.seasons == null) : [];
-  return [own, ...more].filter(Boolean);
-}
+export const europeMapOf = (theatre, dataSet = null, sportId = 'football') => EUROPE_MAPS.find(entry => entry.sport === sportId
+  && entry.theatre === theatre && servesSeason(entry, dataSet)) || null;
+
+/** A season's Europe maps, the strongest clubs first: what football's club theatres list. */
+export const europeMapsOf = (dataSet = null, sportId = 'football') => ['all', 'elite'].map(theatre => europeMapOf(theatre, dataSet, sportId)).filter(Boolean);
+
+/** The theatre a map is: a Europe map's ('all' or 'elite'), else its league's ('NWSL', 'NBA'); null for a country's. */
+export const theatreOf = entry => entry?.theatre ?? entry?.league ?? null;
 
 /**
- * Whether a scope is one of a sport's own maps of the built-in season (the NBA's, the EuroLeague's), which a setup keeps
- * while it plays that season.
+ * The maps a sport's clubs choose between in a season, in the setup's order: Europe's strongest clubs and its elite,
+ * then a league on a map of its own (women's football: the NWSL's USA; basketball: the NBA's USA and Canada, or an
+ * earlier season's map of its era), then a league on a map of Europe (basketball's EuroLeague: a Europe map with no
+ * `theatre`, its theatre its league). Empty for a sport whose clubs always play one map (`clubMapOf`) or the world, and
+ * for a season without maps (a CM 01/02 set built here).
  */
-export function isBuiltInClubMap(scope, sportId) {
-  const entry = domesticEntry(scope);
-  return !!entry && clubMapsOf(sportId).includes(entry);
-}
+export const theatreMapsOf = (sportId, dataSet = null) => (hasTheatreMaps(sportId)
+  ? [...europeMapsOf(dataSet, sportId), ...CLUB_MAPS.filter(entry => entry.sport === sportId && servesSeason(entry, dataSet)),
+    ...EUROPE_MAPS.filter(entry => entry.sport === sportId && !entry.theatre && servesSeason(entry, dataSet))] : []);
 
-/**
- * The Europe map of a football theatre ('all' or 'elite') in a season (`dataSet`: an earlier season's id, or null for the
- * built-in one), or null: a CM 01/02 set built on this computer has none.
- */
-export const europeMapOf = (theatre, dataSet = null) => EUROPE_MAPS.find(entry => entry.theatre === theatre
-  && (dataSet == null ? entry.seasons == null : !!entry.seasons?.includes(dataSet))) || null;
-
-/** A season's Europe maps, the strongest clubs first: what its club theatres list. */
-export const europeMapsOf = (dataSet = null) => ['all', 'elite'].map(theatre => europeMapOf(theatre, dataSet)).filter(Boolean);
+/** Whether a map is one a sport's clubs choose between (`theatreMapsOf`), of any season. */
+export const isTheatreMap = entry => !!entry && hasTheatreMaps(entry.sport);
 
 /** Whether a scope is a Europe map's, of any season. */
 export const isEuropeScope = scope => !!domesticEntry(scope)?.theatre;
@@ -69,9 +76,12 @@ export function isCountryScope(scope) {
   return !entry || !entry.sport;
 }
 
-/** "England · top 100 clubs", "NBA · USA and Canada", "Top 124 · Europe"; a save for a country no longer shipped still reads sensibly. */
+/**
+ * "England · top 100 clubs", "NBA · USA and Canada", "Top 124 · Europe", and "Europe" alone for a theatre named after its
+ * map (women's football's every European club); a save for a country no longer shipped still reads sensibly.
+ */
 export function domesticLabel(scope) {
   const entry = domesticEntry(scope);
-  if (entry) return entry.league ? `${entry.league} · ${entry.name}` : `${entry.name} · top ${entry.clubs} clubs`;
+  if (entry) return entry.league ? (entry.league === entry.name ? entry.name : `${entry.league} · ${entry.name}`) : `${entry.name} · top ${entry.clubs} clubs`;
   return isDomesticScope(scope) ? 'One country · top clubs' : null;
 }

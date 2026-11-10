@@ -28,7 +28,8 @@ import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const docOf = id => JSON.parse(read(`public/domestic/${id}.json`));
 const setOf = id => JSON.parse(read(`public/football/${id}.json`));
-// The earlier seasons with clubs. FIFA 05 and FIFA 06 have nations only, so nothing to put on a map.
+// The earlier seasons with clubs. FIFA 05, FIFA 06, SWOS 96/97 and the fan-made 1989/90 have nations only, so nothing
+// to put on a map.
 const CLUB_SEASONS = BUILT_IN_SEASONS.filter(season => setHasClubs(season.id));
 const ATLAS = JSON.parse(read('public/countries-50m.json'));
 const WORLD = new Map();
@@ -38,6 +39,8 @@ for (const g of ATLAS.objects.countries.geometries) {
   WORLD.set(id, [...(WORLD.get(id) || []), ...polysOf(feature(ATLAS, g).geometry)]);
 }
 const sport = getSport('football');
+// Football's maps; women's football's (weu*) are scripts/womens-club-maps.test.mjs's, and keep the same rule below.
+const FOOTBALL_MAPS = EUROPE_MAPS.filter(entry => entry.sport === 'football');
 const TOP = docOf('eu124'), ELITE = docOf('eu32');
 const polysOfSection = (doc, i) => polysOf(feature(doc.topology, doc.topology.objects.sections.geometries[i]).geometry);
 /** The club whose land holds a point, by name, or null. */
@@ -59,16 +62,16 @@ const TOWNS = {
 
 test('the index lists a built-in pair of maps and one for each earlier season with clubs, each file as its entry says', () => {
   const seasons = [null, ...CLUB_SEASONS.map(season => season.id)];
-  // Football's pairs, then basketball's EuroLeague (scripts/euroleague.test.mjs), which has no football theatre.
-  assert.equal(EUROPE_MAPS.filter(entry => entry.sport === 'football').length, seasons.length * 2);
-  assert.deepEqual(EUROPE_MAPS.filter(entry => entry.sport !== 'football').map(entry => [entry.id, entry.sport, entry.league, entry.theatre]),
-    [['euroleague', 'basketball', 'EuroLeague', undefined]]);
+  assert.equal(FOOTBALL_MAPS.length, seasons.length * 2);
+  // Basketball's EuroLeague (scripts/euroleague.test.mjs) is the one map of Europe with no theatre of its own.
+  assert.deepEqual(EUROPE_MAPS.filter(entry => !entry.theatre).map(entry => [entry.id, entry.sport, entry.league]), [['euroleague', 'basketball', 'EuroLeague']]);
   for (const season of seasons) {
     assert.deepEqual(europeMapsOf(season).map(map => [map.league, map.clubs, map.theatre]),
       [[`Top ${TOP_CLUBS}`, TOP_CLUBS, 'all'], [`Elite ${ELITE_CLUBS}`, ELITE_CLUBS, 'elite']], String(season));
   }
   const nationsOnly = BUILT_IN_SEASONS.filter(season => !setHasClubs(season.id)).map(season => season.id);
-  assert.deepEqual(nationsOnly, ['ea-fifa-06', 'ea-fifa-05']);
+  // The computed World Cup seasons (`wc-<year>`) have nations only too.
+  assert.deepEqual(nationsOnly.filter(id => !id.startsWith('wc-')), ['ea-fifa-06', 'ea-fifa-05', 'swos-9697', 'cm0102-2017-04-cm89']);
   for (const season of nationsOnly) {
     assert.deepEqual(europeMapsOf(season), [], season);
     assert.deepEqual(setOf(season).clubs, [], `${season} has no clubs`);

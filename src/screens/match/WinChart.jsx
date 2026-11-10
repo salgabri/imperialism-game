@@ -2,7 +2,7 @@
 // One viewBox 800 wide at 100% width; strokes are in viewBox units. 132 tall on a phone (358×59); wherever the plot has
 // a box of its own to fill (compact pass: the Match view at ≥700) the viewBox takes that box's shape, so the chart grows
 // without stretching its lines and markers.
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { winSeries, chartGeometry } from '../../engine/winProbability.js';
 import { formatWinChance } from '../../viewModels/format.js';
 import { useMatchMinute } from './useMatchMinute.js';
@@ -10,14 +10,20 @@ import { clockLabel, clockTick, getSport } from '../../sports/index.js';
 
 const W = 800, BASE_H = 132, MAX_H = 480;
 
-/** The viewBox height that matches the plot's box, while CSS lays the drawing out to fill it (position:absolute). */
-function usePlotHeight() {
-  const plotRef = useRef(null);
+/**
+ * The viewBox height that matches the plot's box, while CSS lays the drawing out to fill it (position:absolute).
+ * Measured from a callback ref, as the plot is attached and before the browser paints (hooks/useFit.js), so the chart
+ * never shows a frame stretched from the base height; measured again whenever the plot comes back (a match that gains
+ * its model) and when `measureKey` changes (the Chart / Lineups switch or a phone segment that shows it again).
+ */
+function usePlotHeight(measureKey) {
   const [height, setHeight] = useState(BASE_H);
-  useEffect(() => {
-    const plot = plotRef.current;
+  const observer = useRef(null);
+  const plotRef = useCallback(plot => {
+    observer.current?.disconnect();
+    observer.current = null;
     const view = plot?.ownerDocument?.defaultView;
-    if (!plot || typeof view?.ResizeObserver !== 'function') return undefined;
+    if (!plot || typeof view?.ResizeObserver !== 'function') return;
     const measure = () => {
       const svg = plot.querySelector('svg');
       if (!svg || view.getComputedStyle(svg).position !== 'absolute') { setHeight(BASE_H); return; }
@@ -25,10 +31,9 @@ function usePlotHeight() {
       if (width > 0 && boxHeight > 0) setHeight(Math.max(BASE_H, Math.min(MAX_H, Math.round(W * boxHeight / width))));
     };
     measure();
-    const observer = new view.ResizeObserver(measure);
-    observer.observe(plot);
-    return () => observer.disconnect();
-  }, []);
+    observer.current = new view.ResizeObserver(measure);
+    observer.current.observe(plot);
+  }, [measureKey]);
   return [plotRef, height];
 }
 
@@ -57,9 +62,10 @@ function safeSeries(args) {
 }
 
 export default function WinChart({ sport = 'football', live = false, model = null, goals = [], perspective = null, final = null,
-  length = 90, ot = 0, chartNote = null, aId = null, dId = null, minuteStore = null, minuteFallback = 0, minuteFloor = 0 }) {
+  length = 90, ot = 0, chartNote = null, aId = null, dId = null, minuteStore = null, minuteFallback = 0, minuteFloor = 0,
+  measureKey = null }) {
   const minute = useMatchMinute({ live, minuteStore, minuteFallback, minuteFloor });
-  const [plotRef, H] = usePlotHeight();
+  const [plotRef, H] = usePlotHeight(measureKey);
   const reactId = React.useId();
   const patternId = `match-hatch-${reactId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const series = React.useMemo(() => (model

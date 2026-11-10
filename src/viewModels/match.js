@@ -2,10 +2,11 @@
 // Pure: no window/document/timers/RNG. The live minute is NOT read here (it lives in the minute store, DEC D7);
 // components pass it to buildFeedRows and to the win-probability series.
 import { clockLabel, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeText } from '../sports/index.js';
-import { selectLineup } from '../data/teams.js';
+import { isTennisSport, selectLineup } from '../data/teams.js';
 import { estimateTitle, isEstimated } from '../data/estimates.js';
 import { BENCH } from '../sports/basketball.js';
 import { PERIOD_MODEL } from '../sports/hockey.js';
+import { scoreKind } from '../sports/rugbyLeague.js';
 import { liveModelFor } from '../engine/winProbability.js';
 import { roman, historyRound, formatOddsPair, ratingTier, shortName, memo } from './format.js';
 import { idleTurnCopy } from './turns.js';
@@ -16,9 +17,14 @@ const GROUPS = {
   'american-football': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'],
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP'],
   hockey: ['C', 'LW', 'RW', 'D', 'G'],
+  tennis: ['SGL', 'DBL'],
+  'womens-tennis': ['SGL', 'DBL'],
+  'rugby-league': ['FB', 'WG', 'CE', 'FE', 'HB', 'PR', 'HK', 'SR', 'LK'],
 };
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+/** What an event adds to its side's score: its `pts`, 0 included (a tennis set that wins no rubber), else 1. */
+const ptsOf = e => (Number.isFinite(Number(e?.pts)) && e?.pts !== null && e?.pts !== '' ? Number(e.pts) : 1);
 const scoreText = (base, a, b) => `${base.aCode} ${a}–${b} ${base.bCode}`;
 
 /** Normalised pre-match odds { a, b } from a number or { a, b? }; null when missing. */
@@ -35,15 +41,31 @@ function oddsOf(odds) {
  * "Kelce 2 TD · Butker 3 FG" (American football: top two scorers; a field goal is the 3-point score, a safety the
  * 2-point one, a touchdown 6 to 8 with its try, ranked as 6 since the archived copy keeps no try) or
  * "Judge 3 RBI · Soto 1 RBI" (baseball: the two who drove in most runs) or "McDavid 2 G · Draisaitl 1 G" (ice hockey: the
- * two who scored most; a shoot-out's goal is the side's, nobody's own).
+ * two who scored most; a shoot-out's goal is the side's, nobody's own), "Sinner · Bolelli/Vavassori" (tennis: who won the
+ * side's rubbers, in order; a set that does not win its rubber counts nothing) or "Walsh 2 tries · Cleary 3 PG" (rugby
+ * league: the two who scored most, a try ranked as its four points, a penalty goal as two and a field goal as one; a
+ * conversion is the try's, nobody's own).
  */
 export function scorersLine(shown, teamId, teams, sportId = 'football') {
   const own = (Array.isArray(shown) ? shown : []).filter(e => e && e.tid === teamId && e.name);
   if (!own.length) return '';
+  if (isTennisSport(sportId)) return own.filter(e => Number(e.pts) > 0).map(e => shortName(e.name)).join(' · ');
   if (sportId === 'hockey') {
     const totals = new Map();
     for (const e of own) if (Number(e.m) <= PERIOD_MODEL.MINUTES + PERIOD_MODEL.OVERTIME) totals.set(e.name, (totals.get(e.name) || 0) + 1);
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, goals]) => `${shortName(name)} ${goals} G`).join(' · ');
+  }
+  if (sportId === 'rugby-league') {
+    const totals = new Map();
+    for (const e of own) {
+      const row = totals.get(e.name) || { pts: 0, tries: 0, penalty: 0, field: 0 };
+      const kind = scoreKind(e);
+      if (kind === 'try') { row.tries++; row.pts += 4; } else if (kind === 'penalty') { row.penalty++; row.pts += 2; } else { row.field++; row.pts += 1; }
+      totals.set(e.name, row);
+    }
+    return [...totals.entries()].sort((x, y) => y[1].pts - x[1].pts).slice(0, 2)
+      .map(([name, { tries, penalty, field }]) => `${shortName(name)} ${[tries && `${tries} ${tries === 1 ? 'try' : 'tries'}`, penalty && `${penalty} PG`,
+        field && `${field} FG`].filter(Boolean).join(', ')}`).join(' · ');
   }
   if (sportId === 'baseball') {
     const totals = new Map();
@@ -101,11 +123,14 @@ function xiTable(team, st, sportId) {
   try { lineup = selectLineup(team); } catch { lineup = { starters: [] }; }
   const groups = GROUPS[sportId] || GROUPS.football;
   const rank = pos => { const i = groups.indexOf(pos); return i < 0 ? groups.length : i; };
-  const rows = (lineup.starters || []).map((p, i) => ({ p, i, pos: p.assignedPos || p.pos || '' }))
+  // Tennis lists every place: a small nation's singles player who plays the doubles too is there twice.
+  const tennis = isTennisSport(sportId);
+  const placed = tennis ? (lineup.slots || []).filter(slot => slot.player).map(slot => slot.player) : (lineup.starters || []);
+  const rows = placed.map((p, i) => ({ p, i, pos: p.assignedPos || p.pos || '' }))
     .sort((x, y) => rank(x.pos) - rank(y.pos) || (Number(y.p.rating) || 0) - (Number(x.p.rating) || 0) || x.i - y.i)
     .map(({ p, pos }) => {
       const rating = Math.round(Number(p.effectiveRating ?? p.rating) || 0);
-      return { key: `${team.id}-${p.originalIndex ?? p.name}`, pos, name: p.name || '', natural: p.pos || pos,
+      return { key: `${team.id}-${p.originalIndex ?? p.name}${tennis ? `-${pos}` : ''}`, pos, name: p.name || '', natural: p.pos || pos,
         rating, tier: ratingTier(rating), outOfPosition: !!p.outOfPosition, claimed: claimedTag(p, team, st), estimated: isEstimated(p),
         ...(isEstimated(p) ? { estimateTitle: estimateTitle(p) } : {}) };
     });
@@ -165,10 +190,18 @@ const otOf = sport => Number(sport?.clock?.ot) || (sport?.tieBreak === 'overtime
  * header carries the same scorer lines as the live one. The copy keeps no touchdown's try, so a touchdown reads as 6.
  */
 const EVENT_COPY = /^(?:GOAL|\+(\d+)|(TD|FG|SAFETY)|(\d+) RBI)\s+—\s+(.+?)\s+\(([^()]*)\)$/;
+// Tennis's rubber line, "SINGLES — Jannik Sinner (ITA) 6–4 7–6(5)", and a set's, "SET 1 — Jannik Sinner (ITA) 6–4".
+const TENNIS_COPY = /^(SINGLES|DOUBLES|SET \d+)\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s/;
 const SCORE_POINTS = { TD: 6, FG: 3, SAFETY: 2 };
 function historyShown(entry, aId, dId, aCode, dCode) {
   const shown = [];
   for (const e of Array.isArray(entry?.events) ? entry.events : []) {
+    const tennis = TENNIS_COPY.exec(String(e?.text || '').trim());
+    if (tennis) {
+      const tid = tennis[3] === aCode ? aId : tennis[3] === dCode ? dId : null;
+      if (tid != null) shown.push({ tid, name: tennis[2], m: 0, pts: tennis[1].startsWith('SET') ? 0 : 1 });
+      continue;
+    }
     const match = EVENT_COPY.exec(String(e?.text || '').trim());
     if (!match) continue;
     const tid = match[5] === aCode ? aId : match[5] === dCode ? dId : null;
@@ -274,7 +307,7 @@ function fromMatch(st, ctx, sport, m) {
     ot: otOf(sport),
     perspective: perspectiveOf(ctx, A, D, m.aId, m.dId),
     model,
-    goals: shown.map(e => ({ m: Number(e.m) || 0, tid: e.tid, pts: Number(e.pts) || 1 })),
+    goals: shown.map(e => ({ m: Number(e.m) || 0, tid: e.tid, pts: ptsOf(e) })),
     final: state === 'full-time' && winnerSide ? { winnerSide } : null,
     chartNote: model ? null : 'Live win probability is not available for this match.',
     // A settled conquest already moved the claimed player: the XIs show the kickoff squads, not today's.
@@ -286,7 +319,7 @@ function fromMatch(st, ctx, sport, m) {
       kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: sport.tieBreak === 'overtime',
       kicks: kicks ? { a: kicks.a, b: kicks.b } : null, tieDetail,
       events: shown.map((e, i) => ({ key: `e${i}`, m: Number(e.m) || 0, label: clockLabel(sport, e.m), tid: e.tid,
-        pts: Number(e.pts) || 1, text: sport.formatEvent(e, codeOf(e.tid)).text })),
+        pts: ptsOf(e), text: sport.formatEvent(e, codeOf(e.tid)).text })),
     },
     kicks: kicks ? { a: kicks.kicksA, b: kicks.kicksB } : null,
     preMatch: preMatchOf(m.odds, A, D, m.effA, m.effD),
@@ -365,7 +398,7 @@ export function buildFeedRows(model, minute) {
   const sport = getSport(base.sport);
   const clock = m => clockLabel(sport, m);
   const rows = events.map((e, i) => ({ key: e.key || `e${i}`, n: e.m ?? i, i, minute: e.label || clock(e.m), text: e.text, weight: 700 }));
-  const scored = (tid, limit) => events.reduce((n, e) => n + (e.tid === tid && e.m != null && e.m <= limit ? (e.pts || 1) : 0), 0);
+  const scored = (tid, limit) => events.reduce((n, e) => n + (e.tid === tid && e.m != null && e.m <= limit ? ptsOf(e) : 0), 0);
   const known = events.every(e => e.tid != null && e.m != null);
   const reached = state !== 'live' || now >= base.half;
   if (known && reached && base.half > 0) {
@@ -383,7 +416,9 @@ export function buildFeedRows(model, minute) {
   if (state === 'live') {
     const left = base.length - now;
     const tail = typeof sport.clockLeft === 'function' ? sport.clockLeft(now, base.length)
-      : left > 0 ? `${plural(left, 'minute')} left` : base.overtime && now > base.length ? 'overtime' : 'final minute';
+      // Past full time, the sport's own word for it: rugby league's "golden point".
+      : left > 0 ? `${plural(left, 'minute')} left` : base.overtime && now > base.length ? (sport.words?.overtime || 'Overtime').toLowerCase()
+        : 'final minute';
     top = { key: 'status', minute: clock(now), weight: 600, live: true, text: `Live — ${scoreText(base, base.scoreA, base.scoreB)} · ${tail}` };
   } else if (state === 'penalties') {
     top = { key: 'status', minute: clock(base.finalMinute), weight: 600, live: false,

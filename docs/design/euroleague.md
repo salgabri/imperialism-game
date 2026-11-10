@@ -152,17 +152,22 @@ borders, and a country with no club stays grey. Its index entry (`src/data/europ
 
 Basketball's Clubs offer two theatres in the built-in season: **NBA** (its map of the USA and
 Canada) and **EuroLeague** (its map of Europe), each with its own description; the sport card
-reads "Nations · NBA and EuroLeague clubs". `setClubScope` keeps the EuroLeague while the season
-is the built-in one (`isBuiltInClubMap`); an earlier season goes to its era's NBA map, and
-another sport to its own. Challenge links carry `theatre=domestic:euroleague`; a save names the
+reads "Nations · NBA and EuroLeague clubs". The EuroLeague's map is a Europe map with no
+`theatre` (src/data/europeMaps.js), so basketball is a theatre sport like football
+(`hasTheatreMaps`) and `theatreMapsOf` lists the NBA's map, then the EuroLeague's. `setClubScope`
+keeps the EuroLeague while the season is the built-in one, the only season its map serves; an
+earlier season goes to its era's NBA map, and another sport to its own. Challenge links carry `theatre=domestic:euroleague`; a save names the
 map and its version as any club map's does.
 
 ## EuroBasket
 
-`SCOPES` (src/data/teams.js) gains **EuroBasket**, offered in basketball only (`sports`,
-`nationScopes`): the 24 nations of EuroBasket 2025 (`EUROBASKET_2025`), framed on Europe as the
-UEFA theatre is. Another sport's setup naming it goes back to Europe, a link to it in another
-sport is ignored, and a stale one plays the world.
+`SCOPES` (src/data/teams.js) gains **EuroBasket**, offered in basketball only (`sports`; the rule
+is `nationTheatres` in src/data/scopes.js, which also wants four real sides, and all 24 have
+one): the 24 nations of EuroBasket 2025 (`EUROBASKET_2025`), framed on Europe as the UEFA
+theatre is. Its filter reads the nation's id, not its confederation, so exactly those 24 play
+(the scope filters now get `{ id, conf }`). Another sport keeps the choice in its setup but plays its heartland
+(football's Europe), as for any theatre a sport lacks, and basketball finds EuroBasket again; a
+link to it in another sport is ignored.
 
 Seventeen of the 24 already had a curated five. The other seven (Belgium, Cyprus, Estonia, Great
 Britain, Iceland, Portugal, Sweden) now field the five who started or played most for them at
@@ -181,8 +186,10 @@ the four in Iceland's small lineups, is its power forward.
   differently for his club and his country: Kostas Sloukas is 79 for Greece and 77 by his
   EuroLeague games, Andreas Obst 78 for Germany and 73 for Bayern. Switching the fives to these
   estimates would change several nations' strengths.
-- Great Britain plays on the United Kingdom's shape, which the game names England (with
-  England's flag) in every sport, as before.
+- Great Britain's new five makes it a real basketball side, so it now fields a team in
+  basketball as in both tennis games, as Great Britain under the Union Jack on the United
+  Kingdom's shape (`playsAs`); football still plays England. Basketball fields 47 nations (40
+  before).
 - Rosters are as of 8 November 2026; the EuroLeague's earlier seasons are not built (NBA 2K's
   EuroLeague teams of 2K14–2K17 are not on 2K Archive's page).
 - Dubai, the frame's south-east corner, opens partly under the map's zoom buttons (about a third of

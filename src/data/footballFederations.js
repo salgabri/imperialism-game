@@ -1,28 +1,347 @@
-// Game shapes whose football association joined FIFA after 2001, for data sets of other seasons
-// (docs/design/football-years.md, 'Federations by year'). A shape takes part in season-end year Y when its
-// association was a FIFA member by the cutoff (30 June Y, the end of season Y). Before then it is held by
-// heldBy (merged into that nation's empire at kick-off) or, with no holder, stays neutral (inactive).
-// Membership dates are the dates of admission to FIFA, and each source is FIFA's page for that association.
-// New Caledonia was admitted by the FIFA Congress in Paris on 20-21 May 2004; the Congress's last day is used
-// because no more exact date was found. Either day is before that year's 30 June cutoff.
+// The football federations of every season from 1961/62 on (docs/design/football-years.md, 'Federations by year' and
+// 'Federations of the day'), the state on the cutoff, 30 June of the season-end year. territoryFor and identitiesFor in
+// footballSetBuild.js read this.
+//
+// `shapes`: game shapes whose association joined FIFA after 30 June 1962, the cutoff of the earliest season (1961/62).
+// A shape takes part in season-end year Y when its association was a FIFA member by the cutoff. Before then it is held
+// by heldBy (merged into that nation's empire at kick-off) where it was part of that nation, until heldUntil where the
+// holder lost it earlier (by the same cutoff), or, with no holder, stays neutral (inactive): so do colonies, since the
+// map has no colonial empires. Membership dates are the dates of admission to FIFA, and each source is FIFA's page for
+// that association ("FIFA member since", read 2026-11-08 for the entries from 1996 on and 2026-11-09 for the rest;
+// scripts/data/fifa-member-associations.json keeps every game nation's). FIFA gives 1 January where only the year is
+// known, and that day is used: such an association counts from the season ending in its year. Where another source
+// gives the day (`dateSource`), that day is used. New Caledonia was admitted by the FIFA Congress in Paris on 20-21 May
+// 2004; the Congress's last day is used because no more exact date was found. Either day is before that year's 30 June
+// cutoff. Every other game nation's association was a FIFA member by 30 June 1962, or plays through a federation of the
+// day below.
+//
+// `federations`: the federations of the day, each in its season-end years `from` to `through` (either open): its holder
+// shape plays under its name, code and flag (a season's `identities`), and holds its `members`' shapes, whatever their
+// own dates above. The codes are FIFA's of the day (List of FIFA country codes, Wikipedia, revision 1383938499).
+// `aliases` are other spellings of its name in a database's nation list (CM 01/02's 'Commonwealth of Soviet States').
+//
+// `suspensions`: associations FIFA suspended or expelled, or that had left it, from `from` until `until` (the day it
+// was lifted, or the readmission). A suspended association's shape is inactive, and so is every shape it holds. A date
+// given only to the month is written so ('1963-01'): no such month is a cutoff's June, so no day changes a season.
 
 export const FOOTBALL_FEDERATIONS = {
   cutoff: '06-30',
   shapes: {
+    '012': { name: 'Algeria', fifa: 'ALG', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/ALG',
+      before: 'No FIFA member: neutral.' },
+    '024': { name: 'Angola', fifa: 'ANG', member: '1980-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/ANG',
+      before: 'No FIFA member: neutral.' },
+    '031': { name: 'Azerbaijan', fifa: 'AZE', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/AZE',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations); then no FIFA member: neutral.' },
+    '036': { name: 'Australia', fifa: 'AUS', member: '1963-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/AUS',
+      before: 'No FIFA member: neutral.' },
+    '044': { name: 'Bahamas', fifa: 'BAH', member: '1968-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BAH',
+      before: 'No FIFA member: neutral.' },
+    '050': { name: 'Bangladesh', fifa: 'BAN', member: '1976-01-01', heldBy: '586', heldUntil: '1971-12-16',
+      source: 'https://inside.fifa.com/associations/BAN',
+      heldSource: 'https://en.wikipedia.org/w/index.php?oldid=1382074513',
+      before: 'East Pakistan, held by Pakistan (586) until the war of 1971 ended with the surrender of 16 December 1971 '
+        + '(Bangladesh Liberation War, Wikipedia), before the cutoff of season 1971/72; then no FIFA member: neutral.' },
+    '051': { name: 'Armenia', fifa: 'ARM', member: '1992-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/ARM',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations).' },
+    '064': { name: 'Bhutan', fifa: 'BHU', member: '2000-08-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BHU',
+      before: 'No FIFA member: neutral.' },
+    '070': { name: 'Bosnia and Herzegovina', fifa: 'BIH', member: '1996-07-03', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BIH',
+      before: 'A Yugoslav republic: Yugoslavia\'s to 1990/91 (federations). Independent from 1992, its association not yet a '
+        + 'FIFA member: neutral.' },
+    '072': { name: 'Botswana', fifa: 'BOT', member: '1978-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BOT',
+      before: 'No FIFA member: neutral.' },
+    '084': { name: 'Belize', fifa: 'BLZ', member: '1986-04-03', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BLZ',
+      before: 'No FIFA member: neutral.' },
+    '090': { name: 'Solomon Islands', fifa: 'SOL', member: '1988-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/SOL',
+      before: 'No FIFA member: neutral.' },
+    '096': { name: 'Brunei', fifa: 'BRU', member: '1972-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BRU',
+      before: 'No FIFA member: neutral.' },
+    '108': { name: 'Burundi', fifa: 'BDI', member: '1972-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BDI',
+      before: 'No FIFA member: neutral.' },
+    '112': { name: 'Belarus', fifa: 'BLR', member: '1992-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BLR',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations).' },
+    '140': { name: 'Central African Republic', fifa: 'CTA', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/CTA',
+      before: 'No FIFA member: neutral.' },
+    '148': { name: 'Chad', fifa: 'CHA', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/CHA',
+      before: 'No FIFA member: neutral.' },
+    '178': { name: 'Congo', fifa: 'CGO', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/CGO',
+      before: 'No FIFA member: neutral.' },
+    '180': { name: 'DR Congo', fifa: 'COD', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/COD',
+      before: 'No FIFA member: neutral. Zaire from 1971/72 to 1995/96 (federations).' },
+    '184': { name: 'Cook Islands', fifa: 'COK', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/COK',
+      before: 'No FIFA member: neutral.' },
+    '191': { name: 'Croatia', fifa: 'CRO', member: '1992-07-03', heldBy: null,
+      source: 'https://inside.fifa.com/associations/CRO',
+      before: 'A Yugoslav republic: Yugoslavia\'s to 1990/91 (federations); its association joined FIFA on 3 July 1992, '
+        + 'after the cutoff of 1991/92: neutral that season.' },
+    '204': { name: 'Benin', fifa: 'BEN', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BEN',
+      before: 'No FIFA member: neutral.' },
+    '226': { name: 'Equatorial Guinea', fifa: 'EQG', member: '1986-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/EQG',
+      before: 'No FIFA member: neutral.' },
+    '232': { name: 'Eritrea', fifa: 'ERI', member: '1998-01-01', heldBy: '231', heldUntil: '1991-05-24',
+      source: 'https://inside.fifa.com/associations/ERI',
+      heldSource: 'https://en.wikipedia.org/w/index.php?oldid=1384480852',
+      before: 'Part of Ethiopia (231) until it became independent in fact on 24 May 1991 (in law on 24 May 1993; Eritrea, '
+        + 'Wikipedia), before the cutoff of season 1990/91; then, its association not yet a FIFA member: neutral.' },
+    '242': { name: 'Fiji', fifa: 'FIJ', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/FIJ',
+      before: 'No FIFA member: neutral.' },
+    '262': { name: 'Djibouti', fifa: 'DJI', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/DJI',
+      before: 'No FIFA member: neutral.' },
+    '266': { name: 'Gabon', fifa: 'GAB', member: '1966-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/GAB',
+      before: 'No FIFA member: neutral.' },
+    '268': { name: 'Georgia', fifa: 'GEO', member: '1992-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/GEO',
+      before: 'A Soviet republic: the Soviet Union\'s, then (outside the CIS itself) the CIS team\'s, to 1991/92 (federations).' },
+    '270': { name: 'Gambia', fifa: 'GAM', member: '1968-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/GAM',
+      before: 'No FIFA member: neutral.' },
+    '275': { name: 'Palestine', fifa: 'PLE', member: '1998-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/PLE',
+      before: 'No FIFA member: neutral.' },
+    '328': { name: 'Guyana', fifa: 'GUY', member: '1970-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/GUY',
+      before: 'No FIFA member: neutral.' },
+    '384': { name: 'Côte d\'Ivoire', fifa: 'CIV', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/CIV',
+      before: 'No FIFA member: neutral.' },
+    '398': { name: 'Kazakhstan', fifa: 'KAZ', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/KAZ',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations); then no FIFA member: neutral.' },
+    '414': { name: 'Kuwait', fifa: 'KUW', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/KUW',
+      before: 'No FIFA member: neutral.' },
+    '417': { name: 'Kyrgyzstan', fifa: 'KGZ', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/KGZ',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations); then no FIFA member: neutral.' },
+    '426': { name: 'Lesotho', fifa: 'LES', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/LES',
+      before: 'No FIFA member: neutral.' },
+    '430': { name: 'Liberia', fifa: 'LBR', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/LBR',
+      before: 'No FIFA member: neutral.' },
+    '434': { name: 'Libya', fifa: 'LBY', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/LBY',
+      before: 'No FIFA member: neutral.' },
+    '450': { name: 'Madagascar', fifa: 'MAD', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/MAD',
+      before: 'No FIFA member: neutral.' },
+    '454': { name: 'Malawi', fifa: 'MWI', member: '1968-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/MWI',
+      before: 'No FIFA member: neutral.' },
+    '466': { name: 'Mali', fifa: 'MLI', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/MLI',
+      before: 'No FIFA member: neutral.' },
+    '478': { name: 'Mauritania', fifa: 'MTN', member: '1970-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/MTN',
+      before: 'No FIFA member: neutral.' },
+    '496': { name: 'Mongolia', fifa: 'MNG', member: '1998-07-29', heldBy: null,
+      source: 'https://inside.fifa.com/associations/MNG',
+      before: 'No FIFA member: neutral.' },
+    '498': { name: 'Moldova', fifa: 'MDA', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/MDA',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations); then no FIFA member: neutral.' },
     '499': { name: 'Montenegro', fifa: 'MNE', member: '2007-05-31', heldBy: '688',
       source: 'https://inside.fifa.com/associations/MNE',
-      before: 'Part of FR Yugoslavia, then Serbia and Montenegro (Serbia, 688, keeps its modern name and flag).' },
+      before: 'A Yugoslav republic: Yugoslavia\'s to 1990/91 (federations); then part of FR Yugoslavia, then Serbia and '
+        + 'Montenegro (Serbia, 688; neutral while FR Yugoslavia was suspended, 1991/92 to 1993/94).' },
+    '508': { name: 'Mozambique', fifa: 'MOZ', member: '1980-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/MOZ',
+      before: 'No FIFA member: neutral.' },
+    '512': { name: 'Oman', fifa: 'OMA', member: '1980-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/OMA',
+      before: 'No FIFA member: neutral.' },
+    '516': { name: 'Namibia', fifa: 'NAM', member: '1992-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/NAM',
+      before: 'No FIFA member: neutral.' },
+    '524': { name: 'Nepal', fifa: 'NEP', member: '1972-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/NEP',
+      before: 'No FIFA member: neutral.' },
     '540': { name: 'New Caledonia', fifa: 'NCL', member: '2004-05-21', heldBy: '250',
       source: 'https://inside.fifa.com/associations/NCL',
       before: 'A French territory.' },
+    '548': { name: 'Vanuatu', fifa: 'VAN', member: '1988-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/VAN',
+      before: 'No FIFA member: neutral.' },
+    '562': { name: 'Niger', fifa: 'NIG', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/NIG',
+      before: 'No FIFA member: neutral.' },
+    '598': { name: 'Papua New Guinea', fifa: 'PNG', member: '1966-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/PNG',
+      before: 'No FIFA member: neutral.' },
+    '624': { name: 'Guinea-Bissau', fifa: 'GNB', member: '1986-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/GNB',
+      before: 'No FIFA member: neutral.' },
     '626': { name: 'Timor-Leste', fifa: 'TLS', member: '2005-09-12', heldBy: null,
       source: 'https://inside.fifa.com/associations/TLS',
+      before: 'No FIFA member: neutral (Indonesia\'s occupation until 1999 was never recognised by the United Nations).' },
+    '634': { name: 'Qatar', fifa: 'QAT', member: '1972-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/QAT',
+      before: 'No FIFA member: neutral.' },
+    '646': { name: 'Rwanda', fifa: 'RWA', member: '1978-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/RWA',
+      before: 'No FIFA member: neutral.' },
+    '686': { name: 'Senegal', fifa: 'SEN', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/SEN',
+      before: 'No FIFA member: neutral.' },
+    '703': { name: 'Slovakia', fifa: 'SVK', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/SVK',
+      before: 'Part of Czechoslovakia to 1992/93 (federations): its team played on as the Representation of Czechs and '
+        + 'Slovaks until 17 November 1993, and Slovakia\'s from February 1994.' },
+    '704': { name: 'Vietnam', fifa: 'VIE', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/VIE',
+      before: 'No FIFA member: neutral (FIFA dates today\'s association from 1964).' },
+    '705': { name: 'Slovenia', fifa: 'SVN', member: '1992-07-03', heldBy: null,
+      source: 'https://inside.fifa.com/associations/SVN',
+      dateSource: 'https://en.wikipedia.org/w/index.php?oldid=1372391120',
+      before: 'A Yugoslav republic: Yugoslavia\'s to 1990/91 (federations). FIFA gives only the year, 1992; its association '
+        + 'joined on 3 July 1992 (Football Association of Slovenia, Wikipedia), with Croatia\'s, after the cutoff of 1991/92: '
+        + 'neutral that season.' },
+    '716': { name: 'Zimbabwe', fifa: 'ZIM', member: '1965-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/ZIM',
       before: 'No FIFA member: neutral.' },
     '728': { name: 'South Sudan', fifa: 'SSD', member: '2012-05-25', heldBy: '729',
       source: 'https://inside.fifa.com/associations/SSD',
       before: 'Part of Sudan until independence on 9 July 2011, after the cutoff of season 2010/11.' },
-    'KOS': { name: 'Kosovo', fifa: 'KVX', member: '2016-05-13', heldBy: null,
-      source: 'https://inside.fifa.com/associations/KVX',
+    '748': { name: 'Eswatini', fifa: 'SWZ', member: '1978-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/SWZ',
       before: 'No FIFA member: neutral.' },
+    '762': { name: 'Tajikistan', fifa: 'TJK', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/TJK',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations); then no FIFA member: neutral.' },
+    '768': { name: 'Togo', fifa: 'TOG', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/TOG',
+      before: 'No FIFA member: neutral.' },
+    '776': { name: 'Tonga', fifa: 'TGA', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/TGA',
+      before: 'No FIFA member: neutral.' },
+    '780': { name: 'Trinidad and Tobago', fifa: 'TRI', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/TRI',
+      before: 'No FIFA member: neutral.' },
+    '784': { name: 'United Arab Emirates', fifa: 'UAE', member: '1974-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/UAE',
+      before: 'No FIFA member: neutral.' },
+    '795': { name: 'Turkmenistan', fifa: 'TKM', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/TKM',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations); then no FIFA member: neutral.' },
+    '804': { name: 'Ukraine', fifa: 'UKR', member: '1992-07-03', heldBy: null,
+      source: 'https://inside.fifa.com/associations/UKR',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations).' },
+    '807': { name: 'North Macedonia', fifa: 'MKD', member: '1994-06-16', heldBy: null,
+      source: 'https://inside.fifa.com/associations/MKD',
+      before: 'A Yugoslav republic: Yugoslavia\'s to 1990/91 (federations); then, its association not yet a FIFA member: '
+        + 'neutral.' },
+    '834': { name: 'Tanzania', fifa: 'TAN', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/TAN',
+      before: 'No FIFA member: neutral.' },
+    '854': { name: 'Burkina Faso', fifa: 'BFA', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/BFA',
+      before: 'No FIFA member: neutral.' },
+    '860': { name: 'Uzbekistan', fifa: 'UZB', member: '1994-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/UZB',
+      before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations); then no FIFA member: neutral.' },
+    '882': { name: 'Samoa', fifa: 'SAM', member: '1986-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/SAM',
+      before: 'No FIFA member: neutral.' },
+    '887': { name: 'Yemen', fifa: 'YEM', member: '1980-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/YEM',
+      before: 'No FIFA member: neutral (FIFA dates today\'s association from 1980).' },
+    '894': { name: 'Zambia', fifa: 'ZAM', member: '1964-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/ZAM',
+      before: 'No FIFA member: neutral.' },
+    'KOS': { name: 'Kosovo', fifa: 'KVX', member: '2016-05-13', heldBy: '688', heldUntil: '1999-06-10',
+      source: 'https://inside.fifa.com/associations/KVX',
+      heldSource: 'https://undocs.org/S/RES/1244(1999)',
+      before: 'Part of FR Yugoslavia (Serbia, 688) until the United Nations took over its administration on 10 June 1999 '
+        + '(Security Council resolution 1244), before the cutoff of season 1998/99; from then no FIFA member: neutral. '
+        + 'Yugoslavia\'s to 1990/91 (federations), and neutral while FR Yugoslavia was suspended, 1991/92 to 1993/94.' },
   },
+  federations: [
+    { id: 'URS', name: 'Soviet Union', code: 'URS', flagId: 'URS', holder: '643', through: 1991,
+      members: ['804', '112', '268', '051', '031', '398', '860', '795', '762', '417', '498', '233', '428', '440'],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1384615907',
+      note: 'The Football Federation of the Soviet Union played for all fifteen republics; its last match was on '
+        + '13 November 1991, and the Soviet Union ceased to exist on 26 December 1991, before the cutoff of 1991/92.' },
+    { id: 'CIS', name: 'CIS', code: 'CIS', flagId: 'CIS', holder: '643', from: 1992, through: 1992,
+      aliases: ['Commonwealth of Soviet States'],
+      members: ['804', '112', '268', '051', '031', '398', '860', '795', '762', '417', '498'],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1384484443',
+      note: 'The Soviet team, as the CIS (approved by FIFA on 13 January 1992), played its last match on 18 June 1992 at '
+        + 'Euro 1992: twelve former republics took part, the eleven members of the CIS and Georgia, then outside it, but '
+        + 'not the Baltic states, whose own associations take part from 1991/92 (FIFA dates them from 1923, before the '
+        + 'Soviet years; Estonia\'s first FIFA match after them was on 3 June 1992, Estonia national football team, '
+        + 'Wikipedia, revision 1383569628).' },
+    { id: 'YUG', name: 'Yugoslavia', code: 'YUG', flagId: 'YUG', holder: '688', through: 1991,
+      members: ['191', '705', '070', '807', '499', 'KOS'],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1378612036',
+      note: 'SFR Yugoslavia played for its six republics and Kosovo; its last match was on 25 March 1992. By the cutoff of '
+        + '1991/92 FR Yugoslavia (Serbia and Montenegro) had adopted its constitution (27 April 1992; Serbia and '
+        + 'Montenegro, Wikipedia, revision 1384622516) and its association had been barred (31 May 1992, the United Nations '
+        + 'sanctions), and Croatia and Slovenia joined FIFA on 3 July 1992, after it: in 1991/92 no shape of the old '
+        + 'Yugoslavia fields a team.' },
+    { id: 'FRY', name: 'FR Yugoslavia', code: 'YUG', flagId: 'FRY', holder: '688', from: 1992, through: 1996, members: [],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1366001746',
+      note: 'FR Yugoslavia (Serbia and Montenegro from 2003) holds Montenegro and Kosovo through their own entries above. '
+        + 'Its identity stops with 1995/96: the seasons from 1996/97 were built before identities and play it as Serbia, '
+        + 'with today\'s name and flag.' },
+    { id: 'TCH', name: 'Czechoslovakia', code: 'TCH', flagId: '203', holder: '203', through: 1993, members: ['703'],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1375198257',
+      note: 'Czechoslovakia ended on 31 December 1992, but its team played on as the Representation of Czechs and Slovaks '
+        + '(RCS) until 17 November 1993, after the cutoff of 1992/93; the Czech Republic and Slovakia played from February '
+        + '1994 (FIFA dates Slovakia\'s association from 1994, the Czech one from 1907). Its flag is the Czech one.' },
+    { id: 'FRG', name: 'West Germany', code: 'FRG', flagId: '276', holder: '276', through: 1990, members: [],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1384613198',
+      note: 'Germany FR (FRG) until reunification on 3 October 1990 (German reunification, Wikipedia, revision '
+        + '1383934904), after the cutoff of 1989/90; its flag is Germany\'s. East Germany has no shape on the map, so it '
+        + 'fields no team.' },
+    { id: 'ZAI', name: 'Zaire', code: 'ZAI', flagId: 'ZAI', holder: '180', from: 1972, through: 1996, members: [],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1383080856',
+      note: 'The DR Congo was renamed Zaire on 27 October 1971, in season 1971/72, and the DR Congo again in May 1997, '
+        + 'before the cutoff of 1996/97.' },
+  ],
+  suspensions: [
+    { shape: '156', name: 'China PR', from: '1958-07-08', until: '1980-07-07',
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1375920796',
+      note: 'The Chinese Football Association left FIFA over Taiwan\'s membership (notice of 8 July 1958) and was readmitted '
+        + 'by FIFA\'s 42nd Congress on 7 July 1980, after the cutoff of 1979/80 (the national team\'s article, revision '
+        + '1384083957, gives only the year 1979 for its return).' },
+    { shape: '710', name: 'South Africa', from: '1961-09-26', until: '1963-01',
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1384091000',
+      note: 'Suspended at FIFA\'s annual conference on 26 September 1961; the suspension was lifted in January 1963.' },
+    { shape: '710', name: 'South Africa', from: '1964-10', until: '1992-07-03',
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1384091000',
+      untilSource: 'https://sahistory.org.za/dated-event/sas-fifa-membership-reinstated',
+      note: 'Suspended again at FIFA\'s conference in Tokyo in October 1964, expelled in 1976 (at the Congress in Montreal '
+        + 'on 16 July 1976: South African Football Association, Wikipedia, revision 1370236747), and readmitted on 3 July '
+        + '1992 (South African History Online), after the cutoff of 1991/92. FIFA gives only the year of the new '
+        + 'association, 1992.' },
+    { shape: '688', name: 'Yugoslavia, then FR Yugoslavia', from: '1992-05-31', until: '1994-12',
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1366001746',
+      note: 'Barred under the United Nations sanctions from 31 May 1992 (Yugoslavia national football team, Wikipedia, '
+        + 'revision 1378612036); its first match after them was on 23 December 1994.' },
+  ],
 };

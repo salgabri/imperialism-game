@@ -23,15 +23,16 @@ const slug = text => String(text || '').normalize('NFKD').replace(/[̀-ͯ]/g, ''
 
 /**
  * The share card. `shapes` is the map's land as drawn ([{ id, d, bbox }]: WorldMap's country paths); `backdrop` a
- * country map's neighbouring land ([{ d }]); `own` territory → holder at the end; `fill` the champion's map colour.
- * The map frames `frame` (the campaign's opening camera, App's `viewFocus`) when given, else the land the campaign was
- * fought over (every held territory's mainland), else the whole chart.
- * → { width, height, band, map, sea, transform: { scale, tx, ty }, backdrop: [d], land: [{ d, fill }], border,
- *     kicker, title, line, site, mark, filename }
+ * country map's neighbouring land ([{ d }]); `own` territory → holder at the end; `fill` the champion's map colour;
+ * `claimed` the outlines of the empty land the champion claimed ([{ d }], engine/claims.js), drawn over the land in
+ * that colour, as its territory is. The map frames `frame` (the campaign's opening camera, App's `viewFocus`) when
+ * given, else the land the campaign was fought over (every held territory's mainland), else the whole chart.
+ * → { width, height, band, map, sea, transform: { scale, tx, ty }, backdrop: [d], land: [{ d, fill }], claimed: [d],
+ *     claimFill, border, kicker, title, line, site, mark, filename }
  */
 export function buildShareCard({
   shapes = [], backdrop = [], own = {}, championId = null, championName = '', fill = V4.landNeutral, frame = null,
-  kicker = '', line = '', site = '', mark = null, seed = null,
+  kicker = '', line = '', site = '', mark = null, seed = null, claimed = [],
 } = {}) {
   const { width, height, band, pad } = SHARE_CARD;
   const map = { x: 0, y: 0, w: width, h: height - band };
@@ -46,6 +47,8 @@ export function buildShareCard({
     width, height, band, map, transform, sea: V4.sea, neutral: V4.landNeutral,
     backdrop: Object.freeze((backdrop || []).filter(shape => shape?.d).map(shape => shape.d)),
     land: Object.freeze(land),
+    claimed: Object.freeze((claimed || []).filter(shape => shape?.d).map(shape => shape.d)),
+    claimFill: fill,
     // Borders a constant 0.9 card pixels wide, whatever the frame's scale.
     border: Object.freeze({ color: '#ffffff', width: 0.9 / scale }),
     kicker: String(kicker || ''), title: String(championName || '').toUpperCase(), line: String(line || ''), site: String(site || ''),

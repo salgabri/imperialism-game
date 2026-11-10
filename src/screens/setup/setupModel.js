@@ -3,11 +3,11 @@
 // The in-game settings panel reads the same option lists, Show matches helpers and `campaignFacts`.
 // Everything here is a pure function of the setup record and the opening teams App already computes
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
-import { NATIONS, nationScopes } from '../../data/teams.js';
-import { CLUB_SCOPES, TOP_CLUBS, strongestClubs as topClubs } from '../../data/scopes.js';
+import { NATIONS, SCOPES, isTennisSport, nationIdentity } from '../../data/teams.js';
+import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
-import { clubMapsOf, domesticEntry, domesticLabel, europeMapsOf, isDomesticScope } from '../../data/domesticScope.js';
+import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
@@ -87,6 +87,11 @@ export const FINALE_HELP = {
   'best-of-three': 'The last two teams play until one has won twice.',
 };
 export const RECRUITMENT_OPTIONS = Object.freeze([['highest-rated', 'Best-rated player'], ['best-fit', 'Best lineup fit']]);
+/**
+ * Whether Computer signings is a choice in a sport (an id). In tennis any player plays any place, so the best-rated
+ * player is always the best fit and the two settings sign the same player: the choice is left out there.
+ */
+export const signingsOffered = sportId => !isTennisSport(sportId);
 export const RECRUITMENT_HELP = {
   'highest-rated': "After a win, a team you don't manage signs the loser's highest-rated player.",
   'best-fit': "After a win, a team you don't manage signs the loser's player who most improves its starting lineup.",
@@ -148,7 +153,9 @@ export function moreRulesSummary(setup = {}) {
   const uncertainty = valid(UNCERTAINTY_OPTIONS, setup.uncertainty, 'balanced');
   if (uncertainty !== 'balanced') parts.push(`Upsets: ${nameOf(UNCERTAINTY_OPTIONS, uncertainty)}`);
   if (setup.finale === 'best-of-three') parts.push(`Final: ${nameOf(FINALE_OPTIONS, 'best-of-three')}`);
-  if (setup.acquisitionPolicy === 'best-fit') parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
+  if (setup.acquisitionPolicy === 'best-fit' && signingsOffered(getSport(setup.sport).id)) {
+    parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
+  }
   if (setup.homeAdvantage === 'on') parts.push(`Home advantage: ${nameOf(HOME_OPTIONS, 'on')}`);
   if (setup.rosterPreset === 'competitive' && getSport(setup.sport).id === 'basketball') {
     parts.push(`Team strengths: ${nameOf(ROSTER_OPTIONS, 'competitive')}`);
@@ -161,7 +168,8 @@ export function moreRulesSummary(setup = {}) {
 /**
  * The in-game settings' read-only "This campaign" rows, from the launched settings. Missing or unknown values read as
  * their defaults, so old saves and partial fixtures never show `undefined`. `stored` is the value behind the text.
- * Home advantage has a row only when it is on, as team strengths has one only in basketball.
+ * Home advantage has a row only when it is on, as team strengths has one only in basketball and computer signings
+ * none in tennis.
  * → [{ id, label, value, stored, inner?: { id, stored }, num? }]
  */
 export function campaignFacts(settings = {}, { seed = null, managementEnded = false, managedName = null } = {}) {
@@ -190,8 +198,10 @@ export function campaignFacts(settings = {}, { seed = null, managementEnded = fa
   rows.push(
     { id: 'uncertainty', label: 'Upsets', value: nameOf(UNCERTAINTY_OPTIONS, uncertainty), stored: uncertainty },
     { id: 'finale', label: 'Final', value: nameOf(FINALE_OPTIONS, finale), stored: finale },
-    { id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment },
   );
+  if (signingsOffered(getSport(s.sport).id)) {
+    rows.push({ id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment });
+  }
   if (s.homeAdvantage === 'on') rows.push({ id: 'home-advantage', label: 'Home advantage', value: nameOf(HOME_OPTIONS, 'on'), stored: 'on' });
   if (s.sport === 'basketball') rows.push({ id: 'roster-preset', label: 'Team strengths', value: nameOf(ROSTER_OPTIONS, roster), stored: roster });
   if (seed != null && String(seed) !== '') rows.push({ id: 'seed', label: 'Seed', value: String(seed), stored: String(seed), num: true });
@@ -216,7 +226,7 @@ function nationCounts(sport) {
   if (!nationCountCache.has(key)) {
     // A data set's season can leave out shapes merged into another federation or with none.
     const nations = fieldedNations(sport);
-    nationCountCache.set(key, Object.fromEntries(nationScopes(sport).map(scope => [scope.id, scope.id === 'world'
+    nationCountCache.set(key, Object.fromEntries(SCOPES.map(scope => [scope.id, scope.id === 'world'
       ? nations.length
       : scope.id === 'elite' ? Math.min(32, nations.length) : nations.filter(id => scope.filter({ id, conf: NATIONS[id][2] })).length])));
   }
@@ -252,51 +262,52 @@ function clubIndex(sport) {
 }
 
 const clubMapRows = new Map();
-/**
- * The theatres of a sport whose clubs have their own maps, a row a league: 'NBA' on the USA and Canada, and in
- * basketball's built-in season 'EuroLeague' on its map of Europe.
- */
-function clubMapTheatre(...maps) {
-  const key = maps.map(map => map.id).join('|');
-  if (!clubMapRows.has(key)) {
-    clubMapRows.set(key, Object.freeze(maps.map(map => Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' }))));
+/** The one theatre of a sport whose clubs have their own map: 'NFL', on the USA. */
+function clubMapTheatre(map) {
+  if (!clubMapRows.has(map.id)) {
+    clubMapRows.set(map.id, Object.freeze([Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' })]));
   }
-  return clubMapRows.get(key);
+  return clubMapRows.get(map.id);
 }
 
-const europeRows = new Map();
-/** Football's club theatres in a season (`dataSet`, null for the built-in one): its Europe maps, or none for a set without them. */
-function europeTheatres(dataSet = null) {
-  if (!europeRows.has(dataSet)) {
-    europeRows.set(dataSet, Object.freeze(europeMapsOf(dataSet).map(map => Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' }))));
+const mapRows = new Map();
+/**
+ * The club theatres of a sport whose clubs choose between maps, in a season (`dataSet`, null for the built-in one):
+ * football's Europe maps, women's football's and its NWSL map (`theatreMapsOf`), or none for a set without them.
+ */
+function mapTheatres(sportId, dataSet = null) {
+  const key = `${sportId}|${dataSet}`;
+  if (!mapRows.has(key)) {
+    mapRows.set(key, Object.freeze(theatreMapsOf(sportId, dataSet).map(map => Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' }))));
   }
-  return europeRows.get(dataSet);
+  return mapRows.get(key);
 }
 
 /** Theatre rows for the active layer: [{ id, name, label, count, note }] (counts as in HEAD's setup). */
 export function theatreOptions(sport, clubLayer) {
   if (clubLayer) {
-    // A basketball season plays on its era's map (`clubMap`); the built-in one on the NBA's and the EuroLeague's.
-    const maps = clubMapsOf(sport.id, sport.clubMap);
-    if (maps.length) return clubMapTheatre(...maps);
-    const europe = sport.id === 'football' ? europeTheatres(sport.dataSet ?? null) : [];
-    return europe.length ? europe : clubTheatres(sport);
+    // A basketball season plays on its era's map (`clubMap`).
+    const map = clubMapOf(sport.id, sport.clubMap);
+    if (map) return clubMapTheatre(map);
+    const maps = mapTheatres(sport.id, sport.dataSet ?? null);
+    return maps.length ? maps : clubTheatres(sport);
   }
+  // Only where the sport is played (data/scopes.js `nationTheatres`).
   const counts = nationCounts(sport);
-  return nationScopes(sport).map(scope => theatreRow(scope, counts[scope.id]));
+  return nationTheatres(sport).map(scope => theatreRow(scope, counts[scope.id]));
 }
 
 /**
  * Theatre rows while a chosen data set loads, with no counts (`count: null`): its nations and leagues are not known
  * yet. Clubs offer every club and the elite, plus a league already chosen, which the set keeps or drops once loaded.
  * The maps a season's clubs play on are known already, clubs counted: a basketball season's era map, a football
- * season's Europe maps.
+ * season's Europe maps, a women's football season's Europe and NWSL maps.
  */
 function pendingTheatres(builtIn, clubLayer, clubScope) {
-  if (!clubLayer) return nationScopes(builtIn).map(scope => theatreRow(scope, null));
+  if (!clubLayer) return SCOPES.filter(scope => !scope.sports || scope.sports.includes(builtIn.id)).map(scope => theatreRow(scope, null));
   const map = domesticEntry(clubScope);
-  if (map?.theatre) return europeTheatres(map.seasons?.[0] ?? null);
-  if (map?.sport === builtIn.id) return map.seasons ? clubMapTheatre(map) : clubMapTheatre(...clubMapsOf(builtIn.id));
+  if (isTheatreMap(map)) return mapTheatres(map.sport, map.seasons?.[0] ?? null);
+  if (map?.sport === builtIn.id) return clubMapTheatre(map);
   const [all, elite, ...leagues] = CLUB_SCOPES(builtIn);
   return [all, elite, ...leagues.filter(scope => scope.id === clubScope)].map(scope => theatreRow(scope, null));
 }
@@ -324,34 +335,83 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
-  football: 'Earlier seasons use EA FIFA ratings of that season, with clubs from the seven biggest leagues. Nations without '
-    + 'eleven rated players start short-handed. 2005/06 and 2004/05 have nations only.',
-  'womens-football': 'EA SPORTS FC 27 ratings of the women\'s game, as of 7 November 2026. Nations without eleven rated '
-    + 'players start short-handed, and a nation with none fields no team.',
+  football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1994/95 to '
+    + '1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, Cam F\'s and Simon Treanor\'s), with clubs from '
+    + 'the seven biggest leagues. A nation with fewer than six rated players fields no team, and one without eleven starts '
+    + 'short-handed. 2005/06, 2004/05, 1996/97 and 1989/90 have nations only. The World Cups of 1961/62 to 1993/94 are '
+    + 'computed and have nations only: each finalist rated from its Elo and its players\' records.',
+  'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
+    + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
+    + 'without eleven starts short-handed.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
-    + 'scoring, marked as one. Rosters as of 7 November 2026. Nations field the NHL players of each country.',
-  basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
-    + 'only: the franchises of that season, on the map of their day. No game rates EuroLeague players, so the '
-    + 'EuroLeague\'s ratings are estimates from its box scores, marked as such.',
-  'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
-    + 'of the United States.',
-  baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October). Nations field the players '
-    + 'born there; clubs play on the map of their day, the Athletics in Oakland until 2024.',
+    + 'scoring, marked as one. Rosters as of 7 November 2026. Five earlier seasons use EA\'s ratings of that season, nothing '
+    + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
+    + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings. NHL 08 and '
+    + 'NHL 09 are EA\'s attributes, the overall converted by us. Every other season back to 1966/67 is computed from the '
+    + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank, after from MoneyPuck.com. Clubs '
+    + 'play on the map of their day. Nations field the NHL players of each country, only where they hold at least half '
+    + 'the lineup, and none before 1977/78.',
+  'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
+    + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
+    + 'least half a matchday 17. No game rated 2009–2024: they are computed, each player\'s NRL.com match stats ranked at his '
+    + 'position onto Rugby League 26\'s ratings, each club then moved by its results that season. 2008 '
+    + 'comes from Rugby League 2: World Cup Edition\'s database, every player checked against the Rugby League Project. '
+    + 'The game rates attributes, not players, so the overall is ours, each club then moved by the game\'s own team '
+    + 'rating. Earlier seasons have NRL clubs only, on the map of their day.',
+  basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive (2011/12 by The '
+    + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
+    + 'The seasons no game rated, back to 1960/61, are computed from Basketball-Reference\'s statistics, fitted to '
+    + 'NBA 2K and put on NBA 2K27\'s scale. '
+    + 'They have NBA clubs only: the franchises of that season, on the map of their day. No game rates EuroLeague '
+    + 'players, so the EuroLeague\'s ratings are estimates from its box scores, marked as such.',
+  'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
+    + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
+    + 'overall ours. 2000 back to 1996, 1991 and 1989 back to 1960 are computed from Pro Football Archives\' records of '
+    + 'each player\'s starts and season, and so are the AFL\'s 1960s, on maps of their own. Clubs only: the franchises of '
+    + 'that season, on the map of their day.',
+  baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October; 2018–2020 as the fan site '
+    + 'ShowZone keeps them). 1960–2017 are computed: each player\'s WAR (Baseball-Reference\'s and FanGraphs\', averaged) '
+    + 'put on The Show\'s scale. Nations field the players born there, where they hold at least half the lineup; clubs play on '
+    + 'the map of their day, the Athletics in '
+    + 'Oakland until 2024.',
+  'womens-tennis': 'Elo ratings of the WTA\'s women: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; '
+    + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1968–1979 rough). Each nation names its five '
+    + 'best; one with fewer than two rated players fields no team.',
+  tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
+    + '2016 computed from Jeff Sackmann\'s match results by its method (1960–1979 rough; before 1968 the amateurs\' majors and '
+    + 'Davis Cup only). Each nation names its five best; '
+    + 'one with fewer than two rated players fields no team.',
 });
+
+// What a season's listing label can say of its ratings, the strongest first: whole words, in any case.
+const SEASON_TAGS = Object.freeze([['fan-made', /\bfan-made\b/i], ['converted', /\bconverted\b/i], ['computed', /\bcomputed\b/i]]);
+
+/**
+ * How a data set's ratings were made when its listing label says they are no game's own: 'fan-made' ("CM 01/02 · 93/94
+ * by Cam F, fan-made"), else 'converted' ("NHL 09, converted"), else 'computed' ("Computed from WAR, end of 1961",
+ * "Basketball-Reference (computed)"), each as a whole word in any case; null for any other label.
+ */
+export const seasonTagOf = label => SEASON_TAGS.find(([, words]) => words.test(String(label ?? '')))?.[0] ?? null;
 
 /**
  * The Season choice (docs/design/football-years.md): the sport's built-in season, then each of its listed data sets
- * newest first, as `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no
- * longer has.
+ * newest first, as `{ id, key, season, source, label, name, credit, checked }`. `credit` is the plain text the set's
+ * listing asks to be shown with it ('' for none). `sport` names a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
-  const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
-    label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
-  const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
+  const row = (id, season, source, credit = '') => ({ id, key: id ?? 'built-in', season, source,
+    label: [season, source].filter(Boolean).join(' · '), credit, checked: id === dataSet });
+  const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label, set.credit || ''))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
-  // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
+  // The dropdown names a season by its years, and says so on screen when its label calls its ratings computed, converted
+  // or fan-made ("1969/70 · computed", seasonTagOf). A set sharing its season with another (or with none) keeps its source.
   const shared = season => !season || rows.filter(other => other.season === season).length > 1;
-  return rows.map(option => ({ ...option, name: shared(option.season) ? option.label : option.season }));
+  const optionName = option => {
+    if (shared(option.season)) return option.label;
+    const tag = seasonTagOf(option.source);
+    return tag ? `${option.season} · ${tag}` : option.season;
+  };
+  return rows.map(option => ({ ...option, name: optionName(option) }));
 }
 
 /** A sport's three strongest clubs' names, as a club map's index lists them. */
@@ -363,15 +423,20 @@ export function domesticDescription(entry) {
   const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
-  // A map of Europe: football's strongest clubs, or a league's (basketball's EuroLeague, whose Dubai holds the Emirates).
+  // A map of Europe: football's strongest clubs, women's football's every European club, or a league's (basketball's
+  // EuroLeague, whose Dubai holds the Emirates).
   if (entry.theatre || entry.countries) {
-    const field = entry.theatre ? `Europe's ${clubs} strongest clubs` : `the ${clubs} ${entry.league} clubs`;
+    const field = !entry.theatre ? `the ${clubs} ${entry.league} clubs`
+      : entry.theatre === 'all' && entry.sport !== 'football' ? `the ${clubs} European clubs EA rates` : `Europe's ${clubs} strongest clubs`;
     return `${leaders} ${field}, each on land in its own country: alone it holds all of it, and clubs that `
       + 'share a country split it along its regional borders. A country with no club stays grey.';
   }
   if (entry.league) {
-    const place = entry.lines === 'state' ? 'state' : 'state or province';
-    return `${leaders} the ${clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
+    // 'state' (the NFL's USA), 'state or region' (the NRL's Australia and New Zealand), else 'state or province'.
+    const place = entry.lines || 'state or province';
+    // "the USA and Canada", but "Australia and New Zealand".
+    const land = /^(?:USA|United)\b/.test(entry.name) ? `the ${entry.name}` : entry.name;
+    return `${leaders} the ${clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
       + 'A state with several clubs is divided between them; one with none stays empty.';
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
@@ -476,6 +541,23 @@ export function sportNote(sport, { clubsOnly = false } = {}) {
 }
 
 /**
+ * Each sport card's note for its built-in season: `sportNote` of each sport, written out so the cards need no sport's
+ * players but the chosen one's (every other sport's load only when it is played, sportData.js). A roster rebuild that
+ * changes a club count fails npm test (scripts/sport-data.test.mjs) until this follows; the build scripts do not write it.
+ */
+export const SPORT_NOTES = Object.freeze({
+  football: 'Nations · 124 clubs from 17 leagues',
+  'womens-football': 'Nations · 84 clubs from 6 leagues',
+  basketball: 'Nations · NBA and EuroLeague clubs',
+  'american-football': '32 NFL clubs',
+  baseball: 'Nations · 30 MLB clubs',
+  hockey: 'Nations · 32 NHL clubs',
+  tennis: 'Nations',
+  'womens-tennis': 'Nations',
+  'rugby-league': 'Nations · 17 NRL clubs',
+});
+
+/**
  * Board 03 tier (V1 L1969). The cut-offs (4 / 12 / 30) suit a field of Europe's 46 or more; a smaller field scales them
  * down, so the last of ten clubs reads "Long shot" rather than "Contender".
  */
@@ -547,10 +629,11 @@ function bestPlayers(sport, team, clubLayer, setup) {
 function teamIdentity(sport, id, clubLayer) {
   if (clubLayer) {
     const club = clubIndex(sport).get(id);
-    return { code: club?.code || String(id).slice(0, 3).toUpperCase(), group: club?.league || '', isClub: true };
+    return { code: club?.code || String(id).slice(0, 3).toUpperCase(), group: club?.league || '', isClub: true, flagId: null };
   }
-  const nation = NATIONS[id];
-  return { code: nation?.[1] || String(id), group: nation?.[2] || '', isClub: false };
+  // As the sport plays it: the United Kingdom is Great Britain (GBR, the Union Jack) outside football.
+  const nation = nationIdentity(id, sport);
+  return { code: nation?.code || String(id), group: NATIONS[id]?.[2] || '', isClub: false, flagId: nation?.flagId ?? null };
 }
 
 const NO_ROWS = Object.freeze([]);
@@ -590,7 +673,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);
   // Until then no figure from the built-in season stands in for the set's.
   const pending = dataSet != null && sport.dataSet !== dataSet;
-  const clubLayer = setup.layer === 'clubs';
+  const clubLayer = setup.layer === 'clubs' && !sport.nationsOnly;
   const noun = clubLayer ? 'club' : 'nation';
   const nouns = `${noun}s`;
   const scopes = pending ? pendingTheatres(sport, clubLayer, setup.clubScope) : theatreOptions(sport, clubLayer);
@@ -600,8 +683,11 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   // A chosen country (football), or the map a sport's clubs play on (basketball: the NBA's USA and Canada).
   const chosenMap = clubLayer && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
   const country = chosenMap && (chosenMap.sport ? chosenMap.sport === sport.id : domesticOn) ? chosenMap : null;
-  // Changing sport can leave another sport's theatre in the saved setup; same fallback as startCampaign.
-  const activeScope = scopes.find(scope => scope.id === (clubLayer ? setup.clubScope : setup.scope)) || scopes[0];
+  // Changing sport can leave another sport's theatre in the saved setup; same fallback as startCampaign. A nation
+  // theatre the sport does not offer gives way to its heartland (`nationTheatre`); while a season loads, every theatre
+  // is listed, the choice with it.
+  const chosenScope = clubLayer ? setup.clubScope : pending ? setup.scope : nationTheatre(sport, setup.scope).id;
+  const activeScope = scopes.find(scope => scope.id === chosenScope) || scopes[0];
   const scopeId = country ? setup.clubScope : activeScope.id;
   const scopeName = country ? domesticLabel(setup.clubScope) : activeScope.label;
   const count = country ? country.clubs : activeScope.count;
@@ -622,6 +708,12 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const setName = chosenSeason?.source || dataSet;
   const setLoading = dataSet != null ? `Loading the ${setName} season…` : '';
   const setFailed = dataSet != null ? `The ${setName} season could not be loaded.` : '';
+  // A sport picked before its players have loaded (App's `sportLoad`, src/sports/sportData.js): its card shows as picked
+  // while setup keeps the sport it had, and the steps after this one and Launch wait for it.
+  const sportLoad = ctx.sportLoad?.id != null && ctx.sportLoad.id !== sportId ? ctx.sportLoad : null;
+  const sportPick = sportLoad ? getSport(sportLoad.id) : sport;
+  const sportFailed = sportLoad?.state === 'error';
+  const sportWait = !sportLoad ? '' : sportFailed ? sportLoad.message || `${sportPick.name} could not be loaded.` : `Loading ${sportPick.name}…`;
 
   const ranked = managerTeams.slice().sort(byRating);
   const rankOf = new Map(ranked.map((team, index) => [team.id, index + 1]));
@@ -631,6 +723,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     const rank = rankOf.get(team.id);
     return {
       id: team.id, name: team.name, code: team.code || identity.code, isClub: team.isClub ?? identity.isClub,
+      // The flag a nation flies (Great Britain's is not its shape's); none for a club.
+      flagId: team.flagId ?? identity.flagId,
       rating: team.rating, ratingText: Number.isFinite(team.rating) ? team.rating.toFixed(1) : '–', rank,
     };
   };
@@ -658,10 +752,11 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const favourites = ranked.slice(0, 5).map(row);
   const teamChosen = role !== 'manager' || !!picked;
   // A country campaign also waits for its map (and never launches twice while App prepares it), a data set for its file.
-  const canLaunch = teamChosen && !countryWaits && !seasonWaits && !launching;
+  const canLaunch = teamChosen && !countryWaits && !seasonWaits && !launching && !sportLoad;
   const mapLoading = country ? `Loading the map of ${country.name}…` : '';
   const mapFailed = country ? `The map of ${country.name} could not be loaded.` : '';
-  const launchNote = launching ? `Preparing the map of ${country?.name || 'the country'}…`
+  const launchNote = sportLoad ? sportWait
+    : launching ? `Preparing the map of ${country?.name || 'the country'}…`
     : countryState === 'loading' ? mapLoading
       : countryState === 'error' ? mapFailed
         : seasonState === 'loading' ? setLoading
@@ -672,22 +767,33 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     sport: { id: sport.id, name: sport.name },
     // The chosen set's card counts its own clubs.
     sports: SPORT_LIST.map(item => ({ id: item.id, name: item.name,
-      note: item.id !== sport.id ? sportNote(item) : pending ? sportNote(NO_CLUBS)
-        : sportNote(sport, { clubsOnly: dataSet != null && !setHasNations(dataSet) }), selected: item.id === sport.id })),
+      note: item.id !== sport.id ? SPORT_NOTES[item.id] : pending ? sportNote(NO_CLUBS)
+        : sportNote(sport, { clubsOnly: dataSet != null && !setHasNations(dataSet) }),
+      selected: item.id === sportPick.id, busy: !!sportLoad && !sportFailed && item.id === sportPick.id })),
+    // The sport the cards show as picked, and the wait for one picked before its players loaded (null for none).
+    sportPick: sportPick.id,
+    sportLoad: sportLoad ? { id: sportPick.id, name: sportPick.name, state: sportFailed ? 'error' : 'loading', note: sportWait } : null,
     season: {
       id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTES[sportId] || '', loading: setLoading,
       message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',
+      // The chosen season's credit, shown as text under the choice (docs/design/hockey.md, "Credits"): known from the
+      // listing, so it shows while the season loads.
+      credit: chosenSeason?.credit || '',
     },
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
     // A sport with clubs only names its league ('NFL'): the Nations choice is off.
     clubsOnly: sport.clubsOnly ? [...new Set(sport.clubs.map(club => club.league))].join(' and ') : null,
+    // A sport with nations only (tennis) has no clubs: the Clubs choice is off.
+    nationsOnly: !!sport.nationsOnly,
     // `scopes` stays the league / region rows; countries are their own group (`domesticScopes`) after them.
     scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
     theatreNotes: scopes.filter(scope => scope.note),
     domesticScopes, leagueGroup: LEAGUE_GROUP, domesticGroup: DOMESTIC_GROUP,
     country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs, countries: country.countries ?? null } : null,
-    // A basketball season's own strongest clubs lead its map, named once it has loaded.
-    countryNote: !country ? '' : domesticDescription(dataSet == null ? country : { ...country, top: pending ? [] : strongestClubs(sport) }),
+    // A basketball season's own strongest clubs lead its map, named once it has loaded. A season's map with only some of
+    // its clubs (women's football's: Europe's, the NWSL's) names its own.
+    countryNote: !country ? '' : domesticDescription(dataSet == null || (country.top && country.seasons?.includes(dataSet)) ? country
+      : { ...country, top: pending ? [] : strongestClubs(sport) }),
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
     mapLoading, launching,
     // Step 3's team list is empty until a country's map decodes.

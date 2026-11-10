@@ -72,6 +72,7 @@ export function beginDuel(turnArg) {
   const draw = turn
     ? createDuelDraw(this.rng, this.board(), { speed: st.speed, reducedMotion, attackerId: turn.attackerId })
     : createDuelDraw(this.rng, this.board(), { speed: st.speed, reducedMotion });
+  this.markDraw();
   const round = turn ? turn.round : st.round + 1;
   const notes = [];
   const attackerId = turn ? turn.attackerId : draw?.attackerId ?? null;
@@ -97,8 +98,10 @@ export function beginDuel(turnArg) {
   }
   const extra = notes.length ? { log: st.log.concat(notes).slice(-LOG_CAP) } : {};
   if (this.fastPlayback(st) && ![draw.attackerId, draw.targetId].includes(st.followedId) && st.aliveIds.length > 2) {
-    this.setState({ round, ...turnFields(turn), ...extra, match: null, pu: null, toast: null },
-      () => this.startMatch(draw.attackerId, draw.targetId, draw));
+    // The turn commits with its kickoff (or its tactical gate), as startMatch's `decided`. A match-less commit of its
+    // own was never painted, since React ran the kickoff in the same task, and the kickoff overwrote its checkpoint.
+    this.startMatch(draw.attackerId, draw.targetId, draw, undefined, {},
+      { round, ...turnFields(turn), ...extra, match: null, pu: null, toast: null });
     return;
   }
   const spinKey = (this.spinKey = (this.spinKey || 0) + 1);

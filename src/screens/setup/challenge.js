@@ -2,15 +2,15 @@
 // teams, theatre, season, the rules of war, your role and the seed. Opening it fills in setup without launching, and the
 // same setup and seed replay the same campaign (README §Finale, seeds and saves). Pure: no window or document, and
 // nothing here draws from a campaign's random stream.
-import { nationScopes } from '../../data/teams.js';
-import { CLUB_SCOPES } from '../../data/scopes.js';
+import { SCOPES } from '../../data/teams.js';
+import { CLUB_SCOPES, nationTheatre, nationTheatres } from '../../data/scopes.js';
 import { domesticEntry, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
-import { BUILT_IN_SETS, setHasClubs, setSportOf } from '../../engine/footballSets.js';
+import { BUILT_IN_SETS, setHasClubs, setHasNations, setSportOf, sportOf } from '../../engine/footballSets.js';
 import { DEFAULT_SETUP, dataSetOf, setClubScope } from '../../app/shared.js';
 import {
   DRAW_CARDS, FINALE_OPTIONS, HOME_OPTIONS, RECRUITMENT_OPTIONS, ROSTER_OPTIONS, SHOW_MATCH_OPTIONS, TARGETING_CARDS,
-  UNCERTAINTY_OPTIONS, rulesOf, showMatchesOf,
+  UNCERTAINTY_OPTIONS, rulesOf, showMatchesOf, signingsOffered,
 } from './setupModel.js';
 
 /** A link's query keys, in the order it writes them. */
@@ -32,10 +32,10 @@ const TEAM_ID = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$/;
 const offers = (options, value) => options.some(([id]) => id === value);
 
 /**
- * Whether `value` is a club theatre this build offers the sport: the strongest clubs or the elite, a country of its own
- * (football's built-in clubs only: country maps are built from them) or a map its clubs play on. The map of the sport and
- * season then takes over in `setClubScope`, as in setup. A link to one league's theatre, which this build no longer has,
- * keeps the default.
+ * Whether `value` is a club theatre this build offers the sport: the strongest clubs or the elite (and women's
+ * football's NWSL), a country of its own (football's built-in clubs only: country maps are built from them) or a map its
+ * clubs play on. The map of the sport and season then takes over in `setClubScope`, as in setup. A link to one European
+ * league's theatre, which this build no longer has, keeps the default.
  */
 function offeredClubTheatre(sport, dataSet, value) {
   if (isDomesticScope(value)) {
@@ -43,6 +43,17 @@ function offeredClubTheatre(sport, dataSet, value) {
     return !!entry && (entry.sport ? entry.sport === sport.id : sport.id === 'football' && dataSet == null);
   }
   return CLUB_SCOPES(sport).some(scope => scope.id === value);
+}
+
+/**
+ * Whether `value` is a nation theatre the sport offers (data/scopes.js `nationTheatres`: only where it is played). A
+ * season's nations are known only once it has loaded, so with one (`dataSet`) any theatre stands, and setup gives
+ * one the season lacks to the sport's heartland, as it does when the sport changes.
+ */
+function offeredNationTheatre(sport, dataSet, value) {
+  // A competition of another sport (basketball's EuroBasket) is never offered.
+  return (dataSet == null ? nationTheatres(sport) : SCOPES.filter(scope => !scope.sports || scope.sports.includes(sport.id)))
+    .some(scope => scope.id === value);
 }
 
 /**
@@ -68,14 +79,15 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   take('sport', value => SPORT_LIST.some(sport => sport.id === value), value => { setup.sport = value; });
   const sport = getSport(setup.sport);
   take('season', value => setSportOf(value) === sport.id && sets.some(set => set.id === value), value => { setup.dataSet = value; });
-  // A sport with clubs only (American football: the NFL's) and a basketball season (NBA clubs) play clubs.
-  const clubsOnly = !!sport.clubsOnly || (setup.dataSet != null && setSportOf(setup.dataSet) === 'basketball');
-  // FIFA 05 and FIFA 06 have no clubs to play.
-  const nationsOnly = setup.dataSet != null && !setHasClubs(setup.dataSet);
+  // A sport with clubs only (American football: the NFL's) and a season with clubs only (an NBA season) play clubs.
+  const clubsOnly = !!sport.clubsOnly || (setup.dataSet != null && !setHasNations(setup.dataSet));
+  // FIFA 05 and FIFA 06 have no clubs to play, nor has tennis.
+  const nationsOnly = !!sport.nationsOnly || (setup.dataSet != null && !setHasClubs(setup.dataSet));
   take('teams', value => (value === 'clubs' && !nationsOnly) || (value === 'nations' && !clubsOnly), value => { setup.layer = value; });
   if (clubsOnly) setup.layer = 'clubs';
+  if (sport.nationsOnly) setup.layer = 'nations';
   const clubLayer = setup.layer === 'clubs';
-  take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : nationScopes(sport).some(scope => scope.id === value)),
+  take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : offeredNationTheatre(sport, setup.dataSet, value)),
     value => { setup[clubLayer ? 'clubScope' : 'scope'] = value; });
   if (clubLayer) setup.clubScope = setClubScope(setup);
 
@@ -91,7 +103,8 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   });
   take('upsets', value => offers(UNCERTAINTY_OPTIONS, value), value => { setup.uncertainty = value; });
   take('final', value => offers(FINALE_OPTIONS, value), value => { setup.finale = value; });
-  take('signings', value => offers(RECRUITMENT_OPTIONS, value), value => { setup.acquisitionPolicy = value; });
+  // Computer signings is no choice in tennis (setupModel.js `signingsOffered`).
+  take('signings', value => signingsOffered(sport.id) && offers(RECRUITMENT_OPTIONS, value), value => { setup.acquisitionPolicy = value; });
   take('home', value => offers(HOME_OPTIONS, value), value => { setup.homeAdvantage = value; });
   // Team strengths is a basketball rule.
   take('strengths', value => sport.id === 'basketball' && offers(ROSTER_OPTIONS, value), value => { setup.rosterPreset = value; });
@@ -99,6 +112,15 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   take('team', value => setup.role === 'manager' && TEAM_ID.test(value), value => { setup.managedTeamId = value; });
   take('seed', value => SEED.test(value) && Number(value) <= MAX_SEED, value => { setup.seed = String(Number(value)); });
   return { found: given.size > 0, setup, ignored };
+}
+
+/**
+ * The sport a challenge link in `search` plays, else a new setup's (DEFAULT_SETUP). Reading the rest of the link
+ * (`readChallenge`) reads that sport's theatres, so its players load first (src/sports/sportData.js).
+ */
+export function challengeSport(search = '') {
+  const value = new URLSearchParams(String(search ?? '')).get('sport')?.trim();
+  return SPORT_LIST.some(sport => sport.id === value) ? value : DEFAULT_SETUP.sport;
 }
 
 /** The setup's managed team if it plays in the theatre (`teams`: App's `setupTeams()`), else none (''). */
@@ -120,9 +142,12 @@ export function challengeQuery(settings = {}, seed = settings?.seed) {
   const s = { ...DEFAULT_SETUP, ...settings };
   const sport = getSport(s.sport);
   const dataSet = dataSetOf(s);
-  const clubsOnly = !!sport.clubsOnly || (dataSet != null && setSportOf(dataSet) === 'basketball');
-  const clubLayer = s.layer === 'clubs' || clubsOnly;
-  const theatre = clubLayer ? setClubScope({ ...s, layer: 'clubs' }) : s.scope;
+  const clubsOnly = !!sport.clubsOnly || (dataSet != null && !setHasNations(dataSet));
+  const clubLayer = (s.layer === 'clubs' || clubsOnly) && !sport.nationsOnly;
+  // The nation theatre the campaign plays: a theatre its sport does not offer gives way as at launch (a season still
+  // loading: the choice as it stands).
+  const nationSport = clubLayer ? null : sportOf({ ...s, layer: 'nations' });
+  const theatre = clubLayer ? setClubScope({ ...s, layer: 'clubs' }) : nationSport ? nationTheatre(nationSport, s.scope).id : s.scope;
   const rules = rulesOf(s);
   const show = showMatchesOf(s);
   const manager = s.role === 'manager';
@@ -138,7 +163,7 @@ export function challengeQuery(settings = {}, seed = settings?.seed) {
     show: show !== 'ticker' ? show : null,
     upsets: s.uncertainty !== 'balanced' && offers(UNCERTAINTY_OPTIONS, s.uncertainty) ? s.uncertainty : null,
     final: s.finale === 'best-of-three' ? s.finale : null,
-    signings: s.acquisitionPolicy === 'best-fit' ? s.acquisitionPolicy : null,
+    signings: signingsOffered(sport.id) && s.acquisitionPolicy === 'best-fit' ? s.acquisitionPolicy : null,
     home: s.homeAdvantage === 'on' ? s.homeAdvantage : null,
     strengths: sport.id === 'basketball' && s.rosterPreset === 'competitive' ? s.rosterPreset : null,
     role: manager ? 'manager' : null,

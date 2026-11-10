@@ -1,0 +1,276 @@
+// Build the built-in earlier American football seasons (docs/design/american-football.md, "Earlier seasons", "Tecmo
+// seasons" and "Computed seasons"): Madden NFL's launch rosters of 2001 to 2025, the Tecmo Super Bowl games' 1990 and 1992
+// to 1995, and the seasons no game rated, computed from Pro Football Archives' facts: the NFL's 1960 to 1989, 1991 and
+// 1996 to 2000, and the AFL's 1960 to 1969.
+//
+//   npm run build:nfl-seasons             writes public/american-football/<id>.json (madden-, tecmo-, pfa- and pfa-afl-),
+//                                         src/data/americanFootballSeasons.js and docs/design/american-football-seasons-audit.json
+//   npm run build:nfl-seasons -- --check  builds every file and compares it byte for byte, writes nothing
+//
+// A Madden season is one edition's committed snapshot (scripts/data/madden-seasons/<season>.json, npm run
+// sync:madden-seasons), its launch roster; a Tecmo season the snapshot npm run sync:tecmo makes
+// (scripts/data/tecmo/<season>.json), whose overall is ours; a computed season the snapshot npm run sync:pfa makes
+// (scripts/data/pfa-seasons/<season>.json, afl-<season>.json). Either way the clubs of that season each field the lineup
+// the game picks and its best backups, by the built-in season's rules (scripts/lib/nfl.mjs). The clubs are today's
+// franchises (scripts/data/nfl-teams.json) but for the eras scripts/data/nfl-seasons.json names: the St. Louis and
+// Phoenix Cardinals, the Baltimore Colts, the Boston Patriots, the New York Titans, the Dallas Texans, the Los Angeles and
+// Oakland Raiders, the Los Angeles Rams in Anaheim and the St. Louis Rams, the Houston and Tennessee Oilers, the San Diego
+// Chargers, Washington before the Commanders, and the expansion clubs before their first season; before 1970 the AFL's
+// clubs play in AFL seasons only. Each season names the era map its clubs play on, which npm run build:nfl-map (and
+// build-club-maps --league=afl) builds from the same manifest. Every rating is its snapshot's, unchanged.
+import { existsSync } from 'node:fs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { contentHash, serializeFootballSet } from '../src/data/footballSetBuild.js';
+import { selectLineup } from '../src/data/teams.js';
+import { colourFor, FORMATION, mapOf, playerOf, seasonIdOf, setIdOf, squadOf, strongestFirst, teamsOf } from './lib/nfl.mjs';
+
+const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+const outDir = path.join(root, 'public/american-football');
+const snapshotDir = path.join(root, 'scripts/data/madden-seasons');
+const listingFile = path.join(root, 'src/data/americanFootballSeasons.js');
+const auditFile = path.join(root, 'docs/design/american-football-seasons-audit.json');
+
+/**
+ * Season `year`: its data set document, the document as the file holds it, and its audit row. `snapshot` is the
+ * season's committed snapshot; its teams must be the season's franchises (the manifest's eras), each fielding every
+ * position from its own players.
+ */
+export function buildNflSeason(snapshot, year, manifest, franchises) {
+  const source = manifest.sources?.[year];
+  if (!source) throw new Error(`The manifest has no source for ${year}`);
+  if (snapshot.source?.season !== String(year) || snapshot.source.edition !== source.edition) {
+    throw new Error(`The ${year} snapshot is ${snapshot.source?.edition} of ${snapshot.source?.season}`);
+  }
+  const id = setIdOf(manifest, year);
+  if (id !== seasonIdOf(year)) throw new Error(`${id} is no Madden season`);
+  const teams = teamsOf(franchises, manifest, year);
+  const listed = Object.entries(snapshot.teams);
+  const stray = listed.filter(([ea, name]) => !teams.some(team => String(team.ea) === ea && team.name === name));
+  if (stray.length || listed.length !== teams.length) {
+    throw new Error(`${year}: the snapshot's teams ${stray.map(([ea, name]) => `${ea} ${name}`).join(', ') || '(missing some)'} are not the season's ${teams.length}`);
+  }
+  const pools = new Map(teams.map(team => [team.ea, []]));
+  for (const [name, ea, listedPosition, overall] of snapshot.players) {
+    if (!pools.has(ea)) throw new Error(`${year}: ${name} plays for EA team ${ea}, no team of the season`);
+    if (!Number.isInteger(overall) || overall < 1 || overall > 99) throw new Error(`${year}: ${name} has a rating outside 1-99`);
+    const player = playerOf(name, listedPosition, overall);
+    if (player) pools.get(ea).push(player);
+  }
+  const clubs = teams.map(team => {
+    const { squad, str } = squadOf(pools.get(team.ea), `${year} ${team.name}`);
+    return { id: team.id, name: team.name, code: team.code, league: 'NFL', country: '840', col: colourFor(team.id), str,
+      squad: squad.map(p => [p.name, p.pos, p.rating]) };
+  }).sort(strongestFirst);
+  const doc = {
+    format: 1, kind: 'madden', id, version: '', year, season: String(year), label: source.edition, local: false,
+    source: { provider: manifest.source.provider, edition: source.edition, compiler: source.compiler, url: source.url,
+      iteration: source.iteration, retrieved: source.retrieved, rawScale: 99 },
+    map: mapOf(manifest, year),
+    clubs,
+    coverage: { players: snapshot.players.length, clubs: clubs.length },
+  };
+  doc.version = `${doc.id}-${contentHash(doc)}`;
+  const audit = {
+    id: doc.id, version: doc.version, season: doc.season, edition: source.edition, compiler: source.compiler, url: source.url,
+    iteration: source.iteration, retrieved: source.retrieved, players: snapshot.players.length, map: doc.map,
+    clubs: clubs.map(c => `${c.name} ${c.str}`),
+    checks: snapshot.checks, notes: snapshot.notes, ...(source.remarks ? { remarks: source.remarks } : {}),
+  };
+  return { doc, text: serializeFootballSet(doc), audit };
+}
+
+/** A lineup's places the game fills out of position: `['DL: Neil Smith (LB 80)']`. */
+const outOfPosition = squad => selectLineup({ sport: 'american-football', squad: squad.map(([name, pos, rating]) => ({ name, pos, rating })) })
+  .slots.filter(slot => slot.outOfPosition).map(slot => `${slot.position}: ${slot.player.name} (${slot.player.pos} ${slot.player.rating})`);
+
+/**
+ * Tecmo season `year`: its data set document, the document as the file holds it, and its audit row, from its committed
+ * snapshot (scripts/data/tecmo/<season>.json, npm run sync:tecmo). Tecmo rates no overall: the snapshot's is ours (its
+ * `conversion`), and stays as the snapshot has it. Its clubs must be the season's franchises as the manifest's eras name
+ * them. Each fields its squad by the Madden seasons' rules, except that a place the snapshot documents as short
+ * (`lineup.gaps`: the 3-4 of NES Tecmo Super Bowl, the three linemen of SNES Tecmo Super Bowl, the run-and-shoot clubs
+ * without a tight end, an unlicensed lineman nobody can name) is left to the game to fill out of position: no player is
+ * added, and a shortfall the snapshot does not document stops the build.
+ */
+export function buildTecmoSeason(snapshot, year, manifest, franchises) {
+  const source = manifest.sources?.[year];
+  if (source?.kind !== 'tecmo') throw new Error(`${year} is no Tecmo season of the manifest`);
+  if (snapshot.source?.season !== year) throw new Error(`The ${year} Tecmo snapshot rates ${snapshot.source?.season}`);
+  const id = setIdOf(manifest, year);
+  if (id !== `tecmo-${year}`) throw new Error(`${id} is no Tecmo season`);
+  if (JSON.stringify(snapshot.lineup?.needs) !== JSON.stringify(FORMATION)) throw new Error(`${year}: the snapshot's lineup is not the game's`);
+  const teams = teamsOf(franchises, manifest, year);
+  const listed = Object.entries(snapshot.teams);
+  const stray = listed.filter(([franchise, club]) => !teams.some(team => team.franchise === franchise && team.id === club.era
+    && team.name === club.name && team.code === club.code));
+  if (stray.length || listed.length !== teams.length) {
+    throw new Error(`${year}: the snapshot's clubs ${stray.map(([, club]) => club.name).join(', ') || '(missing some)'} are not the season's ${teams.length}`);
+  }
+  const pools = new Map(teams.map(team => [team.franchise, []]));
+  for (const [name, franchise, slot, pos, overall] of snapshot.players) {
+    if (!pools.has(franchise)) throw new Error(`${year}: ${name} plays for ${franchise}, no club of the season`);
+    if (!FORMATION[pos]) throw new Error(`${year}: ${name} (${slot}) plays ${pos}, no position of the game's`);
+    if (!Number.isInteger(overall) || overall < 1 || overall > 99) throw new Error(`${year}: ${name} has a rating outside 1-99`);
+    pools.get(franchise).push({ name, pos, rating: overall });
+  }
+  const clubs = teams.map(team => {
+    const { squad, str } = squadOf(pools.get(team.franchise), `${year} ${team.name}`, { gaps: snapshot.lineup.gaps[team.franchise] || {} });
+    return { id: team.id, name: team.name, code: team.code, league: 'NFL', country: '840', col: colourFor(team.id), str,
+      squad: squad.map(p => [p.name, p.pos, p.rating]) };
+  }).sort(strongestFirst);
+  const { game, platform, cartridgeSeason, dump } = snapshot.source;
+  const edition = `${game} (${platform})${cartridgeSeason ? `, cartridge season ${cartridgeSeason}` : ''}`;
+  const doc = {
+    format: 1, kind: 'tecmo', id, version: '', year, season: String(year), label: source.label, local: false,
+    source: { provider: 'Tecmo', edition, compiler: source.compiler, url: dump.repo, retrieved: source.retrieved,
+      conversion: snapshot.conversion.overall },
+    map: mapOf(manifest, year),
+    clubs,
+    coverage: { players: snapshot.players.length, clubs: clubs.length },
+  };
+  doc.version = `${doc.id}-${contentHash(doc)}`;
+  const placeholders = snapshot.placeholders || [];
+  const audit = {
+    id: doc.id, version: doc.version, season: doc.season, label: doc.label, edition, compiler: source.compiler,
+    url: dump.repo, dump: `${dump.path} (blob ${dump.blob})`, retrieved: source.retrieved, formula: snapshot.conversion.formula.id,
+    players: snapshot.players.length, map: doc.map,
+    clubs: clubs.map(c => `${c.name} ${c.str}`),
+    // The places each club's lineup fills out of position: its documented gaps, and a kicker the game passes over.
+    outOfPosition: Object.fromEntries(clubs.map(c => [c.name, outOfPosition(c.squad)]).filter(([, places]) => places.length)),
+    gaps: Object.fromEntries(Object.entries(snapshot.lineup.gaps).map(([franchise, gaps]) => [teams.find(t => t.franchise === franchise).name, gaps])),
+    checks: (snapshot.source.checks || []).map(({ name, compared, identical }) => ({ name, compared, identical })),
+    unlicensed: { named: placeholders.filter(p => p.named).length, leftOut: placeholders.filter(p => !p.named).length },
+  };
+  return { doc, text: serializeFootballSet(doc), audit };
+}
+
+/** The manifest's view of `league`'s seasons: the NFL's at its top level, the AFL's (1960–1969) under `afl`. */
+export const leagueManifest = (manifest, league) => (league === 'AFL' ? { ...manifest, ...manifest.afl, teams: manifest.teams } : manifest);
+
+/**
+ * Computed season `year` of `league` (the NFL's, or the AFL's before the 1970 merger): its data set document, the document
+ * as the file holds it, and its audit row, from its committed snapshot (scripts/data/pfa-seasons/<season>.json or
+ * afl-<season>.json, npm run sync:pfa). No game rated the season: each overall is ours, computed from Pro Football
+ * Archives' facts (the snapshot's `conversion`, which the source block carries with method 'computed'). Its clubs must be
+ * the season's franchises of that league as the manifest's eras name them, each fielding its squad by the Madden seasons'
+ * rules; a place the snapshot documents as short (`lineup.gaps`: too few natural players at a position, as a two-corner
+ * defence of the 1960s leaves the nickel) is left to the game.
+ */
+export function buildPfaSeason(snapshot, year, manifest, franchises, league = 'NFL') {
+  const view = leagueManifest(manifest, league);
+  const source = view.sources?.[year];
+  if (source?.kind !== 'pfa' || source.league !== league) throw new Error(`${year} is no computed ${league} season of the manifest`);
+  if (snapshot.source?.season !== year || snapshot.source.league !== league) throw new Error(`The ${league} ${year} snapshot is the ${snapshot.source?.league} ${snapshot.source?.season}`);
+  const id = setIdOf(view, year);
+  if (id !== (league === 'AFL' ? `pfa-afl-${year}` : `pfa-${year}`)) throw new Error(`${id} is no computed ${league} season`);
+  if (JSON.stringify(snapshot.lineup?.needs) !== JSON.stringify(FORMATION)) throw new Error(`${year}: the snapshot's lineup is not the game's`);
+  const teams = teamsOf(franchises, manifest, year, league);
+  const listed = Object.entries(snapshot.teams);
+  const stray = listed.filter(([franchise, club]) => !teams.some(team => team.franchise === franchise && team.id === club.era
+    && team.name === club.name && team.code === club.code));
+  if (stray.length || listed.length !== teams.length) {
+    throw new Error(`${league} ${year}: the snapshot's clubs ${stray.map(([, club]) => club.name).join(', ') || '(missing some)'} are not the season's ${teams.length}`);
+  }
+  const pools = new Map(teams.map(team => [team.franchise, []]));
+  for (const [name, franchise, codes, pos, overall] of snapshot.players) {
+    if (!pools.has(franchise)) throw new Error(`${year}: ${name} plays for ${franchise}, no club of the season`);
+    if (!FORMATION[pos]) throw new Error(`${year}: ${name} (${codes}) plays ${pos}, no position of the game's`);
+    if (!Number.isInteger(overall) || overall < 1 || overall > 99) throw new Error(`${year}: ${name} has a rating outside 1-99`);
+    pools.get(franchise).push({ name, pos, rating: overall });
+  }
+  const clubs = teams.map(team => {
+    const { squad, str } = squadOf(pools.get(team.franchise), `${league} ${year} ${team.name}`, { gaps: snapshot.lineup.gaps[team.franchise] || {} });
+    return { id: team.id, name: team.name, code: team.code, league, country: '840', col: colourFor(team.id), str,
+      squad: squad.map(p => [p.name, p.pos, p.rating]) };
+  }).sort(strongestFirst);
+  const doc = {
+    format: 1, kind: 'pfa', id, version: '', year, season: String(year), label: source.label, local: false,
+    source: { provider: 'Pro Football Archives', edition: `The ${year} ${league} season, computed`, compiler: source.compiler, url: source.url,
+      retrieved: source.retrieved, method: 'computed', rawScale: 'value', conversion: snapshot.conversion.overall },
+    map: mapOf(view, year),
+    clubs,
+    coverage: { players: snapshot.players.length, clubs: clubs.length },
+  };
+  doc.version = `${doc.id}-${contentHash(doc)}`;
+  const facts = snapshot.clubs;
+  const strengths = clubs.map(c => c.str);
+  const audit = {
+    id: doc.id, version: doc.version, season: doc.season, label: doc.label, league, compiler: source.compiler, url: source.url,
+    retrieved: source.retrieved, players: snapshot.players.length, map: doc.map,
+    spread: [Math.min(...strengths), Math.max(...strengths)],
+    clubs: clubs.map(c => {
+      const franchise = teams.find(t => t.id === c.id).franchise, f = facts[franchise];
+      return `${c.name} ${c.str} (${f.record}, ${f.for}–${f.against})`;
+    }),
+    outOfPosition: Object.fromEntries(clubs.map(c => [c.name, outOfPosition(c.squad)]).filter(([, places]) => places.length)),
+    gaps: Object.fromEntries(Object.entries(snapshot.lineup.gaps).map(([franchise, gaps]) => [teams.find(t => t.franchise === franchise).name, gaps])),
+    calibration: snapshot.conversion.calibration.mean,
+    ...(snapshot.source.left?.length ? { left: snapshot.source.left } : {}),
+  };
+  return { doc, text: serializeFootballSet(doc), audit };
+}
+
+function listingModule(docs) {
+  const rows = docs.map(doc => `  Object.freeze({ id: '${doc.id}', version: '${doc.version}', year: ${doc.year}, season: '${doc.season}', label: '${doc.label}', map: '${doc.map}' }),`);
+  return `// GENERATED by npm run build:nfl-seasons; do not edit.
+// The built-in earlier American football seasons, newest first (of one year, the AFL's before the NFL's): clubs only, the
+// NFL's, and before the 1970 merger the AFL's in seasons of their own. Each is public/american-football/<id>.json,
+// loaded when a setup chooses it (src/engine/footballSets.js), and plays on its era's map (\`map\`, public/domestic/<map>.json).
+export const BUILT_IN_AMERICAN_FOOTBALL_SEASONS = Object.freeze([
+${rows.join('\n')}
+]);
+`;
+}
+
+async function main() {
+  const check = process.argv.includes('--check');
+  const unknown = process.argv.slice(2).filter(arg => arg !== '--check');
+  if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
+  const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/nfl-seasons.json'), 'utf8'));
+  const franchises = JSON.parse(await readFile(path.join(root, 'scripts/data/nfl-teams.json'), 'utf8')).teams;
+  const results = [];
+  // Each kind of season, its builder and the sync that makes its snapshot.
+  const KIND = { tecmo: [buildTecmoSeason, 'sync:tecmo'], pfa: [buildPfaSeason, 'sync:pfa'] };
+  const jobs = [...manifest.seasons.map(year => [year, 'NFL']), ...(manifest.afl?.seasons ?? []).map(year => [year, 'AFL'])];
+  for (const [year, league] of jobs) {
+    const source = leagueManifest(manifest, league).sources[year];
+    const [builder, sync] = KIND[source?.kind] ?? [buildNflSeason, 'sync:madden-seasons'];
+    const file = source?.snapshot ? path.join(root, source.snapshot) : path.join(snapshotDir, `${year}.json`);
+    if (!existsSync(file)) throw new Error(`No snapshot for ${league} ${year}: run npm run ${sync} -- --season=${league === 'AFL' ? 'afl-' : ''}${year}`);
+    const snapshot = JSON.parse(await readFile(file, 'utf8'));
+    results.push(builder(snapshot, year, manifest, franchises, league));
+  }
+  // Newest first; of one year, the AFL's season before the NFL's, as the loader lists them.
+  results.sort((a, b) => b.doc.year - a.doc.year || (a.doc.id < b.doc.id ? 1 : -1));
+  for (const { doc, text, audit } of results) {
+    console.log(`${doc.id} ${doc.label} on ${doc.map}: ${doc.clubs.length} clubs from ${audit.players} players, `
+      + `${Math.round(Buffer.byteLength(text) / 1024)} KB; strongest ${audit.clubs.slice(0, 3).join(', ')}`);
+  }
+  const outputs = [
+    ...results.map(({ doc, text }) => [path.join(outDir, `${doc.id}.json`), text]),
+    [listingFile, listingModule(results.map(result => result.doc))],
+    [auditFile, `${JSON.stringify({ generatedBy: 'scripts/build-nfl-seasons.mjs', source: manifest.source, seasons: results.map(r => r.audit) }, null, 2)}\n`],
+  ];
+  if (check) {
+    const differs = [];
+    for (const [file, text] of outputs) {
+      const current = existsSync(file) ? (await readFile(file, 'utf8')).replace(/\r\n/g, '\n') : null;
+      if (current !== text) differs.push(path.relative(root, file));
+    }
+    if (differs.length) throw new Error(`differs: ${differs.join(', ')}`);
+    console.log(`Verified the ${results.length} American football seasons, their listing and audit byte for byte.`);
+    return;
+  }
+  await mkdir(outDir, { recursive: true });
+  for (const [file, text] of outputs) await writeFile(file, text);
+  console.log(`Wrote ${results.length} seasons to public/american-football/, src/data/americanFootballSeasons.js and docs/design/american-football-seasons-audit.json`);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch(error => {
+    console.error(`build-nfl-seasons: ${error.message}`);
+    process.exitCode = 1;
+  });
+}

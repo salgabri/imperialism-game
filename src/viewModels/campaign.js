@@ -385,6 +385,8 @@ function tieSuffix(entry, ctx) {
   if (/overtime/i.test(text)) return ' (OT)';
   // An ice hockey game decided after overtime.
   if (/shoot-?out/i.test(text)) return ' (SO)';
+  // A rugby league game decided in golden point.
+  if (/golden point/i.test(text)) return ' (GP)';
   // A baseball game decided in extra innings: " (F/11)".
   const innings = /innings/i.test(text) ? overtimePeriodsOf(ctx?.sport, text) : null;
   if (innings) return ` (${overtimeShort(ctx?.sport, innings)})`;

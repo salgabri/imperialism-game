@@ -4,8 +4,28 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Imperialism — A world decided by sport</title>
-  <meta name="description" content="Sport decides the borders. Win a match to take all of the loser’s territory and one of its players. Football, women’s football, basketball, American football, baseball and ice hockey in your browser.">
+  <meta name="description" content="Sport decides the borders. Win a match to take all of the loser’s territory and one of its players. Football, women’s football, basketball, American football, baseball, ice hockey, tennis, women’s tennis and rugby league in your browser.">
   <meta name="theme-color" content="#f5f5f2">
+  <!-- The theme, before anything paints. tokens.css switches only on data-theme, and src/appearance.js sets it only
+       once the bundle runs, so without this a dark-mode player sees the light loading screen first. It does what
+       appearance.js does (scripts/first-paint.test.mjs runs both and compares them), in plain ES5 so that no browser
+       stops at it. appearance.js still runs and follows system changes. -->
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = localStorage.getItem('fi-theme'); } catch (e) { /* storage blocked: the system preference */ }
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+      var bar = document.querySelector('meta[name="theme-color"]');
+      if (bar) bar.setAttribute('content', theme === 'dark' ? '#121416' : '#f5f5f2');
+    })();
+  </script>
+  <!-- The dev server injects the stylesheet from the bundle: until it applies, the loading screen in #root stays
+       hidden rather than unstyled. src/styles/shell.css shows it again. A build links the stylesheet in this head, and
+       the browser waits for it before the first paint. -->
+  <style>#root > .app-shell { visibility: hidden; }</style>
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -15,7 +35,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Imperialism">
   <meta property="og:title" content="Imperialism — A world decided by sport">
-  <meta property="og:description" content="Win a match to take all of the loser’s territory, and one of its players. Football, women’s football, basketball, American football, baseball and ice hockey in your browser.">
+  <meta property="og:description" content="Win a match to take all of the loser’s territory, and one of its players. Football, women’s football, basketball, American football, baseball, ice hockey, tennis, women’s tennis and rugby league in your browser.">
   <meta property="og:image" content="https://imperialism-game.vercel.app/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -23,7 +43,10 @@
   <meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
-  <div id="root"></div>
+  <!-- App's loading screen as React first renders it, so the page paints when the stylesheet arrives rather than after
+       the bundle has run. React replaces it with the same markup when it mounts, plus the theme toggle and the map
+       under the loading screen; scripts/first-paint.test.mjs keeps the two in step. -->
+  <div id="root"><div class="app-shell" data-view="setup" data-role="spectator"><header class="mast"><div class="mast__row1"><span class="mast__wordmark">Imperialism</span><span class="mast__spacer"></span></div></header><div class="loading-screen" role="status"><span>Opening the atlas…</span></div></div></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

@@ -11,6 +11,21 @@ const CHECK_EVERY_MS = 60 * 60 * 1000;
 const CHECK_AGAIN_MS = 10 * 60 * 1000;
 // cacheForOffline's fetches at once, beside the game's own requests.
 const OFFLINE_FETCHES = 4;
+// A first visit's page waits at most this long for App's first boot before it registers anyway, so a slow or stuck
+// boot still gets the offline worker (registerAfterBoot).
+const BOOT_WAIT_MS = 10 * 1000;
+// Then it waits for an idle moment, at most this long. Browsers without requestIdleCallback (Safari) wait a moment.
+const IDLE_WAIT_MS = 2000;
+const NO_IDLE_WAIT_MS = 200;
+
+let settleBoot = () => {};
+/** Settles once App's first boot is over: the setup screen is up, or boot failed (settleFirstBoot). */
+export const firstBoot = new Promise(resolve => { settleBoot = resolve; });
+
+/** App's first boot is over (setup on screen, or its error): a first visit may register its worker now. Repeats do nothing. */
+export function settleFirstBoot() {
+  settleBoot();
+}
 
 const listeners = new Set();
 let waiting = null;       // a new version's installed worker, while it waits for the player
@@ -68,6 +83,35 @@ export async function registerServiceWorker(url = './sw.js', env = globalThis) {
     if (env.document.visibilityState === 'visible' && Date.now() - checked > CHECK_AGAIN_MS) check();
   });
   return registration;
+}
+
+/**
+ * Register the worker (registerServiceWorker) when its downloads no longer compete with boot's (main.jsx, production
+ * only). A first install fetches its whole precache past the HTTP cache: Workbox asks for every file it versions with
+ * cache 'reload' (index.html, the fonts, both world maps, the icons), a few hundred KB while boot downloads the same
+ * maps. So a page no worker controls (a first visit, a hard reload) waits for `booted` (App's first boot: firstBoot),
+ * or BOOT_WAIT_MS at most, then for an idle moment. A page a worker controls registers at once: register() downloads
+ * nothing new there, and the update prompt and the crash screen's Reload (applyUpdate) need the registration from the
+ * start. `env` and `booted` stand in for the browser's globals and App's boot in tests. Resolves as
+ * registerServiceWorker does. Async like it, so an error here rejects into main.jsx's catch instead of throwing before
+ * the game renders (Chromium throws reading navigator.serviceWorker in sandboxed and opaque-origin documents).
+ */
+export async function registerAfterBoot(url = './sw.js', env = globalThis, booted = firstBoot) {
+  const container = env.navigator?.serviceWorker;
+  if (typeof container?.register !== 'function' || container.controller) return registerServiceWorker(url, env);
+  return new Promise(resolve => {
+    let started = false, fallback = null;
+    const start = () => {
+      if (started) return;
+      started = true;
+      env.clearTimeout(fallback);
+      const register = () => resolve(registerServiceWorker(url, env));
+      if (typeof env.requestIdleCallback === 'function') env.requestIdleCallback(register, { timeout: IDLE_WAIT_MS });
+      else env.setTimeout(register, NO_IDLE_WAIT_MS);
+    };
+    fallback = env.setTimeout(start, BOOT_WAIT_MS);
+    Promise.resolve(booted).then(start, start);
+  });
 }
 
 /**

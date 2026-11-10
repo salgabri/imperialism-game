@@ -15,19 +15,31 @@ Pick your sport at kick-off:
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
+| Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets | none: a tie always has a winner |
+| Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
 
 And pick who fights:
 
-- **Nations** — 173 national teams, each starting on its own homeland. England,
+- **Nations** — 176 nations on the map, each team starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
+  Basketball, baseball, ice hockey and both tennis games field them as one team, Great Britain
+  (GBR), under the Union Jack. A sport fields 173 at most: those four play Great Britain
+  as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
+  source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
+  only with a **real side**, its own rated players holding at least half the lineup, and
+  every other nation's land stays neutral: 173 nations play football, 52 tennis, 45
+  women's tennis, 40 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
+  rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
-  Europe](#the-europe-maps), each on land in its own country, 84 women's clubs, all 30 NBA
+  Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
+  on [their maps of Europe](#womens-football-on-the-europe-maps), the NWSL's 16 on [theirs](#the-nwsl-map) of the USA), all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada, the EuroLeague's 20 clubs
   on [theirs](#the-euroleague-map) of Europe, all 32 NFL
   franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
-  [theirs](#the-mlb-map) of the USA and Canada, or all 32 NHL clubs on
-  [theirs](#the-nhl-map). Real Madrid annexes territory
-  exactly the way Spain does. American football is played by clubs only.
+  [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
+  [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
+  exactly the way Spain does. American football is played by clubs only, tennis and
+  women's tennis by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
@@ -39,8 +51,12 @@ American football took one module, its club file, its lineup plan and its squad
 field ([design notes](docs/design/american-football.md)). Baseball added the sport's
 own match clock (half-innings, not minutes) and nations by birthplace
 ([design notes](docs/design/baseball.md)). Ice hockey's ratings are partly estimates, each
-marked as one ([design notes](docs/design/hockey.md)), and women's football plays
-under football's rulebook with its own players ([design notes](docs/design/womens-football.md)).
+marked as one ([design notes](docs/design/hockey.md)), women's football plays
+under football's rulebook with its own players ([design notes](docs/design/womens-football.md)), and rugby league plays
+Rugby League 26's NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)).
+Tennis plays Davis Cup ties between nations, its players rated by their Elo
+([design notes](docs/design/tennis.md)), and women's tennis the Billie Jean King Cup's, the WTA's players
+by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -84,6 +100,7 @@ npm run test:targeting # intervening borders, islands, neutral land and real Eur
 npm run test:flag-symbols # symbol proportions, land fitting and generated asset integrity
 npm run build:flag-symbols # regenerate reviewed field/emblem assets after source review
 npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
+npm run build:historic-flags # redraw the federations of the day's public-domain flags (--check to verify)
 npm run sync:ea-fc       # snapshot EA FC 27 from EA's ratings API into scripts/data/ea-fc27.csv (network, cached)
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
 npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
@@ -94,20 +111,30 @@ npm run build:domestic   # rebuild country maps from snapshots and boundaries (a
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
 npm run sync:early-nationalities # ask Wikidata for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
+npm run sync:world-cup-seasons # read the pinned World Cup, results and Wikipedia sources in data-src/ into scripts/data/world-cup-seasons/
+npm run build:world-cup-seasons # rebuild the computed World Cup seasons 1961/62 to 1993/94 from those facts (offline; --check to verify)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
-npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page in data-src/bball-2karchive/
+npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page and sources in data-src/
 npm run sync:euroleague  # snapshot the EuroLeague's rosters and box scores from its public API into scripts/data/euroleague-2026-27.json (network, cached)
 npm run build:euroleague # rebuild the EuroLeague's clubs, every rating an estimate from that snapshot (--check compares byte for byte)
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
 npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
-npm run build:mlb-map    # rebuild MLB's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
+npm run import:mlb-war   # rebuild the 1960–2017 baseball snapshots from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check compares byte for byte)
+npm run build:mlb-map    # rebuild MLB's maps of the USA and Canada, today's and the 43 of earlier seasons (1–2 minutes a map; --check compares byte for byte)
 npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (network, cached)
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
 npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
+npm run sync:nrl         # snapshot Rugby League 26's NRL ratings, Zero Tackle's profiles and NRL.com's 2025 team lists into scripts/data/rugby-league-26.json (network, cached)
+npm run build-rugby-league # rebuild the NRL clubs and the rugby league nations from that snapshot (--check compares byte for byte)
+npm run build:nrl-map    # rebuild the NRL's map of Australia and New Zealand (seconds; --check compares byte for byte)
 npm run sync:ea-fc-women # snapshot EA FC's women's players from its public API into scripts/data/ea-fc27-women.csv (network, cached)
 npm run build-womens-football # rebuild the women's nations and clubs from that snapshot (--check compares byte for byte)
+npm run sync:tennis      # snapshot Tennis Abstract's men's Elo ratings and countries into scripts/data/tennis-elo.json (network, cached)
+npm run build-tennis     # rebuild the tennis nations from that snapshot (--check compares byte for byte)
+npm run sync:womens-tennis # snapshot Tennis Abstract's women's Elo ratings and countries into scripts/data/womens-tennis-elo.json (network, cached)
+npm run build-womens-tennis # rebuild the women's tennis nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 ```
@@ -116,25 +143,38 @@ The production build installs as an app (Chrome's install button, or Share › A
 to Home Screen on an iPhone) and plays offline. `npm run build` writes
 `manifest.webmanifest` and a service worker, `sw.js`, which
 [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) builds from `src/pwa.js`.
-The worker precaches only the app shell, under 3 MB: `index.html`, the hashed
-bundle in `assets/`, the Archivo fonts and the two world maps. Everything else in
-`public/` (about 60 MB) is cached the first time the game uses it. Seasons and
+The worker precaches only the app shell, about 3.5 MB: `index.html`, the hashed
+bundle in `assets/` (every sport's players among it), the Archivo fonts and the
+two world maps. Everything else in `public/` (about 100 MB) is cached the first
+time the game uses it. Seasons and
 country maps come from the network while online, so they always match the
 deployed build, and from the cache offline. Flags and crests show from the cache
 at once and refresh in the background. Starting or resuming a campaign online
 also fetches every one of its teams' crests and flags that is not cached yet, a
-few at a time, so teams the game never showed online still show offline. After
-one online visit the game opens offline and plays nations and club campaigns,
+few at a time, so teams the game never showed online still show offline. A
+first visit installs the worker only once the setup screen is up and the page
+is idle, or about 10 seconds after the game starts if setup takes longer, so its
+downloads leave the game's own alone. After one online visit that got that far,
+the game opens offline and plays nations and club campaigns,
 plus every country whose map was opened online. A country never opened online
 fails to load, with **Retry**, and a flag or crest the game has neither shown
 nor kept for a campaign online stays blank.
+
+The first download holds the game and football's players, the default setup's.
+Every other sport's players are a file of their own (4 to 43 KB compressed),
+loaded the first time that sport is picked, a challenge link names it, or a saved
+or imported campaign of it opens. Until they arrive, the sport's card shows as
+picked and setup holds its next steps and Launch; picking another sport first
+drops the wait. Players that fail to load say so, with **Retry** and **Reload**.
 
 A new version never reloads the page by itself. Its worker downloads in the
 background and waits, and a **New version ready** panel offers **Reload** or
 **Later**. Reload writes the open campaign's checkpoint, as closing the page
 does, and reloads that tab only. Other tabs keep the version they loaded until
-they reload. Later hides the panel for that page; closing every tab also
-updates. The page looks for a new version every hour and when you return to it.
+they reload, all but the players of a sport they have not loaded yet: the new
+version has replaced those files, so picking that sport there fails until
+**Reload**. Later hides the panel for that page; closing every tab also updates.
+The page looks for a new version every hour and when you return to it.
 
 ## Deployment
 
@@ -194,31 +234,71 @@ manager of the theatre's favourite, with decisions from the first match.
 
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
-   choices are the whole world (173 nations), another confederation, or the
-   Elite 32; basketball's nations also offer **EuroBasket**, the 24 nations of EuroBasket 2025.
+   choices are the whole world (173 nations in football), another confederation, or the
+   Elite 32. A sport offers a confederation only where it is played: once at least four
+   of its nations field a real side, their own rated players holding at least half the
+   lineup, and the Elite 32 once 32 nations do. Rugby league offers the world and Asia &
+   Oceania, baseball the world and N. & C. America, ice hockey the world and Europe;
+   neither tennis game nor women's football has Africa, and an earlier season can offer
+   fewer still. A choice the sport doesn't offer plays its heartland, the confederation
+   with the most real sides (rugby league's Asia & Oceania), and comes back with a sport
+   that offers it. Basketball's nations also offer **EuroBasket**, the 24 nations of EuroBasket 2025.
    Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada or [the EuroLeague](#the-euroleague-map) on its map of Europe, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA,
-   baseball clubs MLB on its map of the USA and Canada and ice hockey clubs the NHL on its own. Women's football's clubs
-   offer its five leagues, the Rest of Europe, all of them or the strongest 32. The step opens on a map of the chosen theatre:
+   baseball clubs MLB on its map of the USA and Canada, ice hockey clubs the NHL on its own and rugby league clubs the NRL
+   on its map of Australia and New Zealand. Tennis and women's tennis are nations only
+   (choosing either switches Teams to nations and disables Clubs). Women's football's clubs
+   offer every European club or its Elite 32 on [maps of Europe](#womens-football-on-the-europe-maps), or the NWSL
+   on [its map of the USA](#the-nwsl-map). The step opens on a map of the chosen theatre:
    the board it starts on, each team's land in its kick-off colour, framed as
-   the campaign's opening camera frames it (the continent for Europe). Its foot
+   the campaign's opening camera frames it (the continent for Europe). The map
+   zooms and pans like the campaign's: scroll or pinch, drag, and double-click
+   or the −/+/reset buttons (phones pinch). Its **Political** / **Flags** switch
+   (**Crests** with clubs) puts each team's flag or club crest on its land, as
+   the campaign's Flags mode does. Its foot
    shows the number of teams, the number of matches and the estimated length
    (the length's title names the Show matches mode the estimate assumes). With
    clubs in football, the **One country · top clubs** dropdown under the
    theatres starts a [domestic campaign](#domestic-campaigns), and its map shows that
    country. Football also has a **Season** choice: the built-in 2026/27 (the
    current season), then the [earlier seasons](#football-seasons) 2025/26 back
-   to 2004/05 (EA FIFA and FC ratings of each; 2005/06 and 2004/05 have
-   nations only), and any local
+   to 1989/90 (EA FIFA and FC ratings of each to 2004/05, then SI's
+   Championship Manager, Sensible World of Soccer for 1996/97 to 1994/95, and
+   fans' databases for 1993/94 and 1989/90; 2005/06, 2004/05, 1996/97 and 1989/90
+   have nations only), the World Cups of 1961/62 to 1993/94 (computed from each
+   finalist's Elo and its players' records, nations only), and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
-   1999/00 (NBA 2K ratings of each), which play NBA clubs on the map of their era. American
-   football's lists its built-in 2026 season (Madden NFL 27), and baseball's its
+   1999/00 (NBA 2K ratings of each), then 1998/99 (NBA Live 99), 1991/92 and
+   1983/84 (NBA 2K27's MyNBA Eras) and every other season back to 1960/61
+   (computed from Basketball-Reference's statistics), which play NBA clubs on the map of their era. American
+   football's lists its built-in 2026 season (Madden NFL 27), then its
+   [earlier seasons](#american-football-seasons) 2025 back to 2001 (Madden ratings
+   of each launch), then 1995 to 1992 and 1990 (Tecmo Super Bowl, the overall
+   ours) and every other season back to 1960, with the AFL's of 1960 to 1969
+   (computed from Pro Football Archives' facts), NFL or AFL clubs on the map of
+   their day, and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
-   2025 back to 2021, with nations or with clubs on the map of their day. Women's
-   football and ice hockey list their built-in 2026/27. A one-line quick-resume
+   2025 back to 2018 (MLB The Show of each), then 2017 back to 1960 (computed from
+   WAR), with nations or with clubs on the map of their day. Women's football lists its
+   built-in 2026/27, then its [earlier seasons](#womens-football-seasons) 2025/26
+   back to 2015/16 (EA ratings of each; national teams only before 2022/23), ice
+   hockey its built-in 2026/27, then its [earlier seasons](#ice-hockey-seasons)
+   2025/26 back to 1966/67 but the cancelled 2004/05 (EA's NHL ratings where an
+   edition published them, else converted or computed from the players'
+   statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
+   [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
+   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1968, rugby league its built-in 2025
+   (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 2009 (computed from
+   NRL.com's match statistics) and 2008 (Rugby League 2, the overall ours), NRL clubs on the map of their day.
+   The Season list names a season by its years, adding "· computed", "· converted"
+   or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
+   year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
+   the 1960s) names each by its whole label instead. Only ice hockey's seasons
+   carry a credit, the Hockey Databank's and MoneyPuck.com's as their sources ask,
+   shown whole as small text under the Season choice. A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
    from a challenge link shows a one-line note about the link
    ([Sharing a campaign](#sharing-a-campaign)). The header holds the save actions
@@ -256,7 +336,8 @@ manager of the theatre's favourite, with decisions from the first match.
 | Chaos draw | `chaos` | Draw neighbour-preferred matchups until a name repeats, then resolve the batch. |
 
 Blitz and chaos allow distant pairings without the directional route restrictions
-used in one-by-one mode. Neither mode annexes neutral land to connect teams.
+used in one-by-one mode. Neither mode annexes neutral land to connect teams; the
+empty land between a pair can only be [claimed](#claimed-land).
 
 A manager under Random draw or Round robin also chooses, on the Your role step,
 the **Opponent** rule, which decides who picks the opponent (`targeting`):
@@ -327,14 +408,17 @@ a field goal, now and then a safety, or nothing by its offence against the oppos
 with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime.
 Ice hockey plays three-minute slices whose rates follow the score (a level game tightens up late, a side behind
 pushes and at the end pulls its goalie), then five minutes of sudden death and a shoot-out. Women's football plays
-football's model.
+football's model. Tennis plays a Davis Cup tie: four singles and a doubles, first to three rubbers, each rubber won with
+Elo's odds for the gap between the players and played out set by set, game by game. Women's tennis plays the Billie Jean
+King Cup's tie the same way, its games with the WTA's serve: more breaks, fewer tie-breaks.
 Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
 **Home advantage** is off by default: every match is played on neutral ground, so
 the defending team wins half of even games. On, the defender plays at home and
 wins about as often as home teams do in its sport's league: 45% of even football
 games in ninety minutes (58% with the shoot-outs), 56% in basketball (64% in the EuroLeague), 54% in
-American football and ice hockey and 53% in baseball. Attacks fail more often, and a failed
+American football and ice hockey and 53% in baseball. A Davis Cup host picks the surface and fills the stands:
+even ties go its way 60% of the time. Attacks fail more often, and a failed
 attack hands the defender the attacker's territory, so conquests change hands but
 campaigns run as many matches. A best-of-three final keeps its attacker, so its
 defender hosts every game.
@@ -427,9 +511,36 @@ Map modes:
 | **Fronts** | Your fronts tinted by your win chance (green / amber / red); other land is neutral. |
 | **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours. |
 
-The map mode is not saved: a reloaded campaign opens on Political. Hovering land
+The map mode is not saved: a reloaded campaign opens on Political. The setup
+map's own Political / Flags switch does not carry into the campaign. Hovering land
 shows its owner, since when it has been held and the deciding result. Clicking
 land opens that team's squad.
+
+### Claimed land
+
+Land in a theatre that no team plays on (an American league's states without a
+club, a world theatre's nations that field no team, a Europe map's countries
+without a club) can be **claimed**. On the map it looks exactly like the team's
+territory, in every map mode (a claimed nation flies the team's flag and sits
+inside its borders), but it is never territory: it doesn't count in the
+standings, can't be targeted or clicked, changes no route or neighbour, and
+passes to whoever beats its holder. Land is claimed in two ways:
+
+- **Crossing.** The empty land a match's line of attack passes over goes to the
+  match's winner (a loser's land goes to the winner anyway). Blitz, chaos and the
+  final series draw no line; they use the route the attacker would take to that
+  opponent. A line that only grazes a corner claims nothing, and land another team
+  already claimed stays that team's.
+- **Landlocked.** A patch of empty land (one shape, or several neighbouring ones)
+  that borders one team only, and whose edge is mostly land rather than coast or
+  land outside the theatre, is that team's. In tennis, Lesotho (no team) is South
+  Africa's from kick-off; Ireland, which touches only Great Britain's Northern
+  Ireland but is mostly coast, stays empty. It is checked at kick-off and after every match, and
+  a patch one team claimed passes to another team that landlocks it.
+
+Hovering claimed land reads "Claimed by <team> · Not a territory". The share image
+shows the champion's claims the same way. A campaign saved before claims existed
+works them out when it resumes. Design notes: [claimed-land.md](docs/design/claimed-land.md).
 
 ### Match, squad and conquest screens
 
@@ -524,7 +635,10 @@ Progress autosaves at every draw, kickoff, final whistle and result, and after
 signings, preserving the seed, random state, queue, history and pending manager
 choice. A match's outcome is fixed at kickoff, so the goals and kicks revealed since
 are written with the next checkpoint, on pause, or when the page is hidden or
-closed; a save with nothing new to write is skipped. Save status reports
+closed; a save with nothing new to write is skipped. A fast-forwarded match is
+usually written once, with its result: its final score waits like the goals do,
+and so does its kickoff when it follows straight on from the last saved result,
+since resuming that save draws and plays the same match again. Save status reports
 storage errors. Each checkpoint is kept with a recovery copy. A save is all or
 nothing: when browser storage is full, a campaign may drop its own recovery copy to
 fit, but never another campaign's; otherwise nothing is written and save status
@@ -593,27 +707,28 @@ Each key names a setup choice, and a key left at its default is left out:
 
 | Key | Setup choice | Values | Left out when |
 | --- | --- | --- | --- |
-| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey` | football |
-| `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), the EuroLeague's (`domestic:euroleague`), or for women's football `all`, `elite` or a league (`NWSL`) | Europe for nations, the Top 124 for football clubs, all clubs for women's football, a sport's own map (the NBA's for basketball, NFL, MLB, NHL) |
+| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-league` | football |
+| `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season); tennis and women's tennis are nations only |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), or the EuroLeague's (`domestic:euroleague`) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
 | `show` | Show matches | `ticker`, `instant`, `express` | Live |
 | `upsets` | Upsets | `predictable`, `balanced`, `wild` | Balanced |
 | `final` | Final | `single`, `best-of-three` | Single match |
-| `signings` | Computer signings | `highest-rated`, `best-fit` | Best-rated player |
+| `signings` | Computer signings (not in tennis, where both sign the same player) | `highest-rated`, `best-fit` | Best-rated player |
 | `home` | Home advantage | `off`, `on` | Off |
 | `strengths` | Team strengths (basketball) | `authentic`, `competitive` | Real-world |
 | `role` | Your role | `manager`, `spectator` | Spectator |
 | `team` | A manager's team | a team id: `276` (Germany), `f-real-madrid`, `d826-679` | no team chosen |
 | `seed` | Seed | 0 to 4294967295 | never |
 
-For example, `https://imperialism-game.vercel.app/?sport=basketball&theatre=CONMEBOL&draw=round-robin&role=manager&team=076&seed=4242`
-sets up Brazil's basketball five against South America under round robin.
+For example, `https://imperialism-game.vercel.app/?sport=basketball&theatre=CAF&draw=round-robin&role=manager&team=566&seed=4242`
+sets up Nigeria's basketball five against Africa under round robin.
 
 A value this version doesn't offer stays at its default: an unknown sport, draw or
-seed, a theatre or season no longer built in, a CM 01/02 season built on another
+seed, a theatre or season no longer built in, a theatre the sport doesn't offer
+(rugby league in Africa; with a season, setup falls back once it has loaded), a CM 01/02 season built on another
 computer, a country map with an earlier season, team strengths outside basketball,
 a team for a spectator. A manager's team is checked once its theatre's teams are
 known, after a country map or season has loaded. If the team doesn't play there,
@@ -658,7 +773,7 @@ relocate or repeat the emblem. Other flags and the small UI flag chips retain
 their original artwork.
 
 Scroll to zoom (up to 16×, anchored on the pointer), drag to pan, double-click or
-press the zoom readout to reset. The view is clamped to the world, so the map
+press the zoom readout to reset; the setup screen's map card works the same way. The view is clamped to the world, so the map
 cannot be lost off-screen. Borders, labels and markers hold a constant weight on
 screen at every zoom level. The v4 map has no scale bar or coordinate readout.
 
@@ -673,8 +788,11 @@ the committed EA SPORTS FC 27 snapshot (EA's ratings site as of 1 November 2026;
 the date shown as its rating date) from [EFEM.club](https://efem.club/players),
 retrieved on 2 October 2026. FM is a season behind EA until a Football Manager
 27 database is available.
-All **173 nations field eleven source-backed players** (1,257 EA and 646 FM
-shirts), with natural coverage for a 4-4-2. The builder prioritises unchanged EA
+All **173 nations football fields have eleven source-backed players** (1,257 EA and 646 FM
+shirts), with natural coverage for a 4-4-2. The map's other three, Tonga, Samoa and the
+Cook Islands, field no team, and their land stays neutral, as in women's football: EA FC 27
+rates none of their players, and the FM 26 snapshot was taken before they were on the map
+([Pacific islands](docs/design/pacific-islands.md)). The builder prioritises unchanged EA
 overall ratings and uses FM to fill coverage gaps. It retains database IDs,
 full/display names, all natural roles, source URLs, versions, dates and original
 ratings through transfers and saves. An FM player fills a gap only when he is not
@@ -722,7 +840,7 @@ snapshot takes its names from. FM ratings come from Football Manager 26 database
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
-2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), the NBA, the NFL, MLB, the NHL,
+2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), the NBA, the NFL, MLB, the NHL, the NRL,
 or the clubs, leagues and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
@@ -748,10 +866,10 @@ then the others it lists; any hitter can be the designated hitter. A position ou
 player's list costs 20 points, a hitter pitching or a pitcher hitting 40. The **nations**
 are every Live card (free agents included) by **birthplace**: a US state is the United
 States', Curaçao and Aruba are the Kingdom of the Netherlands', as in the World Baseball
-Classic. 23 nations field players, from the United States (88) and the Dominican
-Republic (85) down; a lineup place a nation's own players cannot fill gets a generated
-player, and a nation with no MLB players is a minnow (45). Ratings are The Show's
-overalls, unchanged. See the [design notes](docs/design/baseball.md).
+Classic. 23 nations have MLB players, from the United States (88) and the Dominican
+Republic (85) down. The 12 whose players hold at least half the lineup field a team, a
+place their own players cannot fill getting a generated player; every other nation's land
+stays neutral. Ratings are The Show's overalls, unchanged. See the [design notes](docs/design/baseball.md).
 
 **Ice hockey** — `src/data/clubs.hockey.js` and `src/data/rosters.hockey.js`, from
 EA SPORTS NHL 27's ratings and the NHL's rosters and statistics, retrieved 2026-11-07
@@ -759,14 +877,38 @@ EA SPORTS NHL 27's ratings and the NHL's rosters and statistics, retrieved 2026-
 is an estimate**, marked as one wherever it is shown: the players EA leaves out are ranked by
 ice time and scoring and spread from 83 down to 72 (goalies 70). EA's own ratings are unchanged. The 32 clubs
 field the lineup the game picks and keep up to 23; nations field the NHL's players, by EA's
-nationality or else birth country, and a place they cannot fill gets a generated player. See the
+nationality or else birth country, and a place they cannot fill gets a generated player. The seven
+whose players hold at least half the lineup field a team; every other nation's land stays neutral. See the
 [design notes](docs/design/hockey.md).
+
+**Tennis** — `src/data/rosters.tennis.js`, from the men's Elo ratings Tennis Abstract (Jeff
+Sackmann) published on 2026-11-02, with each player's country from its ATP rankings report
+(`scripts/data/tennis-elo.json`, 547 players). There is no video-game list for tennis: a rating is
+the player's Elo / 25 + 4, rounded (Sinner's 2297 is 96), so the match model plays Elo's own odds,
+and nothing is estimated. Each nation names its five best; 52 have the two a tie needs, and the
+rest stay neutral. See the [design notes](docs/design/tennis.md).
+
+**Women's tennis** — `src/data/rosters.womens-tennis.js`, from the women's Elo ratings Tennis Abstract
+published on 2026-11-02, with each player's country from its WTA rankings report
+(`scripts/data/womens-tennis-elo.json`, 505 players), on the same scale (Rybakina's 2159 is 90). Nothing is
+estimated: 45 nations have the two a tie needs, and the rest, Denmark and the Philippines among them with one
+player each, stay neutral. See the [design notes](docs/design/womens-tennis.md).
+
+**Rugby league** — `src/data/clubs.rugby-league.js` and `src/data/rosters.rugby-league.js`, from Big Ant's Rugby League 26
+ratings of every NRL player as Zero Tackle listed them on the game's release (17 July 2025), Zero Tackle's player profiles
+and NRL.com's 2025 team lists and Tests (`scripts/data/rugby-league-26.json`). Ratings are the game's overalls, unchanged;
+positions are each player's most-started place in 2025, with Zero Tackle's kept as a second. The 17 clubs field their
+matchday 17 and keep up to 24. Nations field the NRL's players, by their 2025 Test side, else birthplace. Eight have them,
+Australia, New Zealand, Samoa, Tonga, England, Fiji, Papua New Guinea and the Cook Islands; the first six hold at least half
+a matchday 17 and field a team, while Papua New Guinea's six and the Cook Islands' five fall short and their land stays
+neutral. See the
+[design notes](docs/design/rugby-league.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
 (`scripts/data/ea-fc27-women.csv`, 1,940 players). Ratings are EA's, unchanged, and nothing is
-invented: 27 of the 78 nations with a rated player field a full XI, the rest start short-handed, and a
-nation with none fields no team. See the [design notes](docs/design/womens-football.md).
+invented: 27 of the 78 nations with a rated player field a full XI. The 36 with at least six, half an
+XI, field a team, short-handed below eleven; the rest, and a nation with none, field no team. See the [design notes](docs/design/womens-football.md).
 
 **Basketball** — `src/data/rosters.basketball.js`, 47 federations, 235 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
@@ -810,10 +952,13 @@ another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
 An assignment optimizer fills all eleven football, five basketball, 23 American
-football, 13 baseball or 19 ice hockey slots. Playing outside a natural position costs 12 rating
+football, 13 baseball, 19 ice hockey or 17 rugby league slots. Tennis picks its team instead: the two best in the singles, the next two
+in the doubles (a team of two or three plays its singles players there too), its strength weighing each place by the
+rubbers it plays. Playing outside a natural position costs 12 rating
 points (25 in American football, 20 in baseball, where a hitter pitching or a pitcher
 hitting costs 40 and any hitter can be the designated hitter; in ice hockey 4 between the forward places, 15
-between forwards and defence and 40 in or out of goal). A player may have
+between forwards and defence and 40 in or out of goal; in rugby league 4 within the outside backs, the halves or the
+pack, 8 for a common move between them, such as a centre to the second row, and 15 for any other). A player may have
 more than one natural position, and each one is penalty-free: a claimed PG/SG
 can start at either guard spot. Missing legacy slots
 use the team's sport baseline. The same starters determine strength and appear
@@ -854,20 +999,22 @@ The one problem clubs create is territory: twenty Premier League sides share one
 homeland. So football clubs play on [a map of Europe of their own](#the-europe-maps),
 where a club holds land only in its own country: alone it holds all of it, clubs
 that share a country split it along its regional borders, and a country with no
-club stays grey. Each NBA franchise likewise holds its own state or province of
-[the USA and Canada](#the-nba-map). Two kinds of clubs have no such map and are still
-**dealt** onto the world: women's football's, and the strongest clubs of a CM 01/02
-database built on your own computer (see [Football seasons](#football-seasons)). Working
-down the strength order, each club claims the nearest country to its homeland that
-nobody has taken.
+club stays grey. Women's football's European clubs play [maps of Europe](#womens-football-on-the-europe-maps) of
+their own on the same rule, and each NBA franchise holds its own state or province of
+[the USA and Canada](#the-nba-map). Only the strongest clubs of a CM 01/02 database built on your own
+computer (see [Football seasons](#football-seasons)) have no map and are still **dealt** onto the world:
+working down the strength order, each club claims the nearest country to its homeland that nobody has
+taken. So were women's football's until 9 November 2026; a campaign saved on the world then still
+plays there.
 
 A club's territory is painted in a generated colour rather than a flag —
 identical national flags would tell you nothing — and wherever a nation shows its
 flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
-Each NFL franchise holds its own state of [the USA](#the-nfl-map), and each MLB and NHL club its own of
-[the USA and Canada](#the-mlb-map) ([the NHL's](#the-nhl-map)).
+Each NFL franchise holds its own state of [the USA](#the-nfl-map), each MLB and NHL club its own of
+[the USA and Canada](#the-mlb-map) ([the NHL's](#the-nhl-map)), each NRL club its own of
+[Australia and New Zealand](#the-nrl-map), and each NWSL club its own of [the USA](#the-nwsl-map).
 
 Club lineups come from the same sources as the national squads:
 `clubs.football.js` from the EA FC 27 snapshot: the 124 strongest of its 309
@@ -969,12 +1116,13 @@ from these services at runtime.
 
 `public/domestic/ATTRIBUTION.txt` is generated with every build and lists each
 country's boundary source and licence, its cuts and fills, plus the GeoNames,
-Wikidata and EFEM notes. 128 of the game's 173 nations ship, with 4,184 clubs (8
+Wikidata and EFEM notes. 128 of the game's 176 nations ship, with 4,184 clubs (8
 countries have 100, four have ten); the maps total 18.8 MB (46–250 KB each), and
 a session fetches only the one chosen. 42 nations have fewer than ten viable clubs,
 from Bhutan's nine to none in Sri Lanka and Cuba, so they do not ship
-([the list](docs/design/domestic-campaigns.md#tiers)), and Scotland, Wales and
-Northern Ireland have no club data yet. All of them still play as nations.
+([the list](docs/design/domestic-campaigns.md#tiers)), and Scotland, Wales,
+Northern Ireland, Tonga, Samoa and the Cook Islands have no club data yet. All of them
+still play as nations where a sport fields them.
 
 **How sections are built.** For each country the builder takes the coarsest
 boundary level with at least 200 units (twice the 100 sections), or else the
@@ -1050,12 +1198,13 @@ country-map runtime; NBA campaigns saved before it still resume on the world map
 Each [earlier season](#basketball-seasons) plays on a map of its own era, drawn
 the same way from the arenas of that season: the Grizzlies hold British Columbia
 until 2000/01, the SuperSonics Washington until 2007/08 and the Nets New Jersey
-until 2010/11. Nine era maps
-(`public/domestic/nba2000.json` to `nba2014.json`) cover 1999/00 to 2013/14;
+until 2010/11; in 1960/61 the Warriors hold Pennsylvania and the Syracuse
+Nationals share New York with the Knicks. 42 era maps
+(`public/domestic/nba1961.json` to `nba2014.json`) cover 1960/61 to 2013/14;
 later seasons have today's franchises and play on this map.
 
 ```bash
-npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 6 minutes)
+npm run build:nba-map                      # boundaries + arenas → public/domestic/nba*.json, src/data/clubMaps.js (about 45 minutes)
 npm run build:nba-map -- --check           # offline rebuild must match the committed files byte for byte
 npm run build:club-maps                    # the NBA's and the NFL's maps together
 ```
@@ -1103,15 +1252,17 @@ Welsh clubs of the Premier League (Swansea, Cardiff, in earlier seasons) hold Wa
 not England. AS Monaco, a Ligue 1 club, holds the land around Monaco in France.
 
 The earlier [football seasons](#football-seasons) hold the seven big leagues only, so
-their maps draw on those: the strongest 124 and 32 of that season's 132–134 clubs,
-one pair of maps per season. 2005/06 and 2004/05 have nations only, so no maps. Football's "One country · top clubs" campaigns are
+their maps draw on those: the strongest 124 and 32 of that season's 124–134 clubs,
+one pair of maps per season. 2005/06, 2004/05, 1996/97, 1989/90 and the nine World
+Cups have nations only, so no maps. Football's "One country · top clubs" campaigns are
 unchanged. A world campaign saved before these maps stays on the world, and resumes
 as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
 deals its clubs onto the world.
 
-Each map is `public/domestic/eu<clubs>[s<season year>].json` (42 files, 150–190 KB,
+Each map is `public/domestic/eu<clubs>[s<season year>].json` (60 files, 150–190 KB,
 fetched when chosen), with the index `src/data/europeMaps.js`. They follow the clubs, so
-rebuild them after `npm run build-clubs` or `npm run build:ea-seasons`:
+rebuild them after `npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
+`npm run build-womens-football` or `npm run build:womens-seasons`:
 
 ```bash
 npm run build:europe-maps                  # about 8 minutes; --only=eu124,eu32 builds just those
@@ -1121,6 +1272,20 @@ npm run build:europe-maps -- --check       # offline rebuild must match the comm
 Where each club stands comes from `scripts/data/europe-clubs.json`. Boundary layers
 and licences are listed in `public/domestic/ATTRIBUTION-europe.txt`, and
 [the design notes](docs/design/domestic-campaigns.md#the-europe-maps) describe the build.
+
+#### Women's football on the Europe maps
+
+Women's football's clubs play the same way: **Europe**, every European club EA rates (68 in
+2026/27, in thirteen countries), and **Elite 32**, the 32 strongest of them (in six), each on
+a map of Europe where a club holds land only in its own country, by the rules above. The NWSL's
+clubs play [their own map](#the-nwsl-map) instead, so European and American clubs never meet. Glasgow
+City holds Scotland, Benfica Portugal, Brann Norway, Breiðablik Iceland; England's fourteen clubs share
+England, seven of them London's. A club stands at the women's own ground, not the men's: Manchester
+United's land is Leigh's, Chelsea's Kingston's. The earlier seasons with clubs, 2025/26 back to
+2023/24, have their own pair; 2022/23 rated only the WSL and D1 Arkema, so one map of its 24 clubs.
+The maps are `public/domestic/weu[32][s<season year>].json` (9 files, 140–170 KB). There are no
+single-league theatres any more: a world campaign saved on one before still plays on the world
+under its name, and a new setup or challenge link that names one plays Europe.
 
 ### The NFL map
 
@@ -1176,21 +1341,54 @@ npm run build:nhl-map                      # boundaries + arenas → public/dome
 npm run build:nhl-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
 
+### The NRL map
+
+Rugby league clubs have one theatre, **NRL**: the 17 clubs fight over Australia and New Zealand, each holding the state,
+territory or region its ground stands in and nothing else. New South Wales (ten clubs, eight of them in Sydney) and
+Queensland (four) are divided between their clubs; the Storm hold Victoria, the Raiders the Australian Capital Territory
+and the Warriors the Auckland Region, and every other state and region stays empty. The map is `public/domestic/nrl.json`
+(134 KB); grounds are in `scripts/data/nrl-teams.json`.
+
+```bash
+npm run build:nrl-map                      # boundaries + grounds → public/domestic/nrl.json and its index entry (seconds)
+npm run build:nrl-map -- --check           # offline rebuild must match the committed files byte for byte
+```
+
+### The NWSL map
+
+Women's football's NWSL clubs have one theatre of their own, **NWSL**, beside [Europe's two](#womens-football-on-the-europe-maps):
+the 16 clubs fight over the USA, each holding the state its stadium stands in and nothing else. California's three
+(Bay FC, Angel City and the San Diego Wave) divide it along its counties; the Washington Spirit holds only DC, as
+the NBA's Wizards do. Boston Legacy FC plays at Centreville Bank Stadium in Pawtucket, Rhode Island, until White
+Stadium opens in 2028, so it holds Rhode Island and, as Boston's club, Massachusetts. Gotham FC holds New Jersey,
+its stadium's. Every other state stays empty. Each earlier season with NWSL clubs (2025, 2024 and 2023, from EA FC
+26, 25 and 24) has its own map, its clubs where they played then: in 2023 the Current played in Kansas City,
+Kansas, so they hold Kansas. The maps are `public/domestic/nwsl[s<season year>].json` (about 135 KB each);
+stadiums are in `scripts/data/nwsl-teams.json`.
+
+```bash
+npm run build:nwsl-map                     # boundaries + stadiums → public/domestic/nwsl*.json and their index entries (seconds)
+npm run build:nwsl-map -- --check          # offline rebuild must match the committed files byte for byte
+```
+
 ## Football seasons
 
-Football can be played on twenty-two earlier seasons as well as the built-in
+Football can be played on forty-two earlier seasons as well as the built-in
 2026/27: every season from 2004/05 to 2025/26, each from EA's FIFA or EA FC of
-that season (FIFA 05 to EA FC 26). They ship with the game: pick one under
-**Season** in setup. Each is a file in `public/football/` (75–335 KB) that loads
-only when chosen.
+that season (FIFA 05 to EA FC 26), eleven before them, from 2002/03 back to
+1989/90, from the games of their day and two fans' databases ([below](#before-200405)),
+and the nine World Cups from 1962 to 1994, computed
+([below](#the-world-cups-1962-to-1994-computed)). They ship with
+the game: pick one under **Season** in setup. Each is a file in
+`public/football/` (52–340 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
   and the clubs of the seven biggest European leagues (132–134 clubs a season,
   of which the strongest 124 play, on [the season's own maps](#the-europe-maps);
   2005/06 and 2004/05 have nations only). Ratings are EA's overalls, unchanged.
   EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
-  editions) and the rest field the players they have, as an empty or thin
-  built-in nation does. Scotland, Wales and Northern Ireland field their own
+  editions). A nation with at least six rated players, half an XI, fields the players it has, short-handed
+  below eleven; one with fewer fields no team, and its land stays neutral. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
   none, and their players still play for their clubs.
 - **Rosters:** EA FC 26 is update 4 of 19 September 2025, the snapshot the
@@ -1235,10 +1433,67 @@ only when chosen.
   `docs/design/football-seasons-audit.json`, and every file rebuilds byte for
   byte.
 
-Seasons before 2004/05 have no EA source here: the FIFA Index mirror starts with
-FIFA 05. They can come from a Championship
-Manager 01/02 database, which covers 2001/02 to 2025/26 but whose authors have
-not allowed redistribution, so those seasons stay **local**. Download a database
+### Before 2004/05
+
+EA has no source here before FIFA 05 (the FIFA Index mirror starts there), so
+eleven earlier seasons come from Sports Interactive's Championship Manager, from
+Sensible World of Soccer and from two fans' Championship Manager databases, one
+source each:
+
+| Season | Source | Nations with a full XI | Clubs |
+| --- | --- | --- | --- |
+| 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 129 |
+| 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 130 |
+| 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 130 |
+| 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 130 |
+| 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 130 |
+| 1997/98 | SI's Championship Manager 97/98 | 52 | 124 |
+| 1996/97 | Sensible World of Soccer 96/97, its national squads | 133 | nations only |
+| 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 |
+| 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 |
+| 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 130 |
+| 1989/90 | Simon Treanor's 89/90 for CM 01/02, fan-made (Beta 5) | 88 | nations only |
+
+1993/94 and 1989/90 are rated by fans, not by a game's makers, and say so in the
+Season choice. 1989/90 plays the federations of its day: the Soviet Union,
+Yugoslavia and Czechoslovakia field their republics' players, West Germany plays
+as West Germany, and a German at an East German club plays for no nation.
+
+- **Ratings:** CM's current ability (1–200) becomes `round(ca * 99 / 200)`, as
+  for a local CM database (below); CM 97/98 rates the same players about five
+  game points above CM3. SWOS rates no overall: a player's price step (0–49, an
+  outfield player's seven skills summed, a keeper's price alone) becomes
+  `round(40 + value * 59 / 49)`, from an empty shirt's 40 to 99. The raw values
+  stay with each player.
+- **Clubs:** the seven biggest leagues' top divisions, on the season's own
+  [Europe maps](#the-europe-maps).
+- **Credits and rights:** Championship Manager is Sports Interactive's; Eidos
+  made CM 01/02 free to download in December 2008 for personal, non-commercial
+  use, the data's rights reserved. 3.9.60 and 3.9.68 are SI's own files as
+  nckstwrt's CM0102 Starter Kit ships them; CM 00/01 (3.81) and CM 99/00 (3.70),
+  never made free, are SI's own files too, read from users' uploads of the retail
+  CDs to archive.org; CM3's data was ported to CM 01/02 by
+  Gio and released by Cam F on champman0102.co.uk; CM 97/98's database is as
+  baskeyx extracted it. SWOS 96/97 is Sensible Software's (now Codemasters'),
+  from Whiteulver's database and xflea's spreadsheet as keyser1884's SWOS-MCP
+  holds them; SWOS 94/95 and 95/96 are the game's own team files as the SWOS
+  United server keeps them. The fan-made 1993/94 is Cam F's ("Season 93/94 For
+  0102") and 1989/90 Simon Treanor's ("Championship Manager 1989/90 update for CM
+  01/02", cm8990.wordpress.com), both as the CM0102 Starter Kit ships them. None
+  of them grants redistribution: each season's source block names its maker, who
+  compiled it, where it comes from and when it was read.
+  `scripts/data/retro-seasons.json` pins every file by SHA-256. To rebuild:
+
+  ```bash
+  npm run sync:retro-cds        # CM 00/01's and CM 99/00's tables, read by byte range from their CD images
+  npm run build:retro-seasons   # the eleven season files, the listing and the audit (--check compares byte for byte)
+  ```
+- **Missing:** 2003/04: SI's own CM 03/04 database is in a format no one has
+  documented, and that season's CM 01/02 database is a fan's update.
+
+Other Championship Manager 01/02 databases, the CM 01/02 Update Team's for
+2001/02 to 2025/26, can be built on your own computer: their authors have not
+allowed redistribution, so those seasons stay **local**. Download a database
 from [champman0102.co.uk](https://www.champman0102.co.uk) (a free forum account
 is needed) into the ignored `data-src/cm0102/<folder>/`, then run:
 
@@ -1256,33 +1511,77 @@ whether those files may be committed, and the
 considered, back to 1872, and their terms.
 
 - **What the CM 01/02 builder does:**
-  - It identifies the release from its file sizes (48 known releases, each with
-    its season, author, forum topic and date shifts) and refuses seasons ending
-    before 2002.
+  - It identifies the database from its file sizes (53 known: 48 releases, the
+    CM3 port, two fan databases, CM 99/00 and CM 00/01, each with its season,
+    author, forum topic and date shifts) and refuses seasons ending before 1962
+    (`FIRST_YEAR`).
   - It reads the binary files with the game's own parser (`src/data/cm0102.js`,
     format in [cm0102-format.md](docs/design/cm0102-format.md)).
-  - Every one of the 173 nations gets an entry, and clubs come from the seven
-    leagues the club layer already uses.
+  - Every one of the 176 nations gets an entry, and clubs come from the seven
+    leagues the club layer already uses. Tonga, Samoa and the Cook Islands are
+    left out when the database rates none of their players: a season without them
+    fields no team of theirs, as in every built-in EA season (none rates one).
   - Ratings are CM's current ability (1–200) converted once with
     `round(ca * 99 / 200)`. Natural positions are the slots rated 20.
   - It never invents a player or a rating. It stops on an unmapped nation unless
     `--allow-unmapped` is given, and then leaves those players out.
 - **Federations by year:** a nation plays only once its association was a FIFA
   member by the end of the season. Montenegro is held by Serbia until 2006, New
-  Caledonia by France until 2003 and South Sudan by Sudan until 2011. Timor-Leste
-  until 2005 and Kosovo until 2015 stay neutral.
+  Caledonia by France until 2003 and South Sudan by Sudan until 2011. Kosovo is
+  Serbia's until June 1999 (1996/97 and 1997/98), then stays neutral until 2015,
+  as Timor-Leste does until 2005. Bosnia and Herzegovina plays from 1996/97,
+  Eritrea and Palestine from 1997/98, Mongolia from 1998/99 and Bhutan from
+  2000/01. The table goes back to 1961/62: a season of then plays the federations
+  of its day under their own names and flags (the Soviet Union on Russia's shape,
+  holding the other republics, to 1990/91; the CIS in 1991/92; Yugoslavia to
+  1990/91; FR Yugoslavia in 1994/95 and 1995/96; Czechoslovakia to 1992/93; West
+  Germany to 1989/90; Zaire from 1971/72), leaves suspended associations out (South
+  Africa, FR Yugoslavia, China PR) and fields no East Germany, which has no shape.
 - **Saves are self-contained:** players are packed as compact EA or CM tuples,
   so a season campaign resumes or imports without its season file.
+
+### The World Cups, 1962 to 1994 (computed)
+
+No game rates the players of most nations before 1994 in a form the game can
+read, so nine seasons, 1961/62 to 1993/94, are **computed** and say so in the
+Season list ("1969/70 · computed"; in 1993/94 and 1989/90, beside the fan
+databases, "1993/94 · Computed · 1994 World Cup"): each World Cup's finalists,
+nations only, 15 to 24 of them.
+
+- **Ratings:** a nation's strength comes from its Elo the day after the final,
+  `T = 87 − 3.2 × (best Elo − its Elo) / 100`, with the Elo computed from every
+  international result to that day (martj42's results, CC0) by eloratings.net's
+  formula. Its eleven are the players of its World Cup squad with the most
+  minutes in each role (1 GK, 4 DF, 4 MF, 2 FW; a role short of players who
+  played takes the most-used left, out of position), ordered by Ballon d'Or
+  votes, World Cup awards, goals a minute and minutes, and rated T plus today's
+  spread of an XI, so the team's Elo sets most of each rating. Squads, minutes,
+  goals and awards come from the Fjelstul World Cup Database, the 1962 and 1966
+  line-ups and the Ballon d'Or votes from Wikipedia (all CC BY-SA 4.0, credited
+  in `public/football/ATTRIBUTION-world-cup.txt`, which licenses the season
+  files the same way).
+- **Federations of the day:** the Soviet Union, Yugoslavia, Czechoslovakia, West
+  Germany and Zaire play under their own names and flags, holding their members'
+  land where they are finalists. East Germany has no shape and fields no team.
+- **Theatres:** the world, Europe, and South America where it had four
+  finalists; never the Elite 32.
+- **Rebuild:** `npm run sync:world-cup-seasons` reads the pinned sources in
+  `data-src/` into the committed facts; `npm run build:world-cup-seasons` turns
+  them into the season files, offline, and `--check` compares byte for byte.
 
 The [design notes](docs/design/football-years.md) give the file format, the
 runtime, the saves and the known limits.
 
 ## Basketball seasons
 
-Basketball can be played on 26 earlier seasons as well as the built-in 2026/27:
-1999/00 to 2025/26, each from that season's NBA 2K (NBA 2K to NBA 2K26). Pick
+Basketball can be played on 66 earlier seasons as well as the built-in 2026/27:
+every season from 1999/00 to 2025/26, each from that season's NBA 2K (NBA 2K to
+NBA 2K26), three before them from other games (below: 1998/99 from NBA Live 99,
+1991/92 and 1983/84 from NBA 2K27's MyNBA Eras), and the 36 others back to
+1960/61, which no game rated, computed from Basketball-Reference's statistics
+(below). Pick
 one under **Season** in setup; it plays NBA clubs only, so it switches Teams to
-clubs. Each season is a file in `public/basketball/` (about 12 KB) that loads
+clubs. Each season is a file in `public/basketball/` (3 to 12 KB) that loads
 only when chosen, with the map of its era.
 
 - **What a season holds:** the franchises of that season, each with the best
@@ -1290,10 +1589,43 @@ only when chosen, with the map of its era.
   Franchises that have moved since keep their name and city of the time: the
   Vancouver Grizzlies, Seattle SuperSonics, New Jersey Nets, Charlotte Bobcats
   and the New Orleans (and, for 2005/06 and 2006/07, Oklahoma City) Hornets.
-- **What is missing:** 2011/12, whose ratings the source lists for only three
-  players of two teams, and any national team: NBA 2K rates NBA players only.
+- **Before NBA 2K:** 1983/84 and 1991/92 are NBA 2K27's MyNBA Eras ('Magic vs
+  Bird' and 'Jordan'), as 2kratings.com lists them: 2K's opening-night rosters,
+  with 2K's overalls. A player stays only if Basketball-Reference has him
+  playing for that club that season (checked against Sumitro Datta's CC0 copy of
+  its totals), so 2K's made-up bench players are left out; eight 1991/92 players
+  2K lists by an initial are named from evidence (Magic Johnson, on the Lakers'
+  opening-night roster before he retired on 7 November 1991). 2K lists no
+  player it has no licence for, so some fives are weaker than the real club's
+  (the 1991/92 76ers without Charles Barkley, the Pacers without Reggie Miller).
+  1998/99 is EA's NBA Live 99, from its own roster files (the NLSC's original
+  1998 rosters): the lockout season, so the 1997/98 rosters with the trades of
+  May and June 1998. Its overalls run low (28–71), so one line puts them on NBA
+  2K's scale, `round(20.22 + 1.089 * raw)`, fitted on the 296 players NBA 2K
+  rates in 1999/00 (3.95 points out on average).
+- **Computed seasons:** 1960/61 to 1982/83, 1984/85 to 1990/91 and 1992/93 to
+  1997/98, labelled 'Basketball-Reference (computed)'. One score per player
+  season from Basketball-Reference's statistics in Sumitro Datta's copy on
+  Kaggle, whose CC0 label is the compiler's: PER, WS/48 and DWS are
+  Basketball-Reference's own figures, under Sports-Reference's data-use terms
+  ([Rights and terms](docs/design/football-year-sources.md#rights-and-terms)).
+  The score weighs PER and WS/48 shrunk by minutes, minutes, points, rebounds and
+  assists a game, All-Star and All-NBA picks and defensive win shares, its
+  weights fitted by least squares to NBA 2K's overalls of 1999/00 to 2025/26;
+  each club's 13 players with the most minutes are ranked by it and given NBA
+  2K27's ratings rank for rank. A player traded during a season plays for the
+  club he played the most minutes for. Rated this way, 1983/84 and 1991/92 match
+  NBA 2K27's own ratings of them at a rank correlation of 0.95 and 0.94 (about 2
+  points out). Specialists rate low (Dennis Rodman does not start for the
+  1995/96 Bulls), and the engine plays every season with today's rules at that
+  season's pace.
+- **What is missing:** any national team (NBA 2K rates NBA players only), and
+  any season before 1960/61 (no BAA or ABA).
 - **Source:** [2K Archive](https://2karchive.com/), a fan compilation of every
   edition's ratings that names no licence (2K's own rights are not cleared).
+  2011/12 comes from [The Real 2K Insider](https://thereal2kinsider.blogspot.com/2011/09/official-nba-2k12-ratings-released.html)'s
+  transcription of 2K's NBA 2K12 launch ratings, since 2K Archive's 2K12 table
+  lacks two teams; the build pins that page too (`data-src/bball-2k12/`).
   The built-in season, NBA 2K27, comes from the same page.
   `scripts/data/nba-seasons.json` pins one saved copy of its page by SHA-256
   and lists each season's franchises and the arenas of those that moved. To rebuild, save the page as
@@ -1305,33 +1637,142 @@ only when chosen, with the map of its era.
 
   It writes the season files, their listing `src/data/basketballSeasons.js` and
   `docs/design/basketball-seasons-audit.json`; `npm run build:nba-map` then
-  draws the era maps.
+  draws the era maps. The computed seasons need the CC0 copy's tables in
+  `data-src/research-gaps/basketball/kaggle-sumitrodatta-v57/` (ignored, pinned
+  by SHA-256 in the manifest's `computed`).
 - **Saves** hold every player as played, so a season campaign resumes without
   its season file. It still needs its era's map, as any NBA campaign does.
 
 The [design notes](docs/design/football-years.md#earlier-basketball-seasons)
 give the file format, the era maps and the known limits.
 
+## American football seasons
+
+American football can be played on 76 earlier seasons as well as the built-in
+2026: every NFL season from 1960 to 2025, and the AFL's ten seasons before the
+1970 merger. 2001 to 2025 come from that season's Madden (Madden NFL 2002 to
+Madden NFL 26) as it launched, 1990 and 1992 to 1995 from Tecmo Super Bowl,
+and the rest (1960 to 1989, 1991 and 1996 to 2000, and the AFL's) are computed
+from what the players did (below). Pick one under **Season** in setup; it
+plays the clubs of that season on the map of their day. Each season is a
+file in `public/american-football/` (about 30 KB) that loads only when chosen.
+
+- **What a season holds:** every club of that season (from 13 in 1960 to 32
+  since 2002; the AFL's 8 to 10), each with the lineup the game picks from its
+  whole roster and its best backups, by the built-in season's rules. Madden's
+  overalls are used unchanged (Madden NFL 2002 on); every other overall is ours,
+  as each season's source block says (and the computed ones' label).
+- **Clubs of their day:** the St. Louis Rams until 2015, the San Diego Chargers
+  until 2016, the Oakland Raiders until 2019, Washington (named by its city until
+  2019) and the Washington Football Team in 2020 and 2021, no Texans in 2001, the
+  Saints in Baton Rouge in 2005: each on an era map (`nfl2001` … `nfl2022`; 2024
+  and 2025 play on today's `nfl`). A stadium move starts a new map.
+- **Sources:** each launch roster from a copy made at the time, because EA has
+  since edited its live launch lists: maddenratings.net's per-team spreadsheets
+  (2001-2020, 2022, 2023), Madden 22's launch workbook (GitHub `kellerdevin`),
+  and EA's site as copied in GitHub `theedgepredictor` (2024, 2025). Where EA's own
+  lists survive (Madden 16, 17, 22, 23, 24, 26) they agree player for player.
+  2011 is Madden 12's pre-lockout default roster. Placeholder names ("C.#25") are
+  left out. All are fan compilations of EA's ratings; EA's rights are not cleared.
+  `scripts/data/nfl-seasons.json` pins every file by SHA-256. To rebuild:
+
+  ```bash
+  npm run sync:madden-seasons   # the snapshots in scripts/data/madden-seasons/, from the pinned files in data-src/
+  npm run build:nfl-seasons     # the season files, src/data/americanFootballSeasons.js and the audit (--check compares byte for byte)
+  npm run build:nfl-map         # today's map and the era maps
+  ```
+- **Tecmo Super Bowl, 1990 and 1992–1995:** the NES game (1990), the SNES one
+  (1993), Tecmo Super Bowl II (1992 and 1994, its first and third seasons) and
+  III (1995, 30 clubs with the Panthers and Jaguars), read from BAD-AL/tsbtools'
+  roster dumps (`npm run sync:tecmo` writes `scripts/data/tecmo/`, `--check`)
+  and checked against Tecmo Geek, a GameFAQs transcription and the NFTGL's Book
+  of Armaments. Tecmo rates attributes, never a player, so **the overall is
+  ours**: a position score by Tecmo Geek's or the NFTGL's weights, ranked within
+  the season and read off Madden NFL 2002's overalls at that position, which
+  each season's source states. Names come from nflverse's rosters (CC BY 4.0);
+  the games' unlicensed stars ("QB BILLS") are named only where nflverse leaves
+  no doubt, so the 1990 Bills and Browns start without Jim Kelly and Bernie
+  Kosar. The games' 3-4 and one-back lineups leave documented places short
+  (every 1990 club a lineman and a corner, every 1993 club a lineman), filled
+  out of position as the game always does; nobody is added. Clubs of the day:
+  the Phoenix Cardinals, Los Angeles Raiders and Rams, Houston Oilers and the
+  first Cleveland Browns, and in 1995 the Panthers at Clemson (holding South
+  Carolina) and the St. Louis Rams, on the maps `nfl1990` … `nfl1995`.
+- **Computed seasons (1960 to 1989, 1991, 1996 to 2000, and the AFL 1960 to
+  1969):** no game's ratings are used, so **the overall is ours**, from Pro
+  Football Archives' facts (profootballarchives.com: who played where, games and
+  starts, the season's box-score totals): each club's points against the
+  league's shared out by starts and production, ranked at each position and
+  read off Madden NFL 2002 (labelled "computed"). It is a hindsight rating: it
+  follows each season's results more closely than a game's pre-season ratings
+  do. 1987 counts the clubs' own players, not the strike games' replacements.
+  Each AFL season is ranked within the AFL and plays on a map of its own
+  (`afl1960` … `afl1969`); the NFL's seasons before 2001 play on era maps from
+  `nfl1960`, with the clubs of their day (the St. Louis Cardinals, Baltimore
+  Colts, Boston Patriots, Dallas Texans and New York Titans, the Giants at the
+  Yale Bowl holding Connecticut in 1973–74). 1998 to 2000's pages were saved
+  apart (`npm run fetch:pfa -- --years=1998-2000 --into=pfa-1998-2000`, into
+  `data-src/pfa-1998-2000/`), which the sync reads beside `data-src/pfa/`.
+  To rebuild:
+  `npm run fetch:pfa` (polite, resumable), `npm run sync:pfa`, then
+  `npm run build:nfl-seasons`, `npm run build:nfl-map` and
+  `node scripts/build-club-maps.mjs --league=afl`.
+- **What is missing:** anything before 1960. Madden NFL 97 and 98 are not used
+  (their ratings check poorly, so 1996 and 1997 are computed), nor is NFL Draft
+  Buzz's copy of Madden NFL 97 to 2001, because its site refuses automated
+  clients (so 1998 to 2000 are computed too), nor are the fan-made Tecmo Super
+  Bowl ROM hacks.
+
 ## Baseball seasons
 
-Baseball can be played on five earlier seasons as well as the built-in 2026:
-2021 to 2025, each from that year's MLB The Show (21 to 25) at its last roster
-update, every one read from the game's own public API. Pick one under
+Baseball can be played on 66 earlier seasons as well as the built-in 2026:
+2018 to 2025, each from that year's MLB The Show (18 to 25) at its last roster
+update: 2021 to 2025 read from the game's own public API, 2018 to 2020 from the
+fan site ShowZone's copies of Sony's cards; and 1960 to 2017, which no game rated,
+computed from the players' WAR (below). Pick one under
 **Season** in setup. A baseball season keeps both layers: **Nations** field that
 year's players by birthplace, and **Clubs** play that year's MLB on the map of
-their day. Each season is a file in `public/baseball/` (about 35 KB) that loads
+their day. Each season is a file in `public/baseball/` (17–35 KB) that loads
 only when chosen.
 
-- **What a season holds:** every nation with MLB players born there and the 30
-  clubs, each club's lineup and active roster of 26, by the same rules as the
-  built-in season. Ratings are The Show's overalls, unchanged.
-- **Clubs of their day:** the Cleveland Indians in 2021, the Oakland Athletics
-  until 2024 (the Athletics play in West Sacramento from 2025) and the Rays at
-  Steinbrenner Field in Tampa in 2025, each on its era's map (`mlb2021`, `mlb2022`
-  for 2022–24, `mlb2025`; 2026 plays on today's `mlb`).
-- **What is missing:** anything before 2021. Older editions' APIs are gone
-  (mlb17 to mlb20), the Wayback Machine holds two pages of one of them, and no
-  dataset of every player's ratings for those years turned up.
+- **What a season holds:** every nation with MLB players born there and the
+  season's clubs (30 since 1998, 16 in 1960), each club's lineup and active roster of
+  26, by the same rules as the built-in season (a club of the computed seasons that
+  used fewer than 13 pitchers all season keeps every one it used, so 23 to 25). The
+  MLB The Show seasons' ratings are The Show's overalls, unchanged.
+- **Clubs of their day:** the Cleveland Indians until 2021, the Oakland Athletics
+  until 2024 (the Athletics play in West Sacramento from 2025), the Blue Jays in
+  Buffalo in 2020, the Rangers at Globe Life Park until 2019 and the Rays at
+  Steinbrenner Field in Tampa in 2025, each on its era's map (`mlb2018`, `mlb2019`,
+  `mlb2020`, `mlb2021`, `mlb2022` for 2022–24, `mlb2025`; 2026 plays on today's
+  `mlb`).
+- **2018 to 2020:** Sony's mlb18 to mlb20 APIs are gone; ShowZone keeps each
+  edition's final Live cards, read once through its data API and pinned. ShowZone's
+  MLB 21 equals Sony's own snapshot card for card (the import stops otherwise), and
+  Sony's archived pages of the last roster updates agree. ShowZone states "All
+  Rights Reserved" and gives no terms; its site's robots.txt disallows `/api`, its
+  data host has no rules. MLB The Show 18 has no secondary positions and no
+  birthplaces: birthplaces come from MLB 19–21 by name, else MLB's Stats API.
+- **1960 to 2017 are computed** (listed "Computed from WAR, end of <year>"): ShowZone
+  keeps no game's ratings before 2018, and no dataset of every player's ratings for
+  those years turned up. Each player's WAR (Neil Paine's JEFFBAGWELL file, the average
+  of Baseball-Reference's and FanGraphs' WAR) per playing time over the season and the
+  two before it is put rank for rank, within hitters, starters and relievers, on MLB
+  The Show 18 to 24's scale; tested on 2018–2024, it misses the Show by about 4.4
+  points a player. Names, birthplaces and each club's main ballpark are the Chadwick
+  Baseball Bureau's Baseball Databank's (`e9f247e` of November 2023, the latest commit
+  its forks hold, read from the fork `infonuum/baseballdatabank`, as the Bureau's own
+  repository is gone), with one birthplace corrected from Wikipedia (Elmer Valo's).
+  The clubs of their day (the Milwaukee Braves, the Senators, the Expos…) play on 37
+  era maps, `mlb1960` to `mlb2017`
+  ([design notes](docs/design/baseball.md#seasons-before-2018-computed-from-war)).
+  Nothing before 1960.
+- **Licence of the computed seasons:** JEFFBAGWELL is MIT; the Baseball Databank is
+  CC BY-SA 3.0 (share-alike), so the season files and their snapshots are shared
+  under it. `public/baseball/ATTRIBUTION.txt` credits both, repeats the MIT notice,
+  the Databank's licence statement and Retrosheet's notice (the Databank's home games
+  come from Retrosheet's game logs), and names Baseball-Reference and FanGraphs as the
+  WAR's origin.
 - **A source error:** MLB The Show 24's API gives the wrong country for players
   born outside the United States (Juan Soto "At Sea", Ronald Acuña Jr. "Slovenia").
   The build takes each such player's birthplace from the nearest sound edition
@@ -1341,11 +1782,249 @@ only when chosen.
   `--parallel=3` for the older hosts, which take 15–25 s a page). To rebuild:
 
   ```bash
-  npm run build:mlb-seasons   # the season files, src/data/baseballSeasons.js and the audit (--check compares byte for byte)
-  npm run build:mlb-map       # today's map and the era maps from scripts/data/mlb-seasons.json
+  npm run import:mlb-showzone   # 2018–2020's snapshots, from the pinned ShowZone cache in data-src/showzone/ (--check)
+  npm run sync:mlb-birthplaces  # MLB 18's missing birthplaces from MLB's Stats API, pinned in scripts/data/mlb-birthplaces.json
+  npm run import:mlb-war      # 1960–2017's snapshots, from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check)
+  npm run build:mlb-seasons   # the season files, src/data/baseballSeasons.js and the audits (--check compares byte for byte)
+  npm run build:mlb-map       # today's map and the era maps from scripts/data/mlb-seasons.json and mlb-war-seasons.json
   ```
 - **Saves** hold every player as played, so a season campaign resumes without
   its season file; a club campaign still needs its era's map.
+
+## Ice hockey seasons
+
+Ice hockey can be played on every NHL season from 1966/67 to 2025/26 but the
+cancelled 2004/05, as well as the built-in 2026/27. Five are one EA edition's
+ratings of an NHL season: 2021/22 (NHL 22), 2006/07 (NHL 07), 1994/95 (NHL 95),
+1993/94 (NHL '94) and 1992/93 (NHLPA '93); 2007/08 and 2008/09 are NHL 08's and
+NHL 09's attributes, the overall converted; the other 52 are computed from the
+players' statistics, the Hockey Databank's to 2009/10 and MoneyPuck.com's after
+([design notes](docs/design/hockey.md#computed-seasons)).
+Pick one under **Season** in setup; it plays its nations, by birth country or
+by nationality as its source gives them (the seasons before 1977/78 have clubs
+only), or its clubs on the map of their day (the Hartford Whalers, Quebec
+Nordiques, Minnesota North Stars and the first Winnipeg Jets among them). Each
+season is a file in `public/hockey/` that loads only when chosen.
+
+- **Nothing is estimated:** unlike the built-in season, a player the edition
+  does not rate is not there, and a club it leaves short fields what it has
+  (Anaheim and Florida in 1993/94, Ottawa and Tampa Bay in 1992/93, eight clubs
+  in 2021/22). In the seasons from EA's editions each club is the edition's
+  roster at release; in a computed season a player plays for the club he played
+  most games for.
+- **Credits:** setup shows a season's credit as small text under the Season
+  choice, whole: the Hockey Databank's statement, as its terms ask, on every
+  season that takes anything from it (the 37 computed from it, NHL 08 and NHL
+  09, and the MoneyPuck seasons whose birth countries it fills), and "Data:
+  MoneyPuck.com" on the 15 computed from MoneyPuck's data, which MoneyPuck allows
+  for non-commercial use only. `public/hockey/ATTRIBUTION.txt` lists the sources
+  and their terms ([design notes](docs/design/hockey.md#credits)).
+- **Sources:** NHL 22 from NHLRatings.net's team pages as CommonCrawl kept them
+  (EA's own launch lists agree on all 60 players they rate); NHL 07 from IGN's
+  pages of EA's ratings (Wayback Machine); NHL 95 from Jon Morris's sheet
+  (nhl-95.com), the Rangers from Segathon's list; NHL '94 from KinGraph's sheet
+  of the cartridge and NHLPA '93 from the cartridge's attributes
+  (forum.nhl94.com). Positions and birth countries come from the NHL's own
+  season rosters. EA's rights are not cleared.
+  `scripts/data/nhl-seasons-sources.json` pins every download by SHA-256. To
+  rebuild:
+
+  ```bash
+  npm run sync:nhl-seasons    # the snapshots in scripts/data/nhl-seasons/ (--fetch downloads a missing source; --check)
+  npm run build:nhl-seasons   # the season files, src/data/hockeySeasons.js and the audit (--check compares byte for byte)
+  npm run build:nhl-map       # today's map and the era maps
+  ```
+- **The classic games' overall:** NHL '94 computes one from its 0–6 attributes
+  by the game's own rule (as wboy reverse-engineered it); NHLPA '93 shows none,
+  so NHL '94's weights are applied to the values it displays. These overalls run
+  far wider than NHL 27's (1–99, median about 54), which made the 1990s seasons
+  absurdly one-sided (the best club winning 71 of 82, a top scorer of 180
+  goals), so NHLPA '93, NHL '94 and NHL 95 play **rescaled onto NHL 27's
+  ratings**: each overall takes the NHL 27 rating at its rank, so every player
+  keeps his place in the order (Gretzky's 87 in NHL '94 plays as 94, the median
+  as 82). The games' own overalls stay in the snapshots and the audit, and each
+  season's source states the rule
+  ([design notes](docs/design/hockey.md#earlier-seasons)).
+- **Missing:** EA's own ratings of the other seasons: no complete copy could be
+  checked (NHL 24 and NHL 26 were tried and left out), so those seasons are
+  converted or computed.
+
+## Tennis seasons
+
+Tennis can be played on 66 earlier seasons as well as the built-in 2026: the end
+of every year from 1960 to 2025, the ATP's men by Elo (before 1968 the amateurs),
+the Davis Cup's nations only. Pick one under **Season** in setup. Each season is a
+file in `public/tennis/` (13–56 KB) that loads only when chosen.
+
+- **2016 to 2025** are Tennis Abstract's own year-end Elo reports, as the Wayback
+  Machine kept them. 2016 and 2017 are on its older, higher scale.
+- **1973 to 2015** are Elo computed from Jeff Sackmann's complete ATP match results
+  by Tennis Abstract's published method (its season label says "Elo from match
+  results"; 1973 to 1979 are marked rough while the ratings settle). Run on 2016
+  and 2017 with the method of that time, the same engine reproduces Tennis
+  Abstract's lists (r 0.999 and 0.997); on 2019–2025 it runs about 30 Elo higher
+  throughout, which moves no match's odds.
+- **1960 to 1972** are a second run of the same method, warmed up on Sackmann's
+  file of the amateur era (the majors and the Davis Cup, 1877–1967), with its
+  duplicate player ids merged: 1960 to 1967 are the amateurs alone ("Amateur Elo"),
+  the professionals back from 1968, all marked rough. They share about seven of
+  Lance Tingay's year-end ten each season, Laver is first in 1968–1970 as in Tennis
+  Abstract's own Elo, and the run meets the shipped seasons from 1973 within a few
+  points ([design notes](docs/design/tennis.md#before-1973)).
+- **Ratings** are Elo / 25 + 4 as in the built-in season; a season whose best would
+  pass 99 (Borg in 1980) is shifted down as a whole, which keeps every match's
+  odds. The raw Elo stays with each player.
+- **Nations of the day:** a player plays for the nation he played the Davis Cup for
+  that year (Lendl for Czechoslovakia in 1985). Czechoslovakia holds Slovakia's land
+  through 1992, the Soviet Union the republics' through 1991 (Russia shown), and
+  Yugoslavia its six through 1991; West Germany plays as Germany. South Africa
+  (1970–1972 and 1979–1992) and FR Yugoslavia (1993–1995), barred from the Davis
+  Cup, field no team; the Soviet Union plays from 1962, its first cup.
+- **Licence:** Tennis Abstract's ratings and Jeff Sackmann's match data are
+  CC BY-NC-SA 4.0 (attribution, non-commercial, share-alike), as for the built-in
+  season: `public/tennis/ATTRIBUTION.txt` credits them. `scripts/data/tennis-seasons.json`
+  pins the 108 archive files (the GitHub fork Kadantte/tennis_atp at 712be0c, the
+  amateur file among them) and the 19 captures by SHA-256. To rebuild:
+
+  ```bash
+  npm run sync:tennis-seasons    # the year-end lists in scripts/data/tennis-seasons/, from the pinned archive (--check)
+  npm run build:tennis-seasons   # the season files, src/data/tennisSeasons.js and the audit (--check compares byte for byte)
+  ```
+
+## Women's tennis seasons
+
+Women's tennis can be played on 58 earlier seasons as well as the built-in 2026: the
+end of every year from 1968 to 2025, the WTA's women by Elo, the Fed Cup's nations
+only. Pick one under **Season** in setup. Each season is a file in
+`public/womens-tennis/` (11–53 KB) that loads only when chosen. They are built as the
+men's are, by the same scripts with `--tour=wta`
+([design notes](docs/design/womens-tennis.md#earlier-seasons)).
+
+- **2016 to 2025** are Tennis Abstract's own year-end WTA Elo reports, as the Wayback
+  Machine kept them. No capture holds the last 2020 update, so that list stops a week
+  before the season's end, and says so.
+- **1968 to 2015** are Elo computed from Jeff Sackmann's WTA match results by Tennis
+  Abstract's published method, counting what its report counts: tour-level matches with
+  the Fed Cup, tour-level qualifying, WTA 125s and ITF events of $50K or more (none
+  before 1994, when the files start naming an event's prize). A newcomer's start at
+  tour level is fitted on the career peaks of Tennis Abstract's Tennis 128 (1330, the
+  men's 1450). On 2022–2025 the computed lists agree with Tennis Abstract's to within
+  five points; 1968 to 1979 are marked rough (the files start in 1968, so 1968 and
+  1969 are the roughest; 1968–1972 share about eight of Lance Tingay's year-end ten).
+- **Ratings** are Elo / 25 + 4; a season whose best would pass 99 (Navratilova in 1985,
+  Graf in 1989) is shifted down as a whole. The raw Elo stays with each player.
+- **Nations of the day:** a player plays for the nation she played the Fed Cup for
+  that year (Mandlikova for Czechoslovakia in 1985), with the men's federations and
+  their land. South Africa (1978–1991) and FR Yugoslavia (1993–1994), barred from the
+  Fed Cup, field no team. Navratilova plays for the United States from 1976, after her
+  defection, and Mandlikova for Australia from 1988. Monica Seles, Yugoslav until 1994,
+  is Yugoslavia's only rated player in 1991 and 1992, so she sits those seasons out, as
+  every nation of one does.
+- **Licence:** as the men's: `public/womens-tennis/ATTRIBUTION.txt` credits Jeff
+  Sackmann / Tennis Abstract (CC BY-NC-SA 4.0). `scripts/data/womens-tennis-seasons.json`
+  pins the 117 archive files (Aneeshers/tennis-sackmann-archive at 8373358) and the
+  20 captures by SHA-256. To rebuild:
+
+  ```bash
+  npm run sync:womens-tennis-seasons    # the year-end lists in scripts/data/womens-tennis-seasons/ (--check)
+  npm run build:womens-tennis-seasons   # the season files, src/data/womensTennisSeasons.js and the audit (--check)
+  ```
+
+## Women's football seasons
+
+Women's football can be played on eleven earlier seasons as well as the built-in
+2026/27: every season from 2015/16 to 2025/26, each from that season's EA game
+(FIFA 16 to EA FC 26), the first of which was the first to rate women. Pick one
+under **Season** in setup. Each season is a file in `public/womens-football/`
+(15–150 KB) that loads only when chosen.
+
+- **What a season holds:** every nation with a rated player, each with its best
+  XI (one with at least six rated players plays, short-handed below eleven; one with
+  fewer fields no team and its land stays neutral), and from 2022/23 every club EA rates, the European ones
+  on that season's [maps of Europe](#womens-football-on-the-europe-maps), the NWSL's on
+  [its own](#the-nwsl-map). Ratings are EA's
+  overalls, unchanged. A club keeps its id, crest and colour from season to
+  season under the name EA gave it that year (Olympique Lyonnais in 2024/25).
+- **National teams only before 2022/23:** EA rated 12 to 17 women's national
+  teams a year from FIFA 16 to FIFA 22 and no club, so those campaigns are
+  small, and Clubs goes back to the built-in season.
+- **Sources:** FIFA 16 to EA FC 24 from the women's table of the same Kaggle
+  export as the men's seasons (each edition's launch roster); EA FC 25 from an
+  export of EA's ratings website at release (Kaggle `nyagami`); EA FC 26 from
+  EA's ratings API, which serves the previous edition to a request without the
+  ratings site's referrer, with every club named as a copy taken during the season
+  names it (Kaggle `flynn28`). FIFA 19 and FIFA 16 take the first roster after
+  release (update 3): FIFA 19's launch roster in the export still carried FIFA 18's ratings. `scripts/data/ea-women-seasons.json`
+  pins each download by SHA-256; the reduced snapshots are committed. To rebuild:
+
+  ```bash
+  npm run sync:womens-seasons   # the snapshots, from the pinned downloads in data-src/ and EA's API
+  npm run build:womens-seasons  # the season files, src/data/womensFootballSeasons.js and the audit (--check compares byte for byte)
+  ```
+
+## Rugby league seasons
+
+Rugby league can be played on seventeen earlier seasons as well as the built-in
+2025: 2008, from Rugby League 2: World Cup Edition's own database (Sidhe, 2008),
+extracted by Wouldubeinta and kept by the Wayback Machine's copy of
+rugbyleaguemods.net, and 2009 to 2024, which no game rated, computed from
+NRL.com's match centre (below). Pick one under **Season** in setup; it plays the
+NRL clubs of that season, clubs only, on the map of their day: the sixteen of
+2008 to 2022 (no Dolphins; the Bulldogs under their 2008 name in 2008 and 2009),
+the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
+(14–16 KB) that loads only when chosen.
+
+- **2008's players:** every one is checked against the Rugby League Project's 2008
+  records, so 414 of the database's 462 NRL players are kept and the game's
+  padding is left out, each with its reason in the audit.
+- **2008's overall is ours**, in two documented steps, because the game rates
+  twelve attributes from 1 to 10 and no player: a position-weighted score of
+  the attributes (defaults left out, kicking only for the halves) is read off
+  Rugby League 26's ratings at that position by percentile; then every player
+  of a club moves by one whole number so the club lands where the game's own
+  team rating (the mean of its five parts) puts it among the built-in 2025
+  clubs' strengths. Real 2008 results only check the outcome: the clubs' order
+  follows 2008's only loosely (rank correlation 0.33 in simulated seasons), as
+  the game rated some sides well above their year (the Cowboys and Bulldogs
+  won 5 games each).
+- **2009 to 2024 are computed** (labelled "Computed from NRL.com match stats"):
+  NRL.com's match centre keeps every game's team lists and player stats. A
+  player's value is NRL Fantasy's points for eleven of those stats (tries, try
+  assists, line breaks, tackles, metres and the rest; goals count nowhere) per
+  club game, the season before at half weight; his overall is that value's
+  percentile at the position he started at most, read off Rugby League 26's
+  ratings there, as 2008's score is. Then every player of a club moves by one
+  whole number so the club lands where its Simple Rating System, fitted to the
+  season's real margins and adjusted for its opponents, ranks it among the
+  built-in 2025 clubs' strengths: 2008's shift, with the season's own results in
+  place of the game's team rating, so a season's strongest clubs are its best by
+  margin. A player NRL.com never shows starting takes his position from the
+  seasons either side, else from the Rugby League Project. Run on 2025, the
+  method agrees with Rugby League 26 at a rank correlation of 0.76 within
+  position.
+- **Maps:** each club grows from its ground, or from its training base where it
+  shares one, and three rules keep the maps few: a ground being rebuilt stays its
+  club's (R1), COVID-19 relocations are ignored (R2), and a rename on the same
+  site does not split a map (R3). 2008 and 2009 play on `nrl2008`, 2010 and 2011
+  on `nrl2010`, 2012 to 2019 on `nrl2012`, 2020 to 2022 on `nrl2020`, and 2023
+  and 2024, with the Dolphins, on today's `nrl`.
+- **No nations:** 2008's World Cup squads mix Super League players rated on a
+  more generous scale, and the computed seasons rate club games only, so a
+  nations game plays the built-in season's.
+- **Source:** the database, the Rugby League Project's pages and NRL.com's draws
+  and games are pinned by SHA-256 (a page or a reply by the part read) in
+  `scripts/data/rugby-league-seasons-sources.json`. To rebuild:
+
+  ```bash
+  npm run sync:rugby-league-seasons -- --fetch   # missing inputs into data-src/ (the database, RLP pages, NRL.com's games), then scripts/data/rugby-league-seasons/nrl-<year>.json (--check)
+  npm run build:rugby-league-seasons             # the season files, their listing and the audit (--check; --realism plays them)
+  npm run build:nrl-map                          # today's map and the era maps nrl2008, nrl2010, nrl2012 and nrl2020
+  ```
+
+The [design notes](docs/design/rugby-league.md#earlier-seasons) give the
+weights and their reasons, the club shift, the
+[computed seasons](docs/design/rugby-league.md#computed-seasons-20092024) and the
+known limits.
 
 ## Squad economics
 
@@ -1396,6 +2075,16 @@ zoom. Drawn as SVG `<pattern>` fills, every flag's shapes were re-rendered on
 each repaint, and panning, zooming, hovering and the draw compass lagged in
 Flags mode.
 
+Drawing an SVG holds the page's own thread, so the rasteriser keeps out of the
+way. It draws only flags a banner on the map still shows, the largest first,
+and stops when you leave Flags mode; unfinished flags resume when Flags is
+shown again. No flag is parsed or drawn within 200 ms of a click, key press,
+wheel turn or drag, and only at background priority. Finished bitmaps reach the
+map in batches, one re-render for many flags. Bitmaps are lossless WebP in
+Chrome and Firefox (Chrome encodes WebP on a worker thread, but PNG on the
+page's own thread) and PNG in Safari, which has no WebP encoder: the same pixels
+either way.
+
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
 overseas, winding, date-line and geometry-cache regressions.
@@ -1404,9 +2093,13 @@ overseas, winding, date-line and geometry-cache regressions.
 Natural Earth attribute table with football-specific overrides: the home nations
 England (`gb-eng`, on the United Kingdom's id), Scotland (`gb-sct`), Wales
 (`gb-wls`) and Northern Ireland (`gb-nir`), and Kosovo (`xk`), which has no ISO
-numeric code. The SVGs are vendored into `public/flags/` from the MIT-licensed
+numeric code. Great Britain, the United Kingdom's team in the sports that play it
+as one, flies the Union Jack (`gb`) under a flag id of its own, `GBR`. The SVGs are vendored into `public/flags/` from the MIT-licensed
 [`flag-icons`](https://github.com/lipis/flag-icons) package, so the built app has
-no runtime dependency on it.
+no runtime dependency on it. Football's federations of the day fly flags flag-icons
+does not have, under flag ids of their own (`URS`, `CIS`, `YUG`, `FRY`, `ZAI`):
+public-domain Wikimedia Commons SVGs, pinned in `scripts/data/historic-flags.json`
+and redrawn on the same 4:3 canvas by `npm run build:historic-flags`.
 
 ### Club crests
 
@@ -1481,12 +2174,12 @@ for real-app integration coverage.
 
 ## Capital data and dependencies
 
-`src/data/capitals.js` holds lon/lat for all 173. Coastline generalisation at
+`src/data/capitals.js` holds lon/lat for all 176. Coastline generalisation at
 110m in the rule geometry leaves some real capitals fractionally offshore, so a
 capital that misses its own outline is walked toward the country's centre until
-it lands; 169 of 173
+it lands; 171 of 176
 anchor on the city itself and the rest fall back to the centroid rather than
-stranding a marker at sea.
+stranding a marker at sea (Apia, just off Upolu's generalised coast, is one).
 
 Overseas territory is declared in `DEPENDENCIES` in `src/data/teams.js`. It
 fields no team of its own, flies its parent's flag, and is annexed and lost with
@@ -1505,7 +2198,8 @@ opponent, widening the cone only among unobstructed candidates. If the selected
 attacker has no legal straight-line route, a checked coastal sea polyline tries
 to connect its holdings to an enemy. If neutral enclosure prevents that route,
 an explicitly labelled **neutral transit treaty** permits crossing neutral land
-without claiming it. The displayed polyline follows the checked route. A draw
+without annexing it (the match's winner [claims](#claimed-land) it, which changes
+no rule). The displayed polyline follows the checked route. A draw
 retries an unreachable attacker without consuming extra random samples. These
 exceptions keep disconnected final opponents playable. Blitz and chaos use the
 batch pairing rules described above.
@@ -1534,8 +2228,23 @@ follows an estuary's middle (Solway Firth, Dee, Severn) to wherever the coarser
 coast leaves the island. Every other shape and arc stays world-atlas's, pinned by
 SHA-256; `--check` rebuilds offline and compares. Saves from before the cut (v1–v4)
 give the new shapes to whoever held 826, CM 01/02 data sets built before it let
-England hold them, and basketball, where Great Britain is one FIBA team, plays
-the United Kingdom as one.
+England hold them, and basketball, baseball, ice hockey and both tennis games, where Great
+Britain is one team, play the United Kingdom as one. There its team keeps the id 826 and
+plays as Great Britain (GBR) under the Union Jack (`playsAs` in each sport,
+`GREAT_BRITAIN` in `src/data/teams.js`), while the land keeps its names: the
+shape 826 is still England in a tooltip or a list of conquered land. A campaign
+saved before this keeps the England it was saved with.
+
+The 110m atlas also leaves out Tonga (776), Samoa (882) and the Cook Islands (184),
+which field national teams; the 50m atlas draws all three. The same build copies
+each of their rings from the 50m atlas onto the 110m grid, as arcs of their own
+after every other shape, so the rules map holds the outline the map draws: Tonga's
+Tongatapu, ʻEua and Vavaʻu, Samoa's Upolu and Savaiʻi, and Rarotonga, the only one
+of the Cook Islands at 1:50m and the smallest shape on the map (58 km²). They border
+nobody, so they are reached by sea. A campaign saved before them has no owner for
+them: they load as neutral land, as nations outside a theatre are, and nothing is
+migrated. See [Pacific islands](docs/design/pacific-islands.md) for which sports
+field them and what that changes.
 
 Closed coastline rings are clipped at ±180° longitude before projection, so
 date-line crossings cannot create diagonal closure wedges through Russia or
@@ -1649,7 +2358,7 @@ src/
     americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
     baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings
     index.js           the registry, and each sport's clock and tie-break copy (clockLabel, overtimeText)
-  data/teams.js        173 nations: identity, squad building
+  data/teams.js        176 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
@@ -1662,7 +2371,8 @@ src/
   data/sourceTable.js  compact player rows of the generated football files: one
                        JSON line per nation or club, metadata keys and shared
                        values written once (scripts/lib/data-module.mjs writes them)
-  data/scopes.js       club theatre choices (per league, all, elite)
+  data/scopes.js       theatre choices: the nation theatres a sport offers (only where it
+                       is played) and the club ones (per league, all, elite)
   data/domestic.js     GENERATED index of shipped country maps (npm run build:domestic)
   data/clubMaps.js     GENERATED index of a sport's own club maps: the NBA's, today's and its eras', and the NFL's (npm run build:club-maps)
   data/domesticScope.js  labels for 'domestic:<id>' theatres, and a sport's own map
@@ -1699,12 +2409,18 @@ public/
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
   domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …), the NFL's (nfl.json) and the EuroLeague's (euroleague.json), fetched on demand
-  football/            the built-in earlier football seasons (ea-*.json), fetched when chosen
-  basketball/          the built-in earlier basketball seasons (nba-2k*.json), fetched when chosen
-  baseball/            the built-in earlier baseball seasons (mlb-the-show-*.json), fetched when chosen
+  football/            the built-in earlier football seasons (ea-*.json, cm*.json, swos-9697.json, swos-9596.json, swos-9495.json, wc-*.json), fetched when chosen
+  womens-football/     the built-in earlier women's football seasons (eaw-*.json), fetched when chosen
+  basketball/          the built-in earlier basketball seasons (nba-2k*.json, nba-eras-*.json, nba-live-99.json, nba-stats-*.json), fetched when chosen
+  american-football/   the built-in earlier NFL and AFL seasons (madden-*.json, tecmo-*.json, pfa-*.json, pfa-afl-*.json), fetched when chosen
+  baseball/            the built-in earlier baseball seasons (mlb-the-show-*.json, mlb-war-*.json), fetched when chosen
+  hockey/              the built-in earlier ice hockey seasons (nhl-*.json), fetched when chosen
+  tennis/              the built-in earlier tennis seasons (tennis-*.json), fetched when chosen
+  womens-tennis/       the built-in earlier women's tennis seasons (wta-*.json), fetched when chosen
+  rugby-league/        the built-in earlier rugby league seasons (nrl-2008.json to nrl-2024.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
-  flags/               173 vendored flag SVGs
+  flags/               176 vendored flag SVGs
   club-logos/          club crests from Wikipedia, with SOURCES.tsv
   favicon.svg          site icon (npm run build:icons renders favicon.ico and apple-touch-icon.png)
   og-image.png         1200×630 link-preview card
@@ -1716,6 +2432,8 @@ scripts/
   data/seed-replay.golden.json  determinism golden for seeded campaigns
   smoke.mjs            headless campaign test (jsdom)
   sync-flags.mjs       vendors flag SVGs from flag-icons
+  build-historic-flags.mjs  redraws the federations of the day's public-domain flags
+  sync-world-cup-seasons.mjs, build-world-cup-seasons.mjs  the computed World Cup seasons: sources → facts → seasons
   build-rosters.mjs    builds football squads from an EA FC export
   build-basketball.mjs builds FIBA fives from NBA 2K + fiba-squads.json
   build-clubs.mjs      builds the club layer for both sports
@@ -1752,13 +2470,16 @@ vercel.json            cache headers for the deployed site
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **seventeen full
-campaigns** across all three pacings, both resolution modes, all six sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **twenty-two full
+campaigns** across all three pacings, both resolution modes, all nine sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
 sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
 clubs on theirs, also live, one baseball's nations of North and Central America, one the NHL's 32 clubs on
-their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, and one the NWSL's clubs. A **manager campaign** (Italy, Europe, round robin × *You
+their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, one the NWSL's clubs, one
+tennis's Davis Cup nations of Europe, live, one women's tennis's Billie Jean King Cup nations of the world, one the NRL's 17
+clubs on their map, live, and one rugby league's nations of
+Asia and Oceania. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after
@@ -1812,6 +2533,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
 | `euroleague` | The EuroLeague's clubs rebuilt from the snapshot, its estimates, positions and names, its rules, its map, setup, launch, saves and links; the EuroBasket theatre and its fives |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
+| `pacific-islands` | Tonga, Samoa and the Cook Islands: the rules map's rings from the 50m map, their nations, which sports field them, and world wars with them playing or neutral |
 | `error-boundary` | The crash screen: a render error shows it with focus on its heading, Export campaign downloads the stored checkpoint unchanged, and the report link carries the error |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |

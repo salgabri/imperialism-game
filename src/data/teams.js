@@ -15,9 +15,33 @@ export const DEPENDENCIES = {
 
 // Football's home nations: England, Scotland, Wales and Northern Ireland each field a team, so the map cuts the
 // United Kingdom (826, which is England) into four shapes (scripts/build-home-nations.mjs). These are the three cut
-// from it. Saves and data sets from before the cut give their land to whoever holds England, and basketball, where
-// Great Britain is one FIBA team, still plays the United Kingdom as one.
+// from it. Saves and data sets from before the cut give their land to whoever holds England, and basketball, baseball,
+// ice hockey and tennis, where Great Britain is one team, still play the United Kingdom as one (GREAT_BRITAIN below).
 export const HOME_NATIONS = Object.freeze(['SCO', 'WAL', 'NIR']);
+
+/**
+ * The United Kingdom's team where its home nations play as one (FIBA, the World Baseball Classic, the IIHF, the Davis
+ * Cup): Great Britain, under the Union Jack (flag id 'GBR' in src/data/flags.js). A sport plays it so through
+ * `playsAs` (`{ '826': GREAT_BRITAIN }`), and its team keeps the id 826, so saves and the map are unchanged. Football's
+ * 826 is England, a campaign saved before keeps the name it was saved with, and the land itself keeps its own names.
+ */
+export const GREAT_BRITAIN = Object.freeze({ name: 'Great Britain', code: 'GBR', flagId: 'GBR' });
+
+/**
+ * A nation's name, code and flag id in `sport` (a sport object; none for the nation's own): what the sport plays it
+ * as (`sport.playsAs`), else its NATIONS entry and its own flag → { name, code, flagId }, or null for no nation.
+ */
+export function nationIdentity(id, sport) {
+  const rec = NATIONS[id];
+  if (!rec) return null;
+  const as = sport?.playsAs?.[id];
+  return { name: as?.name ?? rec[0], code: as?.code ?? rec[1], flagId: as?.flagId ?? id };
+}
+
+// Tonga, Samoa and the Cook Islands: the 110m map has none of them, so scripts/build-home-nations.mjs adds the 50m
+// map's outlines. Saves from before have no owner for them (neutral land), and football seasons built before list
+// none of them: those seasons field no team of theirs.
+export const PACIFIC_ISLANDS = Object.freeze(['776', '882', '184']);
 
 // Shapes drawn on the map that never belong to anyone (club seeding never deals them).
 // Antarctica, Fr.S.Lands, Falklands, W.Sahara, N.Cyprus, Somaliland.
@@ -241,6 +265,11 @@ export const NATIONS = {
   '090': ['Solomon Islands', 'SOL', 'OFC', 'pac', 44, '#4C9E5C', 0],
   '548': ['Vanuatu', 'VAN', 'OFC', 'pac', 42, '#E8B93C', 0],
   '540': ['New Caledonia', 'NCL', 'OFC', 'pac', 44, '#D0455A', 0],
+  // The 110m map gains these three from the 50m map (scripts/build-home-nations.mjs, PACIFIC_ISLANDS below). No
+  // football source rates their players, so their strength is the confederation's: football fields no team of theirs.
+  '776': ['Tonga', 'TGA', 'OFC', 'pac', 0, '#D9363E', 0],
+  '882': ['Samoa', 'SAM', 'OFC', 'pac', 0, '#3460C8', 0],
+  '184': ['Cook Islands', 'COK', 'OFC', 'pac', 0, '#3FA05A', 0],
 };
 
 
@@ -303,13 +332,16 @@ function rosterPlayer([name, listed, rating, metadata]) {
  * Build a nation's squad for a campaign in the given sport.
  *
  * Football, women's and men's, only fields players in its source data; an incomplete export remains
- * visibly incomplete. Other sports retain their generated baseline fillers.
+ * visibly incomplete. Other sports fill a lineup's gaps with generated players. Only a nation with a real side
+ * (fieldsRealSide) fields a team at all.
  * `real` reports how much of the squad came from actual data.
  */
 export function buildTeam(id, rng, sport) {
   const rec = NATIONS[id];
   if (!rec) return null;
-  const [name, code, conf, culture, , colRaw] = rec;
+  const [, , conf, culture, , colRaw] = rec;
+  // The name, code and flag the sport plays the nation under: the United Kingdom is Great Britain outside football.
+  const { name, code, flagId } = nationIdentity(id, sport);
   const col = colRaw || `oklch(0.72 0.14 ${Math.floor(hashStr(id) % 360)})`;
   const roster = sport.rosters[id];
   const { squadSize, formation, positionPlan } = sport;
@@ -333,11 +365,13 @@ export function buildTeam(id, rng, sport) {
     for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
       if (!slot.player || slot.outOfPosition) squad.push(genPlayer(rng, culture, slot.position, str));
     }
-  } else if (sport.id === 'hockey') {
-    // As in baseball, except that a forward on another forward's line is no gap: only a place left empty, or held by
-    // a defender, a forward or a goalie out of his own group, gets a generated player.
+  } else if (sport.id === 'hockey' || sport.id === 'rugby-league') {
+    // As in baseball, except that a move within a group is no gap (a forward on another forward's line; in rugby league
+    // a back to another outside place, a forward round the pack, a centre to the second row): only a place left empty,
+    // or held by a player out of his own group, gets a generated player.
+    const gap = sport.id === 'hockey' ? outOfPositionPenalty(sport.id) : RUGBY_NEAR_PENALTY;
     for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
-      if (!slot.player || slot.penalty > outOfPositionPenalty(sport.id)) squad.push(genPlayer(rng, culture, slot.position, str));
+      if (!slot.player || slot.penalty > gap) squad.push(genPlayer(rng, culture, slot.position, str));
     }
   } else if (!REAL_PLAYERS_ONLY.has(sport.id)) {
     const have = p => squad.filter(x => x.pos === p).length;
@@ -355,8 +389,8 @@ export function buildTeam(id, rng, sport) {
     kind: 'nation',
     /** The map shape this combatant is seeded from — its homeland. */
     home: id,
-    /** Nations fly a flag; clubs do not. */
-    flagId: id,
+    /** Nations fly a flag (their own id, or the sport's: Great Britain's 'GBR'); clubs do not. */
+    flagId,
     sport: sport.id,
     origin: id,
   };
@@ -396,8 +430,9 @@ export const OUT_OF_POSITION_PENALTY = 12;
 // American football's positions are far more specialised: a tight end on the offensive line, or a receiver at
 // cornerback, is an emergency, not a rotation. So are baseball's: MLB The Show lists every position a player can
 // field, and a starter in the bullpen (or a reliever starting) is out of his role. A hockey forward moves between the
-// lines' three places with little trouble: the NHL lists one position for players who play all three.
-const PENALTY_OF = { 'american-football': 25, baseball: 20, hockey: 4 };
+// lines' three places with little trouble: the NHL lists one position for players who play all three. So does a rugby
+// league back between the outside places, or a forward round the pack (RUGBY_UNIT below).
+const PENALTY_OF = { 'american-football': 25, baseball: 20, hockey: 4, 'rugby-league': 4 };
 /** Rating points a starter loses outside his natural positions, in a sport ('football', 'basketball', …). */
 export const outOfPositionPenalty = sportId => PENALTY_OF[sportId] ?? OUT_OF_POSITION_PENALTY;
 // A baseball hitter on the mound, or a pitcher in the field or at the plate, is no rotation at all. Nor is a hockey
@@ -409,9 +444,23 @@ const PITCHING = new Set(['SP', 'RP']);
 const canPitch = player => PITCHING.has(player.pos) || !!player.positions?.some(position => PITCHING.has(position));
 const canHit = player => !PITCHING.has(player.pos) || !!player.positions?.some(position => !PITCHING.has(position));
 const FORWARDS = new Set(['C', 'LW', 'RW']);
-// Football's rule, in both of its games: a team fields only the players its source rates.
-const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football']);
+// Rugby league's units: the outside backs, the halves, the hooker and the pack. A move within a unit costs the sport's 4
+// points; these moves between units are common and cost 8 (a centre to the second row, a half to fullback or hooker, a
+// hooker to the halves or into the pack, a forward to hooker); any other, a winger in the front row, say, is an
+// emergency.
+const RUGBY_UNIT = { FB: 'out', WG: 'out', CE: 'out', FE: 'half', HB: 'half', HK: 'hooker', PR: 'pack', SR: 'pack', LK: 'pack' };
+const RUGBY_NEAR = new Set(['CE>SR', 'SR>CE', 'FE>FB', 'HB>FB', 'FB>FE', 'FE>HK', 'HB>HK', 'HK>HB', 'HK>FE', 'HK>PR', 'HK>SR',
+  'HK>LK', 'PR>HK', 'SR>HK', 'LK>HK']);
+export const RUGBY_NEAR_PENALTY = 8;
+export const RUGBY_CROSSING_PENALTY = 15;
+/** The sports played by tennis's rules: the men's Davis Cup and the women's Billie Jean King Cup (src/sports/tennis.js). */
+export const TENNIS_SPORTS = Object.freeze(['tennis', 'womens-tennis']);
+/** Whether a sport id plays tennis's lineup, squad and match views: the men's game or the women's. */
+export const isTennisSport = sportId => TENNIS_SPORTS.includes(sportId);
+// Football's rule, in both of its games, and tennis's, in both of its: a team fields only the players its source rates.
+const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS]);
 const FOOTBALL_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
+const TENNIS_PLAN = ['SGL', 'SGL', 'DBL', 'DBL'];
 const LINEUP_PLANS = {
   football: FOOTBALL_PLAN,
   'womens-football': FOOTBALL_PLAN,
@@ -423,8 +472,20 @@ const LINEUP_PLANS = {
     'DL', 'DL', 'DL', 'DL', 'LB', 'LB', 'CB', 'CB', 'CB', 'S', 'S', 'K'],
   // The batting order's nine (a designated hitter, no pitcher at the plate), the day's starter and three relievers.
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP', 'RP', 'RP'],
+  // A Davis Cup team (a Billie Jean King Cup team in the women's game): its No. 1 and No. 2 in the singles, and a doubles
+  // pair.
+  tennis: TENNIS_PLAN,
+  'womens-tennis': TENNIS_PLAN,
+  // The matchday 17: the thirteen (fullback, wings, centres, halves, the front row, the back row) and an interchange bench
+  // of a utility hooker, two props and a lock.
+  'rugby-league': ['FB', 'WG', 'WG', 'CE', 'CE', 'FE', 'HB', 'PR', 'HK', 'PR', 'SR', 'SR', 'LK', 'HK', 'PR', 'PR', 'LK'],
 };
+const TENNIS_POSITIONS = new Set(TENNIS_PLAN);
+// What each lineup place weighs in a tennis team's strength: the No. 1 and the No. 2 each play two of the five rubbers,
+// the pair one between them.
+const TENNIS_WEIGHTS = [2, 2, 0.5, 0.5];
 const BASKETBALL_POSITIONS = new Set(LINEUP_PLANS.basketball);
+const RUGBY_POSITIONS = new Set(Object.keys(RUGBY_UNIT));
 const GRIDIRON_POSITIONS = new Set(LINEUP_PLANS['american-football']);
 // Baseball's catcher shares basketball's 'C'; every other baseball position is its own.
 const BASEBALL_POSITIONS = new Set(LINEUP_PLANS.baseball.filter(position => position !== 'C'));
@@ -438,13 +499,23 @@ function slotPenalty(sportId, player, position) {
     if (position === 'G' || player.pos === 'G') return CROSSOVER_PENALTY;
     if (FORWARDS.has(position) !== FORWARDS.has(player.pos)) return SKATER_CROSSOVER_PENALTY;
   }
+  if (sportId === 'rugby-league') {
+    // The kindest of the player's own positions decides.
+    const own = [player.pos, ...(player.positions || [])].filter(code => RUGBY_UNIT[code]);
+    const cost = code => (RUGBY_UNIT[code] === RUGBY_UNIT[position] ? outOfPositionPenalty(sportId)
+      : RUGBY_NEAR.has(`${code}>${position}`) ? RUGBY_NEAR_PENALTY : RUGBY_CROSSING_PENALTY);
+    return own.length ? Math.min(...own.map(cost)) : RUGBY_CROSSING_PENALTY;
+  }
   return outOfPositionPenalty(sportId);
 }
 
-/** Legacy saves can predate the sport field; their positions identify the plan. */
+/** Legacy saves can predate the sport field; their positions identify the plan (tennis's: the men's game, the older). */
 export function teamSportId(team) {
   if (LINEUP_PLANS[team?.sport]) return team.sport;
+  if (team?.squad?.some(player => TENNIS_POSITIONS.has(player.pos))) return 'tennis';
   if (team?.squad?.some(player => BASEBALL_POSITIONS.has(player.pos))) return 'baseball';
+  // Rugby league's codes are its own.
+  if (team?.squad?.some(player => RUGBY_POSITIONS.has(player.pos))) return 'rugby-league';
   // Basketball's centre and the offensive line never share a code: 'C' is basketball's, 'OL' American football's.
   if (team?.squad?.some(player => GRIDIRON_POSITIONS.has(player.pos) && !BASKETBALL_POSITIONS.has(player.pos))) return 'american-football';
   return team?.squad?.some(player => BASKETBALL_POSITIONS.has(player.pos)) ? 'basketball' : 'football';
@@ -461,6 +532,7 @@ export function selectLineup(team) {
   const sportId = teamSportId(team);
   const plan = LINEUP_PLANS[sportId];
   const squad = Array.isArray(team?.squad) ? team.squad : [];
+  if (isTennisSport(sportId)) return tennisLineup(squad);
   const rowCount = plan.length;
   const columnCount = Math.max(rowCount, squad.length);
   const effective = (row, column) => {
@@ -526,8 +598,55 @@ export function selectLineup(team) {
   };
 }
 
+/**
+ * A Davis Cup (or Billie Jean King Cup) team from a tennis squad: the two best play the singles (the No. 1 first), the
+ * next two the doubles. Any
+ * player plays either, so nobody is out of position. A squad of two or three plays its singles players in the doubles
+ * too, as a small nation does: such a slot holds a second copy of the player, marked `doubling`, and `starters` lists
+ * each player once. The strength weighs each place by the rubbers it plays (TENNIS_WEIGHTS); an empty place counts 40.
+ */
+function tennisLineup(squad) {
+  const ratingOf = player => (Number.isFinite(player?.rating) ? player.rating : 40);
+  const order = squad.map((player, index) => ({ player, index })).filter(entry => entry.player)
+    .sort((a, b) => ratingOf(b.player) - ratingOf(a.player) || a.index - b.index);
+  const singles = order.slice(0, 2);
+  const doubles = order.slice(2, 4);
+  for (const entry of singles) if (doubles.length < 2) doubles.push({ ...entry, doubling: true });
+  const place = (position, entry) => {
+    if (!entry) return { position, player: null, effectiveRating: 40, outOfPosition: false, penalty: 0 };
+    const effectiveRating = ratingOf(entry.player);
+    return { position, effectiveRating, outOfPosition: false, penalty: 0,
+      player: { ...entry.player, originalIndex: entry.index, assignedPos: position, effectiveRating, outOfPosition: false,
+        ...(entry.doubling ? { doubling: true } : {}) } };
+  };
+  const slots = [place('SGL', singles[0]), place('SGL', singles[1]), place('DBL', doubles[0]), place('DBL', doubles[1])];
+  const selected = new Set(slots.filter(slot => slot.player).map(slot => slot.player.originalIndex));
+  const weight = TENNIS_WEIGHTS.reduce((sum, w) => sum + w, 0);
+  return {
+    starters: slots.filter(slot => slot.player && !slot.player.doubling).map(slot => slot.player),
+    bench: squad.filter((player, index) => !selected.has(index)),
+    slots,
+    rating: Math.round(slots.reduce((sum, slot, i) => sum + TENNIS_WEIGHTS[i] * slot.effectiveRating, 0) / weight * 10) / 10,
+  };
+}
+
 export function teamEff(team) {
   return selectLineup(team).rating;
+}
+
+/**
+ * Whether a nation fields a real side in `sport` (a sport object, a season's included): its own rated players hold at
+ * least half the places of the lineup it fields, as buildTeam builds it, with generated players wherever the sport fills
+ * gaps with them (a pitcher would bat, a goalie skate). A tennis player doubling in the doubles counts once. Its own
+ * draw (by the nation's id) builds the team, so the answer never depends on a campaign's. Only these nations field a
+ * team (engine/footballSets.js `fieldedNations`).
+ */
+export function fieldsRealSide(id, sport) {
+  const players = sport?.rosters?.[id]?.[2];
+  const places = LINEUP_PLANS[sport?.id]?.length;
+  if (!places || !players?.length || players.length * 2 < places) return false;
+  const { slots } = selectLineup(buildTeam(id, makeRng(hashStr(`real side ${id}`)), sport));
+  return slots.filter(slot => slot.player && !slot.player.gen && !slot.player.doubling).length * 2 >= places;
 }
 
 /**
@@ -539,7 +658,10 @@ export const EUROBASKET_2025 = Object.freeze(['428', '688', '792', '203', '233',
   '300', '724', '380', '070', '268', '196', '616', '250', '705', '376', '056', '352']);
 const EUROBASKET = new Set(EUROBASKET_2025);
 
-/** Nation theatres. One naming `sports` is offered in those sports only (`nationScopes`); the rest in every sport. */
+/**
+ * Nation theatres. One naming `sports` is offered in those sports only, the rest in every sport; each only where its sport
+ * is played (data/scopes.js `nationTheatres`).
+ */
 export const SCOPES = [
   { id: 'world', name: 'World War', desc: 'Every nation on the map. Last empire standing.', filter: () => true },
   { id: 'UEFA', name: 'Europe', desc: 'UEFA members battle for the continent.', filter: t => t.conf === 'UEFA' },
@@ -551,12 +673,6 @@ export const SCOPES = [
   { id: 'CONCACAF', name: 'N. & C. America', desc: 'CONCACAF, coast to coast.', filter: t => t.conf === 'CONCACAF' },
   { id: 'elite', name: 'Elite 32', desc: 'The 32 strongest nations on Earth.', filter: null }, // handled specially
 ];
-
-/** The nation theatres a sport offers (`sportId`, or a sport object): basketball's include EuroBasket. */
-export const nationScopes = sport => {
-  const id = typeof sport === 'string' ? sport : sport?.id;
-  return SCOPES.filter(scope => !scope.sports || scope.sports.includes(id));
-};
 
 /** Whether a nation theatre is a European one, framed on the continent: the UEFA members, or EuroBasket's field. */
 export const isEuropeanScope = scope => scope === 'UEFA' || scope === 'eurobasket';

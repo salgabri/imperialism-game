@@ -4,6 +4,20 @@
 // FIFA 15 – EA FC 24: EA Sports FC 24 complete player dataset (stefanoleone992), SHA-256 fd788f7809a6…
 // FIFA 07 – FIFA 14: FIFA 21 to FIFA 05 complete player attributes (daguizer, a FIFA Index mirror), joined to Big-Data-FC datasets (a SoFIFA scrape)
 // FIFA 05, FIFA 06: the same ratings, nations only, with nationalities from the later editions and Wikidata
+// and by npm run build:retro-seasons from the databases before them (scripts/data/retro-seasons.json):
+// 2002/03: SI's Championship Manager 01/02 3.9.68 database (the CM0102 Starter Kit's patched_data.zip)
+// 2001/02: SI's Championship Manager 01/02 3.9.60 database (the CM0102 Starter Kit's original_data.zip)
+// 2000/01: SI's Championship Manager 00/01 database, original release 3.81 (the UK retail CD's data files, archive.org cm-0001-rel)
+// 1999/00: SI's Championship Manager 99/00 database, original release 3.70 (the UK retail CD's data files, archive.org championship-manager-season-9900)
+// 1998/99: SI's Championship Manager 3 data in the CM 01/02 format, Cam F's port (the CM0102 Starter Kit's cm3_data.zip)
+// 1997/98: SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)
+// 1996/97: Sensible Software's Sensible World of Soccer 96/97 national squads (Whiteulver's database, as keyser1884's SWOS-MCP holds it)
+// 1995/96: Sensible Software's Sensible World of Soccer 95/96, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
+// 1994/95: Sensible Software's original Sensible World of Soccer (1994), its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
+// 1993/94: Cam F's fan-made 1993/94 database for CM 01/02, its ratings Cam F's (the CM0102 Starter Kit's cm93_data.zip)
+// 1989/90: Simon Treanor's fan-made 1989/90 database for CM 01/02, Beta 5, its ratings his, nations only (the CM0102 Starter Kit's cm89_data.zip)
+// and by npm run build:world-cup-seasons, computed (scripts/data/world-cup-seasons.json):
+// 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994: each World Cup's finalists, rated from their Elo and their players' records
 // The built-in earlier seasons, newest first. Each is public/football/<id>.json, loaded when a setup chooses it
 // (src/engine/footballSets.js); docs/design/football-years.md describes them.
 export const BUILT_IN_SEASONS = Object.freeze([
@@ -29,4 +43,24 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'ea-fifa-07', version: 'ea-fifa-07-ac742262', year: 2007, season: '2006/07', label: 'FIFA 07' }),
   Object.freeze({ id: 'ea-fifa-06', version: 'ea-fifa-06-35251773', year: 2006, season: '2005/06', label: 'FIFA 06' }),
   Object.freeze({ id: 'ea-fifa-05', version: 'ea-fifa-05-f16bdf47', year: 2005, season: '2004/05', label: 'FIFA 05' }),
+  Object.freeze({ id: 'cm0102-2002-11', version: 'cm0102-2002-11-12b13a69', year: 2003, season: '2002/03', label: 'CM 01/02 · 3.9.68' }),
+  Object.freeze({ id: 'cm0102-2001-09', version: 'cm0102-2001-09-58d3ed4f', year: 2002, season: '2001/02', label: 'CM 01/02 · 3.9.60' }),
+  Object.freeze({ id: 'cm-0001', version: 'cm-0001-e6e6a2f0', year: 2001, season: '2000/01', label: 'CM 00/01 · 3.81' }),
+  Object.freeze({ id: 'cm-9900', version: 'cm-9900-e4639df6', year: 2000, season: '1999/00', label: 'CM 99/00 · 3.70' }),
+  Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-5b8d03bc', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
+  Object.freeze({ id: 'cm-9798', version: 'cm-9798-cb9596fd', year: 1998, season: '1997/98', label: 'CM 97/98' }),
+  Object.freeze({ id: 'swos-9697', version: 'swos-9697-189aa2ca', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
+  Object.freeze({ id: 'swos-9596', version: 'swos-9596-ef95edc8', year: 1996, season: '1995/96', label: 'SWOS 95/96' }),
+  Object.freeze({ id: 'swos-9495', version: 'swos-9495-3d369a28', year: 1995, season: '1994/95', label: 'SWOS 94/95' }),
+  Object.freeze({ id: 'wc-1994', version: 'wc-1994-7f151aae', year: 1994, season: '1993/94', label: 'Computed · 1994 World Cup' }),
+  Object.freeze({ id: 'cm0102-2020-11-cm93', version: 'cm0102-2020-11-cm93-1c31e5ae', year: 1994, season: '1993/94', label: 'CM 01/02 · 93/94 by Cam F, fan-made' }),
+  Object.freeze({ id: 'wc-1990', version: 'wc-1990-246f9a35', year: 1990, season: '1989/90', label: 'Computed · 1990 World Cup' }),
+  Object.freeze({ id: 'cm0102-2017-04-cm89', version: 'cm0102-2017-04-cm89-51f49124', year: 1990, season: '1989/90', label: 'CM 01/02 · 89/90 by Simon Treanor, fan-made' }),
+  Object.freeze({ id: 'wc-1986', version: 'wc-1986-f5178adb', year: 1986, season: '1985/86', label: 'Computed · 1986 World Cup' }),
+  Object.freeze({ id: 'wc-1982', version: 'wc-1982-b965e996', year: 1982, season: '1981/82', label: 'Computed · 1982 World Cup' }),
+  Object.freeze({ id: 'wc-1978', version: 'wc-1978-0201c2e5', year: 1978, season: '1977/78', label: 'Computed · 1978 World Cup' }),
+  Object.freeze({ id: 'wc-1974', version: 'wc-1974-e3e160a1', year: 1974, season: '1973/74', label: 'Computed · 1974 World Cup' }),
+  Object.freeze({ id: 'wc-1970', version: 'wc-1970-a986f212', year: 1970, season: '1969/70', label: 'Computed · 1970 World Cup' }),
+  Object.freeze({ id: 'wc-1966', version: 'wc-1966-5da76335', year: 1966, season: '1965/66', label: 'Computed · 1966 World Cup' }),
+  Object.freeze({ id: 'wc-1962', version: 'wc-1962-9241b337', year: 1962, season: '1961/62', label: 'Computed · 1962 World Cup' }),
 ]);

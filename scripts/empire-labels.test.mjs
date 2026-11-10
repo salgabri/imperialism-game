@@ -638,3 +638,40 @@ test('arched coastal world layouts and repeated cached frames have bounded cost'
   assert.ok(warm < 1500, `30 cached curved/coastal frames took ${warm.toFixed(0)} ms`);
   t.diagnostic(`curved/coastal world layout ${cold.toFixed(0)} ms; 30 cached frames ${warm.toFixed(0)} ms`);
 });
+
+// The distinct points of the rings the engine keeps (three or more finite points, nonzero area), as their "x,y" text.
+function distinctLabelPoints(shapes) {
+  const points = new Set();
+  for (const s of shapes) for (const ring of s.rings) {
+    if (ring.length < 3 || !ring.every(p => p.every(Number.isFinite))) continue;
+    let doubled = 0;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) doubled += ring[j][0] * ring[i][1] - ring[i][0] * ring[j][1];
+    if (Math.abs(doubled / 2) > EPS) for (const p of ring) points.add(`${p[0]},${p[1]}`);
+  }
+  return points.size;
+}
+
+// Without point ids, conquest grouping and coast edges fall back to a slower string path that returns the same labels,
+// so no comparison of results can show the ids missing (a one-shot iterator once left every piece without them).
+test('the first layout gives every land piece its point ids, one id per distinct point', () => {
+  const { shapes } = atlas(), engine = createEmpireLabelEngine(shapes);
+  const ownership = Object.fromEntries(shapes.map(s => [s.id, s.id]));
+  engine.layout(options(ownership, [name('250', 'FRANCE')], CURVED_COAST));
+  const stats = engine.pointStats();
+  assert.ok(stats.pieces > 1000, `the atlas has its land pieces (${stats.pieces})`);
+  assert.equal(stats.withIds, stats.pieces, 'every piece has point ids');
+  assert.equal(stats.points, distinctLabelPoints(shapes), 'one id per distinct point');
+  // Points off the 0.1 grid take the string path, -0 meets 0, and the wide Americas theatres (x beyond 1638.4) keep
+  // integer keys: each kind is still one id per distinct printed point, shared across countries.
+  const odd = [
+    shape('west', [[-0, 0], [2050.3, 0], [2050.3, 10], [0, 10]]),
+    shape('east', [[2050.3, 0], [2400.15, 0.05], [2400.15, 10], [2050.3, 10]]),
+    shape('south', [[-0, 10], [2050.3, 10], [1999.99, 30.333], [0, 30.333]]),
+  ];
+  const oddEngine = createEmpireLabelEngine(odd);
+  oddEngine.layout(options({ west: 'A', east: 'A', south: 'B' }, [name('A'), name('B')], { viewBox: { x: -10, y: -10, w: 2500, h: 60 } }));
+  const oddStats = oddEngine.pointStats();
+  assert.equal(oddStats.withIds, oddStats.pieces);
+  assert.equal(oddStats.points, distinctLabelPoints(odd));
+  assert.equal(oddStats.points, 8, 'eight distinct points: -0 is 0, as it prints');
+});

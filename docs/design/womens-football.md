@@ -1,6 +1,6 @@
 # Women's football
 
-Status: implemented 2026-11-07. A sport of its own in the setup, played under football's
+Status: implemented 2026-11-07; clubs on maps of their own since 2026-11-09. A sport of its own in the setup, played under football's
 rulebook: the same match model, squad shape, tie-break and vocabulary (`src/sports/womensFootball.js`
 spreads `football`), with the women's game's own players from EA SPORTS FC 27. Football's
 rule holds: **nothing is invented.**
@@ -39,13 +39,39 @@ By EA's nationality, 78 nations have at least one rated player; 27 can field a f
 
 ## Clubs
 
-84 clubs, each with its best XI in a 4-4-2, ids `w-<slug>`. EA licenses five leagues whole, and
-each is a theatre: the Women's Super League (14), the NWSL (16), Liga F (16), the
-Frauen-Bundesliga (14) and the Première Ligue (12). Its other twelve clubs, a club or two of
-each smaller league (Juventus, Roma, Ajax, Twente, Häcken, Rosengård, Slavia Praha, Benfica,
-Brann, Zürich, Glasgow City, Breiðablik), play together as **Rest of Europe**. Clubs are dealt
-onto the world map from their home countries, as the men's were before their maps of Europe.
-There are no one-country maps or maps of Europe: those hold the men's clubs.
+84 clubs, each with its best XI in a 4-4-2, ids `w-<slug>`. EA licenses five leagues whole: the
+Women's Super League (14), the NWSL (16), Liga F (16), the Frauen-Bundesliga (14) and the
+Première Ligue (12). Its other twelve clubs, a club or two of each smaller league (Juventus, Roma,
+Ajax, Twente, Häcken, Rosengård, Slavia Praha, Benfica, Brann, Zürich, Glasgow City, Breiðablik),
+are the **Rest of Europe** league. There are no one-country maps: those hold the men's clubs.
+
+## Club maps
+
+Since 2026-11-09 every club holds land only in its own country, as the men's do. Until then
+women's clubs were dealt across the world map (`seedClubs`: each country's strongest club took its
+own, every other the nearest free country), so 70 of the 84 started abroad in All Leagues, and
+11 to 15 in each of the five whole leagues: Manchester City held France, Angel City Costa Rica. Asked on
+2026-11-09, the user chose Europe's clubs together, with no single-league theatres, and the NWSL
+apart. So the setup offers three theatres:
+
+| Theatre | Clubs | Map |
+| --- | --- | --- |
+| **Europe** (the default) | 68: every European club EA rates | `weu`, 13 countries |
+| **Elite 32** | the 32 strongest European clubs | `weu32`, 6 countries |
+| **NWSL** | 16 | `nwsl`, the USA |
+
+The Europe maps follow [football's rules](domestic-campaigns.md#the-europe-maps): a country's only
+club holds all of it (Glasgow City Scotland, Benfica Portugal), clubs that share a country split it
+along its regional borders, and a country with no club stays grey. Clubs stand at the women's own
+grounds, from Wikidata and Wikipedia (Manchester United at Leigh, Chelsea at Kingston). On
+[the NWSL map](domestic-campaigns.md#the-nwsl-map) each club holds its stadium's state, California is
+split three ways, and Boston Legacy, in Rhode Island until White Stadium opens in 2028, holds
+Massachusetts too. European and American clubs never meet: a map of both, with the Atlantic
+between, was offered and turned down. Each earlier season with clubs has its own maps (below).
+
+A campaign saved on the world before then still loads and plays there, under its old name;
+a new setup or challenge link naming an old theatre plays the map that replaced it (`all` and
+the European leagues Europe, `elite` Elite 32, `NWSL` the NWSL's).
 
 ## Crests
 
@@ -60,20 +86,79 @@ Union Berlin and Brann, whose men's crests the sync rejects for their shape.
 `REAL_PLAYERS_ONLY` in `src/data/teams.js` is what stops `buildTeam` generating players, the one
 place the two games must agree beyond the rulebook. `LINEUP_PLANS`, the tactical `SUPPORT` table,
 the squad screen's pitch and its shape ("4-4-2"), and the built-in season list carry the sport's id.
-It has one season, 2026/27.
+
+## Earlier seasons
+
+Eleven more seasons ship beside the built-in 2026/27, one per EA edition back to FIFA 16, the first
+to rate women. Each is `public/womens-football/eaw-<edition>.json` (kind `eaw`), built by
+`npm run build:womens-seasons` from committed snapshots by the built-in season's rules
+(`scripts/lib/ea-women-seasons.mjs`); `--check` rebuilds every file byte for byte, offline.
+`npm run sync:womens-seasons` writes the snapshots from their sources
+(`scripts/data/ea-women-seasons.json` names each, with its SHA-256):
+
+| Seasons | Edition | Source | Nations | Clubs |
+| --- | --- | --- | --- | --- |
+| 2025/26 | EA FC 26 | EA's ratings API, read 8 November 2026 | 70 | 74, six leagues |
+| 2024/25 | EA FC 25 | Kaggle `nyagami` (EA's website, 26 Sep 2024) | 62 | 71, six leagues |
+| 2023/24 | EA FC 24 | Kaggle `stefanoleone992`, women's table (launch roster) | 67 | 71, six leagues |
+| 2022/23 | FIFA 23 | the same | 52 | 24: WSL and D1 Arkema |
+| 2015/16 – 2021/22 | FIFA 16 – FIFA 22 | the same (FIFA 16 and FIFA 19: the compiler's file of every roster update, update 3) | 12 – 17 | none |
+
+- **EA FC 26** is the previous edition, which EA's API serves to a request without the ratings
+  site's referrer (`pullPages` takes the headers; its cache can mix the two editions for ten
+  minutes, so the sync checks the count and every rating). EA's site never changed FC 26's
+  ratings in season (the game's own updates did), so these are its launch-window ratings, and
+  players link to SoFIFA's launch roster, 260004, as the men's EA FC 26 does. The API now names
+  no club for the 126 players of the seven clubs EA has dropped since (Leicester City,
+  Saint-Étienne, SGS Essen, Levante, Dijon, Carl Zeiss Jena, Alhama) and gives some clubs FC 27's
+  names, so every player's club and league come from a copy taken during the season (Kaggle
+  `flynn28`, GPL-3 as its compiler set it; `v1shalsb` re-uploaded its first version as CC0), which
+  must rate all 1,645 players as the API does.
+- **EA FC 25** is EA's website a week after release, as the men's EA FC 25: no dates of birth, full
+  names or club ids. A club takes its EA team id from FC 26 or FC 27 by name, or from
+  `siteClubs` (renamed and relegated clubs, by the FIFA 16 – EA FC 24 export's ids). Players
+  link to SoFIFA's release roster, 250002.
+- **FIFA 19 and FIFA 16 take roster update 3.** The export's update 2 of FIFA 19 (21 August
+  2018) is a pre-release roster still carrying FIFA 18's ratings (Rapinoe 89, Kerr 89; 23 of 304
+  overalls match the released game); update 3 (20 September 2018, Rapinoe 92, Kerr 92) is the
+  first after release. FIFA 16's update 3 (25 September 2015) has the same ratings as update 2
+  with full 23-woman squads. Both come from the same compiler's file of every roster update
+  (Kaggle `stefanoleone992/fifa-23-complete-player-dataset`).
+- **National teams only before FIFA 23.** EA rated 12 to 17 national teams a year (FIFA 16's are
+  the United States, France, Germany, Canada, Brazil, Sweden, Australia, China, Italy, Mexico,
+  England and Spain); every other nation fields no team, as in the built-in season, so those
+  campaigns are small. Choosing Clubs with one of these seasons goes back to the built-in season.
+- **Clubs of their day.** A club keeps the game's id for its EA team id, so its crest and colour
+  follow it from season to season, under the name EA gave it that year: Olympique Lyonnais in
+  2024/25, OL Reign and the Chicago Red Stars in 2023/24. A club EA rates with fewer than eleven
+  players is left out (the audit lists them). Leagues are the built-in ones; EA's other clubs play
+  as the Rest of Europe.
+- **Maps of their day.** Each season with clubs plays its own maps: Europe (`weus<year>`), Elite
+  32 (`weu32s<year>`) and the NWSL (`nwsls<year>`, its clubs at that season's stadiums: Kansas
+  City, Kansas, in 2023). FIFA 23 rated 24 European clubs and no NWSL, so it has Europe only.
+- The loader (`src/engine/footballSets.js`, kind `eaw`) holds EA's tuples as the men's seasons
+  do, lists only the nations with a rated player and makes every other one inactive, and checks
+  the leagues and `w-<slug>` ids against the built-in women's clubs. Saves pack players as the
+  men's EA seasons do. `docs/design/womens-seasons-audit.json` lists each season's nations, clubs
+  and warnings.
 
 ## Tests
 
 `scripts/womens-football.test.mjs`: the data rebuilds byte for byte; every player is EA's with
 its overall and source; the rulebook is football's own; short-handed nations; nations without a
 team; the leagues and Rest of Europe; crests; match scores; setup; the squad screen; the running
-App launching and saving. `scripts/home-advantage.test.mjs` plays it at home too. `npm run smoke`
-adds a nations duel and an NWSL blitz.
+App launching and saving. `scripts/womens-club-maps.test.mjs`: the club maps' fields, places and
+land, the setup's three theatres, challenge links, campaigns on them and old world saves.
+`scripts/home-advantage.test.mjs` plays it at home too. `npm run smoke` adds a nations duel, an
+NWSL blitz and an Elite 32 duel, each club theatre on its map.
+`scripts/womens-seasons.test.mjs`: the earlier seasons rebuild byte for byte; each is EA's women of its
+edition, with only its rated nations; clubs keep their ids across seasons under that year's names; the
+loader refuses files the builder did not write; challenge links; the running App choosing, launching and
+resuming a season of national teams and one of clubs on its map of Europe.
 
 ## Known limits
 
-- One season. The Kaggle export behind football's earlier seasons has a women's table, not yet
-  read: that is the way to earlier seasons if they are wanted.
+- Nothing before FIFA 16: no earlier EA game rated women.
 - 51 of the 78 nations are short of eleven, some badly: nations follow club rosters, and EA rates
   few leagues outside Europe and the USA.
 - **The match model is the men's, not calibrated to the women's leagues.** Measured on

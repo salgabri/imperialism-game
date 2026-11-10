@@ -1,11 +1,13 @@
 import { SAVE_KEY, SAVE_VERSION } from '../config.js';
 import { DOMESTIC_PREFIX, domesticScopeId, isDomesticScope } from './domestic.js';
-import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, isSeasonEuropeMap, seasonLabelOf, seasonMapOf, setHasClubs, setHasNations,
+import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, isSeasonTheatreMap, seasonLabelOf, seasonMapOf, setHasClubs, setHasNations, setIsMapped,
   setKindOf, setSportOf } from './footballSets.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 import { CM_ROLES, CM_SOURCE, cmTupleOf } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SOURCE, eaRosterOf, eaTupleOf } from '../data/eaPlayers.js';
+import { SWOS_ROLES, SWOS_SOURCE, swosTupleOf } from '../data/swosPlayers.js';
 import { getSport, SPORT_LIST } from '../sports/index.js';
+import { sportDataLoaded } from '../sports/sportData.js';
 import { HOME_NATIONS } from '../data/teams.js';
 import { keepSaves } from './persistence.js';
 
@@ -29,7 +31,7 @@ export const CHECKPOINT_KEYS = Object.freeze(['settings', 'round', 'matches', 'o
   'followedId', 'pauseFollow', 'choice', 'metrics', 'startedAt', 'completedAt', 'conquestIds',
   'campaignId', 'revision', 'campaignName', 'managedTeamId', 'managementEnded', 'managerElimination',
   'tacticalChoice', 'tactics', 'rules', 'historyFilter', 'selectedHistoryId', 'decisionLedger', 'initialSettings',
-  'turnQueue', 'turnIndex', 'pendingTarget']);
+  'turnQueue', 'turnIndex', 'pendingTarget', 'claims']);
 
 export function campaignSnapshot(state) {
   return { v: SAVE_VERSION, savedAt: Date.now(), ...Object.fromEntries(CHECKPOINT_KEYS.map(key => [key, state[key]])),
@@ -147,7 +149,19 @@ const SET_PACKS = {
       ? { edition: info.edition, update: info.update, snapshotDate: info.snapshotDate, roster: eaRosterOf(info.url) } : null),
     valid: source => text(source.edition) && Number.isInteger(source.update) && text(source.snapshotDate) && /^\d{6}$/.test(source.roster),
   },
+  // SWOS 96/97's national squads (src/data/swosPlayers.js), credited like a CM database.
+  swos: {
+    source: SWOS_SOURCE, size: 9, roles: SWOS_ROLES, tupleOf: swosTupleOf,
+    sourceOf: info => (['edition', 'version', 'snapshotDate', 'url'].every(key => text(info[key])) && optionalText(info.provider)
+      ? Object.fromEntries(['provider', 'edition', 'version', 'snapshotDate', 'url'].filter(key => info[key] !== undefined).map(key => [key, info[key]]))
+      : null),
+    valid: source => ['edition', 'version', 'snapshotDate', 'url'].every(key => text(source[key])) && optionalText(source.provider),
+  },
 };
+// A women's EA season's players are the same records as the men's.
+SET_PACKS.eaw = SET_PACKS.ea;
+// CM 97/98's players are CM 01/02 records (src/data/cmPlayers.js).
+SET_PACKS.cm = SET_PACKS.cm0102;
 
 /** Whether `player` is a record of this kind's database, from `source` when one is given. */
 function setPlayer(player, kind, source) {
@@ -321,16 +335,18 @@ function validateCampaign(input, rebuildSources) {
         || (domestic && !domesticVersion.startsWith(`${domesticScopeId(clubScope)}-`)))) invalid('Campaign map version is invalid.');
     // A data set campaign names the set, the build it was played on and its season, or none of them. A set plays in its
     // own sport: a football one on its own Europe maps or the world, never on a country map (those use the built-in
-    // data) and never with clubs if it has none, a basketball one with clubs on its era's map, which no other campaign
-    // plays on, and a baseball one with its nations or its clubs on its era's map.
+    // data) and never with clubs if it has none. Any other sport's set plays the layers it has: its nations, or its clubs,
+    // on its era's map when its clubs have one (an NBA or MLB season's, which no other campaign plays on), else on one of
+    // the season's own maps (the women's game's: Europe's and the NWSL's) or, saved before those, on the world.
     const { dataSet, dataVersion, dataYear, dataSeason } = configuration;
     const sport = getSport(configuration.sport).id;
     if (dataSet == null ? [dataVersion, dataYear, dataSeason].some(value => value != null) || (domestic && isEraMap(domesticScopeId(clubScope)))
       : !isFootballSetId(dataSet) || setSportOf(dataSet) !== sport
-        || (sport === 'football' ? (domestic && !isSeasonEuropeMap(domesticScopeId(clubScope), dataSet))
+        || (sport === 'football' ? (domestic && !isSeasonTheatreMap(domesticScopeId(clubScope), dataSet))
             || (configuration.layer === 'clubs' && !setHasClubs(dataSet))
           : configuration.layer !== 'clubs' ? !setHasNations(dataSet)
-          : !domestic || domesticScopeId(clubScope) !== seasonMapOf(dataSet))
+          : !setHasClubs(dataSet) || (setIsMapped(dataSet) ? !domestic || domesticScopeId(clubScope) !== seasonMapOf(dataSet)
+            : domestic && !isSeasonTheatreMap(domesticScopeId(clubScope), dataSet)))
         || typeof dataVersion !== 'string' || !new RegExp(`^${dataSet}-[0-9a-f]{8}$`).test(dataVersion)
         || !isDataYear(dataYear) || dataSeason !== seasonLabelOf(dataSet, dataYear)) invalid('Campaign data set is invalid.');
   }
@@ -356,6 +372,9 @@ function validateCampaign(input, rebuildSources) {
       || Object.values(data.metrics.engagement).some(value => value != null && (!Number.isFinite(value) || value < 0)))) invalid('Campaign engagement metrics are invalid.');
   if (data.metrics?.leaderChanges != null && !nonnegative(data.metrics.leaderChanges)) invalid('Campaign leadership metrics are invalid.');
   if (data.fallen?.some(entry => !record(entry) || !known(entry.id) || !nonnegative(entry.r))) invalid('Campaign elimination history is incomplete.');
+  // Claimed land (engine/claims.js): land id -> a surviving team. The map's own land ids are checked when it is shown.
+  if (data.claims != null && (!record(data.claims) || Object.keys(data.claims).length > 1000
+      || Object.values(data.claims).some(id => !known(id) || !alive.has(id)))) invalid('Campaign claimed land is invalid.');
   const textValue = value => value == null || typeof value === 'string' || typeof value === 'number';
   const displayTeam = team => record(team) && typeof team.name === 'string' && textValue(team.score)
     && ['eff', 'code', 'color', 'id'].every(key => textValue(team[key]));
@@ -467,18 +486,67 @@ function validateCampaign(input, rebuildSources) {
 
 function tryParse(text) { try { return text ? parseCampaign(text) : null; } catch { return null; } }
 
-/** Raw damaged data remains available, even when a previous checkpoint can recover it. */
+/**
+ * A checkpoint read for what it is (its id, revision, settings, progress) but not whole: its players' roster sources are
+ * left as stored, so it needs no sport's players. It accepts exactly what parseCampaign accepts (the same checks; the
+ * rebuild it skips never throws), so it answers whether a checkpoint is readable. Never resumed or written back.
+ */
+function tryParseSummary(text) { try { return text ? validateCampaign(JSON.parse(text), false) : null; } catch { return null; } }
+
+/** The sport parsed checkpoint data plays, as validation reads it (a save from before sports is football's). */
+const sportOfData = data => getSport(data?.settings?.sport).id;
+
+/**
+ * The sport a checkpoint's text plays, or null for text that is not a campaign's JSON. Reading the checkpoint whole
+ * (parseCampaign) needs that sport's players (src/sports/sportData.js).
+ */
+export function sportOfText(text) {
+  try {
+    const data = text ? JSON.parse(text) : null;
+    return record(data) ? sportOfData(data) : null;
+  } catch { return null; }
+}
+
+/**
+ * The resume pointer: `{ state, campaign }`. 'ready' holds the campaign, read whole; 'missing' and 'unavailable' none.
+ * A pointer whose sport's players have not loaded is 'unloaded': `summary` says what it is (as tryParseSummary reads
+ * it), `sport` which players to load, and `read()` inspects it again once they are here, without parsing it twice. A
+ * damaged one is 'recovery': its raw text stays available, with the previous checkpoint (`backup`) when that can be
+ * read, or `backupSport` when it could once that sport's players load (inspect again then).
+ */
 export function inspectSave() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return { state: 'missing', campaign: null };
-    try { return { state: 'ready', campaign: parseCampaign(raw) }; }
-    catch (error) {
-      const backup = tryParse(localStorage.getItem(CAMPAIGN_BACKUP_KEY));
-      return { state: 'recovery', campaign: null, raw, backup,
-        message: `The latest checkpoint could not be read. ${error.message}${backup ? ' A previous checkpoint is available.' : ' Export the damaged file to keep a copy.'}` };
+    let data;
+    try { data = JSON.parse(raw); } catch (error) { return recoveryOf(raw, error); }
+    return inspectPointer(raw, data);
+  } catch { return STORAGE_UNAVAILABLE; }
+}
+
+const STORAGE_UNAVAILABLE = Object.freeze({ state: 'unavailable', campaign: null,
+  message: 'Saved campaigns could not be read. Browser storage is unavailable.' });
+
+/** inspectSave of the pointer's parsed `data`. An 'unloaded' pointer's `read()` inspects that same parse again. */
+function inspectPointer(raw, data) {
+  try {
+    const sport = sportOfData(data);
+    if (!sportDataLoaded(sport)) {
+      return { state: 'unloaded', campaign: null, summary: validateCampaign(data, false), sport, read: () => inspectPointer(raw, data) };
     }
-  } catch { return { state: 'unavailable', campaign: null, message: 'Saved campaigns could not be read. Browser storage is unavailable.' }; }
+    return { state: 'ready', campaign: validateCampaign(data, true) };
+  } catch (error) { return recoveryOf(raw, error); }
+}
+
+/** A damaged pointer: its raw text, and the previous checkpoint when that can be read (or `backupSport` to load first). */
+function recoveryOf(raw, error) {
+  try {
+    const backupText = localStorage.getItem(CAMPAIGN_BACKUP_KEY), backup = tryParse(backupText);
+    const backupSummary = backup ? null : tryParseSummary(backupText);
+    const backupSport = backupSummary ? sportOfData(backupSummary) : null;
+    return { state: 'recovery', campaign: null, raw, backup, backupSport,
+      message: `The latest checkpoint could not be read. ${error.message}${backup || backupSport ? ' A previous checkpoint is available.' : ' Export the damaged file to keep a copy.'}` };
+  } catch { return STORAGE_UNAVAILABLE; }
 }
 
 export function loadSave() { return inspectSave().campaign; }
@@ -504,8 +572,19 @@ function indexData() {
   try { parsed = JSON.parse(raw || '[]'); } catch { /* damaged: rebuilt below */ }
   if (Array.isArray(parsed)) return parsed.filter(item => record(item) && typeof item.id === 'string');
   // A damaged index is rebuilt from the slots themselves: it used to fail every autosave and hide every campaign.
-  return storedSlotIds().map(id => tryParse(localStorage.getItem(campaignStorageKey(id))))
+  return storedSlotIds().map(id => tryParseSummary(localStorage.getItem(campaignStorageKey(id))))
     .filter(Boolean).map(campaignMetadata);
+}
+
+/**
+ * The sport campaign slot `id` plays (null for none): its list entry says, else its own text. Loading or renaming the
+ * slot reads it whole, which needs that sport's players; its recovery copy is the same campaign's, so the same sport's.
+ */
+export function campaignSport(id) {
+  try {
+    const listed = indexData().find(item => item.id === id)?.settings;
+    return record(listed) ? getSport(listed.sport).id : sportOfText(localStorage.getItem(campaignStorageKey(id)));
+  } catch { return null; }
 }
 
 /** Ids of the campaign slots in storage (not their backups). */
@@ -535,7 +614,8 @@ function listedMetadata(key, known, read) {
   let entry = known.get(key);
   if (entry?.raw !== raw) entry = [...read.values()].find(other => other.raw === raw);
   if (!entry) {
-    const saved = tryParse(raw);
+    // Listing reads what a campaign is, not its players: any sport's lists, loaded or not.
+    const saved = tryParseSummary(raw);
     entry = { raw, metadata: saved && campaignMetadata(saved) };
   }
   read.set(key, entry);
@@ -563,12 +643,18 @@ export function loadCampaign(id) {
   return parseCampaign(raw);
 }
 
+/**
+ * Campaign slot `id`, as inspectSave reads the pointer: 'ready' with the campaign read whole, 'missing', 'unavailable',
+ * 'recovery' for a damaged one, or 'unloaded' (with the `sport` to load first) while its sport's players are not here.
+ */
 export function inspectCampaign(id) {
   try {
     const raw = localStorage.getItem(campaignStorageKey(id));
     if (!raw) return { state: 'missing', campaign: null, message: 'This campaign checkpoint is no longer available.' };
     const campaign = tryParse(raw);
     if (campaign) return { state: 'ready', campaign };
+    const summary = tryParseSummary(raw), sport = summary && sportOfData(summary);
+    if (summary && !sportDataLoaded(sport)) return { state: 'unloaded', campaign: null, sport };
     const backup = tryParse(localStorage.getItem(backupKey(id)));
     return { state: 'recovery', campaign: null, raw, backup,
       message: `This campaign checkpoint is damaged.${backup ? ' A previous checkpoint is available.' : ' Export the damaged file to keep a copy.'}` };
@@ -628,6 +714,25 @@ function continuesLegacy(legacy, data) {
 let lastWritten = null;
 const writtenSummary = text => (text != null && text === lastWritten?.text ? lastWritten : null);
 
+/**
+ * The resume pointer's campaign as a save or a discard reads it: `{ campaign, stored }`. Another campaign is read for
+ * what it is (tryParseSummary), whatever its sport. A legacy singleton (no campaign id) moves into a slot of its own, so
+ * it is read whole; when its sport's players are not here (they failed to load), it is kept as `stored`, its text, and
+ * moves as stored instead (legacySlotText): never mistaken for damaged bytes, and never in the way of a save.
+ */
+function readPointer(text) {
+  const summary = tryParseSummary(text);
+  if (!summary || summary.campaignId) return { campaign: summary, stored: null };
+  try { return { campaign: parseCampaign(text), stored: null }; } catch { return { campaign: summary, stored: text }; }
+}
+
+/** A legacy singleton's slot: written anew when it was read whole, else its stored checkpoint given the slot's identity. */
+function legacySlotText(migrated, stored) {
+  if (stored == null) return checkpointText(migrated);
+  const { campaignId, revision, campaignName } = migrated;
+  return JSON.stringify({ ...JSON.parse(stored), campaignId, revision, campaignName });
+}
+
 /** Compare-and-save prevents a stale tab from replacing a newer checkpoint. */
 export function writeSave(state, { activate = true } = {}) {
   try {
@@ -646,8 +751,10 @@ export function writeSave(state, { activate = true } = {}) {
     const index = indexData().filter(item => item.id !== data.campaignId);
     index.unshift(campaignMetadata(data));
     const current = localStorage.getItem(SAVE_KEY);
-    // A pointer holding this tab's last checkpoint is that campaign (never a legacy singleton: it has an id).
-    const currentCampaign = writtenSummary(current) || tryParse(current);
+    // A pointer holding this tab's last checkpoint is that campaign (never a legacy singleton: it has an id). Any other
+    // is read for what it is, whatever its sport (readPointer).
+    const pointer = writtenSummary(current) ? { campaign: writtenSummary(current), stored: null } : readPointer(current);
+    const currentCampaign = pointer.campaign;
     const updatePointer = activate || currentCampaign?.campaignId === data.campaignId;
     const kept = [];
     if (updatePointer && currentCampaign && !currentCampaign.campaignId && !continuesLegacy(currentCampaign, data)) {
@@ -655,7 +762,7 @@ export function writeSave(state, { activate = true } = {}) {
       // saved: resuming it gave it a fresh id, and this checkpoint replaces it).
       const migrated = { ...currentCampaign, campaignId: createCampaignId(), revision: 1,
         campaignName: cleanName(currentCampaign.campaignName || `${currentCampaign.settings.sport || 'Football'} legacy campaign`) };
-      kept.push([campaignStorageKey(migrated.campaignId), checkpointText(migrated)]);
+      kept.push([campaignStorageKey(migrated.campaignId), legacySlotText(migrated, pointer.stored)]);
       index.push(campaignMetadata(migrated));
     } else if (updatePointer && current && !currentCampaign) {
       // Retain damaged bytes even when the player chooses to start a fresh run.
@@ -684,7 +791,7 @@ export function writeSave(state, { activate = true } = {}) {
     }
     // Storage is full: only this campaign's own recovery copies may go, one at a time (first the resume pointer's
     // copy, which duplicates the slot's, then the slot's). Every other campaign's copies, damaged or not, stay.
-    const pointerCopy = tryParse(localStorage.getItem(CAMPAIGN_BACKUP_KEY))?.campaignId === data.campaignId
+    const pointerCopy = tryParseSummary(localStorage.getItem(CAMPAIGN_BACKUP_KEY))?.campaignId === data.campaignId
       ? [[CAMPAIGN_BACKUP_KEY, null]] : [];
     for (const [entries, message] of [
       [[...pointerCopy, ...steps(true, false)], 'Progress saved'],
@@ -736,7 +843,7 @@ function writeAll(entries, stored) {
  */
 export function deleteCampaign(id) {
   try {
-    const holds = key => tryParse(localStorage.getItem(key))?.campaignId === id;
+    const holds = key => tryParseSummary(localStorage.getItem(key))?.campaignId === id;
     writeAll([[CAMPAIGN_INDEX_KEY, JSON.stringify(indexData().filter(item => item.id !== id))],
       [campaignStorageKey(id), null], [backupKey(id), null],
       ...[SAVE_KEY, CAMPAIGN_BACKUP_KEY].filter(holds).map(key => [key, null])]);
@@ -820,16 +927,17 @@ export function fitDomesticCampaign(campaign, { meta, clubs, sectionNames }) {
 
 /**
  * Discard only the resume pointer; named campaigns and recovery copies stay intact. A save from before campaign slots
- * (no campaign id) has no copy but the pointer: it moves into Saved campaigns first, as starting a new campaign moves it.
+ * (no campaign id) has no copy but the pointer: it moves into Saved campaigns first, as starting a new campaign moves it
+ * (as stored when its sport's players are not here: readPointer).
  */
 export function clearSave() {
   try {
-    const current = tryParse(localStorage.getItem(SAVE_KEY));
+    const { campaign: current, stored } = readPointer(localStorage.getItem(SAVE_KEY));
     if (current && !current.campaignId) {
       const migrated = { ...current, campaignId: createCampaignId(), revision: 1,
         campaignName: cleanName(current.campaignName || `${current.settings?.sport || 'Football'} legacy campaign`) };
       writeAll([[CAMPAIGN_INDEX_KEY, JSON.stringify([...indexData(), campaignMetadata(migrated)])],
-        [campaignStorageKey(migrated.campaignId), checkpointText(migrated)], [SAVE_KEY, null]]);
+        [campaignStorageKey(migrated.campaignId), legacySlotText(migrated, stored)], [SAVE_KEY, null]]);
       return true;
     }
     localStorage.removeItem(SAVE_KEY);

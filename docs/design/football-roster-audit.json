@@ -169,7 +169,7 @@
   ],
   "unknownAbility": [],
   "conversion": "round(EFEM currentAbility * 99 / 100)",
-  "nationalTeams": 173,
+  "nationalTeams": 176,
   "fullXIs": 173,
   "eaShirts": 1257,
   "fmShirts": 646,
@@ -318,6 +318,15 @@
       "fm": 0,
       "goalkeeper": true,
       "naturalLineup": true
+    },
+    {
+      "id": "184",
+      "name": "Cook Islands",
+      "players": 0,
+      "ea": 0,
+      "fm": 0,
+      "goalkeeper": false,
+      "naturalLineup": false
     },
     {
       "id": "188",
@@ -1355,6 +1364,15 @@
       "naturalLineup": true
     },
     {
+      "id": "776",
+      "name": "Tonga",
+      "players": 0,
+      "ea": 0,
+      "fm": 0,
+      "goalkeeper": false,
+      "naturalLineup": false
+    },
+    {
       "id": "780",
       "name": "Trinidad & Tobago",
       "players": 11,
@@ -1497,6 +1515,15 @@
       "fm": 0,
       "goalkeeper": true,
       "naturalLineup": true
+    },
+    {
+      "id": "882",
+      "name": "Samoa",
+      "players": 0,
+      "ea": 0,
+      "fm": 0,
+      "goalkeeper": false,
+      "naturalLineup": false
     },
     {
       "id": "887",

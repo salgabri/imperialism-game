@@ -1,0 +1,1178 @@
+{
+ "generatedBy": "scripts/sync-tennis-seasons.mjs",
+ "matches": {
+  "counted": 394046,
+  "unplayed": 13546,
+  "no score": 140,
+  "placeholder": 110,
+  "skipped": 24824
+ },
+ "davisCupRubbersUnresolved": 16,
+ "fit": {
+  "years": [
+   1973,
+   2000
+  ],
+  "n": 38,
+  "meanDiff": -2,
+  "rms": 15.1,
+  "byDecade": {
+   "1970s": -1.2,
+   "1980s": -1.6,
+   "1990s": -4.7
+  },
+  "after": {
+   "n": 15,
+   "meanDiff": 29
+  }
+ },
+ "peaks": [
+  {
+   "name": "Bjorn Borg",
+   "year": 1980,
+   "published": 2473,
+   "computed": 2500.6,
+   "date": "1980-08-26",
+   "diff": 27.6
+  },
+  {
+   "name": "Novak Djokovic",
+   "year": 2016,
+   "published": 2470,
+   "computed": 2504.3,
+   "date": "2016-05-09",
+   "diff": 34.3
+  },
+  {
+   "name": "John McEnroe",
+   "year": 1985,
+   "published": 2442,
+   "computed": 2459.1,
+   "date": "1985-04-01",
+   "diff": 17.1
+  },
+  {
+   "name": "Ivan Lendl",
+   "year": 1986,
+   "published": 2402,
+   "computed": 2408,
+   "date": "1986-03-24",
+   "diff": 6
+  },
+  {
+   "name": "Roger Federer",
+   "year": 2007,
+   "published": 2383,
+   "computed": 2400.6,
+   "date": "2007-02-26",
+   "diff": 17.6
+  },
+  {
+   "name": "Rafael Nadal",
+   "year": 2009,
+   "published": 2370,
+   "computed": 2396.2,
+   "date": "2009-05-10",
+   "diff": 26.2
+  },
+  {
+   "name": "Jimmy Connors",
+   "year": 1979,
+   "published": 2364,
+   "computed": 2403.6,
+   "date": "1979-03-19",
+   "diff": 39.6
+  },
+  {
+   "name": "Boris Becker",
+   "year": 1989,
+   "published": 2320,
+   "computed": 2321.3,
+   "date": "1986-12-01",
+   "diff": 1.3
+  },
+  {
+   "name": "Pete Sampras",
+   "year": 1994,
+   "published": 2319,
+   "computed": 2302,
+   "date": "1994-05-09",
+   "diff": -17
+  },
+  {
+   "name": "Mats Wilander",
+   "year": 1983,
+   "published": 2309,
+   "computed": 2315.1,
+   "date": "1984-01-10",
+   "diff": 6.1
+  },
+  {
+   "name": "Guillermo Vilas",
+   "year": 1977,
+   "published": 2298,
+   "computed": 2323.1,
+   "date": "1978-01-04",
+   "diff": 25.1
+  },
+  {
+   "name": "Andre Agassi",
+   "year": 1995,
+   "published": 2282,
+   "computed": 2275.3,
+   "date": "1995-08-28",
+   "diff": -6.7
+  },
+  {
+   "name": "Jim Courier",
+   "year": 1992,
+   "published": 2256,
+   "computed": 2248.9,
+   "date": "1992-06-22",
+   "diff": -7.1
+  },
+  {
+   "name": "Ilie Nastase",
+   "year": 1973,
+   "published": 2256,
+   "computed": 2257.8,
+   "date": "1976-09-01",
+   "diff": 1.8
+  },
+  {
+   "name": "Stan Smith",
+   "year": 1973,
+   "published": 2248,
+   "computed": 2241,
+   "date": "1973-05-09",
+   "diff": -7
+  },
+  {
+   "name": "Stefan Edberg",
+   "year": 1990,
+   "published": 2239,
+   "computed": 2277,
+   "date": "1987-12-02",
+   "diff": 38
+  },
+  {
+   "name": "John Newcombe",
+   "year": 1974,
+   "published": 2209,
+   "computed": 2192.3,
+   "date": "1974-05-13",
+   "diff": -16.7
+  },
+  {
+   "name": "Arthur Ashe",
+   "year": 1976,
+   "published": 2206,
+   "computed": 2212.6,
+   "date": "1976-03-22",
+   "diff": 6.6
+  },
+  {
+   "name": "Michael Stich",
+   "year": 1993,
+   "published": 2203,
+   "computed": 2187.3,
+   "date": "1993-12-07",
+   "diff": -15.7
+  },
+  {
+   "name": "Vitas Gerulaitis",
+   "year": 1978,
+   "published": 2201,
+   "computed": 2221.6,
+   "date": "1979-05-28",
+   "diff": 20.6
+  },
+  {
+   "name": "Tom Okker",
+   "year": 1974,
+   "published": 2190,
+   "computed": 2187.3,
+   "date": "1974-03-30",
+   "diff": -2.7
+  },
+  {
+   "name": "Michael Chang",
+   "year": 1994,
+   "published": 2186,
+   "computed": 2169.6,
+   "date": "1996-03-18",
+   "diff": -16.4
+  },
+  {
+   "name": "Goran Ivanisevic",
+   "year": 1993,
+   "published": 2185,
+   "computed": 2176.9,
+   "date": "1992-12-08",
+   "diff": -8.1
+  }
+ ],
+ "yElo": [
+  {
+   "season": 1979,
+   "name": "Bjorn Borg",
+   "record": "84-5",
+   "ours": "84-5",
+   "published": 2499,
+   "computed": 2490.5,
+   "diff": -8.5
+  },
+  {
+   "season": 1984,
+   "name": "John McEnroe",
+   "record": "82-3",
+   "ours": "82-3",
+   "published": 2476,
+   "computed": 2480.1,
+   "diff": 4.1
+  },
+  {
+   "season": 2015,
+   "name": "Novak Djokovic",
+   "record": "82-6",
+   "ours": "82-6",
+   "published": 2458,
+   "computed": 2493.1,
+   "diff": 35.1
+  },
+  {
+   "season": 1985,
+   "name": "Ivan Lendl",
+   "record": "82-7",
+   "ours": "82-7",
+   "published": 2440,
+   "computed": 2428.6,
+   "diff": -11.4
+  },
+  {
+   "season": 2016,
+   "name": "Andy Murray",
+   "record": "78-9",
+   "ours": "78-9",
+   "published": 2416,
+   "computed": 2452.4,
+   "diff": 36.4
+  },
+  {
+   "season": 2013,
+   "name": "Novak Djokovic",
+   "record": "74-9",
+   "ours": "74-9",
+   "published": 2408,
+   "computed": 2439.7,
+   "diff": 31.7
+  },
+  {
+   "season": 1976,
+   "name": "Jimmy Connors",
+   "record": "97-7",
+   "ours": "96-6",
+   "published": 2406,
+   "computed": 2398.5,
+   "diff": -7.5
+  },
+  {
+   "season": 1977,
+   "name": "Bjorn Borg",
+   "record": "78-6",
+   "ours": "78-6",
+   "published": 2403,
+   "computed": 2389.7,
+   "diff": -13.3
+  },
+  {
+   "season": 1977,
+   "name": "Guillermo Vilas",
+   "record": "133-13",
+   "ours": "133-13",
+   "published": 2401,
+   "computed": 2381.4,
+   "diff": -19.6
+  },
+  {
+   "season": 2006,
+   "name": "Roger Federer",
+   "record": "91-5",
+   "ours": "91-5",
+   "published": 2399,
+   "computed": 2417.3,
+   "diff": 18.3
+  },
+  {
+   "season": 1980,
+   "name": "Bjorn Borg",
+   "record": "70-5",
+   "ours": "70-5",
+   "published": 2395,
+   "computed": 2391.9,
+   "diff": -3.1
+  },
+  {
+   "season": 1981,
+   "name": "Ivan Lendl",
+   "record": "96-12",
+   "ours": "96-12",
+   "published": 2383,
+   "computed": 2375.4,
+   "diff": -7.6
+  },
+  {
+   "season": 1987,
+   "name": "Ivan Lendl",
+   "record": "73-7",
+   "ours": "73-7",
+   "published": 2381,
+   "computed": 2369,
+   "diff": -12
+  },
+  {
+   "season": 1982,
+   "name": "Ivan Lendl",
+   "record": "105-9",
+   "ours": "105-9",
+   "published": 2380,
+   "computed": 2372.3,
+   "diff": -7.7
+  },
+  {
+   "season": 1978,
+   "name": "Jimmy Connors",
+   "record": "66-5",
+   "ours": "66-5",
+   "published": 2379,
+   "computed": 2365.5,
+   "diff": -13.5
+  },
+  {
+   "season": 2013,
+   "name": "Rafael Nadal",
+   "record": "74-7",
+   "ours": "74-7",
+   "published": 2373,
+   "computed": 2404.3,
+   "diff": 31.3
+  },
+  {
+   "season": 1986,
+   "name": "Ivan Lendl",
+   "record": "74-6",
+   "ours": "73-6",
+   "published": 2369,
+   "computed": 2356.1,
+   "diff": -12.9
+  },
+  {
+   "season": 2011,
+   "name": "Novak Djokovic",
+   "record": "63-4",
+   "ours": "63-4",
+   "published": 2367,
+   "computed": 2394.4,
+   "diff": 27.4
+  },
+  {
+   "season": 2005,
+   "name": "Roger Federer",
+   "record": "80-4",
+   "ours": "80-4",
+   "published": 2364,
+   "computed": 2380.6,
+   "diff": 16.6
+  },
+  {
+   "season": 2014,
+   "name": "Novak Djokovic",
+   "record": "61-8",
+   "ours": "61-8",
+   "published": 2363,
+   "computed": 2394.3,
+   "diff": 31.3
+  },
+  {
+   "season": 2012,
+   "name": "Novak Djokovic",
+   "record": "73-12",
+   "ours": "73-12",
+   "published": 2360,
+   "computed": 2391.5,
+   "diff": 31.5
+  },
+  {
+   "season": 1978,
+   "name": "Bjorn Borg",
+   "record": "79-6",
+   "ours": "79-6",
+   "published": 2359,
+   "computed": 2349.2,
+   "diff": -9.8
+  },
+  {
+   "season": 2008,
+   "name": "Rafael Nadal",
+   "record": "81-10",
+   "ours": "81-10",
+   "published": 2352,
+   "computed": 2376.6,
+   "diff": 24.6
+  },
+  {
+   "season": 1986,
+   "name": "Boris Becker",
+   "record": "69-13",
+   "ours": "69-13",
+   "published": 2347,
+   "computed": 2329.7,
+   "diff": -17.3
+  },
+  {
+   "season": 1982,
+   "name": "John McEnroe",
+   "record": "71-9",
+   "ours": "71-9",
+   "published": 2341,
+   "computed": 2336.4,
+   "diff": -4.6
+  },
+  {
+   "season": 2024,
+   "name": "Jannik Sinner",
+   "record": "72-6",
+   "ours": "72-6",
+   "published": 2339,
+   "computed": 2379.7,
+   "diff": 40.7
+  },
+  {
+   "season": 1983,
+   "name": "Mats Wilander",
+   "record": "80-11",
+   "ours": "80-11",
+   "published": 2338,
+   "computed": 2332.2,
+   "diff": -5.8
+  },
+  {
+   "season": 1974,
+   "name": "Jimmy Connors",
+   "record": "94-5",
+   "ours": "94-4",
+   "published": 2332,
+   "computed": 2319.5,
+   "diff": -12.5
+  },
+  {
+   "season": 1989,
+   "name": "Boris Becker",
+   "record": "64-8",
+   "ours": "64-8",
+   "published": 2329,
+   "computed": 2323,
+   "diff": -6
+  },
+  {
+   "season": 2015,
+   "name": "Roger Federer",
+   "record": "62-11",
+   "ours": "62-11",
+   "published": 2329,
+   "computed": 2361.5,
+   "diff": 32.5
+  }
+ ],
+ "published": {
+  "2016": {
+   "updated": "2016-12-12",
+   "method": "pre-2018",
+   "current": {
+    "top100": {
+     "n": 99,
+     "meanDiff": -51.8,
+     "meanAbsDiff": 54,
+     "r": 0.9647,
+     "slope": 0.915
+    },
+    "all": {
+     "n": 146,
+     "meanDiff": -45.1,
+     "meanAbsDiff": 54.5,
+     "r": 0.958,
+     "slope": 0.905
+    },
+    "topTenShared": 8,
+    "listed": {
+     "published": 147,
+     "ours": 402,
+     "both": 143
+    }
+   },
+   "v1": {
+    "top100": {
+     "n": 99,
+     "meanDiff": -2.8,
+     "meanAbsDiff": 6.6,
+     "r": 0.9985,
+     "slope": 1.005
+    },
+    "all": {
+     "n": 146,
+     "meanDiff": -4.8,
+     "meanAbsDiff": 7.8,
+     "r": 0.9988,
+     "slope": 1.014
+    },
+    "topTenShared": 9,
+    "listed": {
+     "published": 147,
+     "ours": 138,
+     "both": 125
+    }
+   }
+  },
+  "2017": {
+   "updated": "2017-11-20",
+   "method": "pre-2018",
+   "current": {
+    "top100": {
+     "n": 99,
+     "meanDiff": -60.4,
+     "meanAbsDiff": 64.1,
+     "r": 0.9391,
+     "slope": 0.875
+    },
+    "all": {
+     "n": 167,
+     "meanDiff": -45.6,
+     "meanAbsDiff": 62.7,
+     "r": 0.9346,
+     "slope": 0.849
+    },
+    "topTenShared": 6,
+    "listed": {
+     "published": 171,
+     "ours": 396,
+     "both": 162
+    }
+   },
+   "v1": {
+    "top100": {
+     "n": 99,
+     "meanDiff": 4.9,
+     "meanAbsDiff": 8.1,
+     "r": 0.9965,
+     "slope": 1.007
+    },
+    "all": {
+     "n": 164,
+     "meanDiff": 5.1,
+     "meanAbsDiff": 8,
+     "r": 0.9975,
+     "slope": 1.002
+    },
+    "topTenShared": 9,
+    "listed": {
+     "published": 171,
+     "ours": 139,
+     "both": 130
+    }
+   }
+  },
+  "2018": {
+   "updated": "2018-12-24",
+   "method": "tour-level",
+   "current": {
+    "top100": {
+     "n": 95,
+     "meanDiff": 41.5,
+     "meanAbsDiff": 54.4,
+     "r": 0.9415,
+     "slope": 1.136
+    },
+    "all": {
+     "n": 175,
+     "meanDiff": 32.8,
+     "meanAbsDiff": 58.8,
+     "r": 0.92,
+     "slope": 1.078
+    },
+    "topTenShared": 9,
+    "listed": {
+     "published": 183,
+     "ours": 399,
+     "both": 166
+    }
+   }
+  },
+  "2019": {
+   "updated": "2019-12-02",
+   "method": "current",
+   "current": {
+    "top100": {
+     "n": 100,
+     "meanDiff": 43.7,
+     "meanAbsDiff": 43.9,
+     "r": 0.9888,
+     "slope": 1.071
+    },
+    "all": {
+     "n": 404,
+     "meanDiff": 37.9,
+     "meanAbsDiff": 38.1,
+     "r": 0.9986,
+     "slope": 1.021
+    },
+    "topTenShared": 8,
+    "listed": {
+     "published": 404,
+     "ours": 507,
+     "both": 403
+    }
+   }
+  },
+  "2020": {
+   "updated": "2020-12-28",
+   "method": "current",
+   "current": {
+    "top100": {
+     "n": 100,
+     "meanDiff": 20.9,
+     "meanAbsDiff": 34.9,
+     "r": 0.9564,
+     "slope": 0.864
+    },
+    "all": {
+     "n": 296,
+     "meanDiff": 30.4,
+     "meanAbsDiff": 35.1,
+     "r": 0.9939,
+     "slope": 0.948
+    },
+    "topTenShared": 8,
+    "listed": {
+     "published": 296,
+     "ours": 296,
+     "both": 296
+    }
+   }
+  },
+  "2021": {
+   "updated": "2021-12-27",
+   "method": "current",
+   "current": {
+    "top100": {
+     "n": 100,
+     "meanDiff": 28.3,
+     "meanAbsDiff": 29.7,
+     "r": 0.987,
+     "slope": 1.001
+    },
+    "all": {
+     "n": 384,
+     "meanDiff": 33,
+     "meanAbsDiff": 33.4,
+     "r": 0.9986,
+     "slope": 0.985
+    },
+    "topTenShared": 9,
+    "listed": {
+     "published": 384,
+     "ours": 384,
+     "both": 384
+    }
+   }
+  },
+  "2022": {
+   "updated": "2022-12-26",
+   "method": "current",
+   "current": {
+    "top100": {
+     "n": 100,
+     "meanDiff": 33.3,
+     "meanAbsDiff": 36,
+     "r": 0.9732,
+     "slope": 1.066
+    },
+    "all": {
+     "n": 444,
+     "meanDiff": 35,
+     "meanAbsDiff": 35.6,
+     "r": 0.996,
+     "slope": 0.993
+    },
+    "topTenShared": 9,
+    "listed": {
+     "published": 444,
+     "ours": 444,
+     "both": 444
+    }
+   }
+  },
+  "2023": {
+   "updated": "2023-12-25",
+   "method": "current",
+   "current": {
+    "top100": {
+     "n": 100,
+     "meanDiff": 35.1,
+     "meanAbsDiff": 35.8,
+     "r": 0.9958,
+     "slope": 1.039
+    },
+    "all": {
+     "n": 456,
+     "meanDiff": 35.7,
+     "meanAbsDiff": 35.9,
+     "r": 0.9991,
+     "slope": 0.998
+    },
+    "topTenShared": 9,
+    "listed": {
+     "published": 456,
+     "ours": 456,
+     "both": 455
+    }
+   }
+  },
+  "2024": {
+   "updated": "2024-12-23",
+   "method": "current",
+   "current": {
+    "top100": {
+     "n": 100,
+     "meanDiff": 38.8,
+     "meanAbsDiff": 40.7,
+     "r": 0.9771,
+     "slope": 1.018
+    },
+    "all": {
+     "n": 482,
+     "meanDiff": 36.1,
+     "meanAbsDiff": 36.7,
+     "r": 0.9981,
+     "slope": 1.004
+    },
+    "topTenShared": 9,
+    "listed": {
+     "published": 482,
+     "ours": 481,
+     "both": 481
+    }
+   }
+  },
+  "2025": {
+   "updated": "2025-12-29",
+   "method": "current",
+   "current": {
+    "top100": {
+     "n": 100,
+     "meanDiff": 31.1,
+     "meanAbsDiff": 32.2,
+     "r": 0.9815,
+     "slope": 1.015
+    },
+    "all": {
+     "n": 498,
+     "meanDiff": 26.2,
+     "meanAbsDiff": 27.3,
+     "r": 0.9958,
+     "slope": 1.013
+    },
+    "topTenShared": 10,
+    "listed": {
+     "published": 498,
+     "ours": 491,
+     "both": 491
+    }
+   }
+  }
+ },
+ "early": {
+  "seasons": [
+   1960,
+   1972
+  ],
+  "matches": {
+   "counted": 417318,
+   "unplayed": 15238,
+   "no score": 177,
+   "placeholder": 110,
+   "skipped": 24824
+  },
+  "davisCupRubbersUnresolved": 31,
+  "aliases": {
+   "pairs": 225,
+   "kinds": {
+    "davis-cup": 200,
+    "open-era": 25
+   },
+   "matchesMoved": 1498
+  },
+  "fit": {
+   "years": [
+    1973,
+    2000
+   ],
+   "n": 38,
+   "meanDiff": -2,
+   "rms": 15.3,
+   "byDecade": {
+    "1970s": -1.2,
+    "1980s": -1.5,
+    "1990s": -4.7
+   },
+   "after": {
+    "n": 15,
+    "meanDiff": 29.1
+   }
+  },
+  "seam": {
+   "1973": {
+    "n": 50,
+    "meanDiff": 0.1,
+    "meanAbsDiff": 2.3,
+    "maxAbsDiff": 18.5
+   },
+   "1974": {
+    "n": 50,
+    "meanDiff": -1.2,
+    "meanAbsDiff": 1.5,
+    "maxAbsDiff": 5
+   },
+   "1975": {
+    "n": 50,
+    "meanDiff": 0.7,
+    "meanAbsDiff": 2.4,
+    "maxAbsDiff": 48.3
+   },
+   "1976": {
+    "n": 50,
+    "meanDiff": 0.9,
+    "meanAbsDiff": 1.8,
+    "maxAbsDiff": 45.3
+   },
+   "1977": {
+    "n": 50,
+    "meanDiff": 2.6,
+    "meanAbsDiff": 3,
+    "maxAbsDiff": 100
+   },
+   "1978": {
+    "n": 50,
+    "meanDiff": 2.2,
+    "meanAbsDiff": 2.3,
+    "maxAbsDiff": 68.4
+   },
+   "1979": {
+    "n": 50,
+    "meanDiff": 0.5,
+    "meanAbsDiff": 0.5,
+    "maxAbsDiff": 1.6
+   },
+   "1980": {
+    "n": 50,
+    "meanDiff": 0.3,
+    "meanAbsDiff": 0.3,
+    "maxAbsDiff": 1.6
+   }
+  }
+ },
+ "checks": {
+  "topTens": {
+   "authority": "Lance Tingay (The Daily Telegraph): his amateur ten for 1960-1967, everyone's from 1968",
+   "periods": {
+    "amateur": {
+     "seasons": 8,
+     "shared": 7.1,
+     "rho": 0.7
+    },
+    "open": {
+     "seasons": 5,
+     "shared": 7.4,
+     "rho": 0.59
+    }
+   },
+   "seasons": {
+    "1960": {
+     "shared": 7,
+     "listed": 10,
+     "rho": 0.87,
+     "ranks": [
+      1,
+      2,
+      3,
+      7,
+      9,
+      11,
+      4,
+      8,
+      12,
+      26
+     ],
+     "notListed": []
+    },
+    "1961": {
+     "shared": 8,
+     "listed": 10,
+     "rho": 0.33,
+     "ranks": [
+      2,
+      3,
+      8,
+      6,
+      15,
+      5,
+      4,
+      1,
+      7,
+      26
+     ],
+     "notListed": []
+    },
+    "1962": {
+     "shared": 6,
+     "listed": 10,
+     "rho": 0.73,
+     "ranks": [
+      1,
+      3,
+      12,
+      2,
+      10,
+      5,
+      13,
+      17,
+      6,
+      36
+     ],
+     "notListed": []
+    },
+    "1963": {
+     "shared": 6,
+     "listed": 10,
+     "rho": 0.81,
+     "ranks": [
+      3,
+      2,
+      1,
+      5,
+      14,
+      4,
+      9,
+      71,
+      12,
+      20
+     ],
+     "notListed": []
+    },
+    "1964": {
+     "shared": 8,
+     "listed": 10,
+     "rho": 0.67,
+     "ranks": [
+      1,
+      3,
+      5,
+      10,
+      2,
+      4,
+      7,
+      13,
+      12,
+      6
+     ],
+     "notListed": []
+    },
+    "1965": {
+     "shared": 7,
+     "listed": 10,
+     "rho": 0.68,
+     "ranks": [
+      1,
+      2,
+      3,
+      4,
+      27,
+      6,
+      12,
+      21,
+      5,
+      7
+     ],
+     "notListed": []
+    },
+    "1966": {
+     "shared": 8,
+     "listed": 10,
+     "rho": 0.83,
+     "ranks": [
+      3,
+      2,
+      1,
+      8,
+      4,
+      7,
+      5,
+      22,
+      10,
+      11
+     ],
+     "notListed": []
+    },
+    "1967": {
+     "shared": 7,
+     "listed": 10,
+     "rho": 0.68,
+     "ranks": [
+      2,
+      1,
+      3,
+      39,
+      5,
+      4,
+      13,
+      6,
+      7,
+      16
+     ],
+     "notListed": []
+    },
+    "1968": {
+     "shared": 6,
+     "listed": 10,
+     "rho": 0.76,
+     "ranks": [
+      1,
+      4,
+      2,
+      11,
+      3,
+      6,
+      16,
+      25,
+      17,
+      9
+     ],
+     "notListed": []
+    },
+    "1969": {
+     "shared": 8,
+     "listed": 10,
+     "rho": 0.49,
+     "ranks": [
+      1,
+      5,
+      8,
+      2,
+      4,
+      7,
+      23,
+      3,
+      6,
+      18
+     ],
+     "notListed": []
+    },
+    "1970": {
+     "shared": 7,
+     "listed": 10,
+     "rho": 0.48,
+     "ranks": [
+      7,
+      2,
+      1,
+      6,
+      9,
+      21,
+      4,
+      3,
+      13,
+      20
+     ],
+     "notListed": []
+    },
+    "1971": {
+     "shared": 9,
+     "listed": 10,
+     "rho": 0.39,
+     "ranks": [
+      4,
+      5,
+      1,
+      2,
+      15,
+      6,
+      7,
+      8,
+      9,
+      3
+     ],
+     "notListed": []
+    },
+    "1972": {
+     "shared": 7,
+     "listed": 10,
+     "rho": 0.81,
+     "ranks": [
+      2,
+      1,
+      6,
+      5,
+      4,
+      3,
+      17,
+      9,
+      18,
+      16
+     ],
+     "notListed": []
+    }
+   }
+  },
+  "statements": {
+   "yearEnd": [
+    {
+     "season": 1968,
+     "text": "Newcombe fourth at the end of 1968, behind Laver, Rosewall and Ashe",
+     "ours": [
+      "Rod Laver 1",
+      "Ken Rosewall 2",
+      "Arthur Ashe 4",
+      "John Newcombe 6"
+     ]
+    },
+    {
+     "season": 1969,
+     "text": "Newcombe fourth again at the end of 1969, now behind Laver, Roche and Okker",
+     "ours": [
+      "Rod Laver 1",
+      "Tony Roche 5",
+      "Tom Okker 2",
+      "John Newcombe 8"
+     ]
+    },
+    {
+     "season": 1970,
+     "text": "Rosewall behind Laver at the end of 1970",
+     "ours": [
+      "Rod Laver 1",
+      "Ken Rosewall 2"
+     ]
+    }
+   ],
+   "peaks": [
+    {
+     "name": "Rod Laver",
+     "year": 1970,
+     "published": 2571,
+     "computed": 2329.2,
+     "date": "1969-09-20",
+     "endOfYear": 2269
+    }
+   ]
+  }
+ }
+}

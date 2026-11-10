@@ -35,7 +35,8 @@ export default defineConfig(({ mode }) => ({
       includeAssets: PAGE_ICONS,
       workbox: {
         globPatterns: PRECACHE,
-        // The bundle is one ~1.7 MB chunk; past this the build fails rather than ship a worker without it.
+        // The first chunk (the game and football's players) is about 1.8 MB; past this the build fails rather than ship a
+        // worker without it. Every other sport's players are a chunk of their own (src/sports/sportData.lazy.js).
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         // The first install takes control of the open page, so what it loads next is cached for offline play. A
         // new version still waits (no skipWaiting) until the prompt's Reload.

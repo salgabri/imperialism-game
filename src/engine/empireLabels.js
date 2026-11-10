@@ -6,6 +6,8 @@
 // stable geographic candidates, while the final padded text rectangle is
 // checked against the actual vector boundary (including holes and enclaves).
 
+import { createPairTable } from './pairTable.js';
+
 const EPS = 1e-7;
 const SQRT2 = Math.SQRT2;
 const MAX_CELLS = 14000;
@@ -14,9 +16,41 @@ const RECENT_GROUP_CACHE = 8;
 const FONT_HEIGHT = 1.5;
 const SIDE_PADDING = 0.16;
 const TRACKING = 0.085;
+// Names turn at most this many degrees either way from horizontal (angleOptions). boundsCanHold relies on the same
+// limit to rule out land too small for a name at any allowed angle, so the two must not drift apart.
+const MAX_ANGLE = 60;
 
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const keyPoint = p => `${p[0]},${p[1]}`;
+
+/**
+ * Dense ids for points, equal exactly when their keyPoint strings are, handed out in first-seen order. A point on the
+ * 0.1 grid (every painted ring is rounded so) is found by its tenths, a pair of integers, in a typed hash table; any
+ * other point by its string. The tenths give the number back exactly (gx / 10 === x), so equal tenths mean equal
+ * numbers and so equal strings, -0 meeting 0 as it does in the string. Equal points always take the same path, so
+ * the two kinds of key never need to meet. `expected` (the number of vertices) sizes the table once.
+ */
+function createPointIds(expected) {
+  const table = createPairTable(expected), strings = new Map();
+  let count = 0;
+  return {
+    get count() { return count; },
+    id(x, y) {
+      const gx = Math.round(x * 10), gy = Math.round(y * 10);
+      // Any 32-bit tenths, so the wide theatres (the Americas reach x = 2050) stay on the integer path too.
+      if (gx / 10 === x && gy / 10 === y && (gx | 0) === gx && (gy | 0) === gy) {
+        const id = table.id(gx, gy, count);
+        if (id === count) count++;
+        return id;
+      }
+      const key = `${x},${y}`;
+      let id = strings.get(key);
+      if (id === undefined) strings.set(key, id = count++);
+      return id;
+    },
+  };
+}
+
 const overlaps = (a, b) => a.x <= b.x + b.w + EPS && a.x + a.w + EPS >= b.x && a.y <= b.y + b.h + EPS && a.y + a.h + EPS >= b.y;
 
 function boundsOf(rings) {
@@ -201,14 +235,16 @@ function exteriorEdgesById(pieces) {
  * distinct keyPoint string over all the countries, so ownerComponents and exteriorEdges need no strings. A piece
  * whose edges do not line up with its rings gets none and keeps the string path.
  */
-function assignPointIds(countries) {
-  const ids = new Map(), space = { count: 0, first: null };
-  const idOf = p => {
-    const key = keyPoint(p);
-    let id = ids.get(key);
-    if (id === undefined) ids.set(key, id = ids.size);
-    return id;
-  };
+function assignPointIds(source) {
+  // The countries are read twice (to size the table, then to give the ids), so an iterator such as prepare's
+  // countries.values() is made a list first. A second pass over a spent iterator would give no piece its ids, and
+  // every later ownerComponents and exteriorEdges call would take the slow string path with the same results, so
+  // nothing but the point counts (pointStats) would show it.
+  const countries = [...source];
+  let vertices = 0;
+  for (const country of countries) for (const piece of country.pieces) for (const ring of piece.rings) vertices += ring.length;
+  const ids = createPointIds(vertices), space = { count: 0, first: null };
+  const idOf = p => ids.id(p[0], p[1]);
   for (const country of countries) for (const piece of country.pieces) {
     const vertexIds = new Int32Array(piece.rings.reduce((sum, ring) => sum + ring.length, 0));
     const edgeA = new Int32Array(piece.edges.length), edgeB = new Int32Array(piece.edges.length);
@@ -226,7 +262,17 @@ function assignPointIds(countries) {
     }
     if (e === piece.edges.length) piece.pointIds = { vertexIds, edgeA, edgeB, space };
   }
-  space.count = ids.size;
+  space.count = ids.count;
+}
+
+/** How many of the countries' pieces there are, how many carry point ids, and how many distinct points they hold. */
+function pointStats(countries) {
+  let pieces = 0, withIds = 0, points = 0;
+  for (const country of countries) for (const piece of country.pieces) {
+    pieces++;
+    if (piece.pointIds) { withIds++; points = piece.pointIds.space.count; }
+  }
+  return { pieces, withIds, points };
 }
 
 function touchingAtFlatBounds(a, b) {
@@ -266,7 +312,8 @@ function ownerComponents(countries, reusable = null) {
   }
   // Natural Earth's shared arcs already match exactly. The cheap bounds-only
   // fallback also handles rectangular custom fixtures without identical vertices.
-  for (let i = 0; i < pieces.length; i++) for (let j = i + 1; j < pieces.length; j++) {
+  // It only ever joins pieces of two different countries, so one country's pieces skip it.
+  if (countries.length > 1) for (let i = 0; i < pieces.length; i++) for (let j = i + 1; j < pieces.length; j++) {
     if (sets.find(i) !== sets.find(j) && pieces[i].countryId !== pieces[j].countryId && overlaps(pieces[i].bbox, pieces[j].bbox) && touchingAtFlatBounds(pieces[i], pieces[j])) sets.join(i, j);
   }
   const grouped = new Map();
@@ -275,15 +322,43 @@ function ownerComponents(countries, reusable = null) {
     if (!grouped.has(root)) grouped.set(root, []);
     grouped.get(root).push(pieces[i]);
   }
-  return [...grouped.values()].map(part => reusable?.get(part.map(p => p.id).sort().join('|'))
-    || { pieces: part, bbox: unionBounds(part.map(p => p.bbox)), edges: exteriorEdges(part) });
+  return [...grouped.values()].map(part => reusable?.get(part.map(p => p.id).sort().join('|')) || new Component(part));
+}
+
+/**
+ * One owner's connected pieces. Its exterior edges (shared borders between its pieces cancelled out) are found when
+ * first read: only a label validated on the component reads them (exactFootprint), a dozen of the thousand-odd
+ * components a world launch builds, and the territory index never does. By then the pieces have their point ids
+ * (prepare gives them first), so the edges come out as they would have at once. Every field is declared here, so all
+ * components share one shape; `edges` is a getter only and must never be assigned.
+ */
+class Component {
+  constructor(pieces) {
+    this.pieces = pieces;
+    this.bbox = unionBounds(pieces.map(p => p.bbox));
+    this.exterior = null;
+    this.key = null;
+    this.area = 0;
+    this.raster = null;
+  }
+
+  get edges() { return this.exterior || (this.exterior = exteriorEdges(this.pieces)); }
+}
+
+/**
+ * A component raster's cell size and grid: at most MAX_SIDE cells a side and about MAX_CELLS in all, plus a ring of
+ * sea cells all round. rasterize builds exactly this grid, and rasterMayClear and boundsCanHold reason about it before
+ * any raster exists, so all three take it from here.
+ */
+function rasterGrid(b) {
+  const cell = Math.max(Math.max(b.w, b.h) / MAX_SIDE, Math.sqrt(b.w * b.h / MAX_CELLS), 0.001);
+  return { cell, nx: Math.ceil(b.w / cell) + 2, ny: Math.ceil(b.h / cell) + 2 };
 }
 
 function rasterize(component) {
   const b = component.bbox;
   if (b.w <= EPS || b.h <= EPS) return null;
-  const cell = Math.max(Math.max(b.w, b.h) / MAX_SIDE, Math.sqrt(b.w * b.h / MAX_CELLS), 0.001);
-  const nx = Math.ceil(b.w / cell) + 2, ny = Math.ceil(b.h / cell) + 2;
+  const { cell, nx, ny } = rasterGrid(b);
   const x0 = b.x - cell, y0 = b.y - cell;
   const mask = new Uint8Array(nx * ny);
   const byCountry = new Map();
@@ -329,6 +404,8 @@ function rasterize(component) {
     }
   }
   if (!count) return null;
+  // A two-pass chamfer distance (steps 1 and √2) to the nearest sea cell. rasterProbes (CHAMFER_RATIO) and
+  // rasterMayClear rely on exactly this transform and on the sea ring round the grid.
   for (let y = 1; y < ny - 1; y++) for (let x = 1; x < nx - 1; x++) {
     const i = y * nx + x;
     if (mask[i]) distance[i] = Math.min(distance[i], distance[i - 1] + 1, distance[i - nx] + 1, distance[i - nx - 1] + SQRT2, distance[i - nx + 1] + SQRT2);
@@ -341,7 +418,7 @@ function rasterize(component) {
   let pca = Math.atan2(2 * (sxy / count - mx * my), sxx / count - mx * mx - (syy / count - my * my)) * 90 / Math.PI;
   if (pca > 90) pca -= 180;
   if (pca < -90) pca += 180;
-  pca = clamp(pca, -60, 60);
+  pca = clamp(pca, -MAX_ANGLE, MAX_ANGLE);
   // Land cells are exactly those at a positive distance (at least one cell), so the distances are the mask too.
   // Every visible component is ranked by its usable area, but only a few are searched for a label: the sea-cell
   // row sums and the candidate points are made when a search first needs them (emptyPrefixOf, candidatesOf).
@@ -365,39 +442,50 @@ function emptyPrefixOf(raster) {
 function candidatesOf(raster) {
   if (raster.candidates) return raster.candidates;
   const { nx, ny, cell, x0, y0, distance, count, mx, my, bbox: b } = raster;
-  // Cells by clearance, then centrality, then y and x: the order of one ranked object per cell, without the objects.
-  const cells = [];
-  for (let y = 1; y < ny - 1; y++) for (let x = 1; x < nx - 1; x++) if (distance[y * nx + x] > 0.9) cells.push(y * nx + x);
-  const n = cells.length, clear = new Float64Array(n), centrality = new Float64Array(n), cx = new Float64Array(n), cy = new Float64Array(n);
-  cells.forEach((i, k) => {
-    clear[k] = distance[i]; centrality[k] = Math.hypot(i % nx - mx, Math.floor(i / nx) - my);
-    cx[k] = x0 + (i % nx + 0.5) * cell; cy[k] = y0 + (Math.floor(i / nx) + 0.5) * cell;
-  });
-  // That order comes from a binary heap rather than a full sort, since the search below rarely reads a quarter of the
-  // cells. Ties left after y and x (if any) go by position in `cells`, as a stable sort leaves them.
-  const before = (p, q) => (clear[q] - clear[p] || centrality[p] - centrality[q] || cy[p] - cy[q] || cx[p] - cx[q] || p - q) < 0;
-  const heap = new Int32Array(n);
-  for (let k = 0; k < n; k++) heap[k] = k;
-  const sift = (k, size) => {
-    for (;;) {
-      const left = 2 * k + 1, right = left + 1;
-      let best = k;
-      if (left < size && before(heap[left], heap[best])) best = left;
-      if (right < size && before(heap[right], heap[best])) best = right;
-      if (best === k) return;
-      const swap = heap[k]; heap[k] = heap[best]; heap[best] = swap;
-      k = best;
-    }
-  };
-  for (let k = (n >> 1) - 1; k >= 0; k--) sift(k, n);
-  const candidates = [];
+  // Land cells are taken by clearance, then centrality, then y and x, and kept when no cell already kept lies within
+  // the spacing; the first 28 kept are the candidates. Rather than ranking every land cell (most are never reached),
+  // cells are counted into buckets of a quarter cell of clearance and a bucket is sorted only when the search reaches
+  // it, highest first. Bucket order follows clearance, so the order is the same. Each kept cell marks every cell
+  // centred within the spacing of it, with the same centres and distance test the search made of each later cell.
   const spacing = Math.max(cell * 3, Math.sqrt(count) * cell * 0.09);
-  for (let size = n; size > 0 && candidates.length < 28;) {
-    const k = heap[0];
-    heap[0] = heap[--size];
-    sift(0, size);
-    const x = cx[k], y = cy[k];
-    if (candidates.every(p => Math.hypot(p.x - x, p.y - y) >= spacing)) candidates.push({ x, y, clearance: clear[k] * cell, record: null });
+  let top = 0;
+  for (let y = 1; y < ny - 1; y++) for (let x = 1; x < nx - 1; x++) if (distance[y * nx + x] > top) top = distance[y * nx + x];
+  // Clearances are float32 path lengths of at most about a hundred cells, so there are a few hundred buckets at most.
+  const buckets = Math.floor(top * 4) + 1, start = new Int32Array(buckets + 1);
+  for (let y = 1; y < ny - 1; y++) for (let x = 1; x < nx - 1; x++) {
+    const d = distance[y * nx + x];
+    if (d > 0.9) start[Math.floor(d * 4) + 1]++;
+  }
+  for (let k = 0; k < buckets; k++) start[k + 1] += start[k];
+  // A counting sort: each bucket's cells in row-major order.
+  const order = new Int32Array(start[buckets]), next = start.slice(0, buckets);
+  for (let y = 1; y < ny - 1; y++) for (let x = 1; x < nx - 1; x++) {
+    const d = distance[y * nx + x];
+    if (d > 0.9) order[next[Math.floor(d * 4)]++] = y * nx + x;
+  }
+  const candidates = [], near = new Uint8Array(nx * ny), reach = Math.ceil(spacing / cell) + 1;
+  for (let bucket = buckets - 1; bucket >= 0 && candidates.length < 28; bucket--) {
+    const free = [];
+    for (let j = start[bucket]; j < start[bucket + 1]; j++) {
+      const i = order[j];
+      if (!near[i]) free.push({ i, clear: distance[i], centrality: Math.hypot(i % nx - mx, Math.floor(i / nx) - my) });
+    }
+    // A cell's centre y and x rise strictly with its row and column, so ordering ties by row and column orders them
+    // by centre y and x.
+    free.sort((p, q) => q.clear - p.clear || p.centrality - q.centrality || Math.floor(p.i / nx) - Math.floor(q.i / nx) || p.i % nx - q.i % nx);
+    for (const { i, clear } of free) {
+      if (candidates.length >= 28) break;
+      if (near[i]) continue;
+      const gx = i % nx, gy = Math.floor(i / nx), x = x0 + (gx + 0.5) * cell, y = y0 + (gy + 0.5) * cell;
+      candidates.push({ x, y, clearance: clear * cell, record: null });
+      // Cells further than `reach` away are more than a whole cell beyond the spacing.
+      for (let ty = Math.max(0, gy - reach), yEnd = Math.min(ny - 1, gy + reach); ty <= yEnd; ty++) {
+        for (let tx = Math.max(0, gx - reach), xEnd = Math.min(nx - 1, gx + reach); tx <= xEnd; tx++) {
+          const t = ty * nx + tx;
+          if (!near[t] && Math.hypot(x - (x0 + (tx + 0.5) * cell), y - (y0 + (ty + 0.5) * cell)) < spacing) near[t] = 1;
+        }
+      }
+    }
   }
   // Include unsnapped centers when they are genuinely on land; grid rounding
   // should not push an otherwise symmetric horizontal name toward one edge.
@@ -459,13 +547,21 @@ function rasterFits(raster, x, y, angle, width, fontSize, curveRise = 0, footpri
   return true;
 }
 
-function edgeInsideRectangle(edge, footprint) {
+/**
+ * A footprint's own frame (corner p0, side lengths and unit axes), worked out once for all the edges tested against
+ * it rather than once per edge (two square roots and four divisions each).
+ */
+function rectangleAxes(footprint) {
   const [p0, p1, , p3] = footprint;
   const w = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]), h = Math.hypot(p3[0] - p0[0], p3[1] - p0[1]);
-  const ux = (p1[0] - p0[0]) / w, uy = (p1[1] - p0[1]) / w;
-  const vx = (p3[0] - p0[0]) / h, vy = (p3[1] - p0[1]) / h;
-  const ax = (edge.a[0] - p0[0]) * ux + (edge.a[1] - p0[1]) * uy;
-  const ay = (edge.a[0] - p0[0]) * vx + (edge.a[1] - p0[1]) * vy;
+  return { px: p0[0], py: p0[1], w, h, ux: (p1[0] - p0[0]) / w, uy: (p1[1] - p0[1]) / w, vx: (p3[0] - p0[0]) / h, vy: (p3[1] - p0[1]) / h };
+}
+
+/** The part of the edge strictly inside the footprint (EPS in from its sides), as [lo, hi] along the edge, or null. */
+function edgeInsideAxes(edge, axes) {
+  const { px, py, w, h, ux, uy, vx, vy } = axes;
+  const ax = (edge.a[0] - px) * ux + (edge.a[1] - py) * uy;
+  const ay = (edge.a[0] - px) * vx + (edge.a[1] - py) * vy;
   const dx = (edge.b[0] - edge.a[0]) * ux + (edge.b[1] - edge.a[1]) * uy;
   const dy = (edge.b[0] - edge.a[0]) * vx + (edge.b[1] - edge.a[1]) * vy;
   let lo = 0, hi = 1;
@@ -487,11 +583,12 @@ function exactFootprint(group, footprint, component = null) {
   if (!footprint.every(([x, y]) => containsCountries(group.countries, x, y))) return false;
   const bbox = boundsOf([footprint]);
   const parts = component ? [component] : group.components;
+  let axes = null;
   for (const part of parts) {
     if (!overlaps(part.bbox, bbox)) continue;
     for (const edge of part.edges) {
       if (!edgeOverlaps(edge, bbox)) continue;
-      const interval = edgeInsideRectangle(edge, footprint);
+      const interval = edgeInsideAxes(edge, axes ||= rectangleAxes(footprint));
       if (!interval) continue;
       const dx = edge.b[0] - edge.a[0], dy = edge.b[1] - edge.a[1], len = Math.hypot(dx, dy);
       const epsilon = Math.max(0.00001, 8 * EPS / len);
@@ -547,6 +644,7 @@ function coastalRasterFits(raster, bbox, footprint, allowance, maxSeaFraction) {
 
 function foreignLandIntersects(foreignCountries, footprint) {
   const bbox = boundsOf([footprint]);
+  let axes = null;
   for (const country of foreignCountries) {
     if (!overlaps(country.bbox, bbox)) continue;
     if (footprint.some(([x, y]) => countryWinding(country, x, y))) return true;
@@ -554,7 +652,7 @@ function foreignLandIntersects(foreignCountries, footprint) {
     // Inspect every relevant vector edge, including edges wholly in the band.
     for (const piece of country.pieces) {
       if (!overlaps(piece.bbox, bbox)) continue;
-      for (const edge of piece.edges) if (edgeOverlaps(edge, bbox) && edgeInsideRectangle(edge, footprint)) return true;
+      for (const edge of piece.edges) if (edgeOverlaps(edge, bbox) && edgeInsideAxes(edge, axes ||= rectangleAxes(footprint))) return true;
     }
   }
   return false;
@@ -694,7 +792,7 @@ function coastalFootprint(group, foreignCountries, footprint, allowance, maxSeaF
 }
 
 function angleOptions(pca) {
-  return [...new Set([0, pca, pca - 15, pca + 15, -30, 30, -45, 45, -60, 60].map(angle => Math.round(clamp(angle, -60, 60) * 10) / 10))];
+  return [...new Set([0, pca, pca - 15, pca + 15, -30, 30, -45, 45, -60, 60].map(angle => Math.round(clamp(angle, -MAX_ANGLE, MAX_ANGLE) * 10) / 10))];
 }
 
 // A proven ceiling on rasterFits, so hopeless sizes are never scanned. rasterFits
@@ -718,16 +816,29 @@ function pointRecord(raster, point) {
   return record;
 }
 
+// rasterize's distance transform (two passes with steps 1 and √2, inside a ring of sea cells) gives each land cell the
+// length of its shortest 8-connected path to a sea cell. Such a path is at most √(4 − 2√2) = 1.082392 times the
+// straight distance between its ends, so every cell centred within distance / 1.082392 cells of a land cell is land
+// too. The ratio is rounded up to cover float32 rounding over a hundred steps. Tied to that transform: if it changes
+// (other steps, no sea ring), rasterProbes' skip must go.
+const CHAMFER_RATIO = 1.0825;
+
 function rasterProbes(raster, record) {
   if (record.probes) return record.probes;
   const found = record.probes = [];
-  const { x, y } = record, { nx, ny, cell, x0, y0 } = raster;
+  const { x, y } = record, { nx, ny, cell, x0, y0, distance } = raster;
   for (let ray = 0; ray < PROBE_RAYS; ray++) {
     const theta = 2 * Math.PI * ray / PROBE_RAYS, dx = Math.cos(theta) * cell / 2, dy = Math.sin(theta) * cell / 2;
     for (let step = 1; ; step++) {
       const gx = Math.floor((x + dx * step - x0) / cell), gy = Math.floor((y + dy * step - y0) / cell);
       if (gx < 0 || gy < 0 || gx >= nx || gy >= ny) break;
-      if (!landCell(raster, gy * nx + gx)) { found.push(x0 + (gx + 0.5) * cell - x, y0 + (gy + 0.5) * cell - y); break; }
+      const clear = distance[gy * nx + gx];
+      if (!(clear > 0)) { found.push(x0 + (gx + 0.5) * cell - x, y0 + (gy + 0.5) * cell - y); break; }
+      // Samples are half a cell apart, and one n steps on lies within n / 2 + √2 cells of this cell's centre: those
+      // proven land by the distance (CHAMFER_RATIO) are not looked up, with half a cell to spare. The samples still
+      // looked at are the same ones, so the first sea cell on each ray is the same.
+      const skip = Math.floor(2 * (clear / CHAMFER_RATIO - SQRT2)) - 1;
+      if (skip > 0) step += skip;
     }
   }
   return found;
@@ -848,11 +959,24 @@ function buildClearanceTable(raster, margin) {
   return table;
 }
 
+/**
+ * Whether any cell of the component's raster, as rasterize would build it, could be `margin` clear of the sea. The
+ * grid's outer rows and columns are sea and each distance pass adds at most one per cell, so no distance exceeds half
+ * the narrower side in cells (exactly so in float32: these are whole numbers).
+ */
+function rasterMayClear(b, margin) {
+  if (b.w <= EPS || b.h <= EPS) return false;
+  const { cell, nx, ny } = rasterGrid(b);
+  return Math.floor((Math.min(nx, ny) - 1) / 2) * cell >= margin;
+}
+
 function visibleUsableArea(component, view, minSize) {
+  const margin = minSize * FONT_HEIGHT / 2;
+  // Land too narrow for the margin has no usable cell anywhere: it is not rasterized only to count none.
+  if (!component.raster && !rasterMayClear(component.bbox, margin)) return 0;
   const raster = component.raster || (component.raster = rasterize(component));
   if (!raster) return 0;
   component.area = raster.area;
-  const margin = minSize * FONT_HEIGHT / 2;
   const x0 = clamp(Math.ceil((view.x + margin - raster.x0) / raster.cell - 0.5), 0, raster.nx);
   const x1 = clamp(Math.ceil((view.x + view.w - margin - raster.x0) / raster.cell - 0.5), 0, raster.nx);
   const y0 = clamp(Math.ceil((view.y + margin - raster.y0) / raster.cell - 0.5), 0, raster.ny);
@@ -958,7 +1082,7 @@ function someEdgeIn(country, box, visit) {
   return false;
 }
 
-/** Does a foreign edge pass within `radius` of (x, y), keeping its clipped run well above edgeInsideRectangle's EPS? */
+/** Does a foreign edge pass within `radius` of (x, y), keeping its clipped run well above edgeInsideAxes's EPS? */
 function foreignEdgeNear(countries, x, y, radius) {
   if (!(radius > 0)) return false;
   const box = { x: x - radius, y: y - radius, w: 2 * radius, h: 2 * radius };
@@ -970,13 +1094,26 @@ function foreignEdgeNear(countries, x, y, radius) {
   }));
 }
 
-/** Does a foreign edge run through the footprint's interior, clearly beyond EPS? */
-function foreignEdgeCrosses(countries, footprint) {
-  const box = boundsOf([footprint]);
-  return countries.some(country => someEdgeIn(country, box, edge => {
-    const interval = edgeInsideRectangle(edge, footprint);
-    return !!interval && interval[1] - interval[0] > 4 * EPS;
-  }));
+/** Does this edge run through the footprint's interior (its axes), clearly beyond EPS? */
+function edgeCrossesInside(edge, axes) {
+  const interval = edgeInsideAxes(edge, axes);
+  return !!interval && interval[1] - interval[0] > 4 * EPS;
+}
+
+/**
+ * Does a foreign edge run through the footprint's interior, clearly beyond EPS? The `likely` edges are tried first,
+ * and a crossing edge the full search finds is added to them. A likely edge that crosses the footprint has a stretch
+ * strictly inside it, so the full search, which visits every grid cell under the footprint's bounds, would have found
+ * it (or another) as well: the answer is the same, found sooner. Only edges of `countries` may be in `likely`.
+ */
+function foreignEdgeCrosses(countries, footprint, likely) {
+  const box = boundsOf([footprint]), axes = rectangleAxes(footprint);
+  // someEdgeIn's own test first, as the full search makes it.
+  for (const edge of likely) if (edgeOverlaps(edge, box) && edgeCrossesInside(edge, axes)) return true;
+  let found = null;
+  countries.some(country => someEdgeIn(country, box, edge => edgeCrossesInside(edge, axes) && !!(found = edge)));
+  if (found) likely.push(found);
+  return !!found;
 }
 
 // Every coastal footprint the layout tries for a pair is centred on its point,
@@ -995,7 +1132,11 @@ function coastalBlocked(component, definition, options, previous, foreign, group
   // The verdicts depend on this geometry, the size and the foreign land, so pans reuse them. The component may serve
   // several territory groups (see prepare), each with its own foreign land: they are kept per group.
   const key = `${groupUid}|${size}|${widthEm}|${curveRatio}`;
+  // Nearly every call ends with every pair blocked, mostly by the same few foreign edges: an edge that crosses one
+  // pair's core usually crosses the next angle's and the next point's too. Those found are tried first (`likely`,
+  // edges of `near` only, kept for this call alone), which changes how soon a verdict is found, never the verdict.
   let near = null, point = null, aroundPoint = false;
+  const likely = [];
   for (const { candidate, angle, angleIndex } of pairs) {
     const record = pointRecord(raster, candidate);
     const blocked = scaleCache(record, 'blocked', key, () => []);
@@ -1004,7 +1145,7 @@ function coastalBlocked(component, definition, options, previous, foreign, group
       // An edge inside the core's inscribed circle settles every angle at once.
       if (candidate !== point) { point = candidate; aroundPoint = foreignEdgeNear(near, candidate.x, candidate.y, inner - margin); }
       const width = widthEm * size;
-      blocked[angleIndex] = aroundPoint || foreignEdgeCrosses(near, labelFootprint(candidate.x, candidate.y, angle, width, size, width * curveRatio));
+      blocked[angleIndex] = aroundPoint || foreignEdgeCrosses(near, labelFootprint(candidate.x, candidate.y, angle, width, size, width * curveRatio), likely);
     }
     if (!blocked[angleIndex]) return false;
   }
@@ -1070,7 +1211,34 @@ function* componentCandidates(component, definition, options, previous, coastal 
   }
 }
 
+const MAX_TURN_COS = Math.cos(MAX_ANGLE * Math.PI / 180), MAX_TURN_SIN = Math.sin(MAX_ANGLE * Math.PI / 180);
+
+/**
+ * Whether the component's bounds can hold the name's smallest footprint (minimum size, no arch) at some allowed angle,
+ * once padded by everything a fit may reach beyond them: a raster cell (a strict fit's corners lie in land cells, half
+ * a cell at most outside the bounds) and the coastal allowance (a coastal fit's samples lie within it). Every fit any
+ * search below accepts is at least that footprint at an angle within ±MAX_ANGLE, so when this fails, none can be found.
+ * The footprint's half extents along x and y (hw·cos + hh·sin and hw·sin + hh·cos) are concave in the angle up to 90°,
+ * so their least values over the allowed angles are at 0 and MAX_ANGLE. The padding and the 1e-9 cover rounding.
+ */
+function boundsCanHold(component, definition, options) {
+  const b = component.bbox;
+  if (!(b.w > EPS && b.h > EPS)) return false;
+  // candidatePairs' width of the name.
+  const characters = Math.max(1, [...definition.text].length);
+  const advance = Number.isFinite(definition.widthEm) && definition.widthEm > 0 ? definition.widthEm : characters * 0.72;
+  const widthEm = advance + Math.max(0, characters - 1) * (characters > 1 ? options.trackingEm ?? TRACKING : 0);
+  const size = options.minFontPx * options.unitsPerPixel;
+  const halfWidth = size * (widthEm / 2 + SIDE_PADDING), halfHeight = size * FONT_HEIGHT / 2;
+  const pad = rasterGrid(b).cell + (options.coastalAllowancePx > 0 ? options.coastalAllowancePx * options.unitsPerPixel : 0) + 1e-6;
+  const alongX = Math.min(halfWidth, halfWidth * MAX_TURN_COS + halfHeight * MAX_TURN_SIN);
+  const alongY = Math.min(halfHeight, halfWidth * MAX_TURN_SIN + halfHeight * MAX_TURN_COS);
+  return alongX <= (b.w / 2 + pad) * (1 + 1e-9) && alongY <= (b.h / 2 + pad) * (1 + 1e-9);
+}
+
 function strictComponentLabel(component, definition, options, previous, accepts) {
+  // Covers the gentler arch's pass as well, which comes through here.
+  if (!boundsCanHold(component, definition, options)) return null;
   for (const candidate of first(componentCandidates(component, definition, options, previous), 36)) {
     if (accepts(candidate.footprint, component)) return candidate;
     // Coarse raster may slightly overestimate coastline clearance. Retry safely
@@ -1100,8 +1268,13 @@ function strictComponentLabel(component, definition, options, previous, accepts)
  */
 export function createTerritoryComponentIndex(countryShapes = []) {
   const countries = countryShapes.map(makeCountry).filter(Boolean).sort((a, b) => a.id.localeCompare(b.id));
+  // Point ids let ownerComponents join pieces at shared vertices by number rather than by "x,y" strings: the same
+  // joins in the same order. The components' exterior edges are never read here, so they are never found.
+  assignPointIds(countries);
   let lastKey = null, lastComponents = [];
   return {
+    /** Land pieces, how many carry point ids, and the distinct points (diagnostics and tests; see the label engine's). */
+    pointStats: () => pointStats(countries),
     components(ownership = {}) {
       const byOwner = new Map();
       for (const country of countries) {
@@ -1355,7 +1528,10 @@ export function createEmpireLabelEngine(countryShapes = []) {
         // Area creates a bounded shortlist, not the final winner: the best
         // legible name on the continent should beat a smaller name squeezed
         // into a broad but awkward visible corner of an overseas possession.
-        const rankedComponents = group.components.filter(component => overlaps(component.bbox, viewBox) && component.bbox.w * component.bbox.h >= (labelOptions.minFontPx * unitsPerPixel) ** 2)
+        const visible = group.components.filter(component => overlaps(component.bbox, viewBox) && component.bbox.w * component.bbox.h >= (labelOptions.minFontPx * unitsPerPixel) ** 2);
+        // When no visible landmass can hold even the smallest name, no pass below can place it: nothing is ranked,
+        // so nothing is rasterized for it.
+        const rankedComponents = (visible.some(component => boundsCanHold(component, definition, labelOptions)) ? visible : [])
           .map(component => ({ component, score: visibleUsableArea(component, viewBox, labelOptions.minFontPx * unitsPerPixel) }))
           .filter(item => item.score > 0)
           .sort((a, b) => b.score - a.score || a.component.key.localeCompare(b.component.key));
@@ -1381,6 +1557,7 @@ export function createEmpireLabelEngine(countryShapes = []) {
         // that otherwise cannot fit, never as an automatic text-size boost.
         if (labelOptions.coastalAllowancePx > 0 && labelOptions.maxSeaFraction > 0 && !chosen) {
           for (const { component, score: visibleArea } of shortlist) {
+            if (!boundsCanHold(component, definition, labelOptions)) continue;
             if (coastalBlocked(component, definition, labelOptions, previous, foreignCountries, group.uid)) continue;
             let componentLabel = null;
             for (const candidate of first(componentCandidates(component, definition, labelOptions, previous, true), 24)) {
@@ -1435,5 +1612,11 @@ export function createEmpireLabelEngine(countryShapes = []) {
       if (!(coastalAllowancePx > 0 && unitsPerPixel > 0)) return exactFootprint(group, footprint);
       return !!coastalFootprint(group, foreignOf(group), footprint, coastalAllowancePx * unitsPerPixel, clamp(maxSeaFraction, 0, 0.22));
     },
+    /**
+     * Land pieces, how many carry point ids, and the distinct points (diagnostics and tests). The first layout gives
+     * every piece its ids; a piece without them takes a slower string path to the same labels, so only these counts
+     * show it.
+     */
+    pointStats: () => pointStats(countries.values()),
   };
 }

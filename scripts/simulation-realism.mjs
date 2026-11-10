@@ -1,5 +1,7 @@
 // Plays whole league seasons with the built-in clubs, each of football's five leagues whole (leagueClubs), and
 // measures what a fan of each league would look at: scores, draws and overtime, margins, standings, and who scores.
+// Tennis has no league: its nations play Davis Cup ties (the women's game's, Billie Jean King Cup ties), the sixteen
+// strongest each meeting every other once a season.
 // Each measure sits beside the real league's figure (REAL below, with its seasons). The defender of each fixture is
 // its home side: at a neutral venue, as campaigns play by default, or at home with `--home` (the Home advantage
 // launch rule).
@@ -13,12 +15,16 @@ import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
-import { buildClub, hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
+import { buildClub, buildTeam, hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
 import { football } from '../src/sports/football.js';
 import { BENCH, euroleagueBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
 import { americanFootball } from '../src/sports/americanFootball.js';
 import { baseball } from '../src/sports/baseball.js';
 import { hockey, PERIOD_MODEL } from '../src/sports/hockey.js';
+import { tennis } from '../src/sports/tennis.js';
+import { womensTennis } from '../src/sports/womensTennis.js';
+import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
+import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugbyLeague.js';
 
 const DRAMA = 6; // Balanced
 
@@ -35,15 +41,22 @@ function roundRobin(n) {
   return rounds;
 }
 
-/** `games` rounds for each team, cycling the round robin (a second cycle swaps the sides), teams shuffled per season. */
+/**
+ * `games` rounds for each team, cycling the round robin (a second cycle swaps the sides), teams shuffled per season. An
+ * odd number of teams (the NRL's 17) adds a bye: each round one team sits out, as in the NRL.
+ */
 function schedule(n, games, rng) {
-  const order = [...Array(n).keys()];
-  for (let i = n - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-  const rounds = roundRobin(n);
+  const slots = n % 2 ? n + 1 : n;
+  const order = [...Array(slots).keys()];
+  for (let i = slots - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  const rounds = roundRobin(slots);
   const fixtures = [];
   for (let g = 0; g < games; g++) {
     const flip = Math.floor(g / rounds.length) % 2 === 1;
-    for (const [a, b] of rounds[g % rounds.length]) fixtures.push(flip ? [order[b], order[a]] : [order[a], order[b]]);
+    for (const [a, b] of rounds[g % rounds.length]) {
+      if (order[a] >= n || order[b] >= n) continue;
+      fixtures.push(flip ? [order[b], order[a]] : [order[a], order[b]]);
+    }
   }
   return fixtures;
 }
@@ -347,6 +360,84 @@ function nhlSeason(seasons, seed, venue) {
   };
 }
 
+// ---- Tennis (Davis Cup, Billie Jean King Cup) -------------------------------------------------------------------
+
+/** The field: the sixteen strongest nations of a tennis sport (the men's, unless told), about a World Group's worth. */
+export function davisCupField(count = 16, sport = tennis) {
+  const rng = makeRng(1);
+  return Object.keys(sport.rosters).map(id => buildTeam(id, rng, sport)).sort((a, b) => b.str - a.str).slice(0, count);
+}
+
+function davisCup(seasons, seed, venue, sport = tennis) {
+  const nations = davisCupField(16, sport);
+  const { played } = playSeasons({ sport, teams: nations, games: nations.length - 1, seasons, seed, venue });
+  // Each rubber's sets, from its deciding event's score ("6–4 3–6 7–6(5)"); a walkover has none.
+  const rubbers = played.flatMap(g => g.ev.filter(e => e.pts > 0 && e.score !== 'w/o').map(e => e.score.split(' ')));
+  const sets = rubbers.flat();
+  const score = (w, l) => share(played, g => Math.max(g.ga, g.gd) === w && Math.min(g.ga, g.gd) === l);
+  return {
+    nations: nations.length,
+    ties: played.length,
+    sweep: score(3, 0), threeOne: score(3, 1), decider: score(3, 2),
+    threeSets: share(rubbers, r => r.length === 3),
+    tiebreakSets: share(sets, set => set.includes('(')),
+    bagels: share(sets, set => /^6–0/.test(set)),
+    favourite: favouriteRecord(played),
+    homeWins: share(played, g => g.winner === g.j),
+  };
+}
+
+// ---- Rugby league (NRL) ---------------------------------------------------------------------------------------
+
+/** Rounds a season: the NRL's 17 clubs play 24 games each, a bye in each round, as 26 rounds of this schedule give. */
+const NRL_ROUNDS = 26;
+const NRL_GAMES = 24;
+
+export function nrlSeason(seasons, seed, venue) {
+  const clubs = NRL_CLUBS.map(c => buildClub(c, rugbyLeague));
+  const { played, tables } = playSeasons({ sport: rugbyLeague, teams: clubs, games: NRL_ROUNDS, seasons, seed, venue });
+  const teamPoints = played.flatMap(g => [g.ga, g.gd]);
+  const margins = played.map(g => Math.abs(g.ga - g.gd));
+  const regulation = played.filter(g => !g.tie);
+  // Each player's place: the thirteen by position, the interchange as the bench, as NRL.com's team lists count them.
+  const positions = new Map(clubs.map(c => {
+    const { starters, bench } = onField(selectLineup(c));
+    return [c.id, new Map([...starters.map(slot => [slot.player.name, slot.position]), ...bench.map(slot => [slot.player.name, 'BENCH'])])];
+  }));
+  const events = played.flatMap(g => g.ev);
+  const tries = events.filter(e => scoreKind(e) === 'try' && e.m <= SLICE_MODEL.MINUTES);
+  const tryShares = {};
+  for (const e of tries) {
+    const position = positions.get(e.tid).get(e.name) || 'other';
+    tryShares[position] = (tryShares[position] || 0) + 1 / tries.length;
+  }
+  const firstHalf = events.filter(e => e.m <= SLICE_MODEL.HALF).reduce((s, e) => s + e.pts, 0);
+  // Win percentages and records by games played: the byes leave each club a game or two either side of 24.
+  const spreads = [], best = [], worst = [];
+  for (const { table } of tables) {
+    const values = table.map(t => (t.w + t.d / 2) / Math.max(1, t.w + t.d + t.l));
+    spreads.push(sd(values));
+    best.push(Math.max(...values) * NRL_GAMES);
+    worst.push(Math.min(...values) * NRL_GAMES);
+  }
+  return {
+    clubs: clubs.length,
+    pointsPerTeam: mean(teamPoints), teamPointsSd: sd(teamPoints),
+    triesPerTeam: tries.length / teamPoints.length,
+    conversionRate: tries.filter(e => e.pts === 6).length / Math.max(1, tries.length),
+    penaltyGoalsPerTeam: events.filter(e => scoreKind(e) === 'penalty' && e.m <= SLICE_MODEL.MINUTES).length / teamPoints.length,
+    fieldGoalsPerGame: events.filter(e => scoreKind(e) === 'field').length / played.length,
+    goldenPoint: share(played, g => g.tie),
+    marginMean: mean(margins), withinSix: share(margins, m => m > 0 && m <= 6), withinTwelve: share(margins, m => m > 0 && m <= 12),
+    byThirteenPlus: share(margins, m => m >= 13), byTwentyFivePlus: share(margins, m => m >= 25), byOne: share(margins, m => m === 1),
+    nilRate: share(teamPoints, p => p === 0), fortyPlusRate: share(teamPoints, p => p >= 40),
+    firstHalfShare: firstHalf / Math.max(1, events.reduce((s, e) => s + e.pts, 0)),
+    homeWins: share(played, g => g.winner === g.j),
+    winPctSd: mean(spreads), bestWins: mean(best), worstWins: mean(worst),
+    favourite: favouriteRecord(played), tryShares, regulationShare: regulation.length / played.length,
+  };
+}
+
 // ---- Real leagues ---------------------------------------------------------------------------------------------
 
 /**
@@ -416,6 +507,40 @@ export const REAL = Object.freeze({
     // est.: 15.2% of the 2025/26 goals of the players on today's rosters.
     defenderGoals: [0.14, 0.17],
   },
+  davisCup: {
+    note: 'Davis Cup World Group and play-off ties 2003–2016 and the ATP tour, as Tennis Abstract (Jeff Sackmann) measured them',
+    // Hosts won 60.9% of 322 ties where Elo expected 53.1%, 7.8 points more, the field's favourites hosting about as often
+    // as not.
+    homeWins: [0.55, 0.62],
+    // About 35% of the ATP's best-of-three matches go to a third set (36% in 2014, 35% in 2023), a mix of matchups
+    // unlike a Davis Cup field's, so reported only.
+    tourThreeSets: 0.35,
+    // The ATP's tour-level best-of-three matches 2022–2025 in Jeff Sackmann's match files (9,454 completed, computed
+    // 2026-11-08): 35.9% to a third set, 19.1% of the sets to a tie-break, 2.0% won 6–0. Reported beside the model's.
+    tourTiebreakSets: 0.191, tourBagels: 0.02,
+  },
+  billieJeanKingCup: {
+    note: 'the WTA tour\'s best-of-three matches 2022–2025 in Jeff Sackmann\'s match files, 10,229 completed, computed '
+      + '2026-11-08; no study of the cup\'s hosts was found, so the hosts\' range is the Davis Cup\'s',
+    homeWins: [0.55, 0.62],
+    // A mix of matchups unlike a Billie Jean King Cup field's, so reported only: 33.7% of the matches to a third set
+    // (35.8% between two top-20 players, the ATP's 36.1%), 11.1% of the sets to a tie-break, 5.0% won 6–0.
+    tourThreeSets: 0.337, tourTiebreakSets: 0.111, tourBagels: 0.05,
+  },
+  nrl: {
+    note: "NRL regular seasons 2021–2025, computed 2026-11-08 from every game in NRL.com's draw and match centre "
+      + '(scripts/lib/nrl-seasons.mjs)',
+    pointsPerTeam: [21.6, 23.5], teamPointsSd: [11.6, 13.0], triesPerTeam: [3.8, 4.11], conversionRate: [0.738, 0.766],
+    penaltyGoalsPerTeam: [0.375, 0.444], fieldGoalsPerGame: [0.083, 0.198],
+    // Level after eighty minutes: 1.6% of 2021's games, 3.6% of 2022's and 4.9% of each season since.
+    goldenPoint: [0.016, 0.049],
+    marginMean: [14.6, 18.3], withinSix: [0.219, 0.338], withinTwelve: [0.391, 0.539], byThirteenPlus: [0.456, 0.609],
+    byTwentyFivePlus: [0.181, 0.302], byOne: [0.034, 0.069], nilRate: [0.01, 0.036], fortyPlusRate: [0.078, 0.128],
+    firstHalfShare: [0.481, 0.501], homeWins: [0.536, 0.589], winPctSd: [0.154, 0.223], bestWins: [18, 21], worstWins: [3, 6],
+    // 2023–2025, by the scorer's place in the team list.
+    tryShares: { WG: [0.292, 0.3], CE: [0.155, 0.184], FB: [0.086, 0.114], SR: [0.104, 0.111], FE: [0.062, 0.066],
+      HB: [0.048, 0.054], PR: [0.038, 0.04], HK: [0.029, 0.034], LK: [0.015, 0.025], BENCH: [0.111, 0.134] },
+  },
 });
 
 const row = (label, value, range, format = num) => {
@@ -436,6 +561,9 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`), venue),
     mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`), venue),
     nhl: nhlSeason(seasons, hashStr(`${seed}:nhl`), venue),
+    davisCup: davisCup(seasons, hashStr(`${seed}:davis-cup`), venue),
+    billieJeanKingCup: davisCup(seasons, hashStr(`${seed}:billie-jean-king-cup`), venue, womensTennis),
+    nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
   };
 }
 
@@ -548,6 +676,47 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
   lines.push(row('favourite wins', h.favourite.wins, rh.favouriteWins, pct));
   lines.push(row('top scorer (goals)', h.topScorer, rh.topScorer, x => num(x, 0)));
   lines.push(row('goals by defenders', h.defenderGoals, rh.defenderGoals, pct));
+  for (const [cup, t, rt, tour] of [['Davis Cup', report.davisCup, REAL.davisCup, 'ATP'],
+    ['Billie Jean King Cup', report.billieJeanKingCup, REAL.billieJeanKingCup, 'WTA']]) {
+    lines.push(`\n${cup} — the ${t.nations} strongest nations, ${t.ties} ties (real: ${rt.note})`);
+    lines.push(row('ties won 3–0', t.sweep, null, pct));
+    lines.push(row('ties won 3–1', t.threeOne, null, pct));
+    lines.push(row('ties won 3–2', t.decider, null, pct));
+    lines.push(row('rubbers to a third set', t.threeSets, null, pct));
+    lines.push(`      (the ${tour} tour's best-of-three matches: about ${pct(rt.tourThreeSets)}, a different mix of matchups)`);
+    lines.push(row('sets decided in a tie-break', t.tiebreakSets, null, pct));
+    lines.push(`      (the ${tour} tour's sets: ${pct(rt.tourTiebreakSets)})`);
+    lines.push(row('sets won 6–0', t.bagels, null, pct));
+    lines.push(`      (the ${tour} tour's sets: ${pct(rt.tourBagels)})`);
+    lines.push(row('favourite wins', t.favourite.wins, null, pct));
+    lines.push(row('host (defending) side wins', t.homeWins, rt.homeWins, pct));
+  }
+  const r = report.nrl, rr = REAL.nrl;
+  lines.push(`\nNRL — ${r.clubs} clubs, ${NRL_GAMES} games (real: ${rr.note})`);
+  lines.push(row('points a team', r.pointsPerTeam, rr.pointsPerTeam, x => num(x, 1)));
+  lines.push(row('team points SD', r.teamPointsSd, rr.teamPointsSd, x => num(x, 1)));
+  lines.push(row('tries a team', r.triesPerTeam, rr.triesPerTeam));
+  lines.push(row('conversions made', r.conversionRate, rr.conversionRate, pct));
+  lines.push(row('penalty goals a team', r.penaltyGoalsPerTeam, rr.penaltyGoalsPerTeam));
+  lines.push(row('field goals a game', r.fieldGoalsPerGame, rr.fieldGoalsPerGame, x => num(x, 3)));
+  lines.push(row('golden point', r.goldenPoint, rr.goldenPoint, pct));
+  lines.push(row('mean margin', r.marginMean, rr.marginMean, x => num(x, 1)));
+  lines.push(row('won by 1', r.byOne, rr.byOne, pct));
+  lines.push(row('won by 1–6', r.withinSix, rr.withinSix, pct));
+  lines.push(row('won by 1–12', r.withinTwelve, rr.withinTwelve, pct));
+  lines.push(row('won by 13 or more', r.byThirteenPlus, rr.byThirteenPlus, pct));
+  lines.push(row('won by 25 or more', r.byTwentyFivePlus, rr.byTwentyFivePlus, pct));
+  lines.push(row('nil (per team game)', r.nilRate, rr.nilRate, pct));
+  lines.push(row('40 or more (per team game)', r.fortyPlusRate, rr.fortyPlusRate, pct));
+  lines.push(row('first-half points', r.firstHalfShare, rr.firstHalfShare, pct));
+  lines.push(row('home (defending) side wins', r.homeWins, rr.homeWins, pct));
+  lines.push(row('win% SD', r.winPctSd, rr.winPctSd, x => num(x, 3)));
+  lines.push(row(`best record (wins of ${NRL_GAMES})`, r.bestWins, rr.bestWins, x => num(x, 1)));
+  lines.push(row(`worst record (wins of ${NRL_GAMES})`, r.worstWins, rr.worstWins, x => num(x, 1)));
+  lines.push(row('favourite wins', r.favourite.wins, rr.favouriteWins, pct));
+  for (const position of ['WG', 'CE', 'FB', 'SR', 'FE', 'HB', 'PR', 'HK', 'LK', 'BENCH']) {
+    lines.push(row(`tries by ${position}`, r.tryShares[position] || 0, rr.tryShares[position], pct));
+  }
   return lines.join('\n');
 }
 

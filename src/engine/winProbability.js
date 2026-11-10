@@ -55,16 +55,34 @@
 //   (shootoutOdds). A lead in overtime has already won. Match-day form, which moves both rates, is integrated over its
 //   normal spread with seven-point Gauss–Hermite quadrature.
 //
+// Tennis — exact, from the model's own odds (src/sports/tennis.js): a Davis Cup tie is five rubbers, first to three, each
+//   a best-of-three-sets match the attacker wins with Elo's odds for its gap (matchOdds), its sets independent given the
+//   day's form, whose spread the rubber's seven nodes hold (daySetChances). The clock gives each rubber twenty units and
+//   the events are its sets (`pts` 0, or 1 for the set that wins the rubber), so the chart knows the rubbers and the sets
+//   of the one in play: P(A wins) is that rubber's chance from its sets (the day's form weighed by the sets already
+//   played), then the rubbers left, exactly. Games inside a set do not move it. Match-day form, one draw on every
+//   rubber's gap, is integrated over its normal spread with seven-point Gauss–Hermite quadrature.
+//
+// Rugby league — the model's own slices (src/sports/rugbyLeague.js), as hockey's: the remaining five-minute slices are
+//   played out backwards from each margin, each side's points in a slice the exact mix of its tries (four, six when
+//   converted), penalty goals and late field goals at the means the sport's own score effects give (sliceMeans), the
+//   slice in progress scaled by the time it has left. Level after eighty, golden point: the first score wins, and after
+//   its last half a field goal decides (goldenRate, deciderOdds). A lead in golden point has already won. Match-day
+//   form, which moves both try rates, is integrated over its normal spread with seven-point Gauss–Hermite quadrature.
+//
 // Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE); basketball's,
-// American football's, baseball's and ice hockey's come from their own modules (BASKETBALL_MODEL; DRIVE_MODEL, driveOdds,
-// lateCall; INNING_MODEL, inningOdds, runMasses; PERIOD_MODEL, sliceMeans, overtimeMeans, shootoutOdds). The tests compare
-// this module against those models, so a change there that is not mirrored here fails loudly.
+// American football's, baseball's, ice hockey's, tennis's and rugby league's come from their own modules (BASKETBALL_MODEL;
+// DRIVE_MODEL, driveOdds, lateCall; INNING_MODEL, inningOdds, runMasses; PERIOD_MODEL, sliceMeans, overtimeMeans,
+// shootoutOdds; RUBBER_MODEL, matchOdds, daySetChances, bestOfThree; SLICE_MODEL, sliceMeans, goldenRate, deciderOdds). The tests compare this module against those models,
+// so a change there that is not mirrored here fails loudly.
 
 import { getSport } from '../sports/index.js';
 import { BASKETBALL_MODEL } from '../sports/basketball.js';
 import { DRIVE_MODEL, driveMoments, driveOdds, lateCall } from '../sports/americanFootball.js';
 import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
 import { overtimeMeans, PERIOD_MODEL, shootoutOdds, sliceMeans } from '../sports/hockey.js';
+import { deciderOdds, goldenRate, POINTS, SLICE_MODEL, sliceMeans as rugbySliceMeans } from '../sports/rugbyLeague.js';
+import { bestOfThree, daySetChances, matchOdds, RUBBER_MODEL } from '../sports/tennis.js';
 
 const BASE_GOALS = 1.28;
 const MAX_LOG_EDGE = 1.5;
@@ -77,6 +95,8 @@ const {
 const ROUNDING_VARIANCE = 1 / 6; // two independently rounded period scores, 1/12 each
 const DEFAULT_DRAMA = 6;
 const DECISIVE_FIELD_GOAL = 0.08;
+// A tennis rubber conceded by an empty place: as good as won (or lost) on the chart's scale.
+const WALKOVER_GAP = 999;
 
 const num = value => (typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : NaN);
 const isNum = value => Number.isFinite(num(value));
@@ -107,6 +127,12 @@ export function footballRate(log) {
  * | { kind:'periods', rateA, rateD, shootout, formSd, length:60, ot:5, maxOt:2 } (ice hockey; rates are goals in sixty
  *     minutes, formSd the spread of match-day form in log rate, and the two "overtime periods" the five minutes of
  *     sudden death and the shoot-out)
+ * | { kind:'rubbers', gaps, formSd, length:60, ot:20, maxOt:2 } (tennis; gaps are the attacker's rating points ahead in
+ *     each of the five rubbers, ±999 for a walkover, formSd the spread of match-day form in rating points; the clock gives
+ *     each rubber twenty units, the fourth and fifth extending the shortest tie as overtime periods do)
+ * | { kind:'tries', triesA, triesD, golden, formSd, length:80, ot:5, maxOt:4 } (rugby league; tries a side in eighty
+ *     minutes, `golden` the attacker's edge when a golden point's last field goal decides, formSd the spread of
+ *     match-day form in log rate, and the "overtime periods" golden point's five-minute halves)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
  * is the match's uncertainty (football ignores it, as the README formula does); `home`, that the defender plays at
@@ -125,6 +151,14 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
   }
   if (!prepared) return null;
   const length = positive(model.clock?.length);
+  if (Array.isArray(prepared.rubbers) && prepared.rubbers.length === RUBBER_MODEL.RUBBERS) {
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    return {
+      kind: 'rubbers', formSd: RUBBER_MODEL.FORM_AT_BALANCED * (variation / 6) ** 2,
+      gaps: prepared.rubbers.map(rubber => (rubber.walkover ? (rubber.walkover === 'A' ? WALKOVER_GAP : -WALKOVER_GAP) : num(rubber.gap))),
+      length: RUBBER_MODEL.LENGTH, ot: RUBBER_MODEL.BLOCK, maxOt: RUBBER_MODEL.RUBBERS - RUBBER_MODEL.TO_WIN,
+    };
+  }
   if (model.tieBreak === 'shootout' && isNum(prepared.logA) && isNum(prepared.logD)) {
     return { kind: 'poisson', rA: footballRate(prepared.logA), rD: footballRate(prepared.logD), length: length || 90 };
   }
@@ -137,6 +171,14 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
     return {
       kind: 'innings', edgeA: num(prepared.edgeA), edgeD: num(prepared.edgeD), formSd: variation * INNING_MODEL.FORM_PER_DRAMA,
       length: INNING_MODEL.LENGTH, ot: INNING_MODEL.INNING, maxOt: INNING_MODEL.MAX_EXTRA,
+    };
+  }
+  if (model.tieBreak === 'overtime' && positive(prepared.triesA) && positive(prepared.triesD)) {
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    return {
+      kind: 'tries', triesA: num(prepared.triesA), triesD: num(prepared.triesD), golden: num(prepared.golden) || 0,
+      formSd: SLICE_MODEL.FORM_AT_BALANCED * (variation / 6) ** 2, length: SLICE_MODEL.MINUTES, ot: SLICE_MODEL.GOLDEN,
+      maxOt: SLICE_MODEL.MAX_GOLDEN,
     };
   }
   if (model.tieBreak === 'overtime' && positive(prepared.rateA) && positive(prepared.rateD)) {
@@ -240,6 +282,15 @@ export function isLiveModel(model) {
   if (model.kind === 'periods') {
     return ['rateA', 'rateD', 'shootout', 'formSd', 'length', 'ot'].every(finite) && model.rateA > 0 && model.rateD > 0 && model.formSd >= 0
       && model.length > 0 && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0;
+  }
+  if (model.kind === 'tries') {
+    return ['triesA', 'triesD', 'golden', 'formSd', 'length', 'ot'].every(finite) && model.triesA > 0 && model.triesD > 0
+      && model.formSd >= 0 && model.length > 0 && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 1;
+  }
+  if (model.kind === 'rubbers') {
+    return ['formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
+      && Number.isInteger(model.maxOt) && model.maxOt >= 0 && Array.isArray(model.gaps) && model.gaps.length === RUBBER_MODEL.RUBBERS
+      && model.gaps.every(gap => typeof gap === 'number' && Number.isFinite(gap));
   }
   return false;
 }
@@ -565,8 +616,221 @@ function periodsAt(model, t, margin) {
   return chance;
 }
 
-/** Models with overtime periods after regulation: basketball's and American football's, baseball's extra innings, ice hockey's. */
-const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives' || model.kind === 'innings' || model.kind === 'periods';
+// A rugby league margin past this many points is as good as won.
+const POINTS_CAP = 72;
+// A side's points in one slice, the last bucket holding "this many or more".
+const SLICE_POINTS = 40;
+const tryTables = new WeakMap();
+
+/** Poisson(λ) masses for 0…cap, the last one holding the rest. */
+function poissonMasses(lambda, cap) {
+  const masses = new Array(cap + 1).fill(0);
+  let mass = Math.exp(-lambda), total = 0;
+  for (let k = 0; k < cap; k++) {
+    masses[k] = mass;
+    total += mass;
+    mass *= lambda / (k + 1);
+  }
+  masses[cap] = Math.max(0, 1 - total);
+  return masses;
+}
+
+/**
+ * One side's points in a slice → masses for 0…SLICE_POINTS: its tries (each four, or six converted), its penalty goals
+ * (two) and its field goal (one, with its chance), the means scaled by `left`, the share of the slice still to play.
+ */
+function slicePoints({ tries, penalties, fieldGoals }, left) {
+  const points = new Array(SLICE_POINTS + 1).fill(0);
+  const tryMasses = poissonMasses(tries * left, 8), penaltyMasses = poissonMasses(penalties * left, 6);
+  const convert = SLICE_MODEL.CONVERSION_RATE, field = clamp01(fieldGoals * left);
+  for (let k = 0; k < tryMasses.length; k++) {
+    if (!tryMasses[k]) continue;
+    // k tries, c of them converted: Binomial(k, convert).
+    let binomial = (1 - convert) ** k;
+    for (let c = 0; c <= k; c++) {
+      const fromTries = POINTS.TRY * k + POINTS.CONVERSION * c;
+      for (let j = 0; j < penaltyMasses.length; j++) {
+        const base = tryMasses[k] * binomial * penaltyMasses[j];
+        const at = fromTries + POINTS.PENALTY_GOAL * j;
+        points[Math.min(SLICE_POINTS, at)] += base * (1 - field);
+        points[Math.min(SLICE_POINTS, at + POINTS.FIELD_GOAL)] += base * field;
+      }
+      binomial *= convert > 0 && convert < 1 ? ((k - c) / (c + 1)) * (convert / (1 - convert)) : 0;
+    }
+  }
+  return points;
+}
+
+/** The distribution of A's points minus D's in a slice → { offset, masses } with masses[i] the chance of i − offset. */
+function marginMasses(a, d) {
+  const masses = new Array(2 * SLICE_POINTS + 1).fill(0);
+  for (let i = 0; i <= SLICE_POINTS; i++) {
+    if (!a[i]) continue;
+    for (let j = 0; j <= SLICE_POINTS; j++) masses[i - j + SLICE_POINTS] += a[i] * d[j];
+  }
+  return { offset: SLICE_POINTS, masses };
+}
+
+/** A's chance in golden point from level with `left` (a share) of its first half to go, then its other halves. */
+function goldenChance(node, halves, left) {
+  const total = node.goldenA + node.goldenD;
+  // No score in what is left of this half and in the halves after it: the last field goal decides.
+  const none = Math.exp(-total * (left + Math.max(0, halves - 1)));
+  return (1 - none) * node.goldenA / total + none * node.decider;
+}
+
+/**
+ * A rugby league model's tables, built once per model: for each form node its two try rates and `from[s][margin]`, A's
+ * chance at the start of slice s (`from[SLICES]` at the end of regulation, level meaning golden point). Margin
+ * distributions are cached by the slice's means, which the score effects change only near level and late on.
+ */
+function rugbyTables(model) {
+  if (tryTables.has(model)) return tryTables.get(model);
+  const { SLICES } = SLICE_MODEL;
+  const decider = deciderOdds(model.golden);
+  const nodes = HERMITE.map(([t, weight]) => {
+    const form = Math.exp(t * model.formSd);
+    const triesA = model.triesA * form, triesD = model.triesD / form;
+    const node = { weight, triesA, triesD, goldenA: goldenRate(triesA), goldenD: goldenRate(triesD), decider, from: new Array(SLICES + 1), deltas: new Map() };
+    node.from[SLICES] = Array.from({ length: 2 * POINTS_CAP + 1 }, (_, i) => step(i - POINTS_CAP, goldenChance(node, model.maxOt, 1)));
+    for (let s = SLICES - 1; s >= 0; s--) node.from[s] = Array.from({ length: 2 * POINTS_CAP + 1 }, (_, i) => tryChance(node, s, i - POINTS_CAP, 1));
+    return node;
+  });
+  const tables = { nodes, cache: new Map() };
+  tryTables.set(model, tables);
+  return tables;
+}
+
+/** A's chance in `node` from `margin` with `left` (a share) of slice s to play, then the slices after it. */
+function tryChance(node, s, margin, left) {
+  const a = rugbySliceMeans(node.triesA, margin, s), d = rugbySliceMeans(node.triesD, -margin, s);
+  const key = `${s}|${left}|${a.tries}|${a.penalties}|${a.fieldGoals}|${d.tries}|${d.penalties}|${d.fieldGoals}`;
+  let delta = node.deltas.get(key);
+  if (!delta) {
+    delta = marginMasses(slicePoints(a, left), slicePoints(d, left));
+    node.deltas.set(key, delta);
+  }
+  const next = node.from[s + 1];
+  let chance = 0;
+  for (let k = 0; k < delta.masses.length; k++) {
+    if (delta.masses[k]) chance += delta.masses[k] * next[clamp(margin + k - delta.offset, -POINTS_CAP, POINTS_CAP) + POINTS_CAP];
+  }
+  return chance;
+}
+
+/** Rugby league: P(side A wins) at minute `t` with points margin `margin`, averaged over the form nodes. */
+function triesAt(model, t, margin) {
+  const { SLICE, SLICES } = SLICE_MODEL;
+  const minute = clamp(t, 0, lastMinute(model));
+  const lead = clamp(Math.round(margin), -POINTS_CAP, POINTS_CAP);
+  const { nodes, cache } = rugbyTables(model);
+  const key = `${minute}|${lead}`;
+  if (cache.has(key)) return cache.get(key);
+  let chance;
+  if (minute >= model.length) {
+    // Regulation is over: a lead has won, in golden point as at full time. Level, what is left of golden point.
+    const played = (minute - model.length) / model.ot;
+    const halves = model.maxOt - Math.floor(played), left = 1 - (played - Math.floor(played));
+    chance = lead ? step(lead, 0.5) : nodes.reduce((sum, node) => sum + node.weight * goldenChance(node, Math.max(1, halves), halves >= 1 ? left : 0), 0);
+  } else {
+    const s = Math.min(SLICES - 1, Math.floor(minute / SLICE));
+    const left = (SLICE * (s + 1) - minute) / SLICE;
+    chance = nodes.reduce((sum, node) => sum + node.weight * tryChance(node, s, lead, left), 0);
+  }
+  chance = clamp01(chance);
+  cache.set(key, chance);
+  return chance;
+}
+
+const rubbers = new WeakMap();
+
+/**
+ * A tennis model's tables, built once per model: for each form node, the attacker's chance in each rubber (`p`) and his
+ * set chances at the day-form nodes of each (`days`). Also a cache of computed values by state.
+ */
+function rubberTables(model) {
+  if (rubbers.has(model)) return rubbers.get(model);
+  const nodes = HERMITE.map(([t, weight]) => {
+    const p = model.gaps.map(gap => matchOdds(gap + t * model.formSd));
+    return { weight, p, days: p.map(daySetChances) };
+  });
+  const tables = { nodes, cache: new Map() };
+  rubbers.set(model, tables);
+  return tables;
+}
+
+/** A's chance to win a best-of-three match from sets `a`–`d` when he wins each set with `s`. */
+function fromSets(s, a, d) {
+  if (a >= 2) return 1;
+  if (d >= 2) return 0;
+  if (a === 1 && d === 1) return s;
+  if (a === 1) return s * (2 - s);
+  if (d === 1) return s * s;
+  return bestOfThree(s);
+}
+
+/**
+ * A's chance to win a rubber from sets `a`–`d`: each day-form node's, weighed by its prior and by how likely it made
+ * the sets already played (the match's own odds `p` at 0–0).
+ */
+function rubberFrom(days, p, a, d) {
+  if (a >= 2) return 1;
+  if (d >= 2) return 0;
+  if (a === 0 && d === 0) return p;
+  let chance = 0, total = 0;
+  for (const { weight, s } of days) {
+    const likely = weight * s ** a * (1 - s) ** d;
+    chance += likely * fromSets(s, a, d);
+    total += likely;
+  }
+  return total > 0 ? chance / total : p;
+}
+
+/** A's chance in `node` from rubbers `a`–`d`, the one in play at sets `sa`–`sd`, then the rubbers left. */
+function tieFrom(node, a, d, sa = 0, sd = 0) {
+  const { TO_WIN } = RUBBER_MODEL;
+  if (a >= TO_WIN) return 1;
+  if (d >= TO_WIN) return 0;
+  const j = a + d;
+  const q = rubberFrom(node.days[j], node.p[j], sa, sd);
+  return q * tieFrom(node, a + 1, d) + (1 - q) * tieFrom(node, a, d + 1);
+}
+
+/** Tennis: P(side A wins) with rubbers `a`–`d` won and the one in play at sets `sa`–`sd`, averaged over the form nodes. */
+function rubbersAt(model, a, d, sa = 0, sd = 0) {
+  if (a >= RUBBER_MODEL.TO_WIN) return 1;
+  if (d >= RUBBER_MODEL.TO_WIN) return 0;
+  const { nodes, cache } = rubberTables(model);
+  const key = `${a}|${d}|${sa}|${sd}`;
+  if (cache.has(key)) return cache.get(key);
+  const chance = clamp01(nodes.reduce((sum, node) => sum + node.weight * tieFrom(node, a, d, sa, sd), 0));
+  cache.set(key, chance);
+  return chance;
+}
+
+/**
+ * The tie's state after the revealed events up to minute `t` → { a, d, sa, sd }: every event is a set won by its side,
+ * `pts` 1 the set that also wins the rubber.
+ */
+function rubberState(events, aId, t) {
+  let a = 0, d = 0, sa = 0, sd = 0;
+  for (const event of events) {
+    if (Math.ceil(num(event.m)) > t) continue;
+    const own = event.tid === aId;
+    if ((isNum(event.pts) ? num(event.pts) : 1) > 0) {
+      if (own) a++; else d++;
+      sa = 0; sd = 0;
+    } else if (own) sa++; else sd++;
+  }
+  return { a, d, sa, sd };
+}
+
+/**
+ * Models with overtime periods after regulation: basketball's and American football's, baseball's extra innings, ice hockey's,
+ * tennis's fourth and fifth rubbers and rugby league's golden point.
+ */
+const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives' || model.kind === 'innings' || model.kind === 'periods'
+  || model.kind === 'rubbers' || model.kind === 'tries';
 
 /**
  * The last minute a model can reach: 90 for football, 40 + 5·4 for basketball (48 + 5·4 in the NBA), 60 + 10·3 for
@@ -615,6 +879,13 @@ export function winProbabilityAt(model, minute, diff = 0) {
   if (model.kind === 'drives') return drivesAt(model, t, lead);
   if (model.kind === 'innings') return inningsAt(model, t, lead);
   if (model.kind === 'periods') return periodsAt(model, t, lead);
+  if (model.kind === 'tries') return triesAt(model, t, lead);
+  if (model.kind === 'rubbers') {
+    // Only the score is known here: the rubbers finished by minute t, none of the sets of the one in play.
+    const played = Math.min(RUBBER_MODEL.RUBBERS, Math.floor(clamp(t, 0, lastMinute(model)) / model.ot));
+    const a = clamp(Math.round((played + lead) / 2), 0, played), d = played - a;
+    return rubbersAt(model, a, d);
+  }
   return footballWinProbability({ rA: model.rA, rD: model.rD, diff: lead, remaining: (model.length - clamp(t, 0, model.length)) / model.length });
 }
 
@@ -660,7 +931,7 @@ function revealedEvents(goals) {
 function endMinute(model, events) {
   const latest = events.reduce((max, event) => Math.max(max, num(event.m)), 0);
   if (!hasOvertime(model) || latest <= model.length) return model.length;
-  if (model.kind === 'drives' || model.kind === 'periods') return Math.min(lastMinute(model), Math.ceil(latest));
+  if (model.kind === 'drives' || model.kind === 'periods' || model.kind === 'rubbers' || model.kind === 'tries') return Math.min(lastMinute(model), Math.ceil(latest));
   return Math.min(lastMinute(model), model.length + model.ot * Math.ceil((latest - model.length) / model.ot));
 }
 
@@ -682,6 +953,19 @@ export function winSeries({ model, goals = [], aId, dId, minute = 0, perspective
   if (final) upTo = Math.max(upTo, end);
   upTo = Math.floor(clamp(upTo, 0, lastMinute(model)));
 
+  if (model.kind === 'rubbers') {
+    const ordered = events.slice().sort((x, y) => num(x.m) - num(y.m));
+    const series = [];
+    for (let t = 0; t <= upTo; t++) {
+      const { a, d, sa, sd } = rubberState(ordered, aId, t);
+      series.push({ t, p: rubbersAt(model, a, d, sa, sd) });
+    }
+    const winner = winnerSideOf(final, aId, dId);
+    if (winner && series.length) series[series.length - 1].p = winner === 'A' ? 1 : 0;
+    if (sideOf(perspective, aId, dId) === 'D') for (const point of series) point.p = 1 - point.p;
+    return series;
+  }
+
   const delta = new Array(upTo + 1).fill(0);
   for (const event of events) {
     const at = Math.max(0, Math.ceil(num(event.m)));
@@ -700,6 +984,7 @@ export function winSeries({ model, goals = [], aId, dId, minute = 0, perspective
       : model.kind === 'drives' ? drivesAt(model, t, diff)
       : model.kind === 'innings' ? inningsAt(model, t, diff)
       : model.kind === 'periods' ? periodsAt(model, t, diff)
+      : model.kind === 'tries' ? triesAt(model, t, diff)
       : footballWinProbability({ rA: model.rA, rD: model.rD, diff, remaining: (model.length - Math.min(t, model.length)) / model.length });
     series.push({ t, p });
   }
@@ -729,9 +1014,27 @@ export function winMarkers(series, goals = [], { aId, model = null, includeRuns 
  * ticks at the quarters and overtime ends, half-time at 20', quarter guides at 10'/20'/30' (NBA rules: 0'…48', the
  * quarters every 12'). American football the same over 0'…60' and its ten-minute overtimes. Baseball: 54 outs, a tick
  * at the end of every inning, extra innings included, and a guide after the third and the sixth. Ice hockey: 0'…60', a
- * tick and a guide at the end of each period, then the overtime and the shoot-out once reached.
+ * tick and a guide at the end of each period, then the overtime and the shoot-out once reached. Tennis: the three
+ * rubbers of the shortest tie, then the fourth and the fifth once reached, a tick and a guide at the end of each. Rugby
+ * league: 0'…80', ticks every 20', half-time at 40', then each half of golden point reached.
  */
 export function chartDomain(model, minute = 0) {
+  if (isLiveModel(model) && model.kind === 'rubbers') {
+    const t = isNum(minute) ? num(minute) : 0;
+    const extra = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;
+    const length = model.length + extra * model.ot;
+    const ticks = [];
+    for (let k = 0; k <= length; k += model.ot) ticks.push(k);
+    return { length, half: model.length / 2, ticks, guides: ticks.slice(1, -1) };
+  }
+  if (isLiveModel(model) && model.kind === 'tries') {
+    const t = isNum(minute) ? num(minute) : 0;
+    const extra = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;
+    const quarter = model.length / 4;
+    const ticks = [0, quarter, 2 * quarter, 3 * quarter, model.length];
+    for (let k = 1; k <= extra; k++) ticks.push(model.length + k * model.ot);
+    return { length: model.length + extra * model.ot, half: model.length / 2, ticks, guides: [model.length / 2] };
+  }
   if (isLiveModel(model) && model.kind === 'periods') {
     const t = isNum(minute) ? num(minute) : 0;
     const extra = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;

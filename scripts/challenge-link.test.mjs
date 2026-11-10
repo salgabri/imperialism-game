@@ -153,8 +153,8 @@ test('stale values fall back: seasons, theatres and teams this build no longer o
     // An NBA season plays NBA clubs on its era's map.
     ['sport=basketball&season=nba-2k09&teams=nations', { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nba2009',
       dataSet: 'nba-2k09' }, ['teams']],
-    // Baseball's earliest season is 2021, and a baseball season's clubs play on their own era's map.
-    ['sport=baseball&season=mlb-the-show-20', { sport: 'baseball' }, ['season']],
+    // Baseball's earliest season is 2018, and a baseball season's clubs play on their own era's map.
+    ['sport=baseball&season=mlb-the-show-17', { sport: 'baseball' }, ['season']],
     ['sport=baseball&season=mlb-the-show-21&teams=clubs&theatre=domestic:mlb', { sport: 'baseball', layer: 'clubs',
       clubScope: 'domestic:mlb2021', dataSet: 'mlb-the-show-21' }, []],
     // Team strengths is basketball's; only a manager names a team, and a team id is a plain id.

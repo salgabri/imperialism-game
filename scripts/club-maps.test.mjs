@@ -1,8 +1,8 @@
-// The American leagues' maps, today's and every era's (docs/design/domestic-campaigns.md, "The NBA map", "The NFL map"
-// and "The MLB map"): a club holds its own state or province and nothing else, a state with several clubs is divided
-// between them, and every state and province without a club stays empty. The boundary layers are not in the repository,
-// so towns stand in for them: every town lies on empty land of its own state or on a club's section, and no club's
-// section reaches into a second state.
+// The leagues' maps, today's and every era's (docs/design/domestic-campaigns.md, "The NBA map", "The NFL map", "The MLB
+// map", "The NHL map" and "The NRL map"): a club holds its own state or province (in New Zealand, region) and nothing
+// else, a state with several clubs is divided between them, and every state and province without a club stays empty.
+// The boundary layers are not in the repository, so towns stand in for them: every town lies on empty land of its own
+// state or on a club's section, and no club's section reaches into a second state.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -31,13 +31,31 @@ const TOWNS = {
   'CA-AB': [[-114.07, 51.05]], 'CA-BC': [[-120.33, 50.67]], 'CA-MB': [[-97.14, 49.9]], 'CA-NB': [[-66.64, 45.96]], 'CA-NL': [[-54.61, 48.95]],
   'CA-NS': [[-63.28, 45.37]], 'CA-NT': [[-114.37, 62.45]], 'CA-NU': [[-96.03, 64.32]], 'CA-ON': [[-81, 46.49], [-89.25, 48.38]], 'CA-PE': [[-63.4, 46.35]],
   'CA-QC': [[-77.78, 48.1]], 'CA-SK': [[-106.67, 52.13]], 'CA-YT': [[-135.05, 60.72]],
+  // The NRL's Australia and New Zealand: New South Wales and Queensland are shared.
+  'AU-NSW': [[148.6, -32.25], [147.37, -35.12], [150.93, -31.09], [141.47, -31.95], [149.1, -33.28], [149.72, -34.75]],
+  'AU-QLD': [[151.95, -27.56], [150.51, -23.38], [139.49, -20.73], [144.25, -23.44]], 'AU-VIC': [[143.85, -37.56], [144.28, -36.76]],
+  'AU-ACT': [[149.13, -35.28]], 'AU-SA': [[137.77, -32.49], [139.27, -35.12]], 'AU-WA': [[121.47, -30.75]], 'AU-TAS': [[147.14, -41.44]],
+  'AU-NT': [[133.88, -23.7]],
+  'NZ-AUK': [[174.76, -36.85]], 'NZ-NTL': [[174.32, -35.73]], 'NZ-WKO': [[175.28, -37.79]], 'NZ-BOP': [[176.25, -38.14]],
+  'NZ-GIS': [[177.7, -38.4]], 'NZ-HKB': [[176.84, -39.64]], 'NZ-TKI': [[174.28, -39.34]], 'NZ-MWT': [[175.61, -40.36]],
+  'NZ-WGN': [[175.66, -40.95]], 'NZ-TAS': [[172.33, -41.8]], 'NZ-MBH': [[173.95, -41.51]], 'NZ-WTC': [[171.2, -42.45]],
+  'NZ-CAN': [[172.64, -43.53]], 'NZ-OTA': [[169.38, -45.25]], 'NZ-STL': [[168.94, -46.1]],
 };
+// The country each region's code belongs to, by the game's world shape: a map tests the towns of its own hosts.
+const HOST_OF = { US: '840', CA: '124', AU: '036', NZ: '554' };
+// Empty regions with no town of their own, by host: Alaska joins the land only through Canada; Jervis Bay is
+// Australia's other territory on the mainland, and the city of Nelson's region is a sliver of coast.
+const UNTOWNED = { '124': ['US-AK'], '036': ['AUS-Other Territories'], '554': ['NZ-NLS'] };
 // Off every map; Alaska only reaches the two that hold Canada.
 const OFF_THE_MAP = { 'US-HI': [[-157.86, 21.31]] };
 const ALASKA = [[-149.9, 61.22]];
 // A league may join a state to another's clubs (LEAGUES in scripts/build-club-maps.mjs): those clubs hold both.
 const JOINED = { NFL: { 'nfl-new-york-giants': ['US-NJ', 'US-NY'], 'nfl-new-york-jets': ['US-NJ', 'US-NY'],
-  'nfl-baltimore-ravens': ['US-DC', 'US-MD'], 'nfl-washington-commanders': ['US-DC', 'US-MD'] } };
+  'nfl-baltimore-ravens': ['US-DC', 'US-MD'], 'nfl-washington-commanders': ['US-DC', 'US-MD'],
+  // Washington's earlier names, on the earlier seasons' maps (scripts/data/nfl-seasons.json).
+  'nfl-washington': ['US-DC', 'US-MD'], 'nfl-washington-football-team': ['US-DC', 'US-MD'] },
+  // Boston Legacy FC plays in Rhode Island until White Stadium opens in 2028.
+  NWSL: { 'w-boston-legacy-fc': ['US-MA', 'US-RI'] } };
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 
 for (const entry of CLUB_MAPS) {
@@ -47,8 +65,9 @@ for (const entry of CLUB_MAPS) {
     const map = decodeDomestic(JSON.parse(text), entry.id);
     const empties = new Map(doc.topology.objects.empty.geometries.map(g => [g.id, polysOf(feature(doc.topology, g).geometry)]));
     const sectionAt = point => map.geo.countries.find(section => pointInPolys(point, section.polys))?.id ?? null;
-    const canada = doc.hosts.includes('124');
-    const towns = Object.entries(TOWNS).filter(([region]) => canada || !region.startsWith('CA-'));
+    const canada = doc.hosts.includes('124'), america = doc.hosts.includes('840');
+    const towns = Object.entries(TOWNS).filter(([region]) => doc.hosts.includes(HOST_OF[region.slice(0, 2)]));
+    const untowned = doc.hosts.flatMap(host => UNTOWNED[host] || []);
 
     const regionsOf = new Map();
     for (const [region, points] of towns) {
@@ -65,16 +84,21 @@ for (const entry of CLUB_MAPS) {
     }
     for (const club of map.clubs) {
       const held = [...(regionsOf.get(club.homeSection) || [])].sort();
+      // A club holds one state, or the states its league joins.
       const allowed = JOINED[entry.league]?.[club.id];
-      if (allowed) assert.ok(held.every(region => allowed.includes(region)), `${club.name} holds ${held}`);
-      else assert.ok(held.length <= 1, `${club.name} holds ${held}`);
+      if (allowed && held.every(region => allowed.includes(region))) continue;
+      assert.ok(held.length <= 1, `${club.name} holds ${held}`);
+      // One of those clubs away from the joined states that season (the Giants at the Yale Bowl in 1973–74) holds the
+      // state its stadium stands in, alone.
+      if (allowed) assert.equal(sectionAt(club.homePoint), club.homeSection, `${club.name} holds ${held}, where it plays`);
     }
     // Empty land covers whatever no club holds: the states and provinces without a town in a section.
     const played = new Set([...regionsOf.values()].flatMap(regions => [...regions]));
     const known = new Set(towns.map(([region]) => region));
-    assert.deepEqual([...empties.keys()].filter(region => !known.has(region)).sort(), canada ? ['US-AK'] : [],
+    assert.deepEqual([...empties.keys()].filter(region => !known.has(region)).sort(), untowned.slice().sort(),
       'every empty region is a state or province');
-    assert.equal(played.size + empties.size, known.size + (canada ? 1 : 0), 'a state has a club or is empty, and never both');
+    assert.equal(played.size + empties.size, known.size + untowned.length, 'a state has a club or is empty, and never both');
+    if (!america) return;
     for (const [where, points] of Object.entries(OFF_THE_MAP)) {
       for (const point of points) assert.equal(sectionAt(point), null, `${where} is off the map`);
       assert.ok(!empties.has(where), `${where} is not drawn`);

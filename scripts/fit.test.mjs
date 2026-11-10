@@ -5,14 +5,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import React, { act } from 'react';
 import { bundleComponents, withDom } from './lib/app-harness.mjs';
-import { fitWall } from '../src/hooks/useFit.js';
+import { fitWall, MIN_ROW_PX } from '../src/hooks/useFit.js';
 
-const { Pager, usePagedList, useFitWall, SetupOverlay, TargetPanel } = await bundleComponents({
+const { createRoot } = await import('react-dom/client');
+const { flushSync } = await import('react-dom');
+
+const { Pager, usePagedList, useFitWall, SetupOverlay, TargetPanel, LedgerScreen, ChronicleScreen } = await bundleComponents({
   Pager: 'src/components/Pager.jsx',
   usePagedList: ['src/hooks/useFit.js', 'usePagedList'],
   useFitWall: ['src/hooks/useFit.js', 'useFitWall'],
   SetupOverlay: 'src/components/SetupOverlay.jsx',
   TargetPanel: 'src/screens/turns/TargetPanel.jsx',
+  LedgerScreen: 'src/screens/ledger/LedgerScreen.jsx',
+  ChronicleScreen: 'src/screens/ledger/ChronicleScreen.jsx',
 });
 
 const click = async element => { await act(async () => { element.click(); }); };
@@ -414,5 +419,402 @@ test('the target list pages what the column cannot hold, and the keyboard walks 
     assert.equal(pos(), 'Page 2 /  of 2');
     assert.ok(!radios().some(row => row.getAttribute('aria-checked') === 'true'), 'the selected target is on the other page');
     assert.deepEqual(radios().map(row => row.tabIndex), [0, -1, -1]);
+  });
+});
+
+// ---------- before the first measure: a window of rows ----------
+
+/** A screen of `width` × `height` CSS px, the bound of the rows a list renders before it has measured its box. */
+function screenOf(window, { width, height }) {
+  Object.defineProperty(window.screen, 'width', { configurable: true, value: width });
+  Object.defineProperty(window.screen, 'height', { configurable: true, value: height });
+}
+
+const MANY = Array.from({ length: 191 }, (_, i) => `Team ${i + 1}`);
+const rowTexts = view => [...view.host.querySelectorAll('li')].map(li => li.textContent);
+const metaOf = view => JSON.parse(view.host.querySelector('.meta').textContent);
+
+/** A box with a height of its own (`room` px), rows 30px from 10px down: with every row it would overflow too. */
+async function measureOwnBox(view, stub, room) {
+  const rendered = view.host.querySelectorAll('li').length;
+  layOut(view.host.querySelector('.box'), { width: 300, height: room, top: 0, scrollHeight: Math.max(room, 10 + 30 * rendered) });
+  view.host.querySelectorAll('li').forEach(row => layOut(row, { width: 300, height: 30, top: 10 }));
+  await stub.fire();
+}
+
+test('held back: a list longer than the screen renders a window of rows first, and pages exactly as with every row', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    // The screen's longer side bounds the window: 600 / 24 + 1 = 26 rows, whichever way the screen is turned.
+    assert.equal(MIN_ROW_PX, 24);
+    screenOf(window, { width: 400, height: 600 });
+    const view = await mount(PagedList, { items: MANY });
+    assert.equal(view.host.querySelectorAll('li').length, 26, '26 of 191 rows before the box is measured');
+    assert.deepEqual(metaOf(view), { page: 0, pages: 1, pageSize: null, start: 0 }, 'the page size is not measured yet');
+    await measureOwnBox(view, stub, 500);
+    assert.deepEqual(metaOf(view), { page: 0, pages: 12, pageSize: 16, start: 0 }, '(500 − 10) / 30 = 16, as with all 191 rows');
+    assert.equal(view.host.querySelectorAll('li').length, 16);
+    assert.equal(rowTexts(view)[0], 'Team 1');
+
+    screenOf(window, { width: 600, height: 400 });
+    const turned = await mount(PagedList, { items: MANY });
+    assert.equal(turned.host.querySelectorAll('li').length, 26, 'a landscape screen: its width is the longer side');
+  });
+});
+
+test('held back: the focused row is in the first render and its page is the first one shown', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    screenOf(window, { width: 400, height: 600 });
+    const view = await mount(PagedList, { items: MANY, focusIndex: 150 });
+    const first = rowTexts(view);
+    assert.equal(first.length, 26);
+    assert.ok(first.includes('Team 151'), 'your row is rendered before the measure, so it can hold the focus');
+    await measureOwnBox(view, stub, 500);
+    assert.deepEqual(metaOf(view), { page: 9, pages: 12, pageSize: 16, start: 144 }, 'page 10 holds row 151');
+    assert.ok(rowTexts(view).includes('Team 151'));
+  });
+});
+
+test('held back near the end: the window still holds a whole window of rows, so the box overflows', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    screenOf(window, { width: 400, height: 600 });
+    const view = await mount(PagedList, { items: MANY, focusIndex: 189 });
+    const first = rowTexts(view);
+    assert.equal(first.length, 26, 'rows 166–191, not the 2 from 190 on');
+    assert.equal(first[0], 'Team 166');
+    await measureOwnBox(view, stub, 500);
+    assert.deepEqual(metaOf(view), { page: 11, pages: 12, pageSize: 16, start: 176 });
+  });
+});
+
+test('held back in a box its rows size: every row is rendered and kept, as before', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    screenOf(window, { width: 200, height: 300 }); // 300 / 24 → 13, + 1: 14 rows held back
+    const view = await mount(PagedList, { items: NAMES });
+    assert.equal(view.host.querySelectorAll('li').length, 14);
+    // The box wraps its rows: as tall as they are, never overflowing.
+    const wrap = async () => {
+      const rows = view.host.querySelectorAll('li');
+      layOut(view.host.querySelector('.box'), { width: 300, height: 10 + 30 * rows.length, top: 0 });
+      rows.forEach(row => layOut(row, { width: 300, height: 30, top: 10 }));
+      await stub.fire();
+    };
+    await wrap();
+    assert.equal(view.host.querySelectorAll('li').length, 25, 'nothing overflowed: a box its rows size gets them all');
+    await wrap();
+    assert.deepEqual(metaOf(view), { page: 0, pages: 1, pageSize: 25, start: 0 });
+  });
+});
+
+test('held back without anything to measure: every row on one page', async () => {
+  await withDom(async ({ mount, window }) => {
+    screenOf(window, { width: 200, height: 300 });
+    // A ResizeObserver when the first render sizes its window of rows, and none by the time the box would be measured.
+    let reads = 0;
+    Object.defineProperty(window, 'ResizeObserver', { configurable: true, get: () => (reads++ === 0 ? class { observe() {} disconnect() {} } : undefined) });
+    const view = await mount(PagedList, { items: NAMES });
+    assert.equal(view.host.querySelectorAll('li').length, 25, 'nothing will measure the box: the window of rows is lifted');
+    assert.ok(reads >= 2, 'the attach looked for an observer again');
+    delete window.ResizeObserver;
+  });
+});
+
+test('a NaN focus is no focus: no render loop, and the window starts at the first row', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    const view = await mount(PagedList, { items: NAMES, focusIndex: NaN });
+    assert.equal(view.host.querySelectorAll('li').length, 25);
+    await measureList(view, stub, 310);
+    assert.deepEqual(metaOf(view), { page: 0, pages: 3, pageSize: 10, start: 0 });
+    await view.render({ items: NAMES, focusIndex: NaN });
+    assert.equal(metaOf(view).page, 0);
+
+    screenOf(window, { width: 400, height: 600 });
+    const held = await mount(PagedList, { items: MANY, focusIndex: NaN });
+    assert.equal(rowTexts(held).length, 26);
+    assert.equal(rowTexts(held)[0], 'Team 1');
+  });
+});
+
+test('a focused last page of one row keeps the page size measured with more rows: no row clipped, no measure loop', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    // A 640px box of 26px rows, the first a rule shorter (no top border), as the standings' are: 24 to a page, so the
+    // 25th row, the focused one, is alone on page 2. Measured alone, that 25px row would make room for 25, which do not fit.
+    const restore = stubLayout(window, [
+      { selector: '.box', clientHeight: () => 640, scrollHeight: el => 10 + 26 * el.children.length,
+        rect: () => ({ top: 0, bottom: 640, height: 640, left: 0, right: 300, width: 300 }) },
+      { selector: 'li', rect: el => {
+        const index = [...el.parentNode.children].indexOf(el);
+        const top = 10 + index * 26 - (index ? 1 : 0), height = index ? 26 : 25;
+        return { top, bottom: top + height, height, left: 0, right: 300, width: 300 };
+      } },
+    ]);
+    // Every page size the list renders with, in order: a 25 would be a frame with the last row cut off.
+    const sizes = [];
+    function Logged(props) {
+      const list = usePagedList(props.items, { row: 'li', focusIndex: props.focusIndex });
+      sizes.push(list.pageSize);
+      return React.createElement(React.Fragment, null,
+        React.createElement('ol', { ref: list.boxRef, className: 'box' }, list.shown.map(item => React.createElement('li', { key: item }, item))),
+        React.createElement('output', { className: 'meta' }, JSON.stringify({ page: list.page, pages: list.pages, pageSize: list.pageSize, start: list.start })));
+    }
+    try {
+      const view = await mount(Logged, { items: NAMES, focusIndex: 24 });
+      assert.deepEqual(metaOf(view), { page: 1, pages: 2, pageSize: 24, start: 24 });
+      assert.deepEqual(rowTexts(view), ['Row 25']);
+      // The observer reports after each new observe() (its first notification) and on every resize.
+      await stub.fire();
+      await stub.fire();
+      assert.deepEqual(metaOf(view), { page: 1, pages: 2, pageSize: 24, start: 24 });
+      assert.deepEqual([...new Set(sizes)], [Infinity, 24], 'never a page of 25, never a measure that flips back and forth');
+    } finally {
+      restore();
+    }
+  });
+});
+
+test('a lone row resized across a breakpoint is paged by the new width’s rows, not by the old, taller ones', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    // A phone's 44px rows in a 150px box, the first a rule shorter: three to a page, so the 25th row, the focused one, is
+    // alone on page 9. The window then widens past the breakpoint: a 360px box 195px tall, of 30px rows.
+    let row = 44, room = 150, width = 300;
+    const restore = stubLayout(window, [
+      { selector: '.box', clientWidth: () => width, clientHeight: () => room, scrollHeight: el => 10 + row * el.children.length,
+        rect: () => ({ top: 0, bottom: room, height: room, left: 0, right: width, width }) },
+      { selector: 'li', rect: el => {
+        const index = [...el.parentNode.children].indexOf(el);
+        const top = 10 + index * row - (index ? 1 : 0), height = index ? row : row - 1;
+        return { top, bottom: top + height, height, left: 0, right: width, width };
+      } },
+    ]);
+    try {
+      const view = await mount(PagedList, { items: NAMES, focusIndex: 24 });
+      assert.deepEqual(metaOf(view), { page: 8, pages: 9, pageSize: 3, start: 24 });
+      assert.deepEqual(rowTexts(view), ['Row 25']);
+      row = 30; room = 195; width = 360;
+      await stub.fire();
+      // (195 − 10) / 30: six to a page, as with the rows the new width draws; the old 44px rows would have left four.
+      assert.deepEqual(metaOf(view), { page: 4, pages: 5, pageSize: 6, start: 24 });
+      assert.deepEqual(rowTexts(view), ['Row 25']);
+    } finally {
+      restore();
+    }
+  });
+});
+
+// ---------- measured before the browser paints ----------
+
+/**
+ * Layout a browser would give, installed on the prototypes before the first commit, since the hooks now measure inside
+ * it: `boxes` = [{ selector, clientWidth?, clientHeight?, scrollHeight?, rect? }], each a function of the element.
+ * Elements matching none measure 0. → restore()
+ */
+function stubLayout(window, boxes) {
+  const proto = window.HTMLElement.prototype;
+  const pick = element => boxes.find(entry => element.matches?.(entry.selector));
+  const keys = ['clientWidth', 'clientHeight', 'scrollHeight'];
+  const saved = keys.map(key => [key, Object.getOwnPropertyDescriptor(proto, key)]);
+  for (const key of keys) {
+    Object.defineProperty(proto, key, { configurable: true, get() { return pick(this)?.[key]?.(this) ?? 0; } });
+  }
+  proto.getBoundingClientRect = function () {
+    return pick(this)?.rect?.(this) ?? { top: 0, bottom: 0, height: 0, width: 0, left: 0, right: 0 };
+  };
+  return () => {
+    for (const [key, descriptor] of saved) { if (descriptor) Object.defineProperty(proto, key, descriptor); else delete proto[key]; }
+    delete proto.getBoundingClientRect;
+  };
+}
+
+/**
+ * Render `element` the way a click's update is rendered: synchronously, with no act() to flush what it leaves for later.
+ * `look()` reads the screen when the synchronous render returns (what the browser paints first) and again once every
+ * task the render scheduled has run. → { first, settled }
+ */
+async function renderSynchronously(document, element, look) {
+  const acting = globalThis.IS_REACT_ACT_ENVIRONMENT;
+  globalThis.IS_REACT_ACT_ENVIRONMENT = false;
+  const host = document.createElement('div');
+  document.body.append(host);
+  const root = createRoot(host);
+  try {
+    flushSync(() => root.render(element));
+    const first = look(host);
+    await new Promise(resolve => { setTimeout(resolve, 60); });
+    return { first, settled: look(host) };
+  } finally {
+    flushSync(() => root.unmount());
+    host.remove();
+    globalThis.IS_REACT_ACT_ENVIRONMENT = acting;
+  }
+}
+
+test('usePagedList: a list laid out when it mounts is paged before the synchronous render returns', async () => {
+  await withDom(async ({ window, document }) => {
+    window.ResizeObserver = class { observe() {} disconnect() {} };
+    // A 310px box, rows 30px tall from 10px down: (310 − 10) / 30 = 10 rows.
+    const restore = stubLayout(window, [
+      { selector: '.box', clientHeight: () => 310, scrollHeight: el => 10 + 30 * el.children.length,
+        rect: () => ({ top: 0, bottom: 310, height: 310, left: 0, right: 300, width: 300 }) },
+      { selector: 'li', clientHeight: () => 30, rect: () => ({ top: 10, bottom: 40, height: 30, left: 0, right: 300, width: 300 }) },
+    ]);
+    try {
+      const { first, settled } = await renderSynchronously(document, React.createElement(PagedList, { items: NAMES }),
+        host => `${host.querySelectorAll('li').length} rows · ${host.querySelector('.meta').textContent}`);
+      assert.equal(first, '10 rows · {"page":0,"pages":3,"pageSize":10,"start":0}', 'no frame of every row before the page');
+      assert.equal(settled, first);
+    } finally {
+      restore();
+    }
+  });
+});
+
+test('a preselected target on page 2 is on show from the first frame and keeps the focus TargetPanel gives it', async () => {
+  await withDom(async ({ window, document }) => {
+    window.ResizeObserver = class { observe() {} disconnect() {} };
+    // 44px rows, the first 10px down a 150px box: three to a page, so t5 is on page 2.
+    const restore = stubLayout(window, [
+      { selector: '.target-panel__rows', clientWidth: () => 320, clientHeight: () => 150, scrollHeight: el => 10 + 44 * el.children.length,
+        rect: () => ({ top: 0, bottom: 150, height: 150, width: 320, left: 0, right: 320 }) },
+      { selector: '.target-panel__row', clientWidth: () => 320, clientHeight: () => 44, scrollHeight: () => 44,
+        rect: () => ({ top: 10, bottom: 54, height: 44, width: 320, left: 0, right: 320 }) },
+    ]);
+    try {
+      const props = { count: '6 neighbours in reach', rows: TARGETS, selectedId: 't5', onSelect: () => {} };
+      const look = host => {
+        const shown = [...host.querySelectorAll('[role="radio"]')].map(row => row.dataset.teamId).join(',');
+        return `${shown} · focus ${document.activeElement?.dataset?.teamId || document.activeElement?.tagName}`;
+      };
+      const { first, settled } = await renderSynchronously(document, React.createElement(TargetPanel, props), look);
+      assert.equal(first, 't3,t4,t5 · focus t5', 'its page first, and the row the panel focused on mount is still the one shown');
+      assert.equal(settled, 't3,t4,t5 · focus t5', 'never unmounted by a page 1 shown in between');
+    } finally {
+      restore();
+    }
+  });
+});
+
+test('the team wall opens on the checked team’s page in the first frame', async () => {
+  await withDom(async ({ window, document }) => {
+    window.ResizeObserver = class { observe() {} disconnect() {} };
+    // 342 × 100: eight cells across and three rows, 24 to a page, so the 30th team is on page 2.
+    const restore = stubLayout(window, [{ selector: '.setup-teams', clientWidth: () => 342, clientHeight: () => 100, scrollHeight: () => 100 }]);
+    try {
+      const props = { setup: { ...SETUP, managedTeamId: 't29' }, managerTeams: TEAMS, initialStep: 3, onPick: () => {} };
+      const look = host => {
+        const pos = host.querySelector('.setup-teams__pager .pager__pos')?.textContent || 'no pager';
+        return `${pos} · ${host.querySelectorAll('.setup-team').length} cells · ${host.querySelector('.setup-team[aria-checked="true"]')?.dataset.name}`;
+      };
+      const { first, settled } = await renderSynchronously(document, React.createElement(SetupOverlay, props), look);
+      assert.equal(first, `Page 2 /  of 2 · 6 cells · ${TEAMS[29].name}`, 'no frame of the whole field, nor of page 1');
+      assert.equal(settled, first);
+    } finally {
+      restore();
+    }
+  });
+});
+
+test('the team wall follows a new page size back to the checked team, and a page turn alone is not undone', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    const props = { setup: { ...SETUP, managedTeamId: 't29' }, managerTeams: TEAMS, initialStep: 3, onPick: () => {} };
+    const view = await mount(SetupOverlay, props);
+    const box = view.host.querySelector('.setup-teams');
+    const pos = () => view.host.querySelector('.setup-teams__pager .pager__pos').textContent;
+    layOut(box, { width: 342, height: 100 });
+    await stub.fire();
+    assert.equal(pos(), 'Page 2 /  of 2');
+    await click(view.host.querySelector('.setup-teams__pager [aria-label="Previous page"]'));
+    assert.equal(pos(), 'Page 1 /  of 2');
+    await view.render({ ...props });
+    assert.equal(pos(), 'Page 1 /  of 2', 'a render with the same checked team keeps the page the player turned to');
+    // A shorter box: one row of eight a page, and the checked team's page again.
+    layOut(box, { width: 342, height: 60 });
+    await stub.fire();
+    assert.equal(pos(), 'Page 4 /  of 4');
+    assert.equal(box.querySelector('.setup-team[aria-checked="true"]')?.dataset.name, TEAMS[29].name);
+  });
+});
+
+// ---------- measureKey: a box shown by a switch is measured in that commit ----------
+
+function KeyedList({ items, measureKey }) {
+  const list = usePagedList(items, { row: 'li', measureKey });
+  return React.createElement(React.Fragment, null,
+    React.createElement('ol', { ref: list.boxRef, className: 'box' }, list.shown.map(item => React.createElement('li', { key: item }, item))),
+    React.createElement('output', { className: 'meta' }, JSON.stringify({ page: list.page, pages: list.pages, pageSize: list.pageSize, start: list.start })));
+}
+
+test('usePagedList and useFitWall: a new measureKey measures a box the switch shows, before its observer reports', async () => {
+  await withDom(async ({ mount, window }) => {
+    installObserver(window);
+    // Hidden when it mounts (display:none measures 0), so nothing is measured.
+    const list = await mount(KeyedList, { items: NAMES, measureKey: 'hidden' });
+    assert.equal(list.host.querySelectorAll('li').length, 25);
+    // The switch shows it: the browser lays it out in the commit that changes the key. The observer never reports here.
+    layOut(list.host.querySelector('.box'), { width: 300, height: 310, top: 0, scrollHeight: 10 + 30 * NAMES.length });
+    list.host.querySelectorAll('li').forEach(row => layOut(row, { width: 300, height: 30, top: 10 }));
+    await list.render({ items: NAMES, measureKey: 'shown' });
+    assert.deepEqual(metaOf(list), { page: 0, pages: 3, pageSize: 10, start: 0 });
+    assert.equal(list.host.querySelectorAll('li').length, 10);
+
+    const options = { ratio: 4 / 3, gap: 6, minCell: 34, maxCell: 104 };
+    const wall = await mount(Wall, { count: 211, options: { ...options, measureKey: 'hidden' } });
+    const box = wall.host.querySelector('.wall');
+    assert.equal(box.getAttribute('data-measured'), null);
+    layOut(box, { width: 366, height: 400 });
+    await wall.render({ count: 211, options: { ...options, measureKey: 'shown' } });
+    assert.equal(box.getAttribute('data-measured'), 'true');
+    assert.equal(box.style.getPropertyValue('--wall-cols'), '9');
+  });
+});
+
+test('setup step 3 measures its wall in the commit that shows it, on the checked team’s page', async () => {
+  await withDom(async ({ mount, window }) => {
+    installObserver(window);
+    const props = { setup: { ...SETUP, managedTeamId: 't29' }, managerTeams: TEAMS, initialStep: 2, onPick: () => {} };
+    const view = await mount(SetupOverlay, props);
+    const box = view.host.querySelector('.setup-teams');
+    assert.equal(box.querySelectorAll('.setup-team').length, 30, 'hidden on step 2: not measured, the whole field');
+    layOut(box, { width: 342, height: 100 });
+    await click(view.host.querySelector('.setup-rail__step[aria-controls="setup-step-role"]'));
+    assert.equal(box.getAttribute('data-measured'), 'true');
+    assert.equal(view.host.querySelector('.setup-teams__pager .pager__pos').textContent, 'Page 2 /  of 2');
+    assert.equal(box.querySelectorAll('.setup-team').length, 6);
+  });
+});
+
+test('the Ledger’s Fallen panel and the Chronicle’s Story panel measure their lists in the commit that shows them', async () => {
+  await withDom(async ({ mount, window }) => {
+    installObserver(window);
+    const panel = (view, label) => [...view.host.querySelectorAll('.ledger-panels button')].find(button => button.textContent === label);
+
+    const fallen = Array.from({ length: 30 }, (_, i) => ({ key: `f${i}`, teamId: `x${i}`, flagId: null, isClub: true, code: `X${i}`,
+      name: `Fallen ${i}`, line: '' }));
+    const ledger = await mount(LedgerScreen, { rows: [], fallen, header: { kicker: 'K', title: 'Ledger', stats: [] }, onSelectTeam() {} });
+    const wall = ledger.host.querySelector('.ledger-fallen__list');
+    assert.equal(wall.getAttribute('data-measured'), null, 'hidden behind the Standings panel: not measured');
+    // 200 × 100: five 35.2px cells across, three rows, 15 to a page.
+    layOut(wall, { width: 200, height: 100 });
+    await click(panel(ledger, 'Fallen'));
+    assert.equal(wall.getAttribute('data-measured'), 'true');
+    assert.equal(ledger.host.querySelector('.ledger-fallen .pager__pos').textContent, 'Page 1 /  of 2');
+    assert.equal(wall.querySelectorAll('.ledger-fallen__row').length, 15);
+
+    const feed = Array.from({ length: 40 }, (_, i) => ({ round: `R${40 - i}`, kind: 'match', text: `Entry ${i}` }));
+    const chronicle = await mount(ChronicleScreen, { history: [], feed, header: { kicker: 'K', title: 'Chronicle', stats: [] } });
+    const activity = chronicle.host.querySelector('.fi-activity-box');
+    assert.equal(activity.querySelectorAll('.fi-activity-item').length, 40);
+    // 200px for 26px rows: seven to a page.
+    layOut(activity, { width: 300, height: 200, top: 0, scrollHeight: 26 * 40 });
+    activity.querySelectorAll('.fi-activity-item').forEach(row => layOut(row, { width: 300, height: 26, top: 0 }));
+    await click(panel(chronicle, 'Story'));
+    assert.equal(activity.querySelectorAll('.fi-activity-item').length, 7);
+    assert.equal(chronicle.host.querySelector('.fi-activity .pager__pos').textContent, 'Page 1 /  of 6');
   });
 });

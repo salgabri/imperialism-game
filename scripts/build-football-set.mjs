@@ -1,7 +1,9 @@
 // Build one football data set from a Championship Manager 01/02 Data folder the user has
 // downloaded (docs/design/football-years.md). Nothing it reads or writes is committed:
-// data-src/ and public/football/ stay local until the database authors allow
-// redistribution (docs/design/football-year-permissions.md).
+// data-src/ and public/football/cm0102-* stay local until the database authors allow
+// redistribution (docs/design/football-year-permissions.md). The exceptions are the built-in
+// seasons from SI's own 3.9.68 and 3.9.60 databases and the CM3 port, which
+// npm run build:retro-seasons writes: this builder neither replaces nor lists them.
 //
 // Usage:
 //   npm run build:football-set -- --cm0102=data-src/cm0102/<folder> [--out=public/football] [--check] [--allow-unmapped]
@@ -21,8 +23,12 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { buildFootballIndex, buildFootballSet, SET_ID } from '../src/data/footballSetBuild.js';
+import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+// SI's own 3.9.68 and 3.9.60 databases and the CM3 port are built-in seasons (npm run build:retro-seasons): their
+// committed files sit in public/football/ beside the local ones, and a local build never replaces or lists them.
+const builtIn = id => BUILT_IN_SEASONS.some(season => season.id === id);
 const SWITCHES = ['check', 'allow-unmapped'];
 const VALUES = ['cm0102', 'out', 'id', 'label', 'provider', 'season', 'released', 'url', 'dob-shift'];
 
@@ -64,7 +70,7 @@ async function otherSets(dir, id) {
   const docs = [];
   for (const name of (await readdir(dir)).sort()) {
     const setId = name.endsWith('.json') && !name.endsWith('.audit.json') ? name.slice(0, -5) : null;
-    if (!setId || !SET_ID.test(setId) || setId === id) continue;
+    if (!setId || !SET_ID.test(setId) || setId === id || builtIn(setId)) continue;
     const file = path.join(dir, name);
     try {
       const doc = JSON.parse(await readFile(file, 'utf8'));
@@ -98,6 +104,7 @@ async function main() {
     console.log(`Check only, nothing written: ${shown(setFile)} ${previous == null ? 'would be new' : previous === result.text ? 'is up to date' : 'would change'}`);
     return;
   }
+  if (builtIn(id)) throw new Error(`${id} is one of the game's built-in seasons (npm run build:retro-seasons), so a local build of it is not written`);
   // The index is built, and every other set in the folder checked, before anything is written.
   const index = buildFootballIndex([...await otherSets(outDir, id), result.doc]);
   await mkdir(outDir, { recursive: true });

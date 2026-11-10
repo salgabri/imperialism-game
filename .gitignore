@@ -15,6 +15,13 @@ data-src/
 
 # Football data sets built from CM 01/02 databases (npm run build:football-set) stay
 # local until the database authors allow redistribution: docs/design/football-year-permissions.md.
-# The built-in EA seasons beside them (public/football/ea-*.json, npm run build:ea-seasons) are committed.
+# The built-in seasons beside them are committed: EA's (public/football/ea-*.json, npm run build:ea-seasons) and
+# those before FIFA 05 (npm run build:retro-seasons), among them SI's own CM 01/02 3.9.68 and 3.9.60 and the CM3 port.
 public/football/cm0102-*
+!public/football/cm0102-2002-11.json
+!public/football/cm0102-2001-09.json
+!public/football/cm0102-2020-11-cm3.json
+# The two fan-made retro databases the user chose to ship (1993/94 by Cam F, 1989/90 by Simon Treanor).
+!public/football/cm0102-2020-11-cm93.json
+!public/football/cm0102-2017-04-cm89.json
 public/football/index.json

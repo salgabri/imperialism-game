@@ -3,9 +3,15 @@
 // Derived from the iso_a2 column of the Natural Earth 110m attribute table, with
 // football-specific overrides: the United Kingdom's shape is England, beside
 // Scotland, Wales and Northern Ireland, and Kosovo has no ISO numeric code of its own.
+// Great Britain, the United Kingdom's team in the sports that play it as one, flies
+// the Union Jack under its own flag id ('GBR', GREAT_BRITAIN in src/data/teams.js).
+// A football season of another era flies the flags of its federations of the day
+// ('URS', 'CIS', 'YUG', 'FRY', 'ZAI'; a season's `identities`, src/data/footballFederations.js).
 //
 // Assets are vendored from the MIT-licensed `flag-icons` package; re-sync them
-// with `npm run sync-flags` after changing this map.
+// with `npm run sync-flags` after changing this map. The historic flags, which
+// flag-icons does not have, are public-domain Wikimedia Commons SVGs redrawn on its
+// 4:3 canvas by `npm run build:historic-flags` (scripts/data/historic-flags.json).
 
 export const FLAG_CODES = {
   '100': 'bg',        // Bulgaria
@@ -24,6 +30,7 @@ export const FLAG_CODES = {
   '170': 'co',        // Colombia
   '178': 'cg',        // Congo
   '180': 'cd',        // DR Congo
+  '184': 'ck',        // Cook Islands
   '188': 'cr',        // Costa Rica
   '191': 'hr',        // Croatia
   '192': 'cu',        // Cuba
@@ -139,6 +146,7 @@ export const FLAG_CODES = {
   '762': 'tj',        // Tajikistan
   '764': 'th',        // Thailand
   '768': 'tg',        // Togo
+  '776': 'to',        // Tonga
   '780': 'tt',        // Trinidad & Tobago
   '784': 'ae',        // United Arab Emirates
   '788': 'tn',        // Tunisia
@@ -152,12 +160,14 @@ export const FLAG_CODES = {
   'SCO': 'gb-sct',    // Scotland
   'WAL': 'gb-wls',    // Wales
   'NIR': 'gb-nir',    // Northern Ireland
+  'GBR': 'gb',        // Great Britain (the United Kingdom as one team)
   '834': 'tz',        // Tanzania
   '840': 'us',        // United States
   '854': 'bf',        // Burkina Faso
   '858': 'uy',        // Uruguay
   '860': 'uz',        // Uzbekistan
   '862': 've',        // Venezuela
+  '882': 'ws',        // Samoa
   '887': 'ye',        // Yemen
   '894': 'zm',        // Zambia
   '032': 'ar',        // Argentina
@@ -181,6 +191,12 @@ export const FLAG_CODES = {
   '064': 'bt',        // Bhutan
   '004': 'af',        // Afghanistan
   '090': 'sb',        // Solomon Islands
+  // Federations of the day (historic flags, scripts/data/historic-flags.json):
+  'URS': 'su',        // Soviet Union
+  'CIS': 'cis-1992',  // CIS (its team's flag at Euro 1992)
+  'YUG': 'yu',        // Yugoslavia (SFR Yugoslavia)
+  'FRY': 'yu-1992',   // FR Yugoslavia
+  'ZAI': 'zr',        // Zaire
 };
 
 /** URL of a nation's flag, or null for shapes without a mapped national flag. */

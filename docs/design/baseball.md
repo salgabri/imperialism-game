@@ -27,7 +27,7 @@ them. Sony's rights are not cleared, as for the built-in EA and 2K data.
 
 `--edition=<NN>` reads another edition and `--parallel=<n>` (at most 4) asks for several
 pages at once: the older editions' hosts take 15–25 s a page. The earlier seasons
-(below) are built from editions 21 to 25.
+(below) are built from editions 21 to 25, and from ShowZone's copies of 18 to 20.
 
 **Clubs.** `scripts/data/mlb-teams.json` names each club, its scoreboard code, the
 place its territory is named after, its ballpark and the point the map places it at
@@ -66,7 +66,9 @@ Netherlands seven to nine of its thirteen places; eleven more one to seven playe
   generated player there at the nation's strength, shown dimmed and asterisked, as
   basketball does. The strength counts those places at the baseline (45).
 - A nation with no MLB players is a minnow at the baseline, 45, whatever its football
-  confederation: baseball is a few nations' sport.
+  confederation: baseball is a few nations' sport. Since 2026-11-09 it fields no team, nor
+  does a nation whose MLB players hold less than half the lineup (`fieldedNations` in
+  `src/engine/footballSets.js`): 12 nations play, and the rest of the land stays neutral.
 - This is birthplace, not World Baseball Classic eligibility: Italy and Israel, whose
   classic teams are heritage players born in the USA, are almost empty, and Japan has
   only its MLB players (no NPB). The game's football nations are likewise dated XIs by
@@ -171,7 +173,8 @@ setting.
 - **Setup.** A fourth sport card, "Nations · 30 MLB clubs". Clubs have one theatre,
   **MLB · USA and Canada**; nations the usual theatres (North and Central America,
   where the baseball nations are, or the world). The Season list holds the built-in
-  2026.
+  2026, then MLB The Show's 2025 to 2018 and the computed 2017 to 1960 (below); a
+  season's clubs take the map of their day.
 - **Squad.** A diamond: the catcher at home plate, the infield and the starter on the
   mound, the outfield inside the fence, the designated hitter on deck and the bullpen
   beyond the right-field line. Groups read Catcher, Infield, Outfield, Designated
@@ -206,48 +209,392 @@ the live ticker, a baseball nations campaign and an MLB resume.
 
 ## Earlier seasons
 
-Five more seasons ship beside the built-in 2026: 2021 to 2025, each MLB The Show
-edition's Live series at its last roster update (5 November 2021, 11 November 2022,
-10 November 2023, 8 November 2024 and the 2025 edition's last), read from that
-edition's own API host (mlb21 to mlb25.theshow.com). Nothing older exists to read:
-the mlb17–mlb20 hosts are gone, the Wayback Machine holds two pages of the MLB 19
-API, and no dataset of every player's ratings for those years turned up. The only
-lead, a fan project that computes Show-like ratings from real statistics back to
-1897, estimates ratings rather than reading them, so it is not used.
+Eight more seasons from MLB The Show ship beside the built-in 2026: 2018 to 2025, each
+edition's Live series at its last roster update (1 November 2018, 27 September 2019,
+30 October 2020, 5 November 2021, 11 November 2022, 10 November 2023, 8 November 2024
+and the 2025 edition's last). 2021 to 2025 are read from each edition's own API host
+(mlb21 to mlb25.theshow.com). Sony's mlb18–mlb20 hosts are gone, so 2018 to 2020 are
+ShowZone's copies of the same cards (below). No game's ratings of every player can be
+read before that: ShowZone keeps no edition before MLB The Show 18, the Wayback Machine
+holds two pages of the MLB 19 API, and no other dataset of every player's ratings for
+those years turned up. The seasons from 1960 to 2017 are therefore computed from the
+players' WAR, by a documented rule and labelled as computed ([below](#seasons-before-2018-computed-from-war)).
+A fan project that computes Show-like ratings from real statistics back to 1897 is
+not used. The 2020 season was 60 games; here it is a season like any other.
 
 - **Building.** `npm run build:mlb-seasons` (`scripts/build-mlb-seasons.mjs`) builds
   each season from its committed snapshot by the built-in season's rules, now in
   `scripts/lib/mlb.mjs`: `public/baseball/mlb-the-show-<nn>.json` (kind `show`), their
   listing `src/data/baseballSeasons.js` and `docs/design/baseball-seasons-audit.json`.
   `--check` rebuilds every file byte for byte, offline.
+- **ShowZone.** showzone.gg, a fan-run card database that is not the publisher, keeps
+  the Live series of MLB The Show 18 to 26 at each edition's last roster update and
+  serves it from a public data API (data.showzone.gg). Its pages for 18 to 21 were read
+  once, on 8 November 2026 (74 pages of 100 cards), cached in the ignored
+  `data-src/showzone/` and pinned by SHA-256 in `scripts/data/mlb-seasons.json`
+  (`showzone`). showzone.gg's robots.txt disallows /api on its own host; the data host
+  serves none. ShowZone states "All Rights Reserved" and publishes no terms: as with
+  Sony's own data, the rights are not cleared. `npm run import:mlb-showzone`
+  (`scripts/import-mlb-showzone.mjs`) checks the pins and writes
+  `scripts/data/mlb-the-show-18.json` to `-20.json` in the Sony snapshots' shape, with
+  the source and these checks in each; it never fetches, and `--check` rebuilds the
+  three byte for byte.
+- **Checks.** ShowZone's MLB The Show 21 must equal Sony's own snapshot card for card
+  (all 2,092: uuid, name, team, position, overall and birthplace) or the import stops;
+  its team ids take their codes and names from that edition, which the clubs kept from
+  2018 to 2021. Against Sony's own pages, ShowZone holds the new rating and the team of
+  all 37 changes of MLB 18's last roster update, 142 of 143 of MLB 19's and 113 of 114
+  of MLB 20's (the Wayback Machine); every overall of the 60 MLB 18, 10 MLB 19 and 95
+  MLB 20 card pages the Wayback Machine and Common Crawl hold agrees, and so do the
+  secondary positions and birthplaces of 19 and 20. Two Live cards are missing, and
+  so are their players: Giovanny Gallegos (MLB 19) and Paolo Espino (MLB 20).
+- **MLB The Show 18** lists no secondary positions (nor do Sony's own MLB 18 card
+  pages), so its players field their primary position only; every club still fields
+  every place naturally. It names no birthplace either. A card takes one from the
+  nearest edition within three that names it (MLB 19 to 21: 1,369 cards, and all 54
+  that Sony's own MLB 18 pages name agree), else from MLB's own records:
+  `npm run sync:mlb-birthplaces` (`scripts/sync-mlb-birthplaces.mjs`) matches each of
+  the other 202 cards to one player of the 2016–2019 seasons in MLB's Stats API
+  (statsapi.mlb.com, which serves no robots.txt; one request a season, pinned in the
+  manifest's `statsApi`), by name, then surname and a shortened first name ("Matt" for
+  Matthew), then surname and club, always in the card's role and with its hands (a
+  pitcher's batting hand aside), and writes the answers to
+  `scripts/data/mlb-birthplaces.json`. 201 match, the six that Sony's MLB 18 pages
+  name among them, and agree; Chris Smith, a free agent two players could be, plays
+  for no nation. The audit lists every birthplace found and where.
 - **Clubs of their day.** `scripts/data/mlb-seasons.json` names the eras in which a
-  franchise played under another name or elsewhere: the Cleveland Indians (2021),
-  the Oakland Athletics at the Oakland Coliseum (to 2024), the Rays at George M.
-  Steinbrenner Field in Tampa (2025, Tropicana Field being repaired after Hurricane
-  Milton), and the old names of Guaranteed Rate Field and Minute Maid Park (to 2024).
-  A club of another era has its own id (`mlb-cleveland-indians`,
-  `mlb-oakland-athletics`), as the NBA's moved franchises do, so it has no crest.
-- **Era maps.** `npm run build:mlb-map` also draws `mlb2021`, `mlb2022` (2022–24) and
-  `mlb2025` from the manifest; each lists the seasons it serves, and a season's clubs
-  play only there. Their clubs rank as their franchises rank today, so section ids
+  franchise played under another name or elsewhere (from the franchise history of
+  1980–2020 researched for the maps): the Cleveland Indians (to 2021), the Oakland
+  Athletics (to 2024) at the Oakland–Alameda County Coliseum, the RingCentral Coliseum
+  (2019) and the Oakland Coliseum (2021–24), the Blue Jays at Sahlen Field in Buffalo
+  (2020, Canada closing its border to visiting teams), the Rangers at Globe Life Park
+  in Arlington (to 2019), the Rays at George M. Steinbrenner Field in Tampa (2025,
+  Tropicana Field being repaired after Hurricane Milton), and the old names of
+  SunTrust Park (to 2019), Marlins Park and Miller Park (to 2020), Safeco Field and
+  AT&T Park (2018), Guaranteed Rate Field and Minute Maid Park (to 2024). A club of
+  another era has its own id (`mlb-cleveland-indians`, `mlb-oakland-athletics`), as
+  the NBA's moved franchises do, so it has no crest.
+- **Era maps.** `npm run build:mlb-map` also draws `mlb2018`, `mlb2019`, `mlb2020`,
+  `mlb2021`, `mlb2022` (2022–24) and `mlb2025` from the manifest; each lists the
+  seasons it serves, and a season's clubs play only there. A map serves the seasons
+  with the same clubs in the same ballparks under the same names, so 2018, 2019 and
+  2020 have one each. Their clubs rank as their franchises rank today, so section ids
   follow one order on every map. Cook County is cut between the Chicago clubs on
-  every map.
+  every map. In 2020 the Blue Jays hold their part of New York State, which they
+  share with the Yankees and the Mets, and Ontario is nobody's.
 - **Nations.** A season keeps both layers, unlike an NBA season: its nations
-  replace the built-in ones (a nation it does not list is the sport's minnow, 45),
+  replace the built-in ones (a nation it does not list fields no team, nor does one whose players hold less than half the lineup),
   and its clubs the built-in clubs, on its era's map. The loader (`seasonSport` in
   `src/engine/footballSets.js`) binds baseball to both; saves name the set, its
-  version and its season ('2024', a calendar year).
+  version and its season ('2024', a calendar year). MLB The Show 19 and 20 name three
+  places the later editions do not: Northern Ireland (the United Kingdom, as Great
+  Britain is), Lithuania and Saudi Arabia, each one pitcher's.
 - **A source error.** MLB The Show 24's API gives the wrong country for players born
   outside the United States (Juan Soto and Ketel Marte "At Sea", Ronald Acuña Jr.
   "Slovenia", Shohei Ohtani "Honduras"); its US states are right. The manifest marks
   that edition (`unreliableBirthplaces`), and the build takes each foreign-born
-  player's birthplace from the nearest sound edition, earlier first. The audit lists
-  every one, and any player no other edition names, who then plays for his club only.
-  The other editions agree with 2026 on all but a handful of players.
+  player's birthplace from the nearest sound edition within three, earlier first.
+  Where that edition has two players of the name born in different places, the one in
+  the card's role (pitcher or not) decides, then the one on its club, then the one at
+  its position; failing all three, the edition is passed over. The audit lists every
+  one, and any player no edition names, who then plays for his club only. The other
+  editions agree with 2026 on all but a handful of players.
+
+## Seasons before 2018: computed from WAR
+
+Status: built 2026-11-09; its names, birthplaces, records and ballparks re-sourced from
+the Baseball Databank on 2026-11-10. Fifty-eight more seasons, 1960 to 2017
+(`mlb-war-<year>`, listed "Computed from WAR, end of <year>"), whose ratings no game
+published. Each player's rating is computed from his WAR and put on MLB The Show's
+scale, rank for rank within his role; the clubs, nations and maps are built as the MLB
+The Show seasons' are. They are not a game's ratings, and every file says so
+(`source.computed`, `method`, `conversion`, `rawScale: "WAR"`).
+
+**Sources.** Pinned in `scripts/data/mlb-war-seasons.json` (`sources`) and cached in the
+ignored `data-src/mlb-war/`:
+
+- **WAR**: JEFFBAGWELL, Neil Paine's player-season-stint WAR of every MLB player since
+  1901 (github.com/Neil-Paine-1/MLB-WAR-data-historical, `jeffbagwell_war_historical_2025.csv`,
+  added in a9087e3, read at commit 1c8c308; git blob 48d384a4, SHA-256 0572a897…). MIT
+  licence. Its WAR averages Baseball-Reference's and FanGraphs' (pitching: FIP-based,
+  runs-allowed modified for defence, and RA9). Neither site was read for these seasons:
+  their terms pages answered HTTP 403 to the research pass and were not read, and no
+  other Sports Reference or FanGraphs page was requested. 2025 is in the file only partly
+  (it was made in April 2025) and is not used.
+- **Baseball Databank** (Chadwick Baseball Bureau, CC BY-SA 3.0): People (names, given
+  names, birth year and birth country, joined by `bbrefID`), Teams (each club's
+  Baseball-Reference code, name and record) and HomeGames (the ballpark each club played
+  most of its home games in, from Retrosheet's game logs). The Databank keeps the Lahman
+  database's tables and format, generated from the Bureau's own data. The Bureau's
+  repository (github.com/chadwickbureau/baseballdatabank) is no longer on GitHub, so
+  whether it had later commits cannot be seen; the latest commit any of its 159 surviving
+  forks holds, `e9f247e` (Ted Turocy, 6 November 2023; seasons 1871 to 2022), is read from
+  raw.githubusercontent.com through a fork whose master is that commit
+  (github.com/infonuum/baseballdatabank, forked two days later); each file's git blob is
+  checked against that commit's tree (GitHub's API) and its SHA-256 pinned.
+  raw.githubusercontent.com and api.github.com serve no robots.txt; github.com's own pages
+  were not requested. Retrieved 10 November 2026, one request every 1.5 s, User-Agent
+  `imperialism-game-data/1.0`. Every one of the 10,401 players of 1960 to 2017 is found,
+  each filed once. The research pass's copy of the Lahman 2025 files, from sabr.box.com,
+  was replaced because box.com's robots.txt disallows the download path it came through.
+- **English Wikipedia** (CC BY-SA 4.0; facts only): the names of the day and the
+  coordinates of the ballparks of 1960 to 1979, from 39 articles' infoboxes, and Elmer
+  Valo's birthplace, the one birth country the Databank gets wrong (below); each
+  article's revision and SHA-256 is pinned. en.wikipedia.org's
+  robots.txt allows /wiki/ pages to every agent; one request every 1.5 s, 2026-11-09.
+  The research pass had read the same parks' coordinates from Wikidata's query service,
+  whose robots.txt disallows /sparql; those answers are not used.
+- **MLB The Show 18 to 24** (the earlier seasons' snapshots): the scale only, and the
+  calibration. No card is copied into these seasons.
+
+`public/baseball/ATTRIBUTION.txt` credits all three, repeats the MIT notice and, in the
+Databank README's own words, its CC BY-SA 3.0 statement and Retrosheet's notice (the
+importer checks that the README holds both), credits Baseball-Reference and FanGraphs as
+the WAR's origin and the Lahman database of 2015 the Databank grew from, and puts the
+season files and their snapshots under CC BY-SA 3.0, as the Databank's share-alike licence
+asks of derived data.
+
+**Building.** `npm run import:mlb-war` (`scripts/import-mlb-war.mjs`) checks every pin
+(each file's SHA-256 and, for the WAR file and the Databank, its git blob in the pinned
+commit), never fetches, and writes one snapshot a season,
+`scripts/data/mlb-war-seasons/<year>.json` (6.7 MB in all, 58,902 player-seasons): every
+player who played in the season with his club, role, positions, score, the inputs it was
+computed from and his birth country, and each club's name, record and main ballpark. It
+also writes
+`scripts/data/mlb-war-reference.json` (below). `npm run build:mlb-seasons` rates and teams
+each season from its snapshot (`public/baseball/mlb-war-<year>.json`, 17–33 KB, 1.6 MB in
+all), with the listing, `docs/design/baseball-war-seasons-audit.json` and the attribution;
+`npm run build:mlb-map` draws the era maps. All three take `--check` and rebuild byte for
+byte offline: the importer from its cache, the seasons from committed files alone, the
+maps from the boundary cache (`data-src/boundaries/`).
+
+**The rule** (constants in the manifest's `method`; `scripts/lib/mlb-war.mjs`):
+
+- A player's stints of a season are summed. A stint's WAR is the file's WAR per 162 team
+  games times its club's scheduled games over 162, so the strike seasons of 1981, 1994
+  and 1995 count their own WAR against their own playing time. His club is that of his
+  last stint, as MLB The Show files a player under his club at its last roster update.
+- He is a pitcher when his innings × 4.3 exceed his plate appearances (or he pitched in at
+  least 80% as many games as he batted in, with fewer than 100 plate appearances). A
+  pitcher starts (SP) when his starts are at least 40% of his games over the season and
+  the one before, else he relieves (RP): the Show's label for 88% of 2019–24 cards.
+- A hitter's position is the fielding position he played most games at in the season
+  (the most over three seasons breaking ties), else the one he played most over the
+  three, else the designated hitter. He also fields every other position he played at
+  least 3 games at over the three seasons (against the Show's lists: precision 0.92,
+  recall 0.59). Every club of the 58 seasons fields all nine places naturally.
+- Scores, over the season (weight 5) and the two before it (3 and 2), regressed toward a
+  level below replacement so that playing time counts:
+  - hitters: 600 × (5W + 3W₋₁ + 2W₋₂ − 9) / (5PA + 3PA₋₁ + 2PA₋₂ + 600), 600 plate
+    appearances of prior at −0.015 WAR each;
+  - starters: 180 × (5W + 3W₋₁ + 2W₋₂ − 4.5) / (5IP + 3IP₋₁ + 2IP₋₂ + 150);
+  - relievers: 65 × (W + W₋₁ + W₋₂ − 1.5) / (IP + IP₋₁ + IP₋₂ + 30) + 0.8 × the season's
+    average leverage index (weighted by innings).
+  The weights and priors were grid-searched on the within-season rank correlation with
+  the Show's overalls, 2018–2024 (hitters 0.854, starters 0.853, relievers 0.756; the
+  season's raw WAR gives 0.69, 0.70 and 0.46). The snapshot keeps each input rounded
+  (WAR to 0.001, innings to 0.001) and the score is computed from those, so it can be
+  checked from the snapshot alone; the build checks it.
+- **Ratings.** The reference is the Show 18 to 24 overalls of the cards matched to their
+  season's WAR (by name, then role, then club: 1,333 / 1,332 / 1,224 / 1,447 / 1,465 /
+  1,440 / 1,433, 9,674 in all), grouped by the role the WAR file gives the player,
+  strongest first: 4,375 hitters (98 to 47), 1,798 starters (97 to 49) and 3,501 relievers
+  (94 to 41), over 210 club-seasons. The k-th best score of a role in a season of T clubs
+  takes the reference value at index (k − 0.5) / T × 210 − 0.5, interpolated and rounded;
+  deeper ranks take the floor; equal scores share their mean rank. Every era therefore
+  has the 2018–24 spread per club, as hockey's rescaled 1990s and rugby league's 2008 do.
+  Mapping hitters by position instead did worse (rank correlation 0.836 against 0.846).
+
+**Calibration** (`leaveOneOut` in the reference: each season of 2018–2024 rated against
+the other six seasons' reference):
+
+| | MAE | Pearson | Spearman | within 3 |
+|---|---|---|---|---|
+| hitters (4,375) | 3.62 | 0.80 | 0.845 | 61% |
+| starters (1,798) | 4.41 | 0.78 | 0.818 | 52% |
+| relievers (3,501) | 5.31 | 0.70 | 0.742 | 44% |
+| all (9,674) | 4.38 | | | 53% |
+
+Club strength (each club's lineup by the game's own rule) against the Show-built clubs of
+the same seasons: r 0.892, mean error 1.13 points, bias +0.24. Against the real records
+(the Databank's, which end with 2022, so 2023 and 2024 have none: `winShare` null), the
+computed clubs correlate better than the Show's own in three of the five seasons (2018 0.89
+against 0.87, 2019 0.92/0.89, 2020 0.67/0.70, 2021 0.79/0.82, 2022 0.94/0.91). Out of
+sample, the computed 2016 against MLB The Show
+17's launch top five at every position (GamesRadar, 40 players): r 0.81, mean error 3.9,
+the computed 3.8 lower (the list is the Show's own top, which the rank mapping
+compresses).
+
+**Spot checks** (`docs/design/baseball-war-seasons-audit.json` has every season):
+
+| season | strongest clubs (record) | best players | club strength vs win% |
+|---|---|---|---|
+| 1960 | Yankees 82.1 (97–57), White Sox 81.1, Pirates 80.8 | Mays 95, Banks 93, Aaron 92 | 0.80 |
+| 1961 | Yankees 82.3 (109–53), Tigers 80.6 (101–61) | Mantle 95, Mays 94, Aaron 92 | 0.93 |
+| 1969 | Orioles 83.5 (109–53), Tigers 81.4, Giants 81.3 | Clemente 96, Yastrzemski 94 | 0.92 |
+| 1975 | Reds 83.2 (108–54), Athletics 82.3 (98–64) | Morgan 96, Schmidt 94, Carew 93 | 0.87 |
+| 1984 | Tigers 81.8 (104–58), Blue Jays 80.5 | Ripken 96, Carter 94, Schmidt 93 | 0.68 |
+| 1998 | Yankees 82.5 (114–48), Indians 81.8 | Bonds 96, Griffey Jr. 94, Piazza 94 | 0.85 |
+| 2017 | Astros 83.5 (101–61), Dodgers 82.8 (104–58) | Trout 96, Altuve 94, Donaldson 94 | 0.83 |
+
+Over the 58 seasons club strength correlates with the real win share at r 0.82 on
+average (0.56 in 1991, whose strongest club on paper, the Reds, went 74–88, to 0.93 in
+1961). The best pitchers read as expected: Gibson 93 in 1968, Seaver 94 in 1975, Gooden 94
+in 1985, Pedro Martinez 94 in 2001; Hoyt Wilhelm (1961), Gossage (1985) and Rivera (2001)
+head their seasons' bullpens.
+
+**Clubs.** Each club fields the lineup the game picks and the rest of an active roster
+of 26, as in every baseball season. A club that used fewer than thirteen pitchers all
+season (109 of the 1,522 club-seasons, nearly all before 1990; the 1975 Reds used eleven)
+keeps every one it used beside its thirteen hitters, so its squad has 23 to 25 players;
+nothing is made up to fill it.
+
+**Names.** The Databank's first name and surname, with the WAR file's generational suffix
+(Ken Griffey and Ken Griffey Jr., the 1990 Mariners), initials written as the Show writes
+them ("A.J. Burnett", where the Databank has "A. J."). The Databank writes names without
+diacritics (Tony Pena, Minnie Minoso) and some by the name the player goes by today (Yolmer
+Sanchez, the White Sox's Carlos Sanchez of 2014–17). Namesakes of one season who would
+share a squad are told apart: the better keeps the name, the others take a middle initial
+from the Databank's given names ("Bob L. Miller"), else a birth year. Only one pair shares
+a squad in the 58 seasons: Pedro Martinez of 1968 beside Pedro Martinez of 1971 in the
+Dominican Republic's squads of 1993 to 1995 ("Pedro Martinez (1968)"); the Databank gives
+the elder no middle name.
+
+**Nations.** By the Databank's birth country, as every baseball season places players by
+birthplace (`nations` in the manifest): US states, the Virgin Islands (the Databank's
+"V.I."), Guam and American Samoa are the United States'; Curacao, Aruba and the
+Netherlands the Kingdom of the Netherlands'; the United Kingdom's players (born in England
+and Scotland) the United Kingdom's. The Databank names today's countries: Germany for West
+Germany, Russia (Victor Cole, Leningrad), Viet Nam (Danny Graves, Saigon), Belize (Chito
+Martinez). Rod Carew (Gatun) and Mike Eden (Fort Clayton), born in the Panama Canal Zone,
+are Panama's, as the Databank files them. The Databank files Elmer Valo under the Czech
+Republic, his birth state reading "Plzensky"; he was born in Rybník in Levice District,
+Slovakia (Wikipedia, citing his SABR biography), and the manifest's `birthCountries`
+gives him Slovakia: the one correction, which the importer applies only while the
+Databank still reads "Czech Republic". Hong Kong's Austin Brice is China's, as MLB The
+Show files him (the game has no Hong Kong). The game has no Singapore, so Robin Jennings
+plays for his club only; every other player of the 58 seasons has a nation. Each nation
+keeps its lineup and up to a club's depth; 4 to 10 nations a season field a team by the
+game's rule (their own players hold half the lineup): in 1960 the United States, Cuba,
+Puerto Rico and the Dominican Republic; Canada, Panama, Venezuela and Mexico in some
+seasons from 1962, 1967 and 1972; the Netherlands from 1998, Japan from 2001, Colombia in
+2015 and South Korea in 2016; ten in 2012. The North and Central America theatre, which
+needs four of its nations' real sides, is offered in every season but 1985–87 and
+1989–90: then only the United States, the Dominican Republic and Puerto Rico field one
+(Venezuela, the fourth, is South America's), and those seasons' nations play the world.
+
+**Clubs of their day.** `scripts/data/mlb-war-seasons.json` `eras` names each franchise's
+clubs of 1960 to 2017 by today's franchise: its Baseball-Reference code (`war`, the code
+the WAR file and the Databank use), its own id, name, code and territory where they are not
+today's, its ballpark of the day and its point (`home`), and the Databank's key of that
+ballpark (`park`, Retrosheet's park code). The build checks every season against the
+Databank: the same clubs under the same codes and names, each at the ballpark it played
+most of its home games in (which places the mid-season moves: the 1966 Cardinals at Busch
+Memorial Stadium, the 1970 Reds at Riverfront, the 1970 Pirates still at Forbes Field (42
+games to Three Rivers' 40), the 1989 Blue Jays at SkyDome, the 1999 Mariners at Safeco
+Field); the importer stops on a club that played as many home games at two ballparks. The
+one name the Databank gives otherwise is the Angels' of 2016–17, Los Angeles Angels from
+2016 (the 1980–2020 eras research), which the Databank still calls "of Anaheim"
+(`databankName`).
+
+- Clubs of another name have their own ids and no crest: the Milwaukee Braves (1960–65),
+  Kansas City Athletics (1960–67), Washington Senators of 1901 (1960, today's Twins) and of
+  1961 (1961–71, today's Rangers), Houston Colt .45's (1962–64), California Angels
+  (1965–96), Anaheim Angels (1997–2004), Los Angeles Angels of Anaheim (2005–15), Seattle
+  Pilots (1969), Montreal Expos (1969–2004), Florida Marlins (1993–2011) and Tampa Bay
+  Devil Rays (1998–2007), with the Oakland Athletics and Cleveland Indians of the MLB The
+  Show seasons. The Los Angeles Angels of 1961–64 have today's name, id and crest. Codes are
+  Baseball-Reference's for clubs of another day (MLN, KCA, WSH and WSA, CAL, ANA, SEP, MON,
+  FLA, TBD).
+- Clubs number 16 in 1960, 18 in 1961, 20 from 1962, 24 from 1969, 26 from 1977, 28 from
+  1993 and 30 from 1998.
+- Ballparks are named as they were: Briggs Stadium (1960), White Sox Park (1962–75),
+  Busch Stadium (Sportsman's Park, to 1965), Connie Mack Stadium, District of Columbia
+  Stadium (1962–68), Atlanta Stadium (1966–75), San Diego Stadium (1969–80), Royals Stadium
+  (1973–92) and the names of 1980 onward the eras research gives. Ballparks still in use
+  in 1980 keep that research's coordinates; the twelve others take their Wikipedia
+  article's (Crosley Field, the Los Angeles Memorial Coliseum, Griffith Stadium, Kansas
+  City's Municipal Stadium, Connie Mack Stadium, Forbes Field, Sportsman's Park, Wrigley
+  Field in Los Angeles, Colt Stadium, the Polo Grounds, Sick's Stadium, Jarry Park).
+- **Two clubs in one city.** In 1961–65 the Dodgers and Angels are "Los Angeles
+  (Dodgers)" and "Los Angeles (Angels)", as the NFL names its two Los Angeles clubs, and
+  Los Angeles County is cut between them; in 1962–63 the Mets at the Polo Grounds hold
+  their part of New York State as "Manhattan", beside the Yankees' Bronx.
+- **Shared ballparks.** The Angels played at Dodger Stadium in 1962–65 and the Yankees at
+  Shea Stadium in 1974–75: two clubs on one point cannot share out its county. As the
+  NFL's clubs that share a stadium grow from their training grounds, each tenant grows
+  from its own previous home (`base`): the Angels from Wrigley Field, Los Angeles, the
+  Yankees from Yankee Stadium. The map names the ballpark they played at.
+
+**Era maps.** `npm run build:mlb-map` draws 37 maps for the 58 seasons (`maps` in the
+manifest), each listing the seasons it serves, built as the other MLB maps are: mlb1960,
+mlb1961, mlb1962 (1962–63), mlb1964, mlb1965, mlb1966 (1966–67), mlb1968, mlb1969 to
+mlb1973, mlb1974 (1974–75), mlb1976, mlb1977 (1977–81), mlb1982 (1982–88), mlb1989
+(1989–90), mlb1991 to mlb1994, mlb1995 (1995–96), mlb1997 to mlb2000, mlb2001 (2001–02),
+mlb2003 to mlb2005, mlb2006 (2006–07), mlb2008, mlb2009, mlb2010 (2010–11), mlb2012
+(2012–15), mlb2016 and mlb2017. A new map starts when the clubs, a club's id, name or
+territory, its tenant base or its ballpark's point changes; a ballpark renamed in place
+keeps the map, which names it as its first season did (the map's `arena` is not shown in
+play). The map builder now checks every era's seasons, the MLB The Show seasons' too, by
+that rule; mlb, mlb2018 to mlb2025 rebuild byte for byte. 2017 has 2018's clubs in
+2018's ballparks, yet gets a map of its own, mlb2017, so mlb2018's version (and the saves
+that name it) stays as it is. Before 1969 no club is Canadian, and Canada's provinces stay
+empty.
+
+**Checks.** `scripts/baseball-war-seasons.test.mjs` (in `npm run test:baseball`): the
+importer's rebuild (when the caches are on the computer); every snapshot score from its
+inputs; the reference's 9,674 cards and its calibration (mean error at most 4.5, clubs r
+at least 0.88; records to 2022); ratings that keep each role's order; the listing, after
+MLB The Show's, each season on its map; every season decoding, computed, its clubs its
+map's, each fielding all nine places and keeping 26 players or every pitcher it used; the
+spot checks above and the record correlation; the nations of 1960, the Databank's birth
+countries, Elmer Valo's correction and Rod Carew's Panama; the namesakes; the clubs of
+their day; the rename rule (37 maps, ballparks named in place,
+2017 with 2018's places); every club growing inside its own land, Los Angeles in 1961, the
+Polo Grounds and the tenants; the loader's refusals; and the running App launching a 1961
+clubs campaign on `mlb1961` and resuming it. `scripts/club-maps.test.mjs` holds the 37
+maps to the state rule, as every other.
+
+**Decisions** (2026-11-09). The user's: seasons back to 1960 and no further. Claude's, as
+coordinator, under the user's request to cover every missing season and not yet confirmed
+by the user: JEFFBAGWELL WAR with the Lahman database for names and birthplaces, by this
+rule and mapping (a Lahman-only metric, nearly as good overall but 5–12 points lower for
+glove-first players, stays a documented fallback, not built); a ballpark renamed in place
+keeps its map, 2017 gets its own; shared ballparks' tenants grow from their own previous
+home; the full per-player snapshot is committed. The WAR averages Baseball-Reference's and
+FanGraphs', whose terms could not be read, so using it is open for the user. The builder's
+own (2026-11-09): "Los Angeles (Dodgers)" and "Los Angeles (Angels)" for 1961–65 and
+"Manhattan" for the Polo Grounds Mets; the Senators' ids by founding year
+(`mlb-washington-senators-1901`, `-1961`); a club short of thirteen pitchers keeps the ones
+it used; namesakes in one squad keep the better player's name; the ballparks' names and
+coordinates of 1960–79 from Wikipedia rather than the research pass's Wikidata answers. The
+re-sourcing's (2026-11-10): the Lahman tables from the Chadwick Bureau's Baseball Databank,
+the first choice asked for, read at the latest commit its forks hold, through one of them;
+its names and birth countries as it gives them (the Peñas become Pena, Rod Carew and Mike
+Eden Panama's), Elmer Valo's alone corrected; the calibration's record check limited to the
+Databank's seasons (2018–2022) rather than a second source for 2023–24.
 
 ## Known limits
 
-- Six seasons, 2021 to 2026: nothing older can be read.
+- MLB The Show's nine seasons, 2018 to 2026: ShowZone keeps nothing older, so 1960 to
+  2017 are computed (below). 2018 to 2020 are a fan
+  site's copy of Sony's cards, checked against Sony's own pages but not Sony's API,
+  read from a data host whose site disallows /api in its robots.txt; MLB The Show 18's
+  players field their primary position only, and its birthplaces come from the next
+  editions and MLB's records.
+- 1960 to 2017 are computed, not a game's ratings: about 4.4 points a player from what
+  the Show would say (relievers 5.3), the very top compressed (3.8 points under MLB The
+  Show 17's launch top fives), and every era given the 2018–24 spread per club by design.
+  Swingmen and firemen of the 1960s are sorted into starters and relievers by a modern
+  rule. A player's club is his last stint's: a deadline acquisition counts for the club
+  that acquired him, a released player stays with the club that released him. Every
+  season is played with a designated hitter and rosters of up to 26, which those seasons
+  did not have. The WAR averages Baseball-Reference's and FanGraphs', whose terms could
+  not be read.
+- Names and birthplaces of 1960 to 2017 are the Baseball Databank's of November 2023, a
+  resource its own README calls legacy, its legacy parts unmaintained: names without
+  diacritics, and whatever it has not corrected since. Its seasons end with 2022, so the
+  calibration checks no records of 2023 or 2024.
 - Nations by birthplace, not eligibility; no NPB, KBO or CPBL players.
 - The ace starts every game, and a run scores as runs batted in only: no errors, wild
   pitches or unearned runs, no home runs as such.

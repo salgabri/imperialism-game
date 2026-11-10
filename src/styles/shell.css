@@ -7,6 +7,9 @@
   position:relative; height:100dvh; min-height:0; display:flex; flex-direction:column; overflow:hidden;
   padding-top:var(--safe-top); background:var(--surface); color:var(--ink);
 }
+/* index.html hides its static copy of the loading screen (`#root > .app-shell`) until this stylesheet applies, since
+   the dev server injects it from the bundle. The extra `html` wins on specificity, whichever of the two comes later. */
+html #root > .app-shell { visibility:visible; }
 .app-shell > .mast, .app-shell > .turn-strip, .app-shell > .phone-bar, .app-shell > .tabbar { flex:none; }
 
 /* ---- main grid ---- */

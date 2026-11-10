@@ -1,9 +1,7 @@
 import { C } from '../theme.js';
-import { ROSTERS } from '../data/rosters.basketball.js';
-import { CLUBS } from '../data/clubs.basketball.js';
-import { CLUBS as EUROLEAGUE_CLUBS } from '../data/clubs.euroleague.js';
+import { defineSportData } from './sportData.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
-import { HOME_NATIONS, selectLineup } from '../data/teams.js';
+import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../data/nbaLeagueAverages.js';
 
 // Two rulebooks, one model. Nations play FIBA's four ten-minute quarters at about 73 possessions a game. Clubs are
@@ -281,24 +279,28 @@ const eventFormat = rules => (e, code) => ({
   text: `+${e.pts} — ${e.name} (${code})`,
 });
 
-export const basketball = {
+/** Basketball without its players: every NBA season plays these rules (`nbaBasketballIn`), read at import. */
+const basketballRules = {
   id: 'basketball',
   simulationVersion: 3,
   name: 'Basketball',
   blurb: 'Starting fives: forty minutes between nations and in the EuroLeague, forty-eight in the NBA. Level games go to overtime.',
-  rosters: ROSTERS,
-  // The NBA's franchises and the EuroLeague's clubs, each league on its own map: they never meet.
-  clubs: [...CLUBS, ...EUROLEAGUE_CLUBS],
+  // Read from the sport's players (sportData.js), once they have loaded: the NBA's franchises and the EuroLeague's clubs,
+  // each league on its own map, so they never meet.
+  rosters: undefined,
+  clubs: undefined,
   // Great Britain is one FIBA team: the home nations' shapes start in the United Kingdom's (826) empire.
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
+  // That empire plays as Great Britain, under the Union Jack.
+  playsAs: { '826': GREAT_BRITAIN },
 
   squadSize: 5,
   formation: { PG: 1, SG: 1, SF: 1, PF: 1, C: 1 },
   positionPlan: ['PG', 'SG', 'SF', 'PF', 'C'],
   positionColors: { PG: C.gold, SG: C.cyan, SF: C.green, PF: C.red, C: '#B07CD8' },
 
-  // Nations outside the curated list are basketball minnows, well below the
-  // forty federations that field real players.
+  // Only the forty curated federations field a team (fieldedNations: a real side). Built anyway, a nation outside the
+  // list would be all generated at this strength.
   fallbackStrength: (rec, confMeta) => Math.max(40, confMeta[rec[2]].baseStr - 8),
   requiredPositions: [],
 
@@ -328,6 +330,8 @@ export const basketball = {
   },
 };
 
+export const basketball = defineSportData({ ...basketballRules });
+
 const nbaSeasons = new Map();
 
 /**
@@ -341,8 +345,8 @@ export function nbaBasketballIn(season) {
   const key = Object.hasOwn(NBA_LEAGUE_AVERAGES, season) ? season : LATEST_NBA_SEASON;
   if (!nbaSeasons.has(key)) {
     const rules = nbaRules(NBA_LEAGUE_AVERAGES[key]);
-    nbaSeasons.set(key, {
-      ...basketball,
+    nbaSeasons.set(key, defineSportData({
+      ...basketballRules,
       simulationVersion: 5,
       clock: { length: rules.minutes, msPerUnit: 79 },
       formatEvent: eventFormat(rules),
@@ -351,7 +355,7 @@ export function nbaBasketballIn(season) {
       simulate(rng, attacker, defender, drama, effA, effD, venue) {
         return playMatch(rng, prepareMatch(attacker, defender, effA, effD, venue, rules), attacker, defender, drama);
       },
-    });
+    }, { id: 'basketball' }));
   }
   return nbaSeasons.get(key);
 }
@@ -368,17 +372,17 @@ export const EUROLEAGUE_SCOPE = `domestic:${EUROLEAGUE_MAP}`;
  * Basketball between EuroLeague clubs: FIBA's forty minutes, at the EuroLeague's pace and scoring rate and with its
  * home edge. Club campaigns on the EuroLeague's map play it (`matchSport` in src/sports/index.js). Version 6.
  */
-export const euroleagueBasketball = {
-  ...basketball,
+export const euroleagueBasketball = defineSportData({
+  ...basketballRules,
   simulationVersion: 6,
-  clock: { length: EUROLEAGUE.minutes, msPerUnit: basketball.clock.msPerUnit },
+  clock: { length: EUROLEAGUE.minutes, msPerUnit: basketballRules.clock.msPerUnit },
   formatEvent: eventFormat(EUROLEAGUE),
   prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, EUROLEAGUE),
 
   simulate(rng, attacker, defender, drama, effA, effD, venue) {
     return playMatch(rng, prepareMatch(attacker, defender, effA, effD, venue, EUROLEAGUE), attacker, defender, drama);
   },
-};
+}, { id: 'basketball' });
 
 /** The constants the live win-probability model mirrors (src/engine/winProbability.js). */
 export const BASKETBALL_MODEL = Object.freeze({ PACE_SD, OVERTIME_PACE_SD, OVERTIME, MAX_OVERTIMES, SHOT_BASE,

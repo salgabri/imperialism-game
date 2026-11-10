@@ -11,6 +11,20 @@
 // The data set builder (src/data/footballSetBuild.js) reads this list in the CLI and in the browser.
 
 export const CM0102_RELEASES = [
+  // SI's own Championship Manager: Season 99/00 (original release 3.70, CD mastered 16 November 1999) and Season 00/01
+  // (original release 3.81, the UK CD of 6 October 2000): their untouched Data files are already the CM 01/02 tables
+  // (format 1, 157-byte staff), read from the retail CDs' InstallShield cabinets (scripts/sync-retro-cds.mjs). Ids are
+  // `cm-<season>`, the kind of a CM edition before CM 01/02, and the url is the archive.org item the files are read from.
+  { id: 'cm-9900', edition: 'CM 99/00', label: '3.70', provider: 'Sports Interactive', season: '1999/00', year: 2000, released: '1999-11',
+    snapshotDate: '1999-11', url: 'https://archive.org/details/championship-manager-season-9900', shifts: { birth: 0 },
+    signatures: [
+      { club: 2540132, staff: 12318294, clubSha256: '8fabfd345a999abedcd3714f6cd8a9373a33782f2d5570c023a4b4098989bf25', staffSha256: '1efd3432d9ea3c54ff88aab39e8b43e7ef7ea064032f38918d5ba58cfc2b8455' },
+    ] },
+  { id: 'cm-0001', edition: 'CM 00/01', label: '3.81', provider: 'Sports Interactive', season: '2000/01', year: 2001, released: '2000-10',
+    snapshotDate: '2000-10', url: 'https://archive.org/details/cm-0001-rel', shifts: { birth: 0 },
+    signatures: [
+      { club: 3691093, staff: 19498141, clubSha256: 'c8b238c19a94d18442099f0294e056ce989d31d3c62679f6b58b72e8d6975305', staffSha256: '6a6b3eead90f246317e7c58a36654bef981d2f1fa61503fc08abc2c2ef7f0926' },
+    ] },
   { id: 'cm0102-2001-09', label: '3.9.60', provider: 'Sports Interactive', season: '2001/02', year: 2002, released: '2001-09',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=65', shifts: { birth: 0, joined: 0, contract: 0 },
     signatures: [
@@ -202,6 +216,34 @@ export const CM0102_RELEASES = [
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=1381', shifts: { birth: 19, joined: 19, contract: 19 },
     signatures: [
       { club: 6664070, staff: 36019444, clubSha256: '6dffe15d59cff8c2362b23d698a39c2afb120769536281329ba054c796b5c3b6', staffSha256: 'a09402e74d1f72f51b9d48a92d782d0d80ab02adfe138ac3fcf23f03c62bee8e' },
+    ] },
+  // SI's Championship Manager 3 data (1998/99; CM3 was released on 26 March 1999) in the CM 01/02 format: Cam F's
+  // "Season 98/99 for 0102 (CM3)" (forum topic of 28 November 2020; Gio converted it about 2011), as the CM0102 Starter
+  // Kit ships it (data/cm3_data.zip). Birth years are stored three years late, so the game can start in 2001. Its
+  // staff.dat carries 230 bytes after its last table (22 bytes of 0xFF, then four repeated preferences records), cut
+  // before reading (`staffTrailing`). Not Cam F's later rework of it to September 1998.
+  { id: 'cm0102-2020-11-cm3', edition: 'CM3', label: '98/99 for CM 01/02', provider: 'Sports Interactive', season: '1998/99', year: 1999,
+    released: '2020-11', snapshotDate: '1999-03', url: 'https://www.champman0102.co.uk/viewtopic.php?t=1547', shifts: { birth: -3 },
+    signatures: [
+      { club: 6148142, staff: 11798060, staffTrailing: 230, clubSha256: '3309a9f3cb68e47bcafc09c1c25615a37150f06e53d76609e0e45885bd1618f3', staffSha256: '2df1a6a0efeb439954218f35f5258817e53a144787b5402f5b8e05b948877b47' },
+    ] },
+  // Two fan-made databases of earlier seasons in the CM 01/02 format, as the CM0102 Starter Kit ships them: their players
+  // and abilities are their makers' (fans'), not SI's, and the user chose to ship both, credited to them. Birth years are
+  // stored as they were (the Starter Kit's loader starts the game in 1993 or 1989).
+  // Cam F's "Season 93/94 For 0102" (forum topic of 28 November 2020; data/cm93_data.zip): against SI's own CM 93/94 data
+  // for 1,452 English-league players its abilities correlate 0.72, and 74 are equal.
+  { id: 'cm0102-2020-11-cm93', label: '93/94 by Cam F, fan-made', provider: 'Cam F', season: '1993/94', year: 1994, released: '2020-11',
+    url: 'https://www.champman0102.co.uk/viewtopic.php?t=1546', shifts: { birth: 0 },
+    signatures: [
+      { club: 6150466, staff: 14364438, clubSha256: '770bbb7d8682a7786de46c4b7959fc64d6fe811bcb495b7691f1721a8732e9ba', staffSha256: 'ea6538893383dab023129429ca1ea2697b1d35bbea4d293f2615b0e9bfd32b0c' },
+    ] },
+  // Simon Treanor's "Championship Manager 1989/90 update for CM 01/02", Beta 5 of 8 April 2017 (its readme;
+  // data/cm89_data.zip): today's nationalities (Ukraine, Croatia, Slovakia; East Germans as 'Germany'), which a season
+  // plays as the federations of their day (src/data/footballSetBuild.js).
+  { id: 'cm0102-2017-04-cm89', label: '89/90 by Simon Treanor, fan-made', provider: 'Simon Treanor', season: '1989/90', year: 1990, released: '2017-04',
+    url: 'https://cm8990.wordpress.com/', shifts: { birth: 0 },
+    signatures: [
+      { club: 7704060, staff: 30177072, clubSha256: 'f2b1b96ed109b590715627ee79933239fce85f32fabee70c719363363196bfd9', staffSha256: 'dc28f8a5b3c190fc326f156ac69bca9d0088cb9f758290bf7bd1ca96cba81844' },
     ] },
   { id: 'cm0102-2021-04', label: 'April 2021', provider: 'CM 01/02 Update Team', season: '2020/21', year: 2021, released: '2021-04',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=2863', shifts: { birth: 19, joined: 19, contract: 19 },

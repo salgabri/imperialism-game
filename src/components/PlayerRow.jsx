@@ -12,14 +12,20 @@ export default function PlayerRow({ player, positionColors = {}, roomy = false, 
   const source = player.sourceInfo;
   // A Championship Manager rating is the CM 01/02 Update Team's own assessment (docs/design/football-years.md).
   const cm = source?.source === 'cm0102';
-  const sourceName = source?.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : 'Football Manager';
+  // Sensible World of Soccer rates a price step, not an ability (src/data/swosPlayers.js).
+  const swos = source?.source === 'swos';
+  // A computed World Cup player's date is his team's Elo's, not a database's (scripts/lib/world-cup-seasons.mjs).
+  const worldCup = source?.source === 'world-cup';
+  const sourceName = source?.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : swos ? 'SWOS' : 'Football Manager';
   const edition = String(source?.edition || '');
   const sourceLabel = edition ? /^\d+$/.test(edition) ? `${sourceName} ${edition}` : edition : sourceName;
   const estimated = isEstimated(player);
-  const sourceTitle = estimated ? estimateTitle(player) : source ? [sourceLabel, cm && (source.provider || 'CM 01/02 Update Team'), source.version && `Database ${source.version}`,
-    source.snapshotDate && `Database snapshot ${source.snapshotDate}`,
+  const sourceTitle = estimated ? estimateTitle(player) : source ? [sourceLabel, cm && (source.provider || 'CM 01/02 Update Team'),
+    swos && (source.provider || 'Sensible Software'), source.version && `Database ${source.version}`,
+    source.snapshotDate && (worldCup ? `Team Elo ${source.teamElo} on ${source.snapshotDate}` : `Database snapshot ${source.snapshotDate}`),
     Number.isFinite(source.rawRating) && `Source rating ${source.rawRating}${Number.isFinite(source.rawScale) ? `/${source.rawScale}` : source.rawScale ? ` (${source.rawScale} scale)` : ''}`,
-    source.conversion && `Game rating converted from ${cm ? 'CM' : 'Football Manager'} current ability: ${source.conversion}`].filter(Boolean).join(' · ') : '';
+    source.conversion && `Game rating converted from ${swos ? 'SWOS\'s price step' : `${cm ? 'CM' : 'Football Manager'} current ability`}: ${source.conversion}`]
+    .filter(Boolean).join(' · ') : '';
   const ratingTitle = [Number.isFinite(player.effectiveRating) && player.effectiveRating !== player.rating
     ? `Base rating ${player.rating}; lineup rating ${player.effectiveRating.toFixed(1)}` : null, sourceTitle].filter(Boolean).join(' · ');
   return (

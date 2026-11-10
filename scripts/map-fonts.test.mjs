@@ -26,7 +26,7 @@ function deferred() {
   return { promise, resolve, reject };
 }
 
-async function fixture({ load, headless = false } = {}) {
+async function fixture({ load, headless = false, initial = {} } = {}) {
   const dom = new JSDOM('<!doctype html><div id="root"></div>', { pretendToBeVisual: true });
   const saved = new Map(['window', 'document', 'navigator', 'IS_REACT_ACT_ENVIRONMENT'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   for (const [key, value] of Object.entries({ window: dom.window, document: dom.window.document, navigator: dom.window.navigator, IS_REACT_ACT_ENVIRONMENT: true })) Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
@@ -54,7 +54,7 @@ async function fixture({ load, headless = false } = {}) {
     await act(async () => root.render(React.createElement('svg', {}, React.createElement(Component, { ...props, ...overrides }))));
   };
   const text = () => dom.window.document.querySelector('[data-empire-label="A"]');
-  await render();
+  await render(initial);
   return { dom, measurements, requests, render, text,
     async complete(pending) { webfontLoaded = true; await act(async () => pending.resolve([{ family: 'Archivo Narrow', status: 'loaded' }])); },
     async unmount() { if (!unmounted) { await act(async () => root.unmount()); unmounted = true; } },
@@ -87,6 +87,25 @@ test('delayed Archivo Narrow loading keeps measured/rendered fallback together, 
     await f.render({ labels: [{ ...props.labels[0] }], mapMode: 'political' });
     assert.equal(f.measurements.length, 2, 'equivalent names and map styling reuse measured widths');
     assert.equal(f.requests.length, 1);
+  } finally { await f.close(); }
+});
+
+// Setup shows no names, so the font is asked for a sample of the characters names use. A campaign's first names (with
+// spaces, ampersands, apostrophes and accents) are then measured and drawn in Archivo Narrow at once: a request for
+// A-Z alone would leave them in the fallback, and lay them all out a second time when a new request settles.
+test('names shown after setup are measured and drawn in Archivo Narrow at once, with the one setup request', async () => {
+  const pending = deferred(), f = await fixture({ load: () => pending.promise, initial: { labels: [] } });
+  try {
+    assert.equal(f.requests.length, 1, 'setup asks for the font with no names on the map');
+    assert.equal(f.measurements.length, 0);
+    await f.complete(pending);
+    await f.render({ labels: [{ id: 'A', text: "CÔTE D'IVOIRE & ÖSTERREICH" }] });
+    assert.equal(f.requests.length, 1, 'the setup sample already covers the names');
+    assert.ok(f.measurements.length >= 1);
+    assert.match(f.measurements[0].font, /^600 100px ['"]Archivo Narrow['"],/, 'the first measurement is in Archivo Narrow');
+    assert.ok(f.measurements[0].webfontLoaded);
+    assert.equal(f.measurements.length, 1, 'measured once, never in the fallback');
+    assert.match(f.text().getAttribute('font-family'), /^['"]Archivo Narrow['"],/);
   } finally { await f.close(); }
 });
 

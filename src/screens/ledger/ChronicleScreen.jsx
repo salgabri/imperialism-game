@@ -61,14 +61,15 @@ export default function ChronicleScreen({
           ))}
         </div>
         <div className="chronicle-body">
+          {/* Below 1200px the panels hide and show the lists: `measureKey` measures them again in the commit that shows them. */}
           <HistoryBrowser entries={history} shown={shown} teamShown={teamShown} teams={historyTeams} report={report}
             filter={filter || ''} managedId={managedId} followedId={followedId} kinds={kinds} kind={kind} onKind={setLocalKind}
-            onFilter={changeFilter} onSelect={select} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} />
+            onFilter={changeFilter} onSelect={select} onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} measureKey={panel} />
           <aside className="chronicle-side" aria-label="Turning points and activity">
             <TurningPoints items={turning} />
             {/* Above the activity feed, which runs to its cap: below it the ad would sit far out of view. */}
             <AdSlot />
-            <ActivityFeed entries={feed} />
+            <ActivityFeed entries={feed} measureKey={panel} />
           </aside>
         </div>
       </div>

@@ -16,7 +16,9 @@ import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
+import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { DOMESTIC } from '../src/data/domestic.js';
+import { withDom } from './lib/app-harness.mjs';
 
 const root = new URL('../', import.meta.url);
 const compiled = await build({
@@ -45,7 +47,7 @@ const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(na
 const sources = readFileSync(new URL('public/club-logos/SOURCES.tsv', root), 'utf8').split('\n')
   .filter(line => line && !line.startsWith('#')).slice(1).map(line => line.split('\t'));
 const domesticIds = DOMESTIC.flatMap(entry => JSON.parse(readFileSync(new URL(`public/domestic/${entry.id}.json`, root), 'utf8')).clubs.map(club => club.id));
-const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...WOMENS_CLUBS].map(club => club.id).concat(domesticIds);
+const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...NRL_CLUBS, ...WOMENS_CLUBS].map(club => club.id).concat(domesticIds);
 const withCrest = allClubIds.filter(id => clubLogoFile(id));
 
 test('every club the list gives a crest has its file, a source row, and nothing else ships', () => {
@@ -69,6 +71,7 @@ test('the big clubs carry crests, and an all-leagues club shares its domestic tw
   assert.ok(NFL_CLUBS.every(club => clubLogoFile(club.id)), 'every NFL franchise has a crest');
   assert.ok(MLB_CLUBS.every(club => clubLogoFile(club.id)), 'every MLB club has a crest');
   assert.ok(NHL_CLUBS.every(club => clubLogoFile(club.id)), 'every NHL club has a crest');
+  assert.ok(NRL_CLUBS.every(club => clubLogoFile(club.id)), 'every NRL club has a crest');
   // A EuroLeague club wears its basketball club's crest, its own file, never its football club's.
   assert.ok(EUROLEAGUE_CLUBS.every(club => clubLogoFile(club.id) === club.id), 'every EuroLeague club has a crest of its own');
   const madrid = clubLogoFile('f-real-madrid');
@@ -100,6 +103,17 @@ test('a club mark is its crest in the monogram box, a club without one keeps its
   const flag = render(React.createElement(TeamMark, { id: '826', teamId: '826', code: 'ENG', isClub: false, width: 24 }));
   assert.ok(flag.querySelector('img.flag-chip'));
 });
+
+test('a nation\'s flag chip loads lazily: React sets loading before src, and never decoding=async', () => withDom(async ({ mount }) => {
+  // Safari (and Firefox before 131) request an image as soon as its src is set, so loading="lazy" only applies when it
+  // is set first. React DOM sets the attributes one by one, and jsdom keeps the order they were set in.
+  const view = await mount(TeamMark, { id: '826', teamId: '826', code: 'ENG', isClub: false, width: 24 });
+  const chip = view.host.querySelector('img.flag-chip');
+  const names = chip.getAttributeNames();
+  assert.equal(chip.getAttribute('loading'), 'lazy');
+  assert.ok(names.indexOf('loading') < names.indexOf('src'), names.join(' '));
+  assert.equal(chip.hasAttribute('decoding'), false, 'chips remount every match, and an async decode can draw one blank');
+}));
 
 test('a claimed player\'s former club shows its crest in the squad tables', () => {
   const club = render(React.createElement(SquadFlag, { teamId: 'f-arsenal', isClub: true, width: 16, height: 12 }));

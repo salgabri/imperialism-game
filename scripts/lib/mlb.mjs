@@ -11,10 +11,12 @@
 // Clubs come from their 40-man rosters. Nations take every Live card, free agents included (The Show files players
 // off a 40-man roster, the injured among them, as free agents), by birthplace: a US state, Washington DC, Guam and the
 // Virgin Islands are the United States'; Curaçao and Aruba play for the Kingdom of the Netherlands, as in the World
-// Baseball Classic. A nation that cannot field a lineup slot from its own players leaves it to the game, which fields
-// a generated player there at the nation's strength; that strength counts those slots at the sport's baseline.
-import { NATIONS, selectLineup } from '../../src/data/teams.js';
-import { BASELINE } from '../../src/sports/baseball.js';
+// Baseball Classic; Great Britain and Northern Ireland are the United Kingdom's. A nation that cannot field a lineup
+// slot from its own players leaves it to the game, which fields a generated player there at the nation's strength;
+// that strength counts those slots at the sport's baseline. A card that names no birthplace the game knows may take
+// one from a nearby edition (nearestBirthplace).
+import { NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
+import { BASELINE, baseball } from '../../src/sports/baseball.js';
 
 export const FREE_AGENTS = 'FA';
 const SPORT = 'baseball';
@@ -40,6 +42,8 @@ const NATION_OF = {
   Colombia: '170', 'South Korea': '410', Panama: '591', Australia: '036', Taiwan: '158', Nicaragua: '558', Curacao: '528',
   Aruba: '528', Netherlands: '528', Bahamas: '044', Italy: '380', Germany: '276', 'South Africa': '710', 'Great Britain': '826',
   Honduras: '340', 'Russian Federation': '643', Slovakia: '703', Brazil: '076', China: '156', 'Czech Republic': '203',
+  // MLB The Show 19 and 20 name these three, which the later editions do not.
+  'Northern Ireland': '826', Lithuania: '440', 'Saudi Arabia': '682',
 };
 
 function hashStr(s) {
@@ -54,6 +58,51 @@ const pitches = player => PITCHING.has(player.pos);
 
 /** The nation a birthplace belongs to, or null for one that is no place the game knows ("At Sea"). */
 export const nationOfBirthplace = born => NATION_OF[born] ?? null;
+
+/**
+ * A player's name as editions and other sources may spell it differently: no accents, case, punctuation, spaces or
+ * generational suffix ("Germán Márquez" and "German Marquez", "Isiah Kiner Falefa" and "Isiah Kiner-Falefa", "Mike
+ * Wright" and "Mike Wright Jr.").
+ */
+export const nameKey = name => name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  .replace(/[\s.,]+(jr|sr|ii|iii|iv)\.?$/, '').replace(/[^a-z]/g, '');
+
+/**
+ * Whether a card's own birthplace stands: a place the game knows, unless the edition of `year` is one whose foreign
+ * birthplaces are wrong (`unreliable`, scripts/data/mlb-seasons.json `unreliableBirthplaces`), where only US states do.
+ */
+export function trustsBirthplace(born, year, unreliable = {}) {
+  const nation = nationOfBirthplace(born);
+  return Boolean(nation) && (nation === '840' || !unreliable[year]);
+}
+
+/** How many editions either side of its own a card may take a birthplace from. */
+export const BIRTHPLACE_WINDOW = 3;
+const pitcher = position => PITCHING.has(POSITION_OF[position]);
+
+/**
+ * A birthplace for the card `row` from the edition nearest its season `year` that names one the game knows, earlier
+ * first, at most BIRTHPLACE_WINDOW editions away: `{ born, from }`, or null. `snapshots` maps a season to its snapshot;
+ * the editions `unreliable` names (scripts/data/mlb-seasons.json `unreliableBirthplaces`) are never asked. Where an
+ * edition has players of that name born in different places, the one in the card's role (pitcher or not) decides, then
+ * the one on its club, then the one at its position; if none does, that edition is passed over.
+ */
+export function nearestBirthplace(snapshots, year, row, unreliable = {}) {
+  const [, name, team, position] = row;
+  const key = nameKey(name);
+  const places = rows => new Set(rows.map(other => other[6]));
+  const narrowings = [p => pitcher(p[3]) === pitcher(position), p => team !== FREE_AGENTS && p[2] === team,
+    p => POSITION_OF[p[3]] === POSITION_OF[position]];
+  for (let d = 1; d <= BIRTHPLACE_WINDOW; d++) {
+    for (const other of [year - d, year + d]) {
+      if (unreliable[other] || !snapshots.has(other)) continue;
+      let rows = snapshots.get(other).players.filter(p => nameKey(p[1]) === key && nationOfBirthplace(p[6]));
+      for (const narrow of narrowings) if (places(rows).size > 1 && rows.some(narrow)) rows = rows.filter(narrow);
+      if (places(rows).size === 1) return { born: rows[0][6], from: other };
+    }
+  }
+  return null;
+}
 
 /**
  * A Live card as a squad player: The Show's primary position first, then the others it can field. A birthplace that is
@@ -104,25 +153,33 @@ export const tupleOf = p => [p.name, p.positions.join('/'), p.rating];
 
 /**
  * The clubs of one edition, strongest first: each team `{ show, id, name, code, col }` fields its lineup and active
- * roster from the cards The Show files under its code. Throws when a team cannot field every position naturally.
+ * roster from the cards The Show files under its code. Throws when a team cannot field every position naturally, or
+ * keeps fewer than the 26 of an active roster, unless `fewerPitchers` allows a club that used fewer than its roster's
+ * thirteen pitchers all season to keep every one it used (the seasons computed from WAR). `order` ranks a pool before
+ * the lineup is picked (by rating, then name, unless a season gives its own).
  */
-export function clubsOf(players, teams) {
+export function clubsOf(players, teams, { order = byRating, fewerPitchers = false } = {}) {
   return teams.map(team => {
-    const pool = players.filter(player => player.team === team.show).sort(byRating);
+    const pool = players.filter(player => player.team === team.show).sort(order);
     const { squad, lineup } = rosterOf(pool);
     if (lineup.slots.some(slot => slot.outOfPosition || !slot.player)) {
       throw new Error(`${team.name} cannot field every position: ${lineup.slots.filter(slot => slot.outOfPosition || !slot.player).map(slot => slot.position).join(', ')}`);
     }
-    if (squad.length !== ROSTER_SIZE) throw new Error(`${team.name} keeps ${squad.length} players, not an active roster of ${ROSTER_SIZE}`);
+    // Short of pitchers only: every one the club has is kept, beside its thirteen hitters.
+    const shortOfPitchers = pool.filter(pitches).every(player => squad.includes(player)) && squad.filter(player => !pitches(player)).length === 13;
+    if (squad.length !== ROSTER_SIZE && !(fewerPitchers && squad.length < ROSTER_SIZE && shortOfPitchers)) {
+      throw new Error(`${team.name} keeps ${squad.length} players, not an active roster of ${ROSTER_SIZE}`);
+    }
     return { id: team.id, name: team.name, code: team.code, col: team.col, str: lineup.rating, squad };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
 }
 
 /**
  * The nations of one edition, strongest first, each `{ id, name, str, squad, open }`: every card under its birthplace's
- * nation, `open` the lineup slots its own players cannot fill (counted at the baseline in `str`).
+ * nation, `open` the lineup slots its own players cannot fill (counted at the baseline in `str`). `order` ranks a
+ * nation's pool as clubsOf's does.
  */
-export function nationsOf(players) {
+export function nationsOf(players, order = byRating) {
   const pools = new Map();
   for (const player of players) {
     if (player.nation == null) continue;
@@ -131,13 +188,29 @@ export function nationsOf(players) {
     pools.get(player.nation).push(player);
   }
   return [...pools.entries()].map(([id, pool]) => {
-    const { squad, lineup } = rosterOf(pool.slice().sort(byRating));
+    const { squad, lineup } = rosterOf(pool.slice().sort(order));
     // A slot the nation's own players cannot fill naturally is the game's to fill, at the sport's baseline.
     const covered = lineup.slots.map(slot => (slot.player && !slot.outOfPosition ? slot.effectiveRating : BASELINE));
     const str = Math.round(covered.reduce((s, v) => s + v, 0) / covered.length);
-    return { id, name: NATIONS[id][0], str, squad, open: lineup.slots.filter(slot => !slot.player || slot.outOfPosition).map(slot => slot.position) };
+    return { id, name: nationIdentity(id, baseball).name, str, squad, open: lineup.slots.filter(slot => !slot.player || slot.outOfPosition).map(slot => slot.position) };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
 }
+
+/**
+ * A snapshot (scripts/data/mlb-the-show-<nn>.json) as its file holds it: `{ note, source, teams, players }`, one card a
+ * line. Cards run by team code, then strongest first, then by name and uuid.
+ */
+export function snapshotText({ note, source, teams, players }) {
+  return `{\n${[
+    `  "note": ${JSON.stringify(note)}`,
+    `  "source": ${JSON.stringify(source)}`,
+    `  "teams": ${JSON.stringify(teams)}`,
+    `  "players": [\n${players.map(row => `    ${JSON.stringify(row)}`).join(',\n')}\n  ]`,
+  ].join(',\n')}\n}\n`;
+}
+
+/** The snapshot's card order: team code, then overall (strongest first), name and uuid. */
+export const byCardOrder = (a, b) => a[2].localeCompare(b[2]) || b[5] - a[5] || a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]);
 
 /** The edition named for the season of `year`, as its API host and files name it: 2025 → '25'. */
 export const editionOf = year => String(year % 100).padStart(2, '0');

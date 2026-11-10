@@ -16,6 +16,7 @@ import { domesticIdOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
 import { clearDomesticCache, decodeDomestic, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
 import { getSport } from '../src/sports/index.js';
+import { fieldedNations, sportOf } from '../src/engine/footballSets.js';
 import { EMPIRE_PASTELS } from '../src/theme.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { createEmpireLabelEngine as createLabelValidator } from '../src/engine/empireLabels.js';
@@ -176,6 +177,12 @@ function crestAssetsMatch(banner, team) {
 /** The right banner for a region's owner: its crest for a club with one, else its flag. */
 const ownerAssetsMatch = (banner, team) => (crestOf(team) ? crestAssetsMatch(banner, team) : flagAssetsMatch(banner, FLAG_CODES[team?.flagId]));
 
+/**
+ * Who the map paints a country for: its holder, else the team that claimed it (a world map's nation with no team,
+ * src/engine/claims.js), which flies that team's banner exactly as its territory does.
+ */
+const holderOf = (app, id) => app.state.own[id] ?? app.state.claims?.[id];
+
 /** A country's flag parts exactly repaint its filled rings with its owner's banner. */
 function bannerPartsMatch(app, path, owner) {
   const parts = countryFlagParts(path.dataset.country);
@@ -209,7 +216,7 @@ function expectedFlagsShown(app) {
   if (app.state.mapMode !== 'flags' || nationPaths.length !== Object.keys(NATIONS).length) return false;
   return paths.every(path => {
     const id = path.dataset.country;
-    const owner = playing ? app.state.teams[app.state.own[id]] : null;
+    const owner = playing ? app.state.teams[holderOf(app, id)] : null;
     const flagId = playing ? owner?.flagId : FLAG_CODES[id] ? id : DEPENDENCIES[id]?.of;
     const parts = countryFlagParts(id);
     if (owner?.kind === 'club' && !crestOf(owner)) return parts.length === 0 && !flagBanner(path) && path.getAttribute('fill') === owner.col;
@@ -253,7 +260,7 @@ function empireFlagsSnapshot(app) {
   const owners = new Set();
   const parts = countryFlagParts();
   for (const part of parts) {
-    const ownerId = app.state.own[part.dataset.flagCountry];
+    const ownerId = holderOf(app, part.dataset.flagCountry);
     owners.add(ownerId);
     if (!groups.has(part.dataset.flagComponent)) groups.set(part.dataset.flagComponent, []);
     groups.get(part.dataset.flagComponent).push(part);
@@ -268,7 +275,7 @@ function empireFlagsSnapshot(app) {
     sharedReferences &&= !!banner && componentParts.every(part => flagBanner(part) === banner);
     if (!banner) { localBounds = false; coversEveryPolygon = false; correctOwner = false; continue; }
     correctOwner &&= componentParts.every(part => {
-      const ownerId = app.state.own[part.dataset.flagCountry];
+      const ownerId = holderOf(app, part.dataset.flagCountry);
       return banner.dataset.owner === ownerId && ownerAssetsMatch(banner, app.state.teams[ownerId]);
     });
     const bounds = bannerBounds(banner);
@@ -283,7 +290,7 @@ function empireFlagsSnapshot(app) {
   }
   const exactCountryCoverage = countryPaths().every(path => {
     const heldParts = parts.filter(part => part.dataset.flagCountry === path.dataset.country);
-    const owner = app.state.teams[app.state.own[path.dataset.country]];
+    const owner = app.state.teams[holderOf(app, path.dataset.country)];
     if (!flies(owner)) return heldParts.length === 0;
     return JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(heldParts.map(shapeD).join('')));
   });
@@ -380,7 +387,9 @@ export async function runSwissFlagRegionCheck() {
 /** Flags follow campaign ownership, never geography or the surviving id list. */
 function regionalFlagsSnapshot(app) {
   const paths = countryPaths();
-  const neutral = paths.filter(path => !app.state.own[path.dataset.country]);
+  // Neutral: nobody holds it and nobody claimed it (claimed land flies its holder's banner, holderOf).
+  const neutral = paths.filter(path => !holderOf(app, path.dataset.country));
+  const fielded = new Set(fieldedNations(sportOf(app.state.settings)));
   const domestic = domesticOf(app);
   if (domestic) return {
     domestic: true,
@@ -399,7 +408,7 @@ function regionalFlagsSnapshot(app) {
     return NATIONS[id] && owner?.kind !== 'club' && owner && owner.id !== id;
   });
   const ownerFlagMatches = path => {
-    const owner = app.state.teams[app.state.own[path.dataset.country]];
+    const owner = app.state.teams[holderOf(app, path.dataset.country)];
     const parts = countryFlagParts(path.dataset.country);
     if (filledRings(path.getAttribute('d')).length === 0) return parts.length === 0;
     return parts.length > 0 && parts.every(part => ownerAssetsMatch(flagBanner(part), owner));
@@ -410,13 +419,16 @@ function regionalFlagsSnapshot(app) {
     correct: expectedFlagsShown(app),
     neutralCount: neutral.length,
     inactiveNations: neutral.filter(path => NATIONS[path.dataset.country]).length,
+    // Nations the sport fields that are neutral all the same: none at a world kickoff. Football fields no team for a
+    // nation no source rates (Tonga, Samoa, the Cook Islands), so their land is neutral there.
+    neutralFielded: neutral.filter(path => fielded.has(path.dataset.country)).length,
     neutralHasNoFlags: neutral.every(neutralMatches),
     conqueredCount: conquered.length,
     conqueredKeepOwnerFlags: conquered.every(ownerFlagMatches),
     empireFlags: empireFlagsSnapshot(app),
     // A held dependency flies its owner's banner (a club's crest); land held by a club without one, or nobody, has none.
     dependenciesCorrect: paths.filter(path => DEPENDENCIES[path.dataset.country]).every(path => {
-      const owner = app.state.teams[app.state.own[path.dataset.country]];
+      const owner = app.state.teams[holderOf(app, path.dataset.country)];
       return owner && (owner.kind !== 'club' || crestOf(owner)) ? ownerFlagMatches(path) : neutralMatches(path);
     }),
   };
@@ -462,13 +474,15 @@ function labelGeographySnapshot(app, placements, unitsPerPixel) {
     return Math.hypot(x - a[0] - t * dx, y - a[1] - t * dy);
   };
   const errors = [];
+  // The land the map paints for each empire, claimed nations included: the ownership its labels are laid out on.
+  const own = app.mapOwnership();
   for (const placement of placements) {
     if (!placement) { errors.push('missing placement'); continue; }
-    const owned = cache.rings.filter(shape => app.state.own[shape.id] === placement.id);
-    const foreign = cache.rings.filter(shape => app.state.own[shape.id] !== placement.id);
+    const owned = cache.rings.filter(shape => own[shape.id] === placement.id);
+    const foreign = cache.rings.filter(shape => own[shape.id] !== placement.id);
     if (!owned.some(shape => contains(shape, [placement.tx, placement.ty]))) errors.push(`${placement.id}: anchor is not owned land`);
     const allowance = placement.coastal ? 10 * unitsPerPixel : 0;
-    if (!cache.validator.validateFootprint(app.state.own, placement.id, placement.corners, {
+    if (!cache.validator.validateFootprint(own, placement.id, placement.corners, {
       unitsPerPixel, coastalAllowancePx: placement.coastal ? 10 : 0, maxSeaFraction: .22,
     })) errors.push(`${placement.id}: curved envelope fails geographic policy`);
     const [a, b, , d] = placement.corners;
@@ -831,12 +845,16 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const note = document.getElementById('setup-theatre-description')?.textContent.trim() || '';
   const fewer = Math.floor(sections / entry.clubs), more = Math.ceil(sections / entry.clubs);
   const share = sections === entry.clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
-  // A Europe map tells the rules of its land (football's strongest clubs, or a league's: the EuroLeague's); a sport's own
-  // map (the NBA's, the NFL's) names its league, each club holding the state of its arena or stadium.
+  // A Europe map tells the rules of its land; a sport's own map (the NBA's, the NFL's) names its league, each club holding
+  // the state of its arena or stadium ("the USA and Canada", but "Australia and New Zealand").
+  const land = /^(?:USA|United)\b/.test(entry.name || '') ? `the ${entry.name}` : entry.name;
+  // Women's football's map of every European club counts them as EA rates them; the EuroLeague's names its league.
+  const field = !entry.theatre ? `the ${entry.clubs} ${entry.league} clubs`
+    : entry.theatre === 'all' && entry.sport !== 'football' ? `the ${entry.clubs} European clubs EA rates` : `Europe's ${entry.clubs} strongest clubs`;
   result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre || entry.countries
-    ? `${entry.theatre ? `Europe's ${entry.clubs} strongest clubs` : `the ${entry.clubs} ${entry.league} clubs`}, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
+    ? `${field}, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
     : entry.league
-      ? `the ${entry.clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines === 'state' ? 'state' : 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
+      ? `the ${entry.clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines || 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
       : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
   // Step 1's country card: every section in its starting club's pastel (the card has no ids, so compare the fills
@@ -1452,7 +1470,7 @@ async function mountAt(address) {
  * map has loaded; a stale link falls back to the defaults and says which choices it could not use.
  */
 export async function runChallengeCheck() {
-  const link = '/?sport=basketball&theatre=CONMEBOL&draw=round-robin&upsets=wild&role=manager&team=076&seed=4242';
+  const link = '/?sport=basketball&theatre=CAF&draw=round-robin&upsets=wild&role=manager&team=566&seed=4242';
   let copied = null;
   Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText: async value => { copied = value; } } });
   const result = {};
@@ -1462,17 +1480,17 @@ export async function runChallengeCheck() {
     // Past the team check: on the world map it settles at once.
     await sleep(200);
     const setup = result.setup = app.state.setup;
-    result.prefilled = setup.sport === 'basketball' && setup.layer === 'nations' && setup.scope === 'CONMEBOL' && setup.pacing === 'duel'
-      && setup.turnOrder === 'round-robin' && setup.uncertainty === 'wild' && setup.role === 'manager' && setup.managedTeamId === '076'
+    result.prefilled = setup.sport === 'basketball' && setup.layer === 'nations' && setup.scope === 'CAF' && setup.pacing === 'duel'
+      && setup.turnOrder === 'round-robin' && setup.uncertainty === 'wild' && setup.role === 'manager' && setup.managedTeamId === '566'
       && setup.seed === '4242' && setup.dataSet == null;
     result.notLaunched = app.state.phase === 'setup' && Object.keys(app.state.teams).length === 0;
     const radio = id => document.getElementById(id)?.closest('[role="radio"]');
     result.rendered = button('Basketball').getAttribute('aria-checked') === 'true'
-      && document.getElementById('setup-theatre').value === 'CONMEBOL'
+      && document.getElementById('setup-theatre').value === 'CAF'
       && radio('rule-draw-round-robin-title')?.getAttribute('aria-checked') === 'true'
       && document.getElementById('setup-uncertainty').value === 'wild'
       && roleCard('manager').getAttribute('aria-checked') === 'true'
-      && document.getElementById('setup-managed-team').value === '076'
+      && document.getElementById('setup-managed-team').value === '566'
       && document.getElementById('setup-seed').value === '4242'
       && /Seed 4242\./.test(document.querySelector('.setup-challenge')?.textContent || '');
     button('Copy challenge link').click();
@@ -1482,8 +1500,8 @@ export async function runChallengeCheck() {
     button('Launch campaign').click();
     await until('the challenge launches', () => app.state.phase === 'playing');
     const settings = result.settings = app.state.settings;
-    result.launched = settings.sport === 'basketball' && settings.scope === 'CONMEBOL' && settings.turnOrder === 'round-robin'
-      && settings.uncertainty === 'wild' && settings.seed === '4242' && app.state.seed === 4242 && app.state.managedTeamId === '076'
+    result.launched = settings.sport === 'basketball' && settings.scope === 'CAF' && settings.turnOrder === 'round-robin'
+      && settings.uncertainty === 'wild' && settings.seed === '4242' && app.state.seed === 4242 && app.state.managedTeamId === '566'
       && !document.querySelector('.setup-challenge');
     mounted.unmount();
 

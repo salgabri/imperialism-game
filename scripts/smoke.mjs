@@ -33,6 +33,8 @@ const NFL = { sport: 'american-football', layer: 'clubs', clubScope: 'domestic:n
 const MLB = { sport: 'baseball', layer: 'clubs', clubScope: 'domestic:mlb' };
 // Ice hockey clubs: the 32 NHL clubs on their own map of the USA and Canada.
 const NHL = { sport: 'hockey', layer: 'clubs', clubScope: 'domestic:nhl' };
+// Rugby league clubs: the 17 NRL clubs on their own map of Australia and New Zealand.
+const NRL = { sport: 'rugby-league', layer: 'clubs', clubScope: 'domestic:nrl' };
 // Football clubs: Europe's strongest, each on land in its own country.
 const TOP = { layer: 'clubs', clubScope: 'domestic:eu124' };
 const ELITE = { layer: 'clubs', clubScope: 'domestic:eu32' };
@@ -41,7 +43,8 @@ const SCENARIOS = [
   { name: 'South America · duel · ticker', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
   { name: 'South America · blitz · instant', scope: 'CONMEBOL', pacing: 'blitz', resolution: 'instant' },
   { name: 'N. & C. America · chaos · instant', scope: 'CONCACAF', pacing: 'chaos', resolution: 'instant' },
-  { name: 'BASKETBALL · South America · duel · ticker', sport: 'basketball', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
+  // Basketball's smallest continent: South America, with two real sides, is not offered (src/data/scopes.js).
+  { name: 'BASKETBALL · N. & C. America · duel · ticker', sport: 'basketball', scope: 'CONCACAF', pacing: 'duel', resolution: 'ticker' },
   { name: 'BASKETBALL · Europe · blitz · instant', sport: 'basketball', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Elite 32 · blitz · instant', ...ELITE, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Top 124 · duel · ticker', ...TOP, pacing: 'duel', resolution: 'ticker' },
@@ -57,12 +60,17 @@ const SCENARIOS = [
   { name: 'CLUBS · NHL · duel · ticker', ...NHL, pacing: 'duel', resolution: 'ticker' },
   { name: 'ICE HOCKEY · Europe · blitz · instant', sport: 'hockey', scope: 'UEFA', pacing: 'blitz', resolution: 'instant' },
   { name: "WOMEN'S FOOTBALL · Europe · duel · ticker", sport: 'womens-football', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
-  { name: "WOMEN'S CLUBS · NWSL · blitz · instant", sport: 'womens-football', layer: 'clubs', clubScope: 'NWSL', pacing: 'blitz', resolution: 'instant' },
+  { name: "WOMEN'S CLUBS · NWSL · blitz · instant", sport: 'womens-football', layer: 'clubs', clubScope: 'domestic:nwsl', pacing: 'blitz', resolution: 'instant' },
+  { name: "WOMEN'S CLUBS · Elite 32 · duel · instant", sport: 'womens-football', layer: 'clubs', clubScope: 'domestic:weu32', pacing: 'duel', resolution: 'instant' },
+  { name: 'TENNIS · Europe · duel · ticker', sport: 'tennis', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
+  { name: "WOMEN'S TENNIS · World · blitz · instant", sport: 'womens-tennis', scope: 'world', pacing: 'blitz', resolution: 'instant' },
+  { name: 'CLUBS · NRL · duel · ticker', ...NRL, pacing: 'duel', resolution: 'ticker' },
+  { name: 'RUGBY LEAGUE · Asia & Oceania · blitz · instant', sport: 'rugby-league', scope: 'AFC', pacing: 'blitz', resolution: 'instant' },
 ];
 
 const RESUME_SCENARIOS = [
   { name: 'World war · blitz · instant', scope: 'world', pacing: 'blitz', resolution: 'instant', expectedField: 173 },
-  { name: 'BASKETBALL · South America · blitz · instant', sport: 'basketball', scope: 'CONMEBOL', pacing: 'blitz', resolution: 'instant' },
+  { name: 'BASKETBALL · N. & C. America · blitz · instant', sport: 'basketball', scope: 'CONCACAF', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Elite 32 · blitz · instant', ...ELITE, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
   { name: 'CLUBS · EuroLeague · blitz · instant', ...EUROLEAGUE, pacing: 'blitz', resolution: 'instant' },
@@ -89,7 +97,9 @@ const MANAGER_SCENARIOS = [
 // `--manager-only` only the manager campaign; any of them skips every other section (together they run each pick).
 // The country scenarios come next to last, so they are `--campaign-only=7` (England duel, with the setup checks), `=8`
 // (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji); the NFL's are `=10` and `=6`, MLB's `=11` and `=7`,
-// baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`. `--scenarios=<text>` composes with
+// baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`, tennis's Davis Cup nations
+// `=17`, the NRL's `=18` and rugby league's nations `=19` (counted before Europe's two club maps came in at `=5` and `=6`: add two
+// to each). `--scenarios=<text>` composes with
 // these: it narrows whatever they leave.
 function onlyIndex(name, list) {
   const arg = process.argv.find(value => value.startsWith(`--${name}=`));
@@ -259,12 +269,18 @@ function checkMapScope(label, snapshot, options) {
 }
 
 /**
- * Football clubs offer every shipped country, grouped apart from the leagues; basketball clubs the NBA's map and the
- * EuroLeague's,
- * American football (clubs only) the NFL's, baseball clubs MLB's and hockey clubs the NHL's.
+ * Football clubs offer every shipped country, grouped apart from the leagues; women's football clubs Europe's two maps
+ * and the NWSL's; basketball clubs the NBA's map and the EuroLeague's, American football (clubs only) the NFL's, baseball clubs MLB's,
+ * hockey clubs the NHL's and rugby league clubs the NRL's.
  */
 function checkTheatres(scenario, theatre) {
   const countries = theatre.options.filter(option => option.value.startsWith('domestic:'));
+  if (scenario.layer === 'clubs' && scenario.sport === 'womens-football') {
+    check('women\'s clubs play Europe\'s every club, its elite or the NWSL, each on a map of its own', JSON.stringify(theatre.options) === JSON.stringify([
+      { value: 'domestic:weu', text: 'Europe · 68 clubs' }, { value: 'domestic:weu32', text: 'Elite 32 · 32 clubs' },
+      { value: 'domestic:nwsl', text: 'NWSL · 16 clubs' }]), JSON.stringify(theatre.options));
+    return;
+  }
   if (scenario.layer === 'clubs' && scenario.sport === 'baseball') {
     check('baseball clubs play only MLB’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:mlb', text: 'MLB · 30 clubs' }]),
       JSON.stringify(theatre.options));
@@ -272,6 +288,11 @@ function checkTheatres(scenario, theatre) {
   }
   if (scenario.layer === 'clubs' && scenario.sport === 'hockey') {
     check('hockey clubs play only the NHL’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:nhl', text: 'NHL · 32 clubs' }]),
+      JSON.stringify(theatre.options));
+    return;
+  }
+  if (scenario.layer === 'clubs' && scenario.sport === 'rugby-league') {
+    check('rugby league clubs play only the NRL’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:nrl', text: 'NRL · 17 clubs' }]),
       JSON.stringify(theatre.options));
     return;
   }
@@ -287,6 +308,11 @@ function checkTheatres(scenario, theatre) {
   }
   if (scenario.layer !== 'clubs' || (scenario.sport || 'football') !== 'football') {
     check('only football clubs offer single-country theatres', countries.length === 0, countries.map(option => option.text).join(', '));
+    // Nations play only where their sport is: rugby league's real sides are all in Asia & Oceania but England's.
+    if (scenario.layer !== 'clubs' && scenario.sport === 'rugby-league') {
+      check('rugby league nations offer only the world and Asia & Oceania', JSON.stringify(theatre.options.map(option => option.value))
+        === JSON.stringify(['world', 'AFC']), JSON.stringify(theatre.options));
+    }
     return;
   }
   const europe = theatre.groups.find(group => group.label === 'Europe');
@@ -623,11 +649,15 @@ if (!filtered && fixedChecks) {
 // Rosters are generated from a dataset that is not committed, so verify the
 // committed output still builds a legal XI for every nation on the map.
 if (!filtered && fixedChecks) {
-  const { NATIONS, buildTeam, makeRng, teamEff } = await import('../src/data/teams.js');
+  const { NATIONS, buildTeam, isTennisSport, makeRng, teamEff } = await import('../src/data/teams.js');
   const { SPORT_LIST } = await import('../src/sports/index.js');
+  const { fieldedNations } = await import('../src/engine/footballSets.js');
+  const { MIN_REAL_SIDES } = await import('../src/data/scopes.js');
   const EXPECTED_BEST = { football: ['France', 'Spain', 'England', 'Brazil'], basketball: ['United States', 'Serbia', 'Canada'],
     baseball: ['United States', 'Dominican Rep.', 'Venezuela', 'Cuba'], hockey: ['Canada', 'United States', 'Sweden', 'Russia'],
-    'womens-football': ['Spain', 'England', 'France', 'Germany'] };
+    'womens-football': ['Spain', 'England', 'France', 'Germany'], tennis: ['Spain', 'Italy', 'United States', 'Germany'],
+    'womens-tennis': ['United States', 'Russia', 'Czechia', 'Ukraine'],
+    'rugby-league': ['Australia', 'New Zealand', 'England', 'Fiji'] };
 
   for (const sport of SPORT_LIST) {
     // A sport with clubs only (American football) fields no nations: its clubs are checked below.
@@ -635,7 +665,8 @@ if (!filtered && fixedChecks) {
     console.log(`\n  Squad rosters — ${sport.name}`);
     try {
       const rng = makeRng(20260802);
-      const ids = Object.keys(NATIONS);
+      // The nations the sport fields: only those with a real side, their own rated players holding half the lineup.
+      const ids = fieldedNations(sport);
       const teams = ids.map(id => buildTeam(id, rng, sport));
       const size = sport.squadSize;
       const realPlayers = teams.reduce((s, t) => s + t.real, 0);
@@ -650,10 +681,17 @@ if (!filtered && fixedChecks) {
       const { selectLineup: lineupOf } = await import('../src/data/teams.js');
       // A hockey forward may play another forward's place. Women's football invents nobody: a nation short of eleven, or
       // with no rated player and no team at all, stays short.
-      const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : !slot.outOfPosition);
-      const fielded = sport.id === 'womens-football' ? teams.filter(t => t.real >= size) : teams;
-      const full = t => (t.squad.length > size ? lineupOf(t).slots.every(natural) : t.squad.length === size);
-      check('every nation fields a full lineup', fielded.length > 20 && fielded.every(full), 'short squad');
+      // A rugby league back may play another outside place, a forward round the pack, a centre in the second row.
+      const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : sport.id === 'rugby-league' ? slot.penalty <= 8 : !slot.outOfPosition);
+      // Tennis invents nobody either: a nation needs two rated players, and a team of two or three plays its singles
+      // players in the doubles too.
+      const fielded = sport.id === 'womens-football' ? teams.filter(t => t.real >= size)
+        : isTennisSport(sport.id) ? teams.filter(t => t.real >= 2) : teams;
+      const full = t => (isTennisSport(sport.id) ? lineupOf(t).slots.every(slot => slot.player)
+        : t.squad.length > size ? lineupOf(t).slots.every(natural) : t.squad.length === size);
+      // A sport fields at least a continent's worth of real sides (src/data/scopes.js): rugby league fields six.
+      check('every nation fields a full lineup', fielded.length >= MIN_REAL_SIDES && fielded.every(full),
+        `${fielded.filter(t => !full(t)).map(t => t.name).join(', ') || `${fielded.length} nations`}: short squad`);
       check('no roster for an unknown nation', strays.length === 0, strays.join(', '));
       check('every rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
       check('every position belongs to this sport', badPos.length === 0, [...new Set(badPos.map(p => p.pos))].join(', '));
@@ -671,6 +709,8 @@ if (!filtered && fixedChecks) {
   const { buildClub, selectLineup } = await import('../src/data/teams.js');
   const { CLUB_SCOPES } = await import('../src/data/scopes.js');
   for (const sport of SPORT_LIST) {
+    // Tennis has nations only.
+    if (!sport.clubs.length) continue;
     console.log(`\n  Club layer — ${sport.name}`);
     try {
       const clubs = sport.clubs.map(c => buildClub(c, sport));
@@ -681,7 +721,8 @@ if (!filtered && fixedChecks) {
       const badPos = clubs.flatMap(c => c.squad).filter(p => !sport.positionColors[p.pos]);
 
       // NFL and MLB clubs carry backups beyond their starters; the other sports' clubs are exactly their lineup.
-      const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : !slot.outOfPosition);
+      // A rugby league back may play another outside place, a forward round the pack, a centre in the second row.
+      const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : sport.id === 'rugby-league' ? slot.penalty <= 8 : !slot.outOfPosition);
       const full = c => (c.squad.length > sport.squadSize ? selectLineup(c).slots.every(natural)
         : c.squad.length === sport.squadSize);
       check('every club fields a full lineup', clubs.every(full), 'short lineup');
@@ -689,8 +730,14 @@ if (!filtered && fixedChecks) {
       check('every club has a real home country', badHome.length === 0, badHome.map(c => c.name).join(', '));
       check('every club rating is within 1-99', outOfRange.length === 0, `${outOfRange.length} outside range`);
       check('every club position belongs to this sport', badPos.length === 0, [...new Set(badPos.map(p => p.pos))].join(', '));
-      // Football has no league theatres: its clubs play Europe's two (the Theatre checks above).
-      if (sport.id !== 'football') check('every league is selectable as a theatre', leagues.every(l => CLUB_SCOPES(sport).some(s => s.id === l)), 'missing scope');
+      // Football has no league theatres: its clubs play Europe's two (the Theatre checks above). Nor has women's football
+      // for its European leagues: every club plays Europe's, or the NWSL's.
+      if (sport.id === 'womens-football') {
+        const scopes = CLUB_SCOPES(sport);
+        const homeless = sport.clubs.filter(club => !scopes.some(scope => sport.clubs.filter(scope.filter).includes(club)));
+        check('every women\'s club plays a theatre: Europe\'s or the NWSL\'s', JSON.stringify(scopes.map(scope => scope.id)) === '["all","elite","NWSL"]'
+          && homeless.length === 0, homeless.map(club => club.name).join(', ') || scopes.map(scope => scope.id).join(', '));
+      } else if (sport.id !== 'football') check('every league is selectable as a theatre', leagues.every(l => CLUB_SCOPES(sport).some(s => s.id === l)), 'missing scope');
       check('clubs carry no flag', clubs.every(c => c.flagId === null), 'club has a flagId');
 
       const ranked = clubs.slice().sort((a, b) => b.str - a.str);
@@ -712,6 +759,7 @@ if (!filtered && fixedChecks) {
       const topo = JSON.parse(await readFile(path.join(root, 'public', 'world-110m.v1.json'), 'utf8'));
       const geo = new WorldGeometry(topo, CAPITALS).fitTo(Object.keys(NATIONS));
       for (const sport of SPORT_LIST) {
+        if (!sport.clubs.length) continue;
         const clubs = sport.clubs.map(c => buildClub(c, sport));
         const own = seedClubs(geo, clubs);
         const seeded = new Set(Object.values(own));
@@ -746,7 +794,9 @@ if (!filtered && fixedChecks) {
       check('every match has a winner', results.every(r => r.winner === a.id || r.winner === b.id), 'no winner');
       check('a level score always triggers a tie-break', unresolved === 0, `${unresolved} left level`);
       check('the feed adds up to the final score', evTotals, 'event totals mismatch');
-      const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], baseball: [2, 10], 'womens-football': [0.6, 3.5], hockey: [1.5, 5.5] }[sport.id];
+      const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], baseball: [2, 10], 'womens-football': [0.6, 3.5], hockey: [1.5, 5.5],
+        // Rubbers: the winner's three and the loser's none to two.
+        tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35] }[sport.id];
       check('scoring is in the right range for the sport', mean > low && mean < high, `mean ${mean.toFixed(1)}`);
       console.log(`    400 matches · mean score ${mean.toFixed(1)} · ${results.filter(r => r.tie).length} needed ${sport.labels.tie.toLowerCase()}`);
     } catch (e) {
@@ -948,7 +998,7 @@ for (const scenario of resumeScenarios) {
     if (scenario.scope === 'world') {
       check('whole world fielded', r.fielded === scenario.expectedField, `${r.fielded}`);
       check('Greenland starts out Danish', r.greenlandStartsDanish, `owner ${r.greenlandAlwaysHeld}`);
-      check('world kickoff still flags every participating nation', r.kickoffFlagScope.inactiveNations === 0 && r.kickoffFlagScope.correct);
+      check('world kickoff still flags every participating nation', r.kickoffFlagScope.neutralFielded === 0 && r.kickoffFlagScope.correct);
     }
     const nationalCampaign = scenario.layer !== 'clubs';
     const continentalNations = nationalCampaign && scenario.scope !== 'world';

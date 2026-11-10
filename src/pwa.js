@@ -8,7 +8,7 @@ export const APP_MANIFEST = Object.freeze({
   short_name: 'Imperialism',
   // index.html's description: what an install dialog shows.
   description: 'Sport decides the borders. Win a match to take all of the loser’s territory and one of its players. '
-    + 'Football, women’s football, basketball, American football, baseball and ice hockey in your browser.',
+    + 'Football, women’s football, basketball, American football, baseball, ice hockey, tennis, women’s tennis and rugby league in your browser.',
   lang: 'en',
   start_url: './',
   scope: './',
@@ -43,8 +43,8 @@ export const PRECACHE = Object.freeze(['index.html', 'assets/**/*', 'fonts/archi
  * URL; the caps hold every file in public/ with room to spare.
  */
 export const RUNTIME_CACHES = Object.freeze([
-  Object.freeze({ cacheName: 'imperialism-data', handler: 'NetworkFirst', maxEntries: 400,
-    pattern: /\/(?:football|basketball|baseball|domestic)\/[^/?#]+\.json$/ }),
+  Object.freeze({ cacheName: 'imperialism-data', handler: 'NetworkFirst', maxEntries: 1000,
+    pattern: /\/(?:football|womens-football|basketball|american-football|baseball|hockey|tennis|womens-tennis|rugby-league|domestic)\/[^/?#]+\.json$/ }),
   Object.freeze({ cacheName: 'imperialism-images', handler: 'StaleWhileRevalidate', maxEntries: 5000,
     pattern: /\/(?:flags|flags-symbols|club-logos|textures)\/[^/?#]+\.(?:svg|webp|png)$/ }),
 ]);

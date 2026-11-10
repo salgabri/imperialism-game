@@ -1,21 +1,25 @@
 // The maps Europe's football clubs play on (docs/design/domestic-campaigns.md, "The Europe maps"): one for the strongest
-// TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier EA season; and the one
-// the EuroLeague's basketball clubs play on (docs/design/euroleague.md), all of its clubs, by the same rules. A club holds
+// TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier season with clubs; and the
+// women's game's, one for every European club and one for its ELITE_CLUBS strongest, likewise; and the one the
+// EuroLeague's basketball clubs play on (docs/design/euroleague.md), all of its clubs, by the same rules. A club holds
 // land only in its own country. A country's only club holds all of it; several clubs share it along its regional
 // borders, a region going whole to one club unless it holds two or more (then its next level down is split between
 // them); a country with no club is not on the map at all, so it stays grey beneath it, like any neighbour of a country map.
 //
 // Usage:
-//   node scripts/build-europe-maps.mjs [--only=eu124,eu32] [--check | --dry-run]
-//     --only     build these maps (eu124, eu32s2018, euroleague…); the index keeps the others' entries as they are
-//     --check    rebuild offline from the caches and compare every output byte for byte
-//     --dry-run  build and verify (downloading boundaries as needed) but write nothing
+//   node scripts/build-europe-maps.mjs [--only=eu124,eu32] [--check | --dry-run] [--boundaries=<dir>]
+//     --only        build these maps (eu124, weu32s2025, euroleague…); the index keeps the others' entries as they are
+//     --check       rebuild offline from the caches and compare every output byte for byte
+//     --dry-run     build and verify (downloading boundaries as needed) but write nothing
+//     --boundaries  the boundary cache (default data-src/boundaries), e.g. another worktree's that holds Europe's layers
 //
-// Inputs:  the clubs in src/data/clubs.football.js, public/football/ea-*.json and src/data/clubs.euroleague.js; where they stand, in
+// Inputs:  the clubs in src/data/clubs.football.js and the earlier seasons' public/football/<id>.json, the women's in
+//          src/data/clubs.womens-football.js and public/womens-football/<id>.json (their European clubs), the EuroLeague's in
+//          src/data/clubs.euroleague.js; where they stand, in
 //          scripts/data/europe-clubs.json; geoBoundaries gbOpen layers, cached under the gitignored data-src/boundaries/;
 //          the game's world map public/countries-50m.json, whose outlines every country keeps, so territories meet
 //          each other and the grey neighbours on the very borders the rest of the game draws.
-// Outputs: public/domestic/eu<clubs>[s<season year>].json, public/domestic/euroleague.json,
+// Outputs: public/domestic/eu<clubs>[s<season year>].json, the women's weu[32][s<season year>].json, the EuroLeague's euroleague.json,
 //          public/domestic/ATTRIBUTION-europe.txt and src/data/europeMaps.js.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -25,9 +29,11 @@ import polygonClipping from 'polygon-clipping';
 import { topology } from 'topojson-server';
 import { feature, mergeArcs, neighbors } from 'topojson-client';
 import { CLUBS } from '../src/data/clubs.football.js';
+import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
-import { ELITE_CLUBS, TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
+import { BUILT_IN_WOMENS_SEASONS } from '../src/data/womensFootballSeasons.js';
+import { ELITE_CLUBS, TOP_CLUBS, isEuropeanClub, strongestClubs } from '../src/data/scopes.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { createBoundarySource, GB_CITATION } from './lib/domestic-boundaries.mjs';
 import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
@@ -43,7 +49,7 @@ const indexFile = path.join(root, 'src/data/europeMaps.js');
 const clubsFile = path.join(root, 'scripts/data/europe-clubs.json');
 const cacheDir = path.join(root, 'data-src/boundaries');
 const worldFile = path.join(root, 'public/countries-50m.json');
-const setFile = id => path.join(root, `public/football/${id}.json`);
+const setFile = (id, sport = 'football') => path.join(root, `public/${sport}/${id}.json`);
 
 /**
  * Each country a club may share, by its world shape: its geoBoundaries layer (`iso3`, `part` of it for the home nations),
@@ -62,6 +68,7 @@ const COUNTRIES = {
   620: { iso3: 'PRT', units: 'ADM2', regions: ['ADM1'] },
   792: { iso3: 'TUR', units: 'ADM2', regions: ['ADM1'] },
   '056': { iso3: 'BEL', units: 'ADM4', regions: ['ADM1', 'ADM2', 'ADM3'] },
+  752: { iso3: 'SWE', units: 'ADM2', regions: ['ADM1'] },
   300: { iso3: 'GRC', units: 'ADM3', regions: ['ADM1', 'ADM2'] },
   203: { iso3: 'CZE', units: 'ADM2', regions: ['ADM1'] },
   208: { iso3: 'DNK', units: 'ADM2', regions: ['ADM1'] },
@@ -355,7 +362,7 @@ function landNames(clubs) {
 }
 
 async function buildMap({ source, spec, countries, splits, log }) {
-  const { id: mapId, sport = 'football', league, theatre = null, seasons, clubs } = spec;
+  const { id: mapId, sport, league, theatre = null, seasons, clubs } = spec;
   const n = clubs.length;
   const byCountry = new Map();
   clubs.forEach((club, i) => {
@@ -449,8 +456,9 @@ async function buildMap({ source, spec, countries, splits, log }) {
     const list = members.map(i => `${names[i]} ${Math.round(areas[i] / 1000)}k`).join(', ');
     log(`    ${shapes.get(shapeId).name}: ${list}`);
   }
+  // A women's season's map serves that season alone, so it names its strongest clubs as the built-in maps do.
   const entry = { id: mapId, sport, league, name: 'Europe', ...(theatre ? { theatre } : {}), ...(seasons ? { seasons } : {}), clubs: n, sections: n, countries: hosts.length,
-    version: doc.version, ...(seasons ? {} : { top: clubs.slice(0, 3).map(club => club.name) }) };
+    version: doc.version, ...(seasons && sport === 'football' ? {} : { top: clubs.slice(0, 3).map(club => club.name) }) };
   return { entry, doc, file: outFile(mapId), text };
 }
 
@@ -461,11 +469,11 @@ function dedupeLayers(layers) {
 }
 
 function indexModule(entries) {
-  return `// GENERATED by scripts/build-europe-maps.mjs from public/domestic/eu*.json and euroleague.json; do not edit.
+  return `// GENERATED by scripts/build-europe-maps.mjs from public/domestic/eu*.json, weu*.json and euroleague.json; do not edit.
 // The maps football clubs play on (docs/design/domestic-campaigns.md, "The Europe maps"): Europe's strongest clubs, each on
-// land in its own country. The setup offers a season's two as its club theatres ('domestic:<id>'), and the loader fetches
-// public/domestic/<id>.json on demand. A map with \`seasons\` is an earlier season's, played only with that season's clubs.
-// Basketball's EuroLeague plays on one by the same rules, with no \`theatre\` (docs/design/euroleague.md).
+// land in its own country; women's football's (sport 'womens-football') every European club and its elite. The setup
+// offers a season's maps as its club theatres ('domestic:<id>'), and the loader fetches public/domestic/<id>.json on
+// demand. A map with \`seasons\` is an earlier season's, played only with that season's clubs.
 // { id, sport, league, name, theatre? ('all' or 'elite'), seasons?, clubs, sections, countries, version, top?: three strongest clubs }
 
 export const EUROPE_MAPS = [
@@ -476,7 +484,7 @@ ${entries.map(entry => `  ${JSON.stringify(entry)},`).join('\n')}
 
 function attributionText(entries, docs) {
   const lines = [
-    'Europe maps (public/domestic/eu*.json)',
+    'Europe maps (public/domestic/eu*.json and weu*.json)',
     'Generated by scripts/build-europe-maps.mjs; do not edit.',
     '',
     `Maps: ${entries.map(entry => entry.version).join(', ')}`,
@@ -499,8 +507,11 @@ function attributionText(entries, docs) {
 }
 
 /**
- * The maps to build: for the built-in season and each earlier EA season with clubs, its strongest TOP_CLUBS and
- * ELITE_CLUBS clubs (FIFA 05 and FIFA 06 have nations only, so no maps); then the EuroLeague's.
+ * The maps to build: for the built-in season and each earlier season with clubs (src/data/footballSeasons.js), its
+ * strongest TOP_CLUBS and ELITE_CLUBS clubs. FIFA 05, FIFA 06 and SWOS 96/97 have nations only, so no maps. Then the
+ * women's game's (src/data/womensFootballSeasons.js), from FIFA 23 on: every European club ('Europe', the NWSL's play on
+ * a map of their own, scripts/build-club-maps.mjs) and the ELITE_CLUBS strongest of them, where there are more. Last the
+ * EuroLeague's, in the built-in season only.
  */
 async function mapSpecs() {
   const { clubs: places } = JSON.parse(await readFile(clubsFile, 'utf8'));
@@ -514,10 +525,21 @@ async function mapSpecs() {
     const set = JSON.parse(await readFile(setFile(season.id), 'utf8'));
     if (set.clubs.length) seasons.push({ tag: `s${season.year}`, set: season.id, clubs: set.clubs });
   }
+  const women = [{ tag: '', set: null, clubs: WOMENS_CLUBS.filter(isEuropeanClub) }];
+  for (const season of BUILT_IN_WOMENS_SEASONS) {
+    const set = JSON.parse(await readFile(setFile(season.id, 'womens-football'), 'utf8'));
+    const clubs = set.clubs.filter(isEuropeanClub);
+    if (clubs.length) women.push({ tag: `s${season.year}`, set: season.id, clubs });
+  }
   return [
     ...seasons.flatMap(({ tag, set, clubs }) => [
-      { id: `eu${TOP_CLUBS}${tag}`, league: `Top ${TOP_CLUBS}`, theatre: 'all', seasons: set ? [set] : null, clubs: field(clubs, TOP_CLUBS) },
-      { id: `eu${ELITE_CLUBS}${tag}`, league: `Elite ${ELITE_CLUBS}`, theatre: 'elite', seasons: set ? [set] : null, clubs: field(clubs, ELITE_CLUBS) },
+      { id: `eu${TOP_CLUBS}${tag}`, sport: 'football', league: `Top ${TOP_CLUBS}`, theatre: 'all', seasons: set ? [set] : null, clubs: field(clubs, TOP_CLUBS) },
+      { id: `eu${ELITE_CLUBS}${tag}`, sport: 'football', league: `Elite ${ELITE_CLUBS}`, theatre: 'elite', seasons: set ? [set] : null, clubs: field(clubs, ELITE_CLUBS) },
+    ]),
+    ...women.flatMap(({ tag, set, clubs }) => [
+      { id: `weu${tag}`, sport: 'womens-football', league: 'Europe', theatre: 'all', seasons: set ? [set] : null, clubs: field(clubs, clubs.length) },
+      ...(clubs.length > ELITE_CLUBS ? [{ id: `weu${ELITE_CLUBS}${tag}`, sport: 'womens-football', league: `Elite ${ELITE_CLUBS}`, theatre: 'elite',
+        seasons: set ? [set] : null, clubs: field(clubs, ELITE_CLUBS) }] : []),
     ]),
     // The EuroLeague's whole league, strongest first, in the built-in season only.
     { id: 'euroleague', sport: 'basketball', league: 'EuroLeague', seasons: null, clubs: field(EUROLEAGUE_CLUBS, EUROLEAGUE_CLUBS.length) },
@@ -528,9 +550,10 @@ async function main() {
   const argv = process.argv.slice(2), args = new Set(argv);
   const check = args.has('--check'), dryRun = args.has('--dry-run');
   const only = argv.find(a => a.startsWith('--only='))?.slice('--only='.length).split(',') ?? null;
+  const boundaries = argv.find(a => a.startsWith('--boundaries='))?.slice('--boundaries='.length);
   const log = line => console.log(line);
   const started = Date.now();
-  const source = createBoundarySource({ cacheDir, worldFile, offline: check, log });
+  const source = createBoundarySource({ cacheDir: boundaries ? path.resolve(boundaries) : cacheDir, worldFile, offline: check, log });
   const specs = await mapSpecs();
   const unknown = only?.filter(id => !specs.some(spec => spec.id === id));
   if (unknown?.length) throw new Error(`Unknown maps: ${unknown.join(', ')}`);

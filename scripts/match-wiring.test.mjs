@@ -517,6 +517,36 @@ test('matchCard keeps the frozen model, adds minuteFallback, and is empty outsid
   }
 });
 
+test('the live log is pinned to its newest line when it is drawn anew or gains one, and is not read on other commits', () => {
+  const f = syncAppFixture();
+  try {
+    const { app } = f;
+    // The compact card's log as App sees it: a line per child, 20px each. Reading scrollHeight is a layout.
+    let reads = 0;
+    const log = lines => ({ childElementCount: lines, scrollTop: 0, get scrollHeight() { reads += 1; return 20 * this.childElementCount; } });
+    const first = log(3);
+    app.eventsRef.current = first;
+    app.setState({ hoverCid: '250' });
+    assert.deepEqual([reads, first.scrollTop], [1, 60], 'drawn anew: pinned to its newest line');
+    // The player scrolls up inside it: hovers, ticker updates and other commits leave it there and read no layout.
+    first.scrollTop = 0;
+    app.setState({ hoverCid: '276' });
+    app.setState({ hoverCid: null });
+    assert.deepEqual([reads, first.scrollTop], [1, 0]);
+    first.childElementCount = 4;
+    app.setState({ hoverCid: '250' });
+    assert.deepEqual([reads, first.scrollTop], [2, 80], 'a new line pins it again');
+    // The match is decided and its log goes: App lets it go, and pins the next match's log as it is drawn.
+    app.eventsRef.current = null;
+    app.setState({ hoverCid: null });
+    assert.ok(app.pinnedLog == null, 'no log kept alive once it has gone');
+    const next = log(1);
+    app.eventsRef.current = next;
+    app.setState({ hoverCid: '276' });
+    assert.deepEqual([reads, next.scrollTop], [3, 20]);
+  } finally { f.close(); }
+});
+
 test('liveMatchModel feeds MatchScreen the live view-model, and the screen reads the minute from the store', async () => {
   const f = syncAppFixture({ role: 'manager' });
   try {

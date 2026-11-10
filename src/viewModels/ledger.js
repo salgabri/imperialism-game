@@ -1,7 +1,7 @@
 // Owner: WP-LEDGER (see PLAN.md §4). Ledger, Chronicle and Match-preview view-models (PLAN §3.6).
 // Pure: (state, ctx) in, plain data out. No window/document/timers/RNG. Tolerates loading/setup state
 // (teams {}, aliveIds [], board null), `stats: {}`, teams without baseEff and history entries without odds.
-import { DEPENDENCIES, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
+import { DEPENDENCIES, isTennisSport, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
 import { worldClubTheatreName } from '../data/scopes.js';
 import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
@@ -10,6 +10,8 @@ import { basketballProfile } from '../sports/basketball.js';
 import { americanFootballProfile } from '../sports/americanFootball.js';
 import { baseballProfile } from '../sports/baseball.js';
 import { hockeyProfile } from '../sports/hockey.js';
+import { tennisProfile } from '../sports/tennis.js';
+import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
 import { FEED_CAP, domesticIdOf } from '../app/shared.js';
@@ -485,7 +487,8 @@ function tapeRow(key, label, a, b) {
 /**
  * Board 07 tale of the tape: the positional profile (football Attack / Defence / Goalkeeping, basketball Offence /
  * Defence, American football Offence / Defence / Kicking, baseball Batting / Pitching / Fielding, ice hockey Attack /
- * Defence / Goaltending) from the sports engines' frozen profile exports, then the lineup rating.
+ * Defence / Goaltending, tennis Singles / Doubles, rugby league Backs / Halves / Forwards) from the sports engines' frozen
+ * profile exports, then the lineup rating.
  */
 function tapeRows(sportId, lineupA, lineupD, copy) {
   if (!lineupA || !lineupD) return [];
@@ -506,6 +509,13 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
       const pA = hockeyProfile(lineupA), pD = hockeyProfile(lineupD);
       rows = [['attack', 'Attack', pA.attack, pD.attack], ['defence', 'Defence', pA.defence, pD.defence],
         ['goaltending', 'Goaltending', pA.goaltending, pD.goaltending]];
+    } else if (isTennisSport(sportId)) {
+      const pA = tennisProfile(lineupA), pD = tennisProfile(lineupD);
+      rows = [['singles', 'Singles', pA.singles, pD.singles], ['doubles', 'Doubles', pA.doubles, pD.doubles]];
+    } else if (sportId === 'rugby-league') {
+      const pA = rugbyLeagueProfile(lineupA), pD = rugbyLeagueProfile(lineupD);
+      rows = [['backs', 'Backs', pA.backs, pD.backs], ['halves', 'Halves', pA.halves, pD.halves],
+        ['forwards', 'Forwards', pA.forwards, pD.forwards]];
     } else {
       const pA = footballProfile(lineupA), pD = footballProfile(lineupD);
       rows = [['attack', 'Attack', pA.attack, pD.attack], ['defence', 'Defence', pA.defence, pD.defence],

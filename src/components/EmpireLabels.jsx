@@ -15,6 +15,12 @@ const OWN_FONT_WEIGHT = 700;
 // README / DEC D19 label policy, single-sourced from the engine: .14em tracking, 5% arc, 9px floor (yours 6.5px).
 const POLICY = V4_LABEL_POLICY || { trackingEm: .14, curveRatio: .05, minFontPx: 9, ownMinFontPx: 6.5, coastalAllowancePx: 10, maxSeaFraction: .22 };
 const estimateWidth = (text, weight) => (typeof estimateLabelWidthEm === 'function' ? estimateLabelWidthEm(text, weight) : text.length * .8);
+// The characters asked of the font from the start, before any name is shown (setup has none): capitals, digits, the
+// space, and the punctuation and accented capitals names use. All lie in the face's Latin subset (U+0000-00FF and
+// U+2000-206F), the same file the interface already loads. A campaign's first names are then measured and drawn in
+// Archivo Narrow at once, rather than in the fallback first and laid out again when the face reports a space or an
+// accent ready. A name with any other character (Č) still waits in the fallback until its subset loads.
+const FONT_SAMPLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 &'-.,()/ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ’–";
 const measuredWidths = new Map();
 let textContext;
 
@@ -76,7 +82,7 @@ export default function EmpireLabels({
   const pathPrefix = `empire-name-${useId().replace(/:/g, '')}`;
   const engine = useMemo(() => createEmpireLabelEngine(geometry), [geometry]);
   const namesKey = JSON.stringify(labels);
-  const characters = useMemo(() => [...new Set('ABCDEFGHIJKLMNOPQRSTUVWXYZ' + labels.map(label => label.text).join(''))].sort().join(''), [namesKey]);
+  const characters = useMemo(() => [...new Set(FONT_SAMPLE + labels.map(label => label.text).join(''))].sort().join(''), [namesKey]);
   const mapFont = useMapFont(characters);
   const names = useMemo(() => labels.map(label => {
     const own = meId != null && label.id === meId;

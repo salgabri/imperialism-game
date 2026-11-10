@@ -3,7 +3,7 @@
 // §4.7 holds on every step: theatre, the draw and match settings, managed team and the `Launch campaign` submit button.
 // Compact pass (docs/design/compact-pass.md): every step fits the window. Controls say what they are by their faces, the
 // explanations live in `title` and for screen readers, and the team list is a wall of flags that pages only if it must.
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import SaveControls from './SaveControls.jsx';
 import ShareCampaign from './ShareCampaign.jsx';
@@ -11,10 +11,10 @@ import TeamMark from './TeamMark.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
 import AdSlot from './AdSlot.jsx';
 import Pager from './Pager.jsx';
+import SetupMap from './SetupMap.jsx';
 import { useFitWall } from '../hooks/useFit.js';
 import * as setupModel from '../screens/setup/setupModel.js';
 import { challengeNote } from '../screens/setup/challenge.js';
-import { themedPaint } from '../theme.js';
 import './setup.css';
 
 // Frozen named exports (kept for the module contract). Definitions live in the pure model module.
@@ -27,7 +27,7 @@ export const domesticDescription = setupModel.domesticDescription;
 const {
   SETUP_STEPS, DRAW_CARDS, TARGETING_CARDS, ROLE_CARDS, UNCERTAINTY_OPTIONS, UNCERTAINTY_HELP, FINALE_OPTIONS,
   FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, HOME_OPTIONS, HOME_HELP, SHOW_MATCH_OPTIONS,
-  showMatchesWrites,
+  showMatchesWrites, signingsOffered,
 } = setupModel;
 
 /** Focus inside one of these keeps Space for itself (A-8). */
@@ -42,6 +42,12 @@ const IDLE_SEASON = Object.freeze({ sets: NO_TEAMS, state: 'idle', message: null
 const SEED_HELP = 'Replays the same campaign with the same rules and choices. Leave blank for a new one.';
 /** The team wall's cells: flags at 4:3, small enough to seat a world of nations; under a finger, a 44px square target. */
 const WALL = { ratio: 4 / 3, gap: 6, minCell: 34, maxCell: 104, touch: { ratio: 1, minCell: 44 } };
+
+/**
+ * The sport tiles' columns: up to four share a row, up to eight split into two even rows, and more into three (nine
+ * sports: three rows of three). Five across would squeeze "Basketball" out of its tile on a desktop's setup column.
+ */
+const sportColumns = count => (count <= 4 ? count : count <= 8 ? Math.ceil(count / 2) : Math.ceil(count / 3));
 
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });
@@ -105,10 +111,11 @@ function RailSummary({ text }) {
   ));
 }
 
+/** A row's flag (`flagId`: Great Britain's is not its shape's id) or a club's crest, found by its id. */
 function TeamRowMark({ team, width = 24 }) {
   return (
     <span className="setup-team-mark" aria-hidden="true">
-      <TeamMark id={team.id} code={team.code} isClub={team.isClub} width={width} />
+      <TeamMark id={team.flagId ?? team.id} teamId={team.id} code={team.code} isClub={team.isClub} width={width} />
     </span>
   );
 }
@@ -118,7 +125,7 @@ function SelectedTeam({ team, noun }) {
     <section className="setup-pick" aria-labelledby="setup-pick-name">
       <div className="setup-pick__head">
         <span className="setup-pick__flag" aria-hidden="true">
-          <TeamMark id={team.id} code={team.code} isClub={team.isClub} width={48} />
+          <TeamMark id={team.flagId ?? team.id} teamId={team.id} code={team.code} isClub={team.isClub} width={48} />
         </span>
         <div className="setup-pick__id">
           <p className="setup-pick__kicker">{team.suggested ? 'Suggested' : 'Selected'} {noun}</p>
@@ -183,31 +190,6 @@ function TeamShortlist({ id, title, teams }) {
   );
 }
 
-/**
- * Step 1's map card: the theatre's opening board, each starting territory in its team's kick-off pastel over the land
- * nobody holds. A world theatre's `preview` comes from `setupModel.theatreMapPreview`, a country's from
- * `setupModel.countryMapPreview` (its sections over the neighbouring land). Static and decorative — no camera, labels or
- * territory attributes; the title, description and stats carry the same facts in text. Memoised: App re-renders
- * setup on every state change, and `preview` keeps its identity per board.
- */
-const TheatreMap = React.memo(function TheatreMap({ preview, caption, loading = false, kind }) {
-  if (!preview && !loading) return null;
-  return (
-    <figure className="setup-map" aria-hidden="true" data-state={preview ? 'ready' : 'loading'} data-kind={kind} title={caption}>
-      {preview ? (
-        <svg className="setup-map__chart" viewBox={preview.viewBox} preserveAspectRatio="xMidYMid meet" focusable="false">
-          <g className="setup-map__backdrop">
-            {preview.backdrop.map((shape, index) => <path key={`${shape.id}-${index}`} d={shape.d} />)}
-          </g>
-          <g className="setup-map__sections">
-            {preview.sections.map(section => <path key={section.id} d={section.d} fill={section.fill} style={{ fill: themedPaint(section.fill) }} />)}
-          </g>
-        </svg>
-      ) : <div className="setup-map__chart setup-map__placeholder" />}
-    </figure>
-  );
-});
-
 /** The world card's caption: "Europe · 46 nations, each on its own land" (a set with no Europe maps deals its clubs out, README §The club layer). */
 function theatreCaption(model, preview) {
   const teams = `${preview.teams} ${preview.teams === 1 ? model.noun : model.nouns}`;
@@ -218,18 +200,22 @@ function theatreCaption(model, preview) {
  * The setup wizard. Props are App's (HEAD) setup props plus optional `onCancel` (header Cancel, only with a save) and
  * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
- * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card, or null.
+ * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card (SetupMap), or null.
+ * The card's `mapMode` ('political' | 'flags') is App's, set through `onMapMode`; `mapFlags` is App's
+ * `setupMapFlags()` for the board on show, while the card is in Flags mode.
  * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
  * `initialStep` (1–3) is the step it opens on: Your role (3) for "Another team" after a defeat. `suggestTeam` (default
  * true) lets a manager with no team picked launch the suggested one; "Another team" turns it off.
  * Sharing (README §Sharing a campaign): `challenge` is the link setup was filled in from ({ seed, ignored }) or null,
  * and `challengeLink` this setup's own link for step 3.
+ * `sportLoad` is App's `sportStatus()`: a sport picked before its players loaded ({ id, state, message, onRetry,
+ * onReload }), or null. Its card shows as picked, and the steps after the first and Launch wait for it.
  */
 export default function SetupOverlay({
   setup = {}, hasSave = false, savedText = '', saveStatus, onResume, onDiscard, onPick, onStart,
   onExport, onImport, onManageSaves, onCancel, managerTeams = NO_TEAMS,
   domestic = IDLE_DOMESTIC, launching = false, restoring = false, theatreMap = null, season = IDLE_SEASON, initialStep = 1,
-  suggestTeam = true, challenge = null, challengeLink = '',
+  suggestTeam = true, challenge = null, challengeLink = '', mapMode = 'political', onMapMode, mapFlags = null, sportLoad = null,
 }) {
   const [step, setStep] = useState(() => Math.min(3, Math.max(1, Math.round(Number(initialStep)) || 1)));
   const [confirmation, setConfirmation] = useState(null);
@@ -242,15 +228,23 @@ export default function SetupOverlay({
   const confirmationFocus = useRef(null);
   // App passes a fresh `onStart` arrow on every render; the Space listener reads the latest one through this ref.
   const startRef = useRef(onStart);
+  // Likewise `onMapMode`: the memoised map card gets one stable handler that calls the latest.
+  const mapModeRef = useRef(onMapMode);
+  mapModeRef.current = onMapMode;
+  const chooseMapMode = useCallback(mode => mapModeRef.current?.(mode), []);
   // App passes a fresh `domestic` object (with a fresh `onRetry`) every render: the model keys on its values only.
   const mapState = domestic?.state || 'idle';
   const mapMessage = domestic?.message || null;
   // Likewise `season`: its list and sport keep their identity until they change.
   const { sets: seasonSets = NO_TEAMS, state: seasonState = 'idle', message: seasonMessage = null, sport: seasonSport = null } = season || IDLE_SEASON;
+  // Likewise `sportLoad`.
+  const { id: sportLoadId = null, state: sportLoadState = 'idle', message: sportLoadMessage = null } = sportLoad || {};
   const model = useMemo(() => setupModel.buildSetupModel(setup, {
     managerTeams, domestic: { state: mapState, message: mapMessage }, launching,
     season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport }, suggest: suggestTeam,
-  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam]);
+    sportLoad: { id: sportLoadId, state: sportLoadState, message: sportLoadMessage },
+  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam,
+    sportLoadId, sportLoadState, sportLoadMessage]);
   const { rules } = model;
   const manager = model.role === 'manager';
   /** Football clubs also offer one country's own top clubs: more than a hundred, so they are a dropdown under Europe's theatres. */
@@ -260,9 +254,11 @@ export default function SetupOverlay({
   const theatreChecked = model.scopes.some(scope => scope.id === model.scopeId);
   // The wall reads strongest first: the favourites lead, and the long shots are where a player would look for them.
   const wallTeams = useMemo(() => model.teams.slice().sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)), [model.teams]);
-  const wall = useFitWall(wallTeams.length, WALL);
   const checkedTeam = wallTeams.findIndex(team => team.id === model.managedId);
-  const { setPage: setWallPage, pageFor: wallPageFor } = wall;
+  // The wall shows the page holding the checked team, however it was picked (a click, the keyboard, a challenge link),
+  // from the render that checks it or measures the wall. Step 3 is hidden while another step shows, so a step change
+  // measures the wall again, in the commit that shows it.
+  const wall = useFitWall(wallTeams.length, { ...WALL, focusIndex: checkedTeam, measureKey: step });
   const wallShown = Number.isFinite(wall.pageSize) ? wallTeams.slice(wall.start, wall.start + wall.pageSize) : wallTeams;
 
   const pick = (key, value) => onPick?.(key, value);
@@ -309,8 +305,6 @@ export default function SetupOverlay({
     choose('managedTeamId', wallTeams[next].id, setup.managedTeamId);
   }
 
-  // The wall shows the page holding the checked team, however it was picked (a click, the keyboard, a challenge link).
-  useEffect(() => { if (checkedTeam >= 0) setWallPage(wallPageFor(checkedTeam)); }, [checkedTeam, wallPageFor, setWallPage]);
   // A keyboard pick moves focus to the new team's flag, once its page is on show.
   useEffect(() => {
     if (!refocusTeam.current) return;
@@ -319,6 +313,8 @@ export default function SetupOverlay({
   });
   function goTo(next) {
     const target = Math.min(3, Math.max(1, next));
+    // A sport still loading is not set up yet: the steps after this one would show the sport it replaces.
+    if (model.sportLoad && target !== step) return;
     navigated.current = true;
     // The discard confirmation belongs to step 1's quick-resume card; leaving the step dismisses it.
     if (target !== 1) setConfirmation(null);
@@ -382,7 +378,7 @@ export default function SetupOverlay({
     }
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [step, model.canLaunch, confirmation]);
+  }, [step, model.canLaunch, model.sportLoad, confirmation]);
 
   function launch(event) {
     event.preventDefault();
@@ -415,14 +411,16 @@ export default function SetupOverlay({
 
   function footer(n) {
     const meta = SETUP_STEPS[n - 1];
-    // Only what holds the launch back: a team to pick, a map or season still loading.
-    const note = n === 3 ? model.launchNote : '';
+    // Only what holds the launch back: a team to pick, a map or season still loading; on the first step, a sport loading
+    // (one that failed says so under the sports).
+    const note = n === 3 ? model.launchNote : n === 1 && model.sportLoad?.state === 'loading' ? model.sportLoad.note : '';
     return (
       <footer className="setup-foot">
         <p className="setup-foot__note" role={note ? 'status' : undefined}>{note}</p>
         {n > 1 ? <button type="button" className="btn-secondary setup-foot__back" onClick={() => goTo(n - 1)}>Back</button> : null}
         {n < 3 ? (
           <button type="button" className="btn-primary setup-foot__next" data-key-hint="Space" data-bar-hint={`Step ${n} of 3`}
+            disabled={!!model.sportLoad} aria-busy={model.sportLoad?.state === 'loading' || undefined}
             onClick={() => goTo(n + 1)}>{meta.next}</button>
         ) : (
           <button type="submit" className="btn-primary setup-foot__next setup-launch" data-key-hint="Space" data-bar-hint="Step 3 of 3"
@@ -453,12 +451,14 @@ export default function SetupOverlay({
           </select>
           <small className="control-help sr-only">{FINALE_HELP[model.finale]}</small>
         </label>
-        <label className="control-field" htmlFor="setup-recruitment" title={RECRUITMENT_HELP[model.acquisitionPolicy]}><span>Computer signings</span>
-          <select id="setup-recruitment" value={model.acquisitionPolicy} onChange={event => pick('acquisitionPolicy', event.target.value)}>
-            {RECRUITMENT_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-          </select>
-          <small className="control-help sr-only">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
-        </label>
+        {signingsOffered(model.sport.id) ? (
+          <label className="control-field" htmlFor="setup-recruitment" title={RECRUITMENT_HELP[model.acquisitionPolicy]}><span>Computer signings</span>
+            <select id="setup-recruitment" value={model.acquisitionPolicy} onChange={event => pick('acquisitionPolicy', event.target.value)}>
+              {RECRUITMENT_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+            </select>
+            <small className="control-help sr-only">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
+          </label>
+        ) : null}
         <label className="control-field" htmlFor="setup-home-advantage" title={HOME_HELP[model.homeAdvantage]}><span>Home advantage</span>
           <select id="setup-home-advantage" value={model.homeAdvantage} onChange={event => pick('homeAdvantage', event.target.value)}>
             {HOME_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
@@ -568,31 +568,45 @@ export default function SetupOverlay({
               </div>
 
               <div className="setup-sports" role="radiogroup" aria-label="Sport"
-                style={{ '--sport-cols': model.sports.length > 4 ? Math.ceil(model.sports.length / 2) : model.sports.length }}>
+                data-rows={Math.ceil(model.sports.length / sportColumns(model.sports.length))}
+                style={{ '--sport-cols': sportColumns(model.sports.length) }}>
                 {model.sports.map(item => (
-                  <div className="setup-card" data-checked={item.selected} key={item.id} title={item.note}>
+                  <div className="setup-card" data-checked={item.selected} data-busy={item.busy || undefined} key={item.id} title={item.note}>
                     <Icon name={item.id} size={22} className="setup-card__icon" />
                     <button type="button" role="radio" aria-checked={item.selected} tabIndex={item.selected ? 0 : -1}
-                      className="setup-card__button" aria-describedby={`setup-sport-${item.id}-note`}
-                      onClick={() => choose('sport', item.id, model.sport.id)} onKeyDown={moveRadio}>{item.name}</button>
+                      className="setup-card__button" aria-describedby={`setup-sport-${item.id}-note`} aria-busy={item.busy || undefined}
+                      onClick={() => choose('sport', item.id, model.sportPick)} onKeyDown={moveRadio}>{item.name}</button>
                     <span className="setup-card__note sr-only" id={`setup-sport-${item.id}-note`}>{item.note}</span>
                   </div>
                 ))}
               </div>
 
+              {/* A sport whose players would not load: Retry, or Reload, as after a deploy that renamed their files. */}
+              {model.sportLoad?.state === 'error' ? (
+                <div className="rule-note setup-sport__error" role="alert">
+                  <Icon name="info" size={20} />
+                  <p>{model.sportLoad.note}{' '}
+                    <button type="button" className="btn-link rule-note__action" onClick={() => sportLoad?.onRetry?.()}>Retry</button>{' '}
+                    <button type="button" className="btn-link rule-note__action" onClick={() => sportLoad?.onReload?.()}>Reload</button>
+                  </p>
+                </div>
+              ) : null}
+
               <div className="setup-row">
                 <div className="setup-group">
                   <span className="sr-only" id="setup-layer-label">Teams</span>
                   <div className="segmented setup-segmented" role="radiogroup" aria-labelledby="setup-layer-label"
-                    aria-describedby={model.clubsOnly ? 'setup-layer-note' : undefined}>
+                    aria-describedby={model.clubsOnly || model.nationsOnly ? 'setup-layer-note' : undefined}>
                     {[['nations', 'Nations'], ['clubs', 'Clubs']].map(([id, name]) => (
                       <button type="button" role="radio" key={id} aria-checked={model.layer === id} tabIndex={model.layer === id ? 0 : -1}
-                        disabled={id === 'nations' && !!model.clubsOnly}
+                        disabled={(id === 'nations' && !!model.clubsOnly) || (id === 'clubs' && !!model.nationsOnly)}
                         onClick={() => choose('layer', id, model.layer)} onKeyDown={moveRadio}>{name}</button>
                     ))}
                   </div>
                   {/* A sport with clubs only (American football) has no national teams to field. */}
                   {model.clubsOnly ? <p className="sr-only" id="setup-layer-note">{model.sport.name} is played by {model.clubsOnly} clubs only.</p> : null}
+                  {/* A sport with nations only (tennis: the Davis Cup's) has no clubs to field. */}
+                  {model.nationsOnly ? <p className="sr-only" id="setup-layer-note">{model.sport.name} is played by nations only.</p> : null}
                 </div>
 
                 {/* The sport's seasons: the built-in one, the earlier ones built in, and any CM 01/02 set built on this
@@ -600,7 +614,8 @@ export default function SetupOverlay({
                 {model.season ? (
                   <div className="setup-group setup-group--season">
                     <span className="sr-only" id="setup-season-label">Season</span>
-                    <select id="setup-season" className="setup-season" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
+                    <select id="setup-season" className="setup-season" aria-labelledby="setup-season-label"
+                      aria-describedby={model.season.credit ? 'setup-season-note setup-season-credit' : 'setup-season-note'}
                       title={model.season.note} value={model.season.id ?? ''} onChange={event => pick('dataSet', event.target.value || null)}>
                       {model.season.options.map(option => <option value={option.id ?? ''} key={option.key}>{option.name}</option>)}
                     </select>
@@ -608,6 +623,8 @@ export default function SetupOverlay({
                   </div>
                 ) : null}
               </div>
+              {/* The chosen season's credit, as its sources ask it to be shown: on screen and whole, never only a title. */}
+              {model.season?.credit ? <p className="setup-season__credit" id="setup-season-credit">{model.season.credit}</p> : null}
               {model.season?.state === 'loading' ? (
                 <p className="setup-season__status setup-season__loading" role="status">{model.season.loading}</p>
               ) : null}
@@ -681,12 +698,15 @@ export default function SetupOverlay({
 
             <div className="setup-side">
               {model.country ? (
-                <TheatreMap kind="country" preview={domestic?.preview || null} loading={model.countryState === 'loading'}
+                <SetupMap kind="country" preview={domestic?.preview || null} loading={model.countryState === 'loading'}
                   caption={!domestic?.preview ? `Loading the map of ${model.country.name}…`
                     : model.country.countries ? `${model.country.name} · ${model.country.clubs} clubs in ${model.country.countries} countries`
                       : `${model.country.name} · ${domestic.preview.sections.length} sections, `
-                        + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)} />
-              ) : theatreMap ? <TheatreMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)} /> : <div className="setup-side__empty" aria-hidden="true" />}
+                        + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)}
+                  mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs resetKey={model.scopeId} />
+              ) : theatreMap ? <SetupMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)}
+                mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs={model.layer === 'clubs'} resetKey={model.scopeId} />
+                : <div className="setup-side__empty" aria-hidden="true" />}
             </div>
           </div>
           {footer(1)}
