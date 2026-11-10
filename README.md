@@ -250,7 +250,8 @@ manager of the theatre's favourite, with decisions from the first match.
    to 1989/90 (EA FIFA and FC ratings of each to 2004/05, then SI's
    Championship Manager, Sensible World of Soccer for 1996/97 to 1994/95, and
    fans' databases for 1993/94 and 1989/90; 2005/06, 2004/05, 1996/97 and 1989/90
-   have nations only), and any local
+   have nations only), the World Cups of 1961/62 to 1993/94 (computed from each
+   finalist's Elo and its players' records, nations only), and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), then 1998/99 (NBA Live 99), 1991/92 and
@@ -259,7 +260,9 @@ manager of the theatre's favourite, with decisions from the first match.
    football's lists its built-in 2026 season (Madden NFL 27), then its
    [earlier seasons](#american-football-seasons) 2025 back to 2001 (Madden ratings
    of each launch), then 1995 to 1992 and 1990 (Tecmo Super Bowl, the overall
-   ours), NFL clubs on the map of their day, and baseball's its
+   ours) and every other season back to 1960, with the AFL's of 1960 to 1969
+   (computed from Pro Football Archives' facts), NFL or AFL clubs on the map of
+   their day, and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
    2025 back to 2018 (MLB The Show of each), then 2017 back to 1960 (computed from
    WAR), with nations or with clubs on the map of their day. Women's football lists its
@@ -271,8 +274,8 @@ manager of the theatre's favourite, with decisions from the first match.
    statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
    2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1968, rugby league its built-in 2025
-   (Rugby League 26) then [2008](#rugby-league-seasons) (Rugby League 2, the
-   overall ours), NRL clubs on the map of 2008. A season whose sources ask for a
+   (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 2009 (computed from
+   NRL.com's match statistics) and 2008 (Rugby League 2, the overall ours), NRL clubs on the map of their day. A season whose sources ask for a
    credit shows it, whole, as small text under the Season choice (ice hockey's
    Hockey Databank and MoneyPuck.com seasons). A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened

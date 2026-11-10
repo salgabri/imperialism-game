@@ -117,7 +117,7 @@ export const setKindOf = id => Object.keys(SET_KINDS).find(kind => SET_KINDS[kin
 /** The sport a set is played in, by its id. */
 export const setSportOf = id => kindRecord(id).sport;
 /** Whether a set fields national teams: every one but the clubs-only kinds' (the NBA's, the NFL's, the NRL's) and the
- * early NHL seasons, when only Canada fielded a real side. */
+ * early NHL seasons, when fewer than three nations fielded a real side. */
 export const setHasNations = id => kindRecord(id).nations !== false && !kindRecord(id).clubsOnly?.test(String(id));
 /** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, SWOS 96/97, the computed
  * World Cup seasons, tennis's). */
