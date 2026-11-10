@@ -56,13 +56,20 @@ function csvRows(text) {
   return rows.filter(row => row.length > 1).map(row => new Proxy(row, { get: (target, key) => (Object.hasOwn(at, key) ? target[at[key]] : target[key]) }));
 }
 
-/** A cached source file, checked against its pin: its text. */
+/**
+ * A cached source file, checked against its pins: its SHA-256 and, where the manifest names it (`blobs`), the git blob
+ * its source's pinned commit holds, so the file is that commit's whichever copy it was read from. → its text.
+ */
 async function pinned(source, file) {
   const at = path.join(root, source.cache, file);
   if (!existsSync(at)) throw new Error(`${source.cache}/${file} is not on this computer (see scripts/data/mlb-war-seasons.json \`sources\`)`);
   const bytes = await readFile(at);
   const sha = createHash('sha256').update(bytes).digest('hex');
   if (sha !== source.sha256[file]) throw new Error(`${source.cache}/${file} is not the pinned file (SHA-256 ${sha})`);
+  const blob = source.blobs?.[file];
+  if (blob && createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex') !== blob) {
+    throw new Error(`${source.cache}/${file} is not the blob ${blob} of commit ${source.commit}`);
+  }
   return bytes.toString('utf8');
 }
 

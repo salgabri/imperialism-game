@@ -353,8 +353,9 @@ the WAR's origin and the Lahman database of 2015 the Databank grew from, and put
 season files and their snapshots under CC BY-SA 3.0, as the Databank's share-alike licence
 asks of derived data.
 
-**Building.** `npm run import:mlb-war` (`scripts/import-mlb-war.mjs`) checks every pin,
-never fetches, and writes one snapshot a season, `scripts/data/mlb-war-seasons/<year>.json`
+**Building.** `npm run import:mlb-war` (`scripts/import-mlb-war.mjs`) checks every pin
+(each file's SHA-256 and, for the WAR file and the Databank, its git blob in the pinned
+commit), never fetches, and writes one snapshot a season, `scripts/data/mlb-war-seasons/<year>.json`
 (6.7 MB in all, 58,902 player-seasons): every player who played in the season with his
 club, role, positions, score, the inputs it was computed from and his birth country, and
 each club's name, record and main ballpark. It also writes
