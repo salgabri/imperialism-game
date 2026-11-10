@@ -26,11 +26,32 @@
     "w-glasgow-city-fc": "Q1529496",
     "w-logrono-united": "Q55242431",
     "w-fc-rosengard": "Q1807026",
-    "w-breidablik": "Q25411210"
+    "w-breidablik": "Q25411210",
+    "el-anadolu-efes": "Q483738",
+    "el-asvel": "Q4089",
+    "el-baskonia": "Q54927",
+    "el-bayern-munich": "Q600149",
+    "el-besiktas": "Q854669",
+    "el-crvena-zvezda": "Q1132627",
+    "el-dubai-basketball": "Q125293758",
+    "el-fc-barcelona": "Q54893",
+    "el-fenerbahce": "Q239447",
+    "el-hapoel-tel-aviv": "Q2735525",
+    "el-maccabi-tel-aviv": "Q819694",
+    "el-olimpia-milano": "Q36362",
+    "el-olympiacos": "Q847701",
+    "el-panathinaikos": "Q739287",
+    "el-paris-basketball": "Q56291131",
+    "el-partizan": "Q912247",
+    "el-real-madrid": "Q54922",
+    "el-valencia-basket": "Q54940",
+    "el-virtus-bologna": "Q36264",
+    "el-zalgiris": "Q393357"
   },
   "files": {
     "d250-826": "LogoASMonacoFC2021.svg",
-    "d528-1011": "FC Volendam logoo.svg"
+    "d528-1011": "FC Volendam logoo.svg",
+    "el-asvel": "ASVEL Basket logo.svg"
   },
   "twins": {
     "f-venezia": "d380-1179",

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CONFIG } from './config.js';
 import { C, V4 } from './theme.js';
-import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
+import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, isEuropeanScope, makeRng, hashStr, nationScopes, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES, worldClubTheatreName } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { teamMarkUrls } from './data/teamMarks.js';
@@ -573,7 +573,7 @@ export default class App extends React.Component {
       .map(country => [country.id, country.id]));
     // Russia and overseas islands remain playable, but the European opening
     // camera should show the continent. Zooming out always restores all land.
-    if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
+    if (isEuropeanScope(settings?.scope) && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
     this.viewResetKey = (this.viewResetKey || 0) + 1;
   }
 
@@ -800,6 +800,8 @@ export default class App extends React.Component {
       // Country and Europe maps come with football data only (basketball clubs take the NBA's map below, in setClubScope).
       if (key === 'sport' && (domestic ? getSport(value).id !== 'football'
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
+      // A nation theatre of one sport only (basketball's EuroBasket) goes back to Europe in another.
+      if (key === 'sport' && !nationScopes(getSport(value)).some(s => s.id === setup.scope)) setup.scope = DEFAULT_SETUP.scope;
       // A data set plays in its own sport and brings its own clubs. A basketball season has clubs only: choosing it
       // takes the clubs, and choosing nations goes back to the built-in season.
       if (setup.dataSet != null && setSportOf(setup.dataSet) !== getSport(setup.sport).id) setup.dataSet = null;
@@ -1055,7 +1057,7 @@ export default class App extends React.Component {
     if (!this.geo || this.domesticId || domesticIdOf(setup)) return null;
     this.setupTeams(setup);
     const { opening, homes } = this.setupTeamsCache;
-    const focus = setup.layer !== 'clubs' && setup.scope === 'UEFA' ? this.europeFocus() : null;
+    const focus = setup.layer !== 'clubs' && isEuropeanScope(setup.scope) ? this.europeFocus() : null;
     return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
       own: opening, frameIds: homes, focus });
   }
@@ -1093,8 +1095,9 @@ export default class App extends React.Component {
       }
     } else {
       const all = fieldedNations(sport).map(id => buildTeam(id, rng, sport));
-      const scope = SCOPES.find(x => x.id === su.scope) || SCOPES[0];
-      included = su.scope === 'world' ? all : su.scope === 'elite' ? eliteNations(all, sport) : all.filter(scope.filter);
+      // A theatre another sport offers (basketball's EuroBasket) is the world's in this one.
+      const scope = nationScopes(sport).find(x => x.id === su.scope) || SCOPES[0];
+      included = scope.id === 'world' ? all : scope.id === 'elite' ? eliteNations(all, sport) : all.filter(scope.filter);
       for (const team of included) own[team.id] = team.id;
       scopeName = plainScopeName(scope.name);
     }

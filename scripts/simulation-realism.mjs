@@ -9,12 +9,13 @@ import { pathToFileURL } from 'node:url';
 import { parseEaPlayers } from './lib/football-data.mjs';
 import { EA_CLUB_SNAPSHOT, firstDivisionClubs, squadTuples } from './lib/first-divisions.mjs';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
+import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { buildClub, hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
 import { football } from '../src/sports/football.js';
-import { BENCH, nbaBasketballIn } from '../src/sports/basketball.js';
+import { BENCH, euroleagueBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
 import { americanFootball } from '../src/sports/americanFootball.js';
 import { baseball } from '../src/sports/baseball.js';
 import { hockey, PERIOD_MODEL } from '../src/sports/hockey.js';
@@ -217,6 +218,26 @@ function nbaSeason(seasons, seed, venue) {
   };
 }
 
+// ---- Basketball (EuroLeague) ------------------------------------------------------------------------------------
+
+/** The EuroLeague's regular season: its 20 clubs twice each, 38 games, under its own rules (FIBA's, at its pace). */
+function euroleagueSeason(seasons, seed, venue) {
+  const sport = euroleagueBasketball;
+  const clubs = EUROLEAGUE_CLUBS.map(c => buildClub(c, sport));
+  const games = 2 * (clubs.length - 1);
+  const { played, tables } = playSeasons({ sport, teams: clubs, games, seasons, seed, venue });
+  const teamPoints = played.flatMap(g => [g.ga, g.gd]);
+  const margins = played.map(g => Math.abs(g.ga - g.gd));
+  const spread = seasonSpread(tables, games);
+  return {
+    clubs: clubs.length, games,
+    pointsPerTeam: mean(teamPoints), teamPointsSd: sd(teamPoints), overtimeRate: share(played, g => g.tie),
+    marginMean: mean(margins), closeGames: share(margins, m => m <= 3), blowouts: share(margins, m => m >= 20),
+    winPctSd: spread.sd, bestWins: spread.best * games, worstWins: spread.worst * games,
+    favourite: favouriteRecord(played), homeWins: share(played, g => g.winner === g.j),
+  };
+}
+
 // ---- American football (NFL) ----------------------------------------------------------------------------------
 
 function nflSeason(seasons, seed, venue) {
@@ -358,6 +379,14 @@ export const REAL = Object.freeze({
     blowouts: [0.15, 0.228], winPctSd: [0.12, 0.161], bestWins: [58, 68], worstWins: [14, 20],
     fortyPointRate: [0.048, 0.083], fiftyPointRate: [0.0073, 0.0102], benchShare: [0.301, 0.312], homeWins: [0.543, 0.58],
   },
+  euroleague: {
+    note: 'EuroLeague regular seasons 2021/22–2025/26, computed 2026-11-08 from every game in its API; records per 38 games',
+    // The built-in clubs play at 2025/26's pace and scoring rate (86.2 points a team); scoring rose from 77.2 in 2021/22.
+    pointsPerTeam: [84.1, 86.2], overtimeRate: [0.033, 0.052], marginMean: [10.2, 10.8], closeGames: [0.15, 0.193],
+    blowouts: [0.105, 0.158], winPctSd: [0.126, 0.159],
+    // 24–27 wins of 34 and 5–8 at the bottom, 26 and 8 of 38 in 2025/26, scaled to 38 games.
+    bestWins: [26, 30.2], worstWins: [5.6, 8.9], homeWins: [0.611, 0.655],
+  },
   nfl: {
     note: 'NFL regular seasons 2021–2025 (margins 2020–2025, playoffs included)',
     pointsPerTeam: [21.8, 23.0], overtimeRate: [0.048, 0.077], marginMean: [10.6, 11.6], oneScore: [0.507, 0.576],
@@ -403,6 +432,7 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     home,
     football: leagues.map(league => footballLeague(league, seasons, hashStr(`${seed}:${league}`), venue)),
     nba: nbaSeason(seasons, hashStr(`${seed}:nba`), venue),
+    euroleague: euroleagueSeason(seasons, hashStr(`${seed}:euroleague`), venue),
     nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`), venue),
     mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`), venue),
     nhl: nhlSeason(seasons, hashStr(`${seed}:nhl`), venue),
@@ -449,6 +479,20 @@ function print(report) {
   lines.push(row('50-point games (per team game)', n.fiftyPointRate, rn.fiftyPointRate, pct));
   lines.push(row("bench's share of the points", n.benchShare, rn.benchShare, pct));
   lines.push(row('home (defending) side wins', n.homeWins, rn.homeWins, pct));
+  const e = report.euroleague, re = REAL.euroleague;
+  lines.push(`
+EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
+  lines.push(row('points a team', e.pointsPerTeam, re.pointsPerTeam, x => num(x, 1)));
+  lines.push(row('team points SD', e.teamPointsSd, null, x => num(x, 1)));
+  lines.push(row('overtime', e.overtimeRate, re.overtimeRate, pct));
+  lines.push(row('mean margin', e.marginMean, re.marginMean, x => num(x, 1)));
+  lines.push(row('decided by 3 or fewer', e.closeGames, re.closeGames, pct));
+  lines.push(row('decided by 20 or more', e.blowouts, re.blowouts, pct));
+  lines.push(row('win% SD', e.winPctSd, re.winPctSd, x => num(x, 3)));
+  lines.push(row('best record (wins)', e.bestWins, re.bestWins, x => num(x, 1)));
+  lines.push(row('worst record (wins)', e.worstWins, re.worstWins, x => num(x, 1)));
+  lines.push(row('favourite wins', e.favourite.wins, null, pct));
+  lines.push(row('home (defending) side wins', e.homeWins, re.homeWins, pct));
   const a = report.nfl, ra = REAL.nfl;
   lines.push(`\nNFL — ${a.clubs} clubs, 17 games (real: ${ra.note})`);
   lines.push(row('points a team', a.pointsPerTeam, ra.pointsPerTeam, x => num(x, 1)));

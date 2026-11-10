@@ -3,7 +3,7 @@
 // components pass it to buildFeedRows and to the win-probability series.
 import { clockLabel, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeText } from '../sports/index.js';
 import { selectLineup } from '../data/teams.js';
-import { isEstimated } from '../data/estimates.js';
+import { estimateTitle, isEstimated } from '../data/estimates.js';
 import { BENCH } from '../sports/basketball.js';
 import { PERIOD_MODEL } from '../sports/hockey.js';
 import { liveModelFor } from '../engine/winProbability.js';
@@ -106,7 +106,8 @@ function xiTable(team, st, sportId) {
     .map(({ p, pos }) => {
       const rating = Math.round(Number(p.effectiveRating ?? p.rating) || 0);
       return { key: `${team.id}-${p.originalIndex ?? p.name}`, pos, name: p.name || '', natural: p.pos || pos,
-        rating, tier: ratingTier(rating), outOfPosition: !!p.outOfPosition, claimed: claimedTag(p, team, st), estimated: isEstimated(p) };
+        rating, tier: ratingTier(rating), outOfPosition: !!p.outOfPosition, claimed: claimedTag(p, team, st), estimated: isEstimated(p),
+        ...(isEstimated(p) ? { estimateTitle: estimateTitle(p) } : {}) };
     });
   // DECISIONS (Misc): basketball lineups read "Starting five", American football's "Starters".
   const title = `${team.name} · ${getSport(sportId).words.lineupTitle}`;

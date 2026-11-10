@@ -16,6 +16,7 @@ import { BUILT_IN_BASEBALL_SEASONS } from '../data/baseballSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
 import { basketball } from '../sports/basketball.js';
+import { CLUBS as NBA_CLUBS } from '../data/clubs.basketball.js';
 import { baseball } from '../sports/baseball.js';
 import { football } from '../sports/football.js';
 import { getSport } from '../sports/index.js';
@@ -430,7 +431,8 @@ function validateBasketballClubs(data, id, fail) {
   if (!map) fail(`map ${JSON.stringify(data.map)} is not a basketball map listing this season`);
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
-  const leagues = new Set(basketball.clubs.map(club => club.league));
+  // An NBA season's clubs are NBA franchises: the EuroLeague's are the built-in season's only.
+  const leagues = new Set(NBA_CLUBS.map(club => club.league));
   const ids = new Set(), codes = new Set();
   data.clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;

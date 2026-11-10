@@ -43,6 +43,13 @@
     "mlb-san-diego-padres": "#2f241d",
     "nhl-chicago-blackhawks": "#cf0a2c",
     "nhl-philadelphia-flyers": "#f74902",
-    "nhl-nashville-predators": "#ffb81c"
+    "nhl-nashville-predators": "#ffb81c",
+    "el-real-madrid": "#ffffff",
+    "el-fc-barcelona": "#a50044",
+    "el-panathinaikos": "#007a3d",
+    "el-maccabi-tel-aviv": "#f8d000",
+    "el-fenerbahce": "#fde100",
+    "el-besiktas": "#000000",
+    "el-partizan": "#000000"
   }
 }

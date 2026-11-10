@@ -3,11 +3,11 @@
 // The in-game settings panel reads the same option lists, Show matches helpers and `campaignFacts`.
 // Everything here is a pure function of the setup record and the opening teams App already computes
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
-import { NATIONS, SCOPES } from '../../data/teams.js';
+import { NATIONS, nationScopes } from '../../data/teams.js';
 import { CLUB_SCOPES, TOP_CLUBS, strongestClubs as topClubs } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
-import { clubMapOf, domesticEntry, domesticLabel, europeMapsOf, isDomesticScope } from '../../data/domesticScope.js';
+import { clubMapsOf, domesticEntry, domesticLabel, europeMapsOf, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
@@ -26,7 +26,7 @@ export function campaignPreview(count, sport, setup) {
   // A best-of-three final plays two or three games where a single final plays one.
   const range = setup.finale === 'best-of-three' && matches > 0 ? `${matches + 1}–${matches + 2}` : `${matches}`;
   // The clock of the rules the campaign will play (a season's sport object carries the built-in one's).
-  const { clock } = matchSport({ sport: sport.id, layer: setup.layer });
+  const { clock } = matchSport({ sport: sport.id, layer: setup.layer, clubScope: setup.clubScope });
   const seconds = setup.express ? 2.5 : setup.resolution === 'instant' ? 5 : clock.length * clock.msPerUnit / 1000 + 7;
   const minutes = Math.max(1, Math.ceil(matches * seconds / 60));
   return { matches: range, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
@@ -215,10 +215,10 @@ function nationCounts(sport) {
   const key = sportKey(sport);
   if (!nationCountCache.has(key)) {
     // A data set's season can leave out shapes merged into another federation or with none.
-    const nations = fieldedNations(sport).map(id => NATIONS[id]);
-    nationCountCache.set(key, Object.fromEntries(SCOPES.map(scope => [scope.id, scope.id === 'world'
+    const nations = fieldedNations(sport);
+    nationCountCache.set(key, Object.fromEntries(nationScopes(sport).map(scope => [scope.id, scope.id === 'world'
       ? nations.length
-      : scope.id === 'elite' ? Math.min(32, nations.length) : nations.filter(nation => scope.filter({ conf: nation[2] })).length])));
+      : scope.id === 'elite' ? Math.min(32, nations.length) : nations.filter(id => scope.filter({ id, conf: NATIONS[id][2] })).length])));
   }
   return nationCountCache.get(key);
 }
@@ -252,12 +252,16 @@ function clubIndex(sport) {
 }
 
 const clubMapRows = new Map();
-/** The one theatre of a sport whose clubs have their own map: 'NBA', on the USA and Canada. */
-function clubMapTheatre(map) {
-  if (!clubMapRows.has(map.id)) {
-    clubMapRows.set(map.id, Object.freeze([Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' })]));
+/**
+ * The theatres of a sport whose clubs have their own maps, a row a league: 'NBA' on the USA and Canada, and in
+ * basketball's built-in season 'EuroLeague' on its map of Europe.
+ */
+function clubMapTheatre(...maps) {
+  const key = maps.map(map => map.id).join('|');
+  if (!clubMapRows.has(key)) {
+    clubMapRows.set(key, Object.freeze(maps.map(map => Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' }))));
   }
-  return clubMapRows.get(map.id);
+  return clubMapRows.get(key);
 }
 
 const europeRows = new Map();
@@ -272,14 +276,14 @@ function europeTheatres(dataSet = null) {
 /** Theatre rows for the active layer: [{ id, name, label, count, note }] (counts as in HEAD's setup). */
 export function theatreOptions(sport, clubLayer) {
   if (clubLayer) {
-    // A basketball season plays on its era's map (`clubMap`).
-    const map = clubMapOf(sport.id, sport.clubMap);
-    if (map) return clubMapTheatre(map);
+    // A basketball season plays on its era's map (`clubMap`); the built-in one on the NBA's and the EuroLeague's.
+    const maps = clubMapsOf(sport.id, sport.clubMap);
+    if (maps.length) return clubMapTheatre(...maps);
     const europe = sport.id === 'football' ? europeTheatres(sport.dataSet ?? null) : [];
     return europe.length ? europe : clubTheatres(sport);
   }
   const counts = nationCounts(sport);
-  return SCOPES.map(scope => theatreRow(scope, counts[scope.id]));
+  return nationScopes(sport).map(scope => theatreRow(scope, counts[scope.id]));
 }
 
 /**
@@ -289,10 +293,10 @@ export function theatreOptions(sport, clubLayer) {
  * season's Europe maps.
  */
 function pendingTheatres(builtIn, clubLayer, clubScope) {
-  if (!clubLayer) return SCOPES.map(scope => theatreRow(scope, null));
+  if (!clubLayer) return nationScopes(builtIn).map(scope => theatreRow(scope, null));
   const map = domesticEntry(clubScope);
   if (map?.theatre) return europeTheatres(map.seasons?.[0] ?? null);
-  if (map?.sport === builtIn.id) return clubMapTheatre(map);
+  if (map?.sport === builtIn.id) return map.seasons ? clubMapTheatre(map) : clubMapTheatre(...clubMapsOf(builtIn.id));
   const [all, elite, ...leagues] = CLUB_SCOPES(builtIn);
   return [all, elite, ...leagues.filter(scope => scope.id === clubScope)].map(scope => theatreRow(scope, null));
 }
@@ -327,7 +331,8 @@ export const SEASON_NOTES = Object.freeze({
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
     + 'scoring, marked as one. Rosters as of 7 November 2026. Nations field the NHL players of each country.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive. They have NBA clubs '
-    + 'only: the franchises of that season, on the map of their day.',
+    + 'only: the franchises of that season, on the map of their day. No game rates EuroLeague players, so the '
+    + 'EuroLeague\'s ratings are estimates from its box scores, marked as such.',
   'american-football': 'Madden NFL 27 ratings from EA SPORTS, as of the week 7 update. NFL clubs only, on their own map '
     + 'of the United States.',
   baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October). Nations field the players '
@@ -358,8 +363,10 @@ export function domesticDescription(entry) {
   const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
-  if (entry.theatre) {
-    return `${leaders} Europe's ${clubs} strongest clubs, each on land in its own country: alone it holds all of it, and clubs that `
+  // A map of Europe: football's strongest clubs, or a league's (basketball's EuroLeague, whose Dubai holds the Emirates).
+  if (entry.theatre || entry.countries) {
+    const field = entry.theatre ? `Europe's ${clubs} strongest clubs` : `the ${clubs} ${entry.league} clubs`;
+    return `${leaders} ${field}, each on land in its own country: alone it holds all of it, and clubs that `
       + 'share a country split it along its regional borders. A country with no club stays grey.';
   }
   if (entry.league) {
@@ -463,6 +470,8 @@ export function sportNote(sport, { clubsOnly = false } = {}) {
   // A sport with clubs only (American football) has no nations to offer.
   if (sport.clubsOnly || clubsOnly) return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs` : `${clubs.length} clubs`;
   if (leagues.length === 1) return `Nations · ${clubs.length} ${leagues[0]} clubs`;
+  // Basketball names its two leagues, each on its own map: the NBA and the EuroLeague.
+  if (sport.id === 'basketball' && leagues.length === 2) return `Nations · ${leagues[0]} and ${leagues[1]} clubs`;
   return `Nations · ${clubs.length} clubs from ${leagues.length} leagues`;
 }
 
@@ -642,7 +651,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
       players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
       })),
-      fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league && !country.theatre)),
+      // The American leagues' maps have empty land between clubs; a map of Europe (football's, the EuroLeague's) has none.
+      fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league && !country.theatre && !country.countries)),
     };
   }
   const favourites = ranked.slice(0, 5).map(row);

@@ -28,6 +28,25 @@ export function clubMapScope(sportId) {
 }
 
 /**
+ * Every map a sport's clubs play on in a season, as its club theatres list them: its own (`clubMapOf`), then, in the
+ * built-in season, its other leagues' maps of Europe (basketball's EuroLeague: a Europe map with no football `theatre`).
+ */
+export function clubMapsOf(sportId, mapId = null) {
+  const own = clubMapOf(sportId, mapId);
+  const more = mapId == null ? EUROPE_MAPS.filter(entry => entry.sport === sportId && !entry.theatre && entry.seasons == null) : [];
+  return [own, ...more].filter(Boolean);
+}
+
+/**
+ * Whether a scope is one of a sport's own maps of the built-in season (the NBA's, the EuroLeague's), which a setup keeps
+ * while it plays that season.
+ */
+export function isBuiltInClubMap(scope, sportId) {
+  const entry = domesticEntry(scope);
+  return !!entry && clubMapsOf(sportId).includes(entry);
+}
+
+/**
  * The Europe map of a football theatre ('all' or 'elite') in a season (`dataSet`: an earlier season's id, or null for the
  * built-in one), or null: a CM 01/02 set built on this computer has none.
  */

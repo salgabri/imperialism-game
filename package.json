@@ -52,6 +52,8 @@
     "build:mlb-seasons": "node scripts/build-mlb-seasons.mjs",
     "sync:nhl": "node scripts/sync-nhl.mjs",
     "build-hockey": "node scripts/build-hockey.mjs",
+    "sync:euroleague": "node scripts/sync-euroleague.mjs",
+    "build:euroleague": "node scripts/build-euroleague.mjs",
     "sync:ea-fc-women": "node scripts/sync-ea-fc-women.mjs",
     "build-womens-football": "node scripts/build-womens-football.mjs",
     "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs scripts/nba-map.test.mjs scripts/club-maps.test.mjs scripts/europe-maps.test.mjs",

@@ -530,12 +530,33 @@ export function teamEff(team) {
   return selectLineup(team).rating;
 }
 
+/**
+ * FIBA EuroBasket 2025's 24 nations, the last European Championship played (hosted by Cyprus, Finland, Poland and
+ * Latvia; Germany won): basketball's own European theatre, beside the UEFA members'. Great Britain is the United
+ * Kingdom's shape (826), as basketball plays it.
+ */
+export const EUROBASKET_2025 = Object.freeze(['428', '688', '792', '203', '233', '620', '246', '440', '276', '499', '752', '826',
+  '300', '724', '380', '070', '268', '196', '616', '250', '705', '376', '056', '352']);
+const EUROBASKET = new Set(EUROBASKET_2025);
+
+/** Nation theatres. One naming `sports` is offered in those sports only (`nationScopes`); the rest in every sport. */
 export const SCOPES = [
   { id: 'world', name: 'World War', desc: 'Every nation on the map. Last empire standing.', filter: () => true },
   { id: 'UEFA', name: 'Europe', desc: 'UEFA members battle for the continent.', filter: t => t.conf === 'UEFA' },
+  { id: 'eurobasket', name: 'EuroBasket', desc: 'The 24 nations of EuroBasket 2025, the European Championship.', filter: t => EUROBASKET.has(t.id),
+    sports: Object.freeze(['basketball']) },
   { id: 'CONMEBOL', name: 'South America', desc: 'CONMEBOL. Ten nations, one crown.', filter: t => t.conf === 'CONMEBOL' },
   { id: 'CAF', name: 'Africa', desc: 'CAF, the deepest map in the game.', filter: t => t.conf === 'CAF' },
   { id: 'AFC', name: 'Asia & Oceania*', desc: 'AFC plus OFC — the whole east.', filter: t => t.conf === 'AFC' || t.conf === 'OFC' },
   { id: 'CONCACAF', name: 'N. & C. America', desc: 'CONCACAF, coast to coast.', filter: t => t.conf === 'CONCACAF' },
   { id: 'elite', name: 'Elite 32', desc: 'The 32 strongest nations on Earth.', filter: null }, // handled specially
 ];
+
+/** The nation theatres a sport offers (`sportId`, or a sport object): basketball's include EuroBasket. */
+export const nationScopes = sport => {
+  const id = typeof sport === 'string' ? sport : sport?.id;
+  return SCOPES.filter(scope => !scope.sports || scope.sports.includes(id));
+};
+
+/** Whether a nation theatre is a European one, framed on the continent: the UEFA members, or EuroBasket's field. */
+export const isEuropeanScope = scope => scope === 'UEFA' || scope === 'eurobasket';

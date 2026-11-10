@@ -11,7 +11,7 @@ Pick your sport at kick-off:
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
 | Football, and women's football | XI in a 4-4-2 | 90 minutes | penalty shootout |
-| Basketball | starting five | 40 minutes for nations (FIBA), 48 for NBA clubs | overtime periods |
+| Basketball | starting five | 40 minutes for nations and EuroLeague clubs (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
@@ -22,7 +22,8 @@ And pick who fights:
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs, all 30 NBA
-  franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
+  franchises on [their own map](#the-nba-map) of the USA and Canada, the EuroLeague's 20 clubs
+  on [theirs](#the-euroleague-map) of Europe, all 32 NFL
   franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, or all 32 NHL clubs on
   [theirs](#the-nhl-map). Real Madrid annexes territory
@@ -95,6 +96,8 @@ npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned 
 npm run sync:early-nationalities # ask Wikidata for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page in data-src/bball-2karchive/
+npm run sync:euroleague  # snapshot the EuroLeague's rosters and box scores from its public API into scripts/data/euroleague-2026-27.json (network, cached)
+npm run build:euroleague # rebuild the EuroLeague's clubs, every rating an estimate from that snapshot (--check compares byte for byte)
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
 npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
@@ -192,9 +195,10 @@ manager of the theatre's favourite, with decisions from the first match.
 1. **Campaign** — choose a sport, nations or clubs, and a **theatre** (where
    the war is fought). Nation campaigns default to Europe (UEFA). The other
    choices are the whole world (173 nations), another confederation, or the
-   Elite 32. Football club campaigns offer Europe's 124 strongest clubs or its
+   Elite 32; basketball's nations also offer **EuroBasket**, the 24 nations of EuroBasket 2025.
+   Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
-   map of the USA and Canada, American football (clubs only: choosing it
+   map of the USA and Canada or [the EuroLeague](#the-euroleague-map) on its map of Europe, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA,
    baseball clubs MLB on its map of the USA and Canada and ice hockey clubs the NHL on its own. Women's football's clubs
    offer its five leagues, the Rest of Europe, all of them or the strongest 32. The step opens on a map of the chosen theatre:
@@ -316,7 +320,8 @@ Basketball uses shared possessions, positional offence/defence, form and shootin
 variance, scaled to the NBA's margins and its share of overtime games. Nations play FIBA's four ten-minute
 quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
 quarters at their season's league pace and scoring rate, so games score like
-their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
+their season did: about 93 a side in 2003/04, 116 today; EuroLeague clubs play FIBA's quarters at the
+EuroLeague's pace and scoring rate, 74 possessions and 86 points a side. American football plays about 11
 possessions a side, each ending in a touchdown and its try (the extra point or two points),
 a field goal, now and then a safety, or nothing by its offence against the opposing defence,
 with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime.
@@ -328,7 +333,7 @@ every Upsets setting retains scoring randomness and possible upsets.
 **Home advantage** is off by default: every match is played on neutral ground, so
 the defending team wins half of even games. On, the defender plays at home and
 wins about as often as home teams do in its sport's league: 45% of even football
-games in ninety minutes (58% with the shoot-outs), 56% in basketball, 54% in
+games in ninety minutes (58% with the shoot-outs), 56% in basketball (64% in the EuroLeague), 54% in
 American football and ice hockey and 53% in baseball. Attacks fail more often, and a failed
 attack hands the defender the attacker's territory, so conquests change hands but
 campaigns run as many matches. A best-of-three final keeps its attacker, so its
@@ -590,7 +595,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | --- | --- | --- | --- |
 | `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season) |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), or for women's football `all`, `elite` or a league (`NWSL`) | Europe for nations, the Top 124 for football clubs, all clubs for women's football, a sport's own map (NBA, NFL, MLB, NHL) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite`, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), the EuroLeague's (`domestic:euroleague`), or for women's football `all`, `elite` or a league (`NWSL`) | Europe for nations, the Top 124 for football clubs, all clubs for women's football, a sport's own map (the NBA's for basketball, NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -763,7 +768,7 @@ nationality or else birth country, and a place they cannot fill gets a generated
 invented: 27 of the 78 nations with a rated player field a full XI, the rest start short-handed, and a
 nation with none fields no team. See the [design notes](docs/design/womens-football.md).
 
-**Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
+**Basketball** — `src/data/rosters.basketball.js`, 47 federations, 235 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
 2K has real 1–99 overalls but no country, and every NBA bio dataset with a
 country column stops in 2014. So the split is deliberate — nationality and
@@ -778,12 +783,23 @@ eligibility follows the federation — Banchero plays for the USA rather than
 Italy). The fives were last checked against FIBA records in October 2026: every
 player has played for his national team since 2023, players who had retired
 from it were replaced by current internationals at the same position, and no
-five fields more than the one naturalized player FIBA allows.
+five fields more than the one naturalized player FIBA allows. In November 2026 the
+seven nations of EuroBasket 2025 that had no five (Belgium, Cyprus, Estonia, Great
+Britain, Iceland, Portugal and Sweden) got the players who started or played most
+for them there, so all 24 of the **EuroBasket** theatre field real fives
+([design notes](docs/design/euroleague.md#eurobasket)).
+
+**The EuroLeague** — `src/data/clubs.euroleague.js`, its 20 clubs of 2026/27, each
+with its best five. No game or dataset rates EuroLeague players, so every rating is
+an estimate on NBA 2K's scale from the player's EuroLeague box scores (his PIR a
+game over three seasons), marked as one wherever it is shown; the rosters and box
+scores come from the EuroLeague's public API (`npm run sync:euroleague`). See the
+[design notes](docs/design/euroleague.md).
 
 Basketball positions are fluid, so most players list two neighbouring positions,
 primary first: Dončić is PG/SG, Giannis PF/C, Melli PF/C. Pure point guards and
 centres such as Calathes and Jokić list one, and so do players whose sources
-show a single position. 133 of the 200 national players cover two positions.
+show a single position. 150 of the 235 national players cover two positions.
 Every listed position is one the player really plays, and every five has a
 real player for each of the five positions. The lineup optimizer fields each
 five from these positions, so Italy starts Pajola (PG/SG) at shooting guard and
@@ -806,7 +822,7 @@ and identify positional penalties; bench depth does not directly inflate strengt
 
 Football never invents a missing player or rating: an incomplete future source
 is shown as an incomplete squad. The shipped sources cover every football XI.
-Basketball is curated to the 40 federations that matter, so **24% of shirts are
+Basketball is curated to the 47 federations that matter, so **28% of shirts are
 real** but every serious basketball nation is. Basketball gaps retain generated
 players at the confederation baseline, shown dimmed and asterisked.
 
@@ -1017,8 +1033,8 @@ known limitations.
 
 ### The NBA map
 
-Basketball clubs have one theatre, **NBA**: the 30 franchises fight over the USA
-and Canada and nothing else. A franchise holds the state or province its arena
+Basketball clubs have two theatres: **NBA**, here, and [EuroLeague](#the-euroleague-map). In
+the NBA the 30 franchises fight over the USA and Canada and nothing else. A franchise holds the state or province its arena
 stands in (geoBoundaries) and nothing else, so Portland holds Oregon, Toronto
 Ontario and Boston Massachusetts. California, Texas, Florida and New York,
 which host two or more franchises, are divided between them along county lines by
@@ -1048,6 +1064,19 @@ Arenas are in `scripts/data/nba-arenas.json`; the
 [design notes](docs/design/domestic-campaigns.md#the-nba-map) cover the border
 fitting and the file additions. `scripts/build-club-maps.mjs` builds every
 league's map (`--league=nba` or `nfl` for one; the index keeps the other's entries).
+
+### The EuroLeague map
+
+Basketball's other club theatre, **EuroLeague**: the EuroLeague's 20 clubs of 2026/27 on a
+map of Europe built by the same rules as football's (below), from their arenas. A club alone
+in its country holds all of it (Bayern Munich Germany, Žalgiris Lithuania, Dubai Basketball
+the United Arab Emirates); clubs that share a country split it along its regional borders
+(Spain's four, Istanbul's three, two each in Italy, France, Greece, Serbia and Israel), and a
+country with no club stays grey. Its games are FIBA's forty minutes at the EuroLeague's pace and
+scoring rate, with its larger home edge. The map is `public/domestic/euroleague.json`
+(`node scripts/build-europe-maps.mjs --only=euroleague`), offered with the built-in season
+only: an earlier basketball season has NBA clubs alone. See the
+[design notes](docs/design/euroleague.md).
 
 ### The Europe maps
 
@@ -1616,7 +1645,7 @@ src/
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
-    basketball.js      starting five, 40 minutes (FIBA) or 48 (NBA clubs), overtime
+    basketball.js      starting five, 40 minutes (FIBA: nations, EuroLeague clubs) or 48 (NBA clubs), overtime
     americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
     baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings
     index.js           the registry, and each sport's clock and tie-break copy (clockLabel, overtimeText)
@@ -1625,6 +1654,7 @@ src/
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
+  data/clubs.euroleague.js    GENERATED EuroLeague fives, every rating an estimate (npm run build:euroleague)
   data/clubs.american-football.js  GENERATED NFL lineups and backups (npm run build-nfl)
   data/clubs.baseball.js      GENERATED MLB lineups and active rosters (npm run build-mlb)
   data/baseballSeasons.js     GENERATED listing of the earlier baseball seasons (npm run build:mlb-seasons)
@@ -1668,7 +1698,7 @@ public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
-  domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …) and the NFL's (nfl.json), fetched on demand
+  domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …), the NFL's (nfl.json) and the EuroLeague's (euroleague.json), fetched on demand
   football/            the built-in earlier football seasons (ea-*.json), fetched when chosen
   basketball/          the built-in earlier basketball seasons (nba-2k*.json), fetched when chosen
   baseball/            the built-in earlier baseball seasons (mlb-the-show-*.json), fetched when chosen
@@ -1698,6 +1728,8 @@ scripts/
   build-mlb.mjs        builds the MLB clubs and the baseball nations from that snapshot
   build-mlb-seasons.mjs  builds the earlier baseball seasons from their snapshots (lib/mlb.mjs holds the shared rules)
   build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
+  sync-euroleague.mjs  snapshots the EuroLeague's rosters and box scores from its public API
+  build-euroleague.mjs builds the EuroLeague's clubs, estimating every rating (scripts/lib/euroleague.mjs)
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
@@ -1778,6 +1810,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `turn-panels`, `turn-wiring` | Turn strip, Choose a target, spectator panel, and the turn flow in the real App |
 | `win-probability` | The live win-probability model against the football and basketball match models |
 | `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
+| `euroleague` | The EuroLeague's clubs rebuilt from the snapshot, its estimates, positions and names, its rules, its map, setup, launch, saves and links; the EuroBasket theatre and its fives |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
 | `error-boundary` | The crash screen: a render error shows it with focus on its heading, Export campaign downloads the stored checkpoint unchanged, and the report link carries the error |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |

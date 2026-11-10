@@ -1028,6 +1028,11 @@ keeps a season on its own maps; `parseCampaign` accepts a set only on its own ma
 (`isSeasonEuropeMap`). The map's rows take the season's clubs at kick-off, as a basketball
 era's do. The victory names "Europe".
 
+**Basketball's EuroLeague** (2026-11-08) plays on a map built by the same script and rules,
+`public/domestic/euroleague.json` (`--only=euroleague`): its 20 clubs in 10 countries, with
+`sport: 'basketball'` and no football `theatre` in its file and index entry, so it is never one of
+football's two. `COUNTRIES` gained Serbia and Israel for it. See [euroleague.md](euroleague.md).
+
 **Old games.** A world campaign saved before these maps (`clubScope` `all`, `elite` or a
 league) has no `domestic:` scope, so it restores on the world with its dealt land, under
 its old name ("All Leagues"). "Another team" after a defeat there opens on the map that

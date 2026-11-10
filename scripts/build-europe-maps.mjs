@@ -1,20 +1,22 @@
 // The maps Europe's football clubs play on (docs/design/domestic-campaigns.md, "The Europe maps"): one for the strongest
-// TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier EA season. A club holds
+// TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier EA season; and the one
+// the EuroLeague's basketball clubs play on (docs/design/euroleague.md), all of its clubs, by the same rules. A club holds
 // land only in its own country. A country's only club holds all of it; several clubs share it along its regional
 // borders, a region going whole to one club unless it holds two or more (then its next level down is split between
 // them); a country with no club is not on the map at all, so it stays grey beneath it, like any neighbour of a country map.
 //
 // Usage:
 //   node scripts/build-europe-maps.mjs [--only=eu124,eu32] [--check | --dry-run]
-//     --only     build these maps; the index keeps the others' entries as they are
+//     --only     build these maps (eu124, eu32s2018, euroleague…); the index keeps the others' entries as they are
 //     --check    rebuild offline from the caches and compare every output byte for byte
 //     --dry-run  build and verify (downloading boundaries as needed) but write nothing
 //
-// Inputs:  the clubs in src/data/clubs.football.js and public/football/ea-*.json; where they stand, in
+// Inputs:  the clubs in src/data/clubs.football.js, public/football/ea-*.json and src/data/clubs.euroleague.js; where they stand, in
 //          scripts/data/europe-clubs.json; geoBoundaries gbOpen layers, cached under the gitignored data-src/boundaries/;
 //          the game's world map public/countries-50m.json, whose outlines every country keeps, so territories meet
 //          each other and the grey neighbours on the very borders the rest of the game draws.
-// Outputs: public/domestic/eu<clubs>[s<season year>].json, public/domestic/ATTRIBUTION-europe.txt and src/data/europeMaps.js.
+// Outputs: public/domestic/eu<clubs>[s<season year>].json, public/domestic/euroleague.json,
+//          public/domestic/ATTRIBUTION-europe.txt and src/data/europeMaps.js.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -23,6 +25,7 @@ import polygonClipping from 'polygon-clipping';
 import { topology } from 'topojson-server';
 import { feature, mergeArcs, neighbors } from 'topojson-client';
 import { CLUBS } from '../src/data/clubs.football.js';
+import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { ELITE_CLUBS, TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
@@ -63,6 +66,9 @@ const COUNTRIES = {
   203: { iso3: 'CZE', units: 'ADM2', regions: ['ADM1'] },
   208: { iso3: 'DNK', units: 'ADM2', regions: ['ADM1'] },
   804: { iso3: 'UKR', units: 'ADM2', regions: ['ADM1'] },
+  // The EuroLeague's: Belgrade's two clubs and Tel Aviv's two. Each city is one unit, so it joins a neighbouring region.
+  688: { iso3: 'SRB', units: 'ADM2', regions: ['ADM1'] },
+  376: { iso3: 'ISR', units: 'ADM2', regions: ['ADM1'] },
 };
 // A region whose clubs would each have under this share of the country's land per club is too small to hold them (a
 // city-state: Berlin, Bremen, Madrid), so it is shared with its largest neighbouring region. A top region with no club is
@@ -349,7 +355,7 @@ function landNames(clubs) {
 }
 
 async function buildMap({ source, spec, countries, splits, log }) {
-  const { id: mapId, league, theatre, seasons, clubs } = spec;
+  const { id: mapId, sport = 'football', league, theatre = null, seasons, clubs } = spec;
   const n = clubs.length;
   const byCountry = new Map();
   clubs.forEach((club, i) => {
@@ -399,7 +405,7 @@ async function buildMap({ source, spec, countries, splits, log }) {
   const projection = { lon0: fixed(round(circularMeanLon(nearPolys.map(poly => [centroidOf([poly])[0], polyAreaKm2(poly)])))), lat0: fixed(round((nearBox[1] + nearBox[3]) / 2)) };
   const sourceAreaKm2 = [...shapes.values()].reduce((sum, shape) => sum + polysAreaKm2(shape.polys), 0);
   const meta = {
-    format: 1, id: mapId, name: 'Europe', sport: 'football', league, theatre,
+    format: 1, id: mapId, name: 'Europe', sport, league, ...(theatre ? { theatre } : {}),
     ...(seasons ? { seasons } : {}),
     hosts, version: '', projection, focus,
     boundaries: { provider: 'geoBoundaries', layers: dedupeLayers(layers), units: n, areaKm2: Math.round(sourceAreaKm2) },
@@ -443,7 +449,7 @@ async function buildMap({ source, spec, countries, splits, log }) {
     const list = members.map(i => `${names[i]} ${Math.round(areas[i] / 1000)}k`).join(', ');
     log(`    ${shapes.get(shapeId).name}: ${list}`);
   }
-  const entry = { id: mapId, sport: 'football', league, name: 'Europe', theatre, ...(seasons ? { seasons } : {}), clubs: n, sections: n, countries: hosts.length,
+  const entry = { id: mapId, sport, league, name: 'Europe', ...(theatre ? { theatre } : {}), ...(seasons ? { seasons } : {}), clubs: n, sections: n, countries: hosts.length,
     version: doc.version, ...(seasons ? {} : { top: clubs.slice(0, 3).map(club => club.name) }) };
   return { entry, doc, file: outFile(mapId), text };
 }
@@ -455,11 +461,12 @@ function dedupeLayers(layers) {
 }
 
 function indexModule(entries) {
-  return `// GENERATED by scripts/build-europe-maps.mjs from public/domestic/eu*.json; do not edit.
+  return `// GENERATED by scripts/build-europe-maps.mjs from public/domestic/eu*.json and euroleague.json; do not edit.
 // The maps football clubs play on (docs/design/domestic-campaigns.md, "The Europe maps"): Europe's strongest clubs, each on
 // land in its own country. The setup offers a season's two as its club theatres ('domestic:<id>'), and the loader fetches
 // public/domestic/<id>.json on demand. A map with \`seasons\` is an earlier season's, played only with that season's clubs.
-// { id, sport, league, name, theatre ('all' or 'elite'), seasons?, clubs, sections, countries, version, top?: three strongest clubs }
+// Basketball's EuroLeague plays on one by the same rules, with no \`theatre\` (docs/design/euroleague.md).
+// { id, sport, league, name, theatre? ('all' or 'elite'), seasons?, clubs, sections, countries, version, top?: three strongest clubs }
 
 export const EUROPE_MAPS = [
 ${entries.map(entry => `  ${JSON.stringify(entry)},`).join('\n')}
@@ -493,7 +500,7 @@ function attributionText(entries, docs) {
 
 /**
  * The maps to build: for the built-in season and each earlier EA season with clubs, its strongest TOP_CLUBS and
- * ELITE_CLUBS clubs. FIFA 05 and FIFA 06 have nations only, so no maps.
+ * ELITE_CLUBS clubs (FIFA 05 and FIFA 06 have nations only, so no maps); then the EuroLeague's.
  */
 async function mapSpecs() {
   const { clubs: places } = JSON.parse(await readFile(clubsFile, 'utf8'));
@@ -507,10 +514,14 @@ async function mapSpecs() {
     const set = JSON.parse(await readFile(setFile(season.id), 'utf8'));
     if (set.clubs.length) seasons.push({ tag: `s${season.year}`, set: season.id, clubs: set.clubs });
   }
-  return seasons.flatMap(({ tag, set, clubs }) => [
-    { id: `eu${TOP_CLUBS}${tag}`, league: `Top ${TOP_CLUBS}`, theatre: 'all', seasons: set ? [set] : null, clubs: field(clubs, TOP_CLUBS) },
-    { id: `eu${ELITE_CLUBS}${tag}`, league: `Elite ${ELITE_CLUBS}`, theatre: 'elite', seasons: set ? [set] : null, clubs: field(clubs, ELITE_CLUBS) },
-  ]);
+  return [
+    ...seasons.flatMap(({ tag, set, clubs }) => [
+      { id: `eu${TOP_CLUBS}${tag}`, league: `Top ${TOP_CLUBS}`, theatre: 'all', seasons: set ? [set] : null, clubs: field(clubs, TOP_CLUBS) },
+      { id: `eu${ELITE_CLUBS}${tag}`, league: `Elite ${ELITE_CLUBS}`, theatre: 'elite', seasons: set ? [set] : null, clubs: field(clubs, ELITE_CLUBS) },
+    ]),
+    // The EuroLeague's whole league, strongest first, in the built-in season only.
+    { id: 'euroleague', sport: 'basketball', league: 'EuroLeague', seasons: null, clubs: field(EUROLEAGUE_CLUBS, EUROLEAGUE_CLUBS.length) },
+  ];
 }
 
 async function main() {

@@ -509,4 +509,7 @@ strong.setup-save__text { font-weight:600; }
   /* At 360 the step-2 bar had ~41px for its 59px "Step 2 of 3" hint: tighter bar padding gives it the missing 24px. */
   .setup-foot .setup-foot__back { padding:0 14px; }
   .setup-foot .setup-foot__next { padding:0 12px; }
+  /* Basketball's eight nation theatres (EuroBasket beside Europe) took a third row at 360, and step 1 scrolled with
+     the resume strip shown: 2px less padding a side keeps them to two rows, as every sport's. */
+  .setup-theatre { padding:0 8px; }
 }

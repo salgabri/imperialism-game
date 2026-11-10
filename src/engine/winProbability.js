@@ -151,6 +151,8 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
     return {
       kind: 'normal', pace: num(prepared.pace), effA: num(prepared.efficiencyA), effD: num(prepared.efficiencyD),
       formSd: variation * FORM_PER_DRAMA, length: length || 40, ot: 5, maxOt: 4,
+      // A rulebook with its own buzzer (the EuroLeague's levels fewer finishes than the NBA's and FIBA's).
+      ...(Array.isArray(prepared.rules?.buzzer) ? { buzzer: prepared.rules.buzzer.slice() } : {}),
     };
   }
   return null;
@@ -219,7 +221,8 @@ export function isLiveModel(model) {
   if (model.kind === 'poisson') return finite('rA') && finite('rD') && model.rA >= 0 && model.rD >= 0 && finite('length') && model.length > 0;
   if (model.kind === 'normal') {
     return finite('pace') && model.pace > 0 && finite('effA') && finite('effD') && finite('formSd') && model.formSd >= 0
-      && finite('length') && model.length > 0 && finite('ot') && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0;
+      && finite('length') && model.length > 0 && finite('ot') && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0
+      && (model.buzzer === undefined || (Array.isArray(model.buzzer) && model.buzzer.every(p => typeof p === 'number' && p >= 0 && p <= 1)));
   }
   if (model.kind === 'drives') {
     const tries = ['xpA', 'twoA', 'xpD', 'twoD'].filter(key => model[key] !== undefined);
@@ -595,7 +598,7 @@ function basketballAt(model, t, margin, chains) {
   return basketballWinProbability({
     effA: model.effA, effD: model.effD, formSd: model.formSd, margin,
     remainingPossessions: pace * remainingMinutes / length, tieA: chain, possessionSd,
-    buzzer: minute < length ? BUZZER_LEVEL : [],
+    buzzer: minute < length ? model.buzzer ?? BUZZER_LEVEL : [],
   });
 }
 

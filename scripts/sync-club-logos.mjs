@@ -1,5 +1,5 @@
 // Club crests for every club the game ships: the all-leagues football layer, the women's clubs, the NBA, NFL, MLB and
-// NHL franchises and every country's domestic clubs. A club with a crest shows it wherever
+// NHL franchises, the EuroLeague's clubs and every country's domestic clubs. A club with a crest shows it wherever
 // a nation shows its flag; a club without one keeps its monogram chip.
 //
 // Usage:
@@ -11,7 +11,7 @@
 //     from (scripts/data/domestic/<nation>.json, location.source "wikidata:Q..", or location.qid); an
 //     all-leagues club takes the item of its domestic twin, the club of its country whose
 //     FM26 squad shares the most players with its EA lineup; NBA, NFL, MLB and NHL franchises
-//     are matched by English label. A women's club wears its men's club's crest (scripts/data/club-logos.json "twins")
+//     are matched by English label; a EuroLeague club names its basketball club's item (scripts/data/club-logos.json "items"). A women's club wears its men's club's crest (scripts/data/club-logos.json "twins")
 //     or has an item of its own there ("items"). scripts/data/club-logos.json overrides any of these ("items"),
 //     or names a twin the lineups do not find ("twins"). The all-leagues clubs are the built-in
 //     ones plus those of the earlier EA seasons no older than the domestic squads (EA FC 26), so
@@ -35,6 +35,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
+import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
@@ -308,6 +309,12 @@ for (const [league, items, list] of [['NBA', nba, BASKETBALL_CLUBS], ['NFL', nfl
   if (!qid && !itemOverrides[club.id]) problems.push(`${club.id}: no ${league} item labelled "${club.name}"`);
   clubs.push({ id: club.id, name: club.name, qid });
 }
+// The EuroLeague's clubs: a basketball club's item is not its football club's (Real Madrid Baloncesto, not Real Madrid
+// CF), and no league item lists them by label, so each names its own.
+for (const club of EUROLEAGUE_CLUBS) {
+  if (!itemOverrides[club.id]) problems.push(`${club.id}: no item (add it to ${path.relative(root, overridesFile)} "items")`);
+  clubs.push({ id: club.id, name: club.name, qid: null });
+}
 for (const [id, qid] of Object.entries(itemOverrides)) {
   const club = clubs.find(entry => entry.id === id);
   if (!club) throw new Error(`club-logos.json names unknown club ${id}`);
@@ -423,12 +430,13 @@ const count = list => list.filter(club => crests.has(club.id)).length;
 const worldClubs = clubs.filter(club => club.id.startsWith('f-')), nbaClubs = clubs.filter(club => club.id.startsWith('b-'));
 const nflClubs = clubs.filter(club => club.id.startsWith('nfl-')), mlbClubs = clubs.filter(club => club.id.startsWith('mlb-'));
 const nhlClubs = clubs.filter(club => club.id.startsWith('nhl-')), womensClubs = clubs.filter(club => club.id.startsWith('w-'));
+const euroleagueClubs = clubs.filter(club => club.id.startsWith('el-'));
 console.log(`Crests: ${crests.size} of ${clubs.length} clubs`);
-console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, MLB ${count(mlbClubs)}/${mlbClubs.length}, NHL ${count(nhlClubs)}/${nhlClubs.length}, women's ${count(womensClubs)}/${womensClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
+console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, MLB ${count(mlbClubs)}/${mlbClubs.length}, NHL ${count(nhlClubs)}/${nhlClubs.length}, EuroLeague ${count(euroleagueClubs)}/${euroleagueClubs.length}, women's ${count(womensClubs)}/${womensClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
 console.log(`  domestic clubs with a Wikidata item: ${domestic.filter(club => club.qid).length}`);
 for (const [reason, list] of Object.entries(rejected)) console.log(`  rejected (${reason}): ${list.length}${list.length <= 12 ? '\n    ' + list.join('\n    ') : ''}`);
-const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs, ...nhlClubs, ...womensClubs].filter(club => !crests.has(club.id));
-if (missing.length) console.log(`  all-leagues, NBA, NFL, MLB, NHL and women's clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
+const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs, ...nhlClubs, ...euroleagueClubs, ...womensClubs].filter(club => !crests.has(club.id));
+if (missing.length) console.log(`  all-leagues, NBA, NFL, MLB, NHL, EuroLeague and women's clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
 for (const problem of problems) console.log(`  ${problem}`);
 const sizes = await Promise.all([...new Set([...crests.values()].map(crest => crest.file))].map(async file => (await readFile(path.join(outDir, `${file}.webp`))).length));
 console.log(`  ${sizes.length} files, ${(sizes.reduce((a, b) => a + b, 0) / 1048576).toFixed(1)} MB, module ${(Buffer.byteLength(await readFile(moduleFile, 'utf8')) / 1024).toFixed(1)} KB`);

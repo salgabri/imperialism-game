@@ -59,7 +59,10 @@ const TOWNS = {
 
 test('the index lists a built-in pair of maps and one for each earlier season with clubs, each file as its entry says', () => {
   const seasons = [null, ...CLUB_SEASONS.map(season => season.id)];
-  assert.equal(EUROPE_MAPS.length, seasons.length * 2);
+  // Football's pairs, then basketball's EuroLeague (scripts/euroleague.test.mjs), which has no football theatre.
+  assert.equal(EUROPE_MAPS.filter(entry => entry.sport === 'football').length, seasons.length * 2);
+  assert.deepEqual(EUROPE_MAPS.filter(entry => entry.sport !== 'football').map(entry => [entry.id, entry.sport, entry.league, entry.theatre]),
+    [['euroleague', 'basketball', 'EuroLeague', undefined]]);
   for (const season of seasons) {
     assert.deepEqual(europeMapsOf(season).map(map => [map.league, map.clubs, map.theatre]),
       [[`Top ${TOP_CLUBS}`, TOP_CLUBS, 'all'], [`Elite ${ELITE_CLUBS}`, ELITE_CLUBS, 'elite']], String(season));
@@ -75,7 +78,7 @@ test('the index lists a built-in pair of maps and one for each earlier season wi
     assert.ok(Buffer.byteLength(text) <= 250000, `${entry.id} is at most 250 KB`);
     const doc = JSON.parse(text);
     assert.deepEqual({ format: doc.format, sport: doc.sport, league: doc.league, name: doc.name, theatre: doc.theatre, version: doc.version },
-      { format: 1, sport: 'football', league: entry.league, name: 'Europe', theatre: entry.theatre, version: entry.version });
+      { format: 1, sport: entry.sport, league: entry.league, name: 'Europe', theatre: entry.theatre, version: entry.version });
     const { version, ...rest } = doc;
     assert.equal(version, `${entry.id}-${createHash('sha256').update(JSON.stringify(rest)).digest('hex').slice(0, 8)}`, `${entry.id}: content hash`);
     assert.deepEqual(doc.seasons, entry.seasons, entry.id);

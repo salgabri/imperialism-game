@@ -1,8 +1,8 @@
 // Whole league seasons played with the built-in clubs land in each real league's range (REAL in
 // simulation-realism.mjs, with its seasons and sources). Only what the models set out to match is held here. Matches
 // are at a neutral venue unless a campaign turns Home advantage on, so the home sides' wins are checked with it on.
-// The known gaps are reported by `npm run simulation:realism` and not tested: NBA games decided by three or fewer,
-// MLB's worst club.
+// The known gaps are reported by `npm run simulation:realism` and not tested: NBA and EuroLeague games decided by three or
+// fewer, the EuroLeague's best and worst clubs (a little too close to the middle), MLB's worst club.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
@@ -51,6 +51,17 @@ test('NBA: points, margins, overtime, the standings and the box score look like 
   within(nba.benchShare, real.benchShare, "the bench's points");
 });
 
+test('EuroLeague: points, margins, overtime and the standings look like a EuroLeague season', () => {
+  const euroleague = report.euroleague, real = REAL.euroleague;
+  assert.equal(euroleague.clubs, 20);
+  // The clubs play at 2025/26's pace and scoring rate, the season's 86.2 points a team.
+  within(euroleague.pointsPerTeam, [84.2, 88.2], 'points a team');
+  within(euroleague.overtimeRate, real.overtimeRate, 'overtime', 0.003);
+  within(euroleague.marginMean, real.marginMean, 'mean margin', 0.2);
+  within(euroleague.blowouts, real.blowouts, '20-point games');
+  within(euroleague.winPctSd, real.winPctSd, 'spread of the standings');
+});
+
 test('NFL: points, margins, overtime, the standings and who scores the touchdowns', () => {
   const nfl = report.nfl, real = REAL.nfl;
   within(nfl.pointsPerTeam, real.pointsPerTeam, 'points a team');
@@ -88,7 +99,7 @@ test('MLB: runs, close games, extra innings and the standings look like an MLB s
 });
 
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
-  for (const [label, share] of [['NBA', report.nba.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins]]) {
+  for (const [label, share] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins]]) {
     assert.ok(Math.abs(share - 0.5) < 0.015, `${label} neutral: the defender won ${share}`);
   }
   for (const league of report.football) {
@@ -100,6 +111,7 @@ test('home sides: half the decided games at a neutral venue, their league\'s sha
     within(league.drawRate, REAL.football.drawRate, `${league.league} draws at home`);
   }
   within(home.nba.homeWins, REAL.nba.homeWins, 'NBA home wins');
+  within(home.euroleague.homeWins, REAL.euroleague.homeWins, 'EuroLeague home wins');
   within(home.nfl.homeWins, REAL.nfl.homeWins, 'NFL home wins');
   within(home.mlb.homeWins, REAL.mlb.homeWins, 'MLB home wins');
   within(home.nhl.homeWins, REAL.nhl.homeWins, 'NHL home wins');

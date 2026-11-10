@@ -2,7 +2,7 @@
 // teams, theatre, season, the rules of war, your role and the seed. Opening it fills in setup without launching, and the
 // same setup and seed replay the same campaign (README §Finale, seeds and saves). Pure: no window or document, and
 // nothing here draws from a campaign's random stream.
-import { SCOPES } from '../../data/teams.js';
+import { nationScopes } from '../../data/teams.js';
 import { CLUB_SCOPES } from '../../data/scopes.js';
 import { domesticEntry, isDomesticScope } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport } from '../../sports/index.js';
@@ -75,7 +75,7 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   take('teams', value => (value === 'clubs' && !nationsOnly) || (value === 'nations' && !clubsOnly), value => { setup.layer = value; });
   if (clubsOnly) setup.layer = 'clubs';
   const clubLayer = setup.layer === 'clubs';
-  take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : SCOPES.some(scope => scope.id === value)),
+  take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : nationScopes(sport).some(scope => scope.id === value)),
     value => { setup[clubLayer ? 'clubScope' : 'scope'] = value; });
   if (clubLayer) setup.clubScope = setClubScope(setup);
 

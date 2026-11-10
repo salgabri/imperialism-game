@@ -831,10 +831,10 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const note = document.getElementById('setup-theatre-description')?.textContent.trim() || '';
   const fewer = Math.floor(sections / entry.clubs), more = Math.ceil(sections / entry.clubs);
   const share = sections === entry.clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
-  // A Europe map tells the rules of its land; a sport's own map (the NBA's, the NFL's) names its league, each club holding
-  // the state of its arena or stadium.
-  result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre
-    ? `Europe's ${entry.clubs} strongest clubs, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
+  // A Europe map tells the rules of its land (football's strongest clubs, or a league's: the EuroLeague's); a sport's own
+  // map (the NBA's, the NFL's) names its league, each club holding the state of its arena or stadium.
+  result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre || entry.countries
+    ? `${entry.theatre ? `Europe's ${entry.clubs} strongest clubs` : `the ${entry.clubs} ${entry.league} clubs`}, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
     : entry.league
       ? `the ${entry.clubs} ${entry.league} clubs fighting over the ${entry.name}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines === 'state' ? 'state' : 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
       : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
@@ -885,9 +885,9 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
     await until('spectator role chosen again', () => app.state.setup.role === 'spectator');
     button('Basketball').click();
     await waitFor(() => app.state.setup.clubScope === 'domestic:nba', 2000);
-    // Basketball clubs have one theatre, the NBA's own map; no country is offered.
+    // Basketball clubs have two theatres, the NBA's own map first and the EuroLeague's; no country is offered.
     result.basketballResets = app.state.setup.clubScope === 'domestic:nba'
-      && JSON.stringify(theatreSnapshot('basketball').options.map(item => item.value)) === '["domestic:nba"]';
+      && JSON.stringify(theatreSnapshot('basketball').options.map(item => item.value)) === '["domestic:nba","domestic:euroleague"]';
     button('Football').click();
     await sleep(20);
     await select('setup-theatre', domesticScope(id));
