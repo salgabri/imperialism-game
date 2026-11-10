@@ -4,14 +4,16 @@
 // as recorded, and the snapshots rebuilt byte for byte where data-src/ has the pages.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { FORMATION, shortOf } from './lib/nfl.mjs';
 import { maddenReferencePlayers, overallsOf, referenceOf } from './lib/nfl-reference.mjs';
 import { clubPagesOf, countOf, parseTeamSeason, placePlayers, playersOfBoxScore, positionOfCode, replacementPlayers, seasonValues, settleKickers,
-  VALUE_WEIGHTS } from './lib/pfa.mjs';
+  spearman, VALUE_WEIGHTS } from './lib/pfa.mjs';
+import { cacheFolders, copiesOf } from './fetch-pfa.mjs';
 import { ranked } from './sync-pfa.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -124,6 +126,24 @@ test('ties are broken by starts, then games; the mapping onto Madden NFL 2002 st
   assert.deepEqual(players.map(p => rank.get(p)), [2, 3, 4, 1, 4]);
   const overall = overallsOf([1, 2, 3, 4, 4], [40, 60, 80, 99]);
   assert.deepEqual([1, 2, 3, 4].map(r => overall.get(r)), [40, 54, 70, 93], 'mid-rank percentiles read off the reference');
+  // The calibration's rank correlation: ties share a mid-rank.
+  assert.equal(spearman([1, 2, 3, 4], [10, 20, 30, 40]), 1);
+  assert.equal(spearman([1, 2, 3, 4], [40, 30, 20, 10]), -1);
+  assert.equal(spearman([1, 2, 2, 3], [1, 2, 3, 4]), 0.949);
+});
+
+test('the pages of a later download, in a data-src/pfa-<name>/ of their own, are read beside data-src/pfa/', t => {
+  const base = mkdtempSync(path.join(tmpdir(), 'pfa-folders-'));
+  t.after(() => rmSync(base, { recursive: true, force: true }));
+  for (const file of ['pfa-1998-2000/1998/1998nfl.html', 'pfa/1997/1997nfl.html', 'pfaroster/1999/1999nfl.html', 'madden-seasons/x.html']) {
+    mkdirSync(path.dirname(path.join(base, file)), { recursive: true });
+    writeFileSync(path.join(base, file), '');
+  }
+  const folders = cacheFolders(base);
+  assert.deepEqual(folders.map(folder => path.basename(folder)), ['pfa', 'pfa-1998-2000'], 'data-src/pfa/ first; nothing else');
+  assert.deepEqual(copiesOf('1997/1997nfl.html', folders).map(file => path.relative(base, file)), [path.join('pfa', '1997', '1997nfl.html')]);
+  assert.deepEqual(copiesOf('1998/1998nfl.html', folders).map(file => path.relative(base, file)), [path.join('pfa-1998-2000', '1998', '1998nfl.html')]);
+  assert.deepEqual(copiesOf('1999/1999nfl.html', folders), []);
 });
 
 // ---------- the snapshots ----------
@@ -183,8 +203,8 @@ test('the calibration holds as recorded: the frozen weights on 2001–2005 again
 
 test('every snapshot and the calibration rebuild byte for byte from the pinned pages', t => {
   const pins = JSON.parse(read('scripts/data/pfa-pages.json')).files;
-  const missing = Object.keys(pins).filter(file => !existsSync(path.join(root, 'data-src/pfa', file)));
-  if (missing.length) { t.skip(`data-src/pfa/ lacks ${missing.length} pinned pages (${missing[0]} …): the rebuild runs where they are`); return; }
+  const missing = Object.keys(pins).filter(file => !copiesOf(file).length);
+  if (missing.length) { t.skip(`data-src/pfa*/ lack ${missing.length} pinned pages (${missing[0]} …): the rebuild runs where they are`); return; }
   assert.match(execFileSync(process.execPath, ['scripts/sync-pfa.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
     /Verified 43 computed seasons and the calibration byte for byte/);
 });

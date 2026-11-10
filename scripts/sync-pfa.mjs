@@ -13,7 +13,8 @@
 // 1987 is ranked on the clubs' own players only: those who played nothing but the three strike games, by those games'
 // box scores, are left out. 1982, whose strike cancelled games, is ranked as played (nine games).
 //
-// The pages stay in the gitignored data-src/pfa/, each read only when it is the file scripts/data/pfa-pages.json pins.
+// The pages stay in the gitignored data-src/pfa/ (and a later download's data-src/pfa-<name>/), each read only when it is
+// the file scripts/data/pfa-pages.json pins.
 //
 // Usage: node scripts/sync-pfa.mjs [--season=<year>|afl-<year>] [--check] [--tune]
 //   --season  one season only
@@ -26,12 +27,10 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { FORMATION, POSITION_OF as MADDEN_POSITION_OF, shortOf, squadOf, teamsOf } from './lib/nfl.mjs';
 import { maddenReferencePlayers, overallsOf, referenceOf } from './lib/nfl-reference.mjs';
-import { clubPagesOf, parseTeamSeason, playersOfBoxScore, replacementPlayers, seasonValues, settleKickers, VALUE_WEIGHTS } from './lib/pfa.mjs';
-import { STRIKE_GAMES } from './fetch-pfa.mjs';
-import { spearman } from './lib/ndb-madden.mjs';
+import { clubPagesOf, parseTeamSeason, playersOfBoxScore, replacementPlayers, seasonValues, settleKickers, spearman, VALUE_WEIGHTS } from './lib/pfa.mjs';
+import { copiesOf, STRIKE_GAMES } from './fetch-pfa.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const dataSrc = path.join(root, 'data-src');
 const outDir = path.join(root, 'scripts/data/pfa-seasons');
 const pinsFile = path.join(root, 'scripts/data/pfa-pages.json');
 const SITE = 'https://www.profootballarchives.com';
@@ -41,16 +40,26 @@ const CALIBRATION = [2001, 2002, 2003, 2004, 2005];
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const plain = text => String(text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
 
-let PINS = null, RETRIEVED = null;
-/** A pinned page's text (by its path under data-src/pfa/); throws when it is missing or not the pinned page. */
+const { files: PINS, retrieved: RETRIEVED } = JSON.parse(await readFile(pinsFile, 'utf8'));
+/**
+ * A pinned page's text (by its path in a folder of pages: data-src/pfa/ or a later download's data-src/pfa-<name>/);
+ * throws when no folder has it or none has the pinned page.
+ */
 async function pinned(file) {
-  if (!PINS) ({ files: PINS, retrieved: RETRIEVED } = JSON.parse(await readFile(pinsFile, 'utf8')));
   if (!(file in PINS)) throw new Error(`pfa/${file} is not pinned in scripts/data/pfa-pages.json`);
-  const full = path.join(dataSrc, 'pfa', file);
-  if (!existsSync(full)) throw new Error(`data-src/pfa/${file} is missing (npm run fetch:pfa)`);
-  const bytes = await readFile(full);
-  if (sha256(bytes) !== PINS[file]) throw new Error(`data-src/pfa/${file} is not the pinned page (SHA-256 ${sha256(bytes)})`);
-  return bytes.toString('utf8');
+  const copies = copiesOf(file);
+  if (!copies.length) throw new Error(`data-src/pfa/${file} is missing (npm run fetch:pfa)`);
+  for (const copy of copies) {
+    const bytes = await readFile(copy);
+    if (sha256(bytes) === PINS[file]) return bytes.toString('utf8');
+  }
+  throw new Error(`${path.relative(root, copies[0])} is not the pinned page (SHA-256 ${sha256(await readFile(copies[0]))})`);
+}
+/** The day the pages of `years` were saved ('2026-11-09'), or the first and last of them ('2026-11-09 to 2026-11-10'). */
+function retrievedOf(years) {
+  const days = Object.keys(RETRIEVED).filter(day => RETRIEVED[day].some(year => years.includes(year))).sort();
+  if (!days.length) throw new Error(`scripts/data/pfa-pages.json names no day the pages of ${years.join(', ')} were saved`);
+  return days.length > 1 ? `${days[0]} to ${days.at(-1)}` : days[0];
 }
 
 /** One league-season's club pages, parsed, in the index's order: `[{ file, page }]`. */
@@ -287,7 +296,8 @@ async function snapshotOf(year, league, manifest, franchises, madden, calibratio
       for: page.games.reduce((t, g) => t + g.for, 0), against: page.games.reduce((t, g) => t + g.against, 0), venues }];
   }));
   const source = {
-    site: SITE, league, season: year, compiler: 'Pro Football Archives (the facts); the overall ours', retrieved: RETRIEVED,
+    site: SITE, league, season: year, compiler: 'Pro Football Archives (the facts); the overall ours',
+    retrieved: retrievedOf([year, ...(aroundFiles.length ? [year - 1, year + 1] : [])]),
     clubs: teams.length, players: players.length,
     files: Object.fromEntries([index, ...clubs.map(c => c.file), ...boxScores, ...aroundFiles].map(file => [file, PINS[file]])),
     ...(replaced.size ? { replacement: { rule: `The replacement players of the strike games (${from} to ${to}, ${strikeGames} a club) are left out: those the games' box scores (the starters and every player with a statistic) name as often as they played, and those who played no more than ${strikeGames} games and for no club in ${year - 1} or ${year + 1}.`,

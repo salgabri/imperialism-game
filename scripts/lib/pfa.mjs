@@ -258,3 +258,26 @@ export function replacementPlayers(players, boxScores, { strikeGames, around }) 
   return new Set(players.filter(p => p.gp > 0 && ((appearances.get(p.id) ?? 0) >= p.gp || (p.gp <= strikeGames && !around.has(p.id))))
     .map(p => p.id));
 }
+
+// ---------- the calibration's statistics ----------
+
+/** Mid-ranks (ties share one). */
+export function ranks(values) {
+  const order = values.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]);
+  const out = Array(values.length);
+  for (let i = 0; i < order.length;) {
+    let j = i;
+    while (j + 1 < order.length && order[j + 1][0] === order[i][0]) j++;
+    for (let q = i; q <= j; q++) out[order[q][1]] = (i + j) / 2;
+    i = j + 1;
+  }
+  return out;
+}
+const pearson = (x, y) => {
+  const n = x.length, mx = x.reduce((a, b) => a + b, 0) / n, my = y.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) { sxy += (x[i] - mx) * (y[i] - my); sxx += (x[i] - mx) ** 2; syy += (y[i] - my) ** 2; }
+  return sxy / Math.sqrt(sxx * syy);
+};
+/** Spearman's rank correlation, to three decimals. */
+export const spearman = (x, y) => Math.round(pearson(ranks(x), ranks(y)) * 1000) / 1000;
