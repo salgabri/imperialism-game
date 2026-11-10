@@ -88,9 +88,9 @@ const SET_KINDS = Object.freeze({
   wta: { prefix: 'wta-', id: /^wta-\d{4}$/, sport: 'womens-tennis', nationsOnly: /^wta-/, calendar: true },
   // `nhl-<season end year>`: an NHL season's ratings from an EA NHL edition (NHL 94 rates 1993/94 → `nhl-1994`), its
   // nations by nationality and the NHL's clubs. A season no edition rated is computed from the NHL's statistics, or
-  // converted from an edition's attributes (source.method, source.conversion). Before 1979/80 only Canada fields a real
-  // side, so those seasons have clubs only (`clubsOnly`).
-  nhl: { prefix: 'nhl-', id: /^nhl-\d{4}$/, sport: 'hockey', mapped: true, clubsOnly: /^nhl-19[67]\d$/ },
+  // converted from an edition's attributes (source.method, source.conversion). Before 1977/78 fewer than three nations
+  // field a real side (Canada; the USA from 1971/72, Sweden from 1977/78), so those seasons have clubs only (`clubsOnly`).
+  nhl: { prefix: 'nhl-', id: /^nhl-\d{4}$/, sport: 'hockey', mapped: true, clubsOnly: /^nhl-19(?:6\d|7[0-7])$/ },
   // `nrl-<season>`: an NRL season from a rugby league game's database (Rugby League 2: World Cup Edition rates 2008), the
   // NRL's clubs only. The game rates attributes, not players: each overall is converted (source.conversion). A season
   // no game rated is computed from the players' match statistics (source.method 'computed', source.metric).
@@ -160,8 +160,9 @@ export function clearFootballSetIndex() {
 const newestFirst = (a, b) => b.year - a.year || (a.id < b.id ? 1 : -1);
 
 /**
- * The data sets present, newest season first: `[{ id, version, year, season, label, map? }]` (`map`: a basketball
- * season's era map), every sport's together (`setSportOf` tells them apart). The built-in earlier seasons are always
+ * The data sets present, newest season first: `[{ id, version, year, season, label, map?, credit? }]` (`map`: a
+ * basketball season's era map; `credit`: the plain text a season's sources ask to be shown with it, which setup shows
+ * under the Season choice), every sport's together (`setSportOf` tells them apart). The built-in earlier seasons are always
  * there; CM 01/02 sets built on this computer are read once from `football/index.json`, where a missing or unreadable
  * index means none. A listing that fails the checks is skipped (each set is validated in full when it loads).
  */
@@ -190,9 +191,11 @@ function listing(data) {
   const valid = entries.filter(entry => entry && isFootballSetId(entry.id) && !seen.has(entry.id) && seen.add(entry.id)
     && isDataYear(entry.year) && entry.season === seasonLabelOf(entry.id, entry.year) && typeof entry.label === 'string' && entry.label.trim()
     && (entry.version == null || (typeof entry.version === 'string' && versionPattern(entry.id).test(entry.version)))
+    && (entry.credit == null || (typeof entry.credit === 'string' && entry.credit.trim()))
     && (!setIsMapped(entry.id) || eraMapOf(entry.id, entry.map) != null));
-  return Object.freeze(valid.sort(newestFirst).map(({ id, version = null, year, season, label, map }) => Object.freeze({
-    id, version, year, season, label: label.trim(), ...(setIsMapped(id) ? { map } : {}) })));
+  // A credit stays exactly as written: a source's terms can ask for its statement word for word.
+  return Object.freeze(valid.sort(newestFirst).map(({ id, version = null, year, season, label, map, credit }) => Object.freeze({
+    id, version, year, season, label: label.trim(), ...(setIsMapped(id) ? { map } : {}), ...(credit != null ? { credit } : {}) })));
 }
 
 // A basketball or baseball season's map (src/data/clubMaps.js), or null: an earlier era's that lists the season, or

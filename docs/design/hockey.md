@@ -5,6 +5,9 @@ Canada on the NHL's own map, each holding its own state or province
 ([domestic-campaigns.md](domestic-campaigns.md#the-nhl-map)), and the nations field the NHL's
 players of each country. Everything outside the match
 (territory, the draw, targeting, conquest, signings, saves) is the game's own, unchanged.
+Since 2026-11-09 every NHL season from 1966/67 to 2025/26 but the cancelled 2004/05 is built in
+("Earlier seasons", "NHL 08 and NHL 09", "Computed seasons", "Eras"); since 2026-11-10 setup shows the
+credit its sources ask for under the Season choice ("Credits").
 
 **This is the one sport whose ratings are partly estimates.** EA publishes NHL 27 ratings
 for its top 300 players only, and 32 clubs need about 600 for full lineups. The player
@@ -147,7 +150,10 @@ chart is within half a point of the fixture's simulated odds.
 ## Interface
 
 - **Setup.** A sport card, "Nations · 32 NHL clubs". Clubs have one theatre, **NHL · USA
-  and Canada**. The note under Season says which ratings are estimates.
+  and Canada**. The note under Season (the choice's title and description) says which ratings are
+  estimates, which seasons are converted or computed and from what, and that nations play from 1977/78.
+  A season to 1976/77 has clubs only: choosing it takes the clubs. A season the Hockey Databank or
+  MoneyPuck.com feeds shows its credit as text under the choice ("Credits").
 - **Squad.** A rink: the goalie in his crease, three pairs below the blue line, four lines
   above it. Groups read Centres, Wings, Defence and Goalie; the profile Attack, Defence and
   Goaltending.
@@ -160,8 +166,20 @@ chart is within half a point of the fixture's simulated odds.
 
 ## Earlier seasons
 
-Five earlier seasons, each one EA edition's ratings of an NHL season: its clubs on the map of
-their day, its nations by birth country. **Nothing in them is estimated**: a player the
+Fifty-nine earlier seasons, every NHL season from 1966/67 to 2025/26 but the cancelled 2004/05,
+each with its clubs on the map of its day ("Eras"):
+
+| Seasons | Ratings | Source |
+| --- | --- | --- |
+| 1992/93, 1993/94, 1994/95, 2006/07, 2021/22 | an EA edition's (below) | NHLPA 93, NHL 94, NHL 95, NHL 07, NHL 22 |
+| 2007/08, 2008/09 | EA's attributes, the overall converted ("NHL 08 and NHL 09") | IGN's NHL 08 and NHL 09 pages |
+| 1966/67–1991/92, 1995/96–2003/04, 2005/06, 2009/10 (37) | computed from the players' statistics ("Computed seasons") | the Hockey Databank |
+| 2010/11–2020/21, 2022/23–2025/26 (15) | computed the same way, with minutes a game | MoneyPuck.com |
+
+The Season list labels the converted seasons "NHL 08, converted" and "NHL 09, converted" and the computed ones
+"Computed from statistics"; each file's source says how (`method`, `conversion`).
+
+The five EA editions' seasons: their nations by birth country. **Nothing in them is estimated**: a player the
 edition does not rate is not there, and a club it leaves short fields what it has (the lineup
 picker moves a defender up front, or leaves an empty shirt at its floor; a backup goalie the
 picker would put on a forward line is left out of the squad instead).
@@ -243,7 +261,8 @@ renamed since has its own id (`nhl-hartford-whalers`, `nhl-quebec-nordiques`,
 `nhl-phoenix-coyotes`, `nhl-atlanta-thrashers`, `nhl-arizona-coyotes`); one that has not keeps
 today's id and colour. `node scripts/build-club-maps.mjs --league=nhl` builds `nhl1993`,
 `nhl1994`, `nhl1995`, `nhl2007` and `nhl2022` by the state-and-province rule: Quebec is split
-between Montreal and Quebec City, the 1990s Capitals at Landover hold Maryland.
+between Montreal and Quebec City, the 1990s Capitals at Landover hold Maryland. The other
+seasons' clubs and maps are in "Eras".
 
 **The scale: rescaled, applied to the three 1990s seasons.** The classic games' overalls run
 far wider than NHL 27's (median 54, from 1 to 99), and the match model was tuned on today's
@@ -292,15 +311,301 @@ The 1990s seasons stay wider than today's league: their expansion clubs were far
 the rest (Ottawa and Tampa Bay in 1992/93, Anaheim and Florida in 1993/94), and the rescale keeps
 every club's place.
 
+## NHL 08 and NHL 09
+
+2007/08 and 2008/09 (decided 2026-11-09): EA's own attributes, as IGN published them for every club, with the overall
+converted, as Tecmo's is for the NFL. Neither edition's overall was ever published in full.
+
+- *NHL 08*: IGN's 30 team pages of September and October 2007 (the Wayback Machine's captures, already pinned for NHL
+  07's countries): 24 skater attributes or 20 goalie attributes, EA's position and EA's Country. Three pages break
+  their rows, and the parser repairs them: the Canadiens' closes each row's last cell as `</td</tr>`, the Devils' leaves
+  its last goalie's row (Kevin Weekes) without its `</tr>`, and the Stars' starts Jeff Halpern's row inside Stu Barnes's
+  last cell. 662 players.
+- *NHL 09*: IGN's 30 team pages as the Wayback Machine captured them on 16 to 18 August 2008, a month before the game came
+  out (fetched again 2026-11-09 from web.archive.org, the same bytes as the research's copies): 23 skater or 19 goalie
+  attributes and nothing else. IGN's article of the same week (xbox360.ign.com/articles/898/898201p1.html, captured
+  2008-08-15) says EA's overalls were not ready, so it gave the attributes only. A skater's position is his longest
+  stint's in the Hockey Databank's 2008/09 season (found by name on his club, then anywhere in 2007/08 to 2009/10, as
+  the earlier seasons find the NHL's players), else NHL 08's; Chad Denny (Atlanta), in neither, is left out. 655 players.
+- *Nations*: EA's Country on the NHL 08 pages (a year on for NHL 09, where the player is there), else the Hockey
+  Databank's birth country. Cristobal Huet's Country reads "Huet" on both pages: he counts for France, where the
+  databank has him born.
+
+**The conversion** (`scripts/lib/nhl-computed.mjs`, `converted` in `scripts/data/nhl-seasons.json`). A player's score is
+the plain mean of his skill attributes: NHL 08's skaters leave out Aggression, Discipline, Durability, Potential and
+Toughness (19 left), its goalies Aggressiveness, Durability, Potential and Puck Playing Frequency (16); NHL 09's skaters
+DIS, TGH, AGG and DUR (19), its goalies AGGR, DUR and PUCK (16). A value outside 0–99, EA's unset 255, leaves the player
+out: Alexei Zhamnov, Mike Rathje, Rob DiMaio and Jiri Fischer, none of whom played that season. The score's mid-rank in
+its group (forwards, defenders, goalies) over the edition's club players is read off NHL 07's EA overalls in that group
+(515 forwards, 259 defenders, 84 goalies, frozen as histograms), so the two seasons play on NHL 07's scale, as NHL 07
+does. Ties stay ties and nobody passes anybody in a group.
+
+Why it holds: within NHL 07 the same plain mean of the skill attributes (all but Injury, Potential, Fighting, Penalty,
+Aggression, Toughness and Intensity) ranks the players like EA's overall, Spearman 0.95 for forwards and 0.94 for
+defenders (`scripts/hockey-computed.test.mjs` measures it from the pinned pages). Results: Brodeur 96, Luongo 95, Iginla
+95, Crosby 94; Anaheim, the 2007 champions, the strongest club of NHL 08 (80.4) and Phoenix the weakest (72.4); Detroit,
+the 2008 champions, the strongest of NHL 09 (78.6).
+
+## Computed seasons
+
+The other 52 seasons have no game's ratings anyone published in full (decided 2026-11-09). NHL 96 to NHL 2006 and NHL 10
+to NHL 21 published none; NHLRatings.net's NHL 23 to 26 pages are stale or partial; EA's own lists stop at its top 20 to
+320 players. Their ratings are **computed from the players' regular-season statistics** by the rule below, labelled as
+computed wherever they are shown. They are no game's ratings.
+
+**Sources.** Only open sources whose sites allow this project's agents. The NHL's own statistics API (api.nhle.com,
+api-web.nhle.com), which the plan meant to use, turns away ClaudeBot, anthropic-ai and Claude-Web in its robots.txt and
+limits its use to non-commercial personal use: nothing of it is used for these seasons, not even for the calibration.
+
+| Source | Seasons | What it gives | Terms |
+| --- | --- | --- | --- |
+| The Hockey Databank, version 13.0 (10 July 2018), as published at github.com/rippinrobr/hockey-databank (commit de59443) | 1964/65–2009/10 here (it runs to 2017/18) | each player's games and points per club (Scoring), goalies' games, minutes, goals against and, from 1982/83, shots against (Goalies), name, position and birth place (Master) | free use, a commercial product included, with its attribution statement displayed in its entirety |
+| MoneyPuck.com's season summaries (moneypuck.com/data.htm) | 2008/09–2025/26 | each player's games, points, time on ice; goalies' shots on goal and goals against; position | free for non-commercial use, crediting MoneyPuck.com |
+| MoneyPuck.com's game-by-game player files (its download host, peter-tanner.com) | the 15 seasons computed from MoneyPuck | each player's team in every game, for his club | the same |
+| MoneyPuck.com's player lookup | 2010/11–2025/26 | each player's nationality (the NHL's) and birth date | the same |
+
+The databank's own sources are the NHL's guides and record books, Total Hockey and others (its readme). Its statement:
+"The information used herein was obtained free of charge from and is copyrighted by the Hockey Databank project. For
+more information about the Hockey Databank project please visit http://sports.groups.yahoo.com/group/hockey-databank".
+Setup shows it in full under the Season choice for every season that takes anything from the databank ("Credits"); it is
+also in `public/hockey/ATTRIBUTION.txt` and in every computed season's `source.attribution`. The sync checks the readme still
+asks for it word for word. raw.githubusercontent.com and peter-tanner.com have no robots.txt rules; moneypuck.com's
+robots.txt only defines Cloudflare's content signals. Every download (4 databank files, 36 MoneyPuck season summaries,
+the lookup and 30 game-by-game archives of 329 MB in all) is pinned by SHA-256 in `scripts/data/nhl-seasons-sources.json`.
+
+**The rule** (`scripts/lib/nhl-computed.mjs`, the built-in season's estimate rule carried back in time):
+
+- *A season's value.* A forward's is 8 × points a game, a defender's 5 × points a game, each line starting from a
+  replacement player's ten games at 0.1 points a game. Where the source keeps time on ice (MoneyPuck, from 2008/09) the
+  value adds minutes a game, the line starting from those ten games at 9 minutes.
+- *A goalie's.* 1000 × his save percentage above the league's, his line starting from 600 shots at 12 points under the
+  league's, plus 6 × his share of the season's games (the most any skater played; at most 1). Before 1982/83 no shots
+  against were kept, so a season whose three seasons are not all from 1982/83 on compares goals against instead:
+  1000 × (the league's goals against per 60 minutes − his) / 30 shots, his line starting from 1,200 minutes at 0.36 goals a
+  game over the league's (the same 600 shots at 12 points under, at 30 shots a game).
+- *The score.* The mean of the values of the season itself, the season before and the one before that, weighted 1:2:1
+  over the seasons he played; 2004/05 is skipped (2003/04 comes before 2005/06).
+- *Club and position.* The club he played most games for (a tie: the later one); the position of his longest stint
+  (the databank) or MoneyPuck's.
+- *Ratings.* Provisional ratings (each score's mid-rank in its group over every player of the season) let the game's
+  own lineup picker choose each club's squad, as the built-in season does. Then every squad player's rating is his
+  score's mid-rank in his group over the season's squad players, read off NHL 27's built-in squads in that group (433
+  forwards, 236 defenders, 64 goalies of 2026-11-07, frozen in `computed.histograms`): every computed season plays on
+  NHL 27's scale. Ties stay ties and nobody passes anybody in a group. A nation's player outside every squad takes the
+  rating of the highest squad score in his group not above his.
+- *Nations.* The databank's birth country, a birth it files in the USSR, Czechoslovakia or Yugoslavia counting for the
+  country its city is in today, and a birth city it files under a country the city is not in (Bratislava and eleven more
+  Slovak cities under the Czech Republic, Ceske Budejovice and Havlickuv Brod under Slovakia, Sverdlovsk under Ukraine,
+  Kharkiv, Pavlodar and Vost under Russia, Naliboki under Poland) counting for the city's country: Stan Mikita and the
+  Stastnys count for Slovakia, Nikolai Khabibulin for Russia. The MoneyPuck seasons take the nationality its lookup
+  gives, the NHL's (Olaf Kolzig counts for Germany there); where it gives none, the databank's birth country of the one
+  player of 2008/09 to 2017/18 with that name (Pavel Datsyuk, Chris Pronger and 25 more in 2010/11). None to one player a
+  season to 2017/18 is left without a nation, 5 to 37 after (2025/26's mostly rookies); they play for no nation.
+- *Namesakes.* Two players of one season who share a name carry their birth year ("Sebastian Aho (1997)"), or their
+  birth date where that is shared too ("Steve Smith (1963-04-04)").
+- *Dropped letters.* MoneyPuck's files from its 2022/23 season on drop every letter of a name that is not plain ASCII
+  ("Tim Sttzle", "Alexis Lafrenire", "Matj  Blmel"). The 17 players this hits in 2022/23 to 2025/26 take back their
+  names (`computed.moneypuckNames`, by NHL id): as MoneyPuck spelled them in its earlier files, else as the built-in NHL
+  27 season does, in plain letters like every other MoneyPuck name ("Tim Stutzle"). The sync checks each is MoneyPuck's
+  name with only letters put back, and stops on any other name with a run of spaces. One more, "Nathan Lgar", in no
+  squad, has no such spelling and stays as MoneyPuck gives it.
+
+**Calibration**, measured 2026-11-09 against the five full EA editions (`scripts/data/nhl-seasons/calibration.json`
+holds their players with their lines from these sources; `docs/design/hockey-seasons-audit.json` `calibration` records
+every figure). Both the edition's overalls and the computed scores are read off NHL 27's squads group by group, then
+compared: Spearman per group, the mean gap per player, and clubs as their best 12 forwards, 6 defenders and 1 goalie.
+
+| Edition | Stats | Forwards | Defenders | Goalies | Goalies by goals against | Player gap | Clubs ρ | Club gap |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| NHLPA 93 (1992/93) | databank, points | 0.84 (322) | 0.76 (168) | 0.60 (62) | 0.66 | 2.78 | 0.78 | 1.69 |
+| NHL 94 (1993/94) | databank, points | 0.90 (345) | 0.83 (202) | 0.83 (55) | 0.77 | 2.04 | 0.79 | 0.66 |
+| NHL 95 (1994/95) | databank, points | 0.88 (361) | 0.81 (195) | 0.73 (53) | 0.71 | 2.23 | 0.82 | 0.69 |
+| NHL 07 (2006/07) | databank, points | 0.90 (509) | 0.79 (259) | 0.73 (83) | 0.66 | 2.21 | 0.63 | 0.47 |
+| NHL 22 (2021/22) | MoneyPuck, minutes | 0.92 (397) | 0.89 (212) | 0.66 (64) | — | 1.88 | 0.89 | 0.45 |
+| NHL 22 (2021/22) | MoneyPuck, points only | 0.91 | 0.86 | 0.66 | — | 1.92 | 0.81 | 0.59 |
+
+The figures are within 0.01 of the research's, made from the NHL's API (NHLPA 93 0.84/0.76/0.60, NHL 22 0.92/0.89/0.67),
+except NHL 07's defenders: the databank keeps no time on ice, and minutes a game rank them better (0.87 in the research). Goals
+against rank goalies within 0.02 of save percentage on average (0.70 against 0.72), so the seasons before 1984/85 use
+them. EA's own published players, cross-checks only, within their narrow tops: NHL 27's top 300 against 2025/26 and
+2024/25 weighted 2:1, F 0.84, D 0.73, G 0.67; NHL 23's launch lists (66) against the computed 2022/23, F 0.84, D 0.55,
+G 0.22 (10 goalies); NHL 24's (120) against 2023/24, F 0.76, D 0.61, G 0.74; NHL 25's 20 against 2024/25, F 0.91; NHL
+26's first 50 against 2025/26, F 0.77, D 0.73, G 0.99 (6). These cross-checks are not in the audit: NHL 27's top 300 are
+in `scripts/data/nhl-27.json`, but the NHL 23 to 26 lists are the research's unpinned copies of EA's pages (rank
+correlations of the computed scores, re-measured 2026-11-10 for NHL 23, 24 and 27).
+
+**Results**, from the audit (`best`, `clubs`):
+
+- 1966/67: Bobby Hull 99, Stan Mikita 95; Doug Mohns and Pierre Pilote the best defenders, Bobby Orr 90 as a rookie;
+  Chicago, first that season, the strongest club (84.9).
+- 1970/71 to 1974/75: Phil Esposito the best forward, Bobby Orr the best defender every season. 1974/75: the expansion
+  Kansas City Scouts and Washington Capitals the weakest clubs (78.6, 77.9).
+- 1976/77: Guy Lafleur 99; the Canadiens, who lost 8 of 80, the strongest club.
+- 1979/80 to 1988/89: Wayne Gretzky the best player every season (Mario Lemieux in 1989/90); Paul Coffey the best
+  defender from 1983/84 to 1990/91.
+- 2019/20: Connor McDavid, Leon Draisaitl, Nathan MacKinnon.
+- Nations: Canada the strongest every season (the USA level with it from 2022/23); the USA second through the 1980s
+  and 1990s (Sweden level in 1979/80); Czechia, Russia and the USA within a point of one another behind Canada from
+  2000/01 to 2005/06 (the Jagr and Hasek years); Sweden second in 2010/11 and 2011/12.
+
+**Club spread.** The rule regresses: its clubs sit closer together than an edition's, at about 0.6 to 0.8 of their
+spread (club strengths' standard deviation 0.99 against 1.26 for NHL 22's players, 0.65 against 0.87 for NHL 07's).
+The MoneyPuck seasons, where every club's top line logs the same minutes, run 0.6 to 0.9 points of standard deviation,
+the databank's 0.7 to 2.3, widest in the 1970s (NHL 27 itself: 1.09). A season's surprise club is underrated (the
+weights lean on the seasons before, as the games' ratings do), and the order at the top is loose: the 2019/20 Coyotes,
+with Darcy Kuemper in goal, come out first by 0.1. A club's squad is picked from everyone who played most of his games
+for it that season, so a club that went through many players fields stars it never had at once: the 2005/06 Penguins,
+29th of 30, come out strongest by 1.4 with Mario Lemieux and Ziggy Palffy, who retired in January, and Mark Recchi,
+traded in March. Skaters ranked by points alone (before 2010/11) undervalue a defensive club: the 1987/88 Canadiens,
+second in the league, come out last of 21.
+
+Over 20 seeded seasons of 82 games (the measures of `npm run simulation:realism` on each season's clubs; NHL range in
+brackets):
+
+| Season | Clubs | Win% spread (0.082–0.127) | Best, worst wins (55–65, 19–25) | Goals a team (3.01–3.14) | Won by five or more (5.5–6.5%) | Top scorer (52–69) |
+| --- | --- | --- | --- | --- | --- | --- |
+| NHL 27 (built in) | 32 | 0.099 | 58, 24 | 3.05 | 6.5% | 59 |
+| 1967/68 | 12 | 0.121 | 57, 23 | 3.11 | 6.9% | 52 |
+| 1976/77 | 18 | 0.118 | 61, 25 | 3.25 | 7.8% | 57 |
+| 1984/85 | 21 | 0.106 | 55, 23 | 3.17 | 7.2% | 56 |
+| 1999/00 | 28 | 0.110 | 55, 17 | 3.03 | 6.7% | 58 |
+| 2007/08 (NHL 08) | 30 | 0.104 | 59, 24 | 2.62 | 5.0% | 79 |
+| 2015/16 | 30 | 0.082 | 54, 26 | 3.05 | 6.0% | 59 |
+| 2025/26 | 32 | 0.088 | 56, 25 | 3.04 | 6.3% | 58 |
+
+The early seasons are allowed outside today's ranges (fewer clubs spread wider; the 1970s' blowouts), and are documented
+rather than forced. So are the closest-packed modern seasons, just under the range's floor when re-measured 2026-11-10
+(the harness's seed 20261101): 2005/06 at 0.079 and 2012/13 at 0.075 (best 55, worst 29 wins), while 1974/75 runs over
+its ceiling at 0.161 (worst 14 wins; the Capitals won 8 of 80). NHL 08 plays on NHL 07's scale, like NHL 07 (2.73
+goals a team, top scorer 80).
+
+**Nations before 1977/78.** A season fields nations only where at least three play a real side (`fieldedNations`: their
+own players hold at least half the lineup). By the databank's birth countries, Canada alone does until 1970/71, the
+USA joins in 1971/72 and Sweden in 1977/78 (Bob Nystrom, Borje Salming, Inge Hammarstrom, Stefan Persson and seven more).
+So the seasons to 1976/77 have clubs only: the loader's id test (`clubsOnly` in `src/engine/footballSets.js`) reads
+`/^nhl-19(?:6\d|7[0-7])$/`, moved from 1979/80 to 1977/78 by this count (the research's sample of the NHL's bios had
+missed 1977/78 and 1978/79), and the build fails if the test and the count disagree.
+
+**Pipeline.** `node scripts/sync-nhl-seasons.mjs` (`--fetch`, `--pin`, `--check` as for the editions) reads the pinned
+downloads under `data-src/nhl-seasons/` (`hockey-databank/`, `moneypuck/`, `moneypuck-games/`) and writes each
+computed season's snapshot: the window's league figures (`leagues`: save percentage, goals against per 60, most games),
+the form (`form`: points or minutes a game, saves or goals against) and every player of the season, `[source key, name,
+club, position, country, lines]`, a line `[season, games, points, seconds on the ice]` or, a goalie's, `[season, games,
+seconds, goals against, shots against]`. `node scripts/build-nhl-seasons.mjs` computes the rule from them, so the
+snapshots (4.3 MB with the editions') are all a rebuild needs. No season waits on the NHL's own statistics: the
+databank and MoneyPuck cover every one, so the `sync-nhl-stats.mjs` the plan offered as a fallback was not written. The
+NHL's API would add time on ice for 1997/98 to 2009/10 and goalies' shots against before 1982/83, if the player ever
+wants to run that download himself.
+
+## Eras
+
+Every season's clubs come from `scripts/data/nhl-seasons.json` `eras` (decided 2026-11-09): each franchise's identities
+and arenas by season, from 1966/67, and the five editions' `teams` lists, which the eras reproduce exactly (tested).
+From 1980/81 the arenas, cities and points are the research's (Wikipedia's arena and franchise articles, read
+2026-11-07), the points the NHL's own where the editions give them; before, Wikipedia's arena articles (Oakland Arena,
+Omni Coliseum, Hy-Vee Arena for Kemper, Richfield Coliseum, MassMutual Center for the Springfield Civic Center, Detroit
+Olympia, Madison Square Garden (1925)). Codes are the NHL's as Wikipedia's list of NHL team abbreviations gives them
+(OAK, CGS, CLE, KCS, CLR, AFM). Every Wikipedia article used, season articles included, is pinned to the revision read
+on 2026-11-09 (`eras.wikipedia`).
+
+- *New ids*: `nhl-oakland-seals`, `nhl-california-golden-seals` and `nhl-cleveland-barons` (the defunct franchise merged
+  into the North Stars in 1978, ranked after today's 32 on every map), `nhl-kansas-city-scouts`, `nhl-colorado-rockies`,
+  `nhl-atlanta-flames`, `nhl-utah-hockey-club` (2024/25). The Chicago Black Hawks (to 1985/86) keep today's id under their
+  name of the day. Era ids get no crest, as before.
+- *Two arenas in a season*: the one that hosted most of its home games, from Wikipedia's season articles: the 1967/68
+  Kings at the Forum (21 of 37; Long Beach and the Sports Arena 16), the 1967/68 Rangers at the third Madison Square
+  Garden (26 of 37), the 1979/80 Red Wings at Joe Louis Arena (28 of 40), the 1979/80 Whalers at the Springfield Civic
+  Center (22 of 40, until 3 February 1980), the 1995/96 Senators at the Palladium (26 of 41), the 1997/98 Capitals at the
+  MCI Center (31 of 41), the 1998/99 Maple Leafs at Maple Leaf Gardens (27 of 41), the 2003/04 Coyotes at Glendale Arena
+  (28 of 41), the 2018/19 and 2019/20 Islanders at Nassau Coliseum (21 of 41, 24 of 35 played).
+- *The 1979/80 Whalers* (decided 2026-11-09, by the rule): they hold central and western Massachusetts (Springfield,
+  Worcester), the Bruins the east, and Connecticut is nobody's that season.
+
+**Maps** (`scripts/build-club-maps.mjs` `nhlSpecs`, decided 2026-11-09). A map serves a run of seasons while the clubs
+and their names stay the same and each arena stays in its county (or, in a state or province no other club shares, its
+state) and within 15 km of the first season's; the map keeps the first season's arenas and places. 26 new maps:
+`nhl1967`; `nhl1968` (to 1969/70: the Rangers' move to the fourth Garden, 1.4 km, keeps it); `nhl1971` (1970/71–1971/72);
+`nhl1973`; `nhl1975`; `nhl1977`; `nhl1979`; `nhl1980`; `nhl1981` (1980/81–1981/82); `nhl1983` (1982/83–1985/86: the
+Saddledome 0.2 km from the Corral); `nhl1987` (1986/87–1990/91, the Blackhawks' new spelling); `nhl1992`; `nhl1996`;
+`nhl1997`; `nhl1998`; `nhl1999`; `nhl2000`; `nhl2001` (2000/01–2002/03: the Stars' new arena 2 km away); `nhl2004`
+(2003/04, 2005/06); `nhl2012` (2011/12–2013/14); `nhl2015`; `nhl2016` (2015/16–2016/17); `nhl2018`; `nhl2019`
+(2018/19–2020/21); `nhl2023` (2022/23–2023/24); `nhl2025`. `nhl2007` now serves 2006/07 to 2010/11 (the Devils' move to
+Newark, 12 km within New Jersey, and the Penguins' 0.2 km keep it): its version changed, and a 2006/07 campaign saved
+on it resumes through the existing remap path (tested). 2025/26 plays on today's `nhl` map, and the builder checks its
+clubs and arenas are today's. The five maps of the editions are unchanged.
+
+## Credits
+
+The Hockey Databank's terms ask that its statement be displayed prominently and in its entirety on the product, and
+MoneyPuck.com asks for a clear credit (added 2026-11-10). The mechanism is any sport's: a data set's listing entry may carry
+a `credit`, the plain text its sources ask to be shown with it. `listing` in `src/engine/footballSets.js` keeps it exactly
+as written (an entry with a blank or non-text credit is left out, as any entry the builder would not write); the setup
+model passes the chosen season's on (`season.credit`, '' for none); and setup shows it as text right under the Season
+choice, while the season loads too, the choice naming it in its `aria-describedby`. The season files carry none, so their
+versions, and every save on them, stand. Only ice hockey's seasons carry one so far.
+
+`scripts/build-nhl-seasons.mjs` (`creditOf`) writes each season's into `src/data/hockeySeasons.js`, each text once as a
+constant:
+
+| Seasons | Credit |
+| --- | --- |
+| The 37 computed from the databank, NHL 08 and NHL 09 | the databank's statement |
+| 2010/11 to 2024/25 but 2021/22 (14), computed from MoneyPuck's data | "Data: MoneyPuck.com." then the statement |
+| 2025/26 | "Data: MoneyPuck.com" |
+| The five EA editions | none: their positions and birth countries are the NHL's rosters' |
+
+The statement is `computed.sources.hdb.attribution`, word for word as the databank's readme asks for it (the sync and a
+test check the readme still does), two spaces after "project." included: "The information used herein was obtained free
+of charge from and is copyrighted by the Hockey Databank project.  For more information about the Hockey Databank project
+please visit http://sports.groups.yahoo.com/group/hockey-databank". A season takes it wherever its snapshot draws on the
+databank (`usesDatabank`): every line of a season computed from it; NHL 09's skaters' positions (its rosters of 2008/09,
+else the seasons beside it); the birth country of a player EA's Country does not place, in NHL 08 (Cristobal Huet's
+France, its notes record) and NHL 09; and a MoneyPuck season's birth countries where MoneyPuck's lookup gives no
+nationality (`notes.birthFromDatabank`: 27 players in 2010/11 down to one in 2024/25, none in 2025/26).
+`public/hockey/ATTRIBUTION.txt` says the same and names where the game shows them.
+
+**On screen.** 11px Archivo in the muted text colour (5.0:1 on the light page, 6.2:1 on the dark), 10.5px below 390px
+wide, never cut or clamped. The longest, MoneyPuck's with the statement (254 characters), runs four lines in the controls'
+column at every size measured (three at 1920 wide, two across a portrait tablet). It takes the room of step 1's extras
+where they compete for height: the lede on every phone and on windows up to 800px tall; the whole heading on a phone with
+a notice line (resume, a challenge link) and on a short window with two. Measured in
+[compact-pass.md](compact-pass.md#measured): no vertical scrolling from 360×640 to 1920×1080, but for two notice lines at
+once on the smallest phones, which already scrolled for football.
+
+**In play** the game names a season (the campaign title, the Ledger's head, Saved campaigns' "Season") but not its
+source, save in the passing loading or error line of Retry this setup when the season must be fetched again ("Loading
+the Computed from statistics season…"), so the credit shows in setup alone.
+
 ## Tests
 
-`scripts/hockey-seasons.test.mjs`: the five seasons rebuild byte for byte (and from the pinned
+`scripts/hockey-seasons.test.mjs`: the 59 seasons rebuild byte for byte (and from the pinned
 downloads, when they are on the computer); the listing, the era maps and the loader's refusals;
 the classic facts (Gretzky 87, Lemieux's cap, Chambers's 1, the Rangers from Segathon, the short
 clubs); the rescale (the frozen NHL 27 reference, every rating the rescaled game overall of its
 player, the order holding and ties staying ties, NHL 07 and NHL 22 unconverted); NHL 22 against
-EA's lists; the name matching; and the running App launching a 1993/94 nations campaign and a
-2006/07 clubs campaign on its map, and resuming.
+EA's lists; the name matching; the running App launching a 1993/94 nations campaign and a
+2006/07 clubs campaign on its map, and resuming; and the Season choice showing each season's credit
+as text under it as the player picks seasons (MoneyPuck's with the statement, MoneyPuck's alone, the
+statement, none).
+
+`scripts/hockey-computed.test.mjs`: the rule by hand (both skater forms, both goalie forms, the
+weights, 2004/05 skipped, the club by most games); the mid-rank ratings, ties and the step rule; every
+computed rating NHL 27's and every group's order kept; the stars and clubs of known seasons; the
+calibration against the five editions (F ≥ 0.84, D ≥ 0.75, G ≥ 0.59, players ≤ 2.8 and clubs ≤ 1.7
+apart; minutes a game better for NHL 22; goals against within 0.03 of save percentage); nations from
+1977/78; the birth-city rule; the names MoneyPuck dropped letters from put back; NHL 08 and NHL 09
+(the attribute lists, the 255 rows, the three rows broken pages hide, NHL 07's self-check from the
+pinned pages); the eras (club counts, the Seals and Barons, the 1979/80 Whalers at Springfield, the
+editions' lists reproduced); every map serving its seasons; the loader's refusals; every season's
+credit (the statement word for word where the season draws on the databank, MoneyPuck's on its
+seasons, none on the editions, the season files untouched) and the databank's readme asking for it,
+when it is on the computer; and the running App playing a 1967/68 clubs campaign, a 1985/86 nations
+campaign, a 2025/26 clubs campaign on today's map and a 2007/08 nations campaign (each saved and the
+last two resumed), and resuming a 2006/07 campaign saved on `nhl2007` before it served more seasons.
+
+`scripts/setup-wizard.test.mjs` holds the generic side: a listed set's credit in the model and on
+screen under the Season choice, gone with a season without one, and the CSS that never cuts it and
+makes room for it; `scripts/football-sets.test.mjs` the listing keeping a credit word for word.
 
 `scripts/hockey.test.mjs`: the data rebuilds byte for byte; EA's ratings unchanged, every
 other rating marked and under the cut-off; namesakes apart; lineups, depth and the position
@@ -316,8 +621,19 @@ duel campaign with the live ticker and a hockey nations campaign.
 - About half of a lineup's ratings are estimates, and the depth players' order is only as
   good as ice time and scoring. A shutdown defender rates low.
 - The built-in season, 2026/27: EA's site shows only the current edition, and each rollover
-  needs a new pull. The five earlier seasons are fixed files ("Earlier seasons").
+  needs a new pull. The earlier seasons are fixed files ("Earlier seasons").
 - NHL players only, by nationality or birth country.
+- 52 seasons are computed, not rated by any game ("Computed seasons"): their clubs sit closer together than an
+  edition's, goalies rank worst (Spearman 0.60 to 0.83 against the editions), and before 2010/11 defenders rank by
+  points alone, so a shutdown defender rates low. No time on ice before 2008/09 and no goalies' shots against before
+  1982/83 are in the open sources; the NHL's API has both, but turns this project's agents away.
+- Terms. MoneyPuck.com's data, behind the 15 seasons from 2010/11, is free for non-commercial use only, as the NHL's own
+  statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. The Hockey Databank's statement
+  and MoneyPuck's credit show in full under the Season choice ("Credits"), in setup only: no screen in play names a
+  season's source beyond a passing loading line.
+- Names: the Hockey Databank and MoneyPuck spell names without accents ("Borje Salming", "Tim Stutzle"), and the
+  databank in its own way (Raymond Bourque); NHL 08 and NHL 09 keep IGN's spellings.
+- NHL 09's attributes are EA's before release; neither NHL 08's nor NHL 09's overall is EA's.
 - Nations campaigns are top-heavy. Half the elite 32 are minnows at the baseline, so the
   United States, Canada and Russia win about four titles in five (`npm run balance`, 1,200
   campaigns). Since 2026-11-09 no minnow plays: the seven real sides play the world and Europe,

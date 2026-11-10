@@ -250,6 +250,27 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
   }
 });
 
+test('a listed set may carry a plain-text credit, kept exactly as written; an empty or non-text one leaves the set out', async () => {
+  fresh();
+  // A source's statement can carry two spaces, as the Hockey Databank's does: the listing keeps it word for word.
+  const credit = 'Data: an example archive.  Shown whole, as its terms ask.';
+  const december = syntheticSet({ id: 'cm0102-2001-12', year: 2002, label: 'CM 01/02 · December 2001' });
+  const may = syntheticSet({ id: 'cm0102-2026-05', year: 2026, label: 'CM 01/02 · May 2026' });
+  const april = syntheticSet({ id: 'cm0102-2026-04', year: 2026, label: 'CM 01/02 · April 2026' });
+  const listed = { format: 1, sets: [{ ...entryOf(SET), credit }, { ...entryOf(december), credit: '   ' }, { ...entryOf(may), credit: 42 },
+    entryOf(april)] };
+  const index = await loadFootballSetIndex({ fetch: fakeFetch({ '/football/index.json': listed }).fetch });
+  const local = index.filter(set => set.id.startsWith('cm0102-') && !BUILT_IN_SETS.some(builtIn => builtIn.id === set.id));
+  assert.deepEqual(local.map(set => set.id), ['cm0102-2026-04', ID], 'a blank or non-text credit is a listing the build did not write');
+  assert.deepEqual(local[1], { id: ID, version: SET.version, year: 2002, season: '2001/02', label: 'CM 01/02 · Test 2002', credit });
+  assert.ok(!('credit' in local[0]), 'a set without one has none');
+  assert.ok(Object.isFrozen(local[1]));
+  // Built-in seasons carry theirs through the same listing (ice hockey's: scripts/hockey-computed.test.mjs).
+  assert.ok(BUILT_IN_SETS.some(set => set.credit), 'a built-in season carries a credit');
+  assert.ok(BUILT_IN_SETS.every(set => set.credit === undefined || (typeof set.credit === 'string' && set.credit.trim() === set.credit && set.credit)));
+  fresh();
+});
+
 test('one shared request per data set; a failed load is not cached and can be retried', async () => {
   fresh();
   const files = { '/base/football/cm0102-2002-05.json': SET };

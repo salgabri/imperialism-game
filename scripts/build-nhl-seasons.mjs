@@ -1,25 +1,35 @@
-// Build ice hockey's built-in earlier seasons (docs/design/hockey.md, "Earlier seasons").
+// Build ice hockey's built-in earlier seasons (docs/design/hockey.md, "Earlier seasons", "NHL 08 and NHL 09",
+// "Computed seasons").
 //
-//   node scripts/build-nhl-seasons.mjs           writes public/hockey/nhl-<year>.json, src/data/hockeySeasons.js and
-//                                                docs/design/hockey-seasons-audit.json
+//   node scripts/build-nhl-seasons.mjs           writes public/hockey/nhl-<year>.json, public/hockey/ATTRIBUTION.txt,
+//                                                src/data/hockeySeasons.js and docs/design/hockey-seasons-audit.json
 //   node scripts/build-nhl-seasons.mjs --check   builds every file and compares it byte for byte, writes nothing
 //
-// Each season is one EA edition's committed snapshot (scripts/data/nhl-seasons/<id>.json, node
-// scripts/sync-nhl-seasons.mjs): its NHL clubs, as the NHL's codes of that season name them (scripts/data/nhl-seasons.json
-// `teams`), and its nations by birth country. The lineups, depth and nations follow the built-in season's rules
-// (scripts/lib/nhl.mjs), except that nothing is estimated: a player the edition does not rate is not there, and a club
-// short of a lineup fields what it has. Each season names the era map its clubs play on, which
-// node scripts/build-club-maps.mjs --league=nhl builds from the same manifest.
+// Each season is built from its committed snapshot (scripts/data/nhl-seasons/<id>.json, node
+// scripts/sync-nhl-seasons.mjs): an EA edition's ratings, an edition's attributes converted onto NHL 07's overalls
+// (`method` 'converted'), or the players' statistics, rated by the computed rule (`method` 'computed',
+// scripts/lib/nhl-computed.mjs). Its NHL clubs are named by the NHL's codes of that season (scripts/data/nhl-seasons.json
+// `teams`, else `eras`), its nations by birth country or nationality. The lineups, depth and nations follow the built-in
+// season's rules (scripts/lib/nhl.mjs), except that nothing is estimated: a player the source does not have is not
+// there, and a club short of a lineup fields what it has. Each season names the era map its clubs play on, which
+// node scripts/build-club-maps.mjs --league=nhl builds from the same manifest; the computed rule's calibration against
+// the full editions (scripts/data/nhl-seasons/calibration.json) goes into the audit. Each season's listing entry carries
+// the credit its sources ask for (creditOf), which setup shows under the Season choice; the season files do not.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { HOME_NATIONS, selectLineup } from '../src/data/teams.js';
+import { HOME_NATIONS, fieldsRealSide, selectLineup } from '../src/data/teams.js';
 import { CLUBS } from '../src/data/clubs.hockey.js';
 import { contentHash, serializeFootballSet } from '../src/data/footballSetBuild.js';
+import { setHasNations } from '../src/engine/footballSets.js';
+import { hockey } from '../src/sports/hockey.js';
 import { colourFor } from './lib/club-identity.mjs';
 import { nationsOf, nationStrength } from './lib/nhl.mjs';
 import { clubSquadOf, mapOf, nationOf, quantileRescale, ratingsOf, teamsOf } from './lib/nhl-seasons.mjs';
+import {
+  RULE, attributeMean, calibrationOf, groupOf, groupRatings, ratingsOfHistogram, scoreOf, stepRating, windowOf,
+} from './lib/nhl-computed.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outDir = path.join(root, 'public/hockey');
@@ -93,6 +103,172 @@ function buildSeason(entry, snapshot, manifest) {
   return { doc, text: serializeFootballSet(doc), audit };
 }
 
+// ---------- the computed and converted seasons ----------
+
+const histogramText = histogram => Object.entries(histogram).map(([r, n]) => `${r}×${n}`).join(' ');
+
+/** A computed season's rule, its constants and its form, as its source states it (source.conversion). */
+function computedConversion(entry, snapshot, manifest, counts) {
+  const { form } = snapshot;
+  const [year, before, beforeThat] = windowOf(entry.year);
+  const skater = form.skaters === 'minutes'
+    ? `a forward's value is minutes a game + ${RULE.pointWeight.F} × points a game, a defender's minutes a game + ${RULE.pointWeight.D} × points a game`
+    : `a forward's value is ${RULE.pointWeight.F} × points a game, a defender's ${RULE.pointWeight.D} × points a game (the source keeps no time on ice)`;
+  const goalie = form.goalies === 'saves'
+    ? `a goalie's is 1000 × (his save percentage − the league's), his line starting from ${RULE.goalie.shots} shots at ${RULE.goalie.below} under the league's`
+    : `a goalie's is 1000 × (the league's goals against per 60 minutes − his) / ${RULE.goals.shotsPer60} (no shots against were kept), his line starting from ${RULE.goals.minutes} minutes at ${RULE.goals.above} goals a game over the league's`;
+  return `computed from each player's regular seasons ${year - 1}/${String(year % 100).padStart(2, '0')}, `
+    + `${before - 1}/${String(before % 100).padStart(2, '0')} and ${beforeThat - 1}/${String(beforeThat % 100).padStart(2, '0')} (weighted ${RULE.weights.join(':')}, over the seasons he played): `
+    + `${skater}, every line starting from a replacement player's ${RULE.prior.games} games at ${RULE.prior.points} points${form.skaters === 'minutes' ? ` and ${RULE.prior.minutes} minutes` : ''} a game; `
+    + `${goalie}, plus ${RULE.goalie.workload} × his share of the season's games (at most 1). A player plays for the club he played most games for (a tie: the later one). `
+    + `Each club's squad is picked by provisional ratings (each score's mid-rank in its group over the season's ${counts.players} players); then every squad player's rating is his score's mid-rank in his group `
+    + `over the season's ${counts.squad} squad players, read off NHL 27's squads in that group (scripts/data/nhl-seasons.json computed.histograms: forwards ${counts.reference.F}, defenders ${counts.reference.D}, goalies ${counts.reference.G}); `
+    + 'ties stay ties and nobody passes anybody in a group. A player outside the squads takes the rating of the highest squad score in his group not above his. '
+    + `Every player's lines are in scripts/data/nhl-seasons/${entry.id}.json.`;
+}
+
+/** The computed season `entry` of the manifest: its data set document and its audit row. */
+function buildComputed(entry, snapshot, manifest) {
+  const { id, year } = entry;
+  if (snapshot.source.id !== id || snapshot.source.method !== 'computed') throw new Error(`scripts/data/nhl-seasons/${id}.json is not ${id}'s computed snapshot`);
+  const src = manifest.computed.sources[entry.source.kind];
+  const histograms = manifest.computed.histograms;
+  const players = snapshot.players.map(([key, name, team, pos, born, lines]) => ({ key, name, team, pos, born, lines, nation: nationOf(born),
+    score: scoreOf({ pos, lines }, year, snapshot.leagues, snapshot.form) }));
+  if (players.some(p => p.score === null)) throw new Error(`${id}: a player without a line of the season`);
+  // Provisional ratings over every player of the season pick each club's squad (the game's own lineup picker); the final
+  // ratings rank the squads' players only, so every club's depth reads off NHL 27's squads as theirs do.
+  const provisional = groupRatings(players, 'score', histograms);
+  for (const p of players) p.rating = provisional.get(p);
+  const colours = new Map(CLUBS.map(club => [club.id, club.col]));
+  const picked = teamsOf(manifest, year).map(team => {
+    const pool = players.filter(player => player.team === team.code);
+    if (pool.length < 12) throw new Error(`${id}: ${team.name} has ${pool.length} players`);
+    return { team, pool, squad: clubSquadOf(pool).squad };
+  });
+  const squadPlayers = picked.flatMap(c => c.squad);
+  const final = groupRatings(squadPlayers, 'score', histograms);
+  const finalOf = new Map(squadPlayers.map(p => [p, final.get(p)]));
+  const rated = squadPlayers.map(p => ({ pos: p.pos, score: p.score, rating: finalOf.get(p) }));
+  const all = players.map(p => ({ ...p, provisional: p.rating, rating: finalOf.get(p) ?? stepRating(p, rated) }));
+  const ratingOf = new Map(players.map((p, i) => [p, all[i]]));
+  const clubs = picked.map(({ team, pool, squad }) => {
+    const listed = squad.map(p => ratingOf.get(p));
+    const lineup = selectLineup({ sport: 'hockey', squad: listed });
+    return { id: team.id, name: team.name, code: team.code, country: team.country, col: colours.get(team.id) ?? colourFor(team.id),
+      str: lineup.rating, squad: listed, players: pool.length, open: lineup.slots.filter(slot => !slot.player || slot.penalty > 4).map(slot => slot.position) };
+  }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
+  const nations = nationsOf(all);
+  const realSides = realSidesOf(nations);
+  const hasNations = setHasNations(id);
+  const counts = { players: players.length, squad: squadPlayers.length,
+    reference: Object.fromEntries(['F', 'D', 'G'].map(g => [g, ratingsOfHistogram(histograms[g]).length])) };
+  const doc = {
+    format: 1, kind: 'nhl', id, version: '', year, season: seasonLabel(year), label: entry.label, local: false,
+    source: { provider: src.provider, edition: src.edition, compiler: src.compiler, url: src.url, retrieved: entry.retrieved, method: 'computed',
+      rawScale: 'value', conversion: computedConversion(entry, snapshot, manifest, counts), licence: src.licence, attribution: src.attribution, nation: src.nation },
+    map: mapOf(manifest, year),
+    // Before 1977/78 fewer than three nations field a real side: clubs only (src/engine/footballSets.js clubsOnly).
+    nations: hasNations ? Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]])) : {},
+    clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'NHL', country: c.country, col: c.col, str: c.str,
+      squad: c.squad.slice().sort(byPlace).map(tupleOf) })),
+    territory: { merged: Object.fromEntries(HOME_NATIONS.map(home => [home, '826'])), inactive: [] },
+    coverage: { players: players.length, clubs: clubs.length, nations: hasNations ? nations.length : 0, left: snapshot.left.length },
+  };
+  doc.version = `${id}-${contentHash(doc)}`;
+  const range = list => { const s = list.slice().sort((a, b) => a - b); return { lowest: s[0], median: s[s.length >> 1], highest: s.at(-1) }; };
+  const top = group => all.filter(p => groupOf(p.pos) === group)
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)).slice(0, 3).map(p => `${p.name} (${p.team}) ${p.rating}`);
+  const audit = {
+    id, version: doc.version, season: doc.season, label: entry.label, method: 'computed', source: entry.source.kind, map: doc.map, form: snapshot.form,
+    players: players.length, squads: squadPlayers.length, ratings: range(clubs.flatMap(c => c.squad.map(p => p.rating))),
+    best: { forwards: top('F'), defenders: top('D'), goalies: top('G') },
+    clubs: clubs.map(c => `${c.name} ${c.str} (${c.players} players${c.open.length ? `; the game fills ${c.open.join(' ')}` : ''})`),
+    nations: hasNations ? nations.map(n => `${n.name} ${n.str} (${n.squad.length}${n.open.length ? `; the game fills ${n.open.join(' ')}` : ''})`) : 'clubs only',
+    realSides,
+    noNation: players.filter(p => p.nation === null).map(p => `${p.name} (${p.team})`),
+    left: snapshot.left.map(row => row.join(' | ')),
+    notes: snapshot.notes,
+  };
+  return { doc, text: serializeFootballSet(doc), audit, realSides, hasNations };
+}
+
+/** The nations that would field a real side (src/data/teams.js fieldsRealSide), strongest first. */
+function realSidesOf(nations) {
+  const rosters = Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]]));
+  const sport = { ...hockey, rosters, territory: { merged: {}, inactive: [] } };
+  return nations.filter(n => fieldsRealSide(n.id, sport)).map(n => n.name);
+}
+
+/** The converted season `entry` (NHL 08, NHL 09): its data set document and its audit row. */
+function buildConverted(entry, snapshot, manifest) {
+  const { id, year } = entry;
+  if (snapshot.source.id !== id || snapshot.source.method !== 'converted') throw new Error(`scripts/data/nhl-seasons/${id}.json is not ${id}'s converted snapshot`);
+  const histograms = manifest.converted.histograms;
+  const players = snapshot.players.map(([name, team, pos, born, values]) => {
+    const score = attributeMean(values);
+    if (score === null) throw new Error(`${id}: ${name} has an attribute outside 0-99`);
+    return { name, team, pos, born, nation: nationOf(born), score };
+  });
+  const ratings = groupRatings(players, 'score', histograms);
+  for (const p of players) p.rating = ratings.get(p);
+  const colours = new Map(CLUBS.map(club => [club.id, club.col]));
+  const clubs = teamsOf(manifest, year).map(team => {
+    const pool = players.filter(player => player.team === team.code);
+    if (pool.length < 12) throw new Error(`${id}: ${team.name} has ${pool.length} players`);
+    const { squad, lineup } = clubSquadOf(pool);
+    return { id: team.id, name: team.name, code: team.code, country: team.country, col: colours.get(team.id) ?? colourFor(team.id),
+      str: lineup.rating, squad, players: pool.length, open: lineup.slots.filter(slot => !slot.player || slot.penalty > 4).map(slot => slot.position) };
+  }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
+  const nations = nationsOf(players);
+  const counts = Object.fromEntries(['F', 'D', 'G'].map(g => [g, players.filter(p => groupOf(p.pos) === g).length]));
+  const reference = Object.fromEntries(['F', 'D', 'G'].map(g => [g, ratingsOfHistogram(histograms[g]).length]));
+  const attributes = snapshot.attributes;
+  const conversion = `the plain mean of each player's skill attributes on IGN's pages (skaters: ${attributes.skater.join(', ')}; goalies: ${attributes.goalie.join(', ')}; `
+    + 'a player with a value outside 0-99, EA\'s unset 255, is left out), ranked within his group over the edition\'s '
+    + `${counts.F} forwards, ${counts.D} defenders and ${counts.G} goalies on club pages, each mean taking the rating at its mid-rank among them in NHL 07's EA overalls of that group `
+    + `(scripts/data/nhl-seasons.json converted.histograms: ${reference.F} forwards, ${reference.D} defenders, ${reference.G} goalies); ties stay ties and nobody passes anybody in a group. `
+    + `Every player's attributes are in scripts/data/nhl-seasons/${id}.json.`;
+  const doc = {
+    format: 1, kind: 'nhl', id, version: '', year, season: seasonLabel(year), label: entry.label, local: false,
+    source: { provider: entry.provider, edition: entry.edition, compiler: entry.compiler, url: entry.url, retrieved: entry.retrieved, method: 'converted',
+      rawScale: entry.rawScale, overall: entry.overall, conversion, nation: entry.nation },
+    map: mapOf(manifest, year),
+    nations: Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]])),
+    clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'NHL', country: c.country, col: c.col, str: c.str,
+      squad: c.squad.slice().sort(byPlace).map(tupleOf) })),
+    territory: { merged: Object.fromEntries(HOME_NATIONS.map(home => [home, '826'])), inactive: [] },
+    coverage: { players: players.length, clubs: clubs.length, nations: nations.length, left: snapshot.left.length },
+  };
+  doc.version = `${id}-${contentHash(doc)}`;
+  const range = list => { const s = list.slice().sort((a, b) => a - b); return { lowest: s[0], median: s[s.length >> 1], highest: s.at(-1) }; };
+  const audit = {
+    id, version: doc.version, season: doc.season, edition: entry.edition, label: entry.label, method: 'converted', map: doc.map, players: players.length,
+    ratings: range(players.map(p => p.rating)),
+    best: Object.fromEntries([['forwards', 'F'], ['defenders', 'D'], ['goalies', 'G']].map(([word, g]) => [word, players.filter(p => groupOf(p.pos) === g)
+      .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)).slice(0, 3).map(p => `${p.name} (${p.team}) ${p.rating}`)])),
+    clubs: clubs.map(c => `${c.name} ${c.str} (${c.players} players${c.open.length ? `; the game fills ${c.open.join(' ')}` : ''})`),
+    nations: nations.map(n => `${n.name} ${n.str} (${n.squad.length}${n.open.length ? `; the game fills ${n.open.join(' ')}` : ''})`),
+    realSides: realSidesOf(nations),
+    noNation: players.filter(p => p.nation === null).map(p => `${p.name} (${p.team})`),
+    left: snapshot.left.map(row => row.join(' | ')),
+    notes: snapshot.notes,
+  };
+  return { doc, text: serializeFootballSet(doc), audit };
+}
+
+/** The computed rule against the full editions (scripts/data/nhl-seasons/calibration.json), as the audit records it. */
+function calibrationAudit(manifest, fixture) {
+  return fixture.editions.map(e => {
+    const forms = [e.form, ...(e.kind === 'hdb' ? [{ ...e.form, goalies: 'goals' }] : [{ ...e.form, skaters: 'points' }])];
+    return { id: e.id, source: e.kind, unmatched: e.unmatched.length, forms: forms.map(form => {
+      const players = e.players.map(([name, team, pos, overall, lines]) => ({ name, team, pos, overall,
+        score: lines.length ? scoreOf({ pos, lines }, e.year, e.leagues, form) : null }));
+      return { form, ...calibrationOf(players, manifest.computed.histograms) };
+    }) };
+  });
+}
+
 /** The whole rule from the edition's numbers to a rescaled season's ratings, as its source states it. */
 function conversionOf(entry, manifest, count) {
   const rescale = `rescaled onto NHL 27's ratings rank for rank: each overall takes the rating at its mid-rank among the season's ${count} rated players `
@@ -101,16 +277,105 @@ function conversionOf(entry, manifest, count) {
   return entry.source.kind === 'nhlpa93' ? `${entry.overall}, 99 at most; then ${rescale}` : `the game's overall, ${rescale}`;
 }
 
-function listingModule(docs) {
-  const rows = docs.map(doc => `  Object.freeze({ id: '${doc.id}', version: '${doc.version}', year: ${doc.year}, season: '${doc.season}', label: '${doc.label}', map: '${doc.map}' }),`);
+// ---------- the credits ----------
+
+/**
+ * Whether season `entry` takes anything from the Hockey Databank, by its snapshot: an EA edition's season takes nothing
+ * (its positions and birth countries are the NHL's rosters'); a season computed from the databank takes every line; NHL
+ * 09 takes its skaters' positions from the databank's rosters, and both converted seasons the birth country of a player
+ * EA's Country does not place (NHL 08's notes record each); a MoneyPuck season takes a birth country where MoneyPuck's
+ * lookup gives no nationality (`notes.birthFromDatabank`).
+ */
+function usesDatabank(entry, snapshot) {
+  if (entry.method === 'computed') return entry.source.kind === 'hdb' || snapshot.notes.birthFromDatabank.length > 0;
+  if (entry.method === 'converted') {
+    return entry.source.kind === 'nhl09' || snapshot.notes.country.some(note => /the Hockey Databank's birth country [A-Z]{3}$/.test(note));
+  }
+  return false;
+}
+
+/**
+ * Season `entry`'s credit, the plain text the Season choice shows under it (docs/design/hockey.md, "Credits"), as
+ * `{ name, text }`, or null for an EA edition's season: "Data: MoneyPuck.com" on a season computed from MoneyPuck's data,
+ * then the Hockey Databank's statement, whole and word for word as its readme asks (the sync checks the readme still
+ * does), on every season that takes anything from the databank. `name` is the listing's constant for it.
+ */
+function creditOf(entry, snapshot, manifest) {
+  const { hdb, moneypuck } = manifest.computed.sources;
+  const parts = [
+    entry.method === 'computed' && entry.source.kind === 'moneypuck' && ['MONEYPUCK', `Data: ${moneypuck.provider}`],
+    usesDatabank(entry, snapshot) && ['DATABANK', hdb.attribution],
+  ].filter(Boolean);
+  return parts.length ? { name: `CREDIT_${parts.map(([key]) => key).join('_')}`, text: parts.map(([, text]) => text).join('. ') } : null;
+}
+
+const quoted = text => `'${text.replace(/[\\']/g, '\\$&')}'`;
+
+/** src/data/hockeySeasons.js: every season's listing entry, each credit written once as a constant its seasons name. */
+function listingModule(docs, credits) {
+  const constants = new Map();
+  for (const credit of docs.map(doc => credits.get(doc.id)).filter(Boolean)) {
+    if (constants.has(credit.name) && constants.get(credit.name) !== credit.text) throw new Error(`two credits named ${credit.name}`);
+    constants.set(credit.name, credit.text);
+  }
+  const rows = docs.map(doc => `  Object.freeze({ id: '${doc.id}', version: '${doc.version}', year: ${doc.year}, season: '${doc.season}', label: '${doc.label}', map: '${doc.map}'`
+    + `${credits.get(doc.id) ? `, credit: ${credits.get(doc.id).name}` : ''} }),`);
   return `// GENERATED by npm run build:nhl-seasons; do not edit.
-// The built-in earlier ice hockey seasons, newest first: each EA NHL edition's nations and NHL clubs. Each is
-// public/hockey/<id>.json, loaded when a setup chooses it (src/engine/footballSets.js), and its clubs play on their era's
-// map (\`map\`, public/domestic/<map>.json).
+// The built-in earlier ice hockey seasons, newest first: an EA NHL edition's ratings, an edition's attributes converted,
+// or ratings computed from the season's statistics (docs/design/hockey.md). Each is public/hockey/<id>.json, loaded when a
+// setup chooses it (src/engine/footballSets.js), and its clubs play on their era's map (\`map\`, public/domestic/<map>.json).
+// A season's \`credit\` is the plain text its sources ask to be shown with it, which setup shows under the Season choice:
+// the Hockey Databank's statement in full on every season that takes anything from it, and "Data: MoneyPuck.com" on those
+// computed from MoneyPuck.com's data (docs/design/hockey.md, "Credits").
+${[...constants].map(([name, text]) => `const ${name} = ${quoted(text)};`).join('\n')}
 export const BUILT_IN_HOCKEY_SEASONS = Object.freeze([
 ${rows.join('\n')}
 ]);
 `;
+}
+
+/**
+ * public/hockey/ATTRIBUTION.txt: where each season's ratings come from, the statements the sources ask for, and which
+ * seasons show them in the game (`credits`, creditOf's by season id).
+ */
+function attributionText(manifest, docs, credits) {
+  const { hdb, moneypuck } = manifest.computed.sources;
+  const seasons = method => docs.filter(doc => (doc.source.method ?? 'game') === method);
+  const list = docs => docs.map(doc => doc.season).sort().join(', ');
+  const computed = (kind, test = () => true) => manifest.seasons.filter(s => s.method === 'computed' && s.source.kind === kind && test(s))
+    .map(s => seasonLabel(s.year));
+  const databank = s => !!credits.get(s.id)?.text.includes(hdb.attribution);
+  const credited = [...credits.values()].filter(Boolean);
+  return [
+    'Ice hockey seasons (public/hockey/nhl-<year>.json): sources, terms and attribution',
+    '=========================================================================',
+    '',
+    `EA's own ratings of a season (${list(seasons('game'))}): each file's source names the edition and who compiled it (docs/design/hockey.md, "Earlier seasons").`,
+    '',
+    `Converted from EA's attributes (${list(seasons('converted'))}): EA's NHL 08 and NHL 09 attributes as IGN's team pages published them`,
+    "(the Wayback Machine's captures, pinned in scripts/data/nhl-seasons-sources.json); the overall is this project's conversion, not EA's",
+    '(docs/design/hockey.md, "NHL 08 and NHL 09"). NHL 09\'s skaters take their positions from the Hockey Databank\'s rosters (2008/09\'s,',
+    'else the seasons beside it, else NHL 08\'s pages), and a player EA\'s Country does not place takes the Hockey Databank\'s birth',
+    'country, under its terms and statement below.',
+    '',
+    `Computed from the players' season statistics by this project's rule (docs/design/hockey.md, "Computed seasons"). These are not any game's ratings.`,
+    '',
+    `- ${computed('hdb').join(', ')}: ${hdb.compiler}.`,
+    `  Terms: ${hdb.licence}. The statement it asks for:`,
+    '',
+    `  "${hdb.attribution}"`,
+    '',
+    `- ${computed('moneypuck').join(', ')}: ${moneypuck.compiler}.`,
+    `  Terms: ${moneypuck.licence}. Credit: MoneyPuck.com (https://moneypuck.com).`,
+    '  Non-commercial: these files may not be used for commercial purposes without MoneyPuck.com\'s leave.',
+    '  Where MoneyPuck\'s player lookup gives no nationality, a season takes the Hockey Databank\'s birth country, under its',
+    `  terms and statement above (${computed('moneypuck', databank).join(', ')}).`,
+    '',
+    'In the game, setup shows the chosen season\'s credit under the Season choice (docs/design/hockey.md, "Credits"): the Hockey',
+    `Databank's statement above, in full, on the ${credited.filter(c => c.text.includes(hdb.attribution)).length} seasons that take anything from the databank, `
+      + `and "Data: ${moneypuck.provider}" on the ${credited.filter(c => c.text.startsWith(`Data: ${moneypuck.provider}`)).length} computed from its data.`,
+    '',
+  ].join('\n');
 }
 
 async function main() {
@@ -119,21 +384,43 @@ async function main() {
   if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
   const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/nhl-seasons.json'), 'utf8'));
   const results = [];
+  const credits = new Map();
   for (const entry of manifest.seasons) {
     const file = path.join(root, `scripts/data/nhl-seasons/${entry.id}.json`);
     if (!existsSync(file)) throw new Error(`No snapshot for ${entry.id}: run node scripts/sync-nhl-seasons.mjs --season=${entry.id}`);
-    results.push(buildSeason(entry, JSON.parse(await readFile(file, 'utf8')), manifest));
+    const snapshot = JSON.parse(await readFile(file, 'utf8'));
+    const build = entry.method === 'computed' ? buildComputed : entry.method === 'converted' ? buildConverted : buildSeason;
+    results.push(build(entry, snapshot, manifest));
+    credits.set(entry.id, creditOf(entry, snapshot, manifest));
   }
+  // Nations only from the first computed season with three real sides (src/engine/footballSets.js clubsOnly): the loader's
+  // id test must agree with the seasons.
+  const computed = results.filter(r => r.realSides).sort((a, b) => a.doc.year - b.doc.year);
+  const first = computed.find(r => r.realSides.length >= 3)?.doc.year;
+  const disagree = computed.filter(r => r.hasNations !== (r.doc.year >= first)).map(r => `${r.doc.id} (${r.realSides.join(', ')})`);
+  if (disagree.length) throw new Error(`The loader's clubsOnly test disagrees with the first season with three real sides (${first}): ${disagree.join('; ')}`);
   results.sort((a, b) => b.doc.year - a.doc.year);
   for (const { doc, text, audit } of results) {
-    console.log(`${doc.id} ${doc.season} ${doc.label} on ${doc.map}: ${doc.clubs.length} clubs, ${audit.nations.length} nations, ${audit.players} players `
+    const nations = Array.isArray(audit.nations) ? `${audit.nations.length} nations` : audit.nations;
+    console.log(`${doc.id} ${doc.season} ${doc.label} on ${doc.map}: ${doc.clubs.length} clubs, ${nations}, ${audit.players} players `
       + `(${audit.ratings.lowest}-${audit.ratings.highest}, median ${audit.ratings.median}), ${Math.round(Buffer.byteLength(text) / 1024)} KB; `
-      + `strongest ${audit.clubs.slice(0, 2).join(', ')}; ${audit.nations.slice(0, 2).join(', ')}`);
+      + `strongest ${audit.clubs.slice(0, 2).join(', ')}${Array.isArray(audit.nations) ? `; ${audit.nations.slice(0, 2).join(', ')}` : ''}`
+      + `${audit.realSides ? `; real sides ${audit.realSides.join(' ')}` : ''}`);
+  }
+  const fixture = JSON.parse(await readFile(path.join(root, 'scripts/data/nhl-seasons/calibration.json'), 'utf8'));
+  const calibration = calibrationAudit(manifest, fixture);
+  for (const e of calibration) {
+    for (const f of e.forms) {
+      console.log(`calibration ${e.id} (${f.form.skaters}, ${f.form.goalies}): F ${f.F.rho} D ${f.D.rho} G ${f.G.rho}, players ${f.playerGap} apart; `
+        + `clubs ${f.clubs.rho}, ${f.clubs.gap} apart`);
+    }
   }
   const outputs = [
     ...results.map(({ doc, text }) => [path.join(outDir, `${doc.id}.json`), text]),
-    [listingFile, listingModule(results.map(result => result.doc))],
-    [auditFile, `${JSON.stringify({ generatedBy: 'scripts/build-nhl-seasons.mjs', seasons: results.map(r => r.audit) }, null, 2)}\n`],
+    [path.join(outDir, 'ATTRIBUTION.txt'), attributionText(manifest, results.map(r => r.doc), credits)],
+    [listingFile, listingModule(results.map(result => result.doc), credits)],
+    [auditFile, `${JSON.stringify({ generatedBy: 'scripts/build-nhl-seasons.mjs', firstSeasonWithNations: seasonLabel(first), calibration,
+      seasons: results.map(r => r.audit) }, null, 2)}\n`],
   ];
   if (check) {
     const differs = [];

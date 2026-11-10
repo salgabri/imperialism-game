@@ -81,7 +81,7 @@
     "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs scripts/nba-map.test.mjs scripts/club-maps.test.mjs scripts/europe-maps.test.mjs",
     "test:american-football": "node --test scripts/american-football.test.mjs scripts/nfl-seasons.test.mjs scripts/tecmo.test.mjs",
     "test:baseball": "node --test scripts/baseball.test.mjs scripts/baseball-seasons.test.mjs",
-    "test:hockey": "node --test scripts/hockey.test.mjs scripts/hockey-seasons.test.mjs",
+    "test:hockey": "node --test scripts/hockey.test.mjs scripts/hockey-seasons.test.mjs scripts/hockey-computed.test.mjs",
     "test:rugby-league": "node --test scripts/rugby-league.test.mjs scripts/rugby-league-seasons.test.mjs",
     "test:womens-football": "node --test scripts/womens-football.test.mjs scripts/womens-seasons.test.mjs",
     "test:tennis": "node --test scripts/tennis.test.mjs scripts/tennis-seasons.test.mjs",

@@ -593,7 +593,8 @@ export default function SetupOverlay({
                 {model.season ? (
                   <div className="setup-group setup-group--season">
                     <span className="sr-only" id="setup-season-label">Season</span>
-                    <select id="setup-season" className="setup-season" aria-labelledby="setup-season-label" aria-describedby="setup-season-note"
+                    <select id="setup-season" className="setup-season" aria-labelledby="setup-season-label"
+                      aria-describedby={model.season.credit ? 'setup-season-note setup-season-credit' : 'setup-season-note'}
                       title={model.season.note} value={model.season.id ?? ''} onChange={event => pick('dataSet', event.target.value || null)}>
                       {model.season.options.map(option => <option value={option.id ?? ''} key={option.key}>{option.name}</option>)}
                     </select>
@@ -601,6 +602,8 @@ export default function SetupOverlay({
                   </div>
                 ) : null}
               </div>
+              {/* The chosen season's credit, as its sources ask it to be shown: on screen and whole, never only a title. */}
+              {model.season?.credit ? <p className="setup-season__credit" id="setup-season-credit">{model.season.credit}</p> : null}
               {model.season?.state === 'loading' ? (
                 <p className="setup-season__status setup-season__loading" role="status">{model.season.loading}</p>
               ) : null}
