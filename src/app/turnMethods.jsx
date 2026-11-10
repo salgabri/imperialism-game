@@ -72,6 +72,7 @@ export function beginDuel(turnArg) {
   const draw = turn
     ? createDuelDraw(this.rng, this.board(), { speed: st.speed, reducedMotion, attackerId: turn.attackerId })
     : createDuelDraw(this.rng, this.board(), { speed: st.speed, reducedMotion });
+  this.markDraw();
   const round = turn ? turn.round : st.round + 1;
   const notes = [];
   const attackerId = turn ? turn.attackerId : draw?.attackerId ?? null;
