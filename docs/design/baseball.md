@@ -302,7 +302,8 @@ not used. The 2020 season was 60 games; here it is a season like any other.
 
 ## Seasons before 2018: computed from WAR
 
-Status: built 2026-11-09. Fifty-eight more seasons, 1960 to 2017 (`mlb-war-<year>`,
+Status: built 2026-11-09; its names, birthplaces, records and ballparks re-sourced from
+the Baseball Databank on 2026-11-10. Fifty-eight more seasons, 1960 to 2017 (`mlb-war-<year>`,
 listed "Computed from WAR, end of <year>"), whose ratings no game published. Each
 player's rating is computed from his WAR and put on MLB The Show's scale, rank for rank
 within his role; the clubs, nations and maps are built as the MLB The Show seasons' are.
@@ -320,26 +321,37 @@ ignored `data-src/mlb-war/`:
   their terms pages answered HTTP 403 to the research pass and were not read, and no
   other Sports Reference or FanGraphs page was requested. 2025 is in the file only partly
   (it was made in April 2025) and is not used.
-- **Lahman Baseball Database 2025** (SABR, CC BY-SA 3.0): People (names, given names,
-  birth year and birth country, joined by `bbrefID`), Teams (each club's
+- **Baseball Databank** (Chadwick Baseball Bureau, CC BY-SA 3.0): People (names, given
+  names, birth year and birth country, joined by `bbrefID`), Teams (each club's
   Baseball-Reference code, name and record) and HomeGames (the ballpark each club played
-  most of its home games in). Every one of the 10,401 players of 1960 to 2017 is found.
-  The research pass downloaded the files from SABR's public Box share through its
-  download endpoint (`sabr.box.com/index.php?rm=box_download_shared_file…`), a path
-  box.com's robots.txt disallows to every agent (it allows the share's own pages, `/s/`);
-  the pinned SHA-256s let the same files be re-read from a copy that allows it.
+  most of its home games in, from Retrosheet's game logs). The Databank keeps the Lahman
+  database's tables and format, generated from the Bureau's own data. The Bureau's
+  repository (github.com/chadwickbureau/baseballdatabank) is no longer on GitHub, so its
+  last commit, `e9f247e` (Ted Turocy, 6 November 2023; seasons 1871 to 2022), is read from
+  raw.githubusercontent.com through a fork whose master is that commit
+  (github.com/infonuum/baseballdatabank); each file's git blob is checked against that
+  commit's tree (GitHub's API) and its SHA-256 pinned. raw.githubusercontent.com and
+  api.github.com serve no robots.txt; github.com's own pages were not requested.
+  Retrieved 10 November 2026, one request every 1.5 s, User-Agent
+  `imperialism-game-data/1.0`. Every one of the 10,401 players of 1960 to 2017 is found,
+  each filed once. The research pass's copy of the Lahman 2025 files, from sabr.box.com,
+  was replaced because box.com's robots.txt disallows the download path it came through.
 - **English Wikipedia** (CC BY-SA 4.0; facts only): the names of the day and the
   coordinates of the ballparks of 1960 to 1979, from 39 articles' infoboxes, and Elmer
-  Valo's birthplace; each article's revision and SHA-256 is pinned. en.wikipedia.org's
+  Valo's birthplace, the one birth country the Databank gets wrong (below); each
+  article's revision and SHA-256 is pinned. en.wikipedia.org's
   robots.txt allows /wiki/ pages to every agent; one request every 1.5 s, 2026-11-09.
   The research pass had read the same parks' coordinates from Wikidata's query service,
   whose robots.txt disallows /sparql; those answers are not used.
 - **MLB The Show 18 to 24** (the earlier seasons' snapshots): the scale only, and the
   calibration. No card is copied into these seasons.
 
-`public/baseball/ATTRIBUTION.txt` credits all three, repeats the MIT notice, credits
-Baseball-Reference and FanGraphs as the WAR's origin, and puts the season files and their
-snapshots under CC BY-SA 3.0, as Lahman's share-alike licence asks of derived data.
+`public/baseball/ATTRIBUTION.txt` credits all three, repeats the MIT notice and, in the
+Databank README's own words, its CC BY-SA 3.0 statement and Retrosheet's notice (the
+importer checks that the README holds both), credits Baseball-Reference and FanGraphs as
+the WAR's origin and the Lahman database of 2015 the Databank grew from, and puts the
+season files and their snapshots under CC BY-SA 3.0, as the Databank's share-alike licence
+asks of derived data.
 
 **Building.** `npm run import:mlb-war` (`scripts/import-mlb-war.mjs`) checks every pin,
 never fetches, and writes one snapshot a season, `scripts/data/mlb-war-seasons/<year>.json`
@@ -401,10 +413,11 @@ the other six seasons' reference):
 | all (9,674) | 4.38 | | | 53% |
 
 Club strength (each club's lineup by the game's own rule) against the Show-built clubs of
-the same seasons: r 0.892, mean error 1.13 points, bias +0.24. Against the real records,
-the computed clubs correlate better than the Show's own in five of the seven seasons
-(2018 0.89 against 0.87, 2019 0.92/0.89, 2020 0.67/0.70, 2021 0.79/0.82, 2022 0.94/0.91,
-2023 0.82/0.82, 2024 0.90/0.88). Out of sample, the computed 2016 against MLB The Show
+the same seasons: r 0.892, mean error 1.13 points, bias +0.24. Against the real records
+(the Databank's, which end with 2022, so 2023 and 2024 have none: `winShare` null), the
+computed clubs correlate better than the Show's own in three of the five seasons (2018 0.89
+against 0.87, 2019 0.92/0.89, 2020 0.67/0.70, 2021 0.79/0.82, 2022 0.94/0.91). Out of
+sample, the computed 2016 against MLB The Show
 17's launch top five at every position (GamesRadar, 40 players): r 0.81, mean error 3.9,
 the computed 3.8 lower (the list is the Show's own top, which the rank mapping
 compresses).
@@ -433,29 +446,31 @@ season (109 of the 1,522 club-seasons, nearly all before 1990; the 1975 Reds use
 keeps every one it used beside its thirteen hitters, so its squad has 23 to 25 players;
 nothing is made up to fill it.
 
-**Names.** Lahman's first name and surname, with the WAR file's generational suffix (Ken
-Griffey and Ken Griffey Jr., the 1990 Mariners), initials written as the Show writes them
-("A.J. Burnett", where Lahman has "A. J."). Namesakes of one season who would share a
-squad are told apart: the better keeps the name, the others take a middle initial from
-Lahman's given names ("Bob L. Miller"), else a birth year. Only one pair shares a squad in
-the 58 seasons: Pedro Martinez of 1968 beside Pedro Martinez of 1971 in the Dominican
-Republic's squads of 1993 to 1995 ("Pedro Martinez (1968)"); Lahman gives the elder no
-middle name.
+**Names.** The Databank's first name and surname, with the WAR file's generational suffix
+(Ken Griffey and Ken Griffey Jr., the 1990 Mariners), initials written as the Show writes
+them ("A.J. Burnett", where the Databank has "A. J."). The Databank writes names without
+diacritics (Tony Pena, Minnie Minoso) and some by the name the player goes by today (Yolmer
+Sanchez, the White Sox's Carlos Sanchez of 2014–17). Namesakes of one season who would
+share a squad are told apart: the better keeps the name, the others take a middle initial
+from the Databank's given names ("Bob L. Miller"), else a birth year. Only one pair shares
+a squad in the 58 seasons: Pedro Martinez of 1968 beside Pedro Martinez of 1971 in the
+Dominican Republic's squads of 1993 to 1995 ("Pedro Martinez (1968)"); the Databank gives
+the elder no middle name.
 
-**Nations.** By Lahman's birth country, as every baseball season places players by
-birthplace (`nations` in the manifest): US states, the Virgin Islands, Guam and American
-Samoa are the United States'; Curaçao, Aruba and the Netherlands the Kingdom of the
-Netherlands'; England and Scotland the United Kingdom's. Countries of their day are
-today's: West Germany (14 players) is Germany, the Soviet Union (Victor Cole, Leningrad)
-Russia, South Vietnam (Danny Graves, Saigon) Vietnam, British Honduras (Chito Martinez)
-Belize, and Czechoslovakia (Elmer Valo) Slovakia, for his birthplace Rybník in Levice
-District (Wikipedia, citing his SABR biography; Lahman's birth state reads "Plzenský").
-Hong Kong's Austin Brice is China's, as Lahman files him. The game has no Singapore, so
-Robin Jennings plays for his club only; every other player of the 58 seasons has a
-nation. Lahman files four of these players' Baseball-Reference ids twice, each beside a
-man with no major-league debut: the player is the one with a debut (Bob Johnson of
-1969–1977, `johnsbo03`, born in Aurora, Illinois, not the `johnsbo05` filed under his id
-with no birthplace; Bob McClure, Eddie Miller and Billy Parker likewise). Each nation
+**Nations.** By the Databank's birth country, as every baseball season places players by
+birthplace (`nations` in the manifest): US states, the Virgin Islands (the Databank's
+"V.I."), Guam and American Samoa are the United States'; Curacao, Aruba and the
+Netherlands the Kingdom of the Netherlands'; the United Kingdom's players (born in England
+and Scotland) the United Kingdom's. The Databank names today's countries: Germany for West
+Germany, Russia (Victor Cole, Leningrad), Viet Nam (Danny Graves, Saigon), Belize (Chito
+Martinez). Rod Carew (Gatun) and Mike Eden (Fort Clayton), born in the Panama Canal Zone,
+are Panama's, as the Databank files them. The Databank files Elmer Valo under the Czech
+Republic, his birth state reading "Plzensky"; he was born in Rybník in Levice District,
+Slovakia (Wikipedia, citing his SABR biography), and the manifest's `birthCountries`
+gives him Slovakia: the one correction, which the importer applies only while the
+Databank still reads "Czech Republic". Hong Kong's Austin Brice is China's, as MLB The
+Show files him (the game has no Hong Kong). The game has no Singapore, so Robin Jennings
+plays for his club only; every other player of the 58 seasons has a nation. Each nation
 keeps its lineup and up to a club's depth; 4 to 10 nations a season field a team by the
 game's rule (their own players hold half the lineup): in 1960 the United States, Cuba,
 Puerto Rico and the Dominican Republic; Canada, Panama, Venezuela and Mexico in some
@@ -467,15 +482,17 @@ needs four of its nations' real sides, is offered in every season but 1985–87 
 
 **Clubs of their day.** `scripts/data/mlb-war-seasons.json` `eras` names each franchise's
 clubs of 1960 to 2017 by today's franchise: its Baseball-Reference code (`war`, the code
-the WAR file and Lahman use), its own id, name, code and territory where they are not
-today's, its ballpark of the day and its point (`home`), and Lahman's key of that
-ballpark (`park`). The build checks every season against Lahman: the same clubs under the
-same codes and names, each at the ballpark it played most of its home games in (which
-places the mid-season moves: the 1966 Cardinals at Busch Memorial Stadium, the 1970 Reds
-at Riverfront, the 1970 Pirates still at Forbes Field (42 games to Three Rivers' 40), the
-1989 Blue Jays at SkyDome, the 1999 Mariners at Safeco Field). The one name Lahman gives
-otherwise is the Angels' of 2016–17, Los Angeles Angels from 2016 (the 1980–2020 eras
-research), which Lahman still calls "of Anaheim" (`lahmanName`).
+the WAR file and the Databank use), its own id, name, code and territory where they are not
+today's, its ballpark of the day and its point (`home`), and the Databank's key of that
+ballpark (`park`, Retrosheet's park code). The build checks every season against the
+Databank: the same clubs under the same codes and names, each at the ballpark it played
+most of its home games in (which places the mid-season moves: the 1966 Cardinals at Busch
+Memorial Stadium, the 1970 Reds at Riverfront, the 1970 Pirates still at Forbes Field (42
+games to Three Rivers' 40), the 1989 Blue Jays at SkyDome, the 1999 Mariners at Safeco
+Field); the importer stops on a club that played as many home games at two ballparks. The
+one name the Databank gives otherwise is the Angels' of 2016–17, Los Angeles Angels from
+2016 (the 1980–2020 eras research), which the Databank still calls "of Anaheim"
+(`databankName`).
 
 - Clubs of another name have their own ids and no crest: the Milwaukee Braves (1960–65),
   Kansas City Athletics (1960–67), Washington Senators of 1901 (1960, today's Twins) and of
@@ -524,11 +541,12 @@ empty.
 **Checks.** `scripts/baseball-war-seasons.test.mjs` (in `npm run test:baseball`): the
 importer's rebuild (when the caches are on the computer); every snapshot score from its
 inputs; the reference's 9,674 cards and its calibration (mean error at most 4.5, clubs r
-at least 0.88); ratings that keep each role's order; the listing, after MLB The Show's,
-each season on its map; every season decoding, computed, its clubs its map's, each
-fielding all nine places and keeping 26 players or every pitcher it used; the spot checks
-above and the record correlation; the nations of 1960 and the countries of their day; the
-namesakes; the clubs of their day; the rename rule (37 maps, ballparks named in place,
+at least 0.88; records to 2022); ratings that keep each role's order; the listing, after
+MLB The Show's, each season on its map; every season decoding, computed, its clubs its
+map's, each fielding all nine places and keeping 26 players or every pitcher it used; the
+spot checks above and the record correlation; the nations of 1960, the Databank's birth
+countries, Elmer Valo's correction and Rod Carew's Panama; the namesakes; the clubs of
+their day; the rename rule (37 maps, ballparks named in place,
 2017 with 2018's places); every club growing inside its own land, Los Angeles in 1961, the
 Polo Grounds and the tenants; the loader's refusals; and the running App launching a 1961
 clubs campaign on `mlb1961` and resuming it. `scripts/club-maps.test.mjs` holds the 37
@@ -544,7 +562,11 @@ and "Los Angeles (Angels)" for 1961–65 and "Manhattan" for the Polo Grounds Me
 Senators' ids by founding year (`mlb-washington-senators-1901`, `-1961`); a club short of
 thirteen pitchers keeps the ones it used; namesakes in one squad keep the better player's
 name; the ballparks' names and coordinates of 1960–79 from Wikipedia rather than the
-research pass's Wikidata answers.
+research pass's Wikidata answers. The re-sourcing's (2026-11-10): the Lahman tables from
+the Chadwick Bureau's Baseball Databank, the first choice asked for, read at its last commit
+through a fork; its names and birth countries as it gives them (the Peñas become Pena, Rod
+Carew and Mike Eden Panama's), Elmer Valo's alone corrected; the calibration's record check
+limited to the Databank's seasons (2018–2022) rather than a second source for 2023–24.
 
 ## Known limits
 
@@ -563,6 +585,10 @@ research pass's Wikidata answers.
   season is played with a designated hitter and rosters of up to 26, which those seasons
   did not have. The WAR averages Baseball-Reference's and FanGraphs', whose terms could
   not be read.
+- Names and birthplaces of 1960 to 2017 are the Baseball Databank's of November 2023, a
+  resource its own README calls legacy, its legacy parts unmaintained: names without
+  diacritics, and whatever it has not corrected since. Its seasons end with 2022, so the
+  calibration checks no records of 2023 or 2024.
 - Nations by birthplace, not eligibility; no NPB, KBO or CPBL players.
 - The ace starts every game, and a run scores as runs batted in only: no errors, wild
   pitches or unearned runs, no home runs as such.

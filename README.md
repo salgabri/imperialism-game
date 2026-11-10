@@ -114,7 +114,7 @@ npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scrip
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
 npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
-npm run import:mlb-war   # rebuild the 1960–2017 baseball snapshots from the pinned WAR and Lahman files in data-src/mlb-war/ (--check compares byte for byte)
+npm run import:mlb-war   # rebuild the 1960–2017 baseball snapshots from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check compares byte for byte)
 npm run build:mlb-map    # rebuild MLB's maps of the USA and Canada, today's and the 43 of earlier seasons (1–2 minutes a map; --check compares byte for byte)
 npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (network, cached)
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
@@ -1562,15 +1562,19 @@ only when chosen.
   of Baseball-Reference's and FanGraphs' WAR) per playing time over the season and the
   two before it is put rank for rank, within hitters, starters and relievers, on MLB
   The Show 18 to 24's scale; tested on 2018–2024, it misses the Show by about 4.4
-  points a player. Names, birthplaces and each club's main ballpark are the Lahman
-  Baseball Database's. The clubs of their day (the Milwaukee Braves, the Senators,
+  points a player. Names, birthplaces and each club's main ballpark are the Chadwick
+  Baseball Bureau's Baseball Databank's (its last commit, read from a GitHub fork, as
+  the Bureau's own repository is gone), with one birthplace corrected from Wikipedia
+  (Elmer Valo's). The clubs of their day (the Milwaukee Braves, the Senators,
   the Expos…) play on 37 era maps, `mlb1960` to `mlb2017`
   ([design notes](docs/design/baseball.md#seasons-before-2018-computed-from-war)).
   Nothing before 1960.
-- **Licence of the computed seasons:** JEFFBAGWELL is MIT; the Lahman database is
+- **Licence of the computed seasons:** JEFFBAGWELL is MIT; the Baseball Databank is
   CC BY-SA 3.0 (share-alike), so the season files and their snapshots are shared
-  under it. `public/baseball/ATTRIBUTION.txt` credits both, repeats the MIT notice and
-  names Baseball-Reference and FanGraphs as the WAR's origin.
+  under it. `public/baseball/ATTRIBUTION.txt` credits both, repeats the MIT notice,
+  the Databank's licence statement and Retrosheet's notice (the Databank's home games
+  come from Retrosheet's game logs), and names Baseball-Reference and FanGraphs as the
+  WAR's origin.
 - **A source error:** MLB The Show 24's API gives the wrong country for players
   born outside the United States (Juan Soto "At Sea", Ronald Acuña Jr. "Slovenia").
   The build takes each such player's birthplace from the nearest sound edition
@@ -1582,7 +1586,7 @@ only when chosen.
   ```bash
   npm run import:mlb-showzone   # 2018–2020's snapshots, from the pinned ShowZone cache in data-src/showzone/ (--check)
   npm run sync:mlb-birthplaces  # MLB 18's missing birthplaces from MLB's Stats API, pinned in scripts/data/mlb-birthplaces.json
-  npm run import:mlb-war      # 1960–2017's snapshots, from the pinned WAR and Lahman files in data-src/mlb-war/ (--check)
+  npm run import:mlb-war      # 1960–2017's snapshots, from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check)
   npm run build:mlb-seasons   # the season files, src/data/baseballSeasons.js and the audits (--check compares byte for byte)
   npm run build:mlb-map       # today's map and the era maps from scripts/data/mlb-seasons.json and mlb-war-seasons.json
   ```
