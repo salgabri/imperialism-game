@@ -200,8 +200,12 @@ const eraMapOf = (id, map) => CLUB_MAPS.find(entry => entry.id === map && entry.
 /** Whether a club map is an earlier era's, played only with its seasons' clubs. */
 export const isEraMap = id => [...CLUB_MAPS, ...EUROPE_MAPS].some(entry => entry.id === id && entry.seasons != null);
 
-/** Whether a Europe map (src/data/europeMaps.js) is the one of football data set `id`. */
-export const isSeasonEuropeMap = (mapId, id) => EUROPE_MAPS.some(entry => entry.id === mapId && !!entry.seasons?.includes(id));
+/**
+ * Whether a map its clubs choose between is one of data set `id`'s: a football season's Europe map, or a women's
+ * football season's Europe or NWSL map (src/data/europeMaps.js, clubMaps.js).
+ */
+export const isSeasonTheatreMap = (mapId, id) => [...EUROPE_MAPS, ...CLUB_MAPS]
+  .some(entry => entry.id === mapId && entry.sport === setSportOf(id) && !setIsMapped(id) && !!entry.seasons?.includes(id));
 
 /** The built-in earlier seasons of every sport, newest first, as the index lists them. */
 export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_WOMENS_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS,

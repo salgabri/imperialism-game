@@ -1,6 +1,6 @@
 import { SAVE_KEY, SAVE_VERSION } from '../config.js';
 import { DOMESTIC_PREFIX, domesticScopeId, isDomesticScope } from './domestic.js';
-import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, isSeasonEuropeMap, seasonLabelOf, seasonMapOf, setHasClubs, setHasNations, setIsMapped,
+import { expandSetPlayer, isDataYear, isEraMap, isFootballSetId, isSeasonTheatreMap, seasonLabelOf, seasonMapOf, setHasClubs, setHasNations, setIsMapped,
   setKindOf, setSportOf } from './footballSets.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 import { CM_ROLES, CM_SOURCE, cmTupleOf } from '../data/cmPlayers.js';
@@ -335,16 +335,17 @@ function validateCampaign(input, rebuildSources) {
     // A data set campaign names the set, the build it was played on and its season, or none of them. A set plays in its
     // own sport: a football one on its own Europe maps or the world, never on a country map (those use the built-in
     // data) and never with clubs if it has none. Any other sport's set plays the layers it has: its nations, or its clubs,
-    // on its era's map when its clubs have one (an NBA or MLB season's, which no other campaign plays on), else on the
-    // world (the women's game's).
+    // on its era's map when its clubs have one (an NBA or MLB season's, which no other campaign plays on), else on one of
+    // the season's own maps (the women's game's: Europe's and the NWSL's) or, saved before those, on the world.
     const { dataSet, dataVersion, dataYear, dataSeason } = configuration;
     const sport = getSport(configuration.sport).id;
     if (dataSet == null ? [dataVersion, dataYear, dataSeason].some(value => value != null) || (domestic && isEraMap(domesticScopeId(clubScope)))
       : !isFootballSetId(dataSet) || setSportOf(dataSet) !== sport
-        || (sport === 'football' ? (domestic && !isSeasonEuropeMap(domesticScopeId(clubScope), dataSet))
+        || (sport === 'football' ? (domestic && !isSeasonTheatreMap(domesticScopeId(clubScope), dataSet))
             || (configuration.layer === 'clubs' && !setHasClubs(dataSet))
           : configuration.layer !== 'clubs' ? !setHasNations(dataSet)
-          : !setHasClubs(dataSet) || (setIsMapped(dataSet) ? !domestic || domesticScopeId(clubScope) !== seasonMapOf(dataSet) : domestic))
+          : !setHasClubs(dataSet) || (setIsMapped(dataSet) ? !domestic || domesticScopeId(clubScope) !== seasonMapOf(dataSet)
+            : domestic && !isSeasonTheatreMap(domesticScopeId(clubScope), dataSet)))
         || typeof dataVersion !== 'string' || !new RegExp(`^${dataSet}-[0-9a-f]{8}$`).test(dataVersion)
         || !isDataYear(dataYear) || dataSeason !== seasonLabelOf(dataSet, dataYear)) invalid('Campaign data set is invalid.');
   }

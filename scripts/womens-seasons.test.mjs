@@ -53,7 +53,7 @@ test('the seasons run from EA FC 26 back to FIFA 16, newest first, beside the bu
     assert.equal(setSportOf(listed.id), 'womens-football');
     assert.ok(setHasNations(listed.id));
     assert.equal(setHasClubs(listed.id), !NATIONS_ONLY.includes(listed.id), `${listed.id}: clubs from FIFA 23 on`);
-    assert.ok(!setIsMapped(listed.id) && seasonMapOf(listed.id) == null, 'women\'s clubs play on the world');
+    assert.ok(!setIsMapped(listed.id) && seasonMapOf(listed.id) == null, 'women\'s clubs choose between their season\'s maps');
     assert.equal(seasonFile(listed.id).version, listed.version);
   }
   // The men's seasons keep their own ids and kind.
@@ -163,7 +163,7 @@ async function withApp(fn) {
   const calls = [];
   const fetch = async url => {
     calls.push(String(url));
-    const [, folder, id] = String(url).match(/^\/(womens-football)\/([0-9A-Za-z-]+)\.json$/) || [];
+    const [, folder, id] = String(url).match(/^\/(womens-football|domestic)\/([0-9A-Za-z-]+)\.json$/) || [];
     let text = null;
     try { text = folder ? read(`public/${folder}/${id}.json`) : null; } catch { text = null; }
     return text ? { ok: true, status: 200, json: async () => JSON.parse(text) }
@@ -233,24 +233,25 @@ test('a season\'s national teams launch with that year\'s players and resume as 
   });
 });
 
-test('a season\'s clubs launch in their leagues, on the world, and save', async () => {
+test('a season\'s clubs launch on its own map of Europe, and save', async () => {
   await withApp(async ({ app, time, items }) => {
     app.pickSetup('sport', 'womens-football');
     app.pickSetup('layer', 'clubs');
+    app.pickSetup('clubScope', 'domestic:weu32');
     app.pickSetup('dataSet', 'eaw-fifa-23');
+    assert.equal(app.state.setup.clubScope, 'domestic:weus2023', 'FIFA 23 rated 24 European clubs: no elite of 32, and no NWSL');
     time.advance(200);
     await app.loadSet('eaw-fifa-23');
+    await app.loadCountry('weus2023');
     await settle();
     const doc = seasonFile('eaw-fifa-23');
-    app.pickSetup('clubScope', 'all');
     app.startCampaign();
     const st = app.state;
     assert.equal(st.phase, 'playing');
-    assert.deepEqual([st.settings.layer, st.settings.dataSet, st.settings.clubScope], ['clubs', 'eaw-fifa-23', 'all']);
-    // The test map has seven shapes, so the seven strongest clubs of the 2022/23 WSL and D1 Arkema take them.
-    const strongest = doc.clubs.slice().sort((a, b) => b.str - a.str).slice(0, 7);
-    assert.deepEqual(Object.keys(st.teams).sort(), strongest.map(club => club.id).sort());
-    for (const club of strongest) {
+    assert.deepEqual([st.settings.layer, st.settings.dataSet, st.settings.clubScope], ['clubs', 'eaw-fifa-23', 'domestic:weus2023']);
+    // Every club of the 2022/23 WSL and D1 Arkema, each on its own country's land.
+    assert.deepEqual(Object.keys(st.teams).sort(), doc.clubs.map(club => club.id).sort());
+    for (const club of doc.clubs) {
       assert.deepEqual(st.teams[club.id].squad.map(player => player.name), club.squad.map(tuple => tuple[1]), `${club.name} as FIFA 23 rated them`);
     }
     assert.equal(st.teams['w-arsenal'].name, 'Arsenal');

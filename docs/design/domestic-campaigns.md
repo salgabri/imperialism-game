@@ -961,6 +961,34 @@ territory; Victoria, the ACT and Auckland are one club's, Cairns the Cowboys', W
 seeded duel campaigns reach a champion across the Tasman; the App launches on the map. `scripts/club-maps.test.mjs`
 holds it to the state rule with towns of each state and region. The smoke runs an NRL duel.
 
+## The NWSL map
+
+Status: implemented 2026-11-09. Women's football's NWSL clubs ([womens-football.md](womens-football.md)) play one of
+the sport's three club theatres, **NWSL**, on `public/domestic/nwsl.json`: the USA, where each of the 16 clubs holds the
+state its stadium stands in, by the same command and partition (`LEAGUES.nwsl` in `scripts/build-club-maps.mjs`;
+`npm run build:nwsl-map`). The other two are maps of Europe (below), so unlike the NBA's this map is not the sport's
+only one: `clubMapOf` leaves a sport with Europe maps alone, and the setup lists the NWSL beside them
+(`theatreMapsOf` in `src/data/domesticScope.js`).
+
+- **Stadiums**: `scripts/data/nwsl-teams.json`, each point Wikidata's (the club's home venue, or the stadium's own item),
+  with `seasons` for the clubs that played elsewhere, or under another stadium name, in an earlier season.
+- **Shared state**: California's three clubs (Bay FC 211,000 km², Angel City 105,000, the San Diego Wave 94,000) split it
+  along its counties. The Washington Spirit holds only the District of Columbia, as the Wizards and Nationals do.
+- **A join**: Boston Legacy FC plays at Centreville Bank Stadium in Pawtucket, Rhode Island, until White Stadium opens in
+  2028 (Wikipedia), so `joins: { 'US-RI': ['US-MA'] }` gives it Massachusetts too, as the NFL's Commanders hold DC.
+  Gotham FC holds New Jersey only, its stadium's; New York stays empty.
+- **Earlier seasons**: `nwsls<year>` for each women's season with NWSL clubs: 2025 (EA FC 26, 14 clubs), 2024 (EA FC
+  25, 14) and 2023 (EA FC 24, 12). Each is its season's alone, its clubs in that season's strength order, and the index
+  entry names its strongest (`eraTop`), since the setup cannot read them off the season: half its clubs are European. In
+  2023 the Current played at Children's Mercy Park in Kansas City, Kansas, so they hold Kansas; the Chicago clubs hold
+  Illinois from Bridgeview (2023–24) and Evanston (2025 on).
+- The files are about 135 KB; the index entries add `venue: "stadium"` and `lines: "state"`, so the setup reads
+  "… fighting over the USA, each starting with only its stadium's state."
+
+**Checks**: `scripts/club-maps.test.mjs` holds every NWSL map to the state rule (Boston Legacy joined to Massachusetts);
+`scripts/womens-club-maps.test.mjs` checks the fields, California's three, DC, Kansas in 2023, the setup and a seeded
+campaign to a champion. The smoke runs an NWSL blitz.
+
 ## The Europe maps
 
 Status: implemented 2026-11-07. Football clubs have two theatres, **Top 124** and
@@ -1056,7 +1084,7 @@ until a season leaves it. The setup lists the season's two rows ("Europe") above
 countries, known even while a season loads, and describes the rules. A session length
 picks between them (Short: Elite 32), and leaves a chosen country as it is. `dataSetOf`
 keeps a season on its own maps; `parseCampaign` accepts a set only on its own map
-(`isSeasonEuropeMap`). The map's rows take the season's clubs at kick-off, as a basketball
+(`isSeasonTheatreMap`). The map's rows take the season's clubs at kick-off, as a basketball
 era's do. The victory names "Europe".
 
 **Old games.** A world campaign saved before these maps (`clubScope` `all`, `elite` or a
@@ -1076,6 +1104,44 @@ colours; seeded duel campaigns on both built-in maps reach a champion without tr
 `setClubScope` and `dataSetOf`; the App sets up and launches both a built-in and a season
 map, and keeps an old campaign on the world. The smoke runs Elite 32 and Top 124
 campaigns and an Elite 32 resume.
+
+**Women's football** (2026-11-09). The same build makes women's football's maps
+(`sport: 'womens-football'`), which replaced its single-league theatres and its clubs'
+dealing across the world map, where 70 of the 84 clubs started on foreign land. Its
+European clubs (`isEuropeanClub`: a UEFA country's) play **Europe**, every one EA rates,
+`weu` (68 clubs in 13 countries), and **Elite 32**, the strongest 32, `weu32` (6 countries);
+its NWSL clubs play [their own map](#the-nwsl-map). The user chose this over one map per
+league and over a transatlantic map that kept all 84 together.
+
+- **Homes** are the women's own grounds (`w-` rows of `scripts/data/europe-clubs.json`):
+  the club's Wikidata home venue, else Wikipedia's ground, else the men's club's ground when
+  the women play in the same town (`as f-…`), else the town by hand. Wikidata was wrong for
+  Granada (a ground in Jerez) and old for Aston Villa (Villa Park since 2024). So Manchester
+  United's land is Leigh's, Chelsea's Kingston's, Arsenal's Holloway's (the Emirates). A club has
+  one row for every season, as the men's do, so an earlier season's map puts it at today's ground:
+  Arsenal at the Emirates in 2022/23, when it still played at Meadow Park.
+- **Sweden** joins `COUNTRIES` (ADM2 municipalities in ADM1 counties) for Häcken and Rosengård.
+- **Crowding**: England's 14 include seven London clubs, so as in the men's maps some start
+  hemmed in or next door: Arsenal holds about 1,200 km², Tottenham, West Ham and Charlton start
+  8–36 km from their grounds. The Basque Country's four leave Athletic Club about 2,000 km² and
+  start Eibar about 50 km out.
+- **Seasons**: `weus<year>` and `weu32s<year>` for EA FC 26, 25 and 24; FIFA 23 rated 24
+  European clubs (the WSL and D1 Arkema), so `weus2023` alone: a setup's Elite 32 or NWSL plays
+  it. Each women's entry names its three strongest (`top`), seasons too.
+- **Names**: the all-Europe theatre is "Europe" (`league` and `name` alike, so `domesticLabel`
+  says it once), and the setup describes it as "the 68 European clubs EA rates".
+- **Old games**: a world campaign saved on a women's theatre of before (`all`, `elite`, a
+  league) restores on the world under its old name ("All Leagues", also for a season's,
+  which `worldClubTheatreName` called "Top 124" before). A new setup turns `all` and a
+  European league into Europe, `elite` into Elite 32 and `NWSL` into the NWSL map; so does a
+  challenge link, though one naming a European league reports the theatre as not offered.
+  `CLUB_SCOPES` keeps `all`, `elite` and `NWSL` as the ids those name.
+
+**Checks** (women's): `scripts/europe-maps.test.mjs` holds every women's map to the same
+land rules; `scripts/womens-club-maps.test.mjs` checks the fields, the places, single-club
+and grey countries, the setup, challenge links, seeded campaigns to a champion, launching
+built-in and season maps, refusing a season on another's map, and old world saves. The
+smoke runs a women's Elite 32 duel.
 
 ## Known limitations
 

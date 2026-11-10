@@ -7,7 +7,7 @@ import { NATIONS, SCOPES, isTennisSport, nationIdentity } from '../../data/teams
 import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
 import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
-import { clubMapOf, domesticEntry, domesticLabel, europeMapsOf, isDomesticScope } from '../../data/domesticScope.js';
+import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
@@ -270,13 +270,17 @@ function clubMapTheatre(map) {
   return clubMapRows.get(map.id);
 }
 
-const europeRows = new Map();
-/** Football's club theatres in a season (`dataSet`, null for the built-in one): its Europe maps, or none for a set without them. */
-function europeTheatres(dataSet = null) {
-  if (!europeRows.has(dataSet)) {
-    europeRows.set(dataSet, Object.freeze(europeMapsOf(dataSet).map(map => Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' }))));
+const mapRows = new Map();
+/**
+ * The club theatres of a sport whose clubs choose between maps, in a season (`dataSet`, null for the built-in one):
+ * football's Europe maps, women's football's and its NWSL map (`theatreMapsOf`), or none for a set without them.
+ */
+function mapTheatres(sportId, dataSet = null) {
+  const key = `${sportId}|${dataSet}`;
+  if (!mapRows.has(key)) {
+    mapRows.set(key, Object.freeze(theatreMapsOf(sportId, dataSet).map(map => Object.freeze({ id: `domestic:${map.id}`, name: map.league, label: map.league, count: map.clubs, note: '' }))));
   }
-  return europeRows.get(dataSet);
+  return mapRows.get(key);
 }
 
 /** Theatre rows for the active layer: [{ id, name, label, count, note }] (counts as in HEAD's setup). */
@@ -285,8 +289,8 @@ export function theatreOptions(sport, clubLayer) {
     // A basketball season plays on its era's map (`clubMap`).
     const map = clubMapOf(sport.id, sport.clubMap);
     if (map) return clubMapTheatre(map);
-    const europe = sport.id === 'football' ? europeTheatres(sport.dataSet ?? null) : [];
-    return europe.length ? europe : clubTheatres(sport);
+    const maps = mapTheatres(sport.id, sport.dataSet ?? null);
+    return maps.length ? maps : clubTheatres(sport);
   }
   // Only where the sport is played (data/scopes.js `nationTheatres`).
   const counts = nationCounts(sport);
@@ -297,12 +301,12 @@ export function theatreOptions(sport, clubLayer) {
  * Theatre rows while a chosen data set loads, with no counts (`count: null`): its nations and leagues are not known
  * yet. Clubs offer every club and the elite, plus a league already chosen, which the set keeps or drops once loaded.
  * The maps a season's clubs play on are known already, clubs counted: a basketball season's era map, a football
- * season's Europe maps.
+ * season's Europe maps, a women's football season's Europe and NWSL maps.
  */
 function pendingTheatres(builtIn, clubLayer, clubScope) {
   if (!clubLayer) return SCOPES.map(scope => theatreRow(scope, null));
   const map = domesticEntry(clubScope);
-  if (map?.theatre) return europeTheatres(map.seasons?.[0] ?? null);
+  if (isTheatreMap(map)) return mapTheatres(map.sport, map.seasons?.[0] ?? null);
   if (map?.sport === builtIn.id) return clubMapTheatre(map);
   const [all, elite, ...leagues] = CLUB_SCOPES(builtIn);
   return [all, elite, ...leagues.filter(scope => scope.id === clubScope)].map(scope => theatreRow(scope, null));
@@ -392,7 +396,9 @@ export function domesticDescription(entry) {
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
   if (entry.theatre) {
-    return `${leaders} Europe's ${clubs} strongest clubs, each on land in its own country: alone it holds all of it, and clubs that `
+    // Women's football's every European club: as many as EA rates that season.
+    const field = entry.theatre === 'all' && entry.sport !== 'football' ? `the ${clubs} European clubs EA rates` : `Europe's ${clubs} strongest clubs`;
+    return `${leaders} ${field}, each on land in its own country: alone it holds all of it, and clubs that `
       + 'share a country split it along its regional borders. A country with no club stays grey.';
   }
   if (entry.league) {
@@ -720,8 +726,10 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     theatreNotes: scopes.filter(scope => scope.note),
     domesticScopes, leagueGroup: LEAGUE_GROUP, domesticGroup: DOMESTIC_GROUP,
     country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs, countries: country.countries ?? null } : null,
-    // A basketball season's own strongest clubs lead its map, named once it has loaded.
-    countryNote: !country ? '' : domesticDescription(dataSet == null ? country : { ...country, top: pending ? [] : strongestClubs(sport) }),
+    // A basketball season's own strongest clubs lead its map, named once it has loaded. A season's map with only some of
+    // its clubs (women's football's: Europe's, the NWSL's) names its own.
+    countryNote: !country ? '' : domesticDescription(dataSet == null || (country.top && country.seasons?.includes(dataSet)) ? country
+      : { ...country, top: pending ? [] : strongestClubs(sport) }),
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
     mapLoading, launching,
     // Step 3's team list is empty until a country's map decodes.
