@@ -7,7 +7,7 @@ import React, { act } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { exportCampaign, loadSave } from '../src/engine/storage.js';
 import { SAVE_KEY } from '../src/config.js';
-import { buildClub, selectLineup } from '../src/data/teams.js';
+import { NATIONS, buildClub, selectLineup } from '../src/data/teams.js';
 import { clubLogoFile } from '../src/data/clubLogos.js';
 import { getSport } from '../src/sports/index.js';
 import { readFileSync } from 'node:fs';
@@ -17,7 +17,7 @@ import { recommendedTactic } from '../src/engine/managerStrategy.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { mergeSharedIds } from '../src/engine/geo.js';
-import { ROOT, bundleApp, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
+import { ROOT, bundleApp, bundleComponents, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 const BundledApp = await bundleApp();
 
@@ -1315,6 +1315,7 @@ test('a country map keeps no world display atlas; the way back builds it again, 
     app.fitMap(ids);
     assert.equal(app.displayGeo, null);
     assert.ok(Object.values(app).every(value => value !== world), 'nothing on the App holds the world display atlas');
+    assert.ok(Object.values(app.drawnFrom).every(value => value !== world.paths), 'nor its paths, kept to compare fits');
     assert.ok([...app.vmCache.values()].every(entry => !entry.deps.includes(world)), 'nor a view model memoised on it');
     app.useGeometry(null);
     app.fitMap(ids);
@@ -1322,6 +1323,151 @@ test('a country map keeps no world display atlas; the way back builds it again, 
     assert.notEqual(app.displayGeo, world, 'the display atlas is built again');
     assert.equal(drawn(), before, 'and draws the world as before');
   });
+});
+
+test('a refit on the frame the map holds keeps its paths, label geometry and flag index; another frame or atlas draws again', async () => {
+  await withBoot(atlasOk(), async ({ app }) => {
+    app.fitMap = BundledApp.prototype.fitMap;
+    const nations = Object.keys(NATIONS), ids = ['250', '276', '826'];
+    const bootPaths = app.geo.paths;
+    app.fitMap(nations);
+    assert.equal(app.geo.paths, bootPaths, 'boot framed the nations before the atlas landed: fitMap keeps that frame');
+    const names = ['paths', 'display paths', 'label geometry', 'flag region source'];
+    const drawn = () => [app.geo.paths, app.displayGeo.paths, app.labelGeometry, app.flagRegionSource];
+    const first = drawn();
+    app.flagComponents = { index: 'built on a Flags view' };
+    app.viewFocus = { x: 0, y: 0, w: 1, h: 1 };
+    const key = app.viewResetKey, ownership = app.setupFlagOwnership;
+    app.fitMap(nations);
+    drawn().forEach((value, i) => assert.equal(value, first[i], `${names[i]} kept`));
+    assert.equal(app.flagComponents.index, 'built on a Flags view', 'and the flag index built on them');
+    // The camera, and what setup flies, are set on every fit.
+    assert.equal(app.viewFocus, null);
+    assert.equal(app.viewResetKey, key + 1);
+    assert.notEqual(app.setupFlagOwnership, ownership);
+    assert.equal(JSON.stringify(app.setupFlagOwnership), JSON.stringify(ownership));
+    app.fitMap(nations, { scope: 'UEFA', layer: 'nations' });
+    assert.deepEqual(app.viewFocus, app.europeFocus());
+    // Another frame draws everything again.
+    app.fitMap(ids);
+    drawn().forEach((value, i) => assert.notEqual(value, first[i], `${names[i]} drawn again`));
+    assert.equal(app.flagComponents, null);
+    const frame = drawn();
+    // The way back from a country map builds a new display atlas: the rules map keeps its frame, the rest is drawn again.
+    await app.loadCountry('826');
+    app.useGeometry('826');
+    app.fitMap(ids);
+    app.useGeometry(null);
+    app.fitMap(ids);
+    const back = drawn();
+    assert.equal(back[0], frame[0], 'the rules map keeps its frame');
+    for (const i of [1, 2, 3]) assert.notEqual(back[i], frame[i], `${names[i]} drawn again`);
+    assert.equal(JSON.stringify(back.slice(1, 3)), JSON.stringify(frame.slice(1, 3)), 'drawn the same');
+  });
+});
+
+/** `fetch` for a boot: the shipped `public` files, `atlas()` for the 50m atlas; each request's file is listed. → restore */
+function serveBoot(atlas, requests = []) {
+  const fetchBefore = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  globalThis.fetch = async url => {
+    const file = String(url).replace(/^\//, '');
+    requests.push(file);
+    if (file === 'countries-50m.json') return atlas();
+    let text = null;
+    try { text = publicText(file); } catch { /* not shipped */ }
+    return text == null ? { ok: false, status: 404 } : { ok: true, status: 200, json: async () => JSON.parse(text), text: async () => text };
+  };
+  return () => { if (fetchBefore) Object.defineProperty(globalThis, 'fetch', fetchBefore); else delete globalThis.fetch; };
+}
+const turn = () => new Promise(resolve => setImmediate(resolve));
+
+test('boot frames the rules map, reads the save and lists the teams while the atlas downloads, and changes no state until it lands', async () => {
+  let land;
+  const landed = new Promise(resolve => { land = resolve; });
+  const restore = serveBoot(async () => { await landed; return atlasOk()(); });
+  const f = fixture({ phase: 'loading' });
+  try {
+    const { app, storage } = f;
+    app.opening = BundledApp.prototype.opening;
+    const changes = [], reads = [];
+    const setState = app.setState;
+    app.setState = function (update, callback) { changes.push(update); return setState.call(this, update, callback); };
+    const getItem = storage.getItem;
+    storage.getItem = key => { reads.push(key); return getItem(key); };
+    const booted = BundledApp.prototype.boot.call(app);
+    for (let i = 0; i < 200 && !app.setupTeamsCache; i++) await turn();
+    assert.ok(app.geo.fit && app.geo.paths['250'], 'the rules map is built and framed');
+    assert.ok(reads.includes(SAVE_KEY), 'the saved campaign is read');
+    assert.ok(app.setupTeamsCache.teams.length > 0, 'the setup\'s team list is built');
+    assert.deepEqual(changes, [], 'and nothing is shown yet');
+    assert.equal(app.state.phase, 'loading');
+    const { paths } = app.geo, { teams } = app.setupTeamsCache;
+    land();
+    await booted;
+    assert.equal(app.state.phase, 'setup');
+    assert.ok(app.displayGeo, 'the atlas is drawn once it lands');
+    assert.equal(app.geo.paths, paths, 'on the frame built before it');
+    assert.equal(app.setupTeams(), teams, 'and the first render lists the teams built before it');
+  } finally {
+    f.close();
+    restore();
+  }
+});
+
+test('a team list that fails to build at boot is left to the setup screen, not reported as a map that failed to load', async () => {
+  const restore = serveBoot(atlasOk());
+  const f = fixture({ phase: 'loading' });
+  try {
+    f.app.setupTeams = () => { throw new Error('no teams'); };
+    await BundledApp.prototype.boot.call(f.app);
+    assert.equal(f.app.state.phase, 'setup');
+    assert.equal(f.app.state.err, null);
+  } finally {
+    f.close();
+    restore();
+  }
+});
+
+test('boot takes the map requests the page started as it loaded; Try again asks again', async () => {
+  // One bundle, so App and the requests main.jsx starts (startMapRequests.js) share mapRequests.js.
+  const Early = await bundleComponents({ App: 'src/App.jsx', requestMapsEarly: ['src/mapRequests.js', 'requestMapsEarly'] },
+    { jsx: 'automatic' });
+  // Setup then asks for the seasons' index (requestSeasons): only the maps are counted.
+  const all = [], requests = { push: file => /^(world-110m|countries-50m)\b/.test(file) && all.push(file) };
+  const restore = serveBoot(atlasOk(), requests);
+  const shipped = globalThis.fetch;
+  try {
+    const started = syncAppFixture({ App: Early.App, phase: 'loading' });
+    try {
+      Early.requestMapsEarly();
+      assert.deepEqual(all, ['world-110m.v1.json', 'countries-50m.json'], 'both requested at once');
+      await Early.App.prototype.boot.call(started.app);
+      assert.equal(started.app.state.phase, 'setup');
+      assert.equal(all.length, 2, 'boot asked for no map again');
+    } finally { started.close(); }
+
+    // A request that fails before boot looks for it is boot's to report (no unhandled rejection meanwhile); Try
+    // again requests both maps anew.
+    globalThis.fetch = async url => {
+      if (/world-110m/.test(String(url))) { all.push('offline'); throw new TypeError('offline'); }
+      return shipped(url);
+    };
+    const failed = syncAppFixture({ App: Early.App, phase: 'loading' });
+    try {
+      Early.requestMapsEarly();
+      await turn();
+      globalThis.fetch = shipped;
+      await Early.App.prototype.boot.call(failed.app);
+      assert.equal(failed.app.state.err, 'MAP DATA FAILED TO LOAD — offline');
+      assert.deepEqual(all.slice(2), ['offline', 'countries-50m.json']);
+      failed.app.setState({ err: null });
+      await Early.App.prototype.boot.call(failed.app);
+      assert.deepEqual(all.slice(4), ['world-110m.v1.json', 'countries-50m.json'], 'Try again requests them anew');
+      assert.equal(failed.app.state.phase, 'setup');
+    } finally { failed.close(); }
+  } finally {
+    restore();
+  }
 });
 
 test('phone bar minute: floored at the last revealed event', async () => {

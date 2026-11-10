@@ -429,7 +429,8 @@ export function domesticSurroundings(atlas, domestic, margin = { x: 480, y: 800 
   const key = [s, tx, ty, margin.x, margin.y].join('|');
   const hit = surroundings.get(domestic);
   if (hit?.atlas === atlas && hit.key === key) return hit.value;
-  const world = new WorldGeometry(atlas, {}, { projection: meta.projection });
+  // Only its rings and its land borders (adj) are read here: no border lengths.
+  const world = new WorldGeometry(atlas, {}, { projection: meta.projection, borderLengths: false });
   const X0 = -margin.x, X1 = 960 + margin.x, Y0 = -margin.y, Y1 = 540 + margin.y;
   // Ring by ring: a shape split at the far-side seam (Russia, the US) spans the
   // whole plane, but only its nearby rings can ever be on screen or on a route.

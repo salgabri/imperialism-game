@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { NATIONS, SCOPES, fieldsRealSide } from '../src/data/teams.js';
+import { NATIONS, SCOPES, buildTeam, fieldsRealSide, hashStr, makeRng, teamEff } from '../src/data/teams.js';
 import { ELITE_NATIONS, MIN_REAL_SIDES, nationTheatre, nationTheatres } from '../src/data/scopes.js';
 import { decodeFootballSet, fieldedNations, seasonSport } from '../src/engine/footballSets.js';
 import { SPORT_LIST, getSport } from '../src/sports/index.js';
@@ -126,5 +126,39 @@ test('launch plays the theatre setup shows, and the campaign keeps it', () => {
     assert.equal(state.teams[state.managedTeamId].id, '036', 'the suggested team, the strongest: Australia');
   } finally {
     f.close();
+  }
+});
+
+/** The Elite 32 as it was ranked before the ranks were kept per sport: every nation rebuilt on its own fixed draw. */
+function eliteField(sport) {
+  const all = fieldedNations(sport).map(id => buildTeam(id, makeRng(1), sport));
+  const rank = new Map(all.map(team => [team.id, teamEff(buildTeam(team.id, makeRng(hashStr(`elite ${team.id}`)), sport))]));
+  return all.slice().sort((a, b) => b.str - a.str || rank.get(b.id) - rank.get(a.id)).slice(0, 32).map(team => team.id);
+}
+
+test('the Elite 32 keeps its ranks per sport and is the same field after: a season\'s, and basketball\'s drawn ties', async () => {
+  const id = 'ea-fc-25';
+  const text = readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8');
+  const season = seasonSport(decodeFootballSet(JSON.parse(text), id));
+  assert.equal(nationTheatre(season, 'elite').id, 'elite');
+  const fetchBefore = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  globalThis.fetch = async url => String(url).endsWith(`football/${id}.json`)
+    ? { ok: true, status: 200, json: async () => JSON.parse(text) } : { ok: false, status: 404 };
+  const f = syncAppFixture({ App: B.App, phase: 'setup', settings: { sport: 'football', layer: 'nations', scope: 'elite', dataSet: id } });
+  f.app.opening = B.App.prototype.opening;
+  try {
+    const { app } = f;
+    await app.loadSet(id);
+    const field = (setup, seed) => app.opening(setup, makeRng(seed)).included.map(team => team.id);
+    const expected = eliteField(season);
+    assert.equal(expected.length, 32);
+    for (const seed of [1, 1, 2026]) assert.deepEqual(field(app.state.setup, seed), expected, `${id}, seed ${seed}`);
+    // Basketball builds generated players, so its ties are ranked on each nation's own draw: the same field too.
+    const basketball = { ...app.state.setup, sport: 'basketball', dataSet: null };
+    const drawn = eliteField(getSport('basketball'));
+    for (const seed of [7, 7, 99]) assert.deepEqual(field(basketball, seed), drawn, `basketball, seed ${seed}`);
+  } finally {
+    f.close();
+    if (fetchBefore) Object.defineProperty(globalThis, 'fetch', fetchBefore); else delete globalThis.fetch;
   }
 });

@@ -92,6 +92,9 @@ export class WorldGeometry {
    * meridian and standard parallel. The defaults are the historical world chart.
    * `options.keepPolys = false` releases each country's lon/lat `polys` once they
    * are projected, for an atlas that is only ever drawn (fitted with buildPaths).
+   * `options.borderLengths = false` skips measuring borders and coasts, for an
+   * atlas no rule reads them from: `borders` and `edges` stay empty, `adj` is
+   * still built (a country map's surroundings claim land across it).
    */
   constructor(topo, anchors = {}, options = {}) {
     const { lon0 = DEFAULT_PROJECTION.lon0, lat0 = DEFAULT_PROJECTION.lat0 } = options.projection || {};
@@ -104,7 +107,7 @@ export class WorldGeometry {
     this.legacy = lon0 === DEFAULT_PROJECTION.lon0 && lat0 === DEFAULT_PROJECTION.lat0;
     this.xScale = lat0 === DEFAULT_PROJECTION.lat0 ? PROJECTION_X_SCALE : Math.cos(lat0 * Math.PI / 180);
 
-    const { countries, adjacency, borders, edges } = decodeTopo(topo, options.object || 'countries');
+    const { countries, adjacency, borders, edges } = decodeTopo(topo, options.object || 'countries', options.borderLengths !== false);
     this.countries = countries;
     /** country id -> Set of ids sharing a land border */
     this.adj = adjacency;
@@ -117,6 +120,8 @@ export class WorldGeometry {
     // cache for fit/rule compatibility; repaired display geometry is separate.
     // A custom central meridian rotates longitudes first, so the seam split
     // happens opposite the country instead of through it.
+    // projected and displayProjected share ring and point arrays (below), so
+    // neither may be mutated once built.
     this.projected = {};
     this.displayProjected = {};
     const plane = this.legacy ? projPt : (lon, lat) => [(lon * Math.PI / 180) * this.xScale, -lat * Math.PI / 180];
@@ -126,16 +131,27 @@ export class WorldGeometry {
       for (const poly of c.polys) {
         const projectedPoly = [], displayPoly = [];
         for (const ring of poly) {
-          const rotated = rotate(ring), atPlace = new Map();
-          projectedPoly.push(rotated.map(pt => {
-            const point = plane(pt[0], pt[1]);
+          const rotated = rotate(ring);
+          const projectedRing = rotated.map(pt => plane(pt[0], pt[1]));
+          projectedPoly.push(projectedRing);
+          // A ring that never meets the seam comes out of the cut as itself: one part
+          // holding exactly its points (seamFreeRing). Its projected ring is then its
+          // display part, the same array, so most of the map skips the cut and keeps
+          // one copy of its points; only rings at the seam take splitAtAntimeridian.
+          const plain = seamFreeRing(rotated);
+          if (plain) {
+            displayPoly.push(plain === DEGENERATE ? [] : [projectedRing]);
+            continue;
+          }
+          const atPlace = new Map();
+          for (let i = 0; i < rotated.length; i++) {
+            const pt = rotated[i];
             if (!atPlace.has(pt[0])) atPlace.set(pt[0], []);
-            atPlace.get(pt[0]).push(pt[0], pt[1], point);
-            return point;
-          }));
-          // A display point at exactly a source point's lon/lat (every point of a ring that never meets the seam)
-          // projects to the same coordinates: it shares that array instead of holding a second copy. Object.is
-          // keeps -0 and 0 apart, which the map's keys would not.
+            atPlace.get(pt[0]).push(pt[0], pt[1], projectedRing[i]);
+          }
+          // A display point at exactly a source point's lon/lat (every point the cut keeps, all but those it adds
+          // on the seam) projects to the same coordinates: it shares that array instead of holding a second copy.
+          // Object.is keeps -0 and 0 apart, which the map's keys would not.
           const shared = ([lon, lat]) => {
             const candidates = atPlace.get(lon) || [];
             for (let i = 0; i < candidates.length; i += 3) {
@@ -166,6 +182,8 @@ export class WorldGeometry {
     if (options.keepPolys === false) for (const c of this.countries) c.polys = null;
 
     this.fit = null;
+    // The bounds of the frame fitTo last built (null: none yet).
+    this.fitBounds = null;
     this.paths = {};
     this.graticule = { d: '', labels: [] };
     this.kmPerUnit = 0;
@@ -214,7 +232,9 @@ export class WorldGeometry {
 
   /**
    * Frame the map on `fitIds` and rebuild every derived path. Countries outside
-   * the set are still drawn — they just do not influence the viewport.
+   * the set are still drawn — they just do not influence the viewport. The frame
+   * it already holds changes nothing: paths, graticule and scale stay the same
+   * objects, and so do the caches built on them.
    */
   fitTo(fitIds) {
     const fit = new Set(fitIds);
@@ -235,6 +255,14 @@ export class WorldGeometry {
         }
       }
     }
+    // Everything fitTo builds follows from these bounds alone (the geometry never
+    // changes once built; a country chart's graticule reads the bounds too), so the
+    // same bounds would build the same frame again: returning to the world in setup,
+    // or boot's early fit then fitMap.
+    const last = this.fitBounds;
+    if (this.fit && last && last.minX === minX && last.minY === minY && last.maxX === maxX && last.maxY === maxY) return this;
+    // Set again once the frame is complete: a build that throws keeps nothing.
+    this.fitBounds = null;
     const s = Math.min((VIEW_W - PAD * 2) / (maxX - minX), (VIEW_H - PAD * 2) / (maxY - minY));
     const tx = (VIEW_W - (maxX - minX) * s) / 2 - minX * s;
     const ty = (VIEW_H - (maxY - minY) * s) / 2 - minY * s;
@@ -246,6 +274,7 @@ export class WorldGeometry {
     // of zoom. A country chart is true scale along meridians and its parallel.
     this.kmPerUnit = this.legacy ? EARTH_RADIUS_KM / (s * PROJECTION_X_SCALE) : EARTH_RADIUS_KM / s;
     this.paths = this.buildPaths(s, tx, ty);
+    this.fitBounds = { minX, minY, maxX, maxY };
     return this;
   }
 
@@ -343,34 +372,61 @@ export class WorldGeometry {
       let minY = Infinity;
       let maxX = -Infinity;
       let maxY = -Infinity;
-      this.displayProjected[c.id].forEach((poly, pi) => {
-        poly.forEach((parts, ri) => {
-          for (const part of parts) {
-            const seg = part.map(q => [q[0] * s + tx, q[1] * s + ty]);
-            if (seg.length < 3) continue;
-            d += 'M' + seg.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L') + 'Z';
-            // Label containment must use the same split, rounded land that the
-            // SVG paints, including holes and disconnected date-line segments.
-            labelRings.push(seg.map(([x, y]) => [Number(x.toFixed(1)), Number(y.toFixed(1))]));
-            if (pi === largest) largestRings.push(labelRings[labelRings.length - 1]);
-            // Include every rendered island/segment in an empire's flag canvas.
-            for (const [x, y] of seg) {
+      const polys = this.displayProjected[c.id];
+      for (let pi = 0; pi < polys.length; pi++) {
+        const poly = polys[pi];
+        for (let ri = 0; ri < poly.length; ri++) {
+          for (const part of poly[ri]) {
+            const n = part.length;
+            if (n < 3) continue;
+            // One pass over each part's fitted points. Each coordinate is rounded once
+            // (roundTenth: its toFixed(1) text and that text's number) for both the
+            // path and the label ring. An outer ring's painted area and box use the
+            // unrounded points: ringCentroid's sum, in the same order with the closing
+            // edge last, and a plain min/max box. Pushed, not preallocated, so the
+            // label ring stays a packed array for the hot loops that read it later.
+            const text = [], ring = [];
+            let twice = 0, x0 = 0, y0 = 0, px = 0, py = 0;
+            let boxX0 = Infinity, boxY0 = Infinity, boxX1 = -Infinity, boxY1 = -Infinity;
+            for (let i = 0; i < n; i++) {
+              const q = part[i], x = q[0] * s + tx, y = q[1] * s + ty;
+              roundTenth(x, ROUNDED, 0);
+              roundTenth(y, ROUNDED, 2);
+              text.push(ROUNDED[0] + ',' + ROUNDED[2]);
+              ring.push([ROUNDED[1], ROUNDED[3]]);
+              // Include every rendered island/segment in an empire's flag canvas.
               minX = Math.min(minX, x);
               minY = Math.min(minY, y);
               maxX = Math.max(maxX, x);
               maxY = Math.max(maxY, y);
+              if (ri !== 0) continue;
+              if (i) twice += px * y - x * py;
+              else { x0 = x; y0 = y; }
+              px = x;
+              py = y;
+              if (x < boxX0) boxX0 = x;
+              if (x > boxX1) boxX1 = x;
+              if (y < boxY0) boxY0 = y;
+              if (y > boxY1) boxY1 = y;
             }
+            d += 'M' + text.join('L') + 'Z';
+            // Label containment must use the same split, rounded land that the
+            // SVG paints, including holes and disconnected date-line segments.
+            labelRings.push(ring);
+            if (pi === largest) largestRings.push(ring);
             if (ri !== 0) continue;
             // The visible mainland bounds follow the repaired outer ring. Rule
             // anchors/area below retain the original source-ring calculation.
-            const c2 = ringCentroid(seg);
-            if (c2 && c2.area > largestPaintedArea && c2.area > 0.01) {
-              largestPaintedArea = c2.area;
-              bbox = ringBounds(seg);
+            twice += px * y0 - x0 * py;
+            const half = twice / 2, area = Math.abs(half);
+            if (half !== 0 && area > largestPaintedArea && area > 0.01) {
+              largestPaintedArea = area;
+              // Floored so a sliver still gets a usable tile.
+              bbox = { x: boxX0, y: boxY0, w: Math.max(3, boxX1 - boxX0), h: Math.max(2.5, boxY1 - boxY0) };
             }
           }
-        });
-      });
+        }
+      }
       if (!bbox) bbox = { x: cx - 2, y: cy - 1.5, w: 4, h: 3 };
       // Small padding around the land covers path coordinates rounded to 0.1,
       // keeping every fill inside one SVG pattern tile (never a repeated flag).
@@ -467,7 +523,7 @@ export function arcBorders(arcs, arcOwners) {
   return { borders, edges };
 }
 
-function decodeTopo(topo, objectName = 'countries') {
+function decodeTopo(topo, objectName = 'countries', borderLengths = true) {
   const objects = topo?.objects || {};
   const collection = objects[objectName]?.type === 'GeometryCollection' ? objects[objectName]
     : Object.values(objects).find(object => object?.type === 'GeometryCollection');
@@ -475,13 +531,22 @@ function decodeTopo(topo, objectName = 'countries') {
     throw new Error(`Topology has no "${objectName}" GeometryCollection`);
   }
   const arcs = topologyArcs(topo);
+  // A ring holds its arcs' own point arrays in ring order (a reversed arc read
+  // backwards), pushed one by one: no arc is copied to be reversed or joined.
   const ringFrom = idxs => {
-    let pts = [];
-    idxs.forEach((i, k) => {
-      let a = i < 0 ? arcs[~i].slice().reverse() : arcs[i];
-      if (k > 0) a = a.slice(1); // the shared endpoint is already in pts
-      pts = pts.concat(a);
-    });
+    const pts = [];
+    for (let k = 0; k < idxs.length; k++) {
+      const i = idxs[k];
+      // The shared endpoint is already in pts: every arc after the first skips it.
+      const skip = k > 0 ? 1 : 0;
+      if (i < 0) {
+        const a = arcs[~i];
+        for (let p = a.length - 1 - skip; p >= 0; p--) pts.push(a[p]);
+      } else {
+        const a = arcs[i];
+        for (let p = skip; p < a.length; p++) pts.push(a[p]);
+      }
+    }
     return pts;
   };
 
@@ -522,11 +587,52 @@ function decodeTopo(topo, objectName = 'countries') {
       }
     }
   }
+  // Every geometry keeps its adjacency. Only the border lengths (arcBorders measures
+  // every arc) are left out of an atlas that is only drawn.
+  if (!borderLengths) return { countries, adjacency, borders: {}, edges: {} };
   return { countries, adjacency, ...arcBorders(arcs, arcOwners) };
 }
 
 const SEAM_EPSILON = 1e-8;
 const SEAM_LATITUDE_STEP = 0.5;
+// seamFreeRing's answer for a ring the cut would drop: it has no area.
+const DEGENERATE = 2;
+
+/**
+ * Whether splitAtAntimeridian(points) would return the ring as itself, found
+ * without cutting it: 1 when its one part holds exactly these points, DEGENERATE
+ * when it has no part (closeAndDensifySeam's zero-area test, the same sum in the
+ * same order), else 0 and the cut decides. That holds for a closed ring (at least
+ * four points, the last exactly the first) whose every point lies strictly inside
+ * the seam at a valid latitude, with no edge longer than 180° of longitude and no
+ * point repeating the one before. Then normalizedRing only drops the closing
+ * point, unwrapRing changes nothing (no turn round a pole), there is one strip
+ * and nothing to clip, and closeAndDensifySeam keeps every point, adds no seam
+ * samples and closes the ring with its first point again. A point on the seam
+ * itself always takes the full cut.
+ */
+function seamFreeRing(points) {
+  const n = points.length;
+  if (n < 4) return 0;
+  const first = points[0], last = points[n - 1];
+  // Object.is: a closing -0 for a first 0 would come out of the cut as 0.
+  if (!Object.is(first[0], last[0]) || !Object.is(first[1], last[1])) return 0;
+  const west = -180 + SEAM_EPSILON, east = 180 - SEAM_EPSILON;
+  let previousLon = 0, previousLat = 0;
+  for (let i = 0; i < n; i++) {
+    const lon = points[i][0], lat = points[i][1];
+    if (typeof lon !== 'number' || typeof lat !== 'number' || !(lon > west && lon < east) || !(lat >= -90 && lat <= 90)) return 0;
+    if (i) {
+      const dLon = Math.abs(lon - previousLon);
+      if (dLon > 180 || (dLon <= SEAM_EPSILON && Math.abs(lat - previousLat) <= SEAM_EPSILON)) return 0;
+    }
+    previousLon = lon;
+    previousLat = lat;
+  }
+  let twiceArea = 0;
+  for (let i = 0, j = n - 2; i < n - 1; j = i++) twiceArea += points[j][0] * points[i][1] - points[i][0] * points[j][1];
+  return Math.abs(twiceArea) < 1e-12 ? DEGENERATE : 1;
+}
 
 function sameGeographicPoint(a, b) {
   const dx = Math.abs(a[0] - b[0]);
@@ -668,30 +774,44 @@ export function splitAtAntimeridian(ring) {
 // painted: d, labelRings and visible bounds exclusively use splitAtAntimeridian
 // above. The 300-unit jump is a world-scale date-line guess that cuts any wide
 // country-scale shape, so custom projections use surfaceMetrics instead.
-function legacyProjectedChunks(pts) {
-  const segs = [];
-  let cur = [pts[0]];
-  for (let i = 1; i < pts.length; i++) {
-    if (Math.abs(pts[i][0] - pts[i - 1][0]) > 300) {
-      segs.push(cur);
-      cur = [];
-    }
-    cur.push(pts[i]);
-  }
-  segs.push(cur);
-  return segs;
-}
-
+// Each outer ring's fitted points are cut into chunks wherever x jumps by more
+// than 300 units, and every chunk of three or more points is a ringCentroid
+// candidate. One pass per ring: the same sums in the same order, closing edge
+// last, without building the fitted points or the chunks.
 function legacyAnchorMetrics(projected, s, tx, ty) {
   let area = -1, cx = 0, cy = 0;
   for (const poly of projected) {
-    const points = poly[0].map(q => [q[0] * s + tx, q[1] * s + ty]);
-    for (const part of legacyProjectedChunks(points)) {
-      if (part.length < 3) continue;
-      const center = ringCentroid(part);
-      if (center && center.area > area && center.area > 0.01) {
-        area = center.area; cx = center.cx; cy = center.cy;
+    const ring = poly[0], n = ring.length;
+    let count = 0, a = 0, sx = 0, sy = 0, x0 = 0, y0 = 0, px = 0, py = 0;
+    for (let i = 0; i <= n; i++) {
+      const x = i < n ? ring[i][0] * s + tx : 0, y = i < n ? ring[i][1] * s + ty : 0;
+      if (i === n || (i > 0 && Math.abs(x - px) > 300)) {
+        // A chunk ends here: close it (its last point back to its first) and weigh it.
+        if (count >= 3) {
+          const cr = px * y0 - x0 * py;
+          a += cr;
+          sx += (px + x0) * cr;
+          sy += (py + y0) * cr;
+          const half = a / 2, chunkArea = Math.abs(half);
+          if (half !== 0 && chunkArea > area && chunkArea > 0.01) {
+            area = chunkArea; cx = sx / (6 * half); cy = sy / (6 * half);
+          }
+        }
+        if (i === n) break;
+        count = 0; a = 0; sx = 0; sy = 0;
       }
+      if (count) {
+        const cr = px * y - x * py;
+        a += cr;
+        sx += (px + x) * cr;
+        sy += (py + y) * cr;
+      } else {
+        x0 = x;
+        y0 = y;
+      }
+      px = x;
+      py = y;
+      count++;
     }
   }
   if (area < 0) {
@@ -870,19 +990,32 @@ function pointInRing(point, ring) {
   return inside;
 }
 
-/** Axis-aligned bounds of a ring, floored so a sliver still gets a usable tile. */
-function ringBounds(ring) {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const [x, y] of ring) {
-    if (x < minX) minX = x;
-    if (x > maxX) maxX = x;
-    if (y < minY) minY = y;
-    if (y > maxY) maxY = y;
+// roundTenth's output, reused so buildPaths' loop allocates nothing for it: read
+// straight back, before anything calls roundTenth again.
+const ROUNDED = ['', 0, '', 0];
+
+/**
+ * x.toFixed(1) into out[at] and Number(x.toFixed(1)) into out[at + 1], without
+ * formatting the number twice. toFixed rounds the exact value of |x| * 10 to the
+ * nearest integer (a half away from zero) and puts the point before its last
+ * digit. Below 1e6 the floating-point product f = |x| * 10 is within about 1e-10
+ * of the exact one, so unless f lies within 1e-9 of a half both round to the same
+ * integer n; those near-ties, values from 1e6 up, NaN and Infinity are left to
+ * toFixed itself. n / 10 is the double nearest the decimal the text spells, which
+ * is exactly what Number() reads back, and the sign rule gives toFixed's "-0.0"
+ * for a small negative x and "0.0" for -0.
+ */
+function roundTenth(x, out, at) {
+  const f = Math.abs(x) * 10, whole = Math.floor(f), frac = f - whole;
+  if (!(Math.abs(frac - 0.5) > 1e-9) || !(f < 1e6)) {
+    const text = x.toFixed(1);
+    out[at] = text;
+    out[at + 1] = Number(text);
+    return;
   }
-  return { x: minX, y: minY, w: Math.max(3, maxX - minX), h: Math.max(2.5, maxY - minY) };
+  const n = frac > 0.5 ? whole + 1 : whole, units = Math.floor(n / 10);
+  out[at] = (x < 0 ? '-' : '') + units + '.' + (n - units * 10);
+  out[at + 1] = x < 0 ? -(n / 10) : n / 10;
 }
 
 const NICE_DISTANCES = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2000, 4000, 8000];

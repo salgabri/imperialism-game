@@ -6,6 +6,7 @@ import { CLUB_SCOPES, nationTheatre, worldClubTheatreName } from './data/scopes.
 import { CAPITALS } from './data/capitals.js';
 import { teamMarkUrls } from './data/teamMarks.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
+import { requestMaps, takeMapRequests } from './mapRequests.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel, hasTheatreMaps, isCountryScope } from './data/domesticScope.js';
@@ -14,7 +15,7 @@ import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootball
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport, matchSport } from './sports/index.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
-import { clearSave, loadSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
+import { clearSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
   fitDomesticCampaign, setActiveCampaign, CHECKPOINT_KEYS } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
@@ -67,8 +68,6 @@ import MatchScreen from './screens/match/MatchScreen.jsx';
 import LedgerScreen from './screens/ledger/LedgerScreen.jsx';
 import ChronicleScreen from './screens/ledger/ChronicleScreen.jsx';
 
-const MAP_URL = `${import.meta.env.BASE_URL}world-110m.v1.json`;
-const ATLAS_URL = `${import.meta.env.BASE_URL}countries-50m.json`;
 // Neighbouring land is drawn this far (SVG units) beyond the 960×540 frame: a
 // fully zoomed-out camera shows up to ~420 units beside it on ultra-wide screens
 // and ~770 above and below on a phone.
@@ -84,13 +83,23 @@ const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}
 /** A club map's row as one of a basketball season's clubs: the season's name, code, strength and five on the map's land. */
 const seasonClub = (row, club) => ({ ...row, name: club.name, code: club.code, league: club.league, str: club.str, squad: club.squad });
 
+// Sport object → Map(nation id → its fixed-draw strength), for eliteNations. A data set's sport is a new object per
+// decoded set, so its ranks go with the set.
+const eliteRanks = new WeakMap();
+
 /**
  * The Elite 32: the strongest nations, the same field whatever the seed. Generated players (a baseball nation's empty
  * slots, a short basketball five) come from the campaign's draw, so ties are ranked on each nation built with its own
  * fixed draw: without that, a new seed could leave out the team a manager plays again. Football builds draw nothing.
+ * That rank depends only on the sport and the nation, so it is kept per sport object (eliteRanks): each Elite pick
+ * and launch after the first sorts without building the field again.
  */
 function eliteNations(all, sport) {
-  const rank = new Map(all.map(team => [team.id, teamEff(buildTeam(team.id, makeRng(hashStr(`elite ${team.id}`)), sport))]));
+  let rank = eliteRanks.get(sport);
+  if (!rank) eliteRanks.set(sport, rank = new Map());
+  for (const team of all) {
+    if (!rank.has(team.id)) rank.set(team.id, teamEff(buildTeam(team.id, makeRng(hashStr(`elite ${team.id}`)), sport)));
+  }
   return all.slice().sort((a, b) => b.str - a.str || rank.get(b.id) - rank.get(a.id)).slice(0, 32);
 }
 
@@ -397,12 +406,26 @@ export default class App extends React.Component {
 
   async boot() {
     try {
-      const [res, atlasText] = await Promise.all([
-        fetch(MAP_URL),
-        fetch(ATLAS_URL).then(r => r.ok ? r.text() : null).catch(() => null),
-      ]);
+      // Both maps are requested together: as the page's script started (mapRequests.js), or anew on Try again. The
+      // 110m rules map is small and lands well before the 50m atlas (about 2 s on a slow link), so the work that needs
+      // only the rules map runs while the atlas downloads: the rules geometry and its frame, the saved campaign and
+      // the setup's team list are ready when it lands. Every state change still waits for the atlas, so the loading
+      // screen gives way to setup in one render, as before.
+      const { map, atlas: atlasRequest } = takeMapRequests() || requestMaps();
+      const res = await map;
       if (!res.ok) throw new Error('map fetch ' + res.status);
       this.geo = new WorldGeometry(await res.json(), CAPITALS);
+      // fitMap frames the same nations below and keeps this frame. Club seeding reads its paths.
+      this.geo.fitTo(Object.keys(NATIONS));
+      this.rng = makeRng((Date.now() % 1000000007) >>> 0);
+      // A retry's team list is built again, on this geometry.
+      this.setupTeamsCache = null;
+      const inspection = inspectSave();
+      const saved = inspection.campaign;
+      // The first render's team list (setupTeams is cached per setup key, and nothing changes that key before it).
+      // Any failure is left for that render to meet, as before, not reported as a map that failed to load.
+      try { this.setupTeams(this.link?.found ? this.link.setup : this.state.setup); } catch { /* built at render */ }
+      const atlasText = await atlasRequest;
       // Display-only detail keeps targeting, club seeding and existing saves
       // on the original topology. A missing or unreadable visual atlas falls back gracefully.
       let atlas = null;
@@ -410,12 +433,10 @@ export default class App extends React.Component {
       // The atlas also draws a country map's neighbours: until one needs it, it waits as text (worldAtlas).
       this.atlas = null;
       this.atlasText = atlas ? atlasText : null;
-      // Only the display atlas's fitted paths are ever read, so its lon/lat polygons go once projected.
-      this.displayGeo = atlas ? new WorldGeometry(mergeSharedIds(atlas), CAPITALS, { keepPolys: false }) : null;
-      this.rng = makeRng((Date.now() % 1000000007) >>> 0);
+      // Only the display atlas's fitted paths are ever read, so its lon/lat polygons go once projected, and it
+      // measures no borders (the rules geometry's are the ones claims read).
+      this.displayGeo = atlas ? new WorldGeometry(mergeSharedIds(atlas), CAPITALS, { keepPolys: false, borderLengths: false }) : null;
 
-      const inspection = inspectSave();
-      const saved = inspection.campaign || loadSave();
       if (saved) {
         this.saved = saved;
         this.setState({
@@ -529,7 +550,7 @@ export default class App extends React.Component {
     } else if (this.domesticId) {
       const atlas = this.worldAtlas();
       this.geo = this.worldGeo;
-      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS, { keepPolys: false }) : null;
+      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS, { keepPolys: false, borderLengths: false }) : null;
       this.domesticId = null;
       this.backdrop = [];
     }
@@ -555,24 +576,37 @@ export default class App extends React.Component {
       return;
     }
     this.fittedDomestic = domestic;
-    // decodeDomestic fits a country on all its sections, the only frame a country map takes: keep its paths.
+    // decodeDomestic fits a country on all its sections, the only frame a country map takes: keep its paths. A world
+    // frame fitTo already holds keeps its paths too.
     if (!domestic || !this.geo.fit) this.geo.fitTo(domestic ? Object.keys(domestic.sectionNames) : ids);
-    if (this.displayGeo) {
-      const { s, tx, ty } = this.geo.fit;
-      this.displayGeo.paths = this.displayGeo.buildPaths(s, tx, ty);
+    const display = this.displayGeo;
+    if (display) {
+      // Drawn again only in a new fit (pathsFit: the fit its paths were drawn in, written only here).
+      const { s, tx, ty } = this.geo.fit, drawnIn = display.pathsFit;
+      if (!drawnIn || drawnIn.s !== s || drawnIn.tx !== tx || drawnIn.ty !== ty) {
+        display.paths = display.buildPaths(s, tx, ty);
+        display.pathsFit = { s, tx, ty };
+      }
     }
     // Stable display-only geometry lets the label engine cache shape work
-    // through ticker updates, hover, selection and camera movements.
-    this.labelGeometry = this.geo.countries.map(country => ({
-      id: country.id,
-      rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
-    }));
-    this.flagLayoutCache = null;
+    // through ticker updates, hover, selection and camera movements. The same
+    // drawn paths on the same map (a refit on the frame it holds) keep it, and the
+    // flag index and banners built on it.
+    const drawnFrom = { base: this.geo.paths, display: display?.paths ?? null, domestic };
+    const last = this.drawnFrom;
+    if (!last || last.base !== drawnFrom.base || last.display !== drawnFrom.display || last.domestic !== drawnFrom.domestic) {
+      this.drawnFrom = drawnFrom;
+      this.labelGeometry = this.geo.countries.map(country => ({
+        id: country.id,
+        rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
+      }));
+      this.flagLayoutCache = null;
+      // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. mapFlags builds
+      // that index from its source on the first Flags view: most games never show one.
+      this.flagComponents = null;
+      this.flagRegionSource = { geometry: this.labelGeometry, maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit };
+    }
     this.viewFocus = null;
-    // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. mapFlags builds
-    // that index from its source on the first Flags view: most games never show one.
-    this.flagComponents = null;
-    this.flagRegionSource = { geometry: this.labelGeometry, maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit };
     if (domestic) {
       // Setup shows no flags on a country map (its clubs carry crests, not flags). The opening camera leaves out far outliers.
       this.setupFlagOwnership = {};
@@ -1055,15 +1089,19 @@ export default class App extends React.Component {
     // which this.geo may still show between a theatre pick and its showSetupMap callback).
     const geo = domesticId ? loaded?.geo : this.domesticId ? this.worldGeo : this.geo;
     const board = geo?.adj ? { geo, own: opening } : null;
-    // Country clubs (ids like "d826-679") are unknown to the sport's club list: pass their own code and kind.
-    const teams = included.map(team => ({ id: team.id, name: team.name, code: team.code, isClub: team.kind === 'club',
-      flagId: team.flagId ?? null, rating: teamEff(team),
-      ...(loaded ? { meta: [team.conf, loaded.sectionNames[team.home]].filter(Boolean).join(' · ') } : {}),
-      players: selectLineup(team).starters.filter(player => Number.isFinite(player?.rating))
-        .sort((a, b) => b.rating - a.rating || String(a.name).localeCompare(String(b.name))).slice(0, 5)
-        .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
-      ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    // Country clubs (ids like "d826-679") are unknown to the sport's club list: pass their own code and kind. One lineup
+    // per team gives both its rating (teamEff's) and its best starters: selectLineup is pure, and filter copies before
+    // the sort.
+    const teams = included.map(team => {
+      const lineup = selectLineup(team);
+      return { id: team.id, name: team.name, code: team.code, isClub: team.kind === 'club',
+        flagId: team.flagId ?? null, rating: lineup.rating,
+        ...(loaded ? { meta: [team.conf, loaded.sectionNames[team.home]].filter(Boolean).join(' · ') } : {}),
+        players: lineup.starters.filter(player => Number.isFinite(player?.rating))
+          .sort((a, b) => b.rating - a.rating || String(a.name).localeCompare(String(b.name))).slice(0, 5)
+          .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
+        ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) };
+    }).sort((a, b) => a.name.localeCompare(b.name));
     // What each team flies on the step-1 card in Flags mode (setupMapFlags): a nation its flag, a club its crest.
     const marks = Object.fromEntries(included.map(team => [team.id, { kind: team.kind, flagId: team.flagId ?? null, col: team.col }]));
     this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own), marks };

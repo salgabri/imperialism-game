@@ -158,6 +158,19 @@ test('Elite 32: Europe\'s countries without a club can be claimed; an island or 
   assert.deepEqual(encloseClaims(euLand, { ...eu.startOwners }), {});
 });
 
+test('Top 124: the surroundings keep every land border of the atlas, which joins land the probes cannot', () => {
+  const eu = decodeDomestic(JSON.parse(read('public/domestic/eu124.json')), 'eu124');
+  const around = domesticSurroundings(ATLAS, eu);
+  // Built without border lengths, which nothing here reads, the atlas in the map's projection keeps its adjacency.
+  const full = new WorldGeometry(ATLAS, {}, { projection: eu.meta.projection });
+  const adjacency = adj => JSON.stringify(Object.entries(adj).map(([id, set]) => [id, [...set]]));
+  assert.equal(adjacency(around.atlasNeighbours), adjacency(full.adj));
+  // Germany holds clubs, so its own shape is no obstacle the probes could meet: Austria–Germany is the atlas's alone.
+  const euLand = domesticLand(eu, around);
+  assert.ok(euLand.claimable.has('040') && euLand.adj.get('040').includes('276'), 'Austria borders Germany');
+  assert.ok(!domesticLand(eu, { ...around, atlasNeighbours: {} }).adj.get('040').includes('276'), 'a link only the atlas gives');
+});
+
 test('the world map: a nation landlocked by one team is claimed at once, an island hanging off one is not', () => {
   const geo = new WorldGeometry(JSON.parse(read('public/world-110m.v1.json')), CAPITALS);
   // South Africa, Great Britain (with Northern Ireland) and Thailand play; nobody else does.
