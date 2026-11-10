@@ -17,6 +17,7 @@ import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { DOMESTIC } from '../src/data/domestic.js';
+import { withDom } from './lib/app-harness.mjs';
 
 const root = new URL('../', import.meta.url);
 const compiled = await build({
@@ -99,6 +100,17 @@ test('a club mark is its crest in the monogram box, a club without one keeps its
   const flag = render(React.createElement(TeamMark, { id: '826', teamId: '826', code: 'ENG', isClub: false, width: 24 }));
   assert.ok(flag.querySelector('img.flag-chip'));
 });
+
+test('a nation\'s flag chip loads lazily: React sets loading before src, and never decoding=async', () => withDom(async ({ mount }) => {
+  // Safari (and Firefox before 131) request an image as soon as its src is set, so loading="lazy" only applies when it
+  // is set first. React DOM sets the attributes one by one, and jsdom keeps the order they were set in.
+  const view = await mount(TeamMark, { id: '826', teamId: '826', code: 'ENG', isClub: false, width: 24 });
+  const chip = view.host.querySelector('img.flag-chip');
+  const names = chip.getAttributeNames();
+  assert.equal(chip.getAttribute('loading'), 'lazy');
+  assert.ok(names.indexOf('loading') < names.indexOf('src'), names.join(' '));
+  assert.equal(chip.hasAttribute('decoding'), false, 'chips remount every match, and an async decode can draw one blank');
+}));
 
 test('a claimed player\'s former club shows its crest in the squad tables', () => {
   const club = render(React.createElement(SquadFlag, { teamId: 'f-arsenal', isClub: true, width: 16, height: 12 }));

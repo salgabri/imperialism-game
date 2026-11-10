@@ -292,6 +292,119 @@ test('a long session looks for new versions every hour', async () => {
   assert.equal(registration.updates, 1);
 });
 
+// ---------- when the page registers the worker ----------
+
+// A copy of serviceWorker.js of its own: the first boot's signal settles once per module.
+const later = await bundleComponents({
+  registerAfterBoot: ['src/serviceWorker.js', 'registerAfterBoot'],
+  firstBoot: ['src/serviceWorker.js', 'firstBoot'],
+  settleFirstBoot: ['src/serviceWorker.js', 'settleFirstBoot'],
+  applyUpdate: ['src/serviceWorker.js', 'applyUpdate'],
+  resetServiceWorker: ['src/serviceWorker.js', 'resetServiceWorker'],
+});
+
+/** browser(), with its timers and idle callbacks run by hand. `idle: false` has no requestIdleCallback, as Safari. */
+function clocked({ idle = true, ...options } = {}) {
+  const page = browser(options);
+  const { env } = page;
+  env.timers = [];
+  env.setTimeout = (fn, ms) => env.timers.push({ fn, ms, cleared: false });
+  env.clearTimeout = id => { if (env.timers[id - 1]) env.timers[id - 1].cleared = true; };
+  env.idles = [];
+  if (idle) env.requestIdleCallback = (fn, idleOptions) => env.idles.push({ fn, options: idleOptions });
+  return page;
+}
+const never = new Promise(() => {});
+// setImmediate, not a timer: syncAppFixture runs the page's timers on a manual clock.
+const settled = promise => Promise.race([promise.then(() => true), new Promise(resolve => setImmediate(resolve, false))]);
+
+test('main.jsx registers the worker through registerAfterBoot, in production builds only', () => {
+  const main = readFileSync(path.join(ROOT, 'src/main.jsx'), 'utf8');
+  assert.match(main, /^if \(import\.meta\.env\.PROD\) registerAfterBoot\(\)\.catch\(/m);
+  assert.doesNotMatch(main, /registerServiceWorker/, 'never straight away: a first visit waits for boot');
+});
+
+test('a page a worker controls registers at once, so the update prompt and the crash screen\'s Reload work from the start', async () => {
+  later.resetServiceWorker();
+  const waiting = new Worker('installed');
+  const { env, container } = clocked({ controller: new Worker('activated'), waiting });
+  const registration = later.registerAfterBoot('./sw.js', env, never);
+  assert.deepEqual(container.registered, [['./sw.js', { scope: './' }]], 'before boot is over, without waiting');
+  assert.ok(await registration);
+  assert.deepEqual([env.timers.length, env.idles.length], [0, 0]);
+  assert.equal(later.applyUpdate(), true, 'Reload hands the page to the waiting version');
+  assert.deepEqual(waiting.messages, [{ type: 'SKIP_WAITING' }]);
+});
+
+test('a first visit registers once App\'s first boot is over and the page is idle, so the precache leaves boot\'s downloads alone', async () => {
+  later.resetServiceWorker();
+  const { env, container } = clocked();
+  assert.equal(await settled(later.firstBoot), false);
+  const registration = later.registerAfterBoot('./sw.js', env);
+  await flush();
+  assert.equal(container.registered.length, 0, 'not while boot downloads the maps');
+  assert.deepEqual(env.timers.map(timer => timer.ms), [10_000], 'a fallback, in case boot never settles');
+  later.settleFirstBoot();
+  later.settleFirstBoot(); // Try again after a failed boot: nothing more happens
+  assert.equal(await settled(later.firstBoot), true);
+  assert.equal(container.registered.length, 0, 'not before the page is idle');
+  assert.ok(env.timers[0].cleared, 'the fallback is cancelled');
+  assert.deepEqual(env.idles.map(idle => idle.options), [{ timeout: 2000 }]);
+  env.idles[0].fn();
+  assert.ok(await registration);
+  assert.deepEqual(container.registered, [['./sw.js', { scope: './' }]]);
+  assert.equal(env.timers.length, 1);
+});
+
+test('a browser whose service worker API throws still starts the game: registerAfterBoot rejects into main.jsx\'s catch', async () => {
+  later.resetServiceWorker();
+  // Chromium throws a SecurityError reading navigator.serviceWorker in sandboxed and opaque-origin documents. A throw
+  // from main.jsx's registerAfterBoot() call would stop it before createRoot renders the game.
+  const env = { navigator: { get serviceWorker() { throw new DOMException('Access to service workers is denied', 'SecurityError'); } } };
+  let registration;
+  assert.doesNotThrow(() => { registration = later.registerAfterBoot('./sw.js', env); });
+  await assert.rejects(registration, { name: 'SecurityError' });
+});
+
+test('a boot that never settles still installs the worker after 10 seconds; without requestIdleCallback a short timer stands in', async () => {
+  later.resetServiceWorker();
+  const { env, container } = clocked({ idle: false });
+  const registration = later.registerAfterBoot('./sw.js', env, never);
+  await flush();
+  assert.equal(container.registered.length, 0);
+  env.timers[0].fn();
+  assert.deepEqual(env.timers.map(timer => timer.ms), [10_000, 200]);
+  assert.equal(container.registered.length, 0, 'not in the same moment');
+  env.timers[1].fn();
+  assert.ok(await registration);
+  assert.deepEqual(container.registered, [['./sw.js', { scope: './' }]]);
+});
+
+test('App\'s boot settles the first-boot signal once setup is up, and when the maps fail to load', async () => {
+  const world = readFileSync(publicFile('world-110m.v1.json'), 'utf8');
+  const priorFetch = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
+  for (const fails of [false, true]) {
+    // A bundle each, for a fresh signal.
+    const { App, firstBoot } = await bundleComponents({ App: 'src/App.jsx', firstBoot: ['src/serviceWorker.js', 'firstBoot'] },
+      { jsx: 'automatic' });
+    Object.defineProperty(globalThis, 'fetch', { configurable: true, writable: true, value: async url => {
+      if (fails) throw new TypeError('Failed to fetch');
+      return String(url).endsWith('/world-110m.v1.json') ? { ok: true, json: async () => JSON.parse(world) } : { ok: false, status: 404 };
+    } });
+    const f = syncAppFixture({ App, phase: 'loading' });
+    try {
+      assert.equal(await settled(firstBoot), false);
+      await App.prototype.boot.call(f.app);
+      await f.app.seasonIndex;
+      assert.deepEqual([f.app.state.phase, !!f.app.state.err], fails ? ['loading', true] : ['setup', false]);
+      assert.equal(await settled(firstBoot), true, fails ? 'boot failed' : 'setup is up');
+    } finally {
+      f.close();
+      Object.defineProperty(globalThis, 'fetch', priorFetch);
+    }
+  }
+});
+
 // ---------- a campaign's crests and flags, kept for offline play ----------
 
 const football = getSport('football');

@@ -23,7 +23,7 @@ import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiv
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
-import { cacheForOffline } from './serviceWorker.js';
+import { cacheForOffline, settleFirstBoot } from './serviceWorker.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { skipAheadModel } from './viewModels/campaign.js';
@@ -476,9 +476,12 @@ export default class App extends React.Component {
           this.showSetupSet();
           if (this.challengeTeam != null) this.settleChallengeTeam();
         }
+        // Setup is up: a first visit's offline worker may register now (serviceWorker.js registerAfterBoot).
+        settleFirstBoot();
         this.requestSeasons();
       });
     } catch (e) {
+      settleFirstBoot();
       this.setState({ err: 'MAP DATA FAILED TO LOAD — ' + String((e && e.message) || e) });
     }
   }

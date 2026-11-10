@@ -143,8 +143,11 @@ country maps come from the network while online, so they always match the
 deployed build, and from the cache offline. Flags and crests show from the cache
 at once and refresh in the background. Starting or resuming a campaign online
 also fetches every one of its teams' crests and flags that is not cached yet, a
-few at a time, so teams the game never showed online still show offline. After
-one online visit the game opens offline and plays nations and club campaigns,
+few at a time, so teams the game never showed online still show offline. A
+first visit installs the worker only once the setup screen is up and the page
+is idle, or about 10 seconds after the game starts if setup takes longer, so its
+downloads leave the game's own alone. After one online visit that got that far,
+the game opens offline and plays nations and club campaigns,
 plus every country whose map was opened online. A country never opened online
 fails to load, with **Retry**, and a flag or crest the game has neither shown
 nor kept for a campaign online stays blank.
