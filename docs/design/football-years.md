@@ -936,15 +936,21 @@ CC BY-SA asks for and licenses the season files under it.
   the best of the teams that played in the four years before (each season's best
   is a finalist), and 87 today's strongest built-in nation.
 - **The XI.** From the squad of 22: one GK, four DF, four MF and two FW by the
-  database's positions, the most minutes first, then the most starts, then the
-  lower shirt number. A role the squad cannot fill takes the most-used players
-  left, whatever their position (1962's Czechoslovakia lists two midfielders,
-  Chile three, 1982's Hungary three). From 1970, minutes come from the
-  appearances, substitutions, sendings-off and extra time. For 1962 and 1966
-  every starter of Wikipedia's line-ups plays the whole match (no substitutes
-  were allowed), 120 minutes with extra time: the line-up is matched to the squad
-  by team and shirt number, and the eleven names spelt otherwise on the page
-  (Li Chan-myung for Chang-myung Lee) are checked and listed in the manifest.
+  database's positions, of the players who played (minutes, or a start), the
+  most minutes first, then the most starts, then the lower shirt number. A role
+  short of them takes the most-used players left, whatever their position:
+  everyone who played comes before anyone who did not, and every finalist used
+  twelve players or more, so no XI holds a player who never played. 29 places in
+  21 XIs are filled so: 1962's Czechoslovakia lists two midfielders, and Chile
+  and 1982's Hungary three, one of whom never played; the other eighteen list
+  enough for the role but not enough who played (Brazil's 1962 midfielders
+  Zequinha and Mengálvio never played, and its forwards Zagallo and Amarildo
+  take their places). From 1970, minutes come from the appearances,
+  substitutions, sendings-off and extra time. For 1962 and 1966 every starter of
+  Wikipedia's line-ups plays the whole match (no substitutes were allowed), 120
+  minutes with extra time: the line-up is matched to the squad by team and
+  shirt number, and the eleven names spelt otherwise on the page (Li Chan-myung
+  for Chang-myung Lee) are checked and listed in the manifest.
 - **Order.** By Ballon d'Or points of the season's two calendar years (1969 and
   1970 for 1969/70), then World Cup awards (Golden Ball 3, Silver 2, Bronze 1,
   Golden Boot 2, Silver and Bronze Boot 1, Golden Glove 1, Best Young Player 1),
@@ -996,10 +1002,11 @@ rollover of the built-in season changes nothing.
   player of the nation has found 147, at 0.65). The computed strengths run 5.5
   points higher on average: SWOS rates Mexico, Saudi Arabia and South Korea at
   60–65 where their results make them 77–81.
-- **How they play.** Each season's finalists, all against all (twenty rounds,
-  neutral venue, Balanced, measured 2026-11-10): 2.89–3.16 goals a game,
-  20.3–23.2% draws and 6.2–7.8% goalless, within the realism harness's real range
-  and as EA's seasons play; the stronger side wins 72–77% of decided games.
+- **How they play.** Each season's finalists, all against all (a hundred
+  rounds, neutral venue, Balanced, measured 2026-11-10): 2.93–3.16 goals a
+  game, 20.6–23.2% draws and 6.2–7.7% goalless, within the realism harness's
+  real range and as EA's seasons play; the stronger side wins 72–77% of decided
+  games.
 - **Saves.** A computed player is a plain record (no `playerPack` kind), its
   source inline: 24 squads take about 105,000 characters, and a whole 1989/90
   world campaign stays within the checkpoint budget (`scripts/save-size.test.mjs`).
@@ -1394,11 +1401,15 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   ordered by World Cup awards, goals a minute and minutes (Pelé, 90, follows
   Jairzinho, 93, in 1969/70), and goals a minute lifts a substitute who scored.
 - Their XI is a 4-4-2 by the database's positions. A 4-2-4 or 4-3-3 side loses
-  its third forward (Tostão in 1969/70), a WM side short of midfielders plays a
-  forward out of position, and a role is filled from its own position first, even
-  by a squad player who never played: 25 of the 1,925 XI places, 18 of them in
-  1961/62 and 1965/66 (Brazil's 1962 XI has Zequinha and Mengálvio, unused, where
-  Zagallo and Amarildo played).
+  its third forward (Tostão in 1969/70), and a role short of players who played
+  (a WM side's midfield, or one whose listed players sat out) takes the
+  most-used players left, out of position, 12 points below their rating in the
+  lineup: 29 of the 1,925 XI places, 21 of them in 1961/62 and 1965/66. Each
+  such place costs the nation about 1.1 of its strength: Brazil's 1962 XI, with
+  Zagallo and Amarildo for Zequinha and Mengálvio, who never played, is 85
+  strong for a T of 87, and Pelé (180 minutes) sits out. A tie goes to the lower
+  shirt number, so Mexico's 1966 midfield takes Antonio Carbajal, a goalkeeper
+  who played one match, before four outfielders who also played one.
 - They field only the World Cup's 15–24 finalists, so no Elite 32, and Africa,
   Asia and North America never reach four sides. The Elo is computed from results
   alone: Asian and North American sides rate higher than SWOS's ratings of autumn

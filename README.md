@@ -1468,13 +1468,14 @@ read, so nine seasons, 1961/62 to 1993/94, are **computed** and say so ("Compute
   `T = 87 − 3.2 × (best Elo − its Elo) / 100`, with the Elo computed from every
   international result to that day (martj42's results, CC0) by eloratings.net's
   formula. Its eleven are the players of its World Cup squad with the most
-  minutes (1 GK, 4 DF, 4 MF, 2 FW), ordered by Ballon d'Or votes, World Cup
-  awards, goals a minute and minutes, and rated T plus today's spread of an XI,
-  so the team's Elo sets most of each rating. Squads, minutes, goals and awards
-  come from the Fjelstul World Cup Database, the 1962 and 1966 line-ups and the
-  Ballon d'Or votes from Wikipedia (all CC BY-SA 4.0, credited in
-  `public/football/ATTRIBUTION-world-cup.txt`, which licenses the season files
-  the same way).
+  minutes in each role (1 GK, 4 DF, 4 MF, 2 FW; a role short of players who
+  played takes the most-used left, out of position), ordered by Ballon d'Or
+  votes, World Cup awards, goals a minute and minutes, and rated T plus today's
+  spread of an XI, so the team's Elo sets most of each rating. Squads, minutes,
+  goals and awards come from the Fjelstul World Cup Database, the 1962 and 1966
+  line-ups and the Ballon d'Or votes from Wikipedia (all CC BY-SA 4.0, credited
+  in `public/football/ATTRIBUTION-world-cup.txt`, which licenses the season
+  files the same way).
 - **Federations of the day:** the Soviet Union, Yugoslavia, Czechoslovakia, West
   Germany and Zaire play under their own names and flags, holding their members'
   land where they are finalists. East Germany has no shape and fields no team.
