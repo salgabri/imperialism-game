@@ -2118,14 +2118,17 @@ Only land with the same owner can join; the flag remains clipped to land.
 Distant possessions such as Greenland or French Guiana receive separate flags,
 so they cannot stretch European stripes or emblems out of sight. This is a
 visual grouping only, not a change to conquest adjacency. Multipart countries
-are drawn as separate flag parts beneath a single clickable outline, preserving holes and
-country selection. Bounds update after conquest, not on zoom or pan. Only land
+are drawn as flag parts beneath a single clickable outline, preserving holes and
+country selection: a country's small islands that lie close together within one
+region share one part, outlined together so that it covers exactly the land they
+cover, while a large landmass and islands far apart keep parts of their own. Bounds update after conquest, not on zoom or pan. Only land
 reveals the flag; seas and neutral countries stay untouched. A solid rectangle
 in the nation's colour is the fallback. Non-participants remain unflagged in
 continental campaigns. A club's land keeps its club colour with its crest placed
 on it, below.
 
-Each banner is drawn once and shown through the outline of each land part, and
+Each banner is drawn once and shown through the outline of each flag part (about
+700 on a World War board, where a part per island took about 1,300), and
 its SVG artwork comes from a bitmap: the first time Flags mode shows a flag, its
 SVG is rasterised in the background at 1024 px on the longer side. Wherever a
 banner is drawn larger than that, it keeps the SVG, so flags stay sharp at any
@@ -2141,7 +2144,17 @@ wheel turn or drag, and only at background priority. Finished bitmaps reach the
 map in batches, one re-render for many flags. Bitmaps are lossless WebP in
 Chrome and Firefox (Chrome encodes WebP on a worker thread, but PNG on the
 page's own thread) and PNG in Safari, which has no WebP encoder: the same pixels
-either way.
+either way. The first banner to ask opens the encoder's connection to the GPU
+process with one pixel, while the click is still being handled: opened at the
+first flag's draw, it waited for the GPU to finish rastering the whole map.
+
+Switching to Flags is quick because what its first view needs is made
+beforehand: the regions, each region's emblem placement and outlines are built
+while the map shows another mode, in steps of a few milliseconds when the page
+is idle and nobody has pressed, scrolled or dragged for 200 ms, and they follow
+the board as it changes, at most every two seconds. The click then only draws
+the map; switching before that work is done finishes it rather than starting
+over.
 
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,

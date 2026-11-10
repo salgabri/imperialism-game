@@ -10,8 +10,10 @@ import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { FLAG_CODES, flagUrl } from '../data/flags.js';
 import { FLAG_SYMBOLS } from '../data/flagSymbols.js';
 import { clubLogoUrl } from '../data/clubLogos.js';
-import { createFlagRegionIndex } from '../engine/flagRegions.js';
+import { regionClips } from '../engine/flagClips.js';
+import { flagRegionIndexSteps } from '../engine/flagRegions.js';
 import { layoutFlagSymbol } from '../engine/flagSymbolLayout.js';
+import { runQuietly } from '../engine/quietTurns.js';
 import { memo } from '../viewModels/format.js';
 import * as mapVM from '../viewModels/map.js';
 
@@ -134,14 +136,14 @@ export function handleMapMove(e) {
 }
 
 /**
- * Each flag region's banner (`components` from createFlagRegionIndex) and the parts every territory shows it through.
+ * Each flag region's banner (`components` from createFlagRegionIndex) and the clip paths every territory shows it
+ * through: one per territory and region, its parts joined (engine/flagClips.js, kept per region object).
  * `markOf(ownerId)` says what an owner flies: `{ crestUrl }` for a club with a crest, else `{ nationId }` for a flag, and
  * the `color` behind it; an owner with neither flies nothing. `idPrefix` keeps two maps' banners apart in one document.
- * A part's path depends only on its rings, and parts are the index's fixed objects: `previousPaths` (the last layout's)
- * hands them back. → { result: { flagParts: Map(territory id → [{ id, d }]), flagPatterns }, paths }
+ * → { flagParts: Map(territory id → [{ id, d }]), flagPatterns }
  */
-function layoutBanners(components, markOf, { previousPaths = null, idPrefix = '' } = {}) {
-  const flagParts = new Map(), flagPatterns = [], paths = new Map();
+function layoutBanners(components, markOf, { idPrefix = '' } = {}) {
+  const flagParts = new Map(), flagPatterns = [];
   for (const component of components) {
     const { crestUrl = null, nationId = null, color = V4.flagBg } = markOf(component.ownerId) || {};
     const url = crestUrl || flagUrl(nationId);
@@ -156,27 +158,46 @@ function layoutBanners(components, markOf, { previousPaths = null, idPrefix = ''
       fieldUrl: symbolProfile?.fieldFile ? `${import.meta.env.BASE_URL}${symbolProfile.fieldFile}` : null,
       symbolUrl: symbolProfile?.symbolFile ? `${import.meta.env.BASE_URL}${symbolProfile.symbolFile}` : null,
       bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
-    for (const part of component.parts) {
-      if (!flagParts.has(part.countryId)) flagParts.set(part.countryId, []);
-      const d = previousPaths?.get(part) ?? part.rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join('');
-      paths.set(part, d);
-      flagParts.get(part.countryId).push({ id, d });
+    for (const { countryId, d } of regionClips(component)) {
+      if (!flagParts.has(countryId)) flagParts.set(countryId, []);
+      flagParts.get(countryId).push({ id, d });
     }
   }
-  return { result: { flagParts, flagPatterns }, paths };
+  return { flagParts, flagPatterns };
 }
 
-/** The flag region index of this fit, built on its first Flags view (fitMap keeps only its source). */
+/**
+ * The flag region index of this fit, built on its first Flags view (fitMap keeps only its source), unless the warm-up
+ * has built it already. One the warm-up is still building is finished here, not begun again.
+ */
 function flagIndex(app) {
-  if (!app.flagComponents && app.flagRegionSource) {
-    app.flagComponents = createFlagRegionIndex(app.flagRegionSource.geometry, { maxGap: app.flagRegionSource.maxGap });
+  const source = app.flagRegionSource;
+  if (!app.flagComponents && source) {
+    const build = app.flagIndexBuild?.source === source ? app.flagIndexBuild.steps
+      : flagRegionIndexSteps(source.geometry, { maxGap: source.maxGap });
+    app.flagIndexBuild = null;
+    for (;;) {
+      const { done, value } = build.next();
+      if (done) { app.flagComponents = value; break; }
+    }
   }
   return app.flagComponents;
 }
 
-/** One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest. */
-export function mapFlags(playing) {
-  const { mapMode, teams } = this.state;
+/** What each owner flies on the campaign map (layoutBanners' `markOf`). */
+const campaignMarks = (teams, playing) => ownerId => {
+  const owner = playing ? teams[ownerId] : null;
+  // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
+  return { crestUrl: crestOf(owner), color: owner?.col || V4.flagBg,
+    nationId: playing ? owner?.flagId : NATIONS[ownerId] ? ownerId : DEPENDENCIES[ownerId]?.of };
+};
+
+/**
+ * One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest. `mapMode` is the
+ * map's mode unless asked for Flags' banners while the map shows another (the warm-up).
+ */
+export function mapFlags(playing, mapMode = this.state.mapMode) {
+  const { teams } = this.state;
   if (mapMode !== 'flags') return NO_FLAGS;
   if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return NO_FLAGS;
   if (!flagIndex(this)) return NO_FLAGS;
@@ -185,14 +206,90 @@ export function mapFlags(playing) {
   const components = this.flagComponents.components(playing ? paintedOwnership(this, mapSnapshot(this)) : this.setupFlagOwnership);
   const cached = this.flagLayoutCache;
   if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
-  const { result, paths } = layoutBanners(components, ownerId => {
-    const owner = playing ? teams[ownerId] : null;
-    // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
-    return { crestUrl: crestOf(owner), color: owner?.col || V4.flagBg,
-      nationId: playing ? owner?.flagId : NATIONS[ownerId] ? ownerId : DEPENDENCIES[ownerId]?.of };
-  }, { previousPaths: cached?.paths });
-  this.flagLayoutCache = { components, teams, playing, result, paths };
+  const result = layoutBanners(components, campaignMarks(teams, playing));
+  this.flagLayoutCache = { components, teams, playing, result };
   return result;
+}
+
+// ---- Flags mode's first view, made ahead ----
+// The first Flags view of a fit builds its region index, every region's emblem layout and every territory's clip paths:
+// about 140 ms of the click on a desktop, several times that on a phone. The warm-up builds them before the click, in
+// quiet turns of a few milliseconds (engine/quietTurns.js) while the campaign map shows another mode, and follows the
+// board as it changes, so the click finds them made. It fills the caches the Flags view reads (flagComponents, the
+// per-region clip and layout caches, flagLayoutCache) with what that view would make itself, and nothing else.
+
+/** The warm-up follows a changing board at most this often, ms: a quick campaign changes it several times a second. */
+const FLAG_WARMUP_EVERY_MS = 2000;
+const clock = () => (typeof performance === 'object' ? performance.now() : Date.now());
+
+/** Whether the warm-up has a view to make ready: a campaign map showing another mode, on a fit it can build from. */
+function warmupWanted(app) {
+  const st = app.state;
+  return !app.flagWarmup?.stopped && isPlaying(st) && st.mapMode !== 'flags' && !!app.flagRegionSource;
+}
+
+/**
+ * The warm-up's steps for the board on screen: the region index, then each region's banner, then the banners. None
+ * when no team flies a flag or crest (Flags mode then shows none).
+ */
+function* flagWarmupSteps(app) {
+  const source = app.flagRegionSource;
+  if (!Object.values(app.state.teams || {}).some(team => team.flagId || crestOf(team))) return;
+  if (!app.flagComponents) {
+    // Kept on the app, so a click on Flags meanwhile finishes this build (flagIndex) instead of starting it over.
+    const build = app.flagIndexBuild = { source, steps: flagRegionIndexSteps(source.geometry, { maxGap: source.maxGap }) };
+    for (;;) {
+      if (app.flagIndexBuild !== build) break;
+      const { done, value } = build.steps.next();
+      if (done) { app.flagComponents = value; app.flagIndexBuild = null; break; }
+      yield;
+    }
+    if (!app.flagComponents) return;
+  }
+  const components = app.flagComponents.components(paintedOwnership(app, mapSnapshot(app)));
+  yield;
+  // One region a step: its emblem layout and clip paths are kept per region, so the banners below find them made.
+  const marks = campaignMarks(app.state.teams, true);
+  for (const component of components) { layoutBanners([component], marks); yield; }
+  app.mapFlags(true, 'flags');
+}
+
+const newWarmup = () => ({ board: null, running: false, timer: null, startedAt: -Infinity, stopped: false, failedOn: null });
+
+/**
+ * Starts the warm-up for the board on screen unless it has run for it, runs now, or ran less than
+ * FLAG_WARMUP_EVERY_MS ago (then it starts once that time is up). App calls it after every commit: it reads identities
+ * only, until it starts.
+ */
+export function queueFlagWarmup() {
+  if (!warmupWanted(this)) return;
+  const st = this.state;
+  const warm = this.flagWarmup ||= newWarmup();
+  // A fit it failed on is left to the Flags view, which builds what it needs as without a warm-up.
+  if (warm.running || warm.timer || warm.failedOn === this.flagRegionSource) return;
+  const board = { source: this.flagRegionSource, own: st.own, claims: st.claims, choice: st.choice, teams: st.teams };
+  const last = warm.board;
+  if (last && Object.keys(board).every(key => last[key] === board[key])) return;
+  const wait = warm.startedAt + FLAG_WARMUP_EVERY_MS - clock();
+  if (wait > 0) {
+    warm.timer = setTimeout(() => { warm.timer = null; this.queueFlagWarmup(); }, wait);
+    return;
+  }
+  Object.assign(warm, { board, running: true, startedAt: clock() });
+  runQuietly(flagWarmupSteps(this), { wanted: () => warmupWanted(this) && this.flagRegionSource === board.source })
+    // A warm-up cut short (Flags shown, a new fit, the campaign over) leaves its board to be made again; the Flags view
+    // makes whatever it lacks, as without a warm-up.
+    .then(finished => { if (!finished) warm.board = null; }, () => { warm.board = null; warm.failedOn = board.source; })
+    .finally(() => { warm.running = false; if (!warm.stopped) this.queueFlagWarmup(); });
+}
+
+/** Ends the warm-up for good (App unmounting). */
+export function stopFlagWarmup() {
+  const warm = this.flagWarmup ||= newWarmup();
+  warm.stopped = true;
+  clearTimeout(warm.timer);
+  warm.timer = null;
+  this.flagIndexBuild = null;
 }
 
 /** Banner ids of the setup map card: apart from the campaign map's, which stays mounted behind the wizard. */
@@ -212,19 +309,19 @@ export function setupMapFlags(setup = this.state.setup) {
   const index = flagIndex(this);
   const cached = this.setupFlagCache;
   if (cached?.index === index && cached.opening === opening && cached.marks === marks) return cached.result;
-  const { result, paths } = layoutBanners(index.components(opening), ownerId => {
+  const result = layoutBanners(index.components(opening), ownerId => {
     const team = marks[ownerId];
     if (!team) return null;
     return team.kind === 'club' ? { crestUrl: clubLogoUrl(ownerId), color: team.col || V4.flagBg }
       : { nationId: team.flagId, color: team.col || V4.flagBg };
-  }, { previousPaths: cached?.index === index ? cached.paths : null, idPrefix: SETUP_FLAG_PREFIX });
+  }, { idPrefix: SETUP_FLAG_PREFIX });
   const fills = new Map();
   for (const [territory, ownerId] of Object.entries(opening)) {
     const team = marks[ownerId];
     if (team?.kind === 'club' && team.col) fills.set(territory, team.col);
   }
   const value = { ...result, fills };
-  this.setupFlagCache = { index, opening, marks, result: value, paths };
+  this.setupFlagCache = { index, opening, marks, result: value };
   return value;
 }
 
