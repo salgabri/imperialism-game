@@ -4,6 +4,10 @@
 // their small UI chips remain unchanged; unknown flags retain their full artwork.
 // Bounds are native-browser measurements, rounded outward with a one-unit
 // stroke margin. The Swiss cross has no stroke and has exact square bounds.
+// The historic flags' emblems (Soviet Union, SFR Yugoslavia, Zaire, the CIS;
+// scripts/data/historic-flags.json) are measured by build-historic-flags.mjs,
+// which checks these bounds: the drawn extent, the Yugoslav star's gold edge and
+// its mitred tips included, rounded outward with the same one-unit margin.
 const profile = (code, x, y, w, h, fieldConstraints) => Object.freeze({
   id: `${code}-symbol`,
   sourceWidth: 640,
@@ -29,4 +33,8 @@ export const FLAG_SYMBOLS = Object.freeze({
   sk: profile('sk', 127, 108, 212, 264),
   tr: profile('tr', 162, 126, 339, 243),
   xk: profile('xk', 138, 72, 364, 331),
+  su: profile('su', 99, 29, 123, 182),
+  yu: profile('yu', 166, 79, 308, 292),
+  zr: profile('zr', 194, 114, 252, 252),
+  'cis-1992': profile('cis-1992', 46, 150, 548, 179),
 });

@@ -55,4 +55,9 @@ export const BUILT_IN_WOMENS_TENNIS_SEASONS = Object.freeze([
   Object.freeze({ id: 'wta-1975', version: 'wta-1975-100ec047', year: 1975, season: '1975', label: 'Elo from match results, end of 1975 (rough)' }),
   Object.freeze({ id: 'wta-1974', version: 'wta-1974-59092679', year: 1974, season: '1974', label: 'Elo from match results, end of 1974 (rough)' }),
   Object.freeze({ id: 'wta-1973', version: 'wta-1973-1e312078', year: 1973, season: '1973', label: 'Elo from match results, end of 1973 (rough)' }),
+  Object.freeze({ id: 'wta-1972', version: 'wta-1972-bbaa9ba2', year: 1972, season: '1972', label: 'Elo from match results, end of 1972 (rough)' }),
+  Object.freeze({ id: 'wta-1971', version: 'wta-1971-f8c8ab32', year: 1971, season: '1971', label: 'Elo from match results, end of 1971 (rough)' }),
+  Object.freeze({ id: 'wta-1970', version: 'wta-1970-0fa27477', year: 1970, season: '1970', label: 'Elo from match results, end of 1970 (rough)' }),
+  Object.freeze({ id: 'wta-1969', version: 'wta-1969-342ca796', year: 1969, season: '1969', label: 'Elo from match results, end of 1969 (rough)' }),
+  Object.freeze({ id: 'wta-1968', version: 'wta-1968-0a2f4817', year: 1968, season: '1968', label: 'Elo from match results, end of 1968 (rough)' }),
 ]);

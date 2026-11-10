@@ -34,10 +34,21 @@ const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'
 const MANIFEST = JSON.parse(read('scripts/data/nfl-seasons.json'));
 const FRANCHISES = JSON.parse(read('scripts/data/nfl-teams.json')).teams;
 const isTecmo = year => MANIFEST.sources[year].kind === 'tecmo';
-const MADDEN = MANIFEST.seasons.filter(year => !isTecmo(year));
+// The seasons no game rated, computed from Pro Football Archives' facts (scripts/data/pfa-seasons/), the NFL's and the AFL's.
+const isPfa = year => MANIFEST.sources[year].kind === 'pfa';
+const MADDEN = MANIFEST.seasons.filter(year => !isTecmo(year) && !isPfa(year));
+const PFA = MANIFEST.seasons.filter(isPfa);
+const AFL = MANIFEST.afl.seasons;
 const TECMO = MANIFEST.seasons.filter(isTecmo);
 const snapshotOf = year => JSON.parse(read(`scripts/data/madden-seasons/${year}.json`));
 const tecmoSnapshotOf = year => JSON.parse(read(`scripts/data/tecmo/${year}.json`));
+/** The places of a season's club its snapshot documents as short, which the game fills out of position. */
+const pfaSnapshotOf = (year, league = 'NFL') => JSON.parse(read(`scripts/data/pfa-seasons/${league === 'AFL' ? 'afl-' : ''}${year}.json`));
+const gapsOf = (year, franchise, league = 'NFL') => (league === 'AFL' ? pfaSnapshotOf(year, 'AFL') : isTecmo(year) ? tecmoSnapshotOf(year)
+  : isPfa(year) ? pfaSnapshotOf(year) : null)?.lineup.gaps[franchise] || {};
+/** A season's league, by its id: the AFL's before the merger, else the NFL's. */
+const leagueOf = id => (id.startsWith('pfa-afl-') ? 'AFL' : 'NFL');
+const viewOf = league => (league === 'AFL' ? { ...MANIFEST, ...MANIFEST.afl, teams: MANIFEST.teams } : MANIFEST);
 const seasonFile = id => JSON.parse(read(`public/american-football/${id}.json`));
 const mapFile = id => JSON.parse(read(`public/domestic/${id}.json`));
 const ERA_MAPS = CLUB_MAPS.filter(entry => entry.sport === 'american-football' && entry.seasons);
@@ -220,7 +231,7 @@ test('a second source is compared player by player, by name, team and position',
 
 test('every season, its listing and audit rebuild byte for byte from the committed snapshots; so does the 2026 season', () => {
   const root = fileURLToPath(new URL('..', import.meta.url));
-  assert.match(execFileSync(process.execPath, ['scripts/build-nfl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 30 American football seasons/);
+  assert.match(execFileSync(process.execPath, ['scripts/build-nfl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), new RegExp(`Verified the ${MANIFEST.seasons.length + AFL.length} American football seasons`));
   assert.match(execFileSync(process.execPath, ['scripts/build-nfl.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the NFL clubs byte for byte/);
   for (const year of MADDEN) {
     const snapshot = snapshotOf(year);
@@ -261,10 +272,18 @@ test('a second source agrees with every Madden season, and EA\'s own copies agre
 });
 
 test('the built-in seasons are the manifest\'s, newest first, from Madden NFL 26 back to Tecmo Super Bowl, each on its era\'s map', () => {
-  assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => set.id), [...MANIFEST.seasons].reverse().map(year => setIdOf(MANIFEST, year)));
+  const ids = [...MANIFEST.seasons.map(year => [year, setIdOf(MANIFEST, year)]), ...AFL.map(year => [year, setIdOf(viewOf('AFL'), year)])]
+    .sort((a, b) => b[0] - a[0] || (a[1] < b[1] ? 1 : -1)).map(([, id]) => id);
+  assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => set.id), ids, 'newest first, a year\'s AFL season before its NFL one');
+  assert.deepEqual(PFA, [...Array.from({ length: 30 }, (_, i) => 1960 + i), 1991, 1996, 1997, 1998, 1999, 2000], 'computed: 1960–1989, 1991 and 1996–2000');
+  assert.deepEqual(AFL, Array.from({ length: 10 }, (_, i) => 1960 + i), 'the AFL\'s ten seasons');
   assert.deepEqual(MADDEN, Array.from({ length: 25 }, (_, i) => 2001 + i), 'no Madden season is missing');
   assert.deepEqual(TECMO, [1990, 1992, 1993, 1994, 1995], 'every Tecmo Super Bowl season: no edition rates 1991');
-  assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.slice(25).map(set => [set.id, set.season, set.label, set.map]), [
+  // 1998 to 2000 are computed: no Madden edition before Madden NFL 2002 is read (NFL Draft Buzz's copy is not used).
+  assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.filter(set => set.year >= 1998 && set.year <= 2000).map(set => [set.id, set.label, set.map]), [
+    ['pfa-2000', 'NFL (computed)', 'nfl2000'], ['pfa-1999', 'NFL (computed)', 'nfl1999'], ['pfa-1998', 'NFL (computed)', 'nfl1998']]);
+  assert.ok(BUILT_IN_SETS.every(set => !/^madden-(?:19\d\d|2000)$/.test(set.id)), 'no Madden season before 2001');
+  assert.deepEqual(BUILT_IN_AMERICAN_FOOTBALL_SEASONS.filter(set => set.id.startsWith('tecmo-')).map(set => [set.id, set.season, set.label, set.map]), [
     ['tecmo-1995', '1995', 'Tecmo Super Bowl III', 'nfl1995'], ['tecmo-1994', '1994', 'Tecmo Super Bowl II', 'nfl1994'],
     ['tecmo-1993', '1993', 'Tecmo Super Bowl (SNES)', 'nfl1992'], ['tecmo-1992', '1992', 'Tecmo Super Bowl II', 'nfl1992'],
     ['tecmo-1990', '1990', 'Tecmo Super Bowl (NES)', 'nfl1990']], 'after the Madden seasons, each game by its name');
@@ -278,12 +297,12 @@ test('the built-in seasons are the manifest\'s, newest first, from Madden NFL 26
     assert.equal(setSportOf(set.id), 'american-football');
     assert.ok(!setHasNations(set.id) && setHasClubs(set.id), 'clubs only');
     assert.equal(seasonMapOf(set.id), listed.map);
-    assert.equal(mapOf(MANIFEST, set.year), listed.map);
+    assert.equal(mapOf(viewOf(leagueOf(set.id)), set.year), listed.map);
     assert.equal(seasonFile(set.id).version, listed.version);
   }
-  assert.deepEqual(ERA_MAPS.map(entry => entry.id), MANIFEST.maps.map(map => map.id).filter(id => id !== 'nfl'));
+  assert.deepEqual(ERA_MAPS.map(entry => entry.id), [...MANIFEST.maps.map(map => map.id).filter(id => id !== 'nfl'), ...MANIFEST.afl.maps.map(map => map.id)]);
   for (const entry of ERA_MAPS) {
-    assert.deepEqual(entry.seasons, BUILT_IN_AMERICAN_FOOTBALL_SEASONS.filter(set => set.map === entry.id).map(set => set.id).sort());
+    assert.deepEqual([...entry.seasons].sort(), BUILT_IN_AMERICAN_FOOTBALL_SEASONS.filter(set => set.map === entry.id).map(set => set.id).sort());
     assert.ok(!('top' in entry), 'an era\'s strongest clubs are its seasons\' own');
   }
 });
@@ -299,16 +318,17 @@ test('every season loads and fits its era\'s map: the same clubs, named and hous
     const entry = CLUB_MAPS.find(item => item.id === listed.map);
     assert.equal(map.meta.version, entry.version);
     assert.deepEqual(map.clubs.map(club => club.id).sort(), doc.clubs.map(club => club.id).sort(), `${listed.id}'s clubs are its map's`);
-    const teams = new Map(teamsOf(FRANCHISES, MANIFEST, listed.year).map(team => [team.id, team]));
+    const league = leagueOf(listed.id);
+    const teams = new Map(teamsOf(FRANCHISES, MANIFEST, listed.year, league).map(team => [team.id, team]));
     for (const row of map.clubs) {
       const team = teams.get(row.id), club = doc.clubs.find(item => item.id === row.id);
-      assert.deepEqual([club.name, club.code, club.league, club.country, club.col], [team.name, team.code, 'NFL', '840', colourFor(team.id)]);
+      assert.deepEqual([club.name, club.code, club.league, club.country, club.col], [team.name, team.code, league, '840', colourFor(team.id)]);
       assert.equal(map.sectionNames[row.homeSection], team.city, `${listed.year} ${team.name} starts at home`);
       assert.deepEqual(row.homePoint, team.home);
       if (entry.seasons) assert.equal(row.name, club.name, 'an era map names its season\'s clubs');
       assert.ok(club.squad.length >= americanFootball.squadSize);
       // A Tecmo club keeps every natural player of a place it is short of; the game fills the rest out of position.
-      const gaps = isTecmo(listed.year) ? tecmoSnapshotOf(listed.year).lineup.gaps[team.franchise] || {} : {};
+      const gaps = gapsOf(listed.year, team.franchise, league);
       for (const [pos, count] of Object.entries(FORMATION)) {
         assert.ok(naturalCount(club.squad, pos) >= count - (gaps[pos] ?? 0), `${listed.year} ${club.name} has its ${pos}`);
       }
@@ -450,6 +470,89 @@ test('the Tecmo seasons play where the clubs played then: Phoenix, the Raiders i
   assert.equal(sectionAt(eraMap('nfl1995'), [-80.8431, 35.2271]), null, 'Charlotte is nobody\'s in 1995');
 });
 
+// ---------- the computed seasons and the AFL's ----------
+
+test('the seasons from 1960 play where the clubs played then, the AFL\'s on maps of their own', () => {
+  const clubs = id => seasonFile(id).clubs.map(club => club.id);
+  // The leagues apart until the 1970 merger: no AFL club in an NFL season, nor an NFL club in an AFL one.
+  assert.deepEqual([clubs('pfa-1960').length, clubs('pfa-1961').length, clubs('pfa-1966').length, clubs('pfa-1967').length, clubs('pfa-1970').length,
+    clubs('pfa-1976').length, clubs('pfa-afl-1960').length, clubs('pfa-afl-1966').length, clubs('pfa-afl-1968').length], [13, 14, 15, 16, 26, 28, 8, 9, 10]);
+  for (const year of AFL) {
+    const afl = new Set(clubs(`pfa-afl-${year}`));
+    assert.ok(clubs(`pfa-${year}`).every(id => !afl.has(id)), `${year}: no club in both leagues`);
+    assert.ok(seasonFile(`pfa-afl-${year}`).clubs.every(club => club.league === 'AFL') && seasonFile(`pfa-${year}`).clubs.every(club => club.league === 'NFL'));
+  }
+  // Expansion clubs before their first season, and the Browns' three seasons without a club.
+  for (const [id, first] of [['nfl-minnesota-vikings', 1961], ['nfl-atlanta-falcons', 1966], ['nfl-new-orleans-saints', 1967],
+    ['nfl-seattle-seahawks', 1976], ['nfl-tampa-bay-buccaneers', 1976]]) {
+    assert.equal(clubOf(`pfa-${first - 1}`, id), null, `${id} before ${first}`);
+    assert.ok(clubOf(`pfa-${first}`, id), `${id} in ${first}`);
+  }
+  for (const id of ['pfa-1998', 'pfa-1997', 'pfa-1996']) assert.equal(clubOf(id, 'nfl-cleveland-browns'), null, `${id}: no Browns`);
+  assert.ok(clubOf('pfa-1999', 'nfl-cleveland-browns'), 'the Browns back in 1999');
+  assert.equal(clubOf('pfa-afl-1966', 'nfl-cincinnati-bengals'), null);
+  assert.deepEqual(homeOf('pfa-afl-1968', 'nfl-cincinnati-bengals'), ['Cincinnati Bengals', 'CIN', 'Cincinnati']);
+
+  assert.deepEqual(homeOf('pfa-afl-1960', 'nfl-dallas-texans'), ['Dallas Texans', 'DTX', 'Dallas']);
+  at('afl1960', [-96.7597, 32.7794], 'nfl-dallas-texans', 'the Texans at the Cotton Bowl');
+  at('nfl1960', [-96.7597, 32.7794], 'nfl-dallas-cowboys', 'the Cowboys at the Cotton Bowl too, in the other league');
+  assert.deepEqual(homeOf('pfa-afl-1960', 'nfl-new-york-titans'), ['New York Titans', 'NYT', 'New York']);
+  assert.deepEqual(homeOf('pfa-afl-1963', 'nfl-new-york-jets'), ['New York Jets', 'NYJ', 'New York']);
+  assert.deepEqual(homeOf('pfa-afl-1960', 'nfl-los-angeles-chargers'), ['Los Angeles Chargers', 'LAC', 'Los Angeles']);
+  assert.deepEqual(homeOf('pfa-afl-1961', 'nfl-san-diego-chargers'), ['San Diego Chargers', 'SDC', 'San Diego']);
+  assert.deepEqual(homeOf('pfa-afl-1963', 'nfl-kansas-city-chiefs'), ['Kansas City Chiefs', 'KCC', 'Kansas City']);
+  at('afl1960', [-122.456, 37.767], 'nfl-oakland-raiders', 'the Raiders at Kezar, in San Francisco');
+  // The Patriots' four Boston grounds, then Foxborough.
+  at('afl1960', [-71.119, 42.353], 'nfl-boston-patriots', 'Nickerson Field');
+  at('afl1963', [-71.0978, 42.3464], 'nfl-boston-patriots', 'Fenway Park');
+  at('afl1969', [-71.1664, 42.335], 'nfl-boston-patriots', 'Alumni Stadium');
+  at('nfl1970', [-71.1272, 42.3664], 'nfl-boston-patriots', 'Harvard Stadium');
+  assert.deepEqual(homeOf('pfa-1971', 'nfl-new-england-patriots'), ['New England Patriots', 'NEP', 'New England']);
+  // The NFL's own: St. Louis, Baltimore, Washington at Griffith Stadium, the Steelers at Forbes Field then Pitt Stadium.
+  assert.deepEqual(homeOf('pfa-1960', 'nfl-st-louis-cardinals'), ['St. Louis Cardinals', 'STL', 'St. Louis']);
+  assert.deepEqual(homeOf('pfa-1983', 'nfl-baltimore-colts'), ['Baltimore Colts', 'BAL', 'Baltimore']);
+  assert.deepEqual(homeOf('pfa-1984', 'nfl-indianapolis-colts'), ['Indianapolis Colts', 'IND', 'Indianapolis']);
+  at('nfl1960', [-77.0203, 38.9175], 'nfl-washington', 'Griffith Stadium');
+  at('nfl1960', [-79.9542, 40.4419], 'nfl-pittsburgh-steelers', 'Forbes Field');
+  at('nfl1964', [-79.962, 40.444], 'nfl-pittsburgh-steelers', 'Pitt Stadium');
+  // The Giants at the Yale Bowl in 1973 and 1974 hold Connecticut; in 1975 the Giants and Jets share Shea, the Jets from Hofstra.
+  at('nfl1973', [-72.68, 41.76], 'nfl-new-york-giants', 'Connecticut is the Giants\'');
+  const ny = eraMap('nfl1973');
+  assert.ok([homeSection(ny, 'nfl-buffalo-bills'), homeSection(ny, 'nfl-new-york-jets')].includes(sectionAt(ny, [-73.76, 42.65])), 'New York between the Bills and the Jets');
+  const shea = eraMap('nfl1975');
+  assert.deepEqual(shea.clubs.find(c => c.id === 'nfl-new-york-giants').homePoint, [-73.8481, 40.7556], 'the Giants from Shea');
+  assert.deepEqual(shea.clubs.find(c => c.id === 'nfl-new-york-jets').homePoint, [-73.6005, 40.7146], 'the Jets from Hofstra');
+  // The Oilers in Memphis (1997) and Nashville (1998), the Ravens at Memorial Stadium (1996–97).
+  assert.deepEqual(homeOf('pfa-1997', 'nfl-tennessee-oilers'), ['Tennessee Oilers', 'TEN', 'Tennessee']);
+  at('nfl1997', [-89.9775, 35.1211], 'nfl-tennessee-oilers', 'the Liberty Bowl, Memphis');
+  at('nfl1998', [-86.8089, 36.1442], 'nfl-tennessee-oilers', 'Vanderbilt Stadium, Nashville');
+  at('nfl1996', [-76.6014, 39.3294], 'nfl-baltimore-ravens', 'Memorial Stadium');
+  // The Oilers renamed the Titans in 1999; the Seahawks at Husky Stadium in 2000, while their stadium was built.
+  assert.deepEqual(homeOf('pfa-1998', 'nfl-tennessee-oilers'), ['Tennessee Oilers', 'TEN', 'Tennessee']);
+  assert.deepEqual(homeOf('pfa-1999', 'nfl-tennessee-titans'), ['Tennessee Titans', 'TEN', 'Tennessee']);
+  at('nfl2000', [-122.3017, 47.6503], 'nfl-seattle-seahawks', 'Husky Stadium');
+  // 1988 to 1991 share the 1990 map: no club moved.
+  assert.deepEqual(ERA_MAPS.find(entry => entry.id === 'nfl1990').seasons, ['pfa-1988', 'pfa-1989', 'tecmo-1990', 'pfa-1991']);
+});
+
+test('a computed season is its snapshot: the overall says so, its gaps are the game\'s to fill', () => {
+  for (const [year, league] of [...PFA.map(year => [year, 'NFL']), ...AFL.map(year => [year, 'AFL'])]) {
+    const snapshot = pfaSnapshotOf(year, league), id = setIdOf(viewOf(league), year), doc = seasonFile(id);
+    assert.deepEqual([doc.kind, doc.source.method, doc.source.rawScale, doc.source.conversion, doc.label],
+      ['pfa', 'computed', 'value', snapshot.conversion.overall, `${league} (computed)`]);
+    const teams = teamsOf(FRANCHISES, MANIFEST, year, league);
+    for (const club of doc.clubs) {
+      const franchise = teams.find(t => t.id === club.id).franchise;
+      const rated = new Set(snapshot.players.filter(p => p[1] === franchise).map(([name, , , pos, overall]) => `${name}|${pos}|${overall}`));
+      for (const [name, pos, rating] of club.squad) assert.ok(rated.has(`${name}|${pos}|${rating}`), `${id} ${club.name}: ${name}`);
+    }
+  }
+  const audit = JSON.parse(read('docs/design/american-football-seasons-audit.json')).seasons;
+  for (const row of audit.filter(r => r.id.startsWith('pfa-'))) {
+    assert.ok(row.spread[0] >= 65 && row.spread[1] <= 92, `${row.id}: clubs ${row.spread.join('–')}`);
+  }
+});
+
 test('the loader refuses an American football season that is not the builder\'s', () => {
   const doc = seasonFile('madden-2005');
   const broken = edit => { const copy = structuredClone(doc); edit(copy); return () => decodeFootballSet(copy, 'madden-2005'); };
@@ -473,6 +576,23 @@ test('the loader refuses an American football season that is not the builder\'s'
   assert.throws(brokenTecmo(d => { delete d.source.conversion; }), /conversion must say how the overalls were derived/);
   assert.throws(brokenTecmo(d => { d.map = 'nfl1992'; }), /map "nfl1992" is not one of American football's maps listing this season/);
   assert.throws(brokenTecmo(d => { d.clubs[0].squad.length = 22; }), /squad needs at least 23 players/);
+  // A computed season must say so and how; each league stays on its own maps.
+  const brokenSet = (id, edit) => { const copy = structuredClone(seasonFile(id)); edit(copy); return () => decodeFootballSet(copy, id); };
+  assert.throws(brokenSet('pfa-1965', d => { delete d.source.conversion; }), /conversion must say how the overalls were derived/);
+  assert.throws(brokenSet('pfa-1965', d => { d.source.method = 'converted'; }), /method must be "computed"/);
+  assert.throws(brokenSet('pfa-1965', d => { d.source.rawScale = 99; }), /rawScale must be "value"/);
+  assert.throws(brokenSet('pfa-1965', d => { d.clubs[0].league = 'AFL'; }), /league "AFL" is not a built-in league/, 'an AFL club on an NFL map');
+  assert.throws(brokenSet('pfa-afl-1965', d => { d.clubs[0].league = 'NFL'; }), /league "NFL" is not a built-in league/, 'an NFL club on an AFL map');
+  assert.throws(brokenSet('pfa-afl-1965', d => { d.map = 'nfl1964'; }), /map "nfl1964" is not one of American football's maps listing this season/);
+  // A Madden edition that kept attributes but no overall would say so (overall 'converted') and how; EA's own are never converted.
+  const converted = d => { Object.assign(d.source, { overall: 'converted', conversion: 'Ours, from the edition\'s attributes.' }); };
+  assert.throws(brokenSet('madden-2005', d => { converted(d); delete d.source.conversion; }), /conversion must say how the overalls were derived/);
+  assert.throws(brokenSet('madden-2005', d => { converted(d); d.source.rawScale = 0; }), /rawScale must be the attributes' scale/);
+  assert.throws(brokenSet('madden-2005', d => { d.source.overall = 'estimated'; }), /overall must be "converted" or absent/);
+  assert.throws(brokenSet('madden-2005', d => { d.source.conversion = 'ours'; }), /Madden ratings are not converted/);
+  for (const [id, edit] of [['pfa-1965', () => {}], ['pfa-afl-1965', () => {}], ['pfa-1998', () => {}], ['madden-2005', converted]]) {
+    assert.doesNotThrow(brokenSet(id, edit), id);
+  }
 });
 
 test('a season binds American football to its clubs and its era\'s map', () => {
@@ -537,8 +657,16 @@ test('American football\'s Season choice lists its seasons; one takes the clubs 
     const model = modelOf(app);
     assert.deepEqual(model.season.options.map(option => option.label),
       ['2026 · built in', ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
-    assert.deepEqual(model.season.options.map(option => option.name), ['2026', ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => set.season)]);
-    assert.equal(model.season.options.at(-1).label, '1990 · Tecmo Super Bowl (NES)');
+    // A season the NFL and the AFL share (the 1960s) is named by its label, every other by its year, a computed one
+    // saying so.
+    const shared = season => BUILT_IN_AMERICAN_FOOTBALL_SEASONS.filter(set => set.season === season).length > 1;
+    assert.deepEqual(model.season.options.map(option => option.name),
+      ['2026', ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS.map(set => (shared(set.season) ? `${set.season} · ${set.label}`
+        : set.id.startsWith('pfa-') ? `${set.season} · computed` : set.season))]);
+    assert.deepEqual(model.season.options.slice(-2).map(option => option.name), ['1960 · AFL (computed)', '1960 · NFL (computed)']);
+    assert.ok(model.season.options.some(option => option.label === '1990 · Tecmo Super Bowl (NES)'));
+    assert.ok(model.season.options.some(option => option.name === '1975 · computed'), 'a computed season of the NFL alone is named by its year and says so');
+    assert.ok(model.season.options.some(option => option.name === '2005'), 'a Madden season by its year alone');
 
     app.pickSetup('dataSet', 'madden-2001');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet, app.state.setup.clubScope], ['clubs', 'madden-2001', 'domestic:nfl2001']);
@@ -630,5 +758,49 @@ test('a Tecmo season launches its clubs on their era\'s map: the Raiders in Los 
     assert.deepEqual(raiders.squad.map(p => [p.name, p.pos, p.rating]), doc.clubs.find(club => club.id === 'nfl-los-angeles-raiders').squad);
     const saved = parseCampaign(items.get(SAVE_KEY));
     assert.equal(JSON.stringify(saved.teams), JSON.stringify(st.teams), 'saved as played');
+
+    // nfl1990 now also serves 1988, 1989 and 1991, which changed its version but not its shapes: a 1990 save made on the
+    // map's earlier build (nfl1990-359ec65c) resumes on this one, club by club, as it was played.
+    const map = CLUB_MAPS.find(entry => entry.id === 'nfl1990');
+    assert.notEqual(map.version, 'nfl1990-359ec65c');
+    const before = JSON.parse(items.get(SAVE_KEY));
+    for (const settings of [before.settings, before.initialSettings].filter(Boolean)) settings.domesticVersion = 'nfl1990-359ec65c';
+    B.clearFootballSetCache();
+    app.continueSaved(parseCampaign(JSON.stringify(before)));
+    assert.equal(app.state.phase, 'playing');
+    assert.equal(app.state.settings.domesticVersion, map.version, 'moved onto the updated map');
+    assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams), 'every club as played');
+    assert.deepEqual(app.state.own, st.own, 'every club on its own land');
   });
+});
+
+test('a computed season launches on its era\'s map, saves and resumes: the NFL\'s 1965 and 1998, and the AFL\'s on a map of its own', async () => {
+  for (const [id, map, count, scope, label] of [['pfa-1965', 'nfl1964', 14, 'NFL', '1965 · NFL (computed)'],
+    ['pfa-afl-1965', 'afl1965', 8, 'AFL', '1965 · AFL (computed)'], ['pfa-1998', 'nfl1998', 30, 'NFL', '1998 · NFL (computed)']]) {
+    await withApp(async ({ app, time, items }) => {
+      app.pickSetup('sport', 'american-football');
+      const model = modelOf(app);
+      assert.ok(model.season.options.some(option => option.label === label), `${id} is offered as ${label}`);
+      await chooseSeason(app, time, id);
+      assert.deepEqual(modelOf(app).scopes.map(row => [row.id, row.label, row.count]), [[`domestic:${map}`, scope, count]]);
+      const doc = seasonFile(id);
+      app.startCampaign();
+      const st = app.state;
+      assert.equal(st.phase, 'playing');
+      assert.deepEqual([st.settings.dataSet, st.settings.dataVersion, st.settings.dataSeason, st.settings.clubScope], [id, doc.version, doc.season, `domestic:${map}`]);
+      assert.equal(st.campaignName, `American football ${doc.season} · ${scope} · USA`);
+      assert.equal(Object.keys(st.teams).length, count);
+      for (const club of doc.clubs) assert.deepEqual(st.teams[club.id].squad.map(p => [p.name, p.pos, p.rating]), club.squad);
+      const saved = parseCampaign(items.get(SAVE_KEY));
+      assert.equal(JSON.stringify(saved.teams), JSON.stringify(st.teams), 'saved as played');
+      // The save holds every player as played, so it resumes without the season file, on the same map.
+      B.clearFootballSetCache();
+      app.continueSaved(saved);
+      assert.equal(app.state.phase, 'playing');
+      assert.deepEqual([app.state.settings.dataSet, app.state.settings.clubScope, app.state.settings.domesticVersion],
+        [id, `domestic:${map}`, CLUB_MAPS.find(entry => entry.id === map).version]);
+      assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams), 'resumed as played');
+      assert.deepEqual(app.state.own, st.own);
+    });
+  }
 });

@@ -17,9 +17,17 @@
 //   penalty he would be charged on its date;
 // - a season ends after its last event, as the match files group them: the Masters played in January belongs to the
 //   year before, an event starting on 29 December to the year after.
+//
+// The men's seasons before 1973 come from a second run (docs/design/tennis.md, "Before 1973"): Sackmann's amateur file
+// (the majors and the Davis Cup, 1877-1967) as a warm-up before the open era's files, its newcomers at their own start
+// (`earlyLevelOf`), its layoffs charged only from `layoff.amateurWeeks`, and its duplicate ids merged (`applyAliases`).
 
-/** Round order within an event, qualifying first (the WTA's files have a fifth qualifying round). */
-export const ROUND_ORDER = Object.freeze({ Q1: 1, Q2: 2, Q3: 3, Q4: 4, Q5: 4.5, ER: 5, R128: 10, R64: 11, R32: 12, R16: 13, RR: 14, QF: 15, SF: 16, BR: 17, F: 18 });
+/**
+ * Round order within an event, qualifying first (the WTA's files have a fifth qualifying round; the amateur file a
+ * preliminary round before the first full one, and the challenge round of Wimbledon and the US Championships after the
+ * final).
+ */
+export const ROUND_ORDER = Object.freeze({ Q1: 1, Q2: 2, Q3: 3, Q4: 4, Q5: 4.5, ER: 5, PR: 9, R128: 10, R64: 11, R32: 12, R16: 13, RR: 14, QF: 15, SF: 16, BR: 17, F: 18, CR: 19 });
 
 // A score that shows a match was not played out: a walkover, a retirement, a default, an abandoned or unfinished one.
 const NOT_PLAYED = /W\/O|walkover|\bRET\b|\bRet\b|\bRE\b|\bDEF\b|\bDef\b|default|\bABD\b|\bABN\b|abandoned|unfinished|\bUNP\b/i;
@@ -44,14 +52,17 @@ export function tieSides(eventName) {
 /**
  * One match file's rows as matches: `{ season, date, event, eventName, level, round, num, file, row, winner, loser,
  * winnerName, loserName, winnerIoc, loserIoc, surface, why }`, `why` null for a counted match. `file` is 0 for the
- * tour-level file and 1 for the challenger and qualifying one; `row` keeps the file's own order.
+ * tour-level file, 1 for the challenger and qualifying one and 2 for the amateur file; `row` keeps the file's own order.
+ * A file of many years (the amateur file) has no `season`: each row's is the year of its date. `pad` restores the
+ * empty cells the amateur file leaves off the end of its rows (40 of the header's 49).
  */
-export function parseMatchFile(text, { season, file }) {
+export function parseMatchFile(text, { season = null, file, pad = false }) {
+  const what = season == null ? 'The amateur match file' : `The match file of ${season}`;
   const lines = String(text).replace(/\r/g, '').split('\n');
   const head = lines[0].split(',');
   const at = name => {
     const i = head.indexOf(name);
-    if (i < 0) throw new Error(`The match file of ${season} has no ${name} column`);
+    if (i < 0) throw new Error(`${what} has no ${name} column`);
     return i;
   };
   const I = { event: at('tourney_id'), eventName: at('tourney_name'), surface: at('surface'), level: at('tourney_level'), date: at('tourney_date'),
@@ -62,14 +73,17 @@ export function parseMatchFile(text, { season, file }) {
     const line = lines[row];
     if (!line) continue;
     const c = line.split(',');
-    if (c.length !== head.length) throw new Error(`The match file of ${season}, row ${row}: ${c.length} cells, not ${head.length}`);
+    if (pad && c.length < head.length) c.push(...Array(head.length - c.length).fill(''));
+    if (c.length !== head.length) throw new Error(`${what}, row ${row}: ${c.length} cells, not ${head.length}`);
     // One WTA row writes its final "f".
     const round = ROUND_ORDER[c[I.round]] ?? ROUND_ORDER[c[I.round].toUpperCase()];
-    if (round == null) throw new Error(`The match file of ${season}, row ${row}: unknown round ${c[I.round]}`);
+    if (round == null) throw new Error(`${what}, row ${row}: unknown round ${c[I.round]}`);
     const date = Number(c[I.date]);
-    if (!Number.isInteger(date) || date < 19000101) throw new Error(`The match file of ${season}, row ${row}: bad date ${c[I.date]}`);
+    // The amateur file starts with the first Wimbledon, in 1877.
+    if (!Number.isInteger(date) || date < 18770101) throw new Error(`${what}, row ${row}: bad date ${c[I.date]}`);
     const why = isPlaceholder(c[I.winnerName]) || isPlaceholder(c[I.loserName]) ? 'placeholder' : notCounted(c[I.score]);
-    matches.push({ season, date, event: c[I.event], eventName: c[I.eventName], level: c[I.level], round, num: Number(c[I.num]) || 0, file, row,
+    matches.push({ season: season ?? Math.floor(date / 10000), date, event: c[I.event], eventName: c[I.eventName], level: c[I.level], round,
+      num: Number(c[I.num]) || 0, file, row,
       winner: c[I.winner], loser: c[I.loser], winnerName: c[I.winnerName], loserName: c[I.loserName], winnerIoc: c[I.winnerIoc],
       loserIoc: c[I.loserIoc], surface: c[I.surface], why });
   }
@@ -126,6 +140,25 @@ export function atpLevelOf(m, method) {
   return 'qualifying';
 }
 
+/**
+ * The men's rule of the run before 1973: the amateur file's matches (`file` 2, the majors and the Davis Cup) are all
+ * counted, and start a new player at `method.start.amateur`; the open era's as `atpLevelOf`.
+ */
+export const earlyLevelOf = (m, method) => (m.file === 2 ? 'amateur' : atpLevelOf(m, method));
+
+/**
+ * Matches with each duplicate id replaced by the id of the same man it joins (`aliasOf`, a Map). A match that would set
+ * a man against himself is a wrong merge, and throws.
+ */
+export function applyAliases(matches, aliasOf) {
+  return matches.map(m => {
+    if (!aliasOf.has(m.winner) && !aliasOf.has(m.loser)) return m;
+    const merged = { ...m, winner: aliasOf.get(m.winner) ?? m.winner, loser: aliasOf.get(m.loser) ?? m.loser };
+    if (merged.winner === merged.loser) throw new Error(`An alias sets ${m.winnerName} against ${m.loserName} (${m.event})`);
+    return merged;
+  });
+}
+
 // The WTA files' tour levels: W (the tour to 1999, the Finals of 2015, the 250s of 2021), the majors, the Fed Cup and
 // the Billie Jean King Cup (D), the Olympics, the Finals, the Tiers of 2000-2008, and Premier and International.
 const WTA_TOUR = new Set(['W', 'G', 'D', 'O', 'F', 'T1', 'T2', 'T3', 'T4', 'T5', 'PM', 'P', 'I']);
@@ -155,8 +188,11 @@ export function wtaLevelOf(m) {
 
 /**
  * Rate every match in order (orderMatches) by `method` (scripts/data/tennis-seasons.json `method`): `{ k: { numerator,
- * offset, exponent }, start: { tour, challenger, qualifying }, layoff: { weeks, min, max, maxWeeks, kBoost, kMatches,
- * repeatDays, threshold, offseason: [mmdd, mmdd] } | null, files: 'tour' | 'all' }`. Options: `seasons`, the seasons to snapshot at
+ * offset, exponent }, start: { tour, challenger, qualifying, amateur? }, layoff: { weeks, min, max, maxWeeks, kBoost, kMatches,
+ * repeatDays, threshold, offseason: [mmdd, mmdd], from?, amateurWeeks? } | null, files: 'tour' | 'all' }`. A layoff with
+ * `from` (yyyymmdd, the open era's start) charges a gap that begins before it only when the gap also ends before it and
+ * lasts `amateurWeeks` or more: the amateur file holds only the majors and the Davis Cup, and a gap across the start
+ * (a professional coming back in 1968) is never charged. Options: `seasons`, the seasons to snapshot at
  * their end; `asOf`, a list's date by season (yyyymmdd; default 31 December, never before the season's last event);
  * `yElo`, also each season's yElo (every player restarting at 1500 against his opponents' real Elo); `levelOf`, which
  * matches count and at what start (`atpLevelOf`, the default, or `wtaLevelOf`).
@@ -187,10 +223,14 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
     }
     return player;
   };
+  // A gap that begins before `layoff.from` is not charged, unless it also ends before it and lasts `amateurWeeks`.
+  const exempt = (p, date) => layoff.from != null && p.last < layoff.from
+    && !(layoff.amateurWeeks != null && date < layoff.from && layoffWeeks(p.last, date, layoff.offseason) >= layoff.amateurWeeks);
   // A list shows a player who is in the middle of a layoff with the penalty he would be charged were he to return on
   // its date, as Tennis Abstract's report does; his rating itself is charged only when he returns.
   const pendingPenalty = (p, date) => {
     if (!layoff || !p.last) return 0;
+    if (exempt(p, date)) return 0;
     if (layoff.threshold != null && p.r < layoff.threshold) return 0;
     const weeks = layoffWeeks(p.last, date, layoff.offseason);
     if (weeks < layoff.weeks) return 0;
@@ -218,6 +258,7 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
   // A comeback after a layoff: the penalty, the larger K, and a second layoff charged only the difference.
   const comeback = (p, date) => {
     if (!layoff || !p.last) return;
+    if (exempt(p, date)) return;
     if (layoff.threshold != null && p.r < layoff.threshold) return;
     const weeks = layoffWeeks(p.last, date, layoff.offseason);
     if (weeks < layoff.weeks) return;

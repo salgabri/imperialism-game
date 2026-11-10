@@ -711,7 +711,7 @@ first build split every county of both countries.) It reuses this whole runtime
 (loader, country chart, backdrop, routing, saves) as a format-1 map whose clubs are
 the game's own.
 
-**Build** (`npm run build:nba-map`, `scripts/build-club-maps.mjs --league=nba`, about 6 minutes with the era maps;
+**Build** (`npm run build:nba-map`, `scripts/build-club-maps.mjs --league=nba`, 43 minutes with the 42 era maps on 2026-11-09;
 `--check` rebuilds offline and compares, `--dry-run` writes nothing):
 
 - **Units**: geoBoundaries gbOpen USA ADM2 (counties, public domain) and CAN ADM2
@@ -804,23 +804,39 @@ no shared border" and the fronts note "reached over open ground", the setup's Fr
 The victory names "USA and Canada". Basketball squads are not FM players, so
 checkpoints store them in full (no `playerPack`).
 
-**Era maps** (2026-10-30). The earlier basketball seasons
+**Era maps** (2026-10-30; back to 1960/61 since 2026-11-09). The earlier basketball seasons
 ([football-years.md](football-years.md#era-maps)) play on maps of their own eras,
 built by the same command from `scripts/data/nba-seasons.json`: one map per era of
-franchises and arenas (`nba2000` … `nba2014`, nine in all), each from that era's
+franchises, cities and arena points (`nba1961` … `nba2014`, 42 in all, 30 of them
+added with the computed seasons of 1960/61 to 1997/98), each from that era's
 arenas and with section ids in today's strength order (a moved franchise ranks as
-its successor). Such a map adds `seasons` (the set ids it serves) to its file and
-index entry, its rows add the franchise's `name`, and the loader then takes no
-club from the game's data: the season gives each row its name, code, strength and
-five at kick-off. Today's `nba.json` is unchanged and also serves the seasons from
-2014/15, whose franchises are today's.
+its successor: the Syracuse Nationals as the 76ers, the Cincinnati Royals as the
+Kings, the Chicago Packers as the Wizards). Such a map adds `seasons` (the set ids
+it serves) to its file and index entry, its rows add the franchise's `name`, and
+the loader then takes no club from the game's data: the season gives each row its
+name, code, strength and five at kick-off. Today's `nba.json` is unchanged and
+also serves the seasons from 2014/15, whose franchises are today's. The 1960s and
+1970s maps divide the states shared then by county as today's does: New York
+between the Knicks and the Syracuse Nationals (1960/61 to 1962/63), the Knicks
+and the Buffalo Braves (1970/71 to 1977/78) and, in 1976/77, the New York Nets at
+Uniondale too; California between the Lakers and the Warriors from 1962/63, with
+the San Diego Rockets (1967/68 to 1970/71) or Clippers (from 1978/79); Ohio
+between the Royals and the Cavaliers (1970/71, 1971/72); Texas between the
+Rockets and the Spurs from 1976/77. The Kansas City-Omaha Kings hold Missouri
+alone.
+`nba1984` serves 1981/82 to 1983/84 (one build later than 1983/84's alone: a
+campaign saved on the earlier build resumes club by club).
 
 **Checks**: `scripts/nba-map.test.mjs` (in `npm run test:domestic`): file, index,
 arenas and clubs agree; the USA and Canada are all the land and the hosts are not
 drawn beneath it; the empty regions are exactly the states and provinces without an
 arena, drawn but no obstacle, on the sections' arcs; towns of one state fall in one
 territory, towns of empty land in none, and New York splits between the Knicks and
-the Nets only; cross-border land neighbours and neighbour colours; a franchise with
+the Nets only; on the 1960s and 1970s maps, New York splits between the Knicks and the
+Syracuse Nationals (1960/61) and among the Knicks, the Braves and the New York Nets
+(1976/77), California among its three franchises of 1967/68, Ohio between the Royals
+and the Cavaliers, and the Kansas City-Omaha Kings hold Missouri alone, Nebraska
+nobody's; cross-border land neighbours and neighbour colours; a franchise with
 no land neighbour still reaches its rivals over open ground, in those words; seeded duel
 campaigns on the app board reach a champion without treaties or third-party
 crossings; loader refusals; the App sets up, launches and titles an NBA campaign
@@ -874,6 +890,13 @@ exactly those without a franchise; seeded duel campaigns reach a champion; the A
 launches on the map. The smoke runs an NFL duel and an NFL resume.
 `scripts/club-maps.test.mjs` holds it to the rule, as it does the NBA's and MLB's.
 
+**Era maps from 1960** (2026-11-09): the earlier seasons ([american-football.md](american-football.md#computed-seasons))
+reach back to 1960 on 20 more NFL maps by the same rule, and the American Football League's ten seasons before the
+1970 merger play on ten maps of their own, `afl1960` to `afl1969`, an `afl` entry in `LEAGUES` (league `AFL`, its
+clubs only, the NFL's joins; `--league=afl`). A map of another league of its day names its clubs' league, which the
+loader accepts (`validateClubsOnMap`). A club whose stadium lies outside its league's joined states holds its own
+state alone: the Giants at the Yale Bowl hold Connecticut in 1973–74, which `scripts/club-maps.test.mjs` allows.
+
 ## The MLB map
 
 Status: implemented 2026-11-01. Baseball clubs ([baseball.md](baseball.md)) have one
@@ -911,6 +934,24 @@ Sox's, Yankee Stadium the Yankees', Citi Field the Mets' and Ottawa the Blue Jay
 seeded duel campaigns reach a champion; the App launches on the map. The smoke runs
 an MLB duel and an MLB resume.
 
+**Era maps, 1960–2017** (2026-11-09; [baseball.md](baseball.md#seasons-before-2018-computed-from-war)):
+37 more maps, `mlb1960` to `mlb2017`, for the seasons computed from WAR, built from the
+franchise eras of `scripts/data/mlb-war-seasons.json` by the same partition. Each club
+holds its ballpark's state or province, the ballpark being the one it played most of its
+home games in (the Baseball Databank's HomeGames, from Retrosheet's game logs; each map's
+attribution credits both). A map serves consecutive seasons with the same clubs,
+named alike, in the same places: a ballpark renamed in place keeps its map (named as its
+first season knew it), and the map builder now checks every MLB era, MLB The Show's
+included, by that rule (`[id, name, territory, base, point]`); mlb2018 to mlb2025 rebuild
+byte for byte. Two clubs that shared a ballpark (the Angels at Dodger Stadium in
+1962–65, the Yankees at Shea Stadium in 1974–75) cannot share out one county, so the
+tenant grows from its own previous ballpark (`base`, as the NFL's shared stadiums grow
+from training grounds): Wrigley Field, Los Angeles, and Yankee Stadium. Los Angeles
+County is cut between the Dodgers and the Angels in 1961–65, the Polo Grounds Mets' part
+of New York State is "Manhattan" in 1962–63, beside the Yankees' Bronx, and before the
+Expos of 1969 Canada's provinces are all empty. `scripts/club-maps.test.mjs` holds every
+one to the rule; 2017 has its own map (2018's clubs and places), so mlb2018 is unchanged.
+
 ## The NHL map
 
 Status: implemented 2026-11-07. Ice hockey clubs ([hockey.md](hockey.md)) have one theatre,
@@ -931,6 +972,17 @@ without a club stays empty. Homes are `scripts/data/nhl-teams.json`, each club's
 **Checks**: `scripts/hockey.test.mjs`: file, index, arenas and clubs agree; every arena lies
 inside its territory; the shared states are split, Staten Island stays New York's; seeded duel
 campaigns reach a champion; the App launches on the map. The smoke runs an NHL duel.
+
+**Era maps** (2026-11-08, then 2026-11-09 for every season back to 1966/67): the same command draws
+31 maps of earlier seasons from `scripts/data/nhl-seasons.json` (clubs and arenas by season, [hockey.md](hockey.md#eras)),
+`nhl1967` to `nhl2025`. A map serves a run of seasons while the clubs and their names stay the same and each
+arena stays in its county (in a state or province no other club shares, its state) and within 15 km of the first
+season's arena (`NHL_MOVE_KM`); it keeps the first season's arenas and places, and the builder throws when a season
+breaks the rule. The defunct Seals and Barons rank after today's 32 franchises. 2025/26 plays on `nhl` itself, and the
+builder checks its clubs and arenas are today's. Firsts: the 1979/80 Whalers hold central and western
+Massachusetts from Springfield and leave Connecticut empty; the Seals split California with the Kings, the Scouts
+Missouri with the Blues; the 2015/16–2017/18 Islanders, at Brooklyn's Barclays Center, hold Brooklyn, Queens and Long
+Island.
 
 ## The NRL map
 
@@ -960,6 +1012,24 @@ Wests Tigers grow from their training bases.
 territory; Victoria, the ACT and Auckland are one club's, Cairns the Cowboys', Wollongong the Dragons', Hamilton nobody's;
 seeded duel campaigns reach a champion across the Tasman; the App launches on the map. `scripts/club-maps.test.mjs`
 holds it to the state rule with towns of each state and region. The smoke runs an NRL duel.
+
+**Era maps** (2026-11-08 and 2026-11-09): the earlier seasons ([rugby-league.md](rugby-league.md#earlier-seasons))
+play on maps of their day, built by the same command from `teams` and `maps` in `scripts/data/rugby-league-seasons.json`,
+16 clubs each, about 134 KB. Rules R1–R3 decide when a ground change makes a new map: a club keeps its own ground while
+it is rebuilt (R1), COVID-19 relocations are ignored (R2), and a rename on the same site does not split a map (R3).
+
+| Map | Seasons | Grounds and bases that set it apart |
+| --- | --- | --- |
+| `nrl2008` | 2008, 2009 | the Bulldogs (as "Bulldogs") train at Sydney Olympic Park and share the City of Parramatta with the Eels; the Storm at Olympic Park Stadium |
+| `nrl2010` | 2010, 2011 | Canterbury-Bankstown again, still at Sydney Olympic Park until October 2011; the Storm at AAMI Park |
+| `nrl2012` | 2012–2019 | the Bulldogs back at Belmore; the Cowboys still at Dairy Farmers (1300SMILES) Stadium |
+| `nrl2020` | 2020–2022 | the Cowboys at the North Queensland Stadium; the Roosters' new stadium; the Rabbitohs still at Redfern Oval; no Dolphins |
+
+2023 and 2024 have today's clubs at today's grounds and play on `nrl.json` itself: `nrlSpecs` checks that they equal
+`scripts/data/nrl-teams.json` and builds no copy. Each era's clubs rank as their franchises do today, so section ids
+follow the same order on every map. `scripts/rugby-league-seasons.test.mjs` checks the City of Parramatta (cut between
+the Bulldogs and the Eels only while the Bulldogs were at Olympic Park), Redcliffe (the Broncos' until the Dolphins
+came) and each era's Rabbitohs.
 
 ## The NWSL map
 
@@ -1007,15 +1077,16 @@ strongest first: 20 clubs each from England and Spain, 19 Italy, 16 Germany, 15 
 6 the Netherlands, 4 each from Portugal, Turkey, Belgium and Greece, 3 Czechia, 2 each
 from Denmark, Ukraine and Scotland, and one each from Norway, Croatia and Bulgaria.
 The strongest `ELITE_CLUBS` (32) are the elite. An earlier season's file holds the
-seven big leagues only, and its two fields are the strongest of those. FIFA 06, FIFA 05
-and SWOS 96/97 (2005/06, 2004/05, 1996/97) have nations only, so they have no maps.
+seven big leagues only, and its two fields are the strongest of those. FIFA 06, FIFA 05,
+SWOS 96/97 and Simon Treanor's fan-made 1989/90 (2005/06, 2004/05, 1996/97, 1989/90) and
+the nine computed World Cups (1961/62 to 1993/94) have nations only, so they have no maps.
 
 **Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 8 minutes;
 `--only=eu124,eu32`, `--check`, `--dry-run`, `--boundaries=<dir>` for another boundary cache).
 The maps follow the clubs, so they are rebuilt after `npm run build-clubs`,
 `npm run build:ea-seasons` or `npm run build:retro-seasons`; the build stops on a club with
-no row in the table below, and the test on a field that has changed. For each of the 25
-seasons with clubs and each of the two fields:
+no row in the table below, and the test on a field that has changed. For each of the 30
+seasons with clubs (the built-in one and 29 earlier) and each of the two fields:
 
 - **Homes**: `scripts/data/europe-clubs.json`, one row per club of any season: a
   `city` that names its land (repeats take the club: "Rome (Lazio)"), `home`, and
@@ -1062,7 +1133,7 @@ seasons with clubs and each of the two fields:
 - **Output** as the sport maps: 16,000 arc points, quantized at 1e5, colours that differ
   across borders and water. Sections are in rank order, `eu124-001` the strongest. The
   file adds `theatre` (`all` or `elite`), `seasons` for an earlier season's map, and a
-  club row's `shape`. The 50 files hold 150–192 KB each, 8.3 MB in all, with
+  club row's `shape`. The 60 files hold 150–192 KB each, 10.0 MB in all, with
   `public/domestic/ATTRIBUTION-europe.txt` and the index `src/data/europeMaps.js`
   (`{ id, sport, league, name, theatre, seasons?, clubs, sections, countries, version, top? }`).
 
@@ -1093,8 +1164,8 @@ its old name ("All Leagues"). "Another team" after a defeat there opens on the m
 replaced it. An old link's `theatre=Premier+League` is reported as not offered.
 A CM 01/02 set built on this computer has no maps, so it plays the two theatres on the
 world, dealt by `seedClubs` as all clubs once were. A season with nations only (FIFA 05,
-FIFA 06) has no clubs to play: it keeps the plain theatre, `all` or `elite`, and
-choosing clubs goes back to the built-in season and its map.
+FIFA 06, SWOS 96/97, 1989/90, the World Cups) has no clubs to play: it keeps the plain
+theatre, `all` or `elite`, and choosing clubs goes back to the built-in season and its map.
 
 **Checks**: `scripts/europe-maps.test.mjs`: index, files, fields and hashes; each club's
 land lies in its country and the land sums to the outlines; the only club holds its whole

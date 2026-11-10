@@ -51,7 +51,8 @@ const moduleFile = path.join(root, 'src/data/clubLogos.js');
 const overridesFile = path.join(root, 'scripts/data/club-logos.json');
 const refresh = process.argv.includes('--refresh');
 
-const USER_AGENT = 'imperialism-game-build/1.0 (https://github.com/salgabri/imperialism-game; club crest sync)';
+// A generic agent: no address, account or other personal data goes out with a request.
+const USER_AGENT = 'imperialism-game-data/1.0';
 const SPARQL = 'https://query.wikidata.org/sparql';
 const ENWIKI = 'https://en.wikipedia.org/w/api.php';
 const NBA = 'Q155223', BASKETBALL_TEAM = 'Q13393265';

@@ -349,55 +349,8 @@ export function nftglScore(position, attributes) {
 
 // ---------- the overall: position percentiles on Madden NFL 2002 ----------
 
-/** Madden NFL 2002's positions as the game's (punters left out). */
-export const MADDEN_POSITION = {
-  QB: 'QB', HB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', LT: 'OL', LG: 'OL', C: 'OL', RG: 'OL', RT: 'OL',
-  LE: 'DL', RE: 'DL', DT: 'DL', LOLB: 'LB', MLB: 'LB', ROLB: 'LB', CB: 'CB', FS: 'S', SS: 'S', K: 'K',
-};
-
-/**
- * The Madden NFL 2002 overalls a game position's Tecmo players are read against, lowest first: as many of each team's
- * best at the position as the Tecmo season carries per club (`quota`, which may be fractional: every team's first
- * whole number of players, then the best of the next rank across the league), so that a Tecmo backup meets Madden's
- * backups rather than its practice squad. `madden`: `[{ team, position, overall, name }]` with game positions.
- */
-export function referenceOf(madden, position, quota) {
-  const byTeam = new Map();
-  for (const player of madden.filter(p => p.position === position)) {
-    if (!byTeam.has(player.team)) byTeam.set(player.team, []);
-    byTeam.get(player.team).push(player);
-  }
-  const ranked = [];
-  for (const players of byTeam.values()) {
-    players.sort((a, b) => b.overall - a.overall || a.name.localeCompare(b.name));
-    players.forEach((player, depth) => ranked.push({ ...player, depth }));
-  }
-  ranked.sort((a, b) => a.depth - b.depth || b.overall - a.overall || a.team.localeCompare(b.team) || a.name.localeCompare(b.name));
-  const count = Math.round(quota * byTeam.size);
-  return ranked.slice(0, count).map(player => player.overall).sort((a, b) => a - b);
-}
-
-/**
- * Each score's overall: its percentile among `scores` (mid-rank, ties sharing one), read off `reference` (ascending)
- * by linear interpolation, rounded and held to 1–99. A higher score never gets a lower overall. → Map score → overall.
- */
-export function overallsOf(scores, reference) {
-  if (!reference.length) throw new Error('No reference overalls');
-  const sorted = [...scores].sort((a, b) => a - b);
-  const n = sorted.length, m = reference.length;
-  const out = new Map();
-  for (let i = 0; i < n;) {
-    let j = i;
-    while (j + 1 < n && sorted[j + 1] === sorted[i]) j++;
-    const p = ((i + j) / 2 + 0.5) / n;
-    const h = Math.min(Math.max(p * m - 0.5, 0), m - 1);
-    const lo = Math.floor(h), hi = Math.ceil(h);
-    const value = reference[lo] + (reference[hi] - reference[lo]) * (h - lo);
-    out.set(sorted[i], Math.min(99, Math.max(1, Math.round(value))));
-    i = j + 1;
-  }
-  return out;
-}
+// The mapping onto Madden NFL 2002 is shared with the other seasons no game rated with an overall (scripts/lib/nfl-reference.mjs).
+export { MADDEN_POSITION, overallsOf, referenceOf } from './nfl-reference.mjs';
 
 // ---------- the clubs ----------
 

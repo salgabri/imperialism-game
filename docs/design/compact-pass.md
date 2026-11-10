@@ -73,8 +73,11 @@ scrolling panels, at desktop, tablet and phone sizes.
   rows of three, tiles trimmed to what the icon and name need but still 44px targets, and on 360×640 with a notice
   line the step's heading gives way, as step 2's does for More rules), Nations | Clubs and the season on
   one row, theatre chips (Europe's Top 124 and Elite 32 for football clubs), the One country · top clubs dropdown,
-  and the counts at the foot. The theatre's map fills the side. Step 2: four short draw cards, with Show matches and More rules
-  beside them. Step 3: compact role cards with the opponent choice in the same row, a flag wall strongest first
+  and the counts at the foot. The theatre's map fills the side. Under the Season choice, a season whose listing carries a
+  credit shows it whole as quiet text, never cut (since 2026-11-10: ice hockey's Hockey Databank statement and MoneyPuck's
+  credit, [hockey.md](hockey.md#credits)); the lede gives way to it on phones and on windows up to 800px tall, and the
+  heading too with a notice line on a phone or two notice lines on a short window. Step 2: four short draw cards, with
+  Show matches and More rules beside them. Step 3: compact role cards with the opponent choice in the same row, a flag wall strongest first
   (arrows, Home, End and type-ahead walk it across its pages), and the suggested team as a compact card. The rail's
   ad shows only at 1600px and wider and at least 740px tall.
 - **Map column.** Next fixture puts the approach in its kicker and the odds detail on its title, and the
@@ -127,6 +130,34 @@ walls, dark mode, `?ads=preview`, and a football club campaign on the Europe map
 those sizes but 1920×1080, 1366×768 and 1280×720). The dark match feed drops its oldest lines at the bottom by
 design.
 
+**Season credits** (2026-11-10). Setup's step 1 with the longest credit, ice hockey's 2011/12 (MoneyPuck's and the
+Hockey Databank's statement, 254 characters), measured with headless Chromium (Playwright) against the dev server: the
+season picked by hand, with a challenge link's notice line, and with Resume's; clubs and nations alike; a coarse pointer
+(44px targets) on phones and tablets. The figure is the room left in the controls' column, or the map's height where the
+map shares the column (its floor is 120px).
+
+| Size | Credit | No notice | Challenge link | Resume |
+| --- | --- | --- | --- | --- |
+| 390×664 | 4 lines, 57px | 77 | 56, heading gone | 48, heading gone |
+| 360×640 | 4 lines, 55px (10.5px) | 32 | 11 | 3 |
+| 1024×768 | 4 lines, 57px | 100 | 42 | 42 |
+| 1024×768, touch | 4 lines, 57px | 84 | 26 | 18 |
+| 1280×720, touch | 4 lines, 57px | 87 | 29 | 21 |
+| 1366×768 | 4 lines, 57px | 135 | 77 | 77 |
+| 1440×900 | 4 lines, 57px | 223 | 165 | 165 |
+| 1920×1080 | 3 lines, 43px | 432 | 374 | 374 |
+| 390×844 | 4 lines, 57px | map 235 | map 214 | map 206 |
+| 375×812 | 4 lines, 55px | map 194 | map 173 | map 165 |
+| 360×780 | 4 lines, 55px | map 150 | map 129 | map 121 |
+| 768×1024 | 2 lines, 29px | map 356 | map 298 | map 290 |
+| 820×1180 | 2 lines, 29px | map 512 | map 454 | map 446 |
+
+Nothing scrolls at any of them, nor at 1280×720, 1024×800, 1280×800, 390×780, 412×800 and 360×740, nor in dark mode
+(390×664, 360×640 and 1024×768 measured).
+Without the lede and heading rules four lines did not fit beside a notice line at 1024×768 (2px short, 18px with a
+coarse pointer) or at 1280×720 with a coarse pointer (15px), and pushed the map under its floor on phones 780–812px tall
+(by 5 to 59px). At 11px the credit's fourth line had 3px to spare in a 360 phone's column, hence 10.5px below 390 wide.
+
 ## Limits
 
 - Hover titles don't exist on touch screens. Everything moved to a `title` is also in `sr-only` text or
@@ -140,6 +171,9 @@ design.
 - Some content left the screen: the managers' Favourites and Long shots lists in setup, the claimed list and the
   pitch in the Squad side column, Latest results on short windows, the full XIs in the conquest comparison, and
   the preview's XIs (one switch away).
+- Two notice lines at once (a save on this browser and a challenge link) were never fitted on phones: setup's step 1
+  scrolls there for football clubs by 26px at 390×664 and 41px at 360×640. A hockey season's credit adds to it (2px at
+  390×664, 47px at 360×640, 37px at 360×780); short desktops and tablets with two lines fit, the heading giving way.
 
 ## Verifying
 

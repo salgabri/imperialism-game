@@ -23,6 +23,19 @@ non-commercial use, data rights reserved), SI's CM3 data as Cam F ported it, SI'
 CM 97/98 database as baskeyx extracted it, and Sensible World of Soccer 96/97's
 national squads. No Update Team or retro-team database is among them.
 
+On 2026-11-09 the user asked to cover every missing season and go back to the 1960s and 1970s, and chose, in their
+words "Yes, ship both", to ship the CM0102 Starter Kit's two fan-made retro databases, Cam F's 1993/94 and Simon
+Treanor's 1989/90 (Beta 5), credited to their makers, their labels saying the ratings are fans'. Neither fan-made
+database names a licence, and neither maker was asked; request 2 does not cover them. Under that request Claude
+added four more on the same terms as the 2026-11-08 seasons, credited to their makers: Sensible World of Soccer's own
+team files of 1994/95 (the original, v1.0) and 1995/96, with their clubs, as the SWOS United server keeps them; and
+SI's own Championship Manager 00/01 (original release 3.81, the UK release-day database rather than SI's later
+European pressing) and CM 99/00 (original release 3.70), read data-only from users' uploads of the retail CDs to
+archive.org, with the archive.org item as each season's source link
+([football-years.md](football-years.md#sis-cm-0001-and-cm-9900-read-from-their-cds-200001-and-199900)). Neither CM
+game was ever made free, and no one has licensed their data. The user has not confirmed these four, so whether they
+ship, the two CM seasons above all, is open for the user.
+
 ## 1. To the CM 01/02 Update Team
 
 **Subject:** Permission to use the official databases in a free open-source game

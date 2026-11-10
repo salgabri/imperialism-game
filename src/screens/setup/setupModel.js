@@ -335,55 +335,82 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
-  football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1996/97: '
-    + 'Sensible World of Soccer\'s), with clubs from the seven biggest leagues. A nation with fewer than six rated players '
-    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1996/97 have nations only.',
+  football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (1994/95 to '
+    + '1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, Cam F\'s and Simon Treanor\'s), with clubs from '
+    + 'the seven biggest leagues. A nation with fewer than six rated players fields no team, and one without eleven starts '
+    + 'short-handed. 2005/06, 2004/05, 1996/97 and 1989/90 have nations only. The World Cups of 1961/62 to 1993/94 are '
+    + 'computed and have nations only: each finalist rated from its Elo and its players\' records.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
     + 'without eleven starts short-handed.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
-    + 'scoring, marked as one. Rosters as of 7 November 2026. Earlier seasons use EA\'s ratings of that season, nothing '
+    + 'scoring, marked as one. Rosters as of 7 November 2026. Five earlier seasons use EA\'s ratings of that season, nothing '
     + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
-    + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings, clubs on '
-    + 'the map of their day. Nations field the NHL '
-    + 'players of each country, and only where they hold at least half the lineup.',
+    + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings. NHL 08 and '
+    + 'NHL 09 are EA\'s attributes, the overall converted by us. Every other season back to 1966/67 is computed from the '
+    + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank, after from MoneyPuck.com. Clubs '
+    + 'play on the map of their day. Nations field the NHL players of each country, only where they hold at least half '
+    + 'the lineup, and none before 1977/78.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
     + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
-    + 'least half a matchday 17. 2008 '
+    + 'least half a matchday 17. No game rated 2009–2024: they are computed, each player\'s NRL.com match stats ranked at his '
+    + 'position onto Rugby League 26\'s ratings, each club then moved by its results that season. 2008 '
     + 'comes from Rugby League 2: World Cup Edition\'s database, every player checked against the Rugby League Project. '
     + 'The game rates attributes, not players, so the overall is ours, each club then moved by the game\'s own team '
-    + 'rating. It has NRL clubs only, on the map of 2008.',
+    + 'rating. Earlier seasons have NRL clubs only, on the map of their day.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive (2011/12 by The '
     + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
+    + 'The seasons no game rated, back to 1960/61, are computed from Basketball-Reference\'s statistics, fitted to '
+    + 'NBA 2K and put on NBA 2K27\'s scale. '
     + 'They have NBA clubs only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
-    + 'overall ours. NFL clubs only: the franchises of that season, on the map of their day.',
+    + 'overall ours. 2000 back to 1996, 1991 and 1989 back to 1960 are computed from Pro Football Archives\' records of '
+    + 'each player\'s starts and season, and so are the AFL\'s 1960s, on maps of their own. Clubs only: the franchises of '
+    + 'that season, on the map of their day.',
   baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October; 2018–2020 as the fan site '
-    + 'ShowZone keeps them). Nations field the players born there, where they hold at least half the lineup; clubs play on '
+    + 'ShowZone keeps them). 1960–2017 are computed: each player\'s WAR (Baseball-Reference\'s and FanGraphs\', averaged) '
+    + 'put on The Show\'s scale. Nations field the players born there, where they hold at least half the lineup; clubs play on '
     + 'the map of their day, the Athletics in '
     + 'Oakland until 2024.',
   'womens-tennis': 'Elo ratings of the WTA\'s women: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; '
-    + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1973–1979 rough). Each nation names its five '
+    + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1968–1979 rough). Each nation names its five '
     + 'best; one with fewer than two rated players fields no team.',
   tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
-    + '2016 computed from Jeff Sackmann\'s match results by its method (1973–1979 rough). Each nation names its five best; '
+    + '2016 computed from Jeff Sackmann\'s match results by its method (1960–1979 rough; before 1968 the amateurs\' majors and '
+    + 'Davis Cup only). Each nation names its five best; '
     + 'one with fewer than two rated players fields no team.',
 });
 
+// What a season's listing label can say of its ratings, the strongest first: whole words, in any case.
+const SEASON_TAGS = Object.freeze([['fan-made', /\bfan-made\b/i], ['converted', /\bconverted\b/i], ['computed', /\bcomputed\b/i]]);
+
+/**
+ * How a data set's ratings were made when its listing label says they are no game's own: 'fan-made' ("CM 01/02 · 93/94
+ * by Cam F, fan-made"), else 'converted' ("NHL 09, converted"), else 'computed' ("Computed from WAR, end of 1961",
+ * "Basketball-Reference (computed)"), each as a whole word in any case; null for any other label.
+ */
+export const seasonTagOf = label => SEASON_TAGS.find(([, words]) => words.test(String(label ?? '')))?.[0] ?? null;
+
 /**
  * The Season choice (docs/design/football-years.md): the sport's built-in season, then each of its listed data sets
- * newest first, as `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no
- * longer has.
+ * newest first, as `{ id, key, season, source, label, name, credit, checked }`. `credit` is the plain text the set's
+ * listing asks to be shown with it ('' for none). `sport` names a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
-  const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
-    label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
-  const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
+  const row = (id, season, source, credit = '') => ({ id, key: id ?? 'built-in', season, source,
+    label: [season, source].filter(Boolean).join(' · '), credit, checked: id === dataSet });
+  const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label, set.credit || ''))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
-  // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
+  // The dropdown names a season by its years, and says so on screen when its label calls its ratings computed, converted
+  // or fan-made ("1969/70 · computed", seasonTagOf). A set sharing its season with another (or with none) keeps its source.
   const shared = season => !season || rows.filter(other => other.season === season).length > 1;
-  return rows.map(option => ({ ...option, name: shared(option.season) ? option.label : option.season }));
+  const optionName = option => {
+    if (shared(option.season)) return option.label;
+    const tag = seasonTagOf(option.source);
+    return tag ? `${option.season} · ${tag}` : option.season;
+  };
+  return rows.map(option => ({ ...option, name: optionName(option) }));
 }
 
 /** A sport's three strongest clubs' names, as a club map's index lists them. */
@@ -715,6 +742,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     season: {
       id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTES[sportId] || '', loading: setLoading,
       message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',
+      // The chosen season's credit, shown as text under the choice (docs/design/hockey.md, "Credits"): known from the
+      // listing, so it shows while the season loads.
+      credit: chosenSeason?.credit || '',
     },
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
     // A sport with clubs only names its league ('NFL'): the Nations choice is off.

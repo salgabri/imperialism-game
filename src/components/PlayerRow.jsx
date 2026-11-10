@@ -14,13 +14,15 @@ export default function PlayerRow({ player, positionColors = {}, roomy = false, 
   const cm = source?.source === 'cm0102';
   // Sensible World of Soccer rates a price step, not an ability (src/data/swosPlayers.js).
   const swos = source?.source === 'swos';
+  // A computed World Cup player's date is his team's Elo's, not a database's (scripts/lib/world-cup-seasons.mjs).
+  const worldCup = source?.source === 'world-cup';
   const sourceName = source?.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : swos ? 'SWOS' : 'Football Manager';
   const edition = String(source?.edition || '');
   const sourceLabel = edition ? /^\d+$/.test(edition) ? `${sourceName} ${edition}` : edition : sourceName;
   const estimated = isEstimated(player);
   const sourceTitle = estimated ? ESTIMATE_TITLE : source ? [sourceLabel, cm && (source.provider || 'CM 01/02 Update Team'),
     swos && (source.provider || 'Sensible Software'), source.version && `Database ${source.version}`,
-    source.snapshotDate && `Database snapshot ${source.snapshotDate}`,
+    source.snapshotDate && (worldCup ? `Team Elo ${source.teamElo} on ${source.snapshotDate}` : `Database snapshot ${source.snapshotDate}`),
     Number.isFinite(source.rawRating) && `Source rating ${source.rawRating}${Number.isFinite(source.rawScale) ? `/${source.rawScale}` : source.rawScale ? ` (${source.rawScale} scale)` : ''}`,
     source.conversion && `Game rating converted from ${swos ? 'SWOS\'s price step' : `${cm ? 'CM' : 'Football Manager'} current ability`}: ${source.conversion}`]
     .filter(Boolean).join(' · ') : '';

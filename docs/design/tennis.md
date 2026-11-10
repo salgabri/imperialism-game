@@ -133,7 +133,7 @@ tie's simulated odds.
 
 - **Setup.** A Tennis card with a racket icon. Tennis is nations only (`nationsOnly` on the
   sport): the Clubs choice is off, a challenge link's `teams=clubs` is ignored, and the
-  Season choice lists 2026 and the 53 earlier seasons back to 1973 (see Earlier seasons).
+  Season choice lists 2026 and the 66 earlier seasons back to 1960 (see Earlier seasons).
 - **Squad.** A court from above: the No. 1 and No. 2 at the near baseline, the doubles pair
   across the net. The list groups Singles and Doubles, a player who doubles up appears in
   both, and a note says so. The profile reads Singles and Doubles, as does the tale of the
@@ -192,13 +192,15 @@ campaign of Europe with the live ticker.
 
 ## Earlier seasons
 
-Status: built 2026-11-08. The Season choice lists 53 earlier seasons, 2025 back to 1973, each
-the ATP's men at the end of a year and the Davis Cup nations of that day, nations only
-(set ids `tennis-<year>`, kind `elo`, `public/tennis/tennis-<year>.json`). The user chose the
-sources: Tennis Abstract's own published lists where they exist, and earlier years computed
-from Jeff Sackmann's match results by Tennis Abstract's published method, on today's scale
-and labelled as computed. The women's seasons are built by the same scripts with `--tour=wta`
-([womens-tennis.md](womens-tennis.md), "Earlier seasons"); the men's rebuild byte for byte.
+Status: built 2026-11-08; 1960–1972 added 2026-11-09 (Before 1973, below). The Season choice
+lists 66 earlier seasons, 2025 back to 1960, each the ATP's men at the end of a year (before
+1968 the amateurs') and the Davis Cup nations of that day, nations only (set ids
+`tennis-<year>`, kind `elo`, `public/tennis/tennis-<year>.json`). The user chose the
+sources (2026-11-08): Tennis Abstract's own published lists where they exist, and earlier
+years computed from Jeff Sackmann's match results by Tennis Abstract's published method, on
+today's scale and labelled as computed. The women's seasons are built by the same scripts
+with `--tour=wta` ([womens-tennis.md](womens-tennis.md), "Earlier seasons"); the men's
+rebuild byte for byte.
 
 ### Sources
 
@@ -223,8 +225,8 @@ and labelled as computed. The women's seasons are built by the same scripts with
   own last commit, 8 June 2026) is pinned, and the Hugging Face mirror
   `Aneeshers/tennis-sackmann-archive` holds the same bytes. Labels read "Elo from match results,
   end of 1985"; the player's source is "Elo from match results", with his Elo in its title.
-- **Pins.** `scripts/data/tennis-seasons.json` holds the SHA-256 of all 107 archive files and
-  19 captures. The captures are the Wayback Machine's raw pages (`id_`): the 2016–2019 reports
+- **Pins.** `scripts/data/tennis-seasons.json` holds the SHA-256 of all 108 archive files (the
+  amateur file of Before 1973 among them) and 19 captures. The captures are the Wayback Machine's raw pages (`id_`): the 2016–2019 reports
   match the archive's own SHA-1 digests, the 2020 one's gzipped page matches its digest and
   decodes to the pinned bytes, and fresh downloads of 2021–2024 and of five rankings captures
   match their pins (the 2025 report could not be fetched again: the archive was throttling).
@@ -348,29 +350,188 @@ African to 1981, Kevin Curren to 1984, Greg Rusedski Canadian to 1994, Mikhail K
 Andrey Golubev Russian to 2007. Great Britain plays as one, as in 2026. A nation needs two rated
 men; countries the map does not draw (Monaco, Hong Kong, Barbados…) field nobody.
 
-The game shows a federation by its holder's name and flag (Czechia, Russia, Serbia, Germany):
-a season file has no way to rename a nation. The audit names both ("Czechoslovakia (Czechia)
-87.4" in 1985).
+The game shows a federation by its holder's name and flag (Czechia, Russia, Serbia, Germany).
+Football's seasons can now carry the federations of their day under their own names
+(`identities`), but tennis keeps today's names, so that its seasons match those shipped from
+1973 on. The audit names both ("Czechoslovakia (Czechia) 87.4" in 1985).
+
+### Before 1973
+
+Built 2026-11-09, when the user asked for every sport's missing years and the 1960s and 1970s.
+Thirteen seasons, `tennis-1960` to `tennis-1972`: 1960–1967 the amateurs alone, labelled
+"Amateur Elo, end of 1962 (rough)", 1968–1972 the open era, "Elo from match results, end of
+1970 (rough)". Their source says `computed`, `rough`, `amateurs` before 1968, and the method
+"Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup
+results of 1877-1967". Claude's choices (2026-11-09), under that request and not yet confirmed
+by the user: back to 1960, the floor the user set for the NBA's, MLB's, NFL's and NHL's
+computed seasons (the file would allow 1950); a run of their own, so that 1973–2025 stay byte
+for byte as shipped; every rated man in 1968–1972, contract professionals too, as from 1973;
+three counted matches a season before 1968; Wikipedia's published top tens pinned as validation
+inputs only; South Africa barred 1970–1972; Drobny's fix; the duplicate ids reviewed and
+committed.
+
+**Sources.**
+
+- **Sackmann's amateur file**, `atp_matches_amateur.csv`, from the same pinned commit
+  (`712be0c`, SHA-256 `2edfa7ab…`, 3,936,333 bytes; the same git blob is in
+  `Aneeshers/tennis-sackmann-archive` at `8373358`): 25,001 rows, 1877–1967, of two levels
+  only, the majors (20,201) and the Davis Cup rubbers (4,800), every tie named with its two
+  sides ("Davis Cup EUR R1: AUT vs FIN"). Each row stops after 40 of the header's 49 cells and
+  is padded when read; it has two rounds of its own (PR, a preliminary round; CR, Wimbledon's
+  challenge round to 1921 and the US Championships' to 1911). Licence as above (CC BY-NC-SA
+  4.0); `public/tennis/ATTRIBUTION.txt` names the file. It holds about a third of a leading
+  amateur's matches, and no professional's: Tennis Abstract's own 1957–1967 database, with the
+  pro tours, is on its site only, behind paths its robots.txt disallows.
+- **The open era's files**, 1968–2025, as the first run reads them.
+- **Validation only** (the manifest's `checks`; nothing from them is in a season file):
+  Wikipedia's "Top ten ranked male tennis players (1912–1972)", revision 1379999545 (13 October
+  2026, CC BY-SA 4.0), whose lists for 1960–1972 are Lance Tingay's (The Daily Telegraph: the
+  amateurs' ten to 1967, everyone's from 1968); each name is kept with its match-file id, joined
+  by hand (Pancho Gonzales is "Richard Gonzalez" in the player file, Jan-Erik Lundqvist "Jan Erik
+  Lundquist"). They match Tingay's columns on the article page of that revision, fetched once
+  under `/wiki/`, which Wikipedia's robots.txt allows (SHA-256 `c6e6c9b0…`). The research pass
+  had first read them from the raw wikitext through `/w/index.php`, a path robots.txt disallows;
+  nothing here uses that copy or fetches `/w/`. Where Tingay ranked men equal at the foot of his
+  list the page's first is kept (1967's tenth place is Leschly's, shared with Bungert and
+  Drysdale). And Tennis Abstract's own words in The Tennis 128: Newcombe fourth at the end of 1968, behind
+  Laver, Rosewall and Ashe, and again in 1969, behind Laver, Roche and Okker; Rosewall behind
+  Laver at the end of 1970; Laver's peak of 2,571 in 1970.
+- **Facts for the nations rules**, from Wikipedia (the revisions are in the manifest's `why`):
+  the article pages of Drobný, Mulligan, Hewitt and Letcher, fetched once each under `/wiki/`,
+  which robots.txt allows, and the article page of "Sporting boycott of South Africa during the
+  apartheid era" at the revision the manifest cites, fetched the same way, for South Africa's
+  ejection from the 1970 Davis Cup (the research pass had read it through `/w/api.php`, which
+  robots.txt disallows).
+
+**The method.** `method.early`: a second run of the same engine, kept apart from the first. It
+reads the amateur file before the open era's files and changes four things:
+
+- **Newcomers of the amateur file start at 1360**, fitted to five points so that the run carries
+  on as the shipped one: on Tennis Abstract's 38 targets for 1973–2000 it comes out −2.0 Elo,
+  root mean square 15.3 (the shipped run −2.0 and 15.1), and over the shipped run's top 50 of
+  each season 1973–1980 its Elo of the same men is within 0.3 to 3.0 points on average (in all
+  −1.2 to +2.6). 1350 leaves those seasons up to 4.8 points under the shipped run, 1450 (the
+  open era's start) 18 to 30 over it. The research pass had fitted 1350 before the 24 open-era
+  aliases below; with them 1360 fits.
+- **Layoffs.** A gap that begins before 1 January 1968 is charged only when it also ends before
+  it and lasts 26 weeks or more, on the shipped scale: the file holds a third of an amateur's
+  matches, and the eight-week rule charges nearly all of them. Against Tingay's tens of
+  1960–1967 the mean rank correlation is 0.66 with eight weeks, 0.64 with 13, 0.70 with 26,
+  0.67 with 39 and 0.67 with no charge. A gap across that date (a professional coming back in
+  1968: Laver last played an amateur match in 1962) is never charged.
+- **Activity.** 1960–1967 list the men with three counted matches in the season (a floor of
+  ten leaves six to eight nations a season, five 15 to 20, three 23 to 30); 1968–1972 ten, as
+  from 1973.
+- **Duplicate ids.** 225 pairs, reviewed by hand and committed (`method.early.aliases`), each
+  merged into the id of the same man before rating: 200 ids of the amateur file with Davis Cup
+  rows only (Edison Mandarino's joins Jose Edison Mandarino's, Alfred Huber's Freddie Huber's)
+  and 25 amateur ids of men who carry on under another id in the open era (John McDonald, Paul
+  Sullivan). Each pair shares a country and careers no more than two seasons apart unless the
+  birth dates agree, by the same full name, surname and initial, surname and birth date, or
+  (fourteen, by hand) a variant of the first name or, for two, of the surname. Those two had
+  each put one man in a squad twice until a second search, for surnames spelt two ways, found
+  them: Julie Mayer, "Julius Mayer" in South Africa's ties of 1961 and "Julian Mayers" at the
+  majors (Wikipedia's article on him names both), and András Szikszay, "Szikszai" at the
+  majors, twice in Hungary's squad of 1967. The open era's id is kept. Never
+  merged: two ids in one event, and men told apart by first name or birth date (the Ulrichs,
+  the Frasers, the Amritraj and Dell brothers, Vo Van Bay and Vo Van Thanh). The sync checks
+  every pair again (both in the player file, no chain, a shared country, no shared event), and
+  1,498 rows move.
+
+Each season lists its men strongest first; the nations of the day come from the same run's
+Davis Cup rows, aliases applied (31 rubbers place nobody). Nothing needs a shift: the best is
+Laver's 2,269 at the end of 1970, rating 95.
+
+**Validation** (`validation.json`, `early` and `checks`):
+
+| Season | Rated | Nations | Best (rating) | Strongest three | Tingay's ten shared | Rank correlation |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1960 | 111 | 23 | Neale Fraser (85) | Australia, United States, Italy | 7 | 0.87 |
+| 1961 | 119 | 25 | Neale Fraser (84) | Australia, United States, Italy | 8 | 0.33 |
+| 1962 | 129 | 28 | Rod Laver (89) | Australia, United States, Italy | 6 | 0.73 |
+| 1963 | 134 | 28 | Roy Emerson (85) | United States, Australia, Mexico | 6 | 0.81 |
+| 1964 | 119 | 27 | Roy Emerson (89) | Australia, United States, Sweden | 8 | 0.67 |
+| 1965 | 125 | 24 | Roy Emerson (88) | Australia, United States, Spain | 7 | 0.68 |
+| 1966 | 131 | 29 | Roy Emerson (87) | Australia, United States, Spain | 8 | 0.83 |
+| 1967 | 141 | 30 | Roy Emerson (87) | Australia, United States, South Africa | 7 | 0.68 |
+| 1968 | 184 | 23 | Rod Laver (89) | Australia, United States, Spain | 6 | 0.76 |
+| 1969 | 136 | 17 | Rod Laver (94) | Australia, United States, Spain | 8 | 0.49 |
+| 1970 | 137 | 19 | Rod Laver (95) | Australia, United States, Spain | 7 | 0.48 |
+| 1971 | 156 | 20 | Rod Laver (92) | Australia, United States, Spain | 9 | 0.39 |
+| 1972 | 168 | 22 | Ilie Nastase (92) | United States, Australia, Romania | 7 | 0.81 |
+
+1960–1967 share 7.1 of Tingay's ten a season (rank correlation 0.70), 1968–1972 7.4 (0.59);
+every man on his lists is rated in his season. Without the warm-up (the first run, everyone new
+in 1968) 1968 has Ashe first, Laver second and Newcombe thirteenth, sharing four of the ten;
+with it Laver, Rosewall, Roche, Ashe, then Emerson, Newcombe sixth. Tennis Abstract's year
+ends come out Laver 1, Rosewall 2, Ashe 4, Newcombe 6 in 1968 (its 1, 2, 3, 4), Laver 1, Okker
+2, Roche 5, Newcombe 8 in 1969 (its 1, 3, 2, 4) and Laver 1, Rosewall 2 in 1970 (its order).
+Laver's peak is 2,329 (20 September 1969) against Tennis Abstract's 2,571, which counts the pro
+tours these files lack. The Davis Cup bears the nations out: Italy, third in 1960, lost that
+year's Challenge Round to Australia; Mexico (Osuna) is third in 1963 and fifth in 1962, the year
+it reached the Challenge Round; the United States and Australia lead every season; Romania,
+the finalist of 1969, 1971 and 1972, is fourth, fourth and third. In 1973–1980 one man
+sits far from the shipped run, Tony Roche (up to 100 points in 1977): a layoff the 1900
+threshold charges in one run and not the other.
+
+**Nations of the day, 1960–1972.** The rule above, from the second run's Davis Cup rows. West
+Germany's ties read GER until 1960 and FRG from 1961, both West Germany. The Soviet Union's
+first cup was 1962, so Russia holds the other republics from then (a nation of one before).
+Rhodesia plays as Zimbabwe when it has two rated men; the Caribbean's combined team sends its
+men to their own countries. Monaco and Hong Kong are off the map. Additions:
+
+- **South Africa is barred 1970–1972**: ejected from the 1970 cup and banned indefinitely; the
+  files have none of its ties in those years and have them again from 1973. Drysdale, Hewitt
+  and seven more play for nobody in 1970.
+- **Fixes**: Jaroslav Drobný plays for Great Britain from 1960 (Czechoslovak to 1950, Egyptian
+  1950–1959, British after; his file says Czechoslovak and his ties end in 1949); Martin
+  Mulligan for Australia to 1967 (his only ties are Italy's of 1968, which the six-season window
+  would reach back to 1962); Bob Hewitt for Australia to 1966 (South African from 1967, the year
+  his ties start); Cliff Letcher for Australia to 1972 (he accepted Austria's Davis Cup offer in
+  November 1974 and played its ties of 1977, which made him Austria's best man of 1971). The
+  fix stops at 1972, so the shipped 1973 and 1974 still make him Austrian by the window.
+
+**Limits.**
+
+- **A third of the amateurs' matches.** Veterans with a few matches keep old ratings (Seixas
+  ninth in 1962 on four matches, Drobný tenth in 1960 on three); 1961 agrees worst with Tingay
+  (0.33).
+- **No professionals before 1968**: Rosewall, Gonzales, Hoad, Laver from 1963 and the rest of
+  the pro tours are missing, true to the Davis Cup, which barred them; from 1968 they are back
+  in every season though the cup barred contract professionals until 1973.
+- **Two tuned parameters**, the start of 1360 and the 26-week layoff, documented, not
+  published; the seasons' level cannot be checked against Tennis Abstract's.
+- **The nearest-season rule** can still make a man his later nation's up to six seasons early
+  where no fix says otherwise; the cases a review of 1960–1972 found are fixed (Mulligan, Hewitt,
+  Letcher).
+- **The second run is not the first**: its 1973 differs from the shipped 1973 by about two
+  points on average, so a 1972 player and his 1973 self come from two runs.
 
 ### Tests
 
 `scripts/tennis-seasons.test.mjs`: the build and (with the inputs cached) the sync rebuild byte
-for byte; every input pinned; the listing, 2025 back to 1973, and its labels; every season
-decodes, two to five men a nation, each rating his Elo on the game's scale less the season's
-shift, the best at 99 where shifted; Borg and Djokovic shifted; 1985's Czechoslovakia holding
-Slovakia with Lendl, West Germany with Becker, South Africa barred with Kriek and Curren out of
-the game in 1980; the Soviet Union, the CIS and Croatia in 1990–1992; FR Yugoslavia barred and
-Kosovo's years; the nation-of-the-day rules and fixes; Tennis Abstract's own lists and
-countries (Tabilo); the validation thresholds; the loader refusing damaged files; the running
-App listing the seasons, loading one, launching 1985 with Slovakia in Czechoslovakia's empire
-and resuming the save; and a challenge link to a season.
+for byte; every input pinned, the amateur file among them; the listing, 2025 back to 1960, and
+its labels; every season decodes, two to five men a nation, each rating his Elo on the game's
+scale less the season's shift, the best at 99 where shifted; Borg and Djokovic shifted; 1985's
+Czechoslovakia holding Slovakia with Lendl, West Germany with Becker, South Africa barred with
+Kriek and Curren out of the game in 1980; the Soviet Union, the CIS and Croatia in 1990–1992;
+FR Yugoslavia barred and Kosovo's years; the nation-of-the-day rules and fixes; Tennis
+Abstract's own lists and countries (Tabilo); the validation thresholds; before 1973, the
+second run's snapshots (three or ten counted matches, no man twice), the professionals absent
+until 1968 and Laver first in 1968–1970, the alias list, Mandarino, Mayers and Szikszay merged
+and the Ulrichs not, no nation naming one man under two spellings of his surname, South Africa
+barred 1970–1972 with Drysdale and Hewitt out, the Soviet Union from 1962, the Drobný,
+Mulligan, Hewitt and Letcher fixes, and the fit, seam and top-ten thresholds; the loader
+refusing damaged files; the running App listing the seasons, loading one, launching 1985 with
+Slovakia in Czechoslovakia's empire and 1962 with Ukraine in the Soviet Union's, and resuming
+the saves; and a challenge link to a season.
 
 ### Limits
 
-- **1973–1979 are rough**, and their labels say so: the ratings start from nothing in 1968 (the
-  archive's amateur file, majors and Davis Cup only before the open era, is not used), and
-  starting them in 1970 instead moves the 1975 list by about 48 points and reorders it more than
-  later seasons.
+- **1960–1979 are rough**, and their labels say so. 1973–1979 start from nothing in 1968 (the
+  first run does not read the archive's amateur file), and starting them in 1970 instead moves
+  the 1975 list by about 48 points and reorders it more than later seasons; 1960–1972 have
+  limits of their own (Before 1973).
 - **No surfaces for the computed seasons.** The published ones keep Tennis Abstract's surface
   Elos (2017–2018 single-surface, 2019–2025 blended); the game plays none of them.
 - **Nation changes.** A man who changed country with no Davis Cup row before the change plays

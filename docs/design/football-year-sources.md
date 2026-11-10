@@ -77,11 +77,12 @@ most of the 170 nations. EA counts are nations able to field a natural
 | 2004 | CM0102 Oct 2003 (Sawczuk) | — | — | results/Elo, Wikidata |
 | 2003 | **Shipping:** SI's own CM 01/02 3.9.68 database (2002/03), from the CM0102 Starter Kit ([football-years.md](football-years.md#seasons-before-fifa-05)) | — | — | results/Elo, Wikidata |
 | 2002 | **Shipping:** SI's own CM 01/02 3.9.60 database (2001/02; 3.9.65 too) | — | — | results/Elo, Wikidata |
-| 1999–2001 | **Shipping 1999:** SI's CM3 data ported to CM 01/02 (Cam F; Starter Kit). CM0102 retro 99/00, 00/01 need their own executables; World Cup 1998 pack (32 nations) | Road to World Cup 98 had 172 national teams, but only inside the game files | — | results/Elo, Wikidata, World Cup squads |
+| 1999–2001 | **Shipping:** 2001 SI's own CM 00/01 (3.81) and 2000 SI's own CM 99/00 (3.70), read from their UK retail CDs on archive.org ([football-years.md](football-years.md#sis-cm-0001-and-cm-9900-read-from-their-cds-200001-and-199900)); 1999 SI's CM3 data ported to CM 01/02 (Cam F; Starter Kit). The community's CM0102 retro 99/00 and 00/01 need their own executables; World Cup 1998 pack (32 nations) | Road to World Cup 98 had 172 national teams, but only inside the game files | Winning Eleven 4 (cross-check only) | results/Elo, Wikidata, World Cup squads |
 | 1998 | **Shipping:** SI's CM 97/98 database as baskeyx extracted it to JSON (2026; tool and game version unstated) | — | Winning Eleven 4 (53 nations, spring 1999: a cross-check only) | as above |
 | 1997 | **Shipping, nations only:** SWOS 96/97: 143 national squads of 16, 133 of our nations, all field a natural 4-4-2 | — | — | as above |
-| 1994–1996 | CM0102 retro: 93/94 (from SI's CM3, 16 nations' leagues), 94/95, 95/96 (from SI's CM2) | — | SWOS 94/95, 95/96 only as game disk images (not usable) | as above |
-| 1985–1993 | **CM0102 1984/85 Retro Update**: 72,015 players, 186 nationalities, 137 of our nations with 11+ players (after USSR/Yugoslavia/Czechoslovakia merges). Also 89/90, 91/92 | — | — | as above |
+| 1995–1996 | **Shipping (2026-11-09), nations and clubs:** SWOS 95/96 and the original SWOS (v1.0, 1994/95) from the game's own team files on the SWOS United server (`cern.swos.eu/data/amiga/`, pinned by SHA-256): 132 and 131 nations, 134 top-division clubs each ([football-years.md](football-years.md#sensible-world-of-soccer-9495-and-9596-nations-and-clubs)). CM0102 retro 94/95, 95/96 (from SI's CM2; forum login) | — | — | as above |
+| 1994 | **Shipping (2026-11-09), fan-made:** Cam F's 93/94 for CM 01/02 (Starter Kit `cm93_data.zip`; his ratings, not SI's): 124 nations, 130 clubs | — | SI's own CM 93/94 (England's leagues only, `ben-clarke/championship-manager-93-tools`): a cross-check | as above |
+| 1985–1993 | **Shipping 1990 (2026-11-09), fan-made, nations only:** Simon Treanor's 1989/90 for CM 01/02, Beta 5 (Starter Kit `cm89_data.zip`): 137 nations as the federations of 1989/90 ([football-years.md](football-years.md#the-fan-made-databases-199394-and-198990)). **CM0102 1984/85 Retro Update**: 72,015 players, 186 nationalities, 137 of our nations with 11+ players (after USSR/Yugoslavia/Czechoslovakia merges). Also 91/92 | — | — | as above |
 | 1966–1984 | CM0102 65/66 (work in progress, ~10% of 21k players rated), 77/78 (creates new players), 81/82; FM throwbacks (2–15 nations) | — | — | results/Elo (118 nations active by 1970); Wikidata XIs for ~33 nations in 1970 |
 | 1930–1965 | none | — | — | World Cup squads (13–16 finalists); Wikidata XIs for ~19–30 nations; results/Elo (55 nations active in 1930) |
 | 1872–1929 | none | — | — | results/Elo only (16–31 nations active) |
@@ -110,12 +111,14 @@ most of the 170 nations. EA counts are nations able to field a natural
 | FIFA Index | FIFA 05–24 | FIFA 05: ~10,994 players, 208 nations listed | Cloudflare-blocked; Kaggle mirror `daguizer/fifa-2021-to-2005-complete-player-attributes` (no nationality, no club, no dates) | Terms ban any robot or scraper |
 | CM 01/02 Update Team databases (champman0102.co.uk, forum f=73) | 2004, 2006, 2008–2026; 2027 due 25 Oct 2026 | 100k+ players, ~231 nation records, CA/PA 1–200, position ratings 1–20, nationality, club, DOB | Forum attachments need a free account; fixed-record `.dat` files (`staff.dat`, `nation.dat`, `club.dat`, `index.dat`) | No licence. On 20 Jul 2026 the Update Team Director allowed a free browser fan project to *convert* the May 2026 database ("Yes work away"). A request about GitHub (18 Oct 2026) is unanswered |
 | SI's original CM 01/02 database (3.9.60 / 3.9.65 / 3.9.68) | 2002, 2003 | ~169k staff, 139,769 players, 213 nation records; covers 165 of our 170 by name (Serbia is "Yugoslavia"; no Montenegro, Kosovo, South Sudan, Timor-Leste) | Same forum, same format | Free download since Dec 2008 (Eidos), for personal, non-commercial use; data rights reserved |
+| SI's CM 99/00 (3.70) and CM 00/01 (3.81) databases, on users' uploads of the retail CDs to archive.org (`championship-manager-season-9900`, its Dutch twin `cm-9900-nl`, `cm-0001-rel`, and the later European pressing `cm-0001`) | 2000, 2001 | CM 99/00: 46,460 players (28,020 rated), 203 nation records; CM 00/01: 71,641 players (48,617 rated), 214. The CM 01/02 tables, staff format 1 | HTTP range requests on the item's CD image: only the InstallShield cabinet header and eleven tables' compressed bytes (`npm run sync:retro-cds`, about 4 MB a CD). Checked 2026-11-09 | Never made free; SI/Eidos rights reserved. archive.org terms of use; robots.txt allows `/download/`. Shipped on Claude's decision of 2026-11-09, under the user's request to cover every missing season; not confirmed by the user, so open for the user |
 | CM0102 community retro databases | 1951–2001 (patchy) | 84/85: 72,015 players, 186 nationalities. 93/94, 95/96, 98/99 ported from SI's CM2/CM3 | MediaFire/sendspace links in forum threads (many sendspace links expired) | No licence; per-author permission (Cam F and the 84/85 team, bruebous, Simon Treanor, PLM9293) |
 | FM throwback databases (tHe MadSCienTiSt and others: fmscout, sortitoutsi, Steam Workshop) | 1952/53–2013/14 | 2–15 playable nations; one 2003/04 database has 62 leagues | `.fmf` / `.fm` files that open only inside a licensed FM | No licence; most attributes copied by hand from SI games. An SI developer called an official retro database "not possible due to licensing" |
 | EFEM.club | FM24 24.3.0, FM26 26.0.0 / 26.2.0 (partial) / 26.3.0 | Full FM database per version | Undocumented JSON API | robots.txt `Disallow: /api/` (since mid-2025); Terms 1.1 personal use only, 1.2 no automated access |
 | FMInside | FM21 21.0.0, FM22 22.1.0, FM23 23.4.0, FM24 24.0.0 and 24.3.0, FMU25 24.4.0 (fan update), FM26 26.2.0 | Per-player pages | HTML | Terms forbid copying or republishing |
 | pesmaster.com | PES 5 (2006), PES 2008–2021 | 52 (PES 5), 54 (2008), 77 (2012), 93 (2020) of our nations; stable Konami ids across editions | HTML, teams by id; no API | robots.txt allows all; no terms page; data is Konami's |
 | SWOS 96/97 | 1997 | 1,440 clubs, 143 national teams, 25,328 players; 8 skills on 0–7, value | Community SQLite in `keyser1884/SWOS-MCP` (MIT repo); game on GOG | Data rights with Codemasters |
+| SWOS's own team files (SWOS United server) | 1995 (v1.0, v1.1, v0.9), 1996 (95/96 and its European Championship Edition), 1997 | Per edition 141–143 national teams and every league's clubs, 16 players each: position, seven skills 0–7, price step, nationality byte | `https://cern.swos.eu/data/amiga/<edition>/TEAM.<nnn>`, 684-byte teams (layout as codemeyer/SwosPlayerFinder, MIT, reads it) | No robots.txt, no licence or terms stated; data rights with Codemasters. Shipping 1994/95 and 1995/96 (2026-11-09) |
 | Wyscout / PlayeRank (Pappalardo et al., figshare) | 2018 | 3,603 players, 47 nations with a full XI, no goalkeepers rated | figshare | CC BY 4.0, the only openly licensed per-player rating found |
 
 Ruled out: pesdb.net (terms ban automated collection), FUTBIN/FUTHEAD/fifaratings
@@ -141,6 +144,15 @@ Rangliste (20–100 players a year).
 Club history has no openly licensed structured source before about 2010 outside
 England (openfootball, engsoccerdata under GPL).
 
+**Shipping, computed (2026-11-10):** the World Cups of 1962 to 1994 as nine
+nations-only seasons whose ratings are computed, not a game's: the Fjelstul
+World Cup Database's squads and records (commit `35a8667`, CC BY-SA 4.0),
+martj42's results through our own Elo (commit `b0948cb`, CC0; each team starts at
+1500, or 1300 when its first match is after 1930), and Wikipedia's Ballon d'Or
+votes and 1962/1966 line-ups at pinned revisions (CC BY-SA 4.0), with
+eloratings.net's tables as a cross-check only
+([football-years.md](football-years.md#computed-world-cup-seasons)).
+
 ## Rights and terms
 
 These findings affect the data that **already ships**, not only new years. This
@@ -160,7 +172,12 @@ is a record of terms as published, not legal advice.
 3. **SI.** The SEGA EULA (12 Dec 2024) limits the product "or related information
    or materials" to personal use and forbids derivative works. SI shares its
    database only with professional partners. Permission has been given case by
-   case, for example to FM Scout in 2012.
+   case, for example to FM Scout in 2012. SI's CM 99/00 and CM 00/01 were never
+   made free (only CM 01/02 was); the seasons built from them ship on Claude's
+   decision of 2026-11-09, under the user's request to cover every missing
+   season, credited to SI
+   ([football-year-permissions.md](football-year-permissions.md)). The user has
+   not confirmed it, so whether they ship is open for the user.
 4. **CM 01/02 community data** is the only rated, global, per-season source with
    a precedent of permission for a fan project. That permission covered
    converting the data, not redistributing it. Committing derived snapshots here
@@ -170,6 +187,25 @@ is a record of terms as published, not legal advice.
 5. **Open data**: martj42 (CC0), Wikidata (CC0) and openfootball (public domain)
    can be committed. Fjelstul and Wikipedia squads can be committed as separate
    files under CC BY-SA 4.0.
+6. **MoneyPuck.com** (ice hockey's 15 seasons computed from its data, 2010/11 to
+   2025/26 but 2021/22) allows non-commercial use only, with a credit, which
+   setup shows; the NHL's own statistics behind the built-in hockey season are
+   for non-commercial personal use too. Using MoneyPuck's data was Claude's
+   decision of 2026-11-09, under the user's request to cover every missing
+   season, and is open for the user ([hockey.md](hockey.md#computed-seasons)).
+7. **Jeff Sackmann / Tennis Abstract** (both tennis sports, every season: Tennis
+   Abstract's Elo reports and the Elo computed from Sackmann's match results)
+   are CC BY-NC-SA 4.0: credit, non-commercial use only, derived data shared
+   alike ([tennis.md](tennis.md#earlier-seasons)).
+8. **Sports-Reference** (the 36 computed basketball seasons): their inputs are
+   Basketball-Reference's statistics, from a Kaggle copy whose CC0 label is its
+   compiler's, not Sports-Reference's. PER, WS/48 and DWS are
+   Basketball-Reference's own figures, and Sports-Reference's data-use terms
+   forbid scraping that harms its sites, building a competing database and AI
+   training with its data; nothing was fetched from basketball-reference.com.
+   Using them was Claude's decision of 2026-11-09, under the same request, and is
+   open for the user
+   ([football-years.md](football-years.md#computed-seasons-196061-to-199798)).
 
 If permission cannot be had, the clean pattern is **bring your own database**
 (the approach `Skallerup/cm0102-reborn` takes): the user downloads a database,

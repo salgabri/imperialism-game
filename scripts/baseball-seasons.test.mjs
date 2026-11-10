@@ -32,7 +32,10 @@ const AUDIT = JSON.parse(read('docs/design/baseball-seasons-audit.json'));
 const snapshotOf = year => JSON.parse(read(`scripts/data/mlb-the-show-${editionOf(year)}.json`));
 const seasonFile = id => JSON.parse(read(`public/baseball/${id}.json`));
 const mapFile = id => JSON.parse(read(`public/domestic/${id}.json`));
-const ERA_MAPS = CLUB_MAPS.filter(entry => entry.sport === 'baseball' && entry.seasons);
+// MLB The Show's seasons and their era maps (the seasons computed from WAR, 1960 to 2017, are
+// scripts/baseball-war-seasons.test.mjs's).
+const SHOW_SEASONS = BUILT_IN_BASEBALL_SEASONS.filter(set => /^mlb-the-show-/.test(set.id));
+const ERA_MAPS = CLUB_MAPS.filter(entry => entry.sport === 'baseball' && entry.seasons?.some(id => /^mlb-the-show-/.test(id)));
 const SHOWZONE_SEASONS = [2018, 2019, 2020];
 const sectionAt = (map, point) => map.geo.countries.find(section => pointInPolys(point, section.polys))?.id ?? null;
 const home = (map, id) => map.clubs.find(club => club.id === id).homeSection;
@@ -41,7 +44,8 @@ const ballpark = (mapId, clubId) => mapFile(mapId).clubs.find(club => club.id ==
 // ---------- building ----------
 
 test('every season rebuilds byte for byte from its committed snapshot', () => {
-  assert.match(execFileSync(process.execPath, ['scripts/build-mlb-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 8 baseball seasons/);
+  assert.match(execFileSync(process.execPath, ['scripts/build-mlb-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
+    /Verified the 66 baseball seasons \(8 from MLB The Show, 58 computed from WAR\)/);
   for (const year of MANIFEST.seasons) {
     const snapshot = snapshotOf(year);
     assert.equal(snapshot.players.length, snapshot.source.cards);
@@ -86,13 +90,14 @@ test('the ShowZone snapshots and MLB\'s birthplaces rebuild from their pinned ca
 });
 
 test('the built-in seasons are the manifest\'s, newest first, from 2025 back to 2018, each on its era\'s map', () => {
-  assert.deepEqual(BUILT_IN_BASEBALL_SEASONS.map(set => set.id), [...MANIFEST.seasons].reverse().map(seasonIdOf));
-  assert.deepEqual(BUILT_IN_BASEBALL_SEASONS.map(set => [set.season, set.label, set.map]), [
+  assert.deepEqual(SHOW_SEASONS.map(set => set.id), [...MANIFEST.seasons].reverse().map(seasonIdOf));
+  assert.deepEqual(BUILT_IN_BASEBALL_SEASONS.slice(0, SHOW_SEASONS.length), SHOW_SEASONS, 'MLB The Show\'s seasons come first, newest first');
+  assert.deepEqual(SHOW_SEASONS.map(set => [set.season, set.label, set.map]), [
     ['2025', 'MLB The Show 25', 'mlb2025'], ['2024', 'MLB The Show 24', 'mlb2022'], ['2023', 'MLB The Show 23', 'mlb2022'],
     ['2022', 'MLB The Show 22', 'mlb2022'], ['2021', 'MLB The Show 21', 'mlb2021'], ['2020', 'MLB The Show 20', 'mlb2020'],
     ['2019', 'MLB The Show 19', 'mlb2019'], ['2018', 'MLB The Show 18', 'mlb2018']]);
   assert.equal(builtInSeasonOf('baseball').season, '2026', 'the built-in season stays the current one');
-  for (const listed of BUILT_IN_BASEBALL_SEASONS) {
+  for (const listed of SHOW_SEASONS) {
     const set = BUILT_IN_SETS.find(entry => entry.id === listed.id);
     assert.deepEqual(set, listed, `${listed.id} is listed as built`);
     assert.equal(setSportOf(set.id), 'baseball');
@@ -108,7 +113,7 @@ test('the built-in seasons are the manifest\'s, newest first, from 2025 back to 
 // ---------- the seasons ----------
 
 test('every season loads and fits its era\'s map: the same clubs, named and housed as that season had them', () => {
-  for (const listed of BUILT_IN_BASEBALL_SEASONS) {
+  for (const listed of SHOW_SEASONS) {
     const doc = seasonFile(listed.id);
     const set = decodeFootballSet(doc, listed.id);
     assert.deepEqual([set.meta.year, set.meta.season, set.meta.map], [listed.year, listed.season, listed.map]);
@@ -312,7 +317,9 @@ test('baseball\'s Season choice lists its own seasons; a season keeps Nations, a
   await withApp(async ({ app, time }) => {
     app.pickSetup('sport', 'baseball');
     const model = modelOf(app);
-    assert.deepEqual(model.season.options.map(option => option.name), ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018']);
+    // A season computed from WAR says so on screen.
+    assert.deepEqual(model.season.options.map(option => option.name), ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018',
+      ...Array.from({ length: 58 }, (_, i) => `${2017 - i} · computed`)]);
     assert.deepEqual(model.season.options.map(option => option.label),
       ['2026 · built in', ...BUILT_IN_BASEBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
     assert.match(model.season.note, /MLB The Show ratings of each season/);
@@ -472,7 +479,7 @@ test('a challenge link to a season\'s nations keeps the manager\'s team once the
     assert.equal(app.state.setup.clubScope, 'domestic:mlb2022', 'the clubs\' map follows the season');
     assert.equal(app.state.setup.managedTeamId, '214', 'the nations field is unchanged, so the Dominican Republic stays picked');
   });
-  // The first season is 2018: a link to an older one is not followed.
+  // MLB The Show's first season is 2018 (the computed ones reach back to 1960): a link to an older edition is not followed.
   assert.deepEqual(readChallenge('?sport=baseball&season=mlb-the-show-18').ignored, []);
   assert.deepEqual(readChallenge('?sport=baseball&season=mlb-the-show-17').ignored, ['season']);
 });

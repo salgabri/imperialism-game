@@ -1,0 +1,226 @@
+{
+  "about": "Computed year-end Elo against eloratings.net's published year-end tables: a cross-check only, never an input; no published rating is kept here (scripts/sync-world-cup-seasons.mjs).",
+  "years": [
+    {
+      "year": 1962,
+      "published": 156,
+      "matched": 128,
+      "pearson": 0.872,
+      "spearmanTop48": 0.924,
+      "slope": 0.568,
+      "leaders": {
+        "published": [
+          "Brazil",
+          "Russia",
+          "Hungary",
+          "Czechoslovakia",
+          "Argentina"
+        ],
+        "computed": [
+          "Brazil",
+          "Russia",
+          "Hungary",
+          "Czechoslovakia",
+          "Argentina"
+        ]
+      }
+    },
+    {
+      "year": 1966,
+      "published": 170,
+      "matched": 147,
+      "pearson": 0.907,
+      "spearmanTop48": 0.93,
+      "slope": 0.575,
+      "leaders": {
+        "published": [
+          "England",
+          "West Germany",
+          "Portugal",
+          "Argentina",
+          "Russia"
+        ],
+        "computed": [
+          "England",
+          "Germany",
+          "Argentina",
+          "Russia",
+          "Portugal"
+        ]
+      }
+    },
+    {
+      "year": 1970,
+      "published": 175,
+      "matched": 152,
+      "pearson": 0.917,
+      "spearmanTop48": 0.887,
+      "slope": 0.605,
+      "leaders": {
+        "published": [
+          "Brazil",
+          "England",
+          "West Germany",
+          "Italy",
+          "Soviet Union"
+        ],
+        "computed": [
+          "Brazil",
+          "England",
+          "Germany",
+          "Italy",
+          "Russia"
+        ]
+      }
+    },
+    {
+      "year": 1974,
+      "published": 182,
+      "matched": 163,
+      "pearson": 0.909,
+      "spearmanTop48": 0.934,
+      "slope": 0.586,
+      "leaders": {
+        "published": [
+          "West Germany",
+          "Netherlands",
+          "Brazil",
+          "Poland",
+          "England"
+        ],
+        "computed": [
+          "Germany",
+          "Netherlands",
+          "Brazil",
+          "Poland",
+          "England"
+        ]
+      }
+    },
+    {
+      "year": 1978,
+      "published": 183,
+      "matched": 169,
+      "pearson": 0.915,
+      "spearmanTop48": 0.931,
+      "slope": 0.609,
+      "leaders": {
+        "published": [
+          "Brazil",
+          "Netherlands",
+          "Argentina",
+          "West Germany",
+          "England"
+        ],
+        "computed": [
+          "Brazil",
+          "Netherlands",
+          "Argentina",
+          "Germany",
+          "Italy"
+        ]
+      }
+    },
+    {
+      "year": 1982,
+      "published": 192,
+      "matched": 179,
+      "pearson": 0.895,
+      "spearmanTop48": 0.928,
+      "slope": 0.565,
+      "leaders": {
+        "published": [
+          "Brazil",
+          "England",
+          "Italy",
+          "West Germany",
+          "Soviet Union"
+        ],
+        "computed": [
+          "Brazil",
+          "Italy",
+          "Germany",
+          "England",
+          "Russia"
+        ]
+      }
+    },
+    {
+      "year": 1986,
+      "published": 197,
+      "matched": 185,
+      "pearson": 0.889,
+      "spearmanTop48": 0.957,
+      "slope": 0.556,
+      "leaders": {
+        "published": [
+          "Argentina",
+          "Brazil",
+          "Spain",
+          "Soviet Union",
+          "England"
+        ],
+        "computed": [
+          "Argentina",
+          "Brazil",
+          "Russia",
+          "Spain",
+          "England"
+        ]
+      }
+    },
+    {
+      "year": 1990,
+      "published": 201,
+      "matched": 189,
+      "pearson": 0.886,
+      "spearmanTop48": 0.886,
+      "slope": 0.555,
+      "leaders": {
+        "published": [
+          "Germany",
+          "Italy",
+          "England",
+          "Yugoslavia",
+          "Brazil"
+        ],
+        "computed": [
+          "Germany",
+          "Italy",
+          "England",
+          "Yugoslavia",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "year": 1994,
+      "published": 222,
+      "matched": 208,
+      "pearson": 0.896,
+      "spearmanTop48": 0.858,
+      "slope": 0.576,
+      "leaders": {
+        "published": [
+          "Brazil",
+          "Germany",
+          "Spain",
+          "Italy",
+          "Netherlands"
+        ],
+        "computed": [
+          "Brazil",
+          "Germany",
+          "Spain",
+          "Italy",
+          "Sweden"
+        ]
+      }
+    }
+  ],
+  "mean": {
+    "pearson": 0.898,
+    "spearmanTop48": 0.915,
+    "slope": 0.577
+  }
+}

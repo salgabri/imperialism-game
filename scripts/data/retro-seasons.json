@@ -1,5 +1,5 @@
 {
-  "about": "The built-in football seasons before FIFA 05 (docs/design/football-years.md, 'Seasons before FIFA 05'), built by npm run build:retro-seasons (scripts/build-retro-seasons.mjs) into public/football/<id>.json. Every source is pinned by SHA-256 and read from the gitignored data-src/<folder>/; download names where it came from. The data's rights stay with its makers (Sports Interactive and Eidos, Sensible Software and Codemasters); the user chose to ship these seasons, credited to them.",
+  "about": "The built-in football seasons before FIFA 05 (docs/design/football-years.md, 'Seasons before FIFA 05'), built by npm run build:retro-seasons (scripts/build-retro-seasons.mjs) into public/football/<id>.json. Every source is pinned by SHA-256 and read from the gitignored data-src/<folder>/; download names where it came from, and a cd block the CD image npm run sync:retro-cds reads it from (scripts/sync-retro-cds.mjs). The data's rights stay with its makers (Sports Interactive and Eidos, Sensible Software and Codemasters, and two fan databases' makers, Cam F and Simon Treanor), and every season is credited to them. The user chose to ship 2002/03, 2001/02, 1998/99, 1997/98 and 1996/97 (2026-11-08) and the two fan databases (2026-11-09); Claude added 2000/01, 1999/00, 1995/96 and 1994/95 on 2026-11-09 under the user's request to cover every missing season, not yet confirmed by the user, and shipping CM 00/01's and CM 99/00's data, from games never made free, is open for the user. A season's own `retrieved` overrides the manifest's where its sources were read another day.",
   "retrieved": "2026-11-08",
   "seasons": [
     {
@@ -33,6 +33,92 @@
         "sha256": "f3a5a9097e7e8d959b75550b4775c1ce4687d004187836ce095ce25e4ff0235c",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/original_data.zip"
       }
+    },
+    {
+      "id": "cm-0001",
+      "kind": "cm",
+      "reader": "tables",
+      "season": "2000/01",
+      "listing": "SI's Championship Manager 00/01 database, original release 3.81 (the UK retail CD's data files, archive.org cm-0001-rel)",
+      "maker": "Sports Interactive",
+      "compiler": "SI's own data files from the retail CD's InstallShield cabinet (DATA1.CAB), read by HTTP range from archive.org cm-0001-rel (CM0001_rel.iso), each file's MD5 as the cabinet header records it",
+      "provenance": "The CD's volume CM0001_rel was mastered on 6 October 2000, three weeks before the game's release on 27 October: the release-day database. A later European pressing (archive.org cm-0001) agrees on 96.3% of current abilities (39,382 players matched by name and date of birth) and rates 1,866 more players, with a few later transfers (Weah at Marseille rather than Manchester City); it is not the one read. The squads are of the summer of 2000: Figo at Real Madrid, Crespo at Lazio, Batistuta at Roma; Charlton, Manchester City and Ipswich promoted. Four players with a current ability below 0 are unrated and left out. For players matched by name and date of birth, 61.8% of current abilities equal CM 99/00's, which sit 2.6 lower on average (22,544 players, correlation 0.931), and 50.3% equal SI's CM 01/02 3.9.60's, which sit 0.7 higher (35,810 players, correlation 0.924): one scale, so the conversion is CM 01/02's, unchanged.",
+      "rights": "Championship Manager: Season 00/01 is Sports Interactive's and Eidos's (now SEGA's and Square Enix's) and was never made free, unlike CM 01/02; the archive.org item is a user's upload of the retail CD, and the data's rights are reserved. Only the eleven tables below are read from it.",
+      "retrieved": "2026-11-09",
+      "cd": {
+        "item": "cm-0001-rel",
+        "image": "CM0001_rel.iso",
+        "imageBytes": 702269440,
+        "imageMd5": "ffae6fe106638f7f4b2d10faedba92b1",
+        "imageSha1": "aa8ca571f898405322df5a5f76d4927a9e8c7590",
+        "sector": 2048,
+        "dataOffset": 0,
+        "volume": "CM0001_rel",
+        "created": "2000100616501300",
+        "cabinet": {
+          "header": "DATA1.HDR",
+          "headerLba": 178424,
+          "headerSha256": "77100b0b8bfa74db1d8b7074758458945b811e9a3a58ec4e026abadae9605ce9",
+          "cabinet": "DATA1.CAB",
+          "cabinetLba": 3241
+        }
+      },
+      "files": [
+        {"folder": "cm0001-cd", "name": "club.dat", "bytes": 3691093, "sha256": "c8b238c19a94d18442099f0294e056ce989d31d3c62679f6b58b72e8d6975305", "md5": "55e07e33230478988b8696aa02a627dd"},
+        {"folder": "cm0001-cd", "name": "club_comp.dat", "bytes": 30281, "sha256": "ccfeec37026c0b7366adaa1e104f214a2b71255d36a31bccfb6e9ad044a821d2", "md5": "da955279e3c9461d15fa05f881f32ca1"},
+        {"folder": "cm0001-cd", "name": "common_names.dat", "bytes": 367440, "sha256": "339cf0faf160969e0be4704b1ea37a4f8c3b01c6b2114499a6f9a78a2acf2b08", "md5": "00ed428875c94612bef142c6079ecee4"},
+        {"folder": "cm0001-cd", "name": "continent.dat", "bytes": 1188, "sha256": "77dbbd6054140f2cb1baf3c3443307c603ea2f089b7f9d056d3933e02aa3cc01", "md5": "404a2142303f10b0adebb8d0eb29b9ae"},
+        {"folder": "cm0001-cd", "name": "first_names.dat", "bytes": 1271940, "sha256": "1f652fc9f7e8f6266b1026f271d210769e1856b66b96e7c6dc6acfb5303f01cf", "md5": "47a9d9ffb0a1b4e491201e2ae281daf3"},
+        {"folder": "cm0001-cd", "name": "index.dat", "bytes": 1482, "sha256": "a6ea56d9d158db4744b4b78f506e8f37c845c4a21a0f42603bc91b3198a1ef1e", "md5": "c6a709adc48b84276be6b224e89b8b92"},
+        {"folder": "cm0001-cd", "name": "nat_club.dat", "bytes": 248668, "sha256": "7f93520b1d3eefdd041e565eb686a422b8493a3bd78808e0127f5f022d047c4b", "md5": "a452361f002fb51a4975291c5a866442"},
+        {"folder": "cm0001-cd", "name": "nation.dat", "bytes": 62060, "sha256": "a84ae88311cdf1bec3bca935533f8d6435314b92b0c22dbefae0ad44a09112d7", "md5": "f104f521b90168326e8419de8a7cce2e"},
+        {"folder": "cm0001-cd", "name": "nation_comp.dat", "bytes": 2033, "sha256": "2b21326033cbcc8fa8f0d4653f16b791c03b5c80176c33df302164318bf701ed", "md5": "6e026150b175ee4a9918d34a4ac7ea0f"},
+        {"folder": "cm0001-cd", "name": "second_names.dat", "bytes": 3316380, "sha256": "db251eaedc618c01fef4b5c5e3aa4e9285eb7fb099e1465f0fec421884b2a582", "md5": "5a6b5cc666e95894533d4e877081134e"},
+        {"folder": "cm0001-cd", "name": "staff.dat", "bytes": 19498141, "sha256": "6a6b3eead90f246317e7c58a36654bef981d2f1fa61503fc08abc2c2ef7f0926", "md5": "a79d766a3869490bc2ec4e60b1e01b58"}
+      ]
+    },
+    {
+      "id": "cm-9900",
+      "kind": "cm",
+      "reader": "tables",
+      "season": "1999/00",
+      "listing": "SI's Championship Manager 99/00 database, original release 3.70 (the UK retail CD's data files, archive.org championship-manager-season-9900)",
+      "maker": "Sports Interactive",
+      "compiler": "SI's own data files from the retail CD's InstallShield cabinet (DATA1.CAB), read by HTTP range from archive.org championship-manager-season-9900 (CM9900_REL.bin), each file's MD5 as the cabinet header records it",
+      "provenance": "The CD's volume CM9900_REL was mastered on 16 November 1999; the game was released on 3 December 1999. A second copy, the Dutch CD (archive.org cm-9900-nl), carries a byte-identical cabinet header, so every data file's MD5 agrees. The squads are of the autumn of 1999: Vieri at Inter, Anelka at Real Madrid, Shevchenko at Milan; Bradford City, Watford and Sunderland promoted. It names the Eredivisie after its sponsor (Dutch KPN-Telecompetition) and spells Burkina Faso 'Burkino Faso'; both are read as such. For players matched by name and date of birth, 70.5% of current abilities equal the CM3 port's (1998/99), which sit 2.0 lower on average (15,637 players, correlation 0.947): the scale of the seasons around it, so the conversion is CM 01/02's, unchanged.",
+      "rights": "Championship Manager: Season 99/00 is Sports Interactive's and Eidos's (now SEGA's and Square Enix's) and was never made free, unlike CM 01/02; the archive.org item is a user's upload of the retail CD (its Public Domain Mark does not apply to the game), and the data's rights are reserved. Only the eleven tables below are read from it.",
+      "retrieved": "2026-11-09",
+      "cd": {
+        "item": "championship-manager-season-9900",
+        "image": "CM9900_REL.bin",
+        "imageBytes": 806512560,
+        "imageMd5": "814eca7ef4e636e4ff15621f4039354b",
+        "imageSha1": "7c665b20be7cd8c1fc6963fd2bbc491974fd1ac7",
+        "sector": 2352,
+        "dataOffset": 16,
+        "volume": "CM9900_REL",
+        "created": "1999111615412400",
+        "cabinet": {
+          "header": "DATA1.HDR",
+          "headerLba": 181185,
+          "headerSha256": "c68afde0c9665b165194dfca504f00422875a92b3a2afa6918b8698f02044c3b",
+          "cabinet": "DATA1.CAB",
+          "cabinetLba": 2649
+        }
+      },
+      "files": [
+        {"folder": "cm9900-cd", "name": "club.dat", "bytes": 2540132, "sha256": "8fabfd345a999abedcd3714f6cd8a9373a33782f2d5570c023a4b4098989bf25", "md5": "5dd5ce64785f6706ccd1623a657799bc"},
+        {"folder": "cm9900-cd", "name": "club_comp.dat", "bytes": 18725, "sha256": "9aa099b9358659ece6d77975131fd8e666981841afe27e146f68a4e28b77462f", "md5": "54350e3f20ddf6f7ec239b34a89ce78c"},
+        {"folder": "cm9900-cd", "name": "common_names.dat", "bytes": 233520, "sha256": "8b323ee306d9d77f39f1758acb368a0603547efd8fb74736ffb31f6b1ebb1f25", "md5": "52e9d542614b83e62fb2f1641c25911a"},
+        {"folder": "cm9900-cd", "name": "continent.dat", "bytes": 1188, "sha256": "77dbbd6054140f2cb1baf3c3443307c603ea2f089b7f9d056d3933e02aa3cc01", "md5": "404a2142303f10b0adebb8d0eb29b9ae"},
+        {"folder": "cm9900-cd", "name": "first_names.dat", "bytes": 804360, "sha256": "9620bee4fe443a4885f558a0e4f04fe0d8b4225e0ba961c1f5c1924545f85241", "md5": "34e311e4d3fde5c518df078fb0474c93"},
+        {"folder": "cm9900-cd", "name": "index.dat", "bytes": 1482, "sha256": "5cc5059ad95b62fb372b9f457f948204e8aaad6ff8ad834aeec3da13d195b030", "md5": "9210f9df1931d390a3545710e481d58f"},
+        {"folder": "cm9900-cd", "name": "nat_club.dat", "bytes": 235886, "sha256": "232426142493ad436486f8d3caf242a18bbf20ed8df04d570a2d847cf090f47f", "md5": "8f64712037e2b1fc9a4e158ae95918cb"},
+        {"folder": "cm9900-cd", "name": "nation.dat", "bytes": 58870, "sha256": "f50cf972b8742d860f7fbd8bdb4d56c0acca01027e35a53d72bf0dba6fe82bb6", "md5": "da9ee447858876682bcc51c4e1fd7f92"},
+        {"folder": "cm9900-cd", "name": "nation_comp.dat", "bytes": 1819, "sha256": "f5875ad1f945f8919e11df09123dc295d1e48d30fca721458f38e0f82840287e", "md5": "168a65193f523a215d1ee70f76a386e0"},
+        {"folder": "cm9900-cd", "name": "second_names.dat", "bytes": 2260080, "sha256": "97d208f6eefddec67fb6bd0a14c1f9f3b6de6c68b048ffdf19c4bc941a2aa841", "md5": "8d12d9fa056b8a1cc6110c649f7cf8c3"},
+        {"folder": "cm9900-cd", "name": "staff.dat", "bytes": 12318294, "sha256": "1efd3432d9ea3c54ff88aab39e8b43e7ef7ea064032f38918d5ba58cfc2b8455", "md5": "a59c383419664cbd4e236936a7532979"}
+      ]
     },
     {
       "id": "cm0102-2020-11-cm3",
@@ -102,6 +188,381 @@
           "download": "https://raw.githubusercontent.com/keyser1884/SWOS-MCP/ac15d74d4a47a6dc0325398bb6c2781ea3f7d322/swos_database.db"
         }
       ]
+    },
+    {
+      "id": "swos-9596",
+      "kind": "swos",
+      "reader": "swos-files",
+      "retrieved": "2026-11-09",
+      "season": "1995/96",
+      "listing": "Sensible Software's Sensible World of Soccer 95/96, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
+      "maker": "Sensible Software",
+      "edition": "SWOS 95/96",
+      "version": "Amiga team files, 95/96",
+      "snapshotDate": "1995",
+      "url": "https://cern.swos.eu/data/amiga/9596/",
+      "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/9596), read by scripts/lib/swos-files.mjs",
+      "provenance": "The launch edition of SWOS 95/96 (the server's 9596), not its European Championship Edition (9596ece, spring 1996, in which 585 of the 2,272 national players differ). Read the same way, SWOS 96/97's own files agree with the shipped 96/97 database for 1,441 of its 1,463 national players; the other 22 are that database's price step 0 stored as 25K, Maldini's and Shearer's step 49 stored as 15M, and namesakes. So steps are read as that database stores them: 0 as 1 (25K) and 49 as 48 (15M).",
+      "rights": "Sensible World of Soccer is Sensible Software's; its rights are now Codemasters'. The SWOS United server, which keeps the game's files for its tools, states no licence or terms (it has no robots.txt), and the data's rights are reserved.",
+      "files": [
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.008",
+          "bytes": 63614,
+          "sha256": "1a7bcb67142bdfbb1307af53248e1775b75d45c56dd054bc651d3b30302a0276",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.008"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.013",
+          "bytes": 34886,
+          "sha256": "827cfbe82d05a109c1ba5572503a78831519db41ab27d5b5db62ae56a53f335f",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.013"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.014",
+          "bytes": 30098,
+          "sha256": "10949f9999f4384489f8690b32604bba257534e0dc978c4a10566f05d4806265",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.014"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.020",
+          "bytes": 33518,
+          "sha256": "537ae1f2c6c8110a40613e6bd63555c26ba0e1d76e56423ad0fa606c4988eaec",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.020"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.025",
+          "bytes": 24626,
+          "sha256": "475c0adb432fce471365c9d0774c4043ff6eff89215f52d926a2f3ce37207a04",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.025"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.029",
+          "bytes": 17102,
+          "sha256": "e27ec06e5d716ce5777fcdb93f93ecbaad1dd1748325c54e9f984469a554c9af",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.029"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.035",
+          "bytes": 30098,
+          "sha256": "f9180136d098a9fb5faae6c6c8b1c1525b148b69cdc2ee7ddde046f37a613ff9",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.035"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.080",
+          "bytes": 33518,
+          "sha256": "5c927112127117d4f1d2e23923e7986585e00e8d04f9cacbbd93f7b0f76662dc",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.080"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.081",
+          "bytes": 23258,
+          "sha256": "49fae0b671391a4069aace38af0268e77dc19b4611d9aa796d3d2d19edc12a1f",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.081"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.082",
+          "bytes": 6842,
+          "sha256": "85fb6598f648abe2b7cfbf028dff9cf16f10ae1fb4448447c0da23a9d95d89f4",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.082"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.083",
+          "bytes": 9578,
+          "sha256": "7c8f34aa7c8351849bd2b1a2ec6fd1d5bfa2a2f727eeee8eac1f8786d1fb0721",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.083"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.084",
+          "bytes": 21206,
+          "sha256": "50bad20762e23da79c617386158fe61a11722b97afdc7a3f192271d09b6dc6c2",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.084"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.085",
+          "bytes": 2738,
+          "sha256": "62f5f68418caa6da9d7b66b4d107b1d56287d853269f475a1b0d3947b41dd5b5",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.085"
+        }
+      ]
+    },
+    {
+      "id": "swos-9495",
+      "kind": "swos",
+      "reader": "swos-files",
+      "retrieved": "2026-11-09",
+      "season": "1994/95",
+      "listing": "Sensible Software's original Sensible World of Soccer (1994), its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
+      "maker": "Sensible Software",
+      "edition": "SWOS 94/95",
+      "version": "Amiga team files, v1.0",
+      "snapshotDate": "1994-12",
+      "url": "https://cern.swos.eu/data/amiga/v1.0/",
+      "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/v1.0), read by scripts/lib/swos-files.mjs",
+      "provenance": "The original release, v1.0, whose READ.ME is Sensible Software's note of Christmas 1994 (kept beside the files in data-src). The v1.1 update of early 1995 has the same national teams and later club squads; the v0.9 pre-release has no Uruguay. Read the same way, SWOS 96/97's own files agree with the shipped 96/97 database for 1,441 of its 1,463 national players; the other 22 are that database's price step 0 stored as 25K, Maldini's and Shearer's step 49 stored as 15M, and namesakes. So steps are read as that database stores them: 0 as 1 (25K) and 49 as 48 (15M). Roberto Baggio's and Romário's step 49 is read as 48.",
+      "rights": "Sensible World of Soccer is Sensible Software's; its rights are now Codemasters'. The SWOS United server, which keeps the game's files for its tools, states no licence or terms (it has no robots.txt), and the data's rights are reserved.",
+      "files": [
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.008",
+          "bytes": 63614,
+          "sha256": "1dd50e1e4350ceadabfa26cc4dc2c2ceec9f3c8927a24853fb037b5787e70f76",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.008"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.013",
+          "bytes": 32150,
+          "sha256": "97fb80187af7748d735b8348889a20c3a44ce68ac5a5f31f4f01c1d812cbd7d3",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.013"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.014",
+          "bytes": 28046,
+          "sha256": "51531f70e8f5f84cce09f8653da1889d39a40613a4b642de20fc72e70963ff89",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.014"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.020",
+          "bytes": 31466,
+          "sha256": "a4f8aa6b1fb5cd0331c4e79c6ead09bcd33b7241a9ea4a36bcb71384b72059a7",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.020"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.025",
+          "bytes": 24626,
+          "sha256": "09da41d506d25ba28cdde555c9a4d9d76d557217a5266a1086ed202dd20cbac4",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.025"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.029",
+          "bytes": 15050,
+          "sha256": "c1e5471834204a2045f545eed18eabddbfbedd7763c05c090c5ced23f76b33e2",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.029"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.035",
+          "bytes": 30098,
+          "sha256": "8e56507e3c6018d979a9edbec18ccdce9c64bcfd33e6f2a534f5800a41b6ebaa",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.035"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.080",
+          "bytes": 32834,
+          "sha256": "23757482eec5dad8300094f274962e289a9d303bb37965752eb2f6b1baa07fc4",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.080"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.081",
+          "bytes": 23258,
+          "sha256": "3bb5c43c967a803a517460d840bad8ce17f14cd2043ae921a3031aeaf87a9ca2",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.081"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.082",
+          "bytes": 6842,
+          "sha256": "92a1a1de2d13127fa26ba5db06aba2e0f1b96da1fac8192131ff77046f7102cd",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.082"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.083",
+          "bytes": 9578,
+          "sha256": "23dd15a2153f9ae564e6e213b67dbfc076a6f2708f902db11b7b8e49fcb155fb",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.083"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.084",
+          "bytes": 21206,
+          "sha256": "486d00d262ed0c34a79f8efaafaf369e0e572e202b5b546be7e06262dddef4ee",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.084"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.085",
+          "bytes": 2738,
+          "sha256": "bdb4d1c24821eba397f4b68573d76e91cef1db55f2ba8829a80de22bb611193a",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.085"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2020-11-cm93",
+      "kind": "cm0102",
+      "season": "1993/94",
+      "listing": "Cam F's fan-made 1993/94 database for CM 01/02, its ratings Cam F's (the CM0102 Starter Kit's cm93_data.zip)",
+      "maker": "Cam F",
+      "compiler": "Cam F, \"Season 93/94 For 0102\" (champman0102.co.uk t=1546, 28 November 2020), a fan-made database in the CM 01/02 format; as nckstwrt's CM0102 Starter Kit ships it (data/cm93_data.zip, whose loader starts the game in 1993)",
+      "provenance": "Fan-made: its players' abilities are Cam F's, not Sports Interactive's. Against SI's own CM 93/94 data (ben-clarke/championship-manager-93-tools' export) for 1,452 English-league players matched by name they correlate 0.72, 74 are equal, and Cam F's run 19 lower on average. It keeps CM 01/02's league sizes, not 1993/94's: its Premier Division has 20 clubs (Oldham Athletic and Swindon Town, of the real 22, are in its First Division) and its French First Division 18 (Angers and Martigues are in its Second), against 1993-94 FA Premier League and 1993-94 French Division 1 on Wikipedia (revisions 1371793527 and 1366136574).",
+      "rights": "A fan-made database for CM 01/02, which Eidos made free to download in December 2008 for personal, non-commercial use; it names no licence. Its players and ratings are its maker's and the game's data rights are reserved; the user chose to ship it, credited to Cam F (2026-11-09).",
+      "file": {
+        "folder": "cm0102-starter-kit",
+        "name": "cm93_data.zip",
+        "bytes": 10932577,
+        "sha256": "91632a6f626789ac3471892bd965956e4b9ae41b0168c2008c91028ad4251a26",
+        "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm93_data.zip"
+      }
+    },
+    {
+      "id": "cm0102-2017-04-cm89",
+      "kind": "cm0102",
+      "season": "1989/90",
+      "listing": "Simon Treanor's fan-made 1989/90 database for CM 01/02, Beta 5, its ratings his, nations only (the CM0102 Starter Kit's cm89_data.zip)",
+      "maker": "Simon Treanor",
+      "compiler": "Simon Treanor, \"Championship Manager 1989/90 update for CM 01/02\", Beta 5 of 8 April 2017 (its readme; cm8990.wordpress.com), a fan-made database in the CM 01/02 format; as nckstwrt's CM0102 Starter Kit ships it (data/cm89_data.zip, whose loader starts the game in 1989)",
+      "provenance": "Fan-made: its players' abilities are Simon Treanor's. Its readme calls it a beta in which many teams keep squads of the early 2000s, and names the English, Scottish, German and Italian leagues as complete. Its nationalities are today's (Ukraine, Croatia, Slovakia, East Germans as 'Germany'), so the season plays the federations of 1989/90: the Soviet Union, Yugoslavia and Czechoslovakia field their republics' players, and a 'Germany' player at an East German club plays for no nation (noNationAt). Nations only: its Spanish and Portuguese first divisions are 1989/90's (1989-90 La Liga and 1989-90 Primeira Divisão on Wikipedia, revisions 1337764526 and 1374234667), but Logroñés (7 rated players), Castellón and Tenerife (10 each) and eight of Portugal's eighteen (Chaves, Feirense, Marítimo, Nacional, Penafiel, Portimonense, Tirsense, União da Madeira) cannot field eleven.",
+      "rights": "A fan-made database for CM 01/02, which Eidos made free to download in December 2008 for personal, non-commercial use; it names no licence. Its players and ratings are its maker's and the game's data rights are reserved; the user chose to ship it, credited to Simon Treanor (2026-11-09).",
+      "birthdays": [
+        [
+          "Diego Maradona",
+          "1960-10-30"
+        ],
+        [
+          "Franco Baresi",
+          "1960-05-08"
+        ],
+        [
+          "Gary Lineker",
+          "1960-11-30"
+        ],
+        [
+          "Lothar Matthäus",
+          "1961-03-21"
+        ],
+        [
+          "Ruud Gullit",
+          "1962-09-01"
+        ],
+        [
+          "Marco van Basten",
+          "1964-10-31"
+        ],
+        [
+          "Jürgen Klinsmann",
+          "1964-07-30"
+        ],
+        [
+          "Romário",
+          "1966-01-29"
+        ],
+        [
+          "Roberto Baggio",
+          "1967-02-18"
+        ],
+        [
+          "Paolo Maldini",
+          "1968-06-26"
+        ]
+      ],
+      "noNationAt": {
+        "nationality": "Germany",
+        "label": "East German clubs",
+        "rule": "The database's German clubs with a rated 'Germany' player whose stadium's city (its own stadium and city records) GeoNames' cities1000 places only in the five eastern states, or that scripts/lib/east-german-clubs.mjs lists by hand (East Berlin's, and towns the gazetteer names twice or not at all).",
+        "gazetteer": {
+          "name": "GeoNames cities1000.txt (CC BY 4.0)",
+          "folder": "geonames-cities1000",
+          "file": "cities1000.txt",
+          "sha256": "dfb5c430f84600b4c64fccb42fd17705b0fb41213471945f5ac6293ebc4795e2",
+          "download": "https://download.geonames.org/export/dump/cities1000.zip"
+        },
+        "clubs": [
+          "1.FC Dynamo Dresden",
+          "1.FC Magdeburg",
+          "1.FC Union Berlin",
+          "1.FC Wernigerode",
+          "1.SV Gera",
+          "1.SV Suhl",
+          "Aufbau Krumhermersdorf",
+          "BSG Chemie Buna Schkopau",
+          "BSG Rotation Berlin",
+          "BSV Brandenburg",
+          "Bischofswerdaer FV",
+          "Bornaer SV",
+          "Chemie Böhlen",
+          "Chemie Guben",
+          "Chemie Ilmenau",
+          "Chemnitzer FC",
+          "Dynamo Eisleben",
+          "Eintracht Sondershausen",
+          "FC 91 Viktoria Frankfurt",
+          "FC Anhalt Dessau",
+          "FC Carl Zeiss Jena",
+          "FC Dynamo Berlin",
+          "FC Energie Cottbus",
+          "FC Energie Cottbus II",
+          "FC Erzgebirge Aue",
+          "FC Hansa Rostock",
+          "FC Hansa Rostock Amateure",
+          "FC Hennigsdorf",
+          "FC Pommern Stralsund",
+          "FC Rot-Weiss Erfurt",
+          "FC Sachsen Leipzig",
+          "FC Stahl Eisenhüttenstadt",
+          "FC Stahl Riesa",
+          "FC Union Mühlhausen",
+          "FSV Brieske/Senftenberg",
+          "FSV Hoyerswerda",
+          "FSV Lok Altmark Stendal",
+          "FSV Optik Rathenow",
+          "FSV Rot-Weiß Prenzlau",
+          "FSV Velten 90",
+          "FSV Wacker Nordhausen",
+          "FSV Zwickau",
+          "FV Motor Eberswalde",
+          "Greifswalder SC",
+          "Hallescher FC",
+          "KWO Berlin",
+          "Ludwigsfelder SC",
+          "OFC Neugersdorf",
+          "Post Neubrandenburg",
+          "Robotron Sömmerda",
+          "SC Weimar",
+          "SG Bergmann-Borsig",
+          "SG Dynamo Fürstenwalde",
+          "SG Dynamo Schwerin",
+          "SV Babelsberg 03",
+          "SV Jenaer Glaswerk",
+          "SV Kahla",
+          "Schwarz-Rot Neustadt/Dosse",
+          "Schönebecker SV",
+          "Stahl Thale",
+          "TSG Markkleeberg",
+          "TSG Meißen",
+          "TSG Neustrelitz",
+          "VFC Plauen",
+          "VfB Chemnitz",
+          "VfB Leipzig",
+          "VfB Leipzig II"
+        ]
+      },
+      "file": {
+        "folder": "cm0102-starter-kit",
+        "name": "cm89_data.zip",
+        "bytes": 14370528,
+        "sha256": "3c9b81ac432a2c0ec9de93e5e188b8d9120237829f1f2f11fa4d05e860a33e1a",
+        "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm89_data.zip"
+      }
     }
   ]
 }

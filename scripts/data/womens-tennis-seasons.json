@@ -1,5 +1,5 @@
 {
- "about": "Women's tennis's earlier seasons (docs/design/womens-tennis.md, \"Earlier seasons\"): Tennis Abstract's own year-end WTA Elo reports for 2016-2025, archived by the Wayback Machine, and year-end Elo computed from Jeff Sackmann's WTA match results by Tennis Abstract's published method for 1973-2015. npm run sync:womens-tennis-seasons rebuilds scripts/data/womens-tennis-seasons/ from the pinned inputs (cached in the ignored data-src/womens-tennis-seasons/); npm run build:womens-tennis-seasons builds the season files from there.",
+ "about": "Women's tennis's earlier seasons (docs/design/womens-tennis.md, \"Earlier seasons\"): Tennis Abstract's own year-end WTA Elo reports for 2016-2025, archived by the Wayback Machine, and year-end Elo computed from Jeff Sackmann's WTA match results by Tennis Abstract's published method for 1968-2015. npm run sync:womens-tennis-seasons rebuilds scripts/data/womens-tennis-seasons/ from the pinned inputs (cached in the ignored data-src/womens-tennis-seasons/); npm run build:womens-tennis-seasons builds the season files from there.",
  "licence": {
   "name": "CC BY-NC-SA 4.0",
   "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
@@ -930,16 +930,39 @@
  },
  "seasons": {
   "computed": [
-   1973,
+   1968,
    2015
   ],
   "rough": [
-   1973,
+   1968,
    1979
   ],
   "published": [
    2016,
    2025
   ]
+ },
+ "checks": {
+  "about": "Published judgments of the seasons before 1973, kept as validation inputs only: validation.json's checks compare the computed lists with them, and nothing from them is in a season file.",
+  "topTens": {
+   "source": "Wikipedia, 'Top ten ranked female tennis players (1921–1974)', revision 1376153875 of 22 September 2026 (https://en.wikipedia.org/w/index.php?oldid=1376153875): its article page (https://en.wikipedia.org/wiki/Top_ten_ranked_female_tennis_players_(1921%E2%80%931974)), fetched once under /wiki/, which Wikipedia's robots.txt allows, on 2026-11-09 at that revision, SHA-256 c9d49c88f50594741549435414a4edc07998d6ee5061d86b715bd3c7268d1ca1; Tingay's columns read from it match the lists below. The research pass first read them from the revision's raw wikitext (SHA-256 cc0c6df44337abb52c278d66a950a3bd45b50fe439cc4c56eca6ca9b4ecdaf97) through /w/index.php, a path robots.txt disallows; nothing here uses that copy or fetches /w/.",
+   "licence": "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/): the page's text by Wikipedia's contributors; the rankings are Lance Tingay's, as the page cites them",
+   "authority": "Lance Tingay (The Daily Telegraph), every year",
+   "columns": ["name as the page writes it", "match-file id"],
+   "years": {
+    "1968": [["B. J. King", "200190"], ["V. Wade", "200237"], ["N. Richey", "200829"], ["M. Bueno", "200848"], ["M. Smith Court", "200144"], ["A. Haydon Jones", "200193"], ["J. Tegart", "200160"], ["A. Van Zyl duPlooy", "200810"], ["L. Turner Bowrey", "200129"], ["R. Casals", "200159"]],
+    "1969": [["M. Smith Court", "200144"], ["A. Haydon Jones", "200193"], ["B. J. King", "200190"], ["N. Richey", "200829"], ["J. Heldman", "200274"], ["R. Casals", "200159"], ["K. Melville", "200176"], ["P. Bartkowicz", "200870"], ["V. Wade", "200237"], ["L. Turner Bowrey", "200129"]],
+    "1970": [["M. Smith Court", "200144"], ["B. J. King", "200190"], ["R. Casals", "200159"], ["H. Niessen Masthoff", "200317"], ["V. Wade", "200237"], ["A. Haydon Jones", "200193"], ["K. Melville", "200176"], ["K. Krantzcke", "200168"], ["J. Heldman", "200274"], ["F. Dürr", "200194"]],
+    "1971": [["E. Goolagong", "200150"], ["M. Smith Court", "200144"], ["B. J. King", "200190"], ["R. Casals", "200159"], ["K. Melville", "200176"], ["J. Tegart", "200160"], ["F. Dürr", "200194"], ["V. Wade", "200237"], ["H. Niessen Masthoff", "200317"], ["C. Evert", "200259"]],
+    "1972": [["B. J. King", "200190"], ["E. Goolagong", "200150"], ["C. Evert", "200259"], ["M. Smith Court", "200144"], ["K. Melville", "200176"], ["V. Wade", "200237"], ["R. Casals", "200159"], ["N. Richey Gunter", "200829"], ["F. Dürr", "200194"], ["L. Tuero", "200866"]]
+   }
+  },
+  "statements": {
+   "source": "Tennis Abstract, The Tennis 128 (2022): its own Elo, from a database that reaches back to the 1920s while these files start in 1968, so a check, not a target",
+   "yearEnd": [],
+   "peaks": [
+    ["200144", "Margaret Court", 2389, 1971, "https://www.tennisabstract.com/blog/2022/11/17/the-tennis-128-no-18-margaret-court/"]
+   ]
+  }
  }
 }

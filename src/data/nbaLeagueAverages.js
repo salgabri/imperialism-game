@@ -1,11 +1,50 @@
 // NBA league averages per regular season, from Basketball-Reference's league averages table
 // (https://www.basketball-reference.com/leagues/NBA_stats_per_game.html, read 2026-11-01; 1983/84, 1991/92 and
 // 1998/99 read 2026-11-08): `pace` is possessions per 48 minutes, `rating` points per 100 possessions (ORtg) and
-// `points` points a game. Club basketball plays each season at its own pace and scoring rate (src/sports/basketball.js);
-// `points` is what the tests hold it to. 2026/27 is left out until it has a full season behind it.
+// `points` points a game. The computed seasons' (1960/61 to 1997/98 but 1983/84 and 1991/92) come from Sumitro
+// Datta's CC0 copy of Basketball-Reference, version 57 (Team Summaries.csv's League Average pace and ORtg, Team Stats
+// Per Game.csv's points), pinned in scripts/data/nba-seasons.json; npm run build:nba-seasons checks them. Club
+// basketball plays each season at its own pace and scoring rate (src/sports/basketball.js); `points` is what the tests
+// hold it to. 2026/27 is left out until it has a full season behind it.
 export const NBA_LEAGUE_AVERAGES = Object.freeze({
+  '1960/61': Object.freeze({ pace: 127.7, rating: 92.1, points: 118.1 }),
+  '1961/62': Object.freeze({ pace: 126.2, rating: 93.6, points: 118.8 }),
+  '1962/63': Object.freeze({ pace: 119.6, rating: 95.9, points: 115.3 }),
+  '1963/64': Object.freeze({ pace: 116.8, rating: 94.6, points: 111.0 }),
+  '1964/65': Object.freeze({ pace: 117.3, rating: 93.6, points: 110.6 }),
+  '1965/66': Object.freeze({ pace: 121.4, rating: 94.9, points: 115.5 }),
+  '1966/67': Object.freeze({ pace: 121.6, rating: 96.1, points: 117.4 }),
+  '1967/68': Object.freeze({ pace: 119.8, rating: 96.8, points: 116.6 }),
+  '1968/69': Object.freeze({ pace: 116.9, rating: 95.5, points: 112.3 }),
+  '1969/70': Object.freeze({ pace: 117.1, rating: 99.0, points: 116.7 }),
+  '1970/71': Object.freeze({ pace: 115.1, rating: 97.2, points: 112.4 }),
+  '1971/72': Object.freeze({ pace: 112.0, rating: 97.9, points: 110.2 }),
+  '1972/73': Object.freeze({ pace: 110.7, rating: 96.8, points: 107.6 }),
+  '1973/74': Object.freeze({ pace: 107.8, rating: 97.7, points: 105.7 }),
+  '1974/75': Object.freeze({ pace: 104.5, rating: 97.7, points: 102.6 }),
+  '1975/76': Object.freeze({ pace: 105.5, rating: 98.3, points: 104.3 }),
+  '1976/77': Object.freeze({ pace: 106.5, rating: 99.5, points: 106.5 }),
+  '1977/78': Object.freeze({ pace: 106.7, rating: 100.9, points: 108.5 }),
+  '1978/79': Object.freeze({ pace: 105.8, rating: 103.8, points: 110.3 }),
+  '1979/80': Object.freeze({ pace: 103.1, rating: 105.3, points: 109.3 }),
+  '1980/81': Object.freeze({ pace: 101.8, rating: 105.5, points: 108.1 }),
+  '1981/82': Object.freeze({ pace: 100.9, rating: 106.9, points: 108.6 }),
+  '1982/83': Object.freeze({ pace: 103.1, rating: 104.7, points: 108.5 }),
   '1983/84': Object.freeze({ pace: 101.4, rating: 107.6, points: 110.1 }),
+  '1984/85': Object.freeze({ pace: 102.1, rating: 107.9, points: 110.8 }),
+  '1985/86': Object.freeze({ pace: 102.1, rating: 107.2, points: 110.2 }),
+  '1986/87': Object.freeze({ pace: 100.8, rating: 108.3, points: 109.9 }),
+  '1987/88': Object.freeze({ pace: 99.6, rating: 108.0, points: 108.2 }),
+  '1988/89': Object.freeze({ pace: 100.6, rating: 107.8, points: 109.2 }),
+  '1989/90': Object.freeze({ pace: 98.3, rating: 108.1, points: 107.0 }),
+  '1990/91': Object.freeze({ pace: 97.8, rating: 107.9, points: 106.3 }),
   '1991/92': Object.freeze({ pace: 96.6, rating: 108.2, points: 105.3 }),
+  '1992/93': Object.freeze({ pace: 96.8, rating: 108.0, points: 105.3 }),
+  '1993/94': Object.freeze({ pace: 95.1, rating: 106.3, points: 101.5 }),
+  '1994/95': Object.freeze({ pace: 92.9, rating: 108.3, points: 101.4 }),
+  '1995/96': Object.freeze({ pace: 91.8, rating: 107.6, points: 99.5 }),
+  '1996/97': Object.freeze({ pace: 90.1, rating: 106.7, points: 96.9 }),
+  '1997/98': Object.freeze({ pace: 90.3, rating: 105.0, points: 95.6 }),
   '1998/99': Object.freeze({ pace: 88.9, rating: 102.2, points: 91.6 }),
   '1999/00': Object.freeze({ pace: 93.1, rating: 104.1, points: 97.5 }),
   '2000/01': Object.freeze({ pace: 91.3, rating: 103.0, points: 94.8 }),

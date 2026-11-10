@@ -195,13 +195,13 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
   assert.ok(islands.every(id => fieldedNations(current).includes(id) && current.rosters[id][2].length === 11));
   // EA rated none of their players, so no EA season lists them. SI's CM 01/02 databases, built on today's map, list all
   // three as they list every nation, and rate a few (3.9.68 nine Cook Islanders, two Tongans and five Samoans, 3.9.60
-  // one Cook Islander). A listed nation fields a team only with half an XI of rated players (fieldedNations): the
-  // Cook Islands in 3.9.68, nobody else.
+  // one Cook Islander), as SI's CM 00/01 does (one Cook Islander). A listed nation fields a team only with half an XI of
+  // rated players (fieldedNations): the Cook Islands in 3.9.68, nobody else.
   const ratedIn = {}, fieldedIn = {};
   for (const { id } of BUILT_IN_SEASONS) {
     const doc = JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
     const listed = islands.filter(island => Object.hasOwn(doc.nations, island));
-    assert.ok(listed.length === 0 || (listed.length === 3 && id.startsWith('cm0102-')), id);
+    assert.ok(listed.length === 0 || (listed.length === 3 && /^cm(?:0102)?-/.test(id)), id);
     const rated = listed.filter(island => doc.nations[island][2].length > 0);
     if (rated.length) ratedIn[id] = rated;
     const fielded = fieldedNations(seasonSport(decodeFootballSet(doc, id)));
@@ -209,7 +209,8 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
     assert.ok(playing.every(island => listed.includes(island) && doc.nations[island][2].length >= 6), id);
     if (playing.length) fieldedIn[id] = playing;
   }
-  assert.deepEqual(ratedIn, { 'cm0102-2002-11': ['184', '776', '882'], 'cm0102-2001-09': ['184'] });
+  // CM 00/01 rates a Cook Islander, and Simon Treanor's 1989/90 one too, of an association FIFA admitted in 1994.
+  assert.deepEqual(ratedIn, { 'cm0102-2002-11': ['184', '776', '882'], 'cm0102-2001-09': ['184'], 'cm-0001': ['184'], 'cm0102-2017-04-cm89': ['184'] });
   assert.deepEqual(fieldedIn, { 'cm0102-2002-11': ['184'] });
 });
 
@@ -223,7 +224,7 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
   assert.equal(await loadFootballSetIndex({ fetch: none.fetch }), BUILT_IN_SETS, 'the answer is kept');
   assert.equal(none.calls.length, 1, 'read once');
   const builtInId = new RegExp('^(?:(?:eaw?-(?:fifa|fc)-|nba-2k|nba-live-|mlb-the-show-)\\d{2}'
-    + '|(?:madden|tecmo|tennis|wta|nhl|nrl|nba-eras|nba-classic|cm|swos)-\\d{4}|cm0102-\\d{4}-\\d{2}(?:-[a-z0-9]+)?)$');
+    + '|(?:madden|tecmo|pfa|pfa-afl|tennis|wta|nhl|nrl|nba-eras|nba-classic|nba-stats|cm|swos|mlb-war|wc)-\\d{4}|cm0102-\\d{4}-\\d{2}(?:-[a-z0-9]+)?)$');
   assert.ok(BUILT_IN_SETS.length > 0, 'seasons are built in');
   assert.deepEqual(BUILT_IN_SETS.map(set => set.id).filter(id => !builtInId.test(id)), [], 'every built-in id has a known shape');
 
@@ -247,6 +248,27 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
     clearFootballSetIndex();
     assert.equal(await loadFootballSetIndex({ fetch }), BUILT_IN_SETS);
   }
+});
+
+test('a listed set may carry a plain-text credit, kept exactly as written; an empty or non-text one leaves the set out', async () => {
+  fresh();
+  // A source's statement can carry two spaces, as the Hockey Databank's does: the listing keeps it word for word.
+  const credit = 'Data: an example archive.  Shown whole, as its terms ask.';
+  const december = syntheticSet({ id: 'cm0102-2001-12', year: 2002, label: 'CM 01/02 · December 2001' });
+  const may = syntheticSet({ id: 'cm0102-2026-05', year: 2026, label: 'CM 01/02 · May 2026' });
+  const april = syntheticSet({ id: 'cm0102-2026-04', year: 2026, label: 'CM 01/02 · April 2026' });
+  const listed = { format: 1, sets: [{ ...entryOf(SET), credit }, { ...entryOf(december), credit: '   ' }, { ...entryOf(may), credit: 42 },
+    entryOf(april)] };
+  const index = await loadFootballSetIndex({ fetch: fakeFetch({ '/football/index.json': listed }).fetch });
+  const local = index.filter(set => set.id.startsWith('cm0102-') && !BUILT_IN_SETS.some(builtIn => builtIn.id === set.id));
+  assert.deepEqual(local.map(set => set.id), ['cm0102-2026-04', ID], 'a blank or non-text credit is a listing the build did not write');
+  assert.deepEqual(local[1], { id: ID, version: SET.version, year: 2002, season: '2001/02', label: 'CM 01/02 · Test 2002', credit });
+  assert.ok(!('credit' in local[0]), 'a set without one has none');
+  assert.ok(Object.isFrozen(local[1]));
+  // Built-in seasons carry theirs through the same listing (ice hockey's: scripts/hockey-computed.test.mjs).
+  assert.ok(BUILT_IN_SETS.some(set => set.credit), 'a built-in season carries a credit');
+  assert.ok(BUILT_IN_SETS.every(set => set.credit === undefined || (typeof set.credit === 'string' && set.credit.trim() === set.credit && set.credit)));
+  fresh();
 });
 
 test('one shared request per data set; a failed load is not cached and can be retried', async () => {

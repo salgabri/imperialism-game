@@ -1541,6 +1541,297 @@
       ]
     },
     {
+      "id": "pfa-2000",
+      "version": "pfa-2000-35ed6d1d",
+      "season": "2000",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/2000nfl.html",
+      "retrieved": "2026-11-10",
+      "players": 1708,
+      "map": "nfl2000",
+      "spread": [
+        73.5,
+        84.4
+      ],
+      "clubs": [
+        "Tampa Bay Buccaneers 84.4 (10-6, 388–269)",
+        "Indianapolis Colts 83.8 (10-6, 429–326)",
+        "Baltimore Ravens 83.5 (12-4, 333–165)",
+        "St. Louis Rams 82.9 (10-6, 540–471)",
+        "Denver Broncos 82.6 (11-5, 485–369)",
+        "Minnesota Vikings 82.5 (11-5, 397–371)",
+        "Tennessee Titans 82.5 (13-3, 346–191)",
+        "Philadelphia Eagles 82.1 (11-5, 351–245)",
+        "Oakland Raiders 81.8 (12-4, 479–299)",
+        "Miami Dolphins 81 (11-5, 323–226)",
+        "New Orleans Saints 80.7 (10-6, 354–305)",
+        "Kansas City Chiefs 79.8 (7-9, 355–354)",
+        "Carolina Panthers 79.6 (7-9, 310–310)",
+        "Green Bay Packers 79.6 (9-7, 353–323)",
+        "Jacksonville Jaguars 79.3 (7-9, 367–327)",
+        "New York Giants 79.2 (12-4, 328–246)",
+        "Pittsburgh Steelers 78.8 (9-7, 321–255)",
+        "San Francisco 49ers 78.1 (6-10, 388–422)",
+        "Seattle Seahawks 78.1 (6-10, 320–405)",
+        "New York Jets 77.5 (9-7, 321–321)",
+        "San Diego Chargers 77.5 (1-15, 269–440)",
+        "Washington 77.5 (8-8, 281–269)",
+        "Detroit Lions 77.3 (9-7, 307–307)",
+        "Buffalo Bills 76.7 (8-8, 315–350)",
+        "Atlanta Falcons 76.1 (4-12, 252–413)",
+        "Chicago Bears 76.1 (5-11, 216–355)",
+        "New England Patriots 75.7 (5-11, 276–338)",
+        "Arizona Cardinals 75 (3-13, 210–443)",
+        "Dallas Cowboys 74.8 (5-11, 294–361)",
+        "Cleveland Browns 74.4 (3-13, 161–419)",
+        "Cincinnati Bengals 73.5 (4-12, 185–359)"
+      ],
+      "outOfPosition": {},
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1999",
+      "version": "pfa-1999-22bdcd9d",
+      "season": "1999",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1999nfl.html",
+      "retrieved": "2026-11-10",
+      "players": 1726,
+      "map": "nfl1999",
+      "spread": [
+        74.8,
+        85.7
+      ],
+      "clubs": [
+        "St. Louis Rams 85.7 (13-3, 526–242)",
+        "Indianapolis Colts 83.9 (13-3, 423–333)",
+        "Jacksonville Jaguars 83.3 (14-2, 396–217)",
+        "Minnesota Vikings 82.4 (10-6, 399–335)",
+        "Washington 82 (10-6, 443–377)",
+        "Carolina Panthers 81.5 (8-8, 421–381)",
+        "Seattle Seahawks 81.4 (9-7, 338–298)",
+        "Kansas City Chiefs 81.1 (9-7, 390–322)",
+        "Baltimore Ravens 80.8 (8-8, 324–277)",
+        "Tennessee Titans 80.7 (13-3, 392–324)",
+        "Tampa Bay Buccaneers 80.5 (11-5, 270–235)",
+        "Green Bay Packers 79.7 (8-8, 357–341)",
+        "Buffalo Bills 79.5 (11-5, 320–229)",
+        "New England Patriots 79.1 (8-8, 299–284)",
+        "Oakland Raiders 78.9 (8-8, 390–329)",
+        "Denver Broncos 78.7 (6-10, 314–318)",
+        "Dallas Cowboys 78.6 (8-8, 352–276)",
+        "Pittsburgh Steelers 78.3 (6-10, 317–320)",
+        "Detroit Lions 78.1 (8-8, 322–314)",
+        "San Francisco 49ers 78 (4-12, 295–453)",
+        "New York Jets 77.9 (8-8, 308–309)",
+        "Miami Dolphins 77.6 (9-7, 326–336)",
+        "New York Giants 77.3 (7-9, 299–358)",
+        "Philadelphia Eagles 77.3 (5-11, 272–348)",
+        "Atlanta Falcons 77 (5-11, 285–380)",
+        "San Diego Chargers 76.8 (8-8, 269–316)",
+        "Cincinnati Bengals 76.3 (4-12, 283–460)",
+        "Chicago Bears 76.1 (6-10, 272–341)",
+        "New Orleans Saints 76.1 (3-13, 260–434)",
+        "Arizona Cardinals 75.9 (6-10, 245–382)",
+        "Cleveland Browns 74.8 (2-14, 217–437)"
+      ],
+      "outOfPosition": {},
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1998",
+      "version": "pfa-1998-1571e0f8",
+      "season": "1998",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1998nfl.html",
+      "retrieved": "2026-11-10",
+      "players": 1668,
+      "map": "nfl1998",
+      "spread": [
+        73.7,
+        85.8
+      ],
+      "clubs": [
+        "Minnesota Vikings 85.8 (15-1, 556–296)",
+        "Denver Broncos 85.5 (14-2, 501–309)",
+        "Atlanta Falcons 85 (14-2, 442–289)",
+        "New York Jets 83.1 (12-4, 416–266)",
+        "San Francisco 49ers 82.6 (12-4, 479–328)",
+        "Seattle Seahawks 81.3 (8-8, 372–310)",
+        "Green Bay Packers 80.7 (11-5, 408–319)",
+        "Tennessee Oilers 80.4 (8-8, 330–320)",
+        "Buffalo Bills 80 (10-6, 400–333)",
+        "New England Patriots 79.9 (9-7, 337–329)",
+        "Dallas Cowboys 79.5 (10-6, 381–275)",
+        "Miami Dolphins 79.2 (10-6, 321–265)",
+        "Jacksonville Jaguars 79 (11-5, 392–335)",
+        "Tampa Bay Buccaneers 78.7 (8-8, 314–295)",
+        "Kansas City Chiefs 78.6 (7-9, 327–363)",
+        "Detroit Lions 78.5 (5-11, 306–378)",
+        "New Orleans Saints 78.1 (6-10, 305–359)",
+        "New York Giants 77.4 (8-8, 287–309)",
+        "Pittsburgh Steelers 77.4 (7-9, 263–303)",
+        "Arizona Cardinals 77.2 (9-7, 325–378)",
+        "San Diego Chargers 77 (5-11, 241–342)",
+        "Oakland Raiders 76.9 (8-8, 288–356)",
+        "Chicago Bears 76.8 (4-12, 276–368)",
+        "St. Louis Rams 76.8 (4-12, 285–378)",
+        "Baltimore Ravens 76.7 (6-10, 269–335)",
+        "Indianapolis Colts 76.4 (3-13, 310–444)",
+        "Carolina Panthers 76.1 (4-12, 336–413)",
+        "Cincinnati Bengals 75.7 (3-13, 268–452)",
+        "Washington 75.3 (6-10, 319–421)",
+        "Philadelphia Eagles 73.7 (3-13, 161–344)"
+      ],
+      "outOfPosition": {
+        "Green Bay Packers": [
+          "CB: Darick Holmes (RB 74)"
+        ],
+        "Arizona Cardinals": [
+          "K: Larry Centers (RB 83)"
+        ],
+        "Philadelphia Eagles": [
+          "K: Kevin Turner (RB 80)"
+        ]
+      },
+      "gaps": {
+        "Green Bay Packers": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1997",
+      "version": "pfa-1997-08e4d7b0",
+      "season": "1997",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1997nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1663,
+      "map": "nfl1997",
+      "spread": [
+        75.4,
+        83.6
+      ],
+      "clubs": [
+        "Denver Broncos 83.6 (12-4, 472–287)",
+        "Detroit Lions 82.6 (9-7, 379–306)",
+        "Green Bay Packers 82.6 (13-3, 422–282)",
+        "New England Patriots 82.2 (10-6, 369–289)",
+        "Kansas City Chiefs 81.7 (13-3, 375–232)",
+        "Tennessee Oilers 81.5 (8-8, 333–310)",
+        "Pittsburgh Steelers 81 (11-5, 372–307)",
+        "San Francisco 49ers 80.7 (13-3, 375–265)",
+        "Jacksonville Jaguars 79.7 (11-5, 394–318)",
+        "New York Jets 79.2 (9-7, 348–287)",
+        "Miami Dolphins 79.1 (9-7, 339–327)",
+        "Tampa Bay Buccaneers 79.1 (10-6, 299–263)",
+        "Atlanta Falcons 79 (7-9, 320–361)",
+        "St. Louis Rams 78.8 (5-11, 299–359)",
+        "Baltimore Ravens 78.6 (6-9-1, 326–345)",
+        "New York Giants 78.6 (10-5-1, 307–265)",
+        "Dallas Cowboys 78.5 (6-10, 304–314)",
+        "Indianapolis Colts 78.3 (3-13, 313–401)",
+        "Oakland Raiders 78.3 (4-12, 324–419)",
+        "Seattle Seahawks 77.9 (8-8, 365–362)",
+        "San Diego Chargers 77.4 (4-12, 266–425)",
+        "Carolina Panthers 77.3 (7-9, 265–314)",
+        "Cincinnati Bengals 77.3 (7-9, 355–405)",
+        "Buffalo Bills 77.1 (6-10, 255–367)",
+        "Minnesota Vikings 77.1 (9-7, 354–359)",
+        "Washington 77 (8-7-1, 327–289)",
+        "Philadelphia Eagles 76.9 (6-9-1, 317–372)",
+        "New Orleans Saints 76.3 (6-10, 237–327)",
+        "Chicago Bears 76 (4-12, 263–421)",
+        "Arizona Cardinals 75.4 (4-12, 283–379)"
+      ],
+      "outOfPosition": {
+        "Washington": [
+          "K: Derek Smith (LB 83)"
+        ],
+        "Arizona Cardinals": [
+          "K: Leeland McElroy (RB 76)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1996",
+      "version": "pfa-1996-61d461fd",
+      "season": "1996",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1996nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1659,
+      "map": "nfl1996",
+      "spread": [
+        74.9,
+        84.9
+      ],
+      "clubs": [
+        "Green Bay Packers 84.9 (13-3, 456–201)",
+        "San Francisco 49ers 84.2 (12-4, 398–257)",
+        "Houston Oilers 82.7 (8-8, 345–319)",
+        "Denver Broncos 82.5 (13-3, 391–275)",
+        "New England Patriots 81.9 (11-5, 418–313)",
+        "Philadelphia Eagles 81 (10-6, 363–341)",
+        "Dallas Cowboys 79.9 (10-6, 286–250)",
+        "Cincinnati Bengals 79.3 (8-8, 372–369)",
+        "Pittsburgh Steelers 79.3 (10-6, 344–257)",
+        "Washington 79.2 (9-7, 364–312)",
+        "Seattle Seahawks 78.9 (7-9, 317–376)",
+        "Buffalo Bills 78.8 (10-6, 319–266)",
+        "Carolina Panthers 78.8 (12-4, 367–218)",
+        "Oakland Raiders 78.8 (7-9, 340–293)",
+        "St. Louis Rams 78.4 (6-10, 303–409)",
+        "Jacksonville Jaguars 78.3 (9-7, 325–326)",
+        "San Diego Chargers 78.3 (8-8, 310–376)",
+        "New York Giants 78.2 (6-10, 242–297)",
+        "Miami Dolphins 78 (8-8, 339–325)",
+        "Detroit Lions 77.8 (5-11, 302–368)",
+        "Indianapolis Colts 77.7 (9-7, 317–334)",
+        "Kansas City Chiefs 77.6 (9-7, 297–300)",
+        "Baltimore Ravens 77.4 (4-12, 371–441)",
+        "Arizona Cardinals 77.3 (7-9, 300–397)",
+        "Minnesota Vikings 77.3 (9-7, 298–315)",
+        "Chicago Bears 76.8 (7-9, 283–305)",
+        "Tampa Bay Buccaneers 76.7 (6-10, 221–293)",
+        "Atlanta Falcons 75.6 (3-13, 309–461)",
+        "New York Jets 75.2 (1-15, 279–454)",
+        "New Orleans Saints 74.9 (3-13, 229–339)"
+      ],
+      "outOfPosition": {
+        "Miami Dolphins": [
+          "K: Stanley Pritchett (RB 82)"
+        ],
+        "Kansas City Chiefs": [
+          "K: Kimble Anders (RB 85)"
+        ],
+        "Arizona Cardinals": [
+          "K: Leeshon Johnson (RB 81)"
+        ],
+        "New York Jets": [
+          "K: Richie Anderson (RB 80)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
       "id": "tecmo-1995",
       "version": "tecmo-1995-2dff66f0",
       "season": "1995",
@@ -2038,6 +2329,69 @@
       }
     },
     {
+      "id": "pfa-1991",
+      "version": "pfa-1991-725f162b",
+      "season": "1991",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1991nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1496,
+      "map": "nfl1990",
+      "spread": [
+        73.1,
+        85.5
+      ],
+      "clubs": [
+        "Washington 85.5 (14-2, 485–224)",
+        "Buffalo Bills 83.6 (13-3, 458–318)",
+        "San Francisco 49ers 81.6 (10-6, 393–239)",
+        "Philadelphia Eagles 81.4 (10-6, 285–244)",
+        "Houston Oilers 81.3 (11-5, 386–251)",
+        "Atlanta Falcons 80.7 (10-6, 361–338)",
+        "Kansas City Chiefs 80.7 (10-6, 322–252)",
+        "Los Angeles Raiders 80.6 (9-7, 298–297)",
+        "Denver Broncos 80.3 (12-4, 304–235)",
+        "New York Jets 80.2 (8-8, 314–293)",
+        "New Orleans Saints 80 (11-5, 341–211)",
+        "Dallas Cowboys 79.8 (11-5, 342–310)",
+        "Seattle Seahawks 79.8 (7-9, 276–261)",
+        "Minnesota Vikings 79.7 (8-8, 301–306)",
+        "Miami Dolphins 79 (8-8, 343–349)",
+        "Chicago Bears 78.7 (11-5, 299–269)",
+        "Detroit Lions 78.6 (12-4, 339–295)",
+        "New York Giants 78.3 (8-8, 281–297)",
+        "Cleveland Browns 77.1 (6-10, 293–298)",
+        "Green Bay Packers 76.8 (4-12, 273–313)",
+        "Phoenix Cardinals 76.5 (4-12, 196–344)",
+        "Pittsburgh Steelers 76.5 (7-9, 292–344)",
+        "New England Patriots 76 (6-10, 211–305)",
+        "Cincinnati Bengals 75.8 (3-13, 263–435)",
+        "Los Angeles Rams 75.3 (3-13, 234–390)",
+        "San Diego Chargers 75.3 (4-12, 274–342)",
+        "Tampa Bay Buccaneers 75 (3-13, 199–365)",
+        "Indianapolis Colts 73.1 (1-15, 143–381)"
+      ],
+      "outOfPosition": {
+        "San Francisco 49ers": [
+          "K: Dexter Carter (RB 82)"
+        ],
+        "Houston Oilers": [
+          "TE: Curtis Duncan (WR 79)"
+        ],
+        "Indianapolis Colts": [
+          "K: Ken Clark (RB 77)"
+        ]
+      },
+      "gaps": {
+        "Houston Oilers": {
+          "TE": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
       "id": "tecmo-1990",
       "version": "tecmo-1990-8c1ebecf",
       "season": "1990",
@@ -2325,6 +2679,2363 @@
         "named": 1,
         "leftOut": 2
       }
+    },
+    {
+      "id": "pfa-1989",
+      "version": "pfa-1989-c5ae383f",
+      "season": "1989",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1989nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1501,
+      "map": "nfl1990",
+      "spread": [
+        74,
+        83.7
+      ],
+      "clubs": [
+        "San Francisco 49ers 83.7 (14-2, 442–253)",
+        "Buffalo Bills 83.4 (9-7, 409–317)",
+        "Los Angeles Rams 82.3 (11-5, 426–344)",
+        "Minnesota Vikings 82 (10-6, 351–275)",
+        "Denver Broncos 81.7 (11-5, 362–226)",
+        "Cincinnati Bengals 81.3 (8-8, 404–285)",
+        "New Orleans Saints 80.7 (9-7, 386–301)",
+        "Green Bay Packers 80.6 (10-6, 362–356)",
+        "Cleveland Browns 80.3 (9-6-1, 334–254)",
+        "Houston Oilers 79.5 (9-7, 365–412)",
+        "New York Giants 79.3 (12-4, 348–252)",
+        "Philadelphia Eagles 79.1 (11-5, 342–274)",
+        "Indianapolis Colts 78.8 (8-8, 298–301)",
+        "Chicago Bears 78.4 (6-10, 358–377)",
+        "Kansas City Chiefs 78.4 (8-7-1, 318–286)",
+        "Washington 78.4 (10-6, 386–308)",
+        "Los Angeles Raiders 78 (8-8, 315–297)",
+        "San Diego Chargers 78 (6-10, 266–290)",
+        "Tampa Bay Buccaneers 77.9 (5-11, 320–419)",
+        "Miami Dolphins 77.7 (8-8, 331–379)",
+        "Pittsburgh Steelers 77.7 (9-7, 265–326)",
+        "Detroit Lions 77.3 (7-9, 312–364)",
+        "Phoenix Cardinals 76.3 (5-11, 258–377)",
+        "Seattle Seahawks 76.3 (7-9, 241–327)",
+        "New England Patriots 76.1 (5-11, 297–391)",
+        "Atlanta Falcons 74.5 (3-13, 279–437)",
+        "New York Jets 74.2 (4-12, 253–411)",
+        "Dallas Cowboys 74 (1-15, 204–393)"
+      ],
+      "outOfPosition": {
+        "Philadelphia Eagles": [
+          "K: Anthony Toney (RB 81)"
+        ],
+        "Detroit Lions": [
+          "TE: Mike Cofer (LB 79)"
+        ],
+        "Seattle Seahawks": [
+          "K: Curt Warner (RB 84)"
+        ],
+        "Dallas Cowboys": [
+          "K: Daryl Johnston (RB 77)"
+        ]
+      },
+      "gaps": {
+        "Detroit Lions": {
+          "TE": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1988",
+      "version": "pfa-1988-efe54efa",
+      "season": "1988",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1988nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1501,
+      "map": "nfl1990",
+      "spread": [
+        75.3,
+        84.7
+      ],
+      "clubs": [
+        "Cincinnati Bengals 84.7 (12-4, 448–329)",
+        "Houston Oilers 83 (10-6, 424–365)",
+        "Minnesota Vikings 82.8 (11-5, 406–233)",
+        "Los Angeles Rams 82.5 (10-6, 407–293)",
+        "San Francisco 49ers 81.3 (10-6, 369–294)",
+        "Buffalo Bills 81.2 (12-4, 329–237)",
+        "Philadelphia Eagles 81.1 (10-6, 379–319)",
+        "Indianapolis Colts 80 (9-7, 354–315)",
+        "Seattle Seahawks 80 (9-7, 339–329)",
+        "Chicago Bears 79.6 (12-4, 312–215)",
+        "New York Jets 79 (8-7-1, 372–354)",
+        "Phoenix Cardinals 79 (7-9, 344–398)",
+        "New York Giants 78.8 (10-6, 359–304)",
+        "Cleveland Browns 78.5 (10-6, 304–288)",
+        "Miami Dolphins 78.4 (6-10, 319–380)",
+        "Detroit Lions 77.4 (4-12, 220–313)",
+        "Pittsburgh Steelers 77.4 (5-11, 336–421)",
+        "Washington 77.3 (7-9, 345–387)",
+        "Tampa Bay Buccaneers 77.1 (5-11, 261–350)",
+        "Dallas Cowboys 76.9 (3-13, 265–381)",
+        "Denver Broncos 76.8 (8-8, 327–352)",
+        "New England Patriots 76.7 (9-7, 250–284)",
+        "New Orleans Saints 76.7 (10-6, 312–283)",
+        "Atlanta Falcons 76.6 (5-11, 244–315)",
+        "San Diego Chargers 76.1 (6-10, 231–332)",
+        "Green Bay Packers 75.8 (4-12, 240–315)",
+        "Kansas City Chiefs 75.7 (4-11-1, 254–320)",
+        "Los Angeles Raiders 75.3 (7-9, 325–369)"
+      ],
+      "outOfPosition": {
+        "Seattle Seahawks": [
+          "CB: John L. Williams (RB 93)"
+        ],
+        "New England Patriots": [
+          "K: Bob Perryman (RB 84)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1987",
+      "version": "pfa-1987-a2e24850",
+      "season": "1987",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1987nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1537,
+      "map": "nfl1987",
+      "spread": [
+        75.1,
+        81.8
+      ],
+      "clubs": [
+        "Cleveland Browns 81.8 (10-5, 390–239)",
+        "Washington 81.8 (11-4, 379–285)",
+        "Seattle Seahawks 81.7 (9-6, 371–314)",
+        "New Orleans Saints 81.3 (12-3, 422–283)",
+        "Dallas Cowboys 80.6 (7-8, 340–348)",
+        "Denver Broncos 80.3 (10-4-1, 379–288)",
+        "St. Louis Cardinals 80.3 (7-8, 362–368)",
+        "Houston Oilers 80 (9-6, 345–349)",
+        "Pittsburgh Steelers 79.9 (8-7, 285–299)",
+        "Chicago Bears 79.8 (11-4, 356–282)",
+        "Indianapolis Colts 79.7 (9-6, 300–238)",
+        "San Francisco 49ers 79.7 (13-2, 459–253)",
+        "Minnesota Vikings 79.5 (8-7, 336–335)",
+        "Philadelphia Eagles 79.2 (7-8, 337–380)",
+        "Miami Dolphins 78.6 (8-7, 362–335)",
+        "Cincinnati Bengals 78.1 (4-11, 285–370)",
+        "Los Angeles Raiders 78 (5-10, 301–289)",
+        "New England Patriots 78 (8-7, 320–293)",
+        "New York Giants 77.7 (6-9, 280–312)",
+        "New York Jets 77.7 (6-9, 334–360)",
+        "Los Angeles Rams 77.6 (6-9, 317–361)",
+        "Buffalo Bills 77.3 (7-8, 270–305)",
+        "Kansas City Chiefs 77.1 (4-11, 273–388)",
+        "Green Bay Packers 76.7 (5-9-1, 255–300)",
+        "San Diego Chargers 76.7 (8-7, 253–317)",
+        "Atlanta Falcons 76.3 (3-12, 205–436)",
+        "Detroit Lions 76.2 (4-11, 269–384)",
+        "Tampa Bay Buccaneers 75.1 (4-11, 286–360)"
+      ],
+      "outOfPosition": {
+        "Seattle Seahawks": [
+          "DL: John L. Williams (RB 87)"
+        ],
+        "St. Louis Cardinals": [
+          "K: Earl Ferrell (RB 84)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1986",
+      "version": "pfa-1986-402bafc4",
+      "season": "1986",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1986nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1455,
+      "map": "nfl1984",
+      "spread": [
+        74.5,
+        83.4
+      ],
+      "clubs": [
+        "Chicago Bears 83.4 (14-2, 352–187)",
+        "Minnesota Vikings 83.3 (9-7, 398–273)",
+        "New York Giants 82.9 (14-2, 371–236)",
+        "Cleveland Browns 81.4 (12-4, 391–301)",
+        "New England Patriots 81.4 (11-5, 412–307)",
+        "Cincinnati Bengals 79.9 (10-6, 409–394)",
+        "Los Angeles Raiders 79.7 (8-8, 323–346)",
+        "San Francisco 49ers 79.7 (10-5-1, 374–247)",
+        "Kansas City Chiefs 79 (10-6, 358–326)",
+        "Miami Dolphins 79 (8-8, 430–405)",
+        "Seattle Seahawks 79 (10-6, 366–293)",
+        "Los Angeles Rams 78.9 (10-6, 309–267)",
+        "Denver Broncos 78.8 (11-5, 378–327)",
+        "Washington 78.7 (12-4, 368–296)",
+        "New Orleans Saints 78.5 (7-9, 288–287)",
+        "Dallas Cowboys 78.2 (7-9, 346–337)",
+        "Buffalo Bills 77.8 (4-12, 287–348)",
+        "Detroit Lions 77.6 (5-11, 277–326)",
+        "New York Jets 77.3 (10-6, 364–386)",
+        "Houston Oilers 77.1 (5-11, 274–329)",
+        "Pittsburgh Steelers 77 (6-10, 307–336)",
+        "San Diego Chargers 77 (4-12, 335–396)",
+        "Atlanta Falcons 76.5 (7-8-1, 280–280)",
+        "Philadelphia Eagles 76 (5-10-1, 256–312)",
+        "Tampa Bay Buccaneers 75.6 (2-14, 239–473)",
+        "Green Bay Packers 75.2 (4-12, 254–418)",
+        "St. Louis Cardinals 74.8 (4-11-1, 218–351)",
+        "Indianapolis Colts 74.5 (3-13, 229–400)"
+      ],
+      "outOfPosition": {
+        "Denver Broncos": [
+          "CB: Gerald Willhite (RB 83)"
+        ],
+        "Dallas Cowboys": [
+          "CB: Tony Dorsett (RB 83)"
+        ],
+        "St. Louis Cardinals": [
+          "K: Earl Ferrell (RB 84)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1985",
+      "version": "pfa-1985-df4bf2a9",
+      "season": "1985",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1985nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1436,
+      "map": "nfl1984",
+      "spread": [
+        74.6,
+        85
+      ],
+      "clubs": [
+        "Chicago Bears 85 (15-1, 456–198)",
+        "Cincinnati Bengals 81.6 (7-9, 441–437)",
+        "Dallas Cowboys 81.2 (10-6, 357–333)",
+        "San Francisco 49ers 81.2 (10-6, 411–263)",
+        "Philadelphia Eagles 80.5 (7-9, 286–310)",
+        "Miami Dolphins 80.3 (12-4, 428–320)",
+        "New York Giants 79.9 (10-6, 399–283)",
+        "San Diego Chargers 79.7 (8-8, 467–435)",
+        "New York Jets 79.1 (11-5, 393–264)",
+        "Los Angeles Raiders 78.7 (12-4, 354–308)",
+        "Pittsburgh Steelers 78.7 (7-9, 379–355)",
+        "New England Patriots 78.6 (11-5, 362–290)",
+        "Seattle Seahawks 78.6 (8-8, 349–303)",
+        "Los Angeles Rams 78.2 (11-5, 340–277)",
+        "Denver Broncos 78 (11-5, 380–329)",
+        "Green Bay Packers 78 (8-8, 337–355)",
+        "Detroit Lions 77.9 (7-9, 307–366)",
+        "Kansas City Chiefs 77.9 (6-10, 317–360)",
+        "Indianapolis Colts 77.4 (5-11, 320–386)",
+        "Washington 77.4 (10-6, 297–312)",
+        "Cleveland Browns 77.3 (8-8, 287–294)",
+        "St. Louis Cardinals 76.9 (5-11, 278–414)",
+        "Houston Oilers 76.8 (5-11, 284–412)",
+        "Tampa Bay Buccaneers 76.4 (2-14, 294–448)",
+        "Minnesota Vikings 76 (7-9, 346–359)",
+        "New Orleans Saints 75.3 (5-11, 294–401)",
+        "Atlanta Falcons 75 (4-12, 282–452)",
+        "Buffalo Bills 74.6 (2-14, 200–381)"
+      ],
+      "outOfPosition": {
+        "New England Patriots": [
+          "CB: Tony Collins (RB 86)"
+        ],
+        "Los Angeles Rams": [
+          "CB: Jim Collins (LB 82)"
+        ],
+        "Cleveland Browns": [
+          "DL: Kevin Mack (RB 88)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1984",
+      "version": "pfa-1984-d1019652",
+      "season": "1984",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1984nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1529,
+      "map": "nfl1984",
+      "spread": [
+        74.5,
+        83.6
+      ],
+      "clubs": [
+        "Miami Dolphins 83.6 (14-2, 513–298)",
+        "San Francisco 49ers 82.3 (15-1, 475–227)",
+        "Seattle Seahawks 82.1 (12-4, 418–282)",
+        "St. Louis Cardinals 81.2 (9-7, 423–345)",
+        "Washington 81.2 (11-5, 426–310)",
+        "Los Angeles Rams 80.4 (10-6, 346–316)",
+        "Chicago Bears 80 (10-6, 325–248)",
+        "Denver Broncos 80 (13-3, 353–241)",
+        "Philadelphia Eagles 80 (6-9-1, 278–320)",
+        "Los Angeles Raiders 79.4 (11-5, 368–278)",
+        "Pittsburgh Steelers 79.2 (9-7, 387–310)",
+        "Dallas Cowboys 79 (9-7, 308–308)",
+        "Kansas City Chiefs 79 (8-8, 314–324)",
+        "New England Patriots 79 (9-7, 362–352)",
+        "Cleveland Browns 78.8 (5-11, 250–297)",
+        "Green Bay Packers 78.8 (8-8, 390–309)",
+        "Cincinnati Bengals 78.1 (8-8, 339–339)",
+        "San Diego Chargers 77.8 (7-9, 394–413)",
+        "Detroit Lions 77.4 (4-11-1, 283–408)",
+        "New York Jets 77.4 (7-9, 332–364)",
+        "New York Giants 77 (9-7, 299–301)",
+        "Atlanta Falcons 76.6 (4-12, 281–382)",
+        "Tampa Bay Buccaneers 76.6 (6-10, 335–380)",
+        "New Orleans Saints 76.4 (7-9, 298–361)",
+        "Buffalo Bills 75.7 (2-14, 250–454)",
+        "Houston Oilers 75.6 (3-13, 240–437)",
+        "Minnesota Vikings 75 (3-13, 276–484)",
+        "Indianapolis Colts 74.5 (4-12, 239–414)"
+      ],
+      "outOfPosition": {
+        "New York Giants": [
+          "K: Joe Morris (RB 78)"
+        ],
+        "New Orleans Saints": [
+          "CB: George Rogers (RB 85)"
+        ],
+        "Buffalo Bills": [
+          "K: Booker Moore (RB 78)"
+        ],
+        "Indianapolis Colts": [
+          "K: Barry Krauss (LB 84)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1983",
+      "version": "pfa-1983-c6282f1d",
+      "season": "1983",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1983nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1487,
+      "map": "nfl1982",
+      "spread": [
+        73.8,
+        84.2
+      ],
+      "clubs": [
+        "Washington 84.2 (14-2, 541–332)",
+        "Dallas Cowboys 83 (12-4, 479–360)",
+        "Los Angeles Raiders 82 (12-4, 442–338)",
+        "San Francisco 49ers 81.8 (10-6, 432–293)",
+        "Miami Dolphins 81.6 (12-4, 389–250)",
+        "Cleveland Browns 80.2 (9-7, 356–342)",
+        "Green Bay Packers 79.6 (8-8, 429–439)",
+        "Atlanta Falcons 79.5 (7-9, 370–389)",
+        "Los Angeles Rams 79.4 (9-7, 361–344)",
+        "Seattle Seahawks 79.3 (9-7, 403–388)",
+        "Cincinnati Bengals 78.7 (7-9, 346–302)",
+        "Kansas City Chiefs 78.7 (6-10, 386–367)",
+        "New Orleans Saints 78.5 (8-8, 319–337)",
+        "St. Louis Cardinals 78.5 (8-7-1, 374–428)",
+        "Denver Broncos 78.3 (9-7, 302–327)",
+        "Detroit Lions 78.3 (9-7, 347–287)",
+        "San Diego Chargers 78 (6-10, 358–462)",
+        "New York Jets 77.4 (7-9, 313–331)",
+        "Pittsburgh Steelers 77.4 (10-6, 355–303)",
+        "Chicago Bears 77.1 (8-8, 311–301)",
+        "Minnesota Vikings 76.9 (8-8, 316–348)",
+        "New England Patriots 76.7 (8-8, 274–289)",
+        "Baltimore Colts 76.3 (7-9, 264–354)",
+        "Houston Oilers 76.3 (2-14, 288–460)",
+        "New York Giants 76.3 (3-12-1, 267–347)",
+        "Buffalo Bills 76.2 (8-8, 283–351)",
+        "Philadelphia Eagles 75.8 (5-11, 233–322)",
+        "Tampa Bay Buccaneers 73.8 (2-14, 241–380)"
+      ],
+      "outOfPosition": {
+        "New England Patriots": [
+          "K: Don Blackmon (LB 83)"
+        ],
+        "Tampa Bay Buccaneers": [
+          "K: Mel Carver (RB 77)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1982",
+      "version": "pfa-1982-b2168509",
+      "season": "1982",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1982nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1424,
+      "map": "nfl1982",
+      "spread": [
+        72.3,
+        83.6
+      ],
+      "clubs": [
+        "San Diego Chargers 83.6 (6-3, 288–221)",
+        "Cincinnati Bengals 82.8 (7-2, 232–177)",
+        "Dallas Cowboys 82.5 (6-3, 226–145)",
+        "Los Angeles Raiders 82 (8-1, 260–200)",
+        "Washington 81.8 (8-1, 190–128)",
+        "New York Jets 81.5 (6-3, 245–166)",
+        "Green Bay Packers 80.7 (5-3-1, 226–169)",
+        "Pittsburgh Steelers 80.4 (6-3, 204–146)",
+        "Miami Dolphins 80.1 (7-2, 198–131)",
+        "Los Angeles Rams 79.5 (2-7, 200–250)",
+        "Philadelphia Eagles 79.2 (3-6, 191–195)",
+        "Buffalo Bills 78.3 (4-5, 150–154)",
+        "Kansas City Chiefs 78.2 (3-6, 176–184)",
+        "Tampa Bay Buccaneers 78 (5-4, 158–178)",
+        "Minnesota Vikings 77.8 (5-4, 187–198)",
+        "San Francisco 49ers 77.3 (3-6, 209–206)",
+        "New England Patriots 77.2 (5-4, 143–157)",
+        "Atlanta Falcons 77.1 (5-4, 183–199)",
+        "Cleveland Browns 77 (4-5, 140–182)",
+        "Denver Broncos 76.8 (2-7, 148–226)",
+        "Detroit Lions 76.8 (4-5, 181–176)",
+        "St. Louis Cardinals 76.7 (5-4, 135–170)",
+        "Seattle Seahawks 76.6 (4-5, 127–147)",
+        "New York Giants 76.4 (4-5, 164–160)",
+        "Chicago Bears 76.3 (3-6, 141–174)",
+        "Houston Oilers 75.3 (1-8, 136–245)",
+        "New Orleans Saints 75.2 (4-5, 129–160)",
+        "Baltimore Colts 72.3 (0-8-1, 113–236)"
+      ],
+      "outOfPosition": {
+        "Pittsburgh Steelers": [
+          "CB: Loren Toews (LB 86)"
+        ],
+        "Los Angeles Rams": [
+          "CB: Mike Guman (RB 84)"
+        ],
+        "Cleveland Browns": [
+          "K: Charles White (RB 85)"
+        ],
+        "Chicago Bears": [
+          "K: Matt Suhey (RB 84)"
+        ],
+        "New Orleans Saints": [
+          "K: George Rogers (RB 83)"
+        ],
+        "Baltimore Colts": [
+          "K: Johnie Cooks (LB 84)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1981",
+      "version": "pfa-1981-4d55670f",
+      "season": "1981",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1981nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1387,
+      "map": "nfl1980",
+      "spread": [
+        72.9,
+        83.6
+      ],
+      "clubs": [
+        "San Diego Chargers 83.6 (10-6, 478–390)",
+        "Dallas Cowboys 82.7 (12-4, 367–277)",
+        "Detroit Lions 82.7 (8-8, 397–322)",
+        "Cincinnati Bengals 82.5 (12-4, 421–304)",
+        "Atlanta Falcons 82.2 (7-9, 426–355)",
+        "San Francisco 49ers 82 (13-3, 357–250)",
+        "Philadelphia Eagles 80.4 (10-6, 368–221)",
+        "New York Jets 79.9 (10-5-1, 355–287)",
+        "Minnesota Vikings 79.8 (7-9, 325–369)",
+        "Green Bay Packers 79.4 (8-8, 324–361)",
+        "Kansas City Chiefs 79.4 (9-7, 343–290)",
+        "Tampa Bay Buccaneers 79.1 (9-7, 315–268)",
+        "Miami Dolphins 79 (11-4-1, 345–275)",
+        "Buffalo Bills 78.3 (10-6, 311–276)",
+        "Pittsburgh Steelers 78 (8-8, 356–297)",
+        "Denver Broncos 77.9 (10-6, 321–289)",
+        "Seattle Seahawks 77.4 (6-10, 322–388)",
+        "New York Giants 77 (9-7, 295–257)",
+        "New England Patriots 76.9 (2-14, 322–370)",
+        "Washington 76.4 (8-8, 347–349)",
+        "Chicago Bears 76.3 (6-10, 253–324)",
+        "Houston Oilers 76.3 (7-9, 281–355)",
+        "Los Angeles Rams 76.3 (6-10, 303–351)",
+        "Cleveland Browns 76 (5-11, 276–375)",
+        "St. Louis Cardinals 75.5 (7-9, 315–408)",
+        "Oakland Raiders 74.5 (7-9, 273–343)",
+        "New Orleans Saints 73 (4-12, 207–378)",
+        "Baltimore Colts 72.9 (2-14, 259–533)"
+      ],
+      "outOfPosition": {
+        "Kansas City Chiefs": [
+          "CB: James Hadnot (RB 84)"
+        ],
+        "Chicago Bears": [
+          "K: Matt Suhey (RB 82)"
+        ],
+        "Baltimore Colts": [
+          "CB: Randy McMillan (RB 85)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1980",
+      "version": "pfa-1980-d923064d",
+      "season": "1980",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1980nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1416,
+      "map": "nfl1980",
+      "spread": [
+        73.1,
+        83.3
+      ],
+      "clubs": [
+        "New England Patriots 83.3 (10-6, 441–325)",
+        "Atlanta Falcons 83 (12-4, 405–272)",
+        "Dallas Cowboys 82.7 (12-4, 454–311)",
+        "Philadelphia Eagles 81.9 (12-4, 384–222)",
+        "San Diego Chargers 80.9 (11-5, 418–327)",
+        "Los Angeles Rams 80.2 (11-5, 424–289)",
+        "Cleveland Browns 79.8 (11-5, 357–310)",
+        "Detroit Lions 79.7 (9-7, 334–272)",
+        "Oakland Raiders 79.7 (11-5, 364–306)",
+        "Buffalo Bills 79.6 (11-5, 320–260)",
+        "Chicago Bears 79.6 (7-9, 304–264)",
+        "Minnesota Vikings 79 (9-7, 317–308)",
+        "Pittsburgh Steelers 79 (9-7, 352–313)",
+        "Kansas City Chiefs 78.3 (8-8, 319–336)",
+        "Houston Oilers 78.1 (11-5, 295–251)",
+        "Seattle Seahawks 77.7 (4-12, 291–408)",
+        "Miami Dolphins 77.1 (8-8, 266–305)",
+        "San Francisco 49ers 77 (6-10, 320–415)",
+        "Baltimore Colts 76.9 (7-9, 355–387)",
+        "Tampa Bay Buccaneers 76.7 (5-10-1, 271–341)",
+        "Green Bay Packers 76.4 (5-10-1, 231–371)",
+        "New York Jets 76.4 (4-12, 302–395)",
+        "Denver Broncos 76.3 (8-8, 310–323)",
+        "Washington 76.3 (6-10, 261–293)",
+        "Cincinnati Bengals 75.2 (6-10, 244–312)",
+        "St. Louis Cardinals 75 (5-11, 299–350)",
+        "New York Giants 74.4 (4-12, 249–425)",
+        "New Orleans Saints 73.1 (1-15, 291–487)"
+      ],
+      "outOfPosition": {
+        "New England Patriots": [
+          "WR: Vagas Ferguson (RB 88)"
+        ],
+        "Atlanta Falcons": [
+          "CB: Lynn Cain (RB 90)"
+        ],
+        "Houston Oilers": [
+          "CB: Mike Barber (TE 90)"
+        ],
+        "Green Bay Packers": [
+          "K: Gerry Ellis (RB 86)"
+        ],
+        "Cincinnati Bengals": [
+          "K: Pete Johnson (RB 82)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1979",
+      "version": "pfa-1979-2035e978",
+      "season": "1979",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1979nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1380,
+      "map": "nfl1976",
+      "spread": [
+        74.8,
+        82
+      ],
+      "clubs": [
+        "San Diego Chargers 82 (12-4, 411–246)",
+        "Houston Oilers 81.9 (11-5, 362–331)",
+        "New Orleans Saints 81.3 (8-8, 370–360)",
+        "Cleveland Browns 81 (9-7, 359–352)",
+        "Philadelphia Eagles 80.9 (11-5, 339–282)",
+        "Washington 80.4 (10-6, 348–295)",
+        "Dallas Cowboys 80.3 (11-5, 371–313)",
+        "Miami Dolphins 80.3 (10-6, 341–257)",
+        "Chicago Bears 79.8 (10-6, 306–249)",
+        "Seattle Seahawks 79.6 (9-7, 378–372)",
+        "Tampa Bay Buccaneers 79.6 (10-6, 273–237)",
+        "New England Patriots 79.5 (9-7, 411–326)",
+        "Denver Broncos 79.3 (10-6, 289–262)",
+        "Oakland Raiders 79 (9-7, 365–337)",
+        "Pittsburgh Steelers 79 (12-4, 416–262)",
+        "New York Jets 78 (8-8, 337–383)",
+        "Buffalo Bills 77.7 (7-9, 268–279)",
+        "Los Angeles Rams 77.6 (9-7, 323–309)",
+        "Minnesota Vikings 77.1 (7-9, 259–337)",
+        "Atlanta Falcons 76.9 (6-10, 300–388)",
+        "Cincinnati Bengals 76.5 (4-12, 337–421)",
+        "Kansas City Chiefs 76.1 (7-9, 238–262)",
+        "San Francisco 49ers 75.7 (2-14, 308–416)",
+        "Green Bay Packers 75.5 (5-11, 246–316)",
+        "Baltimore Colts 75.2 (5-11, 271–351)",
+        "St. Louis Cardinals 75.2 (5-11, 307–358)",
+        "Detroit Lions 74.9 (2-14, 219–365)",
+        "New York Giants 74.8 (6-10, 237–323)"
+      ],
+      "outOfPosition": {
+        "Miami Dolphins": [
+          "CB: Delvin Williams (RB 83)"
+        ],
+        "Buffalo Bills": [
+          "CB: Jim Haslett (LB 86)"
+        ],
+        "Atlanta Falcons": [
+          "CB: Bubba Bean (RB 77)"
+        ],
+        "St. Louis Cardinals": [
+          "K: Wayne Morris (RB 83)"
+        ],
+        "New York Giants": [
+          "K: Brad Van Pelt (LB 86)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1978",
+      "version": "pfa-1978-5d955de3",
+      "season": "1978",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1978nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1360,
+      "map": "nfl1976",
+      "spread": [
+        73,
+        82.9
+      ],
+      "clubs": [
+        "Dallas Cowboys 82.9 (12-4, 384–208)",
+        "Los Angeles Rams 82.7 (12-4, 316–245)",
+        "Pittsburgh Steelers 81.9 (14-2, 356–195)",
+        "New England Patriots 80.7 (11-5, 358–286)",
+        "New York Jets 80.7 (8-8, 359–364)",
+        "Miami Dolphins 80.4 (11-5, 372–254)",
+        "Oakland Raiders 80.1 (9-7, 311–283)",
+        "San Diego Chargers 79.6 (9-7, 355–309)",
+        "Cleveland Browns 79.4 (8-8, 334–356)",
+        "Seattle Seahawks 79.3 (9-7, 345–358)",
+        "Green Bay Packers 79.2 (8-7-1, 249–269)",
+        "Denver Broncos 78.9 (10-6, 282–198)",
+        "Chicago Bears 78.8 (7-9, 253–274)",
+        "Minnesota Vikings 78.6 (8-7-1, 294–306)",
+        "Buffalo Bills 78.3 (5-11, 302–354)",
+        "Houston Oilers 78.3 (10-6, 283–298)",
+        "Detroit Lions 78.2 (7-9, 290–300)",
+        "Philadelphia Eagles 77.9 (9-7, 270–250)",
+        "New Orleans Saints 77.8 (7-9, 281–298)",
+        "New York Giants 77.5 (6-10, 264–298)",
+        "Washington 77.3 (8-8, 273–283)",
+        "Atlanta Falcons 77.1 (9-7, 240–290)",
+        "Kansas City Chiefs 75.9 (4-12, 243–327)",
+        "St. Louis Cardinals 75 (6-10, 248–296)",
+        "Cincinnati Bengals 74.9 (4-12, 252–284)",
+        "Tampa Bay Buccaneers 74.9 (5-11, 241–259)",
+        "San Francisco 49ers 73.9 (2-14, 219–350)",
+        "Baltimore Colts 73 (5-11, 239–421)"
+      ],
+      "outOfPosition": {
+        "Denver Broncos": [
+          "CB: Joe Rizzo (LB 85)"
+        ],
+        "Chicago Bears": [
+          "CB: Roland Harper (RB 94)"
+        ],
+        "Minnesota Vikings": [
+          "CB: Rickey Young (RB 88)"
+        ],
+        "Philadelphia Eagles": [
+          "K: Mike Hogan (RB 81)"
+        ],
+        "Kansas City Chiefs": [
+          "WR: Ted McKnight (RB 83)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1977",
+      "version": "pfa-1977-b788b2ea",
+      "season": "1977",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1977nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1317,
+      "map": "nfl1976",
+      "spread": [
+        74.3,
+        83.7
+      ],
+      "clubs": [
+        "Los Angeles Rams 83.7 (10-4, 302–146)",
+        "Oakland Raiders 82.8 (11-3, 351–230)",
+        "Denver Broncos 82.2 (12-2, 274–148)",
+        "Baltimore Colts 81.7 (10-4, 295–221)",
+        "Dallas Cowboys 81.5 (12-2, 345–212)",
+        "Miami Dolphins 81.1 (10-4, 313–197)",
+        "Atlanta Falcons 80.1 (7-7, 179–129)",
+        "Chicago Bears 79.3 (9-5, 255–253)",
+        "Houston Oilers 78.9 (8-6, 299–230)",
+        "San Diego Chargers 78.9 (7-7, 222–205)",
+        "Philadelphia Eagles 78.5 (5-9, 220–207)",
+        "Washington 78.5 (9-5, 196–189)",
+        "Pittsburgh Steelers 78.4 (9-5, 283–243)",
+        "Cleveland Browns 78.3 (6-8, 269–267)",
+        "Minnesota Vikings 78.2 (9-5, 231–227)",
+        "New England Patriots 78.2 (9-5, 278–217)",
+        "Cincinnati Bengals 77.9 (8-6, 238–235)",
+        "St. Louis Cardinals 77.8 (7-7, 272–287)",
+        "San Francisco 49ers 77.2 (5-9, 220–260)",
+        "Seattle Seahawks 76.9 (5-9, 282–373)",
+        "Buffalo Bills 76.4 (3-11, 160–313)",
+        "New Orleans Saints 76.2 (3-11, 232–336)",
+        "New York Jets 75.5 (3-11, 191–300)",
+        "New York Giants 75.1 (5-9, 181–265)",
+        "Kansas City Chiefs 74.8 (2-12, 225–349)",
+        "Detroit Lions 74.7 (6-8, 183–252)",
+        "Green Bay Packers 74.6 (4-10, 134–219)",
+        "Tampa Bay Buccaneers 74.3 (2-12, 103–223)"
+      ],
+      "outOfPosition": {
+        "Philadelphia Eagles": [
+          "K: Mike Hogan (RB 79)"
+        ],
+        "San Francisco 49ers": [
+          "CB: Wilbur Jackson (RB 90)"
+        ],
+        "New Orleans Saints": [
+          "K: Tony Galbreath (RB 85)"
+        ],
+        "Tampa Bay Buccaneers": [
+          "K: Dave Lewis (LB 83)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1976",
+      "version": "pfa-1976-835dd39f",
+      "season": "1976",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1976nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1310,
+      "map": "nfl1976",
+      "spread": [
+        70.8,
+        86.3
+      ],
+      "clubs": [
+        "Baltimore Colts 86.3 (11-3, 417–246)",
+        "Los Angeles Rams 84.2 (10-3-1, 351–190)",
+        "Minnesota Vikings 82.7 (11-2-1, 305–176)",
+        "New England Patriots 82.2 (11-3, 376–236)",
+        "Denver Broncos 81.6 (9-5, 315–206)",
+        "Pittsburgh Steelers 81.2 (10-4, 342–138)",
+        "St. Louis Cardinals 81.2 (10-4, 309–267)",
+        "Oakland Raiders 81.1 (13-1, 350–237)",
+        "Cincinnati Bengals 80.6 (10-4, 335–210)",
+        "Dallas Cowboys 80 (11-3, 296–194)",
+        "Washington 80 (10-4, 291–217)",
+        "San Francisco 49ers 78.4 (8-6, 270–190)",
+        "Cleveland Browns 78 (9-5, 267–287)",
+        "Buffalo Bills 77.9 (2-12, 245–363)",
+        "Detroit Lions 77.3 (6-8, 262–220)",
+        "Chicago Bears 77 (7-7, 253–216)",
+        "Houston Oilers 76.7 (5-9, 222–273)",
+        "San Diego Chargers 76.7 (6-8, 248–285)",
+        "Green Bay Packers 76.5 (5-9, 218–299)",
+        "Miami Dolphins 76.1 (6-8, 263–264)",
+        "New Orleans Saints 75.8 (4-10, 253–346)",
+        "Philadelphia Eagles 75.5 (4-10, 165–286)",
+        "Kansas City Chiefs 75.1 (5-9, 290–376)",
+        "New York Giants 74.2 (3-11, 170–250)",
+        "Atlanta Falcons 74 (4-10, 172–312)",
+        "Seattle Seahawks 74 (2-12, 229–429)",
+        "New York Jets 73.3 (3-11, 169–383)",
+        "Tampa Bay Buccaneers 70.8 (0-14, 125–412)"
+      ],
+      "outOfPosition": {
+        "New England Patriots": [
+          "CB: Sam Cunningham (RB 86)"
+        ],
+        "Pittsburgh Steelers": [
+          "CB: Rocky Bleier (RB 92)"
+        ],
+        "Oakland Raiders": [
+          "K: Willie Hall (LB 87)"
+        ],
+        "San Francisco 49ers": [
+          "CB: Wilbur Jackson (RB 88)"
+        ],
+        "Chicago Bears": [
+          "CB: Roland Harper (RB 87)"
+        ],
+        "New York Giants": [
+          "K: Larry Csonka (RB 81)"
+        ]
+      },
+      "gaps": {
+        "New England Patriots": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1975",
+      "version": "pfa-1975-698352fd",
+      "season": "1975",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1975nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1189,
+      "map": "nfl1975",
+      "spread": [
+        72.2,
+        83.7
+      ],
+      "clubs": [
+        "Pittsburgh Steelers 83.7 (12-2, 373–162)",
+        "Minnesota Vikings 83.5 (12-2, 377–180)",
+        "Los Angeles Rams 83.4 (12-2, 312–135)",
+        "Baltimore Colts 81.7 (10-4, 395–269)",
+        "St. Louis Cardinals 81.5 (11-3, 356–276)",
+        "Miami Dolphins 81.3 (10-4, 357–222)",
+        "Buffalo Bills 81 (8-6, 420–355)",
+        "Oakland Raiders 80.1 (11-3, 375–255)",
+        "Washington 79.5 (8-6, 325–276)",
+        "Dallas Cowboys 79.3 (10-4, 350–268)",
+        "Houston Oilers 79.3 (10-4, 293–226)",
+        "Cincinnati Bengals 78.7 (11-3, 340–246)",
+        "Atlanta Falcons 77.5 (4-10, 240–289)",
+        "Philadelphia Eagles 77.4 (4-10, 225–302)",
+        "Denver Broncos 77.2 (6-8, 254–307)",
+        "Kansas City Chiefs 76.7 (5-9, 282–341)",
+        "Green Bay Packers 76.5 (4-10, 226–285)",
+        "Detroit Lions 76.3 (7-7, 245–262)",
+        "New York Jets 76.1 (3-11, 258–433)",
+        "San Francisco 49ers 75.5 (5-9, 255–286)",
+        "New England Patriots 75.3 (3-11, 258–358)",
+        "New York Giants 75.3 (5-9, 216–306)",
+        "Cleveland Browns 74.3 (3-11, 218–372)",
+        "San Diego Chargers 74 (2-12, 189–345)",
+        "Chicago Bears 73.6 (4-10, 191–379)",
+        "New Orleans Saints 72.2 (2-12, 165–360)"
+      ],
+      "outOfPosition": {
+        "St. Louis Cardinals": [
+          "CB: Jim Otis (RB 91)"
+        ],
+        "Buffalo Bills": [
+          "CB: Jim Braxton (RB 92)"
+        ],
+        "Atlanta Falcons": [
+          "K: Haskel Stanback (RB 78)"
+        ],
+        "San Francisco 49ers": [
+          "K: Larry Schreiber (RB 84)"
+        ],
+        "Cleveland Browns": [
+          "CB: Billy Pritchett (RB 75)"
+        ],
+        "San Diego Chargers": [
+          "K: Bo Matthews (RB 76)"
+        ]
+      },
+      "gaps": {
+        "Cleveland Browns": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1974",
+      "version": "pfa-1974-3d62c52a",
+      "season": "1974",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1974nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1277,
+      "map": "nfl1973",
+      "spread": [
+        74,
+        84.5
+      ],
+      "clubs": [
+        "Oakland Raiders 84.5 (12-2, 355–228)",
+        "Washington 83.1 (10-4, 320–196)",
+        "Los Angeles Rams 82 (10-4, 263–181)",
+        "Pittsburgh Steelers 80.8 (10-3-1, 305–189)",
+        "St. Louis Cardinals 80.5 (10-4, 285–218)",
+        "New England Patriots 80.2 (7-7, 348–289)",
+        "Denver Broncos 80 (7-6-1, 302–294)",
+        "Minnesota Vikings 79.7 (10-4, 310–195)",
+        "Philadelphia Eagles 79.7 (7-7, 242–217)",
+        "Miami Dolphins 79.5 (11-3, 327–216)",
+        "Detroit Lions 79.3 (7-7, 256–270)",
+        "Buffalo Bills 79.1 (9-5, 264–244)",
+        "Dallas Cowboys 79.1 (8-6, 297–235)",
+        "New York Jets 78.8 (7-7, 279–300)",
+        "Green Bay Packers 78.6 (6-8, 210–206)",
+        "Cincinnati Bengals 78.2 (7-7, 283–259)",
+        "Kansas City Chiefs 77.4 (5-9, 233–293)",
+        "Baltimore Colts 76.6 (2-12, 190–329)",
+        "Cleveland Browns 76.2 (4-10, 251–344)",
+        "Atlanta Falcons 75.4 (3-11, 111–271)",
+        "San Francisco 49ers 75.4 (6-8, 226–236)",
+        "San Diego Chargers 75 (5-9, 212–285)",
+        "Houston Oilers 74.9 (7-7, 236–282)",
+        "New York Giants 74.9 (2-12, 195–299)",
+        "Chicago Bears 74.7 (4-10, 152–279)",
+        "New Orleans Saints 74 (5-9, 166–263)"
+      ],
+      "outOfPosition": {
+        "New England Patriots": [
+          "OL: Sam Cunningham (RB 91)"
+        ],
+        "Buffalo Bills": [
+          "CB: Jim Braxton (RB 84)"
+        ],
+        "Green Bay Packers": [
+          "CB: MacArthur Lane (RB 87)"
+        ],
+        "San Francisco 49ers": [
+          "K: Wilbur Jackson (RB 85)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1973",
+      "version": "pfa-1973-793a20c7",
+      "season": "1973",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1973nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1215,
+      "map": "nfl1973",
+      "spread": [
+        71.2,
+        86.7
+      ],
+      "clubs": [
+        "Los Angeles Rams 86.7 (12-2, 388–178)",
+        "Dallas Cowboys 82.7 (10-4, 382–203)",
+        "Minnesota Vikings 82.5 (12-2, 296–168)",
+        "Miami Dolphins 82.3 (12-2, 343–150)",
+        "Pittsburgh Steelers 82 (10-4, 347–210)",
+        "Washington 81.7 (10-4, 325–198)",
+        "Atlanta Falcons 81.2 (9-5, 318–224)",
+        "Oakland Raiders 80.9 (9-4-1, 292–175)",
+        "Denver Broncos 80 (7-5-2, 354–296)",
+        "Cincinnati Bengals 79.7 (10-4, 286–231)",
+        "Cleveland Browns 78 (7-5-2, 234–255)",
+        "Kansas City Chiefs 77.9 (7-5-2, 231–192)",
+        "San Francisco 49ers 77.9 (5-9, 262–319)",
+        "Detroit Lions 77.8 (6-7-1, 271–247)",
+        "Philadelphia Eagles 76.8 (5-8-1, 310–393)",
+        "Green Bay Packers 76.6 (5-7-2, 202–259)",
+        "Buffalo Bills 76.4 (9-5, 259–230)",
+        "St. Louis Cardinals 76.2 (4-9-1, 286–365)",
+        "New York Jets 76.1 (4-10, 240–306)",
+        "Baltimore Colts 75.5 (4-10, 226–341)",
+        "Chicago Bears 75.5 (3-11, 195–334)",
+        "New England Patriots 75.3 (5-9, 258–300)",
+        "New York Giants 74.7 (2-11-1, 226–362)",
+        "New Orleans Saints 74.4 (5-9, 163–312)",
+        "Houston Oilers 73.7 (1-13, 199–447)",
+        "San Diego Chargers 71.2 (2-11-1, 188–386)"
+      ],
+      "outOfPosition": {
+        "Cincinnati Bengals": [
+          "CB: Essex Johnson (RB 92)"
+        ],
+        "Buffalo Bills": [
+          "CB: Larry Watkins (RB 77)"
+        ],
+        "San Diego Chargers": [
+          "K: Mike Garrett (RB 76)"
+        ]
+      },
+      "gaps": {
+        "Buffalo Bills": {
+          "CB": 1
+        },
+        "Cincinnati Bengals": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1972",
+      "version": "pfa-1972-5f47a943",
+      "season": "1972",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1972nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1203,
+      "map": "nfl1972",
+      "spread": [
+        72.7,
+        83.8
+      ],
+      "clubs": [
+        "Miami Dolphins 83.8 (14-0, 385–171)",
+        "Oakland Raiders 83.1 (10-3-1, 365–248)",
+        "Pittsburgh Steelers 82.4 (11-3, 343–175)",
+        "Washington 81.2 (11-3, 336–218)",
+        "San Francisco 49ers 81 (8-5-1, 353–249)",
+        "New York Giants 80.9 (8-6, 331–247)",
+        "New York Jets 80.9 (7-7, 367–324)",
+        "Green Bay Packers 80.8 (10-4, 304–226)",
+        "Minnesota Vikings 79.8 (7-7, 301–252)",
+        "Atlanta Falcons 79.6 (7-7, 269–274)",
+        "Dallas Cowboys 78.9 (10-4, 319–240)",
+        "Cincinnati Bengals 78.5 (8-6, 299–229)",
+        "Detroit Lions 78.4 (8-5-1, 339–290)",
+        "Cleveland Browns 78 (10-4, 268–249)",
+        "Kansas City Chiefs 77.8 (8-6, 287–254)",
+        "Chicago Bears 77 (4-9-1, 225–275)",
+        "Denver Broncos 76.9 (5-9, 325–350)",
+        "Baltimore Colts 76.8 (5-9, 235–252)",
+        "San Diego Chargers 76.6 (4-9-1, 264–344)",
+        "Los Angeles Rams 76.2 (6-7-1, 291–286)",
+        "Buffalo Bills 74.5 (4-9-1, 257–377)",
+        "Philadelphia Eagles 74.4 (2-11-1, 145–352)",
+        "St. Louis Cardinals 73.9 (4-9-1, 193–303)",
+        "New Orleans Saints 73.7 (2-11-1, 215–361)",
+        "Houston Oilers 73.2 (1-13, 164–380)",
+        "New England Patriots 72.7 (3-11, 192–446)"
+      ],
+      "outOfPosition": {
+        "Oakland Raiders": [
+          "CB: Marv Hubbard (RB 85)"
+        ],
+        "New York Giants": [
+          "CB: Charlie Evans (RB 75)"
+        ],
+        "Green Bay Packers": [
+          "CB: MacArthur Lane (RB 91)"
+        ],
+        "Atlanta Falcons": [
+          "CB: Dave Hampton (RB 88)"
+        ],
+        "Baltimore Colts": [
+          "K: Ray May (LB 78)"
+        ],
+        "San Diego Chargers": [
+          "S: Cid Edwards (RB 89)"
+        ],
+        "Buffalo Bills": [
+          "CB: Jim Braxton (RB 82)"
+        ]
+      },
+      "gaps": {
+        "Buffalo Bills": {
+          "CB": 1
+        },
+        "New York Giants": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1971",
+      "version": "pfa-1971-8731b36c",
+      "season": "1971",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1971nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1188,
+      "map": "nfl1971",
+      "spread": [
+        74.1,
+        85
+      ],
+      "clubs": [
+        "Miami Dolphins 85 (10-3-1, 315–174)",
+        "Baltimore Colts 83.4 (10-4, 313–140)",
+        "San Francisco 49ers 81.8 (9-5, 300–216)",
+        "Detroit Lions 81.7 (7-6-1, 341–286)",
+        "Los Angeles Rams 81.4 (8-5-1, 313–260)",
+        "Washington 81.4 (9-4-1, 276–190)",
+        "Dallas Cowboys 81.3 (11-3, 406–222)",
+        "Minnesota Vikings 81.2 (11-3, 245–139)",
+        "Kansas City Chiefs 80.6 (10-3-1, 302–208)",
+        "Oakland Raiders 80.6 (8-4-2, 344–278)",
+        "Atlanta Falcons 78 (7-6-1, 274–277)",
+        "Cincinnati Bengals 77.5 (4-10, 284–265)",
+        "Cleveland Browns 77.4 (9-5, 285–273)",
+        "Green Bay Packers 77.4 (4-8-2, 274–298)",
+        "San Diego Chargers 77.3 (6-8, 311–341)",
+        "New Orleans Saints 76.6 (4-8-2, 266–347)",
+        "Denver Broncos 76.4 (4-9-1, 203–275)",
+        "Pittsburgh Steelers 76 (6-8, 246–292)",
+        "Chicago Bears 75.5 (6-8, 185–276)",
+        "New England Patriots 75.5 (6-8, 238–325)",
+        "Philadelphia Eagles 75.4 (6-7-1, 221–302)",
+        "St. Louis Cardinals 75.4 (4-9-1, 231–279)",
+        "Houston Oilers 75.1 (4-9-1, 251–330)",
+        "New York Jets 74.4 (6-8, 212–299)",
+        "Buffalo Bills 74.3 (1-13, 184–394)",
+        "New York Giants 74.1 (4-10, 228–362)"
+      ],
+      "outOfPosition": {
+        "San Francisco 49ers": [
+          "CB: Ken Willard (RB 88)"
+        ],
+        "Cleveland Browns": [
+          "CB: Bo Scott (RB 91)"
+        ],
+        "Green Bay Packers": [
+          "K: Donny Anderson (RB 93)"
+        ],
+        "San Diego Chargers": [
+          "CB: Jeff Queen (RB 79)"
+        ],
+        "New York Jets": [
+          "K: Emerson Boozer (RB 84)"
+        ]
+      },
+      "gaps": {
+        "San Diego Chargers": {
+          "CB": 1
+        },
+        "San Francisco 49ers": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1970",
+      "version": "pfa-1970-e4ecaf4b",
+      "season": "1970",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1970nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 1189,
+      "map": "nfl1970",
+      "spread": [
+        72.3,
+        84.4
+      ],
+      "clubs": [
+        "Detroit Lions 84.4 (10-4, 347–202)",
+        "Los Angeles Rams 83.6 (9-4-1, 325–202)",
+        "Minnesota Vikings 83.3 (12-2, 335–143)",
+        "St. Louis Cardinals 83 (8-5-1, 325–228)",
+        "San Francisco 49ers 81.3 (10-3-1, 352–267)",
+        "New York Giants 80.7 (9-5, 301–270)",
+        "Miami Dolphins 80.2 (10-4, 297–228)",
+        "Kansas City Chiefs 79.4 (7-5-2, 272–235)",
+        "Oakland Raiders 78.8 (8-4-2, 300–293)",
+        "Baltimore Colts 78.6 (11-2-1, 321–234)",
+        "Cincinnati Bengals 78.4 (8-6, 312–255)",
+        "Washington 78.3 (6-8, 297–314)",
+        "Dallas Cowboys 77.9 (10-4, 299–221)",
+        "Cleveland Browns 77.4 (7-7, 286–265)",
+        "San Diego Chargers 77.4 (5-6-3, 282–278)",
+        "New York Jets 77.1 (4-10, 255–286)",
+        "Chicago Bears 77 (6-8, 256–261)",
+        "Denver Broncos 77 (5-8-1, 253–264)",
+        "Pittsburgh Steelers 76.2 (5-9, 210–272)",
+        "Houston Oilers 76.1 (3-10-1, 217–352)",
+        "Philadelphia Eagles 75.9 (3-10-1, 241–332)",
+        "Green Bay Packers 75.1 (6-8, 196–293)",
+        "Atlanta Falcons 75 (4-8-2, 206–261)",
+        "Buffalo Bills 74.5 (3-10-1, 204–337)",
+        "Boston Patriots 73 (2-12, 149–361)",
+        "New Orleans Saints 72.3 (2-11-1, 172–347)"
+      ],
+      "outOfPosition": {
+        "Miami Dolphins": [
+          "CB: Larry Csonka (RB 92)"
+        ],
+        "Cincinnati Bengals": [
+          "CB: Jess Phillips (RB 86)"
+        ],
+        "Pittsburgh Steelers": [
+          "K: Preston Pearson (RB 82)"
+        ],
+        "Atlanta Falcons": [
+          "K: Harmon Wages (RB 79)"
+        ],
+        "Boston Patriots": [
+          "K: Carl Garrett (RB 82)"
+        ]
+      },
+      "gaps": {
+        "Cincinnati Bengals": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1969",
+      "version": "pfa-afl-1969-6b9768e5",
+      "season": "1969",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1969afl.html",
+      "retrieved": "2026-11-09",
+      "players": 465,
+      "map": "afl1969",
+      "spread": [
+        75.1,
+        84.3
+      ],
+      "clubs": [
+        "Kansas City Chiefs 84.3 (11-3, 359–177)",
+        "Oakland Raiders 83.2 (12-1-1, 377–242)",
+        "New York Jets 79.5 (10-4, 353–269)",
+        "Houston Oilers 77.8 (6-6-2, 278–279)",
+        "Denver Broncos 77.3 (5-8-1, 297–344)",
+        "San Diego Chargers 77.1 (8-6, 288–276)",
+        "Cincinnati Bengals 76.3 (4-9-1, 280–367)",
+        "Boston Patriots 76 (4-10, 266–316)",
+        "Miami Dolphins 75.7 (3-10-1, 233–332)",
+        "Buffalo Bills 75.1 (4-10, 230–359)"
+      ],
+      "outOfPosition": {
+        "Boston Patriots": [
+          "K: Carl Garrett (RB 87)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1969",
+      "version": "pfa-1969-7bf0e0cb",
+      "season": "1969",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1969nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 721,
+      "map": "nfl1967",
+      "spread": [
+        74.3,
+        86.3
+      ],
+      "clubs": [
+        "Minnesota Vikings 86.3 (12-2, 379–133)",
+        "Dallas Cowboys 82.7 (11-2-1, 369–223)",
+        "Los Angeles Rams 81 (11-3, 320–243)",
+        "Cleveland Browns 80.5 (10-3-1, 351–300)",
+        "Detroit Lions 79 (9-4-1, 259–188)",
+        "Green Bay Packers 78.6 (8-6, 269–221)",
+        "New Orleans Saints 78 (5-9, 311–393)",
+        "St. Louis Cardinals 77.7 (4-9-1, 314–389)",
+        "Washington 77.7 (7-5-2, 307–319)",
+        "Baltimore Colts 77.1 (8-5-1, 279–268)",
+        "San Francisco 49ers 76.9 (4-8-2, 277–319)",
+        "Philadelphia Eagles 76.3 (4-9-1, 279–377)",
+        "New York Giants 76 (6-8, 264–298)",
+        "Atlanta Falcons 75.6 (6-8, 276–268)",
+        "Chicago Bears 74.6 (1-13, 210–339)",
+        "Pittsburgh Steelers 74.3 (1-13, 218–404)"
+      ],
+      "outOfPosition": {
+        "Green Bay Packers": [
+          "K: Dave Robinson (LB 81)"
+        ],
+        "New Orleans Saints": [
+          "WR: Tony Baker (RB 85)"
+        ],
+        "San Francisco 49ers": [
+          "K: Doug Cunningham (RB 87)"
+        ],
+        "Atlanta Falcons": [
+          "CB: Harmon Wages (RB 77)"
+        ]
+      },
+      "gaps": {
+        "Atlanta Falcons": {
+          "CB": 1
+        },
+        "New Orleans Saints": {
+          "WR": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1968",
+      "version": "pfa-afl-1968-65517346",
+      "season": "1968",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1968afl.html",
+      "retrieved": "2026-11-09",
+      "players": 488,
+      "map": "afl1968",
+      "spread": [
+        74.7,
+        83.3
+      ],
+      "clubs": [
+        "Oakland Raiders 83.3 (12-2, 453–233)",
+        "Kansas City Chiefs 82.7 (12-2, 371–170)",
+        "New York Jets 81.5 (11-3, 419–280)",
+        "San Diego Chargers 80.1 (9-5, 382–310)",
+        "Houston Oilers 79.4 (7-7, 303–248)",
+        "Cincinnati Bengals 76.8 (3-11, 215–329)",
+        "Boston Patriots 75.9 (4-10, 229–406)",
+        "Buffalo Bills 75.7 (1-12-1, 199–367)",
+        "Miami Dolphins 74.9 (5-8-1, 276–355)",
+        "Denver Broncos 74.7 (5-9, 255–404)"
+      ],
+      "outOfPosition": {},
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1968",
+      "version": "pfa-1968-5da02841",
+      "season": "1968",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1968nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 724,
+      "map": "nfl1967",
+      "spread": [
+        73.7,
+        86.5
+      ],
+      "clubs": [
+        "Baltimore Colts 86.5 (13-1, 402–144)",
+        "Dallas Cowboys 84.8 (12-2, 431–186)",
+        "Cleveland Browns 81.8 (10-4, 394–273)",
+        "Los Angeles Rams 80.6 (10-3-1, 312–200)",
+        "St. Louis Cardinals 80.5 (9-4-1, 325–289)",
+        "Green Bay Packers 79.6 (6-7-1, 281–227)",
+        "Minnesota Vikings 79.3 (8-6, 282–242)",
+        "San Francisco 49ers 79.1 (7-6-1, 303–310)",
+        "New York Giants 77.4 (7-7, 294–325)",
+        "Chicago Bears 76.8 (7-7, 250–333)",
+        "Detroit Lions 75.9 (4-8-2, 207–241)",
+        "New Orleans Saints 75.3 (4-9-1, 246–327)",
+        "Washington 75.3 (5-9, 249–358)",
+        "Philadelphia Eagles 74 (2-12, 202–351)",
+        "Pittsburgh Steelers 74 (2-11-1, 244–397)",
+        "Atlanta Falcons 73.7 (2-12, 170–389)"
+      ],
+      "outOfPosition": {
+        "Detroit Lions": [
+          "K: Bill Triplett (RB 77)"
+        ],
+        "Pittsburgh Steelers": [
+          "K: Earl Gros (RB 86)"
+        ]
+      },
+      "gaps": {},
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1967",
+      "version": "pfa-afl-1967-10ef8d49",
+      "season": "1967",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1967afl.html",
+      "retrieved": "2026-11-09",
+      "players": 418,
+      "map": "afl1967",
+      "spread": [
+        73.7,
+        83.9
+      ],
+      "clubs": [
+        "Oakland Raiders 83.9 (13-1, 468–233)",
+        "Kansas City Chiefs 80.6 (9-5, 408–254)",
+        "New York Jets 80.1 (8-5-1, 371–329)",
+        "Houston Oilers 78.6 (9-4-1, 258–199)",
+        "San Diego Chargers 78.6 (8-5-1, 360–352)",
+        "Buffalo Bills 77.9 (4-10, 237–285)",
+        "Boston Patriots 76.3 (3-10-1, 280–389)",
+        "Denver Broncos 74 (3-11, 256–409)",
+        "Miami Dolphins 73.7 (4-10, 219–407)"
+      ],
+      "outOfPosition": {
+        "Oakland Raiders": [
+          "CB: Bill Laskey (LB 81)"
+        ],
+        "Houston Oilers": [
+          "CB: Woody Campbell (RB 86)"
+        ],
+        "Boston Patriots": [
+          "K: Larry Garron (RB 81)"
+        ]
+      },
+      "gaps": {
+        "Oakland Raiders": {
+          "CB": 1
+        },
+        "Boston Patriots": {
+          "K": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1967",
+      "version": "pfa-1967-4001d6d1",
+      "season": "1967",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1967nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 729,
+      "map": "nfl1967",
+      "spread": [
+        72.5,
+        86.1
+      ],
+      "clubs": [
+        "Los Angeles Rams 86.1 (11-1-2, 398–196)",
+        "Baltimore Colts 82.7 (11-1-2, 394–198)",
+        "Dallas Cowboys 80.3 (9-5, 342–268)",
+        "Cleveland Browns 80.2 (9-5, 334–297)",
+        "Green Bay Packers 80 (9-4-1, 332–209)",
+        "St. Louis Cardinals 78.8 (6-7-1, 333–356)",
+        "Washington 78.6 (5-6-3, 347–353)",
+        "Philadelphia Eagles 78.2 (6-7-1, 351–409)",
+        "Chicago Bears 77.9 (7-6-1, 239–218)",
+        "New York Giants 77.8 (7-7, 369–379)",
+        "Detroit Lions 77.5 (5-7-2, 260–259)",
+        "Pittsburgh Steelers 77 (4-9-1, 281–320)",
+        "Minnesota Vikings 76.3 (3-8-3, 233–294)",
+        "San Francisco 49ers 75.8 (7-7, 273–337)",
+        "New Orleans Saints 73.2 (3-11, 233–379)",
+        "Atlanta Falcons 72.5 (1-12-1, 175–422)"
+      ],
+      "outOfPosition": {
+        "Dallas Cowboys": [
+          "CB: Don Perkins (RB 84)"
+        ],
+        "New York Giants": [
+          "WR: Joe Morrison (RB 81)"
+        ],
+        "Minnesota Vikings": [
+          "CB: Bill Brown (RB 88)"
+        ],
+        "Atlanta Falcons": [
+          "CB: Ralph Heck (LB 71)"
+        ]
+      },
+      "gaps": {
+        "Atlanta Falcons": {
+          "CB": 1
+        },
+        "Dallas Cowboys": {
+          "CB": 1
+        },
+        "New York Giants": {
+          "WR": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1966",
+      "version": "pfa-afl-1966-372c1488",
+      "season": "1966",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1966afl.html",
+      "retrieved": "2026-11-09",
+      "players": 420,
+      "map": "afl1966",
+      "spread": [
+        73.2,
+        83.9
+      ],
+      "clubs": [
+        "Buffalo Bills 83.9 (9-4-1, 358–255)",
+        "Kansas City Chiefs 83.7 (11-2-1, 448–276)",
+        "New York Jets 79.3 (6-6-2, 322–312)",
+        "Boston Patriots 78.4 (8-4-2, 315–283)",
+        "Oakland Raiders 78 (8-5-1, 315–288)",
+        "San Diego Chargers 77.7 (7-6-1, 335–284)",
+        "Houston Oilers 75.7 (3-11, 335–396)",
+        "Denver Broncos 74.3 (4-10, 196–381)",
+        "Miami Dolphins 73.2 (3-11, 213–362)"
+      ],
+      "outOfPosition": {
+        "Buffalo Bills": [
+          "CB: Wray Carlton (RB 90)"
+        ],
+        "Boston Patriots": [
+          "K: Larry Garron (RB 84)"
+        ]
+      },
+      "gaps": {
+        "Boston Patriots": {
+          "K": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1966",
+      "version": "pfa-1966-48d7d03c",
+      "season": "1966",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1966nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 668,
+      "map": "nfl1966",
+      "spread": [
+        73,
+        82.5
+      ],
+      "clubs": [
+        "Dallas Cowboys 82.5 (10-3-1, 445–239)",
+        "Green Bay Packers 82.3 (12-2, 335–163)",
+        "Washington 80.6 (7-7, 351–355)",
+        "Los Angeles Rams 80.4 (8-6, 289–212)",
+        "Cleveland Browns 79.7 (9-5, 403–259)",
+        "Philadelphia Eagles 79.3 (9-5, 326–340)",
+        "Baltimore Colts 78.8 (9-5, 314–226)",
+        "Chicago Bears 77.7 (5-7-2, 234–272)",
+        "San Francisco 49ers 77.1 (6-6-2, 320–325)",
+        "Detroit Lions 76.9 (4-9-1, 206–317)",
+        "Minnesota Vikings 76.9 (4-9-1, 292–304)",
+        "St. Louis Cardinals 76.9 (8-5-1, 264–265)",
+        "Pittsburgh Steelers 76.5 (5-8-1, 316–347)",
+        "Atlanta Falcons 73.8 (3-11, 204–437)",
+        "New York Giants 73 (1-12-1, 263–501)"
+      ],
+      "outOfPosition": {
+        "Cleveland Browns": [
+          "K: Ernie Green (RB 87)"
+        ],
+        "Baltimore Colts": [
+          "K: Tom Matte (RB 76)"
+        ],
+        "San Francisco 49ers": [
+          "CB: John David Crow (RB 82)"
+        ],
+        "Atlanta Falcons": [
+          "K: Ernie Wheelwright (RB 83)"
+        ]
+      },
+      "gaps": {
+        "Baltimore Colts": {
+          "K": 1
+        },
+        "San Francisco 49ers": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1965",
+      "version": "pfa-afl-1965-490f9c11",
+      "season": "1965",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1965afl.html",
+      "retrieved": "2026-11-09",
+      "players": 348,
+      "map": "afl1965",
+      "spread": [
+        72.8,
+        83.9
+      ],
+      "clubs": [
+        "San Diego Chargers 83.9 (9-2-3, 340–227)",
+        "Kansas City Chiefs 81.7 (7-5-2, 322–285)",
+        "Buffalo Bills 81.3 (10-3-1, 313–226)",
+        "Oakland Raiders 77.7 (8-5-1, 298–239)",
+        "New York Jets 77.3 (5-8-1, 285–303)",
+        "Denver Broncos 75 (4-10, 303–392)",
+        "Houston Oilers 74.5 (4-10, 298–429)",
+        "Boston Patriots 72.8 (4-8-2, 244–302)"
+      ],
+      "outOfPosition": {
+        "Kansas City Chiefs": [
+          "CB: Sherrill Headrick (LB 88)"
+        ],
+        "Houston Oilers": [
+          "K: Charlie Tolar (RB 72)"
+        ],
+        "Boston Patriots": [
+          "K: Larry Garron (RB 73)"
+        ]
+      },
+      "gaps": {
+        "Boston Patriots": {
+          "K": 1
+        },
+        "Houston Oilers": {
+          "K": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1965",
+      "version": "pfa-1965-a5219dcb",
+      "season": "1965",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1965nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 602,
+      "map": "nfl1964",
+      "spread": [
+        74,
+        84.2
+      ],
+      "clubs": [
+        "San Francisco 49ers 84.2 (7-6-1, 421–402)",
+        "Chicago Bears 81.2 (9-5, 409–275)",
+        "Green Bay Packers 80.3 (10-3-1, 316–224)",
+        "Dallas Cowboys 80.2 (7-7, 325–280)",
+        "Minnesota Vikings 79.7 (7-7, 383–403)",
+        "Cleveland Browns 79.3 (11-3, 363–325)",
+        "Baltimore Colts 78.9 (10-3-1, 389–284)",
+        "St. Louis Cardinals 78.3 (5-9, 296–309)",
+        "Philadelphia Eagles 78.1 (5-9, 363–359)",
+        "Detroit Lions 75.6 (6-7-1, 257–295)",
+        "Washington 75.3 (6-8, 257–301)",
+        "Los Angeles Rams 74.7 (4-10, 269–328)",
+        "Pittsburgh Steelers 74.5 (2-12, 202–397)",
+        "New York Giants 74 (7-7, 270–338)"
+      ],
+      "outOfPosition": {
+        "San Francisco 49ers": [
+          "CB: John David Crow (RB 88)"
+        ],
+        "Green Bay Packers": [
+          "CB: Lee Roy Caffey (LB 83)"
+        ],
+        "Philadelphia Eagles": [
+          "K: Earl Gros (RB 86)"
+        ],
+        "Detroit Lions": [
+          "K: Joe Don Looney (RB 76)"
+        ],
+        "New York Giants": [
+          "K: Steve Thurlow (RB 78)"
+        ]
+      },
+      "gaps": {
+        "Detroit Lions": {
+          "K": 1
+        },
+        "Green Bay Packers": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1964",
+      "version": "pfa-afl-1964-d7859293",
+      "season": "1964",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1964afl.html",
+      "retrieved": "2026-11-09",
+      "players": 327,
+      "map": "afl1964",
+      "spread": [
+        73.7,
+        84.6
+      ],
+      "clubs": [
+        "Buffalo Bills 84.6 (12-2, 400–242)",
+        "Kansas City Chiefs 80.9 (7-7, 366–306)",
+        "Boston Patriots 80.1 (10-3-1, 365–297)",
+        "San Diego Chargers 77.1 (8-5-1, 341–300)",
+        "Oakland Raiders 76.5 (5-7-2, 303–350)",
+        "Houston Oilers 76.4 (4-10, 310–355)",
+        "New York Jets 76.3 (5-8-1, 278–315)",
+        "Denver Broncos 73.7 (2-11-1, 240–438)"
+      ],
+      "outOfPosition": {
+        "Houston Oilers": [
+          "K: Charlie Tolar (RB 79)"
+        ]
+      },
+      "gaps": {
+        "Houston Oilers": {
+          "K": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1964",
+      "version": "pfa-1964-c9d1f07c",
+      "season": "1964",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1964nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 576,
+      "map": "nfl1964",
+      "spread": [
+        74.3,
+        83.6
+      ],
+      "clubs": [
+        "Baltimore Colts 83.6 (12-2, 428–225)",
+        "Cleveland Browns 82.8 (10-3-1, 415–293)",
+        "Minnesota Vikings 81.1 (8-5-1, 355–296)",
+        "St. Louis Cardinals 79.8 (9-3-2, 357–331)",
+        "Green Bay Packers 78.8 (8-5-1, 342–245)",
+        "Detroit Lions 77.7 (7-5-2, 280–260)",
+        "Washington 77.3 (6-8, 307–305)",
+        "Los Angeles Rams 76.9 (5-7-2, 283–339)",
+        "Philadelphia Eagles 76.7 (6-8, 312–313)",
+        "Dallas Cowboys 76.6 (5-8-1, 250–289)",
+        "San Francisco 49ers 76.4 (4-10, 236–330)",
+        "Chicago Bears 75 (5-9, 260–379)",
+        "New York Giants 74.7 (2-10-2, 241–399)",
+        "Pittsburgh Steelers 74.3 (5-9, 253–315)"
+      ],
+      "outOfPosition": {
+        "Baltimore Colts": [
+          "CB: Don Shinnick (LB 83)"
+        ],
+        "Cleveland Browns": [
+          "CB: Ernie Green (RB 88)"
+        ],
+        "Minnesota Vikings": [
+          "WR: Tommy Mason (RB 86)"
+        ],
+        "Green Bay Packers": [
+          "K: Paul Hornung (RB 81)"
+        ],
+        "Detroit Lions": [
+          "K: Danny Lewis (RB 77)"
+        ],
+        "Philadelphia Eagles": [
+          "CB: Timmy Brown (RB 83)"
+        ],
+        "Chicago Bears": [
+          "CB: Jon Arnett (RB 76)"
+        ]
+      },
+      "gaps": {
+        "Chicago Bears": {
+          "CB": 1
+        },
+        "Cleveland Browns": {
+          "CB": 1
+        },
+        "Detroit Lions": {
+          "K": 1
+        },
+        "Green Bay Packers": {
+          "K": 1
+        },
+        "Philadelphia Eagles": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1963",
+      "version": "pfa-afl-1963-18b51ba4",
+      "season": "1963",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1963afl.html",
+      "retrieved": "2026-11-09",
+      "players": 316,
+      "map": "afl1963",
+      "spread": [
+        75.7,
+        81.9
+      ],
+      "clubs": [
+        "San Diego Chargers 81.9 (11-3, 399–255)",
+        "Boston Patriots 79.3 (7-6-1, 327–257)",
+        "Oakland Raiders 79.2 (10-4, 363–282)",
+        "Kansas City Chiefs 77.9 (5-7-2, 347–263)",
+        "Buffalo Bills 76.9 (7-6-1, 304–291)",
+        "Houston Oilers 76.8 (6-8, 302–372)",
+        "New York Jets 76.3 (5-8-1, 249–399)",
+        "Denver Broncos 75.7 (2-11-1, 301–473)"
+      ],
+      "outOfPosition": {
+        "Boston Patriots": [
+          "WR: Jim Crawford (RB 72)"
+        ],
+        "Kansas City Chiefs": [
+          "WR: Abner Haynes (RB 78)"
+        ],
+        "Buffalo Bills": [
+          "CB: Harry Jacobs (LB 76)"
+        ],
+        "Houston Oilers": [
+          "K: Bill Tobin (RB 75)"
+        ]
+      },
+      "gaps": {
+        "Buffalo Bills": {
+          "CB": 1
+        },
+        "Kansas City Chiefs": {
+          "WR": 1
+        },
+        "Boston Patriots": {
+          "WR": 1
+        },
+        "Houston Oilers": {
+          "K": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1963",
+      "version": "pfa-1963-8bf868f0",
+      "season": "1963",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1963nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 564,
+      "map": "nfl1961",
+      "spread": [
+        73.5,
+        82.4
+      ],
+      "clubs": [
+        "Cleveland Browns 82.4 (10-4, 343–262)",
+        "Green Bay Packers 82.4 (11-2-1, 369–206)",
+        "New York Giants 81.2 (11-3, 448–280)",
+        "Chicago Bears 80.4 (11-1-2, 301–144)",
+        "Baltimore Colts 79.1 (8-6, 316–285)",
+        "Pittsburgh Steelers 79.1 (7-4-3, 321–295)",
+        "St. Louis Cardinals 78.8 (9-5, 341–283)",
+        "Minnesota Vikings 77.7 (5-8-1, 309–390)",
+        "Washington 76.1 (3-11, 279–398)",
+        "Philadelphia Eagles 75 (2-10-2, 242–381)",
+        "Detroit Lions 74.9 (5-8-1, 326–265)",
+        "Los Angeles Rams 74.9 (5-9, 210–350)",
+        "Dallas Cowboys 74.7 (4-10, 305–378)",
+        "San Francisco 49ers 73.5 (2-12, 198–391)"
+      ],
+      "outOfPosition": {
+        "Green Bay Packers": [
+          "K: Tom Moore (RB 86)"
+        ],
+        "New York Giants": [
+          "CB: Joe Morrison (RB 79)"
+        ],
+        "Baltimore Colts": [
+          "CB: Jerry Hill (RB 75)"
+        ],
+        "St. Louis Cardinals": [
+          "CB: Joe Childress (RB 85)"
+        ],
+        "Minnesota Vikings": [
+          "CB: Bill Brown (RB 82)"
+        ],
+        "Detroit Lions": [
+          "CB: Danny Lewis (RB 76)",
+          "K: Tommy Watkins (RB 72)"
+        ],
+        "San Francisco 49ers": [
+          "CB: Don Lisbon (RB 78)"
+        ]
+      },
+      "gaps": {
+        "Detroit Lions": {
+          "CB": 1,
+          "K": 1
+        },
+        "Green Bay Packers": {
+          "K": 1
+        },
+        "Baltimore Colts": {
+          "CB": 1
+        },
+        "Minnesota Vikings": {
+          "CB": 1
+        },
+        "New York Giants": {
+          "CB": 1
+        },
+        "San Francisco 49ers": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1962",
+      "version": "pfa-afl-1962-464ab45e",
+      "season": "1962",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1962afl.html",
+      "retrieved": "2026-11-09",
+      "players": 324,
+      "map": "afl1962",
+      "spread": [
+        75,
+        82.4
+      ],
+      "clubs": [
+        "Houston Oilers 82.4 (11-3, 387–270)",
+        "Dallas Texans 80.6 (11-3, 389–233)",
+        "Denver Broncos 79.6 (7-7, 353–334)",
+        "Boston Patriots 78.1 (9-4-1, 346–295)",
+        "Buffalo Bills 76 (7-6-1, 309–272)",
+        "New York Titans 75.4 (5-9, 278–423)",
+        "San Diego Chargers 75.3 (4-10, 314–392)",
+        "Oakland Raiders 75 (1-13, 213–370)"
+      ],
+      "outOfPosition": {
+        "Houston Oilers": [
+          "K: Billy Cannon (RB 87)"
+        ],
+        "Boston Patriots": [
+          "WR: Tom Yewcic (QB 77)",
+          "WR: Jim Crawford (RB 77)"
+        ],
+        "Buffalo Bills": [
+          "K: Wray Carlton (RB 75)"
+        ],
+        "San Diego Chargers": [
+          "CB: Bob Jackson (RB 78)"
+        ],
+        "Oakland Raiders": [
+          "K: Bo Roberson (RB 83)"
+        ]
+      },
+      "gaps": {
+        "Buffalo Bills": {
+          "K": 1
+        },
+        "San Diego Chargers": {
+          "CB": 1
+        },
+        "Boston Patriots": {
+          "WR": 2
+        },
+        "Houston Oilers": {
+          "K": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1962",
+      "version": "pfa-1962-b3b47f5a",
+      "season": "1962",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1962nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 543,
+      "map": "nfl1961",
+      "spread": [
+        72.5,
+        85.2
+      ],
+      "clubs": [
+        "Green Bay Packers 85.2 (13-1, 415–148)",
+        "New York Giants 82 (12-2, 398–283)",
+        "Detroit Lions 80.7 (11-3, 315–177)",
+        "Chicago Bears 80.4 (9-5, 321–287)",
+        "Cleveland Browns 78.8 (7-6-1, 291–257)",
+        "Dallas Cowboys 78.7 (5-8-1, 398–402)",
+        "Pittsburgh Steelers 77.8 (9-5, 312–363)",
+        "Baltimore Colts 77.4 (7-7, 293–288)",
+        "Washington 76 (5-7-2, 305–376)",
+        "St. Louis Cardinals 75.9 (4-9-1, 287–361)",
+        "Minnesota Vikings 75.3 (2-11-1, 254–410)",
+        "Los Angeles Rams 75.1 (1-12-1, 220–334)",
+        "San Francisco 49ers 74.6 (6-8, 282–331)",
+        "Philadelphia Eagles 72.5 (3-10-1, 282–356)"
+      ],
+      "outOfPosition": {
+        "Green Bay Packers": [
+          "K: Tom Moore (RB 74)"
+        ],
+        "Detroit Lions": [
+          "CB: Wayne Walker (LB 82)",
+          "K: Danny Lewis (RB 79)"
+        ],
+        "Pittsburgh Steelers": [
+          "CB: Joe Womack (RB 78)"
+        ],
+        "Washington": [
+          "WR: Billy Ray Barnes (RB 81)"
+        ],
+        "San Francisco 49ers": [
+          "CB: Billy Kilmer (RB 78)"
+        ],
+        "Philadelphia Eagles": [
+          "CB: Clarence Peaks (RB 83)",
+          "K: Dick Lucas (TE 69)"
+        ]
+      },
+      "gaps": {
+        "Detroit Lions": {
+          "CB": 1,
+          "K": 1
+        },
+        "Green Bay Packers": {
+          "K": 1
+        },
+        "Philadelphia Eagles": {
+          "CB": 1,
+          "K": 1
+        },
+        "Pittsburgh Steelers": {
+          "CB": 1
+        },
+        "San Francisco 49ers": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1961",
+      "version": "pfa-afl-1961-c635aae0",
+      "season": "1961",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1961afl.html",
+      "retrieved": "2026-11-09",
+      "players": 326,
+      "map": "afl1961",
+      "spread": [
+        73.3,
+        82.5
+      ],
+      "clubs": [
+        "San Diego Chargers 82.5 (12-2, 396–219)",
+        "Houston Oilers 81.4 (10-3-1, 513–242)",
+        "Boston Patriots 80.2 (9-4-1, 413–313)",
+        "New York Titans 77.1 (7-7, 301–390)",
+        "Dallas Texans 76.8 (6-8, 334–343)",
+        "Buffalo Bills 76.3 (6-8, 294–342)",
+        "Oakland Raiders 75.6 (2-12, 237–458)",
+        "Denver Broncos 73.3 (3-11, 251–432)"
+      ],
+      "outOfPosition": {
+        "Houston Oilers": [
+          "WR: Charlie Tolar (RB 81)",
+          "K: Mike Dukes (LB 70)"
+        ],
+        "Dallas Texans": [
+          "K: Bo Dickinson (RB 77)"
+        ],
+        "Oakland Raiders": [
+          "CB: Wayne Crow (RB 78)"
+        ]
+      },
+      "gaps": {
+        "Oakland Raiders": {
+          "CB": 1
+        },
+        "Houston Oilers": {
+          "WR": 1,
+          "K": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1961",
+      "version": "pfa-1961-afcf6d97",
+      "season": "1961",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1961nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 546,
+      "map": "nfl1961",
+      "spread": [
+        73.3,
+        83.6
+      ],
+      "clubs": [
+        "Green Bay Packers 83.6 (11-3, 391–223)",
+        "New York Giants 82 (10-3-1, 368–211)",
+        "Cleveland Browns 80.9 (8-5-1, 319–270)",
+        "Chicago Bears 80.3 (8-6, 326–302)",
+        "Baltimore Colts 80.1 (8-6, 302–307)",
+        "San Francisco 49ers 79.7 (7-6-1, 346–272)",
+        "Detroit Lions 79.5 (8-5-1, 270–258)",
+        "Pittsburgh Steelers 77.2 (6-8, 295–287)",
+        "Philadelphia Eagles 77 (10-4, 361–297)",
+        "Minnesota Vikings 75.9 (3-11, 285–407)",
+        "Los Angeles Rams 75 (4-10, 263–333)",
+        "St. Louis Cardinals 74.9 (7-7, 279–267)",
+        "Dallas Cowboys 74.2 (4-9-1, 236–380)",
+        "Washington 73.3 (1-12-1, 174–392)"
+      ],
+      "outOfPosition": {
+        "New York Giants": [
+          "WR: Bob Gaiters (RB 80)"
+        ],
+        "Philadelphia Eagles": [
+          "WR: Ted Dean (RB 75)"
+        ],
+        "Washington": [
+          "K: Don Bosseler (RB 75)"
+        ]
+      },
+      "gaps": {
+        "New York Giants": {
+          "WR": 1
+        },
+        "Philadelphia Eagles": {
+          "WR": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-afl-1960",
+      "version": "pfa-afl-1960-11f15cb8",
+      "season": "1960",
+      "label": "AFL (computed)",
+      "league": "AFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1960afl.html",
+      "retrieved": "2026-11-09",
+      "players": 358,
+      "map": "afl1960",
+      "spread": [
+        76.1,
+        80.3
+      ],
+      "clubs": [
+        "Houston Oilers 80.3 (10-4, 379–285)",
+        "Los Angeles Chargers 79.6 (10-4, 373–336)",
+        "New York Titans 78.4 (7-7, 382–399)",
+        "Dallas Texans 77.9 (8-6, 362–253)",
+        "Denver Broncos 77.7 (4-9-1, 309–393)",
+        "Buffalo Bills 77.3 (5-8-1, 296–303)",
+        "Oakland Raiders 77.3 (6-8, 319–388)",
+        "Boston Patriots 76.1 (5-9, 286–349)"
+      ],
+      "outOfPosition": {
+        "Houston Oilers": [
+          "WR: Billy Cannon (RB 86)"
+        ],
+        "New York Titans": [
+          "CB: Bill Mathis (RB 76)"
+        ],
+        "Dallas Texans": [
+          "K: Jack Spikes (RB 82)"
+        ],
+        "Oakland Raiders": [
+          "K: Tony Teresa (RB 84)"
+        ]
+      },
+      "gaps": {
+        "Dallas Texans": {
+          "K": 1
+        },
+        "New York Titans": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
+    },
+    {
+      "id": "pfa-1960",
+      "version": "pfa-1960-5a5211d3",
+      "season": "1960",
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1960nfl.html",
+      "retrieved": "2026-11-09",
+      "players": 507,
+      "map": "nfl1960",
+      "spread": [
+        72.5,
+        84.2
+      ],
+      "clubs": [
+        "Cleveland Browns 84.2 (8-3-1, 362–217)",
+        "Green Bay Packers 81.3 (8-4, 332–209)",
+        "Baltimore Colts 81 (6-6, 288–234)",
+        "Detroit Lions 78.4 (7-5, 239–212)",
+        "St. Louis Cardinals 77.9 (6-5-1, 288–230)",
+        "Philadelphia Eagles 77.8 (10-2, 321–246)",
+        "Los Angeles Rams 77.6 (4-7-1, 265–297)",
+        "Chicago Bears 77.5 (5-6-1, 194–299)",
+        "Pittsburgh Steelers 77.3 (5-6-1, 240–275)",
+        "New York Giants 76.7 (6-4-2, 271–261)",
+        "Washington 75.7 (1-9-2, 178–309)",
+        "San Francisco 49ers 75.3 (7-5, 208–205)",
+        "Dallas Cowboys 72.5 (0-11-1, 177–369)"
+      ],
+      "outOfPosition": {
+        "Cleveland Browns": [
+          "CB: Bobby Mitchell (RB 87)"
+        ],
+        "Green Bay Packers": [
+          "K: Paul Hornung (RB 93)"
+        ],
+        "Philadelphia Eagles": [
+          "WR: Clarence Peaks (RB 75)",
+          "CB: Ted Dean (RB 73)"
+        ],
+        "Pittsburgh Steelers": [
+          "K: John Henry Johnson (RB 82)"
+        ],
+        "Washington": [
+          "CB: Don Bosseler (RB 79)"
+        ],
+        "San Francisco 49ers": [
+          "CB: Hugh McElhenny (RB 75)"
+        ],
+        "Dallas Cowboys": [
+          "CB: Don McIlhenny (RB 74)"
+        ]
+      },
+      "gaps": {
+        "Cleveland Browns": {
+          "CB": 1
+        },
+        "Dallas Cowboys": {
+          "CB": 1
+        },
+        "Green Bay Packers": {
+          "K": 1
+        },
+        "Philadelphia Eagles": {
+          "WR": 1,
+          "CB": 1
+        },
+        "Pittsburgh Steelers": {
+          "K": 1
+        },
+        "San Francisco 49ers": {
+          "CB": 1
+        },
+        "Washington": {
+          "CB": 1
+        }
+      },
+      "calibration": 0.7567
     }
   ]
 }

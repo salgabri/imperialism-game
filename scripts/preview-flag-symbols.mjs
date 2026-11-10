@@ -28,6 +28,10 @@ const fixtures = [
   ['Canada', 'ca', ['124']], ['Brazil', 'br', ['076']], ['Albania', 'al', ['008']],
   ['Montenegro', 'me', ['499']], ['Slovakia', 'sk', ['703']], ['Slovenia', 'si', ['705']],
   ['Moldova', 'md', ['498']], ['Kosovo', 'xk', ['KOS']], ['Kazakhstan', 'kz', ['398']],
+  // Federations of the day (src/data/footballFederations.js): the holder and the shapes it holds.
+  ['Soviet Union', 'su', ['643', '804', '112', '268', '051', '031', '398', '860', '795', '762', '417', '498', '233', '428', '440']],
+  ['CIS (1992)', 'cis-1992', ['643', '804', '112', '268', '051', '031', '398', '860', '795', '762', '417', '498']],
+  ['Yugoslavia', 'yu', ['688', '191', '705', '070', '807', '499', 'KOS']], ['Zaire', 'zr', ['180']],
 ];
 const cards = [];
 for (const [title, code, countries] of fixtures) {

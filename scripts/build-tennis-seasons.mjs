@@ -12,7 +12,9 @@
 // A season fields the cup nations of its day (the Davis Cup's, the Fed Cup's): each nation's five best by Elo, a rating
 // being the Elo on the game's scale (Elo / 25 + 4, rounded, as the 2026 season), shifted down for the whole season when
 // its best player would be over 99 (scripts/lib/tennis-seasons.mjs). Every Elo is the source's: Tennis Abstract's own
-// for 2016-2025, computed from Jeff Sackmann's match results by Tennis Abstract's method for 1973-2015.
+// for 2016-2025, computed from Jeff Sackmann's match results by Tennis Abstract's method for 1973-2015 (the women's from
+// 1968), and for the men's 1960-1972 by a second run warmed up on his amateur file (the snapshots' `run: 'early'`;
+// 1960-1967 are the amateurs' alone, `seasons.amateur`).
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -71,6 +73,7 @@ function buildSeason(snapshot, manifest) {
   const rules = manifest.nations;
   const report = manifest.reports.find(entry => entry.season === year) ?? null;
   const rough = year >= manifest.seasons.rough[0] && year <= manifest.seasons.rough[1];
+  const amateurs = !!manifest.seasons.amateur && year >= manifest.seasons.amateur[0] && year <= manifest.seasons.amateur[1];
   const players = playersOf(snapshot, manifest, report);
   const names = new Set();
   for (const player of players) {
@@ -83,16 +86,20 @@ function buildSeason(snapshot, manifest) {
   const fielded = new Set(nations.map(nation => nation.id));
   const territory = territoryOf(year, fielded, rules);
   const label = report ? report.label ?? `Tennis Abstract Elo, ${MONTHS[Number(report.updated.slice(5, 7)) - 1]} ${report.updated.slice(0, 4)}`
-    : `Elo from match results, end of ${year}${rough ? ' (rough)' : ''}`;
+    : `${amateurs ? 'Amateur Elo' : 'Elo from match results'}, end of ${year}${rough ? ' (rough)' : ''}`;
   const licence = manifest.licence.name;
+  // The seasons before 1973 say which run made them: the method warmed up on the amateur file, the amateurs' alone to 1967.
+  const method = snapshot.run === 'early'
+    ? `Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup results of 1877-1967 (docs/design/tennis.md, "Before 1973")`
+    : `Tennis Abstract's published Elo method (docs/design/${tourId === 'wta' ? 'womens-tennis' : 'tennis'}.md, "Earlier seasons")`;
   const source = report
     ? { edition: 'Tennis Abstract Elo', name: 'Tennis Abstract (Jeff Sackmann)', snapshotDate: report.updated, retrieved: manifest.archive.retrieved,
       url: `https://web.archive.org/web/${report.capture}/${report.original}`, rawScale: 'Elo', method: report.method ?? 'current', licence,
       listed: snapshot.listed, rated: snapshot.rated, ...(shift ? { shift } : {}) }
     : { edition: 'Elo from match results', name: tour.results, snapshotDate: snapshot.date,
       retrieved: manifest.archive.retrieved, url: `${manifest.archive.repository}/tree/${manifest.archive.commit}`, rawScale: 'Elo', computed: true,
-      method: `Tennis Abstract's published Elo method (docs/design/${tourId === 'wta' ? 'womens-tennis' : 'tennis'}.md, "Earlier seasons")`, licence, rated: snapshot.rated,
-      ...(shift ? { shift } : {}), ...(rough ? { rough: true } : {}) };
+      method, licence, rated: snapshot.rated,
+      ...(shift ? { shift } : {}), ...(rough ? { rough: true } : {}), ...(amateurs ? { amateurs: true } : {}) };
   const doc = {
     format: 1, kind: tour.kind, id: seasonId(year), version: '', year, season: String(year), label, local: false, source,
     nations: Object.fromEntries(nations.map(nation => [nation.id, [nation.str, nation.players, nation.squad.map(tupleOf)]])),
@@ -113,7 +120,8 @@ function buildSeason(snapshot, manifest) {
   }
   const top = players.slice(0, 5).map(player => `${player.name} ${player.code} ${player.elo} → ${gameRating(player.elo) - shift}`);
   const audit = {
-    id: doc.id, version: doc.version, label, kind: snapshot.kind, date: source.snapshotDate, rated: snapshot.rated,
+    id: doc.id, version: doc.version, label, kind: snapshot.kind, ...(snapshot.run ? { run: snapshot.run, activity: snapshot.activity } : {}),
+    date: source.snapshotDate, rated: snapshot.rated,
     ...(snapshot.kind === 'published' ? { listed: snapshot.listed, leftOffTheList: snapshot.left.map(([key, name, why]) => `${name}: ${why}`) } : {}),
     shift, over99: players.filter(player => gameRating(player.elo) > 99).map(player => `${player.name} ${player.elo} (${gameRating(player.elo)})`),
     top,
@@ -147,8 +155,9 @@ ${rows.join('\n')}
 }
 
 function attributionText(manifest) {
-  const { archive, licence } = manifest;
-  return tourId === 'wta' ? `Women's tennis seasons 1973-2025 (wta-<year>.json): attribution and licence
+  const { archive, licence, seasons } = manifest;
+  const [first] = seasons.early ?? seasons.computed;
+  return tourId === 'wta' ? `Women's tennis seasons ${first}-2025 (wta-<year>.json): attribution and licence
 ===========================================================================
 
 The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived from his data.
@@ -156,7 +165,7 @@ The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived
 - 2016-2025: Tennis Abstract's own year-end WTA Elo reports (https://tennisabstract.com/reports/wta_elo_ratings.html),
   read from the Internet Archive's Wayback Machine captures named in each file's source; each woman's country from
   Tennis Abstract's WTA rankings report of the nearest date.
-- 1973-2015: Elo computed by this project from Jeff Sackmann's WTA match results
+- ${seasons.computed[0]}-2015: Elo computed by this project from Jeff Sackmann's WTA match results
   (${archive.upstream}, as archived at ${archive.repository}, commit ${archive.commit})
   by the method Tennis Abstract has published; see docs/design/womens-tennis.md, "Earlier seasons". These are not
   Tennis Abstract's own numbers.
@@ -164,7 +173,7 @@ The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived
 Credit: ${licence.credit}.
 Licence: ${licence.name} (${licence.url}). ${licence.terms}
 Non-commercial: these files may not be used for commercial purposes.
-` : `Tennis seasons 1973-2025 (tennis-<year>.json): attribution and licence
+` : `Tennis seasons ${first}-2025 (tennis-<year>.json): attribution and licence
 =====================================================================
 
 The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived from his data.
@@ -172,10 +181,13 @@ The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived
 - 2016-2025: Tennis Abstract's own year-end ATP Elo reports (https://tennisabstract.com/reports/atp_elo_ratings.html),
   read from the Internet Archive's Wayback Machine captures named in each file's source; each man's country from
   Tennis Abstract's ATP rankings report of the nearest date.
-- 1973-2015: Elo computed by this project from Jeff Sackmann's ATP match results
+- ${seasons.computed[0]}-2015: Elo computed by this project from Jeff Sackmann's ATP match results
   (${archive.upstream}, as mirrored at ${archive.repository}, commit ${archive.commit})
   by the method Tennis Abstract has published; see docs/design/tennis.md, "Earlier seasons". These are not Tennis
-  Abstract's own numbers.
+  Abstract's own numbers.${seasons.early ? `
+- ${seasons.early[0]}-${seasons.early[1]}: Elo computed the same way from the same repository's match results, warmed up on its file of
+  the amateur era's majors and Davis Cup ties (${manifest.method.early.file}, 1877-1967); ${seasons.amateur[0]}-${seasons.amateur[1]} list the
+  amateurs of that file alone. See docs/design/tennis.md, "Before 1973".` : ''}
 
 Credit: ${licence.credit}.
 Licence: ${licence.name} (${licence.url}). ${licence.terms}
@@ -188,7 +200,7 @@ async function main() {
   const manifest = JSON.parse(await readFile(path.join(root, tour.manifest), 'utf8'));
   const validation = JSON.parse(await readFile(path.join(root, tour.snapshots, 'validation.json'), 'utf8'));
   const years = [];
-  for (let year = manifest.seasons.computed[0]; year <= manifest.seasons.published[1]; year++) years.push(year);
+  for (let year = (manifest.seasons.early ?? manifest.seasons.computed)[0]; year <= manifest.seasons.published[1]; year++) years.push(year);
   const results = [];
   for (const year of years) {
     const file = path.join(root, tour.snapshots, `${year}.json`);
@@ -204,7 +216,10 @@ async function main() {
   }
   const audit = {
     generatedBy: `scripts/build-tennis-seasons.mjs${tourId === 'atp' ? '' : ` --tour=${tourId}`}`, licence: manifest.licence,
-    method: { ...manifest.method, targets: undefined }, validation,
+    // The method without its fit targets, and the early run's without its alias list (the manifest keeps both).
+    method: { ...manifest.method, targets: undefined,
+      ...(manifest.method.early ? { early: { ...manifest.method.early, aliases: { note: manifest.method.early.aliases.note, pairs: manifest.method.early.aliases.items.length } } } : {}) },
+    validation,
     shifted: results.filter(result => result.audit.shift).map(result => `${result.doc.season}: ${result.audit.shift} (${result.audit.over99.join(', ')})`),
     seasons: results.map(result => result.audit),
   };

@@ -1,14 +1,50 @@
 {
-  "note": "The built-in earlier American football seasons: 1990 and 1992 to 1995 (the Tecmo Super Bowl games) and 2001 (Madden NFL 2002) to 2025 (Madden NFL 26). A Madden season is its edition's NFL rosters at launch, from copies made at the time (EA's ratings services today serve rewritten launch iterations): npm run sync:madden-seasons reads the pinned sources (`sources`: copies kept in the gitignored data-src/madden-seasons/<season>/, each file by its SHA-256; `checks` are second sources it compares with) into scripts/data/madden-seasons/<season>.json. A Tecmo season (`kind` tecmo) is built from scripts/data/tecmo/<season>.json, which npm run sync:tecmo makes and pins (its overall is ours: docs/design/american-football.md). npm run build:nfl-seasons builds each season's clubs from those snapshots (a source's `id` names its data set, else madden-<season>), and npm run build:nfl-map each era's map from `teams` and `maps`. `teams` lists, by today's club (scripts/data/nfl-teams.json), the seasons in which a franchise played under another name or elsewhere: such an era keeps today's id, name, code and city unless it names its own; one that names a stadium replaces today's venue whole (a franchise that shares its stadium grows from its training base, `base`, as on today's map); one that is `absent` leaves the franchise out (before an expansion franchise's first season, and the Browns' three seasons without a club). A club plays where it played its home games that season (most of them, when it moved during one). A stadium the club still plays in keeps its present name; one it has left is named as it was best known in those seasons. Washington's club before 2020 is named Washington: its name then was a slur the league has since retired.",
+  "note": "The built-in earlier American football seasons: every NFL season from 1960 to 2025, and the AFL's of 1960 to 1969 (`afl`). 1990 and 1992 to 1995 are the Tecmo Super Bowl games', 2001 (Madden NFL 2002) to 2025 (Madden NFL 26) Madden's launch rosters, and the seasons no game rated, 1960 to 1989, 1991 and 1996 to 2000 and the AFL's, are computed from Pro Football Archives' facts (`kind` pfa: npm run sync:pfa, scripts/data/pfa-seasons/<season>.json, its pages pinned in scripts/data/pfa-pages.json). A Madden season is its edition's NFL rosters at launch, from copies made at the time (EA's ratings services today serve rewritten launch iterations): npm run sync:madden-seasons reads the pinned sources (`sources`: copies kept in the gitignored data-src/madden-seasons/<season>/, each file by its SHA-256; `checks` are second sources it compares with) into scripts/data/madden-seasons/<season>.json. A Tecmo season (`kind` tecmo) is built from scripts/data/tecmo/<season>.json, which npm run sync:tecmo makes and pins (its overall is ours: docs/design/american-football.md). npm run build:nfl-seasons builds each season's clubs from those snapshots (a source's `id` names its data set, else madden-<season>), and npm run build:nfl-map each era's map from `teams` and `maps`. `teams` lists, by today's club (scripts/data/nfl-teams.json), the seasons in which a franchise played under another name or elsewhere: such an era keeps today's id, name, code and city unless it names its own; one that names a stadium replaces today's venue whole (a franchise that shares its stadium grows from its training base, `base`, as on today's map); one that is `absent` leaves the franchise out (before an expansion franchise's first season, and the Browns' three seasons without a club). A club plays where it played its home games that season (most of them, when it moved during one; the computed seasons' sync checks each against Pro Football Archives' scores, leaving out the Packers' games in Milwaukee). An era of the AFL's, before the 1970 merger, says so (`league` AFL): its club plays only in AFL seasons, on the AFL's maps. Stadiums the franchise research of 1980–2025 has no point for are placed from their Wikipedia articles. A stadium the club still plays in keeps its present name; one it has left is named as it was best known in those seasons. Washington's club before 2020 is named Washington: its name then was a slur the league has since retired.",
   "source": {"name":"Madden NFL","provider":"EA Sports","rawScale":99},
   "builtIn": {"year":2026,"edition":"Madden NFL 27"},
-  "seasons": [1990,1992,1993,1994,1995,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
+  "seasons": [1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971,1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
   "sources": {
+    "1960": {"id":"pfa-1960","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1960.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1960nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1961": {"id":"pfa-1961","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1961.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1961nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1962": {"id":"pfa-1962","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1962.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1962nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1963": {"id":"pfa-1963","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1963.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1963nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1964": {"id":"pfa-1964","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1964.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1964nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1965": {"id":"pfa-1965","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1965.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1965nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1966": {"id":"pfa-1966","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1966.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1966nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1967": {"id":"pfa-1967","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1967.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1967nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1968": {"id":"pfa-1968","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1968.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1968nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1969": {"id":"pfa-1969","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1969.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1969nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1970": {"id":"pfa-1970","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1970.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1970nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1971": {"id":"pfa-1971","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1971.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1971nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1972": {"id":"pfa-1972","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1972.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1972nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1973": {"id":"pfa-1973","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1973.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1973nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1974": {"id":"pfa-1974","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1974.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1974nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1975": {"id":"pfa-1975","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1975.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1975nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1976": {"id":"pfa-1976","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1976.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1976nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1977": {"id":"pfa-1977","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1977.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1977nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1978": {"id":"pfa-1978","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1978.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1978nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1979": {"id":"pfa-1979","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1979.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1979nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1980": {"id":"pfa-1980","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1980.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1980nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1981": {"id":"pfa-1981","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1981.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1981nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1982": {"id":"pfa-1982","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1982.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1982nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1983": {"id":"pfa-1983","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1983.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1983nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1984": {"id":"pfa-1984","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1984.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1984nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1985": {"id":"pfa-1985","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1985.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1985nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1986": {"id":"pfa-1986","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1986.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1986nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1987": {"id":"pfa-1987","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1987.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1987nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1988": {"id":"pfa-1988","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1988.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1988nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1989": {"id":"pfa-1989","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1989.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1989nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
     "1990": {"id":"tecmo-1990","kind":"tecmo","label":"Tecmo Super Bowl (NES)","snapshot":"scripts/data/tecmo/1990.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from Tecmo Geek's ratings and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
+    "1991": {"id":"pfa-1991","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1991.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1991nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
     "1992": {"id":"tecmo-1992","kind":"tecmo","label":"Tecmo Super Bowl II","snapshot":"scripts/data/tecmo/1992.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from the NFTGL's TSB III weighting without agility and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
     "1993": {"id":"tecmo-1993","kind":"tecmo","label":"Tecmo Super Bowl (SNES)","snapshot":"scripts/data/tecmo/1993.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from Tecmo Geek's NES weights and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
     "1994": {"id":"tecmo-1994","kind":"tecmo","label":"Tecmo Super Bowl II","snapshot":"scripts/data/tecmo/1994.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from the NFTGL's TSB III weighting without agility and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
     "1995": {"id":"tecmo-1995","kind":"tecmo","label":"Tecmo Super Bowl III","snapshot":"scripts/data/tecmo/1995.json","compiler":"BAD-AL/tsbtools (the roster dump); the overall ours, from the NFTGL's weighting (The Book of Armaments) and Madden NFL 2002 (maddenratings.net); names from nflverse","retrieved":"2026-11-08"},
+    "1996": {"id":"pfa-1996","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1996.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1996nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1997": {"id":"pfa-1997","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1997.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1997nfl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+    "1998": {"id":"pfa-1998","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1998.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1998nfl.html","retrieved":"2026-11-10","pins":"scripts/data/pfa-pages.json"},
+    "1999": {"id":"pfa-1999","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/1999.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1999nfl.html","retrieved":"2026-11-10","pins":"scripts/data/pfa-pages.json"},
+    "2000": {"id":"pfa-2000","kind":"pfa","league":"NFL","label":"NFL (computed)","snapshot":"scripts/data/pfa-seasons/2000.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/2000nfl.html","retrieved":"2026-11-10","pins":"scripts/data/pfa-pages.json"},
     "2001": {
       "edition": "Madden NFL 2002",
       "kind": "maddenratings",
@@ -1056,112 +1092,223 @@
       ]
     }
   },
+  "afl": {
+    "note": "The American Football League's ten seasons before the 1970 merger, computed as the NFL's of those years are (`kind` pfa, ids pfa-afl-<season>), each on an AFL map of its own: the AFL's clubs only, whose eras in `teams` carry `league` AFL. An NFL season never fields an AFL club, nor an AFL season an NFL one.",
+    "seasons": [1960,1961,1962,1963,1964,1965,1966,1967,1968,1969],
+    "sources": {
+      "1960": {"id":"pfa-afl-1960","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1960.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1960afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1961": {"id":"pfa-afl-1961","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1961.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1961afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1962": {"id":"pfa-afl-1962","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1962.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1962afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1963": {"id":"pfa-afl-1963","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1963.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1963afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1964": {"id":"pfa-afl-1964","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1964.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1964afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1965": {"id":"pfa-afl-1965","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1965.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1965afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1966": {"id":"pfa-afl-1966","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1966.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1966afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1967": {"id":"pfa-afl-1967","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1967.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1967afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1968": {"id":"pfa-afl-1968","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1968.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1968afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"},
+      "1969": {"id":"pfa-afl-1969","kind":"pfa","league":"AFL","label":"AFL (computed)","snapshot":"scripts/data/pfa-seasons/afl-1969.json","compiler":"Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)","url":"https://www.profootballarchives.com/1969afl.html","retrieved":"2026-11-09","pins":"scripts/data/pfa-pages.json"}
+    },
+    "maps": [
+      {"id":"afl1960","seasons":[1960]},
+      {"id":"afl1961","seasons":[1961]},
+      {"id":"afl1962","seasons":[1962]},
+      {"id":"afl1963","seasons":[1963]},
+      {"id":"afl1964","seasons":[1964]},
+      {"id":"afl1965","seasons":[1965]},
+      {"id":"afl1966","seasons":[1966]},
+      {"id":"afl1967","seasons":[1967]},
+      {"id":"afl1968","seasons":[1968]},
+      {"id":"afl1969","seasons":[1969]}
+    ]
+  },
   "teams": {
     "nfl-arizona-cardinals": [
-      {"to":1993,"id":"nfl-phoenix-cardinals","name":"Phoenix Cardinals","code":"PHO","city":"Phoenix","stadium":"Sun Devil Stadium","home":[-111.9325,33.4264]},
+      {"from":1960,"to":1965,"id":"nfl-st-louis-cardinals","name":"St. Louis Cardinals","code":"STL","city":"St. Louis","stadium":"Busch Stadium (Sportsman's Park)","home":[-90.22,38.658]},
+      {"from":1966,"to":1987,"id":"nfl-st-louis-cardinals","name":"St. Louis Cardinals","code":"STL","city":"St. Louis","stadium":"Busch Memorial Stadium","home":[-90.1925,38.6239]},
+      {"from":1988,"to":1993,"id":"nfl-phoenix-cardinals","name":"Phoenix Cardinals","code":"PHO","city":"Phoenix","stadium":"Sun Devil Stadium","home":[-111.9325,33.4264]},
       {"from":1994,"to":2005,"stadium":"Sun Devil Stadium","home":[-111.9325,33.4264]}
     ],
     "nfl-atlanta-falcons": [
-      {"to":1991,"stadium":"Atlanta–Fulton County Stadium","home":[-84.3894,33.7394]},
+      {"to":1965,"absent":true},
+      {"from":1966,"to":1991,"stadium":"Atlanta–Fulton County Stadium","home":[-84.3894,33.7394]},
       {"from":1992,"to":2016,"stadium":"Georgia Dome","home":[-84.4008,33.7575]}
     ],
     "nfl-baltimore-ravens": [
-      {"to":1995,"absent":true}
+      {"to":1995,"absent":true},
+      {"from":1996,"to":1997,"stadium":"Memorial Stadium, Baltimore","home":[-76.6014,39.3294]}
+    ],
+    "nfl-buffalo-bills": [
+      {"from":1960,"to":1969,"league":"AFL","stadium":"War Memorial Stadium","home":[-78.856,42.905]},
+      {"from":1970,"to":1972,"stadium":"War Memorial Stadium","home":[-78.856,42.905]}
     ],
     "nfl-carolina-panthers": [
       {"to":1994,"absent":true},
       {"from":1995,"to":1995,"stadium":"Memorial Stadium, Clemson","home":[-82.8431,34.6786]}
     ],
     "nfl-chicago-bears": [
+      {"from":1960,"to":1970,"stadium":"Wrigley Field","home":[-87.6556,41.9481]},
       {"from":2002,"to":2002,"stadium":"Memorial Stadium, Champaign","home":[-88.2358,40.0992]}
     ],
     "nfl-cincinnati-bengals": [
-      {"to":1999,"stadium":"Riverfront Stadium","home":[-84.5083,39.0967]}
+      {"to":1967,"absent":true},
+      {"from":1968,"to":1969,"league":"AFL","stadium":"Nippert Stadium","home":[-84.5162,39.1312]},
+      {"from":1970,"to":1999,"stadium":"Riverfront Stadium","home":[-84.5083,39.0967]}
     ],
     "nfl-cleveland-browns": [
       {"to":1995,"stadium":"Cleveland Municipal Stadium","home":[-81.6997,41.5058]},
       {"from":1996,"to":1998,"absent":true}
     ],
     "nfl-dallas-cowboys": [
-      {"to":2008,"stadium":"Texas Stadium","home":[-96.9109,32.8398]}
+      {"from":1960,"to":1970,"stadium":"Cotton Bowl","home":[-96.7597,32.7794]},
+      {"from":1971,"to":2008,"stadium":"Texas Stadium","home":[-96.9109,32.8398]}
     ],
     "nfl-denver-broncos": [
-      {"to":2000,"stadium":"Mile High Stadium","home":[-105.0217,39.7461]}
+      {"from":1960,"to":1969,"league":"AFL","stadium":"Mile High Stadium","home":[-105.0217,39.7461]},
+      {"from":1970,"to":2000,"stadium":"Mile High Stadium","home":[-105.0217,39.7461]}
     ],
     "nfl-detroit-lions": [
-      {"to":2001,"stadium":"Pontiac Silverdome","home":[-83.255,42.6458]}
+      {"from":1960,"to":1974,"stadium":"Tiger Stadium","home":[-83.0689,42.3319]},
+      {"from":1975,"to":2001,"stadium":"Pontiac Silverdome","home":[-83.255,42.6458]}
     ],
     "nfl-houston-texans": [
       {"to":2001,"absent":true}
     ],
     "nfl-indianapolis-colts": [
-      {"to":2007,"stadium":"RCA Dome","home":[-86.1633,39.7637]}
+      {"from":1960,"to":1983,"id":"nfl-baltimore-colts","name":"Baltimore Colts","code":"BAL","city":"Baltimore","stadium":"Memorial Stadium, Baltimore","home":[-76.6014,39.3294]},
+      {"from":1984,"to":2007,"stadium":"RCA Dome","home":[-86.1633,39.7637]}
     ],
     "nfl-jacksonville-jaguars": [
       {"to":1994,"absent":true}
     ],
+    "nfl-kansas-city-chiefs": [
+      {"from":1960,"to":1962,"league":"AFL","id":"nfl-dallas-texans","name":"Dallas Texans","code":"DTX","city":"Dallas","stadium":"Cotton Bowl","home":[-96.7597,32.7794]},
+      {"from":1963,"to":1969,"league":"AFL","stadium":"Municipal Stadium, Kansas City","home":[-94.558,39.087]},
+      {"from":1970,"to":1971,"stadium":"Municipal Stadium, Kansas City","home":[-94.558,39.087]}
+    ],
     "nfl-las-vegas-raiders": [
-      {"to":1994,"id":"nfl-los-angeles-raiders","name":"Los Angeles Raiders","code":"RAI","city":"Los Angeles (Raiders)","stadium":"Los Angeles Memorial Coliseum","home":[-118.2878,34.0142]},
+      {"from":1960,"to":1960,"league":"AFL","id":"nfl-oakland-raiders","name":"Oakland Raiders","code":"OAK","city":"Oakland","stadium":"Kezar Stadium","home":[-122.456,37.767]},
+      {"from":1961,"to":1961,"league":"AFL","id":"nfl-oakland-raiders","name":"Oakland Raiders","code":"OAK","city":"Oakland","stadium":"Candlestick Park","home":[-122.3861,37.7136]},
+      {"from":1962,"to":1965,"league":"AFL","id":"nfl-oakland-raiders","name":"Oakland Raiders","code":"OAK","city":"Oakland","stadium":"Frank Youell Field","home":[-122.263,37.794]},
+      {"from":1966,"to":1969,"league":"AFL","id":"nfl-oakland-raiders","name":"Oakland Raiders","code":"OAK","city":"Oakland","stadium":"Oakland–Alameda County Coliseum","home":[-122.2006,37.7517]},
+      {"from":1970,"to":1981,"id":"nfl-oakland-raiders","name":"Oakland Raiders","code":"OAK","city":"Oakland","stadium":"Oakland–Alameda County Coliseum","home":[-122.2006,37.7517]},
+      {"from":1982,"to":1994,"id":"nfl-los-angeles-raiders","name":"Los Angeles Raiders","code":"RAI","city":"Los Angeles (Raiders)","stadium":"Los Angeles Memorial Coliseum","home":[-118.2878,34.0142]},
       {"from":1995,"to":2019,"id":"nfl-oakland-raiders","name":"Oakland Raiders","code":"OAK","city":"Oakland","stadium":"Oakland–Alameda County Coliseum","home":[-122.2006,37.7517]}
     ],
     "nfl-los-angeles-chargers": [
-      {"to":2016,"id":"nfl-san-diego-chargers","name":"San Diego Chargers","code":"SDC","city":"San Diego","stadium":"Qualcomm Stadium","home":[-117.1194,32.7831]},
+      {"from":1960,"to":1960,"league":"AFL","city":"Los Angeles","stadium":"Los Angeles Memorial Coliseum","home":[-118.2878,34.0142]},
+      {"from":1961,"to":1966,"league":"AFL","id":"nfl-san-diego-chargers","name":"San Diego Chargers","code":"SDC","city":"San Diego","stadium":"Balboa Stadium","home":[-117.1506,32.7208]},
+      {"from":1967,"to":1969,"league":"AFL","id":"nfl-san-diego-chargers","name":"San Diego Chargers","code":"SDC","city":"San Diego","stadium":"Qualcomm Stadium","home":[-117.1194,32.7831]},
+      {"from":1970,"to":2016,"id":"nfl-san-diego-chargers","name":"San Diego Chargers","code":"SDC","city":"San Diego","stadium":"Qualcomm Stadium","home":[-117.1194,32.7831]},
       {"from":2017,"to":2019,"stadium":"StubHub Center","home":[-118.2611,33.8644]},
       {"from":2020,"to":2023,"stadium":"SoFi Stadium","base":"Jack Hammett Sports Complex, Costa Mesa","home":[-117.9052,33.6737]}
     ],
     "nfl-los-angeles-rams": [
-      {"to":1994,"stadium":"Anaheim Stadium","home":[-117.8828,33.8003]},
+      {"from":1960,"to":1979,"stadium":"Los Angeles Memorial Coliseum","home":[-118.2878,34.0142]},
+      {"from":1980,"to":1994,"stadium":"Anaheim Stadium","home":[-117.8828,33.8003]},
       {"from":1995,"to":2015,"id":"nfl-st-louis-rams","name":"St. Louis Rams","code":"STL","city":"St. Louis","stadium":"Edward Jones Dome","home":[-90.1886,38.6328]},
       {"from":2016,"to":2019,"stadium":"Los Angeles Memorial Coliseum","home":[-118.2878,34.0142]},
       {"from":2020,"to":2023,"stadium":"SoFi Stadium","base":"California Lutheran University, Thousand Oaks","home":[-118.8789,34.2247]}
     ],
+    "nfl-miami-dolphins": [
+      {"to":1965,"absent":true},
+      {"from":1966,"to":1969,"league":"AFL","stadium":"Miami Orange Bowl","home":[-80.2198,25.7781]},
+      {"from":1970,"to":1986,"stadium":"Miami Orange Bowl","home":[-80.2198,25.7781]}
+    ],
     "nfl-minnesota-vikings": [
-      {"to":2013,"stadium":"Hubert H. Humphrey Metrodome","home":[-93.2581,44.9739]},
+      {"to":1960,"absent":true},
+      {"from":1961,"to":1981,"stadium":"Metropolitan Stadium","home":[-93.2419,44.8544]},
+      {"from":1982,"to":2013,"stadium":"Hubert H. Humphrey Metrodome","home":[-93.2581,44.9739]},
       {"from":2014,"to":2015,"stadium":"TCF Bank Stadium","home":[-93.2244,44.9764]}
     ],
     "nfl-new-england-patriots": [
-      {"to":2001,"stadium":"Foxboro Stadium","home":[-71.2674,42.0927]}
+      {"from":1960,"to":1962,"league":"AFL","id":"nfl-boston-patriots","name":"Boston Patriots","code":"BOS","city":"Boston","stadium":"Nickerson Field","home":[-71.119,42.353]},
+      {"from":1963,"to":1968,"league":"AFL","id":"nfl-boston-patriots","name":"Boston Patriots","code":"BOS","city":"Boston","stadium":"Fenway Park","home":[-71.0978,42.3464]},
+      {"from":1969,"to":1969,"league":"AFL","id":"nfl-boston-patriots","name":"Boston Patriots","code":"BOS","city":"Boston","stadium":"Alumni Stadium","home":[-71.1664,42.335]},
+      {"from":1970,"to":1970,"id":"nfl-boston-patriots","name":"Boston Patriots","code":"BOS","city":"Boston","stadium":"Harvard Stadium","home":[-71.1272,42.3664]},
+      {"from":1971,"to":2001,"stadium":"Foxboro Stadium","home":[-71.2674,42.0927]}
     ],
     "nfl-new-orleans-saints": [
+      {"to":1966,"absent":true},
+      {"from":1967,"to":1974,"stadium":"Tulane Stadium","home":[-90.1175,29.9428]},
       {"from":2005,"to":2005,"stadium":"Tiger Stadium, Baton Rouge","home":[-91.1856,30.4119]}
     ],
     "nfl-new-york-giants": [
-      {"to":2009,"stadium":"Giants Stadium","base":"Giants Stadium, East Rutherford","home":[-74.0769,40.8122]}
+      {"from":1960,"to":1972,"stadium":"Yankee Stadium","home":[-73.9281,40.8269]},
+      {"from":1973,"to":1974,"stadium":"Yale Bowl","home":[-72.96,41.313]},
+      {"from":1975,"to":1975,"stadium":"Shea Stadium","home":[-73.8481,40.7556]},
+      {"from":1976,"to":2009,"stadium":"Giants Stadium","base":"Giants Stadium, East Rutherford","home":[-74.0769,40.8122]}
     ],
     "nfl-new-york-jets": [
-      {"to":2007,"stadium":"Giants Stadium","base":"Hofstra University, Hempstead","home":[-73.6005,40.7146]},
+      {"from":1960,"to":1962,"league":"AFL","id":"nfl-new-york-titans","name":"New York Titans","code":"NYT","city":"New York","stadium":"Polo Grounds","home":[-73.9372,40.8317]},
+      {"from":1963,"to":1963,"league":"AFL","city":"New York","stadium":"Polo Grounds","home":[-73.9372,40.8317]},
+      {"from":1964,"to":1969,"league":"AFL","city":"New York","stadium":"Shea Stadium","home":[-73.8481,40.7556]},
+      {"from":1970,"to":1974,"stadium":"Shea Stadium","home":[-73.8481,40.7556]},
+      {"from":1975,"to":1975,"stadium":"Shea Stadium","base":"Hofstra University, Hempstead","home":[-73.6005,40.7146]},
+      {"from":1976,"to":1983,"stadium":"Shea Stadium","home":[-73.8481,40.7556]},
+      {"from":1984,"to":2007,"stadium":"Giants Stadium","base":"Hofstra University, Hempstead","home":[-73.6005,40.7146]},
       {"from":2008,"to":2009,"stadium":"Giants Stadium","base":"Atlantic Health Jets Training Center, Florham Park","home":[-74.385,40.787]}
     ],
     "nfl-philadelphia-eagles": [
-      {"to":2002,"stadium":"Veterans Stadium","home":[-75.1711,39.9067]}
+      {"from":1960,"to":1970,"stadium":"Franklin Field","home":[-75.19,39.95]},
+      {"from":1971,"to":2002,"stadium":"Veterans Stadium","home":[-75.1711,39.9067]}
     ],
     "nfl-pittsburgh-steelers": [
-      {"to":2000,"stadium":"Three Rivers Stadium","home":[-80.0128,40.4467]}
+      {"from":1960,"to":1963,"stadium":"Forbes Field","home":[-79.9542,40.4419]},
+      {"from":1964,"to":1969,"stadium":"Pitt Stadium","home":[-79.962,40.444]},
+      {"from":1970,"to":2000,"stadium":"Three Rivers Stadium","home":[-80.0128,40.4467]}
     ],
     "nfl-san-francisco-49ers": [
-      {"to":2013,"stadium":"Candlestick Park","home":[-122.3861,37.7136]}
+      {"from":1960,"to":1970,"stadium":"Kezar Stadium","home":[-122.456,37.767]},
+      {"from":1971,"to":2013,"stadium":"Candlestick Park","home":[-122.3861,37.7136]}
     ],
     "nfl-seattle-seahawks": [
-      {"to":1999,"stadium":"Kingdome","home":[-122.3331,47.5956]},
+      {"to":1975,"absent":true},
+      {"from":1976,"to":1999,"stadium":"Kingdome","home":[-122.3331,47.5956]},
       {"from":2000,"to":2001,"stadium":"Husky Stadium","home":[-122.3017,47.6503]}
     ],
     "nfl-tampa-bay-buccaneers": [
-      {"to":1997,"stadium":"Tampa Stadium","home":[-82.5036,27.9789]}
+      {"to":1975,"absent":true},
+      {"from":1976,"to":1997,"stadium":"Tampa Stadium","home":[-82.5036,27.9789]}
     ],
     "nfl-tennessee-titans": [
-      {"to":1996,"id":"nfl-houston-oilers","name":"Houston Oilers","code":"HOU","city":"Houston","stadium":"Houston Astrodome","home":[-95.4078,29.685]}
+      {"from":1960,"to":1964,"league":"AFL","id":"nfl-houston-oilers","name":"Houston Oilers","code":"HOU","city":"Houston","stadium":"Jeppesen Stadium","home":[-95.3492,29.7219]},
+      {"from":1965,"to":1967,"league":"AFL","id":"nfl-houston-oilers","name":"Houston Oilers","code":"HOU","city":"Houston","stadium":"Rice Stadium","home":[-95.4092,29.7164]},
+      {"from":1968,"to":1969,"league":"AFL","id":"nfl-houston-oilers","name":"Houston Oilers","code":"HOU","city":"Houston","stadium":"Houston Astrodome","home":[-95.4078,29.685]},
+      {"from":1970,"to":1996,"id":"nfl-houston-oilers","name":"Houston Oilers","code":"HOU","city":"Houston","stadium":"Houston Astrodome","home":[-95.4078,29.685]},
+      {"from":1997,"to":1997,"id":"nfl-tennessee-oilers","name":"Tennessee Oilers","code":"TEN","city":"Tennessee","stadium":"Liberty Bowl Memorial Stadium","home":[-89.9775,35.1211]},
+      {"from":1998,"to":1998,"id":"nfl-tennessee-oilers","name":"Tennessee Oilers","code":"TEN","city":"Tennessee","stadium":"Vanderbilt Stadium","home":[-86.8089,36.1442]}
     ],
     "nfl-washington-commanders": [
-      {"to":1996,"id":"nfl-washington","name":"Washington","stadium":"RFK Stadium","home":[-76.9719,38.89]},
+      {"from":1960,"to":1960,"id":"nfl-washington","name":"Washington","stadium":"Griffith Stadium","home":[-77.0203,38.9175]},
+      {"from":1961,"to":1996,"id":"nfl-washington","name":"Washington","stadium":"RFK Stadium","home":[-76.9719,38.89]},
       {"from":1997,"to":2019,"id":"nfl-washington","name":"Washington"},
       {"from":2020,"to":2021,"id":"nfl-washington-football-team","name":"Washington Football Team"}
     ]
   },
   "maps": [
-    {"id":"nfl1990","seasons":[1990]},
+    {"id":"nfl1960","seasons":[1960]},
+    {"id":"nfl1961","seasons":[1961,1962,1963]},
+    {"id":"nfl1964","seasons":[1964,1965]},
+    {"id":"nfl1966","seasons":[1966]},
+    {"id":"nfl1967","seasons":[1967,1968,1969]},
+    {"id":"nfl1970","seasons":[1970]},
+    {"id":"nfl1971","seasons":[1971]},
+    {"id":"nfl1972","seasons":[1972]},
+    {"id":"nfl1973","seasons":[1973,1974]},
+    {"id":"nfl1975","seasons":[1975]},
+    {"id":"nfl1976","seasons":[1976,1977,1978,1979]},
+    {"id":"nfl1980","seasons":[1980,1981]},
+    {"id":"nfl1982","seasons":[1982,1983]},
+    {"id":"nfl1984","seasons":[1984,1985,1986]},
+    {"id":"nfl1987","seasons":[1987]},
+    {"id":"nfl1990","seasons":[1988,1989,1990,1991]},
     {"id":"nfl1992","seasons":[1992,1993]},
     {"id":"nfl1994","seasons":[1994]},
     {"id":"nfl1995","seasons":[1995]},
+    {"id":"nfl1996","seasons":[1996]},
+    {"id":"nfl1997","seasons":[1997]},
+    {"id":"nfl1998","seasons":[1998]},
+    {"id":"nfl1999","seasons":[1999]},
+    {"id":"nfl2000","seasons":[2000]},
     {"id":"nfl2001","seasons":[2001]},
     {"id":"nfl2002","seasons":[2002]},
     {"id":"nfl2003","seasons":[2003,2004]},

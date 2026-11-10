@@ -654,6 +654,54 @@ test('nine sports sit in three rows of three, compact tiles that stay 44px targe
   assert.match(css, /@media \(max-width:699\.98px\) and \(max-height:660px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="3"\]\) \.setup-heading \{ display:none; \}/);
 });
 
+test('a season\'s credit shows whole under the Season choice, as quiet text, and step 1\'s extras make room for it', async t => {
+  // Any sport's listing may carry a credit (docs/design/hockey.md, "Credits"): here two listed sets of one season, one with.
+  const credit = 'The information used herein was obtained free of charge from and is copyrighted by an example project.  Shown whole.';
+  const withCredit = { id: 'cm0102-2002-05', version: 'cm0102-2002-05-0123abcd', year: 2002, season: '2001/02', label: 'CM 01/02 · Test', credit };
+  const without = { id: 'cm0102-2001-12', version: 'cm0102-2001-12-0123abcd', year: 2002, season: '2001/02', label: 'CM 01/02 · December 2001' };
+  const season = { sets: [withCredit, without], state: 'loading' };
+  // The model: the chosen season's credit, known from the listing while the season loads ('' for none), on its option too.
+  const model = buildSetupModel({ ...BASE, dataSet: withCredit.id }, { managerTeams: TEAMS, season });
+  assert.equal(model.season.state, 'loading');
+  assert.equal(model.season.credit, credit);
+  assert.deepEqual(model.season.options.map(option => [option.key, option.credit]), [['built-in', ''], [withCredit.id, credit], [without.id, '']]);
+  assert.equal(buildSetupModel({ ...BASE, dataSet: without.id }, { season }).season.credit, '');
+  assert.equal(buildSetupModel(BASE, { season }).season.credit, '', 'the built-in season');
+
+  // The view: a paragraph right under the row that holds the Season choice, on screen and word for word, which the
+  // choice names as its description; another season without a credit takes it away.
+  const view = await mount(t, { setup: { dataSet: withCredit.id }, season });
+  const select = view.q('#setup-season');
+  const shown = () => view.qa('.setup-season__credit');
+  assert.equal(shown().length, 1);
+  assert.equal(shown()[0].id, 'setup-season-credit');
+  assert.equal(shown()[0].textContent, credit, 'whole, two spaces and all');
+  assert.equal(shown()[0].classList.contains('sr-only') || !!shown()[0].closest('[hidden]'), false, 'visible text, not a screen reader\'s alone');
+  assert.equal(shown()[0].previousElementSibling.contains(select), true, 'by the Season choice');
+  assert.equal(select.getAttribute('aria-describedby'), 'setup-season-note setup-season-credit');
+  assert.notEqual(select.getAttribute('title'), credit, 'the title keeps the season note');
+  select.value = without.id;
+  await act(async () => select.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(view.calls.picks.at(-1), ['dataSet', without.id]);
+  assert.equal(shown().length, 0);
+  assert.equal(view.q('#setup-season').getAttribute('aria-describedby'), 'setup-season-note');
+
+  // Quiet small type in the muted text colour, never cut, clamped or hidden; the lede and heading give way instead.
+  const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const own = [...css.matchAll(/(?:^|[}\s])\.setup-season__credit \{([^}]*)\}/g)].map(match => match[1]);
+  assert.equal(own.length, 2, 'the credit\'s rule and its narrow-phone size');
+  assert.match(own[0], /font:400 11px\/1\.3 var\(--font-sans\); color:var\(--muted\);/);
+  assert.match(own[1], /^ font-size:10\.5px; $/);
+  for (const body of own) assert.doesNotMatch(body, /display|visibility|overflow:|text-overflow|nowrap|clamp|height|clip/);
+  assert.match(css, /@media \(max-width:699\.98px\), \(max-height:799\.98px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-season__credit\) \.setup-lede \{ display:none; \}/);
+  const phoneQuery = '@media (max-width:699.98px) {';
+  const phone = css.slice(css.lastIndexOf(phoneQuery), css.indexOf('\n}', css.lastIndexOf(phoneQuery)));
+  assert.match(phone, /\.setup-step\[data-step="1"\]:has\(\.setup-season__credit\):has\(\.setup-notices\) \.setup-heading \{ display:none; \}/,
+    'with a notice line, the heading gives way on any phone');
+  assert.match(css, /@media \(max-height:799\.98px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-season__credit\):has\(\.setup-notices > :nth-child\(2\)\) \.setup-heading \{ display:none; \}/);
+  assert.match(css, /@media \(max-width:389\.98px\) \{\s*\.setup-season__credit \{ font-size:10\.5px; \}/);
+});
+
 test('theatre footnote: a "*"-marked scope name resolves to its description; summaries drop the marker', async t => {
   // The marker rule on synthetic scopes.
   assert.deepEqual(theatreRow({ id: 'x', name: 'East*', desc: 'A plus B.' }, 3), { id: 'x', name: 'East*', label: 'East', count: 3, note: 'A plus B.' });
