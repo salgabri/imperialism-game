@@ -1563,9 +1563,10 @@ only when chosen.
   two before it is put rank for rank, within hitters, starters and relievers, on MLB
   The Show 18 to 24's scale; tested on 2018–2024, it misses the Show by about 4.4
   points a player. Names, birthplaces and each club's main ballpark are the Chadwick
-  Baseball Bureau's Baseball Databank's (its last commit, read from a GitHub fork, as
-  the Bureau's own repository is gone), with one birthplace corrected from Wikipedia
-  (Elmer Valo's). The clubs of their day (the Milwaukee Braves, the Senators,
+  Baseball Bureau's Baseball Databank's (its last commit, `e9f247e` of November 2023,
+  read from the fork `infonuum/baseballdatabank`, as the Bureau's own repository is
+  gone), with one birthplace corrected from Wikipedia (Elmer Valo's). The clubs of
+  their day (the Milwaukee Braves, the Senators,
   the Expos…) play on 37 era maps, `mlb1960` to `mlb2017`
   ([design notes](docs/design/baseball.md#seasons-before-2018-computed-from-war)).
   Nothing before 1960.

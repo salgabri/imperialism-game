@@ -303,12 +303,12 @@ not used. The 2020 season was 60 games; here it is a season like any other.
 ## Seasons before 2018: computed from WAR
 
 Status: built 2026-11-09; its names, birthplaces, records and ballparks re-sourced from
-the Baseball Databank on 2026-11-10. Fifty-eight more seasons, 1960 to 2017 (`mlb-war-<year>`,
-listed "Computed from WAR, end of <year>"), whose ratings no game published. Each
-player's rating is computed from his WAR and put on MLB The Show's scale, rank for rank
-within his role; the clubs, nations and maps are built as the MLB The Show seasons' are.
-They are not a game's ratings, and every file says so (`source.computed`, `method`,
-`conversion`, `rawScale: "WAR"`).
+the Baseball Databank on 2026-11-10. Fifty-eight more seasons, 1960 to 2017
+(`mlb-war-<year>`, listed "Computed from WAR, end of <year>"), whose ratings no game
+published. Each player's rating is computed from his WAR and put on MLB The Show's
+scale, rank for rank within his role; the clubs, nations and maps are built as the MLB
+The Show seasons' are. They are not a game's ratings, and every file says so
+(`source.computed`, `method`, `conversion`, `rawScale: "WAR"`).
 
 **Sources.** Pinned in `scripts/data/mlb-war-seasons.json` (`sources`) and cached in the
 ignored `data-src/mlb-war/`:
@@ -355,10 +355,11 @@ asks of derived data.
 
 **Building.** `npm run import:mlb-war` (`scripts/import-mlb-war.mjs`) checks every pin
 (each file's SHA-256 and, for the WAR file and the Databank, its git blob in the pinned
-commit), never fetches, and writes one snapshot a season, `scripts/data/mlb-war-seasons/<year>.json`
-(6.7 MB in all, 58,902 player-seasons): every player who played in the season with his
-club, role, positions, score, the inputs it was computed from and his birth country, and
-each club's name, record and main ballpark. It also writes
+commit), never fetches, and writes one snapshot a season,
+`scripts/data/mlb-war-seasons/<year>.json` (6.7 MB in all, 58,902 player-seasons): every
+player who played in the season with his club, role, positions, score, the inputs it was
+computed from and his birth country, and each club's name, record and main ballpark. It
+also writes
 `scripts/data/mlb-war-reference.json` (below). `npm run build:mlb-seasons` rates and teams
 each season from its snapshot (`public/baseball/mlb-war-<year>.json`, 17–33 KB, 1.6 MB in
 all), with the listing, `docs/design/baseball-war-seasons-audit.json` and the attribution;
