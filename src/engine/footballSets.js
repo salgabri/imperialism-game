@@ -157,8 +157,9 @@ export function clearFootballSetIndex() {
 const newestFirst = (a, b) => b.year - a.year || (a.id < b.id ? 1 : -1);
 
 /**
- * The data sets present, newest season first: `[{ id, version, year, season, label, map? }]` (`map`: a basketball
- * season's era map), every sport's together (`setSportOf` tells them apart). The built-in earlier seasons are always
+ * The data sets present, newest season first: `[{ id, version, year, season, label, map?, credit? }]` (`map`: a
+ * basketball season's era map; `credit`: the plain text a season's sources ask to be shown with it, which setup shows
+ * under the Season choice), every sport's together (`setSportOf` tells them apart). The built-in earlier seasons are always
  * there; CM 01/02 sets built on this computer are read once from `football/index.json`, where a missing or unreadable
  * index means none. A listing that fails the checks is skipped (each set is validated in full when it loads).
  */
@@ -187,9 +188,11 @@ function listing(data) {
   const valid = entries.filter(entry => entry && isFootballSetId(entry.id) && !seen.has(entry.id) && seen.add(entry.id)
     && isDataYear(entry.year) && entry.season === seasonLabelOf(entry.id, entry.year) && typeof entry.label === 'string' && entry.label.trim()
     && (entry.version == null || (typeof entry.version === 'string' && versionPattern(entry.id).test(entry.version)))
+    && (entry.credit == null || (typeof entry.credit === 'string' && entry.credit.trim()))
     && (!setIsMapped(entry.id) || eraMapOf(entry.id, entry.map) != null));
-  return Object.freeze(valid.sort(newestFirst).map(({ id, version = null, year, season, label, map }) => Object.freeze({
-    id, version, year, season, label: label.trim(), ...(setIsMapped(id) ? { map } : {}) })));
+  // A credit stays exactly as written: a source's terms can ask for its statement word for word.
+  return Object.freeze(valid.sort(newestFirst).map(({ id, version = null, year, season, label, map, credit }) => Object.freeze({
+    id, version, year, season, label: label.trim(), ...(setIsMapped(id) ? { map } : {}), ...(credit != null ? { credit } : {}) })));
 }
 
 // A basketball or baseball season's map (src/data/clubMaps.js), or null: an earlier era's that lists the season, or
