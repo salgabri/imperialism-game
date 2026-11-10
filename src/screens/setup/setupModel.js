@@ -346,9 +346,9 @@ export const SEASON_NOTES = Object.freeze({
     + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
     + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings. NHL 08 and '
     + 'NHL 09 are EA\'s attributes, the overall converted by us. Every other season back to 1966/67 is computed from the '
-    + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank (obtained free of charge from and '
-    + 'copyrighted by the Hockey Databank project), after from MoneyPuck.com. Clubs play on the map of their day. Nations '
-    + 'field the NHL players of each country, only where they hold at least half the lineup, and none before 1977/78.',
+    + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank, after from MoneyPuck.com. Clubs '
+    + 'play on the map of their day. Nations field the NHL players of each country, only where they hold at least half '
+    + 'the lineup, and none before 1977/78.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
     + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
     + 'least half a matchday 17. 2008 '
@@ -375,13 +375,13 @@ export const SEASON_NOTES = Object.freeze({
 
 /**
  * The Season choice (docs/design/football-years.md): the sport's built-in season, then each of its listed data sets
- * newest first, as `{ id, key, season, source, label, name, checked }`. `sport` names a chosen set the listing no
- * longer has.
+ * newest first, as `{ id, key, season, source, label, name, credit, checked }`. `credit` is the plain text the set's
+ * listing asks to be shown with it ('' for none). `sport` names a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
-  const row = (id, season, source) => ({ id, key: id ?? 'built-in', season, source,
-    label: [season, source].filter(Boolean).join(' · '), checked: id === dataSet });
-  const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label))];
+  const row = (id, season, source, credit = '') => ({ id, key: id ?? 'built-in', season, source,
+    label: [season, source].filter(Boolean).join(' · '), credit, checked: id === dataSet });
+  const rows = [row(null, builtInSeasonOf(sport.id).season, 'built in'), ...sets.map(set => row(set.id, set.season, set.label, set.credit || ''))];
   if (dataSet != null && !sets.some(set => set.id === dataSet)) rows.push(row(dataSet, sport.dataSeason || '', sport.dataLabel || dataSet));
   // The dropdown names a season by its years alone; a set sharing its season with another (or with none) keeps its source.
   const shared = season => !season || rows.filter(other => other.season === season).length > 1;
@@ -717,6 +717,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     season: {
       id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTES[sportId] || '', loading: setLoading,
       message: seasonState === 'error' ? (seasonCtx.message || setFailed) : '',
+      // The chosen season's credit, shown as text under the choice (docs/design/hockey.md, "Credits"): known from the
+      // listing, so it shows while the season loads.
+      credit: chosenSeason?.credit || '',
     },
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
     // A sport with clubs only names its league ('NFL'): the Nations choice is off.

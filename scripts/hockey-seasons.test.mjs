@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { act } from 'react';
 import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../src/data/hockeySeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
@@ -24,7 +25,7 @@ import { pointInPolys } from './lib/domestic-partition.mjs';
 import {
   findPlayer, nhl94Overall, nhlpa93Displayed, nhlpa93Overall, norm, quantileRescale, ratingsOf, seasonIdOf, teamsOf,
 } from './lib/nhl-seasons.mjs';
-import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
+import { bundleComponents, findElement, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -404,6 +405,54 @@ test('hockey\'s Season choice lists its seasons; a season keeps Nations, and Clu
     assert.equal(app.state.setup.clubScope, 'domestic:nhl2007');
     app.pickSetup('dataSet', null);
     assert.equal(app.state.setup.clubScope, 'domestic:nhl', 'the built-in season plays on today\'s map');
+  });
+});
+
+test('the Season choice shows the chosen season\'s credit as text under it: the databank\'s statement whole, MoneyPuck\'s, or none', async () => {
+  const creditOf = id => BUILT_IN_HOCKEY_SEASONS.find(set => set.id === id).credit;
+  const statement = MANIFEST.computed.sources.hdb.attribution;
+  await withApp(async ({ app }) => {
+    app.pickSetup('sport', 'hockey');
+    // The model, from the App's own listing: the chosen season's credit, known while the season loads.
+    assert.equal(modelOf(app).season.credit, '', 'the built-in season shows none');
+    app.pickSetup('dataSet', 'nhl-2011');
+    const model = modelOf(app);
+    assert.equal(model.season.state, 'loading');
+    assert.equal(model.season.credit, `Data: MoneyPuck.com. ${statement}`);
+    assert.equal(model.season.options.find(option => option.id === 'nhl-2011').credit, creditOf('nhl-2011'));
+    assert.equal(model.season.options.find(option => option.id === 'nhl-2022').credit, '', 'an EA edition credits no one here');
+    await withDom(async ({ document, mount }) => {
+      const part = () => findElement(app.render(), 'SetupOverlay');
+      const view = await mount(part());
+      const refresh = () => act(async () => view.root.render(part()));
+      const credit = () => document.querySelector('.setup-season__credit')?.textContent ?? null;
+      const describedBy = () => document.getElementById('setup-season').getAttribute('aria-describedby');
+      /** Pick a season in the dropdown as the player does, then render what the App now holds. */
+      const pickSeason = async id => {
+        const select = document.getElementById('setup-season');
+        select.value = id;
+        await act(async () => select.dispatchEvent(new document.defaultView.Event('change', { bubbles: true })));
+        await refresh();
+      };
+      assert.equal(credit(), creditOf('nhl-2011'), 'on screen, whole');
+      const shown = document.querySelector('.setup-season__credit');
+      assert.equal(shown.classList.contains('sr-only') || !!shown.closest('[hidden]'), false);
+      assert.equal(shown.previousElementSibling.contains(document.getElementById('setup-season')), true, 'right under the Season choice');
+      assert.equal(describedBy(), 'setup-season-note setup-season-credit');
+      await pickSeason('nhl-2026');
+      assert.equal(credit(), 'Data: MoneyPuck.com', '2025/26 takes nothing from the databank');
+      await pickSeason('nhl-1985');
+      assert.equal(credit(), statement, '1984/85 from the databank');
+      assert.equal(credit().replace(/\s+/g, ' '), 'The information used herein was obtained free of charge from and is copyrighted by the Hockey Databank '
+        + 'project. For more information about the Hockey Databank project please visit http://sports.groups.yahoo.com/group/hockey-databank');
+      await pickSeason('nhl-2009');
+      assert.equal(credit(), statement, 'NHL 09: the databank\'s positions and birth countries');
+      await pickSeason('nhl-2022');
+      assert.equal(credit(), null, 'NHL 22 shows none');
+      assert.equal(describedBy(), 'setup-season-note');
+      await pickSeason('');
+      assert.equal(credit(), null, 'nor does the built-in season');
+    });
   });
 });
 
