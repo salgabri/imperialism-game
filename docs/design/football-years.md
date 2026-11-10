@@ -134,7 +134,8 @@ Yugoslavia and Serbia and Montenegro years. The seasons before 1996/97 are below
 
 Decided 2026-11-09, for the seasons before 1996/97 that the computed World Cup
 seasons, SWOS 94/95 and 95/96 and the fan-made CM databases add (SWOS's and the
-fan-made ones ship: [Seasons before FIFA 05](#seasons-before-fifa-05)). `FIRST_YEAR` is 1962, and `src/data/footballFederations.js` gives every
+fan-made ones ship: [Seasons before FIFA 05](#seasons-before-fifa-05)).
+`FIRST_YEAR` is 1962, and `src/data/footballFederations.js` gives every
 season from 1961/62 its federations, as the state on its cutoff (30 June of the
 season-end year), in three parts. Every year from 1996/97 keeps exactly the
 territory it had, and has no identity, so every season the game ships rebuilds
@@ -414,7 +415,7 @@ names the provider and reads "Game rating converted from CM current ability".
 ## Built-in earlier seasons
 
 Twenty-two seasons ship with the game, every season from 2004/05 to 2025/26
-(and five before them, [below](#seasons-before-fifa-05)).
+(and nine before them, [below](#seasons-before-fifa-05)).
 [EA FC 25](#ea-fc-25) and [FIFA 07 to FIFA 14](#fifa-07-to-fifa-14) are described
 below, and so are [FIFA 05 and FIFA 06](#fifa-05-and-fifa-06),
 which have nations only. Ten, 2014/15 to 2023/24, are the launch roster
@@ -967,14 +968,17 @@ non-commercial use) that name no licence; the data's rights are reserved.
   28 November 2020). Its abilities are Cam F's: against SI's own CM 93/94 data
   for 1,452 English-league players matched by name (ben-clarke's
   championship-manager-93-tools export) they correlate 0.72, 74 are equal, and
-  Cam F's run 19 lower on average. 124 nations with players (77 full XIs) and
-  130 clubs (Premier League 20, La Liga 20, Serie A 18, Bundesliga 18, Ligue 1 18,
-  Eredivisie 18, Liga Portugal 18), on `eu124s1994` and `eu32s1994`. It keeps CM
-  01/02's league sizes, not 1993/94's, and the builder takes a database's own top
-  divisions: its Premier Division has 20 clubs (Oldham Athletic and Swindon Town,
-  of the real 22, are in its First Division) and its French First Division 18
-  (Angers and Martigues are in its Second; 1993–94 FA Premier League and French
-  Division 1 on Wikipedia, revisions 1371793527 and 1366136574). The famous-player
+  Cam F's run 19 lower on average. One rating is wild: Olympiakos's defender
+  Vassilis Ioannidis has the database's highest ability, 200 (rated 99, above
+  Roberto Baggio's 198), so he leads Greece's XI; it ships as Cam F set it. 124
+  nations with players (77 full XIs) and 130 clubs (Premier League 20, La Liga 20,
+  Serie A 18, Bundesliga 18, Ligue 1 18, Eredivisie 18, Liga Portugal 18), on
+  `eu124s1994` and `eu32s1994`. It keeps CM 01/02's league sizes, not 1993/94's,
+  and the builder takes a database's own top divisions: its Premier Division has
+  20 clubs (Oldham Athletic and Swindon Town, of the real 22, are in its First
+  Division) and its French First Division 18 (Angers and Martigues are in its
+  Second; 1993–94 FA Premier League and French Division 1 on Wikipedia, revisions
+  1371793527 and 1366136574). The famous-player
   check agrees at +0 (5 of 6). Federations: Zaire alone plays under a name of its
   day; FR Yugoslavia is barred (Montenegro and Kosovo neutral with it), the Czech
   Republic and Slovakia play apart, and North Macedonia (16 June 1994) and the
@@ -1023,7 +1027,11 @@ non-commercial use) that name no licence; the data's rights are reserved.
   - **Spot check** (2026-11-09): Italy (86) and West Germany (85) are the
     strongest nations, then the Netherlands, Brazil and England; Yugoslavia is Red
     Star's Stojković, Pančev, Savićević and Prosinečki, the Soviet Union Belanov,
-    Dasayev and Zavarov, Czechoslovakia Kubík, Chovanec and Skuhravý.
+    Dasayev and Zavarov, Czechoslovakia Kubík, Chovanec and Skuhravý. One rating
+    is wild: Helsingborg's 36-year-old goalkeeper Jan Möller has the database's
+    highest ability, 198 against a potential of 140 (rated 98, above Maradona's
+    193), so he keeps Sweden's goal ahead of Thomas Ravelli (160, rated 79); it
+    ships as Simon Treanor set it.
 
 ### How they play
 
@@ -1338,8 +1346,9 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
   merged federations are held by their holder, and inactive shapes are
   unclaimed.
 - Serbia keeps its modern name and flag in its FR Yugoslavia and Serbia and
-  Montenegro years from 1996/97, which were built before identities; 1994/95 and
-  1995/96 show FR Yugoslavia.
+  Montenegro years from 1996/97, which were built before identities; 1995/96
+  shows FR Yugoslavia, and 1994/95, whose SWOS has no Yugoslavia squad, leaves
+  Serbia neutral.
 - Seasons ending before 1962 are refused.
 - East Germany has no shape on the map, so it never fields a team, and its
   players, where a database lists them as Germany's, play for West Germany, but
@@ -1376,7 +1385,9 @@ birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons
 - 1993/94 and 1989/90 rate as their makers rated, fans, not as any game's maker
   did, and 1993/94 keeps CM 01/02's league sizes (a 20-club Premier League, an
   18-club French First Division). Simon Treanor's 1989/90 is a beta whose readme
-  says many teams keep squads of the early 2000s.
+  says many teams keep squads of the early 2000s. Each has one wild rating at its
+  top, shipped as its maker set it: 1993/94's Vassilis Ioannidis (99, Greece) and
+  1989/90's Jan Möller (98, Sweden's goalkeeper).
 - SWOS 94/95 and 95/96 keep each club's own sixteen, so a player SWOS files at two
   top-division clubs plays for both (18 and 20 names, mostly namesakes), and
   1995/96's Bordeaux fields Jean-Luc Dogon's two records. Their clubs score nearly
