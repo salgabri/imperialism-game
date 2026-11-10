@@ -1,7 +1,8 @@
 // The computed NFL and AFL seasons (docs/design/american-football.md, "Computed seasons"): the reader of Pro Football
 // Archives' team-season pages, its positions as the game's, the season value on invented clubs, the ranking and the
 // mapping onto Madden NFL 2002 recomputed from each snapshot, every club's lineup or its documented gaps, the calibration
-// as recorded, and the snapshots rebuilt byte for byte where data-src/ has the pages.
+// as recorded (and held out on 2000), each snapshot's day of retrieval, and the snapshots rebuilt byte for byte where
+// data-src/ has the pages (in data-src/pfa/ and a later download's data-src/pfa-<name>/).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -150,7 +151,7 @@ test('the pages of a later download, in a data-src/pfa-<name>/ of their own, are
 
 test('every computed season is recomputed from its snapshot: ranks by value, starts and games, read off Madden NFL 2002', () => {
   const madden = maddenReferencePlayers(JSON.parse(read('scripts/data/madden-seasons/2001.json')));
-  assert.equal(KEYS.length, 33 + 10, 'NFL 1960–1989, 1991, 1996 and 1997; the AFL 1960–1969');
+  assert.equal(KEYS.length, 36 + 10, 'NFL 1960–1989, 1991 and 1996–2000; the AFL 1960–1969');
   for (const key of KEYS) {
     const snapshot = snapshotOf(key);
     const clubs = Object.keys(snapshot.teams).length;
@@ -199,6 +200,22 @@ test('the calibration holds as recorded: the frozen weights on 2001–2005 again
     < Math.abs(width(a[1]) - width(calibration.team.madden2002)) ? b : a));
   assert.equal(Number(nearest[0]), VALUE_WEIGHTS.team);
   for (const key of KEYS) assert.equal(snapshotOf(key).conversion.calibration.mean, calibration.mean);
+  // Out of sample: 2000, which the weights were not tuned on, against Madden NFL 2002 orders its players nearly as well.
+  assert.deepEqual(Object.values(calibration.holdout.seasons).flat().map(row => row.season), POSITIONS.map(() => 2000));
+  assert.ok(calibration.holdout.mean >= 0.7, `held out: mean Spearman ${calibration.holdout.mean}`);
+  for (const position of POSITIONS) assert.ok(calibration.holdout.positions[position] >= 0.6, `held out: ${position} ${calibration.holdout.positions[position]}`);
+});
+
+test('each snapshot says on which day its pages were saved: 1998 to 2000 a day after the rest', () => {
+  const { retrieved } = JSON.parse(read('scripts/data/pfa-pages.json'));
+  const dayOf = year => Object.keys(retrieved).find(day => retrieved[day].includes(year));
+  for (const key of KEYS) {
+    const { source } = snapshotOf(key);
+    assert.equal(source.retrieved, dayOf(source.season), key);
+    assert.ok(Object.keys(source.files).every(file => dayOf(Number(file.slice(0, 4))) === source.retrieved), `${key}: every page it read`);
+  }
+  assert.deepEqual(['1997', '1998', '1999', '2000', '2001'].map(key => key === '2001' ? dayOf(2001) : snapshotOf(key).source.retrieved),
+    ['2026-11-09', '2026-11-10', '2026-11-10', '2026-11-10', '2026-11-09']);
 });
 
 test('every snapshot and the calibration rebuild byte for byte from the pinned pages', t => {
@@ -206,5 +223,5 @@ test('every snapshot and the calibration rebuild byte for byte from the pinned p
   const missing = Object.keys(pins).filter(file => !copiesOf(file).length);
   if (missing.length) { t.skip(`data-src/pfa*/ lack ${missing.length} pinned pages (${missing[0]} …): the rebuild runs where they are`); return; }
   assert.match(execFileSync(process.execPath, ['scripts/sync-pfa.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
-    /Verified 43 computed seasons and the calibration byte for byte/);
+    /Verified 46 computed seasons and the calibration byte for byte/);
 });

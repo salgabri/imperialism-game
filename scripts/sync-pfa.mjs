@@ -1,7 +1,7 @@
 // Snapshot the NFL seasons no game rated (and the AFL's, 1960 to 1969) from Pro Football Archives' facts
 // (docs/design/american-football.md, "Computed seasons") into scripts/data/pfa-seasons/<season>.json and
-// afl-<season>.json (committed), for the earlier American football seasons to build from: 1960 to 1989, 1991, 1996 and
-// 1997, and the AFL's ten seasons.
+// afl-<season>.json (committed), for the earlier American football seasons to build from: 1960 to 1989, 1991 and 1996 to
+// 2000, and the AFL's ten seasons.
 //
 // Each club's page gives who played, at which position, in how many games and starts, and the season's box-score totals.
 // Each player's season value (scripts/lib/pfa.mjs: his club's points against the league's, shared out by starts,
@@ -36,6 +36,10 @@ const pinsFile = path.join(root, 'scripts/data/pfa-pages.json');
 const SITE = 'https://www.profootballarchives.com';
 const POSITIONS = ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'];
 const CALIBRATION = [2001, 2002, 2003, 2004, 2005];
+// Seasons the weights were not tuned on, measured as the tuning seasons are: 2000 against Madden NFL 2002 (the 2001
+// season's launch roster). 1998 and 1999 have no such measure: the next seasons' Madden ratings survive in no copy the
+// game reads.
+const HOLDOUT = [2000];
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const plain = text => String(text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
@@ -167,7 +171,7 @@ function maddenByName(snapshot) {
   }
   return byName;
 }
-/** How well `weights` order 2001–2005's players as the next season's Madden launch ratings do, by position. */
+/** How well `weights` order the seasons' players (2001–2005's) as the next season's Madden launch ratings do, by position. */
 async function calibrate(weights, seasons) {
   const per = Object.fromEntries(POSITIONS.map(p => [p, []]));
   for (const { year, clubs, next } of seasons) {
@@ -181,9 +185,9 @@ async function calibrate(weights, seasons) {
   const mean = Object.fromEntries(POSITIONS.map(p => [p, Math.round(per[p].reduce((t, r) => t + r.spearman, 0) / per[p].length * 1000) / 1000]));
   return { per, mean, overall: Math.round(POSITIONS.reduce((t, p) => t + mean[p], 0) / POSITIONS.length * 10000) / 10000 };
 }
-async function calibrationSeasons() {
+async function calibrationSeasons(years = CALIBRATION) {
   const out = [];
-  for (const year of CALIBRATION) {
+  for (const year of years) {
     const { clubs } = await leagueSeason(year, 'NFL');
     const next = maddenByName(JSON.parse(await readFile(path.join(root, `scripts/data/madden-seasons/${year + 1}.json`), 'utf8')));
     out.push({ year, clubs, next, files: clubs.map(c => c.file) });
@@ -221,6 +225,9 @@ const VENUE_AS = {
   'Pro Player Stadium': ['Hard Rock Stadium'], 'Pro Player Park': ['Hard Rock Stadium'], '3Com Park': ['Candlestick Park'], 'ALLTEL Stadium': ['EverBank Stadium'],
   'Cinergy Field': ['Riverfront Stadium'], 'Ericsson Stadium': ['Bank of America Stadium'], "Houlihan's Stadium": ['Tampa Stadium'],
   'Jack Kent Cooke Stadium': ['Northwest Stadium'], 'Liberty Bowl': ['Liberty Bowl Memorial Stadium'], 'Trans World Dome': ['Edward Jones Dome'], 'Jack Murphy Stadium': ['Qualcomm Stadium'], Metrodome: ['Hubert H. Humphrey Metrodome'],
+  'Ravens Stadium': ['M&T Bank Stadium'], 'PSINet Stadium': ['M&T Bank Stadium'], 'Ralph Wilson Stadium': ['Highmark Stadium'], 'Redskins Stadium': ['Northwest Stadium'],
+  FedExField: ['Northwest Stadium'], 'Network Associates Coliseum': ['Oakland–Alameda County Coliseum'], 'Adelphia Coliseum': ['Nissan Stadium'],
+  'Cleveland Browns Stadium': ['Huntington Bank Field'], 'Paul Brown Stadium': ['Paycor Stadium'],
 };
 /** Whether the site's venue `venue` is the eras' stadium `stadium`. */
 const isVenue = (venue, stadium) => venue === stadium || !!VENUE_AS[venue]?.includes(stadium);
@@ -352,6 +359,8 @@ async function main() {
     return;
   }
   const calibration = await calibrate(VALUE_WEIGHTS, seasons);
+  const heldOut = await calibrationSeasons(HOLDOUT);
+  const holdout = await calibrate(VALUE_WEIGHTS, heldOut);
   const jobs = [
     ...manifest.seasons.filter(year => manifest.sources[year]?.kind === 'pfa').map(year => ({ year, league: 'NFL', key: String(year) })),
     ...(manifest.afl?.seasons ?? []).map(year => ({ year, league: 'AFL', key: `afl-${year}` })),
@@ -363,12 +372,14 @@ async function main() {
   const span = list => [Math.min(...list), Math.max(...list)];
   const spreads = Object.fromEntries(TEAM.map(team => [team, span(strengths(seasons[0].clubs, { ...VALUE_WEIGHTS, team }, madden))]));
   outputs.push([path.join(outDir, 'calibration.json'), `${JSON.stringify({
-    note: 'How well the computed seasons\' value orders each position as the next season\'s Madden launch ratings do (Spearman\'s rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season\'s club strengths by the credit\'s power, beside Madden NFL 2002\'s spread of 2001\'s.',
+    note: 'How well the computed seasons\' value orders each position as the next season\'s Madden launch ratings do (Spearman\'s rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season\'s club strengths by the credit\'s power, beside Madden NFL 2002\'s spread of 2001\'s. `holdout`: the same measure on 2000, which the weights were not tuned on, against Madden NFL 2002 (the 2001 season\'s launch roster); 1998 and 1999 have none, the next seasons\' Madden ratings surviving in no copy the game reads.',
     weights: VALUE_WEIGHTS, grid: GRID, mean: calibration.overall, positions: calibration.mean, seasons: calibration.per,
     team: { madden2002: span(madden2001), computed2001: spreads },
-    files: Object.fromEntries(seasons.flatMap(s => [`${s.year}/${s.year}nfl.html`, ...s.files]).map(file => [file, PINS[file]])),
+    holdout: { mean: holdout.overall, positions: holdout.mean, seasons: holdout.per },
+    files: Object.fromEntries([...seasons, ...heldOut].flatMap(s => [`${s.year}/${s.year}nfl.html`, ...s.files]).map(file => [file, PINS[file]])),
   }, null, 1)}\n`]);
   console.log(`Calibration on 2001–2005: mean Spearman ${calibration.overall} (${POSITIONS.map(p => `${p} ${calibration.mean[p]}`).join(', ')})`);
+  console.log(`Held out, 2000 against Madden NFL 2002: mean Spearman ${holdout.overall} (${POSITIONS.map(p => `${p} ${holdout.mean[p]}`).join(', ')})`);
   for (const { year, league, key } of jobs) {
     const target = league === 'AFL' ? { ...manifest, ...manifest.afl, teams: manifest.teams } : manifest;
     const { text, players, gaps, teams } = await snapshotOf(year, league, target, franchises, madden, calibration);

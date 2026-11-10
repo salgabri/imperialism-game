@@ -353,10 +353,10 @@ export const SEASON_NOTES = Object.freeze({
     + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
     + 'They have NBA clubs only: the franchises of that season, on the map of their day.',
   'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
-    + 'from EA SPORTS and the fan archives and databases that kept them; 1999 and 1998 from Madden NFL 2000\'s and 99\'s '
-    + 'attributes and 1995–1992 and 1990 from Tecmo Super Bowl\'s, the overall ours. 1997, 1996, 1991 and 1989 back to '
-    + '1960 are computed from Pro Football Archives\' records of each player\'s starts and season, and so are the AFL\'s '
-    + '1960s, on maps of their own. Clubs only: the franchises of that season, on the map of their day.',
+    + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
+    + 'overall ours. 2000 back to 1996, 1991 and 1989 back to 1960 are computed from Pro Football Archives\' records of '
+    + 'each player\'s starts and season, and so are the AFL\'s 1960s, on maps of their own. Clubs only: the franchises of '
+    + 'that season, on the map of their day.',
   baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October; 2018–2020 as the fan site '
     + 'ShowZone keeps them). Nations field the players born there, where they hold at least half the lineup; clubs play on '
     + 'the map of their day, the Athletics in '

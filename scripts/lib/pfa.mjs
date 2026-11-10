@@ -111,14 +111,17 @@ export const POSITION_OF = {
   LOT: 'OL', ROT: 'OL', OT: 'OL', T: 'OL', LOG: 'OL', ROG: 'OL', OG: 'OL', G: 'OL', C: 'OL', OL: 'OL',
   LDE: 'DL', RDE: 'DL', DE: 'DL', LDT: 'DL', RDT: 'DL', DT: 'DL', NT: 'DL', MG: 'DL', UT: 'DL', DRE: 'DL', SDE: 'DL', WDE: 'DL', '4DE': 'DL', DL: 'DL', NG: 'DL',
   LLB: 'LB', MLB: 'LB', RLB: 'LB', LB: 'LB', OLB: 'LB', ILB: 'LB', LILB: 'LB', RILB: 'LB', LOLB: 'LB', ROLB: 'LB', SLB: 'LB', WLB: 'LB',
-  BLB: 'LB', JLB: 'LB', LMLB: 'LB', OLLB: 'LB', SILB: 'LB', WILB: 'LB',
+  BLB: 'LB', JLB: 'LB', LMLB: 'LB', OLLB: 'LB', SILB: 'LB', WILB: 'LB', SOLB: 'LB', WOLB: 'LB',
   LCB: 'CB', RCB: 'CB', CB: 'CB', DB: 'CB', LC: 'CB', LSCB: 'CB', NB: 'CB', RXB: 'CB', CLB: 'CB', LBC: 'CB',
   LS: 'S', RS: 'S', FS: 'S', SS: 'S', S: 'S', TS: 'S', WS: 'S',
   K: 'K', P: 'P', LONG: 'LONG', KR: 'KR',
 };
 /** The site's slips, read as meant: a code mistyped or two run together (the first kept). */
 export const SLIPS = { 'RCB=LCB': 'RCB', 'L,DT': 'DT', LAOT: 'LOT', RRLB: 'RLB', RDTLDE: 'RDT', LLS: 'LS', RRS: 'RS', RROT: 'ROT', RSL: 'RS', RO0: 'ROT',
-  RBC: 'RCB', RIOLB: 'ROLB', LWB: 'WLB', LOR: 'LOT', SF: 'SE', LKB: 'LLB', RTS: 'RS', LLLB: 'LLB', 'RS FS?': 'RS', RIOG: 'ROG', LLIB: 'LILB', TRCB: 'RCB', LILBB: 'LILB', MMLB: 'MLB', LILBLOLB: 'LILB', RL: 'RLB', D: 'DE' };
+  RBC: 'RCB', RIOLB: 'ROLB', LWB: 'WLB', LOR: 'LOT', SF: 'SE', LKB: 'LLB', RTS: 'RS', LLLB: 'LLB', 'RS FS?': 'RS', RIOG: 'ROG', LLIB: 'LILB', TRCB: 'RCB', LILBB: 'LILB', MMLB: 'MLB', LILBLOLB: 'LILB', RL: 'RLB', D: 'DE',
+  // 1998–2000, each as the player's other seasons on the site have him: a linebacker (FLB), defensive ends (RE), nose
+  // tackles (N T, TN), an H-back (HB K), a back (RB FB?).
+  FLB: 'LB', RE: 'RDE', 'N T': 'NT', TN: 'NT', 'HB K': 'HBK', 'RB FB?': 'RB' };
 /** A code as the site means it ('Fl' FL, 'mLB' MLB, 'lCB' LCB, 'RDTLDE' RDT), a 0 typed for a hyphen read as one (ROG0LOT ROG). */
 const codeOf = code => {
   const upper = String(code).trim().toUpperCase().replace(/^[^A-Z0-9]+/, '').replace(/[^A-Z0-9,=? ].*$/, '');

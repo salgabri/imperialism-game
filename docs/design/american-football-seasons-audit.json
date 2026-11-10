@@ -1541,437 +1541,173 @@
       ]
     },
     {
-      "id": "madden-2000",
-      "version": "madden-2000-35381aad",
+      "id": "pfa-2000",
+      "version": "pfa-2000-35ed6d1d",
       "season": "2000",
-      "label": "Madden NFL 2001",
-      "edition": "Madden NFL 2001",
-      "compiler": "NFL Draft Buzz's Madden Ratings Database (EA SPORTS' ratings)",
-      "url": "https://www.nfldraftbuzz.com/madden/year/2001",
-      "retrieved": "2026-11-09",
-      "overall": "EA",
-      "players": 1504,
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/2000nfl.html",
+      "retrieved": "2026-11-10",
+      "players": 1708,
       "map": "nfl2000",
+      "spread": [
+        73.5,
+        84.4
+      ],
       "clubs": [
-        "Tampa Bay Buccaneers 86.3",
-        "Tennessee Titans 86.3",
-        "Jacksonville Jaguars 85.8",
-        "Denver Broncos 85.7",
-        "Green Bay Packers 85.6",
-        "Dallas Cowboys 85.4",
-        "Washington 85.4",
-        "Detroit Lions 85",
-        "St. Louis Rams 84.9",
-        "Kansas City Chiefs 84.7",
-        "Oakland Raiders 84.6",
-        "Baltimore Ravens 84.5",
-        "Indianapolis Colts 84.1",
-        "Carolina Panthers 84",
-        "Minnesota Vikings 84",
-        "Buffalo Bills 83.8",
-        "Chicago Bears 83.7",
-        "Miami Dolphins 83.6",
-        "New England Patriots 83.6",
-        "New York Jets 83.3",
-        "New York Giants 83.1",
-        "Seattle Seahawks 83.1",
-        "Arizona Cardinals 83",
-        "Philadelphia Eagles 83",
-        "Cincinnati Bengals 82.9",
-        "New Orleans Saints 82.7",
-        "San Francisco 49ers 82.5",
-        "Atlanta Falcons 82.4",
-        "San Diego Chargers 82.1",
-        "Cleveland Browns 81.1",
-        "Pittsburgh Steelers 80.9"
+        "Tampa Bay Buccaneers 84.4 (10-6, 388–269)",
+        "Indianapolis Colts 83.8 (10-6, 429–326)",
+        "Baltimore Ravens 83.5 (12-4, 333–165)",
+        "St. Louis Rams 82.9 (10-6, 540–471)",
+        "Denver Broncos 82.6 (11-5, 485–369)",
+        "Minnesota Vikings 82.5 (11-5, 397–371)",
+        "Tennessee Titans 82.5 (13-3, 346–191)",
+        "Philadelphia Eagles 82.1 (11-5, 351–245)",
+        "Oakland Raiders 81.8 (12-4, 479–299)",
+        "Miami Dolphins 81 (11-5, 323–226)",
+        "New Orleans Saints 80.7 (10-6, 354–305)",
+        "Kansas City Chiefs 79.8 (7-9, 355–354)",
+        "Carolina Panthers 79.6 (7-9, 310–310)",
+        "Green Bay Packers 79.6 (9-7, 353–323)",
+        "Jacksonville Jaguars 79.3 (7-9, 367–327)",
+        "New York Giants 79.2 (12-4, 328–246)",
+        "Pittsburgh Steelers 78.8 (9-7, 321–255)",
+        "San Francisco 49ers 78.1 (6-10, 388–422)",
+        "Seattle Seahawks 78.1 (6-10, 320–405)",
+        "New York Jets 77.5 (9-7, 321–321)",
+        "San Diego Chargers 77.5 (1-15, 269–440)",
+        "Washington 77.5 (8-8, 281–269)",
+        "Detroit Lions 77.3 (9-7, 307–307)",
+        "Buffalo Bills 76.7 (8-8, 315–350)",
+        "Atlanta Falcons 76.1 (4-12, 252–413)",
+        "Chicago Bears 76.1 (5-11, 216–355)",
+        "New England Patriots 75.7 (5-11, 276–338)",
+        "Arizona Cardinals 75 (3-13, 210–443)",
+        "Dallas Cowboys 74.8 (5-11, 294–361)",
+        "Cleveland Browns 74.4 (3-13, 161–419)",
+        "Cincinnati Bengals 73.5 (4-12, 185–359)"
       ],
       "outOfPosition": {},
       "gaps": {},
-      "checks": [
-        {
-          "name": "maddenratings.net's Madden NFL 2001 team overalls",
-          "clubs": 31,
-          "spearman": 0.832
-        },
-        {
-          "name": "maddenratings.net's Madden NFL 2001 99 and 100 overall clubs",
-          "players": []
-        },
-        {
-          "name": "nflverse's 2000 rosters",
-          "players": 1504,
-          "sameClub": 1347
-        },
-        {
-          "name": "the position lists against the team pages",
-          "compared": 1345,
-          "identical": 1342
-        }
-      ],
-      "left": [
-        "Todd McClure (nfl-atlanta-falcons C #62): a second game row under the name of Todd McClure #62 (the first listed); who he was is unknown",
-        "Mark Campbell (nfl-cleveland-browns TE #83): a second game row under the name of Mark Campbell #83 (the first listed); who he was is unknown",
-        "Marty Moore (nfl-cleveland-browns RLB #53): a second game row under the name of Marty Moore #55 (nflverse's number); who he was is unknown",
-        "Marquis Walker (nfl-detroit-lions DB #43): a second game row under the name of Marquis Walker #38 (nflverse's number); who he was is unknown",
-        "Donta Jones (nfl-carolina-panthers LB #54): another club's game row under the name of Donta Jones of nfl-new-orleans-saints #53 (nflverse's club and number); who he was is unknown",
-        "Myron Bell (nfl-cincinnati-bengals DB #40): another club's game row under the name of Myron Bell of nfl-pittsburgh-steelers #42 (nflverse's club and number); who he was is unknown",
-        "Nate Wayne (nfl-denver-broncos RLB #54): another club's game row under the name of Nate Wayne of nfl-green-bay-packers #54 (nflverse's club and number); who he was is unknown"
-      ]
+      "calibration": 0.7567
     },
     {
-      "id": "madden-1999",
-      "version": "madden-1999-c1e9c79d",
+      "id": "pfa-1999",
+      "version": "pfa-1999-22bdcd9d",
       "season": "1999",
-      "label": "Madden NFL 2000 (converted)",
-      "edition": "Madden NFL 2000",
-      "compiler": "NFL Draft Buzz's Madden Ratings Database (EA SPORTS' attributes); the overall ours, from Madden NFL 2001's weights and Madden NFL 2002 (maddenratings.net)",
-      "url": "https://www.nfldraftbuzz.com/madden/year/2000",
-      "retrieved": "2026-11-09",
-      "overall": "converted",
-      "players": 1215,
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1999nfl.html",
+      "retrieved": "2026-11-10",
+      "players": 1726,
       "map": "nfl1999",
+      "spread": [
+        74.8,
+        85.7
+      ],
       "clubs": [
-        "Denver Broncos 84.6",
-        "Minnesota Vikings 82.6",
-        "Miami Dolphins 82.3",
-        "New England Patriots 81.5",
-        "Dallas Cowboys 81",
-        "Buffalo Bills 80.4",
-        "Jacksonville Jaguars 80.1",
-        "Atlanta Falcons 80",
-        "Kansas City Chiefs 80",
-        "Tennessee Titans 80",
-        "Green Bay Packers 79.9",
-        "Seattle Seahawks 79.9",
-        "Tampa Bay Buccaneers 79.7",
-        "New York Jets 79.3",
-        "Pittsburgh Steelers 78.7",
-        "New York Giants 78.3",
-        "Arizona Cardinals 78.2",
-        "Oakland Raiders 77.9",
-        "Baltimore Ravens 76.7",
-        "San Diego Chargers 76.4",
-        "New Orleans Saints 76.2",
-        "San Francisco 49ers 76.2",
-        "Carolina Panthers 75",
-        "Indianapolis Colts 74.3",
-        "Detroit Lions 73.6",
-        "Chicago Bears 73.3",
-        "St. Louis Rams 73.1",
-        "Washington 72.9",
-        "Cincinnati Bengals 72",
-        "Cleveland Browns 69.3",
-        "Philadelphia Eagles 68.1"
+        "St. Louis Rams 85.7 (13-3, 526–242)",
+        "Indianapolis Colts 83.9 (13-3, 423–333)",
+        "Jacksonville Jaguars 83.3 (14-2, 396–217)",
+        "Minnesota Vikings 82.4 (10-6, 399–335)",
+        "Washington 82 (10-6, 443–377)",
+        "Carolina Panthers 81.5 (8-8, 421–381)",
+        "Seattle Seahawks 81.4 (9-7, 338–298)",
+        "Kansas City Chiefs 81.1 (9-7, 390–322)",
+        "Baltimore Ravens 80.8 (8-8, 324–277)",
+        "Tennessee Titans 80.7 (13-3, 392–324)",
+        "Tampa Bay Buccaneers 80.5 (11-5, 270–235)",
+        "Green Bay Packers 79.7 (8-8, 357–341)",
+        "Buffalo Bills 79.5 (11-5, 320–229)",
+        "New England Patriots 79.1 (8-8, 299–284)",
+        "Oakland Raiders 78.9 (8-8, 390–329)",
+        "Denver Broncos 78.7 (6-10, 314–318)",
+        "Dallas Cowboys 78.6 (8-8, 352–276)",
+        "Pittsburgh Steelers 78.3 (6-10, 317–320)",
+        "Detroit Lions 78.1 (8-8, 322–314)",
+        "San Francisco 49ers 78 (4-12, 295–453)",
+        "New York Jets 77.9 (8-8, 308–309)",
+        "Miami Dolphins 77.6 (9-7, 326–336)",
+        "New York Giants 77.3 (7-9, 299–358)",
+        "Philadelphia Eagles 77.3 (5-11, 272–348)",
+        "Atlanta Falcons 77 (5-11, 285–380)",
+        "San Diego Chargers 76.8 (8-8, 269–316)",
+        "Cincinnati Bengals 76.3 (4-12, 283–460)",
+        "Chicago Bears 76.1 (6-10, 272–341)",
+        "New Orleans Saints 76.1 (3-13, 260–434)",
+        "Arizona Cardinals 75.9 (6-10, 245–382)",
+        "Cleveland Browns 74.8 (2-14, 217–437)"
       ],
-      "outOfPosition": {
-        "Minnesota Vikings": [
-          "CB: Leroy Hoard (RB 85)"
-        ],
-        "Green Bay Packers": [
-          "K: Dorsey Levens (RB 87)"
-        ],
-        "Tampa Bay Buccaneers": [
-          "K: Warrick Dunn (RB 82)"
-        ],
-        "New York Jets": [
-          "K: Roman Phifer (LB 83)"
-        ],
-        "Pittsburgh Steelers": [
-          "K: Jon Witman (RB 84)"
-        ],
-        "Indianapolis Colts": [
-          "WR: Darick Holmes (RB 71)"
-        ],
-        "Washington": [
-          "K: Larry Bowie (RB 76)"
-        ],
-        "Philadelphia Eagles": [
-          "TE: Kevin Turner (RB 77)",
-          "K: Doug Pederson (QB 71)"
-        ]
-      },
-      "gaps": {
-        "Indianapolis Colts": {
-          "WR": 1
-        },
-        "Philadelphia Eagles": {
-          "TE": 1,
-          "K": 1
-        },
-        "Washington": {
-          "K": 1
-        }
-      },
-      "checks": [
-        {
-          "name": "maddenratings.net's Madden NFL 2000 team overalls",
-          "clubs": 31,
-          "spearman": 0.903
-        },
-        {
-          "name": "maddenratings.net's Madden NFL 2000 99 and 100 overall clubs",
-          "players": [
-            "FB Mike Alstott: 10 of 137 at RB (91)",
-            "CB Deion Sanders: 1 of 144 at CB (98)",
-            "RB Barry Sanders: not on a club here",
-            "C Dermontti Dawson: 1 of 214 at OL (99)",
-            "P Matt Turk: not on a club here"
-          ]
-        },
-        {
-          "name": "nflverse's 1999 rosters",
-          "players": 1215,
-          "sameClub": 1199
-        },
-        {
-          "name": "the position lists against the team pages",
-          "compared": 1075,
-          "identical": 1073
-        }
-      ],
-      "fit": {
-        "QB": {
-          "players": 77,
-          "spearman": 0.971
-        },
-        "RB": {
-          "players": 130,
-          "spearman": 0.954
-        },
-        "WR": {
-          "players": 153,
-          "spearman": 0.994
-        },
-        "TE": {
-          "players": 78,
-          "spearman": 0.974
-        },
-        "OT": {
-          "players": 91,
-          "spearman": 0.983
-        },
-        "OG": {
-          "players": 95,
-          "spearman": 0.967
-        },
-        "C": {
-          "players": 54,
-          "spearman": 0.973
-        },
-        "DL": {
-          "players": 212,
-          "spearman": 0.989
-        },
-        "LB": {
-          "players": 193,
-          "spearman": 0.982
-        },
-        "CB": {
-          "players": 66,
-          "spearman": 0.945
-        },
-        "S": {
-          "players": 72,
-          "spearman": 0.986
-        },
-        "K": {
-          "players": 35,
-          "spearman": 0.728
-        }
-      },
-      "left": [
-        "Kyle Richardson (nfl-baltimore-ravens P #14): a second game row under the name of Kyle Richardson #5 (nflverse's number); who he was is unknown",
-        "Kevin Mitchell (nfl-new-orleans-saints LB #59): a second game row under the name of Kevin Mitchell #50 (nflverse's number); who he was is unknown",
-        "Marcus Nash (nfl-baltimore-ravens WR #11): another club's game row under the name of Marcus Nash of nfl-denver-broncos #82 (nflverse's club he left that season); who he was is unknown",
-        "Marcus Spriggs (nfl-buffalo-bills DT): the edition did not track his TAK"
-      ]
+      "outOfPosition": {},
+      "gaps": {},
+      "calibration": 0.7567
     },
     {
-      "id": "madden-1998",
-      "version": "madden-1998-02619a9d",
+      "id": "pfa-1998",
+      "version": "pfa-1998-1571e0f8",
       "season": "1998",
-      "label": "Madden NFL 99 (converted)",
-      "edition": "Madden NFL 99",
-      "compiler": "NFL Draft Buzz's Madden Ratings Database (EA SPORTS' attributes); the overall ours, from Madden NFL 2001's weights and Madden NFL 2002 (maddenratings.net)",
-      "url": "https://www.nfldraftbuzz.com/madden/year/1999",
-      "retrieved": "2026-11-09",
-      "overall": "converted",
-      "players": 1180,
+      "label": "NFL (computed)",
+      "league": "NFL",
+      "compiler": "Pro Football Archives (the facts: starts, positions, box scores); the overall ours, computed from them and read off Madden NFL 2002 (maddenratings.net)",
+      "url": "https://www.profootballarchives.com/1998nfl.html",
+      "retrieved": "2026-11-10",
+      "players": 1668,
       "map": "nfl1998",
+      "spread": [
+        73.7,
+        85.8
+      ],
       "clubs": [
-        "Denver Broncos 82.9",
-        "Pittsburgh Steelers 81.2",
-        "Kansas City Chiefs 80.9",
-        "Green Bay Packers 80.7",
-        "Tampa Bay Buccaneers 80.7",
-        "New England Patriots 79.9",
-        "Seattle Seahawks 79.9",
-        "Minnesota Vikings 79.8",
-        "San Francisco 49ers 79.8",
-        "Tennessee Oilers 79.4",
-        "Dallas Cowboys 79.1",
-        "Oakland Raiders 79.1",
-        "Jacksonville Jaguars 79",
-        "Buffalo Bills 78.7",
-        "Detroit Lions 78.7",
-        "Baltimore Ravens 77.8",
-        "Cincinnati Bengals 77.3",
-        "Washington 77.3",
-        "Carolina Panthers 76.7",
-        "Chicago Bears 76.7",
-        "St. Louis Rams 76.5",
-        "New York Giants 76.2",
-        "Atlanta Falcons 75.9",
-        "Indianapolis Colts 75.1",
-        "New York Jets 74.1",
-        "Philadelphia Eagles 74.1",
-        "Arizona Cardinals 73.7",
-        "New Orleans Saints 73.3",
-        "San Diego Chargers 72.5",
-        "Miami Dolphins 71.7"
+        "Minnesota Vikings 85.8 (15-1, 556–296)",
+        "Denver Broncos 85.5 (14-2, 501–309)",
+        "Atlanta Falcons 85 (14-2, 442–289)",
+        "New York Jets 83.1 (12-4, 416–266)",
+        "San Francisco 49ers 82.6 (12-4, 479–328)",
+        "Seattle Seahawks 81.3 (8-8, 372–310)",
+        "Green Bay Packers 80.7 (11-5, 408–319)",
+        "Tennessee Oilers 80.4 (8-8, 330–320)",
+        "Buffalo Bills 80 (10-6, 400–333)",
+        "New England Patriots 79.9 (9-7, 337–329)",
+        "Dallas Cowboys 79.5 (10-6, 381–275)",
+        "Miami Dolphins 79.2 (10-6, 321–265)",
+        "Jacksonville Jaguars 79 (11-5, 392–335)",
+        "Tampa Bay Buccaneers 78.7 (8-8, 314–295)",
+        "Kansas City Chiefs 78.6 (7-9, 327–363)",
+        "Detroit Lions 78.5 (5-11, 306–378)",
+        "New Orleans Saints 78.1 (6-10, 305–359)",
+        "New York Giants 77.4 (8-8, 287–309)",
+        "Pittsburgh Steelers 77.4 (7-9, 263–303)",
+        "Arizona Cardinals 77.2 (9-7, 325–378)",
+        "San Diego Chargers 77 (5-11, 241–342)",
+        "Oakland Raiders 76.9 (8-8, 288–356)",
+        "Chicago Bears 76.8 (4-12, 276–368)",
+        "St. Louis Rams 76.8 (4-12, 285–378)",
+        "Baltimore Ravens 76.7 (6-10, 269–335)",
+        "Indianapolis Colts 76.4 (3-13, 310–444)",
+        "Carolina Panthers 76.1 (4-12, 336–413)",
+        "Cincinnati Bengals 75.7 (3-13, 268–452)",
+        "Washington 75.3 (6-10, 319–421)",
+        "Philadelphia Eagles 73.7 (3-13, 161–344)"
       ],
       "outOfPosition": {
         "Green Bay Packers": [
-          "K: Raymont Harris (RB 87)"
-        ],
-        "San Francisco 49ers": [
-          "K: Winfred Tubbs (LB 83)"
-        ],
-        "Dallas Cowboys": [
-          "K: Emmitt Smith (RB 83)"
-        ],
-        "Jacksonville Jaguars": [
-          "K: James Stewart (RB 75)"
-        ],
-        "Carolina Panthers": [
-          "OL: Kevin Greene (LB 91)"
-        ],
-        "Indianapolis Colts": [
-          "K: Lamont Warren (RB 74)"
-        ],
-        "New York Jets": [
-          "K: James Farrior (LB 79)"
+          "CB: Darick Holmes (RB 74)"
         ],
         "Arizona Cardinals": [
-          "WR: Mario Bates (RB 81)"
+          "K: Larry Centers (RB 83)"
         ],
-        "Miami Dolphins": [
-          "WR: Danny Stubbs (DL 68)",
-          "WR: Karim Abdul-Jabbar (RB 73)"
+        "Philadelphia Eagles": [
+          "K: Kevin Turner (RB 80)"
         ]
       },
       "gaps": {
-        "Arizona Cardinals": {
-          "WR": 1
-        },
-        "Carolina Panthers": {
-          "OL": 1
-        },
-        "Indianapolis Colts": {
-          "K": 1
-        },
-        "Miami Dolphins": {
-          "WR": 2
-        },
-        "San Francisco 49ers": {
-          "K": 1
+        "Green Bay Packers": {
+          "CB": 1
         }
       },
-      "checks": [
-        {
-          "name": "maddenratings.net's Madden NFL 99 team overalls",
-          "clubs": 30,
-          "spearman": 0.875
-        },
-        {
-          "name": "maddenratings.net's Madden NFL 99 99 and 100 overall clubs",
-          "players": [
-            "RB Barry Sanders: 4 of 131 at RB (94)",
-            "WR Jerry Rice: 1 of 120 at WR (98)",
-            "TE Shannon Sharpe: 2 of 72 at TE (94)",
-            "TE Mark Chmura: 3 of 72 at TE (90)",
-            "OT Tony Boselli: 1 of 207 at OL (99)",
-            "CB Deion Sanders: 20 of 146 at CB (81)",
-            "TE Ben Coates: 1 of 72 at TE (99)",
-            "C Dermontti Dawson: 7 of 207 at OL (95)",
-            "OG Randall McDaniel: 3 of 207 at OL (97)",
-            "OG Larry Allen: 4 of 207 at OL (96)",
-            "OG Mark Schlereth: 2 of 207 at OL (97)",
-            "OT Jonathan Ogden: 11 of 207 at OL (91)",
-            "OT Willie Roaf: 10 of 207 at OL (92)",
-            "DE Bruce Smith: 1 of 195 at DL (99)",
-            "DE Neil Smith: 2 of 195 at DL (97)",
-            "DE Reggie White: 3 of 195 at DL (97)",
-            "DE Tony Brackens: 8 of 195 at DL (93)",
-            "MLB Ken Norton Jr.: 4 of 154 at LB (96)",
-            "CB Jason Sehorn: not on a club here",
-            "K Morten Andersen: 3 of 28 at K (96)"
-          ]
-        },
-        {
-          "name": "nflverse's 1998 rosters",
-          "players": 1180,
-          "sameClub": 1165
-        },
-        {
-          "name": "the position lists against the team pages",
-          "compared": 1043,
-          "identical": 1042
-        }
-      ],
-      "fit": {
-        "QB": {
-          "players": 77,
-          "spearman": 0.971
-        },
-        "RB": {
-          "players": 130,
-          "spearman": 0.954
-        },
-        "WR": {
-          "players": 153,
-          "spearman": 0.994
-        },
-        "TE": {
-          "players": 78,
-          "spearman": 0.974
-        },
-        "OT": {
-          "players": 91,
-          "spearman": 0.983
-        },
-        "OG": {
-          "players": 95,
-          "spearman": 0.967
-        },
-        "C": {
-          "players": 54,
-          "spearman": 0.973
-        },
-        "DL": {
-          "players": 212,
-          "spearman": 0.989
-        },
-        "LB": {
-          "players": 193,
-          "spearman": 0.982
-        },
-        "CB": {
-          "players": 66,
-          "spearman": 0.945
-        },
-        "S": {
-          "players": 72,
-          "spearman": 0.986
-        },
-        "K": {
-          "players": 35,
-          "spearman": 0.728
-        }
-      },
-      "left": [
-        "Rob Moore (nfl-arizona-cardinals WR #20): a second game row under the name of Rob Moore #85 (nflverse's number); who he was is unknown"
-      ]
+      "calibration": 0.7567
     },
     {
       "id": "pfa-1997",

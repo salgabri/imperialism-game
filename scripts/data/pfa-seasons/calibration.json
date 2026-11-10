@@ -1,5 +1,5 @@
 {
- "note": "How well the computed seasons' value orders each position as the next season's Madden launch ratings do (Spearman's rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season's club strengths by the credit's power, beside Madden NFL 2002's spread of 2001's.",
+ "note": "How well the computed seasons' value orders each position as the next season's Madden launch ratings do (Spearman's rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season's club strengths by the credit's power, beside Madden NFL 2002's spread of 2001's. `holdout`: the same measure on 2000, which the weights were not tuned on, against Madden NFL 2002 (the 2001 season's launch roster); 1998 and 1999 have none, the next seasons' Madden ratings surviving in no copy the game reads.",
  "weights": {
   "pass": 0.2,
   "td": 40,
@@ -383,6 +383,93 @@
    ]
   }
  },
+ "holdout": {
+  "mean": 0.7319,
+  "positions": {
+   "QB": 0.801,
+   "RB": 0.697,
+   "WR": 0.808,
+   "TE": 0.779,
+   "OL": 0.633,
+   "DL": 0.691,
+   "LB": 0.731,
+   "CB": 0.723,
+   "S": 0.724,
+   "K": 0.732
+  },
+  "seasons": {
+   "QB": [
+    {
+     "season": 2000,
+     "players": 70,
+     "spearman": 0.801
+    }
+   ],
+   "RB": [
+    {
+     "season": 2000,
+     "players": 124,
+     "spearman": 0.697
+    }
+   ],
+   "WR": [
+    {
+     "season": 2000,
+     "players": 136,
+     "spearman": 0.808
+    }
+   ],
+   "TE": [
+    {
+     "season": 2000,
+     "players": 64,
+     "spearman": 0.779
+    }
+   ],
+   "OL": [
+    {
+     "season": 2000,
+     "players": 233,
+     "spearman": 0.633
+    }
+   ],
+   "DL": [
+    {
+     "season": 2000,
+     "players": 199,
+     "spearman": 0.691
+    }
+   ],
+   "LB": [
+    {
+     "season": 2000,
+     "players": 167,
+     "spearman": 0.731
+    }
+   ],
+   "CB": [
+    {
+     "season": 2000,
+     "players": 116,
+     "spearman": 0.723
+    }
+   ],
+   "S": [
+    {
+     "season": 2000,
+     "players": 111,
+     "spearman": 0.724
+    }
+   ],
+   "K": [
+    {
+     "season": 2000,
+     "players": 31,
+     "spearman": 0.732
+    }
+   ]
+  }
+ },
  "files": {
   "2001/2001nfl.html": "ab6249221522d560b4d782d7c262f26493eee81f92aa7452264ee3edd6714364",
   "2001/2001nflne.html": "f111b8dbe4665ba3305e70f5bce7b80ee18f1e761e207d4d896c2f7bee9c15db",
@@ -547,6 +634,38 @@
   "2005/2005nflsea.html": "e5a8064691e4f10a1f08912bf0a8c5650da18e363a2782bcc274679687fc8092",
   "2005/2005nflstl.html": "37f2c662b4dc240cb2bb816396b72c521170ee3beda621c15c351bec6b311b98",
   "2005/2005nflari.html": "d6c3082166bce04fc6f7ba6ceb999e27bd19292825237cbd302aee2450e72e84",
-  "2005/2005nflsf.html": "33ec8f5d5d64256582c1c3ba4be600a4717c4622ba2ebe514a97c1fea211c52c"
+  "2005/2005nflsf.html": "33ec8f5d5d64256582c1c3ba4be600a4717c4622ba2ebe514a97c1fea211c52c",
+  "2000/2000nfl.html": "2e03b32906c8e723483490a6c1a7e333d824e286af042f81269b34721ee42101",
+  "2000/2000nflbal.html": "2406fa709f8077161743878ffefb0f8f99885f8e15a7a0e9223852cf37004166",
+  "2000/2000nflmia.html": "18cf422bad912527cfa90187eea1652e3d1a3640d04dce9da0dc62b732e49c4f",
+  "2000/2000nflind.html": "cccee9b27513d00852c817174078f0f25f68c1da3976f071e505dfd2bb8e59f2",
+  "2000/2000nflnyj.html": "cd481453ca706b3905eb9e629e93e9d8f5fadd566c275538dddef507a58629c1",
+  "2000/2000nflbuf.html": "87ac6ddf1d8117482e15e0fb17cad65d032a75d679599d90d3dc221e6c3b4fa4",
+  "2000/2000nflne.html": "cc2f1c878cd42ffaab4f478d53a1af21641efae2ef220ca4dd31eb98c888325f",
+  "2000/2000nflten.html": "cb7cfb566c6bc3383a45c40b20c99357f152087b69f98fd2483f1a0a1a7bc841",
+  "2000/2000nflpit.html": "4bfc20fda7c91e53dc94c2fb927f111b9992b9b3a07bff1433b4cee25487ca81",
+  "2000/2000nfljac.html": "8acd7d3002dd8b9526bd14b15371c5510bbf336c03655576b64657a6170a9fb0",
+  "2000/2000nflcin.html": "ae9f13a936d8f2f7ce5c3905bb0db410046a199c7b11370451b58fd81c71ede4",
+  "2000/2000nflcle.html": "2dd3f7ddef932cb82bd96db2d88acb452979cea5e99f83c3edefcabf2ca8ec06",
+  "2000/2000nfloak.html": "accd2ac59d35f12eb591207651081783a8da92071c6089f074ceb6b19d6d03e1",
+  "2000/2000nflden.html": "164fcee0839879c35111b05692007ed19447abcd0e88e35059042fd264c608ac",
+  "2000/2000nflkc.html": "686acfcb3f147113d02364a2c6ecd967914c67654cb174c231a121bb96b29b6b",
+  "2000/2000nflsea.html": "ed568c274b5cb820b864aceba94aeb1077b9d725ec1f7ef32e2df12aa7ee8ab5",
+  "2000/2000nflsd.html": "cf979c92efaabe9bdad1382af21917d544b675b0cca182f75655da87e12561c9",
+  "2000/2000nflnyg.html": "726e9a9f9afaff9c27d0e136142b26b2f1b018ad25eebcaa180c321a82702819",
+  "2000/2000nflphi.html": "94a715328712ce1aa150efe966ea869d20dd443d6aa23e6f9b8e4c4d83be3895",
+  "2000/2000nflwas.html": "c58fb408a421343461dfe44c071ccd04b2afcf3a9ac8462404dea8cabf3e65f5",
+  "2000/2000nfldal.html": "a9538a17599ee0d4ca129590607571bee82adc722f39a5a3ad059db7d2817eb7",
+  "2000/2000nflari.html": "9d72a640cfdbd650d9d622081d4e34a4057895b1744675f0b2cc6424ccb4b139",
+  "2000/2000nflmin.html": "d003c199ab5597522d90f027619d0e6d9aed38d832750cd6e21fe7d4f929f264",
+  "2000/2000nfltb.html": "32907c53cc1201306b9eb3193ed230cfc73812b8ab4539a34d059f3da410904d",
+  "2000/2000nflgb.html": "7725eb2679e6682aeb67092d09779c4d7c71c1f99bb193a4dc4966e5943b493f",
+  "2000/2000nfldet.html": "50768a1367b34c55ee0a2d642a746465941f6887c478e16e1f39876dc68e8625",
+  "2000/2000nflchib.html": "7dfd219b0b4d5c4b147511e7ebdaeacb7b1ca13a9107e4aaa0a98599f8fa729d",
+  "2000/2000nflno.html": "d39bf9757da48d412d97089f21d67f16b45a9f605922c9c20ef3e0e81aa6b9c2",
+  "2000/2000nflstl.html": "35bb2e123649e8b340a65dfc99dd83169650973d4ec736a45af4effdd854c25c",
+  "2000/2000nflcar.html": "bc428eb8a38991487f373afe1ed0eaf664d42b2affec89f9064c325e21798433",
+  "2000/2000nflsf.html": "740b73b7e1db69cfd6123d82dced4f403b0aaec0ea2c173fdb17cd20e704715e",
+  "2000/2000nflatl.html": "603a0a5a1ff2eb8f82446a0086d867f444aeb6214d86dd660dcb10a3568f6e09"
  }
 }

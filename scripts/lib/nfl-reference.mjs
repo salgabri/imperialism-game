@@ -1,7 +1,7 @@
-// The overall the NFL seasons no game rated with one get (docs/design/american-football.md, "Tecmo seasons", "Madden
-// NFL 99 to 2001" and "Computed seasons"): each game position's scores, whatever made them (a Tecmo edition's position
-// score, a Madden edition's weighted attributes, a season's computed value), ranked within the season and read off
-// Madden NFL 2002's overalls at that position, the 2001 season and the earliest Madden season the game ships. No I/O here.
+// The overall the NFL seasons no game rated with one get (docs/design/american-football.md, "Tecmo seasons" and
+// "Computed seasons"): each game position's scores, whatever made them (a Tecmo edition's position score, a season's
+// computed value), ranked within the season and read off Madden NFL 2002's overalls at that position, the 2001 season
+// and the earliest Madden season the game ships. No I/O here.
 //
 // The reference is maddenratings.net's 31 team sheets of Madden NFL 2002 (punters out), as many of each team's best at the
 // position as the season carries per club, so that a backup meets Madden's backups rather than its practice squad.
@@ -68,13 +68,4 @@ export function maddenReferencePlayers(snapshot) {
     if (!position) throw new Error(`Madden NFL 2002: unknown position ${listed}`);
     return { team: String(team), position, overall, name };
   });
-}
-
-/**
- * The overall of each player of a season's game position, `players` (`[{ score }]`, `clubs` clubs): their scores read
- * off the reference at the position by percentile (overallsOf) → `{ overall: Map score → overall, reference }`.
- */
-export function positionOveralls(players, clubs, madden, position) {
-  const reference = referenceOf(madden, position, players.length / clubs);
-  return { overall: overallsOf(players.map(p => p.score), reference), reference };
 }
