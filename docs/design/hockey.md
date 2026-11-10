@@ -6,7 +6,8 @@ Canada on the NHL's own map, each holding its own state or province
 players of each country. Everything outside the match
 (territory, the draw, targeting, conquest, signings, saves) is the game's own, unchanged.
 Since 2026-11-09 every NHL season from 1966/67 to 2025/26 but the cancelled 2004/05 is built in
-("Earlier seasons", "NHL 08 and NHL 09", "Computed seasons", "Eras").
+("Earlier seasons", "NHL 08 and NHL 09", "Computed seasons", "Eras"); since 2026-11-10 setup shows the
+credit its sources ask for under the Season choice ("Credits").
 
 **This is the one sport whose ratings are partly estimates.** EA publishes NHL 27 ratings
 for its top 300 players only, and 32 clubs need about 600 for full lineups. The player
@@ -149,9 +150,10 @@ chart is within half a point of the fixture's simulated odds.
 ## Interface
 
 - **Setup.** A sport card, "Nations · 32 NHL clubs". Clubs have one theatre, **NHL · USA
-  and Canada**. The note under Season says which ratings are estimates, which seasons are converted
-  or computed and from what (crediting the Hockey Databank and MoneyPuck.com), and that nations play
-  from 1977/78. A season to 1976/77 has clubs only: choosing it takes the clubs.
+  and Canada**. The note under Season (the choice's title and description) says which ratings are
+  estimates, which seasons are converted or computed and from what, and that nations play from 1977/78.
+  A season to 1976/77 has clubs only: choosing it takes the clubs. A season the Hockey Databank or
+  MoneyPuck.com feeds shows its credit as text under the choice ("Credits").
 - **Squad.** A rink: the goalie in his crease, three pairs below the blue line, four lines
   above it. Groups read Centres, Wings, Defence and Goalie; the profile Attack, Defence and
   Goaltending.
@@ -365,8 +367,9 @@ limits its use to non-commercial personal use: nothing of it is used for these s
 The databank's own sources are the NHL's guides and record books, Total Hockey and others (its readme). Its statement:
 "The information used herein was obtained free of charge from and is copyrighted by the Hockey Databank project. For
 more information about the Hockey Databank project please visit http://sports.groups.yahoo.com/group/hockey-databank".
-It is in `public/hockey/ATTRIBUTION.txt` and in each of its seasons' `source.attribution`; the sync checks the readme
-still asks for it word for word. raw.githubusercontent.com and peter-tanner.com have no robots.txt rules; moneypuck.com's
+Setup shows it in full under the Season choice for every season that takes anything from the databank ("Credits"); it is
+also in `public/hockey/ATTRIBUTION.txt` and in every computed season's `source.attribution`. The sync checks the readme still
+asks for it word for word. raw.githubusercontent.com and peter-tanner.com have no robots.txt rules; moneypuck.com's
 robots.txt only defines Cloudflare's content signals. Every download (4 databank files, 36 MoneyPuck season summaries,
 the lookup and 30 game-by-game archives of 329 MB in all) is pinned by SHA-256 in `scripts/data/nhl-seasons-sources.json`.
 
@@ -531,6 +534,46 @@ Newark, 12 km within New Jersey, and the Penguins' 0.2 km keep it): its version 
 on it resumes through the existing remap path (tested). 2025/26 plays on today's `nhl` map, and the builder checks its
 clubs and arenas are today's. The five maps of the editions are unchanged.
 
+## Credits
+
+The Hockey Databank's terms ask that its statement be displayed prominently and in its entirety on the product, and
+MoneyPuck.com asks for a clear credit (done 2026-11-10). The mechanism is any sport's: a data set's listing entry may carry
+a `credit`, the plain text its sources ask to be shown with it. `listing` in `src/engine/footballSets.js` keeps it exactly
+as written (an entry with a blank or non-text credit is left out, as any entry the builder would not write); the setup
+model passes the chosen season's on (`season.credit`, '' for none); and setup shows it as text right under the Season
+choice, while the season loads too, the choice naming it in its `aria-describedby`. The season files carry none, so their
+versions, and every save on them, stand. Only ice hockey's seasons carry one so far.
+
+`scripts/build-nhl-seasons.mjs` (`creditOf`) writes each season's into `src/data/hockeySeasons.js`, each text once as a
+constant:
+
+| Seasons | Credit |
+| --- | --- |
+| The 37 computed from the databank, NHL 08 and NHL 09 | the databank's statement |
+| 2010/11 to 2024/25 but 2021/22 (14), computed from MoneyPuck's data | "Data: MoneyPuck.com." then the statement |
+| 2025/26 | "Data: MoneyPuck.com" |
+| The five EA editions | none: their positions and birth countries are the NHL's rosters' |
+
+The statement is `computed.sources.hdb.attribution`, word for word as the databank's readme asks for it (the sync and a
+test check the readme still does), two spaces after "project." included: "The information used herein was obtained free
+of charge from and is copyrighted by the Hockey Databank project.  For more information about the Hockey Databank project
+please visit http://sports.groups.yahoo.com/group/hockey-databank". A season takes it wherever its snapshot draws on the
+databank (`usesDatabank`): every line of a season computed from it; NHL 09's skaters' positions (its rosters of 2008/09,
+else the seasons beside it); the birth country of a player EA's Country does not place, in NHL 08 (Cristobal Huet's
+France, its notes record) and NHL 09; and a MoneyPuck season's birth countries where MoneyPuck's lookup gives no
+nationality (`notes.birthFromDatabank`: 27 players in 2010/11 down to one in 2024/25, none in 2025/26).
+`public/hockey/ATTRIBUTION.txt` says the same and names where the game shows them.
+
+**On screen.** 11px Archivo in the muted text colour (5.0:1 on the light page, 6.2:1 on the dark), 10.5px below 390px
+wide, never cut or clamped. The longest, MoneyPuck's with the statement (254 characters), runs four lines in the controls'
+column at every size measured (three at 1920 wide, two across a portrait tablet). It takes the room of step 1's extras
+where they compete for height: the lede on every phone and on windows up to 800px tall; the whole heading on a phone with
+a notice line (resume, a challenge link) and on a short window with two. Measured in
+[compact-pass.md](compact-pass.md#measured): no vertical scrolling from 360×640 to 1920×1080.
+
+**In play** the game names a season (the campaign title, the Ledger's head, Saved campaigns' "Season") but never its
+source, so the credit shows in setup alone.
+
 ## Tests
 
 `scripts/hockey-seasons.test.mjs`: the 59 seasons rebuild byte for byte (and from the pinned
@@ -538,8 +581,10 @@ downloads, when they are on the computer); the listing, the era maps and the loa
 the classic facts (Gretzky 87, Lemieux's cap, Chambers's 1, the Rangers from Segathon, the short
 clubs); the rescale (the frozen NHL 27 reference, every rating the rescaled game overall of its
 player, the order holding and ties staying ties, NHL 07 and NHL 22 unconverted); NHL 22 against
-EA's lists; the name matching; and the running App launching a 1993/94 nations campaign and a
-2006/07 clubs campaign on its map, and resuming.
+EA's lists; the name matching; the running App launching a 1993/94 nations campaign and a
+2006/07 clubs campaign on its map, and resuming; and the Season choice showing each season's credit
+as text under it as the player picks seasons (MoneyPuck's with the statement, MoneyPuck's alone, the
+statement, none).
 
 `scripts/hockey-computed.test.mjs`: the rule by hand (both skater forms, both goalie forms, the
 weights, 2004/05 skipped, the club by most games); the mid-rank ratings, ties and the step rule; every
@@ -549,10 +594,16 @@ apart; minutes a game better for NHL 22; goals against within 0.03 of save perce
 1977/78; the birth-city rule; the names MoneyPuck dropped letters from put back; NHL 08 and NHL 09
 (the attribute lists, the 255 rows, the three rows broken pages hide, NHL 07's self-check from the
 pinned pages); the eras (club counts, the Seals and Barons, the 1979/80 Whalers at Springfield, the
-editions' lists reproduced); every map serving its seasons; the loader's refusals; and the running
-App playing a 1967/68 clubs campaign, a 1985/86 nations campaign, a 2025/26 clubs campaign on today's
-map and a 2007/08 nations campaign (each saved and the last two resumed), and resuming a 2006/07
-campaign saved on `nhl2007` before it served more seasons.
+editions' lists reproduced); every map serving its seasons; the loader's refusals; every season's
+credit (the statement word for word where the season draws on the databank, MoneyPuck's on its
+seasons, none on the editions, the season files untouched) and the databank's readme asking for it,
+when it is on the computer; and the running App playing a 1967/68 clubs campaign, a 1985/86 nations
+campaign, a 2025/26 clubs campaign on today's map and a 2007/08 nations campaign (each saved and the
+last two resumed), and resuming a 2006/07 campaign saved on `nhl2007` before it served more seasons.
+
+`scripts/setup-wizard.test.mjs` holds the generic side: a listed set's credit in the model and on
+screen under the Season choice, gone with a season without one, and the CSS that never cuts it and
+makes room for it; `scripts/football-sets.test.mjs` the listing keeping a credit word for word.
 
 `scripts/hockey.test.mjs`: the data rebuilds byte for byte; EA's ratings unchanged, every
 other rating marked and under the cut-off; namesakes apart; lineups, depth and the position
@@ -575,11 +626,9 @@ duel campaign with the live ticker and a hockey nations campaign.
   points alone, so a shutdown defender rates low. No time on ice before 2008/09 and no goalies' shots against before
   1982/83 are in the open sources; the NHL's API has both, but turns this project's agents away.
 - Terms. MoneyPuck.com's data, behind the 15 seasons from 2010/11, is free for non-commercial use only, as the NHL's own
-  statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. The Hockey Databank asks for
-  its statement to be displayed prominently and in its entirety on the product: it is whole in
-  `public/hockey/ATTRIBUTION.txt` and each season's source, but the game shows neither; the Season note, which the setup
-  shows only as the Season list's tooltip, credits the databank in short. No screen shows it in full yet: the player's
-  call before these seasons ship.
+  statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. The Hockey Databank's statement
+  and MoneyPuck's credit show in full under the Season choice ("Credits"), in setup only: no screen in play names a
+  season's source.
 - Names: the Hockey Databank and MoneyPuck spell names without accents ("Borje Salming", "Tim Stutzle"), and the
   databank in its own way (Raymond Bourque); NHL 08 and NHL 09 keep IGN's spellings.
 - NHL 09's attributes are EA's before release; neither NHL 08's nor NHL 09's overall is EA's.

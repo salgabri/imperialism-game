@@ -259,12 +259,15 @@ manager of the theatre's favourite, with decisions from the first match.
    built-in 2026/27, then its [earlier seasons](#womens-football-seasons) 2025/26
    back to 2015/16 (EA ratings of each; national teams only before 2022/23), ice
    hockey its built-in 2026/27, then its [earlier seasons](#ice-hockey-seasons)
-   2021/22, 2006/07 and 1994/95 back to 1992/93 (EA's NHL ratings of each),
-   nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
+   2025/26 back to 1966/67 but the cancelled 2004/05 (EA's NHL ratings where an
+   edition published them, else converted or computed from the players'
+   statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1973, women's tennis its 2026 (Elo of
    2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1973, rugby league its built-in 2025
    (Rugby League 26) then [2008](#rugby-league-seasons) (Rugby League 2, the
-   overall ours), NRL clubs on the map of 2008. A one-line quick-resume
+   overall ours), NRL clubs on the map of 2008. A season whose sources ask for a
+   credit shows it, whole, as small text under the Season choice (ice hockey's
+   Hockey Databank and MoneyPuck.com seasons). A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
    from a challenge link shows a one-line note about the link
    ([Sharing a campaign](#sharing-a-campaign)). The header holds the save actions
@@ -1607,9 +1610,13 @@ only when chosen.
 
 ## Ice hockey seasons
 
-Ice hockey can be played on five earlier seasons as well as the built-in
-2026/27, each one EA edition's ratings of an NHL season: 2021/22 (NHL 22),
-2006/07 (NHL 07), 1994/95 (NHL 95), 1993/94 (NHL '94) and 1992/93 (NHLPA '93).
+Ice hockey can be played on every NHL season from 1966/67 to 2025/26 but the
+cancelled 2004/05, as well as the built-in 2026/27. Five are one EA edition's
+ratings of an NHL season: 2021/22 (NHL 22), 2006/07 (NHL 07), 1994/95 (NHL 95),
+1993/94 (NHL '94) and 1992/93 (NHLPA '93); 2007/08 and 2008/09 are NHL 08's and
+NHL 09's attributes, the overall converted; the other 52 are computed from the
+players' statistics, the Hockey Databank's to 2009/10 and MoneyPuck.com's after
+([design notes](docs/design/hockey.md#computed-seasons)).
 Pick one under **Season** in setup; it plays its nations, by birth country, or
 its clubs on the map of their day (the Hartford Whalers, Quebec Nordiques,
 Minnesota North Stars and the first Winnipeg Jets among them). Each season is a
@@ -1619,6 +1626,12 @@ file in `public/hockey/` that loads only when chosen.
   does not rate is not there, and a club it leaves short fields what it has
   (Anaheim and Florida in 1993/94, Ottawa and Tampa Bay in 1992/93, eight clubs
   in 2021/22). Each club is the edition's roster at release.
+- **Credits:** setup shows a season's credit as small text under the Season
+  choice, whole: the Hockey Databank's statement, as its terms ask, on every
+  season that takes anything from it (the 37 computed from it, NHL 08 and NHL
+  09, and the MoneyPuck seasons whose birth countries it fills), and "Data:
+  MoneyPuck.com" on the 15 computed from MoneyPuck's data. `public/hockey/ATTRIBUTION.txt`
+  lists the sources and their terms ([design notes](docs/design/hockey.md#credits)).
 - **Sources:** NHL 22 from NHLRatings.net's team pages as CommonCrawl kept them
   (EA's own launch lists agree on all 60 players they rate); NHL 07 from IGN's
   pages of EA's ratings (Wayback Machine); NHL 95 from Jon Morris's sheet
@@ -1645,8 +1658,9 @@ file in `public/hockey/` that loads only when chosen.
   as 82). The games' own overalls stay in the snapshots and the audit, and each
   season's source states the rule
   ([design notes](docs/design/hockey.md#earlier-seasons)).
-- **Missing:** the other seasons, for which no complete copy of EA's ratings
-  could be checked (NHL 24 and NHL 26 were tried and left out).
+- **Missing:** EA's own ratings of the other seasons: no complete copy could be
+  checked (NHL 24 and NHL 26 were tried and left out), so those seasons are
+  converted or computed.
 
 ## Tennis seasons
 
