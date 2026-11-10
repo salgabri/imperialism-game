@@ -306,6 +306,9 @@ export default class App extends React.Component {
   }
 
   componentDidUpdate(_props, previous) {
+    // The random state this commit's campaign state was drawn with: nextAction starts no turn while the generator has
+    // moved past it (a turn drawn in a timer task that React has not committed yet).
+    this.committedRng = this.rng?.getState?.();
     this.updateEngagement();
     // The crash screen exports the campaign this page plays (storage crashCheckpoint), not another tab's.
     setActiveCampaign(this.state.phase === 'playing' || this.state.phase === 'victory' ? this.state.campaignId : null);
@@ -1597,6 +1600,12 @@ export default class App extends React.Component {
     if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.pendingTarget) return;
     if (st.match && !st.match.applied) return;
     if (st.spin) return;
+    // A turn is already under way. React 18 commits a timer task's updates in a later task, so until then this.state
+    // still shows the settled match while the next turn has drawn and simulated. A second start in that gap would draw
+    // again and play a different campaign from the same seed: two turn timers due together (Play re-arms the turn timer
+    // a pause held, and schedules its own), or a Next match click. Only a draw and its match move the campaign's random
+    // state, and componentDidUpdate records it at every commit, so a state past the last commit is a turn in flight.
+    if (this.committedRng !== undefined && this.rng?.getState?.() !== this.committedRng) return;
     // The random state this turn starts from: its fast-forwarded kickoff waits for its result only when the last
     // checkpoint holds this state (expressKickoffReplays).
     this.turnFrom = this.rng?.getState?.();

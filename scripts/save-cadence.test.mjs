@@ -409,3 +409,27 @@ test('a click between a turn\'s timer task and React\'s commit: a crash after th
     }
   });
 });
+
+test('a second turn start before React commits the first draws nothing: the seed plays the same campaign', async () => {
+  // Two starts in one task stand for the browser's races: Play re-arms the turn timer a pause held and schedules its
+  // own, and a Next match click can land between a turn's timer task and React's commit. this.state still shows the
+  // settled match then, so a second start drew again and the campaign parted from its seed (nextAction's guard).
+  const App = await bundleApp();
+  await realReact(async env => {
+    const runs = {};
+    for (const starts of [1, 2]) {
+      const f = await mountCampaign(env, App, { storage: memoryStorage() });
+      assert.ok(await f.playUntil(settledAt(3)), `${starts}: three matches settle`);
+      const before = f.app.rng.getState();
+      for (let i = 0; i < starts; i++) f.app.nextAction();
+      const drawn = f.app.rng.getState();
+      assert.notEqual(drawn, before, `${starts}: the turn drew`);
+      await reactTasks();
+      assert.ok(await f.playUntil(settledAt(8)), `${starts}: eight matches settle`);
+      runs[starts] = { drawn, played: played(f.app) };
+      f.close();
+    }
+    assert.equal(runs[2].drawn, runs[1].drawn, 'the second start took no samples');
+    assert.equal(runs[2].played, runs[1].played, 'and the campaign plays on exactly as from one start');
+  });
+});
