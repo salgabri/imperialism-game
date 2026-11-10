@@ -3,8 +3,14 @@
 // give every player his position and his birth country. The downloads stay in the ignored data-src/nhl-seasons/, each
 // pinned by SHA-256 in scripts/data/nhl-seasons-sources.json; only the snapshots are committed.
 //
+// Every download goes through scripts/lib/polite-fetch.mjs (one generic User-Agent, robots.txt read first and obeyed),
+// which refuses two kinds of source here, so they are read only from their pinned copies in the cache: the NHL's rosters
+// (api-web.nhle.com, which this project never fetches) and the pages only CommonCrawl kept (data.commoncrawl.org, whose
+// robots.txt disallows every path for every agent; read 2026-11-10).
+//
 // Usage: node scripts/sync-nhl-seasons.mjs [--season=nhl-1994|calibration] [--fetch] [--pin] [--check]
-//   --fetch   download the sources missing from data-src/nhl-seasons/ (about one request a second)
+//   --fetch   download the sources missing from data-src/nhl-seasons/ (about one request a second); a missing NHL roster
+//             or CommonCrawl record stops it
 //   --pin     record the SHA-256 of every source read (after a deliberate new download)
 //   --check   rebuild the snapshots and compare them byte for byte; writes nothing
 // Output: scripts/data/nhl-seasons/nhl-<season end year>.json, read by scripts/build-nhl-seasons.mjs, and
@@ -28,6 +34,7 @@ import {
   parseNhl95Sheet, parseNhlpa93, parseSegathon, segathonTable, teamsOf,
 } from './lib/nhl-seasons.mjs';
 import { assembleNhlRatings } from './lib/nhlratings-net.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
 import {
   assembleCalibration, assembleComputed, assembleConverted, calibrationText, computedSnapshotText, convertedSnapshotText,
 } from './lib/nhl-history.mjs';
@@ -79,8 +86,8 @@ async function download({ url, warc }, at) {
   await sleep(Math.max(0, lastFetch + PAUSE_MS - Date.now()));
   lastFetch = Date.now();
   const from = warc ? `https://data.commoncrawl.org/${warc.file}` : url;
-  const headers = { 'user-agent': 'imperialism-game data sync', ...(warc ? { range: `bytes=${warc.offset}-${warc.offset + warc.length - 1}` } : {}) };
-  const response = await fetch(from, { headers, signal: AbortSignal.timeout(60000) });
+  const headers = warc ? { range: `bytes=${warc.offset}-${warc.offset + warc.length - 1}` } : {};
+  const response = await politeFetch(from, { headers, signal: AbortSignal.timeout(60000) });
   if (!response.ok) throw new Error(`${from}: HTTP ${response.status}`);
   let body = Buffer.from(await response.arrayBuffer());
   if (warc) {

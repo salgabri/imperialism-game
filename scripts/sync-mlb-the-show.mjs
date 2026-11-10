@@ -13,6 +13,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { snapshotText } from './lib/mlb.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const args = process.argv.slice(2);
@@ -39,8 +40,7 @@ async function readJson(name, url) {
   if (!refresh && existsSync(file)) return JSON.parse(await readFile(file, 'utf8'));
   for (let attempt = 0; ; attempt++) {
     try {
-      const response = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (imperialism-game roster sync)', accept: 'application/json' },
-        signal: AbortSignal.timeout(45000) });
+      const response = await politeFetch(url, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(45000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = { url, retrieved: new Date().toISOString().slice(0, 10), body: await response.json() };
       await mkdir(cacheDir, { recursive: true });
@@ -48,7 +48,7 @@ async function readJson(name, url) {
       await sleep(PAUSE_MS);
       return data;
     } catch (error) {
-      if (attempt === 2) throw new Error(`${url}: ${error.message}`);
+      if (attempt === 2 || error.fatal) throw new Error(`${url}: ${error.message}`);
       await sleep(PAUSE_MS * (attempt + 2));
     }
   }

@@ -1,7 +1,8 @@
 // Snapshot the EuroLeague: the season's clubs and their rosters, and every player's per-game statistics for the season
 // under way and the two before it, from the EuroLeague's public API (api-live.euroleague.net, the data behind
 // www.euroleaguebasketball.net). The responses are cached in the ignored data-src/euroleague/, so a rerun reads them
-// instead of the API; only the snapshot is committed.
+// instead of the API; only the snapshot is committed. Requests go through scripts/lib/polite-fetch.mjs (one generic
+// User-Agent, robots.txt read first and obeyed; api-live.euroleague.net has none: HTTP 404, read 2026-11-10).
 //
 // Usage: node scripts/sync-euroleague.mjs [--refresh]
 //   --refresh  download everything again: a new snapshot, dated the day it is fetched
@@ -18,6 +19,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cacheDir = path.join(root, 'data-src/euroleague');
@@ -43,8 +45,7 @@ async function fetched(file, url) {
   if (!refresh && existsSync(at)) return JSON.parse(await readFile(at, 'utf8'));
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await fetch(url, { headers: { 'user-agent': 'imperialism-game data sync', accept: 'application/json' },
-        signal: AbortSignal.timeout(60000) });
+      const response = await politeFetch(url, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(60000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const body = await response.json();
       const result = { url, fetchedAt: new Date().toISOString(), body };
@@ -52,7 +53,7 @@ async function fetched(file, url) {
       await sleep(PAUSE_MS);
       return result;
     } catch (error) {
-      if (attempt === 2) throw new Error(`${url}: ${error.message}`);
+      if (attempt === 2 || error.fatal) throw new Error(`${url}: ${error.message}`);
       await sleep(PAUSE_MS * 5);
     }
   }

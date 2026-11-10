@@ -3,8 +3,12 @@
 // statistics from the NHL's public API (api-web.nhle.com). The responses are cached in the ignored data-src/nhl/, so a
 // rerun reads them instead of the APIs; only the snapshot is committed.
 //
-// Usage: node scripts/sync-nhl.mjs [--refresh]
-//   --refresh  download everything again: a new snapshot, dated the day it is fetched
+// The NHL's API is never fetched now (the project's rule; scripts/lib/polite-fetch.mjs refuses it): its rosters and
+// statistics come only from the cache, and since no allowed source gives the same facts, the snapshot cannot be
+// refreshed. EA's ratings API (drop-api.ea.com, no robots.txt) is still allowed, through scripts/lib/polite-fetch.mjs.
+//
+// Usage: node scripts/sync-nhl.mjs
+//   --refresh  refused: a new snapshot would need the NHL's API; scripts/data/nhl-27.json stays as committed
 // Output: scripts/data/nhl-27.json (committed), read by scripts/build-hockey.mjs.
 //
 // A snapshot row is [NHL id, name, team, position, birth country, EA nationality, EA overall, games, seconds on ice,
@@ -15,6 +19,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cacheDir = path.join(root, 'data-src/nhl');
@@ -32,16 +37,20 @@ const EA_POSITION_OF = { Center: 'C', 'Left Wing': 'LW', 'Right Wing': 'RW', 'Le
 const args = process.argv.slice(2);
 const unknown = args.filter(arg => arg !== '--refresh');
 if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
-const refresh = args.includes('--refresh');
+if (args.includes('--refresh')) {
+  throw new Error("--refresh would download the NHL's rosters and statistics again from api-web.nhle.com, which this project never fetches. "
+    + 'scripts/data/nhl-27.json stays as committed; a rerun reads data-src/nhl/.');
+}
+const refresh = false;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-/** One JSON response, from the cache unless `refresh`. */
+/** One JSON response, from the cache (a missing NHL one is refused by polite-fetch, so the run stops). */
 async function fetched(file, url, headers = {}) {
   const at = path.join(cacheDir, file);
   if (!refresh && existsSync(at)) return JSON.parse(await readFile(at, 'utf8'));
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await fetch(url, { headers: { 'user-agent': 'imperialism-game data sync', ...headers }, signal: AbortSignal.timeout(30000) });
+      const response = await politeFetch(url, { headers, signal: AbortSignal.timeout(30000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const body = await response.json();
       const result = { url, fetchedAt: new Date().toISOString(), body };
@@ -49,7 +58,7 @@ async function fetched(file, url, headers = {}) {
       await sleep(PAUSE_MS);
       return result;
     } catch (error) {
-      if (attempt === 2) throw new Error(`${url}: ${error.message}`);
+      if (attempt === 2 || error.fatal) throw new Error(`${url}: ${error.message}`);
       await sleep(PAUSE_MS * 5);
     }
   }

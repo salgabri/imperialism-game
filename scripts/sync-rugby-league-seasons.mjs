@@ -23,6 +23,7 @@ import path from 'node:path';
 import { unzipSync } from 'fflate';
 import { CLUBS as BUILT_IN_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { playerOf } from './lib/nrl.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
 import {
   ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, PREVIOUS_WEIGHT, REASONS, TEAM_RATING_PARTS, WEIGHTS, areaUnderCurve, bornAlike, clubGamesOf,
   clubOf, clubShiftOf, corePoints, drawGames, drawRounds, findListed, fold, gridPart, matchRecord, mostStarted, overallOf, playerPart,
@@ -61,9 +62,8 @@ let lastFetch = 0;
 async function download(file, url) {
   await sleep(Math.max(0, lastFetch + PAUSE_MS - Date.now()));
   lastFetch = Date.now();
-  // A generic agent: no address, account or other personal data goes out with a request.
-  const response = await fetch(url, { headers: { 'user-agent': 'imperialism-game-data/1.0' },
-    signal: AbortSignal.timeout(60000) });
+  // Through scripts/lib/polite-fetch.mjs: a generic agent, robots.txt obeyed.
+  const response = await politeFetch(url, { signal: AbortSignal.timeout(60000) });
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
   const at = path.join(cacheDir, file);
   await mkdir(path.dirname(at), { recursive: true });
@@ -357,7 +357,6 @@ function whyNot(player, club, clubs, grids) {
 
 const NRLCOM = 'https://www.nrl.com';
 const NRLCOM_PAUSE_MS = 1200;
-const NRLCOM_AGENT = 'Mozilla/5.0 (compatible; imperialism-game data sync; one request every 1.2 s)';
 let lastNrlcom = 0;
 
 /** An NRL.com reply from the cache (downloaded first with --fetch), parsed. Its round's pin covers what is read of it. */
@@ -367,7 +366,7 @@ async function nrlcomReply(file, url) {
     if (!fetchMissing) throw new Error(`Missing data-src/rugby-league-seasons/nrlcom/${file}: run node scripts/sync-rugby-league-seasons.mjs --fetch`);
     await sleep(Math.max(0, lastNrlcom + NRLCOM_PAUSE_MS - Date.now()));
     lastNrlcom = Date.now();
-    const response = await fetch(url, { headers: { 'user-agent': NRLCOM_AGENT }, signal: AbortSignal.timeout(45000) });
+    const response = await politeFetch(url, { signal: AbortSignal.timeout(45000) });
     if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
     const text = await response.text();
     JSON.parse(text);

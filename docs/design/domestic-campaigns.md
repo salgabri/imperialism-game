@@ -133,12 +133,24 @@ Two offline stages; nothing is fetched from these services at runtime.
 
 Every download is cached under the ignored `data-src/` (`domestic/efem`,
 `domestic/wikidata`, `domestic/geonames`, `boundaries/gb`, `boundaries/ne`,
-`boundaries/geonames`), so reruns are offline. Requests send the User-Agent
-`imperialism-game-build/1.0 (offline data build)`. EFEM: three at a time, 0.5 s
+`boundaries/geonames`), so reruns are offline. Every request goes through
+`scripts/lib/polite-fetch.mjs`: the generic User-Agent `imperialism-game-data/1.0`,
+and each host's robots.txt read first and obeyed (README.md, "Network requests").
+EFEM: three at a time, 0.5 s
 apart per slot, three retries with backoff on network errors, 429, 5xx and empty
 bodies, and only with `--efem-permission-granted`: efem.club/robots.txt disallows
 `/api/` (checked 18 October 2026), so without the flag the sync replays cached
-responses and refuses any EFEM request. Wikidata: one at a time, 1 s apart. Boundary downloads: one at a time
+responses and refuses any EFEM request; with it, EFEM's written permission is the one
+exception to its robots.txt. Wikidata: one at a time, 1 s apart, by SPARQL from
+QLever's Wikidata endpoint (`qlever.dev/api/wikidata`, which has no robots.txt), since
+the Wikidata Query Service's robots.txt disallows `/sparql` for every agent (read
+2026-11-10). Each query keeps the Query Service's text, which names its cache file, so
+the cache filled from the Query Service stays valid; QLever is sent it with the
+prefixes declared and the item list moved into each UNION branch
+(`scripts/lib/wikidata-sparql.mjs`), and gave Germany's cached names back unchanged
+(580 of 580). GeoNames: only the cached dumps, since download.geonames.org's robots.txt
+disallows every path for every agent (read 2026-11-10); a missing file stops the sync
+or the build, and `--refresh=all` keeps them. Boundary downloads: one at a time
 (worker threads ask the main thread), 0.5 s apart, four tries. Nominatim is never
 used. From a warm cache the sync of every nation takes about 30 s. A full build
 takes 4.5 to 6.5 minutes: nearly all of it is Canada, whose partition runs three
@@ -155,7 +167,7 @@ background.
 | --- | --- | --- |
 | Clubs, reputation, competition | EFEM.club FM26 `api/clubs/filter`, version 26.3.0 | as the existing FM supplement; not affiliated with SI or EFEM |
 | Squads | EFEM.club FM26 `api/players/filter`, every male 26.3.0 player | as above |
-| Home towns | Wikidata SPARQL; GeoNames `cities1000`; manual overrides | CC0; CC BY 4.0 (attributed) |
+| Home towns | Wikidata by SPARQL (from QLever's Wikidata endpoint); GeoNames `cities1000` (cached copy only); manual overrides | CC0; CC BY 4.0 (attributed) |
 
 ### Club lists
 
@@ -265,6 +277,20 @@ Inputs besides the snapshots: geoBoundaries gbOpen layers (per-layer licence),
 Natural Earth 10m admin-1 v5.1.2 (public domain), GeoNames `cities1000` and
 country files (CC BY 4.0), and the game's own world map `public/countries-50m.json`
 (world-atlas 2.0.2, Natural Earth 1:50m).
+
+Where a missing input comes from (`scripts/lib/domestic-boundaries.mjs`, through
+`scripts/lib/polite-fetch.mjs`): the geoBoundaries metadata from
+`www.geoboundaries.org/api/` (its robots.txt allows it, 10 s apart). The metadata names
+each layer's file as `github.com/wmgeolab/geoBoundaries/raw/<commit>/…`, a path
+github.com's robots.txt disallows (`/*/raw/`), so the file is read from
+`raw.githubusercontent.com` at the same commit; the layers are kept in Git LFS, so that
+answers with a pointer, and the object itself comes from `media.githubusercontent.com`
+and must have the pointer's SHA-256 and size (neither host has a robots.txt; NZL ADM1,
+downloaded this way on 2026-11-10, was its cached copy byte for byte, and the cached USA
+ADM1 layer has its pointer's SHA-256). The outputs still cite the metadata's link.
+Natural Earth from `raw.githubusercontent.com`. GeoNames' dumps never: their host's
+robots.txt disallows every path, so only the cached copies are read and a missing one
+stops the build. `--check` reads only the caches and never reaches the network.
 
 Every map has `DOMESTIC_SECTIONS = 100` sections. The build first grows one
 **territory** per club, exactly as format 1 grew one section per club, then cuts
@@ -996,7 +1022,8 @@ Wests Tigers grow from their training bases.
   territories), and NZL ADM2 (districts, Stats NZ, CC BY 4.0) grouped by ADM1 (regions). The builder takes the eastern
   hemisphere's side of the antimeridian for this league (`east`), so the Chathams go; the world map's Norfolk Island and
   Indian Ocean Territories are cut. GitHub's raw links answered 504 for three of the four layers on 2026-11-08; the
-  same files, pinned to the same commit, came from `media.githubusercontent.com` into the cache.
+  same files, pinned to the same commit, came from `media.githubusercontent.com` into the cache, which is now where the
+  downloader always reads a layer's LFS object (Stage 2, "Where a missing input comes from").
 - **No border to fit**: the Tasman Sea lies between the two countries (`border: null`), so no edge is fitted as the US
   and Canadian ones are; the Warriors reach Australia across the water, as island clubs do on the country maps.
 - **Shared states**: New South Wales (ten clubs) and Queensland (four) split along council lines. Eight of New South

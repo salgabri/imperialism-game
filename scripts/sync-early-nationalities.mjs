@@ -4,7 +4,14 @@
 //   node scripts/sync-early-nationalities.mjs [--data=<dir>] [--csv=<file>] [--refresh]
 //     --data     the downloaded sources (default data-src/), as for npm run build:ea-seasons
 //     --csv      the FIFA 15 – EA FC 24 export elsewhere (default <data>/ea-leone/male_players.csv)
-//     --refresh  ask again instead of reading the answers in data-src/wikidata-early/
+//     --refresh  ask the SPARQL queries again instead of reading the answers in data-src/wikidata-early/
+//
+// Wikidata's facts come by SPARQL from QLever's Wikidata endpoint (scripts/lib/wikidata-sparql.mjs), through
+// scripts/lib/polite-fetch.mjs: the Wikidata Query Service's robots.txt disallows its /sparql. Each query keeps the
+// Query Service's text, which keys the cache. The search by name used Wikidata's own search API (wbsearchentities under
+// www.wikidata.org/w/api.php), which its robots.txt disallows for every agent, with no allowed source of the same
+// answers; its answers as read on 2026-11-07 are pinned in scripts/data/ea-early-search.json, and a name without one
+// there is not searched (the row stays unmatched).
 //
 // Output: scripts/data/ea-early-nationalities.json (committed; Wikidata is CC0). Put the SHA-256 it prints in
 // scripts/data/ea-seasons.json (`early.nationalities`), then run npm run build:ea-seasons.
@@ -21,14 +28,13 @@ import path from 'node:path';
 import { eaCountryName, EARLY_EXTRA_FIELDS, inLaterEdition, nameWords, namesAgree, teamCountry, wikidataNationality } from './lib/ea-early-seasons.mjs';
 import { pinned, readExport, readLaterEditions, sha256Of } from './lib/ea-season-files.mjs';
 import { isoDate, readRatingsRows } from './lib/ea-legacy-seasons.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
+import { sparqlRequest, WIKIDATA_SPARQL } from './lib/wikidata-sparql.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const OUTPUT = path.join(root, 'scripts/data/ea-early-nationalities.json');
 const CACHE = path.join(root, 'data-src/wikidata-early');
-const SPARQL = 'https://query.wikidata.org/sparql';
-const SEARCH = 'https://www.wikidata.org/w/api.php';
-// A generic agent: no address, account or other personal data goes out with a request.
-const USER_AGENT = 'imperialism-game-data/1.0';
+const SEARCH_ANSWERS = path.join(root, 'scripts/data/ea-early-search.json');
 const LANGUAGES = '"en","mul","de","es","fr","it","pt","nl"';
 const FOOTBALLER = 'wd:Q937857';
 const SENIOR_TEAM = 'wd:Q135408445';
@@ -46,13 +52,13 @@ const refresh = args.includes('--refresh');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const inGroups = (list, size) => Array.from({ length: Math.ceil(list.length / size) }, (_, i) => list.slice(i * size, (i + 1) * size));
 
-/** A request's JSON from the cache, or from Wikidata with a pause and retries. */
+/** A request's JSON from the cache, or from QLever with a pause and retries (none after a refusal). */
 async function ask(key, url, init) {
   const file = path.join(CACHE, `${sha256Of(key).slice(0, 24)}.json`);
   if (!refresh && existsSync(file)) return JSON.parse(await readFile(file, 'utf8'));
   for (let attempt = 0; ; attempt++) {
     try {
-      const response = await fetch(url, { ...init, headers: { 'User-Agent': USER_AGENT, Accept: 'application/json', ...init?.headers }, signal: AbortSignal.timeout(120000) });
+      const response = await politeFetch(url, { ...init, signal: AbortSignal.timeout(120000) });
       if (response.status === 429 || response.status >= 500) throw new Error(`HTTP ${response.status}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}: ${(await response.text()).slice(0, 300)}`);
       const data = await response.json();
@@ -61,14 +67,13 @@ async function ask(key, url, init) {
       await sleep(PAUSE_MS);
       return data;
     } catch (error) {
-      if (attempt === 4) throw new Error(`Wikidata: ${error.message}`);
+      if (attempt === 4 || error.fatal) throw new Error(`Wikidata: ${error.message}`);
       await sleep(5000 * (attempt + 1));
     }
   }
 }
 
-const sparql = query => ask(query, SPARQL, { method: 'POST', body: new URLSearchParams({ query, format: 'json' }),
-  headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(data => data.results.bindings);
+const sparql = query => ask(query, WIKIDATA_SPARQL, sparqlRequest(query)).then(data => data.results.bindings);
 const qid = binding => binding.value.split('/').pop();
 const numeric = id => Number(id.slice(1));
 
@@ -152,12 +157,14 @@ async function main() {
 
   // Second pass, for the better players still unmatched: exactly one footballer of that name, of an age to be playing.
   const named = needed.filter(row => !row.candidates.length && row.rating >= NAME_ONLY_FROM && nameWords(row.name).filter(word => word.length > 1).length >= 2);
-  console.log(`${named.length} rows rated ${NAME_ONLY_FROM}+ unmatched by birth date: searching by name`);
+  console.log(`${named.length} rows rated ${NAME_ONLY_FROM}+ unmatched by birth date: searching by name (the pinned answers)`);
+  const { answers: pinnedSearch } = JSON.parse(await readFile(SEARCH_ANSWERS, 'utf8'));
+  let unsearched = 0;
   for (const row of named) {
-    const params = new URLSearchParams({ action: 'wbsearchentities', search: row.name, language: 'en', uselang: 'en', type: 'item', limit: '20', format: 'json', maxlag: '5' });
-    const answer = await ask(`search:${row.name}`, `${SEARCH}?${params}`);
-    row.search = (answer.search || []).map(item => item.id);
+    if (!Object.hasOwn(pinnedSearch, row.name)) unsearched++;
+    row.search = pinnedSearch[row.name] ?? [];
   }
+  if (unsearched) console.log(`  ${unsearched} of those names have no pinned search answer (${path.relative(root, SEARCH_ANSWERS)}): not searched`);
   const searched = [...new Set(named.flatMap(row => row.search))];
   const people = await footballers({ ids: searched });
   for (const row of named) {

@@ -106,11 +106,11 @@ npm run build-rosters   # regenerate football squads from an EA FC player CSV
 npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
-npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
+npm run sync:club-logos  # club crests: Wikidata via QLever (network, cached), Wikipedia's answers from the pinned cache only
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
-npm run sync:early-nationalities # ask Wikidata for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
+npm run sync:early-nationalities # ask Wikidata (via QLever) for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
 npm run sync:world-cup-seasons # read the pinned World Cup, results and Wikipedia sources in data-src/ into scripts/data/world-cup-seasons/
 npm run build:world-cup-seasons # rebuild the computed World Cup seasons 1961/62 to 1993/94 from those facts (offline; --check to verify)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
@@ -123,7 +123,7 @@ npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public A
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
 npm run import:mlb-war   # rebuild the 1960–2017 baseball snapshots from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check compares byte for byte)
 npm run build:mlb-map    # rebuild MLB's maps of the USA and Canada, today's and the 43 of earlier seasons (1–2 minutes a map; --check compares byte for byte)
-npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (network, cached)
+npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (the NHL's from the cache only; no --refresh)
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
 npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run sync:nrl         # snapshot Rugby League 26's NRL ratings, Zero Tackle's profiles and NRL.com's 2025 team lists into scripts/data/rugby-league-26.json (network, cached)
@@ -180,6 +180,40 @@ they reload, all but the players of a sport they have not loaded yet: the new
 version has replaced those files, so picking that sport there fails until
 **Reload**. Later hides the panel for that page; closing every tab also updates.
 The page looks for a new version every hour and when you return to it.
+
+### Network requests
+
+The game itself fetches only its own files. The data scripts that download sources
+(`sync:*`, `fetch:pfa`, and the map builders on a cache miss) send every request
+through `scripts/lib/polite-fetch.mjs`, and `npm test` checks that none calls the
+network any other way:
+
+- One generic User-Agent, `imperialism-game-data/1.0`, naming no person, address or
+  account; a script never sets its own.
+- Each host's robots.txt is read first, once a run, and obeyed as RFC 9309 reads it,
+  for this agent and for the names of Anthropic's crawlers (ClaudeBot, anthropic-ai,
+  Claude-Web): a path any of them may not fetch is refused, a Crawl-delay is kept,
+  and every redirect is checked the same way before it is followed. A host whose
+  robots.txt cannot be read (a server or network error) is not fetched from; one
+  with no robots.txt (HTTP 4xx) has no restrictions.
+- The Sports-Reference sites and the NHL's APIs (`api.nhle.com`, `api-web.nhle.com`)
+  are never fetched, whatever their robots.txt says.
+- A site's written permission stands in for its robots.txt only where a flag says it
+  was given (`--efem-permission-granted`, for EFEM's `/api/`).
+
+Where an audit of 2026-11-10 found a script reaching a disallowed path, it now uses an
+allowed source of the same facts, or reads only its pinned cache and keeps the
+committed outputs:
+
+| Source | Disallowed path | Now |
+| --- | --- | --- |
+| Wikidata Query Service | `query.wikidata.org/sparql` | QLever's Wikidata endpoint, `qlever.dev/api/wikidata` (`scripts/lib/wikidata-sparql.mjs`), for the crests, home towns and FIFA 05/06 nationalities |
+| Wikidata's search API | `www.wikidata.org/w/api.php` | its answers pinned in `scripts/data/ea-early-search.json` |
+| English Wikipedia's API | `en.wikipedia.org/w/api.php` | its cached answers only, once pinned in `scripts/data/club-logos-wikipedia.json`; none is yet, so the committed crests stay ([crests](#club-crests)) |
+| geoBoundaries files on GitHub | `github.com/*/raw/` | `raw.githubusercontent.com`, and `media.githubusercontent.com` for Git LFS objects, checked against the pointer's SHA-256 |
+| GeoNames dumps | `download.geonames.org/` (everything) | the cached copies only |
+| CommonCrawl records | `data.commoncrawl.org/` (everything) | the pinned cached copies only (ice hockey's NHL 22 pages) |
+| The NHL's API | never fetched | the cached answers only: `sync:nhl` cannot refresh, `sync:nhl-seasons` reads its pinned rosters |
 
 ## Deployment
 
@@ -1121,12 +1155,14 @@ from these services at runtime.
   contract club. FM's placeholder names for unlicensed clubs (Portugal's "BRG")
   are replaced from `scripts/data/domestic-names.json`.
 - **Home towns**: manual overrides in `scripts/data/domestic-locations.json`, then
-  Wikidata (CC0), then GeoNames `cities1000` (CC BY 4.0). Each club records which
+  Wikidata (CC0, asked of QLever's Wikidata endpoint), then GeoNames `cities1000`
+  (CC BY 4.0, the cached copy only; see [Network requests](#network-requests)). Each club records which
   one placed it. Some overrides are region-level (marked "approximate:"), and the
   38 clubs with no known home start at a populous place no other club holds
   (`homeSource` `placed:<geonameid>`, an estimate).
 - **Boundaries**: [geoBoundaries](https://www.geoboundaries.org) gbOpen layers,
-  pinned to one commit, with Natural Earth admin-1 (public domain) as a fallback;
+  pinned to one commit (downloaded from raw.githubusercontent.com and, for their Git
+  LFS objects, media.githubusercontent.com), with Natural Earth admin-1 (public domain) as a fallback;
   GeoNames places repair broken unit names and name the extra sections. Licences
   differ by country: 34 maps derive from ODbL layers and 13 from CC BY-SA ones,
   and those terms also cover the section shapes. Land the game's own world map
@@ -2132,9 +2168,11 @@ no code printed over its land, while a club whose crest fits nowhere keeps its
 code. A club without a crest keeps its monogram chip and its code on the map.
 
 The crests come from Wikipedia. `npm run sync:club-logos` finds each club's
-Wikidata item, takes the lead image of its English Wikipedia article (the infobox
-crest, else the item's logo image on Wikimedia Commons), and saves it as a WebP
-fitting 128×128 in `public/club-logos/<club id>.webp`. Domestic clubs reuse the
+Wikidata item (by SPARQL from QLever's Wikidata endpoint, since the Wikidata Query
+Service's robots.txt disallows its `/sparql`), takes the lead image of its English
+Wikipedia article (the infobox crest, else the item's logo image on Wikimedia
+Commons), and saves it as a WebP fitting 128×128 in
+`public/club-logos/<club id>.webp`. Domestic clubs reuse the
 item their home town came from. An all-leagues club shares its domestic twin's
 file: the club of its country whose FM26 squad shares at least four players with
 its EA lineup, the most of any. The all-leagues clubs are the built-in ones and
@@ -2145,7 +2183,18 @@ to a Wikidata item, `files` maps it to a file name, or to `null` for no crest,
 and `twins` names a domestic twin the lineups miss (Venezia, promoted for 2026/27,
 shares only three players with its 2025/26 squad). Responses and
 images are cached in the ignored `data-src/club-logos/`, so reruns are offline;
-`--refresh` asks Wikidata and Wikipedia again.
+`--refresh` asks Wikidata again. The lead images and the files' licences are
+answers of English Wikipedia's API (`en.wikipedia.org/w/api.php`), which its
+robots.txt disallows for every agent, and no allowed source gives the same facts.
+So the sync never asks it again: it reads those answers only from its cache, and
+only those pinned by SHA-256 in `scripts/data/club-logos-wikipedia.json`; a run that
+needs one the cache lacks (a new club, or an article that Wikidata names after
+`--refresh`) or one not pinned stops before writing anything, leaving the committed
+crests as they are. None is pinned yet: a run from the newest cache on hand
+(2026-11-10) would change 89 crest files and the sources, so the committed crests
+stay until someone pins a cache on purpose (`--pin` records the answers the run
+reads, and the run rewrites the crests from them). The thumbnails come from
+`upload.wikimedia.org`, which allows them.
 
 Crests are the clubs' trademarks, and most are non-free files that Wikipedia
 hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records
