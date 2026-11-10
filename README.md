@@ -187,7 +187,8 @@ The page looks for a new version every hour and when you return to it.
 ### Network requests
 
 The game itself fetches only its own files. The data scripts that download sources
-(`sync:*`, `fetch:pfa`, and the map builders on a cache miss) send every request
+(`sync:*`, `fetch:pfa`, `validate:football` for eloratings.net's Elo tables, and the
+map builders on a cache miss) send every request
 through `scripts/lib/polite-fetch.mjs`, and `npm test` checks that none calls the
 network any other way:
 

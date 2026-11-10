@@ -21,8 +21,8 @@
 // On main every season ships by choice, so the verdicts are a report, not a gate on shipping: a built-in that fails the
 // provisional gate is the signal to look before a rollover ships it (the run exits 1).
 //
-// Elo is eloratings.net's static TSVs, cached once in the ignored data-src/validation/elo/ (a handful of polite GETs,
-// only for missing files, after robots.txt is read, under the User-Agent imperialism-game-data/1.0) and never shipped:
+// Elo is eloratings.net's static TSVs, cached once in the ignored data-src/validation/elo/ (a handful of GETs, only for
+// missing files, through scripts/lib/polite-fetch.mjs: robots.txt first, the generic User-Agent) and never shipped:
 // the report carries aggregates and ranks, no Elo values. Elo at D_Y replays {Y}_results.tsv (post-match ratings) over
 // year-end {Y-1}.tsv through matches dated on or before D_Y; replaying the whole file must reproduce {Y}.tsv exactly,
 // and a replay without that check (table not cached, a mismatch, or a table from another snapshot) is incomplete. One
@@ -49,6 +49,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import { ELO_CODES } from './lib/elo-codes.mjs';
 import { FORECAST, forecastTrack, parseResults } from './lib/forecast.mjs';
+import { createPoliteFetch } from './lib/polite-fetch.mjs';
 import { nationForResultsName } from './lib/results-names.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -62,7 +63,6 @@ export const ENGINE_SCALE_FILE = 'docs/design/football-gate/engine-scale.json';
 export const BUILT_IN_AUDIT = 'docs/design/football-roster-audit.json';
 export const BUILT_IN_ROSTERS = 'src/data/rosters.js';
 export const ELO_BASE = 'https://www.eloratings.net/';
-export const USER_AGENT = 'imperialism-game-data/1.0';
 export const CONFEDERATIONS = ['UEFA', 'CONMEBOL', 'CAF', 'AFC', 'CONCACAF', 'OFC'];
 export const NOT_APPLICABLE = 'not applicable';
 const BOOTSTRAP = { resamples: 2000, seed: 20250919 };
@@ -549,54 +549,19 @@ export function buildReport({ inputs, nations, files, generatedAt = null, codes 
 }
 
 // ---- inputs ----
-/** robots.txt rules for one user agent: [{ allow, path }] of its own group, else the * group's. */
-export function robotsRules(text, agent) {
-  const groups = [];
-  let current = null, lastWasAgent = false;
-  for (const raw of String(text).split(/\r?\n/)) {
-    const line = raw.replace(/#.*/, '').trim();
-    const match = /^([A-Za-z-]+)\s*:\s*(.*)$/.exec(line);
-    if (!match) continue;
-    const [, key, value] = match;
-    if (key.toLowerCase() === 'user-agent') {
-      if (!lastWasAgent) { current = { agents: [], rules: [] }; groups.push(current); }
-      current.agents.push(value.toLowerCase());
-      lastWasAgent = true;
-    } else {
-      lastWasAgent = false;
-      if (current && /^(allow|disallow)$/i.test(key)) current.rules.push({ allow: key.toLowerCase() === 'allow', path: value });
-    }
-  }
-  const token = agent.toLowerCase().split('/')[0];
-  const own = groups.find(group => group.agents.some(name => name !== '*' && token.startsWith(name)));
-  return (own ?? groups.find(group => group.agents.includes('*')))?.rules ?? [];
-}
-const escapeRegExp = text => text.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
-/** Whether robots rules allow a path: the longest matching rule decides, Allow on a tie; no rule allows. `*` matches
- * any run of characters and a final `$` anchors the end. */
-export function robotsAllows(rules, pathname) {
-  let best = null;
-  for (const rule of rules) {
-    if (!rule.path) continue;
-    const anchored = rule.path.endsWith('$');
-    const body = (anchored ? rule.path.slice(0, -1) : rule.path).split('*').map(escapeRegExp).join('.*');
-    if (!new RegExp(`^${body}${anchored ? '$' : ''}`).test(pathname)) continue;
-    if (!best || rule.path.length > best.path.length || (rule.path.length === best.path.length && rule.allow)) best = rule;
-  }
-  return !best || best.allow;
-}
-
 /**
  * Cached Elo TSVs (Map name → { text, url, fetchedAt, dateFrom, sha256 }). Seeds or fetches only what is missing,
  * except that a requested {Y}_results.tsv and {Y}.tsv pair is acquired together (from one seed directory that holds
- * both, else by fetching both) whenever either is missing or they are not one snapshot. Before the first fetch of a run
- * it reads eloratings.net's robots.txt and fetches nothing it disallows. sources.json keeps each file's sha256,
- * fetchedAt and dateFrom; trustSeedDates vouches for the mtime dates of the files loaded.
+ * both, else by fetching both) whenever either is missing or they are not one snapshot. Fetches go through
+ * scripts/lib/polite-fetch.mjs (robots.txt first, the generic User-Agent; `fetchImpl` stands in for the network in
+ * tests), a FETCH_DELAY_MS apart. sources.json keeps each file's sha256, fetchedAt and dateFrom; trustSeedDates
+ * vouches for the mtime dates of the files loaded.
  */
 export async function loadEloFiles(names, { eloDir, offline = false, seedDirs = [], trustSeedDates = false, log = () => {},
-  fetchDelayMs = FETCH_DELAY_MS, fetchImpl = globalThis.fetch } = {}) {
+  fetchDelayMs = FETCH_DELAY_MS, fetchImpl = null } = {}) {
   const sidecarPath = path.join(eloDir, 'sources.json');
-  let sidecar = {}, dirty = false, fetched = 0, robots;
+  const get = createPoliteFetch(fetchImpl ? { fetchImpl } : undefined);
+  let sidecar = {}, dirty = false, fetched = 0;
   try { sidecar = JSON.parse(await readFile(sidecarPath, 'utf8')); } catch {}
   const wanted = [...new Set(names)].sort(), bytesOf = new Map();
   const urlOf = name => new URL(name, ELO_BASE).href;
@@ -606,19 +571,6 @@ export async function loadEloFiles(names, { eloDir, offline = false, seedDirs = 
     sidecar[name] = { url: urlOf(name), ...entry, sha256: sha256(bytes) };
     bytesOf.set(name, bytes);
     dirty = true;
-  };
-  // robots.txt, read once per run before any other request: a 404 allows everything, an error allows nothing.
-  const allowed = async url => {
-    if (robots === undefined) {
-      const robotsUrl = new URL('/robots.txt', ELO_BASE).href;
-      try {
-        const response = await fetchImpl(robotsUrl, { headers: { 'user-agent': USER_AGENT }, signal: AbortSignal.timeout(30000) });
-        robots = response.status === 404 ? [] : response.ok ? robotsRules(await response.text(), USER_AGENT) : null;
-        log(`Elo: ${robotsUrl} ${response.status === 404 ? 'is absent (404): everything is allowed' : response.ok ? 'read' : `failed (HTTP ${response.status}): nothing is fetched`}`);
-      } catch (error) { robots = null; log(`Elo: ${robotsUrl} could not be read (${error.message}): nothing is fetched`); }
-      fetched++;
-    }
-    return robots !== null && robotsAllows(robots, new URL(url).pathname);
   };
   for (const name of wanted) {
     const file = path.join(eloDir, name);
@@ -662,13 +614,13 @@ export async function loadEloFiles(names, { eloDir, offline = false, seedDirs = 
       if (found.every(Boolean)) { for (const [i, name] of group.entries()) await seed(name, found[i]); seeded = true; break; }
     }
     if (seeded) continue;
-    // 2. Fetch the whole group; a cached half is replaced only when its fetch succeeds.
+    // 2. Fetch the whole group; a cached half is replaced only when its fetch succeeds. politeFetch refuses a path
+    // robots.txt disallows, or any path when robots.txt cannot be read.
     if (!offline) for (const name of group) {
       const url = urlOf(name);
-      if (!await allowed(url)) { log(`Elo: ${url} not fetched (robots.txt)`); continue; }
       if (fetched++) await sleep(fetchDelayMs);
       try {
-        const response = await fetchImpl(url, { headers: { 'user-agent': USER_AGENT }, signal: AbortSignal.timeout(30000) });
+        const response = await get(url, { signal: AbortSignal.timeout(30000) });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const body = Buffer.from(await response.arrayBuffer());
         validateEloText(name, body.toString('utf8'));

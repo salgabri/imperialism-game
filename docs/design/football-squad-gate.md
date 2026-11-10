@@ -101,9 +101,10 @@ top-five champion share of 0.559 (0.541).
 
 - **World Football Elo** ([eloratings.net](https://www.eloratings.net/)): its static `{Y}.tsv` and `{Y}_results.tsv`
   tables, cached once in the ignored `data-src/validation/elo/` and never shipped: the reports hold aggregates and
-  ranks, no Elo value. The site has no robots.txt (404 on 10 November 2026) and its tables carry no licence; the
-  validator reads robots.txt before its first request anyway, fetches only missing files, one every 1.5 seconds, under the
-  User-Agent `imperialism-game-data/1.0`, and fetches nothing with `--offline` or `--check`. Elo at D_Y replays
+  ranks, no Elo value. The site has no robots.txt (404 on 10 November 2026) and its tables carry no licence. The
+  validator fetches only missing files, one every 1.5 seconds, through `scripts/lib/polite-fetch.mjs` (README,
+  "Network requests": robots.txt read first and obeyed, the generic User-Agent `imperialism-game-data/1.0`), and
+  nothing with `--offline` or `--check`. Elo at D_Y replays
   `{Y}_results.tsv` (post-match ratings) over the year-end `{Y-1}.tsv` through matches on or before D_Y, and replaying
   the whole file must reproduce `{Y}.tsv` exactly. A snapshot stands for D_Y only if taken on D_Y or later;
   `sources.json` beside the files records each file's SHA-256, fetch date and how the date was known, and seeded

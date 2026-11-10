@@ -17,10 +17,11 @@ import { OFF_MAP_RESULTS_NAMES, RESULTS_NAMES, nationForResultsName } from './li
 import { FORECAST, clusterBootstrapSe, clusterJackknifeSe, clusteredSe, criticalValue, fitOrderedLogit, forecastTrack, groupFolds,
   isWindowCompetition, matchClusters, matchWindows, mulberry32, outcomeProbabilities, parseCsv, parseResults, scoreForecast, standardise,
   studentTCentral, studentTQuantile, windowCoverage } from './lib/forecast.mjs';
-import { ENGINE_SCALE_FILE, GATE, MANIFEST_FILE, NOT_APPLICABLE, SHIP_GATE, USER_AGENT, VALIDATION_FILE, auditXIsCheck, bootstrapSpearman,
+import { ENGINE_SCALE_FILE, GATE, MANIFEST_FILE, NOT_APPLICABLE, SHIP_GATE, VALIDATION_FILE, auditXIsCheck, bootstrapSpearman,
   buildReport, crossSectional, eloAtInformationDate, eloAtRatingsDate, engineScaleCheck, gateSet, implicationOf, loadEloFiles, loadResults,
-  nextNewerSeason, parseEloResults, parseEloTable, pearson, ranks, replayElo, replayFiles, robotsAllows, robotsRules, runValidation, sameSnapshot,
+  nextNewerSeason, parseEloResults, parseEloTable, pearson, ranks, replayElo, replayFiles, runValidation, sameSnapshot,
   serializeReport, shipVerdictOf, spearman, validateManifest } from './football-validate.mjs';
+import { USER_AGENT } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const eloCache = path.join(root, 'data-src/validation/elo');
@@ -273,7 +274,7 @@ test('fetch dates come from sources.json by sha256, and a seed or file mtime cou
 const fakeFetch = (pages, robots = null) => {
   const requested = [];
   const fetchImpl = async (target, init) => {
-    requested.push([String(target), init?.headers?.['user-agent']]);
+    requested.push([String(target), new Headers(init?.headers).get('user-agent')]);
     const name = path.basename(new URL(target).pathname);
     if (name === 'robots.txt') return robots == null ? new Response('not found', { status: 404 }) : new Response(robots);
     return name in pages ? new Response(pages[name], { headers: { 'last-modified': 'Fri, 20 Nov 2026 09:00:00 GMT' } }) : new Response('missing', { status: 404 });
@@ -281,7 +282,7 @@ const fakeFetch = (pages, robots = null) => {
   return { fetchImpl, requested };
 };
 
-test('an open-year results file and its table are seeded or fetched together, robots.txt first, under the project User-Agent', async () => withTemp(async dir => {
+test('an open-year results file and its table are seeded or fetched together, through politeFetch', async () => withTemp(async dir => {
   const names = ['2026_results.tsv', '2026.tsv'], url = name => `https://www.eloratings.net/${name}`;
   const fresh = { '2026_results.tsv': oneMatch('2026-10-30'), '2026.tsv': AFTER_MATCH };
   const cacheWith = async (name, entries) => {
@@ -319,21 +320,12 @@ test('an open-year results file and its table are seeded or fetched together, ro
   await loadEloFiles(names, { eloDir: await cacheWith('together', [['2026.tsv', AFTER_MATCH, '2026-11-20T10:00:02.000Z'],
     ['2026_results.tsv', fresh['2026_results.tsv'], '2026-11-20T10:00:00.000Z']]), fetchDelayMs: 0, fetchImpl: together.fetchImpl });
   assert.deepEqual(together.requested, [], 'one snapshot stays cached, and nothing is requested at all');
-  // A robots.txt that disallows the files stops the fetch.
-  const denied = fakeFetch(fresh, 'User-agent: *\nDisallow: /2026\n');
-  const none = await loadEloFiles(names, { eloDir: path.join(dir, 'denied'), fetchDelayMs: 0, fetchImpl: denied.fetchImpl });
+  // A robots.txt that disallows the files stops the fetch, and the refusal is logged.
+  const denied = fakeFetch(fresh, 'User-agent: *\nDisallow: /2026\n'), logs = [];
+  const none = await loadEloFiles(names, { eloDir: path.join(dir, 'denied'), fetchDelayMs: 0, fetchImpl: denied.fetchImpl, log: line => logs.push(line) });
   assert.deepEqual([tsvs(denied.requested), none.size], [[], 0]);
+  assert.match(logs.join('\n'), /robots\.txt disallows \/2026_results\.tsv/);
 }));
-
-test('robots.txt rules: the project group else *, the longest match wins, Allow on a tie', () => {
-  const text = 'User-agent: *\nDisallow: /private/\nAllow: /private/open\n\nUser-agent: Imperialism-Game-Data\nDisallow: /x\n# comment\n';
-  assert.deepEqual(robotsRules(text, USER_AGENT), [{ allow: false, path: '/x' }]);
-  const star = robotsRules(text, 'Other/2.0');
-  assert.deepEqual([robotsAllows(star, '/private/a'), robotsAllows(star, '/private/open/1'), robotsAllows(star, '/2026.tsv')], [false, true, true]);
-  assert.equal(robotsAllows(robotsRules('User-agent: *\nDisallow: /*.tsv$\n', USER_AGENT), '/2026.tsv'), false, '* and $ patterns');
-  assert.equal(robotsAllows(robotsRules('User-agent: *\nDisallow:\n', USER_AGENT), '/2026.tsv'), true, 'an empty Disallow allows');
-  assert.equal(robotsAllows([], '/anything'), true);
-});
 
 // Synthetic season: 3 UEFA, 2 CAF, 2 OFC and one suspended nation whose Elo contradicts its squad, so it would break the
 // ordering if it were scored.
