@@ -11,7 +11,7 @@ import { BUILT_IN_HOCKEY_SEASONS } from '../src/data/hockeySeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { selectLineup } from '../src/data/teams.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
-import { decodeFootballSet, setHasClubs, setHasNations } from '../src/engine/footballSets.js';
+import { BUILT_IN_SETS, decodeFootballSet, setHasClubs, setHasNations } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { pointInPolys } from './lib/domestic-partition.mjs';
 import {
@@ -331,6 +331,52 @@ test('the loader refuses a computed season without its rule, and a clubs-only se
   assert.deepEqual(early.rosters, {});
   assert.equal(setHasNations('nhl-1968'), false);
   assert.equal(setHasNations('nhl-1978'), true);
+});
+
+// ---------- the credits ----------
+
+// The statement the Hockey Databank's readme asks for, displayed in its entirety: word for word, two spaces included.
+const DATABANK_STATEMENT = 'The information used herein was obtained free of charge from and is copyrighted by the Hockey Databank project.  '
+  + 'For more information about the Hockey Databank project please visit http://sports.groups.yahoo.com/group/hockey-databank';
+
+test('credits: the Hockey Databank\'s statement, whole, on every season that takes anything from it; MoneyPuck.com\'s on its seasons', () => {
+  assert.equal(MANIFEST.computed.sources.hdb.attribution, DATABANK_STATEMENT, 'the statement the sync checks against the readme');
+  const kinds = { databank: [], both: [], moneypuck: [], none: [] };
+  for (const listed of BUILT_IN_HOCKEY_SEASONS) {
+    const entry = MANIFEST.seasons.find(season => season.id === listed.id);
+    const notes = snapshotOf(listed.id).notes;
+    const moneypuck = entry.method === 'computed' && entry.source.kind === 'moneypuck';
+    // A season computed from the databank takes every line from it; a MoneyPuck season the birth countries its lookup
+    // leaves out; NHL 08 and NHL 09 their missing countries and NHL 09 its skaters' positions (below); an EA edition nothing.
+    const databank = entry.method === 'converted' || (entry.method === 'computed' && (entry.source.kind === 'hdb' || notes.birthFromDatabank.length > 0));
+    const kind = moneypuck ? (databank ? 'both' : 'moneypuck') : databank ? 'databank' : 'none';
+    kinds[kind].push(listed.id);
+    assert.equal(listed.credit, { databank: DATABANK_STATEMENT, both: `Data: MoneyPuck.com. ${DATABANK_STATEMENT}`, moneypuck: 'Data: MoneyPuck.com',
+      none: undefined }[kind], `${listed.id}'s credit`);
+    if (listed.credit) assert.doesNotMatch(listed.credit, /[<>\n]/, 'plain text on one line');
+    // The listing carries it to setup; the season file does not, so its version and every save on it stand.
+    assert.equal(BUILT_IN_SETS.find(set => set.id === listed.id).credit, listed.credit);
+    assert.ok(!('credit' in seasonFile(listed.id)));
+    assert.equal(seasonFile(listed.id).version, listed.version);
+  }
+  assert.deepEqual(Object.fromEntries(Object.entries(kinds).map(([kind, ids]) => [kind, ids.length])), { databank: 39, both: 14, moneypuck: 1, none: 5 });
+  assert.deepEqual(kinds.none, ['nhl-2022', 'nhl-2007', 'nhl-1995', 'nhl-1994', 'nhl-1993'], 'the EA editions: the NHL\'s rosters, no databank');
+  assert.deepEqual(kinds.moneypuck, ['nhl-2026'], '2025/26: MoneyPuck\'s lookup gives every nationality the season needs');
+  assert.ok(snapshotOf('nhl-2011').notes.birthFromDatabank.includes('Pavel Datsyuk: RUS'), 'Datsyuk\'s Russia, the databank\'s');
+  // NHL 08 takes Cristobal Huet's France from the databank, NHL 09 its skaters' positions.
+  assert.ok(snapshotOf('nhl-2008').notes.country.includes('Cristobal Huet: the Hockey Databank\'s birth country FRA'));
+  assert.ok(snapshotOf('nhl-2009').notes.position.some(note => / = .*: (?:name|surname), another club$/.test(note)), 'positions found on the databank\'s rosters');
+  // public/hockey/ATTRIBUTION.txt quotes it in full and says where the game shows it.
+  const attribution = read('public/hockey/ATTRIBUTION.txt');
+  assert.ok(attribution.includes(`"${DATABANK_STATEMENT}"`));
+  assert.match(attribution, /setup shows the chosen season's credit under the Season choice/);
+  assert.match(attribution, /in full, on the 53 seasons that take anything from the databank, and "Data: MoneyPuck\.com" on the 15 computed from its data/);
+});
+
+const readme = new URL('../data-src/nhl-seasons/hockey-databank/readme.txt', import.meta.url);
+test('the Hockey Databank\'s readme asks for the statement the credits show, word for word', { skip: !existsSync(readme) && 'the databank\'s readme (data-src/nhl-seasons/hockey-databank/) is not on this computer' }, () => {
+  const flat = text => text.replace(/\s+/g, ' ').trim();
+  assert.ok(flat(readFileSync(readme, 'utf8')).includes(`"${flat(DATABANK_STATEMENT)}"`));
 });
 
 // ---------- the running App ----------

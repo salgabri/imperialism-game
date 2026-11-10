@@ -5,7 +5,9 @@ EA's own ratings of a season (1992/93, 1993/94, 1994/95, 2006/07, 2021/22): each
 
 Converted from EA's attributes (2007/08, 2008/09): EA's NHL 08 and NHL 09 attributes as IGN's team pages published them
 (the Wayback Machine's captures, pinned in scripts/data/nhl-seasons-sources.json); the overall is this project's conversion, not EA's
-(docs/design/hockey.md, "NHL 08 and NHL 09").
+(docs/design/hockey.md, "NHL 08 and NHL 09"). NHL 09's skaters take their positions from the Hockey Databank's rosters (2008/09's,
+else the seasons beside it, else NHL 08's pages), and a player EA's Country does not place takes the Hockey Databank's birth
+country, under its terms and statement below.
 
 Computed from the players' season statistics by this project's rule (docs/design/hockey.md, "Computed seasons"). These are not any game's ratings.
 
@@ -17,5 +19,8 @@ Computed from the players' season statistics by this project's rule (docs/design
 - 2010/11, 2011/12, 2012/13, 2013/14, 2014/15, 2015/16, 2016/17, 2017/18, 2018/19, 2019/20, 2020/21, 2022/23, 2023/24, 2024/25, 2025/26: MoneyPuck.com's season summaries and game-by-game player data (moneypuck.com/data.htm).
   Terms: free to use for non-commercial purposes, crediting MoneyPuck.com (moneypuck.com/data.htm). Credit: MoneyPuck.com (https://moneypuck.com).
   Non-commercial: these files may not be used for commercial purposes without MoneyPuck.com's leave.
-  Where MoneyPuck's player lookup gives no nationality, these seasons take the Hockey Databank's birth country, under
-  its terms and statement above.
+  Where MoneyPuck's player lookup gives no nationality, a season takes the Hockey Databank's birth country, under its
+  terms and statement above (2010/11, 2011/12, 2012/13, 2013/14, 2014/15, 2015/16, 2016/17, 2017/18, 2018/19, 2019/20, 2020/21, 2022/23, 2023/24, 2024/25).
+
+In the game, setup shows the chosen season's credit under the Season choice (docs/design/hockey.md, "Credits"): the Hockey
+Databank's statement above, in full, on the 53 seasons that take anything from the databank, and "Data: MoneyPuck.com" on the 15 computed from its data.
