@@ -186,10 +186,29 @@ function handOver() {
   listeners.forEach(listener => listener());
 }
 
+// ---- The encoder's connection ----
+let encoderReady = false;
+/**
+ * The page's first canvas encode opens its connection to the GPU process, a round trip that holds the page's thread
+ * until the GPU process answers. At the first flag's draw the GPU process was busy rastering the map's first Flags
+ * frame, and the page stood still for 60-350 ms. Made with one pixel when the first banner asks, still within the
+ * click and before that frame goes to the GPU, it takes under a millisecond.
+ */
+function readyEncoder() {
+  if (encoderReady) return;
+  encoderReady = true;
+  try {
+    const canvas = new OffscreenCanvas(1, 1);
+    canvas.getContext('2d', { willReadFrequently: true })?.fillRect?.(0, 0, 1, 1);
+    canvas.convertToBlob({ type: 'image/webp', quality: 1 }).catch(() => {});
+  } catch { /* the flags' own encodes open it then */ }
+}
+
 // ---- What the banners use ----
 /** A banner layer shows this flag, drawn `px` device px on its longer side: rasterise it unless done or under way. */
 export function requestFlagBitmap(url, px = 0) {
   if (!url || !canRasterise()) return;
+  readyEncoder();
   wanted.set(url, (wanted.get(url) || 0) + 1);
   drawn.set(url, Math.max(drawn.get(url) || 0, Number.isFinite(px) ? px : 0));
   if (!bitmaps.has(url) && !ready.has(url) && !jobs.has(url)) queuePump();

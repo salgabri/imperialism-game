@@ -58,11 +58,16 @@ globalThis.Image = class {
   set src(value) { this.source = value; sources.push([value, performance.now()]); images.set(value, new WeakRef(this)); }
   decode() { return Promise.resolve(); }
 };
+// The one-pixel canvas that opens the encoder (flagRaster's readyEncoder), kept apart from the flags' canvases.
+const encoderCanvases = [];
 globalThis.OffscreenCanvas = class {
-  constructor(width, height) { Object.assign(this, { width, height, draws: [] }); canvases.push(this); }
+  constructor(width, height) {
+    Object.assign(this, { width, height, draws: [], fills: 0, createdAt: performance.now(), fetchesBefore: fetched.length });
+    (width === 1 && height === 1 ? encoderCanvases : canvases).push(this);
+  }
   getContext(type, options) {
     this.context = { type, options };
-    return { drawImage: (...args) => { this.drawnAt = performance.now(); this.draws.push(args); } };
+    return { drawImage: (...args) => { this.drawnAt = performance.now(); this.draws.push(args); }, fillRect: () => { this.fills++; } };
   }
   async convertToBlob(options) {
     this.type = options?.type; this.quality = options?.quality;
@@ -349,4 +354,18 @@ test('a finished bitmap holds its decoded image until its batch reaches the bann
     holds.delete(urls[1]);
     await view.close();
   }
+});
+
+test('the first banner to ask opens the encoder at once, one pixel encoded as lossless WebP, before any flag is fetched', async () => {
+  // Earlier tests mounted banners: the first of them opened it, and none since has opened another.
+  const view = await mount(React.createElement(FlagArt, { flag: native('203', '/flags/cz.svg'), scale: 1 }));
+  try {
+    assert.equal(encoderCanvases.length, 1, 'once for the page');
+    const [canvas] = encoderCanvases;
+    assert.deepEqual([canvas.fills, canvas.type, canvas.quality, canvas.context.options], [1, 'image/webp', 1, { willReadFrequently: true }],
+      'drawn and encoded as the flags are, so it opens the same connection to the GPU process');
+    assert.equal(canvas.fetchesBefore, 0, 'within the commit that asked, before the first flag was fetched');
+    await until(() => view.q('#fi-flag-203 image').getAttribute('href').startsWith('blob:'), 'the swap');
+    assert.equal(encoderCanvases.length, 1);
+  } finally { await view.close(); }
 });

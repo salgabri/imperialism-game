@@ -10,6 +10,7 @@ import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { FLAG_CODES, flagUrl } from '../data/flags.js';
 import { FLAG_SYMBOLS } from '../data/flagSymbols.js';
 import { clubLogoUrl } from '../data/clubLogos.js';
+import { regionClips } from '../engine/flagClips.js';
 import { createFlagRegionIndex } from '../engine/flagRegions.js';
 import { layoutFlagSymbol } from '../engine/flagSymbolLayout.js';
 import { memo } from '../viewModels/format.js';
@@ -134,14 +135,14 @@ export function handleMapMove(e) {
 }
 
 /**
- * Each flag region's banner (`components` from createFlagRegionIndex) and the parts every territory shows it through.
+ * Each flag region's banner (`components` from createFlagRegionIndex) and the clip paths every territory shows it
+ * through: one per territory and region, its parts joined (engine/flagClips.js, kept per region object).
  * `markOf(ownerId)` says what an owner flies: `{ crestUrl }` for a club with a crest, else `{ nationId }` for a flag, and
  * the `color` behind it; an owner with neither flies nothing. `idPrefix` keeps two maps' banners apart in one document.
- * A part's path depends only on its rings, and parts are the index's fixed objects: `previousPaths` (the last layout's)
- * hands them back. → { result: { flagParts: Map(territory id → [{ id, d }]), flagPatterns }, paths }
+ * → { flagParts: Map(territory id → [{ id, d }]), flagPatterns }
  */
-function layoutBanners(components, markOf, { previousPaths = null, idPrefix = '' } = {}) {
-  const flagParts = new Map(), flagPatterns = [], paths = new Map();
+function layoutBanners(components, markOf, { idPrefix = '' } = {}) {
+  const flagParts = new Map(), flagPatterns = [];
   for (const component of components) {
     const { crestUrl = null, nationId = null, color = V4.flagBg } = markOf(component.ownerId) || {};
     const url = crestUrl || flagUrl(nationId);
@@ -156,14 +157,12 @@ function layoutBanners(components, markOf, { previousPaths = null, idPrefix = ''
       fieldUrl: symbolProfile?.fieldFile ? `${import.meta.env.BASE_URL}${symbolProfile.fieldFile}` : null,
       symbolUrl: symbolProfile?.symbolFile ? `${import.meta.env.BASE_URL}${symbolProfile.symbolFile}` : null,
       bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
-    for (const part of component.parts) {
-      if (!flagParts.has(part.countryId)) flagParts.set(part.countryId, []);
-      const d = previousPaths?.get(part) ?? part.rings.map(ring => 'M' + ring.map(point => point.join(',')).join('L') + 'Z').join('');
-      paths.set(part, d);
-      flagParts.get(part.countryId).push({ id, d });
+    for (const { countryId, d } of regionClips(component)) {
+      if (!flagParts.has(countryId)) flagParts.set(countryId, []);
+      flagParts.get(countryId).push({ id, d });
     }
   }
-  return { result: { flagParts, flagPatterns }, paths };
+  return { flagParts, flagPatterns };
 }
 
 /** The flag region index of this fit, built on its first Flags view (fitMap keeps only its source). */
@@ -185,13 +184,13 @@ export function mapFlags(playing) {
   const components = this.flagComponents.components(playing ? paintedOwnership(this, mapSnapshot(this)) : this.setupFlagOwnership);
   const cached = this.flagLayoutCache;
   if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
-  const { result, paths } = layoutBanners(components, ownerId => {
+  const result = layoutBanners(components, ownerId => {
     const owner = playing ? teams[ownerId] : null;
     // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
     return { crestUrl: crestOf(owner), color: owner?.col || V4.flagBg,
       nationId: playing ? owner?.flagId : NATIONS[ownerId] ? ownerId : DEPENDENCIES[ownerId]?.of };
-  }, { previousPaths: cached?.paths });
-  this.flagLayoutCache = { components, teams, playing, result, paths };
+  });
+  this.flagLayoutCache = { components, teams, playing, result };
   return result;
 }
 
@@ -212,19 +211,19 @@ export function setupMapFlags(setup = this.state.setup) {
   const index = flagIndex(this);
   const cached = this.setupFlagCache;
   if (cached?.index === index && cached.opening === opening && cached.marks === marks) return cached.result;
-  const { result, paths } = layoutBanners(index.components(opening), ownerId => {
+  const result = layoutBanners(index.components(opening), ownerId => {
     const team = marks[ownerId];
     if (!team) return null;
     return team.kind === 'club' ? { crestUrl: clubLogoUrl(ownerId), color: team.col || V4.flagBg }
       : { nationId: team.flagId, color: team.col || V4.flagBg };
-  }, { previousPaths: cached?.index === index ? cached.paths : null, idPrefix: SETUP_FLAG_PREFIX });
+  }, { idPrefix: SETUP_FLAG_PREFIX });
   const fills = new Map();
   for (const [territory, ownerId] of Object.entries(opening)) {
     const team = marks[ownerId];
     if (team?.kind === 'club' && team.col) fills.set(territory, team.col);
   }
   const value = { ...result, fills };
-  this.setupFlagCache = { index, opening, marks, result: value, paths };
+  this.setupFlagCache = { index, opening, marks, result: value };
   return value;
 }
 
