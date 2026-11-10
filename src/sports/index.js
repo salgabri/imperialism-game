@@ -4,7 +4,7 @@
 
 import { football } from './football.js';
 import { womensFootball } from './womensFootball.js';
-import { basketball, nbaBasketballIn } from './basketball.js';
+import { basketball, EUROLEAGUE_SCOPE, euroleagueBasketball, nbaBasketballIn } from './basketball.js';
 import { americanFootball } from './americanFootball.js';
 import { baseball } from './baseball.js';
 import { hockey } from './hockey.js';
@@ -20,13 +20,14 @@ export const DEFAULT_SPORT = 'football';
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];
 
 /**
- * The sport a campaign's matches are played under, from its settings or a setup (`sport`, `layer`, `dataSeason`).
- * Basketball's clubs are NBA franchises and play NBA rules at their season's pace; its nations play FIBA's. Every
- * other sport has one rulebook.
+ * The sport a campaign's matches are played under, from its settings or a setup (`sport`, `layer`, `clubScope`,
+ * `dataSeason`). Basketball's NBA franchises play NBA rules at their season's pace, its EuroLeague clubs (on the
+ * EuroLeague's map) FIBA's at the EuroLeague's, and its nations FIBA's. Every other sport has one rulebook.
  */
 export function matchSport(settings) {
   const sport = getSport(settings?.sport);
-  return sport === basketball && settings?.layer === 'clubs' ? nbaBasketballIn(settings.dataSeason) : sport;
+  if (sport !== basketball || settings?.layer !== 'clubs') return sport;
+  return settings.clubScope === EUROLEAGUE_SCOPE ? euroleagueBasketball : nbaBasketballIn(settings.dataSeason);
 }
 
 const sportOf = sport => (sport && typeof sport === 'object' ? sport : getSport(sport));

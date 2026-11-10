@@ -273,9 +273,10 @@ test('basketball clubs set up and launch on the NBA map; football clubs keep the
   await withApp(async ({ app, time, calls }) => {
     app.pickSetup('sport', 'basketball');
     app.pickSetup('layer', 'clubs');
-    assert.equal(app.state.setup.clubScope, 'domestic:nba', "basketball clubs' one theatre");
+    assert.equal(app.state.setup.clubScope, 'domestic:nba', "basketball clubs' first theatre");
     const loading = buildSetupModel(app.state.setup, { domestic: app.domesticStatus() });
-    assert.deepEqual(loading.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:nba', 'NBA', 30]]);
+    // The EuroLeague's map of Europe is the other (scripts/euroleague.test.mjs).
+    assert.deepEqual(loading.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:nba', 'NBA', 30], ['domestic:euroleague', 'EuroLeague', 20]]);
     assert.equal(loading.country.name, 'USA and Canada');
     assert.equal(loading.canLaunch, false, 'Launch waits for the map');
     time.advance(200);

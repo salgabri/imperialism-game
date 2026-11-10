@@ -12,6 +12,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const GAME = 'madden-nfl-27';
@@ -45,8 +46,7 @@ async function readPage(page) {
   if (!refresh && existsSync(file)) return JSON.parse(await readFile(file, 'utf8'));
   for (let attempt = 0; ; attempt++) {
     try {
-      const response = await fetch(pageUrl(page), { headers: { 'user-agent': 'Mozilla/5.0 (imperialism-game roster sync)' },
-        signal: AbortSignal.timeout(45000) });
+      const response = await politeFetch(pageUrl(page), { signal: AbortSignal.timeout(45000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const props = nextData(await response.text()).props?.pageProps;
       const details = props?.ratingDetails;

@@ -14,6 +14,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { politeFetch } from './lib/polite-fetch.mjs';
 import { NATIONS } from '../src/data/teams.js';
 
 const PERMISSION_FLAG = '--efem-permission-granted';
@@ -69,7 +70,8 @@ function requestUrl(query, page = 1) {
 async function getPage(url) {
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
+      // EFEM's written permission (--efem-permission-granted, checked above) stands in for its robots.txt here only.
+      const response = await politeFetch(url, { permission: 'efem.club', signal: AbortSignal.timeout(30000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const result = await response.json();
       if (!Array.isArray(result.data) || !Number.isInteger(result.count)) throw new Error('Invalid player response');

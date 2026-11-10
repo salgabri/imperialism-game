@@ -848,9 +848,10 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   // A Europe map tells the rules of its land; a sport's own map (the NBA's, the NFL's) names its league, each club holding
   // the state of its arena or stadium ("the USA and Canada", but "Australia and New Zealand").
   const land = /^(?:USA|United)\b/.test(entry.name || '') ? `the ${entry.name}` : entry.name;
-  // Women's football's map of every European club counts them as EA rates them.
-  const field = entry.theatre === 'all' && entry.sport !== 'football' ? `the ${entry.clubs} European clubs EA rates` : `Europe's ${entry.clubs} strongest clubs`;
-  result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre
+  // Women's football's map of every European club counts them as EA rates them; the EuroLeague's names its league.
+  const field = !entry.theatre ? `the ${entry.clubs} ${entry.league} clubs`
+    : entry.theatre === 'all' && entry.sport !== 'football' ? `the ${entry.clubs} European clubs EA rates` : `Europe's ${entry.clubs} strongest clubs`;
+  result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre || entry.countries
     ? `${field}, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
     : entry.league
       ? `the ${entry.clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines || 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
@@ -902,9 +903,9 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
     await until('spectator role chosen again', () => app.state.setup.role === 'spectator');
     button('Basketball').click();
     await waitFor(() => app.state.setup.clubScope === 'domestic:nba', 2000);
-    // Basketball clubs have one theatre, the NBA's own map; no country is offered.
+    // Basketball clubs have two theatres, the NBA's own map first and the EuroLeague's; no country is offered.
     result.basketballResets = app.state.setup.clubScope === 'domestic:nba'
-      && JSON.stringify(theatreSnapshot('basketball').options.map(item => item.value)) === '["domestic:nba"]';
+      && JSON.stringify(theatreSnapshot('basketball').options.map(item => item.value)) === '["domestic:nba","domestic:euroleague"]';
     button('Football').click();
     await sleep(20);
     await select('setup-theatre', domesticScope(id));

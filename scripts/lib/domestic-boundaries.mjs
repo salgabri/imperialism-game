@@ -2,16 +2,24 @@
 // geoBoundaries gbOpen layers (URLs pinned to a release commit) with Natural Earth
 // 10m admin-1 as the fallback. Every download lands in the gitignored
 // data-src/boundaries/ cache, so rebuilds and --check run offline.
+// Downloads go through scripts/lib/polite-fetch.mjs. A layer's file is named by the
+// geoBoundaries metadata as github.com/wmgeolab/geoBoundaries/raw/<commit>/…, a path
+// github.com's robots.txt disallows, so it is read from raw.githubusercontent.com at that
+// commit, and its Git LFS object from media.githubusercontent.com, checked against the
+// pointer's SHA-256 (fetchFile); the outputs still cite the metadata's link. GeoNames'
+// dumps (download.geonames.org) are disallowed for every agent by its robots.txt, so
+// only their cached copies are read: a missing one stops the build.
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { threadId } from 'node:worker_threads';
-import { strFromU8, unzipSync } from 'fflate';
+import { unzipSync } from 'fflate';
 import polygonClipping from 'polygon-clipping';
 import { feature } from 'topojson-client';
 import {
   bboxOf, centroidOf, kmBetween, kmToPolys, nodeRings, pointInPolys, polyAreaKm2, polysAreaKm2, polysOf,
 } from './domestic-partition.mjs';
+import { fetchFile, rawGithubUrl } from './polite-fetch.mjs';
 
 export const GB_META_URL = 'https://www.geoboundaries.org/api/current/gbOpen/ALL/ALL/';
 export const NE_URL = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson';
@@ -19,7 +27,6 @@ export const GN_DUMP = 'https://download.geonames.org/export/dump';
 export const GN_CITATION = 'GeoNames (https://www.geonames.org), CC BY 4.0';
 export const WORLD_SOURCE = "the game's world map, public/countries-50m.json (world-atlas 2.0.2, Natural Earth 1:50m)";
 export const GB_CITATION = 'Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLOS ONE 15(4): e0231866. https://doi.org/10.1371/journal.pone.0231866';
-const USER_AGENT = 'imperialism-game-build/1.0 (offline data build)';
 // Layers we may not redistribute without asking the publisher.
 const BLOCKED_LICENSES = new Set(['Other - Direct Permission']);
 
@@ -289,9 +296,11 @@ const clean = v => (v == null || /^(nan|none|null|)$/i.test(String(v).trim()) ? 
 /**
  * Cached download of url into file: one request at a time however many callers
  * (the builder's worker threads all go through the main thread's downloader),
- * 0.5 s apart, four tries. `offline` turns a cache miss into an error (--check).
- * JSON bodies are checked before caching; with `member` the body is a zip and that
- * member's text is cached instead (GeoNames dumps).
+ * 0.5 s apart (longer where a robots.txt asks), four tries, through fetchFile, so a
+ * github.com /raw/ link is read from raw.githubusercontent.com (see the top of this
+ * file). `offline` turns a cache miss into an error (--check). JSON bodies are
+ * checked before caching; with `member` the body is a zip and that member's text is
+ * cached instead (GeoNames dumps, which robots.txt now keeps to the cache).
  */
 export function createDownloader({ offline = false, log = () => {} } = {}) {
   let lastRequest = 0;
@@ -306,17 +315,16 @@ export function createDownloader({ offline = false, log = () => {} } = {}) {
       if (wait > 0) await sleep(wait);
       lastRequest = Date.now();
       try {
-        log(`  download ${url}`);
-        const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT }, signal: AbortSignal.timeout(300000) });
-        if (response.status === 404) throw Object.assign(new Error(`HTTP 404 for ${url}`), { fatal: true });
-        if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
+        log(`  download ${rawGithubUrl(url)}`);
+        // A refusal (robots.txt, the never list) and a 404 are fatal: no retry.
+        const bytes = await fetchFile(url, { signal: AbortSignal.timeout(300000) });
         let text;
         if (member) {
-          const files = unzipSync(new Uint8Array(await response.arrayBuffer()), { filter: f => f.name === member });
+          const files = unzipSync(new Uint8Array(bytes), { filter: f => f.name === member });
           if (!files[member]) throw new Error(`${url} has no ${member}`);
-          text = strFromU8(files[member]);
+          text = new TextDecoder().decode(files[member]);
         } else {
-          text = await response.text();
+          text = new TextDecoder().decode(bytes); // as response.text() decodes, a byte-order mark dropped
           JSON.parse(text); // never cache a truncated or HTML error body
         }
         if (!text.trim()) throw new Error(`Empty body for ${url}`);
@@ -605,7 +613,8 @@ export function createBoundarySource({ cacheDir, worldFile, offline = false, log
   const world = async () => (worldShapes ??= loadWorldMap(JSON.parse(await readFile(worldFile, 'utf8'))));
 
   // GeoNames populated places: cities1000 (seeded from the club sync's copy when there
-  // is one), or a country's full file where a layer's names need villages too.
+  // is one), or a country's full file where a layer's names need villages too. Only the
+  // cached copies: download.geonames.org's robots.txt refuses the download of a missing one.
   let cityLines = null;
   const parsePlace = f => ({ id: +f[0], name: f[1], ascii: f[2], alt: f[3] ? f[3].split(',') : [], lat: +f[4], lon: +f[5], code: f[7], admin1: f[10], pop: +f[14] || 0 });
   async function places(a2, { admin1 = null, full = false } = {}) {

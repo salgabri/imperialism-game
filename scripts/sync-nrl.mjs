@@ -22,6 +22,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cacheDir = path.join(root, 'data-src/nrl');
@@ -33,7 +34,6 @@ const PREMIERSHIP = 111, INTERNATIONALS = 133, PACIFIC = 195;
 const RATED_SEASON = 2025;
 const SEASONS = [2021, 2022, 2023, 2024, 2025];
 const PAUSE_MS = 250, PARALLEL = 4;
-const UA = 'Mozilla/5.0 (compatible; imperialism-game data sync)';
 
 // The list's own links, where one goes astray: Manly's Nathan Brown links to the coach of that name, Sione Katoa and
 // Daine Laurie to retired namesakes (a hooker born in 1995, a prop born in 1984), and Clint Gutherson's profile has moved
@@ -73,7 +73,7 @@ async function fetched(file, url, { json = true, keep = body => body } = {}) {
   if (!refresh && existsSync(at)) return JSON.parse(await readFile(at, 'utf8'));
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
-      const response = await fetch(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(45000) });
+      const response = await politeFetch(url, { signal: AbortSignal.timeout(45000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const body = keep(json ? await response.json() : await response.text());
       const result = { url, fetchedAt: new Date().toISOString(), body };

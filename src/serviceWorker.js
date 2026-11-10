@@ -1,8 +1,8 @@
 // Registers the offline worker that vite-plugin-pwa builds (src/pwa.js) and runs its updates. A new version never
 // reloads a page by itself: its worker waits until the player chooses Reload in the update prompt, and only that tab
-// reloads (pagehide writes the campaign's checkpoint first). Other open tabs keep the version they loaded. It also
-// fetches a campaign's crests and flags through the worker, so they show offline (cacheForOffline). UI-only: nothing
-// here touches a campaign.
+// reloads (pagehide writes the campaign's checkpoint first). Other open tabs keep the version they loaded. In the
+// installed app it also fetches a campaign's crests and flags through the worker, so they show offline
+// (keepCampaignMarks). UI-only: nothing here touches a campaign.
 import { useEffect, useState } from 'react';
 import { isRuntimeCached } from './pwa.js';
 
@@ -148,6 +148,25 @@ export async function cacheForOffline(urls, env = globalThis) {
     }
   };
   await Promise.all(Array.from({ length: Math.min(OFFLINE_FETCHES, queue.length) }, fetchNext));
+}
+
+/** Whether the page runs as the installed app, in a window of its own, rather than in a browser tab. Never throws. */
+export function runsInstalled(env = globalThis) {
+  try {
+    return env.navigator?.standalone === true || env.matchMedia?.('(display-mode: standalone)')?.matches === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Keep a campaign's crests and flags for offline play (cacheForOffline), in the installed app only. A world campaign
+ * has about 200 of them, each a request against the host's monthly allowance (README "Caching"), and a player in a
+ * browser tab rarely goes offline: a tab fetches each one the first time the game shows it. Resolves as cacheForOffline
+ * does, at once in a tab.
+ */
+export function keepCampaignMarks(urls, env = globalThis) {
+  return runsInstalled(env) ? cacheForOffline(urls, env) : Promise.resolve();
 }
 
 /** Reload into the waiting version: its worker takes over, then this tab reloads. False when nothing waits. */

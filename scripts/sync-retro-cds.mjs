@@ -13,7 +13,9 @@
 // `cd.folder`. The image must have the pinned size and volume (name and creation time), the header its pinned SHA-256,
 // each expanded table the header's MD5, and every file its pinned size and SHA-256 before it is written. No executable
 // and no whole image is downloaded, and nothing is run. archive.org's robots.txt (read 2026-11-09) disallows only
-// /control/ and /report/. A file already present with its pinned digest is not fetched again.
+// /control/ and /report/; the requests go through scripts/lib/polite-fetch.mjs (one generic User-Agent), which reads it
+// and that of the iaNNNNNN.us.archive.org host each download redirects to (none: HTTP 404, 2026-11-10) before following.
+// A file already present with its pinned digest is not fetched again.
 import { existsSync } from 'node:fs';
 import { mkdir, open, readFile, rename, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -21,9 +23,9 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { LAYOUTS, checkLayout, findEntry, readDirectory, readEntry, readUserBytes, readVolume } from './lib/cd-image.mjs';
 import { expandIs5File, is5File, readIs5Header } from './lib/installshield5.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const USER_AGENT = 'imperialism-game data sync (low rate; github.com/salgabri/imperialism-game)';
 const GAP_MS = 1000;
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -53,7 +55,7 @@ function archiveImage(cd, log) {
       last = Date.now();
       requests++;
       try {
-        const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT, Range: `bytes=${start}-${end - 1}` }, redirect: 'follow',
+        const response = await politeFetch(url, { headers: { Range: `bytes=${start}-${end - 1}` }, redirect: 'follow',
           signal: AbortSignal.timeout(300000) });
         if (response.status !== 206) {
           // A server that ignores Range would send the whole image: stop it before the body is read.

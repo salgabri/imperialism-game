@@ -14,6 +14,7 @@ import { clubColour } from '../src/data/clubColours.js';
 import { NATIONS, DEPENDENCIES } from '../src/data/teams.js';
 import { CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as NBA } from '../src/data/clubs.basketball.js';
+import { CLUBS as EUROLEAGUE } from '../src/data/clubs.euroleague.js';
 import { CLUBS as NFL } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL } from '../src/data/clubs.hockey.js';
@@ -130,7 +131,7 @@ test('clubs use their crest colour, with corrections where the crest misleads', 
   assert.equal(clubColour('f-1-fc-union-berlin'), '#eb1923', 'a correction covers a club without a crest');
   assert.equal(clubColour('d999-1'), null);
   assert.equal(politicalFill('d999-1'), empireFill('d999-1'), 'a club with no colour keeps its hash pastel');
-  const missing = [...CLUBS, ...NBA].filter(club => !clubColour(club.id)).map(club => club.id);
+  const missing = [...CLUBS, ...NBA, ...EUROLEAGUE].filter(club => !clubColour(club.id)).map(club => club.id);
   assert.deepEqual(missing, [], 'every league club has a colour');
 });
 
@@ -138,7 +139,7 @@ test('every correction names a club the game ships', () => {
   const { colours } = JSON.parse(readFileSync(new URL('./data/club-colours.json', import.meta.url), 'utf8'));
   // A club the built-in leagues have lost still plays in the earlier seasons the game ships (public/football/).
   const seasonClubs = BUILT_IN_SEASONS.flatMap(set => JSON.parse(readFileSync(new URL(`../public/football/${set.id}.json`, import.meta.url), 'utf8')).clubs);
-  const ids = new Set([...CLUBS, ...NBA, ...NFL, ...MLB, ...NHL, ...NRL, ...seasonClubs].map(club => club.id));
+  const ids = new Set([...CLUBS, ...NBA, ...EUROLEAGUE, ...NFL, ...MLB, ...NHL, ...NRL, ...seasonClubs].map(club => club.id));
   for (const [id, colour] of Object.entries(colours)) {
     assert.ok(ids.has(id) || /^d[0-9A-Za-z]+-\d+$/.test(id), id);
     assert.equal(clubColour(id), colour.toLowerCase(), `${id} applied`);

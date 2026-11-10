@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
-import { createFlagRegionIndex, FLAG_REGION_GAP_KM, makeCoastTree } from '../src/engine/flagRegions.js';
+import { createFlagRegionIndex, FLAG_REGION_GAP_KM, flagRegionIndexSteps, makeCoastTree } from '../src/engine/flagRegions.js';
 import { WorldGeometry, projPt } from '../src/engine/geo.js';
 import { NATIONS } from '../src/data/teams.js';
 
@@ -226,6 +226,29 @@ test('world regional graph construction is bounded and cached frames are inexpen
   const warmMs = performance.now() - warmAt;
   assert.ok(warmMs < 500, `100 cached frames took ${warmMs.toFixed(0)} ms`);
   t.diagnostic(`cold world region graph ${coldMs.toFixed(0)} ms; 100 cached frames ${warmMs.toFixed(0)} ms`);
+});
+
+test('built in steps (the Flags warm-up), the world index gives the regions of one built in one go', t => {
+  const { shapes, maxGap } = atlas();
+  const steps = flagRegionIndexSteps(shapes, { maxGap });
+  const times = [];
+  let index;
+  for (let at = performance.now(); ;) {
+    const { done, value } = steps.next();
+    const now = performance.now();
+    times.push(now - at);
+    at = now;
+    if (done) { index = value; break; }
+  }
+  assert.ok(times.length > 40, `${times.length} steps`);
+  const whole = createFlagRegionIndex(shapes, { maxGap });
+  const ringIds = new Map(shapes.flatMap(s => s.rings).map((ring, i) => [ring, i]));
+  const signature = regions => JSON.stringify(regions, (key, value) => key === 'rings' ? value.map(ring => ringIds.get(ring)) : value);
+  const native = Object.fromEntries(shapes.map(s => [s.id, s.id]));
+  for (const ownership of [native, { ...native, 250: '276', 208: '276', 380: '276' }, Object.fromEntries(shapes.map(s => [s.id, 'one']))]) {
+    assert.ok(signature(index.components(ownership)) === signature(whole.components(ownership)), 'the same regions, keys, bounds and parts');
+  }
+  t.diagnostic(`${times.length} steps, the largest ${Math.max(...times).toFixed(1)} of ${times.reduce((a, b) => a + b, 0).toFixed(0)} ms`);
 });
 
 // ---- The coast tree (makeCoastTree) against other trees of the same coasts ----

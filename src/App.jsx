@@ -1,7 +1,7 @@
 import React from 'react';
 import { CONFIG } from './config.js';
 import { C, V4 } from './theme.js';
-import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
+import { DEPENDENCIES, NATIONS, SCOPES, buildClub, buildTeam, isEuropeanScope, makeRng, hashStr, selectLineup, squadAverage, teamEff } from './data/teams.js';
 import { CLUB_SCOPES, nationTheatre, worldClubTheatreName } from './data/scopes.js';
 import { CAPITALS } from './data/capitals.js';
 import { teamMarkUrls } from './data/teamMarks.js';
@@ -24,7 +24,7 @@ import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiv
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
-import { applyUpdate, cacheForOffline, settleFirstBoot } from './serviceWorker.js';
+import { applyUpdate, keepCampaignMarks, settleFirstBoot } from './serviceWorker.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { skipAheadModel } from './viewModels/campaign.js';
@@ -315,6 +315,7 @@ export default class App extends React.Component {
 
   componentWillUnmount() {
     this.clearTimers();
+    this.stopFlagWarmup();
     clearTimeout(this.confirmTimer);
     clearTimeout(this.setupLoadTimer);
     clearTimeout(this.setupSetTimer);
@@ -366,6 +367,8 @@ export default class App extends React.Component {
     if (previous && ((previous.choice && !this.state.choice) || (previous.pendingTarget && !this.state.pendingTarget))) this.focusRescue = true;
     if (this.focusRescue) this.rescueFocus();
     if (this.challengeTeam != null && this.state.phase === 'setup') this.settleChallengeTeam();
+    // Flags mode's first view, made ahead while the map shows another mode (mapMethods.jsx).
+    this.queueFlagWarmup();
   }
 
   /**
@@ -683,9 +686,11 @@ export default class App extends React.Component {
         rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
       }));
       this.flagLayoutCache = null;
-      // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. mapFlags builds
-      // that index from its source on the first Flags view: most games never show one.
+      // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. Its index is
+      // built from this source in quiet moments while the campaign map shows another mode (the Flags warm-up,
+      // mapMethods.jsx), or by the first Flags view if that comes first; never within the fit itself.
       this.flagComponents = null;
+      this.flagIndexBuild = null;
       this.flagRegionSource = { geometry: this.labelGeometry, maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit };
     }
     this.viewFocus = null;
@@ -703,7 +708,7 @@ export default class App extends React.Component {
       .map(country => [country.id, country.id]));
     // Russia and overseas islands remain playable, but the European opening
     // camera should show the continent. Zooming out always restores all land.
-    if (settings?.scope === 'UEFA' && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
+    if (isEuropeanScope(settings?.scope) && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
     this.viewResetKey = (this.viewResetKey || 0) + 1;
   }
 
@@ -1362,7 +1367,7 @@ export default class App extends React.Component {
     // The theatre the sport plays (a season still loading: the choice as it stands).
     const sport = sportOf(setup);
     const scope = setup.layer === 'clubs' ? null : sport ? nationTheatre(sport, setup.scope).id : setup.scope;
-    const focus = scope === 'UEFA' ? this.europeFocus() : null;
+    const focus = isEuropeanScope(scope) ? this.europeFocus() : null;
     return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
       own: opening, frameIds: homes, focus });
   }
@@ -1563,8 +1568,8 @@ export default class App extends React.Component {
       },
       () => {
         this.persist();
-        // Every team's crest or flag, so the campaign looks the same offline (README §Running it).
-        cacheForOffline(teamMarkUrls(teams));
+        // In the installed app, every team's crest or flag, so the campaign looks the same offline (README §Running it).
+        keepCampaignMarks(teamMarkUrls(teams));
       },
     );
   }
@@ -1650,7 +1655,7 @@ export default class App extends React.Component {
       if (!gated && s.match && !s.match.applied) this.presentMatch();
       else if (!gated && s.spin && !remapped) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
       this.persist();
-      cacheForOffline(teamMarkUrls(s.teams));
+      keepCampaignMarks(teamMarkUrls(s.teams));
       // The checkpoint re-stamps the map version; keep telling the player why the draw restarts.
       if (remapped) this.setState(state => state.saveStatus?.ok && !state.storageConflict ? { saveStatus: { ...state.saveStatus, message } } : null);
     });
@@ -2497,6 +2502,8 @@ export default class App extends React.Component {
   // ---------- derived view models ----------
 
   mapFlags(...args) { return mapM.mapFlags.apply(this, args); }
+  queueFlagWarmup(...args) { return mapM.queueFlagWarmup.apply(this, args); }
+  stopFlagWarmup(...args) { return mapM.stopFlagWarmup.apply(this, args); }
 
   setupMapFlags(...args) { return mapM.setupMapFlags.apply(this, args); }
 

@@ -11,7 +11,7 @@ Pick your sport at kick-off:
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
 | Football, and women's football | XI in a 4-4-2 | 90 minutes | penalty shootout |
-| Basketball | starting five | 40 minutes for nations (FIBA), 48 for NBA clubs | overtime periods |
+| Basketball | starting five | 40 minutes for nations and EuroLeague clubs (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
@@ -28,12 +28,13 @@ And pick who fights:
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
   every other nation's land stays neutral: 173 nations play football, 52 tennis, 45
-  women's tennis, 40 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
+  women's tennis, 47 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
   rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
   on [their maps of Europe](#womens-football-on-the-europe-maps), the NWSL's 16 on [theirs](#the-nwsl-map) of the USA), all 30 NBA
-  franchises on [their own map](#the-nba-map) of the USA and Canada, all 32 NFL
+  franchises on [their own map](#the-nba-map) of the USA and Canada, the EuroLeague's 20 clubs
+  on [theirs](#the-euroleague-map) of Europe, all 32 NFL
   franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
   [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
@@ -108,22 +109,24 @@ npm run engine-scale:football # measure the built-in football squads' scale, odd
 npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
-npm run sync:club-logos  # refresh club crests from Wikipedia (network, cached)
+npm run sync:club-logos  # club crests: Wikidata via QLever (network, cached), Wikipedia's answers from the pinned cache only
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
-npm run sync:early-nationalities # ask Wikidata for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
+npm run sync:early-nationalities # ask Wikidata (via QLever) for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
 npm run sync:world-cup-seasons # read the pinned World Cup, results and Wikipedia sources in data-src/ into scripts/data/world-cup-seasons/
 npm run build:world-cup-seasons # rebuild the computed World Cup seasons 1961/62 to 1993/94 from those facts (offline; --check to verify)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page and sources in data-src/
+npm run sync:euroleague  # snapshot the EuroLeague's rosters and box scores from its public API into scripts/data/euroleague-2026-27.json (network, cached)
+npm run build:euroleague # rebuild the EuroLeague's clubs, every rating an estimate from that snapshot (--check compares byte for byte)
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
 npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
 npm run import:mlb-war   # rebuild the 1960–2017 baseball snapshots from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check compares byte for byte)
 npm run build:mlb-map    # rebuild MLB's maps of the USA and Canada, today's and the 43 of earlier seasons (1–2 minutes a map; --check compares byte for byte)
-npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (network, cached)
+npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (the NHL's from the cache only; no --refresh)
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
 npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run sync:nrl         # snapshot Rugby League 26's NRL ratings, Zero Tackle's profiles and NRL.com's 2025 team lists into scripts/data/rugby-league-26.json (network, cached)
@@ -143,22 +146,27 @@ The production build installs as an app (Chrome's install button, or Share › A
 to Home Screen on an iPhone) and plays offline. `npm run build` writes
 `manifest.webmanifest` and a service worker, `sw.js`, which
 [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) builds from `src/pwa.js`.
-The worker precaches only the app shell, about 3.5 MB: `index.html`, the hashed
-bundle in `assets/` (every sport's players among it), the Archivo fonts and the
-two world maps. Everything else in `public/` (about 100 MB) is cached the first
-time the game uses it. Seasons and
+The worker precaches only the app shell, about 3.5 MB: `index.html` and
+`assets/`, which holds the hashed bundle (every sport's players among it), the
+Archivo fonts and the two world maps. The build copies the fonts and maps there
+under content-hashed names (`hashedShell` in `vite.config.js`), so the worker
+takes the copies a first visit's page has just downloaded instead of fetching
+them again. Everything else in `public/` (about 100 MB), the icons included, is
+cached the first time the game uses it. Seasons and
 country maps come from the network while online, so they always match the
 deployed build, and from the cache offline. Flags and crests show from the cache
-at once and refresh in the background. Starting or resuming a campaign online
-also fetches every one of its teams' crests and flags that is not cached yet, a
-few at a time, so teams the game never showed online still show offline. A
+at once and refresh in the background. In the installed app, starting or
+resuming a campaign online also fetches every one of its teams' crests and flags
+that is not cached yet, a few at a time, so teams the game never showed online
+still show offline. A browser tab skips that: a world campaign has about 200 of
+them, each a request against the host's allowance (see **Caching** below). A
 first visit installs the worker only once the setup screen is up and the page
 is idle, or about 10 seconds after the game starts if setup takes longer, so its
 downloads leave the game's own alone. After one online visit that got that far,
 the game opens offline and plays nations and club campaigns,
 plus every country whose map was opened online. A country never opened online
 fails to load, with **Retry**, and a flag or crest the game has neither shown
-nor kept for a campaign online stays blank.
+online nor, in the installed app, kept for a campaign stays blank.
 
 The first download holds the game and football's players, the default setup's.
 Every other sport's players are a file of their own (4 to 43 KB compressed),
@@ -175,6 +183,40 @@ they reload, all but the players of a sport they have not loaded yet: the new
 version has replaced those files, so picking that sport there fails until
 **Reload**. Later hides the panel for that page; closing every tab also updates.
 The page looks for a new version every hour and when you return to it.
+
+### Network requests
+
+The game itself fetches only its own files. The data scripts that download sources
+(`sync:*`, `fetch:pfa`, and the map builders on a cache miss) send every request
+through `scripts/lib/polite-fetch.mjs`, and `npm test` checks that none calls the
+network any other way:
+
+- One generic User-Agent, `imperialism-game-data/1.0`, naming no person, address or
+  account; a script never sets its own.
+- Each host's robots.txt is read first, once a run, and obeyed as RFC 9309 reads it,
+  for this agent and for the names of Anthropic's crawlers (ClaudeBot, anthropic-ai,
+  Claude-Web): a path any of them may not fetch is refused, a Crawl-delay is kept,
+  and every redirect is checked the same way before it is followed. A host whose
+  robots.txt cannot be read (a server or network error) is not fetched from; one
+  with no robots.txt (HTTP 4xx) has no restrictions.
+- The Sports-Reference sites and the NHL's APIs (`api.nhle.com`, `api-web.nhle.com`)
+  are never fetched, whatever their robots.txt says.
+- A site's written permission stands in for its robots.txt only where a flag says it
+  was given (`--efem-permission-granted`, for EFEM's `/api/`).
+
+Where an audit of 2026-11-10 found a script reaching a disallowed path, it now uses an
+allowed source of the same facts, or reads only its pinned cache and keeps the
+committed outputs:
+
+| Source | Disallowed path | Now |
+| --- | --- | --- |
+| Wikidata Query Service | `query.wikidata.org/sparql` | QLever's Wikidata endpoint, `qlever.dev/api/wikidata` (`scripts/lib/wikidata-sparql.mjs`), for the crests, home towns and FIFA 05/06 nationalities |
+| Wikidata's search API | `www.wikidata.org/w/api.php` | its answers pinned in `scripts/data/ea-early-search.json` |
+| English Wikipedia's API | `en.wikipedia.org/w/api.php` | its cached answers only, once pinned in `scripts/data/club-logos-wikipedia.json`; none is yet, so the committed crests stay ([crests](#club-crests)) |
+| geoBoundaries files on GitHub | `github.com/*/raw/` | `raw.githubusercontent.com`, and `media.githubusercontent.com` for Git LFS objects, checked against the pointer's SHA-256 |
+| GeoNames dumps | `download.geonames.org/` (everything) | the cached copies only |
+| CommonCrawl records | `data.commoncrawl.org/` (everything) | the pinned cached copies only (ice hockey's NHL 22 pages) |
+| The NHL's API | never fetched | the cached answers only: `sync:nhl` cannot refresh, `sync:nhl-seasons` reads its pinned rosters |
 
 ## Deployment
 
@@ -200,13 +242,27 @@ real gates. This needs no tokens or secrets. A first attempt that deployed from
 CI with the Vercel CLI was dropped on 1 November 2026, because the CLI rejected
 the Hobby account's access tokens ("User not found. (404)").
 
-**Caching.** [`vercel.json`](vercel.json) marks the hashed bundle in `/assets/`
-immutable for a year. Fonts, flags and club crests are cached for a day and
-revalidated in the background for a week; a stale image is harmless.
-Everything else revalidates on every load: `index.html`, the maps and the
-season and country files keep their names from one release to the next and
-must match the code that reads them. That includes `sw.js`, which must never be
-cached for long, or players would only see a release once the cache expired.
+**Caching.** [`vercel.json`](vercel.json) marks `/assets/` immutable for a
+year: the hashed bundle, and the fonts and world maps the build copies there
+under hashed names. The worker's runtime, `workbox-<hash>.js`, is named by its
+content too and kept as long, so checking for a new version fetches `sw.js`
+alone. `public/fonts/`, flags, flag symbols, club crests and the icons are
+cached for a day and revalidated in the background for a week; a stale image is
+harmless.
+Everything else revalidates on every load: `index.html` and the season and
+country files keep their names from one release to the next and must match the
+code that reads them. That includes `sw.js`, which must never be cached for
+long, or players would only see a release once the cache expired.
+
+**Requests are the scarce allowance.** Vercel's free Hobby plan includes
+1,000,000 requests and 100 GB of transfer a month. A static site uses nothing
+else, and going over either can pause the site for up to 30 days. A request costs as
+much of the allowance as 100 KB, and most files here are far smaller (a flag is
+about 2.5 KB, a crest about 7 KB), so every one counts, a 304 or a 404 too. A
+deployed build never asks for `football/index.json` unless it was built with
+one (`localSeasonIndex` in `vite.config.js`), the worker leaves the icons out of
+its precache, and only the installed app fetches a campaign's crests and flags
+ahead of time.
 
 **Link previews.** `index.html` carries a description, a canonical URL, and
 Open Graph and Twitter tags, so a shared link shows a card. Crawlers need
@@ -242,9 +298,10 @@ manager of the theatre's favourite, with decisions from the first match.
    neither tennis game nor women's football has Africa, and an earlier season can offer
    fewer still. A choice the sport doesn't offer plays its heartland, the confederation
    with the most real sides (rugby league's Asia & Oceania), and comes back with a sport
-   that offers it. Football club campaigns offer Europe's 124 strongest clubs or its
+   that offers it. Basketball's nations also offer **EuroBasket**, the 24 nations of EuroBasket 2025.
+   Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
-   map of the USA and Canada, American football (clubs only: choosing it
+   map of the USA and Canada or [the EuroLeague](#the-euroleague-map) on its map of Europe, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA,
    baseball clubs MLB on its map of the USA and Canada, ice hockey clubs the NHL on its own and rugby league clubs the NRL
    on its map of Australia and New Zealand. Tennis and women's tennis are nations only
@@ -400,7 +457,8 @@ Basketball uses shared possessions, positional offence/defence, form and shootin
 variance, scaled to the NBA's margins and its share of overtime games. Nations play FIBA's four ten-minute
 quarters at about 73 possessions; NBA clubs play the NBA's four twelve-minute
 quarters at their season's league pace and scoring rate, so games score like
-their season did: about 93 a side in 2003/04, 116 today. American football plays about 11
+their season did: about 93 a side in 2003/04, 116 today; EuroLeague clubs play FIBA's quarters at the
+EuroLeague's pace and scoring rate, 74 possessions and 86 points a side. American football plays about 11
 possessions a side, each ending in a touchdown and its try (the extra point or two points),
 a field goal, now and then a safety, or nothing by its offence against the opposing defence,
 with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime.
@@ -414,7 +472,7 @@ every Upsets setting retains scoring randomness and possible upsets.
 **Home advantage** is off by default: every match is played on neutral ground, so
 the defending team wins half of even games. On, the defender plays at home and
 wins about as often as home teams do in its sport's league: 45% of even football
-games in ninety minutes (58% with the shoot-outs), 56% in basketball, 54% in
+games in ninety minutes (58% with the shoot-outs), 56% in basketball (64% in the EuroLeague), 54% in
 American football and ice hockey and 53% in baseball. A Davis Cup host picks the surface and fills the stands:
 even ties go its way 60% of the time. Attacks fail more often, and a failed
 attack hands the defender the attacker's territory, so conquests change hands but
@@ -707,7 +765,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | --- | --- | --- | --- |
 | `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-league` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season); tennis and women's tennis are nations only |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), or women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, a sport's own map (NBA, NFL, MLB, NHL) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), or the EuroLeague's (`domestic:euroleague`) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -920,7 +978,7 @@ neutral. See the
 invented: 27 of the 78 nations with a rated player field a full XI. The 36 with at least six, half an
 XI, field a team, short-handed below eleven; the rest, and a nation with none, field no team. See the [design notes](docs/design/womens-football.md).
 
-**Basketball** — `src/data/rosters.basketball.js`, 40 federations, 200 players.
+**Basketball** — `src/data/rosters.basketball.js`, 47 federations, 235 players.
 No public dataset carries both current basketball ratings *and* nationality: NBA
 2K has real 1–99 overalls but no country, and every NBA bio dataset with a
 country column stops in 2014. So the split is deliberate — nationality and
@@ -935,12 +993,23 @@ eligibility follows the federation — Banchero plays for the USA rather than
 Italy). The fives were last checked against FIBA records in October 2026: every
 player has played for his national team since 2023, players who had retired
 from it were replaced by current internationals at the same position, and no
-five fields more than the one naturalized player FIBA allows.
+five fields more than the one naturalized player FIBA allows. In November 2026 the
+seven nations of EuroBasket 2025 that had no five (Belgium, Cyprus, Estonia, Great
+Britain, Iceland, Portugal and Sweden) got the players who started or played most
+for them there, so all 24 of the **EuroBasket** theatre field real fives
+([design notes](docs/design/euroleague.md#eurobasket)).
+
+**The EuroLeague** — `src/data/clubs.euroleague.js`, its 20 clubs of 2026/27, each
+with its best five. No game or dataset rates EuroLeague players, so every rating is
+an estimate on NBA 2K's scale from the player's EuroLeague box scores (his PIR a
+game over three seasons), marked as one wherever it is shown; the rosters and box
+scores come from the EuroLeague's public API (`npm run sync:euroleague`). See the
+[design notes](docs/design/euroleague.md).
 
 Basketball positions are fluid, so most players list two neighbouring positions,
 primary first: Dončić is PG/SG, Giannis PF/C, Melli PF/C. Pure point guards and
 centres such as Calathes and Jokić list one, and so do players whose sources
-show a single position. 133 of the 200 national players cover two positions.
+show a single position. 150 of the 235 national players cover two positions.
 Every listed position is one the player really plays, and every five has a
 real player for each of the five positions. The lineup optimizer fields each
 five from these positions, so Italy starts Pajola (PG/SG) at shooting guard and
@@ -966,7 +1035,7 @@ and identify positional penalties; bench depth does not directly inflate strengt
 
 Football never invents a missing player or rating: an incomplete future source
 is shown as an incomplete squad. The shipped sources cover every football XI.
-Basketball is curated to the 40 federations that matter, so **24% of shirts are
+Basketball is curated to the 47 federations that matter, so **28% of shirts are
 real** but every serious basketball nation is. Basketball gaps retain generated
 players at the confederation baseline, shown dimmed and asterisked.
 
@@ -1101,12 +1170,14 @@ from these services at runtime.
   contract club. FM's placeholder names for unlicensed clubs (Portugal's "BRG")
   are replaced from `scripts/data/domestic-names.json`.
 - **Home towns**: manual overrides in `scripts/data/domestic-locations.json`, then
-  Wikidata (CC0), then GeoNames `cities1000` (CC BY 4.0). Each club records which
+  Wikidata (CC0, asked of QLever's Wikidata endpoint), then GeoNames `cities1000`
+  (CC BY 4.0, the cached copy only; see [Network requests](#network-requests)). Each club records which
   one placed it. Some overrides are region-level (marked "approximate:"), and the
   38 clubs with no known home start at a populous place no other club holds
   (`homeSource` `placed:<geonameid>`, an estimate).
 - **Boundaries**: [geoBoundaries](https://www.geoboundaries.org) gbOpen layers,
-  pinned to one commit, with Natural Earth admin-1 (public domain) as a fallback;
+  pinned to one commit (downloaded from raw.githubusercontent.com and, for their Git
+  LFS objects, media.githubusercontent.com), with Natural Earth admin-1 (public domain) as a fallback;
   GeoNames places repair broken unit names and name the extra sections. Licences
   differ by country: 34 maps derive from ODbL layers and 13 from CC BY-SA ones,
   and those terms also cover the section shapes. Land the game's own world map
@@ -1180,8 +1251,8 @@ known limitations.
 
 ### The NBA map
 
-Basketball clubs have one theatre, **NBA**: the 30 franchises fight over the USA
-and Canada and nothing else. A franchise holds the state or province its arena
+Basketball clubs have two theatres: **NBA**, here, and [EuroLeague](#the-euroleague-map). In
+the NBA the 30 franchises fight over the USA and Canada and nothing else. A franchise holds the state or province its arena
 stands in (geoBoundaries) and nothing else, so Portland holds Oregon, Toronto
 Ontario and Boston Massachusetts. California, Texas, Florida and New York,
 which host two or more franchises, are divided between them along county lines by
@@ -1212,6 +1283,19 @@ Arenas are in `scripts/data/nba-arenas.json`; the
 [design notes](docs/design/domestic-campaigns.md#the-nba-map) cover the border
 fitting and the file additions. `scripts/build-club-maps.mjs` builds every
 league's map (`--league=nba` or `nfl` for one; the index keeps the other's entries).
+
+### The EuroLeague map
+
+Basketball's other club theatre, **EuroLeague**: the EuroLeague's 20 clubs of 2026/27 on a
+map of Europe built by the same rules as football's (below), from their arenas. A club alone
+in its country holds all of it (Bayern Munich Germany, Žalgiris Lithuania, Dubai Basketball
+the United Arab Emirates); clubs that share a country split it along its regional borders
+(Spain's four, Istanbul's three, two each in Italy, France, Greece, Serbia and Israel), and a
+country with no club stays grey. Its games are FIBA's forty minutes at the EuroLeague's pace and
+scoring rate, with its larger home edge. The map is `public/domestic/euroleague.json`
+(`node scripts/build-europe-maps.mjs --only=euroleague`), offered with the built-in season
+only: an earlier basketball season has NBA clubs alone. See the
+[design notes](docs/design/euroleague.md).
 
 ### The Europe maps
 
@@ -2046,14 +2130,17 @@ Only land with the same owner can join; the flag remains clipped to land.
 Distant possessions such as Greenland or French Guiana receive separate flags,
 so they cannot stretch European stripes or emblems out of sight. This is a
 visual grouping only, not a change to conquest adjacency. Multipart countries
-are drawn as separate flag parts beneath a single clickable outline, preserving holes and
-country selection. Bounds update after conquest, not on zoom or pan. Only land
+are drawn as flag parts beneath a single clickable outline, preserving holes and
+country selection: a country's small islands that lie close together within one
+region share one part, outlined together so that it covers exactly the land they
+cover, while a large landmass and islands far apart keep parts of their own. Bounds update after conquest, not on zoom or pan. Only land
 reveals the flag; seas and neutral countries stay untouched. A solid rectangle
 in the nation's colour is the fallback. Non-participants remain unflagged in
 continental campaigns. A club's land keeps its club colour with its crest placed
 on it, below.
 
-Each banner is drawn once and shown through the outline of each land part, and
+Each banner is drawn once and shown through the outline of each flag part (about
+700 on a World War board, where a part per island took about 1,300), and
 its SVG artwork comes from a bitmap: the first time Flags mode shows a flag, its
 SVG is rasterised in the background at 1024 px on the longer side. Wherever a
 banner is drawn larger than that, it keeps the SVG, so flags stay sharp at any
@@ -2069,7 +2156,17 @@ wheel turn or drag, and only at background priority. Finished bitmaps reach the
 map in batches, one re-render for many flags. Bitmaps are lossless WebP in
 Chrome and Firefox (Chrome encodes WebP on a worker thread, but PNG on the
 page's own thread) and PNG in Safari, which has no WebP encoder: the same pixels
-either way.
+either way. The first banner to ask opens the encoder's connection to the GPU
+process with one pixel, while the click is still being handled: opened at the
+first flag's draw, it waited for the GPU to finish rastering the whole map.
+
+Switching to Flags is quick because what its first view needs is made
+beforehand: the regions, each region's emblem placement and outlines are built
+while the map shows another mode, in steps of a few milliseconds when the page
+is idle and nobody has pressed, scrolled or dragged for 200 ms, and they follow
+the board as it changes, at most every two seconds. The click then only draws
+the map; switching before that work is done finishes it rather than starting
+over.
 
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
@@ -2099,9 +2196,11 @@ no code printed over its land, while a club whose crest fits nowhere keeps its
 code. A club without a crest keeps its monogram chip and its code on the map.
 
 The crests come from Wikipedia. `npm run sync:club-logos` finds each club's
-Wikidata item, takes the lead image of its English Wikipedia article (the infobox
-crest, else the item's logo image on Wikimedia Commons), and saves it as a WebP
-fitting 128×128 in `public/club-logos/<club id>.webp`. Domestic clubs reuse the
+Wikidata item (by SPARQL from QLever's Wikidata endpoint, since the Wikidata Query
+Service's robots.txt disallows its `/sparql`), takes the lead image of its English
+Wikipedia article (the infobox crest, else the item's logo image on Wikimedia
+Commons), and saves it as a WebP fitting 128×128 in
+`public/club-logos/<club id>.webp`. Domestic clubs reuse the
 item their home town came from. An all-leagues club shares its domestic twin's
 file: the club of its country whose FM26 squad shares at least four players with
 its EA lineup, the most of any. The all-leagues clubs are the built-in ones and
@@ -2112,7 +2211,18 @@ to a Wikidata item, `files` maps it to a file name, or to `null` for no crest,
 and `twins` names a domestic twin the lineups miss (Venezia, promoted for 2026/27,
 shares only three players with its 2025/26 squad). Responses and
 images are cached in the ignored `data-src/club-logos/`, so reruns are offline;
-`--refresh` asks Wikidata and Wikipedia again.
+`--refresh` asks Wikidata again. The lead images and the files' licences are
+answers of English Wikipedia's API (`en.wikipedia.org/w/api.php`), which its
+robots.txt disallows for every agent, and no allowed source gives the same facts.
+So the sync never asks it again: it reads those answers only from its cache, and
+only those pinned by SHA-256 in `scripts/data/club-logos-wikipedia.json`; a run that
+needs one the cache lacks (a new club, or an article that Wikidata names after
+`--refresh`) or one not pinned stops before writing anything, leaving the committed
+crests as they are. None is pinned yet: a run from the newest cache on hand
+(2026-11-10) would change 89 crest files and the sources, so the committed crests
+stay until someone pins a cache on purpose (`--pin` records the answers the run
+reads, and the run rewrites the crests from them). The thumbnails come from
+`upload.wikimedia.org`, which allows them.
 
 Crests are the clubs' trademarks, and most are non-free files that Wikipedia
 hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records
@@ -2340,7 +2450,7 @@ src/
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
     football.js        4-4-2, 90 minutes, penalty shootouts
-    basketball.js      starting five, 40 minutes (FIBA) or 48 (NBA clubs), overtime
+    basketball.js      starting five, 40 minutes (FIBA: nations, EuroLeague clubs) or 48 (NBA clubs), overtime
     americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
     baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings
     index.js           the registry, and each sport's clock and tie-break copy (clockLabel, overtimeText)
@@ -2349,6 +2459,7 @@ src/
   data/rosters.basketball.js  GENERATED FIBA fives (npm run build-basketball)
   data/clubs.football.js      GENERATED club XIs (npm run build-clubs)
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
+  data/clubs.euroleague.js    GENERATED EuroLeague fives, every rating an estimate (npm run build:euroleague)
   data/clubs.american-football.js  GENERATED NFL lineups and backups (npm run build-nfl)
   data/clubs.baseball.js      GENERATED MLB lineups and active rosters (npm run build-mlb)
   data/baseballSeasons.js     GENERATED listing of the earlier baseball seasons (npm run build:mlb-seasons)
@@ -2393,7 +2504,7 @@ public/
   world-110m.v1.json   Natural Earth 110m topology for campaign rules
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
-  domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …) and the NFL's (nfl.json), fetched on demand
+  domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …), the NFL's (nfl.json) and the EuroLeague's (euroleague.json), fetched on demand
   football/            the built-in earlier football seasons (ea-*.json, cm*.json, swos-9697.json, swos-9596.json, swos-9495.json, wc-*.json), fetched when chosen
   womens-football/     the built-in earlier women's football seasons (eaw-*.json), fetched when chosen
   basketball/          the built-in earlier basketball seasons (nba-2k*.json, nba-eras-*.json, nba-live-99.json, nba-stats-*.json), fetched when chosen
@@ -2431,6 +2542,8 @@ scripts/
   build-mlb.mjs        builds the MLB clubs and the baseball nations from that snapshot
   build-mlb-seasons.mjs  builds the earlier baseball seasons from their snapshots (lib/mlb.mjs holds the shared rules)
   build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
+  sync-euroleague.mjs  snapshots the EuroLeague's rosters and box scores from its public API
+  build-euroleague.mjs builds the EuroLeague's clubs, estimating every rating (scripts/lib/euroleague.mjs)
   sync-club-logos.mjs  vendors club crests from Wikipedia
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
@@ -2514,6 +2627,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `turn-panels`, `turn-wiring` | Turn strip, Choose a target, spectator panel, and the turn flow in the real App |
 | `win-probability` | The live win-probability model against the football and basketball match models |
 | `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
+| `euroleague` | The EuroLeague's clubs rebuilt from the snapshot, its estimates, positions and names, its rules, its map, setup, launch, saves and links; the EuroBasket theatre and its fives |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
 | `pacific-islands` | Tonga, Samoa and the Cook Islands: the rules map's rings from the 50m map, their nations, which sports field them, and world wars with them playing or neutral |
 | `football-rosters`, `reep-bridge` | The built-in football squads: every shirt's evidence, one record per real player in one nation (Reep person keys, overrides, the age-checked name match), and the Reep bridge's links |

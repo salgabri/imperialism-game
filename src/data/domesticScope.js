@@ -15,7 +15,7 @@ export function domesticEntry(scope) {
 }
 
 // The sports whose clubs choose between maps: Europe's strongest clubs and its elite (football), and for women's
-// football the NWSL's USA too (its entry in CLUB_MAPS).
+// football the NWSL's USA too (its entry in CLUB_MAPS); basketball's NBA (USA and Canada) and its EuroLeague (Europe).
 const THEATRE_SPORTS = new Set(EUROPE_MAPS.map(entry => entry.sport));
 /** Whether a sport's clubs choose between maps (`theatreMapsOf`) rather than always playing one (`clubMapOf`). */
 export const hasTheatreMaps = sportId => THEATRE_SPORTS.has(sportId);
@@ -51,11 +51,14 @@ export const theatreOf = entry => entry?.theatre ?? entry?.league ?? null;
 
 /**
  * The maps a sport's clubs choose between in a season, in the setup's order: Europe's strongest clubs and its elite,
- * then a league of another continent on a map of its own (women's football: the NWSL's USA). Empty for a sport whose
- * clubs always play one map (`clubMapOf`) or the world, and for a season without maps (a CM 01/02 set built here).
+ * then a league on a map of its own (women's football: the NWSL's USA; basketball: the NBA's USA and Canada, or an
+ * earlier season's map of its era), then a league on a map of Europe (basketball's EuroLeague: a Europe map with no
+ * `theatre`, its theatre its league). Empty for a sport whose clubs always play one map (`clubMapOf`) or the world, and
+ * for a season without maps (a CM 01/02 set built here).
  */
 export const theatreMapsOf = (sportId, dataSet = null) => (hasTheatreMaps(sportId)
-  ? [...europeMapsOf(dataSet, sportId), ...CLUB_MAPS.filter(entry => entry.sport === sportId && servesSeason(entry, dataSet))] : []);
+  ? [...europeMapsOf(dataSet, sportId), ...CLUB_MAPS.filter(entry => entry.sport === sportId && servesSeason(entry, dataSet)),
+    ...EUROPE_MAPS.filter(entry => entry.sport === sportId && !entry.theatre && servesSeason(entry, dataSet))] : []);
 
 /** Whether a map is one a sport's clubs choose between (`theatreMapsOf`), of any season. */
 export const isTheatreMap = entry => !!entry && hasTheatreMaps(entry.sport);

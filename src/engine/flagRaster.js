@@ -9,13 +9,12 @@
 // Parsing and drawing an SVG hold the page's own thread (a worker can neither decode an SVG nor draw one), so the
 // queue keeps out of the player's way:
 // - it draws only flags that a mounted banner still shows, so leaving Flags mode stops it, and the biggest go first;
-// - each step on the page's thread waits QUIET_MS after the player's last press, key, wheel or drag, then for a
-//   background-priority task;
+// - each step on the page's thread waits for a quiet turn (quietTurns.js): QUIET_MS after the player's last press,
+//   key, wheel or drag, then a background-priority task;
 // - finished bitmaps reach the banners in batches, one re-render for many flags (the swap looks the same either way).
+import { quiet, watchInput } from './quietTurns.js';
 
 const BITMAP_SIDE = 1024;
-// No step starts within this long of the player's last input.
-const QUIET_MS = 200;
 // While the queue runs, banners re-render for new bitmaps at most this often; at once when it empties.
 const BATCH_MS = 150;
 // Flags in flight at once: one's fetch, decode or encode overlaps the other's steps on the page's thread.
@@ -32,41 +31,14 @@ const ABANDONED = Symbol('abandoned');
 
 const canRasterise = () => typeof OffscreenCanvas === 'function' && typeof OffscreenCanvas.prototype.convertToBlob === 'function'
   && typeof Image === 'function' && typeof fetch === 'function' && typeof URL?.createObjectURL === 'function';
-const now = () => (typeof performance === 'object' ? performance.now() : Date.now());
 
 // ---- Taking turns with the player ----
-let lastInput = -Infinity;
-const INPUT_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'];
-const LISTENING = { capture: true, passive: true };
-// A drag is input; a pointer merely passing over the map is not.
-const onInput = event => { if (event.type !== 'pointermove' || event.buttons) lastInput = now(); };
+// Whether the queue watches input (quietTurns.js): from its first flag until it empties.
 let listening = false;
-/** The input listeners, on the window only while the queue runs. */
 function listen(on) {
   if (listening === on) return;
   listening = on;
-  if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
-  for (const type of INPUT_EVENTS) window[on ? 'addEventListener' : 'removeEventListener'](type, onInput, LISTENING);
-}
-
-/** A background-priority task where the browser has one; else an idle callback; else (Safari) a timer. */
-function backgroundTask() {
-  const { scheduler } = globalThis;
-  if (typeof scheduler?.postTask === 'function') return scheduler.postTask(() => {}, { priority: 'background' });
-  return new Promise(resolve => {
-    if (typeof globalThis.requestIdleCallback === 'function') globalThis.requestIdleCallback(() => resolve(), { timeout: 1000 });
-    else setTimeout(resolve, 0);
-  });
-}
-
-/** Resolves in a background task at least QUIET_MS after the player's last input, input during the wait included. */
-async function quiet() {
-  for (;;) {
-    const wait = lastInput + QUIET_MS - now();
-    if (wait > 0) { await new Promise(resolve => setTimeout(resolve, wait)); continue; }
-    await backgroundTask();
-    if (now() - lastInput >= QUIET_MS) return;
-  }
+  watchInput(on);
 }
 
 let gate = Promise.resolve();
@@ -140,12 +112,9 @@ function pump() {
 }
 
 function start(url) {
-  if (!listening) {
-    listen(true);
-    // The banners asking were mounted by a commit, most often one that a click or a key made just now, before these
-    // listeners were there to hear it: the queue's first step waits out a quiet period too.
-    lastInput = now();
-  }
+  // The banners asking were mounted by a commit, most often one that a click or a key made just now, before the input
+  // listeners were there to hear it: the watch counts its start as input, so the first step waits out a quiet period.
+  listen(true);
   active++;
   jobs.set(url, rasterise(url).catch(() => null).then(bitmap => {
     jobs.delete(url);
@@ -186,10 +155,29 @@ function handOver() {
   listeners.forEach(listener => listener());
 }
 
+// ---- The encoder's connection ----
+let encoderReady = false;
+/**
+ * The page's first canvas encode opens its connection to the GPU process, a round trip that holds the page's thread
+ * until the GPU process answers. At the first flag's draw the GPU process was busy rastering the map's first Flags
+ * frame, and the page stood still for 60-350 ms. Made with one pixel when the first banner asks, still within the
+ * click and before that frame goes to the GPU, it takes under a millisecond.
+ */
+function readyEncoder() {
+  if (encoderReady) return;
+  encoderReady = true;
+  try {
+    const canvas = new OffscreenCanvas(1, 1);
+    canvas.getContext('2d', { willReadFrequently: true })?.fillRect?.(0, 0, 1, 1);
+    canvas.convertToBlob({ type: 'image/webp', quality: 1 }).catch(() => {});
+  } catch { /* the flags' own encodes open it then */ }
+}
+
 // ---- What the banners use ----
 /** A banner layer shows this flag, drawn `px` device px on its longer side: rasterise it unless done or under way. */
 export function requestFlagBitmap(url, px = 0) {
   if (!url || !canRasterise()) return;
+  readyEncoder();
   wanted.set(url, (wanted.get(url) || 0) + 1);
   drawn.set(url, Math.max(drawn.get(url) || 0, Number.isFinite(px) ? px : 0));
   if (!bitmaps.has(url) && !ready.has(url) && !jobs.has(url)) queuePump();
