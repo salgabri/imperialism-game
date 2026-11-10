@@ -102,6 +102,9 @@ npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
 npm run build:historic-flags # redraw the federations of the day's public-domain flags (--check to verify)
 npm run sync:ea-fc       # snapshot EA FC 27 from EA's ratings API into scripts/data/ea-fc27.csv (network, cached)
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
+npm run sync:reep-bridge # reduce the pinned Reep register in data-src/reep/ to the football person keys, scripts/data/reep-bridge.json (--check to verify)
+npm run validate:football # score the football squads against World Football Elo and real results (docs/design/football-gate/; fetches eloratings.net's tables once)
+npm run engine-scale:football # measure the built-in football squads' scale, odds and campaign length against the squads they replaced (about a minute)
 npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
@@ -790,9 +793,14 @@ rates none of their players, and the FM 26 snapshot was taken before they were o
 ([Pacific islands](docs/design/pacific-islands.md)). The builder prioritises unchanged EA
 overall ratings and uses FM to fill coverage gaps. It retains database IDs,
 full/display names, all natural roles, source URLs, versions, dates and original
-ratings through transfers and saves. An FM player fills a gap only when he is not
-an EA player of the same nation. EA's ratings site gives first and last names
-only, so where FM's name is longer, FM's age must also fit the EA birth date. EA
+ratings through transfers and saves. Each real player is **one person in one
+nation** ([design notes](docs/design/football-squad-identity.md)): the open
+[Reep](https://reep.football/data) register links his EA and FM records, a
+hand-checked overrides file and an age-checked name match cover the rest, so no
+one starts twice in an XI or for two nations, and FM fills a shirt only with a
+player EA does not rate. When EA and FM name different nations, the source dated
+later decides (EA FC 27 today), unless his senior caps say otherwise: Nair
+Tiknizyan plays for Armenia and Filimon Gerezgiher for Eritrea. EA
 fills unlicensed clubs with generated players born on 29 February; the builder
 drops any club where at least half the squad has that birthday, plus clubless
 29-February players. EA's ratings site lists none, so the rule removes nothing
@@ -831,7 +839,14 @@ by rovnez on Kaggle, licensed under
 collected from [sofifa.com](https://sofifa.com), which the 2025/26 season's
 squad rows link to. It is the 2025/26 season, and the reference the FC 27
 snapshot takes its names from. FM ratings come from Football Manager 26 database
-26.3.0 as displayed by EFEM.club.
+26.3.0 as displayed by EFEM.club. Person keys come from
+[Reep](https://reep.football/data)'s identity register (release 2026-10-18.1,
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/)), reduced to the
+committed snapshots' ids in `scripts/data/reep-bridge.json`. The squad gate
+(`npm run validate:football`, [design notes](docs/design/football-squad-gate.md))
+compares the squads offline with World Football Elo
+([eloratings.net](https://www.eloratings.net/)), whose values never ship, and
+with martj42's international results (CC0).
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
@@ -2501,6 +2516,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
 | `pacific-islands` | Tonga, Samoa and the Cook Islands: the rules map's rings from the 50m map, their nations, which sports field them, and world wars with them playing or neutral |
+| `football-rosters`, `reep-bridge` | The built-in football squads: every shirt's evidence, one record per real player in one nation (Reep person keys, overrides, the age-checked name match), and the Reep bridge's links |
+| `football-validate`, `football-engine-scale` | The football squad gate: Elo snapshots and replays, the cross-section against Elo, the forecast track, the engine-scale tolerances, and the committed reports against the shipped squads |
 | `error-boundary` | The crash screen: a render error shows it with focus on its heading, Export campaign downloads the stored checkpoint unchanged, and the report link carries the error |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
