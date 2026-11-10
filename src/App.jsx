@@ -331,8 +331,10 @@ export default class App extends React.Component {
 
   componentDidUpdate(_props, previous) {
     // The random state this commit's campaign state was drawn with: nextAction starts no turn while the generator has
-    // moved past it (a turn drawn in a timer task that React has not committed yet).
-    this.committedRng = this.rng?.getState?.();
+    // moved past it (a turn drawn in a timer task that React has not committed yet), and persist writes it. A commit
+    // that holds every draw so far (markDraw) has it in the generator. A click's sync update that React commits before
+    // such a turn, on the settled match, holds an older mark and keeps the random state of the last commit that did.
+    if (this.state.drawMark === this.drawMark) this.committedRng = this.rng?.getState?.();
     this.updateEngagement();
     // The crash screen exports the campaign this page plays (storage crashCheckpoint), not another tab's.
     setActiveCampaign(this.state.phase === 'playing' || this.state.phase === 'victory' ? this.state.campaignId : null);
@@ -879,9 +881,29 @@ export default class App extends React.Component {
       ...Object.fromEntries(Object.entries(metrics).map(([key, value]) => [`metrics.${key}`, value])), phase: st.phase === 'victory' };
   }
 
+  /**
+   * Called once a draw or a match has taken samples from the campaign's generator (this.rng), in the task that queues
+   * the state they decide. React commits this mark in the same render as that state (one task, one lane), so
+   * componentDidUpdate can tell a commit that holds the draw from a click's commit React rebased before it.
+   */
+  markDraw() {
+    this.drawMark = (this.drawMark || 0) + 1;
+    this.setState({ drawMark: this.drawMark });
+  }
+
+  /**
+   * The random state the committed campaign state was drawn with: what a checkpoint or an export of this.state holds.
+   * Between a timer task that draws (a turn, a locked compass's kickoff) and React's commit of what it drew, the
+   * generator has moved past this.state. A write then (a page hidden or closed, a click that saves) holding the spent
+   * state would resume to another turn or match than the seed played.
+   */
+  committedRngState() {
+    return this.committedRng ?? this.rng?.getState?.() ?? this.state.rngState;
+  }
+
   persist() {
     if (!Object.keys(this.state.teams).length || this.saving || this.state.storageConflict) return;
-    const rngState = this.rng?.getState?.() ?? this.state.rngState;
+    const rngState = this.committedRngState();
     // Unchanged since the last checkpoint (a decision both changes the match and saves in its callback): no write.
     const source = this.checkpointSource(rngState), last = this.lastCheckpoint;
     if (last && this.saved?.campaignId === this.state.campaignId && Object.keys(source).length === Object.keys(last).length
@@ -932,9 +954,9 @@ export default class App extends React.Component {
    * presentation takes none (DEC D1), so that checkpoint must be this campaign's, hold the settled match this kickoff
    * follows, and hold the random state this turn started from (nextAction's turnFrom), the kickoff's samples taken
    * since. Kickoffs that fail this stay checkpoints: a batch's first match (startBatch saved its draw without the
-   * match), the draw a resume kicks off (restoreCampaign saves after it), one whose samples a write between its timer
-   * task and React's commit has already stored, and one whose turn started from a later state than that checkpoint:
-   * a Next match click between a turn's timer task and React's commit still reads the settled match and draws again.
+   * match), the draw a resume kicks off (restoreCampaign saves after it), and one whose turn started from another
+   * random state than that checkpoint. A write between a turn's timer task and React's commit (a Chronicle pick)
+   * holds the settled match with the random state the turn started from (committedRngState): that kickoff can wait.
    */
   expressKickoffReplays(previous) {
     const last = this.lastCheckpoint;
@@ -1033,7 +1055,7 @@ export default class App extends React.Component {
 
   exportProgress() {
     const data = this.state.phase === 'setup' && this.saved ? this.saved
-      : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState,
+      : { ...this.state, rngState: this.committedRngState(),
         metrics: { ...this.state.metrics, engagement: this.engagement.snapshot() } };
     const st = this.state;
     // A decision gate (signing, approach, target, elimination) already holds the campaign with no timers armed, and
@@ -1793,7 +1815,8 @@ export default class App extends React.Component {
     // still shows the settled match while the next turn has drawn and simulated. A second start in that gap would draw
     // again and play a different campaign from the same seed: two turn timers due together (Play re-arms the turn timer
     // a pause held, and schedules its own), or a Next match click. Only a draw and its match move the campaign's random
-    // state, and componentDidUpdate records it at every commit, so a state past the last commit is a turn in flight.
+    // state (markDraw), and componentDidUpdate records it at every commit that holds them, so a state past the last
+    // such commit is a turn in flight.
     if (this.committedRng !== undefined && this.rng?.getState?.() !== this.committedRng) return;
     // The random state this turn starts from: its fast-forwarded kickoff waits for its result only when the last
     // checkpoint holds this state (expressKickoffReplays).
@@ -1829,6 +1852,7 @@ export default class App extends React.Component {
   beginBlitz() {
     const st = this.state;
     const { pairs, bye } = drawBlitzPairs(this.rng, this.board());
+    this.markDraw();
     if (!pairs.length) return;
 
     const log = st.log.slice();
@@ -1841,6 +1865,7 @@ export default class App extends React.Component {
   beginChaos() {
     const st = this.state;
     const pairs = drawChaosPairs(this.rng, this.board());
+    this.markDraw();
     const log = st.log.slice();
     log.push({
       t: 'sys',
@@ -1959,6 +1984,8 @@ export default class App extends React.Component {
       this.presentMatch();
       if (this.state.autoplay && this.state.pauseFollow && [attackerId, defenderId].includes(this.state.followedId)) this.pausePlayback();
     });
+    // The match's samples, committed with its kickoff.
+    this.markDraw();
   }
 
   chooseTactic(id, options = {}) {
@@ -2656,7 +2683,7 @@ export default class App extends React.Component {
           onRename={(id, name) => this.renameSavedCampaign(id, name)}
           // In setup the fork copies the quick-resume save; the outgoing campaign's teams may outlive a cleared one.
           onFork={(st.phase === 'setup' ? this.saved : Object.keys(st.teams).length) ? name => this.continueSaved(st.phase === 'setup' ? this.saved
-            : { ...st, rngState: this.rng.getState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
+            : { ...st, rngState: this.committedRngState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
           onReload={() => this.continueSaved(st.storageDialog.campaign)}
           onRestoreBackup={() => this.continueSaved(st.storageDialog.backup, true, `${st.storageDialog.backup.campaignName || 'Campaign'} recovered`)}
           onExportRaw={st.storageDialog.raw ? () => this.setState({ exportText: st.storageDialog.raw, exportFilename: 'imperialism-damaged-save.json' }) : undefined}
