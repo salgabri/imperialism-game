@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createMapBorderIndex } from '../src/engine/mapBorders.js';
+import { createPairTable } from '../src/engine/pairTable.js';
 import { WorldGeometry, projPt } from '../src/engine/geo.js';
 
 const left = [[0, 0], [2, 0], [2, 2], [0, 2]];
@@ -316,6 +317,40 @@ test('a missing, non-finite or sparse-hole vertex drops just its two edges', () 
   for (const ring of [[[0, 0], [2, 0], null, [0, 2]], [[0, 0], [2, 0], [NaN, 1], [0, 2]], [[0, 0], [2, 0], , [0, 2]]]) {
     assert.equal(coast(ring), 'M2,0L0,0L0,2');
   }
+});
+
+test('points meet as they print: -0 is 0, and far (x beyond 1638.4) and off-grid points share their segments', () => {
+  // West shares its east side with East (x = 2050.3, past the old integer-key range) and its south side with South,
+  // whose own far side is off the 0.1 grid; West is written once with 0 and once with -0.
+  const west = zero => [[zero, 0], [2050.3, 0], [2050.3, 10], [zero, 10]];
+  const east = [[2050.3, 0], [2400.15, 0], [2400.15, 10], [2050.3, 10]];
+  const south = [[0, 10], [2050.3, 10], [2050.3, 20.25], [0, 20.25]];
+  const geometry = zero => [{ id: 'w', rings: [west(zero)] }, { id: 'e', rings: [east] }, { id: 's', rings: [south] }];
+  const plain = createMapBorderIndex(geometry(0)), signed = createMapBorderIndex(geometry(-0));
+  for (const ownership of [{ w: 'A', e: 'A', s: 'A' }, { w: 'A', e: 'B', s: 'A' }, { w: 'A' }]) {
+    const a = plain.layers(ownership), b = signed.layers(ownership);
+    for (const key of ['coastD', 'innerD', 'outerD']) assert.equal(b[key], a[key], `${key} for ${JSON.stringify(ownership)}`);
+    assert.equal(JSON.stringify(b.ownerPaths), JSON.stringify(a.ownerPaths));
+  }
+  const allA = signed.layers({ w: 'A', e: 'A', s: 'A' });
+  assert.deepEqual(edgeKeys(allA.innerD), ['0,10|2050.3,10', '2050.3,0|2050.3,10'], 'both shared sides are seams');
+  assert.equal(edgeKeys(allA.coastD).length, 8);
+  assert.ok(!allA.coastD.includes('-0'), 'a path prints -0 as 0');
+});
+
+test('the typed pair table grows past its estimate and keeps every id, for negative, -0 and extreme pairs', () => {
+  const table = createPairTable(0), oracle = new Map(), extremes = [0, -0, 1, -1, 2147483647, -2147483648];
+  let seed = 7, wrong = 0;
+  const random = () => ((seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) / 4294967296);
+  for (let i = 0; i < 60000; i++) {
+    const p = i % 7 === 0 ? extremes[i % extremes.length] : Math.floor(random() * 500) - 250;
+    const q = i % 11 === 0 ? extremes[(i >> 1) % extremes.length] : Math.floor(random() * 500) - 250;
+    const key = `${p},${q}`, known = oracle.get(key), next = oracle.size, id = table.id(p, q, next);
+    if (known === undefined) { if (id !== next) wrong++; oracle.set(key, next); }
+    else if (id !== known) wrong++;
+  }
+  assert.ok(oracle.size > 30000, `the table grew well past its first size (${oracle.size} pairs)`);
+  assert.equal(wrong, 0, 'every pair keeps the id it was first given, -0 sharing 0\'s');
 });
 
 test('layers: empty and degenerate geometry produces empty layers', () => {
