@@ -15,16 +15,22 @@ export const WORLD_CUP_SOURCE = 'world-cup';
 export const seasonOfYear = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
 
 const byMinutes = (a, b) => b.minutes - a.minutes || b.starts - a.starts || a.shirt - b.shirt || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+/** Whether a squad player played: minutes, or a start (1962's and 1966's minutes are the line-ups' starts). */
+const played = player => player.minutes > 0 || player.starts > 0;
 
 /**
- * The XI: for each role of `xi` ({ GK: 1, DF: 4, MF: 4, FW: 2 }) the squad's players of that position with the most
- * minutes (then starts, then the lower shirt number); a role the squad cannot fill takes the most-used players left,
- * whatever their position. → { eleven, filled } (filled: those who took another role's place).
+ * The XI: for each role of `xi` ({ GK: 1, DF: 4, MF: 4, FW: 2 }) the squad's players of that position who played, the
+ * most minutes first (then starts, then the lower shirt number); a role short of them takes the most-used players left,
+ * whatever their position: every one who played before any who did not, who come in, by the lower shirt number, only
+ * for a squad still short. → { eleven, filled } (filled: those who took a short role's places).
  */
 export function pickEleven(squad, xi) {
   const picked = [];
-  for (const [role, count] of Object.entries(xi)) picked.push(...squad.filter(player => player.position === role).sort(byMinutes).slice(0, count));
+  for (const [role, count] of Object.entries(xi)) {
+    picked.push(...squad.filter(player => player.position === role && played(player)).sort(byMinutes).slice(0, count));
+  }
   const size = Object.values(xi).reduce((sum, count) => sum + count, 0);
+  // byMinutes ranks every player who played (minutes, else a start) above every one who did not.
   const filled = squad.filter(player => !picked.includes(player)).sort(byMinutes).slice(0, size - picked.length);
   if (picked.length + filled.length !== size) throw new Error(`A squad of ${squad.length} cannot field ${size}`);
   return { eleven: [...picked, ...filled], filled };

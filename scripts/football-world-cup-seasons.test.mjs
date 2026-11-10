@@ -104,15 +104,23 @@ test('the constants: 3.2 points per 100 Elo give the match model Elo\'s expected
   assert.ok(Math.abs(strengthOf(1888.2, 1995.3, MANIFEST.strength) - (87 - 3.2 * 107.1 / 100)) < 1e-9);
 });
 
-test('the XI: the most-used of each role, a role short of players filled by the most-used left; its order by the records', () => {
+test('the XI: the most-used of each role who played, a role short of them filled by the most-used left; its order by the records', () => {
   const player = (id, position, minutes, over = {}) => ({ id, name: id, shirt: Number(id.slice(2)), position, minutes, starts: Math.round(minutes / 90),
     goals: 0, awards: [], ballonDor: {}, ...over });
-  // A squad with two midfielders, as the WM sides of 1962 list them.
+  // A squad with two midfielders who played and two who never did, as Brazil's of 1962 lists them.
   const squad = [player('P-01', 'GK', 360), player('P-02', 'GK', 0), ...[3, 4, 5, 6, 7].map(n => player(`P-0${n}`, 'DF', 400 - n * 10)),
-    player('P-08', 'MF', 360), player('P-09', 'MF', 300), ...[10, 11, 12, 13].map(n => player(`P-${n}`, 'FW', 400 - n * 10))];
+    player('P-08', 'MF', 360), player('P-09', 'MF', 300), ...[10, 11, 12, 13].map(n => player(`P-${n}`, 'FW', 400 - n * 10)),
+    player('P-14', 'MF', 0), player('P-15', 'MF', 0)];
   const { eleven: xi, filled } = pickEleven(squad, MANIFEST.xi);
   assert.deepEqual(xi.map(p => p.id), ['P-01', 'P-03', 'P-04', 'P-05', 'P-06', 'P-08', 'P-09', 'P-10', 'P-11', 'P-07', 'P-12']);
-  assert.deepEqual(filled.map(p => p.id), ['P-07', 'P-12'], 'the most-used left, whatever their position');
+  assert.deepEqual(filled.map(p => p.id), ['P-07', 'P-12'], 'the most-used left who played, whatever their position, before the role\'s unused');
+  // A start is playing (1962's and 1966's minutes are the line-ups' starts).
+  const started = pickEleven([...squad, player('P-16', 'MF', 0, { starts: 1 })], MANIFEST.xi);
+  assert.deepEqual([started.eleven.slice(5, 8).map(p => p.id), started.filled.map(p => p.id)], [['P-08', 'P-09', 'P-16'], ['P-07']]);
+  // Only a squad still short fields a player who never played, by the lower shirt number.
+  const short = squad.filter(p => !['P-02', 'P-07', 'P-12'].includes(p.id));
+  assert.deepEqual(pickEleven(short, MANIFEST.xi).filled.map(p => p.id), ['P-13', 'P-14']);
+  assert.throws(() => pickEleven(squad.slice(0, 10), MANIFEST.xi), /A squad of 10 cannot field 11/);
   const order = orderEleven([player('P-21', 'FW', 540, { goals: 2 }), player('P-22', 'MF', 90, { goals: 1 }), player('P-23', 'DF', 540, { ballonDor: { 1970: 3 } }),
     player('P-24', 'FW', 540, { awards: ['Bronze Boot'], goals: 5 }), player('P-25', 'GK', 540), player('P-26', 'DF', 0)], MANIFEST.awards);
   assert.deepEqual(order.map(p => p.id), ['P-23', 'P-24', 'P-22', 'P-21', 'P-25', 'P-26'], 'Ballon d\'Or, awards, goals a minute, minutes');
@@ -252,8 +260,9 @@ test('each season decodes: its finalists, eleven players each, rated 1–99 stro
       assert.ok(Math.abs(mean(players.map(([, , rating]) => rating)) - T) <= 1 / 22 + 1e-9, `${at}: T ${T}`);
       assert.equal(str, Math.round(selectLineup({ sport: 'football', squad: players.map(([name, pos, rating]) => ({ name, pos, rating })) }).rating), at);
       assert.ok(players.every(([, , , source], k) => source.xiRank === k + 1 && source.teamElo === team.elo && source.snapshotDate === own.elo.date), at);
-      // Every player is one of the squad.
+      // Every player is one of the squad, and played: each finalist played twelve or more.
       assert.ok(players.every(([name, pos, , source]) => team.squad.some(p => `wc:${p.id}` === source.id && p.name === name && p.position === pos)), at);
+      assert.ok(players.every(([, , , source]) => source.minutes > 0 || source.starts > 0), `${at}: a player who never played`);
     }
     assert.ok(Object.keys(set.rosters).length === NATION_COUNTS[id] && set.clubs.length === 0, id);
   }
@@ -282,13 +291,27 @@ test('spot checks: each season\'s strongest nations and players are history\'s',
   assert.equal(first('wc-1986', '032'), 'Diego Maradona');
   assert.equal(first('wc-1990', '276'), 'Lothar Matthäus');
   assert.equal(first('wc-1994', '380'), 'Roberto Baggio');
-  // The XI is the most-used per role: Brazil 1970's 4-2-4 keeps Pelé and Jairzinho up front; Tostão, its third forward,
-  // has no place in a 4-4-2.
+  // The XI is the most-used per role of the players who played: Brazil 1970's 4-2-4 keeps Pelé and Jairzinho up front;
+  // Tostão, its third forward, has no place in a 4-4-2.
   const brazil = names(committed('wc-1970'), '076');
   for (const name of ['Pelé', 'Jairzinho', 'Rivellino', 'Gérson', 'Clodoaldo', 'Carlos Alberto', 'Félix']) assert.ok(brazil.includes(name), name);
   assert.ok(!brazil.includes('Tostão'));
   const pele = eleven(committed('wc-1970'), '076').find(([name]) => name === 'Pelé')[3];
   assert.deepEqual([pele.goals, pele.minutes, pele.starts, pele.url], [4, 540, 6, 'https://en.wikipedia.org/wiki/Pel%C3%A9']);
+  // A role short of players who played takes the most-used left, never a squad player who sat out: Brazil's 1962
+  // midfield lists Zequinha and Mengálvio, who never played, so its forwards Zagallo (540 minutes) and Amarildo (360)
+  // take their places, and Pelé (180) sits out; England's 1962 takes Bobby Charlton, West Germany's 1966 Helmut Haller
+  // and its 1986 Ditmar Jakobs.
+  const brazil1962 = names(committed('wc-1962'), '076');
+  for (const name of ['Mário Zagallo', 'Amarildo']) assert.ok(brazil1962.includes(name), name);
+  for (const name of ['Zequinha', 'Mengálvio', 'Pelé']) assert.ok(!brazil1962.includes(name), name);
+  assert.ok(names(committed('wc-1962'), '826').includes('Bobby Charlton'));
+  assert.ok(names(committed('wc-1966'), '276').includes('Helmut Haller'));
+  assert.ok(names(committed('wc-1986'), '276').includes('Ditmar Jakobs'));
+  // 29 of the 1,925 places, in 21 XIs, are a short role's.
+  const audited = JSON.parse(read('docs/design/football-world-cup-seasons-audit.json')).seasons.flatMap(season => season.nations);
+  const short = audited.filter(nation => nation.filled.length);
+  assert.deepEqual([audited.length * 11, short.length, short.reduce((sum, nation) => sum + nation.filled.length, 0)], [1925, 21, 29]);
   // A name is written once: the database's given name "El Arbi Hababi" already ends with his family name, "Hababi".
   for (const id of IDS) {
     for (const nation of facts(id).nations) for (const { name } of nation.squad) assert.ok(!/(?:^|\s)(\S+) \1$/u.test(name), `${id}: ${name}`);

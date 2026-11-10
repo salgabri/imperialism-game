@@ -87,7 +87,7 @@
   "seasons": [
     {
       "id": "wc-1962",
-      "version": "wc-1962-033fca51",
+      "version": "wc-1962-9241b337",
       "season": "1961/62",
       "tournament": {
         "id": "WC-1962",
@@ -140,22 +140,28 @@
           "elo": 2010.8,
           "rank": 1,
           "T": 87,
-          "strength": 87,
+          "strength": 85,
           "mean": 87,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Garrincha (FW as MF)",
+            "Vavá (FW as MF)"
+          ],
+          "filled": [
+            "Mário Zagallo (FW, 540')",
+            "Amarildo (FW, 360')"
+          ],
           "eleven": [
             "Garrincha FW 93 Golden Boot 4g 540'",
             "Vavá FW 90 Golden Boot 4g 540'",
-            "Zito MF 89 1g 540'",
-            "Gilmar GK 88 0g 540'",
-            "Djalma Santos DF 87 0g 540'",
-            "Mauro Ramos DF 87 0g 540'",
-            "Zózimo DF 86 0g 540'",
-            "Nílton Santos DF 85 0g 540'",
-            "Didi MF 85 0g 540'",
-            "Zequinha MF 84 0g 0'",
-            "Mengálvio MF 83 0g 0'"
+            "Amarildo FW 89 3g 360'",
+            "Zito MF 88 1g 540'",
+            "Mário Zagallo FW 87 1g 540'",
+            "Gilmar GK 87 0g 540'",
+            "Djalma Santos DF 86 0g 540'",
+            "Mauro Ramos DF 85 0g 540'",
+            "Zózimo DF 85 0g 540'",
+            "Nílton Santos DF 84 0g 540'",
+            "Didi MF 83 0g 540'"
           ]
         },
         {
@@ -221,10 +227,16 @@
           "elo": 1782.8,
           "rank": 4,
           "T": 79.7,
-          "strength": 80,
+          "strength": 78,
           "mean": 79.73,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Flórián Albert (FW as MF)",
+            "Károly Sándor (FW as MF)"
+          ],
+          "filled": [
+            "Máté Fenyvesi (FW, 270')",
+            "Gyula Rákosi (FW, 270')"
+          ],
           "eleven": [
             "Gyula Grosics GK 85 BdO 5 0g 270'",
             "Lajos Tichy MF 83 BdO 3 3g 360'",
@@ -235,8 +247,8 @@
             "László Sárosi DF 79 0g 360'",
             "Ferenc Sipos MF 78 0g 360'",
             "Károly Sándor FW 77 0g 270'",
-            "István Nagy MF 77 0g 0'",
-            "János Mencel MF 76 0g 0'"
+            "Máté Fenyvesi FW 77 0g 270'",
+            "Gyula Rákosi FW 76 0g 270'"
           ]
         },
         {
@@ -246,22 +258,26 @@
           "elo": 1755.3,
           "rank": 5,
           "T": 78.82,
-          "strength": 79,
+          "strength": 78,
           "mean": 78.82,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Héctor Facundo (FW as MF)"
+          ],
+          "filled": [
+            "José Sanfilippo (FW, 180')"
+          ],
           "eleven": [
             "Héctor Facundo FW 84 1g 180'",
-            "Silvio Marzolini DF 82 0g 270'",
-            "Federico Sacchi MF 81 0g 270'",
-            "Antonio Roma GK 80 0g 180'",
-            "Alberto Sainz DF 79 0g 180'",
+            "José Sanfilippo FW 82 1g 180'",
+            "Silvio Marzolini DF 81 0g 270'",
+            "Federico Sacchi MF 80 0g 270'",
+            "Antonio Roma GK 79 0g 180'",
+            "Alberto Sainz DF 78 0g 180'",
             "Raúl Páez DF 78 0g 180'",
-            "Marcelo Pagani FW 78 0g 180'",
+            "Marcelo Pagani FW 77 0g 180'",
             "Rubén Navarro DF 77 0g 180'",
-            "Oscar Rossi MF 77 0g 90'",
-            "Antonio Rattín MF 76 0g 90'",
-            "Ramón Abeledo MF 75 0g 0'"
+            "Oscar Rossi MF 76 0g 90'",
+            "Antonio Rattín MF 75 0g 90'"
           ]
         },
         {
@@ -346,22 +362,28 @@
           "elo": 1732.4,
           "rank": 9,
           "T": 78.09,
-          "strength": 78,
+          "strength": 76,
           "mean": 78.09,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Johnny Haynes (FW as MF)",
+            "Jimmy Greaves (FW as MF)"
+          ],
+          "filled": [
+            "Bobby Charlton (FW, 360')",
+            "Gerry Hitchens (FW, 180')"
+          ],
           "eleven": [
             "Johnny Haynes FW 84 BdO 22 0g 360'",
             "Jimmy Greaves FW 82 BdO 13 1g 360'",
-            "Ron Flowers MF 80 2g 360'",
-            "Ron Springett GK 79 0g 360'",
-            "Jimmy Armfield DF 78 0g 360'",
-            "Ray Wilson DF 78 0g 360'",
-            "Maurice Norman DF 77 0g 360'",
-            "Bobby Moore DF 76 0g 360'",
-            "Bryan Douglas MF 76 0g 360'",
-            "Bobby Robson MF 75 0g 0'",
-            "John Connelly MF 74 0g 0'"
+            "Bobby Charlton FW 80 BdO 5 1g 360'",
+            "Ron Flowers MF 79 2g 360'",
+            "Gerry Hitchens FW 78 1g 180'",
+            "Ron Springett GK 78 0g 360'",
+            "Jimmy Armfield DF 77 0g 360'",
+            "Ray Wilson DF 76 0g 360'",
+            "Maurice Norman DF 76 0g 360'",
+            "Bobby Moore DF 75 0g 360'",
+            "Bryan Douglas MF 74 0g 360'"
           ]
         },
         {
@@ -371,22 +393,28 @@
           "elo": 1675.2,
           "rank": 13,
           "T": 76.26,
-          "strength": 76,
+          "strength": 74,
           "mean": 76.27,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Alfredo del Águila (FW as MF)",
+            "Héctor Hernández (FW as MF)"
+          ],
+          "filled": [
+            "Isidoro Díaz (FW, 270')",
+            "Antonio Jasso (FW, 180')"
+          ],
           "eleven": [
             "Alfredo del Águila FW 82 1g 270'",
             "Héctor Hernández FW 80 1g 270'",
-            "Antonio Carbajal GK 78 0g 270'",
-            "Jesús del Muro DF 77 0g 270'",
+            "Isidoro Díaz FW 78 1g 270'",
+            "Antonio Carbajal GK 77 0g 270'",
+            "Jesús del Muro DF 76 0g 270'",
             "Guillermo Sepúlveda DF 76 0g 270'",
-            "Raúl Cárdenas DF 76 0g 270'",
+            "Raúl Cárdenas DF 75 0g 270'",
             "Pedro Nájera MF 75 0g 270'",
-            "Salvador Reyes MF 75 0g 270'",
+            "Salvador Reyes MF 74 0g 270'",
             "Ignacio Jáuregui DF 74 0g 180'",
-            "Pedro Romero MF 74 0g 0'",
-            "Salvador Farfán MF 72 0g 0'"
+            "Antonio Jasso FW 72 0g 180'"
           ]
         },
         {
@@ -396,22 +424,26 @@
           "elo": 1672.4,
           "rank": 14,
           "T": 76.17,
-          "strength": 76,
+          "strength": 75,
           "mean": 76.18,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Omar Sívori (FW as MF)"
+          ],
+          "filled": [
+            "Omar Sívori (FW, 180')"
+          ],
           "eleven": [
-            "Bruno Mora FW 82 1g 180'",
-            "Sandro Salvadore DF 80 0g 270'",
-            "Enzo Robotti DF 78 0g 270'",
-            "Lorenzo Buffon GK 77 0g 180'",
+            "Omar Sívori FW 82 BdO 50 0g 180'",
+            "Bruno Mora FW 80 1g 180'",
+            "Sandro Salvadore DF 78 0g 270'",
+            "Enzo Robotti DF 77 0g 270'",
+            "Lorenzo Buffon GK 76 0g 180'",
             "Giacomo Losi DF 76 0g 180'",
-            "Luigi Radice MF 76 0g 180'",
+            "Luigi Radice MF 75 0g 180'",
             "Cesare Maldini DF 75 0g 180'",
-            "José Altafini FW 75 0g 180'",
-            "Giorgio Ferrini MF 74 0g 180'",
-            "Paride Tumburus MF 73 0g 90'",
-            "Giovanni Trapattoni MF 72 0g 0'"
+            "José Altafini FW 74 0g 180'",
+            "Giorgio Ferrini MF 73 0g 180'",
+            "Paride Tumburus MF 72 0g 90'"
           ]
         },
         {
@@ -446,13 +478,15 @@
           "elo": 1653.4,
           "rank": 17,
           "T": 75.56,
-          "strength": 75,
+          "strength": 73,
           "mean": 75.55,
           "outOfPosition": [
-            "Leonel Sánchez (FW as MF)"
+            "Leonel Sánchez (FW as MF)",
+            "Jaime Ramírez (FW as MF)"
           ],
           "filled": [
-            "Honorino Landa (FW, 450')"
+            "Honorino Landa (FW, 450')",
+            "Armando Tobar (FW, 360')"
           ],
           "eleven": [
             "Leonel Sánchez FW 81 Golden Boot 4g 540'",
@@ -465,7 +499,7 @@
             "Carlos Contreras DF 74 0g 450'",
             "Honorino Landa FW 73 0g 450'",
             "Sergio Navarro DF 73 0g 360'",
-            "Mario Ortiz MF 72 0g 0'"
+            "Armando Tobar FW 72 0g 360'"
           ]
         },
         {
@@ -500,10 +534,14 @@
           "elo": 1468.9,
           "rank": 41,
           "T": 69.66,
-          "strength": 70,
+          "strength": 69,
           "mean": 69.64,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Charles Antenen (FW as MF)"
+          ],
+          "filled": [
+            "Richard Dürr (FW, 180')"
+          ],
           "eleven": [
             "Charles Antenen FW 75 BdO 1 0g 270'",
             "Heinz Schneiter DF 73 1g 270'",
@@ -513,9 +551,9 @@
             "André Grobéty DF 69 0g 270'",
             "Hans Weber MF 68 0g 270'",
             "Anton Allemann MF 68 0g 270'",
+            "Richard Dürr FW 67 0g 180'",
             "Roger Vonlanthen MF 67 0g 180'",
-            "Fritz Morf DF 67 0g 90'",
-            "Willy Kernen MF 66 0g 0'"
+            "Fritz Morf DF 66 0g 90'"
           ]
         },
         {
@@ -525,22 +563,26 @@
           "elo": 1312.6,
           "rank": 81,
           "T": 64.66,
-          "strength": 65,
+          "strength": 64,
           "mean": 64.64,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Antonio Rada (FW as MF)"
+          ],
+          "filled": [
+            "Antonio Rada (FW, 180')"
+          ],
           "eleven": [
-            "Germán Aceros FW 70 1g 270'",
-            "Marcos Coll MF 68 1g 270'",
-            "Marino Klinger FW 67 1g 270'",
-            "Efraín Sánchez GK 66 0g 270'",
-            "Jaime González DF 65 0g 270'",
-            "Héctor Echeverry DF 64 0g 270'",
+            "Antonio Rada FW 70 1g 180'",
+            "Germán Aceros FW 68 1g 270'",
+            "Marcos Coll MF 67 1g 270'",
+            "Marino Klinger FW 66 1g 270'",
+            "Efraín Sánchez GK 65 0g 270'",
+            "Jaime González DF 64 0g 270'",
+            "Héctor Echeverry DF 63 0g 270'",
             "Óscar López DF 63 0g 270'",
-            "Aníbal Alzate DF 63 0g 180'",
+            "Aníbal Alzate DF 62 0g 180'",
             "Rolando Serrano MF 62 0g 180'",
-            "Jaime Silva MF 62 0g 90'",
-            "Hernando Tovar MF 61 0g 0'"
+            "Jaime Silva MF 61 0g 90'"
           ]
         }
       ],
@@ -735,7 +777,7 @@
     },
     {
       "id": "wc-1966",
-      "version": "wc-1966-02c57501",
+      "version": "wc-1966-5da76335",
       "season": "1965/66",
       "tournament": {
         "id": "WC-1966",
@@ -803,22 +845,26 @@
           "elo": 1842.3,
           "rank": 2,
           "T": 85.4,
-          "strength": 85,
+          "strength": 84,
           "mean": 85.36,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Helmut Haller (FW as MF)"
+          ],
+          "filled": [
+            "Helmut Haller (FW, 480')"
+          ],
           "eleven": [
             "Franz Beckenbauer MF 91 BdO 61 Bronze Boot/Best Young Player 4g 570'",
             "Karl-Heinz Schnellinger DF 89 BdO 6 0g 570'",
-            "Sigfried Held FW 88 BdO 1 1g 570'",
-            "Willi Schulz DF 86 BdO 1 0g 570'",
+            "Helmut Haller FW 88 BdO 1 Silver Boot 6g 480'",
+            "Sigfried Held FW 86 BdO 1 1g 570'",
+            "Willi Schulz DF 85 BdO 1 0g 570'",
             "Uwe Seeler FW 85 2g 570'",
-            "Wolfgang Weber DF 85 1g 570'",
+            "Wolfgang Weber DF 84 1g 570'",
             "Hans Tilkowski GK 84 0g 570'",
-            "Wolfgang Overath MF 84 0g 570'",
+            "Wolfgang Overath MF 83 0g 570'",
             "Horst-Dieter Höttges DF 83 0g 480'",
-            "Albert Brülls MF 83 0g 180'",
-            "Max Lorenz MF 81 0g 0'"
+            "Albert Brülls MF 81 0g 180'"
           ]
         },
         {
@@ -878,22 +924,26 @@
           "elo": 1796.3,
           "rank": 5,
           "T": 83.93,
-          "strength": 84,
+          "strength": 83,
           "mean": 83.91,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Luis Artime (FW as DF)"
+          ],
+          "filled": [
+            "Ermindo Onega (FW, 360')"
+          ],
           "eleven": [
             "Luis Artime FW 89 3g 360'",
-            "Antonio Roma GK 87 0g 360'",
-            "Roberto Perfumo DF 86 0g 360'",
-            "Silvio Marzolini DF 85 0g 360'",
+            "Ermindo Onega FW 87 1g 360'",
+            "Antonio Roma GK 86 0g 360'",
+            "Roberto Perfumo DF 85 0g 360'",
+            "Silvio Marzolini DF 84 0g 360'",
             "Roberto Ferreiro DF 84 0g 360'",
-            "Antonio Rattín MF 84 0g 360'",
-            "Jorge Solari MF 83 0g 360'",
+            "Antonio Rattín MF 83 0g 360'",
+            "Jorge Solari MF 82 0g 360'",
             "Alberto González FW 82 0g 360'",
-            "Rafael Albrecht MF 82 0g 270'",
-            "Oscar Calics MF 81 0g 90'",
-            "Nelson López DF 80 0g 0'"
+            "Rafael Albrecht MF 81 0g 270'",
+            "Oscar Calics MF 80 0g 90'"
           ]
         },
         {
@@ -978,22 +1028,28 @@
           "elo": 1707.3,
           "rank": 10,
           "T": 81.08,
-          "strength": 81,
+          "strength": 79,
           "mean": 81.09,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Antonio Carbajal (GK as MF)",
+            "Aarón Padilla (FW as MF)"
+          ],
+          "filled": [
+            "Enrique Borja (FW, 270')",
+            "Antonio Carbajal (GK, 90')"
+          ],
           "eleven": [
-            "Arturo Chaires DF 87 0g 270'",
-            "Gustavo Peña DF 85 0g 270'",
-            "Isidoro Díaz MF 83 0g 270'",
-            "Aarón Padilla FW 82 0g 270'",
+            "Enrique Borja FW 87 1g 270'",
+            "Arturo Chaires DF 85 0g 270'",
+            "Gustavo Peña DF 83 0g 270'",
+            "Isidoro Díaz MF 82 0g 270'",
+            "Aarón Padilla FW 81 0g 270'",
             "Gabriel Núñez DF 81 0g 270'",
-            "Guillermo Hernández DF 81 0g 270'",
-            "Salvador Reyes FW 80 0g 270'",
+            "Guillermo Hernández DF 80 0g 270'",
+            "Salvador Reyes FW 79 0g 270'",
             "Ignacio Calderón GK 79 0g 180'",
-            "Magdaleno Mercado MF 79 0g 180'",
-            "Felipe Ruvalcaba MF 78 0g 0'",
-            "José Luis González MF 77 0g 0'"
+            "Magdaleno Mercado MF 78 0g 180'",
+            "Antonio Carbajal GK 77 0g 90'"
           ]
         },
         {
@@ -1128,10 +1184,14 @@
           "elo": 1529.1,
           "rank": 31,
           "T": 75.38,
-          "strength": 75,
+          "strength": 74,
           "mean": 75.36,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Aleksandar Shalamanov (DF as MF)"
+          ],
+          "filled": [
+            "Aleksandar Shalamanov (DF, 180')"
+          ],
           "eleven": [
             "Georgi Asparuhov FW 81 BdO 11 1g 270'",
             "Ivan Vutsov DF 79 0g 270'",
@@ -1140,10 +1200,10 @@
             "Dobromir Zhechev DF 75 0g 270'",
             "Dimitar Yakimov FW 75 0g 270'",
             "Georgi Naydenov GK 74 0g 180'",
-            "Dinko Dermendzhiev MF 74 0g 180'",
+            "Aleksandar Shalamanov DF 74 0g 180'",
+            "Dinko Dermendzhiev MF 73 0g 180'",
             "Stoyan Kitov MF 73 0g 90'",
-            "Ivan Davidov MF 73 0g 90'",
-            "Vasil Metodiev MF 71 0g 0'"
+            "Ivan Davidov MF 71 0g 90'"
           ]
         },
         {
@@ -1840,7 +1900,7 @@
     },
     {
       "id": "wc-1974",
-      "version": "wc-1974-73aec340",
+      "version": "wc-1974-e3e160a1",
       "season": "1973/74",
       "tournament": {
         "id": "WC-1974",
@@ -2068,10 +2128,14 @@
           "elo": 1696,
           "rank": 13,
           "T": 78.56,
-          "strength": 79,
+          "strength": 78,
           "mean": 78.55,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Joe Jordan (FW as MF)"
+          ],
+          "filled": [
+            "Kenny Dalglish (FW, 230')"
+          ],
           "eleven": [
             "Billy Bremner MF 84 BdO 31 0g 270'",
             "Joe Jordan FW 82 2g 270'",
@@ -2081,9 +2145,9 @@
             "Danny McGrain DF 78 0g 270'",
             "Jim Holton DF 77 0g 270'",
             "David Hay MF 77 0g 270'",
+            "Kenny Dalglish FW 76 0g 230'",
             "Martin Buchan DF 76 0g 180'",
-            "Tommy Hutchison MF 76 0g 40'",
-            "Jimmy Johnstone MF 75 0g 0'"
+            "Tommy Hutchison MF 75 0g 40'"
           ]
         },
         {
@@ -2143,10 +2207,14 @@
           "elo": 1605.7,
           "rank": 26,
           "T": 75.67,
-          "strength": 76,
+          "strength": 75,
           "mean": 75.64,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Hristo Bonev (FW as DF)"
+          ],
+          "filled": [
+            "Pavel Panov (FW, 218')"
+          ],
           "eleven": [
             "Hristo Bonev FW 81 BdO 9 1g 270'",
             "Stefko Velichkov MF 79 0g 270'",
@@ -2156,9 +2224,9 @@
             "Tsonyo Vasilev MF 75 0g 270'",
             "Kiril Ivkov MF 74 0g 270'",
             "Voyn Voynov FW 74 0g 255'",
+            "Pavel Panov FW 73 0g 218'",
             "Rumyancho Goranov GK 73 0g 180'",
-            "Mladen Vasilev DF 73 0g 17'",
-            "Ivan Zafirov DF 72 0g 0'"
+            "Mladen Vasilev DF 72 0g 17'"
           ]
         },
         {
@@ -2327,7 +2395,7 @@
     },
     {
       "id": "wc-1978",
-      "version": "wc-1978-0c26e9e2",
+      "version": "wc-1978-0201c2e5",
       "season": "1977/78",
       "tournament": {
         "id": "WC-1978",
@@ -2715,10 +2783,14 @@
           "elo": 1591,
           "rank": 30,
           "T": 74.78,
-          "strength": 75,
+          "strength": 74,
           "mean": 74.82,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Thomas Sjöberg (FW as DF)"
+          ],
+          "filled": [
+            "Benny Wendt (FW, 210')"
+          ],
           "eleven": [
             "Ronnie Hellström GK 80 BdO 24 0g 270'",
             "Anders Linderoth MF 78 BdO 4 0g 173'",
@@ -2729,8 +2801,8 @@
             "Ingemar Erlandsson DF 74 0g 270'",
             "Bo Larsson FW 73 0g 270'",
             "Lennart Larsson MF 73 0g 259'",
-            "Staffan Tapper MF 72 0g 126'",
-            "Magnus Andersson DF 71 0g 0'"
+            "Benny Wendt FW 72 0g 210'",
+            "Staffan Tapper MF 71 0g 126'"
           ]
         },
         {
@@ -2878,7 +2950,7 @@
     },
     {
       "id": "wc-1982",
-      "version": "wc-1982-1fa88a41",
+      "version": "wc-1982-b965e996",
       "season": "1981/82",
       "tournament": {
         "id": "WC-1982",
@@ -3256,26 +3328,28 @@
           "elo": 1671.5,
           "rank": 17,
           "T": 78.04,
-          "strength": 77,
+          "strength": 76,
           "mean": 78,
           "outOfPosition": [
-            "Tibor Nyilasi (FW as MF)"
+            "László Bálint (DF as MF)",
+            "László Fazekas (FW as MF)"
           ],
           "filled": [
-            "László Fazekas (FW, 224')"
+            "László Fazekas (FW, 224')",
+            "József Tóth (DF, 180')"
           ],
           "eleven": [
             "Tibor Nyilasi FW 84 BdO 2 2g 270'",
             "László Fazekas FW 81 2g 224'",
             "Gábor Pölöskei FW 80 2g 270'",
-            "Ferenc Mészáros GK 79 0g 270'",
+            "József Tóth DF 79 1g 180'",
+            "Ferenc Mészáros GK 78 0g 270'",
             "Imre Garaba DF 78 0g 270'",
-            "Győző Martos DF 78 0g 226'",
-            "Sándor Sallai DF 77 0g 203'",
+            "Győző Martos DF 77 0g 226'",
+            "Sándor Sallai DF 76 0g 203'",
             "László Bálint DF 76 0g 180'",
-            "Sándor Müller MF 76 0g 135'",
-            "Ferenc Csongrádi MF 75 0g 20'",
-            "Károly Csapó MF 74 0g 0'"
+            "Sándor Müller MF 75 0g 135'",
+            "Ferenc Csongrádi MF 74 0g 20'"
           ]
         },
         {
@@ -3310,10 +3384,14 @@
           "elo": 1604.7,
           "rank": 27,
           "T": 75.9,
-          "strength": 76,
+          "strength": 75,
           "mean": 75.91,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Gerry Armstrong (FW as MF)"
+          ],
+          "filled": [
+            "Sammy McIlroy (FW, 410')"
+          ],
           "eleven": [
             "Gerry Armstrong FW 81 3g 450'",
             "Billy Hamilton FW 79 2g 450'",
@@ -3322,10 +3400,10 @@
             "John McClelland DF 76 0g 450'",
             "David McCreery MF 76 0g 446'",
             "Martin O'Neill MF 75 0g 438'",
+            "Sammy McIlroy FW 74 0g 410'",
             "Pat Jennings GK 74 0g 360'",
-            "Mal Donaghy DF 74 0g 330'",
-            "Tommy Cassidy MF 73 0g 40'",
-            "Tommy Finney MF 72 0g 0'"
+            "Mal Donaghy DF 73 0g 330'",
+            "Tommy Cassidy MF 72 0g 40'"
           ]
         },
         {
@@ -3460,22 +3538,26 @@
           "elo": 1534.7,
           "rank": 44,
           "T": 73.66,
-          "strength": 74,
+          "strength": 73,
           "mean": 73.64,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Abdullah Al-Buloushi (FW as MF)"
+          ],
+          "filled": [
+            "Faisal Al-Dakhil (FW, 270')"
+          ],
           "eleven": [
             "Abdullah Al-Buloushi FW 79 1g 270'",
-            "Ahmed Al-Tarabulsi GK 77 0g 270'",
-            "Naeem Saad DF 76 0g 270'",
-            "Mahboub Juma'a DF 75 0g 270'",
-            "Saad Al-Houti MF 74 0g 270'",
-            "Abdulaziz Al-Anberi FW 73 0g 270'",
+            "Faisal Al-Dakhil FW 77 1g 270'",
+            "Ahmed Al-Tarabulsi GK 76 0g 270'",
+            "Naeem Saad DF 75 0g 270'",
+            "Mahboub Juma'a DF 74 0g 270'",
+            "Saad Al-Houti MF 73 0g 270'",
+            "Abdulaziz Al-Anberi FW 72 0g 270'",
             "Abdullah Mayouf DF 72 0g 270'",
-            "Waleed Al-Jasem DF 72 0g 244'",
+            "Waleed Al-Jasem DF 71 0g 244'",
             "Mohammed Karam MF 71 0g 103'",
-            "Yussef Al-Suwayed MF 71 0g 90'",
-            "Nassir Al-Ghanim MF 70 0g 0'"
+            "Yussef Al-Suwayed MF 70 0g 90'"
           ]
         },
         {
@@ -3588,7 +3670,7 @@
     },
     {
       "id": "wc-1986",
-      "version": "wc-1986-cb089884",
+      "version": "wc-1986-f5178adb",
       "season": "1985/86",
       "tournament": {
         "id": "WC-1986",
@@ -3731,10 +3813,14 @@
           "elo": 1817,
           "rank": 5,
           "T": 84.74,
-          "strength": 85,
+          "strength": 84,
           "mean": 84.73,
-          "outOfPosition": [],
-          "filled": [],
+          "outOfPosition": [
+            "Ditmar Jakobs (DF as MF)"
+          ],
+          "filled": [
+            "Ditmar Jakobs (DF, 507')"
+          ],
           "eleven": [
             "Hans-Peter Briegel DF 90 BdO 9 0g 543'",
             "Rudi Völler FW 88 BdO 8 3g 393'",
@@ -3745,8 +3831,8 @@
             "Norbert Eder DF 84 0g 656'",
             "Felix Magath MF 83 0g 542'",
             "Thomas Berthold DF 82 0g 515'",
-            "Wolfgang Rolff MF 82 0g 136'",
-            "Karl Allgöwer MF 81 0g 0'"
+            "Ditmar Jakobs DF 82 0g 507'",
+            "Wolfgang Rolff MF 81 0g 136'"
           ]
         },
         {
