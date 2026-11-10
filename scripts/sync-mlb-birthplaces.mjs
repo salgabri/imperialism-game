@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { editionOf, FREE_AGENTS, nameKey, nationOfBirthplace, nearestBirthplace, trustsBirthplace } from './lib/mlb.mjs';
 import { showzoneCards } from './lib/showzone.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cacheDir = path.join(root, 'data-src/mlb-stats-api');
@@ -53,8 +54,7 @@ async function seasonPlayers(statsApi, season) {
   const file = path.join(cacheDir, name);
   if (!existsSync(file)) {
     const url = statsApi.url.replace('<season>', season);
-    const response = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (imperialism-game roster sync)', accept: 'application/json' },
-      signal: AbortSignal.timeout(60000) });
+    const response = await politeFetch(url, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(60000) });
     if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
     await mkdir(cacheDir, { recursive: true });
     await writeFile(file, Buffer.from(await response.arrayBuffer()));

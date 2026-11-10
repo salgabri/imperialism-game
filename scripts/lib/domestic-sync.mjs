@@ -4,6 +4,8 @@
 // efem.club/robots.txt disallows /api/ (checked 18 October 2026), which every EFEM
 // request here uses, so createEfem serves only its cache unless given `permission`
 // (the sync's --efem-permission-granted), to be passed only once EFEM has said yes.
+// Every request goes through scripts/lib/polite-fetch.mjs (generic User-Agent, robots.txt
+// obeyed); EFEM's written permission is the one exception to its robots.txt.
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -12,13 +14,13 @@ import { gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate';
 import { NATIONS } from '../../src/data/teams.js';
 import { FM_ROLES, FM_ORIGIN, expandFmTuple, fmNaturalPositions } from '../../src/data/fmPlayers.js';
 import { domesticCap } from '../../src/data/domesticTiers.js';
+import { politeFetch } from './polite-fetch.mjs';
 
 export const VERSION = '26.3.0';
 // Release date of the FM26 26.3.0 data update: the ratings' as-of date (a snapshot's
 // fetchedAt is only when EFEM was read). Change it with VERSION.
 export const DATABASE_DATE = '2026-03-30';
 export const EFEM_PERMISSION_FLAG = '--efem-permission-granted';
-export const USER_AGENT = 'imperialism-game-build/1.0 (offline data build)';
 export const CLUBS_ENDPOINT = `${FM_ORIGIN}/api/clubs/filter`;
 export const PLAYERS_ENDPOINT = `${FM_ORIGIN}/api/players/filter`;
 export const CLUB_PAGE_SIZE = 100;
@@ -49,13 +51,16 @@ export function createLimiter(concurrency = 3, spacing = 500) {
   };
 }
 
-/** Fetch text with 3 retries and backoff on network errors, 429, 5xx and empty bodies. */
-export async function fetchText(url, { method = 'GET', body, headers = {}, timeout = 120000 } = {}) {
+/**
+ * Fetch text with 3 retries and backoff on network errors, 429, 5xx and empty bodies; a refusal (robots.txt) is not
+ * retried. `permission`: the host whose written permission stands in for its robots.txt (EFEM's, see the top).
+ */
+export async function fetchText(url, { method = 'GET', body, headers = {}, timeout = 120000, permission } = {}) {
   let lastError;
   for (let attempt = 0; attempt < 4; attempt++) {
     if (attempt) await sleep(1500 * 2 ** (attempt - 1));
     try {
-      const response = await fetch(url, { method, body, headers: { 'User-Agent': USER_AGENT, ...headers }, signal: AbortSignal.timeout(timeout) });
+      const response = await politeFetch(url, { method, body, headers, permission, signal: AbortSignal.timeout(timeout) });
       const text = await response.text();
       if (response.status === 429 || response.status >= 500) throw new Error(`HTTP ${response.status}`);
       if (!response.ok) throw Object.assign(new Error(`HTTP ${response.status}`), { fatal: true });
@@ -108,7 +113,7 @@ export function createEfem({ cacheDir, refresh = false, permission = false, conc
     return cachedGz(file, true, () => limit(async () => {
       requests++;
       fresh.add(url);
-      const result = JSON.parse(await fetchText(url));
+      const result = JSON.parse(await fetchText(url, { permission: new URL(url).hostname }));
       if (!Array.isArray(result.data) || !Number.isInteger(result.count)) throw new Error(`Invalid EFEM response for ${url}`);
       return { url, fetchedAt: new Date().toISOString(), count: result.count, data: result.data.map(trim).filter(Boolean) };
     }));

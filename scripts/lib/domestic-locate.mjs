@@ -1,17 +1,18 @@
 // Home towns for domestic clubs, layered and cached:
 //   1. manual overrides (scripts/data/domestic-locations.json, keyed by FM clubId),
-//   2. Wikidata association football clubs of the country (CC0),
-//   3. GeoNames cities1000 town-in-name (CC BY 4.0).
+//   2. Wikidata association football clubs of the country (CC0), asked of QLever's
+//      Wikidata endpoint (scripts/lib/wikidata-sparql.mjs: the Query Service's robots.txt
+//      disallows its /sparql); each query keeps the Query Service's text, which keys the cache,
+//   3. GeoNames cities1000 town-in-name (CC BY 4.0), from the cached dumps only:
+//      download.geonames.org's robots.txt disallows every path.
 // Only lon/lat are produced here; boundary checks happen in build-domestic.mjs.
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { unzipSync } from 'fflate';
 import { cachedGz, createLimiter, fetchText } from './domestic-sync.mjs';
+import { sparqlRequest, WIKIDATA_SPARQL } from './wikidata-sparql.mjs';
 
-const SPARQL = 'https://query.wikidata.org/sparql';
-const GEONAMES = 'https://download.geonames.org/export/dump';
 const FOOTBALL_CLUB = 'Q476028';
 // Multi-sport clubs (San Lorenzo, Platense, Norwegian idrettslag, ...) are typed "sports club"
 // with sport = association football rather than as football clubs.
@@ -76,13 +77,10 @@ export function createWikidata({ cacheDir, refresh = false }) {
   const dir = path.join(cacheDir, 'wikidata');
   let requests = 0;
   const sparql = query => limit(async () => {
-    // A server-side timeout arrives as HTTP 200 with an error appended to the JSON, so parse failures retry too.
+    // A server-side timeout can arrive as HTTP 200 with an error appended to the JSON, so parse failures retry too.
     for (let attempt = 0; ; attempt++) {
       requests++;
-      const text = await fetchText(SPARQL, {
-        method: 'POST', body: 'query=' + encodeURIComponent(query), timeout: 180000,
-        headers: { Accept: 'application/sparql-results+json', 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
+      const text = await fetchText(WIKIDATA_SPARQL, { ...sparqlRequest(query), timeout: 180000 });
       try {
         return JSON.parse(text).results.bindings.map(b => Object.fromEntries(Object.entries(b).map(([k, v]) => [k, v.value])));
       } catch (error) {
@@ -179,8 +177,9 @@ export function createWikidata({ cacheDir, refresh = false }) {
 
 const qidOf = uri => uri.split('/').pop();
 const hash = text => createHash('sha1').update(text).digest('hex').slice(0, 16);
+// The Query Service writes Point(lon lat), QLever POINT(lon lat).
 const point = wkt => {
-  const m = wkt && wkt.match(/Point\(([-\d.eE]+) ([-\d.eE]+)\)/);
+  const m = wkt && wkt.match(/Point\(([-\d.eE]+) ([-\d.eE]+)\)/i);
   return m ? [+m[1], +m[2]] : null;
 };
 
@@ -202,38 +201,21 @@ const NAMESAKE_KM = 15;
 
 // ---- GeoNames ----
 
-export async function ensureGeonames(cacheDir, refresh = false) {
+/**
+ * GeoNames' cities1000.txt and admin1CodesASCII.txt, from data-src/domestic/geonames/ only. Their source,
+ * download.geonames.org/export/dump/, is disallowed for every agent by its robots.txt (read 2026-11-10), so they are
+ * never downloaded, not even for --refresh: a missing file stops the sync.
+ */
+export function ensureGeonames(cacheDir) {
   const dir = path.join(cacheDir, 'geonames');
-  await mkdir(dir, { recursive: true });
-  const cities = path.join(dir, 'cities1000.txt');
-  if (refresh || !existsSync(cities)) {
-    const zip = new Uint8Array(Buffer.from(await fetchBinary(`${GEONAMES}/cities1000.zip`)));
-    const files = unzipSync(zip, { filter: file => file.name === 'cities1000.txt' });
-    if (!files['cities1000.txt']) throw new Error('cities1000.zip has no cities1000.txt');
-    await atomicWrite(cities, files['cities1000.txt']);
-  }
-  const admin1 = path.join(dir, 'admin1CodesASCII.txt');
-  if (refresh || !existsSync(admin1)) await atomicWrite(admin1, await fetchText(`${GEONAMES}/admin1CodesASCII.txt`));
-  return { cities, admin1 };
-}
-
-async function fetchBinary(url) {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    try {
-      const response = await fetch(url, { headers: { 'User-Agent': 'imperialism-game-build/1.0 (offline data build)' }, signal: AbortSignal.timeout(600000) });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return await response.arrayBuffer();
-    } catch (error) {
-      if (attempt === 3) throw new Error(`${url}: ${error.message}`);
-      await new Promise(resolve => setTimeout(resolve, 2000 * 2 ** attempt));
+  const files = { cities: path.join(dir, 'cities1000.txt'), admin1: path.join(dir, 'admin1CodesASCII.txt') };
+  for (const file of Object.values(files)) {
+    if (!existsSync(file)) {
+      throw new Error(`${file} is missing. GeoNames' dumps (download.geonames.org/export/dump/) are disallowed by its robots.txt, `
+        + 'so they are never downloaded: copy cities1000.txt and admin1CodesASCII.txt there from an earlier download.');
     }
   }
-}
-
-async function atomicWrite(file, data) {
-  const tmp = `${file}.${process.pid}.tmp`;
-  await writeFile(tmp, data);
-  await rename(tmp, file);
+  return files;
 }
 
 let citiesText = null;

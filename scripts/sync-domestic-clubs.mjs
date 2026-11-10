@@ -6,7 +6,7 @@
 //     --survey   club list pages only: writes scripts/data/domestic/survey.json
 //     --only     limit to these game nation ids (default: every nation in NATIONS)
 //     --refresh  download club lists and Wikidata again for these nations
-//     --refresh=all  also the global player listing (~700 requests) and GeoNames
+//     --refresh=all  also the global player listing (~700 requests); GeoNames stays cached
 //     --efem-permission-granted  allow requests to EFEM; without it only cached EFEM
 //                responses are used, and a request that would reach EFEM stops the sync.
 //                efem.club/robots.txt disallows /api/ (checked 18 October 2026): do not
@@ -24,8 +24,12 @@
 //     that no paging is needed (paging ties in Current Ability skips players),
 //     and squads are grouped by exact clubId. The list carries no loan club (only the
 //     contract clubId), so a player out on loan counts for his parent club.
-//   - Wikidata SPARQL (CC0) and GeoNames cities1000 (CC BY 4.0) for home towns,
-//     plus manual overrides in scripts/data/domestic-locations.json.
+//   - Wikidata (CC0), by SPARQL from QLever's Wikidata endpoint (qlever.dev; the Query
+//     Service's robots.txt disallows its /sparql), and GeoNames cities1000 (CC BY 4.0),
+//     read only from the cache (download.geonames.org's robots.txt disallows every path),
+//     for home towns, plus manual overrides in scripts/data/domestic-locations.json.
+//   Every request goes through scripts/lib/polite-fetch.mjs: one generic User-Agent,
+//   robots.txt read first and obeyed.
 //   - Real names for FM's unlicensed placeholder names (Portugal's "BRG" is SC Braga)
 //     from scripts/data/domestic-names.json; an all-capitals name without an entry there
 //     stops the sync.
@@ -283,7 +287,7 @@ async function sync() {
   const names = withoutComments(await readFile(namesFile, 'utf8'));
   const players = await loadPlayers();
   const wikidata = createWikidata({ cacheDir, refresh });
-  const geoFiles = await ensureGeonames(cacheDir, refreshAll);
+  const geoFiles = ensureGeonames(cacheDir);
   await mkdir(outDir, { recursive: true });
   const outcomes = new Map();
   for (const id of ids) {

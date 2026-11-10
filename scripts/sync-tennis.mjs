@@ -18,6 +18,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cacheDir = path.join(root, 'data-src/tennis');
@@ -49,7 +50,7 @@ async function fetched(file, url) {
   if (!refresh && existsSync(at)) return readFile(at, 'utf8');
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await fetch(url, { headers: { 'user-agent': 'imperialism-game data sync' }, signal: AbortSignal.timeout(30000) });
+      const response = await politeFetch(url, { signal: AbortSignal.timeout(30000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const body = await response.text();
       await mkdir(path.dirname(at), { recursive: true });

@@ -23,12 +23,12 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { clubPagesOf } from './lib/pfa.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const dataSrc = path.join(root, 'data-src');
 const pinsFile = path.join(root, 'scripts/data/pfa-pages.json');
 const SITE = 'https://www.profootballarchives.com';
-const USER_AGENT = 'imperialism-game-data/1.0';
 const GAP_MS = 5000;
 
 const range = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
@@ -81,7 +81,7 @@ async function get(url, expect) {
   last = Date.now();
   let response;
   try {
-    response = await fetch(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'manual', signal: AbortSignal.timeout(60000) });
+    response = await politeFetch(url, { redirect: 'manual', signal: AbortSignal.timeout(60000) });
   } catch (error) {
     await appendFile(logFile, `${new Date().toISOString()}\tERR\t0\t-\t${url}\n`);
     throw new Error(`${url}: ${error.message}`);

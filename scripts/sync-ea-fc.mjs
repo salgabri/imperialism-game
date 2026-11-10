@@ -28,6 +28,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import { EA_PLAYER_PAGE, nameTokens, parseCsv, ROLE_OF_POSITION } from './lib/football-data.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const VERSION = 27;
@@ -242,7 +243,7 @@ async function page(cacheDir, offset, refresh, gender = 0, headers = HEADERS) {
   const url = `${ENDPOINT}?locale=en&limit=${LIMIT}&offset=${offset}&gender=${gender}`;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await fetch(url, { headers, signal: AbortSignal.timeout(30000) });
+      const response = await politeFetch(url, { headers, signal: AbortSignal.timeout(30000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const body = await response.json();
       if (!Array.isArray(body.items) || !Number.isInteger(body.totalItems)) throw new Error('Unexpected response');
@@ -251,7 +252,7 @@ async function page(cacheDir, offset, refresh, gender = 0, headers = HEADERS) {
       await sleep(PAUSE_MS);
       return result;
     } catch (error) {
-      if (attempt === 2) throw new Error(`${url}: ${error.message}`);
+      if (attempt === 2 || error.fatal) throw new Error(`${url}: ${error.message}`);
       await sleep(PAUSE_MS * 5);
     }
   }
