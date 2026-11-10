@@ -1,6 +1,5 @@
 import { C } from '../theme.js';
-import { ROSTERS } from '../data/rosters.rugby-league.js';
-import { CLUBS } from '../data/clubs.rugby-league.js';
+import { defineSportData } from './sportData.js';
 import { selectLineup } from '../data/teams.js';
 import { clamp, gauss, poisson } from '../engine/random.js';
 
@@ -263,13 +262,14 @@ function scoreMinute(rng, slice, goldenAt) {
   return slice * SLICE + 1 + Math.floor(clamp(rng(), 0, 1 - Number.EPSILON) * SLICE);
 }
 
-export const rugbyLeague = {
+export const rugbyLeague = defineSportData({
   id: 'rugby-league',
   simulationVersion: 1,
   name: 'Rugby league',
   blurb: 'Thirteen a side and four on the bench, eighty minutes. Tries, goals and field goals — level games go to golden point.',
-  rosters: ROSTERS,
-  clubs: CLUBS,
+  // Read from the sport's players (sportData.js), once they have loaded.
+  rosters: undefined,
+  clubs: undefined,
   // England, Scotland and Wales play as themselves, as in football; Ireland is the whole island, so Northern Ireland's
   // shape starts in Ireland's (372) empire.
   territory: { merged: { NIR: '372' }, inactive: [] },
@@ -328,7 +328,7 @@ export const rugbyLeague = {
     ev.sort((x, y) => x.m - y.m);
     return { ga, gd, regA, regD, ev, tie, winner };
   },
-};
+});
 
 /**
  * Squad-screen strength profile: the backs, halves and forwards the match model weighs → { backs, halves, forwards } on

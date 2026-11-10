@@ -14,21 +14,22 @@ import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootball
   loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setHasNations, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport, matchSport } from './sports/index.js';
+import { loadSportData, sportDataLoaded } from './sports/sportData.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
   inspectCampaign, renameCampaign, forkCampaign, createCampaignId, detectSaveConflict, isCampaignStorageEvent,
-  fitDomesticCampaign, setActiveCampaign, CHECKPOINT_KEYS } from './engine/storage.js';
+  fitDomesticCampaign, setActiveCampaign, campaignSport, sportOfText, CHECKPOINT_KEYS } from './engine/storage.js';
 import { PlaybackClock } from './engine/playbackClock.js';
 import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiveBasketballTeams } from './engine/managerStrategy.js';
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
-import { cacheForOffline, settleFirstBoot } from './serviceWorker.js';
+import { applyUpdate, cacheForOffline, settleFirstBoot } from './serviceWorker.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
 import { skipAheadModel } from './viewModels/campaign.js';
 import { countryMapPreview, suggestedTeamId, theatreMapPreview } from './screens/setup/setupModel.js';
-import { challengeUrl, fieldedTeam, readChallenge } from './screens/setup/challenge.js';
+import { challengeSport, challengeUrl, fieldedTeam, readChallenge } from './screens/setup/challenge.js';
 import { buildShareCard, shareLine } from './viewModels/shareCard.js';
 import { canDrawShareImage, deliverShareImage, drawShareCard } from './engine/shareImage.js';
 import { politicalFill } from './data/empireColours.js';
@@ -73,6 +74,15 @@ import ChronicleScreen from './screens/ledger/ChronicleScreen.jsx';
 // and ~770 above and below on a phone.
 const BACKDROP_MARGIN = { x: 480, y: 800 };
 const SETUP_LOAD_DELAY_MS = 120;
+
+/** No sport's players loading (state.sportLoad, UI-only). */
+const IDLE_SPORT_LOAD = Object.freeze({ id: null, state: 'idle', message: null });
+
+/**
+ * Reload the page, into a new version when one waits (as the crash screen does): a sport's players that will not load
+ * after a deploy are under the new version's file names. Leaving the page writes an open campaign's checkpoint.
+ */
+const reloadPage = () => { if (!applyUpdate()) window.location.reload(); };
 
 /** The page's fetch; tests and Node have only the global one. */
 const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : globalThis.fetch);
@@ -147,6 +157,8 @@ export default class App extends React.Component {
   state = {
     phase: 'loading',
     err: null,
+    // Boot failed for a sport's players (a challenge link's): the loading screen also offers Reload.
+    errReload: false,
     // A new campaign manages a team (the suggested one until the player picks), so a first campaign has decisions to
     // make. DEFAULT_SETUP keeps Spectator: it also fills settings that saves from before the role existed lack.
     setup: { ...DEFAULT_SETUP, role: 'manager' },
@@ -199,6 +211,9 @@ export default class App extends React.Component {
     // The setup's chosen country map, a restore waiting for its country map ({ message, status }) and a country
     // launch being prepared (UI-only: campaignSnapshot whitelists its keys, so none of these reach a save).
     domesticLoad: { id: null, state: 'idle', message: null },
+    // A sport the setup picked whose players are still loading, or failed to (src/sports/sportData.js): the setup keeps
+    // the sport it had until they are here, and the latest pick wins. UI-only, like the country map's.
+    sportLoad: IDLE_SPORT_LOAD,
     restoring: null, launching: false,
     // The football seasons on offer (the built-in earlier ones, then any CM 01/02 sets built on this computer) and the
     // setup's chosen one loading (UI-only, like the country map's), and Retry this setup loading a season campaign's
@@ -217,6 +232,8 @@ export default class App extends React.Component {
   // Async map loads compare these so a result the player has moved on from is dropped.
   setupMapToken = 0;
   setupSetToken = 0;
+  // Likewise a sport picked before its players have loaded: only the latest pick applies.
+  sportToken = 0;
   flowToken = 0;
   openingSeed = Date.now() >>> 0;
   away = false;
@@ -266,8 +283,14 @@ export default class App extends React.Component {
   speedRestore = null;
   /** `?playtest` in the address: the results also show the playtest timing (docs/design/playtest.md). */
   playtest = false;
+  /** The page address's query, read for a challenge once boot has the players of the sport it names. */
+  search = '';
   /** The challenge in the address (screens/setup/challenge.js), applied to setup once the map is ready. */
   link = null;
+  /** The sport whose players a restore waits for before it reads its campaign whole (withCampaignSport). */
+  pendingSport = null;
+  /** Bumped by each import: only the latest opens its dialog (importProgress). */
+  importToken = 0;
   /** This page's own address without its query: what a challenge link starts with. */
   pageBase = '';
   /** A challenge link's managed team, until its theatre's teams are known (settleChallengeTeam). */
@@ -278,9 +301,9 @@ export default class App extends React.Component {
   componentDidMount() {
     try { this.playtest = new URLSearchParams(window.location.search).has('playtest'); } catch { this.playtest = false; }
     try {
-      this.link = readChallenge(window.location.search);
+      this.search = window.location.search;
       this.pageBase = `${window.location.origin}${window.location.pathname}`;
-    } catch { this.link = null; }
+    } catch { this.search = ''; }
     window.addEventListener('storage', this.handleStorage);
     window.addEventListener('focus', this.handleFocus);
     window.addEventListener('blur', this.handleBlur);
@@ -295,6 +318,7 @@ export default class App extends React.Component {
     clearTimeout(this.confirmTimer);
     clearTimeout(this.setupLoadTimer);
     clearTimeout(this.setupSetTimer);
+    clearTimeout(this.sportLoadTimer);
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', this.handleStorage);
       window.removeEventListener('focus', this.handleFocus);
@@ -307,8 +331,10 @@ export default class App extends React.Component {
 
   componentDidUpdate(_props, previous) {
     // The random state this commit's campaign state was drawn with: nextAction starts no turn while the generator has
-    // moved past it (a turn drawn in a timer task that React has not committed yet).
-    this.committedRng = this.rng?.getState?.();
+    // moved past it (a turn drawn in a timer task that React has not committed yet), and persist writes it. A commit
+    // that holds every draw so far (markDraw) has it in the generator. A click's sync update that React commits before
+    // such a turn, on the settled match, holds an older mark and keeps the random state of the last commit that did.
+    if (this.state.drawMark === this.drawMark) this.committedRng = this.rng?.getState?.();
     this.updateEngagement();
     // The crash screen exports the campaign this page plays (storage crashCheckpoint), not another tab's.
     setActiveCampaign(this.state.phase === 'playing' || this.state.phase === 'victory' ? this.state.campaignId : null);
@@ -429,6 +455,10 @@ export default class App extends React.Component {
       // the setup's team list are ready when it lands. Every state change still waits for the atlas, so the loading
       // screen gives way to setup in one render, as before.
       const { map, atlas: atlasRequest } = takeMapRequests() || requestMaps();
+      // A challenge link's sport is set up at once, so its players load beside the maps (a new setup's, football's, come
+      // with the page: src/sports/sportData.js).
+      const linkSport = challengeSport(this.search), linkPlayers = sportDataLoaded(linkSport) ? null : loadSportData(linkSport);
+      linkPlayers?.catch(() => { /* reported below, once the map is in */ });
       const res = await map;
       if (!res.ok) throw new Error('map fetch ' + res.status);
       this.geo = new WorldGeometry(await res.json(), CAPITALS);
@@ -437,8 +467,20 @@ export default class App extends React.Component {
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
       // A retry's team list is built again, on this geometry.
       this.setupTeamsCache = null;
-      const inspection = inspectSave();
-      const saved = inspection.campaign;
+      if (linkPlayers) {
+        try {
+          await linkPlayers;
+        } catch (error) {
+          throw Object.assign(new Error(`${getSport(linkSport).name} could not be loaded. ${error?.message || error}`), { sportData: true });
+        }
+      }
+      try { this.link = readChallenge(this.search); } catch { this.link = null; }
+      let inspection = inspectSave();
+      // A quick-resume campaign of another sport, or a damaged one's recovery copy, is read once its players are here:
+      // they load while the atlas downloads.
+      const savedSport = inspection.state === 'unloaded' ? inspection.sport : inspection.backupSport || null;
+      const savedPlayers = savedSport ? loadSportData(savedSport) : null;
+      savedPlayers?.catch(() => { /* savedInspection reports it */ });
       // The first render's team list (setupTeams is cached per setup key, and nothing changes that key before it).
       // Any failure is left for that render to meet, as before, not reported as a map that failed to load.
       try { this.setupTeams(this.link?.found ? this.link.setup : this.state.setup); } catch { /* built at render */ }
@@ -454,6 +496,8 @@ export default class App extends React.Component {
       // measures no borders (the rules geometry's are the ones claims read).
       this.displayGeo = atlas ? new WorldGeometry(mergeSharedIds(atlas), CAPITALS, { keepPolys: false, borderLengths: false }) : null;
 
+      if (savedPlayers) inspection = await this.savedInspection(inspection, savedPlayers);
+      const saved = inspection.campaign;
       if (saved) {
         this.saved = saved;
         this.setState({
@@ -482,8 +526,26 @@ export default class App extends React.Component {
       });
     } catch (e) {
       settleFirstBoot();
-      this.setState({ err: 'MAP DATA FAILED TO LOAD — ' + String((e && e.message) || e) });
+      // A sport's players that will not load may be under a newer deploy's file names: Reload fetches the page again.
+      this.setState({ err: `${e?.sportData ? 'GAME DATA' : 'MAP DATA'} FAILED TO LOAD — ${String((e && e.message) || e)}`, errReload: !!e?.sportData });
     }
+  }
+
+  /**
+   * Boot's quick-resume inspection (storage inspectSave) once the players it waits for (`players`, a promise) are here:
+   * the pointer read whole, or a damaged pointer's recovery copy that can now be read. Players that will not load leave
+   * nothing to resume here; a campaign keeps its slot in Saved campaigns.
+   */
+  async savedInspection(inspection, players) {
+    const unloaded = inspection.state === 'unloaded', sport = unloaded ? inspection.sport : inspection.backupSport;
+    try {
+      await players;
+    } catch (error) {
+      const failed = `The ${getSport(sport).name} players could not be loaded: reload the page to try again. ${error?.message || error}`;
+      return unloaded ? { state: 'unavailable', campaign: null, message: `Your saved campaign could not be opened. ${failed}` }
+        : { ...inspection, backupSport: null, message: `${inspection.message} ${failed}` };
+    }
+    return unloaded ? inspection.read() : inspectSave();
   }
 
   /**
@@ -819,9 +881,29 @@ export default class App extends React.Component {
       ...Object.fromEntries(Object.entries(metrics).map(([key, value]) => [`metrics.${key}`, value])), phase: st.phase === 'victory' };
   }
 
+  /**
+   * Called once a draw or a match has taken samples from the campaign's generator (this.rng), in the task that queues
+   * the state they decide. React commits this mark in the same render as that state (one task, one lane), so
+   * componentDidUpdate can tell a commit that holds the draw from a click's commit React rebased before it.
+   */
+  markDraw() {
+    this.drawMark = (this.drawMark || 0) + 1;
+    this.setState({ drawMark: this.drawMark });
+  }
+
+  /**
+   * The random state the committed campaign state was drawn with: what a checkpoint or an export of this.state holds.
+   * Between a timer task that draws (a turn, a locked compass's kickoff) and React's commit of what it drew, the
+   * generator has moved past this.state. A write then (a page hidden or closed, a click that saves) holding the spent
+   * state would resume to another turn or match than the seed played.
+   */
+  committedRngState() {
+    return this.committedRng ?? this.rng?.getState?.() ?? this.state.rngState;
+  }
+
   persist() {
     if (!Object.keys(this.state.teams).length || this.saving || this.state.storageConflict) return;
-    const rngState = this.rng?.getState?.() ?? this.state.rngState;
+    const rngState = this.committedRngState();
     // Unchanged since the last checkpoint (a decision both changes the match and saves in its callback): no write.
     const source = this.checkpointSource(rngState), last = this.lastCheckpoint;
     if (last && this.saved?.campaignId === this.state.campaignId && Object.keys(source).length === Object.keys(last).length
@@ -872,9 +954,9 @@ export default class App extends React.Component {
    * presentation takes none (DEC D1), so that checkpoint must be this campaign's, hold the settled match this kickoff
    * follows, and hold the random state this turn started from (nextAction's turnFrom), the kickoff's samples taken
    * since. Kickoffs that fail this stay checkpoints: a batch's first match (startBatch saved its draw without the
-   * match), the draw a resume kicks off (restoreCampaign saves after it), one whose samples a write between its timer
-   * task and React's commit has already stored, and one whose turn started from a later state than that checkpoint:
-   * a Next match click between a turn's timer task and React's commit still reads the settled match and draws again.
+   * match), the draw a resume kicks off (restoreCampaign saves after it), and one whose turn started from another
+   * random state than that checkpoint. A write between a turn's timer task and React's commit (a Chronicle pick)
+   * holds the settled match with the random state the turn started from (committedRngState): that kickoff can wait.
    */
   expressKickoffReplays(previous) {
     const last = this.lastCheckpoint;
@@ -883,6 +965,7 @@ export default class App extends React.Component {
   }
 
   pickSetup(key, value) {
+    if (key === 'sport' && !this.pickSport(getSport(value).id)) return;
     this.setState(state => {
       const setup = { ...state.setup, [key]: value };
       const domestic = isDomesticScope(setup.clubScope), country = isCountryScope(setup.clubScope);
@@ -928,9 +1011,51 @@ export default class App extends React.Component {
     });
   }
 
+  /**
+   * A sport pick (src/sports/sportData.js): whether it applies now. The latest pick wins: any pick drops one still
+   * loading, and a pick of the sport set up changes nothing more (its team stays picked). A sport whose players have not
+   * loaded shows as picked while they load (sportLoad), and setup keeps the sport it had until they are here, holding
+   * its steps and Launch. A pick made while another loads waits SETUP_LOAD_DELAY_MS first, so arrow keys stepping
+   * through the cards load only the sport the player stays on.
+   */
+  pickSport(id) {
+    const token = ++this.sportToken, waiting = this.state.sportLoad.id != null;
+    clearTimeout(this.sportLoadTimer);
+    if (sportDataLoaded(id)) {
+      if (waiting) this.setState({ sportLoad: IDLE_SPORT_LOAD });
+      return id !== getSport(this.state.setup.sport).id;
+    }
+    this.setState({ sportLoad: { id, state: 'loading', message: null } });
+    const current = () => token === this.sportToken && this.state.phase === 'setup';
+    // Here, the pick applies as any pick of a loaded sport does, which also ends the wait.
+    const load = () => loadSportData(id).then(() => { if (current()) this.pickSetup('sport', id); }, error => {
+      if (current()) this.setState({ sportLoad: { id, state: 'error', message: `${getSport(id).name} could not be loaded. ${error?.message || error}` } });
+    });
+    if (waiting) this.sportLoadTimer = setTimeout(() => { if (current()) load(); }, SETUP_LOAD_DELAY_MS);
+    else load();
+    return false;
+  }
+
+  /** Leaving setup (a launch or a restore) drops a sport pick still loading: it must not change the next setup. */
+  dropSportPick() {
+    this.sportToken++;
+    clearTimeout(this.sportLoadTimer);
+    if (this.state.sportLoad.id != null) this.setState({ sportLoad: IDLE_SPORT_LOAD });
+  }
+
+  /**
+   * What the setup's Sport cards show of a pick still loading (null for none): its id, 'loading' or 'error' with the
+   * message, Retry (that pick again) and Reload (the page, as after a deploy that renamed the players' files).
+   */
+  sportStatus() {
+    const load = this.state.sportLoad;
+    if (load.id == null) return null;
+    return { ...load, onRetry: () => this.pickSetup('sport', load.id), onReload: reloadPage };
+  }
+
   exportProgress() {
     const data = this.state.phase === 'setup' && this.saved ? this.saved
-      : { ...this.state, rngState: this.rng?.getState?.() ?? this.state.rngState,
+      : { ...this.state, rngState: this.committedRngState(),
         metrics: { ...this.state.metrics, engagement: this.engagement.snapshot() } };
     const st = this.state;
     // A decision gate (signing, approach, target, elimination) already holds the campaign with no timers armed, and
@@ -1006,12 +1131,25 @@ export default class App extends React.Component {
 
   async importProgress(file) {
     if (!file) return;
+    // A later import, a launch, a restore or a conflict while this one waits for its file or its sport's players wins.
+    const token = ++this.importToken, flow = this.flowToken;
+    const current = () => token === this.importToken && flow === this.flowToken && !this.state.storageConflict;
     try {
       if (file.size > 5_000_000) throw new Error('Choose a campaign file smaller than 5 MB.');
-      const saved = parseCampaign(await file.text());
+      const text = await file.text(), sport = sportOfText(text);
+      // A campaign of another sport is read whole once that sport's players are here (src/sports/sportData.js).
+      if (sport && !sportDataLoaded(sport)) {
+        try {
+          await loadSportData(sport);
+        } catch (error) {
+          throw new Error(`${getSport(sport).name} could not be loaded, so this campaign cannot be imported: reload the page to try again. ${error?.message || error}`);
+        }
+      }
+      if (!current()) return;
+      const saved = parseCampaign(text);
       this.openStorageDialog('import', { campaign: saved });
     } catch (error) {
-      this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
+      if (current()) this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
     }
   }
 
@@ -1034,7 +1172,7 @@ export default class App extends React.Component {
   }
 
   continueSaved(campaign, fork = false, name) {
-    if (!campaign || this.pendingDomesticId != null) return;
+    if (!campaign || this.pendingDomesticId != null || this.pendingSport != null) return;
     // A country campaign is checked against its map before it replaces anything.
     return this.withCampaignMap(campaign, (_loaded, fitted) => {
       this.saved = fork ? forkCampaign(fitted, name) : fitted;
@@ -1090,18 +1228,75 @@ export default class App extends React.Component {
     });
   }
 
+  /**
+   * Reading a saved campaign of another sport whole needs that sport's players (src/sports/sportData.js): runs `then()`
+   * once they are here, at once when they already are. Meanwhile Saved campaigns shows the wait as it shows a country
+   * map's, and closing it cancels. Players that will not load refuse with a message.
+   */
+  withCampaignSport(sport, then) {
+    if (!sport || sportDataLoaded(sport)) return then();
+    if (this.pendingDomesticId != null || this.pendingSport != null) return false;
+    const token = ++this.flowToken, name = getSport(sport).name, message = `Loading ${name}…`;
+    this.pendingSport = sport;
+    this.setState(state => ({ restoring: { message, status: state.restoring?.status ?? state.saveStatus }, saveStatus: { ok: true, message } }));
+    const current = () => {
+      if (token !== this.flowToken) return false;
+      this.pendingSport = null;
+      this.setState(state => (state.restoring ? { restoring: null, saveStatus: state.restoring.status ?? null } : null));
+      return true;
+    };
+    return loadSportData(sport).then(() => (current() ? then() : false), error => {
+      if (current()) this.refuseRestore(`${name} could not be loaded, so this campaign cannot be opened: reload the page to try again. ${error?.message || error}`);
+      return false;
+    });
+  }
+
+  /** Saved campaigns' Resume (or Recover) of slot `id`, read whole once its sport's players are here. */
+  openSavedCampaign(id, sport = campaignSport(id)) {
+    return this.withCampaignSport(sport, () => {
+      try {
+        const inspection = inspectCampaign(id);
+        if (inspection.state === 'ready') return this.continueSaved(inspection.campaign);
+        // Its list entry named another sport than its checkpoint plays: that sport's players, then.
+        if (inspection.state === 'unloaded' && inspection.sport !== sport) return this.openSavedCampaign(id, inspection.sport);
+        this.setState({ storageDialog: { mode: 'recovery', ...inspection } });
+      } catch (error) {
+        this.setState(state => ({ storageDialog: state.storageDialog && { ...state.storageDialog, error: error.message } }));
+      }
+      return false;
+    });
+  }
+
+  /** Saved campaigns' Rename of slot `id` (its checkpoint is written again, so it is read whole first). */
+  renameSavedCampaign(id, name) {
+    return this.withCampaignSport(campaignSport(id), () => {
+      let result;
+      // A slot deleted in another tab while the dialog was open cannot be renamed: say so rather than throw.
+      try { result = renameCampaign(id, name); } catch (error) { result = { ok: false, message: error.message }; }
+      // The quick-resume copy (no campaign open yet after a reload) takes the new revision too, or resuming
+      // it reads as a change made in another tab.
+      if (result.ok && this.saved?.campaignId === id) {
+        this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
+      }
+      if (result.ok && id === this.state.campaignId) this.setState({ revision: result.revision, campaignName: result.campaignName });
+      this.setState(state => ({ storageDialog: state.storageDialog && { ...state.storageDialog, error: result.ok ? null : result.message, notice: null } }));
+    });
+  }
+
   /** The pending restore is over (it ran, failed or was replaced). */
   endRestore() {
     this.pendingDomesticId = null;
+    this.pendingSport = null;
     this.retainMaps();
     this.setState(state => state.restoring ? { restoring: null } : null);
   }
 
   /** Drop a restore still waiting for its map: its campaign must not replace anything later. */
   cancelRestore() {
-    if (this.pendingDomesticId == null) return;
+    if (this.pendingDomesticId == null && this.pendingSport == null) return;
     this.flowToken++;
     this.pendingDomesticId = null;
+    this.pendingSport = null;
     this.retainMaps();
     this.setState(state => state.restoring ? { restoring: null, saveStatus: state.restoring.status ?? null } : null);
   }
@@ -1245,6 +1440,9 @@ export default class App extends React.Component {
   }
 
   startCampaign() {
+    // A sport picked before its players loaded is not set up yet: Launch waits for it (setup holds the button).
+    if (this.state.phase === 'setup' && this.state.sportLoad.id != null) return;
+    this.dropSportPick();
     this.cancelRestore();
     // No setup-screen map or data set load outlives the setup screen.
     clearTimeout(this.setupLoadTimer);
@@ -1380,6 +1578,7 @@ export default class App extends React.Component {
 
   restoreCampaign(s, loaded) {
     this.flowToken++;
+    this.dropSportPick();
     this.endRestore();
     this.clearTimers();
     this.setupTeamsCache = null;
@@ -1616,7 +1815,8 @@ export default class App extends React.Component {
     // still shows the settled match while the next turn has drawn and simulated. A second start in that gap would draw
     // again and play a different campaign from the same seed: two turn timers due together (Play re-arms the turn timer
     // a pause held, and schedules its own), or a Next match click. Only a draw and its match move the campaign's random
-    // state, and componentDidUpdate records it at every commit, so a state past the last commit is a turn in flight.
+    // state (markDraw), and componentDidUpdate records it at every commit that holds them, so a state past the last
+    // such commit is a turn in flight.
     if (this.committedRng !== undefined && this.rng?.getState?.() !== this.committedRng) return;
     // The random state this turn starts from: its fast-forwarded kickoff waits for its result only when the last
     // checkpoint holds this state (expressKickoffReplays).
@@ -1652,6 +1852,7 @@ export default class App extends React.Component {
   beginBlitz() {
     const st = this.state;
     const { pairs, bye } = drawBlitzPairs(this.rng, this.board());
+    this.markDraw();
     if (!pairs.length) return;
 
     const log = st.log.slice();
@@ -1664,6 +1865,7 @@ export default class App extends React.Component {
   beginChaos() {
     const st = this.state;
     const pairs = drawChaosPairs(this.rng, this.board());
+    this.markDraw();
     const log = st.log.slice();
     log.push({
       t: 'sys',
@@ -1782,6 +1984,8 @@ export default class App extends React.Component {
       this.presentMatch();
       if (this.state.autoplay && this.state.pauseFollow && [attackerId, defenderId].includes(this.state.followedId)) this.pausePlayback();
     });
+    // The match's samples, committed with its kickoff.
+    this.markDraw();
   }
 
   chooseTactic(id, options = {}) {
@@ -2443,7 +2647,7 @@ export default class App extends React.Component {
           theatreMap={this.setupMapPreview()}
           mapMode={st.setupMapMode} onMapMode={setupMapMode => this.setState({ setupMapMode })}
           mapFlags={st.setupMapMode === 'flags' ? this.setupMapFlags() : null}
-          season={this.seasonStatus()}
+          season={this.seasonStatus()} sportLoad={this.sportStatus()}
           savedText={st.savedMeta ? (st.savedMeta.round ? 'Round ' + st.savedMeta.round : 'Before the first match') + ' · ' + this.savedProgress(st.savedMeta) + ' · ' + this.scopeName(st.savedMeta.settings)
             + (st.savedMeta.settings?.dataSeason ? ' · ' + st.savedMeta.settings.dataSeason : '') : ''}
           onResume={() => this.resume()} onDiscard={() => this.discardSave()}
@@ -2475,29 +2679,11 @@ export default class App extends React.Component {
           onDelete={id => this.deleteSavedCampaign(id)}
           onConfirmImport={name => this.continueSaved(st.storageDialog.campaign, true, name)}
           onExportCurrent={st.hasSave ? () => this.exportProgress() : undefined}
-          onLoad={id => {
-            try {
-              const inspection = inspectCampaign(id);
-              if (inspection.state === 'ready') this.continueSaved(inspection.campaign);
-              else this.setState({ storageDialog: { mode: 'recovery', ...inspection } });
-            }
-            catch (error) { this.setState({ storageDialog: { ...st.storageDialog, error: error.message } }); }
-          }}
-          onRename={(id, name) => {
-            let result;
-            // A slot deleted in another tab while the dialog was open cannot be renamed: say so rather than throw.
-            try { result = renameCampaign(id, name); } catch (error) { result = { ok: false, message: error.message }; }
-            // The quick-resume copy (no campaign open yet after a reload) takes the new revision too, or resuming
-            // it reads as a change made in another tab.
-            if (result.ok && this.saved?.campaignId === id) {
-              this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
-            }
-            if (result.ok && id === st.campaignId) this.setState({ revision: result.revision, campaignName: result.campaignName });
-            this.setState({ storageDialog: { ...st.storageDialog, error: result.ok ? null : result.message, notice: null } });
-          }}
+          onLoad={id => this.openSavedCampaign(id)}
+          onRename={(id, name) => this.renameSavedCampaign(id, name)}
           // In setup the fork copies the quick-resume save; the outgoing campaign's teams may outlive a cleared one.
           onFork={(st.phase === 'setup' ? this.saved : Object.keys(st.teams).length) ? name => this.continueSaved(st.phase === 'setup' ? this.saved
-            : { ...st, rngState: this.rng.getState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
+            : { ...st, rngState: this.committedRngState(), metrics: { ...st.metrics, engagement: this.engagement.snapshot() } }, true, name) : undefined}
           onReload={() => this.continueSaved(st.storageDialog.campaign)}
           onRestoreBackup={() => this.continueSaved(st.storageDialog.backup, true, `${st.storageDialog.backup.campaignName || 'Campaign'} recovered`)}
           onExportRaw={st.storageDialog.raw ? () => this.setState({ exportText: st.storageDialog.raw, exportFilename: 'imperialism-damaged-save.json' }) : undefined}
@@ -2507,7 +2693,8 @@ export default class App extends React.Component {
         <UpdatePrompt campaign={playing} />
         {st.phase === 'loading' && <div className="loading-screen" role={st.err ? 'alert' : 'status'}>
           <span>{st.err || 'Opening the atlas…'}</span>
-          {st.err && <button className="button" onClick={() => { this.setState({ err: null }); this.boot(); }}>Try again</button>}
+          {st.err && <button className="button" onClick={() => { this.setState({ err: null, errReload: false }); this.boot(); }}>Try again</button>}
+          {st.err && st.errReload && <button className="button" onClick={reloadPage}>Reload</button>}
         </div>}
       </div>
     );

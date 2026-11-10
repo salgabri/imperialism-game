@@ -1,5 +1,5 @@
 import { C } from '../theme.js';
-import { ROSTERS } from '../data/rosters.tennis.js';
+import { defineSportData } from './sportData.js';
 import { GREAT_BRITAIN, HOME_NATIONS, NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, gauss } from '../engine/random.js';
 
@@ -354,25 +354,23 @@ const rubberAt = m => clamp(Math.ceil((Number(m) || 0) / BLOCK), 1, RUBBERS);
 const kindOf = e => (e.doubles ? 'DOUBLES' : 'SINGLES');
 
 /**
- * A sport played by these rules with one tour's players: `rosters` the nations that field a team, `tour` its serve (ATP,
- * the men's Davis Cup; WTA, the women's Billie Jean King Cup). Everything else is the same in both cups.
+ * A sport played by these rules with one tour's players (sport `id`'s, sportData.js): `tour` its serve (ATP, the men's
+ * Davis Cup; WTA, the women's Billie Jean King Cup). Everything else is the same in both cups.
  */
-export const tennisSport = ({ id, name, blurb, rosters, tour = ATP }) => ({
+export const tennisSport = ({ id, name, blurb, tour = ATP }) => defineSportData({
   id,
   simulationVersion: 1,
   name,
   blurb,
-  rosters,
+  // Read from the sport's players (sportData.js), once they have loaded.
+  rosters: undefined,
   clubs: [],
   // Nations only: tennis has no clubs to play.
   nationsOnly: true,
   tour,
   // Great Britain plays either cup as one: the home nations' shapes start in the United Kingdom's (826) empire. A nation
   // with fewer than two rated players fields no team, and its land stays neutral.
-  territory: {
-    merged: Object.fromEntries(HOME_NATIONS.map(nation => [nation, '826'])),
-    inactive: Object.keys(NATIONS).filter(nation => !HOME_NATIONS.includes(nation) && !Object.hasOwn(rosters, nation)),
-  },
+  territory: undefined,
   // That empire plays as Great Britain, under the Union Jack.
   playsAs: { '826': GREAT_BRITAIN },
 
@@ -418,14 +416,16 @@ export const tennisSport = ({ id, name, blurb, rosters, tour = ATP }) => ({
     return { ga, gd, regA: ga, regD: gd, tie: null, winner,
       ev: ev.map(({ side, ...e }) => ({ ...e, tid: side === 'A' ? attacker.id : defender.id })) };
   },
-});
+}, { clubs: false, territoryOf: rosters => ({
+  merged: Object.fromEntries(HOME_NATIONS.map(nation => [nation, '826'])),
+  inactive: Object.keys(NATIONS).filter(nation => !HOME_NATIONS.includes(nation) && !Object.hasOwn(rosters, nation)),
+}) });
 
 /** The men's game: the ATP's players in the Davis Cup. */
 export const tennis = tennisSport({
   id: 'tennis',
   name: 'Tennis',
   blurb: 'Davis Cup ties: four singles and a doubles over two days, first to three rubbers. Every match is best of three sets.',
-  rosters: ROSTERS,
   tour: ATP,
 });
 

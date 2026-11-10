@@ -7,9 +7,10 @@
 // - A crash before that result resumes from a checkpoint that draws and plays the same matches again.
 // - Folding nextAction's queued pair keeps the automatic Match view (DEC D11), as series game 2 and a new blitz round
 //   do (those two still commit before their kickoff: folded, startMatch would read the view before its return to Map).
-// - The tactical gate a Fast-forward turn reaches commits that turn with it. A click between a turn's timer task and
-//   React's commit (a save that stores the spent random state, or Next match drawing again) keeps the kickoff after it
-//   a checkpoint: the last checkpoint no longer replays it.
+// - The tactical gate a Fast-forward turn reaches commits that turn with it.
+// - A write between a timer task that draws and React's commit (a page hidden or closed, a click that saves) holds the
+//   random state the committed state was drawn with, not the one the timer task left (committedRngState): a crash
+//   right after it, or after the kickoff that follows, resumes the same campaign.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import React from 'react';
@@ -363,9 +364,9 @@ test('the tactical gate a Fast-forward turn reaches commits with that turn, in o
 
 test('a click between a turn\'s timer task and React\'s commit: a crash after the kickoff still resumes to that kickoff', async () => {
   // A sync click renders before the turn a timer task queued, on the settled match. A Chronicle pick saves that match
-  // with the random state the turn already spent; Next match draws again, so two turns' samples are spent. Either way
-  // the last checkpoint no longer replays what kicks off, so the kickoff must be written at once. (A crash in the gap
-  // itself still resumes from the spent random state, and the second draw is a race of its own: known issues on HEAD.)
+  // with the random state the turn started from, and Next match starts no second turn (nextAction's guard): either
+  // way a crash after the kickoff resumes to the match that was on screen. (A crash right after the write itself: the
+  // last test here.)
   const App = await bundleApp();
   const clicks = {
     'a save': app => app.setState({ selectedHistoryId: app.state.history.at(-1).id }, () => app.persist()),
@@ -431,5 +432,60 @@ test('a second turn start before React commits the first draws nothing: the seed
     }
     assert.equal(runs[2].drawn, runs[1].drawn, 'the second start took no samples');
     assert.equal(runs[2].played, runs[1].played, 'and the campaign plays on exactly as from one start');
+  });
+});
+
+test('a write between a turn\'s timer task and React\'s commit stores that commit\'s random state: a crash right after it resumes the same campaign', async () => {
+  // A timer task that takes random samples (a turn's draw, or the kickoff a locked compass waits for) queues the state
+  // they decide, and React commits it in a later task. A write in between holds the state React has committed: a page
+  // hidden or closed then (flushProgress writes the locked needle), or a click that saves (a Chronicle pick: React
+  // commits the click's own update before the turn, on the settled match). It must hold the random state that state
+  // was drawn with, not the one the timer task left: a campaign resumed from it draws or plays another match.
+  const App = await bundleApp();
+  const cases = [
+    { label: 'a closing page while a locked compass kicks off', settings: { express: false },
+      waiting: st => st.spin?.stage === 'locked', write: app => app.handlePageHide() },
+    { label: 'a Chronicle pick while a fast-forwarded turn draws', settings: {},
+      waiting: st => !!st.match?.applied && !st.spin,
+      write: app => flushSync(() => app.setState({ selectedHistoryId: app.state.history.at(-1).id }, () => app.persist())) },
+  ];
+  const until = 6;
+  await realReact(async env => {
+    for (const { label, settings, waiting, write } of cases) {
+      const f = await mountCampaign(env, App, { storage: memoryStorage(), settings });
+      f.app.persist();
+      assert.ok(await f.playUntil(settledAt(until)), `${label}: the uninterrupted run`);
+      const reference = played(f.app);
+      f.close();
+
+      const storage = memoryStorage();
+      const g = await mountCampaign(env, App, { storage, settings });
+      g.app.persist();
+      assert.ok(await g.playUntil(settledAt(2)), `${label}: two matches settle`);
+      // Timer tasks one at a time, until one takes random samples while the committed state still waits for them.
+      let committed = null;
+      for (let i = 0; i < 2000 && committed == null; i++) {
+        const rng = g.app.rng.getState(), wait = waiting(g.app.state);
+        if (!g.time.step()) { if (!g.app.state.autoplay) g.app.togglePlay(); await reactTasks(); continue; }
+        if (wait && g.app.rng.getState() !== rng) committed = rng;
+        else await reactTasks();
+      }
+      assert.ok(committed != null, `${label}: a timer task took random samples`);
+      const writes = storage.saves.length;
+      write(g.app);
+      assert.equal(storage.saves.length, writes + 1, `${label}: one write`);
+      assert.equal(storage.saves.at(-1).rngState, committed, `${label}: with the random state the committed state was drawn with`);
+      g.close(); // the tab dies before React commits the turn: nothing more is written
+      assert.equal(storage.saves.length, writes + 1);
+
+      const h = await mountCampaign(env, App, { storage, settings });
+      h.app.saved = loadSave();
+      h.app.resume();
+      await reactTasks();
+      h.app.setSpeed(4);
+      assert.ok(await h.playUntil(settledAt(until)), `${label}: the resumed run`);
+      assert.equal(played(h.app), reference, `${label}: the resumed campaign plays the same matches and random state`);
+      h.close();
+    }
   });
 });

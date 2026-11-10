@@ -3,6 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "imports": {
+    "#sport-data": {
+      "browser": "./src/sports/sportData.lazy.js",
+      "default": "./src/sports/sportData.eager.js"
+    }
+  },
   "scripts": {
     "test": "node scripts/test.mjs",
     "test:experience": "node --test scripts/campaign-experience.test.mjs",

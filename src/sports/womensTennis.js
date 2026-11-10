@@ -1,4 +1,3 @@
-import { ROSTERS } from '../data/rosters.womens-tennis.js';
 import { tennisSport, WTA } from './tennis.js';
 
 /**
@@ -11,6 +10,5 @@ export const womensTennis = tennisSport({
   id: 'womens-tennis',
   name: "Women's tennis",
   blurb: 'Billie Jean King Cup ties: four singles and a doubles over two days, first to three rubbers. Every match is best of three sets.',
-  rosters: ROSTERS,
   tour: WTA,
 });

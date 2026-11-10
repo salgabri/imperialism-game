@@ -140,9 +140,10 @@ The production build installs as an app (Chrome's install button, or Share › A
 to Home Screen on an iPhone) and plays offline. `npm run build` writes
 `manifest.webmanifest` and a service worker, `sw.js`, which
 [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) builds from `src/pwa.js`.
-The worker precaches only the app shell, under 3 MB: `index.html`, the hashed
-bundle in `assets/`, the Archivo fonts and the two world maps. Everything else in
-`public/` (about 100 MB) is cached the first time the game uses it. Seasons and
+The worker precaches only the app shell, about 3.5 MB: `index.html`, the hashed
+bundle in `assets/` (every sport's players among it), the Archivo fonts and the
+two world maps. Everything else in `public/` (about 100 MB) is cached the first
+time the game uses it. Seasons and
 country maps come from the network while online, so they always match the
 deployed build, and from the cache offline. Flags and crests show from the cache
 at once and refresh in the background. Starting or resuming a campaign online
@@ -156,12 +157,21 @@ plus every country whose map was opened online. A country never opened online
 fails to load, with **Retry**, and a flag or crest the game has neither shown
 nor kept for a campaign online stays blank.
 
+The first download holds the game and football's players, the default setup's.
+Every other sport's players are a file of their own (4 to 43 KB compressed),
+loaded the first time that sport is picked, a challenge link names it, or a saved
+or imported campaign of it opens. Until they arrive, the sport's card shows as
+picked and setup holds its next steps and Launch; picking another sport first
+drops the wait. Players that fail to load say so, with **Retry** and **Reload**.
+
 A new version never reloads the page by itself. Its worker downloads in the
 background and waits, and a **New version ready** panel offers **Reload** or
 **Later**. Reload writes the open campaign's checkpoint, as closing the page
 does, and reloads that tab only. Other tabs keep the version they loaded until
-they reload. Later hides the panel for that page; closing every tab also
-updates. The page looks for a new version every hour and when you return to it.
+they reload, all but the players of a sport they have not loaded yet: the new
+version has replaced those files, so picking that sport there fails until
+**Reload**. Later hides the panel for that page; closing every tab also updates.
+The page looks for a new version every hour and when you return to it.
 
 ### Network requests
 

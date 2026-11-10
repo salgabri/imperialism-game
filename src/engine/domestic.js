@@ -8,6 +8,7 @@ import { createLand, touchingLand } from './claims.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 import { NATIONS } from '../data/teams.js';
 import { SPORTS } from '../sports/index.js';
+import { loadSportData, sportDataLoaded } from '../sports/sportData.js';
 
 export const DOMESTIC_PREFIX = 'domestic:';
 // The format the build writes. Format 1 (one section per club) still loads, so
@@ -106,6 +107,16 @@ export function loadDomestic(id, { baseUrl = '/', fetch: fetchImpl = globalThis.
       data = await res.json();
     } catch (e) {
       throw new Error(`Domestic map ${key} is not valid JSON: ${(e && e.message) || e}`);
+    }
+    // A sport's own map is checked against that sport's clubs, so their players load first. Only a loaded sport's maps
+    // are asked for (src/sports/sportData.js): in play this waits for nothing.
+    const sport = data?.sport;
+    if (sport != null && Object.hasOwn(SPORTS, sport) && !sportDataLoaded(sport)) {
+      try {
+        await loadSportData(sport);
+      } catch (e) {
+        throw new Error(`Domestic map ${key} could not be checked: the ${SPORTS[sport].name} players failed to load (${(e && e.message) || e})`);
+      }
     }
     entry.value = decodeDomestic(data, key);
     if (cache.get(key) === entry) {
