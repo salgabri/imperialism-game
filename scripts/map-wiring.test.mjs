@@ -3,7 +3,9 @@
 // (DEC D15), the dashed target preview and hover (C-18), tooltip copy, conquest framing reset, render purity (§0.9).
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { setTimeout as delay } from 'node:timers/promises';
 import { MAP, V4 } from '../src/theme.js';
+import { flagRegionIndexSteps } from '../src/engine/flagRegions.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { bundleApp, syncAppFixture, findElement } from './lib/app-harness.mjs';
 
@@ -160,6 +162,79 @@ test('a fit keeps only the flag region source: the first Flags view builds the i
     assert.deepEqual(app.flagRegionSource, { geometry: app.labelGeometry, maxGap: 180 });
     assert.equal(countryOf(app, '250').flagParts[0].d, 'M80,80L120,80L120,120L80,120Z');
     assert.ok(app.flagComponents && app.flagComponents !== index, 'the country fit builds its own index on a Flags view');
+  } finally { f.close(); }
+});
+
+/**
+ * Lets the Flags warm-up run: its quiet turns wait out real time since the commit that queued it (quietTurns.js) and
+ * then the fixture's timers, so this lets both pass until `done()` holds (or 3 s).
+ */
+async function warmUp(f, done) {
+  for (const end = performance.now() + 3000; !done() && performance.now() < end;) {
+    await delay(20);
+    f.time.advance(100);
+    for (let i = 0; i < 5; i++) await new Promise(resolve => setImmediate(resolve));
+  }
+  assert.ok(done(), 'the warm-up ran');
+}
+
+test('the warm-up makes Flags mode\'s first view ahead, in quiet turns, while the map shows another mode', async () => {
+  const f = fixture();
+  try {
+    const { app } = f;
+    app.geo.fitTo = () => {};
+    App.prototype.fitMap.call(app, IDS);
+    app.setState({ hoverCid: '276' });
+    assert.equal(app.flagComponents, null, 'nothing within the commit that queued it');
+    await warmUp(f, () => app.flagLayoutCache);
+    const made = app.flagLayoutCache.result;
+    assert.ok(app.flagComponents, 'the region index');
+    assert.equal(app.state.mapMode, 'political', 'the map itself is untouched');
+    app.setState({ mapMode: 'flags' });
+    assert.equal(app.mapFlags(true), made, 'the first Flags view takes the banners it made');
+    assert.deepEqual(countryOf(app, '250').flagParts, [{ id: '250-250-0', d: 'M80,80L120,80L120,120L80,120Z' }]);
+    // A conquest while the map shows Flags is the view's own work, never the warm-up's.
+    app.setState({ own: { ...app.state.own, 276: '250' } });
+    assert.equal(app.flagWarmup.running, false);
+  } finally { f.close(); }
+});
+
+test('a warm-up that fails leaves its fit to the Flags view and does not try that fit again', async () => {
+  const f = fixture();
+  try {
+    const { app } = f;
+    app.geo.fitTo = () => {};
+    App.prototype.fitMap.call(app, IDS);
+    const source = app.flagRegionSource;
+    app.flagRegionSource = { ...source, geometry: null }; // nothing an index can be built from
+    app.setState({ hoverCid: '276' });
+    await warmUp(f, () => app.flagWarmup?.failedOn === app.flagRegionSource);
+    assert.equal(app.flagComponents, null);
+    app.setState({ hoverCid: '250' });
+    assert.equal(app.flagWarmup.running, false, 'not started again on that fit');
+    assert.equal(app.flagWarmup.timer, null);
+  } finally { f.close(); }
+});
+
+test('a Flags view while the warm-up builds the index finishes that build instead of starting it over', () => {
+  const f = fixture();
+  try {
+    const { app } = f;
+    app.geo.fitTo = () => {};
+    App.prototype.fitMap.call(app, IDS);
+    const source = app.flagRegionSource;
+    const steps = flagRegionIndexSteps(source.geometry, { maxGap: source.maxGap });
+    steps.next();
+    app.flagIndexBuild = { source, steps };
+    app.setState({ mapMode: 'flags' });
+    assert.equal(countryOf(app, '250').flagParts[0].d, 'M80,80L120,80L120,120L80,120Z');
+    assert.equal(app.flagIndexBuild, null);
+    assert.equal(steps.next().done, true, 'its build ran to the end');
+    // A new fit drops a build of the old one.
+    app.flagIndexBuild = { source, steps: flagRegionIndexSteps(source.geometry, { maxGap: source.maxGap }) };
+    app.geo.paths = { ...app.geo.paths };
+    App.prototype.fitMap.call(app, IDS);
+    assert.equal(app.flagIndexBuild, null);
   } finally { f.close(); }
 });
 

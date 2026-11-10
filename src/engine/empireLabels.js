@@ -1267,10 +1267,34 @@ function strictComponentLabel(component, definition, options, previous, accepts)
  * read-only; unchanged ownership returns the same array and component objects.
  */
 export function createTerritoryComponentIndex(countryShapes = []) {
-  const countries = countryShapes.map(makeCountry).filter(Boolean).sort((a, b) => a.id.localeCompare(b.id));
+  const steps = territoryComponentIndexSteps(countryShapes);
+  for (;;) {
+    const { done, value } = steps.next();
+    if (done) return value;
+  }
+}
+
+/**
+ * createTerritoryComponentIndex a little at a time, for building it between other work (Flags mode's warm-up,
+ * app/mapMethods.jsx): a generator that yields after every `every` shapes it reads and once before it is done, its
+ * value then the same index.
+ */
+export function* territoryComponentIndexSteps(countryShapes = [], { every = 16 } = {}) {
+  const countries = [];
+  for (let i = 0; i < countryShapes.length; i++) {
+    const country = makeCountry(countryShapes[i]);
+    if (country) countries.push(country);
+    if ((i + 1) % every === 0) yield;
+  }
+  countries.sort((a, b) => a.id.localeCompare(b.id));
   // Point ids let ownerComponents join pieces at shared vertices by number rather than by "x,y" strings: the same
   // joins in the same order. The components' exterior edges are never read here, so they are never found.
   assignPointIds(countries);
+  yield;
+  return territoryComponentIndex(countries);
+}
+
+function territoryComponentIndex(countries) {
   let lastKey = null, lastComponents = [];
   return {
     /** Land pieces, how many carry point ids, and the distinct points (diagnostics and tests; see the label engine's). */

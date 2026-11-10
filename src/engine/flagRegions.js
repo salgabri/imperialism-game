@@ -1,4 +1,4 @@
-import { createTerritoryComponentIndex } from './empireLabels.js';
+import { territoryComponentIndexSteps } from './empireLabels.js';
 
 // A fixed geographic display rule, independent of camera zoom. Nearby islands
 // share their owner's regional flag instead of repeating a complete flag on
@@ -119,13 +119,20 @@ function coastsWithinGap(first, second, gapSquared) {
   return false;
 }
 
-function makeProximityGraph(nodes, maxGap, coastTree) {
+// The proximity graph's steps: this many nodes' coast trees, or nodes tested against their neighbours, per step.
+const GRAPH_STEP = 64;
+
+function* proximityGraphSteps(nodes, maxGap, coastTree) {
   const neighbors = Array.from({ length: nodes.length }, () => []);
   if (!nodes.length) return neighbors;
   const bounds = combineBounds(nodes.map(node => node.bbox));
   const cellSize = Math.max(maxGap * 4, Math.max(bounds.w, bounds.h) / 128, 0.001);
   const grid = new Map();
-  const trees = nodes.map(node => coastTree(node.parts));
+  const trees = [];
+  for (let i = 0; i < nodes.length; i++) {
+    trees.push(coastTree(nodes[i].parts));
+    if ((i + 1) % GRAPH_STEP === 0) yield;
+  }
   const gapSquared = maxGap * maxGap;
   const gridRange = (bbox, padding = 0) => ({
     x0: Math.floor((bbox.x - padding) / cellSize), x1: Math.floor((bbox.x + bbox.w + padding) / cellSize),
@@ -148,6 +155,7 @@ function makeProximityGraph(nodes, maxGap, coastTree) {
       if (!grid.has(key)) grid.set(key, []);
       grid.get(key).push(i);
     }
+    if ((i + 1) % GRAPH_STEP === 0) yield;
   }
   // The spatial grid and coastline trees are build-time-only. Per-frame work
   // retains just this small graph, native rings and the current ownership result.
@@ -176,11 +184,29 @@ function makeProximityGraph(nodes, maxGap, coastTree) {
  * same coasts (the median-split tree it replaced, one all-pairs leaf) and
  * expect the same regions; the app always uses makeCoastTree.
  */
-export function createFlagRegionIndex(countryShapes = [], { maxGap = 0, coastTree = makeCoastTree } = {}) {
+export function createFlagRegionIndex(countryShapes = [], options = {}) {
+  const steps = flagRegionIndexSteps(countryShapes, options);
+  for (;;) {
+    const { done, value } = steps.next();
+    if (done) return value;
+  }
+}
+
+/**
+ * createFlagRegionIndex a little at a time, for building it between other work (Flags mode's warm-up,
+ * app/mapMethods.jsx): a generator that yields between steps of a few milliseconds, its value when done the same index.
+ */
+export function* flagRegionIndexSteps(countryShapes = [], { maxGap = 0, coastTree = makeCoastTree } = {}) {
   const gap = Number.isFinite(maxGap) ? Math.max(0, maxGap) : 0;
   const nativeOwnership = Object.fromEntries(countryShapes.map(shape => [String(shape.id), String(shape.id)]));
-  const nodes = createTerritoryComponentIndex(countryShapes).components(nativeOwnership);
-  const neighbors = makeProximityGraph(nodes, gap, coastTree);
+  const territories = yield* territoryComponentIndexSteps(countryShapes);
+  const nodes = territories.components(nativeOwnership);
+  yield;
+  const neighbors = yield* proximityGraphSteps(nodes, gap, coastTree);
+  return regionIndex(nodes, neighbors);
+}
+
+function regionIndex(nodes, neighbors) {
   let lastKey = null, lastComponents = [];
   return {
     components(ownership = {}) {

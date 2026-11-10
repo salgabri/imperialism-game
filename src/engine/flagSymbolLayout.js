@@ -338,8 +338,11 @@ export function layoutFlagSymbol(component, profile) {
     if (value !== undefined && (!Number.isFinite(value) || value <= 0)) return null;
   }
   let cached = CACHE.get(component);
-  if (!cached) { cached = { geometry: prepare(component), profiles: new Map() }; CACHE.set(component, cached); }
+  if (!cached) { cached = new Map(); CACHE.set(component, cached); }
   const key = [n.x, n.y, n.w, n.h, profile.sourceWidth, profile.sourceHeight, profile.fieldConstraints?.maxWidthRatio, profile.fieldConstraints?.maxHeightRatio].join(',');
-  if (!cached.profiles.has(key)) cached.profiles.set(key, fit(cached.geometry, profile));
-  return cached.profiles.get(key);
+  // Only the layouts are kept, not the edges prepare() files to make them: a region flies one owner's flag, so its
+  // layout is asked for one emblem, and those edges held 3 MB on a World War board that Flags mode never showed
+  // (its warm-up lays out every region before the first view, app/mapMethods.jsx).
+  if (!cached.has(key)) cached.set(key, fit(prepare(component), profile));
+  return cached.get(key);
 }

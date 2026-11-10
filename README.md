@@ -2145,6 +2145,14 @@ either way. The first banner to ask opens the encoder's connection to the GPU
 process with one pixel, while the click is still being handled: opened at the
 first flag's draw, it waited for the GPU to finish rastering the whole map.
 
+Switching to Flags is quick because what its first view needs is made
+beforehand: the regions, each region's emblem placement and outlines are built
+while the map shows another mode, in steps of a few milliseconds when the page
+is idle and nobody has pressed, scrolled or dragged for 200 ms, and they follow
+the board as it changes, at most every two seconds. The click then only draws
+the map; switching before that work is done finishes it rather than starting
+over.
+
 Run `npm run test:flag-regions` for coastal grouping and island-display
 regressions, and `npm run test:territories` for the underlying exact landmass,
 overseas, winding, date-line and geometry-cache regressions.

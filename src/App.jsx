@@ -315,6 +315,7 @@ export default class App extends React.Component {
 
   componentWillUnmount() {
     this.clearTimers();
+    this.stopFlagWarmup();
     clearTimeout(this.confirmTimer);
     clearTimeout(this.setupLoadTimer);
     clearTimeout(this.setupSetTimer);
@@ -366,6 +367,8 @@ export default class App extends React.Component {
     if (previous && ((previous.choice && !this.state.choice) || (previous.pendingTarget && !this.state.pendingTarget))) this.focusRescue = true;
     if (this.focusRescue) this.rescueFocus();
     if (this.challengeTeam != null && this.state.phase === 'setup') this.settleChallengeTeam();
+    // Flags mode's first view, made ahead while the map shows another mode (mapMethods.jsx).
+    this.queueFlagWarmup();
   }
 
   /**
@@ -683,9 +686,11 @@ export default class App extends React.Component {
         rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
       }));
       this.flagLayoutCache = null;
-      // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. mapFlags builds
-      // that index from its source on the first Flags view: most games never show one.
+      // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. Its index is
+      // built from this source in quiet moments while the campaign map shows another mode (the Flags warm-up,
+      // mapMethods.jsx), or by the first Flags view if that comes first; never within the fit itself.
       this.flagComponents = null;
+      this.flagIndexBuild = null;
       this.flagRegionSource = { geometry: this.labelGeometry, maxGap: FLAG_REGION_GAP_KM / this.geo.kmPerUnit };
     }
     this.viewFocus = null;
@@ -2497,6 +2502,8 @@ export default class App extends React.Component {
   // ---------- derived view models ----------
 
   mapFlags(...args) { return mapM.mapFlags.apply(this, args); }
+  queueFlagWarmup(...args) { return mapM.queueFlagWarmup.apply(this, args); }
+  stopFlagWarmup(...args) { return mapM.stopFlagWarmup.apply(this, args); }
 
   setupMapFlags(...args) { return mapM.setupMapFlags.apply(this, args); }
 
