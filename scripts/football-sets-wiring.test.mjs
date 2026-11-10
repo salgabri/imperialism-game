@@ -136,9 +136,10 @@ async function pickSeason(document, id) {
 /** The built-in earlier seasons' names: "2025/26" … "1961/62", without their source. */
 const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
 /** The Season dropdown's names for them: a season with two sets (1993/94 and 1989/90: a fan's database and a computed
- * World Cup) names each one's source, and a computed World Cup of a season of its own says so ("1969/70 · computed"). */
+ * World Cup) names each one's source, and a computed or fan-made season of its own says so ("1969/70 · computed",
+ * "2003/04 · fan-made"). */
 const EARLIER_NAMES = BUILT_IN_SEASONS.map(set => (BUILT_IN_SEASONS.filter(other => other.season === set.season).length > 1
-  ? `${set.season} · ${set.label}` : set.id.startsWith('wc-') ? `${set.season} · computed` : set.season));
+  ? `${set.season} · ${set.label}` : seasonTagOf(set.label) ? `${set.season} · ${seasonTagOf(set.label)}` : set.season));
 
 // ---------- setup ----------
 
