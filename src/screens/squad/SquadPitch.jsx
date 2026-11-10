@@ -65,7 +65,7 @@ export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side'
       </>}
       {slots.map(slot => (
         <div key={slot.key} className={`pitch__player${slot.claimed ? ' is-claimed' : ''}${slot.estimated ? ' is-estimated' : ''}`} style={{ left: slot.x, top: slot.y }}
-          title={slot.estimated ? `${slot.fullName || slot.name}. ${ESTIMATE_TITLE}` : slot.fullName || slot.name}>
+          title={slot.estimated ? `${slot.fullName || slot.name}. ${slot.estimateTitle || ESTIMATE_TITLE}` : slot.fullName || slot.name}>
           <span className="pitch__dot">{slot.rating}</span>
           <span className="pitch__name">{slot.name}</span>
           {slot.estimated && <span className="sr-only"> (estimated rating)</span>}

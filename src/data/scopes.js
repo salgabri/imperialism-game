@@ -17,6 +17,7 @@ const nationTheatreCache = new WeakMap();
  * A sport's nation theatres (a sport object: a season's once it has loaded). A sport is offered where it is played.
  * The world is always offered, whole. A continent needs MIN_REAL_SIDES of its nations to field a real side, so none is
  * empty, one team's walkover or a field of generated players (rugby league in Africa); the Elite 32 needs 32 real sides.
+ * A competition of one sport (`sports`: basketball's EuroBasket) is offered in that sport only, by the same rule.
  * `fallback` stands in for a theatre the sport lacks: its heartland, the offered continent with the most real sides
  * (the first in SCOPES's order of equals), else the world. Campaigns already launched keep theirs: SCOPES names them all.
  */
@@ -24,10 +25,10 @@ function theatresOf(sport) {
   if (!nationTheatreCache.has(sport)) {
     // Only nations with a real side field a team.
     const real = fieldedNations(sport);
-    const sides = scope => real.filter(id => scope.filter({ conf: NATIONS[id][2] })).length;
-    const offered = Object.freeze(SCOPES.filter(scope => scope.id === 'world'
-      || (scope.id === 'elite' ? real.length >= ELITE_NATIONS : sides(scope) >= MIN_REAL_SIDES)));
-    const heartland = offered.filter(scope => scope.id !== 'world' && scope.id !== 'elite')
+    const sides = scope => real.filter(id => scope.filter({ id, conf: NATIONS[id][2] })).length;
+    const offered = Object.freeze(SCOPES.filter(scope => (!scope.sports || scope.sports.includes(sport?.id)) && (scope.id === 'world'
+      || (scope.id === 'elite' ? real.length >= ELITE_NATIONS : sides(scope) >= MIN_REAL_SIDES))));
+    const heartland = offered.filter(scope => scope.id !== 'world' && scope.id !== 'elite' && !scope.sports)
       .reduce((best, scope) => (!best || sides(scope) > sides(best) ? scope : best), null);
     nationTheatreCache.set(sport, { offered, fallback: heartland || offered[0] });
   }

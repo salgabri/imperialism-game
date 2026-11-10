@@ -63,6 +63,8 @@ const TOWNS = {
 test('the index lists a built-in pair of maps and one for each earlier season with clubs, each file as its entry says', () => {
   const seasons = [null, ...CLUB_SEASONS.map(season => season.id)];
   assert.equal(FOOTBALL_MAPS.length, seasons.length * 2);
+  // Basketball's EuroLeague (scripts/euroleague.test.mjs) is the one map of Europe with no theatre of its own.
+  assert.deepEqual(EUROPE_MAPS.filter(entry => !entry.theatre).map(entry => [entry.id, entry.sport, entry.league]), [['euroleague', 'basketball', 'EuroLeague']]);
   for (const season of seasons) {
     assert.deepEqual(europeMapsOf(season).map(map => [map.league, map.clubs, map.theatre]),
       [[`Top ${TOP_CLUBS}`, TOP_CLUBS, 'all'], [`Elite ${ELITE_CLUBS}`, ELITE_CLUBS, 'elite']], String(season));

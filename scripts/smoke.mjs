@@ -25,6 +25,8 @@ const ENGLAND = { layer: 'clubs', clubScope: 'domestic:826' };
 const FIJI = { layer: 'clubs', clubScope: 'domestic:242' };
 // Basketball clubs: the 30 NBA franchises on their own map of the USA and Canada.
 const NBA = { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nba' };
+// And the EuroLeague's 20 clubs on their map of Europe, under the EuroLeague's rules.
+const EUROLEAGUE = { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:euroleague' };
 // American football: the 32 NFL franchises on their own map of the USA, clubs only.
 const NFL = { sport: 'american-football', layer: 'clubs', clubScope: 'domestic:nfl' };
 // Baseball clubs: the 30 MLB clubs on their own map of the USA and Canada.
@@ -47,6 +49,8 @@ const SCENARIOS = [
   { name: 'CLUBS · Elite 32 · blitz · instant', ...ELITE, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Top 124 · duel · ticker', ...TOP, pacing: 'duel', resolution: 'ticker' },
   { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
+  { name: 'CLUBS · EuroLeague · duel · ticker', ...EUROLEAGUE, pacing: 'duel', resolution: 'ticker' },
+  { name: 'BASKETBALL · EuroBasket · duel · instant', sport: 'basketball', scope: 'eurobasket', pacing: 'duel', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', setupChecks: true },
   { name: 'DOMESTIC · England top clubs · blitz · instant', ...ENGLAND, pacing: 'blitz', resolution: 'instant' },
   { name: 'DOMESTIC · Fiji top clubs · duel · instant', ...FIJI, pacing: 'duel', resolution: 'instant' },
@@ -69,6 +73,7 @@ const RESUME_SCENARIOS = [
   { name: 'BASKETBALL · N. & C. America · blitz · instant', sport: 'basketball', scope: 'CONCACAF', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · Elite 32 · blitz · instant', ...ELITE, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NBA · chaos · instant', ...NBA, pacing: 'chaos', resolution: 'instant' },
+  { name: 'CLUBS · EuroLeague · blitz · instant', ...EUROLEAGUE, pacing: 'blitz', resolution: 'instant' },
   { name: 'DOMESTIC · England top clubs · duel · instant', ...ENGLAND, pacing: 'duel', resolution: 'instant', finish: true },
   { name: 'DOMESTIC · Fiji top clubs · chaos · instant', ...FIJI, pacing: 'chaos', resolution: 'instant', finish: true },
   { name: 'CLUBS · NFL · blitz · instant', ...NFL, pacing: 'blitz', resolution: 'instant' },
@@ -265,7 +270,7 @@ function checkMapScope(label, snapshot, options) {
 
 /**
  * Football clubs offer every shipped country, grouped apart from the leagues; women's football clubs Europe's two maps
- * and the NWSL's; basketball clubs only the NBA's map, American football (clubs only) the NFL's, baseball clubs MLB's,
+ * and the NWSL's; basketball clubs the NBA's map and the EuroLeague's, American football (clubs only) the NFL's, baseball clubs MLB's,
  * hockey clubs the NHL's and rugby league clubs the NRL's.
  */
 function checkTheatres(scenario, theatre) {
@@ -297,8 +302,8 @@ function checkTheatres(scenario, theatre) {
     return;
   }
   if (scenario.layer === 'clubs' && scenario.sport === 'basketball') {
-    check('basketball clubs play only the NBA’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:nba', text: 'NBA · 30 clubs' }]),
-      JSON.stringify(theatre.options));
+    check('basketball clubs play the NBA’s own map and the EuroLeague’s', JSON.stringify(theatre.options) === JSON.stringify([
+      { value: 'domestic:nba', text: 'NBA · 30 clubs' }, { value: 'domestic:euroleague', text: 'EuroLeague · 20 clubs' }]), JSON.stringify(theatre.options));
     return;
   }
   if (scenario.layer !== 'clubs' || (scenario.sport || 'football') !== 'football') {
@@ -329,7 +334,7 @@ function checkDomesticSetup(setup, full) {
     check('Retry loads the map', setup.retryLoaded);
     check('a session preset keeps the chosen country', setup.presetKeepsCountry);
     check('a session preset keeps the managed club of that country', setup.presetKeepsClub);
-    check('switching to basketball swaps the country for the NBA’s own map', setup.basketballResets);
+    check('switching to basketball swaps the country for the NBA’s own map, beside the EuroLeague’s', setup.basketballResets);
   }
   check('the setup map shows exactly the country’s sections', setup.sectionsShown);
   check('setup previews each section in its starting club’s kickoff colour (Political pastel, Flags club colour)', setup.setupColours,
