@@ -927,6 +927,24 @@ Sox's, Yankee Stadium the Yankees', Citi Field the Mets' and Ottawa the Blue Jay
 seeded duel campaigns reach a champion; the App launches on the map. The smoke runs
 an MLB duel and an MLB resume.
 
+**Era maps, 1960–2017** (2026-11-09; [baseball.md](baseball.md#seasons-before-2018-computed-from-war)):
+37 more maps, `mlb1960` to `mlb2017`, for the seasons computed from WAR, built from the
+franchise eras of `scripts/data/mlb-war-seasons.json` by the same partition. Each club
+holds its ballpark's state or province, the ballpark being the one it played most of its
+home games in (the Baseball Databank's HomeGames, from Retrosheet's game logs; each map's
+attribution credits both). A map serves consecutive seasons with the same clubs,
+named alike, in the same places: a ballpark renamed in place keeps its map (named as its
+first season knew it), and the map builder now checks every MLB era, MLB The Show's
+included, by that rule (`[id, name, territory, base, point]`); mlb2018 to mlb2025 rebuild
+byte for byte. Two clubs that shared a ballpark (the Angels at Dodger Stadium in
+1962–65, the Yankees at Shea Stadium in 1974–75) cannot share out one county, so the
+tenant grows from its own previous ballpark (`base`, as the NFL's shared stadiums grow
+from training grounds): Wrigley Field, Los Angeles, and Yankee Stadium. Los Angeles
+County is cut between the Dodgers and the Angels in 1961–65, the Polo Grounds Mets' part
+of New York State is "Manhattan" in 1962–63, beside the Yankees' Bronx, and before the
+Expos of 1969 Canada's provinces are all empty. `scripts/club-maps.test.mjs` holds every
+one to the rule; 2017 has its own map (2018's clubs and places), so mlb2018 is unchanged.
+
 ## The NHL map
 
 Status: implemented 2026-11-07. Ice hockey clubs ([hockey.md](hockey.md)) have one theatre,

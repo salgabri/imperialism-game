@@ -1508,7 +1508,7 @@ season's own three strongest clubs once it has loaded.
 
 ## Earlier baseball seasons
 
-Baseball has eight earlier seasons, 2018 to 2025, one per MLB The Show edition (18
+Baseball has eight earlier seasons from MLB The Show, 2018 to 2025, one per edition (18
 to 25): 2021 to 2025 read from each edition's own public API, 2018 to 2020 from the
 fan site ShowZone's copies of Sony's cards (docs/design/baseball.md); the built-in
 2026 is MLB The Show 26's. Each plays on its era's map (`mlb2018`, `mlb2019`,
@@ -1520,6 +1520,14 @@ each `[name, 'SS/2B', rating]`, on its era's map (`mlb2021`, `mlb2022` for 2022â
 `mlb2025`). A season's `season` is its calendar year ('2024'), not football's
 '2023/24'. The built files, era maps, the Oakland Athletics and the edition whose
 birthplaces are wrong are described in [baseball.md](baseball.md#earlier-seasons).
+
+Before them come 58 seasons, 1960 to 2017 (`mlb-war-<year>`, the same `kind: 'show'`,
+since 2026-11-09), which no game rated: each player's rating is computed from his WAR
+and put on MLB The Show 18 to 24's scale rank for rank within his role. Their source
+block says so (`computed: true`, `method`, `conversion`, `rawScale: 'WAR'`, which the
+loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
+<year>", and they play on 37 era maps of their own (`mlb1960` to `mlb2017`). See
+[baseball.md](baseball.md#seasons-before-2018-computed-from-war).
 
 ## Runtime
 

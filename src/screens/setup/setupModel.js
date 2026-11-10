@@ -366,7 +366,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
     + 'overall ours. NFL clubs only: the franchises of that season, on the map of their day.',
   baseball: 'MLB The Show ratings of each season, at its last roster update (2026: 2 October; 2018–2020 as the fan site '
-    + 'ShowZone keeps them). Nations field the players born there, where they hold at least half the lineup; clubs play on '
+    + 'ShowZone keeps them). 1960–2017 are computed: each player\'s WAR (Baseball-Reference\'s and FanGraphs\', averaged) '
+    + 'put on The Show\'s scale. Nations field the players born there, where they hold at least half the lineup; clubs play on '
     + 'the map of their day, the Athletics in '
     + 'Oakland until 2024.',
   'womens-tennis': 'Elo ratings of the WTA\'s women: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; '

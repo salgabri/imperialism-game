@@ -61,7 +61,8 @@ let lastFetch = 0;
 async function download(file, url) {
   await sleep(Math.max(0, lastFetch + PAUSE_MS - Date.now()));
   lastFetch = Date.now();
-  const response = await fetch(url, { headers: { 'user-agent': 'imperialism-game data sync (low rate; github.com/salgabri/imperialism-game)' },
+  // A generic agent: no address, account or other personal data goes out with a request.
+  const response = await fetch(url, { headers: { 'user-agent': 'imperialism-game-data/1.0' },
     signal: AbortSignal.timeout(60000) });
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
   const at = path.join(cacheDir, file);
