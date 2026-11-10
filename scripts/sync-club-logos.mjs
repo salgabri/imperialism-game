@@ -3,11 +3,15 @@
 // a nation shows its flag; a club without one keeps its monogram chip.
 //
 // Usage:
-//   node scripts/sync-club-logos.mjs [--refresh]
-//     --refresh  ask Wikidata and Wikipedia again (downloaded images stay cached)
+//   node scripts/sync-club-logos.mjs [--refresh] [--pin]
+//     --refresh  ask Wikidata again (downloaded images stay cached; Wikipedia's answers are never asked again)
+//     --pin      record the SHA-256 of every Wikipedia answer the run reads in scripts/data/club-logos-wikipedia.json
 //
-// Sources (cached under the gitignored data-src/club-logos/, so reruns are offline):
-//   - Each club's Wikidata item (CC0). Domestic clubs reuse the item their home town came
+// Sources (cached under the gitignored data-src/club-logos/, so reruns are offline). Every request goes through
+// scripts/lib/polite-fetch.mjs (one generic User-Agent, robots.txt read first and obeyed):
+//   - Each club's Wikidata item (CC0), by SPARQL from QLever's Wikidata endpoint (scripts/lib/wikidata-sparql.mjs; the
+//     Query Service's robots.txt disallows its /sparql). Each query keeps the Query Service's text, which keys the cache.
+//     Domestic clubs reuse the item their home town came
 //     from (scripts/data/domestic/<nation>.json, location.source "wikidata:Q..", or location.qid); an
 //     all-leagues club takes the item of its domestic twin, the club of its country whose
 //     FM26 squad shares the most players with its EA lineup; NBA, NFL, MLB, NHL and NRL franchises
@@ -19,8 +23,18 @@
 //   - The crest: the lead image of the club's English Wikipedia article (its infobox
 //     crest), else the item's logo image (P154) on Wikimedia Commons. Most crests are
 //     non-free files on English Wikipedia; SOURCES.tsv records each file and its licence.
-//   - The file's 250px thumbnail from upload.wikimedia.org, trimmed and saved as WebP
-//     fitting 128x128.
+//     The lead images and the files' details (thumbnail, licence) are English Wikipedia API
+//     answers, and en.wikipedia.org/w/api.php is disallowed by its robots.txt for every agent
+//     (Wikimedia's REST API under /api/ too; read 2026-11-10), with no allowed source of the
+//     same facts. So they are read only from the cache, and only answers pinned by their SHA-256
+//     in scripts/data/club-logos-wikipedia.json: a run that needs an answer the cache lacks (a
+//     new club, or an article Wikidata now names after --refresh), or one not pinned, stops
+//     before writing anything, and the committed crests stay as they are. None is pinned yet:
+//     a run from the newest cache on hand (2026-11-10) does not give back the committed crests
+//     (89 files and the sources would change), so a run waits for someone to pin a cache, on
+//     purpose, with --pin.
+//   - The file's 250px thumbnail from upload.wikimedia.org (allowed by its robots.txt), trimmed
+//     and saved as WebP fitting 128x128.
 //
 // Writes:
 //   public/club-logos/<club id>.webp   one per club with a crest (an all-leagues club with a
@@ -42,19 +56,23 @@ import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
-import { cachedGz, createLimiter, DATABASE_DATE } from './lib/domestic-sync.mjs';
+import { cachedGz, createLimiter, DATABASE_DATE, readGzJson } from './lib/domestic-sync.mjs';
 import { norm } from './lib/domestic-locate.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
+import { sparqlRequest, WIKIDATA_SPARQL } from './lib/wikidata-sparql.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cacheDir = path.join(root, 'data-src/club-logos');
 const outDir = path.join(root, 'public/club-logos');
 const moduleFile = path.join(root, 'src/data/clubLogos.js');
 const overridesFile = path.join(root, 'scripts/data/club-logos.json');
+const pinsFile = path.join(root, 'scripts/data/club-logos-wikipedia.json');
+const unknown = process.argv.slice(2).filter(arg => arg !== '--refresh' && arg !== '--pin');
+if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
 const refresh = process.argv.includes('--refresh');
+const pinning = process.argv.includes('--pin');
 
-// A generic agent: no address, account or other personal data goes out with a request.
-const USER_AGENT = 'imperialism-game-data/1.0';
-const SPARQL = 'https://query.wikidata.org/sparql';
+// The API the cached Wikipedia answers came from: their cache keys are its request URLs. Never requested now.
 const ENWIKI = 'https://en.wikipedia.org/w/api.php';
 const NBA = 'Q155223', BASKETBALL_TEAM = 'Q13393265';
 const NFL = 'Q1215884', AMERICAN_FOOTBALL_TEAM = 'Q17156793';
@@ -70,6 +88,7 @@ const PHOTO_NAME = /stadi|estadio|arena|\d{4}-\d{2}-\d{2}|photo|foto|kit|jersey|
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sha1 = text => createHash('sha1').update(text).digest('hex');
+const sha256 = text => createHash('sha256').update(text).digest('hex');
 const limit = createLimiter(4, 250);
 // upload.wikimedia.org answers bursts with HTTP 429, so images come two at a time, well spaced.
 const imageLimit = createLimiter(2, 700);
@@ -83,7 +102,8 @@ async function fetchOk(url, init = {}) {
     if (attempt) await sleep(Math.min(60000, 2000 * 2 ** (attempt - 1)));
     if (pausedUntil > Date.now()) await sleep(pausedUntil - Date.now());
     try {
-      const response = await fetch(url, { ...init, headers: { 'User-Agent': USER_AGENT, ...(init.headers || {}) }, signal: AbortSignal.timeout(120000) });
+      // A refusal (robots.txt) is fatal: no retry.
+      const response = await politeFetch(url, { ...init, signal: AbortSignal.timeout(120000) });
       if (response.status === 429) {
         const pause = Math.min(120, Math.max(30, Number(response.headers.get('retry-after')) || 0));
         pausedUntil = Math.max(pausedUntil, Date.now() + pause * 1000);
@@ -105,19 +125,34 @@ const getJson = async (url, init) => {
   try { return JSON.parse(text); } catch { throw new Error(`${url.slice(0, 200)}: not JSON: ${text.slice(0, 120)}`); }
 };
 
-/** Run one SPARQL query, cached by its text. → bindings, each value flattened to a string. */
+/** Run one SPARQL query (the Query Service's text, which keys the cache) on QLever. → bindings, each value a string. */
 async function sparql(query) {
   return cachedGz(path.join(cacheDir, `wikidata-${sha1(query)}.json.gz`), refresh, async () => {
-    const data = await getJson(SPARQL, { method: 'POST', body: 'query=' + encodeURIComponent(query),
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/sparql-results+json' } });
+    const data = await getJson(WIKIDATA_SPARQL, sparqlRequest(query));
     return data.results.bindings.map(row => Object.fromEntries(Object.entries(row).map(([key, cell]) => [key, cell.value])));
   });
 }
 
-/** One English Wikipedia API query (GET parameters), cached. */
+// Each cached Wikipedia answer's SHA-256 (of its JSON), by the SHA-1 of its request URL.
+const pins = existsSync(pinsFile) ? JSON.parse(await readFile(pinsFile, 'utf8')).answers : {};
+const read = {}; // the answers this run read, for --pin
+
+/** One English Wikipedia API answer (GET parameters), from the cache only, as pinned (see the top of this file). */
 async function enwiki(params) {
   const url = `${ENWIKI}?${new URLSearchParams({ format: 'json', formatversion: '2', ...params })}`;
-  return cachedGz(path.join(cacheDir, `enwiki-${sha1(url)}.json.gz`), refresh, () => getJson(url));
+  const key = sha1(url), file = path.join(cacheDir, `enwiki-${key}.json.gz`);
+  if (!existsSync(file)) {
+    throw new Error(`No cached Wikipedia answer ${path.relative(root, file)} for ${url.slice(0, 160)}…: en.wikipedia.org/w/api.php is `
+      + 'disallowed by its robots.txt, so it is never asked. Nothing was written; the committed crests stay as they are.');
+  }
+  const answer = await readGzJson(file);
+  const digest = sha256(JSON.stringify(answer));
+  if (!pinning && pins[key] !== digest) {
+    throw new Error(`${path.relative(root, file)} is ${pins[key] ? 'not the pinned answer' : 'not pinned'} in ${path.relative(root, pinsFile)}. `
+      + 'Nothing was written. Pass --pin only to record, deliberately, the answers of the cache on hand (the run then rewrites the crests from them).');
+  }
+  read[key] = digest;
+  return answer;
 }
 
 const chunks = (items, size) => Array.from({ length: Math.ceil(items.length / size) }, (_, i) => items.slice(i * size, i * size + size));
@@ -427,6 +462,17 @@ export function clubLogoUrl(id) {
   return file ? \`\${import.meta.env.BASE_URL}club-logos/\${file}.webp\` : null;
 }
 `);
+if (pinning) {
+  const answers = Object.fromEntries(Object.entries(read).sort(([a], [b]) => a.localeCompare(b)));
+  await writeFile(pinsFile, `${JSON.stringify({
+    note: 'The English Wikipedia API answers scripts/sync-club-logos.mjs reads, each from its cache file data-src/club-logos/enwiki-<key>.json.gz, '
+      + 'where the key is the SHA-1 of the request URL, and each pinned by the SHA-256 of its JSON. en.wikipedia.org/w/api.php is disallowed by '
+      + 'its robots.txt for every agent, so the sync never asks it again: these answers are the only source of the lead images and file details. '
+      + 'Written by npm run sync:club-logos -- --pin.',
+    answers,
+  }, null, 2)}\n`);
+  console.log(`Pinned ${Object.keys(answers).length} Wikipedia answers in ${path.relative(root, pinsFile)}`);
+}
 
 // ---- Report ----
 

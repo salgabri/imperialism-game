@@ -30,6 +30,12 @@ committed):
 - The NHL's statistics (`api-web.nhle.com/v1/club-stats/{team}/{season}/2`) for 2025/26
   and the season under way: games, minutes, points; for goalies, shots faced and saves.
 
+The NHL's API is never fetched now: the project's rule rules it out, and
+`scripts/lib/polite-fetch.mjs`, which every script's request goes through, refuses it. No
+allowed source gives the same rosters and statistics, so the sync reads the NHL's answers
+only from `data-src/nhl/` (as cached on 2026-11-07), refuses `--refresh`, and the committed
+snapshot stays as it is. EA's ratings API has no robots.txt and is still allowed.
+
 EA's and the NHL's names differ now and then (Matthew Boldy, Matt Boldy): the sync matches
 by full name, then surname on the same team, then a surname unique in the league, and
 prints the loose matches for checking. **Two pairs share a name**, the Canucks' two Elias
@@ -197,7 +203,10 @@ The three 1990s seasons are played rescaled onto NHL 27's ratings, by the player
 
 **Pipeline.** `node scripts/sync-nhl-seasons.mjs` reads the downloads (cached in the ignored
 `data-src/nhl-seasons/`, every one pinned by SHA-256 in `scripts/data/nhl-seasons-sources.json`;
-`--fetch` downloads a missing one, a CommonCrawl page from its WARC record) and writes one
+`--fetch` downloads a missing one through `scripts/lib/polite-fetch.mjs`, except two kinds now
+read only from their pinned copies: the NHL's rosters, since `api-web.nhle.com` is never fetched,
+and the pages only CommonCrawl kept, since `data.commoncrawl.org`'s robots.txt disallows every
+path for every agent, read 2026-11-10) and writes one
 snapshot per season, `scripts/data/nhl-seasons/nhl-<year>.json`: each player's name, club,
 position, overall, birth country and NHL id, and the source's players it leaves out, with why.
 `node scripts/build-nhl-seasons.mjs` builds `public/hockey/nhl-<year>.json`,

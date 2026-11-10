@@ -624,7 +624,18 @@ two ways: they have no clubs, and a player's nationality comes from elsewhere.
   and it is where Wikidata keeps a date known only to the year. A player rated 70
   or more who is still unmatched, and whose name has at least two words, is looked
   up by name, and needs exactly one footballer of that name aged 17 to 42 that
-  season. The nationality is the senior national team (P54), else the country for
+  season. Where the facts come from: the SPARQL queries go to QLever's Wikidata
+  endpoint (`qlever.dev/api/wikidata`, no robots.txt), because the Wikidata Query
+  Service's robots.txt disallows `/sparql` for every agent (read 2026-11-10); QLever
+  gave the cached Query Service answers back unchanged when tried (327 of 327
+  statements, 91 of 91 names). The lookup by name used Wikidata's own search
+  (`wbsearchentities` under `www.wikidata.org/w/api.php`), which its robots.txt
+  disallows too, and no allowed source gives the same answers, so its answers of
+  2026-11-07 for the 94 names searched are pinned in
+  `scripts/data/ea-early-search.json`, the sync reads them there and never asks
+  again, and a name not there is not searched. From its cache the sync writes the
+  committed file again byte for byte but the retrieval date. The nationality is
+  the senior national team (P54), else the country for
   sport (P1532) where citizenship backs it, else a youth or B national team, else
   citizenship (P27). Country for sport comes after the team because it can be
   wrong: Wikidata has Demis Nikolaidis, a Greece international, and Robson Ponte, a

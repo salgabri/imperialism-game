@@ -28,6 +28,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { agreement, applyAliases, atpLevelOf, davisCupNations, earlyLevelOf, orderMatches, parseMatchFile, rateMatches, wtaLevelOf } from './lib/tennis-elo.mjs';
 import { codeOfDay, nationOfDay } from './lib/tennis-seasons.mjs';
+import { politeFetch } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 // Each tour's manifest, cache, snapshots and match files, its rankings' rank column and its rule of counted matches.
@@ -64,7 +65,7 @@ async function pinned(folder, file, url, expected) {
   for (let attempt = 0; ; attempt++) {
     try {
       // fetch decodes a capture stored gzipped, so the pin is the page's own bytes.
-      const response = await fetch(url, { headers: { 'user-agent': 'imperialism-game data sync' }, signal: AbortSignal.timeout(60000) });
+      const response = await politeFetch(url, { signal: AbortSignal.timeout(60000) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = Buffer.from(await response.arrayBuffer());
       if (sha256(data) !== expected) throw new Error(`does not match its pin (${sha256(data)})`);
@@ -73,7 +74,7 @@ async function pinned(folder, file, url, expected) {
       await sleep(PAUSE_MS);
       return data.toString('utf8');
     } catch (error) {
-      if (attempt === 2) throw new Error(`${url}: ${error.message}`);
+      if (attempt === 2 || error.fatal) throw new Error(`${url}: ${error.message}`);
       await sleep(PAUSE_MS * 4);
     }
   }

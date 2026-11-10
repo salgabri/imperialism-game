@@ -21,14 +21,15 @@ test('without permission the EFEM client serves its cache and requests nothing',
   try {
     const permitted = createEfem({ cacheDir, permission: true, spacing: 0 });
     assert.deepEqual((await permitted.get(cachedUrl, keep)).data, [{ id: 7 }]);
-    assert.deepEqual(calls, [cachedUrl]);
+    // robots.txt is read first (scripts/lib/polite-fetch.mjs); EFEM's permission stands in for its Disallow: /api/.
+    assert.deepEqual(calls, ['https://efem.club/robots.txt', cachedUrl]);
 
     const efem = createEfem({ cacheDir, spacing: 0 });
     assert.deepEqual((await efem.get(cachedUrl, keep)).data, [{ id: 7 }], 'a cached response needs no permission');
     await assert.rejects(efem.get(uncachedUrl, keep), /robots\.txt disallows \/api\/.*--efem-permission-granted/);
     await assert.rejects(createEfem({ cacheDir, refresh: true, spacing: 0 }).get(cachedUrl, keep), /robots\.txt/,
       'downloading again (--refresh) needs permission too');
-    assert.deepEqual(calls, [cachedUrl], 'nothing reached EFEM without permission');
+    assert.deepEqual(calls, ['https://efem.club/robots.txt', cachedUrl], 'nothing reached EFEM without permission');
     assert.deepEqual(efem.stats(), { requests: 0, cached: 1 });
   } finally {
     if (prior) Object.defineProperty(globalThis, 'fetch', prior); else delete globalThis.fetch;
