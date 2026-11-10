@@ -631,6 +631,7 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     assert.deepEqual(EARLIER.filter(season => season < '1989/90'), ['1985/86', '1981/82', '1977/78', '1973/74', '1969/70', '1965/66', '1961/62'],
       'the computed World Cups before them');
     assert.match(modelOf().season.note, /2005\/06, 2004\/05, 1996\/97 and 1989\/90 have nations only/);
+    assert.match(modelOf().season.note, /The World Cups of 1961\/62 to 1993\/94 are computed and have nations only/);
 
     // From clubs: the season takes the nations. It has no maps of Europe, so the theatre is kept as the plain elite
     // for when clubs come back.

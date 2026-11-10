@@ -339,7 +339,7 @@ export const SEASON_NOTES = Object.freeze({
     + '1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, Cam F\'s and Simon Treanor\'s), with clubs from '
     + 'the seven biggest leagues. A nation with fewer than six rated players fields no team, and one without eleven starts '
     + 'short-handed. 2005/06, 2004/05, 1996/97 and 1989/90 have nations only. The World Cups of 1961/62 to 1993/94 are '
-    + 'computed: each finalist rated from its Elo and its players\' records.',
+    + 'computed and have nations only: each finalist rated from its Elo and its players\' records.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
     + 'without eleven starts short-handed.',
