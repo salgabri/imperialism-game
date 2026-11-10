@@ -37,7 +37,223 @@
     "updateCommand": "node scripts/sync-football-manager.mjs"
   },
   "fmRecords": 16856,
-  "omittedPossibleDuplicates": 4783,
+  "omittedPossibleDuplicates": 4771,
+  "linking": {
+    "pairs": 4569,
+    "meanEaMinusFm": 0.1,
+    "ci95": [0.02, 0.19],
+    "reep": {
+      "pairs": 4234,
+      "meanEaMinusFm": 0.13,
+      "ci95": [0.04, 0.21]
+    }
+  },
+  "identity": {
+    "rule": "Person key: the Reep id (scripts/data/reep-bridge.json), else a football-identity-overrides.json entry, else the name matcher between records no key pairs yet and no Reep person keeps apart (within a nation by name, then across nations by full name), always with FM's age within a year of the EA birth date, one-to-one; an FM name of one word never joins (FM records carry no birth date). A person with no Reep id is keyed by its EA record id, else its FM record id.",
+    "reep": {
+      "release": "2026-10-18.1",
+      "eaRecords": 14977,
+      "eaShare": 83.9,
+      "fmRecords": 11572,
+      "fmShare": 68.7,
+      "pairs": 4234
+    },
+    "overrides": {
+      "same": 5,
+      "distinct": 0,
+      "nations": 2
+    },
+    "links": {
+      "fallback": 499,
+      "fallback-cross": 3,
+      "override": 5,
+      "reep": 4234
+    },
+    "fallback": {
+      "withinNation": 499,
+      "omittedAmbiguous": 13,
+      "omittedOneWord": 17,
+      "crossNation": [
+        {"personKey":"rp3fcc3614baefb6","ea":{"id":"ea:248694","name":"I. Karamoko","fullName":"Ibrahim Karamoko","nation":"250 France","club":"Standard de Liège","dateOfBirth":"2001-06-23"},"fm":{"id":"fm:43393512","name":"Ibrahim Karamoko","nation":"324 Guinea","club":"Standard","age":23}},
+        {"personKey":"rp678595745a5abb","ea":{"id":"ea:247600","name":"B. Adinany","fullName":"Bryan Adinany","nation":"Comoros","club":"KV Kortrijk","dateOfBirth":"2000-03-13"},"fm":{"id":"fm:49051603","name":"Bryan Adinany","nation":"450 Madagascar","club":"KV Kortrijk","age":25}},
+        {"personKey":"rp66f0eedfcadbcb","ea":{"id":"ea:279711","name":"J. Hummelvoll-Nuñez","fullName":"Johannes Hummelvoll-Nuñez","nation":"578 Norway","club":"Fredrikstad FK","dateOfBirth":"1996-12-14"},"fm":{"id":"fm:53152558","name":"Johannes Hummelvoll-Nuñez","nation":"152 Chile","club":"Fredrikstad","age":28}}
+      ],
+      "nearMisses": [
+        {"ea":{"id":"ea:266113","name":"N. Mäenpää","fullName":"Niilo Mäenpää","nation":"246 Finland","club":"Halmstads BK","dateOfBirth":"1998-01-14"},"fm":{"id":"fm:522456","name":"Niki Mäenpää","nation":"246 Finland","club":"","age":40},"reason":"ages differ"},
+        {"ea":{"id":"ea:259971","name":"N. Guzmán","fullName":"Natanael Guzmán","nation":"032 Argentina","club":"CA Aldosivi","dateOfBirth":"1999-08-11"},"fm":{"id":"fm:964419","name":"Nahuel Guzmán","nation":"032 Argentina","club":"Tigres","age":39},"reason":"ages differ"},
+        {"ea":{"id":"ea:222199","name":"Zheng Kaimu","fullName":"Kaimu Zheng","nation":"156 China","club":"Wuhan Three Towns","dateOfBirth":"1992-01-28"},"fm":{"id":"fm:1024748","name":"Zheng Zheng","nation":"156 China","club":"Shandong","age":35},"reason":"ages differ"},
+        {"ea":{"id":"ea:224615","name":"Zheng Dalun","fullName":"Dalun Zheng","nation":"156 China","club":"Henan FC","dateOfBirth":"1994-02-11"},"fm":{"id":"fm:1024748","name":"Zheng Zheng","nation":"156 China","club":"Shandong","age":35},"reason":"ages differ"},
+        {"ea":{"id":"ea:275190","name":"Zheng Haoqian","fullName":"Haoqian Zheng","nation":"156 China","club":"Wuhan Three Towns","dateOfBirth":"1998-11-16"},"fm":{"id":"fm:1024748","name":"Zheng Zheng","nation":"156 China","club":"Shandong","age":35},"reason":"ages differ"},
+        {"ea":{"id":"ea:222344","name":"Sun Zheng'ao","fullName":"Zheng'ao Sun","nation":"156 China","club":"Qingdao Hainiu FC","dateOfBirth":"1994-03-08"},"fm":{"id":"fm:1024748","name":"Zheng Zheng","nation":"156 China","club":"Shandong","age":35},"reason":"ages differ"},
+        {"ea":{"id":"ea:77915","name":"Zheng Chuanhui","fullName":"Chuanhui Zheng","nation":"156 China","club":"Qingdao Hainiu FC","dateOfBirth":"2007-01-01"},"fm":{"id":"fm:1024748","name":"Zheng Zheng","nation":"156 China","club":"Shandong","age":35},"reason":"ages differ"},
+        {"ea":{"id":"ea:279061","name":"A. Traore","fullName":"Abdoul Karim Traore","nation":"466 Mali","club":"Al Ain","dateOfBirth":"2005-01-11"},"fm":{"id":"fm:12096086","name":"Adama Traoré","nation":"466 Mali","club":"Réal Bamako","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:237520","name":"M. Camara","fullName":"Mady Camara","nation":"324 Guinea","club":"PAOK","dateOfBirth":"1997-02-28"},"fm":{"id":"fm:13158291","name":"Moussa Pinpin Camara","nation":"324 Guinea","club":"Simba","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:83163","name":"M. Camara","fullName":"Mansour Camara","nation":"324 Guinea","club":"Al Kholood","dateOfBirth":"2007-08-20"},"fm":{"id":"fm:13158291","name":"Moussa Pinpin Camara","nation":"324 Guinea","club":"Simba","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:83163","name":"M. Camara","fullName":"Mansour Camara","nation":"324 Guinea","club":"Al Kholood","dateOfBirth":"2007-08-20"},"fm":{"id":"fm:13194490","name":"Mohamed Camara","nation":"324 Guinea","club":"Maccabi Tel-Aviv","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:88499","name":"M. Touré","fullName":"Mohamed Touré","nation":"324 Guinea","club":"FC Sochaux-Montbéliard","dateOfBirth":"2006-12-12"},"fm":{"id":"fm:13224781","name":"Mômô Fanyé Touré","nation":"324 Guinea","club":"Alashkert","age":23},"reason":"ages differ"},
+        {"ea":{"id":"ea:212367","name":"Igor Julião","fullName":"Igor de Carvalho Julião","nation":"076 Brazil","club":"Marítimo da Madeira","dateOfBirth":"1994-08-23"},"fm":{"id":"fm:16199713","name":"Igor","nation":"076 Brazil","club":"Brighton","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:74939","name":"Igor Jesus","fullName":"Igor Jesus Lima","nation":"076 Brazil","club":"Los Angeles FC","dateOfBirth":"2003-03-07"},"fm":{"id":"fm:16199713","name":"Igor","nation":"076 Brazil","club":"Brighton","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:79270","name":"Alisson Santos","fullName":"Alisson de Almeida Santos","nation":"076 Brazil","club":"Napoli","dateOfBirth":"2002-09-27"},"fm":{"id":"fm:19058734","name":"Alisson","nation":"076 Brazil","club":"Liverpool","age":32},"reason":"ages differ"},
+        {"ea":{"id":"ea:77883","name":"Alisson","fullName":"Alisson Santana Lopes da Fonseca","nation":"076 Brazil","club":"Shakhtar Donetsk","dateOfBirth":"2005-09-21"},"fm":{"id":"fm:19058734","name":"Alisson","nation":"076 Brazil","club":"Liverpool","age":32},"reason":"ages differ"},
+        {"ea":{"id":"ea:81597","name":"Alisson","fullName":"Alisson Souza de Jesus","nation":"076 Brazil","club":"Estrela da Amadora","dateOfBirth":"2005-04-11"},"fm":{"id":"fm:19058734","name":"Alisson","nation":"076 Brazil","club":"Liverpool","age":32},"reason":"ages differ"},
+        {"ea":{"id":"ea:274187","name":"Gabriel Pereira","fullName":"Gabriel Pereira Magalhães","nation":"076 Brazil","club":"FC København","dateOfBirth":"2000-05-07"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:271132","name":"Gabriel Silva","fullName":"Gabriel Silva Vieira","nation":"076 Brazil","club":"Sporting Clube de Braga","dateOfBirth":"2002-03-22"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:279731","name":"Gabriel Moscardo","fullName":"Gabriel Silva Moscardo de Salles","nation":"076 Brazil","club":"RCD Espanyol","dateOfBirth":"2005-09-28"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:81941","name":"Gabriel Xavier","fullName":"Gabriel Lheman Xavier","nation":"076 Brazil","club":"Shenzhen Peng City","dateOfBirth":"2001-05-06"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:87407","name":"Gabriel Justino","fullName":"Gabriel Pereira Justino","nation":"076 Brazil","club":"Botafogo","dateOfBirth":"2006-04-16"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:203119","name":"Gabriel","fullName":"Gabriel Santana Pinto","nation":"076 Brazil","club":"Sporting Cristal","dateOfBirth":"1990-01-06"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:277301","name":"Gabriel Pirani","fullName":"Gabriel Pirani","nation":"076 Brazil","club":"San Diego FC","dateOfBirth":"2002-04-12"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:72957","name":"Gabriel Maioli","fullName":"Gabriel Maioli da Silva","nation":"076 Brazil","club":"APOEL FC","dateOfBirth":"2003-02-02"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:240131","name":"Gabrielzinho","fullName":"Gabriel Airton de Souza","nation":"076 Brazil","club":"Shanghai Port","dateOfBirth":"1996-03-29"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:86520","name":"Gabriel Índio","fullName":"Gabriel dos Santos Queiroz","nation":"076 Brazil","club":"SL Benfica","dateOfBirth":"2008-07-26"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:80756","name":"Gabriel Carvalho","fullName":"Gabriel Carvalho Teixeira","nation":"076 Brazil","club":"Shakhtar Donetsk","dateOfBirth":"2007-08-17"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:74578","name":"Gabriel Cabral","fullName":"Gabriel Cabral da Cruz","nation":"076 Brazil","club":"Famalicão","dateOfBirth":"2003-04-19"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"ages differ"},
+        {"ea":{"id":"ea:275028","name":"Arthur","fullName":"Arthur Augusto de Matos Soares","nation":"076 Brazil","club":"Bayer 04 Leverkusen","dateOfBirth":"2003-03-17"},"fm":{"id":"fm:19259600","name":"Arthur","nation":"076 Brazil","club":"Juventus","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:252736","name":"H. Ali","fullName":"Hussein Ali","nation":"368 Iraq","club":"Pogoń Szczecin","dateOfBirth":"2002-03-01"},"fm":{"id":"fm:23320669","name":"Hussein Ali","nation":"368 Iraq","club":"Al-Shorta","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:81235","name":"A. Al Khaibari","fullName":"Abdulrahman Al Khaibari","nation":"682 Saudi Arabia","club":"Al Fateh","dateOfBirth":"2000-03-18"},"fm":{"id":"fm:23332501","name":"Abdulelah Al-Khaibari","nation":"682 Saudi Arabia","club":"Al-Ahli (KSA)","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:81660","name":"A. Al Khaibari","fullName":"Ammar Al Khaibari","nation":"682 Saudi Arabia","club":"Al Fayha","dateOfBirth":"2004-09-03"},"fm":{"id":"fm:23332501","name":"Abdulelah Al-Khaibari","nation":"682 Saudi Arabia","club":"Al-Ahli (KSA)","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:81235","name":"A. Al Khaibari","fullName":"Abdulrahman Al Khaibari","nation":"682 Saudi Arabia","club":"Al Fateh","dateOfBirth":"2000-03-18"},"fm":{"id":"fm:23397312","name":"Abdullah Al-Khaibari","nation":"682 Saudi Arabia","club":"Al-Nassr (KSA)","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:81660","name":"A. Al Khaibari","fullName":"Ammar Al Khaibari","nation":"682 Saudi Arabia","club":"Al Fayha","dateOfBirth":"2004-09-03"},"fm":{"id":"fm:23397312","name":"Abdullah Al-Khaibari","nation":"682 Saudi Arabia","club":"Al-Nassr (KSA)","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:248301","name":"K. Singh","fullName":"Kamaljit Singh","nation":"356 India","club":"Odisha FC","dateOfBirth":"1995-12-28"},"fm":{"id":"fm:23497247","name":"Kiranbir Singh","nation":"356 India","club":"North District","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:208481","name":"K. Singh","fullName":"Karanjit Singh","nation":"356 India","club":"Hyderabad FC","dateOfBirth":"1986-01-08"},"fm":{"id":"fm:23497247","name":"Kiranbir Singh","nation":"356 India","club":"North District","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:71926","name":"K. Singh","fullName":"Korou Singh","nation":"356 India","club":"Kerala Blasters FC","dateOfBirth":"2006-12-03"},"fm":{"id":"fm:23497247","name":"Kiranbir Singh","nation":"356 India","club":"North District","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:79161","name":"A. Shala","fullName":"Altin Shala","nation":"KOS Kosovo","club":"FC Sion","dateOfBirth":"2002-12-18"},"fm":{"id":"fm:30047839","name":"Adenis Shala","nation":"KOS Kosovo","club":"Nasaf","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:84006","name":"B. Singh","fullName":"Bungson Singh","nation":"356 India","club":"Bengaluru FC","dateOfBirth":"2007-03-05"},"fm":{"id":"fm:40002067","name":"Balwant Singh","nation":"356 India","club":"","age":38},"reason":"ages differ"},
+        {"ea":{"id":"ea:258410","name":"S. Singh","fullName":"Sandeep Singh","nation":"356 India","club":"Kerala Blasters FC","dateOfBirth":"1995-03-01"},"fm":{"id":"fm:40029598","name":"Sana Singh","nation":"356 India","club":"Bengaluru","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:73733","name":"S. Singh","fullName":"Sanatomba Singh","nation":"356 India","club":"Hyderabad FC","dateOfBirth":"2006-05-15"},"fm":{"id":"fm:40029598","name":"Sana Singh","nation":"356 India","club":"Bengaluru","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:279563","name":"S. Singh","fullName":"Shivaldo Singh","nation":"356 India","club":"Bengaluru FC","dateOfBirth":"2004-06-13"},"fm":{"id":"fm:40029598","name":"Sana Singh","nation":"356 India","club":"Bengaluru","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:258410","name":"S. Singh","fullName":"Sandeep Singh","nation":"356 India","club":"Kerala Blasters FC","dateOfBirth":"1995-03-01"},"fm":{"id":"fm:40030270","name":"Suresh Singh","nation":"356 India","club":"Bengaluru","age":24},"reason":"ages differ"},
+        {"ea":{"id":"ea:73733","name":"S. Singh","fullName":"Sanatomba Singh","nation":"356 India","club":"Hyderabad FC","dateOfBirth":"2006-05-15"},"fm":{"id":"fm:40030270","name":"Suresh Singh","nation":"356 India","club":"Bengaluru","age":24},"reason":"ages differ"},
+        {"ea":{"id":"ea:279563","name":"S. Singh","fullName":"Shivaldo Singh","nation":"356 India","club":"Bengaluru FC","dateOfBirth":"2004-06-13"},"fm":{"id":"fm:40030270","name":"Suresh Singh","nation":"356 India","club":"Bengaluru","age":24},"reason":"ages differ"},
+        {"ea":{"id":"ea:277545","name":"M. Singh","fullName":"Maheson Singh","nation":"356 India","club":"Chennaiyin FC","dateOfBirth":"2004-11-26"},"fm":{"id":"fm:40037045","name":"Mahesh Singh","nation":"356 India","club":"East Bengal","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:77172","name":"T. Singh","fullName":"Taorem Kelvin Singh","nation":"356 India","club":"Bengaluru FC","dateOfBirth":"2005-11-22"},"fm":{"id":"fm:43124959","name":"Taljinder Singh","nation":"356 India","club":"Todi","age":29},"reason":"ages differ"},
+        {"ea":{"id":"ea:84636","name":"T. Singh","fullName":"Taison Singh","nation":"356 India","club":"Kerala Blasters FC","dateOfBirth":"2004-08-11"},"fm":{"id":"fm:43124959","name":"Taljinder Singh","nation":"356 India","club":"Todi","age":29},"reason":"ages differ"},
+        {"ea":{"id":"ea:253672","name":"A. Singh","fullName":"Arshdeep Singh","nation":"356 India","club":"Punjab FC","dateOfBirth":"1997-10-06"},"fm":{"id":"fm:43393620","name":"Akashdeep Singh","nation":"356 India","club":"","age":23},"reason":"ages differ"},
+        {"ea":{"id":"ea:276143","name":"A. Singh","fullName":"Ashangbam Singh Singh","nation":"356 India","club":"Odisha FC","dateOfBirth":"2004-01-06"},"fm":{"id":"fm:43393620","name":"Akashdeep Singh","nation":"356 India","club":"","age":23},"reason":"ages differ"},
+        {"ea":{"id":"ea:85739","name":"J. Domínguez","fullName":"Juan Pablo Domínguez","nation":"484 Mexico","club":"Club Len","dateOfBirth":"1998-10-30"},"fm":{"id":"fm:51000273","name":"Julio César Domínguez","nation":"484 Mexico","club":"At. San Luis","age":37},"reason":"ages differ"},
+        {"ea":{"id":"ea:85819","name":"L. Rodríguez","fullName":"Lenin Rodríguez","nation":"484 Mexico","club":"Club Pachuca","dateOfBirth":"2004-01-31"},"fm":{"id":"fm:51012748","name":"Luis Alfonso Rodríguez","nation":"484 Mexico","club":"","age":34},"reason":"ages differ"},
+        {"ea":{"id":"ea:84061","name":"A. González","fullName":"Armando González","nation":"484 Mexico","club":"Olympiacos FC","dateOfBirth":"2003-04-20"},"fm":{"id":"fm:51015275","name":"Alfonso González","nation":"484 Mexico","club":"Atlas","age":30},"reason":"ages differ"},
+        {"ea":{"id":"ea:205267","name":"I. Rodríguez","fullName":"Iván Rodríguez","nation":"484 Mexico","club":"Club Puebla","dateOfBirth":"1993-05-21"},"fm":{"id":"fm:51072523","name":"Iván Rodríguez","nation":"484 Mexico","club":"León","age":29},"reason":"ages differ"},
+        {"ea":{"id":"ea:245319","name":"Liziero","fullName":"Igor Matheus Liziero Pereira","nation":"076 Brazil","club":"CD Nacional","dateOfBirth":"1998-02-07"},"fm":{"id":"fm:55070289","name":"Matheus Pereira","nation":"076 Brazil","club":"Cruzeiro","age":29},"reason":"ages differ"},
+        {"ea":{"id":"ea:247667","name":"Kim Tae Hwan","fullName":"Tae Hwan Kim","nation":"410 South Korea","club":"Gimcheon Sangmu FC","dateOfBirth":"2000-03-25"},"fm":{"id":"fm:66010441","name":"Kim Tae-Hwan","nation":"410 South Korea","club":"Jeonbuk","age":35},"reason":"ages differ"},
+        {"ea":{"id":"ea:76235","name":"Kim Tae Hwan","fullName":"Tae Hwan Kim","nation":"410 South Korea","club":"Gangwon FC","dateOfBirth":"2006-05-29"},"fm":{"id":"fm:66010441","name":"Kim Tae-Hwan","nation":"410 South Korea","club":"Jeonbuk","age":35},"reason":"ages differ"},
+        {"ea":{"id":"ea:199231","name":"Kim Tae Hwan","fullName":"Tae Hwan Kim","nation":"410 South Korea","club":"Jeonbuk Hyundai Motors","dateOfBirth":"1989-07-24"},"fm":{"id":"fm:66043042","name":"Kim Tae-Hwan","nation":"410 South Korea","club":"Jeju","age":25},"reason":"ages differ"},
+        {"ea":{"id":"ea:76235","name":"Kim Tae Hwan","fullName":"Tae Hwan Kim","nation":"410 South Korea","club":"Gangwon FC","dateOfBirth":"2006-05-29"},"fm":{"id":"fm:66043042","name":"Kim Tae-Hwan","nation":"410 South Korea","club":"Jeju","age":25},"reason":"ages differ"},
+        {"ea":{"id":"ea:74351","name":"J. Córdoba","fullName":"Juan Córdoba","nation":"170 Colombia","club":"Indep. Medellín","dateOfBirth":"2003-07-11"},"fm":{"id":"fm:76018954","name":"Jhon Córdoba","nation":"170 Colombia","club":"Krasnodar","age":32},"reason":"ages differ"},
+        {"ea":{"id":"ea:223302","name":"Samu","fullName":"Fábio Samuel Amorim Silva","nation":"620 Portugal","club":"Vitória SC","dateOfBirth":"1996-04-21"},"fm":{"id":"fm:83206392","name":"Samú","nation":"620 Portugal","club":"Mallorca","age":24},"reason":"ages differ"},
+        {"ea":{"id":"ea:272703","name":"J. Martínez","fullName":"Jayson Martínez","nation":"862 Venezuela","club":"Academia Puerto Cabello","dateOfBirth":"2001-07-12"},"fm":{"id":"fm:86049497","name":"José Martínez","nation":"862 Venezuela","club":"","age":30},"reason":"ages differ"},
+        {"ea":{"id":"ea:86011","name":"P. Ortiz","fullName":"Patrick Ortiz","nation":"218 Ecuador","club":"LDU Quito","dateOfBirth":"2005-05-17"},"fm":{"id":"fm:86050956","name":"Pedro Ortiz","nation":"218 Ecuador","club":"Emelec","age":35},"reason":"ages differ"},
+        {"ea":{"id":"ea:85136","name":"J. Angulo","fullName":"Juan Riquelme Angulo","nation":"218 Ecuador","club":"Independiente del Valle","dateOfBirth":"2008-01-12"},"fm":{"id":"fm:86053260","name":"José Angulo","nation":"218 Ecuador","club":"Manta","age":30},"reason":"ages differ"},
+        {"ea":{"id":"ea:83163","name":"M. Camara","fullName":"Mansour Camara","nation":"324 Guinea","club":"Al Kholood","dateOfBirth":"2007-08-20"},"fm":{"id":"fm:89058721","name":"Mady Camara","nation":"324 Guinea","club":"PAOK","age":28},"reason":"ages differ"},
+        {"ea":{"id":"ea:83620","name":"H. Abdulkareem","fullName":"Haydeer Abdulkareem","nation":"368 Iraq","club":"Al Nassr","dateOfBirth":"2004-08-07"},"fm":{"id":"fm:2000060685","name":"Hasan Abdulkareem","nation":"368 Iraq","club":"Al-Zawra'a","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:258601","name":"M. Sangaré","fullName":"Mamadou Sangaré","nation":"466 Mali","club":"Brentford","dateOfBirth":"2002-06-26"},"fm":{"id":"fm:2000064015","name":"Mustapha Sangaré","nation":"466 Mali","club":"Levski","age":26},"reason":"ages differ"},
+        {"ea":{"id":"ea:86592","name":"S. Nakano","fullName":"Shingo Nakano","nation":"392 Japan","club":"SC Rheindorf Altach","dateOfBirth":"2004-12-26"},"fm":{"id":"fm:2000238820","name":"Shuto Nakano","nation":"392 Japan","club":"Hiroshima","age":25},"reason":"ages differ"},
+        {"ea":{"id":"ea:258722","name":"Capita","fullName":"Osvaldo Pedro Capemba","nation":"024 Angola","club":"Sporting Kansas City","dateOfBirth":"2002-01-10"},"fm":{"id":"fm:224211","name":"Capita","nation":"024 Angola","club":"Sporting KC","age":23},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:226078","name":"Trezeguet","fullName":"Mahmoud Hassan","nation":"818 Egypt","club":"Al Riyadh","dateOfBirth":"1994-10-01"},"fm":{"id":"fm:13156726","name":"Trezeguet","nation":"818 Egypt","club":"Al-Ahly","age":30},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:226376","name":"Kaku","fullName":"Alejandro Romero Gamarra","nation":"600 Paraguay","club":"Al Ain","dateOfBirth":"1995-01-11"},"fm":{"id":"fm:14060324","name":"Kaku","nation":"600 Paraguay","club":"Al-Ain","age":30},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:241585","name":"Igor Julio","fullName":"Igor Julio dos Santos de Paulo","nation":"076 Brazil","club":"Brighton & Hove Albion","dateOfBirth":"1998-02-07"},"fm":{"id":"fm:16199713","name":"Igor","nation":"076 Brazil","club":"Brighton","age":27},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:245319","name":"Liziero","fullName":"Igor Matheus Liziero Pereira","nation":"076 Brazil","club":"CD Nacional","dateOfBirth":"1998-02-07"},"fm":{"id":"fm:16199713","name":"Igor","nation":"076 Brazil","club":"Brighton","age":27},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:86040","name":"Milioransa","fullName":"Igor Milioransa","nation":"076 Brazil","club":"Académico de Viseu FC","dateOfBirth":"1996-09-12"},"fm":{"id":"fm:16199713","name":"Igor","nation":"076 Brazil","club":"Brighton","age":27},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:184926","name":"Fabiano","fullName":"Fabiano Ribeiro de Freitas","nation":"196 Cyprus","club":"Omonia FC","dateOfBirth":"1988-02-29"},"fm":{"id":"fm:19030218","name":"Fabiano","nation":"196 Cyprus","club":"Omonoia","age":37},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:212831","name":"Alisson","fullName":"Alisson Ramses Becker","nation":"076 Brazil","club":"Liverpool","dateOfBirth":"1992-10-02"},"fm":{"id":"fm:19058734","name":"Alisson","nation":"076 Brazil","club":"Liverpool","age":32},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:232580","name":"Gabriel","fullName":"Gabriel dos S. Magalhães","nation":"076 Brazil","club":"Arsenal","dateOfBirth":"1997-12-19"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:235949","name":"Gabriel Strefezza","fullName":"Gabriel Tadeu Strefezza Rebelato","nation":"076 Brazil","club":"Palermo FC","dateOfBirth":"1997-04-18"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:273694","name":"Busanello","fullName":"Gabriel Dal Toé Busanello","nation":"076 Brazil","club":"Malmö FF","dateOfBirth":"1998-10-29"},"fm":{"id":"fm:19242094","name":"Gabriel","nation":"076 Brazil","club":"Arsenal","age":27},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:86581","name":"Pedro Naressi","fullName":"Pedro Henrique Naressi Machado","nation":"076 Brazil","club":"Servette FC","dateOfBirth":"1998-01-10"},"fm":{"id":"fm:19259566","name":"Pedro","nation":"076 Brazil","club":"Flamengo","age":28},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:86352","name":"Pedro Barcelos","fullName":"Pedro Henrique Barcelos Silva","nation":"076 Brazil","club":"Académico de Viseu FC","dateOfBirth":"1996-01-19"},"fm":{"id":"fm:19259566","name":"Pedro","nation":"076 Brazil","club":"Flamengo","age":28},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:257188","name":"Erik","fullName":"Erik Jorgens de Menezes","nation":"784 United Arab Emirates","club":"Al Ain","dateOfBirth":"2001-02-18"},"fm":{"id":"fm:19364337","name":"Erik","nation":"784 United Arab Emirates","club":"Al-Ain","age":24},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:260106","name":"G. Singh","fullName":"Gurmeet Singh","nation":"356 India","club":"NorthEast United","dateOfBirth":"1999-12-03"},"fm":{"id":"fm:40036916","name":"Gurmeet","nation":"356 India","club":"NorthEast United","age":25},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:239482","name":"Galeno","fullName":"Wenderson Nascimento Galeno","nation":"076 Brazil","club":"Al Ahli SFC","dateOfBirth":"1997-10-22"},"fm":{"id":"fm:83152910","name":"Galeno","nation":"076 Brazil","club":"Al-Ahli (KSA)","age":27},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:251942","name":"Costinha","fullName":"João Pedro Loureiro da Costa","nation":"620 Portugal","club":"Brighton & Hove Albion","dateOfBirth":"2000-03-26"},"fm":{"id":"fm:83244144","name":"Costinha","nation":"620 Portugal","club":"Olympiacos","age":25},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:264631","name":"Jonatas Santos","fullName":"Jonatas Santos","nation":"784 United Arab Emirates","club":"Al Ain","dateOfBirth":"2001-12-16"},"fm":{"id":"fm:89071295","name":"Jônatas","nation":"784 United Arab Emirates","club":"Al-Ain","age":23},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:264240","name":"Gavi","fullName":"Pablo Martín Páez Gavira","nation":"724 Spain","club":"FC Barcelona","dateOfBirth":"2004-08-05"},"fm":{"id":"fm:2000049413","name":"Gavi","nation":"724 Spain","club":"Barcelona","age":20},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:277179","name":"Fermín","fullName":"Fermín López Marín","nation":"724 Spain","club":"FC Barcelona","dateOfBirth":"2003-05-11"},"fm":{"id":"fm:2000141742","name":"Fermín","nation":"724 Spain","club":"Barcelona","age":22},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:80697","name":"Fermín García","fullName":"Fermín García Murillo","nation":"724 Spain","club":"Burgos CF","dateOfBirth":"2003-09-30"},"fm":{"id":"fm:2000141742","name":"Fermín","nation":"724 Spain","club":"Barcelona","age":22},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:77337","name":"Khaly","fullName":"Domingos José Gabriel Bandeira","nation":"024 Angola","club":"Casa Pia","dateOfBirth":"2003-11-27"},"fm":{"id":"fm:2000184793","name":"Khaly","nation":"024 Angola","club":"Casa Pia","age":21},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:81341","name":"L. Lalbiaknia","fullName":"Lalrinzuala Lalbiaknia","nation":"356 India","club":"NorthEast United","dateOfBirth":"2000-09-15"},"fm":{"id":"fm:2000318770","name":"Lalrinzuala","nation":"356 India","club":"NorthEast United","age":24},"reason":"one-word FM name"},
+        {"ea":{"id":"ea:212814","name":"João Mário","fullName":"João Mário N. Costa Eduardo","nation":"620 Portugal","club":"Beşiktaş JK","dateOfBirth":"1993-01-19"},"fm":{"id":"fm:55059892","name":"João Mário","nation":"624 Guinea-Bissau","club":"Olymp. Nicosia","age":31},"reason":"two Reep persons"},
+        {"ea":{"id":"ea:87269","name":"D. Šturm","fullName":"Danijel Šturm","nation":"703 Slovakia","club":"SK Slavia Praha","dateOfBirth":"1999-01-04"},"fm":{"id":"fm:62251278","name":"Danijel Šturm","nation":"705 Slovenia","club":"Sigma Olomouc","age":26},"reason":"clubs differ"},
+        {"ea":{"id":"ea:86426","name":"M. Diarra","fullName":"Mamadou Diarra","nation":"250 France","club":"FC Botoşani","dateOfBirth":"1998-08-25"},"fm":{"id":"fm:70104416","name":"Mamadou Diarra","nation":"686 Senegal","club":"Selangor","age":27},"reason":"clubs differ"},
+        {"ea":{"id":"ea:239629","name":"A. Medina","fullName":"Alan Medina","nation":"484 Mexico","club":"Pumas","dateOfBirth":"1997-08-19"},"fm":{"id":"fm:78095059","name":"Alan Medina","nation":"858 Uruguay","club":"León","age":27},"reason":"two Reep persons"},
+        {"ea":{"id":"ea:143076","name":"A. Gómez","fullName":"Alejandro Gómez","nation":"032 Argentina","club":"Padova","dateOfBirth":"1988-02-15"},"fm":{"id":"fm:80013356","name":"Alejandro Gómez","nation":"188 Costa Rica","club":"","age":36},"reason":"clubs differ"},
+        {"ea":{"id":"ea:228303","name":"Jorge Ortíz","fullName":"Jorge Ortíz Mendoza","nation":"724 Spain","club":"Mumbai City FC","dateOfBirth":"1992-04-25"},"fm":{"id":"fm:87004109","name":"Jorge Ortíz","nation":"320 Guatemala","club":"","age":34},"reason":"two Reep persons"},
+        {"ea":{"id":"ea:261867","name":"C. González","fullName":"Carlos González","nation":"862 Venezuela","club":"UCV FC","dateOfBirth":"1999-07-30"},"fm":{"id":"fm:2000023221","name":"Carlos Gonzalez","nation":"084 Belize","club":"Bandits (BLZ)","age":25},"reason":"clubs differ"},
+        {"ea":{"id":"ea:253488","name":"D. Medina","fullName":"Diego Medina","nation":"484 Mexico","club":"Santos Laguna","dateOfBirth":"2001-03-12"},"fm":{"id":"fm:2000086753","name":"Diego Medina","nation":"068 Bolivia","club":"CSKA 1948","age":23},"reason":"two Reep persons"},
+        {"ea":{"id":"ea:279700","name":"M. Coulibaly","fullName":"Mamadou Coulibaly","nation":"250 France","club":"AS Monaco","dateOfBirth":"2004-04-21"},"fm":{"id":"fm:2000124174","name":"Mamadou Coulibaly","nation":"784 United Arab Emirates","club":"Al-Jazira (UAE)","age":22},"reason":"clubs differ"},
+        {"ea":{"id":"ea:258730","name":"Miguel Rodríguez","fullName":"Miguel Rodríguez Vidal","nation":"724 Spain","club":"Deportivo Alavés","dateOfBirth":"2003-04-29"},"fm":{"id":"fm:2000137266","name":"Miguel Rodríguez","nation":"558 Nicaragua","club":"","age":22},"reason":"two Reep persons"},
+        {"ea":{"id":"ea:87185","name":"S. Merheg","fullName":"Samy Merheg","nation":"170 Colombia","club":"Alverca","dateOfBirth":"2006-12-06"},"fm":{"id":"fm:2000320553","name":"Samy Merheg","nation":"422 Lebanon","club":"BRG","age":18},"reason":"clubs differ"}
+      ]
+    },
+    "records": {
+      "ea": 17849,
+      "fm": 16856
+    },
+    "persons": 29934
+  },
+  "fresherSource": "ea",
+  "nationArbitrationRule": "Each person enters exactly one nation's pool before any XI is picked. When its records name different nations, the first rule that applies decides. (a) override: a nations entry of scripts/data/football-identity-overrides.json, checked by hand against the person's senior caps. (b) fresher-ea / fresher-fm: the nationality of the source dated later; EA's when its snapshot postdates the FM database (EA FC 27 of 2026-11-01 against FM 26 26.3.0 of 2026-03-30), else FM's primary nationality. (c) ea-nationality: otherwise (several EA or several FM nations) the best-rated EA record's nationality, or with no EA record the best-rated FM record's. A person whose chosen nation is off the map (Scotland, Wales) enters no pool. The person keeps one record in the pool, EA first, whatever nation won.",
+  "nationArbitration": [
+    {"personKey":"rp71cc074660e2e7","ea":{"id":"ea:246147","nation":"826 England"},"fm":{"id":"fm:28121564","nation":"388 Jamaica"},"chosen":"826 England","rule":"fresher-ea"},
+    {"personKey":"rp82d22e2a3a5d7c","ea":{"id":"ea:234200","nation":"504 Morocco"},"fm":{"id":"fm:37048150","nation":"528 Netherlands"},"chosen":"504 Morocco","rule":"fresher-ea"},
+    {"personKey":"rp6c77e5b78296e6","ea":{"id":"ea:259565","nation":"384 Côte d'Ivoire"},"fm":{"id":"fm:49061476","nation":"250 France"},"chosen":"384 Côte d'Ivoire","rule":"fresher-ea"},
+    {"personKey":"rp43bef00b3f7a0a","ea":{"id":"ea:210021","nation":"276 Germany"},"fm":{"id":"fm:91108809","nation":"729 Sudan"},"chosen":"276 Germany","rule":"fresher-ea"},
+    {"personKey":"rp4aa9bde7049491","ea":{"id":"ea:233866","nation":"250 France"},"fm":{"id":"fm:48036880","nation":"332 Haiti"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rp2c964ffe91197a","ea":{"id":"ea:206591","nation":"276 Germany"},"fm":{"id":"fm:92016244","nation":"012 Algeria"},"chosen":"276 Germany","rule":"fresher-ea"},
+    {"personKey":"rpda93a3caa2a4a2","ea":{"id":"ea:75320","nation":"250 France"},"fm":{"id":"fm:2000205277","nation":"854 Burkina Faso"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rp9c98e6c31b0b45","ea":{"id":"ea:244881","nation":"643 Russia"},"fm":{"id":"fm:58133443","nation":"051 Armenia"},"chosen":"051 Armenia","rule":"override"},
+    {"personKey":"rpab077da5dab1c6","ea":{"id":"ea:271302","nation":"724 Spain"},"fm":{"id":"fm:83227951","nation":"624 Guinea-Bissau"},"chosen":"724 Spain","rule":"fresher-ea"},
+    {"personKey":"rp75042cc6fde204","ea":{"id":"ea:252108","nation":"056 Belgium"},"fm":{"id":"fm:18113291","nation":"504 Morocco"},"chosen":"056 Belgium","rule":"fresher-ea"},
+    {"personKey":"rp672d4bdceca487","ea":{"id":"ea:254601","nation":"600 Paraguay"},"fm":{"id":"fm:78064358","nation":"858 Uruguay"},"chosen":"600 Paraguay","rule":"fresher-ea"},
+    {"personKey":"rpd727d4642eb338","ea":{"id":"ea:263032","nation":"070 Bosnia & Herz."},"fm":{"id":"fm:21028824","nation":"688 Serbia"},"chosen":"070 Bosnia & Herz.","rule":"fresher-ea"},
+    {"personKey":"rp68cef14a86e47c","ea":{"id":"ea:225775","nation":"826 England"},"fm":{"id":"fm:28099976","nation":"180 DR Congo"},"chosen":"826 England","rule":"fresher-ea"},
+    {"personKey":"rp75da2adc440b46","ea":{"id":"ea:258753","nation":"504 Morocco"},"fm":{"id":"fm:37076315","nation":"528 Netherlands"},"chosen":"504 Morocco","rule":"fresher-ea"},
+    {"personKey":"rp2b91c413cbfbdc","ea":{"id":"ea:227835","nation":"232 Eritrea"},"fm":{"id":"fm:93053894","nation":"752 Sweden"},"chosen":"232 Eritrea","rule":"fresher-ea"},
+    {"personKey":"rpe7d06428a61a1f","ea":{"id":"ea:271252","nation":"250 France"},"fm":{"id":"fm:2000193191","nation":"120 Cameroon"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rpfebc5546696de6","ea":{"id":"ea:71351","nation":"180 DR Congo"},"fm":{"id":"fm:2000368248","nation":"056 Belgium"},"chosen":"180 DR Congo","rule":"fresher-ea"},
+    {"personKey":"rpeb3cd6649446f3","ea":{"id":"ea:279064","nation":"008 Albania"},"fm":{"id":"fm:36151960","nation":"300 Greece"},"chosen":"008 Albania","rule":"fresher-ea"},
+    {"personKey":"rp034545dc6ee361","ea":{"id":"ea:237138","nation":"250 France"},"fm":{"id":"fm:85138194","nation":"504 Morocco"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rp7a1c5b2a3c5c29","ea":{"id":"ea:74475","nation":"250 France"},"fm":{"id":"fm:2000191043","nation":"324 Guinea"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rp45f2e0de8af5c0","ea":{"id":"ea:261161","nation":"032 Argentina"},"fm":{"id":"fm:14147808","nation":"600 Paraguay"},"chosen":"032 Argentina","rule":"fresher-ea"},
+    {"personKey":"rpcae441df751790","ea":{"id":"ea:272407","nation":"250 France"},"fm":{"id":"fm:2000125765","nation":"466 Mali"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rpdc0907d0809966","ea":{"id":"ea:70841","nation":"384 Côte d'Ivoire"},"fm":{"id":"fm:12095038","nation":"466 Mali"},"chosen":"384 Côte d'Ivoire","rule":"fresher-ea"},
+    {"personKey":"rpd0c5eac5956e32","ea":{"id":"ea:209449","nation":"620 Portugal"},"fm":{"id":"fm:55024975","nation":"624 Guinea-Bissau"},"chosen":"620 Portugal","rule":"fresher-ea"},
+    {"personKey":"rp6dd01f145d8436","ea":{"id":"ea:262748","nation":"191 Croatia"},"fm":{"id":"fm:2000037979","nation":"036 Australia"},"chosen":"191 Croatia","rule":"fresher-ea"},
+    {"personKey":"rp2da0c3db6ffe3c","ea":{"id":"ea:269237","nation":"008 Albania"},"fm":{"id":"fm:2000096497","nation":"792 Turkey"},"chosen":"008 Albania","rule":"fresher-ea"},
+    {"personKey":"rp23c74cb90d0617","ea":{"id":"ea:268704","nation":"380 Italy"},"fm":{"id":"fm:43079697","nation":"288 Ghana"},"chosen":"380 Italy","rule":"fresher-ea"},
+    {"personKey":"rpd45eaa0d3ed38d","ea":{"id":"ea:76944","nation":"504 Morocco"},"fm":{"id":"fm:2000127879","nation":"056 Belgium"},"chosen":"504 Morocco","rule":"fresher-ea"},
+    {"personKey":"rpc5371b4183c355","ea":{"id":"ea:74403","nation":"724 Spain"},"fm":{"id":"fm:2000193127","nation":"624 Guinea-Bissau"},"chosen":"724 Spain","rule":"fresher-ea"},
+    {"personKey":"rp99a7f5b322fd96","ea":{"id":"ea:78836","nation":"384 Côte d'Ivoire"},"fm":{"id":"fm:67252817","nation":"404 Kenya"},"chosen":"384 Côte d'Ivoire","rule":"fresher-ea"},
+    {"personKey":"rpb9af486d08c940","ea":{"id":"ea:258549","nation":"528 Netherlands"},"fm":{"id":"fm:37059656","nation":"288 Ghana"},"chosen":"528 Netherlands","rule":"fresher-ea"},
+    {"personKey":"rp7493934afade84","ea":{"id":"ea:261360","nation":"056 Belgium"},"fm":{"id":"fm:2000084166","nation":"180 DR Congo"},"chosen":"056 Belgium","rule":"fresher-ea"},
+    {"personKey":"rpbc5a67d970beee","ea":{"id":"ea:251911","nation":"056 Belgium"},"fm":{"id":"fm:18110463","nation":"180 DR Congo"},"chosen":"056 Belgium","rule":"fresher-ea"},
+    {"personKey":"rp7b64a8fce3b2c3","ea":{"id":"ea:258973","nation":"250 France"},"fm":{"id":"fm:49062300","nation":"478 Mauritania"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rpfa4620825b619d","ea":{"id":"ea:261244","nation":"036 Australia"},"fm":{"id":"fm:15090592","nation":"554 New Zealand"},"chosen":"036 Australia","rule":"fresher-ea"},
+    {"personKey":"rp1634953dee1d48","ea":{"id":"ea:202113","nation":"826 England"},"fm":{"id":"fm:29059989","nation":"566 Nigeria"},"chosen":"826 England","rule":"fresher-ea"},
+    {"personKey":"rp1b81cab151ea11","ea":{"id":"ea:73964","nation":"528 Netherlands"},"fm":{"id":"fm:37082902","nation":"740 Suriname"},"chosen":"528 Netherlands","rule":"fresher-ea"},
+    {"personKey":"rp52e27f23d66689","ea":{"id":"ea:217813","nation":"484 Mexico"},"fm":{"id":"fm:51016028","nation":"422 Lebanon"},"chosen":"484 Mexico","rule":"fresher-ea"},
+    {"personKey":"rpf3f7741b276fad","ea":{"id":"ea:206134","nation":"826 England"},"fm":{"id":"fm:28062969","nation":"388 Jamaica"},"chosen":"826 England","rule":"fresher-ea"},
+    {"personKey":"rp66f0eedfcadbcb","ea":{"id":"ea:279711","nation":"578 Norway"},"fm":{"id":"fm:53152558","nation":"152 Chile"},"chosen":"578 Norway","rule":"fresher-ea"},
+    {"personKey":"rpb45a7d37d4b33d","ea":{"id":"ea:253491","nation":"792 Turkey"},"fm":{"id":"fm:16191676","nation":"040 Austria"},"chosen":"792 Turkey","rule":"fresher-ea"},
+    {"personKey":"rp3c197037162b8c","ea":{"id":"ea:73908","nation":"KOS Kosovo"},"fm":{"id":"fm:2000065725","nation":"008 Albania"},"chosen":"KOS Kosovo","rule":"fresher-ea"},
+    {"personKey":"rp3fcc3614baefb6","ea":{"id":"ea:248694","nation":"250 France"},"fm":{"id":"fm:43393512","nation":"324 Guinea"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rpe6e1226d2a78ec","ea":{"id":"ea:266581","nation":"643 Russia"},"fm":{"id":"fm:2000029480","nation":"178 Congo"},"chosen":"643 Russia","rule":"fresher-ea"},
+    {"personKey":"rp907df7f1334828","ea":{"id":"ea:270460","nation":"682 Saudi Arabia"},"fm":{"id":"fm:2000080485","nation":"729 Sudan"},"chosen":"682 Saudi Arabia","rule":"fresher-ea"},
+    {"personKey":"rpef9e0f27f38b92","ea":{"id":"ea:276029","nation":"250 France"},"fm":{"id":"fm:2000198881","nation":"180 DR Congo"},"chosen":"250 France","rule":"fresher-ea"},
+    {"personKey":"rp23abfdf9cd4d37","ea":{"id":"ea:266156","nation":"276 Germany"},"fm":{"id":"fm:2000114312","nation":"608 Philippines"},"chosen":"276 Germany","rule":"fresher-ea"},
+    {"personKey":"rp678595745a5abb","ea":{"id":"ea:247600","nation":"Comoros"},"fm":{"id":"fm:49051603","nation":"450 Madagascar"},"chosen":"Comoros","rule":"fresher-ea"},
+    {"personKey":"rp12bc330b2fc929","ea":{"id":"ea:73004","nation":"276 Germany"},"fm":{"id":"fm:91201950","nation":"232 Eritrea"},"chosen":"232 Eritrea","rule":"override"},
+    {"personKey":"rpd709580b425d13","ea":{"id":"ea:231322","nation":"056 Belgium"},"fm":{"id":"fm:18096681","nation":"180 DR Congo"},"chosen":"056 Belgium","rule":"fresher-ea"},
+    {"personKey":"rp5d4a92a9ac18c2","ea":{"id":"ea:82736","nation":"528 Netherlands"},"fm":{"id":"fm:2000269525","nation":"388 Jamaica"},"chosen":"528 Netherlands","rule":"fresher-ea"},
+    {"personKey":"rpfbfcd112b59a28","ea":{"id":"ea:79927","nation":"368 Iraq"},"fm":{"id":"fm:2000159416","nation":"246 Finland"},"chosen":"368 Iraq","rule":"fresher-ea"},
+    {"personKey":"rp55596df698492d","ea":{"id":"ea:246804","nation":"840 United States"},"fm":{"id":"fm:72052905","nation":"070 Bosnia & Herz."},"chosen":"840 United States","rule":"fresher-ea"},
+    {"personKey":"rp4e38693b4e04af","ea":{"id":"ea:257175","nation":"276 Germany"},"fm":{"id":"fm:91189194","nation":"768 Togo"},"chosen":"276 Germany","rule":"fresher-ea"},
+    {"personKey":"rp8d95563b52867f","ea":{"id":"ea:70668","nation":"276 Germany"},"fm":{"id":"fm:2000068595","nation":"024 Angola"},"chosen":"276 Germany","rule":"fresher-ea"},
+    {"personKey":"rp8c50181c9bf2df","ea":{"id":"ea:77609","nation":"124 Canada"},"fm":{"id":"fm:2000450045","nation":"332 Haiti"},"chosen":"124 Canada","rule":"fresher-ea"},
+    {"personKey":"rp2e9e75b41c82f3","ea":{"id":"ea:259396","nation":"780 Trinidad & Tobago"},"fm":{"id":"fm:2000032638","nation":"454 Malawi"},"chosen":"780 Trinidad & Tobago","rule":"fresher-ea"},
+    {"personKey":"rpc330264c36ecf9","ea":{"id":"ea:78400","nation":"826 England"},"fm":{"id":"fm:2000294473","nation":"694 Sierra Leone"},"chosen":"826 England","rule":"fresher-ea"},
+    {"personKey":"rp98c12dc482199d","ea":{"id":"ea:81889","nation":"036 Australia"},"fm":{"id":"fm:2000326217","nation":"626 Timor-Leste"},"chosen":"036 Australia","rule":"fresher-ea"},
+    {"personKey":"rpf9136d31672a3c","ea":{"id":"ea:75460","nation":"056 Belgium"},"fm":{"id":"fm:2000134958","nation":"180 DR Congo"},"chosen":"056 Belgium","rule":"fresher-ea"}
+  ],
   "unmappedPlayers": 126,
   "unmappedNationalities": [
     {
@@ -171,8 +387,8 @@
   "conversion": "round(EFEM currentAbility * 99 / 100)",
   "nationalTeams": 176,
   "fullXIs": 173,
-  "eaShirts": 1257,
-  "fmShirts": 646,
+  "eaShirts": 1259,
+  "fmShirts": 644,
   "generatedShirts": 0,
   "coverage": [
     {
@@ -182,7 +398,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpf733d4c00eeee6", "rp305cbb8acfa73a", "rp3f7cdf6e4efab6", "rp2848a0392532a9", "rp5c36227c4af971", "rp9c3302b3c7c13e", "rpff1a432c27fd3d", "rp27d72cf9f5a722", "rp68bcf9e441e707", "rp22cfe925aca528", "rp3c4949b4baa16d"]
     },
     {
       "id": "104",
@@ -191,7 +408,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:23298186", "fm:23197376", "rp4b839f92a92288", "fm:23197388", "fm:23298170", "rp563d11655d0e1a", "rpe89791fe4e2373", "rp0d039976bbc113", "fm:23197366", "rp560aa99bc5ff9a", "rp71a5285a340a95"]
     },
     {
       "id": "108",
@@ -200,7 +418,8 @@
       "ea": 4,
       "fm": 7,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp3482175f8b56a2", "rpd15dea72b2f4e3", "rp74a78b2b053cef", "rpaac606d3a0a682", "rp4f73045fecdbf5", "rp499e363d6e106b", "rpa4d7e14885cf56", "rp8160754e3146c2", "rpbcb2b738f0c6f6", "rp012e054a12b659", "fm:13186249"]
     },
     {
       "id": "112",
@@ -209,7 +428,8 @@
       "ea": 6,
       "fm": 5,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:17001262", "rp52c9e8398c587a", "rp61c7333e521ae5", "rp32529fb2c2c8bb", "rpd0710e754957e5", "rpb7d1562ef67e8c", "rp9f29c6c6ea07a3", "ea:79072", "rpe039d84d9e426e", "ea:87217", "ea:77515"]
     },
     {
       "id": "116",
@@ -218,7 +438,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:12079581", "fm:2000158866", "rp3efd7b4768b8de", "rp306d95d5e3f394", "rp0f12b97ca66588", "rpadc5835de2091f", "fm:23481194", "fm:59117614", "rpa78f6d08f073cc", "fm:23481148", "fm:23099180"]
     },
     {
       "id": "120",
@@ -227,7 +448,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp83dba7d2e7aa51", "rp0795e3e881fec2", "rp1f556a1e6eb792", "rp008d191d547bae", "rpd928f9491d6af7", "rpb450a78bbceedc", "rpd0b55b41305df0", "rp6fbf4876c567d5", "rp3b41af0d8ca61d", "rpb7521090d04f67", "rp6e109cc7157c2a"]
     },
     {
       "id": "124",
@@ -236,7 +458,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpa92fb1a4cce76e", "rp0b194db772d1ef", "rpaf4ce071c1d9f1", "rp4c72b539d57904", "rp702c2a17a3602b", "rp933a1d1922c1fb", "rp6f95bbe0d962d5", "rp257710fbb796fd", "rpc4eda0dff98d09", "rp2dc352b18fc9ff", "rp1856369298b9c2"]
     },
     {
       "id": "140",
@@ -245,7 +468,8 @@
       "ea": 5,
       "fm": 6,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpc4ed5d0e8f5a9e", "rp338f7e56292971", "rpbc1a61ab3df806", "rp04736f736e17c6", "rp0b6d7faf126b43", "rpd7e054abd57182", "rp2ac4baec95ba3d", "rp0140ff9117fd4b", "fm:2000250114", "rp505374057c1adf", "rp0842819ff7f163"]
     },
     {
       "id": "144",
@@ -254,7 +478,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpf8c34813eea1ac", "rp96439c8858420c", "rp0550067498fb80", "rp76db0894082965", "rpd0fb55d783431c", "fm:2000242310", "rpcac1c1a4abdfd0", "rp5cc0276dd2fee7", "fm:2000111218", "fm:2000090522", "rp3eb85e6a218aab"]
     },
     {
       "id": "148",
@@ -263,7 +488,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpb7d0e00ea7b2d1", "rp21fdfb1ac19b73", "rp1a2ae5f2c41beb", "rpf45a7e4208410b", "rp382e12b9f15000", "rp4252ba2f700714", "rp1c8687b99ab4df", "rp9ed0b220da7ea5", "rp572d4199891bdd", "rpf87f6139632ddf", "fm:13108263"]
     },
     {
       "id": "152",
@@ -272,7 +498,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpba69b53eb9f58b", "rp295b1e94b1dd37", "rpb94234362b9539", "rpd7d85d35abd39e", "rp57139f0d162e04", "rp52a42072823148", "rpc5cb59438fcb09", "rp07bf7e02fbef12", "rp1f455773862c59", "rpf6567fc4c6ba25", "rp318d9df641acf1"]
     },
     {
       "id": "156",
@@ -281,7 +508,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd497af3fba530a", "rpb18932953db1b3", "rp4154a496e6d42f", "rpc954a9715ab42f", "rp660bbea4a63f89", "rp1aefa723edc9c2", "rpd56756aaf824a5", "ea:200741", "rpad5b75a90c4cc5", "rp3a9e1690c0894d", "ea:269579"]
     },
     {
       "id": "158",
@@ -290,7 +518,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp722bb2dec69b69", "fm:2000110765", "rpa4edb4b420b592", "fm:2000106117", "fm:2000110764", "rp0024503d1ac272", "fm:66037307", "fm:23020963", "fm:20503498", "fm:2000167501", "fm:23244398"]
     },
     {
       "id": "170",
@@ -299,7 +528,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpbde96a5c83f775", "rpe262aa54a85195", "rp7b714cda5973ee", "rp79df8ec9881af5", "rp74137d1f2ad1e4", "rpa5933b59016239", "rpc6a20d7321eb13", "rpe7e61ead4cf65e", "rp3b38c54c62574c", "rp9a45e400d73b38", "rpddd93a60769d78"]
     },
     {
       "id": "178",
@@ -308,7 +538,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp03e4ee16ff8d7c", "rp10d93159f60c77", "rp8b41dbee6ca8ec", "rpe2329e627c726e", "rpd634f8f0f2b2d7", "rpbac26e7806b616", "rpb09cd8453b2d59", "rpbc15511655cac4", "rpc8d3bee3b6f194", "rpab0dc2466de3a1", "rp803c2f0627af3a"]
     },
     {
       "id": "180",
@@ -317,7 +548,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpf1973665877f19", "rpe2c59f4243cfa2", "rp87bab4e76e2382", "rp18c45958d0d63b", "rpb3d9f294368033", "rp0a779cab623cbc", "rp979af8a68c8a1f", "rp750689f843e56a", "rpa1b6715d6c90d2", "rp6163f8838c712b", "rp8dfdffbe7ae353"]
     },
     {
       "id": "184",
@@ -326,7 +558,8 @@
       "ea": 0,
       "fm": 0,
       "goalkeeper": false,
-      "naturalLineup": false
+      "naturalLineup": false,
+      "personKeys": []
     },
     {
       "id": "188",
@@ -335,7 +568,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp9692222ab4e58d", "rp63fdd2a734afc4", "rp2c250557db0c19", "rp2b4cdadaee47c9", "rpa895f7e151a632", "rpad66d13fbff62c", "rp4f735a8562c0ec", "rp154daff8096ae4", "rpf6ebac29f37485", "rp8761ebe6b33585", "rpc8955a7d658863"]
     },
     {
       "id": "191",
@@ -344,7 +578,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6f442ff620cb9f", "rpcb4c7add62b601", "rp659c3f689c7af1", "rp30de4ff1595a57", "rp1caeb62a669e6c", "rp29efcd2eba1935", "rp4ee34a7555e5b8", "rp7e04644841e640", "rp2297c1bb271a5c", "rpcd6ba22b14b57c", "rp8713aad4f7c94b"]
     },
     {
       "id": "192",
@@ -353,7 +588,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp7dccfbeae02e87", "rp9e11c20add07a3", "rp34eed90d7adca0", "rp649707712b6b92", "rp420d8d287df9cb", "rp9ac1dfd909c7fc", "rpfec1cdeaa39471", "rp51dcad672c780f", "rp9dc6c884706e7f", "rp5efca94d7578cb", "rpe40606f5214eb8"]
     },
     {
       "id": "196",
@@ -362,7 +598,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["ea:184926", "rp2d4ca20fbe30ca", "rp68eff5b8b7b0f3", "rpfdd8b43821a652", "rpae172f7771caf0", "rp11677905b0a09d", "rpb4763829bec120", "ea:86490", "rpf110a58ce6767c", "rpd0d9c6860f96b5", "rp4ddcc5f37c395b"]
     },
     {
       "id": "203",
@@ -371,7 +608,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp76df5266a3c60b", "rpc31776ab51aa22", "rp6da7c0fdeccae8", "rpb234f0b4302781", "rpbc35de26a40023", "rp8e5606936e4e21", "rpeadc6b8b73e207", "rpb6c664b2ca9a7a", "rpb69800e601b6f4", "rp6b081248ec7d0b", "rp544de48369e2e5"]
     },
     {
       "id": "204",
@@ -380,7 +618,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp20b700224fbab3", "rp499a34f2d7435f", "rpe537f35eda7742", "rp99ec0e693cd0df", "rp626709d7246e5e", "rpff995e9714e211", "rpa3d4055cc76df2", "rp78cf7ce727a9e6", "rp39e11f18f4ad1f", "ea:86303", "rpe64a10447c7840"]
     },
     {
       "id": "208",
@@ -389,7 +628,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6cd5066da192a9", "rp2fd159f6b43e35", "rp12b1458b4c7368", "rpb855fbcda7aa71", "rp5a587fef66acfe", "rp49880da4d802e9", "rp6162994536147f", "rpa07888ed51b435", "rp05a51d24c24fc1", "rp57a29ab277a779", "rp1d82458fa35eea"]
     },
     {
       "id": "214",
@@ -398,7 +638,8 @@
       "ea": 9,
       "fm": 2,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd198a43c995667", "rp683de4ddba1708", "rp8ae2cebc1499c9", "rp1d25f4a8d21a0a", "fm:82080518", "rp3f5261ef16b643", "rp8b6afb15df5b16", "ea:84081", "rp7aad88ee2abdcc", "rp29e14c44aaa102", "rp29e2027ade45ee"]
     },
     {
       "id": "218",
@@ -407,7 +648,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpee1fbff54add75", "rpf581bb39eff718", "rp8bae988653d7f6", "rp57ccbbbc70454a", "rpe99b798e79ad2f", "rp493da4401e1f47", "rpbd0046615a6291", "rp1bc997b4a9bd66", "rp455840740d2051", "rp6710f85a18707c", "rpee10856543271d"]
     },
     {
       "id": "222",
@@ -416,7 +658,8 @@
       "ea": 3,
       "fm": 8,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp2d49b3e032de9a", "rp350fc207355d53", "rp60e1ef69eeab8f", "fm:87018898", "rp30e1a6f3663eb7", "rpdc01c2d9eb304b", "rp74031e9cf2b530", "rp728b389803383f", "fm:87001402", "rp7870b461c4a841", "rpfc36524c9ffa6c"]
     },
     {
       "id": "226",
@@ -425,7 +668,8 @@
       "ea": 7,
       "fm": 4,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp102349e98a7027", "rpb8a5f119deb6a5", "rp693d8eed8fe997", "rp3d443e14dcba17", "rp9f8548c11f5340", "rp6df26748e0fbb1", "rp3213a22e7f89e5", "fm:13203965", "rp4a6fdc18c92b62", "rp638052795692b8", "rpf3682adbfacef5"]
     },
     {
       "id": "231",
@@ -434,16 +678,18 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpaba06f548f967c", "fm:2000168379", "fm:2000168389", "fm:29178756", "rpee9aa0a0db69ac", "rp5d2d40b0c9ab42", "fm:13161003", "rp01fd205af73fc7", "fm:2000219679", "fm:2000219667", "fm:2000333562"]
     },
     {
       "id": "232",
       "name": "Eritrea",
       "players": 11,
-      "ea": 4,
-      "fm": 7,
+      "ea": 5,
+      "fm": 6,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp2b91c413cbfbdc", "rp6f58f1832e856c", "ea:259998", "rp12bc330b2fc929", "rp0f2f6a66ae6e33", "ea:86991", "rp0f31e5e8e7685c", "rpaf3a896ec0abf4", "fm:29178760", "fm:2000133836", "rp90d71b2a04da4b"]
     },
     {
       "id": "233",
@@ -452,7 +698,8 @@
       "ea": 9,
       "fm": 2,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpcd07ca2f60e28e", "rp2928d5383434c5", "rp07b71bb6f0f47e", "rp619a38bc05c656", "rp67c4dcfd0f85f2", "rp82f3b406337629", "rp18f06db5bcf318", "rp44fcba6176e202", "rp61360f919c4a18", "rp6d0f78f6105f60", "rp4ab2a40142e2fe"]
     },
     {
       "id": "242",
@@ -461,7 +708,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:88000360", "rpd4d7b240d37abf", "rpb7abf545edf996", "fm:95031214", "fm:2000020861", "fm:2000012388", "rp943a2fad9509a6", "rp1f2f62a3583152", "fm:88031511", "rp7c6a7485dbe68f", "fm:425942"]
     },
     {
       "id": "246",
@@ -470,7 +718,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp0876ccd2bfb662", "rp4e4aca337e7adc", "rpc9bb08693f55d4", "rpb6338c1f217ad6", "rp3136e78311619f", "rp9e0892721b80f9", "rpd4864749a580c0", "rpbe829f6bfe9001", "rp6731ba36282cc8", "rp8b3c0042a1f496", "rp4dc7756db96240"]
     },
     {
       "id": "250",
@@ -479,7 +728,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp160fa6b8a94b1f", "rp69c0807fd1f462", "rpbf02b8c1e33a22", "rp3ea28977a37312", "rp76ccf7c01da203", "rpdf2291a28a1519", "rp244e20e67e181c", "rp786709126ec0ff", "rp13178b61874996", "rp82ced573a290ab", "rpf144b24985883d"]
     },
     {
       "id": "262",
@@ -488,7 +738,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp3ab5a4c006ed94", "rp938e210e1044b1", "rpe403662dacd6b4", "rp9b808b435e0072", "rpaf218879e97bd8", "rp56410a1680cef5", "rpd44abd5d788fbb", "rp431b4a3239eb0a", "rp88f6d8b564671e", "fm:2000100470", "fm:2000380158"]
     },
     {
       "id": "266",
@@ -497,7 +748,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd1b2d260d647f8", "rp7a5197ebc37252", "rp5ef8924cda69e1", "rp784194692835a7", "rp16d027c236872e", "rp5484dd5774edab", "rpafb3c1e55a5cd5", "rp057e2d080394b1", "rpe6e09bcdb264fa", "rp115b921dc65461", "rp3709e8c5cc0eeb"]
     },
     {
       "id": "268",
@@ -506,7 +758,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpeb125469c676ea", "rp4ff4fcdd93f83b", "rp8272fa51e0bd38", "rp5bcc76a363d953", "rpcbd70e4dcc6d91", "rp4df6e404a8389f", "rp851153037e4504", "rpb1b11d46c13103", "rp6e23bb7f188a59", "rp2410915b302581", "rp64115cc11bf959"]
     },
     {
       "id": "270",
@@ -515,7 +768,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp0a5f83fbc3ad5c", "rp574876532b2f6c", "rp569ae3b3817e44", "rp17b8d3c61dc335", "rp0a71de49af78af", "rp3dea7260a8322c", "rpa973912f4610fb", "rpd5710761c6d4cb", "rp7981151f9bfa86", "rpd9f691f30713cc", "rp19d3efcd1efba7"]
     },
     {
       "id": "275",
@@ -524,7 +778,8 @@
       "ea": 2,
       "fm": 9,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp4035d88f323b83", "rp51301f5a2b8e50", "fm:14201945", "rp090627f196664f", "rp73a619ad643d13", "fm:42057989", "rp413760ef60e7fb", "rp1fb88c6f3e29cd", "rpd655e08a8ae16e", "fm:2115899", "rpdadfc50cd3c321"]
     },
     {
       "id": "276",
@@ -533,7 +788,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd0633eb14ebe14", "rp68ab5bc6058fa6", "rpd892b2d8d41449", "rpe4e6ca2c8a0f99", "rp909ca0932c0382", "rpce65b40d1dbffa", "rp4da25d25d6d9ec", "rpa735943844f8b4", "rpf753834df0128b", "rp375b7bd6f2dd6e", "rp297aa18ebf5645"]
     },
     {
       "id": "288",
@@ -542,7 +798,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp3e3e82dbcbd568", "rp07aae7c1ae9aef", "rpd649d0ccde3a74", "rp396ceccb72459a", "rp43b0020973a56c", "rpebe7b5e5ffc31f", "rp2bed01e5763fd5", "rpdefd6503e24fac", "rp70748226e85be6", "rp461a21ebe0fa23", "rpefeaad043b5ac7"]
     },
     {
       "id": "300",
@@ -551,7 +808,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp7e3a12f288d149", "rp7e3c9c3ff18ac5", "rpaab73a83ec29d5", "rp5491adc615ea32", "rpe5a25f28e55ab1", "rp5fb65088fe8763", "rp73973f9f73f3af", "rp4f4b16bc6df35d", "rpe4feb1fbf48bcc", "rp3af98ef4f77dac", "rpc95b8268dd22e6"]
     },
     {
       "id": "320",
@@ -560,7 +818,8 @@
       "ea": 3,
       "fm": 8,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp23b67c358fb011", "rp3bd2cd2bf61162", "rpb167fb21e84fce", "rp686b440d99b352", "rp60f329cccb539f", "rp68d6c684106e7b", "rp3352a83c49366e", "rp0a8220b68a2a93", "rp93f81b52ea2e1d", "rpc805429cf5855f", "rp603c6cb843bb38"]
     },
     {
       "id": "324",
@@ -569,7 +828,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp139439099ca4ea", "rpea92785ddfc438", "rp487c77d8940dad", "rp5a34c72af7a6bc", "ea:237520", "rp2def1c63a03c66", "rp195c7eb2561f4a", "rpfec2aba29256dd", "rpc4756c7be829fb", "rp4fd883a330c3d8", "rp4b75ae2f29f377"]
     },
     {
       "id": "328",
@@ -578,7 +838,8 @@
       "ea": 9,
       "fm": 2,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp137ae942ee263f", "rp0a75527f73478f", "rp29b37703608ffd", "rp343e1a561728f7", "rpf6eb71a1fd36ea", "rpca3dd89fc0fa67", "rp1f8ce93f7b29a5", "rpd04b8268c65cd2", "rp1744937a6c90d3", "fm:20045025", "rp219c14a96dd040"]
     },
     {
       "id": "332",
@@ -587,7 +848,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp28c0f35118b968", "rp42b6ebfeb1e714", "rp2c0cc6dfa20900", "rp3702beaf1d1ac8", "rp67a9cfef3e3450", "rp6600941e74ac6b", "rp18a8f777ee8617", "rp9c8e48b4f6e3f9", "rp59c855e388d994", "rpb8e3178992a3cf", "rpe3df6c94903978"]
     },
     {
       "id": "340",
@@ -596,7 +858,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp62ea35750ea531", "rp6dde21171a352b", "rpb7e12a5daf60d3", "rp51ccc767b720a5", "rpa310a7fd6aca63", "rp0cf9896645987c", "rp577a916f0addbf", "rp23a4cab2ad8918", "ea:275253", "rp99bba8b05f188e", "ea:86537"]
     },
     {
       "id": "348",
@@ -605,7 +868,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpe450402293d6f0", "rp25e08c4ebeb84f", "rp40bb5dc8e292b5", "rpa1b94dad926c54", "rp5b5c36541309c6", "rp440c580f4c6d60", "rp086fd74c0881d0", "rp6632df959a1a86", "rp2d57495b27722e", "rpb603531621b796", "rp2b93fad2cd3b48"]
     },
     {
       "id": "352",
@@ -614,7 +878,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp9c31eeb1c5300a", "rp5d1948d297dcdc", "rpaa92e9d242d553", "rpb9447c0f149d1b", "rpae7fc332e354a4", "rp2a97ca5ce9fbff", "rpb2b98fe805ab6e", "rpb926a923eca23b", "rpd8e2cb3f0090e8", "rp3c6cf4f12a2cee", "rp3cda0db107f5e6"]
     },
     {
       "id": "356",
@@ -623,7 +888,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp626f2127215f65", "rp22554362478549", "rp426867dc364ce4", "rp2fd34c54b48456", "rp67ad34db427470", "rpeb7c4bc7d69f24", "rp8aabf1ef1b1734", "rp1d4edeeac69303", "rp639ed735010167", "rp16915b723e4a13", "rp4db0c724631ec4"]
     },
     {
       "id": "360",
@@ -632,7 +898,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp1295fb9fffaa32", "rp700c16b7e93e95", "rp0c5ec5e2741431", "rp40be3fd453e476", "rpe9b0a35eded2b7", "rp0dbbe2314666ab", "rpbd22ec0dcb08b1", "rp920f2a8f880d20", "rpc5598eb6eb3194", "rpc1971efec30203", "rp3f9be949a613ff"]
     },
     {
       "id": "364",
@@ -641,7 +908,8 @@
       "ea": 7,
       "fm": 4,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp4f4b57f31f5d10", "rpaf7b2a50376504", "rpef2b3edfcb178a", "rp97ebbc1afda912", "rp4787dbdb444820", "rp9b15a35d8baba0", "rp0f562f1c9755f7", "fm:23251718", "rpf3f634651f981e", "ea:86307", "ea:87597"]
     },
     {
       "id": "368",
@@ -650,7 +918,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpc30d48f1287f2d", "rp868e44f191b91e", "rpea02f7993d62db", "rp2a65d51bb670f2", "rpd3f4c0d70a8db0", "rp2d5e856b58ecee", "fm:23320744", "rp4863629a8d55b7", "rp24f64d67abd20d", "ea:86293", "rpfbfcd112b59a28"]
     },
     {
       "id": "372",
@@ -659,7 +928,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpb7e60ea800912e", "rp2e83ddb73f9247", "rpd8c9b875df839e", "rp6b912fb59e6b66", "rpdb9b505c794d7d", "rpc403fdf4b54513", "rpcc240f46c2c19a", "rpb5ee18ebfe751f", "rpe5eb0315886b98", "rp81e4d3d75d1bfe", "rp406639875bcc69"]
     },
     {
       "id": "376",
@@ -668,7 +938,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp74d68214c3fa42", "rpe590566667005a", "rpad27e152a1d33d", "rpfea043b9f4599c", "rpa7f4248c65e55a", "rpbf629f9728b82b", "rp9355bf30e548cf", "rp4bbbbbdedd17bb", "rpdc23e4d90b7a3f", "rpbd0b60afa8fda2", "rpae6c75fb80a762"]
     },
     {
       "id": "380",
@@ -677,7 +948,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp53404b1f2684d4", "rp832758bdc0d18a", "rpe1bdced607cf61", "rp134b2a99e4adc2", "rpffb835b50ea83d", "rp74879d6beee7ac", "rpcf4af0358e8e90", "rp77f7a3cc8eeef6", "rp4ada2cd64d7b8c", "rpf50194068b0114", "rp14085be12e1134"]
     },
     {
       "id": "384",
@@ -686,7 +958,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp4121d373b7d22c", "rp4e53b929bcb8f1", "rp7f710967f1c894", "rp6fc04d14c12b57", "rp45ce1507082d71", "rpe915da0c8eb3ad", "rpcffa920d0dc1bc", "rp83400ec774bf67", "rp25ed9f08387add", "rp47c4f5bccd6238", "rp67420e03e955bf"]
     },
     {
       "id": "388",
@@ -695,7 +968,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpf36ff31ab8f1b8", "rpa952f6cb1ad5f2", "rp2b5e9afa85a416", "rp2e5a0a3ff50839", "rp5e3d01b88e5dbc", "rpb315343d380761", "rpdfda7ff4bd12b1", "rpfb2611be92e6a2", "rp95ad4d373c2abf", "rpbf344da1a0b1ec", "rpaab0b0f5a91d24"]
     },
     {
       "id": "392",
@@ -704,7 +978,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpfd626429672778", "rp0258ddff985d07", "rp4f4bc87db2c8c0", "rp0820428dd295c5", "rp49f6281017a856", "rpcc80fd242f7532", "rpd67a8f1eb9dabe", "rp5c1e28361416c5", "rp67cdd414d58411", "rp37aa77528cb5e6", "rpaac902178db594"]
     },
     {
       "id": "398",
@@ -713,7 +988,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpdfb6a85959cc17", "rp32efa46ea94816", "rpd82b22ccdbf70c", "fm:59020844", "rpf11d5380eae124", "rp3357cd47995fc5", "rp8cd75e79860052", "fm:59070895", "fm:59110691", "rpd212edbc8f0bef", "rpa792775960bf3b"]
     },
     {
       "id": "400",
@@ -722,7 +998,8 @@
       "ea": 6,
       "fm": 5,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp633ee9f278b132", "rpd4c33e862e2bd6", "rp146d25f869b4c1", "fm:2000268099", "rp572142954c58db", "rpb04c26b8252e93", "rp82f66916260211", "rp0a8b6164550164", "rpe1699fbbb52fea", "rpe97e863335dbc3", "ea:82303"]
     },
     {
       "id": "404",
@@ -731,7 +1008,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6073417e723030", "rp9205418b65c2f8", "rp7308efa0029fe5", "rpb55e458f1cfd63", "rpd45183e19f1a5b", "rp7099798c3d113b", "rpb9f1bb48a7da78", "rp2cb4070a0ab2b4", "rp4da97e63f74e3f", "rp5829a9b35a7257", "rpc7319208f64fe4"]
     },
     {
       "id": "408",
@@ -740,7 +1018,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:2000299448", "fm:23325469", "fm:23425633", "fm:23425649", "fm:43348788", "fm:2000101541", "fm:23425634", "fm:23425752", "fm:2000142440", "fm:2000295187", "ea:71454"]
     },
     {
       "id": "410",
@@ -749,7 +1028,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6322ee16050d40", "rp9b2439d6786b03", "rp303015dc135374", "rpd394136a547d58", "rpc2b8a2295ea228", "rp6c380af84c1f8d", "rp8f2fa952adf749", "rp39f65a48bc44a4", "rpd6b8e753e55853", "rpd8c8bd30644495", "rpca1c6a3441bd22"]
     },
     {
       "id": "414",
@@ -758,7 +1038,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:2000072468", "rpa66a59687acea2", "fm:2000018230", "fm:2000050512", "fm:23150717", "fm:2000067615", "fm:23150716", "fm:23413661", "fm:2000082247", "fm:23150371", "fm:2000018217"]
     },
     {
       "id": "417",
@@ -767,7 +1048,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp645853cca31505", "rpe1ec63b1417fbf", "rp749fa78acc3b58", "fm:59132031", "rpf09a3003f07621", "fm:89069477", "fm:2000040739", "rp0cf5f883095831", "rp63ccedaf36d6fe", "rpb7a48c3e7df770", "rpd13c3928dc3f8d"]
     },
     {
       "id": "418",
@@ -776,7 +1058,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpc8657aa936440a", "fm:2000508373", "fm:2000115024", "rp4440675384c740", "rp1c9c7913821301", "rp57b67ca90e4b31", "rpe576f5e22bb38d", "rp7a3169ea2a82a6", "rp7ec9a8ce0d4881", "fm:23190697", "fm:23103918"]
     },
     {
       "id": "422",
@@ -785,7 +1068,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp314ff7265815f9", "rpc8559af2140d32", "rpac6b60daf96798", "fm:23019672", "rp288d8d8b5dd1c8", "rp0e906dcee59689", "rp87148e9b8c99d9", "rpff888570547782", "fm:64046397", "rp62abe40596476a", "fm:23190203"]
     },
     {
       "id": "426",
@@ -794,7 +1078,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp97cf9339326e47", "rp870c1bdcdc7e17", "rp95bb983094f3f8", "rpfdbb90bc2c822a", "rpeb06a7c7775120", "rp0e3fa3f34b6034", "rp3f6ed8d508be82", "rpc03f97753990e0", "rpb6b4eb90289c3a", "rpd243a97ac6c5c0", "fm:13178058"]
     },
     {
       "id": "428",
@@ -803,7 +1088,8 @@
       "ea": 8,
       "fm": 3,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp37a6f00365d5d2", "rp2f2b7d8beb0a22", "rp0fee922e5b5611", "rp08cfbbc5b6c1be", "rp63d9ebb50c75ef", "rp4668ff5c5c73b4", "rp332ad57e9d9b91", "rp8895dccfcad099", "rp459f89f38acdc8", "rp5e515cd06eae78", "ea:87249"]
     },
     {
       "id": "430",
@@ -812,7 +1098,8 @@
       "ea": 3,
       "fm": 8,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp9721ba878694d1", "rp832c21135b32ea", "rp36f466800f4a68", "rp2188086c599ff2", "rpb674deec2f74f0", "rpd4a4ca0f95302c", "rp896c30a7163a07", "rp3103f78e3bc89b", "rp02381cbacc4d59", "rp627009cb31ca47", "rp627527c4d46bcb"]
     },
     {
       "id": "434",
@@ -821,7 +1108,8 @@
       "ea": 3,
       "fm": 8,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd3111bf34e2410", "rp6e8e05db28769f", "fm:2000103151", "rpc9789a5c7cfb3c", "rp2ebe05da01369f", "fm:13167437", "fm:13232344", "fm:13178141", "fm:13232380", "rp9709770909a3df", "ea:85517"]
     },
     {
       "id": "440",
@@ -830,7 +1118,8 @@
       "ea": 6,
       "fm": 5,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpa4fc02d4469391", "rpe80fc38b07e81d", "rp149553cb14694e", "rpca4fb3734c943e", "rp96ae95fcbaa35b", "rp68e4d9ceb6bb7f", "rp2a31113f3b103f", "rp81920d1a81d3eb", "rp861566eb35062b", "rp02a0bfe1f62ac1", "rp21dc916b5a5a04"]
     },
     {
       "id": "442",
@@ -839,7 +1128,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpe10da7e0b20240", "rpd7a2bb0a59fd1d", "rpc4ceec03e45d9b", "rp31eeea5a08003e", "rpdc843843ce805f", "rp512e1eb31f250f", "rp624eec511f44d9", "rpc36265a6ec2ca4", "rp7448442e0398a5", "rpfc39ff26739bf4", "rp1219165a00aced"]
     },
     {
       "id": "450",
@@ -848,7 +1138,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rped219b1c7fcda7", "rp206ccd91c00c56", "rp6caeb2588c46b6", "rp09e3ec7a08d098", "rp26aa6929153c5b", "rp7a94d04180ef48", "rp14b24e22e96f4c", "rp4064b0831ac2dc", "rp8bad853ad815e7", "rpe8e32c94af047b", "rp2b88aa6057ba1e"]
     },
     {
       "id": "454",
@@ -857,7 +1148,8 @@
       "ea": 3,
       "fm": 8,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpf654f76581d797", "rpe407f2701a2b8b", "rp36fe5b96b707d5", "fm:13167401", "rp66d68eed7a391a", "ea:81817", "rp48c2a70da3c577", "ea:86410", "fm:13109163", "rpb2b207d7038512", "rpa3058770a9738f"]
     },
     {
       "id": "458",
@@ -866,7 +1158,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp437742da0cbdb6", "rpc87906c3bd7bb0", "fm:19256400", "rp32fab0278116bf", "fm:19241899", "fm:29058228", "rp9e49fccc2d3b40", "rp4b14262f7e1eb4", "rpce504fe3c62009", "rp3b70626e2814f2", "fm:23201328"]
     },
     {
       "id": "466",
@@ -875,7 +1168,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp9829a2693fbef5", "rpbb855479e78f42", "rpa8ebe39e6f6f74", "rpe1986035e785ba", "rp812b94a86b7af4", "rp439c3d117e28d3", "rp42ad2a85b69181", "rp23e871445681f5", "rp76fc628d0b47ab", "rp10691982b449ad", "rp11b5eab9f8de27"]
     },
     {
       "id": "478",
@@ -884,7 +1178,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp867c948a32a0fb", "rp4bfa5391970589", "rp66d3d963dc785f", "rpce2185a8d3e6be", "rpdb9b788484cf5d", "rp60a703159a19a8", "rp0ebe6b142297ab", "rp34742a6cb7c9c1", "rp5f2cf2864bce8d", "rp48d43179f7d675", "rp4dc9db1489199d"]
     },
     {
       "id": "484",
@@ -893,7 +1188,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp035639a98bf43c", "rp02d033ad610932", "rp3db5e52cb95d15", "rp6ca197beeb81ff", "rp0c6455c9718d87", "rp1aa9890a96a902", "rp6f52713a40a39c", "rp84ffa790830338", "rp28a03acef7d6d3", "rpdb26fdb759d9e2", "rp1176e6f616559d"]
     },
     {
       "id": "496",
@@ -902,7 +1198,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp62a3e6d9b5b07c", "fm:2000113474", "fm:16250804", "rp427f9215e54d42", "rp6c8f1cfe61f6dc", "rpc4e03d106356d4", "rp6b8b9f713befb8", "rp531f9f75d535cb", "rp01ac9213e43aca", "fm:23445391", "fm:1020268"]
     },
     {
       "id": "498",
@@ -911,7 +1208,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp1e79ed2b5c2348", "rp8240bef00b6c47", "rp6fbabd1225f88a", "rp63821e11b0a62c", "rp453d3bfba320f8", "rpcb545cf0def985", "rp49b50421b4b4df", "rp10bcbd163bd704", "rp270f709503fc87", "rp4fcdedefa3dbbd", "rp239338387ef416"]
     },
     {
       "id": "499",
@@ -920,7 +1218,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp1555aaefd30ef2", "rp8fcb02921cfd9e", "rpfbf11fa2367e8d", "rp33fe2927c831cb", "rp1c6c2282e2d1b7", "rp3edfaf7562d3a6", "rp21b8328d6b5c88", "rp05a23a10308adb", "rpa5ffd9177c6fe9", "rp7f991439213a6b", "rpdd61b7d80321fa"]
     },
     {
       "id": "504",
@@ -929,7 +1228,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp7b3a3244c981a6", "rp2ff7153451756d", "rp8f2bfa6741a4b3", "rp3798a0f16bb275", "rp432df7fb9af278", "rp75cff9eef8dc59", "rp31bffa388e75c9", "rp5cd1bf11229ed1", "rp57f7be0a23cb15", "rp041584cf54da9f", "rpe6465abd82c20e"]
     },
     {
       "id": "508",
@@ -938,7 +1238,8 @@
       "ea": 5,
       "fm": 6,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp2095ade1cb7272", "rp5695e883ac36cc", "rp2abfa3d3973f90", "rp033651d44b31cb", "rp09b4f3f930c7ec", "fm:83107368", "fm:13117398", "rp16a272c95fa4f6", "fm:55070953", "rp2692161505d4f6", "ea:87016"]
     },
     {
       "id": "512",
@@ -947,7 +1248,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:64043449", "rp12173316679a59", "fm:64045378", "fm:2000285883", "rp39f8f4da3dd091", "fm:2000473221", "rp2fc5bee40ae464", "rp6a1c61bd72ff65", "rp45772bb1d94293", "fm:23357530", "ea:88183"]
     },
     {
       "id": "516",
@@ -956,7 +1258,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:65032608", "fm:13139039", "rp54545fb72f2b84", "rpe5773211b0b7c8", "rp864c913e688d3d", "rpfcc925219ca239", "fm:13104253", "fm:12014099", "rpe132acbca03671", "rp5e6841885419b5", "rp886259a43d5782"]
     },
     {
       "id": "524",
@@ -965,7 +1268,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpb28718c9603d93", "rpb076a3ebf2cd4e", "rpd4a8c894098355", "rp968d84ef82d5aa", "fm:2000095161", "fm:2000076113", "rp1a0c337232fdde", "fm:18087913", "rp18e6001cb8ae78", "rpd84582839f7be2", "fm:2000011000"]
     },
     {
       "id": "528",
@@ -974,7 +1278,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp65c52b88b1ee92", "rpaa90cfee602a9e", "rpa439c3e46c0e10", "rp0d28c5fd87a27a", "rp51ffde383cd908", "rp77341832e2e015", "rpc4a9441b8d5f70", "rpb12bf1170c8436", "rpf8fe698152cebe", "rpe754a105a4c697", "rpea439be8b67f00"]
     },
     {
       "id": "540",
@@ -983,7 +1288,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpf5b1150b337e3c", "rpa8d58f7619e790", "rpebd8a7a736bc3c", "rp1f59eaf8268a70", "fm:50082768", "fm:2000028910", "fm:2000215670", "fm:49040289", "rpd216f4e16ec49c", "rp47d3fd6028ec82", "rpdf2eaec3caf351"]
     },
     {
       "id": "548",
@@ -992,7 +1298,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp5a5f2343642654", "rp7bc1fd7b027833", "fm:15086041", "fm:30052352", "fm:30052494", "rp5ba775306c7d1d", "fm:88024855", "fm:30053161", "fm:88026055", "rpdfae0aaced83e8", "rp702aaeb3830cfa"]
     },
     {
       "id": "554",
@@ -1001,7 +1308,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpa0e75436ebcec4", "rpcc4dcb439775c1", "rp351993c6b89af6", "rpa1d60e641623e0", "rpfc723cb218c23c", "rpb6137ccafef386", "rp3a2e289b0d30b6", "rp2f5e9283e897bf", "rp2580e852b63968", "rp07131f49818d09", "rp0f8d4af1dadcd0"]
     },
     {
       "id": "558",
@@ -1010,7 +1318,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp2c9564a78c3af0", "rp3e043d0695dd51", "rp2311a38a5d4897", "rp8c5377f3ebbe92", "rpd73692c9edc1ac", "rp6a7be4e9b0001b", "rpe74594c592dc2e", "fm:80001533", "rpb28d04c5d33281", "rpe2a6cb5155b599", "rpbf09978233d2c8"]
     },
     {
       "id": "562",
@@ -1019,7 +1328,8 @@
       "ea": 2,
       "fm": 9,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp53d5d5baad97b8", "rpa676697f97c6bd", "rp271a546c711ec4", "fm:13170056", "rpb252322979b50d", "rpf6c1492d563e2d", "fm:67246312", "fm:13221054", "rp6b2171aae012c5", "rp6f26bb0bbb9c42", "rp617733322e62ab"]
     },
     {
       "id": "566",
@@ -1028,7 +1338,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6dd6649c0176fe", "rpda5654b4846f8e", "rp6c74a91e2618d4", "rp99f731ed3182b6", "rp23041d2ddfa328", "rpc19514ab13c20c", "rp82e2262ec75e0b", "rpc69c4e2ff56976", "rp5575d0a5ececb4", "rp35434bd02e27b9", "rpf6b1f963687323"]
     },
     {
       "id": "578",
@@ -1037,7 +1348,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6633c6727b95f0", "rpe0da48cba34547", "rp88bca5889a08c8", "rpc92f67d550d591", "rpf28ab198b31227", "rpcefa2cf4d39bdc", "rp9485ae2981aa5a", "rp5f6e4daafe386a", "rp24c1364644b420", "rp08c918ba647b7f", "rpabaa29d90fc9e1"]
     },
     {
       "id": "586",
@@ -1046,7 +1358,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpf2b30a7362a5ef", "rpe6946171b7086a", "fm:2000253169", "rp12f39f805d4615", "rp768bd531f31efa", "rp72acee6ad11950", "rpbd9a1d60b3536a", "rp0e3ba7a1f4acaf", "rpb863dd92de9009", "fm:2000071736", "fm:2000416074"]
     },
     {
       "id": "591",
@@ -1055,7 +1368,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp06f051d023b4bf", "rp9af313afa5a6a7", "rp24c5cf8b3443ef", "rp1af4bdba08bc85", "rp10badda0597594", "rp9023394b10852f", "rpf4824429480821", "rp4f7db54f3d6fb3", "rpc40904b9795bbd", "rp2312a9a283226b", "rp90fe89f07d9bbb"]
     },
     {
       "id": "598",
@@ -1064,7 +1378,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:88021092", "rpeb9d9c9f717e83", "rpa65e47b7a7c161", "rp6ef060990f28a7", "fm:2000089816", "fm:88021857", "rpdc5b30e22c2db8", "rpd0debb7ff6b952", "fm:88028469", "rp41ccf62d177226", "rpc2521909fc9056"]
     },
     {
       "id": "600",
@@ -1073,7 +1388,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp2eaa1bbb1500f6", "rpedae9e401c084a", "rp5aab65c185e983", "rp7cadb5fc716060", "rpdf33c31d5b3446", "rp6dd10657f121a1", "rpf0a7fb40739bbc", "rp038ab1ccaf29c8", "rp672d4bdceca487", "rp47d656904f6c3d", "rpe7082a33b373c3"]
     },
     {
       "id": "604",
@@ -1082,7 +1398,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpb838082099107a", "rp0dda5937cccf5b", "rp493ffa37c6b4ca", "rp6b2e72985036ab", "rpdb93ce077202ff", "rpa42cb57c9d012f", "rp8551a80949fa20", "rpebfccda65401a2", "rpf42dfb6476601a", "rpc7661edaba61bc", "rp8d78d5a691e257"]
     },
     {
       "id": "608",
@@ -1091,7 +1408,8 @@
       "ea": 6,
       "fm": 5,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpbfdf81952af510", "rp1351a7711f8c14", "rpa47a7fc2ae5263", "rp53f5871eaf1aec", "rp10e71772a31a6f", "rpe34ca29ce04f32", "rp80bc5415ce39f7", "rp05f375d5f36fe9", "rp9bdd173e182d6d", "rpa4328fcb1691f4", "rp5bd23b3a1e262a"]
     },
     {
       "id": "616",
@@ -1100,7 +1418,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp109801338df8b5", "rpd63a5a0a5d653a", "rp08d63b59057e81", "rpe7a5ddeaf97283", "rp9d3c49b93aca63", "rp4b19a6d993f393", "rpaa0caba2d5631d", "rp17e771abe29957", "rp17a2c63e89f29b", "rp8f42b724055c43", "rpa1b4431dc9b1a4"]
     },
     {
       "id": "620",
@@ -1109,7 +1428,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp1e3846fd696a6e", "rp637c0bcee0298e", "rp20a0c692d62031", "rp8e5a5bb72faf75", "rpc62063f6a8f7bd", "rp2be53a7f953197", "rp3780c8860a2b01", "rp7aa96b564d92ef", "rp880e7644492bb5", "rpa33fba8a05ed3d", "rpe63bd2d7ed271d"]
     },
     {
       "id": "624",
@@ -1118,7 +1438,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp3c31e3d9c2a057", "rp8119b17d2debc8", "rp80a13a9068b62c", "rp74020d64526144", "rp75305e9a9757be", "rp0c7f63a230c3cc", "rp6f5fa7e3b63dc0", "rpc20812546f44d8", "rp3462a51bc54592", "rpb4fda58fe31ea1", "rp323a5dc0d01654"]
     },
     {
       "id": "626",
@@ -1127,7 +1448,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:23092840", "fm:41039986", "fm:23270192", "fm:29233996", "rp6316598a7035e0", "fm:23396623", "rp087a45d3037ddd", "rpbe010ba0eea797", "rp135c6fff8a512b", "fm:23103921", "rp5e35156d960e2b"]
     },
     {
       "id": "630",
@@ -1136,7 +1458,8 @@
       "ea": 2,
       "fm": 9,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd304ac35af4e74", "rped306cdd722821", "rpa596b930b7fe1b", "rp29e92714d9b495", "rpfc3afbb2f0a794", "rp9d8f4f8870d9be", "rpa3b94a8403ae70", "fm:2000328682", "rpc6087bebd7b238", "rpcb51a6d16e59d5", "rp0cafb932b9e582"]
     },
     {
       "id": "634",
@@ -1145,7 +1468,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp3eea8857470ce3", "fm:16183022", "rp8065c4e97f9769", "rp621f41f01bdb31", "fm:19105719", "rp36a490a3acd567", "rp32d2c9f08e04f3", "fm:23155600", "rp85011295f0d7dc", "rpca2aec51f1893f", "rpdf0d02d0263b5a"]
     },
     {
       "id": "642",
@@ -1154,7 +1478,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp656523fabd47db", "rp323d2decc0b12f", "rp20c24483c5849a", "rpf3d290d5ff406b", "rp202ee3b7d55d9f", "rp02d66a84690f5d", "rp5316a85aae138d", "rp578181c1c6c035", "rp6e593a231b2444", "rpb36c4fe8e7cd3a", "rp9ed09c417c1ac8"]
     },
     {
       "id": "643",
@@ -1163,7 +1488,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6766f141f802b7", "ea:214092", "rpa79417b4f9b67b", "rp9eef2b6ac695f9", "rpb276fad72ab086", "rpcea1b71e94afda", "rp46c69b012b94c4", "rpccb3f6a9fbfedf", "rp7e8dd74eb1378b", "rpe6e1226d2a78ec", "rp295ff88676a1a0"]
     },
     {
       "id": "646",
@@ -1172,7 +1498,8 @@
       "ea": 4,
       "fm": 7,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpdce65ac9268099", "rp6fe482054b5adc", "rpfc587bdf9d060d", "rp1809d1676f4e4a", "rpc3e0e9d2078b61", "rpf9a47b11c80149", "rp5f83d7190487cf", "rp811d04bc0b53a5", "rpe90d9cc4963b10", "rp8749bffab565cc", "ea:88092"]
     },
     {
       "id": "682",
@@ -1181,7 +1508,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp61e7f42c1f010a", "rpfbdf2bed0a65a1", "rp4d0180d300c49d", "rp32dc25b2ef70d5", "rpc58bef40ecedf3", "ea:238545", "rp07070283bde9f9", "ea:74436", "rp86ee25c39e9b51", "rp382885db2a3be1", "rp1db8b89fec6bd4"]
     },
     {
       "id": "686",
@@ -1190,7 +1518,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpdf0212a886120d", "rpa1bc9a153cd706", "rp78b94491b910c3", "rp7311c895b98513", "rpa60752e5d76934", "rp6b566c3335dd47", "rpa0acb017ed4f5f", "rp5b7b935367a357", "rpfa692c1e8a3bf6", "rp48a3ed7f5638e3", "rpe7b407d8248132"]
     },
     {
       "id": "688",
@@ -1199,7 +1528,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp0e7c00ae8a5876", "rpbae76247d3949c", "rp45e80909fb8707", "rpcc314d8e3ad542", "rpc470fb423c07b3", "rp91ca7452247fe5", "rpf01a442a0b54ad", "rpc22699cb17f48b", "rp07670f4457d4d6", "rp7ad63f187eca83", "rpdddf9b5650b5fa"]
     },
     {
       "id": "694",
@@ -1208,7 +1538,8 @@
       "ea": 9,
       "fm": 2,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp443f519e54733d", "rp1c05761e2c98b4", "rp5f5a626dfaec07", "rpf93edad3f12d15", "rp7311ea7793be8b", "rpaf1083f852e94b", "rpf317b600659970", "rp0efc490c82e4b9", "rp3a30ee6bebfbee", "rp1876c0bc420a9c", "rpcf76db425523ce"]
     },
     {
       "id": "703",
@@ -1217,7 +1548,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd55fb39189a216", "rpb5c359413ca1f6", "rp5f00fc5eac402e", "rpe30974d389c6a7", "rp7f14d7bb6522c0", "rp41a066426731db", "rp2385d734493980", "rpe33e1e5b2ff14b", "rpa44ed151227691", "rp398bd15df8096a", "rp85f73e535307f3"]
     },
     {
       "id": "704",
@@ -1226,7 +1558,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:19231090", "fm:25052501", "fm:48037802", "fm:23339415", "fm:23365449", "fm:23296792", "fm:2000087470", "fm:23303678", "fm:23303751", "fm:23302366", "fm:23303646"]
     },
     {
       "id": "705",
@@ -1235,7 +1568,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp34a8304202ea94", "rpa38e53ecdbdbbc", "rp35771b1a87f4d4", "rp028852774e1a51", "rp9938ed95cf3625", "rpe2d979412d0e4e", "rpe9c16a3a067562", "rp7dc1421bcc0abe", "rp7a46f2ba13f87a", "rp8d68f586a18b67", "rp9bb91621401aac"]
     },
     {
       "id": "706",
@@ -1244,7 +1578,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpf73c01d20302bf", "rp0366f1f9bc75a1", "rpbd3c29be718f5b", "rp8c88e0eb12f0ad", "rpfa23aead74c4c9", "rp2b12000d6b73ff", "rp5caad1f2753da5", "rpd06930e3acde9e", "rp27e10aa70a7a1a", "rpa049acd1ad7e07", "fm:2000320572"]
     },
     {
       "id": "710",
@@ -1253,7 +1588,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd9c1ee6dc0cb6c", "rpe6c99c544f4245", "rp76fa776771a329", "rpace1e0fb88cb63", "rp4410da0cd1f1ff", "ea:82509", "rp4fad75e5464d59", "rp6667ec97e4fcdb", "rp849bd117a67d70", "rp2a547177ca4ce3", "rp3b1bc162dc77d3"]
     },
     {
       "id": "716",
@@ -1262,7 +1598,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp9d142904444072", "rpfed7104c4b5883", "rpe4cf522de1d596", "rp96386df9b84048", "rp009bd31ea855d7", "rp22a8b127076c76", "rp0571fe90ecb94a", "rp39c99c2e747d6c", "ea:279519", "rp0e0b7664ea661b", "rp9238eb945325a6"]
     },
     {
       "id": "724",
@@ -1271,7 +1608,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp7798de805b917b", "rp360a26a0fc1f7f", "rpcc53a150fa2413", "rpb9cc4542f20788", "rp792dff202eeab4", "rp36407ee30b80fb", "rpcad5f86e137dd1", "rp498f72d0bba2ce", "rp4fabdc925adec4", "rpfb535a0eabe483", "rp348993f63328ca"]
     },
     {
       "id": "728",
@@ -1280,7 +1618,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpa66903cf03168a", "rp4c16d32fbcb219", "fm:2000250232", "fm:29162886", "fm:13196470", "fm:2000015988", "rp1443320c96c8d5", "fm:13151122", "rpb606ec6372041e", "rp3c7490a677a8a6", "fm:13232588"]
     },
     {
       "id": "729",
@@ -1289,7 +1628,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:13202579", "rp5c29e3afd9e6d6", "fm:2000088904", "fm:2000199230", "rp520c08287c1308", "rpa9a5a1e18fc4b9", "fm:2000088899", "rp929acc8e7f9631", "fm:2000112342", "rp10a78c085d2750", "rp6ae15f2e2bb105"]
     },
     {
       "id": "740",
@@ -1298,7 +1638,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp0a723048276ba7", "rp306fec337db81c", "rp67a805821ef89b", "rp2a86c91ccff6b2", "rpa8632dafc80dbd", "rp19385f81211da6", "rpe34cb598d91373", "rp293d0b8a975d87", "rp8ec6d3b7d94fc1", "rp614e5285dba1b3", "rp7c82d0231346a0"]
     },
     {
       "id": "748",
@@ -1307,7 +1648,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpdd9bfb25f91dc8", "rpc4e83f26a45da7", "rpa7c1714e2f18d2", "rp6a198381d92911", "rp6d08778dcab790", "rpce7b5321dfbce0", "fm:2000088342", "fm:2000085929", "fm:2000087856", "rpa04374905118ba", "fm:13158437"]
     },
     {
       "id": "752",
@@ -1316,7 +1658,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpc9c9c02c05443c", "rpf81485acee61fb", "rpdc945f149b6440", "rp1194b4b78725eb", "rp73476ac639180d", "rp81814f3f107d49", "rp8b74e34a16fae4", "rpbe214b86b0a43c", "rp59fb0083753435", "rp2e34d50a75960a", "rp3a6d3ab2d6c9e9"]
     },
     {
       "id": "756",
@@ -1325,7 +1668,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp394d4e00c9e377", "rp7ce856598ad9ad", "rp7dd8d1f51a8eeb", "rp55345d9472b052", "rpe2a307d60a998c", "rp64967ba6c529ff", "rpbfcc82fbb653d8", "rp47ddf39d81eeeb", "rp10052080f6fe79", "rp38960d39e0d4cc", "rpfce2353b4b66bb"]
     },
     {
       "id": "760",
@@ -1334,7 +1678,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp58cb9cec92ec21", "rp28ebc8bb86807a", "rp7fa5258a7a6c68", "rpeb26d34b257015", "rp3050a26f4c604f", "rp00bea88451830d", "rp5ba730ccc2789c", "rp45054ba61dd3a2", "rp600d4245cd20e4", "rpfa5fea99a7ecc7", "rp73b453c9dc0d7a"]
     },
     {
       "id": "762",
@@ -1343,7 +1688,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp12598c37f06192", "fm:58045536", "fm:58045537", "fm:59130383", "fm:59145161", "fm:59138173", "fm:2000042549", "fm:58030854", "fm:59130381", "rpb2a9901e240775", "fm:59059599"]
     },
     {
       "id": "764",
@@ -1352,7 +1698,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp64feab28219ec5", "rp3d7f89650e9ee1", "rp7524af1b49b1f0", "rp56c002961bbb5e", "rp09cbc96d644419", "rp16aa66257978bb", "rp62b13893ce83f1", "rpd57dcc0c2ad42c", "rp8030a4de0d354c", "rpc300cab96bee79", "rpbbbc592be46aba"]
     },
     {
       "id": "768",
@@ -1361,7 +1708,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpdab5d13b5bbb5f", "rpecd05b12c81d77", "rp2a74cf0901e95a", "rpd75926bd830b23", "rpd3999b5059cf43", "rpec156de1a6e1b5", "rpaab4ede0d6c2bb", "rpf26dbd9c87ed01", "rp5806eedd172be9", "rpfc5cebe4e44d38", "rp56b64d405ac2f9"]
     },
     {
       "id": "776",
@@ -1370,7 +1718,8 @@
       "ea": 0,
       "fm": 0,
       "goalkeeper": false,
-      "naturalLineup": false
+      "naturalLineup": false,
+      "personKeys": []
     },
     {
       "id": "780",
@@ -1379,7 +1728,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpa7f0a25217d788", "rpabc8a4dc378e07", "rpf9d28b817a743c", "rp2e5c2ab15df620", "rpf94e6fe64e7e24", "rpcabcb88a653246", "rpcc1478f0ad5c9d", "rpe31a67f46a7776", "rp2e9e75b41c82f3", "rp31c3277750b320", "rp19629c704f2d1a"]
     },
     {
       "id": "784",
@@ -1388,7 +1738,8 @@
       "ea": 9,
       "fm": 2,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpa76afa9ce6e44b", "rpb805bc0fb04660", "rp4656018eadaa1d", "ea:247072", "fm:19340769", "ea:262175", "rp3dfd6b2052f5cc", "rp4c1f7d7f935a5d", "rp453d1d71622158", "ea:81402", "rpfffc0488fe3c52"]
     },
     {
       "id": "788",
@@ -1397,7 +1748,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpb3070e3ffd26b2", "rp93d72ac830c29b", "rp9b915e9aad4668", "rp9ba64b64c12370", "rp51c5a163577c86", "rpb1e16751d0b370", "rp408a0288c8621d", "rp841a34e73ff957", "rpc6729929d7fc9d", "rp238549b44a8871", "rp0acbc54427353e"]
     },
     {
       "id": "792",
@@ -1406,7 +1758,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpb2b61bd586ba3c", "rpecfddf893e63b2", "rp89ecb8cb53405e", "rp2411d75e640298", "rpcc4e9548538150", "rpd56e0e4492d313", "rpa84bc9b9003d74", "rp9dc0a51ef03be4", "rp1accc0c08c2111", "rp46c6814c791718", "rp9359567d82fcd0"]
     },
     {
       "id": "795",
@@ -1415,7 +1768,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:47014920", "fm:59045417", "fm:59130373", "rp68f7abf6802e85", "rpe6fc1409c16d3b", "fm:2000035169", "rpc6021abc817ebb", "rpb8d90a4a689c6d", "rpb8d253f7125ba2", "rp75c564ea1e2e0a", "fm:2000034925"]
     },
     {
       "id": "800",
@@ -1424,7 +1778,8 @@
       "ea": 6,
       "fm": 5,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp3a0f196d2d591a", "rpafbc35ec72c9d0", "rp6b29d2674e65d4", "rp159eb4a4b96031", "rp89598c7b8be4cb", "rpe5fefb40b4f1de", "rpe9b08872581aa7", "rp04e90871bbd407", "rp62c6b1a030eb9c", "rp0e3d3e38406744", "rp8400c587a1a6ae"]
     },
     {
       "id": "804",
@@ -1433,7 +1788,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpde8b02b431961b", "rpb5e082871996b2", "rp85caf2f435b207", "rp7e53ea6db7dbfc", "rp08ed1d7b95c394", "rp1447689bc27a32", "rp778e5fbd915144", "rp9e517247ba1ce7", "rpeaceb35c082246", "rpfb6d8422bc709f", "rp90a7b452e2f410"]
     },
     {
       "id": "807",
@@ -1442,7 +1798,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpca570826881b33", "rp846e6f47018142", "rpe873d62699e0f3", "rp64d5ee405da463", "rp9c8c86c9abda09", "rpe77fe0d6686ef6", "rpd11322b326ce79", "rp4613c1b3d2760e", "rp03b164ec2c3330", "rpcdbd237337f2ca", "ea:86990"]
     },
     {
       "id": "818",
@@ -1451,7 +1808,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp63946fbf1893de", "rpcef8cbe2fe7770", "ea:226078", "rp061f25ced4ead4", "rp211db9e0e932e8", "rpc242c1dfbf114c", "rp920fa47b253717", "rpd9fbd879676b10", "rp0ae7527946b762", "rp270153f10d8eda", "rpc818982e2a91d7"]
     },
     {
       "id": "826",
@@ -1460,7 +1818,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp53e98442ac6bba", "rp5e0611be4b48ce", "rp1b829f1d3468c4", "rp56bd0fc61d9da5", "rpe699b2cca132aa", "rpfd968750993411", "rp53af22bbeaa667", "rp083a64f9207903", "rpf54a228ffe39c9", "rp81c8e86b70acf0", "rpdb077c8200e1fe"]
     },
     {
       "id": "834",
@@ -1469,7 +1828,8 @@
       "ea": 4,
       "fm": 7,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp13f33a07ec50b1", "rp3287fced418151", "fm:13102100", "rp96be60d425c55e", "fm:29222279", "rp82b62e3158ab70", "rpe393a7bcd175f1", "fm:13225010", "rp45d2add9af74b8", "rp4cd22ab5b5e038", "ea:87536"]
     },
     {
       "id": "840",
@@ -1478,7 +1838,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6db0be53c084d3", "rp6eeb6be2bf1c51", "rpea19693738527b", "rpb8522ec134dc41", "rpa6d787efb1565c", "rpfb22fab222a965", "rp65603e41d3fe33", "rp26c68502d30d84", "rp4406c8ce9d85db", "rpa83af48ac622c0", "rpa76883942a9470"]
     },
     {
       "id": "854",
@@ -1487,7 +1848,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp5f54d044e83428", "rpb21c06fb346db7", "rp48d73df784ae8a", "rpcf36cc42ef8824", "rpfd83de9eaa6ec7", "rp6fe41bebacc33e", "rp882ffd6999233a", "rpd209726e01f018", "rpf9f006fe3dde14", "rpe30ea3308747c3", "rpa586a038bc0730"]
     },
     {
       "id": "858",
@@ -1496,7 +1858,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp6789990bf73ae5", "rp15a28e451f2a98", "rp95033db934e96c", "rpaf6b3c2cf91726", "rp2ab40c91e80a07", "rp44bb1b620092ab", "rp1f917ee6ab3622", "rp935ef57d54a10a", "rp2413e149b76b48", "rpedce91708d4c67", "rp4693269d9585df"]
     },
     {
       "id": "860",
@@ -1505,7 +1868,8 @@
       "ea": 6,
       "fm": 5,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp05741aa2ecbf35", "rpf02189e469069c", "fm:59124116", "rpcac60a95bb88b4", "fm:59044046", "rp96787420a10161", "rpb7b8276d489740", "fm:59130566", "ea:277568", "ea:79458", "ea:86240"]
     },
     {
       "id": "862",
@@ -1514,7 +1878,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp113b75d2002b82", "rpa23b4e73adeae6", "rpb450064e954491", "rp36db279fc92695", "rp08f46845aa1b4b", "rpc2dfae183f6b4d", "rp5a2d4961303c04", "rp527043d48f7263", "rp96615e6c150512", "rp6694505bf61497", "rp426be0089778ed"]
     },
     {
       "id": "882",
@@ -1523,7 +1888,8 @@
       "ea": 0,
       "fm": 0,
       "goalkeeper": false,
-      "naturalLineup": false
+      "naturalLineup": false,
+      "personKeys": []
     },
     {
       "id": "887",
@@ -1532,7 +1898,8 @@
       "ea": 2,
       "fm": 9,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:54203079", "rpf226ce8b712e13", "rp7bd8dee422b7e2", "fm:64047362", "rp0ecdd19581f2a7", "rp57d3f9bc6d7c60", "fm:2000300082", "fm:2000416134", "fm:23460415", "ea:80918", "ea:80535"]
     },
     {
       "id": "894",
@@ -1541,7 +1908,8 @@
       "ea": 7,
       "fm": 4,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp2dcfd3bf51dd9d", "rpf665ae0e6ff324", "rp42e449675e7915", "rp0c1cfc6d895c29", "rpd1fdffef508151", "rp9c4d7d5b32d1c9", "rp329af936180019", "rp3e39789b396709", "fm:13173883", "rp98726b5f4a09fe", "rp84b64fab943243"]
     },
     {
       "id": "032",
@@ -1550,7 +1918,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp8a503e860b7abe", "rp270d6ac24cf2eb", "rp08b0e04fa736f5", "rp705f91623d350b", "rp8338d5f4e99f13", "rp09999e06eec683", "rpecc5cfdbee4a41", "rpa7cad4540002d2", "rp9ea46430d99213", "rp882d57a861f818", "rpbc8069fd58f11a"]
     },
     {
       "id": "076",
@@ -1559,7 +1928,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpe32943ceca4f2b", "rp8597ee1ee95449", "rp5e6ba4bca98681", "rp32bf99f3638f20", "rpac40012d6bf26f", "rp08822293d5590c", "rp73f8e53a5d904a", "rp1fbe301798a1b0", "rped1e8ae1548fbc", "rp4c1d75ccfbb6f6", "rpe18c3c0d8a72e2"]
     },
     {
       "id": "068",
@@ -1568,7 +1938,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpb668e0448dc93f", "rp3ecd40747b02f0", "rp2f775a2a8cefef", "rp020556a9f3c491", "rp8c6db75fe259a9", "ea:238375", "rp10218bad32db8c", "rp2f2e8d2d9c66f5", "rp5ca33f15dd7a4b", "rp99cc4ae9afa60c", "rp141cf40125622d"]
     },
     {
       "id": "SCO",
@@ -1577,7 +1948,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp652030ab6ed1f0", "rpd933be4d6a8f0e", "rpd5f66f31d4d5b5", "ea:213884", "rp9e5ab252266c40", "rp2a2b1f39bb6661", "rp706b0396106ebd", "rpc640452b3f718f", "rpde6c5b71a046fc", "rp0e7c847b494ced", "rp3484b405f0dfa2"]
     },
     {
       "id": "WAL",
@@ -1586,7 +1958,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpfc86423beeb132", "rpcc2611efdf820f", "rp1a3852db790779", "rpcfe1ebd19d8c3d", "rp430ec8d879f859", "rp76e6cf7712ed0d", "rp4a37792f49844d", "rp094aeb87a4a626", "rp6190627b4b86d6", "rp329f791b069809", "rpe5c6f298fda725"]
     },
     {
       "id": "NIR",
@@ -1595,7 +1968,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpc4a081a86597dc", "rp1cc6325f45e144", "rp4b8de8c67cf4d2", "rpcbcc69b1766094", "rp29b33c8a61cc68", "rp0d668a01c03ffe", "rp97d3bd8473b9e2", "rpc96b2de74e1898", "rp9b4f2843812f2a", "rpeaa9626442290c", "rp80384af3201d8c"]
     },
     {
       "id": "056",
@@ -1604,7 +1978,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp5b20216eb997e5", "rp2a03e4462d5da1", "rp8cde5f85164ca8", "rp76b53eae146b70", "rpd2ffdd3867f4ee", "rp0462261e123c98", "rpb4f5089a8a21f3", "rp5bfae8b2c06983", "rpf983c105bf28c3", "rp29058d1009e215", "rp880add17b9dd4f"]
     },
     {
       "id": "040",
@@ -1613,7 +1988,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp59a6e0edfd5fe3", "rp993245a5ee9bab", "rpe2af4a0550fa0d", "rpf60a9e36bff51c", "rp522b2548196af3", "rp2a39022317999c", "rp89d0897e3db3b7", "rp17810eb1a5679b", "rpba0f9f59f5c351", "rpa31b1119061c60", "rpfe23d17828e9a2"]
     },
     {
       "id": "070",
@@ -1622,7 +1998,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd863215c3414c2", "rped0f48544ba73d", "rpa3f75165585d05", "rpb7270bfbcfe543", "rpd6c0e1d6d03bf0", "rpfc16e87eff0834", "rp7269ac1491d375", "rp04cf1e0b58e4fe", "rpc3a8825dc878e7", "rp90e83869e1db1a", "rp0e9103b7a68a96"]
     },
     {
       "id": "008",
@@ -1631,7 +2008,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpc943e1e982ef2a", "rpacf59a7fc8d120", "rp37f47ec3af7a1e", "rpf246e191c69e14", "rp64eed603cd404e", "rp3b0746e1e62508", "rp76fb03cca253dc", "rp8f36b6a0236a64", "rp89358d7c971111", "rp04ee1d3d21c249", "rp1ae9e535a0cffa"]
     },
     {
       "id": "KOS",
@@ -1640,16 +2018,18 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp17b7a7dc2ed610", "rp555a1cf5c864a9", "rp6f76ee8ad3e2e8", "rpc1cfe2ac76ab01", "rp3f252be8a1b610", "rp8d0a1b38d20a1b", "rp17361640373425", "rpf8e9013326d2fb", "rp121595e5513508", "rp0f646929754c10", "rpe81c9d52865ad7"]
     },
     {
       "id": "051",
       "name": "Armenia",
       "players": 11,
-      "ea": 8,
-      "fm": 3,
+      "ea": 9,
+      "fm": 2,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp8608b6217a391d", "rpad63b33233fdf5", "rp9c98e6c31b0b45", "rp526935e89decef", "rp184859b2eed93d", "rpbafe495efde7a9", "rp3eb066fa5f6c6b", "rp98e3bc0a2ddcbf", "rpcc96887035cf46", "rpf101ec3c7374b5", "rpcb7d3ef72d8f9d"]
     },
     {
       "id": "031",
@@ -1658,7 +2038,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp2b0fc41285a25c", "rpd03b17346c6173", "rp16ba255d0bec7a", "rpacb33edbc5c0d0", "rpda150d87e6b894", "rp68315a5417b66a", "rp1c586f7dd55754", "rpd1474198878730", "rp130eef5ecd33f3", "rpfdcd3e36fb5cec", "rpddb7c5d783e979"]
     },
     {
       "id": "012",
@@ -1667,7 +2048,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpa328e4e4c965b2", "rp95c0f49a418aec", "rpe8158f4fe113a1", "rp74a815db730a26", "rp48e4b499a70614", "rp7026014e49450a", "rp5133f538fbb401", "rpb06ad73373f9f0", "rp91e425e2698204", "rp5357b24a0eb917", "rpe2368d88f2ceee"]
     },
     {
       "id": "024",
@@ -1676,7 +2058,8 @@
       "ea": 10,
       "fm": 1,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpeb9bb1aeb9440d", "rp15bbbf75debc74", "rp0bea7b75b69bcd", "rp6f723935e6af7e", "rp4abd285c6a42ca", "rp5e6f648a391661", "rpad6d767b500985", "rp6c7832abbb74d9", "rp07c8e7aa6f86ff", "rpd690e0ceece057", "rp2dd0327c3e358f"]
     },
     {
       "id": "072",
@@ -1685,7 +2068,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpd4db133fa46cdc", "rpa6305be94bf63d", "rp3c4665015484cc", "rp3c90e1b7a73a40", "rp039e18c0df0087", "rp9acc938f974cad", "rp87733a95f0fa3c", "fm:13187111", "rp84a6ca21ac0021", "rp9ecc49bcd2ea1c", "rpcf7a3bc943d240"]
     },
     {
       "id": "084",
@@ -1694,7 +2078,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp4963388db51beb", "rpb474ad1eac3be7", "rpce5a2e70a015a6", "rp7a37d989cb9112", "rpb1d337d2abed74", "rpd2c38553f68c48", "rp276a7ce135dfd5", "rp1245f77a95fc38", "rpb623513d7469af", "rpbfe8409a92b7ec", "rpd3e63015358caf"]
     },
     {
       "id": "044",
@@ -1703,7 +2088,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:16258636", "rp1dd152cfb5730c", "rpeab91968759f10", "rpc0d50777724c79", "rp9ff5b50e3fbdec", "fm:2000156885", "rpe725f9f0c10a6a", "rp4e5dc662a3c3e6", "rp4e125cec6ba3db", "fm:2000127839", "rp146b25b7517f18"]
     },
     {
       "id": "036",
@@ -1712,7 +2098,8 @@
       "ea": 11,
       "fm": 0,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp7d7ccf51bf4b62", "rpe291b5e5ea18d6", "rp86567a4c31e583", "rp08e3be9b15b4ca", "rpe3ea8c554b3ac3", "rp14eca463290e8e", "rpcf7f1797b92c6b", "rp9fb76f921fe6b3", "rp9b0f4079581a97", "rp7847fe970ca420", "rpe5e9665e0c7c84"]
     },
     {
       "id": "096",
@@ -1721,7 +2108,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpb16b1dc891544c", "fm:23342327", "rp891f497754834c", "rp1335d7fa711353", "rpc9b6a43fa42886", "fm:23047402", "rpc29d46349b1431", "fm:23342137", "fm:23342660", "rpfb5be067ec939f", "rp39ecd4ae5672a4"]
     },
     {
       "id": "050",
@@ -1730,7 +2118,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rpde49c21e9eeb68", "rp6ba8ff894ae940", "fm:1000601", "fm:2000256980", "rp105e04fc3d51a4", "fm:23194314", "rpe06697f91d7257", "fm:23331829", "fm:2000048845", "rp3da4e81f1c5b20", "rpba7925fdd083f5"]
     },
     {
       "id": "064",
@@ -1739,7 +2128,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:23228819", "rpd608fb00c4ad02", "rp0b56beb988ce98", "rp4df7046767facb", "fm:23218295", "rp1d88d5de6ebd88", "fm:23342040", "fm:23342051", "fm:23218292", "rpc4a2ddb8227d52", "fm:46039347"]
     },
     {
       "id": "004",
@@ -1748,7 +2138,8 @@
       "ea": 1,
       "fm": 10,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["rp383fe6908d87c6", "rp387ea5a91e64f9", "rpe9a0f87ce21fa0", "rp4965ba2f66abfd", "rpa01d2dc25a2c47", "rp183684d0bef736", "fm:92022611", "rpc113d40b29f827", "rp2c7be6a1c8a22c", "rpd4eae4335d6231", "rp10f3508d4ad440"]
     },
     {
       "id": "090",
@@ -1757,7 +2148,8 @@
       "ea": 0,
       "fm": 11,
       "goalkeeper": true,
-      "naturalLineup": true
+      "naturalLineup": true,
+      "personKeys": ["fm:30052374", "rp361b5eff60a748", "rpceca3790ddf936", "rpe9eabd354a18ae", "rp0876babd1e102c", "rp7aad821d2deed3", "fm:2000116210", "fm:223765", "rp765b5f9edaec77", "rp5dbf4dc456e262", "fm:30052713"]
     }
   ]
 }

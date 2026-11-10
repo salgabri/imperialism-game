@@ -1,0 +1,45 @@
+{
+  "note": "Hand-verified person identities for the built-in football squads (scripts/lib/football-data.mjs, resolvePersons; docs/design/football-squad-identity.md). same: records of one person that the Reep bridge (reep-bridge.json) lacks or rejected; when one of them holds a Reep id, that id stays the person key. distinct: records of different people; neither a Reep link nor the name matcher may join them. nations: the nation of a person whose records disagree, where the fresher-source rule would choose wrong; ids lists every record of the person and nation is a map nation's name. Each entry names the records and the evidence checked. The builder applies entries whose ids the snapshots hold and skips absent ids; a nations entry that decides no conflict stops the build. Reep links rejected and not listed here stay apart (reep-bridge.json, rejected).",
+  "same": [
+    {
+      "ids": ["ea:240950", "fm:29192705"],
+      "name": "Pedro Gonçalves (Pote)",
+      "evidence": "Reep rpd878e203323a97 links them; the reducer rejected the link only because FM uses the nickname Pote. EA FC 26 and FC 27: Pedro António Pereira Gonçalves, Sporting CP, Portugal, born 1998-06-28, attacking/left midfield. FM 26.3.0: Pote, Sporting CP, Portugal, 27 on 2025-07-01, LW/AM."
+    },
+    {
+      "ids": ["ea:277982", "fm:2000051320"],
+      "name": "Chandrel Massanga Matondo",
+      "evidence": "Reep rpab0dc2466de3a1 links them; rejected because EA (FC 27 only) uses the surname Matondo and FM Massanga. Same rare first name Chandrel, both Congo, both defensive/central midfield, both at Süper Lig clubs (EA Eyüpspor in October 2026, FM Hatayspor in March 2026); EA born 1999-08-17, FM 25 on 2025-07-01."
+    },
+    {
+      "ids": ["ea:271156", "fm:27148032"],
+      "name": "Kristall Máni Ingason",
+      "evidence": "Reep splits him into two persons (EA only, FM only), and the name matcher never joins two Reep persons. Same full name Kristall Máni Ingason, Iceland, EA born 2002-01-18 and FM 23 on 2025-07-01; EA FC 26 (September 2025) has him at Sønderjyske, FM 26.3.0 (March 2026) and EA FC 27 at Brann, a move between the snapshots."
+    },
+    {
+      "ids": ["ea:253537", "fm:86053825"],
+      "name": "Byron Castillo",
+      "evidence": "A birth-date conflict, not two people: EA changed this record's date between editions. EA FC 26 gives Byron David Castillo Segura born 1995-07-25, which fits FM's age (30 on 2025-07-01); EA FC 27 gives the same EA id born 1998-11-09, so the age check splits them. Same name, Ecuador, right back, Barcelona SC (EA Barcelona de Guayaquil, FM Barcelona S.C.) in all three snapshots; the only Byron Castillo in each source. Reep rp362e0a39eacf44 holds the FM record only."
+    },
+    {
+      "ids": ["ea:279573", "fm:12094970"],
+      "name": "Luck Zogbé",
+      "evidence": "A birth-date conflict, not two people: EA born 2005-03-24 (FC 26 and FC 27), FM 22 on 2025-07-01, so the age check splits a pair the name matcher would join. Same name (FM Luck Zogbé, EA FC 27 Luck Zogbé, FC 26 Tolikpaley Luck Evrad Zogbé), Côte d'Ivoire, right back, at Brest (EA Stade Brestois 29) in all three snapshots; the only Zogbé in each source. Reep rp4e52a2f3cde564 holds the EA record only."
+    }
+  ],
+  "distinct": [],
+  "nations": [
+    {
+      "ids": ["ea:244881", "fm:58133443"],
+      "nation": "Armenia",
+      "name": "Nair Tiknizyan",
+      "evidence": "EA FC 27 files him under Russia (Olympiacos, born 1999-05-12), FM 26.3.0 under Armenia (Crvena zvezda, CA 72); one Reep person (rp9c98e6c31b0b45). His senior caps are Armenia's: 35 caps since his debut against Turkey on 25 March 2023 in UEFA Euro 2024 qualifying (Wikipedia \"Nair Tiknizyan\", infobox as of 5 October 2026, read 2026-11-10); his Russia caps are U19 (2017) and U21 (2020–2021) only. martj42's goalscorers.csv has his own goal for Armenia against Wales on 18 November 2023."
+    },
+    {
+      "ids": ["ea:73004", "fm:91201950"],
+      "nation": "Eritrea",
+      "name": "Filimon Gerezgiher",
+      "evidence": "EA FC 27 files him under Germany (SV Elversberg, born 2000-07-04), FM 26.3.0 under Eritrea (Elversberg, CA 67); the name matcher joins them across nations (same full name, age and club). His senior caps are Eritrea's: 2 caps in 2026 (Wikipedia \"Filimon Gerezgiher\", infobox as of 30 September 2026, read 2026-11-10); no Germany cap at any level is listed."
+    }
+  ]
+}

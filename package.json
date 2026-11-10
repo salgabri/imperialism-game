@@ -41,6 +41,7 @@
     "build-rosters": "node scripts/build-rosters.mjs",
     "sync:football-manager": "node scripts/sync-football-manager.mjs",
     "sync:ea-fc": "node scripts/sync-ea-fc.mjs",
+    "sync:reep-bridge": "node scripts/sync-reep-bridge.mjs",
     "test:rosters": "node --test scripts/football-rosters.test.mjs scripts/basketball-rosters.test.mjs",
     "build-basketball": "node scripts/build-basketball.mjs",
     "build-clubs": "node scripts/build-clubs.mjs",
