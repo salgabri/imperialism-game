@@ -199,7 +199,11 @@ test('the nine seasons are built in, after the games\' seasons, labelled compute
   assert.deepEqual(MANIFEST.seasons.map(season => season.id), IDS);
   const listed = BUILT_IN_SEASONS.filter(set => setKindOf(set.id) === 'wc');
   assert.deepEqual(listed.map(set => set.id), IDS.slice().reverse(), 'newest first');
-  assert.deepEqual(BUILT_IN_SEASONS.slice(-IDS.length), listed, 'the earliest seasons');
+  // The earliest seasons: the World Cups, with the fan-made 1993/94 and 1989/90 beside 1994's and 1990's.
+  const tail = BUILT_IN_SEASONS.slice(BUILT_IN_SEASONS.findIndex(set => set.id === IDS.at(-1)));
+  assert.deepEqual(tail.filter(set => setKindOf(set.id) === 'wc'), listed, 'the earliest seasons');
+  assert.deepEqual(tail.filter(set => setKindOf(set.id) !== 'wc').map(set => set.id), ['cm0102-2020-11-cm93', 'cm0102-2017-04-cm89'],
+    'only the two fan-made seasons share their years');
   for (const set of listed) {
     const doc = committed(set.id);
     assert.deepEqual([doc.id, doc.version, doc.year, doc.season, doc.label], [set.id, set.version, set.year, set.season, set.label]);

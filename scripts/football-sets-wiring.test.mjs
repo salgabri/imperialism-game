@@ -133,8 +133,12 @@ async function pickSeason(document, id) {
   select.value = id;
   await act(async () => select.dispatchEvent(new document.defaultView.Event('change', { bubbles: true })));
 }
-/** The Season dropdown's names for the built-in earlier seasons: "2025/26" … "2004/05", without their source. */
+/** The built-in earlier seasons' names: "2025/26" … "1961/62", without their source. */
 const EARLIER = BUILT_IN_SEASONS.map(set => set.season);
+/** The Season dropdown's names for them: a season with two sets (1993/94 and 1989/90: a fan's database and a computed
+ * World Cup) names each one's source. */
+const EARLIER_NAMES = BUILT_IN_SEASONS.map(set => (BUILT_IN_SEASONS.filter(other => other.season === set.season).length > 1
+  ? `${set.season} · ${set.label}` : set.season));
 
 // ---------- setup ----------
 
@@ -150,7 +154,7 @@ test('the Season choice offers the built-in season, then every earlier season bu
       await mountPart(app, mount, 'SetupOverlay');
       assert.equal(seasonPicker(document).tagName, 'SELECT', 'the seasons are a dropdown');
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
-      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER]);
+      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER_NAMES]);
       assert.deepEqual(EARLIER.slice(0, 3), ['2025/26', '2024/25', '2023/24'], 'the last built-in season, then the earlier ones');
       assert.equal(EARLIER.at(-1), '1961/62', 'back to the 1962 World Cup, computed');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
@@ -177,8 +181,8 @@ test('a listed set adds the Season choice; picking it loads the set, and Launch 
     await withDom(async ({ document, mount }) => {
       const view = await mountPart(app, mount, 'SetupOverlay');
       // Two sets of one season keep their source.
-      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER.slice(0, at), `2001/02 · ${SET.label}`,
-        `2001/02 · ${BUILT_IN_SEASONS[at].label}`, ...EARLIER.slice(at + 1)]);
+      assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER_NAMES.slice(0, at), `2001/02 · ${SET.label}`,
+        `2001/02 · ${BUILT_IN_SEASONS[at].label}`, ...EARLIER_NAMES.slice(at + 1)]);
       assert.equal(seasonPicker(document).value, '', 'the built-in season is chosen');
 
       await pickSeason(document, ID);
