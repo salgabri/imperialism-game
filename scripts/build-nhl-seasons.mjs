@@ -289,7 +289,7 @@ function conversionOf(entry, manifest, count) {
 function usesDatabank(entry, snapshot) {
   if (entry.method === 'computed') return entry.source.kind === 'hdb' || snapshot.notes.birthFromDatabank.length > 0;
   if (entry.method === 'converted') {
-    return entry.source.kind === 'nhl09' || snapshot.notes.country.some(note => note.includes("the Hockey Databank's birth country"));
+    return entry.source.kind === 'nhl09' || snapshot.notes.country.some(note => /the Hockey Databank's birth country [A-Z]{3}$/.test(note));
   }
   return false;
 }

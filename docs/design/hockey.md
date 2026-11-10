@@ -537,7 +537,7 @@ clubs and arenas are today's. The five maps of the editions are unchanged.
 ## Credits
 
 The Hockey Databank's terms ask that its statement be displayed prominently and in its entirety on the product, and
-MoneyPuck.com asks for a clear credit (done 2026-11-10). The mechanism is any sport's: a data set's listing entry may carry
+MoneyPuck.com asks for a clear credit (added 2026-11-10). The mechanism is any sport's: a data set's listing entry may carry
 a `credit`, the plain text its sources ask to be shown with it. `listing` in `src/engine/footballSets.js` keeps it exactly
 as written (an entry with a blank or non-text credit is left out, as any entry the builder would not write); the setup
 model passes the chosen season's on (`season.credit`, '' for none); and setup shows it as text right under the Season
@@ -569,10 +569,12 @@ wide, never cut or clamped. The longest, MoneyPuck's with the statement (254 cha
 column at every size measured (three at 1920 wide, two across a portrait tablet). It takes the room of step 1's extras
 where they compete for height: the lede on every phone and on windows up to 800px tall; the whole heading on a phone with
 a notice line (resume, a challenge link) and on a short window with two. Measured in
-[compact-pass.md](compact-pass.md#measured): no vertical scrolling from 360×640 to 1920×1080.
+[compact-pass.md](compact-pass.md#measured): no vertical scrolling from 360×640 to 1920×1080, but for two notice lines at
+once on the smallest phones, which already scrolled for football.
 
-**In play** the game names a season (the campaign title, the Ledger's head, Saved campaigns' "Season") but never its
-source, so the credit shows in setup alone.
+**In play** the game names a season (the campaign title, the Ledger's head, Saved campaigns' "Season") but not its
+source, save in the passing loading or error line of Retry this setup when the season must be fetched again ("Loading
+the Computed from statistics season…"), so the credit shows in setup alone.
 
 ## Tests
 
@@ -628,7 +630,7 @@ duel campaign with the live ticker and a hockey nations campaign.
 - Terms. MoneyPuck.com's data, behind the 15 seasons from 2010/11, is free for non-commercial use only, as the NHL's own
   statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. The Hockey Databank's statement
   and MoneyPuck's credit show in full under the Season choice ("Credits"), in setup only: no screen in play names a
-  season's source.
+  season's source beyond a passing loading line.
 - Names: the Hockey Databank and MoneyPuck spell names without accents ("Borje Salming", "Tim Stutzle"), and the
   databank in its own way (Raymond Bourque); NHL 08 and NHL 09 keep IGN's spellings.
 - NHL 09's attributes are EA's before release; neither NHL 08's nor NHL 09's overall is EA's.
