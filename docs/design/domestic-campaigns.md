@@ -915,7 +915,8 @@ an MLB duel and an MLB resume.
 37 more maps, `mlb1960` to `mlb2017`, for the seasons computed from WAR, built from the
 franchise eras of `scripts/data/mlb-war-seasons.json` by the same partition. Each club
 holds its ballpark's state or province, the ballpark being the one it played most of its
-home games in (Lahman's HomeGames). A map serves consecutive seasons with the same clubs,
+home games in (the Baseball Databank's HomeGames, from Retrosheet's game logs; each map's
+attribution credits both). A map serves consecutive seasons with the same clubs,
 named alike, in the same places: a ballpark renamed in place keeps its map (named as its
 first season knew it), and the map builder now checks every MLB era, MLB The Show's
 included, by that rule (`[id, name, territory, base, point]`); mlb2018 to mlb2025 rebuild
