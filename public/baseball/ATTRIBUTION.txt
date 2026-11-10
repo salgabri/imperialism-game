@@ -52,7 +52,7 @@ Names, given names and birth countries of the players, and the clubs' codes, nam
   The tables `Parks.csv` and `HomeGames.csv` are based on the game logs
   and park code table published by Retrosheet.
   This information is available free of charge from and is copyrighted
-  by Retrosheet.  Interested parties may contact Retrosheet at 
+  by Retrosheet.  Interested parties may contact Retrosheet at
   http://www.retrosheet.org.
 
 Ballpark names of the day, the locations of the ballparks of the 1960s and 1970s on the maps of those

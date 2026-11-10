@@ -220,7 +220,8 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
  */
 function attributionText(manifest, docs) {
   const { war, databank, wikipedia } = manifest.sources;
-  const indent = text => text.split('\n').map(line => (line ? `  ${line}` : '')).join('\n');
+  // Each notice indented, in its own words (a line's trailing spaces dropped).
+  const indent = text => text.split('\n').map(line => (line ? `  ${line.trimEnd()}` : '')).join('\n');
   const corrected = Object.values(manifest.birthCountries || {});
   const correctedNames = corrected.map(fix => fix.name).join(', ');
   const correctedPlaces = corrected.map(fix => `${fix.name}'s, ${fix.birthplace}, ${fix.country}`).join('; ');
