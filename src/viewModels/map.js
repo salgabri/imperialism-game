@@ -2,7 +2,8 @@
 // document, timers or campaign RNG (win chances use estimateWinProbability's own generator, DEC D5). Every builder
 // tolerates the tests' tiny atlas, phase 'loading'/'setup', `stats: {}` and matches without odds/route/live fields.
 // strengthSteps was written final by WP-0 in W1: its signature and semantics are FROZEN (WP-COL's key reads it).
-import { teamEff, NATIONS, DEPENDENCIES } from '../data/teams.js';
+import { NATIONS, DEPENDENCIES } from '../data/teams.js';
+import { viewTeamEff } from './teamStrength.js';
 import { MAP, V4 } from '../theme.js';
 import { politicalFill } from '../data/empireColours.js';
 import { memo, roman, historyRound, winTone } from './format.js';
@@ -15,9 +16,11 @@ export const DEFAULT_MAP_MODE = 'political';
 export const MAP_MODE_LABELS = Object.freeze({ political: 'Political', strength: 'Strength', fronts: 'Fronts', flags: 'Flags' });
 
 const isPlaying = st => st?.phase === 'playing' || st?.phase === 'victory';
+// A team's strength, searched once per team object (viewModels/teamStrength.js): Strength mode's steps and fills ask
+// for every survivor's after each match, and only the teams that match replaced have changed.
 const effOf = team => {
   if (!team) return NaN;
-  try { return teamEff(team); } catch { return NaN; }
+  try { return viewTeamEff(team); } catch { return NaN; }
 };
 
 /** A-7: the map's "you" is the managed team, else the followed team (spectator). */
@@ -294,7 +297,7 @@ export function strengthSteps(st, ctx = {}) {
   if (!ids.length) return [];
   return memo(ctx?.cache, 'map:strength-steps', [st.teams, st.aliveIds], () => {
     const effs = ids.map(id => {
-      try { return teamEff(teams[id]); } catch { return NaN; }
+      try { return viewTeamEff(teams[id]); } catch { return NaN; }
     }).filter(Number.isFinite).sort((a, b) => a - b);
     if (!effs.length) return [];
     return MAP.strengthRamp.map((color, i) => ({

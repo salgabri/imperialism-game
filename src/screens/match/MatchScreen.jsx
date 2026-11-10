@@ -38,8 +38,11 @@ export default function MatchScreen(props) {
   } = props;
   const [segment, setSegment] = React.useState('feed');
   const [mainView, setMainView] = React.useState('chart');
+  // The Chart / Lineups switch and the phone's segments hide and show the lineups and the chart: each switch measures
+  // them again in the commit that shows them, rather than a frame later when their ResizeObserver reports.
+  const measureKey = `${mainView} ${segment}`;
   const rowsA = lineups?.a?.rows || NO_ROWS, rowsB = lineups?.b?.rows || NO_ROWS;
-  const xi = usePagedList(rowsA.length >= rowsB.length ? rowsA : rowsB, { row: '.match-xi__row' });
+  const xi = usePagedList(rowsA.length >= rowsB.length ? rowsA : rowsB, { row: '.match-xi__row', measureKey });
   const page = rows => (Number.isFinite(xi.pageSize) ? rows.slice(xi.start, xi.start + xi.pageSize) : rows);
 
   if (!a || !b || !state) {
@@ -80,7 +83,7 @@ export default function MatchScreen(props) {
             ))}
           </div>
           <WinChart sport={sport} model={model} goals={goals} perspective={perspective} final={final} length={length} ot={ot}
-            chartNote={chartNote} aId={a.teamId} dId={b.teamId} {...minuteProps} />
+            chartNote={chartNote} aId={a.teamId} dId={b.teamId} measureKey={measureKey} {...minuteProps} />
           <MatchStats sport={sport} preMatch={preMatch} speed={speed} paused={paused} onSpeed={onSpeed} onPause={onPause} />
           <div className="match-lineups" ref={xi.boxRef} data-long={rowsA.length > 13 ? '' : undefined}>
             <Pager page={xi.page} pages={xi.pages} onPage={xi.setPage} label="Lineup pages" className="match-lineups__pager" />

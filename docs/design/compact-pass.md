@@ -27,15 +27,29 @@ scrolling panels, at desktop, tablet and phone sizes.
 ## Mechanisms
 
 - [`src/hooks/useFit.js`](../../src/hooks/useFit.js)
-  - `usePagedList(items, { row, focusIndex, minRows })` measures its box with a `ResizeObserver` and returns the
-    page that fits. It re-measures when the box resizes, when the list first gets rows, and when its pager comes or
-    goes. That last case matters because a pager inside the box moves the rows down without resizing the box.
-    `focusIndex` brings a row's page into view (your team in the standings, the selected match in the history).
+  - `usePagedList(items, { row, focusIndex, minRows, measureKey })` measures its box with a `ResizeObserver` and
+    returns the page that fits. It re-measures when the box resizes, when the list first gets rows, and when its pager
+    comes or goes. That last case matters because a pager inside the box moves the rows down without resizing the box.
+    `focusIndex` brings a row's page into view (your team in the standings, the selected match in the history), in
+    the same render that changes it or the page size, so the focused row stays mounted and keeps the keyboard focus.
+    A page of one row keeps the row height measured with more rows: that row is the box's first, which can be a rule
+    shorter than the rest, and measured alone it made room for one row too many. That height holds at the box width
+    it was measured at, or while it is only a rule taller: a window resized across a breakpoint draws rows of
+    another height.
+  - Before its first measure a list renders at most (the screen's longer side ÷ 24px) + 1 rows, from its focused row.
+    A box with a height of its own overflows with them and is measured exactly as with every row; a box its rows size
+    gets every row back. The screen is read because it needs no layout (`innerHeight` lays the page out on Android
+    Chrome), and a window taller than its screen only loses the saving.
+  - Both hooks measure from their box's callback ref, after React writes the screen and before the browser paints,
+    so the first frame shown is already paged. `measureKey` measures again in the commit that changes it: the
+    panels below 1200px, the Match view's Chart / Lineups switch and its phone segments, and setup's steps show
+    boxes that were hidden when they mounted.
   - `fitWall(width, height, count, { ratio, gap, minCell, maxCell })` is the wall's pure arithmetic: the largest
     cell at which the whole field fits, otherwise whole rows of `minCell` cells per page.
   - `useFitWall(count, options)` applies `fitWall` to a measured box. `options.touch` overrides the rest on a
     phone or a touch screen. The team wall and the fallen wall use 44px **square** cells there, with each 4:3
-    flag whole in the middle of its target.
+    flag whole in the middle of its target. `options.focusIndex` (setup's checked team) and `options.measureKey`
+    work as the list's do.
   - Without a `ResizeObserver` (jsdom, the server) nothing is measured and everything renders on one page. That is
     what the DOM contracts in the tests read.
 - [`src/components/Pager.jsx`](../../src/components/Pager.jsx): `‹ n / N ›`. Its end buttons use

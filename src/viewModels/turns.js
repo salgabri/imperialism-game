@@ -4,7 +4,7 @@
 // `estimateWinProbability` (own seeded RNG + cache) via odds.js (DEC D5). Memo keys carry the `turn:` prefix
 // and depend on state identities only (rule 16). Every builder tolerates the loading/setup phases, the tests'
 // tiny atlas (`ctx.board` null or without routes) and fixtures with `stats: {}` / teams without `baseEff`.
-import { teamEff } from '../data/teams.js';
+import { viewTeamEff } from './teamStrength.js';
 import { roundRobinOrder, nextTurn, reachableTargets, routeToTarget, createTargetedDraw } from '../engine/turns.js';
 import { roman, historyRound, formatOddsPair, formatWinChance, winTone, territoryWord, memo } from './format.js';
 import { matchupOdds, winChanceFor } from './odds.js';
@@ -37,25 +37,14 @@ function playingPhase(st) {
   return st?.phase === 'playing' || st?.phase === 'victory';
 }
 
-const strengths = new WeakMap();
-
 /**
- * currentStrength, once per team object. Committed teams are replaced, never edited in place (applyConquest copies
- * both sides), so the lineup search runs once per team rather than for both sides of the fixture and the followed
- * team on every render. The squad check only guards code that pushes to a squad it already showed.
+ * Current XI strength, falling back to the stored starting strength for malformed fixtures. The lineup search runs once
+ * per team object (viewTeamEff, shared with the Ledger and the Strength map), rather than for both sides of the fixture
+ * and the followed team on every render.
  */
 function strengthOf(team) {
   if (!team) return null;
-  const known = strengths.get(team);
-  if (known && known.squad === team.squad && known.length === team.squad?.length) return known.value;
-  const value = currentStrength(team);
-  if (typeof team === 'object') strengths.set(team, { squad: team.squad, length: team.squad?.length, value });
-  return value;
-}
-
-/** Current XI strength, falling back to the stored starting strength for malformed fixtures. */
-function currentStrength(team) {
-  const value = attempt(() => teamEff(team), null);
+  const value = attempt(() => viewTeamEff(team), null);
   if (Number.isFinite(value)) return value;
   return Number.isFinite(team.baseEff) ? team.baseEff : Number.isFinite(team.str) ? team.str : null;
 }
@@ -65,8 +54,11 @@ function strengthText(team) {
   return Number.isFinite(value) ? value.toFixed(1) : '';
 }
 
-/** Territories held per empire, from `st.own` only (no board needed). */
-function territoryCounts(st, ctx) {
+/**
+ * Territories held per empire, from `st.own` only (no board needed): one pass over the map per holdings, shared through
+ * ctx.cache with the Ledger's standings (app/ledgerMethods.jsx powerTable). → { [teamId]: count }
+ */
+export function territoryCounts(st, ctx) {
   return memo(ctx?.cache, 'turn:territories', [st?.own], () => {
     const counts = Object.create(null);
     for (const owner of Object.values(st?.own || {})) if (owner != null) counts[owner] = (counts[owner] || 0) + 1;

@@ -6,6 +6,8 @@ import React from 'react';
 import { pad3 } from '../theme.js';
 import { selectLineup, teamEff } from '../data/teams.js';
 import { territories } from '../engine/campaign.js';
+import { viewTeamEff } from '../viewModels/teamStrength.js';
+import { territoryCounts } from '../viewModels/turns.js';
 import { campaignRecap } from '../engine/campaignExperience.js';
 import { getLoadedDomestic } from '../engine/domestic.js';
 import { domesticEntry } from '../data/domesticScope.js';
@@ -45,12 +47,14 @@ function ledgerContext() {
 export function powerTable(playing) {
   const { aliveIds, teams, stats, own } = this.state;
   if (!playing || !this.geo) return [];
-  // A lineup search per alive team: built once per change of survivors, squads, holdings or stats (state replaces
-  // them, never edits them) rather than on every render of the Ledger. territories() reads only `own`.
+  // Built once per change of survivors, squads, holdings or stats (state replaces them, never edits them) rather than on
+  // every render of the Ledger. The lineup search runs only for the teams the last matches replaced (viewTeamEff caches
+  // it per team object, for the views only), and every survivor's territories come from one pass over `own`, the count
+  // the turn panel memoises, rather than a pass over the map per survivor.
   return memo(this.vmCache, 'ledger:power', [aliveIds, teams, stats, own], () => {
-    const board = this.board();
+    const counts = territoryCounts({ own }, { cache: this.vmCache });
     return aliveIds
-      .map(tid => ({ tid, eff: teamEff(teams[tid]), terr: territories(board, tid).length }))
+      .map(tid => ({ tid, eff: viewTeamEff(teams[tid]), terr: counts[tid] || 0 }))
       .sort((a, b) => b.eff - a.eff || teams[a.tid].name.localeCompare(teams[b.tid].name) || a.tid.localeCompare(b.tid))
       .map((r, i) => ({
         tid: r.tid,

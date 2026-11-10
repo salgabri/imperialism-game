@@ -233,10 +233,12 @@ export function useMapViewport(svgRef, resetKey, initialFocus, fitKey = null) {
     const previous = previousCamera.current;
     const newTheatre = !previous || previous.resetKey !== resetKey ||
       previous.fx !== fx || previous.fy !== fy || previous.fw !== fw || previous.fh !== fh;
-    const rect = svgRef.current?.getBoundingClientRect();
     // A theatre change may reveal the sidebar in the same render. Take the
-    // canvas size from the layout now and frame once, for that aspect.
-    const needsFit = (newTheatre || previous?.needsFit) && rect?.width > 0 && rect.height > 0 &&
+    // canvas size from the layout now and frame once, for that aspect. Only a new theatre or a pending fit uses the
+    // canvas: the other runs (a reported resize, a breakpoint) do not force a layout to read one they would ignore.
+    const wantsCanvas = newTheatre || !!previous?.needsFit;
+    const rect = wantsCanvas ? svgRef.current?.getBoundingClientRect() : null;
+    const needsFit = wantsCanvas && rect?.width > 0 && rect.height > 0 &&
       Math.abs(rect.height / rect.width - aspect) > .0001;
     previousCamera.current = { resetKey, fx, fy, fw, fh, baseWidth, aspect, needsFit, fitKey };
     // Frame once, for the canvas the layout already has: the next pass (previous.needsFit) resets or refits with

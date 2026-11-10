@@ -248,9 +248,11 @@ export default function SetupOverlay({
   const theatreChecked = model.scopes.some(scope => scope.id === model.scopeId);
   // The wall reads strongest first: the favourites lead, and the long shots are where a player would look for them.
   const wallTeams = useMemo(() => model.teams.slice().sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)), [model.teams]);
-  const wall = useFitWall(wallTeams.length, WALL);
   const checkedTeam = wallTeams.findIndex(team => team.id === model.managedId);
-  const { setPage: setWallPage, pageFor: wallPageFor } = wall;
+  // The wall shows the page holding the checked team, however it was picked (a click, the keyboard, a challenge link),
+  // from the render that checks it or measures the wall. Step 3 is hidden while another step shows, so a step change
+  // measures the wall again, in the commit that shows it.
+  const wall = useFitWall(wallTeams.length, { ...WALL, focusIndex: checkedTeam, measureKey: step });
   const wallShown = Number.isFinite(wall.pageSize) ? wallTeams.slice(wall.start, wall.start + wall.pageSize) : wallTeams;
 
   const pick = (key, value) => onPick?.(key, value);
@@ -297,8 +299,6 @@ export default function SetupOverlay({
     choose('managedTeamId', wallTeams[next].id, setup.managedTeamId);
   }
 
-  // The wall shows the page holding the checked team, however it was picked (a click, the keyboard, a challenge link).
-  useEffect(() => { if (checkedTeam >= 0) setWallPage(wallPageFor(checkedTeam)); }, [checkedTeam, wallPageFor, setWallPage]);
   // A keyboard pick moves focus to the new team's flag, once its page is on show.
   useEffect(() => {
     if (!refocusTeam.current) return;

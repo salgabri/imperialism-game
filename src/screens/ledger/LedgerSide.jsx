@@ -50,9 +50,10 @@ export function MapShare({ share }) {
 }
 
 // Memoised: the rows are memoised by the view-model and LedgerScreen's handler is stable, so the list renders when
-// an empire falls rather than on every render of a match.
-export const FallenList = React.memo(function FallenList({ fallen = [], aside = '', onSelectTeam }) {
-  const wall = useFitWall(fallen.length, FALLEN_WALL);
+// an empire falls rather than on every render of a match. `measureKey` (the Ledger's panel) measures the wall again in
+// the commit that shows it.
+export const FallenList = React.memo(function FallenList({ fallen = [], aside = '', onSelectTeam, measureKey = null }) {
+  const wall = useFitWall(fallen.length, { ...FALLEN_WALL, measureKey });
   const shown = Number.isFinite(wall.pageSize) ? fallen.slice(wall.start, wall.start + wall.pageSize) : fallen;
   return (
     <section className="ledger-fallen" aria-labelledby="ledger-fallen-title">

@@ -49,14 +49,15 @@ const HistoryItem = React.memo(function HistoryItem({ entry, pressed, managedId,
 
 export default function HistoryBrowser({
   entries = [], shown = [], teamShown = shown, teams = [], report = null, filter = '', managedId = null, followedId = null,
-  kinds = [], kind = 'all', onKind, onFilter, onSelect, onViewConquest, onSelectTeam,
+  kinds = [], kind = 'all', onKind, onFilter, onSelect, onViewConquest, onSelectTeam, measureKey = null,
 }) {
   // One handler for every row, calling the latest onSelect (ChronicleScreen passes a new one per render).
   const selectRef = useRef(onSelect);
   selectRef.current = onSelect;
   const selectRow = useCallback(id => selectRef.current?.(id), []);
   const newestFirst = useMemo(() => shown.slice().reverse(), [shown]);
-  const paged = usePagedList(newestFirst, { row: '.fi-history-list > li', focusIndex: newestFirst.findIndex(entry => entry.id === report?.id) });
+  // `measureKey` (the Chronicle's panel) measures the list again in the commit that shows it.
+  const paged = usePagedList(newestFirst, { row: '.fi-history-list > li', focusIndex: newestFirst.findIndex(entry => entry.id === report?.id), measureKey });
   return (
     <section className="fi-history" aria-label="Match history">
       <div className="fi-history__index">

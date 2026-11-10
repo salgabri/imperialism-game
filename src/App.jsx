@@ -312,8 +312,17 @@ export default class App extends React.Component {
     this.updateEngagement();
     // The crash screen exports the campaign this page plays (storage crashCheckpoint), not another tab's.
     setActiveCampaign(this.state.phase === 'playing' || this.state.phase === 'victory' ? this.state.campaignId : null);
+    // The live match log shows its newest line: pinned when it is drawn anew or gains a line, not after every commit.
+    // Reading its scrollHeight forced a layout on each hover and ticker update; counting its lines needs none. Instance
+    // fields, never state: they describe the DOM, not the campaign. A log that has gone (the match decided, another
+    // view) is let go rather than kept alive until the next match's.
     const el = this.eventsRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) this.pinnedLog = null;
+    else if (el !== this.pinnedLog || el.childElementCount !== this.pinnedLines) {
+      this.pinnedLog = el;
+      this.pinnedLines = el.childElementCount;
+      el.scrollTop = el.scrollHeight;
+    }
     // Save when the match or spin CONTENT changed. Identity alone looped: when a click's sync update (revealAll's
     // patchMatch) is queued behind a timer's not-yet-rendered default-priority update, every sync re-render rebases
     // and re-runs the updater, minting an equal-but-new match; persist's own setState is such a re-render, so an

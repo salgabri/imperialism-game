@@ -52,8 +52,9 @@ export default function LedgerScreen({
             <MapShare share={share} />
             {/* The ad follows the bounded share list, never the fallen list that grows all campaign. */}
             <AdSlot />
-            {/* Without a built model (W1 stub { rows }) the fallen list is omitted rather than claiming none have fallen. */}
-            {Array.isArray(fallen) && <FallenList fallen={fallen} aside={fallenAside} onSelectTeam={selectTeam} />}
+            {/* Without a built model (W1 stub { rows }) the fallen list is omitted rather than claiming none have fallen.
+                Below 1200px it is a panel of its own, hidden until chosen: the panel measures its wall again. */}
+            {Array.isArray(fallen) && <FallenList fallen={fallen} aside={fallenAside} onSelectTeam={selectTeam} measureKey={panel} />}
           </aside>
         </div>
       </div>
