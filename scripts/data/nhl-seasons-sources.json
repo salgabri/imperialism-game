@@ -358,6 +358,7 @@
     "hockey-databank/Master.csv": {"url":"https://raw.githubusercontent.com/rippinrobr/hockey-databank/de5944312d2e64944cfd7f61459f4c24938a387b/Master.csv","sha256":"eb002da19f24c4917263e295494ed2c6d369052c020cd0dd630c27025de1132f"},
     "hockey-databank/Scoring.csv": {"url":"https://raw.githubusercontent.com/rippinrobr/hockey-databank/de5944312d2e64944cfd7f61459f4c24938a387b/Scoring.csv","sha256":"97340dfa12a51aa8c1b16bca6180a9a693d536b1b172b156b17439c4bbb9e725"},
     "hockey-databank/Goalies.csv": {"url":"https://raw.githubusercontent.com/rippinrobr/hockey-databank/de5944312d2e64944cfd7f61459f4c24938a387b/Goalies.csv","sha256":"5e77c6835f4b3968c4ec6d9c66cdcd278adc5398197340fe7e534bcd16c2cce5"},
+    "hockey-databank/Teams.csv": {"url":"https://raw.githubusercontent.com/rippinrobr/hockey-databank/de5944312d2e64944cfd7f61459f4c24938a387b/Teams.csv","sha256":"955a0ed2c687a85294130e816a481cdb52a3dfb9bab6c3062927c5b34973f43f"},
     "moneypuck/2008-skaters.csv": {"url":"https://moneypuck.com/moneypuck/playerData/seasonSummary/2008/regular/skaters.csv","sha256":"f0d61de9ed196c4e767fc6c4aadeaa58558e07e229e467e19539b8b1d6993821"},
     "moneypuck/2008-goalies.csv": {"url":"https://moneypuck.com/moneypuck/playerData/seasonSummary/2008/regular/goalies.csv","sha256":"aafd11806e6b50a32ab37bd9804d25766b2ba80b6464b73bbfc7436ce32fb725"},
     "moneypuck/2009-skaters.csv": {"url":"https://moneypuck.com/moneypuck/playerData/seasonSummary/2009/regular/skaters.csv","sha256":"4f3a0b529ff6ae7a229ba899c0cb38a406e3e600336dd4b91b282aca96a95ce7"},

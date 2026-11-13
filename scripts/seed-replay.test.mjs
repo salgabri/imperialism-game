@@ -10,6 +10,11 @@
 // Regenerated for the realism pass (football simulation version 3): match-day form's spread at Balanced fell from
 // 0.45 to 0.28, low scores take the Dixon–Coles correction and shoot-out kicks go in 73% of the time, so the same
 // seeds draw different scores (scripts/simulation-realism.mjs measures the model against Europe's top leagues).
+// Regenerated for extra time (football simulation version 4): a game level after ninety minutes now plays thirty
+// minutes of extra time before its shoot-out, which draws from the campaign's generator, so each case's first level
+// game and every match after it play differently: CONMEBOL's fifth, Brazil v Paraguay 0–0, which Brazil won on
+// penalties, Paraguay now wins 1–0 after extra time (a-spectator-duel) or on penalties after a goalless one
+// (b-manager-adaptive, whose Brazil goes out there and so records one decision where it recorded eight).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';

@@ -18,7 +18,7 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { committedSeasons, footballSeasonsModule, retroSeasonIds, worldCupSeasonIds } from './lib/football-seasons-listing.mjs';
+import { committedSeasons, footballSeasonsModule, nationalTeamSeasonIds, retroSeasonIds, worldCupSeasonIds } from './lib/football-seasons-listing.mjs';
 import { buildEaSeason, buildSnapshotEaSeason } from './lib/ea-seasons.mjs';
 import { EARLY_EXTRA_FIELDS, buildEarlyEaSeason, nationalityEntries } from './lib/ea-early-seasons.mjs';
 import { LEGACY_POSITIONS, buildLegacyEaSeason, legacyExclusions, readRatingsRows, rosterDates } from './lib/ea-legacy-seasons.mjs';
@@ -110,14 +110,16 @@ async function main() {
   }
   const retro = JSON.parse(await readFile(path.join(root, 'scripts/data/retro-seasons.json'), 'utf8'));
   const worldCup = JSON.parse(await readFile(path.join(root, 'scripts/data/world-cup-seasons.json'), 'utf8'));
+  const nationalTeams = JSON.parse(await readFile(path.join(root, 'scripts/data/national-team-seasons.json'), 'utf8'));
   const listed = [...results.map(result => result.doc), ...await committedSeasons(path.join(root, 'public/football'), retroSeasonIds(retro)),
-    ...await committedSeasons(path.join(root, 'public/football'), worldCupSeasonIds(worldCup))];
+    ...await committedSeasons(path.join(root, 'public/football'), worldCupSeasonIds(worldCup)),
+    ...await committedSeasons(path.join(root, 'public/football'), nationalTeamSeasonIds(nationalTeams))];
   const { editions, exclusions, ...legacySources } = manifest.legacy;
   const audit = { generatedBy: 'scripts/build-ea-seasons.mjs', snapshots: manifest.snapshots, site: manifest.site, dataset: manifest.dataset,
     legacy: { ...legacySources, positions: LEGACY_POSITIONS, exclusions }, early: manifest.early, seasons: results.map(result => result.audit) };
   const outputs = new Map([
     ...results.map(({ doc, text }) => [path.join(root, 'public/football', `${doc.id}.json`), text]),
-    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea: manifest, retro, worldCup })],
+    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea: manifest, retro, worldCup, nationalTeams })],
     [path.join(root, 'docs/design/football-seasons-audit.json'), `${JSON.stringify(audit, null, 2)}\n`],
   ]);
   if (args.check) {

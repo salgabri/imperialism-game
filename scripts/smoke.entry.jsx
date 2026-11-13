@@ -8,11 +8,11 @@ import App from '../src/App.jsx';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
 import { clubLogoUrl } from '../src/data/clubLogos.js';
-import { DEPENDENCIES, NATIONS, buildClub, makeRng, teamEff } from '../src/data/teams.js';
+import { DEPENDENCIES, HISTORIC_NATIONS, HISTORIC_THROUGH, NATIONS, buildClub, makeRng, teamEff } from '../src/data/teams.js';
 import { SAVE_KEY } from '../src/config.js';
 import { campaignStorageKey, exportCampaign, listCampaigns, writeSave } from '../src/engine/storage.js';
 import { domesticEntry, domesticLabel } from '../src/data/domesticScope.js';
-import { domesticIdOf } from '../src/app/shared.js';
+import { domesticIdOf, mapYearOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
 import { clearDomesticCache, decodeDomestic, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
 import { getSport } from '../src/sports/index.js';
@@ -69,6 +69,16 @@ async function loadReference(id) {
 
 /** A conquest takes everything, so each club's starting group always has one holder. */
 const wholeGroups = (own, reference) => reference.clubs.every(club => club.startSections.every(section => own[section] === own[club.homeSection]));
+
+/**
+ * The nations on the world map of the app's season (its campaign's, or the setup's choice): East Germany and South
+ * Vietnam only on the map of their years (src/engine/historicMap.js), every other nation always.
+ */
+function mapNationIds(app) {
+  const playing = app.state.phase === 'playing' || app.state.phase === 'victory';
+  const year = mapYearOf(playing ? app.state.settings : app.state.setup);
+  return Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id) || (year != null && year <= HISTORIC_THROUGH[id]));
+}
 
 /** The reference map when the app's campaign (or setup choice) is that country. */
 function domesticOf(app) {
@@ -213,7 +223,7 @@ function expectedFlagsShown(app) {
     });
   }
   const nationPaths = paths.filter(path => NATIONS[path.dataset.country]);
-  if (app.state.mapMode !== 'flags' || nationPaths.length !== Object.keys(NATIONS).length) return false;
+  if (app.state.mapMode !== 'flags' || nationPaths.length !== mapNationIds(app).length) return false;
   return paths.every(path => {
     const id = path.dataset.country;
     const owner = playing ? app.state.teams[holderOf(app, id)] : null;

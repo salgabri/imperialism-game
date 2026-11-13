@@ -15,15 +15,15 @@ import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../src/data/hockeySeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { CLUBS } from '../src/data/clubs.hockey.js';
-import { buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
+import { buildTeam, fieldsRealSide, makeRng, selectLineup } from '../src/data/teams.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, seasonMapOf, seasonSport, setHasClubs, setHasNations, setSportOf, sportOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
-import { BASELINE } from '../src/sports/hockey.js';
+import { BASELINE, hockey } from '../src/sports/hockey.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { pointInPolys } from './lib/domestic-partition.mjs';
 import {
-  findPlayer, nhl94Overall, nhlpa93Displayed, nhlpa93Overall, norm, quantileRescale, ratingsOf, seasonIdOf, teamsOf,
+  federationLands, findPlayer, nhl94Overall, nhlpa93Displayed, nhlpa93Overall, norm, quantileRescale, ratingsOf, seasonIdOf, teamsOf,
 } from './lib/nhl-seasons.mjs';
 import { bundleComponents, findElement, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
@@ -57,7 +57,7 @@ const rescaledOf = id => AUDIT.seasons.find(season => season.id === id).rescaled
 // ---------- building ----------
 
 test('every season rebuilds byte for byte from its committed snapshot, and the built-in season is unchanged', () => {
-  assert.match(execFileSync(process.execPath, ['scripts/build-nhl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 59 hockey seasons/);
+  assert.match(execFileSync(process.execPath, ['scripts/build-nhl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 65 hockey seasons/);
   assert.match(execFileSync(process.execPath, ['scripts/build-hockey.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the NHL clubs and the hockey nations/);
   assert.deepEqual(EDITIONS.map(season => season.id).sort(), IDS.slice().sort());
   for (const season of EDITIONS) {
@@ -128,7 +128,10 @@ test('every season loads and fits its era\'s map: its clubs named, coded and hou
     const snapshot = snapshotOf(listed.id);
     assert.equal(doc.coverage.players, snapshot.players.length);
     assert.equal(doc.coverage.left, snapshot.left.length);
-    assert.deepEqual(doc.territory, { merged: { SCO: '826', WAL: '826', NIR: '826' }, inactive: [] }, 'Great Britain plays as one');
+    // Great Britain plays as one, and a federation of the day that fields a real side holds its other members' land.
+    const fielded = new Set(Object.keys(doc.nations).filter(id => fieldsRealSide(id, { ...hockey, rosters: doc.nations })));
+    assert.deepEqual(doc.territory, { merged: { SCO: '826', WAL: '826', NIR: '826', ...federationLands(listed.year, fielded) }, inactive: [] },
+      'Great Britain plays as one');
     if (setHasNations(listed.id)) assert.ok(doc.nations['124'][0] >= doc.nations['840'][0], `${listed.season}: Canada first`);
   }
 });
@@ -418,7 +421,7 @@ test('hockey\'s Season choice lists its seasons; a season keeps Nations, and Clu
     assert.deepEqual(['nhl-2009', 'nhl-1994', 'nhl-1968'].map(id => model.season.options.find(option => option.id === id).name),
       ['2008/09 · converted', '1993/94', '1967/68 · computed']);
     assert.deepEqual(model.season.options.slice(1).map(option => option.label), BUILT_IN_HOCKEY_SEASONS.map(set => `${set.season} · ${set.label}`));
-    assert.equal(model.season.options.length, 60, 'the built-in season and every season from 1966/67 but 2004/05');
+    assert.equal(model.season.options.length, 66, 'the built-in season and every season from 1960/61 but 2004/05');
     app.pickSetup('dataSet', 'nhl-1994');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'nhl-1994'], 'a hockey season keeps its nations');
     app.pickSetup('layer', 'clubs');

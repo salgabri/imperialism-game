@@ -42,10 +42,10 @@ function Kicks({ code, kicks }) {
 
 /**
  * Attack | score + minute | Defend. The attacker always comes first, whichever side you manage (B§1.7). The minute is
- * the sport's clock (`sport`: baseball shows the half-inning).
+ * the sport's clock (`sport`: baseball shows the half-inning), read with the season's rules when given (`clockSport`).
  */
-export default function ScoreHeader({ a, b, sport = 'football', live = false, statusLabel = '', statusDetail = null, kicks = null,
-  minuteStore = null, minuteFallback = 0, minuteFloor = 0 }) {
+export default function ScoreHeader({ a, b, sport = 'football', clockSport = null, live = false, statusLabel = '', statusDetail = null,
+  kicks = null, minuteStore = null, minuteFallback = 0, minuteFloor = 0 }) {
   return (
     <header className="match-score">
       <h1 className="sr-only">{`${a.name} ${a.score}, ${b.name} ${b.score}`}</h1>
@@ -54,7 +54,7 @@ export default function ScoreHeader({ a, b, sport = 'football', live = false, st
         <span>{a.score}</span><span className="match-score__dash">–</span><span>{b.score}</span>
       </div>
       <Side team={b} align="d" />
-      <StatusLine sport={sport} live={live} statusLabel={statusLabel} statusDetail={statusDetail}
+      <StatusLine sport={clockSport || sport} live={live} statusLabel={statusLabel} statusDetail={statusDetail}
         minuteStore={minuteStore} minuteFallback={minuteFallback} minuteFloor={minuteFloor} />
       {kicks && (kicks.a?.length || kicks.b?.length) ? (
         <div className="match-score__pens">

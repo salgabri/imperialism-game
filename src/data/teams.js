@@ -1,6 +1,7 @@
 // Football Imperialism — nation identity and squad building.
 // Keyed by ISO-3166 numeric id (matches world-110m TopoJSON geometry ids). 'KOS' = Kosovo (-99 shape); 'SCO', 'WAL'
-// and 'NIR' = the home nations (HOME_NATIONS below).
+// and 'NIR' = the home nations (HOME_NATIONS below); '278' = East Germany (ISO 3166's code for it until 1990), a shape
+// of the map's earlier years only (HISTORIC_NATIONS below).
 //
 // Squads come from the sport registry (src/sports), which supplies the roster
 // data, lineup shape and match model. This file holds nation identity only.
@@ -47,6 +48,17 @@ export function nationIdentity(id, sport) {
 // map's outlines. Saves from before have no owner for them (neutral land), and football seasons built before list
 // none of them: those seasons field no team of theirs.
 export const PACIFIC_ISLANDS = Object.freeze(['776', '882', '184']);
+
+// Nations the map has only in earlier years (src/engine/historicMap.js): East Germany (278), up to 1990, and South
+// Vietnam (RVN), up to 1975. A season lists one only when its source rates players of its own (East Germany's 1974
+// World Cup finalists and 1989/90 database players, South Vietnam's Davis Cup players of 1964 and 1965), and fields it
+// only on the map of its years; every other season, built for today's map, lists none of them and fields no team of theirs.
+export const HISTORIC_NATIONS = Object.freeze(['278', 'RVN']);
+/**
+ * The last season-end year each nation of HISTORIC_NATIONS is on the map: East Germany's is 1990 (reunification, 3
+ * October 1990), South Vietnam's 1975 (the fall of Saigon, 30 April 1975).
+ */
+export const HISTORIC_THROUGH = Object.freeze({ '278': 1990, RVN: 1975 });
 
 // Shapes drawn on the map that never belong to anyone (club seeding never deals them).
 // Antarctica, Fr.S.Lands, Falklands, W.Sahara, N.Cyprus, Somaliland.
@@ -112,6 +124,10 @@ export const NATIONS = {
   '620': ['Portugal', 'POR', 'UEFA', 'bra', 88, '#E5334D', [['R. Dias','DF',88],['B. Fernandes','MF',87],['Vitinha','MF',87],['R. Leão','FW',86],['C. Ronaldo','FW',84]]],
   '528': ['Netherlands', 'NED', 'UEFA', 'ger', 87, '#FF7A26', [['V. van Dijk','DF',87],['F. de Jong','MF',86],['C. Gakpo','FW',85],['X. Simons','MF',84]]],
   '276': ['Germany', 'GER', 'UEFA', 'ger', 86, '#E8E8EC', [['F. Wirtz','MF',90],['J. Musiala','MF',89],['J. Kimmich','MF',86],['K. Havertz','FW',85]]],
+  // East Germany is on the map only in the seasons up to 1990 (src/engine/historicMap.js) and fields a team only where a
+  // season rates its players (the 1974 World Cup's). Blue, as its first colours (Wikipedia's East Germany national
+  // football team, revision 1377070853).
+  '278': ['East Germany', 'GDR', 'UEFA', 'ger', 0, '#2A3F9E', 0],
   '056': ['Belgium', 'BEL', 'UEFA', 'fra', 85, '#F2C230', [['T. Courtois','GK',88],['K. De Bruyne','MF',85],['J. Doku','FW',85],['L. Openda','FW',83]]],
   '380': ['Italy', 'ITA', 'UEFA', 'lat', 84, '#52A7E0', [['G. Donnarumma','GK',88],['N. Barella','MF',86],['A. Bastoni','DF',86],['F. Chiesa','FW',82]]],
   '191': ['Croatia', 'CRO', 'UEFA', 'sla', 84, '#E4553F', [['J. Gvardiol','DF',87],['L. Modrić','MF',82],['M. Kovačić','MF',84]]],
@@ -236,6 +252,10 @@ export const NATIONS = {
   '156': ['China', 'CHN', 'AFC', 'chn', 64, '#D8404A', [['Wu Lei','FW',73]]],
   '764': ['Thailand', 'THA', 'AFC', 'sea', 62, '#4B72D0', [['C. Songkrasin','MF',74]]],
   '704': ['Vietnam', 'VIE', 'AFC', 'sea', 61, '#D84444', 0],
+  // South Vietnam (the Republic of Vietnam) is on the map only in the seasons up to 1975 (src/engine/historicMap.js),
+  // cut from Vietnam, which is North Vietnam's land then; it fields a team where a season rates its players (the Davis
+  // Cup's of 1964 and 1965). Its code is the IOC's of its day; yellow, as its flag (no source gives its kit).
+  RVN: ['South Vietnam', 'VNM', 'AFC', 'sea', 0, '#E8B820', 0],
   '360': ['Indonesia', 'IDN', 'AFC', 'sea', 64, '#D0433E', 0],
   '458': ['Malaysia', 'MAS', 'AFC', 'sea', 58, '#E8B93C', 0],
   '608': ['Philippines', 'PHI', 'AFC', 'sea', 56, '#4B72D8', 0],

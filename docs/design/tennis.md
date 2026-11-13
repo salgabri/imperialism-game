@@ -8,7 +8,8 @@ rules as the Billie Jean King Cup, a sport of its own ([women's tennis](womens-t
 
 The player chose the format and the data: the home-and-away ties' five rubbers (rather than
 the Final 8's three, or the old best-of-five sets), and Elo ratings only, with nothing
-estimated.
+estimated. That is the built-in season's format; since 2026-11-10 an earlier season plays its
+own year's, best-of-five sets and advantage sets included ([Format by year](#format-by-year)).
 
 ## Data
 
@@ -63,7 +64,8 @@ There are no doubles ratings: the pair is the mean of its two players' singles r
 
 ## The match model
 
-`src/sports/tennis.js`.
+`src/sports/tennis.js`. The built-in season's, and every season's since 2019; the years
+before play their own format on the same model ([Format by year](#format-by-year)).
 
 - **The tie.** Day one: each side's No. 1 plays the other's No. 2 (the attacker's No. 1
   first). Day two: the doubles, then No. 1 against No. 1 and No. 2 against No. 2. Once a side
@@ -129,6 +131,108 @@ with seven-point Gauss–Hermite quadrature, as hockey's is. Games inside a set 
 chart; a set or a rubber always does. At the first serve it sits within sampling error of the
 tie's simulated odds.
 
+## Format by year
+
+Status: implemented 2026-11-10, when the user asked that over time the rules of the games be
+correct. An earlier season plays the Davis Cup of its year: `matchSport` asks the sport for the
+rules of the season's year (`rulesFor`, `src/sports/eras.js`), and tennis answers with
+`DAVIS_CUP_FORMATS` in `src/sports/tennis.js`, one sport object a format (the same players,
+words and labels, its own rubbers, sets and clock). The built-in 2026 and the seasons of
+2019–2025 play today's ties on the sport itself, exactly as before (a test pins the built-in
+season's ties to the ones the module played before this change).
+
+| Seasons | Tie | Sets | Source |
+| --- | --- | --- | --- |
+| 1960–1988 | Five rubbers over three days, first to three: the two singles, the doubles, the reverse singles | Best of five, no tie-break: every set an advantage set | [Davis Cup](https://en.wikipedia.org/w/index.php?oldid=1384175798) ("Each tie consists of five rubbers, which are played in three days"; "Each rubber is normally played as best of five sets") |
+| 1989–2015 | The same | Best of five, a tie-break at 6–6 in every set but the fifth | [1989 Davis Cup](https://en.wikipedia.org/w/index.php?oldid=1367121733): "the introduction of the tiebreak, played at 6–6 in all sets except for the final set" |
+| 2016–2018 | The same | Best of five, a tie-break in every set | [2016 Davis Cup](https://en.wikipedia.org/w/index.php?oldid=1373159027): the deciding set settled by a tie-break at 6 games all; [2018 Davis Cup](https://en.wikipedia.org/w/index.php?oldid=1374169870): only the zone groups went to best of three |
+| 2019–2026 | Five rubbers over two days, the doubles first on day two (today's) | Best of three tie-break sets | [2019 Davis Cup](https://en.wikipedia.org/w/index.php?oldid=1375952558): the matches "changing from best-of-5 sets to best-of-3"; the qualifiers home and away over two days |
+
+The Wikipedia revisions were read on 2026-11-10, each fetched once as its article page under
+`/wiki/` with the User-Agent "imperialism-game-data/1.0" (robots.txt allows `/wiki/`). Jeff
+Sackmann's match files (the pinned archive of Earlier seasons) bear every date out, as
+`node scripts/tennis-formats-real.mjs` counts them from the pinned files (2026-11-10): none of
+the 17,940 sets of the Davis Cup's best-of-five rubbers of 1960–1988 ended 7–6 (two sets of
+dead rubbers shortened to best of three did), and 1,647 went past 7–5; from 1989 to 2015, 2,772
+of the 20,411 first four sets ended 7–6 and none went past it, while 157 of the 1,052 fifth sets
+went past 7–5 and none ended 7–6; from 2016, 12 of the 87 fifth sets ended 7–6 and none went past
+it; all 1,350 rubbers of 2019–2025 are best of three. The files number the singles 1, 2, 4 and 5
+(the doubles third) in all but 2 of the 3,987 ties of 1968–2025, and the first reverse singles is
+the No. 1s': in 505 of the 640 World Group ties of 1985–2018 whose players have a ranking, its two
+players' rankings add up to less than the second's (a dead rubber often fielded others).
+
+**The model.**
+
+- **The order of play** is the Davis Cup's in every year: the two singles, the doubles, the
+  reverse singles, No. 1 against No. 1 first. The third day is not played apart: one match-day
+  form for the tie, as today.
+- **Best of five.** Tennis Abstract's Elo is a best-of-three rating ("My version of tennis Elo
+  is based on the most common match format, best-of-three matches. In a best-of-five match, the
+  favorite has a better chance of winning": Jeff Sackmann,
+  [An Introduction to Tennis Elo](https://www.tennisabstract.com/blog/2019/12/03/an-introduction-to-tennis-elo/),
+  3 December 2019). So a rubber's set chance comes from Elo's odds as in best of three
+  (`setLogitFor`, under the same day form), and the rubber is five sets of it: at each day-form
+  node P = s³(10 − 15s + 6s²) (`bestOfFiveOdds`; the score-only path reads it from a table,
+  `fiveSetOdds`, within 2·10⁻⁵). Sackmann's own conversion treats the sets as independent: his
+  81.4% favourite over three sets is 86.7% over five. Under day form a player's sets are not
+  independent, so the favourite gains less: 84.1%.
+- **Checked against real matches** (`scripts/tennis-formats-real.mjs`, 2026-11-10: every
+  completed best-of-five match of 1968–2025 between men with twenty rated matches behind them,
+  each player's Elo before the match by Tennis Abstract's method, `scripts/lib/tennis-elo.mjs`,
+  whose `rateMatches` takes a `before` hook for it):
+
+  | Matches | Elo's best-of-three odds | Day form over five sets | Independent sets | Favourite won | Fifth set: model, independent, real | Straight sets: model, real |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | The majors, 25,005 | 71.7% | 73.6% | 75.3% | 72.0% | 20.8%, 28.5%, 19.2% | 48.0%, 48.2% |
+  | The Davis Cup to 2018, 4,928 | 72.1% | 73.9% | 75.7% | 71.4% | 20.7%, 28.3%, 20.7% | 48.2%, 48.9% |
+
+  Day form, fitted on best-of-three matches, sends as many rubbers to a fifth set as went there,
+  where independent sets would send half as many again. The favourites' wins sit between Elo's
+  best-of-three odds and day form's: Elo overrates a favourite by two or three points in best of
+  three too (the tour's best-of-three matches of 2000–2025: 68.1% expected, 65.7% won), so the
+  gain over five sets is about day form's.
+- **Advantage sets.** A set without a tie-break is played game by game until a side is two
+  clear (6–4, 9–7, 13–11), with the same hold and break model; its odds are exact
+  (`setChance(pA, pD, false)`: level at five all, the server holds and breaks before the
+  receiver does), and the two servers split their difference for it as for a tie-break set, so
+  the set is still won with the day's set chance. A set that reached 70 games all would end in a
+  tie-break (`MAX_SET_GAMES`), past the longest ever played (Isner–Mahut's 70–68 at Wimbledon in
+  2010); between equal men a set level at five all goes on two more games about seven times in
+  ten. The feed shows such sets as played: "SET 3 — Gilbert/Annacone (USA) 13–11",
+  "SINGLES — John McEnroe (USA) 4–6 6–3 6–3 4–6 6–4".
+- **The clock.** Twenty units a rubber, as today; a best-of-five rubber's units last 113 ms
+  rather than 70, as its games are 1.6 times as many between equal men (the model's own: 39.2
+  with a tie-break in every set, 39.6 without one in the fifth and 43.6 with none, against
+  today's 24.4), so a tie of 1985 lasts 6.8 to 11.3 seconds at normal speed where today's lasts
+  4.2 to 7. The setup's estimate of a campaign reads the season's clock.
+- **The live chart** is the same exact model over five sets: a rubber's chance after its sets
+  weighs each day-form node by how likely it made them, then the sets it still needs
+  (`bestOf: 5` on the saved model; today's model is unchanged).
+
+**Realism** (`npm run simulation:realism`, its "The cups by year" part: each season's sixteen
+strongest nations, each pair once a season, 40 seasons, 4,800 ties; real: the World Group's live
+best-of-five singles in the match files, a dead rubber having been shortened to best of three or
+not played):
+
+| Measure | 1985 | Real, 1981–1988 | 2005 | Real, 1989–2015 | 2017 | Real, 2016–2018 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Rubbers to a fifth set | 21.0% | 21.3% | 22.5% | 20.3% | 21.0% | 24.4% |
+| Rubbers in straight sets | 48.8% | 50.0% | 45.3% | 50.0% | 47.9% | 36.9% |
+| Sets that reached 6–6 | 18.5% | 12.8% | 18.9% | 16.5% | 18.0% | 18.2% |
+| Sets past 7–5 ending 8–6 / 9–7 / longer | 32.2 / 21.9 / 45.9% | 34.9 / 24.7 / 40.3% | 33.4 / 20.4 / 46.2% | 37.7 / 18.9 / 43.4% (fifth sets) | — | — |
+| Ties decided 3–0 / 3–1 / 3–2 | 37.2 / 37.4 / 25.4% | — | 26.9 / 38.4 / 34.7% | 34.9 / 35.7 / 29.4% | 21.3 / 41.5 / 37.1% | — |
+| The longest set | 30–28 | 21–19 | 26–24 (a fifth) | 17–15 | — | — |
+
+The real samples (`scripts/tennis-formats-real.mjs`): 390, 1,721 and 160 rubbers; 1,448, 6,373
+and 620 sets; 186 sets and 53 fifth sets past 7–5; 613 ties of 1989–2015 whose live rubbers say
+when they were decided (before then dead rubbers were not yet shortened in every tie, and the
+files hold no doubles). Their fields are whole World Groups, not the game's sixteen strongest of
+one season. Fewer sets reached 6–6 in the 1980s than in the model: it plays every year at today's
+serve (64% of points won), and the serve won less then. Best of five makes favourites surer: by
+the live model's exact odds at the first serve, the favourites of 1985's sixteen win 82.0% of
+their ties, where today's ties between the same men would give them 80.5% (2005's: 72.8% and
+71.2%).
+
 ## Interface
 
 - **Setup.** A Tennis card with a racket icon. Tennis is nations only (`nationsOnly` on the
@@ -145,7 +249,8 @@ tie's simulated odds.
 ## Realism
 
 `npm run simulation:realism` plays the sixteen strongest nations against each other, each
-pair once a season, 40 seasons (4,800 ties):
+pair once a season, 40 seasons (4,800 ties), in today's ties (an earlier year's format has its
+own table, [Format by year](#format-by-year)):
 
 | Measure | Model | Real |
 | --- | --- | --- |
@@ -177,6 +282,18 @@ the running App launching, playing a tie and saving it. `scripts/home-advantage.
 `scripts/simulation-realism.test.mjs` hold the host's edge; `npm run smoke` adds a Davis Cup
 campaign of Europe with the live ticker.
 
+`scripts/tennis-formats.test.mjs` holds the formats by year, the women's too: each year's format
+and the one sport object a format; advantage sets (exact odds against game-by-game play, their
+serve edge, no tie-break, about a fifth playing on past 7–5); best of five (the formula, Tennis
+Abstract's 81.4% example both ways, the table, Elo's odds over five sets, fifth and straight sets
+as day form expects, rubbers played out given their result); the clock's pace against the games;
+the built-in season's ties pinned to the ones played before (their SHA-256); a 1985 tie of best-of-
+five advantage sets and a 2005 one with the fifth set alone untied; the Fed Cup's three rubbers,
+the No. 2s first, and its doubles last; the live chart's start at the odds, its exact posterior
+after each set of a best-of-five rubber, a three-rubber tie's ticks; the clock and the feed's
+"rubber 2 of 3"; the running App playing a 1985 season best of five, saving and resuming it, and
+a women's 1985 season in three rubbers.
+
 ## Known limits
 
 - No doubles ratings: a pair is its players' singles mean, so doubles specialists (Bolelli and
@@ -189,6 +306,11 @@ campaign of Europe with the live ticker.
 - No surfaces: a host's choice of surface is in the home edge, not played. The snapshot keeps
   each player's hard, clay and grass Elo for that.
 - Players by the country Tennis Abstract files them under, not by Davis Cup nominations.
+- Every year at today's serve: an earlier season's sets reach 6–6 more often than they did
+  (18.5% in the model's 1985, 12.8% in the World Group of 1981–1988). The day form and the
+  hold-and-break model are today's too; only the format is the year's.
+- The Davis Cup's three days are not played apart: one match-day form for the tie, as today's
+  two days. Dead rubbers are not played, though they were in every year.
 
 ## Earlier seasons
 
@@ -200,7 +322,8 @@ sources (2026-11-08): Tennis Abstract's own published lists where they exist, an
 years computed from Jeff Sackmann's match results by Tennis Abstract's published method, on
 today's scale and labelled as computed. The women's seasons are built by the same scripts
 with `--tour=wta` ([womens-tennis.md](womens-tennis.md), "Earlier seasons"); the men's
-rebuild byte for byte.
+rebuild byte for byte. Since 2026-11-10 each season plays its year's Davis Cup format
+([Format by year](#format-by-year)).
 
 ### Sources
 
@@ -350,10 +473,16 @@ African to 1981, Kevin Curren to 1984, Greg Rusedski Canadian to 1994, Mikhail K
 Andrey Golubev Russian to 2007. Great Britain plays as one, as in 2026. A nation needs two rated
 men; countries the map does not draw (Monaco, Hong Kong, Barbados…) field nobody.
 
-The game shows a federation by its holder's name and flag (Czechia, Russia, Serbia, Germany).
-Football's seasons can now carry the federations of their day under their own names
-(`identities`), but tennis keeps today's names, so that its seasons match those shipped from
-1973 on. The audit names both ("Czechoslovakia (Czechia) 87.4" in 1985).
+Since 2026-11-10 the game shows a federation under its own name and flag in its years
+(src/data/namesOfTheDay.js, [Earlier maps](historic-maps.md)): Czechoslovakia to 1992, the Soviet
+Union to 1991, the CIS in 1992, Yugoslavia to 1991, FR Yugoslavia to 2002, Serbia and Montenegro
+to 2006, West Germany to 1990 and the United Arab Republic (Egypt) to 1971. The season files
+are unchanged (the names are the game's, by year), and the audit names both ("Czechoslovakia
+(Czechia) 87.4" in 1985). Until then it showed the holder's name and flag (Czechia, Russia,
+Serbia, Germany). East Germany is on the map of every season to 1990, its land neutral.
+South Vietnam's Davis Cup team of 1964 and 1965 plays on its own land, Vietnam cut at the
+17th parallel to 1975 (`nations.dayNations`). Rhodesia (to 1979) still plays under
+Zimbabwe's name and flag: its flag of the day is too large a drawing to ship.
 
 ### Before 1973
 

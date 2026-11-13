@@ -5291,7 +5291,7 @@
     },
     {
       "id": "nhl-1992",
-      "version": "nhl-1992-f7d7a58a",
+      "version": "nhl-1992-9df4872f",
       "season": "1991/92",
       "label": "Computed from statistics",
       "method": "computed",
@@ -5352,13 +5352,11 @@
       "nations": [
         "Canada 93 (23)",
         "United States 89 (23)",
-        "Russia 82 (22; the game fills G)",
-        "Czechia 81 (21)",
+        "CIS 83 (23; the game fills G)",
+        "Czechoslovakia 81 (23)",
         "Sweden 77 (17; the game fills C C G)",
         "Finland 65 (10; the game fills C C C LW LW RW D D D)",
-        "Slovakia 52 (4; the game fills C C C LW LW LW RW RW RW D D D D D G)",
         "Germany 51 (3; the game fills C C C LW LW LW LW RW RW RW RW D D D D G)",
-        "Ukraine 51 (3; the game fills C C C C LW LW LW RW RW RW D D D D D G)",
         "Great Britain 49 (2; the game fills C C C C LW LW LW LW RW RW RW D D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW RW RW RW RW D D D D D D G)",
@@ -5373,8 +5371,8 @@
       "realSides": [
         "Canada",
         "United States",
-        "Russia",
-        "Czechia",
+        "CIS",
+        "Czechoslovakia",
         "Sweden",
         "Finland"
       ],
@@ -5386,7 +5384,7 @@
     },
     {
       "id": "nhl-1991",
-      "version": "nhl-1991-b6f79d60",
+      "version": "nhl-1991-c2a32793",
       "season": "1990/91",
       "label": "Computed from statistics",
       "method": "computed",
@@ -5446,13 +5444,11 @@
       "nations": [
         "Canada 93 (23)",
         "United States 88 (23)",
-        "Czechia 78 (19; the game fills D)",
+        "Czechoslovakia 81 (22)",
+        "Soviet Union 74 (15; the game fills C LW D G)",
         "Sweden 73 (16; the game fills C LW LW RW G)",
-        "Russia 68 (12; the game fills C LW LW LW D D G)",
         "Finland 66 (12; the game fills C C C RW RW D D D)",
-        "Slovakia 51 (3; the game fills C C C LW LW LW RW RW RW RW D D D D D G)",
         "Germany 50 (3; the game fills C C C LW LW LW LW RW RW RW RW D D D D G)",
-        "Ukraine 50 (3; the game fills C C C C LW LW RW RW RW RW D D D D D G)",
         "Great Britain 49 (2; the game fills C C C C LW LW LW RW RW RW RW D D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
@@ -5465,9 +5461,9 @@
       "realSides": [
         "Canada",
         "United States",
-        "Czechia",
+        "Czechoslovakia",
+        "Soviet Union",
         "Sweden",
-        "Russia",
         "Finland"
       ],
       "noNation": [],
@@ -5478,7 +5474,7 @@
     },
     {
       "id": "nhl-1990",
-      "version": "nhl-1990-c3ed9f71",
+      "version": "nhl-1990-d14407ee",
       "season": "1989/90",
       "label": "Computed from statistics",
       "method": "computed",
@@ -5540,14 +5536,12 @@
         "United States 88 (23)",
         "Sweden 79 (21; the game fills G)",
         "Finland 76 (17; the game fills C LW D)",
-        "Czechia 66 (11; the game fills C LW LW RW RW RW D G)",
-        "Russia 62 (9; the game fills C C C LW LW RW RW D D D)",
-        "Germany 50 (3; the game fills C C C LW LW LW LW RW RW RW RW D D D D G)",
+        "Czechoslovakia 70 (13; the game fills LW RW RW RW D G)",
+        "Soviet Union 63 (10; the game fills C C C LW LW RW D D D)",
+        "West Germany 50 (3; the game fills C C C LW LW LW LW RW RW RW RW D D D D G)",
         "Great Britain 49 (2; the game fills C C C C LW LW LW LW RW RW RW D D D D D G)",
-        "Slovakia 49 (2; the game fills C C LW LW LW LW RW RW RW RW D D D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Latvia 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Poland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D D)",
         "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Brazil 46 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D D)",
@@ -5560,7 +5554,8 @@
         "United States",
         "Sweden",
         "Finland",
-        "Czechia"
+        "Czechoslovakia",
+        "Soviet Union"
       ],
       "noNation": [],
       "left": [],
@@ -5573,7 +5568,7 @@
     },
     {
       "id": "nhl-1989",
-      "version": "nhl-1989-56232756",
+      "version": "nhl-1989-8e4ed6fb",
       "season": "1988/89",
       "label": "Computed from statistics",
       "method": "computed",
@@ -5634,23 +5629,22 @@
         "Canada 93 (23)",
         "United States 87 (23)",
         "Sweden 81 (22; the game fills G)",
+        "Czechoslovakia 77 (17; the game fills D G)",
         "Finland 76 (19; the game fills D D)",
-        "Czechia 65 (11; the game fills C C C LW RW RW D G)",
-        "Slovakia 57 (6; the game fills C C LW LW RW RW D D D D D D G)",
-        "Germany 50 (3; the game fills C C C LW LW LW LW RW RW RW RW D D D D G)",
+        "West Germany 50 (3; the game fills C C C LW LW LW LW RW RW RW RW D D D D G)",
         "Great Britain 49 (2; the game fills C C C C LW LW LW RW RW RW RW D D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Poland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D D)",
         "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
-        "Russia 46 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)"
+        "Soviet Union 46 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)"
       ],
       "realSides": [
         "Canada",
         "United States",
         "Sweden",
-        "Finland",
-        "Czechia"
+        "Czechoslovakia",
+        "Finland"
       ],
       "noNation": [],
       "left": [],
@@ -5667,7 +5661,7 @@
     },
     {
       "id": "nhl-1988",
-      "version": "nhl-1988-f93b9ea1",
+      "version": "nhl-1988-ac0fd6c2",
       "season": "1987/88",
       "label": "Computed from statistics",
       "method": "computed",
@@ -5729,9 +5723,8 @@
         "United States 87 (23)",
         "Sweden 81 (23; the game fills G)",
         "Finland 70 (13; the game fills C C D D D D)",
-        "Czechia 61 (9; the game fills C C C LW LW RW RW D D G)",
-        "Germany 52 (4; the game fills C C C LW LW LW LW RW RW RW RW D D D G)",
-        "Slovakia 52 (3; the game fills C C LW LW LW LW RW RW RW D D D D D D G)",
+        "Czechoslovakia 68 (12; the game fills C LW LW RW D D G)",
+        "West Germany 52 (4; the game fills C C C LW LW LW LW RW RW RW RW D D D G)",
         "Great Britain 49 (2; the game fills C C C C LW LW LW RW RW RW RW D D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
@@ -5744,7 +5737,8 @@
         "Canada",
         "United States",
         "Sweden",
-        "Finland"
+        "Finland",
+        "Czechoslovakia"
       ],
       "noNation": [],
       "left": [],
@@ -5763,7 +5757,7 @@
     },
     {
       "id": "nhl-1987",
-      "version": "nhl-1987-f88131b0",
+      "version": "nhl-1987-d82b564c",
       "season": "1986/87",
       "label": "Computed from statistics",
       "method": "computed",
@@ -5825,9 +5819,8 @@
         "United States 87 (23)",
         "Sweden 80 (20; the game fills G)",
         "Finland 79 (18; the game fills C)",
-        "Czechia 60 (8; the game fills C C C LW LW RW RW D D D G)",
-        "Slovakia 53 (4; the game fills C C LW LW LW LW RW RW D D D D D D G)",
-        "Germany 52 (4; the game fills C C C LW LW LW LW RW RW RW RW D D D G)",
+        "Czechoslovakia 68 (12; the game fills C LW LW D D D G)",
+        "West Germany 52 (4; the game fills C C C LW LW LW LW RW RW RW RW D D D G)",
         "Great Britain 49 (2; the game fills C C C C LW LW LW RW RW RW RW D D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
@@ -5838,7 +5831,8 @@
         "Canada",
         "United States",
         "Sweden",
-        "Finland"
+        "Finland",
+        "Czechoslovakia"
       ],
       "noNation": [],
       "left": [],
@@ -5857,7 +5851,7 @@
     },
     {
       "id": "nhl-1986",
-      "version": "nhl-1986-94dfa8ca",
+      "version": "nhl-1986-6aae663f",
       "season": "1985/86",
       "label": "Computed from statistics",
       "method": "computed",
@@ -5919,9 +5913,8 @@
         "United States 87 (23)",
         "Sweden 85 (23)",
         "Finland 75 (16; the game fills RW D D)",
-        "Czechia 57 (6; the game fills C C C C LW LW LW RW RW D D D G)",
-        "Slovakia 55 (5; the game fills C C LW LW LW RW RW D D D D D D G)",
-        "Germany 51 (3; the game fills C C C C LW LW LW LW RW RW RW D D D D G)",
+        "Czechoslovakia 67 (11; the game fills C C LW LW D D D G)",
+        "West Germany 51 (3; the game fills C C C C LW LW LW LW RW RW RW D D D D G)",
         "Great Britain 50 (3; the game fills C C C C LW LW LW RW RW RW RW D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
@@ -5933,7 +5926,8 @@
         "Canada",
         "United States",
         "Sweden",
-        "Finland"
+        "Finland",
+        "Czechoslovakia"
       ],
       "noNation": [],
       "left": [],
@@ -5954,7 +5948,7 @@
     },
     {
       "id": "nhl-1985",
-      "version": "nhl-1985-e2592152",
+      "version": "nhl-1985-42dc62ec",
       "season": "1984/85",
       "label": "Computed from statistics",
       "method": "computed",
@@ -6015,21 +6009,21 @@
         "Canada 93 (23)",
         "United States 87 (23)",
         "Sweden 85 (23)",
+        "Czechoslovakia 71 (13; the game fills C C RW RW D G)",
         "Finland 71 (16; the game fills C C C RW RW)",
-        "Czechia 62 (9; the game fills C C C C LW RW RW RW D G)",
-        "Slovakia 54 (4; the game fills C C LW LW LW RW RW RW D D D D D D G)",
-        "Germany 51 (3; the game fills C C C C LW LW LW RW RW RW RW D D D D G)",
+        "West Germany 51 (3; the game fills C C C C LW LW LW RW RW RW RW D D D D G)",
         "Great Britain 49 (3; the game fills C C C C LW LW LW RW RW RW RW D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Paraguay 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Serbia 47 (1; the game fills C C C C LW LW LW RW RW RW RW D D D D D D G)",
-        "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)"
+        "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "Yugoslavia 47 (1; the game fills C C C C LW LW LW RW RW RW RW D D D D D D G)"
       ],
       "realSides": [
         "Canada",
         "United States",
         "Sweden",
+        "Czechoslovakia",
         "Finland"
       ],
       "noNation": [],
@@ -6049,7 +6043,7 @@
     },
     {
       "id": "nhl-1984",
-      "version": "nhl-1984-0cc2820e",
+      "version": "nhl-1984-313e6b3f",
       "season": "1983/84",
       "label": "Computed from statistics",
       "method": "computed",
@@ -6111,22 +6105,22 @@
         "United States 86 (23)",
         "Sweden 85 (23)",
         "Finland 68 (12; the game fills C C LW LW RW RW RW)",
-        "Czechia 57 (6; the game fills C C C C LW LW LW RW RW D D D G)",
-        "Slovakia 54 (4; the game fills C C LW LW LW RW RW RW D D D D D D G)",
-        "Germany 49 (2; the game fills C C C C LW LW LW LW RW RW RW D D D D D G)",
+        "Czechoslovakia 66 (10; the game fills C C LW LW RW D D D G)",
+        "West Germany 49 (2; the game fills C C C C LW LW LW LW RW RW RW D D D D D G)",
         "Venezuela 48 (2; the game fills C C C C LW LW LW LW RW RW RW RW D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Paraguay 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Serbia 47 (1; the game fills C C C C LW LW LW RW RW RW RW D D D D D D G)",
         "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "Yugoslavia 47 (1; the game fills C C C C LW LW LW RW RW RW RW D D D D D D G)",
         "Great Britain 46 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)"
       ],
       "realSides": [
         "Canada",
         "United States",
         "Sweden",
-        "Finland"
+        "Finland",
+        "Czechoslovakia"
       ],
       "noNation": [],
       "left": [],
@@ -6136,7 +6130,7 @@
     },
     {
       "id": "nhl-1983",
-      "version": "nhl-1983-cf8e12dc",
+      "version": "nhl-1983-e4213a61",
       "season": "1982/83",
       "label": "Computed from statistics",
       "method": "computed",
@@ -6197,26 +6191,25 @@
         "Canada 93 (23)",
         "United States 84 (23)",
         "Sweden 83 (23)",
+        "Czechoslovakia 73 (14; the game fills LW LW D D G)",
         "Finland 70 (13; the game fills C C LW LW RW RW)",
-        "Czechia 64 (10; the game fills C C LW LW LW RW D D G)",
-        "Slovakia 55 (4; the game fills C C LW LW LW RW RW RW D D D D D D G)",
-        "Germany 50 (3; the game fills C C C C LW LW LW RW RW RW D D D D D G)",
+        "West Germany 50 (3; the game fills C C C C LW LW LW RW RW RW D D D D D G)",
         "Venezuela 48 (2; the game fills C C C C LW LW LW LW RW RW RW RW D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Great Britain 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Netherlands 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Paraguay 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Serbia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
         "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
-        "Russia 46 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)"
+        "Yugoslavia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
+        "Soviet Union 46 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)"
       ],
       "realSides": [
         "Canada",
         "United States",
         "Sweden",
-        "Finland",
-        "Czechia"
+        "Czechoslovakia",
+        "Finland"
       ],
       "noNation": [],
       "left": [],
@@ -6226,7 +6219,7 @@
     },
     {
       "id": "nhl-1982",
-      "version": "nhl-1982-e9ff0cd3",
+      "version": "nhl-1982-60c4b5e9",
       "season": "1981/82",
       "label": "Computed from statistics",
       "method": "computed",
@@ -6288,17 +6281,16 @@
         "United States 84 (23)",
         "Sweden 83 (23)",
         "Finland 70 (14; the game fills C LW RW RW RW G)",
-        "Czechia 54 (5; the game fills C C C LW LW LW LW RW RW D D D D G)",
-        "Slovakia 52 (3; the game fills C C C LW LW LW RW RW RW D D D D D D G)",
-        "Germany 49 (2; the game fills C C C C LW LW LW LW RW RW RW RW D D D D G)",
+        "Czechoslovakia 62 (8; the game fills C C LW LW LW RW D D D D G)",
+        "West Germany 49 (2; the game fills C C C C LW LW LW LW RW RW RW RW D D D D G)",
         "Venezuela 48 (2; the game fills C C C C LW LW LW LW RW RW RW RW D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Great Britain 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Netherlands 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Paraguay 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Serbia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
-        "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)"
+        "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "Yugoslavia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)"
       ],
       "realSides": [
         "Canada",
@@ -6314,7 +6306,7 @@
     },
     {
       "id": "nhl-1981",
-      "version": "nhl-1981-0a58723a",
+      "version": "nhl-1981-134df7c9",
       "season": "1980/81",
       "label": "Computed from statistics",
       "method": "computed",
@@ -6375,18 +6367,17 @@
         "Canada 93 (23)",
         "United States 84 (23)",
         "Sweden 83 (22; the game fills D)",
+        "Czechoslovakia 58 (6; the game fills C C C LW LW LW RW RW RW D D D D)",
         "Finland 55 (6; the game fills C C C LW LW LW RW RW RW RW D D D D)",
-        "Czechia 53 (4; the game fills C C C C LW LW LW LW RW RW RW D D D D)",
-        "Slovakia 50 (2; the game fills C C C LW LW LW RW RW RW RW D D D D D D G)",
-        "Germany 49 (2; the game fills C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "West Germany 49 (2; the game fills C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 48 (2; the game fills C C C C LW LW LW RW RW RW D D D D D D G)",
         "Venezuela 48 (2; the game fills C C C C LW LW LW LW RW RW RW RW D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Great Britain 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Netherlands 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Paraguay 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Serbia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
-        "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)"
+        "Switzerland 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "Yugoslavia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)"
       ],
       "realSides": [
         "Canada",
@@ -6401,7 +6392,7 @@
     },
     {
       "id": "nhl-1980",
-      "version": "nhl-1980-9baee8c6",
+      "version": "nhl-1980-bf7ddadd",
       "season": "1979/80",
       "label": "Computed from statistics",
       "method": "computed",
@@ -6463,15 +6454,14 @@
         "Sweden 84 (20)",
         "United States 84 (23)",
         "Finland 54 (5; the game fills C C C C LW LW LW RW RW RW D D D D)",
-        "Czechia 49 (2; the game fills C C C C LW LW LW LW RW RW RW D D D D D D)",
-        "Germany 49 (2; the game fills C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "Czechoslovakia 51 (3; the game fills C C C LW LW LW LW RW RW RW D D D D D D)",
+        "West Germany 49 (2; the game fills C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Great Britain 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Netherlands 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Paraguay 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Serbia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
-        "Slovakia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
         "Venezuela 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "Yugoslavia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
         "Denmark 46 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "France 46 (1; the game fills C C C C LW LW LW RW RW RW RW D D D D D D G)",
         "Switzerland 46 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)"
@@ -6492,7 +6482,7 @@
     },
     {
       "id": "nhl-1979",
-      "version": "nhl-1979-e47a14c3",
+      "version": "nhl-1979-55eaa5a8",
       "season": "1978/79",
       "label": "Computed from statistics",
       "method": "computed",
@@ -6549,15 +6539,14 @@
         "Canada 93 (23)",
         "United States 80 (23)",
         "Sweden 78 (16; the game fills LW RW G)",
-        "Germany 49 (2; the game fills C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "Czechoslovakia 49 (2; the game fills C C C LW LW LW LW RW RW RW D D D D D D G)",
+        "West Germany 49 (2; the game fills C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Great Britain 48 (2; the game fills C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Chinese Taipei 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
-        "Czechia 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Netherlands 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Paraguay 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Serbia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
-        "Slovakia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
         "Venezuela 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "Yugoslavia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
         "Norway 46 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)"
       ],
       "realSides": [
@@ -6578,7 +6567,7 @@
     },
     {
       "id": "nhl-1978",
-      "version": "nhl-1978-8788a5f8",
+      "version": "nhl-1978-29be0b24",
       "season": "1977/78",
       "label": "Computed from statistics",
       "method": "computed",
@@ -6636,15 +6625,14 @@
         "Canada 93 (23)",
         "United States 80 (23)",
         "Sweden 65 (11; the game fills C C C LW LW RW RW D D)",
+        "Czechoslovakia 49 (2; the game fills C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Great Britain 49 (2; the game fills C C C C LW LW LW LW RW RW D D D D D D G)",
-        "Czechia 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
         "Finland 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
-        "Germany 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
         "Netherlands 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
         "Paraguay 47 (1; the game fills C C C C LW LW LW LW RW RW RW D D D D D D G)",
-        "Serbia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
-        "Slovakia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
-        "Venezuela 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)"
+        "Venezuela 47 (1; the game fills C C C C LW LW LW LW RW RW RW RW D D D D D G)",
+        "West Germany 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)",
+        "Yugoslavia 47 (1; the game fills C C C LW LW LW LW RW RW RW RW D D D D D D G)"
       ],
       "realSides": [
         "Canada",
@@ -7363,6 +7351,330 @@
         "Toronto Maple Leafs 82.3 (30 players)",
         "New York Rangers 82 (25 players)",
         "Boston Bruins 80.9 (33 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1966",
+      "version": "nhl-1966-00541631",
+      "season": "1965/66",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 182,
+      "squads": 138,
+      "ratings": {
+        "lowest": 71,
+        "median": 82,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Bobby Hull (CHI) 99",
+          "Stan Mikita (CHI) 95",
+          "Gordie Howe (DET) 94"
+        ],
+        "defenders": [
+          "Pierre Pilote (CHI) 95",
+          "Pat Stapleton (CHI) 91",
+          "Jacques Laperriere (MTL) 90"
+        ],
+        "goalies": [
+          "Johnny Bower (TOR) 94",
+          "Glenn Hall (CHI) 88",
+          "Charlie Hodge (MTL) 87"
+        ]
+      },
+      "clubs": [
+        "Chicago Black Hawks 84.4 (24 players)",
+        "Montreal Canadiens 83.8 (25 players)",
+        "Detroit Red Wings 83.5 (32 players)",
+        "Toronto Maple Leafs 83.2 (34 players)",
+        "New York Rangers 81.4 (30 players)",
+        "Boston Bruins 81.2 (37 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1965",
+      "version": "nhl-1965-c2806ce1",
+      "season": "1964/65",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 166,
+      "squads": 136,
+      "ratings": {
+        "lowest": 71,
+        "median": 81,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Stan Mikita (CHI) 99",
+          "Bobby Hull (CHI) 95",
+          "Gordie Howe (DET) 94"
+        ],
+        "defenders": [
+          "Pierre Pilote (CHI) 95",
+          "Bob Woytowich (BOS) 91",
+          "Harry Howell (NYR) 89"
+        ],
+        "goalies": [
+          "Glenn Hall (CHI) 94",
+          "Charlie Hodge (MTL) 88",
+          "Johnny Bower (TOR) 87"
+        ]
+      },
+      "clubs": [
+        "Toronto Maple Leafs 83.6 (24 players)",
+        "Chicago Black Hawks 83.5 (21 players; the game fills D)",
+        "Montreal Canadiens 83.2 (26 players)",
+        "Detroit Red Wings 82.6 (31 players)",
+        "Boston Bruins 82.2 (28 players)",
+        "New York Rangers 81.5 (36 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1964",
+      "version": "nhl-1964-aec2930c",
+      "season": "1963/64",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 165,
+      "squads": 136,
+      "ratings": {
+        "lowest": 71,
+        "median": 82,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Stan Mikita (CHI) 99",
+          "Gordie Howe (DET) 95",
+          "Andy Bathgate (NYR) 94"
+        ],
+        "defenders": [
+          "Pierre Pilote (CHI) 95",
+          "Doug Mohns (BOS) 91",
+          "Doug Harvey (NYR) 90"
+        ],
+        "goalies": [
+          "Charlie Hodge (MTL) 94",
+          "Glenn Hall (CHI) 88",
+          "Johnny Bower (TOR) 86"
+        ]
+      },
+      "clubs": [
+        "Montreal Canadiens 84.1 (30 players)",
+        "Toronto Maple Leafs 83.3 (25 players)",
+        "New York Rangers 82.9 (27 players)",
+        "Chicago Black Hawks 82.5 (21 players)",
+        "Detroit Red Wings 82.4 (37 players)",
+        "Boston Bruins 81.7 (25 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1963",
+      "version": "nhl-1963-d2b6d3f0",
+      "season": "1962/63",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 151,
+      "squads": 135,
+      "ratings": {
+        "lowest": 71,
+        "median": 81,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Andy Bathgate (NYR) 99",
+          "Gordie Howe (DET) 95",
+          "Frank Mahovlich (TOR) 94"
+        ],
+        "defenders": [
+          "Pierre Pilote (CHI) 95",
+          "Doug Mohns (BOS) 91",
+          "Jean-Guy Talbot (MTL) 90"
+        ],
+        "goalies": [
+          "Jacques Plante (MTL) 94",
+          "Glenn Hall (CHI) 88",
+          "Johnny Bower (TOR) 87"
+        ]
+      },
+      "clubs": [
+        "Montreal Canadiens 84.4 (25 players)",
+        "Toronto Maple Leafs 83.1 (26 players)",
+        "New York Rangers 82.6 (26 players)",
+        "Detroit Red Wings 82.2 (30 players)",
+        "Chicago Black Hawks 81.4 (20 players; the game fills C)",
+        "Boston Bruins 81.1 (24 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1962",
+      "version": "nhl-1962-f422a796",
+      "season": "1961/62",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 149,
+      "squads": 134,
+      "ratings": {
+        "lowest": 71,
+        "median": 81,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Bernie Geoffrion (MTL) 99",
+          "Jean Beliveau (MTL) 95",
+          "Andy Bathgate (NYR) 94"
+        ],
+        "defenders": [
+          "Doug Mohns (BOS) 95",
+          "Pierre Pilote (CHI) 91",
+          "Doug Harvey (NYR) 89"
+        ],
+        "goalies": [
+          "Glenn Hall (CHI) 94",
+          "Johnny Bower (TOR) 87",
+          "Jacques Plante (MTL) 86"
+        ]
+      },
+      "clubs": [
+        "Montreal Canadiens 84.1 (22 players)",
+        "Chicago Black Hawks 83.5 (20 players)",
+        "Toronto Maple Leafs 83.5 (27 players)",
+        "Detroit Red Wings 82.5 (30 players)",
+        "New York Rangers 81.9 (26 players)",
+        "Boston Bruins 80.7 (24 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1961",
+      "version": "nhl-1961-2b3178bc",
+      "season": "1960/61",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 158,
+      "squads": 134,
+      "ratings": {
+        "lowest": 71,
+        "median": 82,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Jean Beliveau (MTL) 99",
+          "Bernie Geoffrion (MTL) 95",
+          "Dickie Moore (MTL) 94"
+        ],
+        "defenders": [
+          "Doug Mohns (BOS) 95",
+          "Pierre Pilote (CHI) 91",
+          "Bill Gadsby (NYR) 89"
+        ],
+        "goalies": [
+          "Jacques Plante (MTL) 94",
+          "Glenn Hall (CHI) 88",
+          "Johnny Bower (TOR) 86"
+        ]
+      },
+      "clubs": [
+        "Montreal Canadiens 85.2 (25 players)",
+        "Boston Bruins 82.5 (25 players)",
+        "Toronto Maple Leafs 82.4 (25 players; the game fills D)",
+        "New York Rangers 82.1 (38 players)",
+        "Chicago Black Hawks 81.2 (19 players; the game fills D)",
+        "Detroit Red Wings 80.4 (26 players)"
       ],
       "nations": "clubs only",
       "realSides": [

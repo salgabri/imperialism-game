@@ -11,7 +11,7 @@ import { BUILT_IN_WOMENS_SEASONS } from '../src/data/womensFootballSeasons.js';
 import { CLUBS } from '../src/data/clubs.womens-football.js';
 import { clubLogoFile } from '../src/data/clubLogos.js';
 import { CLUB_SCOPES } from '../src/data/scopes.js';
-import { buildTeam, makeRng, NATIONS } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, buildTeam, makeRng, NATIONS } from '../src/data/teams.js';
 import { BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, fieldedNations, seasonMapOf, seasonSport, setHasClubs, setHasNations,
   setIsMapped, setSportOf, sportOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
@@ -70,7 +70,8 @@ test('every season is EA\'s women of that edition: its rated nations and, from F
     assert.equal(set.meta.source.edition, listed.label);
     // Only nations with a rated player are listed; every other one fields no team and its land stays neutral.
     const listedNations = Object.keys(doc.nations);
-    assert.deepEqual([...listedNations, ...doc.territory.inactive].sort(), Object.keys(NATIONS).sort());
+    // Every nation of today's map: East Germany (HISTORIC_NATIONS) is no women's season's.
+    assert.deepEqual([...listedNations, ...doc.territory.inactive].sort(), Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id)).sort());
     assert.deepEqual(doc.territory.merged, {});
     for (const [nation, [str, pool, squad]] of Object.entries(doc.nations)) {
       assert.ok(squad.length >= 1 && squad.length <= 11 && pool >= squad.length, `${listed.id} ${NATIONS[nation][0]}`);

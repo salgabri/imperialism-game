@@ -5,7 +5,7 @@
 // team files (scripts/lib/swos-files.mjs), also have the seven big leagues' top-division clubs, each with its own
 // sixteen. No I/O here: scripts/build-retro-seasons.mjs reads the sources and writes the files, and tests build seasons
 // from invented rows. Every rating is SWOS's own price step, converted by src/data/swosPlayers.js; nothing is generated.
-import { NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
+import { NATIONS, HISTORIC_NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
 import { SWOS_ROLES, SWOS_SCALE, SWOS_SKILLS, expandSwosTuple, swosTupleOf } from '../../src/data/swosPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
 import {
@@ -214,6 +214,8 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
   const islands = PACIFIC_ISLANDS.some(id => nationOf.has(id));
   for (const [id, rec] of Object.entries(NATIONS)) {
     if (!islands && PACIFIC_ISLANDS.includes(id)) continue;
+    // A nation of the map's earlier years (East Germany) is listed only with players of its own.
+    if (HISTORIC_NATIONS.includes(id) && !nationOf.has(id)) continue;
     const pool = (nationOf.get(id)?.members || []).map(row => players.get(row.id));
     const squad = pickFootballSquad(pool);
     const lineup = selectLineup({ sport: 'football', squad });

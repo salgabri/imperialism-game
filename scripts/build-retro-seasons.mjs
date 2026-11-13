@@ -30,7 +30,7 @@ import { setHasClubs } from '../src/engine/footballSets.js';
 import { buildCm9798Season } from './lib/cm9798.mjs';
 import { SWOS_LEAGUES, buildSwosSeason } from './lib/swos.mjs';
 import { SWOS_NATIONAL_FILES, readTeamFile, swosRows } from './lib/swos-files.mjs';
-import { committedSeasons, eaSeasonIds, footballSeasonsModule, worldCupSeasonIds } from './lib/football-seasons-listing.mjs';
+import { committedSeasons, eaSeasonIds, footballSeasonsModule, nationalTeamSeasonIds, worldCupSeasonIds } from './lib/football-seasons-listing.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -69,7 +69,8 @@ const credits = (season, retrieved) => ({ compiler: season.compiler, ...(season.
 /**
  * A CM 01/02-format database: the zip's .dat files, read by the CM 01/02 builder as a known release. A season may name
  * players of its own day to check the stored birth years against (`birthdays`), the clubs whose players of a nationality
- * play for no nation (`noNationAt`), and its nations alone (src/engine/footballSets.js setHasClubs).
+ * play for another nation of their day (`noNationAt.playsFor`: East Germany's clubs, in 1989/90) or for none (`noNationAt`), and its
+ * nations alone (src/engine/footballSets.js setHasClubs).
  */
 async function buildCmZip(season, dataDir, retrieved) {
   const zip = await pinned(dataDir, season.file);
@@ -156,15 +157,17 @@ async function main() {
     for (const warning of result.warnings) console.log(`  warning: ${warning}`);
   }
   const worldCup = JSON.parse(await readFile(path.join(root, 'scripts/data/world-cup-seasons.json'), 'utf8'));
+  const nationalTeams = JSON.parse(await readFile(path.join(root, 'scripts/data/national-team-seasons.json'), 'utf8'));
   const listed = [...await committedSeasons(path.join(root, 'public/football'), eaSeasonIds(ea)), ...results.map(result => result.doc),
-    ...await committedSeasons(path.join(root, 'public/football'), worldCupSeasonIds(worldCup))];
+    ...await committedSeasons(path.join(root, 'public/football'), worldCupSeasonIds(worldCup)),
+    ...await committedSeasons(path.join(root, 'public/football'), nationalTeamSeasonIds(nationalTeams))];
   const audit = {
     generatedBy: 'scripts/build-retro-seasons.mjs', retrieved: manifest.retrieved,
     seasons: results.map(({ doc, audit: own }, i) => ({ ...manifest.seasons[i], version: doc.version, coverage: doc.coverage, audit: own })),
   };
   const outputs = new Map([
     ...results.map(({ doc, text }) => [path.join(root, 'public/football', `${doc.id}.json`), text]),
-    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea, retro: manifest, worldCup })],
+    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea, retro: manifest, worldCup, nationalTeams })],
     [path.join(root, 'docs/design/football-retro-seasons-audit.json'), `${JSON.stringify(audit, null, 2)}\n`],
   ]);
   if (args.check) {

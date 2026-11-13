@@ -25,8 +25,10 @@ export function campaignPreview(count, sport, setup) {
   const matches = Math.max(0, count - 1);
   // A best-of-three final plays two or three games where a single final plays one.
   const range = setup.finale === 'best-of-three' && matches > 0 ? `${matches + 1}–${matches + 2}` : `${matches}`;
-  // The clock of the rules the campaign will play (a season's sport object carries the built-in one's).
-  const { clock } = matchSport({ sport: sport.id, layer: setup.layer, clubScope: setup.clubScope });
+  // The clock of the rules the campaign will play: its season's day's, read from a season's sport object (seasonSport
+  // carries the season's identity), else today's.
+  const { clock } = matchSport({ sport: sport.id, layer: setup.layer, clubScope: setup.clubScope, dataSet: sport.dataSet,
+    dataYear: sport.dataYear, dataSeason: sport.dataSeason });
   const seconds = setup.express ? 2.5 : setup.resolution === 'instant' ? 5 : clock.length * clock.msPerUnit / 1000 + 7;
   const minutes = Math.max(1, Math.ceil(matches * seconds / 60));
   return { matches: range, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
@@ -339,8 +341,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'Alex Sawczuk\'s fan update of them; 1994/95 to 1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, '
     + 'Cam F\'s and Simon Treanor\'s), with clubs from the seven biggest leagues. A nation with fewer than six rated players '
     + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05, 1996/97 and 1989/90 have nations only. '
-    + 'The World Cups of 1961/62 to 1993/94 are computed and have nations only: each finalist rated from its Elo and its '
-    + 'players\' records.',
+    + 'The World Cups of 1961/62 to 1993/94 and the seasons between them are computed and have nations only: each nation '
+    + 'rated from its Elo, its eleven from its World Cup squad or, between World Cups, from its players\' caps on Wikidata.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
     + 'without eleven starts short-handed.',
@@ -348,7 +350,7 @@ export const SEASON_NOTES = Object.freeze({
     + 'scoring, marked as one. Rosters as of 7 November 2026. Five earlier seasons use EA\'s ratings of that season, nothing '
     + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
     + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings. NHL 08 and '
-    + 'NHL 09 are EA\'s attributes, the overall converted by us. Every other season back to 1966/67 is computed from the '
+    + 'NHL 09 are EA\'s attributes, the overall converted by us. Every other season back to 1960/61 is computed from the '
     + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank, after from MoneyPuck.com. Clubs '
     + 'play on the map of their day. Nations field the NHL players of each country, only where they hold at least half '
     + 'the lineup, and none before 1977/78.',

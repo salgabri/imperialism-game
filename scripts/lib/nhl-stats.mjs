@@ -56,6 +56,7 @@ export const hdbPosition = pos => HDB_POSITION[String(pos).trim()[0]] ?? null;
 /**
  * The Hockey Databank's birth countries as ISO 3166 alpha-3. A birth in the USSR, Czechoslovakia or Yugoslavia counts for
  * the country its birth city is in today (HDB_BIRTH_CITIES), as the earlier seasons count the NHL's birth countries.
+ * 'South Wales' is Jack Evans's (Morriston, 1948/49–1962/63), the one birth the databank files under a part of Wales.
  */
 export const HDB_COUNTRIES = Object.freeze({
   Austria: 'AUT', Belarus: 'BLR', Belgium: 'BEL', Brazil: 'BRA', 'Brunei Darussalam': 'BRN', Bulgaria: 'BGR', Canada: 'CAN',
@@ -63,8 +64,8 @@ export const HDB_COUNTRIES = Object.freeze({
   Haiti: 'HTI', Indonesia: 'IDN', Ireland: 'IRL', Italy: 'ITA', Jamaica: 'JAM', Japan: 'JPN', Kazakhstan: 'KAZ', Korea: 'KOR',
   Latvia: 'LVA', Lebanon: 'LBN', Lithuania: 'LTU', Netherlands: 'NLD', Nigeria: 'NGA', Norway: 'NOR', Paraguay: 'PRY',
   Poland: 'POL', Russia: 'RUS', 'Russian Federation': 'RUS', Scotland: 'GBR', Slovakia: 'SVK', Slovenia: 'SVN',
-  'South Africa': 'ZAF', 'South Korea': 'KOR', Sweden: 'SWE', Switzerland: 'CHE', Taiwan: 'TWN', Tanzania: 'TZA', Ukraine: 'UKR',
-  'United Kingdom': 'GBR', USA: 'USA', Venezuela: 'VEN', Wales: 'GBR',
+  'South Africa': 'ZAF', 'South Korea': 'KOR', 'South Wales': 'GBR', Sweden: 'SWE', Switzerland: 'CHE', Taiwan: 'TWN',
+  Tanzania: 'TZA', Ukraine: 'UKR', 'United Kingdom': 'GBR', USA: 'USA', Venezuela: 'VEN', Wales: 'GBR',
 });
 /** The birth cities of the Hockey Databank's USSR, Czechoslovakia and Yugoslavia births, by the country they are in today. */
 export const HDB_BIRTH_CITIES = Object.freeze({

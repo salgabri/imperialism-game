@@ -150,7 +150,7 @@ export const CLUB_MAPS = [
   {"id":"nhl1995","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-1995"],"clubs":26,"sections":26,"version":"nhl1995-cc8833dd"},
   {"id":"nhl2007","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-2007","nhl-2008","nhl-2009","nhl-2010","nhl-2011"],"clubs":30,"sections":30,"version":"nhl2007-ecb12d4c"},
   {"id":"nhl2022","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-2022"],"clubs":32,"sections":32,"version":"nhl2022-93344215"},
-  {"id":"nhl1967","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-1967"],"clubs":6,"sections":6,"version":"nhl1967-fbeeac85"},
+  {"id":"nhl1967","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-1961","nhl-1962","nhl-1963","nhl-1964","nhl-1965","nhl-1966","nhl-1967"],"clubs":6,"sections":6,"version":"nhl1967-c91b13eb"},
   {"id":"nhl1968","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-1968","nhl-1969","nhl-1970"],"clubs":12,"sections":12,"version":"nhl1968-ad87d3f3"},
   {"id":"nhl1971","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-1971","nhl-1972"],"clubs":14,"sections":14,"version":"nhl1971-401c4b05"},
   {"id":"nhl1973","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-1973","nhl-1974"],"clubs":16,"sections":16,"version":"nhl1973-04918428"},

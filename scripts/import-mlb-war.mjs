@@ -12,12 +12,15 @@
 // score and the inputs it was computed from, and his birth country (the Databank's, but where the manifest's
 // `birthCountries` corrects it from a pinned source). The reference holds MLB The Show 18 to 24's overalls of the players
 // matched to that season's WAR, by derived role, strongest first: the scale the scores are mapped onto
-// (scripts/lib/mlb-war.mjs `rateByRank`), with the calibration that left one season out at a time.
+// (scripts/lib/mlb-war.mjs `rateByRank`), with the calibration that left one season out at a time. It also sums the
+// Databank's Teams.csv into each season's league totals and stops on any that src/data/mlbLeagueAverages.js gives
+// otherwise: baseball plays each season at its league's runs a game (docs/design/baseball.md, "Rules by era").
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { MLB_LEAGUE_TOTALS } from '../src/data/mlbLeagueAverages.js';
 import { editionOf, nameKey, rosterOf } from './lib/mlb.mjs';
 import { FIELD_POSITIONS, WAR_ROLES, aliasesOf, displayNameOf, rateByRank, roundTo, warScoreOf } from './lib/mlb-war.mjs';
 
@@ -74,6 +77,32 @@ async function pinned(source, file) {
 }
 
 const number = value => (value === '' || value === 'NA' || value == null ? 0 : Number(value));
+
+/**
+ * Each season's league totals from 1960, summed from the Databank's Teams.csv (G, R, IPouts and SHO of every American and
+ * National League club), must be src/data/mlbLeagueAverages.js's: its figures for the Databank's seasons are these sums.
+ * → the seasons checked.
+ */
+function checkLeagueTotals(teams) {
+  const sums = new Map();
+  for (const team of teams) {
+    const year = Number(team.yearID);
+    if (year < 1960 || (team.lgID !== 'AL' && team.lgID !== 'NL')) continue;
+    const sum = sums.get(year) ?? { games: 0, runs: 0, outs: 0, shutouts: 0 };
+    sum.games += Number(team.G);
+    sum.runs += Number(team.R);
+    sum.outs += Number(team.IPouts);
+    sum.shutouts += Number(team.SHO);
+    sums.set(year, sum);
+  }
+  for (const [year, sum] of sums) {
+    const listed = Object.hasOwn(MLB_LEAGUE_TOTALS, year) ? MLB_LEAGUE_TOTALS[year] : null;
+    if (!listed || Object.keys(sum).some(key => listed[key] !== sum[key])) {
+      throw new Error(`${year}: src/data/mlbLeagueAverages.js has ${JSON.stringify(listed)}, the Databank's Teams.csv sums to ${JSON.stringify(sum)}`);
+    }
+  }
+  return [...sums.keys()].sort((a, b) => a - b);
+}
 
 /**
  * The Databank's People by Baseball-Reference id. It files each player of the 58 seasons once; should an id be filed
@@ -332,6 +361,8 @@ async function main() {
   for (const key of ['licenceText', 'retrosheetText']) if (!readme.includes(databank[key])) throw new Error(`sources.databank.${key} is not in the Databank's README.md`);
   const people = peopleByBbref(csvObjects(await pinned(databank, 'People.csv')));
   const databankTeams = csvObjects(await pinned(databank, 'Teams.csv'));
+  const totalled = checkLeagueTotals(databankTeams);
+  console.log(`League totals: ${totalled[0]} to ${totalled.at(-1)} are src/data/mlbLeagueAverages.js's`);
   // HomeGames names its columns year.key, team.key, park.key, games, ... (Retrosheet's game logs, by club and ballpark).
   const homeGames = csvObjects(await pinned(databank, 'HomeGames.csv'))
     .map(h => ({ year: h['year.key'], team: h['team.key'], park: h['park.key'], games: Number(h.games) }));

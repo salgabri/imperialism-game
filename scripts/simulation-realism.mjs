@@ -1,32 +1,47 @@
 // Plays whole league seasons with the built-in clubs, each of football's five leagues whole (leagueClubs), and
 // measures what a fan of each league would look at: scores, draws and overtime, margins, standings, and who scores.
+// American football also plays a few earlier NFL and AFL seasons' clubs under their own day's rules (NFL_ERAS).
 // Tennis has no league: its nations play Davis Cup ties (the women's game's, Billie Jean King Cup ties), the sixteen
-// strongest each meeting every other once a season.
+// strongest each meeting every other once a season; and a season of each earlier format the cups played, under its
+// year's rules (formatsReport: best of five sets, advantage sets, three-rubber ties). Football's extra time is a
+// knockout game's, so its strongest 32 nations also meet once a season to measure it against the World Cups' knockout
+// games.
 // Each measure sits beside the real league's figure (REAL below, with its seasons). The defender of each fixture is
 // its home side: at a neutral venue, as campaigns play by default, or at home with `--home` (the Home advantage
 // launch rule).
 // Run: node scripts/simulation-realism.mjs [--seasons=40] [--home] [--json]
 import { readFileSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseEaPlayers } from './lib/football-data.mjs';
 import { EA_CLUB_SNAPSHOT, firstDivisionClubs, squadTuples } from './lib/first-divisions.mjs';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
+import { BUILT_IN_BASEBALL_SEASONS } from '../src/data/baseballSeasons.js';
+import { mlbRunsPerGame, mlbShutoutRate } from '../src/data/mlbLeagueAverages.js';
+import { matchSport } from '../src/sports/index.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
+import { BUILT_IN_HOCKEY_SEASONS } from '../src/data/hockeySeasons.js';
+import { NHL_LEAGUE_AVERAGES } from '../src/data/nhlLeagueAverages.js';
 import { buildClub, buildTeam, hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
-import { football } from '../src/sports/football.js';
+import { fieldedNations } from '../src/engine/footballSets.js';
+import { seasonClubs } from './lib/nhl-league.mjs';
+import { football, FOOTBALL_MODEL, footballIn } from '../src/sports/football.js';
 import { BENCH, euroleagueBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
 import { americanFootball } from '../src/sports/americanFootball.js';
 import { baseball } from '../src/sports/baseball.js';
 import { hockey, PERIOD_MODEL } from '../src/sports/hockey.js';
 import { tennis } from '../src/sports/tennis.js';
 import { womensTennis } from '../src/sports/womensTennis.js';
+import { decodeFootballSet, seasonSport } from '../src/engine/footballSets.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugbyLeague.js';
+import { BUILT_IN_AMERICAN_FOOTBALL_SEASONS } from '../src/data/americanFootballSeasons.js';
+import { NFL_LEAGUE_AVERAGES } from '../src/data/nflLeagueAverages.js';
 
 const DRAMA = 6; // Balanced
+const FOOTBALL_MINUTES = FOOTBALL_MODEL.MINUTES;
 
 /** Circle-method rounds for an even number of teams: every pair meets once in n − 1 rounds. */
 function roundRobin(n) {
@@ -113,6 +128,8 @@ function playSeasons({ sport, teams, games, seasons, seed, full = true, venue })
       else if (game.winner === i) { ti.w++; tj.l++; ti.pts += 3; }
       else { tj.w++; ti.l++; tj.pts += 3; }
       for (const e of result.ev || []) {
+        // A league game ends at ninety: football's extra time (a knockout game's) scores for nobody's season.
+        if (sport.id === 'football' && e.m > FOOTBALL_MINUTES) continue;
         const key = `${e.tid}|${e.name}`;
         scorers.set(key, (scorers.get(key) || 0) + (sport.id === 'football' ? 1 : e.pts));
       }
@@ -170,7 +187,8 @@ function footballLeague(league, seasons, seed, venue) {
   const minutes = [0, 0, 0, 0, 0, 0];
   let goals = 0;
   for (const g of played) {
-    for (const e of g.ev) {
+    // The ninety's goals: a level league game ends there (every match in the game is a knockout one, with extra time).
+    for (const e of g.ev.filter(event => event.m <= FOOTBALL_MINUTES)) {
       byPosition[positions.get(e.tid).get(e.name)]++;
       minutes[Math.min(5, Math.floor((e.m - 1) / 15))]++;
       goals++;
@@ -178,7 +196,7 @@ function footballLeague(league, seasons, seed, venue) {
   }
   const topScorer = mean(tables.map(({ scorers }) => Math.max(...scorers.values())));
   const pts = seasonSpread(tables, games, 'pts');
-  const shootouts = played.filter(g => g.tie);
+  const shootouts = played.filter(g => g.tie?.by === 'penalties');
   return {
     league, clubs: clubs.length, games,
     goalsPerGame: mean(totals), teamGoalsVarianceToMean: sd(teamGoals) ** 2 / mean(teamGoals),
@@ -194,6 +212,34 @@ function footballLeague(league, seasons, seed, venue) {
     goalMinutes: minutes.map(v => v / goals),
     shootoutAttackerWins: share(shootouts, g => g.winner === g.i),
     penaltyConversion: mean(shootouts.flatMap(g => [...g.tie.A, ...g.tie.D])),
+  };
+}
+
+// ---- Football's knockouts (extra time) ---------------------------------------------------------------------------
+
+/** The field: the built-in season's 32 strongest nations by lineup rating, a World Cup's worth. */
+export function knockoutField(count = 32) {
+  return fieldedNations(football).map(id => buildTeam(id, makeRng(hashStr(`knockouts:${id}`)), football))
+    .sort((a, b) => teamEff(b) - teamEff(a)).slice(0, count);
+}
+
+/**
+ * The field meets once a season under the knockout rules of `year`'s season (today's by default, footballIn), at
+ * Balanced: how often a game is level after ninety, still level after extra time, extra time's goals, the shoot-outs.
+ */
+function footballKnockouts(seasons, seed, venue, year = null) {
+  const nations = knockoutField();
+  const { played } = playSeasons({ sport: footballIn(year), teams: nations, games: nations.length - 1, seasons, seed, full: false, venue });
+  const extra = played.filter(g => g.regA === g.regD);
+  const shootouts = played.filter(g => g.tie?.by === 'penalties');
+  return {
+    nations: nations.length, games: played.length,
+    levelAfter90: extra.length / played.length,
+    levelAfterExtraTime: share(extra, g => g.ga === g.gd),
+    extraTimeGoals: mean(extra.map(g => g.ga + g.gd - g.regA - g.regD)),
+    penalties: shootouts.length / played.length,
+    penaltyConversion: mean(shootouts.flatMap(g => [...g.tie.A, ...g.tie.D])),
+    attackerWinsLevel: share(extra, g => g.winner === g.i),
   };
 }
 
@@ -300,24 +346,106 @@ function nflSeason(seasons, seed, venue) {
   };
 }
 
+// ---- American football by era ---------------------------------------------------------------------------------
+
+/**
+ * The earlier seasons played whole: a few eras' NFL and AFL clubs, each season under its own day's rules (matchSport),
+ * against its league's regular season (src/data/nflLeagueAverages.js, scripts/data/nfl-scoring.json).
+ */
+// The last is the latest season the league table has (2024: Pro Football Archives had no 2025 on 2026-11-13).
+export const NFL_ERAS = Object.freeze(['pfa-1965', 'pfa-afl-1965', 'pfa-1977', 'pfa-1985', 'tecmo-1993', 'pfa-2000', 'madden-2010',
+  'madden-2024']);
+const NFL_SCORING = JSON.parse(readFileSync(new URL('./data/nfl-scoring.json', import.meta.url), 'utf8')).seasons;
+
+/**
+ * Seasons of data set `id`'s clubs, as many games a club as its league played (a bye a round where the clubs are odd):
+ * points a team (overtime included, as the league's), touchdowns, field goals and safeties a team, extra points made,
+ * the touchdowns going for two, and the games level after sixty minutes, each beside its league's. The real share level
+ * is the tied games' before 1974 (no overtime) and nflverse's overtime games' from 1999; Pro Football Archives' overtime
+ * marks miss games, so the seasons between have none.
+ */
+function nflEra(id, seasons, seed, venue) {
+  const meta = BUILT_IN_AMERICAN_FOOTBALL_SEASONS.find(season => season.id === id);
+  const league = id.startsWith('pfa-afl-') ? 'AFL' : 'NFL';
+  const sport = matchSport({ sport: 'american-football', layer: 'clubs', dataSet: id, dataYear: meta.year, dataSeason: meta.season });
+  const clubs = JSON.parse(readFileSync(new URL(`../public/american-football/${id}.json`, import.meta.url), 'utf8')).clubs
+    .map(club => buildClub(club, sport));
+  const real = NFL_LEAGUE_AVERAGES[league][meta.year], scoring = NFL_SCORING[`${league} ${meta.year}`];
+  const games = Math.round(real.games / clubs.length);
+  const { played } = playSeasons({ sport, teams: clubs, games, seasons, seed, full: false, venue });
+  const count = { touchdowns: 0, fieldGoals: 0, safeties: 0, kicks: 0, kicked: 0, twos: 0 };
+  for (const { plays } of played) {
+    for (const p of plays) {
+      if (p.pts === 3) count.fieldGoals++;
+      if (p.pts === 2) count.safeties++;
+      if (p.pts < 6) continue;
+      count.touchdowns++;
+      if (p.conversion === 'kick') { count.kicks++; if (p.pts === 7) count.kicked++; }
+      if (p.conversion === 'two') count.twos++;
+    }
+  }
+  const sides = played.length * 2;
+  const level = meta.year < 1974 ? scoring.ties / (real.games / 2) : scoring.nflverse ? scoring.nflverse.overtime / (real.games / 2) : null;
+  return {
+    id, league, year: meta.year, clubs: clubs.length, games, overtimeRule: sport.prepareMatch(clubs[0], clubs[1]).rules.overtime,
+    pointsPerTeam: mean(played.flatMap(g => [g.ga, g.gd])), realPoints: real.points / real.games,
+    touchdowns: count.touchdowns / sides, realTouchdowns: real.td / real.games,
+    fieldGoals: count.fieldGoals / sides, realFieldGoals: real.fgm / real.games,
+    xpRate: count.kicked / count.kicks, realXpRate: real.xpm / real.xpa,
+    twoPointShare: count.twos / count.touchdowns, realTwoPointShare: real.twoAtt / real.td,
+    safeties: count.safeties / sides, realSafeties: real.safeties / real.games,
+    overtimeRate: share(played, g => g.tie), realLevel: level,
+    marginMean: mean(played.map(g => Math.abs(g.ga - g.gd))),
+  };
+}
+
 // ---- Baseball (MLB) -------------------------------------------------------------------------------------------
 
-function mlbSeason(seasons, seed, venue) {
-  const clubs = MLB_CLUBS.map(c => buildClub(c, baseball));
-  const { played, tables } = playSeasons({ sport: baseball, teams: clubs, games: 162, seasons, seed, full: false, venue });
+// Seasons of other eras the harness plays besides the built-in 2026, each by its own rules (src/sports/baseball.js
+// baseballIn): the lowest-scoring season since 1960, the 1980s, the highest-scoring and the last before the runner on second.
+export const MLB_ERAS = Object.freeze([1968, 1987, 2000, 2019]);
+
+/** The built-in season's clubs, or `year`'s (public/baseball/<id>.json) under its own rules. */
+function mlbClubs(year) {
+  if (year == null) return { sport: baseball, clubs: MLB_CLUBS.map(c => buildClub(c, baseball)) };
+  const season = BUILT_IN_BASEBALL_SEASONS.find(entry => entry.year === year);
+  const sport = matchSport({ sport: 'baseball', layer: 'clubs', dataSet: season.id, dataYear: season.year, dataSeason: season.season });
+  const doc = JSON.parse(readFileSync(new URL(`../public/baseball/${season.id}.json`, import.meta.url), 'utf8'));
+  return { sport, clubs: doc.clubs.map(c => buildClub(c, baseball)) };
+}
+
+function mlbSeason(seasons, seed, venue, year = null) {
+  const { sport, clubs } = mlbClubs(year);
+  const { played, tables } = playSeasons({ sport, teams: clubs, games: 162, seasons, seed, full: false, venue });
   const teamRuns = played.flatMap(g => [g.ga, g.gd]);
   const margins = played.map(g => Math.abs(g.ga - g.gd));
+  const extras = played.filter(g => g.tie);
   const spread = seasonSpread(tables, 162);
   return {
-    clubs: clubs.length,
+    year, clubs: clubs.length,
     runsPerTeam: mean(teamRuns), teamRunsSd: sd(teamRuns),
     extraInnings: share(played, g => g.tie), oneRun: share(margins, m => m === 1), shutoutRate: share(teamRuns, r => r === 0),
+    endedInTenth: share(extras, g => g.tie.periods.length === 1), pastFifteen: share(played, g => g.tie?.periods.length > 6),
     tenPlusRate: share(teamRuns, r => r >= 10),
     marginMean: mean(margins), blowouts: share(margins, m => m >= 5),
     homeWins: share(played, g => g.winner === g.j),
     winPctSd: spread.sd, bestWins: spread.best * 162, worstWins: spread.worst * 162,
     favourite: favouriteRecord(played),
   };
+}
+
+/**
+ * What a season of MLB looked like (src/data/mlbLeagueAverages.js; before 2018 its records from the committed WAR
+ * season snapshot, scripts/data/mlb-war-seasons/<year>.json, the Baseball Databank's): runs and shutouts a team-game,
+ * and the spread of its winning percentages and its best and worst records per 162 games.
+ */
+export function mlbEraReal(year) {
+  const real = { runsPerTeam: mlbRunsPerGame(year), shutoutRate: mlbShutoutRate(year) };
+  let snapshot = null;
+  try { snapshot = JSON.parse(readFileSync(new URL(`./data/mlb-war-seasons/${year}.json`, import.meta.url), 'utf8')); } catch { snapshot = null; }
+  if (!snapshot) return real;
+  const shares = Object.values(snapshot.teams).map(team => team.w / (team.w + team.l));
+  return { ...real, winPctSd: sd(shares), bestWins: Math.max(...shares) * 162, worstWins: Math.min(...shares) * 162 };
 }
 
 // ---- Ice hockey (NHL) -----------------------------------------------------------------------------------------
@@ -360,6 +488,34 @@ function nhlSeason(seasons, seed, venue) {
   };
 }
 
+/** The earlier NHL seasons played whole beside today's, each under its own rules (src/sports/hockey.js `hockeyIn`). */
+export const NHL_ERAS = Object.freeze(['nhl-1971', 'nhl-1982', 'nhl-1993', 'nhl-2004', 'nhl-2011']);
+
+/**
+ * An earlier NHL season's clubs (public/hockey/<id>.json) over its own schedule's games, under its own scoring and
+ * overtime: before 2005/06 the playoffs' twenty-minute periods, then four on four and the shoot-out.
+ */
+function nhlEraSeason(id, seasons, seed, venue) {
+  const { year, season } = BUILT_IN_HOCKEY_SEASONS.find(entry => entry.id === id);
+  const sport = matchSport({ sport: 'hockey', layer: 'clubs', dataSet: id, dataYear: year, dataSeason: season });
+  const clubs = seasonClubs(fileURLToPath(new URL('..', import.meta.url)), id);
+  const games = REAL.nhlEras[season].games;
+  const { played, tables } = playSeasons({ sport, teams: clubs, games, seasons, seed, venue });
+  // A shoot-out's goal sits on its own minute after the overtime; a season before it has none.
+  const shootoutAt = sport.overtime.shootoutAt;
+  const inShootout = g => shootoutAt != null && g.ev.some(e => e.m >= shootoutAt);
+  const teamGoals = played.flatMap(g => [g.ga - (inShootout(g) && g.ga > g.gd ? 1 : 0), g.gd - (inShootout(g) && g.gd > g.ga ? 1 : 0)]);
+  const level = played.filter(g => g.tie);
+  const spread = seasonSpread(tables, games);
+  return {
+    id, season, clubs: clubs.length, games, league: NHL_LEAGUE_AVERAGES[season].goals, playoffOvertime: shootoutAt == null,
+    goalsPerTeam: mean(teamGoals), overtime: level.length / played.length, shootout: share(played, inShootout),
+    decidedInOvertime: share(level, g => !inShootout(g)), firstPeriod: share(level, g => g.tie.periods.length === 1 && !inShootout(g)),
+    longest: Math.max(0, ...level.map(g => (inShootout(g) ? 1 : g.tie.periods.length))),
+    marginMean: mean(played.map(g => Math.abs(g.ga - g.gd))), winPctSd: spread.sd, bestWins: spread.best * games, worstWins: spread.worst * games,
+  };
+}
+
 // ---- Tennis (Davis Cup, Billie Jean King Cup) -------------------------------------------------------------------
 
 /** The field: the sixteen strongest nations of a tennis sport (the men's, unless told), about a World Group's worth. */
@@ -384,6 +540,39 @@ function davisCup(seasons, seed, venue, sport = tennis) {
     bagels: share(sets, set => /^6–0/.test(set)),
     favourite: favouriteRecord(played),
     homeWins: share(played, g => g.winner === g.j),
+  };
+}
+
+/**
+ * The cups of an earlier year (docs/design/tennis.md and womens-tennis.md, "Format by year"): `seasonId`'s sixteen
+ * strongest nations from its season file, playing each other once a season under that year's format (matchSport). How
+ * ties were decided, how many sets the rubbers went to, how many sets reached 6–6 and how the advantage sets that played
+ * on ended.
+ */
+export function cupOfYear(sportId, seasonId, seasons, seed) {
+  const folder = sportId === 'womens-tennis' ? 'womens-tennis' : 'tennis';
+  const doc = JSON.parse(readFileSync(new URL(`../public/${folder}/${seasonId}.json`, import.meta.url), 'utf8'));
+  const season = seasonSport(decodeFootballSet(doc, seasonId));
+  const sport = matchSport({ sport: sportId, dataSet: seasonId, dataYear: season.dataYear });
+  const nations = davisCupField(16, season);
+  const { played } = playSeasons({ sport, teams: nations, games: nations.length - 1, seasons, seed });
+  const rubbers = played.flatMap(g => g.ev.filter(e => e.pts > 0 && e.score !== 'w/o').map(e => e.score.split(' ')));
+  // Each set's games, the set winner's first (a rubber's score reads from the rubber winner's side: "4–6 6–3 9–7").
+  const sets = rubbers.flat().map(set => set.match(/^(\d+)–(\d+)/).slice(1).map(Number).sort((a, b) => b - a));
+  const { toWin, bestOf } = sport.rules;
+  const decided = Object.fromEntries(Array.from({ length: toWin }, (_, lost) => [`${toWin}–${lost}`,
+    share(played, g => Math.max(g.ga, g.gd) === toWin && Math.min(g.ga, g.gd) === lost)]));
+  const past = sets.filter(([w]) => w >= 8);
+  return {
+    season: seasonId, format: sport.rules.id, nations: nations.length, ties: played.length, decided,
+    // A best-of-five rubber to its fifth set, a best-of-three one to its third.
+    deciders: share(rubbers, r => r.length === bestOf),
+    straight: share(rubbers, r => r.length === (bestOf + 1) / 2),
+    reachedSixAll: share(sets, ([w, l]) => l >= 6),
+    // Of the advantage sets that played on past 7–5: how many ended 8–6, 9–7 or longer.
+    past: { sets: past.length, eightSix: share(past, ([w]) => w === 8), nineSeven: share(past, ([w]) => w === 9), longer: share(past, ([w]) => w >= 10) },
+    longest: past.reduce((max, [w, l]) => (w > max[0] ? [w, l] : max), [0, 0]).join('–'),
+    favourite: favouriteRecord(played),
   };
 }
 
@@ -464,6 +653,15 @@ export const REAL = Object.freeze({
     // Liga's 47.9% in 2022/23 (Statista), the five leagues' mean 45.8% in 2022/23 and 43.0% in 2023/24.
     homeWins: [0.408, 0.479],
   },
+  footballKnockouts: {
+    note: "men's World Cup knockout games played to the plain rule, 1986–1994 and 2006–2022, counted 2026-11-10 from the "
+      + 'Fjelstul World Cup Database (CC BY-SA 4.0: matches.csv, goals.csv); each range runs from the first period to the second',
+    // Level after ninety: 17 of 48 games, 28 of 80. Still level after extra time: 10 of 17, 19 of 28. Extra time's goals:
+    // 14 in 17, 20 in 28. Shoot-outs: 10 of 48 games, 19 of 80.
+    levelAfter90: [0.35, 0.354], levelAfterExtraTime: [0.588, 0.679], extraTimeGoals: [0.714, 0.824], penalties: [0.208, 0.238],
+    // The golden goal's World Cups, 1998 and 2002: 9 of 32 level after ninety, 5 of the 9 still level after extra time.
+    goldenLevelAfterExtraTime: 0.556,
+  },
   nba: {
     note: 'NBA regular seasons 2021/22–2024/25 (2025/26 for the points a team the built-in season plays at)',
     pointsPerTeam: [110.6, 116.5], overtimeRate: [0.047, 0.064], marginMean: [11.2, 13], closeGames: [0.136, 0.157],
@@ -497,6 +695,14 @@ export const REAL = Object.freeze({
     shutoutRate: [0.06, 0.072],
     homeWins: [0.521, 0.543], winPctSd: [0.071, 0.089], bestWins: [97, 111], worstWins: [41, 55],
   },
+  mlbEras: {
+    note: 'MLB regular seasons 1968, 1987, 2000 and 2019, each played by its own rules: runs and shutouts a team-game from '
+      + 'src/data/mlbLeagueAverages.js (the Baseball Databank), records from the WAR seasons\' snapshots (the Databank\'s)',
+    // 43.9% of 2019's extra-inning games ended in the tenth, the last season before the runner on second; 69.1% of 2020's
+    // with it (Wikipedia, "Extra innings", https://en.wikipedia.org/w/index.php?oldid=1380896790, read 2026-11-10, citing
+    // The Boston Globe of 18 July 2023).
+    endedInTenth: { 2019: 0.439, withRunner: 0.691 },
+  },
   nhl: {
     note: "NHL regular seasons 2021/22–2025/26, computed 2026-11-07 from every game in the league's own API",
     // Goals a team without a shoot-out's extra goal; the margins are the final scores', which count it.
@@ -506,6 +712,23 @@ export const REAL = Object.freeze({
     topScorer: [52, 69],
     // est.: 15.2% of the 2025/26 goals of the players on today's rosters.
     defenderGoals: [0.14, 0.17],
+  },
+  // The earlier seasons NHL_ERAS plays, from the Hockey Databank's Teams.csv (computed 2026-11-10): the games a club
+  // played; goals a club a game (NHL_LEAGUE_AVERAGES); the share of games level after sixty (to 1982/83 the ties, none
+  // being played on; from 1999/2000 the ties and overtime losses; unknown between, when an overtime win was not kept);
+  // the ties left after the five minutes of overtime, 1983/84 to 2003/04; shoot-outs, and level games settled before
+  // them (overtime losses less shoot-out losses, of overtime losses; 2003/04: of the overtimes with or without a goal);
+  // the spread of the clubs' win shares and the best and worst records in wins, a tie counted as half. A season before
+  // the shoot-out plays the playoffs' overtime, so its share of level games settled in the first twenty minutes is the
+  // playoffs' of its day (`firstPeriod`, NHL.com's lists: scripts/data/nhl-playoff-overtimes.json).
+  nhlEras: {
+    '1970/71': { games: 78, goalsPerTeam: 3.12, overtime: 0.158, firstPeriod: 0.89, winPctSd: 0.143, bestWins: 60.5, worstWins: 22.5 },
+    '1981/82': { games: 80, goalsPerTeam: 4.01, overtime: 0.176, firstPeriod: 0.904, winPctSd: 0.117, bestWins: 59, worstWins: 24.5 },
+    '1992/93': { games: 84, goalsPerTeam: 3.63, ties: 0.099, firstPeriod: 0.761, winPctSd: 0.142, bestWins: 59.5, worstWins: 12 },
+    '2003/04': { games: 82, goalsPerTeam: 2.57, overtime: 0.256, ties: 0.138, decidedInOvertime: 0.46, firstPeriod: 0.761, winPctSd: 0.097,
+      bestWins: 53.5, worstWins: 25.5 },
+    '2010/11': { games: 82, goalsPerTeam: 2.73, overtime: 0.241, shootout: 0.121, decidedInOvertime: 0.498, winPctSd: 0.083, bestWins: 54,
+      worstWins: 25 },
   },
   davisCup: {
     note: 'Davis Cup World Group and play-off ties 2003–2016 and the ATP tour, as Tennis Abstract (Jeff Sackmann) measured them',
@@ -526,6 +749,31 @@ export const REAL = Object.freeze({
     // A mix of matchups unlike a Billie Jean King Cup field's, so reported only: 33.7% of the matches to a third set
     // (35.8% between two top-20 players, the ATP's 36.1%), 11.1% of the sets to a tie-break, 5.0% won 6–0.
     tourThreeSets: 0.337, tourTiebreakSets: 0.111, tourBagels: 0.05,
+  },
+  // The cups of earlier years, by format (formatsReport): computed 2026-11-10 from Jeff Sackmann's match files (the
+  // pinned archives of docs/design/tennis.md and womens-tennis.md), which hold the singles but not the doubles. Reported
+  // beside the model's, not tested: a real year's field is not the game's sixteen strongest.
+  davisCupFormats: {
+    note: "the Davis Cup World Group's best-of-five singles that were live (not shortened to best of three), by era",
+    // `deciders` the rubbers to a fifth set, `straight` in three; `reachedSixAll` the sets that reached 6–6; `past` how
+    // the advantage sets that played on past 7–5 ended: 8–6, 9–7, longer. 1981–1988: 390 rubbers, 1,448 sets, 186 past
+    // 7–5. 1989–2015: 1,721 rubbers, 6,373 sets; its fifth sets, 53 past 7–5. 2016–2018: 160 rubbers, 620 sets.
+    // scripts/tennis-formats-real.mjs counts them.
+    'davis-cup-advantage': { years: '1981–1988', deciders: 0.213, straight: 0.5, reachedSixAll: 0.128, past: [0.349, 0.247, 0.403] },
+    // `decided` the ties settled in the third, fourth and fifth rubber, from 613 ties: a dead rubber was shortened to best
+    // of three or not played, so the live ones say when a tie was decided (4 ties read otherwise and are left out).
+    'davis-cup-tiebreaks': { years: '1989–2015', deciders: 0.203, straight: 0.5, reachedSixAll: 0.165, decided: [0.349, 0.357, 0.294],
+      past: [0.377, 0.189, 0.434] },
+    'davis-cup-fifth-set-tiebreak': { years: '2016–2018', deciders: 0.244, straight: 0.369, reachedSixAll: 0.182 },
+  },
+  fedCupFormats: {
+    note: "the Fed Cup World Group's singles, every tie's two or four (the doubles decided only a level tie), by era",
+    // `decided` 2–0 and 2–1, or 3–0, 3–1 and 3–2; `deciders` the rubbers to a third set. 1968–1975: 250 ties, 1,118 sets,
+    // and with 1977–1979 99 sets past 7–5. 1980–1994: 806 ties, 3,607 sets. 1995–2017: 265 ties, 2,399 sets. From 1980
+    // only a deciding set played on past 7–5: the World Group's 70 of 1980–2017.
+    'fed-cup-three-advantage': { years: '1968–1975', decided: [0.648, 0.352], deciders: 0.236, reachedSixAll: 0.06, past: [0.545, 0.212, 0.242] },
+    'fed-cup-three': { years: '1980–1994', decided: [0.576, 0.424], deciders: 0.238, reachedSixAll: 0.072, past: [0.386, 0.243, 0.371] },
+    'fed-cup-five': { years: '1995–2017', decided: [0.385, 0.34, 0.275], deciders: 0.316, reachedSixAll: 0.103, past: [0.386, 0.243, 0.371] },
   },
   nrl: {
     note: "NRL regular seasons 2021–2025, computed 2026-11-08 from every game in NRL.com's draw and match centre "
@@ -556,15 +804,51 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
   return {
     home,
     football: leagues.map(league => footballLeague(league, seasons, hashStr(`${seed}:${league}`), venue)),
+    // Today's rules, and the golden goal's (1997/98) and the silver goal's (2003/04) seasons: ten rounds a season, as only
+    // the scores are drawn and a quarter of the games go to extra time.
+    footballKnockouts: footballKnockouts(seasons * 10, hashStr(`${seed}:football-knockouts`), venue),
+    goldenGoalKnockouts: footballKnockouts(seasons * 10, hashStr(`${seed}:golden-goal-knockouts`), venue, 1998),
+    silverGoalKnockouts: footballKnockouts(seasons * 10, hashStr(`${seed}:silver-goal-knockouts`), venue, 2004),
     nba: nbaSeason(seasons, hashStr(`${seed}:nba`), venue),
     euroleague: euroleagueSeason(seasons, hashStr(`${seed}:euroleague`), venue),
     nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`), venue),
+    nflEras: NFL_ERAS.map(id => nflEra(id, seasons * 4, hashStr(`${seed}:${id}`), venue)),
     mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`), venue),
+    mlbEras: MLB_ERAS.map(year => mlbSeason(seasons, hashStr(`${seed}:mlb:${year}`), venue, year)),
     nhl: nhlSeason(seasons, hashStr(`${seed}:nhl`), venue),
+    nhlEras: NHL_ERAS.map(id => nhlEraSeason(id, seasons, hashStr(`${seed}:${id}`), venue)),
     davisCup: davisCup(seasons, hashStr(`${seed}:davis-cup`), venue),
     billieJeanKingCup: davisCup(seasons, hashStr(`${seed}:billie-jean-king-cup`), venue, womensTennis),
     nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
   };
+}
+
+/** A season of each earlier format the cups played (docs/design/tennis.md and womens-tennis.md, "Format by year"). */
+export const FORMAT_SEASONS = Object.freeze([['tennis', 'tennis-1985'], ['tennis', 'tennis-2005'], ['tennis', 'tennis-2017'],
+  ['womens-tennis', 'wta-1972'], ['womens-tennis', 'wta-1985'], ['womens-tennis', 'wta-2005']]);
+
+/** The earlier years' cups (cupOfYear), each season's sixteen strongest nations, at a neutral venue. */
+export function formatsReport({ seasons = 40, seed = 20261101 } = {}) {
+  return FORMAT_SEASONS.map(([sport, id]) => cupOfYear(sport, id, seasons, hashStr(`${seed}:${id}`)));
+}
+
+function printFormats(formats) {
+  const lines = ['\nThe cups by year — each season\'s sixteen strongest nations under its year\'s format (real: the World Group of the years named)'];
+  const line = (label, value, real) => `  ${label.padEnd(36)} ${String(value).padStart(10)}   ${real == null ? '' : pct(real)}`;
+  for (const cup of formats) {
+    const real = REAL.davisCupFormats[cup.format] || REAL.fedCupFormats[cup.format] || null;
+    lines.push(`\n${cup.season} (${cup.format}), ${cup.ties} ties${real ? ` — real: ${real.years}` : ''}`);
+    Object.entries(cup.decided).forEach(([score, value], i) => lines.push(line(`ties won ${score}`, pct(value), real?.decided?.[i])));
+    lines.push(line('rubbers to the deciding set', pct(cup.deciders), real?.deciders));
+    lines.push(line('rubbers in straight sets', pct(cup.straight), real?.straight));
+    lines.push(line('sets that reached 6–6', pct(cup.reachedSixAll), real?.reachedSixAll));
+    if (cup.past.sets) {
+      ['8–6', '9–7', 'longer'].forEach((label, i) => lines.push(line(`sets past 7–5 ending ${label}`, pct([cup.past.eightSix, cup.past.nineSeven, cup.past.longer][i]), real?.past?.[i])));
+      lines.push(line('the longest set', cup.longest));
+    }
+    lines.push(line('favourite wins', pct(cup.favourite.wins)));
+  }
+  return lines.join('\n');
 }
 
 function print(report) {
@@ -590,6 +874,17 @@ function print(report) {
     lines.push(row('penalty conversion (shoot-outs)', f.penaltyConversion, r.penaltyConversion, pct));
     lines.push(`    scorelines: ${f.commonScores.join(', ')}`);
   }
+  const k = report.footballKnockouts, rk = REAL.footballKnockouts;
+  lines.push(`\nFootball knockouts — the ${k.nations} strongest nations, ${k.games} games (real: ${rk.note})`);
+  lines.push(row('level after 90', k.levelAfter90, rk.levelAfter90, pct));
+  lines.push(row('extra times still level after 120', k.levelAfterExtraTime, rk.levelAfterExtraTime, pct));
+  lines.push(row('extra time goals a game', k.extraTimeGoals, rk.extraTimeGoals));
+  lines.push(row('games to penalties', k.penalties, rk.penalties, pct));
+  lines.push(row('penalty conversion (shoot-outs)', k.penaltyConversion, REAL.football.penaltyConversion, pct));
+  lines.push(row('attacker wins a level game', k.attackerWinsLevel, null, pct));
+  lines.push(row('golden goal: extra times still level', report.goldenGoalKnockouts.levelAfterExtraTime, null, pct));
+  lines.push(`      (the World Cups of 1998 and 2002: ${pct(rk.goldenLevelAfterExtraTime)}, 5 of 9)`);
+  lines.push(row('silver goal: extra times still level', report.silverGoalKnockouts.levelAfterExtraTime, null, pct));
   const n = report.nba, rn = REAL.nba;
   lines.push(`\nNBA — ${n.clubs} clubs, 82 games (real: ${rn.note})`);
   lines.push(row('points a team', n.pointsPerTeam, rn.pointsPerTeam, x => num(x, 1)));
@@ -644,6 +939,16 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
   lines.push(row('two-point tries made', a.twoPointRate, ra.twoPointRate, pct));
   lines.push(row('safeties a season', a.safetiesPerSeason, ra.safetiesPerSeason, x => num(x, 1)));
   lines.push(`    team scores: ${a.commonScores.join(', ')}`);
+  lines.push('\nNFL and AFL seasons by era — each season\'s clubs under its own day\'s rules (real: its league\'s regular season)');
+  lines.push(`  ${'season'.padEnd(10)} ${'overtime'.padEnd(9)} ${'points a team'.padEnd(15)} ${'touchdowns'.padEnd(13)} ${'field goals'.padEnd(13)}`
+    + ` ${'extra points'.padEnd(15)} ${'going for two'.padEnd(15)} ${'level at 60'.padEnd(14)}`);
+  const pair = (sim, real, format) => `${format(sim)} (${real == null ? '—' : format(real)})`;
+  for (const e of report.nflEras) {
+    lines.push(`  ${`${e.league} ${e.year}`.padEnd(10)} ${e.overtimeRule.padEnd(9)} ${pair(e.pointsPerTeam, e.realPoints, x => num(x, 1)).padEnd(15)}`
+      + ` ${pair(e.touchdowns, e.realTouchdowns, x => num(x, 2)).padEnd(13)} ${pair(e.fieldGoals, e.realFieldGoals, x => num(x, 2)).padEnd(13)}`
+      + ` ${pair(e.xpRate, e.realXpRate, pct).padEnd(15)} ${pair(e.twoPointShare, e.realTwoPointShare, pct).padEnd(15)}`
+      + ` ${pair(e.overtimeRate, e.realLevel, pct).padEnd(14)}`);
+  }
   const m = report.mlb, rm = REAL.mlb;
   lines.push(`\nMLB — ${m.clubs} clubs, 162 games (real: ${rm.note})`);
   lines.push(row('runs a team', m.runsPerTeam, rm.runsPerTeam));
@@ -656,6 +961,25 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
   lines.push(row('best record (wins)', m.bestWins, rm.bestWins, x => num(x, 0)));
   lines.push(row('worst record (wins)', m.worstWins, rm.worstWins, x => num(x, 0)));
   lines.push(row('favourite wins', m.favourite.wins, rm.favouriteWins, pct));
+  lines.push(row('extras ended in the tenth', m.endedInTenth, null, pct));
+  lines.push(`      (${pct(REAL.mlbEras.endedInTenth.withRunner)} in 2020, the runner's first season)`);
+  // A real season's figure as a range of itself: runs within 3%, shutouts within a point and a half.
+  const around = (value, part) => (value == null ? null : [value * (1 - part), value * (1 + part)]);
+  for (const era of report.mlbEras) {
+    const real = mlbEraReal(era.year);
+    lines.push(`\nMLB ${era.year} by its own rules — ${era.clubs} clubs, 162 games (real: ${REAL.mlbEras.note})`);
+    lines.push(row('runs a team', era.runsPerTeam, around(real.runsPerTeam, 0.03)));
+    lines.push(row('shutouts (per team game)', era.shutoutRate, real.shutoutRate == null ? null : [real.shutoutRate - 0.015, real.shutoutRate + 0.015], pct));
+    lines.push(row('extra innings', era.extraInnings, null, pct));
+    lines.push(row('extras ended in the tenth', era.endedInTenth, REAL.mlbEras.endedInTenth[era.year] == null ? null
+      : [REAL.mlbEras.endedInTenth[era.year] - 0.04, REAL.mlbEras.endedInTenth[era.year] + 0.04], pct));
+    lines.push(row('games past fifteen innings', era.pastFifteen, null, x => `${(100 * x).toFixed(2)}%`));
+    lines.push(row('one-run games', era.oneRun, null, pct));
+    lines.push(row('win% SD', era.winPctSd, null, x => num(x, 3)));
+    if (real.winPctSd != null) lines.push(`      (the real ${era.year}: ${num(real.winPctSd, 3)}, best ${num(real.bestWins, 0)} wins, worst ${num(real.worstWins, 0)} a 162)`);
+    lines.push(row('best record (wins)', era.bestWins, null, x => num(x, 0)));
+    lines.push(row('worst record (wins)', era.worstWins, null, x => num(x, 0)));
+  }
   const h = report.nhl, rh = REAL.nhl;
   lines.push(`\nNHL — ${h.clubs} clubs, 82 games (real: ${rh.note})`);
   lines.push(row('goals a team', h.goalsPerTeam, rh.goalsPerTeam));
@@ -676,6 +1000,26 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
   lines.push(row('favourite wins', h.favourite.wins, rh.favouriteWins, pct));
   lines.push(row('top scorer (goals)', h.topScorer, rh.topScorer, x => num(x, 0)));
   lines.push(row('goals by defenders', h.defenderGoals, rh.defenderGoals, pct));
+  // Each earlier season beside its own league's figure, within what a season's sampling and the season's records allow.
+  const near = (value, tolerance) => (Number.isFinite(value) ? [value - tolerance, value + tolerance] : null);
+  for (const era of report.nhlEras) {
+    const real = REAL.nhlEras[era.season];
+    const overtime = era.playoffOvertime ? "the playoffs' twenty-minute overtimes" : 'five minutes at four on four, then a shoot-out';
+    lines.push(`\nNHL ${era.season} — ${era.clubs} clubs, ${era.games} games, ${overtime} (real: the Hockey Databank, NHL.com's playoff overtimes)`);
+    lines.push(row('goals a team', era.goalsPerTeam, near(real.goalsPerTeam, 0.05)));
+    lines.push(row('level after sixty', era.overtime, near(real.overtime, 0.02), pct));
+    if (real.ties !== undefined) lines.push(`      (ties after the regular season's five-minute overtime: ${pct(real.ties)})`);
+    if (era.playoffOvertime) lines.push(row('level games settled in the first period', era.firstPeriod, near(real.firstPeriod, 0.03), pct));
+    else {
+      lines.push(row('shoot-outs', era.shootout, near(real.shootout, 0.02), pct));
+      lines.push(row('level games settled in the overtime', era.decidedInOvertime, near(real.decidedInOvertime, 0.04), pct));
+    }
+    lines.push(row('longest overtime (periods)', era.longest, null, x => num(x, 0)));
+    lines.push(row('mean margin', era.marginMean, null));
+    lines.push(row('win% SD', era.winPctSd, near(real.winPctSd, 0.02), x => num(x, 3)));
+    lines.push(row(`best record (wins of ${era.games})`, era.bestWins, near(real.bestWins, 4), x => num(x, 0)));
+    lines.push(row(`worst record (wins of ${era.games})`, era.worstWins, near(real.worstWins, 4), x => num(x, 0)));
+  }
   for (const [cup, t, rt, tour] of [['Davis Cup', report.davisCup, REAL.davisCup, 'ATP'],
     ['Billie Jean King Cup', report.billieJeanKingCup, REAL.billieJeanKingCup, 'WTA']]) {
     lines.push(`\n${cup} — the ${t.nations} strongest nations, ${t.ties} ties (real: ${rt.note})`);
@@ -722,6 +1066,10 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const option = name => process.argv.find(arg => arg.startsWith(`--${name}=`))?.split('=')[1];
-  const report = realismReport({ seasons: Number(option('seasons')) || 40, home: process.argv.includes('--home') });
-  process.stdout.write(process.argv.includes('--json') ? `${JSON.stringify(report, null, 2)}\n` : `${print(report)}\n`);
+  const seasons = Number(option('seasons')) || 40;
+  const report = realismReport({ seasons, home: process.argv.includes('--home') });
+  // The earlier years' cups play at a neutral venue: Home advantage is the built-in seasons' measure.
+  const formats = process.argv.includes('--home') ? null : formatsReport({ seasons });
+  process.stdout.write(process.argv.includes('--json') ? `${JSON.stringify({ ...report, ...(formats ? { formats } : {}) }, null, 2)}\n`
+    : `${print(report)}${formats ? printFormats(formats) : ''}\n`);
 }

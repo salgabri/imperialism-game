@@ -59,7 +59,6 @@ export const CM0102_NATIONS = {
     'Curaçao',
     'Czechoslovakia',
     'Dominica',
-    'East Germany',
     'Faroe Islands',
     'Gibraltar',
     'Grenada',

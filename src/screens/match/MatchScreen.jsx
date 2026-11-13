@@ -33,7 +33,7 @@ export default function MatchScreen(props) {
   const {
     empty = null, card = null, state = null, sport = 'football', statusLabel = '', statusDetail = null, live = false,
     a = null, b = null, minuteFallback = 0, minuteFloor = 0, length = 90, ot = 0, perspective = null, model = null,
-    goals = [], final = null, chartNote = null, lineups = null, kicks = null, preMatch = null,
+    goals = [], final = null, chartNote = null, lineups = null, kicks = null, preMatch = null, clockSport = null,
     minuteStore = null, speed = 1, paused = false, onSpeed, onPause, onSelectTeam,
   } = props;
   const [segment, setSegment] = React.useState('feed');
@@ -68,7 +68,8 @@ export default function MatchScreen(props) {
   const minuteProps = { live, minuteStore, minuteFallback, minuteFloor };
   return (
     <Shell state={state} segment={segment} mainView={mainView}>
-      <ScoreHeader a={a} b={b} sport={sport} statusLabel={statusLabel} statusDetail={statusDetail} kicks={kicks} {...minuteProps} />
+      <ScoreHeader a={a} b={b} sport={sport} clockSport={clockSport} statusLabel={statusLabel} statusDetail={statusDetail} kicks={kicks}
+        {...minuteProps} />
       <div className="segmented match-segments" role="group" aria-label="Match details">
         {SEGMENTS.map(([id, label]) => (
           <button key={id} type="button" className="match-segments__item" aria-pressed={segment === id}
@@ -82,8 +83,8 @@ export default function MatchScreen(props) {
               <button key={id} type="button" aria-pressed={mainView === id} onClick={() => setMainView(id)}>{label}</button>
             ))}
           </div>
-          <WinChart sport={sport} model={model} goals={goals} perspective={perspective} final={final} length={length} ot={ot}
-            chartNote={chartNote} aId={a.teamId} dId={b.teamId} measureKey={measureKey} {...minuteProps} />
+          <WinChart sport={sport} clockSport={clockSport} model={model} goals={goals} perspective={perspective} final={final} length={length}
+            ot={ot} chartNote={chartNote} aId={a.teamId} dId={b.teamId} measureKey={measureKey} {...minuteProps} />
           <MatchStats sport={sport} preMatch={preMatch} speed={speed} paused={paused} onSpeed={onSpeed} onPause={onPause} />
           <div className="match-lineups" ref={xi.boxRef} data-long={rowsA.length > 13 ? '' : undefined}>
             <Pager page={xi.page} pages={xi.pages} onPage={xi.setPage} label="Lineup pages" className="match-lineups__pager" />

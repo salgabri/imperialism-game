@@ -178,7 +178,9 @@ test('complete-match events reconcile to scores, eligible scorers and legal cloc
       const result = sport.simulate(rng, attacker, defender, 6, teamEff(attacker), teamEff(defender));
       const sums = { [attacker.id]: 0, [defender.id]: 0 };
       let previousMinute = 0;
-      const lastMinute = sport.clock.length + (sport.id === 'basketball' && result.tie ? 5 * result.tie.periods.length : 0);
+      // Basketball's overtime periods, football's extra time to the minute it ended.
+      const lastMinute = sport.clock.length + (sport.id === 'basketball' && result.tie ? 5 * result.tie.periods.length : 0)
+        + (sport.id === 'football' && result.tie ? result.tie.end - sport.clock.length : 0);
       for (const event of result.ev) {
         assert.ok(Number.isInteger(event.m) && event.m >= 1 && event.m <= lastMinute, `invalid clock ${event.m}/${lastMinute}`);
         assert.ok(event.m >= previousMinute, 'events must be ordered by clock'); previousMinute = event.m;
@@ -197,7 +199,24 @@ test('complete-match events reconcile to scores, eligible scorers and legal cloc
       }
       tieCount++;
       if (sport.id === 'football') {
-        assert.equal(result.ga, result.gd);
+        // Level after ninety: extra time's two halves, each half's goals in its own fifteen minutes, then a shoot-out.
+        assert.equal(result.regA, result.regD, 'extra time only follows a level ninety');
+        assert.equal(result.tie.end, 120, 'today\'s rules play the whole of extra time');
+        assert.equal(result.tie.periods.length, 2);
+        const scored = (tid, from, to) => result.ev.filter(event => event.tid === tid && event.m > from && event.m <= to).length;
+        assert.equal(scored(attacker.id, 0, 90), result.regA);
+        assert.equal(scored(defender.id, 0, 90), result.regD);
+        result.tie.periods.forEach(([a, d], half) => {
+          assert.equal(scored(attacker.id, 90 + 15 * half, 105 + 15 * half), a);
+          assert.equal(scored(defender.id, 90 + 15 * half, 105 + 15 * half), d);
+        });
+        if (result.ga !== result.gd) {
+          assert.equal(result.tie.by, 'extra-time');
+          assert.deepEqual([result.tie.A, result.tie.D, result.tie.ga, result.tie.gd], [[], [], 0, 0], 'no shoot-out after a decided extra time');
+          assert.equal(result.winner, result.ga > result.gd ? attacker.id : defender.id);
+          continue;
+        }
+        assert.equal(result.tie.by, 'penalties');
         assert.equal(result.tie.ga, result.tie.A.reduce((sum, kick) => sum + kick, 0));
         assert.equal(result.tie.gd, result.tie.D.reduce((sum, kick) => sum + kick, 0));
         assert.ok([...result.tie.A, ...result.tie.D].every(kick => kick === 0 || kick === 1));

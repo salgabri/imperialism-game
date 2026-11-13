@@ -1338,6 +1338,14 @@
       "MAC",
       "ITF",
       "UNK"
+    ],
+    "dayNations": [
+      {
+        "code": "VIE",
+        "nation": "RVN",
+        "through": 1975,
+        "note": "Vietnam's cup team to 1975 was the Republic of Vietnam's (South Vietnam, Wikipedia, revision 1384578494: the fall of Saigon on 30 April 1975); the Democratic Republic of Vietnam played neither cup. On the map of those years South Vietnam is a shape of its own (docs/design/historic-maps.md)."
+      }
     ]
   },
   "seasons": {

@@ -25,6 +25,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createDownloader, NE_URL } from './lib/domestic-boundaries.mjs';
+import { addHistoricCut, cutLine, HISTORIC_CUTS } from './lib/historic-shapes.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const check = process.argv.includes('--check');
@@ -68,10 +69,9 @@ const sha256 = text => createHash('sha256').update(text).digest('hex');
 
 // ---- Natural Earth: each home nation's land and the borders between them ----
 
-async function naturalEarth() {
-  const text = await download(NE_URL, path.join(root, 'data-src/boundaries/ne/ne_10m_admin_1.geojson'));
+function naturalEarth(admin1) {
   const polys = Object.fromEntries(NATIONS.map(nation => [nation.gu, []]));
-  for (const { properties, geometry } of JSON.parse(text).features) {
+  for (const { properties, geometry } of admin1.features) {
     if (properties.adm0_a3 !== 'GBR') continue;
     if (!polys[properties.gu_a3]) throw new Error(`Natural Earth has a UK unit in geounit ${properties.gu_a3}`);
     polys[properties.gu_a3].push(...(geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates));
@@ -475,7 +475,9 @@ function addIslands(topo, source, label) {
   return counts;
 }
 
-const nations = await naturalEarth();
+const admin1 = JSON.parse(await download(NE_URL, path.join(root, 'data-src/boundaries/ne/ne_10m_admin_1.geojson')));
+const nations = naturalEarth(admin1);
+const cuts = HISTORIC_CUTS.map(cut => ({ cut, ne: cutLine(admin1, cut) }));
 const upstream = [];
 for (const atlas of ATLASES) {
   const text = await download(atlas.url, path.join(root, 'data-src/world-atlas', atlas.cache));
@@ -488,10 +490,12 @@ for (const [i, atlas] of ATLASES.entries()) {
   const named = atlas.file.includes('50m');
   const { topo, counts } = splitAtlas(upstream[i], nations, atlas.file, named);
   const islands = named ? null : addIslands(topo, fiftyM, atlas.file);
+  // The shapes of earlier years, in a collection of their own after today's (scripts/lib/historic-shapes.mjs).
+  const historic = Object.assign({}, ...cuts.map(({ cut, ne }) => addHistoricCut(topo, cut, ne, atlas.file, named)));
   const output = `${JSON.stringify(topo)}\n`;
   const file = path.join(root, atlas.file);
   const current = await readFile(file, 'utf8').catch(() => null);
-  const parts = [...Object.entries(counts), ...Object.entries(islands || {})].map(([name, n]) => `${name} ${n}`).join(', ');
+  const parts = [...Object.entries(counts), ...Object.entries(islands || {}), ...Object.entries(historic)].map(([name, n]) => `${name} ${n}`).join(', ');
   if (check) {
     if (current !== output) { stale++; console.log(`${atlas.file}: differs from a rebuild`); }
     else console.log(`${atlas.file}: up to date (${parts} polygons)`);

@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { WorldGeometry, drawnPaths, mergeSharedIds } from '../src/engine/geo.js';
-import { EXCLUDED_SHAPES, NATIONS, SCOPES, buildTeam, buildClub, makeRng } from '../src/data/teams.js';
+import { EXCLUDED_SHAPES, HISTORIC_NATIONS, NATIONS, SCOPES, buildTeam, buildClub, makeRng } from '../src/data/teams.js';
 import { CAPITALS } from '../src/data/capitals.js';
 import { SPORT_LIST } from '../src/sports/index.js';
 import { CLUB_SCOPES } from '../src/data/scopes.js';
@@ -12,6 +12,7 @@ import { pickTarget, seedClubs, validateReachability } from '../src/engine/campa
 import { createDuelDraw } from '../src/engine/duelDraw.js';
 import { createAttackRouteIndex, routeLandCrossings } from '../src/engine/attackRoutes.js';
 import { advanceSeries } from '../src/engine/campaignExperience.js';
+import { atlasOfYear, capitalsOfYear } from '../src/engine/historicMap.js';
 
 const load = file => JSON.parse(readFileSync(new URL(`../public/${file}`, import.meta.url), 'utf8'));
 const world = new WorldGeometry(load('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS));
@@ -39,9 +40,12 @@ function assertDraw(board, draw) {
   }
 }
 
+// Today's map: every nation but those of the map's earlier years (East Germany), which it does not draw.
+const TODAY = Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id));
+
 for (const sport of SPORT_LIST) {
   const rng = makeRng(1042);
-  const nations = Object.keys(NATIONS).map(id => buildTeam(id, rng, sport));
+  const nations = TODAY.map(id => buildTeam(id, rng, sport));
   const fields = [
     ...SCOPES.map(scope => {
       const teams = scope.id === 'elite' ? nations.slice().sort((a, b) => b.str - a.str).slice(0, 32) : nations.filter(scope.filter);
@@ -85,8 +89,31 @@ for (const sport of SPORT_LIST) {
   });
 }
 
+test('the map of 1974: East Germany and West Germany, and every other nation, draw each other and reach a final', () => {
+  // The world as it stood in 1973/74 (src/engine/historicMap.js): East Germany (278) between West Germany, Poland and
+  // Czechoslovakia, West Germany anchored on Bonn.
+  const rules = load('world-110m.v1.json'), atlas = load('countries-50m.json');
+  const geo = new WorldGeometry(atlasOfYear(rules, 1974), capitalsOfYear(rules, 1974)).fitTo(Object.keys(NATIONS));
+  const paths = drawnPaths(new WorldGeometry(mergeSharedIds(atlasOfYear(atlas, 1974)), capitalsOfYear(atlas, 1974)).buildPaths(geo.fit.s, geo.fit.tx, geo.fit.ty),
+    geo.countries);
+  const board1974 = { geo, routingPaths: paths, routeIndex: createAttackRouteIndex(paths) };
+  assert.deepEqual([...geo.adj['278']].sort(), ['203', '276', '616']);
+  const own = Object.fromEntries(Object.keys(NATIONS).filter(id => geo.paths[id]).map(id => [id, id]));
+  const field = { ...board1974, own, aliveIds: Object.keys(own) };
+  assert.deepEqual(validateReachability(field).unplacedIds, []);
+  // Each German state, alone against the rest of the world, can attack and be attacked.
+  for (const isolated of ['278', '276']) {
+    const late = { ...board1974, own: Object.fromEntries(Object.keys(own).map(id => [id, id === isolated ? isolated : 'merged'])), aliveIds: [isolated, 'merged'] };
+    for (const attacker of late.aliveIds) {
+      let calls = 0;
+      const draw = createDuelDraw(() => [attacker === isolated ? 0 : .75, .17, .25][calls++], late);
+      assertDraw(late, draw);
+    }
+  }
+});
+
 test('football Elite 32 Japan finale uses an exact sea polyline in both directions', () => {
-  const teams = Object.keys(NATIONS).map(id => buildTeam(id, makeRng(28), SPORT_LIST[0]))
+  const teams = TODAY.map(id => buildTeam(id, makeRng(28), SPORT_LIST[0]))
     .sort((a, b) => b.str - a.str).slice(0, 32);
   assert.ok(teams.some(team => team.id === '392'));
   const own = Object.fromEntries(teams.map(team => [team.id, team.id === '392' ? 'Japan' : 'Empire']));

@@ -1,17 +1,18 @@
 // Ice hockey's computed and converted seasons (docs/design/hockey.md, "Computed seasons", "NHL 08 and NHL 09", "Eras"):
 // the rule by hand, its calibration against the five full EA editions (the committed fixture), the ratings read off the
 // frozen histograms with every order kept, NHL 08 and NHL 09 converted onto NHL 07's overalls, the eras and their maps,
-// clubs only before 1977/78, the loader's refusals, and the App playing a 1967/68 clubs campaign, a 1985/86 nations
-// campaign and resuming a 2006/07 campaign saved on the map before it served more seasons.
+// clubs only before 1977/78, the loader's refusals, and the App playing a 1960/61 and a 1967/68 clubs campaign, a 1985/86
+// nations campaign and resuming a 2006/07 and a 1966/67 campaign saved on the map before it served more seasons.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../src/data/hockeySeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
-import { selectLineup } from '../src/data/teams.js';
+import { nationIdentity, selectLineup } from '../src/data/teams.js';
+import { namesOfTheDay } from '../src/data/namesOfTheDay.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
-import { BUILT_IN_SETS, decodeFootballSet, setHasClubs, setHasNations } from '../src/engine/footballSets.js';
+import { BUILT_IN_SETS, decodeFootballSet, seasonSport, setHasClubs, setHasNations } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { pointInPolys } from './lib/domestic-partition.mjs';
 import {
@@ -19,7 +20,7 @@ import {
   seasonBefore, skaterValue, spearman, stepRating, windowOf,
 } from './lib/nhl-computed.mjs';
 import { hdbBirthCountry, hdbPosition, moneypuckStints } from './lib/nhl-stats.mjs';
-import { mapOf, parseIgnAttributes, teamsOf } from './lib/nhl-seasons.mjs';
+import { FEDERATIONS, mapOf, parseIgnAttributes, teamsOf } from './lib/nhl-seasons.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -113,9 +114,9 @@ test('ratings come from a frozen histogram by mid-rank: ties stay ties, nobody p
 // ---------- the computed seasons ----------
 
 test('the computed seasons: every squad rating NHL 27\'s, the order of every group kept, the source saying how', () => {
-  assert.equal(COMPUTED.length, 52);
+  assert.equal(COMPUTED.length, 58);
   assert.deepEqual(MANIFEST.seasons.map(s => s.year).sort((a, b) => a - b),
-    Array.from({ length: 60 }, (_, i) => 1967 + i).filter(year => year !== 2005), 'every season from 1966/67 to 2025/26 but 2004/05');
+    Array.from({ length: 66 }, (_, i) => 1961 + i).filter(year => year !== 2005), 'every season from 1960/61 to 2025/26 but 2004/05');
   const reference = Object.fromEntries(['F', 'D', 'G'].map(g => [g, new Set(ratingsOfHistogram(MANIFEST.computed.histograms[g]))]));
   for (const entry of COMPUTED) {
     const doc = seasonFile(entry.id), snapshot = snapshotOf(entry.id);
@@ -142,6 +143,16 @@ test('the computed seasons: every squad rating NHL 27\'s, the order of every gro
 });
 
 test('known history: the stars of their day on top, the strongest and weakest clubs of a few seasons', () => {
+  // The Original Six, 1960/61 to 1965/66: the Canadiens first in 1960/61; Mikita the scoring champion of 1963/64 and
+  // 1964/65, Hull of 1965/66 (54 goals); Pilote the Norris winner of 1962/63 to 1964/65, Hodge the Vezina winner of 1963/64.
+  assert.deepEqual(auditOf('nhl-1961').best.forwards.slice(0, 2), ['Jean Beliveau (MTL) 99', 'Bernie Geoffrion (MTL) 95'], 'Beliveau and Geoffrion, 1960/61');
+  assert.match(auditOf('nhl-1961').clubs[0], /^Montreal Canadiens/, 'Montreal, first in 1960/61');
+  for (const id of ['nhl-1964', 'nhl-1965']) assert.match(auditOf(id).best.forwards[0], /^Stan Mikita \(CHI\) 99$/, `${id}: Mikita first`);
+  assert.match(auditOf('nhl-1966').best.forwards[0], /^Bobby Hull \(CHI\) 99$/, 'Hull first, 1965/66');
+  for (const id of ['nhl-1963', 'nhl-1964', 'nhl-1965']) assert.match(auditOf(id).best.defenders[0], /^Pierre Pilote \(CHI\)/, `${id}: Pilote the best defender`);
+  assert.match(auditOf('nhl-1964').best.goalies[0], /^Charlie Hodge \(MTL\)/, 'Hodge the best goalie, 1963/64');
+  assert.deepEqual(playerOf('nhl-1963', 'Gordie Howe'), ['DET', 'RW', 95]);
+  assert.deepEqual(auditOf('nhl-1961').realSides, ['Canada'], 'the Original Six: Canada alone fields a real side');
   assert.deepEqual(auditOf('nhl-1967').best.forwards.slice(0, 2), ['Bobby Hull (CHI) 99', 'Stan Mikita (CHI) 95'], 'Hull and Mikita, 1966/67');
   assert.match(auditOf('nhl-1967').clubs[0], /^Chicago Black Hawks/, 'Chicago, first in 1966/67');
   for (const id of ['nhl-1971', 'nhl-1972', 'nhl-1973', 'nhl-1974', 'nhl-1975']) assert.match(auditOf(id).best.defenders[0], /^Bobby Orr/, `${id}: Orr the best defender`);
@@ -202,9 +213,47 @@ test('birth countries: the Hockey Databank\'s, a birth city in another country t
   assert.equal(hdbBirthCountry(m('', '')), null);
   assert.throws(() => hdbBirthCountry(m('USSR', 'Atlantis')), /No country today/);
   assert.equal(hdbPosition('L/C'), 'LW');
-  const doc = seasonFile('nhl-1983');
-  const nationOf = name => Object.keys(doc.nations).filter(id => doc.nations[id][2].some(([player]) => player === name));
-  assert.deepEqual(nationOf('Peter Stastny'), ['703'], 'Peter Stastny for Slovakia, born in Bratislava');
+  // Born in Bratislava, Peter Stastny plays for Czechoslovakia (on Czechia's shape) to 1991/92, for Slovakia after.
+  assert.deepEqual(nationIn('nhl-1983', 'Peter Stastny'), ['203']);
+  assert.deepEqual(nationIn('nhl-1993', 'Peter Stastny'), ['703']);
+});
+
+const nationIn = (id, name) => Object.keys(seasonFile(id).nations).filter(nation => seasonFile(id).nations[nation][2].some(([player]) => player === name));
+
+test('the federations of the day: Czechoslovakia to 1991/92, the Soviet Union to 1990/91, the CIS in 1991/92', () => {
+  // The same federations, years and member lands as tennis's seasons (docs/design/tennis.md, "Nations of the day").
+  const tennis = JSON.parse(read('scripts/data/tennis-seasons.json')).nations.territory;
+  const plain = list => list.map(({ name, from, through, holder, shapes }) => ({ name, from, through, holder, shapes: [...shapes].sort() }));
+  assert.deepEqual(plain(FEDERATIONS), plain(tennis));
+  for (const entry of MANIFEST.seasons.filter(season => setHasNations(season.id))) {
+    const doc = seasonFile(entry.id);
+    // A member's players play for the holder in the federation's years, so no member lists a nation of its own then.
+    for (const federation of FEDERATIONS.filter(f => (f.from ?? 0) <= entry.year && entry.year <= f.through)) {
+      assert.ok(federation.shapes.every(shape => !doc.nations[shape]), `${entry.id}: ${federation.name}'s members play for it`);
+    }
+    for (const [shape, holder] of Object.entries(doc.territory.merged)) {
+      if (['SCO', 'WAL', 'NIR'].includes(shape)) continue;
+      assert.ok(auditOf(entry.id).realSides.includes(namesOfTheDay('hockey', entry.year)[holder]?.name), `${entry.id}: ${holder} fields a real side`);
+    }
+  }
+  // 1989/90: Czechoslovakia and the Soviet Union field real sides, Helmut Balderis (born in Riga) among the Soviets.
+  assert.deepEqual(auditOf('nhl-1990').realSides.filter(name => ['Czechoslovakia', 'Soviet Union'].includes(name)), ['Czechoslovakia', 'Soviet Union']);
+  assert.deepEqual(nationIn('nhl-1990', 'Helmut Balderis'), ['643']);
+  assert.equal(seasonFile('nhl-1990').territory.merged['428'], '643', 'Latvia in the Soviet Union\'s empire');
+  // 1991/92: the CIS holds Ukraine (Dmitri Khristich, born in Kyiv, plays for it), not the Baltic states: Arturs Irbe
+  // plays for Latvia.
+  assert.deepEqual(nationIn('nhl-1992', 'Dmitri Khristich'), ['643']);
+  assert.deepEqual(nationIn('nhl-1992', 'Arturs Irbe'), ['428']);
+  assert.equal(seasonFile('nhl-1992').territory.merged['804'], '643');
+  assert.equal(seasonFile('nhl-1992').territory.merged['428'], undefined);
+  // 1992/93: Czechia and Slovakia apart, Russia and Ukraine apart, nobody holding another's land.
+  assert.deepEqual(nationIn('nhl-1993', 'Dmitri Khristich'), ['804']);
+  assert.deepEqual(seasonFile('nhl-1993').territory.merged, { SCO: '826', WAL: '826', NIR: '826' });
+  // Names of the day on the campaign's teams.
+  const sportIn = id => seasonSport(decodeFootballSet(seasonFile(id), id));
+  assert.deepEqual(['nhl-1983', 'nhl-1991', 'nhl-1992', 'nhl-1993'].map(id => [nationIdentity('203', sportIn(id)).name, nationIdentity('643', sportIn(id)).name]),
+    [['Czechoslovakia', 'Soviet Union'], ['Czechoslovakia', 'Soviet Union'], ['Czechoslovakia', 'CIS'], ['Czechia', 'Russia']]);
+  assert.equal(nationIdentity('276', sportIn('nhl-1990')).name, 'West Germany');
 });
 
 test('a name MoneyPuck dropped letters from is put back: Tim Stutzle, not Tim Sttzle', () => {
@@ -274,10 +323,13 @@ test('the conversion\'s premise: within NHL 07 the mean of the skill attributes 
 // ---------- eras and maps ----------
 
 test('the eras: the clubs of every season, the defunct Seals and Barons, the 1979/80 Whalers at Springfield', () => {
-  const counts = Object.fromEntries([1967, 1968, 1971, 1973, 1975, 1977, 1979, 1980, 1992, 1993, 1994, 1999, 2000, 2001, 2018, 2022]
+  const counts = Object.fromEntries([1961, 1967, 1968, 1971, 1973, 1975, 1977, 1979, 1980, 1992, 1993, 1994, 1999, 2000, 2001, 2018, 2022]
     .map(year => [year, teamsOf(MANIFEST, year).length]));
-  assert.deepEqual(counts, { 1967: 6, 1968: 12, 1971: 14, 1973: 16, 1975: 18, 1977: 18, 1979: 17, 1980: 21, 1992: 22, 1993: 24, 1994: 26, 1999: 27, 2000: 28,
-    2001: 30, 2018: 31, 2022: 32 });
+  assert.deepEqual(counts, { 1961: 6, 1967: 6, 1968: 12, 1971: 14, 1973: 16, 1975: 18, 1977: 18, 1979: 17, 1980: 21, 1992: 22, 1993: 24, 1994: 26, 1999: 27,
+    2000: 28, 2001: 30, 2018: 31, 2022: 32 });
+  // The Original Six kept their names and arenas from 1960/61 to 1966/67.
+  for (let year = 1961; year <= 1966; year++) assert.deepEqual(teamsOf(MANIFEST, year), teamsOf(MANIFEST, 1967), `${year}: the clubs of 1966/67`);
+  assert.throws(() => teamsOf(MANIFEST, 1960), /No NHL clubs/, 'nothing before 1960/61');
   const seals = teamsOf(MANIFEST, 1968).find(t => t.code === 'OAK');
   assert.deepEqual([seals.id, seals.franchise, seals.name], ['nhl-oakland-seals', null, 'Oakland Seals']);
   assert.equal(teamsOf(MANIFEST, 1972).find(t => t.code === 'CGS').name, 'California Golden Seals');
@@ -309,6 +361,8 @@ test('every season names its map; an era map serves only seasons of the same clu
   assert.equal(seasonFile('nhl-2026').map, 'nhl');
   assert.deepEqual(era.find(e => e.id === 'nhl2007').seasons, ['nhl-2007', 'nhl-2008', 'nhl-2009', 'nhl-2010', 'nhl-2011']);
   assert.deepEqual(era.find(e => e.id === 'nhl1968').seasons, ['nhl-1968', 'nhl-1969', 'nhl-1970']);
+  assert.deepEqual(era.find(e => e.id === 'nhl1967').seasons, ['nhl-1961', 'nhl-1962', 'nhl-1963', 'nhl-1964', 'nhl-1965', 'nhl-1966', 'nhl-1967'],
+    'the Original Six map serves 1960/61 to 1966/67');
   // Defunct franchises rank after today's: the Seals' section comes last.
   const seals = decodeDomestic(mapFile('nhl1968'), 'nhl1968');
   assert.equal(seals.clubs.at(-1).id, 'nhl-oakland-seals');
@@ -359,7 +413,7 @@ test('credits: the Hockey Databank\'s statement, whole, on every season that tak
     assert.ok(!('credit' in seasonFile(listed.id)));
     assert.equal(seasonFile(listed.id).version, listed.version);
   }
-  assert.deepEqual(Object.fromEntries(Object.entries(kinds).map(([kind, ids]) => [kind, ids.length])), { databank: 39, both: 14, moneypuck: 1, none: 5 });
+  assert.deepEqual(Object.fromEntries(Object.entries(kinds).map(([kind, ids]) => [kind, ids.length])), { databank: 45, both: 14, moneypuck: 1, none: 5 });
   assert.deepEqual(kinds.none, ['nhl-2022', 'nhl-2007', 'nhl-1995', 'nhl-1994', 'nhl-1993'], 'the EA editions: the NHL\'s rosters, no databank');
   assert.deepEqual(kinds.moneypuck, ['nhl-2026'], '2025/26: MoneyPuck\'s lookup gives every nationality the season needs');
   assert.ok(snapshotOf('nhl-2011').notes.birthFromDatabank.includes('Pavel Datsyuk: RUS'), 'Datsyuk\'s Russia, the databank\'s');
@@ -370,7 +424,7 @@ test('credits: the Hockey Databank\'s statement, whole, on every season that tak
   const attribution = read('public/hockey/ATTRIBUTION.txt');
   assert.ok(attribution.includes(`"${DATABANK_STATEMENT}"`));
   assert.match(attribution, /setup shows the chosen season's credit under the Season choice/);
-  assert.match(attribution, /in full, on the 53 seasons that take anything from the databank, and "Data: MoneyPuck\.com" on the 15 computed from its data/);
+  assert.match(attribution, /in full, on the 59 seasons that take anything from the databank, and "Data: MoneyPuck\.com" on the 15 computed from its data/);
 });
 
 const readme = new URL('../data-src/nhl-seasons/hockey-databank/readme.txt', import.meta.url);
@@ -501,33 +555,71 @@ test('a 2007/08 nations campaign plays NHL 08\'s converted players, saves and re
   });
 });
 
-test('a 2006/07 campaign saved on the map before it served 2007/08 to 2010/11 resumes on it', async () => {
-  // The version nhl2007 had when it served 2006/07 alone (src/data/clubMaps.js at 06db6f6).
-  const OLD = 'nhl2007-784f3771';
-  assert.notEqual(CLUB_MAPS.find(entry => entry.id === 'nhl2007').version, OLD);
+test('a 1960/61 clubs campaign plays the Original Six on the map of 1966/67, saves and resumes; it offers no nations', async () => {
   await withApp(async ({ app, time, items }) => {
     app.pickSetup('sport', 'hockey');
-    app.pickSetup('layer', 'clubs');
-    app.pickSetup('dataSet', 'nhl-2007');
+    app.pickSetup('dataSet', 'nhl-1961');
+    assert.equal(app.state.setup.layer, 'clubs', 'a clubs-only season takes the clubs');
+    assert.equal(app.state.setup.clubScope, 'domestic:nhl1967', 'the six clubs in the arenas they played in to 1966/67');
     time.advance(200);
-    await Promise.all([app.loadCountry('nhl2007'), app.loadSet('nhl-2007')]);
+    await Promise.all([app.loadCountry('nhl1967'), app.loadSet('nhl-1961')]);
     await settle();
     app.startCampaign();
     const before = app.state;
+    assert.equal(before.phase, 'playing');
+    assert.deepEqual([before.settings.dataSet, before.settings.dataSeason, before.settings.clubScope], ['nhl-1961', '1960/61', 'domestic:nhl1967']);
+    assert.deepEqual(Object.keys(before.teams).sort(), seasonFile('nhl-1961').clubs.map(club => club.id).sort());
+    assert.equal(Object.keys(before.teams).length, 6);
+    assert.equal(before.teams['nhl-chicago-blackhawks'].name, 'Chicago Black Hawks');
+    assert.ok(before.teams['nhl-detroit-red-wings'].squad.some(p => p.name === 'Gordie Howe'), 'Howe plays for Detroit');
+    const saved = parseCampaign(items.get(SAVE_KEY));
+    assert.equal(JSON.stringify(saved.teams), JSON.stringify(before.teams));
+    let resumed = null;
+    assert.notEqual(app.withCampaignMap(saved, (loaded, fitted) => { resumed = { loaded, fitted }; return true; }), false);
+    app.restoreCampaign(resumed.fitted, resumed.loaded);
+    assert.equal(app.state.phase, 'playing');
+    assert.deepEqual(app.state.own, before.own, 'every club keeps its land');
+    assert.equal(app.state.settings.dataSet, 'nhl-1961');
+  });
+});
+
+/** A clubs campaign of season `setId` saved on era map `mapId` at its `old` version, before the map served more seasons, resumes on it. */
+async function resumesOnMapServingMore(mapId, setId, old) {
+  assert.notEqual(CLUB_MAPS.find(entry => entry.id === mapId).version, old);
+  await withApp(async ({ app, time, items }) => {
+    app.pickSetup('sport', 'hockey');
+    app.pickSetup('layer', 'clubs');
+    app.pickSetup('dataSet', setId);
+    time.advance(200);
+    await Promise.all([app.loadCountry(mapId), app.loadSet(setId)]);
+    await settle();
+    app.startCampaign();
+    const before = app.state;
+    assert.equal(before.settings.clubScope, `domestic:${mapId}`);
     const saved = JSON.parse(items.get(SAVE_KEY));
-    saved.settings.domesticVersion = OLD;
-    if (saved.initialSettings) saved.initialSettings.domesticVersion = OLD;
-    const old = parseCampaign(JSON.stringify(saved));
-    assert.equal(old.settings.domesticVersion, OLD);
+    saved.settings.domesticVersion = old;
+    if (saved.initialSettings) saved.initialSettings.domesticVersion = old;
+    const parsed = parseCampaign(JSON.stringify(saved));
+    assert.equal(parsed.settings.domesticVersion, old);
     // The map is loaded, so the save is fitted to it at once.
     let resumed = null;
-    const outcome = app.withCampaignMap(old, (loaded, fitted) => { resumed = { loaded, fitted }; return true; });
+    const outcome = app.withCampaignMap(parsed, (loaded, fitted) => { resumed = { loaded, fitted }; return true; });
     assert.notEqual(outcome, false, 'the old save fits the map that now serves more seasons');
     assert.deepEqual(Object.keys(resumed.fitted.teams).sort(), Object.keys(before.teams).sort());
     assert.deepEqual(resumed.fitted.own, before.own, 'every club keeps its land');
     app.restoreCampaign(resumed.fitted, resumed.loaded);
     assert.equal(app.state.phase, 'playing');
-    assert.equal(app.state.settings.domesticVersion, CLUB_MAPS.find(entry => entry.id === 'nhl2007').version, 'it plays on with the map\'s new version');
+    assert.equal(app.state.settings.domesticVersion, CLUB_MAPS.find(entry => entry.id === mapId).version, 'it plays on with the map\'s new version');
     assert.deepEqual(app.state.own, before.own);
   });
+}
+
+test('a 2006/07 campaign saved on the map before it served 2007/08 to 2010/11 resumes on it', async () => {
+  // The version nhl2007 had when it served 2006/07 alone (src/data/clubMaps.js at 06db6f6).
+  await resumesOnMapServingMore('nhl2007', 'nhl-2007', 'nhl2007-784f3771');
+});
+
+test('a 1966/67 campaign saved on the map before it served 1960/61 to 1965/66 resumes on it', async () => {
+  // The version nhl1967 had when it served 1966/67 alone (src/data/clubMaps.js at 6ad58df).
+  await resumesOnMapServingMore('nhl1967', 'nhl-1967', 'nhl1967-fbeeac85');
 });

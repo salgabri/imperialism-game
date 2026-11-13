@@ -61,9 +61,12 @@ function safeSeries(args) {
   } catch { return []; }
 }
 
-export default function WinChart({ sport = 'football', live = false, model = null, goals = [], perspective = null, final = null,
-  length = 90, ot = 0, chartNote = null, aId = null, dId = null, minuteStore = null, minuteFallback = 0, minuteFloor = 0,
+export default function WinChart({ sport = 'football', clockSport = null, live = false, model = null, goals = [], perspective = null,
+  final = null, length = 90, ot = 0, chartNote = null, aId = null, dId = null, minuteStore = null, minuteFallback = 0, minuteFloor = 0,
   measureKey = null }) {
+  // The minute and the axis read with the season's rules when given: an ice hockey season before the shoot-out ticks its
+  // twenty-minute overtimes "OT", "2OT".
+  const clock = clockSport || sport;
   const minute = useMatchMinute({ live, minuteStore, minuteFallback, minuteFloor });
   const [plotRef, H] = usePlotHeight(measureKey);
   const reactId = React.useId();
@@ -112,7 +115,7 @@ export default function WinChart({ sport = 'football', live = false, model = nul
       </div>
       <div className="match-chart__plot" ref={plotRef}>
         <svg className="match-chart__svg" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img"
-          aria-label={`${label} ${value} at ${clockLabel(sport, minute)}`} focusable="false">
+          aria-label={`${label} ${value} at ${clockLabel(clock, minute)}`} focusable="false">
           <defs>
             <pattern id={patternId} patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
               <rect width="1.2" height="5" className="match-chart__hatch" />
@@ -131,7 +134,7 @@ export default function WinChart({ sport = 'football', live = false, model = nul
         <div className="match-chart__axis" aria-hidden="true">
           {ticks.map(t => {
             const frac = axis ? t / axis : 0;
-            return <span key={t} style={{ left: `${frac * 100}%`, transform: `translateX(${-frac * 100}%)` }}>{clockTick(sport, t)}</span>;
+            return <span key={t} style={{ left: `${frac * 100}%`, transform: `translateX(${-frac * 100}%)` }}>{clockTick(clock, t)}</span>;
           })}
         </div>
       </div>

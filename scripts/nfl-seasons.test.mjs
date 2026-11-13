@@ -4,7 +4,8 @@
 // documented gaps left to the game); the readers that make the Madden snapshots; the era maps (the Phoenix Cardinals,
 // the Raiders in Los Angeles and the Rams in Anaheim, the Houston Oilers, the Panthers in Clemson in 1995, the St. Louis
 // Rams, the San Diego Chargers, the Oakland Raiders, the Saints in Baton Rouge in 2005, no Texans in 2001); the loader's
-// checks; and the running App, which plays a season's clubs on the map of their day and saves and resumes the campaign.
+// checks; and the running App, which plays a season's clubs on the map of their day, under the rules of their day, and
+// saves and resumes the campaign.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -16,8 +17,10 @@ import { BUILT_IN_AMERICAN_FOOTBALL_SEASONS } from '../src/data/americanFootball
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { CLUBS } from '../src/data/clubs.american-football.js';
 import { contentHash } from '../src/data/footballSetBuild.js';
-import { selectLineup } from '../src/data/teams.js';
+import { makeRng, selectLineup } from '../src/data/teams.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
+import { liveModelFor } from '../src/engine/winProbability.js';
+import { matchSport } from '../src/sports/index.js';
 import { BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, seasonMapOf, seasonSport, setHasClubs, setHasNations, setSportOf,
   sportOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
@@ -803,4 +806,32 @@ test('a computed season launches on its era\'s map, saves and resumes: the NFL\'
       assert.deepEqual(app.state.own, st.own);
     });
   }
+});
+
+test('a season\'s campaign plays its day\'s rules: 1977\'s match and its live chart are sudden death in fifteen-minute periods', async () => {
+  await withApp(async ({ app, time }) => {
+    app.pickSetup('sport', 'american-football');
+    await chooseSeason(app, time, 'pfa-1977');
+    app.startCampaign();
+    // The App's own bundle plays the season's sport object; this file's copy of it is the same rules.
+    const sport = matchSport(app.state.settings);
+    assert.deepEqual([app.sport().simulationVersion, app.sport().clock], [5, { length: 60, msPerUnit: 65, ot: 15, sudden: true }]);
+    assert.notEqual(sport, americanFootball, 'not today\'s rules');
+    app.showPopup = () => {};
+    app.showToast = () => {};
+    const [aId, dId] = app.state.aliveIds;
+    const a = app.state.teams[aId], d = app.state.teams[dId];
+    const state = app.rng.getState();
+    app.startMatch(aId, dId);
+    const m = app.state.match, drama = m.matchDrama;
+    // The result is the season's sport's own draw, from the campaign's random stream.
+    const rng = makeRng(0);
+    rng.setState(state);
+    const expected = sport.simulate(rng, a, d, drama, m.effA, m.effD);
+    assert.deepEqual([m.winner, m.finalGa, m.finalGd, m.allEv], [expected.winner, expected.ga, expected.gd, expected.ev]);
+    assert.equal(app.rng.getState(), rng.getState(), 'one match draw, nothing else');
+    assert.deepEqual(m.live, liveModelFor(sport, a, d, m.effA, m.effD, drama));
+    assert.deepEqual([m.live.overtime, m.live.ot], ['sudden', 15]);
+    assert.ok(!liveModelFor(americanFootball, a, d, m.effA, m.effD, drama).overtime, 'today\'s chart has both sides possess');
+  });
 });

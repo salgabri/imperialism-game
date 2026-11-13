@@ -14,8 +14,9 @@ export default function PlayerRow({ player, positionColors = {}, roomy = false, 
   const cm = source?.source === 'cm0102';
   // Sensible World of Soccer rates a price step, not an ability (src/data/swosPlayers.js).
   const swos = source?.source === 'swos';
-  // A computed World Cup player's date is his team's Elo's, not a database's (scripts/lib/world-cup-seasons.mjs).
-  const worldCup = source?.source === 'world-cup';
+  // A computed World Cup or national-team player's date is his team's Elo's, not a database's
+  // (scripts/lib/world-cup-seasons.mjs, scripts/lib/national-team-seasons.mjs).
+  const worldCup = source?.source === 'world-cup' || source?.source === 'wikidata';
   const sourceName = source?.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : swos ? 'SWOS' : 'Football Manager';
   const edition = String(source?.edition || '');
   const sourceLabel = edition ? /^\d+$/.test(edition) ? `${sourceName} ${edition}` : edition : sourceName;

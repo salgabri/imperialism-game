@@ -195,12 +195,13 @@ export function wtaLevelOf(m) {
  * (a professional coming back in 1968) is never charged. Options: `seasons`, the seasons to snapshot at
  * their end; `asOf`, a list's date by season (yyyymmdd; default 31 December, never before the season's last event);
  * `yElo`, also each season's yElo (every player restarting at 1500 against his opponents' real Elo); `levelOf`, which
- * matches count and at what start (`atpLevelOf`, the default, or `wtaLevelOf`).
+ * matches count and at what start (`atpLevelOf`, the default, or `wtaLevelOf`); `before(m, winner, loser)`, called with
+ * each counted match and its two players' ratings and counted matches before it ({ elo, n }), layoffs charged.
  * Returns `{ snapshots: { [season]: { last, date, players } }, peaks, yElo, counts }`, each snapshot player `{ id,
  * name, elo, n, season: counted matches that season, last, absent? }` for everyone who played a counted match that
  * season, `absent` the layoff penalty his listed Elo already shows.
  */
-export function rateMatches(matches, method, { seasons = [], yElo = false, asOf = null, levelOf = atpLevelOf } = {}) {
+export function rateMatches(matches, method, { seasons = [], yElo = false, asOf = null, levelOf = atpLevelOf, before = null } = {}) {
   const wanted = new Set(seasons);
   const players = new Map();
   const counts = { counted: 0, unplayed: 0, 'no score': 0, placeholder: 0, skipped: 0 };
@@ -291,6 +292,7 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
     const w = playerOf(m.winner, m.winnerName, level), l = playerOf(m.loser, m.loserName, level);
     comeback(w, m.date);
     comeback(l, m.date);
+    if (before) before(m, { elo: w.r, n: w.n }, { elo: l.r, n: l.n });
     if (yElo) {
       for (const p of [w, l]) {
         if (p.yYear !== m.season) {

@@ -5,7 +5,7 @@
 // folder and writes the results, and tests build sets from synthetic folders.
 // Every player written is a stored CM record that rebuilds exactly from its tuple; a
 // nation with fewer than eleven natural players keeps exactly the ones it has.
-import { NATIONS, PACIFIC_ISLANDS, selectLineup } from './teams.js';
+import { HISTORIC_NATIONS, HISTORIC_THROUGH, NATIONS, PACIFIC_ISLANDS, selectLineup } from './teams.js';
 import { CM_CONVERSION, CM_SCALE, cmNaturalPositions, cmTupleOf, expandCmTuple } from './cmPlayers.js';
 import { cmMonthDay, decodeCmDate, fileSignature, readCm0102 } from './cm0102.js';
 import { CM0102_RELEASES } from './cm0102Releases.js';
@@ -392,9 +392,9 @@ function withoutTrailingBytes(files, trailing) {
  * SHA-256 of a known database's club.dat and staff.dat, tens of MB), and for a season the game ships
  * (scripts/build-retro-seasons.mjs) `local: false`, `sourceExtra`, fields added to its source block (who
  * compiled it, when it was read), and `kind`, the set kind its manifest names, checked against the one its id makes.
- * `noNationAt` (`{ nationality, clubs, label }`) makes the players of that stored nationality at those clubs (by name)
- * play for no nation, though still for their clubs: a 1989/90 database that files East Germans as 'Germany' names its
- * East German clubs. `clubs: false` builds the nations alone (a season whose clubs are not its year's). Returns
+ * `noNationAt` (`{ nationality, clubs, label, playsFor }`) makes the players of that stored nationality at those clubs (by
+ * name) play for nation `playsFor` instead, or with none for no nation, though still for their clubs: a 1989/90 database
+ * that files East Germans as 'Germany' names its East German clubs, whose Germans play for East Germany (278). `clubs: false` builds the nations alone (a season whose clubs are not its year's). Returns
  * `{ doc, text, audit, summary, warnings }`; throws on an unknown layout, an unmapped nation (unless allowed) or an
  * unnamed database.
  */
@@ -444,7 +444,12 @@ export function buildFootballSet(files, {
     warn(`Birth shift check inconclusive (${oracle.matches} famous players found, ${oracle.agreeing} agreeing); using ${signed(dobShift)} from ${shiftSource}`);
   }
 
-  const resolve = dayNationResolver(nationResolver(nationMap), federations, database.year);
+  const dayResolve = dayNationResolver(nationResolver(nationMap), federations, database.year);
+  // A nation of the map's earlier years (East Germany) after its last year has no team: its land is another's then.
+  const resolve = name => {
+    const id = dayResolve(name);
+    return HISTORIC_NATIONS.includes(id) && database.year > HISTORIC_THROUGH[id] ? NO_TEAM : id;
+  };
   const nationRows = parsed.nations.map(n => {
     const id = resolve(n.name);
     return { name: n.name, id: id === NO_TEAM ? null : id, key: id && id !== NO_TEAM ? id : `cm:${fold(n.name)}`, noTeam: id === NO_TEAM, unmapped: id == null };
@@ -503,12 +508,13 @@ export function buildFootballSet(files, {
     seen.add(player.id);
     // Players of nations without a team still play for their clubs.
     if (nation.noTeam) noTeam[nation.name] = (noTeam[nation.name] || 0) + 1;
-    else if (stateless) noTeam[`${nation.name} at ${noNationAt.label}`] = (noTeam[`${nation.name} at ${noNationAt.label}`] || 0) + 1;
+    else if (stateless && !noNationAt.playsFor) noTeam[`${nation.name} at ${noNationAt.label}`] = (noTeam[`${nation.name} at ${noNationAt.label}`] || 0) + 1;
     const tuple = [player.id, player.name, player.fullName && player.fullName !== player.name ? player.fullName : 0, player.ca,
       keys.join(','), nation.name, player.club == null ? '' : clubByRow.get(player.club).name, dateOfBirth];
     const [name, pos, rating, sourceInfo] = expandCmTuple(tuple, source);
     if (JSON.stringify(cmTupleOf(name, sourceInfo)) !== JSON.stringify(tuple)) throw new Error(`CM player ${player.id} (${player.name}) does not rebuild from its tuple`);
-    return { name, pos, positions: sourceInfo.positions, rating, sourceInfo, tuple, club: player.club, nationId: stateless ? null : nation.id };
+    return { name, pos, positions: sourceInfo.positions, rating, sourceInfo, tuple, club: player.club,
+      nationId: stateless ? noNationAt.playsFor ?? null : nation.id };
   });
 
   // A federation of the day fields its members' players: a Ukrainian of a 1989/90 database plays for the Soviet Union.
@@ -527,6 +533,8 @@ export function buildFootballSet(files, {
   const islands = PACIFIC_ISLANDS.some(id => pools.get(id)?.length);
   for (const [id, rec] of Object.entries(NATIONS)) {
     if (!islands && PACIFIC_ISLANDS.includes(id)) continue;
+    // A nation of the map's earlier years (East Germany) is listed only with players of its own.
+    if (HISTORIC_NATIONS.includes(id) && !pools.get(id)?.length) continue;
     const pool = pools.get(id) || [];
     const squad = pickFootballSquad(pool);
     const lineup = selectLineup({ sport: 'football', squad });
@@ -588,7 +596,8 @@ export function buildFootballSet(files, {
     parser: { format: parsed.format, counts: parsed.counts, index: parsed.index, warnings: parsed.warnings },
     birthShift: { used: dobShift, from: shiftSource, oracle },
     players: { read: parsed.players.length, eligible: players.length, written: coverage.players, dropped },
-    unmapped, noTeam, ...(noNationAt ? { noNationAt: { nationality: noNationAt.nationality, label: noNationAt.label, clubs: noNationClubs.size } } : {}),
+    unmapped, noTeam, ...(noNationAt ? { noNationAt: { nationality: noNationAt.nationality, label: noNationAt.label, clubs: noNationClubs.size,
+      ...(noNationAt.playsFor ? { playsFor: noNationAt.playsFor } : {}) } } : {}),
     ...(withClubs ? {} : { nationsOnly: true }), leagues: leagueAudit, territory,
     // A season of federations of the day records them and whose players they field (by shape, how many).
     ...(Object.keys(identities).length || Object.keys(pooled).length ? { federations: { identities, pooled } } : {}),

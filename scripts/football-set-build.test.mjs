@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { NATIONS, PACIFIC_ISLANDS } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, NATIONS, PACIFIC_ISLANDS } from '../src/data/teams.js';
 import { CM_ROLES, cmTupleOf, expandCmTuple } from '../src/data/cmPlayers.js';
 import { fileSignature } from '../src/data/cm0102.js';
 import { CM0102_RELEASES as databases } from '../src/data/cm0102Releases.js';
@@ -120,7 +120,8 @@ test('every stored CM nation name maps to a game nation or is listed as having n
   assert.equal(STORED_NATIONS.length, 214);
   for (const [name, id] of Object.entries(nationMap.aliases)) assert.ok(NATIONS[id], `${name} -> ${id}`);
   const reached = new Set([...STORED_NATIONS, ...LATER_NATIONS].map(resolve).filter(id => id !== NO_TEAM));
-  assert.deepEqual(Object.keys(NATIONS).filter(id => !reached.has(id)), [], 'game nations no CM name reaches');
+  // South Vietnam, a nation of the map's earlier years, is no CM nation (East Germany is).
+  assert.deepEqual(Object.keys(NATIONS).filter(id => !reached.has(id)), ['RVN'], 'game nations no CM name reaches');
   assert.equal(resolve('Holland'), '528');
   assert.equal(resolve('Yugoslavia'), '688');
   assert.equal(resolve('Republic of Ireland'), '372');
@@ -347,8 +348,9 @@ test('a famous player stored twice counts once towards a conclusive birth shift'
 test('a data set has every game nation, its source block and a content version', () => {
   const { doc, text } = build();
   assert.deepEqual(Object.keys(doc), ['format', 'id', 'version', 'year', 'season', 'label', 'local', 'source', 'nations', 'clubs', 'territory', 'coverage']);
-  // Every game nation; Tonga, Samoa and the Cook Islands only when the database rates one of theirs, as this one does not.
-  assert.deepEqual(Object.keys(doc.nations).sort(), Object.keys(NATIONS).filter(id => !PACIFIC_ISLANDS.includes(id)).sort());
+  // Every game nation; Tonga, Samoa and the Cook Islands only when the database rates one of theirs, as this one does not,
+  // and East Germany (HISTORIC_NATIONS) only with players of its own.
+  assert.deepEqual(Object.keys(doc.nations).sort(), Object.keys(NATIONS).filter(id => !PACIFIC_ISLANDS.includes(id) && !HISTORIC_NATIONS.includes(id)).sort());
   assert.deepEqual(doc.nations['076'], [40, 0, []]);
   for (const [id, [strength, pool, squad]] of Object.entries(doc.nations)) {
     assert.ok(Number.isInteger(strength) && strength >= 1 && strength <= 99, id);
@@ -416,7 +418,7 @@ test('a database that rates a player of Tonga, Samoa or the Cook Islands lists a
   const { doc, audit } = build(db);
   assert.deepEqual(doc.nations['776'][2].map(t => [t[1], t[5]]), [['Sione Fixturefake', 'Tonga']]);
   assert.deepEqual([doc.nations['882'], doc.nations['184']], [[40, 0, []], [40, 0, []]]);
-  assert.deepEqual(Object.keys(doc.nations).sort(), Object.keys(NATIONS).sort());
+  assert.deepEqual(Object.keys(doc.nations).sort(), Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id)).sort());
   assert.ok(!Object.hasOwn(audit.noTeam, 'Tonga'), 'CM\'s Tonga is the game\'s now');
 });
 
@@ -538,8 +540,8 @@ test('every set the builder writes loads in the game (decodeFootballSet)', () =>
     assert.equal(decoded.meta.version, doc.version);
     assert.deepEqual(Object.keys(decoded.rosters).sort(), Object.keys(NATIONS).sort());
     assert.deepEqual(decoded.clubs.map(c => c.id), doc.clubs.map(c => c.id));
-    // No fixture database rates an islander: the islands field no team.
-    assert.deepEqual(decoded.territory, { merged: doc.territory.merged, inactive: [...doc.territory.inactive, ...PACIFIC_ISLANDS] });
+    // No fixture database rates an islander or an East German: the islands field no team, nor does East Germany.
+    assert.deepEqual(decoded.territory, { merged: doc.territory.merged, inactive: [...doc.territory.inactive, ...PACIFIC_ISLANDS, ...HISTORIC_NATIONS] });
   }
   assert.deepEqual([sets[2].doc.label, sets[2].doc.source.version, sets[2].doc.source.provider], ['CM 01/02 · Padded', 'Padded', 'CM 01/02 Update Team']);
   assert.equal(sets[3].doc.year, 2100);

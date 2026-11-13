@@ -9,7 +9,7 @@
 // bound to the season. The built-in data (src/data/rosters.js, clubs.football.js, the basketball and baseball modules)
 // never changes.
 
-import { DEPENDENCIES, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS, fieldsRealSide } from '../data/teams.js';
+import { DEPENDENCIES, HISTORIC_NATIONS, HISTORIC_THROUGH, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS, fieldsRealSide } from '../data/teams.js';
 import { namesOfTheDay } from '../data/namesOfTheDay.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
@@ -103,6 +103,9 @@ const SET_KINDS = Object.freeze({
   // `wc-<season end year>`: a World Cup season no game rated, its finalists' squads computed from the nations' Elo and
   // the players' records (source.conversion), nations only.
   wc: { prefix: 'wc-', id: /^wc-\d{4}$/, sport: 'football', nationsOnly: /^wc-/ },
+  // `nt-<season end year>`: a season between two computed World Cups, every nation whose Wikidata records name eleven
+  // players of it, rated from its Elo and their caps (source.conversion), nations only.
+  nt: { prefix: 'nt-', id: /^nt-\d{4}$/, sport: 'football', nationsOnly: /^nt-/ },
   // `swos-<season>`: a Sensible World of Soccer edition (SWOS 96/97 → `swos-9697`): its national squads, and its clubs
   // where the edition's own team files give them (SWOS 96/97 is nations only).
   swos: { prefix: 'swos-', id: /^swos-\d{4}$/, sport: 'football', nationsOnly: /^swos-9697$/ },
@@ -149,6 +152,9 @@ const beforeHomeNations = nations => HOME_NATIONS.every(id => !Object.hasOwn(nat
 // Nor does a set built before the map had Tonga, Samoa and the Cook Islands list them: they field no team, and their
 // land stays neutral, as on the map the set was built for (no source it was built from rated their players).
 const beforePacificIslands = nations => PACIFIC_ISLANDS.every(id => !Object.hasOwn(nations, id));
+// A nation of the map's earlier years (East Germany) is listed only by a season whose source rates its players: unlisted,
+// it fields no team (and has no shape on today's map).
+const unlistedHistoric = nations => HISTORIC_NATIONS.filter(id => !Object.hasOwn(nations, id));
 
 // ---------- index ----------
 
@@ -352,9 +358,10 @@ export function decodeFootballSet(data, id = data?.id) {
       territory: { merged: { ...territory.merged }, inactive: [...territory.inactive] },
     };
   }
-  // A computed World Cup season lists only its finalists, each with its XI as the built-in rosters hold players: every
-  // other nation fields no team, and its land stays neutral. Its identities stay in `meta`.
-  if (setKindOf(data.id) === 'wc') {
+  // A computed World Cup season lists only its finalists, and a computed national-team season the nations its Wikidata
+  // records field, each with its XI as the built-in rosters hold players: every other nation fields no team, and its
+  // land stays neutral. Its identities stay in `meta`.
+  if (setKindOf(data.id) === 'wc' || setKindOf(data.id) === 'nt') {
     const { nations, clubs, territory, ...meta } = data;
     const record = source => ({ ...source, ...(source.awards ? { awards: [...source.awards] } : {}),
       ...(source.ballonDor ? { ballonDor: { ...source.ballonDor } } : {}) });
@@ -395,7 +402,8 @@ export function decodeFootballSet(data, id = data?.id) {
     })),
     clubs: clubs.map(club => ({ ...club, squad: club.squad.map(expand) })),
     territory: { merged: { ...territory.merged, ...(englandHolds ? Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])) : {}) },
-      inactive: [...territory.inactive, ...(beforePacificIslands(nations) ? PACIFIC_ISLANDS : [])] },
+      inactive: [...territory.inactive, ...(beforePacificIslands(nations) ? PACIFIC_ISLANDS : []),
+        ...unlistedHistoric(nations).filter(id => !territory.inactive.includes(id))] },
   };
 }
 
@@ -481,6 +489,8 @@ KINDS.wc = { size: 4,
     ? 'source must name the edition, the day its Elo is of, when it was read, how the ratings were computed and their licence'
     : src.method !== 'computed' || src.computed !== true ? 'source must say the ratings are computed (method "computed")'
       : src.rawScale !== 'Elo' ? 'source rawScale must be "Elo"' : '') };
+// A computed national-team season: the same shape and source rule as a computed World Cup season's.
+KINDS.nt = KINDS.wc;
 // Nations and clubs, each player `[name, position, rating]`. A season no edition rated says how its ratings were made
 // (source.method 'computed' from the NHL's statistics, or 'converted' from an edition's attributes) and the rule
 // (source.conversion).
@@ -536,7 +546,7 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "tennis-<yyyy>" or "wta-<yyyy>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "tennis-<yyyy>" or "wta-<yyyy>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
@@ -564,6 +574,7 @@ function validateFootballSet(data, id) {
   if (setKindOf(id) === 'show') return validateBaseballSeason(data, id, fail);
   if (setKindOf(id) === 'elo' || setKindOf(id) === 'wta') return validateTennisSeason(data, id, fail);
   if (setKindOf(id) === 'wc') return validateWorldCupSeason(data, id, fail);
+  if (setKindOf(id) === 'nt') return validateNationalTeamSeason(data, id, fail);
   if (setKindOf(id) === 'nhl') return validateNationsAndClubsOnMap(data, id, fail, { sport: hockey, clubId: NHL_CLUB_ID,
     positions: new Set(Object.keys(hockey.formation)), clubLeast: 12, noun: 'an NHL season', clubsOnlyNoun: 'an NHL season before 1977/78' });
   if (setKindOf(id) === 'nrl') return validateClubsOnMap(data, id, fail, { sport: rugbyLeague, clubId: NRL_CLUB_ID,
@@ -608,7 +619,7 @@ function validateFootballSet(data, id) {
   if (unknown.length) fail(`nations has unknown ids ${unknown.slice(0, 5).join(', ')}`);
   const older = beforeHomeNations(nations), islandless = beforePacificIslands(nations);
   const missing = women ? [] : Object.keys(NATIONS).filter(key => !Object.hasOwn(nations, key) && !(older && HOME_NATIONS.includes(key))
-    && !(islandless && PACIFIC_ISLANDS.includes(key)));
+    && !(islandless && PACIFIC_ISLANDS.includes(key)) && !HISTORIC_NATIONS.includes(key));
   if (missing.length) fail(`nations must list all ${Object.keys(NATIONS).length} nations; missing ${missing.slice(0, 5).join(', ')}`);
   for (const [key, entry] of Object.entries(nations)) {
     const at = `nations[${key}]`;
@@ -618,6 +629,10 @@ function validateFootballSet(data, id) {
     players(at, list);
     if (!Number.isInteger(pool) || pool < list.length) fail(`${at} poolSize must be an integer of at least its ${list.length} players`);
     if (women && !list.length) fail(`${at} has no players: a nation with none is inactive, not listed`);
+    // A nation the map has only in earlier years (East Germany) plays only in a season of its years.
+    if (HISTORIC_NATIONS.includes(key) && list.length && !(data.year <= HISTORIC_THROUGH[key])) {
+      fail(`${at} has players, but ${NATIONS[key][0]} is on the map only up to ${HISTORIC_THROUGH[key]}`);
+    }
   }
 
   // League names are the built-in ones, so a club reads the same in every data set.
@@ -658,7 +673,8 @@ function validateFootballSet(data, id) {
   }
   // In a women's season a nation fields a team exactly when it is listed: the others' land stays neutral.
   if (women) {
-    const fielded = Object.keys(NATIONS).filter(key => !inactive.has(key) && !Object.hasOwn(territory.merged, key));
+    const fielded = Object.keys(NATIONS).filter(key => !inactive.has(key) && !Object.hasOwn(territory.merged, key)
+      && (Object.hasOwn(nations, key) || !HISTORIC_NATIONS.includes(key)));
     const unlisted = fielded.filter(key => !Object.hasOwn(nations, key)), idle = Object.keys(nations).filter(key => !fielded.includes(key));
     if (unlisted.length) fail(`territory leaves ${unlisted.slice(0, 5).join(', ')} active with no players`);
     if (idle.length) fail(`territory makes listed nations ${idle.slice(0, 5).join(', ')} inactive or merged`);
@@ -808,7 +824,8 @@ function validateTennisSeason(data, id, fail) {
     }
     if (Object.hasOwn(nations, shape)) fail(`territory.merged ${shape} fields a team of its own`);
   }
-  const inactive = Object.keys(NATIONS).filter(key => !Object.hasOwn(territory.merged, key) && !Object.hasOwn(nations, key));
+  // East Germany (HISTORIC_NATIONS) never played the Davis Cup or the Fed Cup: no tennis season lists it.
+  const inactive = Object.keys(NATIONS).filter(key => !HISTORIC_NATIONS.includes(key) && !Object.hasOwn(territory.merged, key) && !Object.hasOwn(nations, key));
   if (JSON.stringify(territory.inactive) !== JSON.stringify(inactive)) fail('territory.inactive must be every nation the season neither lists nor merges');
 }
 
@@ -860,6 +877,16 @@ function validateWorldCupSeason(data, id, fail) {
       ids.add(source.id);
     });
   }
+  validateFieldedTerritory(data, nations, fail);
+}
+
+/**
+ * The territory of a season that lists only the nations fielding a team (a computed World Cup or national-team
+ * season): every shape it neither lists nor merges is inactive, and a federation of the day holds its members' shapes
+ * only where it fields a team (the Soviet Union in 1969/70).
+ */
+function validateFieldedTerritory(data, nations, fail) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
   const territory = data.territory;
   if (!isObject(territory) || !isObject(territory.merged) || !Array.isArray(territory.inactive)) {
     fail('territory must be { merged: { shape: holder }, inactive: [shape] }');
@@ -871,12 +898,76 @@ function validateWorldCupSeason(data, id, fail) {
     if (Object.hasOwn(nations, shape)) fail(`territory.inactive ${shape} fields a team of its own`);
     inactive.add(shape);
   }
-  // A federation of the day holds its members' shapes only where it fields a team (the Soviet Union in 1969/70).
   for (const [shape, holder] of Object.entries(territory.merged)) {
     if (!Object.hasOwn(NATIONS, shape) || shape === holder || !Object.hasOwn(nations, holder)) fail(`territory.merged ${shape} names no nation of this season as its holder`);
     if (Object.hasOwn(nations, shape)) fail(`territory.merged ${shape} fields a team of its own`);
     if (inactive.has(shape)) fail(`territory ${shape} is both merged and inactive`);
   }
+}
+
+// A computed national-team player's id: his Wikidata item.
+const WIKIDATA_PLAYER_ID = /^wd:Q[1-9]\d*$/;
+// His listed position: the role he fills, then his other positions, each once ('MF/FW').
+const NATIONAL_TEAM_POSITION = /^(GK|DF|MF|FW)(?:\/(GK|DF|MF|FW))*$/;
+// His link: his English Wikipedia article, else his Wikidata item.
+const NATIONAL_TEAM_URL = /^https:\/\/(?:en\.wikipedia\.org\/wiki\/\S+|www\.wikidata\.org\/wiki\/Q[1-9]\d*)$/;
+
+/**
+ * A computed national-team season: the nations whose Wikidata records field a team, each with its eleven strongest
+ * first, as `[name, position, rating, source]` (the position 'GK', 'DF', 'MF' or 'FW', then any other positions of his,
+ * 'MF/FW'), `source` naming the player (`wd:<Wikidata item>`), his team, its Elo, his place in the XI and the stint
+ * that covers the season (from, to, and his caps and goals where Wikidata gives them); no clubs; and its territory,
+ * whose holders field teams. Every nation it does not list fields no team.
+ */
+function validateNationalTeamSeason(data, id, fail) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
+  const text = v => typeof v === 'string' && v.trim().length > 0;
+  const count = v => Number.isInteger(v) && v >= 0;
+  const nations = data.nations;
+  if (!isObject(nations)) fail('nations is missing');
+  if (!Array.isArray(data.clubs) || data.clubs.length) fail('a national-team season has nations only');
+  if (Object.keys(nations).length < 2) fail('a national-team season needs at least two nations');
+  const ids = new Set();
+  for (const [key, entry] of Object.entries(nations)) {
+    const at = `nations[${key}]`;
+    if (!Object.hasOwn(NATIONS, key)) fail(`${at} is not a nation id`);
+    if (!Array.isArray(entry) || entry.length !== 3) fail(`${at} must be [strength, squad size, eleven]`);
+    const [str, size, eleven] = entry;
+    if (typeof str !== 'number' || !(str >= 1 && str <= 99)) fail(`${at} strength must be a rating 1-99`);
+    if (!Array.isArray(eleven) || eleven.length !== 11) fail(`${at} must name its eleven`);
+    if (!Number.isInteger(size) || size < eleven.length) fail(`${at} squad of ${size} cannot hold its ${eleven.length}`);
+    // A nation the map has only in earlier years (East Germany) plays only in a season of its years.
+    if (HISTORIC_NATIONS.includes(key) && !(data.year <= HISTORIC_THROUGH[key])) fail(`${at} has players, but ${NATIONS[key][0]} is on the map only up to ${HISTORIC_THROUGH[key]}`);
+    const names = new Set();
+    eleven.forEach((player, j) => {
+      const where = `${at}[${j}]`;
+      if (!Array.isArray(player) || player.length !== KINDS.nt.size) fail(`${where} is not [name, position, rating, source]`);
+      const [name, position, rating, source] = player;
+      if (!text(name) || name !== name.trim() || names.has(name)) fail(`${where} has no name, or repeats one`);
+      names.add(name);
+      const roles = typeof position === 'string' && NATIONAL_TEAM_POSITION.test(position) ? position.split('/') : [];
+      if (!roles.length || new Set(roles).size !== roles.length) fail(`${where} position ${JSON.stringify(position)} must be GK, DF, MF or FW, then any others once`);
+      if (!Number.isInteger(rating) || rating < 1 || rating > 99) fail(`${where} rating must be a whole number 1-99`);
+      if (j && rating > eleven[j - 1][2]) fail(`${at} must run strongest first`);
+      if (!isObject(source) || source.source !== 'wikidata' || typeof source.id !== 'string' || !WIKIDATA_PLAYER_ID.test(source.id)
+        || !text(source.edition) || source.snapshotDate !== data.source.snapshotDate || !text(source.team) || typeof source.teamElo !== 'number'
+        || source.xiRank !== j + 1 || !Number.isInteger(source.from) || !Number.isInteger(source.to) || source.from > source.to
+        || source.from > data.year || source.to < data.year - 1) {
+        fail(`${where} source must name the player, his team, its Elo, his place in the XI and a stint covering the season`);
+      }
+      if ([source.caps, source.goals].some(value => value !== undefined && !count(value))) fail(`${where} caps and goals must be counts`);
+      if (source.toEstimated !== undefined && source.toEstimated !== true) fail(`${where} toEstimated must be true or absent`);
+      if (typeof source.url !== 'string' || !NATIONAL_TEAM_URL.test(source.url)) fail(`${where} source url must be his Wikipedia article or Wikidata item`);
+      if (source.ballonDor !== undefined && (!isObject(source.ballonDor) || !Object.entries(source.ballonDor)
+        .every(([year, points]) => [data.year - 1, data.year].includes(Number(year)) && typeof points === 'number' && points > 0))) {
+        fail(`${where} Ballon d'Or points must be the season's two years'`);
+      }
+      if (source.dateOfBirth !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(source.dateOfBirth)) fail(`${where} date of birth ${JSON.stringify(source.dateOfBirth)} is not YYYY-MM-DD`);
+      if (ids.has(source.id)) fail(`${where} repeats player ${source.id}`);
+      ids.add(source.id);
+    });
+  }
+  validateFieldedTerritory(data, nations, fail);
 }
 
 // The built-in NHL clubs' `nhl-<slug>` ids, with the same guard against Object.prototype names.
@@ -1103,7 +1194,8 @@ export function seasonSport(set) {
       : setKindOf(meta.id) === 'nrl' ? { ...rugbyLeague, clubs, clubMap: meta.map, ...identity }
       // A women's season's unlisted nations are inactive, so nothing reads their strength in play.
       : setKindOf(meta.id) === 'eaw' ? { ...womensFootball, rosters, clubs, territory, fallbackStrength: () => EMPTY_STRENGTH, ...identity }
-      // Every other football season, a computed World Cup one ('wc') too, whose unlisted nations field no team.
+      // Every other football season, a computed World Cup or national-team one ('wc', 'nt') too, whose unlisted nations field
+      // no team.
       : { ...football, rosters, clubs, territory,
         // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
         fallbackStrength: () => EMPTY_STRENGTH, ...identity };
@@ -1143,8 +1235,10 @@ export function fieldedNations(sport) {
   const cacheable = !!sport && typeof sport === 'object';
   if (cacheable && fieldedCache.has(sport)) return fieldedCache.get(sport);
   const { merged, inactive } = sport?.territory || NO_TERRITORY;
+  // A nation the map has only in earlier years (East Germany) plays only in a season of those years, whose map draws it.
+  const onMap = id => !HISTORIC_NATIONS.includes(id) || (Number.isInteger(sport?.dataYear) && sport.dataYear <= HISTORIC_THROUGH[id]);
   const fielded = Object.freeze(Object.keys(NATIONS)
-    .filter(id => !Object.hasOwn(merged, id) && !inactive.includes(id) && fieldsRealSide(id, sport)));
+    .filter(id => onMap(id) && !Object.hasOwn(merged, id) && !inactive.includes(id) && fieldsRealSide(id, sport)));
   if (cacheable) fieldedCache.set(sport, fielded);
   return fielded;
 }

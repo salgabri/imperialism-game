@@ -5,7 +5,7 @@
 // and tests build seasons from invented records. Every rating is the database's current ability, converted as a CM
 // 01/02 database's is; a player it does not rate (ability 0) is left out, never guessed. Potential and the attributes
 // are not read, so the extraction's null ones change nothing. See docs/design/football-years.md.
-import { NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
+import { NATIONS, HISTORIC_NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
 import { CM_SCALE, cmNaturalPositions, cmTupleOf, expandCmTuple } from '../../src/data/cmPlayers.js';
 import { CM0102_NATIONS } from '../../src/data/cm0102Nations.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
@@ -125,6 +125,8 @@ export function buildCm9798Season({ players, teams }, { source, year, federation
   const islands = PACIFIC_ISLANDS.some(id => pools.get(id)?.length);
   for (const [id, rec] of Object.entries(NATIONS)) {
     if (!islands && PACIFIC_ISLANDS.includes(id)) continue;
+    // A nation of the map's earlier years (East Germany) is listed only with players of its own.
+    if (HISTORIC_NATIONS.includes(id) && !pools.get(id)?.length) continue;
     const pool = pools.get(id) || [];
     const squad = pickFootballSquad(pool);
     const lineup = selectLineup({ sport: 'football', squad });

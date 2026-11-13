@@ -57,8 +57,11 @@ export function syntheticTeam(sport, rating = 75, id = 'A') {
 }
 
 export function regulationScore(sport, result) {
-  // Ice hockey's shoot-out and rugby league's golden point add to the final score, not to regulation's.
-  if (sport.id === 'hockey' || sport.id === 'rugby-league') return [result.regA, result.regD];
+  // Ice hockey's shoot-out, rugby league's golden point and football's extra time add to the final score, not to
+  // regulation's.
+  if (sport.id === 'hockey' || sport.id === 'rugby-league' || sport.id === 'football' || sport.id === 'womens-football') {
+    return [result.regA, result.regD];
+  }
   if (sport.id !== 'basketball' || !result.tie) return [result.ga, result.gd];
   return [result.ga - result.tie.periods.reduce((sum, pair) => sum + pair[0], 0),
     result.gd - result.tie.periods.reduce((sum, pair) => sum + pair[1], 0)];

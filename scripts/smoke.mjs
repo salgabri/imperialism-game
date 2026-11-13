@@ -607,7 +607,8 @@ if (!filtered && fixedChecks) {
 if (!filtered && fixedChecks) {
   const { WorldGeometry } = await import('../src/engine/geo.js');
   const { CAPITALS } = await import('../src/data/capitals.js');
-  const { NATIONS, DEPENDENCIES } = await import('../src/data/teams.js');
+  const { NATIONS, DEPENDENCIES, HISTORIC_NATIONS, HISTORIC_THROUGH } = await import('../src/data/teams.js');
+  const { atlasOfYear } = await import('../src/engine/historicMap.js');
   console.log('\n  Capitals and dependencies');
   try {
     const topo = JSON.parse(await readFile(path.join(root, 'public', 'world-110m.v1.json'), 'utf8'));
@@ -637,8 +638,13 @@ if (!filtered && fixedChecks) {
     const displayGeo = new WorldGeometry(atlas, CAPITALS);
     const { s, tx, ty } = geo.fit;
     const displayPaths = displayGeo.buildPaths(s, tx, ty);
-    const missingDisplay = ids.filter(id => !displayPaths[id]);
+    // A nation of the map's earlier years (East Germany, South Vietnam) is drawn on the map of its years only.
+    const missingDisplay = ids.filter(id => !HISTORIC_NATIONS.includes(id) && !displayPaths[id]);
     check('detailed atlas contains every playable nation', missingDisplay.length === 0, missingDisplay.join(', '));
+    const misdrawnHistoric = HISTORIC_NATIONS.filter(id => displayPaths[id]
+      || !new WorldGeometry(atlasOfYear(atlas, HISTORIC_THROUGH[id]), CAPITALS).buildPaths(s, tx, ty)[id]);
+    check('the detailed atlas draws East Germany and South Vietnam on the map of their years only', misdrawnHistoric.length === 0,
+      misdrawnHistoric.join(', '));
     check('detailed atlas identifies Kosovo by name', displayGeo.countries.some(country => country.id === 'KOS' && country.name === 'Kosovo'));
   } catch (e) {
     failures++;
@@ -929,7 +935,7 @@ for (const scenario of managerScenarios) {
     // The seed keeps Italy in charge into the second cycle (target choices with two and three options, three signings)
     // before it falls, so every check below has something to verify, Continue as spectator included. It depends on the
     // squads and on the approach Continue plays (the recommended one): the 2026/27 rosters needed a new one.
-    const r = await mod.runManagerCampaign({ ...scenario, seed: 20261108 + MANAGER_SCENARIOS.indexOf(scenario) });
+    const r = await mod.runManagerCampaign({ ...scenario, seed: Number(process.env.TEMP_MANAGER_SEED) || 20261108 + MANAGER_SCENARIOS.indexOf(scenario) });
     console.log(
       `    ${r.fielded} nations · ${r.roundRobin.cycles} cycles · ${r.turns} turns · ${r.matches} matches · champion ${r.champion} · ` +
       `${r.teamName} ${r.eliminated ? `out in round ${r.eliminated.round} (placed ${r.eliminated.placement} of ${r.fielded}, by ${r.eliminated.by})` : 'won the campaign'}`,
