@@ -2276,8 +2276,9 @@ on (`src/data/flagsOfTheDay.js`); a state of another name plays under it
 (`src/data/namesOfTheDay.js`: the Soviet Union, Czechoslovakia, Yugoslavia, West
 Germany, Rhodesia, Zaire, FR Yugoslavia). Today's flags are flag-icons', except
 Honduras's: navy blue again since 27 January 2026 (its turquoise flag flies only in
-the seasons of 2022 to 2025). The flags of the day are Wikimedia Commons SVGs, most
-in the public domain, a few (Spain's and Bulgaria's arms) CC BY-SA and credited in
+the seasons of 2022 to 2025). The flags of the day are Wikimedia Commons drawings,
+most in the public domain, six (Spain's and Bulgaria's arms, Rhodesia's flag of 1964)
+CC BY-SA and credited in
 `public/flags/SOURCES-historic.tsv`; a drawing bigger than 40 KB ships as a 640×480
 WebP inside its SVG.
 
