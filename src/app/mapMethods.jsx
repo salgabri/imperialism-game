@@ -9,7 +9,7 @@ import { V4 } from '../theme.js';
 import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { FLAG_CODES, flagUrl } from '../data/flags.js';
 import { FLAG_SYMBOLS } from '../data/flagSymbols.js';
-import { clubLogoUrl } from '../data/clubLogos.js';
+import { crestUrl } from '../data/crests.js';
 import { regionClips } from '../engine/flagClips.js';
 import { flagRegionIndexSteps } from '../engine/flagRegions.js';
 import { layoutFlagSymbol } from '../engine/flagSymbolLayout.js';
@@ -25,8 +25,8 @@ const NONE = Object.freeze([]);
  */
 const CREST_PROFILE = Object.freeze({ id: 'club-crest', sourceWidth: 640, sourceHeight: 480,
   bounds: Object.freeze({ x: 190, y: 110, w: 260, h: 260 }) });
-/** A team's crest URL when it is a club with one. */
-const crestOf = team => (team?.kind === 'club' ? clubLogoUrl(team.id) : null);
+/** A team's crest URL when it is a club with one in season year `year` (null: today's; src/data/crests.js). */
+const crestOf = (team, year) => (team?.kind === 'club' ? crestUrl(team.id, year) : null);
 const NO_IDENTITY = Object.freeze({ meId: null, meFill: false, opponentId: null });
 const NO_CLAIMS = Object.freeze({});
 // mapFlags' empty value: one object (never written to), so the memoised country rows keep their identity.
@@ -185,10 +185,10 @@ function flagIndex(app) {
 }
 
 /** What each owner flies on the campaign map (layoutBanners' `markOf`). */
-const campaignMarks = (teams, playing) => ownerId => {
+const campaignMarks = (teams, playing, year = null) => ownerId => {
   const owner = playing ? teams[ownerId] : null;
   // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
-  return { crestUrl: crestOf(owner), color: owner?.col || V4.flagBg,
+  return { crestUrl: crestOf(owner, year), color: owner?.col || V4.flagBg,
     nationId: playing ? owner?.flagId : NATIONS[ownerId] ? ownerId : DEPENDENCIES[ownerId]?.of };
 };
 
@@ -199,14 +199,16 @@ const campaignMarks = (teams, playing) => ownerId => {
 export function mapFlags(playing, mapMode = this.state.mapMode) {
   const { teams } = this.state;
   if (mapMode !== 'flags') return NO_FLAGS;
-  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team))) return NO_FLAGS;
+  // Clubs wear the crests of the campaign's season.
+  const year = playing ? this.state.settings?.dataYear ?? null : null;
+  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team, year))) return NO_FLAGS;
   if (!flagIndex(this)) return NO_FLAGS;
   // While signing, the projected board: the taken land already flies the winner's banner (DEC D15). Claimed nations fly
   // their holder's banner too (paintedOwnership).
   const components = this.flagComponents.components(playing ? paintedOwnership(this, mapSnapshot(this)) : this.setupFlagOwnership);
   const cached = this.flagLayoutCache;
   if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
-  const result = layoutBanners(components, campaignMarks(teams, playing));
+  const result = layoutBanners(components, campaignMarks(teams, playing, year));
   this.flagLayoutCache = { components, teams, playing, result };
   return result;
 }
@@ -234,7 +236,7 @@ function warmupWanted(app) {
  */
 function* flagWarmupSteps(app) {
   const source = app.flagRegionSource;
-  if (!Object.values(app.state.teams || {}).some(team => team.flagId || crestOf(team))) return;
+  if (!Object.values(app.state.teams || {}).some(team => team.flagId || crestOf(team, app.state.settings?.dataYear ?? null))) return;
   if (!app.flagComponents) {
     // Kept on the app, so a click on Flags meanwhile finishes this build (flagIndex) instead of starting it over.
     const build = app.flagIndexBuild = { source, steps: flagRegionIndexSteps(source.geometry, { maxGap: source.maxGap }) };
@@ -249,7 +251,7 @@ function* flagWarmupSteps(app) {
   const components = app.flagComponents.components(paintedOwnership(app, mapSnapshot(app)));
   yield;
   // One region a step: its emblem layout and clip paths are kept per region, so the banners below find them made.
-  const marks = campaignMarks(app.state.teams, true);
+  const marks = campaignMarks(app.state.teams, true, app.state.settings?.dataYear ?? null);
   for (const component of components) { layoutBanners([component], marks); yield; }
   app.mapFlags(true, 'flags');
 }
@@ -305,14 +307,15 @@ export function setupMapFlags(setup = this.state.setup) {
   if (!this.geo || !this.flagRegionSource) return null;
   if (!this.setupMapPreview(setup) && !this.domesticStatus(setup).preview) return null;
   this.setupTeams(setup);
-  const { opening, marks } = this.setupTeamsCache;
+  // Clubs wear the crests of the chosen season (`year`, cached with the marks it goes with).
+  const { opening, marks, year = null } = this.setupTeamsCache;
   const index = flagIndex(this);
   const cached = this.setupFlagCache;
   if (cached?.index === index && cached.opening === opening && cached.marks === marks) return cached.result;
   const result = layoutBanners(index.components(opening), ownerId => {
     const team = marks[ownerId];
     if (!team) return null;
-    return team.kind === 'club' ? { crestUrl: clubLogoUrl(ownerId), color: team.col || V4.flagBg }
+    return team.kind === 'club' ? { crestUrl: crestUrl(ownerId, year), color: team.col || V4.flagBg }
       : { nationId: team.flagId, color: team.col || V4.flagBg };
   }, { idPrefix: SETUP_FLAG_PREFIX });
   const fills = new Map();

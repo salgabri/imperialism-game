@@ -5,6 +5,7 @@
 //
 // Squads come from the sport registry (src/sports), which supplies the roster
 // data, lineup shape and match model. This file holds nation identity only.
+import { flagOfTheDay } from './flagsOfTheDay.js';
 
 
 // Map shapes that field no team of their own but belong to a nation that does.
@@ -30,13 +31,17 @@ export const GREAT_BRITAIN = Object.freeze({ name: 'Great Britain', code: 'GBR',
 
 /**
  * A nation's name, code and flag id in `sport` (a sport object; none for the nation's own): what the sport plays it
- * as (`sport.playsAs`), else its NATIONS entry and its own flag → { name, code, flagId }, or null for no nation.
+ * as (`sport.playsAs`: Great Britain, a season's names of the day), else its NATIONS entry → { name, code, flagId }, or
+ * null for no nation. A team under its own shape's flag flies the one that shape flew in the season's year
+ * (`sport.dataYear`, src/data/flagsOfTheDay.js: Spain under its eagle of 1977); a federation of the day (the Soviet
+ * Union) and Great Britain keep their own.
  */
 export function nationIdentity(id, sport) {
   const rec = NATIONS[id];
   if (!rec) return null;
   const as = sport?.playsAs?.[id];
-  return { name: as?.name ?? rec[0], code: as?.code ?? rec[1], flagId: as?.flagId ?? id };
+  const flagId = (as?.flagId ?? id) === id ? flagOfTheDay(id, sport?.dataYear) ?? id : as.flagId;
+  return { name: as?.name ?? rec[0], code: as?.code ?? rec[1], flagId };
 }
 
 // Tonga, Samoa and the Cook Islands: the 110m map has none of them, so scripts/build-home-nations.mjs adds the 50m

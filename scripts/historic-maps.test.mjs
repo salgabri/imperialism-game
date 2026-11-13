@@ -110,7 +110,7 @@ test('a setup or campaign plays the map of its season\'s year: today\'s for the 
   }
 });
 
-test('the names of the day: tennis\'s federations, FR Yugoslavia, Swaziland and Macedonia, each sourced', () => {
+test('the names of the day: tennis\'s federations, FR Yugoslavia, Swaziland, Macedonia, Zaire and Rhodesia, each sourced', () => {
   for (const entry of NAMES_OF_THE_DAY) {
     assert.ok(NATIONS[entry.shape], entry.name);
     assert.match(entry.code, /^[A-Z]{3}$/);
@@ -119,8 +119,14 @@ test('the names of the day: tennis\'s federations, FR Yugoslavia, Swaziland and 
   }
   const named = (sport, year) => Object.fromEntries(Object.entries(namesOfTheDay(sport, year)).map(([shape, identity]) => [shape, identity.name]));
   assert.deepEqual(named('tennis', 1985), { 203: 'Czechoslovakia', 643: 'Soviet Union', 688: 'Yugoslavia', 276: 'West Germany', 748: 'Swaziland',
-    807: 'Macedonia' });
-  assert.deepEqual(named('tennis', 1992), { 203: 'Czechoslovakia', 643: 'CIS', 688: 'FR Yugoslavia', 748: 'Swaziland', 807: 'Macedonia' });
+    807: 'Macedonia', 180: 'Zaire' });
+  assert.deepEqual(named('tennis', 1992), { 203: 'Czechoslovakia', 643: 'CIS', 688: 'FR Yugoslavia', 748: 'Swaziland', 807: 'Macedonia',
+    180: 'Zaire' });
+  // A state of another name, in every sport (src/data/flagsOfTheDay.js gives it the flag of the day).
+  assert.equal(named('football', 1978)[716], 'Rhodesia');
+  assert.equal(named('tennis', 1979)[716], 'Zimbabwe Rhodesia');
+  assert.equal(named('tennis', 1980)[716], undefined, '1980: Zimbabwe');
+  assert.equal(named('football', 1997)[180], undefined, '1997: DR Congo');
   assert.deepEqual(named('football', 2005), { 688: 'Serbia and Montenegro', 748: 'Swaziland', 807: 'Macedonia' });
   assert.deepEqual(named('football', 2019), {});
   assert.deepEqual(namesOfTheDay('tennis', null), {}, 'the built-in season plays today\'s names');

@@ -999,10 +999,10 @@ without a club stays empty. Homes are `scripts/data/nhl-teams.json`, each club's
 inside its territory; the shared states are split, Staten Island stays New York's; seeded duel
 campaigns reach a champion; the App launches on the map. The smoke runs an NHL duel.
 
-**Era maps** (2026-11-08, then 2026-11-09 for every season back to 1966/67): the same command draws
-31 maps of earlier seasons from `scripts/data/nhl-seasons.json` (clubs and arenas by season, [hockey.md](hockey.md#eras)),
-`nhl1967` to `nhl2025`. A map serves a run of seasons while the clubs and their names stay the same and each
-arena stays in its county (in a state or province no other club shares, its state) and within 15 km of the first
+**Era maps** (2026-11-08, then 2026-11-09 for every season back to 1966/67, and 2026-11-13 back to 1960/61): the same
+command draws 31 maps of earlier seasons from `scripts/data/nhl-seasons.json` (clubs and arenas by season,
+[hockey.md](hockey.md#eras)), `nhl1967` (the Original Six, 1960/61 to 1966/67) to `nhl2025`. A map serves a run of
+seasons while the clubs and their names stay the same and each arena stays in its county (in a state or province no other club shares, its state) and within 15 km of the first
 season's arena (`NHL_MOVE_KM`); it keeps the first season's arenas and places, and the builder throws when a season
 breaks the rule. The defunct Seals and Barons rank after today's 32 franchises. 2025/26 plays on `nhl` itself, and the
 builder checks its clubs and arenas are today's. Firsts: the 1979/80 Whalers hold central and western

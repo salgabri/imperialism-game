@@ -47,6 +47,16 @@ export const NAMES_OF_THE_DAY = Object.freeze([
     source: 'https://en.wikipedia.org/w/index.php?oldid=1380745431' },
   { shape: '807', name: 'Macedonia', code: 'MKD', flagId: '807', through: 2018,
     source: 'https://en.wikipedia.org/w/index.php?oldid=1380023340' },
+  // States of another name, in every sport, under their flags of the day (src/data/flagsOfTheDay.js, which a flag id of
+  // the shape's own reads): Zaire from 27 October 1971 to 17 May 1997, for the seasons whose files do not name it
+  // (football's from SWOS 94/95; football's to 1995/96 name it themselves); Rhodesia, then Zimbabwe Rhodesia from
+  // 1 June 1979, until Zimbabwe on 18 April 1980 (the Davis Cup's and the Fed Cup's teams of those years).
+  { shape: '180', name: 'Zaire', code: 'ZAI', flagId: 'ZAI', from: 1972, through: 1996,
+    source: 'https://en.wikipedia.org/w/index.php?oldid=1383080856' },
+  { shape: '716', name: 'Rhodesia', code: 'RHO', flagId: '716', through: 1978,
+    source: 'https://en.wikipedia.org/w/index.php?oldid=1384455084' },
+  { shape: '716', name: 'Zimbabwe Rhodesia', code: 'RHO', flagId: '716', from: 1979, through: 1979,
+    source: 'https://en.wikipedia.org/w/index.php?oldid=1381427191' },
 ].map(entry => Object.freeze(entry)));
 
 const inYears = (entry, year) => (entry.from ?? -Infinity) <= year && year <= (entry.through ?? Infinity);

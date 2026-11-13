@@ -140,9 +140,9 @@ export function sourceTitle(player) {
   const cm = info.source === 'cm0102';
   // Sensible World of Soccer rates a price step, not an ability (src/data/swosPlayers.js).
   const swos = info.source === 'swos';
-  // A computed World Cup player's date is his team's Elo's, the day after the final, not a database's
-  // (scripts/lib/world-cup-seasons.mjs).
-  const worldCup = info.source === 'world-cup';
+  // A computed World Cup player's date is his team's Elo's, the day after the final, and a computed national-team
+  // player's his team's Elo's on 1 July, not a database's (scripts/lib/world-cup-seasons.mjs, national-team-seasons.mjs).
+  const worldCup = info.source === 'world-cup' || info.source === 'wikidata';
   const name = info.source === 'ea-fc' ? 'EA FC' : cm ? 'CM 01/02' : swos ? 'SWOS' : 'Football Manager';
   const edition = String(info.edition || '');
   const label = edition ? (/^\d+$/.test(edition) ? `${name} ${edition}` : edition) : name;

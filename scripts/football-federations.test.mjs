@@ -314,7 +314,9 @@ test('the historic flags are vendored, and the Soviet, Yugoslav, Zairean and CIS
   }
   const manifest = JSON.parse(read('scripts/data/historic-flags.json'));
   for (const flag of manifest.flags) {
-    assert.match(flag.licence, /^Public domain/);
+    // Public domain, or (where Commons has no public-domain drawing: Spain's and Bulgaria's arms, Rhodesia's flag of 1964)
+    // CC BY-SA with its author, credited in public/flags/SOURCES-historic.tsv.
+    assert.match(flag.licence, /^(Public domain|CC BY-SA \d\.\d( \(or GFDL 1\.2 or later, at the reuser's choice\))?, by \S)/);
     assert.match(flag.commons.page, /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
     assert.ok(Number.isInteger(flag.commons.revision));
     assert.match(flag.sha256, /^[0-9a-f]{64}$/);

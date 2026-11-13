@@ -15,7 +15,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { attributionText, buildWorldCupSeason } from './lib/world-cup-seasons.mjs';
-import { committedSeasons, eaSeasonIds, footballSeasonsModule, retroSeasonIds } from './lib/football-seasons-listing.mjs';
+import { committedSeasons, eaSeasonIds, footballSeasonsModule, nationalTeamSeasonIds, retroSeasonIds } from './lib/football-seasons-listing.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -34,6 +34,7 @@ async function main() {
   const manifest = await read('scripts/data/world-cup-seasons.json');
   const ea = await read('scripts/data/ea-seasons.json');
   const retro = await read('scripts/data/retro-seasons.json');
+  const nationalTeams = await read('scripts/data/national-team-seasons.json');
   const results = [];
   for (const season of manifest.seasons) {
     const facts = await read(`scripts/data/world-cup-seasons/${season.id}.json`);
@@ -46,7 +47,8 @@ async function main() {
       + `${audit.dropped.length ? `; no team: ${audit.dropped.map(entry => entry.team).join(', ')}` : ''}`);
   }
   const listed = [...await committedSeasons(path.join(root, 'public/football'), eaSeasonIds(ea)),
-    ...await committedSeasons(path.join(root, 'public/football'), retroSeasonIds(retro)), ...results.map(result => result.doc)];
+    ...await committedSeasons(path.join(root, 'public/football'), retroSeasonIds(retro)), ...results.map(result => result.doc),
+    ...await committedSeasons(path.join(root, 'public/football'), nationalTeamSeasonIds(nationalTeams))];
   const crossCheck = await read('scripts/data/world-cup-seasons/elo-crosscheck.json');
   const audit = {
     generatedBy: 'scripts/build-world-cup-seasons.mjs', retrieved: manifest.retrieved, decided: manifest.decided,
@@ -56,7 +58,7 @@ async function main() {
   const outputs = new Map([
     ...results.map(({ doc, text }) => [path.join(root, 'public/football', `${doc.id}.json`), text]),
     [path.join(root, 'public/football/ATTRIBUTION-world-cup.txt'), attributionText(manifest, results.map(result => result.doc))],
-    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea, retro, worldCup: manifest })],
+    [path.join(root, 'src/data/footballSeasons.js'), footballSeasonsModule(listed, { ea, retro, worldCup: manifest, nationalTeams })],
     [path.join(root, 'docs/design/football-world-cup-seasons-audit.json'), `${JSON.stringify(audit, null, 2)}\n`],
   ]);
   if (args.check) {

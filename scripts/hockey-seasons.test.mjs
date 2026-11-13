@@ -57,7 +57,7 @@ const rescaledOf = id => AUDIT.seasons.find(season => season.id === id).rescaled
 // ---------- building ----------
 
 test('every season rebuilds byte for byte from its committed snapshot, and the built-in season is unchanged', () => {
-  assert.match(execFileSync(process.execPath, ['scripts/build-nhl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 59 hockey seasons/);
+  assert.match(execFileSync(process.execPath, ['scripts/build-nhl-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the 65 hockey seasons/);
   assert.match(execFileSync(process.execPath, ['scripts/build-hockey.mjs', '--check'], { cwd: root, encoding: 'utf8' }), /Verified the NHL clubs and the hockey nations/);
   assert.deepEqual(EDITIONS.map(season => season.id).sort(), IDS.slice().sort());
   for (const season of EDITIONS) {
@@ -421,7 +421,7 @@ test('hockey\'s Season choice lists its seasons; a season keeps Nations, and Clu
     assert.deepEqual(['nhl-2009', 'nhl-1994', 'nhl-1968'].map(id => model.season.options.find(option => option.id === id).name),
       ['2008/09 · converted', '1993/94', '1967/68 · computed']);
     assert.deepEqual(model.season.options.slice(1).map(option => option.label), BUILT_IN_HOCKEY_SEASONS.map(set => `${set.season} · ${set.label}`));
-    assert.equal(model.season.options.length, 60, 'the built-in season and every season from 1966/67 but 2004/05');
+    assert.equal(model.season.options.length, 66, 'the built-in season and every season from 1960/61 but 2004/05');
     app.pickSetup('dataSet', 'nhl-1994');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'nhl-1994'], 'a hockey season keeps its nations');
     app.pickSetup('layer', 'clubs');

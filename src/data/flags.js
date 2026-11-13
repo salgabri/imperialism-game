@@ -5,13 +5,15 @@
 // Scotland, Wales and Northern Ireland, and Kosovo has no ISO numeric code of its own.
 // Great Britain, the United Kingdom's team in the sports that play it as one, flies
 // the Union Jack under its own flag id ('GBR', GREAT_BRITAIN in src/data/teams.js).
-// A football season of another era flies the flags of its federations of the day
-// ('URS', 'CIS', 'YUG', 'FRY', 'ZAI'; a season's `identities`, src/data/footballFederations.js).
+// A season of another era flies the flags of its federations of the day ('URS', 'CIS', 'YUG', 'FRY', 'ZAI'; a
+// season's `identities`, src/data/namesOfTheDay.js) and each nation's flag of the day (src/data/flagsOfTheDay.js:
+// 'ESP-1945' and the like).
 //
 // Assets are vendored from the MIT-licensed `flag-icons` package; re-sync them
 // with `npm run sync-flags` after changing this map. The historic flags, which
-// flag-icons does not have, are public-domain Wikimedia Commons SVGs redrawn on its
-// 4:3 canvas by `npm run build:historic-flags` (scripts/data/historic-flags.json).
+// flag-icons does not have, are Wikimedia Commons SVGs (public domain, a few CC BY-SA)
+// redrawn on its 4:3 canvas by `npm run build:historic-flags` (scripts/data/historic-flags.json,
+// public/flags/SOURCES-historic.tsv).
 
 export const FLAG_CODES = {
   '100': 'bg',        // Bulgaria
@@ -61,7 +63,7 @@ export const FLAG_CODES = {
   '324': 'gn',        // Guinea
   '328': 'gy',        // Guyana
   '332': 'ht',        // Haiti
-  '340': 'hn',        // Honduras
+  '340': 'hn-1949',   // Honduras (navy blue: its flag since 27 January 2026, as before 2022)
   '348': 'hu',        // Hungary
   '352': 'is',        // Iceland
   '356': 'in',        // India
@@ -199,7 +201,47 @@ export const FLAG_CODES = {
   'FRY': 'yu-1992',   // FR Yugoslavia
   'ZAI': 'zr',        // Zaire
   'RVN': 'rvn',       // South Vietnam
-  'UAR': 'uar',       // United Arab Republic (Egypt)
+  'UAR': 'uar',       // United Arab Republic (Egypt); Syria's flag of 1980-2025 too
+  // Flags of the day (src/data/flagsOfTheDay.js; scripts/data/historic-flags.json):
+  'CAN-1957': 'ca-1957', // Canada, the Red Ensign (to 1965)
+  'USA-1959': 'us-1959', // United States, 49 stars (1959-60)
+  'BRA-1960': 'br-1960', // Brazil, 22 stars (1960-68)
+  'BRA-1968': 'br-1968', // Brazil, 23 stars (1968-92)
+  'MEX-1934': 'mx-1934', // Mexico, the arms of 1934 (to 1968)
+  'ESP-1945': 'es-1945', // Spain (1945-77)
+  'ESP-1977': 'es-1977', // Spain (1977-81)
+  'ROU-1952': 'ro-1952', // Romania (1952-65)
+  'ROU-1965': 'ro-1965', // Romania (1965-89)
+  'BUL-1948': 'bg-1948', // Bulgaria (1948-67)
+  'BUL-1967': 'bg-1967', // Bulgaria (1967-71)
+  'BUL-1971': 'bg-1971', // Bulgaria (1971-90)
+  'ALB-1946': 'al-1946', // Albania (1946-92)
+  'GRE-1863': 'gr-1863', // Greece, the land flag with the crown (to 1969)
+  'GRE-1822': 'gr-1822', // Greece, the land flag (1975-78)
+  'RSA-1928': 'za-1928', // South Africa (1928-94)
+  'RNY-1953': 'rn-1953', // Federation of Rhodesia and Nyasaland (1953-63)
+  'RHO-1964': 'rh-1964', // Rhodesia (1964-68)
+  'RHO-1968': 'rh-1968', // Rhodesia (1968-79)
+  'ZRH-1979': 'zw-1979', // Zimbabwe Rhodesia (1979)
+  'IRN-1933': 'ir-1933', // Iran, the lion and sun (1933-64)
+  'IRN-1964': 'ir-1964', // Iran, the lion and sun (1964-80)
+  'IRQ-1963': 'iq-1963', // Iraq (1963-91)
+  'IRQ-1991': 'iq-1991', // Iraq (1991-2004)
+  'IRQ-2004': 'iq-2004', // Iraq (2004-08)
+  'HAI-1964': 'ht-1964', // Haiti (1964-86)
+  'BLR-1991': 'by-1991', // Belarus (1991-95)
+  'GEO-1990': 'ge-1990', // Georgia (1990-2004)
+  'MKD-1992': 'mk-1992', // Macedonia (1992-95)
+  'RUS-1954': 'ru-1954', // Russian SFSR (1954-91)
+  'COD-1997': 'cd-1997', // DR Congo (1997-2006)
+  'CGO-1970': 'cg-1970', // People's Republic of the Congo (1970-91)
+  'BEN-1975': 'bj-1975', // People's Republic of Benin (1975-90)
+  'ETH-1991': 'et-1991', // Ethiopia (1991-96)
+  'LES-1987': 'ls-1987', // Lesotho (1987-2006)
+  'LBY-1977': 'ly-1977', // Libya (1977-2011)
+  'MYA-1974': 'mm-1974', // Burma (1974-2010)
+  'VEN-1930': 've-1930', // Venezuela, seven stars (to 2006)
+  'HON-2022': 'hn',      // Honduras, turquoise (2022-26: flag-icons' drawing)
 };
 
 /** URL of a nation's flag, or null for shapes without a mapped national flag. */

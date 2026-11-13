@@ -6,6 +6,9 @@
 // the emblem sits in the canton, evenly when it is centred), and a plain field becomes rectangles of the new size.
 // It also measures each emblem (src/data/flagSymbols.js bounds: the drawn extent, stroke and mitred tips included,
 // rounded outward with a one-unit margin) and checks the reviewed profiles against it.
+// The flags of the day (src/data/flagsOfTheDay.js: Spain's eagle, Canada's Red Ensign, Rhodesia's) need no recipe: each
+// is the original whole inside a 640 x 480 viewport (`fit`), drawn into a WebP bitmap when that passes 40 KB. Their
+// sources, licences and authors go to public/flags/SOURCES-historic.tsv.
 // Usage: node scripts/build-historic-flags.mjs [--check]
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -13,6 +16,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { JSDOM } from 'jsdom';
+import sharp from 'sharp';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
 
@@ -301,19 +305,123 @@ const RECIPES = {
   },
 };
 
+// ---- the flags of the day (src/data/flagsOfTheDay.js): the original whole, inside a 640 x 480 viewport ----
+
+// A flag is always its own document (an <img>, an <image>, or src/engine/flagRaster.js's blob), so its stylesheet,
+// classes and ids stay with it.
+const DROP_ELEMENTS = new Set(['metadata', 'title', 'desc', 'script', 'foreignObject']);
+const EDITOR_NAMESPACES = /^(sodipodi|inkscape|rdf|dc|cc|sketch|serif|i|x|graph|a)$/;
+// How the original's own aspect meets 4:3 (`fit` in scripts/data/historic-flags.json): 'slice' cuts evenly from both
+// sides (a centred emblem keeps its shape), 'slice-hoist' cuts at the fly (an emblem in the canton), 'stretch' scales
+// each axis on its own (bands, stars spread across the field, where cutting would lose part of the design).
+const FITS = { slice: 'xMidYMid slice', 'slice-hoist': 'xMinYMid slice', stretch: 'none' };
+
+/**
+ * The original's elements, cleaned of editor data, comments and anything active, nested in a viewport that fills the
+ * 640 x 480 canvas as `fit` says. Every id stays as it was: each flag is a document of its own (an <img> or <image>).
+ */
+function nestedFlag(svg, fit) {
+  assert(FITS[fit], `fit ${fit}`);
+  const document = svg.ownerDocument;
+  const walker = [...svg.querySelectorAll('*')];
+  for (const node of walker) {
+    if (!node.isConnected) continue;
+    if (DROP_ELEMENTS.has(node.localName) || (node.prefix && EDITOR_NAMESPACES.test(node.prefix))) {
+      node.remove();
+      continue;
+    }
+    if (node.localName === 'style') assert(!/@import|url\(\s*['"]?(?!#)/.test(node.textContent), 'a stylesheet that loads something');
+    for (const attribute of [...node.attributes]) {
+      const name = attribute.name;
+      if (/^on/i.test(name) || (attribute.prefix && EDITOR_NAMESPACES.test(attribute.prefix)) || name === 'xml:space') node.removeAttribute(name);
+      else if (/(^|:)href$/.test(name)) assert(attribute.value.startsWith('#'), `an external reference ${attribute.value}`);
+    }
+  }
+  const comments = document.createTreeWalker(svg, 128 /* NodeFilter.SHOW_COMMENT */);
+  const dead = [];
+  while (comments.nextNode()) dead.push(comments.currentNode);
+  for (const comment of dead) comment.remove();
+  let viewBox = svg.getAttribute('viewBox');
+  if (!viewBox) {
+    const width = parseFloat(svg.getAttribute('width')), height = parseFloat(svg.getAttribute('height'));
+    assert(width > 0 && height > 0, 'a flag needs a viewBox or a size');
+    viewBox = `0 0 ${width} ${height}`;
+  }
+  viewBox = viewBox.trim().split(/[\s,]+/).map(Number).join(' ');
+  const serializer = new (svg.ownerDocument.defaultView.XMLSerializer)();
+  const inner = [...svg.children].map(node => serializer.serializeToString(node)
+    .replace(/ xmlns="http:\/\/www\.w3\.org\/2000\/svg"/g, '')).join('').replace(/>\s+</g, '><');
+  const xlink = /xlink:href/.test(inner) ? ' xmlns:xlink="http://www.w3.org/1999/xlink"' : '';
+  return { field: `<svg${xlink} width="640" height="480" viewBox="${viewBox}" preserveAspectRatio="${FITS[fit]}">${inner.replace(/ xmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink"/g, '')}</svg>`, emblem: '' };
+}
+
+// ---- big drawings, drawn once into a bitmap ----
+
+// A flag whose drawing, nested as above, passes this size (an eagle, a wreath, a coat of arms in hundreds of paths) is
+// drawn once at 640 x 480 and shipped as that bitmap, a WebP inside the same 4:3 SVG: a few kilobytes instead of
+// hundreds, which a chip and the map's Flags mode (src/engine/flagRaster.js) draw far sooner. Smaller ones stay vector.
+const RASTER_OVER = 40 * 1024;
+const rasterOf = async markup => sharp(Buffer.from(markup), { density: 72 }).resize(640, 480, { fit: 'fill' })
+  .webp({ quality: 90, alphaQuality: 100, effort: 6 }).toBuffer();
+const bitmapFlag = (file, webp) => `<svg xmlns="http://www.w3.org/2000/svg" id="flag-historic-${file}" viewBox="0 0 640 480">`
+  + `<image width="640" height="480" preserveAspectRatio="none" href="data:image/webp;base64,${webp.toString('base64')}"/></svg>\n`;
+/** The mean difference of two images' pixels (0-255 per channel): libvips can draw an SVG a shade apart on another system. */
+async function pixelDistance(a, b) {
+  const [x, y] = await Promise.all([a, b].map(input => sharp(input).ensureAlpha().raw().toBuffer()));
+  assert.equal(x.length, y.length, 'the same size');
+  let sum = 0;
+  for (let i = 0; i < x.length; i++) sum += Math.abs(x[i] - y[i]);
+  return sum / x.length;
+}
+
+// A flag pinned as Wikimedia's 1280px PNG of its drawing (when the server refused the original SVG to bulk downloads,
+// asking for its standard thumbnails instead): fitted to 640 x 480 as `fit` says, a WebP inside the SVG like the rest.
+const SHARP_FITS = { stretch: { fit: 'fill' }, slice: { fit: 'cover', position: 'centre' }, 'slice-hoist': { fit: 'cover', position: 'left' } };
+
 let built = 0;
 const report = [];
+const attribution = [];
 for (const flag of manifest.flags) {
+  if (/\.png$/i.test(flag.source)) {
+    const bytes = await readFile(path.join(root, flag.source));
+    assert.equal(sha256(bytes), flag.sha256, `${flag.source}: not the pinned thumbnail`);
+    assert.equal(FLAG_CODES[flag.flagId], flag.file, `src/data/flags.js must map ${flag.flagId} to ${flag.file}`);
+    assert(SHARP_FITS[flag.fit], `${flag.file}: fit ${flag.fit}`);
+    assert(!FLAG_SYMBOLS[flag.file], `${flag.file}: a bitmap flag has no emblem profile`);
+    const webp = await sharp(bytes).resize(640, 480, SHARP_FITS[flag.fit]).webp({ quality: 90, alphaQuality: 100, effort: 6 }).toBuffer();
+    const target = path.join(root, 'public', 'flags', `${flag.file}.svg`);
+    if (check) {
+      const embedded = /href="data:image\/webp;base64,([^"]+)"/.exec((await readFile(target, 'utf8')))?.[1];
+      assert(embedded, `${flag.file}.svg: not the bitmap flag it should be`);
+      const distance = await pixelDistance(Buffer.from(embedded, 'base64'), webp);
+      assert(distance < 1.5, `${flag.file}.svg: its bitmap differs (mean ${distance.toFixed(2)} per channel)`);
+    } else await writeFile(target, bitmapFlag(flag.file, webp));
+    attribution.push([`${flag.file}.svg`, flag.name, flag.flies, flag.commons.title.replace(/^File:/, ''), flag.licence.replace(/\s+/g, ' '), flag.commons.page].join('\t'));
+    built++;
+    continue;
+  }
   const raw = await readFile(path.join(root, flag.source));
   const text = raw.toString('utf8').replace(/\r\n/g, '\n');
   assert.equal(sha256(text), flag.lfSha256, `${flag.source}: not the pinned snapshot`);
   assert.equal(FLAG_CODES[flag.flagId], flag.file, `src/data/flags.js must map ${flag.flagId} to ${flag.file}`);
   const svg = new JSDOM(text, { contentType: 'image/svg+xml' }).window.document.documentElement;
-  const { field, emblem } = RECIPES[flag.file](svg);
-  const out = `<svg xmlns="http://www.w3.org/2000/svg" id="flag-historic-${flag.file}" viewBox="0 0 640 480">${field}${emblem}</svg>\n`;
+  const { field, emblem } = RECIPES[flag.file] ? RECIPES[flag.file](svg) : nestedFlag(svg, flag.fit);
+  let out = `<svg xmlns="http://www.w3.org/2000/svg" id="flag-historic-${flag.file}" viewBox="0 0 640 480">${field}${emblem}</svg>\n`;
   const target = path.join(root, 'public', 'flags', `${flag.file}.svg`);
-  if (check) assert.equal((await readFile(target, 'utf8')).replace(/\r\n/g, '\n'), out, `${flag.file}.svg: generated flag differs`);
+  if (!RECIPES[flag.file] && out.length > RASTER_OVER) {
+    // A bitmap: checked by its pixels, which another system's libvips may draw a shade apart.
+    const webp = await rasterOf(out);
+    out = bitmapFlag(flag.file, webp);
+    if (check) {
+      const shipped = (await readFile(target, 'utf8')).replace(/\r\n/g, '\n');
+      const embedded = /href="data:image\/webp;base64,([^"]+)"/.exec(shipped)?.[1];
+      assert(embedded, `${flag.file}.svg: not the bitmap flag it should be`);
+      const distance = await pixelDistance(Buffer.from(embedded, 'base64'), webp);
+      assert(distance < 1.5, `${flag.file}.svg: its bitmap differs (mean ${distance.toFixed(2)} per channel)`);
+    } else await writeFile(target, out);
+  } else if (check) assert.equal((await readFile(target, 'utf8')).replace(/\r\n/g, '\n'), out, `${flag.file}.svg: generated flag differs`);
   else await writeFile(target, out);
+  attribution.push([`${flag.file}.svg`, flag.name, flag.flies, flag.commons.title.replace(/^File:/, ''), flag.licence.replace(/\s+/g, ' '), flag.commons.page].join('\t'));
   const profile = FLAG_SYMBOLS[flag.file];
   if (emblem) {
     const { exact, ...bounds } = boundsOf(emblem);
@@ -324,5 +432,16 @@ for (const flag of manifest.flags) {
   }
   built++;
 }
+// Every historic flag's source, licence and page beside the flags (CC BY-SA drawings need their credit where they ship).
+const sources = [
+  '# Historic flags in this folder: GENERATED by scripts/build-historic-flags.mjs from scripts/data/historic-flags.json.',
+  '# Each is a Wikimedia Commons SVG redrawn on the 640 x 480 canvas (or drawn into a bitmap there, when big). Most are in',
+  '# the public domain; a drawing under CC BY-SA keeps that licence in its 4:3 version, credited to its author here.',
+  ['image', 'flag', 'flown', 'Commons file', 'licence', 'file page'].join('\t'),
+  ...attribution,
+].join('\n') + '\n';
+const sourcesFile = path.join(root, 'public', 'flags', 'SOURCES-historic.tsv');
+if (check) assert.equal((await readFile(sourcesFile, 'utf8')).replace(/\r\n/g, '\n'), sources, 'public/flags/SOURCES-historic.tsv differs');
+else await writeFile(sourcesFile, sources);
 console.log(report.join('\n'));
 console.log(`${check ? 'Verified' : 'Generated'} ${built} historic flags in public/flags.`);

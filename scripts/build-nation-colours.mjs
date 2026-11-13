@@ -56,7 +56,11 @@ const isGrey = colour => toOklch(colour)[1] < GREY_CHROMA;
 
 /** A flag's colours, largest first: [{ colour, share }]. */
 async function flagColours(code) {
-  const data = await sharp(path.join(root, 'public/flags', `${code}.svg`), { density: 96 })
+  const file = path.join(root, 'public/flags', `${code}.svg`);
+  // A bitmap flag (scripts/build-historic-flags.mjs: a WebP inside the SVG) is read from its bitmap: librsvg, which
+  // sharp draws SVGs with, draws no embedded WebP.
+  const bitmap = /href="data:image\/(?:webp|png);base64,([^"]+)"/.exec(await readFile(file, 'utf8'))?.[1];
+  const data = await sharp(bitmap ? Buffer.from(bitmap, 'base64') : file, bitmap ? {} : { density: 96 })
     .resize(120, 90, { fit: 'fill' }).removeAlpha().raw().toBuffer();
   const clusters = [];
   for (let i = 0; i < data.length; i += 3) {

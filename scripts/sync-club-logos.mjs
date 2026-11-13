@@ -403,9 +403,11 @@ await Promise.all(clubs.filter(club => !club.twin).map(club => work(async () => 
 })));
 for (const club of clubs.filter(entry => entry.twin && crests.has(entry.twin))) crests.set(club.id, { ...crests.get(club.twin), file: club.twin });
 
-// Files of clubs that no longer have a crest go.
+// Files of clubs that no longer have a crest go. A period crest ('<club id>.<year>.webp') is scripts/sync-crest-eras.mjs's.
 for (const name of await readdir(outDir)) {
-  if (name.endsWith('.webp') && ![...crests.values()].some(crest => `${crest.file}.webp` === name)) await rm(path.join(outDir, name));
+  if (name.endsWith('.webp') && !/\.\d{4}\.webp$/.test(name) && ![...crests.values()].some(crest => `${crest.file}.webp` === name)) {
+    await rm(path.join(outDir, name));
+  }
 }
 
 // ---- Outputs ----

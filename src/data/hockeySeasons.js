@@ -68,4 +68,10 @@ export const BUILT_IN_HOCKEY_SEASONS = Object.freeze([
   Object.freeze({ id: 'nhl-1969', version: 'nhl-1969-9e27c211', year: 1969, season: '1968/69', label: 'Computed from statistics', map: 'nhl1968', credit: CREDIT_DATABANK }),
   Object.freeze({ id: 'nhl-1968', version: 'nhl-1968-54c1e858', year: 1968, season: '1967/68', label: 'Computed from statistics', map: 'nhl1968', credit: CREDIT_DATABANK }),
   Object.freeze({ id: 'nhl-1967', version: 'nhl-1967-0a920d5b', year: 1967, season: '1966/67', label: 'Computed from statistics', map: 'nhl1967', credit: CREDIT_DATABANK }),
+  Object.freeze({ id: 'nhl-1966', version: 'nhl-1966-00541631', year: 1966, season: '1965/66', label: 'Computed from statistics', map: 'nhl1967', credit: CREDIT_DATABANK }),
+  Object.freeze({ id: 'nhl-1965', version: 'nhl-1965-c2806ce1', year: 1965, season: '1964/65', label: 'Computed from statistics', map: 'nhl1967', credit: CREDIT_DATABANK }),
+  Object.freeze({ id: 'nhl-1964', version: 'nhl-1964-aec2930c', year: 1964, season: '1963/64', label: 'Computed from statistics', map: 'nhl1967', credit: CREDIT_DATABANK }),
+  Object.freeze({ id: 'nhl-1963', version: 'nhl-1963-d2b6d3f0', year: 1963, season: '1962/63', label: 'Computed from statistics', map: 'nhl1967', credit: CREDIT_DATABANK }),
+  Object.freeze({ id: 'nhl-1962', version: 'nhl-1962-f422a796', year: 1962, season: '1961/62', label: 'Computed from statistics', map: 'nhl1967', credit: CREDIT_DATABANK }),
+  Object.freeze({ id: 'nhl-1961', version: 'nhl-1961-2b3178bc', year: 1961, season: '1960/61', label: 'Computed from statistics', map: 'nhl1967', credit: CREDIT_DATABANK }),
 ]);

@@ -72,7 +72,7 @@ export const NATION_COLOURS = Object.freeze({
   '324': ['#009900', 0], // Guinea
   '328': ['#4c9e5c', 1], // Guyana
   '332': ['#d21034', 2], // Haiti
-  '340': ['#ffffff', 1], // Honduras
+  '340': ['#feffff', 1], // Honduras
   '348': ['#4c9e5c', 1], // Hungary
   '352': ['#4b6fd8', 1], // Iceland
   '356': ['#4b8be0', 1], // India

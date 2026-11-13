@@ -116,6 +116,8 @@ npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned 
 npm run sync:early-nationalities # ask Wikidata (via QLever) for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
 npm run sync:world-cup-seasons # read the pinned World Cup, results and Wikipedia sources in data-src/ into scripts/data/world-cup-seasons/
 npm run build:world-cup-seasons # rebuild the computed World Cup seasons 1961/62 to 1993/94 from those facts (offline; --check to verify)
+npm run sync:national-team-seasons # read the pinned Wikidata answers (via QLever), results and Ballon d'Or pages in data-src/ into scripts/data/national-team-seasons/ (--fetch downloads what is missing)
+npm run build:national-team-seasons # rebuild the computed seasons between those World Cups, 1962/63 to 1992/93, from those facts (offline; --check to verify)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page and sources in data-src/
 npm run sync:euroleague  # snapshot the EuroLeague's rosters and box scores from its public API into scripts/data/euroleague-2026-27.json (network, cached)
@@ -329,7 +331,9 @@ manager of the theatre's favourite, with decisions from the first match.
    Sensible World of Soccer for 1996/97 to 1994/95, and fans' databases for
    1993/94 and 1989/90; 2005/06, 2004/05, 1996/97 and 1989/90 have nations
    only), the World Cups of 1961/62 to 1993/94 (computed from each
-   finalist's Elo and its players' records, nations only), and any local
+   finalist's Elo and its players' records, nations only) and every season
+   between them (computed from each nation's Elo and its players' Wikidata
+   caps, nations only), so every year has a season, and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), then 1998/99 (NBA Live 99), 1991/92 and
@@ -347,7 +351,7 @@ manager of the theatre's favourite, with decisions from the first match.
    built-in 2026/27, then its [earlier seasons](#womens-football-seasons) 2025/26
    back to 2015/16 (EA ratings of each; national teams only before 2022/23), ice
    hockey its built-in 2026/27, then its [earlier seasons](#ice-hockey-seasons)
-   2025/26 back to 1966/67 but the cancelled 2004/05 (EA's NHL ratings where an
+   2025/26 back to 1960/61 but the cancelled 2004/05 (EA's NHL ratings where an
    edition published them, else converted or computed from the players'
    statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
@@ -1662,6 +1666,31 @@ nations only, 15 to 24 of them.
   `data-src/` into the committed facts; `npm run build:world-cup-seasons` turns
   them into the season files, offline, and `--check` compares byte for byte.
 
+### The seasons between the World Cups, 1962/63 to 1992/93 (computed)
+
+The 24 seasons between those World Cups are computed the same way, so football
+has a season ending in every year from 1962 on ("1971/72 · computed"). Their
+players come from Wikidata's national-team records (CC0, read through QLever):
+each player's stints for his national team with their years, caps and goals.
+
+- **Who plays:** every nation whose players' stints cover the season name eleven
+  with a position, one a goalkeeper, and that played a full international in the
+  four years before: 37 nations in 1963/64, 81 in 1992/93. Each plays under the
+  federation of its day, as in the World Cup seasons (the CIS in 1991/92;
+  Yugoslavia sits out its suspension of 1992).
+- **Ratings:** the World Cup seasons' line from the nation's Elo on 1 July of the
+  season's end year; its eleven the players of each role with the most caps a
+  year, ordered by Ballon d'Or votes, then caps by then (Cruyff leads the
+  Netherlands in 1971/72, Gullit and van Basten in 1987/88).
+- **Theatres:** the world, the Elite 32, and each continent with four sides of its
+  own (Europe and South America throughout, Asia from 1966/67, Africa from
+  1970/71, North America from 1971/72).
+- **Rebuild:** `npm run sync:national-team-seasons` reads the pinned sources in
+  `data-src/` (`--fetch` downloads what is missing) into the committed facts;
+  `npm run build:national-team-seasons` turns them into the season files, and
+  `--check` compares byte for byte. `public/football/ATTRIBUTION-national-teams.txt`
+  credits the sources and licenses the season files under CC BY-SA 4.0.
+
 The [design notes](docs/design/football-years.md) give the file format, the
 runtime, the saves and the known limits.
 
@@ -1904,11 +1933,11 @@ only when chosen.
 
 ## Ice hockey seasons
 
-Ice hockey can be played on every NHL season from 1966/67 to 2025/26 but the
+Ice hockey can be played on every NHL season from 1960/61 to 2025/26 but the
 cancelled 2004/05, as well as the built-in 2026/27. Five are one EA edition's
 ratings of an NHL season: 2021/22 (NHL 22), 2006/07 (NHL 07), 1994/95 (NHL 95),
 1993/94 (NHL '94) and 1992/93 (NHLPA '93); 2007/08 and 2008/09 are NHL 08's and
-NHL 09's attributes, the overall converted; the other 52 are computed from the
+NHL 09's attributes, the overall converted; the other 58 are computed from the
 players' statistics, the Hockey Databank's to 2009/10 and MoneyPuck.com's after
 ([design notes](docs/design/hockey.md#computed-seasons)).
 Pick one under **Season** in setup; it plays its nations, by birth country or
@@ -1925,7 +1954,7 @@ season is a file in `public/hockey/` that loads only when chosen.
   most games for.
 - **Credits:** setup shows a season's credit as small text under the Season
   choice, whole: the Hockey Databank's statement, as its terms ask, on every
-  season that takes anything from it (the 37 computed from it, NHL 08 and NHL
+  season that takes anything from it (the 43 computed from it, NHL 08 and NHL
   09, and the MoneyPuck seasons whose birth countries it fills), and "Data:
   MoneyPuck.com" on the 15 computed from MoneyPuck's data, which MoneyPuck allows
   for non-commercial use only. `public/hockey/ATTRIBUTION.txt` lists the sources
@@ -2249,6 +2278,34 @@ no runtime dependency on it. Football's federations of the day fly flags flag-ic
 does not have, under flag ids of their own (`URS`, `CIS`, `YUG`, `FRY`, `ZAI`):
 public-domain Wikimedia Commons SVGs, pinned in `scripts/data/historic-flags.json`
 and redrawn on the same 4:3 canvas by `npm run build:historic-flags`.
+
+### Flags and crests of the day
+
+A season of another day shows each nation under the flag it flew on the season's
+cutoff (30 June of the season's year) and each club under the crest it wore that
+season ([period-marks.md](docs/design/period-marks.md)). Canada flies the Red Ensign
+before 1965, the United States 49 stars in 1960, Spain the eagle of 1945 or 1977
+before 1982, South Africa its 1928 flag before 1994, Iran the lion and sun, and so
+on (`src/data/flagsOfTheDay.js`); a state of another name plays under it
+(`src/data/namesOfTheDay.js`: the Soviet Union, Czechoslovakia, Yugoslavia, West
+Germany, Rhodesia, Zaire, FR Yugoslavia). Today's flags are flag-icons', except
+Honduras's: navy blue again since 27 January 2026 (its turquoise flag flies only in
+the seasons of 2022 to 2025). The flags of the day are Wikimedia Commons drawings,
+most in the public domain, six (Spain's and Bulgaria's arms, Rhodesia's flag of 1964)
+CC BY-SA and credited in
+`public/flags/SOURCES-historic.tsv`; a drawing bigger than 40 KB ships as a 640×480
+WebP inside its SVG.
+
+A club's crests by season are in `scripts/data/crest-eras.json`: each period crest's
+club, years, source and licence, and each club's eras. `npm run sync:crest-eras`
+draws them (from the originals cached in the ignored `data-src/crest-eras/`) into
+`public/club-logos/<club id>.<first year>.webp`, lists them in
+`public/club-logos/SOURCES-eras.tsv` and writes `src/data/clubCrestEras.js`. Where
+the game knows a club wore another crest but has no picture of it, the club shows its
+monogram in those seasons rather than a crest it did not have yet; seasons no source
+dates, and clubs not yet researched, keep today's crest. Period crests come
+only from sources whose robots.txt allows it: Wikipedia articles and file pages in
+any language, Wikimedia Commons, and the Wayback Machine's copies of them.
 
 ### Club crests
 
@@ -2595,7 +2652,7 @@ public/
   countries-50m.json   world-atlas 2.0.2 topology for display
   WORLD_ATLAS_LICENSE.txt  ISC licence for world-atlas
   domestic/            one sectioned map per country, the NBA's (nba.json, nba2000.json …), the NFL's (nfl.json) and the EuroLeague's (euroleague.json), fetched on demand
-  football/            the built-in earlier football seasons (ea-*.json, cm*.json, swos-9697.json, swos-9596.json, swos-9495.json, wc-*.json), fetched when chosen
+  football/            the built-in earlier football seasons (ea-*.json, cm*.json, swos-9697.json, swos-9596.json, swos-9495.json, wc-*.json, nt-*.json), fetched when chosen
   womens-football/     the built-in earlier women's football seasons (eaw-*.json), fetched when chosen
   basketball/          the built-in earlier basketball seasons (nba-2k*.json, nba-eras-*.json, nba-live-99.json, nba-stats-*.json), fetched when chosen
   american-football/   the built-in earlier NFL and AFL seasons (madden-*.json, tecmo-*.json, pfa-*.json, pfa-afl-*.json), fetched when chosen
@@ -2620,6 +2677,7 @@ scripts/
   sync-flags.mjs       vendors flag SVGs from flag-icons
   build-historic-flags.mjs  redraws the federations of the day's public-domain flags
   sync-world-cup-seasons.mjs, build-world-cup-seasons.mjs  the computed World Cup seasons: sources → facts → seasons
+  sync-national-team-seasons.mjs, build-national-team-seasons.mjs  the computed seasons between them: Wikidata → facts → seasons
   build-rosters.mjs    builds football squads from an EA FC export
   build-basketball.mjs builds FIBA fives from NBA 2K + fiba-squads.json
   build-clubs.mjs      builds the club layer for both sports
