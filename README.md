@@ -2289,7 +2289,7 @@ draws them (from the originals cached in the ignored `data-src/crest-eras/`) int
 `public/club-logos/SOURCES-eras.tsv` and writes `src/data/clubCrestEras.js`. Where
 the game knows a club wore another crest but has no picture of it, the club shows its
 monogram in those seasons rather than a crest it did not have yet; seasons no source
-dates, and clubs not yet researched, keep today's crest. Period crests come
+dates keep today's crest. Period crests come
 only from sources whose robots.txt allows it: Wikipedia articles and file pages in
 any language, Wikimedia Commons, and the Wayback Machine's copies of them.
 

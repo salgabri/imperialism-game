@@ -100,8 +100,8 @@ Only a crest known to have been another is null. A redraw that looks the same at
 chip size (a tidied outline, another shade, a star added) is the same crest, so
 Calgary's flaming C with its black trim (1995-2020), Pittsburgh's penguin in Vegas
 gold (2003-2016) and Buffalo's crest in navy (2011-2020) show today's. Seasons no
-source dates (a researcher's "none" for want of any source) and the clubs not yet
-researched keep today's crest, as before. Three retired caricatures of Native
+source dates (a researcher's "none" for want of any source) keep today's crest, as
+before. Three retired caricatures of Native
 Americans are left out, as the game already leaves out Washington's retired name:
 Washington's logo to 2019, Cleveland's Chief Wahoo to 2018 and the Philadelphia
 Warriors' to 1962 show the monogram.
@@ -119,17 +119,21 @@ Period crests come only from sources whose robots.txt allows automated access:
 - Wikipedia articles and file pages in any language (`/wiki/` pages; never the API
   under `/w/` or `/api/`, never `Special:` pages), Wikimedia Commons file and
   category pages, and original files on upload.wikimedia.org (never Commons'
-  `/archive/` of old file versions).
+  `/archive/` of old file versions, which its robots.txt disallows; older versions
+  of German and Russian Wikipedia's own files, which it allows, were read to date a
+  few crests, and none ships).
 - The Wayback Machine's captures of Wikipedia articles and files, where a team's
   article of 2004-2016 showed the logo it wore then: the thumbnail the archived page
   showed, fetched with the `id_` or `im_` flag (both serve the archived bytes as they
   were), its capture named in `crest-eras.json`.
 
 SportsLogos.net disallows ClaudeBot and Logopedia (logos.fandom.com) refuses bots,
-so neither is used. English Wikipedia keeps few historical logos (its non-free
-content policy removed most); French, German and Italian Wikipedia and Commons hold
-many old football badges. Where no picture of a crest known to differ exists, the
-club shows its monogram in those seasons.
+so neither is used; a few Wikipedia files name one of them as where their uploader
+found the logo, and those are fetched from Wikipedia only. English Wikipedia keeps
+few historical logos (its non-free content policy removed most); French, German and
+Italian Wikipedia and Commons hold many old football badges, and German Wikipedia's
+own files many Dutch and Portuguese ones. Where no picture of a crest known to differ
+exists, the club shows its monogram in those seasons.
 
 The research (data-src/crest-eras/: the briefs, the club lists, each league's
 findings and the cached originals) is ignored by git. `npm run sync:crest-eras`
@@ -142,23 +146,30 @@ is present. `sync:club-logos` leaves period crests alone.
 
 ### Coverage
 
-As of 13 November 2026: 412 period crests for 463 club ids. Of the club-seasons
-before today's season (each club id in each season year it plays):
+As of 14 November 2026: 538 period crests for 624 club ids, every club the game has
+researched. Of the club-seasons before today's season (each club id in each season
+year it plays):
 
 | Sport | Period crest | Today's crest, researched | Today's crest, unverified | Monogram |
 |---|---|---|---|---|
-| Football (men's) | 26% | 32% | 11% | 9% |
+| Football (men's) | 41% | 45% | 1% | 9% |
 | American football | 36% | 52% | 0% | 12% |
 | Basketball (NBA) | 29% | 37% | 0% | 34% |
-| Baseball | 19% | 55% | 8% | 18% |
-| Ice hockey | 26% | 55% | 4% | 14% |
+| Baseball | 25% | 57% | 0% | 18% |
+| Ice hockey | 29% | 56% | 4% | 11% |
 | Rugby league | 52% | 47% | 0% | 1% |
 | Women's football | 5% | 73% | 0% | 22% |
 
-The rest of men's football (22%) are clubs with no crest at all, as before: a
-monogram. Not yet researched: 71 English, Dutch and Portuguese clubs and about 30
-Spanish ones (today's crest); the NBA's monograms are mostly logos of 1961-2005 that
-no allowed source still shows.
+The rest of men's football (4%) are club ids with no crest today and no dated one: a
+monogram. The unverified seasons are those no source dates, mostly Dutch and
+Portuguese ones before 2005, when Wikipedia's articles began to show their crests;
+the NBA's monograms are mostly logos of 1961-2005 that no allowed source still shows.
+
+A second round (13-14 November 2026) researched the 71 English, Dutch and Portuguese
+clubs the first had left, the Spanish, Italian, German, MLB and NFL seasons it had
+left undated, the 2003/04 football season and the NHL's 1960/61 to 1965/66, and
+corrected two of its findings (Venezia's crests since 2022, Reggina's gallery
+captions).
 
 Crests are the clubs' trademarks; as with today's crests (the user's choice of
 Wikipedia crests, 2026-10-25), many are non-free files that Wikipedia hosts under
